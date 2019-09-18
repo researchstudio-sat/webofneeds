@@ -8,7 +8,7 @@
   - [7. Use the provided code style](#7-use-the-provided-code-style)
   - [8. Set maven profile `skip-tests`](#8-set-maven-profile-skip-tests)
   - [9. Maven install](#9-maven-install)
-  - [10. On Windows: <PROJECT_ROOT>/webofneeds/won-owner-webapp/src/main/webapp/node/npm -g windows-build-tools](#10-on-windows-projectrootwebofneedswon-owner-webappsrcmainwebappnodenpm--g-windows-build-tools)
+  - [10. On Windows: build-tools for project-local npm](#10-on-windows-build-tools-for-project-local-npm)
   - [11. Copy and Adjust Configurations](#11-copy-and-adjust-configurations)
   - [12. Download/Install the latest Tomcat 9 server](#12-downloadinstall-the-latest-tomcat-9-server)
   - [13. Add Tomcat to Eclipse](#13-add-tomcat-to-eclipse)
@@ -121,7 +121,7 @@ Either run `mvn install -P skip-tests` in the command-line or right-click "webof
 
 Further information on what you can do with the maven-configuration can be found in [./maven.md](./maven.md).
 
-## 10. On Windows: <PROJECT_ROOT>/webofneeds/won-owner-webapp/src/main/webapp/node/npm -g windows-build-tools
+## 10. On Windows: build-tools for project-local npm
 
 When you the maven-install reaches the owner-application, the maven-frontend plugin will install it's own version of `npm`. Using that run the following with admin permissions:
 
