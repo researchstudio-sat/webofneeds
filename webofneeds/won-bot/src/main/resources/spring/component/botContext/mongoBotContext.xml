@@ -50,7 +50,4 @@
     <bean id="mongoBotContext" class="won.bot.framework.bot.context.MongoBotContext">
         <property name="template" ref="mongoTemplate"/>
     </bean>
-
-    <bean id="memoryBotContext" class="won.bot.framework.bot.context.MemoryBotContext" primary="true"/>
-
 </beans>

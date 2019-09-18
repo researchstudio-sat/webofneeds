@@ -90,4 +90,7 @@
     <!-- bean id="nodeUriSourceRandom" class="won.bot.framework.component.nodeurisource.impl.RandomMultiNodeUriSource">
         <property name="nodeURIs" value="#{'${won.node.uris}'.split(' ')}"/>
     </bean -->
+
+    <!-- Import the correct botContext so we do not create all possible botContexts (currently possible: memoryBotContext and mongoBotContext)-->
+    <import resource="classpath:/spring/component/botContext/${botContext.impl}.xml" />
 </beans>
