@@ -1,3 +1,8 @@
+# Outline
+
+The following document walks you through the steps required to set up for development on all Web of Needs components, which are Java Spring applications deployed to a Tomcat server via Eclipse. Maven is used for dependency managment and building.
+
+- [Outline](#outline)
 - [Building](#building)
   - [1. Java SDK version 8 or newer](#1-java-sdk-version-8-or-newer)
   - [2. Eclipse for Java Enterprise Developers (4.7 Oxygen or newer)](#2-eclipse-for-java-enterprise-developers-47-oxygen-or-newer)
