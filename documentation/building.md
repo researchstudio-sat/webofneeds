@@ -28,7 +28,7 @@
   - [Out of memory error](#out-of-memory-error)
   - [icu4j: Invalid byte tag in constant pool](#icu4j-invalid-byte-tag-in-constant-pool)
   - [won.protocol.exception.RDFStorageException: Could not create File!](#wonprotocolexceptionrdfstorageexception-could-not-create-file)
-  - [Port Bind Problem: org.apache.coyote.AbstractProtocol.init Failed to initialize end point associated with ProtocolHandler ["http-apr-8443"]](#port-bind-problem-orgapachecoyoteabstractprotocolinit-failed-to-initialize-end-point-associated-with-protocolhandler-%22http-apr-8443%22)
+  - [Port Bind Problem - Failed to initialize end point associated with ProtocolHandler](#port-bind-problem---failed-to-initialize-end-point-associated-with-protocolhandler)
   - [maven dies in won-owner-webapp during 'clean' task](#maven-dies-in-won-owner-webapp-during-clean-task)
   - [java.security.NoSuchProviderException: no such provider: BC](#javasecuritynosuchproviderexception-no-such-provider-bc)
   - [Exception in Owner-Webapp log: PKIX path building failed](#exception-in-owner-webapp-log-pkix-path-building-failed)
@@ -390,7 +390,11 @@ Check the error message for the actual directory in question. Expect something l
 Caused by: java.io.FileNotFoundException: C:\Program Files\apache-tomcat-7.0.35\temp\1.ttl (Access denied)
 ```
 
-## Port Bind Problem: org.apache.coyote.AbstractProtocol.init Failed to initialize end point associated with ProtocolHandler ["http-apr-8443"]
+## Port Bind Problem - Failed to initialize end point associated with ProtocolHandler
+
+```
+org.apache.coyote.AbstractProtocol.init Failed to initialize end point associated with ProtocolHandler ["http-apr-8443"]
+```
 
 This problem or other similar errors that can be referred as "port bind problems" are causd by setting the port that is used by WoN-node or WoN-webapp in the Tomcat Server Settings of IntelliJ. Leave the field "HTTP port" in the "Run/Debug Configurations" free (the default is 8080 and does not cause any problem).
 
