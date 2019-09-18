@@ -106,6 +106,8 @@ Right-click the webofneeds project in the Project Explorer Tab on the left side 
 
 Either run `mvn install -P skip-tests` in the command-line or right-click "webofneeds" in project explorer >> Run As >> Maven Install
 
+Further information on what you can do with the maven-configuration can be found in [./maven.md](./maven.md).
+
 ## 10. On Windows: <PROJECT_ROOT>/webofneeds/won-owner-webapp/src/main/webapp/node/npm -g windows-build-tools
 
 When you the maven-install reaches the owner-application, the maven-frontend plugin will install it's own version of `npm`. Using that run the following with admin permissions:
