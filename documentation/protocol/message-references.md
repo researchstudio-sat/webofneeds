@@ -17,7 +17,7 @@ Where `messageUri` is the URI of the message currently being processed and
 `previousMessageUri` is the URI of the referenced message.
 In addition to this triple, a signature reference is added to the message:
 
-_TODO: add signature reference_
+<!-- _TODO: add signature reference_ -->
 
 The message references serve the following purposes:
 
@@ -57,7 +57,7 @@ happening before `B`, while they may, on `Pa`'s counterpart `Pb`'s WoN node
 as `B` happening before `A`. This may happen independently of which participants
 send those messages. In order to detect such a case and take measures to avoid
 confusion, both participants should be able to access each other's messages.
-_TODO_ there may be a way to detect such a case solely based on message references.
+<!--_TODO_ there may be a way to detect such a case solely based on message references.-->
 
 This approach ensures the following invariants on the directed graph
 obtained by all message references.
@@ -71,7 +71,7 @@ obtained by all message references.
    at least one path to the atom's `Create` message
 1. A Response must always reference the message that it is a response to.
 
-_TODO explain AtomCreatedNotificationMessage_
+<!-- _TODO explain AtomCreatedNotificationMessage_ -->
 
 ## Invariants in SPARQL
 
