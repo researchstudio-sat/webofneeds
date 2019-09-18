@@ -80,7 +80,11 @@
     </bean>
 
 
-    <!-- Node Uri Source Beans -->
+    <!-- ####################### Node Uri Source Beans ####################################### -->
+    <!--
+        Only use one of the beans defined in here, otherwise nodeUriSourceRoundRobin will be chosen anyway
+        Due to the default-qualifier
+     -->
     <bean id="nodeUriSourceRoundRobin"
           class="won.bot.framework.component.nodeurisource.impl.RoundRobinMultiNodeUriSource">
         <property name="nodeURIs" value="#{'${won.node.uris}'.split(' ')}"/>
@@ -90,6 +94,7 @@
     <!-- bean id="nodeUriSourceRandom" class="won.bot.framework.component.nodeurisource.impl.RandomMultiNodeUriSource">
         <property name="nodeURIs" value="#{'${won.node.uris}'.split(' ')}"/>
     </bean -->
+    <!-- ##################################################################################### -->
 
     <!-- Import the correct botContext so we do not create all possible botContexts (currently possible: memoryBotContext and mongoBotContext)-->
     <import resource="classpath:/spring/component/botContext/${botContext.impl}.xml" />
