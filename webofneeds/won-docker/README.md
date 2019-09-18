@@ -16,12 +16,11 @@ The [steps](#steps) below should guide you quickly through everything necessary 
 
 ### Steps
 
-1. Download and install docker (https://www.docker.com)
-2. Download and install docker-compose (https://docs.docker.com/compose/)
-3. Download and run one of the following scripts:
+1. Download and install docker (https://www.docker.com) and docker-compose (https://docs.docker.com/compose/)
+2. Download and run one of the following scripts:
    - Bash: [deploy_bash.sh](/webofneeds/won-docker/deploy/local_image/deploy_bash.sh)
    - PowerShell: [deploy_powershell.ps1](/webofneeds/won-docker/deploy/local_image/deploy_powershell.ps1)
-4. After Docker downloading and starting the components you can access the owner and the node here:
+2. After Docker downloading and starting the components you can access the owner and the node here:
    - owner: [https://10.0.75.1:8082/owner](https://10.0.75.1:8082/owner)
    - wonnode: [https://10.0.75.1:8889/won](https://10.0.75.1:8889/won)
 
