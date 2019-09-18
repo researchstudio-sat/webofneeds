@@ -20,4 +20,4 @@ To renew the certificate note the following things:
 - check if everything works (HTTPS, websocket and JMS communication)
 
 # Troubleshooting
-Updating the certificates sometimes fails. If things have stopped working for you after a certificate renewal, this [troubleshooting tip](/documentation/troubleshooting.md#exception-in-owner-webapp-log-pkix-path-building-failed) may help.
+Updating the certificates sometimes fails. If things have stopped working for you after a certificate renewal, this [troubleshooting tip](/documentation/building.md#exception-in-owner-webapp-log-pkix-path-building-failed) may help.

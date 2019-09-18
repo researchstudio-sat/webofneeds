@@ -1,26 +1,39 @@
-- [1. Java SDK version 8 or newer](#1-java-sdk-version-8-or-newer)
-- [2. Eclipse for Java Enterprise Developers (4.7 Oxygen or newer)](#2-eclipse-for-java-enterprise-developers-47-oxygen-or-newer)
-- [3. Install Maven (3.3 or newer)](#3-install-maven-33-or-newer)
-- [4. Git Clone to Your Eclipse Workspace](#4-git-clone-to-your-eclipse-workspace)
-- [5. Import the Maven-project in Eclipse](#5-import-the-maven-project-in-eclipse)
-- [6. Deactivate "autobuild"](#6-deactivate-%22autobuild%22)
-- [7. Use the provided code style](#7-use-the-provided-code-style)
-- [8. Set maven profile `skip-tests`](#8-set-maven-profile-skip-tests)
-- [9. Maven install](#9-maven-install)
-- [10. On Windows: <PROJECT_ROOT>/webofneeds/won-owner-webapp/src/main/webapp/node/npm -g windows-build-tools](#10-on-windows-projectrootwebofneedswon-owner-webappsrcmainwebappnodenpm--g-windows-build-tools)
-- [11. Copy and Adjust Configurations](#11-copy-and-adjust-configurations)
-- [12. Download/Install the latest Tomcat 9 server](#12-downloadinstall-the-latest-tomcat-9-server)
-- [13. Add Tomcat to Eclipse](#13-add-tomcat-to-eclipse)
-- [14. Update Connector-Statement in Tomcat's server.xml](#14-update-connector-statement-in-tomcats-serverxml)
-- [15. Edit the Server Configuration in Eclipse](#15-edit-the-server-configuration-in-eclipse)
-  - [VM arguments](#vm-arguments)
-  - [Add the JSTL jar to classpath](#add-the-jstl-jar-to-classpath)
-  - [Add the required libs to the classpath](#add-the-required-libs-to-the-classpath)
-  - [Server Overview Options](#server-overview-options)
-  - [Options to speed up Startup](#options-to-speed-up-startup)
-- [16. Generate cryptographic keys](#16-generate-cryptographic-keys)
-- [17. Install the bouncycastle security provider and the trust manager](#17-install-the-bouncycastle-security-provider-and-the-trust-manager)
-- [18. Start server](#18-start-server)
+- [Building](#building)
+  - [1. Java SDK version 8 or newer](#1-java-sdk-version-8-or-newer)
+  - [2. Eclipse for Java Enterprise Developers (4.7 Oxygen or newer)](#2-eclipse-for-java-enterprise-developers-47-oxygen-or-newer)
+  - [3. Install Maven (3.3 or newer)](#3-install-maven-33-or-newer)
+  - [4. Git Clone to Your Eclipse Workspace](#4-git-clone-to-your-eclipse-workspace)
+  - [5. Import the Maven-project in Eclipse](#5-import-the-maven-project-in-eclipse)
+  - [6. Deactivate "autobuild"](#6-deactivate-%22autobuild%22)
+  - [7. Use the provided code style](#7-use-the-provided-code-style)
+  - [8. Set maven profile `skip-tests`](#8-set-maven-profile-skip-tests)
+  - [9. Maven install](#9-maven-install)
+  - [10. On Windows: <PROJECT_ROOT>/webofneeds/won-owner-webapp/src/main/webapp/node/npm -g windows-build-tools](#10-on-windows-projectrootwebofneedswon-owner-webappsrcmainwebappnodenpm--g-windows-build-tools)
+  - [11. Copy and Adjust Configurations](#11-copy-and-adjust-configurations)
+  - [12. Download/Install the latest Tomcat 9 server](#12-downloadinstall-the-latest-tomcat-9-server)
+  - [13. Add Tomcat to Eclipse](#13-add-tomcat-to-eclipse)
+  - [14. Update Connector-Statement in Tomcat's server.xml](#14-update-connector-statement-in-tomcats-serverxml)
+  - [15. Edit the Server Configuration in Eclipse](#15-edit-the-server-configuration-in-eclipse)
+    - [VM arguments](#vm-arguments)
+    - [Add the JSTL jar to classpath](#add-the-jstl-jar-to-classpath)
+    - [Add the required libs to the classpath](#add-the-required-libs-to-the-classpath)
+    - [Server Overview Options](#server-overview-options)
+    - [Options to speed up Startup](#options-to-speed-up-startup)
+  - [16. Generate cryptographic keys](#16-generate-cryptographic-keys)
+  - [17. Install the bouncycastle security provider and the trust manager](#17-install-the-bouncycastle-security-provider-and-the-trust-manager)
+  - [18. Start server](#18-start-server)
+- [Troubleshooting](#troubleshooting)
+  - [Tomcat complains about Missing Keystore](#tomcat-complains-about-missing-keystore)
+  - [Maven build fails with NoClassDefFoundException: java/sql/SQLException](#maven-build-fails-with-noclassdeffoundexception-javasqlsqlexception)
+  - [Out of memory error](#out-of-memory-error)
+  - [icu4j: Invalid byte tag in constant pool](#icu4j-invalid-byte-tag-in-constant-pool)
+  - [won.protocol.exception.RDFStorageException: Could not create File!](#wonprotocolexceptionrdfstorageexception-could-not-create-file)
+  - [Port Bind Problem: org.apache.coyote.AbstractProtocol.init Failed to initialize end point associated with ProtocolHandler ["http-apr-8443"]](#port-bind-problem-orgapachecoyoteabstractprotocolinit-failed-to-initialize-end-point-associated-with-protocolhandler-%22http-apr-8443%22)
+  - [maven dies in won-owner-webapp during 'clean' task](#maven-dies-in-won-owner-webapp-during-clean-task)
+  - [java.security.NoSuchProviderException: no such provider: BC](#javasecuritynosuchproviderexception-no-such-provider-bc)
+  - [Exception in Owner-Webapp log: PKIX path building failed](#exception-in-owner-webapp-log-pkix-path-building-failed)
+
+# Building
 
 ## 1. Java SDK version 8 or newer
 
@@ -251,7 +264,10 @@ Allow both webapps (owner-webapp and node-webapp) to start simultaneously:
 
 **NOTE:** The following guide assumes you want to run all services on the same machine. If you deploy these on different machines, use the respective IPs and Paths as suited/desired.
 
-1. We use the Apache Portable Runtime (APR) in the security modules of the Web of Needs. Normally, APR is included in the Tomcat by default, but it could happen (e.g. when you use the Tomcat for Windows installer) that it's not included. To be sure that you have APR, check your `<TOMCAT_FOLDER>/bin`. A DLL file called `tcnative-1.dll` MUST be there (if you're on Windows). On Linux it exist occur globally e.g. in `/usr/local/apr/lib/libtcnative-1.a` **NOTE:** After all the configurations below are done, if you have problems starting the tomcat (cannot be started, or started with the default keys, or complains about key format), most probably the APR library is not set up. Check Tomcat documenentation for OS specific setup, e.g. http://tomcat.apache.org/tomcat-9.0-doc/apr.html. For Mac OS users this is helpful: http://mrhaki.blogspot.co.at/2011/01/add-apr-based-native-library-for-tomcat.html (Mac Ports have to be installed)
+1. We use the Apache Portable Runtime (APR) in the security modules of the Web of Needs. Normally, APR is included in the Tomcat by default, but it could happen (e.g. when you use the Tomcat for Windows installer) that it's not included. To be sure that you have APR, check your `<TOMCAT_FOLDER>/bin`. A DLL file called `tcnative-1.dll` MUST be there (if you're on Windows). On Linux it exist occur globally e.g. in `/usr/local/apr/lib/libtcnative-1.a`
+
+   - At least on Ubuntu 18 you might need to compile it for yourself, see the [Ubuntu-installation notes](./ubuntu-installation-notes#building-tcnative)
+   - **NOTE:** After all the configurations below are done, if you have problems starting the tomcat (cannot be started, or started with the default keys, or complains about key format), most probably the APR library is not set up. Check Tomcat documenentation for OS specific setup, e.g. http://tomcat.apache.org/tomcat-9.0-doc/apr.html. For Mac OS users this is helpful: http://mrhaki.blogspot.co.at/2011/01/add-apr-based-native-library-for-tomcat.html (Mac Ports have to be installed)
 
 2. In the console navigate to the folder for the keystore created in previous steps (e.g. `/home/username/WoNKeystore/`), adapt(!) and run the following lines:
 
@@ -314,3 +330,93 @@ TODO I've also copied the jars to tomcat's lib folder (at no avail tho)
 ## 18. Start server
 
 Select Server in the "Servers"-Tab at the bottom and click play (or right-click the server and press "play" in the context-menu)
+
+# Troubleshooting
+
+## Tomcat complains about Missing Keystore
+
+```
+SEVERE [main] org.apache.tomcat.util.net.jsse.JSSESocketFactory.getStore Failed to load keystore type JKS with path C:\Users\[username]/.keystore due to C:\Users\[username]\.keystore
+ java.io.FileNotFoundException: C:\Users\[username]\.keystore
+```
+
+Reason: we use tomcat APR. This means that in `conf/server.xml`, the following line must be present:
+
+```xml
+<Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />
+```
+
+and the apache tomcat native library needs to be installed. On Windows, this means you find the file `tcnative-1.dll` in tomcats `lib` folder, for more information, see <http://tomcat.apache.org/native-doc/>.
+
+On linux you might need to build it for yourself, see "Ubuntu Installation Notes - Building TCNative](./ubuntu-installation-notes.md#building-tcnative)
+
+## Maven build fails with NoClassDefFoundException: java/sql/SQLException
+
+Turns out that you need to have a JDK installed. Download a recent JDK and tell eclipse to use that one by default: `Window >> Preferences >> Java >> Installed JREs`. For me, Jdk11 did not work, but Jdk8u202 did.
+
+## Out of memory error
+
+If you run your project and encounter a "Out of memory" error you should probably add this to your run configuration: `-XX:MaxPermSize=128M`. This should only be necessary if you use JDK 1.8.
+
+## icu4j: Invalid byte tag in constant pool
+
+If you get a compile error like below you can just ignore it. There is a corrupt `.class` file in the maven dependencies and will go away with future updates and everything is OK untill you use it, but you won't. This will only affect Chinese speaking users since it is the `LocaleElements_zh__PINYIN.class` file for Pinyin.
+
+Another possibility is to find the icu4j `.jar` file and delete the `LocaleElements_zh__PINYIN.class` file. This is a quick and dirty hack, but it works.
+
+```
+Apr 16, 2013 2:07:59 PM org.apache.catalina.startup.ContextConfig processAnnotationsJar
+SEVERE: Unable to process Jar entry [com/ibm/icu/impl/data/LocaleElements_zh__PINYIN.class] from Jar [jar:file:/C:/DATA/atus/Code/webofneeds/webofneeds/won-node-webapp/target/won/WEB-INF/lib/icu4j-2.6.1.jar!/] for annotations
+org.apache.tomcat.util.bcel.classfile.ClassFormatException: Invalid byte tag in constant pool: 60
+at org.apache.tomcat.util.bcel.classfile.Constant.readConstant(Constant.java:133)
+at org.apache.tomcat.util.bcel.classfile.ConstantPool.<init>(ConstantPool.java:60)
+```
+
+More info about this error can be found at:
+
+- http://stackoverflow.com/questions/6751920/tomcat-7-servlet-3-0-invalid-byte-tag-in-constant-pool
+- http://maven.40175.n5.nabble.com/Problem-when-mvn-site-site-Generating-quot-Dependencies-quot-report-td113470.html
+- http://jira.codehaus.org/browse/MPIR-142
+
+## won.protocol.exception.RDFStorageException: Could not create File!
+
+This means that Tomcat could not access the temp directory where it stores the `.ttl` files. This is either the `TMP` global variable or the `%tomcat_dir%/tmp` directory. The problem is that if you're on Windows and installed Tomcat in `C:/Program Files/`. Unless you are an admin you will not have access to any of these.
+
+You can either grant your user access to one of these directories or change the directory in `won-node/src/main/resources.localhost/` by changing the `rdf.file.path`.
+
+Check the error message for the actual directory in question. Expect something like
+
+```
+Caused by: java.io.FileNotFoundException: C:\Program Files\apache-tomcat-7.0.35\temp\1.ttl (Access denied)
+```
+
+## Port Bind Problem: org.apache.coyote.AbstractProtocol.init Failed to initialize end point associated with ProtocolHandler ["http-apr-8443"]
+
+This problem or other similar errors that can be referred as "port bind problems" are causd by setting the port that is used by WoN-node or WoN-webapp in the Tomcat Server Settings of IntelliJ. Leave the field "HTTP port" in the "Run/Debug Configurations" free (the default is 8080 and does not cause any problem).
+
+## maven dies in won-owner-webapp during 'clean' task
+
+stating that 'node' was not found.
+solution: run `mvn install` before `mvn clean`
+
+## java.security.NoSuchProviderException: no such provider: BC
+
+Make sure you've gone through the steps in ["Install the bouncycastle security provider and the trust manager"](#17-install-the-bouncycastle-security-provider-and-the-trust-manager).
+
+If this error still occurs, it could happen that Tomcat can't find or access the the bc `.jar` files during startup. Below is a collection of actions that may fix the problem and places to copy the `.jar` files into. You may want to try them both separately and combined to find a setup that works for you.
+
+You should be able to find both `bcpkix-jdk15on-1.52.jar` and `bcprov-jdk15on-1.52.jar` in your maven directory (default location is: `C:/Users/[user name]/.m2/repository/org/bouncycastle/`). If not, build the whole project with `mvn install -Dmaven.test.skip=true` and check again.
+
+- in Eclipse, edit the server launch configuration properties (accessible via "Run As...") and add both `.jar` files as External JARs to User Entries (suggested in: [Building, Step "Add the JSTL jar to classpath"](https://github.com/researchstudio-sat/webofneeds/blob/master/documentation/building.md#add-the-jstl-jar-to-classpath))
+- copy both `bcpkix-jdk15on-1.52.jar` and `bcprov-jdk15on-1.52.jar` to `%tomcat_dir%/lib/` (suggested in: [Crytpographic Keys and Certificates](https://github.com/researchstudio-sat/webofneeds/blob/5dc0db3747c201a87d94621453b8b898a34e7fc4/documentation/installation-cryptographic-keys-and-certificates.md), Step 11)
+- copy both `bcpkix-jdk15on-1.52.jar` and `bcprov-jdk15on-1.52.jar` to `C:/Program Files/Java/[jre dir]/lib/ext/` and [install the bouncy castle security provider](http://www.bouncycastle.org/wiki/display/JA1/Provider+Installation) (suggested in: [issue#1393](https://github.com/researchstudio-sat/webofneeds/issues/1393))
+- In the Tomcat server's `server.xml`, find the xml element `<Host appBase="webapps" ...` and add the xml attribute `startStopThreads="2"`
+  - **NOTE:** This only has an effect if two or more webapps, e.g. a node and an owner, are started on the server.
+
+## Exception in Owner-Webapp log: PKIX path building failed
+
+One possible cause of this is that the [certificate renewal](/documentation/letsencrypt.md#certificate-renewal) updated the pem files but did not update the jks and pfx files. The consequence is that the node webapp uses the new key (as nginx loads the pem file) and the activemq server uses the old key (as it loads the jks file).
+
+_To check if this is the problem:_ list the keys in the jks/pfx file (using `keytool -list -v -keystore t-keystore.pfx`) and compare them to the key information available for, eg. `https://{your-won-node}/won/resource` in the browser or some other http client. If the keys are the same, this is _not_ the problem.
+
+_To fix this:_ overwrite the jks and pfx files by exporting the key from the pem file. This can be done by executing the `openssl`and `keytool` commands in the letsencrypt's container script [certificate-request-and-renew.sh](/webofneeds/won-docker/image/letsencrypt/certificate-request-and-renew.sh)

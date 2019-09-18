@@ -16,7 +16,7 @@ APR is needed to properly load the ssl engine in tomcat.
 
 The build instructions are [here](http://tomcat.apache.org/native-doc/)
 
-### Building
+### Building TCNative
 
 1. Download tcnative from the [download page](http://tomcat.apache.org/download-native.cgi)
     
@@ -41,12 +41,3 @@ The build instructions are [here](http://tomcat.apache.org/native-doc/)
 4. Copy the libraries to tomcat
 
     In `target/lib/` copy all `tcnative*.so*` files into tomcats `bin/` directory
-
-
-## Installing Bouncycastle Libraries
-
-On Linux, the Bouncycastle libraries (`bcpkix` and `bcprov` found in `webofneeds/target/tomcat-libs/` after building) need to be copied to `$JAVA_HOME/jre/lib/ext/` in addition to the tomcat `lib/` directory.
-
-## Problems with the Node
-
-On Ubuntu 18.04 registering the local Owner application with the local Node results in I/O errors while creating the TLS tunnel. The reason for this is not yet known but connecting to an already working Node instance (e.g. satvm05.researchstudio.at) works.
