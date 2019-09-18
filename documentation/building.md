@@ -9,24 +9,24 @@ The following document walks you through the steps required to set up for develo
   - [3. Install Maven (3.3 or newer)](#3-install-maven-33-or-newer)
   - [4. Git Clone to Your Eclipse Workspace](#4-git-clone-to-your-eclipse-workspace)
   - [5. Import the Maven-project in Eclipse](#5-import-the-maven-project-in-eclipse)
-  - [6. Recommended: Deactivate eclipse autobuild](#6-recommended-deactivate-eclipse-autobuild)
-  - [7. Use the provided code style](#7-use-the-provided-code-style)
-  - [8. Set maven profile `skip-tests`](#8-set-maven-profile-skip-tests)
-  - [9. Maven install](#9-maven-install)
-  - [10. On Windows: build-tools for project-local npm](#10-on-windows-build-tools-for-project-local-npm)
-  - [11. Copy and Adjust Configurations](#11-copy-and-adjust-configurations)
-  - [12. Download/Install the latest Tomcat 9 server](#12-downloadinstall-the-latest-tomcat-9-server)
-  - [13. Add Tomcat to Eclipse](#13-add-tomcat-to-eclipse)
-  - [14. Update Connector-Statement in Tomcat's server.xml](#14-update-connector-statement-in-tomcats-serverxml)
-  - [15. Edit the Server Configuration in Eclipse](#15-edit-the-server-configuration-in-eclipse)
+  - [6. Recommended Eclipse Settings](#6-recommended-eclipse-settings)
+    - [Deactivate eclipse autobuild](#deactivate-eclipse-autobuild)
+    - [Use the provided code style](#use-the-provided-code-style)
+  - [7. Maven install](#7-maven-install)
+  - [8. On Windows: build-tools for project-local npm](#8-on-windows-build-tools-for-project-local-npm)
+  - [9. Copy and Adjust Configurations](#9-copy-and-adjust-configurations)
+  - [10. Download/Install the latest Tomcat 9 server](#10-downloadinstall-the-latest-tomcat-9-server)
+  - [11. Add Tomcat to Eclipse](#11-add-tomcat-to-eclipse)
+  - [12. Update Connector-Statement in Tomcat's server.xml](#12-update-connector-statement-in-tomcats-serverxml)
+  - [13. Edit the Server Configuration in Eclipse](#13-edit-the-server-configuration-in-eclipse)
     - [VM arguments](#vm-arguments)
     - [Add the JSTL jar to classpath](#add-the-jstl-jar-to-classpath)
     - [Add the required libs to the classpath](#add-the-required-libs-to-the-classpath)
     - [Server Overview Options](#server-overview-options)
     - [Options to speed up Startup](#options-to-speed-up-startup)
-  - [16. Generate cryptographic keys](#16-generate-cryptographic-keys)
-  - [17. Install the bouncycastle security provider and the trust manager](#17-install-the-bouncycastle-security-provider-and-the-trust-manager)
-  - [18. Start server](#18-start-server)
+  - [14. Generate cryptographic keys](#14-generate-cryptographic-keys)
+  - [15. Install the bouncycastle security provider and the trust manager](#15-install-the-bouncycastle-security-provider-and-the-trust-manager)
+  - [16. Start server](#16-start-server)
 - [Troubleshooting](#troubleshooting)
   - [Tomcat complains about Missing Keystore](#tomcat-complains-about-missing-keystore)
   - [Maven build fails with NoClassDefFoundException: java/sql/SQLException](#maven-build-fails-with-noclassdeffoundexception-javasqlsqlexception)
@@ -94,13 +94,15 @@ File >> Import >> Existing Maven Project >> select the (folder with) the pom.xml
 
 Troubleshooting: If you don't have the "Existing Maven Project"-option, make sure you have the addons mentioned in the [eclipse section above](#2-eclipse-java-ee).
 
-## 6. Recommended: Deactivate eclipse autobuild
+## 6. Recommended Eclipse Settings
+
+### Deactivate eclipse autobuild
 
 Window >> Preferences >> General >> Workspace >> Build >> uncheck "Build automatically"
 
 This increases performance.
 
-## 7. Use the provided code style
+### Use the provided code style
 
 Window >> Preferences >> Java >> Code Style >> Formatter
 
@@ -110,17 +112,22 @@ Window >> Preferences >> Java >> Code Style >> Formatter
 
 If you want to commit to our repositories, this step we'd ask you to do this.
 
-## 8. Set maven profile `skip-tests`
+## 7. Maven install
 
-Right-click the webofneeds project in the Project Explorer Tab on the left side >> Maven >> Select Maven Profiles. Check `skip-tests`.
+In Eclipse: 
 
-## 9. Maven install
+1.  Right-click the webofneeds project in the Project Explorer Tab on the left side >> Maven >> Select Maven Profiles. Check `skip-tests`.
+2. right-click "webofneeds" in project explorer >> Run As >> Maven Install
 
-Either run `mvn install -P skip-tests` in the command-line or right-click "webofneeds" in project explorer >> Run As >> Maven Install
+Or in your terminal:
+
+```
+mvn install -P skip-tests 
+```
 
 Further information on what you can do with the maven-configuration can be found in [./maven.md](./maven.md).
 
-## 10. On Windows: build-tools for project-local npm
+## 8. On Windows: build-tools for project-local npm
 
 When you the maven-install reaches the owner-application, the maven-frontend plugin will install it's own version of `npm`. Using that run the following with admin permissions:
 
@@ -134,7 +141,7 @@ If your Windows User does not have admin permissions, installing `windows-build-
 2. Locate your Python installation, e.g., `c:\Python27\python.exe`
 3. With the **same user that will execute the maven build**, run `npm config set python c:\\Python27\\python.exe` (replace with your actual location, of course, and note the double backslashes).
 
-## 11. Copy and Adjust Configurations
+## 9. Copy and Adjust Configurations
 
 1. Copy the webofneeds conf-folder: `cp -r conf conf.local` if you haven't done that already.
 
@@ -144,14 +151,14 @@ If your Windows User does not have admin permissions, installing `windows-build-
 
 4. Change the accompanying passwords to something at least 6-letter long.
 
-## 12. Download/Install the latest Tomcat 9 server
+## 10. Download/Install the latest Tomcat 9 server
 
 sources:
 
 - https://tomcat.apache.org/download-90.cgi
 - your system's package manager
 
-## 13. Add Tomcat to Eclipse
+## 11. Add Tomcat to Eclipse
 
 1. On Linux: You might need to add your user to the "tomcat" group (e.g. via `sudo usermod -aG tomcat myusername`). Check the permissions on your tomcat-installation/config-directory (e.g. `/usr/share/tomcat/`). Otherwise the integration process might throw an error that it couldn't read the configs.
 1. Add Server view: Window >> Show View >> Server. When the server appears there, double clicking it will allow to open the config-GUI.
@@ -171,7 +178,7 @@ sources:
       1. Maybe the import of the webofneeds maven project somehow did not work properly. Delete all imported projects (without deleting the sources), then import again (File >> Import... >> Maven >> Existing Maven Projects )
       1. Maybe you did not install eclipse for Java EE. Check Help >> About Eclipse. If it does not say 'Eclipse Java EE IDE for Web Developers.', the easiest is to download and install Eclipse for Java EE.
 
-## 14. Update Connector-Statement in Tomcat's server.xml
+## 12. Update Connector-Statement in Tomcat's server.xml
 
 Copy the SSL connector statement given below to `<TOMCAT_FOLDER>/conf/server.xml` as a child of the `<Service name="Catalina">`-node and change the password and key-folders there to values used in previous steps as well (e.g. `"changeit"`, `/home/username/WoNKeystore/t-cert.pem`, `/home/username/WoNKeystore/t-key.pem`). If you already have a `Connector`-statement, modify it accordingly. You can also access the conf in Eclipse if you've already added Tomcat there via Project Explorer >> Server >> "Your Server" >> open `server.xml`.
 
@@ -202,7 +209,7 @@ Copy the SSL connector statement given below to `<TOMCAT_FOLDER>/conf/server.xml
  </Connector>
 ```
 
-## 15. Edit the Server Configuration in Eclipse
+## 13. Edit the Server Configuration in Eclipse
 
 DoubleClick the server in the "Server View" and select:
 
@@ -259,7 +266,7 @@ Allow both webapps (owner-webapp and node-webapp) to start simultaneously:
 - edit `server.xml`
 - find the xml element `<Host appBase="webapps" ...` and add the xml attribute `startStopThreads="2"`
 
-## 16. Generate cryptographic keys
+## 14. Generate cryptographic keys
 
 **NOTE:** The following guide assumes you want to run all services on the same machine. If you deploy these on different machines, use the respective IPs and Paths as suited/desired.
 
@@ -295,7 +302,7 @@ Deploy sripts for building and running web of needs as docker containsers (see `
 
 **NOTE:** Inspecting keystores using `keytool`: owner/node keystores are saved in bouncycastle's UBER format. `keytool -list -v -providerclass org.bouncycastle.jce.provider.BouncyCastleProvider -storetype UBER -storepass <YOUR_KEYSTORE_PASSWORD> -keystore t-keystore.jks`
 
-## 17. Install the bouncycastle security provider and the trust manager
+## 15. Install the bouncycastle security provider and the trust manager
 
 Locate the JRE you are using with eclipse (`Window -> Preferences -> Java -> Installed JREs`).
 
@@ -326,7 +333,7 @@ TODO I've also copied the jars to tomcat's lib folder (at no avail tho)
 
 (if you miss this step, you'll see BC exceptions when running the owner/node)
 
-## 18. Start server
+## 16. Start server
 
 Select Server in the "Servers"-Tab at the bottom and click play (or right-click the server and press "play" in the context-menu)
 
@@ -404,7 +411,7 @@ solution: run `mvn install` before `mvn clean`
 
 ## java.security.NoSuchProviderException: no such provider: BC
 
-Make sure you've gone through the steps in ["Install the bouncycastle security provider and the trust manager"](#17-install-the-bouncycastle-security-provider-and-the-trust-manager).
+Make sure you've gone through the steps in ["Install the bouncycastle security provider and the trust manager"](#15-install-the-bouncycastle-security-provider-and-the-trust-manager).
 
 If this error still occurs, it could happen that Tomcat can't find or access the the bc `.jar` files during startup. Below is a collection of actions that may fix the problem and places to copy the `.jar` files into. You may want to try them both separately and combined to find a setup that works for you.
 
