@@ -26,7 +26,7 @@ The [steps](#steps) below should guide you quickly through everything necessary 
 
 ### Troubleshooting based on steps
 
-**Step 1:** Docker is to slow: Make sure after installing Docker Desktop, that it has enough resources on your machine `Docker Desktop` -> `Settings` -> `Advanced`
+**Step 1:** Docker is too slow: Make sure after installing Docker Desktop, that it has enough resources on your machine `Docker Desktop` -> `Settings` -> `Advanced`
 
 **Step 3:** Problems starting docker:
 
