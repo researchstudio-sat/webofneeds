@@ -1,4 +1,4 @@
-# Atom(=Post) Structure
+# Atom(=Post) Structure [DEPRECATED]
 
 Posting something in the Web of Needs is done by creating an RDF structure and sending it to a WoN node.
 
