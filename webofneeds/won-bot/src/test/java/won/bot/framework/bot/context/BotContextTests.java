@@ -43,8 +43,9 @@ public class BotContextTests {
     public static Iterable<Class[]> getTestParameters() {
         LinkedList<Class[]> linkedList = new LinkedList<>();
         linkedList.add(new Class[] { MemoryBotContext.class });
-        // We exclude mongoBotContext for now TODO: find a better strategy for embedded mongodb integration Testing
-        //linkedList.add(new Class[] { MongoBotContext.class });
+        // We exclude mongoBotContext for now TODO: find a better strategy for embedded
+        // mongodb integration Testing
+        // linkedList.add(new Class[] { MongoBotContext.class });
         return linkedList;
     }
 
