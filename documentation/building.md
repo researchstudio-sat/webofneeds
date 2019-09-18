@@ -9,7 +9,7 @@ The following document walks you through the steps required to set up for develo
   - [3. Install Maven (3.3 or newer)](#3-install-maven-33-or-newer)
   - [4. Git Clone to Your Eclipse Workspace](#4-git-clone-to-your-eclipse-workspace)
   - [5. Import the Maven-project in Eclipse](#5-import-the-maven-project-in-eclipse)
-  - [6. Deactivate eclipse autobuild](#6-deactivate-eclipse-autobuild)
+  - [6. Recommended: Deactivate eclipse autobuild](#6-recommended-deactivate-eclipse-autobuild)
   - [7. Use the provided code style](#7-use-the-provided-code-style)
   - [8. Set maven profile `skip-tests`](#8-set-maven-profile-skip-tests)
   - [9. Maven install](#9-maven-install)
@@ -94,9 +94,11 @@ File >> Import >> Existing Maven Project >> select the (folder with) the pom.xml
 
 Troubleshooting: If you don't have the "Existing Maven Project"-option, make sure you have the addons mentioned in the [eclipse section above](#2-eclipse-java-ee).
 
-## 6. Deactivate eclipse autobuild
+## 6. Recommended: Deactivate eclipse autobuild
 
 Window >> Preferences >> General >> Workspace >> Build >> uncheck "Build automatically"
+
+This increases performance.
 
 ## 7. Use the provided code style
 
@@ -105,6 +107,8 @@ Window >> Preferences >> Java >> Code Style >> Formatter
 1. Click `Import`
 2. Select the file `webofneeds/won-buildtools/src/main/resources/eclipse/formatter.xml`
 3. Click `Apply and Close`
+
+If you want to commit to our repositories, this step we'd ask you to do this.
 
 ## 8. Set maven profile `skip-tests`
 
