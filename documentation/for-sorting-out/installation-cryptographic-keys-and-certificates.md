@@ -15,7 +15,7 @@
 
 6. In `conf.local/owner.properties` set `http.port` and `node.default.http.port` to `8443`
 
-7. Copy the SSL connector statement given below to <TOMCAT_FOLDER>/conf/server.xml as a child of the `<Service name="Catalina">`-node and change the password and key-folders there to values used in previous steps as well (e.g. `"changeit"`, `C:/WoN/Keystore/t-cert.pem`, `C:/WoN/Keystore/t-key.pem`). If the instructions on https://github.com/researchstudio-sat/webofneeds/blob/master/documentation/build-with-eclipse.md were followed before, modify the statement already added at step 6 if needed.
+7. Copy the SSL connector statement given below to <TOMCAT_FOLDER>/conf/server.xml as a child of the `<Service name="Catalina">`-node and change the password and key-folders there to values used in previous steps as well (e.g. `"changeit"`, `C:/WoN/Keystore/t-cert.pem`, `C:/WoN/Keystore/t-key.pem`). If the instructions on https://github.com/researchstudio-sat/webofneeds/blob/master/documentation/building.md were followed before, modify the Connector-statement if needed.
 
     ```xml
     <Connector
