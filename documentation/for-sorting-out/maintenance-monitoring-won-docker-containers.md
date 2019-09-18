@@ -1,4 +1,5 @@
 # Monitoring Docker Containers
+
 ## Remote monitoring
 
 You can monitor wonnode, owner, matcher and some other web of needs docker containers using JavaVisualVM via JMX ports. See example of exposing JMX ports in `webofneeds/webofneeds/won-docker/deploy_int_loadtest.sh`.
@@ -13,7 +14,6 @@ This makes it possible to run locally `JavaVisualVM` application (e.g. `C:\Progr
 
 If you install `MBeans` plugin for the `JavaVisualVM`, you can also monitor activemq broker messages flow.
 
-
 ## View logs
 
 To view logs of the container, use docker logs command. E.g. to view the logs of the container with name `wonnode_dev`, do:
@@ -22,8 +22,8 @@ To view logs of the container, use docker logs command. E.g. to view the logs of
 
 Built by default webofneeds images have INFO level, but if your build images yourself you can specify other log level (point to another log file configuration) in your `Dockerfile` files.
 
+## Restart single WoN container
 
-## Restart signle won container
 If a container (e.g. wonnode_int container) stopped (e.g. due to memory error, or you stopped it youself), you can run it again
 
 with the same as before parameters:
@@ -39,7 +39,8 @@ with different parameters:
 Parameters used with won containers can be found in `webofneeds/webofneeds/won-docker/deploy*.sh`
 
 ## Adjust memory for container
-We can adjust memory setting for Java and for docker container. Java memory can be provided when container is run via JMEM_OPTS variable.  Container memory is limited with -m option (important to limit otherwise docker will consume all the memory and hang the server). For example, on a small server wonnode can be run with the 2 following additional parameters:
+
+We can adjust memory setting for Java and for docker container. Java memory can be provided when container is run via JMEM_OPTS variable. Container memory is limited with -m option (important to limit otherwise docker will consume all the memory and hang the server). For example, on a small server wonnode can be run with the 2 following additional parameters:
 
 `-m 350m`
 
