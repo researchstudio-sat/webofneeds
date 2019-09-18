@@ -13,12 +13,15 @@ package won.bot.framework.bot.context;
 import java.net.URI;
 
 public class FactoryBotContextWrapper extends BotContextWrapper {
-    private final String factoryListName = getBotName() + ":factoryList";
-    private final String factoryInternalIdName = getBotName() + ":factoryInternalId";
-    private final String factoryOfferToFactoryAtomMapName = getBotName() + ":factoryOfferToFactoryAtomMap";
+    private final String factoryListName;
+    private final String factoryInternalIdName;
+    private final String factoryOfferToFactoryAtomMapName;
 
     public FactoryBotContextWrapper(BotContext botContext, String botName) {
         super(botContext, botName);
+        this.factoryListName = botName + ":factoryList";
+        this.factoryInternalIdName = botName + ":factoryInternalId";
+        this.factoryOfferToFactoryAtomMapName = botName + ":factoryOfferToFactoryAtomMap";
     }
 
     public String getFactoryListName() {
