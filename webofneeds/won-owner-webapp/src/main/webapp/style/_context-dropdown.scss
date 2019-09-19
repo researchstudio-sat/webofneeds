@@ -12,7 +12,7 @@ won-connection-context-dropdown {
       --local-primary: #{$won-skeleton-color};
     }
     &.clickable {
-      --local-padding: #{$won-secondary-color};
+      --local-primary: #{$won-secondary-color};
     }
   }
 
