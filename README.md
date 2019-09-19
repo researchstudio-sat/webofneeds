@@ -1,4 +1,4 @@
-# webofneeds
+# Web of Needs
 
 Finding and cooperating with people. Protocol, not platform. Decentralized. Linked Data. Open Source.
 
@@ -25,28 +25,56 @@ Web of Needs is built out of three main components. **Owner applications** enabl
 
 Anyone can run any of these components. They can all talk to each other.
 
-# Demo
+## Demo
 
-A **demo deployment of the Web of Needs** with a simple owner application, one won node and one matching service can be tested at www.matchat.org
+A **demo deployment of the Web of Needs** with a simple owner application, one won node and one matching service can be tested at <https://www.matchat.org>
 
-# Deployment
+## Running WoN
 
-If you want to **set up your own deployment of Web of Needs** components, here you find requirements for **getting started**:
+There are two ways of running WoN locally:
 
-- follow the [docker tutorial](/documentation/how-to-won/docker.md) to set up all the neccessary components of web of needs locally
+### 1. Docker
 
-# Further resources
+The "fastest" way to run the WoN locally ist to use the provided Docker container and setup. We recommend this solution if you want to try the WoN locally for the first time to have a quick hands on.
+For running WoN with Docker locally follow the steps in the [WoN with Docker Documentation](/webofneeds/won-docker/README.md).
 
-- Try [Chatting with the Debug Bot and Viewing the RDF](/documentation/viewing-rdf.md) that the owner webapp and won nodes are exchanging
+### 2. Tomcat
+
+The Tomcat solution of running the WoN locally is mainly for development purposes. If you focus on just one aspect in the WoN you can combine the Docker and the Tomcat setup e.g.: Working on the WebApp, you just need to run the WebApp locally on tomcat and the Node and Matcher still with Docker. To do so we recommend Eclipse as IDE and you can find the setup documentation [here](/documentation/building.md).
+
+## Development
+
+For development we recommend using the [Tomcat-setup mentioned above](#2-tomcat). After having that up and running, depending on what you want to do, you can continue with the following documentation-parts:
+
+### How to write a matcher
+
+Basic information about the matcher service is provided [here](/webofneeds/won-matcher-service/README.md).
+To integrate a new matcher, or matching algorithm we recommend to use the matcher skeleton, providing all needed functions for a matcher service in the WoN.
+
+### How to write a bot
+
+Basic information about bots is provided [here](/webofneeds/won-bot/README.md).
+To write a new bot, we recommend to use the bot skeleton, providing all needed functions for a bot in the WoN.
+
+### How to write a WoN web application
+
+Basic information about a WoN web application is provided [here](/webofneeds/won-owner-webapp/README.md)
+
+### How to set up a WoN cloud instance
+
+Information coming soon [here](installation-setting-up-build-environment-in-jenkins.md)
+
+## Further resources
+
 - Learn how to [Run your own WoN services](webofneeds/won-docker/README.md)
-- [Build-instructions](/documentation/building-with-maven.md), [Setting up Eclipse](/documentation/build-with-eclipse.md), and [Troubleshooting](documentation/troubleshooting.md)
-- [Security architecture](webofneeds/won-core/README.md) and how to [Set up the Keys and Certificates](documentation/installation-cryptographic-keys-and-certificates.md)
+- [Build-instructions](/documentation/building.md#building) and [Troubleshooting](documentation/building.md#troubleshooting)
+- [Security architecture](webofneeds/won-core/README.md) 
 - [Linked Data interface](webofneeds/won-node-webapp/README.md)
 - [Matching Service Architecture](webofneeds/won-matcher-service/README.md)
 - [Bot Framework](webofneeds/won-bot/README.md) for interacting with WoN nodes programmatically
 - [Ontologies](/documentation/ontologies.md) defined for this project
 
-# Papers and further Information
+## Papers and further Information
 
 - More detailed description of the Web of Needs can be found [here](http://sat.researchstudio.at/en/web-of-needs)
 - [Beyond Data: Building a Web of Needs](http://events.linkeddata.org/ldow2013/papers/ldow2013-paper-13.pdf)

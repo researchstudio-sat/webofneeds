@@ -1,7 +1,8 @@
 ## WoN Docker Deployment
 
-Docker images are provided in the [docker hub webofneeds repository](https://hub.docker.com/r/webofneeds/) to run
-the webofneeds applications as docker containers. There are images for the following components of webofneeds available:
+The [steps](#steps) below should guide you quickly through everything necessary to run the webofneeds components mentioned [below](#won-components) locally with docker.
+
+### WoN components
 
 - wonnode: the won node application
 - owner: the owner application
@@ -13,45 +14,38 @@ the webofneeds applications as docker containers. There are images for the follo
 - gencert: a tool that can generate certificates for wonnode and owner application
 - bots: bots are used to test the communication between the servers in the application
 
-For deployment of these components we use [docker-compose](https://docs.docker.com/compose/). It is possible to deploy
-the components on multiple servers. For straight forward deployment however we have provided one docker-compose file
-which can be used to deploy all components on one local server.
+### Steps
 
-### How to deploy and run all webofneeds components on a single server
+1. Download and install docker (https://www.docker.com) and docker-compose (https://docs.docker.com/compose/)
+2. Download and run one of the following scripts:
+   - Bash: [deploy_bash.sh](/webofneeds/won-docker/deploy/local_image/deploy_bash.sh)
+   - PowerShell: [deploy_powershell.ps1](/webofneeds/won-docker/deploy/local_image/deploy_powershell.ps1)
+2. After Docker downloading and starting the components you can access the owner and the node here:
+   - owner: [https://10.0.75.1:8082/owner](https://10.0.75.1:8082/owner)
+   - wonnode: [https://10.0.75.1:8889/won](https://10.0.75.1:8889/won)
 
-**We recommend using the quick guide [tutorial](/documentation/how-to-won/docker.md)**
+### Troubleshooting 
 
-1. Install docker (https://www.docker.com) (make sure after installing Docker Desktop, that it has enough resources on your machine `Docker Desktop` -> `Settings` -> `Advanced`)
-2. Install docker compose (https://docs.docker.com/compose/)
-3. Download the [docker-compose.yml](deploy/local_image/docker-compose.yml) file that deploys all components at once
-4. The script needs two environment parameters to be set. Export `deploy_host` to set the host you want to deploy the
-   docker containers on. Export `base_folder` to set the folder where data (like certificates) are created and mounted
-5. Make sure no other services on the server are running on the following ports that are used by the different
-   containers: 8889, 2561, 2562, 5433, 7071, 8082, 8984, 10000, 61617
-6. Execute the docker-compose.yml file on your "deploy_host" with `docker-compose up -d`
+Docker is too slow: Make sure after installing Docker Desktop, that it has enough resources on your machine `Docker Desktop` -> `Settings` -> `Advanced`
 
-When the script executes it runs all the above listed docker images as containers and downloads them from the
-webofneeds docker hub repository if not available locally. If the script finishes without error all components
-should be started.
+Problems starting docker:
 
-You can access the owner application to log in and create atoms using the following link:
+- The scripts define the `deploy_host` which represents the docker local network address: Check if this matches your local docker network address
+- The scripts define a default `base_folder`: Change it to another existing folder
+- If the scripts say that the `base_folder` does not exist, you might create this folder, or change the path to an existing in the script
+- Make sure the ports used by the containers aren't used by anything else. Currently these are 8889, 2561, 2562, 5433, 7071, 8082, 8984, 10000 and 61617. You can check the `ports`-properties[docker-compose.yml](../webofneeds/won-docker/deploy/local_image/docker-compose.yml) for the definitive version
 
-- **owner:** [https://\${deploy_host}:8082/owner](https://${deploy_host}:8082/owner)
+For a more detailed overview about the WoN docker setup see [here](/webofneeds/won-docker/README.md).
 
-You can access the wonnode and check the generated RDF atoms using the following link:
+### Additional Information
 
-- **wonnode:** [https://\${deploy_host}:8889/won](https://${deploy_host}:8889/won)
+Docker images are provided in the [**docker-hub** webofneeds repository](https://hub.docker.com/r/webofneeds/) to run the webofneeds applications as docker containers. See in the [section "WoN-components"](#won-components) for a quick overview over available containers. When the script executes it runs all the docker images listed above as containers and **downloads** them from the webofneeds docker hub repository if not available locally. If the script finishes without error all components should be started.
 
-The certificates used by the application are created on the first execution of the script, and reused in later
-executions. You can find this data in your "base_folder". If the containers are removed and recreated all data that
-was created is lost because the data is not mounted to the host right now (you can change this by uncommenting the
-"volumes:" parts in the script for the databases: postgres, solr, bigdata. However is might not work out of the box
-on a windows systems with virtual box).
+It is possible to deploy the components on **multiple servers**. For straight forward deployment however we have provided [one docker-compose file](../webofneeds/won-docker/deploy/local_image/docker-compose.yml) which can be used to deploy all components on one local server, which is used by the deploy-script (see [section "Steps"](#steps)). The script loads the most recent `docker-compose.yml` from github. If you want to use a **modified `docker-compose.yml`**, follow step in the setup-script, sans the download.
 
-**NOTE**: If you install Docker on MacOSX/Windows you will have to use the IP-Adress of the docker machine (see
-https://docs.docker.com/engine/installation/mac/), you can retrieve the IP-Adress with the command `$ docker-machine ls`.
+The **certificates** used by the application are created on the first execution of the script, and reused in later executions. You can find this data in the `$base_folder` specified in the setup-script. If the containers are removed and **recreated** all data that was created is lost because the data is not mounted to the host right now (you can change this by uncommenting the
+`"volumes:"` properties in the `docker-compose.yml` for the databases: `postgres`, `solr`, `bigdata`)
 
-**NOTE**: If you change the `$deploy_host` in the script you must either provide a different directory for the
-certificates or delete the certificates beforehand, otherwise the creation of elements will not be possible due to
-faulty certificates. Also delete the postgres docker container to wipe all preexisting data it is not valid for
-different certificates anymore.
+**NOTE**: If you install Docker on MacOSX/Windows you will have to use the IP-Adress of the docker machine (see https://docs.docker.com/engine/installation/mac/), you can retrieve the IP-Adress with the command `$ docker-machine ls`.
+
+**NOTE**: If you change the `$deploy_host` in the setup-script you must either provide a different directory for the certificates or delete the certificates beforehand, otherwise the creation of elements will not be possible due to faulty certificates. Also delete the postgres docker container to wipe all preexisting data, as it won't be valid anymore anyway due to the certificate change. 

@@ -21,6 +21,12 @@
     <dependencies>
         <!-- Warning! Only to be used in connection with the <dependencyManagement> 
             section in the parent pom! -->
+
+        <dependency>
+            <groupId>javax.jws</groupId>
+            <artifactId>javax.jws-api</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-sockets-tx</artifactId>
