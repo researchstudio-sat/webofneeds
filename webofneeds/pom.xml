@@ -1039,7 +1039,7 @@
         <commons-collections.version>3.2.1</commons-collections.version>
         <commons-io.version>2.4</commons-io.version>
         <de.uni_koblenz.aggrimm.icp.version>1.0.1</de.uni_koblenz.aggrimm.icp.version>
-        <camel.version>2.12.1</camel.version>
+        <camel.version>2.24.2</camel.version>
         <qpid.version>0.24</qpid.version>
         <activemq.version>5.10.2</activemq.version>
         <activemq.conf>classpath:</activemq.conf>
