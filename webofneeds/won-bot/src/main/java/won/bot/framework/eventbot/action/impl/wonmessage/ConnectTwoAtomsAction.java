@@ -53,7 +53,7 @@ public class ConnectTwoAtomsAction extends BaseEventBotAction {
     public void doRun(Event event, EventListener executingListener) {
         Collection<URI> atoms = getEventListenerContext().getBotContext().retrieveAllAtomUris();
         try {
-            Iterator iter = atoms.iterator();
+            Iterator<?> iter = atoms.iterator();
             getEventListenerContext().getWonMessageSender()
                             .sendWonMessage(createWonMessage((URI) iter.next(), (URI) iter.next()));
         } catch (Exception e) {
@@ -67,17 +67,18 @@ public class ConnectTwoAtomsAction extends BaseEventBotAction {
         Dataset targetAtomRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(toUri);
         URI localWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(localAtomRDF, fromUri);
         URI remoteWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(targetAtomRDF, toUri);
-        return WonMessageBuilder.setMessagePropertiesForConnect(
-                        wonNodeInformationService.generateEventURI(localWonNode),
-                        localSocketType.map(socketType -> WonLinkedDataUtils
-                                        .getSocketsOfType(fromUri, socketType,
-                                                        getEventListenerContext().getLinkedDataSource())
-                                        .stream().findFirst().orElse(null)),
-                        fromUri, localWonNode,
-                        targetSocketType.map(socketType -> WonLinkedDataUtils
-                                        .getSocketsOfType(toUri, socketType,
-                                                        getEventListenerContext().getLinkedDataSource())
-                                        .stream().findFirst().orElse(null)),
-                        toUri, remoteWonNode, welcomeMessage).build();
+        return WonMessageBuilder
+                        .setMessagePropertiesForConnect(wonNodeInformationService.generateEventURI(localWonNode),
+                                        localSocketType.map(socketType -> WonLinkedDataUtils
+                                                        .getSocketsOfType(fromUri, socketType,
+                                                                        getEventListenerContext().getLinkedDataSource())
+                                                        .stream().findFirst().orElse(null)),
+                                        fromUri, localWonNode,
+                                        targetSocketType.map(socketType -> WonLinkedDataUtils
+                                                        .getSocketsOfType(toUri, socketType,
+                                                                        getEventListenerContext().getLinkedDataSource())
+                                                        .stream().findFirst().orElse(null)),
+                                        toUri, remoteWonNode, welcomeMessage)
+                        .build();
     }
 }

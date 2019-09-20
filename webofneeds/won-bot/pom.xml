@@ -94,16 +94,7 @@
 			</plugin>
 		</plugins>
 	</build>
-	<repositories>
-		<repository>
-			<id>eliza-repo</id>
-			<url>https://raw.github.com/fkleedorfer/eliza/mvn-repo/</url>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-			</snapshots>
-		</repository>
-	</repositories>
+
 	<dependencies>
 		<!-- WON stuff -->
 		<dependency>
@@ -166,10 +157,6 @@
 			<artifactId>spring-boot</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.integration</groupId>
-			<artifactId>spring-integration-mail</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-commons</artifactId>
 		</dependency>
@@ -178,10 +165,6 @@
 			<artifactId>spring-data-mongodb</artifactId>
 		</dependency>
 		<!-- UTILS -->
-		<dependency>
-			<groupId>org.apache.velocity</groupId>
-			<artifactId>velocity</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-email</artifactId>
@@ -251,17 +234,6 @@
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk15on</artifactId>
 			<scope>compile</scope>
-		</dependency>
-		<!-- eliza for the debug bot -->
-		<dependency>
-			<groupId>codeanticode</groupId>
-			<artifactId>eliza</artifactId>
-			<version>1.0.1</version>
-		</dependency>
-		<!-- telegram bot api -->
-		<dependency>
-			<groupId>org.telegram</groupId>
-			<artifactId>telegrambots</artifactId>
 		</dependency>
 	</dependencies>
 	<profiles>

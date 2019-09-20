@@ -439,11 +439,6 @@
                 <version>${org.springframework.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.springframework.integration</groupId>
-                <artifactId>spring-integration-mail</artifactId>
-                <version>${org.springframework.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-orm</artifactId>
                 <version>${org.springframework.version}</version>
@@ -782,12 +777,6 @@
                 <version>2.4.11</version>
             </dependency>
 
-            <!-- telegram bot api -->
-            <dependency>
-                <groupId>org.telegram</groupId>
-                <artifactId>telegrambots</artifactId>
-                <version>2.4.4</version>
-            </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpmime</artifactId>
@@ -798,6 +787,11 @@
     </dependencyManagement>
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.1</version>
+            </plugin>
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>

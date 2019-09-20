@@ -10,11 +10,7 @@
  */
 package won.bot.framework.eventbot.filter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Composite filter.
@@ -23,7 +19,7 @@ public abstract class AbstractCompositeFilter implements CompositeFilter {
     private List<EventFilter> filters;
 
     public AbstractCompositeFilter() {
-        this(new LinkedList<EventFilter>());
+        this(new LinkedList<>());
     }
 
     public AbstractCompositeFilter(final List<EventFilter> filters) {
@@ -48,11 +44,13 @@ public abstract class AbstractCompositeFilter implements CompositeFilter {
         return copy;
     }
 
-    @Override
     /**
      * Replaces the filters by the specified ones, wrapping them in a synchronized
      * list.
+     * 
+     * @param filters
      */
+    @Override
     public synchronized void setFilters(final List<EventFilter> filters) {
         this.filters = Collections.synchronizedList(filters);
     }

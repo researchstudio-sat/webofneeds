@@ -1,3 +1,0 @@
----
-close this request and do not receive mails for it anymore:<mailto:$mailbotEmailAddress?subject=close_Message-Id_$mailReference>
-do not publish my requests on this mailinglist and ignore mails from $mailbotName in the future: <mailto:$mailbotEmailAddress?subject=unsubscribe>

@@ -72,23 +72,20 @@ public class AutomaticMonitoredMessageResponderListener extends AbstractHandleFi
     }
 
     private void handleMessageEvent(final ConnectionSpecificEvent messageEvent) {
-        getEventListenerContext().getTaskScheduler().schedule(new Runnable() {
-            @Override
-            public void run() {
-                EventListenerContext ctx = getEventListenerContext();
-                String message = createMessage();
-                URI connectionUri = messageEvent.getConnectionURI();
-                WonMessage wonMessage = createWonMessage(connectionUri, message);
-                logger.debug("sending message " + message);
-                try {
-                    // fire start message sending monitor event (message sending includes signing)
-                    ctx.getEventBus().publish(new MessageDispatchStartedEvent(wonMessage));
-                    ctx.getWonMessageSender().sendWonMessage(wonMessage);
-                    // fire message is sent monitor event
-                    ctx.getEventBus().publish(new MessageDispatchedEvent(wonMessage));
-                } catch (Exception e) {
-                    logger.warn("could not send message via connection {}", connectionUri, e);
-                }
+        getEventListenerContext().getTaskScheduler().schedule(() -> {
+            EventListenerContext ctx = getEventListenerContext();
+            String message = createMessage();
+            URI connectionUri = messageEvent.getConnectionURI();
+            WonMessage wonMessage = createWonMessage(connectionUri, message);
+            logger.debug("sending message " + message);
+            try {
+                // fire start message sending monitor event (message sending includes signing)
+                ctx.getEventBus().publish(new MessageDispatchStartedEvent(wonMessage));
+                ctx.getWonMessageSender().sendWonMessage(wonMessage);
+                // fire message is sent monitor event
+                ctx.getEventBus().publish(new MessageDispatchedEvent(wonMessage));
+            } catch (Exception e) {
+                logger.warn("could not send message via connection {}", connectionUri, e);
             }
         }, new Date(System.currentTimeMillis() + this.millisTimeoutBeforeReply));
     }

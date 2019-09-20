@@ -29,8 +29,8 @@ public class MultipleActions extends BaseEventBotAction {
 
     @Override
     protected void doRun(final Event event, EventListener executingListener) throws Exception {
-        for (int i = 0; i < actions.length; i++) {
-            getEventListenerContext().getExecutor().execute(actions[i].getActionTask(event, executingListener));
+        for (EventBotAction action : actions) {
+            getEventListenerContext().getExecutor().execute(action.getActionTask(event, executingListener));
         }
     }
 }

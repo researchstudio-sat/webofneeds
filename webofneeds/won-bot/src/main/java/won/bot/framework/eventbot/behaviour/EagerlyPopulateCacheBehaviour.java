@@ -75,7 +75,7 @@ public class EagerlyPopulateCacheBehaviour extends BotBehaviour {
                 ((CachingLinkedDataSource) linkedDataSource).addToCache(responseWonMessage.getCompleteDataset(),
                                 responseWonMessage.getMessageURI(), requester);
                 // load the original message(s) into cache, too
-                Set<URI> toLoad = new HashSet<URI>();
+                Set<URI> toLoad = new HashSet<>();
                 addIfNotNull(toLoad, responseWonMessage.getIsRemoteResponseToMessageURI());
                 addIfNotNull(toLoad, responseWonMessage.getIsResponseToMessageURI());
                 addIfNotNull(toLoad, responseWonMessage.getCorrespondingRemoteMessageURI());
@@ -104,7 +104,7 @@ public class EagerlyPopulateCacheBehaviour extends BotBehaviour {
                 ((CachingLinkedDataSource) linkedDataSource).addToCache(wonMessage.getCompleteDataset(),
                                 wonMessage.getMessageURI(), wonMessage.getRecipientAtomURI());
                 URI requester = wonMessage.getRecipientAtomURI();
-                Set<URI> toLoad = new HashSet<URI>();
+                Set<URI> toLoad = new HashSet<>();
                 addIfNotNull(toLoad, wonMessage.getCorrespondingRemoteMessageURI());
                 List<URI> previous = WonRdfUtils.MessageUtils.getPreviousMessageUrisIncludingRemote(wonMessage);
                 addIfNotNull(toLoad, previous);

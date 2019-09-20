@@ -61,23 +61,23 @@ services:
       - $base_folder/mongodb/data/db:/data/db
 
   # debug bot used to test atom communication
-  debug_bot:
-    restart: always
-    build: ../../image/bots
-    #image: webofneeds/bots:live
-    environment:
-      - "node.default.host=wonnode"
-      - "node.default.http.port=8443"
-      - "won.node.uris=https://wonnode:8443/won/resource"
-      - "botContext.impl=mongoBotContext"
-      - "botContext.mongodb.user=won"
-      - "botContext.mongodb.pass=won"
-      - "botContext.mongodb.host=mongodb"
-      - "botContext.mongodb.port=27017"
-      - "botContext.mongodb.database=won"
-    depends_on:
-      - wonnode
-      - mongodb
+#  debug_bot:
+#    restart: always
+#    build: ../../image/bots
+#    #image: webofneeds/bots:live
+#    environment:
+#      - "node.default.host=wonnode"
+#      - "node.default.http.port=8443"
+#      - "won.node.uris=https://wonnode:8443/won/resource"
+#      - "botContext.impl=mongoBotContext"
+#      - "botContext.mongodb.user=won"
+#      - "botContext.mongodb.pass=won"
+#      - "botContext.mongodb.host=mongodb"
+#      - "botContext.mongodb.port=27017"
+#      - "botContext.mongodb.database=won"
+#    depends_on:
+#      - wonnode
+#      - mongodb
 
   # owner application (frontend) => access https://$deploy_host:8082/owner
   owner:

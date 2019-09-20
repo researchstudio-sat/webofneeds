@@ -25,12 +25,12 @@ public interface AtomProducer {
      * 
      * @return a dataset or null
      */
-    public Dataset create();
+    Dataset create();
 
     /**
      * Indicates that no more atoms will be created by this factory.
      * 
      * @return
      */
-    public boolean isExhausted();
+    boolean isExhausted();
 }

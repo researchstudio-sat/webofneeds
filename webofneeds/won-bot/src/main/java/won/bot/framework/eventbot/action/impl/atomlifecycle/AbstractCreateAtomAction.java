@@ -10,13 +10,7 @@
  */
 package won.bot.framework.eventbot.action.impl.atomlifecycle;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.jena.query.Dataset;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.protocol.exception.WonMessageBuilderException;
@@ -27,6 +21,11 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WONMATCH;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Base class for actions that create atoms.
@@ -64,7 +63,7 @@ public abstract class AbstractCreateAtomAction extends BaseEventBotAction {
         super(eventListenerContext);
         if (sockets == null || sockets.length == 0) {
             // add the default socket if none is present.
-            this.sockets = new ArrayList<URI>(1);
+            this.sockets = new ArrayList<>(1);
             this.sockets.add(SocketType.ChatSocket.getURI());
         } else {
             this.sockets = Arrays.asList(sockets);
@@ -114,13 +113,12 @@ public abstract class AbstractCreateAtomAction extends BaseEventBotAction {
     public void setDoNotMatch(final boolean doNotMatch) {
         this.doNotMatch = doNotMatch;
     }
-
-    private boolean socket(SocketType socketToCheck) {
-        for (URI socket : sockets) {
-            if (socket.equals(socketToCheck.getURI())) {
-                return true;
-            }
-        }
-        return false;
-    }
+    // private boolean socket(SocketType socketToCheck) {
+    // for (URI socket : sockets) {
+    // if (socket.equals(socketToCheck.getURI())) {
+    // return true;
+    // }
+    // }
+    // return false;
+    // }
 }

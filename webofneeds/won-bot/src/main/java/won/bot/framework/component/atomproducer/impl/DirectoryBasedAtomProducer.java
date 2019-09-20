@@ -111,10 +111,7 @@ public class DirectoryBasedAtomProducer implements AtomProducer {
     }
 
     private boolean isInitFailed() {
-        if (this.fileIndex == NOT_INITIALIZED) {
-            return true;
-        }
-        return false;
+        return this.fileIndex == NOT_INITIALIZED;
     }
 
     private synchronized void initializeLazily() {

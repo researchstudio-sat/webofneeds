@@ -44,22 +44,16 @@ public class ExecuteDeactivateAtomCommandAction extends BaseEventBotAction {
         final URI wonNodeUri = WonRdfUtils.ConnectionUtils.getWonNodeURIFromAtom(atomRDF, atomUri);
         WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
         WonMessage deactivateAtomMessage = createWonMessage(wonNodeInformationService, atomUri, wonNodeUri);
-        EventListener successCallback = new EventListener() {
-            @Override
-            public void onEvent(Event event) throws Exception {
-                logger.debug("atom creation successful, new atom URI is {}", atomUri);
-                bus.publish(new DeactivateAtomCommandSuccessEvent(atomUri, deactivateAtomCommandEvent));
-            }
+        EventListener successCallback = event12 -> {
+            logger.debug("atom creation successful, new atom URI is {}", atomUri);
+            bus.publish(new DeactivateAtomCommandSuccessEvent(atomUri, deactivateAtomCommandEvent));
         };
-        EventListener failureCallback = new EventListener() {
-            @Override
-            public void onEvent(Event event) throws Exception {
-                String textMessage = WonRdfUtils.MessageUtils
-                                .getTextMessage(((FailureResponseEvent) event).getFailureMessage());
-                logger.debug("atom creation failed for atom URI {}, original message URI {}: {}", new Object[] {
-                                atomUri, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage });
-                bus.publish(new DeactivateAtomCommandFailureEvent(atomUri, deactivateAtomCommandEvent, textMessage));
-            }
+        EventListener failureCallback = event1 -> {
+            String textMessage = WonRdfUtils.MessageUtils
+                            .getTextMessage(((FailureResponseEvent) event1).getFailureMessage());
+            logger.debug("atom creation failed for atom URI {}, original message URI {}: {}", new Object[] {
+                            atomUri, ((FailureResponseEvent) event1).getOriginalMessageURI(), textMessage });
+            bus.publish(new DeactivateAtomCommandFailureEvent(atomUri, deactivateAtomCommandEvent, textMessage));
         };
         EventBotActionUtils.makeAndSubscribeResponseListener(deactivateAtomMessage, successCallback, failureCallback,
                         ctx);

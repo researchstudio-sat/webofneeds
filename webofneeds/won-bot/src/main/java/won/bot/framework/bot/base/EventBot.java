@@ -78,7 +78,7 @@ import java.util.concurrent.Executor;
  * The bot will only react to onXX methods (i.e., create events and publish them
  * on the internal event bus) if it is in lifecycle phase ACTIVE.
  */
-public abstract class EventBot extends TriggeredBot {
+public abstract class EventBot extends ScheduledTriggerBot {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private EventBus eventBus;
     private EventListenerContext eventListenerContext = new MyEventListenerContext();
@@ -99,7 +99,8 @@ public abstract class EventBot extends TriggeredBot {
         if (getLifecyclePhase().isActive()) {
             eventBus.publish(new MessageFromOtherAtomEvent(con, wonMessage));
         } else {
-            logger.info("not publishing event for call to onMessageFromOtherAtom() as the bot is not in state {} but {}",
+            logger.info(
+                            "not publishing event for call to onMessageFromOtherAtom() as the bot is not in state {} but {}",
                             BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
@@ -119,7 +120,8 @@ public abstract class EventBot extends TriggeredBot {
         if (getLifecyclePhase().isActive()) {
             eventBus.publish(new SocketHintFromMatcherEvent(wonMessage));
         } else {
-            logger.info("not publishing event for call to onSocketHintFromMatcher() as the bot is not in state {} but {}",
+            logger.info(
+                            "not publishing event for call to onSocketHintFromMatcher() as the bot is not in state {} but {}",
                             BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
@@ -149,7 +151,8 @@ public abstract class EventBot extends TriggeredBot {
         if (getLifecyclePhase().isActive()) {
             eventBus.publish(new ConnectFromOtherAtomEvent(con, wonMessage));
         } else {
-            logger.info("not publishing event for call to onConnectFromOtherAtom() as the bot is not in state {} but {}",
+            logger.info(
+                            "not publishing event for call to onConnectFromOtherAtom() as the bot is not in state {} but {}",
                             BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
@@ -251,19 +254,20 @@ public abstract class EventBot extends TriggeredBot {
      */
     protected void shutdownEventListeners() {
         logger.info("shutdownEventListeners was not overridden by the subclass");
-    };
+    }
 
     /**
      * Init method used to create the event bus and allow event listeners to
      * register. Do not override! It not final to allow for CGLIB autoproxying.
      */
     @Override
-    protected void doInitializeCustom() {
+    public synchronized void initialize() throws Exception {
         this.eventBus = new AsyncEventBusImpl(getExecutor());
         // add an eventhandler that reacts to errors
         this.getEventBus().subscribe(ErrorEvent.class, new ErrorEventListener(getEventListenerContext()));
         initializeEventListeners();
         this.eventBus.publish(new InitializeEvent());
+        super.initialize();
     }
 
     /**
@@ -271,9 +275,10 @@ public abstract class EventBot extends TriggeredBot {
      * down. Do not override! It not final to allow for CGLIB autoproxying.
      */
     @Override
-    protected void doShutdownCustom() {
+    public synchronized void shutdown() throws Exception {
         eventBus.publish(new ShutdownEvent());
         shutdownEventListeners();
+        super.shutdown();
     }
 
     protected EventBus getEventBus() {
@@ -297,13 +302,9 @@ public abstract class EventBot extends TriggeredBot {
             return EventBot.this.getNodeURISource();
         }
 
-        public URI getSolrServerURI() {
-            return EventBot.this.getSolrServerURI();
-        }
-
         @Override
         public MatcherNodeURISource getMatcherNodeURISource() {
-            return EventBot.this.getMatcheNodeURISource();
+            return EventBot.this.getMatcherNodeURISource();
         }
 
         public WonMessageSender getWonMessageSender() {

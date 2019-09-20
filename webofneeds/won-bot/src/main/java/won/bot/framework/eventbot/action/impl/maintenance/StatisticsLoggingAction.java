@@ -20,6 +20,7 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.listener.EventListener;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Comparator;
 
 /*
  * Collects the EventBusStatistics and logs them.
@@ -39,11 +40,11 @@ public class StatisticsLoggingAction extends BaseEventBotAction {
         sb.append("\nEvent bus statistics: \n").append("number of listeners: ").append(statistics.getListenerCount())
                         .append("\n").append("number of listeners per listener class:\n");
         statistics.getListenerCountPerListenerClass().entrySet().stream()
-                        .sorted((e1, e2) -> e1.getKey().getName().compareTo(e2.getKey().getName()))
+                        .sorted(Comparator.comparing(e -> e.getKey().getName()))
                         .forEach(e -> sb.append(e.getKey().getName()).append(": ").append(e.getValue()).append("\n"));
         sb.append("number of listeners per event class:\n");
         statistics.getListenerCountPerEvent().entrySet().stream()
-                        .sorted((e1, e2) -> e1.getKey().getName().compareTo(e2.getKey().getName()))
+                        .sorted(Comparator.comparing(e -> e.getKey().getName()))
                         .forEach(e -> sb.append(e.getKey()).append(": ").append(e.getValue()).append("\n"));
         logger.info(sb.toString());
     }

@@ -10,11 +10,7 @@
  */
 package won.bot.integrationtest.failsim;
 
-import java.net.URI;
-import java.util.concurrent.Executor;
-
 import org.springframework.scheduling.TaskScheduler;
-
 import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.bot.context.BotContextWrapper;
 import won.bot.framework.component.atomproducer.AtomProducer;
@@ -27,6 +23,8 @@ import won.protocol.matcher.MatcherProtocolAtomServiceClientSide;
 import won.protocol.message.sender.WonMessageSender;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
+
+import java.util.concurrent.Executor;
 
 /**
  * Delegates calls to another EventListenerContext, allowing to set proxies for
@@ -42,11 +40,6 @@ public abstract class BaseEventListenerContextDecorator implements EventListener
     @Override
     public TaskScheduler getTaskScheduler() {
         return delegate.getTaskScheduler();
-    }
-
-    @Override
-    public URI getSolrServerURI() {
-        return delegate.getSolrServerURI();
     }
 
     @Override

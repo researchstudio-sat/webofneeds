@@ -19,5 +19,5 @@ import won.bot.framework.eventbot.listener.EventListener;
  * execution.
  */
 public interface EventBotAction {
-    public Runnable getActionTask(Event event, EventListener eventListener);
+    Runnable getActionTask(Event event, EventListener eventListener);
 }

@@ -31,7 +31,6 @@
     <!-- the runner -->
     <!--import resource="classpath:/spring/app/botRunner.xml" /-->
     <!-- the bots to run -->
-    <!--import resource="classpath:/spring/bot/mailBasedSimpleReactiveBotComment.xml" /-->
     <import resource="classpath:/spring/matcher-jmsonly.xml" />
     <import resource="classpath:/spring/core/matcher-core.xml" />
     <import resource="classpath:/spring/component/camel/matcher-camel.xml" />

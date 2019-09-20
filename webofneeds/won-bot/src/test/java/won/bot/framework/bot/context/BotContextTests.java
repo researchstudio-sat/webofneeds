@@ -1,24 +1,5 @@
 package won.bot.framework.bot.context;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.URI;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.TreeMap;
-
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
-
 import org.apache.xbean.spring.context.ClassPathXmlApplicationContext;
 import org.junit.Assert;
 import org.junit.Before;
@@ -26,6 +7,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.springframework.context.ApplicationContext;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
+import java.io.*;
+import java.net.URI;
+import java.util.*;
 
 /**
  * Tests for bot context. For the mongo db implementation you have to make
@@ -54,7 +43,9 @@ public class BotContextTests {
     public static Iterable<Class[]> getTestParameters() {
         LinkedList<Class[]> linkedList = new LinkedList<>();
         linkedList.add(new Class[] { MemoryBotContext.class });
-        linkedList.add(new Class[] { MongoBotContext.class });
+        // We exclude mongoBotContext for now TODO: find a better strategy for embedded
+        // mongodb integration Testing
+        // linkedList.add(new Class[] { MongoBotContext.class });
         return linkedList;
     }
 
@@ -143,8 +134,8 @@ public class BotContextTests {
         Assert.assertEquals(URI1, botContext.loadFromObjectMap("col1", "uri1"));
         Assert.assertEquals(URI2, botContext.loadFromObjectMap("col1", "uri2"));
         Assert.assertEquals(3, botContext.loadObjectMap("col2").size());
-        Assert.assertTrue(botContext.loadObjectMap("col2").values().contains(URI2));
-        Assert.assertTrue(botContext.loadObjectMap("col2").values().contains(URI3));
+        Assert.assertTrue(botContext.loadObjectMap("col2").containsValue(URI2));
+        Assert.assertTrue(botContext.loadObjectMap("col2").containsValue(URI3));
         botContext.removeFromObjectMap("col3", "uri1");
         botContext.removeFromObjectMap("col2", "uri3");
         botContext.removeFromObjectMap("col1", "uri1");

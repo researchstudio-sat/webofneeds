@@ -14,9 +14,9 @@ import java.util.*;
  */
 public class BotManagerImpl implements BotManager {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private List<Bot> bots = new LinkedList<Bot>();
-    private Map<URI, Bot> botByUri = new HashMap<URI, Bot>();
-    private Map<URI, List<Bot>> botListByUri = new HashMap<URI, List<Bot>>();
+    private List<Bot> bots = new LinkedList<>();
+    private Map<URI, Bot> botByUri = new HashMap<>();
+    private Map<URI, List<Bot>> botListByUri = new HashMap<>();
     private Object monitor = new Object();
 
     @Override
@@ -48,7 +48,7 @@ public class BotManagerImpl implements BotManager {
             if (botList != null && botList.size() > 0)
                 return botList;
         }
-        List<Bot> botList = new ArrayList<Bot>();
+        List<Bot> botList = new ArrayList<>();
         for (Bot mybot : bots) {
             if (mybot.knowsNodeURI(wonNodeUri)) {
                 synchronized (getMonitor()) {

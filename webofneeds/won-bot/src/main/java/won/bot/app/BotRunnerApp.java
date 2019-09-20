@@ -10,16 +10,15 @@
  */
 package won.bot.app;
 
-import java.util.concurrent.TimeUnit;
-
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.support.PeriodicTrigger;
-
 import won.bot.framework.bot.Bot;
-import won.bot.framework.bot.base.TriggeredBot;
+import won.bot.framework.bot.base.ScheduledTriggerBot;
 import won.bot.framework.manager.BotManager;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Runs any bot by class name.
@@ -31,7 +30,7 @@ public class BotRunnerApp {
             System.exit(1);
         }
         String botClass = args[0];
-        SpringApplication app = new SpringApplication(new Object[] { "classpath:/spring/app/botRunner.xml" });
+        SpringApplication app = new SpringApplication("classpath:/spring/app/botRunner.xml");
         app.setWebEnvironment(false);
         ConfigurableApplicationContext applicationContext = app.run(args);
         Bot bot = null;
@@ -42,10 +41,10 @@ public class BotRunnerApp {
         bot = (Bot) botBean;
         // the bot also needs a trigger so its act() method is called regularly.
         // (there is no trigger bean in the context)
-        if (bot instanceof TriggeredBot) {
+        if (bot instanceof ScheduledTriggerBot) {
             PeriodicTrigger trigger = new PeriodicTrigger(5000, TimeUnit.MILLISECONDS);
             trigger.setInitialDelay(1000);
-            ((TriggeredBot) bot).setTrigger(trigger);
+            ((ScheduledTriggerBot) bot).setTrigger(trigger);
         }
         BotManager botManager = (BotManager) applicationContext.getBean("botManager");
         // adding the bot to the bot manager will cause it to be initialized.

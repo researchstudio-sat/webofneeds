@@ -45,9 +45,9 @@ public class RoundRobinMultiNodeUriSource implements NodeURISource {
 
     public void setNodeURIs(final Collection<URI> nodeURIs) {
         if (nodeURIs == null) {
-            this.nodeURIs = new ArrayList<URI>();
+            this.nodeURIs = new ArrayList<>();
         } else {
-            this.nodeURIs = new ArrayList<URI>(nodeURIs.size());
+            this.nodeURIs = new ArrayList<>(nodeURIs.size());
             this.nodeURIs.addAll(nodeURIs);
         }
     }

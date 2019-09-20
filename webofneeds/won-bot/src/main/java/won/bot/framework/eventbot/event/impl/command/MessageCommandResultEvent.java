@@ -16,5 +16,5 @@ import won.bot.framework.eventbot.event.impl.cmd.CommandResultEvent;
  * Base interface for message command result events.
  */
 public interface MessageCommandResultEvent extends CommandResultEvent<MessageCommandEvent> {
-    public MessageCommandEvent getOriginalCommandEvent();
+    MessageCommandEvent getOriginalCommandEvent();
 }

@@ -12,7 +12,6 @@ package won.bot.framework.eventbot.action.impl.counter;
 
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.bus.EventBus;
-import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.filter.EventFilter;
 
 /**
@@ -50,14 +49,11 @@ public class EventPublishingCounter extends CounterImpl {
     }
 
     public EventFilter makeEventFilter() {
-        return new EventFilter() {
-            @Override
-            public boolean accept(Event event) {
-                if (!(event instanceof CountEvent)) {
-                    return false;
-                }
-                return ((CountEvent) event).getCounter() == EventPublishingCounter.this;
+        return event -> {
+            if (!(event instanceof CountEvent)) {
+                return false;
             }
+            return ((CountEvent) event).getCounter() == EventPublishingCounter.this;
         };
     }
 }

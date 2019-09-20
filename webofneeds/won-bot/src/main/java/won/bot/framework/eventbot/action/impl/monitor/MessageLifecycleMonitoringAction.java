@@ -73,8 +73,8 @@ public class MessageLifecycleMonitoringAction extends BaseEventBotAction {
             }
         } else if (event instanceof SuccessResponseEvent || event instanceof FailureResponseEvent) {
             DeliveryResponseEvent responseEvent = (DeliveryResponseEvent) event;
-            if (connectionMsgUris.keySet().contains(responseEvent.getOriginalMessageURI())
-                            || connectionMsgUris.keySet().contains(responseEvent.getRemoteResponseToMessageURI())) {
+            if (connectionMsgUris.containsKey(responseEvent.getOriginalMessageURI())
+                            || connectionMsgUris.containsKey(responseEvent.getRemoteResponseToMessageURI())) {
                 responseMsgUris.put(responseEvent.getMessage().getMessageURI(), responseEvent.getAtomURI());
                 if (responseEvent.isRemoteResponse()) {
                     responseMsgUris.put(responseEvent.getMessage().getCorrespondingRemoteMessageURI(),

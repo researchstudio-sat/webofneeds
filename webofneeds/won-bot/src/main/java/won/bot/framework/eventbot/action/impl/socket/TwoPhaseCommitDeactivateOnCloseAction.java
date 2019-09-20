@@ -10,12 +10,8 @@
  */
 package won.bot.framework.eventbot.action.impl.socket;
 
-import java.net.URI;
-
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.NodeIterator;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -29,6 +25,8 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
+
+import java.net.URI;
 
 /**
  * Expects a CloseFromOtherAtom event from a and closes the local atom. If the
@@ -47,16 +45,11 @@ public class TwoPhaseCommitDeactivateOnCloseAction extends BaseEventBotAction {
             URI atomURI = ((CloseFromOtherAtomEvent) event).getAtomURI();
             WonMessage wonMessage = ((CloseFromOtherAtomEvent) event).getWonMessage();
             NodeIterator ni = RdfUtils.visitFlattenedToNodeIterator(wonMessage.getMessageContent(),
-                            new RdfUtils.ModelVisitor<NodeIterator>() {
-                                @Override
-                                public NodeIterator visit(final Model model) {
-                                    return model.listObjectsOfProperty(
-                                                    model.createProperty(WON_TX.COORDINATION_MESSAGE.getURI()));
-                                }
-                            });
+                            model -> model.listObjectsOfProperty(
+                                            model.createProperty(WON_TX.COORDINATION_MESSAGE.getURI())));
             assert ni.hasNext() : "no additional content found in close message, expected a commit";
-            String coordinationMessageUri = ni.toList().get(0).asResource().getURI().toString();
-            assert coordinationMessageUri.equals(WON_TX.COORDINATION_MESSAGE_COMMIT.getURI().toString()) : "expected a "
+            String coordinationMessageUri = ni.toList().get(0).asResource().getURI();
+            assert coordinationMessageUri.equals(WON_TX.COORDINATION_MESSAGE_COMMIT.getURI()) : "expected a "
                             + "Commmit message";
             getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(atomURI));
             getEventListenerContext().getEventBus().publish(new AtomDeactivatedEvent(atomURI));

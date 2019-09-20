@@ -71,26 +71,23 @@ public class AutomaticMessageResponderListener extends AbstractHandleFirstNEvent
     }
 
     private void handleMessageEvent(final ConnectionSpecificEvent messageEvent) {
-        getEventListenerContext().getTaskScheduler().schedule(new Runnable() {
-            @Override
-            public void run() {
-                String incomingMessage = "cannot extract message";
-                if (messageEvent instanceof MessageFromOtherAtomEvent) {
-                    WonMessage wonMessage = ((MessageFromOtherAtomEvent) messageEvent).getWonMessage();
-                    incomingMessage = WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
-                }
-                String message = createMessage(messageEvent);
-                URI connectionUri = messageEvent.getConnectionURI();
-                if (logger.isDebugEnabled()) {
-                    logger.debug("connection {}: received message: {}", connectionUri, incomingMessage);
-                    logger.debug("connection {}: sending  message: {}", connectionUri, message);
-                }
-                try {
-                    getEventListenerContext().getWonMessageSender()
-                                    .sendWonMessage(createWonMessage(connectionUri, message));
-                } catch (Exception e) {
-                    logger.warn("could not send message via connection {}", connectionUri, e);
-                }
+        getEventListenerContext().getTaskScheduler().schedule(() -> {
+            String incomingMessage = "cannot extract message";
+            if (messageEvent instanceof MessageFromOtherAtomEvent) {
+                WonMessage wonMessage = ((MessageFromOtherAtomEvent) messageEvent).getWonMessage();
+                incomingMessage = WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
+            }
+            String message = createMessage(messageEvent);
+            URI connectionUri = messageEvent.getConnectionURI();
+            if (logger.isDebugEnabled()) {
+                logger.debug("connection {}: received message: {}", connectionUri, incomingMessage);
+                logger.debug("connection {}: sending  message: {}", connectionUri, message);
+            }
+            try {
+                getEventListenerContext().getWonMessageSender()
+                                .sendWonMessage(createWonMessage(connectionUri, message));
+            } catch (Exception e) {
+                logger.warn("could not send message via connection {}", connectionUri, e);
             }
         }, new Date(System.currentTimeMillis() + this.millisTimeoutBeforeReply));
     }

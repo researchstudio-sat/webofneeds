@@ -14,11 +14,7 @@ import won.bot.framework.eventbot.action.impl.factory.model.Precondition;
 import won.bot.framework.eventbot.action.impl.factory.model.Proposal;
 import won.bot.framework.eventbot.action.impl.factory.model.ProposalState;
 import won.bot.framework.eventbot.bus.EventBus;
-import won.bot.framework.eventbot.event.AtomSpecificEvent;
-import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
-import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.MessageEvent;
-import won.bot.framework.eventbot.event.TargetAtomSpecificEvent;
+import won.bot.framework.eventbot.event.*;
 import won.bot.framework.eventbot.event.impl.analyzation.agreement.AgreementCancellationAcceptedEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.agreement.ProposalAcceptedEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.precondition.PreconditionMetEvent;
@@ -73,7 +69,6 @@ public class AnalyzeBehaviour extends BotBehaviour {
 
     public AnalyzeBehaviour(EventListenerContext context, String name) {
         super(context, name);
-        context.getBotContextWrapper().getBotName();
         botContext = context.getBotContext();
         String botName = context.getBotContextWrapper().getBotName();
         this.preconditionToProposalListMapName = botName + ":" + name + ":preconditionToProposalListMap";
@@ -348,8 +343,7 @@ public class AnalyzeBehaviour extends BotBehaviour {
             try {
                 MessageDigest digest = MessageDigest.getInstance("SHA-256");
                 byte[] hash = digest.digest(strStatements.getBytes(StandardCharsets.UTF_8));
-                String strHash = new String(Base64.getEncoder().encode(hash));
-                return strHash;
+                return new String(Base64.getEncoder().encode(hash));
             } catch (NoSuchAlgorithmException e) {
                 return strStatements;
             }
@@ -420,8 +414,8 @@ public class AnalyzeBehaviour extends BotBehaviour {
      * Removes the stored entry for a preconditionPending Uri This method is used so
      * we can remove the pending precondition (e.g if a proposal can't be created)
      * 
-     * @param preconditionPendingURI the string of the preconditionUri that is not
-     * pending anymore
+     * @param preconditionURI the string of the preconditionUri that is not pending
+     * anymore
      */
     public void removePreconditionMetPending(String preconditionURI) {
         botContext.removeFromObjectMap(preconditionMetPending, preconditionURI);

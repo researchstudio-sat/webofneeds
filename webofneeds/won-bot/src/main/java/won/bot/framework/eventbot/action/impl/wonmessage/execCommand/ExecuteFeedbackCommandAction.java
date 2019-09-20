@@ -10,10 +10,7 @@
  */
 package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 
-import java.net.URI;
-
 import org.apache.jena.query.Dataset;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandNotSentEvent;
@@ -29,6 +26,8 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONCON;
+
+import java.net.URI;
 
 /**
  * Action executing a ConnectCommandEvent, connecting to the targetAtom on
@@ -65,9 +64,9 @@ public class ExecuteFeedbackCommandAction extends ExecuteSendMessageCommandActio
     }
 
     @Override
-    protected MessageCommandNotSentEvent createMessageNotSentEvent(FeedbackCommandEvent originalCommand,
+    protected MessageCommandNotSentEvent<?> createMessageNotSentEvent(FeedbackCommandEvent originalCommand,
                     String message) {
-        return new MessageCommandNotSentEvent<FeedbackCommandEvent>(message, originalCommand);
+        return new MessageCommandNotSentEvent<>(message, originalCommand);
     }
 
     protected WonMessage createWonMessage(FeedbackCommandEvent feedbackCommandEvent) throws WonMessageBuilderException {
@@ -77,8 +76,11 @@ public class ExecuteFeedbackCommandAction extends ExecuteSendMessageCommandActio
         URI localAtom = WonRdfUtils.ConnectionUtils.getLocalAtomURIFromConnection(connectionRDF, connectionURI);
         URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
         // TODO: make more generic by using the URIs specified in the command.
-        return WonMessageBuilder.setMessagePropertiesForHintFeedback(
-                        wonNodeInformationService.generateEventURI(wonNode), connectionURI, localAtom, wonNode,
-                        URI.create(WONCON.Good.getURI()).equals(feedbackCommandEvent.getValue())).build();
+        return WonMessageBuilder
+                        .setMessagePropertiesForHintFeedback(wonNodeInformationService.generateEventURI(wonNode),
+                                        connectionURI,
+                                        localAtom, wonNode,
+                                        URI.create(WONCON.Good.getURI()).equals(feedbackCommandEvent.getValue()))
+                        .build();
     }
 }

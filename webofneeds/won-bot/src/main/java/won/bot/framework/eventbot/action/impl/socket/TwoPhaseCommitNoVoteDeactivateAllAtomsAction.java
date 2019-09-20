@@ -11,7 +11,6 @@
 package won.bot.framework.eventbot.action.impl.socket;
 
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.NodeIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,16 +48,11 @@ public class TwoPhaseCommitNoVoteDeactivateAllAtomsAction extends BaseEventBotAc
         if (event instanceof CloseFromOtherAtomEvent) {
             WonMessage wonMessage = ((CloseFromOtherAtomEvent) event).getWonMessage();
             NodeIterator ni = RdfUtils.visitFlattenedToNodeIterator(wonMessage.getMessageContent(),
-                            new RdfUtils.ModelVisitor<NodeIterator>() {
-                                @Override
-                                public NodeIterator visit(final Model model) {
-                                    return model.listObjectsOfProperty(
-                                                    model.createProperty(WON_TX.COORDINATION_MESSAGE.getURI()));
-                                }
-                            });
+                            model -> model.listObjectsOfProperty(
+                                            model.createProperty(WON_TX.COORDINATION_MESSAGE.getURI())));
             if (ni.hasNext()) {
-                String coordinationMessageUri = ni.toList().get(0).asResource().getURI().toString();
-                if (coordinationMessageUri.equals(WON_TX.COORDINATION_MESSAGE_ABORT.getURI().toString()))
+                String coordinationMessageUri = ni.toList().get(0).asResource().getURI();
+                if (coordinationMessageUri.equals(WON_TX.COORDINATION_MESSAGE_ABORT.getURI()))
                     logger.debug("Sent COORDINATION_MESSAGE: {}", coordinationMessageUri);
                 else
                     logger.error("Content of the COORDINATION_MESSAGE must be: {}. Currently it is: {}",

@@ -29,8 +29,8 @@ public class SendMultipleMessagesAction extends SendMessageAction {
     @Override
     protected void doRun(final Event event, EventListener executingListener) throws Exception {
         if (event instanceof ConnectionSpecificEvent) {
-            for (int i = 0; i < messages.length; i++) {
-                sendMessage((ConnectionSpecificEvent) event, messages[i]);
+            for (String message : messages) {
+                sendMessage((ConnectionSpecificEvent) event, message);
             }
         }
     }

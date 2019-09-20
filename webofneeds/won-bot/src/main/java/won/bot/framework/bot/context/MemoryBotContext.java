@@ -2,14 +2,7 @@ package won.bot.framework.bot.context;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -20,13 +13,11 @@ public class MemoryBotContext implements BotContext {
     private Map<String, Map<String, Object>> contextObjectMap = new HashMap<>();
     private Map<String, Map<String, List<Object>>> contextListMap = new HashMap<>();
     private Set<URI> nodeUris = new HashSet<>();
-    private Map<String, List<URI>> namedAtomUriLists = new HashMap();
+    private Map<String, List<URI>> namedAtomUriLists = new HashMap<>();
 
     @Override
     public Set<URI> retrieveAllAtomUris() {
-        Set<URI> ret = new HashSet<>();
-        ret.addAll(namedAtomUriLists.values().stream().flatMap(List::stream).collect(Collectors.toSet()));
-        return ret;
+        return namedAtomUriLists.values().stream().flatMap(List::stream).collect(Collectors.toSet());
     }
 
     @Override
@@ -44,7 +35,7 @@ public class MemoryBotContext implements BotContext {
     public synchronized void appendToNamedAtomUriList(final URI uri, final String name) {
         List<URI> uris = this.namedAtomUriLists.get(name);
         if (uris == null) {
-            uris = new ArrayList();
+            uris = new ArrayList<>();
         }
         uris.add(uri);
         this.namedAtomUriLists.put(name, uris);
@@ -87,12 +78,7 @@ public class MemoryBotContext implements BotContext {
     }
 
     private Map<String, Object> getObjectMap(String collectionName) {
-        Map<String, Object> collection = contextObjectMap.get(collectionName);
-        if (collection == null) {
-            collection = new HashMap<>();
-            contextObjectMap.put(collectionName, collection);
-        }
-        return collection;
+        return contextObjectMap.computeIfAbsent(collectionName, k -> new HashMap<>());
     }
 
     @Override
@@ -112,7 +98,7 @@ public class MemoryBotContext implements BotContext {
 
     @Override
     public Map<String, Object> loadObjectMap(final String collectionName) {
-        return new HashMap<String, Object>(getObjectMap(collectionName));
+        return new HashMap<>(getObjectMap(collectionName));
     }
 
     @Override
@@ -121,21 +107,11 @@ public class MemoryBotContext implements BotContext {
     }
 
     private Map<String, List<Object>> getListMap(String collectionName) {
-        Map<String, List<Object>> collection = contextListMap.get(collectionName);
-        if (collection == null) {
-            collection = new HashMap<>();
-            contextListMap.put(collectionName, collection);
-        }
-        return collection;
+        return contextListMap.computeIfAbsent(collectionName, k -> new HashMap<>());
     }
 
     private List<Object> getList(String collectionName, String key) {
-        List<Object> objectList = getListMap(collectionName).get(key);
-        if (objectList == null) {
-            objectList = new LinkedList<>();
-            getListMap(collectionName).put(key, objectList);
-        }
-        return objectList;
+        return getListMap(collectionName).computeIfAbsent(key, k -> new LinkedList<>());
     }
 
     @Override

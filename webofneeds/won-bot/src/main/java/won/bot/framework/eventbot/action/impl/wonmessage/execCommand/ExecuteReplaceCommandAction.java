@@ -62,7 +62,7 @@ public class ExecuteReplaceCommandAction extends BaseEventBotAction {
         if (!atomResource.isURIResource()) {
             throw new IllegalArgumentException("atom resource in dataset is not an URI");
         }
-        URI atomURI = URI.create(atomResource.getURI().toString());
+        URI atomURI = URI.create(atomResource.getURI());
         RdfUtils.replaceBaseURI(atomDataset, atomResource.getURI(), true);
         RdfUtils.replaceBaseResource(atomDataset, atomResource, true);
         // AtomModelWrapper atomModelWrapper = new AtomModelWrapper(atomDataset);
@@ -74,25 +74,19 @@ public class ExecuteReplaceCommandAction extends BaseEventBotAction {
         WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         RdfUtils.renameResourceWithPrefix(atomDataset, atomResource.getURI(), atomURI.toString());
         WonMessage replaceMessage = createWonMessage(wonNodeInformationService, atomURI, wonNodeUri, atomDataset);
-        EventListener successCallback = new EventListener() {
-            @Override
-            public void onEvent(Event event) throws Exception {
-                logger.debug("atom content replacement successful for atom URI {}", atomURI);
-                getEventListenerContext().getEventBus()
-                                .publish(new ReplaceCommandSuccessEvent(atomURI, replaceCommandEvent));
-            }
+        EventListener successCallback = event12 -> {
+            logger.debug("atom content replacement successful for atom URI {}", atomURI);
+            getEventListenerContext().getEventBus()
+                            .publish(new ReplaceCommandSuccessEvent(atomURI, replaceCommandEvent));
         };
-        EventListener failureCallback = new EventListener() {
-            @Override
-            public void onEvent(Event event) throws Exception {
-                String textMessage = WonRdfUtils.MessageUtils
-                                .getTextMessage(((FailureResponseEvent) event).getFailureMessage());
-                logger.debug("atom content replacement failed for atom URI {}, original message URI {}: {}",
-                                new Object[] { atomURI, ((FailureResponseEvent) event).getOriginalMessageURI(),
-                                                textMessage });
-                getEventListenerContext().getEventBus()
-                                .publish(new ReplaceCommandFailureEvent(atomURI, replaceCommandEvent, textMessage));
-            }
+        EventListener failureCallback = event1 -> {
+            String textMessage = WonRdfUtils.MessageUtils
+                            .getTextMessage(((FailureResponseEvent) event1).getFailureMessage());
+            logger.debug("atom content replacement failed for atom URI {}, original message URI {}: {}",
+                            new Object[] { atomURI, ((FailureResponseEvent) event1).getOriginalMessageURI(),
+                                            textMessage });
+            getEventListenerContext().getEventBus()
+                            .publish(new ReplaceCommandFailureEvent(atomURI, replaceCommandEvent, textMessage));
         };
         EventBotActionUtils.makeAndSubscribeResponseListener(replaceMessage, successCallback, failureCallback,
                         getEventListenerContext());

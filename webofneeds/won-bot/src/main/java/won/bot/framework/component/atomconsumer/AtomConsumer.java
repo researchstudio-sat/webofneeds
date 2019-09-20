@@ -22,7 +22,7 @@ public interface AtomConsumer {
      * 
      * @param atom
      */
-    public void consume(Dataset atom);
+    void consume(Dataset atom);
 
     /**
      * Returns true if the consumer is prepared to consume another atom object.
@@ -31,5 +31,5 @@ public interface AtomConsumer {
      * 
      * @return
      */
-    public boolean isExhausted();
+    boolean isExhausted();
 }

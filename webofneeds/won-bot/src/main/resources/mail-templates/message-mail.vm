@@ -1,7 +1,0 @@
-#parse('mail-templates/inc/mail-messages.vm')
-
-#parse('mail-templates/inc/target-atom-info.vm')
-
-#parse('mail-templates/inc/quoted-mail.vm')
-
-#parse('mail-templates/inc/footer.vm')

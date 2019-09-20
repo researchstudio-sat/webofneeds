@@ -62,22 +62,19 @@ public class RespondToMessageAction extends BaseEventBotAction {
     }
 
     private void handleMessageEvent(final ConnectionSpecificEvent messageEvent) {
-        getEventListenerContext().getTaskScheduler().schedule(new Runnable() {
-            @Override
-            public void run() {
-                String message = createMessage();
-                URI connectionUri = messageEvent.getConnectionURI();
-                if (logger.isDebugEnabled()) {
-                    logger.debug("connection {}: received message: {}", connectionUri,
-                                    messageEvent.getClass().getSimpleName());
-                    logger.debug("connection {}: sending  message: {}", connectionUri, message);
-                }
-                try {
-                    getEventListenerContext().getWonMessageSender().sendWonMessage(
-                                    BotActionUtils.createWonMessage(getEventListenerContext(), connectionUri, message));
-                } catch (Exception e) {
-                    logger.warn("could not send message via connection {}", connectionUri, e);
-                }
+        getEventListenerContext().getTaskScheduler().schedule(() -> {
+            String message = createMessage();
+            URI connectionUri = messageEvent.getConnectionURI();
+            if (logger.isDebugEnabled()) {
+                logger.debug("connection {}: received message: {}", connectionUri,
+                                messageEvent.getClass().getSimpleName());
+                logger.debug("connection {}: sending  message: {}", connectionUri, message);
+            }
+            try {
+                getEventListenerContext().getWonMessageSender().sendWonMessage(
+                                BotActionUtils.createWonMessage(getEventListenerContext(), connectionUri, message));
+            } catch (Exception e) {
+                logger.warn("could not send message via connection {}", connectionUri, e);
             }
         }, new Date(System.currentTimeMillis() + this.millisTimeoutBeforeReply));
     }

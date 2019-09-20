@@ -19,7 +19,7 @@ import won.bot.framework.eventbot.event.Event;
  * unsubscribed.
  */
 public interface SubscriptionAware {
-    public <T extends Event> void onSubscribe(Class<T> event);
+    <T extends Event> void onSubscribe(Class<T> event);
 
-    public <T extends Event> void onUnsubscribe(Class<T> event);
+    <T extends Event> void onUnsubscribe(Class<T> event);
 }

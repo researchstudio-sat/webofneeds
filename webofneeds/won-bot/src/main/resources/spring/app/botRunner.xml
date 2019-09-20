@@ -19,30 +19,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
 
-    <!--
-       context that combines components to provide an environment for running bots
-    -->
-    <!--import resource="classpath:/spring/component/linkeddatasource/owner-linkeddatasource.xml" /-->
-    <import resource="classpath:/spring/component/scheduling/scheduling.xml"/>
-    <import resource="classpath:/spring/component/ownerCallback/ownerCallback.xml"/>
-    <import resource="classpath:/spring/component/matcherProtocolMatcherServiceHandler/matcherProtocolMatcherServiceHandler.xml"/>
-    <import resource="classpath:/spring/component/botManager/botManager.xml"/>
-    <!-- this introduces the email-based subsystem for generating atoms to be loaded, which is not desirable for most
-     applications. -->
-    <!-- import resource="classpath:/spring/component/atomproducer/atomproducer-mixed.xml" /-->
-    <import resource="classpath:/spring/component/nodeurisource/nodeurisource-roundrobin.xml"/>
     <import resource="classpath:/spring/owner-jmsonly.xml"/>
-    <!-- monitoring -->
-    <!--
-    <import resource="classpath:/spring/component/monitoring/bot-monitoring-jmx.xml" />
-    <import resource="classpath:/spring/component/monitoring/bot-monitoring.xml" />
-    -->
-    <import resource="classpath:/spring/component/monitoring/monitoring-recorder.xml"/>
-
-    <!--import resource="classpath:/spring/component/wonNodeInformationService.xml"/-->
-
-    <!--import resource="classpath:/spring/matcher-jmsonly.xml"/-->
-
     <import resource="classpath:/spring/component/matcherProtocolAtomServiceClient/matcherProtocolAtomServiceClient-jms.xml"/>
     <import resource="classpath:/spring/component/MatcherProtocolMatcherService/matcherProtocolMatcherService-jms.xml"/>
     <import resource="classpath:/spring/component/camel/matcher-camel.xml"/>
@@ -52,6 +29,61 @@
     <import resource="classpath:/spring/component/linkeddatasource/matcher-linkeddatasource.xml"/>
     <import resource="classpath:/spring/component/ehcache/spring-matcher-ehcache.xml"/>
     <import resource="classpath:/spring/component/nodeurisource/matcher-nodeurisource-all.xml"/>
-    <import resource="classpath:/spring/component/threadpool.xml"/>
 
+    <bean id="taskScheduler" class="org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler"
+          destroy-method="destroy">
+        <property name="poolSize" value="15"/>
+    </bean>
+
+    <!-- expects a botManager and a taskScheduler bean -->
+    <bean id="botOwnerProtocolAdapter" class="won.bot.integration.BotOwnerCallback">
+        <property name="botManager" ref="botManager"/>
+        <property name="taskScheduler" ref="taskScheduler"/>
+    </bean>
+
+    <!-- provides the bean expected by the dynamic camel route configuration in won-owner -->
+    <bean id="mainOwnerMessageProcessor" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+        <constructor-arg>
+            <!-- adapts an OwnerCallback to incoming messages. The callback is autowired -->
+            <bean class="won.owner.protocol.message.base.MessageExtractingOwnerCallbackAdapter"/>
+        </constructor-arg>
+    </bean>
+
+    <bean id="botManager" class="won.bot.framework.manager.impl.SpringAwareBotManagerImpl">
+        <property name="checkWorkDoneTrigger">
+            <bean class="org.springframework.scheduling.support.PeriodicTrigger">
+                <constructor-arg name="period" value="10"/>
+                <constructor-arg name="timeUnit" value="SECONDS"/>
+                <property name="fixedRate" value="true"/>
+                <property name="initialDelay" value="10"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- expects a botManager and a taskScheduler bean -->
+    <bean id="matcherProtocolMatcherServiceHandler"
+          class="won.bot.integration.BotMatcherProtocolMatcherServiceCallback">
+        <property name="botManager" ref="botManager"/>
+        <property name="taskScheduler" ref="taskScheduler"/>
+    </bean>
+
+
+    <!-- ####################### Node Uri Source Beans ####################################### -->
+    <!--
+        Only use one of the beans defined in here, otherwise nodeUriSourceRoundRobin will be chosen anyway
+        Due to the default-qualifier
+     -->
+    <bean id="nodeUriSourceRoundRobin"
+          class="won.bot.framework.component.nodeurisource.impl.RoundRobinMultiNodeUriSource">
+        <property name="nodeURIs" value="#{'${won.node.uris}'.split(' ')}"/>
+        <qualifier value="default"/>
+    </bean>
+
+    <!-- bean id="nodeUriSourceRandom" class="won.bot.framework.component.nodeurisource.impl.RandomMultiNodeUriSource">
+        <property name="nodeURIs" value="#{'${won.node.uris}'.split(' ')}"/>
+    </bean -->
+    <!-- ##################################################################################### -->
+
+    <!-- Import the correct botContext so we do not create all possible botContexts (currently possible: memoryBotContext and mongoBotContext)-->
+    <import resource="classpath:/spring/component/botContext/${botContext.impl}.xml" />
 </beans>

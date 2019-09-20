@@ -19,7 +19,7 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.concurrent.ExecutionException;
 
 @Component
-@PropertySource("file:${WON_CONFIG_DIR}/owner.properties")
+@PropertySource(value = "file:${WON_CONFIG_DIR}/owner.properties", ignoreResourceNotFound = true)
 public class WonOwnerPushSender {
     private final String VAPID_KEY_ALIAS = "vapidPushKey";
     @Value("${vapid.privateKeyLocation}")
