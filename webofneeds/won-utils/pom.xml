@@ -3,12 +3,12 @@
     <parent>
         <artifactId>webofneeds</artifactId>
         <groupId>at.researchstudio.sat</groupId>
-        <version>0.5-SNAPSHOT</version>
+        <version>0.5</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <name>Utilities</name>
     <artifactId>won-utils</artifactId>
-    <version>0.5-SNAPSHOT</version>
+    <version>0.5</version>
     <modules>
         <module>won-utils-import</module>
         <module>won-utils-mail</module>

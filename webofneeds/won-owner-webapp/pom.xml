@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>webofneeds</artifactId>
 		<groupId>at.researchstudio.sat</groupId>
-		<version>0.5-SNAPSHOT</version>
+		<version>0.5</version>
 	</parent>
 	<packaging>war</packaging>
 	<name>Owner Webapp</name>

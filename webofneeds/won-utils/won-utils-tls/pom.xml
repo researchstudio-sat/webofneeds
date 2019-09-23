@@ -4,11 +4,11 @@
     <parent>
         <groupId>at.researchstudio.sat</groupId>
         <artifactId>won-utils</artifactId>
-        <version>0.5-SNAPSHOT</version>
+        <version>0.5</version>
     </parent>
     <groupId>at.researchstudio.sat</groupId>
     <artifactId>won-utils-tls</artifactId>
-    <version>0.5-SNAPSHOT</version>
+    <version>0.5</version>
     <name>won-utils-tls</name>
     <url>http://maven.apache.org</url>
     <properties>

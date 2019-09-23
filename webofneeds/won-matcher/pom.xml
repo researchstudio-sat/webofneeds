@@ -6,10 +6,10 @@
     <parent>
         <artifactId>webofneeds</artifactId>
         <groupId>at.researchstudio.sat</groupId>
-        <version>0.5-SNAPSHOT</version>
+        <version>0.5</version>
     </parent>
     <artifactId>won-matcher</artifactId>
-    <version>0.5-SNAPSHOT</version>
+    <version>0.5</version>
     <name>Matcher Client</name>
 
     <properties>
