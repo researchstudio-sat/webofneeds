@@ -13,6 +13,7 @@ package won.bot.framework.eventbot.behaviour;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
+import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.listener.EventListener;
 
@@ -135,8 +136,11 @@ public abstract class BotBehaviour {
      * within the deactivate process of this behaviour.
      */
     protected <T extends Event> void subscribeWithAutoCleanup(Class<T> eventClazz, EventListener listener) {
-        activeListeners.add(listener);
-        context.getEventBus().subscribe(eventClazz, listener);
+        activeListeners.add(context.getEventBus().subscribe(eventClazz, listener));
+    }
+
+    protected <T extends Event> void subscribeWithAutoCleanup(Class<T> eventClazz, BaseEventBotAction... actions) {
+        activeListeners.add(context.getEventBus().subscribe(eventClazz, actions));
     }
 
     /**

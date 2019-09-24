@@ -10,6 +10,7 @@
  */
 package won.bot.framework.eventbot.bus;
 
+import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.bus.impl.EventBusStatistics;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.listener.EventListener;
@@ -32,11 +33,33 @@ public interface EventBus {
      * SubscriptionAware interface, its onSubscribe() method will be called before
      * the bot is subscribed.
      * 
-     * @param eventClazz
-     * @param listener
-     * @param <T>
+     * @param eventClazz event-class to listen to
+     * @param listener executes Listener if event is fired
+     * @param <T> must be a subclass of Event
+     * @return a reference to the used eventListener (this reference can be used to
+     * unsubscribe the event listener combination)
      */
-    <T extends Event> void subscribe(Class<T> eventClazz, EventListener listener);
+    <T extends Event> EventListener subscribe(Class<T> eventClazz, EventListener listener);
+
+    /**
+     * Subscribes all given actions to an event type, by wrapping a
+     * ActionOnEventListener around the given action. If there are multiple actions
+     * a new MultipeActions will be wrapped around the actions as well Example:
+     * subscribe(Event.class, action1, action2, action3) is equivalent to:
+     * subscribe(Event.class, new
+     * ActionOnEventListener(action1.getEventListenerContext, new
+     * MultipleActions(action1.getEventListenerContext(), action1, action2,
+     * action3))) subscribe(Event.class, action) is equivalent to:
+     * subscribe(Event.class, new
+     * ActionOnEventListener(action.getEventListenerContext(), action))
+     *
+     * @param eventClazz event-class to listen to
+     * @param actions actions to be executed every time the event is fired
+     * @param <T> must be a subclass of Event
+     * @return a reference to the created eventListener (this reference can be used
+     * to unsubscribe the event actions combination)
+     */
+    <T extends Event> EventListener subscribe(Class<T> eventClazz, final BaseEventBotAction... actions);
 
     /**
      * Unsubscribes a listener from an event type. If the listener implements the

@@ -10,20 +10,8 @@
  */
 package won.bot.framework.eventbot.behaviour;
 
-import java.util.Optional;
-
 import won.bot.framework.eventbot.EventListenerContext;
-import won.bot.framework.eventbot.action.EventBotAction;
-import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.ExecuteCloseCommandAction;
-import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.ExecuteConnectCommandAction;
-import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.ExecuteConnectionMessageCommandAction;
-import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.ExecuteCreateAtomCommandAction;
-import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.ExecuteDeactivateAtomCommandAction;
-import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.ExecuteFeedbackCommandAction;
-import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.ExecuteOpenCommandAction;
-import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.ExecuteReplaceCommandAction;
-import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.LogMessageCommandFailureAction;
-import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.*;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.command.close.CloseCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.connect.ConnectCommandEvent;
@@ -33,7 +21,8 @@ import won.bot.framework.eventbot.event.impl.command.deactivate.DeactivateAtomCo
 import won.bot.framework.eventbot.event.impl.command.feedback.FeedbackCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.open.OpenCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.replace.ReplaceCommandEvent;
-import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
+
+import java.util.Optional;
 
 /**
  * Behaviour that causes all WonMessageCommand events to be executed.
@@ -49,21 +38,17 @@ public class ExecuteWonMessageCommandBehaviour extends BotBehaviour {
 
     @Override
     protected void onActivate(Optional<Object> message) {
-        linkEventToActionWithAutoCleanup(CreateAtomCommandEvent.class, new ExecuteCreateAtomCommandAction(context));
-        linkEventToActionWithAutoCleanup(ReplaceCommandEvent.class, new ExecuteReplaceCommandAction(context));
-        linkEventToActionWithAutoCleanup(ConnectCommandEvent.class, new ExecuteConnectCommandAction(context));
-        linkEventToActionWithAutoCleanup(OpenCommandEvent.class, new ExecuteOpenCommandAction(context));
-        linkEventToActionWithAutoCleanup(ConnectionMessageCommandEvent.class,
+        this.subscribeWithAutoCleanup(CreateAtomCommandEvent.class, new ExecuteCreateAtomCommandAction(context));
+        this.subscribeWithAutoCleanup(ReplaceCommandEvent.class, new ExecuteReplaceCommandAction(context));
+        this.subscribeWithAutoCleanup(ConnectCommandEvent.class, new ExecuteConnectCommandAction(context));
+        this.subscribeWithAutoCleanup(OpenCommandEvent.class, new ExecuteOpenCommandAction(context));
+        this.subscribeWithAutoCleanup(ConnectionMessageCommandEvent.class,
                         new ExecuteConnectionMessageCommandAction(context));
-        linkEventToActionWithAutoCleanup(CloseCommandEvent.class, new ExecuteCloseCommandAction(context));
-        linkEventToActionWithAutoCleanup(DeactivateAtomCommandEvent.class,
+        this.subscribeWithAutoCleanup(CloseCommandEvent.class, new ExecuteCloseCommandAction(context));
+        this.subscribeWithAutoCleanup(DeactivateAtomCommandEvent.class,
                         new ExecuteDeactivateAtomCommandAction(context));
-        linkEventToActionWithAutoCleanup(FeedbackCommandEvent.class, new ExecuteFeedbackCommandAction(context));
+        this.subscribeWithAutoCleanup(FeedbackCommandEvent.class, new ExecuteFeedbackCommandAction(context));
         // if we receive a message command failure, log it
-        linkEventToActionWithAutoCleanup(MessageCommandFailureEvent.class, new LogMessageCommandFailureAction(context));
-    }
-
-    private void linkEventToActionWithAutoCleanup(Class<? extends Event> clazz, EventBotAction action) {
-        this.subscribeWithAutoCleanup(clazz, new ActionOnEventListener(context, action));
+        this.subscribeWithAutoCleanup(MessageCommandFailureEvent.class, new LogMessageCommandFailureAction(context));
     }
 }

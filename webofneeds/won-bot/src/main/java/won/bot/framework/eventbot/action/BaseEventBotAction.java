@@ -56,7 +56,7 @@ public abstract class BaseEventBotAction implements won.bot.framework.eventbot.a
         };
     }
 
-    protected EventListenerContext getEventListenerContext() {
+    public EventListenerContext getEventListenerContext() {
         return eventListenerContext;
     }
 
