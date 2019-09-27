@@ -169,26 +169,26 @@ services:
     volumes:
       - $base_folder/mongodb/data/db:/data/db
 
-  # debug bot used to test atom communication, connect to wonnodes (proxied: line.uki.or.at)
-#  debug_bot:
-#    restart: always
-#    build: ../../image/bots
-#    environment:
-#      - "uri.prefix.owner=https://cbi.matchat.org/debug_bot"  # set this for the trust store alias
-#      - "node.default.host=cbi.matchat.org"
-#      - "node.default.http.port=443"
-#      - "uri.prefix.node.default=https://cbi.matchat.org/won"
-#      - "won.node.uris=https://cbi.matchat.org/won/resource"
-#      - "botContext.impl=mongoBotContext"
-#      - "botContext.mongodb.user=won"
-#      - "botContext.mongodb.pass=$mongo_db_passwd"
-#      - "botContext.mongodb.host=satvm06.researchstudio.at"
-#      - "botContext.mongodb.port=27017"
-#      - "botContext.mongodb.database=uki_bot"
-#    depends_on:
-#      - wonnode
-#      - mongodb
-
+  # debug bot used to test atom communication, connect to wonnodes 1 and 2
+  debug_bot:
+    restart: always
+    image: webofneeds/won-debugbot:latest
+    environment:
+      - "WON_KEYSTORE_DIR=/usr/src/bots/client-certs/"
+      - "WON_NODE_URI=https://cbi.matchat.org/won"
+      - "uri.prefix.owner=https://cbi.matchat.org/debug_bot" # set this for the trust store alias
+      - "botContext.impl=mongoBotContext"
+      - "botContext.mongodb.user=won"
+      - "botContext.mongodb.pass=$mongo_db_passwd"
+      - "botContext.mongodb.host=satvm06.researchstudio.at"
+      - "botContext.mongodb.port=27017"
+      - "botContext.mongodb.database=uki_bot"
+    volumes:
+      - $base_folder/won-client-certs/debug_bot:/usr/src/bots/client-certs/
+    depends_on:
+      - wonnodeblue
+      - wonnodegreen
+      - mongodb
 
   matcher_sparql:
     restart: always
