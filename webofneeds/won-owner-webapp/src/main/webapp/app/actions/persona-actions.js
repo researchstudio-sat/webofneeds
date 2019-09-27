@@ -153,11 +153,11 @@ export function disconnectPersona(atomUri, personaUri) {
 
     const connectionUri = get(persona, "connections")
       .filter(connection => {
-        const socketUri = get(connection, "socketUri");
+        const socketUri = get(connection, "targetSocketUri");
         const socketType = getIn(atom, ["content", "sockets", socketUri]);
         return (
           get(connection, "targetAtomUri") === atomUri &&
-          socketType === won.HOLD.HolderSocketCompacted
+          socketType === won.HOLD.HoldableSocketCompacted
         );
       })
       .keySeq()

@@ -196,7 +196,7 @@ class WonAtomContentPersona extends React.Component {
               {"Holder of " +
                 this.props.personaHoldsSize +
                 " Post" +
-                (this.props.personaHoldsSize != 0 && "s")}
+                (this.props.personaHoldsSize === 1 ? "" : "s")}
             </div>
             <button
               className="ac-persona__holds__view won-button--filled red"
@@ -213,7 +213,7 @@ class WonAtomContentPersona extends React.Component {
               {"Buddy of " +
                 this.props.personaBuddySize +
                 " Persona" +
-                (this.props.personaBuddySize != 0 && "s")}
+                (this.props.personaBuddySize === 1 ? "" : "s")}
             </div>
             <button
               className="ac-persona__buddies__view won-button--filled red"

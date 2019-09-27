@@ -43,11 +43,12 @@ export default class ElmReact extends React.Component {
     });
 
     if (ports.outPort) {
+      const self = this;
       ports.outPort.subscribe(message => {
         switch (message.type) {
           case "action":
             if (actionCreators[message.name]) {
-              this.context.dispatch(
+              self.context.store.dispatch(
                 actionCreators[message.name](...message.arguments)
               );
             } else {
@@ -56,11 +57,11 @@ export default class ElmReact extends React.Component {
             break;
           case "event": {
             if (typeof this.props[message.name] === "function") {
-              this.props[message.name](message.payload);
+              self.props[message.name](message.payload);
             } else {
               console.error(
                 `Could not find eventHandler ${message.name}`,
-                this.props
+                self.props
               );
             }
             break;
