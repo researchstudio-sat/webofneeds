@@ -214,26 +214,27 @@ services:
     volumes:
       - $base_folder/mongodb/data/db:/data/db
 
-  # debug bot used to test atom communication, connect to wonnodes blue and green
-#  debug_bot:
-#    restart: always
-#    build: ../../image/bots
-#    image: webofneeds/bots:master
-#    environment:
-#      - "node.default.host=nodeblue.master.matchat.org"
-#      - "node.default.http.port=443"
-#      - "uri.prefix.owner=https://master.matchat.org/debug_bot" # set this for the trust store alias
-#      - "won.node.uris=https://nodeblue.master.matchat.org/won/resource https://nodegreen.master.matchat.org/won/resource"
-#      - "botContext.impl=mongoBotContext"
-#      - "botContext.mongodb.user=won"
-#      - "botContext.mongodb.pass=$mongo_db_passwd"
-#      - "botContext.mongodb.host=satvm02.researchstudio.at"
-#      - "botContext.mongodb.port=27018"
-#      - "botContext.mongodb.database=master_bot"
-#    depends_on:
-#      - mongodb
-#      - wonnodeblue
-#      - wonnodegreen
+  # debug bot used to test atom communication, connect to wonnodes 1 and 2
+  debug_bot:
+    restart: always
+    image: webofneeds/won-debugbot:latest
+    environment:
+      - "WON_KEYSTORE_DIR=/usr/src/bots/client-certs/"
+      - "WON_NODE_URI=https://nodeblue.master.matchat.org/won"
+      - "uri.prefix.owner=https://master.matchat.org/debug_bot" # set this for the trust store alias
+      - "won.node.uris=https://nodeblue.master.matchat.org/won/resource https://nodegreen.master.matchat.org/won/resource"
+      - "botContext.impl=mongoBotContext"
+      - "botContext.mongodb.user=won"
+      - "botContext.mongodb.pass=$mongo_db_passwd"
+      - "botContext.mongodb.host=satvm02.researchstudio.at"
+      - "botContext.mongodb.port=27018"
+      - "botContext.mongodb.database=master_bot"
+    volumes:
+      - $base_folder/won-client-certs/debug_bot:/usr/src/bots/client-certs/
+    depends_on:
+      - wonnodeblue
+      - wonnodegreen
+      - mongodb
 
 #  hokify_bot:
 #    restart: always
