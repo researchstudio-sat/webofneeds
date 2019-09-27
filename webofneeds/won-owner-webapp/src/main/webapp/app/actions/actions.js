@@ -36,6 +36,8 @@
  */
 // <utils>
 
+import Immutable from "immutable";
+
 import { atomCreate, atomEdit } from "./create-atom-action.js";
 
 import {
@@ -358,6 +360,7 @@ const actionHierarchy = {
 
   view: {
     toggleRdf: INJ_DEFAULT,
+    toggleDebugMode: toggleDebugMode,
 
     toggleClosedAtoms: INJ_DEFAULT,
 
@@ -572,4 +575,17 @@ export function startTicking() {
       () => dispatch({ type: actionTypes.tick, payload: Date.now() }),
       60000
     );
+}
+
+function toggleDebugMode() {
+  return dispatch => {
+    won.debugmode = !won.debugmode;
+    dispatch({
+      type: actionTypes.view.toggleDebugMode,
+      payload: won.debugmode,
+    });
+    const text = won.debugmode ? "Debugmode On" : "Debugmode Off";
+    // this.props.toastPush(Immutable.fromJS({ text }));
+    dispatch(actionCreators.toasts__push(Immutable.fromJS({ text })));
+  };
 }

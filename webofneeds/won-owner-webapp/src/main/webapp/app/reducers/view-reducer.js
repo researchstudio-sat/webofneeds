@@ -6,6 +6,7 @@ import Immutable from "immutable";
 import { get, getIn } from "../utils.js";
 
 const initialState = Immutable.fromJS({
+  debugMode: false,
   showRdf: false,
   showClosedAtoms: false,
   showMainMenu: false,
@@ -85,6 +86,9 @@ export default function(viewState = initialState, action = {}) {
       return viewState
         .set("showRdf", !viewState.get("showRdf"))
         .set("showMainMenu", false);
+
+    case actionTypes.view.toggleDebugMode:
+      return viewState.set("debugMode", action.payload);
 
     case actionTypes.view.toggleClosedAtoms:
       return viewState.set(
