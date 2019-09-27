@@ -61,7 +61,7 @@ Behaviours act as a wrapper to `EventListener`s and `Action`s and can be activat
 
 ## Implementing a Bot
 
-To create a new bot, we recommend to use the [bot skeleton](https://github.com/researchstudio-sat/bot-skeleton) as a template, providing all needed functions for a bot in the WoN.
+To create a new bot, we recommend to use the [bot skeleton](https://github.com/researchstudio-sat/bot-skeleton) as a template, providing all needed functions for a bot in the WoN. Click [here](https://github.com/researchstudio-sat/bot-skeleton/generate) to go directly to the repository creation.
 
 ### Starting from scratch
 
