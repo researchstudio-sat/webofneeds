@@ -54,7 +54,7 @@ To integrate a new matcher, or matching algorithm we recommend to use the matche
 ### How to write a bot
 
 Basic information about bots is provided [here](/webofneeds/won-bot/README.md).
-To write a new bot, we recommend to use the bot skeleton, providing all needed functions for a bot in the WoN.
+To write a new bot, we recommend to use the [bot skeleton](https://github.com/researchstudio-sat/bot-skeleton) as a template, providing all needed functions for a bot in the WoN.
 
 ### How to write a WoN web application
 
