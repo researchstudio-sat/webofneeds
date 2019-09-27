@@ -196,7 +196,7 @@ class WonAtomContentPersona extends React.Component {
               {"Holder of " +
                 this.props.personaHoldsSize +
                 " Post" +
-                (this.props.personaHoldsSize != 0 && "s")}
+                (this.props.personaHoldsSize === 1 ? "" : "s")}
             </div>
             <button
               className="ac-persona__holds__view won-button--filled red"
