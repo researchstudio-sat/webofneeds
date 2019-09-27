@@ -61,7 +61,7 @@ Behaviours act as a wrapper to `EventListener`s and `Action`s and can be activat
 
 ## Implementing a Bot
 
-To create a new bot, currently the easiest way is to copy the app class and corresponding spring config files of an existing bot, e.g. the `EchoBot`, and modify that.
+To create a new bot, we recommend to use the [bot skeleton](https://github.com/researchstudio-sat/bot-skeleton) as a template, providing all needed functions for a bot in the WoN.
 
 ### Starting from scratch
 
@@ -140,37 +140,13 @@ WonMessageBuilder builder = WonMessageBuilder
 ```
 
 ## Additional Resources
+A good starting point for understanding the framework is the [EchoBot](https://github.com/researchstudio-sat/won-echobot). This bot creates one atom at startup, and it registers with the WoN node configured with the `WON_NODE_URI` environment variable, so it is always notified when a new atom is created. When that happens, the bot attempts to establish a connection with the new atom and if the new atom accepts it, the bot echoes any text message received from the new atom.
 
-A good starting point for understanding the framework is the [EchoBot](src/main/java/won/bot/impl/EchoBot.java) and its corresponding [EchoBotApp](src/main/java/won/bot/app/EchoBotApp.java). This bot creates one atom at startup, and it registers with the WoN node configured in its [node-uri-source.properties](/webofneeds/conf/node-uri-source.properties) file so it is always notified when a new atom is created. When that happens, the bot attempts to establish a connection with the new atom and if the new atom accepts it, the bot echoes any text message received from the new atom.
+For an example of a bot for creating atoms, the [AtomCreatorBot](https://github.com/researchstudio-sat/won-atomcreatorbot) is a good example. This bot reads atom `Model`s from the configured `AtomProducer` and creates new atoms on the configured WoN nodes. It does that until the `AtomProducer` is exhausted.
 
-For an example of a bot for creating atoms, the [AtomCreatorBot](src/main/java/won/bot/impl/AtomCreatorBot.java) is a good model. This bot reads atom `Model`s from the configured `AtomProducer` and creates new atoms on the configured WoN nodes. It does that until the `AtomProducer` is exhausted.
-
-Other, more complex bots to look at are the [MailBot](src/main/java/won/bot/impl/Mail2WonBot.java) and the [DebugBot](src/main/java/won/bot/impl/DebugBot.java). They are described in more detail in the next section.
+Other, more complex bots to look at are the [MailBot](https://github.com/researchstudio-sat/won-mailbot) and the [DebugBot](https://github.com/researchstudio-sat/won-debugbot). Click on the corresponding links to find out more.
 
 # Testing and debugging with bots
-
-## Debug Bot
-
-[DebugBotApp](src/main/java/won/bot/app/DebugBotApp.java) can be used to test if connections
-can be established with the atoms you are creating and if messages can be sent via those connections. For each atom created by you, the Bot will generate a connection request and a hint messages. Additionally, some actions can be triggered by sending text messages on those connections. Check supported [actions](src/main/java/won/bot/framework/eventbot/action/impl/debugbot/DebugBotIncomingMessageToEventMappingAction.java) for more information.
-
-To run the [DebugBotApp](src/main/java/won/bot/app/DebugBotApp.java), an argument specifying the configuration location is needed, e.g:
-
-    -DWON_CONFIG_DIR=C:/webofneeds/conf.local
-
-Make sure this location contains the relevant property files, and you have specified the values of the properties relevant for the system being tested, i.e.:
-
-- in [node-uri-source.properties](../conf/node-uri-source.properties)
-  - won.node.uris - specify values of nodes being tested - the bot will react to atoms published on those nodes
-- in [owner.properties](../conf/owner.properties)
-  - specify default node data (node.default.host/scheme/port) - the bot will create its own atoms on that node
-  - make sure both a path to keystore and truststore (keystore/truststore.location) and their password (keystore/truststore.password) is specified. For additional details on the necessary keys and certificates, refer to the Web of Needs [installation notes](https://github.com/researchstudio-sat/webofneeds/blob/master/documentation/installation-cryptographic-keys-and-certificates.md).
-
-> **NOTE:** Use a separate keystore (and key pair) for your bot, especially if you are running another owner application locally - this will result in the node not delivering messages correctly because the queues used for delivery are defined based on certificates. If multiple applications from the same source share a certificate, there will be errors.
-
-> **NOTE:** For the same reason as above, do not run several bot applications at the same time, - stop one before running another or separate their configurations.
-
-> **NOTE:** Keystore and truststore paths have to be specified, but the files themselves do not have to exist initially, they will be created automatically. If you registered to a node using a different certificate before, the keystore and truststore need to be deleted to be able to register correctly again.
 
 ## Mail2Won Bot
 
