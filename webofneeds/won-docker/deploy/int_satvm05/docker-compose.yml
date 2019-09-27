@@ -228,7 +228,7 @@ services:
     environment:
       - "WON_KEYSTORE_DIR=/usr/src/bots/client-certs/"
       - "WON_NODE_URI=https://satvm05.researchstudio.at/won"
-      - "logging.config=/usr/src/bots/logback.xml"
+#      - "logging.config=/usr/src/bots/logback.xml"
       - "uri.prefix.owner=https://satvm05.researchstudio.at/debug_bot" # set this for the trust store alias
       - "won.node.uris=https://satvm05.researchstudio.at:8888/won/resource https://satvm05.researchstudio.at/won/resource"
       - "botContext.impl=mongoBotContext"
