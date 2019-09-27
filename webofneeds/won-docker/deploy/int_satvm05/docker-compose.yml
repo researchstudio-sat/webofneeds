@@ -228,22 +228,22 @@ services:
     environment:
       - "WON_KEYSTORE_DIR=/usr/src/bots/client-certs/"
       - "WON_NODE_URI=https://satvm05.researchstudio.at/won"
-#      - "logging.config=/usr/src/bots/logback.xml"
+      - "logging.config=/usr/src/bots/logback.xml"
       - "uri.prefix.owner=https://satvm05.researchstudio.at/debug_bot" # set this for the trust store alias
-      - "won.node.uris=https://satvm05.researchstudio.at:8888/won/resource https://satvm05.researchstudio.at/won/resource"
-      - "botContext.impl=mongoBotContext"
-      - "botContext.mongodb.user=won"
-      - "botContext.mongodb.pass=$mongo_db_passwd"
-      - "botContext.mongodb.host=satvm05.researchstudio.at"
-      - "botContext.mongodb.port=27018"
-      - "botContext.mongodb.database=int_bot"
+#      - "won.node.uris=https://satvm05.researchstudio.at:8888/won/resource https://satvm05.researchstudio.at/won/resource"
+#      - "botContext.impl=mongoBotContext"
+#      - "botContext.mongodb.user=won"
+#      - "botContext.mongodb.pass=$mongo_db_passwd"
+#      - "botContext.mongodb.host=satvm05.researchstudio.at"
+#      - "botContext.mongodb.port=27018"
+#      - "botContext.mongodb.database=int_bot"
     volumes:
       - $base_folder/won-client-certs/debug_bot:/usr/src/bots/client-certs/
-#      - $base_folder/logback_debug_bot.xml:/usr/src/bots/logback.xml
+      - $base_folder/logback_debug_bot.xml:/usr/src/bots/logback.xml
     depends_on:
       - wonnode1
       - wonnode2
-      - mongodb
+#      - mongodb
 
 #  hokify_bot:
 #    restart: always
