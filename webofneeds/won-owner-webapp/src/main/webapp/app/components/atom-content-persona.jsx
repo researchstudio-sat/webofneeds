@@ -213,7 +213,7 @@ class WonAtomContentPersona extends React.Component {
               {"Buddy of " +
                 this.props.personaBuddySize +
                 " Persona" +
-                (this.props.personaBuddySize != 0 && "s")}
+                (this.props.personaBuddySize === 1 ? "" : "s")}
             </div>
             <button
               className="ac-persona__buddies__view won-button--filled red"
