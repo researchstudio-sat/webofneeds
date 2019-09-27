@@ -6,7 +6,7 @@ Bots in the Web of Needs are generally reactive. Each bot uses [event listeners]
 
 ## Base Bot
 
-The java application that runs a bot is usually a spring-boot application that loads all the necessary config and then starts the bot. For examples, look at the existing [Bot Apps](https://github.com/search?q=topic%3Abot+org%3Aresearchstudio-sat&type=Repositories).
+The java application that runs a bot is usually a spring-boot application that loads all the necessary config and then starts the bot. For examples, look at existing [Bot Apps](https://github.com/search?q=topic%3Awon-bot&type=Repositories).
 
 The [base bot](src/main/java/won/bot/framework/bot/base/) consists of several interfaces and abstract classes that build upon each other. The `Bot` interface extends the `OwnerCallback` interface and is partially implemented in the abstract `BaseBot` class, which describes the methods needed for creating a minimal bot that is able to interact with atoms. This is extended by the `ScheduledTriggerBot`, which adds Spring task scheduling with [triggers](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/scheduling/Trigger.html). This is then extended by the `EventBot`, which adds the event listener structure described here.
 
