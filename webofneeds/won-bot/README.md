@@ -6,11 +6,11 @@ Bots in the Web of Needs are generally reactive. Each bot uses [event listeners]
 
 ## Base Bot
 
-The java application that runs a bot is usually a spring-boot application that loads all the necessary config and then starts the bot. For examples, look at the existing [Bot Apps](https://github.com/search?q=topic%3Abot+org%3Aresearchstudio-sat&type=Repositories).
+The java application that runs a bot is usually a spring-boot application that loads all the necessary config and then starts the bot. For examples, look at existing [Bot Apps](https://github.com/search?q=topic%3Awon-bot&type=Repositories).
 
 The [base bot](src/main/java/won/bot/framework/bot/base/) consists of several interfaces and abstract classes that build upon each other. The `Bot` interface extends the `OwnerCallback` interface and is partially implemented in the abstract `BaseBot` class, which describes the methods needed for creating a minimal bot that is able to interact with atoms. This is extended by the `ScheduledTriggerBot`, which adds Spring task scheduling with [triggers](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/scheduling/Trigger.html). This is then extended by the `EventBot`, which adds the event listener structure described here.
 
-Furthermore, the `FactoryBot` builds upon the `EventBot` and adds some additional functionality for creating `FactoryAtoms`. This results in a different structure in which a matching query can be used to filter which atoms are sent to the bot by the matcher. It also creates an additional atom representing the bot that may be visible to other users. See the [TaxiBot](https://github.com/researchstudio-sat/won-transport/blob/master/won-taxi-bot/src/main/java/won/transport/taxi/bot/impl/TaxiBot.java) for a possible use for `FactoryBot`.
+Furthermore, the `FactoryBot` builds upon the `EventBot` and adds some additional functionality for creating `FactoryAtoms`. This results in a different structure in which a matching query can be used to filter which atoms are sent to the bot by the matcher. It also creates an additional atom representing the bot that may be visible to other users. See the [TaxiBot](https://github.com/researchstudio-sat/won-transport) for a possible use for `FactoryBot`.
 
 <!-- TODO: bot lifecycle -->
 
@@ -61,7 +61,7 @@ Behaviours act as a wrapper to `EventListener`s and `Action`s and can be activat
 
 ## Implementing a Bot
 
-To create a new bot, currently the easiest way is to copy the app class and corresponding spring config files of an existing bot, e.g. the `EchoBot`, and modify that.
+To create a new bot, we recommend to use the [bot skeleton](https://github.com/researchstudio-sat/bot-skeleton) as a template, providing all needed functions for a bot in the WoN. Click [here](https://github.com/researchstudio-sat/bot-skeleton/generate) to go directly to the repository creation.
 
 ### Starting from scratch
 
@@ -140,82 +140,8 @@ WonMessageBuilder builder = WonMessageBuilder
 ```
 
 ## Additional Resources
+A good starting point for understanding the framework is the [EchoBot](https://github.com/researchstudio-sat/won-echobot). This bot creates one atom at startup, and it registers with the WoN node configured with the `WON_NODE_URI` environment variable, so it is always notified when a new atom is created. When that happens, the bot attempts to establish a connection with the new atom and if the new atom accepts it, the bot echoes any text message received from the new atom.
 
-A good starting point for understanding the framework is the [EchoBot](src/main/java/won/bot/impl/EchoBot.java) and its corresponding [EchoBotApp](src/main/java/won/bot/app/EchoBotApp.java). This bot creates one atom at startup, and it registers with the WoN node configured in its [node-uri-source.properties](/webofneeds/conf/node-uri-source.properties) file so it is always notified when a new atom is created. When that happens, the bot attempts to establish a connection with the new atom and if the new atom accepts it, the bot echoes any text message received from the new atom.
+For an example of a bot for creating atoms, the [AtomCreatorBot](https://github.com/researchstudio-sat/won-atomcreatorbot) is a good example. This bot reads atom `Model`s from the configured `AtomProducer` and creates new atoms on the configured WoN nodes. It does that until the `AtomProducer` is exhausted.
 
-For an example of a bot for creating atoms, the [AtomCreatorBot](src/main/java/won/bot/impl/AtomCreatorBot.java) is a good model. This bot reads atom `Model`s from the configured `AtomProducer` and creates new atoms on the configured WoN nodes. It does that until the `AtomProducer` is exhausted.
-
-Other, more complex bots to look at are the [MailBot](src/main/java/won/bot/impl/Mail2WonBot.java) and the [DebugBot](src/main/java/won/bot/impl/DebugBot.java). They are described in more detail in the next section.
-
-# Testing and debugging with bots
-
-## Debug Bot
-
-[DebugBotApp](src/main/java/won/bot/app/DebugBotApp.java) can be used to test if connections
-can be established with the atoms you are creating and if messages can be sent via those connections. For each atom created by you, the Bot will generate a connection request and a hint messages. Additionally, some actions can be triggered by sending text messages on those connections. Check supported [actions](src/main/java/won/bot/framework/eventbot/action/impl/debugbot/DebugBotIncomingMessageToEventMappingAction.java) for more information.
-
-To run the [DebugBotApp](src/main/java/won/bot/app/DebugBotApp.java), an argument specifying the configuration location is needed, e.g:
-
-    -DWON_CONFIG_DIR=C:/webofneeds/conf.local
-
-Make sure this location contains the relevant property files, and you have specified the values of the properties relevant for the system being tested, i.e.:
-
-- in [node-uri-source.properties](../conf/node-uri-source.properties)
-  - won.node.uris - specify values of nodes being tested - the bot will react to atoms published on those nodes
-- in [owner.properties](../conf/owner.properties)
-  - specify default node data (node.default.host/scheme/port) - the bot will create its own atoms on that node
-  - make sure both a path to keystore and truststore (keystore/truststore.location) and their password (keystore/truststore.password) is specified. For additional details on the necessary keys and certificates, refer to the Web of Needs [installation notes](https://github.com/researchstudio-sat/webofneeds/blob/master/documentation/installation-cryptographic-keys-and-certificates.md).
-
-> **NOTE:** Use a separate keystore (and key pair) for your bot, especially if you are running another owner application locally - this will result in the node not delivering messages correctly because the queues used for delivery are defined based on certificates. If multiple applications from the same source share a certificate, there will be errors.
-
-> **NOTE:** For the same reason as above, do not run several bot applications at the same time, - stop one before running another or separate their configurations.
-
-> **NOTE:** Keystore and truststore paths have to be specified, but the files themselves do not have to exist initially, they will be created automatically. If you registered to a node using a different certificate before, the keystore and truststore need to be deleted to be able to register correctly again.
-
-## Mail2Won Bot
-
-> **NOTE:** The `Mail2WonBotApp` may be currently not entirely functional due to code structure changes in the main WoN applications.
-
-[Mail2WonBotApp](src/main/java/won/bot/app/Mail2WonBotApp.java) can be used to create atoms retrieved from a given email address. This bot acts like the owner application as it allows users to create atoms, open/close connections and communicate with others.
-
-To run the [Mail2WonBotApp](src/main/java/won/bot/app/Mail2WonBotApp.java), an argument specifying the configuration location is needed, e.g:
-
--DWON_CONFIG_DIR=C:/webofneeds/conf.local
-
-Furthermore you need to set the following properties within mail-bot.properties to ensure a connection to an incoming and outgoing mail-server:
-
-```
-mailbot.email.address=emailadress
-mailbot.email.user=username
-mailbot.email.password=pass
-mailbot.email.imap.host=imap.gmail.com
-mailbot.email.imap.port=993
-mailbot.email.smtp.host=smtp.gmail.com
-mailbot.email.smtp.port=587
-```
-
-Make sure the config folder contains the relevant property files, and you have specified the values of the properties relevant for the system being tested, i.e.:
-
-- in [node-uri-source.properties](../conf/node-uri-source.properties)
-  - won.node.uris - specify values of nodes being tested - the bot will react to atoms published on those nodes
-- in [owner.properties](../conf/owner.properties)
-  - specify default node data (node.default.host/scheme/port) - the bot will create its own atoms on that node
-  - make sure both a path to keystore and truststore (keystore/truststore.location) and their password (keystore/truststore.password) is specified.  For additional details on the necessary keys and certificates, refer to the Web of Needs [installation notes](https://github.com/researchstudio-sat/webofneeds/blob/master/documentation/installation-cryptographic-keys-and-certificates.md).
-
-### Usage
-
-> **NOTE:** Due to atom structure changes, the format described here may be accepted by the `Mail2WonBot`, but not by connected node or other clients.
-
-You can send an email with a subject starting with either [WANT], [OFFER], [TOGETHER], [CRITIQUE] to the configured mailadress, to create an atom of the given type. The content of the email will be used as the description, while the subject line will be used as title. Furthermore, tags (strings starting with #) will be extracted from the email and will be stored within the created atom.
-
-You will then receive emails when the matcher finds connections to this created atom, you can answer those e-mails via the reply function of your email-client, for now we support the following commands (which will be retrieved from the replymessage-body):
-
-A reply that starts with:
-
-- "close" or "deny" will close the respective connection
-- "connect" sends a request to the other atom or opens the connection if the status is already request received
-- answering a mail with anything that does not contain any of the keywords above will automatically open a connection and send the replymessage-body as a textmessage
-
-A reply for an already open connection (`connectionState: Connected`) will send the replymessage-body as a textmessage.
-
-Every remote message sent to this connection will be sent to you as an e-mail as well.
+Other, more complex bots to look at are the [MailBot](https://github.com/researchstudio-sat/won-mailbot) and the [DebugBot](https://github.com/researchstudio-sat/won-debugbot). Click on the corresponding links to find out more.

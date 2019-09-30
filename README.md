@@ -44,20 +44,20 @@ The Tomcat solution of running the WoN locally is mainly for development purpose
 
 ## Development
 
-For development we recommend using the [Tomcat-setup mentioned above](#2-tomcat). After having that up and running, depending on what you want to do, you can continue with the following documentation-parts:
-
-### How to write a matcher
-
-Basic information about the matcher service is provided [here](/webofneeds/won-matcher-service/README.md).
-To integrate a new matcher, or matching algorithm we recommend to use the matcher skeleton, providing all needed functions for a matcher service in the WoN.
-
 ### How to write a bot
 
 Basic information about bots is provided [here](/webofneeds/won-bot/README.md).
 To write a new bot, we recommend to use the [bot skeleton](https://github.com/researchstudio-sat/bot-skeleton) as a template, providing all needed functions for a bot in the WoN.
 
-### How to write a WoN web application
 
+### How to write a matcher
+
+For the development of a matcher we recommend using the [Tomcat-setup mentioned above](#2-tomcat). After having that up and running,  you can continue with the following documentation-parts:
+Basic information about the matcher service is provided [here](/webofneeds/won-matcher-service/README.md).
+To integrate a new matcher, or matching algorithm we recommend to use the matcher skeleton, providing all needed functions for a matcher service in the WoN.
+
+### How to write a WoN web application
+For the development of a won-owner-webapp we recommend using the [Tomcat-setup mentioned above](#2-tomcat). After having that up and running,  you can continue with the following documentation-parts:
 Basic information about a WoN web application is provided [here](/webofneeds/won-owner-webapp/README.md)
 
 ### How to set up a WoN cloud instance
