@@ -484,18 +484,31 @@ class WonSlideIn extends React.Component {
     );
   }
 
+  componentDidMount() {
+    this.verifyEmailIfNecessary(undefined);
+  }
+
   componentDidUpdate(prevProps) {
-    //If we find that the verificationToken prop has changed and is not empty we dispatch the email-verification action
-    if (
+    this.verifyEmailIfNecessary(prevProps.verificationToken);
+  }
+
+  /**
+   * If we find that the verificationToken prop has changed and is not empty we dispatch the email-verification action
+   */
+  verifyEmailIfNecessary(previousToken) {
+    const tokenHasChanged =
       this.props.verificationToken &&
-      prevProps.verificationToken !== this.props.verificationToken &&
-      (!this.isProcessingVerifyEmailAddress &&
-        !(
-          this.props.isEmailVerified ||
-          this.props.emailVerificationError ||
-          this.props.isAnonymous
-        ))
-    ) {
+      previousToken !== this.props.verificationToken;
+
+    const verificationNeeded = !(
+      this.props.isEmailVerified ||
+      this.props.emailVerificationError ||
+      this.props.isAnonymous
+    );
+
+    const alreadyProcessing = this.isProcessingVerifyEmailAddress;
+
+    if (tokenHasChanged && !alreadyProcessing && verificationNeeded) {
       this.props.accountVerifyEmailAddress(this.props.verificationToken);
     }
   }
