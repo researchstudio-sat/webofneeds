@@ -309,7 +309,6 @@ export function addConstParams(params, paramsInState) {
  * and if so, initiates the verification process.
  */
 export const runEmailVerifier = [
-  // "$transitions",
   "$rootScope",
   "$ngRedux",
   ($rootScope, $ngRedux) => {
@@ -337,7 +336,6 @@ export const runEmailVerifier = [
         );
 
         if (tokenHasChanged && !alreadyProcessing && verificationNeeded) {
-          //TODO strip token from url?
           dispatch(
             actionCreators.account__verifyEmailAddress(verificationToken)
           );
