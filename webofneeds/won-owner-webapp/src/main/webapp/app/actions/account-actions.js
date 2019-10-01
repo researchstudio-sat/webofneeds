@@ -276,7 +276,6 @@ export function accountVerifyEmailAddress(verificationToken) {
     ownerApi
       .confirmRegistration(verificationToken)
       .then(() => {
-        dispatch(actionCreators.router__stateGoCurrent({ token: undefined }));
         dispatch({ type: actionTypes.account.verifyEmailAddressSuccess });
       })
       .catch(error =>
