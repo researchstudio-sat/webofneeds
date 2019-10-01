@@ -29,6 +29,7 @@ The following document walks you through the steps required to set up for develo
   - [16. Start server](#16-start-server)
 - [Troubleshooting](#troubleshooting)
   - [Tomcat complains about Missing Keystore](#tomcat-complains-about-missing-keystore)
+  - [Tomcat start fails with ClassNotFoundException: java.lang.ClassNotFoundException](#tomcat-start-fails-with-classnotfoundexception-javalangclassnotfoundexception)
   - [Maven build fails with NoClassDefFoundException: java/sql/SQLException](#maven-build-fails-with-noclassdeffoundexception-javasqlsqlexception)
   - [Out of memory error](#out-of-memory-error)
   - [icu4j: Invalid byte tag in constant pool](#icu4j-invalid-byte-tag-in-constant-pool)
@@ -358,7 +359,7 @@ and the apache tomcat native library needs to be installed. On Windows, this mea
 
 On linux you might need to build it for yourself, see "Ubuntu Installation Notes - Building TCNative](./ubuntu-installation-notes.md#building-tcnative)
 
-## Tomcat start fails with ClassNotFoundException: java.lang.ClassNotFoundException:
+## Tomcat start fails with ClassNotFoundException: java.lang.ClassNotFoundException
 
 ```
 Error configuring application listener of class [org.springframework.web.context.ContextLoaderListener]
