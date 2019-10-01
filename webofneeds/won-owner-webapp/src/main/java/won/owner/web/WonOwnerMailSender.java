@@ -80,6 +80,11 @@ public class WonOwnerMailSender {
         properties.setProperty("resource.loader", "file");
         properties.setProperty("file.resource.loader.class",
                         "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+        // force velocity to log to tomcats standard log
+        // as per https://stackoverflow.com/questions/849710/error-in-velocity-and-log4j
+        properties.setProperty("runtime.log.logsystem.class", "org.apache.velocity.runtime.log.SimpleLog4JLogSystem");
+        properties.setProperty("runtime.log.logsystem.log4j.category", "velocity");
+        properties.setProperty("runtime.log.logsystem.log4j.logger", "velocity");
         velocityEngine.init(properties);
         conversationNotificationTemplate = velocityEngine.getTemplate("mail-templates/conversation-notification.vm");
         connectNotificationTemplate = velocityEngine.getTemplate("mail-templates/connect-notification.vm");
