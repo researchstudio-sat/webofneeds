@@ -26,7 +26,11 @@ import uiRouterModule from "angular-ui-router";
 import "angular-ui-router/release/stateEvents.js";
 import { delay } from "./utils.js";
 //---------- Config -----------
-import { configRouting, runAccessControl } from "./configRouting.js";
+import {
+  configRouting,
+  runAccessControl,
+  runEmailVerifier,
+} from "./configRouting.js";
 import configRedux from "./configRedux.js";
 //--------- Actions -----------
 import { actionCreators } from "./actions/actions.js";
@@ -51,9 +55,6 @@ import { runMessagingAgent } from "./messaging-agent.js";
 
 import { runPushAgent } from "./push-agent";
 import { enableNotifications } from "../config/default";
-import { get } from "./utils.js";
-import * as accountUtils from "./redux/utils/account-utils.js";
-import * as processSelectors from "./redux/selectors/process-selectors.js";
 
 console.log(svgs);
 
@@ -143,48 +144,6 @@ app.run([
 
 app.run(runAccessControl);
 
-const runEmailVerifier = [
-  // "$transitions",
-  "$rootScope",
-  "$ngRedux",
-  ($rootScope, $ngRedux) => {
-    $rootScope.$on(
-      "$stateChangeStart",
-      (event, toState, toParams, fromState, fromParams, options) => {
-        options;
-        const dispatch = $ngRedux.dispatch;
-        const state = $ngRedux.getState();
-        const accountState = get(state, "account");
-        const isAnonymous = accountUtils.isAnonymous(accountState);
-        const isEmailVerified = accountUtils.isEmailVerified(accountState);
-        const emailVerificationError = accountUtils.getEmailVerificationError(
-          accountState
-        );
-
-        const previousToken = get(fromParams, "token");
-        const verificationToken = get(toParams, "token");
-        const tokenHasChanged =
-          verificationToken && previousToken !== verificationToken;
-
-        const verificationNeeded = !(
-          isEmailVerified ||
-          emailVerificationError ||
-          isAnonymous
-        );
-
-        const alreadyProcessing = processSelectors.isProcessingVerifyEmailAddress(
-          state
-        );
-
-        if (tokenHasChanged && !alreadyProcessing && verificationNeeded) {
-          dispatch(
-            actionCreators.account__verifyEmailAddress(verificationToken)
-          );
-        }
-      }
-    );
-  },
-];
 app.run(runEmailVerifier);
 
 //check login status. TODO: this should actually be baked-in data (to avoid the extra roundtrip)

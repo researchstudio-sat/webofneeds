@@ -9,8 +9,8 @@ import { getCurrentParamsFromRoute } from "./redux/selectors/general-selectors.j
 import * as wonUtils from "./won-utils.js";
 
 import { get, getIn } from "./utils.js";
-
 import * as accountUtils from "./redux/utils/account-utils.js";
+import * as processSelectors from "./redux/selectors/process-selectors.js";
 import * as processUtils from "./redux/utils/process-utils.js";
 
 import settingsComponent from "./pages/settings.jsx";
@@ -303,3 +303,46 @@ export function addConstParams(params, paramsInState) {
   );
   return currentConstParams.merge(params).toJS();
 }
+
+/**
+ * Checks if a email-verification-token has been added
+ * and if so, initiates the verification process.
+ */
+export const runEmailVerifier = [
+  // "$transitions",
+  "$rootScope",
+  "$ngRedux",
+  ($rootScope, $ngRedux) => {
+    $rootScope.$on(
+      "$stateChangeStart",
+      (event, toState, toParams, fromState, fromParams, options) => {
+        options;
+        const dispatch = $ngRedux.dispatch;
+        const state = $ngRedux.getState();
+        const accountState = get(state, "account");
+        const isEmailVerified = accountUtils.isEmailVerified(accountState);
+        const emailVerificationError = accountUtils.getEmailVerificationError(
+          accountState
+        );
+
+        const previousToken = get(fromParams, "token");
+        const verificationToken = get(toParams, "token");
+        const tokenHasChanged =
+          verificationToken && previousToken !== verificationToken;
+
+        const verificationNeeded = !(isEmailVerified || emailVerificationError);
+
+        const alreadyProcessing = processSelectors.isProcessingVerifyEmailAddress(
+          state
+        );
+
+        if (tokenHasChanged && !alreadyProcessing && verificationNeeded) {
+          //TODO strip token from url?
+          dispatch(
+            actionCreators.account__verifyEmailAddress(verificationToken)
+          );
+        }
+      }
+    );
+  },
+];
