@@ -114,15 +114,15 @@ If you want to commit to our repositories, this step we'd ask you to do this.
 
 ## 7. Maven install
 
-In Eclipse: 
+In Eclipse:
 
 1.  Right-click the webofneeds project in the Project Explorer Tab on the left side >> Maven >> Select Maven Profiles. Check `skip-tests`.
-2. right-click "webofneeds" in project explorer >> Run As >> Maven Install
+2.  right-click "webofneeds" in project explorer >> Run As >> Maven Install
 
 Or in your terminal:
 
 ```
-mvn install -P skip-tests 
+mvn install -P skip-tests
 ```
 
 This is required e.g. so the project-local npm exists for the next step, the required WAR-archives and JAR-files exist, etc.
@@ -357,6 +357,22 @@ Reason: we use tomcat APR. This means that in `conf/server.xml`, the following l
 and the apache tomcat native library needs to be installed. On Windows, this means you find the file `tcnative-1.dll` in tomcats `lib` folder, for more information, see <http://tomcat.apache.org/native-doc/>.
 
 On linux you might need to build it for yourself, see "Ubuntu Installation Notes - Building TCNative](./ubuntu-installation-notes.md#building-tcnative)
+
+## Tomcat start fails with ClassNotFoundException: java.lang.ClassNotFoundException:
+
+```
+Error configuring application listener of class [org.springframework.web.context.ContextLoaderListener]
+java.lang.ClassNotFoundException: org.springframework.web.context.ContextLoaderListener
+```
+
+Reason: The Maven Dependencies are not defined in the Web Deployment Assembly of the Web Application project.
+
+Solution:
+
+1.  Right click on `won-owner-webapp` project >> `Properties` >> `Deployment Assembly` >> `Add...` >> `Java Build Path Entries` >> `Maven Dependencies`.
+2.  `Project` >> `Clean...` >> select `won-owner-webapp` >> select `Build only the selected projects` >> `Clean`.
+3.  Do a maven install
+4.  Right click on server >> `Publish` >> `Start`
 
 ## Maven build fails with NoClassDefFoundException: java/sql/SQLException
 
