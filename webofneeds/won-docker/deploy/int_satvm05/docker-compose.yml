@@ -256,7 +256,7 @@ services:
       - "won.node.uris=https://satvm05.researchstudio.at:8888/won/resource https://satvm05.researchstudio.at/won/resource"
       - "hokifyjobbot.jsonURL = https://hokify.at/jobfeed-webofneeds.json/"
       - "hokifyjobbot.geoURL = https://nominatim.openstreetmap.org/search"
-      - "hokifyjobbot.updateTime=60"
+      - "hokifyjobbot.updateTime=70"
       - "hokifyjobbot.publishTime=10"
       - "hokifyjobbot.createAllInOne=false"
       - "botContext.impl=mongoBotContext"
