@@ -266,7 +266,7 @@ services:
       - "botContext.mongodb.port=27018"
       - "botContext.mongodb.database=int_bot"
     volumes:
-      - $base_folder/won-client-certs/debug_bot:/usr/src/bots/client-certs/
+      - $base_folder/won-client-certs/hokify_bot:/usr/src/bots/client-certs/
     #     - $base_folder/logback_debug_bot.xml:/usr/src/bots/logback.xml
     depends_on:
       - mongodb
