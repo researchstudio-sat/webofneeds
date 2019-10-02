@@ -292,8 +292,8 @@ services:
     #     - $base_folder/logback_debug_bot.xml:/usr/src/bots/logback.xml
     depends_on:
       - mongodb
-      - wonnode1
-      - wonnode2
+      - wonnodeblue
+      - wonnodegreen
 
   #  mail_bot:
 #    restart: always
