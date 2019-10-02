@@ -287,7 +287,8 @@ services:
       - "api.vienna.endpoint=$RB_ENDPOINT_VIENNA"
       - "api.vienna.username=$RB_USER_VIENNA"
       - "api.vienna.request=$RB_REQUEST_VIENNA"
-      - "raidbot.fetchInterval=120" #fetch new raids every 120 seconds
+      - "raidbot.fetchInterval=600" #fetch new raids every 600 seconds (10min)
+      - "raidbot.sanitizeInterval=900" #sanitize existing raids every 900 seconds (15min)
       - "botContext.impl=mongoBotContext"
       - "botContext.mongodb.user=won"
       - "botContext.mongodb.pass=$mongo_db_passwd"
