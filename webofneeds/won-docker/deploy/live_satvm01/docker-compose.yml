@@ -272,8 +272,8 @@ services:
       - "WON_NODE_URI=https://node.matchat.org/won"
       #      - "logging.config=/usr/src/bots/logback.xml"
       - "uri.prefix.owner=https://matchat.org/hokify_bot" # set this for the trust store alias
-      - "hokifyjobbot.jsonURL = https://hokify.at/jobfeed-webofneeds.json/"
-      - "hokifyjobbot.geoURL = https://nominatim.openstreetmap.org/search"
+      - "hokifyjobbot.jsonURL=https://hokify.at/jobfeed-webofneeds.json/"
+      - "hokifyjobbot.geoURL=https://nominatim.openstreetmap.org/search"
       - "hokifyjobbot.updateTime=70"
       - "hokifyjobbot.publishTime=10"
       - "hokifyjobbot.createAllInOne=false"
@@ -289,6 +289,35 @@ services:
     depends_on:
       - mongodb
       - wonnode
+
+#  spoco_raid_bot:
+#    restart: always
+#    image: webofneeds/won-spoco-raidbot:latest
+#    environment:
+#      - "WON_KEYSTORE_DIR=/usr/src/bots/client-certs/"
+#      - "WON_NODE_URI=https://node.matchat.org/won"
+#      # - "logging.config=/usr/src/bots/logback.xml"
+#      - "uri.prefix.owner=https://matchat.org/raid_bot" # set this for the trust store alias
+#      - "api.linz.endpoint=$RB_ENDPOINT_LINZ"
+#      - "api.linz.token=$RB_TOKEN_LINZ"
+#      - "api.vienna.endpoint=$RB_ENDPOINT_VIENNA"
+#      - "api.vienna.username=$RB_USER_VIENNA"
+#      - "api.vienna.request=$RB_REQUEST_VIENNA"
+#      - "raidbot.fetchInterval=600" #fetch new raids every 600 seconds (10min)
+#      - "raidbot.sanitizeInterval=900" #sanitize existing raids every 900 seconds (15min)
+#      - "botContext.impl=mongoBotContext"
+#      - "botContext.mongodb.user=won"
+#      - "botContext.mongodb.pass=$mongo_db_passwd"
+#      - "botContext.mongodb.host=satvm01.researchstudio.at"
+#      - "botContext.mongodb.port=27018"
+#      - "botContext.mongodb.database=live_bot"
+#      # - "raidbot.phaseOut=true" # set this if you do not want to create new atoms but just manage the existing ones
+#    volumes:
+#      - $base_folder/won-client-certs/raid_bot:/usr/src/bots/client-certs/
+#    #     - $base_folder/logback_debug_bot.xml:/usr/src/bots/logback.xml
+#    depends_on:
+#      - mongodb
+#      - wonnode
 
   # MySQL database for piwik
   mysql:
