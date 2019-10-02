@@ -263,32 +263,32 @@ services:
       - mongodb
 
   # job bot connecting hokify to WoN
-#  hokify_bot:
-#    restart: always
-#    build: ../../image/bots
-#    image: webofneeds/bots:live
-#    environment:
-#      - "uri.prefix.owner=https://matchat.org/hokify_bot" # set this for the trust store alias
-#      - "MAIN_BOT=won.bot.app.HokifyJobBotApp"
-#      - "node.default.host=node.matchat.org"
-#      - "node.default.http.port=443"
-#      - "uri.prefix.node.default=https://node.matchat.org/won"
-#      - "won.node.uris=https://node.matchat.org/won/resource"
-#      - "hokifyjobbot.botname = Hokify Bot"
-#      - "hokifyjobbot.jsonURL = https://hokify.at/jobfeed-webofneeds.json/"
-#      - "hokifyjobbot.geoURL = https://nominatim.openstreetmap.org/search"
-#      - "hokifyjobbot.updateTime = 60"
-#      - "hokifyjobbot.publishTime = 10"
-#      - "hokifyjobbot.createAllInOne = false"
-#      - "botContext.impl=mongoBotContext"
-#      - "botContext.mongodb.user=won"
-#      - "botContext.mongodb.pass=$mongo_db_passwd"
-#      - "botContext.mongodb.host=satvm01.researchstudio.at"
-#      - "botContext.mongodb.port=27017"
-#      - "botContext.mongodb.database=live_bot"
-#    depends_on:
-#      - mongodb
-#      - wonnode
+
+  hokify_bot:
+    restart: always
+    image: webofneeds/won-jobbot:latest
+    environment:
+      - "WON_KEYSTORE_DIR=/usr/src/bots/client-certs/"
+      - "WON_NODE_URI=https://node.matchat.org/won"
+      #      - "logging.config=/usr/src/bots/logback.xml"
+      - "uri.prefix.owner=https://matchat.org/hokify_bot" # set this for the trust store alias
+      - "hokifyjobbot.jsonURL = https://hokify.at/jobfeed-webofneeds.json/"
+      - "hokifyjobbot.geoURL = https://nominatim.openstreetmap.org/search"
+      - "hokifyjobbot.updateTime=70"
+      - "hokifyjobbot.publishTime=10"
+      - "hokifyjobbot.createAllInOne=false"
+      - "botContext.impl=mongoBotContext"
+      - "botContext.mongodb.user=won"
+      - "botContext.mongodb.pass=$mongo_db_passwd"
+      - "botContext.mongodb.host=satvm01.researchstudio.at"
+      - "botContext.mongodb.port=27018"
+      - "botContext.mongodb.database=live_bot"
+    volumes:
+      - $base_folder/won-client-certs/hokify_bot:/usr/src/bots/client-certs/
+    #     - $base_folder/logback_debug_bot.xml:/usr/src/bots/logback.xml
+    depends_on:
+      - mongodb
+      - wonnode
 
   # MySQL database for piwik
   mysql:
