@@ -272,8 +272,8 @@ services:
       - "WON_NODE_URI=https://node.matchat.org/won"
       #      - "logging.config=/usr/src/bots/logback.xml"
       - "uri.prefix.owner=https://matchat.org/hokify_bot" # set this for the trust store alias
-      - "hokifyjobbot.jsonURL = https://hokify.at/jobfeed-webofneeds.json/"
-      - "hokifyjobbot.geoURL = https://nominatim.openstreetmap.org/search"
+      - "hokifyjobbot.jsonURL=https://hokify.at/jobfeed-webofneeds.json/"
+      - "hokifyjobbot.geoURL=https://nominatim.openstreetmap.org/search"
       - "hokifyjobbot.updateTime=70"
       - "hokifyjobbot.publishTime=10"
       - "hokifyjobbot.createAllInOne=false"
