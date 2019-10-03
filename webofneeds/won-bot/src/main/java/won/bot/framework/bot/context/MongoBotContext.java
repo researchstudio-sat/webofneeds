@@ -42,6 +42,18 @@ public class MongoBotContext implements BotContext {
     }
 
     @Override
+    public Object getSingleValue(String collectionName) {
+        checkValidCollectionName(collectionName);
+        return get(collectionName, "singleVal");
+    }
+
+    @Override
+    public void setSingleValue(String collectionName, Serializable value) {
+        checkValidCollectionName(collectionName);
+        save(collectionName, "singleVal", value);
+    }
+
+    @Override
     public boolean isAtomKnown(final URI atomURI) {
         // query the field "objectList" since this is the name of the member variable of
         // MongoContextObjectList
