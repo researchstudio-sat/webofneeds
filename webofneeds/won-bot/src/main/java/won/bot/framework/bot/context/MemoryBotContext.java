@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 public class MemoryBotContext implements BotContext {
     private Map<String, Map<String, Object>> contextObjectMap = new HashMap<>();
     private Map<String, Map<String, List<Object>>> contextListMap = new HashMap<>();
+    private Map<String, Object> contextMap = new HashMap<>();
     private Set<URI> nodeUris = new HashSet<>();
     private Map<String, List<URI>> namedAtomUriLists = new HashMap<>();
 
@@ -60,6 +61,16 @@ public class MemoryBotContext implements BotContext {
             ret.addAll(namedList);
         }
         return ret;
+    }
+
+    @Override
+    public Object getSingleValue(String name) {
+        return this.contextMap.get(name);
+    }
+
+    @Override
+    public void setSingleValue(String name, Serializable value) {
+        contextMap.put(name, value);
     }
 
     @Override
