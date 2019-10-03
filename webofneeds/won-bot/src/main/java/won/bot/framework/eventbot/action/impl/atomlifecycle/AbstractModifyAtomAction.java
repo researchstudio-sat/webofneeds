@@ -10,18 +10,16 @@
  */
 package won.bot.framework.eventbot.action.impl.atomlifecycle;
 
-import java.net.URI;
-
 import org.apache.jena.query.Dataset;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
-import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
-import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
+
+import java.net.URI;
 
 /**
  * Base class for actions that modifies atoms.
@@ -37,33 +35,20 @@ public abstract class AbstractModifyAtomAction extends BaseEventBotAction {
      * eventListenerContext of the Action
      * 
      * @param atomURI uri of the atom that should be replaced
-     * @param atomDataset updated content that should be used instead of the
+     * @param modifiedAtomDataset updated content that should be used instead of the
      * existing one
      * @return modify WonMessage
      */
-    protected WonMessage buildWonMessage(URI atomURI, Dataset atomDataset) {
-        return this.buildWonMessage(getEventListenerContext().getWonNodeInformationService(), atomURI,
-                        getEventListenerContext().getNodeURISource().getNodeURI(), atomDataset);
-    }
-
-    /**
-     * Builds a modify message with the given atomURI using the atomDataset as the
-     * content wonNodeInformationService and nodeUri will be taken from the
-     * eventListenerContext of the Action
-     * 
-     * @param wonNodeInformationService
-     * @param atomURI uri of the atom that should be replaced
-     * @param wonNodeURI
-     * @param atomDataset updated content that should be used instead of the
-     * existing one
-     * @return modify WonMessage
-     */
-    protected WonMessage buildWonMessage(WonNodeInformationService wonNodeInformationService, URI atomURI,
-                    URI wonNodeURI, Dataset atomDataset)
-                    throws WonMessageBuilderException {
-        RdfUtils.replaceBaseURI(atomDataset, atomURI.toString(), true);
-        AtomModelWrapper atomModelWrapper = new AtomModelWrapper(atomDataset);
-        return WonMessageBuilder.setMessagePropertiesForReplace(wonNodeInformationService.generateEventURI(wonNodeURI),
-                        atomURI, wonNodeURI).addContent(atomModelWrapper.copyDatasetWithoutSysinfo()).build();
+    protected final WonMessage buildWonMessage(URI atomURI, Dataset modifiedAtomDataset) {
+        Dataset originalAtomDataset = getEventListenerContext().getLinkedDataSource().getDataForResource(atomURI);
+        if (originalAtomDataset == null) {
+            throw new IllegalStateException("Cannot modify atom " + atomURI + " : retrieved dataset is null");
+        }
+        URI wonNodeUri = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(originalAtomDataset, atomURI);
+        URI eventUri = getEventListenerContext().getWonNodeInformationService().generateEventURI(wonNodeUri);
+        RdfUtils.replaceBaseURI(modifiedAtomDataset, atomURI.toString(), true);
+        AtomModelWrapper modifiedAtomModelWrapper = new AtomModelWrapper(modifiedAtomDataset);
+        return WonMessageBuilder.setMessagePropertiesForReplace(eventUri,
+                        atomURI, wonNodeUri).addContent(modifiedAtomModelWrapper.copyDatasetWithoutSysinfo()).build();
     }
 }

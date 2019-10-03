@@ -427,6 +427,14 @@ public class WonMessageBuilder {
                         .setSentTimestampToNow();
     }
 
+    public static WonMessageBuilder setMessagePropertiesForActivateFromOwner(URI messageURI, URI localAtom,
+                    URI localWonNode) {
+        return new WonMessageBuilder(messageURI).setWonMessageDirection(WonMessageDirection.FROM_OWNER)
+                        .setWonMessageType(WonMessageType.ACTIVATE).setSenderAtomURI(localAtom)
+                        .setSenderNodeURI(localWonNode).setRecipientAtomURI(localAtom).setRecipientNodeURI(localWonNode)
+                        .setSentTimestampToNow();
+    }
+
     public static WonMessageBuilder setMessagePropertiesForDeleteFromOwner(URI messageURI, URI localAtom,
                     URI localWonNode) {
         return new WonMessageBuilder(messageURI).setWonMessageDirection(WonMessageDirection.FROM_OWNER)

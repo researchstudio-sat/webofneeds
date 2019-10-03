@@ -20,32 +20,36 @@ import won.protocol.util.WonRdfUtils;
 import java.net.URI;
 
 /**
- * Base class for actions that delete atoms.
+ * Base class for actions that deactivates atoms.
  */
-public abstract class AbstractDeleteAtomAction extends BaseEventBotAction {
+public abstract class AbstractDeactivateAtomAction extends BaseEventBotAction {
     protected String uriListName;
 
-    public AbstractDeleteAtomAction(EventListenerContext eventListenerContext) {
+    public AbstractDeactivateAtomAction(EventListenerContext eventListenerContext) {
         this(eventListenerContext, eventListenerContext.getBotContextWrapper().getAtomCreateListName());
     }
 
-    public AbstractDeleteAtomAction(EventListenerContext eventListenerContext, String uriListName) {
+    public AbstractDeactivateAtomAction(EventListenerContext eventListenerContext, String uriListName) {
         super(eventListenerContext);
         this.uriListName = uriListName;
     }
 
     /**
-     * Builds a delete message for the given atomURI
+     * Builds an deactivate message for the given atomURI
      * 
      * @param atomURI uri of the atom that should be deleted
      * @throws IllegalArgumentException if the atom could not be retrieved from the
      * node
-     * @return delete WonMessage
+     * @return deactivate Atom WonMessage
      */
-    protected WonMessage buildWonMessage(WonNodeInformationService wonNodeInformationService, URI atomURI,
-                    URI wonNodeURI)
-                    throws WonMessageBuilderException {
-        return WonMessageBuilder.setMessagePropertiesForDeleteFromOwner(
-                        wonNodeInformationService.generateEventURI(wonNodeURI), atomURI, wonNodeURI).build();
+    protected final WonMessage buildWonMessage(URI atomURI) throws IllegalArgumentException {
+        Dataset atomDataset = getEventListenerContext().getLinkedDataSource().getDataForResource(atomURI);
+        if (atomDataset == null) {
+            throw new IllegalStateException("Cannot deactivate atom " + atomURI + " : retrieved dataset is null");
+        }
+
+        URI wonNodeUri = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(atomDataset, atomURI);
+        URI eventUri = getEventListenerContext().getWonNodeInformationService().generateEventURI(wonNodeUri);
+        return WonMessageBuilder.setMessagePropertiesForDeactivateFromOwner(eventUri, atomURI, wonNodeUri).build();
     }
 }
