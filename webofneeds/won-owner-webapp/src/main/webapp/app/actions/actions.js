@@ -36,8 +36,6 @@
  */
 // <utils>
 
-import Immutable from "immutable";
-
 import { atomCreate, atomEdit } from "./create-atom-action.js";
 
 import {
@@ -584,8 +582,5 @@ function toggleDebugMode() {
       type: actionTypes.view.toggleDebugMode,
       payload: won.debugmode,
     });
-    const text = won.debugmode ? "Debugmode On" : "Debugmode Off";
-    // this.props.toastPush(Immutable.fromJS({ text }));
-    dispatch(actionCreators.toasts__push(Immutable.fromJS({ text })));
   };
 }
