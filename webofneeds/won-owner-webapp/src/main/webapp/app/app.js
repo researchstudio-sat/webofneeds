@@ -29,7 +29,7 @@ import { delay } from "./utils.js";
 import {
   configRouting,
   runAccessControl,
-  runEmailVerifier,
+  registerEmailVerificationTrigger,
 } from "./configRouting.js";
 import configRedux from "./configRedux.js";
 //--------- Actions -----------
@@ -144,7 +144,7 @@ app.run([
 
 app.run(runAccessControl);
 
-app.run(runEmailVerifier);
+app.run(registerEmailVerificationTrigger);
 
 //check login status. TODO: this should actually be baked-in data (to avoid the extra roundtrip)
 //app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.verifyLogin())]);
