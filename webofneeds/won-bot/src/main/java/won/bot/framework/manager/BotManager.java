@@ -10,7 +10,7 @@ import java.util.List;
  *
  */
 public interface BotManager {
-    Bot getBotForAtomURI(URI atomUri);
+    Bot getBotResponsibleForAtomUri(URI atomUri);
 
     List<Bot> getBotsForNodeURI(URI nodeUri);
 

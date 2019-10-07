@@ -168,7 +168,7 @@ public class BotOwnerCallback implements OwnerCallback {
     }
 
     private Bot getBotForAtomUri(URI atomUri) {
-        Bot bot = botManager.getBotForAtomURI(atomUri);
+        Bot bot = botManager.getBotResponsibleForAtomUri(atomUri);
         if (bot == null)
             throw new NoBotResponsibleException("No bot registered for uri " + atomUri);
         if (!bot.getLifecyclePhase().isActive()) {

@@ -39,8 +39,9 @@ public class BotMatcherProtocolMatcherServiceCallback implements MatcherProtocol
         this.taskScheduler = taskScheduler;
     }
 
+    // probably duplicate code
     private Bot getBotForAtomUri(URI atomUri) {
-        Bot bot = botManager.getBotForAtomURI(atomUri);
+        Bot bot = botManager.getBotResponsibleForAtomUri(atomUri);
         if (bot == null)
             throw new IllegalStateException("No bot registered for uri " + atomUri);
         if (!bot.getLifecyclePhase().isActive()) {
@@ -50,6 +51,7 @@ public class BotMatcherProtocolMatcherServiceCallback implements MatcherProtocol
         return bot;
     }
 
+    // duplicate code, this is already implemented in BotManagerImpl
     private List<Bot> getBotsForNodeUri(URI nodeUri) {
         List<Bot> bots = botManager.getBotsForNodeURI(nodeUri);
         if (bots.size() == 0)
@@ -86,8 +88,7 @@ public class BotMatcherProtocolMatcherServiceCallback implements MatcherProtocol
             try {
                 List<Bot> bots = getBotsForNodeUri(wonNodeURI);
                 for (Bot bot : bots) {
-                    logger.debug("bot {} matcher registered on wonNode {}", bot, wonNodeURI.toString());
-                    bot.onNewAtomCreatedNotificationForMatcher(wonNodeURI, atomURI, content);
+                    logger.debug("bot {} matcher registered on wonNode {}", bot, wonNodeURI.toString());bot.onNewAtomCreatedNotificationForMatcher(wonNodeURI, atomURI, content);
                 }
             } catch (Exception e) {
                 logger.warn("error while handling onRegistered()", e);
