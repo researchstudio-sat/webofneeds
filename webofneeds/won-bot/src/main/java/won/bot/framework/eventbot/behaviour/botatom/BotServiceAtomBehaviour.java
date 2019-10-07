@@ -132,22 +132,25 @@ public class BotServiceAtomBehaviour extends BotBehaviour {
                             protected void doRun(Event event, EventListener executingListener) throws Exception {
                                 if (event instanceof AtomCreatedEvent) {
                                     AtomCreatedEvent atomCreatedEvent = (AtomCreatedEvent) event;
-                                    if (!Objects.equals(atomCreatedEvent.getAtomURI(),
-                                                    serviceAtomContext.getBotServiceAtomUri())) {
-                                        if (ctx.getBotContext().isAtomKnown(atomCreatedEvent.getAtomURI())) {
-                                            logger.debug("Atom is known, must be one we created..., dataset: {}",
+                                    URI botServiceAtomUri = serviceAtomContext.getBotServiceAtomUri();
+                                    URI atomUri = atomCreatedEvent.getAtomURI();
+                                    if (!Objects.equals(atomUri,botServiceAtomUri)) {
+                                        if (ctx.getBotContext().isAtomKnown(atomUri)) {
+                                            logger.debug("Atom ({}) is known, must be one we created..., dataset: {}", atomUri,
                                                             RdfUtils.toString(atomCreatedEvent.getAtomDataset()));
                                             DefaultAtomModelWrapper createdAtomDataSet = new DefaultAtomModelWrapper(
                                                             atomCreatedEvent.getAtomDataset());
                                             if (createdAtomDataSet.hasSocketTypeUri(
                                                             URI.create(WXHOLD.HoldableSocketString))) {
-                                                // TODO: IMPL CONNECT
-                                                logger.debug("Atom has the holdableSocket, connect botServiceAtom with this atom");
+                                                logger.debug("Atom ({}) has the holdableSocket, connect botServiceAtom ({}) with this atom", atomUri, botServiceAtomUri);
+                                                // TODO: EXTRACT SOCKET URI FROM DATASETS
+                                                // PUBLISH CONNECT EVENT
+                                                // context.getEventBus().publish(new ConnectCommandEvent(atomUri, botServiceAtomUri, createdAtomDataSet.getSocketUri(URI.create(WXHOLD.HoldableSocketString), botServiceAtomDataSet.getSocketUri(URI.create(WXHOLD.HolderSocketString)))));
                                             } else {
-                                                logger.debug("Atom does not have a holdable Socket, no connect action required");
+                                                logger.debug("Atom ({}) does not have a holdable Socket, no connect action required", atomUri);
                                             }
                                         } else {
-                                            logger.debug("Atom is not known, must be someone elses...");
+                                            logger.debug("Atom ({}) is not known, must be someone elses...", atomUri);
                                         }
                                     } else {
                                         logger.debug("BotServiceAtomCreated, no connect action required");
