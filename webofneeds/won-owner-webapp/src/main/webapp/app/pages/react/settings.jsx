@@ -11,6 +11,8 @@ import WonToasts from "../../components/toasts.jsx";
 import WonSlideIn from "../../components/slide-in.jsx";
 import WonFooter from "../../components/footer.jsx";
 
+import WonSettingsWrapper from "../../components/settings-wrapper";
+
 import "~/style/_signup.scss";
 
 const mapStateToProps = state => {
@@ -34,7 +36,9 @@ class PageSettings extends React.Component {
         {this.props.isLoggedIn && <WonMenu />}
         <WonToasts />
         {this.props.showSlideIns && <WonSlideIn />}
-        <main className="settings">{/*<won-settings-wrapper />*/}</main>
+        <main className="settings">
+          <WonSettingsWrapper />
+        </main>
         <WonFooter />
       </section>
     );
