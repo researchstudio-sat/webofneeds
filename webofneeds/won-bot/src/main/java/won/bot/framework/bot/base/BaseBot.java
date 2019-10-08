@@ -10,7 +10,6 @@
  */
 package won.bot.framework.bot.base;
 
-import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +23,7 @@ import won.bot.framework.component.nodeurisource.NodeURISource;
 import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
 import won.protocol.matcher.MatcherProtocolAtomServiceClientSide;
-import won.protocol.message.WonMessage;
 import won.protocol.message.sender.WonMessageSender;
-import won.protocol.model.Connection;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
@@ -53,36 +50,33 @@ public abstract class BaseBot implements Bot {
     private MatcherProtocolMatcherServiceImplJMSBased matcherProtocolMatcherService;
     private LinkedDataSource linkedDataSource;
     private WonNodeInformationService wonNodeInformationService;
+    // ================================================================================
+    // Methods from OwnerCallback Interface
+    // ================================================================================
+    // void onConnectFromOtherAtom(Connection con, final WonMessage wonMessage);
+    // void onOpenFromOtherAtom(Connection con, final WonMessage wonMessage);
+    // void onCloseFromOtherAtom(Connection con, final WonMessage wonMessage);
+    // void onAtomHintFromMatcher(final WonMessage wonMessage);
+    // void onSocketHintFromMatcher(final WonMessage wonMessage);
+    // void onMessageFromOtherAtom(Connection con, final WonMessage wonMessage);
+    // void onFailureResponse(URI failedMessageUri, WonMessage wonMessage);
+    // void onSuccessResponse(URI successfulMessageUri, WonMessage wonMessage);
 
     // ================================================================================
-    // Bot Control Methods
+    // Methods from Bot Interface
     // ================================================================================
+    // void onNewAtomCreated(URI atomUri, URI wonNodeUri, Dataset atomDataset)
+    // throws Exception;
+    // void onMatcherRegistered(URI wonNodeUri);
+    // void act() throws Exception;
     @Override
-    public BotLifecyclePhase getLifecyclePhase() {
-        return this.lifecyclePhase;
-    }
-
-    /**
-     * Sets the workDone flag to true.
-     */
-    protected void workIsDone() {
-        this.workDone = true;
+    public boolean knowsAtomURI(final URI atomURI) {
+        return this.botContextWrapper.getBotContext().isAtomKnown(atomURI);
     }
 
     @Override
-    public boolean isWorkDone() {
-        return this.workDone;
-    }
-
-    @Autowired
-    private BotContextWrapper botContextWrapper;
-
-    public void setBotContextWrapper(final BotContextWrapper botContextWrapper) {
-        this.botContextWrapper = botContextWrapper;
-    }
-
-    protected BotContextWrapper getBotContextWrapper() {
-        return botContextWrapper;
+    public boolean knowsNodeURI(final URI wonNodeURI) {
+        return this.botContextWrapper.getBotContext().isNodeKnown(wonNodeURI);
     }
 
     /**
@@ -117,7 +111,35 @@ public abstract class BaseBot implements Bot {
     }
 
     @Override
-    public abstract void act() throws Exception;
+    public synchronized BotLifecyclePhase getLifecyclePhase() {
+        return this.lifecyclePhase;
+    }
+
+    // ================================================================================
+    // Bot Control Methods
+    // ================================================================================
+    /**
+     * Sets the workDone flag to true.
+     */
+    protected void workIsDone() {
+        this.workDone = true;
+    }
+
+    @Override
+    public boolean isWorkDone() {
+        return this.workDone;
+    }
+
+    @Autowired
+    private BotContextWrapper botContextWrapper;
+
+    public void setBotContextWrapper(final BotContextWrapper botContextWrapper) {
+        this.botContextWrapper = botContextWrapper;
+    }
+
+    protected BotContextWrapper getBotContextWrapper() {
+        return botContextWrapper;
+    }
 
     // ================================================================================
     // Node Connection Setters/Getters
@@ -202,58 +224,4 @@ public abstract class BaseBot implements Bot {
     public void setWonNodeInformationService(final WonNodeInformationService wonNodeInformationService) {
         this.wonNodeInformationService = wonNodeInformationService;
     }
-
-    // ================================================================================
-    // Atom Control Method Signatures
-    // ================================================================================
-    @Override
-    public boolean knowsAtomURI(final URI atomURI) {
-        return this.botContextWrapper.getBotContext().isAtomKnown(atomURI);
-    }
-
-    @Override
-    public boolean knowsNodeURI(final URI wonNodeURI) {
-        return this.botContextWrapper.getBotContext().isNodeKnown(wonNodeURI);
-    }
-
-    @Override
-    public abstract void onNewAtomCreated(final URI atomUri, final URI wonNodeUri, final Dataset atomDataset)
-                    throws Exception;
-
-    @Override
-    public abstract void onConnectFromOtherAtom(Connection con, final WonMessage wonMessage);
-
-    @Override
-    public abstract void onOpenFromOtherAtom(Connection con, final WonMessage wonMessage);
-
-    @Override
-    public abstract void onCloseFromOtherAtom(Connection con, final WonMessage wonMessage);
-
-    @Override
-    public abstract void onAtomHintFromMatcher(WonMessage wonMessage);
-
-    @Override
-    public abstract void onSocketHintFromMatcher(WonMessage wonMessage);
-
-    @Override
-    public abstract void onMessageFromOtherAtom(Connection con, final WonMessage wonMessage);
-
-    @Override
-    public abstract void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage);
-
-    @Override
-    public abstract void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage);
-
-    @Override
-    public abstract void onMatcherRegistered(final URI wonNodeUri);
-
-    @Override
-    public abstract void onNewAtomCreatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI,
-                    final Dataset atomDataset);
-
-    @Override
-    public abstract void onAtomActivatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI);
-
-    @Override
-    public abstract void onAtomDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI);
 }

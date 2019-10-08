@@ -32,6 +32,7 @@ public abstract class ScheduledTriggerBot extends BaseBot {
 
     @Override
     public synchronized void initialize() throws Exception {
+        super.initialize();
         if (trigger != null) {
             this.scheduledExecution = getTaskScheduler().schedule(() -> {
                 try {
@@ -43,7 +44,6 @@ public abstract class ScheduledTriggerBot extends BaseBot {
         } else {
             logger.info("This bot will not fire the ActEvent because no trigger was configured.");
         }
-        super.initialize();
     }
 
     @Override

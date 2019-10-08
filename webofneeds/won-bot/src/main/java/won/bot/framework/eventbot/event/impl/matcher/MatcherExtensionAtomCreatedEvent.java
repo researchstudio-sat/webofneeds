@@ -12,13 +12,22 @@ package won.bot.framework.eventbot.event.impl.matcher;
 
 import java.net.URI;
 
+import org.apache.jena.query.Dataset;
+
 import won.bot.framework.eventbot.event.BaseAtomSpecificEvent;
 
 /**
  *
  */
-public class AtomActivatedEventForMatcher extends BaseAtomSpecificEvent {
-    public AtomActivatedEventForMatcher(final URI atomURI) {
+public class MatcherExtensionAtomCreatedEvent extends BaseAtomSpecificEvent {
+    private final Dataset atomData;
+
+    public MatcherExtensionAtomCreatedEvent(final URI atomURI, final Dataset atomData) {
         super(atomURI);
+        this.atomData = atomData;
+    }
+
+    public Dataset getAtomData() {
+        return atomData;
     }
 }

@@ -26,17 +26,6 @@ public interface Bot extends OwnerCallback {
 
     void onNewAtomCreated(final URI atomUri, final URI wonNodeUri, final Dataset atomModel) throws Exception;
 
-    void onMatcherRegistered(URI wonNodeUri);
-
-    void onNewAtomCreatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI,
-                    final Dataset atomModel);
-
-    void onAtomModifiedNotificationForMatcher(final URI wonNodeURI, final URI atomURI);
-
-    void onAtomActivatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI);
-
-    void onAtomDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI);
-
     /**
      * Init method, called exactly once by the framework before any other method is
      * invoked. The callee must make sure this call is thread-safe, e.g. by explicit
@@ -60,16 +49,12 @@ public interface Bot extends OwnerCallback {
 
     /**
      * The lifecycle phase the bot is currently in.
-     * 
-     * @return
      */
     BotLifecyclePhase getLifecyclePhase();
 
     /**
      * Indicates whether the bot considers its work done. If true, the bot is ok
      * with not receiving incoming messages and not having its act() method called.
-     *
-     * @return
      */
     boolean isWorkDone();
 }

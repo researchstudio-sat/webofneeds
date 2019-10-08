@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.TaskScheduler;
 import won.bot.framework.bot.Bot;
+import won.bot.framework.bot.extension.MatcherExtension;
 import won.bot.framework.manager.BotManager;
 import won.matcher.protocol.MatcherProtocolMatcherServiceCallback;
 
@@ -28,8 +29,8 @@ import java.util.List;
  */
 public class BotMatcherProtocolMatcherServiceCallback implements MatcherProtocolMatcherServiceCallback {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    BotManager botManager;
-    TaskScheduler taskScheduler;
+    private BotManager botManager;
+    private TaskScheduler taskScheduler;
 
     public void setBotManager(BotManager botManager) {
         this.botManager = botManager;
@@ -42,7 +43,7 @@ public class BotMatcherProtocolMatcherServiceCallback implements MatcherProtocol
     // probably duplicate code
     private Bot getBotForAtomUri(URI atomUri) {
         Bot bot = botManager.getBotResponsibleForAtomUri(atomUri);
-        if (bot == null)
+        if (null == bot)
             throw new IllegalStateException("No bot registered for uri " + atomUri);
         if (!bot.getLifecyclePhase().isActive()) {
             throw new IllegalStateException("bot responsible for atom " + atomUri
@@ -54,7 +55,7 @@ public class BotMatcherProtocolMatcherServiceCallback implements MatcherProtocol
     // duplicate code, this is already implemented in BotManagerImpl
     private List<Bot> getBotsForNodeUri(URI nodeUri) {
         List<Bot> bots = botManager.getBotsForNodeURI(nodeUri);
-        if (bots.size() == 0)
+        if (bots.isEmpty())
             throw new IllegalStateException("No bot registered for uri " + nodeUri);
         for (int i = bots.size() - 1; i >= 0; i--) {
             Bot bot = bots.get(i);
@@ -74,9 +75,14 @@ public class BotMatcherProtocolMatcherServiceCallback implements MatcherProtocol
                 List<Bot> bots = getBotsForNodeUri(wonNodeUri);
                 for (Bot bot : bots) {
                     logger.debug("bot {} matcher registered on wonNode {}", bot, wonNodeUri.toString());
-                    bot.onMatcherRegistered(wonNodeUri);
+                    // bot.onMatcherRegistered(wonNodeUri);
+                    if (bot instanceof MatcherExtension) {
+                        ((MatcherExtension) bot).onMatcherRegistered(wonNodeUri);
+                    } else {
+                        logger.debug("bot {} does not implement MatchingExtension", bot);
+                    }
                 }
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 logger.warn("error while handling onRegistered()", e);
             }
         }, new Date());
@@ -88,9 +94,14 @@ public class BotMatcherProtocolMatcherServiceCallback implements MatcherProtocol
             try {
                 List<Bot> bots = getBotsForNodeUri(wonNodeURI);
                 for (Bot bot : bots) {
-                    logger.debug("bot {} matcher registered on wonNode {}", bot, wonNodeURI.toString());bot.onNewAtomCreatedNotificationForMatcher(wonNodeURI, atomURI, content);
+                    logger.debug("bot {} matcher registered on wonNode {}", bot, wonNodeURI.toString());
+                    if (bot instanceof MatcherExtension) {
+                        ((MatcherExtension) bot).onNewAtomCreatedNotificationForMatcher(wonNodeURI, atomURI, content);
+                    } else {
+                        logger.debug("bot {} does not implement MatchingExtension", bot);
+                    }
                 }
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 logger.warn("error while handling onRegistered()", e);
             }
         }, new Date());
@@ -101,10 +112,15 @@ public class BotMatcherProtocolMatcherServiceCallback implements MatcherProtocol
         taskScheduler.schedule(() -> {
             try {
                 logger.debug("onAtomModified for atom {} ", atomURI.toString());
-                getBotForAtomUri(atomURI).onAtomModifiedNotificationForMatcher(wonNodeURI, atomURI);
-                // getBotForAtomUri(atomURI.getAtomURI()).onMessageFromOtherAtom(con, message,
-                // content);
-            } catch (Exception e) {
+                // getBotForAtomUri(atomURI).onAtomModifiedNotificationForMatcher(wonNodeURI,
+                // atomURI);
+                Bot bot = getBotForAtomUri(atomURI);
+                if (bot instanceof MatcherExtension) {
+                    ((MatcherExtension) bot).onAtomModifiedNotificationForMatcher(wonNodeURI, atomURI);
+                } else {
+                    logger.debug("bot {} does not implement MatchingExtension", bot);
+                }
+            } catch (RuntimeException e) {
                 logger.warn("error while handling onAtomModified()", e);
             }
         }, new Date());
@@ -115,10 +131,15 @@ public class BotMatcherProtocolMatcherServiceCallback implements MatcherProtocol
         taskScheduler.schedule(() -> {
             try {
                 logger.debug("onAtomActivated for atom {} ", atomURI.toString());
-                getBotForAtomUri(atomURI).onAtomActivatedNotificationForMatcher(wonNodeURI, atomURI);
-                // getBotForAtomUri(atomURI.getAtomURI()).onMessageFromOtherAtom(con, message,
-                // content);
-            } catch (Exception e) {
+                // getBotForAtomUri(atomURI).onAtomActivatedNotificationForMatcher(wonNodeURI,
+                // atomURI);
+                Bot bot = getBotForAtomUri(atomURI);
+                if (bot instanceof MatcherExtension) {
+                    ((MatcherExtension) bot).onAtomActivatedNotificationForMatcher(wonNodeURI, atomURI);
+                } else {
+                    logger.debug("bot {} does not implement MatchingExtension", bot);
+                }
+            } catch (RuntimeException e) {
                 logger.warn("error while handling onAtomActivated()", e);
             }
         }, new Date());
@@ -129,10 +150,15 @@ public class BotMatcherProtocolMatcherServiceCallback implements MatcherProtocol
         taskScheduler.schedule(() -> {
             try {
                 logger.debug("onAtomDeactivated for atom {} ", atomURI.toString());
-                getBotForAtomUri(atomURI).onAtomDeactivatedNotificationForMatcher(wonNodeURI, atomURI);
-                // getBotForAtomUri(atomURI.getAtomURI()).onMessageFromOtherAtom(con, message,
-                // content);
-            } catch (Exception e) {
+                // getBotForAtomUri(atomURI).onAtomDeactivatedNotificationForMatcher(wonNodeURI,
+                // atomURI);
+                Bot bot = getBotForAtomUri(atomURI);
+                if (bot instanceof MatcherExtension) {
+                    ((MatcherExtension) bot).onAtomDeactivatedNotificationForMatcher(wonNodeURI, atomURI);
+                } else {
+                    logger.debug("bot {} does not implement MatchingExtension", bot);
+                }
+            } catch (RuntimeException e) {
                 logger.warn("error while handling onAtomDeactivated()", e);
             }
         }, new Date());

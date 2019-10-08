@@ -17,8 +17,8 @@ import won.bot.framework.eventbot.event.BaseAtomSpecificEvent;
 /**
  *
  */
-public class AtomModifiedEventForMatcher extends BaseAtomSpecificEvent {
-    public AtomModifiedEventForMatcher(final URI atomURI) {
+public class MatcherExtensionAtomDeactivatedEvent extends BaseAtomSpecificEvent {
+    public MatcherExtensionAtomDeactivatedEvent(final URI atomURI) {
         super(atomURI);
     }
 }

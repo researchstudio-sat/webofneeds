@@ -12,13 +12,13 @@ package won.bot.framework.eventbot.event.impl.matcher;
 
 import java.net.URI;
 
-import won.bot.framework.eventbot.event.BaseNodeSpecificEvent;
+import won.bot.framework.eventbot.event.BaseAtomSpecificEvent;
 
 /**
  *
  */
-public class MatcherRegisteredEvent extends BaseNodeSpecificEvent {
-    public MatcherRegisteredEvent(final URI wonNodeURI) {
-        super(wonNodeURI);
+public class MatcherExtensionAtomModifiedEvent extends BaseAtomSpecificEvent {
+    public MatcherExtensionAtomModifiedEvent(final URI atomURI) {
+        super(atomURI);
     }
 }

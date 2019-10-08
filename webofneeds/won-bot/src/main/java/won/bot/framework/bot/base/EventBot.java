@@ -28,7 +28,6 @@ import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.ErrorEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.InitializeEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.ShutdownEvent;
-import won.bot.framework.eventbot.event.impl.matcher.*;
 import won.bot.framework.eventbot.event.impl.wonmessage.*;
 import won.bot.framework.eventbot.listener.BaseEventListener;
 import won.matcher.component.MatcherNodeURISource;
@@ -169,59 +168,6 @@ public abstract class EventBot extends ScheduledTriggerBot {
     }
 
     @Override
-    public final void onNewAtomCreatedNotificationForMatcher(final URI wonNodeURI, final URI atomUri,
-                    final Dataset wonMessageDataset) {
-        if (getLifecyclePhase().isActive()) {
-            Dataset dataset = getEventListenerContext().getLinkedDataSource().getDataForResource(atomUri);
-            eventBus.publish(new AtomCreatedEventForMatcher(atomUri, dataset));
-        } else {
-            logger.info("not publishing event for call to onNewAtomCreated() as the bot is not in state {} but {}",
-                            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
-        }
-    }
-
-    @Override
-    public final void onMatcherRegistered(final URI wonNodeUri) {
-        if (getLifecyclePhase().isActive()) {
-            // EventBotActionUtils.rememberInNodeListIfNamePresent(getEventListenerContext(),wonNodeUri);
-            eventBus.publish(new MatcherRegisteredEvent(wonNodeUri));
-        } else {
-            logger.info("not publishing event for call to onNewAtomCreated() as the bot is not in state {} but {}",
-                            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
-        }
-    }
-
-    @Override
-    public final void onAtomModifiedNotificationForMatcher(final URI wonNodeURI, final URI atomURI) {
-        if (getLifecyclePhase().isActive()) {
-            eventBus.publish(new AtomModifiedEventForMatcher(atomURI));
-        } else {
-            logger.info("not publishing event for call to onNewAtomCreated() as the bot is not in state {} but {}",
-                            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
-        }
-    }
-
-    @Override
-    public final void onAtomActivatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI) {
-        if (getLifecyclePhase().isActive()) {
-            eventBus.publish(new AtomActivatedEventForMatcher(atomURI));
-        } else {
-            logger.info("not publishing event for call to onNewAtomCreated() as the bot is not in state {} but {}",
-                            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
-        }
-    }
-
-    @Override
-    public final void onAtomDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI atomURI) {
-        if (getLifecyclePhase().isActive()) {
-            eventBus.publish(new AtomDeactivatedEventForMatcher(atomURI));
-        } else {
-            logger.info("not publishing event for call to onNewAtomCreated() as the bot is not in state {} but {}",
-                            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
-        }
-    }
-
-    @Override
     public final void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage) {
         if (getLifecyclePhase().isActive()) {
             eventBus.publish(new FailureResponseEvent(failedMessageUri, wonMessage));
@@ -262,12 +208,12 @@ public abstract class EventBot extends ScheduledTriggerBot {
      */
     @Override
     public synchronized void initialize() throws Exception {
-        this.eventBus = new AsyncEventBusImpl(getExecutor());
-        // add an eventhandler that reacts to errors
-        this.getEventBus().subscribe(ErrorEvent.class, new ErrorEventListener(getEventListenerContext()));
-        initializeEventListeners();
-        this.eventBus.publish(new InitializeEvent());
         super.initialize();
+        eventBus = new AsyncEventBusImpl(getExecutor());
+        // add an eventhandler that reacts to errors
+        eventBus.subscribe(ErrorEvent.class, new ErrorEventListener(eventListenerContext));
+        initializeEventListeners();
+        eventBus.publish(new InitializeEvent());
     }
 
     /**
@@ -369,9 +315,8 @@ public abstract class EventBot extends ScheduledTriggerBot {
     }
 
     private EventGeneratingWonMessageSenderWrapper getWonMessageSenderWrapperLazily() {
-        if (this.wonMessageSenderWrapper == null) {
-            this.wonMessageSenderWrapper = new EventGeneratingWonMessageSenderWrapper(
-                            EventBot.this.getWonMessageSender());
+        if (wonMessageSenderWrapper == null) {
+            wonMessageSenderWrapper = new EventGeneratingWonMessageSenderWrapper(getWonMessageSender());
         }
         return wonMessageSenderWrapper;
     }
