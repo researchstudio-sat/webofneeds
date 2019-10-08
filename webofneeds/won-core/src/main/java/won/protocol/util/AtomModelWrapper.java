@@ -417,19 +417,6 @@ public class AtomModelWrapper {
         return socketTypeUriMap;
     }
 
-    public boolean hasSocketTypeUri(URI socketTypeUri) {
-        return getSocketTypeUriMap().containsValue(socketTypeUri);
-    }
-
-    public URI getSocketUri(URI socketTypeUri) {
-        for(Map.Entry<URI, URI> entry : getSocketTypeUriMap().entrySet()){
-            if(Objects.equals(entry.getValue(), socketTypeUri)) {
-                return entry.getKey();
-            }
-        }
-        return null;
-    }
-
     public Optional<String> getSocketType(String socketUri) {
         Resource socket = getAtomModel().createResource(socketUri);
         if (!getAtomContentNode().hasProperty(WON.socket, socket)) {
