@@ -2,6 +2,7 @@
 
 Finding and cooperating with people. Protocol, not platform. Decentralized. Linked Data. Open Source.
 
+[![Join the chat at https://join.slack.com/t/webofneeds/shared_invite/enQtNzc0NjM0MzY3NTIyLTMwZmY1YTljMjMzYjJhMjJkYjYxM2MyMDdmMjU4ZTE4MDM4NWFiNDJiNWMyZGNjYTliYjA4NWYzY2RjMGY5YWE](https://img.shields.io/badge/slack-join%20chat-informational.svg)](https://join.slack.com/t/webofneeds/shared_invite/enQtNzc0NjM0MzY3NTIyLTMwZmY1YTljMjMzYjJhMjJkYjYxM2MyMDdmMjU4ZTE4MDM4NWFiNDJiNWMyZGNjYTliYjA4NWYzY2RjMGY5YWE)
 [![Join the chat at https://gitter.im/researchstudio-sat/webofneeds](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/researchstudio-sat/webofneeds?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 This software is for people who need something, have something to offer, want to discuss something etc. - in short: who wish to connect with others for some reason.
@@ -49,15 +50,15 @@ The Tomcat solution of running the WoN locally is mainly for development purpose
 Basic information about bots is provided [here](/webofneeds/won-bot/README.md).
 To write a new bot, we recommend to use the [bot skeleton](https://github.com/researchstudio-sat/bot-skeleton) as a template, providing all needed functions for a bot in the WoN.
 
-
 ### How to write a matcher
 
-For the development of a matcher we recommend using the [Tomcat-setup mentioned above](#2-tomcat). After having that up and running,  you can continue with the following documentation-parts:
+For the development of a matcher we recommend using the [Tomcat-setup mentioned above](#2-tomcat). After having that up and running, you can continue with the following documentation-parts:
 Basic information about the matcher service is provided [here](/webofneeds/won-matcher-service/README.md).
 To integrate a new matcher, or matching algorithm we recommend to use the matcher skeleton, providing all needed functions for a matcher service in the WoN.
 
 ### How to write a WoN web application
-For the development of a won-owner-webapp we recommend using the [Tomcat-setup mentioned above](#2-tomcat). After having that up and running,  you can continue with the following documentation-parts:
+
+For the development of a won-owner-webapp we recommend using the [Tomcat-setup mentioned above](#2-tomcat). After having that up and running, you can continue with the following documentation-parts:
 Basic information about a WoN web application is provided [here](/webofneeds/won-owner-webapp/README.md)
 
 ### How to set up a WoN cloud instance
@@ -68,7 +69,7 @@ Information coming soon [here](installation-setting-up-build-environment-in-jenk
 
 - Learn how to [Run your own WoN services](webofneeds/won-docker/README.md)
 - [Build-instructions](/documentation/building.md#building) and [Troubleshooting](documentation/building.md#troubleshooting)
-- [Security architecture](webofneeds/won-core/README.md) 
+- [Security architecture](webofneeds/won-core/README.md)
 - [Linked Data interface](webofneeds/won-node-webapp/README.md)
 - [Matching Service Architecture](webofneeds/won-matcher-service/README.md)
 - [Bot Framework](webofneeds/won-bot/README.md) for interacting with WoN nodes programmatically
