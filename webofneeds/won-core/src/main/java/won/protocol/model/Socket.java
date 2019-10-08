@@ -20,7 +20,7 @@ public class Socket {
     @Convert(converter = URIConverter.class)
     private URI typeURI;
     /* The uri of the socket - must be defined in the atom's content */
-    @Column(name = "socketURI")
+    @Column(name = "socketURI", nullable = false)
     @Convert(converter = URIConverter.class)
     private URI socketURI;
     @Column(name = "defaultSocket")
@@ -64,24 +64,27 @@ public class Socket {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        Socket socket = (Socket) o;
-        if (!Objects.equals(id, socket.id))
-            return false;
-        if (!Objects.equals(atomURI, socket.atomURI))
-            return false;
-        return Objects.equals(typeURI, socket.typeURI);
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((socketURI == null) ? 0 : socketURI.hashCode());
+        return result;
     }
 
     @Override
-    public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (atomURI != null ? atomURI.hashCode() : 0);
-        result = 31 * result + (typeURI != null ? typeURI.hashCode() : 0);
-        return result;
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Socket other = (Socket) obj;
+        if (socketURI == null) {
+            if (other.socketURI != null)
+                return false;
+        } else if (!socketURI.equals(other.socketURI))
+            return false;
+        return true;
     }
 }
