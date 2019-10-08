@@ -1,7 +1,7 @@
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
 import won from "../won-es6.js";
-import { getIn, generateIdString } from "../utils.js";
+import { getIn, get, generateIdString } from "../utils.js";
 import { parseRestErrorMessage } from "../won-utils.js";
 
 const initialState = Immutable.fromJS({});
@@ -62,6 +62,12 @@ export default function(allToasts = initialState, action = {}) {
       } else {
         return allToasts;
       }
+    }
+
+    case actionTypes.view.toggleDebugMode: {
+      const debugmode = get(action, "payload");
+      const text = debugmode ? "Debugmode On" : "Debugmode Off";
+      return pushNewToast(allToasts, text, won.WON.infoToast);
     }
 
     case actionTypes.toasts.push: {

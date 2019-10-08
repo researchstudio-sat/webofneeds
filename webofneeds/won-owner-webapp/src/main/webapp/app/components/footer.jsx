@@ -5,8 +5,6 @@ import { actionCreators } from "../actions/actions.js";
 import { getIn } from "../utils.js";
 
 import "~/style/_footer.scss";
-import won from "../won-es6";
-import Immutable from "immutable";
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -14,6 +12,7 @@ const mapStateToProps = (state, ownProps) => {
     themeName: getIn(state, ["config", "theme", "name"]),
     appTitle: getIn(state, ["config", "theme", "title"]),
     shouldShowRdf: state.getIn(["view", "showRdf"]),
+    debugMode: state.getIn(["view", "debugMode"]),
   };
 };
 
@@ -27,6 +26,9 @@ const mapDispatchToProps = dispatch => {
     },
     toggleRdf: () => {
       dispatch(actionCreators.view__toggleRdf());
+    },
+    toggleDebugMode: () => {
+      dispatch(actionCreators.view__toggleDebugMode());
     },
   };
 };
@@ -85,7 +87,7 @@ class WonFooter extends React.Component {
             <span className="footer__linksdesktop__divider">|</span>
             <span
               className="footer__linksdesktop__link"
-              onClick={() => this.toggleDebugMode()}
+              onClick={() => this.props.toggleDebugMode()}
             >
               {this.getDebugModeLabel()}
             </span>
@@ -156,14 +158,8 @@ class WonFooter extends React.Component {
     );
   }
 
-  toggleDebugMode() {
-    won.debugmode = !won.debugmode;
-    const text = won.debugmode ? "Debugmode On" : "Debugmode Off";
-    this.props.toastPush(Immutable.fromJS({ text }));
-  }
-
   getDebugModeLabel() {
-    return won.debugmode ? "Turn Off Debugmode" : "Turn On Debugmode";
+    return this.props.debugMode ? "Turn Off Debugmode" : "Turn On Debugmode";
   }
 }
 WonFooter.propTypes = {
@@ -171,9 +167,11 @@ WonFooter.propTypes = {
   themeName: PropTypes.string,
   appTitle: PropTypes.string,
   shouldShowRdf: PropTypes.bool,
+  debugMode: PropTypes.bool,
   routerGo: PropTypes.func,
   toastPush: PropTypes.func,
   toggleRdf: PropTypes.func,
+  toggleDebugMode: PropTypes.func,
 };
 
 export default connect(
