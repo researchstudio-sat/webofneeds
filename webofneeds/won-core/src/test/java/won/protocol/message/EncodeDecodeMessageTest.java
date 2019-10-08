@@ -4,8 +4,12 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.sparql.util.IsoMatcher;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.LoggerFactory;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import won.protocol.util.RdfUtils;
 
 /**
@@ -21,6 +25,12 @@ public class EncodeDecodeMessageTest {
                     RESOURCE_DIR + "02_connect/01_OA_to_WN1-without-sig.trig",
                     RESOURCE_DIR + "03_receive_connect/01_WN2_to_WN1-without-sig.trig",
                     RESOURCE_DIR + "04_deactivate_(by_owner)/01_WN2_to_WN1-without-sig.trig" };
+
+    @BeforeClass
+    public static void setLogLevel() {
+        Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        root.setLevel(Level.INFO);
+    }
 
     @Test
     public void testEncodeDecodeOneMessage() throws Exception {
