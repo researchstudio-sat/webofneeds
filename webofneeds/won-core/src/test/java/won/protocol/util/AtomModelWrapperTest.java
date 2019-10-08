@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.StreamSupport;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -32,6 +35,10 @@ public class AtomModelWrapperTest {
         AtomModelWrapper atomModelWrapper = new AtomModelWrapper(ds, false);
         Assert.assertEquals(ATOM_URI, atomModelWrapper.getAtomNode(AtomGraphType.ATOM).getURI());
         Assert.assertEquals(ATOM_URI, atomModelWrapper.getAtomNode(AtomGraphType.SYSINFO).getURI());
+        Dataset withoutSysinfo = atomModelWrapper.copyDatasetWithoutSysinfo();
+        Assert.assertEquals(4, StreamSupport.stream(
+                        Spliterators.spliteratorUnknownSize(withoutSysinfo.listNames(), Spliterator.ORDERED), false)
+                        .count());
         // load the atom and sysinfo models individually
         Model atomModel = atomModelWrapper.copyAtomModel(AtomGraphType.ATOM);
         Model sysInfoModel = atomModelWrapper.copyAtomModel(AtomGraphType.SYSINFO);
@@ -40,14 +47,26 @@ public class AtomModelWrapperTest {
                         .isIsomorphicWith(atomModelWrapper.copyAtomModel(AtomGraphType.ATOM)));
         Assert.assertTrue(atomModelWrapperNew.copyAtomModel(AtomGraphType.SYSINFO)
                         .isIsomorphicWith(atomModelWrapper.copyAtomModel(AtomGraphType.SYSINFO)));
+        withoutSysinfo = atomModelWrapper.copyDatasetWithoutSysinfo();
+        Assert.assertEquals(4, StreamSupport.stream(
+                        Spliterators.spliteratorUnknownSize(withoutSysinfo.listNames(), Spliterator.ORDERED), false)
+                        .count());
         // load only the atom model, the other one is created
         atomModelWrapperNew = new AtomModelWrapper(atomModel, null);
         Assert.assertEquals(ATOM_URI, atomModelWrapperNew.getAtomNode(AtomGraphType.ATOM).getURI());
         Assert.assertEquals(ATOM_URI, atomModelWrapperNew.getAtomNode(AtomGraphType.SYSINFO).getURI());
+        withoutSysinfo = atomModelWrapperNew.copyDatasetWithoutSysinfo();
+        Assert.assertEquals(1, StreamSupport.stream(
+                        Spliterators.spliteratorUnknownSize(withoutSysinfo.listNames(), Spliterator.ORDERED), false)
+                        .count());
         // load only the sysinfo model, the other one is created
         atomModelWrapperNew = new AtomModelWrapper(null, sysInfoModel);
         Assert.assertEquals(ATOM_URI, atomModelWrapperNew.getAtomNode(AtomGraphType.ATOM).getURI());
         Assert.assertEquals(ATOM_URI, atomModelWrapperNew.getAtomNode(AtomGraphType.SYSINFO).getURI());
+        withoutSysinfo = atomModelWrapperNew.copyDatasetWithoutSysinfo();
+        Assert.assertEquals(1, StreamSupport.stream(
+                        Spliterators.spliteratorUnknownSize(withoutSysinfo.listNames(), Spliterator.ORDERED), false)
+                        .count());
         // query sysinfo model values
         Assert.assertEquals(AtomState.ACTIVE, atomModelWrapper.getAtomState());
         ZonedDateTime date = ZonedDateTime.parse("2017-02-07T08:46:32.917Z", DateTimeFormatter.ISO_DATE_TIME);

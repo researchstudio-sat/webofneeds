@@ -77,7 +77,7 @@ public class ExecuteCreateAtomCommandAction extends BaseEventBotAction {
             i++;
             atomModelWrapper.addSocket(atomUriBeforeCreation.toString() + "#socket" + i, socketURI.toString());
         }
-        final Dataset atomDatasetWithSockets = atomModelWrapper.copyDataset();
+        final Dataset atomDatasetWithSockets = atomModelWrapper.copyDatasetWithoutSysinfo();
         final URI wonNodeUri = getEventListenerContext().getNodeURISource().getNodeURI();
         logger.debug("creating atom on won node {} with content {} ", wonNodeUri,
                         StringUtils.abbreviate(RdfUtils.toString(atomDatasetWithSockets), 150));
@@ -124,6 +124,6 @@ public class ExecuteCreateAtomCommandAction extends BaseEventBotAction {
             atomModelWrapper.addFlag(WONMATCH.UsedForTesting);
         }
         return WonMessageBuilder.setMessagePropertiesForCreate(wonNodeInformationService.generateEventURI(wonNodeURI),
-                        atomURI, wonNodeURI).addContent(atomModelWrapper.copyDataset()).build();
+                        atomURI, wonNodeURI).addContent(atomModelWrapper.copyDatasetWithoutSysinfo()).build();
     }
 }

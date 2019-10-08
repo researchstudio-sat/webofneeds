@@ -76,7 +76,7 @@ public class CreateAtomWithSocketsAction extends AbstractCreateAtomAction {
             atomModelWrapper.addSocket(atomUriBeforeCreation.toString() + "#socket" + i, socket.toString());
             i++;
         }
-        final Dataset atomDatasetWithSockets = atomModelWrapper.copyDataset();
+        final Dataset atomDatasetWithSockets = atomModelWrapper.copyDatasetWithoutSysinfo();
         final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
         logger.debug("creating atom on won node {} with content {} ", wonNodeUri,
                         StringUtils.abbreviate(RdfUtils.toString(atomDatasetWithSockets), 150));

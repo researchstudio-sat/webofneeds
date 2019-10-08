@@ -248,6 +248,15 @@ public class AtomModelWrapper {
         return RdfUtils.cloneDataset(atomDataset);
     }
 
+    public Dataset copyDatasetWithoutSysinfo() {
+        Dataset ds = copyDataset();
+        getSysInfoModel(); // side effect: find graph name of sysinfo graph
+        if (this.sysInfoGraphName != null) {
+            ds.removeNamedModel(this.sysInfoGraphName);
+        }
+        return ds;
+    }
+
     /**
      * get the node of the atom of either the atom model or the sysinfo model
      *

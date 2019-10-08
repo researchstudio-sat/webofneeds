@@ -64,6 +64,6 @@ public abstract class AbstractModifyAtomAction extends BaseEventBotAction {
         RdfUtils.replaceBaseURI(atomDataset, atomURI.toString(), true);
         AtomModelWrapper atomModelWrapper = new AtomModelWrapper(atomDataset);
         return WonMessageBuilder.setMessagePropertiesForReplace(wonNodeInformationService.generateEventURI(wonNodeURI),
-                        atomURI, wonNodeURI).addContent(atomModelWrapper.copyDataset()).build();
+                        atomURI, wonNodeURI).addContent(atomModelWrapper.copyDatasetWithoutSysinfo()).build();
     }
 }
