@@ -11,7 +11,7 @@ ex:Atom1
 	won:content ex:Atom1_Content1 ;
 	won:hasMatchingConstraint ex:Atom1_Constraint1.
 	
-ex:Atom1_Content1 won:hasTextDescription "Ich suche nach einer Mitfahrgelegenheit Wien - Salzburg f�r 2 Personen. W�r toll wenn sich jemand finden w�rde. (irgendwann zwischen Fr-So) Bitte, bitte wenn jemand diese Strecke f�hrt, bei mir melden :-) Dankesch�n.. LG"^^xsd:string .
+ex:Atom1_Content1 won:hasTextDescription "Ich suche nach einer Mitfahrgelegenheit Wien - Salzburg für 2 Personen. Wär toll wenn sich jemand finden würde. (irgendwann zwischen Fr-So) Bitte, bitte wenn jemand diese Strecke fährt, bei mir melden :-) Dankeschön.. LG"^^xsd:string .
 
 ex:Atom1_Constraint1 
 	a oslc:ResourceShape ;
