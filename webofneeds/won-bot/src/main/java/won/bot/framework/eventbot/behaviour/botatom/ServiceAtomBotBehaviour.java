@@ -3,7 +3,7 @@ package won.bot.framework.eventbot.behaviour.botatom;
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.bot.framework.bot.context.BotServiceAtomContext;
+import won.bot.framework.bot.context.ServiceAtomContext;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -34,46 +34,46 @@ import java.util.Optional;
 /**
  * Behaviour that creates exactly one Atom that represents the Bot itself
  */
-public class BotServiceAtomBehaviour extends BotBehaviour {
+public class ServiceAtomBotBehaviour extends BotBehaviour {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private final BotServiceAtomContext serviceAtomContext;
-    private final BotServiceAtomContent botServiceAtomContent;
+    private final ServiceAtomContext serviceAtomContext;
+    private final ServiceAtomContent serviceAtomContent;
 
-    public BotServiceAtomBehaviour(EventListenerContext context) {
+    public ServiceAtomBotBehaviour(EventListenerContext context) {
         this(context, context.getBotContextWrapper().getBotName());
     }
 
-    public BotServiceAtomBehaviour(EventListenerContext context, String botServiceName) {
-        this(context, new BotServiceAtomContent(botServiceName));
+    public ServiceAtomBotBehaviour(EventListenerContext context, String botServiceName) {
+        this(context, new ServiceAtomContent(botServiceName));
     }
 
-    public BotServiceAtomBehaviour(EventListenerContext context, BotServiceAtomContent botServiceAtomContent) {
+    public ServiceAtomBotBehaviour(EventListenerContext context, ServiceAtomContent serviceAtomContent) {
         super(context);
-        if (!(context.getBotContextWrapper() instanceof BotServiceAtomContext)) {
-            throw new IllegalStateException("BotServiceAtomBehaviour does not work without a BotServiceAtomContext");
+        if (!(context.getBotContextWrapper() instanceof ServiceAtomContext)) {
+            throw new IllegalStateException("ServiceAtomBotBehaviour does not work without a ServiceAtomContext");
         }
-        this.serviceAtomContext = (BotServiceAtomContext) context.getBotContextWrapper();
-        this.botServiceAtomContent = botServiceAtomContent;
+        this.serviceAtomContext = (ServiceAtomContext) context.getBotContextWrapper();
+        this.serviceAtomContent = serviceAtomContent;
     }
 
     @Override
     protected void onActivate(Optional<Object> message) {
-        logger.debug("activating BotServiceAtomBehaviour");
-        EventListenerContext ctx = this.context;
+        logger.debug("activating ServiceAtomBotBehaviour");
+        final EventListenerContext ctx = this.context;
         subscribeWithAutoCleanup(InitializeEvent.class,
-                        new ActionOnEventListener(context, new AbstractCreateAtomAction(ctx) {
+                        new ActionOnEventListener(ctx, new AbstractCreateAtomAction(ctx) {
                             @Override
                             protected void doRun(Event event, EventListener executingListener) throws Exception {
                                 logger.debug("Initializing the BotServiceAtom...");
-                                URI serviceAtomUri = serviceAtomContext.getBotServiceAtomUri();
+                                URI serviceAtomUri = serviceAtomContext.getServiceAtomUri();
                                 if (serviceAtomUri == null) {
                                     logger.debug("BotServiceAtom does not exist, creating a new one...");
                                     final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
                                     WonNodeInformationService wonNodeInformationService = ctx
                                                     .getWonNodeInformationService();
                                     final URI atomUri = wonNodeInformationService.generateAtomURI(wonNodeUri);
-                                    Dataset botServiceDataset = new BotServiceAtomModelWrapper(atomUri,
-                                                    botServiceAtomContent).copyDataset();
+                                    Dataset botServiceDataset = new ServiceAtomModelWrapper(atomUri,
+                                                    serviceAtomContent).copyDataset();
                                     logger.debug("creating BotServiceAtom on won node {} with content: {} ", wonNodeUri,
                                                     RdfUtils.toString(botServiceDataset));
                                     WonMessage createAtomMessage = createWonMessage(atomUri, botServiceDataset);
@@ -86,7 +86,7 @@ public class BotServiceAtomBehaviour extends BotBehaviour {
                                             logger.debug("BotServiceAtom creation successful, new atom URI is {}",
                                                             atomUri);
                                             logger.debug("#####################################################################################");
-                                            serviceAtomContext.setBotServiceAtomUri(atomUri);
+                                            serviceAtomContext.setServiceAtomUri(atomUri);
                                             bus.publish(new AtomCreatedEvent(atomUri, wonNodeUri, botServiceDataset,
                                                             null));
                                         }
@@ -128,12 +128,12 @@ public class BotServiceAtomBehaviour extends BotBehaviour {
                             }
                         }));
         subscribeWithAutoCleanup(AtomCreatedEvent.class,
-                        new ActionOnEventListener(context, new BaseEventBotAction(ctx) {
+                        new ActionOnEventListener(ctx, new BaseEventBotAction(ctx) {
                             @Override
                             protected void doRun(Event event, EventListener executingListener) throws Exception {
                                 if (event instanceof AtomCreatedEvent) {
                                     AtomCreatedEvent atomCreatedEvent = (AtomCreatedEvent) event;
-                                    URI botServiceAtomUri = serviceAtomContext.getBotServiceAtomUri();
+                                    URI botServiceAtomUri = serviceAtomContext.getServiceAtomUri();
                                     URI createdAtomUri = atomCreatedEvent.getAtomURI();
                                     if (!Objects.equals(createdAtomUri, botServiceAtomUri)) {
                                         if (ctx.getBotContext().isAtomKnown(createdAtomUri)) {
@@ -174,7 +174,8 @@ public class BotServiceAtomBehaviour extends BotBehaviour {
                                                                                 createdAtomHoldableSocketUri,
                                                                                 createdAtomUri, localWonNode,
                                                                                 botServiceAtomHolderSocketUri,
-                                                                                botServiceAtomUri, remoteWonNode, null)
+                                                                                botServiceAtomUri, remoteWonNode,
+                                                                                "Automated Connect to Service Atom")
                                                                 .build();
                                                 ctx.getWonMessageSender().sendWonMessage(connectToServiceAtomMessage);
                                             } else {
@@ -191,25 +192,53 @@ public class BotServiceAtomBehaviour extends BotBehaviour {
                                 }
                             }
                         }));
-        // TODO: ACCEPT THE HOLDER CONNECTIONS IF REMOTE ATOM IS THE BotServiceAtom
         subscribeWithAutoCleanup(ConnectFromOtherAtomEvent.class,
-                        new ActionOnEventListener(context, new BaseEventBotAction(ctx) {
+                        new ActionOnEventListener(ctx, new BaseEventBotAction(ctx) {
                             @Override
                             protected void doRun(Event event, EventListener executingListener) throws Exception {
-                                // TODO: ACCEPT CONNECT REQUEST IF HOLDER FACET AND TARGETATOM IS FROM US
                                 if (event instanceof ConnectFromOtherAtomEvent) {
                                     ConnectFromOtherAtomEvent connectFromOtherAtomEvent = (ConnectFromOtherAtomEvent) event;
+                                    URI botServiceAtomUri = serviceAtomContext.getServiceAtomUri();
+                                    URI senderAtomUri = connectFromOtherAtomEvent.getAtomURI();
+                                    URI targetAtomUri = connectFromOtherAtomEvent.getTargetAtomURI();
                                     logger.debug("Possibly accept the connection Request with holderFacet<->holdableFacet if atom is BotServiceAtom");
-                                    if (ctx.getBotContext().isAtomKnown(connectFromOtherAtomEvent.getAtomURI())
-                                                    && ctx.getBotContext().isAtomKnown(
-                                                                    connectFromOtherAtomEvent.getTargetAtomURI())) {
+                                    if (ctx.getBotContext().isAtomKnown(senderAtomUri)
+                                                    && ctx.getBotContext().isAtomKnown(targetAtomUri)
+                                                    && Objects.equals(targetAtomUri, botServiceAtomUri)) {
                                         logger.debug("Both Atoms belong to you, you might want to accept the connect, socketUri: {}, targetSocketUri: {}",
-                                                        connectFromOtherAtomEvent.getCon().getSocketURI(),
-                                                        connectFromOtherAtomEvent.getCon().getTargetSocketURI());
-                                        logger.debug("TargetAtomUri: {}", connectFromOtherAtomEvent.getTargetAtomURI());
-                                        logger.debug("AtomUri: {}", connectFromOtherAtomEvent.getAtomURI());
+                                                        connectFromOtherAtomEvent.getWonMessage().getSenderSocketURI(),
+                                                        connectFromOtherAtomEvent.getWonMessage()
+                                                                        .getRecipientSocketURI());
+                                        URI senderSocketUri = connectFromOtherAtomEvent.getWonMessage()
+                                                        .getSenderSocketURI();
+                                        URI targetSocketUri = connectFromOtherAtomEvent.getWonMessage()
+                                                        .getRecipientSocketURI();
+                                        Optional<URI> senderSocketTypeUri = WonLinkedDataUtils
+                                                        .getTypeOfSocket(senderSocketUri, ctx.getLinkedDataSource());
+                                        Optional<URI> targetSocketTypeUri = WonLinkedDataUtils
+                                                        .getTypeOfSocket(targetSocketUri, ctx.getLinkedDataSource());
+                                        if (senderSocketTypeUri.isPresent() && targetSocketTypeUri.isPresent()
+                                                        && Objects.equals(senderSocketTypeUri.get(),
+                                                                        URI.create(WXHOLD.HoldableSocketString))
+                                                        && Objects.equals(targetSocketTypeUri.get(),
+                                                                        URI.create(WXHOLD.HolderSocketString))) {
+                                            logger.debug("Accepting connect request from atom ({}) to serviceAtom ({})",
+                                                            senderAtomUri, targetAtomUri);
+                                            URI serviceAtomWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(
+                                                            ctx.getLinkedDataSource().getDataForResource(
+                                                                            targetAtomUri),
+                                                            targetAtomUri);
+                                            WonMessage openServiceAtomMessage = WonMessageBuilder
+                                                            .setMessagePropertiesForOpen(ctx
+                                                                            .getWonNodeInformationService()
+                                                                            .generateEventURI(serviceAtomWonNode),
+                                                                            connectFromOtherAtomEvent.getWonMessage(),
+                                                                            "Automated Open from Service Atom")
+                                                            .build();
+                                            ctx.getWonMessageSender().sendWonMessage(openServiceAtomMessage);
+                                        }
                                     } else {
-                                        logger.debug("At least one of the two Atoms is not known, must be a request from someone else...");
+                                        logger.debug("At least one of the two Atoms is not known, or the targetAtomUri is not the botServiceAtomUri, ignore the connect request");
                                     }
                                 }
                             }
