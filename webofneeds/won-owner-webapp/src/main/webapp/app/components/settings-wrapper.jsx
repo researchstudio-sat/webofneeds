@@ -14,17 +14,10 @@ import {
   currentSkin,
 } from "../redux/selectors/general-selectors.js";
 
-export default class WonSettingsWrapper extends React.Component {
+class WonSettingsWrapper extends React.Component {
   componentWillUnmount() {
-    if (this.state && this.state.ports) {
-      this.state.ports.personaOut.unsubscribe();
-      this.state.ports.updatePersonas.unsubscribe();
-      this.state.ports.getVerified.unsubscribe();
-      this.state.ports.getAccountInfo.unsubscribe();
-
-      // this.state.ports.inPort.send({
-      //   unmount: true,
-      // });
+    if (this.state && this.state.disconnectPorts) {
+      this.state.disconnectPorts();
     }
   }
 
@@ -41,17 +34,12 @@ export default class WonSettingsWrapper extends React.Component {
     );
   }
 
-  // UNSAFE_componentWillReceiveProps(nextProps) {
-  // if (this.state && this.state.ports && nextProps.flags) {
-  //   this.state.ports.inPort.send({
-  //     newProps: nextProps.flags,
-  //   });
-  // }
-  // }
-
   setupPorts(ports) {
     const dispatch = this.context.store.dispatch;
     const getState = this.context.store.getState;
+    const connect = this.context.store.connect;
+
+    //// set up listeners on out-ports
 
     ports.personaOut.subscribe(persona => {
       dispatch(actionCreators.personas__create(persona));
@@ -80,11 +68,63 @@ export default class WonSettingsWrapper extends React.Component {
       ports.accountInfoIn.send(accountInfo);
     });
 
-    this.setState({ ports });
+    //// stream persona updates to the elm component
+
+    const personas = getOwnedCondensedPersonaList(getState(), true);
+    if (personas) {
+      ports.personaIn.send(personas.toJS());
+    }
+
+    const selectFromState = state => ({
+      personas: getOwnedCondensedPersonaList(state, true),
+      isVerified: accountUtils.isEmailVerified(get(state, "account")),
+      accountInfo: {
+        email: accountUtils.getEmail(get(state, "account")),
+        isVerified: accountUtils.isEmailVerified(get(state, "account")),
+      },
+    });
+    const pseudoComponent = selectedState => {
+      if (selectedState.personas) {
+        ports.personaIn.send(selectedState.personas.toJS());
+      }
+      ports.isVerified.send(selectedState.isVerified);
+      if (
+        selectedState.accountInfo.isVerified &&
+        selectedState.accountInfo.email
+      ) {
+        ports.accountInfoIn.send(selectedState.accountInfo);
+      }
+    };
+    const disconnectPersonaPort = connect(selectFromState)(pseudoComponent);
+
+    //// stream theme updates to the elm component
+
+    const selectSkinFromState = state => ({
+      skin: state.getIn(["config", "theme"]),
+    });
+    const skinPseudoComponent = () => {
+      ports.skin.send(currentSkin());
+    };
+    const disconnectSkinPort = connect(selectSkinFromState)(
+      skinPseudoComponent
+    );
+
+    //// attach ports reference to component for use elsewhere
+
+    this.setState({
+      ports: ports,
+      disconnectPorts: () => {
+        ports.personaOut.unsubscribe();
+        ports.updatePersonas.unsubscribe();
+        ports.getVerified.unsubscribe();
+        ports.getAccountInfo.unsubscribe();
+        disconnectPersonaPort();
+        disconnectSkinPort();
+      },
+    });
   }
 }
-WonSettingsWrapper.propTypes = {
-  // src: PropTypes.object.isRequired,
-  // flags: PropTypes.object,
-};
+WonSettingsWrapper.propTypes = {};
 WonSettingsWrapper.contextType = ReactReduxContext;
+
+export default WonSettingsWrapper;
