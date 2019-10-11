@@ -19,16 +19,16 @@ import won.bot.framework.eventbot.filter.EventFilter;
  * Accepts only CommandResultEvents that are results of the specified command.
  */
 public class CommandResultFilter implements EventFilter {
-    private CommandEvent orginalCommand;
+    private CommandEvent originalCommand;
 
-    public CommandResultFilter(CommandEvent orginalCommand) {
-        this.orginalCommand = orginalCommand;
+    public CommandResultFilter(CommandEvent originalCommand) {
+        this.originalCommand = originalCommand;
     }
 
     @Override
     public boolean accept(Event event) {
         if (!(event instanceof CommandResultEvent))
             return false;
-        return ((CommandResultEvent<?>) event).getOriginalCommandEvent() == orginalCommand;
+        return ((CommandResultEvent<?>) event).getOriginalCommandEvent() == originalCommand;
     }
 }

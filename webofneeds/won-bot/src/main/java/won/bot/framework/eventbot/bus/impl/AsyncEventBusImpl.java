@@ -113,7 +113,7 @@ public class AsyncEventBusImpl implements EventBus {
                 }
                 entry.setValue(listeners);
                 if (unsubscribed) {
-                    // if we had to unssubscribe the listener, we may have to call its onUnsubscribe
+                    // if we had to unsubscribe the listener, we may have to call its onUnsubscribe
                     // method
                     callOnUnsubscribeIfApplicable(listener, entry.getKey());
                 }

@@ -171,17 +171,8 @@ public class AnalyzeBehaviour extends BotBehaviour {
                     case PROPOSES:
                         logger.trace("\tMessageEffect 'Proposes':");
                         Proposal proposal = new Proposal(messageEffect.getMessageUri(), ProposalState.SUGGESTED);
-                        Model proposalModel = agreementProtocolState.getPendingProposal(proposal.getUri()); // TODO: IT
-                                                                                                            // COULD BE
-                                                                                                            // THAT
-                                                                                                            // WE HAVE
-                                                                                                            // TO ADD
-                                                                                                            // THIS
-                                                                                                            // WHOLE
-                                                                                                            // SHABANG
-                                                                                                            // FOR
-                                                                                                            // AGREEMENTS
-                                                                                                            // AS WELL
+                        Model proposalModel = agreementProtocolState.getPendingProposal(proposal.getUri());
+                        // TODO: IT COULD BE THAT WE HAVE TO ADD THIS WHOLE SHEBANG FOR AGREEMENTS AS WELL
                         if (!proposalModel.isEmpty()) {
                             logger.trace("\t\tProposal: " + proposal);
                             for (Resource goal : goalsInAtom) {
@@ -260,8 +251,8 @@ public class AnalyzeBehaviour extends BotBehaviour {
                     logger.trace("\t\tPrecondition not yet met in a proposal/agreement");
                     // conversationDataset =
                     // WonConversationUtils.getAgreementProtocolState(connectionUri,
-                    // linkedDataSource).getConversationDataset(); //TODO: I DONT KNOW WHY THIS
-                    // CHANGE HAPPENED
+                    // linkedDataSource).getConversationDataset();
+                    // TODO: I DON'T KNOW WHY THIS CHANGE HAPPENED
                     conversationDataset = getConversationDatasetLazyInit(conversationDataset, connectionUri);
                     goalInstantiationProducer = getGoalInstantiationProducerLazyInit(goalInstantiationProducer,
                                     atomDataset, targetAtomDataset, conversationDataset);

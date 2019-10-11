@@ -63,7 +63,7 @@ public class BotTrigger {
     public void changeIntervalByFactor(double factor, Duration maxInterval) {
         long millis = this.interval.toMillis();
         if (millis == 0 && factor < 1) {
-            // nothing to do, the interval is already minimial
+            // nothing to do, the interval is already minimal
             return;
         } else if (factor == 1) {
             // nothing to do, no need to reschedule
@@ -73,7 +73,7 @@ public class BotTrigger {
             throw new IllegalArgumentException("factor must be > 0");
         long newMillis = (long) ((double) millis * factor);
         if (newMillis == millis) {
-            // for some reason, there was no change. increase/decreaese by 1
+            // for some reason, there was no change. increase/decrease by 1
             newMillis += factor > 1 ? 1 : -1;
         }
         newMillis = Math.max(0, Math.min(newMillis, maxInterval.toMillis()));

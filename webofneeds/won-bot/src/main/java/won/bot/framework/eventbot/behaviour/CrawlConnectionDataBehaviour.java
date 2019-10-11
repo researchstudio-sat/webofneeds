@@ -77,7 +77,7 @@ public class CrawlConnectionDataBehaviour extends BotBehaviour {
     @Override
     protected void onActivate(Optional<Object> message) {
         logger.debug("activating crawling connection data for connection {}", command.getConnectionURI());
-        logger.debug("will deactivate autmatically after " + abortTimeout);
+        logger.debug("will deactivate automatically after " + abortTimeout);
         LinkedDataSource linkedDataSource = context.getLinkedDataSource();
         if (linkedDataSource instanceof CachingLinkedDataSource) {
             URI toInvalidate = WonLinkedDataUtils.getMessageContainerURIforConnectionURI(command.getConnectionURI(),

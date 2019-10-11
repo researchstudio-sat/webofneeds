@@ -44,7 +44,7 @@ public interface EventBus {
     /**
      * Subscribes all given actions to an event type, by wrapping a
      * ActionOnEventListener around the given action. If there are multiple actions
-     * a new MultipeActions will be wrapped around the actions as well Example:
+     * a new MultipleActions will be wrapped around the actions as well Example:
      * subscribe(Event.class, action1, action2, action3) is equivalent to:
      * subscribe(Event.class, new
      * ActionOnEventListener(action1.getEventListenerContext, new

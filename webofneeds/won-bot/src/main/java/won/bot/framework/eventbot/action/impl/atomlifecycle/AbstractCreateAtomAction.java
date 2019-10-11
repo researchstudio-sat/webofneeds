@@ -40,7 +40,7 @@ public abstract class AbstractCreateAtomAction extends BaseEventBotAction {
     /**
      * Creates an atom with the specified sockets. If no socket is specified, the
      * chatSocket will be used, Flag 'UsedForTesting' will be set. uriListName is
-     * used from the set botcontextwrapper getAtomCreateListName
+     * used from the set botContextWrapper getAtomCreateListName
      */
     public AbstractCreateAtomAction(EventListenerContext eventListenerContext, URI... sockets) {
         this(eventListenerContext, eventListenerContext.getBotContextWrapper().getAtomCreateListName(), sockets);

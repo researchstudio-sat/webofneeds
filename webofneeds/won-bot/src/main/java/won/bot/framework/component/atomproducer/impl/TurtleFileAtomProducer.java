@@ -37,7 +37,7 @@ public class TurtleFileAtomProducer implements FileBasedAtomProducer {
         try (FileInputStream fis = new FileInputStream(file)) {
             Model model = ModelFactory.createDefaultModel();
             RDFDataMgr.read(model, fis, RDFFormat.TURTLE.getLang());
-            AtomModelWrapper atomModelWrapper = new AtomModelWrapper(model, null); // Use atommodelwrapper to ensure
+            AtomModelWrapper atomModelWrapper = new AtomModelWrapper(model, null); // Use atomModelWrapper to ensure
                                                                                    // that the
                                                                                    // sysinfo graph is added already
             return atomModelWrapper.copyDataset();

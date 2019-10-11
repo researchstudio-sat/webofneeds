@@ -114,10 +114,10 @@ public class SpringAwareBotManagerImpl extends BotManagerImpl
         this.taskScheduler.schedule(() -> {
             boolean workDone = isWorkDone();
             if (!shutdownApplicationContextIfWorkDone) {
-                logger.debug("botmanager will not shutdown spring context when work is done. (workDone:{})",
+                logger.debug("botManager will not shutdown spring context when work is done. (workDone:{})",
                                 workDone);
             } else {
-                logger.debug("botmanager will shutdown spring context when work is done. (workDone:{})", workDone);
+                logger.debug("botManager will shutdown spring context when work is done. (workDone:{})", workDone);
                 if (workDone)
                     SpringApplication.exit(applicationContext);
             }

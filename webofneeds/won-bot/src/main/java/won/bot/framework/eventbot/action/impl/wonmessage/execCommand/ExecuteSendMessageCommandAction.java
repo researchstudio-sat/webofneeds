@@ -58,7 +58,7 @@ public abstract class ExecuteSendMessageCommandAction<T extends MessageCommandEv
     /**
      * Constructs the message via <code>createWonMessage</code> and registers a
      * listener for the response from the local WoN node and, if
-     * <code>messageIsSenttoRemoteNode</code> is true, a listener for the response
+     * <code>messageIsSentToRemoteNode</code> is true, a listener for the response
      * from the remote WoN node.
      * 
      * @param event

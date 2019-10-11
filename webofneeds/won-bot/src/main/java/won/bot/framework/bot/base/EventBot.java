@@ -210,7 +210,7 @@ public abstract class EventBot extends ScheduledTriggerBot {
     public synchronized void initialize() throws Exception {
         super.initialize();
         eventBus = new AsyncEventBusImpl(getExecutor());
-        // add an eventhandler that reacts to errors
+        // add an eventHandler that reacts to errors
         eventBus.subscribe(ErrorEvent.class, new ErrorEventListener(eventListenerContext));
         initializeEventListeners();
         eventBus.publish(new InitializeEvent());
