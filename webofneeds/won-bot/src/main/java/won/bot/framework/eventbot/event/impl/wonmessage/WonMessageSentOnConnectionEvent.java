@@ -16,6 +16,7 @@ import won.bot.framework.eventbot.event.AtomSpecificEvent;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.TargetAtomSpecificEvent;
 import won.protocol.message.WonMessage;
+import won.protocol.model.Connection;
 
 /**
  * Created by fkleedorfer on 14.06.2016.
@@ -39,5 +40,13 @@ public class WonMessageSentOnConnectionEvent extends WonMessageSentEvent
     @Override
     public URI getTargetAtomURI() {
         return getWonMessage().getRecipientAtomURI();
+    }
+
+    public Connection getCon() {
+        Connection con = new Connection();
+        con.setConnectionURI(getConnectionURI());
+        con.setAtomURI(getAtomURI());
+        con.setTargetAtomURI(getTargetAtomURI());
+        return con;
     }
 }
