@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.TaskScheduler;
 import won.bot.framework.bot.Bot;
-import won.bot.framework.bot.extension.MatcherExtension;
+import won.bot.framework.extensions.matcher.MatcherExtension;
 import won.bot.framework.manager.BotManager;
 import won.matcher.protocol.MatcherProtocolMatcherServiceCallback;
 

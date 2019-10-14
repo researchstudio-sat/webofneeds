@@ -162,6 +162,10 @@ public abstract class BotBehaviour {
         return name;
     }
 
+    public EventListenerContext getEventListenerContext() {
+        return context;
+    }
+
     public boolean isActive() {
         return active.get();
     }

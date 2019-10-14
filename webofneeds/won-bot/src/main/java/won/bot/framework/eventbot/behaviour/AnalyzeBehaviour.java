@@ -172,7 +172,8 @@ public class AnalyzeBehaviour extends BotBehaviour {
                         logger.trace("\tMessageEffect 'Proposes':");
                         Proposal proposal = new Proposal(messageEffect.getMessageUri(), ProposalState.SUGGESTED);
                         Model proposalModel = agreementProtocolState.getPendingProposal(proposal.getUri());
-                        // TODO: IT COULD BE THAT WE HAVE TO ADD THIS WHOLE SHEBANG FOR AGREEMENTS AS WELL
+                        // TODO: IT COULD BE THAT WE HAVE TO ADD THIS WHOLE SHEBANG FOR AGREEMENTS AS
+                        // WELL
                         if (!proposalModel.isEmpty()) {
                             logger.trace("\t\tProposal: " + proposal);
                             for (Resource goal : goalsInAtom) {
