@@ -139,9 +139,9 @@ public class BotTests {
     // thread.start();
     // }
     // barrier.await();
-    // // make sure the bot is shutdownd
+    // // make sure the bot is shutdown
     // Assert.assertTrue(bot.getLifecyclePhase().isDown());
-    // // make sure it was shutdownd only once
+    // // make sure it was shutdown only once
     // Assert.assertEquals(1, threadsInShutdown.size());
     // }
 }

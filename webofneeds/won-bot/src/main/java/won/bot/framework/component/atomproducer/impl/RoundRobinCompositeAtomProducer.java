@@ -45,7 +45,7 @@ public class RoundRobinCompositeAtomProducer extends AbstractCompositeAtomProduc
                 this.lastFactory = factoryIterator.next();
                 return lastFactory;
             } else {
-                // else choose take the first factory returned by the iteraor (we were at the
+                // else choose take the first factory returned by the iterator (we were at the
                 // end of the iterators)
                 this.lastFactory = factories.iterator().next();
                 return this.lastFactory;

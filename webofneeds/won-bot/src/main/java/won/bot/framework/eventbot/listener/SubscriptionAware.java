@@ -15,7 +15,7 @@ import won.bot.framework.eventbot.event.Event;
 /**
  * Interface to be implemented by listeners that need to know which event types
  * they are subscribed to. The onSubscribe method will be called before the
- * subscription, the onUnscubscribe methods will be called after the listener is
+ * subscription, the onUnsubscribe methods will be called after the listener is
  * unsubscribed.
  */
 public interface SubscriptionAware {

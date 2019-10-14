@@ -21,12 +21,12 @@ import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
  * Behaviour that responds to a CloseCommand by executing the
  * ExecuteCommandAction
  */
-public class CloseBevahiour extends BotBehaviour {
-    public CloseBevahiour(EventListenerContext context) {
+public class CloseBehaviour extends BotBehaviour {
+    public CloseBehaviour(EventListenerContext context) {
         super(context);
     }
 
-    public CloseBevahiour(EventListenerContext context, String name) {
+    public CloseBehaviour(EventListenerContext context, String name) {
         super(context, name);
     }
 

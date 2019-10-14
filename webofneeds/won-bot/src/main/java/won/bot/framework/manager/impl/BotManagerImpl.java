@@ -14,16 +14,16 @@ import java.util.*;
  */
 public class BotManagerImpl implements BotManager {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private List<Bot> bots = new LinkedList<>();
-    private Map<URI, Bot> botByUri = new HashMap<>();
-    private Map<URI, List<Bot>> botListByUri = new HashMap<>();
-    private Object monitor = new Object();
+    private List<Bot> bots = new LinkedList<>(); // presumably a list of all bots managed on this server
+    private Map<URI, Bot> botByAtomUri = new HashMap<>(); // map of all bot atoms uris and responsible bots
+    private Map<URI, List<Bot>> botListByNodeUri = new HashMap<>(); // map of all bots registered on that node
+    private Object monitor = new Object(); // ???
 
     @Override
-    public Bot getBotForAtomURI(URI atomUri) {
+    public Bot getBotResponsibleForAtomUri(URI atomUri) {
         // try the botByUri map
         {
-            Bot bot = botByUri.get(atomUri);
+            Bot bot = botByAtomUri.get(atomUri);
             if (bot != null)
                 return bot;
         }
@@ -33,7 +33,7 @@ public class BotManagerImpl implements BotManager {
             // logger.debug("bot knows atom: {}", mybot.knowsAtomURI(atomUri));
             if (mybot.knowsAtomURI(atomUri)) {
                 synchronized (getMonitor()) {
-                    this.botByUri.put(atomUri, mybot);
+                    this.botByAtomUri.put(atomUri, mybot);
                 }
                 return mybot;
             }
@@ -42,9 +42,9 @@ public class BotManagerImpl implements BotManager {
     }
 
     @Override
-    public List<Bot> getBotsForNodeURI(final URI wonNodeUri) {
+    public List<Bot> getBotsForNodeURI(URI wonNodeUri) {
         {
-            List<Bot> botList = botListByUri.get(wonNodeUri);
+            List<Bot> botList = botListByNodeUri.get(wonNodeUri);
             if (botList != null && botList.size() > 0)
                 return botList;
         }
@@ -56,7 +56,7 @@ public class BotManagerImpl implements BotManager {
                 }
             }
         }
-        this.botListByUri.put(wonNodeUri, botList);
+        this.botListByNodeUri.put(wonNodeUri, botList);
         return botList;
     }
 
@@ -75,7 +75,7 @@ public class BotManagerImpl implements BotManager {
         synchronized (getMonitor()) {
             this.bots.clear();
             this.bots.addAll(bots);
-            this.botByUri.clear();
+            this.botByAtomUri.clear();
         }
     }
 
@@ -113,7 +113,7 @@ public class BotManagerImpl implements BotManager {
         return bots;
     }
 
-    protected Map<URI, Bot> getBotByUri() {
-        return botByUri;
+    protected Map<URI, Bot> getBotByAtomUri() {
+        return botByAtomUri;
     }
 }

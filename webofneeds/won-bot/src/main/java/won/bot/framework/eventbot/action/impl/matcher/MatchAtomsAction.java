@@ -45,7 +45,7 @@ public class MatchAtomsAction extends BaseEventBotAction {
         URI atom1 = iter.next();
         URI atom2 = iter.next();
         logger.debug("matching atoms {} and {}", atom1, atom2);
-        logger.debug("getEventListnerContext():" + getEventListenerContext());
+        logger.debug("getEventListenerContext():" + getEventListenerContext());
         logger.debug("getMatcherService(): " + getEventListenerContext().getMatcherProtocolAtomServiceClient());
         getEventListenerContext().getMatcherProtocolAtomServiceClient().hint(atom1, atom2, 1.0,
                         URI.create("http://example.com/matcher"), null,

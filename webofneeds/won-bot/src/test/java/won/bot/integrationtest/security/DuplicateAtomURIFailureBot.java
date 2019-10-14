@@ -62,14 +62,14 @@ public class DuplicateAtomURIFailureBot extends IntegrationtestBot {
                                         new MultipleActions(ctx,
                                                         new LogAction(ctx, "Good: atom creation failed for 2nd atom."),
                                                         new PublishEventAction(ctx, new SuccessEvent()))));
-        // when we have 2 SuccessEvents, we're done. Deacivate the atoms and signal
+        // when we have 2 SuccessEvents, we're done. Deactivate the atoms and signal
         // we're finished
         bus.subscribe(SuccessEvent.class,
                         new ActionOnceAfterNEventsListener(ctx, 2,
                                         new MultipleActions(ctx, new LogAction(ctx, "Test passed."),
                                                         new PublishEventAction(ctx, new TestPassedEvent(this)),
                                                         new DeactivateAllAtomsAction(ctx))));
-        // when we have a FailureEvent, we're done, too. Deacivate the atoms and signal
+        // when we have a FailureEvent, we're done, too. Deactivate the atoms and signal
         // we're finished
         bus.subscribe(TestFailedEvent.class, new ActionOnceAfterNEventsListener(ctx, 1, new MultipleActions(ctx,
                         new LogAction(ctx, "Test failed."), new DeactivateAllAtomsAction(ctx))));

@@ -12,10 +12,13 @@ package won.bot.framework.eventbot.bus.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.bot.framework.eventbot.action.BaseEventBotAction;
+import won.bot.framework.eventbot.action.impl.MultipleActions;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.SubscriptionAware;
+import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 
 import java.lang.invoke.MethodHandles;
 import java.util.*;
@@ -50,7 +53,7 @@ public class AsyncEventBusImpl implements EventBus {
     }
 
     @Override
-    public <T extends Event> void subscribe(Class<T> clazz, final EventListener listener) {
+    public <T extends Event> EventListener subscribe(Class<T> clazz, final EventListener listener) {
         logger.debug("subscribing listener {} for type {}", listener, clazz);
         synchronized (monitor) {
             // we want to synchronize so we don't accidentally add or remove listeners at
@@ -59,6 +62,20 @@ public class AsyncEventBusImpl implements EventBus {
             newListenerList.add(listener);
             this.listenerMap.put(clazz, Collections.unmodifiableList(newListenerList));
             callOnSubscribeIfApplicable(listener, clazz);
+        }
+        return listener;
+    }
+
+    @Override
+    public <T extends Event> EventListener subscribe(Class<T> clazz, final BaseEventBotAction... actions) {
+        if (actions == null || actions.length == 0) {
+            logger.warn("Ignoring event subscription without actions");
+            return null;
+        } else if (actions.length == 1) {
+            return subscribe(clazz, new ActionOnEventListener(actions[0].getEventListenerContext(), actions[0]));
+        } else {
+            return subscribe(clazz, new ActionOnEventListener(actions[0].getEventListenerContext(),
+                            new MultipleActions(actions[0].getEventListenerContext(), actions)));
         }
     }
 
@@ -96,7 +113,7 @@ public class AsyncEventBusImpl implements EventBus {
                 }
                 entry.setValue(listeners);
                 if (unsubscribed) {
-                    // if we had to unssubscribe the listener, we may have to call its onUnsubscribe
+                    // if we had to unsubscribe the listener, we may have to call its onUnsubscribe
                     // method
                     callOnUnsubscribeIfApplicable(listener, entry.getKey());
                 }

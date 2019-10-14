@@ -16,7 +16,7 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.impl.matcher.MatcherRegisterFailedEvent;
+import won.bot.framework.eventbot.event.impl.matcher.MatcherExtensionRegisterFailedEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 
 import java.lang.invoke.MethodHandles;
@@ -52,7 +52,7 @@ public class RegisterMatcherAction extends BaseEventBotAction {
             } catch (Exception e) {
                 logger.warn("Error registering matcher at won node {}. Try again later ... Exception was {}",
                                 wonNodeUri, e);
-                getEventListenerContext().getEventBus().publish(new MatcherRegisterFailedEvent(wonNodeUri));
+                getEventListenerContext().getEventBus().publish(new MatcherExtensionRegisterFailedEvent(wonNodeUri));
             }
         }
     }

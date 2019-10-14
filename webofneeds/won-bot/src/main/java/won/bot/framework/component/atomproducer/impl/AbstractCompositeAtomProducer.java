@@ -63,7 +63,7 @@ public abstract class AbstractCompositeAtomProducer implements AtomProducer {
 
     /**
      * Returns one of the AtomProducer objects found in the atomFactories set, or
-     * null if no factories are elegible (in which case the factory is exhausted).
+     * null if no factories are eligible (in which case the factory is exhausted).
      * 
      * @return
      */
