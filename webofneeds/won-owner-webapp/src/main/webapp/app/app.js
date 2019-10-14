@@ -26,7 +26,11 @@ import uiRouterModule from "angular-ui-router";
 import "angular-ui-router/release/stateEvents.js";
 import { delay } from "./utils.js";
 //---------- Config -----------
-import { configRouting, runAccessControl } from "./configRouting.js";
+import {
+  configRouting,
+  runAccessControl,
+  registerEmailVerificationTrigger,
+} from "./configRouting.js";
 import configRedux from "./configRedux.js";
 //--------- Actions -----------
 import { actionCreators } from "./actions/actions.js";
@@ -139,6 +143,8 @@ app.run([
 ]);
 
 app.run(runAccessControl);
+
+app.run(registerEmailVerificationTrigger);
 
 //check login status. TODO: this should actually be baked-in data (to avoid the extra roundtrip)
 //app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.verifyLogin())]);

@@ -87,7 +87,7 @@ export function showSlideInEmailVerification(state) {
   const isAnonymous = accountUtils.isAnonymous(accountState);
   const isEmailVerified = accountUtils.isEmailVerified(accountState);
 
-  return (
+  return !!(
     !showSlideInConnectionLost(state) &&
     (verificationToken || (isLoggedIn && !isEmailVerified && !isAnonymous))
   );
@@ -98,7 +98,7 @@ export function showSlideInConnectionLost(state) {
 }
 
 export function hasSlideIns(state) {
-  return (
+  return !!(
     showSlideInAnonymous(state) ||
     showSlideInAnonymousSuccess(state) ||
     showSlideInDisclaimer(state) ||

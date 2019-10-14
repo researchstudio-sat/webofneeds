@@ -2,6 +2,8 @@
  * Created by ksinger on 08.10.2015.
  */
 
+import Immutable from "immutable";
+
 import reducer from "./reducers/reducers.js";
 import thunk from "redux-thunk";
 
@@ -35,7 +37,13 @@ function createStore($ngReduxProvider) {
             * see https://github.com/zalmoxisus/redux-devtools-extension and
             * https://www.npmjs.com/package/ng-redux#using-devtools for details.
             */
-      devToolsEnhancer(),
+      devToolsEnhancer({
+        trace: true,
+        traceLimit: 10,
+        serialize: {
+          immutable: Immutable,
+        },
+      }),
       // Specify name here, actionsBlacklist, actionsCreators and other options if needed
     ]
   );
