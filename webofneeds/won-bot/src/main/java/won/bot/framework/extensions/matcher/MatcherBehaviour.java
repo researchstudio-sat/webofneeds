@@ -15,16 +15,26 @@ import java.util.Optional;
 
 public class MatcherBehaviour extends BotBehaviour {
     private final EventBus eventBus;
-    private static final long retryInterval = 30000L; // TODO: let this be injected via config
+    private final long retryInterval;
 
     public MatcherBehaviour(EventListenerContext context) {
+        this(context, 30000L);
+    }
+
+    public MatcherBehaviour(EventListenerContext context, long retryInterval) {
         super(context);
         eventBus = context.getEventBus();
+        this.retryInterval = retryInterval;
     }
 
     public MatcherBehaviour(EventListenerContext context, String name) {
+        this(context, name, 30000L);
+    }
+
+    public MatcherBehaviour(EventListenerContext context, String name, long retryInterval) {
         super(context, name);
         eventBus = context.getEventBus();
+        this.retryInterval = retryInterval;
     }
 
     protected void onActivate(Optional<Object> message) {
@@ -37,13 +47,11 @@ public class MatcherBehaviour extends BotBehaviour {
         // using a random delayed action because we don't have a non-random one
         RandomDelayedAction delayedRegistration = new RandomDelayedAction(context, retryInterval, retryInterval, 0L,
                         registerMatcher);
-        subscribeWithAutoCleanup(MatcherExtensionRegisterFailedEvent.class,
-                        new ActionOnEventListener(context, delayedRegistration));
+        subscribeWithAutoCleanup(MatcherExtensionRegisterFailedEvent.class, delayedRegistration);
         // optional action on successful registering
         // TODO: move MatcherExtensionRegisterSucceededEvent to extension
-        LogAction afterRegistration = new LogAction(context, "Successfully registered as Matcher");
         subscribeWithAutoCleanup(MatcherExtensionRegisterSucceededEvent.class,
-                        new ActionOnEventListener(context, afterRegistration));
+                        new LogAction(context, "Successfully registered as Matcher"));
     }
 
     public EventBus getEventBus() {
