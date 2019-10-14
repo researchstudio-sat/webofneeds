@@ -2,7 +2,7 @@ package won.bot.framework.extensions.matcher;
 
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.impl.LogAction;
-import won.bot.framework.eventbot.action.impl.RandomDelayedAction;
+import won.bot.framework.eventbot.action.impl.DelayedAction;
 import won.bot.framework.eventbot.behaviour.BotBehaviour;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
@@ -39,10 +39,7 @@ public class MatcherBehaviour extends BotBehaviour {
         RegisterMatcherAction registerMatcher = new RegisterMatcherAction(context);
         subscribeWithAutoCleanup(ActEvent.class, new ActionOnEventListener(context, registerMatcher, 1));
         // retry in case of failed registering
-
-        // using a random delayed action because we don't have a non-random one
-        RandomDelayedAction delayedRegistration = new RandomDelayedAction(context, retryInterval, retryInterval, 0L,
-                        registerMatcher);
+        DelayedAction delayedRegistration = new DelayedAction(context, retryInterval, registerMatcher);
         subscribeWithAutoCleanup(MatcherExtensionRegisterFailedEvent.class, delayedRegistration);
         // optional action on successful registering
         subscribeWithAutoCleanup(MatcherExtensionRegisterSucceededEvent.class,
