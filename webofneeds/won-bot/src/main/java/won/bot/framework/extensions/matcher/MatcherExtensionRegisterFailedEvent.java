@@ -1,4 +1,4 @@
-package won.bot.framework.eventbot.event.impl.matcher;
+package won.bot.framework.extensions.matcher;
 
 import java.net.URI;
 

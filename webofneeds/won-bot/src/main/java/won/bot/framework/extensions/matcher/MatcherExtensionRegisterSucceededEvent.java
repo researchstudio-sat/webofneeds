@@ -8,17 +8,17 @@
  * KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package won.bot.framework.eventbot.event.impl.matcher;
+package won.bot.framework.extensions.matcher;
 
 import java.net.URI;
 
-import won.bot.framework.eventbot.event.BaseAtomSpecificEvent;
+import won.bot.framework.eventbot.event.BaseNodeSpecificEvent;
 
 /**
  *
  */
-public class MatcherExtensionAtomActivatedEvent extends BaseAtomSpecificEvent {
-    public MatcherExtensionAtomActivatedEvent(final URI atomURI) {
-        super(atomURI);
+public class MatcherExtensionRegisterSucceededEvent extends BaseNodeSpecificEvent {
+    public MatcherExtensionRegisterSucceededEvent(final URI wonNodeURI) {
+        super(wonNodeURI);
     }
 }
