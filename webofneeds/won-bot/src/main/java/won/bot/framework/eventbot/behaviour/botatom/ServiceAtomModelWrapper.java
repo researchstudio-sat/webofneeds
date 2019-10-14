@@ -22,6 +22,7 @@ public class ServiceAtomModelWrapper extends DefaultAtomModelWrapper {
         this.serviceAtomContent = serviceAtomContent;
         // SET RDF STRUCTURE
         this.setTitle(serviceAtomContent.getName());
+        this.setDescription(serviceAtomContent.getDescription());
         this.addSocket("#HolderSocket", WXHOLD.HolderSocketString);
         this.addSocket("#ChatSocket", WXCHAT.ChatSocketString);
         this.addSocket("#ReviewSocket", WXREVIEW.ReviewSocketString);
@@ -29,7 +30,9 @@ public class ServiceAtomModelWrapper extends DefaultAtomModelWrapper {
 
     public ServiceAtomModelWrapper(Dataset atomDataset) {
         super(atomDataset);
-        // TODO: EXTRACT serviceAtomContent
+
+        serviceAtomContent = new ServiceAtomContent(this.getSomeTitleFromIsOrAll());
+        serviceAtomContent.setDescription(this.getSomeDescription());
     }
 
     public ServiceAtomContent getServiceAtomContent() {
