@@ -1,7 +1,6 @@
 package won.bot.framework.extensions.matcher;
 
 import org.apache.jena.query.Dataset;
-import won.bot.framework.eventbot.event.impl.matcher.*;
 
 import java.net.URI;
 

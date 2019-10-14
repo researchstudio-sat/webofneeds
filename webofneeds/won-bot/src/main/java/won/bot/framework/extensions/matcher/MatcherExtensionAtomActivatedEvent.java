@@ -8,7 +8,7 @@
  * KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package won.bot.framework.eventbot.event.impl.matcher;
+package won.bot.framework.extensions.matcher;
 
 import java.net.URI;
 
