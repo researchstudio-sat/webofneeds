@@ -30,7 +30,6 @@ public class ServiceAtomModelWrapper extends DefaultAtomModelWrapper {
 
     public ServiceAtomModelWrapper(Dataset atomDataset) {
         super(atomDataset);
-
         serviceAtomContent = new ServiceAtomContent(this.getSomeTitleFromIsOrAll());
         serviceAtomContent.setDescription(this.getSomeDescription());
     }
