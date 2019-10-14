@@ -1,6 +1,9 @@
 package won.bot.framework.eventbot.behaviour.botatom;
 
 import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDF;
+import won.bot.vocabulary.WXBOT;
 import won.protocol.util.DefaultAtomModelWrapper;
 import won.protocol.vocabulary.WXCHAT;
 import won.protocol.vocabulary.WXHOLD;
@@ -20,6 +23,8 @@ public class ServiceAtomModelWrapper extends DefaultAtomModelWrapper {
         super(atomUri);
         // SET CONTENT OBJECT
         this.serviceAtomContent = serviceAtomContent;
+        Resource atom = this.getAtomModel().createResource(atomUri.toString());
+        atom.addProperty(RDF.type, WXBOT.ServiceAtom);
         // SET RDF STRUCTURE
         this.setTitle(serviceAtomContent.getName());
         this.setDescription(serviceAtomContent.getDescription());
