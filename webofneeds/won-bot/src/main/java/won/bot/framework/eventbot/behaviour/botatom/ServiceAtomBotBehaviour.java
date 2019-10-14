@@ -76,13 +76,14 @@ public class ServiceAtomBotBehaviour extends BotBehaviour {
                                     if (serviceBotDataSet == null) {
                                         logger.debug("BotServiceAtom can't be retrieved, creating a new one...");
                                         createServiceAtom();
-                                    } else if (!Objects.equals(new ServiceAtomModelWrapper(serviceBotDataSet).getServiceAtomContent(), serviceAtomContent)) {
+                                    } else if (!Objects.equals(new ServiceAtomModelWrapper(serviceBotDataSet)
+                                                    .getServiceAtomContent(), serviceAtomContent)) {
                                         logger.debug("BotServiceAtom is outdated, modifying the BotServiceAtom");
                                         modifyServiceAtom();
                                     } else {
                                         logger.info("#####################################################################################");
                                         logger.info("BotServiceAtom is still up to date, atom URI is {}",
-                                                serviceAtomUri);
+                                                        serviceAtomUri);
                                         logger.info("#####################################################################################");
                                     }
                                 }
@@ -134,7 +135,7 @@ public class ServiceAtomBotBehaviour extends BotBehaviour {
 
                             private void modifyServiceAtom() {
                                 logger.info("BotServiceAtom modification currently not implemented");
-                                //TODO: Implement BotServiceAtom modification
+                                // TODO: Implement BotServiceAtom modification
                             }
                         }));
         subscribeWithAutoCleanup(AtomCreatedEvent.class,
