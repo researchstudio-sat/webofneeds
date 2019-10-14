@@ -48,8 +48,13 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
         logger.info("Using key store file {} with key store type {}, provider {}",
                         new Object[] { storeFile, keyStoreType, provider });
         CacheManager manager = CacheManager.getInstance();
-        ehcache = new Cache("keyCache" + storeFile.hashCode(), 100, false, false, 60, 60);
-        manager.addCache(ehcache);
+        String cacheName = "keyCache" + storeFile.hashCode();
+        if (!manager.cacheExists(cacheName)) {
+            ehcache = new Cache(cacheName, 100, false, false, 60, 60);
+            manager.addCache(ehcache);
+        } else {
+            ehcache = manager.getCache(cacheName);
+        }
     }
 
     /*
