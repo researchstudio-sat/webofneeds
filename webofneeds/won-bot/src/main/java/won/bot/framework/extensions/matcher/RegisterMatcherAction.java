@@ -8,7 +8,7 @@
  * KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package won.bot.framework.eventbot.action.impl.matcher;
+package won.bot.framework.extensions.matcher;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +16,7 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.impl.matcher.MatcherExtensionRegisterFailedEvent;
+import won.bot.framework.extensions.matcher.MatcherExtensionRegisterFailedEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 
 import java.lang.invoke.MethodHandles;
