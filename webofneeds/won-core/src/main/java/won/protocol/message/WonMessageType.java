@@ -1,9 +1,10 @@
 package won.protocol.message;
 
-import org.apache.jena.rdf.model.Resource;
-import won.protocol.vocabulary.WONMSG;
-
 import java.net.URI;
+
+import org.apache.jena.rdf.model.Resource;
+
+import won.protocol.vocabulary.WONMSG;
 
 /**
  * User: ypanchenko Date: 13.08.2014
@@ -58,6 +59,20 @@ public enum WonMessageType {
 
     public boolean isHintMessage() {
         return this == ATOM_HINT_MESSAGE || this == SOCKET_HINT_MESSAGE;
+    }
+
+    public boolean isResponseMessage() {
+        return this == SUCCESS_RESPONSE || this == FAILURE_RESPONSE;
+    }
+
+    public boolean causesOutgoingMessage() {
+        return this == CLOSE
+                        || this == OPEN
+                        || this == CONNECT
+                        || this == CONNECTION_MESSAGE
+                        || this == FAILURE_RESPONSE
+                        || this == SUCCESS_RESPONSE
+                        || this == CHANGE_NOTIFICATION;
     }
 
     public static WonMessageType getWonMessageType(Resource resource) {

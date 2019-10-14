@@ -57,7 +57,7 @@ public class MailFileAtomProducer implements FileBasedAtomProducer {
             logger.debug("mail has attachments  : {}", parser.hasAttachments());
             logger.debug("mail plain content    : {}", StringUtils.abbreviate(parser.getPlainContent(), 200));
             logger.debug("mail html content     : {}", StringUtils.abbreviate(parser.getHtmlContent(), 200));
-            return atomModelWrapper.copyDataset();
+            return atomModelWrapper.copyDatasetWithoutSysinfo();
         } catch (Exception e) {
             logger.error("could not parse email from file {} ", file, e);
         }

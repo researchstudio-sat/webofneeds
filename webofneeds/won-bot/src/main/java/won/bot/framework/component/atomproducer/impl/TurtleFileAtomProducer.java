@@ -40,7 +40,7 @@ public class TurtleFileAtomProducer implements FileBasedAtomProducer {
             AtomModelWrapper atomModelWrapper = new AtomModelWrapper(model, null); // Use atomModelWrapper to ensure
                                                                                    // that the
                                                                                    // sysinfo graph is added already
-            return atomModelWrapper.copyDataset();
+            return atomModelWrapper.copyDatasetWithoutSysinfo();
         } catch (Exception e) {
             logger.error("could not parse turtle from file {} ", file, e);
             throw e;

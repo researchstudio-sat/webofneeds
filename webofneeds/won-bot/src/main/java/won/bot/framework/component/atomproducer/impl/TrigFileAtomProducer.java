@@ -37,7 +37,7 @@ public class TrigFileAtomProducer implements FileBasedAtomProducer {
             Dataset dataset = DatasetFactory.createGeneral();
             RDFDataMgr.read(dataset, fis, RDFFormat.TRIG.getLang());
             AtomModelWrapper atomModelWrapper = new AtomModelWrapper(dataset);
-            return atomModelWrapper.copyDataset();
+            return atomModelWrapper.copyDatasetWithoutSysinfo();
         } catch (Exception e) {
             logger.error("could not parse trig from file {} ", file, e);
             throw e;

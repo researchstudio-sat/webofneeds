@@ -1,187 +1,222 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
-  ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
-  ~
-  ~    Licensed under the Apache License, Version 2.0 (the "License");
-  ~    you may not use this file except in compliance with the License.
-  ~    You may obtain a copy of the License at
-  ~
-  ~        http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~    Unless required by applicable law or agreed to in writing, software
-  ~    distributed under the License is distributed on an "AS IS" BASIS,
-  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~    See the License for the specific language governing permissions and
-  ~    limitations under the License.
-  -->
+<!-- ~ Copyright 2012 Research Studios Austria Forschungsges.m.b.H. ~ ~ Licensed 
+	under the Apache License, Version 2.0 (the "License"); ~ you may not use 
+	this file except in compliance with the License. ~ You may obtain a copy 
+	of the License at ~ ~ http://www.apache.org/licenses/LICENSE-2.0 ~ ~ Unless 
+	required by applicable law or agreed to in writing, software ~ distributed 
+	under the License is distributed on an "AS IS" BASIS, ~ WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. ~ See the License for 
+	the specific language governing permissions and ~ limitations under the License. -->
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
             http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
             http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd">
 
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/owner.properties" ignore-unresolvable="true"/>
+	<context:property-placeholder
+		location="file:${WON_CONFIG_DIR}/owner.properties"
+		ignore-unresolvable="true" />
 
-    <!-- owner webapp crypto config -->
-    <bean id="keyStoreService"
-          class="won.cryptography.service.keystore.FileBasedKeyStoreService"
-          init-method="init">
-        <constructor-arg type="java.lang.String" value="${keystore.location}" />
-        <constructor-arg type="java.lang.String" value="${keystore.password}" />
-    </bean>
-
-
-    <bean id="perUserKeyStoreService" class="won.owner.service.impl.PerUserKeystoreService" />
-
-    <bean id="trustStoreService" class="won.cryptography.service.TrustStoreService"
-          init-method="init">
-        <constructor-arg type="java.lang.String" value="${truststore.location}" />
-        <constructor-arg type="java.lang.String" value="${truststore.password}" />
-    </bean>
-    <bean id="fixedToOwnerPrivateKeyStrategy" class="won.cryptography.ssl.PredefinedAliasPrivateKeyStrategy">
-        <constructor-arg value="${uri.prefix.owner}" />
-    </bean>
-    <bean id="ownerUriAliasStrategy" class="won.cryptography.keymanagement.PredefinedAliasStrategy">
-        <constructor-arg name="predefinedAlias" value="${uri.prefix.owner}" />
-    </bean>
-
-    <bean id="registrationClient" class="won.cryptography.service.RegistrationRestClientHttps" depends-on="cryptographyService">
-        <constructor-arg ref="keyStoreService" />
-        <constructor-arg name="privateKeyStrategy" ref="fixedToOwnerPrivateKeyStrategy" />
-        <constructor-arg ref="trustStoreService" />
-        <constructor-arg>
-            <bean class="won.cryptography.ssl.TOFUStrategy">
-                <property name="trustStoreService" ref="trustStoreService" />
-            </bean>
-        </constructor-arg>
-        <constructor-arg name="registrationQuery" value="?register=owner" />
-    </bean>
-
-    <bean id="CryptographyServiceOnBehalfOfAtom" class="won.cryptography.service.CryptographyService">
-        <constructor-arg ref="perUserKeyStoreService" />
-        <!-- we don't set a default alias - that's not needed for the owner webapp -->
-    </bean>
-
-    <bean id="cryptographyService" class="won.cryptography.service.CryptographyService">
-        <constructor-arg ref="keyStoreService" />
-        <constructor-arg name="defaultAlias" value="${uri.prefix.owner}" />
-    </bean>
+	<!-- owner webapp crypto config -->
+	<bean id="keyStoreService"
+		class="won.cryptography.service.keystore.FileBasedKeyStoreService"
+		init-method="init">
+		<constructor-arg type="java.lang.String"
+			value="${keystore.location}" />
+		<constructor-arg type="java.lang.String"
+			value="${keystore.password}" />
+	</bean>
 
 
-    <!-- if the fixedPrivateKeyAlias is empty or null, the processor generates
-        a new Keypair for every atom, if it is a string, the processor uses the same
-        key pair for all atoms and storese it under the specified alias -->
-    <bean id="keyPairAliasDerivationStrategyFactory"
-          class="won.cryptography.keymanagement.KeyPairAliasDerivationStrategyFactory">
-        <property name="predefinedAlias" value="${owner.fixedPrivateKeyAlias}" />
-    </bean>
+	<bean id="perUserKeyStoreService"
+		class="won.owner.service.impl.PerUserKeystoreService" />
 
-    <bean id="linkedDataRestClient" class="won.protocol.rest.LinkedDataRestClientHttps">
-        <constructor-arg ref="keyStoreService" />
-        <constructor-arg ref="trustStoreService" />
-        <constructor-arg name="trustStrategy">
-            <bean class="won.cryptography.ssl.TrustAnyCertificateStrategy" />
-        </constructor-arg>
-        <constructor-arg name="keyPairAliasDerivationStrategy"
-                         ref="ownerUriAliasStrategy" />
-    </bean>
+	<bean id="trustStoreService"
+		class="won.cryptography.service.TrustStoreService" init-method="init">
+		<constructor-arg type="java.lang.String"
+			value="${truststore.location}" />
+		<constructor-arg type="java.lang.String"
+			value="${truststore.password}" />
+	</bean>
+	<bean id="fixedToOwnerPrivateKeyStrategy"
+		class="won.cryptography.ssl.PredefinedAliasPrivateKeyStrategy">
+		<constructor-arg value="${uri.prefix.owner}" />
+	</bean>
+	<bean id="ownerUriAliasStrategy"
+		class="won.cryptography.keymanagement.PredefinedAliasStrategy">
+		<constructor-arg name="predefinedAlias"
+			value="${uri.prefix.owner}" />
+	</bean>
 
-    <bean id="linkedDataRestClientOnBehalfOfAtom" class="won.protocol.rest.LinkedDataRestClientHttps">
-        <constructor-arg ref="perUserKeyStoreService" />
-        <constructor-arg ref="trustStoreService" />
-        <constructor-arg name="trustStrategy">
-            <bean class="won.cryptography.ssl.TrustAnyCertificateStrategy" />
-        </constructor-arg>
-        <constructor-arg name="keyPairAliasDerivationStrategy">
-            <bean factory-bean="keyPairAliasDerivationStrategyFactory"
-                  factory-method="create" />
-        </constructor-arg>
-    </bean>
+	<bean id="registrationClient"
+		class="won.cryptography.service.RegistrationRestClientHttps"
+		depends-on="cryptographyService">
+		<constructor-arg ref="keyStoreService" />
+		<constructor-arg name="privateKeyStrategy"
+			ref="fixedToOwnerPrivateKeyStrategy" />
+		<constructor-arg ref="trustStoreService" />
+		<constructor-arg>
+			<bean class="won.cryptography.ssl.TOFUStrategy">
+				<property name="trustStoreService" ref="trustStoreService" />
+			</bean>
+		</constructor-arg>
+		<constructor-arg name="registrationQuery"
+			value="?register=owner" />
+	</bean>
 
-    <bean id="messagingContext" class="won.cryptography.ssl.MessagingContext">
-        <constructor-arg ref="keyStoreService" />
-        <constructor-arg name="clientDefaultAliasKeyStrategy"
-                         ref="fixedToOwnerPrivateKeyStrategy" />
-        <constructor-arg ref="trustStoreService" />
-    </bean>
+	<bean id="CryptographyServiceOnBehalfOfAtom"
+		class="won.cryptography.service.CryptographyService">
+		<constructor-arg ref="perUserKeyStoreService" />
+		<!-- we don't set a default alias - that's not needed for the owner webapp -->
+	</bean>
 
-    <bean id="linkedDataRestBridge" class="won.protocol.rest.LinkedDataRestBridge">
-        <constructor-arg ref="keyStoreService" />
-        <constructor-arg ref="trustStoreService" />
-        <constructor-arg name="trustStrategy">
-            <bean class="won.cryptography.ssl.TrustAnyCertificateStrategy" />
-        </constructor-arg>
-        <constructor-arg name="keyPairAliasDerivationStrategy" ref="ownerUriAliasStrategy" />
-    </bean>
-
-    <bean id="linkedDataRestBridgeOnBehalfOfAtom" class="won.protocol.rest.LinkedDataRestBridge">
-        <constructor-arg ref="perUserKeyStoreService" />
-        <constructor-arg ref="trustStoreService" />
-        <constructor-arg name="trustStrategy">
-            <bean class="won.cryptography.ssl.TrustAnyCertificateStrategy" />
-        </constructor-arg>
-        <constructor-arg name="keyPairAliasDerivationStrategy">
-            <bean factory-bean="keyPairAliasDerivationStrategyFactory"
-                  factory-method="create" />
-        </constructor-arg>
-    </bean>
+	<bean id="cryptographyService"
+		class="won.cryptography.service.CryptographyService">
+		<constructor-arg ref="keyStoreService" />
+		<constructor-arg name="defaultAlias"
+			value="${uri.prefix.owner}" />
+	</bean>
 
 
+	<!-- if the fixedPrivateKeyAlias is empty or null, the processor generates 
+		a new Keypair for every atom, if it is a string, the processor uses the same 
+		key pair for all atoms and storese it under the specified alias -->
+	<bean id="keyPairAliasDerivationStrategyFactory"
+		class="won.cryptography.keymanagement.KeyPairAliasDerivationStrategyFactory">
+		<!-- The ':' at the end of the property key is intentional. It provides 
+			a default value in case the property key isn't set. The default is empty. -->
+		<property name="predefinedAlias"
+			value="${owner.fixedPrivateKeyAlias:}" />
+	</bean>
 
-    <!-- owner functioning -->
-    <import resource="classpath:/spring/component/cryptographyServices.xml" />
-    <import resource="classpath:/spring/core/owner-core.xml" />
-    <import resource="classpath:/spring/component/ehcache/spring-owner-ehcache.xml" />
-    <import resource="classpath:/spring/component/linkeddatasource/owner-linkeddatasource.xml" />
-    <import resource="classpath:/spring/component/storage/jdbc-storage.xml" />
-    <import resource="classpath:/spring/component/storage/jpabased-rdf-storage.xml" />
-    <import resource="classpath:/spring/component/camel/owner-camel.xml" />
-    <import resource="classpath:/spring/component/ownerProtocolCommunicationService/ownerProtocolCommunicationService.xml" />
-    <import resource="classpath:/spring/component/ownerProtocolCommunicationService/wonNodeRegistrationEventPublisher.xml" />
-    <import resource="classpath:/spring/component/wonNodeInformationService.xml" />
+	<bean id="linkedDataRestClient"
+		class="won.protocol.rest.LinkedDataRestClientHttps">
+		<constructor-arg ref="keyStoreService" />
+		<constructor-arg ref="trustStoreService" />
+		<constructor-arg name="trustStrategy">
+			<bean class="won.cryptography.ssl.TrustAnyCertificateStrategy" />
+		</constructor-arg>
+		<constructor-arg name="keyPairAliasDerivationStrategy"
+			ref="ownerUriAliasStrategy" />
+	</bean>
 
-    <!-- owner message processing -->
-    <bean id="ownerApplicationService" class="won.owner.service.impl.OwnerApplicationService"/>
+	<bean id="linkedDataRestClientOnBehalfOfAtom"
+		class="won.protocol.rest.LinkedDataRestClientHttps">
+		<constructor-arg ref="perUserKeyStoreService" />
+		<constructor-arg ref="trustStoreService" />
+		<constructor-arg name="trustStrategy">
+			<bean class="won.cryptography.ssl.TrustAnyCertificateStrategy" />
+		</constructor-arg>
+		<constructor-arg name="keyPairAliasDerivationStrategy">
+			<bean factory-bean="keyPairAliasDerivationStrategyFactory"
+				factory-method="create" />
+		</constructor-arg>
+	</bean>
 
-    <!-- provides the bean expected by the dynamic camel route configuration in won-owner -->
-    <bean id="mainOwnerMessageProcessor" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
-        <!-- adapts the ownerApplicationService to a camel Processor. -->
-        <constructor-arg ref="ownerApplicationService" />
-    </bean>
+	<bean id="messagingContext"
+		class="won.cryptography.ssl.MessagingContext">
+		<constructor-arg ref="keyStoreService" />
+		<constructor-arg name="clientDefaultAliasKeyStrategy"
+			ref="fixedToOwnerPrivateKeyStrategy" />
+		<constructor-arg ref="trustStoreService" />
+	</bean>
 
-    <bean id="eagerlyCachePopulatingMessageProcessor" class="won.owner.web.websocket.EagerlyCachePopulatingMessageProcessor" />
+	<bean id="linkedDataRestBridge"
+		class="won.protocol.rest.LinkedDataRestBridge">
+		<constructor-arg ref="keyStoreService" />
+		<constructor-arg ref="trustStoreService" />
+		<constructor-arg name="trustStrategy">
+			<bean class="won.cryptography.ssl.TrustAnyCertificateStrategy" />
+		</constructor-arg>
+		<constructor-arg name="keyPairAliasDerivationStrategy"
+			ref="ownerUriAliasStrategy" />
+	</bean>
 
-    <!-- mails from/to user to/from owner mail server -->
-    <bean id="springMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-        <property name="host" value="${email.from.won.smtp.host}"/>
-        <property name="port" value="587" />
-        <property name="username" value="${email.from.won.user}" />
-        <property name="password" value="${email.from.won.password}" />
+	<bean id="linkedDataRestBridgeOnBehalfOfAtom"
+		class="won.protocol.rest.LinkedDataRestBridge">
+		<constructor-arg ref="perUserKeyStoreService" />
+		<constructor-arg ref="trustStoreService" />
+		<constructor-arg name="trustStrategy">
+			<bean class="won.cryptography.ssl.TrustAnyCertificateStrategy" />
+		</constructor-arg>
+		<constructor-arg name="keyPairAliasDerivationStrategy">
+			<bean factory-bean="keyPairAliasDerivationStrategyFactory"
+				factory-method="create" />
+		</constructor-arg>
+	</bean>
 
-        <property name="javaMailProperties">
-            <props>
-                <prop key="mail.smtp.auth">true</prop>
-                <prop key="mail.smtp.starttls.enable">true</prop>
-            </props>
-        </property>
-    </bean>
 
-    <bean id="springTemplateMessage" class="org.springframework.mail.SimpleMailMessage">
-        <property name="from" value="${email.from.won.user}"/>
-    </bean>
 
-    <bean id="ownerNoReplayMailSender" class="won.owner.web.WonOwnerMailSender">
-        <property name="wonMailSender" ref="wonMailSender"/>
-    </bean>
+	<!-- owner functioning -->
+	<import
+		resource="classpath:/spring/component/cryptographyServices.xml" />
+	<import resource="classpath:/spring/core/owner-core.xml" />
+	<import
+		resource="classpath:/spring/component/ehcache/spring-owner-ehcache.xml" />
+	<import
+		resource="classpath:/spring/component/linkeddatasource/owner-linkeddatasource.xml" />
+	<import
+		resource="classpath:/spring/component/storage/jdbc-storage.xml" />
+	<import
+		resource="classpath:/spring/component/storage/jpabased-rdf-storage.xml" />
+	<import
+		resource="classpath:/spring/component/camel/owner-camel.xml" />
+	<import
+		resource="classpath:/spring/component/ownerProtocolCommunicationService/ownerProtocolCommunicationService.xml" />
+	<import
+		resource="classpath:/spring/component/ownerProtocolCommunicationService/wonNodeRegistrationEventPublisher.xml" />
+	<import
+		resource="classpath:/spring/component/wonNodeInformationService.xml" />
 
-    <bean id="wonMailSender" class="won.utils.mail.WonMailSender">
-        <property name="mailSender" ref="springMailSender"/>
-        <property name="templateMessage" ref="springTemplateMessage"/>
-    </bean>
+	<!-- owner message processing -->
+	<bean id="ownerApplicationService"
+		class="won.owner.service.impl.OwnerApplicationService" />
 
-    <!-- servlet filters -->
-    <import resource="classpath:/spring/owner-security.xml"/>
+	<!-- provides the bean expected by the dynamic camel route configuration 
+		in won-owner -->
+	<bean id="mainOwnerMessageProcessor"
+		class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+		<!-- adapts the ownerApplicationService to a camel Processor. -->
+		<constructor-arg ref="ownerApplicationService" />
+	</bean>
+
+	<bean id="eagerlyCachePopulatingMessageProcessor"
+		class="won.owner.web.websocket.EagerlyCachePopulatingMessageProcessor" />
+
+	<!-- mails from/to user to/from owner mail server -->
+	<bean id="springMailSender"
+		class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="${email.from.won.smtp.host}" />
+		<property name="port" value="587" />
+		<property name="username" value="${email.from.won.user}" />
+		<property name="password" value="${email.from.won.password}" />
+
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.smtp.auth">true</prop>
+				<prop key="mail.smtp.starttls.enable">true</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="springTemplateMessage"
+		class="org.springframework.mail.SimpleMailMessage">
+		<property name="from" value="${email.from.won.user}" />
+	</bean>
+
+	<bean id="ownerNoReplayMailSender"
+		class="won.owner.web.WonOwnerMailSender">
+		<property name="wonMailSender" ref="wonMailSender" />
+	</bean>
+
+	<bean id="wonMailSender" class="won.utils.mail.WonMailSender">
+		<property name="mailSender" ref="springMailSender" />
+		<property name="templateMessage" ref="springTemplateMessage" />
+	</bean>
+
+	<!-- servlet filters -->
+	<import resource="classpath:/spring/owner-security.xml" />
 </beans>

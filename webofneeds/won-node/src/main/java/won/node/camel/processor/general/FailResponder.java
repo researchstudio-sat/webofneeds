@@ -82,12 +82,11 @@ public class FailResponder extends AbstractCamelProcessor {
                 }
                 logger.debug("original message: {}", RdfUtils.toString(originalMessage.getCompleteDataset()));
             }
-            if (WonMessageType.FAILURE_RESPONSE == originalMessage.getMessageType()
-                            && WonMessageType.FAILURE_RESPONSE == originalMessage.getIsResponseToMessageType()) {
+            if (WonMessageType.FAILURE_RESPONSE == originalMessage.getMessageType()) {
                 // do not throw failures back and forth. If the original message is already a
                 // failure message
                 // that indicates a problem processing a failure message, log this and stop.
-                logger.info("Encountered an error processing a FailureResponse for a FailureResponse. The FailureResponse is "
+                logger.info("Encountered an error processing a FailureResponse. The FailureResponse is "
                                 + "logged at log level DEBUG. Its message URI is {}", originalMessage.getMessageURI(),
                                 exception);
                 StringWriter sw = new StringWriter();

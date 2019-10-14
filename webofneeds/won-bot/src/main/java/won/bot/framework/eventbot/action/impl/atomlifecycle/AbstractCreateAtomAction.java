@@ -103,7 +103,7 @@ public abstract class AbstractCreateAtomAction extends BaseEventBotAction {
         }
         RdfUtils.replaceBaseURI(atomDataset, atomURI.toString(), true);
         return WonMessageBuilder.setMessagePropertiesForCreate(wonNodeInformationService.generateEventURI(wonNodeURI),
-                        atomURI, wonNodeURI).addContent(atomModelWrapper.copyDataset()).build();
+                        atomURI, wonNodeURI).addContent(atomModelWrapper.copyDatasetWithoutSysinfo()).build();
     }
 
     public void setUsedForTesting(final boolean usedForTesting) {

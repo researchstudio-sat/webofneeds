@@ -54,7 +54,8 @@
         key pair for all atoms and storese it under the specified alias -->
     <bean id="keyPairAliasDerivationStrategyFactory"
         class="won.cryptography.keymanagement.KeyPairAliasDerivationStrategyFactory">
-        <property name="predefinedAlias" value="${owner.fixedPrivateKeyAlias}" />
+        <!-- The ':' at the end of the property key is intentional. It provides a default value in case the property key isn't set. The default is empty.-->
+        <property name="predefinedAlias" value="${owner.fixedPrivateKeyAlias:}" /> 
     </bean>
     
 	<bean id="linkedDataRestClient" class="won.protocol.rest.LinkedDataRestClientHttps">
