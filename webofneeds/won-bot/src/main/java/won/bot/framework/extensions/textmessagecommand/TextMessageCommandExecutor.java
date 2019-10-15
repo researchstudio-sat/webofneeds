@@ -8,7 +8,7 @@
  * KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package won.bot.framework.eventbot.behaviour.textmessagecommand;
+package won.bot.framework.extensions.textmessagecommand;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

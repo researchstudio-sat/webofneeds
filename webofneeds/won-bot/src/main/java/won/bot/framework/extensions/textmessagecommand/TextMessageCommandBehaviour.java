@@ -1,4 +1,4 @@
-package won.bot.framework.eventbot.behaviour.textmessagecommand;
+package won.bot.framework.extensions.textmessagecommand;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

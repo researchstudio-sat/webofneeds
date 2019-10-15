@@ -1,4 +1,4 @@
-package won.bot.framework.eventbot.behaviour.textmessagecommand;
+package won.bot.framework.extensions.textmessagecommand;
 
 import org.apache.commons.lang3.StringUtils;
 import won.bot.framework.eventbot.EventListenerContext;
