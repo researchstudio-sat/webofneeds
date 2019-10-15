@@ -1,4 +1,4 @@
-package won.bot.framework.eventbot.behaviour.botatom;
+package won.bot.framework.extensions.serviceatom;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;

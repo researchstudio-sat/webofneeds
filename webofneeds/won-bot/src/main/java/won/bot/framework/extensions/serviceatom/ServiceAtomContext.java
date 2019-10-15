@@ -1,4 +1,4 @@
-package won.bot.framework.bot.context;
+package won.bot.framework.extensions.serviceatom;
 
 import java.net.URI;
 

@@ -1,9 +1,8 @@
-package won.bot.framework.eventbot.behaviour.botatom;
+package won.bot.framework.extensions.serviceatom;
 
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.bot.framework.bot.context.ServiceAtomContext;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -33,23 +32,23 @@ import java.util.Optional;
 /**
  * Behaviour that creates exactly one Atom that represents the Bot itself
  */
-public class ServiceAtomBotBehaviour extends BotBehaviour {
+public class ServiceAtomBehaviour extends BotBehaviour {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final ServiceAtomContext serviceAtomContext;
     private final ServiceAtomContent serviceAtomContent;
 
-    public ServiceAtomBotBehaviour(EventListenerContext context) {
+    public ServiceAtomBehaviour(EventListenerContext context) {
         this(context, context.getBotContextWrapper().getBotName());
     }
 
-    public ServiceAtomBotBehaviour(EventListenerContext context, String botServiceName) {
+    public ServiceAtomBehaviour(EventListenerContext context, String botServiceName) {
         this(context, new ServiceAtomContent(botServiceName));
     }
 
-    public ServiceAtomBotBehaviour(EventListenerContext context, ServiceAtomContent serviceAtomContent) {
+    public ServiceAtomBehaviour(EventListenerContext context, ServiceAtomContent serviceAtomContent) {
         super(context);
         if (!(context.getBotContextWrapper() instanceof ServiceAtomContext)) {
-            throw new IllegalStateException("ServiceAtomBotBehaviour does not work without a ServiceAtomContext");
+            throw new IllegalStateException("ServiceAtomBehaviour does not work without a ServiceAtomContext");
         }
         this.serviceAtomContext = (ServiceAtomContext) context.getBotContextWrapper();
         this.serviceAtomContent = serviceAtomContent;
@@ -57,7 +56,7 @@ public class ServiceAtomBotBehaviour extends BotBehaviour {
 
     @Override
     protected void onActivate(Optional<Object> message) {
-        logger.debug("activating ServiceAtomBotBehaviour");
+        logger.debug("activating ServiceAtomBehaviour");
         final EventListenerContext ctx = this.context;
         subscribeWithAutoCleanup(InitializeEvent.class,
                         new ActionOnEventListener(ctx, new AbstractCreateAtomAction(ctx) {

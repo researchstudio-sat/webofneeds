@@ -1,4 +1,4 @@
-package won.bot.framework.eventbot.behaviour.botatom;
+package won.bot.framework.extensions.serviceatom;
 
 import java.util.Objects;
 
