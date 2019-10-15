@@ -57,6 +57,10 @@ public interface BotContext {
      */
     List<URI> getNamedAtomUriList(String name);
 
+    Object getSingleValue(String name);
+
+    void setSingleValue(String name, final Serializable value);
+
     /**
      * check if a node uri is known among all stored nodes
      *

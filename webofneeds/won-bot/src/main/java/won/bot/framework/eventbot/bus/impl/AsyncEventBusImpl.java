@@ -16,6 +16,7 @@ import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.impl.MultipleActions;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.filter.EventFilter;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.SubscriptionAware;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
@@ -75,6 +76,23 @@ public class AsyncEventBusImpl implements EventBus {
             return subscribe(clazz, new ActionOnEventListener(actions[0].getEventListenerContext(), actions[0]));
         } else {
             return subscribe(clazz, new ActionOnEventListener(actions[0].getEventListenerContext(),
+                            new MultipleActions(actions[0].getEventListenerContext(), actions)));
+        }
+    }
+
+    @Override
+    public <T extends Event> EventListener subscribe(Class<T> clazz, final EventFilter eventFilter,
+                    final BaseEventBotAction... actions) {
+        if (eventFilter == null) {
+            return subscribe(clazz, actions);
+        } else if (actions == null || actions.length == 0) {
+            logger.warn("Ignoring event subscription without actions");
+            return null;
+        } else if (actions.length == 1) {
+            return subscribe(clazz,
+                            new ActionOnEventListener(actions[0].getEventListenerContext(), eventFilter, actions[0]));
+        } else {
+            return subscribe(clazz, new ActionOnEventListener(actions[0].getEventListenerContext(), eventFilter,
                             new MultipleActions(actions[0].getEventListenerContext(), actions)));
         }
     }

@@ -1,4 +1,4 @@
-package won.bot.framework.eventbot.behaviour.textmessagecommand;
+package won.bot.framework.extensions.textmessagecommand;
 
 import won.bot.framework.eventbot.event.BaseAtomAndConnectionSpecificEvent;
 import won.protocol.model.Connection;
