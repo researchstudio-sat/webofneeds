@@ -1,5 +1,6 @@
 package won.bot.framework.manager;
 
+import won.bot.exception.NoBotResponsibleException;
 import won.bot.framework.bot.Bot;
 
 import java.net.URI;
@@ -10,7 +11,7 @@ import java.util.List;
  *
  */
 public interface BotManager {
-    Bot getBotResponsibleForAtomUri(URI atomUri);
+    Bot getBotResponsibleForAtomUri(URI atomUri) throws NoBotResponsibleException;
 
     List<Bot> getBotsForNodeURI(URI nodeUri);
 

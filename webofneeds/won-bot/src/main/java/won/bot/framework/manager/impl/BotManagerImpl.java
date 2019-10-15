@@ -2,6 +2,7 @@ package won.bot.framework.manager.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.bot.exception.NoBotResponsibleException;
 import won.bot.framework.bot.Bot;
 import won.bot.framework.manager.BotManager;
 
@@ -20,12 +21,17 @@ public class BotManagerImpl implements BotManager {
     private Object monitor = new Object(); // ???
 
     @Override
-    public Bot getBotResponsibleForAtomUri(URI atomUri) {
+    public Bot getBotResponsibleForAtomUri(URI atomUri) throws NoBotResponsibleException {
         // try the botByUri map
         {
             Bot bot = botByAtomUri.get(atomUri);
-            if (bot != null)
+            if (bot != null) {
+                if (!bot.getLifecyclePhase().isActive()) {
+                    throw new NoBotResponsibleException("bot responsible for atom " + atomUri
+                                    + " is not active (lifecycle phase is: " + bot.getLifecyclePhase() + ")");
+                }
                 return bot;
+            }
         }
         // check each bot, return first that knows the atomUri
         logger.trace("bots size:{} ", bots.size());
@@ -35,10 +41,14 @@ public class BotManagerImpl implements BotManager {
                 synchronized (getMonitor()) {
                     this.botByAtomUri.put(atomUri, mybot);
                 }
+                if (!mybot.getLifecyclePhase().isActive()) {
+                    throw new NoBotResponsibleException("bot responsible for atom " + atomUri
+                                    + " is not active (lifecycle phase is: " + mybot.getLifecyclePhase() + ")");
+                }
                 return mybot;
             }
         }
-        return null;
+        throw new NoBotResponsibleException("No bot registered for uri " + atomUri);
     }
 
     @Override
@@ -111,9 +121,5 @@ public class BotManagerImpl implements BotManager {
 
     protected List<Bot> getBots() {
         return bots;
-    }
-
-    protected Map<URI, Bot> getBotByAtomUri() {
-        return botByAtomUri;
     }
 }
