@@ -1,0 +1,30 @@
+@prefix : <https://w3id.org/won/ext/bot#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won: <https://w3id.org/won/core#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@base <https://w3id.org/won/ext/bot> .
+
+<https://w3id.org/won/ext/bot> rdf:type owl:Ontology ;
+                                 owl:versionIRI <https://w3id.org/won/ext/bot/1.0> ;
+                                 owl:imports <https://w3id.org/won/core> ;
+                                 dc:abstract "Ontology for Web of Needs Bots."@en ;
+                                 dc:creator "Fabian Suda" ;
+                                 dc:title "Web of Needs Bot Extension" ;
+                                 dcterms:created "2019-10-16" ;
+                                 dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+                                 vann:preferredNamespacePrefix "wx-bot" .
+
+#################################################################
+#    Classes
+#################################################################
+
+###  https://w3id.org/won/ext/bot#ServiceAtom
+:ServiceAtom rdf:type owl:Class ;
+      rdfs:comment "Represents a Bot Service, and is connected to all Atoms created by this specific Bot Service"@en ;
+      rdfs:label "ServiceAtom" .
