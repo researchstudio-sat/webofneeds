@@ -47,7 +47,6 @@ public abstract class AbstractDeactivateAtomAction extends BaseEventBotAction {
         if (atomDataset == null) {
             throw new IllegalStateException("Cannot deactivate atom " + atomURI + " : retrieved dataset is null");
         }
-
         URI wonNodeUri = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(atomDataset, atomURI);
         URI eventUri = getEventListenerContext().getWonNodeInformationService().generateEventURI(wonNodeUri);
         return WonMessageBuilder.setMessagePropertiesForDeactivateFromOwner(eventUri, atomURI, wonNodeUri).build();

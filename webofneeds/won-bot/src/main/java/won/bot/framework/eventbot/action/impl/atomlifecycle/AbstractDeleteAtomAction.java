@@ -42,10 +42,13 @@ public abstract class AbstractDeleteAtomAction extends BaseEventBotAction {
      * node
      * @return delete WonMessage
      */
-    protected WonMessage buildWonMessage(WonNodeInformationService wonNodeInformationService, URI atomURI,
-                    URI wonNodeURI)
-                    throws WonMessageBuilderException {
-        return WonMessageBuilder.setMessagePropertiesForDeleteFromOwner(
-                        wonNodeInformationService.generateEventURI(wonNodeURI), atomURI, wonNodeURI).build();
+    protected final WonMessage buildWonMessage(URI atomURI) throws IllegalArgumentException {
+        Dataset atomDataset = getEventListenerContext().getLinkedDataSource().getDataForResource(atomURI);
+        if (atomDataset == null) {
+            throw new IllegalStateException("Cannot delete atom " + atomURI + " : retrieved dataset is null");
+        }
+        URI wonNodeUri = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(atomDataset, atomURI);
+        URI eventUri = getEventListenerContext().getWonNodeInformationService().generateEventURI(wonNodeUri);
+        return WonMessageBuilder.setMessagePropertiesForDeleteFromOwner(eventUri, atomURI, wonNodeUri).build();
     }
 }
