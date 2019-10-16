@@ -1,0 +1,39 @@
+[ {
+  "@id" : "https://w3id.org/won/ext/bot",
+  "@type" : [ "http://www.w3.org/2002/07/owl#Ontology" ],
+  "http://purl.org/dc/elements/1.1/abstract" : [ {
+    "@language" : "en",
+    "@value" : "Ontology for Web of Needs Bots."
+  } ],
+  "http://purl.org/dc/elements/1.1/creator" : [ {
+    "@value" : "Fabian Suda"
+  } ],
+  "http://purl.org/dc/elements/1.1/title" : [ {
+    "@value" : "Web of Needs Bot Extension"
+  } ],
+  "http://purl.org/dc/terms/created" : [ {
+    "@value" : "2019-10-16"
+  } ],
+  "http://purl.org/dc/terms/license" : [ {
+    "@id" : "https://creativecommons.org/licenses/by/4.0/"
+  } ],
+  "http://purl.org/vocab/vann/preferredNamespacePrefix" : [ {
+    "@value" : "wx-bot"
+  } ],
+  "http://www.w3.org/2002/07/owl#imports" : [ {
+    "@id" : "https://w3id.org/won/core"
+  } ],
+  "http://www.w3.org/2002/07/owl#versionIRI" : [ {
+    "@id" : "https://w3id.org/won/ext/bot/1.0"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/ext/bot#ServiceAtom",
+  "@type" : [ "http://www.w3.org/2002/07/owl#Class" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Represents a Bot Service, and is connected to all Atoms created by this specific Bot Service"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "ServiceAtom"
+  } ]
+} ]
