@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.filter.EventFilter;
 import won.bot.framework.eventbot.listener.EventListener;
 
 import java.lang.invoke.MethodHandles;
@@ -139,8 +140,32 @@ public abstract class BotBehaviour {
         activeListeners.add(context.getEventBus().subscribe(eventClazz, listener));
     }
 
+    /**
+     * Subscribes an Event and executes the given actions if the event is published,
+     * that will be automatically cleaned within the deactivate process of this
+     * behaviour.
+     *
+     * @param eventClazz Event
+     * @param actions set of actions to be subscribed to the given event
+     * @param <T> subclass of Event
+     */
     protected <T extends Event> void subscribeWithAutoCleanup(Class<T> eventClazz, BaseEventBotAction... actions) {
         activeListeners.add(context.getEventBus().subscribe(eventClazz, actions));
+    }
+
+    /**
+     * Subscribes an Event and executes the given actions if the event is published
+     * and the filter applies, that will be automatically cleaned within the
+     * deactivate process of this behaviour.
+     *
+     * @param eventClazz Event
+     * @param filter execute the actions only if the given filter applies
+     * @param actions set of actions to be subscribed to the given event
+     * @param <T> subclass of Event
+     */
+    protected <T extends Event> void subscribeWithAutoCleanup(Class<T> eventClazz, EventFilter filter,
+                    BaseEventBotAction... actions) {
+        activeListeners.add(context.getEventBus().subscribe(eventClazz, filter, actions));
     }
 
     /**
