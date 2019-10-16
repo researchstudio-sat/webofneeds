@@ -1,6 +1,7 @@
 package won.bot.framework.extensions.textmessagecommand;
 
 import won.bot.framework.eventbot.filter.impl.NotFilter;
+import won.bot.framework.extensions.textmessagecommand.filter.TextMessageCommandFilter;
 
 import java.util.Objects;
 

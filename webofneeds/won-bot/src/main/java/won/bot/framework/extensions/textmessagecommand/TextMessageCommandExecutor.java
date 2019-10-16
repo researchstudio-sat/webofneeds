@@ -22,6 +22,10 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.MessageEvent;
 import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandEvent;
 import won.bot.framework.eventbot.listener.EventListener;
+import won.bot.framework.extensions.textmessagecommand.command.EqualsTextMessageCommand;
+import won.bot.framework.extensions.textmessagecommand.command.PatternMatcherTextMessageCommand;
+import won.bot.framework.extensions.textmessagecommand.command.StartsWithTextMessageCommand;
+import won.bot.framework.extensions.textmessagecommand.command.TextMessageCommand;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.util.WonRdfUtils;
@@ -37,7 +41,7 @@ public class TextMessageCommandExecutor extends BaseEventBotAction {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final List<TextMessageCommand> textMessageCommands;
 
-    public TextMessageCommandExecutor(EventListenerContext eventListenerContext,
+    TextMessageCommandExecutor(EventListenerContext eventListenerContext,
                     List<TextMessageCommand> textMessageCommands) {
         super(eventListenerContext);
         this.textMessageCommands = textMessageCommands;
@@ -59,7 +63,15 @@ public class TextMessageCommandExecutor extends BaseEventBotAction {
                         for (TextMessageCommand textMessageCommand : textMessageCommands) {
                             if (textMessageCommand.matchesCommand(message)) {
                                 try {
-                                    textMessageCommand.execute(con, textMessageCommand.getMatcher(message));
+                                    if (textMessageCommand instanceof PatternMatcherTextMessageCommand) {
+                                        ((PatternMatcherTextMessageCommand) textMessageCommand).execute(con,
+                                                        ((PatternMatcherTextMessageCommand) textMessageCommand)
+                                                                        .getMatcher(message));
+                                    } else if (textMessageCommand instanceof EqualsTextMessageCommand) {
+                                        ((EqualsTextMessageCommand) textMessageCommand).execute(con);
+                                    } else if (textMessageCommand instanceof StartsWithTextMessageCommand) {
+                                        ((StartsWithTextMessageCommand) textMessageCommand).execute(con, message);
+                                    }
                                     break;
                                 } catch (UnsupportedOperationException e) {
                                     logger.warn("TextMessageCommand cant be executed due to: {}", e.getMessage());

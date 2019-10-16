@@ -1,10 +1,11 @@
-package won.bot.framework.extensions.textmessagecommand;
+package won.bot.framework.extensions.textmessagecommand.filter;
 
 import org.apache.commons.lang3.StringUtils;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.MessageEvent;
 import won.bot.framework.eventbot.filter.impl.EventListenerContextAwareFilter;
+import won.bot.framework.extensions.textmessagecommand.TextMessageCommandBehaviour;
 import won.protocol.message.WonMessage;
 import won.protocol.util.WonRdfUtils;
 
