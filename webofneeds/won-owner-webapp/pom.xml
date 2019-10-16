@@ -426,48 +426,6 @@
 			</build>
 		</profile>
 		<profile>
-			<id>skip-frontend-all-but-gulp</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>com.github.ekryd.echo-maven-plugin</groupId>
-						<artifactId>echo-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>frontend-gulp-before</id>
-								<phase>validate</phase>
-								<goals>
-									<goal>echo</goal>
-								</goals>
-								<configuration>
-									<message>Note: the install process for the javascript frontend
-										is skipped but 'gulp build' and 'gulp clean' are still
-										executed. This is done because the profile
-										'skip-frontend-all-but-gulp' is active ('-P
-										skip-frontend-all-but-gulp' on the command line)</message>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<!-- use the same config as above but set the phase to 'none' -->
-					<plugin>
-						<groupId>com.github.eirslett</groupId>
-						<artifactId>frontend-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>install-node-and-npm</id>
-								<phase>none</phase>
-							</execution>
-							<execution>
-								<id>npm-install</id>
-								<phase>none</phase>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
 			<id>suppress-npm-clean</id>
 			<activation>
 				<file>
