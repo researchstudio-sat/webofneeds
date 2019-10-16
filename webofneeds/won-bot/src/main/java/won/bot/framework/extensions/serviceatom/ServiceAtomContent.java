@@ -1,11 +1,13 @@
 package won.bot.framework.extensions.serviceatom;
 
+import java.util.Collection;
 import java.util.Objects;
 
 public class ServiceAtomContent {
-    // TODO: ADD MORE SERVICE BOT ATOM CONTENT
     private String name;
     private String description;
+    private String termsOfService;
+    private Collection<String> tags;
 
     public ServiceAtomContent(String name) {
         this.name = name;
@@ -27,6 +29,22 @@ public class ServiceAtomContent {
         this.description = description;
     }
 
+    public String getTermsOfService() {
+        return termsOfService;
+    }
+
+    public void setTermsOfService(String termsOfService) {
+        this.termsOfService = termsOfService;
+    }
+
+    public Collection<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(Collection<String> tags) {
+        this.tags = tags;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -34,12 +52,14 @@ public class ServiceAtomContent {
         if (o == null || getClass() != o.getClass())
             return false;
         ServiceAtomContent that = (ServiceAtomContent) o;
-        return Objects.equals(name, that.name) &&
-                        Objects.equals(description, that.description);
+        return name.equals(that.name) &&
+                        Objects.equals(description, that.description) &&
+                        Objects.equals(termsOfService, that.termsOfService) &&
+                        Objects.equals(tags, that.tags);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description);
+        return Objects.hash(name, description, termsOfService, tags);
     }
 }

@@ -56,6 +56,7 @@ public class SCHEMA {
     public static final Resource PLANACTION = m.createResource(BASE_URI + "PlanAction");
     public static final Property VALID_FROM = m.createProperty(BASE_URI + "validFrom");
     public static final Property VALID_THROUGH = m.createProperty(BASE_URI + "validThrough");
+    public static final Property TERMS_OF_SERVICE = m.createProperty(BASE_URI + "termsOfService");
     public static final RDFDatatype TEXT = new BaseDatatype(BASE_URI + "Text");
 
     /**
