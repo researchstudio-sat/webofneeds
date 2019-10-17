@@ -16,9 +16,7 @@
         <camel:packageScan>
             <camel:package>won.owner.camel.routes.fixed</camel:package>
         </camel:packageScan>
-        <camel:template id="producerTemplate" defaultEndpoint="direct:OUTMSG1"/>
-        <camel:endpoint id="outgoingMessages" uri="seda:OUTMSG"/>
-        <camel:endpoint id="atomMessageQueue" uri="activemq:WON.MSG" pattern="InOut"></camel:endpoint>
+        <camel:template id="producerTemplate" />
     </camel:camelContext>
 
 
