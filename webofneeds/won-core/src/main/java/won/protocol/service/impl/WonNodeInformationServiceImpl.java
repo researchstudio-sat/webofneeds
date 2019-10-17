@@ -12,6 +12,7 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
+import won.protocol.vocabulary.WONMSG;
 
 /**
  * User: fsalcher Date: 17.09.2014
@@ -42,19 +43,17 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
 
     @Override
     public URI generateEventURI(URI wonNodeURI) {
-        WonNodeInfo wonNodeInformation = getWonNodeInformation(wonNodeURI);
-        return URI.create(wonNodeInformation.getEventURIPrefix() + "/" + generateRandomID());
+        return generateEventURI();
     }
 
     @Override
     public boolean isValidEventURI(URI eventURI) {
-        return isValidEventURI(eventURI, getDefaultWonNodeURI());
+        return eventURI.toString().startsWith(WONMSG.MESSAGE_URI_PREFIX);
     }
 
     @Override
     public boolean isValidEventURI(URI eventURI, URI wonNodeURI) {
-        WonNodeInfo wonNodeInformation = getWonNodeInformation(wonNodeURI);
-        return isValidURI(eventURI, wonNodeInformation.getEventURIPrefix());
+        return isValidEventURI(eventURI);
     }
 
     @Override
@@ -81,7 +80,7 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
 
     @Override
     public URI generateEventURI() {
-        return generateEventURI(getDefaultWonNodeURI());
+        return URI.create(WONMSG.MESSAGE_URI_PREFIX + generateRandomID());
     }
 
     @Override
