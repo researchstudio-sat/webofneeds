@@ -664,6 +664,7 @@ public class WonMessage implements Serializable {
                             new String[] {
                                             "messageType",
                                             "direction",
+                                            "messageUri",
                                             "isResponseTo",
                                             "isRemoteResponseTo",
                                             "isResponseToMessageType,",
@@ -678,6 +679,7 @@ public class WonMessage implements Serializable {
                             new Object[] {
                                             getMessageType(),
                                             getEnvelopeType(),
+                                            getMessageURI(),
                                             getIsResponseToMessageURI(),
                                             getIsRemoteResponseToMessageURI(),
                                             getIsResponseToMessageType(),
@@ -695,7 +697,7 @@ public class WonMessage implements Serializable {
                             new String[] {
                                             "messageType",
                                             "direction",
-                                            "sender",
+                                            "messageUri",
                                             "senderSocket",
                                             "senderAtom",
                                             "senderNode",
@@ -706,6 +708,7 @@ public class WonMessage implements Serializable {
                             new Object[] {
                                             getMessageType(),
                                             getEnvelopeType(),
+                                            getMessageURI(),
                                             getSenderURI(),
                                             getSenderSocketURI(),
                                             getSenderAtomURI(),
