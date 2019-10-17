@@ -1,11 +1,11 @@
 package won.protocol.vocabulary;
 
+import java.net.URI;
+
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
-
-import java.net.URI;
 
 /**
  * User: ypanchenko Date: 04.08.2014
@@ -14,6 +14,7 @@ public class WONMSG {
     // TODO check with existing code how they do it, do they have ontology objects
     // and
     // access the vocabulary from there? If yes, change to that all the enum classes
+    public static final String MESSAGE_URI_PREFIX = "wm:/";
     public static final String BASE_URI = "https://w3id.org/won/message#";
     public static final String DEFAULT_PREFIX = "msg";;
     private static Model m = ModelFactory.createDefaultModel();
