@@ -18,6 +18,8 @@ import NonEmpty exposing (NonEmpty)
 import Time
 import Url exposing (Url)
 
+import Debug exposing (..)
+
 
 type SaveState
     = Saved Time.Posix
@@ -62,6 +64,7 @@ subscription : (Dict String Persona -> msg) -> (Decode.Error -> msg) -> Sub msg
 subscription tag errorTag =
     personaIn
         (\value ->
+            log "personaIn: " <|
             case decodeValue listDecoder value of
                 Ok list ->
                     tag list
@@ -78,7 +81,10 @@ savePersona data_ =
 
 getNewPersonas : Cmd msg
 getNewPersonas =
-    updatePersonas ()
+    log "in getNewPersonas: before calling updatePersonas" () |>
+    updatePersonas |>
+    log "in getNewPersonas: after calling updatePersonas" 
+    -- updatePersonas ()
 
 
 port personaIn : (Value -> msg) -> Sub msg
