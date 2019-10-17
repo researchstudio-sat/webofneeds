@@ -1,23 +1,47 @@
 package won.protocol.message;
 
-import com.google.common.collect.Sets;
-import org.apache.jena.query.*;
-import org.apache.jena.rdf.model.*;
+import java.io.Serializable;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.ResIterator;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.tdb.TDB;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Sets;
+
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.RDFG;
 import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WONMSG;
-
-import java.io.Serializable;
-import java.net.URI;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Wraps an RDF dataset representing a WoN message.
@@ -625,6 +649,108 @@ public class WonMessage implements Serializable {
             }
         }
         return values;
+    }
+
+    /**
+     * Generate a String representaiton of the message for use in log statements.
+     */
+    public String toStringForDebug(boolean multiline) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.getClass().getSimpleName());
+        sb.append("[");
+        WonMessageType type = getMessageType();
+        if (type.isResponseMessage()) {
+            ToStringForDebugUtils.formatFields(
+                            new String[] {
+                                            "messageType",
+                                            "direction",
+                                            "isResponseTo",
+                                            "isRemoteResponseTo",
+                                            "isResponseToMessageType,",
+                                            "sender",
+                                            "senderSocket",
+                                            "senderAtom",
+                                            "senderNode",
+                                            "recipient",
+                                            "recipientSocket",
+                                            "recipientAtom",
+                                            "recipientNode" },
+                            new Object[] {
+                                            getMessageType(),
+                                            getEnvelopeType(),
+                                            getIsResponseToMessageURI(),
+                                            getIsRemoteResponseToMessageURI(),
+                                            getIsResponseToMessageType(),
+                                            getSenderURI(),
+                                            getSenderSocketURI(),
+                                            getSenderAtomURI(),
+                                            getSenderNodeURI(),
+                                            getRecipientURI(),
+                                            getRecipientSocketURI(),
+                                            getRecipientAtomURI(),
+                                            getRecipientNodeURI() },
+                            multiline, sb);
+        } else {
+            ToStringForDebugUtils.formatFields(
+                            new String[] {
+                                            "messageType",
+                                            "direction",
+                                            "sender",
+                                            "senderSocket",
+                                            "senderAtom",
+                                            "senderNode",
+                                            "recipient",
+                                            "recipientSocket",
+                                            "recipientAtom",
+                                            "recipientNode" },
+                            new Object[] {
+                                            getMessageType(),
+                                            getEnvelopeType(),
+                                            getSenderURI(),
+                                            getSenderSocketURI(),
+                                            getSenderAtomURI(),
+                                            getSenderNodeURI(),
+                                            getRecipientURI(),
+                                            getRecipientSocketURI(),
+                                            getRecipientAtomURI(),
+                                            getRecipientNodeURI() },
+                            multiline, sb);
+        }
+        if (multiline) {
+            sb.append("\n");
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private static class ToStringForDebugUtils {
+        private static String indent = "    ";
+        private static int INDENT_LENGTH = indent.length();
+
+        private static void formatFields(String[] names, Object[] values, boolean multiline, StringBuilder sb) {
+            for (int i = 0; i < names.length; i++) {
+                if (multiline) {
+                    sb
+                                    .append("\n")
+                                    .append(indent)
+                                    .append(names[i])
+                                    .append(": ")
+                                    .append(values[i]);
+                } else {
+                    sb
+                                    .append(names[i])
+                                    .append("=")
+                                    .append(values[i])
+                                    .append(", ");
+                }
+            }
+            if (names.length > 0) {
+                int length = sb.length();
+                if (!multiline) {
+                    sb.delete(length - 2, length);
+                }
+            }
+        }
     }
 
     // Used to remember attachment graph uri and destination uri during the process
