@@ -20,7 +20,7 @@ import won.protocol.util.WonRdfUtils;
 import java.net.URI;
 
 /**
- * Base class for actions that deactivates atoms.
+ * Base class for actions that activates atoms.
  */
 public abstract class AbstractActivateAtomAction extends BaseEventBotAction {
     protected String uriListName;
