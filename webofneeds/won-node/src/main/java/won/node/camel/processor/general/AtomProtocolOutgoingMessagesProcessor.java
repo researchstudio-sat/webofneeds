@@ -15,8 +15,8 @@ import org.apache.camel.Processor;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import won.protocol.jms.MessagingService;
 import won.protocol.jms.AtomProtocolCommunicationService;
+import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.util.RdfUtils;
@@ -53,6 +53,10 @@ public class AtomProtocolOutgoingMessagesProcessor implements Processor {
         // wonMessage.getRecipientNodeURI().toString());
         String msgBody = RdfUtils.writeDatasetToString(wonMessage.getCompleteDataset(),
                         WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE);
+        if (logger.isDebugEnabled()) {
+            logger.debug("sending message to node {}: {}", wonMessage.getRecipientNodeURI(),
+                            wonMessage.toStringForDebug(true));
+        }
         messageService.sendInOnlyMessage(null, null, msgBody, ep);
     }
 }

@@ -11,18 +11,23 @@
 package won.node.camel.processor.general;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.riot.Lang;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.OwnerApplication;
 import won.protocol.repository.OwnerApplicationRepository;
 import won.protocol.service.QueueManagementService;
+import won.protocol.util.RdfUtils;
 
 /**
  * User: sbyim Date: 13.11.13
@@ -43,6 +48,12 @@ public class OwnerProtocolOutgoingMessagesProcessor implements Processor {
         logger.debug("number of registered owner applications: {}",
                         ownerApplications == null ? 0 : ownerApplications.size());
         List<String> queueNames = convertToQueueName(ownerApplications, "wonMessage", exchange);
+        if (logger.isDebugEnabled()) {
+            Dataset msgDataset = RdfUtils.readDatasetFromString((String) exchange.getIn().getBody(), Lang.TRIG);
+            WonMessage wonMessage = new WonMessage(msgDataset);
+            logger.debug("sending message to owner(s) {}: {}", Arrays.toString(queueNames.toArray()),
+                            wonMessage.toStringForDebug(true));
+        }
         exchange.getIn().setHeader("ownerApplicationIDs", queueNames);
     }
 
