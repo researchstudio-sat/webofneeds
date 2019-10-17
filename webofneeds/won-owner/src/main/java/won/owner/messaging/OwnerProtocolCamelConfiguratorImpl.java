@@ -10,14 +10,23 @@
  */
 package won.owner.messaging;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
 import org.apache.camel.RoutesBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+
 import won.cryptography.ssl.MessagingContext;
 import won.owner.camel.routes.OwnerApplicationListenerRouteBuilder;
 import won.owner.camel.routes.OwnerProtocolDynamicRoutes;
@@ -27,13 +36,6 @@ import won.protocol.jms.OwnerProtocolCamelConfigurator;
 import won.protocol.model.MessagingType;
 import won.protocol.repository.AtomRepository;
 import won.protocol.repository.ConnectionRepository;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * User: LEIH-NB Date: 28.01.14
@@ -80,7 +82,8 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
     @Override
     public synchronized void addRemoteQueueListener(String endpoint, URI remoteEndpoint)
                     throws CamelConfigurationFailedException {
-        // sending and receiving endpoint need to have the same scheme
+        // sending and receiving endpoint need to have the same scheme,
+        // look at WonJmsConfiguration and BrokerComponentFactory for JMS config info!
         endpoint = remoteEndpoint.getScheme() + endpoint;
         if (camelContext.hasEndpoint(endpoint) != null) {
             logger.debug("route for listening to remote queue {} already configured", remoteEndpoint);

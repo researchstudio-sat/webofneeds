@@ -39,7 +39,7 @@ public class BrokerComponentFactory {
         // TODO: make this configurable for different broker implementations.
         logger.info("establishing activemq connection for brokerUri {} (with specified type)", brokerURI);
         ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(
-                        brokerURI + "?jms.prefetchPolicy.all=50");
+                        brokerURI + "?jms.prefetchPolicy.all=50&jms.useAsyncSend=true");
         return getBrokerComponent(type, activeMQConnectionFactory);
     }
 
@@ -52,7 +52,7 @@ public class BrokerComponentFactory {
         // to overflowing with messages,
         // see http://activemq.apache.org/what-is-the-prefetch-limit-for.html
         ActiveMQSslConnectionFactory activeMQConnectionFactory = new ActiveMQSslConnectionFactory(
-                        brokerURI + "?jms.prefetchPolicy.all=50");
+                        brokerURI + "?jms.prefetchPolicy.all=50&jms.useAsyncSend=true");
         activeMQConnectionFactory.setKeyAndTrustManagers(new KeyManager[] { keyManager },
                         new TrustManager[] { trustManager }, null);
         return getBrokerComponent(type, activeMQConnectionFactory);
