@@ -698,6 +698,7 @@ public class WonMessage implements Serializable {
                                             "messageType",
                                             "direction",
                                             "messageUri",
+                                            "sender",
                                             "senderSocket",
                                             "senderAtom",
                                             "senderNode",
@@ -731,6 +732,10 @@ public class WonMessage implements Serializable {
         private static int INDENT_LENGTH = indent.length();
 
         private static void formatFields(String[] names, Object[] values, boolean multiline, StringBuilder sb) {
+            if (names.length != values.length) {
+                sb.append("error in toStringForDebug: names[] and values[] differ in length");
+                return;
+            }
             for (int i = 0; i < names.length; i++) {
                 if (multiline) {
                     sb
