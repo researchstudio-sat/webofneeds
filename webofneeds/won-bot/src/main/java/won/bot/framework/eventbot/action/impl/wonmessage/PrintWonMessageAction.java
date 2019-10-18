@@ -45,6 +45,7 @@ public class PrintWonMessageAction extends BaseEventBotAction {
         output.append("+-<<< Received " + msg.getMessageType() + " <<<---\n");
         output.append("| message uri: " + msg.getMessageURI() + "\n");
         output.append("| sender: " + getSender(msg) + "\n");
+        output.append("| recipient: " + getRecipient(msg) + "\n");
         Optional<String> textMessage = getTextMessage(msg);
         if (textMessage.isPresent()) {
             output.append("| message : \n");
@@ -58,6 +59,7 @@ public class PrintWonMessageAction extends BaseEventBotAction {
         StringBuilder output = new StringBuilder();
         output.append("+->>> Sent " + msg.getMessageType() + ">>>---\n");
         output.append("| message uri: " + msg.getMessageURI() + "\n");
+        output.append("| sender: " + getSender(msg) + "\n");
         output.append("| recipient: " + getRecipient(msg) + "\n");
         Optional<String> textMessage = getTextMessage(msg);
         if (textMessage.isPresent()) {

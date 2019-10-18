@@ -664,6 +664,7 @@ public class WonMessage implements Serializable {
                             new String[] {
                                             "messageType",
                                             "direction",
+                                            "messageUri",
                                             "isResponseTo",
                                             "isRemoteResponseTo",
                                             "isResponseToMessageType,",
@@ -678,6 +679,7 @@ public class WonMessage implements Serializable {
                             new Object[] {
                                             getMessageType(),
                                             getEnvelopeType(),
+                                            getMessageURI(),
                                             getIsResponseToMessageURI(),
                                             getIsRemoteResponseToMessageURI(),
                                             getIsResponseToMessageType(),
@@ -695,6 +697,7 @@ public class WonMessage implements Serializable {
                             new String[] {
                                             "messageType",
                                             "direction",
+                                            "messageUri",
                                             "sender",
                                             "senderSocket",
                                             "senderAtom",
@@ -706,6 +709,7 @@ public class WonMessage implements Serializable {
                             new Object[] {
                                             getMessageType(),
                                             getEnvelopeType(),
+                                            getMessageURI(),
                                             getSenderURI(),
                                             getSenderSocketURI(),
                                             getSenderAtomURI(),
@@ -728,6 +732,10 @@ public class WonMessage implements Serializable {
         private static int INDENT_LENGTH = indent.length();
 
         private static void formatFields(String[] names, Object[] values, boolean multiline, StringBuilder sb) {
+            if (names.length != values.length) {
+                sb.append("error in toStringForDebug: names[] and values[] differ in length");
+                return;
+            }
             for (int i = 0; i < names.length; i++) {
                 if (multiline) {
                     sb

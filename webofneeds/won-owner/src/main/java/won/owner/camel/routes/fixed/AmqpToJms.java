@@ -20,7 +20,7 @@ import org.apache.camel.builder.RouteBuilder;
 public class AmqpToJms extends RouteBuilder {
     @Override
     public void configure() {
-        from("seda:outgoingMessages?concurrentConsumers=5").routeId("Owner2NodeRoute").choice()
+        from("seda:outgoingMessages?concurrentConsumers=1").routeId("Owner2NodeRoute").choice()
                         .when(header("remoteBrokerEndpoint").isNull())
                         .log(LoggingLevel.ERROR, "could not route message: remoteBrokerEndpoint is null")
                         .throwException(new IllegalArgumentException(

@@ -1,11 +1,12 @@
 package won.protocol.jms;
 
+import java.lang.invoke.MethodHandles;
+
+import javax.jms.ConnectionFactory;
+
 import org.apache.camel.component.jms.JmsConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.jms.ConnectionFactory;
-import java.lang.invoke.MethodHandles;
 
 /**
  * User: LEIH-NB Date: 28.04.14
@@ -25,6 +26,7 @@ public class WonJmsConfiguration extends JmsConfiguration {
                                 // registration situation, when we actually want to get a result from the
                                 // wonnode.
         setDeliveryPersistent(false);
+        setAcknowledgementModeName("CLIENT_ACKNOWLEDGE"); // make each consumer explicitly acknowledge each message
         setDisableReplyTo(true);
         setExplicitQosEnabled(true); // required for the TTL to have an effect
         setTimeToLive(10);
