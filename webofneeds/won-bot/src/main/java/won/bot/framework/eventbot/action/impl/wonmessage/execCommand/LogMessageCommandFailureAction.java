@@ -36,9 +36,9 @@ public class LogMessageCommandFailureAction extends BaseEventBotAction {
         String command = failureEvent.getOriginalCommandEvent().getClass().getSimpleName();
         String message = failureEvent.getMessage();
         if (message != null) {
-            logger.error("Message command {} failed", command);
+            logger.error("Message command {} failed. Message: {}", command, message);
         } else {
-            logger.error("Message command {} failed. Message: ", command, message);
+            logger.error("Message command {} failed", command);
         }
     }
 }
