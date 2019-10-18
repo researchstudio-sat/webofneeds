@@ -10,13 +10,15 @@
  */
 package won.node.service.impl;
 
-import org.springframework.beans.factory.InitializingBean;
-import won.protocol.model.Atom;
-import won.protocol.model.Connection;
-
 import java.net.URI;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.springframework.beans.factory.InitializingBean;
+
+import won.protocol.model.Atom;
+import won.protocol.model.Connection;
+import won.protocol.util.WonMessageUriHelper;
 
 /**
  * User: fkleedorfer Date: 06.11.12
@@ -196,7 +198,7 @@ public class URIService implements InitializingBean {
     }
 
     public URI createEventURIForId(String id) {
-        return URI.create(eventResourceURIPrefix + "/" + id);
+        return WonMessageUriHelper.createMessageURIForId(id);
     }
 
     public URI createAttachmentURIForId(String id) {
@@ -264,5 +266,13 @@ public class URIService implements InitializingBean {
 
     public String getGeneralURIPrefix() {
         return this.generalURIPrefix;
+    }
+
+    public URI toLocalMessageURI(URI messageURI) {
+        return WonMessageUriHelper.toLocalMessageURI(messageURI, this.eventResourceURIPrefix);
+    }
+
+    public URI toGenericMessageURI(URI localMessageURI) {
+        return WonMessageUriHelper.toGenericMessageURI(localMessageURI, this.eventResourceURIPrefix);
     }
 }
