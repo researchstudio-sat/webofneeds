@@ -54,9 +54,7 @@ public class TextMessageCommandBehaviour extends BotBehaviour {
         PatternMatcherTextMessageCommand usageCommand = new PatternMatcherTextMessageCommand("usage",
                         "display this message",
                         Pattern.compile("^usage|\\?|help|debug$", Pattern.CASE_INSENSITIVE),
-                        (Connection connection, Matcher matcher) -> {
-                            bus.publish(new UsageCommandEvent(connection));
-                        });
+                        (Connection connection, Matcher matcher) -> bus.publish(new UsageCommandEvent(connection)));
         this.commands = new ArrayList<>();
         this.commands.add(usageCommand);
         this.commands.addAll(Arrays.asList(commands));
@@ -89,9 +87,7 @@ public class TextMessageCommandBehaviour extends BotBehaviour {
         PatternMatcherTextMessageCommand usageCommand = new PatternMatcherTextMessageCommand("usage",
                         "display this message",
                         Pattern.compile("^usage|\\?|help|debug$", Pattern.CASE_INSENSITIVE),
-                        (Connection connection, Matcher matcher) -> {
-                            bus.publish(new UsageCommandEvent(connection));
-                        });
+                        (Connection connection, Matcher matcher) -> bus.publish(new UsageCommandEvent(connection)));
         this.commands = new ArrayList<>();
         this.commands.add(usageCommand);
         this.commands.addAll(Arrays.asList(commands));

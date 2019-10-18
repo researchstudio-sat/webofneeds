@@ -100,28 +100,22 @@ public class ServiceAtomBehaviour extends BotBehaviour {
                                 WonMessage createAtomMessage = createWonMessage(atomUri, botServiceDataset);
                                 EventBotActionUtils.rememberInList(ctx, atomUri, uriListName);
                                 EventBus bus = ctx.getEventBus();
-                                EventListener successCallback = new EventListener() {
-                                    @Override
-                                    public void onEvent(Event event) {
-                                        logger.info("#####################################################################################");
-                                        logger.info("BotServiceAtom creation successful, new atom URI is {}",
-                                                        atomUri);
-                                        logger.info("#####################################################################################");
-                                        serviceAtomContext.setServiceAtomUri(atomUri);
-                                        bus.publish(new AtomCreatedEvent(atomUri, wonNodeUri, botServiceDataset,
-                                                        null));
-                                    }
+                                EventListener successCallback = event -> {
+                                    logger.info("#####################################################################################");
+                                    logger.info("BotServiceAtom creation successful, new atom URI is {}",
+                                                    atomUri);
+                                    logger.info("#####################################################################################");
+                                    serviceAtomContext.setServiceAtomUri(atomUri);
+                                    bus.publish(new AtomCreatedEvent(atomUri, wonNodeUri, botServiceDataset,
+                                                    null));
                                 };
-                                EventListener failureCallback = new EventListener() {
-                                    @Override
-                                    public void onEvent(Event event) {
-                                        String textMessage = WonRdfUtils.MessageUtils
-                                                        .getTextMessage(((FailureResponseEvent) event)
-                                                                        .getFailureMessage());
-                                        logger.error("BotServiceAtom creation failed for atom URI {}, original message URI: {}",
-                                                        atomUri, textMessage);
-                                        EventBotActionUtils.removeFromList(ctx, atomUri, uriListName);
-                                    }
+                                EventListener failureCallback = event -> {
+                                    String textMessage = WonRdfUtils.MessageUtils
+                                                    .getTextMessage(((FailureResponseEvent) event)
+                                                                    .getFailureMessage());
+                                    logger.error("BotServiceAtom creation failed for atom URI {}, original message URI: {}",
+                                                    atomUri, textMessage);
+                                    EventBotActionUtils.removeFromList(ctx, atomUri, uriListName);
                                 };
                                 EventBotActionUtils.makeAndSubscribeResponseListener(createAtomMessage,
                                                 successCallback, failureCallback, ctx);
