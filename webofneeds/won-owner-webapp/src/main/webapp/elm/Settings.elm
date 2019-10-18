@@ -12,8 +12,6 @@ import Settings.Account as Account
 import Settings.Export as Export
 import Settings.Personas as Personas
 
-import Debug exposing (..)
-
 
 main =
     Skin.skinnedElement
@@ -113,24 +111,9 @@ type Msg
     | Resized Size
     | Back
 
-debugOut msg model = ""
-    ++ "\n-------------------" 
-    ++ ("\n\nMESSAGE: " ++ (toString msg))
-    ++ ("\n\nMODEL: " ++ (toString model))
-    ++ ("\n\nUPDATED_MODEL: ")
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model = 
-    let 
-        model_ = update_ msg model 
-        dbgMsg = debugOut msg model
-    in 
-        -- log dbgMsg model_
-        model_
-
-
-update_ : Msg -> Model -> ( Model, Cmd Msg )
-update_ msg model =
+update msg model =
     case ( msg, model.page ) of
         ( PersonasMsg subMsg, Personas subModel ) ->
             Personas.update subMsg subModel
@@ -145,7 +128,6 @@ update_ msg model =
                 |> updateWith Account AccountMsg model
 
         ( ChangeRoute newRoute, _ ) ->
-
             if toRoute model.page == newRoute then
                 ( { model
                     | menuOpen = False
@@ -183,16 +165,13 @@ changeRoute route model =
                     subInit Export ExportMsg (Export.init ())
 
                 PersonasR ->
-                    log "PersonasR -- ater subInit: " <|
                     subInit Personas PersonasMsg (Personas.init ())
 
                 AccountR ->
                     subInit Account AccountMsg (Account.init ())
-        newPage_ = log "newPage in changeRoute: " newPage
     in
-    log "changeRoute return: " 
     ( { model
-        | page = newPage_
+        | page = newPage
         , menuOpen = False
       }
     , cmd

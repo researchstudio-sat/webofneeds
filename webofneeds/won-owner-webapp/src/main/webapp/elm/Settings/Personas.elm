@@ -24,7 +24,6 @@ import String.Extra as String
 import Url
 import Validate exposing (Validator)
 
-import Debug exposing (..)
 
 
 ---- PERSONA ----
@@ -127,16 +126,10 @@ type alias Url =
 
 init : () -> ( Model, Cmd Msg )
 init () =
-    let 
-        cmd = Persona.getNewPersonas |> log "Personas.init: after calling getNewPersonas: "
-
-        model = { viewState = Inactive, personas = Dict.empty }
-
-        model_ = log "Personas.init: model" model
-    in 
-    ( 
-    model 
-    , cmd
+    ( { viewState = Inactive
+      , personas = Dict.empty
+      }
+    , Persona.getNewPersonas
     )
 
 
