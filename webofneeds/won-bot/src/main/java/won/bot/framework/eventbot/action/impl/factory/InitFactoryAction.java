@@ -128,68 +128,43 @@ public class InitFactoryAction extends AbstractCreateAtomAction {
                             }
                         }));
         bus.subscribe(CreateAtomCommandSuccessEvent.class,
-                        new ActionOnEventListener(ctx,
-                                        new MultipleActions(ctx,
-                                                        new DecrementCounterAction(ctx, creationUnfinishedCounter), // decrease
-                                                                                                                    // the
-                                                                                                                    // creationUnfinishedCounter
-                                                        new IncrementCounterAction(ctx, atomCreationSuccessfulCounter), // count
-                                                                                                                        // a
-                                                                                                                        // successful
-                                                                                                                        // atom
-                                                                                                                        // creation
-                                                        new BaseEventBotAction(ctx) {
-                                                            @Override
-                                                            protected void doRun(Event event,
-                                                                            EventListener executingListener)
-                                                                            throws Exception {
-                                                                if (event instanceof CreateAtomCommandSuccessEvent) {
-                                                                    CreateAtomCommandSuccessEvent atomCreatedEvent = (CreateAtomCommandSuccessEvent) event;
-                                                                    botContextWrapper.addInternalIdToUriReference(
-                                                                                    atomCreatedEvent.getAtomUriBeforeCreation(),
-                                                                                    atomCreatedEvent.getAtomURI());
-                                                                }
-                                                            }
-                                                        })));
+                        new DecrementCounterAction(ctx, creationUnfinishedCounter), // decrease the
+                                                                                    // creationUnfinishedCounter
+                        new IncrementCounterAction(ctx, atomCreationSuccessfulCounter), // count a successful atom
+                                                                                        // creation
+                        new BaseEventBotAction(ctx) {
+                            @Override
+                            protected void doRun(Event event,
+                                            EventListener executingListener)
+                                            throws Exception {
+                                if (event instanceof CreateAtomCommandSuccessEvent) {
+                                    CreateAtomCommandSuccessEvent atomCreatedEvent = (CreateAtomCommandSuccessEvent) event;
+                                    botContextWrapper.addInternalIdToUriReference(
+                                                    atomCreatedEvent.getAtomUriBeforeCreation(),
+                                                    atomCreatedEvent.getAtomURI());
+                                }
+                            }
+                        });
         bus.subscribe(CreateAtomCommandEvent.class,
-                        new ActionOnEventListener(ctx, new MultipleActions(ctx, new ExecuteCreateAtomCommandAction(ctx), // execute
-                                                                                                                         // the
-                                                                                                                         // atom
-                                                                                                                         // creation
-                                                                                                                         // for
-                                                                                                                         // the
-                                                                                                                         // atom
-                                                                                                                         // in
-                                                                                                                         // the
-                                                                                                                         // event
-                                        new IncrementCounterAction(ctx, atomCreationStartedCounter), // increase the
-                                                                                                     // atomCreationStartedCounter
-                                                                                                     // to
-                                                                                                     // signal another
-                                                                                                     // pending creation
-                                        new IncrementCounterAction(ctx, creationUnfinishedCounter) // increase the
-                                                                                                   // creationUnfinishedCounter
-                                                                                                   // to
-                                                                                                   // signal another
-                                                                                                   // pending creation
-                        )));
+                        new ExecuteCreateAtomCommandAction(ctx), // execute the atom creation for the atom in the event
+                        new IncrementCounterAction(ctx, atomCreationStartedCounter), // increase the
+                                                                                     // atomCreationStartedCounter to
+                                                                                     // signal another pending creation
+                        new IncrementCounterAction(ctx, creationUnfinishedCounter) // increase the
+                                                                                   // creationUnfinishedCounter to
+                                                                                   // signal another pending creation
+        );
         // if an atom is already created we skip the recreation of it and increase the
         // atomCreationSkippedCounter
         bus.subscribe(FactoryAtomCreationSkippedEvent.class,
-                        new ActionOnEventListener(ctx, new IncrementCounterAction(ctx, atomCreationSkippedCounter)));
+                        new IncrementCounterAction(ctx, atomCreationSkippedCounter));
         // if a creation failed, we don't want to keep us from keeping the correct count
         bus.subscribe(CreateAtomCommandFailureEvent.class,
-                        new ActionOnEventListener(ctx,
-                                        new MultipleActions(ctx,
-                                                        new DecrementCounterAction(ctx, creationUnfinishedCounter), // decrease
-                                                                                                                    // the
-                                                                                                                    // creationUnfinishedCounter
-                                                        new IncrementCounterAction(ctx, atomCreationFailedCounter) // count
-                                                                                                                   // an
-                                                                                                                   // unsuccessful
-                                                                                                                   // atom
-                                                                                                                   // creation
-                                        )));
+                        new DecrementCounterAction(ctx, creationUnfinishedCounter), // decrease the
+                                                                                    // creationUnfinishedCounter
+                        new IncrementCounterAction(ctx, atomCreationFailedCounter) // count an unsuccessful atom
+                                                                                   // creation
+        );
         // when the atomproducer is exhausted, we stop the creator (trigger) and we have
         // to wait until all unfinished atom creations finish
         // when they do, the InitFactoryFinishedEvent is published
@@ -205,22 +180,21 @@ public class InitFactoryAction extends AbstractCreateAtomAction {
                                                                             EventListener executingListener)
                                                                             throws Exception {
                                                                 // when we're called, there probably are atom creations
-                                                                // unfinished, but
-                                                                // there
-                                                                // may not be
+                                                                // unfinished, but there may not be
                                                                 // a)
                                                                 // first, prepare for the case when there are unfinished
                                                                 // atom creations:
                                                                 // we register a listener, waiting for the unfinished
                                                                 // counter to reach 0
-                                                                EventListener waitForUnfinishedAtomsListener = new ActionOnFirstEventListener(
-                                                                                ctx,
-                                                                                new TargetCounterFilter(
-                                                                                                creationUnfinishedCounter),
-                                                                                new PublishEventAction(ctx,
-                                                                                                new InitFactoryFinishedEvent()));
-                                                                bus.subscribe(TargetCountReachedEvent.class,
-                                                                                waitForUnfinishedAtomsListener);
+                                                                EventListener waitForUnfinishedAtomsListener = bus
+                                                                                .subscribe(TargetCountReachedEvent.class,
+                                                                                                new ActionOnFirstEventListener(
+                                                                                                                ctx,
+                                                                                                                new TargetCounterFilter(
+                                                                                                                                creationUnfinishedCounter),
+                                                                                                                new PublishEventAction(
+                                                                                                                                ctx,
+                                                                                                                                new InitFactoryFinishedEvent())));
                                                                 // now, we can check if we've already reached the target
                                                                 if (creationUnfinishedCounter.getCount() <= 0) {
                                                                     // ok, turned out we didn't need that listener
@@ -241,12 +215,9 @@ public class InitFactoryAction extends AbstractCreateAtomAction {
                             }
                         }));
         // MessageInFlight counter handling *************************
-        bus.subscribe(MessageCommandEvent.class,
-                        new ActionOnEventListener(ctx, new IncrementCounterAction(ctx, messagesInFlightCounter)));
-        bus.subscribe(MessageCommandResultEvent.class,
-                        new ActionOnEventListener(ctx, new DecrementCounterAction(ctx, messagesInFlightCounter)));
-        bus.subscribe(MessageCommandFailureEvent.class,
-                        new ActionOnEventListener(ctx, new LogMessageCommandFailureAction(ctx))); // if we receive a
+        bus.subscribe(MessageCommandEvent.class, new IncrementCounterAction(ctx, messagesInFlightCounter));
+        bus.subscribe(MessageCommandResultEvent.class, new DecrementCounterAction(ctx, messagesInFlightCounter));
+        bus.subscribe(MessageCommandFailureEvent.class, new LogMessageCommandFailureAction(ctx)); // if we receive a
                                                                                                   // message command
                                                                                                   // failure, log it
         // Start the atom creation stuff
