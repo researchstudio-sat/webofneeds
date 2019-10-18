@@ -317,9 +317,7 @@ public class WonMessageBuilder {
                         .setSenderURI(localConnection).setSenderAtomURI(localAtom).setSenderNodeURI(localWonNode)
                         .setRecipientURI(targetConnection).setRecipientAtomURI(targetAtom)
                         .setRecipientNodeURI(remoteWonNode);
-        if (targetSocket.isPresent()) {
-            builder.setRecipientSocketURI(targetSocket.get());
-        }
+        targetSocket.ifPresent(builder::setRecipientSocketURI);
         return builder.setTextMessage(welcomeMessage).setSentTimestampToNow();
     }
 
@@ -427,6 +425,14 @@ public class WonMessageBuilder {
                         .setSentTimestampToNow();
     }
 
+    public static WonMessageBuilder setMessagePropertiesForActivateFromOwner(URI messageURI, URI localAtom,
+                    URI localWonNode) {
+        return new WonMessageBuilder(messageURI).setWonMessageDirection(WonMessageDirection.FROM_OWNER)
+                        .setWonMessageType(WonMessageType.ACTIVATE).setSenderAtomURI(localAtom)
+                        .setSenderNodeURI(localWonNode).setRecipientAtomURI(localAtom).setRecipientNodeURI(localWonNode)
+                        .setSentTimestampToNow();
+    }
+
     public static WonMessageBuilder setMessagePropertiesForDeleteFromOwner(URI messageURI, URI localAtom,
                     URI localWonNode) {
         return new WonMessageBuilder(messageURI).setWonMessageDirection(WonMessageDirection.FROM_OWNER)
@@ -478,12 +484,8 @@ public class WonMessageBuilder {
                         .setWonMessageType(WonMessageType.CONNECT).setSenderAtomURI(localAtom)
                         .setSenderNodeURI(localWonNode).setRecipientAtomURI(targetAtom)
                         .setRecipientNodeURI(remoteWonNode);
-        if (localSocket.isPresent()) {
-            builder.setSenderSocketURI(localSocket.get());
-        }
-        if (targetSocket.isPresent()) {
-            builder.setRecipientSocketURI(targetSocket.get());
-        }
+        localSocket.ifPresent(builder::setSenderSocketURI);
+        targetSocket.ifPresent(builder::setRecipientSocketURI);
         return builder.addContent(model).setSentTimestampToNow();
     }
 

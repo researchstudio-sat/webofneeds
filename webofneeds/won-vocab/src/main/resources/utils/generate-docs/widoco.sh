@@ -48,7 +48,7 @@ echo "   ontologies folder:  ${ontology_root}"
 echo "   output folder    :  ${output_base}"
 
 onts=(core message agreement modification content matching)
-ext_onts=(buddy chat group hold review schema demo pogo)
+ext_onts=(buddy chat group hold review schema demo pogo bot)
 
 rewrite_base="https://researchstudio-sat.github.io/webofneeds/ontologies"
 

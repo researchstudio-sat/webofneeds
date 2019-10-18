@@ -53,6 +53,12 @@ public class DefaultAtomModelWrapper extends AtomModelWrapper {
         atomNode.addLiteral(DC.title, title);
     }
 
+    public void setName(String name) {
+        Resource atomNode = getAtomNode(AtomGraphType.ATOM);
+        atomNode.removeAll(SCHEMA.NAME);
+        atomNode.addLiteral(SCHEMA.NAME, name);
+    }
+
     public void setSeeksTitle(String title) {
         createSeeksNodeIfNonExist();
         setSeeksPropertyStringValue(DC.title, title);
@@ -98,6 +104,10 @@ public class DefaultAtomModelWrapper extends AtomModelWrapper {
 
     public String getSomeDescription(String... preferredLanguages) {
         return getSomeContentPropertyStringValue(DC.description, preferredLanguages);
+    }
+
+    public String getSomeName(String... preferredLanguages) {
+        return getSomeContentPropertyStringValue(SCHEMA.NAME, preferredLanguages);
     }
 
     public Collection<String> getDescriptions(Resource contentNode) {

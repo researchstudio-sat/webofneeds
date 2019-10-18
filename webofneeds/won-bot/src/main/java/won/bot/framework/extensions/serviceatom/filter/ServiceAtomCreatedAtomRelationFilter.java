@@ -1,15 +1,13 @@
-package won.bot.framework.extensions.serviceatom;
+package won.bot.framework.extensions.serviceatom.filter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.context.BotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.MessageEvent;
 import won.bot.framework.eventbot.filter.impl.EventListenerContextAwareFilter;
+import won.bot.framework.extensions.serviceatom.ServiceAtomContext;
 import won.protocol.message.WonMessage;
 
-import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.Objects;
 
@@ -17,10 +15,8 @@ import java.util.Objects;
  * Filter that only accepts Events between the serviceAtom and other
  * createdAtoms
  */
-public class ServiceAtomRelatedFilter extends EventListenerContextAwareFilter {
-    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-    ServiceAtomRelatedFilter(EventListenerContext context) {
+public class ServiceAtomCreatedAtomRelationFilter extends EventListenerContextAwareFilter {
+    public ServiceAtomCreatedAtomRelationFilter(EventListenerContext context) {
         super(context);
     }
 

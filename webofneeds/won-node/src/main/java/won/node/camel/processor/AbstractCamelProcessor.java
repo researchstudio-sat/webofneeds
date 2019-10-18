@@ -10,6 +10,7 @@
  */
 package won.node.camel.processor;
 
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +22,8 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.camel.Processor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import won.cryptography.service.RandomNumberService;
@@ -53,6 +56,7 @@ import won.protocol.util.linkeddata.LinkedDataSource;
  * User: syim Date: 02.03.2015
  */
 public abstract class AbstractCamelProcessor implements Processor {
+    private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     protected MessagingService messagingService;
     @Autowired
@@ -102,6 +106,9 @@ public abstract class AbstractCamelProcessor implements Processor {
         }
         Map headerMap = new HashMap<String, Object>();
         headerMap.put(WonCamelConstants.OWNER_APPLICATIONS, ownerApplicationIds);
+        if (logger.isDebugEnabled()) {
+            logger.debug("sending message to owner of atom {}: {}", atomURI, message.toStringForDebug(true));
+        }
         messagingService.sendInOnlyMessage(null, headerMap, RdfUtils.writeDatasetToString(message.getCompleteDataset(),
                         WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE), "seda:OwnerProtocolOut");
     }
@@ -110,6 +117,9 @@ public abstract class AbstractCamelProcessor implements Processor {
         Map headerMap = new HashMap<String, Object>();
         headerMap.put("protocol", "OwnerProtocol");
         headerMap.put(WonCamelConstants.OWNER_APPLICATIONS, ownerApplicationIds);
+        if (logger.isDebugEnabled()) {
+            logger.debug("sending message to owner: {}", message.toStringForDebug(true));
+        }
         messagingService.sendInOnlyMessage(null, headerMap, RdfUtils.writeDatasetToString(message.getCompleteDataset(),
                         WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE), "seda:OwnerProtocolOut");
     }
@@ -117,6 +127,9 @@ public abstract class AbstractCamelProcessor implements Processor {
     protected void sendMessageToOwner(WonMessage message, String... ownerApplicationIds) {
         Map headerMap = new HashMap<String, Object>();
         headerMap.put(WonCamelConstants.OWNER_APPLICATIONS, Arrays.asList(ownerApplicationIds));
+        if (logger.isDebugEnabled()) {
+            logger.debug("sending message to owner: {}", message.toStringForDebug(true));
+        }
         messagingService.sendInOnlyMessage(null, headerMap, RdfUtils.writeDatasetToString(message.getCompleteDataset(),
                         WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE), "seda:OwnerProtocolOut");
     }
@@ -124,6 +137,9 @@ public abstract class AbstractCamelProcessor implements Processor {
     protected void sendMessageToNode(WonMessage message) {
         Map headerMap = new HashMap<String, Object>();
         headerMap.put(WonCamelConstants.MESSAGE_HEADER, message);
+        if (logger.isDebugEnabled()) {
+            logger.debug("sending message to node: {}", message.toStringForDebug(true));
+        }
         messagingService.sendInOnlyMessage(null, headerMap, null, "seda:AtomProtocolOut");
     }
 
@@ -136,6 +152,9 @@ public abstract class AbstractCamelProcessor implements Processor {
     protected void sendSystemMessage(WonMessage message) {
         Map headerMap = new HashMap<String, Object>();
         headerMap.put(WonCamelConstants.MESSAGE_HEADER, message);
+        if (logger.isDebugEnabled()) {
+            logger.debug("sending system message: {}", message.toStringForDebug(true));
+        }
         messagingService.sendInOnlyMessage(null, headerMap, null, "seda:SystemMessageIn");
     }
 
@@ -167,6 +186,9 @@ public abstract class AbstractCamelProcessor implements Processor {
         headerMap.put(WonCamelConstants.MESSAGE_HEADER, message);
         if (ownerApplicationId != null) {
             headerMap.put(WonCamelConstants.OWNER_APPLICATION_ID, ownerApplicationId);
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("sending system message to owner: {}", message.toStringForDebug(true));
         }
         messagingService.sendInOnlyMessage(null, headerMap, null, "seda:SystemMessageToOwner");
     }

@@ -10,10 +10,16 @@
  */
 package won.bot.framework.bot.base;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Objects;
+import java.util.concurrent.Executor;
+
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.TaskScheduler;
+
 import won.bot.framework.bot.BotLifecyclePhase;
 import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.bot.context.BotContextWrapper;
@@ -28,7 +34,16 @@ import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.ErrorEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.InitializeEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.ShutdownEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.*;
+import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.CloseFromOtherAtomEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherAtomEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.SocketHintFromMatcherEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentOnConnectionEvent;
 import won.bot.framework.eventbot.filter.impl.AtomUriInNamedListFilter;
 import won.bot.framework.eventbot.filter.impl.NotFilter;
 import won.bot.framework.eventbot.listener.BaseEventListener;
@@ -43,11 +58,6 @@ import won.protocol.model.Connection;
 import won.protocol.model.SocketType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.Objects;
-import java.util.concurrent.Executor;
 
 /**
  * Base class for bots that define their behaviour through event listeners. Once
@@ -96,8 +106,15 @@ public abstract class EventBot extends ScheduledTriggerBot {
         }
     }
 
+    private void logMessage(WonMessage wonMessage) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Received message: " + wonMessage.toStringForDebug(true));
+        }
+    }
+
     @Override
     public final void onMessageFromOtherAtom(final Connection con, final WonMessage wonMessage) {
+        logMessage(wonMessage);
         if (getLifecyclePhase().isActive()) {
             eventBus.publish(new MessageFromOtherAtomEvent(con, wonMessage));
         } else {
@@ -109,6 +126,7 @@ public abstract class EventBot extends ScheduledTriggerBot {
 
     @Override
     public final void onAtomHintFromMatcher(final WonMessage wonMessage) {
+        logMessage(wonMessage);
         if (getLifecyclePhase().isActive()) {
             eventBus.publish(new AtomHintFromMatcherEvent(wonMessage));
         } else {
@@ -119,6 +137,7 @@ public abstract class EventBot extends ScheduledTriggerBot {
 
     @Override
     public final void onSocketHintFromMatcher(final WonMessage wonMessage) {
+        logMessage(wonMessage);
         if (getLifecyclePhase().isActive()) {
             eventBus.publish(new SocketHintFromMatcherEvent(wonMessage));
         } else {
@@ -130,6 +149,7 @@ public abstract class EventBot extends ScheduledTriggerBot {
 
     @Override
     public final void onCloseFromOtherAtom(final Connection con, final WonMessage wonMessage) {
+        logMessage(wonMessage);
         if (getLifecyclePhase().isActive()) {
             eventBus.publish(new CloseFromOtherAtomEvent(con, wonMessage));
         } else {
@@ -140,6 +160,7 @@ public abstract class EventBot extends ScheduledTriggerBot {
 
     @Override
     public final void onOpenFromOtherAtom(final Connection con, final WonMessage wonMessage) {
+        logMessage(wonMessage);
         if (getLifecyclePhase().isActive()) {
             eventBus.publish(new OpenFromOtherAtomEvent(con, wonMessage));
         } else {
@@ -150,6 +171,7 @@ public abstract class EventBot extends ScheduledTriggerBot {
 
     @Override
     public void onConnectFromOtherAtom(final Connection con, final WonMessage wonMessage) {
+        logMessage(wonMessage);
         if (getLifecyclePhase().isActive()) {
             eventBus.publish(new ConnectFromOtherAtomEvent(con, wonMessage));
         } else {
@@ -172,6 +194,7 @@ public abstract class EventBot extends ScheduledTriggerBot {
 
     @Override
     public final void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage) {
+        logMessage(wonMessage);
         if (getLifecyclePhase().isActive()) {
             eventBus.publish(new FailureResponseEvent(failedMessageUri, wonMessage));
         } else {
@@ -182,6 +205,7 @@ public abstract class EventBot extends ScheduledTriggerBot {
 
     @Override
     public final void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage) {
+        logMessage(wonMessage);
         if (getLifecyclePhase().isActive()) {
             eventBus.publish(new SuccessResponseEvent(successfulMessageUri, wonMessage));
         } else {
@@ -356,6 +380,9 @@ public abstract class EventBot extends ScheduledTriggerBot {
 
         @Override
         public void sendWonMessage(final WonMessage message) throws WonMessageSenderException {
+            if (logger.isDebugEnabled()) {
+                logger.debug("sending message " + message.toStringForDebug(true));
+            }
             delegate.sendWonMessage(message);
             // publish the WonMessageSent event if no exception was raised
             WonMessageType type = message.getMessageType();

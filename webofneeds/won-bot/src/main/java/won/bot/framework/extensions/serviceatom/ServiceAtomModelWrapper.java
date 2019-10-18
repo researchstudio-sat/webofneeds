@@ -5,6 +5,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 import won.bot.vocabulary.WXBOT;
 import won.protocol.util.DefaultAtomModelWrapper;
+import won.protocol.vocabulary.SCHEMA;
 import won.protocol.vocabulary.WXCHAT;
 import won.protocol.vocabulary.WXHOLD;
 import won.protocol.vocabulary.WXREVIEW;
@@ -30,16 +31,22 @@ public class ServiceAtomModelWrapper extends DefaultAtomModelWrapper {
         this.addSocket("#HolderSocket", WXHOLD.HolderSocketString);
         this.addSocket("#ChatSocket", WXCHAT.ChatSocketString);
         this.addSocket("#ReviewSocket", WXREVIEW.ReviewSocketString);
-        this.setTitle(serviceAtomContent.getName());
+        if (Objects.nonNull(serviceAtomContent.getName())) {
+            this.setName(serviceAtomContent.getName());
+        }
         if (Objects.nonNull(serviceAtomContent.getDescription())) {
             this.setDescription(serviceAtomContent.getDescription());
+        }
+        if (Objects.nonNull(serviceAtomContent.getTermsOfService())) {
+            atom.addProperty(SCHEMA.TERMS_OF_SERVICE, serviceAtomContent.getTermsOfService());
         }
     }
 
     public ServiceAtomModelWrapper(Dataset atomDataset) {
         super(atomDataset);
-        serviceAtomContent = new ServiceAtomContent(this.getSomeTitleFromIsOrAll());
+        serviceAtomContent = new ServiceAtomContent(this.getSomeName());
         serviceAtomContent.setDescription(this.getSomeDescription());
+        serviceAtomContent.setTermsOfService(getSomeContentPropertyStringValue(SCHEMA.TERMS_OF_SERVICE));
     }
 
     public ServiceAtomContent getServiceAtomContent() {

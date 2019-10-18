@@ -230,44 +230,6 @@
                         </configuration>
                     </execution>
 
-<!--                    &lt;!&ndash; copy bot resources &ndash;&gt;-->
-<!--                    <execution>-->
-<!--                        <id>copy-bots-jar</id>-->
-<!--                        <phase>package</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>copy-resources</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <overwrite>true</overwrite>-->
-<!--                            <outputDirectory>${project.basedir}/image/bots</outputDirectory>-->
-<!--                            <resources>-->
-<!--                                <resource>-->
-<!--                                    <directory>${project.parent.basedir}/won-bot/target</directory>-->
-<!--                                    <includes>-->
-<!--                                        <include>bots.jar</include>-->
-<!--                                    </includes>-->
-<!--                                </resource>-->
-<!--                            </resources>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                    <execution>-->
-<!--                        <id>copy-bots-conf</id>-->
-<!--                        <phase>package</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>copy-resources</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <overwrite>true</overwrite>-->
-<!--                            <outputDirectory>${project.basedir}/image/bots/conf</outputDirectory>-->
-<!--                            <resources>-->
-<!--                                <resource>-->
-<!--                                    <directory>${project.parent.basedir}/conf</directory>-->
-<!--                                </resource>-->
-<!--                            </resources>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-
-
                     <!-- copy matcher rescal resources -->
                     <execution>
                         <id>copy-matcher-rescal-jar</id>
