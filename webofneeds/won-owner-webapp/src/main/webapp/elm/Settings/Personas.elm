@@ -248,7 +248,7 @@ saveDraft draft =
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
-        [ Persona.subscription ReceivedPersonas (\_ -> NoOp)
+        [ Persona.subscription ReceivedPersonas (\err -> log "parsing error" err |> always NoOp)
         ]
 
 
