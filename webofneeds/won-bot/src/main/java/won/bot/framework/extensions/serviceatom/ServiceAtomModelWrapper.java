@@ -31,6 +31,7 @@ public class ServiceAtomModelWrapper extends DefaultAtomModelWrapper {
         this.addSocket("#HolderSocket", WXHOLD.HolderSocketString);
         this.addSocket("#ChatSocket", WXCHAT.ChatSocketString);
         this.addSocket("#ReviewSocket", WXREVIEW.ReviewSocketString);
+        this.setDefaultSocket("#ChatSocket");
         if (Objects.nonNull(serviceAtomContent.getName())) {
             this.setName(serviceAtomContent.getName());
         }
