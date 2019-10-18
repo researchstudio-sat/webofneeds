@@ -10,6 +10,18 @@
  */
 package won.node.service.impl;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -27,12 +39,22 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
+
 import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.cryptography.service.CryptographyService;
 import won.protocol.exception.NoSuchAtomException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessageType;
-import won.protocol.model.*;
+import won.protocol.model.Atom;
+import won.protocol.model.AtomModelMapper;
+import won.protocol.model.AtomState;
+import won.protocol.model.Connection;
+import won.protocol.model.ConnectionModelMapper;
+import won.protocol.model.ConnectionState;
+import won.protocol.model.DataWithEtag;
+import won.protocol.model.DatasetHolder;
+import won.protocol.model.DatasetHolderAggregator;
+import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.model.unread.UnreadMessageInfo;
 import won.protocol.model.unread.UnreadMessageInfoForAtom;
 import won.protocol.repository.AtomRepository;
@@ -46,14 +68,6 @@ import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.RDFG;
 import won.protocol.vocabulary.WON;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Creates rdf models from the relational database. TODO: conform to:
