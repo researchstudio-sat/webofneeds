@@ -12,26 +12,16 @@ package won.bot.framework.eventbot.event.impl.wonmessage;
 
 import java.net.URI;
 
-import won.bot.framework.eventbot.event.BaseEvent;
-import won.bot.framework.eventbot.event.MessageEvent;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageType;
 
-public class SocketHintFromMatcherEvent extends BaseEvent implements MessageEvent {
-    final WonMessage wonMessage;
-    double hintScore;
-    URI hintTargetSocket;
-    URI recipientSocket;
+public class SocketHintFromMatcherEvent extends HintFromMatcherEvent {
+    private URI hintTargetSocket;
+    private URI recipientSocket;
 
     public SocketHintFromMatcherEvent(final WonMessage wonMessage) {
-        this.wonMessage = wonMessage;
-        this.hintScore = wonMessage.getHintScore();
+        super(wonMessage);
         this.hintTargetSocket = wonMessage.getHintTargetSocketURI();
         this.recipientSocket = wonMessage.getRecipientSocketURI();
-    }
-
-    public double getHintScore() {
-        return hintScore;
     }
 
     public URI getHintTargetSocket() {
@@ -40,14 +30,5 @@ public class SocketHintFromMatcherEvent extends BaseEvent implements MessageEven
 
     public URI getRecipientSocket() {
         return recipientSocket;
-    }
-
-    public WonMessage getWonMessage() {
-        return wonMessage;
-    }
-
-    @Override
-    public WonMessageType getWonMessageType() {
-        return this.wonMessage.getMessageType();
     }
 }

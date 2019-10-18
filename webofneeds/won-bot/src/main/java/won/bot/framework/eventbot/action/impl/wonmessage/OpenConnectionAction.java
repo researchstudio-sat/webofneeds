@@ -80,10 +80,8 @@ public class OpenConnectionAction extends BaseEventBotAction {
             // better to
             // use connection object instead
             SocketHintFromMatcherEvent hintEvent = (SocketHintFromMatcherEvent) event;
-            Optional<URI> recipientAtom = BotActionUtils.getRecipientAtomURIFromHintEvent(hintEvent,
-                            getEventListenerContext().getLinkedDataSource());
-            Optional<URI> hintTargetAtom = BotActionUtils.getTargetAtomURIFromHintEvent(hintEvent,
-                            getEventListenerContext().getLinkedDataSource());
+            Optional<URI> recipientAtom = hintEvent.getRecipientAtomURI();
+            Optional<URI> hintTargetAtom = hintEvent.getTargetAtomURI();
             if (!recipientAtom.isPresent()) {
                 logger.info("could not get recipient atom for hint event {}, cannot connect", event);
                 return;

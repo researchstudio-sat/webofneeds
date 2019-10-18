@@ -10,44 +10,10 @@
  */
 package won.bot.framework.eventbot.event.impl.wonmessage;
 
-import java.net.URI;
-
-import won.bot.framework.eventbot.event.BaseEvent;
-import won.bot.framework.eventbot.event.MessageEvent;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageType;
 
-public class AtomHintFromMatcherEvent extends BaseEvent implements MessageEvent {
-    final WonMessage wonMessage;
-    double hintScore;
-    URI hintTargetAtom;
-    URI recipientAtom;
-
+public class AtomHintFromMatcherEvent extends HintFromMatcherEvent {
     public AtomHintFromMatcherEvent(final WonMessage wonMessage) {
-        this.wonMessage = wonMessage;
-        this.hintScore = wonMessage.getHintScore();
-        this.hintTargetAtom = wonMessage.getHintTargetAtomURI();
-        this.recipientAtom = wonMessage.getRecipientAtomURI();
-    }
-
-    public double getHintScore() {
-        return hintScore;
-    }
-
-    public URI getHintTargetAtom() {
-        return hintTargetAtom;
-    }
-
-    public URI getRecipientAtom() {
-        return recipientAtom;
-    }
-
-    public WonMessage getWonMessage() {
-        return wonMessage;
-    }
-
-    @Override
-    public WonMessageType getWonMessageType() {
-        return this.wonMessage.getMessageType();
+        super(wonMessage);
     }
 }
