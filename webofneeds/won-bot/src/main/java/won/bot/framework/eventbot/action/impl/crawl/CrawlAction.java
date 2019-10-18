@@ -45,7 +45,7 @@ public class CrawlAction extends BaseEventBotAction {
         logger.debug("starting crawl for {}", crawlCommandEvent.getStartURI());
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        Dataset crawledData = null;
+        Dataset crawledData;
         try {
             crawledData = ctx.getLinkedDataSource().getDataForResourceWithPropertyPath(crawlCommandEvent.getStartURI(),
                             crawlCommandEvent.getAtomURI(), crawlCommandEvent.getPropertyPaths(),

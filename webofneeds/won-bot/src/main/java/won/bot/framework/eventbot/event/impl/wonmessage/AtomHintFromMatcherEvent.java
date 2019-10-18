@@ -19,9 +19,9 @@ import won.protocol.message.WonMessageType;
 
 public class AtomHintFromMatcherEvent extends BaseEvent implements MessageEvent {
     final WonMessage wonMessage;
-    double hintScore = 0;
-    URI hintTargetAtom = null;
-    URI recipientAtom = null;
+    double hintScore;
+    URI hintTargetAtom;
+    URI recipientAtom;
 
     public AtomHintFromMatcherEvent(final WonMessage wonMessage) {
         this.wonMessage = wonMessage;

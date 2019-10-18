@@ -19,9 +19,9 @@ import won.protocol.message.WonMessageType;
 
 public class SocketHintFromMatcherEvent extends BaseEvent implements MessageEvent {
     final WonMessage wonMessage;
-    double hintScore = 0;
-    URI hintTargetSocket = null;
-    URI recipientSocket = null;
+    double hintScore;
+    URI hintTargetSocket;
+    URI recipientSocket;
 
     public SocketHintFromMatcherEvent(final WonMessage wonMessage) {
         this.wonMessage = wonMessage;

@@ -23,8 +23,8 @@ import won.protocol.model.Connection;
 public abstract class AbstractMessageCommandResultEvent extends BaseAtomAndConnectionSpecificEvent
                 implements MessageCommandResultEvent {
     private MessageCommandEvent originalCommandEvent;
-    private String message = null; // TODO: unused variable/parameter (msg is only used in one subclass an that has
-                                   // its own variable for a message)
+    private String message; // TODO: unused variable/parameter (msg is only used in one subclass an that has
+                            // its own variable for a message)
 
     public AbstractMessageCommandResultEvent(MessageCommandEvent originalCommandEvent, Connection con) {
         this(originalCommandEvent, con, null);

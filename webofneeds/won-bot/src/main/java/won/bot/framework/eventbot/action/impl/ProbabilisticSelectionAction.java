@@ -26,7 +26,7 @@ public class ProbabilisticSelectionAction extends BaseEventBotAction {
     private double probabilityA;
     private EventBotAction delegateA;
     private EventBotAction delegateB;
-    private long salt = 0;
+    private long salt;
     private Random random;
 
     public ProbabilisticSelectionAction(final EventListenerContext eventListenerContext, final double probabilityA,

@@ -20,7 +20,7 @@ import won.bot.framework.eventbot.filter.EventFilter;
  */
 public class AcceptNTimesFilter extends AbstractDelegatingFilter {
     private int count = 0;
-    private int targetCount = 0;
+    private int targetCount;
 
     public AcceptNTimesFilter(final EventFilter delegate, final int targetCount) {
         super(delegate);

@@ -37,7 +37,7 @@ import java.util.Date;
  */
 public class AutomaticMessageResponderListener extends AbstractHandleFirstNEventsListener {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private long millisTimeoutBeforeReply = 1000;
+    private long millisTimeoutBeforeReply;
 
     public AutomaticMessageResponderListener(final EventListenerContext context, final int targetNumberOfMessages,
                     final long millisTimeoutBeforeReply) {

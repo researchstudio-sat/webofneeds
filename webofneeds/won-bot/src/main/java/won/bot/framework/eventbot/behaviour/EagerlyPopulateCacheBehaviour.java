@@ -58,7 +58,7 @@ public class EagerlyPopulateCacheBehaviour extends BotBehaviour {
 
         @Override
         protected void doRun(Event event, EventListener executingListener) throws Exception {
-            WonMessage responseWonMessage = null;
+            WonMessage responseWonMessage;
             if (event instanceof SuccessResponseEvent) {
                 responseWonMessage = ((SuccessResponseEvent) event).getMessage();
             } else if (event instanceof FailureResponseEvent) {

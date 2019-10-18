@@ -32,9 +32,9 @@ public class CreateAtomCommandEvent implements MessageCommandEvent {
     // the name of the atom uri list to save the atom uri to
     private String uriListName = BotContext.DEFAULT_ATOM_LIST_NAME;
     // sets the UsedForTesting flag
-    private boolean usedForTesting = false;
+    private boolean usedForTesting;
     // sets the do not match flag
-    private boolean doNotMatch = false;
+    private boolean doNotMatch;
 
     public CreateAtomCommandEvent(Dataset atomDataset, String uriListName, boolean usedForTesting, boolean doNotMatch,
                     URI... sockets) {

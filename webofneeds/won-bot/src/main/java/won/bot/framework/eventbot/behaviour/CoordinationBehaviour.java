@@ -65,7 +65,7 @@ public final class CoordinationBehaviour extends BotBehaviour {
 
     @Override
     protected void onActivate(Optional<Object> message) {
-        EventBotAction actionToExecute = null;
+        EventBotAction actionToExecute;
         if (typeB == CoordinationType.ACTIVATE) {
             actionToExecute = new BaseEventBotAction(context) {
                 @Override
@@ -85,7 +85,7 @@ public final class CoordinationBehaviour extends BotBehaviour {
                 }
             };
         }
-        Class<? extends Event> eventClazz = null;
+        Class<? extends Event> eventClazz;
         if (typeA == CoordinationType.ACTIVATE) {
             eventClazz = BotBehaviourActivatedEvent.class;
         } else {

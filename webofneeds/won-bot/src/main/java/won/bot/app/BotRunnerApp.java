@@ -33,7 +33,7 @@ public class BotRunnerApp {
         SpringApplication app = new SpringApplication("classpath:/spring/app/botRunner.xml");
         app.setWebEnvironment(false);
         ConfigurableApplicationContext applicationContext = app.run(args);
-        Bot bot = null;
+        Bot bot;
         // create a bot instance and auto-wire it
         AutowireCapableBeanFactory beanFactory = applicationContext.getAutowireCapableBeanFactory();
         bot = (Bot) beanFactory.autowire(Class.forName(botClass), AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);

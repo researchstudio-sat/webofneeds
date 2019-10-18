@@ -37,8 +37,8 @@ import java.util.Optional;
  */
 public class ConnectTwoAtomsAction extends BaseEventBotAction {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private Optional<URI> targetSocketType = Optional.empty();
-    private Optional<URI> localSocketType = Optional.empty();
+    private Optional<URI> targetSocketType;
+    private Optional<URI> localSocketType;
     private String welcomeMessage;
 
     public ConnectTwoAtomsAction(final EventListenerContext eventListenerContext, final URI targetSocketType,

@@ -120,7 +120,7 @@ public class PrintWonMessageAction extends BaseEventBotAction {
         int lineLength = 117;
         String[] lines = text.split("\\r?\\n");
         StringBuilder formatted = new StringBuilder();
-        String lineToFormat = null;
+        String lineToFormat;
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i];
             if (line.length() <= lineLength) {
