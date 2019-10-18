@@ -48,6 +48,10 @@ class WonSettingsWrapper extends React.Component {
     ports.updatePersonas.subscribe(() => {
       const personas = getOwnedCondensedPersonaList(getState(), true);
       if (personas) {
+        console.log(
+          "about to send following persona to elm: ",
+          personas.first()
+        );
         ports.personaIn.send(personas.toJS());
       }
     });

@@ -23,6 +23,7 @@ import Regex
 import String.Extra as String
 import Url
 import Validate exposing (Validator)
+import Debug exposing (log)
 
 
 

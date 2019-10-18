@@ -17,6 +17,7 @@ import Json.Encode as Encode
 import NonEmpty exposing (NonEmpty)
 import Time
 import Url exposing (Url)
+import Debug exposing (log)
 
 
 type SaveState
@@ -30,7 +31,6 @@ type Persona
         , data : PersonaData
         , saved : SaveState
         }
-
 
 data : Persona -> PersonaData
 data (Persona persona) =
@@ -62,6 +62,7 @@ subscription : (Dict String Persona -> msg) -> (Decode.Error -> msg) -> Sub msg
 subscription tag errorTag =
     personaIn
         (\value ->
+            log "in personaIn: " <|
             case decodeValue listDecoder value of
                 Ok list ->
                     tag list
