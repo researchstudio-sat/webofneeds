@@ -29,7 +29,11 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
  * Created by fkleedorfer on 10.06.2016.
+ * 
+ * @deprecated will be removed as early as version 0.7, does not serve a purpose
+ * once the methods are removed
  */
+@Deprecated
 public class BotActionUtils {
     /**
      * Creates a connectionMessage for the given connectionURI with the message
@@ -73,6 +77,7 @@ public class BotActionUtils {
      * {@link won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent#getTargetAtomURI()
      * event.getTargetAtomURI()} instead
      */
+    @Deprecated
     public static Optional<URI> getTargetAtomURIFromHintEvent(Event event, LinkedDataSource linkedDataSource) {
         if (event instanceof AtomHintFromMatcherEvent) {
             return Optional.of(((AtomHintFromMatcherEvent) event).getHintTargetAtom());
@@ -94,6 +99,7 @@ public class BotActionUtils {
      * {@link won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent#getRecipientAtomURI()
      * event.getRecipientAtomURI()} instead
      */
+    @Deprecated
     public static Optional<URI> getRecipientAtomURIFromHintEvent(Event event, LinkedDataSource linkedDataSource) {
         if (event instanceof AtomHintFromMatcherEvent) {
             return Optional.of(((AtomHintFromMatcherEvent) event).getRecipientAtom());
