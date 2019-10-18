@@ -10,22 +10,7 @@
  */
 package won.protocol.util.linkeddata;
 
-import net.sf.ehcache.CacheException;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.ehcache.EhCacheCacheManager;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
+import static java.util.EnumSet.noneOf;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -45,7 +30,23 @@ import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.util.EnumSet.noneOf;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.ehcache.EhCacheCacheManager;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+
+import net.sf.ehcache.CacheException;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
+import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
 
 /**
  * LinkedDataSource implementation that uses an ehcache for caching.
@@ -403,14 +404,16 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
         final DatasetResponseWithStatusCodeAndHeaders responseData;
         if (requesterWebID != null) {
             logger.debug("fetching linked data for URI {} with WebID {}", resource, requesterWebID);
-            responseData = linkedDataRestClient.readResourceDataWithHeaders(resource, requesterWebID, headers);
+            URI resolvedResource = wonMessageUriResolver.toLocalMessageURI(resource, this);
+            responseData = linkedDataRestClient.readResourceDataWithHeaders(resolvedResource, requesterWebID, headers);
             if (logger.isTraceEnabled()) {
                 logger.trace("fetched resource {} with requesterWebID {}: ", resource, requesterWebID);
                 RDFDataMgr.write(System.out, responseData.getDataset(), Lang.TRIG);
             }
         } else {
             logger.debug("fetching linked data for URI {} without WebID", resource);
-            responseData = linkedDataRestClient.readResourceDataWithHeaders(resource, headers);
+            URI resolvedResource = wonMessageUriResolver.toLocalMessageURI(resource, this);
+            responseData = linkedDataRestClient.readResourceDataWithHeaders(resolvedResource, headers);
             if (logger.isTraceEnabled()) {
                 logger.trace("fetched resource {} without WebID", resource);
                 RDFDataMgr.write(System.out, responseData.getDataset(), Lang.TRIG);

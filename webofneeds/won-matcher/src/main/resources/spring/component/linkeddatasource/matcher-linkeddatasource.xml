@@ -51,4 +51,6 @@
         <property name="sharedCache" value="false"/>
     </bean>
 
+	<bean id="wonMessageUriResolver" class="won.protocol.util.linkeddata.uriresolver.WonMessageUriResolver" />
+
 </beans>

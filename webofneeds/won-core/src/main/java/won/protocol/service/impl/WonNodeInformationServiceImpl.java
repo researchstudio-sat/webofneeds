@@ -1,6 +1,7 @@
 package won.protocol.service.impl;
 
 import java.net.URI;
+import java.util.Optional;
 
 import org.apache.jena.query.Dataset;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +10,10 @@ import org.springframework.beans.factory.annotation.Value;
 import won.cryptography.service.RandomNumberService;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInformationService;
+import won.protocol.util.WonMessageUriHelper;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
-import won.protocol.vocabulary.WONMSG;
 
 /**
  * User: fsalcher Date: 17.09.2014
@@ -48,7 +49,7 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
 
     @Override
     public boolean isValidEventURI(URI eventURI) {
-        return eventURI.toString().startsWith(WONMSG.MESSAGE_URI_PREFIX);
+        return WonMessageUriHelper.isGenericMessageURI(eventURI);
     }
 
     @Override
@@ -80,7 +81,7 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
 
     @Override
     public URI generateEventURI() {
-        return URI.create(WONMSG.MESSAGE_URI_PREFIX + generateRandomID());
+        return WonMessageUriHelper.createMessageURIForId(generateRandomID());
     }
 
     @Override
@@ -117,6 +118,10 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
         return defaultWonNodeUri;
     }
 
+    public WonNodeInfo getDefaultWonNodeInfo() {
+        return getWonNodeInformation(defaultWonNodeUri);
+    }
+
     public void setDefaultWonNodeUri(final URI defaultWonNodeUri) {
         this.defaultWonNodeUri = defaultWonNodeUri;
     }
@@ -138,5 +143,10 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
      */
     private String generateRandomID() {
         return randomNumberService.generateRandomString(RANDOM_ID_STRING_LENGTH);
+    }
+
+    @Override
+    public Optional<WonNodeInfo> getWonNodeInformationForURI(URI someURI, Optional<URI> requesterWebID) {
+        return WonLinkedDataUtils.findWonNode(someURI, requesterWebID, linkedDataSource);
     }
 }

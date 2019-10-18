@@ -10,6 +10,21 @@
  */
 package won.protocol.util.linkeddata;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.function.BiFunction;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -27,31 +42,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+
 import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
 import won.protocol.rest.LinkedDataFetchingException;
 import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.AuthenticationThreadLocal;
 import won.protocol.util.RdfUtils;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.function.BiFunction;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import won.protocol.util.linkeddata.uriresolver.WonMessageUriResolver;
 
 /**
  * LinkedDataSource implementation that delegates fetching linked data resources
  * to the provided LinedDataRestClient.
  */
-public class LinkedDataSourceBase implements LinkedDataSource {
+public abstract class LinkedDataSourceBase implements LinkedDataSource {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     protected LinkedDataRestClient linkedDataRestClient;
     @Autowired
     private ThreadPoolExecutor parallelRequestsThreadpool;
+    @Autowired
+    protected WonMessageUriResolver wonMessageUriResolver;
 
     /**
      * extract the previous link (in case won node had more data than could be sent
@@ -97,6 +106,7 @@ public class LinkedDataSourceBase implements LinkedDataSource {
         if (resource == null) {
             throw new IllegalArgumentException("resource must not be null");
         }
+        resource = wonMessageUriResolver.toLocalMessageURI(resource, this);
         logger.debug("fetching linked data for URI {}", resource);
         Dataset dataset = DatasetFactory.createGeneral();
         try {
@@ -112,10 +122,11 @@ public class LinkedDataSourceBase implements LinkedDataSource {
     }
 
     @Override
-    public Dataset getDataForResource(final URI resource, final URI requesterWebID) {
+    public Dataset getDataForResource(URI resource, final URI requesterWebID) {
         if (resource == null || requesterWebID == null) {
             throw new IllegalArgumentException("resource and requester must not be null");
         }
+        resource = wonMessageUriResolver.toLocalMessageURI(resource, this);
         logger.debug("fetching linked data for URI {} requester {}", resource, requesterWebID);
         Dataset dataset = DatasetFactory.createGeneral();
         try {
@@ -138,8 +149,9 @@ public class LinkedDataSourceBase implements LinkedDataSource {
     @Override
     public Dataset getDataForResource(final URI resourceURI, final URI requesterWebID, final List<URI> properties,
                     final int maxRequest, final int maxDepth) {
-        return getDataForResource(resourceURI, requesterWebID, maxRequest, maxDepth, (Dataset crawledData,
-                        Set<URI> crawledUris) -> getURIsToCrawl(crawledData, crawledUris, properties));
+        return getDataForResource(resourceURI, Optional.ofNullable(requesterWebID), maxRequest, maxDepth,
+                        (Dataset crawledData,
+                                        Set<URI> crawledUris) -> getURIsToCrawl(crawledData, crawledUris, properties));
     }
 
     private Set<URI> retainOnlyAllowedAmount(Set<URI> newlyDiscoveredURIs, final int maxRequest, int requests) {
@@ -156,20 +168,29 @@ public class LinkedDataSourceBase implements LinkedDataSource {
         Dataset result = DatasetFactory.createGeneral();
         Model m = result.getDefaultModel();
         RdfUtils.toStatementStream(
-                        getDataForResourceWithPropertyPath(resourceURI, null, properties, maxRequest, maxDepth))
+                        getDataForResourceWithPropertyPath(resourceURI, Optional.empty(), properties, maxRequest,
+                                        maxDepth))
                         .forEach(m::add);
         return result;
     }
 
     @Override
-    public Dataset getDataForResourceWithPropertyPath(final URI resourceURI, final URI requesterWebID,
+    public Dataset getDataForResourceWithPropertyPath(final URI resourceURI, final Optional<URI> requesterWebID,
                     final List<Path> properties, final int maxRequest, final int maxDepth) {
         return getDataForResource(resourceURI, requesterWebID, maxRequest, maxDepth,
                         (Dataset crawledData, Set<URI> crawledUris) -> getURIsToCrawlWithPropertyPath(crawledData,
                                         resourceURI, crawledUris, properties));
     }
 
-    private Dataset getDataForResource(final URI resourceURI, final URI requesterWebID, final int maxRequest,
+    @Override
+    public Dataset getDataForResourceWithPropertyPath(final URI resourceURI, final URI requesterWebID,
+                    final List<Path> properties, final int maxRequest, final int maxDepth) {
+        return getDataForResource(resourceURI, Optional.ofNullable(requesterWebID), maxRequest, maxDepth,
+                        (Dataset crawledData, Set<URI> crawledUris) -> getURIsToCrawlWithPropertyPath(crawledData,
+                                        resourceURI, crawledUris, properties));
+    }
+
+    private Dataset getDataForResource(final URI resourceURI, final Optional<URI> requesterWebID, final int maxRequest,
                     final int maxDepth, BiFunction<Dataset, Set<URI>, Set<URI>> findNextUrisFunction) {
         Set<URI> crawledURIs = new HashSet<>();
         Set<URI> newlyDiscoveredURIs = new HashSet<>();
@@ -193,8 +214,8 @@ public class LinkedDataSourceBase implements LinkedDataSource {
                                         // theadlocal hack mentioned above
                                         AuthenticationThreadLocal.setAuthentication(authenticationOpt.get());
                                     }
-                                    return requesterWebID == null ? getDataForResource(uri)
-                                                    : getDataForResource(uri, requesterWebID);
+                                    return requesterWebID.isPresent() ? getDataForResource(uri, requesterWebID.get())
+                                                    : getDataForResource(uri);
                                 } finally {
                                     // be sure to remove the principal from the threadlocal after the call
                                     AuthenticationThreadLocal.remove();

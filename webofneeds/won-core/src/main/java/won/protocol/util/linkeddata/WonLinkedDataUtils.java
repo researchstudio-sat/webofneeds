@@ -10,9 +10,25 @@
  */
 package won.protocol.util.linkeddata;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.SimpleSelector;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.path.Path;
@@ -20,6 +36,7 @@ import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.protocol.model.AtomState;
 import won.protocol.model.SocketDefinition;
 import won.protocol.model.SocketDefinitionImpl;
@@ -29,12 +46,6 @@ import won.protocol.util.RdfUtils.Pair;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.time.ZonedDateTime;
-import java.util.*;
 
 /**
  * Utilitiy functions for common linked data lookups.
@@ -197,6 +208,27 @@ public class WonLinkedDataUtils {
         URI requesterWebId = WonLinkedDataUtils.getAtomURIforConnectionURI(connectionURI, linkedDataSource);
         return linkedDataSource.getDataForResourceWithPropertyPath(connectionURI, requesterWebId, propertyPaths,
                         maxRequests, depth);
+    }
+
+    public static Optional<WonNodeInfo> findWonNode(URI someURI, Optional<URI> requesterWebID,
+                    LinkedDataSource linkedDataSource) {
+        assert linkedDataSource != null : "linkedDataSource must not be null";
+        int depth = 5;
+        int maxRequests = 1000;
+        List<Path> propertyPaths = new ArrayList<>();
+        PrefixMapping pmap = new PrefixMappingImpl();
+        pmap.withDefaultMappings(PrefixMapping.Standard);
+        pmap.setNsPrefix("won", WON.getURI());
+        pmap.setNsPrefix("msg", WONMSG.getURI());
+        pmap.setNsPrefix("rdfs", RDFS.getURI());
+        propertyPaths.add(PathParser.parse("^rdfs:member / ^won:messageContainer / ^won:wonNode", pmap));
+        propertyPaths.add(PathParser.parse("^won:messageContainer / ^won:wonNode", pmap));
+        propertyPaths.add(PathParser.parse("^won:wonNode", pmap));
+        propertyPaths.add(PathParser.parse("rdfs:member / ^won:wonNode", pmap));
+        Dataset ds = linkedDataSource.getDataForResourceWithPropertyPath(someURI, requesterWebID, propertyPaths,
+                        maxRequests, depth);
+        WonNodeInfo info = WonRdfUtils.WonNodeUtils.getWonNodeInfo(ds);
+        return Optional.ofNullable(info);
     }
 
     public static Dataset getConversationDataset(String connectionURI, LinkedDataSource linkedDataSource) {

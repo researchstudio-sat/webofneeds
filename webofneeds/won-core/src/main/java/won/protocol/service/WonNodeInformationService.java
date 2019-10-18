@@ -1,13 +1,30 @@
 package won.protocol.service;
 
 import java.net.URI;
+import java.util.Optional;
 
 /**
  * Service for managing won node related information and for generating URIs
  * required for messaging and creation of resources.
  */
 public interface WonNodeInformationService {
+    /**
+     * Get the WonNodeInfo that is uniquely identified by the specified
+     * <code>wonNodeURI</code>.
+     * 
+     * @param wonNodeURI
+     * @return
+     */
     WonNodeInfo getWonNodeInformation(URI wonNodeURI);
+
+    /**
+     * Given <code>someURI</code>, try different methods to find a WoN node which is
+     * responsible for it.
+     * 
+     * @param someURI
+     * @return
+     */
+    Optional<WonNodeInfo> getWonNodeInformationForURI(URI someURI, Optional<URI> requesterWebID);
 
     /**
      * Generates a random event URI according to the URI pattern of the default won
@@ -112,6 +129,8 @@ public interface WonNodeInformationService {
     boolean isValidAtomURI(URI atomURI, URI wonNodeURI);
 
     URI getDefaultWonNodeURI();
+
+    public WonNodeInfo getDefaultWonNodeInfo();
 
     /**
      * Obtains the won node uri associated with the specified atom or connection

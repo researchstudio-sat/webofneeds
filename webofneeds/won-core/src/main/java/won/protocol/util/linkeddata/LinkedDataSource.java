@@ -10,11 +10,12 @@
  */
 package won.protocol.util.linkeddata;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.sparql.path.Path;
-
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
+
+import org.apache.jena.query.Dataset;
+import org.apache.jena.sparql.path.Path;
 
 /**
  * Interface for fetching linked data as a jena Model.
@@ -50,5 +51,8 @@ public interface LinkedDataSource {
                     int maxRequest, int maxDepth, final boolean moveAllTriplesInDefaultGraph);
 
     Dataset getDataForResourceWithPropertyPath(final URI resourceURI, URI requesterWebID,
+                    final List<Path> properties, int maxRequest, int maxDepth);
+
+    Dataset getDataForResourceWithPropertyPath(final URI resourceURI, Optional<URI> requesterWebID,
                     final List<Path> properties, int maxRequest, int maxDepth);
 }
