@@ -29,5 +29,5 @@ public interface TextMessageCommandExtension {
         } else {
             throw new IllegalStateException("Can't create Filter, TextMessageCommandBehaviour is null");
         }
-    };
+    }
 }
