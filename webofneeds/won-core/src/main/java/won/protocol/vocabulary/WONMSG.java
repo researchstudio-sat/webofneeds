@@ -14,6 +14,10 @@ public class WONMSG {
     // TODO check with existing code how they do it, do they have ontology objects
     // and
     // access the vocabulary from there? If yes, change to that all the enum classes
+    /**
+     * prefix of message URIs. Message IDs are to be added after adding 1 slash.
+     * e.g. wm:/1234
+     */
     public static final String MESSAGE_URI_PREFIX = "wm:/";
     public static final String BASE_URI = "https://w3id.org/won/message#";
     public static final String DEFAULT_PREFIX = "msg";;
