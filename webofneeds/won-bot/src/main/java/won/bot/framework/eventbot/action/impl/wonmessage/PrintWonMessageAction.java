@@ -42,10 +42,10 @@ public class PrintWonMessageAction extends BaseEventBotAction {
 
     private void handleReceivedMessage(WonMessage msg) {
         StringBuilder output = new StringBuilder();
-        output.append("+-<<< Received " + msg.getMessageType() + " <<<---\n");
-        output.append("| message uri: " + msg.getMessageURI() + "\n");
-        output.append("| sender: " + getSender(msg) + "\n");
-        output.append("| recipient: " + getRecipient(msg) + "\n");
+        output.append("+-<<< Received ").append(msg.getMessageType()).append(" <<<---\n");
+        output.append("| message uri: ").append(msg.getMessageURI()).append("\n");
+        output.append("| sender: ").append(getSender(msg)).append("\n");
+        output.append("| recipient: ").append(getRecipient(msg)).append("\n");
         Optional<String> textMessage = getTextMessage(msg);
         if (textMessage.isPresent()) {
             output.append("| message : \n");
@@ -57,10 +57,10 @@ public class PrintWonMessageAction extends BaseEventBotAction {
 
     private void handleSentMessage(WonMessage msg) {
         StringBuilder output = new StringBuilder();
-        output.append("+->>> Sent " + msg.getMessageType() + ">>>---\n");
-        output.append("| message uri: " + msg.getMessageURI() + "\n");
-        output.append("| sender: " + getSender(msg) + "\n");
-        output.append("| recipient: " + getRecipient(msg) + "\n");
+        output.append("+->>> Sent ").append(msg.getMessageType()).append(">>>---\n");
+        output.append("| message uri: ").append(msg.getMessageURI()).append("\n");
+        output.append("| sender: ").append(getSender(msg)).append("\n");
+        output.append("| recipient: ").append(getRecipient(msg)).append("\n");
         Optional<String> textMessage = getTextMessage(msg);
         if (textMessage.isPresent()) {
             output.append("| message : \n");
@@ -130,7 +130,7 @@ public class PrintWonMessageAction extends BaseEventBotAction {
                 lines[i] = line.substring(lineLength);
                 i--; // process same array item again
             }
-            formatted.append("|  " + lineToFormat + "\n");
+            formatted.append("|  ").append(lineToFormat).append("\n");
         }
         return formatted.toString();
     }
