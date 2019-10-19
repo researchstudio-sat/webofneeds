@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -49,6 +50,8 @@ import won.owner.model.UserAtom;
 import won.owner.service.impl.WONUserDetailService;
 import won.protocol.rest.LinkedDataRestBridge;
 import won.protocol.rest.RDFMediaType;
+import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.uriresolver.WonMessageUriResolver;
 
 /**
  * User: ypanchenko Date: 03.09.2015 This controller at Owner server-side serves
@@ -69,6 +72,10 @@ public class BridgeForLinkedDataController implements InitializingBean {
     private LinkedDataRestBridge linkedDataRestBridgeOnBehalfOfAtom;
     @Autowired
     private LinkedDataRestBridge linkedDataRestBridge;
+    @Autowired
+    private WonMessageUriResolver wonMessageUriResolver;
+    @Autowired
+    private LinkedDataSource linkedDataSource;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -84,16 +91,23 @@ public class BridgeForLinkedDataController implements InitializingBean {
 
     final Logger logger = LoggerFactory.getLogger(getClass());
 
-    /*
-     * //for some reason this cannot be used as parameter in restTemplate.execute()
-     * private final ResponseExtractor httpResponseResponseExtractor = new
-     * ResponseExtractor<ClientHttpResponse>() {
-     * @Override public ClientHttpResponse extractData(final ClientHttpResponse
-     * response) throws IOException { return response; } };
+    /**
+     * Fetches a resource via http. Converts a generic message uri that a client
+     * wants to dereference into a local one on the default WoN node. Optionally,
+     * the client can send a URL parameter `wonnode=[wonNodeUri]` to ask for
+     * conversion on that WoN node. If that fails, the default WoN node is used for
+     * conversion. If the conversion fails, the resourceUri is left as-is.
+     * 
+     * @param uri the URI to fetch
+     * @param requesterWebId (optional) the URI of the WebID to use for fetching the
+     * resource.
+     * @param wonnode (optional) the WoN node URI to use for converting a generic
+     * message URI into a WoN-node specific one
      */
     @RequestMapping(value = { "/", "" }, method = RequestMethod.GET, produces = { "*/*" })
-    public void fetchResource(@RequestParam("uri") String resourceUri,
+    public void fetchResource(@RequestParam("uri") String resourceUriString,
                     @RequestParam(value = "requester", required = false) String requesterWebId,
+                    @RequestParam(value = "wonnode", required = false) String wonNodeUriString,
                     final HttpServletResponse response, final HttpServletRequest request) throws IOException {
         // prepare restTestmplate that can deal with webID certificate
         RestTemplate restTemplate = null;
@@ -119,7 +133,12 @@ public class BridgeForLinkedDataController implements InitializingBean {
         }
         // prepare headers to be passed in request for linked data resource
         final HttpHeaders requestHeaders = extractLinkedDataRequestRelevantHeaders(request);
-        restTemplate.execute(URI.create(resourceUri), HttpMethod.valueOf(request.getMethod()), new RequestCallback() {
+        // convert the URI if it's a message URI (the resolver will leave it as-is if
+        // it's not a generic message URI)
+        Optional<URI> wonNodeUri = Optional.ofNullable(wonNodeUriString).map(s -> URI.create(s));
+        URI resourceUri = wonMessageUriResolver.toLocalMessageURIForWonNode(URI.create(resourceUriString), wonNodeUri,
+                        linkedDataSource);
+        restTemplate.execute(resourceUri, HttpMethod.valueOf(request.getMethod()), new RequestCallback() {
             @Override
             public void doWithRequest(final ClientHttpRequest request) throws IOException {
                 request.getHeaders().setAll(requestHeaders.toSingleValueMap());
