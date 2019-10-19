@@ -10,18 +10,20 @@
  */
 package won.bot.framework.eventbot.action;
 
+import java.lang.invoke.MethodHandles;
+import java.util.Objects;
+
 import org.javasimon.SimonManager;
 import org.javasimon.Split;
 import org.javasimon.Stopwatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.lifecycle.ErrorEvent;
 import won.bot.framework.eventbot.listener.EventListener;
-
-import java.lang.invoke.MethodHandles;
-import java.util.Objects;
 
 /**
  *
@@ -40,6 +42,7 @@ public abstract class BaseEventBotAction implements won.bot.framework.eventbot.a
     @Override
     public Runnable getActionTask(final Event event, final EventListener eventListener) {
         return () -> {
+            MDC.clear();
             Stopwatch stopwatch = SimonManager.getStopwatch(stopwatchName);
             Split split = stopwatch.start();
             try {
@@ -47,6 +50,7 @@ public abstract class BaseEventBotAction implements won.bot.framework.eventbot.a
                 split.stop();
             } catch (Exception e) {
                 eventListenerContext.getEventBus().publish(new ErrorEvent(e));
+                logger.warn("Encountered an Exception:", e);
                 split.stop(EXCEPTION_TAG);
             } catch (Throwable t) {
                 logger.warn("could not run action {}", stopwatchName, t);
