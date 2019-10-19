@@ -271,6 +271,11 @@ public class WonLinkedDataUtils {
         return new ModelFetchingIterator(uriIterator, linkedDataSource);
     }
 
+    public static Optional<WonNodeInfo> getWonNodeInfo(URI wonNodeUri, LinkedDataSource linkedDataSource) {
+        Dataset nodeDataset = getDataForResource(wonNodeUri, linkedDataSource);
+        return Optional.ofNullable(WonRdfUtils.WonNodeUtils.getWonNodeInfo(wonNodeUri, nodeDataset));
+    }
+
     public static URI getWonNodeURIForAtomOrConnectionURI(final URI resourceURI, LinkedDataSource linkedDataSource) {
         assert linkedDataSource != null : "linkedDataSource must not be null";
         logger.debug("fetching WON node URI for resource {} with linked data source {}", resourceURI, linkedDataSource);
