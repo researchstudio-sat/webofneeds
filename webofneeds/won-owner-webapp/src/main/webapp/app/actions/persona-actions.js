@@ -16,7 +16,7 @@ export function createPersona(persona, nodeUri) {
     }
 
     const publishedContentUri = nodeUri + "/atom/" + wonUtils.getRandomWonId();
-    const msgUri = nodeUri + "/event/" + wonUtils.getRandomWonId();
+    const msgUri = "wm:/" + wonUtils.getRandomWonId();
 
     //FIXME: THIS SHOULD NOT USE ANY OF THE CODE BELOW BUT EXECUTE OUR ALREADY PRESENT ATOM-CREATION WITH A GIVEN DRAFT INSTEAD
     const graph = {

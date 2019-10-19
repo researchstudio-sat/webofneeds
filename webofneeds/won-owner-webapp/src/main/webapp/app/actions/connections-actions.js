@@ -830,7 +830,7 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
 
     const oldestMessageUri = get(sortedConnectionMessages.first(), "uri");
     const messageHashValue =
-      oldestMessageUri && oldestMessageUri.replace(/.*\/event\/(.*)/, "$1"); // everything following the `/event/`
+      oldestMessageUri && oldestMessageUri.replace(/wm\:\/(.*)/, "$1"); // everything following the `wm:/`
 
     const fetchParams = {
       requesterWebId: atomUri,

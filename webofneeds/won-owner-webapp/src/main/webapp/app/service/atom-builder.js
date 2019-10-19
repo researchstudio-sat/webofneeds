@@ -66,7 +66,7 @@ import { Generator } from "sparqljs";
    *
    *
    * //TODO mandatory but specify later:
-   * contentId, e.g. 'http://localhost:8080/won/resource/event/1997814854983652400#content-atom';
+   * contentId, e.g. 'wm:/1997814854983652400#content-atom';
    */
   won.buildAtomRdf = function(args) {
     if (!args.content && !args.seeks) {
