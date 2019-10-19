@@ -1,7 +1,17 @@
 package won.bot.framework.eventbot.behaviour;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -15,15 +25,12 @@ import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.CachingLinkedDataSource;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 public class EagerlyPopulateCacheBehaviour extends BotBehaviour {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final String MDC_KEY_PREVIOUS_MESSAGE_URIS = "previousMessageUrisIncludingRemote";
+    private static final String MDC_KEY_CORRESPONDING_REMOTE_MESSAGE = "correspondingRemoteMessageURI";
+    private static final String MDC_KEY_RESPONSE = "isResponseToMessageUri";
+    private static final String MDC_KEY_REMOTE_RESPONSE = "isRemoteResponseToMessageURI";
 
     public EagerlyPopulateCacheBehaviour(EventListenerContext context) {
         super(context);
@@ -76,11 +83,13 @@ public class EagerlyPopulateCacheBehaviour extends BotBehaviour {
                                 responseWonMessage.getMessageURI(), requester);
                 // load the original message(s) into cache, too
                 Set<URI> toLoad = new HashSet<>();
-                addIfNotNull(toLoad, responseWonMessage.getIsRemoteResponseToMessageURI());
-                addIfNotNull(toLoad, responseWonMessage.getIsResponseToMessageURI());
-                addIfNotNull(toLoad, responseWonMessage.getCorrespondingRemoteMessageURI());
+                addIfNotNull(toLoad, responseWonMessage.getIsRemoteResponseToMessageURI(),
+                                MDC_KEY_REMOTE_RESPONSE);
+                addIfNotNull(toLoad, responseWonMessage.getIsResponseToMessageURI(), MDC_KEY_RESPONSE);
+                addIfNotNull(toLoad, responseWonMessage.getCorrespondingRemoteMessageURI(),
+                                MDC_KEY_CORRESPONDING_REMOTE_MESSAGE);
                 List<URI> previous = WonRdfUtils.MessageUtils.getPreviousMessageUrisIncludingRemote(responseWonMessage);
-                addIfNotNull(toLoad, previous);
+                addIfNotNull(toLoad, previous, MDC_KEY_PREVIOUS_MESSAGE_URIS);
                 toLoad.forEach(uri -> linkedDataSource.getDataForResource(uri, requester));
             }
         }
@@ -105,23 +114,26 @@ public class EagerlyPopulateCacheBehaviour extends BotBehaviour {
                                 wonMessage.getMessageURI(), wonMessage.getRecipientAtomURI());
                 URI requester = wonMessage.getRecipientAtomURI();
                 Set<URI> toLoad = new HashSet<>();
-                addIfNotNull(toLoad, wonMessage.getCorrespondingRemoteMessageURI());
+                addIfNotNull(toLoad, wonMessage.getCorrespondingRemoteMessageURI(),
+                                MDC_KEY_CORRESPONDING_REMOTE_MESSAGE);
                 List<URI> previous = WonRdfUtils.MessageUtils.getPreviousMessageUrisIncludingRemote(wonMessage);
-                addIfNotNull(toLoad, previous);
+                addIfNotNull(toLoad, previous, MDC_KEY_PREVIOUS_MESSAGE_URIS);
                 toLoad.forEach(uri -> linkedDataSource.getDataForResource(uri, requester));
             }
         }
     }
 
-    private void addIfNotNull(Set<URI> uris, URI uri) {
+    private void addIfNotNull(Set<URI> uris, URI uri, String mdcKey) {
         if (uri != null) {
             uris.add(uri);
+            MDC.put(mdcKey, uri.toString());
         }
     }
 
-    private void addIfNotNull(Set<URI> uris, List<URI> urisToAdd) {
-        if (urisToAdd != null) {
+    private void addIfNotNull(Set<URI> uris, List<URI> urisToAdd, String mdcKey) {
+        if (urisToAdd != null && !urisToAdd.isEmpty()) {
             uris.addAll(urisToAdd);
+            MDC.put(mdcKey, Arrays.toString(urisToAdd.toArray()));
         }
     }
 }
