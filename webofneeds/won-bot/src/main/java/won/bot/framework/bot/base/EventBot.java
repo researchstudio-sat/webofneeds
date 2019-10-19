@@ -31,7 +31,6 @@ import won.bot.framework.eventbot.bus.impl.AsyncEventBusImpl;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomCreatedEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
-import won.bot.framework.eventbot.event.impl.lifecycle.ErrorEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.InitializeEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.ShutdownEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent;
@@ -46,7 +45,6 @@ import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentOnConnectionEvent;
 import won.bot.framework.eventbot.filter.impl.AtomUriInNamedListFilter;
 import won.bot.framework.eventbot.filter.impl.NotFilter;
-import won.bot.framework.eventbot.listener.BaseEventListener;
 import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
 import won.protocol.matcher.MatcherProtocolAtomServiceClientSide;
@@ -238,7 +236,6 @@ public abstract class EventBot extends ScheduledTriggerBot {
         super.initialize();
         eventBus = new AsyncEventBusImpl(getExecutor());
         // add an eventHandler that reacts to errors
-        eventBus.subscribe(ErrorEvent.class, new ErrorEventListener(eventListenerContext));
         initializeEventListeners();
         eventBus.publish(new InitializeEvent());
     }
@@ -346,25 +343,6 @@ public abstract class EventBot extends ScheduledTriggerBot {
             wonMessageSenderWrapper = new EventGeneratingWonMessageSenderWrapper(getWonMessageSender());
         }
         return wonMessageSenderWrapper;
-    }
-
-    /**
-     * Event listener that will stop the bot by publishing a WorkDoneEvent if an
-     * ErrorEvent is seen. Expects to be registered for WorkDoneEvents and
-     * ErrorEvents and will not react to a WorkDoneEvent.
-     */
-    private class ErrorEventListener extends BaseEventListener {
-        public ErrorEventListener(EventListenerContext context) {
-            super(context);
-        }
-
-        @Override
-        protected void doOnEvent(final won.bot.framework.eventbot.event.Event event) throws Exception {
-            if (event instanceof ErrorEvent) {
-                Throwable t = ((ErrorEvent) event).getThrowable();
-                logger.info("Encountered an error:", t);
-            }
-        }
     }
 
     /**
