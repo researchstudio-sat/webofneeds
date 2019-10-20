@@ -12,6 +12,7 @@
 	<camel:camelContext id="wonNodeCamel">
 		<camel:packageScan>
 			<camel:package>won.node.camel.route.fixed</camel:package>
+			<camel:excludes>won.node.camel.route.fixed.NewWonMessageRoutes</camel:excludes>
 		</camel:packageScan>
 		<camel:template id="producerTemplate" defaultEndpoint="direct:JMS"/>
 	</camel:camelContext>
