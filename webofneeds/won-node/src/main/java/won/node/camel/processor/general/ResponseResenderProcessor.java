@@ -8,7 +8,7 @@ import won.node.camel.processor.AbstractCamelProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.model.MessageEventPlaceholder;
+import won.protocol.model.MessageEvent;
 
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
@@ -35,7 +35,7 @@ public class ResponseResenderProcessor extends AbstractCamelProcessor {
         }
         logger.warn("an error occurred while processing WON message {}", originalMessage.getMessageURI());
         // get the event that was found to be already processed
-        MessageEventPlaceholder event = messageEventRepository.findOneByMessageURI(originalMessage.getMessageURI());
+        MessageEvent event = messageEventRepository.findOneByMessageURI(originalMessage.getMessageURI());
         // get response to this event:
         URI responseURI = event.getResponseMessageURI();
         Dataset responseDataset = event.getDatasetHolder().getDataset();

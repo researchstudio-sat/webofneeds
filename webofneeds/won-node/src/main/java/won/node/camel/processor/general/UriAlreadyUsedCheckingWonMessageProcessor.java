@@ -20,7 +20,7 @@ import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.EventAlreadyProcessedException;
 import won.protocol.message.processor.exception.UriAlreadyInUseException;
 import won.protocol.model.Atom;
-import won.protocol.model.MessageEventPlaceholder;
+import won.protocol.model.MessageEvent;
 import won.protocol.repository.AtomRepository;
 import won.protocol.repository.MessageEventRepository;
 import won.protocol.util.RdfUtils;
@@ -65,7 +65,7 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProc
     }
 
     private void checkEventURI(final WonMessage message) {
-        MessageEventPlaceholder event = messageEventRepository.findOneByMessageURI(message.getMessageURI());
+        MessageEvent event = messageEventRepository.findOneByMessageURI(message.getMessageURI());
         if (event == null) {
             return;
         } else {
@@ -78,11 +78,11 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProc
         }
     }
 
-    private boolean hasResponse(final MessageEventPlaceholder event) {
+    private boolean hasResponse(final MessageEvent event) {
         return event.getResponseMessageURI() != null;
     }
 
-    private boolean isDuplicateMessage(final WonMessage message, MessageEventPlaceholder event) {
+    private boolean isDuplicateMessage(final WonMessage message, MessageEvent event) {
         // retrieve already processed message
         Dataset processedDataset = event.getDatasetHolder().getDataset();
         // compare with received message

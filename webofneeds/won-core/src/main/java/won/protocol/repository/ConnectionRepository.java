@@ -113,7 +113,7 @@ public interface ConnectionRepository extends WonRepository<Connection> {
      * @param pageable
      * @return
      */
-    @Query("select msg.parentURI from MessageEventPlaceholder msg "
+    @Query("select msg.parentURI from MessageEvent msg "
                     + "where (msg.senderURI = msg.parentURI or msg.recipientURI = msg.parentURI) "
                     + "group by msg.parentURI")
     Slice<URI> getConnectionURIByActivityDate(Pageable pageable);
@@ -128,26 +128,26 @@ public interface ConnectionRepository extends WonRepository<Connection> {
      * @param pageable
      * @return
      */
-    @Query("select conn from Connection conn where conn.connectionURI in (select distinct msg.parentURI from MessageEventPlaceholder msg "
+    @Query("select conn from Connection conn where conn.connectionURI in (select distinct msg.parentURI from MessageEvent msg "
                     + "where (msg.senderURI = msg.parentURI or msg.recipientURI = msg.parentURI))")
     Slice<Connection> getConnectionsByActivityDate(Pageable pageable);
 
-    @Query("select msg.parentURI from MessageEventPlaceholder msg "
+    @Query("select msg.parentURI from MessageEvent msg "
                     + "where ((msg.senderURI = msg.parentURI or msg.recipientURI = msg.parentURI) and (msg.creationDate < :referenceDate))"
                     + "group by msg.parentURI")
     Slice<URI> getConnectionURIByActivityDate(@Param("referenceDate") Date referenceDate, Pageable pageable);
 
-    @Query("select conn from Connection conn where conn.connectionURI in (select distinct msg.parentURI from MessageEventPlaceholder msg "
+    @Query("select conn from Connection conn where conn.connectionURI in (select distinct msg.parentURI from MessageEvent msg "
                     + "where ((msg.senderURI = msg.parentURI or msg.recipientURI = msg.parentURI) and (msg.creationDate < :referenceDate)))")
     Slice<Connection> getConnectionsByActivityDate(@Param("referenceDate") Date referenceDate, Pageable pageable);
 
-    @Query("select conn from Connection conn where conn.connectionURI in (select msg.parentURI from MessageEventPlaceholder msg "
+    @Query("select conn from Connection conn where conn.connectionURI in (select msg.parentURI from MessageEvent msg "
                     + "where ((msg.senderURI = msg.parentURI or msg.recipientURI = msg.parentURI) and (msg.creationDate < :referenceDate))"
                     + "group by msg.parentURI having max(msg.creationDate) < :resumeDate)")
     Slice<Connection> getConnectionsBeforeByActivityDate(@Param("resumeDate") Date resumeEventDate,
                     @Param("referenceDate") Date referenceDate, Pageable pageable);
 
-    @Query("select conn from Connection conn where conn.connectionURI in (select msg.parentURI from MessageEventPlaceholder msg "
+    @Query("select conn from Connection conn where conn.connectionURI in (select msg.parentURI from MessageEvent msg "
                     + "where ((msg.senderURI = msg.parentURI or msg.recipientURI = msg.parentURI) and (msg.creationDate < :referenceDate))"
                     + "group by msg.parentURI having max(msg.creationDate) > :resumeDate)")
     Slice<Connection> getConnectionsAfterByActivityDate(@Param("resumeDate") Date resumeEventDate,
@@ -164,7 +164,7 @@ public interface ConnectionRepository extends WonRepository<Connection> {
      * @param pageable
      * @return
      */
-    @Query("select msg.parentURI from MessageEventPlaceholder msg "
+    @Query("select msg.parentURI from MessageEvent msg "
                     + "where (msg.senderAtomURI = :atom and msg.senderURI = msg.parentURI) "
                     + "   or (msg.recipientAtomURI = :atom and msg.recipientURI = msg.parentURI) "
                     + "group by msg.parentURI")
@@ -181,25 +181,25 @@ public interface ConnectionRepository extends WonRepository<Connection> {
      * @param pageable
      * @return
      */
-    @Query("select conn from Connection conn where conn.connectionURI in (select distinct msg.parentURI  from MessageEventPlaceholder msg "
+    @Query("select conn from Connection conn where conn.connectionURI in (select distinct msg.parentURI  from MessageEvent msg "
                     + "where (msg.senderAtomURI = :atom and msg.senderURI = msg.parentURI) "
                     + "   or (msg.recipientAtomURI = :atom and msg.recipientURI = msg.parentURI))")
     Slice<Connection> getConnectionsByActivityDate(@Param("atom") URI atomURI, Pageable pageable);
 
-    @Query("select msg.parentURI from MessageEventPlaceholder msg "
+    @Query("select msg.parentURI from MessageEvent msg "
                     + "where (((msg.senderAtomURI = :atom and msg.senderURI = msg.parentURI) "
                     + "   or (msg.recipientAtomURI = :atom and msg.recipientURI = msg.parentURI)) and (msg.creationDate < :referenceDate)) "
                     + "group by msg.parentURI")
     Slice<URI> getConnectionURIByActivityDate(@Param("atom") URI atomURI, @Param("referenceDate") Date referenceDate,
                     Pageable pageable);
 
-    @Query("select conn from Connection conn where conn.connectionURI in (select distinct msg.parentURI  from MessageEventPlaceholder msg "
+    @Query("select conn from Connection conn where conn.connectionURI in (select distinct msg.parentURI  from MessageEvent msg "
                     + "where (((msg.senderAtomURI = :atom and msg.senderURI = msg.parentURI) "
                     + "   or (msg.recipientAtomURI = :atom and msg.recipientURI = msg.parentURI)) and (msg.creationDate < :referenceDate)))")
     Slice<Connection> getConnectionsByActivityDate(@Param("atom") URI atomURI,
                     @Param("referenceDate") Date referenceDate, Pageable pageable);
 
-    @Query("select msg.parentURI from MessageEventPlaceholder msg "
+    @Query("select msg.parentURI from MessageEvent msg "
                     + "where (((msg.senderAtomURI = :atom and msg.senderURI = msg.parentURI) "
                     + "   or (msg.recipientAtomURI = :atom and msg.recipientURI = msg.parentURI)) and (msg.creationDate < :referenceDate)"
                     + "   and (msg.messageType = :messageType)) " + "group by msg.parentURI")
@@ -207,7 +207,7 @@ public interface ConnectionRepository extends WonRepository<Connection> {
                     @Param("messageType") WonMessageType messageType, @Param("referenceDate") Date referenceDate,
                     Pageable pageable);
 
-    @Query("select conn from Connection conn where conn.connectionURI in (select distinct msg.parentURI  from MessageEventPlaceholder msg "
+    @Query("select conn from Connection conn where conn.connectionURI in (select distinct msg.parentURI  from MessageEvent msg "
                     + "where (((msg.senderAtomURI = :atom and msg.senderURI = msg.parentURI) "
                     + "   or (msg.recipientAtomURI = :atom and msg.recipientURI = msg.parentURI)) and (msg.creationDate < :referenceDate)"
                     + "   and (msg.messageType = :messageType)))")
@@ -215,21 +215,21 @@ public interface ConnectionRepository extends WonRepository<Connection> {
                     @Param("messageType") WonMessageType messageType, @Param("referenceDate") Date referenceDate,
                     Pageable pageable);
 
-    @Query("select msg.parentURI from MessageEventPlaceholder msg "
+    @Query("select msg.parentURI from MessageEvent msg "
                     + "where (((msg.senderAtomURI = :atom and msg.senderURI = msg.parentURI) "
                     + "   or (msg.recipientAtomURI = :atom and msg.recipientURI = msg.parentURI)) "
                     + "   and (msg.messageType = :messageType)) " + "group by msg.parentURI")
     Slice<URI> getConnectionURIByActivityDate(@Param("atom") URI atomURI,
                     @Param("messageType") WonMessageType messageType, Pageable pageable);
 
-    @Query("select conn from Connection conn where conn.connectionURI in (select distinct msg.parentURI  from MessageEventPlaceholder msg "
+    @Query("select conn from Connection conn where conn.connectionURI in (select distinct msg.parentURI  from MessageEvent msg "
                     + "where (((msg.senderAtomURI = :atom and msg.senderURI = msg.parentURI) "
                     + "   or (msg.recipientAtomURI = :atom and msg.recipientURI = msg.parentURI)) "
                     + "   and (msg.messageType = :messageType)))")
     Slice<Connection> getConnectionsByActivityDate(@Param("atom") URI atomURI,
                     @Param("messageType") WonMessageType messageType, Pageable pageable);
 
-    @Query("select conn from Connection conn where conn.connectionURI in (select msg.parentURI from MessageEventPlaceholder msg "
+    @Query("select conn from Connection conn where conn.connectionURI in (select msg.parentURI from MessageEvent msg "
                     + "where (((msg.senderAtomURI = :atom and msg.senderURI = msg.parentURI) "
                     + "   or (msg.recipientAtomURI = :atom and msg.recipientURI = msg.parentURI)) and (msg.creationDate < :referenceDate))"
                     + "group by msg.parentURI having max(msg.creationDate) < :resumeDate)")
@@ -237,7 +237,7 @@ public interface ConnectionRepository extends WonRepository<Connection> {
                     @Param("resumeDate") Date resumeEventDate, @Param("referenceDate") Date referenceDate,
                     Pageable pageable);
 
-    @Query("select conn from Connection conn where conn.connectionURI in (select msg.parentURI from MessageEventPlaceholder msg "
+    @Query("select conn from Connection conn where conn.connectionURI in (select msg.parentURI from MessageEvent msg "
                     + "where (((msg.senderAtomURI = :atom and msg.senderURI = msg.parentURI) or (msg.recipientAtomURI = :atom and msg.recipientURI = msg.parentURI)) "
                     + "   and (msg.creationDate < :referenceDate) and (msg.messageType = :messageType))"
                     + "group by msg.parentURI having max(msg.creationDate) < :resumeDate)")
@@ -245,7 +245,7 @@ public interface ConnectionRepository extends WonRepository<Connection> {
                     @Param("resumeDate") Date resumeEventDate, @Param("messageType") WonMessageType messageType,
                     @Param("referenceDate") Date referenceDate, Pageable pageable);
 
-    @Query("select conn from Connection conn where conn.connectionURI in (select msg.parentURI from MessageEventPlaceholder msg "
+    @Query("select conn from Connection conn where conn.connectionURI in (select msg.parentURI from MessageEvent msg "
                     + "where (((msg.senderAtomURI = :atom and msg.senderURI = msg.parentURI) "
                     + "   or (msg.recipientAtomURI = :atom and msg.recipientURI = msg.parentURI)) and (msg.creationDate < :referenceDate))"
                     + "group by msg.parentURI having max(msg.creationDate) > :resumeDate)")
@@ -253,7 +253,7 @@ public interface ConnectionRepository extends WonRepository<Connection> {
                     @Param("resumeDate") Date resumeEventDate, @Param("referenceDate") Date referenceDate,
                     Pageable pageable);
 
-    @Query("select conn from Connection conn where conn.connectionURI in (select msg.parentURI from MessageEventPlaceholder msg "
+    @Query("select conn from Connection conn where conn.connectionURI in (select msg.parentURI from MessageEvent msg "
                     + "where (((msg.senderAtomURI = :atom and msg.senderURI = msg.parentURI) or (msg.recipientAtomURI = :atom and msg.recipientURI = msg.parentURI)) "
                     + "   and (msg.creationDate < :referenceDate) and (msg.messageType = :messageType))"
                     + "group by msg.parentURI having max(msg.creationDate) > :resumeDate)")

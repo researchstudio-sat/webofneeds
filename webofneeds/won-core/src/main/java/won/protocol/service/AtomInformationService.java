@@ -322,13 +322,13 @@ public interface AtomInformationService {
      */
     Model readConnectionContent(URI connectionURI) throws NoSuchConnectionException;
 
-    Slice<MessageEventPlaceholder> listConnectionEvents(URI connectionUri, int page, Integer preferredPageSize,
+    Slice<MessageEvent> listConnectionEvents(URI connectionUri, int page, Integer preferredPageSize,
                     WonMessageType messageType);
 
-    Slice<MessageEventPlaceholder> listConnectionEventsBefore(URI connectionUri, URI msgURI,
+    Slice<MessageEvent> listConnectionEventsBefore(URI connectionUri, URI msgURI,
                     Integer preferredPageSize, WonMessageType msgType);
 
-    Slice<MessageEventPlaceholder> listConnectionEventsAfter(URI connectionUri, URI msgURI,
+    Slice<MessageEvent> listConnectionEventsAfter(URI connectionUri, URI msgURI,
                     Integer preferredPageSize, WonMessageType msgType);
 
     class PagedResource<T, E> {

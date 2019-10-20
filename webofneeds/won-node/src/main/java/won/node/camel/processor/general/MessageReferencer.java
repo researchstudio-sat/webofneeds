@@ -22,7 +22,7 @@ import won.protocol.message.WonSignatureData;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.message.processor.impl.WonMessageSignerVerifier;
 import won.protocol.model.DatasetHolder;
-import won.protocol.model.MessageEventPlaceholder;
+import won.protocol.model.MessageEvent;
 import won.protocol.repository.*;
 import won.protocol.vocabulary.WONMSG;
 
@@ -117,12 +117,12 @@ public class MessageReferencer {
                 // we find identify the message with the same parent as our current message and
                 // add it
                 URI isResponseToURI = WonMessageUtils.getLocalIsResponseToURI(message);
-                MessageEventPlaceholder messageEventPlaceholder = messageEventRepository
+                MessageEvent messageEvent = messageEventRepository
                                 .findOneByMessageURI(isResponseToURI);
                 String methodName = "selectLatestMessage::response";
-                if (messageEventPlaceholder != null) {
-                    selectedUris.add(new MessageUriAndParentUri(messageEventPlaceholder.getMessageURI(),
-                                    messageEventPlaceholder.getParentURI()));
+                if (messageEvent != null) {
+                    selectedUris.add(new MessageUriAndParentUri(messageEvent.getMessageURI(),
+                                    messageEvent.getParentURI()));
                 }
                 break;
             case CREATE_ATOM:
@@ -134,15 +134,15 @@ public class MessageReferencer {
                 // container of the message)
                 // if we don't find any: reference the create message of the atom.
                 URI parentUri = WonMessageUtils.getParentEntityUri(message);
-                messageEventPlaceholder = messageEventRepository.findNewestByParentURI(parentUri);
-                if (messageEventPlaceholder != null) {
-                    selectedUris.add(new MessageUriAndParentUri(messageEventPlaceholder.getMessageURI(),
-                                    messageEventPlaceholder.getParentURI()));
+                messageEvent = messageEventRepository.findNewestByParentURI(parentUri);
+                if (messageEvent != null) {
+                    selectedUris.add(new MessageUriAndParentUri(messageEvent.getMessageURI(),
+                                    messageEvent.getParentURI()));
                 } else {
                     // we did not find any message to link to. Choose the create message of the atom
                     // we're starting a conversation, link to the create message of the atom.
                     URI parentAtomUri = WonMessageUtils.getParentAtomUri(message);
-                    List<MessageEventPlaceholder> eventsToSelect = messageEventRepository
+                    List<MessageEvent> eventsToSelect = messageEventRepository
                                     .findByParentURIAndMessageType(parentAtomUri, WonMessageType.CREATE_ATOM);
                     selectedUris.addAll(eventsToSelect.stream()
                                     .map(p -> (new MessageUriAndParentUri(p.getMessageURI(), p.getParentURI())))
@@ -170,10 +170,10 @@ public class MessageReferencer {
             return;
         URI parentUri = WonMessageUtils.getParentEntityUri(message);
         // find all unreferenced messages for the current message's parent
-        List<MessageEventPlaceholder> messageEventPlaceholders = messageEventRepository
+        List<MessageEvent> messageEvents = messageEventRepository
                         .findByParentURIAndNotReferencedByOtherMessage(parentUri);
         // load the WonMessages for the placeholders
-        selectedUris.addAll(messageEventPlaceholders.stream()
+        selectedUris.addAll(messageEvents.stream()
                         .map(p -> new MessageUriAndParentUri(p.getMessageURI(), p.getParentURI()))
                         .collect(Collectors.toList()));
     }
@@ -193,16 +193,16 @@ public class MessageReferencer {
         });
         WonMessage newMessage = new WonMessage(messageDataset);
         selected.forEach((MessageAndPlaceholder m) -> {
-            newMessage.addMessageProperty(WONMSG.previousMessage, m.getMessageEventPlaceholder().getMessageURI());
+            newMessage.addMessageProperty(WONMSG.previousMessage, m.getMessageEvent().getMessageURI());
         });
         return newMessage;
     }
 
     private void updateReferenced(List<MessageAndPlaceholder> selected) {
         selected.stream().forEach((MessageAndPlaceholder m) -> {
-            MessageEventPlaceholder messageEventPlaceholder = m.getMessageEventPlaceholder();
-            messageEventPlaceholder.setReferencedByOtherMessage(true);
-            messageEventRepository.save(messageEventPlaceholder);
+            MessageEvent messageEvent = m.getMessageEvent();
+            messageEvent.setReferencedByOtherMessage(true);
+            messageEventRepository.save(messageEvent);
         });
     }
 
@@ -239,16 +239,16 @@ public class MessageReferencer {
     }
 
     private static final class MessageAndPlaceholder {
-        private MessageEventPlaceholder messageEventPlaceholder;
+        private MessageEvent messageEvent;
         private WonMessage wonMessage;
 
-        public MessageAndPlaceholder(MessageEventPlaceholder messageEventPlaceholder, WonMessage wonMessage) {
-            this.messageEventPlaceholder = messageEventPlaceholder;
+        public MessageAndPlaceholder(MessageEvent messageEvent, WonMessage wonMessage) {
+            this.messageEvent = messageEvent;
             this.wonMessage = wonMessage;
         }
 
-        public MessageEventPlaceholder getMessageEventPlaceholder() {
-            return messageEventPlaceholder;
+        public MessageEvent getMessageEvent() {
+            return messageEvent;
         }
 
         public WonMessage getWonMessage() {

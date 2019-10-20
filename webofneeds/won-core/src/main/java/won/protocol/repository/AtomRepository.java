@@ -70,7 +70,7 @@ public interface AtomRepository extends WonRepository<Atom> {
      * @return
      */
     @Query("select distinct atom from Atom atom "
-                    + "join Connection c on ( c.atomURI = atom.atomURI ) join MessageEventPlaceholder mep on (mep.parentURI = atom.atomURI or mep.parentURI = c.connectionURI) "
+                    + "join Connection c on ( c.atomURI = atom.atomURI ) join MessageEvent mep on (mep.parentURI = atom.atomURI or mep.parentURI = c.connectionURI) "
                     + "where " + "atom.state = 'ACTIVE' " + "and " + "mep.messageType <> 'ATOM_MESSAGE' " + "and "
                     + " (select count(*) from Connection con where con.atomURI = atom.atomURI and con.state = 'CONNECTED') = 0"
                     + "and " + "( mep.senderURI = c.connectionURI or mep.senderAtomURI = atom.atomURI)"
@@ -88,14 +88,14 @@ public interface AtomRepository extends WonRepository<Atom> {
      * @return
      */
     @Query("select distinct atom from Atom atom "
-                    + "join Connection c on ( c.atomURI = atom.atomURI ) join MessageEventPlaceholder mep on (mep.parentURI = atom.atomURI or mep.parentURI = c.connectionURI) "
+                    + "join Connection c on ( c.atomURI = atom.atomURI ) join MessageEvent mep on (mep.parentURI = atom.atomURI or mep.parentURI = c.connectionURI) "
                     + "where " + "atom.state = 'ACTIVE' " + "and " + "mep.messageType <> 'ATOM_MESSAGE' " + "and "
                     + "( mep.senderURI = c.connectionURI or mep.senderAtomURI = atom.atomURI)" + "group by atom "
                     + "having max(mep.creationDate) > :startDate and max(mep.creationDate) < :endDate ")
     Slice<Atom> findAtomsInactiveBetween(@Param("startDate") Date start, @Param("endDate") Date end, Pageable pageable);
 
     @Query("select distinct atom from Atom atom "
-                    + "join Connection c on ( c.atomURI = atom.atomURI ) join MessageEventPlaceholder mep on (mep.parentURI = atom.atomURI or mep.parentURI = c.connectionURI) "
+                    + "join Connection c on ( c.atomURI = atom.atomURI ) join MessageEvent mep on (mep.parentURI = atom.atomURI or mep.parentURI = c.connectionURI) "
                     + "where " + "atom.state = 'ACTIVE' " + "and " + "mep.messageType <> 'ATOM_MESSAGE' " + "and "
                     + " (select count(*) from Connection con where con.atomURI = atom.atomURI and con.state = 'CONNECTED') = 0"
                     + "and " + "( mep.senderURI = c.connectionURI or mep.senderAtomURI = atom.atomURI)"
@@ -103,7 +103,7 @@ public interface AtomRepository extends WonRepository<Atom> {
     Slice<Atom> findAtomsInactiveSinceAndNotConnected(@Param("sinceDate") Date since, Pageable pageable);
 
     @Query("select distinct atom from Atom atom "
-                    + "join Connection c on ( c.atomURI = atom.atomURI ) join MessageEventPlaceholder mep on (mep.parentURI = atom.atomURI or mep.parentURI = c.connectionURI) "
+                    + "join Connection c on ( c.atomURI = atom.atomURI ) join MessageEvent mep on (mep.parentURI = atom.atomURI or mep.parentURI = c.connectionURI) "
                     + "where " + "atom.state = 'ACTIVE' " + "and " + "mep.messageType <> 'ATOM_MESSAGE' " + "and "
                     + "( mep.senderURI = c.connectionURI or mep.senderAtomURI = atom.atomURI)" + "group by atom "
                     + "having max(mep.creationDate) < :sinceDate")

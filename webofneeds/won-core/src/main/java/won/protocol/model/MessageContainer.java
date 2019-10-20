@@ -45,7 +45,7 @@ public abstract class MessageContainer implements VersionedEntity {
     @Convert(converter = URIConverter.class)
     private URI parentUri;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "messageContainer")
-    private Collection<MessageEventPlaceholder> events = new ArrayList<>(1);
+    private Collection<MessageEvent> events = new ArrayList<>(1);
     @Column(name = "version", columnDefinition = "integer DEFAULT 0", nullable = false)
     private int version = 0;
     @Temporal(TemporalType.TIMESTAMP)
@@ -80,11 +80,11 @@ public abstract class MessageContainer implements VersionedEntity {
         this.id = id;
     }
 
-    public Collection<MessageEventPlaceholder> getEvents() {
+    public Collection<MessageEvent> getEvents() {
         return events;
     }
 
-    public void setEvents(final Collection<MessageEventPlaceholder> events) {
+    public void setEvents(final Collection<MessageEvent> events) {
         this.events = events;
     }
 

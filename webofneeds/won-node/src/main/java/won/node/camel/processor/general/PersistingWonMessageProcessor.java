@@ -68,7 +68,7 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
             // update the message it responds to with the uri of the response
             messageEventRepository.lockConnectionAndMessageContainerByContainedMessageForUpdate(originalMessageURI);
             messageEventRepository.lockAtomAndMessageContainerByContainedMessageForUpdate(originalMessageURI);
-            MessageEventPlaceholder event = messageEventRepository.findOneByMessageURIforUpdate(originalMessageURI);
+            MessageEvent event = messageEventRepository.findOneByMessageURIforUpdate(originalMessageURI);
             if (event != null) {
                 // we may not have saved the event yet if the current message is a
                 // FailureResponse
@@ -85,7 +85,7 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
         MessageContainer container = loadOrCreateMessageContainer(wonMessage, parent);
         DatasetHolder datasetHolder = new DatasetHolder(wonMessage.getMessageURI(),
                         WonMessageEncoder.encodeAsDataset(wonMessage));
-        MessageEventPlaceholder event = new MessageEventPlaceholder(parent, wonMessage, container);
+        MessageEvent event = new MessageEvent(parent, wonMessage, container);
         event.setDatasetHolder(datasetHolder);
         messageEventRepository.save(event);
     }

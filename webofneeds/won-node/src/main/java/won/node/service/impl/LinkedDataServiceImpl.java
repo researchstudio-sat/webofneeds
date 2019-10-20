@@ -54,7 +54,7 @@ import won.protocol.model.ConnectionState;
 import won.protocol.model.DataWithEtag;
 import won.protocol.model.DatasetHolder;
 import won.protocol.model.DatasetHolderAggregator;
-import won.protocol.model.MessageEventPlaceholder;
+import won.protocol.model.MessageEvent;
 import won.protocol.model.unread.UnreadMessageInfo;
 import won.protocol.model.unread.UnreadMessageInfoForAtom;
 import won.protocol.repository.AtomRepository;
@@ -229,8 +229,8 @@ public class LinkedDataServiceImpl implements LinkedDataService {
                         WON.MessageContainer);
         metaModel.add(metaModel.createStatement(atomResource, WON.messageContainer, atomMessageContainer));
         // add atom event URIs
-        Collection<MessageEventPlaceholder> messageEvents = atom.getMessageContainer().getEvents();
-        for (MessageEventPlaceholder messageEvent : messageEvents) {
+        Collection<MessageEvent> messageEvents = atom.getMessageContainer().getEvents();
+        for (MessageEvent messageEvent : messageEvents) {
             metaModel.add(metaModel.createStatement(atomMessageContainer, RDFS.member,
                             metaModel.getResource(messageEvent.getMessageURI().toString())));
         }
@@ -614,11 +614,11 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         Resource messageContainer = model.createResource(connection.getConnectionURI().toString() + "/events",
                         WON.MessageContainer);
         // add the events with the new format (only the URI, no content)
-        List<MessageEventPlaceholder> connectionEvents = messageEventRepository.findByParentURI(connectionUri);
+        List<MessageEvent> connectionEvents = messageEventRepository.findByParentURI(connectionUri);
         Dataset eventsContainerDataset = newDatasetWithNamedModel(createDataGraphUriFromResource(messageContainer),
                         model);
         addBaseUriAndDefaultPrefixes(eventsContainerDataset);
-        for (MessageEventPlaceholder event : connectionEvents) {
+        for (MessageEvent event : connectionEvents) {
             model.add(model.createStatement(messageContainer, RDFS.member,
                             model.getResource(event.getMessageURI().toString())));
             if (deep) {
@@ -634,7 +634,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     public AtomInformationService.PagedResource<Dataset, URI> listConnectionEventURIs(final URI connectionUri,
                     final int pageNum, Integer preferedSize, WonMessageType msgType, boolean deep)
                     throws NoSuchConnectionException {
-        Slice<MessageEventPlaceholder> slice = atomInformationService.listConnectionEvents(connectionUri, pageNum,
+        Slice<MessageEvent> slice = atomInformationService.listConnectionEvents(connectionUri, pageNum,
                         preferedSize, msgType);
         return eventsToContainerPage(this.uriService.createEventsURIForConnection(connectionUri).toString(), slice,
                         deep);
@@ -645,7 +645,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     public AtomInformationService.PagedResource<Dataset, URI> listConnectionEventURIsAfter(final URI connectionUri,
                     final URI msgURI, Integer preferedSize, WonMessageType msgType, boolean deep)
                     throws NoSuchConnectionException {
-        Slice<MessageEventPlaceholder> slice = atomInformationService.listConnectionEventsAfter(connectionUri, msgURI,
+        Slice<MessageEvent> slice = atomInformationService.listConnectionEventsAfter(connectionUri, msgURI,
                         preferedSize, msgType);
         return eventsToContainerPage(this.uriService.createEventsURIForConnection(connectionUri).toString(), slice,
                         deep);
@@ -656,7 +656,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     public AtomInformationService.PagedResource<Dataset, URI> listConnectionEventURIsBefore(final URI connectionUri,
                     final URI msgURI, Integer preferedSize, WonMessageType msgType, boolean deep)
                     throws NoSuchConnectionException {
-        Slice<MessageEventPlaceholder> slice = atomInformationService.listConnectionEventsBefore(connectionUri, msgURI,
+        Slice<MessageEvent> slice = atomInformationService.listConnectionEventsBefore(connectionUri, msgURI,
                         preferedSize, msgType);
         return eventsToContainerPage(this.uriService.createEventsURIForConnection(connectionUri).toString(), slice,
                         deep);
@@ -802,9 +802,8 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     }
 
     /**
-     * Returns a container resource with the messageUris of all
-     * MessageEventPlaceholder objects in the slice. If deep == true, the event
-     * datasets are added, too.
+     * Returns a container resource with the messageUris of all MessageEvent objects
+     * in the slice. If deep == true, the event datasets are added, too.
      *
      * @param containerUri
      * @param slice
@@ -812,8 +811,8 @@ public class LinkedDataServiceImpl implements LinkedDataService {
      * @return
      */
     private AtomInformationService.PagedResource<Dataset, URI> eventsToContainerPage(String containerUri,
-                    Slice<MessageEventPlaceholder> slice, boolean deep) {
-        List<MessageEventPlaceholder> events = slice.getContent();
+                    Slice<MessageEvent> slice, boolean deep) {
+        List<MessageEvent> events = slice.getContent();
         URI resumeBefore = null;
         URI resumeAfter = null;
         if (slice.getSort() != null && !events.isEmpty()) {
@@ -833,7 +832,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         setNsPrefixes(model);
         Resource atomListPageResource = model.createResource(containerUri);
         DatasetHolderAggregator aggregator = new DatasetHolderAggregator();
-        for (MessageEventPlaceholder event : events) {
+        for (MessageEvent event : events) {
             model.add(model.createStatement(atomListPageResource, RDFS.member,
                             model.createResource(event.getMessageURI().toString())));
             if (deep) {

@@ -355,11 +355,11 @@ public class AtomInformationServiceImpl implements AtomInformationService {
     }
 
     @Override
-    public Slice<MessageEventPlaceholder> listConnectionEvents(URI connectionUri, int page, Integer preferedPageSize,
+    public Slice<MessageEvent> listConnectionEvents(URI connectionUri, int page, Integer preferedPageSize,
                     WonMessageType messageType) {
         int pageSize = getPageSize(preferedPageSize);
         int pageNum = page - 1;
-        Slice<MessageEventPlaceholder> slice = null;
+        Slice<MessageEvent> slice = null;
         if (messageType == null) {
             slice = messageEventRepository.findByParentURI(connectionUri,
                             new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "creationDate"));
@@ -371,12 +371,12 @@ public class AtomInformationServiceImpl implements AtomInformationService {
     }
 
     @Override
-    public Slice<MessageEventPlaceholder> listConnectionEventsAfter(URI connectionUri, URI msgURI,
+    public Slice<MessageEvent> listConnectionEventsAfter(URI connectionUri, URI msgURI,
                     Integer preferredPageSize, WonMessageType msgType) {
-        MessageEventPlaceholder referenceMsg = messageEventRepository.findOneByMessageURI(msgURI);
+        MessageEvent referenceMsg = messageEventRepository.findOneByMessageURI(msgURI);
         Date referenceDate = referenceMsg.getCreationDate();
         int pageSize = getPageSize(preferredPageSize);
-        Slice<MessageEventPlaceholder> slice = null;
+        Slice<MessageEvent> slice = null;
         if (msgType == null) {
             slice = messageEventRepository.findByParentURIAfter(connectionUri, referenceDate,
                             new PageRequest(0, pageSize, Sort.Direction.ASC, "creationDate"));
@@ -388,10 +388,10 @@ public class AtomInformationServiceImpl implements AtomInformationService {
     }
 
     @Override
-    public Slice<MessageEventPlaceholder> listConnectionEventsBefore(final URI connectionUri, final URI msgURI,
+    public Slice<MessageEvent> listConnectionEventsBefore(final URI connectionUri, final URI msgURI,
                     final Integer preferredPageSize, final WonMessageType msgType) {
         int pageSize = getPageSize(preferredPageSize);
-        Slice<MessageEventPlaceholder> slice = null;
+        Slice<MessageEvent> slice = null;
         if (msgType == null) {
             slice = messageEventRepository.findByParentURIBeforeFetchDatasetEagerly(connectionUri, msgURI,
                             new PageRequest(0, pageSize, Sort.Direction.DESC, "creationDate"));

@@ -20,11 +20,11 @@ import java.util.Objects;
                                 @UniqueConstraint(name = "IDX_ME_UNIQUE_MESSAGE_URI", columnNames = "messageURI"),
                                 @UniqueConstraint(name = "IDX_ME_UNIQUE_CORREXPONDING_REMOTE_MESSAGE_URI", columnNames = "correspondingRemoteMessageURI"),
                                 @UniqueConstraint(name = "IDX_ME_UNIQUE_DATASETHOLDER_ID", columnNames = "datasetholder_id") })
-public class MessageEventPlaceholder implements ParentAware<MessageContainer> {
-    public MessageEventPlaceholder() {
+public class MessageEvent implements ParentAware<MessageContainer> {
+    public MessageEvent() {
     }
 
-    public MessageEventPlaceholder(URI parentURI, WonMessage wonMessage, MessageContainer messageContainer) {
+    public MessageEvent(URI parentURI, WonMessage wonMessage, MessageContainer messageContainer) {
         this.parentURI = parentURI;
         this.messageURI = wonMessage.getMessageURI();
         this.messageType = wonMessage.getMessageType();
@@ -249,9 +249,9 @@ public class MessageEventPlaceholder implements ParentAware<MessageContainer> {
     public boolean equals(final Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof MessageEventPlaceholder))
+        if (!(o instanceof MessageEvent))
             return false;
-        final MessageEventPlaceholder that = (MessageEventPlaceholder) o;
+        final MessageEvent that = (MessageEvent) o;
         if (!Objects.equals(messageType, that.messageType))
             return false;
         if (!Objects.equals(messageURI, that.messageURI))

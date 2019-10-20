@@ -25,7 +25,7 @@ public class SuccessResponseFromExternalProcessor extends AbstractCamelProcessor
         WonMessageType responseToType = responseMessage.getIsResponseToMessageType();
         // only process successResponse of connect message
         if (WonMessageType.CONNECT.equals(responseToType)) {
-            MessageEventPlaceholder mep = this.messageEventRepository
+            MessageEvent mep = this.messageEventRepository
                             .findOneByCorrespondingRemoteMessageURI(responseMessage.getIsResponseToMessageURI());
             // update the connection database: set the remote connection URI just obtained
             // from the response
