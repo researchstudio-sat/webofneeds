@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import won.node.service.impl.DataAccessServiceImpl;
+import won.node.service.persistence.DataAccessService;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForAtomStateException;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
@@ -34,9 +34,9 @@ import won.protocol.vocabulary.WON;
  */
 public abstract class AbstractBASocket implements SocketLogic {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    protected won.node.service.impl.URIService URIService;
+    protected won.node.service.nodeconfig.URIService URIService;
     protected ExecutorService executorService;
-    protected DataAccessServiceImpl dataService;
+    protected DataAccessService dataService;
     @Autowired
     protected DatasetHolderRepository datasetHolderRepository;
 
@@ -380,7 +380,7 @@ public abstract class AbstractBASocket implements SocketLogic {
         return AtomState.ACTIVE == atom.getState();
     }
 
-    public void setDataService(DataAccessServiceImpl dataService) {
+    public void setDataService(DataAccessService dataService) {
         this.dataService = dataService;
     }
 
@@ -388,7 +388,7 @@ public abstract class AbstractBASocket implements SocketLogic {
         this.executorService = executorService;
     }
 
-    public void setURIService(won.node.service.impl.URIService URIService) {
+    public void setURIService(won.node.service.nodeconfig.URIService URIService) {
         this.URIService = URIService;
     }
 }

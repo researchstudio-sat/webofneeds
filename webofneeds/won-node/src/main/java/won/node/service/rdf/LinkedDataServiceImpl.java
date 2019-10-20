@@ -8,7 +8,7 @@
  * KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package won.node.service.impl;
+package won.node.service.rdf;
 
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
@@ -38,10 +38,12 @@ import org.springframework.context.NoSuchMessageException;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.cryptography.service.CryptographyService;
+import won.node.service.nodeconfig.URIService;
 import won.protocol.exception.NoSuchAtomException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessageType;
@@ -74,6 +76,7 @@ import won.protocol.vocabulary.WON;
  * https://dvcs.w3.org/hg/ldpwg/raw-file/default/ldp-paging.html, especially for
  * sorting
  */
+@Component
 public class LinkedDataServiceImpl implements LinkedDataService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     // prefix of an atom resource

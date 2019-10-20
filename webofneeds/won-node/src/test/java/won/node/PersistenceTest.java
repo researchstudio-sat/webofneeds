@@ -1,8 +1,17 @@
 package won.node;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Date;
 
+import javax.transaction.Transactional;
+
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.query.ReadWrite;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +20,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import won.node.service.persistence.AtomService;
+import won.node.service.persistence.MessageService;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Atom;
 import won.protocol.model.AtomMessageContainer;
 import won.protocol.model.AtomState;
@@ -22,11 +34,16 @@ import won.protocol.repository.AtomRepository;
                 "classpath:/spring/component/storage/jpabased-rdf-storage.xml" })
 @TestPropertySource
 @RunWith(SpringJUnit4ClassRunner.class)
+@Transactional
 public class PersistenceTest {
     @Autowired
     AtomRepository atomRepository;
     @Autowired
     AtomMessageContainerRepository atomMessageContainerRepository;
+    @Autowired
+    AtomService atomService;
+    @Autowired
+    MessageService messageService;
 
     @Test(expected = DataIntegrityViolationException.class)
     public void test_Atom_missing_message_container() {
@@ -61,5 +78,23 @@ public class PersistenceTest {
         mc.setParentUri(atomUri);
         atom.setMessageContainer(mc);
         atomRepository.save(atom);
+    }
+
+    @Test
+    public void test_create_Atom_from_message() throws Exception {
+        Dataset ds = createTestDataset("/won/node/test-messages/create-atom.trig");
+        WonMessage msg = new WonMessage(ds);
+        Atom atom = atomService.createAtom(msg);
+        messageService.saveMessage(msg, atom.getAtomURI());
+    }
+
+    private Dataset createTestDataset(String resourceName) throws IOException {
+        InputStream is = this.getClass().getResourceAsStream(resourceName);
+        Dataset dataset = DatasetFactory.createGeneral();
+        dataset.begin(ReadWrite.WRITE);
+        RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
+        is.close();
+        dataset.commit();
+        return dataset;
     }
 }

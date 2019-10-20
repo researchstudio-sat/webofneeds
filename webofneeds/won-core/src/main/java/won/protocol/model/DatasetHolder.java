@@ -10,6 +10,24 @@
  */
 package won.protocol.model;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Objects;
+
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.riot.Lang;
@@ -17,13 +35,6 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RiotException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.persistence.*;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
 
 /**
  * Encapsulates a jena dataset for storing it in a relational db.
@@ -106,8 +117,8 @@ public class DatasetHolder {
      * @param dataset
      */
     public void setDataset(Dataset dataset) {
-        assert this.uri != null : "uri must not be null";
-        assert this.datasetBytes != null : "model must not be null";
+        Objects.requireNonNull(this.uri);
+        Objects.requireNonNull(dataset);
         ByteArrayOutputStream out = new ByteArrayOutputStream(DEFAULT_BYTE_ARRAY_SIZE);
         synchronized (this) {
             RDFDataMgr.write(out, dataset, Lang.NQUADS);
@@ -125,8 +136,8 @@ public class DatasetHolder {
      * @return
      */
     public Dataset getDataset() {
-        assert this.uri != null : "uri must not be null";
-        assert this.datasetBytes != null : "model must not be null";
+        Objects.requireNonNull(this.uri);
+        Objects.requireNonNull(this.datasetBytes);
         if (this.cachedDataset != null)
             return cachedDataset;
         synchronized (this) {

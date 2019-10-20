@@ -8,13 +8,14 @@
  * KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package won.node.service.impl;
+package won.node.service.nodeconfig;
 
 import java.net.URI;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.stereotype.Component;
 
 import won.protocol.model.Atom;
 import won.protocol.model.Connection;
@@ -23,6 +24,7 @@ import won.protocol.util.WonMessageUriHelper;
 /**
  * User: fkleedorfer Date: 06.11.12
  */
+@Component
 public class URIService implements InitializingBean {
     // prefix of any URI
     private String generalURIPrefix;

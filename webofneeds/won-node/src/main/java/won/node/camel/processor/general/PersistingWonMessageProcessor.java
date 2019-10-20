@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import won.node.service.impl.DataAccessServiceImpl;
+import won.node.service.persistence.MessageService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageUtils;
 import won.protocol.message.processor.WonMessageProcessor;
@@ -29,15 +29,15 @@ import won.protocol.message.processor.exception.WonMessageProcessingException;
 public class PersistingWonMessageProcessor implements WonMessageProcessor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
-    DataAccessServiceImpl dataAccessService;
+    MessageService messageService;
 
     @Override
     // we use READ_COMMITTED because we want to wait for an exclusive lock will
     // accept data written by a concurrent transaction that commits before we read
     public WonMessage process(WonMessage message) throws WonMessageProcessingException {
         URI parentURI = WonMessageUtils.getParentEntityUri(message);
-        dataAccessService.updateResponseInfo(message);
-        dataAccessService.saveMessage(message, parentURI);
+        messageService.updateResponseInfo(message);
+        messageService.saveMessage(message, parentURI);
         return message;
     }
 }

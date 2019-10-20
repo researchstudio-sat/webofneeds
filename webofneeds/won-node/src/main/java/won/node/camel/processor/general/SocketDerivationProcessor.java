@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.node.protocol.impl.MatcherProtocolMatcherClientImpl;
-import won.node.socket.ConnectionStateChange;
-import won.node.socket.SocketService;
+import won.node.service.nodebehaviour.ConnectionStateChange;
+import won.node.service.nodebehaviour.SocketService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;

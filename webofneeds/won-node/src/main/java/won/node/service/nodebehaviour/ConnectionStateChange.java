@@ -1,4 +1,4 @@
-package won.node.socket;
+package won.node.service.nodebehaviour;
 
 import java.util.Objects;
 import java.util.Optional;

@@ -22,7 +22,8 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.stereotype.Component;
-import won.node.service.impl.AtomManagementService;
+
+import won.node.service.nodebehaviour.AtomManagementService;
 import won.protocol.model.Atom;
 import won.protocol.repository.AtomRepository;
 

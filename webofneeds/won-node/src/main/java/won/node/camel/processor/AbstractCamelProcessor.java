@@ -28,8 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import won.cryptography.service.RandomNumberService;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
-import won.node.service.impl.DataAccessServiceImpl;
-import won.node.socket.SocketService;
+import won.node.service.nodebehaviour.SocketService;
+import won.node.service.persistence.AtomService;
+import won.node.service.persistence.DataAccessService;
 import won.protocol.exception.IncompatibleSocketsException;
 import won.protocol.exception.SocketCapacityException;
 import won.protocol.jms.MessagingService;
@@ -60,7 +61,7 @@ public abstract class AbstractCamelProcessor implements Processor {
     @Autowired
     protected MessagingService messagingService;
     @Autowired
-    protected DataAccessServiceImpl dataService;
+    protected DataAccessService dataService;
     @Autowired
     protected DatasetHolderRepository datasetHolderRepository;
     @Autowired
@@ -93,6 +94,8 @@ public abstract class AbstractCamelProcessor implements Processor {
     protected ExecutorService executorService;
     @Autowired
     protected SocketService socketService;
+    @Autowired
+    protected AtomService atomService;
 
     protected void sendMessageToOwner(WonMessage message, URI atomURI, String fallbackOwnerApplicationId) {
         Atom atom = atomRepository.findOneByAtomURI(atomURI);

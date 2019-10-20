@@ -3,7 +3,7 @@ package won.node.camel.processor.general;
 import java.util.Objects;
 import java.util.Optional;
 
-import won.node.socket.ConnectionStateChange;
+import won.node.service.nodebehaviour.ConnectionStateChange;
 import won.protocol.model.ConnectionState;
 
 /**

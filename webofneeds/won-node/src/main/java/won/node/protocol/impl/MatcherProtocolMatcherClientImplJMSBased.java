@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
-import won.node.service.impl.URIService;
+import won.node.service.nodeconfig.URIService;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;

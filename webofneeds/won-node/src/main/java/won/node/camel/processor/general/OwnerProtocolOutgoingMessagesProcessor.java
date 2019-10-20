@@ -22,11 +22,11 @@ import org.apache.jena.riot.Lang;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import won.node.service.persistence.OwnerManagementService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.OwnerApplication;
 import won.protocol.repository.OwnerApplicationRepository;
-import won.protocol.service.QueueManagementService;
 import won.protocol.util.RdfUtils;
 
 /**
@@ -34,7 +34,8 @@ import won.protocol.util.RdfUtils;
  */
 public class OwnerProtocolOutgoingMessagesProcessor implements Processor {
     private final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
-    private QueueManagementService queueManagementService;
+    @Autowired
+    private OwnerManagementService ownerManagementService;
     @Autowired
     private OwnerApplicationRepository ownerApplicationRepository;
 
@@ -63,17 +64,9 @@ public class OwnerProtocolOutgoingMessagesProcessor implements Processor {
             OwnerApplication ownerApplication = ownerApplicationRepository
                             .findByOwnerApplicationId(ownerApplications.get(i)).get(i);
             logger.debug("ownerApplicationID: " + ownerApplications.get(i));
-            ownerApplicationQueueNames.add(i, queueManagementService.getEndpointForMessage(methodName,
+            ownerApplicationQueueNames.add(i, ownerManagementService.getEndpointForMessage(methodName,
                             ownerApplication.getOwnerApplicationId()));
         }
         return ownerApplicationQueueNames;
-    }
-
-    public void setQueueManagementService(QueueManagementService queueManagementService) {
-        this.queueManagementService = queueManagementService;
-    }
-
-    public void setOwnerApplicationRepository(OwnerApplicationRepository ownerApplicationRepository) {
-        this.ownerApplicationRepository = ownerApplicationRepository;
     }
 }

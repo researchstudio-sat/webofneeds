@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
 import won.node.camel.processor.general.ConnectionStateChangeBuilder;
-import won.node.socket.ConnectionStateChange;
+import won.node.service.nodebehaviour.ConnectionStateChange;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;

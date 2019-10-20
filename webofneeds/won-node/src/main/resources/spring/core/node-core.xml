@@ -15,8 +15,12 @@
   ~ limitations under the License.
   -->
 
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans         http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
+<beans 
+	xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd">
 
     <!--import resource="classpath:/spring/component/security/key-services.xml" /-->
 
@@ -26,7 +30,7 @@
         <context:include-filter type="regex" expression="won.protocol.rest.*"/>
     </context:component-scan-->
 
-    <bean id="uriService" class="won.node.service.impl.URIService">
+    <bean id="uriService" class="won.node.service.nodeconfig.URIService">
         <property name="resourceURIPrefix" value="${uri.prefix.resource}" />
         <property name="dataURIPrefix" value="${uri.prefix.data}" />
         <property name="connectionResourceURIPrefix" value="${uri.prefix.connection}" />
@@ -45,7 +49,7 @@
     
     <bean id="unreadInformationService" class="won.protocol.service.impl.UnreadInformationService" />
 
-    <bean id="linkedDataService" class="won.node.service.impl.LinkedDataServiceImpl">
+    <bean id="linkedDataService" class="won.node.service.rdf.LinkedDataServiceImpl">
         <property name="atomInformationService" ref="atomInformationService" />
         <property name="resourceURIPrefix" value="${uri.prefix.resource}" />
         <property name="connectionResourceURIPrefix" value="${uri.prefix.connection}" />
@@ -66,41 +70,26 @@
         <property name="uriService" ref="uriService" />
     </bean>
 
-    <bean id="queueManagementService" class="won.node.service.impl.QueueManagementServiceImpl"/>
 
     <bean id="messagingService" class="won.protocol.jms.MessagingServiceImpl">
         <property name="producerTemplate" ref="producerTemplate"/>
     </bean>
-
-    <!--bean id="QueueManagementService" class="won.node.service.impl.QueueManagementServiceImpl"/-->
+	
+	<context:component-scan base-package="won.node.service.persistence" />
+	
 
     <!--- DataAccessService -->
-    <bean id="dataServiceRef" class="won.node.service.impl.DataAccessServiceImpl" depends-on="linkedDataService"/>
+    <bean id="dataAccessService" class="won.node.service.persistence.DataAccessService" depends-on="linkedDataService"/>
 
 
-    <bean id="atomInformationService" class="won.node.service.impl.AtomInformationServiceImpl">
+    <bean id="atomInformationService" class="won.node.service.persistence.AtomInformationServiceImpl">
         <property name="pageSize" value="${linkeddata.pagesize}" />
     </bean>
 
-    <bean id="ownerManagementService" class="won.node.service.impl.OwnerManagementServiceImpl"/>
+    <bean id="ownerManagementService" class="won.node.service.persistence.OwnerManagementService"/>
     
     
-    <bean id="socketService" class="won.node.socket.SocketService" />
-    <!--
-    <bean id="keyStoreService" class="won.cryptography.service.keystore.FileBasedKeyStoreService" init-method="init">
-        <constructor-arg type="java.lang.String" value="${keystore.location}" />
-    </bean>
-    <bean id="trustStoreService" class="won.cryptography.service.TrustStoreService" init-method="init">
-        <constructor-arg type="java.lang.String" value="${truststore.location}" />
-    </bean>
+    <bean id="socketService" class="won.node.service.nodebehaviour.SocketService" />
 
-    <bean id="cryptoService" class="won.cryptography.service.CryptographyService">
-        <constructor-arg ref="keyStoreService" />
-    </bean>
-
-    <bean id="nodeCertificateOnStartupCreator"
-          class="won.node.service.impl.NodeCertificateOnStartupCreator"
-          autowire="byType"/>
--->
 
 </beans>

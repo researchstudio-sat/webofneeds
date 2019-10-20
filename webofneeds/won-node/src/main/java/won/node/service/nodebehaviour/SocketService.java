@@ -1,4 +1,4 @@
-package won.node.socket;
+package won.node.service.nodebehaviour;
 
 import java.net.URI;
 import java.util.HashMap;

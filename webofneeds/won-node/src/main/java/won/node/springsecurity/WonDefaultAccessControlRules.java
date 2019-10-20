@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import won.cryptography.webid.AccessControlRules;
-import won.node.service.impl.URIService;
+import won.node.service.nodeconfig.URIService;
 import won.protocol.repository.AtomMessageContainerRepository;
 import won.protocol.repository.ConnectionMessageContainerRepository;
 import won.protocol.repository.MessageEventRepository;

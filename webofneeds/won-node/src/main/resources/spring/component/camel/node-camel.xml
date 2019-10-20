@@ -71,9 +71,9 @@
 	<bean id="atomProtocolCommunicationService" class="won.node.camel.AtomProtocolCommunicationServiceImpl">
 		<property name="registrationClient" ref="registrationClient" />
 	</bean>
-	<bean id="ownerProtocolOutgoingMessagesProcessor" class="won.node.camel.processor.general.OwnerProtocolOutgoingMessagesProcessor">
-		<property name="queueManagementService" ref="queueManagementService"/>
-	</bean>
+
+	<bean id="ownerProtocolOutgoingMessagesProcessor" class="won.node.camel.processor.general.OwnerProtocolOutgoingMessagesProcessor" />
+
 	<bean name="atomProtocolCamelConfigurator" class="won.node.camel.AtomProtocolCamelConfiguratorImpl">
 		<property name="componentName" value="activemq"/>
 		<property name="messagingContext" ref="messagingContext"/>

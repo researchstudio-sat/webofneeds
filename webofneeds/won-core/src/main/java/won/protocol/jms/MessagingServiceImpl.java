@@ -1,8 +1,15 @@
 package won.protocol.jms;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.SettableFuture;
-import org.apache.camel.*;
+import java.lang.invoke.MethodHandles;
+import java.util.Iterator;
+import java.util.Map;
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.CamelContextAware;
+import org.apache.camel.Endpoint;
+import org.apache.camel.Exchange;
+import org.apache.camel.ExchangePattern;
+import org.apache.camel.ProducerTemplate;
 import org.apache.camel.impl.DefaultExchange;
 import org.apache.camel.spi.Synchronization;
 import org.slf4j.Logger;
@@ -10,14 +17,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 
-import java.lang.invoke.MethodHandles;
-import java.util.Iterator;
-import java.util.Map;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
 
 /**
  * User: LEIH-NB Date: 04.11.13
  */
+@Component
 public class MessagingServiceImpl<T> implements ApplicationContextAware, MessagingService, CamelContextAware {
     private static final long DEFAULT_JMS_EXPIRATION_TIME = 0;
     private CamelContext camelContext;
