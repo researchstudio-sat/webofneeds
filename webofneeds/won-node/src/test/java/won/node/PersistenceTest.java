@@ -1,11 +1,11 @@
 package won.node;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Date;
-
-import javax.transaction.Transactional;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -16,13 +16,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import won.node.service.persistence.AtomService;
 import won.node.service.persistence.MessageService;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
 import won.protocol.model.Atom;
 import won.protocol.model.AtomMessageContainer;
 import won.protocol.model.AtomState;
@@ -44,6 +47,8 @@ public class PersistenceTest {
     AtomService atomService;
     @Autowired
     MessageService messageService;
+    @Autowired
+    JpaTransactionManager txManager;
 
     @Test(expected = DataIntegrityViolationException.class)
     public void test_Atom_missing_message_container() {
@@ -85,7 +90,14 @@ public class PersistenceTest {
         Dataset ds = createTestDataset("/won/node/test-messages/create-atom.trig");
         WonMessage msg = new WonMessage(ds);
         Atom atom = atomService.createAtom(msg);
+        URI atomURI = atom.getAtomURI();
         messageService.saveMessage(msg, atom.getAtomURI());
+        URI newMessageURI = URI.create("uri:successResponse");
+        WonMessage responseMessage = WonMessageBuilder
+                        .setPropertiesForNodeResponse(msg, true, newMessageURI).build();
+        messageService.saveMessage(responseMessage, atom.getAtomURI());
+        Atom atom2 = atomRepository.findOneByAtomURI(atomURI);
+        assertEquals(2, atom2.getMessageContainer().getEvents().size());
     }
 
     private Dataset createTestDataset(String resourceName) throws IOException {

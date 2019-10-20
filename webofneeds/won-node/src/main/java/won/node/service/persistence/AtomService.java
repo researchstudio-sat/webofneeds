@@ -19,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
@@ -53,6 +55,7 @@ public class AtomService {
     @Autowired
     OwnerApplicationRepository ownerApplicationRepository;
 
+    @Transactional(propagation = Propagation.MANDATORY)
     public Atom createAtom(final WonMessage wonMessage) {
         Dataset atomContent = wonMessage.getMessageContent();
         List<WonMessage.AttachmentHolder> attachmentHolders = wonMessage.getAttachments();
@@ -128,6 +131,7 @@ public class AtomService {
         }
     }
 
+    @Transactional(propagation = Propagation.MANDATORY)
     public void authorizeOwnerApplicationForAtom(final Message message, final Atom atom) {
         String ownerApplicationID = message.getHeader(WonCamelConstants.OWNER_APPLICATION_ID).toString();
         authorizeOwnerApplicationForAtom(ownerApplicationID, atom);

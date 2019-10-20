@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
@@ -42,6 +44,8 @@ public class MessageService {
      * 
      * @param message response message
      */
+    @Transactional(propagation = Propagation.MANDATORY)
+    // TODO: we should be able to remove this method after the message refactoring
     public void updateResponseInfo(final WonMessage message) {
         // find a message it responds to
         URI originalMessageURI = message.getIsResponseToMessageURI();
@@ -61,6 +65,7 @@ public class MessageService {
         }
     }
 
+    @Transactional(propagation = Propagation.MANDATORY)
     public void saveMessage(final WonMessage wonMessage, URI parent) {
         logger.debug("STORING message with uri {} and parent uri", wonMessage.getMessageURI(), parent);
         MessageContainer container = loadOrCreateMessageContainer(parent, wonMessage.getMessageType());
@@ -68,9 +73,11 @@ public class MessageService {
                         WonMessageEncoder.encodeAsDataset(wonMessage));
         MessageEvent event = new MessageEvent(parent, wonMessage, container);
         event.setDatasetHolder(datasetHolder);
+        container.getEvents().add(event);
         messageEventRepository.save(event);
     }
 
+    @Transactional(propagation = Propagation.MANDATORY)
     public MessageContainer loadOrCreateMessageContainer(final URI parent, final WonMessageType messageType) {
         if (WonMessageType.CREATE_ATOM.equals(messageType)) {
             // create an atom event container with null parent (because it will only be
@@ -80,7 +87,7 @@ public class MessageService {
                 return container;
             AtomMessageContainer nec = new AtomMessageContainer(null, parent);
             atomMessageContainerRepository.saveAndFlush(nec);
-            return nec;
+            return atomMessageContainerRepository.findOne(nec.getId());
         } else if (WonMessageType.CONNECT.equals(messageType)
                         || WonMessageType.SOCKET_HINT_MESSAGE.equals(messageType)) {
             // create a connection event container witn null parent (because it will only be
@@ -91,7 +98,7 @@ public class MessageService {
                 return container;
             ConnectionMessageContainer cec = new ConnectionMessageContainer(null, parent);
             connectionMessageContainerRepository.saveAndFlush(cec);
-            return cec;
+            return connectionMessageContainerRepository.findOne(cec.getId());
         }
         MessageContainer container = atomMessageContainerRepository.findOneByParentUriForUpdate(parent);
         if (container != null)
