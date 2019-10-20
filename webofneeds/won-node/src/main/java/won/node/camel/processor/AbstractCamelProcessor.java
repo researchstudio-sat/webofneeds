@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import won.cryptography.service.RandomNumberService;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
-import won.node.service.DataAccessService;
+import won.node.service.impl.DataAccessServiceImpl;
 import won.node.socket.SocketService;
 import won.protocol.exception.IncompatibleSocketsException;
 import won.protocol.exception.SocketCapacityException;
@@ -60,7 +60,7 @@ public abstract class AbstractCamelProcessor implements Processor {
     @Autowired
     protected MessagingService messagingService;
     @Autowired
-    protected DataAccessService dataService;
+    protected DataAccessServiceImpl dataService;
     @Autowired
     protected DatasetHolderRepository datasetHolderRepository;
     @Autowired

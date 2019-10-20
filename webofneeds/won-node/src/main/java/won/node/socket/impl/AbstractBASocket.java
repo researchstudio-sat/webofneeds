@@ -1,5 +1,10 @@
 package won.node.socket.impl;
 
+import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.concurrent.ExecutorService;
+
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
@@ -9,8 +14,13 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.node.service.DataAccessService;
-import won.protocol.exception.*;
+
+import won.node.service.impl.DataAccessServiceImpl;
+import won.protocol.exception.ConnectionAlreadyExistsException;
+import won.protocol.exception.IllegalMessageForAtomStateException;
+import won.protocol.exception.IllegalMessageForConnectionStateException;
+import won.protocol.exception.NoSuchAtomException;
+import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Atom;
 import won.protocol.model.AtomState;
@@ -19,11 +29,6 @@ import won.protocol.repository.DatasetHolderRepository;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
-import java.io.StringWriter;
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.concurrent.ExecutorService;
-
 /**
  * User: Danijel Date: 4.6.14.
  */
@@ -31,7 +36,7 @@ public abstract class AbstractBASocket implements SocketLogic {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     protected won.node.service.impl.URIService URIService;
     protected ExecutorService executorService;
-    protected DataAccessService dataService;
+    protected DataAccessServiceImpl dataService;
     @Autowired
     protected DatasetHolderRepository datasetHolderRepository;
 
@@ -375,7 +380,7 @@ public abstract class AbstractBASocket implements SocketLogic {
         return AtomState.ACTIVE == atom.getState();
     }
 
-    public void setDataService(DataAccessService dataService) {
+    public void setDataService(DataAccessServiceImpl dataService) {
         this.dataService = dataService;
     }
 
