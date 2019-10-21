@@ -88,7 +88,7 @@ public class ConnectionService {
             if (con.get().getTargetSocketURI() == null) {
                 con.get().setTargetSocketURI(
                                 userDefinedTargetSocketURI
-                                                .orElse(socketService
+                                                .orElseGet(() -> socketService
                                                                 .lookupDefaultSocket(recipientAtomURI)
                                                                 .orElseThrow(() -> new IllegalStateException(
                                                                                 "No default socket found for atom "
@@ -108,7 +108,7 @@ public class ConnectionService {
             Socket actualSocket = socketService.getSocket(senderAtomURI, userDefinedSocketURI);
             Optional<URI> actualSocketURI = Optional.of(actualSocket.getSocketURI());
             Optional<URI> actualTargetSocketURI = Optional
-                            .of(userDefinedTargetSocketURI.orElse(socketService
+                            .of(userDefinedTargetSocketURI.orElseGet(() -> socketService
                                             .lookupDefaultSocket(recipientAtomURI)
                                             .orElseThrow(() -> new IllegalStateException(
                                                             "No default socket found for atom "
@@ -289,6 +289,8 @@ public class ConnectionService {
             // lock the connection table by socketURI to avoid a race condition
             connectionRepository.countBySocketUriForUpdate(socketURI);
             if (connectionRepository.countBySocketURIAndState(socketURI, ConnectionState.CONNECTED) >= capacity.get()) {
+                throw new SocketCapacityException(
+                                "Connect would exceed socket " + socketURI + " capacity of " + capacity.get());
             }
         }
     }

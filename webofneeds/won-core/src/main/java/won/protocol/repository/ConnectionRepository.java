@@ -70,7 +70,7 @@ public interface ConnectionRepository extends WonRepository<Connection> {
      */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select count (*) from Connection con where socketURI = :socketUri")
-    long countBySocketUriForUpdate(URI socketURI);
+    long countBySocketUriForUpdate(@Param("socketUri") URI socketURI);
 
     long countByAtomURIAndState(URI atomURI, ConnectionState connectionState);
 
