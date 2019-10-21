@@ -58,16 +58,17 @@ export default function WonFileDropzone(props) {
           </svg>
           {isDragActive ? (
             <p className="wfd__dropzone__label">
-              {" "}
-              Drop the file
-              {props.multiSelect ? "s" : ""} here... {props.accepts}
+              {"Drop the file" +
+                (props.multiSelect ? "s" : "") +
+                " here..." +
+                props.accepts}
             </p>
           ) : (
             <p className="wfd__dropzone__label">
-              {" "}
-              Drag some file
-              {props.multiSelect ? "s" : ""} here, or click to select
-              {" " + (props.multiSelect ? "files" : "a file")}
+              {"Drag some file" +
+                (props.multiSelect ? "s" : "") +
+                " here, or click to select " +
+                (props.multiSelect ? "files" : "a file")}
             </p>
           )}
         </React.Fragment>
