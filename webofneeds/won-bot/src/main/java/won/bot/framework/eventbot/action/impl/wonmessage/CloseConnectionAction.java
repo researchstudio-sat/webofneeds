@@ -46,7 +46,7 @@ public class CloseConnectionAction extends BaseEventBotAction {
             ConnectionSpecificEvent connectionSpecificEvent = (ConnectionSpecificEvent) event;
             logger.debug("trying to close connection related to event {}", connectionSpecificEvent);
             try {
-                URI connectionURI = null;
+                URI connectionURI;
                 connectionURI = connectionSpecificEvent.getConnectionURI();
                 logger.debug("Extracted connection uri {}", connectionURI);
                 if (connectionURI != null) {

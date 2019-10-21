@@ -29,8 +29,26 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
  * Created by fkleedorfer on 10.06.2016.
+ * 
+ * @deprecated will be removed as early as version 0.7, does not serve a purpose
+ * once the methods are removed
  */
+@Deprecated
 public class BotActionUtils {
+    /**
+     * Creates a connectionMessage for the given connectionURI with the message
+     * parameter as text
+     * 
+     * @param context EventListenerContext
+     * @param connectionURI in which the message that is created going to be sent in
+     * @param message textMessage
+     * @return createdWonMessage
+     * @throws WonMessageBuilderException if message could not be built
+     * @deprecated will be removed as early as version 0.7, does not have a clear
+     * method name and Class might get removed altogether in favor of a better
+     * solution
+     */
+    @Deprecated
     public static WonMessage createWonMessage(final EventListenerContext context, final URI connectionURI,
                     final String message) throws WonMessageBuilderException {
         WonNodeInformationService wonNodeInformationService = context.getWonNodeInformationService();
@@ -53,9 +71,13 @@ public class BotActionUtils {
      * Retrieves the recipient atom URI for either AtomHintFromMatcherEvent or
      * SocketHintFromMatcherEvent.
      * 
-     * @param event
-     * @return
+     * @param event to retrieve targetAtomURI Optional from
+     * @return Optional that might contain the targetAtomURI
+     * @deprecated will be removed as early as version 0.7, use
+     * {@link won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent#getTargetAtomURI()
+     * event.getTargetAtomURI()} instead
      */
+    @Deprecated
     public static Optional<URI> getTargetAtomURIFromHintEvent(Event event, LinkedDataSource linkedDataSource) {
         if (event instanceof AtomHintFromMatcherEvent) {
             return Optional.of(((AtomHintFromMatcherEvent) event).getHintTargetAtom());
@@ -71,9 +93,13 @@ public class BotActionUtils {
      * Retrieves the recipient atom URI for either AtomHintFromMatcherEvent or
      * SocketHintFromMatcherEvent.
      * 
-     * @param event
-     * @return
+     * @param event to retrieve recipientAtomURI Optional from
+     * @return Optional that might contain the recipientAtomURI
+     * @deprecated will be removed as early as version 0.7, use
+     * {@link won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent#getRecipientAtomURI()
+     * event.getRecipientAtomURI()} instead
      */
+    @Deprecated
     public static Optional<URI> getRecipientAtomURIFromHintEvent(Event event, LinkedDataSource linkedDataSource) {
         if (event instanceof AtomHintFromMatcherEvent) {
             return Optional.of(((AtomHintFromMatcherEvent) event).getRecipientAtom());

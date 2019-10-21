@@ -49,7 +49,7 @@ public abstract class AbstractCompositeAtomProducer implements AtomProducer {
     }
 
     private AtomProducer selectNonExhaustedAtomFactory() {
-        AtomProducer delegate = null;
+        AtomProducer delegate;
         // keep fetching delegates, and remove them from the list if they are exhausted
         while ((delegate = selectActiveAtomFactory()) != null && delegate.isExhausted()) {
             // here we have a non-null delegate that is exhausted. Remove it

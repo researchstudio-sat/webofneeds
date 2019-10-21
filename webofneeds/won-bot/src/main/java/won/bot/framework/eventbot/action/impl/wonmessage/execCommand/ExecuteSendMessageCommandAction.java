@@ -43,7 +43,7 @@ import java.lang.invoke.MethodHandles;
  */
 public abstract class ExecuteSendMessageCommandAction<T extends MessageCommandEvent> extends BaseEventBotAction {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private boolean messageIsSentToRemoteNode = true;
+    private boolean messageIsSentToRemoteNode;
 
     protected ExecuteSendMessageCommandAction(EventListenerContext eventListenerContext,
                     boolean messageIsSentToRemoteNode) {

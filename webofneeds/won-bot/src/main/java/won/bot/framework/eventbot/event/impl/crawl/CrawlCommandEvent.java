@@ -25,8 +25,8 @@ import won.bot.framework.eventbot.event.impl.cmd.CommandEvent;
 public class CrawlCommandEvent extends BaseAtomSpecificEvent implements CommandEvent {
     private List<Path> propertyPaths;
     private URI startURI;
-    private int getMaxRequest = 1000;
-    private int maxDepth = 5;
+    private int getMaxRequest;
+    private int maxDepth;
 
     public CrawlCommandEvent(URI atomURI, URI startURI, List<Path> propertyPaths, int getMaxRequest, int maxDepth) {
         super(atomURI);

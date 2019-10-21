@@ -26,7 +26,7 @@ public class ServiceAtomModelWrapper extends DefaultAtomModelWrapper {
         // SET CONTENT OBJECT
         this.serviceAtomContent = serviceAtomContent;
         // SET RDF STRUCTURE
-        Resource atom = this.getAtomModel().createResource(atomUri.toString());
+        Resource atom = this.getAtomModel().createResource(atomUri);
         atom.addProperty(RDF.type, WXBOT.ServiceAtom);
         this.addSocket("#HolderSocket", WXHOLD.HolderSocketString);
         this.addSocket("#ChatSocket", WXCHAT.ChatSocketString);

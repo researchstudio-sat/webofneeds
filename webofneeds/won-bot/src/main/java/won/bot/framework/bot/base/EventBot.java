@@ -386,7 +386,7 @@ public abstract class EventBot extends ScheduledTriggerBot {
             delegate.sendWonMessage(message);
             // publish the WonMessageSent event if no exception was raised
             WonMessageType type = message.getMessageType();
-            Event event = null;
+            Event event;
             // if the event is connection specific, raise a more specialized event
             switch (type) {
                 case CLOSE:

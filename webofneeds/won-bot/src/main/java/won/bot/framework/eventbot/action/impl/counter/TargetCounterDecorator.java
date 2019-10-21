@@ -38,8 +38,8 @@ public class TargetCounterDecorator implements Counter {
 
     @Override
     public int increment() {
-        boolean publishEvent = false;
-        int cnt = 0;
+        boolean publishEvent;
+        int cnt;
         synchronized (this) {
             cnt = delegate.increment();
             publishEvent = checkCount(cnt);
@@ -52,8 +52,8 @@ public class TargetCounterDecorator implements Counter {
 
     @Override
     public int decrement() {
-        boolean publishEvent = false;
-        int cnt = 0;
+        boolean publishEvent;
+        int cnt;
         synchronized (this) {
             cnt = delegate.decrement();
             publishEvent = checkCount(cnt);

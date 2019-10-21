@@ -206,7 +206,7 @@ class PageOverview extends React.Component {
               )}
               {this.hasOtherAtoms() && (
                 <div className="owneroverview__usecases__usecase">
-                  {this.propswhatsNewUseCaseIdentifierArray && (
+                  {this.props.whatsNewUseCaseIdentifierArray && (
                     <div className="owneroverview__usecases__usecase__header">
                       <div className="owneroverview__usecases__usecase__header__title">
                         Other

@@ -30,7 +30,7 @@ public interface ServiceAtomExtension {
         } else {
             throw new IllegalStateException("Can't create Filter, ServiceAtomBehaviour is null");
         }
-    };
+    }
 
     /**
      * Initializes and returns a Filter that can be used to exclude Events that do

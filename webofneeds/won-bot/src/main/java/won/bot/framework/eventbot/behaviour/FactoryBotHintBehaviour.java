@@ -4,8 +4,7 @@ import java.util.Optional;
 
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.impl.factory.FactoryHintCheckAction;
-import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent;
-import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
+import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
 
 /**
  * FactoryBotHintBehaviour
@@ -21,7 +20,6 @@ public class FactoryBotHintBehaviour extends BotBehaviour {
 
     @Override
     protected void onActivate(Optional<Object> message) {
-        subscribeWithAutoCleanup(AtomHintFromMatcherEvent.class,
-                        new ActionOnEventListener(context, new FactoryHintCheckAction(context)));
+        subscribeWithAutoCleanup(HintFromMatcherEvent.class, new FactoryHintCheckAction(context));
     }
 }

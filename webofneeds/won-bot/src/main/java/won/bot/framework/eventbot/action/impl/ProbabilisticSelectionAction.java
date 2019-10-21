@@ -21,12 +21,16 @@ import won.bot.framework.eventbot.listener.EventListener;
 /**
  * Action that delegates to delegateA with probabilityA or to delegateB with
  * probability 1-probabilityA.
+ *
+ * @Deprecated will be removed as early as version 0.7, RandomSimulatorBot
+ * specific Action
  */
+@Deprecated
 public class ProbabilisticSelectionAction extends BaseEventBotAction {
     private double probabilityA;
     private EventBotAction delegateA;
     private EventBotAction delegateB;
-    private long salt = 0;
+    private long salt;
     private Random random;
 
     public ProbabilisticSelectionAction(final EventListenerContext eventListenerContext, final double probabilityA,
