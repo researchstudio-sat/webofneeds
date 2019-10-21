@@ -157,7 +157,10 @@ class AtomInfo extends React.Component {
               showPersonas={true}
               submitButtonLabel="Ask&#160;to&#160;Chat"
               onSubmit={({ value, selectedPersona }) =>
-                this.sendAdHocRequest(value, selectedPersona)
+                this.sendAdHocRequest(
+                  value,
+                  selectedPersona && selectedPersona.personaId
+                )
               }
             />
           )}
