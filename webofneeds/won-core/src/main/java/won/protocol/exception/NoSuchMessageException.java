@@ -10,27 +10,21 @@
  */
 package won.protocol.exception;
 
+import java.net.URI;
+import java.text.MessageFormat;
+
 /**
  * User: fkleedorfer Date: 02.11.12
  */
-public class WonProtocolException extends RuntimeException {
-    public WonProtocolException() {
-        super();
+public class NoSuchMessageException extends WonProtocolException {
+    private URI unknownAtomURI;
+
+    public URI getUnknownAtomURI() {
+        return unknownAtomURI;
     }
 
-    public WonProtocolException(final String message) {
-        super(message);
-    }
-
-    public WonProtocolException(final String message, final Throwable cause) {
-        super(message, cause);
-    }
-
-    public WonProtocolException(final Throwable cause) {
-        super(cause);
-    }
-
-    protected static String safeToString(Object o) {
-        return o == null ? "null" : o.toString();
+    public NoSuchMessageException(final URI unknownMessageURI) {
+        super(MessageFormat.format("No message with the URI {0} is known on this server.", unknownMessageURI));
+        this.unknownAtomURI = unknownMessageURI;
     }
 }

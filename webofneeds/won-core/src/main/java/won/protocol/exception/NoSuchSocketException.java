@@ -6,7 +6,7 @@ import java.text.MessageFormat;
 /**
  * User: LEIH-NB Date: 20.02.14
  */
-public class NoSuchSocketException extends Throwable {
+public class NoSuchSocketException extends RuntimeException {
     private URI unknownSocketURI;
 
     public URI getUnknownAtomURI() {
