@@ -25,11 +25,10 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
-import won.protocol.model.Connection;
-import won.protocol.model.ConnectionState;
 import won.protocol.model.Atom;
 import won.protocol.model.AtomState;
-import won.protocol.util.DataAccessUtils;
+import won.protocol.model.Connection;
+import won.protocol.model.ConnectionState;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -47,7 +46,7 @@ public class DeleteAtomMessageFromOwnerReactionProcessor extends AbstractCamelPr
         if (recipientAtomURI == null) {
             throw new WonMessageProcessingException("recipientAtomURI is not set");
         }
-        Atom atom = DataAccessUtils.loadAtom(atomRepository, recipientAtomURI);
+        Atom atom = atomService.getAtomRequired(recipientAtomURI);
         matcherProtocolMatcherClient.atomDeleted(atom.getAtomURI(), wonMessage);
         // Check if atom already in State DELETED
         if (atom.getState() == AtomState.DELETED) {

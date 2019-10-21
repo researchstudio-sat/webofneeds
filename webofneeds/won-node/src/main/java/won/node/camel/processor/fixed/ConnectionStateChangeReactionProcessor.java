@@ -55,7 +55,7 @@ public class ConnectionStateChangeReactionProcessor extends AbstractCamelProcess
         }
         if (conUri != null) {
             // found a connection. Put its URI in the header and load it
-            con = Optional.of(connectionRepository.findOneByConnectionURI(conUri));
+            con = connectionService.getConnection(conUri);
             if (!stateChangeBuilder.canBuild()) {
                 stateChangeBuilder.newState(con.get().getState());
             }
@@ -68,9 +68,9 @@ public class ConnectionStateChangeReactionProcessor extends AbstractCamelProcess
         if (stateChangeBuilder.canBuild()) {
             ConnectionStateChange connectionStateChange = stateChangeBuilder.build();
             if (!con.isPresent()) {
-                con = Optional.of(connectionRepository.findOneByConnectionURI(conUri));
+                con = connectionService.getConnection(conUri);
             }
-            Atom atom = atomRepository.findOneByAtomURI(con.get().getAtomURI());
+            Atom atom = atomService.getAtomRequired(con.get().getAtomURI());
             if (connectionStateChange.isConnect() || connectionStateChange.isDisconnect()) {
                 // trigger rematch
                 matcherProtocolMatcherClient.atomModified(atom.getAtomURI(), null);

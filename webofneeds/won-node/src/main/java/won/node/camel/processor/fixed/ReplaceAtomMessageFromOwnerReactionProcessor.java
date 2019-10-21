@@ -22,14 +22,10 @@ import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.WonMessageDirection;
-import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
+import won.protocol.model.Atom;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
-import won.protocol.model.Atom;
-import won.protocol.util.DataAccessUtils;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -47,7 +43,7 @@ public class ReplaceAtomMessageFromOwnerReactionProcessor extends AbstractCamelP
         if (atomURI == null)
             throw new IllegalArgumentException("senderAtomURI not found!");
         logger.debug("Reacting to atom replacement. AtomURI:{}", atomURI);
-        Atom atom = DataAccessUtils.loadAtom(atomRepository, atomURI);
+        Atom atom = atomService.getAtomRequired(atomURI);
         matcherProtocolMatcherClient.atomModified(atom.getAtomURI(), wonMessage);
         // notify all connections
         Collection<Connection> conns = connectionRepository.findByAtomURIAndState(atom.getAtomURI(),

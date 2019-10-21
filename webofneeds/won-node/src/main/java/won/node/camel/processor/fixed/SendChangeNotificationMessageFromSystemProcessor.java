@@ -34,15 +34,7 @@ public class SendChangeNotificationMessageFromSystemProcessor extends AbstractCa
     public void process(final Exchange exchange) throws Exception {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
-        URI connectionUri = wonMessage.getSenderURI();
-        if (connectionUri == null) {
-            throw new MissingMessagePropertyException(URI.create(WONMSG.sender.toString()));
-        }
-        Connection con = connectionRepository.findOneByConnectionURIForUpdate(connectionUri).get();
-        if (con.getState() != ConnectionState.CONNECTED) {
-            throw new IllegalMessageForConnectionStateException(connectionUri, "CHANGE_NOTIFICATION_MESSAGE",
-                            con.getState());
-        }
+        Connection con = changeNotificationFromSystem(wonMessage);
         URI remoteMessageUri = wonNodeInformationService.generateEventURI(wonMessage.getRecipientNodeURI());
         if (wonMessage.getRecipientURI() == null) {
             // set the sender uri in the envelope TODO: TwoMsgs: do not set sender here
@@ -58,6 +50,19 @@ public class SendChangeNotificationMessageFromSystemProcessor extends AbstractCa
         // all the data that we also store locally
         OutboundMessageFactory outboundMessageFactory = new OutboundMessageFactory(remoteMessageUri, con);
         exchange.getIn().setHeader(WonCamelConstants.OUTBOUND_MESSAGE_FACTORY_HEADER, outboundMessageFactory);
+    }
+
+    private Connection changeNotificationFromSystem(WonMessage wonMessage) {
+        URI connectionUri = wonMessage.getSenderURI();
+        if (connectionUri == null) {
+            throw new MissingMessagePropertyException(URI.create(WONMSG.sender.toString()));
+        }
+        Connection con = connectionRepository.findOneByConnectionURIForUpdate(connectionUri).get();
+        if (con.getState() != ConnectionState.CONNECTED) {
+            throw new IllegalMessageForConnectionStateException(connectionUri, "CHANGE_NOTIFICATION_MESSAGE",
+                            con.getState());
+        }
+        return con;
     }
 
     private class OutboundMessageFactory extends OutboundMessageFactoryProcessor {

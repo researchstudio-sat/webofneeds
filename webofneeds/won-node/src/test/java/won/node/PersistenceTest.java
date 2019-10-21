@@ -106,7 +106,7 @@ public class PersistenceTest {
         WonMessage responseMessage = WonMessageBuilder
                         .setPropertiesForNodeResponse(msg, true, newMessageURI).build();
         messageService.saveMessage(responseMessage, atom.getAtomURI());
-        Atom atom2 = atomRepository.findOneByAtomURI(atomURI);
+        Atom atom2 = atomService.getAtomRequired(atomURI);
         assertEquals(2, atom2.getMessageContainer().getEvents().size());
     }
 
@@ -122,7 +122,7 @@ public class PersistenceTest {
         WonMessage responseMessage = WonMessageBuilder
                         .setPropertiesForNodeResponse(createMsg, true, newMessageURI).build();
         messageService.saveMessage(responseMessage, atom.getAtomURI());
-        Atom checkAtom = atomRepository.findOneByAtomURI(atomURI);
+        Atom checkAtom = atomService.getAtomRequired(atomURI);
         assertEquals(2, checkAtom.getMessageContainer().getEvents().size());
         //
         // create another atom
@@ -135,7 +135,7 @@ public class PersistenceTest {
         WonMessage responseMessage2 = WonMessageBuilder
                         .setPropertiesForNodeResponse(createMsg2, true, successResponse2).build();
         messageService.saveMessage(responseMessage2, atom2.getAtomURI());
-        checkAtom = atomRepository.findOneByAtomURI(atomURI2);
+        checkAtom = atomService.getAtomRequired(atomURI2);
         assertEquals(2, checkAtom.getMessageContainer().getEvents().size());
         //
         // simulate a connect from atom to atom2

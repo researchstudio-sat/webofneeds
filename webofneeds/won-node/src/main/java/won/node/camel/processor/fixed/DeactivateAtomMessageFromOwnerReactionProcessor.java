@@ -25,10 +25,9 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
+import won.protocol.model.Atom;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
-import won.protocol.model.Atom;
-import won.protocol.util.DataAccessUtils;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -45,7 +44,7 @@ public class DeactivateAtomMessageFromOwnerReactionProcessor extends AbstractCam
         logger.debug("DEACTIVATING atom. atomURI:{}", recipientAtomURI);
         if (recipientAtomURI == null)
             throw new WonMessageProcessingException("recipientAtomURI is not set");
-        Atom atom = DataAccessUtils.loadAtom(atomRepository, recipientAtomURI);
+        Atom atom = atomService.getAtomRequired(recipientAtomURI);
         matcherProtocolMatcherClient.atomDeactivated(atom.getAtomURI(), wonMessage);
         // close all connections
         Collection<Connection> conns = connectionRepository.findByAtomURIAndNotStateForUpdate(atom.getAtomURI(),

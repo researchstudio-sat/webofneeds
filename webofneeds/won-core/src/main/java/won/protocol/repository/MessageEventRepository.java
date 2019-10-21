@@ -1,22 +1,25 @@
 package won.protocol.repository;
 
+import java.net.URI;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+import javax.persistence.LockModeType;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
 import won.protocol.message.WonMessageType;
 import won.protocol.model.MessageEvent;
 import won.protocol.model.unread.UnreadMessageInfoForConnection;
 
-import javax.persistence.LockModeType;
-import java.net.URI;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-
 public interface MessageEventRepository extends WonRepository<MessageEvent> {
-    MessageEvent findOneByMessageURI(URI URI);
+    Optional<MessageEvent> findOneByMessageURI(URI URI);
 
     // read is permitted iff any of these conditions apply:
     // * the WebId is the sender atom

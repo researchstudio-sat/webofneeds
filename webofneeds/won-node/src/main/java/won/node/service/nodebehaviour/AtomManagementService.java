@@ -10,22 +10,23 @@
  */
 package won.node.service.nodebehaviour;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import won.node.service.persistence.AtomService;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Atom;
-import won.protocol.repository.AtomRepository;
 import won.protocol.service.WonNodeInformationService;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Manipulates atoms from the system side by generating msg:FromSystem messages.
@@ -38,7 +39,7 @@ public class AtomManagementService {
     @Autowired
     private WonNodeInformationService wonNodeInformationService;
     @Autowired
-    private AtomRepository atomRepository;
+    private AtomService atomService;
 
     public void sendTextMessageToOwner(URI atomURI, String message) {
         if (atomURI == null) {
@@ -53,7 +54,7 @@ public class AtomManagementService {
         logger.debug("Sending FromSystem text message to atom {}", atomURI);
         // check if we have that atom (e.g. it's not an atom living on another node, or
         // does not exist at all)
-        Atom atom = atomRepository.findOneByAtomURI(atomURI);
+        Atom atom = atomService.getAtomRequired(atomURI);
         if (atom == null) {
             logger.debug("deactivateAtom called for atom {} but that atom was not found in the repository - doing nothing",
                             atomURI);
@@ -80,7 +81,7 @@ public class AtomManagementService {
         logger.debug("Deactivating atom {}", atomURI);
         // check if we have that atom (e.g. it's not an atom living on another node, or
         // does not exist at all)
-        Atom atom = atomRepository.findOneByAtomURI(atomURI);
+        Atom atom = atomService.getAtomRequired(atomURI);
         if (atom == null) {
             logger.debug("deactivateAtom called for atom {} but that atom was not found in the repository - doing nothing",
                             atomURI);

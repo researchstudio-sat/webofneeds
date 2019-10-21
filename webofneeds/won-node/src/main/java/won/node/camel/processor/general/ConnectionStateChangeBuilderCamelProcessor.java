@@ -16,11 +16,11 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import won.node.service.persistence.ConnectionService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
-import won.protocol.repository.ConnectionRepository;
 
 /**
  * Extracts the connection state and creates a ConnectionStateChangeBuilder. The
@@ -28,7 +28,7 @@ import won.protocol.repository.ConnectionRepository;
  */
 public class ConnectionStateChangeBuilderCamelProcessor implements Processor {
     @Autowired
-    ConnectionRepository connectionRepository;
+    ConnectionService connectionService;
 
     public ConnectionStateChangeBuilderCamelProcessor() {
     }
@@ -46,7 +46,7 @@ public class ConnectionStateChangeBuilderCamelProcessor implements Processor {
         }
         if (conUri != null) {
             // found a connection. Put its URI in the header and load it
-            Connection con = connectionRepository.findOneByConnectionURI(conUri);
+            Connection con = connectionService.getConnectionRequired(conUri);
             stateChangeBuilder.oldState(con.getState());
         } else {
             // found no connection. don't modify the builder

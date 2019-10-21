@@ -1,10 +1,17 @@
 package won.node.camel.processor.fixed;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
 import won.protocol.message.WonMessage;
@@ -16,11 +23,6 @@ import won.protocol.util.LoggingUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WONMSG;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.List;
-import java.util.Objects;
 
 @Component
 @FixedMessageReactionProcessor(direction = WONMSG.FromExternalString, messageType = WONMSG.ConnectionMessageString)
@@ -50,9 +52,13 @@ public class SendMessageFromNodeReactionProcessor extends AbstractCamelProcessor
                 }
                 // only inject into those connections that belong to the receiver atom of this
                 // message
-                Connection con = connectionRepository.findOneByConnectionURI(target);
-                if (con.getAtomURI().equals(wonMessage.getRecipientAtomURI())) {
-                    forward(wonMessage, con);
+                Optional<Connection> con = connectionService.getConnection(target);
+                if (con.isPresent()) {
+                    if (con.get().getAtomURI().equals(wonMessage.getRecipientAtomURI())) {
+                        forward(wonMessage, con.get());
+                    }
+                } else {
+                    logger.debug("Could not inject message into connection {}: no connection found", target);
                 }
             } catch (Exception e) {
                 LoggingUtils.logMessageAsInfoAndStacktraceAsDebug(logger, e, "Could not forward message {}",

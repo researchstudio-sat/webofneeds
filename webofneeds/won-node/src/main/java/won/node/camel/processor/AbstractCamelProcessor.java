@@ -30,6 +30,7 @@ import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.node.service.linkeddata.generate.LinkedDataService;
 import won.node.service.persistence.AtomService;
 import won.node.service.persistence.ConnectionService;
+import won.node.service.persistence.MessageService;
 import won.node.service.persistence.SocketService;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
@@ -92,9 +93,11 @@ public abstract class AbstractCamelProcessor implements Processor {
     protected AtomService atomService;
     @Autowired
     protected ConnectionService connectionService;
+    @Autowired
+    protected MessageService messageService;
 
     protected void sendMessageToOwner(WonMessage message, URI atomURI, String fallbackOwnerApplicationId) {
-        Atom atom = atomRepository.findOneByAtomURI(atomURI);
+        Atom atom = atomService.getAtomRequired(atomURI);
         List<OwnerApplication> ownerApplications = atom != null ? atom.getAuthorizedApplications()
                         : Collections.EMPTY_LIST;
         List<String> ownerApplicationIds = toStringIds(ownerApplications);

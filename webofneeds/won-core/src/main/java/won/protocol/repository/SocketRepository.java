@@ -2,6 +2,7 @@ package won.protocol.repository;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 import won.protocol.model.Socket;
 
@@ -16,9 +17,9 @@ public interface SocketRepository extends WonRepository<Socket> {
 
     List<Socket> findByAtomURIAndSocketURI(URI atomURI, URI socketURI);
 
-    Socket findOneByAtomURIAndTypeURI(URI atomURI, URI typeURI);
+    Optional<Socket> findOneByAtomURIAndTypeURI(URI atomURI, URI typeURI);
 
-    Socket findOneByAtomURIAndSocketURI(URI atomURI, URI socketURI);
+    Optional<Socket> findOneByAtomURIAndSocketURI(URI atomURI, URI socketURI);
 
-    Socket findOneBySocketURI(URI socketURI);
+    Optional<Socket> findOneBySocketURI(URI socketURI);
 }

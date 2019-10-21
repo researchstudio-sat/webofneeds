@@ -27,8 +27,6 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.model.Connection;
-import won.protocol.model.ConnectionEventType;
-import won.protocol.model.ConnectionState;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -50,10 +48,7 @@ public class CloseMessageFromSystemProcessor extends AbstractCamelProcessor {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
         logger.debug("CLOSE received from the system side for connection {}", wonMessage.getSenderURI());
-        Connection con = connectionRepository.findOneByConnectionURIForUpdate(wonMessage.getSenderURI()).get();
-        ConnectionState originalState = con.getState();
-        // TODO: we could introduce SYSTEM_CLOSE here
-        con = connectionService.nextConnectionState(con, ConnectionEventType.OWNER_CLOSE);
+        Connection con = connectionService.closeFromSystem(wonMessage);
         // if we know the remote connection, send a close message to the remote
         // connection
         if (con.getTargetConnectionURI() != null) {

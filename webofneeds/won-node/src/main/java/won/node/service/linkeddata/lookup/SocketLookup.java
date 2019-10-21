@@ -15,4 +15,6 @@ public interface SocketLookup {
     public boolean isCompatible(URI localSocket, URI targetSocket);
 
     public boolean isAutoOpen(URI localSocket);
+
+    Optional<URI> getSocketType(URI socketURI);
 }

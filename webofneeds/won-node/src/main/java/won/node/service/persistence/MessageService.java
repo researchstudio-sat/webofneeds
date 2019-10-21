@@ -2,6 +2,7 @@ package won.node.service.persistence;
 
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import won.protocol.exception.NoSuchMessageException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.message.WonMessageType;
@@ -37,6 +39,14 @@ public class MessageService {
     protected DatasetHolderRepository datasetHolderRepository;
     @Autowired
     private MessageEventRepository messageEventRepository;
+
+    public Optional<MessageEvent> getMessage(URI messageURI) {
+        return messageEventRepository.findOneByMessageURI(messageURI);
+    }
+
+    public MessageEvent getMessageRequired(URI messageURI) {
+        return getMessage(messageURI).orElseThrow(() -> new NoSuchMessageException(messageURI));
+    }
 
     /**
      * If we are saving response message, update original massage with the

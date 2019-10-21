@@ -1,23 +1,25 @@
 package won.node.camel.processor.fixed;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.MissingMessagePropertyException;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WONMSG;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
 
 /**
  * User: syim Date: 02.03.2015
@@ -30,6 +32,11 @@ public class SendChangeNotificationMessageFromNodeProcessor extends AbstractCame
     public void process(final Exchange exchange) throws Exception {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
+        changeNotificationFromNode(wonMessage);
+    }
+
+    public void changeNotificationFromNode(WonMessage wonMessage) {
+        wonMessage.getMessageType().requireType(WonMessageType.CHANGE_NOTIFICATION);
         URI connectionUri = wonMessage.getRecipientURI();
         if (connectionUri == null) {
             throw new MissingMessagePropertyException(URI.create(WONMSG.recipient.toString()));

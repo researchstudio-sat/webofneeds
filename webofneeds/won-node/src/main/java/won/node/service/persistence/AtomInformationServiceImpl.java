@@ -10,6 +10,10 @@
  */
 package won.node.service.persistence;
 
+import java.net.URI;
+import java.util.Collection;
+import java.util.Date;
+
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,16 +25,17 @@ import org.springframework.stereotype.Component;
 import won.node.service.nodeconfig.URIService;
 import won.protocol.exception.NoSuchAtomException;
 import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.exception.NoSuchMessageException;
 import won.protocol.message.WonMessageType;
-import won.protocol.model.*;
+import won.protocol.model.Atom;
+import won.protocol.model.AtomState;
+import won.protocol.model.Connection;
+import won.protocol.model.DataWithEtag;
+import won.protocol.model.MessageEvent;
 import won.protocol.repository.AtomRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MessageEventRepository;
 import won.protocol.util.DataAccessUtils;
-
-import java.net.URI;
-import java.util.Collection;
-import java.util.Date;
 
 /**
  * User: fkleedorfer Date: 02.11.12
@@ -72,7 +77,8 @@ public class AtomInformationServiceImpl implements AtomInformationService {
 
     @Override
     public Slice<URI> listPagedAtomURIsBefore(URI atomURI, Integer preferedPageSize, AtomState atomState) {
-        Atom referenceAtom = atomRepository.findOneByAtomURI(atomURI);
+        Atom referenceAtom = atomRepository.findOneByAtomURI(atomURI)
+                        .orElseThrow(() -> new NoSuchAtomException(atomURI));
         Date referenceDate = referenceAtom.getCreationDate();
         int pageSize = this.pageSize;
         if (preferedPageSize != null && preferedPageSize < this.pageSize) {
@@ -103,7 +109,8 @@ public class AtomInformationServiceImpl implements AtomInformationService {
 
     @Override
     public Slice<URI> listPagedAtomURIsAfter(URI atomURI, Integer preferedPageSize, AtomState atomState) {
-        Atom referenceAtom = atomRepository.findOneByAtomURI(atomURI);
+        Atom referenceAtom = atomRepository.findOneByAtomURI(atomURI)
+                        .orElseThrow(() -> new NoSuchAtomException(atomURI));
         Date referenceDate = referenceAtom.getCreationDate();
         int pageSize = this.pageSize;
         if (preferedPageSize != null && preferedPageSize < this.pageSize) {
@@ -341,7 +348,8 @@ public class AtomInformationServiceImpl implements AtomInformationService {
             throw new IllegalArgumentException("connectionURI is not set");
         Connection con = null;
         if (etag == null) {
-            con = connectionRepository.findOneByConnectionURI(connectionURI);
+            con = connectionRepository.findOneByConnectionURI(connectionURI)
+                            .orElseThrow(() -> new NoSuchConnectionException(connectionURI));
         } else {
             Integer version = Integer.valueOf(etag);
             con = connectionRepository.findOneByConnectionURIAndVersionNot(connectionURI, version);
@@ -374,7 +382,8 @@ public class AtomInformationServiceImpl implements AtomInformationService {
     @Override
     public Slice<MessageEvent> listConnectionEventsAfter(URI connectionUri, URI msgURI,
                     Integer preferredPageSize, WonMessageType msgType) {
-        MessageEvent referenceMsg = messageEventRepository.findOneByMessageURI(msgURI);
+        MessageEvent referenceMsg = messageEventRepository.findOneByMessageURI(msgURI)
+                        .orElseThrow(() -> new NoSuchMessageException(msgURI));
         Date referenceDate = referenceMsg.getCreationDate();
         int pageSize = getPageSize(preferredPageSize);
         Slice<MessageEvent> slice = null;

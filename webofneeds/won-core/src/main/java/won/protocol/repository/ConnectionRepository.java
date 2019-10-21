@@ -34,7 +34,7 @@ import won.protocol.model.ConnectionState;
 public interface ConnectionRepository extends WonRepository<Connection> {
     List<Connection> findByConnectionURI(URI URI);
 
-    Connection findOneByConnectionURI(URI URI);
+    Optional<Connection> findOneByConnectionURI(URI URI);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select con from Connection con where connectionURI = :uri")

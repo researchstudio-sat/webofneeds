@@ -17,7 +17,6 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.model.Connection;
-import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
 import won.protocol.vocabulary.WONMSG;
 
@@ -33,9 +32,9 @@ public class CloseMessageFromOwnerProcessor extends AbstractCamelProcessor {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
         logger.debug("CLOSE received from the owner side for connection {}", wonMessage.getSenderURI());
-        Connection con = connectionRepository.findOneByConnectionURIForUpdate(wonMessage.getSenderURI()).get();
+        Connection con = connectionService.getConnectionRequired(wonMessage.getSenderURI());
         ConnectionState originalState = con.getState();
-        con = connectionService.nextConnectionState(con, ConnectionEventType.OWNER_CLOSE);
+        con = connectionService.closeFromOwner(wonMessage);
         // if the connection was in suggested state, don't send a close message to the
         // remote atom
         if (originalState != ConnectionState.SUGGESTED) {

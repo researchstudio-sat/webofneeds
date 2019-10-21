@@ -1,17 +1,18 @@
 package won.node.camel.processor.general;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
 import org.apache.camel.Exchange;
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.MessageEvent;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
 
 /**
  * User: ypanchenko Date: 27.04.2015
@@ -35,7 +36,7 @@ public class ResponseResenderProcessor extends AbstractCamelProcessor {
         }
         logger.warn("an error occurred while processing WON message {}", originalMessage.getMessageURI());
         // get the event that was found to be already processed
-        MessageEvent event = messageEventRepository.findOneByMessageURI(originalMessage.getMessageURI());
+        MessageEvent event = messageService.getMessageRequired(originalMessage.getMessageURI());
         // get response to this event:
         URI responseURI = event.getResponseMessageURI();
         Dataset responseDataset = event.getDatasetHolder().getDataset();

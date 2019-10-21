@@ -1,17 +1,20 @@
 package won.protocol.repository;
 
+import java.net.URI;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+import javax.persistence.LockModeType;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
 import won.protocol.model.Atom;
 import won.protocol.model.AtomState;
-
-import javax.persistence.LockModeType;
-import java.net.URI;
-import java.util.Date;
-import java.util.List;
 
 /**
  * User: Gabriel Date: 02.11.12 Time: 15:28
@@ -25,7 +28,7 @@ public interface AtomRepository extends WonRepository<Atom> {
     @Query("select atomURI from Atom atom where :atomState is null or atom.state = :atomState")
     Slice<URI> getAllAtomURIs(@Param("atomState") AtomState atomState, Pageable pageable);
 
-    Atom findOneByAtomURI(URI atomURI);
+    Optional<Atom> findOneByAtomURI(URI atomURI);
 
     Atom findOneByAtomURIAndVersionNot(URI atomURI, int version);
 

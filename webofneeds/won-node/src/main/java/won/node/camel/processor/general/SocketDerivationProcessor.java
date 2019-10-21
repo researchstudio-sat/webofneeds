@@ -9,13 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import won.node.service.nodebehaviour.ConnectionStateChange;
 import won.node.service.nodebehaviour.DataDerivationService;
+import won.node.service.persistence.AtomService;
+import won.node.service.persistence.ConnectionService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Atom;
 import won.protocol.model.Connection;
-import won.protocol.repository.AtomRepository;
-import won.protocol.repository.ConnectionRepository;
 
 /**
  * Compares the connection state found in the header of the 'in' message with
@@ -23,11 +23,11 @@ import won.protocol.repository.ConnectionRepository;
  */
 public class SocketDerivationProcessor implements Processor {
     @Autowired
-    ConnectionRepository connectionRepository;
-    @Autowired
-    AtomRepository atomRepository;
-    @Autowired
     DataDerivationService dataDerivationService;
+    @Autowired
+    ConnectionService connectionService;
+    @Autowired
+    AtomService atomService;
 
     public SocketDerivationProcessor() {
     }
@@ -51,7 +51,7 @@ public class SocketDerivationProcessor implements Processor {
         }
         if (conUri != null) {
             // found a connection. Put its URI in the header and load it
-            con = Optional.of(connectionRepository.findOneByConnectionURI(conUri));
+            con = connectionService.getConnection(conUri);
             stateChangeBuilder.newState(con.get().getState());
         } else {
             // found no connection. don't modify the builder
@@ -62,9 +62,9 @@ public class SocketDerivationProcessor implements Processor {
         if (stateChangeBuilder.canBuild()) {
             ConnectionStateChange connectionStateChange = stateChangeBuilder.build();
             if (!con.isPresent()) {
-                con = Optional.of(connectionRepository.findOneByConnectionURI(conUri));
+                con = connectionService.getConnection(conUri);
             }
-            Atom atom = atomRepository.findOneByAtomURI(con.get().getAtomURI());
+            Atom atom = atomService.getAtomRequired(con.get().getAtomURI());
             dataDerivationService.deriveDataForStateChange(connectionStateChange, atom, con.get());
         }
     }

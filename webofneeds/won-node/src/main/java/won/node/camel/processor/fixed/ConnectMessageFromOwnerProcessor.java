@@ -27,23 +27,10 @@ public class ConnectMessageFromOwnerProcessor extends AbstractCamelProcessor {
     public void process(final Exchange exchange) throws Exception {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
-        URI senderAtomURI = wonMessage.getSenderAtomURI();
-        URI senderNodeURI = wonMessage.getSenderNodeURI();
-        URI recipientAtomURI = wonMessage.getRecipientAtomURI();
-        // this is a connect from owner. We allow owners to omit sockets for ease of
-        // use.
-        // If local or remote sockets were not specified, we define them now.
+        Connection con = connectionService.connectFromOwner(wonMessage);
         Optional<URI> userDefinedSocketURI = Optional.ofNullable(WonRdfUtils.SocketUtils.getSocket(wonMessage));
-        connectionService.failIfIsNotSocketOfAtom(userDefinedSocketURI, Optional.of(senderAtomURI));
         Optional<URI> userDefinedTargetSocketURI = Optional
                         .ofNullable(WonRdfUtils.SocketUtils.getTargetSocket(wonMessage));
-        connectionService.failIfIsNotSocketOfAtom(userDefinedTargetSocketURI, Optional.of(recipientAtomURI));
-        Optional<URI> connectionURI = Optional.ofNullable(wonMessage.getSenderURI()); // if the uri is known already, we
-                                                                                      // can
-                                                                                      // load the connection!
-        Connection con = connectionService.connectFromOwner(senderAtomURI, senderNodeURI, recipientAtomURI,
-                        userDefinedSocketURI,
-                        userDefinedTargetSocketURI, connectionURI);
         // prepare the message to pass to the remote node
         URI remoteMessageUri = wonNodeInformationService.generateEventURI(wonMessage.getRecipientNodeURI());
         // set the sender uri in the envelope TODO: TwoMsgs: do not set sender here

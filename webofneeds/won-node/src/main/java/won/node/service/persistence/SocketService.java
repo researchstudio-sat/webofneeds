@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import won.node.service.linkeddata.lookup.SocketLookup;
 import won.protocol.exception.NoSuchAtomException;
+import won.protocol.exception.NoSuchSocketException;
 import won.protocol.model.Socket;
 import won.protocol.model.SocketDefinition;
 import won.protocol.repository.AtomRepository;
@@ -55,6 +56,14 @@ public class SocketService {
                         .orElseThrow(() -> new IllegalArgumentException("No default socket found: atom: " + atomUri));
     }
 
+    public Optional<Socket> getSocket(URI socketURI) {
+        return socketRepository.findOneBySocketURI(socketURI);
+    }
+
+    public Socket getSocketRequired(URI socketURI) {
+        return getSocket(socketURI).orElseThrow(() -> new NoSuchSocketException(socketURI));
+    }
+
     public Optional<URI> lookupDefaultSocket(URI atomURI) {
         return socketLookup.lookupDefaultSocket(atomURI);
     }
@@ -73,5 +82,9 @@ public class SocketService {
 
     public boolean isAutoOpen(URI localSocket) {
         return socketLookup.isAutoOpen(localSocket);
+    }
+
+    public Optional<URI> getSocketType(URI socketURI) {
+        return socketLookup.getSocketType(socketURI);
     }
 }

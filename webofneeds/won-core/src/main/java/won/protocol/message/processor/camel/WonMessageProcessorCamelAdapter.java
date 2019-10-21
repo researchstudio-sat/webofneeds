@@ -10,14 +10,16 @@
  */
 package won.protocol.message.processor.camel;
 
+import java.lang.invoke.MethodHandles;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.WonMessageProcessor;
-
-import java.lang.invoke.MethodHandles;
+import won.protocol.util.LoggingUtils;
 
 /**
  * Adapts a WonMessageProcessor to act as a camel processor. The WonMessage
@@ -62,7 +64,8 @@ public class WonMessageProcessorCamelAdapter implements Processor {
                                                 ((WonMessage) msg).getRecipientURI() });
             }
         } catch (Exception e) {
-            logger.info("re-throwing exception {} caught calling adaptee {} with message {} (type: {}, direction: {}, recipient:{})",
+            LoggingUtils.logMessageAsInfoAndStacktraceAsDebug(logger, e,
+                            "re-throwing exception {} caught calling adaptee {} with message {} (type: {}, direction: {}, recipient:{}",
                             new Object[] { e, adaptee, msg, ((WonMessage) msg).getMessageType(),
                                             ((WonMessage) msg).getEnvelopeType(),
                                             ((WonMessage) msg).getRecipientURI() });

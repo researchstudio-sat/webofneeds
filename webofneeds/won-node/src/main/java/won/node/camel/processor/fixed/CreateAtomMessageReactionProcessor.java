@@ -10,6 +10,10 @@
  */
 package won.node.camel.processor.fixed;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Optional;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.jena.query.Dataset;
@@ -18,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
 import won.protocol.exception.NoSuchAtomException;
@@ -29,9 +34,6 @@ import won.protocol.model.Atom;
 import won.protocol.repository.AtomRepository;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
 
 /**
  * Reacts to a CREATE message, informing matchers of the newly created atom.
@@ -53,9 +55,9 @@ public class CreateAtomMessageReactionProcessor extends AbstractCamelProcessor {
             logger.warn("could not obtain atomURI from message " + wonMessage.getMessageURI());
             return;
         }
-        Atom atom = atomRepository.findOneByAtomURI(atomUri);
+        Optional<Atom> atom = atomRepository.findOneByAtomURI(atomUri);
         try {
-            WonMessage newAtomNotificationMessage = makeAtomCreatedMessageForMatcher(atom);
+            WonMessage newAtomNotificationMessage = makeAtomCreatedMessageForMatcher(atom.get());
             matcherProtocolMatcherClient.atomCreated(atomUri, ModelFactory.createDefaultModel(),
                             newAtomNotificationMessage);
         } catch (Exception e) {

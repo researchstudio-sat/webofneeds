@@ -10,10 +10,16 @@
  */
 package won.node.camel.processor.general;
 
+import java.net.URI;
+import java.util.Optional;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.util.IsoMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import won.node.service.persistence.AtomService;
+import won.node.service.persistence.MessageService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
@@ -21,12 +27,8 @@ import won.protocol.message.processor.exception.EventAlreadyProcessedException;
 import won.protocol.message.processor.exception.UriAlreadyInUseException;
 import won.protocol.model.Atom;
 import won.protocol.model.MessageEvent;
-import won.protocol.repository.AtomRepository;
-import won.protocol.repository.MessageEventRepository;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
 
 /**
  * Checks whether the event or atom URI is already used. It is possible that
@@ -40,9 +42,9 @@ import java.net.URI;
  */
 public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProcessor {
     @Autowired
-    private MessageEventRepository messageEventRepository;
+    private MessageService messageService;
     @Autowired
-    protected AtomRepository atomRepository;
+    protected AtomService atomService;
 
     @Override
     public WonMessage process(final WonMessage message) throws UriAlreadyInUseException {
@@ -54,8 +56,8 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProc
     private void checkAtomURI(final WonMessage message) {
         if (message.getMessageType() == WonMessageType.CREATE_ATOM) {
             URI atomURI = WonRdfUtils.AtomUtils.getAtomURI(message.getCompleteDataset());
-            Atom atom = atomRepository.findOneByAtomURI(atomURI);
-            if (atom == null) {
+            Optional<Atom> atom = atomService.getAtom(atomURI);
+            if (!atom.isPresent()) {
                 return;
             } else {
                 throw new UriAlreadyInUseException(message.getSenderAtomURI().toString());
@@ -65,11 +67,11 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProc
     }
 
     private void checkEventURI(final WonMessage message) {
-        MessageEvent event = messageEventRepository.findOneByMessageURI(message.getMessageURI());
-        if (event == null) {
+        Optional<MessageEvent> event = messageService.getMessage(message.getMessageURI());
+        if (!event.isPresent()) {
             return;
         } else {
-            if (hasResponse(event) && isDuplicateMessage(message, event)) {
+            if (hasResponse(event.get()) && isDuplicateMessage(message, event.get())) {
                 // the same massage as the one already processed is received
                 throw new EventAlreadyProcessedException(message.getMessageURI().toString());
             } else {

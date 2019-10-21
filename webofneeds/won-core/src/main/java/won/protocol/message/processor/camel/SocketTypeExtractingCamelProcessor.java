@@ -10,17 +10,20 @@
  */
 package won.protocol.message.processor.camel;
 
+import java.net.URI;
+import java.util.Optional;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.exception.MissingMessagePropertyException;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.model.Connection;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.vocabulary.WONMSG;
-
-import java.net.URI;
 
 /**
  * Extracts the socket looking into the 'wonConnectionURI' header and looking up
@@ -38,8 +41,9 @@ public class SocketTypeExtractingCamelProcessor implements Processor {
         if (conUri == null) {
             throw new MissingMessagePropertyException(URI.create(WONMSG.recipient.getURI()));
         }
-        Connection con = connectionRepository.findOneByConnectionURI(conUri);
-        socketType = con.getTypeURI();
+        Optional<Connection> con = connectionRepository.findOneByConnectionURI(conUri);
+        socketType = con.orElseThrow(() -> new NoSuchConnectionException(conUri))
+                        .getTypeURI();
         if (socketType == null) {
             throw new WonMessageProcessingException(String.format(
                             "Failed to determine connection " + "socket for message %s", wonMessage.getMessageURI()));

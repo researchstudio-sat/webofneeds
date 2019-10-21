@@ -14,7 +14,6 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.springframework.stereotype.Service;
 
 import won.node.camel.processor.AbstractCamelProcessor;
@@ -24,15 +23,15 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
+import won.protocol.model.Atom;
+import won.protocol.model.AtomMessageContainer;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.DatasetHolder;
 import won.protocol.model.Socket;
-import won.protocol.model.Atom;
-import won.protocol.model.AtomMessageContainer;
+import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
-import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
@@ -55,10 +54,10 @@ public class ReplaceAtomMessageProcessor extends AbstractCamelProcessor {
     public void process(final Exchange exchange) throws Exception {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
-        Atom atom = storeAtom(wonMessage);
+        Atom atom = replaceAtom(wonMessage);
     }
 
-    private Atom storeAtom(final WonMessage wonMessage) throws NoSuchAtomException {
+    public Atom replaceAtom(final WonMessage wonMessage) throws NoSuchAtomException {
         Dataset atomContent = wonMessage.getMessageContent();
         List<WonMessage.AttachmentHolder> attachmentHolders = wonMessage.getAttachments();
         // remove attachment and its signature from the atomContent
@@ -104,6 +103,10 @@ public class ReplaceAtomMessageProcessor extends AbstractCamelProcessor {
                             socket.getSocketURI(), ConnectionState.CLOSED);
             connsToClose.forEach(con -> {
                 if (con.getState() != ConnectionState.CLOSED) {
+                    // TODO: closing the connections should be done in a reaction
+                    // the fact that it's done here complicates things and we'll refrain from
+                    // moving the replace functionality into the atomService. Once we refactor
+                    // the closing behaviour, we should move the code there.
                     closeConnection(atom, con,
                                     "Closed because the socket of this connection was changed or removed by the atom's owner.");
                 }

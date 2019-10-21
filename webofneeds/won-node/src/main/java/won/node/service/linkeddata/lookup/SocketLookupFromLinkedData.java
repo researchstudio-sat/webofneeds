@@ -35,6 +35,12 @@ public class SocketLookupFromLinkedData implements SocketLookup {
     }
 
     @Override
+    public Optional<URI> getSocketType(URI socketURI) {
+        return WonLinkedDataUtils.getTypeOfSocket(socketURI,
+                        linkedDataSource);
+    }
+
+    @Override
     public Optional<Integer> getCapacity(URI socket) {
         Optional<SocketDefinition> localConfig = getSocketConfig(socket);
         if (!localConfig.isPresent() && localConfig.get().getCapacity().isPresent()) {

@@ -10,10 +10,19 @@
  */
 package won.node.camel.processor.general;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import won.cryptography.rdfsign.SigningStage;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
@@ -23,15 +32,13 @@ import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.message.processor.impl.WonMessageSignerVerifier;
 import won.protocol.model.DatasetHolder;
 import won.protocol.model.MessageEvent;
-import won.protocol.repository.*;
+import won.protocol.repository.AtomMessageContainerRepository;
+import won.protocol.repository.AtomRepository;
+import won.protocol.repository.ConnectionMessageContainerRepository;
+import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.DatasetHolderRepository;
+import won.protocol.repository.MessageEventRepository;
 import won.protocol.vocabulary.WONMSG;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Utility class containing code needed at multiple points for adding references
@@ -117,12 +124,12 @@ public class MessageReferencer {
                 // we find identify the message with the same parent as our current message and
                 // add it
                 URI isResponseToURI = WonMessageUtils.getLocalIsResponseToURI(message);
-                MessageEvent messageEvent = messageEventRepository
+                Optional<MessageEvent> messageEvent = messageEventRepository
                                 .findOneByMessageURI(isResponseToURI);
                 String methodName = "selectLatestMessage::response";
-                if (messageEvent != null) {
-                    selectedUris.add(new MessageUriAndParentUri(messageEvent.getMessageURI(),
-                                    messageEvent.getParentURI()));
+                if (messageEvent.isPresent()) {
+                    selectedUris.add(new MessageUriAndParentUri(messageEvent.get().getMessageURI(),
+                                    messageEvent.get().getParentURI()));
                 }
                 break;
             case CREATE_ATOM:
@@ -134,10 +141,10 @@ public class MessageReferencer {
                 // container of the message)
                 // if we don't find any: reference the create message of the atom.
                 URI parentUri = WonMessageUtils.getParentEntityUri(message);
-                messageEvent = messageEventRepository.findNewestByParentURI(parentUri);
-                if (messageEvent != null) {
-                    selectedUris.add(new MessageUriAndParentUri(messageEvent.getMessageURI(),
-                                    messageEvent.getParentURI()));
+                messageEvent = Optional.ofNullable(messageEventRepository.findNewestByParentURI(parentUri));
+                if (messageEvent.isPresent()) {
+                    selectedUris.add(new MessageUriAndParentUri(messageEvent.get().getMessageURI(),
+                                    messageEvent.get().getParentURI()));
                 } else {
                     // we did not find any message to link to. Choose the create message of the atom
                     // we're starting a conversation, link to the create message of the atom.

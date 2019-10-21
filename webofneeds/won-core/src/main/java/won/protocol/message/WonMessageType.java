@@ -116,4 +116,10 @@ public enum WonMessageType {
             return ATOM_CREATED_NOTIFICATION;
         return null;
     }
+
+    public void requireType(WonMessageType expectedType) {
+        if (this != expectedType) {
+            throw new WrongMessageTypeException(expectedType, this);
+        }
+    }
 }
