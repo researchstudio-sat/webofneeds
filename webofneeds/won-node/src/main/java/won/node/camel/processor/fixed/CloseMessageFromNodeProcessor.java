@@ -24,7 +24,7 @@ public class CloseMessageFromNodeProcessor extends AbstractCamelProcessor {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
         URI connectionURIFromWonMessage = wonMessage.getRecipientURI();
-        Connection con = dataService.nextConnectionState(connectionURIFromWonMessage,
+        Connection con = connectionService.nextConnectionState(connectionURIFromWonMessage,
                         ConnectionEventType.PARTNER_CLOSE);
     }
 }

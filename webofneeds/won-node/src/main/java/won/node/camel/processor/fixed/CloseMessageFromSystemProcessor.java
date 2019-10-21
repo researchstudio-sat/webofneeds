@@ -10,11 +10,15 @@
  */
 package won.node.camel.processor.fixed;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.node.camel.processor.general.OutboundMessageFactoryProcessor;
@@ -26,9 +30,6 @@ import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
 import won.protocol.vocabulary.WONMSG;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
 
 /**
  * Processes a CLOSE message coming from the FROM_SYSTEM direction. The effects
@@ -52,7 +53,7 @@ public class CloseMessageFromSystemProcessor extends AbstractCamelProcessor {
         Connection con = connectionRepository.findOneByConnectionURIForUpdate(wonMessage.getSenderURI()).get();
         ConnectionState originalState = con.getState();
         // TODO: we could introduce SYSTEM_CLOSE here
-        con = dataService.nextConnectionState(con, ConnectionEventType.OWNER_CLOSE);
+        con = connectionService.nextConnectionState(con, ConnectionEventType.OWNER_CLOSE);
         // if we know the remote connection, send a close message to the remote
         // connection
         if (con.getTargetConnectionURI() != null) {

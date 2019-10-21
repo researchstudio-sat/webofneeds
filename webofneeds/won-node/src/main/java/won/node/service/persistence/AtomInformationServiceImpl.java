@@ -26,7 +26,6 @@ import won.protocol.model.*;
 import won.protocol.repository.AtomRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MessageEventRepository;
-import won.protocol.service.AtomInformationService;
 import won.protocol.util.DataAccessUtils;
 
 import java.net.URI;

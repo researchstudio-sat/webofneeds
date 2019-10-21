@@ -49,7 +49,7 @@
     
     <bean id="unreadInformationService" class="won.protocol.service.impl.UnreadInformationService" />
 
-    <bean id="linkedDataService" class="won.node.service.rdf.LinkedDataServiceImpl">
+    <bean id="linkedDataService" class="won.node.service.linkeddata.generate.LinkedDataServiceImpl">
         <property name="atomInformationService" ref="atomInformationService" />
         <property name="resourceURIPrefix" value="${uri.prefix.resource}" />
         <property name="connectionResourceURIPrefix" value="${uri.prefix.connection}" />
@@ -76,10 +76,8 @@
     </bean>
 	
 	<context:component-scan base-package="won.node.service.persistence" />
-	
-
-    <!--- DataAccessService -->
-    <bean id="dataAccessService" class="won.node.service.persistence.DataAccessService" depends-on="linkedDataService"/>
+	<context:component-scan base-package="won.node.service.linkeddata.*" />
+	<context:component-scan base-package="won.node.service.nodebehaviour" />
 
 
     <bean id="atomInformationService" class="won.node.service.persistence.AtomInformationServiceImpl">
@@ -88,8 +86,5 @@
 
     <bean id="ownerManagementService" class="won.node.service.persistence.OwnerManagementService"/>
     
-    
-    <bean id="socketService" class="won.node.service.nodebehaviour.SocketService" />
-
 
 </beans>

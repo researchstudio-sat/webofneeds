@@ -28,7 +28,7 @@
 	
     
     <!-- available log-levels: DEBUG, INFO, WARN, ERROR -->
-    <root level="WARN">
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>

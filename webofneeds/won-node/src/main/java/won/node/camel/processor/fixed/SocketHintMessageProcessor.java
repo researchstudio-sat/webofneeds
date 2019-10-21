@@ -1,5 +1,9 @@
 package won.node.camel.processor.fixed;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Optional;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.slf4j.Logger;
@@ -7,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.protocol.exception.IncompatibleSocketsException;
 import won.protocol.message.WonMessage;
@@ -19,10 +24,6 @@ import won.protocol.model.Socket;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WONMSG;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.Optional;
 
 /**
  * User: syim Date: 02.03.2015
@@ -67,7 +68,7 @@ public class SocketHintMessageProcessor extends AbstractCamelProcessor {
         if (!WonLinkedDataUtils.isCompatibleSockets(linkedDataSource, recipientSocketURI, targetSocketURI)) {
             throw new IncompatibleSocketsException(recipientSocketURI, targetSocketURI);
         }
-        Socket socket = dataService.getSocket(recipientAtomURI, Optional.ofNullable(recipientSocketURI));
+        Socket socket = socketService.getSocket(recipientAtomURI, Optional.ofNullable(recipientSocketURI));
         // create Connection in Database
         Optional<URI> targetAtomURI = WonLinkedDataUtils.getAtomOfSocket(targetSocketURI, linkedDataSource);
         if (!targetAtomURI.isPresent()) {
@@ -78,7 +79,8 @@ public class SocketHintMessageProcessor extends AbstractCamelProcessor {
                                         targetAtomURI.get(), socket.getSocketURI(), targetSocketURI);
         if (!con.isPresent()) {
             URI connectionUri = wonNodeInformationService.generateConnectionURI(recipientWoNNodeURI);
-            con = Optional.of(dataService.createConnection(connectionUri, recipientAtomURI, targetAtomURI.get(), null,
+            con = Optional.of(connectionService.createConnection(connectionUri, recipientAtomURI, targetAtomURI.get(),
+                            null,
                             socket.getSocketURI(), socket.getTypeURI(), targetSocketURI, ConnectionState.SUGGESTED,
                             ConnectionEventType.MATCHER_HINT));
         }

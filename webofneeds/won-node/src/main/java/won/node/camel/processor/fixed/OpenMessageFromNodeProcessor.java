@@ -39,9 +39,9 @@ public class OpenMessageFromNodeProcessor extends AbstractCamelProcessor {
             // As the call is coming from the node, it must be present
             // (the node fills it in if the owner leaves it out)
             Optional<URI> socketURI = Optional.of(WonRdfUtils.SocketUtils.getSocket(wonMessage));
-            failIfIsNotSocketOfAtom(socketURI, Optional.of(wonMessage.getRecipientAtomURI()));
+            connectionService.failIfIsNotSocketOfAtom(socketURI, Optional.of(wonMessage.getRecipientAtomURI()));
             Optional<URI> targetSocketURI = Optional.of(WonRdfUtils.SocketUtils.getTargetSocket(wonMessage));
-            failIfIsNotSocketOfAtom(targetSocketURI, Optional.of(wonMessage.getSenderAtomURI()));
+            connectionService.failIfIsNotSocketOfAtom(targetSocketURI, Optional.of(wonMessage.getSenderAtomURI()));
             if (!socketURI.isPresent())
                 throw new IllegalArgumentException(
                                 "Cannot process OPEN FROM_EXTERNAl as no socket information is present");
@@ -57,10 +57,10 @@ public class OpenMessageFromNodeProcessor extends AbstractCamelProcessor {
                                 wonMessage.getRecipientAtomURI(), wonMessage.getSenderAtomURI(), socketURI.get());
             }
             if (!con.isPresent()) {
-                Socket socket = dataService.getSocket(wonMessage.getRecipientAtomURI(), socketURI);
+                Socket socket = socketService.getSocket(wonMessage.getRecipientAtomURI(), socketURI);
                 // ok, we really do not know about the connection. create it.
                 URI connectionUri = wonNodeInformationService.generateConnectionURI(wonMessage.getRecipientNodeURI());
-                con = Optional.of(dataService.createConnection(connectionUri, wonMessage.getRecipientAtomURI(),
+                con = Optional.of(connectionService.createConnection(connectionUri, wonMessage.getRecipientAtomURI(),
                                 wonMessage.getSenderAtomURI(), wonMessage.getSenderURI(), socket.getSocketURI(),
                                 socket.getTypeURI(), targetSocketURI.get(), ConnectionState.REQUEST_RECEIVED,
                                 ConnectionEventType.PARTNER_OPEN));
@@ -87,13 +87,13 @@ public class OpenMessageFromNodeProcessor extends AbstractCamelProcessor {
         }
         if (!con.get().getTargetConnectionURI().equals(wonMessage.getSenderURI()))
             throw new IllegalStateException("the sender uri of the message must be equal to the remote connection uri");
-        failForIncompatibleSockets(con.get().getSocketURI(), con.get().getTargetSocketURI());
+        connectionService.failForIncompatibleSockets(con.get().getSocketURI(), con.get().getTargetSocketURI());
         ConnectionState state = con.get().getState();
         if (state != ConnectionState.CONNECTED) {
             state = state.transit(ConnectionEventType.PARTNER_OPEN);
             if (state == ConnectionState.CONNECTED) {
                 // previously unconnected connection would be established. Check capacity:
-                failForExceededCapacity(con.get().getSocketURI());
+                connectionService.failForExceededCapacity(con.get().getSocketURI());
             }
         }
         con.get().setState(state);

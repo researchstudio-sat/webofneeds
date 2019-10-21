@@ -124,6 +124,13 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
+       <dependency>
+       		<!--  introduced so we can use @MockBean -->
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-test</artifactId>
+		    <version>${org.springframework.boot.version}</version>
+		    <scope>test</scope>
+		</dependency>
 
         <!-- HSQL STUFF -->
         <dependency>

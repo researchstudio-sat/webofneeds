@@ -15,13 +15,14 @@ import org.apache.jena.riot.RDFFormat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import won.node.service.linkeddata.lookup.SocketLookupFromLinkedData;
 import won.node.service.persistence.AtomService;
 import won.node.service.persistence.MessageService;
 import won.protocol.message.WonMessage;
@@ -31,12 +32,13 @@ import won.protocol.model.AtomMessageContainer;
 import won.protocol.model.AtomState;
 import won.protocol.repository.AtomMessageContainerRepository;
 import won.protocol.repository.AtomRepository;
+import won.protocol.service.WonNodeInformationService;
 
 @ContextConfiguration(locations = { "classpath:/won/node/common-test-context.xml",
                 "classpath:/spring/component/storage/jdbc-storage.xml",
                 "classpath:/spring/component/storage/jpabased-rdf-storage.xml" })
-@TestPropertySource
 @RunWith(SpringJUnit4ClassRunner.class)
+@TestPropertySource
 @Transactional
 public class PersistenceTest {
     @Autowired
@@ -47,8 +49,10 @@ public class PersistenceTest {
     AtomService atomService;
     @Autowired
     MessageService messageService;
-    @Autowired
-    JpaTransactionManager txManager;
+    @MockBean
+    SocketLookupFromLinkedData socketLookup;
+    @MockBean
+    WonNodeInformationService wonNodeInformationService;
 
     @Test(expected = DataIntegrityViolationException.class)
     public void test_Atom_missing_message_container() {

@@ -7,10 +7,8 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
-import won.node.protocol.impl.MatcherProtocolMatcherClientImpl;
 import won.node.service.nodebehaviour.ConnectionStateChange;
-import won.node.service.nodebehaviour.SocketService;
+import won.node.service.nodebehaviour.DataDerivationService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
@@ -29,7 +27,7 @@ public class SocketDerivationProcessor implements Processor {
     @Autowired
     AtomRepository atomRepository;
     @Autowired
-    SocketService derivationService;
+    DataDerivationService dataDerivationService;
 
     public SocketDerivationProcessor() {
     }
@@ -67,7 +65,7 @@ public class SocketDerivationProcessor implements Processor {
                 con = Optional.of(connectionRepository.findOneByConnectionURI(conUri));
             }
             Atom atom = atomRepository.findOneByAtomURI(con.get().getAtomURI());
-            derivationService.deriveDataForStateChange(connectionStateChange, atom, con.get());
+            dataDerivationService.deriveDataForStateChange(connectionStateChange, atom, con.get());
         }
     }
 }

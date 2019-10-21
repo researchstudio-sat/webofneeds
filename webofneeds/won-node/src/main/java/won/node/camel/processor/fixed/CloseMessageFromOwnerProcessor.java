@@ -1,10 +1,14 @@
 package won.node.camel.processor.fixed;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.node.camel.processor.general.OutboundMessageFactoryProcessor;
@@ -16,9 +20,6 @@ import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
 import won.protocol.vocabulary.WONMSG;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
 
 /**
  * User: syim Date: 02.03.2015
@@ -34,7 +35,7 @@ public class CloseMessageFromOwnerProcessor extends AbstractCamelProcessor {
         logger.debug("CLOSE received from the owner side for connection {}", wonMessage.getSenderURI());
         Connection con = connectionRepository.findOneByConnectionURIForUpdate(wonMessage.getSenderURI()).get();
         ConnectionState originalState = con.getState();
-        con = dataService.nextConnectionState(con, ConnectionEventType.OWNER_CLOSE);
+        con = connectionService.nextConnectionState(con, ConnectionEventType.OWNER_CLOSE);
         // if the connection was in suggested state, don't send a close message to the
         // remote atom
         if (originalState != ConnectionState.SUGGESTED) {

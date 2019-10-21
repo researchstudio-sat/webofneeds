@@ -1,10 +1,16 @@
 package won.node.camel.processor.fixed;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Objects;
+import java.util.Optional;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.node.camel.processor.general.OutboundMessageFactoryProcessor;
@@ -18,11 +24,6 @@ import won.protocol.model.ConnectionState;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WONMSG;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * User: syim Date: 02.03.2015
@@ -57,8 +58,9 @@ public class OpenMessageFromOwnerProcessor extends AbstractCamelProcessor {
         Optional<URI> userDefinedTargetSocketURI = Optional
                         .ofNullable(WonRdfUtils.SocketUtils.getTargetSocket(wonMessage));
         Optional<URI> userDefinedSocketURI = Optional.ofNullable(WonRdfUtils.SocketUtils.getSocket(wonMessage));
-        failIfIsNotSocketOfAtom(userDefinedSocketURI, Optional.of(wonMessage.getSenderAtomURI()));
-        failIfIsNotSocketOfAtom(userDefinedTargetSocketURI, Optional.of(wonMessage.getRecipientAtomURI()));
+        connectionService.failIfIsNotSocketOfAtom(userDefinedSocketURI, Optional.of(wonMessage.getSenderAtomURI()));
+        connectionService.failIfIsNotSocketOfAtom(userDefinedTargetSocketURI,
+                        Optional.of(wonMessage.getRecipientAtomURI()));
         Optional<URI> connectionsTargetSocketURI = Optional.ofNullable(con.getTargetSocketURI());
         // check remote socket info
         if (userDefinedTargetSocketURI.isPresent()) {
@@ -78,13 +80,13 @@ public class OpenMessageFromOwnerProcessor extends AbstractCamelProcessor {
                 con.setTargetSocketURI(lookupDefaultSocket(con.getTargetAtomURI()));
             }
         }
-        failForIncompatibleSockets(con.getSocketURI(), con.getTargetSocketURI());
+        connectionService.failForIncompatibleSockets(con.getSocketURI(), con.getTargetSocketURI());
         ConnectionState state = con.getState();
         if (state != ConnectionState.CONNECTED) {
             state = state.transit(ConnectionEventType.OWNER_OPEN);
             if (state == ConnectionState.CONNECTED) {
                 // previously unconnected connection would be established. Check capacity:
-                failForExceededCapacity(con.getSocketURI());
+                connectionService.failForExceededCapacity(con.getSocketURI());
             }
         }
         con.setState(state);

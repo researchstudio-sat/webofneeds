@@ -36,12 +36,12 @@ public class ConnectMessageFromNodeProcessor extends AbstractCamelProcessor {
         if (socketURI == null) {
             throw new IllegalArgumentException("cannot process FROM_EXTERNAL connect without recipientSocketURI");
         }
-        failIfIsNotSocketOfAtom(Optional.of(socketURI), Optional.of(atomUri));
-        Socket socket = dataService.getSocket(atomUri, socketURI == null ? Optional.empty() : Optional.of(socketURI));
+        connectionService.failIfIsNotSocketOfAtom(Optional.of(socketURI), Optional.of(atomUri));
+        Socket socket = socketService.getSocket(atomUri, socketURI == null ? Optional.empty() : Optional.of(socketURI));
         URI connectionURI = wonMessage.getRecipientURI(); // if the uri is known already, we can load the connection!
         // the remote socket must be specified in a message coming from another node
         URI targetSocketURI = WonRdfUtils.SocketUtils.getTargetSocket(wonMessage);
-        failIfIsNotSocketOfAtom(Optional.of(targetSocketURI), Optional.of(targetAtomUri));
+        connectionService.failIfIsNotSocketOfAtom(Optional.of(targetSocketURI), Optional.of(targetAtomUri));
         // we complain about socket, not targetSocket, because it's a remote
         // message!
         if (targetSocketURI == null)
@@ -89,12 +89,12 @@ public class ConnectMessageFromNodeProcessor extends AbstractCamelProcessor {
                 }
             }
         }
-        failForExceededCapacity(socket.getSocketURI());
-        failForIncompatibleSockets(socket.getSocketURI(), targetSocketURI);
+        connectionService.failForExceededCapacity(socket.getSocketURI());
+        connectionService.failForIncompatibleSockets(socket.getSocketURI(), targetSocketURI);
         if (con == null) {
             // create Connection in Database
             URI connectionUri = wonNodeInformationService.generateConnectionURI(wonNodeUriFromWonMessage);
-            con = dataService.createConnection(connectionUri, atomUri, targetAtomUri, targetConnectionUri,
+            con = connectionService.createConnection(connectionUri, atomUri, targetAtomUri, targetConnectionUri,
                             socket.getSocketURI(), socket.getTypeURI(), targetSocketURI,
                             ConnectionState.REQUEST_RECEIVED, ConnectionEventType.PARTNER_OPEN);
         }
