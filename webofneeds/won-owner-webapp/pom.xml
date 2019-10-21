@@ -226,11 +226,13 @@
 						</configuration>
 					</execution>
 					<execution>
-						<id>npm-install</id>
+						<id>npm ci</id>
 						<goals>
-							<!-- everything else is executed by the postinstall hook in package.json -->
 							<goal>npm</goal>
 						</goals>
+						<configuration>
+							<arguments>ci</arguments>
+						</configuration>
 					</execution>
 					<execution>
 						<id>npm-build</id>
@@ -409,7 +411,7 @@
 								<phase>none</phase>
 							</execution>
 							<execution>
-								<id>npm-install</id>
+								<id>npm ci</id>
 								<phase>none</phase>
 							</execution>
 							<execution>
