@@ -136,7 +136,11 @@ const mapStateToProps = (state, ownProps) => {
     atomFailedToLoad:
       atom && processUtils.hasAtomFailedToLoad(process, ownProps.atomUri),
     shouldShowRdf: viewUtils.showRdf(viewState),
-    visibleTab: viewUtils.getVisibleTabByAtomUri(viewState, ownProps.atomUri),
+    visibleTab: viewUtils.getVisibleTabByAtomUri(
+      viewState,
+      ownProps.atomUri,
+      ownProps.defaultTab
+    ),
   };
 };
 

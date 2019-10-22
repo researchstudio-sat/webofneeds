@@ -46,6 +46,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     className: ownProps.className,
     atomUri: ownProps.atomUri,
+    defaultTab: ownProps.defaultTab,
     loggedIn: accountUtils.isLoggedIn(get(state, "account")),
     isInactive: atomUtils.isInactive(atom),
     showAdHocRequestField,
@@ -179,8 +180,14 @@ class AtomInfo extends React.Component {
         }
       >
         <WonAtomHeaderBig atomUri={this.props.atomUri} />
-        <WonAtomMenu atomUri={this.props.atomUri} />
-        <WonAtomContent atomUri={this.props.atomUri} />
+        <WonAtomMenu
+          atomUri={this.props.atomUri}
+          defaultTab={this.props.defaultTab}
+        />
+        <WonAtomContent
+          atomUri={this.props.atomUri}
+          defaultTab={this.props.defaultTab}
+        />
         {footerElement}
       </won-atom-info>
     );
@@ -229,6 +236,7 @@ class AtomInfo extends React.Component {
 
 AtomInfo.propTypes = {
   atomUri: PropTypes.string,
+  defaultTab: PropTypes.string,
   loggedIn: PropTypes.bool,
   isInactive: PropTypes.bool,
   showAdHocRequestField: PropTypes.bool,

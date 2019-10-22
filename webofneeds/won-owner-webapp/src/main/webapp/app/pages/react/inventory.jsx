@@ -142,6 +142,7 @@ class PageInventory extends React.Component {
                         key={personaUri + "-" + index}
                         className="ownerinventory__personas__persona"
                         atomUri={personaUri}
+                        defaultTab="HOLDS"
                       />
                     )
                   )}
