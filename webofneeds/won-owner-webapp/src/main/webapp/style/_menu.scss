@@ -53,11 +53,11 @@
 
       &.menu__slideintoggle__carret--expanded {
         transform: rotate(-180deg);
-        transition: transform linear 0.25s;
+        transition: transform linear 0.2s;
       }
       &:not(.menu__slideintoggle__carret--expanded) {
         transform: rotate(0deg);
-        transition: transform linear 0.25s;
+        transition: transform linear 0.2s;
       }
     }
   }
