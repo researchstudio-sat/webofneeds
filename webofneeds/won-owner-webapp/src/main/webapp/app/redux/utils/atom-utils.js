@@ -294,10 +294,28 @@ export function hasSuggestedConnections(atom) {
   );
 }
 
+export function hasRequestedConnections(atom) {
+  return (
+    get(atom, "connections") &&
+    !!get(atom, "connections").find(conn =>
+      connectionUtils.isRequestReceived(conn)
+    )
+  );
+}
+
 export function getSuggestedConnections(atom) {
   return (
     get(atom, "connections") &&
     get(atom, "connections").filter(conn => connectionUtils.isSuggested(conn))
+  );
+}
+
+export function getRequestedConnections(atom) {
+  return (
+    get(atom, "connections") &&
+    get(atom, "connections").filter(conn =>
+      connectionUtils.isRequestReceived(conn)
+    )
   );
 }
 
@@ -310,6 +328,7 @@ export function hasUnreadSuggestedConnections(atom) {
   );
 }
 
+// to be used on personas
 export function hasUnreadBuddyRequests(atom) {
   return (
     get(atom, "connections") &&
