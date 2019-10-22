@@ -54,13 +54,11 @@
     "whatwg-fetch": "^0.10.1"
   },
   "scripts": {
-    "build": "cross-env PARCEL_WORKERS=1 WON_OWNER_BASE_URL=/owner parcel build index.html --public-url=/owner -d generated",
+    "build": "cross-env WON_OWNER_BASE_URL=/owner parcel build index.html --public-url=/owner -d generated",
     "serve": "parcel ENABLE_NOTIFICATIONS=true index.html",
-    "win:serve": "cross-env PARCEL_WORKERS=1 npm run serve",
     "postinstall": "npm rebuild && patch-package",
     "precommit": "lint-staged",
     "watch": "cross-env ENABLE_NOTIFICATIONS=true WON_OWNER_BASE_URL=/owner parcel watch index.html --public-url=/owner -d generated --no-hmr",
-    "win:watch": "cross-env PARCEL_WORKERS=1 npm run watch",
     "clean": "rimraf ./generated ./.cache"
   },
   "devDependencies": {
@@ -73,8 +71,8 @@
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "cross-env": "^5.2.0",
-    "elm": "^0.19.0-bugfix6",
-    "elm-hot": "^1.0.1",
+    "elm": "^0.19.1-1",
+    "elm-hot": "^1.1.2",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^2.10.0",
     "eslint-config-standard": "^11.0.0",

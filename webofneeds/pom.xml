@@ -914,7 +914,6 @@
                         <localCheckout>true</localCheckout>
                         <pushChanges>false</pushChanges>
                         <mavenExecutorId>forked-path</mavenExecutorId>
-                        <arguments>-Dgpg.passphrase=${gpg.passphrase}</arguments>
                     </configuration>
                     <dependencies>
                         <dependency>
@@ -1020,6 +1019,7 @@
 
 
     <properties>
+	<doclint>none</doclint>
         <solr.upload.dest>${project.build.directory}</solr.upload.dest>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compile.compilerargs>
