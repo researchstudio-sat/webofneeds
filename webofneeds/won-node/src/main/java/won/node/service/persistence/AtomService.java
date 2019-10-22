@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,7 +30,6 @@ import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.MissingMessagePropertyException;
 import won.protocol.message.processor.exception.UriAlreadyInUseException;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.model.Atom;
 import won.protocol.model.AtomMessageContainer;
 import won.protocol.model.AtomState;
@@ -44,7 +44,6 @@ import won.protocol.repository.MessageEventRepository;
 import won.protocol.repository.OwnerApplicationRepository;
 import won.protocol.repository.SocketRepository;
 import won.protocol.util.AtomModelWrapper;
-import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
@@ -64,6 +63,8 @@ public class AtomService {
     OwnerApplicationRepository ownerApplicationRepository;
     @Autowired
     MessageEventRepository messageEventRepository;
+    @Autowired
+    MessageService messageService;
 
     public Optional<Atom> getAtom(URI atomURI) {
         return atomRepository.findOneByAtomURI(atomURI);
@@ -208,11 +209,10 @@ public class AtomService {
 
     public void activate(URI atomURI, URI messageURI) throws NoSuchAtomException {
         logger.debug("ACTIVATING atom. atomURI:{}", atomURI);
-        if (atomURI == null)
-            throw new IllegalArgumentException("recipientAtomURI is not set");
-        Atom atom = DataAccessUtils.loadAtom(atomRepository, atomURI);
-        atom.getMessageContainer().getEvents()
-                        .add(messageEventRepository.findOneByMessageURIforUpdate(messageURI));
+        Objects.requireNonNull(atomURI);
+        Objects.requireNonNull(messageURI);
+        Atom atom = getAtomRequired(atomURI);
+        messageService.saveMessageInContainer(messageURI, atomURI);
         logger.debug("Setting Atom State: " + atom.getState());
         atom.setState(AtomState.ACTIVE);
         atomRepository.save(atom);
@@ -234,13 +234,13 @@ public class AtomService {
 
     public void deactivate(URI atomURI, URI messageURI) {
         logger.debug("DEACTIVATING atom. atomURI:{}", atomURI);
-        if (atomURI == null)
-            throw new WonMessageProcessingException("recipientAtomURI is not set");
-        Atom atom = DataAccessUtils.loadAtom(atomRepository, atomURI);
-        atom.getMessageContainer().getEvents()
-                        .add(messageEventRepository.findOneByMessageURIforUpdate(messageURI));
+        Objects.requireNonNull(atomURI);
+        Objects.requireNonNull(messageURI);
+        Atom atom = getAtomRequired(atomURI);
+        messageService.saveMessageInContainer(messageURI, atomURI);
+        logger.debug("Setting Atom State: " + atom.getState());
         atom.setState(AtomState.INACTIVE);
-        atom = atomRepository.save(atom);
+        atomRepository.save(atom);
     }
 
     public void atomMessageFromSystem(WonMessage wonMessage) {
@@ -257,13 +257,6 @@ public class AtomService {
             throw new WrongAddressingInformationException("SenderAtomUri and recipientAtomUri must be identical",
                             URI.create(WONMSG.senderAtom.getURI()), URI.create(WONMSG.recipientAtom.getURI()));
         }
-        putMessageInAtomMessageContainer(senderAtomURI, messageURI);
-    }
-
-    public void putMessageInAtomMessageContainer(URI atomURI, URI messageURI) {
-        Atom atom = getAtomRequired(atomURI);
-        atom.getMessageContainer().getEvents()
-                        .add(messageEventRepository.findOneByMessageURIforUpdate(messageURI));
-        atom = atomRepository.save(atom);
+        messageService.saveMessageInContainer(messageURI, senderAtomURI);
     }
 }

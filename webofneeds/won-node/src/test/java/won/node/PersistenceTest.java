@@ -1,12 +1,15 @@
 package won.node;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Date;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -148,7 +151,8 @@ public class PersistenceTest {
         Mockito.when(socketLookup.getCapacity(senderSocket)).thenReturn(Optional.of(10));
         Mockito.when(socketLookup.getCapacity(targetSocket)).thenReturn(Optional.of(10));
         Mockito.when(socketLookup.isCompatible(senderSocket, targetSocket)).thenReturn(true);
-        WonMessage connectMessage = WonMessageBuilder.setMessagePropertiesForConnect(URI.create("uri:connectMessage"),
+        URI connectMessageUri = URI.create("uri:connectMessage");
+        WonMessage connectMessage = WonMessageBuilder.setMessagePropertiesForConnect(connectMessageUri,
                         Optional.of(senderSocket),
                         atom.getAtomURI(), atom.getWonNodeURI(),
                         Optional.of(targetSocket), atom2.getAtomURI(),
@@ -167,6 +171,10 @@ public class PersistenceTest {
         messageService.saveMessage(responseForConnectMessage, con.getConnectionURI());
         // let's check:
         assertEquals(2, con.getMessageContainer().getEvents().size());
+        Set<URI> messagesInConnection = con.getMessageContainer().getEvents().stream()
+                        .map(mic -> mic.getMessage().getMessageURI()).collect(Collectors.toSet());
+        assertTrue(messagesInConnection.contains(connectMessageUri));
+        assertTrue(messagesInConnection.contains(successForConnect));
     }
 
     private Dataset createTestDataset(String resourceName) throws IOException {

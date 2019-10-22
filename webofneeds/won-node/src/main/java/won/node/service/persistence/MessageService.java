@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import won.protocol.exception.IncoherentDatabaseStateException;
 import won.protocol.exception.NoSuchMessageException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
@@ -20,10 +21,12 @@ import won.protocol.model.ConnectionMessageContainer;
 import won.protocol.model.DatasetHolder;
 import won.protocol.model.MessageContainer;
 import won.protocol.model.MessageEvent;
+import won.protocol.model.MessageInContainer;
 import won.protocol.repository.AtomMessageContainerRepository;
 import won.protocol.repository.ConnectionContainerRepository;
 import won.protocol.repository.ConnectionMessageContainerRepository;
 import won.protocol.repository.DatasetHolderRepository;
+import won.protocol.repository.MessageContainerRepository;
 import won.protocol.repository.MessageEventRepository;
 
 @Component
@@ -33,6 +36,8 @@ public class MessageService {
     protected ConnectionContainerRepository connectionContainerRepository;
     @Autowired
     protected AtomMessageContainerRepository atomMessageContainerRepository;
+    @Autowired
+    protected MessageContainerRepository messageContainerRepository;
     @Autowired
     protected ConnectionMessageContainerRepository connectionMessageContainerRepository;
     @Autowired
@@ -82,9 +87,26 @@ public class MessageService {
         DatasetHolder datasetHolder = new DatasetHolder(wonMessage.getMessageURI(),
                         WonMessageEncoder.encodeAsDataset(wonMessage));
         MessageEvent event = new MessageEvent(parent, wonMessage, container);
+        MessageInContainer mic = new MessageInContainer(event, container);
         event.setDatasetHolder(datasetHolder);
-        container.getEvents().add(event);
+        container.getEvents().add(mic);
         messageEventRepository.save(event);
+    }
+
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void saveMessageInContainer(final URI messageURI, URI parentURI) {
+        logger.debug("STORING message with uri {} and parent uri", messageURI, parentURI);
+        MessageContainer container = messageContainerRepository.findOneByParentUriForUpdate(parentURI)
+                        .orElseThrow(() -> new IncoherentDatabaseStateException(
+                                        "Cannot store message " + messageURI + " in container with parent " + parentURI
+                                                        + ": container not found"));
+        MessageEvent message = messageEventRepository.findOneByMessageURI(messageURI)
+                        .orElseThrow(() -> new IncoherentDatabaseStateException(
+                                        "Cannot store message " + messageURI + " in container with parent " + parentURI
+                                                        + ": message not found"));
+        MessageInContainer mic = new MessageInContainer(message, container);
+        container.getEvents().add(mic);
+        messageContainerRepository.save(container);
     }
 
     @Transactional(propagation = Propagation.MANDATORY)
@@ -110,14 +132,9 @@ public class MessageService {
             connectionMessageContainerRepository.saveAndFlush(cec);
             return connectionMessageContainerRepository.findOne(cec.getId());
         }
-        MessageContainer container = atomMessageContainerRepository.findOneByParentUriForUpdate(parent);
-        if (container != null)
-            return container;
-        container = connectionMessageContainerRepository.findOneByParentUriForUpdate(parent);
-        if (container != null)
-            return container;
-        // let's see if we can find the event conta
-        throw new IllegalArgumentException("Cannot store '" + messageType + "' event: unable to find "
-                        + "event container with parent URI '" + parent + "'");
+        return messageContainerRepository.findOneByParentUriForUpdate(parent)
+                        .orElseThrow(() -> new IncoherentDatabaseStateException(
+                                        "Cannot store '" + messageType + "' event: unable to find "
+                                                        + "event container with parent URI '" + parent + "'"));
     }
 }

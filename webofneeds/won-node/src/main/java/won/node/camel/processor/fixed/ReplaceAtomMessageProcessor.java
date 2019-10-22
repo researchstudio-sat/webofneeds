@@ -24,13 +24,11 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Atom;
-import won.protocol.model.AtomMessageContainer;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.DatasetHolder;
 import won.protocol.model.Socket;
 import won.protocol.util.AtomModelWrapper;
-import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
@@ -67,15 +65,10 @@ public class ReplaceAtomMessageProcessor extends AbstractCamelProcessor {
             throw new IllegalArgumentException("Could not determine atom URI within message content");
         if (!atomURI.equals(wonMessage.getSenderAtomURI()))
             throw new IllegalArgumentException("senderAtomURI and AtomURI of the content are not equal");
-        final Atom atom = DataAccessUtils.loadAtom(atomRepository, atomURI);
-        AtomMessageContainer atomMessageContainer = atom.getMessageContainer();
-        if (atomMessageContainer == null) {
-            throw new IllegalStateException("Trying to replace atom that does not have an event container");
-        }
-        atomMessageContainer.getEvents()
-                        .add(messageEventRepository.findOneByMessageURIforUpdate(wonMessage.getMessageURI()));
-        // store the atom content
+        final Atom atom = atomService.getAtomRequired(atomURI);
         URI messageURI = wonMessage.getMessageURI();
+        messageService.saveMessageInContainer(messageURI, atomURI);
+        // store the atom content
         DatasetHolder datasetHolder = atom.getDatatsetHolder();
         // get the derived data, we don't change that here
         Dataset atomDataset = atom.getDatatsetHolder().getDataset();

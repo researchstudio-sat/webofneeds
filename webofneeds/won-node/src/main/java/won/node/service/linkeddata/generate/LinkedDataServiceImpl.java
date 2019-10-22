@@ -58,6 +58,7 @@ import won.protocol.model.DataWithEtag;
 import won.protocol.model.DatasetHolder;
 import won.protocol.model.DatasetHolderAggregator;
 import won.protocol.model.MessageEvent;
+import won.protocol.model.MessageInContainer;
 import won.protocol.model.unread.UnreadMessageInfo;
 import won.protocol.model.unread.UnreadMessageInfoForAtom;
 import won.protocol.repository.AtomRepository;
@@ -231,11 +232,12 @@ public class LinkedDataServiceImpl implements LinkedDataService {
                         WON.MessageContainer);
         metaModel.add(metaModel.createStatement(atomResource, WON.messageContainer, atomMessageContainer));
         // add atom event URIs
-        Collection<MessageEvent> messageEvents = atom.getMessageContainer().getEvents();
-        for (MessageEvent messageEvent : messageEvents) {
-            metaModel.add(metaModel.createStatement(atomMessageContainer, RDFS.member,
-                            metaModel.getResource(messageEvent.getMessageURI().toString())));
-        }
+        Collection<MessageInContainer> messageEvents = atom.getMessageContainer().getEvents();
+        messageEvents.stream().map(mic -> mic.getMessage())
+                        .forEach(messageEvent -> metaModel.add(metaModel.createStatement(
+                                        atomMessageContainer,
+                                        RDFS.member,
+                                        metaModel.getResource(messageEvent.getMessageURI().toString()))));
         // add WON node link
         atomResource.addProperty(WON.wonNode, metaModel.createResource(this.resourceURIPrefix));
         // link all atom graphs taken from the create message to atom uri:
