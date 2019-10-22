@@ -257,12 +257,14 @@ personaList personas =
                     [ HA.class "won-persona-list-entry"
                     , HA.class "empty"
                     ]
-                    [ Html.a
-                        [ HA.href "#!/settings"
-                        , HA.target "_blank"
-                        , HA.class "won-persona-name"
+                    [
+                        Html.div [ HA.class "won-persona-name"] [
+                            Html.text ("No Personas created yet. You "
+                                ++ "can do so, by going to this post's "
+                                ++ "detail page and adding a (new) persona "
+                                ++ "there. This persona can then also be "
+                                ++ "used for other new posts." )
                         ]
-                        [ Html.text "Create Personas" ]
                     ]
                 ]
 
