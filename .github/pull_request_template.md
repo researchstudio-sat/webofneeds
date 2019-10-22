@@ -3,7 +3,7 @@
 ## Pull request checklist
 
 Please check if your PR fulfills the following requirements:
-- [ ] Tests for the changes have been added/altered (for bug fixes / features)
+- [ ] Affected Tests have been added/altered (for bug fixes / features)
 - [ ] Docs have been reviewed and added/updated if needed (for bug fixes / features)
 - [ ] Build was run locally and `mvn install` succeeds
 
@@ -22,7 +22,7 @@ Please check the type of change your PR introduces:
 ## What is the current behavior?
 <!-- Please describe the current behavior that you are modifying, or link to a relevant issue. -->
 
-Issue Number: N/A
+- Fixes: N/A
 
 
 ## What is the new behavior?
