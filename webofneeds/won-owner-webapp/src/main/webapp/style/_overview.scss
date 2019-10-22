@@ -112,11 +112,11 @@ main.owneroverview {
 
           &--expanded {
             transform: rotate(-180deg);
-            transition: all linear 0.5s;
+            transition: all linear 0.2s;
           }
 
           &--collapsed {
-            transition: all linear 0.5s;
+            transition: all linear 0.2s;
           }
         }
       }

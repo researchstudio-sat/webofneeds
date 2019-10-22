@@ -156,7 +156,10 @@ class PageOverview extends React.Component {
                     className="owneroverview__usecases__usecase"
                     key={ucIdentifier + "-" + index}
                   >
-                    <div className="owneroverview__usecases__usecase__header">
+                    <div
+                      className="owneroverview__usecases__usecase__header clickable"
+                      onClick={() => this.toggleUseCase(ucIdentifier)}
+                    >
                       {useCaseUtils.getUseCaseIcon(ucIdentifier) && (
                         <svg className="owneroverview__usecases__usecase__header__icon">
                           <use
@@ -180,7 +183,6 @@ class PageOverview extends React.Component {
                             ? " owneroverview__usecases__usecase__header__carret--expanded "
                             : " owneroverview__usecases__usecase__header__carret--collapsed ")
                         }
-                        onClick={() => this.toggleUseCase(ucIdentifier)}
                       >
                         <use
                           xlinkHref="#ico16_arrow_down"
@@ -207,7 +209,10 @@ class PageOverview extends React.Component {
               {this.hasOtherAtoms() && (
                 <div className="owneroverview__usecases__usecase">
                   {this.props.whatsNewUseCaseIdentifierArray && (
-                    <div className="owneroverview__usecases__usecase__header">
+                    <div
+                      className="owneroverview__usecases__usecase__header"
+                      onClick={() => this.toggleUseCase(undefined)}
+                    >
                       <div className="owneroverview__usecases__usecase__header__title">
                         Other
                         <span className="owneroverview__usecases__usecase__header__title__count">
@@ -221,7 +226,6 @@ class PageOverview extends React.Component {
                             ? " owneroverview__usecases__usecase__header__carret--expanded "
                             : " owneroverview__usecases__usecase__header__carret--collapsed ")
                         }
-                        onClick={() => this.toggleUseCase(undefined)}
                       >
                         <use
                           xlinkHref="#ico16_arrow_down"

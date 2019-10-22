@@ -29,7 +29,6 @@ const initialState = Immutable.fromJS({
 });
 
 const initialAtomState = Immutable.fromJS({
-  showGeneralInfo: false,
   visibleTab: "DETAIL",
 });
 
@@ -177,10 +176,11 @@ export default function(viewState = initialState, action = {}) {
       const atomUri = action.payload.get("atomUri");
       const selectTab = action.payload.get("selectTab");
 
-      return viewState.updateIn(
+      const atomState = viewState.getIn(["atoms", atomUri]) || initialAtomState;
+
+      return viewState.setIn(
         ["atoms", atomUri],
-        initialAtomState,
-        atomState => atomState.update("visibleTab", () => selectTab)
+        atomState.set("visibleTab", selectTab)
       );
     }
 

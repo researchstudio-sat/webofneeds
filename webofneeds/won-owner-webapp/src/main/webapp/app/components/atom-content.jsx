@@ -74,7 +74,11 @@ const mapStateToProps = (state, ownProps) => {
     shouldShowRdf: viewUtils.showRdf(viewState),
     fromConnection: !!openConnectionUri,
     openConnectionUri,
-    visibleTab: viewUtils.getVisibleTabByAtomUri(viewState, ownProps.atomUri),
+    visibleTab: viewUtils.getVisibleTabByAtomUri(
+      viewState,
+      ownProps.atomUri,
+      ownProps.defaultTab
+    ),
     personas: generalSelectors.getOwnedCondensedPersonaList(state),
   };
 };
