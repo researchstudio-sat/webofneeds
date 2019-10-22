@@ -121,7 +121,15 @@ class PagePost extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.atomUri && this.props.atomUri !== prevProps.atomUri) {
+    // Invoke possible fetch if:
+    //    - atomUri is present AND
+    //        - atomUri has changed OR
+    //        - loginStatus has changed to loggedOut
+    if (
+      this.props.atomUri &&
+      (this.props.atomUri !== prevProps.atomUri ||
+        (!this.props.isLoggedIn && prevProps.isLoggedIn))
+    ) {
       if (
         !this.props.atom ||
         (this.props.atomToLoad && !this.props.atomLoading)
