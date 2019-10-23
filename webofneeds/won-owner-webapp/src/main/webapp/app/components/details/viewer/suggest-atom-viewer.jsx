@@ -9,6 +9,7 @@ import { get, getIn } from "../../../utils.js";
 import { actionCreators } from "../../../actions/actions.js";
 
 import "~/style/_suggest-atom-viewer.scss";
+import * as processSelectors from "../../../redux/selectors/process-selectors";
 
 const mapStateToProps = (state, ownProps) => {
   const openedConnectionUri = generalSelectors.getConnectionUriFromRoute(state);
@@ -31,19 +32,13 @@ const mapStateToProps = (state, ownProps) => {
   const hasConnectionBetweenPosts =
     connectionsBetweenPosts && connectionsBetweenPosts.size > 0;
 
-  const isLoading = state.getIn([
-    "process",
-    "atoms",
-    ownProps.content,
-    "loading",
-  ]);
-  const toLoad = state.getIn(["process", "atoms", ownProps.content, "toLoad"]);
-  const failedToLoad = state.getIn([
-    "process",
-    "atoms",
-    ownProps.content,
-    "failedToLoad",
-  ]);
+  const isLoading = processSelectors.isAtomLoading(state, ownProps.content);
+  const toLoad = processSelectors.isAtomToLoad(state, ownProps.content);
+
+  const failedToLoad = processSelectors.hasAtomFailedToLoad(
+    state,
+    ownProps.content
+  );
 
   const fetchedSuggestion = !isLoading && !toLoad && !failedToLoad;
   const isSuggestedOwned = generalSelectors.isAtomOwned(

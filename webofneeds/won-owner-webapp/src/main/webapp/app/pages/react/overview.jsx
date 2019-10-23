@@ -5,7 +5,7 @@ import { actionCreators } from "../../actions/actions.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import { get, getIn, sortByDate } from "../../utils.js";
-import * as processUtils from "../../redux/utils/process-utils.js";
+import * as processSelectors from "../../redux/selectors/process-selectors.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as useCaseUtils from "../../usecase-utils.js";
 import * as wonLabelUtils from "../../won-label-utils.js";
@@ -58,8 +58,7 @@ const mapStateToProps = state => {
     "lastWhatsNewUpdateTime",
   ]);
 
-  const process = get(state, "process");
-  const isOwnerAtomUrisLoading = processUtils.isProcessingWhatsNew(process);
+  const isOwnerAtomUrisLoading = processSelectors.isProcessingWhatsNew(state);
   const isOwnerAtomUrisToLoad =
     !lastAtomUrisUpdateDate && !isOwnerAtomUrisLoading;
 

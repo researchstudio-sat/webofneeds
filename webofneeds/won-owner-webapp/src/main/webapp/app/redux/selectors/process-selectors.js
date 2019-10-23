@@ -30,6 +30,10 @@ export function isLoading(state) {
   );
 }
 
+export function isProcessingPublish(state) {
+  return processUtils.isProcessingPublish(get(state, "process"));
+}
+
 export function isProcessingAcceptTermsOfService(state) {
   return processUtils.isProcessingAcceptTermsOfService(get(state, "process"));
 }
