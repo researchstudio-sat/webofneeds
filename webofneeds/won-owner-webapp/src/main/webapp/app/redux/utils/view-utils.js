@@ -25,6 +25,10 @@ export function showRdf(viewState) {
   return get(viewState, "showRdf");
 }
 
+export function isDebugModeEnabled(viewState) {
+  return get(viewState, "debugMode");
+}
+
 export function isMenuVisible(viewState) {
   return get(viewState, "showMenu");
 }

@@ -23,6 +23,10 @@ export function showRdf(state) {
   return viewUtils.showRdf(get(state, "view"));
 }
 
+export function isDebugModeEnabled(state) {
+  return viewUtils.isDebugModeEnabled(get(state, "view"));
+}
+
 export function isMenuVisible(state) {
   return viewUtils.isMenuVisible(get(state, "view"));
 }
