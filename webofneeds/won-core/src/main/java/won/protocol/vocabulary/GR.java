@@ -6,9 +6,7 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 
 /**
- * Good relations vocabulary.
- * <p/>
- * User: Alan Tus Date: 21.04.13. Time: 22:23
+ * Good relations vocabulary. User: Alan Tus Date: 21.04.13. Time: 22:23
  */
 public class GR {
     public static final String BASE_URI = "http://purl.org/goodrelations/v1#";

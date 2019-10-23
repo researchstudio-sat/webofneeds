@@ -88,7 +88,6 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
      * ID (lower 64 bits of the owner public key fingerprint). Unless there is a
      * collision of owner ids on the node - then the owner can assign another id...
      *
-     * @return ownerApplicationId
      * @throws Exception
      */
     public synchronized void register(URI wonNodeURI, MessagingService messagingService) throws Exception {

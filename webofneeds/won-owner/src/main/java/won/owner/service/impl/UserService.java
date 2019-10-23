@@ -261,7 +261,7 @@ public class UserService {
      * @param password
      * @param role
      * @throws UserAlreadyExistsException
-     * @returns the created User
+     * @return the created User
      */
     public User registerUser(String email, String password, String role) throws UserAlreadyExistsException {
         return registerUser(email, password, role, null);
@@ -274,9 +274,8 @@ public class UserService {
      * @param email
      * @param password
      * @param role
-     * @param isAnonymousUser
      * @throws UserAlreadyExistsException
-     * @returns the created User
+     * @return the created User
      */
     public User registerUser(String email, String password, String role, String privateId)
                     throws UserAlreadyExistsException {

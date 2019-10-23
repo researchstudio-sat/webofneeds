@@ -46,9 +46,9 @@ public interface AtomInformationService {
      * state with number of atom uris per page preference.
      *
      * @param page the page number
-     * @param preferredSize preferred number of members per page, null => use
-     * default
-     * @param atomState Active/Inactive, null => all states
+     * @param preferredSize preferred number of members per page, null {@literal =>}
+     * use default
+     * @param atomState Active/Inactive, null {@literal =>} all states
      * @return a collection of all atom URIs.
      */
     Slice<URI> listPagedAtomURIs(int page, Integer preferredSize, AtomState atomState);
@@ -59,9 +59,9 @@ public interface AtomInformationService {
      * preference.
      *
      * @param atom
-     * @param preferredSize preferred number of members per page, null => use
-     * default
-     * @param atomState Active/Inactive, null => all states
+     * @param preferredSize preferred number of members per page, null {@literal =>}
+     * use default
+     * @param atomState Active/Inactive, null {@literal =>} all states
      * @return a collection of all atom URIs.
      */
     Slice<URI> listPagedAtomURIsBefore(URI atom, Integer preferredSize, AtomState atomState);
@@ -72,9 +72,9 @@ public interface AtomInformationService {
      * preference.
      *
      * @param atom
-     * @param preferredSize preferred number of members per page, null => use
-     * default
-     * @param atomState Active/Inactive, null => all states
+     * @param preferredSize preferred number of members per page, null {@literal =>}
+     * use default
+     * @param atomState Active/Inactive, null {@literal =>} all states
      * @return a collection of all atom URIs.
      */
     Slice<URI> listPagedAtomURIsAfter(URI atom, Integer preferredSize, AtomState atomState);
@@ -124,8 +124,8 @@ public interface AtomInformationService {
      * Retrieves slice of the connection URIs list for a given page number
      *
      * @param page the page number
-     * @param preferredSize preferred number of members per page or null; null =>
-     * use default
+     * @param preferredSize preferred number of members per page or null; null
+     * {@literal =>} use default
      * @param timeSpot time at which we want the list state to be fixed, if null -
      * current state
      * @return a slice connection URIs.
@@ -136,8 +136,8 @@ public interface AtomInformationService {
      * Retrieves slice of the connection URIs list for a given page number
      *
      * @param page the page number
-     * @param preferredSize preferred number of members per page or null; null =>
-     * use default
+     * @param preferredSize preferred number of members per page or null; null
+     * {@literal =>} use default
      * @param timeSpot time at which we want the list state to be fixed, if null -
      * current state
      * @return a slice connection URIs.
@@ -151,7 +151,7 @@ public interface AtomInformationService {
      * @param resumeConnURI the returned slice connections precede (in time of their
      * latest events) this connection uri
      * @param preferredPageSize preferred number of members per page or null; null
-     * => use default
+     * {@literal =>} use default
      * @param timeSpot time at which we want the list state to be fixed, cannot be
      * null
      * @return a slice of connection URIs.
@@ -166,7 +166,7 @@ public interface AtomInformationService {
      * @param resumeConnURI the returned slice connections follow (in time of their
      * latest events) this connection uri
      * @param preferredPageSize preferred number of members per page or null; null
-     * => use default
+     * {@literal =>} use default
      * @param timeSpot time at which we want the list state to be fixed, cannot be
      * null
      * @return a slice of connection URIs.
@@ -202,15 +202,13 @@ public interface AtomInformationService {
      *
      * @param atomURI the URI of the atom
      * @param page the page number
-     * @param preferredSize preferred number of members per page or null; null =>
-     * use default
+     * @param preferredSize preferred number of members per page or null; null
+     * {@literal =>} use default
      * @param messageType event type that should be used for defining connection
-     * latest activity; null => all event types
+     * latest activity; null {@literal =>} all event types
      * @param timeSpot time at which we want the list state to be fixed, if null -
      * current state
      * @return a collection of connection URIs.
-     * @throws won.protocol.exception.NoSuchAtomException if atomURI is not a known
-     * atom URI
      */
     Slice<URI> listConnectionURIs(URI atomURI, int page, Integer preferredSize, WonMessageType messageType,
                     Date timeSpot);
@@ -220,15 +218,13 @@ public interface AtomInformationService {
      *
      * @param atomURI the URI of the atom
      * @param page the page number
-     * @param preferredSize preferred number of members per page or null; null =>
-     * use default
+     * @param preferredSize preferred number of members per page or null; null
+     * {@literal =>} use default
      * @param messageType event type that should be used for defining connection
-     * latest activity; null => all event types
+     * latest activity; null {@literal =>} all event types
      * @param timeSpot time at which we want the list state to be fixed, if null -
      * current state
      * @return a collection of connections.
-     * @throws won.protocol.exception.NoSuchAtomException if atomURI is not a known
-     * atom URI
      */
     Slice<Connection> listConnections(URI atomURI, int page, Integer preferredSize, WonMessageType messageType,
                     Date timeSpot);
@@ -238,12 +234,13 @@ public interface AtomInformationService {
      * precede the given connection URI from the point of view of their latest
      * events.
      *
+     * @param atomURI
      * @param resumeConnURI the returned slice connections precede (in time of their
      * latest events) this connection uri
      * @param preferredPageSize preferred number of members per page or null; null
-     * => use default
+     * {@literal =>} use default
      * @param messageType event type that should be used for defining connection
-     * latest activity; null => all event types
+     * latest activity; null {@literal =>} all event types
      * @param timeSpot time at which we want the list state to be fixed, cannot be
      * null
      * @return a slice of connection URIs.
@@ -255,12 +252,13 @@ public interface AtomInformationService {
      * Retrieves slice of the connections that follows the given connection URI from
      * the point of view of their latest events.
      *
+     * @param atomURI
      * @param resumeConnURI the returned slice connections follow (in time of their
      * latest events) this connection uri
      * @param preferredPageSize preferred number of members per page or null; null
-     * => use default
+     * {@literal =>} use default
      * @param messageType event type that should be used for defining connection
-     * latest activity; null => all event types
+     * latest activity; null {@literal =>} all event types
      * @param timeSpot time at which we want the list state to be fixed, cannot be
      * null
      * @return a slice of connection URIs.
@@ -302,7 +300,6 @@ public interface AtomInformationService {
      *
      * @param connectionURI
      * @return
-     * @throws NoSuchAtomException
      */
     Connection readConnection(URI connectionURI) throws NoSuchConnectionException;
 
@@ -322,7 +319,6 @@ public interface AtomInformationService {
      *
      * @param connectionURI
      * @return
-     * @throws NoSuchAtomException
      */
     Model readConnectionContent(URI connectionURI) throws NoSuchConnectionException;
 

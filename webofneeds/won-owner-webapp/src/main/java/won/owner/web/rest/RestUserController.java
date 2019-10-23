@@ -400,7 +400,7 @@ public class RestUserController {
 
     /**
      * Method only accessible if the user's still signed in / the session's still
-     * valid -> Use it to check the session cookie.
+     * valid {@literal ->} Use it to check the session cookie.
      */
     // * @param user user object
     // * @param request

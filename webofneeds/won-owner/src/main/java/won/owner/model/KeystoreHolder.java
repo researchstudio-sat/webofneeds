@@ -50,9 +50,6 @@ public class KeystoreHolder {
 
     /**
      * Careful, expensive operation: writes dataset to string.
-     *
-     * @param dataset
-     * @throws IOException
      */
     public synchronized void setKeystore(KeyStore store, String password) throws KeyStoreIOException {
         synchronized (this) {

@@ -28,7 +28,6 @@ import org.la4j.vector.functor.VectorProcedure;
 
 /**
  * Sparse third order tensor based on la4j implementation of sparse matrices.
- * <p/>
  * User: hfriedrich Date: 09.07.2014
  */
 public class ThirdOrderSparseTensor {

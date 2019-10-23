@@ -24,8 +24,8 @@ public interface MatcherFacingAtomCommunicationService {
     /**
      * Notifies the atom of a matching otherAtom with the specified match score.
      * Originator identifies the entity making the call. Normally, originator is a
-     * matching service. Expects <> won:socket [SOCKET] in the RDF content, will
-     * choose a socket supported by the atom if none is present.
+     * matching service. Expects {@literal <>} won:socket [SOCKET] in the RDF
+     * content, will choose a socket supported by the atom if none is present.
      *
      * @param atomURI the URI of the atom
      * @param otherAtom URI of the other atom (may be on the local atomserver)
@@ -33,9 +33,9 @@ public interface MatcherFacingAtomCommunicationService {
      * treat lower values as 0.0 and higher values as 1.0.
      * @param originator an URI identifying the calling entity
      * @param content (optional) an optional RDF graph containing more detailed
-     * information about the hint. The null releative URI ('<>') inside that graph,
-     * as well as the base URI of the graph will be attached to the resource
-     * identifying the match event.
+     * information about the hint. The null releative URI ('{@literal <>}') inside
+     * that graph, as well as the base URI of the graph will be attached to the
+     * resource identifying the match event.
      * @throws won.protocol.exception.NoSuchAtomException if atomURI is not a known
      * atom URI
      * @throws won.protocol.exception.IllegalMessageForAtomStateException if the

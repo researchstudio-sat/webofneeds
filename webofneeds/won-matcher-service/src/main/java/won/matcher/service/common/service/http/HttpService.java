@@ -15,9 +15,7 @@ import java.lang.invoke.MethodHandles;
 import java.nio.charset.Charset;
 
 /**
- * Service to use HTTP to request resources
- * <p/>
- * User: hfriedrich Date: 04.05.2015
+ * Service to use HTTP to request resources User: hfriedrich Date: 04.05.2015
  */
 @Component
 @Scope("prototype")

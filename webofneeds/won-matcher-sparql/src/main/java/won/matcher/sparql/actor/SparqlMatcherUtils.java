@@ -57,7 +57,7 @@ public class SparqlMatcherUtils {
      * @param queryOp
      * @param graphVarName optional graph name. If not specified, a random variable
      * name is generated. Can be a variable (starting with '?') or an URI (NOT
-     * enclosed by '<' and '>')
+     * enclosed by '&lt;' and '&gt;')
      * @return
      */
     public static Op addGraphOp(Op queryOp, Optional<String> graphVarName) {
@@ -81,7 +81,7 @@ public class SparqlMatcherUtils {
     }
 
     /**
-     * Removes an Op "'SERVICE' '<'{URI}'>'" from the query.
+     * Removes an Op "'SERVICE' '&lt;'{URI}'&gt;'" from the query.
      * 
      * @param serviceURI
      * @return

@@ -261,7 +261,6 @@ public class TensorMatchingData {
      *
      * @param folder
      * @return cleaned tensor data
-     * @throws Exception
      */
     public TensorMatchingData writeCleanedOutputFiles(String folder) throws IOException {
         if (!isValidTensor()) {
@@ -282,8 +281,8 @@ public class TensorMatchingData {
     /**
      * Write the tensor out to the file system for further processing. Create the
      * following files: - header.txt file with the atom/attribute names that
-     * correspond to the index in the tensor. - <Slice>.mtx files for the different
-     * slices e.g. connections, atom type, title and other attributes
+     * correspond to the index in the tensor. - {@literal <Slice>.mtx} files for the
+     * different slices e.g. connections, atom type, title and other attributes
      *
      * @param folder
      * @throws IOException

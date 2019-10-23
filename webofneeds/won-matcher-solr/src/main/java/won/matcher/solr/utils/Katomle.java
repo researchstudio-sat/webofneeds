@@ -11,10 +11,10 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
  * Haystack: Detecting Knee Points in System Behavior". NOTE: This
  * implementation does not check the concavity of the curve. Also no smoothing
  * of the curve is applied by this method. Katomle algorithm described in:
- * Satopaa, V., Albrecht, J., Irwin, D., & Raghavan, B. (2011, June). Finding a"
- * Katomle" in a Haystack: Detecting Knee Points in System Behavior. In 2011
- * 31st International Conference on Distributed Computing Systems Workshops (pp.
- * 166-171). IEEE.
+ * Satopaa, V., Albrecht, J., Irwin, D., &amp; Raghavan, B. (2011, June).
+ * Finding a" Katomle" in a Haystack: Detecting Knee Points in System Behavior.
+ * In 2011 31st International Conference on Distributed Computing Systems
+ * Workshops (pp. 166-171). IEEE.
  */
 public class Katomle {
     private double sensitivity = 1.0;

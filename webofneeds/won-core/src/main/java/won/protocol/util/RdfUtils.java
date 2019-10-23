@@ -733,8 +733,8 @@ public class RdfUtils {
     /**
      * Reads the InputStream into a Model. Sets a 'fantasy URI' as base URI and
      * handles it gracefully if the model read from the string defines its own base
-     * URI. Special care is taken that the null relative URI ('<>') is replaced by
-     * the baseURI.
+     * URI. Special care is taken that the null relative URI ('{@literal <>}') is
+     * replaced by the baseURI.
      * 
      * @param in
      * @param rdfLanguage
@@ -762,8 +762,8 @@ public class RdfUtils {
     /**
      * Reads the InputStream into a Model. Sets a 'fantasy URI' as base URI and
      * handles it gracefully if the model read from the string defines its own base
-     * URI. Special care is taken that the null relative URI ('<>') is replaced by
-     * the baseURI.
+     * URI. Special care is taken that the null relative URI ('{@literal <>}') is
+     * replaced by the baseURI.
      * 
      * @param in
      * @param rdfLanguage
@@ -791,8 +791,8 @@ public class RdfUtils {
     /**
      * Reads the specified string into a Model. Sets a 'fantasy URI' as base URI and
      * handles it gracefully if the model read from the string defines its own base
-     * URI. Special care is taken that the null relative URI ('<>') is replaced by
-     * the baseURI.
+     * URI. Special care is taken that the null relative URI ('{@literal <>}') is
+     * replaced by the baseURI.
      * 
      * @param rdfAsString
      * @param rdfLanguage
@@ -805,10 +805,10 @@ public class RdfUtils {
     /**
      * Evaluates the path on the model obtained by dereferencing the specified
      * resourceURI. If the path resolves to multiple resources, only the first one
-     * is returned. <br />
-     * <br />
+     * is returned. <br>
+     * <br>
      * Note: For more information on property paths, see
-     * http://jena.sourceforge.net/ARQ/property_paths.html <br />
+     * http://jena.sourceforge.net/ARQ/property_paths.html <br>
      * To create a Path object for the path "rdf:type/rdfs:subClassOf*":
      * 
      * <pre>
@@ -827,10 +827,10 @@ public class RdfUtils {
     /**
      * Evaluates the path on all models in the dataset obtained by dereferencing the
      * specified resourceURI. If the path resolves to multiple resources, only the
-     * first one is returned. <br />
-     * <br />
+     * first one is returned. <br>
+     * <br>
      * Note: For more information on property paths, see
-     * http://jena.sourceforge.net/ARQ/property_paths.html <br />
+     * http://jena.sourceforge.net/ARQ/property_paths.html <br>
      * To create a Path object for the path "rdf:type/rdfs:subClassOf*":
      * 
      * <pre>
@@ -957,10 +957,10 @@ public class RdfUtils {
     /**
      * Evaluates the path on the model obtained by dereferencing the specified
      * resourceURI. If the path resolves to multiple resources, only the first one
-     * is returned. <br />
-     * <br />
+     * is returned. <br>
+     * <br>
      * Note: For more information on property paths, see
-     * http://jena.sourceforge.net/ARQ/property_paths.html <br />
+     * http://jena.sourceforge.net/ARQ/property_paths.html <br>
      * To create a Path object for the path "rdf:type/rdfs:subClassOf*":
      * 
      * <pre>
@@ -978,10 +978,10 @@ public class RdfUtils {
     /**
      * Evaluates the path on each model in the dataset obtained by dereferencing the
      * specified resourceURI. If the path resolves to multiple resources, only the
-     * first one is returned. <br />
-     * <br />
+     * first one is returned. <br>
+     * <br>
      * Note: For more information on property paths, see
-     * http://jena.sourceforge.net/ARQ/property_paths.html <br />
+     * http://jena.sourceforge.net/ARQ/property_paths.html <br>
      * To create a Path object for the path "rdf:type/rdfs:subClassOf*":
      * 
      * <pre>

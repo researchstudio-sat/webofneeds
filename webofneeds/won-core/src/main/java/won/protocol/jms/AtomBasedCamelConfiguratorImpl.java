@@ -61,7 +61,6 @@ public abstract class AtomBasedCamelConfiguratorImpl implements AtomProtocolCame
 
     /**
      * @param brokerUri
-     * @return componentName
      */
     @Override
     public synchronized void addCamelComponentForWonNodeBroker(URI brokerUri, String brokerComponentName) {

@@ -17,11 +17,9 @@ import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
 /**
- * Created by ypanchenko on 08.07.2014.
- * <p/>
- * A utility class for assembling the calculated signature inside the
- * GraphCollection into the original Dataset; for removing signature graphs from
- * a Dataset.
+ * Created by ypanchenko on 08.07.2014. A utility class for assembling the
+ * calculated signature inside the GraphCollection into the original Dataset;
+ * for removing signature graphs from a Dataset.
  */
 public class WonAssembler {
     private static final String SIG_GRAPH_NAME_TEMP = "<http://localhost:8080/won/SIG-GRAPH-PLACEHOLDER-TEMP>";

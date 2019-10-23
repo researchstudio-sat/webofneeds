@@ -798,7 +798,7 @@ public class WonRdfUtils {
 
         /**
          * Returns all sockets found in the model, attached to the null relative URI
-         * '<>'. Returns an empty collection if there is no such socket.
+         * '{@literal <>}'. Returns an empty collection if there is no such socket.
          * 
          * @param content
          * @return
@@ -818,7 +818,7 @@ public class WonRdfUtils {
 
         /**
          * Returns all sockets found in the model, attached to the null relative URI
-         * '<>'. Returns an empty collection if there is no such socket.
+         * '{@literal <>}'. Returns an empty collection if there is no such socket.
          * 
          * @param content
          * @return
@@ -937,7 +937,7 @@ public class WonRdfUtils {
         }
 
         /**
-         * Adds a triple to the model of the form <> won:socket [socketURI].
+         * Adds a triple to the model of the form {@literal <>} won:socket [socketURI].
          * 
          * @param model
          * @param socketURI
@@ -965,7 +965,8 @@ public class WonRdfUtils {
         }
 
         /**
-         * Adds a triple to the model of the form <> won:targetSocket [socketURI].
+         * Adds a triple to the model of the form {@literal <>} won:targetSocket
+         * [socketURI].
          * 
          * @param content
          * @param socketURI

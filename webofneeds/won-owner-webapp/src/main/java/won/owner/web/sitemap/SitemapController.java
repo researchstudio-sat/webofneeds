@@ -23,8 +23,6 @@ public class SitemapController {
 
     /**
      * Fetches the full sitemap.
-     *
-     * @return ResponseEntity the xml sitemap.
      */
     @ResponseBody
     @RequestMapping(value = "sitemap.xml", method = RequestMethod.GET)

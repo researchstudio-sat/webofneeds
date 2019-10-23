@@ -139,7 +139,6 @@ public class WonNodeControllerActor extends UntypedActor {
      * processing these won nodes.
      *
      * @param message
-     * @throws Exception
      */
     @Override
     public void onReceive(final Object message) {

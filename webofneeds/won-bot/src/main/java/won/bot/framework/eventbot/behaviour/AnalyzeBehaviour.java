@@ -477,7 +477,7 @@ public class AnalyzeBehaviour extends BotBehaviour {
      * Returns a List of preconditions saved for the given connectionUri
      * 
      * @param connectionUri
-     * @return List<Precondition>
+     * @return {@link List}&lt;{@link Precondition}&gt;
      */
     public List<Precondition> getPreconditionListForConnectionUri(String connectionUri) {
         return (List<Precondition>) (List<?>) botContext.loadFromListMap(connectionPreconditionListMapName,

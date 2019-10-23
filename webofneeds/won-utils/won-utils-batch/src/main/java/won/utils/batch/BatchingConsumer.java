@@ -24,8 +24,8 @@ import com.google.common.hash.Funnels;
 
 /**
  * Accepts items together with a key for grouping them, a
- * Consumer<Collection<Object>> for consuming them. The consumer's purpose is to
- * balance the following goals
+ * Consumer{@literal <Collection<Object>>} for consuming them. The consumer's
+ * purpose is to balance the following goals
  * <ul>
  * <li>the consumer should be called as soon as possible</li>
  * <li>frequent invocations of the consumer should be avoided</li>

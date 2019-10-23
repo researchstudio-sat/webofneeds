@@ -40,8 +40,6 @@ public class NeverExpiresFilter implements Filter {
     /**
      * Sets the Date and Expires header fields such that the response will be
      * treated as 'never expires' (and will therefore be cached forever)
-     * 
-     * @return the headers map with added header values
      */
     @Override
     public void doFilter(final ServletRequest servletRequest, final ServletResponse servletResponse,

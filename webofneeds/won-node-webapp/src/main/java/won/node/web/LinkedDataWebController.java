@@ -96,8 +96,8 @@ import java.util.regex.Pattern;
  * see 5.3.2 LDPC - send 404 when non-member-properties is not supported...
  * <p>
  * <p>
- * 5.3.3 first page request: if a Request-URI of “<containerURL>?firstPage” is
- * not supported --> 404
+ * 5.3.3 first page request: if a Request-URI of
+ * “{@literal <containerURL>}?firstPage” is not supported {@literal -->} 404
  * <p>
  * 5.3.4 support the firstPage query param
  * <p>
