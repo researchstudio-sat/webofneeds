@@ -13,6 +13,7 @@ pokemon-raid-card {
 
   .card__icon {
     grid-area: card__icon;
+    background: white;
 
     &:not(.card__icon--map) {
       display: grid;
