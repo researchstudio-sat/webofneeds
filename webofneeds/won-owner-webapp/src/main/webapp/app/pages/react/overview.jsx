@@ -25,12 +25,19 @@ import "~/style/_connection-overlay.scss";
 
 const mapStateToProps = state => {
   const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
+
+  const debugModeEnabled = viewSelectors.isDebugModeEnabled(state);
+
   const whatsNewAtoms = generalSelectors
     .getWhatsNewAtoms(state)
     .filter(metaAtom => atomUtils.isActive(metaAtom))
-    .filter(metaAtom => !atomUtils.isSearchAtom(metaAtom))
-    .filter(metaAtom => !atomUtils.isDirectResponseAtom(metaAtom))
-    .filter(metaAtom => !atomUtils.isInvisibleAtom(metaAtom))
+    .filter(metaAtom => debugModeEnabled || !atomUtils.isSearchAtom(metaAtom))
+    .filter(
+      metaAtom => debugModeEnabled || !atomUtils.isDirectResponseAtom(metaAtom)
+    )
+    .filter(
+      metaAtom => debugModeEnabled || !atomUtils.isInvisibleAtom(metaAtom)
+    )
     .filter(
       (metaAtom, metaAtomUri) =>
         !generalSelectors.isAtomOwned(state, metaAtomUri)
