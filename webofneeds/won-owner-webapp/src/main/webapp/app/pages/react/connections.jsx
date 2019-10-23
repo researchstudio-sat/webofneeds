@@ -48,7 +48,7 @@ const mapStateToProps = state => {
 
   return {
     isLoggedIn: accountUtils.isLoggedIn(accountState),
-    showModalDialog: getIn(state, ["view", "showModalDialog"]),
+    showModalDialog: viewSelectors.showModalDialog(state),
     showListSide: hasChatAtoms,
     showNoSelectionSide:
       (hasChatAtoms && !selectedConnection) ||

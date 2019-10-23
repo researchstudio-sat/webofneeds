@@ -22,7 +22,7 @@ const mapStateToProps = state => {
     registerError: accountUtils.getRegisterError(accountState),
     isAnonymous: accountUtils.isAnonymous(accountState),
     privateId: accountUtils.getPrivateId(accountState),
-    showModalDialog: state.getIn(["view", "showModalDialog"]),
+    showModalDialog: viewSelectors.showModalDialog(state),
     showSlideIns:
       viewSelectors.hasSlideIns(state) &&
       viewSelectors.isSlideInsVisible(state),
