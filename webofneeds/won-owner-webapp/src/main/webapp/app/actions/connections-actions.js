@@ -486,7 +486,7 @@ function connectAdHoc(
     };
     const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
 
-    // create new atom
+    // build create message for new atom
     const { message, eventUri, atomUri } = await buildCreateMessage(
       adHocDraft,
       nodeUri
@@ -507,6 +507,17 @@ function connectAdHoc(
       }
     }
 
+    // create the new atom
+    dispatch({
+      type: actionTypes.atoms.create, // TODO custom action
+      payload: {
+        eventUri,
+        message,
+        atomUri,
+        atom: adHocDraft,
+      },
+    });
+
     // establish connection
     const cnctMsg = buildConnectMessage({
       ownedAtomUri: atomUri,
@@ -515,6 +526,15 @@ function connectAdHoc(
       theirNodeUri: get(theirAtom, "nodeUri"),
       connectMessage: textMessage,
     });
+
+    // get default socketUri
+    const connectToSocketUri = atomUtils.getDefaultSocketUri(theirAtom);
+    let socketUri = atomUri;
+    if (atomUtils.hasChatSocket(theirAtom)) {
+      socketUri += "#chatSocket";
+    } else if (atomUtils.hasGroupSocket(theirAtom)) {
+      socketUri += "#groupSocket";
+    }
 
     won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
       // connect action to be dispatched when the
@@ -526,6 +546,8 @@ function connectAdHoc(
           eventUri: cnctMsg.eventUri,
           message: cnctMsg.message,
           optimisticEvent: optimisticEvent,
+          socketUri: socketUri,
+          targetSocketUri: connectToSocketUri,
         },
       };
 
@@ -539,17 +561,6 @@ function connectAdHoc(
             effect: "stateGoCurrent",
             connectionUri: "responseEvent::receiverUri",
           },
-        },
-      });
-
-      // create the new atom
-      dispatch({
-        type: actionTypes.atoms.create, // TODO custom action
-        payload: {
-          eventUri,
-          message,
-          atomUri,
-          atom: adHocDraft,
         },
       });
 
