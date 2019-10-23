@@ -1,5 +1,7 @@
 import React from "react";
 
+import _ from "lodash";
+
 import "~/style/_titlepicker.scss";
 import PropTypes from "prop-types";
 
@@ -7,6 +9,11 @@ import PropTypes from "prop-types";
 export default class WonTitlePicker extends React.Component {
   constructor(props) {
     super(props);
+
+    this.debounceEvent = _.debounce(() => {
+      this.props.onUpdate({ value: this.state.value.trim() });
+    }, props.debounce || 0);
+
     this.state = {
       value: props.initialValue || "",
     };
@@ -42,9 +49,7 @@ export default class WonTitlePicker extends React.Component {
     const text = event.target.value;
 
     if (text.trim().length > 0) {
-      this.setState({ value: text }, () =>
-        this.props.onUpdate({ value: this.state.value.trim() })
-      );
+      this.setState({ value: text }, () => this.debounceEvent());
     } else {
       this.reset();
     }
@@ -55,7 +60,7 @@ export default class WonTitlePicker extends React.Component {
       {
         value: "",
       },
-      () => this.props.onUpdate({ value: undefined })
+      () => this.debounceEvent()
     );
   }
 }
@@ -64,4 +69,5 @@ WonTitlePicker.propTypes = {
   initialValue: PropTypes.string,
   detail: PropTypes.object,
   onUpdate: PropTypes.func.isRequired,
+  debounce: PropTypes.number,
 };
