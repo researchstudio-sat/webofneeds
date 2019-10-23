@@ -12,10 +12,10 @@
 	<parent>
 		<groupId>at.researchstudio.sat</groupId>
 		<artifactId>webofneeds</artifactId>
-		<version>0.6</version>
+		<version>0.7-SNAPSHOT</version>
 	</parent>
 	<artifactId>won-core</artifactId>
-	<version>0.6</version>
+	<version>0.7-SNAPSHOT</version>
 	<name>Core</name>
 	<build>
 		<plugins>

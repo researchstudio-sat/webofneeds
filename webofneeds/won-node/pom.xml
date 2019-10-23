@@ -5,12 +5,12 @@
     <parent>
         <groupId>at.researchstudio.sat</groupId>
         <artifactId>webofneeds</artifactId>
-        <version>0.6</version>
+        <version>0.7-SNAPSHOT</version>
     </parent>
 
     <groupId>at.researchstudio.sat</groupId>
     <artifactId>won-node</artifactId>
-    <version>0.6</version>
+    <version>0.7-SNAPSHOT</version>
     <name>Node</name>
     <url>http://maven.apache.org</url>
 
