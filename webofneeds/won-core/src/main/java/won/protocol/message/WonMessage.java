@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 
+import won.protocol.message.processor.exception.MissingMessagePropertyException;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.RDFG;
 import won.protocol.vocabulary.SFSIG;
@@ -415,12 +416,28 @@ public class WonMessage implements Serializable {
         return this.messageURI;
     }
 
+    public synchronized URI getMessageURIRequired() {
+        URI ret = getMessageURI();
+        if (ret == null) {
+            throw new IllegalStateException("Could not determine message URI");
+        }
+        return ret;
+    }
+
     public synchronized WonMessageType getMessageType() {
         if (this.messageType == null) {
             URI type = getEnvelopePropertyURIValue(WONMSG.messageType);
             this.messageType = WonMessageType.getWonMessageType(type);
         }
         return this.messageType;
+    }
+
+    public synchronized WonMessageType getMessageTypeRequired() {
+        WonMessageType ret = getMessageType();
+        if (ret == null) {
+            throw new MissingMessagePropertyException(WONMSG.messageType);
+        }
+        return ret;
     }
 
     public synchronized WonMessageDirection getEnvelopeType() {
@@ -433,11 +450,27 @@ public class WonMessage implements Serializable {
         return this.envelopeType;
     }
 
+    public synchronized WonMessageDirection getEnvelopeTypeRequired() {
+        WonMessageDirection ret = getEnvelopeType();
+        if (ret == null) {
+            throw new MissingMessagePropertyException(RDF.type);
+        }
+        return ret;
+    }
+
     public synchronized URI getSenderURI() {
         if (this.senderURI == null) {
             this.senderURI = getEnvelopePropertyURIValue(WONMSG.sender);
         }
         return this.senderURI;
+    }
+
+    public synchronized URI getSenderURIRequired() {
+        URI ret = getSenderURI();
+        if (ret == null) {
+            throw new MissingMessagePropertyException(WONMSG.sender);
+        }
+        return ret;
     }
 
     public synchronized URI getSenderAtomURI() {
@@ -447,11 +480,27 @@ public class WonMessage implements Serializable {
         return this.senderAtomURI;
     }
 
+    public synchronized URI getSenderAtomURIRequired() {
+        URI ret = getSenderAtomURI();
+        if (ret == null) {
+            throw new MissingMessagePropertyException(WONMSG.senderAtom);
+        }
+        return ret;
+    }
+
     public synchronized URI getSenderNodeURI() {
         if (this.senderNodeURI == null) {
             this.senderNodeURI = getEnvelopePropertyURIValue(WONMSG.senderNode);
         }
         return this.senderNodeURI;
+    }
+
+    public synchronized URI getSenderNodeURIRequired() {
+        URI ret = getSenderNodeURI();
+        if (ret == null) {
+            throw new MissingMessagePropertyException(WONMSG.senderNode);
+        }
+        return ret;
     }
 
     public synchronized URI getSenderSocketURI() {
@@ -461,11 +510,27 @@ public class WonMessage implements Serializable {
         return this.senderSocketURI;
     }
 
+    public synchronized URI getSenderSocketURIRequired() {
+        URI ret = getSenderSocketURI();
+        if (ret == null) {
+            throw new MissingMessagePropertyException(WONMSG.senderSocket);
+        }
+        return ret;
+    }
+
     public synchronized URI getRecipientURI() {
         if (this.recipientURI == null) {
             this.recipientURI = getEnvelopePropertyURIValue(WONMSG.recipient);
         }
         return this.recipientURI;
+    }
+
+    public synchronized URI getRecipientURIRequired() {
+        URI ret = getRecipientURI();
+        if (ret == null) {
+            throw new MissingMessagePropertyException(WONMSG.recipient);
+        }
+        return ret;
     }
 
     public synchronized URI getRecipientAtomURI() {
@@ -475,11 +540,27 @@ public class WonMessage implements Serializable {
         return this.recipientAtomURI;
     }
 
+    public synchronized URI getRecipientAtomURIRequired() {
+        URI ret = getRecipientAtomURI();
+        if (ret == null) {
+            throw new MissingMessagePropertyException(WONMSG.recipientAtom);
+        }
+        return ret;
+    }
+
     public synchronized URI getRecipientNodeURI() {
         if (this.recipientNodeURI == null) {
             this.recipientNodeURI = getEnvelopePropertyURIValue(WONMSG.recipientNode);
         }
         return this.recipientNodeURI;
+    }
+
+    public synchronized URI getRecipientNodeURIRequired() {
+        URI ret = getRecipientNodeURI();
+        if (ret == null) {
+            throw new MissingMessagePropertyException(WONMSG.recipientNode);
+        }
+        return ret;
     }
 
     public synchronized URI getRecipientSocketURI() {
@@ -489,6 +570,14 @@ public class WonMessage implements Serializable {
         return this.recipientSocketURI;
     }
 
+    public synchronized URI getRecipientSocketURIRequired() {
+        URI ret = getRecipientSocketURI();
+        if (ret == null) {
+            throw new MissingMessagePropertyException(WONMSG.recipientSocket);
+        }
+        return ret;
+    }
+
     public synchronized URI getHintTargetSocketURI() {
         if (this.hintTargetSocketURI == null) {
             this.hintTargetSocketURI = getEnvelopePropertyURIValue(WONMSG.hintTargetSocket);
@@ -496,11 +585,27 @@ public class WonMessage implements Serializable {
         return this.hintTargetSocketURI;
     }
 
+    public synchronized URI getHintTargetSocketURIRequired() {
+        URI ret = getHintTargetSocketURI();
+        if (ret == null) {
+            throw new MissingMessagePropertyException(WONMSG.hintTargetSocket);
+        }
+        return ret;
+    }
+
     public synchronized URI getHintTargetAtomURI() {
         if (this.hintTargetAtomURI == null) {
             this.hintTargetAtomURI = getEnvelopePropertyURIValue(WONMSG.hintTargetAtom);
         }
         return this.hintTargetAtomURI;
+    }
+
+    public synchronized URI getHintTargetAtomURIRequired() {
+        URI ret = getHintTargetAtomURI();
+        if (ret == null) {
+            throw new MissingMessagePropertyException(WONMSG.hintTargetAtom);
+        }
+        return ret;
     }
 
     public synchronized Double getHintScore() {
@@ -511,11 +616,27 @@ public class WonMessage implements Serializable {
         return this.hintScore;
     }
 
+    public synchronized Double getHintScoreRequired() {
+        Double ret = getHintScore();
+        if (ret == null) {
+            throw new MissingMessagePropertyException(WONMSG.hintScore);
+        }
+        return ret;
+    }
+
     public synchronized List<URI> getInjectIntoConnectionURIs() {
         if (this.injectIntoConnections == null) {
             this.injectIntoConnections = getEnvelopePropertyURIValues(WONMSG.injectIntoConnection);
         }
         return this.injectIntoConnections;
+    }
+
+    public synchronized List<URI> getInjectIntoConnectionURIsRequired() {
+        List<URI> ret = getInjectIntoConnectionURIs();
+        if (ret == null) {
+            throw new MissingMessagePropertyException(WONMSG.injectIntoConnection);
+        }
+        return ret;
     }
 
     public synchronized List<URI> getPreviousMessageURIs() {
@@ -525,11 +646,27 @@ public class WonMessage implements Serializable {
         return this.previousMessages;
     }
 
+    public synchronized List<URI> getPreviousMessageURIsRequired() {
+        List<URI> ret = getPreviousMessageURIs();
+        if (ret == null) {
+            throw new MissingMessagePropertyException(WONMSG.previousMessage);
+        }
+        return ret;
+    }
+
     public synchronized URI getIsResponseToMessageURI() {
         if (this.isResponseToMessageURI == null) {
             this.isResponseToMessageURI = getEnvelopePropertyURIValue(WONMSG.isResponseTo);
         }
         return this.isResponseToMessageURI;
+    }
+
+    public synchronized URI getIsResponseToMessageURIRequired() {
+        URI ret = getIsResponseToMessageURI();
+        if (ret == null) {
+            throw new MissingMessagePropertyException(WONMSG.isResponseTo);
+        }
+        return ret;
     }
 
     public synchronized URI getIsRemoteResponseToMessageURI() {
@@ -539,6 +676,14 @@ public class WonMessage implements Serializable {
         return this.isRemoteResponseToMessageURI;
     }
 
+    public synchronized URI getIsRemoteResponseToMessageURIRequired() {
+        URI ret = getIsRemoteResponseToMessageURI();
+        if (ret == null) {
+            throw new MissingMessagePropertyException(WONMSG.isRemoteResponseTo);
+        }
+        return ret;
+    }
+
     public synchronized URI getCorrespondingRemoteMessageURI() {
         if (this.correspondingRemoteMessageURI == null) {
             this.correspondingRemoteMessageURI = getEnvelopePropertyURIValue(WONMSG.correspondingRemoteMessage);
@@ -546,11 +691,27 @@ public class WonMessage implements Serializable {
         return this.correspondingRemoteMessageURI;
     }
 
+    public synchronized URI getCorrespondingRemoteMessageURIRequired() {
+        URI ret = getCorrespondingRemoteMessageURI();
+        if (ret == null) {
+            throw new MissingMessagePropertyException(WONMSG.correspondingRemoteMessage);
+        }
+        return ret;
+    }
+
     public synchronized URI getForwardedMessageURI() {
         if (this.forwardedMessageURI == null) {
             this.forwardedMessageURI = getEnvelopePropertyURIValue(WONMSG.forwardedMessage);
         }
         return this.forwardedMessageURI;
+    }
+
+    public synchronized URI getForwardedMessageURIRequired() {
+        URI ret = getForwardedMessageURI();
+        if (ret == null) {
+            throw new MissingMessagePropertyException(WONMSG.forwardedMessage);
+        }
+        return ret;
     }
 
     public synchronized URI getInnermostMessageURI() {
@@ -561,6 +722,14 @@ public class WonMessage implements Serializable {
         return this.innermostMessageURI;
     }
 
+    public synchronized URI getInnermostMessageURIRequired() {
+        URI ret = getInnermostMessageURI();
+        if (ret == null) {
+            throw new IllegalStateException("No innermost message URI found");
+        }
+        return ret;
+    }
+
     public synchronized WonMessageType getIsResponseToMessageType() {
         if (this.isResponseToMessageType == null) {
             URI typeURI = getEnvelopePropertyURIValue(WONMSG.isResponseToMessageType);
@@ -569,6 +738,14 @@ public class WonMessage implements Serializable {
             }
         }
         return isResponseToMessageType;
+    }
+
+    public synchronized WonMessageType getIsResponseToMessageTypeRequired() {
+        WonMessageType ret = getIsResponseToMessageType();
+        if (ret == null) {
+            throw new MissingMessagePropertyException(WONMSG.isResponseToMessageType);
+        }
+        return ret;
     }
 
     public synchronized URI getEnvelopePropertyURIValue(URI propertyURI) {

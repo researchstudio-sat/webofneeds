@@ -38,7 +38,6 @@ import won.bot.framework.eventbot.event.impl.wonmessage.CloseFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SocketHintFromMatcherEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentEvent;
@@ -152,17 +151,6 @@ public abstract class EventBot extends ScheduledTriggerBot {
             eventBus.publish(new CloseFromOtherAtomEvent(con, wonMessage));
         } else {
             logger.info("not publishing event for call to onClose() as the bot is not in state {} but {}",
-                            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
-        }
-    }
-
-    @Override
-    public final void onOpenFromOtherAtom(final Connection con, final WonMessage wonMessage) {
-        logMessage(wonMessage);
-        if (getLifecyclePhase().isActive()) {
-            eventBus.publish(new OpenFromOtherAtomEvent(con, wonMessage));
-        } else {
-            logger.info("not publishing event for call to onOpenFromOtherAtom() as the bot is not in state {} but {}",
                             BotLifecyclePhase.ACTIVE, getLifecyclePhase());
         }
     }
@@ -370,7 +358,6 @@ public abstract class EventBot extends ScheduledTriggerBot {
                 case CLOSE:
                 case CONNECT:
                 case CONNECTION_MESSAGE:
-                case OPEN:
                     event = new WonMessageSentOnConnectionEvent(message);
                     break;
                 default:

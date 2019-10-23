@@ -133,8 +133,8 @@ public class ServerSideActionService implements WonMessageProcessor {
         URI fromWonNodeURI = WonLinkedDataUtils.getWonNodeURIForAtomOrConnectionURI(fromAtomURI, linkedDataSource);
         URI toWonNodeURI = WonLinkedDataUtils.getWonNodeURIForAtomOrConnectionURI(toAtomURI, linkedDataSource);
         URI messageURI = wonNodeInformationService.generateEventURI(fromWonNodeURI);
-        WonMessage msgToSend = WonMessageBuilder.setMessagePropertiesForConnect(messageURI, Optional.of(fromSocket),
-                        fromAtomURI, fromWonNodeURI, Optional.of(toSocket), toAtomURI, toWonNodeURI,
+        WonMessage msgToSend = WonMessageBuilder.setMessagePropertiesForConnect(messageURI, fromSocket,
+                        fromAtomURI, fromWonNodeURI, toSocket, toAtomURI, toWonNodeURI,
                         "Connect message automatically sent by a server-side action").build();
         try {
             AuthenticationThreadLocal.setAuthentication(authentication);
@@ -148,7 +148,7 @@ public class ServerSideActionService implements WonMessageProcessor {
     private void sendOpen(WonMessage connectMessageToReactTo, Authentication authentication) {
         URI fromWonNodeURI = connectMessageToReactTo.getRecipientNodeURI();
         URI messageURI = wonNodeInformationService.generateEventURI(fromWonNodeURI);
-        WonMessage msgToSend = WonMessageBuilder.setMessagePropertiesForOpen(messageURI, connectMessageToReactTo,
+        WonMessage msgToSend = WonMessageBuilder.setMessagePropertiesForConnect(messageURI, connectMessageToReactTo,
                         "Open message automatically sent by a server-side action").build();
         try {
             AuthenticationThreadLocal.setAuthentication(authentication);

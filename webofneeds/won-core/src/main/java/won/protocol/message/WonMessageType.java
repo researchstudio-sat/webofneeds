@@ -11,13 +11,21 @@ import won.protocol.vocabulary.WONMSG;
  */
 public enum WonMessageType {
     // main messages
-    CREATE_ATOM(WONMSG.CreateMessage), REPLACE(WONMSG.ReplaceMessage), CONNECT(WONMSG.ConnectMessage),
-    DEACTIVATE(WONMSG.DeactivateMessage), ACTIVATE(WONMSG.ActivateMessage), CLOSE(WONMSG.CloseMessage),
-    DELETE(WONMSG.DeleteMessage), OPEN(WONMSG.OpenMessage), CONNECTION_MESSAGE(WONMSG.ConnectionMessage),
-    ATOM_MESSAGE(WONMSG.AtomMessage), ATOM_HINT_MESSAGE(WONMSG.AtomHintMessage),
-    SOCKET_HINT_MESSAGE(WONMSG.SocketHintMessage), HINT_FEEDBACK_MESSAGE(WONMSG.HintFeedbackMessage),
+    CREATE_ATOM(WONMSG.CreateMessage),
+    REPLACE(WONMSG.ReplaceMessage),
+    CONNECT(WONMSG.ConnectMessage),
+    DEACTIVATE(WONMSG.DeactivateMessage),
+    ACTIVATE(WONMSG.ActivateMessage),
+    CLOSE(WONMSG.CloseMessage),
+    DELETE(WONMSG.DeleteMessage),
+    CONNECTION_MESSAGE(WONMSG.ConnectionMessage),
+    ATOM_MESSAGE(WONMSG.AtomMessage),
+    ATOM_HINT_MESSAGE(WONMSG.AtomHintMessage),
+    SOCKET_HINT_MESSAGE(WONMSG.SocketHintMessage),
+    HINT_FEEDBACK_MESSAGE(WONMSG.HintFeedbackMessage),
     // notification messages
-    HINT_NOTIFICATION(WONMSG.HintNotificationMessage), ATOM_CREATED_NOTIFICATION(WONMSG.AtomCreatedNotificationMessage),
+    HINT_NOTIFICATION(WONMSG.HintNotificationMessage),
+    ATOM_CREATED_NOTIFICATION(WONMSG.AtomCreatedNotificationMessage),
     // response messages
     SUCCESS_RESPONSE(WONMSG.SuccessResponse), FAILURE_RESPONSE(WONMSG.FailureResponse),
     CHANGE_NOTIFICATION(WONMSG.ChangeNotificationMessage);
@@ -46,7 +54,7 @@ public enum WonMessageType {
     }
 
     public boolean causesConnectionStateChange() {
-        return this == CLOSE || this == CONNECT || this == OPEN;
+        return this == CLOSE || this == CONNECT;
     }
 
     public boolean causesAtomStateChange() {
@@ -67,7 +75,6 @@ public enum WonMessageType {
 
     public boolean causesOutgoingMessage() {
         return this == CLOSE
-                        || this == OPEN
                         || this == CONNECT
                         || this == CONNECTION_MESSAGE
                         || this == FAILURE_RESPONSE
@@ -86,8 +93,6 @@ public enum WonMessageType {
             return DEACTIVATE;
         if (WONMSG.ActivateMessage.equals(resource))
             return ACTIVATE;
-        if (WONMSG.OpenMessage.equals(resource))
-            return OPEN;
         if (WONMSG.CloseMessage.equals(resource))
             return CLOSE;
         if (WONMSG.DeleteMessage.equals(resource))

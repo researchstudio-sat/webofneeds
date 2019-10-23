@@ -19,7 +19,7 @@ import won.protocol.model.MessageEvent;
 import won.protocol.model.unread.UnreadMessageInfoForConnection;
 
 public interface MessageEventRepository extends WonRepository<MessageEvent> {
-    Optional<MessageEvent> findOneByMessageURI(URI URI);
+    Optional<MessageEvent> findFirstByMessageURI(URI URI);
 
     // read is permitted iff any of these conditions apply:
     // * the WebId is the sender atom
@@ -216,8 +216,7 @@ public interface MessageEventRepository extends WonRepository<MessageEvent> {
                     @Param("referenceDate") Date referenceDate, @Param("messageType") WonMessageType messageType,
                     Pageable pageable);
 
-    @Query("select msg from MessageEvent msg where msg.correspondingRemoteMessageURI = :uri")
-    MessageEvent findOneByCorrespondingRemoteMessageURI(@Param("uri") URI uri);
+    MessageEvent findOneByCorrespondingRemoteMessageURIAndParentURI(URI correspondingRemoteMessageURI, URI parentURI);
 
     @Query("select max(msg.creationDate) from MessageEvent msg where msg.creationDate <= :referenceDate and "
                     + "parentURI = :parent")

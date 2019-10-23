@@ -12,6 +12,8 @@ package won.protocol.message.processor.exception;
 
 import java.net.URI;
 
+import org.apache.jena.rdf.model.Property;
+
 /**
  * Exception indicating a missing message property.
  */
@@ -20,6 +22,14 @@ public class MissingMessagePropertyException extends WonMessageNotWellFormedExce
 
     private static String createExceptionMessage(URI missingProperty) {
         return String.format("Missing message property: %s", missingProperty);
+    }
+
+    public MissingMessagePropertyException(String missingProperty) {
+        this(URI.create(missingProperty));
+    }
+
+    public MissingMessagePropertyException(Property property) {
+        this(property.toString());
     }
 
     public MissingMessagePropertyException(URI missingProperty) {

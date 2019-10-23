@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -86,6 +87,18 @@ public class WonLinkedDataUtils {
         Dataset dataset = getDataForResource(connectionURI, linkedDataSource);
         Path propertyPath = PathParser.parse("<" + WON.messageContainer + ">", PrefixMapping.Standard);
         return RdfUtils.getURIPropertyForPropertyPath(dataset, connectionURI, propertyPath);
+    }
+
+    public static URI getSocketURIForConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
+        Objects.requireNonNull(linkedDataSource);
+        Dataset dataset = getDataForResource(connectionURI, linkedDataSource);
+        return WonRdfUtils.ConnectionUtils.getSocketURIFromConnection(dataset, connectionURI);
+    }
+
+    public static URI getTargetSocketURIForConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
+        Objects.requireNonNull(linkedDataSource);
+        Dataset dataset = getDataForResource(connectionURI, linkedDataSource);
+        return WonRdfUtils.ConnectionUtils.getTargetSocketURIFromConnection(dataset, connectionURI);
     }
 
     public static URI getMessageContainerURIforAtomURI(URI atomURI, LinkedDataSource linkedDataSource) {

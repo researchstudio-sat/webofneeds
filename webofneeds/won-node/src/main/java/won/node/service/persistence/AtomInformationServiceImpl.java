@@ -382,7 +382,7 @@ public class AtomInformationServiceImpl implements AtomInformationService {
     @Override
     public Slice<MessageEvent> listConnectionEventsAfter(URI connectionUri, URI msgURI,
                     Integer preferredPageSize, WonMessageType msgType) {
-        MessageEvent referenceMsg = messageEventRepository.findOneByMessageURI(msgURI)
+        MessageEvent referenceMsg = messageEventRepository.findFirstByMessageURI(msgURI)
                         .orElseThrow(() -> new NoSuchMessageException(msgURI));
         Date referenceDate = referenceMsg.getCreationDate();
         int pageSize = getPageSize(preferredPageSize);

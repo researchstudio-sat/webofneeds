@@ -10,13 +10,28 @@
  */
 package won.bot.framework.eventbot.event.impl.wonmessage;
 
+import java.net.URI;
+
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 
 /**
  */
 public class ConnectFromOtherAtomEvent extends WonMessageReceivedOnConnectionEvent {
+    private URI recipientSocket;
+    private URI senderSocket;
+
     public ConnectFromOtherAtomEvent(final Connection con, final WonMessage wonMessage) {
         super(con, wonMessage);
+        this.recipientSocket = wonMessage.getRecipientSocketURIRequired();
+        this.senderSocket = wonMessage.getSenderSocketURIRequired();
+    }
+
+    public URI getSenderSocket() {
+        return senderSocket;
+    }
+
+    public URI getRecipientSocket() {
+        return recipientSocket;
     }
 }

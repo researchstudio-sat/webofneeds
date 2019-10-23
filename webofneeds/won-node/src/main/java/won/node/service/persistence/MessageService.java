@@ -21,7 +21,6 @@ import won.protocol.model.ConnectionMessageContainer;
 import won.protocol.model.DatasetHolder;
 import won.protocol.model.MessageContainer;
 import won.protocol.model.MessageEvent;
-import won.protocol.model.MessageInContainer;
 import won.protocol.repository.AtomMessageContainerRepository;
 import won.protocol.repository.ConnectionContainerRepository;
 import won.protocol.repository.ConnectionMessageContainerRepository;
@@ -46,7 +45,7 @@ public class MessageService {
     private MessageEventRepository messageEventRepository;
 
     public Optional<MessageEvent> getMessage(URI messageURI) {
-        return messageEventRepository.findOneByMessageURI(messageURI);
+        return messageEventRepository.findFirstByMessageURI(messageURI);
     }
 
     public MessageEvent getMessageRequired(URI messageURI) {
@@ -84,12 +83,13 @@ public class MessageService {
     public void saveMessage(final WonMessage wonMessage, URI parent) {
         logger.debug("STORING message with uri {} and parent uri", wonMessage.getMessageURI(), parent);
         MessageContainer container = loadOrCreateMessageContainer(parent, wonMessage.getMessageType());
-        DatasetHolder datasetHolder = new DatasetHolder(wonMessage.getMessageURI(),
-                        WonMessageEncoder.encodeAsDataset(wonMessage));
         MessageEvent event = new MessageEvent(parent, wonMessage, container);
-        MessageInContainer mic = new MessageInContainer(event, container);
-        event.setDatasetHolder(datasetHolder);
-        container.getEvents().add(mic);
+        // a message can be in multiple containers (=parents), such messages share a
+        // datasetholder
+        Optional<DatasetHolder> datasetHolder = datasetHolderRepository.findOneByUri(wonMessage.getMessageURI());
+        event.setDatasetHolder(datasetHolder.orElseGet(() -> new DatasetHolder(wonMessage.getMessageURI(),
+                        WonMessageEncoder.encodeAsDataset(wonMessage))));
+        container.getEvents().add(event);
         messageEventRepository.save(event);
     }
 
@@ -100,12 +100,11 @@ public class MessageService {
                         .orElseThrow(() -> new IncoherentDatabaseStateException(
                                         "Cannot store message " + messageURI + " in container with parent " + parentURI
                                                         + ": container not found"));
-        MessageEvent message = messageEventRepository.findOneByMessageURI(messageURI)
+        MessageEvent message = messageEventRepository.findFirstByMessageURI(messageURI)
                         .orElseThrow(() -> new IncoherentDatabaseStateException(
                                         "Cannot store message " + messageURI + " in container with parent " + parentURI
                                                         + ": message not found"));
-        MessageInContainer mic = new MessageInContainer(message, container);
-        container.getEvents().add(mic);
+        container.getEvents().add(message);
         messageContainerRepository.save(container);
     }
 

@@ -45,8 +45,17 @@ public class SocketHintMessageProcessor extends AbstractCamelProcessor {
             exchange.getIn().setHeader(WonCamelConstants.IGNORE_HINT, Boolean.TRUE);
             return;
         }
-        URI recipientWoNNodeURI = wonMessage.getRecipientNodeURI();
-        URI targetSocketURI = wonMessage.getHintTargetSocketURI();
+        Optional<Connection> con = socketHint(wonMessage);
+        // build message to send to owner, put in header
+        // set the receiver to the newly generated connection uri
+        wonMessage.addMessageProperty(WONMSG.recipient, con.get().getConnectionURI());
+    }
+
+    public Optional<Connection> socketHint(WonMessage wonMessage) {
+        URI recipientAtomURI = wonMessage.getRecipientAtomURIRequired();
+        URI recipientWoNNodeURI = wonMessage.getRecipientNodeURIRequired();
+        URI targetSocketURI = wonMessage.getHintTargetSocketURIRequired();
+        URI recipientSocketURI = wonMessage.getRecipientSocketURIRequired();
         Double score = wonMessage.getHintScore();
         if (targetSocketURI == null) {
             throw new MissingMessagePropertyException(URI.create(WONMSG.hintTargetSocket.toString()));
@@ -61,7 +70,6 @@ public class SocketHintMessageProcessor extends AbstractCamelProcessor {
         if (wmOriginator == null) {
             throw new IllegalArgumentException("originator is not set");
         }
-        URI recipientSocketURI = wonMessage.getRecipientSocketURI();
         if (recipientSocketURI == null) {
             throw new MissingMessagePropertyException(URI.create(WONMSG.recipientSocket.toString()));
         }
@@ -78,15 +86,12 @@ public class SocketHintMessageProcessor extends AbstractCamelProcessor {
                         .findOneByAtomURIAndTargetAtomURIAndSocketURIAndTargetSocketURIForUpdate(recipientAtomURI,
                                         targetAtomURI.get(), socket.getSocketURI(), targetSocketURI);
         if (!con.isPresent()) {
-            URI connectionUri = wonNodeInformationService.generateConnectionURI(recipientWoNNodeURI);
-            con = Optional.of(connectionService.createConnection(connectionUri, recipientAtomURI, targetAtomURI.get(),
-                            null,
-                            socket.getSocketURI(), socket.getTypeURI(), targetSocketURI, ConnectionState.SUGGESTED,
+            con = Optional.of(connectionService.createConnection(recipientAtomURI, targetAtomURI.get(),
+                            recipientSocketURI, socket.getTypeURI(), targetSocketURI, Optional.empty(),
+                            ConnectionState.SUGGESTED,
                             ConnectionEventType.MATCHER_HINT));
         }
-        // build message to send to owner, put in header
-        // set the receiver to the newly generated connection uri
-        wonMessage.addMessageProperty(WONMSG.recipient, con.get().getConnectionURI());
+        return con;
     }
 
     private boolean isTooManyHints(URI atomURIFromWonMessage) {

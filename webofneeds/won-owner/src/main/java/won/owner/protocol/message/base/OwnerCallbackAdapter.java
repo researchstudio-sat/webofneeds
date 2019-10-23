@@ -10,11 +10,14 @@
  */
 package won.owner.protocol.message.base;
 
+import java.lang.invoke.MethodHandles;
+
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+
 import won.owner.protocol.message.OwnerCallback;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
@@ -22,8 +25,6 @@ import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.model.Connection;
 import won.protocol.util.RdfUtils;
-
-import java.lang.invoke.MethodHandles;
 
 /**
  * Maps incoming messages from the WonMessageProcessor interface to the
@@ -64,9 +65,6 @@ public abstract class OwnerCallbackAdapter implements WonMessageProcessor {
                 break;
             case CONNECT:
                 adaptee.onConnectFromOtherAtom(makeConnection(message), message);
-                break;
-            case OPEN:
-                adaptee.onOpenFromOtherAtom(makeConnection(message), message);
                 break;
             case CONNECTION_MESSAGE:
                 adaptee.onMessageFromOtherAtom(makeConnection(message), message);

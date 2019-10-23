@@ -1,14 +1,29 @@
 package won.protocol.model;
 
+import java.net.URI;
+import java.util.Date;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import javax.xml.bind.annotation.XmlTransient;
+
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.parentaware.ParentAware;
-
-import javax.persistence.*;
-import javax.xml.bind.annotation.XmlTransient;
-import java.net.URI;
-import java.util.Date;
-import java.util.Objects;
 
 @Entity
 @Table(name = "message_event", indexes = {
@@ -17,9 +32,10 @@ import java.util.Objects;
                 @Index(name = "IDX_ME_PARENT_URI_MESSAGE_TYPE", columnList = "parentURI, messageType"),
                 @Index(name = "IDX_ME_PARENT_URI_REFERENCED_BY_OTHER_MESSAGE", columnList = "parentURI, referencedByOtherMessage"),
                 @Index(name = "IDX_ME_INNERMOST_MESSAGE_URI_RECIPIENT_ATOM_URI", columnList = "messageURI, recipientAtomURI, innermostMessageURI, correspondingRemoteMessageURI") }, uniqueConstraints = {
-                                @UniqueConstraint(name = "IDX_ME_UNIQUE_MESSAGE_URI", columnNames = "messageURI"),
+                                @UniqueConstraint(name = "IDX_ME_UNIQUE_MESSAGE_URI", columnNames = { "messageURI",
+                                                "parentURI" }),
                                 @UniqueConstraint(name = "IDX_ME_UNIQUE_CORREXPONDING_REMOTE_MESSAGE_URI", columnNames = "correspondingRemoteMessageURI"),
-                                @UniqueConstraint(name = "IDX_ME_UNIQUE_DATASETHOLDER_ID", columnNames = "datasetholder_id") })
+                })
 public class MessageEvent implements ParentAware<MessageContainer> {
     public MessageEvent() {
     }
@@ -94,7 +110,7 @@ public class MessageEvent implements ParentAware<MessageContainer> {
     @Column(name = "innermostMessageURI")
     @Convert(converter = URIConverter.class)
     private URI innermostMessageURI;
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private DatasetHolder datasetHolder;
 
     @PreUpdate
@@ -246,29 +262,33 @@ public class MessageEvent implements ParentAware<MessageContainer> {
     }
 
     @Override
-    public boolean equals(final Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof MessageEvent))
-            return false;
-        final MessageEvent that = (MessageEvent) o;
-        if (!Objects.equals(messageType, that.messageType))
-            return false;
-        if (!Objects.equals(messageURI, that.messageURI))
-            return false;
-        if (!Objects.equals(recipientURI, that.recipientURI))
-            return false;
-        return Objects.equals(senderURI, that.senderURI);
-        // if (signatures != null ? !signatures.equals(that.signatures) :
-        // that.signatures != null) return false;
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((messageURI == null) ? 0 : messageURI.hashCode());
+        result = prime * result + ((parentURI == null) ? 0 : parentURI.hashCode());
+        return result;
     }
 
     @Override
-    public int hashCode() {
-        int result = messageURI != null ? messageURI.hashCode() : 0;
-        result = 31 * result + (messageType != null ? messageType.hashCode() : 0);
-        result = 31 * result + (senderURI != null ? senderURI.hashCode() : 0);
-        result = 31 * result + (recipientURI != null ? recipientURI.hashCode() : 0);
-        return result;
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        MessageEvent other = (MessageEvent) obj;
+        if (messageURI == null) {
+            if (other.messageURI != null)
+                return false;
+        } else if (!messageURI.equals(other.messageURI))
+            return false;
+        if (parentURI == null) {
+            if (other.parentURI != null)
+                return false;
+        } else if (!parentURI.equals(other.parentURI))
+            return false;
+        return true;
     }
 }

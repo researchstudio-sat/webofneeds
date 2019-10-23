@@ -65,7 +65,6 @@ import org.slf4j.LoggerFactory;
 
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonSignatureData;
 import won.protocol.model.AtomGraphType;
 import won.protocol.model.ConnectionState;
@@ -713,11 +712,7 @@ public class WonRdfUtils {
          * @return
          */
         public static URI getSocket(WonMessage message) {
-            if (message.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL) {
-                return message.getRecipientSocketURI();
-            } else {
-                return message.getSenderSocketURI();
-            }
+            return message.getSenderSocketURI();
         }
 
         /**
@@ -729,11 +724,7 @@ public class WonRdfUtils {
          * @return
          */
         public static URI getTargetSocket(WonMessage message) {
-            if (message.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL) {
-                return message.getSenderSocketURI();
-            } else {
-                return message.getRecipientSocketURI();
-            }
+            return message.getRecipientSocketURI();
         }
 
         /**
@@ -1164,6 +1155,16 @@ public class WonRdfUtils {
 
         public static URI getTargetConnectionURIFromConnection(Dataset dataset, final URI connectionURI) {
             return URI.create(findOnePropertyFromResource(dataset, connectionURI, WON.targetConnection).asResource()
+                            .getURI());
+        }
+
+        public static URI getSocketURIFromConnection(Dataset dataset, final URI connectionURI) {
+            return URI.create(findOnePropertyFromResource(dataset, connectionURI, WON.socket).asResource()
+                            .getURI());
+        }
+
+        public static URI getTargetSocketURIFromConnection(Dataset dataset, final URI connectionURI) {
+            return URI.create(findOnePropertyFromResource(dataset, connectionURI, WON.targetSocket).asResource()
                             .getURI());
         }
 

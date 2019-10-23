@@ -10,9 +10,17 @@
  */
 package won.bot.framework.eventbot.action.impl.wonmessage;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -23,13 +31,6 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * BaseEventBotAction connecting two atoms on the specified sockets. The atom's
@@ -160,12 +161,18 @@ public class ConnectFromListToListAction extends BaseEventBotAction {
                         fromSocketType.map(socketType -> WonLinkedDataUtils
                                         .getSocketsOfType(fromUri, socketType,
                                                         getEventListenerContext().getLinkedDataSource())
-                                        .stream().findFirst().orElse(null)),
+                                        .stream().findFirst())
+                                        .orElseThrow(() -> new IllegalStateException(
+                                                        "No suitable sockets found for connect on " + fromUri))
+                                        .get(),
                         fromUri, localWonNode,
                         toSocketType.map(socketType -> WonLinkedDataUtils
                                         .getSocketsOfType(toUri, socketType,
                                                         getEventListenerContext().getLinkedDataSource())
-                                        .stream().findFirst().orElse(null)),
+                                        .stream().findFirst())
+                                        .orElseThrow(() -> new IllegalStateException(
+                                                        "No suitable sockets found for connect on " + fromUri))
+                                        .get(),
                         toUri, remoteWonNode, welcomeMessage).build();
     }
 

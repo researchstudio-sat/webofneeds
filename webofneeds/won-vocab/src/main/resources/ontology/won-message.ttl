@@ -437,14 +437,6 @@ won:Node rdf:type owl:Class .
                  rdfs:label "FailureResponse" .
 
 
-###  https://w3id.org/won/message#OpenMessage
-:OpenMessage rdf:type owl:NamedIndividual ,
-                      :MessageType ;
-             rdfs:comment "Type of Message used to (re)open an existing Connection."@en ;
-             rdfs:isDefinedBy <https://w3id.org/won/message> ;
-             rdfs:label "OpenMessage" .
-
-
 ###  https://w3id.org/won/message#ReplaceMessage
 :ReplaceMessage rdf:type owl:NamedIndividual ,
                          :MessageType ;

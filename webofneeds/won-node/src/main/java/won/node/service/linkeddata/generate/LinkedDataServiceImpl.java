@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
@@ -58,7 +59,6 @@ import won.protocol.model.DataWithEtag;
 import won.protocol.model.DatasetHolder;
 import won.protocol.model.DatasetHolderAggregator;
 import won.protocol.model.MessageEvent;
-import won.protocol.model.MessageInContainer;
 import won.protocol.model.unread.UnreadMessageInfo;
 import won.protocol.model.unread.UnreadMessageInfoForAtom;
 import won.protocol.repository.AtomRepository;
@@ -232,12 +232,11 @@ public class LinkedDataServiceImpl implements LinkedDataService {
                         WON.MessageContainer);
         metaModel.add(metaModel.createStatement(atomResource, WON.messageContainer, atomMessageContainer));
         // add atom event URIs
-        Collection<MessageInContainer> messageEvents = atom.getMessageContainer().getEvents();
-        messageEvents.stream().map(mic -> mic.getMessage())
-                        .forEach(messageEvent -> metaModel.add(metaModel.createStatement(
-                                        atomMessageContainer,
-                                        RDFS.member,
-                                        metaModel.getResource(messageEvent.getMessageURI().toString()))));
+        Collection<MessageEvent> messageEvents = atom.getMessageContainer().getEvents();
+        for (MessageEvent messageEvent : messageEvents) {
+            metaModel.add(metaModel.createStatement(atomMessageContainer, RDFS.member,
+                            metaModel.getResource(messageEvent.getMessageURI().toString())));
+        }
         // add WON node link
         atomResource.addProperty(WON.wonNode, metaModel.createResource(this.resourceURIPrefix));
         // link all atom graphs taken from the create message to atom uri:
@@ -670,17 +669,17 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     @Transactional
     public DataWithEtag<Dataset> getDatasetForUri(URI datasetUri, String etag) {
         Integer version = etag == null ? -1 : Integer.valueOf(etag);
-        DatasetHolder datasetHolder = datasetHolderRepository.findOneByUri(datasetUri);
-        if (datasetHolder == null) {
+        Optional<DatasetHolder> datasetHolder = datasetHolderRepository.findOneByUri(datasetUri);
+        if (!datasetHolder.isPresent()) {
             return DataWithEtag.dataNotFound();
         }
-        if (version == datasetHolder.getVersion()) {
+        if (version == datasetHolder.get().getVersion()) {
             return DataWithEtag.dataNotChanged(etag);
         }
-        Dataset dataset = datasetHolder.getDataset();
+        Dataset dataset = datasetHolder.get().getDataset();
         DefaultPrefixUtils.setDefaultPrefixes(dataset.getDefaultModel());
         addBaseUriAndDefaultPrefixes(dataset);
-        return new DataWithEtag<>(dataset, Integer.toString(datasetHolder.getVersion()), etag);
+        return new DataWithEtag<>(dataset, Integer.toString(datasetHolder.get().getVersion()), etag);
     }
 
     private String createDataGraphUriFromResource(Resource atomListPageResource) {

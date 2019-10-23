@@ -10,16 +10,18 @@
  */
 package won.protocol.repository.rdfstorage.impl;
 
+import java.net.URI;
+import java.util.Optional;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import won.protocol.model.DataWithEtag;
 import won.protocol.model.DatasetHolder;
 import won.protocol.repository.DatasetHolderRepository;
 import won.protocol.repository.rdfstorage.RDFStorageService;
-
-import java.net.URI;
 
 /**
  * Rdf Storage service that delegates to a JPA repository
@@ -37,43 +39,43 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
 
     @Override
     public void storeDataset(final URI resourceURI, final Dataset dataset) {
-        DatasetHolder datasetHolder = datasetHolderRepository.findOneByUri(resourceURI);
-        if (datasetHolder != null) {
-            datasetHolder.setDataset(dataset);
+        Optional<DatasetHolder> datasetHolder = datasetHolderRepository.findOneByUri(resourceURI);
+        if (datasetHolder.isPresent()) {
+            datasetHolder.get().setDataset(dataset);
         } else {
-            datasetHolder = new DatasetHolder(resourceURI, dataset);
+            datasetHolder = Optional.of(new DatasetHolder(resourceURI, dataset));
         }
-        datasetHolderRepository.save(datasetHolder);
+        datasetHolderRepository.save(datasetHolder.get());
     }
 
     @Override
     public Model loadModel(final URI resourceURI) {
-        DatasetHolder datasetHolder = datasetHolderRepository.findOneByUri(resourceURI);
-        return datasetHolder == null ? null : datasetHolder.getDataset().getDefaultModel();
+        Optional<DatasetHolder> datasetHolder = datasetHolderRepository.findOneByUri(resourceURI);
+        return datasetHolder.isPresent() ? datasetHolder.get().getDataset().getDefaultModel() : null;
     }
 
     @Override
     public DataWithEtag<Model> loadModel(final URI resourceURI, String etag) {
         Integer version = Integer.valueOf(etag);
-        DatasetHolder datasetHolder = datasetHolderRepository.findOneByUriAndVersionNot(resourceURI, version);
+        Optional<DatasetHolder> datasetHolder = datasetHolderRepository.findOneByUriAndVersionNot(resourceURI, version);
         return new DataWithEtag<>(
-                        datasetHolder == null ? null : datasetHolder.getDataset().getDefaultModel(),
-                        datasetHolder == null ? etag : Integer.toString(datasetHolder.getVersion()), etag);
+                        datasetHolder.isPresent() ? datasetHolder.get().getDataset().getDefaultModel() : null,
+                        datasetHolder.isPresent() ? Integer.toString(datasetHolder.get().getVersion()) : etag, etag);
     }
 
     @Override
     public Dataset loadDataset(final URI resourceURI) {
-        DatasetHolder datasetHolder = datasetHolderRepository.findOneByUri(resourceURI);
-        return datasetHolder == null ? null : datasetHolder.getDataset();
+        Optional<DatasetHolder> datasetHolder = datasetHolderRepository.findOneByUri(resourceURI);
+        return datasetHolder.isPresent() ? datasetHolder.get().getDataset() : null;
     }
 
     @Override
     public DataWithEtag<Dataset> loadDataset(final URI resourceURI, String etag) {
         Integer version = etag == null ? -1 : Integer.valueOf(etag);
-        DatasetHolder datasetHolder = datasetHolderRepository.findOneByUriAndVersionNot(resourceURI, version);
+        Optional<DatasetHolder> datasetHolder = datasetHolderRepository.findOneByUriAndVersionNot(resourceURI, version);
         return new DataWithEtag<>(
-                        datasetHolder == null ? null : datasetHolder.getDataset(),
-                        datasetHolder == null ? etag : Integer.toString(datasetHolder.getVersion()), etag);
+                        datasetHolder.isPresent() ? datasetHolder.get().getDataset() : null,
+                        datasetHolder.isPresent() ? Integer.toString(datasetHolder.get().getVersion()) : etag, etag);
     }
 
     @Override

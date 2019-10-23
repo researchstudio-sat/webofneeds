@@ -36,7 +36,6 @@ public class WONMSG {
     public static final String ConnectMessageString = BASE_URI + "ConnectMessage";
     public static final String DeactivateMessageString = BASE_URI + "DeactivateMessage";
     public static final String ActivateMessageString = BASE_URI + "ActivateMessage";
-    public static final String OpenMessageString = BASE_URI + "OpenMessage";
     public static final String CloseMessageString = BASE_URI + "CloseMessage";
     public static final String DeleteMessageString = BASE_URI + "DeleteMessage";
     public static final String ConnectionMessageString = BASE_URI + "ConnectionMessage";
@@ -53,7 +52,6 @@ public class WONMSG {
     public static final Resource ConnectMessage = m.createResource(ConnectMessageString);
     public static final Resource DeactivateMessage = m.createResource(DeactivateMessageString);
     public static final Resource ActivateMessage = m.createResource(ActivateMessageString);
-    public static final Resource OpenMessage = m.createResource(OpenMessageString);
     public static final Resource CloseMessage = m.createResource(CloseMessageString);
     public static final Resource DeleteMessage = m.createResource(DeleteMessageString);
     public static final Resource ConnectionMessage = m.createResource(ConnectionMessageString);
@@ -69,28 +67,6 @@ public class WONMSG {
     // TODO: delete if not needed
     public static final Resource AtomCreatedNotificationMessage = m
                     .createResource(BASE_URI + "AtomCreatedNotificationMessage");
-    // response types
-    // TODO: delete if not needed
-    public static final Resource CreateResponseMessage = m.createResource(BASE_URI + "CreateResponseMessage");
-    // TODO: delete if not needed
-    public static final Resource ConnectResponseMessage = m.createResource(BASE_URI + "ConnectResponseMessage");
-    // TODO: delete if not needed
-    public static final Resource AtomStateResponseMessage = m.createResource(BASE_URI + "AtomStateResponseMessage");
-    // TODO: delete if not needed
-    public static final Resource CloseResponseMessage = m.createResource(BASE_URI + "CloseResponseMessage");
-    // TODO: delete if not needed
-    public static final Resource OpenResponseMessage = m.createResource(BASE_URI + "OpenResponseMessage");
-    // TODO: delete if not needed
-    public static final Resource ConnectionMessageResponseMessage = m
-                    .createResource(BASE_URI + "ConnectionMessageResponseMessage");
-
-    // TODO: delete if not needed
-    public static boolean isResponseMessageType(Resource resource) {
-        return resource.equals(CreateResponseMessage) || resource.equals(ConnectResponseMessage)
-                        || resource.equals(AtomStateResponseMessage) || resource.equals(CloseResponseMessage)
-                        || resource.equals(OpenResponseMessage) || resource.equals(ConnectionMessageResponseMessage);
-    }
-
     // response states
     public static final Resource SuccessResponseState = m.createResource(BASE_URI + "SuccessResponse");
     public static final Resource FailureResponseState = m.createResource(BASE_URI + "FailureResponse");

@@ -130,30 +130,6 @@ public class WonMessageSlipComputerTests {
     }
 
     @Test
-    public void testOpenMessageFromNode() throws Exception {
-        Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createGeneral()));
-        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.OpenMessageString));
-        exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER,
-                        URI.create(WonMessageDirection.FROM_EXTERNAL.getResource().getURI().toString()));
-        exchange.getIn().setHeader(WonCamelConstants.SOCKET_TYPE_HEADER, URI.create(WXCHAT.ChatSocketString));
-        String slip = wonMessageSlipComputer.evaluate(exchange, String.class);
-        Assert.assertEquals("openMessageFromNodeProcessor,openFromNodeChatSocketImpl", slip);
-    }
-
-    @Test
-    public void testOpenMessageFromOwner() throws Exception {
-        Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createGeneral()));
-        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.OpenMessageString));
-        exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER,
-                        URI.create(WonMessageDirection.FROM_OWNER.getResource().getURI().toString()));
-        exchange.getIn().setHeader(WonCamelConstants.SOCKET_TYPE_HEADER, URI.create(WXCHAT.ChatSocketString));
-        String slip = wonMessageSlipComputer.evaluate(exchange, String.class);
-        Assert.assertEquals("openMessageFromOwnerProcessor,openFromOwnerChatSocketImpl", slip);
-    }
-
-    @Test
     public void testSendMessageFromNode() throws Exception {
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
         exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createGeneral()));

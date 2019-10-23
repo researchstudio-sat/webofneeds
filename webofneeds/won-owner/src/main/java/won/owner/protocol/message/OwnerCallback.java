@@ -22,8 +22,6 @@ import won.protocol.model.Connection;
 public interface OwnerCallback {
     public void onConnectFromOtherAtom(Connection con, final WonMessage wonMessage);
 
-    public void onOpenFromOtherAtom(Connection con, final WonMessage wonMessage);
-
     public void onCloseFromOtherAtom(Connection con, final WonMessage wonMessage);
 
     public void onAtomHintFromMatcher(final WonMessage wonMessage);

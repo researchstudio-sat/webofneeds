@@ -1,8 +1,14 @@
 package won.bot.framework.extensions.serviceatom;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Objects;
+import java.util.Optional;
+
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -23,11 +29,6 @@ import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WXHOLD;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Behaviour that creates exactly one Atom that represents the Bot itself
@@ -173,9 +174,15 @@ public class ServiceAtomBehaviour extends BotBehaviour {
                                                                                 ctx.getWonNodeInformationService()
                                                                                                 .generateEventURI(
                                                                                                                 localWonNode),
-                                                                                createdAtomHoldableSocketUri,
+                                                                                createdAtomHoldableSocketUri
+                                                                                                .orElseThrow(() -> new IllegalStateException(
+                                                                                                                "no suitable socket for connecting on created atom "
+                                                                                                                                + createdAtomUri)),
                                                                                 createdAtomUri, localWonNode,
-                                                                                botServiceAtomHolderSocketUri,
+                                                                                botServiceAtomHolderSocketUri
+                                                                                                .orElseThrow(() -> new IllegalStateException(
+                                                                                                                "no suitable socket for connecting on bot service atom "
+                                                                                                                                + botServiceAtomUri)),
                                                                                 botServiceAtomUri, remoteWonNode,
                                                                                 "Automated Connect to Service Atom")
                                                                 .build();
@@ -231,7 +238,7 @@ public class ServiceAtomBehaviour extends BotBehaviour {
                                                                             targetAtomUri),
                                                             targetAtomUri);
                                             WonMessage openServiceAtomMessage = WonMessageBuilder
-                                                            .setMessagePropertiesForOpen(ctx
+                                                            .setMessagePropertiesForConnect(ctx
                                                                             .getWonNodeInformationService()
                                                                             .generateEventURI(serviceAtomWonNode),
                                                                             connectFromOtherAtomEvent.getWonMessage(),

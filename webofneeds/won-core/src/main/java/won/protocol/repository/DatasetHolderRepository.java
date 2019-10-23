@@ -11,6 +11,7 @@
 package won.protocol.repository;
 
 import java.net.URI;
+import java.util.Optional;
 
 import javax.persistence.LockModeType;
 
@@ -25,11 +26,11 @@ import won.protocol.model.DatasetHolder;
  * Repository for jena datasets (wrapped in DatasetHolders)
  */
 public interface DatasetHolderRepository extends CrudRepository<DatasetHolder, URI> {
-    DatasetHolder findOneByUriAndVersionNot(URI uri, Integer version);
+    Optional<DatasetHolder> findOneByUriAndVersionNot(URI uri, Integer version);
 
-    DatasetHolder findOneByUri(URI uri);
+    Optional<DatasetHolder> findOneByUri(URI uri);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select d from DatasetHolder d where d.uri = :uri")
-    DatasetHolder findOneByUriForUpdate(@Param("uri") URI uri);
+    Optional<DatasetHolder> findOneByUriForUpdate(@Param("uri") URI uri);
 }

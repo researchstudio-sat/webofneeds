@@ -69,7 +69,7 @@
             msg:senderNode            <https://localhost:8443/won/resource> ;
             msg:isRemoteResponseTo       event:usi9yhill1lo2xi70sjx ;
             msg:isResponseTo             event:2kt4vylzjcvoz4rtn5tn ;
-            msg:isResponseToMessageType  msg:OpenMessage ;
+            msg:isResponseToMessageType  msg:ConnectMessage ;
             msg:protocolVersion          "1.0" .
     
     <https://localhost:8443/won/resource/event/2kt4vylzjcvoz4rtn5tn#envelope-ikk0-sig>
@@ -994,7 +994,7 @@
             msg:senderAtom            atom:nte803gz4pbiw6equ3qa ;
             msg:senderNode            <https://localhost:8443/won/resource> ;
             msg:isResponseTo             event:usi9yhill1lo2xi70sjx ;
-            msg:isResponseToMessageType  msg:OpenMessage ;
+            msg:isResponseToMessageType  msg:ConnectMessage ;
             msg:protocolVersion          "1.0" .
     
     <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#envelope-0sio-sig>
@@ -1271,7 +1271,7 @@
     event:usi9yhill1lo2xi70sjx
             a                     msg:FromOwner ;
             msg:content        <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> ;
-            msg:messageType    msg:OpenMessage ;
+            msg:messageType    msg:ConnectMessage ;
             msg:recipient       conn:xq6jofxo2w8o05io6dre ;
             msg:recipientAtom   atom:7820503869697675000 ;
             msg:recipientNode   <https://localhost:8443/won/resource> ;

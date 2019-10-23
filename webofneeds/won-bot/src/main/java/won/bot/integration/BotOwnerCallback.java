@@ -1,19 +1,20 @@
 package won.bot.integration;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.TaskScheduler;
+
 import won.bot.exception.NoBotResponsibleException;
 import won.bot.framework.manager.BotManager;
 import won.owner.protocol.message.OwnerCallback;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.model.Connection;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.Date;
 
 /**
  * OwnerProtocolOwnerServiceCallback that dispatches the calls to the bots.
@@ -90,23 +91,6 @@ public class BotOwnerCallback implements OwnerCallback {
                 }
             } else {
                 logger.debug("Received echo for onConnectFromOtherAtom");
-            }
-        }, new Date());
-    }
-
-    @Override
-    public void onOpenFromOtherAtom(final Connection con, final WonMessage wonMessage) {
-        taskScheduler.schedule(() -> {
-            if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
-                try {
-                    botManager.getBotResponsibleForAtomUri(con.getAtomURI()).onOpenFromOtherAtom(con, wonMessage);
-                } catch (NoBotResponsibleException e) {
-                    logger.debug("error while handling onOpenFromOtherAtom() message: {}", e.getMessage());
-                } catch (Exception e) {
-                    logger.warn("error while handling onOpenFromOtherAtom()", e);
-                }
-            } else {
-                logger.debug("Received echo for onOpenFromOtherAtom");
             }
         }, new Date());
     }

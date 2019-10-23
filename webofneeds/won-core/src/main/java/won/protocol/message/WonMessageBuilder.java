@@ -1,11 +1,23 @@
 package won.protocol.message;
 
+import java.net.URI;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
+
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.util.CheapInsecureRandomString;
 import won.protocol.util.DefaultPrefixUtils;
@@ -13,9 +25,6 @@ import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.RDFG;
 import won.protocol.vocabulary.WONMSG;
-
-import java.net.URI;
-import java.util.*;
 
 /**
  * Class to build a WonMessage based on the specific properties.
@@ -65,6 +74,7 @@ public class WonMessageBuilder {
     private Long receivedTimestamp;
 
     public WonMessageBuilder(URI messageURI) {
+        Objects.requireNonNull(messageURI);
         this.messageURI = messageURI;
     }
 
@@ -308,34 +318,6 @@ public class WonMessageBuilder {
         return builder;
     }
 
-    // complete MessageType specific setters
-    public static WonMessageBuilder setMessagePropertiesForOpen(URI messageURI, URI localConnection, URI localAtom,
-                    URI localWonNode, URI targetConnection, URI targetAtom, URI remoteWonNode,
-                    Optional<URI> targetSocket, String welcomeMessage) {
-        WonMessageBuilder builder = new WonMessageBuilder(messageURI)
-                        .setWonMessageDirection(WonMessageDirection.FROM_OWNER).setWonMessageType(WonMessageType.OPEN)
-                        .setSenderURI(localConnection).setSenderAtomURI(localAtom).setSenderNodeURI(localWonNode)
-                        .setRecipientURI(targetConnection).setRecipientAtomURI(targetAtom)
-                        .setRecipientNodeURI(remoteWonNode);
-        targetSocket.ifPresent(builder::setRecipientSocketURI);
-        return builder.setTextMessage(welcomeMessage).setSentTimestampToNow();
-    }
-
-    public static WonMessageBuilder setMessagePropertiesForOpen(URI messageURI, URI localConnection, URI localAtom,
-                    URI localWonNode, URI targetConnection, URI targetAtom, URI remoteWonNode, String welcomeMessage) {
-        return setMessagePropertiesForOpen(messageURI, localConnection, localAtom, localWonNode, targetConnection,
-                        targetAtom, remoteWonNode, Optional.empty(), welcomeMessage);
-    }
-
-    public static WonMessageBuilder setMessagePropertiesForOpen(URI messageURI, WonMessage connectToReactTo,
-                    String welcomeMessage) {
-        return setMessagePropertiesForOpen(messageURI, connectToReactTo.getRecipientURI(),
-                        connectToReactTo.getRecipientAtomURI(), connectToReactTo.getRecipientNodeURI(),
-                        connectToReactTo.getSenderURI(), connectToReactTo.getSenderAtomURI(),
-                        connectToReactTo.getSenderNodeURI(), Optional.of(connectToReactTo.getSenderSocketURI()),
-                        welcomeMessage);
-    }
-
     public static WonMessageBuilder setMessagePropertiesForClose(URI messageURI, WonMessage connectToReactTo,
                     String farewellMessage) {
         return setMessagePropertiesForClose(messageURI, connectToReactTo.getRecipientURI(),
@@ -469,8 +451,25 @@ public class WonMessageBuilder {
                         .setSentTimestampToNow();
     }
 
-    public static WonMessageBuilder setMessagePropertiesForConnect(URI messageURI, Optional<URI> localSocket,
-                    URI localAtom, URI localWonNode, Optional<URI> targetSocket, URI targetAtom, URI remoteWonNode,
+    public static WonMessageBuilder setMessagePropertiesForConnect(URI messageURI,
+                    WonMessage connectToReactTo,
+                    String welcomeMessage) {
+        return setMessagePropertiesForRespondingConnect(messageURI,
+                        connectToReactTo.getRecipientURIRequired(),
+                        connectToReactTo.getRecipientSocketURIRequired(),
+                        connectToReactTo.getRecipientAtomURIRequired(),
+                        connectToReactTo.getRecipientNodeURIRequired(),
+                        connectToReactTo.getSenderURIRequired(),
+                        connectToReactTo.getSenderSocketURIRequired(),
+                        connectToReactTo.getSenderAtomURIRequired(),
+                        connectToReactTo.getSenderNodeURIRequired(),
+                        welcomeMessage);
+    }
+
+    public static WonMessageBuilder setMessagePropertiesForRespondingConnect(URI messageURI, URI localConnection,
+                    URI localSocket,
+                    URI localAtom, URI localWonNode, URI targetConnection, URI targetSocket, URI targetAtom,
+                    URI remoteWonNode,
                     String welcomeMessage) {
         // create content model
         Model model = ModelFactory.createDefaultModel();
@@ -483,9 +482,31 @@ public class WonMessageBuilder {
                         .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
                         .setWonMessageType(WonMessageType.CONNECT).setSenderAtomURI(localAtom)
                         .setSenderNodeURI(localWonNode).setRecipientAtomURI(targetAtom)
-                        .setRecipientNodeURI(remoteWonNode);
-        localSocket.ifPresent(builder::setSenderSocketURI);
-        targetSocket.ifPresent(builder::setRecipientSocketURI);
+                        .setRecipientNodeURI(remoteWonNode)
+                        .setSenderSocketURI(localSocket)
+                        .setSenderURI(localConnection)
+                        .setRecipientSocketURI(targetSocket)
+                        .setRecipientURI(targetConnection);
+        return builder.addContent(model).setSentTimestampToNow();
+    }
+
+    public static WonMessageBuilder setMessagePropertiesForConnect(URI messageURI, URI localSocket,
+                    URI localAtom, URI localWonNode, URI targetSocket, URI targetAtom, URI remoteWonNode,
+                    String welcomeMessage) {
+        // create content model
+        Model model = ModelFactory.createDefaultModel();
+        RdfUtils.findOrCreateBaseResource(model);
+        RdfUtils.replaceBaseResource(model, model.createResource(messageURI.toString()));
+        if (welcomeMessage != null) {
+            WonRdfUtils.MessageUtils.addMessage(model, welcomeMessage);
+        }
+        WonMessageBuilder builder = new WonMessageBuilder(messageURI)
+                        .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
+                        .setWonMessageType(WonMessageType.CONNECT).setSenderAtomURI(localAtom)
+                        .setSenderNodeURI(localWonNode).setRecipientAtomURI(targetAtom)
+                        .setRecipientNodeURI(remoteWonNode)
+                        .setSenderSocketURI(localSocket)
+                        .setRecipientSocketURI(targetSocket);
         return builder.addContent(model).setSentTimestampToNow();
     }
 
@@ -614,76 +635,91 @@ public class WonMessageBuilder {
         WonMessageBuilder messageBuilder = new WonMessageBuilder(messageURI).setWonMessageType(
                         isSuccess ? WonMessageType.SUCCESS_RESPONSE : WonMessageType.FAILURE_RESPONSE);
         WonMessageDirection origDirection = originalMessage.getEnvelopeType();
+        Optional<URI> senderAtomURI = Optional.ofNullable(originalMessage.getSenderAtomURI());
+        Optional<URI> senderURI = Optional.ofNullable(originalMessage.getSenderURI());
+        Optional<URI> recipientAtomURI = Optional.ofNullable(originalMessage.getRecipientAtomURI());
+        Optional<URI> recipientURI = Optional.ofNullable(originalMessage.getRecipientURI());
         if (WonMessageDirection.FROM_EXTERNAL == origDirection) {
             // if the message is an external message, the original receiver becomes
             // the sender of the response.
             messageBuilder.setSenderNodeURI(originalMessage.getRecipientNodeURI())
-                            .setSenderAtomURI(originalMessage.getRecipientAtomURI())
-                            .setSenderURI(originalMessage.getRecipientURI())
                             .setIsRemoteResponseToMessageURI(originalMessage.getCorrespondingRemoteMessageURI());
+            recipientAtomURI.ifPresent(messageBuilder::setSenderAtomURI);
+            recipientURI.ifPresent(messageBuilder::setSenderURI);
         } else if (WonMessageDirection.FROM_OWNER == origDirection
                         || WonMessageDirection.FROM_SYSTEM == origDirection) {
             // if the message comes from the owner, the original sender is also
             // the sender of the response
-            messageBuilder.setSenderNodeURI(originalMessage.getSenderNodeURI())
-                            .setSenderAtomURI(originalMessage.getSenderAtomURI())
-                            .setSenderURI(originalMessage.getSenderURI());
+            messageBuilder.setSenderNodeURI(originalMessage.getSenderNodeURI());
+            senderAtomURI.ifPresent(messageBuilder::setSenderAtomURI);
+            senderURI.ifPresent(messageBuilder::setSenderURI);
         }
-        messageBuilder.setRecipientAtomURI(originalMessage.getSenderAtomURI())
+        messageBuilder
                         .setRecipientNodeURI(originalMessage.getSenderNodeURI())
-                        .setRecipientURI(originalMessage.getSenderURI())
                         .setIsResponseToMessageURI(originalMessage.getMessageURI())
                         .setIsResponseToMessageType(originalMessage.getMessageType())
                         .setWonMessageDirection(WonMessageDirection.FROM_SYSTEM);
+        senderURI.ifPresent(messageBuilder::setRecipientURI);
+        senderAtomURI.ifPresent(messageBuilder::setRecipientAtomURI);
         return messageBuilder;
     }
 
     public WonMessageBuilder setSenderURI(URI senderURI) {
+        Objects.requireNonNull(senderURI);
         this.senderURI = senderURI;
         return this;
     }
 
     public WonMessageBuilder setSenderAtomURI(URI senderAtomURI) {
+        Objects.requireNonNull(senderAtomURI);
         this.senderAtomURI = senderAtomURI;
         return this;
     }
 
     public WonMessageBuilder setSenderNodeURI(URI senderNodeURI) {
+        Objects.requireNonNull(senderNodeURI);
         this.senderNodeURI = senderNodeURI;
         return this;
     }
 
     public WonMessageBuilder setSenderSocketURI(URI senderSocketURI) {
+        Objects.requireNonNull(senderSocketURI);
         this.senderSocketURI = senderSocketURI;
         return this;
     }
 
     public WonMessageBuilder setRecipientURI(URI recipientURI) {
+        Objects.requireNonNull(recipientURI);
         this.recipientURI = recipientURI;
         return this;
     }
 
     public WonMessageBuilder setRecipientAtomURI(URI recipientAtomURI) {
+        Objects.requireNonNull(recipientAtomURI);
         this.recipientAtomURI = recipientAtomURI;
         return this;
     }
 
     public WonMessageBuilder setRecipientNodeURI(URI recipientNodeURI) {
+        Objects.requireNonNull(recipientNodeURI);
         this.recipientNodeURI = recipientNodeURI;
         return this;
     }
 
     public WonMessageBuilder setRecipientSocketURI(URI recipientSocketURI) {
+        Objects.requireNonNull(recipientSocketURI);
         this.recipientSocketURI = recipientSocketURI;
         return this;
     }
 
     public WonMessageBuilder setWonMessageType(WonMessageType wonMessageType) {
+        Objects.requireNonNull(wonMessageType);
         this.wonMessageType = wonMessageType;
         return this;
     }
 
     public WonMessageBuilder setWonMessageDirection(WonMessageDirection wonMessageDirection) {
+        Objects.requireNonNull(wonMessageDirection);
         this.wonMessageDirection = wonMessageDirection;
         return this;
     }
@@ -697,6 +733,7 @@ public class WonMessageBuilder {
      * @return
      */
     public WonMessageBuilder addContent(Model content) {
+        Objects.requireNonNull(content);
         addContentInternal(content);
         return this;
     }
@@ -719,6 +756,7 @@ public class WonMessageBuilder {
      * @return
      */
     public WonMessageBuilder addContent(Dataset dataset) {
+        Objects.requireNonNull(dataset);
         Dataset toAdd = RdfUtils.cloneDataset(dataset);
         // we can add the default model without remembering the newly
         // generated URI because there cannot be a reference
@@ -782,41 +820,49 @@ public class WonMessageBuilder {
     }
 
     public WonMessageBuilder setIsResponseToMessageURI(URI isResponseToMessageURI) {
+        Objects.requireNonNull(isResponseToMessageURI);
         this.isResponseToMessageURI = isResponseToMessageURI;
         return this;
     }
 
     public WonMessageBuilder setIsRemoteResponseToMessageURI(final URI isRemoteResponseToMessageURI) {
+        Objects.requireNonNull(isRemoteResponseToMessageURI);
         this.isRemoteResponseToMessageURI = isRemoteResponseToMessageURI;
         return this;
     }
 
     public WonMessageBuilder setIsResponseToMessageType(final WonMessageType isResponseToMessageType) {
+        Objects.requireNonNull(isResponseToMessageType);
         this.isResponseToMessageType = isResponseToMessageType;
         return this;
     }
 
     public WonMessageBuilder setCorrespondingRemoteMessageURI(URI correspondingRemoteMessageURI) {
+        Objects.requireNonNull(correspondingRemoteMessageURI);
         this.correspondingRemoteMessageURI = correspondingRemoteMessageURI;
         return this;
     }
 
     public WonMessageBuilder setForwardedMessageURI(URI forwardedMessageURI) {
+        Objects.requireNonNull(forwardedMessageURI);
         this.forwardedMessageURI = forwardedMessageURI;
         return this;
     }
 
     public WonMessageBuilder setInjectIntoConnections(Collection<URI> forwardToRecipientUris) {
+        Objects.requireNonNull(forwardToRecipientUris);
         this.injectIntoConnections.addAll(forwardToRecipientUris);
         return this;
     }
 
     public WonMessageBuilder setSentTimestamp(final long sentTimestamp) {
+        Objects.requireNonNull(sentTimestamp);
         this.sentTimestamp = sentTimestamp;
         return this;
     }
 
     public WonMessageBuilder setReceivedTimestamp(Long receivedTimestamp) {
+        Objects.requireNonNull(receivedTimestamp);
         this.receivedTimestamp = receivedTimestamp;
         return this;
     }
@@ -832,16 +878,19 @@ public class WonMessageBuilder {
     }
 
     public WonMessageBuilder setHintScore(Double hintScore) {
+        Objects.requireNonNull(hintScore);
         this.hintScore = hintScore;
         return this;
     }
 
     public WonMessageBuilder setHintTargetAtomURI(URI hintTargetAtomURI) {
+        Objects.requireNonNull(hintTargetAtomURI);
         this.hintTargetAtomURI = hintTargetAtomURI;
         return this;
     }
 
     public WonMessageBuilder setHintTargetSocketURI(URI hintTargetSocketURI) {
+        Objects.requireNonNull(hintTargetSocketURI);
         this.hintTargetSocketURI = hintTargetSocketURI;
         return this;
     }
@@ -854,9 +903,8 @@ public class WonMessageBuilder {
      * @return
      */
     public WonMessageBuilder setTextMessage(String textMessage) {
-        if (textMessage != null) {
-            WonRdfUtils.MessageUtils.addMessage(getUnsignedContentGraph(), textMessage);
-        }
+        Objects.requireNonNull(textMessage);
+        WonRdfUtils.MessageUtils.addMessage(getUnsignedContentGraph(), textMessage);
         return this;
     }
 
@@ -900,5 +948,122 @@ public class WonMessageBuilder {
                         .setIsResponseToMessageType(wonMessage.getIsResponseToMessageType())
                         .setWonMessageDirection(WonMessageDirection.FROM_SYSTEM);
         return builder.build();
+    }
+
+    public static Make make(URI messageURI) {
+        WonMessageBuilder builder = new WonMessageBuilder(messageURI);
+        return new Make(builder);
+    }
+
+    public static class BuilderBase {
+        protected WonMessageBuilder builder;
+
+        public BuilderBase(WonMessageBuilder builder) {
+            this.builder = builder;
+        }
+    }
+
+    public static class Make extends BuilderBase {
+        private Make(WonMessageBuilder builder) {
+            super(builder);
+        }
+
+        public ConnectSenderSocket connect() {
+            return new ConnectSenderSocket(builder);
+        }
+    }
+
+    public static class ConnectSenderSocket extends BuilderBase {
+        public ConnectSenderSocket(WonMessageBuilder builder) {
+            super(builder);
+            builder
+                            .setSentTimestampToNow()
+                            .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
+                            .setWonMessageType(WonMessageType.CONNECT);
+        }
+
+        public ConnectSenderAtom senderSocket(URI socketURI) {
+            builder.setSenderSocketURI(socketURI);
+            return new ConnectSenderAtom(builder);
+        }
+    }
+
+    public static class ConnectSenderAtom extends BuilderBase {
+        public ConnectSenderAtom(WonMessageBuilder builder) {
+            super(builder);
+        }
+
+        public ConnectSenderNode senderAtom(URI atomURI) {
+            builder.setSenderAtomURI(atomURI);
+            return new ConnectSenderNode(builder);
+        }
+    }
+
+    public static class ConnectSenderNode extends BuilderBase {
+        public ConnectSenderNode(WonMessageBuilder builder) {
+            super(builder);
+        }
+
+        public ConnectRecipientSocket senderNode(URI nodeURI) {
+            builder.setSenderNodeURI(nodeURI);
+            return new ConnectRecipientSocket(builder);
+        }
+    }
+
+    public static class ConnectRecipientSocket extends BuilderBase {
+        public ConnectRecipientSocket(WonMessageBuilder builder) {
+            super(builder);
+        }
+
+        public ConnectRecipientAtom recipientSocket(URI atomURI) {
+            builder.setRecipientSocketURI(atomURI);
+            return new ConnectRecipientAtom(builder);
+        }
+    }
+
+    public static class ConnectRecipientAtom extends BuilderBase {
+        public ConnectRecipientAtom(WonMessageBuilder builder) {
+            super(builder);
+        }
+
+        public ConnectRecipientNode recipientAtom(URI atomURI) {
+            builder.setRecipientAtomURI(atomURI);
+            return new ConnectRecipientNode(builder);
+        }
+    }
+
+    public static class ConnectRecipientNode extends BuilderBase {
+        public ConnectRecipientNode(WonMessageBuilder builder) {
+            super(builder);
+        }
+
+        public ConnectWelcomeMessage recipientNode(URI atomURI) {
+            builder.setRecipientNodeURI(atomURI);
+            return new ConnectWelcomeMessage(builder);
+        }
+    }
+
+    public static class ConnectWelcomeMessage extends BuilderBase {
+        public ConnectWelcomeMessage(WonMessageBuilder builder) {
+            super(builder);
+        }
+
+        public WonMessageBuilder welcomeMessage(String welcomeMessage) {
+            Objects.requireNonNull(welcomeMessage);
+            Model model = ModelFactory.createDefaultModel();
+            RdfUtils.findOrCreateBaseResource(model);
+            RdfUtils.replaceBaseResource(model, model.createResource(builder.getMessageURI().toString()));
+            WonRdfUtils.MessageUtils.addMessage(model, welcomeMessage);
+            builder.addContent(model);
+            return builder;
+        }
+
+        public WonMessageBuilder noMessage() {
+            return builder;
+        }
+    }
+
+    private URI getMessageURI() {
+        return messageURI;
     }
 }

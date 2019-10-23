@@ -42,7 +42,7 @@ public class CloseCommandEvent extends BaseAtomAndConnectionSpecificEvent implem
 
     @Override
     public WonMessageType getWonMessageType() {
-        return WonMessageType.OPEN;
+        return WonMessageType.CLOSE;
     }
 
     public String getCloseMessage() {

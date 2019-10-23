@@ -125,7 +125,7 @@ public class MessageReferencer {
                 // add it
                 URI isResponseToURI = WonMessageUtils.getLocalIsResponseToURI(message);
                 Optional<MessageEvent> messageEvent = messageEventRepository
-                                .findOneByMessageURI(isResponseToURI);
+                                .findFirstByMessageURI(isResponseToURI);
                 String methodName = "selectLatestMessage::response";
                 if (messageEvent.isPresent()) {
                     selectedUris.add(new MessageUriAndParentUri(messageEvent.get().getMessageURI(),
@@ -238,10 +238,9 @@ public class MessageReferencer {
     }
 
     private WonMessage loadWonMessageforURI(final URI messageURI) {
-        DatasetHolder datasetHolder = datasetHolderRepository.findOneByUriForUpdate(messageURI);
-        if (datasetHolder == null || datasetHolder.getDataset() == null) {
-            throw new IllegalStateException(String.format("could not load dataset for message %s", messageURI));
-        }
+        DatasetHolder datasetHolder = datasetHolderRepository.findOneByUriForUpdate(messageURI)
+                        .orElseThrow(() -> new IllegalStateException(
+                                        String.format("could not load dataset for message %s", messageURI)));
         return new WonMessage(datasetHolder.getDataset());
     }
 
