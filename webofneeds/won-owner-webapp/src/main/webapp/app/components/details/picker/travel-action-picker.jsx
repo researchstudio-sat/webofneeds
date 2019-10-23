@@ -174,6 +174,7 @@ export default class WonTravelActionPicker extends React.Component {
     return (
       <won-travel-action-picker>
         <WonTitlePicker
+          debounce={800}
           className={"rp__searchbox-from"}
           initial-value={
             this.state.fromAddedLocation && this.state.fromAddedLocation.name
@@ -231,6 +232,7 @@ export default class WonTravelActionPicker extends React.Component {
           {fromSearchResults}
         </ul>
         <WonTitlePicker
+          debounce={800}
           className={"rp__searchbox-to"}
           initial-value={
             this.state.toAddedLocation && this.state.toAddedLocation.name

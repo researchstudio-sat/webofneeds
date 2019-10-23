@@ -118,6 +118,7 @@ export default class WonLocationPicker extends React.Component {
       <won-location-picker>
         <WonTitlePicker
           className={"lp__searchbox"}
+          debounce={800}
           initial-value={
             this.state.pickedLocation && this.state.pickedLocation.name
           }
