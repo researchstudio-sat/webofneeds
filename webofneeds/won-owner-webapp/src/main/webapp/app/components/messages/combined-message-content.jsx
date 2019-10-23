@@ -20,6 +20,7 @@ import WonAtomIcon from "../atom-icon.jsx";
 import WonReferencedMessageContent from "./referenced-message-content.jsx";
 
 import "~/style/_combined-message-content.scss";
+import * as viewSelectors from "../../redux/selectors/view-selectors";
 
 const mapStateToProps = (state, ownProps) => {
   const ownedAtom =
@@ -72,7 +73,7 @@ const mapStateToProps = (state, ownProps) => {
     personaName,
     multiSelectType: connection && connection.get("multiSelectType"),
     contentGraphTrig: get(message, "contentGraphTrigRaw"),
-    shouldShowRdf: state.getIn(["view", "showRdf"]),
+    shouldShowRdf: viewSelectors.showRdf(state),
     hasContent: message && message.get("hasContent"),
     hasNotBeenLoaded: !message,
     hasReferences,

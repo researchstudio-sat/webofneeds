@@ -19,6 +19,7 @@ import VisibilitySensor from "react-visibility-sensor";
 
 import "~/style/_connection-message.scss";
 import "~/style/_rdflink.scss";
+import * as viewSelectors from "../../redux/selectors/view-selectors";
 
 const MESSAGE_READ_TIMEOUT = 1500;
 
@@ -33,7 +34,7 @@ const mapStateToProps = (state, ownProps) => {
       ? getIn(connection, ["messages", ownProps.messageUri])
       : Immutable.Map();
 
-  const shouldShowRdf = getIn(state, ["view", "showRdf"]);
+  const shouldShowRdf = viewSelectors.showRdf(state);
 
   let rdfLinkURL;
   if (shouldShowRdf && ownerBaseUrl && ownedAtom && message) {
