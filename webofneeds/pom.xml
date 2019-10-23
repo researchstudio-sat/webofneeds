@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>at.researchstudio.sat</groupId>
     <artifactId>webofneeds</artifactId>
-    <version>0.6-SNAPSHOT</version>
+    <version>0.6</version>
     <description>Finding people to cooperate with. Protocol, not platform. Decentralized. Linked Data. Open Source.</description>
     <url>https://github.com/researchstudio-sat/webofneeds</url>
     <developers>
@@ -60,7 +60,7 @@
         <connection>scm:git:git://github.com/researchstudio-sat/webofneeds.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/researchstudio-sat/webofneeds.git</developerConnection>
         <url>https://github.com/researchstudio-sat/webofneeds.git</url>
-        <tag>HEAD</tag>
+        <tag>webofneeds-0.6</tag>
     </scm>
     <modules>
         <module>won-core</module>

@@ -4,11 +4,11 @@
     <parent>
         <groupId>at.researchstudio.sat</groupId>
         <artifactId>webofneeds</artifactId>
-        <version>0.6-SNAPSHOT</version>
+        <version>0.6</version>
     </parent>
     <groupId>at.researchstudio.sat</groupId>
     <artifactId>won-node-webapp</artifactId>
-    <version>0.6-SNAPSHOT</version>
+    <version>0.6</version>
     <packaging>war</packaging>
     <name>Node Webapp</name>
 
