@@ -179,8 +179,9 @@ view { model, props } =
             selectedPersona model props
                 |> Maybe.map (\persona -> props.label ++ " as " ++ persona.name)
                 |> Maybe.withDefault (props.label ++ " Anonymously")
+        personas = Dict.values props.personas
     in
-    if not props.showPersonas then
+    if (not props.showPersonas) || (List.isEmpty personas)  then
         Palette.wonButton
             [ HA.disabled <| not props.buttonEnabled
             , HA.class "won-publish-button"
@@ -240,7 +241,7 @@ view { model, props } =
              ]
                 ++ (case model.state of
                         Open ->
-                            [ personaList (Dict.values props.personas) ]
+                            [ personaList personas ]
 
                         Closed ->
                             []
@@ -258,13 +259,7 @@ personaList personas =
                     , HA.class "empty"
                     ]
                     [
-                        Html.div [ HA.class "won-persona-name"] [
-                            Html.text ("No Personas created yet. You "
-                                ++ "can do so, by going to this post's "
-                                ++ "detail page and adding a (new) persona "
-                                ++ "there. This persona can then also be "
-                                ++ "used for other new posts." )
-                        ]
+                        Html.text "No pre-existing personas to add right now. Publish this post first, you can create and link personas with it later."
                     ]
                 ]
 
