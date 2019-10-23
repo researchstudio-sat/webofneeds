@@ -161,7 +161,7 @@ view { model, props } =
             ++ (if List.isEmpty props.personas then
                     [ div [] [ text "You have no personas yet" ]
                     , a
-                        [ Attributes.href "#!/settings"
+                        [ Attributes.href "#!/create?useCase=persona"
                         , Attributes.class "won-button--filled"
                         , Attributes.class "red"
                         ]

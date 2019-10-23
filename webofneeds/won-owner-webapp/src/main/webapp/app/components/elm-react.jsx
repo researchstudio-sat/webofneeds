@@ -29,6 +29,7 @@ export default class ElmReact extends React.Component {
     );
   }
 
+  // TODO replace with `getDerivedStateFromProps`
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.state && this.state.ports && nextProps.flags) {
       this.state.ports.inPort.send({
