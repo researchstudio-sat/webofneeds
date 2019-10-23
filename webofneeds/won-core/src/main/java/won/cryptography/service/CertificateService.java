@@ -42,7 +42,6 @@ public class CertificateService {
      * @param webId webID that represents the identity of the subject or null if the
      * subject has no webID
      * @return
-     * @throws IOException
      */
     public X509Certificate createSelfSignedCertificate(BigInteger serialNumber, KeyPair key, String commonName,
                     String webId) {
@@ -66,7 +65,6 @@ public class CertificateService {
      * @param webId webID that represents the identity of the subject or null if the
      * subject has no webID.
      * @return
-     * @throws IOException
      */
     public X509Certificate createSelfSignedCertificate(BigInteger serialNumber, KeyPair key,
                     Map<ASN1ObjectIdentifier, String> subjectData, String webId) {

@@ -60,7 +60,7 @@ public class RematchSparqlService extends SparqlService {
      * Bulk update of several meta data messages about the crawling process using a
      * separate graph.
      * 
-     * @param msgs multiple messages that describe crawling meta data to update
+     * @param msg multiple messages that describe crawling meta data to update
      */
     public void registerMatchingAttempts(BulkAtomEvent msg) {
         StringBuilder builder = new StringBuilder();

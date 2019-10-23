@@ -322,7 +322,7 @@ public class WonLinkedDataUtils {
     }
 
     /**
-     * Executes {@link WonRdfUtils.SocketUtils.getCompatibleSocketsForAtoms} after
+     * Executes {@link WonRdfUtils.SocketUtils#getCompatibleSocketsForAtoms} after
      * crawling the required data.
      * 
      * @param linkedDataSource

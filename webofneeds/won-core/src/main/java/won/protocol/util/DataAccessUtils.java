@@ -52,7 +52,6 @@ public class DataAccessUtils {
      * Loads the specified wonNode from the database.
      *
      * @param wonNodeURI
-     * @throws won.protocol.exception.NoSuchAtomException
      * @return the wonNode or null if none is found
      */
     public static WonNode loadWonNode(WonNodeRepository repository, final URI wonNodeURI) {

@@ -64,10 +64,7 @@ public class KeystorePasswordUtils {
      * 
      * @param toHash
      * @param hashLength in bits
-     * @param saltString must be a hexadecimal number
      * @return
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidKeySpecException
      */
     public static String generatePassword(String toHash, int hashLength) {
         try {

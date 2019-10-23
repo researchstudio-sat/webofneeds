@@ -27,10 +27,9 @@ import java.net.URI;
 
 /**
  * Implementation of the WonMessageHandlerAdapter that uses a Dataset for
- * creating the objects needed for invoking the adaptee's callback methods.
- * <p/>
- * Sent and received messages are added to the dataset automatically. Missing
- * data is automatically loaded via linked data.
+ * creating the objects needed for invoking the adaptee's callback methods. Sent
+ * and received messages are added to the dataset automatically. Missing data is
+ * automatically loaded via linked data.
  */
 public class DatasetBackedOwnerCallbackAdapter extends OwnerCallbackAdapter {
     // TODO move to the queries object!

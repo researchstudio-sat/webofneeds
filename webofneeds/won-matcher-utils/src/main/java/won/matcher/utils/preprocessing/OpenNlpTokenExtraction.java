@@ -27,7 +27,7 @@ public class OpenNlpTokenExtraction {
     }
 
     /**
-     * Extract tokens that are words and have length > 1 from a text
+     * Extract tokens that are words and have length {@literal >} 1 from a text
      *
      * @param text
      * @return
@@ -43,8 +43,8 @@ public class OpenNlpTokenExtraction {
 
     /**
      * Extract tokens that are words of type nouns, adjectives or forgein words and
-     * have length > 1 from a text. NOTE: This method uses pos-tagger and is
-     * supposed to be slower than the extractWordTokens()
+     * have length {@literal >} 1 from a text. NOTE: This method uses pos-tagger and
+     * is supposed to be slower than the extractWordTokens()
      *
      * @param text
      * @return

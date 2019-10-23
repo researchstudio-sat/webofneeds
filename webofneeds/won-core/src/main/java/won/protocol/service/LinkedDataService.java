@@ -56,8 +56,8 @@ public interface LinkedDataService {
     Dataset listAtomURIs(AtomState atomState, URI filterBySocketTypeUri, URI filterByAtomTypeUri);
 
     /**
-     * Returns a model containing all atom URIs. If page >= 0, paging is used and
-     * the respective page is returned.
+     * Returns a model containing all atom URIs. If page {@literal >=} 0, paging is
+     * used and the respective page is returned.
      *
      * @param page
      * @return
@@ -66,7 +66,7 @@ public interface LinkedDataService {
 
     /**
      * Returns a model containing all atom URIs that are in the specified state. If
-     * page >= 0, paging is used and the respective page is returned.
+     * page {@literal >=} 0, paging is used and the respective page is returned.
      *
      * @param page
      * @param preferedSize preferred number of atom uris per page (null means use
@@ -178,14 +178,13 @@ public interface LinkedDataService {
     /**
      * Returns a resource containing connections at given page. If deep is true, the
      * resource data of those connection uris is also part of the returned resource.
-     * If page >0, paging is used and the respective page is returned.
+     * If page {@literal >} 0, paging is used and the respective page is returned.
      *
      * @param page
      * @param preferredSize preferred number of connection uris per page (null means
      * use default)
      * @param deep
      * @return
-     * @throws NoSuchAtomException
      * @throws NoSuchConnectionException
      */
     AtomInformationService.PagedResource<Dataset, Connection> listConnections(final int page,
@@ -205,7 +204,6 @@ public interface LinkedDataService {
      * @param deep if true, the resource data of those connection uris is also part
      * of the resource
      * @return
-     * @throws NoSuchAtomException
      * @throws NoSuchConnectionException only in case deep is set to true and
      * connection data for a member connection uri cannot be retrieved.
      */
@@ -226,7 +224,6 @@ public interface LinkedDataService {
      * @param deep if true, the resource data of those connection uris is also part
      * of the resource
      * @return
-     * @throws NoSuchAtomException
      * @throws NoSuchConnectionException only in case deep is set to true and
      * connection data for a member connection uri cannot be retrieved.
      */
@@ -256,7 +253,7 @@ public interface LinkedDataService {
      * use default)
      * @param atomURI local atom the connections of which are retrieved
      * @param messageType the event type that should be used for defining connection
-     * latest activity; null => all event types
+     * latest activity; null {@literal =>} all event types
      * @param timeSpot time at which we want the list state to be fixed
      * @param deep if true, the resource data of those connection uris is also part
      * of the resource
@@ -282,7 +279,7 @@ public interface LinkedDataService {
      * @param preferredSize preferred number of connection uris per page (null means
      * use default)
      * @param messageType the event type that should be used for defining connection
-     * latest activity; null => all event types
+     * latest activity; null {@literal =>} all event types
      * @param timeSpot time at which we want the list state to be fixed
      * @param deep if true, the resource data of those connection uris is also part
      * of the resource
@@ -308,7 +305,7 @@ public interface LinkedDataService {
      * @param preferredSize preferred number of connection uris per page (null means
      * use default)
      * @param messageType the event type that should be used for defining connection
-     * latest activity; null => all event types
+     * latest activity; null {@literal =>} all event types
      * @param timeSpot time at which we want the list state to be fixed
      * @param deep if true, the resource data of those connection uris is also part
      * of the resource
@@ -358,7 +355,6 @@ public interface LinkedDataService {
      * @param includeMessageContainer
      * @param etag
      * @return
-     * @throws NoSuchConnectionException
      */
     DataWithEtag<Dataset> getConnectionDataset(URI connectionUri, boolean includeMessageContainer, String etag);
 

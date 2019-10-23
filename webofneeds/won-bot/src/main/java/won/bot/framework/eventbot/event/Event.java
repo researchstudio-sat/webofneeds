@@ -11,14 +11,11 @@
 package won.bot.framework.eventbot.event;
 
 /**
- * Event interface.
- * <p>
- * Implementations should:
+ * Event interface. Implementations should:
  * <ul>
  * <li>be immutable</li>
  * <li>implement equals() and hashCode() to reflect reference equality (==)</li>
  * </ul>
- * </p>
  */
 public interface Event {
 }

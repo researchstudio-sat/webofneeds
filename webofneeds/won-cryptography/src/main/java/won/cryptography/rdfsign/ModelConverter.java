@@ -31,14 +31,13 @@ public class ModelConverter {
      * applied (i.e. its applyPrefixes() method should not be called). Otherwise
      * there could be errors when converting, since Signingframework when applying
      * prefixes just looks whether the resource uri starts with that prefix uri,
-     * which would be true in both cases below:
-     * 
-     * @prefix : <http://www.example.com/resource/atom/12#> .
-     * @prefix atom: <http://www.example.com/resource/atom/12> . Also, applying
+     * which would be true in both cases below: <code>
+     * &#64;prefix : &lt;http://www.example.com/resource/atom/12#&gt; .
+     * &#64;prefix atom: &lt;http://www.example.com/resource/atom/12&gt; . Also, applying
      * prefixes in NamedGraph in cases like
-     * @prefix : <http://www.example.com/resource/atom/12/>
-     * <http://www.example.com/resource/atom/12/connections/> a ldp:Container .
-     * would result in a wrong RDF triple: :connections/ a ldp:Container .
+     * &#64;prefix : &lt;http://www.example.com/resource/atom/12/&gt;
+     * &lt;http://www.example.com/resource/atom/12/connections/&gt; a ldp:Container .
+     * </code> would result in a wrong RDF triple: :connections/ a ldp:Container .
      */
     public static Model namedGraphToModel(String graphName, GraphCollection gc) throws Exception {
         NamedGraph graph = null;

@@ -296,7 +296,7 @@ public class WonMessageBuilder {
      * referencing toWrap's envelope in the envelope of the new message. The message
      * that will be built has the same messageURI as the wrapped message.
      *
-     * @param
+     * @param toWrap
      * @return
      */
     public static WonMessageBuilder wrap(WonMessage toWrap) {

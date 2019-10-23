@@ -25,14 +25,13 @@ import java.lang.invoke.MethodHandles;
 
 /**
  * Checks WonMessages for integrity. The following steps are performed:
- * 
- * <pre>
- *   <ul>
- *     <li>No default graph may be present</li>
- *     <li>each named graph is either an EnvelopeGraph or referenced in an EnvelopeGraph</li>
- *     <li>The outermost EnvelopeGraph is a subgraph of the graph identified by the message URI</li>
- *   </ul>
- * </pre>
+ * <ul>
+ * <li>No default graph may be present</li>
+ * <li>each named graph is either an EnvelopeGraph or referenced in an
+ * EnvelopeGraph</li>
+ * <li>The outermost EnvelopeGraph is a subgraph of the graph identified by the
+ * message URI</li>
+ * </ul>
  */
 public class WellformednessCheckingWonMessageProcessor implements WonMessageProcessor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

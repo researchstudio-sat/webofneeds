@@ -68,8 +68,8 @@ public abstract class AbstractSocket implements SocketLogic {
      *
      * @param con the connection object
      * @param content a rdf graph describing properties of the event. The null
-     * releative URI ('<>') inside that graph, as well as the base URI of the graph
-     * will be attached to the resource identifying the event.
+     * releative URI ('{@literal <>}') inside that graph, as well as the base URI of
+     * the graph will be attached to the resource identifying the event.
      * @throws NoSuchConnectionException if connectionURI does not refer to an
      * existing connection
      * @throws IllegalMessageForConnectionStateException if the message is not
@@ -104,8 +104,8 @@ public abstract class AbstractSocket implements SocketLogic {
      *
      * @param con the connection object
      * @param content a rdf graph describing properties of the event. The null
-     * releative URI ('<>') inside that graph, as well as the base URI of the graph
-     * will be attached to the resource identifying the event.
+     * releative URI ('{@literal <>}') inside that graph, as well as the base URI of
+     * the graph will be attached to the resource identifying the event.
      * @throws NoSuchConnectionException if connectionURI does not refer to an
      * existing connection
      * @throws IllegalMessageForConnectionStateException if the message is not
@@ -170,8 +170,8 @@ public abstract class AbstractSocket implements SocketLogic {
      *
      * @param con the connection object
      * @param content a rdf graph describing properties of the event. The null
-     * releative URI ('<>') inside that graph, as well as the base URI of the graph
-     * will be attached to the resource identifying the event.
+     * releative URI ('{@literal <>}') inside that graph, as well as the base URI of
+     * the graph will be attached to the resource identifying the event.
      * @throws NoSuchConnectionException if connectionURI does not refer to an
      * existing connection
      * @throws IllegalMessageForConnectionStateException if the message is not
@@ -203,8 +203,8 @@ public abstract class AbstractSocket implements SocketLogic {
      *
      * @param con the connection object
      * @param content a rdf graph describing properties of the event. The null
-     * releative URI ('<>') inside that graph, as well as the base URI of the graph
-     * will be attached to the resource identifying the event.
+     * releative URI ('{@literal <>}') inside that graph, as well as the base URI of
+     * the graph will be attached to the resource identifying the event.
      * @throws NoSuchConnectionException if connectionURI does not refer to an
      * existing connection
      * @throws IllegalMessageForConnectionStateException if the message is not
@@ -269,9 +269,9 @@ public abstract class AbstractSocket implements SocketLogic {
      * treat lower values as 0.0 and higher values as 1.0.
      * @param originator an URI identifying the calling entity
      * @param content (optional) an optional RDF graph containing more detailed
-     * information about the hint. The null releative URI ('<>') inside that graph,
-     * as well as the base URI of the graph will be attached to the resource
-     * identifying the match event.
+     * information about the hint. The null releative URI ('{@literal <>}') inside
+     * that graph, as well as the base URI of the graph will be attached to the
+     * resource identifying the match event.
      * @throws won.protocol.exception.NoSuchAtomException if atomURI is not a known
      * atom URI
      * @throws won.protocol.exception.IllegalMessageForAtomStateException if the
@@ -316,12 +316,8 @@ public abstract class AbstractSocket implements SocketLogic {
      *
      * @param con the connection object
      * @param content a rdf graph describing properties of the event. The null
-     * releative URI ('<>') inside that graph, as well as the base URI of the graph
-     * will be attached to the resource identifying the event.
-     * @throws NoSuchConnectionException if connectionURI does not refer to an
-     * existing connection
-     * @throws IllegalMessageForConnectionStateException if the message is not
-     * allowed in the current state of the connection
+     * releative URI ('{@literal <>}') inside that graph, as well as the base URI of
+     * the graph will be attached to the resource identifying the event.
      */
     @Override
     public void connectFromAtom(final Connection con, final Model content, final WonMessage wonMessage)
@@ -364,12 +360,8 @@ public abstract class AbstractSocket implements SocketLogic {
      *
      * @param con the connection object
      * @param content a rdf graph describing properties of the event. The null
-     * releative URI ('<>') inside that graph, as well as the base URI of the graph
-     * will be attached to the resource identifying the event.
-     * @throws NoSuchConnectionException if connectionURI does not refer to an
-     * existing connection
-     * @throws IllegalMessageForConnectionStateException if the message is not
-     * allowed in the current state of the connection
+     * releative URI ('{@literal <>}') inside that graph, as well as the base URI of
+     * the graph will be attached to the resource identifying the event.
      */
     @Override
     public void connectFromOwner(final Connection con, final Model content, WonMessage wonMessage)

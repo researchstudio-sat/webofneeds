@@ -371,7 +371,8 @@ public class AtomModelWrapper {
     /**
      * Add a socket. The socketURI must be a fragment URI off the atom URI, i.e.
      * [atomuri]#socketid, or it is just a fragment identifier, which will be
-     * interpreted relative to the atomURI, i.e. #socketid -> [atomuri]#socketid.
+     * interpreted relative to the atomURI, i.e. #socketid {@literal ->}
+     * [atomuri]#socketid.
      * 
      * @param socketUri uniquely identifies this socket of this atom
      * @param socketTypeUri the type of the socket, e.g. won:ChatSocket

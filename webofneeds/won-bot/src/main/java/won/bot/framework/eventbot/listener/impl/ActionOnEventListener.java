@@ -21,8 +21,8 @@ import won.bot.framework.eventbot.listener.BaseEventListener;
 import java.lang.invoke.MethodHandles;
 
 /**
- * Executes a task when an event is seen. If the property timesToRun > 0, will
- * unregister after that number of events.
+ * Executes a task when an event is seen. If the property timesToRun &gt; 0,
+ * will unregister after that number of events.
  */
 public class ActionOnEventListener extends BaseEventListener {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -56,8 +56,8 @@ public class ActionOnEventListener extends BaseEventListener {
     /**
      * @param context
      * @param task
-     * @param timesToRun if > 0, listener will unsubscribe from any events after the
-     * specified number of executions.
+     * @param timesToRun if &gt; 0, listener will unsubscribe from any events after
+     * the specified number of executions.
      */
     public ActionOnEventListener(final EventListenerContext context, EventBotAction task, int timesToRun) {
         super(context);

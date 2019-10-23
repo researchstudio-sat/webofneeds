@@ -140,7 +140,7 @@ public class RestAtomController {
      * with the given atomTypeUri
      * @param limit limit results to this size (if null, 0, or negative value do not
      * limit at all)
-     * @return Map of AtomPojos -> atoms with certain metadata @see
+     * @return Map of AtomPojos {@literal ->} atoms with certain metadata @see
      * won.owner.pojo.AtomPojo
      */
     @ResponseBody
