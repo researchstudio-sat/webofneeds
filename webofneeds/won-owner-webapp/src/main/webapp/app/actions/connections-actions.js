@@ -459,14 +459,27 @@ function connectReactionAtom(
   });
 }
 
-export function connectionsConnectAdHoc(theirAtomUri, textMessage, persona) {
+export function connectionsConnectAdHoc(
+  theirAtomUri,
+  textMessage,
+  connectToSocketUri,
+  persona
+) {
   return (dispatch, getState) =>
-    connectAdHoc(theirAtomUri, textMessage, persona, dispatch, getState); // moved to separate function to make transpilation work properly
+    connectAdHoc(
+      theirAtomUri,
+      textMessage,
+      connectToSocketUri,
+      persona,
+      dispatch,
+      getState
+    ); // moved to separate function to make transpilation work properly
 }
 
 function connectAdHoc(
   theirAtomUri,
   textMessage,
+  connectToSocketUri,
   personaUri,
   dispatch,
   getState
@@ -528,13 +541,8 @@ function connectAdHoc(
     });
 
     // get default socketUri
-    const connectToSocketUri = atomUtils.getDefaultSocketUri(theirAtom);
-    let socketUri = atomUri;
-    if (atomUtils.hasChatSocket(theirAtom)) {
-      socketUri += "#chatSocket";
-    } else if (atomUtils.hasGroupSocket(theirAtom)) {
-      socketUri += "#groupSocket";
-    }
+    //const connectToSocketUri = atomUtils.getDefaultSocketUri(theirAtom);
+    let socketUri = `${atomUri}#chatSocket`;
 
     won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
       // connect action to be dispatched when the
