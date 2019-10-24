@@ -31,7 +31,7 @@ export function isLoading(state) {
 }
 
 export function isProcessingWhatsNew(state) {
-  return processUtils.isProcessingWhatsNew(state);
+  return processUtils.isProcessingWhatsNew(get(state, "process"));
 }
 
 export function isProcessingPublish(state) {
