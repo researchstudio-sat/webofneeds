@@ -208,7 +208,6 @@ class PageMap extends React.Component {
                     />
                   </svg>
                   <WonTitlePicker
-                    debounce={800}
                     onUpdate={this.updateWhatsAroundSuggestions}
                     initialValue={this.state.searchText}
                     detail={{ placeholder: "Search around location" }}

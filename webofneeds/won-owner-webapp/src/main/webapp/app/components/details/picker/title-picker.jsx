@@ -1,73 +1,43 @@
 import React from "react";
 
-import _ from "lodash";
-
 import "~/style/_titlepicker.scss";
 import PropTypes from "prop-types";
 
-//TODO: IMPLEMENT DEBOUNCE HOOK IF PROP IS SET
-export default class WonTitlePicker extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.debounceEvent = _.debounce(() => {
-      this.props.onUpdate({ value: this.state.value.trim() });
-    }, props.debounce || 0);
-
-    this.state = {
-      value: props.initialValue || "",
-    };
-  }
-
-  render() {
-    return (
-      <won-title-picker
-        class={this.props.className ? this.props.className : ""}
-      >
-        <div className="titlep__input">
-          {this.state.value && (
-            <svg
-              className="titlep__input__icon clickable"
-              onClick={this.reset.bind(this)}
-            >
-              <use xlinkHref="#ico36_close" href="#ico36_close" />
-            </svg>
-          )}
-          <input
-            type="text"
-            className="titlep__input__inner"
-            placeholder={this.props.detail && this.props.detail.placeholder}
-            value={this.state.value}
-            onChange={this.update.bind(this)}
-          />
-        </div>
-      </won-title-picker>
-    );
-  }
-
-  update(event) {
-    const text = event.target.value;
-
-    if (text.trim().length > 0) {
-      this.setState({ value: text }, () => this.debounceEvent());
-    } else {
-      this.reset();
+export default function WonTitlePicker(props) {
+  const reset = () => {
+    props.onUpdate({ value: "" });
+    if (props.onReset) {
+      props.onReset();
     }
-  }
+  };
+  const update = event => {
+    props.onUpdate({ value: event.target.value });
+  };
 
-  reset() {
-    this.setState(
-      {
-        value: "",
-      },
-      () => this.debounceEvent()
-    );
-  }
+  return (
+    <won-title-picker class={props.className ? props.className : ""}>
+      <div className="titlep__input">
+        {props.initialValue && (
+          <svg className="titlep__input__icon clickable" onClick={reset}>
+            <use xlinkHref="#ico36_close" href="#ico36_close" />
+          </svg>
+        )}
+        <input
+          type="text"
+          className="titlep__input__inner"
+          placeholder={props.detail && props.detail.placeholder}
+          value={props.initialValue === undefined ? "" : props.initialValue}
+          onChange={update}
+        />
+      </div>
+    </won-title-picker>
+  );
 }
+
 WonTitlePicker.propTypes = {
   className: PropTypes.string,
   initialValue: PropTypes.string,
   detail: PropTypes.object,
   onUpdate: PropTypes.func.isRequired,
-  debounce: PropTypes.number,
+  onReset: PropTypes.func,
 };

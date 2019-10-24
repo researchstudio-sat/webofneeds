@@ -44,14 +44,15 @@ class WonUsecasePicker extends React.Component {
           {/*<!-- SEARCH FIELD -->*/}
           <div className="ucp__main__search">
             <WonTitlePicker
-              onUpdate={this.updateSearch}
+              onUpdate={this.updateSearch.bind(this)}
               initialValue={this.state.searchText}
               detail={{ placeholder: "Search for Usecases" }}
             />
           </div>
           {/*<!-- SEARCH RESULTS -->*/}
-          {this.state.searchText !== "" &&
-          this.state.searchText !== undefined ? (
+          {this.state.searchText &&
+          this.state.searchText.trim &&
+          this.state.searchText.trim().length > 1 ? (
             this.state.searchResults.length > 0 ? (
               this.state.searchResults.map((useCase, index) => (
                 <div
@@ -192,28 +193,35 @@ class WonUsecasePicker extends React.Component {
   }
 
   updateSearch({ value }) {
-    if (value && value.trim().length > 1) {
-      const searchResults = useCaseUtils.filterUseCasesBySearchQuery(value);
-
-      const sortByLabelAsc = (a, b) => {
-        const bValue = b && b.label && b.label.toLowerCase();
-        const aValue = a && a.label && a.label.toLowerCase();
-
-        if (aValue < bValue) return -1;
-        if (aValue > bValue) return 1;
-        return 0;
-      };
-
-      this.setState({
+    this.setState(
+      {
         searchText: value,
-        searchResults: searchResults ? searchResults.sort(sortByLabelAsc) : [],
-      });
-    } else {
-      this.setState({
-        searchText: "",
-        searchResults: [],
-      });
-    }
+      },
+      () => {
+        if (value && value.trim().length > 1) {
+          const searchResults = useCaseUtils.filterUseCasesBySearchQuery(value);
+
+          const sortByLabelAsc = (a, b) => {
+            const bValue = b && b.label && b.label.toLowerCase();
+            const aValue = a && a.label && a.label.toLowerCase();
+
+            if (aValue < bValue) return -1;
+            if (aValue > bValue) return 1;
+            return 0;
+          };
+
+          this.setState({
+            searchResults: searchResults
+              ? searchResults.sort(sortByLabelAsc)
+              : [],
+          });
+        } else {
+          this.setState({
+            searchResults: [],
+          });
+        }
+      }
+    );
   }
 }
 WonUsecasePicker.propTypes = {
