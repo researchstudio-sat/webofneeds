@@ -260,7 +260,7 @@ class WonSuggestAtomViewer extends React.Component {
 }
 WonSuggestAtomViewer.propTypes = {
   detail: PropTypes.object,
-  content: PropTypes.object,
+  content: PropTypes.string,
   className: PropTypes.string,
   fetchAtom: PropTypes.func,
   connect: PropTypes.func,

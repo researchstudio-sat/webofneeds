@@ -531,6 +531,9 @@ function connectAdHoc(
       },
     });
 
+    // set default socketUri
+    let socketUri = `${atomUri}#chatSocket`;
+
     // establish connection
     const cnctMsg = buildConnectMessage({
       ownedAtomUri: atomUri,
@@ -538,16 +541,14 @@ function connectAdHoc(
       ownNodeUri: nodeUri,
       theirNodeUri: get(theirAtom, "nodeUri"),
       connectMessage: textMessage,
+      undefined,
+      socketUri,
+      connectToSocketUri,
     });
-
-    // get default socketUri
-    //const connectToSocketUri = atomUtils.getDefaultSocketUri(theirAtom);
-    let socketUri = `${atomUri}#chatSocket`;
 
     won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
       // connect action to be dispatched when the
       // ad hoc atom has been created:
-      //TODO: FIGURE OUT WHICH SOCKETS WILL BE CONNECTED
       const connectAction = {
         type: actionTypes.atoms.connect,
         payload: {
