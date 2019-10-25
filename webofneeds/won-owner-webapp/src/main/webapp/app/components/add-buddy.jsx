@@ -10,6 +10,7 @@ import WonAtomHeader from "../components/atom-header.jsx";
 import PropTypes from "prop-types";
 
 import "~/style/_add-buddy.scss";
+import { actionCreators } from "../actions/actions";
 
 const mapStateToProps = (state, ownProps) => {
   const ownedAtomsWithBuddySocket = generalSelectors.getOwnedAtomsWithBuddySocket(
@@ -30,6 +31,36 @@ const mapStateToProps = (state, ownProps) => {
       won.BUDDY.BuddySocketCompacted
     ),
     atomUri: ownProps.atomUri,
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    hideModalDialog: () => {
+      dispatch(actionCreators.view__hideModalDialog());
+    },
+    showModalDialog: payload => {
+      dispatch(actionCreators.view__showModalDialog(payload));
+    },
+    connect: (
+      ownedAtomUri,
+      connectionUri,
+      targetAtomUri,
+      message,
+      ownSocket,
+      targetSocket
+    ) => {
+      dispatch(
+        actionCreators.atoms__connect(
+          ownedAtomUri,
+          connectionUri,
+          targetAtomUri,
+          message,
+          ownSocket,
+          targetSocket
+        )
+      );
+    },
   };
 };
 
@@ -60,14 +91,6 @@ class WonAddBuddy extends React.Component {
             <div
               className="add-buddy__addbuddymenu__content__selection__buddy connected"
               key={get(atom, "uri")}
-              onClick={() => {
-                console.debug(
-                  "You are already buddies ",
-                  atomUtils.getSocketUri(atom, won.BUDDY.BuddySocketCompacted),
-                  " to ",
-                  this.props.targetBuddySocketUri
-                );
-              }}
             >
               <WonAtomHeader atomUri={get(atom, "uri")} hideTimestamp={true} />
               <svg className="add-buddy__addbuddymenu__content__selection__buddy__status">
@@ -88,6 +111,7 @@ class WonAddBuddy extends React.Component {
                   " to ",
                   this.props.targetBuddySocketUri
                 );
+                this.connectBuddy(get(atom, "uri"));
               }}
             >
               <WonAtomHeader atomUri={get(atom, "uri")} hideTimestamp={true} />
@@ -102,14 +126,6 @@ class WonAddBuddy extends React.Component {
             <div
               className="add-buddy__addbuddymenu__content__selection__buddy sent"
               key={get(atom, "uri")}
-              onClick={() => {
-                console.debug(
-                  "You have to wait until your request was accepted for ",
-                  atomUtils.getSocketUri(atom, won.BUDDY.BuddySocketCompacted),
-                  " to ",
-                  this.props.targetBuddySocketUri
-                );
-              }}
             >
               <WonAtomHeader atomUri={get(atom, "uri")} hideTimestamp={true} />
               <svg className="add-buddy__addbuddymenu__content__selection__buddy__status">
@@ -123,14 +139,6 @@ class WonAddBuddy extends React.Component {
             <div
               className="add-buddy__addbuddymenu__content__selection__buddy closed"
               key={get(atom, "uri")}
-              onClick={() => {
-                console.debug(
-                  "You used to be friends or your buddyRequest was denied for ",
-                  atomUtils.getSocketUri(atom, won.BUDDY.BuddySocketCompacted),
-                  " to ",
-                  this.props.targetBuddySocketUri
-                );
-              }}
             >
               <WonAtomHeader atomUri={get(atom, "uri")} hideTimestamp={true} />
               <svg className="add-buddy__addbuddymenu__content__selection__buddy__status">
@@ -149,12 +157,7 @@ class WonAddBuddy extends React.Component {
               className="add-buddy__addbuddymenu__content__selection__buddy requestable"
               key={get(atom, "uri")}
               onClick={() => {
-                console.debug(
-                  "Send buddy request from",
-                  atomUtils.getSocketUri(atom, won.BUDDY.BuddySocketCompacted),
-                  " to ",
-                  this.props.targetBuddySocketUri
-                );
+                this.connectBuddy(get(atom, "uri"));
               }}
             >
               <WonAtomHeader atomUri={get(atom, "uri")} hideTimestamp={true} />
@@ -224,12 +227,48 @@ class WonAddBuddy extends React.Component {
       return;
     }
   }
+
+  connectBuddy(selectedAtomUri, message = "") {
+    const payload = {
+      caption: "Persona",
+      text: "Send Buddy Request?",
+      buttons: [
+        {
+          caption: "Yes",
+          callback: () => {
+            this.props.connect(
+              selectedAtomUri,
+              undefined,
+              this.props.atomUri,
+              message,
+              won.BUDDY.BuddySocketCompacted,
+              won.BUDDY.BuddySocketCompacted
+            );
+            this.props.hideModalDialog();
+          },
+        },
+        {
+          caption: "No",
+          callback: () => {
+            this.props.hideModalDialog();
+          },
+        },
+      ],
+    };
+    this.props.showModalDialog(payload);
+  }
 }
 WonAddBuddy.propTypes = {
   atomUri: PropTypes.string.isRequired,
   className: PropTypes.string,
   ownedAtomsWithBuddySocketArray: PropTypes.arrayOf(PropTypes.object),
   targetBuddySocketUri: PropTypes.string,
+  hideModalDialog: PropTypes.func,
+  showModalDialog: PropTypes.func,
+  connect: PropTypes.func,
 };
 
-export default connect(mapStateToProps)(WonAddBuddy);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WonAddBuddy);

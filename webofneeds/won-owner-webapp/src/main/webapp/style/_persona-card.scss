@@ -41,6 +41,7 @@ won-persona-card {
 
   .card__main {
     grid-area: card__main;
+    overflow: hidden;
 
     &__name {
       min-width: 0;
