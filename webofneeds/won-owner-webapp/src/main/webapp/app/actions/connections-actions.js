@@ -520,17 +520,6 @@ function connectAdHoc(
       }
     }
 
-    // create the new atom
-    dispatch({
-      type: actionTypes.atoms.create, // TODO custom action
-      payload: {
-        eventUri,
-        message,
-        atomUri,
-        atom: adHocDraft,
-      },
-    });
-
     // set default socketUri
     let socketUri = `${atomUri}#chatSocket`;
 
@@ -580,6 +569,17 @@ function connectAdHoc(
         payload: {
           eventUri: eventUri,
           actionToDispatch: connectAction,
+        },
+      });
+
+      // create the new atom
+      dispatch({
+        type: actionTypes.atoms.create, // TODO custom action
+        payload: {
+          eventUri,
+          message,
+          atomUri,
+          atom: adHocDraft,
         },
       });
     });
