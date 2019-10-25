@@ -13,11 +13,11 @@ export const persona = {
       content: {
         type: [won.WON.PersonaCompacted],
         sockets: {
+          "#chatSocket": won.CHAT.ChatSocketCompacted,
           "#reviewSocket": won.REVIEW.ReviewSocketCompacted,
           "#holderSocket": won.HOLD.HolderSocketCompacted,
           "#buddySocket": won.BUDDY.BuddySocketCompacted,
         },
-        flags: ["match:NoHintForMe", "match:NoHintForCounterpart"],
       },
       seeks: {},
     }),
