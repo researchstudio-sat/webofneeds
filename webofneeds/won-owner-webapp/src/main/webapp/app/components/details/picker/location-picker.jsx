@@ -11,6 +11,8 @@ import {
 } from "../../../api/nominatim-api.js";
 import L from "leaflet";
 
+import _ from "lodash";
+
 import "leaflet/dist/leaflet.css";
 
 const locationIcon = L.divIcon({
@@ -23,7 +25,6 @@ const locationIcon = L.divIcon({
 export default class WonLocationPicker extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = {
       searchResults: [],
       lastSearchedFor: undefined,
@@ -31,10 +32,22 @@ export default class WonLocationPicker extends React.Component {
       previousLocation: undefined,
       alternativeName: "",
       currentLocation: undefined,
+      searchTerm: (props.initialValue && props.initialValue.name) || "",
     };
     this.doneTyping = this.doneTyping.bind(this);
     this.setAlternativeName = this.setAlternativeName.bind(this);
     this.update = this.update.bind(this);
+
+    this.startSearch = _.debounce(value => {
+      searchNominatim(value).then(searchResults => {
+        const parsedResults = scrubSearchResults(searchResults, value);
+
+        this.setState({
+          searchResults: parsedResults || [],
+          lastSearchedFor: value,
+        });
+      });
+    }, 700);
   }
 
   componentDidMount() {
@@ -118,11 +131,9 @@ export default class WonLocationPicker extends React.Component {
       <won-location-picker>
         <WonTitlePicker
           className={"lp__searchbox"}
-          debounce={800}
-          initial-value={
-            this.state.pickedLocation && this.state.pickedLocation.name
-          }
+          initialValue={this.state.searchTerm}
           onUpdate={this.doneTyping}
+          onReset={this.resetLocation.bind(this)}
           detail={{ placeholder: this.props.detail.placeholder }}
         />
         {/*<!-- LIST OF SUGGESTED LOCATIONS -->*/}
@@ -187,7 +198,7 @@ export default class WonLocationPicker extends React.Component {
         {!!this.state.pickedLocation && (
           <WonTitlePicker
             className={"lp__addressoverride"}
-            initial-value={this.state.alternativeName}
+            initialValue={this.state.alternativeName}
             onUpdate={this.setAlternativeName}
             detail={
               this.props.detail && this.props.detail.overrideAddressDetail
@@ -206,16 +217,9 @@ export default class WonLocationPicker extends React.Component {
   }
 
   doneTyping({ value }) {
-    this.resetLocation(() => {
+    this.setState({ searchTerm: value }, () => {
       if (value) {
-        searchNominatim(value).then(searchResults => {
-          const parsedResults = scrubSearchResults(searchResults, value);
-
-          this.setState({
-            searchResults: parsedResults || [],
-            lastSearchedFor: value,
-          });
-        });
+        this.startSearch(value);
       } else {
         this.resetSearchResults();
       }
@@ -253,6 +257,7 @@ export default class WonLocationPicker extends React.Component {
       {
         pickedLocation: location,
         alternativeName: "",
+        searchTerm: location.name,
       },
       () => {
         this.resetSearchResults();
@@ -270,7 +275,9 @@ export default class WonLocationPicker extends React.Component {
       },
       () => {
         this.update();
-        callback();
+        if (callback) {
+          callback();
+        }
       }
     );
   }

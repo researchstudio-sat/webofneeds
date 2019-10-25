@@ -11,6 +11,8 @@ import {
 } from "../../../api/nominatim-api.js";
 import L from "leaflet";
 
+import _ from "lodash";
+
 import "leaflet/dist/leaflet.css";
 
 const locationIcon = L.divIcon({
@@ -33,10 +35,40 @@ export default class WonTravelActionPicker extends React.Component {
       previousFromLocation: undefined,
       previousToLocatin: undefined,
       currentLocation: undefined,
+      searchFrom:
+        props.initialValue &&
+        props.initialValue.fromLocation &&
+        props.initialValue.fromLocation.name,
+      searchTo:
+        props.initialValue &&
+        props.initialValue.toLocation &&
+        props.initialValue.toLocation.name,
     };
     this.doneTypingFrom = this.doneTypingFrom.bind(this);
     this.doneTypingTo = this.doneTypingTo.bind(this);
     this.update = this.update.bind(this);
+
+    this.startSearchFrom = _.debounce(value => {
+      searchNominatim(value).then(fromSearchResults => {
+        const parsedResults = scrubSearchResults(fromSearchResults, value);
+
+        this.setState({
+          fromSearchResults: parsedResults || [],
+          lastSearchedFor: value,
+        });
+      });
+    }, 700);
+
+    this.startSearchTo = _.debounce(value => {
+      searchNominatim(value).then(toSearchResults => {
+        const parsedResults = scrubSearchResults(toSearchResults, value);
+
+        this.setState({
+          toSearchResults: parsedResults || [],
+          lastSearchedFor: value,
+        });
+      });
+    }, 700);
   }
 
   componentDidMount() {
@@ -174,11 +206,9 @@ export default class WonTravelActionPicker extends React.Component {
     return (
       <won-travel-action-picker>
         <WonTitlePicker
-          debounce={800}
           className={"rp__searchbox-from"}
-          initial-value={
-            this.state.fromAddedLocation && this.state.fromAddedLocation.name
-          }
+          initialValue={this.state.searchFrom}
+          onReset={this.resetFromLocation.bind(this)}
           onUpdate={this.doneTypingFrom}
           detail={{ placeholder: this.props.detail.placeholder.departure }}
         />
@@ -232,12 +262,10 @@ export default class WonTravelActionPicker extends React.Component {
           {fromSearchResults}
         </ul>
         <WonTitlePicker
-          debounce={800}
           className={"rp__searchbox-to"}
-          initial-value={
-            this.state.toAddedLocation && this.state.toAddedLocation.name
-          }
+          initialValue={this.state.searchTo}
           onUpdate={this.doneTypingTo}
+          onReset={this.resetToLocation.bind(this)}
           detail={{ placeholder: this.props.detail.placeholder.destination }}
         />
         {/*<!-- LIST OF SUGGESTED TO-LOCATIONS -->*/}
@@ -322,16 +350,9 @@ export default class WonTravelActionPicker extends React.Component {
   }
 
   doneTypingFrom({ value }) {
-    this.resetFromLocation(() => {
+    this.setState({ searchFrom: value }, () => {
       if (value) {
-        searchNominatim(value).then(fromSearchResults => {
-          const parsedResults = scrubSearchResults(fromSearchResults, value);
-
-          this.setState({
-            fromSearchResults: parsedResults || [],
-            lastSearchedFor: value,
-          });
-        });
+        this.startSearchFrom();
       } else {
         this.resetFromSearchResults();
       }
@@ -339,16 +360,9 @@ export default class WonTravelActionPicker extends React.Component {
   }
 
   doneTypingTo({ value }) {
-    this.resetToLocation(() => {
+    this.setState({ searchTo: value }, () => {
       if (value) {
-        searchNominatim(value).then(toSearchResults => {
-          const parsedResults = scrubSearchResults(toSearchResults, value);
-
-          this.setState({
-            toSearchResults: parsedResults || [],
-            lastSearchedFor: value,
-          });
-        });
+        this.startSearchTo();
       } else {
         this.resetToSearchResults();
       }
@@ -373,6 +387,7 @@ export default class WonTravelActionPicker extends React.Component {
     this.setState(
       {
         fromAddedLocation: location,
+        searchFrom: location.name,
       },
       () => {
         this.resetFromSearchResults();
@@ -385,6 +400,7 @@ export default class WonTravelActionPicker extends React.Component {
     this.setState(
       {
         toAddedLocation: location,
+        searchTo: location.name,
       },
       () => {
         this.resetToSearchResults();
@@ -401,7 +417,9 @@ export default class WonTravelActionPicker extends React.Component {
       },
       () => {
         this.update();
-        callback();
+        if (callback) {
+          callback();
+        }
       }
     );
   }
@@ -414,7 +432,9 @@ export default class WonTravelActionPicker extends React.Component {
       },
       () => {
         this.update();
-        callback();
+        if (callback) {
+          callback();
+        }
       }
     );
   }
