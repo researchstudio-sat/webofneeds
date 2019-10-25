@@ -9,17 +9,15 @@ won-add-buddy {
 
   .add-buddy__addbuddymenu__header {
     white-space: nowrap;
-    display: flex;
+    display: grid;
+    grid-gap: 0.25rem;
+    grid-auto-flow: column;
     --local-primary: #{$won-secondary-color};
     color: $won-secondary-color;
-    padding-left: 0.25rem;
+    padding: 0 0.25rem;
 
     &__icon {
       @include fixed-square($postIconSizeMobile);
-      padding-right: 0.25rem;
-    }
-    &__text {
-      padding-right: 0.25rem;
     }
   }
 
@@ -46,15 +44,13 @@ won-add-buddy {
         float: right;
         right: -0.3rem;
 
-        &__icon {
-          @media (max-width: $responsivenessBreakPoint) {
-            padding-right: 0;
-          }
-        }
-
-        &__text {
+        @media (max-width: $responsivenessBreakPoint) {
           padding-right: 0;
         }
+      }
+
+      &__selection {
+        border-top: $thinGrayBorder;
       }
     }
   }

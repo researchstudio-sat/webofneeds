@@ -34,7 +34,9 @@ export default class WonAddBuddy extends React.Component {
               </span>
             </div>
           </div>
-          TODO Buddy Selection
+          <div className="add-buddy__addbuddymenu__content__selection">
+            TODO Buddy Selection
+          </div>
         </div>
       </div>
     );
