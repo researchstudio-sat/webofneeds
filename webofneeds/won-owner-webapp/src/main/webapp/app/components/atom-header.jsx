@@ -45,7 +45,9 @@ const mapStateToProps = (state, ownProps) => {
     isDirectResponse: isDirectResponse,
     isGroupChatEnabled: atomUtils.hasGroupSocket(atom),
     isChatEnabled: atomUtils.hasChatSocket(atom),
+    hideTimestamp: ownProps.hideTimestamp,
     friendlyTimestamp:
+      !ownProps.hideTimestamp &&
       atom &&
       relativeTime(selectLastUpdateTime(state), get(atom, "lastUpdateDate")),
   };
@@ -162,9 +164,11 @@ class WonAtomHeader extends React.Component {
               )}
               <span>{this.props.atomTypeLabel}</span>
             </span>
-            <div className="ph__right__subtitle__date">
-              {this.props.friendlyTimestamp}
-            </div>
+            {!this.props.hideTimestamp && (
+              <div className="ph__right__subtitle__date">
+                {this.props.friendlyTimestamp}
+              </div>
+            )}
           </div>
         </div>
       );
@@ -228,6 +232,7 @@ class WonAtomHeader extends React.Component {
 
 WonAtomHeader.propTypes = {
   atomUri: PropTypes.string.isRequired,
+  hideTimestamp: PropTypes.bool,
   onClick: PropTypes.func,
   fetchAtom: PropTypes.func,
   responseToAtom: PropTypes.object,

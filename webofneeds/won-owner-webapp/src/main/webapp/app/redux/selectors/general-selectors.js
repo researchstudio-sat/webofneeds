@@ -323,6 +323,11 @@ export function getOwnedPersonas(state) {
   return atoms && atoms.filter(atom => atomUtils.isPersona(atom));
 }
 
+export function getOwnedAtomsWithBuddySocket(state) {
+  const atoms = getOwnedAtoms(state);
+  return atoms && atoms.filter(atom => atomUtils.hasBuddySocket(atom));
+}
+
 /**
  * Returns all owned Personas as a List, condenses the information of the persona so that only some attributes are included.
  * This Function is currently used for persona lists/views based on elm (as they are not based on our general atom-structure)
