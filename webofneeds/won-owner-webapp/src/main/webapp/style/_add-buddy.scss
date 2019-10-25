@@ -14,7 +14,7 @@ won-add-buddy {
     height: 2rem;
   }
 
-  .add-buddy__icon__small__sharemenu {
+  .add-buddy__icon__small__addbuddymenu {
     --local-primary: black;
     @include fixed-square($postIconSizeMobile);
     //padding-left: 0.5rem;
@@ -25,14 +25,14 @@ won-add-buddy {
     float: right;
   }
 
-  .add-buddy__sharemenu {
+  .add-buddy__addbuddymenu {
     position: relative;
     height: 0;
     z-index: 1000;
     top: calc((#{$postIconSizeMobile} + #{$thinBorderWidth} + 0.5rem) * -1);
     right: $thinBorderWidth;
 
-    .add-buddy__sharemenu__content {
+    .add-buddy__addbuddymenu__content {
       background: white;
       border: $thinGrayBorder;
       padding: 0.5rem;

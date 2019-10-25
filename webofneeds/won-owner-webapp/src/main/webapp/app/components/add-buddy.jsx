@@ -19,11 +19,11 @@ export default class WonAddBuddy extends React.Component {
 
   render() {
     const dropdownElement = this.state.contextMenuOpen && (
-      <div className="add-buddy__sharemenu">
-        <div className="add-buddy__sharemenu__content">
+      <div className="add-buddy__addbuddymenu">
+        <div className="add-buddy__addbuddymenu__content">
           <div className="topline">
             <svg
-              className="add-buddy__icon__small__sharemenu clickable"
+              className="add-buddy__icon__small__addbuddymenu clickable"
               onClick={() => this.setState({ contextMenuOpen: false })}
             >
               <use xlinkHref="#ico36_plus_circle" href="#ico36_plus_circle" />
