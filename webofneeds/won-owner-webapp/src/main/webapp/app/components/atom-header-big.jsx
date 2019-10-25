@@ -7,11 +7,13 @@ import { connect } from "react-redux";
 
 import "~/style/_atom-header-big.scss";
 import * as atomUtils from "../redux/utils/atom-utils";
+import * as accountUtils from "../redux/utils/account-utils";
 import { get, getIn } from "../utils.js";
 
 import WonAtomContextDropdown from "../components/atom-context-dropdown.jsx";
 import WonAtomIcon from "../components/atom-icon.jsx";
 import WonShareDropdown from "../components/share-dropdown.jsx";
+import WonAddBuddy from "../components/add-buddy.jsx";
 
 const mapStateToProps = (state, ownProps) => {
   const atom = state.getIn(["atoms", ownProps.atomUri]);
@@ -26,14 +28,20 @@ const mapStateToProps = (state, ownProps) => {
     ? getIn(state, ["atoms", responseToUri])
     : undefined;
 
+  const atomUri = ownProps.atomUri;
+  const accountState = get(state, "account");
+
   return {
-    atomUri: ownProps.atomUri,
+    atomUri,
     atom,
     personaName,
     isDirectResponse,
     responseToAtom,
     isGroupChatEnabled: atomUtils.hasGroupSocket(atom),
     isChatEnabled: atomUtils.hasChatSocket(atom),
+    showAddBuddyElement:
+      atomUtils.hasBuddySocket(atom) &&
+      !accountUtils.isAtomOwned(accountState, atomUri),
     atomTypeLabel: atom && atomUtils.generateTypeLabel(atom),
   };
 };
@@ -64,6 +72,10 @@ class WonAtomHeaderBig extends React.Component {
       </span>
     );
 
+    const buddyActionElement = this.props.showAddBuddyElement && (
+      <WonAddBuddy atomUri={this.props.atomUri} />
+    );
+
     return (
       <won-atom-header-big>
         <nav className="atom-header-big">
@@ -79,6 +91,7 @@ class WonAtomHeaderBig extends React.Component {
               </div>
             </hgroup>
           </div>
+          {buddyActionElement}
           <WonShareDropdown atomUri={this.props.atomUri} />
           <WonAtomContextDropdown atomUri={this.props.atomUri} />
         </nav>
@@ -111,6 +124,7 @@ WonAtomHeaderBig.propTypes = {
   responseToAtom: PropTypes.object,
   isGroupChatEnabled: PropTypes.bool,
   isChatEnabled: PropTypes.bool,
+  showAddBuddyElement: PropTypes.bool,
   atomTypeLabel: PropTypes.string,
 };
 

@@ -1,0 +1,60 @@
+@import "sizing-utils";
+@import "won-config";
+@import "animate";
+
+won-add-buddy {
+  .add-buddy__icon__small {
+    --local-primary: #{$won-secondary-color};
+    @include fixed-square($postIconSizeMobile);
+    padding-left: 0.5rem;
+    padding-right: 0.25rem;
+  }
+
+  .topline {
+    height: 2rem;
+  }
+
+  .add-buddy__icon__small__sharemenu {
+    --local-primary: black;
+    @include fixed-square($postIconSizeMobile);
+    //padding-left: 0.5rem;
+    position: relative;
+    right: -0.35rem;
+    /*the correct right value would be "calc(-0.5rem - #{$thinBorderWidth});"
+    however, it is not displayed correct so we assume the right value with -0.6rem*/
+    float: right;
+  }
+
+  .add-buddy__sharemenu {
+    position: relative;
+    height: 0;
+    z-index: 1000;
+    top: calc((#{$postIconSizeMobile} + #{$thinBorderWidth} + 0.5rem) * -1);
+    right: $thinBorderWidth;
+
+    .add-buddy__sharemenu__content {
+      background: white;
+      border: $thinGrayBorder;
+      padding: 0.5rem;
+      max-width: 15rem;
+      position: absolute;
+      right: -1px;
+      top: -5px;
+      min-width: 15rem;
+
+      a.won-button--outlined,
+      button {
+        width: 100%;
+        white-space: nowrap;
+      }
+
+      a.won-button--outlined {
+        cursor: pointer;
+        display: flex;
+        align-content: center;
+        align-items: center;
+        box-sizing: border-box;
+      }
+    }
+  }
+}
