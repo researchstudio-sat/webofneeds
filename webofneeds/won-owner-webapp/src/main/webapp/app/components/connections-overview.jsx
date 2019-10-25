@@ -16,7 +16,7 @@ import "~/style/_connections-overview.scss";
 import PropTypes from "prop-types";
 
 const mapStateToProps = state => {
-  const allAtoms = generalSelectors.getPosts(state);
+  const allAtoms = generalSelectors.getAtoms(state);
   const ownedAtoms = generalSelectors.getOwnedAtoms(state);
   const openAtoms = generalSelectors.getChatAtoms(state);
 
