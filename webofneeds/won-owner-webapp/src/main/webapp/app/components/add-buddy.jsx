@@ -22,12 +22,17 @@ export default class WonAddBuddy extends React.Component {
       <div className="add-buddy__addbuddymenu">
         <div className="add-buddy__addbuddymenu__content">
           <div className="topline">
-            <svg
-              className="add-buddy__icon__small__addbuddymenu clickable"
+            <div
+              className="add-buddy__addbuddymenu__header clickable"
               onClick={() => this.setState({ contextMenuOpen: false })}
             >
-              <use xlinkHref="#ico36_plus_circle" href="#ico36_plus_circle" />
-            </svg>
+              <svg className="add-buddy__addbuddymenu__header__icon">
+                <use xlinkHref="#ico36_plus_circle" href="#ico36_plus_circle" />
+              </svg>
+              <span className="add-buddy__addbuddymenu__header__text hide-in-responsive">
+                Add as Buddy
+              </span>
+            </div>
           </div>
           TODO Buddy Selection
         </div>
@@ -39,12 +44,17 @@ export default class WonAddBuddy extends React.Component {
         class={this.props.className ? this.props.className : ""}
         ref={node => (this.node = node)}
       >
-        <svg
-          className="add-buddy__icon__small clickable"
+        <div
+          className="add-buddy__addbuddymenu__header clickable"
           onClick={() => this.setState({ contextMenuOpen: true })}
         >
-          <use xlinkHref="#ico36_plus_circle" href="#ico36_plus_circle" />
-        </svg>
+          <svg className="add-buddy__addbuddymenu__header__icon">
+            <use xlinkHref="#ico36_plus_circle" href="#ico36_plus_circle" />
+          </svg>
+          <span className="add-buddy__addbuddymenu__header__text hide-in-responsive">
+            Add as Buddy
+          </span>
+        </div>
         {dropdownElement}
       </won-add-buddy>
     );
