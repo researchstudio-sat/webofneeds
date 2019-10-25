@@ -127,7 +127,10 @@ export function connectionsChatMessage(
 
         referencedMessages.map(msg => {
           const correctUri = get(msg, "remoteUri") || get(msg, "uri");
-          if (correctUri) contentUris.push({ "@id": correctUri });
+          if (correctUri)
+            contentUris.push({
+              "@id": correctUri,
+            });
           //THE PARTS BELOW SHOULD NOT BE CALLED WITHIN THIS DISPATCH
           switch (key) {
             case "retracts":
@@ -311,6 +314,7 @@ export function connectionsConnectReactionAtom(
       getState
     ); // moved to separate function to make transpilation work properly
 }
+
 function connectReactionAtom(
   connectToAtomUri,
   atomDraft,
@@ -335,7 +339,12 @@ function connectReactionAtom(
     // create the new atom
     dispatch({
       type: actionTypes.atoms.create, // TODO custom action
-      payload: { eventUri, message, atomUri, atom: atomDraft },
+      payload: {
+        eventUri,
+        message,
+        atomUri,
+        atom: atomDraft,
+      },
     });
 
     dispatch(
@@ -450,13 +459,27 @@ function connectReactionAtom(
   });
 }
 
-export function connectionsConnectAdHoc(theirAtomUri, textMessage, persona) {
+export function connectionsConnectAdHoc(
+  theirAtomUri,
+  textMessage,
+  connectToSocketUri,
+  persona
+) {
   return (dispatch, getState) =>
-    connectAdHoc(theirAtomUri, textMessage, persona, dispatch, getState); // moved to separate function to make transpilation work properly
+    connectAdHoc(
+      theirAtomUri,
+      textMessage,
+      connectToSocketUri,
+      persona,
+      dispatch,
+      getState
+    ); // moved to separate function to make transpilation work properly
 }
+
 function connectAdHoc(
   theirAtomUri,
   textMessage,
+  connectToSocketUri,
   personaUri,
   dispatch,
   getState
@@ -476,7 +499,7 @@ function connectAdHoc(
     };
     const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
 
-    // create new atom
+    // build create message for new atom
     const { message, eventUri, atomUri } = await buildCreateMessage(
       adHocDraft,
       nodeUri
@@ -497,6 +520,9 @@ function connectAdHoc(
       }
     }
 
+    // set default socketUri
+    let socketUri = `${atomUri}#chatSocket`;
+
     // establish connection
     const cnctMsg = buildConnectMessage({
       ownedAtomUri: atomUri,
@@ -504,18 +530,22 @@ function connectAdHoc(
       ownNodeUri: nodeUri,
       theirNodeUri: get(theirAtom, "nodeUri"),
       connectMessage: textMessage,
+      undefined,
+      socketUri,
+      connectToSocketUri,
     });
 
     won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
       // connect action to be dispatched when the
       // ad hoc atom has been created:
-      //TODO: FIGURE OUT WHICH SOCKETS WILL BE CONNECTED
       const connectAction = {
         type: actionTypes.atoms.connect,
         payload: {
           eventUri: cnctMsg.eventUri,
           message: cnctMsg.message,
           optimisticEvent: optimisticEvent,
+          socketUri: socketUri,
+          targetSocketUri: connectToSocketUri,
         },
       };
 
@@ -545,7 +575,12 @@ function connectAdHoc(
       // create the new atom
       dispatch({
         type: actionTypes.atoms.create, // TODO custom action
-        payload: { eventUri, message, atomUri, atom: adHocDraft },
+        payload: {
+          eventUri,
+          message,
+          atomUri,
+          atom: adHocDraft,
+        },
       });
     });
   });
@@ -643,7 +678,9 @@ export function connectionsRate(connectionUri, rating) {
         requesterWebId: get(ownedAtom, "uri"),
       })
       .then(connection => {
-        let msgToRateFor = { connection: connection };
+        let msgToRateFor = {
+          connection: connection,
+        };
 
         return buildRateMessage(
           msgToRateFor,

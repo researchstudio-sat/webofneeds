@@ -14,6 +14,7 @@ import * as viewUtils from "../redux/utils/view-utils";
 import * as processSelectors from "../redux/selectors/process-selectors";
 import * as accountUtils from "../redux/utils/account-utils";
 import * as useCaseUtils from "../usecase-utils.js";
+import won from "../won-es6.js";
 
 import "~/style/_atom-info.scss";
 
@@ -22,6 +23,7 @@ const mapStateToProps = (state, ownProps) => {
 
   const isOwned = generalSelectors.isAtomOwned(state, ownProps.atomUri);
 
+  //checks for active and chatSocket || groupSocket
   const isConnectible = atomUtils.isConnectible(atom);
   const hasReactionUseCases = atomUtils.hasReactionUseCases(atom);
   const hasEnabledUseCases = atomUtils.hasEnabledUseCases(atom);
@@ -37,6 +39,13 @@ const mapStateToProps = (state, ownProps) => {
     viewState,
     ownProps.atomUri
   );
+
+  const chatSocket = atomUtils.hasChatSocket(atom)
+    ? atomUtils.getSocketUri(atom, won.CHAT.ChatSocketCompacted)
+    : undefined;
+  const groupSocket = atomUtils.hasGroupSocket(atom)
+    ? atomUtils.getSocketUri(atom, won.GROUP.GroupSocketCompacted)
+    : undefined;
 
   const atomLoading =
     !atom || processSelectors.isAtomLoading(state, ownProps.atomUri);
@@ -65,6 +74,8 @@ const mapStateToProps = (state, ownProps) => {
       (showEnabledUseCases || showReactionUseCases || showAdHocRequestField),
     addHolderUri: showEnabledUseCases ? holderUri : undefined,
     holderUri,
+    chatSocket,
+    groupSocket,
   };
 };
 
@@ -85,11 +96,17 @@ const mapDispatchToProps = dispatch => {
     showTermsDialog: payload => {
       dispatch(actionCreators.view__showTermsDialog(payload));
     },
-    connectionsConnectAdHoc: (connectToAtomUri, message, persona) => {
+    connectionsConnectAdHoc: (
+      connectToAtomUri,
+      message,
+      connectToSocketUri,
+      persona
+    ) => {
       dispatch(
         actionCreators.connections__connectAdHoc(
           connectToAtomUri,
           message,
+          connectToSocketUri,
           persona
         )
       );
@@ -151,15 +168,38 @@ class AtomInfo extends React.Component {
       footerElement = (
         <div className="atom-info__footer">
           {this.props.showAdHocRequestField && (
-            <ChatTextfield
-              placeholder="Message (optional)"
-              allowEmptySubmit={true}
-              showPersonas={true}
-              submitButtonLabel="Ask&#160;to&#160;Chat"
-              onSubmit={({ value, selectedPersona }) =>
-                this.sendAdHocRequest(value, selectedPersona)
-              }
-            />
+            <React.Fragment>
+              {this.props.chatSocket && (
+                <ChatTextfield
+                  placeholder="Message (optional)"
+                  allowEmptySubmit={true}
+                  showPersonas={true}
+                  submitButtonLabel="Ask&#160;to&#160;Chat"
+                  onSubmit={({ value, selectedPersona }) =>
+                    this.sendAdHocRequest(
+                      value,
+                      this.props.chatSocket,
+                      selectedPersona && selectedPersona.personaId
+                    )
+                  }
+                />
+              )}
+              {this.props.groupSocket && (
+                <ChatTextfield
+                  placeholder="Message (optional)"
+                  allowEmptySubmit={true}
+                  showPersonas={true}
+                  submitButtonLabel="Join&#160;Group"
+                  onSubmit={({ value, selectedPersona }) =>
+                    this.sendAdHocRequest(
+                      value,
+                      this.props.groupSocket,
+                      selectedPersona && selectedPersona.personaId
+                    )
+                  }
+                />
+              )}
+            </React.Fragment>
           )}
           {reactionUseCaseElements}
           {enabledUseCaseElements}
@@ -205,14 +245,19 @@ class AtomInfo extends React.Component {
     });
   }
 
-  sendAdHocRequest(message, persona) {
+  sendAdHocRequest(message, connectToSocketUri, persona) {
     const _atomUri = this.props.atomUri;
 
     if (this.props.loggedIn) {
       this.props.routerGoResetParams("connections");
 
       if (_atomUri) {
-        this.props.connectionsConnectAdHoc(_atomUri, message, persona);
+        this.props.connectionsConnectAdHoc(
+          _atomUri,
+          message,
+          connectToSocketUri,
+          persona
+        );
       }
     } else {
       this.props.showTermsDialog(
@@ -222,7 +267,12 @@ class AtomInfo extends React.Component {
             this.props.routerGoResetParams("connections");
 
             if (_atomUri) {
-              this.props.connectionsConnectAdHoc(_atomUri, message, persona);
+              this.props.connectionsConnectAdHoc(
+                _atomUri,
+                message,
+                connectToSocketUri,
+                persona
+              );
             }
           },
           cancelCallback: () => {
@@ -254,6 +304,8 @@ AtomInfo.propTypes = {
   hideModalDialog: PropTypes.func,
   showTermsDialog: PropTypes.func,
   connectionsConnectAdHoc: PropTypes.func,
+  chatSocket: PropTypes.string,
+  groupSocket: PropTypes.string,
 };
 
 export default connect(
