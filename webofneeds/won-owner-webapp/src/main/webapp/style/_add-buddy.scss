@@ -58,8 +58,23 @@ won-add-buddy {
           align-items: center;
           padding: 0.25rem;
 
-          &:hover {
-            background: $won-light-gray;
+          &.requestable,
+          &.received {
+            cursor: pointer;
+            &:hover {
+              --local-primary: #{$won-primary-color};
+              background: $won-light-gray;
+            }
+          }
+
+          &.connected {
+            --local-primary: green;
+          }
+
+          &.sent,
+          &.closed {
+            filter: opacity(0.5);
+            --local-primary: #{$won-dark-gray};
           }
 
           won-atom-header {
