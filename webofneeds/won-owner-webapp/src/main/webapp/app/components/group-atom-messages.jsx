@@ -21,6 +21,7 @@ import WonLabelledHr from "./labelled-hr.jsx";
 import WonAtomContentMessage from "./messages/atom-content-message.jsx";
 import WonConnectionMessage from "./messages/connection-message.jsx";
 import { actionCreators } from "../actions/actions.js";
+import * as viewSelectors from "../redux/selectors/view-selectors";
 
 const rdfTextfieldHelpText =
   "Expects valid turtle. " +
@@ -86,8 +87,7 @@ const mapStateToProps = (state, ownProps) => {
       connection && connectionUtils.isRequestReceived(connection),
     isConnected: connection && connectionUtils.isConnected(connection),
     isSuggested: connection && connectionUtils.isSuggested(connection),
-    debugmode: won.debugmode,
-    shouldShowRdf: state.getIn(["view", "showRdf"]),
+    shouldShowRdf: viewSelectors.showRdf(state),
     // if the connect-message is here, everything else should be as well
     hasConnectionMessagesToLoad,
     connectionOrAtomsLoading:
@@ -528,7 +528,6 @@ GroupAtomMessages.propTypes = {
   isReceivedRequest: PropTypes.bool,
   isConnected: PropTypes.bool,
   isSuggested: PropTypes.bool,
-  debugmode: PropTypes.bool,
   shouldShowRdf: PropTypes.bool,
   hasConnectionMessagesToLoad: PropTypes.bool,
   connectionOrAtomsLoading: PropTypes.bool,

@@ -135,7 +135,7 @@ const mapStateToProps = state => {
     holderUri,
     isHolderAtomValid,
     connectToAtomUri,
-    processingPublish: state.getIn(["process", "processingPublish"]),
+    processingPublish: processSelectors.isProcessingPublish(state),
     connectionHasBeenLost: !generalSelectors.selectIsConnected(state),
     useCase,
     fromAtom,

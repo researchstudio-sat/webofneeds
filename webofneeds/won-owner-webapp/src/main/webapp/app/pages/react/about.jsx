@@ -168,7 +168,7 @@ const mapStateToProps = state => {
     imprintTemplateHtml: get(theme, "imprintTemplate"),
     privacyPolicyTemplateHtml: get(theme, "privacyPolicyTemplate"),
     peopleGrid: peopleGrid({ themeName }),
-    showModalDialog: getIn(state, ["view", "showModalDialog"]),
+    showModalDialog: viewSelectors.showModalDialog(state),
     showSlideIns:
       viewSelectors.hasSlideIns(state) &&
       viewSelectors.isSlideInsVisible(state),

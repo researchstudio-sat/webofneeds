@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
 import { getIn } from "../utils.js";
+import * as viewSelectors from "../redux/selectors/view-selectors.js";
 
 import "~/style/_footer.scss";
 
@@ -11,8 +12,8 @@ const mapStateToProps = (state, ownProps) => {
     className: ownProps.className,
     themeName: getIn(state, ["config", "theme", "name"]),
     appTitle: getIn(state, ["config", "theme", "title"]),
-    shouldShowRdf: state.getIn(["view", "showRdf"]),
-    debugMode: state.getIn(["view", "debugMode"]),
+    shouldShowRdf: viewSelectors.showRdf(state),
+    debugMode: viewSelectors.isDebugModeEnabled(state),
   };
 };
 

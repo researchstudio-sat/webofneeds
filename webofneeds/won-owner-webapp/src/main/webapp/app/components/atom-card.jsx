@@ -9,6 +9,7 @@ import * as processUtils from "../redux/utils/process-utils.js";
 import WonOtherCard from "./cards/other-card.jsx";
 import WonSkeletonCard from "./cards/skeleton-card.jsx";
 import WonPersonaCard from "./cards/persona-card.jsx";
+import PokemonRaidCard from "./cards/pokemon-raid-card.jsx";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 
@@ -28,6 +29,9 @@ const mapStateToProps = (state, ownProps) => {
     processUtils.isAtomLoading(process, ownProps.atomUri) ||
     processUtils.isAtomToLoad(process, ownProps.atomUri);
 
+  const isPokemonRaid =
+    getIn(atom, ["matchedUseCase", "identifier"]) === "pokemonGoRaid";
+
   if (isSkeleton) {
     return {
       atomUri: ownProps.atomUri,
@@ -36,6 +40,7 @@ const mapStateToProps = (state, ownProps) => {
       currentLocation: ownProps.currentLocation,
       onAtomClick: ownProps.onAtomClick,
       isPersona: false,
+      isPokemonRaid: false,
       isOtherAtom: false,
       isSkeleton: true,
     };
@@ -47,6 +52,19 @@ const mapStateToProps = (state, ownProps) => {
       currentLocation: ownProps.currentLocation,
       onAtomClick: ownProps.onAtomClick,
       isPersona: true,
+      isPokemonRaid: false,
+      isOtherAtom: false,
+      isSkeleton: false,
+    };
+  } else if (isPokemonRaid) {
+    return {
+      atomUri: ownProps.atomUri,
+      showPersona: ownProps.showPersona,
+      showSuggestions: ownProps.showSuggestions,
+      currentLocation: ownProps.currentLocation,
+      onAtomClick: ownProps.onAtomClick,
+      isPersona: false,
+      isPokemonRaid: true,
       isOtherAtom: false,
       isSkeleton: false,
     };
@@ -58,6 +76,7 @@ const mapStateToProps = (state, ownProps) => {
       currentLocation: ownProps.currentLocation,
       onAtomClick: ownProps.onAtomClick,
       isPersona: false,
+      isPokemonRaid: false,
       isOtherAtom: true,
       isSkeleton: false,
     };
@@ -66,38 +85,42 @@ const mapStateToProps = (state, ownProps) => {
 
 class WonAtomCard extends React.Component {
   render() {
+    let cardContent;
     if (this.props.isSkeleton) {
-      return (
-        <won-atom-card>
-          <WonSkeletonCard
-            atomUri={this.props.atomUri}
-            showSuggestions={this.props.showSuggestions}
-            showPersona={this.props.showPersona}
-          />
-        </won-atom-card>
+      cardContent = (
+        <WonSkeletonCard
+          atomUri={this.props.atomUri}
+          showSuggestions={this.props.showSuggestions}
+          showPersona={this.props.showPersona}
+        />
       );
     } else if (this.props.isPersona) {
-      return (
-        <won-atom-card>
-          <WonPersonaCard
-            atomUri={this.props.atomUri}
-            onAtomClick={this.props.onAtomClick}
-          />
-        </won-atom-card>
+      cardContent = (
+        <WonPersonaCard
+          atomUri={this.props.atomUri}
+          onAtomClick={this.props.onAtomClick}
+        />
+      );
+    } else if (this.props.isPokemonRaid) {
+      cardContent = (
+        <PokemonRaidCard
+          atomUri={this.props.atomUri}
+          onAtomClick={this.props.onAtomClick}
+        />
       );
     } else {
-      return (
-        <won-atom-card>
-          <WonOtherCard
-            atomUri={this.props.atomUri}
-            showSuggestions={this.props.showSuggestions}
-            showPersona={this.props.showPersona}
-            onAtomClick={this.props.onAtomClick}
-            currentLocation={this.props.currentLocation}
-          />
-        </won-atom-card>
+      cardContent = (
+        <WonOtherCard
+          atomUri={this.props.atomUri}
+          showSuggestions={this.props.showSuggestions}
+          showPersona={this.props.showPersona}
+          onAtomClick={this.props.onAtomClick}
+          currentLocation={this.props.currentLocation}
+        />
       );
     }
+
+    return <won-atom-card>{cardContent}</won-atom-card>;
   }
 }
 
@@ -108,6 +131,7 @@ WonAtomCard.propTypes = {
   currentLocation: PropTypes.object,
   onAtomClick: PropTypes.func,
   isPersona: PropTypes.bool,
+  isPokemonRaid: PropTypes.bool,
   isOtherAtom: PropTypes.bool,
   isSkeleton: PropTypes.bool,
 };

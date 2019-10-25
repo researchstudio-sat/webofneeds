@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
-import { get, getIn } from "../../utils.js";
+import { get } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import WonModalDialog from "../../components/modal-dialog.jsx";
@@ -34,7 +34,7 @@ const mapStateToProps = state => {
 
   return {
     isLoggedIn: accountUtils.isLoggedIn(accountState),
-    showModalDialog: getIn(state, ["view", "showModalDialog"]),
+    showModalDialog: viewSelectors.showModalDialog(state),
     showUseCasePicker: !(showUseCaseGroup || showCreatePost),
     showUseCaseGroup,
     showCreatePost,

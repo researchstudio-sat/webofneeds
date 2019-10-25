@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 
 import * as generalSelectors from "../redux/selectors/general-selectors";
+import * as viewSelectors from "../redux/selectors/view-selectors";
 import * as messageUtils from "../redux/utils/message-utils";
 import { hasMessagesToLoad } from "../redux/selectors/connection-selectors";
 import {
@@ -162,8 +163,7 @@ const mapStateToProps = (state, ownProps) => {
     isReceivedRequest: connectionUtils.isRequestReceived(connection),
     isConnected: connectionUtils.isConnected(connection),
     isSuggested: connectionUtils.isSuggested(connection),
-    debugmode: won.debugmode,
-    shouldShowRdf: getIn(state, ["view", "showRdf"]),
+    shouldShowRdf: viewSelectors.showRdf(state),
     hasConnectionMessagesToLoad,
     hasAgreementMessages: agreementMessages && agreementMessages.size > 0,
     hasPetriNetData: petriNetData && petriNetData.size > 0,
@@ -1234,7 +1234,6 @@ AtomMessages.propTypes = {
   isReceivedRequest: PropTypes.bool,
   isConnected: PropTypes.bool,
   isSuggested: PropTypes.bool,
-  debugmode: PropTypes.bool,
   shouldShowRdf: PropTypes.bool,
   hasConnectionMessagesToLoad: PropTypes.bool,
   hasAgreementMessages: PropTypes.bool,
