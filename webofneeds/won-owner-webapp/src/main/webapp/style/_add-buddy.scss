@@ -19,6 +19,25 @@ won-add-buddy {
     &__icon {
       @include fixed-square($postIconSizeMobile);
     }
+
+    &.requestable,
+    &.received {
+      cursor: pointer;
+      &:hover {
+        --local-primary: #{$won-primary-color};
+        background: $won-light-gray;
+      }
+    }
+
+    &.connected {
+      --local-primary: green;
+    }
+
+    &.sent,
+    &.closed {
+      filter: opacity(0.5);
+      --local-primary: #{$won-dark-gray};
+    }
   }
 
   .add-buddy__addbuddymenu {
@@ -42,7 +61,7 @@ won-add-buddy {
         --local-primary: black;
         color: black;
         float: right;
-        right: -0.5rem;
+        right: -0.55rem;
       }
 
       &__selection {

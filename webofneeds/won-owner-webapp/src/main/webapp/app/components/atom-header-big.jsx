@@ -14,6 +14,7 @@ import WonAtomContextDropdown from "../components/atom-context-dropdown.jsx";
 import WonAtomIcon from "../components/atom-icon.jsx";
 import WonShareDropdown from "../components/share-dropdown.jsx";
 import WonAddBuddy from "../components/add-buddy.jsx";
+import * as generalSelectors from "../redux/selectors/general-selectors";
 
 const mapStateToProps = (state, ownProps) => {
   const atom = state.getIn(["atoms", ownProps.atomUri]);
@@ -31,6 +32,15 @@ const mapStateToProps = (state, ownProps) => {
   const atomUri = ownProps.atomUri;
   const accountState = get(state, "account");
 
+  const ownedAtomsWithBuddySocket = generalSelectors.getOwnedAtomsWithBuddySocket(
+    state
+  );
+  const hasOwnedAtomsWithBuddySocket =
+    ownedAtomsWithBuddySocket &&
+    ownedAtomsWithBuddySocket
+      .filter(atom => atomUtils.isActive(atom))
+      .filter(atom => get(atom, "uri") !== atomUri).size > 0;
+
   return {
     atomUri,
     atom,
@@ -41,6 +51,7 @@ const mapStateToProps = (state, ownProps) => {
     isChatEnabled: atomUtils.hasChatSocket(atom),
     showAddBuddyElement:
       atomUtils.hasBuddySocket(atom) &&
+      hasOwnedAtomsWithBuddySocket &&
       !accountUtils.isAtomOwned(accountState, atomUri),
     atomTypeLabel: atom && atomUtils.generateTypeLabel(atom),
   };
