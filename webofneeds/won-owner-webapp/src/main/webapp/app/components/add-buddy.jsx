@@ -65,6 +65,9 @@ const mapDispatchToProps = dispatch => {
         )
       );
     },
+    connectionOpen: (connectionUri, message) => {
+      dispatch(actionCreators.connections__open(connectionUri, message));
+    },
   };
 };
 
@@ -288,14 +291,18 @@ class WonAddBuddy extends React.Component {
         {
           caption: "Yes",
           callback: () => {
-            this.props.connect(
-              selectedAtomUri,
-              existingBuddyConnectionUri,
-              this.props.atomUri,
-              message,
-              won.BUDDY.BuddySocketCompacted,
-              won.BUDDY.BuddySocketCompacted
-            );
+            if (connectionUtils.isRequestReceived(existingBuddyConnection)) {
+              this.props.open(existingBuddyConnectionUri, message);
+            } else {
+              this.props.connect(
+                selectedAtomUri,
+                existingBuddyConnectionUri,
+                this.props.atomUri,
+                message,
+                won.BUDDY.BuddySocketCompacted,
+                won.BUDDY.BuddySocketCompacted
+              );
+            }
             this.props.hideModalDialog();
           },
         },
@@ -319,6 +326,7 @@ WonAddBuddy.propTypes = {
   hideModalDialog: PropTypes.func,
   showModalDialog: PropTypes.func,
   connect: PropTypes.func,
+  open: PropTypes.func,
 };
 
 export default connect(
