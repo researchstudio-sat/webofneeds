@@ -263,7 +263,9 @@ class WonMenu extends React.Component {
 
   handleClick(e) {
     if (!this.node.contains(e.target) && this.props.isMenuVisible) {
-      this.props.hideMenu();
+      // TODO: Fix me.
+      // Handler is closing menu before actual MenuAction is toggled
+      //this.props.hideMenu();
 
       return;
     }
