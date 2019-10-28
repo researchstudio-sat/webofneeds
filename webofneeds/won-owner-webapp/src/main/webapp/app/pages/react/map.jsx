@@ -27,6 +27,8 @@ import WonAtomCardGrid from "../../components/atom-card-grid.jsx";
 import WonFooter from "../../components/footer.jsx";
 import WonTitlePicker from "../../components/details/picker/title-picker.jsx";
 
+import _ from "lodash";
+
 import "~/style/_map.scss";
 import "~/style/_connection-overlay.scss";
 
@@ -162,6 +164,17 @@ class PageMap extends React.Component {
     this.fetchCurrentLocationAndReload = this.fetchCurrentLocationAndReload.bind(
       this
     );
+
+    this.startSearch = _.debounce(value => {
+      searchNominatim(value).then(searchResults => {
+        const parsedResults = scrubSearchResults(searchResults, value);
+
+        this.setState({
+          searchText: value,
+          searchResults: parsedResults,
+        });
+      });
+    }, 700);
   }
 
   render() {
@@ -422,17 +435,7 @@ class PageMap extends React.Component {
   updateWhatsAroundSuggestions({ value }) {
     const whatsAroundInputValue = value && value.trim();
     if (!!whatsAroundInputValue && whatsAroundInputValue.length > 0) {
-      searchNominatim(whatsAroundInputValue).then(searchResults => {
-        const parsedResults = scrubSearchResults(
-          searchResults,
-          whatsAroundInputValue
-        );
-
-        this.setState({
-          searchText: value,
-          searchResults: parsedResults,
-        });
-      });
+      this.startSearch(value);
     } else {
       this.resetWhatsAroundInput();
     }
