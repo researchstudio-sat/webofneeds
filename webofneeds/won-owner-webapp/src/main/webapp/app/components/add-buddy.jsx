@@ -205,7 +205,7 @@ class WonAddBuddy extends React.Component {
         // also includes suggested (BuddySocket)Connections
         connectionStateClass = "requestable";
         connectionStateIcon = "#ico36_plus_circle";
-        connectionStateLabel = "Accept as Buddy";
+        connectionStateLabel = "Add as Buddy";
         onClickAction = () => {
           console.debug(
             "IMMEDIATE CONNECT FROM",
