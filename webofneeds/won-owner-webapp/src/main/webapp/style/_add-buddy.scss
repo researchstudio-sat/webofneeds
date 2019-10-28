@@ -1,0 +1,111 @@
+@import "sizing-utils";
+@import "won-config";
+@import "animate";
+
+won-add-buddy {
+  .topline {
+    height: 2rem;
+  }
+
+  .add-buddy__addbuddymenu__header {
+    white-space: nowrap;
+    display: grid;
+    grid-gap: 0.25rem;
+    grid-auto-flow: column;
+    --local-primary: #{$won-secondary-color};
+    color: $won-secondary-color;
+    padding: 0 0.25rem;
+
+    &__icon {
+      @include fixed-square($postIconSizeMobile);
+    }
+
+    &.requestable,
+    &.received {
+      cursor: pointer;
+      &:hover {
+        --local-primary: #{$won-primary-color};
+        background: $won-light-gray;
+      }
+    }
+
+    &.connected {
+      --local-primary: green;
+    }
+
+    &.sent,
+    &.closed {
+      filter: opacity(0.5);
+      --local-primary: #{$won-dark-gray};
+    }
+  }
+
+  .add-buddy__addbuddymenu {
+    position: relative;
+    height: 0;
+    z-index: 1000;
+    top: calc((#{$postIconSizeMobile} + #{$thinBorderWidth} + 0.5rem) * -1);
+    right: $thinBorderWidth;
+
+    .add-buddy__addbuddymenu__content {
+      background: white;
+      border: $thinGrayBorder;
+      padding: 0.5rem;
+      max-width: 15rem;
+      position: absolute;
+      right: -1px;
+      min-width: 15rem;
+
+      .add-buddy__addbuddymenu__header {
+        position: relative;
+        --local-primary: black;
+        color: black;
+        float: right;
+        right: -0.55rem;
+      }
+
+      &__selection {
+        border-top: $thinGrayBorder;
+        display: grid;
+        padding-top: 0.5rem;
+
+        &__buddy {
+          display: grid;
+          grid-template-areas: "buddy_atom buddy_status";
+          grid-gap: 0.5rem;
+          grid-template-columns: 1fr min-content;
+          align-items: center;
+          padding: 0.25rem;
+
+          &.requestable,
+          &.received {
+            cursor: pointer;
+            &:hover {
+              --local-primary: #{$won-primary-color};
+              background: $won-light-gray;
+            }
+          }
+
+          &.connected {
+            --local-primary: green;
+          }
+
+          &.sent,
+          &.closed {
+            filter: opacity(0.5);
+            --local-primary: #{$won-dark-gray};
+          }
+
+          won-atom-header {
+            grid-area: buddy_atom;
+          }
+
+          .add-buddy__addbuddymenu__content__selection__buddy__status {
+            grid-area: buddy_status;
+            @include fixed-square($postIconSizeMobile);
+          }
+        }
+      }
+    }
+  }
+}
