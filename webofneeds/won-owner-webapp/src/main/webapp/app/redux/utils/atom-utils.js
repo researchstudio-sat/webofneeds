@@ -295,7 +295,9 @@ export function hasSuggestedConnections(atom) {
 }
 
 export function hasRequestedConnections(atom) {
+  // TODO: verify that all requests are on chat sockets
   return (
+    hasChatSocket(atom) &&
     get(atom, "connections") &&
     !!get(atom, "connections").find(conn =>
       connectionUtils.isRequestReceived(conn)
@@ -311,7 +313,9 @@ export function getSuggestedConnections(atom) {
 }
 
 export function getRequestedConnections(atom) {
+  // TODO: verify that all requests are on chat sockets
   return (
+    hasChatSocket(atom) &&
     get(atom, "connections") &&
     get(atom, "connections").filter(conn =>
       connectionUtils.isRequestReceived(conn)
@@ -320,7 +324,9 @@ export function getRequestedConnections(atom) {
 }
 
 export function getUnreadChatMessageConnections(atom) {
+  // TODO: verify that all messages are on chat sockets
   return (
+    hasChatSocket(atom) &&
     !!get(atom, "connections") &&
     !!get(atom, "connections").find(
       conn =>
