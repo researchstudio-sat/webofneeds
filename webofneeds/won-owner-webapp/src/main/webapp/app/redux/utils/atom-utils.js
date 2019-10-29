@@ -319,6 +319,18 @@ export function getRequestedConnections(atom) {
   );
 }
 
+export function getUnreadChatMessageConnections(atom) {
+  return (
+    !!get(atom, "connections") &&
+    !!get(atom, "connections").find(
+      conn =>
+        !(
+          connectionUtils.isClosed(conn) || connectionUtils.isSuggested(conn)
+        ) && connectionUtils.isUnread(conn)
+    )
+  );
+}
+
 export function hasUnreadSuggestedConnections(atom) {
   return (
     get(atom, "connections") &&

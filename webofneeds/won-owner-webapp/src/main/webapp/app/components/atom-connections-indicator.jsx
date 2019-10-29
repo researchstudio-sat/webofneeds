@@ -2,14 +2,13 @@
  * Created by sigpie on 21.09.2019.
  */
 import React from "react";
-import Immutable from "immutable";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
-import { getIn } from "../utils.js";
+import { get, getIn } from "../utils.js";
 
 import * as atomUtils from "../redux/utils/atom-utils.js";
-//import * as generalSelectors from "../redux/selectors/general-selectors.js";
+
 import "~/style/_atom-connections-indicator.scss";
 
 const mapStateToProps = (state, ownProps) => {
@@ -22,20 +21,16 @@ const mapStateToProps = (state, ownProps) => {
     requestedConnections.filter(conn => conn.get("unread"));
   const unreadRequestsCount = unreadRequests ? unreadRequests.size : 0;
 
-  const unreadChatMessages = ownProps && ownProps.hasUnreadChatConnections;
-
-  console.log(
-    "has unread msgs: " +
-      !!unreadChatMessages +
-      " unread reqs: " +
-      unreadRequestsCount
-  );
+  const hasUnreadChatMessages = ownProps && ownProps.hasUnreadChatConnections;
+  const unreadChatConnections = atomUtils.getUnreadChatMessageConnections(atom);
 
   return {
     atomUri: ownProps.atomUri,
     requestsCount,
     unreadRequestsCount,
-    unreadChatMessages,
+    unreadRequests,
+    hasUnreadChatMessages,
+    unreadChatConnections,
   };
 };
 
@@ -44,32 +39,21 @@ const mapDispatchToProps = dispatch => {
     routerGo: (path, props) => {
       dispatch(actionCreators.router__stateGo(path, props));
     },
-    selectAtomTab: (atomUri, selectTab) => {
-      dispatch(
-        actionCreators.atoms__selectTab(
-          Immutable.fromJS({
-            atomUri: atomUri,
-            selectTab: selectTab,
-          })
-        )
-      );
-    },
   };
 };
 
 class WonAtomConnectionsIndicator extends React.Component {
   constructor(props) {
     super(props);
+    window.con4dbg = this;
     this.showAtomConnections = this.showAtomConnections.bind(this);
   }
-  //   showAtomSuggestions() {
-  //     this.props.selectAtomTab(this.props.atomUri, "SUGGESTIONS");
-  //     this.props.routerGo("post", { postUri: this.props.atomUri });
-  //   }
 
   showAtomConnections() {
-    // TODO: add code to show appropriate connection!
-    this.props.routerGo("connections");
+    const connUri = this.props.hasUnreadChatMessages
+      ? get(this.props.unreadChatConnections.first(), "uri")
+      : get(this.props.unreadRequests.first(), "uri");
+    this.props.routerGo("connections", { connectionUri: connUri });
   }
 
   render() {
@@ -109,9 +93,11 @@ class WonAtomConnectionsIndicator extends React.Component {
 
 WonAtomConnectionsIndicator.propTypes = {
   atomUri: PropTypes.string.isRequired,
-  unreadChatMessages: PropTypes.bool,
+  hasUnreadChatMessages: PropTypes.bool,
+  unreadChatConnections: PropTypes.object,
   requestsCount: PropTypes.number,
   unreadRequestsCount: PropTypes.number,
+  unreadRequests: PropTypes.object,
   routerGo: PropTypes.func,
   selectAtomTab: PropTypes.func,
 };
