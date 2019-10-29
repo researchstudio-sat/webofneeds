@@ -141,7 +141,7 @@ class WonFooter extends React.Component {
             </a>
             <span
               className="footer__linksmobile__link"
-              onClick={() => this.toggleDebugMode()}
+              onClick={() => this.props.toggleDebugMode()}
             >
               {this.getDebugModeLabel()}
             </span>

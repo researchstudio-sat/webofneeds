@@ -68,6 +68,9 @@ const mapDispatchToProps = dispatch => {
     connectionOpen: (connectionUri, message) => {
       dispatch(actionCreators.connections__open(connectionUri, message));
     },
+    connectionClose: (connectionUri, message) => {
+      dispatch(actionCreators.connections__close(connectionUri, message));
+    },
   };
 };
 
@@ -96,23 +99,29 @@ class WonAddBuddy extends React.Component {
 
         if (connectionUtils.isConnected(existingBuddyConnection)) {
           connectionStateClass = "connected";
-          connectionStateIcon = "#ico16_checkmark";
+          connectionStateIcon = "#ico32_buddy_accept";
+          onClickAction = () => {
+            this.removeBuddy(existingBuddyConnection);
+          };
         } else if (connectionUtils.isRequestSent(existingBuddyConnection)) {
           connectionStateClass = "sent";
-          connectionStateIcon = "#ico36_outgoing";
+          connectionStateIcon = "#ico32_buddy_waiting";
+          onClickAction = () => {
+            this.removeBuddy(existingBuddyConnection);
+          };
         } else if (connectionUtils.isClosed(existingBuddyConnection)) {
           connectionStateClass = "closed";
-          connectionStateIcon = "#ico36_close";
+          connectionStateIcon = "#ico32_buddy_deny";
         } else if (connectionUtils.isRequestReceived(existingBuddyConnection)) {
           connectionStateClass = "received";
-          connectionStateIcon = "#ico36_incoming";
+          connectionStateIcon = "#ico32_buddy_accept";
           onClickAction = () => {
             this.connectBuddy(get(atom, "uri"), existingBuddyConnection);
           };
         } else {
           // also includes suggested (BuddySocket)Connections
           connectionStateClass = "requestable";
-          connectionStateIcon = "#ico36_plus_circle";
+          connectionStateIcon = "#ico32_buddy_add";
           onClickAction = () => {
             this.connectBuddy(get(atom, "uri"), existingBuddyConnection);
           };
@@ -144,7 +153,7 @@ class WonAddBuddy extends React.Component {
               onClick={() => this.setState({ contextMenuOpen: false })}
             >
               <svg className="add-buddy__addbuddymenu__header__icon">
-                <use xlinkHref="#ico36_plus_circle" href="#ico36_plus_circle" />
+                <use xlinkHref="#ico32_buddy_add" href="#ico32_buddy_add" />
               </svg>
               <span className="add-buddy__addbuddymenu__header__text hide-in-responsive">
                 Add as Buddy&#8230;
@@ -175,27 +184,27 @@ class WonAddBuddy extends React.Component {
 
       if (connectionUtils.isConnected(existingBuddyConnection)) {
         connectionStateClass = "connected";
-        connectionStateIcon = "#ico16_checkmark";
-        connectionStateLabel = "Already Buddies";
+        connectionStateIcon = "#ico32_buddy_accept";
+        connectionStateLabel = "Already a Buddy";
+        onClickAction = () => {
+          this.removeBuddy(existingBuddyConnection);
+        };
       } else if (connectionUtils.isRequestSent(existingBuddyConnection)) {
         connectionStateClass = "sent";
-        connectionStateIcon = "#ico36_outgoing";
+        connectionStateIcon = "#ico32_buddy_waiting";
         connectionStateLabel = "Buddy Request sent";
+        onClickAction = () => {
+          this.removeBuddy(existingBuddyConnection);
+        };
       } else if (connectionUtils.isClosed(existingBuddyConnection)) {
         connectionStateClass = "closed";
-        connectionStateIcon = "#ico36_close";
+        connectionStateIcon = "#ico32_buddy_deny";
         connectionStateLabel = "Buddy Request denied";
       } else if (connectionUtils.isRequestReceived(existingBuddyConnection)) {
         connectionStateClass = "received";
-        connectionStateIcon = "#ico36_incoming";
+        connectionStateIcon = "#ico32_buddy_accept";
         connectionStateLabel = "Accept Buddy Request";
         onClickAction = () => {
-          console.debug(
-            "IMMEDIATE CONNECT FROM",
-            get(this.props.immediateConnectBuddy, "uri"),
-            " to ",
-            this.props.atomUri
-          );
           this.connectBuddy(
             get(this.props.immediateConnectBuddy, "uri"),
             existingBuddyConnection
@@ -204,15 +213,9 @@ class WonAddBuddy extends React.Component {
       } else {
         // also includes suggested (BuddySocket)Connections
         connectionStateClass = "requestable";
-        connectionStateIcon = "#ico36_plus_circle";
+        connectionStateIcon = "#ico32_buddy_add";
         connectionStateLabel = "Add as Buddy";
         onClickAction = () => {
-          console.debug(
-            "IMMEDIATE CONNECT FROM",
-            get(this.props.immediateConnectBuddy, "uri"),
-            " to ",
-            this.props.atomUri
-          );
           this.connectBuddy(
             get(this.props.immediateConnectBuddy, "uri"),
             existingBuddyConnection
@@ -240,7 +243,7 @@ class WonAddBuddy extends React.Component {
           onClick={() => this.setState({ contextMenuOpen: true })}
         >
           <svg className="add-buddy__addbuddymenu__header__icon">
-            <use xlinkHref="#ico36_plus_circle" href="#ico36_plus_circle" />
+            <use xlinkHref="#ico32_buddy_add" href="#ico32_buddy_add" />
           </svg>
           <span className="add-buddy__addbuddymenu__header__text hide-in-responsive">
             Add as Buddy&#8230;
@@ -275,6 +278,40 @@ class WonAddBuddy extends React.Component {
     }
   }
 
+  removeBuddy(existingBuddyConnection, message = "") {
+    let dialogText;
+    if (connectionUtils.isConnected(existingBuddyConnection)) {
+      dialogText = "Remove Buddy?";
+    } else if (connectionUtils.isRequestSent(existingBuddyConnection)) {
+      dialogText = "Cancel Buddy Request?";
+    } else {
+      return;
+    }
+
+    const existingBuddyConnectionUri = get(existingBuddyConnection, "uri");
+
+    const payload = {
+      caption: "Buddy",
+      text: dialogText,
+      buttons: [
+        {
+          caption: "Yes",
+          callback: () => {
+            this.props.connectionClose(existingBuddyConnectionUri, message);
+            this.props.hideModalDialog();
+          },
+        },
+        {
+          caption: "No",
+          callback: () => {
+            this.props.hideModalDialog();
+          },
+        },
+      ],
+    };
+    this.props.showModalDialog(payload);
+  }
+
   connectBuddy(selectedAtomUri, existingBuddyConnection, message = "") {
     const dialogText = connectionUtils.isRequestReceived(
       existingBuddyConnection
@@ -292,7 +329,7 @@ class WonAddBuddy extends React.Component {
           caption: "Yes",
           callback: () => {
             if (connectionUtils.isRequestReceived(existingBuddyConnection)) {
-              this.props.open(existingBuddyConnectionUri, message);
+              this.props.connectionOpen(existingBuddyConnectionUri, message);
             } else {
               this.props.connect(
                 selectedAtomUri,
@@ -309,6 +346,10 @@ class WonAddBuddy extends React.Component {
         {
           caption: "No",
           callback: () => {
+            if (connectionUtils.isRequestReceived(existingBuddyConnection)) {
+              this.props.connectionClose(existingBuddyConnectionUri, message);
+            }
+
             this.props.hideModalDialog();
           },
         },
@@ -321,12 +362,13 @@ WonAddBuddy.propTypes = {
   atomUri: PropTypes.string.isRequired,
   className: PropTypes.string,
   ownedAtomsWithBuddySocketArray: PropTypes.arrayOf(PropTypes.object),
-  immediateConnectBuddy: PropTypes.string,
+  immediateConnectBuddy: PropTypes.object,
   targetBuddySocketUri: PropTypes.string,
   hideModalDialog: PropTypes.func,
   showModalDialog: PropTypes.func,
   connect: PropTypes.func,
-  open: PropTypes.func,
+  connectionOpen: PropTypes.func,
+  connectionClose: PropTypes.func,
 };
 
 export default connect(

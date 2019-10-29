@@ -140,7 +140,7 @@ class WonAtomContentPersona extends React.Component {
           className="ac-persona__websitelink"
           target="_blank"
           rel="noopener noreferrer"
-          href="{this.props.personaWebsite}"
+          href={this.props.personaWebsite}
         >
           {this.props.personaWebsite}
         </a>

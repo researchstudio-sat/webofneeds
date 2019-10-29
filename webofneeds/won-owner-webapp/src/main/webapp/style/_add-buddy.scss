@@ -26,17 +26,23 @@ won-add-buddy {
       &:hover {
         --local-primary: #{$won-primary-color};
         background: $won-light-gray;
+        color: $won-primary-color;
       }
     }
 
     &.connected {
+      cursor: pointer;
       --local-primary: green;
+    }
+    &.sent {
+      cursor: pointer;
     }
 
     &.sent,
     &.closed {
       filter: opacity(0.5);
       --local-primary: #{$won-dark-gray};
+      color: $won-dark-gray;
     }
   }
 
@@ -88,12 +94,18 @@ won-add-buddy {
 
           &.connected {
             --local-primary: green;
+            cursor: pointer;
+          }
+
+          &.sent {
+            cursor: pointer;
           }
 
           &.sent,
           &.closed {
             filter: opacity(0.5);
             --local-primary: #{$won-dark-gray};
+            color: $won-dark-gray;
           }
 
           won-atom-header {
