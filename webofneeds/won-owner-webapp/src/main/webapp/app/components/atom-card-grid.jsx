@@ -22,6 +22,7 @@ class WonAtomCardGrid extends React.Component {
     const showPersona = this.props.showPersona;
     const showSuggestions = this.props.showSuggestions;
     const showCreate = this.props.showCreate;
+    const showCreatePersona = this.props.showCreatePersona;
     const currentLocation = this.props.currentLocation;
 
     let atomCards = undefined;
@@ -51,10 +52,24 @@ class WonAtomCardGrid extends React.Component {
       undefined
     );
 
+    const createPersonaAtom = showCreatePersona ? (
+      <won-create-card
+        onClick={() => this.props.routerGo("create", { useCase: "persona" })}
+      >
+        <svg className="createcard__icon" title="Create a new post">
+          <use xlinkHref="#ico32_buddy_add" href="#ico32_buddy_add" />
+        </svg>
+        <span className="createcard__label">New Persona</span>
+      </won-create-card>
+    ) : (
+      undefined
+    );
+
     return (
       <React.Fragment>
         {atomCards}
         {createAtom}
+        {createPersonaAtom}
       </React.Fragment>
     );
   }
@@ -65,6 +80,7 @@ WonAtomCardGrid.propTypes = {
   showPersona: PropTypes.bool,
   showSuggestions: PropTypes.bool,
   showCreate: PropTypes.bool,
+  showCreatePersona: PropTypes.bool,
   currentLocation: PropTypes.object,
   routerGo: PropTypes.func,
 };

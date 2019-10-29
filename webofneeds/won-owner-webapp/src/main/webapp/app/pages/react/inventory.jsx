@@ -165,6 +165,7 @@ class PageInventory extends React.Component {
                   showSuggestions={true}
                   showPersona={true}
                   showCreate={true}
+                  showCreatePersona={false}
                 />
               </div>
               {this.props.hasOwnedInactiveAtomUris && (
