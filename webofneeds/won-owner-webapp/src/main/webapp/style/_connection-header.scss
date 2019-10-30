@@ -30,9 +30,9 @@ won-connection-header {
   //padding: 0.5rem;
 
   display: grid;
-  grid-template-areas: "icon main";
-  grid-template-columns: min-content 1fr;
-  grid-column-gap: 0.5rem;
+  grid-template-areas: "icon main indicator";
+  grid-template-columns: min-content 1fr min-content;
+  //grid-column-gap: 0.5rem;
   min-width: 0;
 
   won-group-icon,
@@ -45,11 +45,23 @@ won-connection-header {
     @include square-image($postIconSize);
   }
 
+  .ch__indicator {
+    grid-area: indicator;
+    align-self: center;
+    padding-left: 0.5rem;
+
+    > won-connection-indicators > svg {
+      @include fixed-square($iconSize);
+    }
+  }
+
   .ch__right {
     grid-area: main;
     display: grid;
+    padding-left: 0.5rem;
     grid-template-areas: "topline" "subtitle";
     min-width: 0;
+
     &__topline {
       grid-area: topline;
       min-width: 0;
@@ -62,10 +74,12 @@ won-connection-header {
         font-weight: 400;
         min-width: 0;
       }
-      &__notitle {
-        color: $won-subtitle-gray;
-      }
     }
+
+    &__notitle {
+      color: $won-subtitle-gray;
+    }
+
     &__subtitle {
       grid-area: subtitle;
       display: grid;
