@@ -10,6 +10,7 @@ import WonAtomContent from "./atom-content.jsx";
 import ChatTextfield from "./chat-textfield.jsx";
 import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as atomUtils from "../redux/utils/atom-utils";
+import * as connectionUtils from "../redux/utils/connection-utils";
 import * as viewUtils from "../redux/utils/view-utils";
 import * as processSelectors from "../redux/selectors/process-selectors";
 import * as accountUtils from "../redux/utils/account-utils";
@@ -40,17 +41,24 @@ const mapStateToProps = (state, ownProps) => {
     ownProps.atomUri
   );
 
-  const chatSocket = atomUtils.hasChatSocket(atom)
-    ? atomUtils.getSocketUri(atom, won.CHAT.ChatSocketCompacted)
-    : undefined;
-  const groupSocket = atomUtils.hasGroupSocket(atom)
-    ? atomUtils.getSocketUri(atom, won.GROUP.GroupSocketCompacted)
-    : undefined;
+  const chatSocketUri = atomUtils.getSocketUri(
+    atom,
+    won.CHAT.ChatSocketCompacted
+  );
+  const groupSocketUri = atomUtils.getSocketUri(
+    atom,
+    won.GROUP.GroupSocketCompacted
+  );
 
   const atomLoading =
     !atom || processSelectors.isAtomLoading(state, ownProps.atomUri);
 
   const holderUri = atomUtils.getHeldByUri(atom);
+
+  const ownedAtoms = generalSelectors.getOwnedAtoms(state);
+
+  const ownedChatSocketAtoms =
+    ownedAtoms && ownedAtoms.filter(atom => atomUtils.hasChatSocket(atom));
 
   return {
     className: ownProps.className,
@@ -74,8 +82,9 @@ const mapStateToProps = (state, ownProps) => {
       (showEnabledUseCases || showReactionUseCases || showAdHocRequestField),
     addHolderUri: showEnabledUseCases ? holderUri : undefined,
     holderUri,
-    chatSocket,
-    groupSocket,
+    chatSocketUri,
+    groupSocketUri,
+    ownedChatSocketAtoms,
   };
 };
 
@@ -110,6 +119,45 @@ const mapDispatchToProps = dispatch => {
           persona
         )
       );
+    },
+    connect: (
+      ownedAtomUri,
+      connectionUri,
+      targetAtomUri,
+      message,
+      ownSocket,
+      targetSocket
+    ) => {
+      dispatch(
+        actionCreators.atoms__connect(
+          ownedAtomUri,
+          connectionUri,
+          targetAtomUri,
+          message,
+          ownSocket,
+          targetSocket
+        )
+      );
+    },
+    sendChatMessage: (
+      trimmedMsg,
+      additionalContent,
+      referencedContent,
+      connectionUri,
+      isTTL
+    ) => {
+      dispatch(
+        actionCreators.connections__sendChatMessage(
+          trimmedMsg,
+          additionalContent,
+          referencedContent,
+          connectionUri,
+          isTTL
+        )
+      );
+    },
+    connectionsOpen: (connectionUri, message) => {
+      dispatch(actionCreators.connections__open(connectionUri, message));
     },
   };
 };
@@ -169,7 +217,7 @@ class AtomInfo extends React.Component {
         <div className="atom-info__footer">
           {this.props.showAdHocRequestField && (
             <React.Fragment>
-              {this.props.chatSocket && (
+              {this.props.chatSocketUri && (
                 <ChatTextfield
                   placeholder="Message (optional)"
                   allowEmptySubmit={true}
@@ -178,13 +226,13 @@ class AtomInfo extends React.Component {
                   onSubmit={({ value, selectedPersona }) =>
                     this.sendAdHocRequest(
                       value,
-                      this.props.chatSocket,
+                      this.props.chatSocketUri,
                       selectedPersona && selectedPersona.personaId
                     )
                   }
                 />
               )}
-              {this.props.groupSocket && (
+              {this.props.groupSocketUri && (
                 <ChatTextfield
                   placeholder="Message (optional)"
                   allowEmptySubmit={true}
@@ -193,7 +241,7 @@ class AtomInfo extends React.Component {
                   onSubmit={({ value, selectedPersona }) =>
                     this.sendAdHocRequest(
                       value,
-                      this.props.groupSocket,
+                      this.props.groupSocketUri,
                       selectedPersona && selectedPersona.personaId
                     )
                   }
@@ -245,19 +293,103 @@ class AtomInfo extends React.Component {
     });
   }
 
-  sendAdHocRequest(message, connectToSocketUri, persona) {
+  sendAdHocRequest(message, connectToSocketUri, personaUri) {
     const _atomUri = this.props.atomUri;
 
     if (this.props.loggedIn) {
-      this.props.routerGoResetParams("connections");
-
       if (_atomUri) {
-        this.props.connectionsConnectAdHoc(
-          _atomUri,
-          message,
-          connectToSocketUri,
-          persona
-        );
+        const personaAtom = get(this.props.ownedChatSocketAtoms, personaUri);
+
+        if (personaAtom) {
+          const targetSocketType =
+            connectToSocketUri === this.props.chatSocketUri
+              ? won.CHAT.ChatSocketCompacted
+              : won.GROUP.GroupSocketCompacted;
+
+          // if the personaAtom already contains a chatSocket we will just use the persona as the Atom that connects
+          const personaConnections = get(personaAtom, "connections")
+            .filter(conn => get(conn, "targetAtomUri") === _atomUri)
+            .filter(conn => get(conn, "targetSocketUri") === connectToSocketUri)
+            .filter(
+              conn =>
+                get(conn, "socketUri") ===
+                atomUtils.getSocketUri(
+                  personaAtom,
+                  won.CHAT.ChatSocketCompacted
+                )
+            );
+
+          if (personaConnections.size == 0) {
+            this.props.connect(
+              personaUri,
+              undefined,
+              _atomUri,
+              message,
+              won.CHAT.ChatSocketCompacted,
+              targetSocketType
+            );
+            this.props.routerGoResetParams("connections");
+          } else if (personaConnections.size == 1) {
+            const personaConnection = personaConnections.first();
+            const personaConnectionUri = get(personaConnection, "uri");
+
+            if (
+              connectionUtils.isSuggested(personaConnection) ||
+              connectionUtils.isClosed(personaConnection)
+            ) {
+              this.props.connect(
+                personaUri,
+                personaConnectionUri,
+                _atomUri,
+                message,
+                won.CHAT.ChatSocketCompacted,
+                targetSocketType
+              );
+            } else if (connectionUtils.isRequestSent(personaConnection)) {
+              // Just go to the connection without sending another request
+              /*
+              //Send another Request with a new message if there is a message present
+              this.props.connect(
+                personaUri,
+                personaConnectionUri,
+                _atomUri,
+                message,
+                won.CHAT.ChatSocketCompacted,
+                targetSocketType
+              );
+              */
+            } else if (connectionUtils.isRequestReceived(personaConnection)) {
+              this.props.connectionsOpen(personaConnectionUri, message);
+            } else if (connectionUtils.isConnected(personaConnection)) {
+              this.props.sendChatMessage(
+                message,
+                undefined,
+                undefined,
+                personaConnectionUri,
+                false
+              );
+            }
+
+            this.props.routerGo("connections", {
+              connectionUri: personaConnectionUri,
+            });
+          } else {
+            console.error(
+              "more than one connection stored between two atoms that use the same exact sockets",
+              personaAtom,
+              connectToSocketUri
+            );
+          }
+        } else {
+          this.props.routerGoResetParams("connections");
+
+          this.props.connectionsConnectAdHoc(
+            _atomUri,
+            message,
+            connectToSocketUri,
+            personaUri
+          );
+        }
       }
     } else {
       this.props.showTermsDialog(
@@ -271,7 +403,7 @@ class AtomInfo extends React.Component {
                 _atomUri,
                 message,
                 connectToSocketUri,
-                persona
+                personaUri
               );
             }
           },
@@ -304,8 +436,12 @@ AtomInfo.propTypes = {
   hideModalDialog: PropTypes.func,
   showTermsDialog: PropTypes.func,
   connectionsConnectAdHoc: PropTypes.func,
-  chatSocket: PropTypes.string,
-  groupSocket: PropTypes.string,
+  ownedChatSocketAtoms: PropTypes.func,
+  chatSocketUri: PropTypes.string,
+  groupSocketUri: PropTypes.string,
+  connect: PropTypes.func,
+  connectionsOpen: PropTypes.func,
+  sendChatMessage: PropTypes.func,
 };
 
 export default connect(
