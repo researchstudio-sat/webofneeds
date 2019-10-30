@@ -12,7 +12,7 @@ import * as connectionUtils from "../redux/utils/connection-utils";
 import won from "../won-es6";
 import WonLabelledHr from "./labelled-hr.jsx";
 import WonSuggestAtomPicker from "./details/picker/suggest-atom-picker.jsx";
-import WonAtomCard from "./atom-card.jsx";
+import WonAtomHeader from "./atom-header.jsx";
 
 import "~/style/_atom-content-buddies.scss";
 import VisibilitySensor from "react-visibility-sensor";
@@ -101,6 +101,9 @@ const mapDispatchToProps = dispatch => {
           targetSocket
         )
       );
+    },
+    routerGo: (path, props) => {
+      dispatch(actionCreators.router__stateGo(path, props));
     },
   };
 };
@@ -220,11 +223,14 @@ class WonAtomContentBuddies extends React.Component {
                     (connectionUtils.isUnread(conn) ? " won-unread " : "")
                   }
                 >
-                  <WonAtomCard
+                  <WonAtomHeader
                     atomUri={get(conn, "targetAtomUri")}
-                    currentLocation={this.props.currentLocation}
-                    showSuggestions={false}
-                    showPersona={false}
+                    hideTimestamp={true}
+                    onClick={() =>
+                      this.props.routerGo("post", {
+                        postUri: get(conn, "targetAtomUri"),
+                      })
+                    }
                   />
                   {actionButtons}
                 </div>
@@ -265,11 +271,14 @@ class WonAtomContentBuddies extends React.Component {
         buddies = this.props.buddiesArray.map(memberUri => {
           return (
             <div className="acb__buddy" key={memberUri}>
-              <WonAtomCard
+              <WonAtomHeader
                 atomUri={memberUri}
-                currentLocation={this.props.currentLocation}
-                showSuggestions={false}
-                showPersona={false}
+                hideTimestamp={true}
+                onClick={() =>
+                  this.props.routerGo("post", {
+                    postUri: memberUri,
+                  })
+                }
               />
               <div className="acb__buddy__actions" />
             </div>
@@ -388,6 +397,7 @@ WonAtomContentBuddies.propTypes = {
   connectionClose: PropTypes.func,
   connectionOpen: PropTypes.func,
   connect: PropTypes.func,
+  routerGo: PropTypes.func,
 };
 
 export default connect(
