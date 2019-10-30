@@ -10,13 +10,18 @@ import VisibilitySensor from "react-visibility-sensor";
 import { get, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
+import won from "../won-es6";
 import { labels, relativeTime } from "../won-label-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as messageSelectors from "../redux/selectors/message-selectors.js";
 import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as messageUtils from "../redux/utils/message-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
+import Immutable from "immutable";
+
 import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
 
 import "~/style/_connection-header.scss";
@@ -69,6 +74,27 @@ const mapStateToProps = (state, ownProps) => {
     get(targetAtom, "uri")
   );
 
+  const isTargetAtomOwned = accountUtils.isAtomOwned(
+    get(state, "account"),
+    targetAtomUri
+  );
+
+  const groupConnections =
+    isTargetAtomOwned &&
+    get(targetAtom, "connections")
+      .filter(
+        con =>
+          atomUtils.getSocketUri(targetAtom, won.GROUP.GroupSocketCompacted) ===
+          get(con, "socketUri")
+      )
+      .filter(con => connectionUtils.isRequestReceived(con));
+
+  const hasGroupRequests = groupConnections && groupConnections.size > 0;
+  const hasNewGroupRequests = !!(
+    hasGroupRequests &&
+    groupConnections.find(con => connectionUtils.isUnread(con))
+  );
+
   return {
     connectionUri: ownProps.connectionUri,
     onClick: ownProps.onClick,
@@ -83,6 +109,9 @@ const mapStateToProps = (state, ownProps) => {
       generalSelectors.getAtoms(state),
       connection
     ),
+    hasGroupRequests: hasGroupRequests,
+    hasNewGroupRequests: hasNewGroupRequests,
+    isTargetAtomOwned: isTargetAtomOwned,
     isDirectResponseFromRemote: atomUtils.isDirectResponseAtom(targetAtom),
     isGroupChatEnabled: atomUtils.hasGroupSocket(targetAtom),
     isChatEnabled: atomUtils.hasChatSocket(targetAtom),
@@ -121,6 +150,17 @@ const mapDispatchToProps = dispatch => {
     fetchAtom: atomUri => {
       dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
     },
+
+    selectTab: (atomUri, tab) => {
+      dispatch(
+        actionCreators.atoms__selectTab(
+          Immutable.fromJS({ atomUri: atomUri, selectTab: tab })
+        )
+      );
+    },
+    routerGo: (path, props) => {
+      dispatch(actionCreators.router__stateGo(path, props));
+    },
   };
 };
 
@@ -154,9 +194,17 @@ class WonConnectionHeader extends React.Component {
       );
     } else {
       const headerIcon = this.props.isConnectionToGroup ? (
-        <WonGroupIcon connectionUri={this.props.connectionUri} />
+        <div
+          className="ch__icon"
+          onClick={this.props.onClick ? () => this.props.onClick() : undefined}
+        >
+          <WonGroupIcon connectionUri={this.props.connectionUri} />
+        </div>
       ) : (
-        <div className="ch__icon">
+        <div
+          className="ch__icon"
+          onClick={this.props.onClick ? () => this.props.onClick() : undefined}
+        >
           <WonAtomIcon atomUri={get(this.props.targetAtom, "uri")} />
         </div>
       );
@@ -275,6 +323,7 @@ class WonConnectionHeader extends React.Component {
             <div className="ch__right__topline">
               {headerRightToplineContent}
             </div>
+
             <div className="ch__right__subtitle">
               <span className="ch__right__subtitle__type">
                 {personaName}
@@ -292,14 +341,43 @@ class WonConnectionHeader extends React.Component {
           </React.Fragment>
         );
       }
+      let incomingRequestsIcon =
+        this.props.isTargetAtomOwned && this.props.hasGroupRequests ? (
+          <div className="ch__indicator">
+            <won-connection-indicators>
+              <svg
+                className={
+                  "indicators__item " +
+                  (!this.props.hasNewGroupRequests
+                    ? " indicators__item--reads "
+                    : "") +
+                  (this.props.hasNewGroupRequests
+                    ? " indicators__item--unreads "
+                    : "")
+                }
+                //TODO
+                onClick={() => this.selectMembersTab()}
+              >
+                <use xlinkHref="#ico36_incoming" href="#ico36_incoming" />
+              </svg>
+            </won-connection-indicators>
+          </div>
+        ) : (
+          undefined
+        );
 
       return (
-        <won-connection-header
-          onClick={this.props.onClick ? () => this.props.onClick() : undefined}
-          class={this.props.onClick ? "clickable" : ""}
-        >
+        <won-connection-header class={this.props.onClick ? "clickable" : ""}>
           {headerIcon}
-          <div className="ch__right">{headerRightContent}</div>
+          <div
+            className="ch__right"
+            onClick={
+              this.props.onClick ? () => this.props.onClick() : undefined
+            }
+          >
+            {headerRightContent}
+          </div>
+          {incomingRequestsIcon}
         </won-connection-header>
       );
     }
@@ -308,6 +386,11 @@ class WonConnectionHeader extends React.Component {
     if (isVisible) {
       this.ensureAtomIsLoaded();
     }
+  }
+
+  selectMembersTab() {
+    this.props.selectTab(this.props.targetAtomUri, "PARTICIPANTS");
+    this.props.routerGo("post", { postUri: this.props.targetAtomUri });
   }
 
   ensureAtomIsLoaded() {
@@ -323,6 +406,8 @@ class WonConnectionHeader extends React.Component {
 WonConnectionHeader.propTypes = {
   connectionUri: PropTypes.string.isRequired,
   onClick: PropTypes.func,
+  selectTab: PropTypes.func,
+  routerGo: PropTypes.func,
   connection: PropTypes.object,
   groupMembersArray: PropTypes.arrayOf(PropTypes.object),
   groupMembersSize: PropTypes.number,
@@ -330,6 +415,9 @@ WonConnectionHeader.propTypes = {
   targetAtom: PropTypes.object,
   remotePersonaName: PropTypes.string,
   isConnectionToGroup: PropTypes.bool,
+  hasGroupRequests: PropTypes.bool,
+  hasNewGroupRequests: PropTypes.bool,
+  isTargetAtomOwned: PropTypes.bool,
   isDirectResponseFromRemote: PropTypes.bool,
   isGroupChatEnabled: PropTypes.bool,
   isChatEnabled: PropTypes.bool,
