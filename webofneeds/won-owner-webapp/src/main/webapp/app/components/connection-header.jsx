@@ -20,7 +20,6 @@ import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as messageUtils from "../redux/utils/message-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
-import * as viewUtils from "../redux/utils/view-utils.js";
 import Immutable from "immutable";
 
 import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
@@ -112,11 +111,6 @@ const mapStateToProps = (state, ownProps) => {
     ),
     hasGroupRequests: hasGroupRequests,
     hasNewGroupRequests: hasNewGroupRequests,
-    visibleTab: viewUtils.getVisibleTabByAtomUri(
-      get(state, "view"),
-      ownProps.atomUri,
-      ownProps.defaultTab
-    ),
     isTargetAtomOwned: isTargetAtomOwned,
     isDirectResponseFromRemote: atomUtils.isDirectResponseAtom(targetAtom),
     isGroupChatEnabled: atomUtils.hasGroupSocket(targetAtom),
@@ -423,7 +417,6 @@ WonConnectionHeader.propTypes = {
   isConnectionToGroup: PropTypes.bool,
   hasGroupRequests: PropTypes.bool,
   hasNewGroupRequests: PropTypes.bool,
-  visibleTab: PropTypes.string,
   isTargetAtomOwned: PropTypes.bool,
   isDirectResponseFromRemote: PropTypes.bool,
   isGroupChatEnabled: PropTypes.bool,
