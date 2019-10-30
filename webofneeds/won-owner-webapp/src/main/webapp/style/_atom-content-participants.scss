@@ -18,6 +18,10 @@ won-atom-content-participants {
     border: $thinGrayBorder;
     background: $won-light-gray;
 
+    won-atom-header {
+      padding: 0.5rem;
+    }
+
     &.won-unread {
       border-color: $won-unread-attention;
       /*box-shadow: 0px 0px 5px 5px var(--won-primary-color);*/
