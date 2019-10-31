@@ -28,7 +28,7 @@ public enum RestStatusResponse {
     TOKEN_CREATION_FAILED(3401, "Could not create VerifyToken", HttpStatus.SERVICE_UNAVAILABLE),
     TOKEN_EXPIRED(3403, "Verification Token is expired", HttpStatus.BAD_REQUEST),
     TOKEN_RESEND_FAILED_ALREADY_VERIFIED(3404, "User is already verified, E-Mail will not be sent",
-            HttpStatus.CONFLICT),
+                    HttpStatus.CONFLICT),
     TOKEN_RESEND_FAILED_USER_ANONYMOUS(3405, "User is not verifiable, E-Mail will not be sent", HttpStatus.FORBIDDEN),
     TOKEN_PURPOSE_MISMATCH(3406, "Token was issued for another purpose", HttpStatus.BAD_REQUEST),
     SIGNUP_FAILED(4400, "Registration failed", HttpStatus.BAD_REQUEST),
@@ -39,7 +39,6 @@ public enum RestStatusResponse {
     RECOVERY_KEYGEN_USER_NOT_FOUND(8100, "Could not generate recovery key: user not found", HttpStatus.BAD_REQUEST),
     RECOVERY_KEYGEN_WRONG_PASSWORD(8101, "Could not generate recovery key: wrong password", HttpStatus.BAD_REQUEST),
     SUBSCRIBE_SUCCESS(8200, "Successfully subscribed to push notifications", HttpStatus.OK);
-
     private final int code;
     private final String message;
     private final HttpStatus httpStatus;
