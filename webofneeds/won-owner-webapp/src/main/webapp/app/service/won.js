@@ -343,6 +343,10 @@ won.RESPONSECODE = Object.freeze({
   USER_ALREADY_EXISTS: 1405,
   TRANSFERUSER_NOT_FOUND: 2400,
   TRANSFERUSER_ALREADY_EXISTS: 2401,
+  PASSWORDCHANGE_USER_NOT_FOUND: 8400,
+  PASSWORDCHANGE_BAD_PASSWORD: 8401,
+  PASSWORDCHANGE_KEYSTORE_PROBLEM: 8402,
+  PASSWORDCHANGE_WRONG_OLD_PASSWORD: 8403,
   TOKEN_VERIFICATION_SUCCESS: 3200,
   TOKEN_RESEND_SUCCESS: 3201,
   TOKEN_NOT_FOUND: 3400,
@@ -350,11 +354,15 @@ won.RESPONSECODE = Object.freeze({
   TOKEN_EXPIRED: 3403,
   TOKEN_RESEND_FAILED_ALREADY_VERIFIED: 3404,
   TOKEN_RESEND_FAILED_USER_ANONYMOUS: 3405,
+  TOKEN_PURPOSE_MISMATCH: 3406,
   SIGNUP_FAILED: 4400,
   SETTINGS_CREATED: 5200,
   TOS_ACCEPT_SUCCESS: 6200,
   EXPORT_SUCCESS: 7200,
   EXPORT_NOT_VERIFIED: 7403,
+  RECOVERY_KEYGEN_USER_NOT_FOUND: 8100,
+  RECOVERY_KEYGEN_WRONG_PASSWORD: 8101,
+  SUBSCRIBE_SUCCESS: 8200,
 
   PRIVATEID_NOT_FOUND: 666, //this one is not defined in RestStatusResponse.java
 });
@@ -815,7 +823,9 @@ won.addContentGraphReferencesToMessageGraph = function(
           ? []
           : existingContentRefs;
       for (const graphURI of graphURIs) {
-        contentGraphURIs.push({ "@id": graphURI });
+        contentGraphURIs.push({
+          "@id": graphURI,
+        });
       }
       messageGraph["@graph"][0][
         won.WONMSG.hasContentCompacted
@@ -841,12 +851,16 @@ won.addMessageGraph = function(builder, graphURIs, messageType) {
     "@graph": [
       {
         "@id": won.WONMSG.uriPlaceholder.event,
-        "msg:messageType": { "@id": messageType },
+        "msg:messageType": {
+          "@id": messageType,
+        },
       },
       {
         "@id": unsetMessageGraphUri,
         "@type": "msg:EnvelopeGraph",
-        "rdfg:subGraphOf": { "@id": won.WONMSG.uriPlaceholder.event },
+        "rdfg:subGraphOf": {
+          "@id": won.WONMSG.uriPlaceholder.event,
+        },
       },
     ],
     "@id": unsetMessageGraphUri,
@@ -1037,7 +1051,10 @@ won.n3Parse = async function(rdf, parserArgs) {
         quads.push(quad);
       } else {
         // all quads collected
-        resolve({ quads, prefixes });
+        resolve({
+          quads,
+          prefixes,
+        });
       }
     });
   });
@@ -1165,7 +1182,9 @@ WonMessage.prototype = {
         const eventUriPrefix = prefixOfUri(this.getMessageUri());
         const jsonldData = {
           "@context": Object.assign(
-            { event: eventUriPrefix },
+            {
+              event: eventUriPrefix,
+            },
             won.defaultContext
           ),
           "@graph": contentGraphs,
@@ -1713,7 +1732,9 @@ WonMessage.prototype = {
     this.graphs.forEach(graph => {
       let graphUri = graph["@id"];
       if (this.__isEnvelopeGraph(graph)) {
-        let node = { uri: graphUri };
+        let node = {
+          uri: graphUri,
+        };
         unreferencedEnvelopes.push(graphUri);
         let msgUriAndDirection = this.__getMessageUriAndDirection(graph);
         if (msgUriAndDirection) {
@@ -1743,7 +1764,9 @@ WonMessage.prototype = {
         //do nothing - we don't want to handle signatures in the client for now
       } else {
         //content graph
-        nodes[graphUri] = { uri: graphUri };
+        nodes[graphUri] = {
+          uri: graphUri,
+        };
       }
     });
     //second pass: connect the nodes so we get a tree
@@ -1979,7 +2002,9 @@ WonMessage.prototype = {
  */
 won.MessageBuilder = function MessageBuilder(messageType, content) {
   if (messageType == null) {
-    throw { message: "messageType must not be null!" };
+    throw {
+      message: "messageType must not be null!",
+    };
   }
   let graphNames = null;
   if (content != null) {
@@ -2019,7 +2044,9 @@ won.MessageBuilder.prototype = {
   forEnvelopeData: function(envelopeData) {
     const node = this.getMessageEventNode();
     for (let key in envelopeData) {
-      node[key] = { "@id": envelopeData[key] };
+      node[key] = {
+        "@id": envelopeData[key],
+      };
     }
     return this;
   },
@@ -2128,7 +2155,11 @@ won.MessageBuilder.prototype = {
     //none found: create it
     const contentGraph = {
       "@id": this.eventUriValue + "#content",
-      "@graph": [{ "@id": this.eventUriValue }],
+      "@graph": [
+        {
+          "@id": this.eventUriValue,
+        },
+      ],
     };
     graphs.push(contentGraph);
     //add a reference to it to the envelope
