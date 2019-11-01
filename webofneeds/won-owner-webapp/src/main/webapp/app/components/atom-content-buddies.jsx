@@ -10,6 +10,7 @@ import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as connectionSelectors from "../redux/selectors/connection-selectors";
 import * as connectionUtils from "../redux/utils/connection-utils";
 import won from "../won-es6";
+import SwipeableViews from "react-swipeable-views";
 import WonLabelledHr from "./labelled-hr.jsx";
 import WonSuggestAtomPicker from "./details/picker/suggest-atom-picker.jsx";
 import WonAtomHeader from "./atom-header.jsx";
@@ -33,7 +34,7 @@ const mapStateToProps = (state, ownProps) => {
       state,
       ownProps.atomUri,
       true,
-      true
+      false
     );
 
   let excludedFromRequestUris = [ownProps.atomUri];
@@ -134,8 +135,10 @@ class WonAtomContentBuddies extends React.Component {
         buddies = this.props.buddyConnectionsArray.map(conn => {
           if (!connectionUtils.isClosed(conn)) {
             let actionButtons;
+            let headerClassName;
 
             if (connectionUtils.isRequestReceived(conn)) {
+              headerClassName = "status--received";
               actionButtons = (
                 <div className="acb__buddy__actions">
                   <div
@@ -155,6 +158,7 @@ class WonAtomContentBuddies extends React.Component {
                 </div>
               );
             } else if (connectionUtils.isSuggested(conn)) {
+              headerClassName = "status--suggested";
               actionButtons = (
                 <div className="acb__buddy__actions">
                   <div
@@ -174,21 +178,16 @@ class WonAtomContentBuddies extends React.Component {
                 </div>
               );
             } else if (connectionUtils.isRequestSent(conn)) {
+              headerClassName = "status--sent";
               actionButtons = (
                 <div className="acb__buddy__actions">
-                  <div
-                    className="acb__buddy__actions__button red won-button--outlined thin"
-                    disabled={true}
-                  >
-                    Waiting for Accept...
-                  </div>
                   <div
                     className="acb__buddy__actions__button red won-button--outlined thin"
                     onClick={() =>
                       this.closeConnection(conn, "Cancel Buddy Request?")
                     }
                   >
-                    Cancel
+                    Cancel Request
                   </div>
                 </div>
               );
@@ -203,8 +202,16 @@ class WonAtomContentBuddies extends React.Component {
                   </div>
                 </div>
               );
+            } else if (connectionUtils.isClosed(conn)) {
+              actionButtons = (
+                <div className="acb__buddy__actions">
+                  Buddy has been removed
+                </div>
+              );
             } else {
-              actionButtons = <div className="acb__buddy__actions" />;
+              actionButtons = (
+                <div className="acb__buddy__actions">Unknown State</div>
+              );
             }
 
             return (
@@ -223,16 +230,19 @@ class WonAtomContentBuddies extends React.Component {
                     (connectionUtils.isUnread(conn) ? " won-unread " : "")
                   }
                 >
-                  <WonAtomHeader
-                    atomUri={get(conn, "targetAtomUri")}
-                    hideTimestamp={true}
-                    onClick={() =>
-                      this.props.routerGo("post", {
-                        postUri: get(conn, "targetAtomUri"),
-                      })
-                    }
-                  />
-                  {actionButtons}
+                  <SwipeableViews enableMouseEvents>
+                    <WonAtomHeader
+                      className={headerClassName}
+                      atomUri={get(conn, "targetAtomUri")}
+                      hideTimestamp={true}
+                      onClick={() =>
+                        this.props.routerGo("post", {
+                          postUri: get(conn, "targetAtomUri"),
+                        })
+                      }
+                    />
+                    {actionButtons}
+                  </SwipeableViews>
                 </div>
               </VisibilitySensor>
             );
@@ -271,16 +281,18 @@ class WonAtomContentBuddies extends React.Component {
         buddies = this.props.buddiesArray.map(memberUri => {
           return (
             <div className="acb__buddy" key={memberUri}>
-              <WonAtomHeader
-                atomUri={memberUri}
-                hideTimestamp={true}
-                onClick={() =>
-                  this.props.routerGo("post", {
-                    postUri: memberUri,
-                  })
-                }
-              />
-              <div className="acb__buddy__actions" />
+              <SwipeableViews enableMouseEvents>
+                <WonAtomHeader
+                  atomUri={memberUri}
+                  hideTimestamp={true}
+                  onClick={() =>
+                    this.props.routerGo("post", {
+                      postUri: memberUri,
+                    })
+                  }
+                />
+                <div className="acb__buddy__actions" />
+              </SwipeableViews>
             </div>
           );
         });
