@@ -17,6 +17,7 @@ import WonAtomHeader from "./atom-header.jsx";
 import "~/style/_atom-content-participants.scss";
 import VisibilitySensor from "react-visibility-sensor";
 import PropTypes from "prop-types";
+import SwipeableViews from "react-swipeable-views";
 
 const mapStateToProps = (state, ownProps) => {
   const post = getIn(state, ["atoms", ownProps.atomUri]);
@@ -118,8 +119,10 @@ class WonAtomContentParticipants extends React.Component {
         participants = this.props.groupChatConnectionsArray.map(conn => {
           if (!connectionUtils.isClosed(conn)) {
             let actionButtons;
+            let headerClassName;
 
             if (connectionUtils.isRequestReceived(conn)) {
+              headerClassName = "status--received";
               actionButtons = (
                 <div className="acp__participant__actions">
                   <button
@@ -139,6 +142,7 @@ class WonAtomContentParticipants extends React.Component {
                 </div>
               );
             } else if (connectionUtils.isSuggested(conn)) {
+              headerClassName = "status--suggested";
               actionButtons = (
                 <div className="acp__participant__actions">
                   <button
@@ -161,6 +165,7 @@ class WonAtomContentParticipants extends React.Component {
                 </div>
               );
             } else if (connectionUtils.isRequestSent(conn)) {
+              headerClassName = "status--sent";
               actionButtons = (
                 <div className="acp__participant__actions">
                   <button
@@ -190,8 +195,17 @@ class WonAtomContentParticipants extends React.Component {
                   </button>
                 </div>
               );
+            } else if (connectionUtils.isClosed(conn)) {
+              headerClassName = "status--closed";
+              actionButtons = (
+                <div className="acp__participant__actions">
+                  Member has been removed
+                </div>
+              );
             } else {
-              actionButtons = <div className="acp__participant__actions" />;
+              actionButtons = (
+                <div className="acp__participant__actions">Unknown State</div>
+              );
             }
 
             return (
@@ -210,16 +224,19 @@ class WonAtomContentParticipants extends React.Component {
                     (connectionUtils.isUnread(conn) ? " won-unread " : "")
                   }
                 >
-                  <WonAtomHeader
-                    atomUri={get(conn, "targetAtomUri")}
-                    hideTimestamp={true}
-                    onClick={() =>
-                      this.props.routerGo("post", {
-                        postUri: get(conn, "targetAtomUri"),
-                      })
-                    }
-                  />
-                  {actionButtons}
+                  <SwipeableViews enableMouseEvents>
+                    <WonAtomHeader
+                      atomUri={get(conn, "targetAtomUri")}
+                      className={headerClassName}
+                      hideTimestamp={true}
+                      onClick={() =>
+                        this.props.routerGo("post", {
+                          postUri: get(conn, "targetAtomUri"),
+                        })
+                      }
+                    />
+                    {actionButtons}
+                  </SwipeableViews>
                 </div>
               </VisibilitySensor>
             );
@@ -263,14 +280,16 @@ class WonAtomContentParticipants extends React.Component {
         participants = this.props.groupMembersArray.map(memberUri => {
           return (
             <div className="acp__participant" key={memberUri}>
-              <WonAtomHeader
-                atomUri={memberUri}
-                hideTimestamp={true}
-                onClick={() =>
-                  this.props.routerGo("post", { postUri: memberUri })
-                }
-              />
-              <div className="acp__participant__actions" />
+              <SwipeableViews enableMouseEvents>
+                <WonAtomHeader
+                  atomUri={memberUri}
+                  hideTimestamp={true}
+                  onClick={() =>
+                    this.props.routerGo("post", { postUri: memberUri })
+                  }
+                />
+                <div className="acp__participant__actions" />
+              </SwipeableViews>
             </div>
           );
         });

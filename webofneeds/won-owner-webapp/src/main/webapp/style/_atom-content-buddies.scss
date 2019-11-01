@@ -26,6 +26,10 @@ won-atom-content-buddies {
         opacity: 0.25;
       }
 
+      &.status--closed {
+        //TODO: Filter grayscale or something
+      }
+
       &.status--suggested,
       &.status--received {
         @include animateOpacityHeartBeat();

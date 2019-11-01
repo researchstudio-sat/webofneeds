@@ -181,6 +181,12 @@ class WonAtomContentBuddies extends React.Component {
               headerClassName = "status--sent";
               actionButtons = (
                 <div className="acb__buddy__actions">
+                  <button
+                    className="acb__buddy__actions__button red won-button--outlined thin"
+                    disabled={true}
+                  >
+                    Waiting for Accept...
+                  </button>
                   <div
                     className="acb__buddy__actions__button red won-button--outlined thin"
                     onClick={() =>
@@ -203,6 +209,7 @@ class WonAtomContentBuddies extends React.Component {
                 </div>
               );
             } else if (connectionUtils.isClosed(conn)) {
+              headerClassName = "status--closed";
               actionButtons = (
                 <div className="acb__buddy__actions">
                   Buddy has been removed
