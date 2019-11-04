@@ -14,7 +14,7 @@ import "~/style/_atom-connections-indicator.scss";
 const mapStateToProps = (state, ownProps) => {
   const atom = getIn(state, ["atoms", ownProps.atomUri]);
 
-  const requestedConnections = atomUtils.getRequestedConnections(atom);
+  const requestedConnections = atomUtils.getRequestedConnections(atom, state);
   const requestsCount = requestedConnections ? requestedConnections.size : 0;
   const unreadRequests =
     requestedConnections &&
@@ -22,7 +22,10 @@ const mapStateToProps = (state, ownProps) => {
   const unreadRequestsCount = unreadRequests ? unreadRequests.size : 0;
 
   const hasUnreadChatMessages = ownProps && ownProps.hasUnreadChatConnections;
-  const unreadChatConnections = atomUtils.getUnreadChatMessageConnections(atom);
+  const unreadChatConnections = atomUtils.getUnreadChatMessageConnections(
+    atom,
+    state
+  );
 
   return {
     atomUri: ownProps.atomUri,
@@ -57,7 +60,6 @@ class WonAtomConnectionsIndicator extends React.Component {
   }
 
   render() {
-    // TODO: add stuff for msgs
     return (
       <won-atom-connections-indicator
         class={!this.props.requestsCount > 0 ? "won-no-connections" : ""}
