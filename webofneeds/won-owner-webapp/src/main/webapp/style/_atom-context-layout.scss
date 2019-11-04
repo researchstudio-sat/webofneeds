@@ -1,0 +1,26 @@
+@import "won-config";
+@import "sizing-utils";
+@import "square-image";
+@import "animate";
+
+won-atom-context-layout {
+  display: grid;
+  grid-template-areas: "main trigger";
+  grid-template-columns: 1fr min-content;
+  //grid-column-gap: 0.5rem;
+  min-width: 0;
+
+  @include square-image($postIconSize);
+
+  .cl__main {
+    grid-area: main;
+  }
+
+  .cl__trigger {
+    grid-area: trigger;
+    align-self: center;
+    padding-left: 0.5rem;
+    --local-primary: #{$won-secondary-color};
+    @include fixed-square($postIconSizeMobile);
+  }
+}
