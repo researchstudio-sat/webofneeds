@@ -20,11 +20,12 @@ const mapStateToProps = (state, ownProps) => {
     atom
   );
 
-  const unreadChats =
-    ownProps.hasUnreadChatConnections &&
-    connectionSelectors.getUnreadChatMessageConnections(state, atom);
+  const unreadChats = connectionSelectors.getUnreadChatMessageConnections(
+    state,
+    atom
+  );
+  const hasUnreadChats = !!unreadChats && unreadChats.size > 0;
 
-  // TODO: requests count is wrong?
   const requestsCount = requests ? requests.size : 0;
   const unreadRequestsCount = unreadRequests ? unreadRequests.size : 0;
   // TODO: unread msgs count?
@@ -34,7 +35,7 @@ const mapStateToProps = (state, ownProps) => {
     requestsCount,
     unreadRequestsCount,
     unreadRequests,
-    hasUnreadChats: ownProps.hasUnreadChatConnections,
+    hasUnreadChats,
     unreadChats,
   };
 };
@@ -50,7 +51,6 @@ const mapDispatchToProps = dispatch => {
 class WonAtomConnectionsIndicator extends React.Component {
   constructor(props) {
     super(props);
-    window.con4dbg = this; // TODO: remove debug
     this.showAtomConnections = this.showAtomConnections.bind(this);
   }
 
@@ -62,30 +62,47 @@ class WonAtomConnectionsIndicator extends React.Component {
   }
 
   render() {
-    // TODO: different icon & label & text for msgs
+    const hasNoUnreadConnections =
+      !this.props.requestsCount > 0 && !this.props.hasUnreadChats;
     return (
       <won-atom-connections-indicator
-        class={!this.props.requestsCount > 0 ? "won-no-connections" : ""}
+        class={hasNoUnreadConnections ? "won-no-connections" : ""}
         onClick={this.showAtomConnections}
       >
         <svg
           className={
             "asi__icon " +
-            (this.props.unreadRequestsCount > 0
+            (this.props.hasUnreadChats || this.props.unreadRequestsCount > 0
               ? "asi__icon--unreads"
               : "asi__icon--reads")
           }
         >
-          <use xlinkHref="#ico36_incoming" href="#ico36_incoming" />
+          <use
+            xlinkHref={
+              this.props.hasUnreadChats ? "#ico36_message" : "#ico36_incoming"
+            }
+            href={
+              this.props.hasUnreadChats ? "#ico36_message" : "#ico36_incoming"
+            }
+          />
         </svg>
         <div className="asi__right">
           <div className="asi__right__topline">
-            <div className="asi__right__topline__title">Connections</div>
+            <div className="asi__right__topline__title">
+              {this.props.hasUnreadChats
+                ? "Unread Messages"
+                : "Connection Requests"}
+            </div>
           </div>
           <div className="asi__right__subtitle">
             <div className="asi__right__subtitle__label">
-              <span>{this.props.requestsCount + " Connections"}</span>
-              {this.props.unreadRequestsCount > 0 ? (
+              <span>
+                {this.props.hasUnreadChats
+                  ? "You have unread Chat Messages"
+                  : this.props.requestsCount + " Requests"}
+              </span>
+              {!this.props.hasUnreadChats &&
+              this.props.unreadRequestsCount > 0 ? (
                 <span>{", " + this.props.unreadRequestsCount + " new"}</span>
               ) : null}
             </div>

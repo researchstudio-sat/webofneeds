@@ -175,28 +175,22 @@ export function getUnreadRequestedConnections(state, atom) {
   );
 }
 
+/**
+ * Returns all chat connections that are open and unread, which should cover only chat messages.
+ * @param state
+ * @param atom
+ */
 export function getUnreadChatMessageConnections(state, atom) {
   const atoms = getAtoms(state);
-  // TODO: verify conditions
-  return (
-    !!get(atom, "connections") &&
-    !!get(atom, "connections").find(
-      conn =>
-        isChatToXConnection(atoms, conn) &&
-        !(
-          connectionUtils.isClosed(conn) || connectionUtils.isSuggested(conn)
-        ) &&
-        connectionUtils.isUnread(conn)
-    )
-  );
-}
-
-export function hasRequestedConnections(atom) {
-  // TODO: verify that all requests are on chat sockets
   const connections = get(atom, "connections");
   return (
     connections &&
-    !!connections.find(conn => connectionUtils.isRequestReceived(conn))
+    connections.filter(
+      conn =>
+        isChatToXConnection(atoms, conn) &&
+        connectionUtils.isConnected(conn) &&
+        connectionUtils.isUnread(conn)
+    )
   );
 }
 
