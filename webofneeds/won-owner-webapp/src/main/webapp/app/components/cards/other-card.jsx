@@ -239,7 +239,6 @@ class WonOtherCard extends React.Component {
       undefined
     );
 
-    // TODO: add if clause for return value to show only suggestions or connections
     return (
       <won-other-card>
         {cardIcon}

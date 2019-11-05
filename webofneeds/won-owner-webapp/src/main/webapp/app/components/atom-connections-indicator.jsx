@@ -7,33 +7,35 @@ import { connect } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
 import { get, getIn } from "../utils.js";
 
-import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 
 import "~/style/_atom-connections-indicator.scss";
 
 const mapStateToProps = (state, ownProps) => {
   const atom = getIn(state, ["atoms", ownProps.atomUri]);
 
-  const requestedConnections = atomUtils.getRequestedConnections(atom, state);
-  const requestsCount = requestedConnections ? requestedConnections.size : 0;
-  const unreadRequests =
-    requestedConnections &&
-    requestedConnections.filter(conn => conn.get("unread"));
-  const unreadRequestsCount = unreadRequests ? unreadRequests.size : 0;
-
-  const hasUnreadChatMessages = ownProps && ownProps.hasUnreadChatConnections;
-  const unreadChatConnections = atomUtils.getUnreadChatMessageConnections(
-    atom,
-    state
+  const requests = connectionSelectors.getRequestedConnections(state, atom);
+  const unreadRequests = connectionSelectors.getUnreadRequestedConnections(
+    state,
+    atom
   );
+
+  const unreadChats =
+    ownProps.hasUnreadChatConnections &&
+    connectionSelectors.getUnreadChatMessageConnections(state, atom);
+
+  // TODO: requests count is wrong?
+  const requestsCount = requests ? requests.size : 0;
+  const unreadRequestsCount = unreadRequests ? unreadRequests.size : 0;
+  // TODO: unread msgs count?
 
   return {
     atomUri: ownProps.atomUri,
     requestsCount,
     unreadRequestsCount,
     unreadRequests,
-    hasUnreadChatMessages,
-    unreadChatConnections,
+    hasUnreadChats: ownProps.hasUnreadChatConnections,
+    unreadChats,
   };
 };
 
@@ -48,18 +50,19 @@ const mapDispatchToProps = dispatch => {
 class WonAtomConnectionsIndicator extends React.Component {
   constructor(props) {
     super(props);
-    window.con4dbg = this;
+    window.con4dbg = this; // TODO: remove debug
     this.showAtomConnections = this.showAtomConnections.bind(this);
   }
 
   showAtomConnections() {
-    const connUri = this.props.hasUnreadChatMessages
-      ? get(this.props.unreadChatConnections.first(), "uri")
+    const connUri = this.props.hasUnreadChats
+      ? get(this.props.unreadChats.first(), "uri")
       : get(this.props.unreadRequests.first(), "uri");
     this.props.routerGo("connections", { connectionUri: connUri });
   }
 
   render() {
+    // TODO: different icon & label & text for msgs
     return (
       <won-atom-connections-indicator
         class={!this.props.requestsCount > 0 ? "won-no-connections" : ""}
@@ -95,8 +98,8 @@ class WonAtomConnectionsIndicator extends React.Component {
 
 WonAtomConnectionsIndicator.propTypes = {
   atomUri: PropTypes.string.isRequired,
-  hasUnreadChatMessages: PropTypes.bool,
-  unreadChatConnections: PropTypes.object,
+  hasUnreadChats: PropTypes.bool,
+  unreadChats: PropTypes.object,
   requestsCount: PropTypes.number,
   unreadRequestsCount: PropTypes.number,
   unreadRequests: PropTypes.object,

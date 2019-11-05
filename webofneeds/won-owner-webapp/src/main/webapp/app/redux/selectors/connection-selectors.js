@@ -144,6 +144,62 @@ export function getChatConnectionsToCrawl(state) {
   return connectionsWithoutConnectMessage || Immutable.Map();
 }
 
+/**
+ * Returns all connections of an atom that have the status "requestReceived".
+ * @param state
+ * @param atom
+ */
+export function getRequestedConnections(state, atom) {
+  const atoms = getAtoms(state);
+  const connections = get(atom, "connections");
+  return (
+    connections &&
+    connections.filter(
+      conn =>
+        connectionUtils.isRequestReceived(conn) &&
+        isChatToXConnection(atoms, conn)
+    )
+  );
+}
+
+/**
+ * Returns all connections of an atom that have the status "requestReceived" and are unread.
+ * @param state
+ * @param atom
+ */
+export function getUnreadRequestedConnections(state, atom) {
+  const requestedConnections = getRequestedConnections(state, atom);
+  return (
+    requestedConnections &&
+    requestedConnections.filter(conn => get(conn, "unread"))
+  );
+}
+
+export function getUnreadChatMessageConnections(state, atom) {
+  const atoms = getAtoms(state);
+  // TODO: verify conditions
+  return (
+    !!get(atom, "connections") &&
+    !!get(atom, "connections").find(
+      conn =>
+        isChatToXConnection(atoms, conn) &&
+        !(
+          connectionUtils.isClosed(conn) || connectionUtils.isSuggested(conn)
+        ) &&
+        connectionUtils.isUnread(conn)
+    )
+  );
+}
+
+export function hasRequestedConnections(atom) {
+  // TODO: verify that all requests are on chat sockets
+  const connections = get(atom, "connections");
+  return (
+    connections &&
+    !!connections.find(conn => connectionUtils.isRequestReceived(conn))
+  );
+}
+
 export function hasMessagesToLoad(state, connUri) {
   const messageProcess = getIn(state, [
     "process",

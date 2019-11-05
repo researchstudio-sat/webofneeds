@@ -6,7 +6,6 @@ import won from "../../won-es6.js";
 import { get, getIn } from "../../utils.js";
 import { labels } from "../../won-label-utils.js";
 import * as connectionUtils from "./connection-utils.js";
-import * as connectionSelectors from "../selectors/connection-selectors.js";
 import * as useCaseUtils from "../../usecase-utils.js";
 import Immutable from "immutable";
 
@@ -295,44 +294,10 @@ export function hasSuggestedConnections(atom) {
   );
 }
 
-export function hasRequestedConnections(atom) {
-  // TODO: verify that all requests are on chat sockets
-  return (
-    hasChatSocket(atom) &&
-    get(atom, "connections") &&
-    !!get(atom, "connections").find(conn =>
-      connectionUtils.isRequestReceived(conn)
-    )
-  );
-}
-
 export function getSuggestedConnections(atom) {
   return (
     get(atom, "connections") &&
     get(atom, "connections").filter(conn => connectionUtils.isSuggested(conn))
-  );
-}
-
-export function getRequestedConnections(atom, state) {
-  const allAtoms = get(state, "atoms");
-  return (
-    get(atom, "connections") &&
-    get(atom, "connections").filter(conn => {
-      connectionUtils.isRequestReceived(conn);
-      connectionSelectors.isChatToXConnection(allAtoms, conn);
-    })
-  );
-}
-
-export function getUnreadChatMessageConnections(atom, state) {
-  const allAtoms = get(state, "atoms");
-  return (
-    !!get(atom, "connections") &&
-    !!get(atom, "connections").find(conn => {
-      connectionSelectors.isChatToXConnection(allAtoms, conn);
-      !(connectionUtils.isClosed(conn) || connectionUtils.isSuggested(conn)) &&
-        connectionUtils.isUnread(conn);
-    })
   );
 }
 
