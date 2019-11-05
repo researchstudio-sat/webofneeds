@@ -11,6 +11,7 @@ import * as connectionSelectors from "../redux/selectors/connection-selectors";
 import * as connectionUtils from "../redux/utils/connection-utils";
 import won from "../won-es6";
 import WonLabelledHr from "./labelled-hr.jsx";
+import WonAtomContextSwipeableView from "./atom-context-swipeable-view";
 import WonSuggestAtomPicker from "./details/picker/suggest-atom-picker.jsx";
 import WonAtomHeader from "./atom-header.jsx";
 
@@ -224,19 +225,17 @@ class WonAtomContentParticipants extends React.Component {
                     (connectionUtils.isUnread(conn) ? " won-unread " : "")
                   }
                 >
-                  <SwipeableViews enableMouseEvents>
-                    <WonAtomHeader
-                      atomUri={get(conn, "targetAtomUri")}
-                      className={headerClassName}
-                      hideTimestamp={true}
-                      onClick={() =>
-                        this.props.routerGo("post", {
-                          postUri: get(conn, "targetAtomUri"),
-                        })
-                      }
-                    />
-                    {actionButtons}
-                  </SwipeableViews>
+                  <WonAtomContextSwipeableView
+                    enableMouseEvents
+                    className={headerClassName}
+                    actionButtons={actionButtons}
+                    atomUri={get(conn, "targetAtomUri")}
+                    onClick={() =>
+                      this.props.routerGo("post", {
+                        postUri: get(conn, "targetAtomUri"),
+                      })
+                    }
+                  />
                 </div>
               </VisibilitySensor>
             );

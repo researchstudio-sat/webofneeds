@@ -13,10 +13,10 @@ const mapStateToProps = (state, ownProps) => {
   return {
     atomUri: ownProps.atomUri,
     onClick: ownProps.onClick,
-    actionButtons: ownProps.actionButtons,
+    actionButtons: ownProps.actionButtons ? ownProps.actionButtons : undefined,
     className: ownProps.className,
     enableMouseEvents: false, //ownProps.enableMouseEvents,
-    hideTimestamp: ownProps.hideTimestamp,
+    hideTimestamp: ownProps.hideTimestamp ? ownProps.hideTimestamp : false,
   };
 };
 
@@ -43,19 +43,35 @@ class WonAtomContextSwipeableView extends React.Component {
     if (this.props.actionButtons) {
       const show = this.state.show;
       let triggerIcon = (
-        <svg className="cl__trigger" onClick={() => this.handleClick(show)}>
-          <use xlinkHref="#ico16_contextmenu" href="#ico16_contextmenu" />
-        </svg>
+        <React.Fragment>
+          <svg
+            className="cl__trigger cl__trigger--waiting"
+            onClick={() => this.handleClick(show)}
+          >
+            <use xlinkHref="#ico16_contextmenu" href="#ico16_contextmenu" />
+          </svg>
+          <svg
+            className="cl__trigger cl__trigger--add"
+            onClick={() => this.handleClick(show)}
+          >
+            <use xlinkHref="#ico32_buddy_add" href="#ico32_buddy_add" />
+          </svg>
+          <svg
+            className="cl__trigger cl__trigger--default"
+            onClick={() => this.handleClick(show)}
+          >
+            <use xlinkHref="#ico16_contextmenu" href="#ico16_contextmenu" />
+          </svg>
+        </React.Fragment>
       );
       return (
-        <won-atom-context-layout>
-          <div className="cl__main">
+        <won-atom-context-layout class={this.props.className}>
+          <div className="cl__main ">
             <SwipeableViews
               index={show ? 1 : 0}
               enableMouseEvents={this.props.enableMouseEvents}
             >
               <WonAtomHeader
-                className={this.props.className}
                 atomUri={this.props.atomUri}
                 hideTimestamp={this.props.hideTimestamp}
                 onClick={this.props.onClick}

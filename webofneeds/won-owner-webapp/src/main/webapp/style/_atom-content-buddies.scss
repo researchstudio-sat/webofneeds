@@ -21,19 +21,6 @@ won-atom-content-buddies {
 
     won-atom-header {
       padding: 0.5rem;
-
-      &.status--sent {
-        opacity: 0.25;
-      }
-
-      &.status--closed {
-        //TODO: Filter grayscale or something
-      }
-
-      &.status--suggested,
-      &.status--received {
-        @include animateOpacityHeartBeat();
-      }
     }
 
     &.won-unread {

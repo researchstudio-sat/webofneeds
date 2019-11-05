@@ -183,7 +183,7 @@ class WonAtomContentBuddies extends React.Component {
                     className="acb__buddy__actions__button red won-button--outlined thin"
                     disabled={true}
                   >
-                    Waiting for Accept...
+                    Pending...
                   </button>
                   <div
                     className="acb__buddy__actions__button red won-button--outlined thin"
@@ -240,7 +240,6 @@ class WonAtomContentBuddies extends React.Component {
                     className={headerClassName}
                     actionButtons={actionButtons}
                     atomUri={get(conn, "targetAtomUri")}
-                    hideTimestamp={true}
                     onClick={() =>
                       this.props.routerGo("post", {
                         postUri: get(conn, "targetAtomUri"),
@@ -284,13 +283,11 @@ class WonAtomContentBuddies extends React.Component {
       if (this.props.hasBuddies) {
         buddies = this.props.buddiesArray.map(memberUri => {
           //TODO: Define possible actions
-          let actionButtons = undefined;
+          // if actionButtons = undefined: No SwipableView
           return (
             <div className="acb__buddy" key={memberUri}>
               <WonAtomContextSwipeableView
                 atomUri={memberUri}
-                hideTimestamp={true}
-                actionButtons={actionButtons}
                 onClick={() =>
                   this.props.routerGo("post", {
                     postUri: memberUri,
