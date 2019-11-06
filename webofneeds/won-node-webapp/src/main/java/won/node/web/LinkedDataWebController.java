@@ -1042,6 +1042,8 @@ public class LinkedDataWebController {
                     "application/ld+json", "application/trig", "application/n-quads" })
     public ResponseEntity<Dataset> readConnectionsOfAtom(HttpServletRequest request,
                     @PathVariable(value = "identifier") String identifier,
+                    @RequestParam(value = "socket", required = false) String socket,
+                    @RequestParam(value = "targetSocket", required = false) String targetSocket,
                     @RequestParam(value = "deep", defaultValue = "false") boolean deep,
                     @RequestParam(value = "p", required = false) Integer page,
                     @RequestParam(value = "resumebefore", required = false) String beforeId,
@@ -1061,7 +1063,9 @@ public class LinkedDataWebController {
                             Boolean.toString(deep));
             // if no preferred size provided by the client => the client does not support
             // paging, return everything:
-            if (preferedSize == null) {
+            if (socket != null && targetSocket != null) {
+                rdfDataset = linkedDataService.listConnection(atomUri, connectionsURI, deep);
+            } else if (preferedSize == null) {
                 // does not support date and type filtering for clients that do not support
                 // paging
                 rdfDataset = linkedDataService.listConnections(atomUri, deep, true).getContent();
