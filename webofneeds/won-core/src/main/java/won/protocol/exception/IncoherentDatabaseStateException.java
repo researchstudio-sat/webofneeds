@@ -1,6 +1,6 @@
 package won.protocol.exception;
 
-public class IncoherentDatabaseStateException extends WonProtocolException {
+public class IncoherentDatabaseStateException extends DataIntegrityException {
     public IncoherentDatabaseStateException() {
         super();
         // TODO Auto-generated constructor stub

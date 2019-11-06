@@ -3,7 +3,7 @@ package won.protocol.exception;
 import java.net.URI;
 import java.text.MessageFormat;
 
-public class NoDefaultSocketException extends RuntimeException {
+public class NoDefaultSocketException extends WonProtocolException {
     private static final long serialVersionUID = -8417204478048969672L;
     private URI atomUri;
 

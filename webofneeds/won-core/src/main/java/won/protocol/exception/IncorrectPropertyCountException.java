@@ -44,14 +44,6 @@ public class IncorrectPropertyCountException extends DataIntegrityException {
         this.actualCount = actualCount;
     }
 
-    public IncorrectPropertyCountException(final String message, final Throwable cause, final boolean enableSuppression,
-                    final boolean writableStackTrace, final int expectedCount, final int actualCount) {
-        super(message + ", expected: " + expectedCount + ", actual: " + actualCount, cause, enableSuppression,
-                        writableStackTrace);
-        this.expectedCount = expectedCount;
-        this.actualCount = actualCount;
-    }
-
     public int getExpectedCount() {
         return expectedCount;
     }
