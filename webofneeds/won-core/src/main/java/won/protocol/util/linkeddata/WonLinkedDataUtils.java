@@ -436,7 +436,8 @@ public class WonLinkedDataUtils {
         return dataset;
     }
 
-    public static Optional<SocketDefinition> getSocketDefinition(LinkedDataSource linkedDataSource, URI socket) {
+    public static Optional<SocketDefinition> getSocketDefinitionOfSocket(LinkedDataSource linkedDataSource,
+                    URI socket) {
         Dataset dataset = linkedDataSource.getDataForResource(socket);
         // load all data for configurations
         List<URI> configURIs = RdfUtils.getObjectsOfProperty(dataset, socket,
@@ -468,11 +469,36 @@ public class WonLinkedDataUtils {
                             + " of socket " + socket);
         }
         socketDef.setSocketDefinitionURI(socketDefinitionURI);
-        WonRdfUtils.SocketUtils.setCompatibleSocketDefinitions(socketDef, dataset, socket);
-        WonRdfUtils.SocketUtils.setAutoOpen(socketDef, dataset, socket);
-        WonRdfUtils.SocketUtils.setSocketCapacity(socketDef, dataset, socket);
-        WonRdfUtils.SocketUtils.setDerivationProperties(socketDef, dataset, socket);
-        WonRdfUtils.SocketUtils.setInverseDerivationProperties(socketDef, dataset, socket);
+        WonRdfUtils.SocketUtils.setCompatibleSocketDefinitionsOfSocket(socketDef, dataset, socket);
+        WonRdfUtils.SocketUtils.setAutoOpenOfSocket(socketDef, dataset, socket);
+        WonRdfUtils.SocketUtils.setSocketCapacityOfSocket(socketDef, dataset, socket);
+        WonRdfUtils.SocketUtils.setDerivationPropertiesOfSocket(socketDef, dataset, socket);
+        WonRdfUtils.SocketUtils.setInverseDerivationPropertiesOfSocket(socketDef, dataset, socket);
+        return Optional.of(socketDef);
+    }
+
+    public static Optional<SocketDefinition> getSocketDefinition(LinkedDataSource linkedDataSource,
+                    URI socketDefinitionURI) {
+        Dataset dataset = linkedDataSource.getDataForResource(socketDefinitionURI);
+        SocketDefinitionImpl socketDef = new SocketDefinitionImpl(socketDefinitionURI);
+        // if a socket definition is referenced via won:socketDefinition, it has to be
+        // the subject of a triple
+        boolean isSocketDefFound = RdfUtils.findFirst(dataset, model -> {
+            if (model.listStatements(new SimpleSelector(model.createResource(socketDefinitionURI.toString()), null,
+                            (RDFNode) null)).hasNext()) {
+                return socketDefinitionURI;
+            }
+            return null;
+        }) != null;
+        if (!isSocketDefFound) {
+            throw new IllegalArgumentException("Could not find data for socket definition " + socketDefinitionURI);
+        }
+        socketDef.setSocketDefinitionURI(socketDefinitionURI);
+        WonRdfUtils.SocketUtils.setCompatibleSocketDefinitions(socketDef, dataset, socketDefinitionURI);
+        WonRdfUtils.SocketUtils.setAutoOpenOfSocket(socketDef, dataset, socketDefinitionURI);
+        WonRdfUtils.SocketUtils.setSocketCapacityOfSocket(socketDef, dataset, socketDefinitionURI);
+        WonRdfUtils.SocketUtils.setDerivationPropertiesOfSocket(socketDef, dataset, socketDefinitionURI);
+        WonRdfUtils.SocketUtils.setInverseDerivationPropertiesOfSocket(socketDef, dataset, socketDefinitionURI);
         return Optional.of(socketDef);
     }
 
@@ -529,5 +555,27 @@ public class WonLinkedDataUtils {
         public void remove() {
             throw new UnsupportedOperationException("this iterator cannot remove");
         }
+    }
+
+    public static Optional<URI> getConnectionURIForSocketAndTargetSocket(URI socket,
+                    URI targetSocket, LinkedDataSource linkedDataSource) {
+        Dataset ds = linkedDataSource.getDataForResource(socket);
+        Optional<URI> atomUri = WonRdfUtils.SocketUtils.getAtomOfSocket(ds, socket);
+        if (!atomUri.isPresent()) {
+            return Optional.empty();
+        }
+        Optional<URI> connectionContainer = WonRdfUtils.AtomUtils.getConnectionContainerOfAtom(ds, atomUri.get());
+        if (!connectionContainer.isPresent()) {
+            return Optional.empty();
+        }
+        Optional<Dataset> connConnData = Optional.ofNullable(linkedDataSource.getDataForResource(
+                        URI.create(connectionContainer.get().toString()
+                                        + "?socket=" + socket.toString() + "?targetSocket=" + targetSocket.toString()),
+                        atomUri.get()));
+        if (!connConnData.isPresent()) {
+            return Optional.empty();
+        }
+        Iterator<URI> it = WonRdfUtils.AtomUtils.getConnections(connConnData.get(), connectionContainer.get());
+        return it.hasNext() ? Optional.of(it.next()) : Optional.empty();
     }
 }
