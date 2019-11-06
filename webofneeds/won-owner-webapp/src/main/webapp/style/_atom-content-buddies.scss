@@ -1,5 +1,6 @@
 @import "won-config";
 @import "sizing-utils";
+@import "animate";
 
 won-atom-content-buddies {
   display: grid;
@@ -28,11 +29,12 @@ won-atom-content-buddies {
     }
 
     &__actions {
-      border-top: $thinGrayBorder;
       display: grid;
       grid-auto-flow: column;
       grid-gap: 0.5rem;
       padding: 0.5rem;
+      height: 100%;
+      box-sizing: border-box;
 
       &__button.won-button--filled.red,
       &__button.won-button--outlined.red.thin {

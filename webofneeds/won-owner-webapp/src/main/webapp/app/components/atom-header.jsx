@@ -179,7 +179,8 @@ class WonAtomHeader extends React.Component {
         class={
           (this.props.atomLoading ? " won-is-loading " : "") +
           (this.props.atomToLoad ? " won-to-load " : "") +
-          (this.props.onClick ? " clickable " : "")
+          (this.props.onClick ? " clickable " : "") +
+          (this.props.className ? " " + this.props.className + " " : "")
         }
         onClick={this.props.onClick}
       >
@@ -231,6 +232,7 @@ class WonAtomHeader extends React.Component {
 }
 
 WonAtomHeader.propTypes = {
+  className: PropTypes.string,
   atomUri: PropTypes.string.isRequired,
   hideTimestamp: PropTypes.bool,
   onClick: PropTypes.func,

@@ -1,0 +1,62 @@
+@import "won-config";
+@import "sizing-utils";
+@import "square-image";
+@import "animate";
+
+won-atom-context-layout {
+  display: grid;
+  grid-template-areas: "main trigger";
+  grid-template-columns: 1fr min-content;
+  //grid-column-gap: 0.5rem;
+  min-width: 0;
+
+  @include square-image($postIconSize);
+
+  .cl__main {
+    grid-area: main;
+  }
+
+  .cl__trigger {
+    grid-area: trigger;
+    display: none;
+    align-self: center;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    --local-primary: #{$won-secondary-color};
+    @include fixed-square($postIconSizeMobile);
+  }
+
+  &.status--sent {
+    won-atom-header {
+      opacity: 0.25;
+    }
+
+    .cl__trigger {
+      &--waiting {
+        display: block;
+      }
+    }
+  }
+
+  &:not(.status--sent):not(.status--received):not(.status--suggested),
+  &.status--closed {
+    .cl__trigger {
+      &--default {
+        display: block;
+      }
+    }
+  }
+
+  &.status--suggested,
+  &.status--received {
+    won-atom-header {
+      @include animateOpacityHeartBeat();
+    }
+
+    .cl__trigger {
+      &--add {
+        display: block;
+      }
+    }
+  }
+}
