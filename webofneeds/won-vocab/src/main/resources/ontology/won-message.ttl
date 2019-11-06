@@ -88,14 +88,6 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
          rdfs:label "content" .
 
 
-###  https://w3id.org/won/message#correspondingRemoteMessage
-:correspondingRemoteMessage rdf:type owl:ObjectProperty ;
-                            rdfs:domain :Message ;
-                            rdfs:range :Message ;
-                            rdfs:comment "Points to another message. Messages always exist in two copies: one on the sender's WoN node and one on the receiver's WoN node. The receiver's WoN node copies the message, mints a new URI for it and points to the original message using `msg:correspondingRemoteMessage`."@en ;
-                            rdfs:label "correspondingRemoteMessage" .
-
-
 ###  https://w3id.org/won/message#hintTargetAtom
 :hintTargetAtom rdf:type owl:ObjectProperty ;
                 rdfs:comment "The target Atom of the AtomHintMessage. By sending this message, the sender wants to express that the Atom's owner may want to establish a connection with the targetAtom (but first must choose a suitable pair of sockets), or that the targetAtom may just be interesting for the owner for other reasons."@en ;
@@ -108,22 +100,16 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
                   rdfs:label "hintTargetSocket" .
 
 
-###  https://w3id.org/won/message#isRemoteResponseTo
-:isRemoteResponseTo rdf:type owl:ObjectProperty ;
-                    rdfs:comment "Links a response message on the recipientAtom's WoN node to the original message on the senderAtom's WoN node,"@en ;
-                    rdfs:label "isRemoteResponseTo" .
-
-
-###  https://w3id.org/won/message#isResponseTo
-:isResponseTo rdf:type owl:ObjectProperty ;
+###  https://w3id.org/won/message#respondingTo
+:respondingTo rdf:type owl:ObjectProperty ;
               rdfs:domain :Message ;
               rdfs:range :Message ;
               rdfs:comment "Links a SuccessResponse or a FailureResponse to the message it is responding to."@en ;
-              rdfs:label "isResponseTo" .
+              rdfs:label "respondingTo" .
 
 
-###  https://w3id.org/won/message#isResponseToMessageType
-:isResponseToMessageType rdf:type owl:ObjectProperty ;
+###  https://w3id.org/won/message#respondingToMessageType
+:respondingToMessageType rdf:type owl:ObjectProperty ;
                          rdfs:domain :Message ;
                          rdfs:range :MessageType ;
                          rdfs:comment "Used in a response message to indicate the messageType of the original message."@en ;
@@ -253,20 +239,12 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
                       rdfs:label "publicKeyFingerprint" .
 
 
-###  https://w3id.org/won/message#receivedTimestamp
-:receivedTimestamp rdf:type owl:DatatypeProperty ;
+###  https://w3id.org/won/message#timestamp
+:timestamp rdf:type owl:DatatypeProperty ;
                    rdfs:domain :Message ;
                    rdfs:range xsd:long ;
-                   rdfs:comment "Holds the timestamp assigned when the WoN node received and saved the message."@en ;
+                   rdfs:comment "Holds the timestamp assigned when the message was created, as obtained by the local system clock."@en ;
                    rdfs:label "receivedTimestamp" .
-
-
-###  https://w3id.org/won/message#sentTimestamp
-:sentTimestamp rdf:type owl:DatatypeProperty ;
-               rdfs:domain :Message ;
-               rdfs:range xsd:long ;
-               rdfs:comment "Holds the timestamp assigned when the WoN node created and sent the message."@en ;
-               rdfs:label "sentTimestamp" .
 
 
 #################################################################
