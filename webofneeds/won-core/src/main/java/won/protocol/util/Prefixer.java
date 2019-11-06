@@ -1,7 +1,17 @@
 package won.protocol.util;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -11,17 +21,29 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
-import org.apache.jena.vocabulary.*;
+import org.apache.jena.vocabulary.DC;
+import org.apache.jena.vocabulary.DCTerms;
+import org.apache.jena.vocabulary.OWL;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
+import org.apache.jena.vocabulary.XSD;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StopWatch;
-import won.protocol.vocabulary.*;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import won.protocol.vocabulary.CERT;
+import won.protocol.vocabulary.SCHEMA;
+import won.protocol.vocabulary.SFSIG;
+import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONCON;
+import won.protocol.vocabulary.WONMATCH;
+import won.protocol.vocabulary.WONMSG;
+import won.protocol.vocabulary.WXBUDDY;
+import won.protocol.vocabulary.WXCHAT;
+import won.protocol.vocabulary.WXGROUP;
+import won.protocol.vocabulary.WXHOLD;
+import won.protocol.vocabulary.WXREVIEW;
 
 /**
  * Tests if it is viable to set exactly those prefixes that are used in a a
@@ -33,7 +55,7 @@ import java.util.stream.Stream;
 public class Prefixer {
     private static final Pattern PREFIX_PATTERN = Pattern.compile("[^/#]+$");
 
-    private Dataset loadDatasetFromFile(String file) {
+    private static Dataset loadDatasetFromFile(String file) {
         try {
             Dataset dataset;
             dataset = DatasetFactory.createGeneral();
@@ -45,12 +67,12 @@ public class Prefixer {
         }
     }
 
-    public static void setLogLevel() {
+    private static void setLogLevel() {
         Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(Level.INFO);
     }
 
-    public PrefixMapping getPrefixes() {
+    public static PrefixMapping getPrefixes() {
         PrefixMapping prefixMapping = new PrefixMappingImpl();
         prefixMapping.setNsPrefix(WON.DEFAULT_PREFIX, WON.getURI());
         prefixMapping.setNsPrefix(WONMSG.DEFAULT_PREFIX, WONMSG.getURI());
@@ -79,16 +101,18 @@ public class Prefixer {
         return prefixMapping;
     }
 
-    public Set<String> getBlacklist() {
+    private static Set<String> getBlacklist() {
         return Stream.of("https://w3id.org/won/ext/", "https://w3id.org/won/").collect(Collectors.toSet());
     }
 
-    public void setUsedPrefixes(Dataset ds) {
-        Model dm = ds.getDefaultModel();
+    public static Dataset setPrefixes(Dataset ds) {
+        Dataset result = RdfUtils.cloneDataset(ds);
+        Model dm = result.getDefaultModel();
         StopWatch sw = new StopWatch();
         sw.start();
         dm.getNsPrefixMap().keySet().stream().forEach(dm::removeNsPrefix);
-        Set<String> prefixes = RdfUtils.toStatementStream(ds).flatMap(this::getPrefixes).collect(Collectors.toSet());
+        Set<String> prefixes = RdfUtils.toStatementStream(result).flatMap(Prefixer::getPrefixes)
+                        .collect(Collectors.toSet());
         Map<String, String> defaultPrefixes = getPrefixes().getNsPrefixMap();
         defaultPrefixes.entrySet().stream()
                         .forEach(entry -> {
@@ -113,9 +137,10 @@ public class Prefixer {
         prefixes.stream()
                         .forEach(prefix -> dm.setNsPrefix("p" + cnt.getAndIncrement(), prefix));
         sw.stop();
+        return result;
     }
 
-    public Stream<String> getPrefixes(Statement stmt) {
+    private static Stream<String> getPrefixes(Statement stmt) {
         Set<String> prefixes = new HashSet<>();
         getUriPrefix(stmt.getSubject()).map(prefixes::add);
         getUriPrefix(stmt.getPredicate()).map(prefixes::add);
@@ -123,7 +148,7 @@ public class Prefixer {
         return prefixes.stream();
     }
 
-    public Optional<String> getUriPrefix(RDFNode node) {
+    private static Optional<String> getUriPrefix(RDFNode node) {
         if (node.isURIResource()) {
             return Optional.ofNullable(toPrefix(node.asResource().getURI()));
         }
@@ -135,12 +160,32 @@ public class Prefixer {
         return Optional.empty();
     }
 
-    public String toPrefix(String uri) {
-        Matcher m = PREFIX_PATTERN.matcher(uri);
-        if (!m.find()) {
-            return null;
+    private static String toPrefix(String uri) {
+        URI asURI = URI.create(uri);
+        String fragment = asURI.getRawFragment();
+        if (fragment != null) {
+            return uri.substring(0, uri.length() - fragment.length());
         }
-        return m.replaceAll("");
+        String ssp = asURI.getSchemeSpecificPart();
+        if (ssp != null) {
+            int lastSlash = ssp.lastIndexOf('/');
+            if (lastSlash > 0) {
+                try {
+                    return new URI(asURI.getScheme(), ssp.substring(0, lastSlash + 1), null).toString();
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
+            }
+            int lastColon = ssp.lastIndexOf(':');
+            if (lastColon > 0) {
+                try {
+                    return new URI(asURI.getScheme(), ssp.substring(0, lastColon + 1), null).toString();
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return null;
     }
 
     public static void main(String[] args) {
@@ -152,9 +197,8 @@ public class Prefixer {
         }
         setLogLevel();
         String filename = args[0];
-        Prefixer app = new Prefixer();
-        Dataset ds = app.loadDatasetFromFile(filename);
-        app.setUsedPrefixes(ds);
+        Dataset ds = Prefixer.loadDatasetFromFile(filename);
+        ds = Prefixer.setPrefixes(ds);
         RDFDataMgr.write(System.out, ds, Lang.TRIG);
     }
 }
