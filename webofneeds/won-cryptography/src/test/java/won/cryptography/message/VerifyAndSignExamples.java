@@ -1,26 +1,27 @@
 package won.cryptography.message;
 
+import java.io.File;
+import java.net.URI;
+import java.security.Security;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
 import won.cryptography.service.CryptographyService;
 import won.cryptography.service.keystore.FileBasedKeyStoreService;
 import won.cryptography.utils.TestSigningUtils;
 import won.cryptography.utils.TestingDataSource;
+import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor;
 import won.protocol.message.processor.impl.SignatureCheckingWonMessageProcessor;
 import won.protocol.util.RdfUtils;
-
-import java.io.File;
-import java.net.URI;
-import java.security.Security;
 
 /**
  * User: ypanchenko Date: 25.03.2015
@@ -84,7 +85,7 @@ public class VerifyAndSignExamples {
         // pretend it was serialized and deserialized
         String datasetString = RdfUtils.writeDatasetToString(outputDataset, Lang.JSONLD);
         outputDataset = RdfUtils.readDatasetFromString(datasetString, Lang.JSONLD);
-        WonMessage outputMessage = new WonMessage(outputDataset);
+        WonMessage outputMessage = WonMessage.of(outputDataset);
         // write for debugging
         // TestSigningUtils.writeToTempFile(outputDataset);
         // the receiver of this message should be able to verify it
@@ -107,7 +108,7 @@ public class VerifyAndSignExamples {
         // this is what nodes receives when the atom is created
         Dataset inputDataset = TestSigningUtils.prepareTestDatasetFromNamedGraphs(RESOURCE_FILE, new String[] {
                         ATOM_CORE_DATA_URI, ATOM_CORE_DATA_SIG_URI, EVENT_ENV1_URI, EVENT_ENV1_SIG_URI, });
-        WonMessage inputMessage = new WonMessage(inputDataset);
+        WonMessage inputMessage = WonMessage.of(inputDataset);
         // node verifies the signature:
         WonMessage verifiedMessage = null;
         try {
@@ -115,23 +116,12 @@ public class VerifyAndSignExamples {
         } catch (WonMessageProcessingException e) {
             Assert.fail("Signature verification failed");
         }
-        // node then process the message in some way, and adds its own envelope,
-        // the envelope should contain the reference to the verified signatures
-        WonMessage nodeWonMessage = WonMessageBuilder.wrap(verifiedMessage)
-                        .setWonMessageDirection(WonMessageDirection.FROM_SYSTEM).build();
-        Dataset outputDataset = nodeWonMessage.getCompleteDataset();
-        Assert.assertEquals(5, RdfUtils.getModelNames(outputDataset).size());
-        // write for debugging
-        // TestSigningUtils.writeToTempFile(outputDataset);
-        // node should then sign its envelope
-        WonMessage signedMessage = nodeAddingProcessor.process(nodeWonMessage);
-        Assert.assertEquals(6, RdfUtils.getModelNames(outputDataset).size());
         // write for debugging
         // TestSigningUtils.writeToTempFile(outputDataset);
         // everyone should be able to verify this message, inculding when it was read
         // from RDF:
-        String datasetString = RdfUtils.writeDatasetToString(signedMessage.getCompleteDataset(), Lang.TRIG);
-        WonMessage outputMessage = new WonMessage(RdfUtils.readDatasetFromString(datasetString, Lang.TRIG));
+        String datasetString = RdfUtils.writeDatasetToString(inputMessage.getCompleteDataset(), Lang.TRIG);
+        WonMessage outputMessage = WonMessage.of(RdfUtils.readDatasetFromString(datasetString, Lang.TRIG));
         try {
             checkingProcessor.process(outputMessage);
         } catch (WonMessageProcessingException e) {

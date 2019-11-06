@@ -1,9 +1,15 @@
 package won.protocol.message.processor.impl;
 
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
+
 import won.cryptography.rdfsign.SignatureVerificationState;
 import won.cryptography.rdfsign.SigningStage;
 import won.cryptography.rdfsign.WonSigner;
@@ -12,11 +18,6 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonSignatureData;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
-
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.List;
-import java.util.Map;
 
 /**
  * User: ypanchenko Date: 08.04.2015
@@ -30,7 +31,7 @@ public class WonMessageSignerVerifier {
         WonSigner signer = new WonSigner(msgDataset);
         signContents(msgDataset, sigStage, signer, privateKey, privateKeyUri, publicKey);
         signEnvelopes(msgDataset, sigStage, signer, privateKey, privateKeyUri, publicKey);
-        return new WonMessage(msgDataset);
+        return WonMessage.of(msgDataset);
     }
 
     /**
@@ -59,9 +60,11 @@ public class WonMessageSignerVerifier {
             wonSignatureData = signer.sign(privateKey, privateKeyUri, publicKey, envUri).get(0);
             // outerEnvUri = envUri;
         }
-        // this is the signature of the outermost envelopoe. put it in a new graph.
-        msgDataset.addNamedModel(wonSignatureData.getSignatureUri(), ModelFactory.createDefaultModel());
-        addSignature(wonSignatureData, wonSignatureData.getSignatureUri(), msgDataset, false);
+        if (wonSignatureData != null) {
+            // this is the signature of the outermost envelopoe. put it in a new graph.
+            msgDataset.addNamedModel(wonSignatureData.getSignatureUri(), ModelFactory.createDefaultModel());
+            addSignature(wonSignatureData, wonSignatureData.getSignatureUri(), msgDataset, false);
+        }
     }
 
     /**
