@@ -8,12 +8,12 @@
  * KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package won.protocol.message.processor.exception;
+package won.protocol.exception;
 
 /**
  * Indicates that a WonMessage is not well-formed.
  */
-public class WonMessageNotWellFormedException extends WonMessageProcessingException {
+public class WonMessageNotWellFormedException extends WonProtocolException {
     public WonMessageNotWellFormedException() {
     }
 
@@ -27,10 +27,5 @@ public class WonMessageNotWellFormedException extends WonMessageProcessingExcept
 
     public WonMessageNotWellFormedException(final Throwable cause) {
         super(cause);
-    }
-
-    public WonMessageNotWellFormedException(final String message, final Throwable cause,
-                    final boolean enableSuppression, final boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

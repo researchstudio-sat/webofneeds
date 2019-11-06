@@ -1,4 +1,4 @@
-package won.protocol.message.processor.exception;
+package won.protocol.exception;
 
 /**
  * Indicates that the uri (of event or atom) is already in use. User: ypanchenko

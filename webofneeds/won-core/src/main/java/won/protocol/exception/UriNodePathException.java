@@ -1,4 +1,4 @@
-package won.protocol.message.processor.exception;
+package won.protocol.exception;
 
 /**
  * Indicates that the uri (of event or atom) is malformed from the point of view
@@ -6,7 +6,7 @@ package won.protocol.message.processor.exception;
  * event uri does not correspond to the node domain, etc.) User: ypanchenko
  * Date: 24.04.2015
  */
-public class UriNodePathException extends WonMessageProcessingException {
+public class UriNodePathException extends WonMessageNotWellFormedException {
     public UriNodePathException() {
     }
 
@@ -20,10 +20,5 @@ public class UriNodePathException extends WonMessageProcessingException {
 
     public UriNodePathException(Throwable cause) {
         super(cause);
-    }
-
-    public UriNodePathException(String message, Throwable cause, boolean enableSuppression,
-                    boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

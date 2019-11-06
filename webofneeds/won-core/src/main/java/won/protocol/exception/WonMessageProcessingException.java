@@ -8,7 +8,9 @@
  * KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package won.protocol.message.processor.exception;
+package won.protocol.exception;
+
+import won.protocol.message.WonMessage;
 
 /**
  * Base class for exceptions thrown during message processing
@@ -17,8 +19,16 @@ public class WonMessageProcessingException extends RuntimeException {
     public WonMessageProcessingException() {
     }
 
+    public WonMessageProcessingException(WonMessage wonMessage) {
+        super("Failed to process WonMessage " + wonMessage.getMessageURI());
+    }
+
     public WonMessageProcessingException(final String message) {
         super(message);
+    }
+
+    public WonMessageProcessingException(final String message, WonMessage wonMessage) {
+        super(message + " WonMessage: " + wonMessage.getMessageURI());
     }
 
     public WonMessageProcessingException(final String message, final Throwable cause) {

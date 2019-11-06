@@ -8,7 +8,7 @@
  * KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package won.protocol.message.processor.exception;
+package won.protocol.exception;
 
 import java.net.URI;
 
@@ -39,12 +39,6 @@ public class MissingMessagePropertyException extends WonMessageNotWellFormedExce
 
     public MissingMessagePropertyException(Throwable cause, URI missingProperty) {
         super(cause);
-        this.missingProperty = missingProperty;
-    }
-
-    public MissingMessagePropertyException(Throwable cause, boolean enableSuppression, boolean writableStackTrace,
-                    URI missingProperty) {
-        super(createExceptionMessage(missingProperty), cause, enableSuppression, writableStackTrace);
         this.missingProperty = missingProperty;
     }
 
