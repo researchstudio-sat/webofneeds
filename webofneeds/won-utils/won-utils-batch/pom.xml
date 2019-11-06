@@ -6,6 +6,14 @@
 		<version>0.7-SNAPSHOT</version>
 	</parent>
 	<artifactId>won-utils-batch</artifactId>
+		<build>
+		<plugins>
+            <plugin>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+	</build>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -30,4 +38,5 @@
 			<artifactId>logback-core</artifactId>
 		</dependency>
 	</dependencies>
+	
 </project>

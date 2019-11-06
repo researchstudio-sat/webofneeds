@@ -10,6 +10,15 @@
 
     <artifactId>won-utils-mail</artifactId>
     <name>Utilities-Mail</name>
+	
+	<build>
+		<plugins>
+            <plugin>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+	</build>
 
     <dependencies>
 
