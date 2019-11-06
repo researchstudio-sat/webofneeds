@@ -13,96 +13,69 @@ prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.o
 prefix ldp:   <http://www.w3.org/ns/ldp#>
 prefix rdfg:   <http://www.w3.org/2004/03/trix/rdfg-1/>
 
-# the content should be part of the envelope chain: each content graph should be referenced from exactly one envelope
+# each content graph should be referenced from exactly one envelope graph
+
 #ASK
 #{
   SELECT
 
-    ?numOfMultiRefContent
-    (if(?numOfMultiRefContent>0, "expected content is referenced from only 1 envelope", "OK") AS
-    ?contentMultiReferenceCheck)
+	?unreferencedGraphs
 
-    ?ttlGraphs
-    ?ttlContents
-    ?ttlEnvelopes
-    (if((?ttlContents*2+?ttlEnvelopes*2)!=?ttlGraphs, "a content is not referenced from an envelope", "OK") AS
-    ?contentNotReferencedCheck)
 
-    (if((bound(?type) && (?type = msg:AtomHintMessage || ?type = msg:SocketHintMessage )) || ! (?numOfMultiRefContent>0 || ((?ttlContents + ?ttlEnvelopes + 1)!=?ttlGraphs)), "OK", "FAIL") AS ?check)
+    (if(?unreferencedGraphs = 0, "OK", "FAIL") AS ?check)
 
   WHERE
   {
 
-
-    # allow hint messages that are not signed
-    {SELECT ?type
-      WHERE
-      {
-          optional {
-            graph ?g{
-                ?g rdfg:subGraphOf ?event.
-                     ?event msg:messageType ?type.
-                   ?event a msg:FromExternal
-            }
-          }
-        }
-    }
-
-    # get number of content graphs that have more than one reference from envelopes
-    { SELECT (count(?multiReferenced) as ?numOfMultiRefContent)
-      { SELECT (?content as ?multiReferenced)
-               (count(?event) as ?refCount)
+   
+    # count number of graphs that are neither envelopes nor signatures and that are not referenced from an envelope graph
+    { SELECT (count(distinct ?graphToCheck) as ?unreferencedGraphs)
         WHERE
         {
-          GRAPH ?envelope
-          {
-            OPTIONAL {?event msg:content ?content } .
-            ?envelope rdf:type msg:EnvelopeGraph .
-            FILTER ( bound(?content) )
-          } .
-        } GROUP BY ?content
-        HAVING (?refCount > 1)
-      }
+        	# select all graphs
+        	{ SELECT ?graphToCheck 
+        		WHERE 
+	        	{
+			    	GRAPH ?graphToCheck
+		    		{
+		        		?a ?b ?c
+		        	} 
+		    	}
+        	}
+        	# filter out the envelopes
+	        FILTER NOT EXISTS 
+	        {
+	        	GRAPH ?graphToCheck
+	            {
+	              ?graphToCheck rdf:type msg:EnvelopeGraph
+	            } 
+			}
+            
+			# filter out those that are signature graphs
+	        FILTER NOT EXISTS 
+	        {
+	        	GRAPH ?graphToCheck
+	            {
+	              ?graphToCheck rdf:type signature:Signature .
+	              ?graphToCheck msg:signedGraph ?anotherGraph .
+	            } 
+			}
+			
+			# filter out those that are referenced with msg:content from an envelopeGraph
+	        FILTER NOT EXISTS 
+	        {
+	        	GRAPH ?env
+	            {
+	              ?env a msg:EnvelopeGraph .
+	              ?env rdfg:subGraphOf/msg:content ?graphToCheck .
+	            } 
+			}
+            
+		}
      }
 
 
 
-
-   # get number of named graphs
-   { SELECT (count(DISTINCT  ?graph) as ?ttlGraphs)
-     WHERE
-     {
-      GRAPH ?graph
-      {
-       ?a ?b ?c
-      } .
-     }
-   }
-
-    # get number of envelope graphs
-    { SELECT (count(DISTINCT  ?envelope) as ?ttlEnvelopes)
-      WHERE
-      {
-       GRAPH ?envelope
-       {
-        ?envelope rdf:type msg:EnvelopeGraph .
-       } .
-      }
-    }
-
-
-    # get number of content graphs
-   { SELECT (count(DISTINCT  ?content) as ?ttlContents)
-     WHERE
-     {
-      GRAPH ?envelope
-      {
-      ?envelope rdf:type msg:EnvelopeGraph .
-      ?envelope <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf> ?event .
-      OPTIONAL {?event msg:content ?content } .
-      } .
-     }
-   }
 
   }
 #}

@@ -19,57 +19,62 @@ prefix rdfg:   <http://www.w3.org/2004/03/trix/rdfg-1/>
 #{
   SELECT
 
-  ?numGraphs
-  ?numCorrectSignatures
+	?numNeitherSignedNorSignature
 
 
-    (if((bound(?type) && (?type = msg:AtomHintMessage || ?type = msg:SocketHintMessage )) || (?numCorrectSignatures = 1 && ?numGraphs >= 2), "OK", "FAIL") AS ?check)
+    (if(?numNeitherSignedNorSignature = 0, "OK", "FAIL") AS ?check)
 
   WHERE
   {
 
-    # allow hint messages that are not signed
-    {SELECT ?type
-      WHERE
-      {
-        optional { 
-          graph ?g
-          {
-            ?g rdfg:subGraphOf ?event.
-            ?event msg:messageType ?type.
-            ?event a msg:FromExternal
-          }
-        }
-      }
-    }
-
+   
     # count number of signature graphs that have corresponding signed graph
-    { SELECT (count(distinct ?g) as ?numCorrectSignatures)
+    { SELECT (count(distinct ?graphToCheck) as ?numNeitherSignedNorSignature)
         WHERE
         {
-        GRAPH ?g
-            {
-              ?g rdf:type signature:Signature .
-              ?g msg:signedGraph ?signed .
-            } .
-
-        GRAPH ?signed
-            {
-               ?a ?b ?c
-            } .
-        }
+        	# select all graphs
+        	{ SELECT ?graphToCheck 
+        		WHERE 
+	        	{
+			    	GRAPH ?graphToCheck
+		    		{
+		        		?a ?b ?c
+		        	} 
+		    	}
+        	}
+        	# filter out those that are signed (either in a separate signature graph or in another graph)
+	        FILTER NOT EXISTS 
+	        {
+	        	GRAPH ?any
+	            {
+	              ?g rdf:type signature:Signature .
+	              ?g msg:signedGraph ?graphToCheck .
+	            } .
+			}
+			# filter out hints (we allow for them not to be signed)
+			FILTER NOT EXISTS 
+	        {
+	        	GRAPH ?graphToCheck
+	            {
+	        		?graphToCheck rdfg:subGraphOf ?event.
+            		?event msg:messageType ?type.
+            		filter (?type = msg:SocketHintMessage || ?type = msg:AtomHintMessage)
+	            } .
+			}
+            
+			# filter out those that are signature graphs
+	        FILTER NOT EXISTS 
+	        {
+	        	GRAPH ?graphToCheck
+	            {
+	              ?graphToCheck rdf:type signature:Signature .
+	              ?graphToCheck msg:signedGraph ?anotherGraph .
+	            } .
+			}
+		}
      }
 
 
-    # count number of graphs
-    {  SELECT (count(DISTINCT ?g) as ?numGraphs) WHERE
-     {
-       GRAPH ?g
-       {
-               ?a ?b ?c .
-       } .
-     }
-    }
 
 
   }

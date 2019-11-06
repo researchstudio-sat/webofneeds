@@ -10,27 +10,29 @@
  */
 package won.protocol.message;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import com.google.common.collect.Iterators;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.rdf.model.*;
-import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.SKOS;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.slf4j.LoggerFactory;
-import won.protocol.util.RdfUtils;
-
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import static won.protocol.message.WonMessageBuilder.wrap;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.vocabulary.SKOS;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Iterators;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import won.protocol.util.RdfUtils;
 
 public class WonMessageBuilderTest {
     private static final URI MSG_URI_1 = URI.create("http://example.com/msg/1234");
@@ -61,64 +63,8 @@ public class WonMessageBuilderTest {
     }
 
     @Test
-    public void test_wrap_retains_envelope_graph_properties() {
-        WonMessage msg2 = wrapMessage(createMessageWithContent().build()).build();
-        Assert.assertEquals(WonMessageType.ATOM_HINT_MESSAGE, msg2.getMessageType());
-    }
-
-    @Test
-    public void test_wrap_allows_new_envelope_graph_properties() {
-        WonMessage msg2 = wrapMessage(createMessageWithContent().build()).build();
-        Assert.assertEquals(CONNECTION_URI_1, msg2.getRecipientURI());
-    }
-
-    @Test
-    public void test_wrap_retains_content_graphs() {
-        WonMessage msg2 = wrapMessage(createMessageWithContent().build()).build();
-        Assert.assertEquals(MSG_URI_1.toString(),
-                        RdfUtils.findOne(msg2.getMessageContent(), model -> {
-                            StmtIterator it = model.listStatements(null, RDF.type,
-                                            model.getResource(TYPE_URI_1.toString()));
-                            if (it.hasNext())
-                                return it.nextStatement().getSubject().asResource().toString();
-                            return null;
-                        }, false));
-        Assert.assertEquals(TYPE_URI_1.toString(),
-                        RdfUtils.findOnePropertyFromResource(msg2.getMessageContent(), MSG_URI_1, RDF.type).asResource()
-                                        .getURI());
-    }
-
-    @Test
-    public void test_wrap_allows_new_content_graphs() {
-        WonMessage msg2 = addContentWithDifferentURI(wrapMessage(createMessageWithoutContent().build())).build();
-        Assert.assertEquals(MSG_URI_2.toString(),
-                        RdfUtils.findOne(msg2.getMessageContent(), model -> {
-                            StmtIterator it = model.listStatements(null, RDF.type,
-                                            model.getResource(TYPE_URI_2.toString()));
-                            if (it.hasNext())
-                                return it.nextStatement().getSubject().asResource().toString();
-                            return null;
-                        }, false));
-        Assert.assertEquals(TYPE_URI_2.toString(),
-                        RdfUtils.findOnePropertyFromResource(msg2.getMessageContent(), MSG_URI_2, RDF.type).asResource()
-                                        .getURI());
-    }
-
-    @Test
-    public void test_wrapped_message_contains_correct_number_of_envelope_graphs() {
-        WonMessage msg2 = addContent(wrapMessage(createMessageWithContent().build())).build();
-        Assert.assertEquals(2, msg2.getEnvelopeGraphs().size());
-    }
-
-    @Test
     public void test_get_content_in_message_without_content() {
         final WonMessage msg = this.createMessageWithoutContent().build();
-        check_get_content_in_message_without_content(msg);
-    }
-
-    @Test
-    public void test_get_content_in_wrapped_message_without_content() {
-        final WonMessage msg = wrapMessage(createMessageWithoutContent().build()).build();
         check_get_content_in_message_without_content(msg);
     }
 
@@ -133,12 +79,6 @@ public class WonMessageBuilderTest {
     @Test
     public void test_get_content_in_message_with_content() {
         final WonMessage msg = this.createMessageWithContent().build();
-        check_get_content_in_message_with_content(msg);
-    }
-
-    @Test
-    public void test_get_content_in_wrapped_message_with_content() {
-        final WonMessage msg = wrapMessage(createMessageWithContent().build()).build();
         check_get_content_in_message_with_content(msg);
     }
 
@@ -165,13 +105,6 @@ public class WonMessageBuilderTest {
     public void test_get_content_in_message_with_content_dataset() {
         final WonMessage msg = this.createMessageWithContentDataset().build();
         check_get_content_in_message_with_content_dataset(msg);
-    }
-
-    @Test
-    public void test_get_content_in_wrapped_message_with_two_content_graphs() {
-        WonMessage msg = this.createMessageWithTwoContentGraphs().build();
-        msg = wrapMessage(msg).build();
-        check_get_content_in_message_with_two_content_graphs(msg);
     }
 
     @Test
@@ -242,10 +175,6 @@ public class WonMessageBuilderTest {
 
     private WonMessageBuilder addContentWithDifferentURI(WonMessageBuilder builder) {
         return builder.addContent(createDifferentContent());
-    }
-
-    private WonMessageBuilder wrapMessage(final WonMessage msg1) {
-        return wrap(msg1).setRecipientURI(CONNECTION_URI_1).setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
     }
 
     private WonMessageBuilder createMessageWithContent() {

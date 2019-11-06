@@ -18,104 +18,8 @@
 @prefix event: <https://satvm05.researchstudio.at/won/resource/event/> .
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
 @prefix sioc:  <http://rdfs.org/sioc/ns#> .
+    
 
-<https://satvm05.researchstudio.at/won/resource/event/hsvug43m3rvz9qei25zh#envelope-wwtm> {
-    <https://satvm05.researchstudio.at/won/resource/event/fksky6va56f8wfb90aug#envelope-sq5s-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMFp8metz4uymEPCnAmiugZpJP/WxLTLRkOUzysDMXUccSs5jp6nbunOjIEd2XPm15AIxAK586CTZhclDPt2qKcTmCvBdlTs/GStXZNWfRYKl2AEFLU3yD3oK1Hc+2Rox1SU37w==" ;
-            sig:hasVerificationCertificate  <https://satvm05.researchstudio.at/won/resource> ;
-            msg:hash                     "E4bv8mQ3QmcDItg36LzA7tmHsydX+PWM7nrvwKe/SW5lJEzw1M0YOomkynTF3q1vsUpvy/TiJ/VnEOZllURzK4xFulL6zdHBreL45eVorpR2o8vORYyQFenO7NaYnqraCikRptP7eeAmsQLA+fOXIzBQtVquU/c/QMu27SZj2KM=" ;
-            msg:publicKeyFingerprint     "4LmhYLhsZQNfIOINHzhhE7zy4CX7QmWxkzl1mqZ17Xw=" ;
-            msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/fksky6va56f8wfb90aug#envelope-sq5s> .
-    
-    <https://satvm05.researchstudio.at/won/resource/event/hsvug43m3rvz9qei25zh#envelope-wwtm>
-            a                      msg:EnvelopeGraph ;
-            msg:containsEnvelope   <https://satvm05.researchstudio.at/won/resource/event/hsvug43m3rvz9qei25zh#envelope-llgv> ;
-            msg:containsSignature  <https://satvm05.researchstudio.at/won/resource/event/hsvug43m3rvz9qei25zh#envelope-llgv-sig> , <https://satvm05.researchstudio.at/won/resource/event/fksky6va56f8wfb90aug#envelope-sq5s-sig> ;
-            <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
-                    event:hsvug43m3rvz9qei25zh .
-    
-    event:hsvug43m3rvz9qei25zh
-            a                         msg:FromExternal ;
-            msg:previousMessage    event:fksky6va56f8wfb90aug ;
-            msg:receivedTimestamp  "1548165408225"^^xsd:long ;
-            msg:protocolVersion       "1.0" .
-    
-    <https://satvm05.researchstudio.at/won/resource/event/hsvug43m3rvz9qei25zh#envelope-llgv-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQDUBuNI9HBSNnm5MhWojeAUn/tkaiKw46wSOMNJHJRY4bucUMn9tQyfTbNCB6vRtNgCMQDOk+1E7t3q018fv492I8ob4xGN6DOW/FSE/HD2ESs42shtrfi+JtI5HN37PSS+ziI=" ;
-            sig:hasVerificationCertificate  <https://satvm05.researchstudio.at/won/resource> ;
-            msg:hash                     "N/8D0qj36xyRyoDvmQkskTFcgSBNtMUzbz2tnNcPvW6lOV2/qKZU60Lu+W4inB4DFYxcEEvfTz2p6b4Zr21P+K11WvKFJ7t+hL2p8ZGy3V4guU6gzjf6nhqnbTNLULcX7j2Q6LhlfkJsAU2+Hm1VOlNAOlHXHBt73Mo8ycrbBhI=" ;
-            msg:publicKeyFingerprint     "4LmhYLhsZQNfIOINHzhhE7zy4CX7QmWxkzl1mqZ17Xw=" ;
-            msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/hsvug43m3rvz9qei25zh#envelope-llgv> .
-}
-
-<https://satvm05.researchstudio.at/won/resource/event/hsvug43m3rvz9qei25zh#envelope-wwtm-sig> {
-    <https://satvm05.researchstudio.at/won/resource/event/hsvug43m3rvz9qei25zh#envelope-wwtm-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMHT5AVCkb2F9eEpK20HE/tq2DDMwIKi+e34WTqJoAAKrE7lX+2YtamDozpgoxxISsQIxAP7LgcrmXULm9sJsH60MpW4T5upniQdhFBsvYzdTfmDf6Vgzx25Nx+xebeVMvdHa8w==" ;
-            sig:hasVerificationCertificate  <https://satvm05.researchstudio.at/won/resource> ;
-            msg:hash                     "RPvrzlja3RvmAbXuPduXgItuDNDtjJd8bdszPo0Jsh7iVAheIgXKbqqKQGXXxc9QH+dJb6NKuKVcBpj4UP4+DpkibPYIOqLVBBHCLQuZRvbg7EQxEiZPQTIFbV8zXttbsJEJCx4Yd6LRni7F0mRtLrrivm9yCbPbY17LKpQg+Qw=" ;
-            msg:publicKeyFingerprint     "4LmhYLhsZQNfIOINHzhhE7zy4CX7QmWxkzl1mqZ17Xw=" ;
-            msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/hsvug43m3rvz9qei25zh#envelope-wwtm> .
-}
-
-<https://satvm05.researchstudio.at/won/resource/event/e5syo59w9t3if0y428r8#envelope-ws3d> {
-    event:e5syo59w9t3if0y428r8
-            a                     msg:FromExternal ;
-            msg:correspondingRemoteMessage
-                    event:wxmlua2uu1gu ;
-            msg:sentTimestamp  "1548165407702"^^xsd:long ;
-            msg:protocolVersion   "1.0" .
-    
-    <https://satvm05.researchstudio.at/won/resource/event/e5syo59w9t3if0y428r8#envelope-ws3d>
-            a                      msg:EnvelopeGraph ;
-            msg:containsEnvelope   <https://satvm05.researchstudio.at/won/resource/event/wxmlua2uu1gu#envelope-l8ef> ;
-            msg:containsSignature  <https://satvm05.researchstudio.at/won/resource/event/wxmlua2uu1gu#envelope-l8ef-sig> ;
-            <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
-                    event:e5syo59w9t3if0y428r8 .
-    
-    <https://satvm05.researchstudio.at/won/resource/event/wxmlua2uu1gu#envelope-l8ef-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMDe6pBT+8z2B3v/UWWY/P0cfNSTLKjjhS0MiaKpD0hckV1WfVrz3g/vB5G9cKPpz+wIwUQin7Q7Rl9Tn56+7LHXcDI1zFKWw6RKIY3TYyo6eMETDXxIYoBassWG31hazdHBJ" ;
-            sig:hasVerificationCertificate  <https://satvm05.researchstudio.at/won/resource> ;
-            msg:hash                     "DpDW/oNkMdxV0HDkxHaq8nB1HSsya8sKrEj4bsXuRi6Z5CPg2TPn9XJ1hg3rLek/1dRMNw2zPFdhxtsJAkRg6a5r+pBfbFbzZumNQWXwGbaNNnTCcIEp6EOPFNuj2HRP8FNiAQS+lgND22uhDo/kO+fH0yvaZGC/yqpi61io/1s=" ;
-            msg:publicKeyFingerprint     "4LmhYLhsZQNfIOINHzhhE7zy4CX7QmWxkzl1mqZ17Xw=" ;
-            msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/wxmlua2uu1gu#envelope-l8ef> .
-}
-
-<https://satvm05.researchstudio.at/won/resource/event/wxmlua2uu1gu#envelope-l8ef> {
-    <https://satvm05.researchstudio.at/won/resource/event/wxmlua2uu1gu#envelope-l8ef>
-            a                      msg:EnvelopeGraph ;
-            msg:containsEnvelope   <https://satvm05.researchstudio.at/won/resource/event/wxmlua2uu1gu#data> ;
-            msg:containsSignature  <https://satvm05.researchstudio.at/won/resource/event/ib4saclhkrb4v92kmdxb#envelope-fml3-sig> , <https://satvm05.researchstudio.at/won/resource/event/wxmlua2uu1gu#data-sig> ;
-            <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
-                    event:wxmlua2uu1gu .
-    
-    <https://satvm05.researchstudio.at/won/resource/event/wxmlua2uu1gu#data-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMHXBES92xgUklmRkFco0A/pb20UtHs4KiaBTb/BDJkHNaH3/Whu8Rs6OUiJRA6Uz+AIxAIuJYoqqDv5xrFFulvf9ztLM1KLxKGjzhJQ0Gp8OAUvIVMo0hnxDUbvdbd1AmlBhSw==" ;
-            sig:hasVerificationCertificate  atom:j82pg6klrbqj ;
-            msg:hash                     "AIlCgDsTkSPfEKxRtQWAjxjZH8+++JBjiEh93f+vMCy325Rx+wKnohEqCx5e9ePSafX1H+UD1MKZIe9WF30MGEnUPupGZS4wACTn3Fstkj67FxEisepKC412W72f6u7kFjlhMNKRblliiHCP5qtgVK9WTeU8A5BQR4uwyPmXWwPk" ;
-            msg:publicKeyFingerprint     "ddn5TyI9t9kEajMyUSY9IguyXT3OAdmqgELpQWi7X1g=" ;
-            msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/wxmlua2uu1gu#data> .
-    
-    event:wxmlua2uu1gu
-            a                         msg:FromOwner ;
-            msg:correspondingRemoteMessage
-                    event:e5syo59w9t3if0y428r8 ;
-            msg:previousMessage    event:ib4saclhkrb4v92kmdxb ;
-            msg:receivedTimestamp  "1548165407652"^^xsd:long ;
-            msg:protocolVersion       "1.0" .
-    
-    <https://satvm05.researchstudio.at/won/resource/event/ib4saclhkrb4v92kmdxb#envelope-fml3-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMCitkrHE+W2ofaja2laZjBeneHEoqcMfp/MOjMPNTM0g5VMqrHWhRHjsluUsvC93hAIwbqBp9mo545uF8UeOUXZ9KGkL6264OL+CU6VfZdi/MooSH6W9V/dp520L0hOQj3aS" ;
-            sig:hasVerificationCertificate  <https://satvm05.researchstudio.at/won/resource> ;
-            msg:hash                     "Wpl62h/52UVdxYTG/jm2O78MuKxKQBp/iZ7XRNzpuhTzD/n5xunSo2/WkoAfMOIrCREDjui3tLn0FUGES16XPHINH/gMHcaGhdV1URpEA0CxhNRhiXWoKqyP3fdX0nZzWSuLwW+h98z/7fgFV6qd482v4kyKYr1bY8DGV+iiKrE=" ;
-            msg:publicKeyFingerprint     "4LmhYLhsZQNfIOINHzhhE7zy4CX7QmWxkzl1mqZ17Xw=" ;
-            msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/ib4saclhkrb4v92kmdxb#envelope-fml3> .
-}
 
 <https://satvm05.researchstudio.at/won/resource/event/wxmlua2uu1gu#data> {
     <https://satvm05.researchstudio.at/won/resource/event/wxmlua2uu1gu#content-sig>
@@ -150,14 +54,7 @@
             con:text  "Forwarded message" .
 }
 
-<https://satvm05.researchstudio.at/won/resource/event/hsvug43m3rvz9qei25zh#envelope-llgv> {
-    <https://satvm05.researchstudio.at/won/resource/event/hsvug43m3rvz9qei25zh#envelope-llgv>
-            a                      msg:EnvelopeGraph ;
-            msg:containsEnvelope   <https://satvm05.researchstudio.at/won/resource/event/pcunhsv1urpd2q3bfpan#envelope-4zq8> ;
-            msg:containsSignature  <https://satvm05.researchstudio.at/won/resource/event/pcunhsv1urpd2q3bfpan#envelope-4zq8-sig> ;
-            <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
-                    event:hsvug43m3rvz9qei25zh .
-    
+<https://satvm05.researchstudio.at/won/resource/event/pcunhsv1urpd2q3bfpan#envelope-4zq8-sig> {
     <https://satvm05.researchstudio.at/won/resource/event/pcunhsv1urpd2q3bfpan#envelope-4zq8-sig>
             a                               sig:Signature ;
             sig:signatureValue           "MGYCMQC7B10oxceGflkLad3CZIsUJ4FAGgfKElcF3/Oe4ckvzXReGLIcil3apdEI9zRmTzoCMQDBAl9/Ev75YWf+v6NhjkDtZtbiMOQPnW6cOxXSfbxpxEwla2TNCSJJh+SKnu7E5ko=" ;
@@ -165,29 +62,15 @@
             msg:hash                     "DWVF6ZHp8lKNfwNdI8d63pgcJx482e3dCz+hpsPTfhj/hRIQMpRCWNAls+V4XWmmOTz44KSgaeYZN8VJ1cTUSANVwzQgSbxC10+wT8XkcDvEzNk5Gg9DBmMdlQSmyOGoL+zy5VY9Hn5w3mV+jz2WMn2e9zCXCZlb2kfR74Os7CQ=" ;
             msg:publicKeyFingerprint     "4LmhYLhsZQNfIOINHzhhE7zy4CX7QmWxkzl1mqZ17Xw=" ;
             msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/pcunhsv1urpd2q3bfpan#envelope-4zq8> .
-    
-    event:hsvug43m3rvz9qei25zh
-            a                     msg:FromExternal ;
-            msg:correspondingRemoteMessage
-                    event:pcunhsv1urpd2q3bfpan ;
-            msg:sentTimestamp  "1548165408066"^^xsd:long ;
-            msg:protocolVersion   "1.0" .
 }
 
 <https://satvm05.researchstudio.at/won/resource/event/pcunhsv1urpd2q3bfpan#envelope-4zq8> {
-    <https://satvm05.researchstudio.at/won/resource/event/exs843oh2cvf8etnqmp5#envelope-apey-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQD6BPpKNG5WDvL5F/0X1ZZPAh1HhCmaHihGMLHJzLRTtHcrtOUyWz2EWFkbS0TbzzECMF58CN0JssBxZvdddIaVe9KpF4HxE9EqatOnBhxDP4bamM00xe0ku/k9X0/8+SUdrw==" ;
-            sig:hasVerificationCertificate  <https://satvm05.researchstudio.at/won/resource> ;
-            msg:hash                     "Mzl3WNyRnPOdIz4O3bh32x2WL37eN5ce5eC8H95RSDm3W3KwPklyblIN7STmVy895izDAgizX7uDtkkQ5LvJJUHMlqCYtR5MrQOWULZu/phyRuE/9FO+qB+XdT7XUvl84ocfv8mCeWRnpoNEzJUnGws0CI5dSnL+udhk9/CNb+w=" ;
-            msg:publicKeyFingerprint     "4LmhYLhsZQNfIOINHzhhE7zy4CX7QmWxkzl1mqZ17Xw=" ;
-            msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/exs843oh2cvf8etnqmp5#envelope-apey> .
-    
+        
     event:pcunhsv1urpd2q3bfpan
-            a                         msg:FromSystem ;
+            a                         msg:FromOwner ;
             msg:correspondingRemoteMessage
                     event:hsvug43m3rvz9qei25zh ;
-            msg:forwardedMessage   event:e5syo59w9t3if0y428r8 ;
+            msg:forwardedMessage   event:wxmlua2uu1gu ;
             msg:messageType        msg:ConnectionMessage ;
             msg:previousMessage    event:exs843oh2cvf8etnqmp5 ;
             msg:receivedTimestamp  "1548165407986"^^xsd:long ;
@@ -202,8 +85,7 @@
     
     <https://satvm05.researchstudio.at/won/resource/event/pcunhsv1urpd2q3bfpan#envelope-4zq8>
             a                      msg:EnvelopeGraph ;
-            msg:containsEnvelope   <https://satvm05.researchstudio.at/won/resource/event/e5syo59w9t3if0y428r8#envelope-fb49> ;
-            msg:containsSignature  <https://satvm05.researchstudio.at/won/resource/event/exs843oh2cvf8etnqmp5#envelope-apey-sig> , <https://satvm05.researchstudio.at/won/resource/event/e5syo59w9t3if0y428r8#envelope-fb49-sig> ;
+            msg:containsSignature  <https://satvm05.researchstudio.at/won/resource/event/e5syo59w9t3if0y428r8#envelope-fb49-sig> ;
             <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
                     event:pcunhsv1urpd2q3bfpan .
     
@@ -214,35 +96,4 @@
             msg:hash                     "ALCYfAABgLNl3AI5R+9VcvllfyJThjvGEndEFsRaZUlKZlbMzYRXVBVjxBHSuk7mW06e3qxWIYfCc6z6uBf6QtH+TkjfkBMW4+3KeENa/8AyM9Syrr1+/j6ScuxP4QbnsHWCc/iVlCfuBqcEH0eTpq9bW2SD6EXUXnF0PSxfGnEY" ;
             msg:publicKeyFingerprint     "4LmhYLhsZQNfIOINHzhhE7zy4CX7QmWxkzl1mqZ17Xw=" ;
             msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/e5syo59w9t3if0y428r8#envelope-fb49> .
-}
-
-<https://satvm05.researchstudio.at/won/resource/event/e5syo59w9t3if0y428r8#envelope-fb49> {
-    <https://satvm05.researchstudio.at/won/resource/event/e5syo59w9t3if0y428r8#envelope-ws3d-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQDIyEBYZ9zno7FFg8YffYxmEa4W6l3IEVb7oRPpS/A++hKbd+5lAn22VSKQUGW/u5UCMQCavTo9jMIuLEI2K701+DFtrwCl/GYIi+AuKDzSQYs2G7n0PxWN+4+2q4razQ734vs=" ;
-            sig:hasVerificationCertificate  <https://satvm05.researchstudio.at/won/resource> ;
-            msg:hash                     "WOr6pM19ZFXr5u0+MqD8rCfRyFRdAAHRyHiNfpMhJsAwjGTwh6r5XqG8R+kguSRU5DcNbF9p7+JwGRrj8llEIgzHxaq0QvHgKpjOcdpOcl9LtHtM7Xx3JdFeyRsVFNYxNx8SKPPuZXk0uU7dn9U59jZRDhkjbBxomEEiKi/GDUY=" ;
-            msg:publicKeyFingerprint     "4LmhYLhsZQNfIOINHzhhE7zy4CX7QmWxkzl1mqZ17Xw=" ;
-            msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/e5syo59w9t3if0y428r8#envelope-ws3d> .
-    
-    <https://satvm05.researchstudio.at/won/resource/event/e5syo59w9t3if0y428r8#envelope-fb49>
-            a                      msg:EnvelopeGraph ;
-            msg:containsEnvelope   <https://satvm05.researchstudio.at/won/resource/event/e5syo59w9t3if0y428r8#envelope-ws3d> ;
-            msg:containsSignature  <https://satvm05.researchstudio.at/won/resource/event/e5syo59w9t3if0y428r8#envelope-ws3d-sig> , <https://satvm05.researchstudio.at/won/resource/event/tqjpe9bsbqmysvusylaw#envelope-2mqp-sig> ;
-            <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
-                    event:e5syo59w9t3if0y428r8 .
-    
-    <https://satvm05.researchstudio.at/won/resource/event/tqjpe9bsbqmysvusylaw#envelope-2mqp-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQC8GW/oci7KLgWdx+odM/a+X5jDnunvcJTE61aKvbRFsIniUvtV/gbsbkH1VXFNkDwCMEnZKKuTZTJGcV4fBhuvshJ5VLA64kmSxDwaDIHeCfMuKC4wXVvRSNkrikHw1EdfIA==" ;
-            sig:hasVerificationCertificate  <https://satvm05.researchstudio.at/won/resource> ;
-            msg:hash                     "V/n95kbIDYG/eyvhuADgHLUiQ2aIg/GE6qWJutoYYVnSJ/YkbIJMtTKeWxYSSdXG/1+a+lF4rE4597Q6mexMFof5tCn4KP551R9l+n4tw7JggT+Wt0vexFdi3qnmiI1NF8OADtc7AviZELyu9ENTe461tcjlw89hDvUtI5g68vM=" ;
-            msg:publicKeyFingerprint     "4LmhYLhsZQNfIOINHzhhE7zy4CX7QmWxkzl1mqZ17Xw=" ;
-            msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/tqjpe9bsbqmysvusylaw#envelope-2mqp> .
-    
-    event:e5syo59w9t3if0y428r8
-            a                         msg:FromExternal ;
-            msg:previousMessage    event:tqjpe9bsbqmysvusylaw ;
-            msg:receivedTimestamp  "1548165407853"^^xsd:long ;
-            msg:protocolVersion       "1.0" .
 }

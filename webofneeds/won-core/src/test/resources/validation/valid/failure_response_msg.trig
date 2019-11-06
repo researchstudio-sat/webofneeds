@@ -5,7 +5,7 @@
                     <https://satvm05.researchstudio.at/won/resource/event/n3j4mhrrypppoymsa5xp#content-vybl> ;
             <https://w3id.org/won/message#messageType>
                     <https://w3id.org/won/message#FailureResponse> ;
-            <https://w3id.org/won/message#receivedTimestamp>
+            <https://w3id.org/won/message#timestamp>
                     "1537253096017"^^<http://www.w3.org/2001/XMLSchema#long> ;
             <https://w3id.org/won/message#recipientAtom>
                     <https://satvm05.researchstudio.at/won/resource/atom/fw1tqsz1grkz> ;

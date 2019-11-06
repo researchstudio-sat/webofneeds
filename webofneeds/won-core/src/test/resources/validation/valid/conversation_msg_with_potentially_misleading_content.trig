@@ -54,7 +54,7 @@
                     <https://satvm05.researchstudio.at/won/resource/atom/bxh7r6yz5u5s7u4s8ru5> ;
             <https://w3id.org/won/message#senderNode>
                     <https://satvm05.researchstudio.at/won/resource> ;
-            <https://w3id.org/won/message#sentTimestamp>
+            <https://w3id.org/won/message#timestamp>
                     "1536133735069"^^<http://www.w3.org/2001/XMLSchema#long> ;
             <https://w3id.org/won/message#protocolVersion>
                     "1.0" .

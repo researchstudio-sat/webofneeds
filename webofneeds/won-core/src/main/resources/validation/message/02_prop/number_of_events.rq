@@ -25,16 +25,14 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
 
 
 
-  ?numEvents
-      ?numRemoteEvents
+  	?numEvents
+      ?numResponseEvents
       ?numTypedEvents
       ?numForwardedEvents
 
 
-      (if(?numEvents != ?numForwardedEvents + ?numRemoteEvents + 1
-      || ?numTypedEvents != ?numForwardedEvents + 1
-      || ?numEvents != (1 + ?numRemoteEvents + ?numForwardedEvents),
-      "FAIL", "OK") AS ?check)
+      (if( ?numEvents = 1 || ?numEvents = ?numForwardedEvents + ?numResponseEvents + 1,
+      "OK", "FAIL") AS ?check)
 
     WHERE
     {
@@ -61,21 +59,22 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
         }
       }
 
-      # number of remote events with addressing and type correctly related to another event
-      { SELECT (count(DISTINCT ?revent) as ?numRemoteEvents)
+      # number of responses
+      { SELECT (count(DISTINCT ?revent) as ?numResponseEvents)
         WHERE
         {
           GRAPH ?envelope
           {
             ?envelope rdf:type msg:EnvelopeGraph .
-            ?event msg:correspondingRemoteMessage ?revent .
+            ?revent msg:respondingTo ?event .
           } .
           GRAPH ?renvelope
           {
             ?renvelope rdf:type msg:EnvelopeGraph .
-            ?revent msg:recipientAtom|msg:senderAtom|msg:recipientNode|msg:senderNode ?uri .
+            ?revent msg:recipientAtom|msg:senderAtom|msg:recipientNode|msg:senderNode|msg:recipientSocket|msg:senderSocket ?uri .
             ?revent msg:messageType ?type .
             ?renvelope rdfg:subGraphOf ?revent .
+            filter (?type = msg:SuccessResponse || ?type = msg:FailureResponse)
           } .
         }
       }

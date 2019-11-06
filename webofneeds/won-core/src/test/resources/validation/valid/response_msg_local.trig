@@ -48,7 +48,7 @@
 
     event:kpft39z0ladmp3cqm4ju
             a                         msg:FromSystem ;
-            msg:receivedTimestamp  "1433774720773"^^xsd:long ;
+            msg:timestamp  "1433774720773"^^xsd:long ;
             msg:containsSignature   [ msg:signatureGraph  <http://localhost:8080/won/resource/event/kpft39z0ladmp3cqm4ju#envelope-c37o-sig> ;
                                         msg:signatureValue  "MGUCMDvSj42RBFrY9YEd0rKcy9jWSH8h/v1u0SMwlp53Dx6kXOcCY2P+CehW0z/KzyFx7QIxAIpYh1+Xol5ib7RLueMi/IMJVUGCa+QFYnwZ4cYsp9mTAsaCyknXsQXe/SiEWZmobg==" ;
                                         msg:signedGraph     <http://localhost:8080/won/resource/event/kpft39z0ladmp3cqm4ju#envelope-c37o>
