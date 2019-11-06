@@ -1,18 +1,19 @@
 package won.cryptography.service.keystore;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * User: fsalcher Date: 12.06.2014
@@ -28,7 +29,6 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
     private String storePW;
     private File storeFile;
     private java.security.KeyStore store;
-    private final Ehcache ehcache;
     private final String provider;
     private final String keyStoreType;
 
@@ -47,14 +47,6 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
         this.keyStoreType = keyStoreType;
         logger.info("Using key store file {} with key store type {}, provider {}",
                         new Object[] { storeFile, keyStoreType, provider });
-        CacheManager manager = CacheManager.getInstance();
-        String cacheName = "keyCache" + storeFile.hashCode();
-        if (!manager.cacheExists(cacheName)) {
-            ehcache = new Cache(cacheName, 100, false, false, 60, 60);
-            manager.addCache(ehcache);
-        } else {
-            ehcache = manager.getCache(cacheName);
-        }
     }
 
     /*
@@ -63,19 +55,17 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
      */
     @Override
     public PrivateKey getPrivateKey(String alias) {
-        Element cachedElement = ehcache.get("KEY++" + alias);
-        if (cachedElement != null)
-            return (PrivateKey) cachedElement.getObjectValue();
         PrivateKey retrieved = null;
         try {
             retrieved = (PrivateKey) store.getKey(alias, storePW.toCharArray());
         } catch (Exception e) {
             logger.warn("Could not retrieve key for " + alias + " from ks " + storeFile.getName(), e);
         }
-        if (retrieved != null) {
-            ehcache.put(new Element("KEY++" + alias, retrieved));
-        }
         return retrieved;
+    }
+
+    private String makeCacheKeyForPrivateKey(String alias) {
+        return "PK " + hashCode() + alias;
     }
 
     /*
@@ -108,17 +98,17 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
      */
     @Override
     public Certificate getCertificate(String alias) {
-        Element cachedElement = ehcache.get("CERT++" + alias);
-        if (cachedElement != null)
-            return (Certificate) cachedElement.getObjectValue();
         Certificate retrieved = null;
         try {
             retrieved = store.getCertificate(alias);
         } catch (Exception e) {
             logger.warn("No certificate found for alias " + alias, e);
         }
-        ehcache.put(new Element("CERT++" + alias, retrieved));
         return retrieved;
+    }
+
+    private Serializable makeCacheKeyForCertificate(String alias) {
+        return "CERT " + hashCode() + alias;
     }
 
     /*
@@ -218,5 +208,42 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
             logger.error("Error initializing key store " + storeFile.getName(), e);
             throw e;
         }
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((keyStoreType == null) ? 0 : keyStoreType.hashCode());
+        result = prime * result + ((provider == null) ? 0 : provider.hashCode());
+        result = prime * result + ((storeFile == null) ? 0 : storeFile.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        FileBasedKeyStoreService other = (FileBasedKeyStoreService) obj;
+        if (keyStoreType == null) {
+            if (other.keyStoreType != null)
+                return false;
+        } else if (!keyStoreType.equals(other.keyStoreType))
+            return false;
+        if (provider == null) {
+            if (other.provider != null)
+                return false;
+        } else if (!provider.equals(other.provider))
+            return false;
+        if (storeFile == null) {
+            if (other.storeFile != null)
+                return false;
+        } else if (!storeFile.equals(other.storeFile))
+            return false;
+        return true;
     }
 }
