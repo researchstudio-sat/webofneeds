@@ -9,7 +9,14 @@
 
     <artifactId>won-utils-goals</artifactId>
     <name>Utilities-Goals</name>
-
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>net.revelc.code.formatter</groupId>
+				<artifactId>formatter-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
     <dependencies>
         <dependency>
             <groupId>at.researchstudio.sat</groupId>
