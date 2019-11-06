@@ -42,7 +42,7 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware, Messagi
      * @param endpoint
      * @return
      */
-    public synchronized ListenableFuture sendInOutMessageGeneric(Map properties, Map headers, Object body,
+    public synchronized ListenableFuture<String> sendInOutMessageGeneric(Map properties, Map headers, Object body,
                     String endpoint) {
         Exchange exchange = new DefaultExchange(getCamelContext());
         // TODO: the method name shall be set in the header of the message.
@@ -58,12 +58,12 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware, Messagi
         exchange.getIn().setBody(body);
         // exchange.getOut().setBody(body);
         exchange.setPattern(ExchangePattern.InOut);
-        final SettableFuture<T> result = SettableFuture.create();
+        final SettableFuture<String> result = SettableFuture.create();
         logger.debug("sending inout message");
         producerTemplate.asyncCallback(ep, exchange, new Synchronization() {
             @Override
             public void onComplete(Exchange exchange) {
-                T resultObject = (T) exchange.getOut().getBody();
+                String resultObject = (String) exchange.getOut().getBody();
                 result.set(resultObject);
             }
 
@@ -136,6 +136,12 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware, Messagi
         if (exchange.getException() != null) {
             logger.warn("caught exception while sending jms message", exchange.getException());
         }
+    }
+
+    @Override
+    public synchronized void send(Exchange exchange, String endpoint) {
+        Endpoint ep = getCamelContext().getEndpoint(endpoint);
+        producerTemplate.send(ep, exchange);
     }
 
     @Override
