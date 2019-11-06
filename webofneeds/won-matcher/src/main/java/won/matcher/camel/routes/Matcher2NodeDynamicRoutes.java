@@ -15,6 +15,8 @@ import java.util.List;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 
+import won.protocol.message.processor.camel.WonCamelConstants;
+
 /**
  * User: LEIH-NB Date: 10.10.13
  */
@@ -31,6 +33,6 @@ public class Matcher2NodeDynamicRoutes extends RouteBuilder {
     @Override
     public void configure() {
         from("seda:MatcherProtocol.Out.Hint?concurrentConsumers=2").routeId("Matcher2NodeRoute")
-                        .recipientList(header("remoteBrokerEndpoint"));
+                        .recipientList(header(WonCamelConstants.REMOTE_BROKER_ENDPOINT_HEADER));
     }
 }

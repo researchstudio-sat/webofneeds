@@ -10,22 +10,24 @@
  */
 package won.matcher.protocol.impl;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.protocol.jms.CamelConfiguration;
 import won.protocol.jms.MatcherProtocolCommunicationService;
 import won.protocol.jms.MessagingService;
 import won.protocol.matcher.MatcherProtocolAtomServiceClientSide;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
+import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.util.RdfUtils;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * User: gabriel Date: 12.02.13 Time: 17:26
@@ -50,7 +52,7 @@ public class MatcherProtocolAtomServiceClientJMSBased implements MatcherProtocol
         headerMap.put("score", String.valueOf(score));
         headerMap.put("originator", originator.toString());
         headerMap.put("content", RdfUtils.toString(content));
-        headerMap.put("remoteBrokerEndpoint", endpoint);
+        headerMap.put(WonCamelConstants.REMOTE_BROKER_ENDPOINT_HEADER, endpoint);
         headerMap.put("methodName", "hint");
         messagingService.sendInOnlyMessage(null, headerMap, WonMessageEncoder.encode(wonMessage, Lang.TRIG),
                         startingEndpoint);
