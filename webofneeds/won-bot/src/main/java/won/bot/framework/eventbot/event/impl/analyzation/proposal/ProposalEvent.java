@@ -20,11 +20,9 @@ public abstract class ProposalEvent extends BaseAtomAndConnectionSpecificEvent {
     public ProposalEvent(Connection con, MessageEvent proposalEvent) {
         super(con);
         this.proposalEvent = proposalEvent;
-        if (proposalEvent instanceof WonMessageReceivedOnConnectionEvent) {
-            this.proposalUri = proposalEvent.getWonMessage().getCorrespondingRemoteMessageURI();
-        } else if (proposalEvent instanceof WonMessageSentOnConnectionEvent) {
-            this.proposalUri = proposalEvent.getWonMessage().getMessageURI();
-        } else {
+        this.proposalUri = proposalEvent.getWonMessage().getMessageURI();
+        if (!(proposalEvent instanceof WonMessageReceivedOnConnectionEvent)
+                        || (proposalEvent instanceof WonMessageSentOnConnectionEvent)) {
             throw new IllegalArgumentException(
                             "MessageEvent can only be of the instance WonMessageReceivedOnConnectionEvent or WonMessageSentOnConnectionEvent");
         }
