@@ -1,0 +1,6 @@
+@prefix ex:<http://example.com/>.
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+@prefix won:<https://w3id.org/won/core#>.
+
+ex:atom1 a won:Atom;
+    dc:title "Test Atom 1" .
