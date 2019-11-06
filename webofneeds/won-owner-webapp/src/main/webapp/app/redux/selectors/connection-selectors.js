@@ -144,6 +144,56 @@ export function getChatConnectionsToCrawl(state) {
   return connectionsWithoutConnectMessage || Immutable.Map();
 }
 
+/**
+ * Returns all connections of an atom that have the status "requestReceived".
+ * @param state
+ * @param atom
+ */
+export function getRequestedConnections(state, atom) {
+  const atoms = getAtoms(state);
+  const connections = get(atom, "connections");
+  return (
+    connections &&
+    connections.filter(
+      conn =>
+        connectionUtils.isRequestReceived(conn) &&
+        isChatToXConnection(atoms, conn)
+    )
+  );
+}
+
+/**
+ * Returns all connections of an atom that have the status "requestReceived" and are unread.
+ * @param state
+ * @param atom
+ */
+export function getUnreadRequestedConnections(state, atom) {
+  const requestedConnections = getRequestedConnections(state, atom);
+  return (
+    requestedConnections &&
+    requestedConnections.filter(conn => get(conn, "unread"))
+  );
+}
+
+/**
+ * Returns all chat connections that are open and unread, which should cover only chat messages.
+ * @param state
+ * @param atom
+ */
+export function getUnreadChatMessageConnections(state, atom) {
+  const atoms = getAtoms(state);
+  const connections = get(atom, "connections");
+  return (
+    connections &&
+    connections.filter(
+      conn =>
+        isChatToXConnection(atoms, conn) &&
+        connectionUtils.isConnected(conn) &&
+        connectionUtils.isUnread(conn)
+    )
+  );
+}
+
 export function hasMessagesToLoad(state, connUri) {
   const messageProcess = getIn(state, [
     "process",

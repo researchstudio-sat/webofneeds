@@ -310,6 +310,7 @@ export function hasUnreadSuggestedConnections(atom) {
   );
 }
 
+// to be used on personas
 export function hasUnreadBuddyRequests(atom) {
   return (
     get(atom, "connections") &&

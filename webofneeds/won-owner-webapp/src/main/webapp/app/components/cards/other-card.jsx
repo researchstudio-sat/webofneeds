@@ -10,9 +10,13 @@ import PropTypes from "prop-types";
 
 import WonAtomMap from "../atom-map.jsx";
 import WonAtomSuggestionsIndicator from "../atom-suggestions-indicator.jsx";
+import WonAtomConnectionsIndicator from "../atom-connections-indicator.jsx";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import { relativeTime } from "../../won-label-utils.js";
-import { selectLastUpdateTime } from "../../redux/selectors/general-selectors.js";
+import {
+  selectLastUpdateTime,
+  hasUnreadChatConnections,
+} from "../../redux/selectors/general-selectors.js";
 
 import "~/style/_other-card.scss";
 
@@ -75,6 +79,7 @@ const mapStateToProps = (state, ownProps) => {
     useCaseIcon,
     iconBackground,
     identiconSvg,
+    hasUnreadChatConnections: hasUnreadChatConnections(state),
   };
 };
 
@@ -204,10 +209,32 @@ class WonOtherCard extends React.Component {
         undefined
       );
 
-    const cardSuggestionIndicators = this.props.showSuggestions ? (
-      <div className="card__indicators">
-        <WonAtomSuggestionsIndicator atomUri={this.props.atomUri} />
-      </div>
+    // const cardSuggestionIndicators = this.props.showSuggestions ? (
+    //   <div className="card__indicators">
+    //     <WonAtomSuggestionsIndicator atomUri={this.props.atomUri} />
+    //   </div>
+    // ) : (
+    //   undefined
+    // );
+
+    // const cardNewConnectionIndicators = this.props.showSuggestions ? (
+    //   <div className="card__indicators">
+    //     <WonAtomConnectionsIndicator atomUri={this.props.atomUri} />
+    //   </div>
+    // ) : (
+    //   undefined
+    // );
+
+    const cardConnectionIndicators = this.props.showSuggestions ? (
+      this.props.hasUnreadChatConnections ? (
+        <div className="card__indicators">
+          <WonAtomConnectionsIndicator atomUri={this.props.atomUri} />
+        </div>
+      ) : (
+        <div className="card__indicators">
+          <WonAtomSuggestionsIndicator atomUri={this.props.atomUri} />
+        </div>
+      )
     ) : (
       undefined
     );
@@ -217,7 +244,7 @@ class WonOtherCard extends React.Component {
         {cardIcon}
         {cardMain}
         {cardPersonaInfo}
-        {cardSuggestionIndicators}
+        {cardConnectionIndicators}
       </won-other-card>
     );
   }
@@ -434,6 +461,7 @@ WonOtherCard.propTypes = {
   useCaseIcon: PropTypes.string,
   iconBackground: PropTypes.string,
   identiconSvg: PropTypes.string,
+  hasUnreadChatConnections: PropTypes.bool,
 };
 
 export default connect(
