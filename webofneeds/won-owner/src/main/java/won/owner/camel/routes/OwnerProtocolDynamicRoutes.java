@@ -16,6 +16,8 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 
+import won.protocol.message.processor.camel.WonCamelConstants;
+
 /**
  * User: sbyim Date: 25.11.13 This class is used to dynamically generate routes
  * for outgoing messages from owner application.
@@ -45,10 +47,13 @@ public class OwnerProtocolDynamicRoutes extends RouteBuilder {
     @Override
     public void configure() throws Exception {
         from(from).routeId(from).to("log:Dynamic Route FROM Owner").choice()
-                        .when(header("remoteBrokerEndpoint").isNull())
-                        .log(LoggingLevel.ERROR, "could not route message: remoteBrokerEndpoint is null")
+                        .when(header(WonCamelConstants.REMOTE_BROKER_ENDPOINT_HEADER).isNull())
+                        .log(LoggingLevel.ERROR,
+                                        "could not route message: " + WonCamelConstants.REMOTE_BROKER_ENDPOINT_HEADER
+                                                        + " is null")
                         .throwException(new IllegalArgumentException(
-                                        "could not route message: remoteBrokerEndpoint is null"))
-                        .otherwise().recipientList(header("remoteBrokerEndpoint"));
+                                        "could not route message: " + WonCamelConstants.REMOTE_BROKER_ENDPOINT_HEADER
+                                                        + " is null"))
+                        .otherwise().recipientList(header(WonCamelConstants.REMOTE_BROKER_ENDPOINT_HEADER));
     }
 }

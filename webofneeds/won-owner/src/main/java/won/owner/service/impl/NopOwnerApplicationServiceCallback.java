@@ -10,9 +10,9 @@
  */
 package won.owner.service.impl;
 
+import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.WonMessageProcessor;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
 
 /**
  * Handler implementation that does nothing. Useful for extending as well as

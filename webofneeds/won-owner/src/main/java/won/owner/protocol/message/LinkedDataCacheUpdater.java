@@ -3,9 +3,10 @@ package won.owner.protocol.message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.WonMessageProcessor;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.util.linkeddata.CachingLinkedDataSource;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
