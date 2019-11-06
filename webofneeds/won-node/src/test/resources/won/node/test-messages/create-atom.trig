@@ -20,33 +20,13 @@
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
 
 
-this:envelope-b8nv {
-    event:createMessage
-            a                      msg:FromOwner ;
-            msg:protocolVersion    "1.0" ;
-            msg:receivedTimestamp  "1568107960792"^^xsd:long .
-    
+this:envelope-sig {   
     this:envelope-sig  a                      sig:Signature ;
             sig:hasVerificationCertificate  atom:newAtom ;
             sig:signatureValue              "MGYC[...]sDgg=" ;
             msg:hash                        "UikX[...]uq7k=" ;
             msg:publicKeyFingerprint        "drBD[...]6Tqk=" ;
             msg:signedGraph                 this:envelope .
-    
-    this:envelope-b8nv  a            msg:EnvelopeGraph ;
-            rdfg:subGraphOf        event:createMessage ;
-            msg:containsEnvelope   this:envelope ;
-            msg:containsSignature  this:envelope-sig .
-}
-
-this:envelope-b8nv-sig {
-    this:envelope-b8nv-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  node:resource ;
-            sig:signatureValue              "MGQC[...]CTXWq" ;
-            msg:hash                        "AIsM[...]9jyPf" ;
-            msg:publicKeyFingerprint        "lZnZ[...]y1LQ=" ;
-            msg:signedGraph                 this:envelope-b8nv .
 }
 
 this:envelope {

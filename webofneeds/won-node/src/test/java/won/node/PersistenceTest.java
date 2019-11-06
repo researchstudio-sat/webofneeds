@@ -1,7 +1,7 @@
 package won.node;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +16,7 @@ import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -28,11 +29,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import won.node.service.linkeddata.lookup.SocketLookupFromLinkedData;
+import won.node.service.nodeconfig.URIService;
 import won.node.service.persistence.AtomService;
 import won.node.service.persistence.ConnectionService;
 import won.node.service.persistence.MessageService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.model.Atom;
 import won.protocol.model.AtomMessageContainer;
 import won.protocol.model.AtomState;
@@ -42,13 +45,16 @@ import won.protocol.repository.AtomRepository;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.vocabulary.WONMSG;
 
-@ContextConfiguration(locations = { "classpath:/won/node/common-test-context.xml",
+@ContextConfiguration(locations = { "classpath:/won/node/PersistenceTest.xml",
                 "classpath:/spring/component/storage/jdbc-storage.xml",
                 "classpath:/spring/component/storage/jpabased-rdf-storage.xml" })
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestPropertySource
 @Transactional
 public class PersistenceTest {
+    /**
+     * Actual services
+     */
     @Autowired
     AtomRepository atomRepository;
     @Autowired
@@ -60,9 +66,22 @@ public class PersistenceTest {
     @Autowired
     ConnectionService connectionService;
     @MockBean
+    URIService uriService;
+    /*
+     * Mocked services
+     */
+    @MockBean
     SocketLookupFromLinkedData socketLookup;
     @MockBean
     WonNodeInformationService wonNodeInformationService;
+
+    @Before
+    public void setUp() {
+        Mockito.when(uriService.isAtomURI(any(URI.class))).thenReturn(true);
+        Mockito.when(uriService.getAtomResourceURIPrefix()).then(x -> "uri:/node/resource/atom");
+        Mockito.when(uriService.getResourceURIPrefix()).then(x -> "uri:/node/resource");
+        Mockito.when(uriService.createAtomSysInfoGraphURI(any(URI.class))).thenCallRealMethod();
+    }
 
     @Test(expected = DataIntegrityViolationException.class)
     public void test_Atom_missing_message_container() {
@@ -102,13 +121,15 @@ public class PersistenceTest {
     @Test
     public void test_create_Atom_from_message() throws Exception {
         Dataset ds = createTestDataset("/won/node/test-messages/create-atom.trig");
-        WonMessage msg = new WonMessage(ds);
+        WonMessage msg = WonMessage.of(ds);
         Atom atom = atomService.createAtom(msg);
         URI atomURI = atom.getAtomURI();
         messageService.saveMessage(msg, atom.getAtomURI());
         URI newMessageURI = URI.create("uri:successResponse");
         WonMessage responseMessage = WonMessageBuilder
-                        .setPropertiesForNodeResponse(msg, true, newMessageURI).build();
+                        .setPropertiesForNodeResponse(msg, true, newMessageURI, Optional.empty(),
+                                        WonMessageDirection.FROM_OWNER)
+                        .build();
         messageService.saveMessage(responseMessage, atom.getAtomURI());
         Atom atom2 = atomService.getAtomRequired(atomURI);
         assertEquals(2, atom2.getMessageContainer().getEvents().size());
@@ -118,26 +139,32 @@ public class PersistenceTest {
     public void test_create_two_atoms_and_connect() throws Exception {
         // create an atom, as before
         Dataset ds = createTestDataset("/won/node/test-messages/create-atom.trig");
-        WonMessage createMsg = new WonMessage(ds);
+        WonMessage createMsg = WonMessage.of(ds);
         Atom atom = atomService.createAtom(createMsg);
         URI atomURI = atom.getAtomURI();
         messageService.saveMessage(createMsg, atom.getAtomURI());
         URI newMessageURI = URI.create("uri:successResponse");
         WonMessage responseMessage = WonMessageBuilder
-                        .setPropertiesForNodeResponse(createMsg, true, newMessageURI).build();
+                        .setPropertiesForNodeResponse(createMsg, true, newMessageURI,
+                                        Optional.empty(),
+                                        WonMessageDirection.FROM_OWNER)
+                        .build();
         messageService.saveMessage(responseMessage, atom.getAtomURI());
         Atom checkAtom = atomService.getAtomRequired(atomURI);
         assertEquals(2, checkAtom.getMessageContainer().getEvents().size());
         //
         // create another atom
         ds = createTestDataset("/won/node/test-messages/create-atom2.trig");
-        WonMessage createMsg2 = new WonMessage(ds);
+        WonMessage createMsg2 = WonMessage.of(ds);
         Atom atom2 = atomService.createAtom(createMsg2);
         URI atomURI2 = atom2.getAtomURI();
         messageService.saveMessage(createMsg2, atom2.getAtomURI());
         URI successResponse2 = URI.create("uri:successResponse2");
         WonMessage responseMessage2 = WonMessageBuilder
-                        .setPropertiesForNodeResponse(createMsg2, true, successResponse2).build();
+                        .setPropertiesForNodeResponse(createMsg2, true, successResponse2,
+                                        Optional.empty(),
+                                        WonMessageDirection.FROM_OWNER)
+                        .build();
         messageService.saveMessage(responseMessage2, atom2.getAtomURI());
         checkAtom = atomService.getAtomRequired(atomURI2);
         assertEquals(2, checkAtom.getMessageContainer().getEvents().size());
@@ -153,6 +180,8 @@ public class PersistenceTest {
         Mockito.when(socketLookup.getCapacity(targetSocket)).thenReturn(Optional.of(10));
         Mockito.when(socketLookup.isCompatible(senderSocket, targetSocket)).thenReturn(true);
         Mockito.when(socketLookup.isCompatible(targetSocket, senderSocket)).thenReturn(true);
+        Mockito.when(socketLookup.getCapacityOfType(any(URI.class))).thenReturn(Optional.of(10));
+        Mockito.when(socketLookup.isCompatibleSocketTypes(any(URI.class), any(URI.class))).thenReturn(true);
         URI connectMessageUri = URI.create("uri:connectMessage");
         WonMessage connectMessage = WonMessageBuilder.setMessagePropertiesForConnect(connectMessageUri,
                         senderSocket,
@@ -168,7 +197,10 @@ public class PersistenceTest {
         // we'd create a response
         URI successForConnect = URI.create("uri:successForConnect");
         WonMessage responseForConnectMessage = WonMessageBuilder
-                        .setPropertiesForNodeResponse(connectMessage, true, successForConnect).build();
+                        .setPropertiesForNodeResponse(connectMessage, true, successForConnect,
+                                        Optional.of(con.getConnectionURI()),
+                                        WonMessageDirection.FROM_OWNER)
+                        .build();
         // and store the response
         messageService.saveMessage(responseForConnectMessage, con.getConnectionURI());
         // let's check:
@@ -183,26 +215,32 @@ public class PersistenceTest {
     public void test_create_two_atoms_and_connect_use_same_message_in_both_connections() throws Exception {
         // create an atom, as before
         Dataset ds = createTestDataset("/won/node/test-messages/create-atom.trig");
-        WonMessage createMsg = new WonMessage(ds);
+        WonMessage createMsg = WonMessage.of(ds);
         Atom atom = atomService.createAtom(createMsg);
         URI atomURI = atom.getAtomURI();
         messageService.saveMessage(createMsg, atom.getAtomURI());
         URI newMessageURI = URI.create("uri:successResponse");
         WonMessage responseMessage = WonMessageBuilder
-                        .setPropertiesForNodeResponse(createMsg, true, newMessageURI).build();
+                        .setPropertiesForNodeResponse(createMsg, true, newMessageURI,
+                                        Optional.empty(),
+                                        WonMessageDirection.FROM_OWNER)
+                        .build();
         messageService.saveMessage(responseMessage, atom.getAtomURI());
         Atom checkAtom = atomService.getAtomRequired(atomURI);
         assertEquals(2, checkAtom.getMessageContainer().getEvents().size());
         //
         // create another atom
         ds = createTestDataset("/won/node/test-messages/create-atom2.trig");
-        WonMessage createMsg2 = new WonMessage(ds);
+        WonMessage createMsg2 = WonMessage.of(ds);
         Atom atom2 = atomService.createAtom(createMsg2);
         URI atomURI2 = atom2.getAtomURI();
         messageService.saveMessage(createMsg2, atom2.getAtomURI());
         URI successResponse2 = URI.create("uri:successResponse2");
         WonMessage responseMessage2 = WonMessageBuilder
-                        .setPropertiesForNodeResponse(createMsg2, true, successResponse2).build();
+                        .setPropertiesForNodeResponse(createMsg2, true, successResponse2,
+                                        Optional.empty(),
+                                        WonMessageDirection.FROM_OWNER)
+                        .build();
         messageService.saveMessage(responseMessage2, atom2.getAtomURI());
         checkAtom = atomService.getAtomRequired(atomURI2);
         assertEquals(2, checkAtom.getMessageContainer().getEvents().size());
@@ -218,6 +256,8 @@ public class PersistenceTest {
         Mockito.when(socketLookup.getCapacity(targetSocket)).thenReturn(Optional.of(10));
         Mockito.when(socketLookup.isCompatible(senderSocket, targetSocket)).thenReturn(true);
         Mockito.when(socketLookup.isCompatible(targetSocket, senderSocket)).thenReturn(true);
+        Mockito.when(socketLookup.getCapacityOfType(any(URI.class))).thenReturn(Optional.of(10));
+        Mockito.when(socketLookup.isCompatibleSocketTypes(any(URI.class), any(URI.class))).thenReturn(true);
         URI connectMessageUri = URI.create("uri:connectMessage");
         WonMessage connectMessage = WonMessageBuilder.setMessagePropertiesForConnect(connectMessageUri,
                         senderSocket,
@@ -233,7 +273,10 @@ public class PersistenceTest {
         // we'd create a response
         URI successForConnect = URI.create("uri:successForConnect");
         WonMessage responseForConnectMessage = WonMessageBuilder
-                        .setPropertiesForNodeResponse(connectMessage, true, successForConnect).build();
+                        .setPropertiesForNodeResponse(connectMessage, true, successForConnect,
+                                        Optional.of(con.getConnectionURI()),
+                                        WonMessageDirection.FROM_OWNER)
+                        .build();
         // and store the response
         messageService.saveMessage(responseForConnectMessage, con.getConnectionURI());
         // let's check:
@@ -251,7 +294,10 @@ public class PersistenceTest {
         messageService.saveMessage(connectMessage, remoteCon.getConnectionURI());
         URI successForConnect2 = URI.create("uri:successForConnect2");
         WonMessage responseForConnectMessage2 = WonMessageBuilder
-                        .setPropertiesForNodeResponse(connectMessage, true, successForConnect2).build();
+                        .setPropertiesForNodeResponse(connectMessage, true, successForConnect2,
+                                        Optional.of(remoteCon.getConnectionURI()),
+                                        WonMessageDirection.FROM_OWNER)
+                        .build();
         messageService.saveMessage(responseForConnectMessage2, remoteCon.getConnectionURI());
         assertEquals(2, con.getMessageContainer().getEvents().size());
         Set<URI> messages2 = remoteCon.getMessageContainer().getEvents().stream()

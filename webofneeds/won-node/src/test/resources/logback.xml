@@ -25,10 +25,17 @@
     </appender>
 
 	<logger name="org.springframework" level="WARN" />
+	<logger name="won.node.WonMessageRoutesExternalInterceptedTest" level="INFO" />
+	<logger name="won.node.WonMessageRoutesExternalRoutedTest" level="INFO" />
+	<logger name="won.node.WonMessageRoutesTest" level="INFO" />
+	<logger name="won" level="INFO" />
+	<!-- if the CamelContext's 'trace' feature is enabled  (changes with camel version) -->
+	<logger name="org.apache.camel.processor.interceptor.Tracer" level="WARN"/> 
+	<logger name="won.node.camel.processor.general.FailResponder" level="INFO" />
 	
     
     <!-- available log-levels: DEBUG, INFO, WARN, ERROR -->
-    <root level="INFO">
+    <root level="WARN">
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>

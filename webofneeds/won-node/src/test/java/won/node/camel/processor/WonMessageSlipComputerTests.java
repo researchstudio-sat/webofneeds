@@ -37,7 +37,7 @@ public class WonMessageSlipComputerTests {
     @Test
     public void testCreateFromOwner() throws Exception {
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createGeneral()));
+        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, WonMessage.of(DatasetFactory.createGeneral()));
         exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.CreateMessageString));
         exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER,
                         URI.create(WonMessageDirection.FROM_OWNER.getResource().getURI().toString()));
@@ -48,7 +48,7 @@ public class WonMessageSlipComputerTests {
     @Test
     public void testActivateAtomMessage() throws Exception {
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createGeneral()));
+        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, WonMessage.of(DatasetFactory.createGeneral()));
         exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.ActivateMessageString));
         exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER,
                         URI.create(WONMSG.FromOwner.getURI().toString()));
@@ -60,7 +60,7 @@ public class WonMessageSlipComputerTests {
     @Test
     public void testCloseMessageFromNode() throws Exception {
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createGeneral()));
+        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, WonMessage.of(DatasetFactory.createGeneral()));
         exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.CloseMessageString));
         exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER,
                         URI.create(WonMessageDirection.FROM_EXTERNAL.getResource().getURI().toString()));
@@ -72,7 +72,7 @@ public class WonMessageSlipComputerTests {
     @Test
     public void testCloseMessageFromOwner() throws Exception {
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createGeneral()));
+        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, WonMessage.of(DatasetFactory.createGeneral()));
         exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.CloseMessageString));
         exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER,
                         URI.create(WonMessageDirection.FROM_OWNER.getResource().getURI().toString()));
@@ -84,7 +84,7 @@ public class WonMessageSlipComputerTests {
     @Test
     public void testConnectMessageFromNode() throws Exception {
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createGeneral()));
+        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, WonMessage.of(DatasetFactory.createGeneral()));
         exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.ConnectMessageString));
         exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER,
                         URI.create(WonMessageDirection.FROM_EXTERNAL.getResource().getURI().toString()));
@@ -96,7 +96,7 @@ public class WonMessageSlipComputerTests {
     @Test
     public void testConnectMessageFromOwner() throws Exception {
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createGeneral()));
+        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, WonMessage.of(DatasetFactory.createGeneral()));
         exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.ConnectMessageString));
         exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER,
                         URI.create(WonMessageDirection.FROM_OWNER.getResource().getURI().toString()));
@@ -108,7 +108,7 @@ public class WonMessageSlipComputerTests {
     @Test
     public void testDeactivateAtomMessageFromOwner() throws Exception {
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createGeneral()));
+        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, WonMessage.of(DatasetFactory.createGeneral()));
         exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.DeactivateMessageString));
         exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER,
                         URI.create(WonMessageDirection.FROM_OWNER.getResource().getURI().toString()));
@@ -120,7 +120,7 @@ public class WonMessageSlipComputerTests {
     @Test
     public void testHintMessageProcessor() throws Exception {
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createGeneral()));
+        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, WonMessage.of(DatasetFactory.createGeneral()));
         exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.SocketHintMessageString));
         exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER, URI.create(
                         WonMessageDirection.FROM_EXTERNAL.getResource().getURI().toString()));
@@ -132,7 +132,7 @@ public class WonMessageSlipComputerTests {
     @Test
     public void testSendMessageFromNode() throws Exception {
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createGeneral()));
+        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, WonMessage.of(DatasetFactory.createGeneral()));
         exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.ConnectionMessageString));
         exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER,
                         URI.create(WonMessageDirection.FROM_EXTERNAL.getResource().getURI().toString()));
@@ -144,7 +144,7 @@ public class WonMessageSlipComputerTests {
     @Test
     public void testSendMessageFromOwner() throws Exception {
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createGeneral()));
+        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, WonMessage.of(DatasetFactory.createGeneral()));
         exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.ConnectionMessageString));
         exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER,
                         URI.create(WonMessageDirection.FROM_OWNER.getResource().getURI().toString()));
@@ -156,7 +156,7 @@ public class WonMessageSlipComputerTests {
     @Test
     public void testSendMessageFromNodeGroupSocket() throws Exception {
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createGeneral()));
+        exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, WonMessage.of(DatasetFactory.createGeneral()));
         exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.ConnectionMessageString));
         exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER,
                         URI.create(WonMessageDirection.FROM_EXTERNAL.getResource().getURI().toString()));
