@@ -10,22 +10,20 @@
  */
 package won.node.camel.processor.general;
 
-import java.net.URI;
+import java.util.Date;
 
+import won.protocol.exception.WonMessageProcessingException;
+import won.protocol.message.WonMessage;
 import won.protocol.message.processor.WonMessageProcessor;
+import won.protocol.vocabulary.WONMSG;
 
 /**
- * WonMessageProcessor that can be used exactly once to generate an outbound
- * message based on a local message.
+ * Wraps the wonMessage, adding the direction property.
  */
-public abstract class OutboundMessageFactoryProcessor implements WonMessageProcessor {
-    private URI messageURI;
-
-    public OutboundMessageFactoryProcessor(URI messageURI) {
-        this.messageURI = messageURI;
-    }
-
-    public URI getMessageURI() {
-        return messageURI;
+public class TimestampAddingWonMessageProcessor implements WonMessageProcessor {
+    @Override
+    public WonMessage process(WonMessage message) throws WonMessageProcessingException {
+        message.addMessageProperty(WONMSG.timestamp, new Date().getTime());
+        return message;
     }
 }

@@ -10,20 +10,28 @@
  */
 package won.node.camel.processor.general;
 
-import java.util.Date;
+import static won.node.camel.processor.WonCamelHelper.*;
 
+import java.net.URI;
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import won.node.camel.processor.WonCamelHelper;
 import won.protocol.message.WonMessage;
-import won.protocol.message.processor.WonMessageProcessor;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
-import won.protocol.vocabulary.WONMSG;
 
 /**
- * Wraps the wonMessage, adding the direction property.
+ * Created by fkleedorfer on 22.07.2016.
  */
-public class ReceivedTimestampAddingWonMessageProcessor implements WonMessageProcessor {
+public class ReferencesToResponseAdder implements Processor {
+    @Autowired
+    private MessageReferencer messageReferencer;
+
     @Override
-    public WonMessage process(WonMessage message) throws WonMessageProcessingException {
-        message.addMessageProperty(WONMSG.receivedTimestamp, new Date().getTime());
-        return message;
+    public void process(Exchange exchange) throws Exception {
+        WonMessage msg = WonCamelHelper.getResponseRequired(exchange);
+        URI parent = getParentURIRequired(exchange);
+        WonCamelHelper.putResponse(exchange, messageReferencer.addMessageReferences(msg, parent));
     }
 }

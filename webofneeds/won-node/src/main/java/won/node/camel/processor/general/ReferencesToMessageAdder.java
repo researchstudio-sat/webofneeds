@@ -10,22 +10,28 @@
  */
 package won.node.camel.processor.general;
 
+import static won.node.camel.processor.WonCamelHelper.*;
+
+import java.net.URI;
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import won.node.camel.processor.WonCamelHelper;
 import won.protocol.message.WonMessage;
-import won.protocol.message.processor.WonMessageProcessor;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
 
 /**
  * Created by fkleedorfer on 22.07.2016.
  */
-public class ReferenceToUnreferencedMessageAddingProcessor implements WonMessageProcessor {
+public class ReferencesToMessageAdder implements Processor {
     @Autowired
     private MessageReferencer messageReferencer;
 
     @Override
-    // we use READ_COMMITTED because we want to wait for an exclusive lock will
-    // accept data written by a concurrent transaction that commits before we read
-    public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
-        return messageReferencer.addMessageReferences(message);
+    public void process(Exchange exchange) throws Exception {
+        WonMessage msg = WonCamelHelper.getMessageRequired(exchange);
+        URI parentURI = getParentURIRequired(exchange);
+        WonCamelHelper.putMessage(exchange, messageReferencer.addMessageReferences(msg, parentURI));
     }
 }
