@@ -15,7 +15,7 @@ const mapStateToProps = (state, ownProps) => {
     onClick: ownProps.onClick,
     actionButtons: ownProps.actionButtons ? ownProps.actionButtons : undefined,
     className: ownProps.className,
-    enableMouseEvents: false, //ownProps.enableMouseEvents,
+    enableMouseEvents: false,
     hideTimestamp: ownProps.hideTimestamp ? ownProps.hideTimestamp : false,
   };
 };
