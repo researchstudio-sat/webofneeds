@@ -595,32 +595,33 @@ public class WonWebSocketHandler extends TextWebSocketHandler
     private void updateUserAtomAssociation(WonMessage wonMessage, User user) {
         URI atomUri = getOwnedAtomURI(wonMessage);
         Long userId = user != null ? user.getId() : null;
-        if (wonMessage.getMessageType() == WonMessageType.SUCCESS_RESPONSE) {
-            switch (wonMessage.getIsResponseToMessageType()) {
+        WonMessage focalMessage = wonMessage.getFocalMessage();
+        if (focalMessage.getMessageType() == WonMessageType.SUCCESS_RESPONSE) {
+            switch (focalMessage.getRespondingToMessageType()) {
                 case CREATE_ATOM:
                     try {
-                        saveAtomUriWithUser(wonMessage, user);
+                        saveAtomUriWithUser(focalMessage, user);
                     } catch (Exception e) {
                         logger.warn("could not associate atom " + atomUri + " with user " + userId, e);
                     }
                     break;
                 case DEACTIVATE:
                     try {
-                        deactivateAtomUri(wonMessage);
+                        deactivateAtomUri(focalMessage);
                     } catch (Exception e) {
                         logger.warn("could not deactivate atom " + atomUri + " of user " + userId, e);
                     }
                     break;
                 case ACTIVATE:
                     try {
-                        activateAtomUri(wonMessage);
+                        activateAtomUri(focalMessage);
                     } catch (Exception e) {
                         logger.warn("could not activate atom " + atomUri + " of user " + userId, e);
                     }
                     break;
                 case DELETE:
                     try {
-                        deleteUserAtom(wonMessage, user);
+                        deleteUserAtom(focalMessage, user);
                     } catch (Exception e) {
                         logger.warn("could not delete atom " + atomUri + " of user " + userId, e);
                     }

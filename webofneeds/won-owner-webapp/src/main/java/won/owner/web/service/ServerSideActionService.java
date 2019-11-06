@@ -18,12 +18,12 @@ import won.owner.pojo.SocketToConnect;
 import won.owner.service.impl.OwnerApplicationService;
 import won.owner.web.service.serversideaction.EventTriggeredAction;
 import won.owner.web.service.serversideaction.EventTriggeredActionContainer;
+import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.AuthenticationThreadLocal;
 import won.protocol.util.linkeddata.LinkedDataSource;
@@ -107,7 +107,7 @@ public class ServerSideActionService implements WonMessageProcessor {
     }
 
     private boolean isSuccessResponse(WonMessage msg) {
-        return msg.getMessageType() == WonMessageType.SUCCESS_RESPONSE;
+        return msg.getMessageType() == WonMessageType.SUCCESS_RESPONSE || msg.getResponse().isPresent();
     }
 
     private boolean isResponseToCreateOfSockets(WonMessage msg, List<SocketToConnect> sockets) {
@@ -115,7 +115,7 @@ public class ServerSideActionService implements WonMessageProcessor {
     }
 
     private boolean isResponseToCreateOfSocket(WonMessage msg, SocketToConnect socket) {
-        return msg.getIsResponseToMessageType() == WonMessageType.CREATE_ATOM
+        return msg.getRespondingToMessageType() == WonMessageType.CREATE_ATOM
                         && msg.getEnvelopeType() == WonMessageDirection.FROM_SYSTEM
                         && socket.getSocket().startsWith(msg.getRecipientAtomURI().toString() + "#");
     }

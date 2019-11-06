@@ -1,21 +1,22 @@
 package won.owner.web.websocket;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import won.protocol.message.WonMessage;
-import won.protocol.message.processor.WonMessageProcessor;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
-import won.protocol.util.WonRdfUtils;
-import won.protocol.util.linkeddata.CachingLinkedDataSource;
-import won.protocol.util.linkeddata.LinkedDataSource;
-
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import won.protocol.exception.WonMessageProcessingException;
+import won.protocol.message.WonMessage;
+import won.protocol.message.processor.WonMessageProcessor;
+import won.protocol.util.WonRdfUtils;
+import won.protocol.util.linkeddata.CachingLinkedDataSource;
+import won.protocol.util.linkeddata.LinkedDataSource;
 
 public class EagerlyCachePopulatingMessageProcessor implements WonMessageProcessor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -34,9 +35,7 @@ public class EagerlyCachePopulatingMessageProcessor implements WonMessageProcess
                             message.getMessageURI(), requester);
             // load the original message(s) into cache, too
             Set<URI> toLoad = new HashSet<URI>();
-            addIfNotNull(toLoad, message.getIsRemoteResponseToMessageURI());
-            addIfNotNull(toLoad, message.getIsResponseToMessageURI());
-            addIfNotNull(toLoad, message.getCorrespondingRemoteMessageURI());
+            addIfNotNull(toLoad, message.getRespondingToMessageURI());
             List<URI> previous = WonRdfUtils.MessageUtils.getPreviousMessageUrisIncludingRemote(message);
             addIfNotNull(toLoad, previous);
             parallelRequestsThreadpool.submit(() -> toLoad.parallelStream()
