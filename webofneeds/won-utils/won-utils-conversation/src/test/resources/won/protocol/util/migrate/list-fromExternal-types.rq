@@ -1,0 +1,12 @@
+PREFIX won:<https://w3id.org/won/core#>
+PREFIX msg:<https://w3id.org/won/message#>
+select distinct * where {
+	optional {
+		graph ?graph {
+			?msg msg:messageType ?type
+		}
+	}
+	graph ?graph2 {
+		?msg a msg:FromExternal .
+	}
+}
