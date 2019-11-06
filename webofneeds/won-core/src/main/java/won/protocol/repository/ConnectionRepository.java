@@ -36,6 +36,13 @@ public interface ConnectionRepository extends WonRepository<Connection> {
 
     Optional<Connection> findOneByConnectionURI(URI URI);
 
+    Optional<Connection> findOneBySocketURIAndTargetSocketURI(URI socketURI, URI remoteSocketURI);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select con from Connection con where socketURI = :socketUri and targetSocketURI = :targetSocketUri")
+    Optional<Connection> findOneBySocketURIAndTargetSocketURIForUpdate(@Param("socketUri") URI socketURI,
+                    @Param("targetSocketUri") URI targetSocketURI);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select con from Connection con where connectionURI = :uri")
     Optional<Connection> findOneByConnectionURIForUpdate(@Param("uri") URI uri);
@@ -68,9 +75,8 @@ public interface ConnectionRepository extends WonRepository<Connection> {
      * Locks all connections for a given socket. Used to avoid race conditions when
      * deciding if socket capacity is exceeded.
      */
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select count (*) from Connection con where socketURI = :socketUri")
-    long countBySocketUriForUpdate(@Param("socketUri") URI socketURI);
+    long countBySocketUri(@Param("socketUri") URI socketURI);
 
     long countByAtomURIAndState(URI atomURI, ConnectionState connectionState);
 
@@ -99,6 +105,9 @@ public interface ConnectionRepository extends WonRepository<Connection> {
 
     @Query("select c from Connection c where c.atomURI = ?1 and c.socketURI = ?2 and c.state != ?3")
     List<Connection> findByAtomURIAndSocketURIAndNotState(URI atomURI, URI socketURI, ConnectionState connectionState);
+
+    @Query("select case when (count(c) > 0) then true else false end from Connection c where c.atomURI = ?1 and c.socketURI = ?2 and c.state = ?3")
+    boolean existsWithtomURIAndSocketURIAndState(URI atomURI, URI socketURI, ConnectionState connectionState);
 
     @Query("select conn from Connection conn where lastUpdate > :modifiedAfter")
     List<Connection> findModifiedConnectionsAfter(@Param("modifiedAfter") Date modifiedAfter);

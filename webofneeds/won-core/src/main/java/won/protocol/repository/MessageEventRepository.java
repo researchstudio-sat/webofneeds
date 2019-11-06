@@ -19,7 +19,9 @@ import won.protocol.model.MessageEvent;
 import won.protocol.model.unread.UnreadMessageInfoForConnection;
 
 public interface MessageEventRepository extends WonRepository<MessageEvent> {
-    Optional<MessageEvent> findFirstByMessageURI(URI URI);
+    Optional<MessageEvent> findFirstByMessageURIAndParentURI(URI messageUri, URI parentUri);
+
+    Optional<MessageEvent> findOneByMessageURIAndParentURI(URI messageURI, URI parentURI);
 
     // read is permitted iff any of these conditions apply:
     // * the WebId is the sender atom
@@ -93,8 +95,8 @@ public interface MessageEventRepository extends WonRepository<MessageEvent> {
     void lockConnectionAndMessageContainerByContainedMessageForUpdate(@Param("messageUri") URI messageUri);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select msg from MessageEvent msg where msg.messageURI = :uri")
-    MessageEvent findOneByMessageURIforUpdate(@Param("uri") URI uri);
+    @Query("select msg from MessageEvent msg where msg.messageURI = :msgUri and msg.parentURI = :parentUri")
+    MessageEvent findOneByMessageURIAndParentURIForUpdate(@Param("msgUri") URI uri, @Param("parentUri") URI parentUri);
 
     List<MessageEvent> findByParentURI(URI URI);
 
@@ -216,8 +218,6 @@ public interface MessageEventRepository extends WonRepository<MessageEvent> {
                     @Param("referenceDate") Date referenceDate, @Param("messageType") WonMessageType messageType,
                     Pageable pageable);
 
-    MessageEvent findOneByCorrespondingRemoteMessageURIAndParentURI(URI correspondingRemoteMessageURI, URI parentURI);
-
     @Query("select max(msg.creationDate) from MessageEvent msg where msg.creationDate <= :referenceDate and "
                     + "parentURI = :parent")
     Date findMaxActivityDateOfParentAtTime(@Param("parent") URI parentURI, @Param("referenceDate") Date referenceDate);
@@ -226,47 +226,6 @@ public interface MessageEventRepository extends WonRepository<MessageEvent> {
                     + "parentURI = :parent and msg.messageType = :messageType")
     Date findMaxActivityDateOfParentAtTime(@Param("parent") URI parentURI,
                     @Param("messageType") WonMessageType messageType, @Param("referenceDate") Date referenceDate);
-
-    /**
-     * For a specified message (msg in the query), return true iff there is an
-     * earlier message with the same recipient and the same innermost message uri
-     * that is not the corresponding remote message of the specified one
-     * 
-     * @param messageUri
-     * @return
-     */
-    @Query("select case when (count(otherMsg) > 0) then true else false end "
-                    + "from MessageEvent msg, MessageEvent otherMsg join Connection otherCon "
-                    + "on (otherMsg.parentURI = otherCon.connectionURI) " + "where "
-                    + "msg.messageURI = :messageUri and " + "otherMsg.messageURI <> msg.messageURI and "
-                    + "otherCon.atomURI = msg.recipientAtomURI and "
-                    + "otherMsg.recipientAtomURI = msg.recipientAtomURI and "
-                    + "otherMsg.innermostMessageURI = msg.innermostMessageURI and " + "( " +
-                    // either the other message is earlier - then we lose
-                    "    msg.creationDate > otherMsg.creationDate " + "    or (" +
-                    // if both messages happen at the same instant, we need a tie-breaker: db id
-                    "        msg.creationDate = otherMsg.creationDate and " + "        msg.id > otherMsg.id " + "    )"
-                    + ")")
-    boolean existEarlierMessageWithSameInnermostMessageURIAndRecipientAtomURI(
-                    @Param("messageUri") URI messageUri);
-
-    /**
-     * When we want to forward a message to recipient r, we first check if we have
-     * received a message with the same innermost message from r. If that's the
-     * case, we don't forward it to r. Here is the check for that
-     *
-     * @param messageUri
-     * @return
-     */
-    @Query("select case when (count(otherMsg) > 0) then true else false end "
-                    + "from MessageEvent msg, MessageEvent otherMsg join Connection otherCon "
-                    + "on (otherMsg.parentURI = otherCon.connectionURI) " + "where "
-                    + "msg.messageURI = :messageUri and " + "otherMsg.senderAtomURI = :senderAtomUri and "
-                    + "otherMsg.messageURI <> msg.messageURI and " + "otherCon.atomURI = msg.recipientAtomURI and "
-                    + "otherMsg.recipientAtomURI = msg.recipientAtomURI and "
-                    + "otherMsg.innermostMessageURI = msg.innermostMessageURI")
-    boolean isReceivedSameInnermostMessageFromSender(@Param("messageUri") URI messageUri,
-                    @Param("senderAtomUri") URI senderAtomURI);
 
     void deleteByParentURI(URI parentUri);
 }

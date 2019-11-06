@@ -31,11 +31,10 @@ import won.protocol.model.parentaware.ParentAware;
                 @Index(name = "IDX_ME_PARENT_URI", columnList = "parentURI"),
                 @Index(name = "IDX_ME_PARENT_URI_MESSAGE_TYPE", columnList = "parentURI, messageType"),
                 @Index(name = "IDX_ME_PARENT_URI_REFERENCED_BY_OTHER_MESSAGE", columnList = "parentURI, referencedByOtherMessage"),
-                @Index(name = "IDX_ME_INNERMOST_MESSAGE_URI_RECIPIENT_ATOM_URI", columnList = "messageURI, recipientAtomURI, innermostMessageURI, correspondingRemoteMessageURI") }, uniqueConstraints = {
-                                @UniqueConstraint(name = "IDX_ME_UNIQUE_MESSAGE_URI", columnNames = { "messageURI",
-                                                "parentURI" }),
-                                @UniqueConstraint(name = "IDX_ME_UNIQUE_CORREXPONDING_REMOTE_MESSAGE_URI", columnNames = "correspondingRemoteMessageURI"),
-                })
+                @Index(name = "IDX_ME_RECIPIENT_ATOM_URI", columnList = "messageURI, recipientAtomURI") }, uniqueConstraints = {
+                                @UniqueConstraint(name = "IDX_ME_UNIQUE_MESSAGE_URI_PER_PARENT", columnNames = {
+                                                "messageURI",
+                                                "parentURI" }) })
 public class MessageEvent implements ParentAware<MessageContainer> {
     public MessageEvent() {
     }
@@ -51,9 +50,7 @@ public class MessageEvent implements ParentAware<MessageContainer> {
         this.recipientAtomURI = wonMessage.getRecipientAtomURI();
         this.recipientNodeURI = wonMessage.getRecipientNodeURI();
         this.creationDate = new Date();
-        this.correspondingRemoteMessageURI = wonMessage.getCorrespondingRemoteMessageURI();
         this.referencedByOtherMessage = false;
-        this.innermostMessageURI = wonMessage.getInnermostMessageURI();
         this.messageContainer = messageContainer;
     }
 
@@ -99,17 +96,11 @@ public class MessageEvent implements ParentAware<MessageContainer> {
     private URI recipientNodeURI;
     @Column(name = "creationDate")
     private Date creationDate;
-    @Column(name = "correspondingRemoteMessageURI")
-    @Convert(converter = URIConverter.class)
-    private URI correspondingRemoteMessageURI;
     @Column(name = "responseMessageURI")
     @Convert(converter = URIConverter.class)
     private URI responseMessageURI;
     @Column(name = "referencedByOtherMessage")
     private boolean referencedByOtherMessage;
-    @Column(name = "innermostMessageURI")
-    @Convert(converter = URIConverter.class)
-    private URI innermostMessageURI;
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private DatasetHolder datasetHolder;
 
@@ -221,14 +212,6 @@ public class MessageEvent implements ParentAware<MessageContainer> {
         this.creationDate = creationDate;
     }
 
-    public URI getCorrespondingRemoteMessageURI() {
-        return correspondingRemoteMessageURI;
-    }
-
-    public void setCorrespondingRemoteMessageURI(final URI correspondingRemoteMessageURI) {
-        this.correspondingRemoteMessageURI = correspondingRemoteMessageURI;
-    }
-
     public boolean isReferencedByOtherMessage() {
         return referencedByOtherMessage;
     }
@@ -243,14 +226,6 @@ public class MessageEvent implements ParentAware<MessageContainer> {
 
     public void setResponseMessageURI(final URI responseMessageURI) {
         this.responseMessageURI = responseMessageURI;
-    }
-
-    public URI getInnermostMessageURI() {
-        return innermostMessageURI;
-    }
-
-    public void setInnermostMessageURI(URI innermostMessageURI) {
-        this.innermostMessageURI = innermostMessageURI;
     }
 
     public DatasetHolder getDatasetHolder() {

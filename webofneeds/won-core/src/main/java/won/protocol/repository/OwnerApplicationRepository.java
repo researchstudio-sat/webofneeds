@@ -1,6 +1,7 @@
 package won.protocol.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.LockModeType;
 
@@ -15,6 +16,8 @@ import won.protocol.model.OwnerApplication;
  */
 public interface OwnerApplicationRepository extends WonRepository<OwnerApplication> {
     List<OwnerApplication> findByOwnerApplicationId(String ownerApplicationId);
+
+    Optional<OwnerApplication> findOneByOwnerApplicationId(String ownerApplicationId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select app from OwnerApplication app where app.ownerApplicationId = :ownerApplicationId")
