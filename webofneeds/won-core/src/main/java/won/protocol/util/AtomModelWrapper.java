@@ -1,27 +1,55 @@
 package won.protocol.util;
 
+import java.net.URI;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Node;
-import org.apache.jena.query.*;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.ResIterator;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
+
+import won.protocol.exception.IllegalAtomContentException;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.model.AtomGraphType;
 import won.protocol.model.AtomState;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMATCH;
-
-import java.net.URI;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This class wraps the atom models (atom and sysinfo graphs in an atom
@@ -139,6 +167,10 @@ public class AtomModelWrapper {
                 atomDataset.addNamedModel(this.atomModelGraphName, atomModel);
             }
         }
+    }
+
+    public Dataset getDataset() {
+        return atomDataset;
     }
 
     /**
@@ -266,14 +298,25 @@ public class AtomModelWrapper {
     protected Resource getAtomNode(AtomGraphType graph) {
         if (graph.equals(AtomGraphType.ATOM) && getAtomModel() != null) {
             ResIterator iter = getAtomModel().listSubjectsWithProperty(RDF.type, WON.Atom);
+            Resource ret = null;
             if (iter.hasNext()) {
-                return iter.next();
+                ret = iter.next();
             }
+            if (iter.hasNext()) {
+                throw new IllegalAtomContentException("More than one atom resource found");
+            }
+            return ret;
         } else if (graph.equals(AtomGraphType.SYSINFO) && getSysInfoModel() != null) {
             ResIterator iter = getSysInfoModel().listSubjectsWithProperty(RDF.type, WON.Atom);
+            Resource ret = null;
             if (iter.hasNext()) {
                 return iter.next();
             }
+            if (iter.hasNext()) {
+                throw new IllegalAtomContentException(
+                                "More than one atom resource found. Remove a triple '[atom] rdf:type won:Atom'!");
+            }
+            return ret;
         }
         return null;
     }
@@ -288,7 +331,11 @@ public class AtomModelWrapper {
     }
 
     public String getAtomUri() {
-        return getAtomContentNode().getURI();
+        Resource atom = getAtomContentNode();
+        if (atom == null) {
+            throw new IllegalAtomContentException("No atom resource found. Add a triple '[atom] rdf:type won:Atom'!");
+        }
+        return atom.getURI();
     }
 
     public void addFlag(Resource flag) {
@@ -334,6 +381,42 @@ public class AtomModelWrapper {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Rename resources in all models, replacing the prefix string by the
+     * replacement string.
+     * 
+     * @param dataset
+     * @param prefix
+     * @param replacement
+     */
+    public void renameResourceWithPrefix(String prefix, String replacement) {
+        RdfUtils.renameResourceWithPrefix(this.atomDataset, prefix, replacement);
+        this.atomModelGraphName = preplacePrefix(this.atomModelGraphName, prefix, replacement);
+        this.sysInfoGraphName = preplacePrefix(this.sysInfoGraphName, prefix, replacement);
+    }
+
+    private String preplacePrefix(String toChange, String prefix, String replacement) {
+        if (toChange == null) {
+            return null;
+        }
+        if (toChange.startsWith(prefix)) {
+            return replacement + toChange.substring(prefix.length());
+        }
+        return toChange;
+    }
+
+    public void setAtomURI(URI newAtomURI) {
+        setAtomURI(newAtomURI.toString());
+    }
+
+    public void setAtomURI(String newAtomURI) {
+        String atomURI = getAtomUri();
+        if (atomURI == null) {
+            throw new IllegalStateException("Cannot change atom URI: none found.");
+        }
+        renameResourceWithPrefix(atomURI, newAtomURI);
     }
 
     public void addMatchingContext(String context) {
