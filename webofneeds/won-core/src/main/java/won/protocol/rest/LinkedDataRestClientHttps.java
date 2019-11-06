@@ -10,6 +10,11 @@
  */
 package won.protocol.rest;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
+import javax.annotation.PostConstruct;
+
 import org.apache.http.ssl.TrustStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,15 +22,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
+
 import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
 import won.cryptography.service.CryptographyUtils;
 import won.cryptography.service.TrustStoreService;
 import won.cryptography.service.keystore.KeyStoreService;
 import won.cryptography.ssl.PredefinedAliasPrivateKeyStrategy;
-
-import javax.annotation.PostConstruct;
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
 
 /**
  * User: ypanchenko Date: 07.10.15
@@ -61,12 +63,18 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
     private RestTemplate createRestTemplateForReadingLinkedData(String webID) {
         RestTemplate template;
         try {
+            if (logger.isDebugEnabled()) {
+                logger.debug("creating rest template for webID {} ", webID == null ? "[none provided]" : webID);
+            }
             template = CryptographyUtils.createSslRestTemplate(this.keyStoreService.getUnderlyingKeyStore(),
                             this.keyStoreService.getPassword(),
                             new PredefinedAliasPrivateKeyStrategy(
                                             keyPairAliasDerivationStrategy.getAliasForAtomUri(webID)),
                             this.trustStoreService.getUnderlyingKeyStore(), this.trustStrategy, readTimeout,
                             connectionTimeout, true);
+            if (logger.isDebugEnabled()) {
+                logger.debug("rest template for webID {} created", webID == null ? "[none provided]" : webID);
+            }
         } catch (Exception e) {
             throw new RuntimeException("Failed to create rest template for webID '" + webID + "'", e);
         }
