@@ -547,17 +547,6 @@ public class AgreementProtocolState {
         Set<DeadReferenceConversationMessage> messagesWithDeadReferences = new HashSet<>();
         // iterate over messages and interconnect them
         messages.stream().forEach(message -> {
-            if (message.getCorrespondingRemoteMessageURI() != null
-                            && !message.getCorrespondingRemoteMessageURI().equals(message.getMessageURI())) {
-                ConversationMessage other = messagesByURI.get(message.getCorrespondingRemoteMessageURI());
-                if (other != null) {
-                    message.setCorrespondingRemoteMessageRef(other);
-                    other.setCorrespondingRemoteMessageRef(message);
-                } else {
-                    messagesWithDeadReferences.add(new DeadReferenceConversationMessage(message,
-                                    "msg:correspondingRemoteMessage", message.getCorrespondingRemoteMessageURI()));
-                }
-            }
             message.getPrevious().stream().filter(uri -> !uri.equals(message.getMessageURI())).forEach(uri -> {
                 ConversationMessage other = messagesByURI.get(uri);
                 if (other != null) {
@@ -633,25 +622,22 @@ public class AgreementProtocolState {
                     messagesWithDeadReferences.add(new DeadReferenceConversationMessage(message, "mod:retracts", uri));
                 }
             });
-            if (message.getIsResponseTo() != null && !message.getIsResponseTo().equals(message.getMessageURI())) {
-                ConversationMessage other = messagesByURI.get(message.getIsResponseTo());
+            if (message.getRespondingTo() != null && !message.getRespondingTo().equals(message.getMessageURI())) {
+                ConversationMessage other = messagesByURI.get(message.getRespondingTo());
                 if (other != null) {
-                    message.setIsResponseToRef(other);
-                    other.setIsResponseToInverseRef(message);
+                    if (other.getSenderAtomURI().equals(message.getSenderAtomURI())) {
+                        message.setRespondingToRef(other);
+                        other.setRespondingToInverseRef(message);
+                    } else {
+                        // change from respondingTo to remotelyRespondingTo
+                        message.setRemotelyRespondingTo(message.getRespondingTo());
+                        message.setRespondingTo(null); // clear original reference
+                        message.setRemotelyRespondingToRef(other);
+                        other.setRemotelyRespondingToInverseRef(message);
+                    }
                 } else {
-                    messagesWithDeadReferences.add(new DeadReferenceConversationMessage(message, "msg:isResponseTo",
-                                    message.getIsResponseTo()));
-                }
-            }
-            if (message.getIsRemoteResponseTo() != null
-                            && !message.getIsRemoteResponseTo().equals(message.getMessageURI())) {
-                ConversationMessage other = messagesByURI.get(message.getIsRemoteResponseTo());
-                if (other != null) {
-                    message.setIsRemoteResponseToRef(other);
-                    other.setIsRemoteResponseToInverseRef(message);
-                } else {
-                    messagesWithDeadReferences.add(new DeadReferenceConversationMessage(message,
-                                    "msg:isRemoteResponseTo", message.getIsRemoteResponseTo()));
+                    messagesWithDeadReferences.add(new DeadReferenceConversationMessage(message, "msg:respondingTo",
+                                    message.getRespondingTo()));
                 }
             }
             if (message.getPrevious().isEmpty()) {
@@ -669,7 +655,7 @@ public class AgreementProtocolState {
                 // eg because it failed consistency checks
                 return;
             }
-            if (deadRef.message.isForwardedOrRemoteMessageOfForwarded()) {
+            if (deadRef.message.isForwardedMessage()) {
                 // we are lenient here because a forwarded message should not cause an
                 // exception, even
                 // if it points to a missing message
@@ -678,6 +664,9 @@ public class AgreementProtocolState {
             throw new IncompleteConversationDataException(deadRef.message.getMessageURI(), deadRef.deadReference,
                             deadRef.predicate);
         });
+        if (logger.isDebugEnabled()) {
+            messages.stream().forEach(m -> logger.debug(m.toString()));
+        }
         // link messages to deliveryChains
         deliveryChains = messages.stream().map(m -> {
             if (logger.isDebugEnabled()) {

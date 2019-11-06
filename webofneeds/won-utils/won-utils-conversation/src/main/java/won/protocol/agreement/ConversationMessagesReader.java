@@ -54,10 +54,6 @@ public class ConversationMessagesReader {
                         (Map<URI, ConversationMessage> messages,
                                         Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
                                                         .setSenderAtomURI(getUri(s.getObject())));
-        inithandlers.put(WONMSG.correspondingRemoteMessage,
-                        (Map<URI, ConversationMessage> messages,
-                                        Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
-                                                        .setCorrespondingRemoteMessageURI(getUri(s.getObject())));
         inithandlers.put(WONMSG.forwardedMessage,
                         (Map<URI, ConversationMessage> messages,
                                         Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
@@ -66,14 +62,10 @@ public class ConversationMessagesReader {
                         (Map<URI, ConversationMessage> messages,
                                         Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
                                                         .addPrevious(getUri(s.getObject())));
-        inithandlers.put(WONMSG.isResponseTo,
+        inithandlers.put(WONMSG.respondingTo,
                         (Map<URI, ConversationMessage> messages,
                                         Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
-                                                        .setIsResponseTo(getUri(s.getObject())));
-        inithandlers.put(WONMSG.isRemoteResponseTo,
-                        (Map<URI, ConversationMessage> messages,
-                                        Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
-                                                        .setIsRemoteResponseTo(getUri(s.getObject())));
+                                                        .setRespondingTo(getUri(s.getObject())));
         inithandlers.put(WONMSG.messageType, (Map<URI, ConversationMessage> messages, Statement s) -> {
             URI uri = getUri(s.getObject());
             if (uri == null) {
