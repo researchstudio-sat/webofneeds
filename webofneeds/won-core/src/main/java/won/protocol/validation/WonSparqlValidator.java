@@ -10,15 +10,23 @@
  */
 package won.protocol.validation;
 
+import java.lang.invoke.MethodHandles;
+
 import org.apache.jena.graph.Node;
-import org.apache.jena.query.*;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.ReadWrite;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.Syntax;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.tdb.TDB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.invoke.MethodHandles;
+import won.protocol.exception.WonMessageProcessingException;
 
 /**
  * User: ypanchenko Date: 02.06.2015
@@ -56,6 +64,9 @@ public class WonSparqlValidator {
             } else if (constraint.isSelectType()) {
                 return validateSelect(input);
             }
+        } catch (Exception e) {
+            String constraintName = name != null ? name : "[unnamed constraint]";
+            throw new WonMessageProcessingException("Error checking message constraint " + constraintName, e);
         } finally {
             input.end();
         }
