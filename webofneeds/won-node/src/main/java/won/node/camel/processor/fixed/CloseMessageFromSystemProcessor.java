@@ -10,22 +10,18 @@
  */
 package won.node.camel.processor.fixed;
 
+import static won.node.camel.processor.WonCamelHelper.*;
+
 import java.lang.invoke.MethodHandles;
-import java.net.URI;
 
 import org.apache.camel.Exchange;
-import org.apache.camel.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
-import won.node.camel.processor.general.OutboundMessageFactoryProcessor;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.model.Connection;
 import won.protocol.vocabulary.WONMSG;
 
@@ -45,57 +41,13 @@ public class CloseMessageFromSystemProcessor extends AbstractCamelProcessor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public void process(final Exchange exchange) throws Exception {
-        Message message = exchange.getIn();
-        WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
+        WonMessage wonMessage = getMessageRequired(exchange);
         logger.debug("CLOSE received from the system side for connection {}", wonMessage.getSenderURI());
         Connection con = connectionService.closeFromSystem(wonMessage);
         // if we know the remote connection, send a close message to the remote
         // connection
-        if (con.getTargetConnectionURI() != null) {
-            URI remoteNodeURI = wonNodeInformationService.getWonNodeUri(con.getTargetConnectionURI());
-            URI remoteMessageUri = wonNodeInformationService.generateEventURI(remoteNodeURI);
-            // put the factory into the outbound message factory header. It will be used to
-            // generate the outbound message
-            // after the wonMessage has been processed and saved, to make sure that the
-            // outbound message contains
-            // all the data that we also store locally
-            OutboundMessageFactory outboundMessageFactory = new OutboundMessageFactory(remoteMessageUri, con);
-            message.setHeader(WonCamelConstants.OUTBOUND_MESSAGE_FACTORY_HEADER, outboundMessageFactory);
-            // set the sender uri in the envelope TODO: TwoMsgs: do not set sender here
-            wonMessage.addMessageProperty(WONMSG.sender, con.getConnectionURI());
-            // add the information about the corresponding message to the local one
-            wonMessage.addMessageProperty(WONMSG.correspondingRemoteMessage, remoteMessageUri);
-            // the persister will pick it up later
-        }
-        // because the FromSystem message is now in the message header, it will be
-        // picked up by the routing system and delivered to the owner.
-        // the message for the remote connection is in the outbound message header and
-        // will be
-        // sent to the remote connection.
-    }
-
-    private class OutboundMessageFactory extends OutboundMessageFactoryProcessor {
-        private Connection connection;
-
-        public OutboundMessageFactory(URI messageURI, Connection connection) {
-            super(messageURI);
-            this.connection = connection;
-        }
-
-        @Override
-        public WonMessage process(WonMessage message) throws WonMessageProcessingException {
-            // there need not be a remote connection. Don't create a message if this is the
-            // case.
-            if (connection.getTargetConnectionURI() == null)
-                return null;
-            URI remoteNodeURI = wonNodeInformationService.getWonNodeUri(connection.getTargetConnectionURI());
-            URI localNodeURI = wonNodeInformationService.getWonNodeUri(connection.getConnectionURI());
-            // create the message to send to the remote node
-            return WonMessageBuilder.setPropertiesForPassingMessageToRemoteNode(message, getMessageURI())
-                            .setSenderNodeURI(localNodeURI).setSenderURI(connection.getConnectionURI())
-                            .setSenderAtomURI(connection.getAtomURI()).setRecipientNodeURI(remoteNodeURI)
-                            .setRecipientURI(connection.getTargetConnectionURI())
-                            .setRecipientAtomURI(connection.getTargetAtomURI()).build();
+        if (con.getTargetConnectionURI() == null) {
+            suppressMessageToNode(exchange);
         }
     }
 }

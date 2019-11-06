@@ -10,16 +10,22 @@
  */
 package won.node.service.persistence;
 
-import org.apache.jena.rdf.model.Model;
-import org.springframework.data.domain.Slice;
-import won.protocol.exception.NoSuchAtomException;
-import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.message.WonMessageType;
-import won.protocol.model.*;
-
 import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Optional;
+
+import org.apache.jena.rdf.model.Model;
+import org.springframework.data.domain.Slice;
+
+import won.protocol.exception.NoSuchAtomException;
+import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.message.WonMessageType;
+import won.protocol.model.Atom;
+import won.protocol.model.AtomState;
+import won.protocol.model.Connection;
+import won.protocol.model.DataWithEtag;
+import won.protocol.model.MessageEvent;
 
 /**
  * Service for obtaining information about atoms and connections in the system
@@ -110,6 +116,13 @@ public interface AtomInformationService {
      * @return a collection of connections.
      */
     Collection<Connection> listConnections();
+
+    /**
+     * Retrieves the connection identified by the specified sockets.
+     *
+     * @return a collection of connections.
+     */
+    Optional<Connection> getConnection(URI socket, URI targetSocket);
 
     /**
      * Retrieves all connections that were modified (by adding events) after a

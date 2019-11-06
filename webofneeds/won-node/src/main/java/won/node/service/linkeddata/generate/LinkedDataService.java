@@ -10,6 +10,10 @@
  */
 package won.node.service.linkeddata.generate;
 
+import java.net.URI;
+import java.util.Collection;
+import java.util.Date;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.springframework.context.NoSuchMessageException;
@@ -21,10 +25,6 @@ import won.protocol.message.WonMessageType;
 import won.protocol.model.AtomState;
 import won.protocol.model.Connection;
 import won.protocol.model.DataWithEtag;
-
-import java.net.URI;
-import java.util.Collection;
-import java.util.Date;
 
 /**
  * User: fkleedorfer Date: 26.11.12
@@ -151,6 +151,18 @@ public interface LinkedDataService {
      */
     Dataset listAtomURIsCreatedAfter(Date createdDate, AtomState atomState, URI filterBySocketTypeUri,
                     URI filterByAtomTypeUri);
+
+    /**
+     * Returns the dataset describing the connection between the two specified
+     * sockets.
+     * 
+     * @param socketUri
+     * @param targetSocketUri
+     * @return
+     * @throws NoSuchConnectionException
+     */
+    Dataset listConnection(URI socketUri, URI targetSocketUri, boolean deep)
+                    throws NoSuchConnectionException;
 
     /**
      * Returns container dataset containing all connections. If deep is true, the

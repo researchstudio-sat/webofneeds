@@ -14,9 +14,12 @@ import org.springframework.transaction.annotation.Transactional;
 import won.protocol.exception.IncoherentDatabaseStateException;
 import won.protocol.exception.NoSuchMessageException;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.message.WonMessageType;
+import won.protocol.message.WonMessageUtils;
 import won.protocol.model.AtomMessageContainer;
+import won.protocol.model.Connection;
 import won.protocol.model.ConnectionMessageContainer;
 import won.protocol.model.DatasetHolder;
 import won.protocol.model.MessageContainer;
@@ -24,6 +27,7 @@ import won.protocol.model.MessageEvent;
 import won.protocol.repository.AtomMessageContainerRepository;
 import won.protocol.repository.ConnectionContainerRepository;
 import won.protocol.repository.ConnectionMessageContainerRepository;
+import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.DatasetHolderRepository;
 import won.protocol.repository.MessageContainerRepository;
 import won.protocol.repository.MessageEventRepository;
@@ -33,6 +37,8 @@ public class MessageService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     protected ConnectionContainerRepository connectionContainerRepository;
+    @Autowired
+    protected ConnectionRepository connectionRepository;
     @Autowired
     protected AtomMessageContainerRepository atomMessageContainerRepository;
     @Autowired
@@ -44,68 +50,58 @@ public class MessageService {
     @Autowired
     private MessageEventRepository messageEventRepository;
 
-    public Optional<MessageEvent> getMessage(URI messageURI) {
-        return messageEventRepository.findFirstByMessageURI(messageURI);
+    public Optional<MessageEvent> getMessage(URI messageURI, URI parentURI) {
+        return messageEventRepository.findOneByMessageURIAndParentURI(messageURI, parentURI);
     }
 
-    public MessageEvent getMessageRequired(URI messageURI) {
-        return getMessage(messageURI).orElseThrow(() -> new NoSuchMessageException(messageURI));
+    public MessageEvent getMessageRequired(URI messageURI, URI parentURI) {
+        return getMessage(messageURI, parentURI).orElseThrow(() -> new NoSuchMessageException(messageURI));
     }
 
-    /**
-     * If we are saving response message, update original massage with the
-     * information about response message uri
-     * 
-     * @param message response message
-     */
     @Transactional(propagation = Propagation.MANDATORY)
-    // TODO: we should be able to remove this method after the message refactoring
-    public void updateResponseInfo(final WonMessage message) {
-        // find a message it responds to
-        URI originalMessageURI = message.getIsResponseToMessageURI();
-        if (originalMessageURI != null) {
-            // update the message it responds to with the uri of the response
-            messageEventRepository.lockConnectionAndMessageContainerByContainedMessageForUpdate(originalMessageURI);
-            messageEventRepository.lockAtomAndMessageContainerByContainedMessageForUpdate(originalMessageURI);
-            MessageEvent event = messageEventRepository.findOneByMessageURIforUpdate(originalMessageURI);
-            if (event != null) {
-                // we may not have saved the event yet if the current message is a
-                // FailureResponse
-                // and the error causing the response happened before saving the original
-                // message.
-                event.setResponseMessageURI(message.getMessageURI());
-                messageEventRepository.save(event);
+    public Optional<URI> getParentofMessage(WonMessage msg, WonMessageDirection direction) {
+        WonMessageType type = msg.getMessageTypeRequired();
+        if (type.isResponseMessage()) {
+            type = msg.getRespondingToMessageTypeRequired();
+        }
+        if (type.isAtomSpecificMessage()) {
+            // no need to look into the db:
+            return Optional.of(WonMessageUtils.getParentAtomUri(msg));
+        } else if (type.isConnectionSpecificMessage() && !type.isHintMessage()) {
+            Optional<URI> ourSocket = Optional.empty();
+            Optional<URI> theirSocket = Optional.empty();
+            if (direction.isFromExternal()) {
+                ourSocket = Optional.ofNullable(msg.getRecipientSocketURIRequired());
+                theirSocket = Optional.ofNullable(msg.getSenderSocketURIRequired());
+            } else {
+                ourSocket = Optional.ofNullable(msg.getSenderSocketURIRequired());
+                theirSocket = Optional.ofNullable(msg.getRecipientSocketURIRequired());
+            }
+            if (ourSocket.isPresent() && theirSocket.isPresent()) {
+                Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(ourSocket.get(),
+                                theirSocket.get());
+                if (con.isPresent()) {
+                    return Optional.of(con.get().getConnectionURI());
+                }
             }
         }
+        return Optional.empty();
     }
 
     @Transactional(propagation = Propagation.MANDATORY)
-    public void saveMessage(final WonMessage wonMessage, URI parent) {
-        logger.debug("STORING message with uri {} and parent uri", wonMessage.getMessageURI(), parent);
-        MessageContainer container = loadOrCreateMessageContainer(parent, wonMessage.getMessageType());
-        MessageEvent event = new MessageEvent(parent, wonMessage, container);
-        // a message can be in multiple containers (=parents), such messages share a
-        // datasetholder
-        Optional<DatasetHolder> datasetHolder = datasetHolderRepository.findOneByUri(wonMessage.getMessageURI());
-        event.setDatasetHolder(datasetHolder.orElseGet(() -> new DatasetHolder(wonMessage.getMessageURI(),
-                        WonMessageEncoder.encodeAsDataset(wonMessage))));
-        container.getEvents().add(event);
-        messageEventRepository.save(event);
-    }
-
-    @Transactional(propagation = Propagation.MANDATORY)
-    public void saveMessageInContainer(final URI messageURI, URI parentURI) {
-        logger.debug("STORING message with uri {} and parent uri", messageURI, parentURI);
-        MessageContainer container = messageContainerRepository.findOneByParentUriForUpdate(parentURI)
-                        .orElseThrow(() -> new IncoherentDatabaseStateException(
-                                        "Cannot store message " + messageURI + " in container with parent " + parentURI
-                                                        + ": container not found"));
-        MessageEvent message = messageEventRepository.findFirstByMessageURI(messageURI)
-                        .orElseThrow(() -> new IncoherentDatabaseStateException(
-                                        "Cannot store message " + messageURI + " in container with parent " + parentURI
-                                                        + ": message not found"));
-        container.getEvents().add(message);
-        messageContainerRepository.save(container);
+    public void saveMessage(final WonMessage message, URI parent) {
+        for (WonMessage wonMessage : message.getAllMessages()) {
+            logger.debug("STORING message with uri {} and parent uri", wonMessage.getMessageURI(), parent);
+            MessageContainer container = loadOrCreateMessageContainer(parent, wonMessage.getMessageType());
+            MessageEvent event = new MessageEvent(parent, wonMessage, container);
+            // a message can be in multiple containers (=parents), such messages share a
+            // datasetholder
+            Optional<DatasetHolder> datasetHolder = datasetHolderRepository.findOneByUri(wonMessage.getMessageURI());
+            event.setDatasetHolder(datasetHolder.orElseGet(() -> new DatasetHolder(wonMessage.getMessageURI(),
+                            WonMessageEncoder.encodeAsDataset(wonMessage))));
+            container.getEvents().add(event);
+            messageEventRepository.save(event);
+        }
     }
 
     @Transactional(propagation = Propagation.MANDATORY)

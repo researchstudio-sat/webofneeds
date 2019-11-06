@@ -42,7 +42,10 @@ public class ConnectionStateChangeReactionProcessor extends AbstractCamelProcess
         ConnectionStateChangeBuilder stateChangeBuilder = (ConnectionStateChangeBuilder) exchange.getIn()
                         .getHeader(WonCamelConstants.CONNECTION_STATE_CHANGE_BUILDER_HEADER);
         if (stateChangeBuilder == null) {
-            logger.info("no stateChangeBuilder found in exchange header, cannot check for state change " + msgTypeDir);
+            if (logger.isDebugEnabled()) {
+                logger.debug("no stateChangeBuilder found in exchange header, cannot check for state change "
+                                + msgTypeDir);
+            }
             return;
         }
         // first, try to find the connection uri in the header:
@@ -74,13 +77,13 @@ public class ConnectionStateChangeReactionProcessor extends AbstractCamelProcess
             if (connectionStateChange.isConnect() || connectionStateChange.isDisconnect()) {
                 // trigger rematch
                 matcherProtocolMatcherClient.atomModified(atom.getAtomURI(), null);
-                logger.info("matchers notified of connection state change " + msgTypeDir);
+                logger.debug("matchers notified of connection state change {}", msgTypeDir);
             } else {
-                logger.debug("no relevant connection state change, not notifying matchers " + msgTypeDir);
+                logger.debug("no relevant connection state change, not notifying matchers {}", msgTypeDir);
             }
         } else {
-            logger.info("Could not collect ConnectionStateChange information, not checking for state change "
-                            + msgTypeDir);
+            logger.debug("Could not collect ConnectionStateChange information, not checking for state change {}",
+                            msgTypeDir);
         }
     }
 }

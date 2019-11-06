@@ -5,6 +5,7 @@ import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
 
 import won.node.camel.processor.AbstractCamelProcessor;
+import won.node.camel.processor.WonCamelHelper;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
@@ -18,7 +19,6 @@ public class ConnectMessageFromNodeProcessor extends AbstractCamelProcessor {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
         Connection con = connectionService.connectFromNode(wonMessage);
-        // set the receiver to the newly generated connection uri
-        wonMessage.addMessageProperty(WONMSG.recipient, con.getConnectionURI());
+        WonCamelHelper.putParentURI(exchange, con.getConnectionURI());
     }
 }

@@ -20,6 +20,6 @@ public class SuccessResponseFromExternalProcessor extends AbstractCamelProcessor
     public void process(final Exchange exchange) throws Exception {
         WonMessage responseMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
         Objects.requireNonNull(responseMessage);
-        connectionService.successResponseFromNode(responseMessage);
+        connectionService.grabRemoteConnectionURIFromRemoteResponse(responseMessage);
     }
 }

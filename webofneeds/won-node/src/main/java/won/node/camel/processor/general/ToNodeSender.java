@@ -10,20 +10,73 @@
  */
 package won.node.camel.processor.general;
 
-import org.apache.camel.Exchange;
+import static won.node.camel.processor.WonCamelHelper.*;
 
-import won.node.camel.processor.AbstractCamelProcessor;
+import java.net.URI;
+import java.util.Optional;
+
+import org.apache.camel.CamelContext;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.impl.DefaultExchange;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import won.protocol.jms.AtomProtocolCommunicationService;
+import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
-import won.protocol.message.processor.camel.WonCamelConstants;
+import won.protocol.message.WonMessageDirection;
+import won.protocol.service.MessageRoutingInfoService;
 
 /**
- * Sends the WonMessage found in the exchange's in (in the 'wonMessage' header)
- * to the respective remote WoN node or delivers it locally.
+ * Processor responsible for routing messages to another node, or to route it
+ * internally if the recipient atom is local. Sends the message in the message
+ * header, ignoring the response header.
  */
-public class ToNodeSender extends AbstractCamelProcessor {
-    @Override
-    public void process(final Exchange exchange) throws Exception {
-        WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-        sendMessageToNode(message);
+public class ToNodeSender implements Processor {
+    private final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
+    @Autowired
+    MessagingService messagingService;
+    @Autowired
+    MessageRoutingInfoService messageRoutingInfoService;
+    @Autowired
+    private AtomProtocolCommunicationService atomProtocolCommunicationService;
+    @Autowired
+    private CamelContext camelContext;
+
+    public void process(Exchange exchange) throws Exception {
+        logger.debug("processing message for sending to remote node");
+        WonMessage msg = getMessageToSendRequired(exchange);
+        // senderNode may be null, in this case we have to go via activemq
+        Optional<URI> senderNode = messageRoutingInfoService.senderNode(msg);
+        Optional<URI> recipientNode = messageRoutingInfoService.recipientNode(msg);
+        if (!(senderNode.isPresent() && recipientNode.isPresent())) {
+            logger.warn("Cannot send message {} to remote node: could not determine sender/recipient node",
+                            msg.getMessageURI());
+        }
+        if (senderNode.get().equals(recipientNode.get())) {
+            // sending locally, directly put message into the incoming atom protocol
+            Exchange newExchangeFromExternal = new DefaultExchange(camelContext);
+            putMessage(newExchangeFromExternal, msg);
+            putDirection(newExchangeFromExternal, WonMessageDirection.FROM_EXTERNAL);
+            putMessageType(newExchangeFromExternal, msg.getMessageType());
+            messagingService.send(newExchangeFromExternal, "direct:msgFromExternal");
+            removeMessageToSend(exchange);
+            return;
+        }
+        // add a camel endpoint for the remote won node
+        atomProtocolCommunicationService.configureCamelEndpoint(recipientNode.get());
+        // send the message to that endpoint
+        String ep = atomProtocolCommunicationService.getProtocolCamelConfigurator()
+                        .getEndpoint(recipientNode.get());
+        // messageService.sendInOnlyMessage(null, null, wonMessage,
+        // wonMessage.getRecipientNodeURI().toString());
+        String msgBody = (String) exchange.getIn().getBody();
+        if (logger.isDebugEnabled()) {
+            logger.debug("sending message to node {}: {}", recipientNode,
+                            msg.toStringForDebug(true));
+        }
+        messagingService.sendInOnlyMessage(null, null, msgBody, ep);
+        removeMessageToSend(exchange);
     }
 }

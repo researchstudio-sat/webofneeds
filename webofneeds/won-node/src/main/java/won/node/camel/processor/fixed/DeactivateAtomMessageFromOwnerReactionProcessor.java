@@ -20,11 +20,11 @@ import org.springframework.stereotype.Component;
 
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
+import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.model.Atom;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
@@ -60,8 +60,9 @@ public class DeactivateAtomMessageFromOwnerReactionProcessor extends AbstractCam
         // be routed to the owner and forwarded to to remote connection
         URI messageURI = wonNodeInformationService.generateEventURI();
         WonMessage message = WonMessageBuilder.setMessagePropertiesForClose(messageURI, WonMessageDirection.FROM_SYSTEM,
-                        con.getConnectionURI(), con.getAtomURI(), atom.getWonNodeURI(), con.getConnectionURI(),
+                        con.getSocketURI(), con.getConnectionURI(), con.getAtomURI(), atom.getWonNodeURI(),
+                        con.getSocketURI(), con.getConnectionURI(),
                         con.getAtomURI(), atom.getWonNodeURI(), "Closed because Atom was deactivated").build();
-        sendSystemMessage(message);
+        camelWonMessageService.sendSystemMessage(message);
     }
 }

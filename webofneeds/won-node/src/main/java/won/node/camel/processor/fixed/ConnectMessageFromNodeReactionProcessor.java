@@ -39,6 +39,6 @@ public class ConnectMessageFromNodeReactionProcessor extends AbstractCamelProces
                                         "Connection request accepted automatically by WoN node")
                         .setWonMessageDirection(WonMessageDirection.FROM_SYSTEM).build();
         logger.info("sending auto-open for connection {}, reacting to connect", msg.getSenderURI());
-        super.sendSystemMessage(msg);
+        camelWonMessageService.sendSystemMessage(msg);
     }
 }

@@ -8,13 +8,21 @@ import won.protocol.model.SocketDefinition;
 public interface SocketLookup {
     Optional<URI> lookupDefaultSocket(URI atomURI);
 
-    public Optional<SocketDefinition> getSocketConfig(URI socketType);
+    Optional<SocketDefinition> getSocketConfig(URI socketType);
 
-    public Optional<Integer> getCapacity(URI socket);
+    Optional<Integer> getCapacity(URI socket);
 
-    public boolean isCompatible(URI localSocket, URI targetSocket);
+    boolean isCompatible(URI localSocket, URI targetSocket);
 
-    public boolean isAutoOpen(URI localSocket);
+    boolean isCompatibleSocketTypes(URI localSocketDefinition, URI targetSocketDefinition);
+
+    boolean isAutoOpen(URI localSocket);
+
+    boolean isAutoOpenSocketType(URI socketDefinition);
 
     Optional<URI> getSocketType(URI socketURI);
+
+    Optional<SocketDefinition> getSocketConfigOfType(URI socketType);
+
+    Optional<Integer> getCapacityOfType(URI socketType);
 }

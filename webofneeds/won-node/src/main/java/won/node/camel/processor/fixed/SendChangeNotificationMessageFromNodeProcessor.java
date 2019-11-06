@@ -12,12 +12,13 @@ import org.springframework.stereotype.Component;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
+import won.protocol.exception.MissingMessagePropertyException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.message.processor.exception.MissingMessagePropertyException;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
+import won.protocol.util.Prefixer;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
@@ -48,9 +49,9 @@ public class SendChangeNotificationMessageFromNodeProcessor extends AbstractCame
         }
         if (logger.isDebugEnabled()) {
             logger.debug("received this ChangeNotificationMessage FromExternal:\n{}",
-                            RdfUtils.toString(wonMessage.getCompleteDataset()));
-            if (wonMessage.getForwardedMessageURI() != null) {
-                logger.debug("This message contains the forwarded message {}", wonMessage.getForwardedMessageURI());
+                            RdfUtils.toString(Prefixer.setPrefixes(wonMessage.getCompleteDataset())));
+            if (!wonMessage.getForwardedMessageURIs().isEmpty()) {
+                logger.debug("This message contains the forwarded message(s) {}", wonMessage.getForwardedMessageURIs());
             }
         }
     }

@@ -13,6 +13,7 @@ package won.node.service.persistence;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Optional;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -132,6 +133,11 @@ public class AtomInformationServiceImpl implements AtomInformationService {
     @Override
     public Collection<URI> listConnectionURIs() {
         return connectionRepository.getAllConnectionURIs();
+    }
+
+    @Override
+    public Optional<Connection> getConnection(URI socket, URI targetSocket) {
+        return connectionRepository.findOneBySocketURIAndTargetSocketURI(socket, targetSocket);
     }
 
     @Override
@@ -382,7 +388,7 @@ public class AtomInformationServiceImpl implements AtomInformationService {
     @Override
     public Slice<MessageEvent> listConnectionEventsAfter(URI connectionUri, URI msgURI,
                     Integer preferredPageSize, WonMessageType msgType) {
-        MessageEvent referenceMsg = messageEventRepository.findFirstByMessageURI(msgURI)
+        MessageEvent referenceMsg = messageEventRepository.findFirstByMessageURIAndParentURI(msgURI, connectionUri)
                         .orElseThrow(() -> new NoSuchMessageException(msgURI));
         Date referenceDate = referenceMsg.getCreationDate();
         int pageSize = getPageSize(preferredPageSize);

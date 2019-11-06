@@ -22,12 +22,14 @@ import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForAtomStateException;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.IncompatibleSocketsException;
+import won.protocol.exception.MissingMessagePropertyException;
 import won.protocol.exception.NoSuchAtomException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.SocketCapacityException;
+import won.protocol.exception.WrongAddressingInformationException;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
-import won.protocol.message.WonMessageUtils;
 import won.protocol.model.Atom;
 import won.protocol.model.AtomState;
 import won.protocol.model.Connection;
@@ -35,7 +37,6 @@ import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionMessageContainer;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.DatasetHolder;
-import won.protocol.model.MessageEvent;
 import won.protocol.model.Socket;
 import won.protocol.repository.AtomRepository;
 import won.protocol.repository.ConnectionContainerRepository;
@@ -48,6 +49,7 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WONCON;
+import won.protocol.vocabulary.WONMSG;
 
 @Component
 public class ConnectionService {
@@ -79,6 +81,10 @@ public class ConnectionService {
         return getConnection(connectionURI).orElseThrow(() -> new NoSuchConnectionException(connectionURI));
     }
 
+    public boolean existOpenConnections(URI atom, URI socket) {
+        return connectionRepository.existsWithtomURIAndSocketURIAndState(atom, socket, ConnectionState.CONNECTED);
+    }
+
     public Connection connectFromOwner(WonMessage wonMessage)
                     throws NoSuchConnectionException, NoSuchAtomException, IllegalMessageForAtomStateException,
                     ConnectionAlreadyExistsException, SocketCapacityException, IncompatibleSocketsException {
@@ -105,21 +111,15 @@ public class ConnectionService {
         Objects.requireNonNull(senderSocketURI);
         Objects.requireNonNull(recipientSocketURI);
         Optional<Connection> con;
-        // we did not know about this connection. try to find out if one exists that we
-        // can use
-        // the effect of connect should not be surprising. either use specified sockets
-        // (if they are) or use default sockets.
-        // don't try to be clever and look for suggested connections with other sockets
-        // because that leads
-        // consecutive connects opening connections between different sockets
-        //
-        // hence, we can determine our sockets now, before looking at what's there.
+        // lock the atom so we don't make writes that cancel each other out in case we
+        // process an connect from node in parallel
+        Atom atom = atomRepository.findOneByAtomURIForUpdate(senderAtomURI);
         Socket actualSocket = socketService.getSocket(senderAtomURI, Optional.of(senderSocketURI));
         Optional<URI> actualSocketURI = Optional.of(actualSocket.getSocketURI());
         Optional<URI> actualTargetSocketURI = Optional.of(recipientSocketURI);
         failIfIsNotSocketOfAtom(Optional.of(recipientSocketURI), Optional.of(recipientAtomURI));
-        con = connectionRepository.findOneByAtomURIAndTargetAtomURIAndSocketURIAndTargetSocketURIForUpdate(
-                        senderAtomURI, recipientAtomURI, actualSocketURI.get(), actualTargetSocketURI.get());
+        con = connectionRepository.findOneBySocketURIAndTargetSocketURIForUpdate(actualSocketURI.get(),
+                        actualTargetSocketURI.get());
         if (!con.isPresent()) {
             // did not find such a connection either. We can safely create a new one
             // create Connection in Database
@@ -132,8 +132,7 @@ public class ConnectionService {
         failForIncompatibleSockets(con.get().getSocketURI(), con.get().getTargetSocketURI());
         // state transiation
         con.get().setState(con.get().getState().transit(ConnectionEventType.OWNER_CONNECT));
-        connectionRepository.save(con.get());
-        return con.get();
+        return connectionRepository.saveAndFlush(con.get());
     }
 
     public Connection connectFromNode(WonMessage wonMessage) {
@@ -145,24 +144,25 @@ public class ConnectionService {
         URI wonNodeUriFromWonMessage = wonMessage.getRecipientNodeURIRequired();
         URI senderAtomUri = wonMessage.getSenderAtomURIRequired();
         URI senderSocketURI = wonMessage.getSenderSocketURIRequired();
-        URI senderURI = wonMessage.getSenderURIRequired();
         return connectFromNode(recipientAtomUri, recipientSocketURI, wonNodeUriFromWonMessage, senderAtomUri,
-                        senderSocketURI, senderURI);
+                        senderSocketURI);
     }
 
     private Connection connectFromNode(URI recipientAtomUri, URI recipientSocketURI, URI wonNodeUriFromWonMessage,
-                    URI senderAtomUri, URI senderSocketURI, URI senderURI) {
+                    URI senderAtomUri, URI senderSocketURI) {
         Objects.requireNonNull(recipientAtomUri);
         Objects.requireNonNull(recipientSocketURI);
         Objects.requireNonNull(wonNodeUriFromWonMessage);
         Objects.requireNonNull(senderAtomUri);
         Objects.requireNonNull(senderSocketURI);
-        Objects.requireNonNull(senderURI);
         failIfIsNotSocketOfAtom(Optional.of(recipientSocketURI), Optional.of(recipientAtomUri));
         Socket socket = socketService.getSocket(recipientAtomUri, Optional.of(recipientSocketURI));
         // the remote socket must be specified in a message coming from another node
         failIfIsNotSocketOfAtom(Optional.of(senderSocketURI), Optional.of(senderAtomUri));
         Connection con = null;
+        // lock the atom so we don't make writes that cancel each other out in case we
+        // process an connect from owner in parallel
+        Atom atom = atomRepository.findOneByAtomURIForUpdate(recipientAtomUri);
         // the sender did not know about our connection. try to find out if one exists
         // that we can use
         // we know which remote socket to connect to. There may be a connection with
@@ -170,8 +170,7 @@ public class ConnectionService {
         // socket or because the connection is already in a different state and this
         // is a duplicate connect..
         Optional<Connection> conOpt = connectionRepository
-                        .findOneByAtomURIAndTargetAtomURIAndSocketURIAndTargetSocketURIForUpdate(recipientAtomUri,
-                                        senderAtomUri, socket.getSocketURI(), senderSocketURI);
+                        .findOneBySocketURIAndTargetSocketURIForUpdate(socket.getSocketURI(), senderSocketURI);
         if (conOpt.isPresent()) {
             con = conOpt.get();
         }
@@ -180,13 +179,53 @@ public class ConnectionService {
         if (con == null) {
             // create Connection in Database
             con = createConnection(recipientAtomUri, senderAtomUri,
-                            socket.getSocketURI(), socket.getTypeURI(), senderSocketURI, Optional.of(senderURI),
+                            socket.getSocketURI(), socket.getTypeURI(), senderSocketURI, Optional.empty(),
                             ConnectionState.REQUEST_RECEIVED, ConnectionEventType.PARTNER_CONNECT);
         }
         con.setTargetSocketURI(senderSocketURI);
         con.setState(con.getState().transit(ConnectionEventType.PARTNER_CONNECT));
-        connectionRepository.save(con);
-        return con;
+        return connectionRepository.saveAndFlush(con);
+    }
+
+    public Connection socketHint(WonMessage wonMessage) {
+        URI recipientAtomURI = wonMessage.getRecipientAtomURIRequired();
+        URI recipientWoNNodeURI = wonMessage.getRecipientNodeURIRequired();
+        URI targetSocketURI = wonMessage.getHintTargetSocketURIRequired();
+        URI recipientSocketURI = wonMessage.getRecipientSocketURIRequired();
+        Double score = wonMessage.getHintScore();
+        if (targetSocketURI == null) {
+            throw new MissingMessagePropertyException(WONMSG.hintTargetSocket);
+        }
+        if (wonMessage.getHintTargetAtomURI() != null) {
+            throw new WrongAddressingInformationException(
+                            "A SocketHintMessage must not have a msg:hintTargetAtom property",
+                            wonMessage.getMessageURI(), WONMSG.hintTargetAtom);
+        }
+        if (score < 0 || score > 1) {
+            throw new WrongAddressingInformationException("score is not in [0,1]", wonMessage.getMessageURI(),
+                            WONMSG.hintScore);
+        }
+        URI wmOriginator = wonMessage.getSenderNodeURI();
+        if (wmOriginator == null) {
+            throw new WrongAddressingInformationException("originator is not set", wonMessage.getMessageURI(),
+                            WONMSG.senderNode);
+        }
+        if (recipientSocketURI == null) {
+            throw new MissingMessagePropertyException(WONMSG.recipientSocket);
+        }
+        if (!socketService.isCompatible(recipientSocketURI, targetSocketURI)) {
+            throw new IncompatibleSocketsException(recipientSocketURI, targetSocketURI);
+        }
+        atomRepository.findOneByAtomURIForUpdate(recipientAtomURI);
+        Socket socket = socketService.getSocket(recipientAtomURI, Optional.ofNullable(recipientSocketURI));
+        // create Connection in Database
+        URI targetAtomURI = socketService.getAtomOfSocketRequired(targetSocketURI);
+        Optional<Connection> con = connectionRepository
+                        .findOneBySocketURIAndTargetSocketURIForUpdate(socket.getSocketURI(), targetSocketURI);
+        return con.orElseGet(() -> createConnection(recipientAtomURI, targetAtomURI,
+                        recipientSocketURI, socket.getTypeURI(), targetSocketURI, Optional.empty(),
+                        ConnectionState.SUGGESTED,
+                        ConnectionEventType.MATCHER_HINT));
     }
 
     /**
@@ -222,7 +261,7 @@ public class ConnectionService {
         if (socketTypeURI == null)
             throw new IllegalArgumentException("socketTypeURI is not set");
         // Load atom (throws exception if not found)
-        Atom atom = DataAccessUtils.loadAtom(atomRepository, atomURI);
+        Atom atom = atomRepository.findOneByAtomURIForUpdate(atomURI);
         if (atom.getState() != AtomState.ACTIVE)
             throw new IllegalMessageForAtomStateException(atomURI, connectionEventType.name(), atom.getState());
         // TODO: create a proper exception if a socket is not supported by an atom
@@ -261,12 +300,8 @@ public class ConnectionService {
     }
 
     public boolean shouldSendAutoOpenForConnect(WonMessage wonMessage) {
-        Optional<URI> atomURI = Optional.of(wonMessage.getRecipientAtomURI());
-        Optional<URI> connectionURI = Optional.of(wonMessage.getRecipientURI());
-        if (!atomURI.isPresent()) {
-            return false;
-        }
-        return shouldSendAutoOpenForConnect(connectionURI);
+        URI recipientSocketURI = wonMessage.getRecipientSocketURIRequired();
+        return socketService.isAutoOpen(recipientSocketURI);
     }
 
     public boolean shouldSendAutoOpenForConnect(Optional<URI> connectionURI) {
@@ -300,26 +335,21 @@ public class ConnectionService {
         return false;
     }
 
-    public void successResponseFromNode(WonMessage responseMessage) {
+    public void grabRemoteConnectionURIFromRemoteResponse(WonMessage responseMessage) {
         responseMessage.getMessageType().requireType(WonMessageType.SUCCESS_RESPONSE);
-        WonMessageType responseToType = responseMessage.getIsResponseToMessageType();
-        URI senderURI = responseMessage.getSenderURI();
-        URI isResponseToMessageURI = responseMessage.getIsResponseToMessageURI();
-        URI parentURI = WonMessageUtils.getParentEntityUri(responseMessage);
-        successResponseFromNode(senderURI, isResponseToMessageURI, responseToType, parentURI);
-    }
-
-    public void successResponseFromNode(URI senderURI, URI isResponseToMessageURI, WonMessageType responseToType,
-                    URI parentURI) {
-        // only process successResponse of connect message
-        if (WonMessageType.CONNECT.equals(responseToType)) {
-            MessageEvent mep = this.messageEventRepository
-                            .findOneByCorrespondingRemoteMessageURIAndParentURI(isResponseToMessageURI, parentURI);
-            // update the connection database: set the remote connection URI just obtained
-            // from the response
-            Optional<Connection> con = this.connectionRepository.findOneByConnectionURIForUpdate(mep.getSenderURI());
+        WonMessageType responseToType = responseMessage.getRespondingToMessageType();
+        URI senderURI = responseMessage.getSenderURI(); // the remote connection uri
+        URI senderSocketURI = responseMessage.getSenderSocketURIRequired();
+        URI recipientSocketURI = responseMessage.getRecipientSocketURIRequired();
+        Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(recipientSocketURI,
+                        senderSocketURI);
+        if (con.isPresent() && senderURI != null) {
             con.get().setTargetConnectionURI(senderURI);
-            this.connectionRepository.save(con.get());
+            if (logger.isDebugEnabled()) {
+                logger.debug("Grabbed targetURI {} for connectionURI {} from success response {}", new Object[] {
+                                senderURI, con.get().getConnectionURI(), responseMessage.getMessageURI() });
+            }
+            connectionRepository.save(con.get());
         }
     }
 
@@ -466,8 +496,6 @@ public class ConnectionService {
     public void failForExceededCapacity(URI socketURI) throws SocketCapacityException {
         Optional<Integer> capacity = socketService.getCapacity(socketURI);
         if (capacity.isPresent()) {
-            // lock the connection table by socketURI to avoid a race condition
-            connectionRepository.countBySocketUriForUpdate(socketURI);
             if (connectionRepository.countBySocketURIAndState(socketURI, ConnectionState.CONNECTED) >= capacity.get()) {
                 throw new SocketCapacityException(
                                 "Connect would exceed socket " + socketURI + " capacity of " + capacity.get());
@@ -506,5 +534,31 @@ public class ConnectionService {
             throw new IllegalMessageForConnectionStateException(con.getConnectionURI(), msg.name(), con.getState());
         }
         return con.getState().transit(msg);
+    }
+
+    public Optional<Connection> getConnectionForMessage(WonMessage originalMessage, WonMessageDirection direction) {
+        URI connectionURI = null;
+        URI socketURI = null;
+        URI targetSocketURI = null;
+        if (direction.isFromExternal()) {
+            connectionURI = originalMessage.getRecipientURI();
+            if (connectionURI == null) {
+                socketURI = originalMessage.getRecipientSocketURIRequired();
+                targetSocketURI = originalMessage.getSenderSocketURIRequired();
+            }
+        } else {
+            connectionURI = originalMessage.getSenderURI();
+            if (connectionURI == null) {
+                socketURI = originalMessage.getSenderSocketURIRequired();
+                targetSocketURI = originalMessage.getRecipientSocketURIRequired();
+            }
+        }
+        if (connectionURI != null) {
+            return connectionRepository.findOneByConnectionURI(connectionURI);
+        } else if (targetSocketURI != null && socketURI != null) {
+            return connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI, targetSocketURI);
+        } else {
+            return Optional.empty();
+        }
     }
 }

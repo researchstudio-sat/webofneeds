@@ -10,24 +10,37 @@
  */
 package won.node.camel.processor.general;
 
+import static won.node.camel.processor.WonCamelHelper.*;
+
+import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Date;
+import java.util.Optional;
+
 import org.apache.camel.Exchange;
+import org.apache.camel.ProducerTemplate;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import won.node.camel.processor.AbstractCamelProcessor;
+import won.node.camel.processor.WonCamelHelper;
+import won.protocol.exception.WonProtocolException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
+import won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor;
+import won.protocol.service.MessageRoutingInfoService;
+import won.protocol.util.Prefixer;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
-
-import java.io.StringWriter;
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
+import won.protocol.vocabulary.WONMSG;
 
 /**
  * Sends a error response message back to the sender of the original message, if
@@ -36,24 +49,24 @@ import java.net.URI;
  */
 public class FailResponder extends AbstractCamelProcessor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    @Autowired
+    MessageRoutingInfoService messageRoutingInfoService;
+    @Autowired
+    ProducerTemplate producerTemplate;
+    @Autowired
+    private SignatureAddingWonMessageProcessor signatureAddingWonMessageProcessor;
 
     @Override
     public void process(final Exchange exchange) throws Exception {
         Exception exception = null;
         WonMessage originalMessage = null;
         try {
-            originalMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.ORIGINAL_MESSAGE_HEADER);
-            if (originalMessage == null) {
-                logger.debug("Processing an exception. camel header {} was null, assuming original message in header {}",
-                                WonCamelConstants.ORIGINAL_MESSAGE_HEADER, WonCamelConstants.MESSAGE_HEADER);
-                originalMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-            }
+            originalMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
             if (originalMessage == null) {
                 // we didn't find the original message, so we can't send a response.
                 // Log all we can so that we can start debugging the problem
-                logger.warn("Could not obtain original message from camel headers {} or {} for error {}",
-                                new Object[] { WonCamelConstants.ORIGINAL_MESSAGE_HEADER,
-                                                WonCamelConstants.MESSAGE_HEADER,
+                logger.warn("Could not obtain original message from camel header {} for error {}",
+                                new Object[] { WonCamelConstants.MESSAGE_HEADER,
                                                 exchange.getProperty(Exchange.EXCEPTION_CAUGHT) });
                 logger.warn("original exception:", exchange.getProperty(Exchange.EXCEPTION_CAUGHT));
                 return;
@@ -62,25 +75,26 @@ public class FailResponder extends AbstractCamelProcessor {
             String errormessage = null;
             if (exception != null) {
                 errormessage = exception.getClass().getSimpleName() + ": " + exception.getMessage();
-            } else {
-                errormessage = String.format("An error occurred while processing message %s",
-                                originalMessage.getMessageURI());
             }
-            if (originalMessage.getMessageType().isHintMessage()) {
-                // we don't want to send a FailureResponse for a hint message as matchers
-                // are not fully compatible messaging agents (atoms), so sending this message
-                // will fail.
-                logger.debug("suppressing failure response for HINT message", exception);
-                return;
+            if (errormessage != null) {
+                errormessage = String.format("An error occurred while processing message %s (type: %s): %s",
+                                originalMessage.getMessageURI(), originalMessage.getMessageType(), errormessage);
             }
-            logger.info("Caught error while processing WON message {} (type:{}) : {} - sending FailureResponse (full message and stacktrace (if any) on log level DEBUG)",
-                            new Object[] { originalMessage.getMessageURI(), originalMessage.getMessageType(),
-                                            errormessage });
-            if (logger.isDebugEnabled()) {
-                if (exception != null) {
-                    logger.debug("stacktrace of caught exception:", exception);
+            if (exception instanceof WonProtocolException) {
+                if (logger.isDebugEnabled()) {
+                    if (exception != null) {
+                        logger.debug("Caught protocol exception. Sending FailureResponse ", exception);
+                    }
                 }
-                logger.debug("original message: {}", RdfUtils.toString(originalMessage.getCompleteDataset()));
+            } else {
+                logger.warn("Caught unexpected exception while processing WON message {} (type:{}) : {} - sending FailureResponse",
+                                new Object[] { originalMessage.getMessageURI(), originalMessage.getMessageType(),
+                                                errormessage });
+                logger.warn("Full stacktrace: ", exception);
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("original message: {}",
+                                RdfUtils.toString(Prefixer.setPrefixes(originalMessage.getCompleteDataset())));
             }
             if (WonMessageType.FAILURE_RESPONSE == originalMessage.getMessageType()) {
                 // do not throw failures back and forth. If the original message is already a
@@ -90,7 +104,7 @@ public class FailResponder extends AbstractCamelProcessor {
                                 + "logged at log level DEBUG. Its message URI is {}", originalMessage.getMessageURI(),
                                 exception);
                 StringWriter sw = new StringWriter();
-                RDFDataMgr.write(sw, originalMessage.getCompleteDataset(), Lang.TRIG);
+                RDFDataMgr.write(sw, Prefixer.setPrefixes(originalMessage.getCompleteDataset()), Lang.TRIG);
                 logger.warn("FailureResponse to FailureResponse that raised the error:\n{}", sw.toString());
                 return;
             }
@@ -98,19 +112,35 @@ public class FailResponder extends AbstractCamelProcessor {
             logger.debug("Sending FailureResponse {}", newMessageURI);
             Model errorMessageContent = WonRdfUtils.MessageUtils.textMessage(errormessage);
             RdfUtils.replaceBaseURI(errorMessageContent, newMessageURI.toString());
-            WonMessage responseMessage = WonMessageBuilder
-                            .setPropertiesForNodeResponse(originalMessage, false, newMessageURI)
+            WonMessageDirection direction = getDirectionRequired(exchange);
+            Optional<URI> parent = WonCamelHelper.getConnectionURI(exchange);
+            WonMessage failureResponseMessage = WonMessageBuilder
+                            .setPropertiesForNodeResponse(originalMessage, false, newMessageURI, parent,
+                                            direction)
                             .addContent(errorMessageContent).build();
-            if (WonMessageDirection.FROM_OWNER == originalMessage.getEnvelopeType()) {
-                String ownerApplicationId = (String) exchange.getIn().getHeader(WonCamelConstants.OWNER_APPLICATION_ID);
-                sendSystemMessageToOwner(responseMessage, ownerApplicationId);
-            } else if (WonMessageDirection.FROM_EXTERNAL == originalMessage.getEnvelopeType()) {
-                sendSystemMessage(responseMessage);
-            } else {
-                logger.info(String.format("cannot route failure message for direction of original message, "
-                                + "expected FROM_OWNER or FROM_EXTERNAL, but found %s. Original cause is logged on log level DEBUG.",
-                                originalMessage.getEnvelopeType()));
-                logger.debug("original cause", exception);
+            failureResponseMessage.addMessageProperty(WONMSG.timestamp, new Date().getTime());
+            failureResponseMessage = signatureAddingWonMessageProcessor.process(failureResponseMessage);
+            putResponse(exchange, failureResponseMessage);
+            putMessageToSend(exchange, failureResponseMessage);
+            // extract the routing information
+            URI atom = messageRoutingInfoService.recipientAtom(failureResponseMessage)
+                            .orElseThrow(() -> new IllegalArgumentException(
+                                            "Cannot dertermine recipient atom for response"));
+            // the sender node is not there in the case of hint messages.
+            Optional<URI> senderNode = messageRoutingInfoService.senderNode(failureResponseMessage);
+            URI recipientNode = messageRoutingInfoService.recipientNode(failureResponseMessage)
+                            .orElseThrow(() -> new IllegalArgumentException(
+                                            "Cannot dertermine node for response"));
+            if (senderNode.isPresent()) {
+                putSenderNodeURI(exchange, senderNode.get());
+            }
+            putRecipientNodeURI(exchange, recipientNode);
+            putRecipientAtomURI(exchange, atom);
+            // send the message
+            if (direction.isFromExternal()) {
+                messagingService.send(exchange, "direct:sendToNode");
+            } else if (direction.isFromOwner()) {
+                messagingService.send(exchange, "direct:sendToOwner");
             }
         } catch (Throwable t) {
             // something went wrong - we can't inform the sender of the message.

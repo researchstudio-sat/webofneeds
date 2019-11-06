@@ -1,10 +1,17 @@
 package won.node.camel.processor.socket.groupSocket;
 
+import static won.node.camel.processor.WonCamelHelper.*;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.List;
+
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.SocketMessageProcessor;
 import won.protocol.message.WonMessage;
@@ -17,10 +24,6 @@ import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WONMSG;
 import won.protocol.vocabulary.WXGROUP;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA. User: gabriel Date: 16.09.13 Time: 18:42 To
@@ -37,7 +40,7 @@ public class SendMessageFromNodeGroupSocketImpl extends AbstractCamelProcessor {
     public void process(final Exchange exchange) throws Exception {
         final WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
         // whatever happens, this message is not sent to the owner:
-        exchange.getIn().setHeader(WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER, Boolean.TRUE);
+        exchange.getIn().setHeader(WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER_HEADER, Boolean.TRUE);
         // avoid message duplication in larger group networks:
         // it is possible that we have already processed this message
         // and through connected groups it was forwarded back to us.
@@ -45,16 +48,18 @@ public class SendMessageFromNodeGroupSocketImpl extends AbstractCamelProcessor {
         // we check it by comparing the innermost message uri to that of any
         // message we have processed so far.
         // now check if we processed the message earlier
-        if (messageEventRepository.existEarlierMessageWithSameInnermostMessageURIAndRecipientAtomURI(
-                        wonMessage.getMessageURI())) {
-            if (logger.isDebugEnabled()) {
-                URI innermostMessageURI = wonMessage.getInnermostMessageURI();
-                URI groupUri = wonMessage.getRecipientAtomURI();
-                logger.debug("suppressing message {} " + "as its innermost message is {} which has already "
-                                + "been processed by group {}",
-                                new Object[] { wonMessage.getMessageURI(), innermostMessageURI, groupUri });
+        URI parent = getParentURIRequired(exchange);
+        for (URI forwarded : wonMessage.getForwardedMessageURIs()) {
+            if (messageEventRepository.findOneByMessageURIAndParentURI(
+                            forwarded, parent).isPresent()) {
+                if (logger.isDebugEnabled()) {
+                    URI groupUri = wonMessage.getRecipientAtomURI();
+                    logger.debug("suppressing message {} " + "as its innermost message is {} which has already "
+                                    + "been processed by group {}",
+                                    new Object[] { wonMessage.getMessageURI(), forwarded, groupUri });
+                }
+                return;
             }
-            return;
         }
         final Connection conOfIncomingMessage = connectionRepository.findByConnectionURI(wonMessage.getRecipientURI())
                         .get(0);
@@ -71,19 +76,6 @@ public class SendMessageFromNodeGroupSocketImpl extends AbstractCamelProcessor {
         for (final Connection conToSendTo : consInGroup) {
             try {
                 if (!conToSendTo.equals(conOfIncomingMessage)) {
-                    if (messageEventRepository.isReceivedSameInnermostMessageFromSender(wonMessage.getMessageURI(),
-                                    conToSendTo.getTargetAtomURI())) {
-                        if (logger.isDebugEnabled()) {
-                            URI innermostMessageURI = wonMessage.getInnermostMessageURI();
-                            URI groupUri = wonMessage.getRecipientAtomURI();
-                            logger.debug("suppressing forward of message {} to {} in group {}"
-                                            + "as its innermost message is {} which has already "
-                                            + "been received from that atom",
-                                            new Object[] { wonMessage.getMessageURI(), conToSendTo.getTargetAtomURI(),
-                                                            groupUri, innermostMessageURI });
-                        }
-                        continue;
-                    }
                     if (logger.isDebugEnabled()) {
                         logger.debug("forwarding message {} received from atom {} in group {} to group member {}",
                                         new Object[] { wonMessage.getMessageURI(), wonMessage.getSenderAtomURI(),
@@ -99,7 +91,7 @@ public class SendMessageFromNodeGroupSocketImpl extends AbstractCamelProcessor {
                                     conToSendTo.getAtomURI(), wonMessage.getRecipientNodeURI(),
                                     conToSendTo.getTargetConnectionURI(), conToSendTo.getTargetAtomURI(),
                                     remoteWonNodeUri);
-                    sendSystemMessage(newWonMessage);
+                    camelWonMessageService.sendSystemMessage(newWonMessage);
                 }
             } catch (Exception e) {
                 logger.warn("caught Exception:", e);

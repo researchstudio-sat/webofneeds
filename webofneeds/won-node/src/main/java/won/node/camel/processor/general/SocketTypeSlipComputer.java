@@ -18,9 +18,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import won.node.camel.processor.annotation.DefaultSocketMessageProcessor;
 import won.node.camel.processor.annotation.SocketMessageProcessor;
+import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;

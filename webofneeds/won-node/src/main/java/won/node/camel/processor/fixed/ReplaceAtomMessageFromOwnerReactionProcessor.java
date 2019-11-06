@@ -60,6 +60,6 @@ public class ReplaceAtomMessageFromOwnerReactionProcessor extends AbstractCamelP
         WonMessage message = WonMessageBuilder.setMessagePropertiesForSystemChangeNotificationMessageToTargetAtom(
                         messageURI, con.getConnectionURI(), con.getAtomURI(), atom.getWonNodeURI(),
                         con.getTargetConnectionURI(), con.getTargetAtomURI(), remoteWonNodeURI).build();
-        sendSystemMessage(message);
+        camelWonMessageService.sendSystemMessage(message);
     }
 }

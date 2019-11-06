@@ -1,5 +1,7 @@
 package won.node.camel.processor.general;
 
+import static won.node.camel.processor.WonCamelHelper.*;
+
 import java.net.URI;
 import java.util.Optional;
 
@@ -35,6 +37,7 @@ public class SocketDerivationProcessor implements Processor {
     @Override
     public void process(Exchange exchange) throws Exception {
         Optional<Connection> con = Optional.empty();
+        WonMessageDirection direction = getDirectionRequired(exchange);
         ConnectionStateChangeBuilder stateChangeBuilder = (ConnectionStateChangeBuilder) exchange.getIn()
                         .getHeader(WonCamelConstants.CONNECTION_STATE_CHANGE_BUILDER_HEADER);
         if (stateChangeBuilder == null) {
@@ -45,8 +48,8 @@ public class SocketDerivationProcessor implements Processor {
         URI conUri = (URI) exchange.getIn().getHeader(WonCamelConstants.CONNECTION_URI_HEADER);
         if (conUri == null) {
             // not found. get it from the message and put it in the header
-            WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-            conUri = wonMessage.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL ? wonMessage.getRecipientURI()
+            WonMessage wonMessage = getMessageRequired(exchange);
+            conUri = direction.isFromExternal() ? wonMessage.getRecipientURI()
                             : wonMessage.getSenderURI();
         }
         if (conUri != null) {

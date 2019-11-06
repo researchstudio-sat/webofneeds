@@ -8,14 +8,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import won.node.camel.processor.AbstractCamelProcessor;
+import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
-import won.protocol.model.Connection;
-import won.protocol.model.ConnectionState;
 import won.protocol.model.Atom;
 import won.protocol.model.AtomState;
+import won.protocol.model.Connection;
+import won.protocol.model.ConnectionState;
 import won.protocol.util.DataAccessUtils;
 
 /**
@@ -26,10 +26,11 @@ public class DeleteAtomMessageProcessor extends AbstractCamelProcessor {
 
     @Override
     public void process(final Exchange exchange) throws Exception {
-        WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-        if (wonMessage.getMessageType() == WonMessageType.SUCCESS_RESPONSE
-                        && wonMessage.getIsResponseToMessageType() == WonMessageType.DELETE) {
-            URI recipientAtomURI = wonMessage.getRecipientAtomURI();
+        WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.RESPONSE_HEADER);
+        WonMessage focalMessage = wonMessage.getFocalMessage();
+        if (focalMessage.getMessageType() == WonMessageType.SUCCESS_RESPONSE
+                        && focalMessage.getRespondingToMessageType() == WonMessageType.DELETE) {
+            URI recipientAtomURI = focalMessage.getRecipientAtomURI();
             if (recipientAtomURI == null) {
                 throw new WonMessageProcessingException("recipientAtomURI is not set");
             }

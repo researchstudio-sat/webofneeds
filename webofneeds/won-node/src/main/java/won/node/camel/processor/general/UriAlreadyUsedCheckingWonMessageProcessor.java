@@ -13,18 +13,22 @@ package won.node.camel.processor.general;
 import java.net.URI;
 import java.util.Optional;
 
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.util.IsoMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import won.node.camel.processor.WonCamelHelper;
 import won.node.service.persistence.AtomService;
 import won.node.service.persistence.MessageService;
+import won.protocol.exception.UriAlreadyInUseException;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
-import won.protocol.message.processor.WonMessageProcessor;
+import won.protocol.message.WonMessageUtils;
 import won.protocol.message.processor.exception.EventAlreadyProcessedException;
-import won.protocol.message.processor.exception.UriAlreadyInUseException;
 import won.protocol.model.Atom;
 import won.protocol.model.MessageEvent;
 import won.protocol.util.RdfUtils;
@@ -40,17 +44,20 @@ import won.protocol.util.WonRdfUtils;
  * on the early stage, before the whole message processing logic is at work.
  * User: ypanchenko Date: 23.04.2015
  */
-public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProcessor {
+public class UriAlreadyUsedCheckingWonMessageProcessor implements Processor {
     @Autowired
     private MessageService messageService;
     @Autowired
     protected AtomService atomService;
 
     @Override
-    public WonMessage process(final WonMessage message) throws UriAlreadyInUseException {
-        checkEventURI(message);
+    public void process(Exchange exchange) throws Exception {
+        WonMessage message = WonCamelHelper.getMessageRequired(exchange);
+        WonMessageDirection direction = WonCamelHelper.getDirectionRequired(exchange);
+        URI parentUri = WonCamelHelper.getParentURI(exchange)
+                        .orElseGet(() -> WonMessageUtils.getParentEntityUri(message, direction));
+        checkEventURI(message, parentUri);
         checkAtomURI(message);
-        return message;
     }
 
     private void checkAtomURI(final WonMessage message) {
@@ -66,22 +73,18 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProc
         return;
     }
 
-    private void checkEventURI(final WonMessage message) {
-        Optional<MessageEvent> event = messageService.getMessage(message.getMessageURI());
+    private void checkEventURI(final WonMessage message, URI parentURI) {
+        Optional<MessageEvent> event = messageService.getMessage(message.getMessageURI(), parentURI);
         if (!event.isPresent()) {
             return;
         } else {
-            if (hasResponse(event.get()) && isDuplicateMessage(message, event.get())) {
+            if (isDuplicateMessage(message, event.get())) {
                 // the same massage as the one already processed is received
                 throw new EventAlreadyProcessedException(message.getMessageURI().toString());
             } else {
                 throw new UriAlreadyInUseException(message.getMessageURI().toString());
             }
         }
-    }
-
-    private boolean hasResponse(final MessageEvent event) {
-        return event.getResponseMessageURI() != null;
     }
 
     private boolean isDuplicateMessage(final WonMessage message, MessageEvent event) {
@@ -96,7 +99,7 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProc
         // envelope,
         // we compare here the main envelope data and the contents, without envelope
         // signatures.
-        WonMessage processedMessage = new WonMessage(processedDataset);
+        WonMessage processedMessage = WonMessage.of(processedDataset);
         boolean sameEnvelope = hasSameEnvelopeData(processedMessage, message);
         boolean sameContent = hasSameContent(processedMessage, message);
         if (sameEnvelope && sameContent) {
@@ -134,8 +137,8 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProc
                         // &&
                         // equalsOrBothNull(processedMessage.getCorrespondingRemoteMessageURI(),
                         // message.getCorrespondingRemoteMessageURI())
-                        && equalsOrBothNull(processedMessage.getIsResponseToMessageURI(),
-                                        message.getIsResponseToMessageURI())
+                        && equalsOrBothNull(processedMessage.getRespondingToMessageURI(),
+                                        message.getRespondingToMessageURI())
                         && processedMessage.getContentGraphURIs().containsAll(message.getContentGraphURIs())
                         && equalsOrBothNull(processedMessage.getMessageType(), message.getMessageType())
                         && equalsOrBothNull(processedMessage.getHintTargetAtomURI(), message.getHintTargetAtomURI())

@@ -12,32 +12,37 @@ package won.node.camel.processor.general;
 
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
+import java.util.Optional;
 
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import won.node.camel.processor.WonCamelHelper;
 import won.node.service.persistence.MessageService;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageUtils;
-import won.protocol.message.processor.WonMessageProcessor;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
 
 /**
- * Persists the specified WonMessage.
+ * Persists the message and if present, also the response.
  */
-public class PersistingWonMessageProcessor implements WonMessageProcessor {
+public class PersistingWonMessageProcessor implements Processor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     MessageService messageService;
 
     @Override
-    // we use READ_COMMITTED because we want to wait for an exclusive lock will
-    // accept data written by a concurrent transaction that commits before we read
-    public WonMessage process(WonMessage message) throws WonMessageProcessingException {
-        URI parentURI = WonMessageUtils.getParentEntityUri(message);
-        messageService.updateResponseInfo(message);
+    public void process(Exchange exchange) throws Exception {
+        WonMessage message = WonCamelHelper.getMessageRequired(exchange);
+        URI parentURI = WonCamelHelper.getParentURIRequired(exchange);
+        if (logger.isDebugEnabled()) {
+            logger.debug("storing message {}", message.toStringForDebug(false));
+        }
         messageService.saveMessage(message, parentURI);
-        return message;
+        Optional<WonMessage> response = WonCamelHelper.getResponse(exchange);
+        if (response.isPresent()) {
+            messageService.saveMessage(response.get(), parentURI);
+        }
     }
 }

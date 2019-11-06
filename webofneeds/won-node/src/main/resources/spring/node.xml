@@ -13,6 +13,7 @@
     <import resource="classpath:/spring/component/storage/jpabased-rdf-storage.xml" />
     <import resource="classpath:/spring/component/linkeddatasource/linkeddatasource.xml"/>
     <import resource="classpath:/spring/component/camel/node-camel.xml" />
+    <import resource="classpath:/spring/component/camel/node-camel-activemq.xml" />
 
     <import
             resource="classpath:/spring/component/matcherProtocolMatcherServiceClient/matcherProtocolMatcherServiceClient-jms.xml"/>

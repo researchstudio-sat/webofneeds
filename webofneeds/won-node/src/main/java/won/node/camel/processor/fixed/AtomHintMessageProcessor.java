@@ -7,10 +7,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import won.node.camel.processor.AbstractCamelProcessor;
+import won.protocol.exception.MissingMessagePropertyException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.message.processor.exception.MissingMessagePropertyException;
 import won.protocol.vocabulary.WONMSG;
 
 import java.lang.invoke.MethodHandles;
@@ -31,7 +31,7 @@ public class AtomHintMessageProcessor extends AbstractCamelProcessor {
         logger.debug("STORING message with id {}", wonMessage.getMessageURI());
         URI atomURIFromWonMessage = wonMessage.getRecipientAtomURI();
         if (isTooManyHints(atomURIFromWonMessage)) {
-            exchange.getIn().setHeader(WonCamelConstants.IGNORE_HINT, Boolean.TRUE);
+            exchange.getIn().setHeader(WonCamelConstants.IGNORE_HINT_HEADER, Boolean.TRUE);
             return;
         }
         URI otherAtomURIFromWonMessage = wonMessage.getHintTargetAtomURI();

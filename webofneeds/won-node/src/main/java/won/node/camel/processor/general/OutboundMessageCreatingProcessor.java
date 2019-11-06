@@ -10,14 +10,15 @@
  */
 package won.node.camel.processor.general;
 
+import java.lang.invoke.MethodHandles;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
-
-import java.lang.invoke.MethodHandles;
 
 /**
  * Processor that expects an outgoingMessageFactory in the respecitve in header,
@@ -35,20 +36,7 @@ public class OutboundMessageCreatingProcessor implements Processor {
                             WonCamelConstants.MESSAGE_HEADER);
             return;
         }
-        // remove the factory from the camel message so it does not slow down the rest
-        // of the processing chain
-        Object factory = exchange.getIn().removeHeader(WonCamelConstants.OUTBOUND_MESSAGE_FACTORY_HEADER);
-        if (factory == null) {
-            logger.debug("did not find an outbound message for message {} in header {}, this is unexpected ",
-                            wonMessage.getMessageURI(), WonCamelConstants.OUTBOUND_MESSAGE_FACTORY_HEADER);
-            return;
-        }
-        OutboundMessageFactoryProcessor factoryProcessor = (OutboundMessageFactoryProcessor) factory;
-        WonMessage outboundMessage = factoryProcessor.process(wonMessage);
-        if (outboundMessage == null) {
-            logger.debug("factory did not produce an outgoing WonMessage based on WonMessage {}, this is unexpected",
-                            wonMessage.getMessageURI());
-        }
-        exchange.getIn().setHeader(WonCamelConstants.OUTBOUND_MESSAGE_HEADER, outboundMessage);
+        // just send the original message
+        exchange.getIn().setHeader(WonCamelConstants.OUTBOUND_MESSAGE_HEADER, wonMessage);
     }
 }

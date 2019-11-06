@@ -10,27 +10,31 @@
  */
 package won.node.camel.processor.general;
 
+import static won.node.camel.processor.WonCamelHelper.*;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Optional;
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageUtils;
-import won.protocol.message.processor.WonMessageProcessor;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.model.Connection;
 import won.protocol.repository.AtomMessageContainerRepository;
 import won.protocol.repository.AtomRepository;
 import won.protocol.repository.ConnectionMessageContainerRepository;
 import won.protocol.repository.ConnectionRepository;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.Optional;
-
 /**
  * Acquires a pessimistic read lock on the message's parent.
  */
-public class LockMessageParentWonMessageProcessor implements WonMessageProcessor {
+public class LockMessageParentWonMessageProcessor implements Processor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     ConnectionRepository connectionRepository;
@@ -42,9 +46,19 @@ public class LockMessageParentWonMessageProcessor implements WonMessageProcessor
     AtomMessageContainerRepository atomMessageContainerRepository;
 
     @Override
-    public WonMessage process(WonMessage message) throws WonMessageProcessingException {
+    public void process(Exchange exchange) throws Exception {
+        WonMessage message = getMessageRequired(exchange);
         try {
-            lockParent(message);
+            Optional<URI> parent = getParentURI(exchange);
+            if (parent.isPresent()) {
+                lockParent(message, parent.get());
+            } else {
+                WonMessageDirection direction = getDirectionRequired(exchange);
+                parent = Optional.ofNullable(WonMessageUtils.getParentEntityUri(message, direction));
+                if (parent.isPresent()) {
+                    lockParent(message, parent.get());
+                }
+            }
         } catch (Exception e) {
             URI messageUri;
             try {
@@ -55,12 +69,9 @@ public class LockMessageParentWonMessageProcessor implements WonMessageProcessor
             }
             logger.error("Error locking parent of WonMessage with uri {}", messageUri);
         }
-        return message;
     }
 
-    private void lockParent(WonMessage message) {
-        // get the parent's URI (either a connection or an atom
-        URI parentURI = WonMessageUtils.getParentEntityUri(message);
+    private void lockParent(WonMessage message, URI parentURI) {
         // try a connection:
         Optional<Connection> con = connectionRepository.findOneByConnectionURIForUpdate(parentURI);
         if (con.isPresent()) {

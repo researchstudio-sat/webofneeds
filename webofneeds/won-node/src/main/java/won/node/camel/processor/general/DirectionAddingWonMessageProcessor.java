@@ -12,10 +12,10 @@ package won.node.camel.processor.general;
 
 import org.apache.jena.vocabulary.RDF;
 
+import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.WonMessageProcessor;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
 
 /**
  * Wraps the wonMessage, adding the direction property.

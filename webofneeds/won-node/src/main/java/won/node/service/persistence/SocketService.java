@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import won.node.service.linkeddata.lookup.SocketLookup;
+import won.protocol.exception.NoAtomForSocketFoundException;
+import won.protocol.exception.NoDefaultSocketException;
 import won.protocol.exception.NoSuchAtomException;
 import won.protocol.exception.NoSuchSocketException;
 import won.protocol.model.Socket;
@@ -48,12 +50,27 @@ public class SocketService {
 
     public Socket getSocket(URI atomUri, Optional<URI> socketUri) throws IllegalArgumentException, NoSuchAtomException {
         if (socketUri.isPresent()) {
-            return socketRepository.findByAtomURIAndSocketURI(atomUri, socketUri.get()).stream().findFirst()
-                            .orElseThrow(() -> new IllegalArgumentException(
-                                            "No socket found: atom: " + atomUri + ", socket:" + socketUri.get()));
+            return socketRepository.findOneBySocketURI(socketUri.get())
+                            .orElseThrow(() -> new NoSuchSocketException(socketUri.get()));
         }
         return getDefaultSocket(atomUri)
-                        .orElseThrow(() -> new IllegalArgumentException("No default socket found: atom: " + atomUri));
+                        .orElseThrow(() -> new NoDefaultSocketException(atomUri));
+    }
+
+    public Optional<URI> getAtomOfSocket(URI socketURI) {
+        if (socketURI == null) {
+            return Optional.empty();
+        }
+        String uri = socketURI.toString();
+        String fragment = socketURI.getRawFragment();
+        if (fragment == null) {
+            return Optional.empty();
+        }
+        return Optional.of(URI.create(uri.substring(0, uri.length() - fragment.length() - 1)));
+    }
+
+    public URI getAtomOfSocketRequired(URI socketURI) {
+        return getAtomOfSocket(socketURI).orElseThrow(() -> new NoAtomForSocketFoundException(socketURI));
     }
 
     public Optional<Socket> getSocket(URI socketURI) {
@@ -64,24 +81,42 @@ public class SocketService {
         return getSocket(socketURI).orElseThrow(() -> new NoSuchSocketException(socketURI));
     }
 
-    public Optional<URI> lookupDefaultSocket(URI atomURI) {
-        return socketLookup.lookupDefaultSocket(atomURI);
-    }
-
     public Optional<SocketDefinition> getSocketConfig(URI socketType) {
         return socketLookup.getSocketConfig(socketType);
     }
 
-    public Optional<Integer> getCapacity(URI socket) {
-        return socketLookup.getCapacity(socket);
+    public Optional<Integer> getCapacity(URI localSocket) {
+        Optional<Socket> socket = socketRepository.findOneBySocketURI(localSocket);
+        if (!socket.isPresent()) {
+            throw new NoSuchSocketException(localSocket);
+        }
+        return socketLookup.getCapacityOfType(socket.get().getTypeURI());
     }
 
     public boolean isCompatible(URI localSocket, URI targetSocket) {
-        return socketLookup.isCompatible(localSocket, targetSocket);
+        Optional<Socket> socket = socketRepository.findOneBySocketURI(localSocket);
+        if (!socket.isPresent()) {
+            throw new NoSuchSocketException(localSocket);
+        }
+        Optional<Socket> target = socketRepository.findOneBySocketURI(targetSocket);
+        Optional<URI> targetType = Optional.empty();
+        if (target.isPresent()) {
+            targetType = Optional.of(target.get().getTypeURI());
+        } else {
+            targetType = socketLookup.getSocketType(targetSocket);
+        }
+        if (targetType.isPresent()) {
+            return socketLookup.isCompatibleSocketTypes(socket.get().getTypeURI(), targetType.get());
+        }
+        return false;
     }
 
     public boolean isAutoOpen(URI localSocket) {
-        return socketLookup.isAutoOpen(localSocket);
+        Optional<Socket> socket = socketRepository.findOneBySocketURI(localSocket);
+        if (!socket.isPresent()) {
+            throw new NoSuchSocketException(localSocket);
+        }
+        return socketLookup.isAutoOpenSocketType(socket.get().getTypeURI());
     }
 
     public Optional<URI> getSocketType(URI socketURI) {

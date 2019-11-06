@@ -1,5 +1,7 @@
 package won.node.camel.processor.fixed;
 
+import static won.node.camel.processor.WonCamelHelper.*;
+
 import java.lang.invoke.MethodHandles;
 
 import org.apache.camel.Exchange;
@@ -28,6 +30,8 @@ public class CreateAtomMessageProcessor extends AbstractCamelProcessor {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
         Atom atom = atomService.createAtom(wonMessage);
-        atomService.authorizeOwnerApplicationForAtom(message, atom);
+        putParentURI(exchange, atom.getAtomURI());
+        String ownerApplicationID = message.getHeader(WonCamelConstants.OWNER_APPLICATION_ID_HEADER).toString();
+        atomService.authorizeOwnerApplicationForAtom(ownerApplicationID, atom);
     }
 }

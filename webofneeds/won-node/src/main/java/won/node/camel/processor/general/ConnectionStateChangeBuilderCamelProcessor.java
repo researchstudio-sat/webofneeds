@@ -10,6 +10,8 @@
  */
 package won.node.camel.processor.general;
 
+import static won.node.camel.processor.WonCamelHelper.*;
+
 import java.net.URI;
 
 import org.apache.camel.Exchange;
@@ -19,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.node.service.persistence.ConnectionService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
+import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 
@@ -36,20 +39,28 @@ public class ConnectionStateChangeBuilderCamelProcessor implements Processor {
     @Override
     public void process(Exchange exchange) throws Exception {
         ConnectionStateChangeBuilder stateChangeBuilder = new ConnectionStateChangeBuilder();
-        // first, try to find the connection uri in the header:
-        URI conUri = (URI) exchange.getIn().getHeader(WonCamelConstants.CONNECTION_URI_HEADER);
-        if (conUri == null) {
-            // not found. get it from the message and put it in the header
-            WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-            conUri = wonMessage.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL ? wonMessage.getRecipientURI()
-                            : wonMessage.getSenderURI();
+        WonMessage wonMessage = getMessageRequired(exchange);
+        WonMessageType type = wonMessage.getMessageTypeRequired();
+        if (type.isResponseMessage()) {
+            type = wonMessage.getRespondingToMessageType();
         }
-        if (conUri != null) {
-            // found a connection. Put its URI in the header and load it
-            Connection con = connectionService.getConnectionRequired(conUri);
-            stateChangeBuilder.oldState(con.getState());
-        } else {
-            // found no connection. don't modify the builder
+        if (type.isConnectionSpecificMessage()) {
+            WonMessageDirection direction = getDirectionRequired(exchange);
+            // first, try to find the connection uri in the header:
+            URI conUri = (URI) exchange.getIn().getHeader(WonCamelConstants.CONNECTION_URI_HEADER);
+            if (conUri == null) {
+                // not found. get it from the message and put it in the header
+                conUri = direction.isFromExternal()
+                                ? wonMessage.getRecipientURI()
+                                : wonMessage.getSenderURI();
+            }
+            if (conUri != null) {
+                // found a connection. Put its URI in the header and load it
+                Connection con = connectionService.getConnectionRequired(conUri);
+                stateChangeBuilder.oldState(con.getState());
+            } else {
+                // found no connection. don't modify the builder
+            }
         }
         // put the state change builder in the header
         exchange.getIn().setHeader(WonCamelConstants.CONNECTION_STATE_CHANGE_BUILDER_HEADER, stateChangeBuilder);

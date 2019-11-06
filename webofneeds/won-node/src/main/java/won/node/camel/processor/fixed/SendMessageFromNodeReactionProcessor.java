@@ -20,6 +20,7 @@ import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
 import won.protocol.util.LoggingUtils;
+import won.protocol.util.Prefixer;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WONMSG;
@@ -84,8 +85,9 @@ public class SendMessageFromNodeReactionProcessor extends AbstractCamelProcessor
                         wonMessage.getRecipientNodeURI(), conToSendTo.getTargetConnectionURI(),
                         conToSendTo.getTargetAtomURI(), remoteWonNodeUri);
         if (logger.isDebugEnabled()) {
-            logger.debug("injecting this message: {} ", RdfUtils.toString(newWonMessage.getCompleteDataset()));
+            logger.debug("injecting this message: {} ",
+                            RdfUtils.toString(Prefixer.setPrefixes(newWonMessage.getCompleteDataset())));
         }
-        sendSystemMessage(newWonMessage);
+        camelWonMessageService.sendSystemMessage(newWonMessage);
     }
 }

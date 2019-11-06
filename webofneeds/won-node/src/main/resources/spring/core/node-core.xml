@@ -78,6 +78,8 @@
 	<context:component-scan base-package="won.node.service.persistence" />
 	<context:component-scan base-package="won.node.service.linkeddata.*" />
 	<context:component-scan base-package="won.node.service.nodebehaviour" />
+	<context:component-scan base-package="won.node.camel.service" />
+	<context:component-scan base-package="won.protocol.service.impl" />
 
 
     <bean id="atomInformationService" class="won.node.service.persistence.AtomInformationServiceImpl">
@@ -85,6 +87,8 @@
     </bean>
 
     <bean id="ownerManagementService" class="won.node.service.persistence.OwnerManagementService"/>
+    
+    <bean id="messageRoutingInfoService" class=" won.protocol.service.impl.MessageRoutingInfoServiceImpl" />
     
 
 </beans>

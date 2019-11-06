@@ -219,12 +219,24 @@ public class URIService implements InitializingBean {
         this.atomResourceURIPrefix = atomResourceURIPrefix;
     }
 
+    public String getAtomResourceURIPrefix() {
+        return atomResourceURIPrefix;
+    }
+
     public void setConnectionResourceURIPrefix(final String connectionResourceURIPrefix) {
         this.connectionResourceURIPrefix = connectionResourceURIPrefix;
     }
 
+    public String getConnectionResourceURIPrefix() {
+        return connectionResourceURIPrefix;
+    }
+
     public void setEventResourceURIPrefix(final String eventResourceURIPrefix) {
         this.eventResourceURIPrefix = eventResourceURIPrefix;
+    }
+
+    public String getEventResourceURIPrefix() {
+        return eventResourceURIPrefix;
     }
 
     public void setAttachmentResourceURIPrefix(String attachmentResourceURIPrefix) {
@@ -237,6 +249,10 @@ public class URIService implements InitializingBean {
 
     public void setResourceURIPrefix(final String resourceURIPrefix) {
         this.resourceURIPrefix = resourceURIPrefix;
+    }
+
+    public String getResourceURIPrefix() {
+        return resourceURIPrefix;
     }
 
     public void setPageURIPrefix(final String pageURIPrefix) {
