@@ -32,6 +32,6 @@ public class WonMessageDecoder {
     }
 
     public static WonMessage decodeFromDataset(Dataset message) {
-        return new WonMessage(message);
+        return WonMessage.of(message);
     }
 }

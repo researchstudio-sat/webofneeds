@@ -1,9 +1,10 @@
 package won.protocol.message;
 
-import org.apache.jena.rdf.model.Resource;
-import won.protocol.vocabulary.WONMSG;
-
 import java.net.URI;
+
+import org.apache.jena.rdf.model.Resource;
+
+import won.protocol.vocabulary.WONMSG;
 
 /**
  * User: syim Date: 17.02.2015
@@ -38,5 +39,17 @@ public enum WonMessageDirection {
         if (WONMSG.FromExternal.equals(resource))
             return FROM_EXTERNAL;
         return null;
+    }
+
+    public boolean isFromOwner() {
+        return this == FROM_OWNER;
+    }
+
+    public boolean isFromExternal() {
+        return this == FROM_EXTERNAL;
+    }
+
+    public boolean isFromSystem() {
+        return this == FROM_SYSTEM;
     }
 }
