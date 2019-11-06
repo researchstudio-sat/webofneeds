@@ -40,6 +40,14 @@ class WonAtomContextSwipeableView extends React.Component {
   }
 
   render() {
+    const headerElement = (
+      <WonAtomHeader
+        atomUri={this.props.atomUri}
+        hideTimestamp={this.props.hideTimestamp}
+        onClick={this.props.onClick}
+      />
+    );
+
     if (this.props.actionButtons) {
       const show = this.state.show;
       let triggerIcon = (
@@ -64,6 +72,7 @@ class WonAtomContextSwipeableView extends React.Component {
           </svg>
         </React.Fragment>
       );
+
       return (
         <won-atom-context-layout class={this.props.className}>
           <div className="cl__main ">
@@ -71,11 +80,7 @@ class WonAtomContextSwipeableView extends React.Component {
               index={show ? 1 : 0}
               enableMouseEvents={this.props.enableMouseEvents}
             >
-              <WonAtomHeader
-                atomUri={this.props.atomUri}
-                hideTimestamp={this.props.hideTimestamp}
-                onClick={this.props.onClick}
-              />
+              {headerElement}
               {this.props.actionButtons}
             </SwipeableViews>
           </div>
@@ -83,14 +88,7 @@ class WonAtomContextSwipeableView extends React.Component {
         </won-atom-context-layout>
       );
     } else {
-      return (
-        <WonAtomHeader
-          className={this.props.className}
-          atomUri={this.props.atomUri}
-          hideTimestamp={this.props.hideTimestamp}
-          onClick={this.props.onClick}
-        />
-      );
+      return headerElement;
     }
   }
 }
