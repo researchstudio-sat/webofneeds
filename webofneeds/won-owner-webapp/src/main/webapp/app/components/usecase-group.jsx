@@ -6,10 +6,18 @@ import * as useCaseUtils from "../usecase-utils.js";
 import { getUseCaseGroupFromRoute } from "../redux/selectors/general-selectors.js";
 
 import "~/style/_usecase-group.scss";
+import { getIn } from "../utils";
 
 const mapStateToProps = state => {
+  const visibleUseCasesByConfig = getIn(state, [
+    "config",
+    "theme",
+    "visibleUseCases",
+  ]);
+
   const selectedGroup = getUseCaseGroupFromRoute(state);
   return {
+    visibleUseCasesByConfig,
     useCaseGroup: useCaseUtils.getUseCaseGroupByIdentifier(selectedGroup),
   };
 };
@@ -102,6 +110,7 @@ class WonUsecasePicker extends React.Component {
   }
 }
 WonUsecasePicker.propTypes = {
+  visibleUseCasesByConfig: PropTypes.arrayOf(PropTypes.string),
   useCaseGroup: PropTypes.object,
   routerGoCurrent: PropTypes.func,
 };

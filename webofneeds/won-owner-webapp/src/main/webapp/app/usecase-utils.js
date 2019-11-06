@@ -245,9 +245,10 @@ function initializeAllMessageDetails() {
  * not found in a useCaseGroup or in a group that's too
  * small to be displayed as a group
  * @param threshold => defines size that is deemed too small to display group
+ * @param visibleUseCasesArray => array of useCaseIdentifier that are visible
  * @returns {*}
  */
-export function getUnGroupedUseCases(threshold = 0) {
+export function getUnGroupedUseCases(threshold = 0, visibleUseCasesArray) {
   const useCaseGroups = useCaseDefinitions.getAllUseCaseGroups();
   let ungroupedUseCases = JSON.parse(
     JSON.stringify(useCaseDefinitions.getAllUseCases())
@@ -258,8 +259,8 @@ export function getUnGroupedUseCases(threshold = 0) {
     // show use cases from groups that can't be displayed
     // show use cases from groups that have no more than threshold use cases
     if (
-      !isDisplayableUseCaseGroup(group) ||
-      countDisplayableItemsInGroup(group) <= threshold
+      !isDisplayableUseCaseGroup(group, visibleUseCasesArray) ||
+      countDisplayableItemsInGroup(group, visibleUseCasesArray) <= threshold
     ) {
       continue;
     }
@@ -312,9 +313,11 @@ export function getUseCaseGroupByIdentifier(groupIdentifier) {
 /**
  * return if the given useCase is displayable or not
  * @param useCase
+ * @param visibleUseCasesArray => array of useCaseIdentifier that are visible
  * @returns {*}
  */
-export function isDisplayableUseCase(useCase) {
+export function isDisplayableUseCase(useCase, visibleUseCasesArray) {
+  console.debug(visibleUseCasesArray);
   return (
     useCase &&
     useCase.identifier &&
@@ -327,19 +330,24 @@ export function isDisplayableUseCase(useCase) {
 /**
  * return whether the given useCase is displayable or not
  * @param useCase
+ * @param visibleUseCasesArray => array of useCaseIdentifier that are visible
  * @returns {*}
  */
-export function isDisplayableItem(item) {
-  return isDisplayableUseCase(item) || isDisplayableUseCaseGroup(item);
+export function isDisplayableItem(item, visibleUseCasesArray) {
+  return (
+    isDisplayableUseCase(item, visibleUseCasesArray) ||
+    isDisplayableUseCaseGroup(item, visibleUseCasesArray)
+  );
 }
 
 /**
  * return if the given useCaseGroup is displayable or not
  * needs to have at least one displayable UseCase
  * @param useCase
+ * @param visibleUseCasesArray => array of useCaseIdentifier that are visible
  * @returns {*}
  */
-export function isDisplayableUseCaseGroup(useCaseGroup) {
+export function isDisplayableUseCaseGroup(useCaseGroup, visibleUseCasesArray) {
   const useCaseGroupValid =
     useCaseGroup &&
     (useCaseGroup.label || useCaseGroup.icon) &&
@@ -347,7 +355,7 @@ export function isDisplayableUseCaseGroup(useCaseGroup) {
 
   if (useCaseGroupValid) {
     for (const key in useCaseGroup.subItems) {
-      if (isDisplayableItem(useCaseGroup.subItems[key])) {
+      if (isDisplayableItem(useCaseGroup.subItems[key], visibleUseCasesArray)) {
         return true;
       }
     }
@@ -358,13 +366,17 @@ export function isDisplayableUseCaseGroup(useCaseGroup) {
 /**
  * return the amount of displayable items in a useCaseGroup
  * @param useCaseGroup
+ * @param visibleUseCasesArray => array of useCaseIdentifier that are visible
  * @return {*}
  */
-export function countDisplayableItemsInGroup(useCaseGroup) {
+export function countDisplayableItemsInGroup(
+  useCaseGroup,
+  visibleUseCasesArray
+) {
   let countItems = 0;
 
   for (const key in useCaseGroup.subItems) {
-    if (isDisplayableItem(useCaseGroup.subItems[key])) {
+    if (isDisplayableItem(useCaseGroup.subItems[key], visibleUseCasesArray)) {
       countItems++;
     }
   }
@@ -380,11 +392,16 @@ export function isUseCaseGroup(element) {
   return element.subItems;
 }
 
-export function filterUseCasesBySearchQuery(queryString) {
+export function filterUseCasesBySearchQuery(
+  queryString,
+  visibleUseCaseesArray
+) {
   let results = new Map();
   const useCases = useCaseDefinitions.getAllUseCases();
   for (const useCaseKey in useCases) {
-    if (searchFunction(useCases[useCaseKey], queryString)) {
+    if (
+      searchFunction(useCases[useCaseKey], queryString, visibleUseCaseesArray)
+    ) {
       results.set(useCases[useCaseKey].identifier, useCases[useCaseKey]);
     }
   }
@@ -396,9 +413,9 @@ export function filterUseCasesBySearchQuery(queryString) {
   return Array.from(results.values());
 }
 
-function searchFunction(useCase, searchString) {
+function searchFunction(useCase, searchString, visibleUseCaseesArray) {
   // don't treat use cases that can't be displayed as results
-  if (!isDisplayableUseCase(useCase)) {
+  if (!isDisplayableUseCase(useCase, visibleUseCaseesArray)) {
     return false;
   }
   // check for searchString in use case label and draft
