@@ -1,0 +1,1222 @@
+package won.node;
+
+import static org.mockito.Matchers.*;
+
+import java.net.URI;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.apache.camel.EndpointInject;
+import org.apache.camel.builder.AdviceWithRouteBuilder;
+import org.apache.camel.component.mock.MockEndpoint;
+import org.apache.camel.model.ModelCamelContext;
+import org.apache.jena.query.Dataset;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mockito;
+import org.springframework.test.annotation.Commit;
+
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.WonMessageDirection;
+import won.protocol.message.processor.camel.WonCamelConstants;
+import won.protocol.model.Atom;
+import won.protocol.model.AtomState;
+import won.protocol.model.Connection;
+import won.protocol.model.ConnectionState;
+import won.protocol.model.Socket;
+import won.protocol.util.RdfUtils;
+
+public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTest {
+    @EndpointInject(uri = "mock:seda:AtomProtocolOut")
+    protected MockEndpoint toNodeMockEndpoint;
+
+    /*******************************************
+     * Create tests
+     *******************************************/
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_create_atom__error_multiple_atoms() throws Exception {
+        URI atomURI = URI.create("http://example.com/atom-caema"); // uri in the file
+        Dataset atom1Content = loadDataset(
+                        "/won/node/WonMessageRoutesTest/data/test-atom1__error_multiple_atoms.ttl",
+                        "http://example.com/atom1", atomURI.toString());
+        WonMessage createAtom1Msg = WonMessageBuilder.setMessagePropertiesForCreate(newMessageURI(),
+                        atomURI, URI_NODE_1).addContent(atom1Content).build();
+        // set expectations
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isFailureResponseTo(createAtom1Msg.getMessageURI()));
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        toOwnerMockEndpoint.assertIsSatisfied();
+        Assert.assertFalse("No atom should have been created",
+                        atomService.getAtom(atomURI).isPresent());
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_create_atom__error_no_atom() throws Exception {
+        URI atomURI = URI.create("http://example.com/atom1-caena"); // uri in the file
+        Dataset atom1Content = loadDataset(
+                        "/won/node/WonMessageRoutesTest/data/test-atom1__error_no_atom.ttl", "http://example.com/atom1",
+                        atomURI.toString());
+        WonMessage createAtom1Msg = WonMessageBuilder.setMessagePropertiesForCreate(newMessageURI(),
+                        atomURI, URI_NODE_1).addContent(atom1Content).build();
+        // set expectations
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isFailureResponseTo(createAtom1Msg.getMessageURI()));
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        toOwnerMockEndpoint.assertIsSatisfied();
+        Assert.assertFalse("No atom should have been created",
+                        atomService.getAtom(atomURI).isPresent());
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_create_atom__error_no_socket() throws Exception {
+        URI atomURI = newAtomURI();
+        Dataset atom1Content = loadDatasetAndReplaceAtomURI(
+                        "/won/node/WonMessageRoutesTest/data/test-atom1__error_no_socket.ttl",
+                        atomURI);
+        WonMessage createAtom1Msg = WonMessageBuilder.setMessagePropertiesForCreate(newMessageURI(),
+                        atomURI, URI_NODE_1).addContent(atom1Content).build();
+        // set expectations
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isFailureResponseTo(createAtom1Msg.getMessageURI()));
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        toOwnerMockEndpoint.assertIsSatisfied();
+        Assert.assertFalse("No atom should have been created",
+                        atomService.getAtom(atomURI).isPresent());
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_create_atom__error_wrong_default_socket() throws Exception {
+        URI atomURI = newAtomURI();
+        Dataset atom1Content = loadDatasetAndReplaceAtomURI(
+                        "/won/node/WonMessageRoutesTest/data/test-atom1__error_wrong_default_socket.ttl",
+                        atomURI);
+        WonMessage createAtom1Msg = WonMessageBuilder.setMessagePropertiesForCreate(newMessageURI(),
+                        atomURI, URI_NODE_1).addContent(atom1Content).build();
+        // set expectations
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isFailureResponseTo(createAtom1Msg.getMessageURI()));
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        toOwnerMockEndpoint.assertIsSatisfied();
+        Assert.assertFalse("No atom should have been created",
+                        atomService.getAtom(atomURI).isPresent());
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_create_atom__error_wrong_socket() throws Exception {
+        URI atomURI = newAtomURI();
+        Dataset atom1Content = loadDatasetAndReplaceAtomURI(
+                        "/won/node/WonMessageRoutesTest/data/test-atom1__error_wrong_socket.ttl",
+                        atomURI);
+        WonMessage createAtom1Msg = WonMessageBuilder.setMessagePropertiesForCreate(newMessageURI(),
+                        atomURI, URI_NODE_1).addContent(atom1Content).build();
+        // set expectations
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isFailureResponseTo(createAtom1Msg.getMessageURI()));
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        toOwnerMockEndpoint.assertIsSatisfied();
+        Assert.assertFalse("No atom should have been created",
+                        atomService.getAtom(atomURI).isPresent());
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_create_atom__error_missing_socket_definition() throws Exception {
+        URI atomURI = newAtomURI();
+        Dataset atom1Content = loadDatasetAndReplaceAtomURI(
+                        "/won/node/WonMessageRoutesTest/data/test-atom1__error_missing_socket_definition.ttl",
+                        atomURI);
+        WonMessage createAtom1Msg = WonMessageBuilder.setMessagePropertiesForCreate(newMessageURI(),
+                        atomURI, URI_NODE_1).addContent(atom1Content).build();
+        // set expectations
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isFailureResponseTo(createAtom1Msg.getMessageURI()));
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        toOwnerMockEndpoint.assertIsSatisfied();
+        Assert.assertFalse("No atom should have been created",
+                        atomService.getAtom(atomURI).isPresent());
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_create_atom__error_contains_subpath() throws Exception {
+        URI atomURI = newAtomURI();
+        Dataset atom1Content = loadDatasetAndReplaceAtomURI(
+                        "/won/node/WonMessageRoutesTest/data/test-atom1__error_contains_subpath.ttl",
+                        atomURI);
+        WonMessage createAtom1Msg = WonMessageBuilder.setMessagePropertiesForCreate(newMessageURI(),
+                        atomURI, URI_NODE_1).addContent(atom1Content).build();
+        // set expectations
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isFailureResponseTo(createAtom1Msg.getMessageURI()));
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        toOwnerMockEndpoint.assertIsSatisfied();
+        Assert.assertFalse("No atom should have been created",
+                        atomService.getAtom(atomURI).isPresent());
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_create_atom() throws Exception {
+        URI atomURI = newAtomURI();
+        Dataset atom1Content = loadDatasetAndReplaceAtomURI("/won/node/WonMessageRoutesTest/data/test-atom1.ttl",
+                        atomURI);
+        WonMessage createAtom1Msg = WonMessageBuilder.setMessagePropertiesForCreate(newMessageURI(),
+                        atomURI, URI_NODE_1).addContent(atom1Content).build();
+        // set expectations
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(createAtom1Msg));
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        toMatcherMockEndpoint.assertIsSatisfied();
+        toOwnerMockEndpoint.assertIsSatisfied();
+        Assert.assertTrue("An atom should have been created", atomService.getAtom(atomURI).isPresent());
+        Assert.assertTrue("A message should have been stored",
+                        messageService.getMessage(createAtom1Msg.getMessageURI(), atomURI).isPresent());
+        Assert.assertTrue("A #socket1 should have been stored", socketRepository
+                        .findOneBySocketURI(URI.create(atomURI.toString() + "#socket1")).isPresent());
+        Assert.assertTrue("A #socket2 should have been stored", socketRepository
+                        .findOneBySocketURI(URI.create(atomURI.toString() + "#socket2")).isPresent());
+    }
+
+    /*******************************************
+     * Replace tests
+     *******************************************/
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_replace_atom__successful() throws Exception {
+        URI atomURI = newAtomURI();
+        Dataset atom1Content = loadDatasetAndReplaceAtomURI("/won/node/WonMessageRoutesTest/data/test-atom1.ttl",
+                        atomURI);
+        WonMessage createAtom1Msg = WonMessageBuilder.setMessagePropertiesForCreate(newMessageURI(),
+                        atomURI, URI_NODE_1).addContent(atom1Content).build();
+        // set expectations
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(createAtom1Msg));
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        toMatcherMockEndpoint.assertIsSatisfied();
+        toOwnerMockEndpoint.assertIsSatisfied();
+        // new expectations
+        toMatcherMockEndpoint.reset();
+        toOwnerMockEndpoint.reset();
+        Dataset atom1ReplaceContent = loadDatasetAndReplaceAtomURI(
+                        "/won/node/WonMessageRoutesTest/data/test-atom1__replacement.ttl",
+                        atomURI);
+        WonMessage replaceMsg = WonMessageBuilder.setMessagePropertiesForReplace(newMessageURI(), atomURI, URI_NODE_1)
+                        .addContent(atom1ReplaceContent)
+                        .build();
+        Mockito.when(linkedDataSource.getDataForResource(eq(atomURI)))
+                        .then(x -> linkedDataService.getAtomDataset(atomURI, false, null));
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(replaceMsg));
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        sendFromOwner(replaceMsg, OWNERAPPLICATION_ID_OWNER1);
+        toMatcherMockEndpoint.assertIsSatisfied();
+        toOwnerMockEndpoint.assertIsSatisfied();
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_replace_atom__error_contains_subpath() throws Exception {
+        URI atomURI = newAtomURI();
+        Dataset atom1Content = loadDatasetAndReplaceAtomURI("/won/node/WonMessageRoutesTest/data/test-atom1.ttl",
+                        atomURI);
+        WonMessage createAtom1Msg = WonMessageBuilder.setMessagePropertiesForCreate(newMessageURI(),
+                        atomURI, URI_NODE_1).addContent(atom1Content).build();
+        // set expectations
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(createAtom1Msg));
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        toMatcherMockEndpoint.assertIsSatisfied();
+        toOwnerMockEndpoint.assertIsSatisfied();
+        // new expectations
+        toMatcherMockEndpoint.reset();
+        toOwnerMockEndpoint.reset();
+        Dataset atom1ReplaceContent = loadDatasetAndReplaceAtomURI(
+                        "/won/node/WonMessageRoutesTest/data/test-atom1__error_contains_subpath.ttl",
+                        atomURI);
+        WonMessage replaceMsg = WonMessageBuilder.setMessagePropertiesForReplace(newMessageURI(), atomURI, URI_NODE_1)
+                        .addContent(atom1ReplaceContent)
+                        .build();
+        Mockito.when(linkedDataSource.getDataForResource(eq(atomURI)))
+                        .then(x -> linkedDataService.getAtomDataset(atomURI, false, null));
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isFailureResponseTo(replaceMsg.getMessageURI()));
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(replaceMsg, OWNERAPPLICATION_ID_OWNER1);
+        toMatcherMockEndpoint.assertIsSatisfied();
+        toOwnerMockEndpoint.assertIsSatisfied();
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_replace_atom__error_missing_socket_definition() throws Exception {
+        URI atomURI = newAtomURI();
+        Dataset atom1Content = loadDatasetAndReplaceAtomURI("/won/node/WonMessageRoutesTest/data/test-atom1.ttl",
+                        atomURI);
+        WonMessage createAtom1Msg = WonMessageBuilder.setMessagePropertiesForCreate(newMessageURI(),
+                        atomURI, URI_NODE_1).addContent(atom1Content).build();
+        // set expectations
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(createAtom1Msg));
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        toMatcherMockEndpoint.assertIsSatisfied();
+        toOwnerMockEndpoint.assertIsSatisfied();
+        // new expectations
+        toMatcherMockEndpoint.reset();
+        toOwnerMockEndpoint.reset();
+        Dataset atom1ReplaceContent = loadDatasetAndReplaceAtomURI(
+                        "/won/node/WonMessageRoutesTest/data/test-atom1__error_missing_socket_definition.ttl",
+                        atomURI);
+        WonMessage replaceMsg = WonMessageBuilder.setMessagePropertiesForReplace(newMessageURI(), atomURI, URI_NODE_1)
+                        .addContent(atom1ReplaceContent)
+                        .build();
+        Mockito.when(linkedDataSource.getDataForResource(eq(atomURI)))
+                        .then(x -> linkedDataService.getAtomDataset(atomURI, false, null));
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isFailureResponseTo(replaceMsg.getMessageURI()));
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(replaceMsg, OWNERAPPLICATION_ID_OWNER1);
+        toMatcherMockEndpoint.assertIsSatisfied();
+        toOwnerMockEndpoint.assertIsSatisfied();
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_replace_atom__error_multiple_atoms() throws Exception {
+        URI atomURI = URI.create("http://example.com/atom-raema"); // uri in the file
+        Dataset atom1Content = loadDatasetAndReplaceAtomURI("/won/node/WonMessageRoutesTest/data/test-atom1.ttl",
+                        atomURI);
+        WonMessage createAtom1Msg = WonMessageBuilder.setMessagePropertiesForCreate(newMessageURI(),
+                        atomURI, URI_NODE_1).addContent(atom1Content).build();
+        // set expectations
+        toNodeMockEndpoint.expectedMessageCount(0);
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(createAtom1Msg));
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        toMatcherMockEndpoint.assertIsSatisfied();
+        toOwnerMockEndpoint.assertIsSatisfied();
+        // new expectations
+        toMatcherMockEndpoint.reset();
+        toOwnerMockEndpoint.reset();
+        Dataset atom1ReplaceContent = loadDataset(
+                        "/won/node/WonMessageRoutesTest/data/test-atom1__error_multiple_atoms.ttl",
+                        "http://example.com/atom1", atomURI.toString());
+        WonMessage replaceMsg = WonMessageBuilder.setMessagePropertiesForReplace(newMessageURI(), atomURI, URI_NODE_1)
+                        .addContent(atom1ReplaceContent)
+                        .build();
+        Mockito.when(linkedDataSource.getDataForResource(eq(atomURI)))
+                        .then(x -> linkedDataService.getAtomDataset(atomURI, false, null));
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isFailureResponseTo(replaceMsg.getMessageURI()));
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(replaceMsg, OWNERAPPLICATION_ID_OWNER1);
+        toMatcherMockEndpoint.assertIsSatisfied();
+        toOwnerMockEndpoint.assertIsSatisfied();
+        toNodeMockEndpoint.assertIsSatisfied();
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_replace_atom__error_no_atom() throws Exception {
+        URI atomURI = URI.create("http://example.com/atom-raena"); // uri in the file
+        Dataset atom1Content = loadDatasetAndReplaceAtomURI("/won/node/WonMessageRoutesTest/data/test-atom1.ttl",
+                        atomURI);
+        WonMessage createAtom1Msg = WonMessageBuilder.setMessagePropertiesForCreate(newMessageURI(),
+                        atomURI, URI_NODE_1).addContent(atom1Content).build();
+        // set expectations
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(createAtom1Msg));
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        toMatcherMockEndpoint.assertIsSatisfied();
+        toOwnerMockEndpoint.assertIsSatisfied();
+        // new expectations
+        toMatcherMockEndpoint.reset();
+        toOwnerMockEndpoint.reset();
+        Dataset atom1ReplaceContent = loadDataset(
+                        "/won/node/WonMessageRoutesTest/data/test-atom1__error_no_atom.ttl", "http://example.com/atom1",
+                        atomURI.toString());
+        WonMessage replaceMsg = WonMessageBuilder.setMessagePropertiesForReplace(newMessageURI(), atomURI, URI_NODE_1)
+                        .addContent(atom1ReplaceContent)
+                        .build();
+        Mockito.when(linkedDataSource.getDataForResource(eq(atomURI)))
+                        .then(x -> linkedDataService.getAtomDataset(atomURI, false, null));
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isFailureResponseTo(replaceMsg.getMessageURI()));
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(replaceMsg, OWNERAPPLICATION_ID_OWNER1);
+        toMatcherMockEndpoint.assertIsSatisfied();
+        toOwnerMockEndpoint.assertIsSatisfied();
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_replace_atom__error_no_socket() throws Exception {
+        URI atomURI = newAtomURI();
+        Dataset atom1Content = loadDatasetAndReplaceAtomURI("/won/node/WonMessageRoutesTest/data/test-atom1.ttl",
+                        atomURI);
+        WonMessage createAtom1Msg = WonMessageBuilder.setMessagePropertiesForCreate(newMessageURI(),
+                        atomURI, URI_NODE_1).addContent(atom1Content).build();
+        // set expectations
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(createAtom1Msg));
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        toMatcherMockEndpoint.assertIsSatisfied();
+        toOwnerMockEndpoint.assertIsSatisfied();
+        // new expectations
+        toMatcherMockEndpoint.reset();
+        toOwnerMockEndpoint.reset();
+        Dataset atom1ReplaceContent = loadDatasetAndReplaceAtomURI(
+                        "/won/node/WonMessageRoutesTest/data/test-atom1__error_no_socket.ttl",
+                        atomURI);
+        WonMessage replaceMsg = WonMessageBuilder.setMessagePropertiesForReplace(newMessageURI(), atomURI, URI_NODE_1)
+                        .addContent(atom1ReplaceContent)
+                        .build();
+        Mockito.when(linkedDataSource.getDataForResource(eq(atomURI)))
+                        .then(x -> linkedDataService.getAtomDataset(atomURI, false, null));
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isFailureResponseTo(replaceMsg.getMessageURI()));
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(replaceMsg, OWNERAPPLICATION_ID_OWNER1);
+        toMatcherMockEndpoint.assertIsSatisfied();
+        toOwnerMockEndpoint.assertIsSatisfied();
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_replace_atom__error_wrong_default_socket() throws Exception {
+        URI atomURI = newAtomURI();
+        Dataset atom1Content = loadDatasetAndReplaceAtomURI("/won/node/WonMessageRoutesTest/data/test-atom1.ttl",
+                        atomURI);
+        WonMessage createAtom1Msg = WonMessageBuilder.setMessagePropertiesForCreate(newMessageURI(),
+                        atomURI, URI_NODE_1).addContent(atom1Content).build();
+        // set expectations
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(createAtom1Msg));
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        toMatcherMockEndpoint.assertIsSatisfied();
+        toOwnerMockEndpoint.assertIsSatisfied();
+        // new expectations
+        toMatcherMockEndpoint.reset();
+        toOwnerMockEndpoint.reset();
+        Dataset atom1ReplaceContent = loadDatasetAndReplaceAtomURI(
+                        "/won/node/WonMessageRoutesTest/data/test-atom1__error_wrong_default_socket.ttl",
+                        atomURI);
+        WonMessage replaceMsg = WonMessageBuilder.setMessagePropertiesForReplace(newMessageURI(), atomURI, URI_NODE_1)
+                        .addContent(atom1ReplaceContent)
+                        .build();
+        Mockito.when(linkedDataSource.getDataForResource(eq(atomURI)))
+                        .then(x -> linkedDataService.getAtomDataset(atomURI, false, null));
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isFailureResponseTo(replaceMsg.getMessageURI()));
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(replaceMsg, OWNERAPPLICATION_ID_OWNER1);
+        toMatcherMockEndpoint.assertIsSatisfied();
+        toOwnerMockEndpoint.assertIsSatisfied();
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_replace_atom__error_wrong_socket() throws Exception {
+        URI atomURI = newAtomURI();
+        Dataset atom1Content = loadDatasetAndReplaceAtomURI("/won/node/WonMessageRoutesTest/data/test-atom1.ttl",
+                        atomURI);
+        WonMessage createAtom1Msg = WonMessageBuilder.setMessagePropertiesForCreate(newMessageURI(),
+                        atomURI, URI_NODE_1).addContent(atom1Content).build();
+        // set expectations
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(createAtom1Msg));
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        toMatcherMockEndpoint.assertIsSatisfied();
+        toOwnerMockEndpoint.assertIsSatisfied();
+        // new expectations
+        toMatcherMockEndpoint.reset();
+        toOwnerMockEndpoint.reset();
+        Dataset atom1ReplaceContent = loadDatasetAndReplaceAtomURI(
+                        "/won/node/WonMessageRoutesTest/data/test-atom1__error_wrong_socket.ttl",
+                        atomURI);
+        WonMessage replaceMsg = WonMessageBuilder.setMessagePropertiesForReplace(newMessageURI(), atomURI, URI_NODE_1)
+                        .addContent(atom1ReplaceContent)
+                        .build();
+        Mockito.when(linkedDataSource.getDataForResource(eq(atomURI)))
+                        .then(x -> linkedDataService.getAtomDataset(atomURI, false, null));
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isFailureResponseTo(replaceMsg.getMessageURI()));
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(replaceMsg, OWNERAPPLICATION_ID_OWNER1);
+        toMatcherMockEndpoint.assertIsSatisfied();
+        toOwnerMockEndpoint.assertIsSatisfied();
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_replace_atom__successful_add_socket() throws Exception {
+        URI atomURI = newAtomURI();
+        Dataset atom1Content = loadDatasetAndReplaceAtomURI("/won/node/WonMessageRoutesTest/data/test-atom1.ttl",
+                        atomURI);
+        WonMessage createAtom1Msg = WonMessageBuilder.setMessagePropertiesForCreate(newMessageURI(),
+                        atomURI, URI_NODE_1).addContent(atom1Content).build();
+        // set expectations
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(createAtom1Msg));
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        toMatcherMockEndpoint.assertIsSatisfied();
+        toOwnerMockEndpoint.assertIsSatisfied();
+        // new expectations
+        toMatcherMockEndpoint.reset();
+        toOwnerMockEndpoint.reset();
+        Dataset atom1ReplaceContent = loadDatasetAndReplaceAtomURI(
+                        "/won/node/WonMessageRoutesTest/data/test-atom1__replacement_add_socket.ttl",
+                        atomURI);
+        WonMessage replaceMsg = WonMessageBuilder.setMessagePropertiesForReplace(newMessageURI(), atomURI, URI_NODE_1)
+                        .addContent(atom1ReplaceContent)
+                        .build();
+        Mockito.when(linkedDataSource.getDataForResource(eq(atomURI)))
+                        .then(x -> linkedDataService.getAtomDataset(atomURI, false, null));
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(replaceMsg));
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        sendFromOwner(replaceMsg, OWNERAPPLICATION_ID_OWNER1);
+        toMatcherMockEndpoint.assertIsSatisfied();
+        toOwnerMockEndpoint.assertIsSatisfied();
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_replace_atom__successful_change_socket() throws Exception {
+        URI atomURI = newAtomURI();
+        Dataset atom1Content = loadDatasetAndReplaceAtomURI("/won/node/WonMessageRoutesTest/data/test-atom1.ttl",
+                        atomURI);
+        WonMessage createAtom1Msg = WonMessageBuilder.setMessagePropertiesForCreate(newMessageURI(),
+                        atomURI, URI_NODE_1).addContent(atom1Content).build();
+        // set expectations
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(createAtom1Msg));
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        toMatcherMockEndpoint.assertIsSatisfied();
+        toOwnerMockEndpoint.assertIsSatisfied();
+        // new expectations
+        toMatcherMockEndpoint.reset();
+        toOwnerMockEndpoint.reset();
+        Dataset atom1ReplaceContent = loadDatasetAndReplaceAtomURI(
+                        "/won/node/WonMessageRoutesTest/data/test-atom1__replacement_change_socket.ttl",
+                        atomURI);
+        WonMessage replaceMsg = WonMessageBuilder.setMessagePropertiesForReplace(newMessageURI(), atomURI, URI_NODE_1)
+                        .addContent(atom1ReplaceContent)
+                        .build();
+        Mockito.when(linkedDataSource.getDataForResource(eq(atomURI)))
+                        .then(x -> linkedDataService.getAtomDataset(atomURI, false, null));
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(replaceMsg));
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        sendFromOwner(replaceMsg, OWNERAPPLICATION_ID_OWNER1);
+        toMatcherMockEndpoint.assertIsSatisfied();
+        toOwnerMockEndpoint.assertIsSatisfied();
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_replace_atom__successful_remove_socket() throws Exception {
+        URI atomURI = newAtomURI();
+        Dataset atom1Content = loadDatasetAndReplaceAtomURI("/won/node/WonMessageRoutesTest/data/test-atom1.ttl",
+                        atomURI);
+        WonMessage createAtom1Msg = WonMessageBuilder.setMessagePropertiesForCreate(newMessageURI(),
+                        atomURI, URI_NODE_1).addContent(atom1Content).build();
+        // set expectations
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(createAtom1Msg));
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        toMatcherMockEndpoint.assertIsSatisfied();
+        toOwnerMockEndpoint.assertIsSatisfied();
+        // new expectations
+        toMatcherMockEndpoint.reset();
+        toOwnerMockEndpoint.reset();
+        Dataset atom1ReplaceContent = loadDatasetAndReplaceAtomURI(
+                        "/won/node/WonMessageRoutesTest/data/test-atom1__replacement_remove_socket.ttl",
+                        atomURI);
+        WonMessage replaceMsg = WonMessageBuilder.setMessagePropertiesForReplace(newMessageURI(), atomURI, URI_NODE_1)
+                        .addContent(atom1ReplaceContent)
+                        .build();
+        Mockito.when(linkedDataSource.getDataForResource(eq(atomURI)))
+                        .then(x -> linkedDataService.getAtomDataset(atomURI, false, null));
+        toOwnerMockEndpoint.expectedMessageCount(2);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(replaceMsg));
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        sendFromOwner(replaceMsg, OWNERAPPLICATION_ID_OWNER1);
+        toMatcherMockEndpoint.assertIsSatisfied();
+    }
+
+    /*******************************************
+     * SocketHint tests
+     *******************************************/
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_socketHint__to_inactive() throws Exception {
+        URI atomURI = newAtomURI();
+        toMatcherMockEndpoint.expectedMessageCount(2); // notifications for create & deactivate
+        toOwnerMockEndpoint.expectedMessageCount(2); // echoes and responses for create & deactivate
+        WonMessage createAtom1Msg = makeCreateAtomMessage(atomURI,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
+        // create
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        Mockito.when(linkedDataSource.getDataForResource(eq(atomURI)))
+                        .then(x -> linkedDataService.getAtomDataset(atomURI, false, null));
+        WonMessage deactivateMsg = WonMessageBuilder
+                        .setMessagePropertiesForDeactivateFromOwner(newMessageURI(), atomURI, URI_NODE_1).build();
+        // deactivate
+        sendFromOwner(deactivateMsg, OWNERAPPLICATION_ID_OWNER1);
+        Atom atom = atomService.getAtom(atomURI).get();
+        List<Socket> sockets = socketRepository.findByAtomURI(atomURI);
+        URI socketURI = sockets.get(0).getSocketURI();
+        URI targetSocketURI = URI.create("uri:some-other-atom#socket");
+        Mockito.when(socketLookup.isCompatible(socketURI, targetSocketURI)).then(x -> true);
+        // set new expectations for hint
+        toMatcherMockEndpoint.assertIsSatisfied();
+        toOwnerMockEndpoint.assertIsSatisfied();
+        toOwnerMockEndpoint.reset();
+        toMatcherMockEndpoint.reset();
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        toOwnerMockEndpoint.expectedMessageCount(0);
+        WonMessage socketHintMessage = WonMessageBuilder.setMessagePropertiesForHintToSocket(newMessageURI(), atomURI,
+                        socketURI, URI_NODE_1, targetSocketURI, URI_MATCHER_1, 0.5).build();
+        sendFromMatcher(socketHintMessage);
+        toOwnerMockEndpoint.assertIsSatisfied();
+        toMatcherMockEndpoint.assertIsSatisfied();
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_socketHint__error_incompatible_sockets() throws Exception {
+        URI atomURI = newAtomURI();
+        WonMessage createAtom1Msg = makeCreateAtomMessage(atomURI,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
+        // set expectations
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(createAtom1Msg));
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        toOwnerMockEndpoint.assertIsSatisfied();
+        toMatcherMockEndpoint.assertIsSatisfied();
+        Atom atom = atomService.getAtom(atomURI).get();
+        List<Socket> sockets = socketRepository.findByAtomURI(atomURI);
+        URI socketURI = sockets.get(0).getSocketURI();
+        URI targetSocketURI = URI.create("uri:some-other-atom#socket");
+        Mockito.when(socketLookup.isCompatible(socketURI, targetSocketURI)).then(x -> false);
+        // set new expectations for hint
+        toOwnerMockEndpoint.reset();
+        toMatcherMockEndpoint.reset();
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        toOwnerMockEndpoint.expectedMessageCount(0);
+        WonMessage socketHintMessage = WonMessageBuilder.setMessagePropertiesForHintToSocket(newMessageURI(), atomURI,
+                        socketURI, URI_NODE_1, targetSocketURI, URI_MATCHER_1, 0.5).build();
+        sendFromMatcher(socketHintMessage);
+        toOwnerMockEndpoint.assertIsSatisfied();
+        toMatcherMockEndpoint.assertIsSatisfied();
+        Assert.assertTrue("At least one socket should have been stored", sockets.size() > 0);
+        Assert.assertTrue("An atom should have been created",
+                        atomService.getAtom(atomURI).isPresent());
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_socketHint__error_no_such_socket() throws Exception {
+        URI atomURI = newAtomURI();
+        WonMessage createAtom1Msg = makeCreateAtomMessage(atomURI,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
+        // set expectations
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(createAtom1Msg));
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        toOwnerMockEndpoint.assertIsSatisfied();
+        toMatcherMockEndpoint.assertIsSatisfied();
+        Assert.assertTrue("An atom should have been created",
+                        atomService.getAtom(atomURI).isPresent());
+        Atom atom = atomService.getAtom(atomURI).get();
+        List<Socket> sockets = socketRepository.findByAtomURI(atomURI);
+        URI socketURI = URI.create(
+                        atom.getAtomURI().toString() + "#socket-dontfind-" + Math.floor(Math.random() * 1000000));
+        Set<URI> socketURIs = sockets.stream().map(Socket::getSocketURI).collect(Collectors.toSet());
+        while (socketURIs.contains(socketURI)) {
+            socketURI = URI.create(
+                            atom.getAtomURI().toString() + "#socket-dontfind-" + Math.floor(Math.random() * 1000000));
+        }
+        URI targetSocketURI = URI.create("uri:some-other-atom#socket");
+        Mockito.when(socketLookup.isCompatible(socketURI, targetSocketURI)).then(x -> true);
+        Assert.assertTrue("At least one socket should have been stored", sockets.size() > 0);
+        // set new expectations for hint
+        toOwnerMockEndpoint.reset();
+        toMatcherMockEndpoint.reset();
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        toOwnerMockEndpoint.expectedMessageCount(0);
+        WonMessage socketHintMessage = WonMessageBuilder.setMessagePropertiesForHintToSocket(newMessageURI(), atomURI,
+                        socketURI, URI_NODE_1, targetSocketURI, URI_MATCHER_1, 0.5).build();
+        sendFromMatcher(socketHintMessage);
+        toOwnerMockEndpoint.assertIsSatisfied();
+        toMatcherMockEndpoint.assertIsSatisfied();
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_socketHint__error_no_such_recipient_atom() throws Exception {
+        URI atomURI = newAtomURI();
+        URI socketURI = URI.create(atomURI.toString() + "#socket");
+        URI targetSocketURI = URI.create("uri:some-other-atom#socket");
+        // set new expectations for hint
+        toOwnerMockEndpoint.reset();
+        toMatcherMockEndpoint.reset();
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        toOwnerMockEndpoint.expectedMessageCount(0);
+        WonMessage socketHintMessage = WonMessageBuilder.setMessagePropertiesForHintToSocket(newMessageURI(), atomURI,
+                        socketURI, URI_NODE_1, targetSocketURI, URI_MATCHER_1, 0.5).build();
+        sendFromMatcher(socketHintMessage);
+        toOwnerMockEndpoint.assertIsSatisfied();
+        toMatcherMockEndpoint.assertIsSatisfied();
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_socketHint__success() throws Exception {
+        URI atomURI = newAtomURI();
+        WonMessage createAtom1Msg = makeCreateAtomMessage(atomURI,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
+        // set expectations
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(createAtom1Msg));
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        toOwnerMockEndpoint.assertIsSatisfied();
+        toMatcherMockEndpoint.assertIsSatisfied();
+        Atom atom = atomService.getAtom(atomURI).get();
+        List<Socket> sockets = socketRepository.findByAtomURI(atomURI);
+        URI socketURI = sockets.get(0).getSocketURI();
+        URI targetSocketURI = URI.create("uri:some-other-atom#socket");
+        Assert.assertTrue("An atom should have been created", atomService.getAtom(atomURI).isPresent());
+        Assert.assertTrue("At least one socket should have been stored", sockets.size() > 0);
+        // set new expectations for hint
+        Mockito.when(socketLookup.isCompatible(socketURI, targetSocketURI)).then(x -> true);
+        Mockito.when(socketLookup.isCompatibleSocketTypes(any(URI.class), any(URI.class))).then(x -> true);
+        Mockito.when(socketLookup.getSocketType(eq(targetSocketURI)))
+                        .thenReturn(Optional.of(URI.create("just:some-uri")));
+        toOwnerMockEndpoint.reset();
+        toMatcherMockEndpoint.reset();
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isSocketHintFor(socketURI));
+        WonMessage socketHintMessage = WonMessageBuilder.setMessagePropertiesForHintToSocket(newMessageURI(), atomURI,
+                        socketURI, URI_NODE_1, targetSocketURI, URI_MATCHER_1, 0.5).build();
+        sendFromMatcher(socketHintMessage);
+        toOwnerMockEndpoint.assertIsSatisfied();
+        toMatcherMockEndpoint.assertIsSatisfied();
+    }
+
+    /*******************************************
+     * Deactivate tests
+     *******************************************/
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_deactivate__successful() throws Exception {
+        URI atomURI = newAtomURI();
+        WonMessage createAtom1Msg = makeCreateAtomMessage(atomURI,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
+        // set expectations
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(createAtom1Msg));
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        toOwnerMockEndpoint.assertIsSatisfied();
+        toMatcherMockEndpoint.assertIsSatisfied();
+        // set new expectations for deactivate
+        toOwnerMockEndpoint.reset();
+        toMatcherMockEndpoint.reset();
+        WonMessage deactivateMsg = WonMessageBuilder
+                        .setMessagePropertiesForDeactivateFromOwner(newMessageURI(), atomURI, URI_NODE_1).build();
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(deactivateMsg));
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        Mockito.when(linkedDataSource.getDataForResource(eq(atomURI)))
+                        .then(x -> linkedDataService.getAtomDataset(atomURI, false, null));
+        sendFromOwner(deactivateMsg, OWNERAPPLICATION_ID_OWNER1);
+        toOwnerMockEndpoint.assertIsSatisfied();
+        toMatcherMockEndpoint.assertIsSatisfied();
+        Assert.assertSame("Atom should have been deactivated",
+                        AtomState.INACTIVE, atomService.getAtom(atomURI).get().getState());
+        Assert.assertTrue("A message should have been stored",
+                        messageService.getMessage(createAtom1Msg.getMessageURI(), atomURI).isPresent());
+        Assert.assertTrue("A message should have been stored",
+                        messageService.getMessage(deactivateMsg.getMessageURI(), atomURI).isPresent());
+    }
+
+    /*******************************************
+     * Activate tests
+     *******************************************/
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_deactivate_reactivate_successful() throws Exception {
+        URI atomURI = newAtomURI();
+        WonMessage createAtom1Msg = makeCreateAtomMessage(atomURI,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
+        // set expectations
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(createAtom1Msg));
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        WonMessage deactivateMsg = WonMessageBuilder
+                        .setMessagePropertiesForDeactivateFromOwner(newMessageURI(), atomURI, URI_NODE_1).build();
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(deactivateMsg));
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        Mockito.when(linkedDataSource.getDataForResource(eq(atomURI)))
+                        .then(x -> linkedDataService.getAtomDataset(atomURI, false, null));
+        sendFromOwner(deactivateMsg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        WonMessage reactivateMsg = WonMessageBuilder
+                        .setMessagePropertiesForActivateFromOwner(newMessageURI(), atomURI, URI_NODE_1).build();
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(reactivateMsg));
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        sendFromOwner(reactivateMsg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        Assert.assertSame("Atom should have been reactivated",
+                        AtomState.ACTIVE, atomService.getAtom(atomURI).get().getState());
+        Assert.assertTrue("A message should have been stored",
+                        messageService.getMessage(createAtom1Msg.getMessageURI(), atomURI).isPresent());
+        Assert.assertTrue("A message should have been stored",
+                        messageService.getMessage(deactivateMsg.getMessageURI(), atomURI).isPresent());
+        Assert.assertTrue("A message should have been stored",
+                        messageService.getMessage(reactivateMsg.getMessageURI(), atomURI).isPresent());
+    }
+
+    /*******************************************
+     * Connect tests
+     *******************************************/
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_connect() throws Exception {
+        URI atomURI = newAtomURI();
+        URI socketURI = URI.create(atomURI.toString() + "#socket1");
+        URI atomURI2 = newAtomURI();
+        URI socketURI2 = URI.create(atomURI2.toString() + "#socket1");
+        prepareMockitoStubs(atomURI, socketURI, atomURI2, socketURI2);
+        WonMessage createAtom1Msg = makeCreateAtomMessage(atomURI,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
+        WonMessage createAtom2Msg = makeCreateAtomMessage(atomURI2,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
+        // set expectations
+        toOwnerMockEndpoint.expectedMessageCount(2);
+        toOwnerMockEndpoint.expectedMessagesMatches(
+                        or(isMessageAndResponse(createAtom1Msg),
+                                        isMessageAndResponse(createAtom2Msg)));
+        toMatcherMockEndpoint.expectedMessageCount(2);
+        toMatcherMockEndpoint.expectedMessagesMatches(
+                        or(isAtomCreatedNotification(atomURI), isAtomCreatedNotification(atomURI2)));
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        WonMessage connectMsg = WonMessageBuilder.setMessagePropertiesForConnect(
+                        newMessageURI(), socketURI, atomURI, URI_NODE_1,
+                        socketURI2, atomURI2, URI_NODE_1, "unittest connect")
+                        .build();
+        // expectations for connect
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(connectMsg));
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(connectMsg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        Connection expected = new Connection();
+        expected.setState(ConnectionState.REQUEST_SENT);
+        expected.setSocketURI(socketURI);
+        expected.setTargetSocketURI(socketURI2);
+        Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI, socketURI2);
+        assertConnectionAsExpected(expected, con);
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_connect__with_external_success_response() throws Exception {
+        URI atomURI = newAtomURI();
+        URI socketURI = URI.create(atomURI.toString() + "#socket1");
+        URI atomURI2 = newAtomURI();
+        URI socketURI2 = URI.create(atomURI2.toString() + "#socket1");
+        prepareMockitoStubs(atomURI, socketURI, atomURI2, socketURI2);
+        WonMessage createAtom1Msg = makeCreateAtomMessage(atomURI,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
+        WonMessage createAtom2Msg = makeCreateAtomMessage(atomURI2,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
+        // set expectations
+        toOwnerMockEndpoint.expectedMessageCount(2);
+        toOwnerMockEndpoint.expectedMessagesMatches(
+                        or(isMessageAndResponse(createAtom1Msg),
+                                        isMessageAndResponse(createAtom2Msg)));
+        toMatcherMockEndpoint.expectedMessageCount(2);
+        toMatcherMockEndpoint.expectedMessagesMatches(
+                        or(isAtomCreatedNotification(atomURI), isAtomCreatedNotification(atomURI2)));
+        toNodeMockEndpoint.setExpectedMessageCount(0);
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
+        WonMessage connectMsg = WonMessageBuilder.setMessagePropertiesForConnect(
+                        newMessageURI(), socketURI, atomURI, URI_NODE_1,
+                        socketURI2, atomURI2, URI_NODE_1, "unittest connect")
+                        .build();
+        // expectations for connect
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(connectMsg));
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        toNodeMockEndpoint.expectedMessageCount(1);
+        toNodeMockEndpoint.expectedMessagesMatches(isMessageAndResponse(connectMsg));
+        sendFromOwner(connectMsg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
+        URI remoteCon = newConnectionURI();
+        WonMessage successResponse = WonMessageBuilder.setPropertiesForNodeResponse(connectMsg, true, newMessageURI(),
+                        Optional.of(remoteCon), WonMessageDirection.FROM_EXTERNAL).build();
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageWithoutResponse(successResponse));
+        toNodeMockEndpoint.expectedMessageCount(0);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromExternalSystem(successResponse);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
+        Connection expected = new Connection();
+        expected.setState(ConnectionState.REQUEST_SENT);
+        expected.setSocketURI(socketURI);
+        expected.setTargetSocketURI(socketURI2);
+        expected.setTargetConnectionURI(remoteCon);
+        Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI, socketURI2);
+        assertConnectionAsExpected(expected, con);
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_connect__after_hint() throws Exception {
+        URI atomURI = newAtomURI();
+        URI socketURI = URI.create(atomURI.toString() + "#socket1");
+        URI atomURI2 = newAtomURI();
+        URI socketURI2 = URI.create(atomURI2.toString() + "#socket1");
+        prepareMockitoStubs(atomURI, socketURI, atomURI2, socketURI2);
+        WonMessage createAtom1Msg = makeCreateAtomMessage(atomURI,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
+        WonMessage createAtom2Msg = makeCreateAtomMessage(atomURI2,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
+        // set minimal expectations just so we can expect something and subsequently
+        // reset expectations
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(2);
+        toNodeMockEndpoint.expectedMessageCount(0);
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER1);
+        // set new expectations for hint
+        Mockito.when(socketLookup.isCompatible(socketURI, socketURI2)).then(x -> true);
+        WonMessage socketHintMessage = WonMessageBuilder.setMessagePropertiesForHintToSocket(newMessageURI(), atomURI,
+                        socketURI, URI_NODE_1, socketURI2, URI_MATCHER_1, 0.5).build();
+        sendFromMatcher(socketHintMessage);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
+        WonMessage connectMsg = WonMessageBuilder.setMessagePropertiesForConnect(
+                        newMessageURI(), socketURI, atomURI, URI_NODE_1,
+                        socketURI2, atomURI2, URI_NODE_1, "unittest connect")
+                        .build();
+        // expectations for connect
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(connectMsg));
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        toNodeMockEndpoint.expectedMessageCount(1);
+        toNodeMockEndpoint.expectedMessagesMatches(isMessageAndResponse(connectMsg));
+        sendFromOwner(connectMsg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
+        Connection expectedCon = new Connection();
+        expectedCon.setState(ConnectionState.REQUEST_SENT);
+        expectedCon.setSocketURI(socketURI);
+        expectedCon.setTargetSocketURI(socketURI2);
+        Optional<Connection> actualCon = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI,
+                        socketURI2);
+        assertConnectionAsExpected(expectedCon, actualCon);
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_connect_from_external() throws Exception {
+        URI atomURI = newAtomURI();
+        URI socketURI = URI.create(atomURI.toString() + "#socket1");
+        URI atomURI2 = newAtomURI();
+        URI socketURI2 = URI.create(atomURI2.toString() + "#socket1");
+        prepareMockitoStubs(atomURI, socketURI, atomURI2, socketURI2);
+        WonMessage createAtom1Msg = makeCreateAtomMessage(atomURI,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
+        WonMessage createAtom2Msg = makeCreateAtomMessage(atomURI2,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
+        // set minimal expectations just so we can expect something and subsequently
+        // reset expectations
+        toOwnerMockEndpoint.expectedMessageCount(2);
+        toOwnerMockEndpoint.expectedMessagesMatches(
+                        or(isMessageAndResponse(createAtom1Msg), isMessageAndResponse(createAtom2Msg)));
+        toMatcherMockEndpoint.expectedMessageCount(2);
+        toNodeMockEndpoint.expectedMessageCount(0);
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER1);
+        // set new expectations for connect
+        WonMessage connectMsg = WonMessageBuilder.setMessagePropertiesForConnect(
+                        newMessageURI(), socketURI, atomURI, URI_NODE_1,
+                        socketURI2, atomURI2, URI_NODE_1, "unittest connect")
+                        .build();
+        WonMessage response = WonMessageBuilder.setPropertiesForNodeResponse(connectMsg, true, newMessageURI(),
+                        Optional.empty(), WonMessageDirection.FROM_OWNER).build();
+        WonMessage msg = WonMessage.of(connectMsg, signatureAdder.process(response));
+        // expectations for connect
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponseAndRemoteResponse(msg));
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        toNodeMockEndpoint.expectedMessageCount(1);
+        toNodeMockEndpoint.expectedMessagesMatches(isSuccessResponseTo(msg));
+        sendFromExternalOwner(msg);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
+        Connection expected = new Connection();
+        expected.setState(ConnectionState.REQUEST_RECEIVED);
+        expected.setSocketURI(socketURI2);
+        expected.setTargetSocketURI(socketURI);
+        Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI2, socketURI);
+        assertConnectionAsExpected(expected, con);
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_connect_from_external__after_hint() throws Exception {
+        URI atomURI = newAtomURI();
+        URI socketURI = URI.create(atomURI.toString() + "#socket1");
+        URI atomURI2 = newAtomURI();
+        URI socketURI2 = URI.create(atomURI2.toString() + "#socket1");
+        prepareMockitoStubs(atomURI, socketURI, atomURI2, socketURI2);
+        WonMessage createAtom1Msg = makeCreateAtomMessage(atomURI,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
+        WonMessage createAtom2Msg = makeCreateAtomMessage(atomURI2,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
+        // set minimal expectations just so we can expect something and subsequently
+        // reset expectations
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(2);
+        toNodeMockEndpoint.expectedMessageCount(0);
+        // send message
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER1);
+        // set new expectations for hint
+        WonMessage socketHintMessage = WonMessageBuilder.setMessagePropertiesForHintToSocket(newMessageURI(), atomURI,
+                        socketURI, URI_NODE_1, socketURI2, URI_MATCHER_1, 0.5).build();
+        sendFromMatcher(socketHintMessage);
+        // set new expectations for connect
+        WonMessage connectMsg = WonMessageBuilder.setMessagePropertiesForConnect(
+                        newMessageURI(), socketURI2, atomURI2, URI_NODE_1,
+                        socketURI, atomURI, URI_NODE_1, "unittest connect")
+                        .build();
+        WonMessage response = WonMessageBuilder.setPropertiesForNodeResponse(connectMsg, true, newMessageURI(),
+                        Optional.empty(), WonMessageDirection.FROM_OWNER).build();
+        WonMessage msg = WonMessage.of(connectMsg, signatureAdder.process(response));
+        // expectations for connect
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponseAndRemoteResponse(connectMsg));
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        toNodeMockEndpoint.expectedMessageCount(1);
+        toNodeMockEndpoint.expectedMessagesMatches(isSuccessResponseTo(connectMsg));
+        Assert.assertTrue("A #socket1 should have been stored", socketRepository
+                        .findOneBySocketURI(URI.create(atomURI.toString() + "#socket1")).isPresent());
+        Assert.assertTrue("A #socket2 should have been stored", socketRepository
+                        .findOneBySocketURI(URI.create(atomURI.toString() + "#socket2")).isPresent());
+        sendFromExternalOwner(msg);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
+        Connection expected = new Connection();
+        expected.setState(ConnectionState.REQUEST_RECEIVED);
+        expected.setSocketURI(socketURI);
+        expected.setTargetSocketURI(socketURI2);
+        Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI, socketURI2);
+        assertConnectionAsExpected(expected, con);
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_connect__after_connect_from_external__after_hint() throws Exception {
+        URI atomURI = newAtomURI();
+        URI socketURI = URI.create(atomURI.toString() + "#socket1");
+        URI atomURI2 = newAtomURI();
+        URI socketURI2 = URI.create(atomURI2.toString() + "#socket1");
+        prepareMockitoStubs(atomURI, socketURI, atomURI2, socketURI2);
+        WonMessage createAtom1Msg = makeCreateAtomMessage(atomURI,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
+        WonMessage createAtom2Msg = makeCreateAtomMessage(atomURI2,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
+        // set minimal expectations just so we can expect something and subsequently
+        // reset expectations
+        toOwnerMockEndpoint.expectedMessageCount(4);
+        toMatcherMockEndpoint.expectedMessageCount(2);
+        toNodeMockEndpoint.expectedMessageCount(1);
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER1);
+        WonMessage socketHintMessage = WonMessageBuilder.setMessagePropertiesForHintToSocket(newMessageURI(), atomURI,
+                        socketURI, URI_NODE_1, socketURI2, URI_MATCHER_1, 0.5).build();
+        sendFromMatcher(socketHintMessage);
+        WonMessage connectFromExternalMsg = WonMessageBuilder.setMessagePropertiesForConnect(
+                        newMessageURI(), socketURI2, atomURI2, URI_NODE_1,
+                        socketURI, atomURI, URI_NODE_1, "unittest connect")
+                        .build();
+        WonMessage response = WonMessageBuilder
+                        .setPropertiesForNodeResponse(connectFromExternalMsg, true, newMessageURI(),
+                                        Optional.empty(), WonMessageDirection.FROM_OWNER)
+                        .build();
+        WonMessage msg = WonMessage.of(connectFromExternalMsg, signatureAdder.process(response));
+        // expectations for connect
+        Assert.assertTrue("A #socket1 should have been stored", socketRepository
+                        .findOneBySocketURI(URI.create(atomURI.toString() + "#socket1")).isPresent());
+        Assert.assertTrue("A #socket2 should have been stored", socketRepository
+                        .findOneBySocketURI(URI.create(atomURI.toString() + "#socket2")).isPresent());
+        sendFromExternalOwner(msg);
+        WonMessage connectFromOwnerMsg = WonMessageBuilder.setMessagePropertiesForConnect(
+                        newMessageURI(), socketURI, atomURI, URI_NODE_1,
+                        socketURI2, atomURI2, URI_NODE_1, "unittest connect")
+                        .build();
+        logger.warn("response: " + response.getMessageURI());
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        // toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(connectFromOwnerMsg));
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        toNodeMockEndpoint.expectedMessageCount(1);
+        // toNodeMockEndpoint.expectedMessagesMatches(isMessageAndResponse(connectFromOwnerMsg));
+        sendFromOwner(connectFromOwnerMsg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
+        Connection expected = new Connection();
+        expected.setState(ConnectionState.CONNECTED);
+        expected.setSocketURI(socketURI);
+        expected.setTargetSocketURI(socketURI2);
+        Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI, socketURI2);
+        assertConnectionAsExpected(expected, con);
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_connect__after_connect_from_external__try_force_racecondition() throws Exception {
+        URI atomURI = newAtomURI();
+        URI socketURI = URI.create(atomURI.toString() + "#socket1");
+        URI atomURI2 = newAtomURI();
+        URI socketURI2 = URI.create(atomURI2.toString() + "#socket1");
+        prepareMockitoStubs(atomURI, socketURI, atomURI2, socketURI2);
+        WonMessage createAtom1Msg = makeCreateAtomMessage(atomURI,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
+        WonMessage createAtom2Msg = makeCreateAtomMessage(atomURI2,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
+        // set minimal expectations just so we can expect something and subsequently
+        // reset expectations
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(2);
+        toNodeMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER1);
+        WonMessage socketHintMessage = WonMessageBuilder.setMessagePropertiesForHintToSocket(newMessageURI(), atomURI,
+                        socketURI, URI_NODE_1, socketURI2, URI_MATCHER_1, 0.5).build();
+        sendFromMatcher(socketHintMessage);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
+        WonMessage connectFromExternalMsg = WonMessageBuilder.setMessagePropertiesForConnect(
+                        newMessageURI(), socketURI2, atomURI2, URI_NODE_1,
+                        socketURI, atomURI, URI_NODE_1, "unittest connect")
+                        .build();
+        WonMessage response = WonMessageBuilder
+                        .setPropertiesForNodeResponse(connectFromExternalMsg, true, newMessageURI(),
+                                        Optional.empty(), WonMessageDirection.FROM_OWNER)
+                        .build();
+        WonMessage msg = WonMessage.of(connectFromExternalMsg, signatureAdder.process(response));
+        WonMessage connectFromOwnerMsg = WonMessageBuilder.setMessagePropertiesForConnect(
+                        newMessageURI(), socketURI, atomURI, URI_NODE_1,
+                        socketURI2, atomURI2, URI_NODE_1, "unittest connect trying to cause conflict")
+                        .build();
+        toOwnerMockEndpoint.expectedMessageCount(2);
+        toOwnerMockEndpoint.expectedMessagesMatches(
+                        or(isMessageAndResponseAndRemoteResponse(msg), isMessageAndResponse(connectFromOwnerMsg)));
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        toNodeMockEndpoint.expectedMessageCount(2);
+        toNodeMockEndpoint.expectedMessagesMatches(
+                        or(isMessageAndResponse(connectFromOwnerMsg),
+                                        isSuccessResponseTo(msg)));
+        executeInSeparateThreadAndWaitForResult(() -> sendFromExternalOwner(msg));
+        sendFromExternalOwner(msg);
+        sendFromOwner(connectFromOwnerMsg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
+        Connection expected = new Connection();
+        expected.setState(ConnectionState.CONNECTED);
+        expected.setSocketURI(socketURI);
+        expected.setTargetSocketURI(socketURI2);
+        Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI, socketURI2);
+        assertConnectionAsExpected(expected, con);
+    }
+
+    @Before
+    public void setUp() throws Exception {
+        toNodeMockEndpoint.reset();
+        toNodeMockEndpoint.setResultWaitTime(1000);
+        toNodeMockEndpoint
+                        .setReporter(exchange -> {
+                            logMessageRdf(makeMessageBox("message NODE => EXTERNAL"),
+                                            WonMessage.of(RdfUtils.readDatasetFromString(
+                                                            (String) exchange.getIn().getBody(),
+                                                            WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE)));
+                        });
+        interceptMessagesToExternal();
+    }
+
+    protected void interceptMessagesToExternal() throws Exception {
+        ModelCamelContext context = (ModelCamelContext) camelContext;
+        context.getRouteDefinition("direct:sendToNode").adviceWith(context,
+                        new AdviceWithRouteBuilder() {
+                            @Override
+                            public void configure() throws Exception {
+                                interceptSendToEndpoint("bean:toNodeSender")
+                                                .skipSendToOriginalEndpoint()
+                                                .bean(messageToSendIntoBody)
+                                                .to(toNodeMockEndpoint);
+                            };
+                        });
+    }
+}
