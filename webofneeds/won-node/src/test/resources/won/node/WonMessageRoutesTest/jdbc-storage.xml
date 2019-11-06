@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~    Unless required by applicable law or agreed to in writing, software
+  ~    distributed under the License is distributed on an "AS IS" BASIS,
+  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~    See the License for the specific language governing permissions and
+  ~    limitations under the License.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation=
+               "http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+                http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+                http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
+                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd
+                http://www.springframework.org/schema/data/repository http://www.springframework.org/schema/data/repository/spring-repository-1.8.xsd
+                http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.1.xsd">
+
+    <!-- Defines where to search for annotated components -->
+    <context:component-scan base-package="won.node.protocol.impl" />
+
+
+    <!-- Database connection -->
+    
+    <!--  bean id="dataSource" class="org.springframework.jdbc.datasource.SingleConnectionDataSource">
+        <property name="url" value="${db.sql.jdbcUrl}"/>
+        <property name="username" value="${db.sql.user}" />
+        <property name="password" value="${db.sql.password}" />
+        <property name="suppressClose" value="true" />
+    </bean-->
+    <!-- Database connection -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${db.sql.jdbcDriverClass}" />
+        <property name="jdbcUrl" value="${db.sql.jdbcUrl}"/>
+        <property name="user" value="${db.sql.user}" />
+        <property name="password" value="${db.sql.password}" />
+        <property name="initialPoolSize" value="20" />
+        <property name="maxPoolSize" value="50" />
+        <property name="minPoolSize" value="10" />
+        <property name="acquireIncrement" value="5" />
+        <property name="maxIdleTime" value="600" />
+        <property name="maxIdleTimeExcessConnections" value="60" />
+        <property name="maxConnectionAge" value="3600" />
+        <property name="numHelperThreads" value="50" />
+        <!--
+         added these properties to avoid classloader problems, see
+         http://www.mchange.com/projects/c3p0/#configuring_to_avoid_memory_leaks_on_redeploy
+        -->
+        <property name="contextClassLoaderSource" value="library" />
+        <property name="privilegeSpawnedThreads" value="true" />
+    </bean>
+
+    <!-- Entity manager -->
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" depends-on="node-flyway">
+        <property name="dataSource" ref="dataSource" />
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/><!-- Hibernate is used as JPA vendor-->
+        </property>
+        <property name="packagesToScan" value="won.protocol.model" />
+
+        <property name="jpaPropertyMap">
+            <map>
+                <entry key="hibernate.hbm2ddl.auto" value="${db.ddl.strategy}"/>
+                <entry key="hibernate.show_sql" value="false" />
+                <entry key="hibernate.generate_statistics" value="false" />
+                <entry key="hibernate.cache.use_minimal_puts" value="true"/>
+                <entry key="hibernate.integrator_provider">
+                    <bean class="won.protocol.model.parentaware.ParentAwareIntegratorProvider" />
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="node-flyway" class="won.db.FlywayWrapper">
+        <property name="ddlStrategy" value="${db.ddl.strategy}"/>
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+
+    <!-- ==================================== -->
+    <!--  Hibernate 4.3 Statistics for JMX    -->
+    <!-- ==================================== -->
+    <!--bean id="jmxExporter" class="org.springframework.jmx.export.MBeanExporter">
+        <property name="beans">
+            <map>
+                <entry key="Hibernate:type=NodeStatistics">
+                    <bean class="won.monitoring.hibernate.HibernateStatisticsFactoryBean">
+                        <property name="sessionFactory">
+                            <util:property-path path="entityManagerFactory.sessionFactory"/>
+                        </property>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+    </bean-->
+
+    <!-- Configure transaction management -->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager" />
+
+    <tx:annotation-driven transaction-manager="transactionManager" />
+
+    <!-- Defines where repositories are placed -->
+    <jpa:repositories base-package="won.protocol.repository" />
+
+</beans>
