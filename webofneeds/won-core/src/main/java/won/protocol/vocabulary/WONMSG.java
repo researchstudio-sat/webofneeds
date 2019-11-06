@@ -101,15 +101,12 @@ public class WONMSG {
     public static final Property senderNode = m.createProperty(BASE_URI, "senderNode");
     public static final Property messageType = m.createProperty(BASE_URI, "messageType");
     public static final Property content = m.createProperty(BASE_URI, "content");
-    public static final Property isResponseTo = m.createProperty(BASE_URI, "isResponseTo");
-    public static final Property isRemoteResponseTo = m.createProperty(BASE_URI, "isRemoteResponseTo");
-    public static final Property isResponseToMessageType = m.createProperty(BASE_URI, "isResponseToMessageType");;
-    public static final Property correspondingRemoteMessage = m.createProperty(BASE_URI, "correspondingRemoteMessage");
+    public static final Property respondingTo = m.createProperty(BASE_URI, "respondingTo");
+    public static final Property respondingToMessageType = m.createProperty(BASE_URI, "respondingToMessageType");;
     public static final Property forwardedMessage = m.createProperty(BASE_URI, "forwardedMessage");
     public static final Property injectIntoConnection = m.createProperty(BASE_URI, "injectIntoConnection");
     public static final Property previousMessage = m.createProperty(BASE_URI + "previousMessage");
-    public static final Property sentTimestamp = m.createProperty(BASE_URI, "sentTimestamp");
-    public static final Property receivedTimestamp = m.createProperty(BASE_URI, "receivedTimestamp");
+    public static final Property timestamp = m.createProperty(BASE_URI, "timestamp");
     // added to support referencing signatures from the envelope
     public static final Property containsSignature = m.createProperty(BASE_URI, "containsSignature");
     // TODO maybe the three properties below could better belong to a separate
