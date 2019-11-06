@@ -11,12 +11,16 @@
 package won.protocol.message.processor.camel;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import won.protocol.exception.WonProtocolException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.util.LoggingUtils;
@@ -29,22 +33,59 @@ import won.protocol.util.LoggingUtils;
  */
 public class WonMessageProcessorCamelAdapter implements Processor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    public static String WON_MESSAGE_HEADER = "wonMessage";
     private WonMessageProcessor adaptee;
+    private List<String> headersHoldingWonMessage;
+    private int allowMissing;
 
     protected WonMessageProcessorCamelAdapter(WonMessageProcessor adaptee) {
+        this(adaptee, 0, WonCamelConstants.MESSAGE_HEADER);
+    }
+
+    protected WonMessageProcessorCamelAdapter(WonMessageProcessor adaptee, String header) {
+        this(adaptee, 0, header);
+    }
+
+    protected WonMessageProcessorCamelAdapter(WonMessageProcessor adaptee, String... headers) {
+        this(adaptee, 0, headers);
+    }
+
+    public WonMessageProcessorCamelAdapter(WonMessageProcessor adaptee, int allowMissing, String... headers) {
+        Objects.requireNonNull(adaptee);
+        Objects.requireNonNull(headers);
+        if (headers.length == 0)
+            throw new IllegalArgumentException("at least one header must be specified");
         this.adaptee = adaptee;
+        this.allowMissing = allowMissing;
+        this.headersHoldingWonMessage = Arrays.asList(headers);
     }
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        Object msg = exchange.getIn().getHeader(WON_MESSAGE_HEADER);
+        headersHoldingWonMessage.stream().reduce(0,
+                        (missed, header) -> missed + (processHeader(exchange, header, missed < allowMissing) ? 0 : 1),
+                        Integer::sum);
+    }
+
+    /**
+     * Returns true if the header was processed properly, false if the header was
+     * not found and headerMayBeMissing was true
+     * 
+     * @param exchange
+     * @param header
+     * @return
+     * @throws Exception
+     */
+    private boolean processHeader(Exchange exchange, String header, boolean headerMayBeMissing) {
+        Object msg = exchange.getIn().getHeader(header);
         if (msg == null) {
-            throw new IllegalArgumentException("expected a WonMessage object in the '" + WON_MESSAGE_HEADER
+            if (headerMayBeMissing) {
+                return false;
+            }
+            throw new IllegalArgumentException("expected a WonMessage object in the '" + header
                             + " header but header was null");
         }
         if (!(msg instanceof WonMessage)) {
-            throw new IllegalArgumentException("expected a WonMessage object in the '" + WON_MESSAGE_HEADER
+            throw new IllegalArgumentException("expected a WonMessage object in the '" + header
                             + " header but the object is of type " + msg.getClass());
         }
         if (logger.isDebugEnabled()) {
@@ -63,6 +104,10 @@ public class WonMessageProcessorCamelAdapter implements Processor {
                                                 ((WonMessage) msg).getEnvelopeType(),
                                                 ((WonMessage) msg).getRecipientURI() });
             }
+        } catch (WonProtocolException wpe) {
+            // no need to log this, it's an expected exception that will be reported to the
+            // client
+            throw wpe;
         } catch (Exception e) {
             LoggingUtils.logMessageAsInfoAndStacktraceAsDebug(logger, e,
                             "re-throwing exception {} caught calling adaptee {} with message {} (type: {}, direction: {}, recipient:{}",
@@ -72,6 +117,7 @@ public class WonMessageProcessorCamelAdapter implements Processor {
             throw e;
         }
         // set the result of the call as the new message in the exchange's in
-        exchange.getIn().setHeader(WON_MESSAGE_HEADER, resultMsg);
+        exchange.getIn().setHeader(header, resultMsg);
+        return true;
     }
 }

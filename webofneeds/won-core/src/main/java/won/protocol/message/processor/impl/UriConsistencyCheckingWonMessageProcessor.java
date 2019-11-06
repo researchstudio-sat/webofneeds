@@ -4,11 +4,11 @@ import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import won.protocol.exception.UriAlreadyInUseException;
+import won.protocol.exception.UriNodePathException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
-import won.protocol.message.processor.exception.UriAlreadyInUseException;
-import won.protocol.message.processor.exception.UriNodePathException;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
@@ -63,10 +63,6 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
 
     private void checkLocalEventURI(final WonMessage message, WonNodeInfo localNodeInfo) {
         checkNodeConformance(localNodeInfo, null, null, message.getMessageURI());
-    }
-
-    private void checkRemoteEventURI(final WonMessage message, final WonNodeInfo remoteNodeInfo) {
-        checkNodeConformance(remoteNodeInfo, null, null, message.getCorrespondingRemoteMessageURI());
     }
 
     private void checkCreateMsgAtomURI(final WonMessage message, final WonNodeInfo nodeInfo) {

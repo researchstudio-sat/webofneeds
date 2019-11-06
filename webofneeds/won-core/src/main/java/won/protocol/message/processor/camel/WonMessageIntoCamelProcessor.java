@@ -19,9 +19,9 @@ import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDecoder;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
 
 /**
  * First processor for incoming messages. It expects a serialized WonMessage in
@@ -37,27 +37,38 @@ public class WonMessageIntoCamelProcessor implements Processor {
     @Override
     public void process(final Exchange exchange) throws Exception {
         logger.debug("processing won message");
-        Map headers = exchange.getIn().getHeaders();
-        // if the wonMessage header is there, don't change it - that way we can re-route
-        // internal messages
-        WonMessage wonMessage = (WonMessage) headers.get(WonCamelConstants.MESSAGE_HEADER);
-        if (wonMessage == null) {
-            try {
-                wonMessage = WonMessageDecoder.decode(Lang.TRIG, exchange.getIn().getBody().toString());
-            } catch (Exception e) {
-                // stop the exchange in this case - maybe at some point we can return a failure
-                // response but
-                // currently, we would have to look into the message for doing that, and looking
-                // into
-                // the message is not possible if we cannot decode it.
-                logger.info("could not decode message as TriG, ignoring it (the offending message is logged at loglevel 'DEBUG')",
-                                e);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("offending message: {}", exchange.getIn().getBody().toString());
+        WonMessage wonMessage = null;
+        Object body = exchange.getIn().getBody();
+        if (body != null) {
+            if (body instanceof WonMessage) {
+                // is the body an already decoded message?
+                wonMessage = (WonMessage) body;
+            } else {
+                try {
+                    // try to decode the body from TriG
+                    wonMessage = WonMessageDecoder.decode(Lang.TRIG, exchange.getIn().getBody().toString());
+                } catch (Exception e) {
+                    // stop the exchange in this case - maybe at some point we can return a failure
+                    // response but
+                    // currently, we would have to look into the message for doing that, and looking
+                    // into
+                    // the message is not possible if we cannot decode it.
+                    logger.info("could not decode message as TriG, ignoring it (the offending message is logged at loglevel 'DEBUG')",
+                                    e);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("offending message: {}", exchange.getIn().getBody().toString());
+                    }
+                    exchange.setProperty(Exchange.ROUTE_STOP, Boolean.TRUE);
+                    throw new WonMessageProcessingException("Could not decode message", e);
                 }
-                exchange.setProperty(Exchange.ROUTE_STOP, Boolean.TRUE);
-                throw new WonMessageProcessingException("Could not decode message", e);
             }
+        }
+        if (wonMessage == null) {
+            // at this point, lookinto the standard header
+            Map headers = exchange.getIn().getHeaders();
+            // if the wonMessage header is there, don't change it - that way we can re-route
+            // internal messages
+            wonMessage = (WonMessage) headers.get(WonCamelConstants.MESSAGE_HEADER);
         }
         if (wonMessage == null) {
             throw new WonMessageProcessingException(

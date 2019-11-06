@@ -20,8 +20,8 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
 
 /**
  * Last processor for outgoing messages. It expects a WonMessage object in the
