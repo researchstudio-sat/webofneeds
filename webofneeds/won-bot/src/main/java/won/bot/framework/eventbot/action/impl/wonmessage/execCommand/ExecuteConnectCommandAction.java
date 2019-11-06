@@ -10,7 +10,10 @@
  */
 package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 
+import java.net.URI;
+
 import org.apache.jena.query.Dataset;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandNotSentEvent;
@@ -26,8 +29,6 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
-import java.net.URI;
-
 /**
  * Action executing a ConnectCommandEvent, connecting to the targetAtom on
  * behalf of the atom.
@@ -41,21 +42,24 @@ public class ExecuteConnectCommandAction extends ExecuteSendMessageCommandAction
     protected MessageCommandFailureEvent createRemoteNodeFailureEvent(ConnectCommandEvent originalCommand,
                     WonMessage messageSent, FailureResponseEvent failureResponseEvent) {
         return new ConnectCommandFailureEvent(originalCommand, failureResponseEvent.getAtomURI(),
-                        failureResponseEvent.getTargetAtomURI(), failureResponseEvent.getConnectionURI());
+                        failureResponseEvent.getTargetAtomURI(), failureResponseEvent.getConnectionURI()
+                                        .orElseThrow(() -> new IllegalArgumentException("ConnectionUri must be set")));
     }
 
     @Override
     protected MessageCommandSuccessEvent createRemoteNodeSuccessEvent(ConnectCommandEvent originalCommand,
                     WonMessage messageSent, SuccessResponseEvent successResponseEvent) {
         return new ConnectCommandSuccessEvent(originalCommand, successResponseEvent.getAtomURI(),
-                        successResponseEvent.getTargetAtomURI(), successResponseEvent.getConnectionURI());
+                        successResponseEvent.getTargetAtomURI(), successResponseEvent.getConnectionURI()
+                                        .orElseThrow(() -> new IllegalArgumentException("ConnectionUri must be set")));
     }
 
     @Override
     protected MessageCommandFailureEvent createLocalNodeFailureEvent(ConnectCommandEvent originalCommand,
                     WonMessage messageSent, FailureResponseEvent failureResponseEvent) {
         return new ConnectCommandFailureEvent(originalCommand, failureResponseEvent.getAtomURI(),
-                        failureResponseEvent.getTargetAtomURI(), failureResponseEvent.getConnectionURI());
+                        failureResponseEvent.getTargetAtomURI(), failureResponseEvent.getConnectionURI()
+                                        .orElseThrow(() -> new IllegalArgumentException("ConnectionUri must be set")));
     }
 
     @Override

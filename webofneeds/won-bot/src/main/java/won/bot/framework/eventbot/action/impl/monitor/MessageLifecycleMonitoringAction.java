@@ -10,6 +10,14 @@
  */
 package won.bot.framework.eventbot.action.impl.monitor;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.io.Charsets;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
@@ -19,6 +27,7 @@ import org.javasimon.Split;
 import org.javasimon.Stopwatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -26,14 +35,14 @@ import won.bot.framework.eventbot.event.impl.monitor.CrawlDoneEvent;
 import won.bot.framework.eventbot.event.impl.monitor.CrawlReadyEvent;
 import won.bot.framework.eventbot.event.impl.monitor.MessageDispatchStartedEvent;
 import won.bot.framework.eventbot.event.impl.monitor.MessageDispatchedEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.*;
+import won.bot.framework.eventbot.event.impl.wonmessage.DeliveryResponseEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.MessageSpecificEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
 import won.protocol.util.RdfUtils;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.*;
 
 public class MessageLifecycleMonitoringAction extends BaseEventBotAction {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -73,28 +82,16 @@ public class MessageLifecycleMonitoringAction extends BaseEventBotAction {
             }
         } else if (event instanceof SuccessResponseEvent || event instanceof FailureResponseEvent) {
             DeliveryResponseEvent responseEvent = (DeliveryResponseEvent) event;
-            if (connectionMsgUris.containsKey(responseEvent.getOriginalMessageURI())
-                            || connectionMsgUris.containsKey(responseEvent.getRemoteResponseToMessageURI())) {
+            if (connectionMsgUris.containsKey(responseEvent.getOriginalMessageURI())) {
                 responseMsgUris.put(responseEvent.getMessage().getMessageURI(), responseEvent.getAtomURI());
-                if (responseEvent.isRemoteResponse()) {
-                    responseMsgUris.put(responseEvent.getMessage().getCorrespondingRemoteMessageURI(),
-                                    responseEvent.getTargetAtomURI());
-                }
             }
-            if (responseEvent.isRemoteResponse()) {
-                if (msgSplitsBC.get(responseEvent.getRemoteResponseToMessageURI().toString()) != null) {
-                    logger.debug("RECEIVED REMOTE RESPONSE EVENT {} for uri {}", event,
-                                    responseEvent.getRemoteResponseToMessageURI());
-                    msgSplitsBCDE.get(responseEvent.getRemoteResponseToMessageURI().toString()).stop();
-                }
-            } else if (msgSplitsBC.get(responseEvent.getOriginalMessageURI().toString()) != null) {
+            if (msgSplitsBC.get(responseEvent.getOriginalMessageURI().toString()) != null) {
                 logger.debug("RECEIVED RESPONSE EVENT {} for uri {}", event, responseEvent.getOriginalMessageURI());
                 msgSplitsBC.get(responseEvent.getOriginalMessageURI().toString()).stop();
             }
         } else if (event instanceof MessageFromOtherAtomEvent) {
             WonMessage msg = ((MessageFromOtherAtomEvent) event).getWonMessage();
-            URI remoteMessageURI = msg.getCorrespondingRemoteMessageURI();
-            msgSplitsBCD.get(remoteMessageURI.toString()).stop();
+            msgSplitsBCD.get(msg.getMessageURI()).stop();
             connectionMsgUris.put(msg.getMessageURI(), msg.getRecipientAtomURI());
         } else if (event instanceof CrawlReadyEvent) {
             reportMessageSizes(connectionMsgUris, "Connection Messages");

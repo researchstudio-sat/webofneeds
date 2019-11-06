@@ -10,11 +10,15 @@
  */
 package won.bot.framework.eventbot.action.impl.atomlifecycle;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.event.AtomCreationFailedEvent;
@@ -26,11 +30,9 @@ import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.AtomModelWrapper;
+import won.protocol.util.Prefixer;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
 
 /**
  * Creates an atom with the specified sockets. If no socket is specified, the
@@ -79,7 +81,7 @@ public class CreateAtomWithSocketsAction extends AbstractCreateAtomAction {
         final Dataset atomDatasetWithSockets = atomModelWrapper.copyDatasetWithoutSysinfo();
         final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
         logger.debug("creating atom on won node {} with content {} ", wonNodeUri,
-                        StringUtils.abbreviate(RdfUtils.toString(atomDatasetWithSockets), 150));
+                        StringUtils.abbreviate(RdfUtils.toString(Prefixer.setPrefixes(atomDatasetWithSockets)), 150));
         WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
         final URI atomURI = wonNodeInformationService.generateAtomURI(wonNodeUri);
         WonMessage createAtomMessage = createWonMessage(wonNodeInformationService, atomURI, wonNodeUri,

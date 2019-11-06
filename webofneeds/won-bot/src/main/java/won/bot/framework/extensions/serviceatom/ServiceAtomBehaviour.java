@@ -25,6 +25,7 @@ import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
+import won.protocol.util.Prefixer;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
@@ -97,7 +98,7 @@ public class ServiceAtomBehaviour extends BotBehaviour {
                                 Dataset botServiceDataset = new ServiceAtomModelWrapper(atomUri,
                                                 serviceAtomContent).copyDataset();
                                 logger.debug("creating BotServiceAtom on won node {} with content: {} ", wonNodeUri,
-                                                RdfUtils.toString(botServiceDataset));
+                                                RdfUtils.toString(Prefixer.setPrefixes(botServiceDataset)));
                                 WonMessage createAtomMessage = createWonMessage(atomUri, botServiceDataset);
                                 EventBotActionUtils.rememberInList(ctx, atomUri, uriListName);
                                 EventBus bus = ctx.getEventBus();
@@ -144,7 +145,8 @@ public class ServiceAtomBehaviour extends BotBehaviour {
                                         if (ctx.getBotContext().isAtomKnown(createdAtomUri)) {
                                             logger.debug("Atom ({}) is known, must be one we created..., dataset: {}",
                                                             createdAtomUri,
-                                                            RdfUtils.toString(atomCreatedEvent.getAtomDataset()));
+                                                            RdfUtils.toString(Prefixer.setPrefixes(
+                                                                            atomCreatedEvent.getAtomDataset())));
                                             Optional<URI> createdAtomHoldableSocketUri = WonLinkedDataUtils
                                                             .getSocketsOfType(createdAtomUri,
                                                                             URI.create(WXHOLD.HoldableSocketString),

@@ -33,6 +33,16 @@ public class WonMessageSentOnConnectionEvent extends WonMessageSentEvent
     }
 
     @Override
+    public URI getSocketURI() {
+        return getWonMessage().getSenderSocketURIRequired();
+    }
+
+    @Override
+    public URI getTargetSocketURI() {
+        return getWonMessage().getRecipientSocketURIRequired();
+    }
+
+    @Override
     public URI getAtomURI() {
         return getWonMessage().getSenderAtomURI();
     }
@@ -47,6 +57,8 @@ public class WonMessageSentOnConnectionEvent extends WonMessageSentEvent
         con.setConnectionURI(getConnectionURI());
         con.setAtomURI(getAtomURI());
         con.setTargetAtomURI(getTargetAtomURI());
+        con.setSocketURI(getSocketURI());
+        con.setTargetSocketURI(getTargetSocketURI());
         return con;
     }
 }

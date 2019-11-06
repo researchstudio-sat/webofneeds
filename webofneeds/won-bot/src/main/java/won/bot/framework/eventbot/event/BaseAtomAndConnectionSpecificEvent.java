@@ -45,16 +45,29 @@ public abstract class BaseAtomAndConnectionSpecificEvent extends BaseEvent
     }
 
     @Override
+    public URI getSocketURI() {
+        return con.getSocketURI();
+    }
+
+    @Override
+    public URI getTargetSocketURI() {
+        return con.getTargetSocketURI();
+    }
+
+    @Override
     public String toString() {
         return getClass().getSimpleName() + "@" + Integer.toHexString(hashCode()) + "{" + "atomURI=" + getAtomURI()
                         + ", connectionURI=" + getConnectionURI() + '}';
     }
 
-    protected static Connection makeConnection(URI atomURI, URI targetAtomURI, URI connectionURI) {
+    protected static Connection makeConnection(URI atomURI, URI socketURI, URI targetAtomURI, URI targetSocketURI,
+                    URI connectionURI) {
         Connection con = new Connection();
         con.setConnectionURI(connectionURI);
         con.setAtomURI(atomURI);
         con.setTargetAtomURI(targetAtomURI);
+        con.setSocketURI(socketURI);
+        con.setTargetSocketURI(targetSocketURI);
         return con;
     }
 }

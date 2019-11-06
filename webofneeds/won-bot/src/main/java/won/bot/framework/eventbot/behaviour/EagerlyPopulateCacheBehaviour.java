@@ -2,15 +2,10 @@ package won.bot.framework.eventbot.behaviour;
 
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -21,7 +16,7 @@ import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.protocol.message.WonMessage;
-import won.protocol.util.WonRdfUtils;
+import won.protocol.message.WonMessageUtils;
 import won.protocol.util.linkeddata.CachingLinkedDataSource;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
@@ -74,24 +69,18 @@ public class EagerlyPopulateCacheBehaviour extends BotBehaviour {
                 // can't process any other events
                 return;
             }
-            logger.debug("eagerly caching data in reaction to event {}", event);
-            // put received message into cache
-            LinkedDataSource linkedDataSource = context.getLinkedDataSource();
-            if (linkedDataSource instanceof CachingLinkedDataSource) {
-                URI requester = responseWonMessage.getRecipientAtomURI();
-                ((CachingLinkedDataSource) linkedDataSource).addToCache(responseWonMessage.getCompleteDataset(),
-                                responseWonMessage.getMessageURI(), requester);
-                // load the original message(s) into cache, too
-                Set<URI> toLoad = new HashSet<>();
-                addIfNotNull(toLoad, responseWonMessage.getIsRemoteResponseToMessageURI(),
-                                MDC_KEY_REMOTE_RESPONSE);
-                addIfNotNull(toLoad, responseWonMessage.getIsResponseToMessageURI(), MDC_KEY_RESPONSE);
-                addIfNotNull(toLoad, responseWonMessage.getCorrespondingRemoteMessageURI(),
-                                MDC_KEY_CORRESPONDING_REMOTE_MESSAGE);
-                List<URI> previous = WonRdfUtils.MessageUtils.getPreviousMessageUrisIncludingRemote(responseWonMessage);
-                addIfNotNull(toLoad, previous, MDC_KEY_PREVIOUS_MESSAGE_URIS);
-                toLoad.forEach(uri -> linkedDataSource.getDataForResource(uri, requester));
-            }
+            URI webID = WonMessageUtils.getRecipientAtomURIRequired(responseWonMessage);
+            addMessageOrWholeChainToCache(responseWonMessage, webID);
+        }
+    }
+
+    public void addMessageOrWholeChainToCache(WonMessage responseWonMessage, URI webID) {
+        if (responseWonMessage.isPartOfDeliveryChain()) {
+            responseWonMessage.getDeliveryChain().get().getAllMessages().forEach(msg -> {
+                addMessageToCache(msg, webID);
+            });
+        } else {
+            addMessageToCache(responseWonMessage, webID);
         }
     }
 
@@ -106,34 +95,17 @@ public class EagerlyPopulateCacheBehaviour extends BotBehaviour {
                 return;
             }
             logger.debug("eagerly caching data in reaction to event {}", event);
-            MessageFromOtherAtomEvent msgEvent = (MessageFromOtherAtomEvent) event;
-            WonMessage wonMessage = msgEvent.getWonMessage();
-            LinkedDataSource linkedDataSource = context.getLinkedDataSource();
-            if (linkedDataSource instanceof CachingLinkedDataSource) {
-                ((CachingLinkedDataSource) linkedDataSource).addToCache(wonMessage.getCompleteDataset(),
-                                wonMessage.getMessageURI(), wonMessage.getRecipientAtomURI());
-                URI requester = wonMessage.getRecipientAtomURI();
-                Set<URI> toLoad = new HashSet<>();
-                addIfNotNull(toLoad, wonMessage.getCorrespondingRemoteMessageURI(),
-                                MDC_KEY_CORRESPONDING_REMOTE_MESSAGE);
-                List<URI> previous = WonRdfUtils.MessageUtils.getPreviousMessageUrisIncludingRemote(wonMessage);
-                addIfNotNull(toLoad, previous, MDC_KEY_PREVIOUS_MESSAGE_URIS);
-                toLoad.forEach(uri -> linkedDataSource.getDataForResource(uri, requester));
-            }
+            WonMessage msg = ((MessageFromOtherAtomEvent) event).getWonMessage();
+            URI webID = WonMessageUtils.getRecipientAtomURIRequired(msg);
+            addMessageOrWholeChainToCache(msg, webID);
         }
     }
 
-    private void addIfNotNull(Set<URI> uris, URI uri, String mdcKey) {
-        if (uri != null) {
-            uris.add(uri);
-            MDC.put(mdcKey, uri.toString());
-        }
-    }
-
-    private void addIfNotNull(Set<URI> uris, List<URI> urisToAdd, String mdcKey) {
-        if (urisToAdd != null && !urisToAdd.isEmpty()) {
-            uris.addAll(urisToAdd);
-            MDC.put(mdcKey, Arrays.toString(urisToAdd.toArray()));
+    public void addMessageToCache(WonMessage msg, URI webID) {
+        LinkedDataSource linkedDataSource = context.getLinkedDataSource();
+        if (linkedDataSource instanceof CachingLinkedDataSource) {
+            ((CachingLinkedDataSource) linkedDataSource).addToCache(msg.getCompleteDataset(),
+                            msg.getMessageURI(), webID);
         }
     }
 }

@@ -10,8 +10,6 @@
  */
 package won.bot.framework.eventbot.event.impl.command.close;
 
-import java.net.URI;
-
 import won.bot.framework.eventbot.event.BaseAtomAndConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.protocol.message.WonMessageType;
@@ -30,14 +28,6 @@ public class CloseCommandEvent extends BaseAtomAndConnectionSpecificEvent implem
 
     public CloseCommandEvent(Connection con) {
         this(con, "Hello!");
-    }
-
-    public CloseCommandEvent(URI atomURI, URI targetAtomURI, URI connectionURI, String closeMessage) {
-        this(makeConnection(atomURI, targetAtomURI, connectionURI), closeMessage);
-    }
-
-    public CloseCommandEvent(URI atomURI, URI targetAtomURI, URI connectionURI) {
-        this(atomURI, targetAtomURI, connectionURI, "Hello!");
     }
 
     @Override

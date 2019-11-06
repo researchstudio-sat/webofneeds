@@ -133,7 +133,6 @@ public class AnalyzeBehaviour extends BotBehaviour {
             logger.trace("Message Information ------");
             logger.trace("Message Type: " + (receivedMessage ? "RECEIVED" : "SENT"));
             logger.trace("MessageUri: " + wonMessage.getMessageURI());
-            logger.trace("CorrespondingRemoteMessageURI: " + wonMessage.getCorrespondingRemoteMessageURI());
             logger.trace("AtomUri: " + atomUri);
             logger.trace("targetAtomUri: " + targetAtomUri);
             logger.trace("connectionUri: " + connectionUri);

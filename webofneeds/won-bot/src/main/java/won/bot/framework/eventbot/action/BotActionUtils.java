@@ -56,10 +56,15 @@ public class BotActionUtils {
         URI targetAtom = WonRdfUtils.ConnectionUtils.getTargetAtomURIFromConnection(connectionRDF, connectionURI);
         URI localAtom = WonRdfUtils.ConnectionUtils.getLocalAtomURIFromConnection(connectionRDF, connectionURI);
         URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
+        URI socketURI = WonRdfUtils.ConnectionUtils.getSocketURIFromConnection(connectionRDF, connectionURI);
+        URI targetSocketURI = WonRdfUtils.ConnectionUtils.getTargetSocketURIFromConnection(connectionRDF,
+                        connectionURI);
         Dataset targetAtomRDF = context.getLinkedDataSource().getDataForResource(targetAtom);
         URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
         return WonMessageBuilder
-                        .setMessagePropertiesForConnectionMessage(messageURI, connectionURI, localAtom, wonNode,
+                        .setMessagePropertiesForConnectionMessage(messageURI, socketURI, connectionURI, localAtom,
+                                        wonNode,
+                                        targetSocketURI,
                                         WonRdfUtils.ConnectionUtils.getTargetConnectionURIFromConnection(connectionRDF,
                                                         connectionURI),
                                         targetAtom,

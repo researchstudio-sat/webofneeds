@@ -11,10 +11,12 @@
 package won.bot.framework.eventbot.event.impl.wonmessage;
 
 import java.net.URI;
+import java.util.Optional;
 
 import won.bot.framework.eventbot.event.BaseEvent;
 import won.bot.framework.eventbot.event.ResponseEvent;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageUtils;
 
 /**
  * Event published whenever a WonMessage is received that indicates the failure
@@ -23,35 +25,35 @@ import won.protocol.message.WonMessage;
 public class DeliveryResponseEvent extends BaseEvent implements ResponseEvent {
     private URI originalMessageURI;
     private WonMessage message;
-    private URI remoteResponseToMessageURI;
+    private URI senderAtomURI;
 
     public DeliveryResponseEvent(URI originalMessageURI, WonMessage message) {
         assert originalMessageURI != null : "originalMessageURI must not be null!";
         assert message != null : "responseMessage must not be null!";
         this.originalMessageURI = originalMessageURI;
         this.message = message;
-        this.remoteResponseToMessageURI = message.getIsRemoteResponseToMessageURI();
+        this.senderAtomURI = WonMessageUtils.getSenderAtomURI(message).orElseThrow(() -> new IllegalArgumentException(
+                        "Could not obtain sender atom URI for message " + message.getMessageURI()));
     }
 
     public URI getOriginalMessageURI() {
         return originalMessageURI;
     }
 
-    public URI getRemoteResponseToMessageURI() {
-        return remoteResponseToMessageURI;
-    }
-
     public WonMessage getMessage() {
         return message;
     }
 
-    public boolean isRemoteResponse() {
-        return remoteResponseToMessageURI != null;
+    public Optional<URI> getConnectionURI() {
+        return Optional.ofNullable(message.getRecipientURI());
     }
 
-    @Override
-    public URI getConnectionURI() {
-        return message.getRecipientURI();
+    public Optional<URI> getSocketURI() {
+        return Optional.ofNullable(message.getRecipientSocketURI());
+    }
+
+    public Optional<URI> getTargetSocketURI() {
+        return Optional.ofNullable(message.getSenderSocketURI());
     }
 
     @Override
@@ -62,5 +64,10 @@ public class DeliveryResponseEvent extends BaseEvent implements ResponseEvent {
     @Override
     public URI getAtomURI() {
         return message.getRecipientAtomURI();
+    }
+
+    @Override
+    public URI getSenderAtomURI() {
+        return senderAtomURI;
     }
 }

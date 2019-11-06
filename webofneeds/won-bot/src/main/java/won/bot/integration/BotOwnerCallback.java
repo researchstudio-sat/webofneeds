@@ -79,7 +79,7 @@ public class BotOwnerCallback implements OwnerCallback {
     @Override
     public void onConnectFromOtherAtom(final Connection con, final WonMessage wonMessage) {
         taskScheduler.schedule(() -> {
-            if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
+            if (true) { // TODO: figure out how to detect echoes
                 try {
                     logger.debug("onConnectFromOtherAtom called for connection {}, message {}",
                                     con.getConnectionURI(), wonMessage.getMessageURI());
@@ -98,7 +98,7 @@ public class BotOwnerCallback implements OwnerCallback {
     @Override
     public void onMessageFromOtherAtom(final Connection con, final WonMessage wonMessage) {
         taskScheduler.schedule(() -> {
-            if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
+            if (true) { // TODO: figure out how to detect echoes
                 try {
                     logger.debug("onMessageFromOtherAtom for Connection {}, message {}", con.getConnectionURI(),
                                     wonMessage.getMessageURI());

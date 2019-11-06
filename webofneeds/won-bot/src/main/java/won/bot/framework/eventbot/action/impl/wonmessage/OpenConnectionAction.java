@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
-import won.bot.framework.eventbot.action.BotActionUtils;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
@@ -78,8 +77,8 @@ public class OpenConnectionAction extends BaseEventBotAction {
             // better to
             // use connection object instead
             SocketHintFromMatcherEvent hintEvent = (SocketHintFromMatcherEvent) event;
-            Optional<URI> recipientAtom = hintEvent.getRecipientAtomURI();
-            Optional<URI> hintTargetAtom = hintEvent.getTargetAtomURI();
+            Optional<URI> recipientAtom = Optional.of(hintEvent.getRecipientAtom());
+            Optional<URI> hintTargetAtom = Optional.of(hintEvent.getHintTargetAtom());
             if (!recipientAtom.isPresent()) {
                 logger.info("could not get recipient atom for hint event {}, cannot connect", event);
                 return;
