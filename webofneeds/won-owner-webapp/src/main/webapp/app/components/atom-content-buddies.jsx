@@ -236,7 +236,6 @@ class WonAtomContentBuddies extends React.Component {
                   }
                 >
                   <WonAtomContextSwipeableView
-                    enableMouseEvents
                     className={headerClassName}
                     actionButtons={actionButtons}
                     atomUri={get(conn, "targetAtomUri")}

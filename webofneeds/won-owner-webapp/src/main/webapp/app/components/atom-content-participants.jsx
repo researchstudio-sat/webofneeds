@@ -13,12 +13,10 @@ import won from "../won-es6";
 import WonLabelledHr from "./labelled-hr.jsx";
 import WonAtomContextSwipeableView from "./atom-context-swipeable-view";
 import WonSuggestAtomPicker from "./details/picker/suggest-atom-picker.jsx";
-import WonAtomHeader from "./atom-header.jsx";
 
 import "~/style/_atom-content-participants.scss";
 import VisibilitySensor from "react-visibility-sensor";
 import PropTypes from "prop-types";
-import SwipeableViews from "react-swipeable-views";
 
 const mapStateToProps = (state, ownProps) => {
   const post = getIn(state, ["atoms", ownProps.atomUri]);
@@ -226,7 +224,6 @@ class WonAtomContentParticipants extends React.Component {
                   }
                 >
                   <WonAtomContextSwipeableView
-                    enableMouseEvents
                     className={headerClassName}
                     actionButtons={actionButtons}
                     atomUri={get(conn, "targetAtomUri")}
@@ -279,16 +276,12 @@ class WonAtomContentParticipants extends React.Component {
         participants = this.props.groupMembersArray.map(memberUri => {
           return (
             <div className="acp__participant" key={memberUri}>
-              <SwipeableViews enableMouseEvents>
-                <WonAtomHeader
-                  atomUri={memberUri}
-                  hideTimestamp={true}
-                  onClick={() =>
-                    this.props.routerGo("post", { postUri: memberUri })
-                  }
-                />
-                <div className="acp__participant__actions" />
-              </SwipeableViews>
+              <WonAtomContextSwipeableView
+                atomUri={memberUri}
+                onClick={() =>
+                  this.props.routerGo("post", { postUri: memberUri })
+                }
+              />
             </div>
           );
         });
