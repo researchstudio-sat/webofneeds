@@ -1,5 +1,7 @@
 package won.node.camel.processor.fixed;
 
+import static won.node.camel.processor.WonCamelHelper.*;
+
 import java.lang.invoke.MethodHandles;
 
 import org.apache.camel.Exchange;
@@ -28,8 +30,9 @@ public class CloseMessageFromOwnerProcessor extends AbstractCamelProcessor {
     public void process(final Exchange exchange) throws Exception {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
-        logger.debug("CLOSE received from the owner side for connection {}", wonMessage.getSenderURI());
-        Connection con = connectionService.getConnectionRequired(wonMessage.getSenderURI());
+        logger.debug("CLOSE received from the owner side for connection {}-{}", wonMessage.getSenderSocketURI(),
+                        wonMessage.getRecipientSocketURI());
+        Connection con = getConnectionRequired(exchange, connectionService);
         ConnectionState originalState = con.getState();
         con = connectionService.closeFromOwner(wonMessage);
         // if the connection was in suggested state, don't send a close message to the

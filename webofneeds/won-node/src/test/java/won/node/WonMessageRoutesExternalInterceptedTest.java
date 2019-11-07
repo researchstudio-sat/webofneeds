@@ -184,8 +184,8 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
         toMatcherMockEndpoint.expectedMessageCount(1);
         // send message
         sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
-        toMatcherMockEndpoint.assertIsSatisfied();
         toOwnerMockEndpoint.assertIsSatisfied();
+        toMatcherMockEndpoint.assertIsSatisfied();
         Assert.assertTrue("An atom should have been created", atomService.getAtom(atomURI).isPresent());
         Assert.assertTrue("A message should have been stored",
                         messageService.getMessage(createAtom1Msg.getMessageURI(), atomURI).isPresent());

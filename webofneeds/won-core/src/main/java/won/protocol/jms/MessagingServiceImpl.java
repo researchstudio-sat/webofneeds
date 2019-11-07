@@ -42,7 +42,7 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware, Messagi
      * @param endpoint
      * @return
      */
-    public synchronized ListenableFuture<String> sendInOutMessageGeneric(Map properties, Map headers, Object body,
+    public ListenableFuture<String> sendInOutMessageGeneric(Map properties, Map headers, Object body,
                     String endpoint) {
         Exchange exchange = new DefaultExchange(getCamelContext());
         // TODO: the method name shall be set in the header of the message.
@@ -119,7 +119,7 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware, Messagi
         }
     }
 
-    public synchronized void sendInOnlyMessage(Map properties, Map headers, Object body, String endpoint) {
+    public void sendInOnlyMessage(Map properties, Map headers, Object body, String endpoint) {
         Exchange exchange = new DefaultExchange(getCamelContext());
         exchange.setPattern(ExchangePattern.InOnly);
         Endpoint ep = getCamelContext().getEndpoint(endpoint);
@@ -139,7 +139,7 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware, Messagi
     }
 
     @Override
-    public synchronized void send(Exchange exchange, String endpoint) {
+    public void send(Exchange exchange, String endpoint) {
         Endpoint ep = getCamelContext().getEndpoint(endpoint);
         producerTemplate.send(ep, exchange);
     }

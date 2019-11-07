@@ -22,9 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import won.node.service.persistence.MessageService;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageDirection;
-import won.protocol.message.WonMessageUtils;
 import won.protocol.model.Connection;
 import won.protocol.repository.AtomMessageContainerRepository;
 import won.protocol.repository.AtomRepository;
@@ -44,20 +43,16 @@ public class LockMessageParentWonMessageProcessor implements Processor {
     ConnectionMessageContainerRepository connectionMessageContainerRepository;
     @Autowired
     AtomMessageContainerRepository atomMessageContainerRepository;
+    @Autowired
+    MessageService messageService;
 
     @Override
     public void process(Exchange exchange) throws Exception {
         WonMessage message = getMessageRequired(exchange);
         try {
-            Optional<URI> parent = getParentURI(exchange);
+            Optional<URI> parent = messageService.getParentofMessage(message, getDirectionRequired(exchange));
             if (parent.isPresent()) {
                 lockParent(message, parent.get());
-            } else {
-                WonMessageDirection direction = getDirectionRequired(exchange);
-                parent = Optional.ofNullable(WonMessageUtils.getParentEntityUri(message, direction));
-                if (parent.isPresent()) {
-                    lockParent(message, parent.get());
-                }
             }
         } catch (Exception e) {
             URI messageUri;

@@ -31,7 +31,7 @@
 	<logger name="won" level="INFO" />
 	<!-- if the CamelContext's 'trace' feature is enabled  (changes with camel version) -->
 	<logger name="org.apache.camel.processor.interceptor.Tracer" level="WARN"/> 
-	<logger name="won.node.camel.processor.general.FailResponder" level="INFO" />
+	<logger name="won.node.camel.processor.general.FailResponder" level="debug" />
 	
     
     <!-- available log-levels: DEBUG, INFO, WARN, ERROR -->

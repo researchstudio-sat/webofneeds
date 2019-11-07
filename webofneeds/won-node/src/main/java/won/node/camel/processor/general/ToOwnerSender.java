@@ -59,7 +59,6 @@ public class ToOwnerSender extends AbstractCamelProcessor {
     public void process(Exchange exchange) throws Exception {
         WonMessage msg = getMessageToSendRequired(exchange);
         Objects.requireNonNull(msg);
-        logger.warn("TODO (message-refactoring): merge message dataset before sending");
         if (false && !msg.getMessageTypeRequired().isResponseMessage()) {
             // if we are not processing a response message, we'll have a response to add to
             // the message:

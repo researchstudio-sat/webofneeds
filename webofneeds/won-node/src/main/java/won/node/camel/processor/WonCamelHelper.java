@@ -7,11 +7,13 @@ import java.util.function.Supplier;
 
 import org.apache.camel.Exchange;
 
+import won.node.service.persistence.ConnectionService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
+import won.protocol.model.Connection;
 import won.protocol.util.RdfUtils;
 
 public class WonCamelHelper {
@@ -263,6 +265,29 @@ public class WonCamelHelper {
 
     public static void stopExchange(Exchange exchange) {
         exchange.setProperty(Exchange.ROUTE_STOP, Boolean.TRUE);
+    }
+
+    //// connection
+    public static Optional<Connection> getConnection(Exchange exchange, ConnectionService connectionService) {
+        Connection con = (Connection) exchange.getIn().getHeader(WonCamelConstants.CONNECTION_HEADER);
+        if (con != null) {
+            return Optional.of(con);
+        }
+        Optional<WonMessage> msg = getMessage(exchange);
+        Optional<WonMessageDirection> direction = getDirection(exchange);
+        if (msg.isPresent() && direction.isPresent()) {
+            return connectionService.getConnectionForMessage(msg.get(), direction.get());
+        }
+        return Optional.empty();
+    }
+
+    public static Connection getConnectionRequired(Exchange exchange, ConnectionService connectionService) {
+        Connection con = (Connection) exchange.getIn().getHeader(WonCamelConstants.CONNECTION_HEADER);
+        if (con != null) {
+            return con;
+        }
+        return connectionService.getConnectionForMessageRequired(getMessageRequired(exchange),
+                        getDirectionRequired(exchange));
     }
 
     /********************************************************

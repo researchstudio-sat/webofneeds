@@ -28,6 +28,7 @@ public class WonCamelConstants {
     public static final Lang RDF_LANGUAGE_FOR_MESSAGE = Lang.TRIG;
     public static final String OUTBOUND_MESSAGE_HEADER = "won.outboundMessage";
     public static final String CONNECTION_URI_HEADER = "won.connectionURI";
+    public static final String CONNECTION_HEADER = "won.connection";
     public static final String CONNECTION_STATE_CHANGE_BUILDER_HEADER = "won.connectionStateChangeBuilder";
     public static final String OWNER_APPLICATION_ID_HEADER = "won.ownerApplicationId";
     public static final String OWNER_APPLICATION_IDS_HEADER = "won.ownerApplicationIds";

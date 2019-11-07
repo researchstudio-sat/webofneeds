@@ -14,6 +14,7 @@ import org.apache.jena.vocabulary.RDF;
 
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
+import won.protocol.message.WonMessageUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WONAGR;
 import won.protocol.vocabulary.WONMOD;
@@ -54,6 +55,11 @@ public class ConversationMessagesReader {
                         (Map<URI, ConversationMessage> messages,
                                         Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
                                                         .setSenderAtomURI(getUri(s.getObject())));
+        inithandlers.put(WONMSG.senderSocket,
+                        (Map<URI, ConversationMessage> messages,
+                                        Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
+                                                        .setSenderAtomURI(WonMessageUtils
+                                                                        .stripFragment(getUri(s.getObject()))));
         inithandlers.put(WONMSG.forwardedMessage,
                         (Map<URI, ConversationMessage> messages,
                                         Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))

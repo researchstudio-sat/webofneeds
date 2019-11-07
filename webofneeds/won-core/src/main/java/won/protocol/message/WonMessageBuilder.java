@@ -287,6 +287,7 @@ public class WonMessageBuilder {
         }
     }
 
+    @Deprecated
     public static WonMessageBuilder setMessagePropertiesForClose(URI messageURI, WonMessage connectToReactTo,
                     String farewellMessage) {
         return setMessagePropertiesForClose(messageURI, connectToReactTo.getRecipientSocketURI(),
@@ -297,6 +298,7 @@ public class WonMessageBuilder {
                         connectToReactTo.getSenderNodeURI(), farewellMessage);
     }
 
+    @Deprecated
     public static WonMessageBuilder setMessagePropertiesForClose(URI messageURI, URI localSocket, URI localConnection,
                     URI localAtom,
                     URI localWonNode, URI targetSocket, URI targetConnection, URI targetAtom, URI remoteWonNode,
@@ -306,6 +308,7 @@ public class WonMessageBuilder {
                         localWonNode, targetSocket, targetConnection, targetAtom, remoteWonNode, farewellMessage);
     }
 
+    @Deprecated
     public static WonMessageBuilder setMessagePropertiesForClose(URI messageURI, WonMessageDirection direction,
                     URI localSocket,
                     URI localConnection, URI localAtom, URI localWonNode, URI targetSocket, URI targetConnection,
@@ -321,6 +324,19 @@ public class WonMessageBuilder {
                         .setRecipientURI(targetConnection)
                         .setRecipientAtomURI(targetAtom)
                         .setRecipientNodeURI(remoteWonNode)
+                        .setTextMessage(farewellMessage)
+                        .setTimestampToNow();
+    }
+
+    public static WonMessageBuilder setMessagePropertiesForClose(URI messageURI,
+                    URI senderSocket,
+                    URI recipientSocket,
+                    WonMessageDirection direction,
+                    String farewellMessage) {
+        return new WonMessageBuilder(messageURI).setWonMessageDirection(direction)
+                        .setWonMessageType(WonMessageType.CLOSE)
+                        .setSenderSocketURI(senderSocket)
+                        .setRecipientSocketURI(recipientSocket)
                         .setTextMessage(farewellMessage)
                         .setTimestampToNow();
     }

@@ -2,6 +2,7 @@ package won.node.service.persistence;
 
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -75,6 +76,15 @@ public class ConnectionService {
 
     public Optional<Connection> getConnection(URI connectionURI) {
         return connectionRepository.findOneByConnectionURI(connectionURI);
+    }
+
+    public Optional<Connection> getConnection(URI socketURI, URI targetsSocketURI) {
+        return connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI, targetsSocketURI);
+    }
+
+    public Connection getConnectionRequired(URI socketURI, URI targetSocketURI) {
+        return connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI, targetSocketURI)
+                        .orElseThrow(() -> new NoSuchConnectionException(socketURI, targetSocketURI));
     }
 
     public Connection getConnectionRequired(URI connectionURI) {
@@ -304,37 +314,6 @@ public class ConnectionService {
         return socketService.isAutoOpen(recipientSocketURI);
     }
 
-    public boolean shouldSendAutoOpenForConnect(Optional<URI> connectionURI) {
-        if (connectionURI.isPresent()) {
-            Connection con = getConnectionRequired(connectionURI.get());
-            return socketService.isAutoOpen(con.getSocketURI());
-        }
-        return false;
-    }
-
-    public boolean shouldSendAutoOpenForOpen(WonMessage wonMessage) {
-        Optional<URI> atomURI = Optional.of(wonMessage.getRecipientAtomURI());
-        Optional<URI> connectionURI = Optional.of(wonMessage.getRecipientURI());
-        if (!atomURI.isPresent()) {
-            return false;
-        }
-        return shouldSendAutoOpenForOpen(connectionURI);
-    }
-
-    private boolean shouldSendAutoOpenForOpen(Optional<URI> connectionURI) {
-        if (connectionURI.isPresent()) {
-            Connection con = getConnectionRequired(connectionURI.get());
-            if (con.getState() == ConnectionState.REQUEST_RECEIVED) {
-                Socket socket = socketService.getSocketRequired(con.getSocketURI());
-                Optional<URI> targetSocket = socketService.getSocketType(con.getTargetSocketURI());
-                if (targetSocket.isPresent() && socketService.isAutoOpen(socket.getSocketURI())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     public void grabRemoteConnectionURIFromRemoteResponse(WonMessage responseMessage) {
         responseMessage.getMessageType().requireType(WonMessageType.SUCCESS_RESPONSE);
         WonMessageType responseToType = responseMessage.getRespondingToMessageType();
@@ -355,30 +334,21 @@ public class ConnectionService {
 
     public Connection closeFromOwner(WonMessage wonMessage) {
         wonMessage.getMessageType().requireType(WonMessageType.CLOSE);
-        URI connectionURI = wonMessage.getSenderURI();
-        return closeFromOwner(connectionURI);
-    }
-
-    public Connection closeFromOwner(URI connectionURI) {
-        Connection con = connectionRepository.findOneByConnectionURIForUpdate(connectionURI).get();
-        return nextConnectionState(con, ConnectionEventType.OWNER_CLOSE);
+        return close(wonMessage.getSenderSocketURIRequired(),
+                        wonMessage.getRecipientSocketURIRequired());
     }
 
     public Connection closeFromSystem(WonMessage wonMessage) {
         wonMessage.getMessageType().requireType(WonMessageType.CLOSE);
-        URI connectionURI = wonMessage.getSenderURI();
-        return closeFromSystem(connectionURI);
+        return close(wonMessage.getSenderSocketURIRequired(), wonMessage.getRecipientSocketURIRequired());
     }
 
-    public Connection closeFromSystem(URI connectionURI) {
-        Connection con = connectionRepository.findOneByConnectionURIForUpdate(connectionURI).get();
-        ConnectionState originalState = con.getState();
-        // TODO: we could introduce SYSTEM_CLOSE here
-        con = nextConnectionState(con, ConnectionEventType.OWNER_CLOSE);
-        return con;
+    private Connection close(URI socketURI, URI targetSocketURI) {
+        Connection con = getConnectionRequired(socketURI, targetSocketURI);
+        return nextConnectionState(con, ConnectionEventType.OWNER_CLOSE);
     }
 
-    public Connection nextConnectionState(URI connectionURI, ConnectionEventType connectionEventType)
+    private Connection nextConnectionState(URI connectionURI, ConnectionEventType connectionEventType)
                     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         if (connectionURI == null)
             throw new IllegalArgumentException("connectionURI is not set");
@@ -403,13 +373,8 @@ public class ConnectionService {
     }
 
     public Connection closeFromNode(WonMessage wonMessage) {
-        URI connectionURIFromWonMessage = wonMessage.getRecipientURI();
-        return closeFromNode(connectionURIFromWonMessage);
-    }
-
-    private Connection closeFromNode(URI connectionUri) {
-        return nextConnectionState(connectionUri,
-                        ConnectionEventType.PARTNER_CLOSE);
+        wonMessage.getMessageType().requireType(WonMessageType.CLOSE);
+        return close(wonMessage.getRecipientSocketURIRequired(), wonMessage.getSenderSocketURIRequired());
     }
 
     /**
@@ -536,26 +501,24 @@ public class ConnectionService {
         return con.getState().transit(msg);
     }
 
+    public Connection getConnectionForMessageRequired(WonMessage message, WonMessageDirection direction) {
+        return getConnectionForMessage(message, direction)
+                        .orElseThrow(() -> new NoSuchConnectionException(
+                                        MessageFormat.format("Did not find connection for message {0}, direction {1}",
+                                                        message.getMessageURI(), direction)));
+    }
+
     public Optional<Connection> getConnectionForMessage(WonMessage originalMessage, WonMessageDirection direction) {
-        URI connectionURI = null;
         URI socketURI = null;
         URI targetSocketURI = null;
         if (direction.isFromExternal()) {
-            connectionURI = originalMessage.getRecipientURI();
-            if (connectionURI == null) {
-                socketURI = originalMessage.getRecipientSocketURIRequired();
-                targetSocketURI = originalMessage.getSenderSocketURIRequired();
-            }
+            socketURI = originalMessage.getRecipientSocketURI();
+            targetSocketURI = originalMessage.getSenderSocketURI();
         } else {
-            connectionURI = originalMessage.getSenderURI();
-            if (connectionURI == null) {
-                socketURI = originalMessage.getSenderSocketURIRequired();
-                targetSocketURI = originalMessage.getRecipientSocketURIRequired();
-            }
+            socketURI = originalMessage.getSenderSocketURI();
+            targetSocketURI = originalMessage.getRecipientSocketURI();
         }
-        if (connectionURI != null) {
-            return connectionRepository.findOneByConnectionURI(connectionURI);
-        } else if (targetSocketURI != null && socketURI != null) {
+        if (targetSocketURI != null && socketURI != null) {
             return connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI, targetSocketURI);
         } else {
             return Optional.empty();

@@ -12,7 +12,7 @@ package won.node.camel.processor.general;
 
 import static won.node.camel.processor.WonCamelHelper.*;
 
-import java.net.URI;
+import java.util.Optional;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import won.node.service.persistence.ConnectionService;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
@@ -45,21 +44,9 @@ public class ConnectionStateChangeBuilderCamelProcessor implements Processor {
             type = wonMessage.getRespondingToMessageType();
         }
         if (type.isConnectionSpecificMessage()) {
-            WonMessageDirection direction = getDirectionRequired(exchange);
-            // first, try to find the connection uri in the header:
-            URI conUri = (URI) exchange.getIn().getHeader(WonCamelConstants.CONNECTION_URI_HEADER);
-            if (conUri == null) {
-                // not found. get it from the message and put it in the header
-                conUri = direction.isFromExternal()
-                                ? wonMessage.getRecipientURI()
-                                : wonMessage.getSenderURI();
-            }
-            if (conUri != null) {
-                // found a connection. Put its URI in the header and load it
-                Connection con = connectionService.getConnectionRequired(conUri);
-                stateChangeBuilder.oldState(con.getState());
-            } else {
-                // found no connection. don't modify the builder
+            Optional<Connection> con = getConnection(exchange, connectionService);
+            if (con.isPresent()) {
+                stateChangeBuilder.oldState(con.get().getState());
             }
         }
         // put the state change builder in the header

@@ -1,6 +1,7 @@
 package won.node.camel.processor.fixed;
 
-import java.net.URI;
+import static won.node.camel.processor.WonCamelHelper.*;
+
 import java.util.Optional;
 
 import org.apache.camel.Exchange;
@@ -13,7 +14,6 @@ import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
 import won.node.camel.processor.general.ConnectionStateChangeBuilder;
 import won.node.service.nodebehaviour.ConnectionStateChange;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Atom;
 import won.protocol.model.Connection;
@@ -34,7 +34,6 @@ public class ConnectionStateChangeReactionProcessor extends AbstractCamelProcess
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        Optional<Connection> con = Optional.empty();
         WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
         String msgTypeDir = "[message type: "
                         + wonMessage.getMessageType()
@@ -48,31 +47,17 @@ public class ConnectionStateChangeReactionProcessor extends AbstractCamelProcess
             }
             return;
         }
-        // first, try to find the connection uri in the header:
-        URI conUri = (URI) exchange.getIn().getHeader(WonCamelConstants.CONNECTION_URI_HEADER);
-        if (conUri == null) {
-            // not found. get it from the message and put it in the header
-            wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-            conUri = wonMessage.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL ? wonMessage.getRecipientURI()
-                            : wonMessage.getSenderURI();
-        }
-        if (conUri != null) {
-            // found a connection. Put its URI in the header and load it
-            con = connectionService.getConnection(conUri);
+        Optional<Connection> con = getConnection(exchange, connectionService);
+        if (con.isPresent()) {
             if (!stateChangeBuilder.canBuild()) {
                 stateChangeBuilder.newState(con.get().getState());
             }
-        } else {
-            // found no connection. don't modify the builder
         }
         // only if there is enough data to make a connectionStateChange object, make it
         // and pass it to the data
         // derivation service.
         if (stateChangeBuilder.canBuild()) {
             ConnectionStateChange connectionStateChange = stateChangeBuilder.build();
-            if (!con.isPresent()) {
-                con = connectionService.getConnection(conUri);
-            }
             Atom atom = atomService.getAtomRequired(con.get().getAtomURI());
             if (connectionStateChange.isConnect() || connectionStateChange.isDisconnect()) {
                 // trigger rematch

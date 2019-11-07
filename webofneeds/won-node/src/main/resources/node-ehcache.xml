@@ -25,10 +25,10 @@
                               properties="jndiName=java:/TransactionManager" propertySeparator=";"/>
 
 
-    <defaultCache maxEntriesLocalHeap="100" eternal="false" timeToIdleSeconds="1200" timeToLiveSeconds="1200" />
+    <defaultCache maxEntriesLocalHeap="1000" eternal="false" timeToIdleSeconds="1200" timeToLiveSeconds="1200" />
 
     <cache name="linkedDataCache" overflowToDisk="false" diskPersistent="false" eternal="false"
-           maxBytesLocalHeap="300M" timeToIdleSeconds="7200" memoryStoreEvictionPolicy="LRU"
+           maxBytesLocalHeap="300M" timeToIdleSeconds="7200" memoryStoreEvictionPolicy="LFU"
            transactionalMode="off">
         <!--persistence strategy="localTempSwap"/--> <!-- we disable persistent cache until we find out how to serialize a model in ehcache -->
     </cache>

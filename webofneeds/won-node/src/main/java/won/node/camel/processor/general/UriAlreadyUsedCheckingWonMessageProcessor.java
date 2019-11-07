@@ -27,7 +27,6 @@ import won.protocol.exception.UriAlreadyInUseException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
-import won.protocol.message.WonMessageUtils;
 import won.protocol.message.processor.exception.EventAlreadyProcessedException;
 import won.protocol.model.Atom;
 import won.protocol.model.MessageEvent;
@@ -54,9 +53,13 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements Processor {
     public void process(Exchange exchange) throws Exception {
         WonMessage message = WonCamelHelper.getMessageRequired(exchange);
         WonMessageDirection direction = WonCamelHelper.getDirectionRequired(exchange);
-        URI parentUri = WonCamelHelper.getParentURI(exchange)
-                        .orElseGet(() -> WonMessageUtils.getParentEntityUri(message, direction));
-        checkEventURI(message, parentUri);
+        Optional<URI> parentUri = WonCamelHelper.getParentURI(exchange);
+        if (!parentUri.isPresent()) {
+            parentUri = messageService.getParentofMessage(message, direction);
+        }
+        if (parentUri.isPresent()) {
+            checkEventURI(message, parentUri.get());
+        }
         checkAtomURI(message);
     }
 

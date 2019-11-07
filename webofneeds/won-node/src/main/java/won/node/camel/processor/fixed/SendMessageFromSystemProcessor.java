@@ -10,18 +10,14 @@
  */
 package won.node.camel.processor.fixed;
 
-import java.net.URI;
+import static won.node.camel.processor.WonCamelHelper.*;
 
 import org.apache.camel.Exchange;
-import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
 
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
-import won.protocol.exception.MissingMessagePropertyException;
-import won.protocol.message.WonMessage;
-import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
 import won.protocol.vocabulary.WONMSG;
@@ -30,15 +26,11 @@ import won.protocol.vocabulary.WONMSG;
 @FixedMessageProcessor(direction = WONMSG.FromSystemString, messageType = WONMSG.ConnectionMessageString)
 public class SendMessageFromSystemProcessor extends AbstractCamelProcessor {
     public void process(final Exchange exchange) throws Exception {
-        Message message = exchange.getIn();
-        WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
-        URI connectionUri = wonMessage.getSenderURI();
-        if (connectionUri == null) {
-            throw new MissingMessagePropertyException(URI.create(WONMSG.sender.toString()));
-        }
-        Connection con = connectionRepository.findOneByConnectionURIForUpdate(connectionUri).get();
+        Connection con = connectionService.getConnectionForMessageRequired(getMessageRequired(exchange),
+                        getDirectionRequired(exchange));
         if (con.getState() != ConnectionState.CONNECTED) {
-            throw new IllegalMessageForConnectionStateException(connectionUri, "CONNECTION_MESSAGE", con.getState());
+            throw new IllegalMessageForConnectionStateException(con.getConnectionURI(), "CONNECTION_MESSAGE",
+                            con.getState());
         }
     }
 }

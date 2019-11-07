@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import won.node.test.WonMessageRoutesTestHelper;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.model.Atom;
 import won.protocol.model.AtomMessageContainer;
 import won.protocol.model.AtomState;
@@ -73,6 +74,7 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
                         socketURI2, atomURI2, URI_NODE_1, "unittest connect")
                         .build();
         toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(2);
         sendFromOwner(connectFromOwnerMsg, OWNERAPPLICATION_ID_OWNER1);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
         Thread t1 = new Thread(() -> helper.doInSeparateTransaction(() -> {
@@ -278,7 +280,7 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
                         isMessageAndResponse(connectFromOwnerMsg),
                         isMessageAndResponseAndRemoteResponse(connectFromOwnerMsg),
                         isSuccessResponseTo(connectFromOwnerMsg)));
-        toMatcherMockEndpoint.expectedMessageCount(0);
+        toMatcherMockEndpoint.expectedMessageCount(2);
         sendFromOwner(connectFromOwnerMsg, OWNERAPPLICATION_ID_OWNER1);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
         Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI,
@@ -377,6 +379,7 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
                         .build();
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
         toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(0);
         sendFromOwner(connectFromExternalMsg, OWNERAPPLICATION_ID_OWNER2);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
         WonMessage connectFromOwnerMsg = WonMessageBuilder.setMessagePropertiesForConnect(
@@ -384,6 +387,7 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
                         socketURI2, atomURI2, URI_NODE_1, "unittest connect")
                         .build();
         toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(2);
         sendFromOwner(connectFromOwnerMsg, OWNERAPPLICATION_ID_OWNER1);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
         Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI,
@@ -449,15 +453,16 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         toMatcherMockEndpoint.expectedMessageCount(0);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
         WonMessage closeMsg = WonMessageBuilder.setMessagePropertiesForClose(newMessageURI(),
-                        con.get().getSocketURI(), con.get().getConnectionURI(), con.get().getAtomURI(), URI_NODE_1,
-                        con.get().getTargetSocketURI(), con.get().getTargetConnectionURI(),
-                        con.get().getTargetAtomURI(), URI_NODE_1,
+                        con.get().getSocketURI(),
+                        con.get().getTargetSocketURI(),
+                        WonMessageDirection.FROM_OWNER,
                         "unittest close!").build();
         toOwnerMockEndpoint.expectedMessageCount(3);
         toOwnerMockEndpoint.expectedMessagesMatches(or(
                         isMessageAndResponse(closeMsg),
                         isMessageAndResponseAndRemoteResponse(closeMsg),
                         isSuccessResponseTo(closeMsg)));
+        toMatcherMockEndpoint.expectedMessageCount(2);
         sendFromOwner(closeMsg, OWNERAPPLICATION_ID_OWNER1);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint);
         Connection expected = new Connection();
