@@ -7,6 +7,8 @@ import static won.node.camel.processor.WonCamelHelper.*;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
@@ -34,6 +36,7 @@ public class WonMessageRoutes extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
+        ExecutorService executorSvc = Executors.newCachedThreadPool();
         from("direct:onExceptionFailResponder")
                         .routeId("direct:onExceptionFailResponder")
                         .onException(Exception.class)
@@ -84,6 +87,8 @@ public class WonMessageRoutes extends RouteBuilder {
                         // onException must be the first processor after onCompletion
                         /* onCompletion: executed after the whole route finishes successfully */
                         .onCompletion()
+                        /**/.executorService(executorSvc)
+                        /**/.executorService(executorSvc)
                         /**/.onCompleteOnly()
                         /**/.to("direct:msgFromOwner_respondToOwner")
                         .end() // onCompletion
@@ -110,19 +115,13 @@ public class WonMessageRoutes extends RouteBuilder {
                         .to("bean:persister"); // store the incoming message as well as the response
         from("direct:msgFromOwner_respondToOwner") // to owner
                         .routeId("direct:msgFromOwner_respondToOwner")
-                        .onException(Exception.class)
-                        /**/.log(simple("failure during direct:msgFromOwner_respondToOwner, not sending a response. Exception message: ${exception.message}, stacktrace: ${exception.stacktrace}")
-                                        .getText())
-                        /**/.handled(true)
-                        /**/.stop()
-                        .end()
                         .onCompletion()
+                        /**/.executorService(executorSvc)
                         /**/.onCompleteOnly()
                         /**/.to("direct:msgFromOwner_forwardToNode")
                         .end() // onCompletion
                         // send the response+echo to the owner
                         .transacted("PROPAGATION_REQUIRES_NEW")
-                        .log(LoggingLevel.INFO, "Responding to owner")
                         .to("bean:responseRoutingInfoExtractor")
                         .bean(messageAndResponseIntoToSendHeader)
                         .to("direct:sendToOwner")
@@ -130,39 +129,24 @@ public class WonMessageRoutes extends RouteBuilder {
                                                  // db for routing!)
         from("direct:msgFromOwner_forwardToNode") // to node
                         .routeId("direct:msgFromOwner_forwardToNode")
-                        .onException(Exception.class)
-                        /**/.log(simple("failure during direct:msgFromOwner_forwardToNode, not sending a response. Exception message: ${exception.message}, stacktrace: ${exception.stacktrace}")
-                                        .getText())
-                        /**/.handled(true)
-                        /**/.stop()
-                        .end()
                         .onCompletion()
+                        /**/.executorService(executorSvc)
                         /**/.onCompleteOnly()
                         /**/.to("direct:msgFromOwner_react")
                         .end()
                         .transacted("PROPAGATION_REQUIRES_NEW")
                         .choice()
                         /**/.when(and(causesOutgoingMessage, shouldSendFromOwnerToExternal))
-                        /**//**/.log(LoggingLevel.INFO, "Forwarding message to remote node")
                         /**//**/.to("bean:routingInfoExtractor")
-                        /**//**/.log(LoggingLevel.WARN,
-                                        "TODO (message-refactoring): merge message dataset before sending")
                         /**//**/.bean(messageAndResponseIntoToSendHeader)
                         /**//**/.to("direct:sendToNode")
                         /**/.endChoice() // choice
                         .end();
         from("direct:msgFromOwner_react")
                         .routeId("direct:msgFromOwner_react")
-                        .onException(Exception.class)
-                        /**/.log(simple("failure during direct:msgFromOwner_react, not sending a response. Exception message: ${exception.message}, stacktrace: ${exception.stacktrace}")
-                                        .getText())
-                        /**/.handled(true)
-                        /**/.stop()
-                        .end()
                         .transacted("PROPAGATION_REQUIRES_NEW")
                         .choice()
                         /**/.when(isAllowedToReact)
-                        /**//**/.log(LoggingLevel.INFO, "Reacting to message ")
                         // react to the message, if we don't want to suppress the reaction, which would
                         // be indicated by a header.
                         /**//**/.to("direct:reactToMessage")
@@ -183,12 +167,6 @@ public class WonMessageRoutes extends RouteBuilder {
                         // route to message processing logic
                         .to("direct:msgFromOwner");
         from("direct:reactToMessage")
-                        .onException(Exception.class)
-                        /**/.log(simple("failure during direct:reactToMessage, not sending a response. Exception message: ${exception.message}, stacktrace: ${exception.stacktrace}")
-                                        .getText())
-                        /**/.handled(true)
-                        /**/.stop()
-                        .end()
                         .transacted("PROPAGATION_REQUIRES_NEW")
                         .routeId("direct:reactToMessage")
                         .routingSlip(method("fixedMessageReactionProcessorSlip"));
@@ -214,6 +192,7 @@ public class WonMessageRoutes extends RouteBuilder {
                         /**/.to("direct:onExceptionFailResponder")
                         .end()
                         .onCompletion()
+                        /**/.executorService(executorSvc)
                         /**/.onCompleteOnly()
                         /**/.to("direct:msgFromExternal_respondToNode")
                         .end() // onCompletion
@@ -242,19 +221,13 @@ public class WonMessageRoutes extends RouteBuilder {
                         .to("bean:persister"); // store the incoming message as well as the response, if there is any
         from("direct:msgFromExternal_respondToNode") // to node!
                         .routeId("direct:msgFromExternal_respondToNode")
-                        .onException(Exception.class)
-                        /**/.log(simple("failure during direct:msgFromExternal_respondToNode, not sending a response. Exception message: ${exception.message}, stacktrace: ${exception.stacktrace}")
-                                        .getText())
-                        /**/.handled(true)
-                        /**/.stop()
-                        .end()
                         .onCompletion()
+                        /**/.executorService(executorSvc)
                         /**/.onCompleteOnly()
                         /**/.to("direct:msgFromExternal_forwardToOwner")
                         .end() // onCompletion
                         .choice()
                         /**/.when(responseIsPresent) // we made a response, send it back to the node
-                        /**//**/.log(LoggingLevel.INFO, "Sending response back to node")
                         /**//**/.to("bean:responseRoutingInfoExtractor")
                         /**//**/.bean(responseIntoMessageToSendHeader)
                         /**//**/.to("direct:sendToNode") // send response
@@ -262,15 +235,11 @@ public class WonMessageRoutes extends RouteBuilder {
                         .end(); // choice
         from("direct:msgFromExternal_forwardToOwner") // to owner!
                         .routeId("direct:msgFromExternal_forwardToOwner")
-                        // .onException(Exception.class)
-                        // /**/.handled(true)
-                        // /**/.stop()
-                        // .end()
                         .onCompletion()
+                        /**/.executorService(executorSvc)
                         /**/.onCompleteOnly()
                         /**/.to("direct:msgFromExternal_react")
                         .end() // onCompletion
-                        .log(LoggingLevel.INFO, "Sending message from external to owner")
                         .choice()
                         /**/.when(shouldSendExternalToOwner)
                         /**//**/.to("bean:routingInfoExtractor")
@@ -280,18 +249,11 @@ public class WonMessageRoutes extends RouteBuilder {
                         .end(); // choice
         from("direct:msgFromExternal_react")
                         .routeId("direct:msgFromExternal_react")
-                        .onException(Exception.class)
-                        /**/.log(simple("failure during direct:msgFromExternal_react, not sending a response. Exception message: ${exception.message}, stacktrace: ${exception.stacktrace}")
-                                        .getText())
-                        /**/.handled(true)
-                        /**/.stop()
-                        .end()
                         .transacted("PROPAGATION_REQUIRES_NEW")
                         .choice()
                         /**/.when(isAllowedToReact)
                         // react to the message, if we don't want to suppress the reaction, which would
                         // be indicated by a header.
-                        /**//**/.log(LoggingLevel.INFO, "Reacting to message from external")
                         /**//**/.to("direct:reactToMessage")
                         /**/.endChoice() // choice
                         .end(); // choice
@@ -299,14 +261,6 @@ public class WonMessageRoutes extends RouteBuilder {
          * Matcher protocol, incoming
          */
         from("activemq:queue:" + FROM_MATCHER_QUEUENAME + "?concurrentConsumers=5")
-                        .onException(Exception.class)
-                        /**/.log(simple("failure during activemq:queue:" + FROM_MATCHER_QUEUENAME
-                                        + ", not sending a response. "
-                                        + "Exception message: ${exception.message}, "
-                                        + "Stacktrace: ${exception.stacktrace}").getText())
-                        /**/.handled(true)
-                        /**/.stop()
-                        .end()
                         .transacted("PROPAGATION_REQUIRES_NEW")
                         .routeId("activemq:queue:" + FROM_MATCHER_QUEUENAME)
                         .to("bean:wonMessageIntoCamelProcessor")
