@@ -564,6 +564,15 @@ public class WonMessageBuilder {
                         .setRecipientSocketURI(recpientSocket).addContent(content)
                         .setTimestampToNow();
     }
+    
+    public static WonMessageBuilder setMessagePropertiesForConnectionMessage(URI messageURI, URI senderSocket,
+                    URI recpientSocket,
+                    String textMessage) {
+        return new WonMessageBuilder(messageURI).setWonMessageDirection(WonMessageDirection.FROM_OWNER)
+                        .setWonMessageType(WonMessageType.CONNECTION_MESSAGE).setSenderSocketURI(senderSocket)
+                        .setRecipientSocketURI(recpientSocket).addContent(WonRdfUtils.MessageUtils.textMessage(textMessage))
+                        .setTimestampToNow();
+    }
 
     public static WonMessageBuilder setMessagePropertiesForConnectionMessage(URI messageURI, URI localSocket,
                     URI localConnection,

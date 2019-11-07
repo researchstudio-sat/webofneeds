@@ -62,13 +62,9 @@ public class BotActionUtils {
         Dataset targetAtomRDF = context.getLinkedDataSource().getDataForResource(targetAtom);
         URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
         return WonMessageBuilder
-                        .setMessagePropertiesForConnectionMessage(messageURI, socketURI, connectionURI, localAtom,
-                                        wonNode,
+                        .setMessagePropertiesForConnectionMessage(messageURI, socketURI,
                                         targetSocketURI,
-                                        WonRdfUtils.ConnectionUtils.getTargetConnectionURIFromConnection(connectionRDF,
-                                                        connectionURI),
-                                        targetAtom,
-                                        WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(targetAtomRDF, targetAtom), message)
+                                        message)
                         .build();
     }
 
