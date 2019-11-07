@@ -27,8 +27,8 @@
 
     <defaultCache maxEntriesLocalHeap="1000" eternal="false" timeToIdleSeconds="1200" timeToLiveSeconds="1200" />
 
-    <cache name="linkedDataCache" overflowToDisk="false" diskPersistent="false" eternal="false"
-           maxBytesLocalHeap="300M" timeToIdleSeconds="7200" memoryStoreEvictionPolicy="LFU"
+    <cache name="linkedDataCache" overflowToDisk="false" diskPersistent="false" eternal="true"
+           maxBytesLocalHeap="300M" memoryStoreEvictionPolicy="LFU"
            transactionalMode="off">
         <!--persistence strategy="localTempSwap"/--> <!-- we disable persistent cache until we find out how to serialize a model in ehcache -->
     </cache>
