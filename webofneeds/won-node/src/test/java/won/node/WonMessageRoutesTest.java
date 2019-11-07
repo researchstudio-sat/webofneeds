@@ -739,7 +739,7 @@ public abstract class WonMessageRoutesTest {
     }
 
     protected URI newAtomURI() {
-        return URI.create("uri:atom" + counter.incrementAndGet());
+        return URI.create(URI_NODE_1 + "/atom/atom-" + counter.incrementAndGet());
     }
 
     protected URI newConnectionURI() {
@@ -849,10 +849,15 @@ public abstract class WonMessageRoutesTest {
                         .setReporter(exchange -> {
                             try {
                                 Optional<String> ownerAppId = WonCamelHelper.getOwnerApplicationId(exchange);
-                                logMessageRdf(makeMessageBox("message NODE => MATCHER"),
-                                                WonMessage.of(RdfUtils.readDatasetFromString(
-                                                                (String) exchange.getIn().getBody(),
-                                                                WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE)));
+                                Optional<String> wonMessageString = Optional
+                                                .ofNullable((String) exchange.getIn().getBody());
+                                if (wonMessageString.isPresent() && wonMessageString.get().trim().length() > 0) {
+                                    logMessageRdf(makeMessageBox("message NODE => MATCHER"),
+                                                    WonMessage.of(RdfUtils.readDatasetFromString(wonMessageString.get(),
+                                                                    WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE)));
+                                } else {
+                                    logger.debug(makeMessageBox("message NODE => MATCHER (no WonMessage)"));
+                                }
                             } catch (WonMessageNotWellFormedException e) {
                                 logger.info("swallowed WonMessageNotWellFormedException - this can happen");
                             }
