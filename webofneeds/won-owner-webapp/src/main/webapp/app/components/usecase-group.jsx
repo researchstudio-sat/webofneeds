@@ -55,7 +55,12 @@ class WonUsecasePicker extends React.Component {
               {!!this.props.useCaseGroup.subItems &&
                 Object.values(this.props.useCaseGroup.subItems).map(
                   (subItem, index) => {
-                    if (useCaseUtils.isDisplayableItem(subItem)) {
+                    if (
+                      useCaseUtils.isDisplayableItem(
+                        subItem,
+                        this.props.visibleUseCasesByConfig
+                      )
+                    ) {
                       return (
                         <div
                           key={subItem.identifier + "-" + index}

@@ -11,12 +11,21 @@ import won from "./won-es6.js";
 import Immutable from "immutable";
 
 const useCasesImm = Immutable.fromJS(useCaseDefinitions.getAllUseCases());
+const useCaseGroupsImm = Immutable.fromJS(
+  useCaseDefinitions.getAllUseCaseGroups()
+);
 const allDetailsImm = Immutable.fromJS(initializeAllDetails());
 const allMessageDetailsImm = Immutable.fromJS(initializeAllMessageDetails());
 
 console.debug("useCasesImm: ", useCasesImm);
+console.debug("useCaseGroupsImm:", useCaseGroupsImm);
 console.debug("allDetailsImm: ", allDetailsImm);
 console.debug("allMessageDetailsImm: ", allMessageDetailsImm);
+
+window.useCasesImm4dbg = useCasesImm;
+window.useCaseGroupsImm4dbg = useCaseGroupsImm;
+window.allDetailsImm4dbg = allDetailsImm;
+window.allMessageDetailsImm4dbg = allMessageDetailsImm;
 
 /**
  * Returns all the details that are defined in any useCase Defined in the useCaseDefinitions
@@ -73,116 +82,113 @@ export function findUseCaseByAtom(atomImm) {
     getIn(atomImm, ["content", "type"])
       .toSet()
       .remove(won.WON.AtomCompacted);
-  const useCases = useCaseDefinitions.getAllUseCases();
 
-  if (hasSubElements(useCases)) {
-    if (useCasesImm && useCasesImm.size > 0) {
-      const hasExactMatchingTypes = (useCase, types, branch) => {
-        const typesSize = types ? types.size : 0;
-        const ucTypes =
-          useCase.getIn(["draft", branch, "type"]) &&
-          useCase
-            .getIn(["draft", branch, "type"])
-            .toSet()
-            .remove(won.WON.AtomCompacted);
+  if (useCasesImm && useCasesImm.size > 0) {
+    const hasExactMatchingTypes = (useCase, types, branch) => {
+      const typesSize = types ? types.size : 0;
+      const ucTypes =
+        useCase.getIn(["draft", branch, "type"]) &&
+        useCase
+          .getIn(["draft", branch, "type"])
+          .toSet()
+          .remove(won.WON.AtomCompacted);
 
-        const ucTypesSize = ucTypes ? ucTypes.size : 0;
+      const ucTypesSize = ucTypes ? ucTypes.size : 0;
 
-        if (typesSize != ucTypesSize) {
-          return false;
+      if (typesSize != ucTypesSize) {
+        return false;
+      }
+
+      const hasTypes = typesSize > 0;
+
+      return !hasTypes || (ucTypes && ucTypes.isSubset(types));
+    };
+
+    let matchingUseCases = useCasesImm.filter(useCase =>
+      hasExactMatchingTypes(useCase, contentTypes, "content")
+    );
+
+    if (
+      matchingUseCases.size > 1 &&
+      contentTypes &&
+      contentTypes.includes("s:PlanAction")
+    ) {
+      matchingUseCases = matchingUseCases.filter(useCase => {
+        const draftEventObject = getIn(useCase, [
+          "draft",
+          "content",
+          "eventObjectAboutUris",
+        ]);
+        const atomEventObject = getIn(atomImm, [
+          "content",
+          "eventObjectAboutUris",
+        ]);
+        if (Immutable.List.isList(draftEventObject)) {
+          const eventObjectSize = draftEventObject.size;
+          const matchingEventObjectSize = draftEventObject.filter(
+            object => atomEventObject && atomEventObject.includes(object)
+          ).size;
+          return eventObjectSize == matchingEventObjectSize;
         }
+        return atomEventObject && atomEventObject.includes(draftEventObject);
+      });
+    }
 
-        const hasTypes = typesSize > 0;
-
-        return !hasTypes || (ucTypes && ucTypes.isSubset(types));
-      };
-
-      let matchingUseCases = useCasesImm.filter(useCase =>
-        hasExactMatchingTypes(useCase, contentTypes, "content")
+    if (matchingUseCases.size > 1) {
+      //If there are multiple matched found based on the content type(s) alone we refine based on the seeks type as well
+      matchingUseCases = matchingUseCases.filter(useCase =>
+        hasExactMatchingTypes(useCase, seeksTypes, "seeks")
       );
+    }
 
-      if (
-        matchingUseCases.size > 1 &&
-        contentTypes &&
-        contentTypes.includes("s:PlanAction")
-      ) {
-        matchingUseCases = matchingUseCases.filter(useCase => {
-          const draftEventObject = getIn(useCase, [
-            "draft",
-            "content",
-            "eventObjectAboutUris",
-          ]);
-          const atomEventObject = getIn(atomImm, [
-            "content",
-            "eventObjectAboutUris",
-          ]);
-          if (Immutable.List.isList(draftEventObject)) {
-            const eventObjectSize = draftEventObject.size;
-            const matchingEventObjectSize = draftEventObject.filter(
-              object => atomEventObject && atomEventObject.includes(object)
-            ).size;
-            return eventObjectSize == matchingEventObjectSize;
-          }
-          return atomEventObject && atomEventObject.includes(draftEventObject);
-        });
-      }
+    if (
+      matchingUseCases.size > 1 &&
+      seeksTypes &&
+      seeksTypes.includes("s:PlanAction")
+    ) {
+      matchingUseCases = matchingUseCases.filter(useCase => {
+        const draftEventObject = getIn(useCase, [
+          "draft",
+          "seeks",
+          "eventObjectAboutUris",
+        ]);
+        const atomEventObject = getIn(atomImm, [
+          "seeks",
+          "eventObjectAboutUris",
+        ]);
 
-      if (matchingUseCases.size > 1) {
-        //If there are multiple matched found based on the content type(s) alone we refine based on the seeks type as well
-        matchingUseCases = matchingUseCases.filter(useCase =>
-          hasExactMatchingTypes(useCase, seeksTypes, "seeks")
-        );
-      }
+        if (Immutable.List.isList(draftEventObject)) {
+          //Fixme: work with check for all list objects
+          const eventObjectSize = draftEventObject.size;
+          const matchingEventObjectSize = draftEventObject.filter(
+            object => atomEventObject && atomEventObject.includes(object)
+          ).size;
+          return eventObjectSize == matchingEventObjectSize;
+        }
+        return atomEventObject && atomEventObject.includes(draftEventObject);
+      });
+    }
 
-      if (
-        matchingUseCases.size > 1 &&
-        seeksTypes &&
-        seeksTypes.includes("s:PlanAction")
-      ) {
-        matchingUseCases = matchingUseCases.filter(useCase => {
-          const draftEventObject = getIn(useCase, [
-            "draft",
-            "seeks",
-            "eventObjectAboutUris",
-          ]);
-          const atomEventObject = getIn(atomImm, [
-            "seeks",
-            "eventObjectAboutUris",
-          ]);
-
-          if (Immutable.List.isList(draftEventObject)) {
-            //Fixme: work with check for all list objects
-            const eventObjectSize = draftEventObject.size;
-            const matchingEventObjectSize = draftEventObject.filter(
-              object => atomEventObject && atomEventObject.includes(object)
-            ).size;
-            return eventObjectSize == matchingEventObjectSize;
-          }
-          return atomEventObject && atomEventObject.includes(draftEventObject);
-        });
-      }
-
-      if (matchingUseCases.size > 1) {
-        console.warn(
-          "Found multiple matching UseCases for: ",
-          atomImm,
-          " matching UseCases: ",
-          matchingUseCases,
-          " -> returning undefined"
-        );
-        return undefined;
-      } else if (matchingUseCases.size == 1) {
-        return matchingUseCases.first().toJS();
-      } else {
-        console.warn(
-          "Found no matching UseCase for:",
-          atomImm,
-          " within, ",
-          useCases,
-          " -> returning undefined"
-        );
-        return undefined;
-      }
+    if (matchingUseCases.size > 1) {
+      console.warn(
+        "Found multiple matching UseCases for: ",
+        atomImm,
+        " matching UseCases: ",
+        matchingUseCases,
+        " -> returning undefined"
+      );
+      return undefined;
+    } else if (matchingUseCases.size == 1) {
+      return matchingUseCases.first().toJS();
+    } else {
+      console.warn(
+        "Found no matching UseCase for:",
+        atomImm,
+        " within, ",
+        useCasesImm,
+        " -> returning undefined"
+      );
+      return undefined;
     }
   }
 
@@ -249,29 +255,34 @@ function initializeAllMessageDetails() {
  * @returns {*}
  */
 export function getUnGroupedUseCases(threshold = 0, visibleUseCasesArray) {
-  const useCaseGroups = useCaseDefinitions.getAllUseCaseGroups();
-  let ungroupedUseCases = JSON.parse(
-    JSON.stringify(useCaseDefinitions.getAllUseCases())
-  );
+  let ungroupedUseCasesImm = useCasesImm;
 
-  for (const identifier in useCaseGroups) {
-    const group = useCaseGroups[identifier];
-    // show use cases from groups that can't be displayed
-    // show use cases from groups that have no more than threshold use cases
-    if (
-      !isDisplayableUseCaseGroup(group, visibleUseCasesArray) ||
-      countDisplayableItemsInGroup(group, visibleUseCasesArray) <= threshold
-    ) {
-      continue;
-    }
-    // don't show usecases in groups as sinle use cases
-    for (const useCase in group.subItems) {
-      if (!group.subItems[useCase].subItems) {
-        delete ungroupedUseCases[useCase];
-      }
-    }
-  }
-  return ungroupedUseCases;
+  useCaseGroupsImm
+    .filter(
+      useCaseGroup =>
+        isDisplayableUseCaseGroupImm(useCaseGroup, visibleUseCasesArray) &&
+        countDisplayableItemsInGroupImm(useCaseGroup, visibleUseCasesArray) >
+          threshold
+    )
+    .map(useCaseGroup => {
+      // don't show usecases in groups as single use cases
+      const subItems = get(useCaseGroup, "subItems");
+      subItems &&
+        subItems.map(subItem => {
+          if (!get(subItem, "subItems")) {
+            ungroupedUseCasesImm = ungroupedUseCasesImm.delete(
+              get(subItem, "identifier")
+            );
+          }
+        });
+    });
+
+  return (
+    ungroupedUseCasesImm &&
+    ungroupedUseCasesImm
+      .filter(useCase => isDisplayableUseCaseImm(useCase, visibleUseCasesArray))
+      .toJS()
+  );
 }
 
 /**
@@ -297,17 +308,12 @@ export function getUseCase(useCaseString) {
 }
 
 export function getUseCaseGroupByIdentifier(groupIdentifier) {
-  if (groupIdentifier) {
-    const useCaseGroups = useCaseDefinitions.getAllUseCaseGroups();
-    for (const groupName in useCaseGroups) {
-      const element = useCaseGroups[groupName];
-
-      if (groupIdentifier === element["identifier"]) {
-        return element;
-      }
-    }
-  }
-  return undefined;
+  const foundUseCaseGroup =
+    groupIdentifier &&
+    useCaseGroupsImm.find(
+      useCaseGroup => get(useCaseGroup, "identifier") === groupIdentifier
+    );
+  return foundUseCaseGroup && foundUseCaseGroup.toJS();
 }
 
 /**
@@ -317,13 +323,24 @@ export function getUseCaseGroupByIdentifier(groupIdentifier) {
  * @returns {*}
  */
 export function isDisplayableUseCase(useCase, visibleUseCasesArray) {
-  console.debug(visibleUseCasesArray);
   return (
     useCase &&
+    isInVisibleUseCaseArray(useCase, visibleUseCasesArray) &&
     useCase.identifier &&
     !useCase.hidden &&
     (useCase.label || useCase.icon) &&
     !useCase.subItems
+  );
+}
+
+function isDisplayableUseCaseImm(useCaseImm, visibleUseCasesArray) {
+  return (
+    useCaseImm &&
+    get(useCaseImm, "identifier") &&
+    isInVisibleUseCaseArray(useCaseImm, visibleUseCasesArray) &&
+    !get(useCaseImm, "hidden") &&
+    (get(useCaseImm, "label") || get(useCaseImm, "icon")) &&
+    !get(useCaseImm, "subItems")
   );
 }
 
@@ -337,6 +354,13 @@ export function isDisplayableItem(item, visibleUseCasesArray) {
   return (
     isDisplayableUseCase(item, visibleUseCasesArray) ||
     isDisplayableUseCaseGroup(item, visibleUseCasesArray)
+  );
+}
+
+function isDisplayableItemImm(itemImm, visibleUseCasesArray) {
+  return (
+    isDisplayableUseCaseImm(itemImm, visibleUseCasesArray) ||
+    isDisplayableUseCaseGroupImm(itemImm, visibleUseCasesArray)
   );
 }
 
@@ -363,24 +387,43 @@ export function isDisplayableUseCaseGroup(useCaseGroup, visibleUseCasesArray) {
   return false;
 }
 
+function isDisplayableUseCaseGroupImm(useCaseGroupImm, visibleUseCasesArray) {
+  const useCaseGroupValid =
+    useCaseGroupImm &&
+    (get(useCaseGroupImm, "label") || get(useCaseGroupImm, "icon")) &&
+    get(useCaseGroupImm, "subItems");
+
+  if (useCaseGroupValid) {
+    const subItems = get(useCaseGroupImm, "subItems");
+    return !!(
+      subItems &&
+      subItems.find(subItem =>
+        isDisplayableItemImm(subItem, visibleUseCasesArray)
+      )
+    );
+  }
+  return false;
+}
+
 /**
  * return the amount of displayable items in a useCaseGroup
  * @param useCaseGroup
  * @param visibleUseCasesArray => array of useCaseIdentifier that are visible
  * @return {*}
  */
-export function countDisplayableItemsInGroup(
-  useCaseGroup,
+function countDisplayableItemsInGroupImm(
+  useCaseGroupImm,
   visibleUseCasesArray
 ) {
-  let countItems = 0;
+  const subItems = get(useCaseGroupImm, "subItems");
 
-  for (const key in useCaseGroup.subItems) {
-    if (isDisplayableItem(useCaseGroup.subItems[key], visibleUseCasesArray)) {
-      countItems++;
-    }
-  }
-  return countItems;
+  const size = subItems
+    ? subItems.filter(subItem =>
+        isDisplayableItemImm(subItem, visibleUseCasesArray)
+      ).size
+    : 0;
+
+  return size;
 }
 
 /**
@@ -392,38 +435,33 @@ export function isUseCaseGroup(element) {
   return element.subItems;
 }
 
-export function filterUseCasesBySearchQuery(
-  queryString,
-  visibleUseCaseesArray
-) {
-  let results = new Map();
-  const useCases = useCaseDefinitions.getAllUseCases();
-  for (const useCaseKey in useCases) {
-    if (
-      searchFunction(useCases[useCaseKey], queryString, visibleUseCaseesArray)
-    ) {
-      results.set(useCases[useCaseKey].identifier, useCases[useCaseKey]);
-    }
-  }
+export function filterUseCasesBySearchQuery(queryString, visibleUseCasesArray) {
+  const resultSet =
+    useCasesImm &&
+    useCasesImm
+      .filter(useCase =>
+        searchFunctionImm(useCase, queryString, visibleUseCasesArray)
+      )
+      .toSet();
 
-  if (results.size === 0) {
+  if (!resultSet || resultSet.size === 0) {
     return undefined;
   }
 
-  return Array.from(results.values());
+  return Array.from(resultSet.toJS());
 }
 
-function searchFunction(useCase, searchString, visibleUseCaseesArray) {
+function searchFunctionImm(useCaseImm, searchString, visibleUseCasesArray) {
   // don't treat use cases that can't be displayed as results
-  if (!isDisplayableUseCase(useCase, visibleUseCaseesArray)) {
+  if (!isDisplayableUseCaseImm(useCaseImm, visibleUseCasesArray)) {
     return false;
   }
   // check for searchString in use case label and draft
-  const useCaseLabel = useCase.label
-    ? JSON.stringify(useCase.label).toLowerCase()
+  const useCaseLabel = get(useCaseImm, "label")
+    ? JSON.stringify(get(useCaseImm, "label")).toLowerCase()
     : "";
-  const useCaseDraft = useCase.draft
-    ? JSON.stringify(useCase.draft).toLowerCase()
+  const useCaseDraft = get(useCaseImm, "draft")
+    ? JSON.stringify(get(useCaseImm, "draft").toJS()).toLowerCase()
     : "";
 
   const useCaseString = useCaseLabel.concat(useCaseDraft);
@@ -442,8 +480,17 @@ function hasSubElements(obj) {
   return obj && obj !== {} && Object.keys(obj).length > 0;
 }
 
-export function getUseCaseGroups() {
-  return useCaseDefinitions.getUseCaseGroups();
+export function getVisibleUseCaseGroups(threshold, visibleUseCasesArray) {
+  const visibleUseCaseGroups =
+    useCaseGroupsImm &&
+    useCaseGroupsImm.filter(
+      useCaseGroup =>
+        isDisplayableUseCaseGroupImm(useCaseGroup, visibleUseCasesArray) &&
+        countDisplayableItemsInGroupImm(useCaseGroup, visibleUseCasesArray) >
+          threshold
+    );
+
+  return visibleUseCaseGroups && visibleUseCaseGroups.toJS();
 }
 
 export function isHoldable(useCase) {
@@ -464,4 +511,29 @@ export function getUseCaseLabel(identifier) {
 
 export function getUseCaseIcon(identifier) {
   return getIn(useCasesImm, [identifier, "icon"]);
+}
+
+function isInVisibleUseCaseArray(useCase, visibleUseCasesArray) {
+  if (
+    !visibleUseCasesArray ||
+    visibleUseCasesArray.size == 0 ||
+    visibleUseCasesArray.contains("*")
+  ) {
+    console.debug(
+      "No specific useCases within visibleUseCasesArray, allow all"
+    );
+    return true;
+  } else {
+    const isUseCaseConfigured = !!visibleUseCasesArray.contains(
+      get(useCase, "identifier") || useCase.identifier
+    );
+    console.debug(
+      "UseCase [",
+      get(useCase, "identifier") || useCase.identifier,
+      "] is ",
+      isUseCaseConfigured ? "" : "NOT",
+      "in visibleUseCaseArray"
+    );
+    return isUseCaseConfigured;
+  }
 }

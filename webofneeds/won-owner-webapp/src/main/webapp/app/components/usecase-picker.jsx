@@ -17,7 +17,11 @@ const mapStateToProps = state => {
 
   const showGroupsThreshold = 1;
   const customUseCase = useCaseUtils.getCustomUseCase();
-  const useCaseGroups = useCaseUtils.getUseCaseGroups();
+
+  const visibleUseCaseGroups = useCaseUtils.getVisibleUseCaseGroups(
+    showGroupsThreshold,
+    visibleUseCasesByConfig
+  );
   const ungroupedUseCases = useCaseUtils.getUnGroupedUseCases(
     showGroupsThreshold,
     visibleUseCasesByConfig
@@ -25,8 +29,7 @@ const mapStateToProps = state => {
 
   return {
     customUseCase,
-    showGroupsThreshold,
-    useCaseGroups,
+    visibleUseCaseGroups,
     ungroupedUseCases,
     visibleUseCasesByConfig,
   };
@@ -122,61 +125,48 @@ class WonUsecasePicker extends React.Component {
           ) : (
             <React.Fragment>
               {/*<!-- USE CASE GROUPS -->*/}
-              {!!this.props.useCaseGroups &&
-                Object.values(this.props.useCaseGroups).map((ucg, index) => {
-                  if (
-                    useCaseUtils.isDisplayableUseCaseGroup(ucg) &&
-                    useCaseUtils.countDisplayableItemsInGroup(ucg) >
-                      this.props.showGroupsThreshold
-                  ) {
-                    return (
-                      <div
-                        key={ucg.identifier + "-" + index}
-                        className="ucp__main__usecase-group clickable"
-                        onClick={() => this.viewUseCaseGroup(ucg)}
-                      >
-                        {!!ucg.icon && (
-                          <svg className="ucp__main__usecase-group__icon">
-                            <use xlinkHref={ucg.icon} href={ucg.icon} />
-                          </svg>
-                        )}
-                        {!!ucg.label && (
-                          <div className="ucp__main__usecase-group__label">
-                            {ucg.label}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  }
-                })}
+              {!!this.props.visibleUseCaseGroups &&
+                Object.values(this.props.visibleUseCaseGroups).map(
+                  (ucg, index) => (
+                    <div
+                      key={ucg.identifier + "-" + index}
+                      className="ucp__main__usecase-group clickable"
+                      onClick={() => this.viewUseCaseGroup(ucg)}
+                    >
+                      {!!ucg.icon && (
+                        <svg className="ucp__main__usecase-group__icon">
+                          <use xlinkHref={ucg.icon} href={ucg.icon} />
+                        </svg>
+                      )}
+                      {!!ucg.label && (
+                        <div className="ucp__main__usecase-group__label">
+                          {ucg.label}
+                        </div>
+                      )}
+                    </div>
+                  )
+                )}
               {/*<!-- USE CASES WITHOUT GROUPS -->*/}
               {!!this.props.ungroupedUseCases &&
                 Object.values(this.props.ungroupedUseCases).map(
-                  (useCase, index) => {
-                    if (useCaseUtils.isDisplayableUseCase(useCase)) {
-                      return (
-                        <div
-                          key={useCase.identifier + "-" + index}
-                          className="ucp__main__usecase-group clickable"
-                          onClick={() => this.startFrom(useCase)}
-                        >
-                          {!!useCase.icon && (
-                            <svg className="ucp__main__usecase-group__icon">
-                              <use
-                                xlinkHref={useCase.icon}
-                                href={useCase.icon}
-                              />
-                            </svg>
-                          )}
-                          {!!useCase.label && (
-                            <div className="ucp__main__usecase-group__label">
-                              {useCase.label}
-                            </div>
-                          )}
+                  (useCase, index) => (
+                    <div
+                      key={useCase.identifier + "-" + index}
+                      className="ucp__main__usecase-group clickable"
+                      onClick={() => this.startFrom(useCase)}
+                    >
+                      {!!useCase.icon && (
+                        <svg className="ucp__main__usecase-group__icon">
+                          <use xlinkHref={useCase.icon} href={useCase.icon} />
+                        </svg>
+                      )}
+                      {!!useCase.label && (
+                        <div className="ucp__main__usecase-group__label">
+                          {useCase.label}
                         </div>
-                      );
-                    }
-                  }
+                      )}
+                    </div>
+                  )
                 )}
             </React.Fragment>
           )}
@@ -224,7 +214,10 @@ class WonUsecasePicker extends React.Component {
       },
       () => {
         if (value && value.trim().length > 1) {
-          const searchResults = useCaseUtils.filterUseCasesBySearchQuery(value);
+          const searchResults = useCaseUtils.filterUseCasesBySearchQuery(
+            value,
+            this.props.visibleUseCasesByConfig
+          );
 
           const sortByLabelAsc = (a, b) => {
             const bValue = b && b.label && b.label.toLowerCase();
@@ -252,10 +245,9 @@ class WonUsecasePicker extends React.Component {
 WonUsecasePicker.propTypes = {
   routerGoCurrent: PropTypes.func,
   customUseCase: PropTypes.object,
-  showGroupsThreshold: PropTypes.number,
-  useCaseGroups: PropTypes.arrayOf(PropTypes.object),
-  ungroupedUseCases: PropTypes.arrayOf(PropTypes.object),
+  visibleUseCaseGroups: PropTypes.objectOf(PropTypes.object),
   visibleUseCasesByConfig: PropTypes.arrayOf(PropTypes.string),
+  ungroupedUseCases: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default connect(
