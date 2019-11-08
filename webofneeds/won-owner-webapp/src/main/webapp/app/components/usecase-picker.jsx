@@ -18,14 +18,18 @@ const mapStateToProps = state => {
   const showGroupsThreshold = 1;
   const customUseCase = useCaseUtils.getCustomUseCase();
 
-  const visibleUseCaseGroups = useCaseUtils.getVisibleUseCaseGroups(
-    showGroupsThreshold,
-    visibleUseCasesByConfig
-  );
-  const ungroupedUseCases = useCaseUtils.getUnGroupedUseCases(
-    showGroupsThreshold,
-    visibleUseCasesByConfig
-  );
+  const visibleUseCaseGroups =
+    visibleUseCasesByConfig &&
+    useCaseUtils.getVisibleUseCaseGroups(
+      showGroupsThreshold,
+      visibleUseCasesByConfig
+    );
+  const ungroupedUseCases =
+    visibleUseCasesByConfig &&
+    useCaseUtils.getUnGroupedUseCases(
+      showGroupsThreshold,
+      visibleUseCasesByConfig
+    );
 
   return {
     customUseCase,

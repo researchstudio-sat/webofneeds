@@ -18,7 +18,9 @@ const mapStateToProps = state => {
   const selectedGroup = getUseCaseGroupFromRoute(state);
   return {
     visibleUseCasesByConfig,
-    useCaseGroup: useCaseUtils.getUseCaseGroupByIdentifier(selectedGroup),
+    useCaseGroup:
+      visibleUseCasesByConfig &&
+      useCaseUtils.getUseCaseGroupByIdentifier(selectedGroup),
   };
 };
 
