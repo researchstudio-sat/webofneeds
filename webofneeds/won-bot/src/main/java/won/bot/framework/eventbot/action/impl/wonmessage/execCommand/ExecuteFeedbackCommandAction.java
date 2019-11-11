@@ -34,7 +34,7 @@ import won.protocol.vocabulary.WONCON;
  * Action executing a ConnectCommandEvent, connecting to the targetAtom on
  * behalf of the atom.
  */
-public class ExecuteFeedbackCommandAction extends ExecuteSendMessageCommandAction<FeedbackCommandEvent> {
+public class ExecuteFeedbackCommandAction extends ExecuteMessageCommandAction<FeedbackCommandEvent> {
     public ExecuteFeedbackCommandAction(final EventListenerContext eventListenerContext) {
         super(eventListenerContext, false);
     }

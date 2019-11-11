@@ -17,6 +17,7 @@ import won.bot.framework.eventbot.event.BaseAtomSpecificEvent;
 import won.bot.framework.eventbot.event.TargetAtomSpecificEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.protocol.message.WonMessageType;
+import won.protocol.message.WonMessageUtils;
 
 /**
  * Instructs the bot to connect to the specified targetAtom on behalf of the
@@ -28,6 +29,7 @@ public class ConnectCommandEvent extends BaseAtomSpecificEvent implements Messag
     private URI targetSocket;
     private String welcomeMessage;
 
+    @Deprecated
     public ConnectCommandEvent(URI atomURI, URI targetAtomURI, URI localSocket, URI targetSocket,
                     String welcomeMessage) {
         super(atomURI);
@@ -39,14 +41,15 @@ public class ConnectCommandEvent extends BaseAtomSpecificEvent implements Messag
         this.welcomeMessage = welcomeMessage;
     }
 
-    public ConnectCommandEvent(URI atomURI, URI targetAtomURI, String welcomeMessage) {
-        super(atomURI);
-        this.targetAtomURI = targetAtomURI;
+    public ConnectCommandEvent(URI localSocket, URI targetSocket,
+                    String welcomeMessage) {
+        super(WonMessageUtils.stripFragment(localSocket));
+        Objects.requireNonNull(localSocket);
+        Objects.requireNonNull(targetSocket);
+        this.targetAtomURI = WonMessageUtils.stripFragment(targetSocket);
+        this.localSocket = localSocket;
+        this.targetSocket = targetSocket;
         this.welcomeMessage = welcomeMessage;
-    }
-
-    public ConnectCommandEvent(URI atomURI, URI targetAtomURI) {
-        this(atomURI, targetAtomURI, "Hello!");
     }
 
     @Override

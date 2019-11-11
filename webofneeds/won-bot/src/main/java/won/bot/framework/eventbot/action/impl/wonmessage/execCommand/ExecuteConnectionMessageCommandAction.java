@@ -28,7 +28,7 @@ import won.protocol.util.WonRdfUtils;
  * as the content of the message.
  */
 public class ExecuteConnectionMessageCommandAction
-                extends ExecuteSendMessageCommandAction<ConnectionMessageCommandEvent> {
+                extends ExecuteMessageCommandAction<ConnectionMessageCommandEvent> {
     public ExecuteConnectionMessageCommandAction(EventListenerContext eventListenerContext) {
         super(eventListenerContext, true);
     }
@@ -70,13 +70,8 @@ public class ExecuteConnectionMessageCommandAction
         Model localMessageModel = RdfUtils.cloneModel(messageCommandEvent.getMessageModel());
         Dataset connectionRDF = getEventListenerContext().getLinkedDataSource()
                         .getDataForResource(messageCommandEvent.getConnectionURI());
-        URI targetAtom = WonRdfUtils.ConnectionUtils.getTargetAtomURIFromConnection(connectionRDF,
-                        messageCommandEvent.getConnectionURI());
-        URI localAtom = WonRdfUtils.ConnectionUtils.getLocalAtomURIFromConnection(connectionRDF,
-                        messageCommandEvent.getConnectionURI());
         URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF,
                         messageCommandEvent.getConnectionURI());
-        Dataset targetAtomRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(targetAtom);
         URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
         RdfUtils.replaceBaseURI(localMessageModel, messageURI.toString());
         WonMessageBuilder wmb = WonMessageBuilder.setMessagePropertiesForConnectionMessage(messageURI,

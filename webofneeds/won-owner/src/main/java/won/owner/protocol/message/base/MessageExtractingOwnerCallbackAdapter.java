@@ -65,7 +65,11 @@ public class MessageExtractingOwnerCallbackAdapter extends OwnerCallbackAdapter 
             // message with onlny one response is our node's response plus the echo
             // our node's response (the response in this delivery chain) has the connection
             // URI
-            connectionUri = Optional.of(wonMessage.getResponse().get().getSenderURIRequired());
+            if (wonMessage.getHeadMessage().get().getMessageTypeRequired().isConnectionSpecificMessage()) {
+                connectionUri = Optional.of(wonMessage.getResponse().get().getSenderURIRequired());
+            } else {
+                return null;
+            }
         } else if (wonMessage.isRemoteResponse()) {
             // only a remote response. Our connection URI isn't there at all
             // here, we fetch it from the node by asking for the connection for the two

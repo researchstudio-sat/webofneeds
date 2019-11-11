@@ -33,7 +33,7 @@ import won.protocol.util.WonRdfUtils;
  * Action executing a ConnectCommandEvent, connecting to the targetAtom on
  * behalf of the atom.
  */
-public class ExecuteCloseCommandAction extends ExecuteSendMessageCommandAction<CloseCommandEvent> {
+public class ExecuteCloseCommandAction extends ExecuteMessageCommandAction<CloseCommandEvent> {
     public ExecuteCloseCommandAction(final EventListenerContext eventListenerContext) {
         super(eventListenerContext);
     }

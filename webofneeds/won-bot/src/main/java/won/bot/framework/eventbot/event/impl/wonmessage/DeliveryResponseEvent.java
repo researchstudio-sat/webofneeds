@@ -17,6 +17,7 @@ import won.bot.framework.eventbot.event.BaseEvent;
 import won.bot.framework.eventbot.event.ResponseEvent;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageUtils;
+import won.protocol.model.Connection;
 
 /**
  * Event published whenever a WonMessage is received that indicates the failure
@@ -26,14 +27,16 @@ public class DeliveryResponseEvent extends BaseEvent implements ResponseEvent {
     private URI originalMessageURI;
     private WonMessage message;
     private URI senderAtomURI;
+    private Optional<Connection> con;
 
-    public DeliveryResponseEvent(URI originalMessageURI, WonMessage message) {
+    public DeliveryResponseEvent(URI originalMessageURI, WonMessage message, Optional<Connection> con) {
         assert originalMessageURI != null : "originalMessageURI must not be null!";
         assert message != null : "responseMessage must not be null!";
         this.originalMessageURI = originalMessageURI;
         this.message = message;
         this.senderAtomURI = WonMessageUtils.getSenderAtomURI(message).orElseThrow(() -> new IllegalArgumentException(
                         "Could not obtain sender atom URI for message " + message.getMessageURI()));
+        this.con = con;
     }
 
     public URI getOriginalMessageURI() {
@@ -45,15 +48,24 @@ public class DeliveryResponseEvent extends BaseEvent implements ResponseEvent {
     }
 
     public Optional<URI> getConnectionURI() {
-        return Optional.ofNullable(message.getRecipientURI());
+        if (con.isPresent()) {
+            return Optional.of(con.get().getConnectionURI());
+        }
+        return Optional.empty();
     }
 
     public Optional<URI> getSocketURI() {
-        return Optional.ofNullable(message.getRecipientSocketURI());
+        if (con.isPresent()) {
+            return Optional.of(con.get().getSocketURI());
+        }
+        return Optional.empty();
     }
 
     public Optional<URI> getTargetSocketURI() {
-        return Optional.ofNullable(message.getSenderSocketURI());
+        if (con.isPresent()) {
+            return Optional.of(con.get().getTargetSocketURI());
+        }
+        return Optional.empty();
     }
 
     @Override

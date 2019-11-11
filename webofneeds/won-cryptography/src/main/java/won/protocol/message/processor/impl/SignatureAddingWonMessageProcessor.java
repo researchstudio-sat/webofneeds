@@ -6,6 +6,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -56,7 +57,6 @@ public class SignatureAddingWonMessageProcessor implements WonMessageProcessor {
         for (WonMessage message : wonMessage.getAllMessages()) {
             // use senderAtom key for signing
             Optional<URI> senderAtomURI = Optional.of(message.getSenderAtomURI());
-            // messageRoutingInfoService.senderAtom(message);
             if (!senderAtomURI.isPresent()) {
                 throw new WonMessageProcessingException(
                                 "Cannot determine sender atom of message " + message.getMessageURI());
@@ -64,6 +64,8 @@ public class SignatureAddingWonMessageProcessor implements WonMessageProcessor {
             String alias = keyPairAliasDerivationStrategy.getAliasForAtomUri(senderAtomURI.get().toString());
             PrivateKey privateKey = cryptographyService.getPrivateKey(alias);
             PublicKey publicKey = cryptographyService.getPublicKey(alias);
+            Objects.requireNonNull(publicKey);
+            Objects.requireNonNull(publicKey);
             try {
                 ret.add(processWithKey(message, senderAtomURI.get().toString(), privateKey, publicKey));
             } catch (Exception e) {

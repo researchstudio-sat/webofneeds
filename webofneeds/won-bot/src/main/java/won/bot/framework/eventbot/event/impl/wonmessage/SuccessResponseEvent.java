@@ -11,16 +11,18 @@
 package won.bot.framework.eventbot.event.impl.wonmessage;
 
 import java.net.URI;
+import java.util.Optional;
 
 import won.protocol.message.WonMessage;
+import won.protocol.model.Connection;
 
 /**
  * Event published whenever a WonMessage is received that indicates the failure
  * of a previous message.
  */
 public class SuccessResponseEvent extends DeliveryResponseEvent {
-    public SuccessResponseEvent(URI originalMessageURI, WonMessage successMessage) {
-        super(originalMessageURI, successMessage);
+    public SuccessResponseEvent(URI originalMessageURI, WonMessage successMessage, Optional<Connection> con) {
+        super(originalMessageURI, successMessage, con);
     }
 
     public WonMessage getSuccessMessage() {

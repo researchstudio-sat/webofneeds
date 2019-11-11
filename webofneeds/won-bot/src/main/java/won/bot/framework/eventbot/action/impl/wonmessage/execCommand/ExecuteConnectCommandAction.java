@@ -33,7 +33,7 @@ import won.protocol.util.WonRdfUtils;
  * Action executing a ConnectCommandEvent, connecting to the targetAtom on
  * behalf of the atom.
  */
-public class ExecuteConnectCommandAction extends ExecuteSendMessageCommandAction<ConnectCommandEvent> {
+public class ExecuteConnectCommandAction extends ExecuteMessageCommandAction<ConnectCommandEvent> {
     public ExecuteConnectCommandAction(final EventListenerContext eventListenerContext) {
         super(eventListenerContext);
     }
@@ -78,15 +78,11 @@ public class ExecuteConnectCommandAction extends ExecuteSendMessageCommandAction
         WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         Dataset localAtomRDF = getEventListenerContext().getLinkedDataSource()
                         .getDataForResource(connectCommandEvent.getAtomURI());
-        Dataset targetAtomRDF = getEventListenerContext().getLinkedDataSource()
-                        .getDataForResource(connectCommandEvent.getTargetAtomURI());
         URI localWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(localAtomRDF, connectCommandEvent.getAtomURI());
-        URI remoteWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(targetAtomRDF,
-                        connectCommandEvent.getTargetAtomURI());
+        connectCommandEvent.getTargetAtomURI();
         return WonMessageBuilder.setMessagePropertiesForConnect(
                         wonNodeInformationService.generateEventURI(localWonNode), connectCommandEvent.getLocalSocket(),
-                        connectCommandEvent.getAtomURI(), localWonNode, connectCommandEvent.getTargetSocket(),
-                        connectCommandEvent.getTargetAtomURI(), remoteWonNode, connectCommandEvent.getWelcomeMessage())
+                        connectCommandEvent.getTargetSocket(), connectCommandEvent.getWelcomeMessage())
                         .build();
     }
 }

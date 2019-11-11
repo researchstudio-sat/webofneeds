@@ -13,6 +13,7 @@ package won.bot.framework.bot.base;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.Executor;
 
 import org.apache.jena.query.Dataset;
@@ -179,10 +180,11 @@ public abstract class EventBot extends ScheduledTriggerBot {
     }
 
     @Override
-    public final void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage) {
+    public final void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage,
+                    Optional<Connection> con) {
         logMessage(wonMessage);
         if (getLifecyclePhase().isActive()) {
-            eventBus.publish(new FailureResponseEvent(failedMessageUri, wonMessage));
+            eventBus.publish(new FailureResponseEvent(failedMessageUri, wonMessage, con));
         } else {
             logger.info("not publishing event for call to onFailureResponse() as the bot is not in state {} but {}",
                             BotLifecyclePhase.ACTIVE, getLifecyclePhase());
@@ -190,10 +192,11 @@ public abstract class EventBot extends ScheduledTriggerBot {
     }
 
     @Override
-    public final void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage) {
+    public final void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage,
+                    Optional<Connection> con) {
         logMessage(wonMessage);
         if (getLifecyclePhase().isActive()) {
-            eventBus.publish(new SuccessResponseEvent(successfulMessageUri, wonMessage));
+            eventBus.publish(new SuccessResponseEvent(successfulMessageUri, wonMessage, con));
         } else {
             logger.info("not publishing event for call to onSuccessResponse() as the bot is not in state {} but {}",
                             BotLifecyclePhase.ACTIVE, getLifecyclePhase());

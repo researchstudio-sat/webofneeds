@@ -11,6 +11,7 @@
 package won.owner.protocol.message.base;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Optional;
 
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
@@ -78,10 +79,12 @@ public abstract class OwnerCallbackAdapter implements WonMessageProcessor {
                 adaptee.onCloseFromOtherAtom(makeConnection(message), focalMessage);
                 break;
             case SUCCESS_RESPONSE:
-                adaptee.onSuccessResponse(focalMessage.getRespondingToMessageURI(), focalMessage);
+                adaptee.onSuccessResponse(focalMessage.getRespondingToMessageURI(), focalMessage,
+                                Optional.ofNullable(makeConnection(message)));
                 break;
             case FAILURE_RESPONSE:
-                adaptee.onFailureResponse(focalMessage.getRespondingToMessageURI(), focalMessage);
+                adaptee.onFailureResponse(focalMessage.getRespondingToMessageURI(), focalMessage,
+                                Optional.ofNullable(makeConnection(message)));
                 break;
             case CREATE_ATOM:
                 logger.debug("Handling CREATE_ATOM for message {}", focalMessage);

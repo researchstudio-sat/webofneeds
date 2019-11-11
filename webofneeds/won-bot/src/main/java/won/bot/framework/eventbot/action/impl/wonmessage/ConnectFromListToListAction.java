@@ -165,7 +165,6 @@ public class ConnectFromListToListAction extends BaseEventBotAction {
                                         .orElseThrow(() -> new IllegalStateException(
                                                         "No suitable sockets found for connect on " + fromUri))
                                         .get(),
-                        fromUri, localWonNode,
                         toSocketType.map(socketType -> WonLinkedDataUtils
                                         .getSocketsOfType(toUri, socketType,
                                                         getEventListenerContext().getLinkedDataSource())
@@ -173,7 +172,7 @@ public class ConnectFromListToListAction extends BaseEventBotAction {
                                         .orElseThrow(() -> new IllegalStateException(
                                                         "No suitable sockets found for connect on " + fromUri))
                                         .get(),
-                        toUri, remoteWonNode, welcomeMessage).build();
+                        welcomeMessage).build();
     }
 
     public static abstract class ConnectHook {

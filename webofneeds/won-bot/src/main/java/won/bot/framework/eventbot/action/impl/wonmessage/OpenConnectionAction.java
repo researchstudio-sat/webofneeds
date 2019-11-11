@@ -99,11 +99,9 @@ public class OpenConnectionAction extends BaseEventBotAction {
                     URI targetSocket) throws WonMessageBuilderException {
         WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         Dataset localAtomRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(fromUri);
-        Dataset targetAtomRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(toUri);
         URI localWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(localAtomRDF, fromUri);
-        URI remoteWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(targetAtomRDF, toUri);
         return WonMessageBuilder.setMessagePropertiesForConnect(
-                        wonNodeInformationService.generateEventURI(localWonNode), localSocket, fromUri, localWonNode,
-                        targetSocket, toUri, remoteWonNode, welcomeMessage).build();
+                        wonNodeInformationService.generateEventURI(localWonNode), localSocket,
+                        targetSocket, welcomeMessage).build();
     }
 }

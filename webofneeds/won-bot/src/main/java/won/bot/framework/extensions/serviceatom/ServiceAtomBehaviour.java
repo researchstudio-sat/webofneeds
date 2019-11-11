@@ -180,12 +180,10 @@ public class ServiceAtomBehaviour extends BotBehaviour {
                                                                                                 .orElseThrow(() -> new IllegalStateException(
                                                                                                                 "no suitable socket for connecting on created atom "
                                                                                                                                 + createdAtomUri)),
-                                                                                createdAtomUri, localWonNode,
                                                                                 botServiceAtomHolderSocketUri
                                                                                                 .orElseThrow(() -> new IllegalStateException(
                                                                                                                 "no suitable socket for connecting on bot service atom "
                                                                                                                                 + botServiceAtomUri)),
-                                                                                botServiceAtomUri, remoteWonNode,
                                                                                 "Automated Connect to Service Atom")
                                                                 .build();
                                                 ctx.getWonMessageSender().sendWonMessage(connectToServiceAtomMessage);
