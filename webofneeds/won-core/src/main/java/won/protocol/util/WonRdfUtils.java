@@ -1312,7 +1312,7 @@ public class WonRdfUtils {
             pmap.withDefaultMappings(PrefixMapping.Standard);
             pmap.setNsPrefix("won", WON.getURI());
             pmap.setNsPrefix("msg", WONMSG.getURI());
-            Path path = PathParser.parse("won:connectionContainer", pmap);
+            Path path = PathParser.parse("won:connections", pmap);
             Iterator<URI> it = RdfUtils.getURIsForPropertyPath(dataset, atomURI, path);
             return it.hasNext() ? Optional.of(it.next()) : Optional.empty();
         }
