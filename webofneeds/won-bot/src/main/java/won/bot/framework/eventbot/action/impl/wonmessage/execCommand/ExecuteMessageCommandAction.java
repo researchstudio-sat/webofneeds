@@ -41,17 +41,17 @@ import java.lang.invoke.MethodHandles;
  * determine if response listeners for a response from the remote node are to be
  * registered
  */
-public abstract class ExecuteSendMessageCommandAction<T extends MessageCommandEvent> extends BaseEventBotAction {
+public abstract class ExecuteMessageCommandAction<T extends MessageCommandEvent> extends BaseEventBotAction {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private boolean messageIsSentToRemoteNode;
 
-    protected ExecuteSendMessageCommandAction(EventListenerContext eventListenerContext,
+    protected ExecuteMessageCommandAction(EventListenerContext eventListenerContext,
                     boolean messageIsSentToRemoteNode) {
         super(eventListenerContext);
         this.messageIsSentToRemoteNode = messageIsSentToRemoteNode;
     }
 
-    public ExecuteSendMessageCommandAction(final EventListenerContext eventListenerContext) {
+    public ExecuteMessageCommandAction(final EventListenerContext eventListenerContext) {
         this(eventListenerContext, true);
     }
 
