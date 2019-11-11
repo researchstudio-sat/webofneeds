@@ -256,9 +256,9 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
         try {
             if (preExistingLatch != null) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("resource " + cacheKey
+                    logger.debug("resource {}"
                                     + " is being fetched in another thread, we wait for its result and use it "
-                                    + "if it turns out to be cacheable");
+                                    + "if it turns out to be cacheable", cacheKey);
                 }
                 // in this case, another thread is already fetching the URI. Wait.
                 try {
@@ -272,7 +272,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
                 Element element = cache.get(cacheKey);
                 if (element != null) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("resource " + cacheKey + " turned out to be cacheable, using it");
+                        logger.debug("resource {} turned out to be cacheable, using it", cacheKey);
                     }
                     // ok, we'll recreate a response from the cache.
                     // Caution: this is not a copy, it's the SAME dataset - so manipulating the
@@ -281,7 +281,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
                     return entry.recreateResponse();
                 }
                 if (logger.isDebugEnabled()) {
-                    logger.debug("resource " + cacheKey + " did not turn out to be cacheable - fetching it, too");
+                    logger.debug("resource {} did not turn out to be cacheable - fetching it, too", cacheKey);
                 }
                 // so the cache still doesn't have it. We think it's better to let every thread
                 // fetch it for itself.
@@ -312,7 +312,8 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
                 // the expires header was invalid (e.g. '0'), which means: already expired.
                 // Don't cache.
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Fetched {}. Will not be cached due to invalid 'Expires' header sent by server");
+                    logger.debug("Fetched {}. Will not be cached due to invalid 'Expires' header sent by server",
+                                    resource);
                 }
                 return responseData;
             }
