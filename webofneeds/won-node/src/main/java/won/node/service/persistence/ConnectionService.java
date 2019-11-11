@@ -6,6 +6,8 @@ import java.text.MessageFormat;
 import java.util.Objects;
 import java.util.Optional;
 
+import javax.persistence.EntityManager;
+
 import org.apache.jena.graph.TripleBoundary;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -73,6 +75,8 @@ public class ConnectionService {
     DatasetHolderRepository datasetHolderRepository;
     @Autowired
     MessageEventRepository messageEventRepository;
+    @Autowired
+    EntityManager entityManager;
 
     public Optional<Connection> getConnection(URI connectionURI) {
         return connectionRepository.findOneByConnectionURI(connectionURI);
@@ -106,6 +110,7 @@ public class ConnectionService {
         URI recipientSocketURI = wonMessage.getRecipientSocketURIRequired();
         failIfIsNotSocketOfAtom(Optional.of(senderSocketURI), Optional.of(senderAtomURI));
         failIfIsNotSocketOfAtom(Optional.of(recipientSocketURI), Optional.of(recipientAtomURI));
+        logger.debug("connect from owner: processing message {}", wonMessage.getMessageURI());
         Connection con = connectFromOwner(senderAtomURI, senderSocketURI, senderNodeURI, recipientAtomURI,
                         recipientSocketURI);
         return con;
@@ -121,27 +126,53 @@ public class ConnectionService {
         Objects.requireNonNull(senderSocketURI);
         Objects.requireNonNull(recipientSocketURI);
         Optional<Connection> con;
-        // lock the atom so we don't make writes that cancel each other out in case we
-        // process an connect from node in parallel
-        Atom atom = atomRepository.findOneByAtomURIForUpdate(senderAtomURI);
+        // // lock the atom so we don't make writes that cancel each other out in case
+        // we
+        // // process an connect from node in parallel
+        // if (logger.isDebugEnabled()) {
+        // logger.debug("connect from owner: locking atom {}", senderAtomURI);
+        // }
+        // Atom atom = atomRepository.findOneByAtomURIForUpdate(senderAtomURI);
+        // entityManager.refresh(atom);
         Socket actualSocket = socketService.getSocket(senderAtomURI, Optional.of(senderSocketURI));
         Optional<URI> actualSocketURI = Optional.of(actualSocket.getSocketURI());
         Optional<URI> actualTargetSocketURI = Optional.of(recipientSocketURI);
         failIfIsNotSocketOfAtom(Optional.of(recipientSocketURI), Optional.of(recipientAtomURI));
+        if (logger.isDebugEnabled()) {
+            logger.debug("connect from owner: loading connection {} - {}", actualSocketURI.get(),
+                            actualTargetSocketURI.get());
+        }
         con = connectionRepository.findOneBySocketURIAndTargetSocketURIForUpdate(actualSocketURI.get(),
                         actualTargetSocketURI.get());
         if (!con.isPresent()) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("connect from owner: did not find an existing connection");
+            }
             // did not find such a connection either. We can safely create a new one
             // create Connection in Database
             con = Optional.of(createConnection(senderAtomURI, recipientAtomURI,
                             actualSocket.getSocketURI(), actualSocket.getTypeURI(), actualTargetSocketURI.get(),
                             Optional.empty(),
                             ConnectionState.REQUEST_SENT, ConnectionEventType.OWNER_CONNECT));
+            if (logger.isDebugEnabled()) {
+                logger.debug("connect from owner: created new connection {}", con.get().getConnectionURI());
+            }
+        } else {
+            entityManager.refresh(con.get());
+            if (logger.isDebugEnabled()) {
+                logger.debug("connect from owner: found existing connection {} in state {}",
+                                con.get().getConnectionURI(),
+                                con.get().getState());
+            }
         }
         failForExceededCapacity(con.get().getSocketURI());
         failForIncompatibleSockets(con.get().getSocketURI(), con.get().getTargetSocketURI());
         // state transiation
         con.get().setState(con.get().getState().transit(ConnectionEventType.OWNER_CONNECT));
+        if (logger.isDebugEnabled()) {
+            logger.debug("connect from owner: set connection {} state to: {}", con.get().getConnectionURI(),
+                            con.get().getState());
+        }
         return connectionRepository.saveAndFlush(con.get());
     }
 
@@ -154,6 +185,7 @@ public class ConnectionService {
         URI wonNodeUriFromWonMessage = wonMessage.getRecipientNodeURIRequired();
         URI senderAtomUri = wonMessage.getSenderAtomURIRequired();
         URI senderSocketURI = wonMessage.getSenderSocketURIRequired();
+        logger.debug("connect from node: processing message {}", wonMessage.getMessageURI());
         return connectFromNode(recipientAtomUri, recipientSocketURI, wonNodeUriFromWonMessage, senderAtomUri,
                         senderSocketURI);
     }
@@ -170,19 +202,37 @@ public class ConnectionService {
         // the remote socket must be specified in a message coming from another node
         failIfIsNotSocketOfAtom(Optional.of(senderSocketURI), Optional.of(senderAtomUri));
         Connection con = null;
-        // lock the atom so we don't make writes that cancel each other out in case we
-        // process an connect from owner in parallel
-        Atom atom = atomRepository.findOneByAtomURIForUpdate(recipientAtomUri);
+        // // lock the atom so we don't make writes that cancel each other out in case
+        // we
+        // // process an connect from owner in parallel
+        // if (logger.isDebugEnabled()) {
+        // logger.debug("connect from node: locking atom {}", recipientAtomUri);
+        // }
+        // Atom atom = atomRepository.findOneByAtomURIForUpdate(recipientAtomUri);
+        // entityManager.refresh(atom);
         // the sender did not know about our connection. try to find out if one exists
         // that we can use
         // we know which remote socket to connect to. There may be a connection with
         // that information already, either because the hint pointed to the remote
         // socket or because the connection is already in a different state and this
         // is a duplicate connect..
+        if (logger.isDebugEnabled()) {
+            logger.debug("connect from node: loading connection {} - {}", socket.getSocketURI(), senderSocketURI);
+        }
         Optional<Connection> conOpt = connectionRepository
                         .findOneBySocketURIAndTargetSocketURIForUpdate(socket.getSocketURI(), senderSocketURI);
         if (conOpt.isPresent()) {
+            entityManager.refresh(conOpt.get());
+            if (logger.isDebugEnabled()) {
+                logger.debug("connect from node: found existing connection {} in state {}",
+                                conOpt.get().getConnectionURI(),
+                                conOpt.get().getState());
+            }
             con = conOpt.get();
+        } else {
+            if (logger.isDebugEnabled()) {
+                logger.debug("connect from node: did not find an existing connection");
+            }
         }
         failForExceededCapacity(socket.getSocketURI());
         failForIncompatibleSockets(socket.getSocketURI(), senderSocketURI);
@@ -191,9 +241,14 @@ public class ConnectionService {
             con = createConnection(recipientAtomUri, senderAtomUri,
                             socket.getSocketURI(), socket.getTypeURI(), senderSocketURI, Optional.empty(),
                             ConnectionState.REQUEST_RECEIVED, ConnectionEventType.PARTNER_CONNECT);
+            if (logger.isDebugEnabled()) {
+                logger.debug("connect from node: created new connection {}", con.getConnectionURI());
+            }
         }
-        con.setTargetSocketURI(senderSocketURI);
         con.setState(con.getState().transit(ConnectionEventType.PARTNER_CONNECT));
+        if (logger.isDebugEnabled()) {
+            logger.debug("connect from node: set connection {} state to: {}", con.getConnectionURI(), con.getState());
+        }
         return connectionRepository.saveAndFlush(con);
     }
 
@@ -226,16 +281,32 @@ public class ConnectionService {
         if (!socketService.isCompatible(recipientSocketURI, targetSocketURI)) {
             throw new IncompatibleSocketsException(recipientSocketURI, targetSocketURI);
         }
-        atomRepository.findOneByAtomURIForUpdate(recipientAtomURI);
+        // if (logger.isDebugEnabled()) {
+        // logger.debug("socket hint: locking atom {}", recipientAtomURI);
+        // }
+        // Atom atom = atomRepository.findOneByAtomURIForUpdate(recipientAtomURI);
+        // entityManager.refresh(atom);
         Socket socket = socketService.getSocket(recipientAtomURI, Optional.ofNullable(recipientSocketURI));
         // create Connection in Database
         URI targetAtomURI = socketService.getAtomOfSocketRequired(targetSocketURI);
         Optional<Connection> con = connectionRepository
                         .findOneBySocketURIAndTargetSocketURIForUpdate(socket.getSocketURI(), targetSocketURI);
-        return con.orElseGet(() -> createConnection(recipientAtomURI, targetAtomURI,
+        if (con.isPresent()) {
+            entityManager.refresh(con);
+            if (logger.isDebugEnabled()) {
+                logger.debug("socket hint: connection {} - {} already exists", con.get().getSocketURI(),
+                                con.get().getTargetSocketURI());
+            }
+            return con.get();
+        }
+        Connection newCon = createConnection(recipientAtomURI, targetAtomURI,
                         recipientSocketURI, socket.getTypeURI(), targetSocketURI, Optional.empty(),
                         ConnectionState.SUGGESTED,
-                        ConnectionEventType.MATCHER_HINT));
+                        ConnectionEventType.MATCHER_HINT);
+        if (logger.isDebugEnabled()) {
+            logger.debug("socket hint: created connection {}", newCon.getConnectionURI());
+        }
+        return newCon;
     }
 
     /**
@@ -271,9 +342,12 @@ public class ConnectionService {
         if (socketTypeURI == null)
             throw new IllegalArgumentException("socketTypeURI is not set");
         // Load atom (throws exception if not found)
-        Atom atom = atomRepository.findOneByAtomURIForUpdate(atomURI);
-        if (atom.getState() != AtomState.ACTIVE)
-            throw new IllegalMessageForAtomStateException(atomURI, connectionEventType.name(), atom.getState());
+        Optional<Atom> atom = atomRepository.findOneByAtomURIForUpdate(atomURI);
+        if (atom.isPresent()) {
+            entityManager.refresh(atom.get());
+        }
+        if (atom.get().getState() != AtomState.ACTIVE)
+            throw new IllegalMessageForAtomStateException(atomURI, connectionEventType.name(), atom.get().getState());
         // TODO: create a proper exception if a socket is not supported by an atom
         if (socketRepository.findByAtomURIAndTypeURI(atomURI, socketTypeURI).isEmpty())
             throw new RuntimeException("Socket '" + socketTypeURI + "' is not supported by Atom: '" + atomURI + "'");

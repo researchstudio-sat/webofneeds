@@ -8,8 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import won.protocol.exception.IncoherentDatabaseStateException;
 import won.protocol.exception.NoSuchMessageException;
@@ -58,7 +56,6 @@ public class MessageService {
         return getMessage(messageURI, parentURI).orElseThrow(() -> new NoSuchMessageException(messageURI));
     }
 
-    @Transactional(propagation = Propagation.MANDATORY)
     public Optional<URI> getParentofMessage(WonMessage msg, WonMessageDirection direction) {
         WonMessageType type = msg.getMessageTypeRequired();
         if (type.isResponseMessage()) {
@@ -66,7 +63,7 @@ public class MessageService {
         }
         if (type.isAtomSpecificMessage()) {
             // no need to look into the db:
-            return Optional.of(WonMessageUtils.getParentAtomUri(msg));
+            return WonMessageUtils.getParentAtomUri(msg, direction);
         } else if (type.isConnectionSpecificMessage() && !type.isHintMessage()) {
             Optional<URI> ourSocket = Optional.empty();
             Optional<URI> theirSocket = Optional.empty();
@@ -78,7 +75,8 @@ public class MessageService {
                 theirSocket = Optional.ofNullable(msg.getRecipientSocketURIRequired());
             }
             if (ourSocket.isPresent() && theirSocket.isPresent()) {
-                Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(ourSocket.get(),
+                Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(
+                                ourSocket.get(),
                                 theirSocket.get());
                 if (con.isPresent()) {
                     return Optional.of(con.get().getConnectionURI());
@@ -88,10 +86,44 @@ public class MessageService {
         return Optional.empty();
     }
 
-    @Transactional(propagation = Propagation.MANDATORY)
+    public Optional<URI> getAtomOfMessage(WonMessage message, WonMessageDirection direction) {
+        return WonMessageUtils.getParentAtomUri(message, direction);
+    }
+
+    public Optional<URI> getConnectionofMessage(WonMessage msg, WonMessageDirection direction) {
+        WonMessageType type = msg.getMessageTypeRequired();
+        if (type.isResponseMessage()) {
+            type = msg.getRespondingToMessageTypeRequired();
+        }
+        if (!type.isConnectionSpecificMessage()) {
+            return Optional.empty();
+        }
+        Optional<URI> ourSocket = Optional.empty();
+        Optional<URI> theirSocket = Optional.empty();
+        if (type.isSocketHintMessage()) {
+            // special handling for hints
+            ourSocket = Optional.ofNullable(msg.getRecipientSocketURIRequired());
+            theirSocket = Optional.ofNullable(msg.getHintTargetSocketURIRequired());
+        } else {
+            if (direction.isFromExternal()) {
+                ourSocket = Optional.ofNullable(msg.getRecipientSocketURIRequired());
+                theirSocket = Optional.ofNullable(msg.getSenderSocketURIRequired());
+            } else {
+                ourSocket = Optional.ofNullable(msg.getSenderSocketURIRequired());
+                theirSocket = Optional.ofNullable(msg.getRecipientSocketURIRequired());
+            }
+        }
+        if (ourSocket.isPresent() && theirSocket.isPresent()) {
+            return connectionRepository.findOneBySocketURIAndTargetSocketURI(ourSocket.get(),
+                            theirSocket.get()).map(Connection::getConnectionURI);
+        }
+        return Optional.empty();
+    }
+
     public void saveMessage(final WonMessage message, URI parent) {
         for (WonMessage wonMessage : message.getAllMessages()) {
-            logger.debug("STORING message with uri {} and parent uri", wonMessage.getMessageURI(), parent);
+            logger.debug("STORING {} message {} under parent {}", new Object[] { wonMessage.getMessageType(),
+                            wonMessage.getMessageURI(), parent });
             MessageContainer container = loadOrCreateMessageContainer(parent, wonMessage.getMessageType());
             MessageEvent event = new MessageEvent(parent, wonMessage, container);
             // a message can be in multiple containers (=parents), such messages share a
@@ -104,7 +136,6 @@ public class MessageService {
         }
     }
 
-    @Transactional(propagation = Propagation.MANDATORY)
     public MessageContainer loadOrCreateMessageContainer(final URI parent, final WonMessageType messageType) {
         if (WonMessageType.CREATE_ATOM.equals(messageType)) {
             // create an atom event container with null parent (because it will only be
@@ -124,7 +155,7 @@ public class MessageService {
             if (container != null)
                 return container;
             ConnectionMessageContainer cec = new ConnectionMessageContainer(null, parent);
-            connectionMessageContainerRepository.saveAndFlush(cec);
+            connectionMessageContainerRepository.save(cec);
             return connectionMessageContainerRepository.findOne(cec.getId());
         }
         return messageContainerRepository.findOneByParentUriForUpdate(parent)
