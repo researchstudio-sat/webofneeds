@@ -12,7 +12,6 @@ package won.protocol.model;
 
 import java.net.URI;
 import java.util.Date;
-import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -57,11 +56,11 @@ public class Connection implements ParentAware<ConnectionContainer>, VersionedEn
     @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date lastUpdate = new Date();
     /* The public URI of this connection */
-    @Column(name = "connectionURI", unique = true)
+    @Column(name = "connectionURI", unique = true, nullable = false)
     @Convert(converter = URIConverter.class)
     private URI connectionURI;
     /* The uri of the connection's atom object */
-    @Column(name = "atomURI")
+    @Column(name = "atomURI", nullable = false)
     @Convert(converter = URIConverter.class)
     private URI atomURI;
     /* The uri of the socket's type */
@@ -72,14 +71,14 @@ public class Connection implements ParentAware<ConnectionContainer>, VersionedEn
      * The uri of the socket. This must be a resource defined in the atom's content.
      * The type of that resource is the typeURI
      */
-    @Column(name = "socketURI")
+    @Column(name = "socketURI", nullable = false)
     @Convert(converter = URIConverter.class)
     private URI socketURI;
     /*
      * The uri of the remote socket. This must be a resource defined in the remote
      * atom's content or null, if we don't know it yet
      */
-    @Column(name = "targetSocketURI")
+    @Column(name = "targetSocketURI", nullable = false)
     @Convert(converter = URIConverter.class)
     private URI targetSocketURI;
     /* The URI of the remote connection */
@@ -88,11 +87,11 @@ public class Connection implements ParentAware<ConnectionContainer>, VersionedEn
     @Convert(converter = URIConverter.class)
     private URI targetConnectionURI;
     /* The URI of the remote atom */
-    @Column(name = "targetAtomURI")
+    @Column(name = "targetAtomURI", nullable = false)
     @Convert(converter = URIConverter.class)
     private URI targetAtomURI;
     /* The state of the connection */
-    @Column(name = "state")
+    @Column(name = "state", nullable = false)
     @Enumerated(EnumType.STRING)
     private ConnectionState state;
     @OneToOne(fetch = FetchType.LAZY)
@@ -136,10 +135,11 @@ public class Connection implements ParentAware<ConnectionContainer>, VersionedEn
 
     @Override
     public String toString() {
-        return "Connection [id=" + id + ", connectionURI=" + connectionURI + ", atomURI=" + atomURI + ", typeURI="
+        return "Connection [id=" + id + ", state=" + state + ", connectionURI=" + connectionURI + ", atomURI=" + atomURI
+                        + ", typeURI="
                         + typeURI + ", socketURI=" + socketURI + ", targetSocketURI=" + targetSocketURI
                         + ", targetConnectionURI=" + targetConnectionURI + ", targetAtomURI=" + targetAtomURI
-                        + ", state=" + state + "]";
+                        + "]";
     }
 
     public void setTypeURI(URI typeURI) {
@@ -235,30 +235,33 @@ public class Connection implements ParentAware<ConnectionContainer>, VersionedEn
     }
 
     @Override
-    public boolean equals(final Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof Connection))
-            return false;
-        final Connection that = (Connection) o;
-        if (!Objects.equals(connectionURI, that.connectionURI))
-            return false;
-        if (!Objects.equals(atomURI, that.atomURI))
-            return false;
-        if (!Objects.equals(targetConnectionURI, that.targetConnectionURI))
-            return false;
-        if (!Objects.equals(targetAtomURI, that.targetAtomURI))
-            return false;
-        return state == that.state;
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((socketURI == null) ? 0 : socketURI.hashCode());
+        result = prime * result + ((targetSocketURI == null) ? 0 : targetSocketURI.hashCode());
+        return result;
     }
 
     @Override
-    public int hashCode() {
-        int result = connectionURI != null ? connectionURI.hashCode() : 0;
-        result = 31 * result + (atomURI != null ? atomURI.hashCode() : 0);
-        result = 31 * result + (targetConnectionURI != null ? targetConnectionURI.hashCode() : 0);
-        result = 31 * result + (targetAtomURI != null ? targetAtomURI.hashCode() : 0);
-        result = 31 * result + (state != null ? state.hashCode() : 0);
-        return result;
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Connection other = (Connection) obj;
+        if (socketURI == null) {
+            if (other.socketURI != null)
+                return false;
+        } else if (!socketURI.equals(other.socketURI))
+            return false;
+        if (targetSocketURI == null) {
+            if (other.targetSocketURI != null)
+                return false;
+        } else if (!targetSocketURI.equals(other.targetSocketURI))
+            return false;
+        return true;
     }
 }
