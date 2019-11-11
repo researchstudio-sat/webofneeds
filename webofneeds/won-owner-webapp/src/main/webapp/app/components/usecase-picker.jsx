@@ -1,11 +1,43 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { getIn } from "../utils.js";
 import { connect } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
 import WonTitlePicker from "./details/picker/title-picker.jsx";
 import * as useCaseUtils from "../usecase-utils.js";
 
 import "~/style/_usecase-picker.scss";
+
+const mapStateToProps = state => {
+  const visibleUseCasesByConfig = getIn(state, [
+    "config",
+    "theme",
+    "visibleUseCases",
+  ]);
+
+  const showGroupsThreshold = 1;
+  const customUseCase = useCaseUtils.getCustomUseCase();
+
+  const visibleUseCaseGroups =
+    visibleUseCasesByConfig &&
+    useCaseUtils.getVisibleUseCaseGroups(
+      showGroupsThreshold,
+      visibleUseCasesByConfig
+    );
+  const ungroupedUseCases =
+    visibleUseCasesByConfig &&
+    useCaseUtils.getUnGroupedUseCases(
+      showGroupsThreshold,
+      visibleUseCasesByConfig
+    );
+
+  return {
+    customUseCase,
+    visibleUseCaseGroups,
+    ungroupedUseCases,
+    visibleUseCasesByConfig,
+  };
+};
 
 const mapDispatchToProps = dispatch => {
   return {
@@ -23,12 +55,7 @@ class WonUsecasePicker extends React.Component {
       searchText: "",
       searchResults: [],
     };
-    this.showGroupsThreshold = 1;
-    this.customUseCase = useCaseUtils.getCustomUseCase();
-    this.useCaseGroups = useCaseUtils.getUseCaseGroups();
-    this.ungroupedUseCases = useCaseUtils.getUnGroupedUseCases(
-      this.showGroupsThreshold
-    );
+
     this.updateSearch = this.updateSearch.bind(this);
   }
 
@@ -77,22 +104,22 @@ class WonUsecasePicker extends React.Component {
                 <div className="ucp__main__noresults">
                   {"No Results found for '" + this.state.searchText + "'."}
                 </div>
-                {!!this.customUseCase && (
+                {!!this.props.customUseCase && (
                   <div
                     className="ucp__main__newcustom clickable"
-                    onClick={() => this.startFrom(this.customUseCase)}
+                    onClick={() => this.startFrom(this.props.customUseCase)}
                   >
-                    {!!this.customUseCase.icon && (
+                    {!!this.props.customUseCase.icon && (
                       <svg className="ucp__main__newcustom__icon">
                         <use
-                          xlinkHref={this.customUseCase.icon}
-                          href={this.customUseCase.icon}
+                          xlinkHref={this.props.customUseCase.icon}
+                          href={this.props.customUseCase.icon}
                         />
                       </svg>
                     )}
-                    {!!this.customUseCase.label && (
+                    {!!this.props.customUseCase.label && (
                       <div className="ucp__main__newcustom__label">
-                        {this.customUseCase.label}
+                        {this.props.customUseCase.label}
                       </div>
                     )}
                   </div>
@@ -102,57 +129,49 @@ class WonUsecasePicker extends React.Component {
           ) : (
             <React.Fragment>
               {/*<!-- USE CASE GROUPS -->*/}
-              {!!this.useCaseGroups &&
-                Object.values(this.useCaseGroups).map((ucg, index) => {
-                  if (
-                    useCaseUtils.isDisplayableUseCaseGroup(ucg) &&
-                    useCaseUtils.countDisplayableItemsInGroup(ucg) >
-                      this.showGroupsThreshold
-                  ) {
-                    return (
-                      <div
-                        key={ucg.identifier + "-" + index}
-                        className="ucp__main__usecase-group clickable"
-                        onClick={() => this.viewUseCaseGroup(ucg)}
-                      >
-                        {!!ucg.icon && (
-                          <svg className="ucp__main__usecase-group__icon">
-                            <use xlinkHref={ucg.icon} href={ucg.icon} />
-                          </svg>
-                        )}
-                        {!!ucg.label && (
-                          <div className="ucp__main__usecase-group__label">
-                            {ucg.label}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  }
-                })}
+              {!!this.props.visibleUseCaseGroups &&
+                Object.values(this.props.visibleUseCaseGroups).map(
+                  (ucg, index) => (
+                    <div
+                      key={ucg.identifier + "-" + index}
+                      className="ucp__main__usecase-group clickable"
+                      onClick={() => this.viewUseCaseGroup(ucg)}
+                    >
+                      {!!ucg.icon && (
+                        <svg className="ucp__main__usecase-group__icon">
+                          <use xlinkHref={ucg.icon} href={ucg.icon} />
+                        </svg>
+                      )}
+                      {!!ucg.label && (
+                        <div className="ucp__main__usecase-group__label">
+                          {ucg.label}
+                        </div>
+                      )}
+                    </div>
+                  )
+                )}
               {/*<!-- USE CASES WITHOUT GROUPS -->*/}
-              {!!this.ungroupedUseCases &&
-                Object.values(this.ungroupedUseCases).map((useCase, index) => {
-                  if (useCaseUtils.isDisplayableUseCase(useCase)) {
-                    return (
-                      <div
-                        key={useCase.identifier + "-" + index}
-                        className="ucp__main__usecase-group clickable"
-                        onClick={() => this.startFrom(useCase)}
-                      >
-                        {!!useCase.icon && (
-                          <svg className="ucp__main__usecase-group__icon">
-                            <use xlinkHref={useCase.icon} href={useCase.icon} />
-                          </svg>
-                        )}
-                        {!!useCase.label && (
-                          <div className="ucp__main__usecase-group__label">
-                            {useCase.label}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  }
-                })}
+              {!!this.props.ungroupedUseCases &&
+                Object.values(this.props.ungroupedUseCases).map(
+                  (useCase, index) => (
+                    <div
+                      key={useCase.identifier + "-" + index}
+                      className="ucp__main__usecase-group clickable"
+                      onClick={() => this.startFrom(useCase)}
+                    >
+                      {!!useCase.icon && (
+                        <svg className="ucp__main__usecase-group__icon">
+                          <use xlinkHref={useCase.icon} href={useCase.icon} />
+                        </svg>
+                      )}
+                      {!!useCase.label && (
+                        <div className="ucp__main__usecase-group__label">
+                          {useCase.label}
+                        </div>
+                      )}
+                    </div>
+                  )
+                )}
             </React.Fragment>
           )}
         </div>
@@ -199,7 +218,10 @@ class WonUsecasePicker extends React.Component {
       },
       () => {
         if (value && value.trim().length > 1) {
-          const searchResults = useCaseUtils.filterUseCasesBySearchQuery(value);
+          const searchResults = useCaseUtils.filterUseCasesBySearchQuery(
+            value,
+            this.props.visibleUseCasesByConfig
+          );
 
           const sortByLabelAsc = (a, b) => {
             const bValue = b && b.label && b.label.toLowerCase();
@@ -226,9 +248,13 @@ class WonUsecasePicker extends React.Component {
 }
 WonUsecasePicker.propTypes = {
   routerGoCurrent: PropTypes.func,
+  customUseCase: PropTypes.object,
+  visibleUseCaseGroups: PropTypes.objectOf(PropTypes.object),
+  visibleUseCasesByConfig: PropTypes.arrayOf(PropTypes.string),
+  ungroupedUseCases: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default connect(
-  undefined,
+  mapStateToProps,
   mapDispatchToProps
 )(WonUsecasePicker);

@@ -117,10 +117,6 @@ let tempUseCaseGroups = {};
 addUseCaseGroupToTemp(tempUseCaseGroups, useCaseGroups);
 const allUseCaseGroups = tempUseCaseGroups;
 
-export function getUseCaseGroups() {
-  return useCaseGroups;
-}
-
 export function getAllUseCases() {
   return useCases;
 }
