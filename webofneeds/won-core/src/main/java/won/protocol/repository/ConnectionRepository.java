@@ -71,10 +71,6 @@ public interface ConnectionRepository extends WonRepository<Connection> {
 
     List<Connection> findByAtomURIAndTypeURI(URI atomURI, URI socketType);
 
-    /**
-     * Locks all connections for a given socket. Used to avoid race conditions when
-     * deciding if socket capacity is exceeded.
-     */
     @Query("select count (*) from Connection con where socketURI = :socketUri")
     long countBySocketUri(@Param("socketUri") URI socketURI);
 
