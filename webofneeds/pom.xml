@@ -1063,8 +1063,8 @@
         <net.sf.ehcache.version>2.6.8</net.sf.ehcache.version>
         <org.apache.jena.version>3.5.0</org.apache.jena.version>
         <org.apache.jena-tdb.version>3.5.0</org.apache.jena-tdb.version>
-        <org.hibernate.version>5.2.10.Final</org.hibernate.version>
-        <org.hibernate.hibernate-validator.version>5.4.1.Final</org.hibernate.hibernate-validator.version>
+        <org.hibernate.version>5.4.8.Final</org.hibernate.version>
+        <org.hibernate.hibernate-validator.version>6.0.18</org.hibernate.hibernate-validator.version>
         <org.javasimon.version>3.4.0</org.javasimon.version>
         <org.jboss.jandex.version>1.1.0.Final</org.jboss.jandex.version>
         <org.quartz-scheduler.version>2.2.1</org.quartz-scheduler.version>
@@ -1072,8 +1072,8 @@
         <org.springframework.version>4.3.18.RELEASE</org.springframework.version>
         <org.springframework.security.version>4.2.9.RELEASE</org.springframework.security.version>
         <org.slf4j.version>1.6.6</org.slf4j.version>
-        <org.hsqldb.version>2.3.2</org.hsqldb.version>
-        <postgresql.version>42.1.1</postgresql.version>
+        <org.hsqldb.version>2.5.0</org.hsqldb.version>
+        <postgresql.version>42.2.8</postgresql.version>
         <flyway.version>4.0.3</flyway.version>
         <javax.servlet.jstl.version>1.2</javax.servlet.jstl.version>
         <javax.validation.version>1.1.0.Final</javax.validation.version>
