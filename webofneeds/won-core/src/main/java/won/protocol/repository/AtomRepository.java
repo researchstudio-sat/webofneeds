@@ -62,7 +62,7 @@ public interface AtomRepository extends WonRepository<Atom> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select atom from Atom atom where atomURI= :uri")
-    Atom findOneByAtomURIForUpdate(@Param("uri") URI uri);
+    Optional<Atom> findOneByAtomURIForUpdate(@Param("uri") URI uri);
 
     /**
      * Finds atoms that have been inactive between start and end date
