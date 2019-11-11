@@ -134,7 +134,7 @@ public class ServerSideActionService implements WonMessageProcessor {
         URI toWonNodeURI = WonLinkedDataUtils.getWonNodeURIForAtomOrConnectionURI(toAtomURI, linkedDataSource);
         URI messageURI = wonNodeInformationService.generateEventURI(fromWonNodeURI);
         WonMessage msgToSend = WonMessageBuilder.setMessagePropertiesForConnect(messageURI, fromSocket,
-                        fromAtomURI, fromWonNodeURI, toSocket, toAtomURI, toWonNodeURI,
+                        toSocket,
                         "Connect message automatically sent by a server-side action").build();
         try {
             AuthenticationThreadLocal.setAuthentication(authentication);
