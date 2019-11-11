@@ -23,8 +23,6 @@ import java.util.stream.Collectors;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultExchange;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +35,6 @@ import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Atom;
 import won.protocol.model.OwnerApplication;
 import won.protocol.repository.OwnerApplicationRepository;
-import won.protocol.util.RdfUtils;
 
 /**
  * Combines the MESSAGE_HEADER and RESPONSE_HEADER messages and sends them to
@@ -59,17 +56,9 @@ public class ToOwnerSender extends AbstractCamelProcessor {
     public void process(Exchange exchange) throws Exception {
         WonMessage msg = getMessageToSendRequired(exchange);
         Objects.requireNonNull(msg);
-        if (false && !msg.getMessageTypeRequired().isResponseMessage()) {
-            // if we are not processing a response message, we'll have a response to add to
-            // the message:
-            WonMessage response = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.RESPONSE_HEADER);
-            Objects.requireNonNull(response);
-            Dataset merged = DatasetFactory.createGeneral();
-            merged = RdfUtils.addDatasetToDataset(merged, msg.getCompleteDataset());
-            merged = RdfUtils.addDatasetToDataset(merged, response.getCompleteDataset());
-            msg = WonMessage.of(merged);
-        }
-        List<OwnerApplication> ownerApps = getOwnerApplications(msg, getRecipientAtomURIRequired(exchange),
+        URI recipientAtom = getRecipientAtomURIRequired(exchange);
+        Atom atom = atomService.getAtomRequired(recipientAtom);
+        List<OwnerApplication> ownerApps = getOwnerApplications(msg, atom,
                         getOwnerApplicationId(exchange));
         // String methodName =headers.get("methodName").toString();
         logger.debug("number of registered owner applications: {}",
@@ -99,17 +88,16 @@ public class ToOwnerSender extends AbstractCamelProcessor {
      * @param msg
      * @param ownerApplicationId
      */
-    private List<OwnerApplication> getOwnerApplications(WonMessage msg, URI atomURI,
+    private List<OwnerApplication> getOwnerApplications(WonMessage msg, Atom atom,
                     Optional<String> fallbackOwnerApplicationId) {
         Objects.requireNonNull(msg);
-        Objects.requireNonNull(atomURI);
+        Objects.requireNonNull(atom);
         if (logger.isDebugEnabled()) {
             logger.debug("about to send this message to registered owner apps:" + msg.toStringForDebug(true));
         }
-        Atom atom = atomService.getAtomRequired(atomURI);
         List<OwnerApplication> ownerApplications = atom != null ? atom.getAuthorizedApplications() : new ArrayList<>();
         if (logger.isDebugEnabled()) {
-            logger.debug("Atom to send the message {} to: {}", msg.getMessageURI(), atomURI);
+            logger.debug("Atom to send the message {} to: {}", msg.getMessageURI(), atom.getAtomURI());
             logger.debug("Found these ownerapplicationids for message {} : {}", msg.getMessageURI(),
                             ownerApplications);
         }
