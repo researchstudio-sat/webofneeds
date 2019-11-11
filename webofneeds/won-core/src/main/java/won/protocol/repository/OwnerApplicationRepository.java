@@ -8,6 +8,9 @@ import javax.persistence.LockModeType;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import won.protocol.model.OwnerApplication;
 
@@ -19,6 +22,7 @@ public interface OwnerApplicationRepository extends WonRepository<OwnerApplicati
 
     Optional<OwnerApplication> findOneByOwnerApplicationId(String ownerApplicationId);
 
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select app from OwnerApplication app where app.ownerApplicationId = :ownerApplicationId")
     List<OwnerApplication> findByOwnerApplicationIdForUpdate(@Param("ownerApplicationId") String ownerApplicationId);
