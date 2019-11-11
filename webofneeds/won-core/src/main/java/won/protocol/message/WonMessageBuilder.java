@@ -456,40 +456,14 @@ public class WonMessageBuilder {
     public static WonMessageBuilder setMessagePropertiesForConnect(URI messageURI,
                     WonMessage connectToReactTo,
                     String welcomeMessage) {
-        return setMessagePropertiesForRespondingConnect(messageURI,
+        return setMessagePropertiesForConnect(messageURI,
                         connectToReactTo.getRecipientSocketURIRequired(),
-                        connectToReactTo.getRecipientAtomURIRequired(),
-                        connectToReactTo.getRecipientNodeURIRequired(),
                         connectToReactTo.getSenderSocketURIRequired(),
-                        connectToReactTo.getSenderAtomURIRequired(),
-                        connectToReactTo.getSenderNodeURIRequired(),
                         welcomeMessage);
     }
 
-    public static WonMessageBuilder setMessagePropertiesForRespondingConnect(URI messageURI,
-                    URI localSocket,
-                    URI localAtom, URI localWonNode, URI targetSocket, URI targetAtom,
-                    URI remoteWonNode,
-                    String welcomeMessage) {
-        // create content model
-        Model model = ModelFactory.createDefaultModel();
-        RdfUtils.findOrCreateBaseResource(model);
-        RdfUtils.replaceBaseResource(model, model.createResource(messageURI.toString()));
-        if (welcomeMessage != null) {
-            WonRdfUtils.MessageUtils.addMessage(model, welcomeMessage);
-        }
-        WonMessageBuilder builder = new WonMessageBuilder(messageURI)
-                        .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
-                        .setWonMessageType(WonMessageType.CONNECT).setSenderAtomURI(localAtom)
-                        .setSenderNodeURI(localWonNode).setRecipientAtomURI(targetAtom)
-                        .setRecipientNodeURI(remoteWonNode)
-                        .setSenderSocketURI(localSocket)
-                        .setRecipientSocketURI(targetSocket);
-        return builder.addContent(model).setTimestampToNow();
-    }
-
     public static WonMessageBuilder setMessagePropertiesForConnect(URI messageURI, URI localSocket,
-                    URI localAtom, URI localWonNode, URI targetSocket, URI targetAtom, URI remoteWonNode,
+                    URI targetSocket,
                     String welcomeMessage) {
         // create content model
         Model model = ModelFactory.createDefaultModel();
@@ -500,9 +474,7 @@ public class WonMessageBuilder {
         }
         WonMessageBuilder builder = new WonMessageBuilder(messageURI)
                         .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
-                        .setWonMessageType(WonMessageType.CONNECT).setSenderAtomURI(localAtom)
-                        .setSenderNodeURI(localWonNode).setRecipientAtomURI(targetAtom)
-                        .setRecipientNodeURI(remoteWonNode)
+                        .setWonMessageType(WonMessageType.CONNECT)
                         .setSenderSocketURI(localSocket)
                         .setRecipientSocketURI(targetSocket);
         return builder.addContent(model).setTimestampToNow();

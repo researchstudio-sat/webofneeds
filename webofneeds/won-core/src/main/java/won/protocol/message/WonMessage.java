@@ -45,6 +45,7 @@ import com.google.common.collect.Sets;
 import won.protocol.exception.MissingMessagePropertyException;
 import won.protocol.exception.WonMessageNotWellFormedException;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.RDFG;
 import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WONMSG;
@@ -1135,7 +1136,8 @@ public class WonMessage implements Serializable {
                                             "recipient",
                                             "recipientSocket",
                                             "recipientAtom",
-                                            "recipientNode" },
+                                            "recipientNode",
+                                            "textMessage" },
                             new Object[] {
                                             getMessageType(),
                                             getEnvelopeType(),
@@ -1147,7 +1149,9 @@ public class WonMessage implements Serializable {
                                             getRecipientURI(),
                                             getRecipientSocketURI(),
                                             getRecipientAtomURI(),
-                                            getRecipientNodeURI() },
+                                            getRecipientNodeURI(),
+                                            WonRdfUtils.MessageUtils.getTextMessage(this)
+                            },
                             multiline, sb);
         }
         if (multiline) {
@@ -1266,6 +1270,7 @@ public class WonMessage implements Serializable {
     }
 
     public boolean isRemoteResponse() {
-        return headMessage.getMessageTypeRequired().isResponseMessage() && messages == null;
+        return headMessage.getMessageTypeRequired().isResponseMessage() && messages == null
+                        && headMessage.getRespondingToMessageTypeRequired().isConnectionSpecificMessage();
     }
 }

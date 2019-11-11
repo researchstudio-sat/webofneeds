@@ -10,9 +10,11 @@
  */
 package won.protocol.util.linkeddata;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,6 +43,7 @@ import org.slf4j.LoggerFactory;
 import won.protocol.model.AtomState;
 import won.protocol.model.SocketDefinition;
 import won.protocol.model.SocketDefinitionImpl;
+import won.protocol.rest.LinkedDataFetchingException;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.RdfUtils.Pair;
@@ -568,10 +571,19 @@ public class WonLinkedDataUtils {
         if (!connectionContainer.isPresent()) {
             return Optional.empty();
         }
-        Optional<Dataset> connConnData = Optional.ofNullable(linkedDataSource.getDataForResource(
-                        URI.create(connectionContainer.get().toString()
-                                        + "?socket=" + socket.toString() + "?targetSocket=" + targetSocket.toString()),
-                        atomUri.get()));
+        Optional<Dataset> connConnData;
+        try {
+            connConnData = Optional.ofNullable(linkedDataSource.getDataForResource(
+                            URI.create(connectionContainer.get().toString()
+                                            + "?socket=" + URLEncoder.encode(socket.toString(), "UTF-8")
+                                            + "?targetSocket="
+                                            + URLEncoder.encode(targetSocket.toString(), "UTF-8")),
+                            atomUri.get()));
+        } catch (UnsupportedEncodingException e) {
+            throw new LinkedDataFetchingException(connectionContainer.get(),
+                            "Error building request for connection by socket " + socket.toString()
+                                            + " and targetSocket " + targetSocket.toString());
+        }
         if (!connConnData.isPresent()) {
             return Optional.empty();
         }

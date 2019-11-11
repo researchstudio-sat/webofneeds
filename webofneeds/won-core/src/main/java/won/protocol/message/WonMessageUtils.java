@@ -19,16 +19,6 @@ import won.protocol.exception.WonMessageProcessingException;
  * Utilities for working with wonMessage objects.
  */
 public class WonMessageUtils {
-    public static URI getParentEntityUri(final WonMessage message, WonMessageDirection direction) {
-        URI parentURI = null;
-        if (direction == WonMessageDirection.FROM_EXTERNAL) {
-            parentURI = getParentUriFromReceiverProperties(message);
-        } else if (direction == WonMessageDirection.FROM_OWNER || direction == WonMessageDirection.FROM_SYSTEM) {
-            parentURI = getParentUriFromSenderProperties(message);
-        }
-        return parentURI;
-    }
-
     public static Optional<URI> getSenderAtomURI(WonMessage msg) {
         URI atomUri = msg.getSenderAtomURI();
         if (atomUri == null) {
@@ -77,39 +67,12 @@ public class WonMessageUtils {
      * @param message
      * @return
      */
-    public static URI getParentAtomUri(final WonMessage message) {
-        WonMessageDirection direction = message.getEnvelopeType();
-        if (direction == WonMessageDirection.FROM_EXTERNAL) {
-            return message.getRecipientAtomURI();
-        } else if (direction == WonMessageDirection.FROM_OWNER || direction == WonMessageDirection.FROM_SYSTEM) {
-            return message.getSenderAtomURI();
+    public static Optional<URI> getParentAtomUri(final WonMessage message, WonMessageDirection direction) {
+        if (direction.isFromExternal()) {
+            return Optional.of(message.getRecipientAtomURI());
         } else {
-            throw new IllegalArgumentException("Unexpected message direction: " + direction);
+            return Optional.of(message.getSenderAtomURI());
         }
-    }
-
-    private static URI getParentUriFromSenderProperties(WonMessage message) {
-        URI parentURI;
-        parentURI = message.getSenderURI();
-        if (parentURI == null) {
-            parentURI = message.getSenderAtomURI();
-        }
-        if (parentURI == null) {
-            parentURI = message.getSenderNodeURI();
-        }
-        return parentURI;
-    }
-
-    private static URI getParentUriFromReceiverProperties(WonMessage message) {
-        URI parentURI;
-        parentURI = message.getRecipientURI();
-        if (parentURI == null) {
-            parentURI = message.getRecipientAtomURI();
-        }
-        if (parentURI == null) {
-            parentURI = message.getRecipientNodeURI();
-        }
-        return parentURI;
     }
 
     public static URI stripFragment(URI uriWithFragment) {
@@ -122,7 +85,6 @@ public class WonMessageUtils {
     }
 
     public static URI stripAtomSuffix(URI atomURI) {
-        URI atomUri;
         String uri = atomURI.toString();
         return URI.create(uri.replaceFirst("/atom/.+$", ""));
     }
