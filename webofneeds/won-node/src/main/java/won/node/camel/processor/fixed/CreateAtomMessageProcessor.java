@@ -32,6 +32,8 @@ public class CreateAtomMessageProcessor extends AbstractCamelProcessor {
         Atom atom = atomService.createAtom(wonMessage);
         putParentURI(exchange, atom.getAtomURI());
         String ownerApplicationID = message.getHeader(WonCamelConstants.OWNER_APPLICATION_ID_HEADER).toString();
-        atomService.authorizeOwnerApplicationForAtom(ownerApplicationID, atom);
+        atom = atomService.authorizeOwnerApplicationForAtom(ownerApplicationID, atom);
+        // putAtom(exchange, atom);
+        atomService.lockAtom(atom.getAtomURI());
     }
 }

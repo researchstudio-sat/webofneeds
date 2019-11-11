@@ -3,10 +3,13 @@ package won.node.camel.processor.fixed;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 
+import javax.persistence.EntityManager;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import won.node.camel.processor.AbstractCamelProcessor;
@@ -29,6 +32,8 @@ import won.protocol.vocabulary.WONMSG;
 @FixedMessageProcessor(direction = WONMSG.FromExternalString, messageType = WONMSG.ChangeNotificationMessageString)
 public class SendChangeNotificationMessageFromNodeProcessor extends AbstractCamelProcessor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    @Autowired
+    EntityManager entityManager;
 
     public void process(final Exchange exchange) throws Exception {
         Message message = exchange.getIn();
@@ -43,6 +48,7 @@ public class SendChangeNotificationMessageFromNodeProcessor extends AbstractCame
             throw new MissingMessagePropertyException(URI.create(WONMSG.recipient.toString()));
         }
         Connection con = connectionRepository.findOneByConnectionURIForUpdate(connectionUri).get();
+        entityManager.refresh(con);
         if (con.getState() != ConnectionState.CONNECTED) {
             throw new IllegalMessageForConnectionStateException(connectionUri, "CHANGE_NOTIFICATION_MESSAGE",
                             con.getState());

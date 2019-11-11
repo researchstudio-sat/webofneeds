@@ -21,4 +21,12 @@ CREATE INDEX IDX_ME_INNERMOST_MESSAGE_URI_RECIPIENT_ATOM_URI on message_event (m
 ALTER TABLE message_event DROP column innermostmessageuri;
 DROP INDEX IDX_ME_INNERMOST_MESSAGE_URI_RECIPIENT_ATOM_URI;
 CREATE INDEX IDX_ME_RECIPIENT_ATOM_URI on message_event(messageURI, recipientAtomURI) 
- 
+
+-- make essential fields in connection non-nullable
+ALTER TABLE connection ALTER COLUMN state SET NOT NULL;
+ALTER TABLE connection ALTER COLUMN atomuri SET NOT NULL;
+ALTER TABLE connection ALTER COLUMN targetatomuri SET NOT NULL;
+ALTER TABLE connection ALTER COLUMN atomuri SET NOT NULL;
+ALTER TABLE connection ALTER COLUMN socketuri SET NOT NULL;
+ALTER TABLE connection ALTER COLUMN remotesocketuri SET NOT NULL;
+ALTER TABLE connection ALTER COLUMN connectionuri SET NOT NULL;

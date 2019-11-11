@@ -141,68 +141,68 @@ public class WonCamelHelper {
     public static void putSocketTypeURI(Exchange exchange, URI socketTypeURI) {
         Objects.requireNonNull(socketTypeURI);
         Objects.requireNonNull(exchange);
-        exchange.getIn().setHeader(WonCamelConstants.SOCKET_TYPE_HEADER, socketTypeURI);
+        exchange.getIn().setHeader(WonCamelConstants.SOCKET_TYPE_URI_HEADER, socketTypeURI);
     }
 
     public static Optional<URI> getSocketTypeURI(Exchange exchange) {
         Objects.requireNonNull(exchange);
-        return Optional.ofNullable((URI) exchange.getIn().getHeader(WonCamelConstants.SOCKET_TYPE_HEADER));
+        return Optional.ofNullable((URI) exchange.getIn().getHeader(WonCamelConstants.SOCKET_TYPE_URI_HEADER));
     }
 
     public static URI getSocketTypeURIRequired(Exchange exchange) {
         Objects.requireNonNull(exchange);
-        return getSocketTypeURI(exchange).orElseThrow(expectedHeader(WonCamelConstants.SOCKET_TYPE_HEADER));
+        return getSocketTypeURI(exchange).orElseThrow(expectedHeader(WonCamelConstants.SOCKET_TYPE_URI_HEADER));
     }
 
     //// senderNode
     public static void putSenderNodeURI(Exchange exchange, URI message) {
         Objects.requireNonNull(exchange);
         Objects.requireNonNull(message);
-        exchange.getIn().setHeader(WonCamelConstants.SENDER_NODE_HEADER, message);
+        exchange.getIn().setHeader(WonCamelConstants.SENDER_NODE_URI_HEADER, message);
     }
 
     public static Optional<URI> getSenderNodeURI(Exchange exchange) {
         Objects.requireNonNull(exchange);
-        return Optional.ofNullable((URI) exchange.getIn().getHeader(WonCamelConstants.SENDER_NODE_HEADER));
+        return Optional.ofNullable((URI) exchange.getIn().getHeader(WonCamelConstants.SENDER_NODE_URI_HEADER));
     }
 
     public static URI getSenderNodeURIRequired(Exchange exchange) {
         Objects.requireNonNull(exchange);
-        return getSenderNodeURI(exchange).orElseThrow(expectedHeader(WonCamelConstants.SENDER_NODE_HEADER));
+        return getSenderNodeURI(exchange).orElseThrow(expectedHeader(WonCamelConstants.SENDER_NODE_URI_HEADER));
     }
 
     //// recipientNode
     public static void putRecipientNodeURI(Exchange exchange, URI message) {
         Objects.requireNonNull(exchange);
         Objects.requireNonNull(message);
-        exchange.getIn().setHeader(WonCamelConstants.RECIPIENT_NODE_HEADER, message);
+        exchange.getIn().setHeader(WonCamelConstants.RECIPIENT_NODE_URI_HEADER, message);
     }
 
     public static Optional<URI> getRecipientNodeURI(Exchange exchange) {
         Objects.requireNonNull(exchange);
-        return Optional.ofNullable((URI) exchange.getIn().getHeader(WonCamelConstants.RECIPIENT_NODE_HEADER));
+        return Optional.ofNullable((URI) exchange.getIn().getHeader(WonCamelConstants.RECIPIENT_NODE_URI_HEADER));
     }
 
     public static URI getRecipientNodeURIRequired(Exchange exchange) {
         Objects.requireNonNull(exchange);
-        return getRecipientNodeURI(exchange).orElseThrow(expectedHeader(WonCamelConstants.RECIPIENT_NODE_HEADER));
+        return getRecipientNodeURI(exchange).orElseThrow(expectedHeader(WonCamelConstants.RECIPIENT_NODE_URI_HEADER));
     }
 
-    //// atom
+    //// recipient atom uri
     public static void putRecipientAtomURI(Exchange exchange, URI message) {
         Objects.requireNonNull(exchange);
         Objects.requireNonNull(message);
-        exchange.getIn().setHeader(WonCamelConstants.RECIPIENT_ATOM_HEADER, message);
+        exchange.getIn().setHeader(WonCamelConstants.RECIPIENT_ATOM_URI_HEADER, message);
     }
 
     public static Optional<URI> getRecipientAtomURI(Exchange exchange) {
         Objects.requireNonNull(exchange);
-        return Optional.ofNullable((URI) exchange.getIn().getHeader(WonCamelConstants.RECIPIENT_ATOM_HEADER));
+        return Optional.ofNullable((URI) exchange.getIn().getHeader(WonCamelConstants.RECIPIENT_ATOM_URI_HEADER));
     }
 
     public static URI getRecipientAtomURIRequired(Exchange exchange) {
         Objects.requireNonNull(exchange);
-        return getRecipientAtomURI(exchange).orElseThrow(expectedHeader(WonCamelConstants.RECIPIENT_ATOM_HEADER));
+        return getRecipientAtomURI(exchange).orElseThrow(expectedHeader(WonCamelConstants.RECIPIENT_ATOM_URI_HEADER));
     }
 
     //// suppress
@@ -240,12 +240,14 @@ public class WonCamelHelper {
     }
 
     public static String getOwnerApplicationIdRequired(Exchange exchange) {
+        Objects.requireNonNull(exchange);
         return getOwnerApplicationId(exchange)
                         .orElseThrow(expectedHeader(WonCamelConstants.OWNER_APPLICATION_ID_HEADER));
     }
 
     //// msg from body
     public static Optional<WonMessage> getMessageFromBody(Exchange exchange) {
+        Objects.requireNonNull(exchange);
         String datasetAsString = (String) exchange.getIn().getBody();
         if (datasetAsString == null) {
             return Optional.empty();
@@ -255,10 +257,13 @@ public class WonCamelHelper {
     }
 
     public static void putMessageIntoBody(Exchange exchange, WonMessage message) {
+        Objects.requireNonNull(exchange);
+        Objects.requireNonNull(message);
         exchange.getIn().setBody(WonMessageEncoder.encode(message, WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE));
     }
 
     public static WonMessage getMessageFromBodyRequired(Exchange exchange) {
+        Objects.requireNonNull(exchange);
         return getMessageFromBody(exchange).orElseThrow(() -> new IllegalStateException(
                         "Expected to find a serialized WonMessage in the body of the camel exchange's In message"));
     }
@@ -269,6 +274,8 @@ public class WonCamelHelper {
 
     //// connection
     public static Optional<Connection> getConnection(Exchange exchange, ConnectionService connectionService) {
+        Objects.requireNonNull(exchange);
+        Objects.requireNonNull(connectionService);
         Connection con = (Connection) exchange.getIn().getHeader(WonCamelConstants.CONNECTION_HEADER);
         if (con != null) {
             return Optional.of(con);
@@ -282,6 +289,8 @@ public class WonCamelHelper {
     }
 
     public static Connection getConnectionRequired(Exchange exchange, ConnectionService connectionService) {
+        Objects.requireNonNull(exchange);
+        Objects.requireNonNull(connectionService);
         Connection con = (Connection) exchange.getIn().getHeader(WonCamelConstants.CONNECTION_HEADER);
         if (con != null) {
             return con;
@@ -290,6 +299,25 @@ public class WonCamelHelper {
                         getDirectionRequired(exchange));
     }
 
+    /**
+     * public static Optional<Atom> getAtom(Exchange exchange, AtomService
+     * atomService) { Objects.requireNonNull(exchange);
+     * Objects.requireNonNull(atomService); Atom atom = (Atom)
+     * exchange.getIn().getHeader(WonCamelConstants.ATOM_HEADER); if (atom != null)
+     * { return Optional.of(atom); } Optional<WonMessage> msg =
+     * getMessage(exchange); Optional<WonMessageDirection> direction =
+     * getDirection(exchange); if (msg.isPresent() && direction.isPresent()) {
+     * return atomService.getAtomForMessage(msg.get(), direction.get()); } return
+     * Optional.empty(); } public static Atom getAtomRequired(Exchange exchange,
+     * AtomService atomService) { Objects.requireNonNull(exchange);
+     * Objects.requireNonNull(atomService); Atom atom = (Atom)
+     * exchange.getIn().getHeader(WonCamelConstants.ATOM_HEADER); if (atom != null)
+     * { return atom; } return
+     * atomService.getAtomForMessageRequired(getMessageRequired(exchange),
+     * getDirectionRequired(exchange)); } public static void putAtom(Exchange
+     * exchange, Atom atom) { Objects.requireNonNull(atom);
+     * exchange.getIn().setHeader(WonCamelConstants.ATOM_HEADER, atom); }
+     */
     /********************************************************
      * Private utility methods
      ********************************************************/

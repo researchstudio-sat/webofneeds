@@ -18,6 +18,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityManager;
+
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +60,8 @@ public class MessageReferencer {
     private AtomMessageContainerRepository atomMessageContainerRepository;
     @Autowired
     private DatasetHolderRepository datasetHolderRepository;
+    @Autowired
+    EntityManager entityManager;
 
     /**
      * Adds message references to <code>message</code>. If
@@ -100,9 +104,11 @@ public class MessageReferencer {
                         .map(messageUri -> {
                             // lock the messages and load the WonMessages and MessageEventPlaceholders
                             logger.debug("loading for update:{}", messageUri);
-                            return new MessageAndPlaceholder(
-                                            messageEventRepository.findOneByMessageURIAndParentURIForUpdate(messageUri,
-                                                            parentURI),
+                            MessageEvent ev = messageEventRepository.findOneByMessageURIAndParentURIForUpdate(
+                                            messageUri,
+                                            parentURI);
+                            entityManager.refresh(ev);
+                            return new MessageAndPlaceholder(ev,
                                             loadWonMessageforURI(messageUri));
                         }).collect(Collectors.toList());
     }
@@ -236,6 +242,7 @@ public class MessageReferencer {
         DatasetHolder datasetHolder = datasetHolderRepository.findOneByUriForUpdate(messageURI)
                         .orElseThrow(() -> new IllegalStateException(
                                         String.format("could not load dataset for message %s", messageURI)));
+        entityManager.refresh(datasetHolder);
         return WonMessage.of(datasetHolder.getDataset());
     }
 

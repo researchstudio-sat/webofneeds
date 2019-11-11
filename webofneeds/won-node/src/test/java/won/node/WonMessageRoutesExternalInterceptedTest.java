@@ -17,8 +17,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Commit;
 
+import won.node.test.WonMessageRoutesTestHelper;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
@@ -31,7 +33,9 @@ import won.protocol.model.Socket;
 import won.protocol.util.RdfUtils;
 
 public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTest {
-    @EndpointInject(uri = "mock:seda:AtomProtocolOut")
+    @Autowired
+    WonMessageRoutesTestHelper helper;
+    @EndpointInject(uri = "mock:direct:AtomProtocolOut")
     protected MockEndpoint toNodeMockEndpoint;
 
     /*******************************************
@@ -591,8 +595,8 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
     @Commit // @Rollback would't work as camel still commits
     public void test_socketHint__to_inactive() throws Exception {
         URI atomURI = newAtomURI();
-        toMatcherMockEndpoint.expectedMessageCount(2); // notifications for create & deactivate
-        toOwnerMockEndpoint.expectedMessageCount(2); // echoes and responses for create & deactivate
+        toMatcherMockEndpoint.expectedMessageCount(1); // notifications for create & deactivate
+        toOwnerMockEndpoint.expectedMessageCount(1); // echoes and responses for create & deactivate
         WonMessage createAtom1Msg = makeCreateAtomMessage(atomURI,
                         "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
         // create
@@ -602,8 +606,10 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
         WonMessage deactivateMsg = WonMessageBuilder
                         .setMessagePropertiesForDeactivateFromOwner(newMessageURI(), atomURI, URI_NODE_1).build();
         // deactivate
+        assertMockEndpointsSatisfiedAndReset(toMatcherMockEndpoint, toOwnerMockEndpoint);
+        toMatcherMockEndpoint.expectedMessageCount(1); // notifications for create & deactivate
+        toOwnerMockEndpoint.expectedMessageCount(1); // echoes and responses for create & deactivate
         sendFromOwner(deactivateMsg, OWNERAPPLICATION_ID_OWNER1);
-        Atom atom = atomService.getAtom(atomURI).get();
         List<Socket> sockets = socketRepository.findByAtomURI(atomURI);
         URI socketURI = sockets.get(0).getSocketURI();
         URI targetSocketURI = URI.create("uri:some-other-atom#socket");
@@ -641,6 +647,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
         URI socketURI = sockets.get(0).getSocketURI();
         URI targetSocketURI = URI.create("uri:some-other-atom#socket");
         Mockito.when(socketLookup.isCompatible(socketURI, targetSocketURI)).then(x -> false);
+        Mockito.when(socketLookup.getSocketType(any(URI.class))).then(x -> Optional.empty());
         // set new expectations for hint
         toOwnerMockEndpoint.reset();
         toMatcherMockEndpoint.reset();
@@ -859,8 +866,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
         sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER1);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
         WonMessage connectMsg = WonMessageBuilder.setMessagePropertiesForConnect(
-                        newMessageURI(), socketURI, atomURI, URI_NODE_1,
-                        socketURI2, atomURI2, URI_NODE_1, "unittest connect")
+                        newMessageURI(), socketURI, socketURI2, "unittest connect")
                         .build();
         // expectations for connect
         toOwnerMockEndpoint.expectedMessageCount(1);
@@ -902,8 +908,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
         sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER1);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
         WonMessage connectMsg = WonMessageBuilder.setMessagePropertiesForConnect(
-                        newMessageURI(), socketURI, atomURI, URI_NODE_1,
-                        socketURI2, atomURI2, URI_NODE_1, "unittest connect")
+                        newMessageURI(), socketURI, socketURI2, "unittest connect")
                         .build();
         // expectations for connect
         toOwnerMockEndpoint.expectedMessageCount(1);
@@ -945,7 +950,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
                         "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
         // set minimal expectations just so we can expect something and subsequently
         // reset expectations
-        toOwnerMockEndpoint.expectedMessageCount(3);
+        toOwnerMockEndpoint.expectedMessageCount(2);
         toMatcherMockEndpoint.expectedMessageCount(2);
         toNodeMockEndpoint.expectedMessageCount(0);
         // send message
@@ -955,11 +960,14 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
         Mockito.when(socketLookup.isCompatible(socketURI, socketURI2)).then(x -> true);
         WonMessage socketHintMessage = WonMessageBuilder.setMessagePropertiesForHintToSocket(newMessageURI(), atomURI,
                         socketURI, URI_NODE_1, socketURI2, URI_MATCHER_1, 0.5).build();
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        toNodeMockEndpoint.expectedMessageCount(0);
         sendFromMatcher(socketHintMessage);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
         WonMessage connectMsg = WonMessageBuilder.setMessagePropertiesForConnect(
-                        newMessageURI(), socketURI, atomURI, URI_NODE_1,
-                        socketURI2, atomURI2, URI_NODE_1, "unittest connect")
+                        newMessageURI(), socketURI, socketURI2, "unittest connect")
                         .build();
         // expectations for connect
         toOwnerMockEndpoint.expectedMessageCount(1);
@@ -1002,8 +1010,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
         sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER1);
         // set new expectations for connect
         WonMessage connectMsg = WonMessageBuilder.setMessagePropertiesForConnect(
-                        newMessageURI(), socketURI, atomURI, URI_NODE_1,
-                        socketURI2, atomURI2, URI_NODE_1, "unittest connect")
+                        newMessageURI(), socketURI, socketURI2, "unittest connect")
                         .build();
         WonMessage response = WonMessageBuilder.setPropertiesForNodeResponse(connectMsg, true, newMessageURI(),
                         Optional.empty(), WonMessageDirection.FROM_OWNER).build();
@@ -1039,26 +1046,29 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
                         "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
         // set minimal expectations just so we can expect something and subsequently
         // reset expectations
-        toOwnerMockEndpoint.expectedMessageCount(3);
+        toOwnerMockEndpoint.expectedMessageCount(2);
         toMatcherMockEndpoint.expectedMessageCount(2);
         toNodeMockEndpoint.expectedMessageCount(0);
         // send message
         sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
         sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
         // set new expectations for hint
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        toNodeMockEndpoint.expectedMessageCount(0);
         WonMessage socketHintMessage = WonMessageBuilder.setMessagePropertiesForHintToSocket(newMessageURI(), atomURI,
                         socketURI, URI_NODE_1, socketURI2, URI_MATCHER_1, 0.5).build();
         sendFromMatcher(socketHintMessage);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
         // set new expectations for connect
         WonMessage connectMsg = WonMessageBuilder.setMessagePropertiesForConnect(
-                        newMessageURI(), socketURI2, atomURI2, URI_NODE_1,
-                        socketURI, atomURI, URI_NODE_1, "unittest connect")
+                        newMessageURI(), socketURI2, socketURI, "unittest connect")
                         .build();
         WonMessage response = WonMessageBuilder.setPropertiesForNodeResponse(connectMsg, true, newMessageURI(),
                         Optional.empty(), WonMessageDirection.FROM_OWNER).build();
         WonMessage msg = WonMessage.of(connectMsg, signatureAdder.process(response));
         // expectations for connect
-        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
         toOwnerMockEndpoint.expectedMessageCount(1);
         toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponseAndRemoteResponse(connectMsg));
         toMatcherMockEndpoint.expectedMessageCount(0);
@@ -1092,17 +1102,21 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
                         "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
         // set minimal expectations just so we can expect something and subsequently
         // reset expectations
-        toOwnerMockEndpoint.expectedMessageCount(4);
+        toOwnerMockEndpoint.expectedMessageCount(2);
         toMatcherMockEndpoint.expectedMessageCount(2);
-        toNodeMockEndpoint.expectedMessageCount(1);
+        toNodeMockEndpoint.expectedMessageCount(0);
         sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
         sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER1);
         WonMessage socketHintMessage = WonMessageBuilder.setMessagePropertiesForHintToSocket(newMessageURI(), atomURI,
                         socketURI, URI_NODE_1, socketURI2, URI_MATCHER_1, 0.5).build();
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
         sendFromMatcher(socketHintMessage);
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        toNodeMockEndpoint.expectedMessageCount(0);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
         WonMessage connectFromExternalMsg = WonMessageBuilder.setMessagePropertiesForConnect(
-                        newMessageURI(), socketURI2, atomURI2, URI_NODE_1,
-                        socketURI, atomURI, URI_NODE_1, "unittest connect")
+                        newMessageURI(), socketURI2, socketURI, "unittest connect")
                         .build();
         WonMessage response = WonMessageBuilder
                         .setPropertiesForNodeResponse(connectFromExternalMsg, true, newMessageURI(),
@@ -1114,10 +1128,12 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
                         .findOneBySocketURI(URI.create(atomURI.toString() + "#socket1")).isPresent());
         Assert.assertTrue("A #socket2 should have been stored", socketRepository
                         .findOneBySocketURI(URI.create(atomURI.toString() + "#socket2")).isPresent());
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        toNodeMockEndpoint.expectedMessageCount(1);
         sendFromExternalOwner(msg);
         WonMessage connectFromOwnerMsg = WonMessageBuilder.setMessagePropertiesForConnect(
-                        newMessageURI(), socketURI, atomURI, URI_NODE_1,
-                        socketURI2, atomURI2, URI_NODE_1, "unittest connect")
+                        newMessageURI(), socketURI, socketURI2, "unittest connect")
                         .build();
         logger.warn("response: " + response.getMessageURI());
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
@@ -1138,64 +1154,136 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
 
     @Test
     @Commit // @Rollback would't work as camel still commits
-    public void test_connect__after_connect_from_external__try_force_racecondition() throws Exception {
-        URI atomURI = newAtomURI();
-        URI socketURI = URI.create(atomURI.toString() + "#socket1");
-        URI atomURI2 = newAtomURI();
-        URI socketURI2 = URI.create(atomURI2.toString() + "#socket1");
-        prepareMockitoStubs(atomURI, socketURI, atomURI2, socketURI2);
-        WonMessage createAtom1Msg = makeCreateAtomMessage(atomURI,
-                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
-        WonMessage createAtom2Msg = makeCreateAtomMessage(atomURI2,
-                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
-        // set minimal expectations just so we can expect something and subsequently
-        // reset expectations
-        toOwnerMockEndpoint.expectedMessageCount(3);
-        toMatcherMockEndpoint.expectedMessageCount(2);
-        toNodeMockEndpoint.expectedMessageCount(0);
-        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
-        sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER1);
-        WonMessage socketHintMessage = WonMessageBuilder.setMessagePropertiesForHintToSocket(newMessageURI(), atomURI,
-                        socketURI, URI_NODE_1, socketURI2, URI_MATCHER_1, 0.5).build();
-        sendFromMatcher(socketHintMessage);
-        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
-        WonMessage connectFromExternalMsg = WonMessageBuilder.setMessagePropertiesForConnect(
-                        newMessageURI(), socketURI2, atomURI2, URI_NODE_1,
-                        socketURI, atomURI, URI_NODE_1, "unittest connect")
-                        .build();
-        WonMessage response = WonMessageBuilder
-                        .setPropertiesForNodeResponse(connectFromExternalMsg, true, newMessageURI(),
-                                        Optional.empty(), WonMessageDirection.FROM_OWNER)
-                        .build();
-        WonMessage msg = WonMessage.of(connectFromExternalMsg, signatureAdder.process(response));
-        WonMessage connectFromOwnerMsg = WonMessageBuilder.setMessagePropertiesForConnect(
-                        newMessageURI(), socketURI, atomURI, URI_NODE_1,
-                        socketURI2, atomURI2, URI_NODE_1, "unittest connect trying to cause conflict")
-                        .build();
-        toOwnerMockEndpoint.expectedMessageCount(2);
-        toOwnerMockEndpoint.expectedMessagesMatches(
-                        or(isMessageAndResponseAndRemoteResponse(msg), isMessageAndResponse(connectFromOwnerMsg)));
-        toMatcherMockEndpoint.expectedMessageCount(0);
-        toNodeMockEndpoint.expectedMessageCount(2);
-        toNodeMockEndpoint.expectedMessagesMatches(
-                        or(isMessageAndResponse(connectFromOwnerMsg),
-                                        isSuccessResponseTo(msg)));
-        executeInSeparateThreadAndWaitForResult(() -> sendFromExternalOwner(msg));
-        sendFromExternalOwner(msg);
-        sendFromOwner(connectFromOwnerMsg, OWNERAPPLICATION_ID_OWNER1);
-        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
-        Connection expected = new Connection();
-        expected.setState(ConnectionState.CONNECTED);
-        expected.setSocketURI(socketURI);
-        expected.setTargetSocketURI(socketURI2);
-        Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI, socketURI2);
-        assertConnectionAsExpected(expected, con);
+    public void test__hint__connect_from_external__connect__try_force_racecondition() throws Exception {
+        for (int i = 0; i < 1; i++) {
+            URI atomURI = newAtomURI();
+            URI socketURI = URI.create(atomURI.toString() + "#socket1");
+            URI atomURI2 = newAtomURI();
+            URI socketURI2 = URI.create(atomURI2.toString() + "#socket1");
+            prepareMockitoStubs(atomURI, socketURI, atomURI2, socketURI2);
+            WonMessage createAtom1Msg = makeCreateAtomMessage(atomURI,
+                            "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
+            WonMessage createAtom2Msg = makeCreateAtomMessage(atomURI2,
+                            "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
+            // set minimal expectations just so we can expect something and subsequently
+            // reset expectations
+            toOwnerMockEndpoint.expectedMessageCount(2);
+            toMatcherMockEndpoint.expectedMessageCount(2);
+            toNodeMockEndpoint.expectedMessageCount(0);
+            sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+            sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER1);
+            assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
+            toOwnerMockEndpoint.expectedMessageCount(1);
+            toMatcherMockEndpoint.expectedMessageCount(0);
+            toNodeMockEndpoint.expectedMessageCount(0);
+            WonMessage socketHintMessage = WonMessageBuilder
+                            .setMessagePropertiesForHintToSocket(newMessageURI(), atomURI,
+                                            socketURI, URI_NODE_1, socketURI2, URI_MATCHER_1, 0.5)
+                            .build();
+            sendFromMatcher(socketHintMessage);
+            assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
+            WonMessage connectFromExternalMsg = WonMessageBuilder.setMessagePropertiesForConnect(
+                            newMessageURI(), socketURI2, socketURI, "unittest connect")
+                            .build();
+            WonMessage response = WonMessageBuilder
+                            .setPropertiesForNodeResponse(connectFromExternalMsg, true, newMessageURI(),
+                                            Optional.empty(), WonMessageDirection.FROM_OWNER)
+                            .build();
+            WonMessage msg = WonMessage.of(connectFromExternalMsg, signatureAdder.process(response));
+            WonMessage connectFromOwnerMsg = WonMessageBuilder.setMessagePropertiesForConnect(
+                            newMessageURI(), socketURI, socketURI2, "unittest connect")
+                            .build();
+            toOwnerMockEndpoint.expectedMessageCount(2);
+            toOwnerMockEndpoint.expectedMessagesMatches(
+                            or(isMessageAndResponseAndRemoteResponse(msg), isMessageAndResponse(connectFromOwnerMsg)));
+            toMatcherMockEndpoint.expectedMessageCount(2);
+            toNodeMockEndpoint.expectedMessageCount(2);
+            toNodeMockEndpoint.expectedMessagesMatches(
+                            or(isMessageAndResponse(connectFromOwnerMsg),
+                                            isSuccessResponseTo(msg)));
+            Thread t1 = new Thread(() -> helper.doInSeparateTransaction(
+                            () -> sendFromExternalOwner(msg)));
+            Thread t2 = new Thread(() -> helper.doInSeparateTransaction(
+                            () -> sendFromOwner(connectFromOwnerMsg, OWNERAPPLICATION_ID_OWNER1)));
+            t1.start();
+            t2.start();
+            t1.join();
+            t2.join();
+            assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
+            Connection expected = new Connection();
+            expected.setState(ConnectionState.CONNECTED);
+            expected.setSocketURI(socketURI);
+            expected.setTargetSocketURI(socketURI2);
+            Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI, socketURI2);
+            assertConnectionAsExpected(expected, con);
+        }
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test__connect_from_external__connect__try_force_racecondition() throws Exception {
+        for (int i = 0; i < 20; i++) {
+            toOwnerMockEndpoint.reset();
+            toMatcherMockEndpoint.reset();
+            toNodeMockEndpoint.reset();
+            URI atomURI = newAtomURI();
+            URI socketURI = URI.create(atomURI.toString() + "#socket1");
+            URI atomURI2 = newAtomURI();
+            URI socketURI2 = URI.create(atomURI2.toString() + "#socket1");
+            prepareMockitoStubs(atomURI, socketURI, atomURI2, socketURI2);
+            WonMessage createAtom1Msg = makeCreateAtomMessage(atomURI,
+                            "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
+            WonMessage createAtom2Msg = makeCreateAtomMessage(atomURI2,
+                            "/won/node/WonMessageRoutesTest/data/test-atom1.ttl");
+            // set minimal expectations just so we can expect something and subsequently
+            // reset expectations
+            toOwnerMockEndpoint.expectedMessageCount(2);
+            toMatcherMockEndpoint.expectedMessageCount(2);
+            toNodeMockEndpoint.expectedMessageCount(0);
+            sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+            sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER1);
+            assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
+            WonMessage connectFromExternalMsg = WonMessageBuilder.setMessagePropertiesForConnect(
+                            newMessageURI(), socketURI2, socketURI, "unittest connect")
+                            .build();
+            WonMessage response = WonMessageBuilder
+                            .setPropertiesForNodeResponse(connectFromExternalMsg, true, newMessageURI(),
+                                            Optional.empty(), WonMessageDirection.FROM_OWNER)
+                            .build();
+            WonMessage msg = WonMessage.of(connectFromExternalMsg, signatureAdder.process(response));
+            WonMessage connectFromOwnerMsg = WonMessageBuilder.setMessagePropertiesForConnect(
+                            newMessageURI(), socketURI, socketURI2, "unittest connect")
+                            .build();
+            toOwnerMockEndpoint.expectedMessageCount(2);
+            toOwnerMockEndpoint.expectedMessagesMatches(
+                            or(isMessageAndResponseAndRemoteResponse(msg), isMessageAndResponse(connectFromOwnerMsg)));
+            toMatcherMockEndpoint.expectedMessageCount(1);
+            toNodeMockEndpoint.expectedMessageCount(2);
+            toNodeMockEndpoint.expectedMessagesMatches(
+                            or(isMessageAndResponse(connectFromOwnerMsg),
+                                            isSuccessResponseTo(msg)));
+            Thread t1 = new Thread(() -> helper.doInSeparateTransaction(
+                            () -> sendFromExternalOwner(msg)));
+            Thread t2 = new Thread(() -> helper.doInSeparateTransaction(
+                            () -> sendFromOwner(connectFromOwnerMsg, OWNERAPPLICATION_ID_OWNER1)));
+            t1.start();
+            t2.start();
+            t1.join();
+            t2.join();
+            assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
+            Connection expected = new Connection();
+            expected.setState(ConnectionState.CONNECTED);
+            expected.setSocketURI(socketURI);
+            expected.setTargetSocketURI(socketURI2);
+            Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI, socketURI2);
+            assertConnectionAsExpected(expected, con);
+        }
     }
 
     @Before
     public void setUp() throws Exception {
         toNodeMockEndpoint.reset();
-        toNodeMockEndpoint.setResultWaitTime(1000);
+        toNodeMockEndpoint.setResultWaitTime(5000);
         toNodeMockEndpoint
                         .setReporter(exchange -> {
                             logMessageRdf(makeMessageBox("message NODE => EXTERNAL"),

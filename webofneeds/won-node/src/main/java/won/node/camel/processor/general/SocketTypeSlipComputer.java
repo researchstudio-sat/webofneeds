@@ -54,7 +54,7 @@ public class SocketTypeSlipComputer implements InitializingBean, ApplicationCont
         assert messageType != null : "messageType header must not be null";
         URI direction = (URI) exchange.getIn().getHeader(WonCamelConstants.DIRECTION_HEADER);
         assert direction != null : "direction header must not be null";
-        URI socketType = (URI) exchange.getIn().getHeader(WonCamelConstants.SOCKET_TYPE_HEADER);
+        URI socketType = (URI) exchange.getIn().getHeader(WonCamelConstants.SOCKET_TYPE_URI_HEADER);
         String slip = "bean:" + computeSocketSlip(messageType, socketType, direction) + "?method=process";
         return type.cast(slip);
     }

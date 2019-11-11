@@ -56,7 +56,6 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import won.cryptography.service.RandomNumberService;
 import won.node.camel.processor.WonCamelHelper;
@@ -112,7 +111,6 @@ import won.protocol.vocabulary.WXCHAT;
                 "classpath:/spring/component/crypto/node-crypto.xml" })
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestPropertySource
-@Transactional
 @Rollback
 public abstract class WonMessageRoutesTest {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
@@ -180,7 +178,7 @@ public abstract class WonMessageRoutesTest {
      * 
      * @throws Exception
      */
-    @EndpointInject(uri = "mock:seda:OwnerProtocolOut")
+    @EndpointInject(uri = "mock:direct:OwnerProtocolOut")
     protected MockEndpoint toOwnerMockEndpoint;
     @EndpointInject(uri = "mock:seda:MatcherProtocolOut")
     protected MockEndpoint toMatcherMockEndpoint;
@@ -581,6 +579,7 @@ public abstract class WonMessageRoutesTest {
     }
 
     protected void assertConnectionAsExpected(Connection expected, Optional<Connection> con) {
+        System.out.println("checking connection: " + con.get());
         Assert.assertTrue("New connection should have been stored", con.isPresent());
         Assert.assertSame("Wrong state of connection", expected.getState(), con.get().getState());
         if (expected.getSocketURI() != null) {
@@ -823,7 +822,7 @@ public abstract class WonMessageRoutesTest {
         //
         // MockEndpoint intercepting messages to owners
         toOwnerMockEndpoint.reset();
-        toOwnerMockEndpoint.setResultWaitTime(1000);
+        toOwnerMockEndpoint.setResultWaitTime(5000);
         toOwnerMockEndpoint
                         .setReporter(exchange -> {
                             Optional<String> ownerAppId = WonCamelHelper.getOwnerApplicationId(exchange);
@@ -844,7 +843,7 @@ public abstract class WonMessageRoutesTest {
         // }
         // });
         toMatcherMockEndpoint.reset();
-        toMatcherMockEndpoint.setResultWaitTime(1000);
+        toMatcherMockEndpoint.setResultWaitTime(5000);
         toMatcherMockEndpoint
                         .setReporter(exchange -> {
                             try {

@@ -13,9 +13,12 @@ package won.node.camel.processor.fixed;
 import java.net.URI;
 import java.util.Collection;
 
+import javax.persistence.EntityManager;
+
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import won.node.camel.processor.AbstractCamelProcessor;
@@ -38,6 +41,8 @@ import won.protocol.vocabulary.WONMSG;
 @FixedMessageProcessor(direction = WONMSG.FromOwnerString, messageType = WONMSG.DeleteMessageString)
 public class DeleteAtomMessageFromOwnerReactionProcessor extends AbstractCamelProcessor {
     Logger logger = LoggerFactory.getLogger(this.getClass());
+    @Autowired
+    EntityManager entityManager;
 
     public void process(final Exchange exchange) throws Exception {
         WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -54,6 +59,7 @@ public class DeleteAtomMessageFromOwnerReactionProcessor extends AbstractCamelPr
             Collection<Connection> conns = connectionRepository.findByAtomURIAndNotStateForUpdate(atom.getAtomURI(),
                             ConnectionState.DELETED);
             for (Connection con : conns) {
+                entityManager.refresh(con);
                 // Delete all connection data
                 messageEventRepository.deleteByParentURI(con.getConnectionURI());
                 connectionRepository.delete(con);
@@ -64,6 +70,7 @@ public class DeleteAtomMessageFromOwnerReactionProcessor extends AbstractCamelPr
                             ConnectionState.CLOSED);
             // Close open connections
             for (Connection con : conns) {
+                entityManager.refresh(con);
                 closeConnection(atom, con);
             }
         }

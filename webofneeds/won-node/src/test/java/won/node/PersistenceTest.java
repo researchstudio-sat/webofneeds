@@ -185,9 +185,7 @@ public class PersistenceTest {
         URI connectMessageUri = URI.create("uri:connectMessage");
         WonMessage connectMessage = WonMessageBuilder.setMessagePropertiesForConnect(connectMessageUri,
                         senderSocket,
-                        atom.getAtomURI(), atom.getWonNodeURI(),
-                        targetSocket, atom2.getAtomURI(),
-                        atom2.getWonNodeURI(), "Hey there!").build();
+                        targetSocket, "Hey there!").build();
         // processing the message would lead to this call:
         Mockito.when(wonNodeInformationService.generateConnectionURI())
                         .thenReturn(URI.create("uri:newconnection1"));
@@ -261,9 +259,7 @@ public class PersistenceTest {
         URI connectMessageUri = URI.create("uri:connectMessage");
         WonMessage connectMessage = WonMessageBuilder.setMessagePropertiesForConnect(connectMessageUri,
                         senderSocket,
-                        atom.getAtomURI(), atom.getWonNodeURI(),
-                        targetSocket, atom2.getAtomURI(),
-                        atom2.getWonNodeURI(), "Hey there!").build();
+                        targetSocket, "Hey there!").build();
         // processing the message would lead to this call:
         Mockito.when(wonNodeInformationService.generateConnectionURI())
                         .thenReturn(URI.create("uri:newconnection1"), URI.create("uri:newconnection2"));

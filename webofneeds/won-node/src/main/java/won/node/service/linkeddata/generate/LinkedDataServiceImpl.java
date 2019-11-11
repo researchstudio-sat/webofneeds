@@ -41,6 +41,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import won.cryptography.rdfsign.WonKeysReaderWriter;
@@ -115,17 +117,17 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     private String activeMqMatcherProtocolTopicNameAtomDeactivated;
     private String activeMqMatcherProtocolTopicNameAtomDeleted;
 
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public Dataset listAtomURIs() {
         return listAtomURIs(null);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public Dataset listAtomURIs(AtomState atomState) {
         return listAtomURIs(atomState, null, null);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public Dataset listAtomURIs(AtomState atomState, URI filterSocketTypeUri, URI filterAtomTypeUri) {
         Model model = ModelFactory.createDefaultModel();
         setNsPrefixes(model);
@@ -133,43 +135,43 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         return getFilteredAtomURIListDataset(model, uris, filterSocketTypeUri, filterAtomTypeUri);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIs(final int pageNum) {
         return listPagedAtomURIs(pageNum, null, null);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIsBefore(final URI atom) {
         return listPagedAtomURIsBefore(atom, null, null);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIsAfter(final URI atom) {
         return listPagedAtomURIsAfter(atom, null, null);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIs(final int pageNum,
                     final Integer preferedSize, AtomState atomState) {
         Slice<URI> slice = atomInformationService.listPagedAtomURIs(pageNum, preferedSize, atomState);
         return toContainerPage(this.atomResourceURIPrefix + "/", slice);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIsBefore(final URI atom,
                     final Integer preferedSize, AtomState atomState) {
         Slice<URI> slice = atomInformationService.listPagedAtomURIsBefore(atom, preferedSize, atomState);
         return toContainerPage(this.atomResourceURIPrefix + "/", slice);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public AtomInformationService.PagedResource<Dataset, URI> listPagedAtomURIsAfter(final URI atom,
                     final Integer preferedSize, AtomState atomState) {
         Slice<URI> slice = atomInformationService.listPagedAtomURIsAfter(atom, preferedSize, atomState);
         return toContainerPage(this.atomResourceURIPrefix + "/", slice);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public Dataset listAtomURIsModifiedAfter(Date modifiedDate, AtomState atomState, URI filterSocketTypeUri,
                     URI filterAtomTypeUri) {
         Model model = ModelFactory.createDefaultModel();
@@ -178,7 +180,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         return getFilteredAtomURIListDataset(model, uris, filterSocketTypeUri, filterAtomTypeUri);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public Dataset listAtomURIsCreatedAfter(Date createdDate, AtomState atomState, URI filterSocketTypeUri,
                     URI filterAtomTypeUri) {
         Model model = ModelFactory.createDefaultModel();
@@ -187,7 +189,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         return getFilteredAtomURIListDataset(model, uris, filterSocketTypeUri, filterAtomTypeUri);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public DataWithEtag<Dataset> getAtomDataset(final URI atomUri, String etag) {
         Instant start = logger.isDebugEnabled() ? Instant.now() : null;
         DataWithEtag<Atom> atomDataWithEtag;
@@ -258,7 +260,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public Dataset getAtomDataset(final URI atomUri, boolean deep, Integer deepLayerSize)
                     throws NoSuchAtomException, NoSuchConnectionException, NoSuchMessageException {
         Dataset dataset = getAtomDataset(atomUri, null).getData();
@@ -282,7 +284,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public Model getUnreadInformationForAtom(URI atomURI, Collection<URI> lastSeenMessageURIs) {
         UnreadMessageInfoForAtom unreadInfo = this.unreadInformationService.getUnreadInformation(atomURI,
                         lastSeenMessageURIs);
@@ -320,7 +322,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         }
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public Dataset getNodeDataset() {
         Model model = ModelFactory.createDefaultModel();
         setNsPrefixes(model);
@@ -381,7 +383,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
      * @return
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public DataWithEtag<Dataset> getConnectionDataset(final URI connectionUri, final boolean includeMessageContainer,
                     final String etag) {
         DataWithEtag<Connection> data = atomInformationService.readConnection(connectionUri, etag);
@@ -425,6 +427,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public Dataset listConnection(URI socketUri, URI targetSocketUri, boolean deep) throws NoSuchConnectionException {
         Optional<Connection> con = atomInformationService.getConnection(socketUri, targetSocketUri);
         Dataset data = makeConnectionContainer(this.connectionResourceURIPrefix + "/", Arrays.asList(con.get()));
@@ -435,7 +438,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public AtomInformationService.PagedResource<Dataset, Connection> listConnections(final boolean deep)
                     throws NoSuchConnectionException {
         List<Connection> connections = new ArrayList<>(atomInformationService.listConnections());
@@ -449,7 +452,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public AtomInformationService.PagedResource<Dataset, Connection> listModifiedConnectionsAfter(Date modifiedAfter,
                     boolean deep) throws NoSuchConnectionException {
         List<Connection> connections = new ArrayList<>(
@@ -464,7 +467,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public AtomInformationService.PagedResource<Dataset, Connection> listConnections(final int page,
                     final Integer preferredSize, Date timeSpot, final boolean deep) throws NoSuchConnectionException {
         Slice<Connection> slice = atomInformationService.listConnections(page, preferredSize, timeSpot);
@@ -478,7 +481,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public AtomInformationService.PagedResource<Dataset, Connection> listConnectionsBefore(URI beforeConnURI,
                     final Integer preferredSize, Date timeSpot, boolean deep) throws NoSuchConnectionException {
         Slice<Connection> slice = atomInformationService.listConnectionsBefore(beforeConnURI, preferredSize, timeSpot);
@@ -492,7 +495,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public AtomInformationService.PagedResource<Dataset, Connection> listConnectionsAfter(URI afterConnURI,
                     final Integer preferredSize, Date timeSpot, boolean deep) throws NoSuchConnectionException {
         Slice<Connection> slice = atomInformationService.listConnectionsAfter(afterConnURI, preferredSize, timeSpot);
@@ -506,7 +509,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public AtomInformationService.PagedResource<Dataset, Connection> listConnections(final URI atomURI, boolean deep,
                     boolean addMetadata) throws NoSuchAtomException, NoSuchConnectionException {
         List<Connection> connections = new ArrayList<>(atomInformationService.listConnections(atomURI));
@@ -524,7 +527,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public AtomInformationService.PagedResource<Dataset, Connection> listConnections(final int page, final URI atomURI,
                     final Integer preferredSize, final WonMessageType messageType, final Date timeSpot, boolean deep,
                     boolean addMetadata) throws NoSuchAtomException, NoSuchConnectionException {
@@ -544,7 +547,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public AtomInformationService.PagedResource<Dataset, Connection> listConnectionsBefore(final URI atomURI,
                     URI beforeEventURI, final Integer preferredSize, final WonMessageType messageType,
                     final Date timeSpot, boolean deep, boolean addMetadata)
@@ -565,7 +568,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public AtomInformationService.PagedResource<Dataset, Connection> listConnectionsAfter(final URI atomURI,
                     URI resumeConnURI, final Integer preferredSize, final WonMessageType messageType,
                     final Date timeSpot, boolean deep, boolean addMetadata)
@@ -620,7 +623,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public Dataset listConnectionEventURIs(final URI connectionUri, boolean deep) throws NoSuchConnectionException {
         Model model = ModelFactory.createDefaultModel();
         setNsPrefixes(model);
@@ -644,7 +647,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public AtomInformationService.PagedResource<Dataset, URI> listConnectionEventURIs(final URI connectionUri,
                     final int pageNum, Integer preferedSize, WonMessageType msgType, boolean deep)
                     throws NoSuchConnectionException {
@@ -655,7 +658,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public AtomInformationService.PagedResource<Dataset, URI> listConnectionEventURIsAfter(final URI connectionUri,
                     final URI msgURI, Integer preferedSize, WonMessageType msgType, boolean deep)
                     throws NoSuchConnectionException {
@@ -666,7 +669,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public AtomInformationService.PagedResource<Dataset, URI> listConnectionEventURIsBefore(final URI connectionUri,
                     final URI msgURI, Integer preferedSize, WonMessageType msgType, boolean deep)
                     throws NoSuchConnectionException {
@@ -677,7 +680,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public DataWithEtag<Dataset> getDatasetForUri(URI datasetUri, String etag) {
         Integer version = etag == null ? -1 : Integer.valueOf(etag);
         Optional<DatasetHolder> datasetHolder = datasetHolderRepository.findOneByUri(datasetUri);
@@ -807,6 +810,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         return new AtomInformationService.PagedResource(dataset, resumeBefore, resumeAfter);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public Dataset makeConnectionContainer(String containerUri, List<Connection> connections) {
         Model model = ModelFactory.createDefaultModel();
         setNsPrefixes(model);
@@ -979,8 +983,8 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         return ret;
     }
 
-    @Transactional(readOnly = true)
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public Dataset getAtomDatasetForFilter(final URI atomUri) {
         Instant start = logger.isDebugEnabled() ? Instant.now() : null;
         DataWithEtag<Atom> atomDataWithEtag;
