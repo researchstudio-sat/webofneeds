@@ -16,14 +16,15 @@ import org.apache.jena.riot.Lang;
  * Constants used for camel.
  */
 public class WonCamelConstants {
-    public static final String RECIPIENT_ATOM_HEADER = "won.atom";
-    public static final String SENDER_NODE_HEADER = "won.senderNode";
-    public static final String RECIPIENT_NODE_HEADER = "won.recipientNode";
+    public static final String ATOM_HEADER = "won.atom";
+    public static final String RECIPIENT_ATOM_URI_HEADER = "won.recipientAtomUri";
+    public static final String SENDER_NODE_URI_HEADER = "won.senderNodeUri";
+    public static final String RECIPIENT_NODE_URI_HEADER = "won.recipientNodeUri";
     public static final String MESSAGE_HEADER = "won.message";
     public static final String RESPONSE_HEADER = "won.responseMessage";
     public static final String MESSAGE_TO_SEND_HEADER = "won.messageToSend";
     public static final String DIRECTION_HEADER = "won.direction";
-    public static final String SOCKET_TYPE_HEADER = "won.socketType";
+    public static final String SOCKET_TYPE_URI_HEADER = "won.socketType";
     public static final String MESSAGE_TYPE_HEADER = "won.messageType";
     public static final Lang RDF_LANGUAGE_FOR_MESSAGE = Lang.TRIG;
     public static final String OUTBOUND_MESSAGE_HEADER = "won.outboundMessage";

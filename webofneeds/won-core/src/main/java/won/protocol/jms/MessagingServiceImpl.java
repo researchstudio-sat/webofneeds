@@ -141,6 +141,7 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware, Messagi
     @Override
     public void send(Exchange exchange, String endpoint) {
         Endpoint ep = getCamelContext().getEndpoint(endpoint);
+        exchange.setPattern(ExchangePattern.InOnly);
         producerTemplate.send(ep, exchange);
     }
 
