@@ -12,6 +12,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityManager;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.javasimon.SimonManager;
@@ -21,8 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import won.node.service.nodeconfig.URIService;
 import won.protocol.exception.IllegalAtomContentException;
@@ -31,9 +31,12 @@ import won.protocol.exception.IllegalSocketModificationException;
 import won.protocol.exception.MissingMessagePropertyException;
 import won.protocol.exception.NoSuchAtomException;
 import won.protocol.exception.UriAlreadyInUseException;
+import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.exception.WrongAddressingInformationException;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
+import won.protocol.message.WonMessageUtils;
 import won.protocol.model.Atom;
 import won.protocol.model.AtomMessageContainer;
 import won.protocol.model.AtomState;
@@ -73,20 +76,81 @@ public class AtomService {
     URIService uriService;
     @Autowired
     ConnectionService connectionService;
+    @Autowired
+    EntityManager entityManager;
 
     public Optional<Atom> getAtomForUpdate(URI atomURI) {
-        return Optional.of(atomRepository.findOneByAtomURIForUpdate(atomURI));
+        Optional<Atom> atom = atomRepository.findOneByAtomURIForUpdate(atomURI);
+        entityManager.refresh(atom.get());
+        return atom;
     }
 
     public Optional<Atom> getAtom(URI atomURI) {
         return atomRepository.findOneByAtomURI(atomURI);
     }
 
+    public Optional<Atom> lockAtom(URI atomURI) {
+        Optional<Atom> atom = atomRepository.findOneByAtomURIForUpdate(atomURI);
+        entityManager.refresh(atom.get());
+        return atom;
+    }
+
+    public Atom lockAtomRequired(URI atomURI) {
+        return atomRepository.findOneByAtomURIForUpdate(atomURI).orElseThrow(() -> new NoSuchAtomException(atomURI));
+    }
+
     public Atom getAtomRequired(URI atomURI) {
         return getAtom(atomURI).orElseThrow(() -> new NoSuchAtomException(atomURI));
     }
 
-    @Transactional(propagation = Propagation.MANDATORY)
+    public Optional<Atom> getAtomForMessage(WonMessage msg, WonMessageDirection direction) {
+        URI socketURI = null;
+        URI atomURI = null;
+        if (msg.getMessageTypeRequired().isConnectionSpecificMessage()) {
+            if (direction.isFromExternal()) {
+                socketURI = msg.getRecipientSocketURI();
+            } else {
+                socketURI = msg.getSenderSocketURI();
+            }
+            if (socketURI == null) {
+                return Optional.empty();
+            }
+            atomURI = WonMessageUtils.stripFragment(socketURI);
+        } else {
+            atomURI = msg.getRecipientAtomURI();
+        }
+        if (atomURI == null) {
+            atomURI = msg.getSenderAtomURI();
+        }
+        if (atomURI != null) {
+            return getAtom(atomURI);
+        }
+        return Optional.empty();
+    }
+
+    public Atom getAtomForMessageRequired(WonMessage msg, WonMessageDirection direction) {
+        URI socketURI = null;
+        URI atomURI = null;
+        if (msg.getMessageTypeRequired().isConnectionSpecificMessage()) {
+            if (direction.isFromExternal()) {
+                socketURI = msg.getRecipientSocketURIRequired();
+            } else {
+                socketURI = msg.getSenderSocketURIRequired();
+            }
+            atomURI = WonMessageUtils.stripFragment(socketURI);
+        } else {
+            atomURI = msg.getRecipientAtomURI();
+        }
+        if (atomURI == null) {
+            atomURI = msg.getSenderAtomURI();
+        }
+        if (atomURI != null) {
+            return getAtomRequired(atomURI);
+        } else {
+            throw new WonMessageProcessingException("Could not obtain atom URI from messsage " + msg.getMessageURI());
+        }
+    }
+
     public Atom createAtom(final WonMessage wonMessage) {
         wonMessage.getMessageType().requireType(WonMessageType.CREATE_ATOM);
         Dataset atomContent = wonMessage.getMessageContent();
@@ -143,7 +207,7 @@ public class AtomService {
         atom.setAttachmentDatasetHolders(attachments);
         atom = atomRepository.save(atom);
         connectionContainerRepository.save(connectionContainer);
-        socketEntities.forEach(socket -> socketRepository.saveAndFlush(socket));
+        socketEntities.forEach(socket -> socketRepository.save(socket));
         return atom;
     }
 
@@ -350,7 +414,7 @@ public class AtomService {
         return atomURI;
     }
 
-    public void authorizeOwnerApplicationForAtom(final String ownerApplicationID, Atom atom) {
+    public Atom authorizeOwnerApplicationForAtom(final String ownerApplicationID, Atom atom) {
         String stopwatchName = getClass().getName() + ".authorizeOwnerApplicationForAtom";
         Stopwatch stopwatch = SimonManager.getStopwatch(stopwatchName + "_phase1");
         Split split = stopwatch.start();
@@ -383,6 +447,7 @@ public class AtomService {
         split = stopwatch.start();
         atom = atomRepository.save(atom);
         split.stop();
+        return atom;
     }
 
     public void activate(WonMessage wonMessage) throws NoSuchAtomException {
@@ -421,12 +486,11 @@ public class AtomService {
         logger.debug("DEACTIVATING atom. atomURI:{}", atomURI);
         Objects.requireNonNull(atomURI);
         Objects.requireNonNull(messageURI);
-        Atom atom = getAtomRequired(atomURI);
-        logger.debug("atom State: " + atom.getState());
-        atom.setState(AtomState.INACTIVE);
-        atomRepository.findOneByAtomURIForUpdate(atomURI);
-        atomRepository.save(atom);
-        logger.debug("atom State: " + atom.getState());
+        Optional<Atom> atom = getAtomForUpdate(atomURI);
+        logger.debug("atom State: " + atom.get().getState());
+        atom.get().setState(AtomState.INACTIVE);
+        atomRepository.save(atom.get());
+        logger.debug("atom State: " + atom.get().getState());
     }
 
     public void atomMessageFromSystem(WonMessage wonMessage) {
