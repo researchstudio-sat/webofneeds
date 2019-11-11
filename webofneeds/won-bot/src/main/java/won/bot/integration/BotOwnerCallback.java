@@ -3,6 +3,7 @@ package won.bot.integration;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.Date;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,12 +116,14 @@ public class BotOwnerCallback implements OwnerCallback {
     }
 
     @Override
-    public void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage) {
+    public void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage,
+                    Optional<Connection> con) {
         taskScheduler.schedule(() -> {
             try {
                 logger.debug("onSuccessResponse for message {} ", successfulMessageUri);
                 URI atomUri = wonMessage.getRecipientAtomURI();
-                botManager.getBotResponsibleForAtomUri(atomUri).onSuccessResponse(successfulMessageUri, wonMessage);
+                botManager.getBotResponsibleForAtomUri(atomUri).onSuccessResponse(successfulMessageUri, wonMessage,
+                                con);
             } catch (NoBotResponsibleException e) {
                 logger.debug("error while handling onSuccessResponse() message: {}", e.getMessage());
             } catch (Exception e) {
@@ -130,12 +133,12 @@ public class BotOwnerCallback implements OwnerCallback {
     }
 
     @Override
-    public void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage) {
+    public void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage, Optional<Connection> con) {
         taskScheduler.schedule(() -> {
             try {
                 logger.debug("onFailureResponse for message {} ", failedMessageUri);
                 URI atomUri = wonMessage.getRecipientAtomURI();
-                botManager.getBotResponsibleForAtomUri(atomUri).onFailureResponse(failedMessageUri, wonMessage);
+                botManager.getBotResponsibleForAtomUri(atomUri).onFailureResponse(failedMessageUri, wonMessage, con);
             } catch (NoBotResponsibleException e) {
                 logger.debug("error while handling onFailureResponse() message: {}", e.getMessage());
             } catch (Exception e) {
