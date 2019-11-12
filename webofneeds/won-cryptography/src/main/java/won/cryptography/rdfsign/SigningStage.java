@@ -1,17 +1,23 @@
 package won.cryptography.rdfsign;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.StmtIterator;
+
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonSignatureData;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.RDFG;
 import won.protocol.vocabulary.WONMSG;
-
-import java.util.*;
 
 /**
  * A helper class to represent the won message information such as which content
@@ -66,7 +72,7 @@ public class SigningStage {
     }
 
     private void orderEnvelopes(final WonMessage message) {
-        String outer = message.getOuterEnvelopeGraphURI().toString();
+        String outer = message.getEnvelopeURI().toString();
         envOrderedByContainment.add(outer);
         while (outer != null) {
             String inner = envUriToContainedInItEnvUri.get(outer);
@@ -104,12 +110,6 @@ public class SigningStage {
         StmtIterator it = msgEventResource.listProperties(WONMSG.content);
         while (it.hasNext()) {
             contentUriToContainingItEnvUri.put(it.nextStatement().getObject().asResource().getURI(), envelopeGraphUri);
-        }
-        // find if it contains another envelopes
-        it = msgEnvelopeResource.listProperties(WONMSG.containsEnvelope);
-        // TODO make sure that > 1 envelope is not possible in the protocol
-        if (it.hasNext()) {
-            envUriToContainedInItEnvUri.put(envelopeGraphUri, it.nextStatement().getObject().asResource().getURI());
         }
         // find if it contains a signature references
         it = msgEnvelopeResource.listProperties(WONMSG.containsSignature);

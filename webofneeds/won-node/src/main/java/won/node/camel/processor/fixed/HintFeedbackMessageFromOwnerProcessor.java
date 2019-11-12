@@ -35,7 +35,6 @@ public class HintFeedbackMessageFromOwnerProcessor extends AbstractCamelProcesso
     public void process(final Exchange exchange) throws Exception {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
-        logger.debug("HINT_FEEDBACK received from the owner side for connection {}", wonMessage.getSenderURI());
         connectionService.hintFeedbackFromOwner(wonMessage);
     }
 }

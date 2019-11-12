@@ -2,7 +2,7 @@ package won.node.camel.route.fixed;
 
 import static org.apache.camel.builder.PredicateBuilder.*;
 import static won.node.camel.WonNodeConstants.*;
-import static won.node.camel.processor.WonCamelHelper.*;
+import static won.node.camel.service.WonCamelHelper.*;
 
 import java.lang.invoke.MethodHandles;
 import java.net.URI;

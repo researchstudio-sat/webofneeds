@@ -56,11 +56,7 @@ public class SignatureAddingWonMessageProcessor implements WonMessageProcessor {
         List<WonMessage> ret = new ArrayList();
         for (WonMessage message : wonMessage.getAllMessages()) {
             // use senderAtom key for signing
-            Optional<URI> senderAtomURI = Optional.of(message.getSenderAtomURI());
-            if (!senderAtomURI.isPresent()) {
-                throw new WonMessageProcessingException(
-                                "Cannot determine sender atom of message " + message.getMessageURI());
-            }
+            Optional<URI> senderAtomURI = Optional.of(message.getSenderAtomURIRequired());
             String alias = keyPairAliasDerivationStrategy.getAliasForAtomUri(senderAtomURI.get().toString());
             PrivateKey privateKey = cryptographyService.getPrivateKey(alias);
             PublicKey publicKey = cryptographyService.getPublicKey(alias);

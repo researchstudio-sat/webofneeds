@@ -1,8 +1,8 @@
 package won.bot.framework.eventbot.action.impl.wonmessage;
 
 import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +14,6 @@ import won.bot.framework.eventbot.event.MessageEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
-import won.protocol.util.WonRdfUtils;
 
 public class PrintWonMessageAction extends BaseEventBotAction {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -41,96 +40,112 @@ public class PrintWonMessageAction extends BaseEventBotAction {
     }
 
     private void handleReceivedMessage(WonMessage msg) {
-        StringBuilder output = new StringBuilder();
-        output.append("+-<<< Received ").append(msg.getMessageType()).append(" <<<---\n");
-        output.append("| message uri: ").append(msg.getMessageURI()).append("\n");
-        output.append("| sender: ").append(getSender(msg)).append("\n");
-        output.append("| recipient: ").append(getRecipient(msg)).append("\n");
-        Optional<String> textMessage = getTextMessage(msg);
-        if (textMessage.isPresent()) {
-            output.append("| message : \n");
-            output.append(format(textMessage.get()));
-        }
-        output.append("+-<<< End of Message <<<---");
-        System.out.println(output.toString());
+        System.out.println(makeMessageBox("                <---- Received Message <---- ", msg.toStringForDebug(true),
+                        120));
     }
 
     private void handleSentMessage(WonMessage msg) {
-        StringBuilder output = new StringBuilder();
-        output.append("+->>> Sent ").append(msg.getMessageType()).append(">>>---\n");
-        output.append("| message uri: ").append(msg.getMessageURI()).append("\n");
-        output.append("| sender: ").append(getSender(msg)).append("\n");
-        output.append("| recipient: ").append(getRecipient(msg)).append("\n");
-        Optional<String> textMessage = getTextMessage(msg);
-        if (textMessage.isPresent()) {
-            output.append("| message : \n");
-            output.append(format(textMessage.get()));
-        }
-        output.append("+->>> End of Message >>>---");
-        System.out.println(output.toString());
+        System.out.println(
+                        makeMessageBox(" ----> Sent Message ---->                ", msg.toStringForDebug(true), 120));
     }
 
-    private URI getSender(WonMessage msg) {
-        URI ret = msg.getSenderURI();
-        if (ret != null) {
-            return ret;
+    private BiFunction<String, Integer, String> centerLayout = (text, width) -> {
+        if (text == null) {
+            return null;
         }
-        ret = msg.getSenderSocketURI();
-        if (ret != null) {
-            return ret;
+        if (text.length() >= width) {
+            return text;
         }
-        ret = msg.getSenderAtomURI();
-        if (ret != null) {
-            return ret;
+        int spare = width - text.length();
+        int half = spare / 2;
+        int rightHalf = (half * 2) == spare ? half : half + 1;
+        StringBuilder sb = new StringBuilder();
+        sb
+                        .append(rep(' ', half))
+                        .append(text)
+                        .append(rep(' ', rightHalf));
+        return sb.toString();
+    };
+    private BiFunction<String, Integer, String> leftLayout = (text, width) -> {
+        if (text == null) {
+            return null;
         }
-        ret = msg.getSenderNodeURI();
-        if (ret != null) {
-            return ret;
+        if (text.length() >= width) {
+            return text;
         }
-        logger.warn("could not get a sender URI from message " + msg.getMessageURI());
-        return null;
+        int spare = width - text.length();
+        StringBuilder sb = new StringBuilder();
+        sb
+                        .append(text)
+                        .append(rep(' ', spare));
+        return sb.toString();
+    };
+
+    private String rep(char character, int times) {
+        StringBuilder sb = new StringBuilder();
+        Stream.generate(() -> character).limit(times).forEach(c -> sb.append(c));
+        return sb.toString();
     }
 
-    private URI getRecipient(WonMessage msg) {
-        URI ret = msg.getRecipientURI();
-        if (ret != null) {
-            return ret;
-        }
-        ret = msg.getRecipientSocketURI();
-        if (ret != null) {
-            return ret;
-        }
-        ret = msg.getRecipientAtomURI();
-        if (ret != null) {
-            return ret;
-        }
-        ret = msg.getRecipientNodeURI();
-        if (ret != null) {
-            return ret;
-        }
-        logger.warn("could not get a recipient URI from message " + msg.getMessageURI());
-        return null;
+    protected String makeMessageBox(String header, String body, int textWidth) {
+        int padding = 2;
+        int width = textWidth + 2 * padding;
+        StringBuilder box = new StringBuilder();
+        // header upper border
+        box
+                        .append('+')
+                        .append(rep('=', width))
+                        .append('+')
+                        .append('\n');
+        // header
+        box.append(surround(lineBreaks(header, textWidth, centerLayout), ' ', '|', padding));
+        // header lower border
+        box
+                        .append('+')
+                        .append(rep('-', width))
+                        .append('+')
+                        .append('\n');
+        // body
+        box.append(surround(lineBreaks(body, textWidth, leftLayout), ' ', '|', padding));
+        box
+                        .append('+')
+                        .append(rep('=', width))
+                        .append('+')
+                        .append('\n');
+        return "\n" + box.toString() + "\n";
     }
 
-    private Optional<String> getTextMessage(WonMessage msg) {
-        return Optional.ofNullable(WonRdfUtils.MessageUtils.getTextMessage(msg));
-    }
-
-    private String format(String text) {
-        int lineLength = 117;
+    private String lineBreaks(String text, int textWidth, BiFunction<String, Integer, String> layout) {
         String[] lines = text.split("\\r?\\n");
         StringBuilder formatted = new StringBuilder();
-        String lineToFormat;
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i];
-            if (line.length() <= lineLength) {
-                lineToFormat = line;
+            if (line.length() <= textWidth) {
+                formatted
+                                .append(layout.apply(line, textWidth))
+                                .append('\n');
             } else {
-                lineToFormat = line.substring(0, lineLength);
-                lines[i] = line.substring(lineLength);
+                formatted
+                                .append(line.substring(0, textWidth))
+                                .append('\n');
+                lines[i] = line.substring(textWidth);
                 i--; // process same array item again
             }
-            formatted.append("|  ").append(lineToFormat).append("\n");
+        }
+        return formatted.toString();
+    }
+
+    private String surround(String text, char filler, char border, int padding) {
+        String[] lines = text.split("\\r?\\n");
+        StringBuilder formatted = new StringBuilder();
+        for (int i = 0; i < lines.length; i++) {
+            formatted
+                            .append(border)
+                            .append(rep(filler, padding))
+                            .append(lines[i])
+                            .append(rep(filler, padding))
+                            .append(border)
+                            .append('\n');
         }
         return formatted.toString();
     }

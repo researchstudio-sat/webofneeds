@@ -3,6 +3,7 @@ package won.node.camel.processor.socket.reviewSocket;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
@@ -20,6 +21,7 @@ import won.node.camel.processor.annotation.SocketMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Atom;
+import won.protocol.model.Connection;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.SCHEMA;
 import won.protocol.vocabulary.WONMSG;
@@ -37,12 +39,12 @@ public class ConnectFromNodeReviewSocketImpl extends AbstractCamelProcessor {
     public void process(final Exchange exchange) {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
-        URI connectionUri = wonMessage.getRecipientURI();
-        // Connection con = connectionRepository.findOneByConnectionURI(connectionUri);
+        Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(
+                        wonMessage.getRecipientSocketURIRequired(), wonMessage.getSenderSocketURIRequired());
         try {
             Map<Property, String> reviewData = WonRdfUtils.MessageUtils.getReviewContent(wonMessage);
             if (reviewData != null) {
-                addReviewToAtom(reviewData, connectionUri);
+                addReviewToAtom(reviewData, con.get().getConnectionURI());
             } else {
                 logger.debug("No review data found in message: {}", wonMessage);
             }

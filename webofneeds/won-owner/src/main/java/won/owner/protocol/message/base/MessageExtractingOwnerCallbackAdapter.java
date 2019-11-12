@@ -55,30 +55,8 @@ public class MessageExtractingOwnerCallbackAdapter extends OwnerCallbackAdapter 
      * @param wonMessage or null if the message is not directed at a connection
      */
     private Connection toConnection(WonMessage wonMessage) {
-        Optional<URI> connectionUri = Optional.empty();
-        if (wonMessage.isMessageWithBothResponses()) {
-            // message with both responses is an incoming message from another atom.
-            // our node's response (the remote response, in this delivery chain) has the
-            // connection URI
-            connectionUri = Optional.of(wonMessage.getRemoteResponse().get().getSenderURIRequired());
-        } else if (wonMessage.isMessageWithResponse()) {
-            // message with onlny one response is our node's response plus the echo
-            // our node's response (the response in this delivery chain) has the connection
-            // URI
-            if (wonMessage.getHeadMessage().get().getMessageTypeRequired().isConnectionSpecificMessage()) {
-                connectionUri = Optional.of(wonMessage.getResponse().get().getSenderURIRequired());
-            } else {
-                return null;
-            }
-        } else if (wonMessage.isRemoteResponse()) {
-            // only a remote response. Our connection URI isn't there at all
-            // here, we fetch it from the node by asking for the connection for the two
-            // sockets
-            // - we could also use some kind of local storage for that.
-            connectionUri = WonLinkedDataUtils.getConnectionURIForSocketAndTargetSocket(
-                            wonMessage.getRecipientSocketURIRequired(),
-                            wonMessage.getSenderSocketURIRequired(), linkedDataSource);
-        }
+        Optional<URI> connectionUri = WonLinkedDataUtils.getConnectionURIForIncomingMessage(wonMessage,
+                        linkedDataSource);
         if (connectionUri.isPresent()) {
             // fetch the rest of the connection data from the node and make a connection
             // object for use in events.

@@ -20,10 +20,10 @@ public class WONMSG {
      */
     public static final String MESSAGE_URI_PREFIX = "wm:/";
     public static final String BASE_URI = "https://w3id.org/won/message#";
-    public static final String DEFAULT_PREFIX = "msg";;
+    public static final String DEFAULT_PREFIX = "msg";
     private static Model m = ModelFactory.createDefaultModel();
-    public static final String PROTOCOL_VERSION_STRING = BASE_URI + "protocolVersion";
-    public static final Property PROTOCOL_VERSION = m.createProperty(PROTOCOL_VERSION_STRING);
+    public static final String protocolVersionString = BASE_URI + "protocolVersion";
+    public static final Property protocolVersion = m.createProperty(protocolVersionString);
     public static final String FromOwnerString = BASE_URI + "FromOwner";
     public static final String FromSystemString = BASE_URI + "FromSystem";
     public static final String FromExternalString = BASE_URI + "FromExternal";
@@ -92,13 +92,6 @@ public class WONMSG {
     // used to wrap an envelope inside another for forwarding and adding the
     // server-side envelope to a
     // client-generated message
-    public static final Property containsEnvelope = m.createProperty(BASE_URI, "containsEnvelope");
-    public static final Property recipient = m.createProperty(BASE_URI, "recipient");
-    public static final Property recipientAtom = m.createProperty(BASE_URI, "recipientAtom");
-    public static final Property recipientNode = m.createProperty(BASE_URI, "recipientNode");
-    public static final Property sender = m.createProperty(BASE_URI, "sender");
-    public static final Property senderAtom = m.createProperty(BASE_URI, "senderAtom");
-    public static final Property senderNode = m.createProperty(BASE_URI, "senderNode");
     public static final Property messageType = m.createProperty(BASE_URI, "messageType");
     public static final Property content = m.createProperty(BASE_URI, "content");
     public static final Property respondingTo = m.createProperty(BASE_URI, "respondingTo");
@@ -119,6 +112,8 @@ public class WONMSG {
     public static final Property recipientSocket = m.createProperty(BASE_URI, "recipientSocket");
     public static final Property senderSocket = m.createProperty(BASE_URI, "senderSocket");
     public static final Property contentType = m.createProperty(BASE_URI, "contentType");
+    public static final Property connection = m.createProperty(BASE_URI, "connection");
+    public static final Property atom = m.createProperty(BASE_URI, "atom");
     public static final Property hintScore = m.createProperty(BASE_URI, "hintScore");
     public static final Property hintTargetAtom = m.createProperty(BASE_URI, "hintTargetAtom");
     public static final Property hintTargetSocket = m.createProperty(BASE_URI, "hintTargetSocket");

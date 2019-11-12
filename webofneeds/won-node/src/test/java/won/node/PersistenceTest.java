@@ -43,7 +43,6 @@ import won.protocol.model.Connection;
 import won.protocol.repository.AtomMessageContainerRepository;
 import won.protocol.repository.AtomRepository;
 import won.protocol.service.WonNodeInformationService;
-import won.protocol.vocabulary.WONMSG;
 
 @ContextConfiguration(locations = { "classpath:/won/node/PersistenceTest.xml",
                 "classpath:/spring/component/storage/jdbc-storage.xml",
@@ -281,12 +280,7 @@ public class PersistenceTest {
                         .map(mic -> mic.getMessageURI()).collect(Collectors.toSet());
         assertTrue(messages.contains(connectMessageUri));
         assertTrue(messages.contains(successForConnect));
-        // if we want to use the existing logic, we have to set the sender URI on the
-        // connectMessage (TODO: remove this step eventually)
-        connectMessage.addMessageProperty(WONMSG.sender, con.getConnectionURI());
-        // now simulate the other side receives the connect
         Connection remoteCon = connectionService.connectFromNode(connectMessage);
-        connectMessage.addMessageProperty(WONMSG.recipient, remoteCon.getConnectionURI());
         messageService.saveMessage(connectMessage, remoteCon.getConnectionURI());
         URI successForConnect2 = URI.create("uri:successForConnect2");
         WonMessage responseForConnectMessage2 = WonMessageBuilder

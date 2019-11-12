@@ -40,7 +40,9 @@ import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import won.protocol.message.WonMessage;
 import won.protocol.model.AtomState;
+import won.protocol.model.Connection;
 import won.protocol.model.SocketDefinition;
 import won.protocol.model.SocketDefinitionImpl;
 import won.protocol.rest.LinkedDataFetchingException;
@@ -62,6 +64,65 @@ public class WonLinkedDataUtils {
         Dataset dataset = getDataForResource(connectionURI, linkedDataSource);
         Path propertyPath = PathParser.parse("<" + WON.connectionState + ">", PrefixMapping.Standard);
         return RdfUtils.getURIPropertyForPropertyPath(dataset, connectionURI, propertyPath);
+    }
+
+    public static Optional<URI> getConnectionURIForIncomingMessage(WonMessage wonMessage,
+                    LinkedDataSource linkedDataSource) {
+        if (wonMessage.getMessageTypeRequired().isSocketHintMessage()) {
+            return WonLinkedDataUtils.getConnectionURIForSocketAndTargetSocket(
+                            wonMessage.getRecipientSocketURIRequired(),
+                            wonMessage.getHintTargetSocketURIRequired(), linkedDataSource);
+        } else if (wonMessage.getMessageTypeRequired().isAtomHintMessage()) {
+            return Optional.empty();
+        }
+        if (wonMessage.isMessageWithBothResponses()) {
+            // message with both responses is an incoming message from another atom.
+            // our node's response (the remote response, in this delivery chain) has the
+            // connection URI
+            return Optional.of(wonMessage.getRemoteResponse().get().getConnectionURIRequired());
+        } else if (wonMessage.isMessageWithResponse()) {
+            // message with onlny one response is our node's response plus the echo
+            // our node's response (the response in this delivery chain) has the connection
+            // URI
+            if (wonMessage.getHeadMessage().get().getMessageTypeRequired().isConnectionSpecificMessage()) {
+                return Optional.of(wonMessage.getResponse().get().getConnectionURIRequired());
+            } else {
+                return Optional.empty();
+            }
+        } else if (wonMessage.isRemoteResponse()) {
+            // only a remote response. Our connection URI isn't there at all
+            // here, we fetch it from the node by asking for the connection for the two
+            // sockets
+            // - we could also use some kind of local storage for that.
+            return WonLinkedDataUtils.getConnectionURIForSocketAndTargetSocket(
+                            wonMessage.getRecipientSocketURIRequired(),
+                            wonMessage.getSenderSocketURIRequired(), linkedDataSource);
+        }
+        return Optional.empty();
+    }
+
+    public static Optional<URI> getConnectionURIForOutgoingMessage(WonMessage wonMessage,
+                    LinkedDataSource linkedDataSource) {
+        if (wonMessage.getMessageTypeRequired().isConnectionSpecificMessage()) {
+            return WonLinkedDataUtils.getConnectionURIForSocketAndTargetSocket(
+                            wonMessage.getSenderSocketURIRequired(),
+                            wonMessage.getRecipientSocketURIRequired(), linkedDataSource);
+        }
+        return Optional.empty();
+    }
+
+    public static Optional<Connection> getConnectionForIncomingMessage(WonMessage wonMessage,
+                    LinkedDataSource linkedDataSource) {
+        Optional<URI> connectionURI = getConnectionURIForIncomingMessage(wonMessage, linkedDataSource);
+        return connectionURI.map(uri -> WonRdfUtils.ConnectionUtils
+                        .getConnection(linkedDataSource.getDataForResource(uri), uri));
+    }
+
+    public static Optional<Connection> getConnectionForOutgoingMessage(WonMessage wonMessage,
+                    LinkedDataSource linkedDataSource) {
+        Optional<URI> connectionURI = getConnectionURIForOutgoingMessage(wonMessage, linkedDataSource);
+        return connectionURI.map(uri -> WonRdfUtils.ConnectionUtils
+                        .getConnection(linkedDataSource.getDataForResource(uri), uri));
     }
 
     public static URI getAtomURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {

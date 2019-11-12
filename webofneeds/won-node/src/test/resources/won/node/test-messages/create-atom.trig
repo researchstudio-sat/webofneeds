@@ -42,8 +42,7 @@ this:envelope {
             msg:content        this:atom ;
             msg:messageType    msg:CreateMessage ;
             msg:recipientNode  node:resource ;
-            msg:senderAtom     atom:newAtom ;
-            msg:senderNode     node:resource ;
+            msg:atom           atom:newAtom ;
             msg:sentTimestamp  1568107960343 .
     
     this:envelope  a                 msg:EnvelopeGraph ;

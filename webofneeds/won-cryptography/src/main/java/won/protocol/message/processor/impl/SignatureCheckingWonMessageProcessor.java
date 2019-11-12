@@ -110,7 +110,7 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
             // throw exception if the verification fails:
             if (!result.isVerificationPassed()) {
                 String errormessage = "Message verification failed. Message:"
-                                + messageDataToString(message)
+                                + message.toStringForDebug(false)
                                 + ", Problem:"
                                 + result.getMessage();
                 if (logger.isDebugEnabled()) {
@@ -124,30 +124,6 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
             }
         }
         return message;
-    }
-
-    private String messageDataToString(WonMessage message) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        sb.append("messageURI: ").append(message.getMessageURI()).append(", ");
-        sb.append("messageType: ").append(message.getMessageType()).append(", ");
-        boolean senderPrinted = appendIfPresent(message.getSenderURI(), "sender", sb)
-                        || appendIfPresent(message.getSenderSocketURI(), "senderSocket", sb)
-                        || appendIfPresent(message.getSenderAtomURI(), "senderAtom", sb)
-                        || appendIfPresent(message.getSenderNodeURI(), "senderNode", sb);
-        if (!senderPrinted) {
-            sb.append("sender: (no sender info found)");
-        }
-        sb.append(", ");
-        boolean recipientPrinted = appendIfPresent(message.getRecipientURI(), "recipient", sb)
-                        || appendIfPresent(message.getRecipientSocketURI(), "recipientSocket", sb)
-                        || appendIfPresent(message.getRecipientAtomURI(), "recipientAtom", sb)
-                        || appendIfPresent(message.getRecipientNodeURI(), "senderNode", sb);
-        if (!recipientPrinted) {
-            sb.append("recipient: (no recipient info found)");
-        }
-        sb.append("]");
-        return sb.toString();
     }
 
     private boolean appendIfPresent(URI uri, String label, StringBuilder sb) {

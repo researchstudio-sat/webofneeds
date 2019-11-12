@@ -31,6 +31,10 @@ public enum WonMessageDirection {
         return getResource().getURI().equals(uri.toString());
     }
 
+    public URI getURI() {
+        return URI.create(getResource().getURI());
+    }
+
     public static WonMessageDirection getWonMessageDirection(Resource resource) {
         if (WONMSG.FromOwner.equals(resource))
             return FROM_OWNER;

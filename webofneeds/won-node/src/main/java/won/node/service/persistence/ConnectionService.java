@@ -270,11 +270,6 @@ public class ConnectionService {
             throw new WrongAddressingInformationException("score is not in [0,1]", wonMessage.getMessageURI(),
                             WONMSG.hintScore);
         }
-        URI wmOriginator = wonMessage.getSenderNodeURI();
-        if (wmOriginator == null) {
-            throw new WrongAddressingInformationException("originator is not set", wonMessage.getMessageURI(),
-                            WONMSG.senderNode);
-        }
         if (recipientSocketURI == null) {
             throw new MissingMessagePropertyException(WONMSG.recipientSocket);
         }
@@ -391,7 +386,7 @@ public class ConnectionService {
     public void grabRemoteConnectionURIFromRemoteResponse(WonMessage responseMessage) {
         responseMessage.getMessageType().requireType(WonMessageType.SUCCESS_RESPONSE);
         WonMessageType responseToType = responseMessage.getRespondingToMessageType();
-        URI senderURI = responseMessage.getSenderURI(); // the remote connection uri
+        URI senderURI = responseMessage.getConnectionURIRequired(); // the remote connection uri
         URI senderSocketURI = responseMessage.getSenderSocketURIRequired();
         URI recipientSocketURI = responseMessage.getRecipientSocketURIRequired();
         Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(recipientSocketURI,
@@ -459,7 +454,7 @@ public class ConnectionService {
      */
     public void hintFeedbackFromOwner(final WonMessage message) {
         message.getMessageType().requireType(WonMessageType.HINT_FEEDBACK_MESSAGE);
-        Connection con = getConnectionRequired(message.getSenderURI());
+        Connection con = getConnectionRequired(message.getConnectionURIRequired());
         final URI messageURI = message.getMessageURI();
         RdfUtils.visit(message.getMessageContent(), model -> {
             Resource baseResource = model.getResource(messageURI.toString());

@@ -43,7 +43,6 @@ public class DeliveryChain {
             case DEACTIVATE:
             case ACTIVATE:
             case HINT_FEEDBACK_MESSAGE:
-            case HINT_NOTIFICATION:
             case ATOM_CREATED_NOTIFICATION:
             case ATOM_HINT_MESSAGE:
             case SOCKET_HINT_MESSAGE:
@@ -63,7 +62,6 @@ public class DeliveryChain {
             case DEACTIVATE:
             case ACTIVATE:
             case HINT_FEEDBACK_MESSAGE:
-            case HINT_NOTIFICATION:
             case ATOM_CREATED_NOTIFICATION:
                 return head.getRespondingToInverseRef();
             default:

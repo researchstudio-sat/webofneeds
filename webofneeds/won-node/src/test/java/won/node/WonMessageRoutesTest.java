@@ -2,7 +2,7 @@ package won.node;
 
 import static org.mockito.Matchers.*;
 import static won.node.camel.WonNodeConstants.*;
-import static won.node.camel.processor.WonCamelHelper.*;
+import static won.node.camel.service.WonCamelHelper.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,7 +58,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import won.cryptography.service.RandomNumberService;
-import won.node.camel.processor.WonCamelHelper;
+import won.node.camel.service.WonCamelHelper;
 import won.node.service.linkeddata.generate.LinkedDataService;
 import won.node.service.linkeddata.lookup.SocketLookupFromLinkedData;
 import won.node.service.nodebehaviour.DataDerivationService;
@@ -80,6 +80,7 @@ import won.protocol.model.Connection;
 import won.protocol.repository.AtomRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.SocketRepository;
+import won.protocol.service.WonNodeInfoBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.service.impl.MessageRoutingInfoServiceWithLookup;
 import won.protocol.util.AtomModelWrapper;
@@ -499,11 +500,11 @@ public abstract class WonMessageRoutesTest {
     }
 
     protected Predicate doesResponseContainSender() {
-        return new ResponseContainsSender();
+        return new ResponseContainsConnection();
     }
 
-    private class ResponseContainsSender implements Predicate {
-        public ResponseContainsSender() {
+    private class ResponseContainsConnection implements Predicate {
+        public ResponseContainsConnection() {
         }
 
         @Override
@@ -511,18 +512,18 @@ public abstract class WonMessageRoutesTest {
             WonMessage msg = getMessage(exchange);
             Optional<WonMessage> resp = msg.getResponse();
             if (resp.isPresent()) {
-                if (resp.get().getSenderURI() == null) {
+                if (resp.get().getConnectionURI() == null) {
                     return false;
                 }
             }
             resp = msg.getRemoteResponse();
             if (resp.isPresent()) {
-                if (resp.get().getSenderURI() == null) {
+                if (resp.get().getConnectionURI() == null) {
                     return false;
                 }
             }
             if (msg.isRemoteResponse()) {
-                if (msg.getSenderURI() == null) {
+                if (msg.getConnectionURI() == null) {
                     return false;
                 }
             }
@@ -742,7 +743,7 @@ public abstract class WonMessageRoutesTest {
     }
 
     protected URI newConnectionURI() {
-        return URI.create("uri:/connection-" + counter.incrementAndGet());
+        return URI.create(URI_NODE_1 + "/connection/connection-" + counter.incrementAndGet());
     }
 
     protected URI newMessageURI() {
@@ -879,6 +880,10 @@ public abstract class WonMessageRoutesTest {
         Mockito.when(wonNodeInformationService
                         .generateEventURI())
                         .then(x -> newMessageURI());
+        Mockito.when(wonNodeInformationService.getWonNodeInformation(URI_NODE_1)).then(x -> new WonNodeInfoBuilder()
+                        .setAtomURIPrefix(URI_NODE_1 + "/atom")
+                        .setConnectionURIPrefix(URI_NODE_1 + "/connection")
+                        .build());
         Mockito.when(uriService.isAtomURI(any(URI.class))).thenReturn(true);
         Mockito.when(uriService.getAtomResourceURIPrefix()).then(x -> URI_NODE_1.toString() + "/atom");
         Mockito.when(uriService.getResourceURIPrefix()).then(x -> URI_NODE_1.toString());

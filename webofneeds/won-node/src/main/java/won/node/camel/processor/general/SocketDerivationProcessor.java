@@ -1,6 +1,6 @@
 package won.node.camel.processor.general;
 
-import static won.node.camel.processor.WonCamelHelper.*;
+import static won.node.camel.service.WonCamelHelper.*;
 
 import java.util.Optional;
 
@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import won.node.camel.processor.WonCamelHelper;
+import won.node.camel.service.WonCamelHelper;
 import won.node.service.nodebehaviour.ConnectionStateChange;
 import won.node.service.nodebehaviour.DataDerivationService;
 import won.node.service.persistence.AtomService;

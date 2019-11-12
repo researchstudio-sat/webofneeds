@@ -94,8 +94,7 @@ public class AtomManagementService {
             return;
         }
         URI messageURI = wonNodeInformationService.generateEventURI(wonNodeURI);
-        WonMessageBuilder builder = WonMessageBuilder.setMessagePropertiesForDeactivateFromSystem(messageURI, atomURI,
-                        wonNodeURI);
+        WonMessageBuilder builder = WonMessageBuilder.setMessagePropertiesForDeactivateFromSystem(messageURI, atomURI);
         if (optionalMessage != null && optionalMessage.trim().length() > 0) {
             builder.setTextMessage(optionalMessage);
         }

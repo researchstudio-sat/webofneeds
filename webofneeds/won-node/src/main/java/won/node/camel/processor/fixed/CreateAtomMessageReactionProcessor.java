@@ -10,7 +10,7 @@
  */
 package won.node.camel.processor.fixed;
 
-import static won.node.camel.processor.WonCamelHelper.*;
+import static won.node.camel.service.WonCamelHelper.*;
 
 import java.lang.invoke.MethodHandles;
 
@@ -57,7 +57,7 @@ public class CreateAtomMessageReactionProcessor extends AbstractCamelProcessor {
     private WonMessage makeAtomCreatedMessageForMatcher(final Atom atom) throws NoSuchAtomException {
         return WonMessageBuilder
                         .setMessagePropertiesForAtomCreatedNotification(wonNodeInformationService.generateEventURI(),
-                                        atom.getAtomURI(), atom.getWonNodeURI())
+                                        atom.getAtomURI())
                         .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build();
     }
 }

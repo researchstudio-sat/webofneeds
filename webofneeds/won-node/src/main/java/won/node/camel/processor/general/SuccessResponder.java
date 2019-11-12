@@ -10,7 +10,7 @@
  */
 package won.node.camel.processor.general;
 
-import static won.node.camel.processor.WonCamelHelper.*;
+import static won.node.camel.service.WonCamelHelper.*;
 
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import won.node.camel.processor.AbstractCamelProcessor;
-import won.node.camel.processor.WonCamelHelper;
+import won.node.camel.service.WonCamelHelper;
 import won.node.service.persistence.ConnectionService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -62,6 +62,8 @@ public class SuccessResponder extends AbstractCamelProcessor {
             if (con.isPresent()) {
                 parent = Optional.of(con.get().getConnectionURI());
             }
+        } else if (originalMessage.getMessageTypeRequired().isAtomSpecificMessage()) {
+            parent = Optional.of(originalMessage.getAtomURIRequired());
         }
         URI newMessageURI = this.wonNodeInformationService.generateEventURI();
         WonMessage responseMessage = WonMessageBuilder

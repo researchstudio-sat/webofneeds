@@ -39,24 +39,6 @@ public class WonMessageTest {
     }
 
     @Test
-    public void testForwardedMessage1() {
-        Dataset input = DatasetFactory.createGeneral();
-        RDFDataMgr.read(input, getResourceAsStream("wonmessage/forward/forwarded-msg-1.trig"), Lang.TRIG);
-        WonMessage msg = WonMessage.of(input);
-        Assert.assertEquals(URI.create("https://satvm05.researchstudio.at/won/resource/event/pcunhsv1urpd2q3bfpan"),
-                        msg.getMessageURI());
-        Assert.assertEquals(
-                        URI.create("https://satvm05.researchstudio.at/won/resource/connection/zy478j5k7roa38f2ao9l"),
-                        msg.getSenderURI());
-        Assert.assertEquals(
-                        URI.create("https://satvm05.researchstudio.at/won/resource/connection/nz3dg71sop2v5f82j3lm"),
-                        msg.getRecipientURI());
-        Assert.assertTrue(msg.getForwardedMessageURIs().contains(URI
-                        .create("https://satvm05.researchstudio.at/won/resource/event/wxmlua2uu1gu")));
-        Assert.assertEquals(WonMessageDirection.FROM_OWNER, msg.getEnvelopeType());
-    }
-
-    @Test
     public void testGetMessageContentDataset() {
         Dataset input = DatasetFactory.createGeneral();
         RDFDataMgr.read(input, getResourceAsStream("wonmessage/extract_content/create_message.trig"), Lang.TRIG);
@@ -95,14 +77,14 @@ public class WonMessageTest {
     public void test_message_and_response_in_same_dataset() {
         WonMessage msg = WonMessageBuilder.setMessagePropertiesForConnectionMessage(
                         URI.create("uri:/messageUri"),
-                        URI.create("uri:/localSocket"), URI.create("uri:/localConnection"),
+                        URI.create("uri:/localAtom#socket"), URI.create("uri:/localConnection"),
                         URI.create("uri:/localAtom"),
                         URI.create("uri:/localWonnode"),
-                        URI.create("uri:/targetSocket"), URI.create("uri:/targetConnection"),
+                        URI.create("uri:/targetAtom#socket"), URI.create("uri:/targetConnection"),
                         URI.create("uri:/targetAtom"), URI.create("uri:/targetWonNode"),
                         "hello").build();
         WonMessage response = WonMessageBuilder.setPropertiesForNodeResponse(msg, true, URI.create("uri:/succ1"),
-                        Optional.empty(), WonMessageDirection.FROM_OWNER).build();
+                        Optional.of(URI.create("uri:/conn1")), WonMessageDirection.FROM_OWNER).build();
         Dataset both = msg.getCompleteDataset();
         RdfUtils.addDatasetToDataset(both, response.getCompleteDataset());
         WonMessage msgAndResponse = WonMessage.of(both);
@@ -114,16 +96,16 @@ public class WonMessageTest {
     public void test_message_and_two_responses_in_same_dataset() {
         WonMessage msg = WonMessageBuilder.setMessagePropertiesForConnectionMessage(
                         URI.create("uri:/messageUri"),
-                        URI.create("uri:/localSocket"), URI.create("uri:/localConnection"),
+                        URI.create("uri:/localAtom#socket"), URI.create("uri:/localConnection"),
                         URI.create("uri:/localAtom"),
                         URI.create("uri:/localWonnode"),
-                        URI.create("uri:/targetSocket"), URI.create("uri:/targetConnection"),
+                        URI.create("uri:/targetAtom#socket"), URI.create("uri:/targetConnection"),
                         URI.create("uri:/targetAtom"), URI.create("uri:/targetWonNode"),
                         "hello").build();
         WonMessage response = WonMessageBuilder.setPropertiesForNodeResponse(msg, true, URI.create("uri:/succ1"),
-                        Optional.empty(), WonMessageDirection.FROM_OWNER).build();
+                        Optional.of(URI.create("uri:/conn1")), WonMessageDirection.FROM_OWNER).build();
         WonMessage response2 = WonMessageBuilder.setPropertiesForNodeResponse(msg, true, URI.create("uri:/succ2"),
-                        Optional.empty(), WonMessageDirection.FROM_EXTERNAL).build();
+                        Optional.of(URI.create("uri:/conn2")), WonMessageDirection.FROM_EXTERNAL).build();
         Dataset both = msg.getCompleteDataset();
         RdfUtils.addDatasetToDataset(both, response.getCompleteDataset());
         RdfUtils.addDatasetToDataset(both, response2.getCompleteDataset());

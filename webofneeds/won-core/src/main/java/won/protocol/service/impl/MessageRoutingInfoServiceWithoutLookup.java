@@ -39,17 +39,11 @@ public class MessageRoutingInfoServiceWithoutLookup implements MessageRoutingInf
 
     @Override
     public Optional<URI> senderNode(WonMessage msg) {
-        URI senderNode = msg.getSenderNodeURI();
-        // we don't have a rule that the node URI must be a substring of the atom URI,
-        // so we cannot do anything else here.
-        return Optional.ofNullable(senderNode);
+        return senderAtom(msg).map(WonMessageUtils::stripAtomSuffix);
     }
 
     @Override
     public Optional<URI> recipientNode(WonMessage msg) {
-        URI recipientNode = msg.getRecipientNodeURI();
-        // we don't have a rule that the node URI must be a substring of the atom URI,
-        // so we cannot do anything else here.
-        return Optional.ofNullable(recipientNode);
+        return recipientAtom(msg).map(WonMessageUtils::stripAtomSuffix);
     }
 }

@@ -10,7 +10,7 @@
  */
 package won.node.camel.processor.general;
 
-import static won.node.camel.processor.WonCamelHelper.*;
+import static won.node.camel.service.WonCamelHelper.*;
 
 import java.net.URI;
 
@@ -18,7 +18,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import won.node.camel.processor.WonCamelHelper;
+import won.node.camel.service.WonCamelHelper;
 import won.protocol.message.WonMessage;
 
 /**

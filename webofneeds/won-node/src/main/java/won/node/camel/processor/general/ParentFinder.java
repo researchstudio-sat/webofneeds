@@ -7,7 +7,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import won.node.camel.processor.WonCamelHelper;
+import won.node.camel.service.WonCamelHelper;
 import won.node.service.persistence.MessageService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;

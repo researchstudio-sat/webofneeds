@@ -66,7 +66,7 @@ public class ExecuteDeactivateAtomCommandAction extends BaseEventBotAction {
                     URI wonNodeURI) throws WonMessageBuilderException {
         return WonMessageBuilder
                         .setMessagePropertiesForDeactivateFromOwner(
-                                        wonNodeInformationService.generateEventURI(wonNodeURI), atomURI, wonNodeURI)
+                                        wonNodeInformationService.generateEventURI(wonNodeURI), atomURI)
                         .build();
     }
 }

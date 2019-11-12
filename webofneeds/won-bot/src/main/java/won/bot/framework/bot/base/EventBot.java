@@ -56,6 +56,7 @@ import won.protocol.model.Connection;
 import won.protocol.model.SocketType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
  * Base class for bots that define their behaviour through event listeners. Once
@@ -361,7 +362,12 @@ public abstract class EventBot extends ScheduledTriggerBot {
                 case CLOSE:
                 case CONNECT:
                 case CONNECTION_MESSAGE:
-                    event = new WonMessageSentOnConnectionEvent(message);
+                    event = new WonMessageSentOnConnectionEvent(
+                                    WonLinkedDataUtils.getConnectionForOutgoingMessage(message, getLinkedDataSource())
+                                                    .orElseThrow(() -> new IllegalStateException(
+                                                                    "Could not obtain connection data for message "
+                                                                                    + message.toShortStringForDebug())),
+                                    message);
                     break;
                 default:
                     event = new WonMessageSentEvent(message);

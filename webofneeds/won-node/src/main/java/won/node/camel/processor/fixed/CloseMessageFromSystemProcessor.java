@@ -10,7 +10,7 @@
  */
 package won.node.camel.processor.fixed;
 
-import static won.node.camel.processor.WonCamelHelper.*;
+import static won.node.camel.service.WonCamelHelper.*;
 
 import java.lang.invoke.MethodHandles;
 
@@ -42,7 +42,6 @@ public class CloseMessageFromSystemProcessor extends AbstractCamelProcessor {
 
     public void process(final Exchange exchange) throws Exception {
         WonMessage wonMessage = getMessageRequired(exchange);
-        logger.debug("CLOSE received from the system side for connection {}", wonMessage.getSenderURI());
         Connection con = connectionService.closeFromSystem(wonMessage);
         // if we know the remote connection, send a close message to the remote
         // connection

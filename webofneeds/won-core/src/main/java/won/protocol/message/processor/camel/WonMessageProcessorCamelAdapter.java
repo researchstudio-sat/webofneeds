@@ -89,20 +89,16 @@ public class WonMessageProcessorCamelAdapter implements Processor {
                             + " header but the object is of type " + msg.getClass());
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("calling adaptee {} with message {} (type: {}, direction: {}, recipient: {})",
-                            new Object[] { adaptee, msg, ((WonMessage) msg).getMessageType(),
-                                            ((WonMessage) msg).getEnvelopeType(),
-                                            ((WonMessage) msg).getRecipientURI() });
+            logger.debug("calling adaptee {} with message {}",
+                            new Object[] { adaptee, ((WonMessage) msg).toShortStringForDebug() });
         }
         // call the process method
         WonMessage resultMsg;
         try {
             resultMsg = adaptee.process((WonMessage) msg);
             if (logger.isDebugEnabled()) {
-                logger.debug("returning from adaptee {} with message {} (type: {}, direction: {}, recipient: {})",
-                                new Object[] { adaptee, msg, ((WonMessage) msg).getMessageType(),
-                                                ((WonMessage) msg).getEnvelopeType(),
-                                                ((WonMessage) msg).getRecipientURI() });
+                logger.debug("returning from adaptee {} with message {}",
+                                new Object[] { adaptee, ((WonMessage) msg).toShortStringForDebug() });
             }
         } catch (WonProtocolException wpe) {
             // no need to log this, it's an expected exception that will be reported to the
@@ -110,10 +106,8 @@ public class WonMessageProcessorCamelAdapter implements Processor {
             throw wpe;
         } catch (Exception e) {
             LoggingUtils.logMessageAsInfoAndStacktraceAsDebug(logger, e,
-                            "re-throwing exception {} caught calling adaptee {} with message {} (type: {}, direction: {}, recipient:{}",
-                            new Object[] { e, adaptee, msg, ((WonMessage) msg).getMessageType(),
-                                            ((WonMessage) msg).getEnvelopeType(),
-                                            ((WonMessage) msg).getRecipientURI() });
+                            "re-throwing exception {} caught calling adaptee {} with message {}",
+                            new Object[] { e, adaptee, ((WonMessage) msg).toShortStringForDebug() });
             throw e;
         }
         // set the result of the call as the new message in the exchange's in

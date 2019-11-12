@@ -1,4 +1,4 @@
-package won.node.camel.processor;
+package won.node.camel.service;
 
 import java.net.URI;
 import java.util.Objects;

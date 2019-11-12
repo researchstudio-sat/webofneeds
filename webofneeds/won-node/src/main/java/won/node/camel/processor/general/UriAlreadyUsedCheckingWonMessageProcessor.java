@@ -20,7 +20,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.util.IsoMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import won.node.camel.processor.WonCamelHelper;
+import won.node.camel.service.WonCamelHelper;
 import won.node.service.persistence.AtomService;
 import won.node.service.persistence.MessageService;
 import won.protocol.exception.UriAlreadyInUseException;
@@ -132,8 +132,6 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements Processor {
                         && equalsOrBothNull(processedMessage.getRecipientAtomURI(), message.getRecipientAtomURI())
                         // the receiving side can add this info
                         // &&
-                        // equalsOrBothNull(processedMessage.getSenderURI(), message.getSenderURI())
-                        && equalsOrBothNull(processedMessage.getRecipientURI(), message.getRecipientURI())
                         && equalsOrBothNull(processedMessage.getSenderNodeURI(), message.getSenderNodeURI())
                         && equalsOrBothNull(processedMessage.getRecipientNodeURI(), message.getRecipientNodeURI())
                         // the receiving side can add this info

@@ -198,9 +198,8 @@ public interface ConnectionRepository extends WonRepository<Connection> {
     Slice<URI> getConnectionURIByActivityDate(@Param("atom") URI atomURI, @Param("referenceDate") Date referenceDate,
                     Pageable pageable);
 
-    @Query("select conn from Connection conn where conn.connectionURI in (select distinct msg.parentURI  from MessageEvent msg "
-                    + "where (((msg.senderAtomURI = :atom and msg.senderURI = msg.parentURI) "
-                    + "   or (msg.recipientAtomURI = :atom and msg.recipientURI = msg.parentURI)) and (msg.creationDate < :referenceDate)))")
+    @Query("select conn from Connection conn where conn.atomURI = :atom and conn.connectionURI in (select distinct msg.parentURI  from MessageEvent msg "
+                    + "where msg.parentURI = conn.connectionURI and msg.creationDate < :referenceDate)")
     Slice<Connection> getConnectionsByActivityDate(@Param("atom") URI atomURI,
                     @Param("referenceDate") Date referenceDate, Pageable pageable);
 

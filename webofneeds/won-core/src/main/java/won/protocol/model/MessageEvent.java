@@ -43,10 +43,8 @@ public class MessageEvent implements ParentAware<MessageContainer> {
         this.parentURI = parentURI;
         this.messageURI = wonMessage.getMessageURI();
         this.messageType = wonMessage.getMessageType();
-        this.senderURI = wonMessage.getSenderURI();
         this.senderAtomURI = wonMessage.getSenderAtomURI();
         this.senderNodeURI = wonMessage.getSenderNodeURI();
-        this.recipientURI = wonMessage.getRecipientURI();
         this.recipientAtomURI = wonMessage.getRecipientAtomURI();
         this.recipientNodeURI = wonMessage.getRecipientNodeURI();
         this.creationDate = new Date();
@@ -156,50 +154,62 @@ public class MessageEvent implements ParentAware<MessageContainer> {
         this.messageType = messageType;
     }
 
+    @Deprecated
     public URI getSenderURI() {
         return senderURI;
     }
 
+    @Deprecated
     public void setSenderURI(final URI senderURI) {
         this.senderURI = senderURI;
     }
 
+    @Deprecated
     public URI getSenderAtomURI() {
         return senderAtomURI;
     }
 
+    @Deprecated
     public void setSenderAtomURI(final URI senderAtomURI) {
         this.senderAtomURI = senderAtomURI;
     }
 
+    @Deprecated
     public URI getSenderNodeURI() {
         return senderNodeURI;
     }
 
+    @Deprecated
     public void setSenderNodeURI(final URI senderNodeURI) {
         this.senderNodeURI = senderNodeURI;
     }
 
+    @Deprecated
     public URI getRecipientURI() {
         return recipientURI;
     }
 
+    @Deprecated
     public void setRecipientURI(final URI recipientURI) {
         this.recipientURI = recipientURI;
     }
 
+    @Deprecated
     public URI getRecipientAtomURI() {
         return recipientAtomURI;
     }
 
+    @Deprecated
     public void setRecipientAtomURI(final URI recipientAtomURI) {
         this.recipientAtomURI = recipientAtomURI;
     }
 
+    @Deprecated
     public URI getRecipientNodeURI() {
         return recipientNodeURI;
     }
 
+    @Deprecated
     public void setRecipientNodeURI(final URI recipientNodeURI) {
         this.recipientNodeURI = recipientNodeURI;
     }
@@ -220,10 +230,12 @@ public class MessageEvent implements ParentAware<MessageContainer> {
         this.referencedByOtherMessage = referencedByOtherMessage;
     }
 
+    @Deprecated
     public URI getResponseMessageURI() {
         return responseMessageURI;
     }
 
+    @Deprecated
     public void setResponseMessageURI(final URI responseMessageURI) {
         this.responseMessageURI = responseMessageURI;
     }

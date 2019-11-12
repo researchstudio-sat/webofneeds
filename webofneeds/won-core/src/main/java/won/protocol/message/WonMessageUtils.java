@@ -11,9 +11,11 @@
 package won.protocol.message;
 
 import java.net.URI;
+import java.util.Objects;
 import java.util.Optional;
 
 import won.protocol.exception.WonMessageProcessingException;
+import won.protocol.vocabulary.WONMSG;
 
 /**
  * Utilities for working with wonMessage objects.
@@ -77,6 +79,7 @@ public class WonMessageUtils {
 
     public static URI stripFragment(URI uriWithFragment) {
         URI atomUri;
+        Objects.requireNonNull(uriWithFragment);
         // just strip the fragment
         String fragment = uriWithFragment.getRawFragment();
         String uri = uriWithFragment.toString();
@@ -85,6 +88,7 @@ public class WonMessageUtils {
     }
 
     public static URI stripAtomSuffix(URI atomURI) {
+        Objects.requireNonNull(atomURI);
         String uri = atomURI.toString();
         return URI.create(uri.replaceFirst("/atom/.+$", ""));
     }
@@ -115,5 +119,12 @@ public class WonMessageUtils {
             }
         }
         return Optional.ofNullable(atomUri);
+    }
+
+    public static boolean isValidMessageUri(URI messageURIRequired) {
+        if (messageURIRequired == null) {
+            return false;
+        }
+        return messageURIRequired.toString().startsWith(WONMSG.MESSAGE_URI_PREFIX);
     }
 }

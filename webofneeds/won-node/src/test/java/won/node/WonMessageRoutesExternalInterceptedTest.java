@@ -44,7 +44,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
     @Test
     @Commit // @Rollback would't work as camel still commits
     public void test_create_atom__error_multiple_atoms() throws Exception {
-        URI atomURI = URI.create("http://example.com/atom-caema"); // uri in the file
+        URI atomURI = newAtomURI(); // uri in the file
         Dataset atom1Content = loadDataset(
                         "/won/node/WonMessageRoutesTest/data/test-atom1__error_multiple_atoms.ttl",
                         "http://example.com/atom1", atomURI.toString());
@@ -63,7 +63,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
     @Test
     @Commit // @Rollback would't work as camel still commits
     public void test_create_atom__error_no_atom() throws Exception {
-        URI atomURI = URI.create("http://example.com/atom1-caena"); // uri in the file
+        URI atomURI = newAtomURI();
         Dataset atom1Content = loadDataset(
                         "/won/node/WonMessageRoutesTest/data/test-atom1__error_no_atom.ttl", "http://example.com/atom1",
                         atomURI.toString());
@@ -310,7 +310,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
     @Test
     @Commit // @Rollback would't work as camel still commits
     public void test_replace_atom__error_multiple_atoms() throws Exception {
-        URI atomURI = URI.create("http://example.com/atom-raema"); // uri in the file
+        URI atomURI = newAtomURI();
         Dataset atom1Content = loadDatasetAndReplaceAtomURI("/won/node/WonMessageRoutesTest/data/test-atom1.ttl",
                         atomURI);
         WonMessage createAtom1Msg = WonMessageBuilder.setMessagePropertiesForCreate(newMessageURI(),
@@ -347,7 +347,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
     @Test
     @Commit // @Rollback would't work as camel still commits
     public void test_replace_atom__error_no_atom() throws Exception {
-        URI atomURI = URI.create("http://example.com/atom-raena"); // uri in the file
+        URI atomURI = newAtomURI();
         Dataset atom1Content = loadDatasetAndReplaceAtomURI("/won/node/WonMessageRoutesTest/data/test-atom1.ttl",
                         atomURI);
         WonMessage createAtom1Msg = WonMessageBuilder.setMessagePropertiesForCreate(newMessageURI(),
@@ -604,7 +604,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
         Mockito.when(linkedDataSource.getDataForResource(eq(atomURI)))
                         .then(x -> linkedDataService.getAtomDataset(atomURI, false, null));
         WonMessage deactivateMsg = WonMessageBuilder
-                        .setMessagePropertiesForDeactivateFromOwner(newMessageURI(), atomURI, URI_NODE_1).build();
+                        .setMessagePropertiesForDeactivateFromOwner(newMessageURI(), atomURI).build();
         // deactivate
         assertMockEndpointsSatisfiedAndReset(toMatcherMockEndpoint, toOwnerMockEndpoint);
         toMatcherMockEndpoint.expectedMessageCount(1); // notifications for create & deactivate
@@ -779,7 +779,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
         toOwnerMockEndpoint.reset();
         toMatcherMockEndpoint.reset();
         WonMessage deactivateMsg = WonMessageBuilder
-                        .setMessagePropertiesForDeactivateFromOwner(newMessageURI(), atomURI, URI_NODE_1).build();
+                        .setMessagePropertiesForDeactivateFromOwner(newMessageURI(), atomURI).build();
         toOwnerMockEndpoint.expectedMessageCount(1);
         toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(deactivateMsg));
         toMatcherMockEndpoint.expectedMessageCount(1);
@@ -813,7 +813,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
         sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
         WonMessage deactivateMsg = WonMessageBuilder
-                        .setMessagePropertiesForDeactivateFromOwner(newMessageURI(), atomURI, URI_NODE_1).build();
+                        .setMessagePropertiesForDeactivateFromOwner(newMessageURI(), atomURI).build();
         toOwnerMockEndpoint.expectedMessageCount(1);
         toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(deactivateMsg));
         toMatcherMockEndpoint.expectedMessageCount(1);
@@ -822,7 +822,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
         sendFromOwner(deactivateMsg, OWNERAPPLICATION_ID_OWNER1);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
         WonMessage reactivateMsg = WonMessageBuilder
-                        .setMessagePropertiesForActivateFromOwner(newMessageURI(), atomURI, URI_NODE_1).build();
+                        .setMessagePropertiesForActivateFromOwner(newMessageURI(), atomURI).build();
         toOwnerMockEndpoint.expectedMessageCount(1);
         toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(reactivateMsg));
         toMatcherMockEndpoint.expectedMessageCount(1);
@@ -1013,7 +1013,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
                         newMessageURI(), socketURI, socketURI2, "unittest connect")
                         .build();
         WonMessage response = WonMessageBuilder.setPropertiesForNodeResponse(connectMsg, true, newMessageURI(),
-                        Optional.empty(), WonMessageDirection.FROM_OWNER).build();
+                        Optional.of(newConnectionURI()), WonMessageDirection.FROM_OWNER).build();
         WonMessage msg = WonMessage.of(connectMsg, signatureAdder.process(response));
         // expectations for connect
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
@@ -1066,7 +1066,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
                         newMessageURI(), socketURI2, socketURI, "unittest connect")
                         .build();
         WonMessage response = WonMessageBuilder.setPropertiesForNodeResponse(connectMsg, true, newMessageURI(),
-                        Optional.empty(), WonMessageDirection.FROM_OWNER).build();
+                        Optional.of(newConnectionURI()), WonMessageDirection.FROM_OWNER).build();
         WonMessage msg = WonMessage.of(connectMsg, signatureAdder.process(response));
         // expectations for connect
         toOwnerMockEndpoint.expectedMessageCount(1);
@@ -1120,7 +1120,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
                         .build();
         WonMessage response = WonMessageBuilder
                         .setPropertiesForNodeResponse(connectFromExternalMsg, true, newMessageURI(),
-                                        Optional.empty(), WonMessageDirection.FROM_OWNER)
+                                        Optional.of(newConnectionURI()), WonMessageDirection.FROM_OWNER)
                         .build();
         WonMessage msg = WonMessage.of(connectFromExternalMsg, signatureAdder.process(response));
         // expectations for connect
@@ -1187,7 +1187,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
                             .build();
             WonMessage response = WonMessageBuilder
                             .setPropertiesForNodeResponse(connectFromExternalMsg, true, newMessageURI(),
-                                            Optional.empty(), WonMessageDirection.FROM_OWNER)
+                                            Optional.of(newConnectionURI()), WonMessageDirection.FROM_OWNER)
                             .build();
             WonMessage msg = WonMessage.of(connectFromExternalMsg, signatureAdder.process(response));
             WonMessage connectFromOwnerMsg = WonMessageBuilder.setMessagePropertiesForConnect(
@@ -1248,7 +1248,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
                             .build();
             WonMessage response = WonMessageBuilder
                             .setPropertiesForNodeResponse(connectFromExternalMsg, true, newMessageURI(),
-                                            Optional.empty(), WonMessageDirection.FROM_OWNER)
+                                            Optional.of(newConnectionURI()), WonMessageDirection.FROM_OWNER)
                             .build();
             WonMessage msg = WonMessage.of(connectFromExternalMsg, signatureAdder.process(response));
             WonMessage connectFromOwnerMsg = WonMessageBuilder.setMessagePropertiesForConnect(

@@ -32,7 +32,7 @@ public class MessageRoutingInfoServiceWithLookup implements MessageRoutingInfoSe
             }
         }
         if (atomUri == null) {
-            URI senderUri = msg.getSenderURI();
+            URI senderUri = msg.getConnectionURI();
             if (senderUri != null) {
                 atomUri = WonLinkedDataUtils.getAtomURIforConnectionURI(senderUri, linkedDataSource);
             }
@@ -44,7 +44,7 @@ public class MessageRoutingInfoServiceWithLookup implements MessageRoutingInfoSe
     public Optional<URI> senderSocketType(WonMessage msg) {
         URI socketURI = msg.getSenderSocketURI();
         if (socketURI == null) {
-            URI possiblyConnectionURI = msg.getSenderURI();
+            URI possiblyConnectionURI = msg.getConnectionURI();
             if (possiblyConnectionURI != null) {
                 socketURI = WonLinkedDataUtils.getSocketURIForConnectionURI(possiblyConnectionURI, linkedDataSource);
             }
@@ -57,7 +57,7 @@ public class MessageRoutingInfoServiceWithLookup implements MessageRoutingInfoSe
     public Optional<URI> recipientSocketType(WonMessage msg) {
         URI socketURI = msg.getRecipientSocketURI();
         if (socketURI == null) {
-            URI possiblyConnectionURI = msg.getRecipientURI();
+            URI possiblyConnectionURI = msg.getConnectionURI();
             if (possiblyConnectionURI != null) {
                 socketURI = WonLinkedDataUtils.getSocketURIForConnectionURI(possiblyConnectionURI, linkedDataSource);
             }
@@ -76,7 +76,7 @@ public class MessageRoutingInfoServiceWithLookup implements MessageRoutingInfoSe
             }
         }
         if (atomUri == null) {
-            URI senderUri = msg.getRecipientURI();
+            URI senderUri = msg.getConnectionURI();
             if (senderUri != null) {
                 atomUri = WonLinkedDataUtils.getAtomURIforConnectionURI(senderUri, linkedDataSource);
             }

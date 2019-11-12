@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
+import won.node.camel.service.WonCamelHelper;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
@@ -48,7 +49,7 @@ public class SendMessageFromNodeReactionProcessor extends AbstractCamelProcessor
         injectTargets.forEach(target -> {
             try {
                 // don't inject into the connection we're currently on.
-                if (target.equals(wonMessage.getRecipientURI())) {
+                if (Objects.equals(target, WonCamelHelper.getConnectionURI(exchange))) {
                     return;
                 }
                 // only inject into those connections that belong to the receiver atom of this

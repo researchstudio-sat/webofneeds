@@ -1,6 +1,6 @@
 package won.node.camel.processor.fixed;
 
-import static won.node.camel.processor.WonCamelHelper.*;
+import static won.node.camel.service.WonCamelHelper.*;
 
 import java.lang.invoke.MethodHandles;
 

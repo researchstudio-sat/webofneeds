@@ -47,7 +47,7 @@ public class KeyForNewAtomAddingProcessor implements WonMessageProcessor {
     public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
         try {
             if (message.getMessageType() == WonMessageType.CREATE_ATOM) {
-                String atomUri = message.getSenderAtomURI().toString();
+                String atomUri = message.getAtomURIRequired().toString();
                 Dataset msgDataset = WonMessageEncoder.encodeAsDataset(message);
                 // generate and add atom's public key to the atom content
                 String alias = keyPairAliasDerivationStrategy.getAliasForAtomUri(atomUri);
@@ -61,7 +61,7 @@ public class KeyForNewAtomAddingProcessor implements WonMessageProcessor {
                 keyWriter.writeToModel(contentModel, contentModel.createResource(atomUri), pubKey);
                 return WonMessage.of(msgDataset);
             } else if (message.getMessageType() == WonMessageType.REPLACE) {
-                String atomUri = message.getSenderAtomURI().toString();
+                String atomUri = message.getAtomURIRequired().toString();
                 Dataset msgDataset = WonMessageEncoder.encodeAsDataset(message);
                 // we should already have the key. If not, that's a problem!
                 String alias = keyPairAliasDerivationStrategy.getAliasForAtomUri(atomUri);
@@ -78,7 +78,7 @@ public class KeyForNewAtomAddingProcessor implements WonMessageProcessor {
         } catch (Exception e) {
             logger.error("Failed to add key", e);
             throw new WonMessageProcessingException(
-                            "Failed to add key for atom in message " + message.getMessageURI().toString());
+                            "Failed to add key for atom in message " + message.getMessageURI().toString(), e);
         }
         return message;
     }

@@ -1,10 +1,11 @@
 package won.node.camel.processor.socket.groupSocket;
 
-import static won.node.camel.processor.WonCamelHelper.*;
+import static won.node.camel.service.WonCamelHelper.*;
 
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
@@ -61,10 +62,10 @@ public class SendMessageFromNodeGroupSocketImpl extends AbstractCamelProcessor {
                 return;
             }
         }
-        final Connection conOfIncomingMessage = connectionRepository.findByConnectionURI(wonMessage.getRecipientURI())
-                        .get(0);
+        final Optional<Connection> conOfIncomingMessage = connectionRepository.findOneBySocketURIAndTargetSocketURI(
+                        wonMessage.getRecipientSocketURIRequired(), wonMessage.getSenderSocketURIRequired());
         final List<Connection> consInGroup = connectionRepository
-                        .findBySocketURIAndState(conOfIncomingMessage.getSocketURI(), ConnectionState.CONNECTED);
+                        .findBySocketURIAndState(conOfIncomingMessage.get().getSocketURI(), ConnectionState.CONNECTED);
         if (consInGroup == null || consInGroup.size() < 2)
             return;
         if (logger.isDebugEnabled()) {

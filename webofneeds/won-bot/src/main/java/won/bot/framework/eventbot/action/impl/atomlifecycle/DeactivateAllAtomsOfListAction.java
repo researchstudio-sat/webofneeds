@@ -51,7 +51,7 @@ public class DeactivateAllAtomsOfListAction extends BaseEventBotAction {
                         getEventListenerContext().getLinkedDataSource().getDataForResource(atomURI), atomURI);
         return WonMessageBuilder
                         .setMessagePropertiesForDeactivateFromOwner(
-                                        wonNodeInformationService.generateEventURI(localWonNode), atomURI, localWonNode)
+                                        wonNodeInformationService.generateEventURI(localWonNode), atomURI)
                         .build();
     }
 }

@@ -51,10 +51,17 @@ public class ConversationMessagesReader {
 
     static {
         Map<Property, BiConsumer<Map<URI, ConversationMessage>, Statement>> inithandlers = new HashMap<>();
-        inithandlers.put(WONMSG.senderAtom,
+        inithandlers.put(WONMSG.atom,
                         (Map<URI, ConversationMessage> messages,
                                         Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
                                                         .setSenderAtomURI(getUri(s.getObject())));
+        inithandlers.put(WONMSG.connection,
+                        (Map<URI, ConversationMessage> messages,
+                                        Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
+                                                        .setSenderAtomURI(
+                                                                        WonMessageUtils.stripAtomSuffix(WonMessageUtils
+                                                                                        .stripFragment(getUri(s
+                                                                                                        .getObject())))));
         inithandlers.put(WONMSG.senderSocket,
                         (Map<URI, ConversationMessage> messages,
                                         Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))

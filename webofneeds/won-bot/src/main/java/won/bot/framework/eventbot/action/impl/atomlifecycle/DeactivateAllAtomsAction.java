@@ -49,7 +49,7 @@ public class DeactivateAllAtomsAction extends BaseEventBotAction {
         URI localWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(ds, atomURI);
         return WonMessageBuilder
                         .setMessagePropertiesForDeactivateFromOwner(
-                                        wonNodeInformationService.generateEventURI(localWonNode), atomURI, localWonNode)
+                                        wonNodeInformationService.generateEventURI(localWonNode), atomURI)
                         .build();
     }
 }

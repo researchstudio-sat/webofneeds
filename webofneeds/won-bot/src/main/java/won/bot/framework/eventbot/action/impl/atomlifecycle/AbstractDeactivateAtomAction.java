@@ -49,6 +49,6 @@ public abstract class AbstractDeactivateAtomAction extends BaseEventBotAction {
         }
         URI wonNodeUri = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(atomDataset, atomURI);
         URI eventUri = getEventListenerContext().getWonNodeInformationService().generateEventURI(wonNodeUri);
-        return WonMessageBuilder.setMessagePropertiesForDeactivateFromOwner(eventUri, atomURI, wonNodeUri).build();
+        return WonMessageBuilder.setMessagePropertiesForDeactivateFromOwner(eventUri, atomURI).build();
     }
 }

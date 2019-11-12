@@ -72,7 +72,7 @@ public class TwoPhaseCommitNoVoteDeactivateAllAtomsAction extends BaseEventBotAc
         URI localWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(ds, atomURI);
         return WonMessageBuilder
                         .setMessagePropertiesForDeactivateFromOwner(
-                                        wonNodeInformationService.generateEventURI(localWonNode), atomURI, localWonNode)
+                                        wonNodeInformationService.generateEventURI(localWonNode), atomURI)
                         .build();
     }
 }

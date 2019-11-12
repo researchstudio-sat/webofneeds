@@ -5,8 +5,8 @@ import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
 
 import won.node.camel.processor.AbstractCamelProcessor;
-import won.node.camel.processor.WonCamelHelper;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
+import won.node.camel.service.WonCamelHelper;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;

@@ -10,7 +10,7 @@
  */
 package won.node.camel.processor.general;
 
-import static won.node.camel.processor.WonCamelHelper.*;
+import static won.node.camel.service.WonCamelHelper.*;
 
 import java.lang.invoke.MethodHandles;
 import java.net.URI;

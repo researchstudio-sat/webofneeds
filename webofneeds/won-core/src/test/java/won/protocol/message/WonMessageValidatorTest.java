@@ -238,54 +238,6 @@ public class WonMessageValidatorTest {
 
     @Test
     @Ignore
-    public void testInvalidEnvelopeChain() throws IOException {
-        // test 1
-        // create invalid dataset by removing a triple that references envelope 1 from
-        // envelope 2
-        Dataset invalidDataset = WonRdfUtils.MessageUtils
-                        .copyByDatasetSerialization(WonMessage.of(createMessageDataset)).getCompleteDataset();
-        Model env2Model = invalidDataset.getNamedModel(CREATE_ENV2_NAME);
-        Model env1Model = invalidDataset.getNamedModel(CREATE_ENV1_NAME);
-        Statement stmtOld = env2Model.createStatement(ResourceFactory.createResource(CREATE_ENV2_NAME),
-                        WONMSG.containsEnvelope, ResourceFactory.createResource(CREATE_ENV1_NAME));
-        env2Model.remove(stmtOld);
-        // validate this invalid dataset
-        WonMessageValidator validator = new WonMessageValidator();
-        StringBuilder message = new StringBuilder();
-        boolean valid = validator.validate(invalidDataset, message);
-        Assert.assertFalse(valid);
-        Assert.assertTrue(message.toString().contains("validation/05_sign/invalid_from_owner_signer.rq"));
-        // reset for further testing
-        env2Model.add(stmtOld);
-        // test 2
-        // create invalid dataset by adding a triple that references envelope 2 from
-        // envelope 1,
-        // thus creating a cycle in the envelope chain
-        Statement stmtNew = env1Model.createStatement(ResourceFactory.createResource(CREATE_ENV1_NAME),
-                        WONMSG.containsEnvelope, ResourceFactory.createResource(CREATE_ENV2_NAME));
-        env1Model.add(stmtNew);
-        // validate this invalid dataset
-        valid = validator.validate(invalidDataset, message);
-        Assert.assertFalse(valid);
-        Assert.assertTrue(message.toString().contains("validation/05_sign/invalid_from_owner_signer.rq"));
-        // reset for further testing
-        env1Model.remove(stmtNew);
-        // test 3
-        // create invalid dataset by adding a triple that references an envelope that is
-        // not present in the dataset
-        stmtNew = env1Model.createStatement(ResourceFactory.createResource(CREATE_ENV1_NAME), WONMSG.containsEnvelope,
-                        ResourceFactory.createResource("test:resource:uri"));
-        env1Model.add(stmtNew);
-        // validate this invalid dataset
-        valid = validator.validate(invalidDataset, message);
-        Assert.assertFalse(valid);
-        Assert.assertTrue(message.toString().contains("validation/05_sign/invalid_from_owner_signer.rq"));
-        // reset for further testing
-        env1Model.remove(stmtNew);
-    }
-
-    @Test
-    @Ignore
     public void testInvalidContentChain() throws IOException {
         Dataset invalidDataset = WonRdfUtils.MessageUtils
                         .copyByDatasetSerialization(WonMessage.of(createMessageDataset)).getCompleteDataset();

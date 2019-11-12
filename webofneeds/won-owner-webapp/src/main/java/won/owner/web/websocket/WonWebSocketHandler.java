@@ -284,6 +284,8 @@ public class WonWebSocketHandler extends TextWebSocketHandler
     public WonMessage process(final WonMessage wonMessage) {
         try {
             String wonMessageJsonLdString = WonMessageEncoder.encodeAsJsonLd(wonMessage);
+            Optional<URI> connectionURI = WonLinkedDataUtils.getConnectionURIForIncomingMessage(wonMessage,
+                            linkedDataSource);
             WebSocketMessage<String> webSocketMessage = new TextMessage(wonMessageJsonLdString);
             URI atomUri = getOwnedAtomURI(wonMessage);
             Set<WebSocketSession> webSocketSessions = webSocketSessionService.getWebSocketSessions(atomUri);
@@ -300,11 +302,12 @@ public class WonWebSocketHandler extends TextWebSocketHandler
             webSocketSessions = findWebSocketSessionsForAtomAndUser(atomUri, user);
             // check if we can deliver the message. If not, send email.
             if (webSocketSessions.size() == 0) {
-                logger.debug("cannot deliver message of type {} for atom {}, receiver {}: no websocket session found. Trying to send message by email.",
-                                new Object[] { wonMessage.getMessageType(), wonMessage.getRecipientAtomURI(),
-                                                wonMessage.getRecipientURI() });
+                if (logger.isDebugEnabled()) {
+                    logger.debug("cannot deliver message {}: no websocket session found. Trying to send message by email.",
+                                    wonMessage.toShortStringForDebug());
+                }
                 // send per email notifications if it applies:
-                notifyPerEmail(user, atomUri, wonMessage);
+                notifyPerEmail(user, atomUri, connectionURI, wonMessage);
                 return wonMessage;
             }
             // we can send it - pre-cache the delivery chain:
@@ -316,14 +319,15 @@ public class WonWebSocketHandler extends TextWebSocketHandler
             }
             if (successfullySent == 0) {
                 // we did not manage to send the message via the websocket, send it by email.
-                logger.debug("cannot deliver message of type {} for atom {}, receiver {}: none of the associated websocket sessions worked. Trying to send message by webpush and email.",
-                                new Object[] { wonMessage.getMessageType(), wonMessage.getRecipientAtomURI(),
-                                                wonMessage.getRecipientURI() });
+                if (logger.isDebugEnabled()) {
+                    logger.debug("cannot deliver message {}: none of the associated websocket sessions worked. Trying to send message by webpush and email.",
+                                    wonMessage.toShortStringForDebug());
+                }
                 // TODO: ideally in this case
                 // 1. collect multiple events occurring in close succession
                 // 2. try to push
                 // 3. email only if push was not successful
-                notifyPerEmail(user, atomUri, wonMessage);
+                notifyPerEmail(user, atomUri, connectionURI, wonMessage);
             }
             return wonMessage;
         } finally {
@@ -357,11 +361,13 @@ public class WonWebSocketHandler extends TextWebSocketHandler
         }
         String textMsg = WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
         String iconUrl = uriService.getOwnerProtocolOwnerURI().toString() + "/skin/current/images/logo.png";
+        Optional<URI> connectionURI = WonLinkedDataUtils.getConnectionURIForIncomingMessage(wonMessage,
+                        linkedDataSource);
         switch (wonMessage.getMessageType()) {
             case CONNECTION_MESSAGE:
             case SOCKET_HINT_MESSAGE:
                 if (userAtom.isMatches()) {
-                    if (!isConnectionInSuggestedState(wonMessage.getRecipientURI())) {
+                    if (!isConnectionInSuggestedState(connectionURI)) {
                         // we only want to notify if the connection is in state won:Suggested.
                         // otherwise, the owner has already handled another suggestion, or
                         // found the connection previously and we don't want to notify them
@@ -371,8 +377,8 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                     ObjectNode rootNode = mapper.createObjectNode();
                     rootNode.put("type", "HINT");
                     rootNode.put("atomUri", userAtom.getUri().toString());
-                    if (wonMessage.getRecipientURI() != null) {
-                        rootNode.put("connectionUri", wonMessage.getRecipientURI().toString());
+                    if (connectionURI.isPresent()) {
+                        rootNode.put("connectionUri", connectionURI.get().toString());
                     } else {
                         logger.warn("received SocketHint for atom {} without recipientURI", userAtom.getUri());
                         return; // we are not going to notify if the message is missing this
@@ -393,7 +399,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                     ObjectNode rootNode = mapper.createObjectNode();
                     rootNode.put("type", "CONNECT");
                     rootNode.put("atomUri", userAtom.getUri().toString());
-                    rootNode.put("connectionUri", wonMessage.getRecipientURI().toString());
+                    rootNode.put("connectionUri", connectionURI.get().toString());
                     rootNode.put("icon", iconUrl);
                     if (textMsg != null) {
                         rootNode.put("message", textMsg);
@@ -412,7 +418,8 @@ public class WonWebSocketHandler extends TextWebSocketHandler
         }
     }
 
-    private void notifyPerEmail(final User user, final URI atomUri, final WonMessage wonMessage) {
+    private void notifyPerEmail(final User user, final URI atomUri, final Optional<URI> connectionURI,
+                    final WonMessage wonMessage) {
         if (wonMessage.getEnvelopeType() == WonMessageDirection.FROM_OWNER) {
             // we assume that this message, coming from the server here, can only be an
             // echoed message. don't send by email.
@@ -449,14 +456,14 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                     if (userAtom.isConversations()) {
                         emailSender.sendConversationNotificationMessage(user.getEmail(), atomUri.toString(),
                                         wonMessage.getSenderAtomURI().toString(),
-                                        wonMessage.getRecipientURI().toString(), textMsg);
+                                        connectionURI.get().toString(), textMsg);
                     }
                     return;
                 case CONNECT:
                     if (userAtom.isRequests()) {
                         emailSender.sendConnectNotificationMessage(user.getEmail(), atomUri.toString(),
                                         wonMessage.getSenderAtomURI().toString(),
-                                        wonMessage.getRecipientURI().toString(), textMsg);
+                                        connectionURI.get().toString(), textMsg);
                     }
                     return;
                 case ATOM_HINT_MESSAGE:
@@ -464,7 +471,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                     if (userAtom.isMatches()) {
                         Optional<URI> targetAtomUri = WonLinkedDataUtils
                                         .getAtomOfSocket(wonMessage.getHintTargetSocketURI(), linkedDataSource);
-                        if (!isConnectionInSuggestedState(wonMessage.getRecipientURI())) {
+                        if (!isConnectionInSuggestedState(connectionURI)) {
                             // we only want to notify if the connection is in state won:Suggested.
                             // otherwise, the owner has already handled another suggestion, or
                             // found the connection previously and we don't want to notify them
@@ -480,7 +487,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                                             user.getEmail(),
                                             atomUri.toString(),
                                             targetAtomUri.get().toString(),
-                                            wonMessage.getRecipientURI().toString() };
+                                            connectionURI.get().toString() };
                             // only count 1 item per atom/atom combination per batch key.
                             String deduplicationKey = atomUri.toString() + targetAtomUri.toString();
                             // set the configuration
@@ -530,10 +537,11 @@ public class WonWebSocketHandler extends TextWebSocketHandler
         }
     }
 
-    private boolean isConnectionInSuggestedState(URI connectionURI) {
-        if (connectionURI == null)
+    private boolean isConnectionInSuggestedState(Optional<URI> connectionURI) {
+        if (!connectionURI.isPresent()) {
             return false;
-        URI state = WonLinkedDataUtils.getConnectionStateforConnectionURI(connectionURI, linkedDataSource);
+        }
+        URI state = WonLinkedDataUtils.getConnectionStateforConnectionURI(connectionURI.get(), linkedDataSource);
         return ConnectionState.SUGGESTED.equals(ConnectionState.fromURI(state));
     }
 

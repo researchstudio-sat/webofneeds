@@ -191,7 +191,7 @@ public class MessageReferencer {
 
     private WonMessage processSelected(List<MessageAndPlaceholder> selected, WonMessage message) {
         Dataset messageDataset = message.getCompleteDataset();
-        URI outerEnvelopeGraphURI = message.getOuterEnvelopeGraphURI();
+        URI outerEnvelopeGraphURI = message.getEnvelopeURI();
         URI messageUri = message.getMessageURI();
         selected.forEach((MessageAndPlaceholder m) -> {
             if (!m.getWonMessage().getMessageTypeRequired().isHintMessage()) {

@@ -1,6 +1,6 @@
 package won.node.camel.processor.fixed;
 
-import static won.node.camel.processor.WonCamelHelper.*;
+import static won.node.camel.service.WonCamelHelper.*;
 
 import java.lang.invoke.MethodHandles;
 
@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import won.node.camel.processor.AbstractCamelProcessor;
-import won.node.camel.processor.WonCamelHelper;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
+import won.node.camel.service.WonCamelHelper;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;

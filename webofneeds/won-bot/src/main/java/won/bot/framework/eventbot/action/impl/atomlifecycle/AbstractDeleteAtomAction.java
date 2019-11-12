@@ -49,6 +49,6 @@ public abstract class AbstractDeleteAtomAction extends BaseEventBotAction {
         }
         URI wonNodeUri = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(atomDataset, atomURI);
         URI eventUri = getEventListenerContext().getWonNodeInformationService().generateEventURI(wonNodeUri);
-        return WonMessageBuilder.setMessagePropertiesForDeleteFromOwner(eventUri, atomURI, wonNodeUri).build();
+        return WonMessageBuilder.setMessagePropertiesForDeleteFromOwner(eventUri, atomURI).build();
     }
 }

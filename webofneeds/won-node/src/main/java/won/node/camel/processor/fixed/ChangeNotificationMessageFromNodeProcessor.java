@@ -1,7 +1,6 @@
 package won.node.camel.processor.fixed;
 
 import java.lang.invoke.MethodHandles;
-import java.net.URI;
 
 import javax.persistence.EntityManager;
 
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Component;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
-import won.protocol.exception.MissingMessagePropertyException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
@@ -30,7 +28,7 @@ import won.protocol.vocabulary.WONMSG;
  */
 @Component
 @FixedMessageProcessor(direction = WONMSG.FromExternalString, messageType = WONMSG.ChangeNotificationMessageString)
-public class SendChangeNotificationMessageFromNodeProcessor extends AbstractCamelProcessor {
+public class ChangeNotificationMessageFromNodeProcessor extends AbstractCamelProcessor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     EntityManager entityManager;
@@ -43,14 +41,11 @@ public class SendChangeNotificationMessageFromNodeProcessor extends AbstractCame
 
     public void changeNotificationFromNode(WonMessage wonMessage) {
         wonMessage.getMessageType().requireType(WonMessageType.CHANGE_NOTIFICATION);
-        URI connectionUri = wonMessage.getRecipientURI();
-        if (connectionUri == null) {
-            throw new MissingMessagePropertyException(URI.create(WONMSG.recipient.toString()));
-        }
-        Connection con = connectionRepository.findOneByConnectionURIForUpdate(connectionUri).get();
+        Connection con = connectionRepository.findOneBySocketURIAndTargetSocketURIForUpdate(
+                        wonMessage.getRecipientSocketURIRequired(), wonMessage.getSenderSocketURIRequired()).get();
         entityManager.refresh(con);
         if (con.getState() != ConnectionState.CONNECTED) {
-            throw new IllegalMessageForConnectionStateException(connectionUri, "CHANGE_NOTIFICATION_MESSAGE",
+            throw new IllegalMessageForConnectionStateException(con.getConnectionURI(), "CHANGE_NOTIFICATION_MESSAGE",
                             con.getState());
         }
         if (logger.isDebugEnabled()) {

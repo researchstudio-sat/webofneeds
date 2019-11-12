@@ -49,6 +49,6 @@ public abstract class AbstractActivateAtomAction extends BaseEventBotAction {
         }
         URI wonNodeUri = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(atomDataset, atomURI);
         URI eventUri = getEventListenerContext().getWonNodeInformationService().generateEventURI(wonNodeUri);
-        return WonMessageBuilder.setMessagePropertiesForActivateFromOwner(eventUri, atomURI, wonNodeUri).build();
+        return WonMessageBuilder.setMessagePropertiesForActivateFromOwner(eventUri, atomURI).build();
     }
 }

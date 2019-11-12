@@ -350,9 +350,11 @@ public class AtomService {
     }
 
     private void checkCanThisMessageCreateOrModifyThisAtom(final WonMessage wonMessage, URI atomURI) {
-        if (!atomURI.equals(wonMessage.getSenderAtomURI()))
-            throw new WrongAddressingInformationException("recipientAtomURI and AtomURI of the content are not equal",
-                            wonMessage.getMessageURI(), WONMSG.recipientAtom);
+        if (!atomURI.equals(wonMessage.getAtomURI()))
+            throw new WrongAddressingInformationException(
+                            "atomURI of the message (" + wonMessage.getAtomURI() + ") and AtomURI of the content ("
+                                            + atomURI + ") are not equal",
+                            wonMessage.getMessageURI(), WONMSG.atom);
         if (!uriService.isAtomURI(atomURI)) {
             throw new IllegalAtomURIException("Atom URI " + atomURI + "does not match this node's prefix "
                             + uriService.getAtomResourceURIPrefix());
@@ -470,16 +472,12 @@ public class AtomService {
 
     public void deactivate(WonMessage wonMessage) {
         wonMessage.getMessageType().requireType(WonMessageType.DEACTIVATE);
-        URI recipientAtomURI = wonMessage.getRecipientAtomURI();
-        URI senderAtomURI = wonMessage.getSenderAtomURI();
+        URI atomURI = wonMessage.getAtomURI();
         URI messageURI = wonMessage.getMessageURI();
-        if (recipientAtomURI == null) {
-            throw new MissingMessagePropertyException(URI.create(WONMSG.recipientAtom.toString()));
+        if (atomURI == null) {
+            throw new MissingMessagePropertyException(URI.create(WONMSG.atom.toString()));
         }
-        if (senderAtomURI == null) {
-            throw new MissingMessagePropertyException(URI.create(WONMSG.senderAtom.toString()));
-        }
-        deactivate(recipientAtomURI, messageURI);
+        deactivate(atomURI, messageURI);
     }
 
     public void deactivate(URI atomURI, URI messageURI) {
@@ -494,18 +492,9 @@ public class AtomService {
     }
 
     public void atomMessageFromSystem(WonMessage wonMessage) {
-        URI recipientAtomURI = wonMessage.getRecipientAtomURI();
-        URI senderAtomURI = wonMessage.getSenderAtomURI();
-        URI messageURI = wonMessage.getMessageURI();
-        if (recipientAtomURI == null) {
-            throw new MissingMessagePropertyException(URI.create(WONMSG.recipientAtom.toString()));
-        }
-        if (senderAtomURI == null) {
-            throw new MissingMessagePropertyException(URI.create(WONMSG.senderAtom.toString()));
-        }
-        if (!recipientAtomURI.equals(senderAtomURI)) {
-            throw new WrongAddressingInformationException("SenderAtomUri and recipientAtomUri must be identical",
-                            URI.create(WONMSG.senderAtom.getURI()), URI.create(WONMSG.recipientAtom.getURI()));
+        URI atomURI = wonMessage.getAtomURI();
+        if (atomURI == null) {
+            throw new MissingMessagePropertyException(URI.create(WONMSG.atom.getURI()));
         }
     }
 
