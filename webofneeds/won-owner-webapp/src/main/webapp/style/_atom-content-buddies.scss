@@ -41,6 +41,10 @@ won-atom-content-buddies {
         font-size: $smallFontSize;
         padding: 0.5rem;
       }
+
+      &__button.won-button--icon {
+        display: block;
+      }
     }
   }
 

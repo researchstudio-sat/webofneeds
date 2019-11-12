@@ -199,6 +199,18 @@ class WonAtomContentBuddies extends React.Component {
               actionButtons = (
                 <div className="acb__buddy__actions">
                   <div
+                    className="acb__buddy__actions__button won-button--icon"
+                    onClick={() =>
+                      this.props.routerGo("connections", {
+                        connectionUri: get(conn, "uri"),
+                      })
+                    }
+                  >
+                    <svg>
+                      <use xlinkHref="#ico36_message" href="#ico36_message" />
+                    </svg>
+                  </div>
+                  <div
                     className="acb__buddy__actions__button red won-button--outlined thin"
                     onClick={() => this.closeConnection(conn)}
                   >
