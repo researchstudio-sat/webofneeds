@@ -185,12 +185,12 @@ public class WorkerCrawlerActor extends UntypedActor {
         } catch (LinkedDataFetchingException e) {
             log.debug("Exception during crawling: " + e);
             Throwable cause = e.getCause();
-            if (cause instanceof HttpClientErrorException) {
-                HttpClientErrorException clientErrorException = (HttpClientErrorException) cause;
-                if (Objects.equals(clientErrorException.getStatusCode(), HttpStatus.GONE)) {
-                    log.debug("Uri used to exist, but has been deleted, marking uri as done");
-                    sendDoneUriMessage(uriMsg, uriMsg.getWonNodeUri(), etags);
-                }
+            if (cause instanceof HttpClientErrorException
+                            && Objects.equals(((HttpClientErrorException) cause).getStatusCode(), HttpStatus.GONE)) {
+                log.debug("Uri used to exist, but has been deleted, marking uri as done");
+                sendDoneUriMessage(uriMsg, uriMsg.getWonNodeUri(), etags);
+            } else {
+                throw new CrawlWrapperException(e, uriMsg);
             }
         } catch (Exception e) {
             log.debug("Exception during crawling: " + e);
