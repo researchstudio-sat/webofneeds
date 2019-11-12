@@ -444,7 +444,7 @@ You should be able to find both `bcpkix-jdk15on-1.52.jar` and `bcprov-jdk15on-1.
 
 ## Exception in Owner-Webapp log: PKIX path building failed
 
-One possible cause of this is that the [certificate renewal](/documentation/letsencrypt.md#certificate-renewal) updated the pem files but did not update the jks and pfx files. The consequence is that the node webapp uses the new key (as nginx loads the pem file) and the activemq server uses the old key (as it loads the jks file).
+One possible cause of this is that the [certificate renewal](/documentation/letsencrypt/README.md#certificate-renewal) updated the pem files but did not update the jks and pfx files. The consequence is that the node webapp uses the new key (as nginx loads the pem file) and the activemq server uses the old key (as it loads the jks file).
 
 _To check if this is the problem:_ list the keys in the jks/pfx file (using `keytool -list -v -keystore t-keystore.pfx`) and compare them to the key information available for, eg. `https://{your-won-node}/won/resource` in the browser or some other http client. If the keys are the same, this is _not_ the problem.
 
