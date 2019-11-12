@@ -28,6 +28,8 @@ import won.matcher.service.crawler.exception.CrawlWrapperException;
 import won.matcher.service.crawler.msg.CrawlUriMessage;
 import won.matcher.service.crawler.msg.ResourceCrawlUriMessage;
 import won.matcher.service.crawler.service.CrawlSparqlService;
+import won.protocol.model.Atom;
+import won.protocol.model.AtomState;
 import won.protocol.service.WonNodeInfo;
 
 /**
@@ -295,25 +297,23 @@ public class MasterCrawlerActor extends UntypedActor {
         log.info("start crawling won node: {} ...", wonNodeInfo.getWonNodeURI());
         String lastAtomModificationDate = sparqlService
                         .retrieveAtomModificationDateForCrawling(wonNodeInfo.getWonNodeURI());
+        String atomListUri = removeEndingSlash(wonNodeInfo.getAtomListURI());
+        String modifiedUri = atomListUri + "?state=" + AtomState.ACTIVE;
         if (lastAtomModificationDate != null) {
-            String atomListUri = removeEndingSlash(wonNodeInfo.getAtomListURI());
-            String modifiedUri = atomListUri + "?modifiedafter=" + lastAtomModificationDate;
-            self().tell(new CrawlUriMessage(modifiedUri, atomListUri, wonNodeInfo.getWonNodeURI(),
-                            CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), null), getSelf());
-        } else {
-            // or else if we didn't crawl atoms yet start crawling the whole won node
-            String atomListUri = removeEndingSlash(wonNodeInfo.getAtomListURI());
-            self().tell(new CrawlUriMessage(atomListUri, atomListUri, wonNodeInfo.getWonNodeURI(),
-                            CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), null), getSelf());
+            modifiedUri += "&modifiedafter=" + lastAtomModificationDate;
         }
+        self().tell(new CrawlUriMessage(modifiedUri, atomListUri, wonNodeInfo.getWonNodeURI(),
+                        CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), null), getSelf());
         // get the last known connection modification date and start crawling from this
         // point again
         String lastConnectionModificationDate = sparqlService
                         .retrieveConnectionModificationDateForCrawling(wonNodeInfo.getWonNodeURI());
         if (lastConnectionModificationDate != null) {
             String connectionPrefixUri = removeEndingSlash(wonNodeInfo.getConnectionURIPrefix());
-            String modifiedUri = connectionPrefixUri + "?modifiedafter=" + lastConnectionModificationDate;
-            self().tell(new CrawlUriMessage(modifiedUri, connectionPrefixUri, wonNodeInfo.getWonNodeURI(),
+            String modifiedConnectionPrefixUri = connectionPrefixUri + "?modifiedafter="
+                            + lastConnectionModificationDate;
+            self().tell(new CrawlUriMessage(modifiedConnectionPrefixUri, connectionPrefixUri,
+                            wonNodeInfo.getWonNodeURI(),
                             CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), null), getSelf());
         }
     }
@@ -323,5 +323,9 @@ public class MasterCrawlerActor extends UntypedActor {
             return uri.substring(0, uri.length() - 1);
         }
         return uri;
+    }
+
+    public static void main(String args[]) {
+        System.out.println("AtomState: " + AtomState.ACTIVE);
     }
 }
