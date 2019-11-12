@@ -324,8 +324,4 @@ public class MasterCrawlerActor extends UntypedActor {
         }
         return uri;
     }
-
-    public static void main(String args[]) {
-        System.out.println("AtomState: " + AtomState.ACTIVE);
-    }
 }
