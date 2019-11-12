@@ -207,25 +207,25 @@ services:
       - matcher_service
 
   # rescal matcher and connect to matcher service
-  matcher_rescal:
-    restart: always
-    build: ../../image/matcher-rescal
-    image: webofneeds/matcher_rescal:live
-    environment:
-      - "node.host=satvm01.researchstudio.at"
-      - "cluster.seedNodes=satvm01.researchstudio.at:2561,satvm01.researchstudio.at:2563"
-      - "cluster.local.port=2563"
-      - "matcher.rescal.uri.public=http://satvm01.researchstudio.at/rescal/"
-      - "matcher.rescal.uri.sparql.endpoint=http://satvm01.researchstudio.at:10000/blazegraph/namespace/kb/sparql"
-      - "matcher.rescal.executionDurationMinutes=30"
-      - "matcher.rescal.threshold=0.2"
-      - "matcher.rescal.rank=10"
-      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
-    ports:
-      - "2563:2563"
-    depends_on:
-      - bigdata
-      - matcher_service
+#  matcher_rescal:
+#    restart: always
+#    build: ../../image/matcher-rescal
+#    image: webofneeds/matcher_rescal:live
+#    environment:
+#      - "node.host=satvm01.researchstudio.at"
+#      - "cluster.seedNodes=satvm01.researchstudio.at:2561,satvm01.researchstudio.at:2563"
+#      - "cluster.local.port=2563"
+#      - "matcher.rescal.uri.public=http://satvm01.researchstudio.at/rescal/"
+#      - "matcher.rescal.uri.sparql.endpoint=http://satvm01.researchstudio.at:10000/blazegraph/namespace/kb/sparql"
+#      - "matcher.rescal.executionDurationMinutes=30"
+#      - "matcher.rescal.threshold=0.2"
+#      - "matcher.rescal.rank=10"
+#      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+#    ports:
+#      - "2563:2563"
+#    depends_on:
+#      - bigdata
+#      - matcher_service
 
   # mongodb for persistent debug bot
   mongodb:

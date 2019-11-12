@@ -3,6 +3,7 @@ package won.matcher.service.crawler.actor;
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.jena.query.Dataset;
@@ -10,8 +11,10 @@ import org.apache.jena.shared.Lock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 
 import akka.actor.ActorRef;
@@ -31,6 +34,7 @@ import won.matcher.service.crawler.service.CrawlSparqlService;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.model.AtomState;
 import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
+import won.protocol.rest.LinkedDataFetchingException;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSourceBase;
@@ -178,6 +182,16 @@ public class WorkerCrawlerActor extends UntypedActor {
             // HttpServerErrorException, HttpClientErrorException
             log.debug("Exception during crawling: " + e1);
             throw new CrawlWrapperException(e1, uriMsg);
+        } catch (LinkedDataFetchingException e) {
+            log.debug("Exception during crawling: " + e);
+            Throwable cause = e.getCause();
+            if (cause instanceof HttpClientErrorException
+                            && Objects.equals(((HttpClientErrorException) cause).getStatusCode(), HttpStatus.GONE)) {
+                log.debug("Uri used to exist, but has been deleted, marking uri as done");
+                sendDoneUriMessage(uriMsg, uriMsg.getWonNodeUri(), etags);
+            } else {
+                throw new CrawlWrapperException(e, uriMsg);
+            }
         } catch (Exception e) {
             log.debug("Exception during crawling: " + e);
             throw new CrawlWrapperException(e, uriMsg);
