@@ -397,32 +397,32 @@ services:
       - matcher_service
 
   # rescal matcher and connect to matcher service
-  matcher_rescal:
-    restart: always
-    build: ../../image/matcher-rescal
-    image: webofneeds/matcher_rescal:master
-    environment:
-      - "node.host=satvm02.researchstudio.at"
-      - "cluster.seedNodes=satvm02.researchstudio.at:2551,satvm02.researchstudio.at:2553"
-      - "cluster.local.port=2553"
-      - "matcher.rescal.uri.public=http://satvm02.researchstudio.at/rescal/"
-      - "matcher.rescal.uri.sparql.endpoint=http://satvm02.researchstudio.at:9999/blazegraph/namespace/kb/sparql"
-      - "matcher.rescal.executionDurationMinutes=5"
-      - "matcher.rescal.threshold=0.15"
-      - "matcher.rescal.rank=10"
-      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
-      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62922,server=y,suspend=n
-        -Dcom.sun.management.jmxremote.port=9022 -Dcom.sun.management.jmxremote.authenticate=false
-        -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9022
-        -Djava.rmi.server.hostname=satvm02.researchstudio.at"
-    ports:
-      - "2553:2553"
-      - "9022:9022"
-      - "62922:62922"
-    volumes:
-      - $base_folder/agent:/opt/agent/
-    depends_on:
-      - matcher_service
+#  matcher_rescal:
+#    restart: always
+#    build: ../../image/matcher-rescal
+#    image: webofneeds/matcher_rescal:master
+#    environment:
+#      - "node.host=satvm02.researchstudio.at"
+#      - "cluster.seedNodes=satvm02.researchstudio.at:2551,satvm02.researchstudio.at:2553"
+#      - "cluster.local.port=2553"
+#      - "matcher.rescal.uri.public=http://satvm02.researchstudio.at/rescal/"
+#      - "matcher.rescal.uri.sparql.endpoint=http://satvm02.researchstudio.at:9999/blazegraph/namespace/kb/sparql"
+#      - "matcher.rescal.executionDurationMinutes=5"
+#      - "matcher.rescal.threshold=0.15"
+#      - "matcher.rescal.rank=10"
+#      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+#      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62922,server=y,suspend=n
+#        -Dcom.sun.management.jmxremote.port=9022 -Dcom.sun.management.jmxremote.authenticate=false
+#        -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9022
+#        -Djava.rmi.server.hostname=satvm02.researchstudio.at"
+#    ports:
+#      - "2553:2553"
+#      - "9022:9022"
+#      - "62922:62922"
+#    volumes:
+#      - $base_folder/agent:/opt/agent/
+#    depends_on:
+#      - matcher_service
 
   matcher_sparql:
     restart: always

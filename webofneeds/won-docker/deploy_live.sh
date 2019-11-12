@@ -50,7 +50,7 @@ then
     docker --tlsverify -H satvm01.researchstudio.at:2376 push webofneeds/owner:live
     docker --tlsverify -H satvm01.researchstudio.at:2376 push webofneeds/matcher_service:live
     docker --tlsverify -H satvm01.researchstudio.at:2376 push webofneeds/matcher_solr:live
-    docker --tlsverify -H satvm01.researchstudio.at:2376 push webofneeds/matcher_rescal:live
+    # docker --tlsverify -H satvm01.researchstudio.at:2376 push webofneeds/matcher_rescal:live
     docker --tlsverify -H satvm01.researchstudio.at:2376 push webofneeds/solr:live
     docker --tlsverify -H satvm01.researchstudio.at:2376 push webofneeds/postgres:live
     docker --tlsverify -H satvm01.researchstudio.at:2376 push webofneeds/bots:live
