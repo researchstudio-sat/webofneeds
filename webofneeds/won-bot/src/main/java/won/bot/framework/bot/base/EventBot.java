@@ -360,7 +360,6 @@ public abstract class EventBot extends ScheduledTriggerBot {
             // if the event is connection specific, raise a more specialized event
             switch (type) {
                 case CLOSE:
-                case CONNECT:
                 case CONNECTION_MESSAGE:
                     event = new WonMessageSentOnConnectionEvent(
                                     WonLinkedDataUtils.getConnectionForOutgoingMessage(message, getLinkedDataSource())
@@ -369,6 +368,12 @@ public abstract class EventBot extends ScheduledTriggerBot {
                                                                                     + message.toShortStringForDebug())),
                                     message);
                     break;
+                case CONNECT:
+                    Optional<Connection> con = WonLinkedDataUtils.getConnectionForOutgoingMessage(message,
+                                    getLinkedDataSource());
+                    // in case of a connect, it's possible the connection does not exist yet.
+                    event = con.map(c -> (Event) new WonMessageSentOnConnectionEvent(c, message))
+                                    .orElseGet(() -> new WonMessageSentEvent(message));
                 default:
                     event = new WonMessageSentEvent(message);
             }
