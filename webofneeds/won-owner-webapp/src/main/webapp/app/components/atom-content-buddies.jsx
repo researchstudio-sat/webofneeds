@@ -43,10 +43,22 @@ const mapStateToProps = (state, ownProps) => {
     );
   }
 
+  const chatConnections =
+    isOwned &&
+    connectionSelectors.getChatConnectionsByAtomUri(state, ownProps.atomUri);
+
+  const chatSocketUri = atomUtils.getSocketUri(
+    atom,
+    won.CHAT.ChatSocketCompacted
+  );
+
   return {
     atomUri: ownProps.atomUri,
     atom,
     isOwned,
+    chatSocketUri,
+    hasChatConnections: chatConnections && chatConnections.size > 0,
+    chatConnectionsArray: chatConnections && chatConnections.toArray(),
     hasBuddySocket,
     hasBuddies: buddies && buddies.size > 0,
     hasBuddyConnections: buddyConnections && buddyConnections.size > 0,
@@ -82,6 +94,16 @@ const mapDispatchToProps = dispatch => {
     connectionOpen: (connectionUri, message) => {
       dispatch(actionCreators.connections__open(connectionUri, message));
     },
+    connectAdHoc: (targetAtomUri, message, connectToSocketUri, persona) => {
+      dispatch(
+        actionCreators.connections__connectAdHoc(
+          targetAtomUri,
+          message,
+          connectToSocketUri,
+          persona
+        )
+      );
+    },
     connect: (
       ownedAtomUri,
       connectionUri,
@@ -103,6 +125,9 @@ const mapDispatchToProps = dispatch => {
     },
     routerGo: (path, props) => {
       dispatch(actionCreators.router__stateGo(path, props));
+    },
+    routerGoResetParams: path => {
+      dispatch(actionCreators.router__stateGoResetParams(path));
     },
   };
 };
@@ -196,15 +221,12 @@ class WonAtomContentBuddies extends React.Component {
                 </div>
               );
             } else if (connectionUtils.isConnected(conn)) {
+              //TODO: Check chat socket connection
               actionButtons = (
                 <div className="acb__buddy__actions">
                   <div
-                    className="acb__buddy__actions__button won-button--icon"
-                    onClick={() =>
-                      this.props.routerGo("connections", {
-                        connectionUri: get(conn, "uri"),
-                      })
-                    }
+                    className="acb__buddy__actions__icon"
+                    onClick={() => this.sendChatMessage(conn)}
                   >
                     <svg>
                       <use xlinkHref="#ico36_message" href="#ico36_message" />
@@ -397,6 +419,43 @@ class WonAtomContentBuddies extends React.Component {
     this.props.showModalDialog(payload);
   }
 
+  sendChatMessage(conn) {
+    if (this.props.chatConnectionsArray && this.props.hasChatConnections) {
+      let chatConnectionUri;
+      for (let connection of this.props.chatConnectionsArray) {
+        if (get(connection, "targetAtomUri") === get(conn, "targetAtomUri")) {
+          chatConnectionUri = get(connection, "uri");
+          break;
+        }
+      }
+
+      if (chatConnectionUri) {
+        //chatConnection between buddies already exists
+        this.props.routerGo("connections", {
+          connectionUri: chatConnectionUri, //get(conn, "uri"),
+        });
+      } else {
+        //TODO: Connect Buddy Atoms, not via AdHocAtom!
+        this.props.connectAdHoc(
+          get(conn, "targetAtomUri"),
+          "",
+          this.props.chatSocketUri,
+          this.props.atomUri
+        );
+        this.props.routerGoResetParams("connections");
+      }
+    } else {
+      //TODO: Connect Buddy Atoms, not via AdHocAtom!
+      this.props.connectAdHoc(
+        get(conn, "targetAtomUri"),
+        "",
+        this.props.chatSocketUri,
+        this.props.atomUri
+      );
+      this.props.routerGoResetParams("connections");
+    }
+  }
+
   markAsRead(conn) {
     if (connectionUtils.isUnread(conn)) {
       this.props.connectionMarkAsRead(get(conn, "uri"), this.props.atomUri);
@@ -421,7 +480,12 @@ WonAtomContentBuddies.propTypes = {
   connectionClose: PropTypes.func,
   connectionOpen: PropTypes.func,
   connect: PropTypes.func,
+  connectAdHoc: PropTypes.func,
   routerGo: PropTypes.func,
+  routerGoResetParams: PropTypes.func,
+  chatSocketUri: PropTypes.string,
+  chatConnectionsArray: PropTypes.arrayOf(PropTypes.object),
+  hasChatConnections: PropTypes.bool,
 };
 
 export default connect(
