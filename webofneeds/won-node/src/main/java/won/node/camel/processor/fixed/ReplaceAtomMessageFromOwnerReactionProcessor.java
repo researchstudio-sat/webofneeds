@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Atom;
 import won.protocol.model.Connection;
@@ -56,10 +56,13 @@ public class ReplaceAtomMessageFromOwnerReactionProcessor extends AbstractCamelP
     private void sendChangeNotificationMessage(final Atom atom, final Connection con) {
         // send message from system via connection
         URI messageURI = wonNodeInformationService.generateEventURI();
-        URI remoteWonNodeURI = wonNodeInformationService.getWonNodeUri(con.getTargetAtomURI());
-        WonMessage message = WonMessageBuilder.setMessagePropertiesForSystemChangeNotificationMessageToTargetAtom(
-                        messageURI, con.getConnectionURI(), con.getAtomURI(), atom.getWonNodeURI(),
-                        con.getTargetConnectionURI(), con.getTargetAtomURI(), remoteWonNodeURI).build();
+        WonMessage message = WonMessageBuilder
+                        .changeNotificatin(messageURI)
+                        .direction().fromSystem()
+                        .sockets()
+                        /**/.sender(con.getSocketURI())
+                        /**/.recipient(con.getTargetSocketURI())
+                        .build();
         camelWonMessageService.sendSystemMessage(message);
     }
 }

@@ -33,7 +33,7 @@
 	<logger name="org.apache.camel.processor.interceptor.Tracer" level="warn"/> 
 	<logger name="won.node.camel.processor" level="INFO" />
 	<logger name="won.node.service" level="INFO" />
-	<logger name="won.node.camel.processor.general.FailResponder" level="INFO" />
+	<logger name="won.node.camel.processor.general.FailResponder" level="debug" />
 	<logger name="org.springframework.orm.jpa" level="INFO" />
 	<logger name="org.springframework.transaction" level="INFO" />
 	<logger name="org.hibernate.engine.transaction" level="INFO"/>	

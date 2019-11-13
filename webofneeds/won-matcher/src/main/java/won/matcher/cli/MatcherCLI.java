@@ -1,23 +1,23 @@
 package won.matcher.cli;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+
 import won.matcher.protocol.impl.MatcherProtocolAtomServiceClient;
 import won.protocol.exception.IllegalMessageForAtomStateException;
 import won.protocol.exception.NoSuchAtomException;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.WonMessageDirection;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 /**
  * User: gabriel Date: 14.02.13 Time: 15:00
@@ -81,8 +81,11 @@ public class MatcherCLI implements CommandLineRunner {
         URI wonNode = WonLinkedDataUtils.getWonNodeURIForAtomOrConnection(atomURI,
                         linkedDataSource.getDataForResource(atomURI));
         return WonMessageBuilder
-                        .setMessagePropertiesForHintToAtom(wonNodeInformationService.generateEventURI(wonNode), atomURI,
-                                        wonNode, otherAtomURI, originator, score)
-                        .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build();
+                        .atomHint(wonNodeInformationService.generateEventURI(wonNode))
+                        .atom(atomURI)
+                        .hintTargetAtom(otherAtomURI)
+                        .hintScore(score)
+                        .direction().fromExternal()
+                        .build();
     }
 }

@@ -25,8 +25,7 @@ import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
 import won.protocol.exception.NoSuchAtomException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.WonMessageDirection;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.model.Atom;
 import won.protocol.repository.AtomRepository;
 import won.protocol.vocabulary.WONMSG;
@@ -56,8 +55,7 @@ public class CreateAtomMessageReactionProcessor extends AbstractCamelProcessor {
 
     private WonMessage makeAtomCreatedMessageForMatcher(final Atom atom) throws NoSuchAtomException {
         return WonMessageBuilder
-                        .setMessagePropertiesForAtomCreatedNotification(wonNodeInformationService.generateEventURI(),
-                                        atom.getAtomURI())
-                        .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build();
+                        .atomCreatedNotification(wonNodeInformationService.generateEventURI())
+                        .atom(atom.getAtomURI()).build();
     }
 }

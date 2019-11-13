@@ -27,7 +27,7 @@ import won.bot.framework.eventbot.event.impl.wonmessage.SocketHintFromMatcherEve
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
@@ -100,8 +100,13 @@ public class OpenConnectionAction extends BaseEventBotAction {
         WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         Dataset localAtomRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(fromUri);
         URI localWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(localAtomRDF, fromUri);
-        return WonMessageBuilder.setMessagePropertiesForConnect(
-                        wonNodeInformationService.generateEventURI(localWonNode), localSocket,
-                        targetSocket, welcomeMessage).build();
+        URI messageURI = wonNodeInformationService.generateEventURI(localWonNode);
+        return WonMessageBuilder
+                        .connect(messageURI)
+                        .sockets()
+                        /**/.sender(localSocket)
+                        /**/.recipient(targetSocket)
+                        .content().text(welcomeMessage)
+                        .build();
     }
 }

@@ -1,8 +1,12 @@
 package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -15,12 +19,9 @@ import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
 
 /**
  * Created by fsuda on 17.05.2017.
@@ -64,9 +65,11 @@ public class ExecuteDeactivateAtomCommandAction extends BaseEventBotAction {
 
     private WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI atomURI,
                     URI wonNodeURI) throws WonMessageBuilderException {
+        URI messageURI = wonNodeInformationService.generateEventURI(wonNodeURI);
         return WonMessageBuilder
-                        .setMessagePropertiesForDeactivateFromOwner(
-                                        wonNodeInformationService.generateEventURI(wonNodeURI), atomURI)
+                        .deactivate(messageURI)
+                        .atom(atomURI)
+                        .direction().fromOwner()
                         .build();
     }
 }

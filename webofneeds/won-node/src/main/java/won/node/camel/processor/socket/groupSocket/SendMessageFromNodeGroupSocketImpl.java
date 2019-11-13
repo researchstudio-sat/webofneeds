@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.SocketMessageProcessor;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
@@ -87,11 +87,15 @@ public class SendMessageFromNodeGroupSocketImpl extends AbstractCamelProcessor {
                                     .generateEventURI(wonMessage.getRecipientNodeURI());
                     URI remoteWonNodeUri = WonLinkedDataUtils.getWonNodeURIForAtomOrConnectionURI(
                                     conToSendTo.getTargetConnectionURI(), linkedDataSource);
-                    WonMessage newWonMessage = WonMessageBuilder.forwardReceivedNodeToNodeMessageAsNodeToNodeMessage(
-                                    forwardedMessageURI, wonMessage, conToSendTo.getConnectionURI(),
-                                    conToSendTo.getAtomURI(), wonMessage.getRecipientNodeURI(),
-                                    conToSendTo.getTargetConnectionURI(), conToSendTo.getTargetAtomURI(),
-                                    remoteWonNodeUri);
+                    WonMessage newWonMessage = WonMessageBuilder
+                                    .connectionMessage(forwardedMessageURI)
+                                    .direction()
+                                    /**/.fromSystem()
+                                    .forward(wonMessage)
+                                    .sockets()
+                                    /**/.sender(conToSendTo.getSocketURI())
+                                    /**/.recipient(conToSendTo.getTargetSocketURI())
+                                    .build();
                     camelWonMessageService.sendSystemMessage(newWonMessage);
                 }
             } catch (Exception e) {

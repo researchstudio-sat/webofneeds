@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Objects;
+
 import won.protocol.exception.IncoherentDatabaseStateException;
 import won.protocol.exception.NoSuchMessageException;
 import won.protocol.message.WonMessage;
@@ -58,8 +60,11 @@ public class MessageService {
 
     public Optional<URI> getParentofMessage(WonMessage msg, WonMessageDirection direction) {
         WonMessageType type = msg.getMessageTypeRequired();
+        Optional<URI> connectionFromResponse = Optional.empty();
         if (type.isResponseMessage()) {
             type = msg.getRespondingToMessageTypeRequired();
+            // if we are handling a response from a socket, the connection is there:
+            connectionFromResponse = Optional.ofNullable(msg.getConnectionURI());
         }
         if (type.isAtomSpecificMessage()) {
             // no need to look into the db:
@@ -75,12 +80,15 @@ public class MessageService {
                 theirSocket = Optional.ofNullable(msg.getRecipientSocketURIRequired());
             }
             if (ourSocket.isPresent() && theirSocket.isPresent()) {
-                Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(
-                                ourSocket.get(),
-                                theirSocket.get());
-                if (con.isPresent()) {
-                    return Optional.of(con.get().getConnectionURI());
+                Optional<Connection> con = Optional.empty();
+                if (Objects.equal(ourSocket.get(), theirSocket.get()) && connectionFromResponse.isPresent()) {
+                    con = connectionRepository.findOneByConnectionURI(connectionFromResponse.get());
+                } else {
+                    con = connectionRepository.findOneBySocketURIAndTargetSocketURI(
+                                    ourSocket.get(),
+                                    theirSocket.get());
                 }
+                return con.map(Connection::getConnectionURI);
             }
         }
         return Optional.empty();

@@ -17,8 +17,7 @@ import won.cryptography.utils.TestSigningUtils;
 import won.cryptography.utils.TestingDataSource;
 import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.WonMessageDirection;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor;
 import won.protocol.message.processor.impl.SignatureCheckingWonMessageProcessor;
 import won.protocol.util.RdfUtils;
@@ -69,9 +68,11 @@ public class VerifyAndSignExamples {
         // KeyForNewAtomAddingProcessor processor = new KeyForNewAtomAddingProcessor();
         // WonMessage inputMessage = atomKeyGeneratorAndAdder.process(inputMessage);
         // owner adds envelope
-        WonMessage wonMessage = new WonMessageBuilder(URI.create(EVENT_ENV1_URI)).setSenderAtomURI(URI.create(ATOM_URI))
-                        .addContent(inputDataset.getNamedModel(ATOM_CORE_DATA_URI))
-                        .setWonMessageDirection(WonMessageDirection.FROM_OWNER).build();
+        WonMessage wonMessage = WonMessageBuilder
+                        .createAtom(URI.create(EVENT_ENV1_URI))
+                        .atom(URI.create(ATOM_URI))
+                        .content().model(inputDataset.getNamedModel(ATOM_CORE_DATA_URI))
+                        .direction().fromOwner().build();
         Dataset outputDataset = wonMessage.getCompleteDataset();
         Assert.assertEquals(2, RdfUtils.getModelNames(outputDataset).size());
         // write for debugging

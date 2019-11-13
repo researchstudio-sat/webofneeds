@@ -32,7 +32,7 @@ import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.RdfUtils;
@@ -124,7 +124,11 @@ public class ExecuteCreateAtomCommandAction extends BaseEventBotAction {
         if (usedForTesting) {
             atomModelWrapper.addFlag(WONMATCH.UsedForTesting);
         }
-        return WonMessageBuilder.setMessagePropertiesForCreate(wonNodeInformationService.generateEventURI(wonNodeURI),
-                        atomURI, wonNodeURI).addContent(atomModelWrapper.copyDatasetWithoutSysinfo()).build();
+        return WonMessageBuilder
+                        .createAtom(wonNodeInformationService.generateEventURI(wonNodeURI))
+                        .atom(atomURI)
+                        .content().dataset(atomModelWrapper.copyDatasetWithoutSysinfo())
+                        .direction().fromOwner()
+                        .build();
     }
 }

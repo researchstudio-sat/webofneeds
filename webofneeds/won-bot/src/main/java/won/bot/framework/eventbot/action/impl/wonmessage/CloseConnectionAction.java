@@ -24,8 +24,7 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.WonMessageDirection;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
@@ -72,10 +71,9 @@ public class CloseConnectionAction extends BaseEventBotAction {
         URI socketURI = WonRdfUtils.ConnectionUtils.getSocketURIFromConnection(connectionRDF, connectionURI);
         URI targetSocketURI = WonRdfUtils.ConnectionUtils.getTargetSocketURIFromConnection(connectionRDF,
                         connectionURI);
-        return WonMessageBuilder.setMessagePropertiesForClose(wonNodeInformationService.generateEventURI(wonNode),
-                        socketURI,
-                        targetSocketURI,
-                        WonMessageDirection.FROM_OWNER,
-                        farewellMessage).build();
+        return WonMessageBuilder
+                        .close(wonNodeInformationService.generateEventURI(wonNode))
+                        .sockets().sender(socketURI).recipient(targetSocketURI)
+                        .content().text(farewellMessage).build();
     }
 }

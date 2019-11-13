@@ -25,8 +25,7 @@ import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.WonMessageDirection;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Atom;
 import won.protocol.model.AtomState;
@@ -81,10 +80,12 @@ public class DeleteAtomMessageFromOwnerReactionProcessor extends AbstractCamelPr
         // the close message is directed at our local connection. It will
         // be routed to the owner and forwarded to to remote connection
         URI messageURI = wonNodeInformationService.generateEventURI();
-        WonMessage message = WonMessageBuilder.setMessagePropertiesForClose(messageURI, WonMessageDirection.FROM_SYSTEM,
-                        con.getSocketURI(), con.getConnectionURI(), con.getAtomURI(), atom.getWonNodeURI(),
-                        con.getSocketURI(), con.getConnectionURI(),
-                        con.getAtomURI(), atom.getWonNodeURI(), "Closed because Atom was deleted").build();
+        WonMessage message = WonMessageBuilder
+                        .close(messageURI)
+                        .direction().fromSystem()
+                        .sockets().sender(con.getSocketURI()).recipient(con.getTargetSocketURI())
+                        .content().text("Closed because Atom was deleted")
+                        .build();
         camelWonMessageService.sendSystemMessage(message);
     }
 }

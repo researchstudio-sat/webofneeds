@@ -10,11 +10,15 @@
  */
 package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -27,14 +31,11 @@ import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
 
 /**
  * Action executing a CreateAtomCommandEvent, creating the specified atom.
@@ -99,7 +100,10 @@ public class ExecuteReplaceCommandAction extends BaseEventBotAction {
                     URI wonNodeURI, Dataset atomDataset) throws WonMessageBuilderException {
         RdfUtils.replaceBaseURI(atomDataset, atomURI.toString(), true);
         AtomModelWrapper atomModelWrapper = new AtomModelWrapper(atomDataset);
-        return WonMessageBuilder.setMessagePropertiesForReplace(wonNodeInformationService.generateEventURI(wonNodeURI),
-                        atomURI, wonNodeURI).addContent(atomModelWrapper.copyDatasetWithoutSysinfo()).build();
+        return WonMessageBuilder
+                        .replace(wonNodeInformationService.generateEventURI(wonNodeURI))
+                        .atom(atomURI)
+                        .content().dataset(atomModelWrapper.copyDatasetWithoutSysinfo())
+                        .build();
     }
 }

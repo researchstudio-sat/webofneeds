@@ -26,7 +26,8 @@ import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.service.WonCamelHelper;
 import won.node.service.persistence.ConnectionService;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.builder.ResponseBuilder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor;
 import won.protocol.model.Connection;
@@ -53,22 +54,22 @@ public class SuccessResponder extends AbstractCamelProcessor {
             // we don't respond to responses
             return;
         }
+        URI newMessageURI = this.wonNodeInformationService.generateEventURI();
+        ResponseBuilder responseBuilder = WonMessageBuilder.response(newMessageURI);
         // in the case of connect, the owners don't know connection uris yet. Tell them
         // about them by using them as the senderURI property in the response.
-        Optional<URI> parent = Optional.empty();
         if (originalMessage.getMessageTypeRequired().isConnectionSpecificMessage()) {
             Optional<Connection> con = connectionService.getConnectionForMessage(originalMessage,
                             getDirectionRequired(exchange));
             if (con.isPresent()) {
-                parent = Optional.of(con.get().getConnectionURI());
+                responseBuilder.fromConnection(con.get().getConnectionURI());
             }
         } else if (originalMessage.getMessageTypeRequired().isAtomSpecificMessage()) {
-            parent = Optional.of(originalMessage.getAtomURIRequired());
+            responseBuilder.fromAtom(originalMessage.getAtomURIRequired());
         }
-        URI newMessageURI = this.wonNodeInformationService.generateEventURI();
-        WonMessage responseMessage = WonMessageBuilder
-                        .setPropertiesForNodeResponse(originalMessage, true, newMessageURI,
-                                        parent, getDirectionRequired(exchange))
+        WonMessage responseMessage = responseBuilder
+                        .respondingToMessage(originalMessage, getDirectionRequired(exchange))
+                        .success()
                         .build();
         messageReferencer.addMessageReferences(responseMessage, getParentURIRequired(exchange));
         responseMessage.addMessageProperty(WONMSG.timestamp, new Date().getTime());

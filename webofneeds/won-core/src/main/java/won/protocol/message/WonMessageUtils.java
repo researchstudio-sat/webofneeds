@@ -45,17 +45,17 @@ public class WonMessageUtils {
     public static Optional<URI> getRecipientAtomURI(WonMessage msg) {
         URI atomUri = msg.getRecipientAtomURI();
         if (atomUri == null) {
-            atomUri = getRecipientAtomURIFromRecipientSocketURI(msg, atomUri);
+            atomUri = getRecipientAtomURIFromRecipientSocketURI(msg);
         }
         return Optional.ofNullable(atomUri);
     }
 
-    public static URI getRecipientAtomURIFromRecipientSocketURI(WonMessage msg, URI atomUri) {
+    public static URI getRecipientAtomURIFromRecipientSocketURI(WonMessage msg) {
         URI socketUri = msg.getRecipientSocketURI();
         if (socketUri != null) {
-            atomUri = stripFragment(socketUri);
+            return stripFragment(socketUri);
         }
-        return atomUri;
+        return null;
     }
 
     public static URI getRecipientAtomURIRequired(WonMessage msg) {

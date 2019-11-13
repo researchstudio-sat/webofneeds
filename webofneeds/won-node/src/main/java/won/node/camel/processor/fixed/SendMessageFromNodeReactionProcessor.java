@@ -16,14 +16,13 @@ import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
 import won.node.camel.service.WonCamelHelper;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
 import won.protocol.util.LoggingUtils;
 import won.protocol.util.Prefixer;
 import won.protocol.util.RdfUtils;
-import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WONMSG;
 
 @Component
@@ -79,12 +78,15 @@ public class SendMessageFromNodeReactionProcessor extends AbstractCamelProcessor
                                             conToSendTo.getConnectionURI() });
         }
         URI injectedMessageURI = wonNodeInformationService.generateEventURI(wonMessage.getRecipientNodeURI());
-        URI remoteWonNodeUri = WonLinkedDataUtils
-                        .getWonNodeURIForAtomOrConnectionURI(conToSendTo.getTargetConnectionURI(), linkedDataSource);
-        WonMessage newWonMessage = WonMessageBuilder.forwardReceivedNodeToNodeMessageAsNodeToNodeMessage(
-                        injectedMessageURI, wonMessage, conToSendTo.getConnectionURI(), conToSendTo.getAtomURI(),
-                        wonMessage.getRecipientNodeURI(), conToSendTo.getTargetConnectionURI(),
-                        conToSendTo.getTargetAtomURI(), remoteWonNodeUri);
+        WonMessage newWonMessage = WonMessageBuilder
+                        .connectionMessage(injectedMessageURI)
+                        .sockets()
+                        /**/.sender(conToSendTo.getSocketURI())
+                        /**/.recipient(conToSendTo.getTargetSocketURI())
+                        .forward(wonMessage)
+                        .direction()
+                        /**/.fromSystem()
+                        .build();
         if (logger.isDebugEnabled()) {
             logger.debug("injecting this message: {} ",
                             RdfUtils.toString(Prefixer.setPrefixes(newWonMessage.getCompleteDataset())));

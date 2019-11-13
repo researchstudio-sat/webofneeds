@@ -20,14 +20,14 @@ import won.owner.web.service.serversideaction.EventTriggeredAction;
 import won.owner.web.service.serversideaction.EventTriggeredActionContainer;
 import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
+import won.protocol.message.WonMessageUtils;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.AuthenticationThreadLocal;
 import won.protocol.util.linkeddata.LinkedDataSource;
-import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 @Component
 public class ServerSideActionService implements WonMessageProcessor {
@@ -84,7 +84,7 @@ public class ServerSideActionService implements WonMessageProcessor {
                         // we have sent the connect, check if we're processing the connect on the
                         // receiving end. If so, send an open.
                         if (isConnectFromSocketForSocket(msg.get(), fromSocket, toSocket)) {
-                            sendOpen(msg.get(), authentication);
+                            reactWithConnect(msg.get(), authentication);
                             // that's it - don't register any more actions
                         }
                     }
@@ -128,14 +128,14 @@ public class ServerSideActionService implements WonMessageProcessor {
     }
 
     private void sendConnect(URI fromSocket, URI toSocket, Authentication authentication) {
-        URI fromAtomURI = URI.create(fromSocket.toString().replaceFirst("#.+$", ""));
-        URI toAtomURI = URI.create(toSocket.toString().replaceFirst("#.+$", ""));
-        URI fromWonNodeURI = WonLinkedDataUtils.getWonNodeURIForAtomOrConnectionURI(fromAtomURI, linkedDataSource);
-        URI toWonNodeURI = WonLinkedDataUtils.getWonNodeURIForAtomOrConnectionURI(toAtomURI, linkedDataSource);
+        URI fromAtomURI = WonMessageUtils.stripFragment(fromSocket);
+        URI fromWonNodeURI = WonMessageUtils.stripAtomSuffix(fromAtomURI);
         URI messageURI = wonNodeInformationService.generateEventURI(fromWonNodeURI);
-        WonMessage msgToSend = WonMessageBuilder.setMessagePropertiesForConnect(messageURI, fromSocket,
-                        toSocket,
-                        "Connect message automatically sent by a server-side action").build();
+        WonMessage msgToSend = WonMessageBuilder
+                        .connect(messageURI)
+                        .sockets().sender(fromSocket).recipient(toSocket)
+                        .content().text("Connect message automatically sent by a server-side action")
+                        .build();
         try {
             AuthenticationThreadLocal.setAuthentication(authentication);
             ownerApplicationService.sendWonMessage(msgToSend);
@@ -145,11 +145,14 @@ public class ServerSideActionService implements WonMessageProcessor {
         }
     }
 
-    private void sendOpen(WonMessage connectMessageToReactTo, Authentication authentication) {
+    private void reactWithConnect(WonMessage connectMessageToReactTo, Authentication authentication) {
         URI fromWonNodeURI = connectMessageToReactTo.getRecipientNodeURI();
         URI messageURI = wonNodeInformationService.generateEventURI(fromWonNodeURI);
-        WonMessage msgToSend = WonMessageBuilder.setMessagePropertiesForConnect(messageURI, connectMessageToReactTo,
-                        "Open message automatically sent by a server-side action").build();
+        WonMessage msgToSend = WonMessageBuilder
+                        .connect(messageURI)
+                        .sockets().reactingTo(connectMessageToReactTo)
+                        .content().text("Open message automatically sent by a server-side action")
+                        .build();
         try {
             AuthenticationThreadLocal.setAuthentication(authentication);
             ownerApplicationService.sendWonMessage(msgToSend);

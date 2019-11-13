@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 import won.node.service.persistence.AtomService;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Atom;
 import won.protocol.service.WonNodeInformationService;
@@ -67,10 +67,12 @@ public class AtomManagementService {
             return;
         }
         URI messageURI = wonNodeInformationService.generateEventURI(wonNodeURI);
-        WonMessageBuilder builder = WonMessageBuilder.setMessagePropertiesForAtomMessageFromSystem(messageURI, atomURI,
-                        wonNodeURI);
-        builder.setTextMessage(message);
-        sendSystemMessage(builder.build());
+        WonMessage msg = WonMessageBuilder
+                        .atomMessage(messageURI)
+                        .atom(atomURI)
+                        .content().text(message)
+                        .build();
+        sendSystemMessage(msg);
     }
 
     public void deactivateAtom(URI atomURI, String optionalMessage) {
@@ -94,11 +96,13 @@ public class AtomManagementService {
             return;
         }
         URI messageURI = wonNodeInformationService.generateEventURI(wonNodeURI);
-        WonMessageBuilder builder = WonMessageBuilder.setMessagePropertiesForDeactivateFromSystem(messageURI, atomURI);
-        if (optionalMessage != null && optionalMessage.trim().length() > 0) {
-            builder.setTextMessage(optionalMessage);
-        }
-        sendSystemMessage(builder.build());
+        WonMessage msg = WonMessageBuilder
+                        .deactivate(messageURI)
+                        .atom(atomURI)
+                        .content().text(optionalMessage)
+                        .direction().fromSystem()
+                        .build();
+        sendSystemMessage(msg);
     }
 
     /**

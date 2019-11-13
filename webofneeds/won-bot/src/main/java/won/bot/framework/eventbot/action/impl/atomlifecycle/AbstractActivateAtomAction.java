@@ -10,14 +10,15 @@
  */
 package won.bot.framework.eventbot.action.impl.atomlifecycle;
 
+import java.net.URI;
+
 import org.apache.jena.query.Dataset;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
 
 /**
  * Base class for actions that activates atoms.
@@ -49,6 +50,8 @@ public abstract class AbstractActivateAtomAction extends BaseEventBotAction {
         }
         URI wonNodeUri = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(atomDataset, atomURI);
         URI eventUri = getEventListenerContext().getWonNodeInformationService().generateEventURI(wonNodeUri);
-        return WonMessageBuilder.setMessagePropertiesForActivateFromOwner(eventUri, atomURI).build();
+        return WonMessageBuilder.activate(eventUri)
+                        .atom(atomURI)
+                        .build();
     }
 }

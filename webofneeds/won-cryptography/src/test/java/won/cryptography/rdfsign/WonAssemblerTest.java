@@ -1,18 +1,19 @@
 package won.cryptography.rdfsign;
 
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
-import org.apache.jena.query.Dataset;
-import org.junit.Assert;
-import org.junit.Test;
-import won.cryptography.utils.TestSigningUtils;
-import won.protocol.util.RdfUtils;
-
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.jena.query.Dataset;
+import org.junit.Assert;
+import org.junit.Test;
+
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
+import won.cryptography.utils.TestSigningUtils;
+import won.protocol.util.RdfUtils;
 
 /**
  * Created by ypanchenko on 23.03.2015.

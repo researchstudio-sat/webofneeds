@@ -32,6 +32,7 @@ import com.google.common.collect.Iterators;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.util.RdfUtils;
 
 public class WonMessageBuilderTest {
@@ -43,6 +44,7 @@ public class WonMessageBuilderTest {
     private static final URI TYPE_URI_2 = URI.create("http://example.com/type/2");
     private static final URI CONNECTION_URI_1 = URI.create("http://example.com/won/res/con/1");
     private static final URI ATOM_URI_1 = URI.create("http://example.com/atom/1");
+    private static final URI ATOM_URI_2 = URI.create("http://example.com/atom/2");
 
     @BeforeClass
     public static void setLogLevel() {
@@ -52,7 +54,7 @@ public class WonMessageBuilderTest {
 
     @Test
     public void test_content_is_referenced_from_envelope() {
-        WonMessage msg1 = createMessageWithContent().build();
+        WonMessage msg1 = createMessageWithContent();
         List<String> contentGraphUris = msg1.getContentGraphURIs();
         Assert.assertFalse("envelope graph does not contain any content graph URI", contentGraphUris.isEmpty());
         Assert.assertEquals(1, msg1.getContentGraphURIs().size());
@@ -64,7 +66,7 @@ public class WonMessageBuilderTest {
 
     @Test
     public void test_get_content_in_message_without_content() {
-        final WonMessage msg = this.createMessageWithoutContent().build();
+        final WonMessage msg = this.createMessageWithoutContent();
         check_get_content_in_message_without_content(msg);
     }
 
@@ -78,7 +80,7 @@ public class WonMessageBuilderTest {
 
     @Test
     public void test_get_content_in_message_with_content() {
-        final WonMessage msg = this.createMessageWithContent().build();
+        final WonMessage msg = this.createMessageWithContent();
         check_get_content_in_message_with_content(msg);
     }
 
@@ -97,21 +99,14 @@ public class WonMessageBuilderTest {
 
     @Test
     public void test_get_content_in_message_with_two_content_graphs() {
-        final WonMessage msg = this.createMessageWithTwoContentGraphs().build();
+        final WonMessage msg = this.createMessageWithTwoContentGraphs();
         check_get_content_in_message_with_two_content_graphs(msg);
     }
 
     @Test
     public void test_get_content_in_message_with_content_dataset() {
-        final WonMessage msg = this.createMessageWithContentDataset().build();
+        final WonMessage msg = this.createMessageWithContentDataset();
         check_get_content_in_message_with_content_dataset(msg);
-    }
-
-    @Test
-    public void test_envelope_type_exists() {
-        WonMessageBuilder msgbuilder = this.createMessageWithEnvelopeType();
-        WonMessage msg = msgbuilder.build();
-        Assert.assertEquals(WonMessageDirection.FROM_EXTERNAL, msg.getEnvelopeType());
     }
 
     public void check_get_content_in_message_with_two_content_graphs(final WonMessage msg) {
@@ -158,41 +153,40 @@ public class WonMessageBuilderTest {
         return foundIt;
     }
 
-    private WonMessageBuilder createMessageWithEnvelopeType() {
-        return new WonMessageBuilder(MSG_URI_1).setWonMessageType(WonMessageType.CLOSE)
-                        .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
+    private WonMessage createMessageWithoutContent() {
+        return WonMessageBuilder
+                        .atomHint(MSG_URI_1)
+                        .atom(ATOM_URI_1)
+                        .hintTargetAtom(ATOM_URI_2)
+                        .hintScore(0.2)
+                        .direction()
+                        .fromOwner()
+                        .build();
     }
 
-    private WonMessageBuilder createMessageWithoutContent() {
-        return new WonMessageBuilder(MSG_URI_1).setWonMessageType(WonMessageType.ATOM_HINT_MESSAGE)
-                        .setHintTargetAtomURI(ATOM_URI_1).setHintScore(0.2)
-                        .setWonMessageDirection(WonMessageDirection.FROM_OWNER);
+    private WonMessage createMessageWithContent() {
+        return WonMessageBuilder.createAtom(MSG_URI_1)
+                        .content().model(createContent())
+                        .atom(ATOM_URI_1)
+                        .direction().fromOwner()
+                        .build();
     }
 
-    private WonMessageBuilder addContent(WonMessageBuilder builder) {
-        return builder.addContent(createDifferentContent());
+    private WonMessage createMessageWithTwoContentGraphs() {
+        return WonMessageBuilder.createAtom(MSG_URI_1)
+                        .content().model(createContent())
+                        .content().model(createDifferentContent())
+                        .atom(ATOM_URI_1)
+                        .direction().fromOwner()
+                        .build();
     }
 
-    private WonMessageBuilder addContentWithDifferentURI(WonMessageBuilder builder) {
-        return builder.addContent(createDifferentContent());
-    }
-
-    private WonMessageBuilder createMessageWithContent() {
-        return new WonMessageBuilder(MSG_URI_1).addContent(createContent())
-                        .setWonMessageType(WonMessageType.ATOM_HINT_MESSAGE).setHintTargetAtomURI(ATOM_URI_1)
-                        .setHintScore(0.5).setWonMessageDirection(WonMessageDirection.FROM_OWNER);
-    }
-
-    private WonMessageBuilder createMessageWithTwoContentGraphs() {
-        return new WonMessageBuilder(MSG_URI_1).addContent(createContent()).addContent(createDifferentContent())
-                        .setWonMessageType(WonMessageType.ATOM_HINT_MESSAGE).setHintTargetAtomURI(ATOM_URI_1)
-                        .setHintScore(0.2).setWonMessageDirection(WonMessageDirection.FROM_OWNER);
-    }
-
-    private WonMessageBuilder createMessageWithContentDataset() {
-        return new WonMessageBuilder(MSG_URI_1).addContent(createContentDataset())
-                        .setWonMessageType(WonMessageType.ATOM_HINT_MESSAGE).setHintTargetAtomURI(ATOM_URI_1)
-                        .setHintScore(0.2).setWonMessageDirection(WonMessageDirection.FROM_OWNER);
+    private WonMessage createMessageWithContentDataset() {
+        return WonMessageBuilder.createAtom(MSG_URI_1)
+                        .content().dataset(createContentDataset())
+                        .atom(ATOM_URI_1)
+                        .direction().fromOwner()
+                        .build();
     }
 
     private Model createContent() {

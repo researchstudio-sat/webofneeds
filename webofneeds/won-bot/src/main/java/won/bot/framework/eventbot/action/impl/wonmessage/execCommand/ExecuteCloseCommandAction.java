@@ -25,7 +25,7 @@ import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
@@ -85,11 +85,10 @@ public class ExecuteCloseCommandAction extends ExecuteMessageCommandAction<Close
         URI socketURI = WonRdfUtils.ConnectionUtils.getSocketURIFromConnection(connectionRDF, connectionURI);
         URI targetSocketURI = WonRdfUtils.ConnectionUtils.getTargetSocketURIFromConnection(connectionRDF,
                         connectionURI);
-        return WonMessageBuilder.setMessagePropertiesForClose(wonNodeInformationService.generateEventURI(wonNode),
-                        socketURI, connectionURI, localAtom, wonNode,
-                        targetSocketURI,
-                        WonRdfUtils.ConnectionUtils.getTargetConnectionURIFromConnection(connectionRDF, connectionURI),
-                        targetAtom, WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(targetAtomRDF, targetAtom),
-                        connectCommandEvent.getCloseMessage()).build();
+        return WonMessageBuilder
+                        .close(wonNodeInformationService.generateEventURI(wonNode))
+                        .sockets().sender(socketURI).recipient(targetSocketURI)
+                        .content().text(connectCommandEvent.getCloseMessage())
+                        .build();
     }
 }

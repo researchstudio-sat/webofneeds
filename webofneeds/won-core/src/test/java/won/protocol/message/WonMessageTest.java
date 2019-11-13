@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Iterator;
-import java.util.Optional;
 import java.util.Set;
 
 import org.apache.jena.query.Dataset;
@@ -22,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
@@ -75,16 +75,17 @@ public class WonMessageTest {
 
     @Test
     public void test_message_and_response_in_same_dataset() {
-        WonMessage msg = WonMessageBuilder.setMessagePropertiesForConnectionMessage(
-                        URI.create("uri:/messageUri"),
-                        URI.create("uri:/localAtom#socket"), URI.create("uri:/localConnection"),
-                        URI.create("uri:/localAtom"),
-                        URI.create("uri:/localWonnode"),
-                        URI.create("uri:/targetAtom#socket"), URI.create("uri:/targetConnection"),
-                        URI.create("uri:/targetAtom"), URI.create("uri:/targetWonNode"),
-                        "hello").build();
-        WonMessage response = WonMessageBuilder.setPropertiesForNodeResponse(msg, true, URI.create("uri:/succ1"),
-                        Optional.of(URI.create("uri:/conn1")), WonMessageDirection.FROM_OWNER).build();
+        WonMessage msg = WonMessageBuilder.connectionMessage(URI.create("uri:/messageUri"))
+                        .sockets()
+                        .sender(URI.create("uri:/localAtom#socket"))
+                        .recipient(URI.create("uri:/targetAtom#socket"))
+                        .content().text("hello").build();
+        WonMessage response = WonMessageBuilder
+                        .response(URI.create("uri:/succ1"))
+                        .fromConnection(URI.create("uri:/conn1"))
+                        .respondingToMessageFromOwner(msg)
+                        .success()
+                        .build();
         Dataset both = msg.getCompleteDataset();
         RdfUtils.addDatasetToDataset(both, response.getCompleteDataset());
         WonMessage msgAndResponse = WonMessage.of(both);
@@ -94,18 +95,23 @@ public class WonMessageTest {
 
     @Test
     public void test_message_and_two_responses_in_same_dataset() {
-        WonMessage msg = WonMessageBuilder.setMessagePropertiesForConnectionMessage(
-                        URI.create("uri:/messageUri"),
-                        URI.create("uri:/localAtom#socket"), URI.create("uri:/localConnection"),
-                        URI.create("uri:/localAtom"),
-                        URI.create("uri:/localWonnode"),
-                        URI.create("uri:/targetAtom#socket"), URI.create("uri:/targetConnection"),
-                        URI.create("uri:/targetAtom"), URI.create("uri:/targetWonNode"),
-                        "hello").build();
-        WonMessage response = WonMessageBuilder.setPropertiesForNodeResponse(msg, true, URI.create("uri:/succ1"),
-                        Optional.of(URI.create("uri:/conn1")), WonMessageDirection.FROM_OWNER).build();
-        WonMessage response2 = WonMessageBuilder.setPropertiesForNodeResponse(msg, true, URI.create("uri:/succ2"),
-                        Optional.of(URI.create("uri:/conn2")), WonMessageDirection.FROM_EXTERNAL).build();
+        WonMessage msg = WonMessageBuilder.connectionMessage(URI.create("uri:/messageUri"))
+                        .sockets()
+                        .sender(URI.create("uri:/localAtom#socket"))
+                        .recipient(URI.create("uri:/targetAtom#socket"))
+                        .content().text("hello").build();
+        WonMessage response = WonMessageBuilder
+                        .response(URI.create("uri:/succ1"))
+                        .fromConnection(URI.create("uri:/conn1"))
+                        .respondingToMessageFromOwner(msg)
+                        .success()
+                        .build();
+        WonMessage response2 = WonMessageBuilder
+                        .response(URI.create("uri:/succ2"))
+                        .fromConnection(URI.create("uri:/conn2"))
+                        .respondingToMessageFromExternal(msg)
+                        .success()
+                        .build();
         Dataset both = msg.getCompleteDataset();
         RdfUtils.addDatasetToDataset(both, response.getCompleteDataset());
         RdfUtils.addDatasetToDataset(both, response2.getCompleteDataset());

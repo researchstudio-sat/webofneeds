@@ -25,7 +25,7 @@ import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONCON;
@@ -75,14 +75,12 @@ public class ExecuteFeedbackCommandAction extends ExecuteMessageCommandAction<Fe
         URI connectionURI = feedbackCommandEvent.getConnectionURI();
         WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
-        URI localAtom = WonRdfUtils.ConnectionUtils.getLocalAtomURIFromConnection(connectionRDF, connectionURI);
         URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
         // TODO: make more generic by using the URIs specified in the command.
         return WonMessageBuilder
-                        .setMessagePropertiesForHintFeedback(wonNodeInformationService.generateEventURI(wonNode),
-                                        connectionURI,
-                                        localAtom, wonNode,
-                                        URI.create(WONCON.Good.getURI()).equals(feedbackCommandEvent.getValue()))
+                        .hintFeedbackMessage(wonNodeInformationService.generateEventURI(wonNode))
+                        .connection(connectionURI)
+                        .binaryFeedback(URI.create(WONCON.Good.getURI()).equals(feedbackCommandEvent.getValue()))
                         .build();
     }
 }

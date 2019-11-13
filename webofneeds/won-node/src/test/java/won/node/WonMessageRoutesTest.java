@@ -71,8 +71,8 @@ import won.protocol.exception.WonMessageNotWellFormedException;
 import won.protocol.jms.AtomProtocolCommunicationService;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageEncoder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.impl.KeyForNewAtomAddingProcessor;
 import won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor;
@@ -249,8 +249,12 @@ public abstract class WonMessageRoutesTest {
      ******************************************/
     protected WonMessage makeCreateAtomMessage(URI atomURI, String filename) throws IOException {
         Dataset atom1Content = loadDatasetAndReplaceAtomURI(filename, atomURI);
-        WonMessage createAtom1Msg = WonMessageBuilder.setMessagePropertiesForCreate(newMessageURI(),
-                        atomURI, URI_NODE_1).addContent(atom1Content).build();
+        WonMessage createAtom1Msg = WonMessageBuilder
+                        .createAtom(newMessageURI())
+                        .atom(atomURI)
+                        .content()
+                        /**/.dataset(atom1Content)
+                        .build();
         return createAtom1Msg;
     }
 

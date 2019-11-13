@@ -25,7 +25,7 @@ import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
@@ -80,9 +80,13 @@ public class ExecuteConnectCommandAction extends ExecuteMessageCommandAction<Con
                         .getDataForResource(connectCommandEvent.getAtomURI());
         URI localWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(localAtomRDF, connectCommandEvent.getAtomURI());
         connectCommandEvent.getTargetAtomURI();
-        return WonMessageBuilder.setMessagePropertiesForConnect(
-                        wonNodeInformationService.generateEventURI(localWonNode), connectCommandEvent.getLocalSocket(),
-                        connectCommandEvent.getTargetSocket(), connectCommandEvent.getWelcomeMessage())
+        URI messageURI = wonNodeInformationService.generateEventURI(localWonNode);
+        return WonMessageBuilder
+                        .connect(messageURI)
+                        .sockets()
+                        /**/.sender(connectCommandEvent.getLocalSocket())
+                        /**/.recipient(connectCommandEvent.getTargetSocket())
+                        .content().text(connectCommandEvent.getWelcomeMessage())
                         .build();
     }
 }

@@ -11,8 +11,7 @@ import org.springframework.stereotype.Component;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.WonMessageDirection;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.vocabulary.WONMSG;
 
@@ -35,9 +34,11 @@ public class ConnectMessageFromNodeReactionProcessor extends AbstractCamelProces
         URI fromWonNodeURI = connectMessageToReactTo.getRecipientNodeURI();
         URI messageURI = wonNodeInformationService.generateEventURI(fromWonNodeURI);
         WonMessage msg = WonMessageBuilder
-                        .setMessagePropertiesForConnect(messageURI, connectMessageToReactTo,
-                                        "Connection request accepted automatically by WoN node")
-                        .setWonMessageDirection(WonMessageDirection.FROM_SYSTEM).build();
+                        .connect(messageURI)
+                        .sockets().reactingTo(connectMessageToReactTo)
+                        .direction().fromSystem()
+                        .content().text("Connection request accepted automatically by WoN node")
+                        .build();
         logger.info("sending auto-open for connection {}-{}, reacting to connect", msg.getSenderSocketURI(),
                         msg.getRecipientSocketURI());
         camelWonMessageService.sendSystemMessage(msg);

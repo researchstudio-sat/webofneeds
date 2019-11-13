@@ -10,14 +10,15 @@
  */
 package won.bot.framework.eventbot.action.impl.atomlifecycle;
 
+import java.net.URI;
+
 import org.apache.jena.query.Dataset;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
 
 /**
  * Base class for actions that delete atoms.
@@ -49,6 +50,10 @@ public abstract class AbstractDeleteAtomAction extends BaseEventBotAction {
         }
         URI wonNodeUri = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(atomDataset, atomURI);
         URI eventUri = getEventListenerContext().getWonNodeInformationService().generateEventURI(wonNodeUri);
-        return WonMessageBuilder.setMessagePropertiesForDeleteFromOwner(eventUri, atomURI).build();
+        return WonMessageBuilder
+                        .delete(eventUri)
+                        .direction().fromOwner()
+                        .atom(atomURI)
+                        .build();
     }
 }

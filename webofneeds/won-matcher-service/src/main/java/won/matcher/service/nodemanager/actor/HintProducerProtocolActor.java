@@ -26,9 +26,8 @@ import won.matcher.service.common.event.SocketHintEvent;
 import won.matcher.service.common.service.monitoring.MonitoringService;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageEncoder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
@@ -110,27 +109,24 @@ public class HintProducerProtocolActor extends UntypedProducerActor {
         if (hint instanceof AtomHintEvent) {
             AtomHintEvent ahe = (AtomHintEvent) hint;
             return Optional.of(WonMessageBuilder
-                            .setMessagePropertiesForHintToAtom(ahe.getGeneratedEventUri(),
-                                            URI.create(ahe.getRecipientAtomUri()),
-                                            URI.create(ahe.getRecipientWonNodeUri()),
-                                            URI.create(ahe.getTargetAtomUri()),
-                                            URI.create(ahe.getMatcherUri()),
-                                            hint.getScore())
-                            .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build());
+                            .atomHint(ahe.getGeneratedEventUri())
+                            .atom(URI.create(ahe.getRecipientAtomUri()))
+                            .hintTargetAtom(URI.create(ahe.getTargetAtomUri()))
+                            .hintScore(ahe.getScore())
+                            .direction().fromExternal()
+                            .build());
         } else if (hint instanceof SocketHintEvent) {
             SocketHintEvent she = (SocketHintEvent) hint;
             Optional<URI> recipientAtomURI = WonLinkedDataUtils.getAtomOfSocket(URI.create(she.getRecipientSocketUri()),
                             linkedDataSource);
             if (recipientAtomURI.isPresent()) {
                 return Optional.of(WonMessageBuilder
-                                .setMessagePropertiesForHintToSocket(she.getGeneratedEventUri(),
-                                                recipientAtomURI.get(),
-                                                URI.create(she.getRecipientSocketUri()),
-                                                URI.create(she.getRecipientWonNodeUri()),
-                                                URI.create(she.getTargetSocketUri()),
-                                                URI.create(she.getMatcherUri()),
-                                                hint.getScore())
-                                .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build());
+                                .socketHint(she.getGeneratedEventUri())
+                                .recipientSocket(URI.create(she.getRecipientSocketUri()))
+                                .hintTargetSocket(URI.create(she.getTargetSocketUri()))
+                                .hintScore(hint.getScore())
+                                .direction().fromExternal()
+                                .build());
             }
         }
         return Optional.empty();

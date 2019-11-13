@@ -10,22 +10,23 @@
  */
 package won.bot.framework.eventbot.action.impl.atomlifecycle;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.jena.query.Dataset;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.model.SocketType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WONMATCH;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Base class for actions that create atoms.
@@ -102,8 +103,11 @@ public abstract class AbstractCreateAtomAction extends BaseEventBotAction {
             atomModelWrapper.addFlag(WONMATCH.UsedForTesting);
         }
         RdfUtils.replaceBaseURI(atomDataset, atomURI.toString(), true);
-        return WonMessageBuilder.setMessagePropertiesForCreate(wonNodeInformationService.generateEventURI(wonNodeURI),
-                        atomURI, wonNodeURI).addContent(atomModelWrapper.copyDatasetWithoutSysinfo()).build();
+        return WonMessageBuilder
+                        .createAtom(wonNodeInformationService.generateEventURI(wonNodeURI))
+                        .atom(atomURI)
+                        .content().dataset(atomModelWrapper.copyDatasetWithoutSysinfo())
+                        .build();
     }
 
     public void setUsedForTesting(final boolean usedForTesting) {

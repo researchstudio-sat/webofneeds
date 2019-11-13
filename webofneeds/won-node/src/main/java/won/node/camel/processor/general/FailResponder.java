@@ -15,12 +15,10 @@ import static won.node.camel.service.WonCamelHelper.*;
 import java.io.StringWriter;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
-import java.util.Date;
 import java.util.Optional;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
@@ -28,19 +26,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import won.node.camel.processor.AbstractCamelProcessor;
-import won.node.camel.service.WonCamelHelper;
 import won.protocol.exception.WonProtocolException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
+import won.protocol.message.builder.ResponseBuilder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor;
+import won.protocol.model.Connection;
 import won.protocol.service.MessageRoutingInfoService;
 import won.protocol.util.Prefixer;
 import won.protocol.util.RdfUtils;
-import won.protocol.util.WonRdfUtils;
-import won.protocol.vocabulary.WONMSG;
 
 /**
  * Sends a error response message back to the sender of the original message, if
@@ -109,26 +106,39 @@ public class FailResponder extends AbstractCamelProcessor {
                 return;
             }
             URI newMessageURI = this.wonNodeInformationService.generateEventURI();
+            if (originalMessage.getMessageTypeRequired().isResponseMessage()) {
+                // not sending a failure response for a response
+                return;
+            }
             logger.debug("Sending FailureResponse {}", newMessageURI);
-            Model errorMessageContent = WonRdfUtils.MessageUtils.textMessage(errormessage);
-            RdfUtils.replaceBaseURI(errorMessageContent, newMessageURI.toString());
             WonMessageDirection direction = getDirectionRequired(exchange);
-            Optional<URI> parent = WonCamelHelper.getConnectionURI(exchange);
-            WonMessage failureResponseMessage = WonMessageBuilder
-                            .setPropertiesForNodeResponse(originalMessage, false, newMessageURI, parent,
-                                            direction)
-                            .addContent(errorMessageContent).build();
-            failureResponseMessage.addMessageProperty(WONMSG.timestamp, new Date().getTime());
-            failureResponseMessage = signatureAddingWonMessageProcessor.process(failureResponseMessage);
-            putResponse(exchange, failureResponseMessage);
-            putMessageToSend(exchange, failureResponseMessage);
+            ResponseBuilder responseBuilder = WonMessageBuilder.response(newMessageURI);
+            // in the case of connect, the owners don't know connection uris yet. Tell them
+            // about them by using them as the senderURI property in the response.
+            if (originalMessage.getMessageTypeRequired().isConnectionSpecificMessage()) {
+                Optional<Connection> con = connectionService.getConnectionForMessage(originalMessage,
+                                getDirectionRequired(exchange));
+                if (con.isPresent()) {
+                    responseBuilder.fromConnection(con.get().getConnectionURI());
+                }
+            } else if (originalMessage.getMessageTypeRequired().isAtomSpecificMessage()) {
+                responseBuilder.fromAtom(originalMessage.getAtomURIRequired());
+            }
+            WonMessage responseMessage = responseBuilder
+                            .respondingToMessage(originalMessage, getDirectionRequired(exchange))
+                            .failure()
+                            .content().text(errormessage)
+                            .build();
+            responseMessage = signatureAddingWonMessageProcessor.process(responseMessage);
+            putResponse(exchange, responseMessage);
+            putMessageToSend(exchange, responseMessage);
             // extract the routing information
-            URI atom = messageRoutingInfoService.recipientAtom(failureResponseMessage)
+            URI atom = messageRoutingInfoService.recipientAtom(responseMessage)
                             .orElseThrow(() -> new IllegalArgumentException(
                                             "Cannot dertermine recipient atom for response"));
             // the sender node is not there in the case of hint messages.
-            Optional<URI> senderNode = messageRoutingInfoService.senderNode(failureResponseMessage);
-            URI recipientNode = messageRoutingInfoService.recipientNode(failureResponseMessage)
+            Optional<URI> senderNode = messageRoutingInfoService.senderNode(responseMessage);
+            URI recipientNode = messageRoutingInfoService.recipientNode(responseMessage)
                             .orElseThrow(() -> new IllegalArgumentException(
                                             "Cannot dertermine node for response"));
             if (senderNode.isPresent()) {

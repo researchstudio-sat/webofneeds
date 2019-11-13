@@ -25,7 +25,7 @@ import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
@@ -68,8 +68,9 @@ public class SendFeedbackForHintAction extends BaseEventBotAction {
         URI localAtom = WonRdfUtils.ConnectionUtils.getLocalAtomURIFromConnection(connectionRDF, connectionURI);
         URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
         return WonMessageBuilder
-                        .setMessagePropertiesForHintFeedback(wonNodeInformationService.generateEventURI(wonNode),
-                                        connectionURI, localAtom, wonNode, booleanFeedbackValue)
+                        .hintFeedbackMessage(wonNodeInformationService.generateEventURI(wonNode))
+                        .connection(connectionURI)
+                        .binaryFeedback(booleanFeedbackValue)
                         .build();
     }
 }

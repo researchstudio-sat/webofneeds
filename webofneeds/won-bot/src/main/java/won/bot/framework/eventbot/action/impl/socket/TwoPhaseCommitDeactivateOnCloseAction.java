@@ -10,8 +10,11 @@
  */
 package won.bot.framework.eventbot.action.impl.socket;
 
+import java.net.URI;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.NodeIterator;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -21,12 +24,10 @@ import won.bot.framework.eventbot.listener.EventListener;
 import won.node.socket.impl.WON_TX;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
 
 /**
  * Expects a CloseFromOtherAtom event from a and closes the local atom. If the
@@ -60,9 +61,11 @@ public class TwoPhaseCommitDeactivateOnCloseAction extends BaseEventBotAction {
         WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         Dataset ds = getEventListenerContext().getLinkedDataSource().getDataForResource(atomURI);
         URI localWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(ds, atomURI);
+        URI messageURI = wonNodeInformationService.generateEventURI(localWonNode);
         return WonMessageBuilder
-                        .setMessagePropertiesForDeactivateFromOwner(
-                                        wonNodeInformationService.generateEventURI(localWonNode), atomURI)
+                        .deactivate(messageURI)
+                        .direction().fromOwner()
+                        .atom(atomURI)
                         .build();
     }
 }

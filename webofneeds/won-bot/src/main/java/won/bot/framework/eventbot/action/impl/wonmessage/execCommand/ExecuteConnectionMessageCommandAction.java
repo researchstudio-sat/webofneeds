@@ -17,7 +17,8 @@ import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.builder.ConnectionMessageBuilder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
@@ -74,12 +75,14 @@ public class ExecuteConnectionMessageCommandAction
                         messageCommandEvent.getConnectionURI());
         URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
         RdfUtils.replaceBaseURI(localMessageModel, messageURI.toString());
-        WonMessageBuilder wmb = WonMessageBuilder.setMessagePropertiesForConnectionMessage(messageURI,
-                        messageCommandEvent.getCon().getSocketURI(), messageCommandEvent.getCon().getTargetSocketURI(),
-                        localMessageModel);
+        ConnectionMessageBuilder wmb = WonMessageBuilder.connectionMessage(messageURI)
+                        .sockets()
+                        /**/.sender(messageCommandEvent.getCon().getSocketURI())
+                        /**/.recipient(messageCommandEvent.getCon().getTargetSocketURI())
+                        .content().model(localMessageModel);
         Set<URI> injectionTargets = messageCommandEvent.getInjectIntoConnections();
         if (!injectionTargets.isEmpty()) {
-            wmb.setInjectIntoConnections(injectionTargets);
+            wmb.injectIntoConnections(injectionTargets);
         }
         return wmb.build();
     }

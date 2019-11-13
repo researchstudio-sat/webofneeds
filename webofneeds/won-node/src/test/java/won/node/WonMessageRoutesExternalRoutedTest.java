@@ -14,8 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import won.node.test.WonMessageRoutesTestHelper;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.WonMessageDirection;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.model.Atom;
 import won.protocol.model.AtomMessageContainer;
 import won.protocol.model.AtomState;
@@ -59,22 +58,30 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         toMatcherMockEndpoint.expectedMessageCount(2);
         sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
         sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER2);
-        WonMessage socketHintMessage = WonMessageBuilder.setMessagePropertiesForHintToSocket(newMessageURI(), atomURI,
-                        socketURI, URI_NODE_1, socketURI2, URI_MATCHER_1, 0.5).build();
+        WonMessage socketHintMessage = WonMessageBuilder
+                        .socketHint(newMessageURI())
+                        .recipientSocket(socketURI)
+                        .hintTargetSocket(socketURI2)
+                        .hintScore(0.5)
+                        .build();
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
         toOwnerMockEndpoint.expectedMessageCount(1);
         toMatcherMockEndpoint.expectedMessageCount(0);
         sendFromMatcher(socketHintMessage);
         // start connecting
-        WonMessage connectFromExternalMsg = WonMessageBuilder.setMessagePropertiesForConnect(
-                        newMessageURI(), socketURI2, socketURI, "unittest connect")
+        WonMessage connectFromExternalMsg = WonMessageBuilder
+                        .connect(newMessageURI())
+                        .sockets().sender(socketURI2).recipient(socketURI)
+                        .content().text("Unittest connect")
                         .build();
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
         toOwnerMockEndpoint.expectedMessageCount(3);
         sendFromOwner(connectFromExternalMsg, OWNERAPPLICATION_ID_OWNER2);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
-        WonMessage connectFromOwnerMsg = WonMessageBuilder.setMessagePropertiesForConnect(
-                        newMessageURI(), socketURI, socketURI2, "unittest connect")
+        WonMessage connectFromOwnerMsg = WonMessageBuilder
+                        .connect(newMessageURI())
+                        .sockets().sender(socketURI).recipient(socketURI2)
+                        .content().text("Unittest connect")
                         .build();
         toOwnerMockEndpoint.expectedMessageCount(3);
         toMatcherMockEndpoint.expectedMessageCount(2);
@@ -84,16 +91,12 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
             Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI,
                             socketURI2);
             WonMessage textMsgFromOwner = WonMessageBuilder
-                            .setMessagePropertiesForConnectionMessage(newMessageURI(),
-                                            con.get().getSocketURI(),
-                                            con.get().getConnectionURI(),
-                                            con.get().getAtomURI(),
-                                            URI_NODE_1,
-                                            con.get().getTargetSocketURI(),
-                                            con.get().getTargetConnectionURI(),
-                                            con.get().getTargetAtomURI(),
-                                            URI_NODE_1,
-                                            "unittest message from " + socketURI)
+                            .connectionMessage(newMessageURI())
+                            .sockets()
+                            /**/.sender(con.get().getSocketURI())
+                            /**/.recipient(con.get().getTargetSocketURI())
+                            .content()
+                            /**/.text("unittest message from " + socketURI)
                             .build();
             toOwnerMockEndpoint.expectedMessageCount(3);
             toOwnerMockEndpoint.expectedMessagesMatches(
@@ -134,8 +137,10 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
             sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
             sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER2);
             WonMessage socketHintMessage = WonMessageBuilder
-                            .setMessagePropertiesForHintToSocket(newMessageURI(), atomURI,
-                                            socketURI, URI_NODE_1, socketURI2, URI_MATCHER_1, 0.5)
+                            .socketHint(newMessageURI())
+                            .recipientSocket(socketURI)
+                            .hintTargetSocket(socketURI2)
+                            .hintScore(0.5)
                             .build();
             assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
             // seems fair to wait for response to create before we send the hint
@@ -143,12 +148,16 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
             sendFromMatcher(socketHintMessage);
             assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
             // start connecting
-            WonMessage connectFromExternalMsg = WonMessageBuilder.setMessagePropertiesForConnect(
-                            newMessageURI(), socketURI2, socketURI, "unittest connect")
+            WonMessage connectFromExternalMsg = WonMessageBuilder
+                            .connect(newMessageURI())
+                            .sockets().sender(socketURI2).recipient(socketURI)
+                            .content().text("Unittest connect")
                             .build();
             assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
-            WonMessage connectFromOwnerMsg = WonMessageBuilder.setMessagePropertiesForConnect(
-                            newMessageURI(), socketURI, socketURI2, "unittest connect")
+            WonMessage connectFromOwnerMsg = WonMessageBuilder
+                            .connect(newMessageURI())
+                            .sockets().sender(socketURI).recipient(socketURI2)
+                            .content().text("Unittest connect")
                             .build();
             toOwnerMockEndpoint.expectedMessageCount(6);
             toOwnerMockEndpoint.expectedMessagesMatches(
@@ -327,15 +336,21 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         toMatcherMockEndpoint.expectedMessageCount(2);
         sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
         sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER2);
-        WonMessage socketHintMessage = WonMessageBuilder.setMessagePropertiesForHintToSocket(newMessageURI(), atomURI,
-                        socketURI, URI_NODE_1, socketURI2, URI_MATCHER_1, 0.5).build();
+        WonMessage socketHintMessage = WonMessageBuilder
+                        .socketHint(newMessageURI())
+                        .recipientSocket(socketURI)
+                        .hintTargetSocket(socketURI2)
+                        .hintScore(0.5)
+                        .build();
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
         toOwnerMockEndpoint.expectedMessageCount(1);
         toMatcherMockEndpoint.expectedMessageCount(0);
         sendFromMatcher(socketHintMessage);
         // start connecting
-        WonMessage connectFromExternalMsg = WonMessageBuilder.setMessagePropertiesForConnect(
-                        newMessageURI(), socketURI2, socketURI, "unittest connect")
+        WonMessage connectFromExternalMsg = WonMessageBuilder
+                        .connect(newMessageURI())
+                        .sockets().sender(socketURI2).recipient(socketURI)
+                        .content().text("Unittest connect")
                         .build();
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
         toMatcherMockEndpoint.expectedMessageCount(0);
@@ -346,8 +361,10 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
                         isSuccessResponseTo(connectFromExternalMsg)));
         sendFromOwner(connectFromExternalMsg, OWNERAPPLICATION_ID_OWNER2);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
-        WonMessage connectFromOwnerMsg = WonMessageBuilder.setMessagePropertiesForConnect(
-                        newMessageURI(), socketURI, socketURI2, "unittest connect")
+        WonMessage connectFromOwnerMsg = WonMessageBuilder
+                        .connect(newMessageURI())
+                        .sockets().sender(socketURI).recipient(socketURI2)
+                        .content().text("Unittest connect")
                         .build();
         toOwnerMockEndpoint.expectedMessageCount(3);
         toOwnerMockEndpoint.expectedMessagesMatches(or(
@@ -360,16 +377,12 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI,
                         socketURI2);
         WonMessage textMsgFromOwner = WonMessageBuilder
-                        .setMessagePropertiesForConnectionMessage(newMessageURI(),
-                                        con.get().getSocketURI(),
-                                        con.get().getConnectionURI(),
-                                        con.get().getAtomURI(),
-                                        URI_NODE_1,
-                                        con.get().getTargetSocketURI(),
-                                        con.get().getTargetConnectionURI(),
-                                        con.get().getTargetAtomURI(),
-                                        URI_NODE_1,
-                                        "unittest message from " + socketURI)
+                        .connectionMessage(newMessageURI())
+                        .sockets()
+                        /**/.sender(con.get().getSocketURI())
+                        /**/.recipient(con.get().getTargetSocketURI())
+                        .content()
+                        /**/.text("unittest message from " + socketURI)
                         .build();
         toOwnerMockEndpoint.expectedMessageCount(3);
         toOwnerMockEndpoint.expectedMessagesMatches(or(
@@ -380,16 +393,12 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         sendFromOwner(textMsgFromOwner, OWNERAPPLICATION_ID_OWNER1);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
         textMsgFromOwner = WonMessageBuilder
-                        .setMessagePropertiesForConnectionMessage(newMessageURI(),
-                                        con.get().getSocketURI(),
-                                        con.get().getConnectionURI(),
-                                        con.get().getAtomURI(),
-                                        URI_NODE_1,
-                                        con.get().getTargetSocketURI(),
-                                        con.get().getTargetConnectionURI(),
-                                        con.get().getTargetAtomURI(),
-                                        URI_NODE_1,
-                                        "unittest message 2 from " + socketURI)
+                        .connectionMessage(newMessageURI())
+                        .sockets()
+                        /**/.sender(con.get().getSocketURI())
+                        /**/.recipient(con.get().getTargetSocketURI())
+                        .content()
+                        /**/.text("unittest message 2 from " + socketURI)
                         .build();
         sendFromOwner(textMsgFromOwner, OWNERAPPLICATION_ID_OWNER1);
         toOwnerMockEndpoint.expectedMessageCount(3);
@@ -400,16 +409,12 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         toMatcherMockEndpoint.expectedMessageCount(0);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
         WonMessage textMsgFromOtherOwner = WonMessageBuilder
-                        .setMessagePropertiesForConnectionMessage(newMessageURI(),
-                                        con.get().getTargetSocketURI(),
-                                        con.get().getTargetConnectionURI(),
-                                        con.get().getTargetAtomURI(),
-                                        URI_NODE_1,
-                                        con.get().getSocketURI(),
-                                        con.get().getConnectionURI(),
-                                        con.get().getAtomURI(),
-                                        URI_NODE_1,
-                                        "unittest message from " + socketURI2)
+                        .connectionMessage(newMessageURI())
+                        .sockets()
+                        /**/.sender(con.get().getTargetSocketURI())
+                        /**/.recipient(con.get().getSocketURI())
+                        .content()
+                        /**/.text("unittest message from " + socketURI2)
                         .build();
         toOwnerMockEndpoint.expectedMessageCount(3);
         toOwnerMockEndpoint.expectedMessagesMatches(or(
@@ -446,20 +451,28 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
         toOwnerMockEndpoint.expectedMessageCount(1);
         toMatcherMockEndpoint.expectedMessageCount(0);
-        WonMessage socketHintMessage = WonMessageBuilder.setMessagePropertiesForHintToSocket(newMessageURI(), atomURI,
-                        socketURI, URI_NODE_1, socketURI2, URI_MATCHER_1, 0.5).build();
+        WonMessage socketHintMessage = WonMessageBuilder
+                        .socketHint(newMessageURI())
+                        .recipientSocket(socketURI)
+                        .hintTargetSocket(socketURI2)
+                        .hintScore(0.5)
+                        .build();
         sendFromMatcher(socketHintMessage);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
         // start connecting
-        WonMessage connectFromExternalMsg = WonMessageBuilder.setMessagePropertiesForConnect(
-                        newMessageURI(), socketURI2, socketURI, "unittest connect")
+        WonMessage connectFromExternalMsg = WonMessageBuilder
+                        .connect(newMessageURI())
+                        .sockets().sender(socketURI2).recipient(socketURI)
+                        .content().text("Unittest connect")
                         .build();
         toOwnerMockEndpoint.expectedMessageCount(3);
         toMatcherMockEndpoint.expectedMessageCount(0);
         sendFromOwner(connectFromExternalMsg, OWNERAPPLICATION_ID_OWNER2);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
-        WonMessage connectFromOwnerMsg = WonMessageBuilder.setMessagePropertiesForConnect(
-                        newMessageURI(), socketURI, socketURI2, "unittest connect")
+        WonMessage connectFromOwnerMsg = WonMessageBuilder
+                        .connect(newMessageURI())
+                        .sockets().sender(socketURI).recipient(socketURI2)
+                        .content().text("Unittest connect")
                         .build();
         toOwnerMockEndpoint.expectedMessageCount(3);
         toMatcherMockEndpoint.expectedMessageCount(2);
@@ -468,16 +481,12 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI,
                         socketURI2);
         WonMessage textMsgFromOwner = WonMessageBuilder
-                        .setMessagePropertiesForConnectionMessage(newMessageURI(),
-                                        con.get().getSocketURI(),
-                                        con.get().getConnectionURI(),
-                                        con.get().getAtomURI(),
-                                        URI_NODE_1,
-                                        con.get().getTargetSocketURI(),
-                                        con.get().getTargetConnectionURI(),
-                                        con.get().getTargetAtomURI(),
-                                        URI_NODE_1,
-                                        "unittest message from " + socketURI)
+                        .connectionMessage(newMessageURI())
+                        .sockets()
+                        /**/.sender(con.get().getSocketURI())
+                        /**/.recipient(con.get().getTargetSocketURI())
+                        .content()
+                        /**/.text("unittest message from " + socketURI)
                         .build();
         toOwnerMockEndpoint.expectedMessageCount(3);
         toOwnerMockEndpoint.expectedMessagesMatches(or(
@@ -488,16 +497,12 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         sendFromOwner(textMsgFromOwner, OWNERAPPLICATION_ID_OWNER1);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
         textMsgFromOwner = WonMessageBuilder
-                        .setMessagePropertiesForConnectionMessage(newMessageURI(),
-                                        con.get().getSocketURI(),
-                                        con.get().getConnectionURI(),
-                                        con.get().getAtomURI(),
-                                        URI_NODE_1,
-                                        con.get().getTargetSocketURI(),
-                                        con.get().getTargetConnectionURI(),
-                                        con.get().getTargetAtomURI(),
-                                        URI_NODE_1,
-                                        "unittest message 2 from " + socketURI)
+                        .connectionMessage(newMessageURI())
+                        .sockets()
+                        /**/.sender(con.get().getSocketURI())
+                        /**/.recipient(con.get().getTargetSocketURI())
+                        .content()
+                        /**/.text("unittest message 2 from " + socketURI)
                         .build();
         sendFromOwner(textMsgFromOwner, OWNERAPPLICATION_ID_OWNER1);
         toOwnerMockEndpoint.expectedMessageCount(3);
@@ -508,16 +513,12 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         toMatcherMockEndpoint.expectedMessageCount(0);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
         WonMessage textMsgFromOtherOwner = WonMessageBuilder
-                        .setMessagePropertiesForConnectionMessage(newMessageURI(),
-                                        con.get().getTargetSocketURI(),
-                                        con.get().getTargetConnectionURI(),
-                                        con.get().getTargetAtomURI(),
-                                        URI_NODE_1,
-                                        con.get().getSocketURI(),
-                                        con.get().getConnectionURI(),
-                                        con.get().getAtomURI(),
-                                        URI_NODE_1,
-                                        "unittest message from " + socketURI2)
+                        .connectionMessage(newMessageURI())
+                        .sockets()
+                        /**/.sender(con.get().getTargetSocketURI())
+                        /**/.recipient(con.get().getSocketURI())
+                        .content()
+                        /**/.text("unittest message from " + socketURI2)
                         .build();
         toOwnerMockEndpoint.expectedMessageCount(3);
         toOwnerMockEndpoint.expectedMessagesMatches(or(
@@ -527,11 +528,10 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         sendFromOwner(textMsgFromOtherOwner, OWNERAPPLICATION_ID_OWNER2);
         toMatcherMockEndpoint.expectedMessageCount(0);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
-        WonMessage closeMsg = WonMessageBuilder.setMessagePropertiesForClose(newMessageURI(),
-                        con.get().getSocketURI(),
-                        con.get().getTargetSocketURI(),
-                        WonMessageDirection.FROM_OWNER,
-                        "unittest close!").build();
+        WonMessage closeMsg = WonMessageBuilder
+                        .close(newMessageURI())
+                        .sockets().sender(con.get().getSocketURI()).recipient(con.get().getTargetSocketURI())
+                        .content().text("unittest close!").build();
         toOwnerMockEndpoint.expectedMessageCount(3);
         toOwnerMockEndpoint.expectedMessagesMatches(or(
                         isMessageAndResponse(closeMsg),
@@ -566,15 +566,21 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
         sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER1);
         // set new expectations for hint
-        WonMessage socketHintMessage = WonMessageBuilder.setMessagePropertiesForHintToSocket(newMessageURI(), atomURI,
-                        socketURI, URI_NODE_1, socketURI2, URI_MATCHER_1, 0.5).build();
+        WonMessage socketHintMessage = WonMessageBuilder
+                        .socketHint(newMessageURI())
+                        .recipientSocket(socketURI)
+                        .hintTargetSocket(socketURI2)
+                        .hintScore(0.5)
+                        .build();
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
         toOwnerMockEndpoint.expectedMessageCount(1);
         toMatcherMockEndpoint.expectedMessageCount(0);
         sendFromMatcher(socketHintMessage);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
-        WonMessage connectMsg = WonMessageBuilder.setMessagePropertiesForConnect(
-                        newMessageURI(), socketURI, socketURI2, "unittest connect")
+        WonMessage connectMsg = WonMessageBuilder
+                        .connect(newMessageURI())
+                        .sockets().sender(socketURI).recipient(socketURI2)
+                        .content().text("Unittest connect")
                         .build();
         // expectations for connect
         toOwnerMockEndpoint.expectedMessageCount(3);
@@ -626,8 +632,10 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
         sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER1);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
-        WonMessage connectMsg = WonMessageBuilder.setMessagePropertiesForConnect(
-                        newMessageURI(), socketURI, socketURI2, "unittest connect")
+        WonMessage connectMsg = WonMessageBuilder
+                        .connect(newMessageURI())
+                        .sockets().sender(socketURI).recipient(socketURI2)
+                        .content().text("Unittest connect")
                         .build();
         // expectations for connect
         toOwnerMockEndpoint.expectedMessageCount(3);
