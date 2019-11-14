@@ -35,7 +35,9 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -79,8 +81,8 @@ import won.protocol.vocabulary.WON;
  * https://dvcs.w3.org/hg/ldpwg/raw-file/default/ldp-paging.html, especially for
  * sorting
  */
-@Component
-public class LinkedDataServiceImpl implements LinkedDataService {
+@Component("linkedDataService")
+public class LinkedDataServiceImpl implements LinkedDataService, InitializingBean {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     // prefix of an atom resource
     private String atomResourceURIPrefix;
@@ -89,6 +91,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     // prefix of a event resource
     private String eventResourceURIPrefix;
     // prefix for URIs referring to real-world things
+    @Value("${uri.prefix.resource}")
     private String resourceURIPrefix;
     @Autowired
     private MessageEventRepository messageEventRepository;
@@ -108,14 +111,31 @@ public class LinkedDataServiceImpl implements LinkedDataService {
     private UnreadInformationService unreadInformationService;
     @Autowired
     private AtomInformationService atomInformationService;
+    @Value("${uri.protocol.activemq}")
     private String activeMqEndpoint;
+    @Value("${activemq.queuename.atom.incoming}")
     private String activeMqAtomProtcolQueueName;
+    @Value("${activemq.queuename.owner.incoming}")
     private String activeMqOwnerProtcolQueueName;
+    @Value("${activemq.queuename.matcher.incoming}")
     private String activeMqMatcherPrtotocolQueueName;
+    @Value("${activemq.matcher.outgoing.topicname.atom.created}")
     private String activeMqMatcherProtocolTopicNameAtomCreated;
+    @Value("${activemq.matcher.outgoing.topicname.atom.activated}")
     private String activeMqMatcherProtocolTopicNameAtomActivated;
+    @Value("${activemq.matcher.outgoing.topicname.atom.deactivated}")
     private String activeMqMatcherProtocolTopicNameAtomDeactivated;
+    @Value("${activemq.matcher.outgoing.topicname.atom.deleted}")
     private String activeMqMatcherProtocolTopicNameAtomDeleted;
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        this.atomResourceURIPrefix = this.resourceURIPrefix + "/atom";
+        this.connectionResourceURIPrefix = this.resourceURIPrefix + "/connection";
+        this.eventResourceURIPrefix = this.resourceURIPrefix + "/msg";
+        logger.info("setting prefixes: atom: {}, connection: {}, event: {}", new Object[] { this.atomResourceURIPrefix,
+                        this.connectionResourceURIPrefix, this.eventResourceURIPrefix });
+    }
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public Dataset listAtomURIs() {
@@ -228,10 +248,10 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         // link atomMetaInformationURI to atom via rdfg:subGraphOf
         atomMetaInformationResource.addProperty(RDFG.SUBGRAPH_OF, atomResource);
         // add connections
-        Resource connectionsContainer = metaModel.createResource(atom.getAtomURI().toString() + "/connections");
+        Resource connectionsContainer = metaModel.createResource(atom.getAtomURI().toString() + "/c");
         metaModel.add(metaModel.createStatement(atomResource, WON.connections, connectionsContainer));
         // add atom event container
-        Resource atomMessageContainer = metaModel.createResource(atom.getAtomURI().toString() + "#events",
+        Resource atomMessageContainer = metaModel.createResource(atom.getAtomURI().toString() + "#msg",
                         WON.MessageContainer);
         metaModel.add(metaModel.createStatement(atomResource, WON.messageContainer, atomMessageContainer));
         // add atom event URIs
@@ -413,7 +433,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         connectionResource.addProperty(WON.wonNode, model.createResource(this.resourceURIPrefix));
         if (includeMessageContainer) {
             // create event container and attach it to the member
-            Resource messageContainer = model.createResource(connection.getConnectionURI().toString() + "/events");
+            Resource messageContainer = model.createResource(connection.getConnectionURI().toString() + "/msg");
             connectionResource.addProperty(WON.messageContainer, messageContainer);
             messageContainer.addProperty(RDF.type, WON.MessageContainer);
             DatasetHolder datasetHolder = connection.getDatasetHolder();
@@ -628,7 +648,7 @@ public class LinkedDataServiceImpl implements LinkedDataService {
         Model model = ModelFactory.createDefaultModel();
         setNsPrefixes(model);
         Connection connection = atomInformationService.readConnection(connectionUri);
-        Resource messageContainer = model.createResource(connection.getConnectionURI().toString() + "/events",
+        Resource messageContainer = model.createResource(connection.getConnectionURI().toString() + "/msg",
                         WON.MessageContainer);
         // add the events with the new format (only the URI, no content)
         List<MessageEvent> connectionEvents = messageEventRepository.findByParentURI(connectionUri);

@@ -1031,11 +1031,11 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
         toNodeMockEndpoint.expectedMessagesMatches(isMessageAndResponse(connectMsg));
         sendFromOwner(connectMsg, OWNERAPPLICATION_ID_OWNER1);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
-        URI remoteCon = newConnectionURI();
+        URI remoteCon = newConnectionURI(atomURI2);
         WonMessage successResponse = WonMessageBuilder
                         .response(newMessageURI())
                         .respondingToMessageFromExternal(connectMsg)
-                        .fromConnection(newConnectionURI())
+                        .fromConnection(remoteCon)
                         .success()
                         .build();
         toOwnerMockEndpoint.expectedMessageCount(1);
@@ -1140,7 +1140,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
         WonMessage response = WonMessageBuilder
                         .response(newMessageURI())
                         .respondingToMessageFromOwner(connectMsg)
-                        .fromConnection(newConnectionURI())
+                        .fromConnection(newConnectionURI(atomURI))
                         .success()
                         .build();
         WonMessage msg = WonMessage.of(connectMsg, signatureAdder.process(response));
@@ -1203,7 +1203,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
         WonMessage response = WonMessageBuilder
                         .response(newMessageURI())
                         .respondingToMessageFromOwner(connectMsg)
-                        .fromConnection(newConnectionURI())
+                        .fromConnection(newConnectionURI(atomURI))
                         .success()
                         .build();
         WonMessage msg = WonMessage.of(connectMsg, signatureAdder.process(response));
@@ -1266,7 +1266,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
         WonMessage response = WonMessageBuilder
                         .response(newMessageURI())
                         .respondingToMessageFromOwner(connectFromExternalMsg)
-                        .fromConnection(newConnectionURI())
+                        .fromConnection(newConnectionURI(atomURI))
                         .success()
                         .build();
         WonMessage msg = WonMessage.of(connectFromExternalMsg, signatureAdder.process(response));
@@ -1284,7 +1284,6 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
                         .sockets().sender(socketURI).recipient(socketURI2)
                         .content().text("Unittest connect")
                         .build();
-        logger.warn("response: " + response.getMessageURI());
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
         toOwnerMockEndpoint.expectedMessageCount(1);
         // toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(connectFromOwnerMsg));
@@ -1341,7 +1340,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
             WonMessage response = WonMessageBuilder
                             .response(newMessageURI())
                             .respondingToMessageFromOwner(connectFromExternalMsg)
-                            .fromConnection(newConnectionURI())
+                            .fromConnection(newConnectionURI(atomURI))
                             .success()
                             .build();
             WonMessage msg = WonMessage.of(connectFromExternalMsg, signatureAdder.process(response));
@@ -1408,7 +1407,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
             WonMessage response = WonMessageBuilder
                             .response(newMessageURI())
                             .respondingToMessageFromOwner(connectFromExternalMsg)
-                            .fromConnection(newConnectionURI())
+                            .fromConnection(newConnectionURI(atomURI))
                             .success()
                             .build();
             WonMessage msg = WonMessage.of(connectFromExternalMsg, signatureAdder.process(response));

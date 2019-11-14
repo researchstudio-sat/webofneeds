@@ -347,7 +347,7 @@ public class ConnectionService {
         if (socketRepository.findByAtomURIAndTypeURI(atomURI, socketTypeURI).isEmpty())
             throw new RuntimeException("Socket '" + socketTypeURI + "' is not supported by Atom: '" + atomURI + "'");
         /* Create connection */
-        URI connectionUri = wonNodeInformationService.generateConnectionURI();
+        URI connectionUri = wonNodeInformationService.generateConnectionURI(atomURI);
         Connection con = new Connection();
         // create and set new uri
         con.setConnectionURI(connectionUri);

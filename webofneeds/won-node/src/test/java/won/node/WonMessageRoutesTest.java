@@ -584,7 +584,6 @@ public abstract class WonMessageRoutesTest {
     }
 
     protected void assertConnectionAsExpected(Connection expected, Optional<Connection> con) {
-        System.out.println("checking connection: " + con.get());
         Assert.assertTrue("New connection should have been stored", con.isPresent());
         Assert.assertSame("Wrong state of connection", expected.getState(), con.get().getState());
         if (expected.getSocketURI() != null) {
@@ -743,15 +742,15 @@ public abstract class WonMessageRoutesTest {
     }
 
     protected URI newAtomURI() {
-        return URI.create(URI_NODE_1 + "/atom/atom-" + counter.incrementAndGet());
+        return URI.create(URI_NODE_1 + "/atom/atom" + counter.incrementAndGet());
     }
 
-    protected URI newConnectionURI() {
-        return URI.create(URI_NODE_1 + "/connection/connection-" + counter.incrementAndGet());
+    protected URI newConnectionURI(URI atomUri) {
+        return URI.create(atomUri.toString() + "/c/connection" + counter.incrementAndGet());
     }
 
     protected URI newMessageURI() {
-        return URI.create("wm:/message-" + counter.incrementAndGet());
+        return URI.create("wm:/message" + counter.incrementAndGet());
     }
 
     protected Dataset loadDatasetAndReplaceAtomURI(String file, URI atomURI) throws IOException {
@@ -867,17 +866,14 @@ public abstract class WonMessageRoutesTest {
                             }
                         });
         Mockito.when(wonNodeInformationService
-                        .generateConnectionURI(any(URI.class)))
-                        .then(x -> newConnectionURI());
-        Mockito.when(wonNodeInformationService
                         .generateAtomURI(any(URI.class)))
                         .then(x -> newAtomURI());
         Mockito.when(wonNodeInformationService
                         .generateEventURI(any(URI.class)))
                         .then(x -> newMessageURI());
         Mockito.when(wonNodeInformationService
-                        .generateConnectionURI())
-                        .then(x -> newConnectionURI());
+                        .generateConnectionURI(any(URI.class)))
+                        .then(invocation -> newConnectionURI((URI) invocation.getArguments()[0]));
         Mockito.when(wonNodeInformationService
                         .generateAtomURI())
                         .then(x -> newAtomURI());
@@ -886,6 +882,7 @@ public abstract class WonMessageRoutesTest {
                         .then(x -> newMessageURI());
         Mockito.when(wonNodeInformationService.getWonNodeInformation(URI_NODE_1)).then(x -> new WonNodeInfoBuilder()
                         .setAtomURIPrefix(URI_NODE_1 + "/atom")
+                        .setWonNodeURI(URI_NODE_1.toString())
                         .setConnectionURIPrefix(URI_NODE_1 + "/connection")
                         .build());
         Mockito.when(uriService.isAtomURI(any(URI.class))).thenReturn(true);

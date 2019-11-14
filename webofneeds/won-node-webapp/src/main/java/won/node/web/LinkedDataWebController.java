@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
@@ -39,6 +40,7 @@ import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.http.HttpHeaders;
@@ -117,7 +119,7 @@ import won.protocol.vocabulary.WONMSG;
  */
 @Controller
 @RequestMapping("/")
-public class LinkedDataWebController {
+public class LinkedDataWebController implements InitializingBean {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     // full prefix of an atom resource
     private String atomResourceURIPrefix;
@@ -141,13 +143,21 @@ public class LinkedDataWebController {
     @Autowired
     private URIService uriService;
 
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        this.atomResourceURIPrefix = this.nodeResourceURIPrefix + "/atom";
+        this.connectionResourceURIPrefix = this.nodeResourceURIPrefix + "/connection";
+        logger.info("setting prefixes: atom: {}, connection: {}, ", new Object[] { this.atomResourceURIPrefix,
+                        this.connectionResourceURIPrefix });
+    }
+
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String showIndexPage() {
         return "index";
     }
 
     // webmvc controller method
-    @RequestMapping("${uri.path.page.atom}/{identifier}")
+    @RequestMapping("${uri.path.page}/atom/{identifier}")
     public String showAtomPage(@PathVariable String identifier, Model model, HttpServletResponse response) {
         URI atomURI = uriService.createAtomURIForId(identifier);
         Dataset rdfDataset = linkedDataService.getAtomDataset(atomURI, null).getData();
@@ -172,7 +182,7 @@ public class LinkedDataWebController {
      * @return
      */
     // webmvc controller method
-    @RequestMapping("${uri.path.page.atom}/{identifier}/deep")
+    @RequestMapping("${uri.path.page}/atom/{identifier}/deep")
     public String showDeepAtomPage(@PathVariable String identifier, Model model, HttpServletResponse response,
                     @RequestParam(value = "layer-size", required = false) Integer layerSize) {
         try {
@@ -189,9 +199,11 @@ public class LinkedDataWebController {
     }
 
     // webmvc controller method
-    @RequestMapping("${uri.path.page.connection}/{identifier}")
-    public String showConnectionPage(@PathVariable String identifier, Model model, HttpServletResponse response) {
-        URI connectionURI = uriService.createConnectionURIForId(identifier);
+    @RequestMapping("${uri.path.page}/atom/{atomId}/c/{identifier}")
+    public String showConnectionPage(@PathVariable String atomId, @PathVariable String identifier, Model model,
+                    HttpServletRequest request,
+                    HttpServletResponse response) {
+        URI connectionURI = uriService.createConnectionURIForId(atomId, identifier);
         DataWithEtag<Dataset> rdfDataset = linkedDataService.getConnectionDataset(connectionURI, true, null);
         if (rdfDataset.isNotFound()) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -204,20 +216,23 @@ public class LinkedDataWebController {
     }
 
     // webmvc controller method
-    @RequestMapping("${uri.path.page.connection}/{identifier}/events")
-    public String showConnectionEventsPage(@PathVariable String identifier,
+    @RequestMapping("${uri.path.page}/atom/{atomId}/c/{identifier}/msg")
+    public String showConnectionEventsPage(
+                    @PathVariable String atomId,
+                    @PathVariable String identifier,
                     @RequestParam(value = "p", required = false) Integer page,
-                    @RequestParam(value = "resumebefore", required = false) String beforeId,
-                    @RequestParam(value = "resumeafter", required = false) String afterId,
+                    @RequestParam(value = "resumebefore", required = false) String resumeBefore,
+                    @RequestParam(value = "resumeafter", required = false) String resumeAfter,
                     @RequestParam(value = "type", required = false) String type,
                     @RequestParam(value = "deep", required = false, defaultValue = "false") boolean deep, Model model,
+                    HttpServletRequest request,
                     HttpServletResponse response) {
         try {
-            URI connectionURI = uriService.createConnectionURIForId(identifier);
-            String eventsURI = connectionURI.toString() + "/events";
+            URI connectionURI = uriService.createConnectionURIForId(atomId, identifier);
+            String eventsURI = connectionURI.toString() + "/msg";
             Dataset rdfDataset;
             WonMessageType msgType = getMessageType(type);
-            if (page == null && beforeId == null && afterId == null) {
+            if (page == null && resumeBefore == null && resumeAfter == null) {
                 // all events, does not support type filtering for clients that do not support
                 // paging
                 rdfDataset = linkedDataService.listConnectionEventURIs(connectionURI, deep);
@@ -226,15 +241,25 @@ public class LinkedDataWebController {
                 AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService
                                 .listConnectionEventURIs(connectionURI, page, null, msgType, deep);
                 rdfDataset = resource.getContent();
-            } else if (beforeId != null) {
-                // a page that precedes the item identified by the beforeId is requested
-                URI referenceEvent = uriService.createEventURIForId(beforeId);
+            } else if (resumeBefore != null) {
+                // a page that precedes the item identified by the resumeBefore is requested
+                URI referenceEvent;
+                try {
+                    referenceEvent = new URI(resumeBefore);
+                } catch (URISyntaxException e) {
+                    throw new IllegalArgumentException("resumeBefore must be a full, valid message URI");
+                }
                 AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService
                                 .listConnectionEventURIsBefore(connectionURI, referenceEvent, null, msgType, deep);
                 rdfDataset = resource.getContent();
             } else {
-                // a page that follows the item identified by the afterId is requested
-                URI referenceEvent = uriService.createEventURIForId(afterId);
+                // a page that follows the item identified by the resumeAfter is requested
+                URI referenceEvent;
+                try {
+                    referenceEvent = new URI(resumeAfter);
+                } catch (URISyntaxException e) {
+                    throw new IllegalArgumentException("resumeAfter must be a full, valid message URI");
+                }
                 AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService
                                 .listConnectionEventURIsAfter(connectionURI, referenceEvent, null, msgType, deep);
                 rdfDataset = resource.getContent();
@@ -260,7 +285,7 @@ public class LinkedDataWebController {
      * @return
      */
     // webmvc controller method
-    @RequestMapping("${uri.path.page.event}/{identifier}")
+    @RequestMapping("${uri.path.page}/event/{identifier}")
     public String showEventPage(@PathVariable(value = "identifier") String identifier, Model model,
                     HttpServletResponse response) {
         URI eventURI = uriService.createEventURIForId(identifier);
@@ -268,7 +293,7 @@ public class LinkedDataWebController {
     }
 
     // webmvc controller method
-    @RequestMapping("${uri.path.page.attachment}/{identifier}")
+    @RequestMapping("${uri.path.page}/attachment/{identifier}")
     public String showAttachmentPage(@PathVariable(value = "identifier") String identifier, Model model,
                     HttpServletResponse response) {
         URI attachmentURI = uriService.createAttachmentURIForId(identifier);
@@ -276,10 +301,10 @@ public class LinkedDataWebController {
     }
 
     // webmvc controller method
-    @RequestMapping("${uri.path.page.atom}")
+    @RequestMapping("${uri.path.page}/atom")
     public String showAtomURIListPage(@RequestParam(value = "p", required = false) Integer page,
-                    @RequestParam(value = "resumebefore", required = false) String beforeId,
-                    @RequestParam(value = "resumeafter", required = false) String afterId,
+                    @RequestParam(value = "resumebefore", required = false) String resumeBefore,
+                    @RequestParam(value = "resumeafter", required = false) String resumeAfter,
                     @RequestParam(value = "modifiedafter", required = false) String modifiedAfter,
                     @RequestParam(value = "createdafter", required = false) String createdAfter,
                     @RequestParam(value = "filterBySocketTypeUri", required = false) String filterBySocketTypeUriString,
@@ -290,20 +315,31 @@ public class LinkedDataWebController {
         AtomState atomState = getAtomState(state);
         URI filterBySocketTypeUri = getURIOrNull(filterBySocketTypeUriString);
         URI filterByAtomTypeUri = getURIOrNull(filterByAtomTypeUriString);
-        if (page == null && beforeId == null && afterId == null && modifiedAfter == null && createdAfter == null) {
+        if (page == null && resumeBefore == null && resumeAfter == null && modifiedAfter == null
+                        && createdAfter == null) {
             rdfDataset = linkedDataService.listAtomURIs(atomState, filterBySocketTypeUri, filterByAtomTypeUri);
         } else if (page != null) {
             AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listPagedAtomURIs(page,
                             null,
                             atomState);
             rdfDataset = resource.getContent();
-        } else if (beforeId != null) {
-            URI referenceAtom = URI.create(this.atomResourceURIPrefix + "/" + beforeId);
+        } else if (resumeBefore != null) {
+            URI referenceAtom;
+            try {
+                referenceAtom = new URI(resumeBefore);
+            } catch (URISyntaxException e) {
+                throw new IllegalArgumentException("resumeBefore must be a full, valid atom URI");
+            }
             AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService
                             .listPagedAtomURIsBefore(referenceAtom, null, atomState);
             rdfDataset = resource.getContent();
-        } else if (afterId != null) { // afterId != null
-            URI referenceAtom = URI.create(this.atomResourceURIPrefix + "/" + afterId);
+        } else if (resumeAfter != null) { // resumeAfter != null
+            URI referenceAtom;
+            try {
+                referenceAtom = new URI(resumeAfter);
+            } catch (URISyntaxException e) {
+                throw new IllegalArgumentException("resumeAfter must be a full, valid atom URI");
+            }
             AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService
                             .listPagedAtomURIsAfter(referenceAtom, null, atomState);
             rdfDataset = resource.getContent();
@@ -324,12 +360,12 @@ public class LinkedDataWebController {
         return "rdfDatasetView";
     }
 
-    @RequestMapping(value = "${uri.path.data.atom}", method = RequestMethod.GET, produces = { "application/ld+json",
+    @RequestMapping(value = "${uri.path.data}/atom", method = RequestMethod.GET, produces = { "application/ld+json",
                     "application/trig", "application/n-quads" })
     public ResponseEntity<Dataset> listAtomURIs(HttpServletRequest request, HttpServletResponse response,
                     @RequestParam(value = "p", required = false) Integer page,
-                    @RequestParam(value = "resumebefore", required = false) String beforeId,
-                    @RequestParam(value = "resumeafter", required = false) String afterId,
+                    @RequestParam(value = "resumebefore", required = false) String resumeBefore,
+                    @RequestParam(value = "resumeafter", required = false) String resumeAfter,
                     @RequestParam(value = "modifiedafter", required = false) String modifiedAfter,
                     @RequestParam(value = "createdafter", required = false) String createdAfter,
                     @RequestParam(value = "filterBySocketTypeUri", required = false) String filterBySocketTypeUriString,
@@ -347,7 +383,7 @@ public class LinkedDataWebController {
         URI filterByAtomTypeUri = getURIOrNull(filterByAtomTypeUriString);
         if (preferedSize == null && modifiedAfter == null && createdAfter == null) {
             rdfDataset = linkedDataService.listAtomURIs(atomState, filterBySocketTypeUri, filterByAtomTypeUri);
-        } else if (page == null && beforeId == null && afterId == null && modifiedAfter == null
+        } else if (page == null && resumeBefore == null && resumeAfter == null && modifiedAfter == null
                         && createdAfter == null) {
             // return latest atoms
             AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listPagedAtomURIs(1,
@@ -362,14 +398,24 @@ public class LinkedDataWebController {
             rdfDataset = resource.getContent();
             addPagedResourceInSequenceHeader(headers, URI.create(this.atomResourceURIPrefix), resource, page,
                             passableQuery);
-        } else if (beforeId != null) {
-            URI referenceAtom = URI.create(this.atomResourceURIPrefix + "/" + beforeId);
+        } else if (resumeBefore != null) {
+            URI referenceAtom;
+            try {
+                referenceAtom = new URI(resumeBefore);
+            } catch (URISyntaxException e) {
+                throw new IllegalArgumentException("resumeBefore must be a full, valid atom URI");
+            }
             AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService
                             .listPagedAtomURIsBefore(referenceAtom, preferedSize, atomState);
             rdfDataset = resource.getContent();
             addPagedResourceInSequenceHeader(headers, URI.create(this.atomResourceURIPrefix), resource, passableQuery);
-        } else if (afterId != null) {
-            URI referenceAtom = URI.create(this.atomResourceURIPrefix + "/" + afterId);
+        } else if (resumeAfter != null) {
+            URI referenceAtom;
+            try {
+                referenceAtom = new URI(resumeAfter);
+            } catch (URISyntaxException e) {
+                throw new IllegalArgumentException("resumeAfter must be a full, valid atom URI");
+            }
             AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService
                             .listPagedAtomURIsAfter(referenceAtom, preferedSize, atomState);
             rdfDataset = resource.getContent();
@@ -402,11 +448,11 @@ public class LinkedDataWebController {
     }
 
     // webmvc controller method
-    @RequestMapping("${uri.path.page.connection}")
+    @RequestMapping("${uri.path.page}/connection")
     public String showConnectionURIListPage(@RequestParam(value = "p", required = false) Integer page,
                     @RequestParam(value = "deep", defaultValue = "false") boolean deep,
-                    @RequestParam(value = "resumebefore", required = false) String beforeId,
-                    @RequestParam(value = "resumeafter", required = false) String afterId,
+                    @RequestParam(value = "resumebefore", required = false) String resumeBefore,
+                    @RequestParam(value = "resumeafter", required = false) String resumeAfter,
                     @RequestParam(value = "timeof", required = false) String timestamp, HttpServletRequest request,
                     Model model, HttpServletResponse response) {
         try {
@@ -414,12 +460,22 @@ public class LinkedDataWebController {
             Dataset rdfDataset;
             if (page != null) {
                 rdfDataset = linkedDataService.listConnections(page, null, dateParam.getDate(), deep).getContent();
-            } else if (beforeId != null) {
-                URI connURI = uriService.createConnectionURIForId(beforeId);
+            } else if (resumeBefore != null) {
+                URI connURI;
+                try {
+                    connURI = new URI(resumeBefore);
+                } catch (URISyntaxException e) {
+                    throw new IllegalArgumentException("resumeBefore must be a full, valid connection URI");
+                }
                 rdfDataset = linkedDataService.listConnectionsBefore(connURI, null, dateParam.getDate(), deep)
                                 .getContent();
-            } else if (afterId != null) {
-                URI connURI = uriService.createConnectionURIForId(afterId);
+            } else if (resumeAfter != null) {
+                URI connURI;
+                try {
+                    connURI = new URI(resumeAfter);
+                } catch (URISyntaxException e) {
+                    throw new IllegalArgumentException("resumeAfter must be a full, valid connection URI");
+                }
                 rdfDataset = linkedDataService.listConnectionsAfter(connURI, null, dateParam.getDate(), deep)
                                 .getContent();
             } else {
@@ -443,12 +499,12 @@ public class LinkedDataWebController {
     }
 
     // webmvc controller method
-    @RequestMapping("${uri.path.page.atom}/{identifier}/connections")
+    @RequestMapping("${uri.path.page}/atom/{identifier}/c")
     public String showConnectionURIListPage(@PathVariable String identifier,
                     @RequestParam(value = "p", required = false) Integer page,
                     @RequestParam(value = "deep", defaultValue = "false") boolean deep,
-                    @RequestParam(value = "resumebefore", required = false) String beforeId,
-                    @RequestParam(value = "resumeafter", required = false) String afterId,
+                    @RequestParam(value = "resumebefore", required = false) String resumeBefore,
+                    @RequestParam(value = "resumeafter", required = false) String resumeAfter,
                     @RequestParam(value = "type", required = false) String type,
                     @RequestParam(value = "timeof", required = false) String timestamp, HttpServletRequest request,
                     Model model, HttpServletResponse response) {
@@ -461,12 +517,22 @@ public class LinkedDataWebController {
                 rdfDataset = linkedDataService
                                 .listConnections(page, atomURI, null, eventsType, dateParam.getDate(), deep, true)
                                 .getContent();
-            } else if (beforeId != null) {
-                URI connURI = uriService.createConnectionURIForId(beforeId);
+            } else if (resumeBefore != null) {
+                URI connURI;
+                try {
+                    connURI = new URI(resumeBefore);
+                } catch (URISyntaxException e) {
+                    throw new IllegalArgumentException("resumeBefore must be a full, valid connection URI");
+                }
                 rdfDataset = linkedDataService.listConnectionsBefore(atomURI, connURI, null, eventsType,
                                 dateParam.getDate(), deep, true).getContent();
-            } else if (afterId != null) {
-                URI connURI = uriService.createConnectionURIForId(afterId);
+            } else if (resumeAfter != null) {
+                URI connURI;
+                try {
+                    connURI = new URI(resumeAfter);
+                } catch (URISyntaxException e) {
+                    throw new IllegalArgumentException("resumeAfter must be a full, valid connection URI");
+                }
                 rdfDataset = linkedDataService.listConnectionsAfter(atomURI, connURI, null, eventsType,
                                 dateParam.getDate(), deep, true).getContent();
             } else {
@@ -635,12 +701,12 @@ public class LinkedDataWebController {
         return preferedSize;
     }
 
-    @RequestMapping(value = "${uri.path.data.connection}", method = RequestMethod.GET, produces = {
+    @RequestMapping(value = "${uri.path.data}/connection", method = RequestMethod.GET, produces = {
                     "application/ld+json", "application/trig", "application/n-quads" })
     public ResponseEntity<Dataset> listConnectionURIs(HttpServletRequest request,
                     @RequestParam(value = "p", required = false) Integer page,
-                    @RequestParam(value = "resumebefore", required = false) String beforeId,
-                    @RequestParam(value = "resumeafter", required = false) String afterId,
+                    @RequestParam(value = "resumebefore", required = false) String resumeBefore,
+                    @RequestParam(value = "resumeafter", required = false) String resumeAfter,
                     @RequestParam(value = "timeof", required = false) String timestamp,
                     @RequestParam(value = "modifiedafter", required = false) String modifiedAfter,
                     @RequestParam(value = "deep", defaultValue = "false") boolean deep) {
@@ -675,7 +741,7 @@ public class LinkedDataWebController {
                                 resource, page, passableMap);
                 // resume before parameter specified - display the connections with activities
                 // before the specified event id
-            } else if (beforeId == null && afterId == null) {
+            } else if (resumeBefore == null && resumeAfter == null) {
                 // return latest by the given timestamp
                 AtomInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
                                 .listConnections(1, preferedSize, dateParam.getDate(), deep);
@@ -685,8 +751,13 @@ public class LinkedDataWebController {
                 // resume before parameter specified - display the connections with activities
                 // before the specified event id
             } else {
-                if (beforeId != null) {
-                    URI resumeConnURI = uriService.createConnectionURIForId(beforeId);
+                if (resumeBefore != null) {
+                    URI resumeConnURI;
+                    try {
+                        resumeConnURI = new URI(resumeBefore);
+                    } catch (URISyntaxException e) {
+                        throw new IllegalArgumentException("resumeBefore must be a full, valid connection URI");
+                    }
                     AtomInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
                                     .listConnectionsBefore(resumeConnURI, preferedSize, dateParam.getDate(), deep);
                     rdfDataset = resource.getContent();
@@ -694,8 +765,13 @@ public class LinkedDataWebController {
                                     resource, passableMap);
                     // resume after parameter specified - display the connections with activities
                     // after the specified event id:
-                } else { // if (afterId != null)
-                    URI resumeConnURI = uriService.createConnectionURIForId(afterId);
+                } else { // if (resumeAfter != null)
+                    URI resumeConnURI;
+                    try {
+                        resumeConnURI = new URI(resumeAfter);
+                    } catch (URISyntaxException e) {
+                        throw new IllegalArgumentException("resumeAfter must be a full, valid connection URI");
+                    }
                     AtomInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
                                     .listConnectionsAfter(resumeConnURI, preferedSize, dateParam.getDate(), deep);
                     rdfDataset = resource.getContent();
@@ -718,7 +794,7 @@ public class LinkedDataWebController {
         return new ResponseEntity<>(rdfDataset, headers, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "${uri.path.data.atom}/{identifier}", method = RequestMethod.GET, produces = {
+    @RequestMapping(value = "${uri.path.data}/atom/{identifier}", method = RequestMethod.GET, produces = {
                     "application/ld+json", "application/trig", "application/n-quads" })
     public ResponseEntity<Dataset> readAtom(HttpServletRequest request,
                     @PathVariable(value = "identifier") String identifier) {
@@ -742,7 +818,7 @@ public class LinkedDataWebController {
         });
     }
 
-    @RequestMapping(value = "${uri.path.data.atom}/{identifier}/unread", method = RequestMethod.POST, produces = {
+    @RequestMapping(value = "${uri.path.data}/atom/{identifier}/unread", method = RequestMethod.POST, produces = {
                     "application/ld+json", "application/trig", "application/n-quads" })
     public ResponseEntity<org.apache.jena.rdf.model.Model> readUnreadInformationPost(
                     @PathVariable(value = "identifier") String identifier,
@@ -758,7 +834,7 @@ public class LinkedDataWebController {
         return new ResponseEntity<>(unreadInfo, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "${uri.path.data.atom}/{identifier}/unread", method = RequestMethod.GET, produces = {
+    @RequestMapping(value = "${uri.path.data}/atom/{identifier}/unread", method = RequestMethod.GET, produces = {
                     "application/ld+json", "application/trig", "application/n-quads" })
     public ResponseEntity<org.apache.jena.rdf.model.Model> readUnreadInformationGet(
                     @PathVariable(value = "identifier") String identifier,
@@ -783,7 +859,7 @@ public class LinkedDataWebController {
      * @param identifier
      * @return
      */
-    @RequestMapping(value = "${uri.path.data.atom}/{identifier}/deep", method = RequestMethod.GET, produces = {
+    @RequestMapping(value = "${uri.path.data}/atom/{identifier}/deep", method = RequestMethod.GET, produces = {
                     "application/ld+json", "application/trig", "application/n-quads" })
     public ResponseEntity<Dataset> readAtomDeep(HttpServletRequest request,
                     @PathVariable(value = "identifier") String identifier,
@@ -817,15 +893,17 @@ public class LinkedDataWebController {
         return new ResponseEntity<>(model, headers, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "${uri.path.data.connection}/{identifier}", method = RequestMethod.GET, produces = {
+    @RequestMapping(value = "${uri.path.data}/atom/{atomId}/c/{identifier}", method = RequestMethod.GET, produces = {
                     "application/ld+json", "application/trig", "application/n-quads" })
     public ResponseEntity<Dataset> readConnection(HttpServletRequest request,
+                    @PathVariable String atomId,
                     @PathVariable(value = "identifier") String identifier) {
         logger.debug("readConnection() called");
-        return getResponseEntity(identifier, request, new EtagSupportingDataLoader<Dataset>() {
+        URI connectionURI = uriService.createConnectionURIForId(atomId, identifier);
+        return getResponseEntity(connectionURI.toString(), request, new EtagSupportingDataLoader<Dataset>() {
             @Override
-            public URI createUriForIdentifier(final String identifier) {
-                return URI.create(connectionResourceURIPrefix + "/" + identifier);
+            public URI createUriForIdentifier(final String connectionURL) {
+                return URI.create(connectionURL);
             }
 
             @Override
@@ -841,13 +919,14 @@ public class LinkedDataWebController {
         });
     }
 
-    @RequestMapping(value = "${uri.path.data.connection}/{identifier}/events", method = RequestMethod.GET, produces = {
+    @RequestMapping(value = "${uri.path.data}/atom/{atomId}/c/{identifier}/msg", method = RequestMethod.GET, produces = {
                     "application/ld+json", "application/trig", "application/n-quads" })
     public ResponseEntity<Dataset> readConnectionEvents(HttpServletRequest request,
+                    @PathVariable String atomId,
                     @PathVariable(value = "identifier") String identifier,
                     @RequestParam(value = "p", required = false) Integer page,
-                    @RequestParam(value = "resumebefore", required = false) String beforeId,
-                    @RequestParam(value = "resumeafter", required = false) String afterId,
+                    @RequestParam(value = "resumebefore", required = false) String resumeBefore,
+                    @RequestParam(value = "resumeafter", required = false) String resumeAfter,
                     @RequestParam(value = "type", required = false) String type,
                     @RequestParam(value = "deep", required = false, defaultValue = "false") boolean deep) {
         StopWatch stopWatch = new StopWatch();
@@ -856,8 +935,8 @@ public class LinkedDataWebController {
         Dataset rdfDataset;
         HttpHeaders headers = new HttpHeaders();
         Integer preferedSize = getPreferredSize(request);
-        URI connectionUri = URI.create(this.connectionResourceURIPrefix + "/" + identifier);
-        URI connectionEventsURI = URI.create(connectionUri.toString() + "/" + "events");
+        URI connectionUri = uriService.createConnectionURIForId(atomId, identifier);
+        URI connectionEventsURI = URI.create(connectionUri.toString() + "/" + "msg");
         WonMessageType msgType = getMessageType(type);
         try {
             String passableMap = getPassableQueryMap("type", type);
@@ -866,7 +945,7 @@ public class LinkedDataWebController {
                 // filtering for clients that do
                 // not support paging
                 rdfDataset = linkedDataService.listConnectionEventURIs(connectionUri, deep);
-            } else if (beforeId == null && afterId == null) {
+            } else if (resumeBefore == null && resumeAfter == null) {
                 // if page == null -> return page with latest events
                 AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listConnectionEventURIs(
                                 connectionUri, page != null ? page : 1, preferedSize, msgType, deep); // FIXME:
@@ -881,17 +960,27 @@ public class LinkedDataWebController {
                 } else {
                     addPagedResourceInSequenceHeader(headers, connectionEventsURI, resource, page, passableMap);
                 }
-            } else if (beforeId != null) {
-                // a page that precedes the item identified by the beforeId is requested
-                URI referenceEvent = uriService.createEventURIForId(beforeId);
+            } else if (resumeBefore != null) {
+                // a page that precedes the item identified by the resumeBefore is requested
+                URI referenceEvent;
+                try {
+                    referenceEvent = new URI(resumeBefore);
+                } catch (URISyntaxException e) {
+                    throw new IllegalArgumentException("resumeBefore must be a full, valid message URI");
+                }
                 AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService
                                 .listConnectionEventURIsBefore(connectionUri, referenceEvent, preferedSize, msgType,
                                                 deep);
                 rdfDataset = resource.getContent();
                 addPagedResourceInSequenceHeader(headers, connectionEventsURI, resource, passableMap);
             } else {
-                // a page that follows the item identified by the afterId is requested
-                URI referenceEvent = uriService.createEventURIForId(afterId);
+                // a page that follows the item identified by the resumeAfter is requested
+                URI referenceEvent;
+                try {
+                    referenceEvent = new URI(resumeAfter);
+                } catch (URISyntaxException e) {
+                    throw new IllegalArgumentException("resumeAfter must be a full, valid message URI");
+                }
                 AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService
                                 .listConnectionEventURIsAfter(connectionUri, referenceEvent, preferedSize, msgType,
                                                 deep);
@@ -931,7 +1020,7 @@ public class LinkedDataWebController {
      * @param identifier
      * @return
      */
-    @RequestMapping(value = "${uri.path.data.event}/{identifier}", method = RequestMethod.GET, produces = {
+    @RequestMapping(value = "${uri.path.data}/msg/{identifier}", method = RequestMethod.GET, produces = {
                     "application/ld+json", "application/trig", "application/n-quads" })
     public ResponseEntity<Dataset> readEvent(@PathVariable(value = "identifier") String identifier,
                     HttpServletRequest request, HttpServletResponse response) {
@@ -975,7 +1064,7 @@ public class LinkedDataWebController {
         return getResponseEntityForPossiblyNotModifiedResult(dataWithEtag, headers);
     }
 
-    @RequestMapping(value = "${uri.path.data.attachment}/{identifier}", method = RequestMethod.GET, produces = {
+    @RequestMapping(value = "${uri.path.data}/attachment/{identifier}", method = RequestMethod.GET, produces = {
                     "application/ld+json", "application/trig", "application/n-quads", "*/*" })
     public ResponseEntity<Dataset> readAttachment(HttpServletRequest request,
                     @PathVariable(value = "identifier") String identifier) {
@@ -1025,12 +1114,12 @@ public class LinkedDataWebController {
      * connection URIs). Default: false.
      * @param page taken into account only if client supports paging; in that case
      * the specified page is returned
-     * @param beforeId taken into account only if client supports paging; in that
-     * case the page with connections URIs that precede the connection having
-     * beforeId is returned
-     * @param afterId taken into account only if client supports paging; in that
-     * case the page with connections URIs that follow the connection having afterId
-     * are returned
+     * @param resumeBefore taken into account only if client supports paging; in
+     * that case the page with connections URIs that precede the connection having
+     * resumeBefore is returned
+     * @param resumeAfter taken into account only if client supports paging; in that
+     * case the page with connections URIs that follow the connection having
+     * resumeAfter are returned
      * @param type only connection events of the given type are considered when
      * ordering returned connections. Default: all event types.
      * @param timestamp only connection events that where created before the given
@@ -1038,7 +1127,7 @@ public class LinkedDataWebController {
      * time.
      * @return
      */
-    @RequestMapping(value = "${uri.path.data.atom}/{identifier}/connections", method = RequestMethod.GET, produces = {
+    @RequestMapping(value = "${uri.path.data}/atom/{identifier}/c", method = RequestMethod.GET, produces = {
                     "application/ld+json", "application/trig", "application/n-quads" })
     public ResponseEntity<Dataset> readConnectionsOfAtom(HttpServletRequest request,
                     @PathVariable(value = "identifier") String identifier,
@@ -1046,16 +1135,16 @@ public class LinkedDataWebController {
                     @RequestParam(value = "targetSocket", required = false) String targetSocket,
                     @RequestParam(value = "deep", defaultValue = "false") boolean deep,
                     @RequestParam(value = "p", required = false) Integer page,
-                    @RequestParam(value = "resumebefore", required = false) String beforeId,
-                    @RequestParam(value = "resumeafter", required = false) String afterId,
+                    @RequestParam(value = "resumebefore", required = false) String resumeBefore,
+                    @RequestParam(value = "resumeafter", required = false) String resumeAfter,
                     @RequestParam(value = "type", required = false) String type,
                     @RequestParam(value = "timeof", required = false) String timestamp) {
         logger.debug("readConnectionsOfAtom() called");
-        URI atomUri = URI.create(this.atomResourceURIPrefix + "/" + identifier);
+        URI atomUri = uriService.createAtomURIForId(identifier);
         Dataset rdfDataset;
         HttpHeaders headers = new HttpHeaders();
         Integer preferedSize = getPreferredSize(request);
-        URI connectionsURI = URI.create(atomUri.toString() + "/connections");
+        URI connectionsURI = URI.create(atomUri.toString() + "/c");
         try {
             WonMessageType eventsType = getMessageType(type);
             DateParameter dateParam = new DateParameter(timestamp);
@@ -1070,7 +1159,7 @@ public class LinkedDataWebController {
                 // paging
                 rdfDataset = linkedDataService.listConnections(atomUri, deep, true).getContent();
                 // if no page or resume parameter is specified, display the latest connections:
-            } else if (page == null && beforeId == null && afterId == null) {
+            } else if (page == null && resumeBefore == null && resumeAfter == null) {
                 AtomInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
                                 .listConnections(1, atomUri, preferedSize, eventsType, dateParam.getDate(), deep, true);
                 rdfDataset = resource.getContent();
@@ -1083,8 +1172,13 @@ public class LinkedDataWebController {
             } else {
                 // resume before parameter specified - display the connections with activities
                 // before the specified event id:
-                if (beforeId != null) {
-                    URI resumeConnURI = uriService.createConnectionURIForId(beforeId);
+                if (resumeBefore != null) {
+                    URI resumeConnURI;
+                    try {
+                        resumeConnURI = new URI(resumeBefore);
+                    } catch (URISyntaxException e) {
+                        throw new IllegalArgumentException("resumeBefore must be a full, valid connection URI");
+                    }
                     AtomInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
                                     .listConnectionsBefore(atomUri, resumeConnURI, preferedSize, eventsType,
                                                     dateParam.getDate(), deep, true);
@@ -1092,8 +1186,13 @@ public class LinkedDataWebController {
                     addPagedConnectionResourceInSequenceHeader(headers, connectionsURI, resource, passableQuery);
                     // resume after parameter specified - display the connections with activities
                     // after the specified event id:
-                } else { // if (afterId != null)
-                    URI resumeConnURI = uriService.createConnectionURIForId(afterId);
+                } else { // if (resumeAfter != null)
+                    URI resumeConnURI;
+                    try {
+                        resumeConnURI = new URI(resumeAfter);
+                    } catch (URISyntaxException e) {
+                        throw new IllegalArgumentException("resumeAfter must be a full, valid connection URI");
+                    }
                     AtomInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
                                     .listConnectionsAfter(atomUri, resumeConnURI, preferedSize, eventsType,
                                                     dateParam.getDate(), deep, true);
@@ -1178,11 +1277,11 @@ public class LinkedDataWebController {
         headers.add("Link",
                         "<http://www.w3.org/ns/ldp#Resource>; rel=\"type\", <http://www.w3.org/ns/ldp#Page>; rel=\"type\"");
         if (resource.hasNext()) {
-            String id = extractResourceLocalId(resource.getResumeAfter());
+            String id = resource.getResumeAfter().toString();
             headers.add("Link", "<" + canonicalURI.toString() + "?resumeafter=" + id + queryPart + ">; rel=\"next\"");
         }
         if (resource.hasPrevious()) {
-            String id = extractResourceLocalId(resource.getResumeBefore());
+            String id = resource.getResumeBefore().toString();
             headers.add("Link", "<" + canonicalURI.toString() + "?resumebefore=" + id + queryPart + ">; rel=\"prev\"");
         }
         headers.add("Link", "<" + canonicalURI.toString() + ">; rel=\"canonical\"");
@@ -1228,11 +1327,11 @@ public class LinkedDataWebController {
         headers.add("Link",
                         "<http://www.w3.org/ns/ldp#Resource>; rel=\"type\", <http://www.w3.org/ns/ldp#Page>; rel=\"type\"");
         if (resource.hasNext()) {
-            String id = extractResourceLocalId(resource.getResumeAfter().getConnectionURI());
+            String id = resource.getResumeAfter().getConnectionURI().toString();
             headers.add("Link", "<" + canonicalURI.toString() + "?resumeafter=" + id + queryPart + ">; rel=\"next\"");
         }
         if (resource.hasPrevious()) {
-            String id = extractResourceLocalId(resource.getResumeBefore().getConnectionURI());
+            String id = resource.getResumeBefore().getConnectionURI().toString();
             headers.add("Link", "<" + canonicalURI.toString() + "?resumebefore=" + id + queryPart + ">; rel=\"prev\"");
         }
         headers.add("Link", "<" + canonicalURI.toString() + ">; rel=\"canonical\"");
@@ -1247,11 +1346,6 @@ public class LinkedDataWebController {
             i++;
         }
         return queryPart.toString();
-    }
-
-    private String extractResourceLocalId(final URI uri) {
-        int startIdAfter = uri.toString().replaceAll("/$", "").lastIndexOf("/");
-        return uri.toString().substring(startIdAfter + 1);
     }
 
     /**

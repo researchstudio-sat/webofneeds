@@ -46,13 +46,8 @@ public class WonNodeInformationServiceDecorator implements WonNodeInformationSer
     }
 
     @Override
-    public URI generateConnectionURI() {
-        return delegate.generateConnectionURI();
-    }
-
-    @Override
-    public URI generateConnectionURI(URI wonNodeURI) {
-        return delegate.generateConnectionURI(wonNodeURI);
+    public URI generateConnectionURI(URI atomURI) {
+        return delegate.generateConnectionURI(atomURI);
     }
 
     @Override

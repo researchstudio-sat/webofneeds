@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import won.cryptography.service.RandomNumberService;
+import won.protocol.exception.IllegalAtomURIException;
+import won.protocol.message.WonMessageUtils;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonMessageUriHelper;
@@ -58,14 +60,12 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
     }
 
     @Override
-    public URI generateConnectionURI() {
-        return generateConnectionURI(getDefaultWonNodeURI());
-    }
-
-    @Override
-    public URI generateConnectionURI(URI wonNodeURI) {
-        WonNodeInfo wonNodeInformation = getWonNodeInformation(wonNodeURI);
-        return URI.create(wonNodeInformation.getConnectionURIPrefix() + "/" + generateRandomID());
+    public URI generateConnectionURI(URI atomURI) {
+        if (!isValidAtomURI(atomURI)) {
+            throw new IllegalAtomURIException(
+                            "Atom URI " + atomURI + " does not conform to this WoN node's URI patterns");
+        }
+        return URI.create(WonMessageUtils.stripFragment(atomURI).toString() + "/c/" + generateRandomID());
     }
 
     @Override

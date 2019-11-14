@@ -21,6 +21,7 @@ import won.protocol.service.MessageRoutingInfoService;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
+import won.protocol.util.WonUriCheckHelper;
 
 /**
  * Checks if the event, graph or atom uri is well-formed according the node's
@@ -47,7 +48,7 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
         }
         Optional<URI> senderNode = messageRoutingInfoService.senderNode(message);
         Optional<URI> recipientNode = messageRoutingInfoService.recipientNode(message);
-        if (!senderNode.isPresent()) {
+        if (!senderNode.isPresent() && !message.getMessageTypeRequired().isHintMessage()) {
             throw new WonMessageProcessingException(
                             "Cannot determine sender node for " + message.toShortStringForDebug());
         }
@@ -57,13 +58,21 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
         }
         WonNodeInfo senderNodeInfo = null;
         WonNodeInfo recipientNodeInfo = null;
-        if (senderNode != null && !message.getMessageType().isHintMessage()) {
+        if (senderNode.isPresent() && !message.getMessageType().isHintMessage()) {
             // do not check the sender node for a hint
             // TODO: change this behaviour as soon as a matcher uses a WoN node
             senderNodeInfo = wonNodeInformationService.getWonNodeInformation(senderNode.get());
         }
         if (recipientNode != null) {
             recipientNodeInfo = wonNodeInformationService.getWonNodeInformation(recipientNode.get());
+        }
+        if (senderNodeInfo == null && !message.getMessageType().isHintMessage()) {
+            throw new WonMessageProcessingException(
+                            "Could not load sender WonNodeInfo (won node " + senderNode.get() + ")");
+        }
+        if (recipientNodeInfo == null) {
+            throw new WonMessageProcessingException(
+                            "Could not load recipient WonNodeInfo (won node " + recipientNode.get() + ")");
         }
         checkAtomUri(message.getSenderAtomURI(), senderNodeInfo);
         checkSocketUri(message.getSenderSocketURI(), senderNodeInfo);
@@ -121,7 +130,7 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
         if (socket == null) {
             return;
         }
-        if (!WonMessageUtils.stripFragment(socket).toString().startsWith(info.getAtomURIPrefix())) {
+        if (!WonUriCheckHelper.isValidSocketURI(info.getAtomURIPrefix(), socket.toString())) {
             throw new WonMessageNotWellFormedException(
                             socket + " is not a valid socket URI on node " + info.getWonNodeURI());
         }
@@ -131,7 +140,7 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
         if (connection == null) {
             return;
         }
-        if (!connection.toString().startsWith(info.getConnectionURIPrefix())) {
+        if (!WonUriCheckHelper.isValidConnectionURI(info.getAtomURIPrefix(), connection.toString())) {
             throw new WonMessageNotWellFormedException(
                             connection + " is not a valid connection URI on node " + info.getWonNodeURI());
         }

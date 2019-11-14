@@ -39,25 +39,6 @@
      <bean name="matcherProtocolMatcherClientJMSBased" class="won.node.protocol.impl.MatcherProtocolMatcherClientImplJMSBased">
     </bean>
 	
-    <bean id="linkedDataService" class="won.node.service.linkeddata.generate.LinkedDataServiceImpl">
-        <property name="atomInformationService" ref="atomInformationService" />
-        <property name="resourceURIPrefix" value="${uri.prefix.resource}" />
-        <property name="connectionResourceURIPrefix" value="${uri.prefix.connection}" />
-        <property name="atomResourceURIPrefix" value="${uri.prefix.atom}" />
-        <property name="eventResourceURIPrefix" value="${uri.prefix.event}" />
-        <property name="activeMqEndpoint" value="${uri.protocol.activemq}" />
-        <property name="activeMqAtomProtcolQueueName" value="${activemq.queuename.atom.incoming}" />
-        <property name="activeMqOwnerProtcolQueueName" value="${activemq.queuename.owner.incoming}" />
-        <property name="activeMqMatcherPrtotocolQueueName" value="${activemq.queuename.matcher.incoming}"/>
-        <property name="activeMqMatcherProtocolTopicNameAtomActivated"
-                  value="${activemq.matcher.outgoing.topicname.atom.activated}"/>
-        <property name="activeMqMatcherProtocolTopicNameAtomCreated"
-                  value="${activemq.matcher.outgoing.topicname.atom.created}"/>
-        <property name="activeMqMatcherProtocolTopicNameAtomDeactivated"
-                  value="${activemq.matcher.outgoing.topicname.atom.deactivated}"/>
-        <property name="activeMqMatcherProtocolTopicNameAtomDeleted"
-                  value="${activemq.matcher.outgoing.topicname.atom.deleted}"/>
-    </bean>
 	
     <bean id="atomInformationService" class="won.node.service.persistence.AtomInformationServiceImpl">
         <property name="pageSize" value="${linkeddata.pagesize}" />

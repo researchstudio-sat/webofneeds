@@ -196,12 +196,6 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
             expected.setTargetSocketURI(socketURI);
             expected.setTargetAtomURI(atomURI);
             assertConnectionAsExpected(expected, con);
-            executeInSeparateThreadAndWaitForResult(() -> {
-                connectionRepository.findByAtomURI(atomURI).stream()
-                                .forEach(c -> System.out.println("con of " + atomURI + ":" + c));
-                connectionRepository.findByAtomURI(atomURI2).stream()
-                                .forEach(c -> System.out.println("con of " + atomURI2 + ":" + c));
-            });
         }
     }
 

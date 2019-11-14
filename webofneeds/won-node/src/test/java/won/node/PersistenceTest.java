@@ -9,6 +9,7 @@ import java.net.URI;
 import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.apache.jena.query.Dataset;
@@ -188,7 +189,7 @@ public class PersistenceTest {
                         .content().text("Hey there!")
                         .build();
         // processing the message would lead to this call:
-        Mockito.when(wonNodeInformationService.generateConnectionURI())
+        Mockito.when(wonNodeInformationService.generateConnectionURI(atom.getAtomURI()))
                         .thenReturn(URI.create("uri:newconnection1"));
         Connection con = connectionService.connectFromOwner(connectMessage);
         // then it would be stored:
@@ -265,8 +266,8 @@ public class PersistenceTest {
                         .content().text("Hey there!")
                         .build();
         // processing the message would lead to this call:
-        Mockito.when(wonNodeInformationService.generateConnectionURI())
-                        .thenReturn(URI.create("uri:newconnection1"), URI.create("uri:newconnection2"));
+        Mockito.when(wonNodeInformationService.generateConnectionURI(any(URI.class)))
+                        .then(invocation -> newConnectionURI(invocation.getArgumentAt(0, URI.class)));
         Connection con = connectionService.connectFromOwner(connectMessage);
         // then it would be stored:
         messageService.saveMessage(connectMessage, con.getConnectionURI());
@@ -313,5 +314,11 @@ public class PersistenceTest {
         is.close();
         dataset.commit();
         return dataset;
+    }
+
+    protected static AtomicInteger counter = new AtomicInteger(0);
+
+    protected URI newConnectionURI(URI atomUri) {
+        return URI.create(atomUri.toString() + "/c/connection-" + counter.incrementAndGet());
     }
 }

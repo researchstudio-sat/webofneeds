@@ -17,9 +17,8 @@ import java.util.regex.Pattern;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
-import won.protocol.model.Atom;
-import won.protocol.model.Connection;
 import won.protocol.util.WonMessageUriHelper;
+import won.protocol.util.WonUriCheckHelper;
 
 /**
  * User: fkleedorfer Date: 06.11.12
@@ -50,9 +49,13 @@ public class URIService implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        this.connectionEventsPattern = Pattern.compile(connectionResourceURIPrefix + "/[a-zA-Z0-9]+/events");
-        this.connectionUriPattern = Pattern.compile(connectionResourceURIPrefix + "/[a-zA-Z0-9]+");
-        this.atomEventsPattern = Pattern.compile(atomResourceURIPrefix + "/[a-zA-Z0-9]+/events");
+        this.atomResourceURIPrefix = this.resourceURIPrefix + "/atom";
+        this.connectionResourceURIPrefix = this.resourceURIPrefix + "/connection";
+        this.eventResourceURIPrefix = this.resourceURIPrefix + "/msg";
+        this.attachmentResourceURIPrefix = this.resourceURIPrefix + "/attachment";
+        this.connectionEventsPattern = Pattern.compile(atomResourceURIPrefix + "/[a-zA-Z0-9]+/c/[a-zA-Z0-9]+/msg");
+        this.connectionUriPattern = Pattern.compile(atomResourceURIPrefix + "/[a-zA-Z0-9]+/c/[a-zA-Z0-9]+");
+        this.atomEventsPattern = Pattern.compile(atomResourceURIPrefix + "/[a-zA-Z0-9]+/msg");
         this.atomUnreadPattern = Pattern.compile(atomResourceURIPrefix + "/[a-zA-Z0-9]+/unread");
         this.atomUriPattern = Pattern.compile(atomResourceURIPrefix + "/[a-zA-Z0-9]+");
     }
@@ -72,7 +75,7 @@ public class URIService implements InitializingBean {
     public boolean isConnectionURI(URI toCheck) {
         if (toCheck == null)
             return false;
-        return toCheck.toString().startsWith(connectionResourceURIPrefix);
+        return WonUriCheckHelper.isValidConnectionURI(this.atomResourceURIPrefix, toCheck.toString());
     }
 
     public boolean isAtomEventsURI(URI toCheck) {
@@ -187,16 +190,16 @@ public class URIService implements InitializingBean {
         return URI.create(atomResourceURIPrefix + "/" + id);
     }
 
+    public URI createConnectionURIForId(String atomId, String connectionId) {
+        return URI.create(atomResourceURIPrefix + "/" + atomId + "/c/" + connectionId);
+    }
+
     public URI createConnectionsURIForAtom(URI atomURI) {
-        return URI.create(atomURI.toString() + "/connections");
+        return URI.create(atomURI.toString() + "/c");
     }
 
     public URI createEventsURIForConnection(URI connURI) {
-        return URI.create(connURI.toString() + "/events");
-    }
-
-    public URI createConnectionURIForId(String id) {
-        return URI.create(connectionResourceURIPrefix + "/" + id);
+        return URI.create(connURI.toString() + "/msg");
     }
 
     public URI createEventURIForId(String id) {
@@ -207,40 +210,12 @@ public class URIService implements InitializingBean {
         return URI.create(attachmentResourceURIPrefix + "/" + id);
     }
 
-    public URI createAtomURI(Atom atom) {
-        return URI.create(atomResourceURIPrefix + "/" + atom.getId());
-    }
-
-    public URI createConnectionURI(Connection con) {
-        return URI.create(connectionResourceURIPrefix + "/" + con.getId());
-    }
-
-    public void setAtomResourceURIPrefix(final String atomResourceURIPrefix) {
-        this.atomResourceURIPrefix = atomResourceURIPrefix;
-    }
-
     public String getAtomResourceURIPrefix() {
         return atomResourceURIPrefix;
     }
 
-    public void setConnectionResourceURIPrefix(final String connectionResourceURIPrefix) {
-        this.connectionResourceURIPrefix = connectionResourceURIPrefix;
-    }
-
-    public String getConnectionResourceURIPrefix() {
-        return connectionResourceURIPrefix;
-    }
-
-    public void setEventResourceURIPrefix(final String eventResourceURIPrefix) {
-        this.eventResourceURIPrefix = eventResourceURIPrefix;
-    }
-
     public String getEventResourceURIPrefix() {
         return eventResourceURIPrefix;
-    }
-
-    public void setAttachmentResourceURIPrefix(String attachmentResourceURIPrefix) {
-        this.attachmentResourceURIPrefix = attachmentResourceURIPrefix;
     }
 
     public void setDataURIPrefix(final String dataURIPrefix) {

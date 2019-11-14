@@ -82,6 +82,9 @@ public class WonMessageUtils {
         Objects.requireNonNull(uriWithFragment);
         // just strip the fragment
         String fragment = uriWithFragment.getRawFragment();
+        if (fragment == null) {
+            return uriWithFragment;
+        }
         String uri = uriWithFragment.toString();
         atomUri = URI.create(uri.substring(0, uri.length() - fragment.length() - 1));
         return atomUri;

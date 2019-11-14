@@ -61,21 +61,15 @@ public interface WonNodeInformationService {
     boolean isValidEventURI(URI eventURI, URI wonNodeURI);
 
     /**
-     * Generates a random connection URI according to the URI pattern of the default
-     * won node.
+     * Generates a previously unused connection URI at random as the concatenation
+     * of <code>atomURI + '/c/[id]'</code>, where <code>atomURI</code> is the
+     * specified atom URI, which must conform to the node's prefixes, and [id] is a
+     * randomly generated alphanumeric identifier.
      *
+     * @param atomURI
      * @return
      */
-    URI generateConnectionURI();
-
-    /**
-     * Generates a random connection URI according to the URI pattern of the
-     * specified won node.
-     *
-     * @param wonNodeURI
-     * @return
-     */
-    URI generateConnectionURI(URI wonNodeURI);
+    URI generateConnectionURI(URI atomURI);
 
     /**
      * Checks if the passed connection URI is matching the won default node pattern

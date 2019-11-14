@@ -75,7 +75,10 @@ public class ResponseBuilder extends TerminalBuilderBase<ResponseBuilder> {
             builder.atom(toRespondto.getAtomURIRequired());
             builder.connectionURI = null;
         } else if (toRespondto.getMessageTypeRequired().isConnectionSpecificMessage()) {
-            if (builder.connectionURI == null) {
+            if (builder.connectionURI == null && !(builder.wonMessageType == WonMessageType.FAILURE_RESPONSE
+                            && toRespondto.getMessageTypeRequired().isConnect())) {
+                // allow a failure response without connection uri in case of a connect - the
+                // connection creation will have failed
                 throw new MissingMessagePropertyException(WONMSG.connection);
             }
             if (directionOfMessageToRespondTo.isFromExternal()) {
