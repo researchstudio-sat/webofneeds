@@ -656,7 +656,8 @@ public class LinkedDataWebController implements InitializingBean {
         // for /resource/atom and resource/connection so that crawlers always re-fetch
         // these data
         URI requestUriAsURI = URI.create(requestUri);
-        if (uriService.isConnectionEventsURI(requestUriAsURI) || uriService.isAtomEventsURI(requestUriAsURI)
+        if (uriService.isConnectionEventsURI(requestUriAsURI)
+                        || uriService.isAtomEventsURI(requestUriAsURI)
                         || uriService.isAtomURI(requestUriAsURI)) {
             addMutableResourceHeaders(headers);
         } else {
