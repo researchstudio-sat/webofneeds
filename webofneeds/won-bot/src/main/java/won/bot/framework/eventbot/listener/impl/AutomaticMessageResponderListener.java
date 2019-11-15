@@ -27,7 +27,6 @@ import won.bot.framework.eventbot.listener.AbstractHandleFirstNEventsListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
-import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
 /**
@@ -86,7 +85,7 @@ public class AutomaticMessageResponderListener extends AbstractHandleFirstNEvent
             }
             try {
                 getEventListenerContext().getWonMessageSender()
-                                .sendWonMessage(createWonMessage(connectionUri, message));
+                                .prepareAndSendMessage(createWonMessage(connectionUri, message));
             } catch (Exception e) {
                 logger.warn("could not send message via connection {}", connectionUri, e);
             }
@@ -109,15 +108,12 @@ public class AutomaticMessageResponderListener extends AbstractHandleFirstNEvent
     }
 
     private WonMessage createWonMessage(URI connectionURI, String message) throws WonMessageBuilderException {
-        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
-        URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
-        URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
         URI socketURI = WonRdfUtils.ConnectionUtils.getSocketURIFromConnection(connectionRDF, connectionURI);
         URI targetSocketURI = WonRdfUtils.ConnectionUtils.getTargetSocketURIFromConnection(connectionRDF,
                         connectionURI);
         return WonMessageBuilder
-                        .connectionMessage(messageURI)
+                        .connectionMessage()
                         .sockets()
                         /**/.sender(socketURI)
                         /**/.recipient(targetSocketURI)

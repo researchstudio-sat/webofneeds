@@ -155,7 +155,7 @@ public class WonMessageBuilderTest {
 
     private WonMessage createMessageWithoutContent() {
         return WonMessageBuilder
-                        .atomHint(MSG_URI_1)
+                        .atomHint()
                         .atom(ATOM_URI_1)
                         .hintTargetAtom(ATOM_URI_2)
                         .hintScore(0.2)
@@ -165,7 +165,7 @@ public class WonMessageBuilderTest {
     }
 
     private WonMessage createMessageWithContent() {
-        return WonMessageBuilder.createAtom(MSG_URI_1)
+        return WonMessageBuilder.createAtom()
                         .content().model(createContent())
                         .atom(ATOM_URI_1)
                         .direction().fromOwner()
@@ -173,7 +173,7 @@ public class WonMessageBuilderTest {
     }
 
     private WonMessage createMessageWithTwoContentGraphs() {
-        return WonMessageBuilder.createAtom(MSG_URI_1)
+        return WonMessageBuilder.createAtom()
                         .content().model(createContent())
                         .content().model(createDifferentContent())
                         .atom(ATOM_URI_1)
@@ -182,7 +182,7 @@ public class WonMessageBuilderTest {
     }
 
     private WonMessage createMessageWithContentDataset() {
-        return WonMessageBuilder.createAtom(MSG_URI_1)
+        return WonMessageBuilder.createAtom()
                         .content().dataset(createContentDataset())
                         .atom(ATOM_URI_1)
                         .direction().fromOwner()

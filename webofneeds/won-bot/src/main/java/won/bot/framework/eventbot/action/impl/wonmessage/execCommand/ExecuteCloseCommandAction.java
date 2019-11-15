@@ -26,7 +26,6 @@ import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
-import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
 /**
@@ -76,17 +75,12 @@ public class ExecuteCloseCommandAction extends ExecuteMessageCommandAction<Close
 
     protected WonMessage createWonMessage(CloseCommandEvent connectCommandEvent) throws WonMessageBuilderException {
         URI connectionURI = connectCommandEvent.getConnectionURI();
-        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
-        URI targetAtom = WonRdfUtils.ConnectionUtils.getTargetAtomURIFromConnection(connectionRDF, connectionURI);
-        URI localAtom = WonRdfUtils.ConnectionUtils.getLocalAtomURIFromConnection(connectionRDF, connectionURI);
-        URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
-        Dataset targetAtomRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(targetAtom);
         URI socketURI = WonRdfUtils.ConnectionUtils.getSocketURIFromConnection(connectionRDF, connectionURI);
         URI targetSocketURI = WonRdfUtils.ConnectionUtils.getTargetSocketURIFromConnection(connectionRDF,
                         connectionURI);
         return WonMessageBuilder
-                        .close(wonNodeInformationService.generateEventURI(wonNode))
+                        .close()
                         .sockets().sender(socketURI).recipient(targetSocketURI)
                         .content().text(connectCommandEvent.getCloseMessage())
                         .build();

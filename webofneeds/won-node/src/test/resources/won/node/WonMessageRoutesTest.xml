@@ -31,7 +31,7 @@
         class="won.cryptography.keymanagement.KeyPairAliasDerivationStrategyFactory">
         <property name="predefinedAlias" value="" /> <!--  create a new key alias each time --> 
     </bean>
-        <bean id="messagingService" class="won.protocol.jms.MessagingServiceImpl">
+    <bean id="messagingService" class="won.protocol.jms.MessagingServiceImpl">
         <property name="producerTemplate" ref="producerTemplate"/>
     </bean>
     

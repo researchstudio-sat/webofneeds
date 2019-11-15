@@ -12,6 +12,22 @@
 	
 	<context:component-scan base-package="won.node.service.persistence" />
 	<context:component-scan base-package="won.node.service.nodeconfig" />
+    	
+    <!-- signing messages -->
+	<bean id="signatureAddingProcessor" class="won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor">
+		<property name="cryptographyService" ref="cryptographyService" />
+	</bean>
+	<!-- needed to simulate owner behaviour -->
+    <bean id="keyPairAliasDerivationStrategy" factory-bean="keyPairAliasDerivationStrategyFactory" factory-method="create" />
     
+    <!-- For generating and adding keys for just created atoms -->
+    <bean name="atomKeyGeneratorAndAdder" class="won.protocol.message.processor.impl.KeyForNewAtomAddingProcessor">
+        <property name="cryptographyService" ref="cryptographyService"/>
+        <property name="keyPairAliasDerivationStrategy" ref="keyPairAliasDerivationStrategy" />
+    </bean>    
+    <bean id="keyPairAliasDerivationStrategyFactory"
+        class="won.cryptography.keymanagement.KeyPairAliasDerivationStrategyFactory">
+        <property name="predefinedAlias" value="" /> <!--  create a new key alias each time --> 
+    </bean>
 	
 </beans>

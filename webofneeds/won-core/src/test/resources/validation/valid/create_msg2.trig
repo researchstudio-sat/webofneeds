@@ -15,14 +15,14 @@
 @prefix review: <https://w3id.org/won/ext/review#> .
 @prefix won:   <https://w3id.org/won/core#> .
 
-p1:envelope-vlgh-sig {
-    p1:envelope-vlgh-sig
+p1:signature {
+    p1:signature
             a                               sig:Signature ;
             sig:hasVerificationCertificate  p0:siafpbvk54213t32fnvn ;
             sig:signatureValue              "MGUCMHopp05I92rJcw8CqF6lmWp0WJwTPsFsDs8dkDWlMxUhUkenU2PGYKKi+QKZgPz2gQIxAO+AHAcB+V0i41U6muzo7rtVLWjq1jwZkW+56Hi+Q7IzzXHxwTBsahR3oBGMtA5dTw==" ;
             msg:hash                        "AKg40HCDLMCCIZtz1yxWYAtVQGvs3+m6dxiuzRPMO3hTsALmRJMNsLaD+pjf74EKigeyHouQwXCm7UddoTc89NPRJdvF57LLmFEWv3K3YrHwET15geHrSHwE0xzJKwOTZX9ek2bdhhFaSbQ1+NSIhkViq8oa6Mts5yQArxY+o7fT" ;
             msg:publicKeyFingerprint        "CfJwsyy4wtBhbSUyTkqY3SvXIAXiFj5Av3lk1werWt8=" ;
-            msg:signedGraph                 p1:envelope-vlgh .
+            msg:signedGraph                 p1:envelope .
 }
 
 p1:content-d0zo {
@@ -45,8 +45,8 @@ p1:content-d0zo {
     p4:HolderSocket  won:socketDefinition  hold:HolderSocket .
 }
 
-p1:envelope-vlgh {
-    p1:envelope-vlgh  a            msg:EnvelopeGraph ;
+p1:envelope {
+    p1:envelope  a            msg:EnvelopeGraph ;
             rdfg:subGraphOf        <wm:/jq15ga3aacsxbvl9nngw> ;
             msg:containsSignature  p1:content-d0zo-sig .
     

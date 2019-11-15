@@ -7,8 +7,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import won.cryptography.utils.TestSigningUtils;
 import won.cryptography.utils.TestingKeys;
+import won.protocol.message.WonMessage;
 
 /**
  * User: ypanchenko Date: 14.07.2014
@@ -34,27 +36,28 @@ public class WonVerifierTest {
         // create dataset that contains atom core data graph and its signature graph
         Dataset testDataset = TestSigningUtils.prepareTestDatasetFromNamedGraphs(RESOURCE_FILE,
                         new String[] { ATOM_CORE_DATA_URI, ATOM_CORE_DATA_SIG_URI });
+        WonMessage msg = WonMessage.of(testDataset);
         // verify
-        WonVerifier verifier = new WonVerifier(testDataset);
+        WonVerifier verifier = new WonVerifier(msg);
         // TODO load public keys from certificate referenced from signatures
         boolean verified = verifier.verify(keys.getPublicKeys());
         SignatureVerificationState result = verifier.getVerificationResult();
         Assert.assertTrue(result.getMessage(), verified);
         Assert.assertEquals(1, result.getSignatureGraphNames().size());
-        Assert.assertEquals(ATOM_CORE_DATA_URI, result.getSignedGraphName(ATOM_CORE_DATA_SIG_URI));
+        Assert.assertEquals(ATOM_CORE_DATA_URI, result.getSignedGraphNames(ATOM_CORE_DATA_SIG_URI));
         // modify a model and check that it does not verify..
         Model m = testDataset.getNamedModel(ATOM_CORE_DATA_URI);
         Statement stmt = m.listStatements().nextStatement();
         m.remove(stmt);
-        verifier = new WonVerifier(testDataset);
+        verifier = new WonVerifier(WonMessage.of(testDataset));
         verified = verifier.verify(keys.getPublicKeys());
         result = verifier.getVerificationResult();
         Assert.assertFalse(verified);
         Assert.assertEquals(1, result.getSignatureGraphNames().size());
-        Assert.assertEquals(ATOM_CORE_DATA_URI, result.getSignedGraphName(ATOM_CORE_DATA_SIG_URI));
+        Assert.assertEquals(ATOM_CORE_DATA_URI, result.getSignedGraphNames(ATOM_CORE_DATA_SIG_URI));
         // add the removed statement back
         m.add(stmt);
-        verifier = new WonVerifier(testDataset);
+        verifier = new WonVerifier(WonMessage.of(testDataset));
         verified = verifier.verify(keys.getPublicKeys());
         // now it should verify again
         Assert.assertTrue(verified);
@@ -67,14 +70,14 @@ public class WonVerifierTest {
         Dataset testDataset = TestSigningUtils.prepareTestDatasetFromNamedGraphs(RESOURCE_FILE, new String[] {
                         ATOM_CORE_DATA_URI, ATOM_CORE_DATA_SIG_URI, EVENT_ENV1_URI, EVENT_ENV1_SIG_URI });
         // verify
-        WonVerifier verifier = new WonVerifier(testDataset);
+        WonVerifier verifier = new WonVerifier(WonMessage.of(testDataset));
         // TODO load public keys from certificate referenced from signatures
         boolean verified = verifier.verify(keys.getPublicKeys());
         SignatureVerificationState result = verifier.getVerificationResult();
         Assert.assertTrue(result.getMessage(), verified);
         Assert.assertEquals(2, result.getSignatureGraphNames().size());
-        Assert.assertEquals(ATOM_CORE_DATA_URI, result.getSignedGraphName(ATOM_CORE_DATA_SIG_URI));
-        Assert.assertEquals(EVENT_ENV1_URI, result.getSignedGraphName(EVENT_ENV1_SIG_URI));
+        Assert.assertEquals(ATOM_CORE_DATA_URI, result.getSignedGraphNames(ATOM_CORE_DATA_SIG_URI));
+        Assert.assertEquals(EVENT_ENV1_URI, result.getSignedGraphNames(EVENT_ENV1_SIG_URI));
     }
 
     @Test
@@ -86,14 +89,14 @@ public class WonVerifierTest {
                         new String[] { ATOM_CORE_DATA_URI, ATOM_CORE_DATA_SIG_URI, EVENT_ENV1_URI, EVENT_ENV1_SIG_URI,
                                         EVENT_ENV2_URI, EVENT_ENV2_SIG_URI });
         // verify
-        WonVerifier verifier = new WonVerifier(testDataset);
+        WonVerifier verifier = new WonVerifier(WonMessage.of(testDataset));
         boolean verified = verifier.verify(keys.getPublicKeys());
         SignatureVerificationState result = verifier.getVerificationResult();
         Assert.assertTrue(result.getMessage(), verified);
         Assert.assertEquals(3, result.getSignatureGraphNames().size());
-        Assert.assertEquals(ATOM_CORE_DATA_URI, result.getSignedGraphName(ATOM_CORE_DATA_SIG_URI));
-        Assert.assertEquals(EVENT_ENV1_URI, result.getSignedGraphName(EVENT_ENV1_SIG_URI));
-        Assert.assertEquals(EVENT_ENV2_URI, result.getSignedGraphName(EVENT_ENV2_SIG_URI));
+        Assert.assertEquals(ATOM_CORE_DATA_URI, result.getSignedGraphNames(ATOM_CORE_DATA_SIG_URI));
+        Assert.assertEquals(EVENT_ENV1_URI, result.getSignedGraphNames(EVENT_ENV1_SIG_URI));
+        Assert.assertEquals(EVENT_ENV2_URI, result.getSignedGraphNames(EVENT_ENV2_SIG_URI));
     }
     // TODO test more versions of not valid signatures, e.g. signatures missing,
     // graphs missing,

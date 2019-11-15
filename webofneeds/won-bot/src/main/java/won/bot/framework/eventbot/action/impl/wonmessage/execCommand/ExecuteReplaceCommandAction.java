@@ -32,7 +32,6 @@ import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
-import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
@@ -72,9 +71,9 @@ public class ExecuteReplaceCommandAction extends BaseEventBotAction {
         final URI wonNodeUri = getEventListenerContext().getWonNodeInformationService().getWonNodeUri(atomURI);
         logger.debug("replacing atom content on won node {} with content {} ", wonNodeUri,
                         StringUtils.abbreviate(RdfUtils.toString(atomDataset), 150));
-        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         RdfUtils.renameResourceWithPrefix(atomDataset, atomResource.getURI(), atomURI.toString());
-        WonMessage replaceMessage = createWonMessage(wonNodeInformationService, atomURI, wonNodeUri, atomDataset);
+        WonMessage replaceMessage = createWonMessage(atomURI, wonNodeUri, atomDataset);
+        replaceMessage = getEventListenerContext().getWonMessageSender().prepareMessage(replaceMessage);
         EventListener successCallback = event12 -> {
             logger.debug("atom content replacement successful for atom URI {}", atomURI);
             getEventListenerContext().getEventBus()
@@ -92,16 +91,16 @@ public class ExecuteReplaceCommandAction extends BaseEventBotAction {
         EventBotActionUtils.makeAndSubscribeResponseListener(replaceMessage, successCallback, failureCallback,
                         getEventListenerContext());
         logger.debug("registered listeners for response to message URI {}", replaceMessage.getMessageURI());
-        getEventListenerContext().getWonMessageSender().sendWonMessage(replaceMessage);
+        getEventListenerContext().getWonMessageSender().sendMessage(replaceMessage);
         logger.debug("atom content replacement message sent with message URI {}", replaceMessage.getMessageURI());
     }
 
-    private WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI atomURI,
-                    URI wonNodeURI, Dataset atomDataset) throws WonMessageBuilderException {
+    private WonMessage createWonMessage(URI atomURI, URI wonNodeURI,
+                    Dataset atomDataset) throws WonMessageBuilderException {
         RdfUtils.replaceBaseURI(atomDataset, atomURI.toString(), true);
         AtomModelWrapper atomModelWrapper = new AtomModelWrapper(atomDataset);
         return WonMessageBuilder
-                        .replace(wonNodeInformationService.generateEventURI(wonNodeURI))
+                        .replace()
                         .atom(atomURI)
                         .content().dataset(atomModelWrapper.copyDatasetWithoutSysinfo())
                         .build();

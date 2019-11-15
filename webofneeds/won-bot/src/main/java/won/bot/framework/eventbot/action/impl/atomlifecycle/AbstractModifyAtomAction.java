@@ -20,7 +20,6 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.RdfUtils;
-import won.protocol.util.WonRdfUtils;
 
 /**
  * Base class for actions that modifies atoms.
@@ -41,16 +40,10 @@ public abstract class AbstractModifyAtomAction extends BaseEventBotAction {
      * @return modify WonMessage
      */
     protected final WonMessage buildWonMessage(URI atomURI, Dataset modifiedAtomDataset) {
-        Dataset originalAtomDataset = getEventListenerContext().getLinkedDataSource().getDataForResource(atomURI);
-        if (originalAtomDataset == null) {
-            throw new IllegalStateException("Cannot modify atom " + atomURI + " : retrieved dataset is null");
-        }
-        URI wonNodeUri = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(originalAtomDataset, atomURI);
-        URI eventUri = getEventListenerContext().getWonNodeInformationService().generateEventURI(wonNodeUri);
         RdfUtils.replaceBaseURI(modifiedAtomDataset, atomURI.toString(), true);
         AtomModelWrapper modifiedAtomModelWrapper = new AtomModelWrapper(modifiedAtomDataset);
         return WonMessageBuilder
-                        .replace(eventUri)
+                        .replace()
                         .atom(atomURI)
                         .content().dataset(modifiedAtomModelWrapper.copyDatasetWithoutSysinfo())
                         .build();

@@ -76,6 +76,7 @@ import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.impl.KeyForNewAtomAddingProcessor;
 import won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor;
+import won.protocol.message.processor.impl.WonMessageSignerVerifier;
 import won.protocol.model.Connection;
 import won.protocol.repository.AtomRepository;
 import won.protocol.repository.ConnectionRepository;
@@ -86,6 +87,7 @@ import won.protocol.service.impl.MessageRoutingInfoServiceWithLookup;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.Prefixer;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonMessageUriHelper;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WXCHAT;
 
@@ -250,7 +252,7 @@ public abstract class WonMessageRoutesTest {
     protected WonMessage makeCreateAtomMessage(URI atomURI, String filename) throws IOException {
         Dataset atom1Content = loadDatasetAndReplaceAtomURI(filename, atomURI);
         WonMessage createAtom1Msg = WonMessageBuilder
-                        .createAtom(newMessageURI())
+                        .createAtom()
                         .atom(atomURI)
                         .content()
                         /**/.dataset(atom1Content)
@@ -677,11 +679,30 @@ public abstract class WonMessageRoutesTest {
         return model;
     }
 
-    protected void sendFromOwner(WonMessage msg, String ownerApplicationIdForResponse) {
+    protected WonMessage prepareFromOwner(WonMessage msg) {
         // add public key of the newly created atom
         msg = atomKeyGeneratorAndAdder.process(msg);
         // add signature:
-        msg = signatureAdder.processOnBehalfOfAtom(msg);
+        return signatureAdder.signWithAtomKey(msg);
+    }
+
+    protected WonMessage prepareFromMatcher(WonMessage msg) throws Exception {
+        // add signature:
+        return WonMessageSignerVerifier.setMessageUriForContent(msg);
+    }
+
+    protected WonMessage prepareFromExternalOwner(WonMessage msg) {
+        return signatureAdder.signWithAtomKey(msg);
+    }
+
+    protected WonMessage prepareFromSystem(WonMessage msg) {
+        return signatureAdder.signWithDefaultKey(msg);
+    }
+
+    protected void sendFromOwner(WonMessage msg, String ownerApplicationIdForResponse) {
+        if (Objects.equals(WonMessageUriHelper.getSelfUri(), msg.getMessageURIRequired())) {
+            throw new IllegalArgumentException("message is not prepared, cannot send : " + msg.toShortStringForDebug());
+        }
         logMessageRdf(makeMessageBox(" message OWNER => NODE"), msg);
         Map<String, String> headers = new HashMap<>();
         headers.put(WonCamelConstants.OWNER_APPLICATION_ID_HEADER, ownerApplicationIdForResponse);
@@ -690,26 +711,27 @@ public abstract class WonMessageRoutesTest {
     }
 
     protected void sendFromMatcher(WonMessage msg) {
+        if (Objects.equals(WonMessageUriHelper.getSelfUri(), msg.getMessageURIRequired())) {
+            throw new IllegalArgumentException("message is not prepared, cannot send : " + msg.toShortStringForDebug());
+        }
         logMessageRdf(makeMessageBox("message MATCHER => NODE"), msg);
         send(null, null, RdfUtils.writeDatasetToString(msg.getCompleteDataset(),
                         WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE), "direct:fromMatcherMock");
     }
 
     protected void sendFromExternalOwner(WonMessage msg) {
-        msg = signatureAdder.processOnBehalfOfAtom(msg);
+        if (Objects.equals(WonMessageUriHelper.getSelfUri(), msg.getMessageURIRequired())) {
+            throw new IllegalArgumentException("message is not prepared, cannot send : " + msg.toShortStringForDebug());
+        }
         logMessageRdf(makeMessageBox("message EXTERNAL => NODE"), msg);
         send(null, null, RdfUtils.writeDatasetToString(msg.getCompleteDataset(),
                         WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE), "direct:fromNodeMock");
     }
 
     protected void sendFromExternalSystem(WonMessage msg) {
-        msg = signatureAdder.process(msg);
-        logMessageRdf(makeMessageBox("message EXTERNAL => NODE"), msg);
-        send(null, null, RdfUtils.writeDatasetToString(msg.getCompleteDataset(),
-                        WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE), "direct:fromNodeMock");
-    }
-
-    protected void sendFromExternalAlreadySigned(WonMessage msg) {
+        if (Objects.equals(WonMessageUriHelper.getSelfUri(), msg.getMessageURIRequired())) {
+            throw new IllegalArgumentException("message is not prepared, cannot send : " + msg.toShortStringForDebug());
+        }
         logMessageRdf(makeMessageBox("message EXTERNAL => NODE"), msg);
         send(null, null, RdfUtils.writeDatasetToString(msg.getCompleteDataset(),
                         WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE), "direct:fromNodeMock");
@@ -869,17 +891,11 @@ public abstract class WonMessageRoutesTest {
                         .generateAtomURI(any(URI.class)))
                         .then(x -> newAtomURI());
         Mockito.when(wonNodeInformationService
-                        .generateEventURI(any(URI.class)))
-                        .then(x -> newMessageURI());
-        Mockito.when(wonNodeInformationService
                         .generateConnectionURI(any(URI.class)))
                         .then(invocation -> newConnectionURI((URI) invocation.getArguments()[0]));
         Mockito.when(wonNodeInformationService
                         .generateAtomURI())
                         .then(x -> newAtomURI());
-        Mockito.when(wonNodeInformationService
-                        .generateEventURI())
-                        .then(x -> newMessageURI());
         Mockito.when(wonNodeInformationService.getWonNodeInformation(URI_NODE_1)).then(x -> new WonNodeInfoBuilder()
                         .setAtomURIPrefix(URI_NODE_1 + "/atom")
                         .setWonNodeURI(URI_NODE_1.toString())

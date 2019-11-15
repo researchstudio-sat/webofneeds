@@ -23,6 +23,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonMessageUriHelper;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
@@ -75,13 +76,13 @@ public class WonMessageTest {
 
     @Test
     public void test_message_and_response_in_same_dataset() {
-        WonMessage msg = WonMessageBuilder.connectionMessage(URI.create("uri:/messageUri"))
+        WonMessage msg = WonMessageBuilder.connectionMessage()
                         .sockets()
                         .sender(URI.create("uri:/localAtom#socket"))
                         .recipient(URI.create("uri:/targetAtom#socket"))
                         .content().text("hello").build();
         WonMessage response = WonMessageBuilder
-                        .response(URI.create("uri:/succ1"))
+                        .response()
                         .fromConnection(URI.create("uri:/conn1"))
                         .respondingToMessageFromOwner(msg)
                         .success()
@@ -89,25 +90,25 @@ public class WonMessageTest {
         Dataset both = msg.getCompleteDataset();
         RdfUtils.addDatasetToDataset(both, response.getCompleteDataset());
         WonMessage msgAndResponse = WonMessage.of(both);
-        Assert.assertEquals("messageUri should be that of original message", URI.create("uri:/messageUri"),
+        Assert.assertEquals("messageUri should be that of original message", WonMessageUriHelper.getSelfUri(),
                         msgAndResponse.getMessageURI());
     }
 
     @Test
     public void test_message_and_two_responses_in_same_dataset() {
-        WonMessage msg = WonMessageBuilder.connectionMessage(URI.create("uri:/messageUri"))
+        WonMessage msg = WonMessageBuilder.connectionMessage()
                         .sockets()
                         .sender(URI.create("uri:/localAtom#socket"))
                         .recipient(URI.create("uri:/targetAtom#socket"))
                         .content().text("hello").build();
         WonMessage response = WonMessageBuilder
-                        .response(URI.create("uri:/succ1"))
+                        .response()
                         .fromConnection(URI.create("uri:/conn1"))
                         .respondingToMessageFromOwner(msg)
                         .success()
                         .build();
         WonMessage response2 = WonMessageBuilder
-                        .response(URI.create("uri:/succ2"))
+                        .response()
                         .fromConnection(URI.create("uri:/conn2"))
                         .respondingToMessageFromExternal(msg)
                         .success()
@@ -116,7 +117,8 @@ public class WonMessageTest {
         RdfUtils.addDatasetToDataset(both, response.getCompleteDataset());
         RdfUtils.addDatasetToDataset(both, response2.getCompleteDataset());
         WonMessage msgAndResponse = WonMessage.of(both);
-        Assert.assertEquals("messageUri should be that of original message", URI.create("uri:/messageUri"),
+        Assert.assertEquals("messageUri should be that of original message",
+                        WonMessageUriHelper.getSelfUri(),
                         msgAndResponse.getMessageURI());
     }
 }

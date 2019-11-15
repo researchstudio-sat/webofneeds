@@ -22,7 +22,6 @@ import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
-import won.protocol.message.WonMessageUtils;
 import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.service.WonNodeInformationService;
@@ -128,17 +127,14 @@ public class ServerSideActionService implements WonMessageProcessor {
     }
 
     private void sendConnect(URI fromSocket, URI toSocket, Authentication authentication) {
-        URI fromAtomURI = WonMessageUtils.stripFragment(fromSocket);
-        URI fromWonNodeURI = WonMessageUtils.stripAtomSuffix(fromAtomURI);
-        URI messageURI = wonNodeInformationService.generateEventURI(fromWonNodeURI);
         WonMessage msgToSend = WonMessageBuilder
-                        .connect(messageURI)
+                        .connect()
                         .sockets().sender(fromSocket).recipient(toSocket)
                         .content().text("Connect message automatically sent by a server-side action")
                         .build();
         try {
             AuthenticationThreadLocal.setAuthentication(authentication);
-            ownerApplicationService.sendWonMessage(msgToSend);
+            ownerApplicationService.sendMessage(msgToSend);
         } finally {
             // be sure to remove the principal from the threadlocal
             AuthenticationThreadLocal.remove();
@@ -146,16 +142,14 @@ public class ServerSideActionService implements WonMessageProcessor {
     }
 
     private void reactWithConnect(WonMessage connectMessageToReactTo, Authentication authentication) {
-        URI fromWonNodeURI = connectMessageToReactTo.getRecipientNodeURI();
-        URI messageURI = wonNodeInformationService.generateEventURI(fromWonNodeURI);
         WonMessage msgToSend = WonMessageBuilder
-                        .connect(messageURI)
+                        .connect()
                         .sockets().reactingTo(connectMessageToReactTo)
                         .content().text("Open message automatically sent by a server-side action")
                         .build();
         try {
             AuthenticationThreadLocal.setAuthentication(authentication);
-            ownerApplicationService.sendWonMessage(msgToSend);
+            ownerApplicationService.sendMessage(msgToSend);
         } finally {
             // be sure to remove the principal from the threadlocal
             AuthenticationThreadLocal.remove();

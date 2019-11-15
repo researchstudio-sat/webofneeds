@@ -10,10 +10,6 @@
  */
 package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 
-import java.net.URI;
-
-import org.apache.jena.query.Dataset;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandNotSentEvent;
@@ -26,8 +22,6 @@ import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
-import won.protocol.service.WonNodeInformationService;
-import won.protocol.util.WonRdfUtils;
 
 /**
  * Action executing a ConnectCommandEvent, connecting to the targetAtom on
@@ -75,14 +69,8 @@ public class ExecuteConnectCommandAction extends ExecuteMessageCommandAction<Con
     }
 
     protected WonMessage createWonMessage(ConnectCommandEvent connectCommandEvent) throws WonMessageBuilderException {
-        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
-        Dataset localAtomRDF = getEventListenerContext().getLinkedDataSource()
-                        .getDataForResource(connectCommandEvent.getAtomURI());
-        URI localWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(localAtomRDF, connectCommandEvent.getAtomURI());
-        connectCommandEvent.getTargetAtomURI();
-        URI messageURI = wonNodeInformationService.generateEventURI(localWonNode);
         return WonMessageBuilder
-                        .connect(messageURI)
+                        .connect()
                         .sockets()
                         /**/.sender(connectCommandEvent.getLocalSocket())
                         /**/.recipient(connectCommandEvent.getTargetSocket())

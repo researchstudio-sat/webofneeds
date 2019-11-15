@@ -45,11 +45,53 @@ public class WonMessageUriHelper {
         return messageURI.toString().startsWith(withTrailingSlash(localPrefix));
     }
 
+    /**
+     * Appends the specified <code>id</code> to the message URI prefix
+     * <code>'wm:/'</code>.
+     * 
+     * @param id
+     * @return
+     */
     public static URI createMessageURIForId(String id) {
         return URI.create(withTrailingSlash(WONMSG.MESSAGE_URI_PREFIX) + id);
     }
 
+    /**
+     * Get the id from a <code>messageURI</code>. For example,
+     * <code>wm:/abcd1234</code> yields <code>abcd1234</code>. Removes the message
+     * URI prefix <code>'wm:/'</code> and strips anything after <code>'#'</code> or
+     * <code>'/'</code>, if present.
+     * 
+     * @param messageURI
+     * @return
+     */
+    public static String getIdFromMessageURI(URI messageURI) {
+        int charsToSkip = withTrailingSlash(WONMSG.MESSAGE_URI_PREFIX).length();
+        String id = messageURI.toString().substring(charsToSkip);
+        // remove everything after '/'
+        int pos = id.indexOf('/');
+        if (pos > -1) {
+            id = id.substring(0, pos);
+        }
+        // remove everything after '#'
+        pos = id.indexOf('#');
+        if (pos > -1) {
+            id = id.substring(0, pos);
+        }
+        return id;
+    }
+
     private static String withTrailingSlash(String localPrefix) {
         return localPrefix.endsWith("/") ? localPrefix : localPrefix + "/";
+    }
+
+    /**
+     * Returns the URI reserved for a message being created or checked. The uri is
+     * {@link won.protocol.vocabulary.WONMSG.MESSAGE_SELF}
+     * 
+     * @return
+     */
+    public static URI getSelfUri() {
+        return URI.create(WONMSG.MESSAGE_SELF);
     }
 }

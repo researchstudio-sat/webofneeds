@@ -25,7 +25,6 @@ import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
-import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
 /**
@@ -52,7 +51,8 @@ public class CloseConnectionAction extends BaseEventBotAction {
                 logger.debug("Extracted connection uri {}", connectionURI);
                 if (connectionURI != null) {
                     logger.debug("closing connection {}", connectionURI);
-                    getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(connectionURI));
+                    getEventListenerContext().getWonMessageSender()
+                                    .prepareAndSendMessage(createWonMessage(connectionURI));
                 } else {
                     logger.warn("could not determine which connection to close for event {}", event);
                 }
@@ -65,14 +65,12 @@ public class CloseConnectionAction extends BaseEventBotAction {
     }
 
     private WonMessage createWonMessage(URI connectionURI) throws WonMessageBuilderException {
-        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
-        URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
         URI socketURI = WonRdfUtils.ConnectionUtils.getSocketURIFromConnection(connectionRDF, connectionURI);
         URI targetSocketURI = WonRdfUtils.ConnectionUtils.getTargetSocketURIFromConnection(connectionRDF,
                         connectionURI);
         return WonMessageBuilder
-                        .close(wonNodeInformationService.generateEventURI(wonNode))
+                        .close()
                         .sockets().sender(socketURI).recipient(targetSocketURI)
                         .content().text(farewellMessage).build();
     }

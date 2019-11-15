@@ -227,7 +227,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler
         }
         try {
             AuthenticationThreadLocal.setAuthentication((Authentication) session.getPrincipal());
-            ownerApplicationService.sendWonMessage(wonMessage);
+            ownerApplicationService.sendMessage(wonMessage);
             if (wonMessage.getMessageType() == WonMessageType.DELETE) {
                 // TODO: Set in STATE "inDeletion" and delete after it's deleted in the node
                 // (receiving success response for delete msg)

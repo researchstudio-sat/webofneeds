@@ -84,8 +84,8 @@ public class CreateAtomWithSocketsAction extends AbstractCreateAtomAction {
                         StringUtils.abbreviate(RdfUtils.toString(Prefixer.setPrefixes(atomDatasetWithSockets)), 150));
         WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
         final URI atomURI = wonNodeInformationService.generateAtomURI(wonNodeUri);
-        WonMessage createAtomMessage = createWonMessage(wonNodeInformationService, atomURI, wonNodeUri,
-                        atomDatasetWithSockets);
+        WonMessage createAtomMessage = createWonMessage(atomURI, wonNodeUri, atomDatasetWithSockets);
+        createAtomMessage = ctx.getWonMessageSender().prepareMessage(createAtomMessage);
         // remember the atom URI so we can react to success/failure responses
         EventBotActionUtils.rememberInList(ctx, atomURI, uriListName);
         EventListener successCallback = event12 -> {
@@ -103,7 +103,7 @@ public class CreateAtomWithSocketsAction extends AbstractCreateAtomAction {
         };
         EventBotActionUtils.makeAndSubscribeResponseListener(createAtomMessage, successCallback, failureCallback, ctx);
         logger.debug("registered listeners for response to message URI {}", createAtomMessage.getMessageURI());
-        ctx.getWonMessageSender().sendWonMessage(createAtomMessage);
+        ctx.getWonMessageSender().sendMessage(createAtomMessage);
         logger.debug("atom creation message sent with message URI {}", createAtomMessage.getMessageURI());
     }
 }

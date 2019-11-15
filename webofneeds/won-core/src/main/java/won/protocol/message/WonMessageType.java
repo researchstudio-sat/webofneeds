@@ -210,6 +210,10 @@ public enum WonMessageType {
                         || this == CHANGE_NOTIFICATION;
     }
 
+    public boolean isContentSignedSeparately() {
+        return this == CREATE_ATOM || this == REPLACE;
+    }
+
     public static WonMessageType getWonMessageType(Resource resource) {
         if (WONMSG.CreateMessage.equals(resource))
             return CREATE_ATOM;

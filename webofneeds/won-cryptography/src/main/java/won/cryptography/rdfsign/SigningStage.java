@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.jena.query.Dataset;
@@ -27,7 +28,7 @@ import won.protocol.vocabulary.WONMSG;
  * ypanchenko Date: 09.04.2015
  */
 public class SigningStage {
-    private final Set<String> envUris = new HashSet<>();
+    private String envUri = null;
     private final Set<String> contentUris = new HashSet<>();
     private final Map<String, String> contentUriToContainingItEnvUri = new HashMap<>();
     private final Map<String, String> envUriToContainedInItEnvUri = new HashMap<>();
@@ -53,33 +54,15 @@ public class SigningStage {
     private void extractData(final WonMessage message) {
         messageUri = message.getMessageURI().toString();
         Dataset dataset = message.getCompleteDataset();
+        String envelopeURI = message.getEnvelopeURI().toString();
+        Model envelope = dataset.getNamedModel(envelopeURI.toString());
+        extractEnvelopeData(envelopeURI.toString(), envelope, message);
         for (String uri : RdfUtils.getModelNames(dataset)) {
-            Model model = dataset.getNamedModel(uri);
-            if (message.isEnvelopeGraph(uri, model)) {
-                extractEnvelopeData(uri, model, message);
-            } else if (WonRdfUtils.SignatureUtils.isSignature(model, uri)) {
-                if (outermostSignatureUri != null) {
-                    throw new IllegalStateException("Found more than one signature graph");
-                }
-                outermostSignatureUri = uri;
-                extractSignatureData(uri, model);
-            } else { // should be content
-                extractContentData(uri);
+            if (envelopeURI.equals(uri)) {
+                continue; // we already processed this
             }
-        }
-        // created ordered env list
-        orderEnvelopes(message);
-    }
-
-    private void orderEnvelopes(final WonMessage message) {
-        String outer = message.getEnvelopeURI().toString();
-        envOrderedByContainment.add(outer);
-        while (outer != null) {
-            String inner = envUriToContainedInItEnvUri.get(outer);
-            if (inner != null) {
-                envOrderedByContainment.add(0, inner);
-            }
-            outer = inner;
+            // should be content
+            extractContentData(uri);
         }
     }
 
@@ -87,18 +70,22 @@ public class SigningStage {
         contentUris.add(uri);
     }
 
-    private void extractSignatureData(final String uri, final Model model) {
-        WonSignatureData wonSignatureData = WonRdfUtils.SignatureUtils.extractWonSignatureData(uri, model);
+    private void extractSignatureData(final String sigGraphUri, final Model model) {
+        WonSignatureData wonSignatureData = WonRdfUtils.SignatureUtils.extractWonSignatureData(sigGraphUri, model);
         if (wonSignatureData != null && wonSignatureData.getSignatureValue() != null) {
-            graphUriToSigUri.put(wonSignatureData.getSignedGraphUri(), uri);
-            sigUriToSigReference.put(uri, wonSignatureData);
+            wonSignatureData.getSignedGraphUris().forEach(signed -> graphUriToSigUri.put(signed, sigGraphUri));
+            sigUriToSigReference.put(sigGraphUri, wonSignatureData);
         }
+    }
+
+    public String getEnvelopeUri() {
+        Objects.requireNonNull(envUri);
+        return envUri;
     }
 
     private void extractEnvelopeData(final String envelopeGraphUri, final Model envelopeGraph,
                     final WonMessage message) {
-        // add to envelope uris
-        envUris.add(envelopeGraphUri);
+        this.envUri = envelopeGraphUri;
         // find if it contains has_content
         // TODO this duplicates private findmessageuri method from wonmessage, refactor
         // to avoid code repetition
@@ -117,16 +104,6 @@ public class SigningStage {
             Resource refObj = it.next().getObject().asResource();
             extractSignatureData(refObj.getURI(), refObj.getModel());
         }
-    }
-
-    public List<String> getUnsignedEnvUrisOrderedByContainment() {
-        List<String> ordered = new ArrayList<>(envOrderedByContainment.size());
-        for (String uri : envOrderedByContainment) {
-            if (!graphUriToSigUri.containsKey(uri)) {
-                ordered.add(uri);
-            }
-        }
-        return ordered;
     }
 
     public Set<String> getUnsignedContentUris() {

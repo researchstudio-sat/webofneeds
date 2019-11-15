@@ -56,7 +56,7 @@ import won.protocol.vocabulary.WONMSG;
  * Note: this implementation is not thread-safe.
  */
 public class WonMessage implements Serializable {
-    public static final String SIGNATURE_URI_SUFFIX = "#envelope-sig";
+    public static final String SIGNATURE_URI_SUFFIX = "#signature";
     public static final String ENVELOPE_URI_SUFFIX = "#envelope";
     final Logger logger = LoggerFactory.getLogger(getClass());
     private Dataset messageContent;

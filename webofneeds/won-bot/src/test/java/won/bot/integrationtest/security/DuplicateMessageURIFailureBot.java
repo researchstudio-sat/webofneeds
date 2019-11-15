@@ -16,21 +16,17 @@ import won.bot.framework.eventbot.action.impl.LogAction;
 import won.bot.framework.eventbot.action.impl.LogErrorAction;
 import won.bot.framework.eventbot.action.impl.MultipleActions;
 import won.bot.framework.eventbot.action.impl.PublishEventAction;
-import won.bot.framework.eventbot.action.impl.lifecycle.SignalWorkDoneAction;
-import won.bot.framework.eventbot.action.impl.atomlifecycle.CreateAtomWithSocketsAction;
 import won.bot.framework.eventbot.action.impl.atomlifecycle.DeactivateAllAtomsAction;
+import won.bot.framework.eventbot.action.impl.lifecycle.SignalWorkDoneAction;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.AtomCreationFailedEvent;
-import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
 import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomCreatedEvent;
 import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomDeactivatedEvent;
 import won.bot.framework.eventbot.event.impl.test.SuccessEvent;
 import won.bot.framework.eventbot.event.impl.test.TestFailedEvent;
 import won.bot.framework.eventbot.event.impl.test.TestPassedEvent;
-import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnFirstNEventsListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnceAfterNEventsListener;
-import won.bot.integrationtest.failsim.ConstantNewEventURIDecorator;
 
 /**
  *
@@ -40,12 +36,6 @@ public class DuplicateMessageURIFailureBot extends IntegrationtestBot {
     protected void initializeEventListeners() {
         EventListenerContext ctx = getEventListenerContext();
         EventBus bus = getEventBus();
-        // create atoms every trigger execution until 2 atoms are created
-        bus.subscribe(ActEvent.class, new ActionOnEventListener(ctx, new CreateAtomWithSocketsAction(
-                        // use a decorator that will cause the same atom URI to be used in each create
-                        // message
-                        new ConstantNewEventURIDecorator(ctx, "constantMsgURI" + System.currentTimeMillis()),
-                        getBotContextWrapper().getAtomCreateListName()), 2));
         // log error if we can create 2 atoms
         bus.subscribe(AtomCreatedEvent.class, new ActionOnceAfterNEventsListener(ctx, 2, new MultipleActions(ctx,
                         new LogErrorAction(ctx,

@@ -25,7 +25,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
     ?contentChainSize
     ?parallelContentSigChainSize
 
-    (if((bound(?type) && (?type = msg:AtomHintMessage || ?type = msg:SocketHintMessage )) || ! (?envChainSize != ?parallelEnvSigChainSize || ?contentChainSize != ?parallelContentSigChainSize), "OK",
+    (if((bound(?type) && (?type = msg:AtomHintMessage || ?type = msg:SocketHintMessage )) || ! (?envChainSize != ?parallelEnvSigChainSize || ?contentGraphs != ?signedContentGraphs), "OK",
     "FAIL")
     AS ?check)
 
@@ -69,7 +69,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
       }
     }
 
-    { SELECT (count(distinct ?g) as ?contentChainSize)
+    { SELECT (count(distinct ?g) as ?contentGraphs)
       WHERE
       {
         GRAPH ?envelope
@@ -79,15 +79,26 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
       }
     }
 
-    { SELECT (count(distinct ?g) as ?parallelContentSigChainSize)
+    { SELECT (count(distinct ?g) as ?signedContentGraphs)
       WHERE
       {
-        GRAPH ?envelope
         {
-          ?event msg:content ?g .
-          ?envelope msg:containsSignature ?ref .
-          ?ref msg:signedGraph ?g .
-        } .
+	        GRAPH ?envelope
+	        {
+	          ?event msg:content ?g .
+	          ?envelope msg:containsSignature ?ref .
+	          ?ref msg:signedGraph ?g .
+	        }
+	    } UNION {
+	    	GRAPH ?signature
+	    	{
+				?signature msg:signedGraph ?envelope, ?g	    	
+	    	}
+	        GRAPH ?envelope
+	        {
+	          ?event msg:content ?g .
+	        }
+	    }  
       }
     }
 

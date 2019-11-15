@@ -12,8 +12,6 @@ package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 
 import java.net.URI;
 
-import org.apache.jena.query.Dataset;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandNotSentEvent;
@@ -26,8 +24,6 @@ import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
-import won.protocol.service.WonNodeInformationService;
-import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONCON;
 
 /**
@@ -73,12 +69,8 @@ public class ExecuteFeedbackCommandAction extends ExecuteMessageCommandAction<Fe
 
     protected WonMessage createWonMessage(FeedbackCommandEvent feedbackCommandEvent) throws WonMessageBuilderException {
         URI connectionURI = feedbackCommandEvent.getConnectionURI();
-        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
-        Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
-        URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
-        // TODO: make more generic by using the URIs specified in the command.
         return WonMessageBuilder
-                        .hintFeedbackMessage(wonNodeInformationService.generateEventURI(wonNode))
+                        .hintFeedbackMessage()
                         .connection(connectionURI)
                         .binaryFeedback(URI.create(WONCON.Good.getURI()).equals(feedbackCommandEvent.getValue()))
                         .build();

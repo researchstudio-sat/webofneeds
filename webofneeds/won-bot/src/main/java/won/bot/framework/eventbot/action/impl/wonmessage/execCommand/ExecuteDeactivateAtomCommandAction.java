@@ -45,6 +45,7 @@ public class ExecuteDeactivateAtomCommandAction extends BaseEventBotAction {
         final URI wonNodeUri = WonRdfUtils.ConnectionUtils.getWonNodeURIFromAtom(atomRDF, atomUri);
         WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
         WonMessage deactivateAtomMessage = createWonMessage(wonNodeInformationService, atomUri, wonNodeUri);
+        deactivateAtomMessage = ctx.getWonMessageSender().prepareMessage(deactivateAtomMessage);
         EventListener successCallback = event12 -> {
             logger.debug("atom creation successful, new atom URI is {}", atomUri);
             bus.publish(new DeactivateAtomCommandSuccessEvent(atomUri, deactivateAtomCommandEvent));
@@ -59,15 +60,14 @@ public class ExecuteDeactivateAtomCommandAction extends BaseEventBotAction {
         EventBotActionUtils.makeAndSubscribeResponseListener(deactivateAtomMessage, successCallback, failureCallback,
                         ctx);
         logger.debug("registered listeners for response to message URI {}", deactivateAtomMessage.getMessageURI());
-        ctx.getWonMessageSender().sendWonMessage(deactivateAtomMessage);
+        ctx.getWonMessageSender().sendMessage(deactivateAtomMessage);
         logger.debug("atom creation message sent with message URI {}", deactivateAtomMessage.getMessageURI());
     }
 
     private WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI atomURI,
                     URI wonNodeURI) throws WonMessageBuilderException {
-        URI messageURI = wonNodeInformationService.generateEventURI(wonNodeURI);
         return WonMessageBuilder
-                        .deactivate(messageURI)
+                        .deactivate()
                         .atom(atomURI)
                         .direction().fromOwner()
                         .build();

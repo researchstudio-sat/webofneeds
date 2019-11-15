@@ -14,7 +14,6 @@ import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.Optional;
 
-import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,8 +27,6 @@ import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
-import won.protocol.service.WonNodeInformationService;
-import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
@@ -51,7 +48,7 @@ public class OpenConnectionAction extends BaseEventBotAction {
             ConnectFromOtherAtomEvent connectEvent = (ConnectFromOtherAtomEvent) event;
             logger.debug("auto-replying to connect for connection {}", connectEvent.getConnectionURI());
             getEventListenerContext().getWonMessageSender()
-                            .sendWonMessage(createConnectWonMessage(connectEvent.getAtomURI(),
+                            .prepareAndSendMessage(createConnectWonMessage(connectEvent.getAtomURI(),
                                             connectEvent.getTargetAtomURI(),
                                             connectEvent.getRecipientSocket(),
                                             connectEvent.getSenderSocket()));
@@ -68,7 +65,7 @@ public class OpenConnectionAction extends BaseEventBotAction {
             Optional<URI> targetSocket = WonLinkedDataUtils.getDefaultSocket(hintEvent.getHintTargetAtom(), false, lds);
             if (recipientSocket.isPresent() && targetSocket.isPresent()) {
                 getEventListenerContext().getWonMessageSender()
-                                .sendWonMessage(createConnectWonMessage(hintEvent.getRecipientAtom(),
+                                .prepareAndSendMessage(createConnectWonMessage(hintEvent.getRecipientAtom(),
                                                 hintEvent.getHintTargetAtom(), recipientSocket.get(),
                                                 targetSocket.get()));
             }
@@ -89,7 +86,7 @@ public class OpenConnectionAction extends BaseEventBotAction {
             }
             logger.debug("opening connection based on hint {}", event);
             getEventListenerContext().getWonMessageSender()
-                            .sendWonMessage(createConnectWonMessage(recipientAtom.get(), hintTargetAtom.get(),
+                            .prepareAndSendMessage(createConnectWonMessage(recipientAtom.get(), hintTargetAtom.get(),
                                             hintEvent.getRecipientSocket(),
                                             (hintEvent.getHintTargetSocket())));
         }
@@ -97,12 +94,8 @@ public class OpenConnectionAction extends BaseEventBotAction {
 
     private WonMessage createConnectWonMessage(URI fromUri, URI toUri, URI localSocket,
                     URI targetSocket) throws WonMessageBuilderException {
-        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
-        Dataset localAtomRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(fromUri);
-        URI localWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(localAtomRDF, fromUri);
-        URI messageURI = wonNodeInformationService.generateEventURI(localWonNode);
         return WonMessageBuilder
-                        .connect(messageURI)
+                        .connect()
                         .sockets()
                         /**/.sender(localSocket)
                         /**/.recipient(targetSocket)

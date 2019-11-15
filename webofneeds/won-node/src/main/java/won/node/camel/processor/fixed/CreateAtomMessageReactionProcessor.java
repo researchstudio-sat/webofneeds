@@ -26,6 +26,7 @@ import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
 import won.protocol.exception.NoSuchAtomException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
+import won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor;
 import won.protocol.model.Atom;
 import won.protocol.repository.AtomRepository;
 import won.protocol.vocabulary.WONMSG;
@@ -39,6 +40,8 @@ public class CreateAtomMessageReactionProcessor extends AbstractCamelProcessor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     AtomRepository atomRepository;
+    @Autowired
+    SignatureAddingWonMessageProcessor signatureAdder;
 
     @Override
     public void process(final Exchange exchange) throws Exception {
@@ -47,7 +50,7 @@ public class CreateAtomMessageReactionProcessor extends AbstractCamelProcessor {
         try {
             WonMessage newAtomNotificationMessage = makeAtomCreatedMessageForMatcher(atom);
             matcherProtocolMatcherClient.atomCreated(atom.getAtomURI(), ModelFactory.createDefaultModel(),
-                            newAtomNotificationMessage);
+                            signatureAdder.process(newAtomNotificationMessage));
         } catch (Exception e) {
             logger.warn("could not create AtomCreatedNotification", e);
         }
@@ -55,7 +58,7 @@ public class CreateAtomMessageReactionProcessor extends AbstractCamelProcessor {
 
     private WonMessage makeAtomCreatedMessageForMatcher(final Atom atom) throws NoSuchAtomException {
         return WonMessageBuilder
-                        .atomCreatedNotification(wonNodeInformationService.generateEventURI())
+                        .atomCreatedNotification()
                         .atom(atom.getAtomURI()).build();
     }
 }

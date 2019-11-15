@@ -13,7 +13,6 @@ package won.node.camel.processor.general;
 import static won.node.camel.service.WonCamelHelper.*;
 
 import java.lang.invoke.MethodHandles;
-import java.net.URI;
 import java.util.Date;
 import java.util.Optional;
 
@@ -54,8 +53,7 @@ public class SuccessResponder extends AbstractCamelProcessor {
             // we don't respond to responses
             return;
         }
-        URI newMessageURI = this.wonNodeInformationService.generateEventURI();
-        ResponseBuilder responseBuilder = WonMessageBuilder.response(newMessageURI);
+        ResponseBuilder responseBuilder = WonMessageBuilder.response();
         // in the case of connect, the owners don't know connection uris yet. Tell them
         // about them by using them as the senderURI property in the response.
         if (originalMessage.getMessageTypeRequired().isConnectionSpecificMessage()) {
@@ -73,7 +71,7 @@ public class SuccessResponder extends AbstractCamelProcessor {
                         .build();
         messageReferencer.addMessageReferences(responseMessage, getParentURIRequired(exchange));
         responseMessage.addMessageProperty(WONMSG.timestamp, new Date().getTime());
-        responseMessage = signatureAddingWonMessageProcessor.process(responseMessage);
+        responseMessage = signatureAddingWonMessageProcessor.signWithDefaultKey(responseMessage);
         exchange.getIn().setHeader(WonCamelConstants.RESPONSE_HEADER, responseMessage);
     }
 }

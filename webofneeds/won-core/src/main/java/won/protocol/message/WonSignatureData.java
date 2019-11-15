@@ -1,19 +1,21 @@
 package won.protocol.message;
 
+import java.util.List;
+
 /**
  * User: ypanchenko Date: 24.03.2015
  */
 public class WonSignatureData {
-    private String signedGraphUri;
+    private List<String> signedGraphUris;
     private String signatureUri;
     private String signatureValue;
     private String hash;
     private String publicKeyFingerprint;
     private String verificationCertificateUri;
 
-    public WonSignatureData(final String signedGraphUri, final String signatureUri, final String signatureValue,
+    public WonSignatureData(final List<String> signedGraphUris, final String signatureUri, final String signatureValue,
                     final String hash, final String publicKeyFingerprint, final String verificationCertificateUri) {
-        this.signedGraphUri = signedGraphUri;
+        this.signedGraphUris = signedGraphUris;
         this.signatureUri = signatureUri;
         this.signatureValue = signatureValue;
         this.hash = hash;
@@ -21,12 +23,12 @@ public class WonSignatureData {
         this.verificationCertificateUri = verificationCertificateUri;
     }
 
-    public String getSignedGraphUri() {
-        return signedGraphUri;
+    public List<String> getSignedGraphUris() {
+        return signedGraphUris;
     }
 
-    public void setSignedGraphUri(final String signedGraphUri) {
-        this.signedGraphUri = signedGraphUri;
+    public void setSignedGraphUri(final List<String> signedGraphUris) {
+        this.signedGraphUris = signedGraphUris;
     }
 
     public String getSignatureUri() {

@@ -126,9 +126,14 @@ public class WonRdfUtils {
         }
 
         public static WonSignatureData extractWonSignatureData(final Resource resource) {
-            Statement stmt = resource.getRequiredProperty(WONMSG.signedGraph);
-            String signedGraphUri = stmt.getObject().asResource().getURI();
-            stmt = resource.getRequiredProperty(SFSIG.HAS_SIGNATURE_VALUE);
+            List<String> signedGraphs = new ArrayList<>();
+            StmtIterator it = resource.listProperties(WONMSG.signedGraph);
+            while (it.hasNext()) {
+                Statement s = it.next();
+                String signedGraphUri = s.getObject().asResource().getURI();
+                signedGraphs.add(signedGraphUri);
+            }
+            Statement stmt = resource.getRequiredProperty(SFSIG.HAS_SIGNATURE_VALUE);
             String signatureValue = stmt.getObject().asLiteral().getString();
             stmt = resource.getRequiredProperty(WONMSG.hash);
             String hash = stmt.getObject().asLiteral().getString();
@@ -136,7 +141,7 @@ public class WonRdfUtils {
             String fingerprint = stmt.getObject().asLiteral().getString();
             stmt = resource.getRequiredProperty(SFSIG.HAS_VERIFICATION_CERT);
             String cert = stmt.getObject().asResource().getURI();
-            return new WonSignatureData(signedGraphUri, resource.getURI(), signatureValue, hash, fingerprint, cert);
+            return new WonSignatureData(signedGraphs, resource.getURI(), signatureValue, hash, fingerprint, cert);
         }
 
         /**
@@ -150,14 +155,14 @@ public class WonRdfUtils {
             assert wonSignatureData.getHash() != null;
             assert wonSignatureData.getSignatureValue() != null;
             assert wonSignatureData.getPublicKeyFingerprint() != null;
-            assert wonSignatureData.getSignedGraphUri() != null;
+            assert wonSignatureData.getSignedGraphUris() != null;
             assert wonSignatureData.getVerificationCertificateUri() != null;
             Model containingGraph = subject.getModel();
             subject.addProperty(RDF.type, SFSIG.SIGNATURE);
             subject.addProperty(WONMSG.hash, wonSignatureData.getHash());
             subject.addProperty(SFSIG.HAS_SIGNATURE_VALUE, wonSignatureData.getSignatureValue());
-            subject.addProperty(WONMSG.signedGraph,
-                            containingGraph.createResource(wonSignatureData.getSignedGraphUri()));
+            wonSignatureData.getSignedGraphUris().forEach(
+                            uri -> subject.addProperty(WONMSG.signedGraph, containingGraph.createResource(uri)));
             subject.addProperty(WONMSG.publicKeyFingerprint, wonSignatureData.getPublicKeyFingerprint());
             subject.addProperty(SFSIG.HAS_VERIFICATION_CERT,
                             containingGraph.createResource(wonSignatureData.getVerificationCertificateUri()));

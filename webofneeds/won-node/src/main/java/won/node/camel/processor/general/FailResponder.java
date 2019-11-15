@@ -105,14 +105,12 @@ public class FailResponder extends AbstractCamelProcessor {
                 logger.warn("FailureResponse to FailureResponse that raised the error:\n{}", sw.toString());
                 return;
             }
-            URI newMessageURI = this.wonNodeInformationService.generateEventURI();
             if (originalMessage.getMessageTypeRequired().isResponseMessage()) {
                 // not sending a failure response for a response
                 return;
             }
-            logger.debug("Sending FailureResponse {}", newMessageURI);
             WonMessageDirection direction = getDirectionRequired(exchange);
-            ResponseBuilder responseBuilder = WonMessageBuilder.response(newMessageURI);
+            ResponseBuilder responseBuilder = WonMessageBuilder.response();
             // in the case of connect, the owners don't know connection uris yet. Tell them
             // about them by using them as the senderURI property in the response.
             if (originalMessage.getMessageTypeRequired().isConnectionSpecificMessage()) {
@@ -129,7 +127,7 @@ public class FailResponder extends AbstractCamelProcessor {
                             .failure()
                             .content().text(errormessage)
                             .build();
-            responseMessage = signatureAddingWonMessageProcessor.process(responseMessage);
+            responseMessage = signatureAddingWonMessageProcessor.signWithDefaultKey(responseMessage);
             putResponse(exchange, responseMessage);
             putMessageToSend(exchange, responseMessage);
             // extract the routing information

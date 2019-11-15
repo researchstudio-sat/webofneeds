@@ -69,7 +69,7 @@ public class VerifyAndSignExamples {
         // WonMessage inputMessage = atomKeyGeneratorAndAdder.process(inputMessage);
         // owner adds envelope
         WonMessage wonMessage = WonMessageBuilder
-                        .createAtom(URI.create(EVENT_ENV1_URI))
+                        .createAtom()
                         .atom(URI.create(ATOM_URI))
                         .content().model(inputDataset.getNamedModel(ATOM_CORE_DATA_URI))
                         .direction().fromOwner().build();
@@ -78,7 +78,7 @@ public class VerifyAndSignExamples {
         // write for debugging
         TestSigningUtils.writeToTempFile(outputDataset);
         // owner signs, - on behalf of atom
-        WonMessage signedMessage = ownerAddingProcessor.processOnBehalfOfAtom(wonMessage);
+        WonMessage signedMessage = ownerAddingProcessor.signWithAtomKey(wonMessage);
         outputDataset = signedMessage.getCompleteDataset();
         // write for debugging
         // TestSigningUtils.writeToTempFile(outputDataset);

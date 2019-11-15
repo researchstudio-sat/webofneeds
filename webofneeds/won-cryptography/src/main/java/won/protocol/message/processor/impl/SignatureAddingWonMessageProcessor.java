@@ -18,9 +18,9 @@ import won.cryptography.service.CryptographyService;
 import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.WonMessageProcessor;
-import won.protocol.service.MessageRoutingInfoService;
 import won.protocol.util.Prefixer;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonMessageUriHelper;
 
 /**
  * User: ypanchenko Date: 03.04.2015
@@ -32,14 +32,23 @@ public class SignatureAddingWonMessageProcessor implements WonMessageProcessor {
     @Autowired(required = false) // in production, there is a factory setting this value, for testing, we use
                                  // Autowired
     private KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy;
-    @Autowired
-    private MessageRoutingInfoService messageRoutingInfoService;
 
     public SignatureAddingWonMessageProcessor() {
     }
 
     @Override
-    public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
+    public WonMessage process(WonMessage message) throws WonMessageProcessingException {
+        return signWithDefaultKey(message);
+    }
+
+    /**
+     * Used by the WoN node. Uses its default key for signing any outgoing message.
+     * 
+     * @param message
+     * @return
+     * @throws WonMessageProcessingException
+     */
+    public WonMessage signWithDefaultKey(final WonMessage message) throws WonMessageProcessingException {
         // use default key for signing
         PrivateKey privateKey = cryptographyService.getDefaultPrivateKey();
         String webId = cryptographyService.getDefaultPrivateKeyAlias();
@@ -52,8 +61,16 @@ public class SignatureAddingWonMessageProcessor implements WonMessageProcessor {
         }
     }
 
-    public WonMessage processOnBehalfOfAtom(final WonMessage wonMessage) throws WonMessageProcessingException {
-        List<WonMessage> ret = new ArrayList();
+    /**
+     * Used by owners - they find the key alias in the message and get the key from
+     * the cryptography service.
+     * 
+     * @param wonMessage
+     * @return
+     * @throws WonMessageProcessingException
+     */
+    public WonMessage signWithAtomKey(final WonMessage wonMessage) throws WonMessageProcessingException {
+        List<WonMessage> ret = new ArrayList<WonMessage>();
         for (WonMessage message : wonMessage.getAllMessages()) {
             // use senderAtom key for signing
             Optional<URI> senderAtomURI = Optional.of(message.getSenderAtomURIRequired());
@@ -75,6 +92,11 @@ public class SignatureAddingWonMessageProcessor implements WonMessageProcessor {
 
     private WonMessage processWithKey(final WonMessage wonMessage, final String privateKeyUri,
                     final PrivateKey privateKey, final PublicKey publicKey) throws Exception {
+        URI messageURI = wonMessage.getMessageURIRequired();
+        if (!Objects.equals(messageURI, WonMessageUriHelper.getSelfUri())) {
+            // we only sign a message if it still has the self message uri
+            return wonMessage;
+        }
         WonMessage signed = WonMessageSignerVerifier.sign(privateKey, publicKey, privateKeyUri, wonMessage);
         if (logger.isDebugEnabled()) {
             logger.debug("SIGNED with key " + privateKeyUri + ":\n"

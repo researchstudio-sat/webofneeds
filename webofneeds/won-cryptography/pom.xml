@@ -11,9 +11,28 @@
     <artifactId>won-cryptography</artifactId>
     <version>0.7-SNAPSHOT</version>
     <name>Cryptography</name>
+	
+	<repositories>
+	    <repository>
+	        <id>jitpack.io</id>
+	        <url>https://jitpack.io</url>
+	    </repository>
+  	</repositories>
 
     <dependencies>
 
+	    <dependency>
+	      <groupId>com.github.multiformats</groupId>
+	      <artifactId>java-multihash</artifactId>
+	      <version>v1.2.1</version>
+	    </dependency>
+  
+  		<dependency>
+            <groupId>com.github.multiformats</groupId>
+            <artifactId>java-multibase</artifactId>
+            <version>v1.0.1</version>
+        </dependency>
+  
         <dependency>
             <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-core</artifactId>

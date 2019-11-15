@@ -45,11 +45,6 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
     }
 
     @Override
-    public URI generateEventURI(URI wonNodeURI) {
-        return generateEventURI();
-    }
-
-    @Override
     public boolean isValidEventURI(URI eventURI) {
         return WonMessageUriHelper.isGenericMessageURI(eventURI);
     }
@@ -77,11 +72,6 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
     public boolean isValidConnectionURI(URI connectionURI, URI wonNodeURI) {
         WonNodeInfo wonNodeInformation = getWonNodeInformation(wonNodeURI);
         return isValidURI(connectionURI, wonNodeInformation.getConnectionURIPrefix());
-    }
-
-    @Override
-    public URI generateEventURI() {
-        return WonMessageUriHelper.createMessageURIForId(generateRandomID());
     }
 
     @Override

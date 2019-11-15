@@ -33,7 +33,6 @@
     <bean id="uriService" class="won.node.service.nodeconfig.URIService">
         <property name="resourceURIPrefix" value="${uri.prefix.resource}" />
         <property name="dataURIPrefix" value="${uri.prefix.data}" />
-        <property name="attachmentResourceURIPrefix" value="${uri.prefix.attachment}" />
         <property name="pageURIPrefix" value="${uri.prefix.page}" />
         <property name="generalURIPrefix" value="${uri.prefix}" />
     </bean>

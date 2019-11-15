@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import won.protocol.exception.WonMessageProcessingException;
+import won.protocol.util.WonMessageUriHelper;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -124,10 +125,13 @@ public class WonMessageUtils {
         return Optional.ofNullable(atomUri);
     }
 
-    public static boolean isValidMessageUri(URI messageURIRequired) {
-        if (messageURIRequired == null) {
+    public static boolean isValidMessageUri(URI messageURI) {
+        if (messageURI == null) {
             return false;
         }
-        return messageURIRequired.toString().startsWith(WONMSG.MESSAGE_URI_PREFIX);
+        if (Objects.equals(messageURI, WonMessageUriHelper.getSelfUri())) {
+            return false;
+        }
+        return messageURI.toString().startsWith(WONMSG.MESSAGE_URI_PREFIX);
     }
 }

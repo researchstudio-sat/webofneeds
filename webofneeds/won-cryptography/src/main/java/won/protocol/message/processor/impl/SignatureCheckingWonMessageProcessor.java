@@ -72,15 +72,15 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
         for (WonMessage toCheck : message.getAllMessages()) {
             try {
                 // obtain public keys
-                Map<String, PublicKey> keys = getRequiredPublicKeys(message.getCompleteDataset());
+                Map<String, PublicKey> keys = getRequiredPublicKeys(toCheck.getCompleteDataset());
                 // verify with those public keys
-                result = WonMessageSignerVerifier.verify(keys, message);
+                result = WonMessageSignerVerifier.verify(keys, toCheck);
                 if (logger.isDebugEnabled()) {
                     logger.debug("VERIFIED=" + result.isVerificationPassed()
                                     + " with keys: " + keys.values()
                                     + " for\n"
                                     + RdfUtils.writeDatasetToString(
-                                                    Prefixer.setPrefixes(message.getCompleteDataset()),
+                                                    Prefixer.setPrefixes(toCheck.getCompleteDataset()),
                                                     Lang.TRIG));
                 }
             } catch (LinkedDataFetchingException e) {
@@ -89,33 +89,33 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
                  * deleted, we assume that this message is just mirrored back to the owner and
                  * is to be accepteed
                  */
-                if (WonMessageType.DELETE.equals(message.getMessageType())) {
+                if (WonMessageType.DELETE.equals(toCheck.getMessageType())) {
                     if (e.getCause() instanceof HttpClientErrorException
                                     && HttpStatus.GONE.equals(
                                                     ((HttpClientErrorException) e.getCause()).getStatusCode())) {
                         if (logger.isDebugEnabled()) {
                             logger.debug("Failure during processing signature check of message"
-                                            + message.getMessageURI()
+                                            + toCheck.getMessageURI()
                                             + " (messageType was DELETE, but atom is already deleted, accept message anyway)");
                         }
-                        return message;
+                        return toCheck;
                     }
                 }
                 // TODO SignatureProcessingException?
-                throw new WonMessageProcessingException("Could not verify message " + message.getMessageURI(), e);
+                throw new WonMessageProcessingException("Could not verify message " + toCheck.getMessageURI(), e);
             } catch (Exception e) {
                 // TODO SignatureProcessingException?
-                throw new WonMessageProcessingException("Could not verify message " + message.getMessageURI(), e);
+                throw new WonMessageProcessingException("Could not verify message " + toCheck.getMessageURI(), e);
             }
             // throw exception if the verification fails:
             if (!result.isVerificationPassed()) {
                 String errormessage = "Message verification failed. Message:"
-                                + message.toStringForDebug(false)
+                                + toCheck.toStringForDebug(false)
                                 + ", Problem:"
                                 + result.getMessage();
                 if (logger.isDebugEnabled()) {
                     logger.debug(errormessage + ". Offending message:\n"
-                                    + RdfUtils.toString(Prefixer.setPrefixes(message.getCompleteDataset())));
+                                    + RdfUtils.toString(Prefixer.setPrefixes(toCheck.getCompleteDataset())));
                 }
                 // TODO SignatureProcessingException?
                 throw new WonMessageProcessingException(new SignatureException(

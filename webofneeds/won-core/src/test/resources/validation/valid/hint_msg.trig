@@ -2,8 +2,8 @@
 @prefix match:   <https://w3id.org/won/matching#> .
 
 
-<https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc#envelope-0w69> {
-    <https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc#envelope-0w69>
+<https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc#envelope> {
+    <https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc#envelope>
             a       <https://w3id.org/won/message#EnvelopeGraph> ;
             <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
                     <https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc> .

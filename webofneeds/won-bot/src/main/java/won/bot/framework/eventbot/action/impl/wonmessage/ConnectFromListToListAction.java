@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,8 +27,6 @@ import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
-import won.protocol.service.WonNodeInformationService;
-import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
@@ -142,7 +139,7 @@ public class ConnectFromListToListAction extends BaseEventBotAction {
                     connectHook.onConnect(fromUri, toUri);
                 }
                 WonMessage connMessage = createWonMessage(fromUri, toUri);
-                getEventListenerContext().getWonMessageSender().sendWonMessage(connMessage);
+                getEventListenerContext().getWonMessageSender().prepareAndSendMessage(connMessage);
             } catch (Exception e) {
                 logger.warn("could not connect {} and {}", fromUri, toUri); // throws
                 logger.warn("caught exception", e);
@@ -151,12 +148,6 @@ public class ConnectFromListToListAction extends BaseEventBotAction {
     }
 
     private WonMessage createWonMessage(URI fromUri, URI toUri) throws WonMessageBuilderException {
-        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
-        Dataset localAtomRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(fromUri);
-        Dataset targetAtomRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(toUri);
-        URI localWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(localAtomRDF, fromUri);
-        URI remoteWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(targetAtomRDF, toUri);
-        URI messageURI = wonNodeInformationService.generateEventURI(localWonNode);
         URI localSocket = fromSocketType.map(socketType -> WonLinkedDataUtils
                         .getSocketsOfType(fromUri, socketType,
                                         getEventListenerContext().getLinkedDataSource())
@@ -172,7 +163,7 @@ public class ConnectFromListToListAction extends BaseEventBotAction {
                                         "No suitable sockets found for connect on " + fromUri))
                         .get();
         return WonMessageBuilder
-                        .connect(messageURI)
+                        .connect()
                         .sockets()
                         /**/.sender(localSocket)
                         /**/.recipient(targetSocket)

@@ -1,9 +1,19 @@
 package won.cryptography.rdfsign;
 
-import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.SignatureAlgorithmInterface;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.algorithm.SignatureAlgorithmFisteus2010;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
+import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
+import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.apache.jena.ext.com.google.common.collect.Streams;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -14,16 +24,12 @@ import org.apache.jena.vocabulary.RDF;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
+import io.ipfs.multihash.Multihash.Type;
 import won.protocol.message.WonSignatureData;
 import won.protocol.vocabulary.SFSIG;
-
-import java.io.StringWriter;
-import java.lang.invoke.MethodHandles;
-import java.security.*;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Created by ypanchenko on 12.06.2014.
@@ -35,8 +41,9 @@ public class WonSigner {
     public static final String SIGNING_ALGORITHM_PROVIDER = "BC";
     // TODO which hashing algorithm to use?
     public static final String ENV_HASH_ALGORITHM = "sha-256";
-    private SignatureAlgorithmInterface algorithm;
+    public static final Type HASH_ALGORITHM_FOR_MULTIHASH = Type.sha2_256;
     private Dataset dataset;
+    private WonHasher hasher;
     private static final Model defaultGraphSigningMethod;
     static {
         // initialize a model with the triples indicating the default graph signing
@@ -55,8 +62,8 @@ public class WonSigner {
     public WonSigner(Dataset dataset) {
         this.dataset = dataset;
         // default algorithm: Fisteus2010
-        this.algorithm = new SignatureAlgorithmFisteus2010();
         Provider provider = new BouncyCastleProvider();
+        this.hasher = new WonHasher();
     }
 
     /**
@@ -72,11 +79,11 @@ public class WonSigner {
      * @throws Exception
      */
     // TODO chng exceptions to won exceptions?
-    public List<WonSignatureData> sign(PrivateKey privateKey, String cert, PublicKey publicKey, String... graphsToSign)
+    public List<WonSignatureData> signNamedGraphsSeparately(PrivateKey privateKey, String cert, PublicKey publicKey,
+                    String... graphsToSign)
                     throws Exception {
         List<WonSignatureData> sigRefs = new ArrayList<>(graphsToSign.length);
-        MessageDigest md = MessageDigest.getInstance(ENV_HASH_ALGORITHM, SIGNING_ALGORITHM_PROVIDER);
-        String fingerprint = Base64.getEncoder().encodeToString(md.digest(publicKey.getEncoded()));
+        String fingerprint = WonHasher.hashToString(publicKey.getEncoded());
         for (String signedGraphUri : graphsToSign) {
             // TODO should be generated in a more proper way and not here - check of the
             // name already exists etc.
@@ -90,31 +97,48 @@ public class WonSigner {
             GraphCollection inputGraph = ModelConverter.modelToGraphCollection(signedGraphUri, dataset);
             // sign the NamedGraph inside that GraphCollection
             SignatureData sigValue = signNamedGraph(inputGraph, privateKey, cert);
-            String hash = Base64.getEncoder().encodeToString(sigValue.getHash().toByteArray());
-            WonSignatureData sigRef = new WonSignatureData(signedGraphUri, signatureUri, sigValue.getSignature(), hash,
+            String hash = WonHasher.hashToString(sigValue.getHash());
+            WonSignatureData sigRef = new WonSignatureData(Arrays.asList(signedGraphUri), signatureUri,
+                            sigValue.getSignature(), hash,
                             fingerprint, cert);
             sigRefs.add(sigRef);
         }
         return sigRefs;
     }
 
+    public WonSignatureData signWholeDataset(PrivateKey privateKey, String cert, PublicKey publicKey,
+                    String signatureUri)
+                    throws Exception {
+        String fingerprint = WonHasher.hashToString(publicKey.getEncoded());
+        if (logger.isDebugEnabled()) {
+            StringWriter sw = new StringWriter();
+            RDFDataMgr.write(sw, dataset, Lang.TRIG);
+            logger.debug("signing dataset with content: {}", sw.toString());
+        }
+        List<String> graphURIs = Streams.stream(dataset.listNames()).collect(Collectors.toList());
+        // create GraphCollection with one NamedGraph that corresponds to this Model
+        GraphCollection inputGraphCollection = ModelConverter.fromDataset(dataset);
+        // sign the NamedGraph inside that GraphCollection
+        SignatureData sigValue = sign(hasher.hashNamedGraphForSigning(inputGraphCollection), privateKey, cert);
+        String hash = WonHasher.hashToString(sigValue.getHash());
+        WonSignatureData sigRef = new WonSignatureData(graphURIs, signatureUri, sigValue.getSignature(), hash,
+                        fingerprint, cert);
+        return sigRef;
+    }
+
     public List<WonSignatureData> sign(PrivateKey privateKey, String cert, PublicKey publicKey,
                     Collection<String> graphsToSign) throws Exception {
         String[] array = new String[graphsToSign.size()];
-        return sign(privateKey, cert, publicKey, graphsToSign.toArray(array));
+        return signNamedGraphsSeparately(privateKey, cert, publicKey, graphsToSign.toArray(array));
     }
 
     private de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData signNamedGraph(
                     final GraphCollection inputWithOneNamedGraph, final PrivateKey privateKey, String cert)
                     throws Exception {
-        this.algorithm.canonicalize(inputWithOneNamedGraph);
-        this.algorithm.postCanonicalize(inputWithOneNamedGraph);
-        this.algorithm.hash(inputWithOneNamedGraph, ENV_HASH_ALGORITHM);
-        this.algorithm.postHash(inputWithOneNamedGraph);
-        return sign(inputWithOneNamedGraph, privateKey, cert);
+        return sign(hasher.hashNamedGraphForSigning(inputWithOneNamedGraph), privateKey, cert);
     }
 
-    private SignatureData sign(GraphCollection gc, PrivateKey privateKey, String verificationCertificate)
+    private SignatureData sign(SignatureData sigData, PrivateKey privateKey, String verificationCertificate)
                     throws Exception {
         if (verificationCertificate == null) {
             verificationCertificate = "\"cert\"";
@@ -122,11 +146,9 @@ public class WonSigner {
             verificationCertificate = "<" + verificationCertificate + ">";
         }
         // Signature Data existing?
-        if (!gc.hasSignature()) {
+        if (sigData == null) {
             throw new Exception("GraphCollection has no signature data. Call 'canonicalize' and 'hash' methods first.");
         }
-        // Get Signature Data
-        SignatureData sigData = gc.getSignature();
         // Sign
         Signature sig = Signature.getInstance(SIGNING_ALGORITHM_NAME, SIGNING_ALGORITHM_PROVIDER);
         sig.initSign(privateKey);

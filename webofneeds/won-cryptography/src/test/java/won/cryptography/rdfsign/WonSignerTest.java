@@ -1,16 +1,18 @@
 package won.cryptography.rdfsign;
 
+import java.util.List;
+
 import org.apache.jena.query.Dataset;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import won.cryptography.utils.TestSigningUtils;
 import won.cryptography.utils.TestingKeys;
+import won.protocol.message.WonMessage;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.SFSIG;
-
-import java.util.List;
 
 /**
  * User: ypanchenko Date: 14.07.2014
@@ -38,7 +40,7 @@ public class WonSignerTest {
                         new String[] { ATOM_CORE_DATA_URI });
         // sign it
         WonSigner signer = new WonSigner(testDataset);
-        signer.sign(keys.getPrivateKey(TestSigningUtils.atomCertUri), TestSigningUtils.atomCertUri,
+        signer.signNamedGraphsSeparately(keys.getPrivateKey(TestSigningUtils.atomCertUri), TestSigningUtils.atomCertUri,
                         keys.getPublicKey(TestSigningUtils.atomCertUri), ATOM_CORE_DATA_URI);
         // write for debugging
         // TestSigningUtils.writeToTempFile(testDataset);
@@ -71,7 +73,7 @@ public class WonSignerTest {
                         new String[] { ATOM_CORE_DATA_URI, ATOM_CORE_DATA_SIG_URI, EVENT_ENV1_URI });
         // sign it
         WonSigner signer = new WonSigner(testDataset);
-        signer.sign(keys.getPrivateKey(TestSigningUtils.atomCertUri), TestSigningUtils.atomCertUri,
+        signer.signNamedGraphsSeparately(keys.getPrivateKey(TestSigningUtils.atomCertUri), TestSigningUtils.atomCertUri,
                         keys.getPublicKey(TestSigningUtils.atomCertUri), EVENT_ENV1_URI);
         // write for debugging
         // TestSigningUtils.writeToTempFile(testDataset);
@@ -104,12 +106,12 @@ public class WonSignerTest {
                                         EVENT_ENV2_URI });
         // sign it
         WonSigner signer = new WonSigner(testDataset);
-        signer.sign(keys.getPrivateKey(TestSigningUtils.nodeCertUri), TestSigningUtils.nodeCertUri,
+        signer.signNamedGraphsSeparately(keys.getPrivateKey(TestSigningUtils.nodeCertUri), TestSigningUtils.nodeCertUri,
                         keys.getPublicKey(TestSigningUtils.nodeCertUri), EVENT_ENV2_URI);
         // write for debugging
         TestSigningUtils.writeToTempFile(testDataset);
         // verify
-        WonVerifier verifier = new WonVerifier(testDataset);
+        WonVerifier verifier = new WonVerifier(WonMessage.of(testDataset));
         boolean verified = verifier.verify(keys.getPublicKeys());
         SignatureVerificationState result = verifier.getVerificationResult();
         Assert.assertTrue(result.getMessage(), verified);

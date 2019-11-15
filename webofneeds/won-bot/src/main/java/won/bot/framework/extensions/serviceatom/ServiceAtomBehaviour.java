@@ -100,6 +100,7 @@ public class ServiceAtomBehaviour extends BotBehaviour {
                                 logger.debug("creating BotServiceAtom on won node {} with content: {} ", wonNodeUri,
                                                 RdfUtils.toString(Prefixer.setPrefixes(botServiceDataset)));
                                 WonMessage createAtomMessage = createWonMessage(atomUri, botServiceDataset);
+                                createAtomMessage = ctx.getWonMessageSender().prepareMessage(createAtomMessage);
                                 EventBotActionUtils.rememberInList(ctx, atomUri, uriListName);
                                 EventBus bus = ctx.getEventBus();
                                 EventListener successCallback = event -> {
@@ -123,7 +124,7 @@ public class ServiceAtomBehaviour extends BotBehaviour {
                                                 successCallback, failureCallback, ctx);
                                 logger.debug("registered listeners for response to message URI {}",
                                                 createAtomMessage.getMessageURI());
-                                ctx.getWonMessageSender().sendWonMessage(createAtomMessage);
+                                ctx.getWonMessageSender().sendMessage(createAtomMessage);
                                 logger.debug("BotServiceAtom creation message sent with message URI {}",
                                                 createAtomMessage.getMessageURI());
                             }
@@ -160,19 +161,9 @@ public class ServiceAtomBehaviour extends BotBehaviour {
                                                                                 URI.create(WXHOLD.HolderSocketString),
                                                                                 ctx.getLinkedDataSource())
                                                                 .stream().findFirst();
-                                                URI localWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(
-                                                                ctx.getLinkedDataSource().getDataForResource(
-                                                                                createdAtomUri),
-                                                                createdAtomUri);
-                                                URI remoteWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(
-                                                                ctx.getLinkedDataSource().getDataForResource(
-                                                                                botServiceAtomUri),
-                                                                botServiceAtomUri);
                                                 logger.debug("Connecting atom ({}) - botServiceAtom ({})",
                                                                 createdAtomUri,
                                                                 botServiceAtomUri);
-                                                URI msgURI = ctx.getWonNodeInformationService()
-                                                                .generateEventURI(localWonNode);
                                                 URI senderSocketURI = createdAtomHoldableSocketUri
                                                                 .orElseThrow(() -> new IllegalStateException(
                                                                                 "no suitable socket for connecting on created atom "
@@ -182,13 +173,14 @@ public class ServiceAtomBehaviour extends BotBehaviour {
                                                                                 "no suitable socket for connecting on bot service atom "
                                                                                                 + botServiceAtomUri));
                                                 WonMessage connectToServiceAtomMessage = WonMessageBuilder
-                                                                .connect(msgURI)
+                                                                .connect()
                                                                 .sockets()
                                                                 /**/.sender(senderSocketURI)
                                                                 /**/.recipient(recipientSocketURI)
                                                                 .content().text("Automated Connect to Service Atom")
                                                                 .build();
-                                                ctx.getWonMessageSender().sendWonMessage(connectToServiceAtomMessage);
+                                                ctx.getWonMessageSender()
+                                                                .prepareAndSendMessage(connectToServiceAtomMessage);
                                             } else {
                                                 logger.debug("Atom ({}) does not have a holdable Socket, no connect action required",
                                                                 createdAtomUri);
@@ -235,21 +227,14 @@ public class ServiceAtomBehaviour extends BotBehaviour {
                                                                         URI.create(WXHOLD.HolderSocketString))) {
                                             logger.debug("Accepting connect request from atom ({}) to serviceAtom ({})",
                                                             senderAtomUri, targetAtomUri);
-                                            URI serviceAtomWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(
-                                                            ctx.getLinkedDataSource().getDataForResource(
-                                                                            targetAtomUri),
-                                                            targetAtomUri);
-                                            URI messageURI = ctx
-                                                            .getWonNodeInformationService()
-                                                            .generateEventURI(serviceAtomWonNode);
                                             WonMessage openServiceAtomMessage = WonMessageBuilder
-                                                            .connect(messageURI)
+                                                            .connect()
                                                             .sockets()
                                                             /**/.reactingTo(connectFromOtherAtomEvent.getWonMessage())
                                                             .direction().fromOwner()
                                                             .content().text("Automated Open from Service Atom")
                                                             .build();
-                                            ctx.getWonMessageSender().sendWonMessage(openServiceAtomMessage);
+                                            ctx.getWonMessageSender().prepareAndSendMessage(openServiceAtomMessage);
                                         }
                                     } else {
                                         logger.debug("At least one of the two Atoms is not known, or the targetAtomUri is not the botServiceAtomUri, ignore the connect request");

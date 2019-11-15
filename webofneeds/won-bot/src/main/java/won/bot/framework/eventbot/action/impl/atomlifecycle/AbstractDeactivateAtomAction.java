@@ -12,13 +12,10 @@ package won.bot.framework.eventbot.action.impl.atomlifecycle;
 
 import java.net.URI;
 
-import org.apache.jena.query.Dataset;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
-import won.protocol.util.WonRdfUtils;
 
 /**
  * Base class for actions that deactivates atoms.
@@ -44,13 +41,7 @@ public abstract class AbstractDeactivateAtomAction extends BaseEventBotAction {
      * @return deactivate Atom WonMessage
      */
     protected final WonMessage buildWonMessage(URI atomURI) throws IllegalArgumentException {
-        Dataset atomDataset = getEventListenerContext().getLinkedDataSource().getDataForResource(atomURI);
-        if (atomDataset == null) {
-            throw new IllegalStateException("Cannot deactivate atom " + atomURI + " : retrieved dataset is null");
-        }
-        URI wonNodeUri = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(atomDataset, atomURI);
-        URI eventUri = getEventListenerContext().getWonNodeInformationService().generateEventURI(wonNodeUri);
-        return WonMessageBuilder.deactivate(eventUri)
+        return WonMessageBuilder.deactivate()
                         .direction().fromOwner()
                         .atom(atomURI)
                         .build();

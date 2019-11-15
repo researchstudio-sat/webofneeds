@@ -85,9 +85,10 @@ public class ExecuteCreateAtomCommandAction extends BaseEventBotAction {
         WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         final URI atomURI = wonNodeInformationService.generateAtomURI(wonNodeUri);
         RdfUtils.renameResourceWithPrefix(atomDataset, atomResource.getURI(), atomURI.toString());
-        WonMessage createAtomMessage = createWonMessage(wonNodeInformationService, atomURI, wonNodeUri,
-                        atomDatasetWithSockets, createAtomCommandEvent.isUsedForTesting(),
+        WonMessage createAtomMessage = createWonMessage(atomURI, atomDatasetWithSockets,
+                        createAtomCommandEvent.isUsedForTesting(),
                         createAtomCommandEvent.isDoNotMatch());
+        createAtomMessage = getEventListenerContext().getWonMessageSender().prepareMessage(createAtomMessage);
         // remember the atom URI so we can react to success/failure responses
         EventBotActionUtils.rememberInList(getEventListenerContext(), atomURI, createAtomCommandEvent.getUriListName());
         EventListener successCallback = event12 -> {
@@ -108,12 +109,12 @@ public class ExecuteCreateAtomCommandAction extends BaseEventBotAction {
         EventBotActionUtils.makeAndSubscribeResponseListener(createAtomMessage, successCallback, failureCallback,
                         getEventListenerContext());
         logger.debug("registered listeners for response to message URI {}", createAtomMessage.getMessageURI());
-        getEventListenerContext().getWonMessageSender().sendWonMessage(createAtomMessage);
+        getEventListenerContext().getWonMessageSender().sendMessage(createAtomMessage);
         logger.debug("atom creation message sent with message URI {}", createAtomMessage.getMessageURI());
     }
 
-    private WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI atomURI,
-                    URI wonNodeURI, Dataset atomDataset, final boolean usedForTesting, final boolean doNotMatch)
+    private WonMessage createWonMessage(URI atomURI, Dataset atomDataset,
+                    final boolean usedForTesting, final boolean doNotMatch)
                     throws WonMessageBuilderException {
         RdfUtils.replaceBaseURI(atomDataset, atomURI.toString(), true);
         AtomModelWrapper atomModelWrapper = new AtomModelWrapper(atomDataset);
@@ -125,7 +126,7 @@ public class ExecuteCreateAtomCommandAction extends BaseEventBotAction {
             atomModelWrapper.addFlag(WONMATCH.UsedForTesting);
         }
         return WonMessageBuilder
-                        .createAtom(wonNodeInformationService.generateEventURI(wonNodeURI))
+                        .createAtom()
                         .atom(atomURI)
                         .content().dataset(atomModelWrapper.copyDatasetWithoutSysinfo())
                         .direction().fromOwner()

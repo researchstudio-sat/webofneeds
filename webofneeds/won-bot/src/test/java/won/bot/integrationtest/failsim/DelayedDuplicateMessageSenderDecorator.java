@@ -10,12 +10,15 @@
  */
 package won.bot.integrationtest.failsim;
 
+import java.lang.invoke.MethodHandles;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.bot.framework.eventbot.EventListenerContext;
-import won.protocol.message.sender.WonMessageSender;
 
-import java.lang.invoke.MethodHandles;
+import won.bot.framework.eventbot.EventListenerContext;
+import won.protocol.message.WonMessage;
+import won.protocol.message.sender.WonMessageSender;
+import won.protocol.message.sender.exception.WonMessageSenderException;
 
 /**
  * Decorates the EventListenerContext such that the bot sends each message
@@ -37,14 +40,25 @@ public class DelayedDuplicateMessageSenderDecorator extends BaseEventListenerCon
     @Override
     public WonMessageSender getWonMessageSender() {
         final WonMessageSender delegate = super.getWonMessageSender();
-        return message -> {
-            delegate.sendWonMessage(message);
-            try {
-                Thread.sleep(delay);
-            } catch (InterruptedException e) {
-                logger.warn("caught while waiting the delay time before sending duplicate message", e);
+        return new WonMessageSender() {
+            @Override
+            public void sendMessage(WonMessage message) throws WonMessageSenderException {
+                try {
+                    Thread.sleep(delay);
+                } catch (InterruptedException e) {
+                }
+                delegate.sendMessage(message);
             }
-            delegate.sendWonMessage(message);
+
+            @Override
+            public WonMessage prepareMessage(WonMessage message) throws WonMessageSenderException {
+                return delegate.prepareMessage(message);
+            }
+
+            @Override
+            public void prepareAndSendMessage(WonMessage message) throws WonMessageSenderException {
+                sendMessage(prepareMessage(message));
+            }
         };
     }
 }

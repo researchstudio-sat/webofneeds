@@ -24,6 +24,7 @@ import won.protocol.message.WonMessageType;
 import won.protocol.util.CheapInsecureRandomString;
 import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonMessageUriHelper;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.RDFG;
 import won.protocol.vocabulary.WONMSG;
@@ -65,77 +66,72 @@ public class WonMessageBuilder {
     private List<WonMessage> forwardedMessages;
     private Long timestamp;
 
-    WonMessageBuilder(URI messageURI) {
-        Objects.requireNonNull(messageURI);
-        this.messageURI = messageURI;
+    public WonMessageBuilder() {
+        this.messageURI = WonMessageUriHelper.getSelfUri();
     }
 
-    private WonMessageBuilder() {
-        throw new UnsupportedOperationException("A messageURI must be provided when creating the WonMessageBuilder");
+    public static CloseBuilder close() {
+        return new CloseBuilder(new WonMessageBuilder());
+    }
+
+    public static ConnectionMessageBuilder connectionMessage() {
+        return new ConnectionMessageBuilder(new WonMessageBuilder());
+    }
+
+    public static ConnectBuilder connect() {
+        return new ConnectBuilder(new WonMessageBuilder());
+    }
+
+    public static ResponseBuilder response() {
+        return new ResponseBuilder(new WonMessageBuilder());
+    }
+
+    public static CreateAtomBuilder createAtom() {
+        return new CreateAtomBuilder(new WonMessageBuilder());
+    }
+
+    public static ReplaceBuilder replace() {
+        return new ReplaceBuilder(new WonMessageBuilder());
+    }
+
+    public static DeactivateBuilder deactivate() {
+        return new DeactivateBuilder(new WonMessageBuilder());
+    }
+
+    public static ActivateBuilder activate() {
+        return new ActivateBuilder(new WonMessageBuilder());
+    }
+
+    public static AtomMessageBuilder atomMessage() {
+        return new AtomMessageBuilder(new WonMessageBuilder());
+    }
+
+    public static AtomCreatedNotificationBuilder atomCreatedNotification() {
+        return new AtomCreatedNotificationBuilder(new WonMessageBuilder());
+    }
+
+    public static HintFeedbackMessageBuilder hintFeedbackMessage() {
+        return new HintFeedbackMessageBuilder(new WonMessageBuilder());
+    }
+
+    public static DeleteBuilder delete() {
+        return new DeleteBuilder(new WonMessageBuilder());
+    }
+
+    public static ChangeNotificationBuilder changeNotificatin() {
+        return new ChangeNotificationBuilder(new WonMessageBuilder());
+    }
+
+    public static AtomHintBuilder atomHint() {
+        return new AtomHintBuilder(new WonMessageBuilder());
+    }
+
+    public static SocketHintBuilder socketHint() {
+        return new SocketHintBuilder(new WonMessageBuilder());
     }
 
     WonMessage build() throws WonMessageBuilderException {
         return build(DatasetFactory.createGeneral());
-    }
-
-    public static CloseBuilder close(URI messageURI) {
-        return new CloseBuilder(new WonMessageBuilder(messageURI));
-    }
-
-    public static ConnectionMessageBuilder connectionMessage(URI messageURI) {
-        return new ConnectionMessageBuilder(new WonMessageBuilder(messageURI));
-    }
-
-    public static ConnectBuilder connect(URI messageURI) {
-        return new ConnectBuilder(new WonMessageBuilder(messageURI));
-    }
-
-    public static ResponseBuilder response(URI messageURI) {
-        return new ResponseBuilder(new WonMessageBuilder(messageURI));
-    }
-
-    public static CreateAtomBuilder createAtom(URI messageURI) {
-        return new CreateAtomBuilder(new WonMessageBuilder(messageURI));
-    }
-
-    public static ReplaceBuilder replace(URI messageURI) {
-        return new ReplaceBuilder(new WonMessageBuilder(messageURI));
-    }
-
-    public static DeactivateBuilder deactivate(URI messageURI) {
-        return new DeactivateBuilder(new WonMessageBuilder(messageURI));
-    }
-
-    public static ActivateBuilder activate(URI messageURI) {
-        return new ActivateBuilder(new WonMessageBuilder(messageURI));
-    }
-
-    public static AtomMessageBuilder atomMessage(URI messageURI) {
-        return new AtomMessageBuilder(new WonMessageBuilder(messageURI));
-    }
-
-    public static AtomCreatedNotificationBuilder atomCreatedNotification(URI messageURI) {
-        return new AtomCreatedNotificationBuilder(new WonMessageBuilder(messageURI));
-    }
-
-    public static HintFeedbackMessageBuilder hintFeedbackMessage(URI messageURI) {
-        return new HintFeedbackMessageBuilder(new WonMessageBuilder());
-    }
-
-    public static DeleteBuilder delete(URI messageURI) {
-        return new DeleteBuilder(new WonMessageBuilder(messageURI));
-    }
-
-    public static ChangeNotificationBuilder changeNotificatin(URI messageURI) {
-        return new ChangeNotificationBuilder(new WonMessageBuilder(messageURI));
-    }
-
-    public static AtomHintBuilder atomHint(URI messageURI) {
-        return new AtomHintBuilder(new WonMessageBuilder(messageURI));
-    }
-
-    public static SocketHintBuilder socketHint(URI messageURI) {
-        return new SocketHintBuilder(new WonMessageBuilder(messageURI));
     }
 
     /**

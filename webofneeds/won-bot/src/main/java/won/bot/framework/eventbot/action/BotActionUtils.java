@@ -57,9 +57,8 @@ public class BotActionUtils {
         URI socketURI = WonRdfUtils.ConnectionUtils.getSocketURIFromConnection(connectionRDF, connectionURI);
         URI targetSocketURI = WonRdfUtils.ConnectionUtils.getTargetSocketURIFromConnection(connectionRDF,
                         connectionURI);
-        URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
         return WonMessageBuilder
-                        .connectionMessage(messageURI)
+                        .connectionMessage()
                         .sockets().sender(socketURI).recipient(targetSocketURI)
                         .content().text(message)
                         .build();

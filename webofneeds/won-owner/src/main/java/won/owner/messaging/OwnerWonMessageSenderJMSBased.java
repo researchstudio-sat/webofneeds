@@ -25,10 +25,12 @@ import org.springframework.context.ApplicationListener;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
+import won.protocol.message.WonMessageUtils;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.impl.KeyForNewAtomAddingProcessor;
 import won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor;
 import won.protocol.message.sender.WonMessageSender;
+import won.protocol.message.sender.exception.WonMessageSenderException;
 import won.protocol.model.WonNode;
 import won.protocol.repository.WonNodeRepository;
 import won.protocol.util.LoggingUtils;
@@ -54,13 +56,37 @@ public class OwnerWonMessageSenderJMSBased implements ApplicationListener<WonNod
     @Autowired
     private KeyForNewAtomAddingProcessor atomKeyGeneratorAndAdder;
 
-    public void sendWonMessage(WonMessage wonMessage) {
+    @Override
+    public void prepareAndSendMessage(WonMessage message) throws WonMessageSenderException {
+        sendMessage(prepareMessage(message));
+    }
+
+    @Override
+    public WonMessage prepareMessage(WonMessage message) throws WonMessageSenderException {
         try {
-            // TODO check if there is a better place for applying signing logic
-            wonMessage = doSigningOnOwner(wonMessage);
+            return doSigningOnOwner(message);
+        } catch (Exception e) {
+            throw new WonMessageSenderException("Could not sign message or calculate its URI", e);
+        }
+    }
+
+    /**
+     * Signs the message, calculates its messageURI based on content and sends it.
+     * 
+     * @param message
+     * @return the updated, final message.
+     * @throws WonMessageSenderException
+     */
+    public void sendMessage(WonMessage wonMessage) {
+        try {
             if (logger.isDebugEnabled()) {
                 logger.debug("sending this message: {}",
                                 RdfUtils.writeDatasetToString(wonMessage.getCompleteDataset(), Lang.TRIG));
+            }
+            URI msgUri = wonMessage.getMessageURIRequired();
+            if (!WonMessageUtils.isValidMessageUri(msgUri)) {
+                throw new WonMessageSenderException(
+                                "Not a valid message uri: " + msgUri + ". Did you call prepareMessage(message) first?");
             }
             // ToDo (FS): change it to won node URI and create method in the MessageEvent
             // class
@@ -108,7 +134,7 @@ public class OwnerWonMessageSenderJMSBased implements ApplicationListener<WonNod
         // add public key of the newly created atom
         WonMessage outMessage = atomKeyGeneratorAndAdder.process(wonMessage);
         // add signature:
-        return signatureAddingProcessor.processOnBehalfOfAtom(outMessage);
+        return signatureAddingProcessor.signWithAtomKey(outMessage);
     }
 
     /**

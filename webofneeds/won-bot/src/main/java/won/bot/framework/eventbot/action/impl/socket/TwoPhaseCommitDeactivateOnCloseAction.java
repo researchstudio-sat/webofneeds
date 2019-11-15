@@ -12,7 +12,6 @@ package won.bot.framework.eventbot.action.impl.socket;
 
 import java.net.URI;
 
-import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.NodeIterator;
 
 import won.bot.framework.eventbot.EventListenerContext;
@@ -22,12 +21,9 @@ import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomDeactivatedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.CloseFromOtherAtomEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.node.socket.impl.WON_TX;
-import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
-import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.RdfUtils;
-import won.protocol.util.WonRdfUtils;
 
 /**
  * Expects a CloseFromOtherAtom event from a and closes the local atom. If the
@@ -52,20 +48,12 @@ public class TwoPhaseCommitDeactivateOnCloseAction extends BaseEventBotAction {
             String coordinationMessageUri = ni.toList().get(0).asResource().getURI();
             assert coordinationMessageUri.equals(WON_TX.COORDINATION_MESSAGE_COMMIT.getURI()) : "expected a "
                             + "Commit message";
-            getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(atomURI));
+            getEventListenerContext().getWonMessageSender().prepareAndSendMessage(WonMessageBuilder
+                            .deactivate()
+                            .direction().fromOwner()
+                            .atom(atomURI)
+                            .build());
             getEventListenerContext().getEventBus().publish(new AtomDeactivatedEvent(atomURI));
         }
-    }
-
-    private WonMessage createWonMessage(URI atomURI) throws WonMessageBuilderException {
-        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
-        Dataset ds = getEventListenerContext().getLinkedDataSource().getDataForResource(atomURI);
-        URI localWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(ds, atomURI);
-        URI messageURI = wonNodeInformationService.generateEventURI(localWonNode);
-        return WonMessageBuilder
-                        .deactivate(messageURI)
-                        .direction().fromOwner()
-                        .atom(atomURI)
-                        .build();
     }
 }

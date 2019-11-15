@@ -3,7 +3,6 @@ package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 import java.net.URI;
 import java.util.Set;
 
-import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 
 import won.bot.framework.eventbot.EventListenerContext;
@@ -19,9 +18,8 @@ import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.ConnectionMessageBuilder;
 import won.protocol.message.builder.WonMessageBuilder;
-import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.RdfUtils;
-import won.protocol.util.WonRdfUtils;
+import won.protocol.util.WonMessageUriHelper;
 
 /**
  * Action executing a ConnectionMessageCommandEvent, creating a connection
@@ -67,15 +65,9 @@ public class ExecuteConnectionMessageCommandAction
     @Override
     protected WonMessage createWonMessage(ConnectionMessageCommandEvent messageCommandEvent)
                     throws WonMessageBuilderException {
-        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         Model localMessageModel = RdfUtils.cloneModel(messageCommandEvent.getMessageModel());
-        Dataset connectionRDF = getEventListenerContext().getLinkedDataSource()
-                        .getDataForResource(messageCommandEvent.getConnectionURI());
-        URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF,
-                        messageCommandEvent.getConnectionURI());
-        URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
-        RdfUtils.replaceBaseURI(localMessageModel, messageURI.toString());
-        ConnectionMessageBuilder wmb = WonMessageBuilder.connectionMessage(messageURI)
+        RdfUtils.replaceBaseURI(localMessageModel, WonMessageUriHelper.getSelfUri().toString());
+        ConnectionMessageBuilder wmb = WonMessageBuilder.connectionMessage()
                         .sockets()
                         /**/.sender(messageCommandEvent.getCon().getSocketURI())
                         /**/.recipient(messageCommandEvent.getCon().getTargetSocketURI())

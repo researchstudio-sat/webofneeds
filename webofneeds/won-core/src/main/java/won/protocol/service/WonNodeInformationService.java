@@ -27,23 +27,6 @@ public interface WonNodeInformationService {
     Optional<WonNodeInfo> getWonNodeInformationForURI(URI someURI, Optional<URI> requesterWebID);
 
     /**
-     * Generates a random event URI according to the URI pattern of the default won
-     * node.
-     *
-     * @return
-     */
-    URI generateEventURI();
-
-    /**
-     * Generates a random event URI according to the URI pattern of the specified
-     * won node.
-     *
-     * @param wonNodeURI
-     * @return
-     */
-    URI generateEventURI(URI wonNodeURI);
-
-    /**
      * Checks if the passed event URI is matching the won node default pattern
      * 
      * @param eventURI

@@ -349,11 +349,21 @@ public abstract class EventBot extends ScheduledTriggerBot {
         }
 
         @Override
-        public void sendWonMessage(final WonMessage message) throws WonMessageSenderException {
+        public void prepareAndSendMessage(WonMessage message) throws WonMessageSenderException {
+            sendMessage(prepareMessage(message));
+        }
+
+        @Override
+        public WonMessage prepareMessage(WonMessage message) throws WonMessageSenderException {
+            return delegate.prepareMessage(message);
+        }
+
+        @Override
+        public void sendMessage(final WonMessage message) throws WonMessageSenderException {
             if (logger.isDebugEnabled()) {
                 logger.debug("sending message " + message.toStringForDebug(true));
             }
-            delegate.sendWonMessage(message);
+            delegate.sendMessage(message);
             // publish the WonMessageSent event if no exception was raised
             WonMessageType type = message.getMessageType();
             Event event;

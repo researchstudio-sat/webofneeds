@@ -19,6 +19,13 @@ public class WONMSG {
      * e.g. wm:/1234
      */
     public static final String MESSAGE_URI_PREFIX = "wm:/";
+    /**
+     * URI used as message URI when creating a message, before its permanent URI is
+     * calculated. Likewise, this URI is used for verifying message
+     * signatures/contents: before verification, its permanent message URI is
+     * replaced with this one.
+     */
+    public static final String MESSAGE_SELF = "wm:/SELF";
     public static final String BASE_URI = "https://w3id.org/won/message#";
     public static final String DEFAULT_PREFIX = "msg";
     private static Model m = ModelFactory.createDefaultModel();
