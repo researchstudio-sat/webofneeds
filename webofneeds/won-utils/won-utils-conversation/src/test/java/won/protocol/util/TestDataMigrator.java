@@ -24,7 +24,6 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.rdf.model.impl.StatementImpl;
-import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.core.Quad;
 import org.slf4j.Logger;
@@ -32,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 import won.protocol.util.RdfUtils.Pair;
+import won.protocol.util.pretty.Lang_WON;
 import won.protocol.vocabulary.WONMSG;
 
 public class TestDataMigrator {
@@ -196,7 +196,7 @@ public class TestDataMigrator {
         ds = Stream.concat(RdfUtils.toQuadStream(ds), moveddata.stream()).collect(RdfUtils.collectToDataset());
         ds = removeMessages(ds, listFromExternalMsgs.apply(ds).stream().collect(Collectors.toSet()));
         logger.debug("writing rsult to {}", outFile);
-        RDFDataMgr.write(new FileOutputStream(outFile), Prefixer.setPrefixes(ds), Lang.TRIG);
+        RDFDataMgr.write(new FileOutputStream(outFile), Prefixer.setPrefixes(ds), Lang_WON.TRIG_WON_CONVERSATION);
         // RDFDataMgr.write(System.out, ds, Lang.TRIG);
     }
 

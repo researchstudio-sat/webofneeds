@@ -17,8 +17,8 @@ import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFWriterRegistry;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.vocabulary.DC;
@@ -32,6 +32,8 @@ import org.springframework.util.StopWatch;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
+import won.protocol.util.pretty.ConversationDatasetWriterFactory;
+import won.protocol.util.pretty.Lang_WON;
 import won.protocol.vocabulary.CERT;
 import won.protocol.vocabulary.SCHEMA;
 import won.protocol.vocabulary.SFSIG;
@@ -54,6 +56,10 @@ import won.protocol.vocabulary.WXREVIEW;
  */
 public class Prefixer {
     private static final Pattern PREFIX_PATTERN = Pattern.compile("[^/#]+$");
+    static {
+        RDFWriterRegistry.register(Lang_WON.TRIG_WON_CONVERSATION,
+                        new ConversationDatasetWriterFactory());
+    }
 
     private static Dataset loadDatasetFromFile(String file) {
         try {
@@ -199,6 +205,6 @@ public class Prefixer {
         String filename = args[0];
         Dataset ds = Prefixer.loadDatasetFromFile(filename);
         ds = Prefixer.setPrefixes(ds);
-        RDFDataMgr.write(System.out, ds, Lang.TRIG);
+        RDFDataMgr.write(System.out, ds, Lang_WON.TRIG_WON_CONVERSATION);
     }
 }
