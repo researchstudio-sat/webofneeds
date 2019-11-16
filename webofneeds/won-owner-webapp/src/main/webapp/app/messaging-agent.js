@@ -478,7 +478,23 @@ export function runMessagingAgent(redux) {
               return;
             }
             const [eventUri, msg] = firstEntry;
-            ws.send(JSON.stringify(msg));
+            // send message via POST this call returns
+            // the message URI (which now has to be 'wm:/SELF')
+            fetch("/owner/rest/messages/send", {
+              body: JSON.stringify(msg),
+              method: "POST",
+              headers: new Headers({
+                "Content-Type": "application/ld+json",
+              }),
+              credentials: "include",
+            });
+            //
+            //
+            // TODO: process the result of the call
+            //
+            // replaced this call:
+            // ws.send(JSON.stringify(msg));
+            //
             // move message to next stat ("waitingForAnswer"). Also triggers this watch again as a result.
             redux.dispatch(
               actionCreators.messages__waitingForAnswer({ eventUri, msg })

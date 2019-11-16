@@ -71,14 +71,13 @@ import won from "./won.js";
       {
         "@id": args.msgUri,
         "@type": "msg:FromOwner",
-        "msg:sentTimestamp": new Date().getTime(),
+        "msg:protocolVersion": "1.0",
+        "msg:timestamp": new Date().getTime(),
         "msg:messageType": { "@id": args.msgType },
         "msg:content": nonEnvelopeGraphIds.map(function(graphId) {
           return { "@id": graphId };
         }),
-        "msg:recipientNode": { "@id": args.recipientNode },
-        "msg:senderNode": { "@id": args.senderNode },
-        "msg:senderAtom": { "@id": args.publishedContentUri },
+        "msg:atom": { "@id": args.publishedContentUri },
         "msg:hasAttachment": attachmentBlankNodes.map(function(n) {
           return { "@id": n["@id"] };
         }),

@@ -149,7 +149,7 @@ public class ServerSideActionService implements WonMessageProcessor {
                         .build();
         try {
             AuthenticationThreadLocal.setAuthentication(authentication);
-            ownerApplicationService.sendMessage(msgToSend);
+            ownerApplicationService.prepareAndSendMessage(msgToSend);
         } finally {
             // be sure to remove the principal from the threadlocal
             AuthenticationThreadLocal.remove();

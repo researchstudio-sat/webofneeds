@@ -38,7 +38,10 @@ public enum RestStatusResponse {
     EXPORT_NOT_VERIFIED(7403, "You need a verified account to export your data", HttpStatus.BAD_REQUEST),
     RECOVERY_KEYGEN_USER_NOT_FOUND(8100, "Could not generate recovery key: user not found", HttpStatus.BAD_REQUEST),
     RECOVERY_KEYGEN_WRONG_PASSWORD(8101, "Could not generate recovery key: wrong password", HttpStatus.BAD_REQUEST),
-    SUBSCRIBE_SUCCESS(8200, "Successfully subscribed to push notifications", HttpStatus.OK);
+    SUBSCRIBE_SUCCESS(8200, "Successfully subscribed to push notifications", HttpStatus.OK),
+    ERROR_SENDING_MESSAGE_TO_NODE(9000, "Error sending WoN message to node", HttpStatus.INTERNAL_SERVER_ERROR),
+    ERROR_PREPARING_MESSAGE(9000, "Error signing and sealing WoN message", HttpStatus.INTERNAL_SERVER_ERROR),
+    ERROR_PARSING_MESSAGE(9000, "Error parsing WoN message", HttpStatus.INTERNAL_SERVER_ERROR);
     private final int code;
     private final String message;
     private final HttpStatus httpStatus;

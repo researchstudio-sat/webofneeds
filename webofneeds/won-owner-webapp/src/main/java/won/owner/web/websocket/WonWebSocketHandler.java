@@ -21,8 +21,6 @@ import java.security.Principal;
 import java.text.MessageFormat;
 import java.time.Duration;
 import java.util.Base64;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -51,7 +49,6 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import won.owner.model.User;
 import won.owner.model.UserAtom;
-import won.owner.repository.UserAtomRepository;
 import won.owner.repository.UserRepository;
 import won.owner.service.impl.KeystoreEnabledUserDetails;
 import won.owner.service.impl.OwnerApplicationService;
@@ -59,13 +56,13 @@ import won.owner.service.impl.URIService;
 import won.owner.web.WonOwnerMailSender;
 import won.owner.web.WonOwnerPushSender;
 import won.owner.web.service.ServerSideActionService;
+import won.owner.web.service.UserAtomService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDecoder;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
-import won.protocol.model.AtomState;
 import won.protocol.model.ConnectionState;
 import won.protocol.util.AuthenticationThreadLocal;
 import won.protocol.util.LoggingUtils;
@@ -89,7 +86,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private UserAtomRepository userAtomRepository;
+    private UserAtomService userAtomService;
     @Autowired
     SessionRepository sessionRepository;
     @Autowired
@@ -232,10 +229,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                 // TODO: Set in STATE "inDeletion" and delete after it's deleted in the node
                 // (receiving success response for delete msg)
                 try {
-                    // Get the atom from owner application db
-                    UserAtom userAtom = userAtomRepository.findByAtomUri(atomUri);
-                    userAtom.setState(AtomState.DELETED);
-                    userAtomRepository.save(userAtom);
+                    userAtomService.setAtomDeleted(atomUri);
                     /*
                      * //Get the user from owner application db user =
                      * userRepository.findOne(user.getId()); //Delete atom in users atom list and
@@ -297,9 +291,9 @@ public class WonWebSocketHandler extends TextWebSocketHandler
             }
             User user = userOpt.orElse(null); // it's quite possible that we don't find the user object this way.
                                               // Methods below can handle that.
-            updateUserAtomAssociation(wonMessage, user);
+            userAtomService.updateUserAtomAssociation(wonMessage, user);
             notifyPerPush(user, atomUri, wonMessage);
-            webSocketSessions = findWebSocketSessionsForAtomAndUser(atomUri, user);
+            webSocketSessions = webSocketSessionService.findWebSocketSessionsForAtomAndUser(atomUri, user);
             // check if we can deliver the message. If not, send email.
             if (webSocketSessions.size() == 0) {
                 if (logger.isDebugEnabled()) {
@@ -545,50 +539,14 @@ public class WonWebSocketHandler extends TextWebSocketHandler
         return ConnectionState.SUGGESTED.equals(ConnectionState.fromURI(state));
     }
 
-    private Set<WebSocketSession> findWebSocketSessionsForAtomAndUser(URI atomUri, User user) {
-        Set<WebSocketSession> webSocketSessions = webSocketSessionService.getWebSocketSessions(atomUri);
-        if (webSocketSessions == null)
-            webSocketSessions = new HashSet();
-        logger.debug("found {} sessions for atom uri {}, now removing closed sessions", webSocketSessions.size(),
-                        atomUri);
-        removeClosedSessions(webSocketSessions, atomUri);
-        if (user != null) {
-            Set<WebSocketSession> userSessions = webSocketSessionService.getWebSocketSessions(user);
-            if (userSessions == null)
-                userSessions = new HashSet();
-            logger.debug("found {} sessions for user {}, now removing closed sessions", userSessions.size(),
-                            user.getId());
-            removeClosedSessions(userSessions, user);
-            webSocketSessions.addAll(userSessions);
-        }
-        return webSocketSessions;
-    }
-
-    private void removeClosedSessions(final Set<WebSocketSession> webSocketSessions, final URI atomUri) {
-        for (Iterator<WebSocketSession> it = webSocketSessions.iterator(); it.hasNext();) {
-            WebSocketSession session = it.next();
-            if (!session.isOpen()) {
-                logger.debug("removing closed websocket session {} of atom {}", session.getId(), atomUri);
-                webSocketSessionService.removeMapping(atomUri, session);
-                it.remove();
-            }
-        }
-    }
-
-    private void removeClosedSessions(final Set<WebSocketSession> webSocketSessions, final User user) {
-        for (Iterator<WebSocketSession> it = webSocketSessions.iterator(); it.hasNext();) {
-            WebSocketSession session = it.next();
-            if (!session.isOpen()) {
-                logger.debug("removing closed websocket session {} of user {}", session.getId(), user.getId());
-                webSocketSessionService.removeMapping(user, session);
-                it.remove();
-            }
-        }
-    }
-
     private User getUserForWonMessage(final WonMessage wonMessage) {
         URI atomUri = getOwnedAtomURI(wonMessage);
         return userRepository.findByAtomUri(atomUri);
+    }
+
+    private URI getOwnedAtomURI(WonMessage message) {
+        return message.getEnvelopeType() == WonMessageDirection.FROM_SYSTEM ? message.getSenderAtomURI()
+                        : message.getRecipientAtomURI();
     }
 
     private UserAtom getAtomOfUser(final User user, final URI atomUri) {
@@ -598,43 +556,6 @@ public class WonWebSocketHandler extends TextWebSocketHandler
             }
         }
         return null;
-    }
-
-    private void updateUserAtomAssociation(WonMessage wonMessage, User user) {
-        URI atomUri = getOwnedAtomURI(wonMessage);
-        Long userId = user != null ? user.getId() : null;
-        WonMessage focalMessage = wonMessage.getFocalMessage();
-        if (focalMessage.getMessageType() == WonMessageType.SUCCESS_RESPONSE) {
-            switch (focalMessage.getRespondingToMessageType()) {
-                case CREATE_ATOM:
-                    try {
-                        saveAtomUriWithUser(focalMessage, user);
-                    } catch (Exception e) {
-                        logger.warn("could not associate atom " + atomUri + " with user " + userId, e);
-                    }
-                    break;
-                case DEACTIVATE:
-                    try {
-                        deactivateAtomUri(focalMessage);
-                    } catch (Exception e) {
-                        logger.warn("could not deactivate atom " + atomUri + " of user " + userId, e);
-                    }
-                    break;
-                case ACTIVATE:
-                    try {
-                        activateAtomUri(focalMessage);
-                    } catch (Exception e) {
-                        logger.warn("could not activate atom " + atomUri + " of user " + userId, e);
-                    }
-                    break;
-                case DELETE:
-                    try {
-                        deleteUserAtom(focalMessage, user);
-                    } catch (Exception e) {
-                        logger.warn("could not delete atom " + atomUri + " of user " + userId, e);
-                    }
-            }
-        }
     }
 
     /**
@@ -674,52 +595,6 @@ public class WonWebSocketHandler extends TextWebSocketHandler
         return true;
     }
 
-    private void saveAtomUriWithUser(final WonMessage wonMessage, User user) {
-        URI atomUri = getOwnedAtomURI(wonMessage);
-        logger.debug("adding atom {} to atoms of user {}", atomUri, user.getId());
-        UserAtom userAtom = new UserAtom(atomUri);
-        // reload the user so we can save it
-        // (the user object we get from getUserForSession is detached)
-        user = userRepository.findOne(user.getId());
-        userAtom = userAtomRepository.save(userAtom);
-        logger.debug("saved user atom {}", userAtom.getId());
-        user.addUserAtom(userAtom);
-        userRepository.save(user);
-        logger.debug("atom {} added to atoms of user {}", userAtom.getId(), user.getId());
-    }
-
-    private void deactivateAtomUri(final WonMessage wonMessage) {
-        updateAtomUriState(wonMessage, AtomState.INACTIVE);
-    }
-
-    private void activateAtomUri(final WonMessage wonMessage) {
-        updateAtomUriState(wonMessage, AtomState.ACTIVE);
-    }
-
-    private void updateAtomUriState(final WonMessage wonMessage, AtomState newState) {
-        URI atomUri = getOwnedAtomURI(wonMessage);
-        UserAtom userAtom = userAtomRepository.findByAtomUri(atomUri);
-        userAtom.setState(newState);
-        // reload the user so we can save it
-        // (the user object we get from getUserForSession is detached)
-        userAtomRepository.save(userAtom);
-    }
-
-    private void deleteUserAtom(final WonMessage wonMessage, User user) {
-        URI atomUri = getOwnedAtomURI(wonMessage);
-        // Get the atom from owner application db
-        UserAtom userAtom = userAtomRepository.findByAtomUri(atomUri);
-        if (userAtom.getState() == AtomState.DELETED) {
-            // Delete atom in users atom list and save changes
-            user.removeUserAtom(userAtom);
-            userRepository.save(user);
-            // Delete atom in atom repository
-            userAtomRepository.delete(userAtom.getId());
-        } else {
-            throw new IllegalStateException("atom not in state deleted");
-        }
-    }
-
     private User getUserForSession(final WebSocketSession session) {
         if (session == null) {
             return null;
@@ -745,10 +620,5 @@ public class WonWebSocketHandler extends TextWebSocketHandler
 
     public void setServerSideActionService(ServerSideActionService serverSideActionService) {
         this.serverSideActionService = serverSideActionService;
-    }
-
-    private URI getOwnedAtomURI(WonMessage message) {
-        return message.getEnvelopeType() == WonMessageDirection.FROM_SYSTEM ? message.getSenderAtomURI()
-                        : message.getRecipientAtomURI();
     }
 }

@@ -37,8 +37,7 @@ export function buildRateMessage(
   return new Promise(resolve => {
     const buildMessage = function(envelopeData) {
       //TODO: use event URI pattern specified by WoN node
-      const eventUri =
-        "wm:/" + wonUtils.getRandomWonId();
+      const eventUri = "wm:/" + wonUtils.getRandomWonId();
       const message = new won.MessageBuilder(won.WONMSG.feedbackMessage) //TODO: Looks like a copy-paste-leftover from connect
         .eventURI(eventUri)
         .ownerDirection()
@@ -78,8 +77,7 @@ export function buildCloseMessage(
 ) {
   const buildMessage = function(envelopeData) {
     //TODO: use event URI pattern specified by WoN node
-    const eventUri =
-      "wm:/" + wonUtils.getRandomWonId();
+    const eventUri = "wm:/" + wonUtils.getRandomWonId();
     const message = new won.MessageBuilder(won.WONMSG.closeMessage)
       .eventURI(eventUri)
       .forEnvelopeData(envelopeData)
@@ -110,9 +108,7 @@ export function buildCloseMessage(
 }
 export function buildCloseAtomMessage(atomUri, wonNodeUri) {
   const buildMessage = function(envelopeData) {
-    const eventUri =
-      "wm:/" +
-      wonUtils.getRandomWonId();
+    const eventUri = "wm:/" + wonUtils.getRandomWonId();
     const message = new won.MessageBuilder(won.WONMSG.closeAtomMessage)
       .eventURI(eventUri)
       .recipientNode(wonNodeUri)
@@ -134,9 +130,7 @@ export function buildCloseAtomMessage(atomUri, wonNodeUri) {
 
 export function buildDeleteAtomMessage(atomUri, wonNodeUri) {
   const buildMessage = function(envelopeData) {
-    const eventUri =
-      "wm:/" +
-      wonUtils.getRandomWonId();
+    const eventUri = "wm:/" + wonUtils.getRandomWonId();
     const message = new won.MessageBuilder(won.WONMSG.deleteAtomMessage)
       .eventURI(eventUri)
       .recipientNode(wonNodeUri)
@@ -158,9 +152,7 @@ export function buildDeleteAtomMessage(atomUri, wonNodeUri) {
 
 export function buildOpenAtomMessage(atomUri, wonNodeUri) {
   const buildMessage = function(envelopeData) {
-    const eventUri =
-      "wm:/" +
-      wonUtils.getRandomWonId();
+    const eventUri = "wm:/" + wonUtils.getRandomWonId();
     const message = new won.MessageBuilder(won.WONMSG.activateAtomMessage)
       .eventURI(eventUri)
       .recipientNode(wonNodeUri)
@@ -212,8 +204,7 @@ export function buildConnectMessage({
     envelopeData[won.WONMSG.recipientSocket] = targetSocketUri;
   }
   //TODO: use event URI pattern specified by WoN node
-  const eventUri =
-    "wm:/" + wonUtils.getRandomWonId();
+  const eventUri = "wm:/" + wonUtils.getRandomWonId();
   const messageBuilder = new won.MessageBuilder(won.WONMSG.connectMessage);
   messageBuilder.eventURI(eventUri);
   messageBuilder.forEnvelopeData(envelopeData);
@@ -257,9 +248,7 @@ export function buildChatMessage({
 
   const messageP = Promise.all([envelopeDataP, jsonldGraphPayloadP]).then(
     ([envelopeData, graphPayload]) => {
-      const eventUri =
-        "wm:/" +
-        wonUtils.getRandomWonId();
+      const eventUri = "wm:/" + wonUtils.getRandomWonId();
 
       /*
              * Build the json-ld message that's signed on the owner-server
@@ -408,9 +397,7 @@ export function buildOpenMessage(
     )
     .then(envelopeData => {
       //TODO: use event URI pattern specified by WoN node
-      const eventUri =
-        "wm:/" +
-        wonUtils.getRandomWonId();
+      const eventUri = "wm:/" + wonUtils.getRandomWonId();
       const message = new won.MessageBuilder(won.WONMSG.openMessage)
         .eventURI(eventUri)
         .forEnvelopeData(envelopeData)
@@ -522,10 +509,9 @@ export async function buildCreateMessage(atomData, wonNodeUri) {
     socket: atomData.socket,
   });
 
-  const msgUri = "wm:/" + wonUtils.getRandomWonId(); //mandatory
+  const msgUri = "wm:/SELF"; //mandatory
   const msgJson = won.buildMessageRdf(contentRdf, {
-    recipientNode: wonNodeUri, //mandatory
-    senderNode: wonNodeUri, //mandatory
+    atom: publishedContentUri, //mandatory
     msgType: won.WONMSG.createMessage, //mandatory
     publishedContentUri: publishedContentUri, //mandatory
     msgUri: msgUri,
