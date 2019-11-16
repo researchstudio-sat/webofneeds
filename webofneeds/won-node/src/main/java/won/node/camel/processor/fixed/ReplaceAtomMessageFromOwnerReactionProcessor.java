@@ -55,9 +55,8 @@ public class ReplaceAtomMessageFromOwnerReactionProcessor extends AbstractCamelP
 
     private void sendChangeNotificationMessage(final Atom atom, final Connection con) {
         // send message from system via connection
-        URI messageURI = wonNodeInformationService.generateEventURI();
         WonMessage message = WonMessageBuilder
-                        .changeNotificatin(messageURI)
+                        .changeNotificatin()
                         .direction().fromSystem()
                         .sockets()
                         /**/.sender(con.getSocketURI())

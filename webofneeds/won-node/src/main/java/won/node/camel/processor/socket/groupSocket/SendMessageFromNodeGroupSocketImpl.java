@@ -83,12 +83,10 @@ public class SendMessageFromNodeGroupSocketImpl extends AbstractCamelProcessor {
                                                         wonMessage.getRecipientAtomURI(),
                                                         conToSendTo.getTargetAtomURI() });
                     }
-                    URI forwardedMessageURI = wonNodeInformationService
-                                    .generateEventURI(wonMessage.getRecipientNodeURI());
                     URI remoteWonNodeUri = WonLinkedDataUtils.getWonNodeURIForAtomOrConnectionURI(
                                     conToSendTo.getTargetConnectionURI(), linkedDataSource);
                     WonMessage newWonMessage = WonMessageBuilder
-                                    .connectionMessage(forwardedMessageURI)
+                                    .connectionMessage()
                                     .direction()
                                     /**/.fromSystem()
                                     .forward(wonMessage)

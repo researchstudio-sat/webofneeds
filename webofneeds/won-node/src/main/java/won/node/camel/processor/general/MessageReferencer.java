@@ -31,7 +31,6 @@ import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.WonSignatureData;
-import won.protocol.message.processor.impl.WonMessageSignerVerifier;
 import won.protocol.model.DatasetHolder;
 import won.protocol.model.MessageEvent;
 import won.protocol.repository.AtomMessageContainerRepository;
@@ -220,7 +219,6 @@ public class MessageReferencer {
         WonSignatureData wonSignatureData = signingStage.getOutermostSignature();
         checkWellformedness(messageURI, msgToLinkTo, wonSignatureData);
         // add them to to outermost envelope in the current message
-        WonMessageSignerVerifier.addSignature(wonSignatureData, outerEnvelopeGraphURI.toString(), messageDataset, true);
         if (logger.isDebugEnabled()) {
             logger.debug("adding reference to message {} into message {} ", msgToLinkTo.getMessageURI(), messageURI);
         }

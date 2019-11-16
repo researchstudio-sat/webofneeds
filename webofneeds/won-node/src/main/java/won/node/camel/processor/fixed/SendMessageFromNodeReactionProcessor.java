@@ -77,9 +77,8 @@ public class SendMessageFromNodeReactionProcessor extends AbstractCamelProcessor
                             new Object[] { wonMessage.getMessageURI(), wonMessage.getSenderAtomURI(),
                                             conToSendTo.getConnectionURI() });
         }
-        URI injectedMessageURI = wonNodeInformationService.generateEventURI(wonMessage.getRecipientNodeURI());
         WonMessage newWonMessage = WonMessageBuilder
-                        .connectionMessage(injectedMessageURI)
+                        .connectionMessage()
                         .sockets()
                         /**/.sender(conToSendTo.getSocketURI())
                         /**/.recipient(conToSendTo.getTargetSocketURI())

@@ -66,9 +66,8 @@ public class AtomManagementService {
                             atomURI);
             return;
         }
-        URI messageURI = wonNodeInformationService.generateEventURI(wonNodeURI);
         WonMessage msg = WonMessageBuilder
-                        .atomMessage(messageURI)
+                        .atomMessage()
                         .atom(atomURI)
                         .content().text(message)
                         .build();
@@ -95,9 +94,8 @@ public class AtomManagementService {
                             atomURI);
             return;
         }
-        URI messageURI = wonNodeInformationService.generateEventURI(wonNodeURI);
         WonMessage msg = WonMessageBuilder
-                        .deactivate(messageURI)
+                        .deactivate()
                         .atom(atomURI)
                         .content().text(optionalMessage)
                         .direction().fromSystem()

@@ -63,9 +63,8 @@ public class DeactivateAtomMessageFromSystemReactionProcessor extends AbstractCa
         // send close from system to each connection
         // the close message is directed at our local connection. It will
         // be routed to the owner and forwarded to to remote connection
-        URI messageURI = wonNodeInformationService.generateEventURI();
         WonMessage message = WonMessageBuilder
-                        .close(messageURI)
+                        .close()
                         .direction().fromSystem()
                         .sockets().sender(con.getSocketURI()).recipient(con.getTargetSocketURI())
                         .content().text("Closed because Atom was deactivated")

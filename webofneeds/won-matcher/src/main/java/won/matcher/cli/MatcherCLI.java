@@ -17,7 +17,6 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
-import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
  * User: gabriel Date: 14.02.13 Time: 15:00
@@ -78,10 +77,8 @@ public class MatcherCLI implements CommandLineRunner {
 
     private WonMessage createWonMessage(URI atomURI, URI otherAtomURI, double score, URI originator)
                     throws WonMessageBuilderException {
-        URI wonNode = WonLinkedDataUtils.getWonNodeURIForAtomOrConnection(atomURI,
-                        linkedDataSource.getDataForResource(atomURI));
         return WonMessageBuilder
-                        .atomHint(wonNodeInformationService.generateEventURI(wonNode))
+                        .atomHint()
                         .atom(atomURI)
                         .hintTargetAtom(otherAtomURI)
                         .hintScore(score)

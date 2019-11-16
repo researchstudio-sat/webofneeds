@@ -32,9 +32,8 @@ public class ConnectMessageFromNodeReactionProcessor extends AbstractCamelProces
 
     private void sendAutoOpenForConnect(WonMessage connectMessageToReactTo) {
         URI fromWonNodeURI = connectMessageToReactTo.getRecipientNodeURI();
-        URI messageURI = wonNodeInformationService.generateEventURI(fromWonNodeURI);
         WonMessage msg = WonMessageBuilder
-                        .connect(messageURI)
+                        .connect()
                         .sockets().reactingTo(connectMessageToReactTo)
                         .direction().fromSystem()
                         .content().text("Connection request accepted automatically by WoN node")
