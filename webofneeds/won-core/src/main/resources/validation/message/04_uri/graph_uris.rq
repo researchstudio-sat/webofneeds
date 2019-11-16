@@ -17,7 +17,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
   SELECT
 
 	?requiredGraphNames
-    (if(?requiredGraphNames = if (bound(?type) && (?type = msg:AtomHintMessage || ?type = msg:SocketHintMessage ), 1,2) , "OK", "FAIL") AS ?check)
+    (if(?requiredAndIllegalGraphs = if (bound(?type) && (?type = msg:AtomHintMessage || ?type = msg:SocketHintMessage ), 1,2) , "OK", "FAIL") AS ?check)
 
   WHERE 
   {     
@@ -35,7 +35,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
     }
   
     {
-	  SELECT ( COUNT(DISTINCT(?g)) as ?requiredGraphNames )
+	  SELECT ( COUNT(DISTINCT(?g)) as ?requiredAndIllegalGraphs )
 	  WHERE
 	  {
         {
@@ -54,11 +54,11 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
 	    {
 	      ?a ?b ?c .
 	    } 
-        # idea: select only envelope + signature (required) plus anything that's not a content graph (illegal)
+        # idea: select only envelope + signature (required) plus anything that's not a content graph (illegal), then fail if not the required number
         FILTER(
         	STR( ?g ) = CONCAT(STR(?message),"#envelope" ) 
         	|| STR( ?g ) = CONCAT(STR(?message),"#signature" )
-            || ! STRSTARTS( STR( ?g ), CONCAT(STR(?message),"#content" ))
+            || ! STRSTARTS( STR( ?g ), CONCAT(STR(?message),"#" ))
           )
 	  }
 	}
