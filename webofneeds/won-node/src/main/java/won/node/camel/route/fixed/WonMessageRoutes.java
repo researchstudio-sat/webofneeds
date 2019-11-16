@@ -140,15 +140,13 @@ public class WonMessageRoutes extends RouteBuilder {
                         /**/.endChoice() // choice
                         .end(); // choice
         /**
-         * System messages: add timestamp, sign and then process as if it came from an
-         * owner.
+         * System messages: sign and then process as if it came from an owner.
          */
         from("seda:SystemMessageIn?concurrentConsumers=5")
                         .routeId("seda:SystemMessageIn")
                         .to("bean:wonMessageIntoCamelProcessor")
                         .setHeader(WonCamelConstants.DIRECTION_HEADER,
                                         new URIConstant(URI.create(WONMSG.FromSystemString)))
-                        .to("bean:timestampToMessageAdder")
                         .to("bean:referencesToMessageAdder")
                         .to("bean:signatureToMessageAdder")
                         // route to message processing logic

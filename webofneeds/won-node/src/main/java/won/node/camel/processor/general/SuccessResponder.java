@@ -70,7 +70,6 @@ public class SuccessResponder extends AbstractCamelProcessor {
                         .success()
                         .build();
         messageReferencer.addMessageReferences(responseMessage, getParentURIRequired(exchange));
-        responseMessage.addMessageProperty(WONMSG.timestamp, new Date().getTime());
         responseMessage = signatureAddingWonMessageProcessor.signWithDefaultKey(responseMessage);
         exchange.getIn().setHeader(WonCamelConstants.RESPONSE_HEADER, responseMessage);
     }

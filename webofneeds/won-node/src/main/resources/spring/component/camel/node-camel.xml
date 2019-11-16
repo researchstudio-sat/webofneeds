@@ -56,27 +56,6 @@
 	<!-- won-specific processors -->
 	<!-- start of the pipeline -->
 	<bean name="wonMessageIntoCamelProcessor" class="won.protocol.message.processor.camel.WonMessageIntoCamelProcessor" />
-	<bean name="timestampToResponseAdder" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
-		<constructor-arg>
-			<bean class="won.node.camel.processor.general.TimestampAddingWonMessageProcessor" />
-		</constructor-arg>
-		<constructor-arg name="header">  
-			<array>
-				<util:constant static-field="won.protocol.message.processor.camel.WonCamelConstants.RESPONSE_HEADER" />
-			</array>
-		</constructor-arg>
-	</bean>
-	<bean name="timestampToMessageAdder" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
-		<constructor-arg>
-			<bean class="won.node.camel.processor.general.TimestampAddingWonMessageProcessor" />
-		</constructor-arg>
-		<constructor-arg name="header">  
-			<array>
-				<util:constant static-field="won.protocol.message.processor.camel.WonCamelConstants.MESSAGE_HEADER" />
-			</array>
-		</constructor-arg>
-	</bean>
-	<!-- processor for checking if message event, create atom, or create connection uri is well-formed -->
 	<bean name="uriNodePathChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
 		<constructor-arg>
 			<bean class="won.protocol.message.processor.impl.UriConsistencyCheckingWonMessageProcessor" />
