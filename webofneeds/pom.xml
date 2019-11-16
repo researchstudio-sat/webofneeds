@@ -1064,7 +1064,7 @@
         <org.apache.jena.version>3.5.0</org.apache.jena.version>
         <org.apache.jena-tdb.version>3.5.0</org.apache.jena-tdb.version>
         <org.hibernate.version>5.4.8.Final</org.hibernate.version>
-        <org.hibernate.hibernate-validator.version>6.0.18.Final	</org.hibernate.hibernate-validator.version>
+        <org.hibernate.hibernate-validator.version>5.4.3.Final</org.hibernate.hibernate-validator.version>
         <org.javasimon.version>3.4.0</org.javasimon.version>
         <org.jboss.jandex.version>1.1.0.Final</org.jboss.jandex.version>
         <org.quartz-scheduler.version>2.2.1</org.quartz-scheduler.version>
