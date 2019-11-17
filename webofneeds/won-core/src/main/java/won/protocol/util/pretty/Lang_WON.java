@@ -6,7 +6,7 @@ import org.apache.jena.riot.RDFFormatVariant;
 
 public class Lang_WON {
     public static RDFFormat TRIG_WON_CONVERSATION = new RDFFormat(Lang.TRIG,
-    new RDFFormatVariant("TriG_WoN_Conversation"));
+                    new RDFFormatVariant("TriG_WoN_Conversation"));
 
     public Lang_WON() {
     }
