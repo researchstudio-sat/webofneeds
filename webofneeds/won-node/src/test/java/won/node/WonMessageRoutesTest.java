@@ -46,6 +46,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
@@ -90,6 +91,7 @@ import won.protocol.util.RdfUtils;
 import won.protocol.util.WonMessageUriHelper;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WXCHAT;
+import won.test.category.RequiresPosgresServer;
 
 /**
  * Tests that check the input/output behaviour of the WoN node.
@@ -115,6 +117,7 @@ import won.protocol.vocabulary.WXCHAT;
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestPropertySource
 @Rollback
+@Category(RequiresPosgresServer.class)
 public abstract class WonMessageRoutesTest {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     protected static final String OWNERAPPLICATION_ID_OWNER1 = "ownerapp-1";

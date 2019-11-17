@@ -1,4 +1,3 @@
-<?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -8,20 +7,15 @@
 		<groupId>at.researchstudio.sat</groupId>
 		<version>0.7-SNAPSHOT</version>
 	</parent>
-	<groupId>at.researchstudio.sat</groupId>
-	<artifactId>won-buildtools</artifactId>
-	<version>0.7-SNAPSHOT</version>
-	<name>won-buildtools</name>
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
+	<artifactId>won-test</artifactId>
+	<name>Web of Needs Test </name>
+	<description>Provides utilities for testing</description>
 	<build>
-		<resources>
-			<resource>
-				<directory>
-  			src/main/resources
-  		</directory>
-			</resource>
-		</resources>
+		<plugins>
+			<plugin>
+				<groupId>net.revelc.code.formatter</groupId>
+				<artifactId>formatter-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
 	</build>
 </project>

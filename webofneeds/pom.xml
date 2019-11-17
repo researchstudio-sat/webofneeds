@@ -82,8 +82,9 @@
         <module>won-vocab</module>
         <module>won-docker</module>
         <module>won-buildtools</module>
+        <module>won-test</module>
+        <module>won-parent-pom</module>
     </modules>
-
     <dependencyManagement>
         <dependencies>
             <!-- Unsorted; needed by won-core -->
@@ -792,44 +793,9 @@
 
         </dependencies>
     </dependencyManagement>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.1.1</version>
-            </plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.7</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>attach-javadoc</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-        <pluginManagement>
+    
+	<build>
+		<pluginManagement>
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -971,7 +937,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>2.6</version>
+                    <version>3.2.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.cargo</groupId>
@@ -1005,239 +971,7 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-    </build>
-    <repositories>
-        <!-- jboss repo used for javax.jms -->
-        <repository>
-            <id>repository.jboss.org-public</id>
-            <name>JBoss repository</name>
-            <url>https://repository.jboss.org/nexus/content/groups/public</url>
-        </repository>
-        <repository>
-            <id>central</id>
-            <name>Maven Repository Switchboard</name>
-            <layout>default</layout>
-            <url>http://repo1.maven.org/maven2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
-
-    <properties>
-	<doclint>none</doclint>
-        <solr.upload.dest>${project.build.directory}</solr.upload.dest>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compile.compilerargs>
-            -Xlint:deprecation,fallthrough,finally,path,serial,unchecked
-        </maven.compile.compilerargs>
-        <compile.forked>false</compile.forked>
-        <java.source.version>1.8</java.source.version>
-        <java.target.version>1.8</java.target.version>
-        <surefire.skip>false</surefire.skip>
-        <surefire.failure.ignore>true</surefire.failure.ignore>
-        <surefire.reportformat>brief</surefire.reportformat>
-        <surefire.usefile>false</surefire.usefile>
-        <dependencies.scope>compile</dependencies.scope>
-        <!-- versions for various dependencies -->
-        <aspectj.version>1.5.4</aspectj.version>
-        <bouncycastle.version>1.64</bouncycastle.version>
-        <commons-collections.version>3.2.1</commons-collections.version>
-        <commons-io.version>2.4</commons-io.version>
-        <de.uni_koblenz.aggrimm.icp.version>1.0.1</de.uni_koblenz.aggrimm.icp.version>
-        <camel.version>2.12.1</camel.version>
-        <qpid.version>0.24</qpid.version>
-        <activemq.version>5.10.2</activemq.version>
-        <activemq.conf>classpath:</activemq.conf>
-        <jms.version>1.1</jms.version>
-        <xbean.version>3.14</xbean.version>   <!-- Check later if it is really needed -->
-        <siren.version>1.4</siren.version>
-        <cglib.version>2.2.2</cglib.version>
-        <com.google.guava.version>15.0</com.google.guava.version>
-        <ch.qos.logback.version>1.0.13</ch.qos.logback.version>
-        <com.fasterxml.classmate.version>1.0.0</com.fasterxml.classmate.version>
-        <com.mchange.c3p0.version>0.9.5</com.mchange.c3p0.version>
-        <junit.version>4.12</junit.version>
-        <org.apache.commons.email.version>1.3.1</org.apache.commons.email.version>
-        <net.sf.ehcache.version>2.6.8</net.sf.ehcache.version>
-        <org.apache.jena.version>3.5.0</org.apache.jena.version>
-        <org.apache.jena-tdb.version>3.5.0</org.apache.jena-tdb.version>
-        <org.hibernate.version>5.4.8.Final</org.hibernate.version>
-        <org.hibernate.hibernate-validator.version>5.4.3.Final</org.hibernate.hibernate-validator.version>
-        <org.javasimon.version>3.4.0</org.javasimon.version>
-        <org.jboss.jandex.version>1.1.0.Final</org.jboss.jandex.version>
-        <org.quartz-scheduler.version>2.2.1</org.quartz-scheduler.version>
-        <org.springframework.boot.version>1.5.17.RELEASE</org.springframework.boot.version>
-        <org.springframework.version>4.3.18.RELEASE</org.springframework.version>
-        <org.springframework.security.version>4.2.9.RELEASE</org.springframework.security.version>
-        <org.slf4j.version>1.6.6</org.slf4j.version>
-        <org.hsqldb.version>2.5.0</org.hsqldb.version>
-        <postgresql.version>42.2.8</postgresql.version>
-        <flyway.version>4.0.3</flyway.version>
-        <javax.servlet.jstl.version>1.2</javax.servlet.jstl.version>
-        <javax.validation.version>1.1.0.Final</javax.validation.version>
-        <mojoexec.version>1.3.2</mojoexec.version>
-        <cargo.version>1.4.2</cargo.version>
-        <jrebel.version>1.1.3</jrebel.version>
-        <wagon.version>1.0-beta-3</wagon.version>
-        <assembly.version>2.2</assembly.version>
-        <net.sf.supercsv.version>2.1.0</net.sf.supercsv.version>
-        <jaxb.version>2.2.11</jaxb.version>
-        <javax.activation.version>1.1.1</javax.activation.version>
-        <javax.annotation.version>1.3.2</javax.annotation.version>
-        <javax.jws.version>1.1</javax.jws.version>
-    </properties>
-
-    <profiles>
-        <profile>
-            <id>skip-tests</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <skip>true</skip>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>no-warn</id>
-            <properties>
-                <maven.compile.compilerargs>-Xlint:none</maven.compile.compilerargs>
-            </properties>
-        </profile>
-
-
-        <!-- copies the dependencies of each module to a subfolder inside 
-            that module -->
-        <profile>
-            <id>copy-module-dependencies</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy-module-dependencies</id>
-                                <!-- technically, 'validate' is not the correct 
-                                    phase, but when put here, copying the dependencies can be executed isolated 
-                                    from all other tasks an thus runs faster. For only copying the dependencies 
-                                    run 'mvn validate -Pcopy-module-dependencies' -->
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>copy-dependencies</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>${project.build.directory}/copiedDependencies</outputDirectory>
-                                    <overWriteReleases>false</overWriteReleases>
-                                    <overWriteSnapshots>false</overWriteSnapshots>
-                                    <overWriteIfNewer>true</overWriteIfNewer>
-                                    <!-- reasons for exclusions: webofneeds: 
-                                        because these are the libs we change frequently, they should not be put into 
-                                        a shared tomcat libs folder siren: because of some mechanism we don't fully 
-                                        understand, having the libs in a shared folder AND in a webapp (like [solr 
-                                        home]/lib) that causes problems with ClassCastExceptions servlet: conflicts 
-                                        with tomcat's version -->
-                                    <excludeGroupIds>webofneeds</excludeGroupIds>
-                                    <excludeArtifactIds>servlet-api</excludeArtifactIds>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <!-- copies all project dependencies to the folder where mvn 
-                is executed (<exec-dir>/target/copiedDependencies) -->
-            <id>copy-project-dependencies</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <!-- don't use this same id in module pom.xmls, 
-                                    say won-owner-webapp -->
-                                <id>copy-project-dependencies</id>
-                                <!-- technically, 'validate' is not the correct 
-                                    phase, but when put here, copying the dependencies can be executed isolated 
-                                    from all other tasks an thus runs faster. For only copying the dependencies 
-                                    run 'mvn validate -Pcopy-project-dependencies' -->
-                                <phase>validate</phase>
-
-                                <goals>
-                                    <goal>copy-dependencies</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>${session.executionRootDirectory}/target/copiedDependencies</outputDirectory>
-                                    <overWriteReleases>false</overWriteReleases>
-                                    <overWriteSnapshots>false</overWriteSnapshots>
-                                    <overWriteIfNewer>true</overWriteIfNewer>
-                                    <!-- reasons for exclusions: see config 
-                                        of profile 'copy-module-dependencies' -->
-                                    <excludeGroupIds>webofneeds,org.sindice.siren,
-                                        org.apache.lucene</excludeGroupIds>
-                                    <excludeArtifactIds>servlet-api</excludeArtifactIds>
-                                    <excludeTypes>war</excludeTypes>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>skip-dependencies</id>
-            <properties>
-                <dependencies.scope>provided</dependencies.scope>
-            </properties>
-        </profile>
-        <profile>
-            <id>release-sign-artifacts</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
+	</build>
+    	
 
 </project>
