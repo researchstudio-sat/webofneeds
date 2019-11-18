@@ -165,18 +165,28 @@ class WonAtomContentBuddies extends React.Component {
               actionButtons = (
                 <div className="acb__buddy__actions">
                   <div
-                    className="acb__buddy__actions__button red won-button--outlined thin"
+                    className="acb__buddy__actions__icon"
                     onClick={() => this.openRequest(conn)}
                   >
-                    Accept
+                    <svg className="acb__buddy__actions__icon--request">
+                      <use
+                        xlinkHref="#ico32_buddy_accept"
+                        href="#ico32_buddy_accept"
+                      />
+                    </svg>
                   </div>
                   <div
-                    className="acb__buddy__actions__button red won-button--outlined thin"
+                    className="acb__buddy__actions__icon"
                     onClick={() =>
                       this.closeConnection(conn, "Reject Buddy Request?")
                     }
                   >
-                    Reject
+                    <svg className="acb__buddy__actions__icon--primary">
+                      <use
+                        xlinkHref="#ico32_buddy_deny"
+                        href="#ico32_buddy_deny"
+                      />
+                    </svg>
                   </div>
                 </div>
               );
@@ -185,18 +195,28 @@ class WonAtomContentBuddies extends React.Component {
               actionButtons = (
                 <div className="acb__buddy__actions">
                   <div
-                    className="acb__buddy__actions__button red won-button--outlined thin"
+                    className="acb__buddy__actions__icon"
                     onClick={() => this.requestBuddy(conn)}
                   >
-                    Request
+                    <svg className="acb__buddy__actions__icon--request">
+                      <use
+                        xlinkHref="#ico32_buddy_accept"
+                        href="#ico32_buddy_accept"
+                      />
+                    </svg>
                   </div>
                   <div
-                    className="acb__buddy__actions__button red won-button--outlined thin"
+                    className="acb__buddy__actions__icon"
                     onClick={() =>
                       this.closeConnection(conn, "Reject Buddy Suggestion?")
                     }
                   >
-                    Remove
+                    <svg className="acb__buddy__actions__icon--primary">
+                      <use
+                        xlinkHref="#ico32_buddy_deny"
+                        href="#ico32_buddy_deny"
+                      />
+                    </svg>
                   </div>
                 </div>
               );
@@ -204,19 +224,26 @@ class WonAtomContentBuddies extends React.Component {
               headerClassName = "status--sent";
               actionButtons = (
                 <div className="acb__buddy__actions">
-                  <button
-                    className="acb__buddy__actions__button red won-button--outlined thin"
-                    disabled={true}
-                  >
-                    Pending...
-                  </button>
+                  <div className="acb__buddy__actions__icon" disabled={true}>
+                    <svg className="acb__buddy__actions__icon--disabled">
+                      <use
+                        xlinkHref="#ico32_buddy_waiting"
+                        href="#ico32_buddy_waiting"
+                      />
+                    </svg>
+                  </div>
                   <div
-                    className="acb__buddy__actions__button red won-button--outlined thin"
+                    className="acb__buddy__actions__icon"
                     onClick={() =>
                       this.closeConnection(conn, "Cancel Buddy Request?")
                     }
                   >
-                    Cancel Request
+                    <svg className="acb__buddy__actions__icon--secondary">
+                      <use
+                        xlinkHref="#ico32_buddy_deny"
+                        href="#ico32_buddy_deny"
+                      />
+                    </svg>
                   </div>
                 </div>
               );
@@ -228,15 +255,20 @@ class WonAtomContentBuddies extends React.Component {
                     className="acb__buddy__actions__icon"
                     onClick={() => this.sendChatMessage(conn)}
                   >
-                    <svg>
+                    <svg className="acb__buddy__actions__icon--primary">
                       <use xlinkHref="#ico36_message" href="#ico36_message" />
                     </svg>
                   </div>
                   <div
-                    className="acb__buddy__actions__button red won-button--outlined thin"
+                    className="acb__buddy__actions__icon"
                     onClick={() => this.closeConnection(conn)}
                   >
-                    Remove
+                    <svg className="acb__buddy__actions__icon--secondary">
+                      <use
+                        xlinkHref="#ico32_buddy_deny"
+                        href="#ico32_buddy_deny"
+                      />
+                    </svg>
                   </div>
                 </div>
               );
