@@ -2,14 +2,15 @@ package won.node.service.persistence;
 
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.google.common.base.Objects;
 
 import won.protocol.exception.IncoherentDatabaseStateException;
 import won.protocol.exception.NoSuchMessageException;
@@ -81,7 +82,7 @@ public class MessageService {
             }
             if (ourSocket.isPresent() && theirSocket.isPresent()) {
                 Optional<Connection> con = Optional.empty();
-                if (Objects.equal(ourSocket.get(), theirSocket.get()) && connectionFromResponse.isPresent()) {
+                if (Objects.equals(ourSocket.get(), theirSocket.get()) && connectionFromResponse.isPresent()) {
                     con = connectionRepository.findOneByConnectionURI(connectionFromResponse.get());
                 } else {
                     con = connectionRepository.findOneBySocketURIAndTargetSocketURI(
@@ -128,11 +129,74 @@ public class MessageService {
         return Optional.empty();
     }
 
-    public void saveMessage(final WonMessage message, URI parent) {
-        for (WonMessage wonMessage : message.getAllMessages()) {
+    private void removeConfirmed(final MessageContainer container, final WonMessage message, final URI parent) {
+        // the message might be an external message referencing some of our messages.
+        // if that is the case, that transitively confirms their earlier messages
+        if (logger.isDebugEnabled()) {
+            logger.debug("Checking if message {} confirms any unconfirmed messages in the message container of {}",
+                            message.toShortStringForDebug(), parent);
+        }
+        if (message.getMessageTypeRequired().isSuccessResponse()
+                        && !Objects.equals(message.getConnectionURI(), parent)) {
+            List<URI> previous = message.getPreviousMessageURIs();
+            if (logger.isDebugEnabled()) {
+                logger.debug("Message {} is an external response referencing {} messages",
+                                message.toShortStringForDebug(), previous.size());
+            }
+            List<MessageEvent> prevMsgs = previous.stream().map(prev -> {
+                Optional<MessageEvent> prevEvent = messageEventRepository.findOneByMessageURIAndParentURI(prev, parent);
+                if (!prevEvent.isPresent()) {
+                    // the message we received references a message we don't know.
+                    // this can happen if the message overtook another one. We could keep it for a
+                    // while
+                    // and reprocess it after the next message in this container.
+                    // for now, just cause a failure
+                    throw new NoSuchMessageException(prev);
+                }
+                return prevEvent.get();
+            }).collect(Collectors.toList());
+            logger.debug("Successfully loaded the referenced messages");
+            List<URI> confirmed = prevMsgs
+                            .stream()
+                            .flatMap(ev -> WonMessage.of(ev.getDatasetHolder().getDataset()).getPreviousMessageURIs()
+                                            .stream())
+                            .collect(Collectors.toList());
+            if (logger.isDebugEnabled()) {
+                logger.debug("Removing {} messages from the unconfirmed list of the message container of {} (size {})",
+                                new Object[] { confirmed.size(), parent, container.getUnconfirmed().size() });
+            }
+            container.removeUnconfirmed(confirmed);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Unconfirmed list of the message container of {} now contains {} messages",
+                                new Object[] { confirmed.size(), parent, container.getUnconfirmed().size() });
+            }
+        }
+    }
+
+    public void saveMessage(final WonMessage messageOrDeliveryChain, URI parent) {
+        for (WonMessage wonMessage : messageOrDeliveryChain.getAllMessages()) {
             logger.debug("STORING {} message {} under parent {}", new Object[] { wonMessage.getMessageType(),
                             wonMessage.getMessageURI(), parent });
             MessageContainer container = loadOrCreateMessageContainer(parent, wonMessage.getMessageType());
+            removeConfirmed(container, wonMessage, parent);
+            // unconfirmed list:
+            // - add any success response message from partner in a connection
+            // - add any of our system responses messages if we 're in an atom's message
+            // container.
+            if (wonMessage.getConnectionURI() != null && !Objects.equals(parent, wonMessage.getConnectionURI())
+                            && wonMessage.getMessageTypeRequired().isSuccessResponse()) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Adding as unconfirmed message: {}", wonMessage.getMessageURIRequired());
+                }
+                container.addUnconfirmed(wonMessage.getMessageURIRequired());
+            } else if (wonMessage.getAtomURI() != null && Objects.equals(parent, wonMessage.getAtomURI())
+                            && wonMessage.getEnvelopeType().isFromSystem()
+                            && wonMessage.getMessageTypeRequired().isSuccessResponse()) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Adding as unconfirmed message: {}", wonMessage.getMessageURIRequired());
+                }
+                container.addUnconfirmed(wonMessage.getMessageURI());
+            }
             MessageEvent event = new MessageEvent(parent, wonMessage, container);
             // a message can be in multiple containers (=parents), such messages share a
             // datasetholder

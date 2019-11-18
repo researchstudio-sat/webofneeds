@@ -14,10 +14,13 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.DiscriminatorColumn;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -46,6 +49,9 @@ public abstract class MessageContainer implements VersionedEntity {
     private URI parentUri;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "messageContainer")
     private Collection<MessageEvent> events = new ArrayList<>(1);
+    @ElementCollection(fetch = FetchType.EAGER, targetClass = URI.class)
+    @Convert(converter = URIConverter.class)
+    private Set<URI> unconfirmed = new HashSet<>();
     @Column(name = "version", columnDefinition = "integer DEFAULT 0", nullable = false)
     private int version = 0;
     @Temporal(TemporalType.TIMESTAMP)
@@ -102,5 +108,25 @@ public abstract class MessageContainer implements VersionedEntity {
 
     public void setParentUri(final URI parentUri) {
         this.parentUri = parentUri;
+    }
+
+    public Set<URI> getUnconfirmed() {
+        return unconfirmed;
+    }
+
+    public void addUnconfirmed(URI toAdd) {
+        unconfirmed.add(toAdd);
+    }
+
+    public void removeUnconfirmed(URI toRemove) {
+        unconfirmed.remove(toRemove);
+    }
+
+    public void addUnconfirmed(Collection<URI> toAdd) {
+        unconfirmed.addAll(toAdd);
+    }
+
+    public void removeUnconfirmed(Collection<URI> toRemove) {
+        unconfirmed.removeAll(toRemove);
     }
 }

@@ -81,6 +81,12 @@ public class ResponseBuilder extends TerminalBuilderBase<ResponseBuilder> {
                 // connection creation will have failed
                 throw new MissingMessagePropertyException(WONMSG.connection);
             }
+            // if we are responding to a message that already has one response from the
+            // sending node
+            // add a reference to that message, thereby confirming it
+            if (toRespondto.isMessageWithResponse()) {
+                toRespondto.getResponse().ifPresent(msg -> builder.previousMessage(msg.getMessageURIRequired()));
+            }
             if (directionOfMessageToRespondTo.isFromExternal()) {
                 // if the message is an external message, the original receiver becomes
                 // the sender of the response.

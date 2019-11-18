@@ -30,3 +30,16 @@ ALTER TABLE connection ALTER COLUMN atomuri SET NOT NULL;
 ALTER TABLE connection ALTER COLUMN socketuri SET NOT NULL;
 ALTER TABLE connection ALTER COLUMN remotesocketuri SET NOT NULL;
 ALTER TABLE connection ALTER COLUMN connectionuri SET NOT NULL;
+
+-- Table: public.messagecontainer_unconfirmed
+
+CREATE TABLE messagecontainer_unconfirmed
+(
+    messagecontainer_id bigint NOT NULL,
+    unconfirmed character varying(255) COLLATE pg_catalog."default",
+    CONSTRAINT fkgrs8fwpa6quslrln90ntcqs26 FOREIGN KEY (messagecontainer_id)
+        REFERENCES public.message_container (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
+)
