@@ -99,7 +99,8 @@ public enum WonMessageType {
                                     WONMSG.atom,
                                     WONMSG.connection,
                                     WONMSG.senderSocket,
-                                    WONMSG.recipientSocket
+                                    WONMSG.recipientSocket,
+                                    WONMSG.previousMessage
                     },
                     WONMSG.protocolVersion,
                     RDF.type,
