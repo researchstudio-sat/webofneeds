@@ -78,6 +78,7 @@ public class WonMessageRoutes extends RouteBuilder {
          * ("FROM_SYSTEM")
          */
         from("seda:msgFromOwner")
+                        .routeId("seda:msgFromOwner")
                         .to("direct:msgFromOwner_process")
                         .to("direct:msgFromOwner_respondToOwner")
                         .to("direct:msgFromOwner_forwardToNode")
@@ -177,6 +178,7 @@ public class WonMessageRoutes extends RouteBuilder {
          * Main 'fromExternal' route
          */
         from("seda:msgFromExternal")
+                        .routeId("seda:msgFromExternal")
                         .to("direct:msgFromExternal_process")
                         .to("direct:msgFromExternal_respondToNode")
                         .to("direct:msgFromExternal_forwardToOwner")
