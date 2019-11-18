@@ -1,13 +1,13 @@
 package won.protocol.message.builder;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
@@ -64,6 +64,7 @@ public class WonMessageBuilder {
     private Map<URI, Model> contentMap = new HashMap<>();
     private Map<URI, Model> signatureMap = new HashMap<>();
     private List<WonMessage> forwardedMessages;
+    private List<URI> previousMessages;
     private Long timestamp;
 
     public WonMessageBuilder() {
@@ -245,6 +246,12 @@ public class WonMessageBuilder {
                 messageEventResource.addProperty(WONMSG.forwardedMessage,
                                 envelopeGraph.getResource(msg.getMessageURIRequired().toString()));
                 RdfUtils.addDatasetToDataset(dataset, msg.getCompleteDataset());
+            });
+        }
+        if (previousMessages != null) {
+            previousMessages.forEach(msg -> {
+                messageEventResource.addProperty(WONMSG.previousMessage,
+                                envelopeGraph.getResource(msg.toString()));
             });
         }
         if (timestamp != null) {
@@ -476,6 +483,14 @@ public class WonMessageBuilder {
         return this;
     }
 
+    WonMessageBuilder previousMessage(URI previousMessageURI) {
+        if (this.previousMessages == null) {
+            this.previousMessages = new ArrayList<URI>();
+        }
+        this.previousMessages.add(previousMessageURI);
+        return this;
+    }
+
     /**
      * Adds the complete message content to the message that will be built,
      * referencing toForward's envelope in the envelope of the new message.
@@ -486,6 +501,9 @@ public class WonMessageBuilder {
     WonMessageBuilder forward(WonMessage toForward) {
         // make a copy to avoid modification in current message in case wrapped message
         // is modified externally
+        if (this.forwardedMessages == null) {
+            this.forwardedMessages = new ArrayList<WonMessage>();
+        }
         this.forwardedMessages.add(toForward);
         return this;
     }
