@@ -1,5 +1,6 @@
 @import "won-config";
 @import "button";
+@import "icon";
 @import "responsiveness-utils";
 @import "animate";
 
@@ -77,6 +78,7 @@ won-slide-in {
   .si__termsofservice {
     @include slide-in();
   }
+
   .si__disclaimer {
     @include slide-in();
 
@@ -143,6 +145,7 @@ won-slide-in {
       font-size: $smallFontSize;
       overflow-y: auto;
       text-align: left;
+
       a {
         color: white;
         text-decoration: underline;

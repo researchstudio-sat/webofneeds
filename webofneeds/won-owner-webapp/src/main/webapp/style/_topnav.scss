@@ -1,5 +1,6 @@
 @import "flex-layout";
 @import "button";
+@import "icon";
 @import "positioning-utils";
 
 won-topnav {
@@ -69,6 +70,7 @@ won-topnav {
         @include fixed-square(1.5rem);
         --local-primary: #{$won-secondary-color};
       }
+
       > .topnav__slideintoggle__carret {
         @include fixed-square(1.5rem);
         --local-primary: #{$won-secondary-color};
@@ -77,6 +79,7 @@ won-topnav {
           transform: rotate(-180deg);
           transition: transform linear 0.2s;
         }
+
         &:not(.topnav__slideintoggle__carret--expanded) {
           transform: rotate(0deg);
           transition: transform linear 0.2s;

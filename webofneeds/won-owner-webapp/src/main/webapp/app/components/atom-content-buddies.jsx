@@ -164,112 +164,100 @@ class WonAtomContentBuddies extends React.Component {
               headerClassName = "status--received";
               actionButtons = (
                 <div className="acb__buddy__actions">
-                  <div
-                    className="acb__buddy__actions__icon"
+                  <svg
+                    className="acb__buddy__actions__icon request won-icon"
                     onClick={() => this.openRequest(conn)}
                   >
-                    <svg className="acb__buddy__actions__icon--request">
-                      <use
-                        xlinkHref="#ico32_buddy_accept"
-                        href="#ico32_buddy_accept"
-                      />
-                    </svg>
-                  </div>
-                  <div
-                    className="acb__buddy__actions__icon"
+                    <use
+                      xlinkHref="#ico32_buddy_accept"
+                      href="#ico32_buddy_accept"
+                    />
+                  </svg>
+                  <svg
+                    className="acb__buddy__actions__icon primary won-icon"
                     onClick={() =>
                       this.closeConnection(conn, "Reject Buddy Request?")
                     }
                   >
-                    <svg className="acb__buddy__actions__icon--primary">
-                      <use
-                        xlinkHref="#ico32_buddy_deny"
-                        href="#ico32_buddy_deny"
-                      />
-                    </svg>
-                  </div>
+                    <use
+                      xlinkHref="#ico32_buddy_deny"
+                      href="#ico32_buddy_deny"
+                    />
+                  </svg>
                 </div>
               );
             } else if (connectionUtils.isSuggested(conn)) {
               headerClassName = "status--suggested";
               actionButtons = (
                 <div className="acb__buddy__actions">
-                  <div
-                    className="acb__buddy__actions__icon"
+                  <svg
+                    className="acb__buddy__actions__icon request won-icon"
                     onClick={() => this.requestBuddy(conn)}
                   >
-                    <svg className="acb__buddy__actions__icon--request">
-                      <use
-                        xlinkHref="#ico32_buddy_accept"
-                        href="#ico32_buddy_accept"
-                      />
-                    </svg>
-                  </div>
-                  <div
-                    className="acb__buddy__actions__icon"
+                    <use
+                      xlinkHref="#ico32_buddy_accept"
+                      href="#ico32_buddy_accept"
+                    />
+                  </svg>
+                  <svg
+                    className="acb__buddy__actions__icon primary won-icon"
                     onClick={() =>
                       this.closeConnection(conn, "Reject Buddy Suggestion?")
                     }
                   >
-                    <svg className="acb__buddy__actions__icon--primary">
-                      <use
-                        xlinkHref="#ico32_buddy_deny"
-                        href="#ico32_buddy_deny"
-                      />
-                    </svg>
-                  </div>
+                    <use
+                      xlinkHref="#ico32_buddy_deny"
+                      href="#ico32_buddy_deny"
+                    />
+                  </svg>
                 </div>
               );
             } else if (connectionUtils.isRequestSent(conn)) {
               headerClassName = "status--sent";
               actionButtons = (
                 <div className="acb__buddy__actions">
-                  <div className="acb__buddy__actions__icon" disabled={true}>
-                    <svg className="acb__buddy__actions__icon--disabled">
-                      <use
-                        xlinkHref="#ico32_buddy_waiting"
-                        href="#ico32_buddy_waiting"
-                      />
-                    </svg>
-                  </div>
-                  <div
-                    className="acb__buddy__actions__icon"
+                  <svg
+                    className="acb__buddy__actions__icon disabled won-icon"
+                    disabled={true}
+                  >
+                    <use
+                      xlinkHref="#ico32_buddy_waiting"
+                      href="#ico32_buddy_waiting"
+                    />
+                  </svg>
+                  <svg
+                    className="acb__buddy__actions__icon secondary won-icon"
                     onClick={() =>
                       this.closeConnection(conn, "Cancel Buddy Request?")
                     }
                   >
-                    <svg className="acb__buddy__actions__icon--secondary">
-                      <use
-                        xlinkHref="#ico32_buddy_deny"
-                        href="#ico32_buddy_deny"
-                      />
-                    </svg>
-                  </div>
+                    <use
+                      xlinkHref="#ico32_buddy_deny"
+                      href="#ico32_buddy_deny"
+                    />
+                  </svg>
                 </div>
               );
             } else if (connectionUtils.isConnected(conn)) {
               //TODO: Check chat socket connection
               actionButtons = (
                 <div className="acb__buddy__actions">
-                  <div
-                    className="acb__buddy__actions__icon"
+                  <svg
+                    className="acb__buddy__actions__icon primary won-icon"
                     onClick={() => this.sendChatMessage(conn)}
                   >
-                    <svg className="acb__buddy__actions__icon--primary">
-                      <use xlinkHref="#ico36_message" href="#ico36_message" />
-                    </svg>
-                  </div>
-                  <div
-                    className="acb__buddy__actions__icon"
+                    <use xlinkHref="#ico36_message" href="#ico36_message" />
+                  </svg>
+
+                  <svg
+                    className="acb__buddy__actions__icon secondary won-icon"
                     onClick={() => this.closeConnection(conn)}
                   >
-                    <svg className="acb__buddy__actions__icon--secondary">
-                      <use
-                        xlinkHref="#ico32_buddy_deny"
-                        href="#ico32_buddy_deny"
-                      />
-                    </svg>
-                  </div>
+                    <use
+                      xlinkHref="#ico32_buddy_deny"
+                      href="#ico32_buddy_deny"
+                    />
+                  </svg>
                 </div>
               );
             } else if (connectionUtils.isClosed(conn)) {

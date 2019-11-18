@@ -1,0 +1,17 @@
+.won-icon {
+  &.primary {
+    --local-primary: #{$won-primary-color};
+  }
+
+  &.secondary {
+    --local-primary: #{$won-secondary-color};
+  }
+
+  &.disabled {
+    --local-primary: #{$won-disabled-color};
+  }
+
+  &.request {
+    --local-primary: green;
+  }
+}
