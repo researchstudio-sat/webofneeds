@@ -27,11 +27,13 @@ The following properties are used:
 | `msg:timestamp` | denotes the timestamp when the message was created |
 | `msg:protocolVersion` | indicates the protocol version, currently `"1.0"`.
 | `msg:content`| links to one of the message's content graphs |
-| `msg:atom` | used in messages of type msg:SuccessResponse when acknowledging a message in an atom's message container  |
+| `msg:atom` | used in atom-specific messages (Create, Replace, Activate, Deactivate, Delete) as well as their Responses, to specify the atom |
 | `msg:connection`  |  used in messages of type msg:SuccessResponse when acknowledging a message in an connection's message container |
 | `msg:previousMessage`| links to an earlier message |
 | `msg:senderSocket` | indicates the socket from which the message was sent |
 | `msg:recipientSocket`| indicates the socket at which the message is addressed |
+| `msg:respondingTo`| used in response messages to link to the message being responded to |
+| `msg:respondingToMesageType`| used in response messages to indicate the type of message being responded to |
 
 Not all properties are used in all message types. The definition of mandatory and optional properties per type can be found in [WonMessageType.java](webofneeds/won-core/src/main/java/won/protocol/message/WonMessageType.java)
 
@@ -70,12 +72,12 @@ signed separately and the signatures are part of the content graph.
 
 The follwing properties are used to specify a signature:
 
-| Property | Descripiton |
+| Property | Description |
 | --------- | -----------
 | `msg:signer` |  links to the public key for its verification |
 | `msg:signedGraph` | links to the graphs within the message that are signed by this signature |
 | `msg:hash` | specifies the Base58-encoded multihash of the signed graphs |
-| `msg:signatureValue` | specifies the value obtained signing the hash with the key |
+| `msg:signatureValue` | specifies the Base64-encoded ECDSA signature value obtained signing the hash with the key |
 | `msg:publicKeyFingerprint` | specifies the Base58-encoded multihash of the public key |
 
 
@@ -97,6 +99,66 @@ Example:
 
 ```
 
+# Complete Example
+Full example of a WoN message, in this case, a Create message:
+```
+<wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#content-rf6e> {
+    atom:i573rg5eohhwqh77285g
+            a                  won:Atom ;
+            dc:title           "Test Atom 2" ;
+            cert:key           [ cert:PublicKey  [ a                  won:ECCPublicKey ;
+                                                   won:ecc_algorithm  "EC" ;
+                                                   won:ecc_curveId    "secp384r1" ;
+                                                   won:ecc_qx         "f6514f811722ed756de7ccc789df1236cb051f17d39c3936c0f649bd7cda06056a3508685612a58a23ce5a273e4aa4e6" ;
+                                                   won:ecc_qy         "727fab734bcb1164db084948b5c67462ed2c6a88896c13de2f6321f42cb660da97fe6f34656ccd924865942bcdd6cb83"
+                                                 ] ] ;
+            won:defaultSocket  <https://localhost:8443/won/resource/atom/i573rg5eohhwqh77285g#chatSocket> ;
+            won:socket         <https://localhost:8443/won/resource/atom/i573rg5eohhwqh77285g#chatSocket> , <https://localhost:8443/won/resource/atom/i573rg5eohhwqh77285g#holdableSocket> , <https://localhost:8443/won/resource/atom/i573rg5eohhwqh77285g#socket1> ;
+            match:flag         match:UsedForTesting .
+    
+    <https://localhost:8443/won/resource/atom/i573rg5eohhwqh77285g#chatSocket>
+            won:socketDefinition  <https://w3id.org/won/ext/chat#ChatSocket> .
+    
+    <https://localhost:8443/won/resource/atom/i573rg5eohhwqh77285g#holdableSocket>
+            won:socketDefinition  <https://w3id.org/won/ext/hold#HoldableSocket> .
+    
+    <https://localhost:8443/won/resource/atom/i573rg5eohhwqh77285g#socket1>
+            won:socketDefinition  <https://w3id.org/won/ext/chat#ChatSocket> .
+}
 
+<wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#envelope> {
+    <wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS>
+            a                    msg:FromOwner ;
+            msg:atom             atom:i573rg5eohhwqh77285g ;
+            msg:content          <wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#content-rf6e> ;
+            msg:messageType      msg:CreateMessage ;
+            msg:protocolVersion  "1.0" ;
+            msg:timestamp        1574083632172 .
+    
+    <wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#envelope>
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        <wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS> ;
+            msg:containsSignature  <wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#content-rf6e-sig> .
+    
+    <wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#content-rf6e-sig>
+            a                               msg:Signature ;
+            msg:hasVerificationCertificate  atom:i573rg5eohhwqh77285g ;
+            msg:signatureValue              "MGYCMQDV/cWOD61AguKBkCRVdma10bEFZaNDc00VIHOfNzX6k/8LuWgfyaPi3wVszScrfUECMQCBoicpa2t5V+Cz8WCo52dIJUWlP4Y8JqMd8IisPsq6qZHP79716hTgkg1BM0UBIEs=" ;
+            msg:hash                        "W1dMkKqey5ZKLdi7gbsxYmkNZ2XRjU9Jq8UTHVPV3Qt9ES" ;
+            msg:publicKeyFingerprint        "W1nQKZrBKwuo9MQbChv5tir2uZA2hHX5izrEiYH98v6nzC" ;
+            msg:signedGraph                 <wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#content-rf6e> .
+}
+
+<wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#signature> {
+    <wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#signature>
+            a                               msg:Signature ;
+            msg:hasVerificationCertificate  atom:i573rg5eohhwqh77285g ;
+            msg:signatureValue              "MGUCMDuZ8mDOEagNZBCH7aHvoNsFZVzgNmI7WFy2p2OpqolIOafDycNNmSuapUDpaxIOKwIxAO3beItRo4QYsA+4+6Iu7hPSJCnniQ0/9bkl27jS/W8oS8Q7iVwIiwxKq2/5XkuCaA==" ;
+            msg:hash                        "W1p9hqRotr7VsYrvD4kWH1yE5RBLyyNNvPyu1BE6EFKpVh" ;
+            msg:publicKeyFingerprint        "W1nQKZrBKwuo9MQbChv5tir2uZA2hHX5izrEiYH98v6nzC" ;
+            msg:signedGraph                 <wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#envelope> .
+}
+
+```
 
 
