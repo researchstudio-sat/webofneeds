@@ -125,6 +125,12 @@ public class WonLinkedDataUtils {
                         .getConnection(linkedDataSource.getDataForResource(uri), uri));
     }
 
+    public static Optional<Connection> getConnectionForConnectionURI(URI connectionURI,
+                    LinkedDataSource linkedDataSource) {
+        return Optional.ofNullable(WonRdfUtils.ConnectionUtils
+                        .getConnection(linkedDataSource.getDataForResource(connectionURI), connectionURI));
+    }
+
     public static URI getAtomURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
         assert linkedDataSource != null : "linkedDataSource must not be null";
         Dataset dataset = getDataForResource(connectionURI, linkedDataSource);
