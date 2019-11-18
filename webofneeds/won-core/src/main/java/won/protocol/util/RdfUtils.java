@@ -112,6 +112,16 @@ public class RdfUtils {
         return result;
     }
 
+    public static String toString(Dataset dataset, RDFFormat format) {
+        String result = "";
+        if (dataset != null) {
+            StringWriter sw = new StringWriter();
+            RDFDataMgr.write(sw, dataset, format);
+            result = sw.toString();
+        }
+        return result;
+    }
+
     /**
      * Converts a <code>String</code> containing TriG formatted RDF into a Jena
      * Dataset
