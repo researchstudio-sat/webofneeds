@@ -90,6 +90,7 @@ import won.protocol.util.Prefixer;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonMessageUriHelper;
 import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.pretty.Lang_WON;
 import won.protocol.vocabulary.WXCHAT;
 import won.test.category.RequiresPosgresServer;
 
@@ -758,7 +759,8 @@ public abstract class WonMessageRoutesTest {
 
     protected void logMessageRdf(String logText, WonMessage msg) {
         if (logger.isDebugEnabled()) {
-            logger.debug("\n" + logText + "\n" + RdfUtils.toString(Prefixer.setPrefixes(msg.getCompleteDataset())));
+            logger.debug("\n" + logText + "\n" + RdfUtils.toString(Prefixer.setPrefixes(msg.getCompleteDataset()),
+                            Lang_WON.TRIG_WON_CONVERSATION));
         }
     }
 
