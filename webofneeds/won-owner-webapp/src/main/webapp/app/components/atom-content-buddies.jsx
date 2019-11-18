@@ -248,7 +248,6 @@ class WonAtomContentBuddies extends React.Component {
                   >
                     <use xlinkHref="#ico36_message" href="#ico36_message" />
                   </svg>
-
                   <svg
                     className="acb__buddy__actions__icon secondary won-icon"
                     onClick={() => this.closeConnection(conn)}

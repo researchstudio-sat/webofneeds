@@ -54,6 +54,16 @@ won-atom-content-participants {
         font-size: $smallFontSize;
         padding: 0.5rem;
       }
+
+      &__icon.won-icon.primary,
+      &__icon.won-icon.secondary,
+      &__icon.won-icon.disabled,
+      &__icon.won-icon.request {
+        display: flex;
+        align-self: center;
+        margin: auto;
+        @include fixed-square($postIconSize);
+      }
     }
   }
 
