@@ -40,7 +40,7 @@
 }
 
 # signature of the permanent part of data:
-:#OWN1 sig:signature [
+:#OWN1 msg:Signature [
       rdf:type sig:WonSignature ;
       #TODO:
       # Solve question where to link:
@@ -80,7 +80,7 @@
       ] .
 }
 # signature of the transient part of data:
-:#OWN2 sig:signature [
+:#OWN2 msg:Signature [
       rdf:type sig:WonSignature ;
       sig:creator <http://example.com/webid#key-5>;
       sig:created
@@ -108,7 +108,7 @@
 }
 
 # signature of the webid
-:#OWNER-WEBID sig:signature [
+:#OWNER-WEBID msg:Signature [
       rdf:type sig:WonSignature ;
       # TODO is that correct?:
       # If the public key is provided as part of data
@@ -141,7 +141,7 @@
 }
 
 # signature of the owner info
-:#OWNER-INFO sig:signature [
+:#OWNER-INFO msg:Signature [
       rdf:type sig:WonSignature ;
       sig:creator <http://example.com/webid#key-5>;
       sig:created
@@ -175,7 +175,7 @@
 #       http resource level? If the latter is the case, our model breaks.
 #       compare to ldp access control: http://www.w3.org/2012/ldp/wiki/AccessControl
 #
-:#ACL sig:signature [
+:#ACL msg:Signature [
       rdf:type sig:WonSignature ;
       sig:creator <http://example.com/webid#key-5>;
       sig:created
@@ -189,7 +189,7 @@
 }
 
 # signature of the versioning
-:#VERSIONING sig:signature [
+:#VERSIONING msg:Signature [
       rdf:type sig:WonSignature ;
       sig:creator <http://example.com/webid#key-5>;
       sig:created

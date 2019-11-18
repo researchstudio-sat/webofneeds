@@ -38,9 +38,9 @@
 
 <https://satvm05.researchstudio.at/won/resource/event/qkrivynfftr9gtl3u8im#envelope-uhuo-sig> {
     <https://satvm05.researchstudio.at/won/resource/event/qkrivynfftr9gtl3u8im#envelope-uhuo-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMAUd2kqL2fwONeaCKPYSlteJ0jccZuNYHWCMfzdXmOlDC3by1bWIm0CnACIdlMzPHwIwdOWItUGJnS4k/ZQN7ej0n1pW/+fYpaHZ2Q/W6Ose3YzmbyPfHCPWRvYDjV7+1Uz1" ;
-            sig:hasVerificationCertificate  atom:ize9ntwo0vjyqbdvb4cu ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMAUd2kqL2fwONeaCKPYSlteJ0jccZuNYHWCMfzdXmOlDC3by1bWIm0CnACIdlMzPHwIwdOWItUGJnS4k/ZQN7ej0n1pW/+fYpaHZ2Q/W6Ose3YzmbyPfHCPWRvYDjV7+1Uz1" ;
+            msg:signer  atom:ize9ntwo0vjyqbdvb4cu ;
             msg:hash                     "ekR9ls5KaS9yp2W3mFvw7wnBJsvIemm0eFnO/Kjx1wWcFAqgTaFviFL3Q7dq264FHmJnn54D8yj7d1V6GL/RDXJOpmkz9M4553PSz13omWVjgycjs47MhjZOmAxYfKmGipSVaooFsRY09HwVFFC9Nie/Vd6Q1QWEhoUjqIdLCvw=" ;
             msg:publicKeyFingerprint     "5s/qPiYhn2Gs+gJW9HWEpt9VzV+8SHAYV8c4LiJ7e+g=" ;
             msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/qkrivynfftr9gtl3u8im#envelope-uhuo> .

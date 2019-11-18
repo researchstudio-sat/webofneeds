@@ -15,12 +15,8 @@ import java.util.stream.Collectors;
 
 import org.apache.jena.ext.com.google.common.collect.Streams;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.vocabulary.RDF;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +25,6 @@ import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
 import io.ipfs.multihash.Multihash.Type;
 import won.protocol.message.WonSignatureData;
-import won.protocol.vocabulary.SFSIG;
 
 /**
  * Created by ypanchenko on 12.06.2014.
@@ -44,20 +39,6 @@ public class WonSigner {
     public static final Type HASH_ALGORITHM_FOR_MULTIHASH = Type.sha2_256;
     private Dataset dataset;
     private WonHasher hasher;
-    private static final Model defaultGraphSigningMethod;
-    static {
-        // initialize a model with the triples indicating the default graph signing
-        // method, so we are not
-        // required to add it to every signature
-        defaultGraphSigningMethod = ModelFactory.createDefaultModel();
-        Resource bNode = defaultGraphSigningMethod.createResource();
-        bNode.addProperty(RDF.type, SFSIG.GRAPH_SIGNING_METHOD);
-        bNode.addProperty(SFSIG.HAS_DIGEST_METHOD, SFSIG.DIGEST_METHOD_SHA_256);
-        bNode.addProperty(SFSIG.HAS_GRAPH_CANONICALIZATION_METHOD, SFSIG.GRAPH_CANONICALIZATION_METHOD_Fisteus2010);
-        bNode.addProperty(SFSIG.HAS_GRAPH_DIGEST_METHOD, SFSIG.GRAPH_DIGEST_METHOD_Fisteus2010);
-        bNode.addProperty(SFSIG.HAS_GRAPH_SERIALIZATION_METHOD, SFSIG.GRAPH_SERIALIZATION_METHOD_TRIG);
-        bNode.addProperty(SFSIG.HAS_SIGNATURE_METHOD, SFSIG.SIGNATURE_METHOD_ECDSA);
-    }
 
     public WonSigner(Dataset dataset) {
         this.dataset = dataset;

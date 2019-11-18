@@ -17,9 +17,9 @@
 
 p1:signature {
     p1:signature
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p0:siafpbvk54213t32fnvn ;
-            sig:signatureValue              "MGUCMHopp05I92rJcw8CqF6lmWp0WJwTPsFsDs8dkDWlMxUhUkenU2PGYKKi+QKZgPz2gQIxAO+AHAcB+V0i41U6muzo7rtVLWjq1jwZkW+56Hi+Q7IzzXHxwTBsahR3oBGMtA5dTw==" ;
+            a                               msg:Signature ;
+            msg:signer  p0:siafpbvk54213t32fnvn ;
+            msg:signatureValue              "MGUCMHopp05I92rJcw8CqF6lmWp0WJwTPsFsDs8dkDWlMxUhUkenU2PGYKKi+QKZgPz2gQIxAO+AHAcB+V0i41U6muzo7rtVLWjq1jwZkW+56Hi+Q7IzzXHxwTBsahR3oBGMtA5dTw==" ;
             msg:hash                        "AKg40HCDLMCCIZtz1yxWYAtVQGvs3+m6dxiuzRPMO3hTsALmRJMNsLaD+pjf74EKigeyHouQwXCm7UddoTc89NPRJdvF57LLmFEWv3K3YrHwET15geHrSHwE0xzJKwOTZX9ek2bdhhFaSbQ1+NSIhkViq8oa6Mts5yQArxY+o7fT" ;
             msg:publicKeyFingerprint        "CfJwsyy4wtBhbSUyTkqY3SvXIAXiFj5Av3lk1werWt8=" ;
             msg:signedGraph                 p1:envelope .
@@ -51,9 +51,9 @@ p1:envelope {
             msg:containsSignature  p1:content-d0zo-sig .
     
     p1:content-d0zo-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p0:siafpbvk54213t32fnvn ;
-            sig:signatureValue              "MGYCMQD2wKO6HmeJjFSU+5l47V5J2oNRJeOjx7F5Ts7vxTT76qImrG2K1/a69437ap76KWICMQDO/X/wYUNmVQuO1zqzZU47U4miCayBh0hzM8A7DRY504pXvsXhPNUsRVCOtqBFIHI=" ;
+            a                               msg:Signature ;
+            msg:signer  p0:siafpbvk54213t32fnvn ;
+            msg:signatureValue              "MGYCMQD2wKO6HmeJjFSU+5l47V5J2oNRJeOjx7F5Ts7vxTT76qImrG2K1/a69437ap76KWICMQDO/X/wYUNmVQuO1zqzZU47U4miCayBh0hzM8A7DRY504pXvsXhPNUsRVCOtqBFIHI=" ;
             msg:hash                        "UavRMH1snEdeZksTJOr+kM60+e9b0gEoDfjTUjW3UdtKCglPgqqIoFqtnHVrSuvMVuYYMrQkm7qPBpWBGY2raZWNiTMzjuDmu4N/8/I7u4JtZky02rBr4A8sTJENjXCw+sl11PJwQbZknMp5DqNAtHRddgiYwIJBVY0lrVPoAXg=" ;
             msg:publicKeyFingerprint        "CfJwsyy4wtBhbSUyTkqY3SvXIAXiFj5Av3lk1werWt8=" ;
             msg:signedGraph                 p1:content-d0zo .

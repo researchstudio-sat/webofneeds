@@ -9,7 +9,7 @@ prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix local: <http://localhost:8080/won/resource/>
 prefix won:   <https://w3id.org/won/core#>
 prefix msg:   <https://w3id.org/won/message#>
-prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
+
 prefix ldp:   <http://www.w3.org/ns/ldp#>
 
 
@@ -54,14 +54,14 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
       BIND( IRI( replace( ?senderSocketOrAtom, "/atom/[a-zA-Z0-9#]+$", "" ) ) as ?signer )
       GRAPH ?g1
       {
-          ?sig a signature:Signature .
+          ?sig a msg:Signature .
           ?sig msg:signedGraph ?signedGraph .
       } 
       GRAPH ?g2
       {
-          ?sig a signature:Signature .
+          ?sig a msg:Signature .
           ?sig msg:signedGraph ?signedGraph .
-          ?sig signature:hasVerificationCertificate ?signer .
+          ?sig msg:signer ?signer .
       }
       FILTER NOT EXISTS {
       	?env msg:content ?g1

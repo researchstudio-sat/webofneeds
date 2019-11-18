@@ -34,8 +34,8 @@ import won.cryptography.key.KeyInformationExtractor;
 import won.cryptography.key.KeyInformationExtractorBouncyCastle;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.CERT;
-import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONMSG;
 
 /**
  * A helper class to read from/write to RDF EC public key won representation, as
@@ -150,7 +150,7 @@ public class WonKeysReaderWriter {
 
     public Set<String> readKeyReferences(Dataset dataset) {
         List<String> keyRefs = RdfUtils.visitFlattenedToList(dataset, model -> {
-            StmtIterator it = model.listStatements((Resource) null, SFSIG.HAS_VERIFICATION_CERT, (RDFNode) null);
+            StmtIterator it = model.listStatements((Resource) null, WONMSG.signer, (RDFNode) null);
             List<String> ret = new ArrayList<>();
             while (it.hasNext()) {
                 ret.add(it.next().getObject().toString());

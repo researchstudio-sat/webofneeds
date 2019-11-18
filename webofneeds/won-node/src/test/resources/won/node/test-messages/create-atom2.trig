@@ -20,9 +20,9 @@
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
 
 this:envelope-sig {
-   this:envelope-sig  a                      sig:Signature ;
-            sig:hasVerificationCertificate  atom:newAtom2 ;
-            sig:signatureValue              "MGYC[...]sDgg=" ;
+   this:envelope-sig  a                      msg:Signature ;
+            msg:signer  atom:newAtom2 ;
+            msg:signatureValue              "MGYC[...]sDgg=" ;
             msg:hash                        "UikX[...]uq7k=" ;
             msg:publicKeyFingerprint        "drBD[...]6Tqk=" ;
             msg:signedGraph                 this:envelope .
@@ -30,9 +30,9 @@ this:envelope-sig {
 }
 
 this:envelope {
-    this:atom-sig  a                          sig:Signature ;
-            sig:hasVerificationCertificate  atom:newAtom2 ;
-            sig:signatureValue              "MGYC[...]HZgE=" ;
+    this:atom-sig  a                          msg:Signature ;
+            msg:signer  atom:newAtom2 ;
+            msg:signatureValue              "MGYC[...]HZgE=" ;
             msg:hash                        "AK9b[...]sV6oZ" ;
             msg:publicKeyFingerprint        "drBD[...]6Tqk=" ;
             msg:signedGraph                 this:atom .

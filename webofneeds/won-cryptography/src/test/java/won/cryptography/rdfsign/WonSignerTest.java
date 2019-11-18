@@ -12,7 +12,7 @@ import won.cryptography.utils.TestSigningUtils;
 import won.cryptography.utils.TestingKeys;
 import won.protocol.message.WonMessage;
 import won.protocol.util.RdfUtils;
-import won.protocol.vocabulary.SFSIG;
+import won.protocol.vocabulary.WONMSG;
 
 /**
  * User: ypanchenko Date: 14.07.2014
@@ -54,7 +54,7 @@ public class WonSignerTest {
                         .countTriples(testDataset.getNamedModel(ATOM_CORE_DATA_SIG_URI).listStatements());
         Assert.assertEquals(11, triplesCounter);
         String sigValue = TestSigningUtils.getObjectOfPredAsString(testDataset.getNamedModel(ATOM_CORE_DATA_SIG_URI),
-                        SFSIG.HAS_SIGNATURE_VALUE.getURI());
+                        WONMSG.signatureValue.getURI());
         // even with the same key the signature for the same input is different each
         // time due to the random
         // integer used by the elliptic curve signing algorithm, therefore, we cannot

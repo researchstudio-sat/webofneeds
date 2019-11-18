@@ -693,7 +693,6 @@ won.defaultContext = {
   xsd: "http://www.w3.org/2001/XMLSchema#",
   gr: "http://purl.org/goodrelations/v1#",
   ldp: "http://www.w3.org/ns/ldp#",
-  sig: "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#",
   sioc: "http://rdfs.org/sioc/ns#",
   dct: "http://purl.org/dc/terms/",
   cert: "http://www.w3.org/ns/auth/cert#",
@@ -1891,7 +1890,7 @@ WonMessage.prototype = {
       resource =>
         resource["@id"] === graphUri &&
         resource["@type"].includes(
-          "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature"
+          "https://w3id.org/won/message#Signature"
         )
     );
   },

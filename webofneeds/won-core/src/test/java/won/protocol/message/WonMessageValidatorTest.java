@@ -18,7 +18,6 @@ import org.junit.Test;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.validation.WonMessageValidator;
-import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -282,10 +281,10 @@ public class WonMessageValidatorTest {
         // Model env2Model = invalidDataset.getNamedModel(RESPONSE_LOCAL_ENV2_NAME);
         // create invalid dataset by replacing a signer
         Statement stmtOld = env1sigModel.createStatement(ResourceFactory.createResource(RESPONSE_LOCAL_ENV1_SIG_NAME),
-                        SFSIG.HAS_VERIFICATION_CERT, ResourceFactory.createResource(NODE_LOCAL_URI));
+                        WONMSG.signer, ResourceFactory.createResource(NODE_LOCAL_URI));
         env1sigModel.remove(stmtOld);
         Statement stmtNew = env1sigModel.createStatement(ResourceFactory.createResource(RESPONSE_LOCAL_ENV1_SIG_NAME),
-                        SFSIG.HAS_VERIFICATION_CERT, ResourceFactory.createResource(ATOM_LOCAL_URI));
+                        WONMSG.signer, ResourceFactory.createResource(ATOM_LOCAL_URI));
         env1sigModel.add(stmtNew);
         WonMessageValidator validator = new WonMessageValidator();
         StringBuilder message = new StringBuilder();
@@ -306,10 +305,10 @@ public class WonMessageValidatorTest {
         Model env1sigModel = invalidDataset.getNamedModel(CREATE_ENV1_SIG_NAME);
         // create invalid dataset by replacing a signer in leaf envelope
         Statement stmtOld = env1sigModel.createStatement(ResourceFactory.createResource(CREATE_ENV1_SIG_NAME),
-                        SFSIG.HAS_VERIFICATION_CERT, ResourceFactory.createResource(ATOM_LOCAL_URI));
+                        WONMSG.signer, ResourceFactory.createResource(ATOM_LOCAL_URI));
         env1sigModel.remove(stmtOld);
         Statement stmtNew = env1sigModel.createStatement(ResourceFactory.createResource(CREATE_ENV1_SIG_NAME),
-                        SFSIG.HAS_VERIFICATION_CERT, ResourceFactory.createResource(NODE_LOCAL_URI));
+                        WONMSG.signer, ResourceFactory.createResource(NODE_LOCAL_URI));
         env1sigModel.add(stmtNew);
         WonMessageValidator validator = new WonMessageValidator();
         StringBuilder message = new StringBuilder();
@@ -326,10 +325,10 @@ public class WonMessageValidatorTest {
         Model env2sigModel = invalidDataset.getNamedModel(TEXT_ENV2_SIG_NAME);
         // create invalid dataset by replacing a signer in non-leaf envelope
         stmtOld = env2sigModel.createStatement(ResourceFactory.createResource(TEXT_ENV2_SIG_NAME),
-                        SFSIG.HAS_VERIFICATION_CERT, ResourceFactory.createResource(NODE_LOCAL_URI));
+                        WONMSG.signer, ResourceFactory.createResource(NODE_LOCAL_URI));
         env2sigModel.remove(stmtOld);
         stmtNew = env2sigModel.createStatement(ResourceFactory.createResource(TEXT_ENV2_SIG_NAME),
-                        SFSIG.HAS_VERIFICATION_CERT, ResourceFactory.createResource(ATOM_LOCAL_URI));
+                        WONMSG.signer, ResourceFactory.createResource(ATOM_LOCAL_URI));
         env2sigModel.add(stmtNew);
         validator = new WonMessageValidator();
         message = new StringBuilder();
@@ -352,10 +351,10 @@ public class WonMessageValidatorTest {
         // create invalid dataset by replacing a signer - sender node - in close to leaf
         // envelope
         Statement stmtOld = env3sigModel.createStatement(ResourceFactory.createResource(TEXT_ENV3_SIG_NAME),
-                        SFSIG.HAS_VERIFICATION_CERT, ResourceFactory.createResource(NODE_LOCAL_URI));
+                        WONMSG.signer, ResourceFactory.createResource(NODE_LOCAL_URI));
         env3sigModel.remove(stmtOld);
         Statement stmtNew = env3sigModel.createStatement(ResourceFactory.createResource(TEXT_ENV3_SIG_NAME),
-                        SFSIG.HAS_VERIFICATION_CERT, ResourceFactory.createResource(NODE_REMOTE_URI));
+                        WONMSG.signer, ResourceFactory.createResource(NODE_REMOTE_URI));
         env3sigModel.add(stmtNew);
         WonMessageValidator validator = new WonMessageValidator();
         StringBuilder message = new StringBuilder();
@@ -370,10 +369,10 @@ public class WonMessageValidatorTest {
         Model env4sigModel = invalidDataset.getNamedModel(TEXT_ENV4_SIG_NAME);
         // create invalid dataset by replacing a signer in non-leaf envelope
         stmtOld = env4sigModel.createStatement(ResourceFactory.createResource(TEXT_ENV4_SIG_NAME),
-                        SFSIG.HAS_VERIFICATION_CERT, ResourceFactory.createResource(NODE_LOCAL_URI));
+                        WONMSG.signer, ResourceFactory.createResource(NODE_LOCAL_URI));
         env4sigModel.remove(stmtOld);
         stmtNew = env4sigModel.createStatement(ResourceFactory.createResource(TEXT_ENV4_SIG_NAME),
-                        SFSIG.HAS_VERIFICATION_CERT, ResourceFactory.createResource(ATOM_LOCAL_URI));
+                        WONMSG.signer, ResourceFactory.createResource(ATOM_LOCAL_URI));
         env4sigModel.add(stmtNew);
         validator = new WonMessageValidator();
         message = new StringBuilder();
@@ -388,41 +387,6 @@ public class WonMessageValidatorTest {
 
     @Test
     @Ignore
-    public void testSignatureRequiredProperties() throws IOException {
-        // Test signature of the 1st envelope
-        Dataset invalidDataset = WonRdfUtils.MessageUtils
-                        .copyByDatasetSerialization(WonMessage.of(createMessageDataset)).getCompleteDataset();
-        Model env1sigModel = invalidDataset.getNamedModel(CREATE_ENV1_SIG_NAME);
-        StmtIterator iter = env1sigModel.listStatements(ResourceFactory.createResource(CREATE_ENV1_SIG_NAME),
-                        SFSIG.HAS_GRAPH_SIGNING_METHOD, RdfUtils.EMPTY_RDF_NODE);
-        Statement stmtOld = iter.removeNext();
-        WonMessageValidator validator = new WonMessageValidator();
-        StringBuilder message = new StringBuilder();
-        // validate this invalid dataset
-        boolean valid = validator.validate(invalidDataset, message);
-        Assert.assertFalse(valid);
-        Assert.assertTrue(message.toString().contains("signature_properties"));
-        // reset for further testing:
-        env1sigModel.add(stmtOld);
-        iter = env1sigModel.listStatements(ResourceFactory.createResource(CREATE_ENV1_SIG_NAME), WONMSG.signedGraph,
-                        RdfUtils.EMPTY_RDF_NODE);
-        Statement stmtModified = iter.nextStatement();
-        stmtModified.changeObject(ResourceFactory.createResource("test:object:uri"));
-        env1sigModel.add(stmtModified);
-        // String test = RdfUtils.writeDatasetToString(invalidDataset, Lang.TRIG);
-        // System.out.println("OUT:\n" + test);
-        validator = new WonMessageValidator();
-        message = new StringBuilder();
-        // validate this invalid dataset
-        valid = validator.validate(invalidDataset, message);
-        Assert.assertFalse(valid);
-        Assert.assertTrue(message.toString().contains("signature_properties"));
-        // reset for further testing:
-        env1sigModel.add(stmtOld);
-    }
-
-    @Test
-    @Ignore
     public void testSignatureReferenceValues() throws IOException {
         // Test signature of the 1st envelope: replace value of the signature with some
         // dummy value
@@ -430,10 +394,10 @@ public class WonMessageValidatorTest {
                         .copyByDatasetSerialization(WonMessage.of(createMessageDataset)).getCompleteDataset();
         Model env1sigModel = invalidDataset.getNamedModel(CREATE_ENV1_SIG_NAME);
         StmtIterator iter = env1sigModel.listStatements(ResourceFactory.createResource(CREATE_ENV1_SIG_NAME),
-                        SFSIG.HAS_SIGNATURE_VALUE, RdfUtils.EMPTY_RDF_NODE);
+                        WONMSG.signatureValue, RdfUtils.EMPTY_RDF_NODE);
         Statement stmtOld = iter.removeNext();
         Statement stmtNew = env1sigModel.createStatement(ResourceFactory.createResource(CREATE_ENV1_SIG_NAME),
-                        SFSIG.HAS_SIGNATURE_VALUE, ResourceFactory.createPlainLiteral("eve's value"));
+                        WONMSG.signatureValue, ResourceFactory.createPlainLiteral("eve's value"));
         env1sigModel.add(stmtNew);
         WonMessageValidator validator = new WonMessageValidator();
         StringBuilder message = new StringBuilder();

@@ -16,9 +16,9 @@
 @prefix atom:  <https://node.matchat.org/won/resource/atom/> .
 @prefix event: <https://node.matchat.org/won/resource/event/> .
     p1:envelope-sig {
-    p1:envelope-sig  a                      sig:Signature ;
-            sig:hasVerificationCertificate  atom:so20ub00h1de ;
-            sig:signatureValue              "MGYCMQCtCe16iMM4guNO+Y4ez9AcPDmHXfOh+1uP9vKf4oHcUjEjKcp+m+N56bdz0G99i60CMQD1useqNQZt8iaKkDxuF/HiaJO7u85MIFPafGTVEKI6DbE3pFUbfJFaxqCSQFIsEmM=" ;
+    p1:envelope-sig  a                      msg:Signature ;
+            msg:signer  atom:so20ub00h1de ;
+            msg:signatureValue              "MGYCMQCtCe16iMM4guNO+Y4ez9AcPDmHXfOh+1uP9vKf4oHcUjEjKcp+m+N56bdz0G99i60CMQD1useqNQZt8iaKkDxuF/HiaJO7u85MIFPafGTVEKI6DbE3pFUbfJFaxqCSQFIsEmM=" ;
             msg:hash                        "TuNqxidQOnGoI34ysGM6fy2dQltfxvPQ1WQe52XY2A5a+DNpxqfpgSeFW5SPTwpahvsG0HBd5yeOfT4XOr2C8rMY9el8hKQEFEaGTR/JVwvRJpmxooQgQohvqm0r6DOTNzRhIaLSU1CZtAV+g2aE7Yds2bSpm8SCY867sjO/9tQ=" ;
             msg:publicKeyFingerprint        "753GyoDfN6gDf0SVDX3wkqtvVkDePUokg+TMYq9BUHU=" ;
             msg:signedGraph                 p1:envelope .
@@ -37,9 +37,9 @@ p1:envelope {
             rdfg:subGraphOf        event:bqvmlcrnkv3s ;
             msg:containsSignature  p1:atom-sig .
     
-    p1:atom-sig  a                          sig:Signature ;
-            sig:hasVerificationCertificate  atom:so20ub00h1de ;
-            sig:signatureValue              "MGUCMQC69AkAHbM39unLEzv5B34E9cDTZ1aPwdIGaVJSV9zylXTrEi2QTbGNjdVzLXU4PAYCMBDndYMmReEkZj+cFPwIOsJw2zUCguIRMs3evIZNMYdSwWX/GCbpNYPSa1YpfDhlhA==" ;
+    p1:atom-sig  a                          msg:Signature ;
+            msg:signer  atom:so20ub00h1de ;
+            msg:signatureValue              "MGUCMQC69AkAHbM39unLEzv5B34E9cDTZ1aPwdIGaVJSV9zylXTrEi2QTbGNjdVzLXU4PAYCMBDndYMmReEkZj+cFPwIOsJw2zUCguIRMs3evIZNMYdSwWX/GCbpNYPSa1YpfDhlhA==" ;
             msg:hash                        "AK/bebuX3t9uftC5uBvqQvEu0V9Nne3MnlHMzJ7Q6GB75hwJGJMbU8yzOEUKSqUl9njWzIoRdJFxQgEiU8QKjH6JkASgfRLJsxTatT+dZOk3XGFwdvDwGxzAP/3V9T0/+8Qgw6pOTKtT4Vkd+z2eC/j6NSEzZoRGYyPDfbasp5XN" ;
             msg:publicKeyFingerprint        "753GyoDfN6gDf0SVDX3wkqtvVkDePUokg+TMYq9BUHU=" ;
             msg:signedGraph                 p1:atom .

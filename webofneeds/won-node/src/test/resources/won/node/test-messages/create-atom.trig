@@ -21,18 +21,18 @@
 
 
 this:envelope-sig {   
-    this:envelope-sig  a                      sig:Signature ;
-            sig:hasVerificationCertificate  atom:newAtom ;
-            sig:signatureValue              "MGYC[...]sDgg=" ;
+    this:envelope-sig  a                      msg:Signature ;
+            msg:signer  atom:newAtom ;
+            msg:signatureValue              "MGYC[...]sDgg=" ;
             msg:hash                        "UikX[...]uq7k=" ;
             msg:publicKeyFingerprint        "drBD[...]6Tqk=" ;
             msg:signedGraph                 this:envelope .
 }
 
 this:envelope {
-    this:atom-sig  a                          sig:Signature ;
-            sig:hasVerificationCertificate  atom:newAtom ;
-            sig:signatureValue              "MGYC[...]HZgE=" ;
+    this:atom-sig  a                          msg:Signature ;
+            msg:signer  atom:newAtom ;
+            msg:signatureValue              "MGYC[...]HZgE=" ;
             msg:hash                        "AK9b[...]sV6oZ" ;
             msg:publicKeyFingerprint        "drBD[...]6Tqk=" ;
             msg:signedGraph                 this:atom .

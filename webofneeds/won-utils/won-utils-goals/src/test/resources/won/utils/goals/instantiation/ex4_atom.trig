@@ -45,9 +45,9 @@
 
 <https://localhost:8443/won/resource/event/8297793462831835000#envelope-sig> {
     <https://localhost:8443/won/resource/event/8297793462831835000#envelope-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMFU/riyDJEiknnVupxHs8NQlT4gu66JDeGKAcPZnVqb+GjyYw9yyFIU1HhuVto3sZQIwQoShiIffxFAfnai+u5bnVVjzcs44hF8Wer70y/TBDklieG6gF3u7KeqdEO0TPyZO" ;
-            sig:hasVerificationCertificate  atom:6462959329580403000 ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMFU/riyDJEiknnVupxHs8NQlT4gu66JDeGKAcPZnVqb+GjyYw9yyFIU1HhuVto3sZQIwQoShiIffxFAfnai+u5bnVVjzcs44hF8Wer70y/TBDklieG6gF3u7KeqdEO0TPyZO" ;
+            msg:signer  atom:6462959329580403000 ;
             msg:hash                     "AIaFN76/Vo0J71D8xsBKKocpIL+SYUVk8vdVyVPYu5K0awRci0xFZEjTI2EVzb/C32I4wTV3eKihWMFtcSRsII9CpmdCJw/xgmFuRlSIGJF72eKOm9t35MVK5s/VH+cT1lMEmXafW7B8P5cCdN74nloBk3iOwIn9lqQDlRFvaKVv" ;
             msg:publicKeyFingerprint     "lpT4VEyi1WSXpfxqojE03HRE6MmjNJXOqDr2eCc1AgI=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/8297793462831835000#envelope> .

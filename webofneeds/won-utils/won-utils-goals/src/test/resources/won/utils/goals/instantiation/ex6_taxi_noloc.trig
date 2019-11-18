@@ -23,9 +23,9 @@
 
 <https://satvm05.researchstudio.at/won/resource/event/7684802668741646000#envelope-sig> {
     <https://satvm05.researchstudio.at/won/resource/event/7684802668741646000#envelope-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMAzda/lBqGSJooCjNlbh1T1/HNUJkAenddz7RiPjuVux/Axidt7iTD5sC+oZMYUgOQIwfp6qafpB1TiX9CO3WzPCXvVWir+EoCpZRIPhHV6lghk9u2LmP4bY3cwfIyWx3H2D" ;
-            sig:hasVerificationCertificate  atom:1196850096998977500 ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMAzda/lBqGSJooCjNlbh1T1/HNUJkAenddz7RiPjuVux/Axidt7iTD5sC+oZMYUgOQIwfp6qafpB1TiX9CO3WzPCXvVWir+EoCpZRIPhHV6lghk9u2LmP4bY3cwfIyWx3H2D" ;
+            msg:signer  atom:1196850096998977500 ;
             msg:hash                     "VtB15TtDYg102taFc5PYGL6y/1OEsk1RgPJBxvOJp1DAPme0QbuVikuLvOB16jlxnwpvRgurtUwtAdFuxlcRKFyE3AzAV5/7+Rs4N8qWwbkmZdUf+rhW+MAj2v+dQ/NCizSAZA48ZYbX9pCBn45MDIkKMUMHJ+ghAP7wuxgrspQ=" ;
             msg:publicKeyFingerprint     "l/HpKKFqtQrTvP75OOuOGJlypz5fucujvPCZuQk2BzE=" ;
             msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/7684802668741646000#envelope> .

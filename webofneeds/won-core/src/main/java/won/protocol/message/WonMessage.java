@@ -47,7 +47,6 @@ import won.protocol.exception.WonMessageNotWellFormedException;
 import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
-import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -407,7 +406,7 @@ public class WonMessage implements Serializable {
             return Optional.empty();
         }
         StmtIterator it = signatureGraph.listStatements(signatureGraph.getResource(signatureURI.toString()),
-                        SFSIG.HAS_VERIFICATION_CERT, (RDFNode) null);
+                        WONMSG.signer, (RDFNode) null);
         if (!it.hasNext()) {
             return Optional.empty();
         }
@@ -538,7 +537,7 @@ public class WonMessage implements Serializable {
         if (headMessage.graphSignatures == null) {
             headMessage.graphSignatures = new HashMap<>();
             // check if the graph contains a signature and if so, remember it
-            ResIterator it = getEnvelopeGraph().listSubjectsWithProperty(RDF.type, SFSIG.SIGNATURE);
+            ResIterator it = getEnvelopeGraph().listSubjectsWithProperty(RDF.type, WONMSG.Signature);
             while (it.hasNext()) {
                 Resource sig = it.next();
                 Resource signedGraph = sig.getPropertyResourceValue(WONMSG.signedGraph);

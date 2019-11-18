@@ -66,9 +66,9 @@ p31:data {
             rdfg:subGraphOf        p32:6671551888677331000 ;
             msg:containsSignature  p31:content-sig .
     
-    p31:content-sig  a                      sig:Signature ;
-            sig:hasVerificationCertificate  p12:7820503869697675000 ;
-            sig:signatureValue              "MGUCMQC8s+IIJAoHkvcIdubHxzBik8L7E2Uu+xKrfWDJtcQ5XhZmY3bEehM5Y2CiPL5yPqcCMFhdd4j1wwHBJXnXadWBBd/aop9epzhHsT/MHN4PE8umyfaO5WzGxokS5a+eOnAzoQ==" ;
+    p31:content-sig  a                      msg:Signature ;
+            msg:signer  p12:7820503869697675000 ;
+            msg:signatureValue              "MGUCMQC8s+IIJAoHkvcIdubHxzBik8L7E2Uu+xKrfWDJtcQ5XhZmY3bEehM5Y2CiPL5yPqcCMFhdd4j1wwHBJXnXadWBBd/aop9epzhHsT/MHN4PE8umyfaO5WzGxokS5a+eOnAzoQ==" ;
             msg:hash                        "BoCZK0kl8NrdzpoBdkpm//8KQfVZ+3Rg4tdbpVmmdkamub63KXXiIMXFof9rELUExf4EOgdG3C1ih1IPNn67hkCH08Qs2n4zq+ZSe0UqigGE/erkTcF1BN2nBxzg0rJtk9GpIEcgPJVjmUr2p0bGc+PDN85dC9ec/FEp28aLwA==" ;
             msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
             msg:signedGraph                 p31:content .
@@ -103,9 +103,9 @@ p17:envelope-1vve {
             msg:senderNode               p38:resource .
     
     p48:envelope-ikk0-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMDEdA9yaGpxmvlWOr20dQ090oFgRuySbbRY0/bfms4Gv9BMQOdEG02Z2sqXgJMhJRQIwbIoIITiGBTX9aDIbHGkUAhF1pWvfB0GjIb0FNPQqTDCiJ62iIYx1DZqLbKc38DLT" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMDEdA9yaGpxmvlWOr20dQ090oFgRuySbbRY0/bfms4Gv9BMQOdEG02Z2sqXgJMhJRQIwbIoIITiGBTX9aDIbHGkUAhF1pWvfB0GjIb0FNPQqTDCiJ62iIYx1DZqLbKc38DLT" ;
             msg:hash                        "AI1JXq2JRf30m3OTyCa1BuKHGzriUbn88urWhmcG1D0TMICpl2iKrCHVgGcbmRWNQ/veW54H3h4PnZe/THXVPFFPmRKHrG4qVMZDAGFGVUrZS5hPza9R4bppv/XkR7pYehjXNJfQBXQ/oBjijpf37lcXqjzmi9XxXE9YcYndAvVh" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p48:envelope-ikk0 .
@@ -118,9 +118,9 @@ p17:envelope-1vve {
 
 p11:envelope-dm4n-sig {
     p11:envelope-dm4n-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGUCME7vs+vj6DBFOGrAORkGB3ZhdKJhBfPUTMjX5ey6FXEmKi22qz36lArluEqQpXQJbgIxAOkODyq4TUQlV4N3hXayfjKqP3VkguUjExesH0c+qKAvDTUn8xAXuyueBTSLJOfX+Q==" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGUCME7vs+vj6DBFOGrAORkGB3ZhdKJhBfPUTMjX5ey6FXEmKi22qz36lArluEqQpXQJbgIxAOkODyq4TUQlV4N3hXayfjKqP3VkguUjExesH0c+qKAvDTUn8xAXuyueBTSLJOfX+Q==" ;
             msg:hash                        "Lp3mhUAQ4yJ3PkY2/c99IgeAq0r8+kbmwpJN1a5DExAT5zpmZ0OKaizOrn38tIQ81WoyUNTA0Ui0UPMP2c8/YZjYqQdfs0vHVou8tGdP5bmpdY+zhwP85pcxSj6uVb8O+KOhKO91LerG3b4iUHa2kVnpTW9A9VGB47eyr5BKIrk=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p11:envelope-dm4n .
@@ -128,9 +128,9 @@ p11:envelope-dm4n-sig {
 
 p27:envelope-7byg-sig {
     p27:envelope-7byg-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGUCMQDjqWaOEmquNCaei/HWoU8Oyj+H6DHgmZcOY3Ch/zqXvtk3YjeTJ6/IM8cM2y20jM4CMH0i36AbyMMD/L8g/S0esn2SjaGqovfNObKZ/qkEhfSlIW8QB6L4kVnC2wrJD5M0QQ==" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGUCMQDjqWaOEmquNCaei/HWoU8Oyj+H6DHgmZcOY3Ch/zqXvtk3YjeTJ6/IM8cM2y20jM4CMH0i36AbyMMD/L8g/S0esn2SjaGqovfNObKZ/qkEhfSlIW8QB6L4kVnC2wrJD5M0QQ==" ;
             msg:hash                        "EJvNE4Ag/2tM+qASghpMbmS+/EyPnRnkr9EGybKJiPwf0KXid1MZ44CG/dkYoGsEN6/1NY89F3yUJLLeQ6OQDlpoe35KsQhczWZVgfku/w03V+PST1jV3cz3tGAzCvV2O5FG14NaSpg0DvZRWe+y5Qvlwf387H1HNHS6fjvHImE=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p27:envelope-7byg .
@@ -138,17 +138,17 @@ p27:envelope-7byg-sig {
 
 p14:envelope-vnv7 {
     p11:envelope-dm4n-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGUCME7vs+vj6DBFOGrAORkGB3ZhdKJhBfPUTMjX5ey6FXEmKi22qz36lArluEqQpXQJbgIxAOkODyq4TUQlV4N3hXayfjKqP3VkguUjExesH0c+qKAvDTUn8xAXuyueBTSLJOfX+Q==" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGUCME7vs+vj6DBFOGrAORkGB3ZhdKJhBfPUTMjX5ey6FXEmKi22qz36lArluEqQpXQJbgIxAOkODyq4TUQlV4N3hXayfjKqP3VkguUjExesH0c+qKAvDTUn8xAXuyueBTSLJOfX+Q==" ;
             msg:hash                        "Lp3mhUAQ4yJ3PkY2/c99IgeAq0r8+kbmwpJN1a5DExAT5zpmZ0OKaizOrn38tIQ81WoyUNTA0Ui0UPMP2c8/YZjYqQdfs0vHVou8tGdP5bmpdY+zhwP85pcxSj6uVb8O+KOhKO91LerG3b4iUHa2kVnpTW9A9VGB47eyr5BKIrk=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p11:envelope-dm4n .
     
     p14:envelope-ua55-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p12:nte803gz4pbiw6equ3qa ;
-            sig:signatureValue              "MGYCMQC04AcJGOpxTA8nmUBnX5NjM/QWoHCjDPh89u6e7LAUyOeYxrpGTGHOf470os1w7HsCMQCWugfOoAhoFd0nOf2Z3nOkaSlrW1wBwM97iJhKvFaOneZNXL30feQmw0vutiT6DUs=" ;
+            a                               msg:Signature ;
+            msg:signer  p12:nte803gz4pbiw6equ3qa ;
+            msg:signatureValue              "MGYCMQC04AcJGOpxTA8nmUBnX5NjM/QWoHCjDPh89u6e7LAUyOeYxrpGTGHOf470os1w7HsCMQCWugfOoAhoFd0nOf2Z3nOkaSlrW1wBwM97iJhKvFaOneZNXL30feQmw0vutiT6DUs=" ;
             msg:hash                        "AIhm9NU/Tiv2NGiF7/UcFMKOidywUXhazWcIZiAq1dZ6dQ9B84qLNbSvMMgDZdiXgFIBjPSLCMU1Ft/gAav+eXvwbGBg+xQ+U6mg6GFZgdAPnnzAt/7H+Nm/iuTyyKaa4PvtGBN0Z2C8LihC9N36dBoNw4SDP46Ukmtt1Br9zZKp" ;
             msg:publicKeyFingerprint        "IwyZXueJ69uldEQMoR6tmjSICtahgt4Oji/iALKaL+4=" ;
             msg:signedGraph                 p14:envelope-ua55 .
@@ -184,9 +184,9 @@ p9:data {
             msg:senderNode       p38:resource ;
             msg:sentTimestamp    "1513345783513" .
     
-    p9:content-sig  a                       sig:Signature ;
-            sig:hasVerificationCertificate  p12:7820503869697675000 ;
-            sig:signatureValue              "MGUCMGweBf3N9MAUNbvZcxpfueo4VIZWXgAW2EEbKyXDA4wea9SMq3q/5haZtAfLJv7FmAIxANdTyTcQ6IqlKhP8a655QF2gLdbEjMNao9xbgc7o5XotOKLUPVc145JnVXGIe1pvxg==" ;
+    p9:content-sig  a                       msg:Signature ;
+            msg:signer  p12:7820503869697675000 ;
+            msg:signatureValue              "MGUCMGweBf3N9MAUNbvZcxpfueo4VIZWXgAW2EEbKyXDA4wea9SMq3q/5haZtAfLJv7FmAIxANdTyTcQ6IqlKhP8a655QF2gLdbEjMNao9xbgc7o5XotOKLUPVc145JnVXGIe1pvxg==" ;
             msg:hash                        "ALNs2UTDIodwFyAkA57/S4xpXn6pTLvNmZqzm2oMxTdmypt/0/Y4eQ4AdVjOQetMTxvAiQ6J/tIRzEMWFTU0qrCVmaiEL2d5EhVqdEnQtqUO27UM/i5/5eGaBqNGJXiPrdrO3BNwsmUNd4KsjhR8QVfCiS/rmmpiE3JNYI1b0t1z" ;
             msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
             msg:signedGraph                 p9:content .
@@ -244,9 +244,9 @@ p2:envelope-u2li {
             msg:containsSignature  p8:envelope-3j0q-sig .
     
     p8:envelope-3j0q-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGUCMBaYnjba1p8HqPybVQ97bajXsIhgPzMTpK6Z3XiDiH0B1qsUG2LmTZeHyEZr7jw6oAIxAPnMV7kpW/GsLvJ1LNajYJD1Sq5OOiNDN98wZdPAcJR+lV8yVICMqpiAO/eLsLfvVw==" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGUCMBaYnjba1p8HqPybVQ97bajXsIhgPzMTpK6Z3XiDiH0B1qsUG2LmTZeHyEZr7jw6oAIxAPnMV7kpW/GsLvJ1LNajYJD1Sq5OOiNDN98wZdPAcJR+lV8yVICMqpiAO/eLsLfvVw==" ;
             msg:hash                        "YkDuMQGZg1UzsQStc9xXMn+KBAIVsOtDQbT/L9cBKoY6pgQYM7u9Anlk9ZkU64PpcmGdd/SzHmrZVZ2oVlOaolVspgeoS/RWJTMq+FFJnTx+cl+GCgV/eOzxqEJjA53tIqCPy00pAf7My12GB1DCd9PAPDicqWdVNdW+F5HfhTI=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p8:envelope-3j0q .
@@ -254,9 +254,9 @@ p2:envelope-u2li {
 
 p11:envelope-dm4n {
     p40:envelope-ed0k-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGYCMQCbBcNn+z17+7eT4dg9qGnjlmprLaSlVre17weEFTRbVpGb5OGtV8C0p02gRDtImbcCMQCLL4ZP5oHcftbXS5Ne55cyIy+omDfMMbiPNs8VSM1XG6K4tXipuGEyffhhZKkrNoc=" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGYCMQCbBcNn+z17+7eT4dg9qGnjlmprLaSlVre17weEFTRbVpGb5OGtV8C0p02gRDtImbcCMQCLL4ZP5oHcftbXS5Ne55cyIy+omDfMMbiPNs8VSM1XG6K4tXipuGEyffhhZKkrNoc=" ;
             msg:hash                        "AK5n/tH3cxBUCoThr41HUVh1sR/h9bCE1lnRSALL+af1++fcyPr18nQdS67h4QvBAdJiDyNNFqxOx9y4HNgS5sbubyUNc4bOYcyLppan2YbHLt82+bb94gJrUTEEDE1THY6qCQV4OBGg6p8+DZ0FkVXJ1aK6eF1vQgfHl/s0mMIu" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p40:envelope-ed0k .
@@ -284,9 +284,9 @@ p11:envelope-dm4n {
 
 p14:envelope-ua55 {
     p14:content-lqq1-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p12:nte803gz4pbiw6equ3qa ;
-            sig:signatureValue              "MGYCMQCdvBJ6busDMET+Cwm+X0G9F0h6cdZKyhAu5mRHnimH+NHgPxl3iXbCnrUUCDlrKbICMQCg7DDvZ8semfU7XtLUdEqaF6BxwtInpqXKY7euftsorqnBEJdvRHD4ZZCj4isTwJM=" ;
+            a                               msg:Signature ;
+            msg:signer  p12:nte803gz4pbiw6equ3qa ;
+            msg:signatureValue              "MGYCMQCdvBJ6busDMET+Cwm+X0G9F0h6cdZKyhAu5mRHnimH+NHgPxl3iXbCnrUUCDlrKbICMQCg7DDvZ8semfU7XtLUdEqaF6BxwtInpqXKY7euftsorqnBEJdvRHD4ZZCj4isTwJM=" ;
             msg:hash                        "TSVmMl49sNiO/xne3gwUUt4fxfqcep2n6jJM5mhkda2dT4oraDtoJrZ7ktbkP05qsTuQsJo2hTtgJuJa1N4VSw==" ;
             msg:publicKeyFingerprint        "IwyZXueJ69uldEQMoR6tmjSICtahgt4Oji/iALKaL+4=" ;
             msg:signedGraph                 p14:content-lqq1 .
@@ -313,9 +313,9 @@ p14:envelope-ua55 {
 
 p41:envelope-m8nh-sig {
     p41:envelope-m8nh-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMFkYMyMw9kJalRr/BqiB7xcSlGri1t7+w5Zqzq3gLyEcXljbTgkDh1R+1fcFgtjpIQIwMATJyEVHlwp7CehvnSCIu0/7P432WdTB0qTLC1aG1aMpBHw5yY/mq7C7aYTcNrE+" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMFkYMyMw9kJalRr/BqiB7xcSlGri1t7+w5Zqzq3gLyEcXljbTgkDh1R+1fcFgtjpIQIwMATJyEVHlwp7CehvnSCIu0/7P432WdTB0qTLC1aG1aMpBHw5yY/mq7C7aYTcNrE+" ;
             msg:hash                        "AK073HiHdEciUwclUdlRiHTQF8f2z57d+2+CpDIGbhBTOKG7/vPaApvU+w2Ysb681AhMRdHbhiP5Xqxix63HYWiE1OLDUIpXzkn4La/8JKgJVCd8ePVA83tO/uu+MR2zts5+uDt2Eu/sxQiiqwqXtT8zTGHjJvTugDfIyCJCE1hV" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p41:envelope-m8nh .
@@ -328,9 +328,9 @@ p28:envelope-engq {
             msg:containsSignature  p42:envelope-l74h-sig .
     
     p42:envelope-l74h-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGUCMQDNs+0WTJ68EkuUhqkRrxuu5523hdYmiL4hklfMqSsrM+ZcuMJJ36ZtAz/PWR3oVyACMGGajjHGtQucHUX+7bTs3U2iuTmbd2jZNEqbByI8uuQ+B4080BYH+xTud9yS0P47tw==" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGUCMQDNs+0WTJ68EkuUhqkRrxuu5523hdYmiL4hklfMqSsrM+ZcuMJJ36ZtAz/PWR3oVyACMGGajjHGtQucHUX+7bTs3U2iuTmbd2jZNEqbByI8uuQ+B4080BYH+xTud9yS0P47tw==" ;
             msg:hash                        "PkvTzg6rT8TzBcpavSw2tgLPIKSr80+7AYU4xfO9RMT28Sc196egfBtp5KaURrl1QWqh710bNhB5de6QaB/iigf2feVni47KUyesCntnHiyrtDfKwIJirU20Eu2AVW/T2c9/pppG+48EmfaH0tEH73mGTtuKlC3fydDAT58ByeA=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p42:envelope-l74h .
@@ -353,9 +353,9 @@ p28:envelope-engq {
 
 p41:envelope-m8nh {
     p31:envelope-pj9k-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMC1qFwNsbRCwDeGs5sBqve1gmMahi+GwAPITuSzA3MDJaMnGKE1RjrLHtyNYj0xDZwIwH/RNg7JluB5O+kJmPFkTzcvVUD+AHFCQ/5y2SLq/5lbGutnlB7iMPg1PNqTzEfkM" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMC1qFwNsbRCwDeGs5sBqve1gmMahi+GwAPITuSzA3MDJaMnGKE1RjrLHtyNYj0xDZwIwH/RNg7JluB5O+kJmPFkTzcvVUD+AHFCQ/5y2SLq/5lbGutnlB7iMPg1PNqTzEfkM" ;
             msg:hash                        "YwC+ZwsKsdKfjTZGJGjETX1y7XdVHVwN4ocDTJgIJZjV6YPlvLAS+G25TNrYqwWLiHrNyfit4bgW6ECjSUncreMiwvnXwk83WmepYlDKlsXAkVphAeZ2Cf3Bm4NKtCJC4FZxA9BG1rirhRBOOVT4EseLwzRzB8wSb8v3St/NW9U=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p31:envelope-pj9k .
@@ -383,9 +383,9 @@ p41:envelope-m8nh {
 
 p33:envelope-goia-sig {
     p33:envelope-goia-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMHFbd98lJ8VEtN6nGpzNLbxY5z7yUuE4uHXkdaVcSxcDihH61eQ12cp7dAdPayvRbQIwZ3OGzL5BF6FVonqVh0nncQtsSyY+22Ti+Q6s3lxrAnB3wVagcIzwa1jEwpzhF7jJ" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMHFbd98lJ8VEtN6nGpzNLbxY5z7yUuE4uHXkdaVcSxcDihH61eQ12cp7dAdPayvRbQIwZ3OGzL5BF6FVonqVh0nncQtsSyY+22Ti+Q6s3lxrAnB3wVagcIzwa1jEwpzhF7jJ" ;
             msg:hash                        "R5CS0JbVblBh1msc6dYfNM898uTbuHf+Jo9CCRhkFC+RjLhDf7a/W0wrV9hUtsqV0aqUNE5ZTKYaMhEPqN+dIIxCwzJg0LEZgIcx3VojSh5du+X3KsHLsNhJPUCQoGmN/o8jHS8AUyF1o/rJxdzXaw+tVJN43/3amSoLXTHoGVQ=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p33:envelope-goia .
@@ -393,9 +393,9 @@ p33:envelope-goia-sig {
 
 p10:envelope-r04c-sig {
     p10:envelope-r04c-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMEUNfneCxlsUiN9SOY+KSCpYco9+CtnHttkrt5doDp+Z1AYsTSYSXT/t4ce4fGKBTQIwayEuVK8utWG/w/IcVP8iexY2OeBY9ePJF2tYHYWOjNy5fuNlpD/L68SK51Pj+VNU" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMEUNfneCxlsUiN9SOY+KSCpYco9+CtnHttkrt5doDp+Z1AYsTSYSXT/t4ce4fGKBTQIwayEuVK8utWG/w/IcVP8iexY2OeBY9ePJF2tYHYWOjNy5fuNlpD/L68SK51Pj+VNU" ;
             msg:hash                        "VaUnB4qpYrVUq5192++a60h6scH5tVL6jLNNkK370TQeVqRsJkw+EX34snGIoAwNCEt43w2jcmNHWREEiyLa1PjbWIr3WDxcV7zOFhB3e5Dnc2QfA5mEFSeTStdSDcuZJq9l72qRz33LAhWCAIwyCkLt974m3Tt2eL6ZteCIJRM=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p10:envelope-r04c .
@@ -403,9 +403,9 @@ p10:envelope-r04c-sig {
 
 p25:envelope-twcq-sig {
     p25:envelope-twcq-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGYCMQDAZc8YUNHdsMxuJQ0DLhdJFTVveU0vS3Z7JUHFE7zkJVLHOGa90Tb2fFo4C0CQEAkCMQCAXNofwxdXV3hkH+FlR2/ci8kGCfzAyb8acuk/IpHh3Um7CtznGxKt7S7nOGd7I0Q=" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGYCMQDAZc8YUNHdsMxuJQ0DLhdJFTVveU0vS3Z7JUHFE7zkJVLHOGa90Tb2fFo4C0CQEAkCMQCAXNofwxdXV3hkH+FlR2/ci8kGCfzAyb8acuk/IpHh3Um7CtznGxKt7S7nOGd7I0Q=" ;
             msg:hash                        "VqpDJcyGjGPcFCsOFpi4FsoxGO8zIQeM3kN2abA/IOVC+q3ti/1nn5C778/baE885x6wz9vBqIrZzbJ7zV/xz2sf94VR0R91QfUMLC/YZZnPsQiEoJCP4R1IAwzN9oje90DfAMiMDvHXgkeEcpyqyPbcytaQUl+oHSKNKcpP1wY=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p25:envelope-twcq .
@@ -432,9 +432,9 @@ p10:envelope-1ltm {
             msg:sentTimestamp    1513345783797 .
     
     p10:content-tbn3-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p12:nte803gz4pbiw6equ3qa ;
-            sig:signatureValue              "MGYCMQCNVnk3VqhGgM8E6IDKZ0QlLY8YcssIyLff8VkIVkWHLjfHZ40hpLMuq62ptH+nWDYCMQC/TfcJZPQwf0Mck/3itkSVRw36RWXAAkPDud978+6xoyZdUSW6c0hhSuyXc7C0SMc=" ;
+            a                               msg:Signature ;
+            msg:signer  p12:nte803gz4pbiw6equ3qa ;
+            msg:signatureValue              "MGYCMQCNVnk3VqhGgM8E6IDKZ0QlLY8YcssIyLff8VkIVkWHLjfHZ40hpLMuq62ptH+nWDYCMQC/TfcJZPQwf0Mck/3itkSVRw36RWXAAkPDud978+6xoyZdUSW6c0hhSuyXc7C0SMc=" ;
             msg:hash                        "QMIxz7ronBfwS8qVTYLd+XZNoQERVtEeGImJtU1R14joB5435IM1dEwMI3okhvM+fA4NdicOFOKhmyFj2uA/bA==" ;
             msg:publicKeyFingerprint        "IwyZXueJ69uldEQMoR6tmjSICtahgt4Oji/iALKaL+4=" ;
             msg:signedGraph                 p10:content-tbn3 .
@@ -479,9 +479,9 @@ p0:sysinfo {
 
 p13:envelope-dec7 {
     p13:content-3ssv-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p12:nte803gz4pbiw6equ3qa ;
-            sig:signatureValue              "MGUCMDsRexnkM9aBm9No9DMy2KngGouc2oqNkuU63oGsi9t5UBHtgK7unhwWPWOJCwohxAIxAKmWfRhlBQyL3lFB57OUuEkXgUHu9uhSl14+zgy77vUOoTjjj2Hjk99fjp6Kld0uxQ==" ;
+            a                               msg:Signature ;
+            msg:signer  p12:nte803gz4pbiw6equ3qa ;
+            msg:signatureValue              "MGUCMDsRexnkM9aBm9No9DMy2KngGouc2oqNkuU63oGsi9t5UBHtgK7unhwWPWOJCwohxAIxAKmWfRhlBQyL3lFB57OUuEkXgUHu9uhSl14+zgy77vUOoTjjj2Hjk99fjp6Kld0uxQ==" ;
             msg:hash                        "flOoxMv80L0iIY89g/TTWNU2GOrKcfgbr14mSwhUOfEkbRxy7WywlOyfZgwmiaGlxjV50OLymY1iWuyEU8cpH9iO3gfrc3hsV09I4bAbNpj0qTig2/HHVvQfIrSbf7IHKgVZa2BYRnfIW1lMtfkjvr+7yOCz03vbfOns86PQ8gc=" ;
             msg:publicKeyFingerprint        "IwyZXueJ69uldEQMoR6tmjSICtahgt4Oji/iALKaL+4=" ;
             msg:signedGraph                 p13:content-3ssv .
@@ -504,9 +504,9 @@ p13:envelope-dec7 {
 
 p44:envelope-jrbj {
     p23:envelope-jglh-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMCpwQXjXgGiu3nKFb0Gr1ELBJ62zrPp+nSy2HmWecq7X31raChZ0wP6m8dj3TObY/QIwAc/B8lj/wZfbl1Zwa075E8aS4QVd0boWWmsOcJ+UbGB1LtQQylZQrHWyhJVzmmPz" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMCpwQXjXgGiu3nKFb0Gr1ELBJ62zrPp+nSy2HmWecq7X31raChZ0wP6m8dj3TObY/QIwAc/B8lj/wZfbl1Zwa075E8aS4QVd0boWWmsOcJ+UbGB1LtQQylZQrHWyhJVzmmPz" ;
             msg:hash                        "AIDhNZ3FQFty7JhCcevwb7aK/h9sBgS/XPRU5oWOwbS/V2HJBerBJ/LcFrBQyVGzADwxhuZ+fTJnxC9h227Zb3veUCZPofDMxuOuYyY71Rzz9zCi18yXrTmI8J5fukkSX1aLIsFitH34wrVUS7YsYUpUI57DEkDEeoEyP7qheppb" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p23:envelope-jglh .
@@ -516,9 +516,9 @@ p44:envelope-jrbj {
             msg:protocolVersion    "1.0" ;
             msg:receivedTimestamp  1513345771398 .
     
-    p44:data-sig  a                         sig:Signature ;
-            sig:hasVerificationCertificate  p12:7820503869697675000 ;
-            sig:signatureValue              "MGUCMHdZCr5bWgELom7iIFji+rva2pxSN6oKAEX2V62/BAWeptejodDOnFIzeKd13zLLywIxALXOeQLHkeEpGjsjgDn5iopRhoxF1tdZcVKdJUGB7/qVScJ8igUc/zhzBHd+EcluZA==" ;
+    p44:data-sig  a                         msg:Signature ;
+            msg:signer  p12:7820503869697675000 ;
+            msg:signatureValue              "MGUCMHdZCr5bWgELom7iIFji+rva2pxSN6oKAEX2V62/BAWeptejodDOnFIzeKd13zLLywIxALXOeQLHkeEpGjsjgDn5iopRhoxF1tdZcVKdJUGB7/qVScJ8igUc/zhzBHd+EcluZA==" ;
             msg:hash                        "duXwxaAnisuhtEVMauXsrdgEWygDgF4eCLXy2Ofd5XBT6TG0Mzci1iBHevBZQ11JU0/4b4GccYKmRvSmkp3q9Xm7HnrD+hR2zHDz7D1hbItq+BJ5SkV146rGJ7a6M/FdACCYcdekQTBZpwrIrTqAwzfJV3nJlHR4M6ghRk862Ts=" ;
             msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
             msg:signedGraph                 p44:data .
@@ -532,9 +532,9 @@ p44:envelope-jrbj {
 
 p3:envelope-yk1e {
     p14:envelope-vnv7-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGUCMHVCSjsEM/gyeyRC33+ivJ2yCThu1JUe/G6mHiM+jPTOqiGnXN2VswTjhb1RozZyOAIxANFU9h+zHDqO/LGpr4jlFSmYPR6Zq1n7Q0gS5WpaY9MndmlrLJCoeesRIBIuQMybDw==" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGUCMHVCSjsEM/gyeyRC33+ivJ2yCThu1JUe/G6mHiM+jPTOqiGnXN2VswTjhb1RozZyOAIxANFU9h+zHDqO/LGpr4jlFSmYPR6Zq1n7Q0gS5WpaY9MndmlrLJCoeesRIBIuQMybDw==" ;
             msg:hash                        "AIIxesQPL9q1zM4iNjnklPlrvu2qPpseat5PbHCDOpQzQp9y9OT41fKcwkVm3xlcLJoieAB2MdeYiPbrTh0qQooIQAe0Ch8bJEbj4JpST5Ybu7bLtKhMOlVd8rAyBA3+NtHL/1qEVGQqE0n4E0VLzv/mbe4iygWauI8wVgRUkOIT" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p14:envelope-vnv7 .
@@ -561,9 +561,9 @@ p3:envelope-yk1e {
 
 p6:envelope-0sio-sig {
     p6:envelope-0sio-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMGJcaS/o1c+vzZhNbkecNFzkLKLgNBzhAr9XxXPgcR6uB2v4IeGo8SWDcJ0ur+JTUAIwY4ifOfo3+312U+nQ/Br1fJPTLuHpNU0dfcbjwnl0+VmCAttlO2NUgOYLEOg8dHMK" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMGJcaS/o1c+vzZhNbkecNFzkLKLgNBzhAr9XxXPgcR6uB2v4IeGo8SWDcJ0ur+JTUAIwY4ifOfo3+312U+nQ/Br1fJPTLuHpNU0dfcbjwnl0+VmCAttlO2NUgOYLEOg8dHMK" ;
             msg:hash                        "MvQxlMP22+XTumpMJF2DTocqyQMLmETaw7xeLlS7WyfNjkg6ztuILsfrYYRrldJVVgNhIYxDu2lKqbyjdayBeAQzDGZ86wo4HHPAMYGUFcEoXnPSb+UdCkng1gCFfUrSjjGY2vfKv1aKjESbcSoHDs9IfPDfA3IKlxwPC1MOLc0=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p6:envelope-0sio .
@@ -576,9 +576,9 @@ p29:envelope-kxkb {
             msg:containsSignature  p47:envelope-7ezq-sig .
     
     p47:envelope-7ezq-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGUCMDSVEw/mnhUVWBCvJatxDAqEWh/ZqfQMs1rwUsyFdE0UBz5mN4RE5RlvD/QWE2trUwIxAKLrmSjbOxQkV0gQxDJiwCNXG/8IjipHOV7C8r8YaZX6Vkb/P2EAmUI9XkBjzu9fXw==" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGUCMDSVEw/mnhUVWBCvJatxDAqEWh/ZqfQMs1rwUsyFdE0UBz5mN4RE5RlvD/QWE2trUwIxAKLrmSjbOxQkV0gQxDJiwCNXG/8IjipHOV7C8r8YaZX6Vkb/P2EAmUI9XkBjzu9fXw==" ;
             msg:hash                        "AJhIRXrKtWkJUlBsG/pV5dYj9ZpkWAz8JC9IUeA1MOQ5IhlkIONdkXLkSAyCyMu0UrQNUk7MAM3PfNDPi1t4zAtm3ByyNckZFZN6D6YYzqClamxfiApN/W+wkO4OzNnv0lyD507XYmWeu3OJfunszrXQLtGKwGfigg/5FNvig2/w" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p47:envelope-7ezq .
@@ -621,9 +621,9 @@ p49:envelope-5mhl {
             msg:containsSignature  p10:envelope-r04c-sig .
     
     p10:envelope-r04c-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMEUNfneCxlsUiN9SOY+KSCpYco9+CtnHttkrt5doDp+Z1AYsTSYSXT/t4ce4fGKBTQIwayEuVK8utWG/w/IcVP8iexY2OeBY9ePJF2tYHYWOjNy5fuNlpD/L68SK51Pj+VNU" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMEUNfneCxlsUiN9SOY+KSCpYco9+CtnHttkrt5doDp+Z1AYsTSYSXT/t4ce4fGKBTQIwayEuVK8utWG/w/IcVP8iexY2OeBY9ePJF2tYHYWOjNy5fuNlpD/L68SK51Pj+VNU" ;
             msg:hash                        "VaUnB4qpYrVUq5192++a60h6scH5tVL6jLNNkK370TQeVqRsJkw+EX34snGIoAwNCEt43w2jcmNHWREEiyLa1PjbWIr3WDxcV7zOFhB3e5Dnc2QfA5mEFSeTStdSDcuZJq9l72qRz33LAhWCAIwyCkLt974m3Tt2eL6ZteCIJRM=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p10:envelope-r04c .
@@ -649,9 +649,9 @@ p16:envelope-z4jb {
             msg:containsSignature  p33:envelope-goia-sig .
     
     p33:envelope-goia-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMHFbd98lJ8VEtN6nGpzNLbxY5z7yUuE4uHXkdaVcSxcDihH61eQ12cp7dAdPayvRbQIwZ3OGzL5BF6FVonqVh0nncQtsSyY+22Ti+Q6s3lxrAnB3wVagcIzwa1jEwpzhF7jJ" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMHFbd98lJ8VEtN6nGpzNLbxY5z7yUuE4uHXkdaVcSxcDihH61eQ12cp7dAdPayvRbQIwZ3OGzL5BF6FVonqVh0nncQtsSyY+22Ti+Q6s3lxrAnB3wVagcIzwa1jEwpzhF7jJ" ;
             msg:hash                        "R5CS0JbVblBh1msc6dYfNM898uTbuHf+Jo9CCRhkFC+RjLhDf7a/W0wrV9hUtsqV0aqUNE5ZTKYaMhEPqN+dIIxCwzJg0LEZgIcx3VojSh5du+X3KsHLsNhJPUCQoGmN/o8jHS8AUyF1o/rJxdzXaw+tVJN43/3amSoLXTHoGVQ=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p33:envelope-goia .
@@ -659,9 +659,9 @@ p16:envelope-z4jb {
 
 p1:envelope-30wn {
     p44:envelope-jrbj-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGUCMQDXbefj3ydejJ2UTwyiXpDikapjgRINBew+3Gd7+sVzXOTS9jZM1+9M/r5DnrO98nkCMD6WFYYtj7eCXji2SdV05JNbjpfb0+GImxQubSMzgcLcrd+hm8ahjrLWxBtQ97ALFw==" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGUCMQDXbefj3ydejJ2UTwyiXpDikapjgRINBew+3Gd7+sVzXOTS9jZM1+9M/r5DnrO98nkCMD6WFYYtj7eCXji2SdV05JNbjpfb0+GImxQubSMzgcLcrd+hm8ahjrLWxBtQ97ALFw==" ;
             msg:hash                        "VJzUItukPZoUQCCekcp9Byf5LmaEgO+TUIHljAD+kBdbgfxT2iK6fqjQryZ2utG/yVlTPjc3TaOP9waktvOo6ZWGebhb4ViIb59BdC/ELvYZ4H4WZIrstVe6EkCDYiMaTWpBcTMEsXOWg/47C4eCjZiqefz7m1zzUhYDfzSfOXM=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p44:envelope-jrbj .
@@ -687,9 +687,9 @@ p1:envelope-30wn {
 }
 
 p33:envelope-goia {
-    p33:envelope-sig  a                     sig:Signature ;
-            sig:hasVerificationCertificate  p12:7820503869697675000 ;
-            sig:signatureValue              "MGUCMDCWztT5w6bzulB1Js0Oy6jOyTux91W1ymePV/uuiu8kfBC+EyPkUMKkGTF4MXUEewIxANli8byJCB+FNxxXM1GemCtyXxedjDKZfEwmg46ZMeokoyhp9YG+EOVqDlmveSNGnA==" ;
+    p33:envelope-sig  a                     msg:Signature ;
+            msg:signer  p12:7820503869697675000 ;
+            msg:signatureValue              "MGUCMDCWztT5w6bzulB1Js0Oy6jOyTux91W1ymePV/uuiu8kfBC+EyPkUMKkGTF4MXUEewIxANli8byJCB+FNxxXM1GemCtyXxedjDKZfEwmg46ZMeokoyhp9YG+EOVqDlmveSNGnA==" ;
             msg:hash                        "ah4WEk0+Blv0BrP1i17LWmxPJEVfGSn8WP/Z8VN68nis2tdxRO4XKoKClFDW25W/I06am11K4mC+kHIWfSUzIDz47B/Upjrc4N+xwIBNNZmTnV1nn/HzGUuXFTqZyAXl3mzoDK0GSnIphl9kDCIUNW8PpeacGo9tzbqxrr6BkjI=" ;
             msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
             msg:signedGraph                 p33:envelope .
@@ -708,9 +708,9 @@ p33:envelope-goia {
 
 p19:envelope-h151-sig {
     p19:envelope-h151-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGUCMFRyXmiy0uHwZzgEQSOZdSf93TPZBpMV/qlnfgKLaexAcmCIPkjpceoT6xqI5Z0IUwIxAMoI7KD0T/2tzCvGIJkdxxLqc8530la7j8eIQhglBG1ZtMAxJkrbuUMQtotFGZa5cQ==" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGUCMFRyXmiy0uHwZzgEQSOZdSf93TPZBpMV/qlnfgKLaexAcmCIPkjpceoT6xqI5Z0IUwIxAMoI7KD0T/2tzCvGIJkdxxLqc8530la7j8eIQhglBG1ZtMAxJkrbuUMQtotFGZa5cQ==" ;
             msg:hash                        "AI73fczFmVY5ogs8ChpgvhPb8Jrfqw72Bx0yvaKJX+dQg7YcorGeV/lEFI1ovBJnujKwrXKfsuqTWkqrxUD/yZAMf+f2eDWZiPhOI6gIZhZ/nLhGp2aXw5WQcoXAjuG3389JNyKV4qdMda8Yq39/ciJ4mf2UemkRbObMK41UMvUP" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p19:envelope-h151 .
@@ -718,9 +718,9 @@ p19:envelope-h151-sig {
 
 p46:envelope-i81z-sig {
     p46:envelope-i81z-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGYCMQDyyJw+3HWSOPnKQExRPY5stbhVx2FydpMZFG/HM46RNzRkez3HdeqZfkzatj5rNlcCMQDmex0vveoKc4Xx9AKIwaNj8Z3eZ+HeuqfUZvw7nmxTnIQHJ5m0vpTHJrxcgLNLfZ8=" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGYCMQDyyJw+3HWSOPnKQExRPY5stbhVx2FydpMZFG/HM46RNzRkez3HdeqZfkzatj5rNlcCMQDmex0vveoKc4Xx9AKIwaNj8Z3eZ+HeuqfUZvw7nmxTnIQHJ5m0vpTHJrxcgLNLfZ8=" ;
             msg:hash                        "B1g5eIUYkKPC7GaDQIkSifpE/SjOoJtNL9vmwHoVATyEP0kfENSPOnPVhykuM9p3ZvKdGWDf/66VI8szkOAviRWGjMImhmfGTgaB14N25nmKymc2lVgPq4bE6A4ZZuSZDR2nD5Iy34FSYUPAwuTCtrg2vijDt/3xt7ZWz9trn18=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p46:envelope-i81z .
@@ -728,9 +728,9 @@ p46:envelope-i81z-sig {
 
 p44:envelope-jrbj-sig {
     p44:envelope-jrbj-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGUCMQDXbefj3ydejJ2UTwyiXpDikapjgRINBew+3Gd7+sVzXOTS9jZM1+9M/r5DnrO98nkCMD6WFYYtj7eCXji2SdV05JNbjpfb0+GImxQubSMzgcLcrd+hm8ahjrLWxBtQ97ALFw==" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGUCMQDXbefj3ydejJ2UTwyiXpDikapjgRINBew+3Gd7+sVzXOTS9jZM1+9M/r5DnrO98nkCMD6WFYYtj7eCXji2SdV05JNbjpfb0+GImxQubSMzgcLcrd+hm8ahjrLWxBtQ97ALFw==" ;
             msg:hash                        "VJzUItukPZoUQCCekcp9Byf5LmaEgO+TUIHljAD+kBdbgfxT2iK6fqjQryZ2utG/yVlTPjc3TaOP9waktvOo6ZWGebhb4ViIb59BdC/ELvYZ4H4WZIrstVe6EkCDYiMaTWpBcTMEsXOWg/47C4eCjZiqefz7m1zzUhYDfzSfOXM=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p44:envelope-jrbj .
@@ -738,17 +738,17 @@ p44:envelope-jrbj-sig {
 
 p6:envelope-0sio {
     p22:envelope-tico-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMD6p+UtbijQYaqQbihg61SoVap9E70jzoxjrm+eCpmpucad6Rg/S7t3fU6PYiCy7cQIwOTeJ+elxgjjocdNAFn9Hv36OLs3Fo+ZCQz9otegEOjKhQSVekXxzZeUtOgkqan0g" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMD6p+UtbijQYaqQbihg61SoVap9E70jzoxjrm+eCpmpucad6Rg/S7t3fU6PYiCy7cQIwOTeJ+elxgjjocdNAFn9Hv36OLs3Fo+ZCQz9otegEOjKhQSVekXxzZeUtOgkqan0g" ;
             msg:hash                        "AIJ4UZSQK85vJrqCxttUa1GeboKv008zRE0FyH1as1zsl4mtuL7wqilqiFSMNEoL6sOyy1k2NqI4b3DBQu1Om5r+MD0EWoQ7G5XxeZKhN2WXlO4Ac8ogkDRU1FgrpJk7Bc/HwYpQHLoI+XBFLOe+ZVQGE95G5DzVVeCLLzivPUYc" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p22:envelope-tico .
     
     p6:envelope-kn0t-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p12:nte803gz4pbiw6equ3qa ;
-            sig:signatureValue              "MGUCMQDRpT3AQ9mWAxXDyV2stXhtCtZdcnJmZxPm9WrPHta5rsf2l4f0yy4VHdapg5RbIrMCMCB5o1J3//zCnsQbEE9Qn9E/VEY414bpNtz+OizdU6Ply5v5ub0VQH+xfKlaHcpiOA==" ;
+            a                               msg:Signature ;
+            msg:signer  p12:nte803gz4pbiw6equ3qa ;
+            msg:signatureValue              "MGUCMQDRpT3AQ9mWAxXDyV2stXhtCtZdcnJmZxPm9WrPHta5rsf2l4f0yy4VHdapg5RbIrMCMCB5o1J3//zCnsQbEE9Qn9E/VEY414bpNtz+OizdU6Ply5v5ub0VQH+xfKlaHcpiOA==" ;
             msg:hash                        "AIncp2745wkT9TywwSGwBUWJucfodFa8xhROn71VwfRCjUt1wAwcKj4I5q/NXpNTa8I52E3RRJws44iM/cN2wNyw0Mn1ukoVxj0+vN9IZNsI3781GYnQsN+katHP66TnQ/EtGnbgIW0X7lgDU7BiAnxAF7Mfj9yM7BqIbw7KI3gc" ;
             msg:publicKeyFingerprint        "IwyZXueJ69uldEQMoR6tmjSICtahgt4Oji/iALKaL+4=" ;
             msg:signedGraph                 p6:envelope-kn0t .
@@ -771,9 +771,9 @@ p6:envelope-0sio {
 }
 
 p21:data {
-    p21:content-sig  a                      sig:Signature ;
-            sig:hasVerificationCertificate  p12:7820503869697675000 ;
-            sig:signatureValue              "MGUCMQCcFEv58uXwwSDbFOamPoxY5MNYWgS9NOIjsEuALKxNylZvOFKzMhWxjpZc+OPYspwCMDcZYt75XuGJH+P3SQ0B5iMXW+0P19rSWVsY98TT1cSeYnUGGIA+gaIp9bOyRUaEsA==" ;
+    p21:content-sig  a                      msg:Signature ;
+            msg:signer  p12:7820503869697675000 ;
+            msg:signatureValue              "MGUCMQCcFEv58uXwwSDbFOamPoxY5MNYWgS9NOIjsEuALKxNylZvOFKzMhWxjpZc+OPYspwCMDcZYt75XuGJH+P3SQ0B5iMXW+0P19rSWVsY98TT1cSeYnUGGIA+gaIp9bOyRUaEsA==" ;
             msg:hash                        "ALNs2UTDIodwFyAkA57/S4xpXn6pTLvNmZqzm2oMxTdmypt/0/Y4eQ4AdVjOQetMTxvAiQ6J/tIRzEMWFTU0qrCQPVVGBnoaFQjEeNxzeOycBGhVAXaZaJaBCFS2NtP03hvPcULGNPs6LbgdMYP9veTaap8KLwDKpwa6wBOY1wTY" ;
             msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
             msg:signedGraph                 p21:content .
@@ -818,9 +818,9 @@ p39:envelope-b7qv {
             msg:containsSignature  p35:envelope-qdj9-sig .
     
     p35:envelope-qdj9-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGUCMQDp4EW/TRcVjt36HYwuMqtupgfsFkedLfEw0AyMWociyv0Cd+sAir+FYbb97y88b8ACMDT19mFthP4FOu2hUqYH7f+GKDMGqRiCsg7mN96vwNy8wOcnLL7xMtoOY4CxBvEYwg==" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGUCMQDp4EW/TRcVjt36HYwuMqtupgfsFkedLfEw0AyMWociyv0Cd+sAir+FYbb97y88b8ACMDT19mFthP4FOu2hUqYH7f+GKDMGqRiCsg7mN96vwNy8wOcnLL7xMtoOY4CxBvEYwg==" ;
             msg:hash                        "AJn3h4w+jd7mvcbsZBb700m26pJu+FZMWgXuSawF1zSbRAPpLqbURsL/FSea42XmDU94Fe1Ztuoj6dr4dDNsx4BucPanY3GrFKyvGM/zorObmvVHSE1uyrDja8ssZJ0tmCwzbNRW94n1boeygM/CaWa7V84qz+p/F7549APX+roC" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p35:envelope-qdj9 .
@@ -849,9 +849,9 @@ p21:content {
 
 p3:envelope-yk1e-sig {
     p3:envelope-yk1e-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGYCMQDhFH1neZ7C7838A3mhlCF0BZ3Ede2d9DMkZrr82jpL1hKdia7+5LEKAa2+XAbA9M4CMQCIvTifI4YQNZBaKBQd7V5Z16eLKFuoinj32aKq5EysedaMX+dHbCyY2hvHS0GUS4o=" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGYCMQDhFH1neZ7C7838A3mhlCF0BZ3Ede2d9DMkZrr82jpL1hKdia7+5LEKAa2+XAbA9M4CMQCIvTifI4YQNZBaKBQd7V5Z16eLKFuoinj32aKq5EysedaMX+dHbCyY2hvHS0GUS4o=" ;
             msg:hash                        "BJj+bsB7zFfZwzIaywWuYF7dc6w6xVPZJWgKtSVEwGHLeD/I4obyh3umPHfjCZz0byAfvYgZZ3RVJhyyzg/+whhghyohqa/YFgfxhQb6fRpXvbaEOe2S60R7SUC7l1Uq1JcXW5pDa9SE+OT3RNzqQtvYeVCkvgehLGOcjTseHxg=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p3:envelope-yk1e .
@@ -859,9 +859,9 @@ p3:envelope-yk1e-sig {
 
 p42:envelope-l74h-sig {
     p42:envelope-l74h-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGUCMQDNs+0WTJ68EkuUhqkRrxuu5523hdYmiL4hklfMqSsrM+ZcuMJJ36ZtAz/PWR3oVyACMGGajjHGtQucHUX+7bTs3U2iuTmbd2jZNEqbByI8uuQ+B4080BYH+xTud9yS0P47tw==" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGUCMQDNs+0WTJ68EkuUhqkRrxuu5523hdYmiL4hklfMqSsrM+ZcuMJJ36ZtAz/PWR3oVyACMGGajjHGtQucHUX+7bTs3U2iuTmbd2jZNEqbByI8uuQ+B4080BYH+xTud9yS0P47tw==" ;
             msg:hash                        "PkvTzg6rT8TzBcpavSw2tgLPIKSr80+7AYU4xfO9RMT28Sc196egfBtp5KaURrl1QWqh710bNhB5de6QaB/iigf2feVni47KUyesCntnHiyrtDfKwIJirU20Eu2AVW/T2c9/pppG+48EmfaH0tEH73mGTtuKlC3fydDAT58ByeA=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p42:envelope-l74h .
@@ -907,9 +907,9 @@ p33:envelope {
             rdfg:subGraphOf        p32:4240608697617289000 ;
             msg:containsSignature  p33:atom-sig .
     
-    p33:atom-sig  a                         sig:Signature ;
-            sig:hasVerificationCertificate  p12:7820503869697675000 ;
-            sig:signatureValue              "MGUCMCzR5WvSfYOt0bF+fHgITZJl7YGCJg1fs/6bIAdiqNQFi1O6RBFYQLi5L2KW9LJRYQIxAIllpz3hFBESOdTV4YNKvyv+QUsfDupMREQkmlrnQZlZeraxzJC12Ic3WMtSaPZrNg==" ;
+    p33:atom-sig  a                         msg:Signature ;
+            msg:signer  p12:7820503869697675000 ;
+            msg:signatureValue              "MGUCMCzR5WvSfYOt0bF+fHgITZJl7YGCJg1fs/6bIAdiqNQFi1O6RBFYQLi5L2KW9LJRYQIxAIllpz3hFBESOdTV4YNKvyv+QUsfDupMREQkmlrnQZlZeraxzJC12Ic3WMtSaPZrNg==" ;
             msg:hash                        "XtGMwwT9OXHfU8C6L/+ApMK9PNJrgavB5tED/KsqT7FJaJXbyg0vyycM6UIDrNnx6gxeuIu0Wr3ZvHBhyp3GW5Ur0SH6Mqej3ItUImewnMDn+MTBDUoNrjRRB+aXIXkM/lT/zifqY2fe/QG9lWFt4m7JFZLetEL/CIC5+7LhAgg=" ;
             msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
             msg:signedGraph                 p33:atom .
@@ -926,9 +926,9 @@ p33:envelope {
 
 p14:envelope-vnv7-sig {
     p14:envelope-vnv7-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGUCMHVCSjsEM/gyeyRC33+ivJ2yCThu1JUe/G6mHiM+jPTOqiGnXN2VswTjhb1RozZyOAIxANFU9h+zHDqO/LGpr4jlFSmYPR6Zq1n7Q0gS5WpaY9MndmlrLJCoeesRIBIuQMybDw==" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGUCMHVCSjsEM/gyeyRC33+ivJ2yCThu1JUe/G6mHiM+jPTOqiGnXN2VswTjhb1RozZyOAIxANFU9h+zHDqO/LGpr4jlFSmYPR6Zq1n7Q0gS5WpaY9MndmlrLJCoeesRIBIuQMybDw==" ;
             msg:hash                        "AIIxesQPL9q1zM4iNjnklPlrvu2qPpseat5PbHCDOpQzQp9y9OT41fKcwkVm3xlcLJoieAB2MdeYiPbrTh0qQooIQAe0Ch8bJEbj4JpST5Ybu7bLtKhMOlVd8rAyBA3+NtHL/1qEVGQqE0n4E0VLzv/mbe4iygWauI8wVgRUkOIT" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p14:envelope-vnv7 .
@@ -936,9 +936,9 @@ p14:envelope-vnv7-sig {
 
 p2:envelope-u2li-sig {
     p2:envelope-u2li-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGUCMD5qi3FdjivGrKu8X1jZiFIvR+8TOcQ8JeFO6ejJ9ChiXG0F2rpHngBM2n8t3Zh5tgIxAM0cK+YxvJYXNSNI+Zie0ddxEgXldwct3+mxnugGpKz3WZfVCQKVPkdksXyD86iDBw==" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGUCMD5qi3FdjivGrKu8X1jZiFIvR+8TOcQ8JeFO6ejJ9ChiXG0F2rpHngBM2n8t3Zh5tgIxAM0cK+YxvJYXNSNI+Zie0ddxEgXldwct3+mxnugGpKz3WZfVCQKVPkdksXyD86iDBw==" ;
             msg:hash                        "J1LOQz3N53dtEVPKHhUmnNsyDovo+hQdIfh7uuxlVm1vTT39vrb1+PN9C467O3Tr8O2AuWWQp3MScb7q3yAY1Hl6BLQu7aeJDv7SQxvE96fQFAx1ZWv80/0w6LjiCibXVDBTv54b24w/q8akqE+eKe3Lj45DtRnDOGRfpgeqvNM=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p2:envelope-u2li .
@@ -958,16 +958,16 @@ p18:envelope-xg0i {
             msg:containsSignature  p18:data-sig , p39:envelope-b7qv-sig .
     
     p39:envelope-b7qv-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMCMjAJ8u5TtpnKT/5N0TgnmeT0JbK2epep7sPAVe5jcJEayTK987rKRkr5DetW2I7AIwL0h/bh3pQSWz6nq7U8P3eoXQIkmQSbSt24sR4JYVdSVfOns+BPnbkAnKVzdLvrMM" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMCMjAJ8u5TtpnKT/5N0TgnmeT0JbK2epep7sPAVe5jcJEayTK987rKRkr5DetW2I7AIwL0h/bh3pQSWz6nq7U8P3eoXQIkmQSbSt24sR4JYVdSVfOns+BPnbkAnKVzdLvrMM" ;
             msg:hash                        "ShY3hdW9vTHBqXcZjIQuFRRimkaZ8ADFioXR5D3jeI1m77fSlmtPdwOAZT7J7VtGho053HpVx8HbWHctII7rwZX/dyCWB/hn+iYmlD7ouUKHdLYxAo+QC4JT+DIonbiUW/7XVoVg/ANoVMrSXJC7u3pQqx1teNORCJgYiI+h6fA=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p39:envelope-b7qv .
     
-    p18:data-sig  a                         sig:Signature ;
-            sig:hasVerificationCertificate  p12:7820503869697675000 ;
-            sig:signatureValue              "MGYCMQCxGjx8fOsUiEBAHtUopbTGoeUTTeEp9zDv57ktaUjnZWtoDiVL9KxnJI85a6PB5MYCMQDKtIANs8qTjsQPjt1LXozY8sNxVn33Mq4yTbwHFCyqPxNYLZ70EH5AGNQ/0yGGAsw=" ;
+    p18:data-sig  a                         msg:Signature ;
+            msg:signer  p12:7820503869697675000 ;
+            msg:signatureValue              "MGYCMQCxGjx8fOsUiEBAHtUopbTGoeUTTeEp9zDv57ktaUjnZWtoDiVL9KxnJI85a6PB5MYCMQDKtIANs8qTjsQPjt1LXozY8sNxVn33Mq4yTbwHFCyqPxNYLZ70EH5AGNQ/0yGGAsw=" ;
             msg:hash                        "AIfkmbHflvEm73NsMdO3umYnVfnN31wgC+fpTLW6M/eQx1RXTaQ2KYjIZB/3dVI7ZH0fqHaD27KFkLbsv6ZHzwohoOxuSpAS2FPlVaNtydn4SQrJw9vNASyKw3CtCISRZa9wASMZ2Gn0XlQNE0/8tOkpSpI52wCwksH0jpuPRkcx" ;
             msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
             msg:signedGraph                 p18:data .
@@ -975,9 +975,9 @@ p18:envelope-xg0i {
 
 p17:envelope-1vve-sig {
     p17:envelope-1vve-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMGIEULjL8oMlO9l9FCFJ7T54P1yld2FvzFineIVu9CHzJygmf6k01TC8ZFXeLE3E+wIwN05ci2M22pvCkbU/C53MKmsm3p2IYl8bRmeUxKkh30CwI+o4LHhhTjZ1Ke5p/O6o" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMGIEULjL8oMlO9l9FCFJ7T54P1yld2FvzFineIVu9CHzJygmf6k01TC8ZFXeLE3E+wIwN05ci2M22pvCkbU/C53MKmsm3p2IYl8bRmeUxKkh30CwI+o4LHhhTjZ1Ke5p/O6o" ;
             msg:hash                        "AIcBYYzZ38UvybEJgDktKQWzJpW75o2hryGDKWTWdOTMJifc1hz1ti4yZPZjesgLK7rzODjktk4E98qBnsYi53v83wUGGqB6zhjKHLfsdPl9pfTpo3RCW8RfG9pKKW/416pF6dWitXCOSQiaZ1GkjsfMbfZ5qmKQW6seolj9Qczo" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p17:envelope-1vve .
@@ -985,9 +985,9 @@ p17:envelope-1vve-sig {
 
 p29:envelope-kxkb-sig {
     p29:envelope-kxkb-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMH1xsE6eU6WNQGY16ZEV70ubqzx1zbrvxnUrRozvs6e3Zc1krfyq144fhnQB18kGlwIwG3SDOexc/y/+Q4GZyZBnqL6nc2Xh6Fse/1xDD96DrqPtxcrZh79SO1+qHNZn5MlT" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMH1xsE6eU6WNQGY16ZEV70ubqzx1zbrvxnUrRozvs6e3Zc1krfyq144fhnQB18kGlwIwG3SDOexc/y/+Q4GZyZBnqL6nc2Xh6Fse/1xDD96DrqPtxcrZh79SO1+qHNZn5MlT" ;
             msg:hash                        "QnNO2fmVyDvsbVqoIpIHi2trFODcAc9/x7u4rCFb7ZT3ypnNI4kDiM05ZJZgCyAJQV9FqZMTRkRUaNHm/Qpmxdg1bGCFZFoJEk0vwcaQ+U+RwOYHPIaZa4XGXasYXRvy8lvxgAwMldOO1CrLyUGwq3uGrATNmkcfFhwPzlEAGJA=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p29:envelope-kxkb .
@@ -1001,17 +1001,17 @@ p31:content {
 }
 
 p9:envelope-ma7y {
-    p9:data-sig  a                          sig:Signature ;
-            sig:hasVerificationCertificate  p12:7820503869697675000 ;
-            sig:signatureValue              "MGQCMG2FKmIWT4Je9NzII0nUfiVfNC1l4G9lvPLmivGGbIdl5SYbfcYFgyETOPnpehwbLAIwFUVG5usf2rREyNPSf3+2joHobgl/LR6Q3sK5SJc+T1Dev9mPRhgqMlSkb2aJK/xX" ;
+    p9:data-sig  a                          msg:Signature ;
+            msg:signer  p12:7820503869697675000 ;
+            msg:signatureValue              "MGQCMG2FKmIWT4Je9NzII0nUfiVfNC1l4G9lvPLmivGGbIdl5SYbfcYFgyETOPnpehwbLAIwFUVG5usf2rREyNPSf3+2joHobgl/LR6Q3sK5SJc+T1Dev9mPRhgqMlSkb2aJK/xX" ;
             msg:hash                        "AI4OATbuvyw1inYycES79iLVi64uv8dwPoVVnfcFlQdJeB5rFr4C9c/tVMTYKGHaYtYdV80A9FLgjIv7KkRgqtUSI2hZ+vQn+aVFhk9QvigtY2Ho4puE3XmmLMf/bA/myt8u8xBfDMc43rvSIiEi26PcOaY2kEXAZbwH5gRannoK" ;
             msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
             msg:signedGraph                 p9:data .
     
     p17:envelope-1vve-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMGIEULjL8oMlO9l9FCFJ7T54P1yld2FvzFineIVu9CHzJygmf6k01TC8ZFXeLE3E+wIwN05ci2M22pvCkbU/C53MKmsm3p2IYl8bRmeUxKkh30CwI+o4LHhhTjZ1Ke5p/O6o" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMGIEULjL8oMlO9l9FCFJ7T54P1yld2FvzFineIVu9CHzJygmf6k01TC8ZFXeLE3E+wIwN05ci2M22pvCkbU/C53MKmsm3p2IYl8bRmeUxKkh30CwI+o4LHhhTjZ1Ke5p/O6o" ;
             msg:hash                        "AIcBYYzZ38UvybEJgDktKQWzJpW75o2hryGDKWTWdOTMJifc1hz1ti4yZPZjesgLK7rzODjktk4E98qBnsYi53v83wUGGqB6zhjKHLfsdPl9pfTpo3RCW8RfG9pKKW/416pF6dWitXCOSQiaZ1GkjsfMbfZ5qmKQW6seolj9Qczo" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p17:envelope-1vve .
@@ -1029,9 +1029,9 @@ p9:envelope-ma7y {
 }
 
 p44:data {
-    p44:content-sig  a                      sig:Signature ;
-            sig:hasVerificationCertificate  p12:7820503869697675000 ;
-            sig:signatureValue              "MGUCMQCkUmfDJFXIcp7Wl4CbEfmFDlWEghuxsV+ZOwBFH2pRJWqLSUv5U/C1X5d8heePFTMCMBsbE0eugz/3/ahl1oP2wjeDDvLD5d/P9px+PvqvhnKa0rBeBLpesSJDW5eCkmBEXQ==" ;
+    p44:content-sig  a                      msg:Signature ;
+            msg:signer  p12:7820503869697675000 ;
+            msg:signatureValue              "MGUCMQCkUmfDJFXIcp7Wl4CbEfmFDlWEghuxsV+ZOwBFH2pRJWqLSUv5U/C1X5d8heePFTMCMBsbE0eugz/3/ahl1oP2wjeDDvLD5d/P9px+PvqvhnKa0rBeBLpesSJDW5eCkmBEXQ==" ;
             msg:hash                        "GHLR9YCZos+IsIM5zJoHqtezGfRn1mkUNCsGuJM8QMm/0nEzoM4ChwxDIOQSFktk2pDs3YeXXGbfEPEWwHtoK0JQzFQeOs+2W1g97wsF2mjx143MMDHYMYOe1S6cBBdjwmuJ9UQW2CUSAVZiUqvMSI+8XTaIHCzKP1EsDI774Ig=" ;
             msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
             msg:signedGraph                 p44:content .
@@ -1059,9 +1059,9 @@ p6:content-klsc {
 
 p13:envelope-dec7-sig {
     p13:envelope-dec7-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p12:nte803gz4pbiw6equ3qa ;
-            sig:signatureValue              "MGQCMDGRAg/WYKeOXQUZTmVItgLGRclCSy0OHUGcQpAXPfrbzEQvjtSFlihCIimpPoBhFQIwUUXNxto18jQx+wdXxm9PYEyZ4gHy6+Cc9ZqkYZu12stWMS+QjDwQk1kbqzcRoeHd" ;
+            a                               msg:Signature ;
+            msg:signer  p12:nte803gz4pbiw6equ3qa ;
+            msg:signatureValue              "MGQCMDGRAg/WYKeOXQUZTmVItgLGRclCSy0OHUGcQpAXPfrbzEQvjtSFlihCIimpPoBhFQIwUUXNxto18jQx+wdXxm9PYEyZ4gHy6+Cc9ZqkYZu12stWMS+QjDwQk1kbqzcRoeHd" ;
             msg:hash                        "bZ49MTg4UvJGrZGuZURRp/vx6O1dYmUPBkFaKVWSsj8UFaXOrFCoYBcSblp8aqk3TDt2f6SpPzyNxkgGuQh13a1nXO9QwKW9E7P8umnfXc8Y1xy91bkvBbgXSKhKLUOiOZK8DId/iAElY77MNTr6URTFYWkBPKeuXsmyjT4JDhk=" ;
             msg:publicKeyFingerprint        "IwyZXueJ69uldEQMoR6tmjSICtahgt4Oji/iALKaL+4=" ;
             msg:signedGraph                 p13:envelope-dec7 .
@@ -1082,9 +1082,9 @@ p25:envelope-twcq {
             msg:senderNode               p38:resource .
     
     p13:envelope-talb-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGUCMQCTXKq2KY5Kw41U6mtz12zj7dEzuEzH/yLrcC6shZdzviFPhZjdDtrkMCB2hwb6XtYCMHpqUiPcSOYS9bAI8aITCkNk9/zVUsLZiYdukS5odFlc3lq3LBGW9cG/jTDMItYxcQ==" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGUCMQCTXKq2KY5Kw41U6mtz12zj7dEzuEzH/yLrcC6shZdzviFPhZjdDtrkMCB2hwb6XtYCMHpqUiPcSOYS9bAI8aITCkNk9/zVUsLZiYdukS5odFlc3lq3LBGW9cG/jTDMItYxcQ==" ;
             msg:hash                        "RBEP7+mU4T6sbS5B68OoIs81reEHzv7M0Diui+G8gmmyrZFKqljDWcLEHvqzjIcbvCHopy8wHQWVoypyoDCkUMIJ07pdi5EJq9TwwZQaSCMFlx7WxrHeeg8PhM9VbPm/WLs2gKu1lhdyrP3jzzPdDVyanCECL8Db0B+Ol3RU76s=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p13:envelope-talb .
@@ -1097,9 +1097,9 @@ p25:envelope-twcq {
 
 p26:envelope-u0yx-sig {
     p26:envelope-u0yx-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGUCMDlOI/Gj3axjChneiOXVvB2Z9zgBUkgrogf6Cz6Yyg2xKVLOCfuwWe5J2+Qr3QyPRgIxAIogWYBmM+9HbFegFaxc3PjJFiysZnChVxhG1OpIjUZM3fnVDWNZ+89in41VM6FOsw==" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGUCMDlOI/Gj3axjChneiOXVvB2Z9zgBUkgrogf6Cz6Yyg2xKVLOCfuwWe5J2+Qr3QyPRgIxAIogWYBmM+9HbFegFaxc3PjJFiysZnChVxhG1OpIjUZM3fnVDWNZ+89in41VM6FOsw==" ;
             msg:hash                        "bql8PcPUO7jwl9XBEifkxaFX8ebUonMdg/eXVr108iPXoU7IkM9weZCuHOINbn9zyN2JWyyiOsZeqCpOSzUGU0+6AE0HpY8Vmnnpu69CGeUUmoWGb+DDnAtaSzhzb8o+cHLSjZScp/5PFc7j4DAGNaBTclRs2v4VmUyzuBAEFnA=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p26:envelope-u0yx .
@@ -1107,9 +1107,9 @@ p26:envelope-u0yx-sig {
 
 p26:envelope-u0yx {
     p45:envelope-iy82-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMB3m1MpHnkobDdV+yilNqWW3idZWVLxdEPOTSr1hmDPh/Rw9YAXVSSw0ZVLxyGm01AIwA1Sk1vIUK8m4+L+0xxCU82obbPnSerIXPQh13svjeYn/56FPWUG0e9Nc2A7sey1c" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMB3m1MpHnkobDdV+yilNqWW3idZWVLxdEPOTSr1hmDPh/Rw9YAXVSSw0ZVLxyGm01AIwA1Sk1vIUK8m4+L+0xxCU82obbPnSerIXPQh13svjeYn/56FPWUG0e9Nc2A7sey1c" ;
             msg:hash                        "AJING3WFiAS5XgPAynRlNT/WOPf8u0F4DmzYNaA6zuna6Jn7vYuJu6evkuOwyz2Q8Jr1mRnlRs1j0/hvQVYdld0YUm/m6eyursWkI+1XYt7+vwfzlhjJipO2TGCpm5UXnoVVnHt6Pprpeu4mM3gKZEW8RSp4gHduI8enIPtCK1S0" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p45:envelope-iy82 .
@@ -1137,9 +1137,9 @@ p26:envelope-u0yx {
 
 p22:envelope-tico {
     p20:envelope-gdsa-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCME+l/ZnkqnIIEnPNoJqAe3G9W0iyMlHx+PV6BQ4OBEOO0Lw/qudoBF3RfCbgJF4aTwIwT+2WxIa9nY85dwRjVvYRAzFy/dI5H6lF1UAStyFQbaxJmw59ToyfNKanYeJoVajD" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCME+l/ZnkqnIIEnPNoJqAe3G9W0iyMlHx+PV6BQ4OBEOO0Lw/qudoBF3RfCbgJF4aTwIwT+2WxIa9nY85dwRjVvYRAzFy/dI5H6lF1UAStyFQbaxJmw59ToyfNKanYeJoVajD" ;
             msg:hash                        "ecqEktUiRxI1wLZWnyGEiXuiF+R7uEG6zJigpDueFNdCqnNyGp9uA33tvkQKPCD8tGCr9r9CWy77fIvEdG6w4K3z396Dem1YsRGyy5lEoVeBsPJeFBhHR4S4fQMzF2RvPeGz5aJFL+2N4U5AtoKc7BEcpIPUNCaBe61lEXhiJik=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p20:envelope-gdsa .
@@ -1167,9 +1167,9 @@ p22:envelope-tico {
 
 p5:envelope-baaw {
     p6:envelope-0sio-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMGJcaS/o1c+vzZhNbkecNFzkLKLgNBzhAr9XxXPgcR6uB2v4IeGo8SWDcJ0ur+JTUAIwY4ifOfo3+312U+nQ/Br1fJPTLuHpNU0dfcbjwnl0+VmCAttlO2NUgOYLEOg8dHMK" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMGJcaS/o1c+vzZhNbkecNFzkLKLgNBzhAr9XxXPgcR6uB2v4IeGo8SWDcJ0ur+JTUAIwY4ifOfo3+312U+nQ/Br1fJPTLuHpNU0dfcbjwnl0+VmCAttlO2NUgOYLEOg8dHMK" ;
             msg:hash                        "MvQxlMP22+XTumpMJF2DTocqyQMLmETaw7xeLlS7WyfNjkg6ztuILsfrYYRrldJVVgNhIYxDu2lKqbyjdayBeAQzDGZ86wo4HHPAMYGUFcEoXnPSb+UdCkng1gCFfUrSjjGY2vfKv1aKjESbcSoHDs9IfPDfA3IKlxwPC1MOLc0=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p6:envelope-0sio .
@@ -1196,9 +1196,9 @@ p5:envelope-baaw {
 
 p39:envelope-b7qv-sig {
     p39:envelope-b7qv-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMCMjAJ8u5TtpnKT/5N0TgnmeT0JbK2epep7sPAVe5jcJEayTK987rKRkr5DetW2I7AIwL0h/bh3pQSWz6nq7U8P3eoXQIkmQSbSt24sR4JYVdSVfOns+BPnbkAnKVzdLvrMM" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMCMjAJ8u5TtpnKT/5N0TgnmeT0JbK2epep7sPAVe5jcJEayTK987rKRkr5DetW2I7AIwL0h/bh3pQSWz6nq7U8P3eoXQIkmQSbSt24sR4JYVdSVfOns+BPnbkAnKVzdLvrMM" ;
             msg:hash                        "ShY3hdW9vTHBqXcZjIQuFRRimkaZ8ADFioXR5D3jeI1m77fSlmtPdwOAZT7J7VtGho053HpVx8HbWHctII7rwZX/dyCWB/hn+iYmlD7ouUKHdLYxAo+QC4JT+DIonbiUW/7XVoVg/ANoVMrSXJC7u3pQqx1teNORCJgYiI+h6fA=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p39:envelope-b7qv .
@@ -1206,9 +1206,9 @@ p39:envelope-b7qv-sig {
 
 p31:envelope-pj9k-sig {
     p31:envelope-pj9k-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMC1qFwNsbRCwDeGs5sBqve1gmMahi+GwAPITuSzA3MDJaMnGKE1RjrLHtyNYj0xDZwIwH/RNg7JluB5O+kJmPFkTzcvVUD+AHFCQ/5y2SLq/5lbGutnlB7iMPg1PNqTzEfkM" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMC1qFwNsbRCwDeGs5sBqve1gmMahi+GwAPITuSzA3MDJaMnGKE1RjrLHtyNYj0xDZwIwH/RNg7JluB5O+kJmPFkTzcvVUD+AHFCQ/5y2SLq/5lbGutnlB7iMPg1PNqTzEfkM" ;
             msg:hash                        "YwC+ZwsKsdKfjTZGJGjETX1y7XdVHVwN4ocDTJgIJZjV6YPlvLAS+G25TNrYqwWLiHrNyfit4bgW6ECjSUncreMiwvnXwk83WmepYlDKlsXAkVphAeZ2Cf3Bm4NKtCJC4FZxA9BG1rirhRBOOVT4EseLwzRzB8wSb8v3St/NW9U=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p31:envelope-pj9k .
@@ -1233,9 +1233,9 @@ p43:envelope-pc7l {
             msg:containsSignature  p18:envelope-xg0i-sig .
     
     p18:envelope-xg0i-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMGVOVyMB9FstIrPmbdOLqpffTJgZaJ6avWe2UtTTTtxFeX/dxXpy7POaBNGmHSnvQwIwIFfFJmlhKCdbEduFO451QAXBOKr6H7kAIaCy/NUGjxjbYHH05AoGix0FoW09YrJj" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMGVOVyMB9FstIrPmbdOLqpffTJgZaJ6avWe2UtTTTtxFeX/dxXpy7POaBNGmHSnvQwIwIFfFJmlhKCdbEduFO451QAXBOKr6H7kAIaCy/NUGjxjbYHH05AoGix0FoW09YrJj" ;
             msg:hash                        "AK7ovAcUTa5/JQ/r7v8+GoXsOqxZSC4QB4zt0hYuZ1vvDrbLz4BKVl483Sn2Qx9d3i4nT5pqQZh8BU/K4r40wWjNPCCsuoLgBLBSKfhMA0aLX86lzXP1/HYgUtUWSevoctf9MlW56KEmwhloJYOoaYSz+x1439j1yyIJzqf5W2zO" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p18:envelope-xg0i .
@@ -1258,9 +1258,9 @@ p43:envelope-pc7l {
 
 p21:envelope-wq0v-sig {
     p21:envelope-wq0v-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGYCMQDQnP1YWZB5uaJObkesCjucKeJXln4dN3bAAmWaFLS/ccmGyngLKlbcE+ZhSpg/F5QCMQC5xu+Cgb9xrR57cuBURWcWL9YclgT+K/ZqZoIpPt8MdlE3IodKg0feEu+UpBBNsQM=" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGYCMQDQnP1YWZB5uaJObkesCjucKeJXln4dN3bAAmWaFLS/ccmGyngLKlbcE+ZhSpg/F5QCMQC5xu+Cgb9xrR57cuBURWcWL9YclgT+K/ZqZoIpPt8MdlE3IodKg0feEu+UpBBNsQM=" ;
             msg:hash                        "KsfkgFc6QnLbYGAlO70SVpmVtRFBOAH7pk2P6l0tPTtAxBAxdpKB/SrC+Xs7BEtiD+qNd8f3eAtsgmsl+JPYnWYizfdw3/B7PMUCNMqP/787VLwHlqX2y5pJYqoCzK2VUY55QnzA0grE4OT2m7yFkfK2pQCXcxVXE2pU6f+WXjM=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p21:envelope-wq0v .
@@ -1268,9 +1268,9 @@ p21:envelope-wq0v-sig {
 
 p49:envelope-5mhl-sig {
     p49:envelope-5mhl-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMG//jgog2QiZkgYZ96J5RhmvT9LzL82al+2/eQKO5JzyzTKyvJr/1yo7jiWCI/yJjQIwCJt4rAwXe05bsbvGeaNlpetQIem3JkkFoT14MmZfSg3geJLITyk8IpxmzSXfMbeK" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMG//jgog2QiZkgYZ96J5RhmvT9LzL82al+2/eQKO5JzyzTKyvJr/1yo7jiWCI/yJjQIwCJt4rAwXe05bsbvGeaNlpetQIem3JkkFoT14MmZfSg3geJLITyk8IpxmzSXfMbeK" ;
             msg:hash                        "KXHUQklAFGUm9nvPmsVKpA3Rb25/mqGkowijgjIa9W6ZiWRCBqj+2V0VCe6IvJQsnb0s1+ll1zVF0VKI9U2qAWQxn5yjdp2Rxg2RMtV5JHM5j6TEmYU6Hl91NcW2qj8jJCPVFTrKyOwMIizV1bsr5SNVcujGj+JjCYvCnX++oxI=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p49:envelope-5mhl .
@@ -1278,9 +1278,9 @@ p49:envelope-5mhl-sig {
 
 p9:envelope-ma7y-sig {
     p9:envelope-ma7y-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGUCMQD0H3I+Y3Y27WJgS6B3lLpDPhtI1odks1YXXd61zmYE0/DVLLWiMQoyDn6H8JQKY/ACMGz1OKAt2e+rg9xCOm53tP56gctuzUS6Qi6Es9Q6fZep8j20iihafRyE41uYcxvAtQ==" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGUCMQD0H3I+Y3Y27WJgS6B3lLpDPhtI1odks1YXXd61zmYE0/DVLLWiMQoyDn6H8JQKY/ACMGz1OKAt2e+rg9xCOm53tP56gctuzUS6Qi6Es9Q6fZep8j20iihafRyE41uYcxvAtQ==" ;
             msg:hash                        "C8nYCZS1IgqOdjLk3f73I9dSekaGxFlNEPKwAAfBFuA/P3aoLEE8ypNLylRearbSS+xx4CuRwulCIfdRxDkZlydctRvVPOFr48u1lS04nPNlL43EMI4r21myMUbjIlo1VEjopgSJoUc/M1IlXcBcN1ir/p4W5zVc5GMy+2Jh5eo=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p9:envelope-ma7y .
@@ -1293,9 +1293,9 @@ p10:content-tbn3 {
 
 p1:envelope-30wn-sig {
     p1:envelope-30wn-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMFplMNHAWOfPW9EfTh/Ejc7bHOJ+q3crX548PN3U2MuRrjdvHsscXaJkhVlqdOOiVAIwD0qjS/VlzsHtsbw/2MzjGAvqjrKKyVvGuo21vOqjpFR3xOew49QKzrG1BZ8GlGEq" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMFplMNHAWOfPW9EfTh/Ejc7bHOJ+q3crX548PN3U2MuRrjdvHsscXaJkhVlqdOOiVAIwD0qjS/VlzsHtsbw/2MzjGAvqjrKKyVvGuo21vOqjpFR3xOew49QKzrG1BZ8GlGEq" ;
             msg:hash                        "AIndLYiOGc3NpUl+mBuuwMOywlztyiQuh5dDuWD5+X3TY4e/HqOrHk7oYajHQsMM4g13hO3835w9Ts7lbWuoJsqmG6Go5mKpOaUXU2w7kMNWGoB9slR9m7CBFfZDLEf8CaRaheBk7+K29DkkSX8x6miIhY9TbYlVD1Y9jpJCygae" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p1:envelope-30wn .
@@ -1303,9 +1303,9 @@ p1:envelope-30wn-sig {
 
 p16:envelope-z4jb-sig {
     p16:envelope-z4jb-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMAmccqgYrQcqqSTVfWMeQJFkjASxQ76uYjzUx8ZgZclZrqTyEDAmFDiySz7VejeM0QIwQWDgPqNzr0DTqK+1fUkcLcbyfGS8iyTEDqPU3hLDBLBWnmhRneZSHsLFlbEfnMwR" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMAmccqgYrQcqqSTVfWMeQJFkjASxQ76uYjzUx8ZgZclZrqTyEDAmFDiySz7VejeM0QIwQWDgPqNzr0DTqK+1fUkcLcbyfGS8iyTEDqPU3hLDBLBWnmhRneZSHsLFlbEfnMwR" ;
             msg:hash                        "AJIruPK6hthlGaY7Sc8hQ0mI3ggNfvBx9b8pasEw3EFTaDyDoSYdYEaa4FegHcGqbbL3/hGh4Mi4lagArZS/kHbf1WLE0TakCoKq28J2UyM+U/CAfXSLyL/5jba6v6hIZ2FtTl79pQemHwmPZVvHKtlT2gnAEzXN2z2wyTNe4mwb" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p16:envelope-z4jb .
@@ -1319,9 +1319,9 @@ p14:content-lqq1 {
 
 p43:envelope-pc7l-sig {
     p43:envelope-pc7l-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMGQbRkIwGbdOiqQMMI7av550EuCucGcWkifeaUChoaujvCVXcNGN82Y5KIlTgAf7rwIwScUrSCjaTOQBfEF3C08s9lWaGBQhpR+6W3uQA5/CFwujoSEcdbqBR1S1NIb79EcD" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMGQbRkIwGbdOiqQMMI7av550EuCucGcWkifeaUChoaujvCVXcNGN82Y5KIlTgAf7rwIwScUrSCjaTOQBfEF3C08s9lWaGBQhpR+6W3uQA5/CFwujoSEcdbqBR1S1NIb79EcD" ;
             msg:hash                        "UcdCD2TlTiepxvjmjRTJCBcD1wpoum1WG2w/zB32yl0j0dRmzF08gI1yvITwtJXDoPlvT4PDYRS6X6x8hyVlgEw2nh1KCRISV+n7t22ngXrZplFzrKhuD5orBHebRL0qJHEcVgACU5iYrybfElzvwJ20TC8E2PAWz3KDKcyB/+Y=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p43:envelope-pc7l .
@@ -1349,9 +1349,9 @@ p27:envelope-7byg {
             msg:senderNode               p38:resource .
     
     p21:envelope-wq0v-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGYCMQDQnP1YWZB5uaJObkesCjucKeJXln4dN3bAAmWaFLS/ccmGyngLKlbcE+ZhSpg/F5QCMQC5xu+Cgb9xrR57cuBURWcWL9YclgT+K/ZqZoIpPt8MdlE3IodKg0feEu+UpBBNsQM=" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGYCMQDQnP1YWZB5uaJObkesCjucKeJXln4dN3bAAmWaFLS/ccmGyngLKlbcE+ZhSpg/F5QCMQC5xu+Cgb9xrR57cuBURWcWL9YclgT+K/ZqZoIpPt8MdlE3IodKg0feEu+UpBBNsQM=" ;
             msg:hash                        "KsfkgFc6QnLbYGAlO70SVpmVtRFBOAH7pk2P6l0tPTtAxBAxdpKB/SrC+Xs7BEtiD+qNd8f3eAtsgmsl+JPYnWYizfdw3/B7PMUCNMqP/787VLwHlqX2y5pJYqoCzK2VUY55QnzA0grE4OT2m7yFkfK2pQCXcxVXE2pU6f+WXjM=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p21:envelope-wq0v .
@@ -1371,17 +1371,17 @@ p42:envelope-l74h {
             msg:receivedTimestamp  1513345785798 .
     
     p26:envelope-u0yx-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGUCMDlOI/Gj3axjChneiOXVvB2Z9zgBUkgrogf6Cz6Yyg2xKVLOCfuwWe5J2+Qr3QyPRgIxAIogWYBmM+9HbFegFaxc3PjJFiysZnChVxhG1OpIjUZM3fnVDWNZ+89in41VM6FOsw==" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGUCMDlOI/Gj3axjChneiOXVvB2Z9zgBUkgrogf6Cz6Yyg2xKVLOCfuwWe5J2+Qr3QyPRgIxAIogWYBmM+9HbFegFaxc3PjJFiysZnChVxhG1OpIjUZM3fnVDWNZ+89in41VM6FOsw==" ;
             msg:hash                        "bql8PcPUO7jwl9XBEifkxaFX8ebUonMdg/eXVr108iPXoU7IkM9weZCuHOINbn9zyN2JWyyiOsZeqCpOSzUGU0+6AE0HpY8Vmnnpu69CGeUUmoWGb+DDnAtaSzhzb8o+cHLSjZScp/5PFc7j4DAGNaBTclRs2v4VmUyzuBAEFnA=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p26:envelope-u0yx .
     
     p42:envelope-w5bl-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p12:nte803gz4pbiw6equ3qa ;
-            sig:signatureValue              "MGUCMCBWmcTfYcEFb95HmBXYO+4L6SBRQeju26UmUDO2Vl40r5BMGNLVVRv7Mml+1YjbPgIxAKgXfRGAI5EUjY5Al3LmPDM73bl2kWYG6v+o7mDJdbVHKu/542ixljNHSBKWcqF6SQ==" ;
+            a                               msg:Signature ;
+            msg:signer  p12:nte803gz4pbiw6equ3qa ;
+            msg:signatureValue              "MGUCMCBWmcTfYcEFb95HmBXYO+4L6SBRQeju26UmUDO2Vl40r5BMGNLVVRv7Mml+1YjbPgIxAKgXfRGAI5EUjY5Al3LmPDM73bl2kWYG6v+o7mDJdbVHKu/542ixljNHSBKWcqF6SQ==" ;
             msg:hash                        "HiHkD2TL4JeOfT2C4DG8jD9yoQfy9SIxPA0wOdViN7eSYKTz0RDdRZqrE0lLxLJngzj0E2i42ohz7+jMU6Dq5UY9CpQtboFuJaX5ehIK02m3KBts2UhMnipEMvKFW4051IYhbk0yU4vj2r6EwVP0TQt8rBi0OAd3H7bXUT6wxOY=" ;
             msg:publicKeyFingerprint        "IwyZXueJ69uldEQMoR6tmjSICtahgt4Oji/iALKaL+4=" ;
             msg:signedGraph                 p42:envelope-w5bl .
@@ -1389,9 +1389,9 @@ p42:envelope-l74h {
 
 p5:envelope-baaw-sig {
     p5:envelope-baaw-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMBfmYoxsILGbd3E11B27lwvkvC536GhwbDjSrpOupktgOdaMt4MvKlSfzvaHCQ32jQIwEqFN/ENYMJmqte5N+/6TTZvT3uOgR502xkKZpbYc3fIZySpt3syNVDxfXY4m6DKJ" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMBfmYoxsILGbd3E11B27lwvkvC536GhwbDjSrpOupktgOdaMt4MvKlSfzvaHCQ32jQIwEqFN/ENYMJmqte5N+/6TTZvT3uOgR502xkKZpbYc3fIZySpt3syNVDxfXY4m6DKJ" ;
             msg:hash                        "Zvtvz2aR9A+SFGiWs014lshH6nTWwIB2Ii/YS0Wg0GhUElnDKG4nInyw3UVKA+U5x8cfaZMZ+Nf+Y4kbwUQhiTnCepzVrh7e/YIQtHYFA890z1/Vp+A84hKDYY6dc8gcqOoxCA24VbyFm56Ttq5y6hL5MqglviAbBRIeUZeSeys=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p5:envelope-baaw .
@@ -1399,9 +1399,9 @@ p5:envelope-baaw-sig {
 
 p13:envelope-talb-sig {
     p13:envelope-talb-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGUCMQCTXKq2KY5Kw41U6mtz12zj7dEzuEzH/yLrcC6shZdzviFPhZjdDtrkMCB2hwb6XtYCMHpqUiPcSOYS9bAI8aITCkNk9/zVUsLZiYdukS5odFlc3lq3LBGW9cG/jTDMItYxcQ==" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGUCMQCTXKq2KY5Kw41U6mtz12zj7dEzuEzH/yLrcC6shZdzviFPhZjdDtrkMCB2hwb6XtYCMHpqUiPcSOYS9bAI8aITCkNk9/zVUsLZiYdukS5odFlc3lq3LBGW9cG/jTDMItYxcQ==" ;
             msg:hash                        "RBEP7+mU4T6sbS5B68OoIs81reEHzv7M0Diui+G8gmmyrZFKqljDWcLEHvqzjIcbvCHopy8wHQWVoypyoDCkUMIJ07pdi5EJq9TwwZQaSCMFlx7WxrHeeg8PhM9VbPm/WLs2gKu1lhdyrP3jzzPdDVyanCECL8Db0B+Ol3RU76s=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p13:envelope-talb .
@@ -1409,9 +1409,9 @@ p13:envelope-talb-sig {
 
 p13:envelope-talb {
     p13:envelope-dec7-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p12:nte803gz4pbiw6equ3qa ;
-            sig:signatureValue              "MGQCMDGRAg/WYKeOXQUZTmVItgLGRclCSy0OHUGcQpAXPfrbzEQvjtSFlihCIimpPoBhFQIwUUXNxto18jQx+wdXxm9PYEyZ4gHy6+Cc9ZqkYZu12stWMS+QjDwQk1kbqzcRoeHd" ;
+            a                               msg:Signature ;
+            msg:signer  p12:nte803gz4pbiw6equ3qa ;
+            msg:signatureValue              "MGQCMDGRAg/WYKeOXQUZTmVItgLGRclCSy0OHUGcQpAXPfrbzEQvjtSFlihCIimpPoBhFQIwUUXNxto18jQx+wdXxm9PYEyZ4gHy6+Cc9ZqkYZu12stWMS+QjDwQk1kbqzcRoeHd" ;
             msg:hash                        "bZ49MTg4UvJGrZGuZURRp/vx6O1dYmUPBkFaKVWSsj8UFaXOrFCoYBcSblp8aqk3TDt2f6SpPzyNxkgGuQh13a1nXO9QwKW9E7P8umnfXc8Y1xy91bkvBbgXSKhKLUOiOZK8DId/iAElY77MNTr6URTFYWkBPKeuXsmyjT4JDhk=" ;
             msg:publicKeyFingerprint        "IwyZXueJ69uldEQMoR6tmjSICtahgt4Oji/iALKaL+4=" ;
             msg:signedGraph                 p13:envelope-dec7 .
@@ -1436,17 +1436,17 @@ p10:envelope-r04c {
             msg:receivedTimestamp  1513345783842 .
     
     p19:envelope-h151-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGUCMFRyXmiy0uHwZzgEQSOZdSf93TPZBpMV/qlnfgKLaexAcmCIPkjpceoT6xqI5Z0IUwIxAMoI7KD0T/2tzCvGIJkdxxLqc8530la7j8eIQhglBG1ZtMAxJkrbuUMQtotFGZa5cQ==" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGUCMFRyXmiy0uHwZzgEQSOZdSf93TPZBpMV/qlnfgKLaexAcmCIPkjpceoT6xqI5Z0IUwIxAMoI7KD0T/2tzCvGIJkdxxLqc8530la7j8eIQhglBG1ZtMAxJkrbuUMQtotFGZa5cQ==" ;
             msg:hash                        "AI73fczFmVY5ogs8ChpgvhPb8Jrfqw72Bx0yvaKJX+dQg7YcorGeV/lEFI1ovBJnujKwrXKfsuqTWkqrxUD/yZAMf+f2eDWZiPhOI6gIZhZ/nLhGp2aXw5WQcoXAjuG3389JNyKV4qdMda8Yq39/ciJ4mf2UemkRbObMK41UMvUP" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p19:envelope-h151 .
     
     p10:envelope-1ltm-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p12:nte803gz4pbiw6equ3qa ;
-            sig:signatureValue              "MGYCMQDHmXzTqskktfFGaZjXuZNHsfa86iaAOHFLeey7Ll6Q3crzxLGW7fZXODfSUN9d/4ACMQDa53mS6rdsQWiSl+TVCWVb1crYV7cU+CCCMFy26yke5raK+cZRXyAz8/5oBGskSvI=" ;
+            a                               msg:Signature ;
+            msg:signer  p12:nte803gz4pbiw6equ3qa ;
+            msg:signatureValue              "MGYCMQDHmXzTqskktfFGaZjXuZNHsfa86iaAOHFLeey7Ll6Q3crzxLGW7fZXODfSUN9d/4ACMQDa53mS6rdsQWiSl+TVCWVb1crYV7cU+CCCMFy26yke5raK+cZRXyAz8/5oBGskSvI=" ;
             msg:hash                        "KiQPp34Pjzx2F1HrQ0Xld8VOIL9UGfdekOZKRrH5G0lO3Zwp/lB/K/BuAfsgjuDSftirBzdUKfqJKrrCdZ+2HA7UMrRThlHm5FdZaCvhA7WBpfRz6HEMyyl8IJptYovDdbCvd4MIDHLVdAtQOJCkwHhCAs5qrB/9RUrmdaHHkd4=" ;
             msg:publicKeyFingerprint        "IwyZXueJ69uldEQMoR6tmjSICtahgt4Oji/iALKaL+4=" ;
             msg:signedGraph                 p10:envelope-1ltm .
@@ -1459,9 +1459,9 @@ p10:envelope-r04c {
 }
 
 p33:envelope-sig {
-    p33:envelope-sig  a                     sig:Signature ;
-            sig:hasVerificationCertificate  p12:7820503869697675000 ;
-            sig:signatureValue              "MGUCMDCWztT5w6bzulB1Js0Oy6jOyTux91W1ymePV/uuiu8kfBC+EyPkUMKkGTF4MXUEewIxANli8byJCB+FNxxXM1GemCtyXxedjDKZfEwmg46ZMeokoyhp9YG+EOVqDlmveSNGnA==" ;
+    p33:envelope-sig  a                     msg:Signature ;
+            msg:signer  p12:7820503869697675000 ;
+            msg:signatureValue              "MGUCMDCWztT5w6bzulB1Js0Oy6jOyTux91W1ymePV/uuiu8kfBC+EyPkUMKkGTF4MXUEewIxANli8byJCB+FNxxXM1GemCtyXxedjDKZfEwmg46ZMeokoyhp9YG+EOVqDlmveSNGnA==" ;
             msg:hash                        "ah4WEk0+Blv0BrP1i17LWmxPJEVfGSn8WP/Z8VN68nis2tdxRO4XKoKClFDW25W/I06am11K4mC+kHIWfSUzIDz47B/Upjrc4N+xwIBNNZmTnV1nn/HzGUuXFTqZyAXl3mzoDK0GSnIphl9kDCIUNW8PpeacGo9tzbqxrr6BkjI=" ;
             msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
             msg:signedGraph                 p33:envelope .
@@ -1469,9 +1469,9 @@ p33:envelope-sig {
 
 p6:envelope-kn0t {
     p6:content-klsc-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p12:nte803gz4pbiw6equ3qa ;
-            sig:signatureValue              "MGUCME5ypn3jwfjH8INWy+tToqG81NU6rNcDiU5UeshZb7V9xc2Qw/mBJ/866NoF7bQ0QgIxAIwFu4j2LtTaOnTICJVoGT4rSOou+wF/Hd+9Xc1aUUvmTh6FHF1F1nYHYC/r1URUYw==" ;
+            a                               msg:Signature ;
+            msg:signer  p12:nte803gz4pbiw6equ3qa ;
+            msg:signatureValue              "MGUCME5ypn3jwfjH8INWy+tToqG81NU6rNcDiU5UeshZb7V9xc2Qw/mBJ/866NoF7bQ0QgIxAIwFu4j2LtTaOnTICJVoGT4rSOou+wF/Hd+9Xc1aUUvmTh6FHF1F1nYHYC/r1URUYw==" ;
             msg:hash                        "Apw818wB88HbkNMBLNp8fdE88g+xFskXR45Tr9Sn5qTLM5QqmZBBz+cBlTeahIJCyQ0Yovp4e3Whr3IeTJYiGA==" ;
             msg:publicKeyFingerprint        "IwyZXueJ69uldEQMoR6tmjSICtahgt4Oji/iALKaL+4=" ;
             msg:signedGraph                 p6:content-klsc .
@@ -1502,9 +1502,9 @@ p19:envelope-h151 {
             msg:containsSignature  p15:envelope-xm9b-sig .
     
     p15:envelope-xm9b-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGUCMFKhx97tjGDjZQm6fXkqqM98rD81g97YWiIhirU0UzMnyIsBRLIRjPsoSZ8coHVsFQIxAKIT+1HYcQI5m9DU96Q7l2L5v5Cfz/zwCU4jZID4MxVqW9y3aiFLhYvL9HWvn35xRQ==" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGUCMFKhx97tjGDjZQm6fXkqqM98rD81g97YWiIhirU0UzMnyIsBRLIRjPsoSZ8coHVsFQIxAKIT+1HYcQI5m9DU96Q7l2L5v5Cfz/zwCU4jZID4MxVqW9y3aiFLhYvL9HWvn35xRQ==" ;
             msg:hash                        "Jn/1M6AArmzFLhVeHd4Ar93WstPiCFvtlvgJUPoDJPSopHcvonVGyQP1231cLlRe1Hx7kz0Q7b/iIMRRQxxI0BTMMEm05ridJ4aqcmR51i+VSv/MqB6yLktCxQ7OpTcTOrNwIAADihgPUIzjWE1PXU7buCOcTp91KuaCk40fGB4=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p15:envelope-xm9b .
@@ -1526,9 +1526,9 @@ p19:envelope-h151 {
 }
 
 p21:envelope-wq0v {
-    p21:data-sig  a                         sig:Signature ;
-            sig:hasVerificationCertificate  p12:7820503869697675000 ;
-            sig:signatureValue              "MGUCMQCga8Q74kKHLV/CuksgG65BQlguLl31J4VVCCX5KOZYXtq34jjwhKo2l66/KJ2uFjkCMHR51YF3LMxdkxdInO831LNQ7TaD8NBFLKpjFhLc+36XdXbO1gFnNiuJYu63hMtRxA==" ;
+    p21:data-sig  a                         msg:Signature ;
+            msg:signer  p12:7820503869697675000 ;
+            msg:signatureValue              "MGUCMQCga8Q74kKHLV/CuksgG65BQlguLl31J4VVCCX5KOZYXtq34jjwhKo2l66/KJ2uFjkCMHR51YF3LMxdkxdInO831LNQ7TaD8NBFLKpjFhLc+36XdXbO1gFnNiuJYu63hMtRxA==" ;
             msg:hash                        "AKFruUJ/9xCpTg54oAT89hF5Hcie1ks2ITJyy1iH83J54iJajGL+p66QHGhmtjTz1Pu2ZHJC9cjLplyz93ZdvbVsorgN5Nx1WxjnVU09NwLN+IiwWthi1+f/QHEsTFi89mRrYbZG/slzLL4QF00PyLkOJIiOL3+pCog32yl5FbC6" ;
             msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
             msg:signedGraph                 p21:data .
@@ -1546,9 +1546,9 @@ p21:envelope-wq0v {
             msg:receivedTimestamp  1513345787240 .
     
     p29:envelope-kxkb-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMH1xsE6eU6WNQGY16ZEV70ubqzx1zbrvxnUrRozvs6e3Zc1krfyq144fhnQB18kGlwIwG3SDOexc/y/+Q4GZyZBnqL6nc2Xh6Fse/1xDD96DrqPtxcrZh79SO1+qHNZn5MlT" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMH1xsE6eU6WNQGY16ZEV70ubqzx1zbrvxnUrRozvs6e3Zc1krfyq144fhnQB18kGlwIwG3SDOexc/y/+Q4GZyZBnqL6nc2Xh6Fse/1xDD96DrqPtxcrZh79SO1+qHNZn5MlT" ;
             msg:hash                        "QnNO2fmVyDvsbVqoIpIHi2trFODcAc9/x7u4rCFb7ZT3ypnNI4kDiM05ZJZgCyAJQV9FqZMTRkRUaNHm/Qpmxdg1bGCFZFoJEk0vwcaQ+U+RwOYHPIaZa4XGXasYXRvy8lvxgAwMldOO1CrLyUGwq3uGrATNmkcfFhwPzlEAGJA=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p29:envelope-kxkb .
@@ -1556,9 +1556,9 @@ p21:envelope-wq0v {
 
 p22:envelope-tico-sig {
     p22:envelope-tico-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMD6p+UtbijQYaqQbihg61SoVap9E70jzoxjrm+eCpmpucad6Rg/S7t3fU6PYiCy7cQIwOTeJ+elxgjjocdNAFn9Hv36OLs3Fo+ZCQz9otegEOjKhQSVekXxzZeUtOgkqan0g" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMD6p+UtbijQYaqQbihg61SoVap9E70jzoxjrm+eCpmpucad6Rg/S7t3fU6PYiCy7cQIwOTeJ+elxgjjocdNAFn9Hv36OLs3Fo+ZCQz9otegEOjKhQSVekXxzZeUtOgkqan0g" ;
             msg:hash                        "AIJ4UZSQK85vJrqCxttUa1GeboKv008zRE0FyH1as1zsl4mtuL7wqilqiFSMNEoL6sOyy1k2NqI4b3DBQu1Om5r+MD0EWoQ7G5XxeZKhN2WXlO4Ac8ogkDRU1FgrpJk7Bc/HwYpQHLoI+XBFLOe+ZVQGE95G5DzVVeCLLzivPUYc" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p22:envelope-tico .
@@ -1596,9 +1596,9 @@ p18:data {
             msg:senderNode       p38:resource ;
             msg:sentTimestamp    "1513345785450" .
     
-    p18:content-sig  a                      sig:Signature ;
-            sig:hasVerificationCertificate  p12:7820503869697675000 ;
-            sig:signatureValue              "MGUCMDEY7IlIrXWmAKaIOWY0L1yZjirZUlQfPx5ybdT1V1WJ3Vnq7ekiNAUBsXTr9qpY8gIxAKZy2sKwc5AgPYNTQ1Kt2yT2mJ+lghNjHd+uaPbXGDHefZe1X6EnhaKWzsWHdxmj9Q==" ;
+    p18:content-sig  a                      msg:Signature ;
+            msg:signer  p12:7820503869697675000 ;
+            msg:signatureValue              "MGUCMDEY7IlIrXWmAKaIOWY0L1yZjirZUlQfPx5ybdT1V1WJ3Vnq7ekiNAUBsXTr9qpY8gIxAKZy2sKwc5AgPYNTQ1Kt2yT2mJ+lghNjHd+uaPbXGDHefZe1X6EnhaKWzsWHdxmj9Q==" ;
             msg:hash                        "Fh+pMtbJ7Jpl3BL38pq47oN7RAmmP5dw45rwsi9voe3W28WdeseacZjN2C6+pRok32meeqnL8tb9ElqJbG7xaA==" ;
             msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
             msg:signedGraph                 p18:content .
@@ -1606,9 +1606,9 @@ p18:data {
 
 p28:envelope-engq-sig {
     p28:envelope-engq-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGUCMQClv4q+/II4/vRdZk+mNVy7MqlemvVnJsWYmpVGqpLQ2/jyzVSt8xF1XkJ5sD7g7HQCMAI63vTGP0SiGckH3md9ineAWBurfiMLCkJQe3qpQT1jkYTDjJvtqMu6YZcof6pmRA==" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGUCMQClv4q+/II4/vRdZk+mNVy7MqlemvVnJsWYmpVGqpLQ2/jyzVSt8xF1XkJ5sD7g7HQCMAI63vTGP0SiGckH3md9ineAWBurfiMLCkJQe3qpQT1jkYTDjJvtqMu6YZcof6pmRA==" ;
             msg:hash                        "epf1/rNvhvwpj+8mTejVyG3nzTUmwuPHyx1LOE2SorObezmZq2PwO7ZGQDHR4PZbti3QEDVPVuU2wR+6ItfOLPyrsSe8X+xGPrFeDSkMQJhC1n+FkcGFrnAfg6sFpQnkAfjLGqz6wsSU7YPn5Hr4cOjlb93FEZyXwQwWQJpfX+0=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p28:envelope-engq .
@@ -1621,18 +1621,18 @@ p9:content {
 
 p18:envelope-xg0i-sig {
     p18:envelope-xg0i-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMGVOVyMB9FstIrPmbdOLqpffTJgZaJ6avWe2UtTTTtxFeX/dxXpy7POaBNGmHSnvQwIwIFfFJmlhKCdbEduFO451QAXBOKr6H7kAIaCy/NUGjxjbYHH05AoGix0FoW09YrJj" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMGVOVyMB9FstIrPmbdOLqpffTJgZaJ6avWe2UtTTTtxFeX/dxXpy7POaBNGmHSnvQwIwIFfFJmlhKCdbEduFO451QAXBOKr6H7kAIaCy/NUGjxjbYHH05AoGix0FoW09YrJj" ;
             msg:hash                        "AK7ovAcUTa5/JQ/r7v8+GoXsOqxZSC4QB4zt0hYuZ1vvDrbLz4BKVl483Sn2Qx9d3i4nT5pqQZh8BU/K4r40wWjNPCCsuoLgBLBSKfhMA0aLX86lzXP1/HYgUtUWSevoctf9MlW56KEmwhloJYOoaYSz+x1439j1yyIJzqf5W2zO" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p18:envelope-xg0i .
 }
 
 p31:envelope-pj9k {
-    p31:data-sig  a                         sig:Signature ;
-            sig:hasVerificationCertificate  p12:7820503869697675000 ;
-            sig:signatureValue              "MGQCMFNReqF/Ovg5KUpW0UV72n4qdPqsA1G9zPck/etm07eLwIByztPsxUmATjWqqApOLQIwKk7JZjNTurLvsQ//fpMwdcIuq50/UEQhwsI5Xitvi52iJrfywTZCIwbg4zFu209P" ;
+    p31:data-sig  a                         msg:Signature ;
+            msg:signer  p12:7820503869697675000 ;
+            msg:signatureValue              "MGQCMFNReqF/Ovg5KUpW0UV72n4qdPqsA1G9zPck/etm07eLwIByztPsxUmATjWqqApOLQIwKk7JZjNTurLvsQ//fpMwdcIuq50/UEQhwsI5Xitvi52iJrfywTZCIwbg4zFu209P" ;
             msg:hash                        "fs4orqA2ZXWb5NRf7iDWHDdLyEAO8AREcmY/tg5gf1l+evJkXXzQv976FIO5iUedH0933wIeWSbbaiBMRg6w0wZ9QLe9/9+3Kr4iLOjEyc5P0mWKwoSkGrmMT0WTKdXDkxISQX6dbTZtejmbUBqzD732YXSDKuk/TRRYWpi/CAk=" ;
             msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
             msg:signedGraph                 p31:data .
@@ -1651,9 +1651,9 @@ p31:envelope-pj9k {
             msg:containsSignature  p31:data-sig , p1:envelope-30wn-sig .
     
     p1:envelope-30wn-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGQCMFplMNHAWOfPW9EfTh/Ejc7bHOJ+q3crX548PN3U2MuRrjdvHsscXaJkhVlqdOOiVAIwD0qjS/VlzsHtsbw/2MzjGAvqjrKKyVvGuo21vOqjpFR3xOew49QKzrG1BZ8GlGEq" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGQCMFplMNHAWOfPW9EfTh/Ejc7bHOJ+q3crX548PN3U2MuRrjdvHsscXaJkhVlqdOOiVAIwD0qjS/VlzsHtsbw/2MzjGAvqjrKKyVvGuo21vOqjpFR3xOew49QKzrG1BZ8GlGEq" ;
             msg:hash                        "AIndLYiOGc3NpUl+mBuuwMOywlztyiQuh5dDuWD5+X3TY4e/HqOrHk7oYajHQsMM4g13hO3835w9Ts7lbWuoJsqmG6Go5mKpOaUXU2w7kMNWGoB9slR9m7CBFfZDLEf8CaRaheBk7+K29DkkSX8x6miIhY9TbYlVD1Y9jpJCygae" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p1:envelope-30wn .
@@ -1666,9 +1666,9 @@ p46:envelope-i81z {
             msg:containsSignature  p9:envelope-ma7y-sig .
     
     p9:envelope-ma7y-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p38:resource ;
-            sig:signatureValue              "MGUCMQD0H3I+Y3Y27WJgS6B3lLpDPhtI1odks1YXXd61zmYE0/DVLLWiMQoyDn6H8JQKY/ACMGz1OKAt2e+rg9xCOm53tP56gctuzUS6Qi6Es9Q6fZep8j20iihafRyE41uYcxvAtQ==" ;
+            a                               msg:Signature ;
+            msg:signer  p38:resource ;
+            msg:signatureValue              "MGUCMQD0H3I+Y3Y27WJgS6B3lLpDPhtI1odks1YXXd61zmYE0/DVLLWiMQoyDn6H8JQKY/ACMGz1OKAt2e+rg9xCOm53tP56gctuzUS6Qi6Es9Q6fZep8j20iihafRyE41uYcxvAtQ==" ;
             msg:hash                        "C8nYCZS1IgqOdjLk3f73I9dSekaGxFlNEPKwAAfBFuA/P3aoLEE8ypNLylRearbSS+xx4CuRwulCIfdRxDkZlydctRvVPOFr48u1lS04nPNlL43EMI4r21myMUbjIlo1VEjopgSJoUc/M1IlXcBcN1ir/p4W5zVc5GMy+2Jh5eo=" ;
             msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:signedGraph                 p9:envelope-ma7y .
@@ -1710,9 +1710,9 @@ p42:envelope-w5bl {
             msg:containsSignature  p42:content-1o90-sig .
     
     p42:content-1o90-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  p12:nte803gz4pbiw6equ3qa ;
-            sig:signatureValue              "MGYCMQD5Nwik6+m6Uo7mRcw8vhDA72HhVqADszGW+E1WQych1GPJ6pIajJ2u9EhhaCYtdbUCMQCJaOGoq7i0ZkWUC34fLwg3XVsnyc+m8ViFI3DFMaRTk1lwRpffsvB4EnvtRduijm0=" ;
+            a                               msg:Signature ;
+            msg:signer  p12:nte803gz4pbiw6equ3qa ;
+            msg:signatureValue              "MGYCMQD5Nwik6+m6Uo7mRcw8vhDA72HhVqADszGW+E1WQych1GPJ6pIajJ2u9EhhaCYtdbUCMQCJaOGoq7i0ZkWUC34fLwg3XVsnyc+m8ViFI3DFMaRTk1lwRpffsvB4EnvtRduijm0=" ;
             msg:hash                        "ALNs2UTDIodwFyAkA57/S4xpXn6pTLvNmZqzm2oMxTdmypt/0/Y4eQ4AdVjOQetMTxvAiQ6J/tIRzEMWFTU0qrBh3XTELGoID/BTlfjk8DUxcBF9fKmaHKc8tQfbUk+IKsrGvsLFu364vQ5dBxVh14qcbwmXs1daUcWJ8NN6CcjD" ;
             msg:publicKeyFingerprint        "IwyZXueJ69uldEQMoR6tmjSICtahgt4Oji/iALKaL+4=" ;
             msg:signedGraph                 p42:content-1o90 .

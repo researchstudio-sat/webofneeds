@@ -24,9 +24,9 @@
 
 <https://satvm05.researchstudio.at/won/resource/event/wh698cvrukwu#envelope-sig> {
     <https://satvm05.researchstudio.at/won/resource/event/wh698cvrukwu#envelope-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQDeR98fsXaIff43svGgSQYstSuJ6/EPoHUVuZi3km1tLYgiUDg3rsxV/ELWT9LFdLsCMCC6SJ+5yzjsEthPZDAO/hCn9/RkTJ5rA1rgVNR7K/B30FWJ1lQdBqnLfatdjrLdMQ==" ;
-            sig:hasVerificationCertificate  <https://satvm05.researchstudio.at/won/resource/atom/fw1tqsz1grkz> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQDeR98fsXaIff43svGgSQYstSuJ6/EPoHUVuZi3km1tLYgiUDg3rsxV/ELWT9LFdLsCMCC6SJ+5yzjsEthPZDAO/hCn9/RkTJ5rA1rgVNR7K/B30FWJ1lQdBqnLfatdjrLdMQ==" ;
+            msg:signer  <https://satvm05.researchstudio.at/won/resource/atom/fw1tqsz1grkz> ;
             msg:hash                     "MTEbibThObfznigsKrNSRSt+lU8jAKB0E4typt+eSYsno7hCZLu9wzs5q542lS4Fx7C58OdyicrUgH8Y9z10VnlXhd9A2N0Mzv8oKxvdJp9qghq8cMotrFLXKCChjCEISEvwoUJfRI1D4RzTe5zToLw5dZqvICHvmY8LTNEjzM8=" ;
             msg:publicKeyFingerprint     "MJXK51S3WommnANGwyLCxWaLoXHpIwcaMKSTFFA/6qo=" ;
             msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/wh698cvrukwu#envelope> .
@@ -49,9 +49,9 @@
 
 <https://satvm05.researchstudio.at/won/resource/event/wh698cvrukwu#envelope> {
     <https://satvm05.researchstudio.at/won/resource/event/wh698cvrukwu#atom-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMAO6rYzZyW5B058RaRO3tX96fXQfoerOcB8RjAA4SEH8jF41ZpgW2CufZ8yv1Huu1wIwcPDoQFqywOivhTdbKqasSmAuL0jhmFqnXBEDzoMmHRZzVTY2SS7Qg9wY6jaEhol2" ;
-            sig:hasVerificationCertificate  <https://satvm05.researchstudio.at/won/resource/atom/fw1tqsz1grkz> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMAO6rYzZyW5B058RaRO3tX96fXQfoerOcB8RjAA4SEH8jF41ZpgW2CufZ8yv1Huu1wIwcPDoQFqywOivhTdbKqasSmAuL0jhmFqnXBEDzoMmHRZzVTY2SS7Qg9wY6jaEhol2" ;
+            msg:signer  <https://satvm05.researchstudio.at/won/resource/atom/fw1tqsz1grkz> ;
             msg:hash                     "PuN4qpHJCciJoqnkE+5rq1ICXFb4/9INzTa78VDL+flDo19lvd4mejH98hHNeN1O3gfzHy4Xnim8387eZvexEAo9fFz4lhu67zjc3dhq7haq/NDd4PBj325QsBWwCxf2l/OjvblpGgiw1AftHEEt6T0t+NptM2axp2i4PVfPueA=" ;
             msg:publicKeyFingerprint     "MJXK51S3WommnANGwyLCxWaLoXHpIwcaMKSTFFA/6qo=" ;
             msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/wh698cvrukwu#atom> .

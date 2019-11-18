@@ -10,7 +10,7 @@ prefix rdfg:   <http://www.w3.org/2004/03/trix/rdfg-1/>
 prefix local: <http://localhost:8080/won/resource/>
 prefix won:   <https://w3id.org/won/core#>
 prefix msg:   <https://w3id.org/won/message#>
-prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
+
 prefix ldp:   <http://www.w3.org/ns/ldp#>
 
 #message events check:

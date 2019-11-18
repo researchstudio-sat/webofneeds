@@ -70,9 +70,9 @@
 
 <https://192.168.124.49:8443/won/resource/event/tb06f3a5l8vw#envelope-sig> {
     <https://192.168.124.49:8443/won/resource/event/tb06f3a5l8vw#envelope-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQDRfmzpM43Z9aLGy0JHKjde1Gflxnt5uWk1OGRFDtNElb3UucgBdntseO8LWyf7duQCMQDI7lH8wGJvcblaUy8c0sKsfGjOT9AGf1tZsLIT8/NjDRwonrbjV0ctg711EjzMXFg=" ;
-            sig:hasVerificationCertificate  atom:cbfgi37je6kr ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQDRfmzpM43Z9aLGy0JHKjde1Gflxnt5uWk1OGRFDtNElb3UucgBdntseO8LWyf7duQCMQDI7lH8wGJvcblaUy8c0sKsfGjOT9AGf1tZsLIT8/NjDRwonrbjV0ctg711EjzMXFg=" ;
+            msg:signer  atom:cbfgi37je6kr ;
             msg:hash                     "AIJAHAKhwONNb8RKvFDWitB4zS4eZybc9gw6Ik1nhZjiqhQ48zx42DdxTDmgcaX8ySl+5RPel/3pcfWbmubL3gDGApbFBbV+J/bhiGwKXTJx3qy4WKtgaRi6L3lbPtDB/v9x16ZTGev5qWffND67IMHEsGN/MoJBgUDB3FlIsnqQ" ;
             msg:publicKeyFingerprint     "Jwr0/bFPnGzLCrE+74woWkF2ZT7yYrjxxoJC/cWREXw=" ;
             msg:signedGraph              <https://192.168.124.49:8443/won/resource/event/tb06f3a5l8vw#envelope> .

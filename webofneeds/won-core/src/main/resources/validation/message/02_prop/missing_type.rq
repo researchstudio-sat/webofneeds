@@ -9,7 +9,7 @@ prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix local: <http://localhost:8080/won/resource/>
 prefix won:   <https://w3id.org/won/core#>
 prefix msg:   <https://w3id.org/won/message#>
-prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
+
 prefix ldp:   <http://www.w3.org/ns/ldp#>
 
 # true => there are no triples with msg:messageType predicate

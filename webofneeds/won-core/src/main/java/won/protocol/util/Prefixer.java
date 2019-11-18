@@ -36,7 +36,6 @@ import won.protocol.util.pretty.ConversationDatasetWriterFactory;
 import won.protocol.util.pretty.Lang_WON;
 import won.protocol.vocabulary.CERT;
 import won.protocol.vocabulary.SCHEMA;
-import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONCON;
 import won.protocol.vocabulary.WONMATCH;
@@ -92,7 +91,6 @@ public class Prefixer {
         prefixMapping.setNsPrefix("demo", "https://w3id.org/won/ext/demo#");
         prefixMapping.setNsPrefix("wxs", "https://w3id.org/won/ext/schema#");
         prefixMapping.setNsPrefix("pogo", "https://w3id.org/won/ext/pogo#");
-        prefixMapping.setNsPrefix(SFSIG.DEFAULT_PREFIX, SFSIG.getURI());
         prefixMapping.setNsPrefix(CERT.DEFAULT_PREFIX, CERT.getURI());
         prefixMapping.setNsPrefix("rdf", RDF.getURI());
         prefixMapping.setNsPrefix("rdfs", RDFS.getURI());

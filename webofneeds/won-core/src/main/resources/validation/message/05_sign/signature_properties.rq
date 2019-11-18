@@ -9,7 +9,7 @@ prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix local: <http://localhost:8080/won/resource/>
 prefix won:   <https://w3id.org/won/core#>
 prefix msg:   <https://w3id.org/won/message#>
-prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
+
 prefix ldp:   <http://www.w3.org/ns/ldp#>
 
 # each signature graph should have required signature triples, including one link to envelope or content graph
@@ -32,9 +32,9 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
         WHERE
         {
 
-          ?g rdf:type signature:Signature .
-          ?g signature:signatureValue ?svalue .
-          ?g signature:hasVerificationCertificate ?signer .
+          ?g rdf:type msg:Signature .
+          ?g msg:signatureValue ?svalue .
+          ?g msg:signer ?signer .
           ?g msg:signedGraph ?signed .
           ?g msg:publicKeyFingerprint ?fingerprint .
           ?g msg:hash ?hash

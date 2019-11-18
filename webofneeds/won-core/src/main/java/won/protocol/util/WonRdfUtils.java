@@ -73,7 +73,6 @@ import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInfoBuilder;
 import won.protocol.util.RdfUtils.Pair;
 import won.protocol.vocabulary.SCHEMA;
-import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONAGR;
 import won.protocol.vocabulary.WONCON;
@@ -92,13 +91,13 @@ public class WonRdfUtils {
         public static boolean isSignatureGraph(String graphUri, Model model) {
             // TODO check the presence of all the required triples
             Resource resource = model.getResource(graphUri);
-            StmtIterator si = model.listStatements(resource, RDF.type, SFSIG.SIGNATURE);
+            StmtIterator si = model.listStatements(resource, RDF.type, WONMSG.Signature);
             return si.hasNext();
         }
 
         public static boolean isSignature(Model model, String modelName) {
             // TODO check the presence of all the required triples
-            return model.contains(model.getResource(modelName), RDF.type, SFSIG.SIGNATURE);
+            return model.contains(model.getResource(modelName), RDF.type, WONMSG.Signature);
         }
 
         public static String getSignedGraphUri(String signatureGraphUri, Model signatureGraph) {
@@ -114,7 +113,7 @@ public class WonRdfUtils {
         public static String getSignatureValue(String signatureGraphUri, Model signatureGraph) {
             String signatureValue = null;
             Resource resource = signatureGraph.getResource(signatureGraphUri);
-            NodeIterator ni2 = signatureGraph.listObjectsOfProperty(resource, SFSIG.HAS_SIGNATURE_VALUE);
+            NodeIterator ni2 = signatureGraph.listObjectsOfProperty(resource, WONMSG.signatureValue);
             if (ni2.hasNext()) {
                 signatureValue = ni2.next().asLiteral().toString();
             }
@@ -133,13 +132,13 @@ public class WonRdfUtils {
                 String signedGraphUri = s.getObject().asResource().getURI();
                 signedGraphs.add(signedGraphUri);
             }
-            Statement stmt = resource.getRequiredProperty(SFSIG.HAS_SIGNATURE_VALUE);
+            Statement stmt = resource.getRequiredProperty(WONMSG.signatureValue);
             String signatureValue = stmt.getObject().asLiteral().getString();
             stmt = resource.getRequiredProperty(WONMSG.hash);
             String hash = stmt.getObject().asLiteral().getString();
             stmt = resource.getRequiredProperty(WONMSG.publicKeyFingerprint);
             String fingerprint = stmt.getObject().asLiteral().getString();
-            stmt = resource.getRequiredProperty(SFSIG.HAS_VERIFICATION_CERT);
+            stmt = resource.getRequiredProperty(WONMSG.signer);
             String cert = stmt.getObject().asResource().getURI();
             return new WonSignatureData(signedGraphs, resource.getURI(), signatureValue, hash, fingerprint, cert);
         }
@@ -158,13 +157,13 @@ public class WonRdfUtils {
             assert wonSignatureData.getSignedGraphUris() != null;
             assert wonSignatureData.getVerificationCertificateUri() != null;
             Model containingGraph = subject.getModel();
-            subject.addProperty(RDF.type, SFSIG.SIGNATURE);
+            subject.addProperty(RDF.type, WONMSG.Signature);
             subject.addProperty(WONMSG.hash, wonSignatureData.getHash());
-            subject.addProperty(SFSIG.HAS_SIGNATURE_VALUE, wonSignatureData.getSignatureValue());
+            subject.addProperty(WONMSG.signatureValue, wonSignatureData.getSignatureValue());
             wonSignatureData.getSignedGraphUris().forEach(
                             uri -> subject.addProperty(WONMSG.signedGraph, containingGraph.createResource(uri)));
             subject.addProperty(WONMSG.publicKeyFingerprint, wonSignatureData.getPublicKeyFingerprint());
-            subject.addProperty(SFSIG.HAS_VERIFICATION_CERT,
+            subject.addProperty(WONMSG.signer,
                             containingGraph.createResource(wonSignatureData.getVerificationCertificateUri()));
         }
     }

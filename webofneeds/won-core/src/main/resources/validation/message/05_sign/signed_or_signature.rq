@@ -9,7 +9,6 @@ prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix local: <http://localhost:8080/won/resource/>
 prefix won:   <https://w3id.org/won/core#>
 prefix msg:   <https://w3id.org/won/message#>
-prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
 prefix ldp:   <http://www.w3.org/ns/ldp#>
 prefix rdfg:   <http://www.w3.org/2004/03/trix/rdfg-1/>
 
@@ -47,7 +46,7 @@ prefix rdfg:   <http://www.w3.org/2004/03/trix/rdfg-1/>
 	        {
 	        	GRAPH ?any
 	            {
-	              ?g rdf:type signature:Signature .
+	              ?g rdf:type msg::Signature .
 	              ?g msg:signedGraph ?graphToCheck .
 	            } .
 			}
@@ -67,7 +66,7 @@ prefix rdfg:   <http://www.w3.org/2004/03/trix/rdfg-1/>
 	        {
 	        	GRAPH ?graphToCheck
 	            {
-	              ?graphToCheck rdf:type signature:Signature .
+	              ?graphToCheck rdf:type msg:Signature .
 	              ?graphToCheck msg:signedGraph ?anotherGraph .
 	            } .
 			}
