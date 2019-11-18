@@ -419,38 +419,68 @@ class WonAtomContentBuddies extends React.Component {
     this.props.showModalDialog(payload);
   }
 
-  sendChatMessage(conn) {
+  sendChatMessage(connection) {
     if (this.props.chatConnectionsArray && this.props.hasChatConnections) {
-      let chatConnectionUri;
-      for (let connection of this.props.chatConnectionsArray) {
-        if (get(connection, "targetAtomUri") === get(conn, "targetAtomUri")) {
-          chatConnectionUri = get(connection, "uri");
-          break;
-        }
-      }
+      //Check if connection is already an existing chatConnection
+      const targetAtomUri = get(connection, "targetAtomUri");
+      //const targetSocketUri = get(connection, "socketUri");
+      const chatConnections = this.props.chatConnectionsArray.filter(
+        conn => get(conn, "targetAtomUri") === targetAtomUri
+      );
+      //.filter(conn => get(conn, "socketUri") === targetSocketUri);
 
-      if (chatConnectionUri) {
-        //chatConnection between buddies already exists
-        this.props.routerGo("connections", {
-          connectionUri: chatConnectionUri, //get(conn, "uri"),
-        });
-      } else {
-        //TODO: Connect Buddy Atoms, not via AdHocAtom!
-        this.props.connectAdHoc(
-          get(conn, "targetAtomUri"),
+      if (chatConnections.length == 0) {
+        //No chatConnection between buddies exists => connect
+        this.props.connect(
+          this.props.atomUri,
+          undefined,
+          get(connection, "targetAtomUri"),
           "",
-          this.props.chatSocketUri,
-          this.props.atomUri
+          won.CHAT.ChatSocketCompacted,
+          won.CHAT.ChatSocketCompacted
         );
         this.props.routerGoResetParams("connections");
+      } else if (chatConnections.length == 1) {
+        const chatConnection = chatConnections[0];
+        const chatConnectionUri = get(chatConnection, "uri");
+
+        if (
+          connectionUtils.isSuggested(chatConnection) ||
+          connectionUtils.isClosed(chatConnection)
+        ) {
+          this.props.connect(
+            this.props.atomUri,
+            undefined,
+            chatConnectionUri,
+            "",
+            won.CHAT.ChatSocketCompacted,
+            won.CHAT.ChatSocketCompacted
+          );
+        } else if (
+          connectionUtils.isConnected(chatConnection) ||
+          connectionUtils.isRequestSent(chatConnection) ||
+          connectionUtils.isRequestReceived(chatConnection)
+        ) {
+          this.props.routerGo("connections", {
+            connectionUri: chatConnectionUri,
+          });
+        }
+      } else {
+        console.error(
+          "more than one connection stored between two atoms that use the same exact sockets",
+          this.props.atom,
+          this.props.chatSocketUri
+        );
       }
     } else {
-      //TODO: Connect Buddy Atoms, not via AdHocAtom!
-      this.props.connectAdHoc(
-        get(conn, "targetAtomUri"),
+      //No chatConnection between buddies exists => connect
+      this.props.connect(
+        this.props.atomUri,
+        undefined,
+        get(connection, "targetAtomUri"),
         "",
-        this.props.chatSocketUri,
-        this.props.atomUri
+        won.CHAT.ChatSocketCompacted,
+        won.CHAT.ChatSocketCompacted
       );
       this.props.routerGoResetParams("connections");
     }
