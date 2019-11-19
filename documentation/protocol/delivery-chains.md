@@ -53,24 +53,28 @@ Each message is content-addressed, i.e., its URI is calculated based on its enti
 By referencing earlier messages in a conversation, the conversation becomes immutable in the sense that alteration of any part of it can be detected. Each message is also signed by its author, so no other participant could modify the contents without detection. In combination, only the last message in a conversation could be modified (and subsequently its URI recalculated) by one of the participants.
 
 In WoN it is the responsibility of the WoN nodes to link new messages to earlier ones. They do this by adding message references to the SuccessResponses they generate. (FailureResponses are never used in this way). These references are realized using the RDF property 
-`msg:previouseMessage`, which always point to an earlier SuccessResponse. The actual user-generated (or system-generated) messages are referenced by those SuccessResponses.
+`msg:previousMessage`, which always point to an earlier SuccessResponse. The actual user-generated (or system-generated) messages are referenced by those SuccessResponses. Thus, a SuccessResponse gets *confirmed*. 
 
-Thus, a message log may look like this:
-```
-m1 <--msg:respondingTo-- s1
-                          ^
-                          |
-                  msg:previousMessage
-                          |
-m2 <--msg:respondingTo-- s2
-                          ^
-                          |
-                  msg:previousMessage
-                          |
-m3 <--msg:respondingTo-- s3
+The confirmation algorithm differs for an atom's message container and for a connection's message container.
 
-```
-### Atom-Specific Messages
+### Atom's Message Container
+An atom's message container only holds user-generated messages, system-generated messages, and the atom's responses.
 
-### Connection-Specific Messages
+It may look like this: [TODO image]
+
+
+In this case, `m1`, `m2`, and `m3` were processed sequentially, therefore their SuccessResponses link up in a chain. When messages are processed in parallel, the chain forks. A subsequent SuccessResponse then contain references to multiple previous messages and thereby reunites the forked chains.
+
+#### Confirmation Algorithm
+For each message container a *confirmation list* is maintained, which contains the URIs of those messages that have not been confirmed yet. 
+* Each time a SuccessResponse is appended to the message container, the messages it confirms are removed from the confirmation list.
+* Each time a SuccessResponse is created, all URIs in the confirmation list are added as `msg:previousMessage` properties. 
+
+### Connection's Message Container
+
+An connection's message container holds user-generated messages and system-generated messages from both atoms, as well as both atom's responses.
+
+It may look like this: [TODO image]
+
+                          
 
