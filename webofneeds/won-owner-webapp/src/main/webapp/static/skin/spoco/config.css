@@ -1,0 +1,23 @@
+:root {
+  --won-primary-color: #f04646;
+  --won-primary-color-light: #f09f9f;
+  --won-secondary-color: #00325a;
+  --won-secondary-color-light: #2266b4;
+  --won-secondary-color-lighter: #468cdc;
+  --won-disabled-color: #ccd2d2;
+
+  --won-light-gray: #f0f2f4; /*used for headings*/
+  --won-lighter-gray: #f8f9f9; /*used for background*/
+  --won-line-gray: #cbd2d1; /*use for lines*/
+  --won-subtitle-gray: #808080;
+  --won-helpbox-yellow: #fffce5;
+
+  --won-unread: #ccdff5; /*If you want to indicate the unread status with a background (maybe in addition to a marker), use this slightly less in your face color*/
+  --won-unread-attention: #f04646; /*Bold color used for markers that indicate an unread status of an element*/
+
+  --won-dark-purple: #673a68;
+  --won-dark-gray: #303a43;
+  --won-primary-text-color: #000000;
+  --won-secondary-text-color: #ffffff;
+  --won-skeleton-color: #ccd2d2;
+}
