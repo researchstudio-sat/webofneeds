@@ -40,8 +40,8 @@ public enum RestStatusResponse {
     RECOVERY_KEYGEN_WRONG_PASSWORD(8101, "Could not generate recovery key: wrong password", HttpStatus.BAD_REQUEST),
     SUBSCRIBE_SUCCESS(8200, "Successfully subscribed to push notifications", HttpStatus.OK),
     ERROR_SENDING_MESSAGE_TO_NODE(9000, "Error sending WoN message to node", HttpStatus.INTERNAL_SERVER_ERROR),
-    ERROR_PREPARING_MESSAGE(9000, "Error signing and sealing WoN message", HttpStatus.INTERNAL_SERVER_ERROR),
-    ERROR_PARSING_MESSAGE(9000, "Error parsing WoN message", HttpStatus.INTERNAL_SERVER_ERROR);
+    ERROR_PREPARING_MESSAGE(9001, "Error signing and sealing WoN message", HttpStatus.INTERNAL_SERVER_ERROR),
+    ERROR_PARSING_MESSAGE(9002, "Error parsing WoN message", HttpStatus.INTERNAL_SERVER_ERROR);
     private final int code;
     private final String message;
     private final HttpStatus httpStatus;
