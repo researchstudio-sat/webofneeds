@@ -30,7 +30,7 @@ The following depictions show which messages are exchanged. `a => b : x, y` mean
 Atom-specific delivery: Simple in/out behavior:
 ```
 owner -> node : m
-owner <- node : m <--msg:respondingTo-- s
+owner <- node : m, s
 ```
 Connection-specific delivery: Message `m` travels from `owner1` to `node1`, to `node2`, to `owner2`. The responses `s1` and `s2` are delivered to both `owner1` and `owner2`. The sequence is depicted in the following diagram. Each row describes a dataset
 
