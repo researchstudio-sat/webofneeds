@@ -1,4 +1,4 @@
-# Delivery Chains
+# Delivery Chain
 
 The messages involved in the delivery and acknowledgment of a message logically form a chain. (If you are strict about it, the structure is a DAG.)
 This structure is called a *delivery chain*.
@@ -45,4 +45,32 @@ Connection-specific delivery: Message `m` travels from `owner1` to `node1`, to `
 After these exchanges, both owners end up with `m`, `s1`, and `s2`.
 
 Message 2 contains `m` and `s1`, not just `s1`, which might be surprising. In this case, `m` is called an *echo*, and it is delivered to all clients registered as the owner of the atom that sends `m`. Thus, when one client sends a message, all clients are informed of that message immediately.
+
+## Message Log Integrity
+
+Each message is content-addressed, i.e., its URI is calculated based on its entire content. It is thus not possible to change a message after calculating its URI without breaking this relationship. 
+
+By referencing earlier messages in a conversation, the conversation becomes immutable in the sense that alteration of any part of it can be detected. Each message is also signed by its author, so no other participant could modify the contents without detection. In combination, only the last message in a conversation could be modified (and subsequently its URI recalculated) by one of the participants.
+
+In WoN it is the responsibility of the WoN nodes to link new messages to earlier ones. They do this by adding message references to the SuccessResponses they generate. (FailureResponses are never used in this way). These references are realized using the RDF property 
+`msg:previouseMessage`, which always point to an earlier SuccessResponse. The actual user-generated (or system-generated) messages are referenced by those SuccessResponses.
+
+Thus, a message log may look like this:
+```
+m1 <--msg:respondingTo-- s1
+                          ^
+                          |
+                  msg:previousMessage
+                          |
+m2 <--msg:respondingTo-- s2
+                          ^
+                          |
+                  msg:previousMessage
+                          |
+m3 <--msg:respondingTo-- s3
+
+```
+### Atom-Specific Messages
+
+### Connection-Specific Messages
 
