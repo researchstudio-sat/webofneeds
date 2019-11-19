@@ -35,12 +35,13 @@ owner <- node : m <--msg:respondingTo-- s
 Connection-specific delivery: Message `m` travels from `owner1` to `node1`, to `node2`, to `owner2`. The responses `s1` and `s2` are delivered to both `owner1` and `owner2`.
 
 ```
-owner => node1 : m 
-owner <= node2 : m <--msg:respondingTo-- s1
-node1 => node2 : m <--msg:respondingTo-- s1
-node1 <= node2 :  (m) <--msg:respondingTo-- s2
-                 (s1) <--msg:previousMessage-- s2
-node2 => owner2:  m <--msg:respondingTo-- s2
-                 s1 <--msg:previousMessage-- s2                
+1. owner => node1                    : m 
+2. owner <= node1                    : m, s1
+3.          node1 => node2           : m, s1
+4.          node1 <= node2           : s2
+5.                   node2 => owner2 : m, s1, s2
+6. owner <= node1 :                  : s2
 ```                 
 After these exchanges, both owners end up with `m`, `s1`, and `s2`.
+Message 2 contains `m` and `s1`, not just `s1`, which might be surprising. In this case, `m` is called an *echo*, and it is delivered to all clients registered as the owner of the atom that sends `m`. Thus, when one client sends a message, all clients are informed of that message immediately.
+
