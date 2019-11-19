@@ -117,7 +117,8 @@ After the first delivery chain is finished, as in the first example, `s1A` is in
 
 ![Three messages from same side, response is late or lost](img/conn-message-container-late-response.png)
 
-This example is a possible continuation of  Example 2, in which `s2B` is late or lost. The consequence is that `s1B` is not removed from `C(A)`. When `A` creates the response `s3A`, it therefore references `s1B` again. The lost response also causes `s3B` to reference `s2A` again.
+This example is a possible continuation of  Example 2, in which `s2B` is late or lost. The consequence is that `s1B` is not removed from `C(A)`. When `A` creates the response `s3A`, it therefore references `s1B` again. The lost response also causes `s3B` to reference `s2A` again. Only when `A` actually receives `s3B` will `s1B` be removed from `C(A)`.
+
 
 
                           
