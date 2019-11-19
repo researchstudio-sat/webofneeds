@@ -101,9 +101,17 @@ Simply put, we confirm our partner's SuccessResponse `s` until we receive a Succ
 
 In the following examples, `A` denotes the connection of the atom on the left side, `B` denotes the connection of the atom on the right side. `s1A` is the SuccessResponse from `A`, in response to message `m1`, `s1B`is the response of `B`, and so on.
 
+##### Example 1: one message from each side
+
 ![One message from each side](img/conn-message-container.png)
 
 After the first delivery chain is *finished* (both responses are present), `S1A` is in `C(B)` and `S1B` is in `c(A)`. In the second delivery chain, when `B` confirms `s1A` it is actually the second time it refrences it. `B` must do that because `s1B` might have been lost or delayed. `A` confirms `s1B` because it is its first chance to do so.
+
+##### Example 2: two messages from the same side
+
+![Two messages from same side](img/conn-message-container-same-side.png)
+
+After the first delivery chain is finished, as in the first example, `S1A` is in `C(B)` and `S1B` is in `c(A)`. However, now the message comes from the owner of `A`. The difference is the order in which `s2A` and `s2B` are created: `s2A` confirms `s1B`, which, according to the algorithm, removes `s1A` from `C(B)`. Therefore, `s2B` only references `s2A`.
 
 
 
