@@ -58,23 +58,55 @@ In WoN it is the responsibility of the WoN nodes to link new messages to earlier
 The confirmation algorithm differs for an atom's message container and for a connection's message container.
 
 ### Atom's Message Container
+
 An atom's message container only holds user-generated messages, system-generated messages, and the atom's responses.
 
-It may look like this: [TODO image]
-
-
-In this case, `m1`, `m2`, and `m3` were processed sequentially, therefore their SuccessResponses link up in a chain. When messages are processed in parallel, the chain forks. A subsequent SuccessResponse then contain references to multiple previous messages and thereby reunites the forked chains.
-
 #### Confirmation Algorithm
+
 For each message container a *confirmation list* is maintained, which contains the URIs of those messages that have not been confirmed yet. 
 * Each time a SuccessResponse is appended to the message container, the messages it confirms are removed from the confirmation list.
 * Each time a SuccessResponse is created, all URIs in the confirmation list are added as `msg:previousMessage` properties. 
+
+#### Examples
+
+![Chain in atom's message container](img/atom-message-container.png)
+
+In this case, `m1`, `m2`, and `m3` were processed sequentially, therefore their SuccessResponses link up in a chain. 
+
+When messages are processed in parallel, the chain forks. A subsequent SuccessResponse then contain references to multiple previous messages and thereby reunites the forked chains:
+
+![Chain in atom's message container](img/atom-message-container-fork.png)
+
+
 
 ### Connection's Message Container
 
 An connection's message container holds user-generated messages and system-generated messages from both atoms, as well as both atom's responses.
 
-It may look like this: [TODO image]
+In this setting, confirmation is the mechanism to inform the communication partner of the receipt of one of their responses. Once we know that our response was received by our partner, we know that we both have all messages of that delivery chain in our message containers.
+
+#### Confirmation Algorithm
+
+For each message container a *confirmation list* `C` is maintained, which contains the URIs of those messages that have not been confirmed yet. 
+* Each time a SuccessResponse `s` from the other connection is appended to the message container
+    - The messages it confirms transitively are removed from the confirmation list:
+        + load all messages referenced by `s` via `msg:previousMessage` - these are our responses 
+        + extract from them the URIs *they* reference via `msg:previousMessage` and remove them from `C`
+    - `s` is added to `C`
+* Each time a SuccessResponse is created, all URIs in the confirmation list are added as `msg:previousMessage` properties. 
+
+Simply put, we confirm our partner's SuccessResponse `s` until we receive a SuccessResponse `s'` that confirms one of our messages that confirms `s`.
+
+#### Examples
+
+In the following examples, `A` denotes the connection of the atom on the left side, `B` denotes the connection of the atom on the right side. `s1A` is the SuccessResponse from `A`, in response to message `m1`, `s1B`is the response of `B`, and so on.
+
+![One message from each side](img/conn-message-container.png)
+
+After the first delivery chain is *finished* (both responses are present), `S1A` is in `C(B)` and `S1B` is in `c(A)`. In the second delivery chain, when `B` confirms `s1A` it is actually the second time it refrences it. `B` must do that because `s1B` might have been lost or delayed. `A` confirms `s1B` because it is its first chance to do so.
+
+
+
 
                           
 
