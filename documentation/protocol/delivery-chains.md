@@ -25,14 +25,14 @@ s1 <--msg:previousMessage-- s2
 ```
 
 ## Message Delivery
-The following depictions show which messages are exchanged. `a => b : [structure]` means `a` sends `[structure]` to `b`, realized as one dataset. Messages that are set in parentheses, such as `(m)` indicate that they are referenced but not contained in the dataset.
+The following depictions show which messages are exchanged. `a => b : x, y` means `a` sends messages `x` and `y` to `b` *in one RDF dataset*. 
 
 Atom-specific delivery: Simple in/out behavior:
 ```
 owner -> node : m
 owner <- node : m <--msg:respondingTo-- s
 ```
-Connection-specific delivery: Message `m` travels from `owner1` to `node1`, to `node2`, to `owner2`. The responses `s1` and `s2` are delivered to both `owner1` and `owner2`.
+Connection-specific delivery: Message `m` travels from `owner1` to `node1`, to `node2`, to `owner2`. The responses `s1` and `s2` are delivered to both `owner1` and `owner2`. The sequence is depicted in the following diagram. Each row describes a dataset
 
 ```
 1. owner => node1                    : m 
