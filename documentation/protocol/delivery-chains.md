@@ -125,4 +125,6 @@ This example is a possible continuation of  Example 2, in which `s2B` is late or
 
 Here, `m2` and `m3` are sent roughly the same time, such that they are both processed by the sending node before they are both processed by the receiving node. Their delivery chains do not influence each other. After this exchange, `C(A) = {s2B, s3B}` and  `C(B) = {s2A, s3A}`. 
                           
+##### Example 5: delayed message
 
+After `m1` is finished, `B` sends `m2`. It is processed by the sending node, but then gets delayed. Meanwhile, A sends `m3`, which is processed completely. Only then, the receiving node processes `m2`. The references in the delivery chain of `m3` change the confirmation lists, such that `s2B` references  `s3B` instead of `s1B`. It is always possible for a node to create this situation artificially by referencing responses from earlier in the chain. For the recipient node, this is indistinguishable from a message that really is delayed by the network. Conversely, a node can delay a *recipient response* artificially and create it only after having processed other messages in the container; this, too, is indistinguishable from an actual network delay for the original sender. 
