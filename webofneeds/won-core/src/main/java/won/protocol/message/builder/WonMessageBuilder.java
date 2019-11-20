@@ -164,7 +164,7 @@ public class WonMessageBuilder {
         // the [envelopeGraphURI] rdf:type msg:EnvelopeGraph makes it easy to select
         // graphs by type
         Resource envelopeGraphResource = envelopeGraph.createResource(envelopeGraphURI, WONMSG.EnvelopeGraph);
-        envelopeGraphResource.addProperty(RDFG.SUBGRAPH_OF, messageEventResource);
+        envelopeGraph.add(messageEventResource, WONMSG.envelope, envelopeGraphResource);
         // make sure the envelope type has been set
         if (this.wonMessageDirection == null) {
             throw new IllegalStateException("envelopeType must be set!");
@@ -263,9 +263,6 @@ public class WonMessageBuilder {
             dataset.addNamedModel(contentUriString, contentMap.get(contentURI));
             messageEventResource.addProperty(WONMSG.content,
                             messageEventResource.getModel().createResource(contentUriString));
-            // add the [content-graph] rdfg:subGraphOf [message-uri] triple to the envelope
-            envelopeGraph.createStatement(envelopeGraph.getResource(contentURI.toString()), RDFG.SUBGRAPH_OF,
-                            messageEventResource);
             Model signatureGraph = signatureMap.get(contentURI);
             if (signatureGraph != null) {
                 throw new UnsupportedOperationException("signatures are not supported yet");

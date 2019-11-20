@@ -1,0 +1,97 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
+@prefix msg:   <https://w3id.org/won/message#> .
+@prefix conn:  <https://satvm05.researchstudio.at/won/resource/connection/> .
+@prefix atom:  <https://satvm05.researchstudio.at/won/resource/atom/> .
+@prefix woncrypt: <https://w3id.org/won/core#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix cert:  <http://www.w3.org/ns/auth/cert#> .
+@prefix local: <https://satvm05.researchstudio.at/won/resource/> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
+@prefix s:     <http://schema.org/> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:   <https://w3id.org/won/core#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+@prefix event: <https://satvm05.researchstudio.at/won/resource/event/> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+@prefix sioc:  <http://rdfs.org/sioc/ns#> .
+    
+
+
+<https://satvm05.researchstudio.at/won/resource/event/wxmlua2uu1gu#data> {
+    <https://satvm05.researchstudio.at/won/resource/event/wxmlua2uu1gu#content-sig>
+            a                               sig:Signature ;
+            sig:signatureValue           "MGYCMQCFnunzjAUPgX8Q0Bug+t0HegyE9lm8n8tzf0WImtAIEelHxaN0Z1g+VgSnxkZR95kCMQCAy1tKLGJXFM7oHdwI+sSyWsuQKnaRXs3ZMklrzSJbPq+gri7+v4zA+mTiTG25xpY=" ;
+            sig:hasVerificationCertificate  atom:j82pg6klrbqj ;
+            msg:hash                     "SCpkfHepa/GnqGa9yPVXtnw/DKwS0URyDEwBLRJrOOzRU2TvmrYjbWF3sADqwucsUjvbzgnqL9yOChzg2Zi4wA==" ;
+            msg:publicKeyFingerprint     "ddn5TyI9t9kEajMyUSY9IguyXT3OAdmqgELpQWi7X1g=" ;
+            msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/wxmlua2uu1gu#content> .
+    
+    <https://satvm05.researchstudio.at/won/resource/event/wxmlua2uu1gu#data>
+            a                      msg:EnvelopeGraph ;
+            msg:containsSignature  <https://satvm05.researchstudio.at/won/resource/event/wxmlua2uu1gu#content-sig> ;
+            <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
+                    event:wxmlua2uu1gu .
+    
+    event:wxmlua2uu1gu
+            a                     msg:FromOwner ;
+            msg:content        <https://satvm05.researchstudio.at/won/resource/event/wxmlua2uu1gu#content> ;
+            msg:messageType    msg:ConnectionMessage ;
+            msg:recipient       conn:j7x0tbv8irdahtpq7qzb ;
+            msg:recipientAtom   atom:x352mak8agtf ;
+            msg:recipientNode   <https://satvm05.researchstudio.at/won/resource> ;
+            msg:sender         conn:utfsk1qf68f4j9fv5s93 ;
+            msg:senderAtom     atom:j82pg6klrbqj ;
+            msg:senderNode     <https://satvm05.researchstudio.at/won/resource> ;
+            msg:sentTimestamp  "1548165405757" .
+}
+
+<https://satvm05.researchstudio.at/won/resource/event/wxmlua2uu1gu#content> {
+    event:wxmlua2uu1gu
+            con:text  "Forwarded message" .
+}
+
+<https://satvm05.researchstudio.at/won/resource/event/pcunhsv1urpd2q3bfpan#envelope-4zq8-sig> {
+    <https://satvm05.researchstudio.at/won/resource/event/pcunhsv1urpd2q3bfpan#envelope-4zq8-sig>
+            a                               sig:Signature ;
+            sig:signatureValue           "MGYCMQC7B10oxceGflkLad3CZIsUJ4FAGgfKElcF3/Oe4ckvzXReGLIcil3apdEI9zRmTzoCMQDBAl9/Ev75YWf+v6NhjkDtZtbiMOQPnW6cOxXSfbxpxEwla2TNCSJJh+SKnu7E5ko=" ;
+            sig:hasVerificationCertificate  <https://satvm05.researchstudio.at/won/resource> ;
+            msg:hash                     "DWVF6ZHp8lKNfwNdI8d63pgcJx482e3dCz+hpsPTfhj/hRIQMpRCWNAls+V4XWmmOTz44KSgaeYZN8VJ1cTUSANVwzQgSbxC10+wT8XkcDvEzNk5Gg9DBmMdlQSmyOGoL+zy5VY9Hn5w3mV+jz2WMn2e9zCXCZlb2kfR74Os7CQ=" ;
+            msg:publicKeyFingerprint     "4LmhYLhsZQNfIOINHzhhE7zy4CX7QmWxkzl1mqZ17Xw=" ;
+            msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/pcunhsv1urpd2q3bfpan#envelope-4zq8> .
+}
+
+<https://satvm05.researchstudio.at/won/resource/event/pcunhsv1urpd2q3bfpan#envelope-4zq8> {
+        
+    event:pcunhsv1urpd2q3bfpan
+            a                         msg:FromOwner ;
+            msg:correspondingRemoteMessage
+                    event:hsvug43m3rvz9qei25zh ;
+            msg:forwardedMessage   event:wxmlua2uu1gu ;
+            msg:messageType        msg:ConnectionMessage ;
+            msg:previousMessage    event:exs843oh2cvf8etnqmp5 ;
+            msg:receivedTimestamp  "1548165407986"^^xsd:long ;
+            msg:recipientSocket       atom:lhpo9wghhg8w# ;
+            msg:recipientNode       <https://satvm05.researchstudio.at/won/resource> ;
+            msg:senderSocket         atom:x352mak8agtf ;
+            msg:senderNode         <https://satvm05.researchstudio.at/won/resource> ;
+            msg:sentTimestamp      "1548165407971"^^xsd:long ;
+            msg:protocolVersion       "1.0" .
+    
+    <https://satvm05.researchstudio.at/won/resource/event/pcunhsv1urpd2q3bfpan#envelope-4zq8>
+            a                      msg:EnvelopeGraph ;
+            msg:containsSignature  <https://satvm05.researchstudio.at/won/resource/event/e5syo59w9t3if0y428r8#envelope-fb49-sig> ;
+            <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
+                    event:pcunhsv1urpd2q3bfpan .
+    
+    <https://satvm05.researchstudio.at/won/resource/event/e5syo59w9t3if0y428r8#envelope-fb49-sig>
+            a                               sig:Signature ;
+            sig:signatureValue           "MGUCMQDFDBSwjZdF5Hs+sBMYyfuFqXwFD9LQP/KToFHgETqNOxZ79/B+EwC+jkeQJh/YcQMCMC+rDibnZ28ud28DWByPCKSqYITXdQAn+x17xlVep86juyQT85PighMkbs85eoUGiA==" ;
+            sig:hasVerificationCertificate  <https://satvm05.researchstudio.at/won/resource> ;
+            msg:hash                     "ALCYfAABgLNl3AI5R+9VcvllfyJThjvGEndEFsRaZUlKZlbMzYRXVBVjxBHSuk7mW06e3qxWIYfCc6z6uBf6QtH+TkjfkBMW4+3KeENa/8AyM9Syrr1+/j6ScuxP4QbnsHWCc/iVlCfuBqcEH0eTpq9bW2SD6EXUXnF0PSxfGnEY" ;
+            msg:publicKeyFingerprint     "4LmhYLhsZQNfIOINHzhhE7zy4CX7QmWxkzl1mqZ17Xw=" ;
+            msg:signedGraph              <https://satvm05.researchstudio.at/won/resource/event/e5syo59w9t3if0y428r8#envelope-fb49> .
+}

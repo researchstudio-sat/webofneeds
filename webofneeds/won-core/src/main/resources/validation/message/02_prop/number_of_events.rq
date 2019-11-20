@@ -43,7 +43,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
           GRAPH ?envelope
           {
             ?envelope rdf:type msg:EnvelopeGraph .
-            ?envelope rdfg:subGraphOf ?event .
+            ?event msg:envelope ?envelope .
           } .
         }
       }
@@ -73,7 +73,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
             ?renvelope rdf:type msg:EnvelopeGraph .
             ?revent msg:recipientAtom|msg:senderAtom|msg:recipientNode|msg:senderNode|msg:recipientSocket|msg:senderSocket ?uri .
             ?revent msg:messageType ?type .
-            ?renvelope rdfg:subGraphOf ?revent .
+            ?revent msg:envelope ?renvelope .
             filter (?type = msg:SuccessResponse || ?type = msg:FailureResponse)
           } .
         }
@@ -91,7 +91,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
           GRAPH ?renvelope
           {
             ?renvelope rdf:type msg:EnvelopeGraph .
-            ?renvelope rdfg:subGraphOf ?revent .
+            ?revent msg:envelope ?renvelope .
           } .
         }
       }

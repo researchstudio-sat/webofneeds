@@ -81,11 +81,11 @@ import won from "./won.js";
         "msg:hasAttachment": attachmentBlankNodes.map(function(n) {
           return { "@id": n["@id"] };
         }),
+        "msg:envelope": msgDataUri,
       },
       {
         "@id": msgDataUri,
         "@type": "msg:EnvelopeGraph",
-        "rdfg:subGraphOf": { "@id": args.msgUri },
       },
     ];
 

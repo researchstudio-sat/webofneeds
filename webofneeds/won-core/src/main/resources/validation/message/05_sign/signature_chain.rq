@@ -37,7 +37,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
       { 
         optional {
           graph ?g{
-            ?g rdfg:subGraphOf ?event.
+            ?event msg:envelope ?g.
                  ?event msg:messageType ?type.
                ?event a msg:FromExternal
           }

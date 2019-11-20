@@ -116,6 +116,8 @@ public class WONMSG {
     public static final Property hash = m.createProperty(BASE_URI, "hash");
     public static final Property signer = m.createProperty(BASE_URI, "signer");
     public static final Property Signature = m.createProperty(BASE_URI, "Signature");
+    public static final Property signature = m.createProperty(BASE_URI, "signature");
+    public static final Property envelope = m.createProperty(BASE_URI, "envelope");
     public static final Property signatureGraph = m.createProperty(BASE_URI, "signatureGraph");
     public static final Property publicKeyFingerprint = m.createProperty(BASE_URI, "publicKeyFingerprint");
     public static final Property recipientSocket = m.createProperty(BASE_URI, "recipientSocket");

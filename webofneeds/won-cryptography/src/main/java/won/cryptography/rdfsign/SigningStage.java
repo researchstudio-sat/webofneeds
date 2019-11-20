@@ -17,7 +17,6 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonSignatureData;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
-import won.protocol.vocabulary.RDFG;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -86,11 +85,7 @@ public class SigningStage {
     private void extractEnvelopeData(final String envelopeGraphUri, final Model envelopeGraph,
                     final WonMessage message) {
         this.envUri = envelopeGraphUri;
-        // find if it contains has_content
-        // TODO this duplicates private findmessageuri method from wonmessage, refactor
-        // to avoid code repetition
-        String envMessageUri = RdfUtils.findOnePropertyFromResource(envelopeGraph,
-                        envelopeGraph.getResource(envelopeGraphUri), RDFG.SUBGRAPH_OF).asResource().getURI();
+        String envMessageUri = message.getMessageURIRequired().toString();
         graphUriToItsMessageUri.put(envelopeGraphUri, envMessageUri);
         Resource msgEventResource = envelopeGraph.getResource(envMessageUri);
         Resource msgEnvelopeResource = envelopeGraph.getResource(envelopeGraphUri);

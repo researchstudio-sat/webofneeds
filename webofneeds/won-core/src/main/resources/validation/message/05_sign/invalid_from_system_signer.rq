@@ -42,8 +42,8 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
       GRAPH ?env
       {
           ?env a msg:EnvelopeGraph .
-          ?env <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf> ?event .
-          ?event a msg:FromOwner .
+          ?event msg:envelope ?env ;
+                 a msg:FromOwner .
           {
           	?event msg:senderSocket  ?senderSocketOrAtom .
           } union {

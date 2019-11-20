@@ -67,7 +67,8 @@ prefix rdfg:   <http://www.w3.org/2004/03/trix/rdfg-1/>
 	        	GRAPH ?env
 	            {
 	              ?env a msg:EnvelopeGraph .
-	              ?env rdfg:subGraphOf/msg:content ?graphToCheck .
+	              ?x msg:envelope ?env ;
+	                 msg:content ?graphToCheck .
 	            } 
 			}
             

@@ -120,17 +120,22 @@ public class WonMessageSignerVerifier {
      * @param graphUri
      * @param msgDataset
      * @param graphIsEnvelope if true, a msg:containsSignature property is added to
-     * the graph URI
+     * the graph URI, otherwise a triple [msgUri] msg:signature [signatureUri] is
+     * added to the graph.
      */
     private static void addSignature(final WonSignatureData sigData, final String graphUri, final Dataset msgDataset,
                     boolean graphIsEnvelope) {
-        Model envelopeGraph = msgDataset.getNamedModel(graphUri);
-        Resource envelopeResource = envelopeGraph.createResource(graphUri);
-        Resource sigNode = envelopeGraph.createResource(sigData.getSignatureUri());
+        Model graph = msgDataset.getNamedModel(graphUri);
+        Resource graphNode = graph.createResource(graphUri);
+        Resource sigNode = graph.createResource(sigData.getSignatureUri());
         if (graphIsEnvelope) {
             // only connect envelope to signature. pure signature graphs are not connected
             // this way.
-            envelopeResource.addProperty(WONMSG.containsSignature, sigNode);
+            graphNode.addProperty(WONMSG.containsSignature, sigNode);
+        } else if (Objects.equals(graphNode.getURI(), sigNode.getURI())) {
+            URI messageURI = WonMessageUtils.stripFragment(URI.create(graphUri));
+            Resource msgNode = graph.getResource(messageURI.toString());
+            graph.add(msgNode, WONMSG.signature, sigNode);
         }
         WonRdfUtils.SignatureUtils.addSignature(sigNode, sigData);
     }

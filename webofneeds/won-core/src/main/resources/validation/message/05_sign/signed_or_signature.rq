@@ -46,7 +46,7 @@ prefix rdfg:   <http://www.w3.org/2004/03/trix/rdfg-1/>
 	        {
 	        	GRAPH ?any
 	            {
-	              ?g rdf:type msg::Signature .
+	              ?g rdf:type msg:Signature .
 	              ?g msg:signedGraph ?graphToCheck .
 	            } .
 			}
@@ -55,7 +55,7 @@ prefix rdfg:   <http://www.w3.org/2004/03/trix/rdfg-1/>
 	        {
 	        	GRAPH ?graphToCheck
 	            {
-	        		?graphToCheck rdfg:subGraphOf ?event.
+	        		?event msg:envelope ?graphToCheck.
             		?event msg:messageType ?type.
             		filter (?type = msg:SocketHintMessage || ?type = msg:AtomHintMessage)
 	            } .

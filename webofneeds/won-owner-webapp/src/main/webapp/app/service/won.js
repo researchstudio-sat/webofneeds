@@ -853,13 +853,11 @@ won.addMessageGraph = function(builder, graphURIs, messageType) {
         "msg:messageType": {
           "@id": messageType,
         },
+        "msg:envelope": unsedMessageGraphUri,
       },
       {
         "@id": unsetMessageGraphUri,
         "@type": "msg:EnvelopeGraph",
-        "rdfg:subGraphOf": {
-          "@id": won.WONMSG.uriPlaceholder.event,
-        },
       },
     ],
     "@id": unsetMessageGraphUri,
