@@ -36,6 +36,8 @@ After these exchanges, both owners/nodes end up with `m1`, `s1A`, and `s1B`.
 
 It may be surprising that message 2 contains `m1` and `s1A`, not just `s1A`. In this case, `m1` is called an *echo*, and it is delivered to all clients registered as the owner of the atom that sends `m1`. Thus, when one client sends a message, all clients are informed of that message immediately.
 
+Message `s1B` is sent back to the `A` side without repeating `m1` and `s1A`, because the `A` side already knows them. In order to emphasize that `s1B` references them, we still draw the respective arrows pointing into blank space.
+
 ## Message Log Integrity
 
 Each message is content-addressed, i.e., its URI is calculated based on its entire content. It is thus not possible to change a message after calculating its URI without breaking this relationship. 
