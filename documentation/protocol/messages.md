@@ -15,6 +15,8 @@ Messages have the following properties
 * The content graphs may contain arbitrary data.
 * The message dataset does not contain any other graphs.
 
+The properties ensure that multiple messages can be aggregated in one dataset without affecting their interpretation. In a multi-message dataset, all named graphs that belong to a message can be identified by removing the fragment identifier (`#[graphId]`) from their graph URI. This yields the message URI.
+
 ## Envelope
 The envelope contains type and addressing information. This information is given in the form of properties 
 of the message URI, i.e, triples of the form [message-uri] [property] [value].
