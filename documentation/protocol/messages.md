@@ -120,63 +120,65 @@ Example:
 # Complete Example
 Full example of a WoN message, in this case, a Create message:
 ```
-<wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#content-rf6e> {
-    atom:i573rg5eohhwqh77285g
+<wm:/W1m1yyMqCaDLoWAKQPZYYaJRL7nctKoPVhyQ57c6WcSd3k#content-d7cj> {
+    atom:yocee5mo10hvxn3uvimk
             a                  won:Atom ;
-            dc:title           "Test Atom 2" ;
+            dc:title           "Test Atom" ;
             cert:key           [ cert:PublicKey  [ a                  won:ECCPublicKey ;
                                                    won:ecc_algorithm  "EC" ;
                                                    won:ecc_curveId    "secp384r1" ;
-                                                   won:ecc_qx         "f6514f811722ed756de7ccc789df1236cb051f17d39c3936c0f649bd7cda06056a3508685612a58a23ce5a273e4aa4e6" ;
-                                                   won:ecc_qy         "727fab734bcb1164db084948b5c67462ed2c6a88896c13de2f6321f42cb660da97fe6f34656ccd924865942bcdd6cb83"
+                                                   won:ecc_qx         "711d26d7891f86300a382e5a7e0f32ad48e29f109526d9799d2fb89a490baff1e5a118366e94aa7134a3d3faaac3fd10" ;
+                                                   won:ecc_qy         "f552821a439f5a4530e8524f5d6a2b3b069bf076155fd74270951c666a0b333d07f95f954310a5306378515fa8932b05"
                                                  ] ] ;
-            won:defaultSocket  <https://localhost:8443/won/resource/atom/i573rg5eohhwqh77285g#chatSocket> ;
-            won:socket         <https://localhost:8443/won/resource/atom/i573rg5eohhwqh77285g#chatSocket> , <https://localhost:8443/won/resource/atom/i573rg5eohhwqh77285g#holdableSocket> , <https://localhost:8443/won/resource/atom/i573rg5eohhwqh77285g#socket1> ;
+            won:defaultSocket  <https://localhost:8443/won/resource/atom/yocee5mo10hvxn3uvimk#chatSocket> ;
+            won:socket         <https://localhost:8443/won/resource/atom/yocee5mo10hvxn3uvimk#chatSocket> , <https://localhost:8443/won/resource/atom/yocee5mo10hvxn3uvimk#socket1> , <https://localhost:8443/won/resource/atom/yocee5mo10hvxn3uvimk#holdableSocket> ;
             match:flag         match:UsedForTesting .
     
-    <https://localhost:8443/won/resource/atom/i573rg5eohhwqh77285g#chatSocket>
+    <https://localhost:8443/won/resource/atom/yocee5mo10hvxn3uvimk#chatSocket>
             won:socketDefinition  <https://w3id.org/won/ext/chat#ChatSocket> .
     
-    <https://localhost:8443/won/resource/atom/i573rg5eohhwqh77285g#holdableSocket>
+    <https://localhost:8443/won/resource/atom/yocee5mo10hvxn3uvimk#socket1>
+            won:socketDefinition  <https://w3id.org/won/ext/chat#ChatSocket> .
+    
+    <https://localhost:8443/won/resource/atom/yocee5mo10hvxn3uvimk#holdableSocket>
             won:socketDefinition  <https://w3id.org/won/ext/hold#HoldableSocket> .
-    
-    <https://localhost:8443/won/resource/atom/i573rg5eohhwqh77285g#socket1>
-            won:socketDefinition  <https://w3id.org/won/ext/chat#ChatSocket> .
 }
 
-<wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#envelope> {
-    <wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS>
+<wm:/W1m1yyMqCaDLoWAKQPZYYaJRL7nctKoPVhyQ57c6WcSd3k#envelope> {
+    <wm:/W1m1yyMqCaDLoWAKQPZYYaJRL7nctKoPVhyQ57c6WcSd3k>
             a                    msg:FromOwner ;
-            msg:atom             atom:i573rg5eohhwqh77285g ;
-            msg:content          <wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#content-rf6e> ;
+            msg:atom             atom:yocee5mo10hvxn3uvimk ;
+            msg:content          <wm:/W1m1yyMqCaDLoWAKQPZYYaJRL7nctKoPVhyQ57c6WcSd3k#content-d7cj> ;
+            msg:envelope         <wm:/W1m1yyMqCaDLoWAKQPZYYaJRL7nctKoPVhyQ57c6WcSd3k#envelope> ;
             msg:messageType      msg:CreateMessage ;
             msg:protocolVersion  "1.0" ;
-            msg:timestamp        1574083632172 .
+            msg:timestamp        1574256374484 .
     
-    <wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#envelope>
+    <wm:/W1m1yyMqCaDLoWAKQPZYYaJRL7nctKoPVhyQ57c6WcSd3k#envelope>
             a                      msg:EnvelopeGraph ;
-            rdfg:subGraphOf        <wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS> ;
-            msg:containsSignature  <wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#content-rf6e-sig> .
+            msg:containsSignature  <wm:/W1m1yyMqCaDLoWAKQPZYYaJRL7nctKoPVhyQ57c6WcSd3k#content-d7cj-sig> .
     
-    <wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#content-rf6e-sig>
-            a                               msg:Signature ;
-            msg:hasVerificationCertificate  atom:i573rg5eohhwqh77285g ;
-            msg:signatureValue              "MGYCMQDV/cWOD61AguKBkCRVdma10bEFZaNDc00VIHOfNzX6k/8LuWgfyaPi3wVszScrfUECMQCBoicpa2t5V+Cz8WCo52dIJUWlP4Y8JqMd8IisPsq6qZHP79716hTgkg1BM0UBIEs=" ;
-            msg:hash                        "W1dMkKqey5ZKLdi7gbsxYmkNZ2XRjU9Jq8UTHVPV3Qt9ES" ;
-            msg:publicKeyFingerprint        "W1nQKZrBKwuo9MQbChv5tir2uZA2hHX5izrEiYH98v6nzC" ;
-            msg:signedGraph                 <wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#content-rf6e> .
+    <wm:/W1m1yyMqCaDLoWAKQPZYYaJRL7nctKoPVhyQ57c6WcSd3k#content-d7cj-sig>
+            a                         msg:Signature ;
+            msg:hash                  "W1jBGZWLn8b3erQCoUqzykz5DzarNR6aQGzmhwtJZ7zobH" ;
+            msg:publicKeyFingerprint  "W1fBnLmQHAbkNN3kEu5GNHazRhuNPpcBqGGfZk3JP2L7sF" ;
+            msg:signatureValue        "MGYCMQDIpNhCOI/cVWGmBuQg4i8G0jGsnEs+hRVKHyy5alIAPDcbdWVe+UPmVMqkumMhsf8CMQCKiRJq0EUc8/Kc9D6mgxKrWLEcrDe9u4Ubmf+Arkdy/OljmJKG8FHrKNhIR/P/k5A=" ;
+            msg:signedGraph           <wm:/W1m1yyMqCaDLoWAKQPZYYaJRL7nctKoPVhyQ57c6WcSd3k#content-d7cj> ;
+            msg:signer                atom:yocee5mo10hvxn3uvimk .
 }
 
-<wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#signature> {
-    <wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#signature>
-            a                               msg:Signature ;
-            msg:hasVerificationCertificate  atom:i573rg5eohhwqh77285g ;
-            msg:signatureValue              "MGUCMDuZ8mDOEagNZBCH7aHvoNsFZVzgNmI7WFy2p2OpqolIOafDycNNmSuapUDpaxIOKwIxAO3beItRo4QYsA+4+6Iu7hPSJCnniQ0/9bkl27jS/W8oS8Q7iVwIiwxKq2/5XkuCaA==" ;
-            msg:hash                        "W1p9hqRotr7VsYrvD4kWH1yE5RBLyyNNvPyu1BE6EFKpVh" ;
-            msg:publicKeyFingerprint        "W1nQKZrBKwuo9MQbChv5tir2uZA2hHX5izrEiYH98v6nzC" ;
-            msg:signedGraph                 <wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#envelope> .
+<wm:/W1m1yyMqCaDLoWAKQPZYYaJRL7nctKoPVhyQ57c6WcSd3k#signature> {
+    <wm:/W1m1yyMqCaDLoWAKQPZYYaJRL7nctKoPVhyQ57c6WcSd3k>
+            msg:signature  <wm:/W1m1yyMqCaDLoWAKQPZYYaJRL7nctKoPVhyQ57c6WcSd3k#signature> .
+    
+    <wm:/W1m1yyMqCaDLoWAKQPZYYaJRL7nctKoPVhyQ57c6WcSd3k#signature>
+            a                         msg:Signature ;
+            msg:hash                  "W1bibbwCCZA4n6XQMtFzxhuDfFZ6gdcZjUx6NZ57jSFwKr" ;
+            msg:publicKeyFingerprint  "W1fBnLmQHAbkNN3kEu5GNHazRhuNPpcBqGGfZk3JP2L7sF" ;
+            msg:signatureValue        "MGUCMQDVT+wJuaCpMzVUZHhF0+DnSoMMuVzPTjcMbg6cmrLN40iCTR+OhvJ5tUa5vwo2z6sCMElebX+ny5kfuxamjrr9n3TqSrK83AnjqYUt5KA651sSLPNKDpUvV0OuQ8HG+HF4Ng==" ;
+            msg:signedGraph           <wm:/W1m1yyMqCaDLoWAKQPZYYaJRL7nctKoPVhyQ57c6WcSd3k#envelope> ;
+            msg:signer                atom:yocee5mo10hvxn3uvimk .
 }
-
 ```
 
 
