@@ -28,17 +28,11 @@ Atom-specific delivery: Simple in/out behavior:
 owner -> node : m
 owner <- node : m, s
 ```
-Connection-specific delivery: Message `m` travels from `owner1` to `node1`, to `node2`, to `owner2`. The responses `s1` and `s2` are delivered to both `owner1` and `owner2`. The sequence is depicted in the following diagram.
+Connection-specific delivery: Message `m1` travels from `ownerA` to `nodeA`, to `nodeB`, to `ownerB`. The responses `s1A` and `s1B` are delivered to both `ownerA` and `ownerB`. The sequence is depicted in the following diagram.
 
-```
-1. owner => node1                    : m 
-2. owner <= node1                    : m, s1
-3.          node1 => node2           : m, s1
-4.          node1 <= node2           : s2
-5.                   node2 => owner2 : m, s1, s2
-6. owner <= node1 :                  : s2
-```                 
-After these exchanges, both owners end up with `m`, `s1`, and `s2`.
+![Connection message exchange](img/conn-message-exchange.png)             
+
+After these exchanges, both owners/nodes end up with `m1`, `s1A`, and `s1B`.
 
 Message 2 contains `m` and `s1`, not just `s1`, which might be surprising. In this case, `m` is called an *echo*, and it is delivered to all clients registered as the owner of the atom that sends `m`. Thus, when one client sends a message, all clients are informed of that message immediately.
 
