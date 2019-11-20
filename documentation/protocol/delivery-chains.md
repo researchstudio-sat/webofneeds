@@ -119,7 +119,10 @@ After the first delivery chain is finished, as in the first example, `s1A` is in
 
 This example is a possible continuation of  Example 2, in which `s2B` is late or lost. The consequence is that `s1B` is not removed from `C(A)`. When `A` creates the response `s3A`, it therefore references `s1B` again. The lost response also causes `s3B` to reference `s2A` again. Only when `A` actually receives `s3B` will `s1B` be removed from `C(A)`.
 
+##### Example 4: two simultaneous messages
 
+![Two simultenaous messages from either side](img/conn-message-container-2simultaneous.png)
 
+Here, `m2` and `m3` are sent roughly the same time, such that they are both processed by the sending node before they are both processed by the receiving node. Their delivery chains do not influence each other. After this exchange, `C(A) = {s2B, s3B}`,  `C(B) = {s2A, s3A}`. 
                           
 
