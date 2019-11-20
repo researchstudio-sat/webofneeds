@@ -72,7 +72,6 @@ Example:
 # Envelope:
 <wm:/[msgid]#envelope> {
     <wm:/[msgid]> msg:content <wm:/[msgid]#content-1> .
-    <wm:/[msgid]#content-1> rdfg:subGraphOf <wm:/[msgid]> .
     # ... (other envelope triples omitted)
 }
 
