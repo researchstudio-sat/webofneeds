@@ -13,8 +13,10 @@ Messages have the following properties
 * The envelope graph contains addressing and type information
 * The signature graph contains a signature made with the public key of the atom or the WoN node that sent the message. 
 * The content graphs may contain arbitrary data.
-* Content graph and signature graph each contain a triple linking the graph to the message using `rdfg:subGraphOf`, i.e.
-    `[message-uri]#envelope rdfg:subGraphOf [message-uri] .` and `[message-uri]#signature rdfg:subGraphOf [message-uri] .`. In the envelope graph, any content graphs are also linked to the message this way.
+* Each graph is linked to the message resource: 
+   - Envelope graph: `[message-uri] msg:envelope [envelope-graph-uri] .` (Triple is in the envelope graph)
+   - Signature graph: `[message-uri] msg:signature [signature-graph-uri] .` (Triple is in the signature graph)
+   - Content graph: `[message-uri] msg:content [content-graph-uri] .` (Triple is in the envelope graph)
 * The message dataset does not contain any other graphs, unless they are graphs belonging to other messages.
 
 ## Multiple Messages in one Dataset
