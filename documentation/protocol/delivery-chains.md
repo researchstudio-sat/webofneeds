@@ -11,18 +11,14 @@ These structures are different depending on the type of message.
 
 In the following depictions, the arrows are labeled with their RDF property names.
 
-In the case of an *atom-specific* message, it consists of the message `m` and the WoN node's success response `s`:
-```
-m <--msg:respondingTo-- s
-```
+In the case of an *atom-specific* message, it consists of the message `m1` and the WoN node's success response `s1`:
 
-In the case of a *connection-specific* message, it consists of the message `m` and the WoN node's success response `s1` as well as 
-the recipient node's success response `s2`:
-```
-m <--msg:respondingTo-- s1
-m <--msg:respondingTo-- s2
-s1 <--msg:previousMessage-- s2
-```
+![Delivery chain in an atom's message container ](img/atom-delivery-chain.png)
+
+In the case of a *connection-specific* message, it consists of the message `m1A` and the WoN node's success response `s1A` as well as 
+the recipient node's success response `s1B`. (We identify the left side with `A` and the right side with `B`)
+
+![Delivery chain in a connection's message container ](img/conn-delivery-chain.png)
 
 ## Message Delivery
 The following depictions show which messages are exchanged. `a => b : x, y` means `a` sends messages `x` and `y` to `b` *in one RDF dataset*. 
