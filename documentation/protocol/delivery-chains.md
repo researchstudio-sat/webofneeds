@@ -15,8 +15,8 @@ In the case of an *atom-specific* message, it consists of the message `m1` and t
 
 ![Delivery chain in an atom's message container ](img/atom-delivery-chain.png)
 
-In the case of a *connection-specific* message, it consists of the message `m1A` and the WoN node's success response `s1A` as well as 
-the recipient node's success response `s1B`. (We identify the left side with `A` and the right side with `B`)
+In the case of a *connection-specific* message, it consists of the message `m1A` and the WoN node's success response `s1A` (*sender response*) as well as 
+the recipient node's success response `s1B` (*recipient response*). (We identify the left side with `A` and the right side with `B`)
 
 ![Delivery chain in a connection's message container ](img/conn-delivery-chain.png)
 
