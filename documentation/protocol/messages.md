@@ -78,7 +78,7 @@ Example:
 # Content graph: 
 <wm:/[msgid]#content-1> {
     <wm:/[msgid]>
-            con:text  "Nice, we are connected!" .
+            con:text  "Hello World!" .
 }
 ```
 
