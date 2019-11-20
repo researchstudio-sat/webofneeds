@@ -105,13 +105,13 @@ In the following examples, `A` denotes the connection of the atom on the left si
 
 ![One message from each side](img/conn-message-container.png)
 
-After the first delivery chain is *finished* (both responses are present), `s1A` is in `C(B)` and `s1B` is in `c(A)`. In the second delivery chain, when `B` confirms `s1A` it is actually the second time it refrences it. `B` must do that because `s1B` might have been lost or delayed. `A` confirms `s1B` because it is its first chance to do so.
+After the first delivery chain is *finished* (both responses are present), `C(B) = {s1A}` and ` C(A) = {s1B}`. In the second delivery chain, when `B` confirms `s1A` it is actually the second time it refrences it. `B` must do that because `s1B` might have been lost or delayed. `A` confirms `s1B` because it is its first chance to do so.
 
 ##### Example 2: two messages from the same side
 
 ![Two messages from same side](img/conn-message-container-same-side.png)
 
-After the first delivery chain is finished, as in the first example, `s1A` is in `C(B)` and `s1B` is in `c(A)`. However, now the message comes from the owner of `A`. The difference is the order in which `s2A` and `s2B` are created: `s2A` confirms `s1B`, which, according to the algorithm, removes `s1A` from `C(B)`. Therefore, `s2B` only references `s2A` - which, upon receipt by `A` removes `s1B` from `C(A)`.
+After the first delivery chain is finished, as in the first example,`C(B) = {s1A}` and `c(A) = {s1B}`. However, now the message comes from the owner of `A`. The difference is the order in which `s2A` and `s2B` are created: `s2A` confirms `s1B`, which, according to the algorithm, removes `s1A` from `C(B)`. Therefore, `s2B` only references `s2A` - which, upon receipt by `A` removes `s1B` from `C(A)`.
 
 ##### Example 3: lost response
 
@@ -123,6 +123,6 @@ This example is a possible continuation of  Example 2, in which `s2B` is late or
 
 ![Two simultenaous messages from either side](img/conn-message-container-2simultaneous.png)
 
-Here, `m2` and `m3` are sent roughly the same time, such that they are both processed by the sending node before they are both processed by the receiving node. Their delivery chains do not influence each other. After this exchange, `C(A) = {s2B, s3B}`,  `C(B) = {s2A, s3A}`. 
+Here, `m2` and `m3` are sent roughly the same time, such that they are both processed by the sending node before they are both processed by the receiving node. Their delivery chains do not influence each other. After this exchange, `C(A) = {s2B, s3B}` and  `C(B) = {s2A, s3A}`. 
                           
 
