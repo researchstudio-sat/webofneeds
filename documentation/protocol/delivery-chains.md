@@ -24,10 +24,9 @@ the recipient node's success response `s1B`. (We identify the left side with `A`
 The following depictions show which messages are exchanged. `a => b : x, y` means `a` sends messages `x` and `y` to `b` *in one RDF dataset*. 
 
 Atom-specific delivery: Simple in/out behavior:
-```
-owner -> node : m
-owner <- node : m, s
-```
+
+![Atom message exchange](img/atom-message-exchange.png)
+
 Connection-specific delivery: Message `m1` travels from `ownerA` to `nodeA`, to `nodeB`, to `ownerB`. The responses `s1A` and `s1B` are delivered to both `ownerA` and `ownerB`. The sequence is depicted in the following diagram.
 
 ![Connection message exchange](img/conn-message-exchange.png)             
