@@ -21,19 +21,25 @@ the recipient node's success response `s1B`. (We identify the left side with `A`
 ![Delivery chain in a connection's message container ](img/conn-delivery-chain.png)
 
 ## Message Delivery
-The following depictions show which messages are exchanged. `a => b : x, y` means `a` sends messages `x` and `y` to `b` *in one RDF dataset*. 
+The following depictions show which messages are exchanged. Each arrow in the sequence diagram represents one RDF dataset being sent from one participant to another. The object(s) depicted above the arrow represent the WoN messages encoded in the RDF dataset.
 
-Atom-specific delivery: Simple in/out behavior:
+### Delivery for an Atom's Message Container
+
+Simple in/out behavior:
 
 ![Atom message exchange](img/atom-message-exchange.png)
 
-Connection-specific delivery: Message `m1` travels from `ownerA` to `nodeA`, to `nodeB`, to `ownerB`. The responses `s1A` and `s1B` are delivered to both `ownerA` and `ownerB`. The sequence is depicted in the following diagram.
+Message 2 contains `m1` and `s1`, not just `s1`, as one might suspect. `m1` is called an *echo*, and it is delivered to all clients registered as the owner of the atom that sends `m1`, along with the WoN node's response. Thus, when one client sends a message, all clients are informed of that message immediately.
+
+### Delivery for an Connection's Message Container
+
+Message `m1` travels from `ownerA` to `nodeA`, to `nodeB`, to `ownerB`. The responses `s1A` and `s1B` are delivered to both `ownerA` and `ownerB`. The sequence is depicted in the following diagram.
 
 ![Connection message exchange](img/conn-message-exchange.png)             
 
 After these exchanges, both owners/nodes end up with `m1`, `s1A`, and `s1B`.
 
-It may be surprising that message 2 contains `m1` and `s1A`, not just `s1A`. In this case, `m1` is called an *echo*, and it is delivered to all clients registered as the owner of the atom that sends `m1`. Thus, when one client sends a message, all clients are informed of that message immediately.
+Message 2 contains `m1` and `s1A`, not just `s1A`, as one might suspect. `m1` is called an *echo*, and it is delivered to all clients registered as the owner of the atom that sends `m1`, along with the WoN node's response. Thus, when one client sends a message, all clients are informed of that message immediately.
 
 Message `s1B` is sent back to the `A` side without repeating `m1` and `s1A`, because the `A` side already knows them. In order to emphasize that `s1B` references them, we still draw the respective arrows pointing into blank space.
 
