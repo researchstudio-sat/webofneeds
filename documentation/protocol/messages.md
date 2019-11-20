@@ -13,7 +13,10 @@ Messages have the following properties
 * The envelope graph contains addressing and type information
 * The signature graph contains a signature made with the public key of the atom or the WoN node that sent the message. 
 * The content graphs may contain arbitrary data.
-* The message dataset does not contain any other graphs.
+* Content graph and signature graph each contain a triple linking the graph to the message using `rdfg:subGraphOf`, i.e.
+    `[message-uri]#envelope rdfg:subGraphOf [message-uri] .` and `[message-uri]#signature rdfg:subGraphOf [message-uri] .`. In the envelope graph, any content graphs are also linked to the message this way.
+* The message dataset does not contain any other graphs, unless they are graphs belonging to other messages.
+
 
 The properties ensure that multiple messages can be aggregated in one dataset without affecting their interpretation. In a multi-message dataset, all named graphs that belong to a message can be identified by removing the fragment identifier (`#[graphId]`) from their graph URI. This yields the message URI.
 
@@ -52,15 +55,15 @@ Example:
 @prefix con:   <https://w3id.org/won/content#> .
 
 # Envelope:
-<wm:/W1q3ZULNznsgdSmmA4HqRgpLvYJfZyhgexRd2eurTzb1mH#envelope> {
-    <wm:/W1q3ZULNznsgdSmmA4HqRgpLvYJfZyhgexRd2eurTzb1mH>
-            msg:content          <wm:/W1q3ZULNznsgdSmmA4HqRgpLvYJfZyhgexRd2eurTzb1mH#content-fips> ;
+<wm:/[msgid]#envelope> {
+    <wm:/[msgid]> msg:content <wm:/[msgid]#content-1> .
+    <wm:/[msgid]#content-1> rdfg:subGraphOf <wm:/[msgid]> .
     # ... (other envelope triples omitted)
 }
 
 # Content graph: 
-<wm:/W1q3ZULNznsgdSmmA4HqRgpLvYJfZyhgexRd2eurTzb1mH#content-fips> {
-    <wm:/W1q3ZULNznsgdSmmA4HqRgpLvYJfZyhgexRd2eurTzb1mH>
+<wm:/[msgid]#content-1> {
+    <wm:/[msgid]>
             con:text  "Nice, we are connected!" .
 }
 ```
@@ -87,16 +90,16 @@ Example:
 ```
 @prefix msg:   <https://w3id.org/won/message#> .
 @prefix atom:  <https://localhost:8443/won/resource/atom/> .
-@prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
 
-<wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#signature> {
-    <wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#signature>
+<wm:/[msgid]#signature> {
+    <wm:/[msgid]#signature>
             a                               msg:Signature ;
             msg:hasVerificationCertificate  atom:i573rg5eohhwqh77285g ;
             msg:signatureValue              "MGUCMDuZ8mDOEagNZBCH7aHvoNsFZVzgNmI7WFy2p2OpqolIOafDycNNmSuapUDpaxIOKwIxAO3beItRo4QYsA+4+6Iu7hPSJCnniQ0/9bkl27jS/W8oS8Q7iVwIiwxKq2/5XkuCaA==" ;
             msg:hash                        "W1p9hqRotr7VsYrvD4kWH1yE5RBLyyNNvPyu1BE6EFKpVh" ;
             msg:publicKeyFingerprint        "W1nQKZrBKwuo9MQbChv5tir2uZA2hHX5izrEiYH98v6nzC" ;
-            msg:signedGraph                 <wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#envelope> .
+            msg:signedGraph                 <wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#envelope> ;
+            rdfg:subGraphOf <wm:/[msgid]> .
 }
 
 ```
