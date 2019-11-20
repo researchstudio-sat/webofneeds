@@ -17,14 +17,29 @@ Messages have the following properties
     `[message-uri]#envelope rdfg:subGraphOf [message-uri] .` and `[message-uri]#signature rdfg:subGraphOf [message-uri] .`. In the envelope graph, any content graphs are also linked to the message this way.
 * The message dataset does not contain any other graphs, unless they are graphs belonging to other messages.
 
-
+## Multiple Messages in one Dataset
 The properties ensure that multiple messages can be aggregated in one dataset without affecting their interpretation. In a multi-message dataset, all named graphs that belong to a message can be identified by removing the fragment identifier (`#[graphId]`) from their graph URI. This yields the message URI.
+
+## Structure Overview
+
+The central RDF resource in a WoN message is the *message URI* of the form `wm:/[id] `. The message's data is linked to this resource, for example:
+
+![Message data](img/message-structure-data.png)
+
+The information of a message, however, is separated in multiple RDF graphs. These graphs are named by URIs in the message dataset, which are discoverable from the message resource by following `msg:content`, `msg:envelope`, and `msg:signature`:
+
+![Message structure - no graphs](img/message-structure-nographs.png)
+
+The same information, separated in graphs: 
+
+![Message structure - with graphs](img/message-structure-graphs.png)
 
 ## Envelope
 The envelope contains type and addressing information. This information is given in the form of properties 
 of the message URI, i.e, triples of the form [message-uri] [property] [value].
 
-The following properties are used:
+The following properties are used - however, not all properties are used in all message types. The definition of mandatory and optional properties per type can be found in [WonMessageType.java](webofneeds/won-core/src/main/java/won/protocol/message/WonMessageType.java)
+
 
 | Property | Description |
 | -------- | ----------- |
@@ -40,9 +55,7 @@ The following properties are used:
 | `msg:respondingTo`| used in response messages to link to the message being responded to |
 | `msg:respondingToMesageType`| used in response messages to indicate the type of message being responded to |
 
-Not all properties are used in all message types. The definition of mandatory and optional properties per type can be found in [WonMessageType.java](webofneeds/won-core/src/main/java/won/protocol/message/WonMessageType.java)
 
-The envelope graph contains a the name of the graph, i.e. `[message-uri]#envelope` as a resource that is defined to be a subgraph of the message.
 
 ## Content
 The content of a WoN message may contain arbitrary RDF triples, with only one exception: the message namespace (default prefix `msg:`)
@@ -98,8 +111,8 @@ Example:
             msg:signatureValue              "MGUCMDuZ8mDOEagNZBCH7aHvoNsFZVzgNmI7WFy2p2OpqolIOafDycNNmSuapUDpaxIOKwIxAO3beItRo4QYsA+4+6Iu7hPSJCnniQ0/9bkl27jS/W8oS8Q7iVwIiwxKq2/5XkuCaA==" ;
             msg:hash                        "W1p9hqRotr7VsYrvD4kWH1yE5RBLyyNNvPyu1BE6EFKpVh" ;
             msg:publicKeyFingerprint        "W1nQKZrBKwuo9MQbChv5tir2uZA2hHX5izrEiYH98v6nzC" ;
-            msg:signedGraph                 <wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#envelope> ;
-            rdfg:subGraphOf <wm:/[msgid]> .
+            msg:signedGraph                 <wm:/W1jfE1q9XN9EhKUTxKTAFwapuc6CyoJGYV5nEkhMfakMKS#envelope> .
+    <wm:/[msgid]> msg:signature <wm:/[msgid]#signature> .
 }
 
 ```
