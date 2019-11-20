@@ -50,7 +50,7 @@ Each message is content-addressed, i.e., its URI is calculated based on its enti
 By referencing earlier messages in a conversation, the conversation becomes immutable in the sense that alteration of any part of it can be detected. Each message is also signed by its author, so no other participant could modify the contents without detection. In combination, only the last message in a conversation could be modified (and subsequently its URI recalculated) by one of the participants.
 
 In WoN it is the responsibility of the WoN nodes to link new messages to earlier ones. They do this by adding message references to the SuccessResponses they generate. (FailureResponses are never used in this way). These references are realized using the RDF property 
-`msg:previousMessage`, which always point to an earlier SuccessResponse. The actual user-generated (or system-generated) messages are referenced by those SuccessResponses. Thus, a SuccessResponse gets *confirmed*. 
+`msg:previousMessage`, which always point to an earlier SuccessResponse. Thus, a SuccessResponse gets *confirmed*. The actual user-generated (or system-generated) messages are not confirmed directly - they are referenced by SuccessResponses (via `msg:respondingTo`) that eventually get confirmed.
 
 The confirmation algorithm differs for an atom's message container and for a connection's message container.
 
