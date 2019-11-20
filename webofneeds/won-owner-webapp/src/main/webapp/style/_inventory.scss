@@ -51,17 +51,18 @@ main.ownerwelcome {
 
   .ownerwelcome__logo {
     display: grid;
-    grid-gap: 1rem;
-    padding: 0.5rem;
-
+    grid-column-gap: 2rem;
     grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    justify-items: center;
+
+    @media (max-width: $responsivenessBreakPoint) {
+      grid-column-gap: 0.5rem;
+    }
 
     &__icon {
-      display: grid;
-      grid-auto-flow: column;
+      display: flex;
+      align-self: center;
       margin: auto;
-      box-sizing: border-box;
-      width: 100%;
     }
   }
 }

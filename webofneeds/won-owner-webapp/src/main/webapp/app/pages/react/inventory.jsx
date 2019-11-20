@@ -116,11 +116,9 @@ class PageInventory extends React.Component {
     let additionalLogosElement;
     if (this.props.additionalLogos && this.props.additionalLogos.length > 0) {
       additionalLogosElement = this.props.additionalLogos.map(logo => (
-        <React.Fragment key={logo}>
-          <svg className="ownerwelcome__logo__icon">
-            <use xlinkHref={logo} href={logo} />
-          </svg>
-        </React.Fragment>
+        <svg className="ownerwelcome__logo__icon" key={logo}>
+          <use xlinkHref={logo} href={logo} />
+        </svg>
       ));
     }
     return (
