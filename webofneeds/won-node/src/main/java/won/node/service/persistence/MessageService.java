@@ -2,9 +2,11 @@ package won.node.service.persistence;
 
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -12,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import won.protocol.exception.DuplicateResponseException;
 import won.protocol.exception.IncoherentDatabaseStateException;
 import won.protocol.exception.NoSuchMessageException;
 import won.protocol.message.WonMessage;
@@ -129,6 +132,14 @@ public class MessageService {
         return Optional.empty();
     }
 
+    /**
+     * Removes the URIs that are confirmed by the specified message from the
+     * parent's unconfirmed list.
+     * 
+     * @param container
+     * @param message
+     * @param parent
+     */
     private void removeConfirmed(final MessageContainer container, final WonMessage message, final URI parent) {
         // the message might be an external message referencing some of our messages.
         // if that is the case, that transitively confirms their earlier messages
@@ -136,40 +147,40 @@ public class MessageService {
             logger.debug("Checking if message {} confirms any unconfirmed messages in the message container of {}",
                             message.toShortStringForDebug(), parent);
         }
-        if (message.getMessageTypeRequired().isSuccessResponse()
-                        && !Objects.equals(message.getConnectionURI(), parent)) {
-            List<URI> previous = message.getPreviousMessageURIs();
-            if (logger.isDebugEnabled()) {
-                logger.debug("Message {} is an external response referencing {} messages",
-                                message.toShortStringForDebug(), previous.size());
+        Set<URI> previous = message.getPreviousMessageURIs().stream().collect(Collectors.toSet());
+        if (logger.isDebugEnabled()) {
+            logger.debug("{} previous messages referenced by external response {} ",
+                            previous.size(), message.toShortStringForDebug());
+            logger.debug("previous messages: {}", previous);
+        }
+        List<MessageEvent> prevMsgs = previous.stream().map(prev -> {
+            Optional<MessageEvent> prevEvent = messageEventRepository.findOneByMessageURIAndParentURI(prev, parent);
+            if (!prevEvent.isPresent()) {
+                // the message we received references a message we don't know.
+                // this can happen if the message overtook another one. We could keep it for a
+                // while
+                // and reprocess it after the next message in this container.
+                // for now, just cause a failure
+                throw new NoSuchMessageException(prev);
             }
-            List<MessageEvent> prevMsgs = previous.stream().map(prev -> {
-                Optional<MessageEvent> prevEvent = messageEventRepository.findOneByMessageURIAndParentURI(prev, parent);
-                if (!prevEvent.isPresent()) {
-                    // the message we received references a message we don't know.
-                    // this can happen if the message overtook another one. We could keep it for a
-                    // while
-                    // and reprocess it after the next message in this container.
-                    // for now, just cause a failure
-                    throw new NoSuchMessageException(prev);
-                }
-                return prevEvent.get();
-            }).collect(Collectors.toList());
-            logger.debug("Successfully loaded the referenced messages");
-            List<URI> confirmed = prevMsgs
-                            .stream()
-                            .flatMap(ev -> WonMessage.of(ev.getDatasetHolder().getDataset()).getPreviousMessageURIs()
-                                            .stream())
-                            .collect(Collectors.toList());
-            if (logger.isDebugEnabled()) {
-                logger.debug("Removing {} messages from the unconfirmed list of the message container of {} (size {})",
-                                new Object[] { confirmed.size(), parent, container.getUnconfirmed().size() });
-            }
-            container.removeUnconfirmed(confirmed);
-            if (logger.isDebugEnabled()) {
-                logger.debug("Unconfirmed list of the message container of {} now contains {} messages",
-                                new Object[] { confirmed.size(), parent, container.getUnconfirmed().size() });
-            }
+            return prevEvent.get();
+        }).collect(Collectors.toList());
+        logger.debug("Successfully loaded the referenced messages");
+        Set<URI> confirmed = prevMsgs
+                        .stream()
+                        .flatMap(ev -> WonMessage.of(ev.getDatasetHolder().getDataset()).getPreviousMessageURIs()
+                                        .stream())
+                        .collect(Collectors.toSet());
+        if (logger.isDebugEnabled()) {
+            logger.debug("{} unconfirmed for message container of {}, Removing {} ",
+                            new Object[] { container.getUnconfirmed().size(), parent, confirmed.size() });
+            logger.debug("unconfirmed: {}", container.getUnconfirmed());
+            logger.debug("confirmed: {}", confirmed);
+        }
+        container.removeUnconfirmed(confirmed);
+        if (logger.isDebugEnabled()) {
+            logger.debug("{} messages left in unconfirmed list of the message container of {}",
+                            new Object[] { container.getUnconfirmed().size(), parent });
         }
     }
 
@@ -178,20 +189,37 @@ public class MessageService {
             logger.debug("STORING {} message {} under parent {}", new Object[] { wonMessage.getMessageType(),
                             wonMessage.getMessageURI(), parent });
             MessageContainer container = loadOrCreateMessageContainer(parent, wonMessage.getMessageType());
-            removeConfirmed(container, wonMessage, parent);
             // unconfirmed list:
             // - add any success response message from partner in a connection
             // - add any of our system responses messages if we 're in an atom's message
             // container.
-            if (wonMessage.getConnectionURI() != null && !Objects.equals(parent, wonMessage.getConnectionURI())
-                            && wonMessage.getMessageTypeRequired().isSuccessResponse()) {
+            if (wonMessage.getMessageTypeRequired().isSuccessResponse()) {
+                // make sure it's not a duplicate response
+                URI respondingTo = wonMessage.getRespondingToMessageURIRequired();
+                URI responseContainer = wonMessage.getAtomURI();
+                if (responseContainer == null) {
+                    responseContainer = wonMessage.getConnectionURIRequired();
+                }
+                Optional<MessageEvent> duplicate = messageEventRepository
+                                .findOneByParentURIAndRespondingToURIAndResponseContainerURI(parent, respondingTo,
+                                                responseContainer);
+                if (duplicate.isPresent()) {
+                    logger.debug("Detected duplicate response to {} from container {} in container {}: {}",
+                                    new Object[] { respondingTo, responseContainer, parent,
+                                                    wonMessage.toShortStringForDebug() });
+                    throw new DuplicateResponseException(MessageFormat.format(
+                                    "Detected duplicate response to {0} from container {1} in container {2}: {3}",
+                                    respondingTo, responseContainer, parent, wonMessage.toShortStringForDebug()));
+                }
+            }
+            if (isExternalSuccessResponseInConnection(parent, wonMessage)) {
+                removeConfirmed(container, wonMessage, parent);
                 if (logger.isDebugEnabled()) {
                     logger.debug("Adding as unconfirmed message: {}", wonMessage.getMessageURIRequired());
                 }
                 container.addUnconfirmed(wonMessage.getMessageURIRequired());
-            } else if (wonMessage.getAtomURI() != null && Objects.equals(parent, wonMessage.getAtomURI())
-                            && wonMessage.getEnvelopeType().isFromSystem()
-                            && wonMessage.getMessageTypeRequired().isSuccessResponse()) {
+            } else if (isOwnSuccessResponseInAtom(parent, wonMessage)) {
+                removeConfirmed(container, wonMessage, parent);
                 if (logger.isDebugEnabled()) {
                     logger.debug("Adding as unconfirmed message: {}", wonMessage.getMessageURIRequired());
                 }
@@ -204,8 +232,24 @@ public class MessageService {
             event.setDatasetHolder(datasetHolder.orElseGet(() -> new DatasetHolder(wonMessage.getMessageURI(),
                             WonMessageEncoder.encodeAsDataset(wonMessage))));
             container.getEvents().add(event);
+            messageContainerRepository.save(container);
             messageEventRepository.save(event);
         }
+    }
+
+    public boolean isOwnSuccessResponseInAtom(URI parent, WonMessage wonMessage) {
+        return wonMessage.getAtomURI() != null && Objects.equals(parent, wonMessage.getAtomURI())
+                        && wonMessage.getEnvelopeType().isFromSystem()
+                        && wonMessage.getMessageTypeRequired().isSuccessResponse()
+                        && wonMessage.getRespondingToMessageTypeRequired().isAtomSpecificMessage();
+    }
+
+    public boolean isExternalSuccessResponseInConnection(URI parent, WonMessage wonMessage) {
+        return wonMessage.getConnectionURI() != null
+                        && !Objects.equals(parent, wonMessage.getConnectionURI())
+                        && wonMessage.getEnvelopeType().isFromSystem()
+                        && wonMessage.getMessageTypeRequired().isSuccessResponse()
+                        && wonMessage.getRespondingToMessageTypeRequired().isConnectionSpecificMessage();
     }
 
     public MessageContainer loadOrCreateMessageContainer(final URI parent, final WonMessageType messageType) {

@@ -23,6 +23,9 @@ public interface MessageEventRepository extends WonRepository<MessageEvent> {
 
     Optional<MessageEvent> findOneByMessageURIAndParentURI(URI messageURI, URI parentURI);
 
+    Optional<MessageEvent> findOneByParentURIAndRespondingToURIAndResponseContainerURI(URI parentURI, URI responseToURI,
+                    URI responseParentURI);
+
     // read is permitted iff any of these conditions apply:
     // * the WebId is the sender atom
     // * the WebId is the recipient atom

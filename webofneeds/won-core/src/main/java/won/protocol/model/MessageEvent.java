@@ -31,10 +31,13 @@ import won.protocol.model.parentaware.ParentAware;
                 @Index(name = "IDX_ME_PARENT_URI", columnList = "parentURI"),
                 @Index(name = "IDX_ME_PARENT_URI_MESSAGE_TYPE", columnList = "parentURI, messageType"),
                 @Index(name = "IDX_ME_PARENT_URI_REFERENCED_BY_OTHER_MESSAGE", columnList = "parentURI, referencedByOtherMessage"),
-                @Index(name = "IDX_ME_RECIPIENT_ATOM_URI", columnList = "messageURI, recipientAtomURI") }, uniqueConstraints = {
-                                @UniqueConstraint(name = "IDX_ME_UNIQUE_MESSAGE_URI_PER_PARENT", columnNames = {
-                                                "messageURI",
-                                                "parentURI" }) })
+                @Index(name = "IDX_ME_RECIPIENT_ATOM_URI", columnList = "messageURI, recipientAtomURI")
+}, uniqueConstraints = {
+                @UniqueConstraint(name = "IDX_ME_UNIQUE_MESSAGE_URI_PER_PARENT", columnNames = { "messageURI",
+                                "parentURI" }),
+                @UniqueConstraint(name = "IDX_ME_UNIQUE_RESPONSE_PER_CONTAINER", columnNames = { "parentURI",
+                                "respondingToURI", "responseContainerURI" })
+})
 public class MessageEvent implements ParentAware<MessageContainer> {
     public MessageEvent() {
     }
@@ -50,6 +53,13 @@ public class MessageEvent implements ParentAware<MessageContainer> {
         this.creationDate = new Date();
         this.referencedByOtherMessage = false;
         this.messageContainer = messageContainer;
+        if (wonMessage.getMessageTypeRequired().isSuccessResponse()) {
+            this.respondingToURI = wonMessage.getRespondingToMessageURI();
+            this.responseContainerURI = wonMessage.getAtomURI();
+            if (this.responseContainerURI == null) {
+                this.responseContainerURI = wonMessage.getConnectionURIRequired();
+            }
+        }
     }
 
     @Id
@@ -71,6 +81,12 @@ public class MessageEvent implements ParentAware<MessageContainer> {
     @Column(name = "parentURI")
     @Convert(converter = URIConverter.class)
     private URI parentURI;
+    @Column(name = "responseContainerURI", nullable = true)
+    @Convert(converter = URIConverter.class)
+    private URI responseContainerURI;
+    @Column(name = "respondingToURI", nullable = true)
+    @Convert(converter = URIConverter.class)
+    private URI respondingToURI;
     @Column(name = "messageType")
     @Enumerated(EnumType.STRING)
     private WonMessageType messageType; // ConnectMessage, CreateMessage, AtomStateMessage

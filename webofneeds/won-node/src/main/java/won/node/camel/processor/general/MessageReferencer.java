@@ -42,11 +42,22 @@ public class MessageReferencer {
     public WonMessage addMessageReferences(final WonMessage message, URI parentURI)
                     throws WonMessageProcessingException {
         if (message.getMessageTypeRequired().isSuccessResponse()
-                        && Objects.equals(message.getConnectionURI(), parentURI)) {
+                        && (Objects.equals(message.getConnectionURI(), parentURI)
+                                        || Objects.equals(message.getAtomURI(), parentURI))) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Referencing unconfirmed messages in {} to message {}", parentURI,
+                                message.toShortStringForDebug());
+            }
             Optional<MessageContainer> container = messageContainerRepository.findOneByParentUri(parentURI);
             if (container.isPresent()) {
                 container.get().getUnconfirmed()
                                 .forEach(prev -> message.addMessageProperty(WONMSG.previousMessage, prev));
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Added {} references to message {}", container.get().getUnconfirmed().size(),
+                                    message.toShortStringForDebug());
+                }
+            } else {
+                logger.debug("No unconfirmed messages found");
             }
         }
         return message;

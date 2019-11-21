@@ -15,12 +15,19 @@ CREATE UNIQUE INDEX IDX_ME_UNIQUE_MESSAGE_URI_PER_PARENT ON message_event (messa
 ALTER TABLE message_event DROP column correspondingremotemessageuri;
 DROP INDEX IDX_ME_UNIQUE_CORREXPONDING_REMOTE_MESSAGE_URI;
 DROP INDEX IDX_ME_INNERMOST_MESSAGE_URI_RECIPIENT_ATOM_URI;
-CREATE INDEX IDX_ME_INNERMOST_MESSAGE_URI_RECIPIENT_ATOM_URI on message_event (messageURI, recipientAtomURI, innermostMessageURI);
+CREATE INDEX IDX_ME_INNERMOST_MESSAGE_URI_RECIPIENT_ATOM_URI on message_event (messageuri, recipientatomuri, innermostmessageuri);
 
 -- drop innermostmessageuri
 ALTER TABLE message_event DROP column innermostmessageuri;
 DROP INDEX IDX_ME_INNERMOST_MESSAGE_URI_RECIPIENT_ATOM_URI;
-CREATE INDEX IDX_ME_RECIPIENT_ATOM_URI on message_event(messageURI, recipientAtomURI) 
+CREATE INDEX IDX_ME_RECIPIENT_ATOM_URI on message_event(messageuri, recipientatomuri) 
+
+-- add special fields for response information (respondingToURI, responseContainerURI), so we can make sure we 
+-- store only one response from a container
+ALTER TABLE message_event ADD COLUMN responsetouri VARCHAR(255) default null;
+ALTER TABLE message_event ADD COLUMN responseparenturi VARCHAR(255) default null;
+CREATE INDEX IDX_ME_UNIQUE_RESPONSE_PER_CONTAINER on message_event(parenturi, respondingtouri, responsecontaineruri) 
+
 
 -- make essential fields in connection non-nullable
 ALTER TABLE connection ALTER COLUMN state SET NOT NULL;

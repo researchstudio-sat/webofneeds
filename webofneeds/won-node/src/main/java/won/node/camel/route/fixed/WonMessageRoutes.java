@@ -148,7 +148,6 @@ public class WonMessageRoutes extends RouteBuilder {
                         .to("bean:wonMessageIntoCamelProcessor")
                         .setHeader(WonCamelConstants.DIRECTION_HEADER,
                                         new URIConstant(URI.create(WONMSG.FromSystemString)))
-                        .to("bean:referencesToMessageAdder")
                         .to("bean:signatureToMessageAdder")
                         // route to message processing logic
                         .to("direct:msgFromOwner");
