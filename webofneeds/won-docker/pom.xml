@@ -63,7 +63,7 @@
                             <outputDirectory>${project.basedir}/image/wonnode</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/../won-node-webapp/target</directory>
+                                    <directory>${project.parent.parent.basedir}/won-node-webapp/target</directory>
                                     <includes>
                                         <include>won.war</include>
                                     </includes>
@@ -82,7 +82,7 @@
                             <outputDirectory>${project.basedir}/image/wonnode/conf</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/../conf</directory>
+                                    <directory>${project.parent.parent.basedir}/conf</directory>
                                 </resource>
                             </resources>
                         </configuration>
@@ -98,7 +98,7 @@
                             <outputDirectory>${project.basedir}/image/wonnode/required-libs</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/../target/required-libs</directory>
+                                    <directory>${project.parent.parent.basedir}/target/required-libs</directory>
                                 </resource>
                             </resources>
                         </configuration>
@@ -116,7 +116,7 @@
                             <outputDirectory>${project.basedir}/image/owner</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/../won-owner-webapp/target</directory>
+                                    <directory>${project.parent.parent.basedir}/won-owner-webapp/target</directory>
                                     <includes>
                                         <include>owner.war</include>
                                     </includes>
@@ -135,7 +135,7 @@
                             <outputDirectory>${project.basedir}/image/owner/conf</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/../conf</directory>
+                                    <directory>${project.parent.parent.basedir}/conf</directory>
                                 </resource>
                             </resources>
                         </configuration>
@@ -151,7 +151,7 @@
                             <outputDirectory>${project.basedir}/image/owner/required-libs</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/../target/required-libs</directory>
+                                    <directory>${project.parent.parent.basedir}/target/required-libs</directory>
                                 </resource>
                             </resources>
                         </configuration>
@@ -169,7 +169,7 @@
                             <outputDirectory>${project.basedir}/image/matcher-service</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/../won-matcher-service/target</directory>
+                                    <directory>${project.parent.parent.basedir}/won-matcher-service/target</directory>
                                     <includes>
                                         <include>won-matcher-service.jar</include>
                                     </includes>
@@ -188,7 +188,7 @@
                             <outputDirectory>${project.basedir}/image/matcher-service/conf</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/../conf</directory>
+                                    <directory>${project.parent.parent.basedir}/conf</directory>
                                 </resource>
                             </resources>
                         </configuration>
@@ -206,7 +206,7 @@
                             <outputDirectory>${project.basedir}/image/matcher-solr</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/../won-matcher-solr/target</directory>
+                                    <directory>${project.parent.parent.basedir}/won-matcher-solr/target</directory>
                                     <includes>
                                         <include>won-matcher-solr.jar</include>
                                     </includes>
@@ -225,7 +225,7 @@
                             <outputDirectory>${project.basedir}/image/matcher-solr/conf</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/../conf</directory>
+                                    <directory>${project.parent.parent.basedir}/conf</directory>
                                 </resource>
                             </resources>
                         </configuration>
@@ -243,7 +243,7 @@
                             <outputDirectory>image/matcher-rescal</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/../won-matcher-rescal/target</directory>
+                                    <directory>${project.parent.parent.basedir}/won-matcher-rescal/target</directory>
                                     <includes>
                                         <include>won-matcher-rescal.jar</include>
                                     </includes>
@@ -262,7 +262,7 @@
                             <outputDirectory>image/matcher-rescal/python</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/../won-matcher-rescal/src/main/python</directory>
+                                    <directory>${project.parent.parent.basedir}/won-matcher-rescal/src/main/python</directory>
                                 </resource>
                             </resources>
                         </configuration>
@@ -278,7 +278,7 @@
                             <outputDirectory>image/matcher-rescal/conf</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/../conf</directory>
+                                    <directory>${project.parent.parent.basedir}/conf</directory>
                                 </resource>
                             </resources>
                         </configuration>
@@ -296,7 +296,7 @@
                             <outputDirectory>image/matcher-sparql</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/../won-matcher-sparql/target</directory>
+                                    <directory>${project.parent.parent.basedir}/won-matcher-sparql/target</directory>
                                     <includes>
                                         <include>won-matcher-sparql.jar</include>
                                     </includes>
@@ -315,7 +315,7 @@
                             <outputDirectory>image/matcher-sparql/conf</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/../conf</directory>
+                                    <directory>${project.parent.parent.basedir}/conf</directory>
                                 </resource>
                             </resources>
                         </configuration>

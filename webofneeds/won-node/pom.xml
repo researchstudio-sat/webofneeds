@@ -193,7 +193,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.parent.basedir}/../target/required-libs</outputDirectory>
+                            <outputDirectory>${project.parent.parent.basedir}/target/required-libs</outputDirectory>
                             <includeGroupIds>at.researchstudio.sat</includeGroupIds>
                             <includeArtifactIds>won-utils-tls</includeArtifactIds>
                         </configuration>
@@ -207,8 +207,8 @@
 		          <forkCount>1</forkCount>
 		          <threadCount>1</threadCount>
 		          <additionalClasspathElements>
-		            <additionalClasspathElement>${project.parent.basedir}/../target/required-libs/bcprov-jdk15on-1.64.jar</additionalClasspathElement>
-		            <additionalClasspathElement>${project.parent.basedir}/../target/required-libs/bcpkix-jdk15on-1.64.jar</additionalClasspathElement>
+		            <additionalClasspathElement>${project.parent.parent.basedir}/target/required-libs/bcprov-jdk15on-1.64.jar</additionalClasspathElement>
+		            <additionalClasspathElement>${project.parent.parent.basedir}/target/required-libs/bcpkix-jdk15on-1.64.jar</additionalClasspathElement>
 		          </additionalClasspathElements>
 		        </configuration>
 	        </plugin>
