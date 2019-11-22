@@ -102,7 +102,7 @@ export const travelAction = {
             name: getIn(value, ["fromLocation", "name"]),
             // excluding nwCorner and seCorner as travelaction calculates its bounding box differently
           },
-          baseUri: baseUri && baseUri + "/fromLocation",
+          baseUri: baseUri && baseUri + "#fromLocation",
         }),
 
         "s:toLocation": genSPlace({
@@ -112,7 +112,7 @@ export const travelAction = {
             name: getIn(value, ["toLocation", "name"]),
             // excluding nwCorner and seCorner as travelaction calculates its bounding box differently
           },
-          baseUri: baseUri && baseUri + "/toLocation",
+          baseUri: baseUri && baseUri + "#toLocation",
         }),
       },
     };
@@ -275,7 +275,7 @@ function genSPlace({ geoData, baseUri }) {
       return undefined;
     }
     return {
-      "@id": baseUri ? baseUri + "/geo" : undefined,
+      "@id": baseUri ? baseUri + "#geo" : undefined,
       "@type": "s:GeoCoordinates",
       "s:latitude": lat.toFixed(6),
       "s:longitude": lng.toFixed(6),
@@ -289,15 +289,15 @@ function genSPlace({ geoData, baseUri }) {
     return !nwCorner || !seCorner
       ? undefined
       : {
-          "@id": baseUri ? baseUri + "/bounds" : undefined,
+          "@id": baseUri ? baseUri + "#bounds" : undefined,
           "con:northWestCorner": {
-            "@id": baseUri ? baseUri + "/bounds/nw" : undefined,
+            "@id": baseUri ? baseUri + "#bounds#nw" : undefined,
             "@type": "s:GeoCoordinates",
             "s:latitude": nwCorner.lat.toFixed(6),
             "s:longitude": nwCorner.lng.toFixed(6),
           },
           "con:southEastCorner": {
-            "@id": baseUri ? baseUri + "/bounds/se" : undefined,
+            "@id": baseUri ? baseUri + "#bounds#se" : undefined,
             "@type": "s:GeoCoordinates",
             "s:latitude": seCorner.lat.toFixed(6),
             "s:longitude": seCorner.lng.toFixed(6),

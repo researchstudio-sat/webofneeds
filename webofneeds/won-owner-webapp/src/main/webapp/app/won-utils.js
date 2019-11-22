@@ -209,5 +209,5 @@ export function genDetailBaseUri(baseUri, detailIdentifier) {
     return undefined;
   }
   const randomId = generateIdString(10);
-  return baseUri + "/" + detailIdentifier + "/" + randomId;
+  return baseUri + "#" + detailIdentifier + "#" + randomId;
 }

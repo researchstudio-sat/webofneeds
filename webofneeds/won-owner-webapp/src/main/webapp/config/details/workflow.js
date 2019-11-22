@@ -27,7 +27,7 @@ export const bpmnWorkflow = {
       let workflow = {
         "@id":
           contentUri && identifier
-            ? contentUri + "/" + identifier + "/" + generateIdString(10)
+            ? contentUri + "#" + identifier + "#" + generateIdString(10)
             : undefined,
         "@type": "s:FileObject",
         "s:name": value.name,
@@ -77,7 +77,7 @@ export const petriNetWorkflow = {
       let workflow = {
         "@id":
           contentUri && identifier
-            ? contentUri + "/" + identifier + "/" + generateIdString(10)
+            ? contentUri + "#" + identifier + "#" + generateIdString(10)
             : undefined,
         "@type": "s:FileObject",
         "s:name": value.name,

@@ -853,7 +853,7 @@ won.addMessageGraph = function(builder, graphURIs, messageType) {
         "msg:messageType": {
           "@id": messageType,
         },
-        "msg:envelope": unsedMessageGraphUri,
+        "msg:envelope": unsetMessageGraphUri,
       },
       {
         "@id": unsetMessageGraphUri,
@@ -1887,9 +1887,7 @@ WonMessage.prototype = {
     return graphData.some(
       resource =>
         resource["@id"] === graphUri &&
-        resource["@type"].includes(
-          "https://w3id.org/won/message#Signature"
-        )
+        resource["@type"].includes("https://w3id.org/won/message#Signature")
     );
   },
   __getContainedEnvelopeUris: graph => {

@@ -40,7 +40,7 @@ export const pricerange = {
       "s:priceSpecification": {
         "@id":
           contentUri && identifier
-            ? contentUri + "/" + identifier + "/" + generateIdString(10)
+            ? contentUri + "#" + identifier + "#" + generateIdString(10)
             : undefined,
         "@type": "s:CompoundPriceSpecification",
         "s:minPrice": value.min && [
@@ -178,7 +178,7 @@ export const price = {
       "s:priceSpecification": {
         "@id":
           contentUri && identifier
-            ? contentUri + "/" + identifier + "/" + generateIdString(10)
+            ? contentUri + "#" + identifier + "#" + generateIdString(10)
             : undefined,
         "@type": "s:CompoundPriceSpecification",
         "s:price": [{ "@value": value.amount, "@type": "xsd:float" }],
