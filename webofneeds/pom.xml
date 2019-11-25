@@ -85,6 +85,69 @@
         <module>won-test</module>
         <module>won-parent-pom</module>
     </modules>
+    <properties>
+	<doclint>none</doclint>
+        <solr.upload.dest>${project.build.directory}</solr.upload.dest>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compile.compilerargs>
+            -Xlint:deprecation,fallthrough,finally,path,serial,unchecked
+        </maven.compile.compilerargs>
+        <compile.forked>false</compile.forked>
+        <java.source.version>1.8</java.source.version>
+        <java.target.version>1.8</java.target.version>
+        <surefire.skip>false</surefire.skip>
+        <surefire.failure.ignore>true</surefire.failure.ignore>
+        <surefire.reportformat>brief</surefire.reportformat>
+        <surefire.usefile>false</surefire.usefile>
+        <dependencies.scope>compile</dependencies.scope>
+        <!-- versions for various dependencies -->
+        <aspectj.version>1.5.4</aspectj.version>
+        <bouncycastle.version>1.64</bouncycastle.version>
+        <commons-collections.version>3.2.1</commons-collections.version>
+        <commons-io.version>2.4</commons-io.version>
+        <de.uni_koblenz.aggrimm.icp.version>1.0.1</de.uni_koblenz.aggrimm.icp.version>
+        <camel.version>2.12.1</camel.version>
+        <qpid.version>0.24</qpid.version>
+        <activemq.version>5.10.2</activemq.version>
+        <activemq.conf>classpath:</activemq.conf>
+        <jms.version>1.1</jms.version>
+        <xbean.version>3.14</xbean.version>   <!-- Check later if it is really needed -->
+        <siren.version>1.4</siren.version>
+        <cglib.version>2.2.2</cglib.version>
+        <com.google.guava.version>15.0</com.google.guava.version>
+        <ch.qos.logback.version>1.0.13</ch.qos.logback.version>
+        <com.fasterxml.classmate.version>1.0.0</com.fasterxml.classmate.version>
+        <com.mchange.c3p0.version>0.9.5</com.mchange.c3p0.version>
+        <junit.version>4.12</junit.version>
+        <org.apache.commons.email.version>1.3.1</org.apache.commons.email.version>
+        <net.sf.ehcache.version>2.6.8</net.sf.ehcache.version>
+        <org.apache.jena.version>3.5.0</org.apache.jena.version>
+        <org.apache.jena-tdb.version>3.5.0</org.apache.jena-tdb.version>
+        <org.hibernate.version>5.4.8.Final</org.hibernate.version>
+        <org.hibernate.hibernate-validator.version>5.4.3.Final</org.hibernate.hibernate-validator.version>
+        <org.javasimon.version>3.4.0</org.javasimon.version>
+        <org.jboss.jandex.version>1.1.0.Final</org.jboss.jandex.version>
+        <org.quartz-scheduler.version>2.2.1</org.quartz-scheduler.version>
+        <org.springframework.boot.version>1.5.17.RELEASE</org.springframework.boot.version>
+        <org.springframework.version>4.3.18.RELEASE</org.springframework.version>
+        <org.springframework.security.version>4.2.9.RELEASE</org.springframework.security.version>
+        <org.slf4j.version>1.6.6</org.slf4j.version>
+        <org.hsqldb.version>2.5.0</org.hsqldb.version>
+        <postgresql.version>42.2.8</postgresql.version>
+        <flyway.version>4.0.3</flyway.version>
+        <javax.servlet.jstl.version>1.2</javax.servlet.jstl.version>
+        <javax.validation.version>1.1.0.Final</javax.validation.version>
+        <mojoexec.version>1.3.2</mojoexec.version>
+        <cargo.version>1.4.2</cargo.version>
+        <jrebel.version>1.1.3</jrebel.version>
+        <wagon.version>1.0-beta-3</wagon.version>
+        <assembly.version>2.2</assembly.version>
+        <net.sf.supercsv.version>2.1.0</net.sf.supercsv.version>
+        <jaxb.version>2.2.11</jaxb.version>
+        <javax.activation.version>1.1.1</javax.activation.version>
+        <javax.annotation.version>1.3.2</javax.annotation.version>
+        <javax.jws.version>1.1</javax.jws.version>
+    </properties>
     <dependencyManagement>
         <dependencies>
             <!-- Unsorted; needed by won-core -->
@@ -647,6 +710,11 @@
                 <artifactId>commons-io</artifactId>
                 <version>${commons-io.version}</version>
             </dependency>
+            <dependency>
+    			<groupId>org.apache.commons</groupId>
+    			<artifactId>commons-pool2</artifactId>
+    			<version>2.7.0</version>
+			</dependency>
             <dependency>
                 <groupId>net.sf.supercsv</groupId>
                 <artifactId>super-csv</artifactId>

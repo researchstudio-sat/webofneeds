@@ -5,6 +5,10 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.Arrays;
 
+import org.apache.commons.pool2.BasePooledObjectFactory;
+import org.apache.commons.pool2.PooledObject;
+import org.apache.commons.pool2.impl.DefaultPooledObject;
+import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +28,13 @@ public class WonHasher {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final String ENV_HASH_ALGORITHM = "sha-256";
     public static final Type MULTIHASH_TYPE = Type.sha3_256;
-    private SignatureAlgorithmInterface algorithm;
+    private static GenericObjectPool<SignatureAlgorithmInterface> signatureAlgorithmPool = new GenericObjectPool<SignatureAlgorithmInterface>(
+                    new SignatureAlgorithmFactory());
+    static {
+        signatureAlgorithmPool.setMaxTotal(20);
+    }
 
     public WonHasher() {
-        // default algorithm: Fisteus2010
-        this.algorithm = new SignatureAlgorithmFisteus2010();
     }
 
     /**
@@ -42,20 +48,38 @@ public class WonHasher {
     public SignatureData hashNamedGraphForSigning(
                     final GraphCollection inputWithOneNamedGraph)
                     throws Exception {
-        this.algorithm.canonicalize(inputWithOneNamedGraph);
-        this.algorithm.postCanonicalize(inputWithOneNamedGraph);
-        this.algorithm.hash(inputWithOneNamedGraph, ENV_HASH_ALGORITHM);
-        this.algorithm.postHash(inputWithOneNamedGraph);
-        return inputWithOneNamedGraph.getSignature();
+        SignatureAlgorithmInterface algorithm = new SignatureAlgorithmFisteus2010();
+        // signatureAlgorithmPool.borrowObject();
+        try {
+            algorithm.canonicalize(inputWithOneNamedGraph);
+            algorithm.postCanonicalize(inputWithOneNamedGraph);
+            algorithm.hash(inputWithOneNamedGraph, ENV_HASH_ALGORITHM);
+            algorithm.postHash(inputWithOneNamedGraph);
+            inputWithOneNamedGraph.getSignature().getDigestGen().reset();
+            return inputWithOneNamedGraph.getSignature();
+        } finally {
+            if (algorithm != null) {
+                // signatureAlgorithmPool.returnObject(algorithm);
+            }
+        }
     }
 
     public String calculateHashIdForDataset(Dataset dataset) throws Exception {
-        GraphCollection graphCollection = ModelConverter.fromDataset(dataset);
-        this.algorithm.canonicalize(graphCollection);
-        this.algorithm.postCanonicalize(graphCollection);
-        this.algorithm.hash(graphCollection, ENV_HASH_ALGORITHM);
-        this.algorithm.postHash(graphCollection);
-        return hashToString(graphCollection.getSignature().getHash());
+        SignatureAlgorithmInterface algorithm = new SignatureAlgorithmFisteus2010();
+        // signatureAlgorithmPool.borrowObject();
+        try {
+            GraphCollection graphCollection = ModelConverter.fromDataset(dataset);
+            algorithm.canonicalize(graphCollection);
+            algorithm.postCanonicalize(graphCollection);
+            algorithm.hash(graphCollection, ENV_HASH_ALGORITHM);
+            algorithm.postHash(graphCollection);
+            graphCollection.getSignature().getDigestGen().reset();
+            return hashToString(graphCollection.getSignature().getHash());
+        } finally {
+            if (algorithm != null) {
+                // signatureAlgorithmPool.returnObject(algorithm);
+            }
+        }
     }
 
     /**
@@ -105,5 +129,20 @@ public class WonHasher {
         byte[] hashed = md.digest(valueToHash);
         Multihash multihash = Multihash.fromBase58(expected);
         return Arrays.equals(hashed, multihash.getHash());
+    }
+
+    public static class SignatureAlgorithmFactory extends BasePooledObjectFactory<SignatureAlgorithmInterface> {
+        public SignatureAlgorithmFactory() {
+        }
+
+        @Override
+        public SignatureAlgorithmInterface create() throws Exception {
+            return new SignatureAlgorithmFisteus2010();
+        }
+
+        @Override
+        public PooledObject<SignatureAlgorithmInterface> wrap(SignatureAlgorithmInterface obj) {
+            return new DefaultPooledObject<SignatureAlgorithmInterface>(obj);
+        }
     }
 }
