@@ -1,12 +1,17 @@
 package won.protocol.service.impl;
 
 import java.net.URI;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.jena.query.Dataset;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
 import won.cryptography.service.RandomNumberService;
 import won.protocol.exception.IllegalAtomURIException;
 import won.protocol.message.WonMessageUtils;
@@ -28,14 +33,34 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
     private LinkedDataSource linkedDataSource;
     @Value(value = "${uri.node.default}")
     private URI defaultWonNodeUri;
+    private final Ehcache wonNodeInfoCache;
+
+    public WonNodeInformationServiceImpl() {
+        CacheManager manager = CacheManager.getInstance();
+        this.wonNodeInfoCache = new Cache("wonNodeInformationServiceImpl", 100, false, false, 3600, 3600);
+        manager.addCache(wonNodeInfoCache);
+    }
+
+    private WonNodeInfo getFromCache(URI wonNodeURI) {
+        Element e = wonNodeInfoCache.get(wonNodeURI);
+        if (e == null) {
+            return null;
+        }
+        return (WonNodeInfo) e.getObjectValue();
+    }
 
     @Override
     public WonNodeInfo getWonNodeInformation(URI wonNodeURI) {
-        assert wonNodeURI != null;
+        Objects.requireNonNull(wonNodeURI);
+        WonNodeInfo info = getFromCache(wonNodeURI);
+        if (info != null) {
+            return info;
+        }
         Dataset nodeDataset = linkedDataSource.getDataForResource(wonNodeURI);
-        WonNodeInfo info = WonRdfUtils.WonNodeUtils.getWonNodeInfo(wonNodeURI, nodeDataset);
+        info = WonRdfUtils.WonNodeUtils.getWonNodeInfo(wonNodeURI, nodeDataset);
         if (info == null)
             throw new IllegalStateException("Could not obtain WonNodeInformation for URI " + wonNodeURI);
+        wonNodeInfoCache.put(new Element(wonNodeURI, info));
         return info;
     }
 

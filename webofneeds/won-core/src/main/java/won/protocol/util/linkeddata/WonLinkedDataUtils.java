@@ -40,6 +40,10 @@ import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
 import won.protocol.message.WonMessage;
 import won.protocol.model.AtomState;
 import won.protocol.model.Connection;
@@ -58,6 +62,12 @@ import won.protocol.vocabulary.WONMSG;
  */
 public class WonLinkedDataUtils {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Ehcache linkedDataObjectCache;
+    static {
+        CacheManager manager = CacheManager.getInstance();
+        linkedDataObjectCache = new Cache("linkedDataObjectCache", 1000, false, false, 3600, 3600);
+        manager.addCache(linkedDataObjectCache);
+    }
 
     public static URI getConnectionStateforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
         assert linkedDataSource != null : "linkedDataSource must not be null";
@@ -524,33 +534,17 @@ public class WonLinkedDataUtils {
             RdfUtils.addDatasetToDataset(dataset, ds);
         });
         URI socketDefinitionURI = configURIs.stream().findFirst().get();
-        SocketDefinitionImpl socketDef = new SocketDefinitionImpl(socket);
-        // if a socket definition is referenced via won:socketDefinition, it has to be
-        // the subject of a triple
-        boolean isSocketDefFound = RdfUtils.findFirst(dataset, model -> {
-            if (model.listStatements(new SimpleSelector(model.createResource(socketDefinitionURI.toString()), null,
-                            (RDFNode) null)).hasNext()) {
-                return socket;
-            }
-            return null;
-        }) != null;
-        if (!isSocketDefFound) {
-            throw new IllegalArgumentException("Could not find data for socket definition " + socketDefinitionURI
-                            + " of socket " + socket);
-        }
-        socketDef.setSocketDefinitionURI(socketDefinitionURI);
-        WonRdfUtils.SocketUtils.setCompatibleSocketDefinitionsOfSocket(socketDef, dataset, socket);
-        WonRdfUtils.SocketUtils.setAutoOpenOfSocket(socketDef, dataset, socket);
-        WonRdfUtils.SocketUtils.setSocketCapacityOfSocket(socketDef, dataset, socket);
-        WonRdfUtils.SocketUtils.setDerivationPropertiesOfSocket(socketDef, dataset, socket);
-        WonRdfUtils.SocketUtils.setInverseDerivationPropertiesOfSocket(socketDef, dataset, socket);
-        return Optional.of(socketDef);
+        return getSocketDefinition(linkedDataSource, socketDefinitionURI);
     }
 
     public static Optional<SocketDefinition> getSocketDefinition(LinkedDataSource linkedDataSource,
                     URI socketDefinitionURI) {
+        SocketDefinitionImpl socketDef = getSocketDefinitionFromCache(socketDefinitionURI);
+        if (socketDef != null) {
+            return Optional.of(socketDef);
+        }
         Dataset dataset = linkedDataSource.getDataForResource(socketDefinitionURI);
-        SocketDefinitionImpl socketDef = new SocketDefinitionImpl(socketDefinitionURI);
+        socketDef = new SocketDefinitionImpl(socketDefinitionURI);
         // if a socket definition is referenced via won:socketDefinition, it has to be
         // the subject of a triple
         boolean isSocketDefFound = RdfUtils.findFirst(dataset, model -> {
@@ -569,7 +563,16 @@ public class WonLinkedDataUtils {
         WonRdfUtils.SocketUtils.setSocketCapacityOfSocket(socketDef, dataset, socketDefinitionURI);
         WonRdfUtils.SocketUtils.setDerivationPropertiesOfSocket(socketDef, dataset, socketDefinitionURI);
         WonRdfUtils.SocketUtils.setInverseDerivationPropertiesOfSocket(socketDef, dataset, socketDefinitionURI);
+        linkedDataObjectCache.put(new Element(socketDefinitionURI, socketDef));
         return Optional.of(socketDef);
+    }
+
+    private static SocketDefinitionImpl getSocketDefinitionFromCache(URI socketDefinitionURI) {
+        Element e = linkedDataObjectCache.get(socketDefinitionURI);
+        if (e == null) {
+            return null;
+        }
+        return (SocketDefinitionImpl) e.getObjectValue();
     }
 
     public static Optional<URI> getTypeOfSocket(URI socketURI, LinkedDataSource linkedDataSource) {
