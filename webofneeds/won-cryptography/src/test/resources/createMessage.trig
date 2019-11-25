@@ -1,0 +1,54 @@
+@prefix msg:   <https://w3id.org/won/message#> .
+@prefix conn:  <https://localhost:8443/won/resource/connection/> .
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix rdfg:  <http://www.w3.org/2004/03/trix/rdfg-1/> .
+@prefix match: <https://w3id.org/won/matching#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix cert:  <http://www.w3.org/ns/auth/cert#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix local: <https://localhost:8443/won/resource/> .
+@prefix s:     <http://schema.org/> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix won:   <https://w3id.org/won/core#> .
+@prefix atom:  <https://localhost:8443/won/resource/atom/> .
+@prefix event: <https://localhost:8443/won/resource/msg/> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+
+<wm:/SELF#content-9jtg> {
+    <https://localhost:8443/won/resource/atom/x2gloxh0fecwt1na9u5o#holdableSocket>
+            won:socketDefinition  <https://w3id.org/won/ext/hold#HoldableSocket> .
+    
+    <https://localhost:8443/won/resource/atom/x2gloxh0fecwt1na9u5o#chatSocket>
+            won:socketDefinition  <https://w3id.org/won/ext/chat#ChatSocket> .
+    
+    <https://localhost:8443/won/resource/atom/x2gloxh0fecwt1na9u5o#socket1>
+            won:socketDefinition  <https://w3id.org/won/ext/chat#ChatSocket> .
+    
+    atom:x2gloxh0fecwt1na9u5o
+            a                  won:Atom ;
+            dc:title           "Test Atom 2" ;
+            cert:key           [ cert:PublicKey  [ a                  won:ECCPublicKey ;
+                                                   won:ecc_algorithm  "EC" ;
+                                                   won:ecc_curveId    "secp384r1" ;
+                                                   won:ecc_qx         "1a3b2ac3667b27c88f2596b345bbd11d8467ae248a14c10a59ad243468479e3586dc18287fafa30dc67552f519e32f44" ;
+                                                   won:ecc_qy         "faaee4cc5bcd142005033a0ec306a8deb47099cf2db3d33e713550cdafe25876f31303d50102b2aecee7dc7e39c04630"
+                                                 ] ] ;
+            won:defaultSocket  <https://localhost:8443/won/resource/atom/x2gloxh0fecwt1na9u5o#chatSocket> ;
+            won:socket         <https://localhost:8443/won/resource/atom/x2gloxh0fecwt1na9u5o#holdableSocket> , <https://localhost:8443/won/resource/atom/x2gloxh0fecwt1na9u5o#chatSocket> , <https://localhost:8443/won/resource/atom/x2gloxh0fecwt1na9u5o#socket1> ;
+            match:flag         match:UsedForTesting .
+}
+
+<wm:/SELF#envelope> {
+    <wm:/SELF>
+            a                    msg:FromOwner ;
+            msg:atom             atom:x2gloxh0fecwt1na9u5o ;
+            msg:content          <wm:/SELF#content-9jtg> ;
+            msg:envelope         <wm:/SELF#envelope> ;
+            msg:messageType      msg:CreateMessage ;
+            msg:protocolVersion  "1.0" ;
+            msg:timestamp        1574359799178 .
+    
+   
+}
