@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.StopWatch;
 import org.springframework.web.client.HttpClientErrorException;
 
 import won.cryptography.rdfsign.SignatureVerificationState;
@@ -36,6 +37,7 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.rest.LinkedDataFetchingException;
+import won.protocol.util.LogMarkers;
 import won.protocol.util.Prefixer;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
@@ -59,71 +61,79 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
 
     @Override
     public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
-        SignatureVerificationState result;
-        /*
-         * If the message is a successResponse to a delete Message then we can't check
-         * the signature as it is stored in the deleted Atom, so we just accept the
-         * message as valid and return it.
-         */
-        if (message.getRespondingToMessageType() == WonMessageType.DELETE
-                        && message.getMessageType() == WonMessageType.SUCCESS_RESPONSE) {
-            return message;
-        }
-        for (WonMessage toCheck : message.getAllMessages()) {
-            try {
-                // obtain public keys
-                Map<String, PublicKey> keys = getRequiredPublicKeys(toCheck.getCompleteDataset());
-                // verify with those public keys
-                result = WonMessageSignerVerifier.verify(keys, toCheck);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("VERIFIED=" + result.isVerificationPassed()
-                                    + " with keys: " + keys.values()
-                                    + " for\n"
-                                    + RdfUtils.writeDatasetToString(
-                                                    Prefixer.setPrefixes(toCheck.getCompleteDataset()),
-                                                    Lang.TRIG));
-                }
-            } catch (LinkedDataFetchingException e) {
-                /*
-                 * If a delete message could not be validated because the atom was already
-                 * deleted, we assume that this message is just mirrored back to the owner and
-                 * is to be accepteed
-                 */
-                if (WonMessageType.DELETE.equals(toCheck.getMessageType())) {
-                    if (e.getCause() instanceof HttpClientErrorException
-                                    && HttpStatus.GONE.equals(
-                                                    ((HttpClientErrorException) e.getCause()).getStatusCode())) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Failure during processing signature check of message"
-                                            + toCheck.getMessageURI()
-                                            + " (messageType was DELETE, but atom is already deleted, accept message anyway)");
-                        }
-                        return toCheck;
+        StopWatch sw = new StopWatch();
+        sw.start();
+        try {
+            SignatureVerificationState result;
+            /*
+             * If the message is a successResponse to a delete Message then we can't check
+             * the signature as it is stored in the deleted Atom, so we just accept the
+             * message as valid and return it.
+             */
+            if (message.getRespondingToMessageType() == WonMessageType.DELETE
+                            && message.getMessageType() == WonMessageType.SUCCESS_RESPONSE) {
+                return message;
+            }
+            for (WonMessage toCheck : message.getAllMessages()) {
+                try {
+                    // obtain public keys
+                    Map<String, PublicKey> keys = getRequiredPublicKeys(toCheck.getCompleteDataset());
+                    // verify with those public keys
+                    result = WonMessageSignerVerifier.verify(keys, toCheck);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("VERIFIED=" + result.isVerificationPassed()
+                                        + " with keys: " + keys.values()
+                                        + " for\n"
+                                        + RdfUtils.writeDatasetToString(
+                                                        Prefixer.setPrefixes(toCheck.getCompleteDataset()),
+                                                        Lang.TRIG));
                     }
+                } catch (LinkedDataFetchingException e) {
+                    /*
+                     * If a delete message could not be validated because the atom was already
+                     * deleted, we assume that this message is just mirrored back to the owner and
+                     * is to be accepteed
+                     */
+                    if (WonMessageType.DELETE.equals(toCheck.getMessageType())) {
+                        if (e.getCause() instanceof HttpClientErrorException
+                                        && HttpStatus.GONE.equals(
+                                                        ((HttpClientErrorException) e.getCause()).getStatusCode())) {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("Failure during processing signature check of message"
+                                                + toCheck.getMessageURI()
+                                                + " (messageType was DELETE, but atom is already deleted, accept message anyway)");
+                            }
+                            return toCheck;
+                        }
+                    }
+                    // TODO SignatureProcessingException?
+                    throw new WonMessageProcessingException("Could not verify message " + toCheck.getMessageURI(), e);
+                } catch (Exception e) {
+                    // TODO SignatureProcessingException?
+                    throw new WonMessageProcessingException("Could not verify message " + toCheck.getMessageURI(), e);
                 }
-                // TODO SignatureProcessingException?
-                throw new WonMessageProcessingException("Could not verify message " + toCheck.getMessageURI(), e);
-            } catch (Exception e) {
-                // TODO SignatureProcessingException?
-                throw new WonMessageProcessingException("Could not verify message " + toCheck.getMessageURI(), e);
-            }
-            // throw exception if the verification fails:
-            if (!result.isVerificationPassed()) {
-                String errormessage = "Message verification failed. Message:"
-                                + toCheck.toStringForDebug(false)
-                                + ", Problem:"
-                                + result.getMessage();
-                if (logger.isDebugEnabled()) {
-                    logger.debug(errormessage + ". Offending message:\n"
-                                    + RdfUtils.toString(Prefixer.setPrefixes(toCheck.getCompleteDataset())));
+                // throw exception if the verification fails:
+                if (!result.isVerificationPassed()) {
+                    String errormessage = "Message verification failed. Message:"
+                                    + toCheck.toStringForDebug(false)
+                                    + ", Problem:"
+                                    + result.getMessage();
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(errormessage + ". Offending message:\n"
+                                        + RdfUtils.toString(Prefixer.setPrefixes(toCheck.getCompleteDataset())));
+                    }
+                    // TODO SignatureProcessingException?
+                    throw new WonMessageProcessingException(new SignatureException(
+                                    errormessage + ". To log the offending message, set Loglevel to DEBUG for logger '"
+                                                    + this.getClass().getName() + "'"));
                 }
-                // TODO SignatureProcessingException?
-                throw new WonMessageProcessingException(new SignatureException(
-                                errormessage + ". To log the offending message, set Loglevel to DEBUG for logger '"
-                                                + this.getClass().getName() + "'"));
             }
+            return message;
+        } finally {
+            sw.stop();
+            logger.debug(LogMarkers.TIMING, "Signature check for message {} took {} millis",
+                            message.getMessageURIRequired(), sw.getLastTaskTimeMillis());
         }
-        return message;
     }
 
     private boolean appendIfPresent(URI uri, String label, StringBuilder sb) {

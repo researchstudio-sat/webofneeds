@@ -6,7 +6,10 @@ import java.util.Optional;
 
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StopWatch;
 
 import won.protocol.exception.UriNodePathException;
 import won.protocol.exception.WonMessageNotWellFormedException;
@@ -20,6 +23,7 @@ import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.service.MessageRoutingInfoService;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInformationService;
+import won.protocol.util.LogMarkers;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.WonUriCheckHelper;
 
@@ -29,6 +33,7 @@ import won.protocol.util.WonUriCheckHelper;
  * Date: 23.04.2015
  */
 public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProcessor {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     protected WonNodeInformationService wonNodeInformationService;
     @Autowired
@@ -36,16 +41,22 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
 
     @Override
     public WonMessage process(WonMessage message) {
+        StopWatch sw = new StopWatch();
         if (message == null) {
             throw new WonMessageProcessingException("No WonMessage object found in exchange");
         }
+        sw.start("validMessageURI");
         if (!WonMessageUtils.isValidMessageUri(message.getMessageURIRequired())) {
             throw new WonMessageNotWellFormedException("Not a valid message URI: " + message.getMessageURI());
         }
+        sw.stop();
+        sw.start("envelopePropertyCheck");
         EnvelopePropertyCheckResult result = message.checkEnvelopeProperties();
         if (!result.isValid()) {
             throw new WonMessageNotWellFormedException(result.getMessage());
         }
+        sw.stop();
+        sw.start("getNodeInfo");
         Optional<URI> senderNode = messageRoutingInfoService.senderNode(message);
         Optional<URI> recipientNode = messageRoutingInfoService.recipientNode(message);
         if (!senderNode.isPresent() && !message.getMessageTypeRequired().isHintMessage()) {
@@ -74,16 +85,32 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
             throw new WonMessageProcessingException(
                             "Could not load recipient WonNodeInfo (won node " + recipientNode.get() + ")");
         }
+        sw.stop();
+        sw.start("senderAtomUriCheck");
         checkAtomUri(message.getSenderAtomURI(), senderNodeInfo);
+        sw.stop();
+        sw.start("senderSocketUriCheck");
         checkSocketUri(message.getSenderSocketURI(), senderNodeInfo);
+        sw.stop();
+        sw.start("recipientAtomUriCheck");
         checkAtomUri(message.getRecipientAtomURI(), recipientNodeInfo);
+        sw.stop();
+        sw.start("recipientSocketUriCheck");
         checkSocketUri(message.getRecipientSocketURI(), recipientNodeInfo);
         // there is no way atom or connection uri can be on the recipient node and the
         // recipient node is different from the sender node
+        sw.stop();
+        sw.start("atomUriCheck");
         checkAtomUri(message.getAtomURI(), senderNodeInfo);
+        sw.stop();
+        sw.start("connectionUriCheck");
         checkConnectionUri(message.getConnectionURI(), senderNodeInfo);
         // Check that atom URI for create_atom message corresponds to local pattern
+        sw.stop();
+        sw.start("createMsgAtomUriCheck");
         checkCreateMsgAtomURI(message, senderNodeInfo);
+        sw.stop();
+        sw.start("signerCheck");
         WonMessageDirection statedDirection = message.getEnvelopeType();
         if (statedDirection.isFromOwner()) {
             if (!Objects.equals(message.getSenderAtomURIRequired(), message.getSignerURIRequired())) {
@@ -98,6 +125,11 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
                 throw new WonMessageNotWellFormedException("WonMessage " + message.toShortStringForDebug()
                                 + " is FROM_SYSTEM but not signed by its node");
             }
+        }
+        sw.stop();
+        if (logger.isDebugEnabled()) {
+            logger.debug(LogMarkers.TIMING, "URI Consistency check timing for message {}:\n{}",
+                            message.getMessageURIRequired(), sw.prettyPrint());
         }
         return message;
     }

@@ -18,7 +18,10 @@ import org.apache.camel.Processor;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.util.IsoMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StopWatch;
 
 import won.node.camel.service.WonCamelHelper;
 import won.node.service.persistence.AtomService;
@@ -30,6 +33,7 @@ import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.exception.EventAlreadyProcessedException;
 import won.protocol.model.Atom;
 import won.protocol.model.MessageEvent;
+import won.protocol.util.LogMarkers;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
@@ -44,6 +48,7 @@ import won.protocol.util.WonRdfUtils;
  * User: ypanchenko Date: 23.04.2015
  */
 public class UriAlreadyUsedCheckingWonMessageProcessor implements Processor {
+    Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     private MessageService messageService;
     @Autowired
@@ -51,6 +56,8 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
+        StopWatch sw = new StopWatch();
+        sw.start();
         WonMessage message = WonCamelHelper.getMessageRequired(exchange);
         WonMessageDirection direction = WonCamelHelper.getDirectionRequired(exchange);
         Optional<URI> parentUri = WonCamelHelper.getParentURI(exchange);
@@ -61,6 +68,9 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements Processor {
             checkEventURI(message, parentUri.get());
         }
         checkAtomURI(message);
+        sw.stop();
+        logger.debug(LogMarkers.TIMING, "URI in use check for message {} took {} milllis",
+                        message.getMessageURIRequired(), sw.getLastTaskTimeMillis());
     }
 
     private void checkAtomURI(final WonMessage message) {

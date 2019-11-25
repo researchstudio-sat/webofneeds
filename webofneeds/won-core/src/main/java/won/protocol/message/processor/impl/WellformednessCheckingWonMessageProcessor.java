@@ -16,11 +16,13 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StopWatch;
 
 import won.protocol.exception.WonMessageNotWellFormedException;
 import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.WonMessageProcessor;
+import won.protocol.util.LogMarkers;
 import won.protocol.util.RdfUtils;
 import won.protocol.validation.WonMessageValidator;
 
@@ -40,9 +42,14 @@ public class WellformednessCheckingWonMessageProcessor implements WonMessageProc
 
     @Override
     public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
+        StopWatch sw = new StopWatch();
+        sw.start();
         for (WonMessage msg : message.getAllMessages()) {
             checkMessage(msg);
         }
+        sw.stop();
+        logger.debug(LogMarkers.TIMING, "checking message {} took {} millis", message.getMessageURIRequired(),
+                        sw.getLastTaskTimeMillis());
         return message;
     }
 
