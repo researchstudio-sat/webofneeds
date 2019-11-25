@@ -30,6 +30,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.util.StopWatch;
 import org.springframework.web.client.HttpClientErrorException;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
 import won.cryptography.rdfsign.SignatureVerificationState;
 import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.protocol.exception.WonMessageProcessingException;
@@ -48,8 +52,12 @@ import won.protocol.util.linkeddata.LinkedDataSource;
  */
 public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private final Ehcache webIdCache;
 
     public SignatureCheckingWonMessageProcessor() {
+        CacheManager manager = CacheManager.getInstance();
+        this.webIdCache = new Cache("SignatureCheckingWonMessageProcessor", 100, false, false, 3600, 3600);
+        manager.addCache(webIdCache);
     }
 
     public void setLinkedDataSource(final LinkedDataSource linkedDataSource) {
@@ -62,7 +70,6 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
     @Override
     public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
         StopWatch sw = new StopWatch();
-        sw.start();
         try {
             SignatureVerificationState result;
             /*
@@ -77,9 +84,13 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
             for (WonMessage toCheck : message.getAllMessages()) {
                 try {
                     // obtain public keys
+                    sw.start("get public keys");
                     Map<String, PublicKey> keys = getRequiredPublicKeys(toCheck.getCompleteDataset());
+                    sw.stop();
                     // verify with those public keys
+                    sw.start("verify");
                     result = WonMessageSignerVerifier.verify(keys, toCheck);
+                    sw.stop();
                     if (logger.isDebugEnabled()) {
                         logger.debug("VERIFIED=" + result.isVerificationPassed()
                                         + " with keys: " + keys.values()
@@ -130,9 +141,9 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
             }
             return message;
         } finally {
-            sw.stop();
-            logger.debug(LogMarkers.TIMING, "Signature check for message {} took {} millis",
-                            message.getMessageURIRequired(), sw.getLastTaskTimeMillis());
+            logger.debug(LogMarkers.TIMING, "Signature check for message {} took {} millis, details:\n {}",
+                            new Object[] { message.getMessageURIRequired(), sw.getTotalTimeMillis(),
+                                            sw.prettyPrint() });
         }
     }
 
@@ -164,22 +175,33 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
      */
     private Map<String, PublicKey> getRequiredPublicKeys(final Dataset msgDataset)
                     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
+        StopWatch sw = new StopWatch();
+        sw.start("read embedded keys");
         // extracted and then
         WonKeysReaderWriter keyReader = new WonKeysReaderWriter();
         // extract keys if directly provided in the message content:
         Map<String, PublicKey> keys = keyReader.readFromDataset(msgDataset);
+        sw.stop();
+        // don't put the embedded keys in the cache - they have not been retrieved from
+        // the WebID URI, they could be wrong!
+        // just continue loading referenced keys. We will have to load each key once
+        // from its WebID URI
+        if (logger.isDebugEnabled()) {
+            logger.debug("Embedded keys: {}", keys.keySet());
+        }
+        sw.start("extract referenced keys");
         // extract referenced key by dereferencing a (kind of) webid of a signer
         Set<String> refKeys = keyReader.readKeyReferences(msgDataset);
+        sw.stop();
         if (logger.isDebugEnabled()) {
             logger.debug("referenced keys: " + Arrays.toString(refKeys.toArray()));
         }
         for (String refKey : refKeys) {
             if (!keys.containsKey(refKey)) {
-                Dataset keyDataset = linkedDataSource.getDataForResource(URI.create(refKey));
-                // TODO replace the WonKeysReaderWriter methods with WonRDFUtils methods and use
-                // the WonKeysReaderWriter
-                // itself internally there in those methods
-                Set<PublicKey> resolvedKeys = keyReader.readFromDataset(keyDataset, refKey);
+                logger.debug("loading referenced key {}", refKey);
+                sw.start("load referenced key");
+                Set<PublicKey> resolvedKeys = loadKey(refKey, keyReader);
+                sw.stop();
                 for (PublicKey resolvedKey : resolvedKeys) {
                     keys.put(refKey, resolvedKey);
                     // TODO now we only expect one key but in future there could be several keys for
@@ -190,7 +212,32 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
         }
         if (logger.isDebugEnabled()) {
             logger.debug("retrieved public keys of these webids: " + Arrays.toString(keys.keySet().toArray()));
+            logger.debug(LogMarkers.TIMING, "Timing info: \n{}", sw.prettyPrint());
         }
         return keys;
+    }
+
+    public Set<PublicKey> loadKey(String keyURI, WonKeysReaderWriter keyReader)
+                    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
+        Element cachedElement = webIdCache.get(keyURI);
+        if (cachedElement != null) {
+            return (Set<PublicKey>) cachedElement.getObjectValue();
+        } else {
+            Set<PublicKey> ret = loadKeyRemotely(keyReader, keyURI);
+            if (ret != null && ret.size() > 0) {
+                webIdCache.put(new Element(keyURI, ret));
+            }
+            return ret;
+        }
+    }
+
+    public Set<PublicKey> loadKeyRemotely(WonKeysReaderWriter keyReader, String refKey)
+                    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
+        Dataset keyDataset = linkedDataSource.getDataForResource(URI.create(refKey));
+        // TODO replace the WonKeysReaderWriter methods with WonRDFUtils methods and use
+        // the WonKeysReaderWriter
+        // itself internally there in those methods
+        Set<PublicKey> resolvedKeys = keyReader.readFromDataset(keyDataset, refKey);
+        return resolvedKeys;
     }
 }
