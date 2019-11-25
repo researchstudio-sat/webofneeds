@@ -20,7 +20,6 @@ import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.DiscriminatorColumn;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -49,8 +48,7 @@ public abstract class MessageContainer implements VersionedEntity {
     private URI parentUri;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "messageContainer")
     private Collection<MessageEvent> events = new ArrayList<>(1);
-    @ElementCollection(fetch = FetchType.EAGER, targetClass = URI.class)
-    @Convert(converter = URIConverter.class)
+    @Convert(converter = URISetConverter.class)
     private Set<URI> unconfirmed = new HashSet<>();
     @Column(name = "version", columnDefinition = "integer DEFAULT 0", nullable = false)
     private int version = 0;

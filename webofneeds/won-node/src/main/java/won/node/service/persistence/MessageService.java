@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 
 import won.protocol.exception.DuplicateResponseException;
 import won.protocol.exception.IncoherentDatabaseStateException;
@@ -28,6 +29,7 @@ import won.protocol.model.ConnectionMessageContainer;
 import won.protocol.model.DatasetHolder;
 import won.protocol.model.MessageContainer;
 import won.protocol.model.MessageEvent;
+import won.protocol.model.PendingConfirmation;
 import won.protocol.repository.AtomMessageContainerRepository;
 import won.protocol.repository.ConnectionContainerRepository;
 import won.protocol.repository.ConnectionMessageContainerRepository;
@@ -35,6 +37,7 @@ import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.DatasetHolderRepository;
 import won.protocol.repository.MessageContainerRepository;
 import won.protocol.repository.MessageEventRepository;
+import won.protocol.repository.PendingConfirmationRepository;
 
 @Component
 public class MessageService {
@@ -53,6 +56,8 @@ public class MessageService {
     protected DatasetHolderRepository datasetHolderRepository;
     @Autowired
     private MessageEventRepository messageEventRepository;
+    @Autowired
+    private PendingConfirmationRepository pendingConfirmationRepository;
 
     public Optional<MessageEvent> getMessage(URI messageURI, URI parentURI) {
         return messageEventRepository.findOneByMessageURIAndParentURI(messageURI, parentURI);
@@ -143,44 +148,49 @@ public class MessageService {
     private void removeConfirmed(final MessageContainer container, final WonMessage message, final URI parent) {
         // the message might be an external message referencing some of our messages.
         // if that is the case, that transitively confirms their earlier messages
+        StopWatch sw = new StopWatch();
         if (logger.isDebugEnabled()) {
             logger.debug("Checking if message {} confirms any unconfirmed messages in the message container of {}",
                             message.toShortStringForDebug(), parent);
         }
+        sw.start("get previous URIs from message");
         Set<URI> previous = message.getPreviousMessageURIs().stream().collect(Collectors.toSet());
+        sw.stop();
         if (logger.isDebugEnabled()) {
             logger.debug("{} previous messages referenced by external response {} ",
                             previous.size(), message.toShortStringForDebug());
             logger.debug("previous messages: {}", previous);
         }
-        List<MessageEvent> prevMsgs = previous.stream().map(prev -> {
-            Optional<MessageEvent> prevEvent = messageEventRepository.findOneByMessageURIAndParentURI(prev, parent);
-            if (!prevEvent.isPresent()) {
-                // the message we received references a message we don't know.
-                // this can happen if the message overtook another one. We could keep it for a
-                // while
-                // and reprocess it after the next message in this container.
-                // for now, just cause a failure
-                throw new NoSuchMessageException(prev);
-            }
-            return prevEvent.get();
-        }).collect(Collectors.toList());
-        logger.debug("Successfully loaded the referenced messages");
-        Set<URI> confirmed = prevMsgs
-                        .stream()
-                        .flatMap(ev -> WonMessage.of(ev.getDatasetHolder().getDataset()).getPreviousMessageURIs()
-                                        .stream())
+        sw.start("load pending");
+        Set<PendingConfirmation> pending = pendingConfirmationRepository
+                        .findAllByMessageContainerIdAndConfirmingMessageURIIn(container.getId(), previous);
+        sw.stop();
+        sw.start("determine confirmed");
+        Set<URI> confirmed = pending.stream()
+                        .filter(pc -> previous.contains(pc.getConfirmingMessageURI()))
+                        .flatMap(pc -> pc.getConfirmedMessageURIs().stream())
                         .collect(Collectors.toSet());
+        sw.stop();
         if (logger.isDebugEnabled()) {
             logger.debug("{} unconfirmed for message container of {}, Removing {} ",
                             new Object[] { container.getUnconfirmed().size(), parent, confirmed.size() });
             logger.debug("unconfirmed: {}", container.getUnconfirmed());
             logger.debug("confirmed: {}", confirmed);
         }
+        sw.start("remove unconfirmed");
         container.removeUnconfirmed(confirmed);
+        sw.stop();
+        sw.start("remove pending");
+        // container.removePendingConfirmations(previous);
+        pendingConfirmationRepository.deleteByMessageContainerIdAndConfirmingMessageURIIn(container.getId(), previous);
+        sw.stop();
         if (logger.isDebugEnabled()) {
             logger.debug("{} messages left in unconfirmed list of the message container of {}",
                             new Object[] { container.getUnconfirmed().size(), parent });
+        }
+        logger.debug("removing confirmed took {} millis", sw.getLastTaskTimeMillis());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Timinig info: \n{}", sw.prettyPrint());
         }
     }
 
@@ -218,6 +228,17 @@ public class MessageService {
                     logger.debug("Adding as unconfirmed message: {}", wonMessage.getMessageURIRequired());
                 }
                 container.addUnconfirmed(wonMessage.getMessageURIRequired());
+            } else if (isOwnSuccessResponseInConnection(parent, wonMessage)) {
+                // our message confirms a number of remote ones (those that were in the
+                // confirmed list). However, only when a remote message confirms ours, we can
+                // remove them from the unconfirmed list
+                List<URI> previous = wonMessage.getPreviousMessageURIs();
+                if (!previous.isEmpty()) {
+                    PendingConfirmation newPending = new PendingConfirmation(container,
+                                    wonMessage.getMessageURIRequired(),
+                                    previous.stream().collect(Collectors.toSet()));
+                    pendingConfirmationRepository.save(newPending);
+                }
             } else if (isOwnSuccessResponseInAtom(parent, wonMessage)) {
                 removeConfirmed(container, wonMessage, parent);
                 if (logger.isDebugEnabled()) {
@@ -247,6 +268,14 @@ public class MessageService {
     public boolean isExternalSuccessResponseInConnection(URI parent, WonMessage wonMessage) {
         return wonMessage.getConnectionURI() != null
                         && !Objects.equals(parent, wonMessage.getConnectionURI())
+                        && wonMessage.getEnvelopeType().isFromSystem()
+                        && wonMessage.getMessageTypeRequired().isSuccessResponse()
+                        && wonMessage.getRespondingToMessageTypeRequired().isConnectionSpecificMessage();
+    }
+
+    public boolean isOwnSuccessResponseInConnection(URI parent, WonMessage wonMessage) {
+        return wonMessage.getConnectionURI() != null
+                        && Objects.equals(parent, wonMessage.getConnectionURI())
                         && wonMessage.getEnvelopeType().isFromSystem()
                         && wonMessage.getMessageTypeRequired().isSuccessResponse()
                         && wonMessage.getRespondingToMessageTypeRequired().isConnectionSpecificMessage();

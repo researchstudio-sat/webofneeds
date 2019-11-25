@@ -3,7 +3,6 @@ package won.cryptography.rdfsign;
 import java.io.StringWriter;
 import java.lang.invoke.MethodHandles;
 import java.security.PrivateKey;
-import java.security.Provider;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ import org.apache.jena.ext.com.google.common.collect.Streams;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,13 +36,10 @@ public class WonSigner {
     public static final String ENV_HASH_ALGORITHM = "sha-256";
     public static final Type HASH_ALGORITHM_FOR_MULTIHASH = Type.sha2_256;
     private Dataset dataset;
-    private WonHasher hasher;
+    private WonHasher hasher = new WonHasher();
 
     public WonSigner(Dataset dataset) {
         this.dataset = dataset;
-        // default algorithm: Fisteus2010
-        Provider provider = new BouncyCastleProvider();
-        this.hasher = new WonHasher();
     }
 
     /**

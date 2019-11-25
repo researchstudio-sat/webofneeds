@@ -40,13 +40,17 @@ ALTER TABLE connection ALTER COLUMN connectionuri SET NOT NULL;
 
 -- Table: public.messagecontainer_unconfirmed
 
-CREATE TABLE messagecontainer_unconfirmed
+CREATE TABLE public.pendingconfirmation
 (
+    id bigint NOT NULL,
+    confirmedmessageuri oid,
+    confirmingmessageuri character varying(255) COLLATE pg_catalog."default" NOT NULL,
     messagecontainer_id bigint NOT NULL,
-    unconfirmed character varying(255) COLLATE pg_catalog."default",
-    CONSTRAINT fkgrs8fwpa6quslrln90ntcqs26 FOREIGN KEY (messagecontainer_id)
+    CONSTRAINT pendingconfirmation_pkey PRIMARY KEY (id),
+    CONSTRAINT idx_pendingconfirmation_to_container_id UNIQUE (messagecontainer_id, confirmingmessageuri)
+,
+    CONSTRAINT fk_pendingconfirmation FOREIGN KEY (messagecontainer_id)
         REFERENCES public.message_container (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-        NOT VALID
+        ON DELETE CASCADE
 )
+

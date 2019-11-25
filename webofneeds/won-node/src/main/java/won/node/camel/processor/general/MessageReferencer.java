@@ -18,6 +18,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StopWatch;
 
 import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
@@ -41,6 +42,8 @@ public class MessageReferencer {
      */
     public WonMessage addMessageReferences(final WonMessage message, URI parentURI)
                     throws WonMessageProcessingException {
+        StopWatch sw = new StopWatch();
+        sw.start();
         if (message.getMessageTypeRequired().isSuccessResponse()
                         && (Objects.equals(message.getConnectionURI(), parentURI)
                                         || Objects.equals(message.getAtomURI(), parentURI))) {
@@ -60,6 +63,8 @@ public class MessageReferencer {
                 logger.debug("No unconfirmed messages found");
             }
         }
+        sw.stop();
+        logger.info("adding unconfirmed took {} millis", sw.getLastTaskTimeMillis());
         return message;
     }
 }

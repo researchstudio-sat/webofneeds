@@ -6,7 +6,6 @@ import java.io.StringWriter;
 import java.lang.invoke.MethodHandles;
 import java.math.BigInteger;
 import java.net.URI;
-import java.security.Provider;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.util.Base64;
@@ -20,7 +19,6 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +43,6 @@ public class WonVerifier {
     private URI messageURI;
 
     public WonVerifier(WonMessage message) {
-        Provider provider = new BouncyCastleProvider();
         this.dataset = message.getCompleteDataset();
         this.messageURI = message.getMessageURIRequired();
         prepareForVerifying();
@@ -153,7 +150,7 @@ public class WonVerifier {
             GraphCollection inputGraph = ModelConverter.modelsToGraphCollection(dataset,
                             wonSignatureData.getSignedGraphUris()
                                             .toArray(new String[wonSignatureData.getSignedGraphUris().size()]));
-            SignatureData sigData = this.hasher.hashNamedGraphForSigning(inputGraph);
+            SignatureData sigData = hasher.hashNamedGraphForSigning(inputGraph);
             // check the hash of the data. It must be identical to the hash in the signature
             BigInteger hashValue = sigData.getHash();
             String hashString = WonHasher.hashToString(hashValue);
