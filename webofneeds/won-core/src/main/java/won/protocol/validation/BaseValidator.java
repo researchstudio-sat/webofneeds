@@ -18,12 +18,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.jena.query.Dataset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.util.StopWatch;
 
 /**
  * Base class for validators. Provides the validate methods.
  */
 public abstract class BaseValidator {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     protected Map<String, List<WonSparqlValidator>> dirToValidator = new LinkedHashMap<>();
 
     public final boolean validate(Dataset input) {
@@ -39,17 +43,41 @@ public abstract class BaseValidator {
     }
 
     public final boolean validate(Dataset input, StringBuilder causePlaceholder) {
-        for (String dir : dirToValidator.keySet()) {
-            List<WonSparqlValidator> validators = dirToValidator.get(dir);
-            for (WonSparqlValidator validator : validators) {
-                WonSparqlValidator.ValidationResult result = validator.validate(input);
-                if (!result.isValid()) {
-                    causePlaceholder.append(dir);
-                    causePlaceholder.append(validator.getName());
-                    causePlaceholder.append(": ").append(result.getErrorMessage());
-                    return false;
+        // tests that are sometimes very expensive in spqarl, but cheap here are done
+        // here
+        StopWatch sw = new StopWatch();
+        try {
+            if (!checkEmptyDefaultGraph(input, causePlaceholder)) {
+                return false;
+            }
+            int valNum = 0;
+            for (String dir : dirToValidator.keySet()) {
+                List<WonSparqlValidator> validators = dirToValidator.get(dir);
+                for (WonSparqlValidator validator : validators) {
+                    sw.start("validator" + valNum + ": " + validator.getName());
+                    WonSparqlValidator.ValidationResult result = validator.validate(input);
+                    sw.stop();
+                    if (!result.isValid()) {
+                        causePlaceholder.append(dir);
+                        causePlaceholder.append(validator.getName());
+                        causePlaceholder.append(": ").append(result.getErrorMessage());
+                        return false;
+                    }
+                    valNum++;
                 }
             }
+            return true;
+        } finally {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Timing info for Validation: \n{}", sw.prettyPrint());
+            }
+        }
+    }
+
+    private boolean checkEmptyDefaultGraph(Dataset input, StringBuilder cause) {
+        if (input.getDefaultModel() != null && !input.getDefaultModel().isEmpty()) {
+            cause.append("Default graph is not empty");
+            return false;
         }
         return true;
     }
