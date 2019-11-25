@@ -10,6 +10,10 @@
  */
 package won.protocol.rest;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.text.MessageFormat;
+
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,14 +21,13 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StopWatch;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.text.MessageFormat;
+import won.protocol.util.LogMarkers;
 
 public abstract class LinkedDataRestClient {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -68,6 +71,8 @@ public abstract class LinkedDataRestClient {
     protected DatasetResponseWithStatusCodeAndHeaders readResourceData(URI resourceURI, RestTemplate restTemplate,
                     HttpHeaders requestHeaders) {
         assert resourceURI != null : "resource URI must not be null";
+        StopWatch sw = new StopWatch();
+        sw.start();
         logger.debug("fetching linked data resource: {}", resourceURI);
         // If a RestClientException is thrown here complaining that it can't read a
         // Model with MIME media type text/html,
@@ -113,6 +118,8 @@ public abstract class LinkedDataRestClient {
             logger.debug("fetched model with {} statements in default model for resource {}",
                             result.getDefaultModel().size(), resourceURI);
         }
+        sw.stop();
+        logger.debug(LogMarkers.TIMING, "fetching {} took {} millis", resourceURI, sw.getLastTaskTimeMillis());
         return new DatasetResponseWithStatusCodeAndHeaders(result, statusCode, responseHeaders);
     }
 }

@@ -42,12 +42,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.StopWatch;
 
 import ch.qos.logback.core.util.Duration;
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
+import won.protocol.util.LogMarkers;
 
 /**
  * LinkedDataSource implementation that uses an ehcache for caching.
@@ -134,31 +136,39 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     }
 
     public Dataset getDataForResource(URI resource, URI requesterWebID) {
-        if (resource == null)
-            throw new IllegalArgumentException("resource cannot be null");
-        Element element;
+        StopWatch sw = new StopWatch();
+        sw.start();
         try {
-            element = cache.get(makeCacheKey(resource, requesterWebID));
-        } catch (CacheException e) {
-            // logging on warn level as not reporting errors here can make misconfiguration
-            // hard to detect
-            logger.warn(String.format("Couldn't fetch resource %s", resource));
-            logger.debug("Exception is:", e);
-            return DatasetFactory.createGeneral();
-        }
-        LinkedDataCacheEntry linkedDataCacheEntry = null;
-        if (element != null) {
-            // cached element found
-            Object cachedObject = element.getObjectValue();
-            if (!(cachedObject instanceof LinkedDataCacheEntry)) {
-                // wrong type - how did that happen?
-                throw new IllegalStateException(new MessageFormat(
-                                "The underlying linkedDataCache should only contain Datasets, but we got a {0} for URI {1}")
-                                                .format(new Object[] { cachedObject.getClass(), resource }));
+            if (resource == null)
+                throw new IllegalArgumentException("resource cannot be null");
+            Element element;
+            try {
+                element = cache.get(makeCacheKey(resource, requesterWebID));
+            } catch (CacheException e) {
+                // logging on warn level as not reporting errors here can make misconfiguration
+                // hard to detect
+                logger.warn(String.format("Couldn't fetch resource %s", resource));
+                logger.debug("Exception is:", e);
+                return DatasetFactory.createGeneral();
             }
-            linkedDataCacheEntry = (LinkedDataCacheEntry) cachedObject;
+            LinkedDataCacheEntry linkedDataCacheEntry = null;
+            if (element != null) {
+                // cached element found
+                Object cachedObject = element.getObjectValue();
+                if (!(cachedObject instanceof LinkedDataCacheEntry)) {
+                    // wrong type - how did that happen?
+                    throw new IllegalStateException(new MessageFormat(
+                                    "The underlying linkedDataCache should only contain Datasets, but we got a {0} for URI {1}")
+                                                    .format(new Object[] { cachedObject.getClass(), resource }));
+                }
+                linkedDataCacheEntry = (LinkedDataCacheEntry) cachedObject;
+            }
+            return fetchOrUseCached(resource, requesterWebID, linkedDataCacheEntry).getDataset();
+        } finally {
+            sw.stop();
+            logger.debug(LogMarkers.TIMING, "obtaining (possibly cached) resource {} took {} millis", resource,
+                            sw.getLastTaskTimeMillis());
         }
-        return fetchOrUseCached(resource, requesterWebID, linkedDataCacheEntry).getDataset();
     }
 
     /**
