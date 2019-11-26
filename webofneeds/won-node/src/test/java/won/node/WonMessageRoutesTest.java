@@ -278,7 +278,9 @@ public abstract class WonMessageRoutesTest {
             WonMessage msg = getMessage(ex);
             boolean result = (msg.getMessageTypeRequired().isFailureResponse()
                             && messageURI.equals(msg.getRespondingToMessageURI()));
-            logger.debug("predicate 'isFailureResponseTo({})' = {}", messageURI, result);
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "mesaggeURI", messageURI, msg);
+            }
             return result;
         };
     }
@@ -296,7 +298,9 @@ public abstract class WonMessageRoutesTest {
             WonMessage msg = getMessage(exchange);
             boolean result = (msg.getMessageTypeRequired().isFailureResponse()
                             && messageURI.equals(msg.getRespondingToMessageURI()));
-            logger.debug("predicate 'isFailureResponseTo({})' = {}", messageURI, result);
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "mesaggeURI", messageURI, msg);
+            }
             return result;
         }
     }
@@ -323,7 +327,9 @@ public abstract class WonMessageRoutesTest {
             WonMessage msg = getMessage(exchange);
             boolean result = (msg.getMessageTypeRequired().isSuccessResponse()
                             && messageURI.equals(msg.getRespondingToMessageURI()));
-            logger.debug("predicate 'isSuccessResponseTo({})' = {}", messageURI, result);
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "mesaggeURI", messageURI, msg);
+            }
             return result;
         }
     }
@@ -395,7 +401,9 @@ public abstract class WonMessageRoutesTest {
         public boolean matches(Exchange exchange) {
             WonMessage msg = getMessage(exchange);
             boolean result = msg.getMessageURIRequired().equals(messageURI) && (!msg.getResponse().isPresent());
-            logger.debug("predicate 'isMessage({})' = {}", messageURI, result);
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "messageURI", messageURI, msg);
+            }
             return result;
         }
     }
@@ -417,7 +425,9 @@ public abstract class WonMessageRoutesTest {
             WonMessage msg = getMessage(exchange);
             boolean result = ((msg.getMessageTypeRequired().isSocketHintMessage()
                             && socketURI.equals(msg.getRecipientSocketURIRequired())));
-            logger.debug("predicate 'isSocketHintFor({})' = {}", socketURI, result);
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "socketURI", socketURI, msg);
+            }
             return result;
         }
     }
@@ -439,7 +449,9 @@ public abstract class WonMessageRoutesTest {
             WonMessage msg = getMessage(exchange);
             boolean result = (msg.getMessageTypeRequired().isAtomCreatedNotification()
                             && msg.getSenderAtomURIRequired().equals(atomURI));
-            logger.debug("predicate 'isAtomCreatedNotification({})' = {}", atomURI, result);
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "atomURI", atomURI, msg);
+            }
             return result;
         }
     }
@@ -529,17 +541,20 @@ public abstract class WonMessageRoutesTest {
             Optional<WonMessage> resp = msg.getResponse();
             if (resp.isPresent()) {
                 if (resp.get().getConnectionURI() == null) {
+                    logMessageForFailedPredicate(getClass().getName(), "[no parameter]", null, msg);
                     return false;
                 }
             }
             resp = msg.getRemoteResponse();
             if (resp.isPresent()) {
                 if (resp.get().getConnectionURI() == null) {
+                    logMessageForFailedPredicate(getClass().getName(), "[no parameter]", null, msg);
                     return false;
                 }
             }
             if (msg.isRemoteResponse()) {
                 if (msg.getConnectionURI() == null) {
+                    logMessageForFailedPredicate(getClass().getName(), "[no parameter]", null, msg);
                     return false;
                 }
             }
@@ -566,9 +581,13 @@ public abstract class WonMessageRoutesTest {
         @Override
         public boolean matches(Exchange exchange) {
             WonMessage msg = getMessage(exchange);
-            return Objects.equals(msgUri, msg.getMessageURIRequired())
+            boolean result = Objects.equals(msgUri, msg.getMessageURIRequired())
                             && msg.getResponse().isPresent()
                             && msg.getRemoteResponse().isPresent();
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "msgUri", msgUri, msg);
+            }
+            return result;
         }
     }
 
@@ -603,7 +622,7 @@ public abstract class WonMessageRoutesTest {
         return new RemoteResponseConfirmsNPreviousMessages(n);
     }
 
-    private static class OwnResponseConfirmsNPreviousMessages implements Predicate {
+    private class OwnResponseConfirmsNPreviousMessages implements Predicate {
         private final int n;
 
         public OwnResponseConfirmsNPreviousMessages(int n) {
@@ -614,19 +633,20 @@ public abstract class WonMessageRoutesTest {
         @Override
         public boolean matches(Exchange exchange) {
             WonMessage msg = getMessageRequired(exchange);
-            System.out.println("OwnResponseConfirmsNPrevious (" + n + " checking:");
-            System.out.println(RdfUtils.toString(Prefixer.setPrefixes(msg.getCompleteDataset()),
-                            Lang_WON.TRIG_WON_CONVERSATION));
             Optional<WonMessage> resp = msg.getResponse();
             if (resp.isPresent()) {
-                return resp.get().getPreviousMessageURIs().size() == n;
+                boolean result = resp.get().getPreviousMessageURIs().size() == n;
+                if (!result) {
+                    logMessageForFailedPredicate(getClass().getName(), "n", Integer.valueOf(n), msg);
+                }
+                return result;
             }
             // do not fail if we don't have a local response
             return true;
         }
     }
 
-    private static class RemoteResponseConfirmsNPreviousMessages implements Predicate {
+    private class RemoteResponseConfirmsNPreviousMessages implements Predicate {
         private final int n;
 
         public RemoteResponseConfirmsNPreviousMessages(int n) {
@@ -637,12 +657,13 @@ public abstract class WonMessageRoutesTest {
         @Override
         public boolean matches(Exchange exchange) {
             WonMessage msg = getMessageRequired(exchange);
-            System.out.println("RemoteResponseConfirmsNPrevious (" + n + " checking:");
-            System.out.println(RdfUtils.toString(Prefixer.setPrefixes(msg.getCompleteDataset()),
-                            Lang_WON.TRIG_WON_CONVERSATION));
             Optional<WonMessage> resp = msg.getRemoteResponse();
             if (resp.isPresent()) {
-                return resp.get().getPreviousMessageURIs().size() == n;
+                boolean result = resp.get().getPreviousMessageURIs().size() == n;
+                if (!result) {
+                    logMessageForFailedPredicate(getClass().getName(), "n", Integer.valueOf(n), msg);
+                }
+                return result;
             }
             // do not fail if we don't have a remote response
             return true;
