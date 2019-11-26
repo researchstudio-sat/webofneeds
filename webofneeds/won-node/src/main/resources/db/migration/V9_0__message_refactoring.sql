@@ -31,7 +31,7 @@ ALTER TABLE connection ALTER COLUMN atomuri SET NOT NULL;
 ALTER TABLE connection ALTER COLUMN targetatomuri SET NOT NULL;
 ALTER TABLE connection ALTER COLUMN atomuri SET NOT NULL;
 ALTER TABLE connection ALTER COLUMN socketuri SET NOT NULL;
-ALTER TABLE connection ALTER COLUMN remotesocketuri SET NOT NULL;
+ALTER TABLE connection ALTER COLUMN targetsocketuri SET NOT NULL;
 ALTER TABLE connection ALTER COLUMN connectionuri SET NOT NULL;
 
 -- Table: public.messagecontainer_unconfirmed
