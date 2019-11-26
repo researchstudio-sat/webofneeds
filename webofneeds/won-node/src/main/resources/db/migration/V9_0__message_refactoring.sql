@@ -26,7 +26,7 @@ CREATE INDEX IDX_ME_RECIPIENT_ATOM_URI on message_event(messageuri, recipientato
 -- store only one response from a container
 ALTER TABLE message_event ADD COLUMN responsetouri VARCHAR(255) default null;
 ALTER TABLE message_event ADD COLUMN responseparenturi VARCHAR(255) default null;
-CREATE INDEX IDX_ME_UNIQUE_RESPONSE_PER_CONTAINER on message_event(parenturi, respondingtouri, responsecontaineruri) 
+CREATE INDEX IDX_ME_UNIQUE_RESPONSE_PER_CONTAINER on message_event(parenturi, respondingtouri, responsecontaineruri);
 
 
 -- make essential fields in connection non-nullable
