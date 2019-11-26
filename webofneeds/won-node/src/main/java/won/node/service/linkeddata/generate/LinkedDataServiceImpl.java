@@ -68,6 +68,7 @@ import won.protocol.model.unread.UnreadMessageInfo;
 import won.protocol.model.unread.UnreadMessageInfoForAtom;
 import won.protocol.repository.AtomRepository;
 import won.protocol.repository.DatasetHolderRepository;
+import won.protocol.repository.MessageContainerRepository;
 import won.protocol.repository.MessageEventRepository;
 import won.protocol.service.impl.UnreadInformationService;
 import won.protocol.util.DefaultAtomModelWrapper;
@@ -95,6 +96,8 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
     private String resourceURIPrefix;
     @Autowired
     private MessageEventRepository messageEventRepository;
+    @Autowired
+    private MessageContainerRepository messageContainerRepository;
     @Autowired
     private AtomRepository atomRepository;
     @Autowired
@@ -255,7 +258,7 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
                         WON.MessageContainer);
         metaModel.add(metaModel.createStatement(atomResource, WON.messageContainer, atomMessageContainer));
         // add atom event URIs
-        Collection<MessageEvent> messageEvents = atom.getMessageContainer().getEvents();
+        Collection<MessageEvent> messageEvents = messageEventRepository.findByParentURI(atomUri);
         for (MessageEvent messageEvent : messageEvents) {
             metaModel.add(metaModel.createStatement(atomMessageContainer, RDFS.member,
                             metaModel.getResource(messageEvent.getMessageURI().toString())));

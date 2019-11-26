@@ -45,6 +45,7 @@ import won.protocol.model.AtomState;
 import won.protocol.model.Connection;
 import won.protocol.repository.AtomMessageContainerRepository;
 import won.protocol.repository.AtomRepository;
+import won.protocol.repository.MessageEventRepository;
 import won.protocol.service.WonNodeInformationService;
 
 @ContextConfiguration(locations = { "classpath:/won/node/PersistenceTest.xml",
@@ -64,6 +65,8 @@ public class PersistenceTest {
     AtomRepository atomRepository;
     @Autowired
     AtomMessageContainerRepository atomMessageContainerRepository;
+    @Autowired
+    MessageEventRepository messageEventRepository;
     @Autowired
     AtomService atomService;
     @Autowired
@@ -141,7 +144,7 @@ public class PersistenceTest {
                         .build();
         messageService.saveMessage(responseMessage, atom.getAtomURI());
         Atom atom2 = atomService.getAtomRequired(atomURI);
-        assertEquals(2, atom2.getMessageContainer().getEvents().size());
+        assertEquals(2, messageEventRepository.findByParentURI(atom2.getAtomURI()).size());
     }
 
     @Test
@@ -159,7 +162,7 @@ public class PersistenceTest {
                         .build();
         messageService.saveMessage(responseMessage, atom.getAtomURI());
         Atom checkAtom = atomService.getAtomRequired(atomURI);
-        assertEquals(2, checkAtom.getMessageContainer().getEvents().size());
+        assertEquals(2, messageEventRepository.findByParentURI(checkAtom.getAtomURI()).size());
         //
         // create another atom
         ds = createTestDataset("/won/node/test-messages/create-atom2.trig");
@@ -174,7 +177,7 @@ public class PersistenceTest {
                         .build();
         messageService.saveMessage(responseMessage2, atom2.getAtomURI());
         checkAtom = atomService.getAtomRequired(atomURI2);
-        assertEquals(2, checkAtom.getMessageContainer().getEvents().size());
+        assertEquals(2, messageEventRepository.findByParentURI(checkAtom.getAtomURI()).size());
         //
         // simulate a connect from atom to atom2
         // we'll need a connection uri from the mocked service
@@ -189,11 +192,11 @@ public class PersistenceTest {
         Mockito.when(socketLookup.isCompatible(targetSocket, senderSocket)).thenReturn(true);
         Mockito.when(socketLookup.getCapacityOfType(any(URI.class))).thenReturn(Optional.of(10));
         Mockito.when(socketLookup.isCompatibleSocketTypes(any(URI.class), any(URI.class))).thenReturn(true);
-        WonMessage connectMessage = WonMessageBuilder
+        WonMessage connectMessage = prepareFromOwner(WonMessageBuilder
                         .connect()
                         .sockets().sender(senderSocket).recipient(targetSocket)
                         .content().text("Hey there!")
-                        .build();
+                        .build());
         // processing the message would lead to this call:
         Mockito.when(wonNodeInformationService.generateConnectionURI(atom.getAtomURI()))
                         .thenReturn(URI.create("uri:newconnection1"));
@@ -201,17 +204,17 @@ public class PersistenceTest {
         // then it would be stored:
         messageService.saveMessage(connectMessage, con.getConnectionURI());
         // we'd create a response
-        WonMessage responseForConnectMessage = WonMessageBuilder
+        WonMessage responseForConnectMessage = prepareFromExternalOwner(WonMessageBuilder
                         .response()
                         .respondingToMessageFromOwner(connectMessage)
                         .fromConnection(con.getConnectionURI())
                         .success()
-                        .build();
+                        .build());
         // and store the response
         messageService.saveMessage(responseForConnectMessage, con.getConnectionURI());
         // let's check:
-        assertEquals(2, con.getMessageContainer().getEvents().size());
-        Set<URI> messages = con.getMessageContainer().getEvents().stream()
+        assertEquals(2, messageEventRepository.findByParentURI(con.getConnectionURI()).size());
+        Set<URI> messages = messageEventRepository.findByParentURI(con.getConnectionURI()).stream()
                         .map(mic -> mic.getMessageURI()).collect(Collectors.toSet());
     }
 
@@ -230,7 +233,7 @@ public class PersistenceTest {
                         .build());
         messageService.saveMessage(responseMessage, atom.getAtomURI());
         Atom checkAtom = atomService.getAtomRequired(atomURI);
-        assertEquals(2, checkAtom.getMessageContainer().getEvents().size());
+        assertEquals(2, messageEventRepository.findByParentURI(checkAtom.getAtomURI()).size());
         //
         // create another atom
         ds = createTestDataset("/won/node/test-messages/create-atom2.trig");
@@ -245,7 +248,7 @@ public class PersistenceTest {
                         .build());
         messageService.saveMessage(responseMessage2, atom2.getAtomURI());
         checkAtom = atomService.getAtomRequired(atomURI2);
-        assertEquals(2, checkAtom.getMessageContainer().getEvents().size());
+        assertEquals(2, messageEventRepository.findByParentURI(checkAtom.getAtomURI()).size());
         //
         // simulate a connect from atom to atom2
         // we'll need a connection uri from the mocked service
@@ -281,8 +284,8 @@ public class PersistenceTest {
         // and store the response
         messageService.saveMessage(responseForConnectMessage, con.getConnectionURI());
         // let's check:
-        assertEquals(2, con.getMessageContainer().getEvents().size());
-        Set<URI> messages = con.getMessageContainer().getEvents().stream()
+        assertEquals(2, messageEventRepository.findByParentURI(con.getConnectionURI()).size());
+        Set<URI> messages = messageEventRepository.findByParentURI(con.getConnectionURI()).stream()
                         .map(mic -> mic.getMessageURI()).collect(Collectors.toSet());
         Connection remoteCon = connectionService.connectFromNode(connectMessage);
         messageService.saveMessage(connectMessage, remoteCon.getConnectionURI());
@@ -293,8 +296,8 @@ public class PersistenceTest {
                         .success()
                         .build());
         messageService.saveMessage(responseForConnectMessage2, remoteCon.getConnectionURI());
-        assertEquals(2, con.getMessageContainer().getEvents().size());
-        Set<URI> messages2 = remoteCon.getMessageContainer().getEvents().stream()
+        assertEquals(2, messageEventRepository.findByParentURI(con.getConnectionURI()).size());
+        Set<URI> messages2 = messageEventRepository.findByParentURI(remoteCon.getConnectionURI()).stream()
                         .map(mic -> mic.getMessageURI()).collect(Collectors.toSet());
     }
 

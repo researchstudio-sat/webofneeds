@@ -11,7 +11,6 @@
 package won.protocol.model;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -21,11 +20,9 @@ import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
-import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -46,8 +43,6 @@ public abstract class MessageContainer implements VersionedEntity {
     @Column(name = "parent_uri", nullable = false, unique = true, updatable = false)
     @Convert(converter = URIConverter.class)
     private URI parentUri;
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "messageContainer")
-    private Collection<MessageEvent> events = new ArrayList<>(1);
     @Convert(converter = URISetConverter.class)
     private Set<URI> unconfirmed = new HashSet<>();
     @Column(name = "version", columnDefinition = "integer DEFAULT 0", nullable = false)
@@ -82,14 +77,6 @@ public abstract class MessageContainer implements VersionedEntity {
 
     public void setId(final Long id) {
         this.id = id;
-    }
-
-    public Collection<MessageEvent> getEvents() {
-        return events;
-    }
-
-    public void setEvents(final Collection<MessageEvent> events) {
-        this.events = events;
     }
 
     public int getVersion() {
