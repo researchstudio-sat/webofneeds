@@ -58,6 +58,7 @@ import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
+import org.apache.jena.riot.RDFWriterRegistry;
 import org.apache.jena.shared.Lock;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.Quad;
@@ -73,6 +74,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Iterators;
 
 import won.protocol.exception.IncorrectPropertyCountException;
+import won.protocol.util.pretty.ConversationDatasetWriterFactory;
+import won.protocol.util.pretty.Lang_WON;
 
 /**
  * Utilities for RDF manipulation with Jena.
@@ -81,6 +84,12 @@ public class RdfUtils {
     public static final RDFNode EMPTY_RDF_NODE = null;
     private static final CheapInsecureRandomString randomString = new CheapInsecureRandomString();
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    static {
+        if (!RDFWriterRegistry.contains(Lang_WON.TRIG_WON_CONVERSATION)) {
+            RDFWriterRegistry.register(Lang_WON.TRIG_WON_CONVERSATION,
+                            new ConversationDatasetWriterFactory());
+        }
+    }
 
     public static String toString(Model model) {
         String ret = "";

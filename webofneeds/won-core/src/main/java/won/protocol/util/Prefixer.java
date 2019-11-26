@@ -56,8 +56,10 @@ import won.protocol.vocabulary.WXREVIEW;
 public class Prefixer {
     private static final Pattern PREFIX_PATTERN = Pattern.compile("[^/#]+$");
     static {
-        RDFWriterRegistry.register(Lang_WON.TRIG_WON_CONVERSATION,
-                        new ConversationDatasetWriterFactory());
+        if (!RDFWriterRegistry.contains(Lang_WON.TRIG_WON_CONVERSATION)) {
+            RDFWriterRegistry.register(Lang_WON.TRIG_WON_CONVERSATION,
+                            new ConversationDatasetWriterFactory());
+        }
     }
 
     private static Dataset loadDatasetFromFile(String file) {
