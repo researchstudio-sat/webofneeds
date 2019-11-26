@@ -624,7 +624,7 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
                         or(isAtomCreatedNotification(atomURI), isAtomCreatedNotification(atomURI2)));
         // send message
         sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
-        sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER1);
+        sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER2);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
         WonMessage connectMsg = prepareFromOwner(WonMessageBuilder
                         .connect()
@@ -633,11 +633,12 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
                         .build());
         // expectations for connect
         toOwnerMockEndpoint.expectedMessageCount(3);
-        toOwnerMockEndpoint.expectedMessagesMatches(doesResponseContainSender(),
-                        or(
-                                        isMessageAndResponse(connectMsg),
-                                        isSuccessResponseTo(connectMsg),
-                                        isMessageAndResponseAndRemoteResponse(connectMsg)));
+        toOwnerMockEndpoint.expectedMessagesMatches(isResponseContainsSender(),
+                        // isOwnResponseConfirmsNPrevious(0),
+                        // isRemoteResponseConfirmsNPrevious(1),
+                        isMessageAndResponse(connectMsg),
+                        isSuccessResponseTo(connectMsg),
+                        isMessageAndResponseAndRemoteResponse(connectMsg));
         toMatcherMockEndpoint.expectedMessageCount(0);
         sendFromOwner(connectMsg, OWNERAPPLICATION_ID_OWNER1);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);

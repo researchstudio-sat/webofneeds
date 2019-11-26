@@ -460,7 +460,9 @@ public abstract class WonMessageRoutesTest {
             WonMessage msg = getMessage(ex);
             boolean result = (msg.getMessageTypeRequired().isChangeNotification()
                             && msg.getSenderAtomURIRequired().equals(atomURI));
-            logger.debug("predicate 'isChangeNotificationFor({})' = {}", atomURI, result);
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "atomURI", atomURI, msg);
+            }
             return result;
         }
     }
@@ -503,13 +505,17 @@ public abstract class WonMessageRoutesTest {
         @Override
         public boolean matches(Exchange exchange) {
             WonMessage msg = getMessage(exchange);
-            return Objects.equals(msgUri, msg.getMessageURIRequired())
+            boolean ret = Objects.equals(msgUri, msg.getMessageURIRequired())
                             && msg.getResponse().isPresent()
                             && !msg.getRemoteResponse().isPresent();
+            if (!ret) {
+                logMessageForFailedPredicate(getClass().getName(), "msgUri", msgUri, msg);
+            }
+            return ret;
         }
     }
 
-    protected Predicate doesResponseContainSender() {
+    protected Predicate isResponseContainsSender() {
         return new ResponseContainsConnection();
     }
 
@@ -586,6 +592,60 @@ public abstract class WonMessageRoutesTest {
                 matchesLeft.decrementAndGet();
             }
             return result;
+        }
+    }
+
+    protected Predicate isOwnResponseConfirmsNPrevious(int n) {
+        return new OwnResponseConfirmsNPreviousMessages(n);
+    }
+
+    protected Predicate isRemoteResponseConfirmsNPrevious(int n) {
+        return new RemoteResponseConfirmsNPreviousMessages(n);
+    }
+
+    private static class OwnResponseConfirmsNPreviousMessages implements Predicate {
+        private final int n;
+
+        public OwnResponseConfirmsNPreviousMessages(int n) {
+            super();
+            this.n = n;
+        }
+
+        @Override
+        public boolean matches(Exchange exchange) {
+            WonMessage msg = getMessageRequired(exchange);
+            System.out.println("OwnResponseConfirmsNPrevious (" + n + " checking:");
+            System.out.println(RdfUtils.toString(Prefixer.setPrefixes(msg.getCompleteDataset()),
+                            Lang_WON.TRIG_WON_CONVERSATION));
+            Optional<WonMessage> resp = msg.getResponse();
+            if (resp.isPresent()) {
+                return resp.get().getPreviousMessageURIs().size() == n;
+            }
+            // do not fail if we don't have a local response
+            return true;
+        }
+    }
+
+    private static class RemoteResponseConfirmsNPreviousMessages implements Predicate {
+        private final int n;
+
+        public RemoteResponseConfirmsNPreviousMessages(int n) {
+            super();
+            this.n = n;
+        }
+
+        @Override
+        public boolean matches(Exchange exchange) {
+            WonMessage msg = getMessageRequired(exchange);
+            System.out.println("RemoteResponseConfirmsNPrevious (" + n + " checking:");
+            System.out.println(RdfUtils.toString(Prefixer.setPrefixes(msg.getCompleteDataset()),
+                            Lang_WON.TRIG_WON_CONVERSATION));
+            Optional<WonMessage> resp = msg.getRemoteResponse();
+            if (resp.isPresent()) {
+                return resp.get().getPreviousMessageURIs().size() == n;
+            }
+            // do not fail if we don't have a remote response
+            return true;
         }
     }
 
@@ -1005,6 +1065,17 @@ public abstract class WonMessageRoutesTest {
                         .thenReturn(Optional.of(URI_NODE_1));
         Mockito.when(messageRoutingInfoServiceWithLookup.recipientNode(any(WonMessage.class)))
                         .thenReturn(Optional.of(URI_NODE_1));
+    }
+
+    public void logMessageForFailedPredicate(String className, String parameterName, Object parameterValue,
+                    WonMessage msg) {
+        if (logger.isInfoEnabled()) {
+            logger.info("predicate {} ({}: {}), does not match message {}:\n{}",
+                            new Object[] { className, parameterName, parameterValue,
+                                            msg.getMessageURI(),
+                                            RdfUtils.toString(msg.getCompleteDataset(),
+                                                            Lang_WON.TRIG_WON_CONVERSATION) });
+        }
     }
 
     Processor messageToSendIntoBody = new MessageToSendIntoBodyProcessor();
