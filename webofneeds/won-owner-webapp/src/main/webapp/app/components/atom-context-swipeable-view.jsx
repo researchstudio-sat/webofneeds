@@ -48,8 +48,16 @@ class WonAtomContextSwipeableView extends React.Component {
       />
     );
 
+    let buttons = this.props.actionButtons;
+
     if (this.props.actionButtons) {
       const show = this.state.show;
+      buttons = (
+        <div onClick={() => this.handleClick(show)}>
+          {this.props.actionButtons}
+        </div>
+      );
+
       let triggerIcon = (
         <React.Fragment>
           <svg
@@ -81,7 +89,7 @@ class WonAtomContextSwipeableView extends React.Component {
               enableMouseEvents={this.props.enableMouseEvents}
             >
               {headerElement}
-              {this.props.actionButtons}
+              {buttons}
             </SwipeableViews>
           </div>
           {triggerIcon}

@@ -124,34 +124,43 @@ class WonAtomContentParticipants extends React.Component {
               headerClassName = "status--received";
               actionButtons = (
                 <div className="acp__participant__actions">
-                  <button
-                    className="acp__participant__actions__button red won-button--outlined thin"
+                  <svg
+                    className="acp__participant__actions__icon request won-icon"
                     onClick={() => this.openRequest(conn)}
                   >
-                    Accept
-                  </button>
-                  <button
-                    className="acp__participant__actions__button red won-button--outlined thin"
+                    <use
+                      xlinkHref="#ico32_buddy_accept"
+                      href="#ico32_buddy_accept"
+                    />
+                  </svg>
+                  <svg
+                    className="acp__participant__actions__icon primary won-icon"
                     onClick={() =>
                       this.closeConnection(conn, "Reject Participant Request?")
                     }
                   >
-                    Reject
-                  </button>
+                    <use
+                      xlinkHref="#ico32_buddy_deny"
+                      href="#ico32_buddy_deny"
+                    />
+                  </svg>
                 </div>
               );
             } else if (connectionUtils.isSuggested(conn)) {
               headerClassName = "status--suggested";
               actionButtons = (
                 <div className="acp__participant__actions">
-                  <button
-                    className="acp__participant__actions__button red won-button--outlined thin"
+                  <svg
+                    className="acp__participant_actions__icon request won-icon"
                     onClick={() => this.sendRequest(conn)}
                   >
-                    Request
-                  </button>
-                  <button
-                    className="acp__participant__actions__button red won-button--outlined thin"
+                    <use
+                      xlinkHref="#ico32_buddy_accept"
+                      href="#ico32_buddy_accept"
+                    />
+                  </svg>
+                  <svg
+                    className="acb__buddy__actions__icon primary won-icon"
                     onClick={() =>
                       this.closeConnection(
                         conn,
@@ -159,39 +168,51 @@ class WonAtomContentParticipants extends React.Component {
                       )
                     }
                   >
-                    Remove
-                  </button>
+                    <use
+                      xlinkHref="#ico32_buddy_deny"
+                      href="#ico32_buddy_deny"
+                    />
+                  </svg>
                 </div>
               );
             } else if (connectionUtils.isRequestSent(conn)) {
               headerClassName = "status--sent";
               actionButtons = (
                 <div className="acp__participant__actions">
-                  <button
-                    className="acp__participant__actions__button red won-button--outlined thin"
+                  <svg
+                    className="acp__participant__actions__icon disabled won-icon"
                     disabled={true}
                   >
-                    Waiting for Accept...
-                  </button>
-                  <button
-                    className="acp__participant__actions__button red won-button--outlined thin"
+                    <use
+                      xlinkHref="#ico32_buddy_waiting"
+                      href="#ico32_buddy_waiting"
+                    />
+                  </svg>
+                  <svg
+                    className="acp__participant__actions__icon secondary won-icon"
                     onClick={() =>
                       this.closeConnection(conn, "Cancel Participant Request?")
                     }
                   >
-                    Cancel
-                  </button>
+                    <use
+                      xlinkHref="#ico32_buddy_deny"
+                      href="#ico32_buddy_deny"
+                    />
+                  </svg>
                 </div>
               );
             } else if (connectionUtils.isConnected(conn)) {
               actionButtons = (
                 <div className="acp__participant__actions">
-                  <button
-                    className="acp__participant__actions__button red won-button--outlined thin"
+                  <svg
+                    className="acp__participant__actions__icon secondary won-icon"
                     onClick={() => this.closeConnection(conn)}
                   >
-                    Remove
-                  </button>
+                    <use
+                      xlinkHref="#ico32_buddy_deny"
+                      href="#ico32_buddy_deny"
+                    />
+                  </svg>
                 </div>
               );
             } else if (connectionUtils.isClosed(conn)) {

@@ -43,10 +43,22 @@ const mapStateToProps = (state, ownProps) => {
     );
   }
 
+  const chatConnections =
+    isOwned &&
+    connectionSelectors.getChatConnectionsByAtomUri(state, ownProps.atomUri);
+
+  const chatSocketUri = atomUtils.getSocketUri(
+    atom,
+    won.CHAT.ChatSocketCompacted
+  );
+
   return {
     atomUri: ownProps.atomUri,
     atom,
     isOwned,
+    chatSocketUri,
+    hasChatConnections: chatConnections && chatConnections.size > 0,
+    chatConnectionsArray: chatConnections && chatConnections.toArray(),
     hasBuddySocket,
     hasBuddies: buddies && buddies.size > 0,
     hasBuddyConnections: buddyConnections && buddyConnections.size > 0,
@@ -82,6 +94,16 @@ const mapDispatchToProps = dispatch => {
     connectionOpen: (connectionUri, message) => {
       dispatch(actionCreators.connections__open(connectionUri, message));
     },
+    connectAdHoc: (targetAtomUri, message, connectToSocketUri, persona) => {
+      dispatch(
+        actionCreators.connections__connectAdHoc(
+          targetAtomUri,
+          message,
+          connectToSocketUri,
+          persona
+        )
+      );
+    },
     connect: (
       ownedAtomUri,
       connectionUri,
@@ -103,6 +125,9 @@ const mapDispatchToProps = dispatch => {
     },
     routerGo: (path, props) => {
       dispatch(actionCreators.router__stateGo(path, props));
+    },
+    routerGoResetParams: path => {
+      dispatch(actionCreators.router__stateGoResetParams(path));
     },
   };
 };
@@ -139,71 +164,99 @@ class WonAtomContentBuddies extends React.Component {
               headerClassName = "status--received";
               actionButtons = (
                 <div className="acb__buddy__actions">
-                  <div
-                    className="acb__buddy__actions__button red won-button--outlined thin"
+                  <svg
+                    className="acb__buddy__actions__icon request won-icon"
                     onClick={() => this.openRequest(conn)}
                   >
-                    Accept
-                  </div>
-                  <div
-                    className="acb__buddy__actions__button red won-button--outlined thin"
+                    <use
+                      xlinkHref="#ico32_buddy_accept"
+                      href="#ico32_buddy_accept"
+                    />
+                  </svg>
+                  <svg
+                    className="acb__buddy__actions__icon primary won-icon"
                     onClick={() =>
                       this.closeConnection(conn, "Reject Buddy Request?")
                     }
                   >
-                    Reject
-                  </div>
+                    <use
+                      xlinkHref="#ico32_buddy_deny"
+                      href="#ico32_buddy_deny"
+                    />
+                  </svg>
                 </div>
               );
             } else if (connectionUtils.isSuggested(conn)) {
               headerClassName = "status--suggested";
               actionButtons = (
                 <div className="acb__buddy__actions">
-                  <div
-                    className="acb__buddy__actions__button red won-button--outlined thin"
+                  <svg
+                    className="acb__buddy__actions__icon request won-icon"
                     onClick={() => this.requestBuddy(conn)}
                   >
-                    Request
-                  </div>
-                  <div
-                    className="acb__buddy__actions__button red won-button--outlined thin"
+                    <use
+                      xlinkHref="#ico32_buddy_accept"
+                      href="#ico32_buddy_accept"
+                    />
+                  </svg>
+                  <svg
+                    className="acb__buddy__actions__icon primary won-icon"
                     onClick={() =>
                       this.closeConnection(conn, "Reject Buddy Suggestion?")
                     }
                   >
-                    Remove
-                  </div>
+                    <use
+                      xlinkHref="#ico32_buddy_deny"
+                      href="#ico32_buddy_deny"
+                    />
+                  </svg>
                 </div>
               );
             } else if (connectionUtils.isRequestSent(conn)) {
               headerClassName = "status--sent";
               actionButtons = (
                 <div className="acb__buddy__actions">
-                  <button
-                    className="acb__buddy__actions__button red won-button--outlined thin"
+                  <svg
+                    className="acb__buddy__actions__icon disabled won-icon"
                     disabled={true}
                   >
-                    Pending...
-                  </button>
-                  <div
-                    className="acb__buddy__actions__button red won-button--outlined thin"
+                    <use
+                      xlinkHref="#ico32_buddy_waiting"
+                      href="#ico32_buddy_waiting"
+                    />
+                  </svg>
+                  <svg
+                    className="acb__buddy__actions__icon secondary won-icon"
                     onClick={() =>
                       this.closeConnection(conn, "Cancel Buddy Request?")
                     }
                   >
-                    Cancel Request
-                  </div>
+                    <use
+                      xlinkHref="#ico32_buddy_deny"
+                      href="#ico32_buddy_deny"
+                    />
+                  </svg>
                 </div>
               );
             } else if (connectionUtils.isConnected(conn)) {
+              //TODO: Check chat socket connection
               actionButtons = (
                 <div className="acb__buddy__actions">
-                  <div
-                    className="acb__buddy__actions__button red won-button--outlined thin"
+                  <svg
+                    className="acb__buddy__actions__icon primary won-icon"
+                    onClick={() => this.sendChatMessage(conn)}
+                  >
+                    <use xlinkHref="#ico36_message" href="#ico36_message" />
+                  </svg>
+                  <svg
+                    className="acb__buddy__actions__icon secondary won-icon"
                     onClick={() => this.closeConnection(conn)}
                   >
-                    Remove
-                  </div>
+                    <use
+                      xlinkHref="#ico32_buddy_deny"
+                      href="#ico32_buddy_deny"
+                    />
+                  </svg>
                 </div>
               );
             } else if (connectionUtils.isClosed(conn)) {
@@ -385,6 +438,73 @@ class WonAtomContentBuddies extends React.Component {
     this.props.showModalDialog(payload);
   }
 
+  sendChatMessage(connection) {
+    if (this.props.chatConnectionsArray && this.props.hasChatConnections) {
+      //Check if connection is already an existing chatConnection
+      const targetAtomUri = get(connection, "targetAtomUri");
+      //const targetSocketUri = get(connection, "socketUri");
+      const chatConnections = this.props.chatConnectionsArray.filter(
+        conn => get(conn, "targetAtomUri") === targetAtomUri
+      );
+      //.filter(conn => get(conn, "socketUri") === targetSocketUri);
+
+      if (chatConnections.length == 0) {
+        //No chatConnection between buddies exists => connect
+        this.props.connect(
+          this.props.atomUri,
+          undefined,
+          get(connection, "targetAtomUri"),
+          "",
+          won.CHAT.ChatSocketCompacted,
+          won.CHAT.ChatSocketCompacted
+        );
+        this.props.routerGoResetParams("connections");
+      } else if (chatConnections.length == 1) {
+        const chatConnection = chatConnections[0];
+        const chatConnectionUri = get(chatConnection, "uri");
+
+        if (
+          connectionUtils.isSuggested(chatConnection) ||
+          connectionUtils.isClosed(chatConnection)
+        ) {
+          this.props.connect(
+            this.props.atomUri,
+            undefined,
+            chatConnectionUri,
+            "",
+            won.CHAT.ChatSocketCompacted,
+            won.CHAT.ChatSocketCompacted
+          );
+        } else if (
+          connectionUtils.isConnected(chatConnection) ||
+          connectionUtils.isRequestSent(chatConnection) ||
+          connectionUtils.isRequestReceived(chatConnection)
+        ) {
+          this.props.routerGo("connections", {
+            connectionUri: chatConnectionUri,
+          });
+        }
+      } else {
+        console.error(
+          "more than one connection stored between two atoms that use the same exact sockets",
+          this.props.atom,
+          this.props.chatSocketUri
+        );
+      }
+    } else {
+      //No chatConnection between buddies exists => connect
+      this.props.connect(
+        this.props.atomUri,
+        undefined,
+        get(connection, "targetAtomUri"),
+        "",
+        won.CHAT.ChatSocketCompacted,
+        won.CHAT.ChatSocketCompacted
+      );
+      this.props.routerGoResetParams("connections");
+    }
+  }
+
   markAsRead(conn) {
     if (connectionUtils.isUnread(conn)) {
       this.props.connectionMarkAsRead(get(conn, "uri"), this.props.atomUri);
@@ -409,7 +529,12 @@ WonAtomContentBuddies.propTypes = {
   connectionClose: PropTypes.func,
   connectionOpen: PropTypes.func,
   connect: PropTypes.func,
+  connectAdHoc: PropTypes.func,
   routerGo: PropTypes.func,
+  routerGoResetParams: PropTypes.func,
+  chatSocketUri: PropTypes.string,
+  chatConnectionsArray: PropTypes.arrayOf(PropTypes.object),
+  hasChatConnections: PropTypes.bool,
 };
 
 export default connect(
