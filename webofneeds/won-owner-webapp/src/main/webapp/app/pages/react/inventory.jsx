@@ -72,6 +72,10 @@ const mapStateToProps = state => {
     isInitialLoadInProgress: processUtils.isProcessingInitialLoad(process),
     isLoggedIn: accountUtils.isLoggedIn(accountState),
     welcomeTemplateHtml: get(theme, "welcomeTemplate"),
+    additionalLogos:
+      theme && get(theme, "additionalLogos")
+        ? get(theme, "additionalLogos").toArray()
+        : undefined,
     currentLocation: generalSelectors.getCurrentLocation(state),
     sortedOwnedUnassignedAtomUriArray,
     sortedOwnedInactiveAtomUriArray,
@@ -109,6 +113,14 @@ const mapDispatchToProps = dispatch => {
 
 class PageInventory extends React.Component {
   render() {
+    let additionalLogosElement;
+    if (this.props.additionalLogos && this.props.additionalLogos.length > 0) {
+      additionalLogosElement = this.props.additionalLogos.map(logo => (
+        <svg className="ownerwelcome__logo__icon" key={logo}>
+          <use xlinkHref={logo} href={logo} />
+        </svg>
+      ));
+    }
     return (
       <section className={!this.props.isLoggedIn ? "won-signed-out" : ""}>
         {this.props.showModalDialog && <WonModalDialog />}
@@ -214,6 +226,7 @@ class PageInventory extends React.Component {
                 __html: this.props.welcomeTemplateHtml,
               }}
             />
+            <div className="ownerwelcome__logo">{additionalLogosElement}</div>
             <WonHowTo />
           </main>
         )}
@@ -227,6 +240,7 @@ PageInventory.propTypes = {
   isLoggedIn: PropTypes.bool,
   isInitialLoadInProgress: PropTypes.bool,
   welcomeTemplateHtml: PropTypes.string,
+  additionalLogos: PropTypes.arrayOf(PropTypes.string),
   currentLocation: PropTypes.object,
   sortedOwnedUnassignedAtomUriArray: PropTypes.arrayOf(PropTypes.string),
   sortedOwnedInactiveAtomUriArray: PropTypes.arrayOf(PropTypes.string),

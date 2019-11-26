@@ -21,6 +21,7 @@ main.ownerwelcome {
   }
 
   padding: 3rem $minContentPadding 3rem $minContentPadding;
+
   @media (max-width: $responsivenessBreakPoint) {
     padding: 2rem 0.5rem 2rem;
     border-left: 0;
@@ -37,15 +38,35 @@ main.ownerwelcome {
       padding-bottom: 1.5rem;
       text-align: center;
     }
+
     p {
       padding-bottom: 1.5rem;
       text-align: center;
     }
+
     h3 {
       text-align: center;
     }
   }
+
+  .ownerwelcome__logo {
+    display: grid;
+    grid-column-gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    justify-items: center;
+
+    @media (max-width: $responsivenessBreakPoint) {
+      grid-column-gap: 0.5rem;
+    }
+
+    &__icon {
+      display: flex;
+      align-self: center;
+      margin: auto;
+    }
+  }
 }
+
 main.ownerloading {
   grid-column: 1 / -1;
   display: flex;
@@ -57,6 +78,7 @@ main.ownerloading {
   > .ownerloading__spinner.hspinner {
     @include fixed-square(5rem);
   }
+
   > .ownerloading__label {
     color: $won-line-gray;
     text-align: center;
@@ -89,9 +111,11 @@ main.ownerinventory {
     grid-gap: 0.5rem;
     border-bottom: $thinGrayBorder;
     padding: 0.5rem;
+
     @media (min-width: $maxContentWidth) {
       padding-right: 0;
     }
+
     align-items: center;
 
     &__title {
