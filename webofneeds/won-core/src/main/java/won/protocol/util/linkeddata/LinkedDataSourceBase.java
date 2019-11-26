@@ -54,7 +54,7 @@ import won.protocol.util.linkeddata.uriresolver.WonMessageUriResolver;
  * LinkedDataSource implementation that delegates fetching linked data resources
  * to the provided LinedDataRestClient.
  */
-public abstract class LinkedDataSourceBase implements LinkedDataSource {
+public class LinkedDataSourceBase implements LinkedDataSource {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     protected LinkedDataRestClient linkedDataRestClient;
     @Autowired
