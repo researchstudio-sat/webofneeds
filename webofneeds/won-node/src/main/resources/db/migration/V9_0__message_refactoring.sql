@@ -3,10 +3,6 @@ ALTER TABLE atom ALTER COLUMN state SET NOT NULL;
 -- DatasetHolder is no longer unique for MessageEvents 
 DROP INDEX IF EXISTS IDX_ME_UNIQUE_DATASETHOLDER_ID;
 
-/* TODO
- *  [x] change constraint from MessageEvent @UniqueConstraint(name = "IDX_ME_UNIQUE_MESSAGE_URI", columnNames = { "messageURI", "parentURI" }),
- *  [ ] manyToOne rel message->datasetholder
- */
 -- message_event is now only unique with respect to messageuri and parenturi
 DROP INDEX IF EXISTS IDX_ME_UNIQUE_MESSAGE_URI;
 CREATE UNIQUE INDEX IDX_ME_UNIQUE_MESSAGE_URI_PER_PARENT ON message_event (messageuri, parenturi);
@@ -24,9 +20,9 @@ CREATE INDEX IDX_ME_RECIPIENT_ATOM_URI on message_event(messageuri, recipientato
 
 -- add special fields for response information (respondingToURI, responseContainerURI), so we can make sure we 
 -- store only one response from a container
-ALTER TABLE message_event ADD COLUMN responsetouri VARCHAR(255) default null;
-ALTER TABLE message_event ADD COLUMN responseparenturi VARCHAR(255) default null;
-CREATE INDEX IDX_ME_UNIQUE_RESPONSE_PER_CONTAINER on message_event(parenturi, respondingtouri, responsecontaineruri);
+ALTER TABLE message_event ADD COLUMN respondingtouri VARCHAR(255) default null;
+ALTER TABLE message_event ADD COLUMN responsecontaineruri VARCHAR(255) default null;
+CREATE UNIQUE INDEX IDX_ME_UNIQUE_RESPONSE_PER_CONTAINER on message_event(parenturi, respondingtouri, responsecontaineruri);
 
 
 -- make essential fields in connection non-nullable
