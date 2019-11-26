@@ -222,13 +222,7 @@ class AtomInfo extends React.Component {
       footerElement = (
         <div className="atom-info__footer">
           {this.props.isInactive &&
-            !this.props.isOwned && (
-              <div className="atom-info__footer__infolabel">
-                Atom is inactive, no requests allowed
-              </div>
-            )}
-          {this.props.isInactive &&
-            this.props.isOwned && (
+            (this.props.isOwned ? (
               <React.Fragment>
                 <div className="atom-info__footer__infolabel">
                   This Atom is inactive. Others will not be able to interact
@@ -241,7 +235,11 @@ class AtomInfo extends React.Component {
                   Reopen
                 </button>
               </React.Fragment>
-            )}
+            ) : (
+              <div className="atom-info__footer__infolabel">
+                Atom is inactive, no requests allowed
+              </div>
+            ))}
           {this.props.showAdHocRequestField && (
             <React.Fragment>
               {this.props.chatSocketUri && (
