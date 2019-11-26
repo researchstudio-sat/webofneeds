@@ -9,13 +9,11 @@ CREATE UNIQUE INDEX IDX_ME_UNIQUE_MESSAGE_URI_PER_PARENT ON message_event (messa
 
 -- drop correspondingremotemessageuri
 ALTER TABLE message_event DROP column correspondingremotemessageuri;
-DROP INDEX IF EXISTS IDX_ME_UNIQUE_CORREXPONDING_REMOTE_MESSAGE_URI;
+DROP INDEX IF EXISTS IDX_ME_UNIQUE_CORRESPONDING_REMOTE_MESSAGE_URI;
 DROP INDEX IF EXISTS IDX_ME_INNERMOST_MESSAGE_URI_RECIPIENT_ATOM_URI;
-CREATE INDEX IDX_ME_INNERMOST_MESSAGE_URI_RECIPIENT_ATOM_URI on message_event (messageuri, recipientatomuri, innermostmessageuri);
 
 -- drop innermostmessageuri
 ALTER TABLE message_event DROP column innermostmessageuri;
-DROP INDEX IF EXISTS IDX_ME_INNERMOST_MESSAGE_URI_RECIPIENT_ATOM_URI;
 CREATE INDEX IDX_ME_RECIPIENT_ATOM_URI on message_event(messageuri, recipientatomuri);
 
 -- add special fields for response information (respondingToURI, responseContainerURI), so we can make sure we 
@@ -34,8 +32,10 @@ ALTER TABLE connection ALTER COLUMN socketuri SET NOT NULL;
 ALTER TABLE connection ALTER COLUMN targetsocketuri SET NOT NULL;
 ALTER TABLE connection ALTER COLUMN connectionuri SET NOT NULL;
 
--- Table: public.messagecontainer_unconfirmed
+-- add the field for the serialized set of unconfirmed message uris
+ALTER TABLE message_container ADD COLUMN unconfirmed bytea NOT NULL;
 
+-- add the table for pending confirmations
 CREATE TABLE public.pendingconfirmation
 (
     id bigint NOT NULL,
@@ -43,8 +43,7 @@ CREATE TABLE public.pendingconfirmation
     confirmingmessageuri character varying(255) COLLATE pg_catalog."default" NOT NULL,
     messagecontainer_id bigint NOT NULL,
     CONSTRAINT pendingconfirmation_pkey PRIMARY KEY (id),
-    CONSTRAINT idx_pendingconfirmation_to_container_id UNIQUE (messagecontainer_id, confirmingmessageuri)
-,
+    CONSTRAINT idx_pendingconfirmation_to_container_id UNIQUE (messagecontainer_id, confirmingmessageuri),
     CONSTRAINT fk_pendingconfirmation FOREIGN KEY (messagecontainer_id)
         REFERENCES public.message_container (id) MATCH SIMPLE
         ON DELETE CASCADE
