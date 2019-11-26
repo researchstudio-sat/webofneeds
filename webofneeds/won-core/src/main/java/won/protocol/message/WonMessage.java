@@ -431,6 +431,18 @@ public class WonMessage implements Serializable {
         getEnvelopeGraph().getResource(getMessageURI().toString()).addProperty(property, value);
     }
 
+    public synchronized void addMessagePropertiesRDFNode(Property property, Collection<RDFNode> values) {
+        if (values == null || values.isEmpty()) {
+            return;
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("adding property {}, values {}, to message {} in envelope {}",
+                            new Object[] { property, values, getMessageURI(), getEnvelopeURI() });
+        }
+        Resource msg = getEnvelopeGraph().getResource(getMessageURI().toString());
+        values.forEach(v -> msg.addProperty(property, v));
+    }
+
     /**
      * Adds a property to the message resource in the outermost envelope.
      *
@@ -442,6 +454,15 @@ public class WonMessage implements Serializable {
         addMessageProperty(property, valueAsRdfNode);
     }
 
+    public synchronized void addMessagePropertiesString(Property property, Collection<String> uris) {
+        if (uris == null || uris.isEmpty()) {
+            return;
+        }
+        final Model envelopeGraph = getEnvelopeGraph();
+        addMessagePropertiesRDFNode(property,
+                        uris.stream().map(u -> envelopeGraph.createResource(u)).collect(Collectors.toList()));
+    }
+
     /**
      * Adds a property to the message resource in the outermost envelope.
      *
@@ -450,6 +471,13 @@ public class WonMessage implements Serializable {
      */
     public synchronized void addMessageProperty(Property property, URI value) {
         addMessageProperty(property, value.toString());
+    }
+
+    public synchronized void addMessagePropertiesURI(Property property, Collection<URI> values) {
+        if (values == null || values.isEmpty()) {
+            return;
+        }
+        addMessagePropertiesString(property, values.stream().map(u -> u.toString()).collect(Collectors.toList()));
     }
 
     /**

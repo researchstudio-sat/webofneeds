@@ -24,6 +24,7 @@ import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
 import won.protocol.model.MessageContainer;
 import won.protocol.repository.MessageContainerRepository;
+import won.protocol.util.LogMarkers;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -53,8 +54,7 @@ public class MessageReferencer {
             }
             Optional<MessageContainer> container = messageContainerRepository.findOneByParentUri(parentURI);
             if (container.isPresent()) {
-                container.get().getUnconfirmed()
-                                .forEach(prev -> message.addMessageProperty(WONMSG.previousMessage, prev));
+                message.addMessagePropertiesURI(WONMSG.previousMessage, container.get().getUnconfirmed());
                 if (logger.isDebugEnabled()) {
                     logger.debug("Added {} references to message {}", container.get().getUnconfirmed().size(),
                                     message.toShortStringForDebug());
@@ -64,7 +64,7 @@ public class MessageReferencer {
             }
         }
         sw.stop();
-        logger.info("adding unconfirmed took {} millis", sw.getLastTaskTimeMillis());
+        logger.debug(LogMarkers.TIMING, "adding unconfirmed took {} millis", sw.getLastTaskTimeMillis());
         return message;
     }
 }
