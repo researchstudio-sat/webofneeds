@@ -161,13 +161,16 @@ public class MessageService {
                             previous.size(), message.toShortStringForDebug());
             logger.debug("previous messages: {}", previous);
         }
+        if (previous.isEmpty()) {
+            logger.debug("no previous messages found, not removing any unconfirmed messages");
+            return;
+        }
         sw.start("load pending");
         Set<PendingConfirmation> pending = pendingConfirmationRepository
                         .findAllByMessageContainerIdAndConfirmingMessageURIIn(container.getId(), previous);
         sw.stop();
         sw.start("determine confirmed");
         Set<URI> confirmed = pending.stream()
-                        .filter(pc -> previous.contains(pc.getConfirmingMessageURI()))
                         .flatMap(pc -> pc.getConfirmedMessageURIs().stream())
                         .collect(Collectors.toSet());
         sw.stop();
@@ -175,7 +178,7 @@ public class MessageService {
             logger.debug("{} unconfirmed for message container of {}, Removing {} ",
                             new Object[] { container.getUnconfirmed().size(), parent, confirmed.size() });
             logger.debug("unconfirmed: {}", container.getUnconfirmed());
-            logger.debug("confirmed: {}", confirmed);
+            logger.debug("transitively confirmed: {}", confirmed);
         }
         sw.start("remove unconfirmed");
         container.removeUnconfirmed(confirmed);
@@ -252,7 +255,6 @@ public class MessageService {
             Optional<DatasetHolder> datasetHolder = datasetHolderRepository.findOneByUri(wonMessage.getMessageURI());
             event.setDatasetHolder(datasetHolder.orElseGet(() -> new DatasetHolder(wonMessage.getMessageURI(),
                             WonMessageEncoder.encodeAsDataset(wonMessage))));
-            container.getEvents().add(event);
             messageContainerRepository.save(container);
             messageEventRepository.save(event);
         }
