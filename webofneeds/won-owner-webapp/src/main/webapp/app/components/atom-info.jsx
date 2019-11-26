@@ -459,7 +459,7 @@ AtomInfo.propTypes = {
   hideModalDialog: PropTypes.func,
   showTermsDialog: PropTypes.func,
   connectionsConnectAdHoc: PropTypes.func,
-  ownedChatSocketAtoms: PropTypes.func,
+  ownedChatSocketAtoms: PropTypes.object,
   chatSocketUri: PropTypes.string,
   groupSocketUri: PropTypes.string,
   connect: PropTypes.func,
