@@ -60,12 +60,14 @@ const mapStateToProps = (state, ownProps) => {
   const ownedChatSocketAtoms =
     ownedAtoms && ownedAtoms.filter(atom => atomUtils.hasChatSocket(atom));
 
+  const isInactive = atomUtils.isInactive(atom);
   return {
     className: ownProps.className,
     atomUri: ownProps.atomUri,
     defaultTab: ownProps.defaultTab,
     loggedIn: accountUtils.isLoggedIn(get(state, "account")),
-    isInactive: atomUtils.isInactive(atom),
+    isInactive: isInactive,
+    isOwned: isOwned,
     showAdHocRequestField,
     showEnabledUseCases,
     showReactionUseCases,
@@ -79,7 +81,10 @@ const mapStateToProps = (state, ownProps) => {
     showFooter:
       !atomLoading &&
       visibleTab === "DETAIL" &&
-      (showEnabledUseCases || showReactionUseCases || showAdHocRequestField),
+      (showEnabledUseCases ||
+        showReactionUseCases ||
+        showAdHocRequestField ||
+        isInactive),
     addHolderUri: showEnabledUseCases ? holderUri : undefined,
     holderUri,
     chatSocketUri,
@@ -159,6 +164,7 @@ const mapDispatchToProps = dispatch => {
     connectionsOpen: (connectionUri, message) => {
       dispatch(actionCreators.connections__open(connectionUri, message));
     },
+    atomReopen: atomUri => dispatch(actionCreators.atoms__reopen(atomUri)),
   };
 };
 
@@ -215,6 +221,25 @@ class AtomInfo extends React.Component {
 
       footerElement = (
         <div className="atom-info__footer">
+          {this.props.isInactive &&
+            (this.props.isOwned ? (
+              <React.Fragment>
+                <div className="atom-info__footer__infolabel">
+                  This Atom is inactive. Others will not be able to interact
+                  with it.
+                </div>
+                <button
+                  className="won-publish-button red won-button--filled"
+                  onClick={() => this.props.atomReopen(this.props.atomUri)}
+                >
+                  Reopen
+                </button>
+              </React.Fragment>
+            ) : (
+              <div className="atom-info__footer__infolabel">
+                Atom is inactive, no requests allowed
+              </div>
+            ))}
           {this.props.showAdHocRequestField && (
             <React.Fragment>
               {this.props.chatSocketUri && (
@@ -251,11 +276,6 @@ class AtomInfo extends React.Component {
           )}
           {reactionUseCaseElements}
           {enabledUseCaseElements}
-          {this.props.isInactive && (
-            <div className="atom-info__footer__infolabel">
-              Atom is inactive, no requests allowed
-            </div>
-          )}
         </div>
       );
     }
@@ -421,6 +441,7 @@ AtomInfo.propTypes = {
   defaultTab: PropTypes.string,
   loggedIn: PropTypes.bool,
   isInactive: PropTypes.bool,
+  isOwned: PropTypes.bool,
   showAdHocRequestField: PropTypes.bool,
   showEnabledUseCases: PropTypes.bool,
   showReactionUseCases: PropTypes.bool,
@@ -436,12 +457,13 @@ AtomInfo.propTypes = {
   hideModalDialog: PropTypes.func,
   showTermsDialog: PropTypes.func,
   connectionsConnectAdHoc: PropTypes.func,
-  ownedChatSocketAtoms: PropTypes.func,
+  ownedChatSocketAtoms: PropTypes.object,
   chatSocketUri: PropTypes.string,
   groupSocketUri: PropTypes.string,
   connect: PropTypes.func,
   connectionsOpen: PropTypes.func,
   sendChatMessage: PropTypes.func,
+  atomReopen: PropTypes.func,
 };
 
 export default connect(
