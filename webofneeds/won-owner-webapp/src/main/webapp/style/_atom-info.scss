@@ -39,6 +39,11 @@ won-atom-info {
       }
     }
 
+    & > *:not(:last-child) {
+      // a bit of space between elements in the footer
+      margin-bottom: 0.5rem;
+    }
+
     &__infolabel {
       text-align: center;
     }
