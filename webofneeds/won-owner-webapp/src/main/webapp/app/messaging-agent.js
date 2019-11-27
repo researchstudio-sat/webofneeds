@@ -367,29 +367,50 @@ export function runMessagingAgent(redux) {
     missedHeartbeats = 0;
 
     const data = JSON.parse(receivedMsg.data);
-    console.debug("WS MSG RECEIVED: ", data);
-    won.wonMessageFromJsonLd(data).then(message => {
-      won.addJsonLdData(data);
 
-      let messageProcessed = false;
+    const graphArray = data["@graph"];
+    const messages = {};
 
-      //process message
-      for (const messageProcessor of messageProcessingArray) {
-        messageProcessed = messageProcessed || messageProcessor(message);
-      }
+    graphArray.forEach(graph => {
+      console.debug(graph["@id"], " --> ", graph["@id"].split("#")[0]);
 
-      //post-process message
-      for (const messagePostprocessor of messagePostProcessingArray) {
-        messagePostprocessor(message);
-      }
+      const msgUri = graph["@id"].split("#")[0];
+      const singleMessage = messages[msgUri];
 
-      if (!messageProcessed) {
-        console.warn(
-          "MESSAGE WASN'T PROCESSED DUE TO MISSING HANDLER FOR ITS TYPE: ",
-          message
-        );
+      if (singleMessage) {
+        singleMessage["@graph"].push(graph);
+      } else {
+        messages[msgUri] = { "@graph": [graph] };
       }
     });
+
+    console.debug("messages", messages);
+
+    for (const msgUri in messages) {
+      const msg = messages[msgUri];
+      won.wonMessageFromJsonLd(msg).then(message => {
+        won.addJsonLdData(msg);
+
+        let messageProcessed = false;
+
+        //process message
+        for (const messageProcessor of messageProcessingArray) {
+          messageProcessed = messageProcessed || messageProcessor(message);
+        }
+
+        //post-process message
+        for (const messagePostprocessor of messagePostProcessingArray) {
+          messagePostprocessor(message);
+        }
+
+        if (!messageProcessed) {
+          console.warn(
+            "MESSAGE WASN'T PROCESSED DUE TO MISSING HANDLER FOR ITS TYPE: ",
+            message
+          );
+        }
+      });
+    }
   }
 
   /* TODOs
