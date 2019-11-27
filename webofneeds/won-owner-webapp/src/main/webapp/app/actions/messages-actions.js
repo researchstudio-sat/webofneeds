@@ -156,7 +156,7 @@ export function successfulEdit(event) {
     console.debug("Received success replace message:", event);
     //const state = getState();
     //load the edited data into the local rdf store and publish AtomEditEvent when done
-    const atomURI = event.getRecipientAtom();
+    const atomURI = event.getAtomUri();
 
     const processState = get(getState(), "process");
 
@@ -174,7 +174,7 @@ export function successfulEdit(event) {
           dispatch(
             actionCreators.atoms__editSuccessful({
               eventUri: event.getIsResponseTo(),
-              atomUri: event.getSenderAtom(),
+              atomUri: event.getAtomUri(),
               //atom: atom,
             })
           );

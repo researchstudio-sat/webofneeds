@@ -39,14 +39,19 @@ export function atomEdit(draft, oldAtom, nodeUri) {
     }
 
     return ensureLoggedIn(dispatch, getState).then(async () => {
-      buildEditMessage(draft, oldAtom, nodeUri).then(msg => {
-        //TODO: WRAP /rest/messages/send POST AROUND
+      const { message, atomUri } = await buildEditMessage(
+        draft,
+        oldAtom,
+        nodeUri
+      );
+
+      ownerApi.sendMessage(message).then(jsonResp => {
         dispatch({
           type: actionTypes.atoms.edit,
           payload: {
-            eventUri: msg.eventUri,
-            message: msg.message,
-            atomUri: msg.atomUri,
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
+            atomUri: atomUri,
             atom: draft,
             oldAtom,
           },
