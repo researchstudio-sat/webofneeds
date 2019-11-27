@@ -1397,12 +1397,12 @@ WonMessage.prototype = {
   },
   getReceivedTimestamp: function() {
     return this.getPropertyFromLocalMessage(
-      "https://w3id.org/won/message#receivedTimestamp"
+      "https://w3id.org/won/message#timestamp"
     );
   },
   getSentTimestamp: function() {
     return this.getPropertyFromLocalMessage(
-      "https://w3id.org/won/message#sentTimestamp"
+      "https://w3id.org/won/message#timestamp"
     );
   },
   /**
@@ -1429,14 +1429,14 @@ WonMessage.prototype = {
     return this.getProperty("https://w3id.org/won/core#hintTargetSocket");
   },
   getIsResponseTo: function() {
-    return this.getProperty("https://w3id.org/won/message#isResponseTo");
+    return this.getProperty("https://w3id.org/won/message#respondingTo");
   },
   getIsRemoteResponseTo: function() {
     return this.getProperty("https://w3id.org/won/message#isRemoteResponseTo");
   },
   getIsResponseToMessageType: function() {
     return this.getProperty(
-      "https://w3id.org/won/message#isResponseToMessageType"
+      "https://w3id.org/won/message#respondingToMessageType"
     );
   },
 
@@ -1452,8 +1452,8 @@ WonMessage.prototype = {
   getRecipientNode: function() {
     return this.getProperty("https://w3id.org/won/message#recipientNode");
   },
-  getRecipientAtom: function() {
-    return this.getProperty("https://w3id.org/won/message#recipientAtom");
+  getAtomUri: function() {
+    return this.getProperty("https://w3id.org/won/message#atom");
   },
   getRecipientConnection: function() {
     return this.getProperty("https://w3id.org/won/message#recipient");
@@ -1714,6 +1714,7 @@ WonMessage.prototype = {
 
   __init: function() {
     this.context = this.graphs = this.rawMessage;
+
     if (!Array.isArray(this.graphs)) {
       this.parseErrors.push("@graph not found or not an array");
     }
@@ -1725,6 +1726,7 @@ WonMessage.prototype = {
     let unreferencedEnvelopes = [];
     const innermostEnvelopes = [];
     const contentGraphUris = [];
+
     //first pass: create one node per envelope/content graph
     this.graphs.forEach(graph => {
       let graphUri = graph["@id"];
@@ -1781,10 +1783,10 @@ WonMessage.prototype = {
             uri => !containedEnvelopes.includes(uri)
           );
         }
-        if (node.correspondingRemoteMessageUri) {
+        if (node && node.correspondingRemoteMessageUri) {
           referencesOtherGraphs = true;
         }
-        if (node.forwardedMessageUri) {
+        if (node && node.forwardedMessageUri) {
           referencesOtherGraphs = true;
         }
         if (!referencesOtherGraphs) {
@@ -1845,7 +1847,7 @@ WonMessage.prototype = {
       this.graphs.forEach(graph => {
         let graphUri = graph["@id"];
         let node = nodes[graphUri];
-        if (node.forwardedMessageUri) {
+        if (node && node.forwardedMessageUri) {
           node.forwardedMessage = nodes[node.forwardedMessageUri];
           unreferencedEnvelopes = unreferencedEnvelopes.filter(
             uri => uri != node.forwardedMessageUri
@@ -2086,7 +2088,7 @@ won.MessageBuilder.prototype = {
     return this;
   },
   sentTimestamp: function(timestamp) {
-    this.getMessageEventNode()["msg:sentTimestamp"] = timestamp;
+    this.getMessageEventNode()["msg:timestamp"] = timestamp;
     return this;
   },
   /**

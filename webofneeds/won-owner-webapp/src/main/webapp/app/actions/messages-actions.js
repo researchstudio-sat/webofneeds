@@ -137,13 +137,13 @@ export function successfulCreate(event) {
     //get URI of newly created atom from message
 
     //load the data into the local rdf store and publish AtomCreatedEvent when done
-    const atomURI = event.getRecipientAtom();
+    const atomURI = event.getAtomUri();
 
     won.getAtom(atomURI).then(atom => {
       dispatch(
         actionCreators.atoms__createSuccessful({
           eventUri: event.getIsResponseTo(),
-          atomUri: event.getSenderAtom(),
+          atomUri: event.getAtomUri(),
           atom: atom,
         })
       );
@@ -1200,6 +1200,7 @@ export function dispatchActionOnSuccessRemote(event) {
           ])
         )
         .then(([optimisticEvent, jsonldMessage]) => {
+          //TODO: WRAP /rest/messages/send POST AROUND
           dispatch({
             type: actionTypes.connections.sendChatMessageRefreshDataOnSuccess,
             payload: {

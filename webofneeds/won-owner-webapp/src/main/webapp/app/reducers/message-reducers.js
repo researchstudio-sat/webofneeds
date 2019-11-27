@@ -6,7 +6,6 @@ import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
 
 const initialState = Immutable.fromJS({
-  enqueued: {},
   waitingForAnswer: {},
   claimOnSuccess: {},
   refreshDataOnSuccess: {},
@@ -26,11 +25,19 @@ export function messagesReducer(messages = initialState, action = {}) {
     case actionTypes.atoms.edit:
     case actionTypes.atoms.connect:
     case actionTypes.personas.create:
-    case actionTypes.atoms.create:
-      return messages.setIn(
-        ["enqueued", action.payload.eventUri],
+    case actionTypes.atoms.create: {
+      console.debug(
+        "Set waitingForAnswer for message(",
+        action.payload.eventUri,
+        "): ",
         action.payload.message
       );
+
+      return messages.setIn(
+        ["waitingForAnswer", action.payload.eventUri],
+        action.payload.message
+      );
+    }
 
     case actionTypes.atoms.editFailure: {
       //TODO: IMPL
@@ -47,17 +54,12 @@ export function messagesReducer(messages = initialState, action = {}) {
     case actionTypes.messages.chatMessage.success:
       return messages.removeIn(["waitingForAnswer", action.payload.eventUri]);
 
-    case actionTypes.messages.waitingForAnswer: {
-      const pendingEventUri = action.payload.eventUri;
-      const msg = messages.getIn(["enqueued", pendingEventUri]);
-      return messages
-        .removeIn(["enqueued", pendingEventUri])
-        .setIn(["waitingForAnswer", pendingEventUri], msg);
-    }
-
     case actionTypes.connections.sendChatMessageRefreshDataOnSuccess:
       return messages
-        .setIn(["enqueued", action.payload.eventUri], action.payload.message)
+        .setIn(
+          ["waitingForAnswer", action.payload.eventUri],
+          action.payload.message
+        )
         .setIn(
           ["refreshDataOnSuccess", action.payload.eventUri],
           action.payload.message
@@ -65,7 +67,10 @@ export function messagesReducer(messages = initialState, action = {}) {
 
     case actionTypes.connections.sendChatMessageClaimOnSuccess:
       return messages
-        .setIn(["enqueued", action.payload.eventUri], action.payload.message)
+        .setIn(
+          ["waitingForAnswer", action.payload.eventUri],
+          action.payload.message
+        )
         .setIn(
           ["claimOnSuccess", action.payload.eventUri],
           action.payload.message

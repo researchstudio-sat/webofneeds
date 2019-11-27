@@ -39,18 +39,21 @@ export function atomEdit(draft, oldAtom, nodeUri) {
     }
 
     return ensureLoggedIn(dispatch, getState).then(async () => {
-      const { message, eventUri, atomUri } = await buildEditMessage(
-        draft,
-        oldAtom,
-        nodeUri
-      );
+      buildEditMessage(draft, oldAtom, nodeUri).then(msg => {
+        //TODO: WRAP /rest/messages/send POST AROUND
+        dispatch({
+          type: actionTypes.atoms.edit,
+          payload: {
+            eventUri: msg.eventUri,
+            message: msg.message,
+            atomUri: msg.atomUri,
+            atom: draft,
+            oldAtom,
+          },
+        });
 
-      dispatch({
-        type: actionTypes.atoms.edit,
-        payload: { eventUri, message, atomUri, atom: draft, oldAtom },
+        dispatch(actionCreators.router__back());
       });
-
-      dispatch(actionCreators.router__back());
     });
   };
 }
@@ -79,14 +82,18 @@ export function atomCreate(draft, personaUri, nodeUri) {
     }
 
     return ensureLoggedIn(dispatch, getState).then(async () => {
-      const { message, eventUri, atomUri } = await buildCreateMessage(
-        draft,
-        nodeUri
-      );
+      const { message, atomUri } = await buildCreateMessage(draft, nodeUri);
 
-      dispatch({
-        type: actionTypes.atoms.create,
-        payload: { eventUri, message, atomUri, atom: draft },
+      ownerApi.sendMessage(message).then(jsonResp => {
+        dispatch({
+          type: actionTypes.atoms.create,
+          payload: {
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
+            atomUri: atomUri,
+            atom: draft,
+          },
+        });
       });
 
       const persona = getIn(state, ["atoms", personaUri]);

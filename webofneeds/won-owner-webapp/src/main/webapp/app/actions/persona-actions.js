@@ -16,7 +16,7 @@ export function createPersona(persona, nodeUri) {
     }
 
     const publishedContentUri = nodeUri + "/atom/" + wonUtils.getRandomWonId();
-    const msgUri = "wm:/" + wonUtils.getRandomWonId();
+    const msgUri = "wm:/SELF"; //mandatory
 
     //FIXME: THIS SHOULD NOT USE ANY OF THE CODE BELOW BUT EXECUTE OUR ALREADY PRESENT ATOM-CREATION WITH A GIVEN DRAFT INSTEAD
     const graph = {
@@ -58,6 +58,7 @@ export function createPersona(persona, nodeUri) {
 
     msg["@context"]["@base"] = publishedContentUri;
 
+    //TODO: WRAP /rest/messages/send POST AROUND
     dispatch({
       type: actionTypes.personas.create,
       payload: {
@@ -109,6 +110,7 @@ async function connectReview(
     targetSocketUri: targetSocketUri,
   });
   const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
+  //TODO: WRAP /rest/messages/send POST AROUND
   dispatch({
     type: actionTypes.atoms.connect,
     payload: {
@@ -173,6 +175,7 @@ export function disconnectPersona(atomUri, personaUri) {
       atom.get("nodeUri"),
       connection.get("targetConnectionUri")
     ).then(({ eventUri, message }) => {
+      //TODO: WRAP /rest/messages/send POST AROUND
       dispatch({
         type: actionTypes.connections.close,
         payload: {

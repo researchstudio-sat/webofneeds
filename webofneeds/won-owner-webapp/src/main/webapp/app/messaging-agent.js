@@ -23,7 +23,6 @@ import { ownerBaseUrl } from "~/config/default.js";
 import urljoin from "url-join";
 
 import { actionTypes, actionCreators } from "./actions/actions.js";
-//import './message-service.js'; //TODO still uses es5
 import SockJS from "sockjs-client";
 
 const ECHO_STRING = "e";
@@ -101,6 +100,14 @@ export function runMessagingAgent(redux) {
       return false;
     },
     function(message) {
+      console.debug("message: ", message);
+      console.debug("isFromSystem: ", message.isFromSystem());
+      console.debug("isSuccessResponse: ", message.isSuccessResponse());
+      console.debug(
+        "isResponseToCreateMessage: ",
+        message.isResponseToCreateMessage()
+      );
+
       if (
         message.isFromSystem() &&
         message.isSuccessResponse() &&
@@ -360,7 +367,7 @@ export function runMessagingAgent(redux) {
     missedHeartbeats = 0;
 
     const data = JSON.parse(receivedMsg.data);
-
+    console.debug("WS MSG RECEIVED: ", data);
     won.wonMessageFromJsonLd(data).then(message => {
       won.addJsonLdData(data);
 
@@ -464,54 +471,7 @@ export function runMessagingAgent(redux) {
       redux.dispatch(actionCreators.reconnect__success());
     }
 
-    const sendFirstInBuffer = function(newMsgBuffer) {
-      if (newMsgBuffer && !newMsgBuffer.isEmpty()) {
-        try {
-          const firstEntry = newMsgBuffer.entries().next().value;
-          if (firstEntry && ws.readyState === SockJS.OPEN) {
-            //undefined if queue is empty
-            if (firstEntry.length != 2) {
-              console.error(
-                "Could not send message, did not find a uri/message pair in the message buffer. The first Entry in the buffer is:",
-                firstEntry
-              );
-              return;
-            }
-            const [eventUri, msg] = firstEntry;
-            // send message via POST this call returns
-            // the message URI (which now has to be 'wm:/SELF')
-            fetch("/owner/rest/messages/send", {
-              body: JSON.stringify(msg),
-              method: "POST",
-              headers: new Headers({
-                "Content-Type": "application/ld+json",
-              }),
-              credentials: "include",
-            });
-            //
-            //
-            // TODO: process the result of the call
-            //
-            // replaced this call:
-            // ws.send(JSON.stringify(msg));
-            //
-            // move message to next stat ("waitingForAnswer"). Also triggers this watch again as a result.
-            redux.dispatch(
-              actionCreators.messages__waitingForAnswer({ eventUri, msg })
-            );
-          }
-        } catch (error) {
-          console.error("could not send message due to this error", error);
-        }
-      }
-    };
-
     if (unsubscribeWatches.length === 0) {
-      const unsubscribeMsgQWatch = watchImmutableRdxState(
-        redux,
-        ["messages", "enqueued"],
-        newMsgBuffer => sendFirstInBuffer(newMsgBuffer)
-      );
       const unsubscribeReconnectWatch = watchImmutableRdxState(
         redux,
         ["messages", "reconnecting"],
@@ -531,13 +491,8 @@ export function runMessagingAgent(redux) {
         }
       );
 
-      unsubscribeWatches.push(unsubscribeMsgQWatch);
       unsubscribeWatches.push(unsubscribeReconnectWatch);
     }
-
-    //if there are enqueued messages, send the first one, (sending the rest should be triggered by the watch we just created)
-    const currentMsgBuffer = getIn(redux.getState(), ["messages", "enqueued"]);
-    sendFirstInBuffer(currentMsgBuffer);
   }
   function onError(e) {
     console.error("messaging-agent.js: websocket error: ", e);

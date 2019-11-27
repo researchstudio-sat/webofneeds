@@ -16,6 +16,7 @@ import {
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as stateStore from "../redux/state-store.js";
+import * as ownerApi from "../api/owner-api.js";
 import { get } from "../utils.js";
 
 export function fetchUnloadedAtom(atomUri) {
@@ -63,6 +64,7 @@ export function atomsConnect(
       targetSocketUri: targetSocketUri,
     });
     const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
+    //TODO: WRAP /rest/messages/send POST AROUND
     dispatch({
       type: actionTypes.atoms.connect,
       payload: {
@@ -84,6 +86,7 @@ export function atomsClose(atomUri) {
       getState().getIn(["config", "defaultNodeUri"])
     )
       .then(data => {
+        //TODO: WRAP /rest/messages/send POST AROUND
         dispatch(
           actionCreators.messages__send({
             eventUri: data.eventUri,
@@ -120,6 +123,7 @@ export function atomsOpen(atomUri) {
     )
       .then(data => {
         dispatch(
+          //TODO: WRAP /rest/messages/send POST AROUND
           actionCreators.messages__send({
             eventUri: data.eventUri,
             message: data.message,
@@ -165,11 +169,12 @@ export function atomsDelete(atomUri) {
       atomUri,
       getState().getIn(["config", "defaultNodeUri"])
     )
-      .then(data => {
+      .then(data => ownerApi.sendMessage(data.message))
+      .then(jsonResp => {
         dispatch(
           actionCreators.messages__send({
-            eventUri: data.eventUri,
-            message: data.message,
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
           })
         );
       })

@@ -69,6 +69,7 @@ export function connectionsChatMessageClaimOnSuccess(
         ])
       )
       .then(([optimisticEvent, jsonldMessage]) => {
+        //TODO: WRAP /rest/messages/send POST AROUND
         dispatch({
           type: actionTypes.connections.sendChatMessageClaimOnSuccess,
           payload: {
@@ -228,6 +229,7 @@ export function connectionsChatMessage(
         ])
       )
       .then(([optimisticEvent, jsonldMessage]) => {
+        //TODO: WRAP /rest/messages/send POST AROUND
         dispatch({
           type: referencedContentUris
             ? actionTypes.connections.sendChatMessageRefreshDataOnSuccess //If there are references in the message we need to Refresh the Data from the backend on msg success
@@ -282,7 +284,7 @@ export function connectionsOpen(connectionUri, textMessage) {
     );
 
     const optimisticEvent = await won.wonMessageFromJsonLd(openMsg.message);
-
+    //TODO: WRAP /rest/messages/send POST AROUND
     dispatch({
       type: actionTypes.connections.open,
       payload: {
@@ -337,6 +339,7 @@ function connectReactionAtom(
     );
 
     // create the new atom
+    //TODO: WRAP /rest/messages/send POST AROUND
     dispatch({
       type: actionTypes.atoms.create, // TODO custom action
       payload: {
@@ -435,6 +438,7 @@ function connectReactionAtom(
         // connect action to be dispatched when the
         // ad hoc atom has been created:
         //TODO: FIGURE OUT WHICH SOCKETS WILL BE CONNECTED
+        //TODO: WRAP /rest/messages/send POST AROUND
         const connectAction = {
           type: actionTypes.atoms.connect,
           payload: {
@@ -538,6 +542,7 @@ function connectAdHoc(
     won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
       // connect action to be dispatched when the
       // ad hoc atom has been created:
+      //TODO: WRAP /rest/messages/send POST AROUND
       const connectAction = {
         type: actionTypes.atoms.connect,
         payload: {
@@ -573,6 +578,7 @@ function connectAdHoc(
       });
 
       // create the new atom
+      //TODO: WRAP /rest/messages/send POST AROUND
       dispatch({
         type: actionTypes.atoms.create, // TODO custom action
         payload: {
@@ -613,6 +619,7 @@ export function connectionsClose(connectionUri) {
       get(theirAtom, "nodeUri"),
       theirConnectionUri
     ).then(({ eventUri, message }) => {
+      //TODO: WRAP /rest/messages/send POST AROUND
       dispatch({
         type: actionTypes.connections.close,
         payload: {
@@ -642,6 +649,7 @@ export function connectionsCloseRemote(message) {
       remoteNode,
       null
     ).then(closeMessage => {
+      //TODO: WRAP /rest/messages/send POST AROUND
       dispatch(
         actionCreators.messages__send({
           eventUri: closeMessage.eventUri,
@@ -693,6 +701,7 @@ export function connectionsRate(connectionUri, rating) {
         );
       })
       .then(({ eventUri, message }) =>
+        //TODO: WRAP /rest/messages/send POST AROUND
         dispatch({
           type: actionTypes.connections.rate,
           payload: {
@@ -830,7 +839,7 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
 
     const oldestMessageUri = get(sortedConnectionMessages.first(), "uri");
     const messageHashValue =
-      oldestMessageUri && oldestMessageUri.replace(/wm\:\/(.*)/, "$1"); // everything following the `wm:/`
+      oldestMessageUri && oldestMessageUri.replace(/wm:\/(.*)/, "$1"); // everything following the `wm:/`
 
     const fetchParams = {
       requesterWebId: atomUri,
