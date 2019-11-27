@@ -1434,7 +1434,7 @@ WonMessage.prototype = {
   getIsRemoteResponseTo: function() {
     return this.getProperty("https://w3id.org/won/message#isRemoteResponseTo");
   },
-  getIsResponseToMessageType: function() {
+  getRespondingToMessageType: function() {
     return this.getProperty(
       "https://w3id.org/won/message#respondingToMessageType"
     );
@@ -1620,67 +1620,67 @@ WonMessage.prototype = {
   },
   isResponseToReplaceMessage: function() {
     return (
-      this.getIsResponseToMessageType() ===
+      this.getRespondingToMessageType() ===
       "https://w3id.org/won/message#ReplaceMessage"
     );
   },
   isResponseToAtomHintMessage: function() {
     return (
-      this.getIsResponseToMessageType() ===
+      this.getRespondingToMessageType() ===
       "https://w3id.org/won/message#AtomHintMessage"
     );
   },
   isResponseToCreateMessage: function() {
     return (
-      this.getIsResponseToMessageType() ===
+      this.getRespondingToMessageType() ===
       "https://w3id.org/won/message#CreateMessage"
     );
   },
   isResponseToConnectMessage: function() {
     return (
-      this.getIsResponseToMessageType() ===
+      this.getRespondingToMessageType() ===
       "https://w3id.org/won/message#ConnectMessage"
     );
   },
   isResponseToOpenMessage: function() {
     return (
-      this.getIsResponseToMessageType() ===
+      this.getRespondingToMessageType() ===
       "https://w3id.org/won/message#OpenMessage"
     );
   },
   isResponseToConnectionMessage: function() {
     return (
-      this.getIsResponseToMessageType() ===
+      this.getRespondingToMessageType() ===
       "https://w3id.org/won/message#ConnectionMessage"
     );
   },
   isResponseToCloseMessage: function() {
     return (
-      this.getIsResponseToMessageType() ===
+      this.getRespondingToMessageType() ===
       "https://w3id.org/won/message#CloseMessage"
     );
   },
   isResponseToHintFeedbackMessage: function() {
     return (
-      this.getIsResponseToMessageType() ===
+      this.getRespondingToMessageType() ===
       "https://w3id.org/won/message#HintFeedbackMessage"
     );
   },
   isResponseToActivateMessage: function() {
     return (
-      this.getIsResponseToMessageType() ===
+      this.getRespondingToMessageType() ===
       "https://w3id.org/won/message#ActivateMessage"
     );
   },
   isResponseToDeactivateMessage: function() {
     return (
-      this.getIsResponseToMessageType() ===
+      this.getRespondingToMessageType() ===
       "https://w3id.org/won/message#DeactivateMessage"
     );
   },
   isResponseToDeleteMessage: function() {
     return (
-      this.getIsResponseToMessageType() ===
+      this.getRespondingToMessageType() ===
       "https://w3id.org/won/message#DeleteMessage"
     );
   },

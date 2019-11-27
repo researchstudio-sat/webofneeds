@@ -100,14 +100,6 @@ export function runMessagingAgent(redux) {
       return false;
     },
     function(message) {
-      console.debug("message: ", message);
-      console.debug("isFromSystem: ", message.isFromSystem());
-      console.debug("isSuccessResponse: ", message.isSuccessResponse());
-      console.debug(
-        "isResponseToCreateMessage: ",
-        message.isResponseToCreateMessage()
-      );
-
       if (
         message.isFromSystem() &&
         message.isSuccessResponse() &&
