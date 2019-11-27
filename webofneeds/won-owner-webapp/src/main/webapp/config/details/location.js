@@ -20,11 +20,11 @@ export const location = {
     placeholder:
       "Alternative Address name (e.g. if doornumber should be included)",
   },
-  parseToRDF: function({ value, identifier, contentUri }) {
+  parseToRDF: function({ value, contentUri }) {
     return {
       "s:location": genSPlace({
         geoData: value,
-        baseUri: wonUtils.genDetailBaseUri(contentUri, identifier),
+        baseUri: wonUtils.genDetailBaseUri(contentUri),
       }),
     };
   },
@@ -54,11 +54,11 @@ export const jobLocation = {
     placeholder:
       "Alternative Address name (e.g. if doornumber should be included)",
   },
-  parseToRDF: function({ value, identifier, contentUri }) {
+  parseToRDF: function({ value, contentUri }) {
     return {
       "s:jobLocation": genSPlace({
         geoData: value,
-        baseUri: wonUtils.genDetailBaseUri(contentUri, identifier),
+        baseUri: wonUtils.genDetailBaseUri(contentUri),
       }),
     };
   },
@@ -85,12 +85,12 @@ export const travelAction = {
   component: WonTravelActionPicker,
   viewerComponent: WonTravelActionViewer,
   messageEnabled: true,
-  parseToRDF: function({ value, identifier, contentUri }) {
+  parseToRDF: function({ value, contentUri }) {
     if (!value) {
       return { "con:travelAction": undefined };
     }
 
-    const baseUri = wonUtils.genDetailBaseUri(contentUri, identifier);
+    const baseUri = wonUtils.genDetailBaseUri(contentUri);
     return {
       "con:travelAction": {
         "@id": baseUri,
@@ -275,7 +275,7 @@ function genSPlace({ geoData, baseUri }) {
       return undefined;
     }
     return {
-      "@id": baseUri ? baseUri + "#geo" : undefined,
+      "@id": baseUri ? baseUri + "-geo" : undefined,
       "@type": "s:GeoCoordinates",
       "s:latitude": lat.toFixed(6),
       "s:longitude": lng.toFixed(6),
@@ -289,15 +289,15 @@ function genSPlace({ geoData, baseUri }) {
     return !nwCorner || !seCorner
       ? undefined
       : {
-          "@id": baseUri ? baseUri + "#bounds" : undefined,
+          "@id": baseUri ? baseUri + "-bounds" : undefined,
           "con:northWestCorner": {
-            "@id": baseUri ? baseUri + "#bounds#nw" : undefined,
+            "@id": baseUri ? baseUri + "-bounds-nw" : undefined,
             "@type": "s:GeoCoordinates",
             "s:latitude": nwCorner.lat.toFixed(6),
             "s:longitude": nwCorner.lng.toFixed(6),
           },
           "con:southEastCorner": {
-            "@id": baseUri ? baseUri + "#bounds#se" : undefined,
+            "@id": baseUri ? baseUri + "-bounds-se" : undefined,
             "@type": "s:GeoCoordinates",
             "s:latitude": seCorner.lat.toFixed(6),
             "s:longitude": seCorner.lng.toFixed(6),

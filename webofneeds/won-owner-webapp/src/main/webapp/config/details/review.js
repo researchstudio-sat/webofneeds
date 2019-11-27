@@ -35,7 +35,7 @@ export const review = {
         "@type": "s:Review",
         "@id":
           contentUri && identifier
-            ? contentUri + "#" + identifier + "#" + randomString
+            ? contentUri + "#" + identifier + "-" + randomString
             : undefined,
         "s:about":
           "TODO: here should be the identityUri that the review refers to", //TODO: use identity uri
@@ -48,9 +48,9 @@ export const review = {
               ? contentUri +
                 "#" +
                 identifier +
-                "#" +
+                "-" +
                 randomString +
-                "#" +
+                "-" +
                 generateIdString(10)
               : undefined,
           "s:bestRating": { "@value": 5, "@type": "xsd:int" }, //not necessary but possible

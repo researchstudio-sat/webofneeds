@@ -68,9 +68,9 @@ export const person = {
                 ? contentUri +
                   "#" +
                   identifier +
-                  "#" +
+                  "-" +
                   generateIdString(10) +
-                  "#organization"
+                  "-organization"
                 : undefined,
             "@type": "s:Organization",
             "s:name": getIn(value, ["company"]),
