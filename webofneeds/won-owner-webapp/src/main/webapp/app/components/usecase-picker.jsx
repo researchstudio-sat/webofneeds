@@ -250,8 +250,8 @@ WonUsecasePicker.propTypes = {
   routerGoCurrent: PropTypes.func,
   customUseCase: PropTypes.object,
   visibleUseCaseGroups: PropTypes.objectOf(PropTypes.object),
-  visibleUseCasesByConfig: PropTypes.arrayOf(PropTypes.string),
-  ungroupedUseCases: PropTypes.arrayOf(PropTypes.object),
+  visibleUseCasesByConfig: PropTypes.objectOf(PropTypes.object),
+  ungroupedUseCases: PropTypes.objectOf(PropTypes.object),
 };
 
 export default connect(
