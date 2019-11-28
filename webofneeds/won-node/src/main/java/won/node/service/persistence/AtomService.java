@@ -439,7 +439,7 @@ public class AtomService {
             List<OwnerApplication> ownerApplicationList = new ArrayList<>(1);
             OwnerApplication ownerApplication = new OwnerApplication();
             ownerApplication.setOwnerApplicationId(ownerApplicationID);
-            ownerApplicationRepository.save(ownerApplication);
+            ownerApplication = ownerApplicationRepository.save(ownerApplication);
             ownerApplicationList.add(ownerApplication);
             atom.setAuthorizedApplications(ownerApplicationList);
             logger.debug("setting OwnerApp ID: " + ownerApplicationList.get(0));

@@ -173,7 +173,7 @@ public class ConnectionService {
             logger.debug("connect from owner: set connection {} state to: {}", con.get().getConnectionURI(),
                             con.get().getState());
         }
-        return connectionRepository.saveAndFlush(con.get());
+        return connectionRepository.save(con.get());
     }
 
     public Connection connectFromNode(WonMessage wonMessage) {
@@ -249,7 +249,7 @@ public class ConnectionService {
         if (logger.isDebugEnabled()) {
             logger.debug("connect from node: set connection {} state to: {}", con.getConnectionURI(), con.getState());
         }
-        return connectionRepository.saveAndFlush(con);
+        return connectionRepository.save(con);
     }
 
     public Connection socketHint(WonMessage wonMessage) {
