@@ -343,28 +343,28 @@ function connectReactionAtom(
         });
     }
 
+    const getSocketFromDraft = atomDraft => {
+      const draftContent = atomDraft["content"];
+      const draftSockets = draftContent["sockets"];
+
+      if (draftSockets && atomDraftSocketType) {
+        for (let socketKey in draftSockets) {
+          if (draftSockets[socketKey] === atomDraftSocketType) {
+            return socketKey;
+          }
+        }
+      }
+
+      const defaultSocket = draftContent["defaultSocket"];
+      return defaultSocket && Object.keys(defaultSocket)[0];
+    };
+
+    const atomDraftSocketUri = getSocketFromDraft(atomDraft);
+
     if (generalSelectors.isAtomOwned(state, connectToAtomUri)) {
       const connectToSocketUri = connectToSocketType
         ? atomUtils.getSocketUri(connectToAtom, connectToSocketType)
         : atomUtils.getDefaultSocketUri(connectToAtom);
-
-      const getSocketFromDraft = atomDraft => {
-        const draftContent = atomDraft["content"];
-        const draftSockets = draftContent["sockets"];
-
-        if (draftSockets && atomDraftSocketType) {
-          for (let socketKey in draftSockets) {
-            if (draftSockets[socketKey] === atomDraftSocketType) {
-              return socketKey;
-            }
-          }
-        }
-
-        const defaultSocket = draftContent["defaultSocket"];
-        return defaultSocket && Object.keys(defaultSocket)[0];
-      };
-
-      const atomDraftSocketUri = getSocketFromDraft(atomDraft);
 
       if (atomDraftSocketUri && connectToSocketUri) {
         ownerApi
@@ -393,7 +393,7 @@ function connectReactionAtom(
       // establish connection
       const cnctMsg = buildConnectMessage({
         connectMessage: "",
-        socketUri: undefined, //TODO: FIND CORRECT SOCKETURIS
+        socketUri: `${atomUri}${atomDraftSocketUri}`,
         targetSocketUri: connectToSocketUri,
       });
 
