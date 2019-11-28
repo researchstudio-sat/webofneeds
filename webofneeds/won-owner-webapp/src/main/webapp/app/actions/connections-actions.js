@@ -233,28 +233,16 @@ export function connectionsOpen(connectionUri, textMessage) {
     const ownedAtom = get(getState(), "atoms").find(atom =>
       getIn(atom, ["connections", connectionUri])
     );
-    const theirAtomUri = getIn(getState(), [
-      "atoms",
-      get(ownedAtom, "uri"),
-      "connections",
-      connectionUri,
-      "targetAtomUri",
-    ]);
-    const theirAtom = getIn(getState(), ["atoms", theirAtomUri]);
-    const theirConnectionUri = getIn(ownedAtom, [
-      "connections",
-      connectionUri,
-      "targetConnectionUri",
+    const socketUri = getIn(ownedAtom, ["connectionUri", "socketUri"]);
+    const targetSocketUri = getIn(ownedAtom, [
+      "connectionUri",
+      "targetSocketUri",
     ]);
 
     const openMsg = await buildOpenMessage(
-      connectionUri,
-      get(ownedAtom, "uri"),
-      theirAtomUri,
-      get(ownedAtom, "nodeUri"),
-      get(theirAtom, "nodeUri"),
-      theirConnectionUri,
-      textMessage
+      textMessage,
+      socketUri,
+      targetSocketUri
     );
 
     const optimisticEvent = await won.wonMessageFromJsonLd(openMsg.message);

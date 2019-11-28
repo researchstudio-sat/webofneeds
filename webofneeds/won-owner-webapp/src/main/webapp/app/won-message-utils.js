@@ -352,21 +352,11 @@ export function buildChatMessage({
   return messageP;
 }
 
-export function buildOpenMessage(
-  connectionUri,
-  ownedAtomUri,
-  theirAtomUri,
-  ownNodeUri,
-  theirNodeUri,
-  theirConnectionUri,
-  chatMessage,
-  socketUri,
-  targetSocketUri
-) {
+export function buildOpenMessage(chatMessage, socketUri, targetSocketUri) {
+  //TODO: REMOVE THIS ALTOGETHER
   return won
     .validateEnvelopeDataForConnection(socketUri, targetSocketUri)
     .then(() => {
-      //TODO: use event URI pattern specified by WoN node
       const eventUri = "wm:/SELF"; //mandatory
       const message = new won.MessageBuilder(won.WONMSG.openMessage)
         .protocolVersion("1.0")
