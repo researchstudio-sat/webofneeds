@@ -15,13 +15,9 @@ import * as accountUtils from "../redux/utils/account-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as ownerApi from "../api/owner-api.js";
 
-export function atomEdit(draft, oldAtom, nodeUri) {
+export function atomEdit(draft, oldAtom) {
   return (dispatch, getState) => {
     const state = getState();
-
-    if (!nodeUri) {
-      nodeUri = getIn(state, ["config", "defaultNodeUri"]);
-    }
 
     let prevParams = getIn(state, ["router", "prevParams"]);
 
@@ -39,11 +35,7 @@ export function atomEdit(draft, oldAtom, nodeUri) {
     }
 
     return ensureLoggedIn(dispatch, getState).then(async () => {
-      const { message, atomUri } = await buildEditMessage(
-        draft,
-        oldAtom,
-        nodeUri
-      );
+      const { message, atomUri } = await buildEditMessage(draft, oldAtom);
 
       ownerApi.sendMessage(message).then(jsonResp => {
         dispatch({

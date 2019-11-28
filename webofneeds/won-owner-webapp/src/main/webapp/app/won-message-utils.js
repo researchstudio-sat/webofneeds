@@ -39,6 +39,7 @@ export function buildRateMessage(
       //TODO: use event URI pattern specified by WoN node
       const eventUri = "wm:/SELF"; //mandatory
       const message = new won.MessageBuilder(won.WONMSG.feedbackMessage) //TODO: Looks like a copy-paste-leftover from connect
+        .protocolVersion("1.0")
         .eventURI(eventUri)
         .ownerDirection()
         .forEnvelopeData(envelopeData)
@@ -79,6 +80,7 @@ export function buildCloseMessage(
     //TODO: use event URI pattern specified by WoN node
     const eventUri = "wm:/SELF"; //mandatory
     const message = new won.MessageBuilder(won.WONMSG.closeMessage)
+      .protocolVersion("1.0")
       .eventURI(eventUri)
       .forEnvelopeData(envelopeData)
       .ownerDirection()
@@ -110,6 +112,7 @@ export function buildCloseAtomMessage(atomUri) {
   const buildMessage = function(envelopeData) {
     const eventUri = "wm:/SELF"; //mandatory
     const message = new won.MessageBuilder(won.WONMSG.closeAtomMessage)
+      .protocolVersion("1.0")
       .eventURI(eventUri)
       .ownerDirection()
       .timestamp(new Date().getTime().toString())
@@ -131,6 +134,7 @@ export function buildDeleteAtomMessage(atomUri) {
   const buildMessage = function(envelopeData) {
     const eventUri = "wm:/SELF"; //mandatory
     const message = new won.MessageBuilder(won.WONMSG.deleteAtomMessage)
+      .protocolVersion("1.0")
       .eventURI(eventUri)
       .ownerDirection()
       .timestamp(new Date().getTime().toString())
@@ -152,6 +156,7 @@ export function buildOpenAtomMessage(atomUri) {
   const buildMessage = function(envelopeData) {
     const eventUri = "wm:/SELF"; //mandatory
     const message = new won.MessageBuilder(won.WONMSG.activateAtomMessage)
+      .protocolVersion("1.0")
       .eventURI(eventUri)
       .ownerDirection()
       .timestamp(new Date().getTime().toString())
@@ -212,6 +217,7 @@ export function buildConnectMessage({
     messageBuilder.mergeIntoContentGraph(connectMessage);
   }
   messageBuilder.ownerDirection();
+  messageBuilder.protocolVersion("1.0");
   messageBuilder.timestamp(new Date().getTime().toString());
   const message = messageBuilder.build();
 
@@ -255,6 +261,7 @@ export function buildChatMessage({
         won.WONMSG.connectionMessage
       )
         .forEnvelopeData(envelopeData)
+        .protocolVersion("1.0")
         .ownerDirection()
         .timestamp(new Date().getTime().toString());
 
@@ -396,6 +403,7 @@ export function buildOpenMessage(
       //TODO: use event URI pattern specified by WoN node
       const eventUri = "wm:/SELF"; //mandatory
       const message = new won.MessageBuilder(won.WONMSG.openMessage)
+        .protocolVersion("1.0")
         .eventURI(eventUri)
         .forEnvelopeData(envelopeData)
         .textMessage(chatMessage)
@@ -412,7 +420,7 @@ export function buildOpenMessage(
   return messageP;
 }
 
-export async function buildEditMessage(editedAtomData, oldAtom, wonNodeUri) {
+export async function buildEditMessage(editedAtomData, oldAtom) {
   const atomUriToEdit = oldAtom && oldAtom.get("uri");
 
   //if type  create -> use atomBuilder as well
@@ -441,8 +449,6 @@ export async function buildEditMessage(editedAtomData, oldAtom, wonNodeUri) {
 
   const msgUri = "wm:/SELF"; //mandatory
   const msgJson = won.buildMessageRdf(contentRdf, {
-    recipientNode: wonNodeUri, //mandatory
-    senderNode: wonNodeUri, //mandatory
     msgType: won.WONMSG.replaceMessage, //mandatory
     publishedContentUri: atomUriToEdit, //mandatory
     msgUri: msgUri,

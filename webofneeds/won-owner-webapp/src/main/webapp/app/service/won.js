@@ -2079,6 +2079,10 @@ won.MessageBuilder.prototype = {
     this.getMessageEventNode()["msg:timestamp"] = timestamp;
     return this;
   },
+  protocolVersion: function(version) {
+    this.getMessageEventNode()["msg:protocolVersion"] = version;
+    return this;
+  },
   /**
    * Adds the specified socket as local sockets. Only needed for connect and
    * openSuggested.

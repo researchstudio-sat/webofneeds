@@ -161,12 +161,10 @@ import won from "./won.js";
  forEnvelopeData(?)
 
  sender
- senderNode
  senderAtom (used)
 
  recipient
  recipientAtom
- recipientNode (used)
 
  socket (used, in atombuilder)
  targetSocket
