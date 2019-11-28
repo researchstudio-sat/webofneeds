@@ -109,67 +109,67 @@ export function buildCloseMessage(
     });
 }
 export function buildCloseAtomMessage(atomUri) {
-  const buildMessage = function(envelopeData) {
+  const buildMessage = function() {
     const eventUri = "wm:/SELF"; //mandatory
     const message = new won.MessageBuilder(won.WONMSG.closeAtomMessage)
       .protocolVersion("1.0")
+      .atom(atomUri)
       .eventURI(eventUri)
       .ownerDirection()
       .timestamp(new Date().getTime().toString())
-      .forEnvelopeData(envelopeData)
       .build();
 
     return { eventUri: eventUri, message: message };
   };
 
   return won
-    .getEnvelopeDataForAtom(atomUri)
+    .validateEnvelopeDataForAtom(atomUri)
     .then(
-      envelopeData => buildMessage(envelopeData),
+      () => buildMessage(),
       () => won.reportError("cannot close atom " + atomUri)
     );
 }
 
 export function buildDeleteAtomMessage(atomUri) {
-  const buildMessage = function(envelopeData) {
+  const buildMessage = function() {
     const eventUri = "wm:/SELF"; //mandatory
     const message = new won.MessageBuilder(won.WONMSG.deleteAtomMessage)
       .protocolVersion("1.0")
+      .atom(atomUri)
       .eventURI(eventUri)
       .ownerDirection()
       .timestamp(new Date().getTime().toString())
-      .forEnvelopeData(envelopeData)
       .build();
 
     return { eventUri: eventUri, message: message };
   };
 
   return won
-    .getEnvelopeDataForAtom(atomUri)
+    .validateEnvelopeDataForAtom(atomUri)
     .then(
-      envelopeData => buildMessage(envelopeData),
+      () => buildMessage(),
       () => won.reportError("cannot delete atom " + atomUri)
     );
 }
 
 export function buildOpenAtomMessage(atomUri) {
-  const buildMessage = function(envelopeData) {
+  const buildMessage = function() {
     const eventUri = "wm:/SELF"; //mandatory
     const message = new won.MessageBuilder(won.WONMSG.activateAtomMessage)
       .protocolVersion("1.0")
+      .atom(atomUri)
       .eventURI(eventUri)
       .ownerDirection()
       .timestamp(new Date().getTime().toString())
-      .forEnvelopeData(envelopeData)
       .build();
 
     return { eventUri: eventUri, message: message };
   };
 
   return won
-    .getEnvelopeDataForAtom(atomUri)
+    .validateEnvelopeDataForAtom(atomUri)
     .then(
-      envelopeData => buildMessage(envelopeData),
+      () => buildMessage(),
       () => won.reportError("cannot close atom " + atomUri)
     );
 }
@@ -181,44 +181,29 @@ export function buildOpenAtomMessage(atomUri) {
  * @returns {{eventUri, message}|*}
  */
 export function buildConnectMessage({
-  ownedAtomUri,
-  theirAtomUri,
-  ownNodeUri,
-  theirNodeUri,
   connectMessage,
-  optionalOwnConnectionUri,
   socketUri,
   targetSocketUri,
 }) {
-  const envelopeData = won.getEnvelopeDataforNewConnection(
-    ownedAtomUri,
-    theirAtomUri,
-    ownNodeUri,
-    theirNodeUri
-  );
-  if (optionalOwnConnectionUri) {
-    envelopeData[won.WONMSG.sender] = optionalOwnConnectionUri;
+  if (!socketUri || !targetSocketUri) {
+    throw new Error("buildConnectMessage is missing socketUris");
   }
-  if (socketUri) {
-    envelopeData[won.WONMSG.senderSocket] = socketUri;
-  }
-  if (targetSocketUri) {
-    envelopeData[won.WONMSG.recipientSocket] = targetSocketUri;
-  }
-  //TODO: use event URI pattern specified by WoN node
+
   const eventUri = "wm:/SELF"; //mandatory
-  const messageBuilder = new won.MessageBuilder(won.WONMSG.connectMessage);
-  messageBuilder.eventURI(eventUri);
-  messageBuilder.forEnvelopeData(envelopeData);
-  //do not set sockets: connect the default sockets with each other
+  const messageBuilder = new won.MessageBuilder(won.WONMSG.connectMessage)
+    .protocolVersion("1.0")
+    .eventURI(eventUri)
+    .senderSocket(socketUri)
+    .targetSocket(targetSocketUri)
+    .ownerDirection()
+    .timestamp(new Date().getTime().toString());
+
   if (connectMessage && typeof connectMessage === "string") {
     messageBuilder.textMessage(connectMessage);
   } else if (connectMessage) {
     messageBuilder.mergeIntoContentGraph(connectMessage);
   }
-  messageBuilder.ownerDirection();
-  messageBuilder.protocolVersion("1.0");
-  messageBuilder.timestamp(new Date().getTime().toString());
+
   const message = messageBuilder.build();
 
   return { eventUri: eventUri, message: message };

@@ -53,13 +53,8 @@ export function atomsConnect(
       );
     }
 
-    const cnctMsg = await buildConnectMessage({
-      ownedAtomUri: ownedAtomUri,
-      theirAtomUri: theirAtomUri,
-      ownNodeUri: ownedAtom.get("nodeUri"),
-      theirNodeUri: theirAtom.get("nodeUri"),
+    const cnctMsg = buildConnectMessage({
       connectMessage: connectMessage,
-      optionalOwnConnectionUri: ownConnectionUri,
       socketUri: socketUri,
       targetSocketUri: targetSocketUri,
     });

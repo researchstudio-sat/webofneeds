@@ -1431,6 +1431,9 @@ WonMessage.prototype = {
   getSenderNode: function() {
     return this.getProperty("https://w3id.org/won/message#senderNode");
   },
+  getSenderSocket: function() {
+    return this.getProperty("https://w3id.org/won/message#senderSocket");
+  },
   getSenderAtom: function() {
     return this.getProperty("https://w3id.org/won/message#senderAtom");
   },
@@ -1440,7 +1443,10 @@ WonMessage.prototype = {
   getRecipientNode: function() {
     return this.getProperty("https://w3id.org/won/message#recipientNode");
   },
-  getAtomUri: function() {
+  getRecipientSocket: function() {
+    return this.getProperty("https://w3id.org/won/message#recipientSocket");
+  },
+  getAtom: function() {
     return this.getProperty("https://w3id.org/won/message#atom");
   },
   getRecipientConnection: function() {
@@ -2035,9 +2041,27 @@ won.MessageBuilder.prototype = {
     }
     return this;
   },
+  atom: function(atomURI) {
+    this.getMessageEventNode()[won.WONMSG.atomCompacted] = {
+      "@id": atomURI,
+    };
+    return this;
+  },
   senderAtom: function(senderAtomURI) {
     this.getMessageEventNode()[won.WONMSG.senderAtomCompacted] = {
       "@id": senderAtomURI,
+    };
+    return this;
+  },
+  senderSocket: function(senderSocketURI) {
+    this.getMessageEventNode()[won.WONMSG.senderSocketCompacted] = {
+      "@id": senderSocketURI,
+    };
+    return this;
+  },
+  recipientSocket: function(recipientSocketURI) {
+    this.getMessageEventNode()[won.WONMSG.recipientSocketCompacted] = {
+      "@id": recipientSocketURI,
     };
     return this;
   },

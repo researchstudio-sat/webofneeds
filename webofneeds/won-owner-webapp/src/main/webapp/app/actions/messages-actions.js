@@ -137,13 +137,13 @@ export function successfulCreate(event) {
     //get URI of newly created atom from message
 
     //load the data into the local rdf store and publish AtomCreatedEvent when done
-    const atomURI = event.getAtomUri();
+    const atomURI = event.getAtom();
 
     won.getAtom(atomURI).then(atom => {
       dispatch(
         actionCreators.atoms__createSuccessful({
           eventUri: event.getIsResponseTo(),
-          atomUri: event.getAtomUri(),
+          atomUri: event.getAtom(),
           atom: atom,
         })
       );
@@ -156,7 +156,7 @@ export function successfulEdit(event) {
     console.debug("Received success replace message:", event);
     //const state = getState();
     //load the edited data into the local rdf store and publish AtomEditEvent when done
-    const atomURI = event.getAtomUri();
+    const atomURI = event.getAtom();
 
     const processState = get(getState(), "process");
 
@@ -174,7 +174,7 @@ export function successfulEdit(event) {
           dispatch(
             actionCreators.atoms__editSuccessful({
               eventUri: event.getIsResponseTo(),
-              atomUri: event.getAtomUri(),
+              atomUri: event.getAtom(),
               //atom: atom,
             })
           );

@@ -1030,41 +1030,14 @@ import won from "./won.js";
     return triples.map(tripleToString).join("\n");
   }
 
-  won.getEnvelopeDataForAtom = function(atomUri) {
+  won.validateEnvelopeDataForAtom = function(atomUri) {
     if (typeof atomUri === "undefined" || atomUri == null) {
-      throw { message: "getEnvelopeDataForAtom: atomUri must not be null" };
-    }
-
-    let ret = {};
-    ret[won.WONMSG.atom] = atomUri;
-
-    return Promise.resolve(ret);
-  };
-
-  won.getEnvelopeDataforNewConnection = function(
-    ownedAtomUri,
-    theirAtomUri,
-    ownNodeUri,
-    theirNodeUri
-  ) {
-    if (!ownedAtomUri) {
       throw {
-        message:
-          "getEnvelopeDataforNewConnection: ownedAtomUri must not be null",
+        message: "validateEnvelopeDataForAtom: atomUri must not be null",
       };
     }
-    if (!theirAtomUri) {
-      throw {
-        message:
-          "getEnvelopeDataforNewConnection: theirAtomUri must not be null",
-      };
-    }
-    return {
-      [won.WONMSG.senderAtom]: ownedAtomUri,
-      [won.WONMSG.senderNode]: ownNodeUri,
-      [won.WONMSG.recipientAtom]: theirAtomUri,
-      [won.WONMSG.recipientNode]: theirNodeUri,
-    };
+
+    return Promise.resolve();
   };
 
   /**

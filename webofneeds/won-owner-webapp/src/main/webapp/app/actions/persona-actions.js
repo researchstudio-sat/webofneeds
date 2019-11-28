@@ -36,12 +36,7 @@ async function connectReview(
   }
 
   const cnctMsg = buildConnectMessage({
-    ownedAtomUri: ownPersona.get("uri"),
-    theirAtomUri: foreignPersona.get("uri"),
-    ownNodeUri: ownPersona.get("nodeUri"),
-    theirNodeUri: foreignPersona.get("nodeUri"),
     connectMessage: connectMessage,
-    optionalOwnConnectionUri: connectionUri,
     socketUri: socketUri,
     targetSocketUri: targetSocketUri,
   });

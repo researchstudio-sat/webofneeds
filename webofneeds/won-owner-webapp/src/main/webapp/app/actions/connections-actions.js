@@ -422,18 +422,16 @@ function connectReactionAtom(
         );
       }
     } else {
-      // establish connection
-      const cnctMsg = buildConnectMessage({
-        ownedAtomUri: atomUri,
-        theirAtomUri: connectToAtomUri,
-        ownNodeUri: nodeUri,
-        theirNodeUri: get(connectToAtom, "nodeUri"),
-        connectMessage: "",
-      });
-
       const connectToSocketUri = connectToSocketType
         ? atomUtils.getSocketUri(connectToAtom, connectToSocketType)
         : atomUtils.getDefaultSocketUri(connectToAtom);
+
+      // establish connection
+      const cnctMsg = buildConnectMessage({
+        connectMessage: "",
+        socketUri: undefined, //TODO: FIND CORRECT SOCKETURIS
+        targetSocketUri: connectToSocketUri,
+      });
 
       won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
         // connect action to be dispatched when the
@@ -491,7 +489,6 @@ function connectAdHoc(
 ) {
   ensureLoggedIn(dispatch, getState).then(async () => {
     const state = getState();
-    const theirAtom = getIn(state, ["atoms", theirAtomUri]);
     const adHocDraft = {
       content: {
         responseToUri: theirAtomUri,
@@ -530,14 +527,9 @@ function connectAdHoc(
 
     // establish connection
     const cnctMsg = buildConnectMessage({
-      ownedAtomUri: atomUri,
-      theirAtomUri: theirAtomUri,
-      ownNodeUri: nodeUri,
-      theirNodeUri: get(theirAtom, "nodeUri"),
       connectMessage: textMessage,
-      undefined,
-      socketUri,
-      connectToSocketUri,
+      socketUri: socketUri,
+      targetSocketUri: connectToSocketUri,
     });
 
     won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
