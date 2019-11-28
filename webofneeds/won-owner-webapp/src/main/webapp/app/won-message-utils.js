@@ -106,12 +106,11 @@ export function buildCloseMessage(
       throw err;
     });
 }
-export function buildCloseAtomMessage(atomUri, wonNodeUri) {
+export function buildCloseAtomMessage(atomUri) {
   const buildMessage = function(envelopeData) {
     const eventUri = "wm:/SELF"; //mandatory
     const message = new won.MessageBuilder(won.WONMSG.closeAtomMessage)
       .eventURI(eventUri)
-      .recipientNode(wonNodeUri)
       .ownerDirection()
       .sentTimestamp(new Date().getTime().toString())
       .forEnvelopeData(envelopeData)
@@ -121,19 +120,18 @@ export function buildCloseAtomMessage(atomUri, wonNodeUri) {
   };
 
   return won
-    .getEnvelopeDataForAtom(atomUri, wonNodeUri)
+    .getEnvelopeDataForAtom(atomUri)
     .then(
       envelopeData => buildMessage(envelopeData),
       () => won.reportError("cannot close atom " + atomUri)
     );
 }
 
-export function buildDeleteAtomMessage(atomUri, wonNodeUri) {
+export function buildDeleteAtomMessage(atomUri) {
   const buildMessage = function(envelopeData) {
     const eventUri = "wm:/SELF"; //mandatory
     const message = new won.MessageBuilder(won.WONMSG.deleteAtomMessage)
       .eventURI(eventUri)
-      .recipientNode(wonNodeUri)
       .ownerDirection()
       .sentTimestamp(new Date().getTime().toString())
       .forEnvelopeData(envelopeData)
@@ -143,19 +141,18 @@ export function buildDeleteAtomMessage(atomUri, wonNodeUri) {
   };
 
   return won
-    .getEnvelopeDataForAtom(atomUri, wonNodeUri)
+    .getEnvelopeDataForAtom(atomUri)
     .then(
       envelopeData => buildMessage(envelopeData),
       () => won.reportError("cannot delete atom " + atomUri)
     );
 }
 
-export function buildOpenAtomMessage(atomUri, wonNodeUri) {
+export function buildOpenAtomMessage(atomUri) {
   const buildMessage = function(envelopeData) {
     const eventUri = "wm:/SELF"; //mandatory
     const message = new won.MessageBuilder(won.WONMSG.activateAtomMessage)
       .eventURI(eventUri)
-      .recipientNode(wonNodeUri)
       .ownerDirection()
       .sentTimestamp(new Date().getTime().toString())
       .forEnvelopeData(envelopeData)
@@ -165,7 +162,7 @@ export function buildOpenAtomMessage(atomUri, wonNodeUri) {
   };
 
   return won
-    .getEnvelopeDataForAtom(atomUri, wonNodeUri)
+    .getEnvelopeDataForAtom(atomUri)
     .then(
       envelopeData => buildMessage(envelopeData),
       () => won.reportError("cannot close atom " + atomUri)

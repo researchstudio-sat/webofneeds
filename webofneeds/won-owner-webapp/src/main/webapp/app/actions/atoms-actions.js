@@ -83,10 +83,7 @@ export function atomsConnect(
 
 export function atomsClose(atomUri) {
   return (dispatch, getState) => {
-    buildCloseAtomMessage(
-      atomUri,
-      getState().getIn(["config", "defaultNodeUri"])
-    )
+    buildCloseAtomMessage(atomUri)
       .then(data => ownerApi.sendMessage(data.message))
       .then(jsonResp => {
         dispatch(
@@ -118,11 +115,8 @@ export function atomsClose(atomUri) {
 }
 
 export function atomsOpen(atomUri) {
-  return (dispatch, getState) => {
-    buildOpenAtomMessage(
-      atomUri,
-      getState().getIn(["config", "defaultNodeUri"])
-    )
+  return dispatch => {
+    buildOpenAtomMessage(atomUri)
       .then(data => ownerApi.sendMessage(data.message))
       .then(jsonResp => {
         dispatch(
@@ -166,11 +160,8 @@ export function atomsClosedBySystem(event) {
 }
 
 export function atomsDelete(atomUri) {
-  return (dispatch, getState) => {
-    buildDeleteAtomMessage(
-      atomUri,
-      getState().getIn(["config", "defaultNodeUri"])
-    )
+  return dispatch => {
+    buildDeleteAtomMessage(atomUri)
       .then(data => ownerApi.sendMessage(data.message))
       .then(jsonResp => {
         dispatch(

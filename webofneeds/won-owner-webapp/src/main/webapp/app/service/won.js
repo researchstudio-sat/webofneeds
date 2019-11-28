@@ -161,6 +161,8 @@ won.WONMSG.recipientNode = won.WONMSG.baseUri + "recipientNode";
 won.WONMSG.recipientNodeCompacted = won.WONMSG.prefix + ":recipientNode";
 won.WONMSG.recipientSocket = won.WONMSG.baseUri + "recipientSocket";
 won.WONMSG.recipientSocketCompacted = won.WONMSG.prefix + ":recipientSocket";
+won.WONMSG.atom = won.WONMSG.baseUri + "atom";
+won.WONMSG.atomCompacted = won.WONMSG.prefix + ":atom";
 won.WONMSG.senderAtom = won.WONMSG.baseUri + "senderAtom";
 won.WONMSG.senderAtomCompacted = won.WONMSG.prefix + ":senderAtom";
 won.WONMSG.sender = won.WONMSG.baseUri + "sender";
@@ -400,7 +402,7 @@ won.messageType2EventType = {
 
 //UTILS
 won.WONMSG.uriPlaceholder = Object.freeze({
-  event: "this:eventuri",
+  event: "wm:/SELF",
 });
 
 won.WON.contentNodeBlankUri = Object.freeze({
@@ -844,7 +846,7 @@ won.addContentGraphReferencesToMessageGraph = function(
  */
 won.addMessageGraph = function(builder, graphURIs, messageType) {
   let graphs = builder.data["@graph"];
-  let unsetMessageGraphUri = won.WONMSG.uriPlaceholder.event + "#data";
+  let unsetMessageGraphUri = won.WONMSG.uriPlaceholder.event + "#envelope";
   //create the message graph, containing the message type
   const messageGraph = {
     "@graph": [
@@ -853,7 +855,9 @@ won.addMessageGraph = function(builder, graphURIs, messageType) {
         "msg:messageType": {
           "@id": messageType,
         },
-        "msg:envelope": unsetMessageGraphUri,
+        "msg:envelope": {
+          "@id": unsetMessageGraphUri,
+        },
       },
       {
         "@id": unsetMessageGraphUri,

@@ -1030,19 +1030,13 @@ import won from "./won.js";
     return triples.map(tripleToString).join("\n");
   }
 
-  won.getEnvelopeDataForAtom = function(atomUri, nodeUri) {
+  won.getEnvelopeDataForAtom = function(atomUri) {
     if (typeof atomUri === "undefined" || atomUri == null) {
       throw { message: "getEnvelopeDataForAtom: atomUri must not be null" };
     }
 
     let ret = {};
-    ret[won.WONMSG.senderAtom] = atomUri;
-    ret[won.WONMSG.recipientAtom] = atomUri;
-
-    if (!(typeof nodeUri === "undefined" || nodeUri == null)) {
-      ret[won.WONMSG.senderNode] = nodeUri;
-      ret[won.WONMSG.recipientNode] = nodeUri;
-    }
+    ret[won.WONMSG.atom] = atomUri;
 
     return Promise.resolve(ret);
   };
