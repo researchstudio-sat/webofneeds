@@ -115,30 +115,6 @@ export default function(allAtomsInState = initialState, action = {}) {
     case actionTypes.atoms.delete:
       return deleteAtom(allAtomsInState, action.payload.get("uri"));
 
-    case actionTypes.personas.create: {
-      //FIXME: Please let us use the addAtom method as a single entry point to add Atoms(even Personas) to the State
-      return allAtomsInState.set(
-        action.payload.atomUri,
-        Immutable.fromJS({
-          jsonld: action.payload.persona,
-          isBeingCreated: true,
-          uri: action.payload.atomUri,
-          creationDate: new Date(),
-          content: {
-            type: Immutable.Set([
-              won.WON.AtomCompacted,
-              won.WON.PersonaCompacted,
-            ]),
-            sockets: Immutable.Map(),
-          },
-          connections: Immutable.Map(),
-          holds: Immutable.Set(),
-          buddies: Immutable.Set(),
-          rating: { aggregateRating: 0.0, reviewCount: 0 },
-        })
-      );
-    }
-
     case actionTypes.atoms.edit: {
       console.debug(
         "payload = {eventUri, message, atomUri, atom: draft, oldAtom}"

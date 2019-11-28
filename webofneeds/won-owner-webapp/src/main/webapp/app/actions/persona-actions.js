@@ -1,75 +1,11 @@
 import { generateIdString, get, getIn } from "../utils";
 import won from "../won-es6";
-import * as wonUtils from "../won-utils.js";
 import { actionTypes } from "./actions";
 import { getOwnedAtomByConnectionUri } from "../redux/selectors/general-selectors";
 import { getOwnedConnectionByUri } from "../redux/selectors/connection-selectors";
 import { buildCloseMessage, buildConnectMessage } from "../won-message-utils";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as ownerApi from "../api/owner-api.js";
-
-export function createPersona(persona, nodeUri) {
-  return (dispatch, getState) => {
-    const state = getState();
-    if (!nodeUri) {
-      nodeUri = getIn(state, ["config", "defaultNodeUri"]);
-    }
-
-    const publishedContentUri = nodeUri + "/atom/" + wonUtils.getRandomWonId();
-    const msgUri = "wm:/SELF"; //mandatory
-
-    //FIXME: THIS SHOULD NOT USE ANY OF THE CODE BELOW BUT EXECUTE OUR ALREADY PRESENT ATOM-CREATION WITH A GIVEN DRAFT INSTEAD
-    const graph = {
-      "@id": publishedContentUri,
-      "@type": [won.WON.AtomCompacted, won.WON.PersonaCompacted],
-      "won:socket": [
-        {
-          "@id": "#holderSocket",
-          "won:socketDefinition": { "@id": "hold:HolderSocket" },
-        },
-        {
-          "@id": "#reviewSocket",
-          "won:socketDefinition": { "@id": "review:ReviewSocket" },
-        },
-        {
-          "@id": "#buddySocket",
-          "won:socketDefinition": { "@id": "buddy:BuddySocket" },
-        },
-      ],
-      "match:flag": [
-        { "@id": "match:NoHintForCounterpart" },
-        { "@id": "match:NoHintForMe" },
-      ],
-      "s:name": persona.displayName,
-      "s:description": persona.aboutMe || undefined,
-      "s:url": persona.website || undefined,
-    };
-    const graphEnvelope = {
-      "@graph": [graph],
-    };
-
-    const msg = won.buildMessageRdf(graphEnvelope, {
-      recipientNode: nodeUri, //mandatory
-      senderNode: nodeUri, //mandatory
-      msgType: won.WONMSG.createMessage, //mandatory
-      publishedContentUri: publishedContentUri, //mandatory
-      msgUri: msgUri,
-    });
-
-    msg["@context"]["@base"] = publishedContentUri;
-
-    //TODO: WRAP /rest/messages/send POST AROUND
-    dispatch({
-      type: actionTypes.personas.create,
-      payload: {
-        eventUri: msgUri,
-        message: msg,
-        atomUri: publishedContentUri,
-        persona: graph,
-      },
-    });
-  };
-}
 
 async function connectReview(
   dispatch,

@@ -179,7 +179,6 @@ export default function(processState = initialState, action = {}) {
       return processState.set("processingWhatsAround", false);
     }
 
-    case actionTypes.personas.create:
     case actionTypes.atoms.create:
       return processState.set("processingPublish", true);
 

@@ -82,7 +82,6 @@ import {
 import { stateGo, stateReload } from "redux-ui-router";
 import {
   connectPersona,
-  createPersona,
   disconnectPersona,
   reviewPersona,
 } from "./persona-actions.js";
@@ -170,7 +169,6 @@ const actionHierarchy = {
     selectTab: INJ_DEFAULT,
   },
   personas: {
-    create: createPersona,
     review: reviewPersona,
     connect: connectPersona,
     disconnect: disconnectPersona,

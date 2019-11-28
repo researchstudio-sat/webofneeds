@@ -24,7 +24,6 @@ export function messagesReducer(messages = initialState, action = {}) {
     case actionTypes.messages.send:
     case actionTypes.atoms.edit:
     case actionTypes.atoms.connect:
-    case actionTypes.personas.create:
     case actionTypes.atoms.create: {
       console.debug(
         "Set waitingForAnswer for message(",
