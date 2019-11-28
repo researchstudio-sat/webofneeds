@@ -1148,11 +1148,11 @@ export function dispatchActionOnSuccessRemote(event) {
     }
 
     if (toAutoClaim) {
-      const theirConnectionUri = event.getSenderConnection();
+      //TODO: FIX WHAT THIS AUTOCLAIM DOES
+      const socketUri = undefined; //TODO: FIND CORRECT SOCKETURIS
+      const targetSocketUri = undefined; //TODO: FIND CORRECT SOCKETURIS
+
       const ownedAtomUri = event.getRecipientAtom();
-      const ownNodeUri = event.getRecipientNode();
-      const theirAtomUri = event.getSenderAtom();
-      const theirNodeUri = event.getSenderNode();
 
       let referencedContentUris = new Map().set("claims", [
         { "@id": event.getIsRemoteResponseTo() },
@@ -1185,12 +1185,8 @@ export function dispatchActionOnSuccessRemote(event) {
         chatMessage: undefined,
         additionalContent: undefined,
         referencedContentUris: referencedContentUris,
-        connectionUri,
-        ownedAtomUri,
-        theirAtomUri,
-        ownNodeUri,
-        theirNodeUri,
-        theirConnectionUri,
+        socketUri: socketUri,
+        targetSocketUri: targetSocketUri,
         isTTL: false,
       })
         .then(msgData =>

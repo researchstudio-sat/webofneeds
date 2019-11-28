@@ -36,30 +36,18 @@ export function connectionsChatMessageClaimOnSuccess(
     const ownedAtom = get(getState(), "atoms").find(atom =>
       getIn(atom, ["connections", connectionUri])
     );
-    const theirAtomUri = getIn(getState(), [
-      "atoms",
-      get(ownedAtom, "uri"),
-      "connections",
-      connectionUri,
-      "targetAtomUri",
-    ]);
-    const theirAtom = getIn(getState(), ["atoms", theirAtomUri]);
-    const theirConnectionUri = getIn(ownedAtom, [
-      "connections",
-      connectionUri,
-      "targetConnectionUri",
+    const socketUri = getIn(ownedAtom, ["connectionUri", "socketUri"]);
+    const targetSocketUri = getIn(ownedAtom, [
+      "connectionUri",
+      "targetSocketUri",
     ]);
 
     buildChatMessage({
       chatMessage: chatMessage,
       additionalContent: additionalContent,
       referencedContentUris: undefined,
-      connectionUri,
-      ownedAtomUri: get(ownedAtom, "uri"),
-      theirAtomUri: theirAtomUri,
-      ownNodeUri: get(ownedAtom, "nodeUri"),
-      theirNodeUri: get(theirAtom, "nodeUri"),
-      theirConnectionUri,
+      socketUri: socketUri,
+      targetSocketUri: targetSocketUri,
       isTTL: false,
     })
       .then(msgData =>
@@ -102,18 +90,10 @@ export function connectionsChatMessage(
     const ownedAtom = get(getState(), "atoms").find(atom =>
       getIn(atom, ["connections", connectionUri])
     );
-    const theirAtomUri = getIn(getState(), [
-      "atoms",
-      get(ownedAtom, "uri"),
-      "connections",
-      connectionUri,
-      "targetAtomUri",
-    ]);
-    const theirAtom = getIn(getState(), ["atoms", theirAtomUri]);
-    const theirConnectionUri = getIn(ownedAtom, [
-      "connections",
-      connectionUri,
-      "targetConnectionUri",
+    const socketUri = getIn(ownedAtom, ["connectionUri", "socketUri"]);
+    const targetSocketUri = getIn(ownedAtom, [
+      "connectionUri",
+      "targetSocketUri",
     ]);
 
     let referencedContentUris = undefined;
@@ -213,12 +193,8 @@ export function connectionsChatMessage(
       chatMessage: chatMessage,
       additionalContent: additionalContent,
       referencedContentUris: referencedContentUris,
-      connectionUri,
-      ownedAtomUri: get(ownedAtom, "uri"),
-      theirAtomUri: theirAtomUri,
-      ownNodeUri: get(ownedAtom, "nodeUri"),
-      theirNodeUri: get(theirAtom, "nodeUri"),
-      theirConnectionUri,
+      socketUri: socketUri,
+      targetSocketUri: targetSocketUri,
       isTTL,
     })
       .then(msgData =>

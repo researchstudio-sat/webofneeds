@@ -1040,46 +1040,22 @@ import won from "./won.js";
     return Promise.resolve();
   };
 
-  /**
-   * Fetches a structure that can be used directly (in a JSON-LD node) as the envelope data
-   * to send a message via the specified connectionUri (that is interpreted as a local connection.
-   * @param connectionUri
-   * @param ownedAtomUri
-   * @param theirAtomUri
-   * @param ownNodeUri
-   * @param theirNodeUri
-   * @param theirConnectionUri
-   * @returns a promise to the data
-   */
-  won.getEnvelopeDataforConnection = async function(
-    connectionUri,
-    ownedAtomUri,
-    theirAtomUri,
-    ownNodeUri,
-    theirNodeUri,
-    theirConnectionUri
+  won.validateEnvelopeDataForConnection = async function(
+    socketUri,
+    targetSocketUri
   ) {
-    if (typeof connectionUri === "undefined" || connectionUri == null) {
+    if (
+      typeof socketUri === "undefined" ||
+      socketUri == null ||
+      typeof targetSocketUri === "undefined" ||
+      targetSocketUri == null
+    ) {
       throw {
-        message: "getEnvelopeDataforConnection: connectionUri must not be null",
+        message: "getEnvelopeDataforConnection: socketUris must not be null",
       };
     }
 
-    const ret = {
-      [won.WONMSG.sender]: connectionUri,
-      [won.WONMSG.senderAtom]: ownedAtomUri,
-      [won.WONMSG.senderNode]: ownNodeUri,
-      [won.WONMSG.recipientAtom]: theirAtomUri,
-      [won.WONMSG.recipientNode]: theirNodeUri,
-    };
-    try {
-      if (theirConnectionUri) {
-        ret[won.WONMSG.recipient] = theirConnectionUri;
-      }
-    } catch (err) {
-      console.error("getEnvelopeDataforConnection: ", err.message, err.stack);
-    }
-    return Promise.resolve(ret);
+    return Promise.resolve();
   };
 
   won.getConnectionUrisWithStateByAtomUri = (atomUri, requesterWebId) => {
