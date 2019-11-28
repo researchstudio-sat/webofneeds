@@ -400,7 +400,6 @@ function connectReactionAtom(
       won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
         // connect action to be dispatched when the
         // ad hoc atom has been created:
-        //TODO: FIGURE OUT WHICH SOCKETS WILL BE CONNECTED
         //TODO: WRAP /rest/messages/send POST AROUND
         const connectAction = {
           type: actionTypes.atoms.connect,
@@ -409,8 +408,8 @@ function connectReactionAtom(
             message: cnctMsg.message,
             optimisticEvent: optimisticEvent,
             targetSocketUri: connectToSocketUri,
-            socketUri: undefined, //TODO: FIGURE OUT HOW TO HANDLE A NEWLY CREATED ATOM
-            atomUri: undefined, //TODO: FIGURE OUT HOW TO HANDLE A NEWLY CREATED ATOM
+            socketUri: `${atomUri}${atomDraftSocketUri}`,
+            atomUri: atomUri,
             targetAtomUri: get(connectToAtom, "uri"),
           },
         };
@@ -561,28 +560,19 @@ export function connectionsClose(connectionUri) {
     const ownedAtom = get(getState(), "atoms").find(atom =>
       getIn(atom, ["connections", connectionUri])
     );
-    const theirAtomUri = getIn(getState(), [
-      "atoms",
-      get(ownedAtom, "uri"),
+
+    const socketUri = getIn(ownedAtom, [
       "connections",
       connectionUri,
-      "targetAtomUri",
+      "socketUri",
     ]);
-    const theirAtom = getIn(getState(), ["atoms", theirAtomUri]);
-    const theirConnectionUri = getIn(ownedAtom, [
+    const targetSocketUri = getIn(ownedAtom, [
       "connections",
       connectionUri,
-      "targetConnectionUri",
+      "targetSocketUri",
     ]);
 
-    buildCloseMessage(
-      connectionUri,
-      get(ownedAtom, "uri"),
-      theirAtomUri,
-      get(ownedAtom, "nodeUri"),
-      get(theirAtom, "nodeUri"),
-      theirConnectionUri
-    )
+    buildCloseMessage(socketUri, targetSocketUri)
       .then(({ message }) => ownerApi.sendMessage(message))
       .then(jsonResp => {
         dispatch({
@@ -600,20 +590,10 @@ export function connectionsClose(connectionUri) {
 export function connectionsCloseRemote(message) {
   //Closes the 'targetConnection' again, if closeConnections(...) only closes the 'own' connection
   return dispatch => {
-    const connectionUri = message.getSenderConnection();
-    const targetAtomUri = message.getSenderAtom();
-    const remoteNode = message.getSenderNode();
-    const ownedAtomUri = message.getRecipientAtom();
-    const ownNode = message.getRecipientNode();
+    const socketUri = message.getSenderSocket();
+    const targetSocketUri = message.getTargetSocket();
 
-    buildCloseMessage(
-      connectionUri,
-      targetAtomUri,
-      ownedAtomUri,
-      ownNode,
-      remoteNode,
-      null
-    )
+    buildCloseMessage(socketUri, targetSocketUri)
       .then(closeMessage => ownerApi.sendMessage(closeMessage.message))
       .then(jsonResp => {
         dispatch(

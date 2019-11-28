@@ -419,6 +419,11 @@ export function getCurrentLocation(state) {
   return viewState && viewUtils.getCurrentLocation(viewState);
 }
 
+export function getAtomUriBySocketUri(state, socketUri) {
+  //TODO: GET FROM STATE AND NOT FROM substr
+  return socketUri && socketUri.split("#")[0];
+}
+
 function decodeUriComponentProperly(encodedUri) {
   if (!encodedUri) return undefined;
   //for some reason decodeUri(undefined) yields "undefined"

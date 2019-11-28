@@ -379,6 +379,7 @@ export function runMessagingAgent(redux) {
     for (const msgUri in messages) {
       const msg = messages[msgUri];
       won.wonMessageFromJsonLd(msg).then(message => {
+        console.debug("Processing WonMessage from WS: ", message);
         won.addJsonLdData(msg);
 
         let messageProcessed = false;

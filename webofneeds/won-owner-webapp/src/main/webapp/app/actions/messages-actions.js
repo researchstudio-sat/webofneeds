@@ -612,19 +612,37 @@ export function processConnectionMessage(event) {
 
 export function processConnectMessage(event) {
   return (dispatch, getState) => {
-    const receiverConnectionUri = event.getRecipientConnection();
-    const recipientAtomUri = event.getRecipientAtom();
-
-    const senderAtomUri = event.getSenderAtom();
-    const senderConnectionUri = event.getSenderConnection();
-
+    const senderSocketUri = event.getSenderSocket();
+    const targetSocketUri = event.getTargetSocket();
     const state = getState();
+
+    const recipientAtomUri = generalSelectors.getAtomUriBySocketUri(
+      state,
+      targetSocketUri
+    );
+
+    const senderAtomUri = generalSelectors.getAtomUriBySocketUri(
+      state,
+      senderSocketUri
+    );
+
     const senderAtom = getIn(state, ["atoms", senderAtomUri]);
     const recipientAtom = getIn(state, ["atoms", recipientAtomUri]);
     const isOwnSenderAtom = generalSelectors.isAtomOwned(state, senderAtomUri);
     const isOwnRecipientAtom = generalSelectors.isAtomOwned(
       state,
       recipientAtomUri
+    );
+
+    const receiverConnectionUri = atomUtils.getConnectionUriBySocketUris(
+      senderAtom,
+      senderSocketUri,
+      targetSocketUri
+    );
+    const senderConnectionUri = atomUtils.getConnectionUriBySocketUris(
+      recipientAtom,
+      targetSocketUri,
+      senderSocketUri
     );
 
     let senderAtomP;

@@ -64,16 +64,7 @@ export function buildRateMessage(
   });
 }
 
-export function buildCloseMessage(
-  connectionUri,
-  ownedAtomUri,
-  theirAtomUri,
-  ownNodeUri,
-  theirNodeUri,
-  theirConnectionUri,
-  socketUri,
-  targetSocketUri
-) {
+export function buildCloseMessage(socketUri, targetSocketUri) {
   const buildMessage = function() {
     //TODO: use event URI pattern specified by WoN node
     const eventUri = "wm:/SELF"; //mandatory
@@ -94,9 +85,7 @@ export function buildCloseMessage(
     .validateEnvelopeDataForConnection(socketUri, targetSocketUri)
     .then(() => buildMessage())
     .catch(err => {
-      won.reportError(
-        "cannot close connection " + connectionUri + ": " + JSON.stringify(err)
-      );
+      won.reportError("cannot close connection " + JSON.stringify(err));
       throw err;
     });
 }

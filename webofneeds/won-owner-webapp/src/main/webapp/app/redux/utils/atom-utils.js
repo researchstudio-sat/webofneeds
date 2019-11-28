@@ -310,6 +310,18 @@ export function hasUnreadSuggestedConnections(atom) {
   );
 }
 
+export function getConnectionUriBySocketUris(atom, socketUri, targetSocketUri) {
+  const connections = get(atom, "connections");
+  return (
+    connections &&
+    connections.find(
+      conn =>
+        get(conn, "socketUri") === socketUri &&
+        get(conn, "targetSocketUri") === targetSocketUri
+    )
+  );
+}
+
 // to be used on personas
 export function hasUnreadBuddyRequests(atom) {
   return (

@@ -86,28 +86,20 @@ export function disconnectPersona(atomUri, personaUri) {
     const persona = getIn(state, ["atoms", personaUri]);
     const atom = getIn(state, ["atoms", atomUri]);
 
-    const connectionUri = get(persona, "connections")
-      .filter(connection => {
-        const socketUri = get(connection, "targetSocketUri");
-        const socketType = getIn(atom, ["content", "sockets", socketUri]);
-        return (
-          get(connection, "targetAtomUri") === atomUri &&
-          socketType === won.HOLD.HoldableSocketCompacted
-        );
-      })
-      .keySeq()
-      .first();
+    const connection = get(persona, "connections").find(conn => {
+      const socketUri = get(conn, "targetSocketUri");
+      const socketType = getIn(atom, ["content", "sockets", socketUri]);
+      return (
+        get(conn, "targetAtomUri") === atomUri &&
+        socketType === won.HOLD.HoldableSocketCompacted
+      );
+    });
 
-    const connection = getOwnedConnectionByUri(state, connectionUri);
+    const socketUri = get(connection, "socketUri");
+    const targetSocketUri = get(connection, "targetSocketUri");
+    const connectionUri = get(connection, "uri");
 
-    buildCloseMessage(
-      connectionUri,
-      personaUri,
-      atomUri,
-      persona.get("nodeUri"),
-      atom.get("nodeUri"),
-      connection.get("targetConnectionUri")
-    )
+    buildCloseMessage(socketUri, targetSocketUri)
       .then(({ message }) => ownerApi.sendMessage(message))
       .then(jsonResp => {
         dispatch({
