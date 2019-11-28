@@ -1045,32 +1045,6 @@ export function processAtomHintMessage(event) {
 }
 
 /**
- * Dispatches actions registered for the "successOwn" event for the specified message uri.
- * The corresponding reducer clears any registered actions for the "failureOwn" event
- */
-export function dispatchActionOnSuccessOwn(event) {
-  return (dispatch, getState) => {
-    const toDispatchList = getState().getIn([
-      "messages",
-      "dispatchOnSuccessOwn",
-      event.getIsResponseTo(),
-    ]);
-    if (toDispatchList) {
-      toDispatchList.forEach(d => {
-        dispatch(d);
-      });
-    }
-    //the reducer will delete the toDispatchList for successOwn and failureOwn
-    dispatch({
-      type: actionTypes.messages.dispatchActionOn.successOwn,
-      payload: {
-        eventUri: event.getIsResponseTo(),
-      },
-    });
-  };
-}
-
-/**
  * Dispatches actions registered for the "failureOwn" event for the specified message uri.
  * The corresponding reducer clears any registered actions for the "successOwn" event
  */

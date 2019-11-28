@@ -367,30 +367,6 @@ export function runMessagingAgent(redux) {
   // have been processed normally
   const messagePostProcessingArray = [
     function(message) {
-      if (message.isFromSystem() && message.isSuccessResponse()) {
-        redux.dispatch(
-          actionCreators.messages__dispatchActionOn__successOwn(message)
-        );
-        console.debug(
-          "dispatch actionCreators.messages__dispatchActionOn__successOwn"
-        );
-        return true;
-      }
-      return false;
-    },
-    function(message) {
-      if (message.isFromSystem() && message.isFailureResponse()) {
-        redux.dispatch(
-          actionCreators.messages__dispatchActionOn__failureOwn(message)
-        );
-        console.debug(
-          "dispatch actionCreators.messages__dispatchActionOn__failureOwn"
-        );
-        return true;
-      }
-      return false;
-    },
-    function(message) {
       if (message.isFromExternal() && message.isSuccessResponse()) {
         redux.dispatch(
           actionCreators.messages__dispatchActionOn__successRemote(message)

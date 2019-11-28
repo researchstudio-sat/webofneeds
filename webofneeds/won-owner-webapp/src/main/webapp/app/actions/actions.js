@@ -281,17 +281,14 @@ const actionHierarchy = {
     // (when the respective success message is processed)
     dispatchActionOn: {
       // registers the action (in action.actionToDispatch)
-      registerSuccessOwn: INJ_DEFAULT,
       registerFailureOwn: INJ_DEFAULT,
       registerSuccessRemote: INJ_DEFAULT,
       registerFailureRemote: INJ_DEFAULT,
       // the action creator dispatches the registered actions
-      successOwn: messages.dispatchActionOnSuccessOwn,
       successRemote: messages.dispatchActionOnSuccessRemote,
       // failure actions clear the list of registered success actions
       // and vice versa
-      failureOwn: messages.dispatchActionOnSuccessOwn,
-      failureRemote: messages.dispatchActionOnSuccessOwn,
+      failureRemote: messages.dispatchActionOnFailureRemote,
     },
 
     waitingForAnswer: INJ_DEFAULT,

@@ -297,137 +297,126 @@ function connectReactionAtom(
     const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
 
     // create new atom
-    const { message, eventUri, atomUri } = await buildCreateMessage(
-      atomDraft,
-      nodeUri
-    );
+    const { message, atomUri } = await buildCreateMessage(atomDraft, nodeUri);
 
     // create the new atom
-    ownerApi.sendMessage(message).then(jsonResp => {
-      dispatch({
-        type: actionTypes.atoms.create, // TODO custom action
-        payload: {
-          eventUri: jsonResp.messageUri,
-          message: jsonResp.message,
-          atomUri: atomUri,
-          atom: atomDraft,
-        },
-      });
-
-      dispatch(
-        actionCreators.router__stateGo("connections", {
-          useCase: undefined,
-          useCaseGroup: undefined,
-          fromAtomUri: undefined,
-          viewConnUri: undefined,
-          mode: undefined,
-        })
-      );
-    });
-
-    // add persona if present
-    if (personaUri) {
-      const persona = getIn(state, ["atoms", personaUri]);
-      ownerApi
-        .serverSideConnect(
-          atomUtils.getSocketUri(persona, won.HOLD.HolderSocketCompacted),
-          `${atomUri}#holdableSocket`,
-          false,
-          true
-        )
-        .then(async response => {
-          if (!response.ok) {
-            const errorMsg = await response.text();
-            throw new Error(`Could not connect identity: ${errorMsg}`);
-          }
-        });
-    }
-
-    const getSocketFromDraft = atomDraft => {
-      const draftContent = atomDraft["content"];
-      const draftSockets = draftContent["sockets"];
-
-      if (draftSockets && atomDraftSocketType) {
-        for (let socketKey in draftSockets) {
-          if (draftSockets[socketKey] === atomDraftSocketType) {
-            return socketKey;
-          }
-        }
-      }
-
-      const defaultSocket = draftContent["defaultSocket"];
-      return defaultSocket && Object.keys(defaultSocket)[0];
-    };
-
-    const atomDraftSocketUri = getSocketFromDraft(atomDraft);
-
-    if (generalSelectors.isAtomOwned(state, connectToAtomUri)) {
-      const connectToSocketUri = connectToSocketType
-        ? atomUtils.getSocketUri(connectToAtom, connectToSocketType)
-        : atomUtils.getDefaultSocketUri(connectToAtom);
-
-      if (atomDraftSocketUri && connectToSocketUri) {
-        ownerApi
-          .serverSideConnect(
-            connectToSocketUri,
-            `${atomUri}${atomDraftSocketUri}`,
-            false,
-            true
-          )
-          .then(async response => {
-            if (!response.ok) {
-              const errorMsg = await response.text();
-              throw new Error(`Could not connect owned atoms: ${errorMsg}`);
-            }
-          });
-      } else {
-        throw new Error(
-          `Could not connect owned atoms did not find necessary sockets`
-        );
-      }
-    } else {
-      const connectToSocketUri = connectToSocketType
-        ? atomUtils.getSocketUri(connectToAtom, connectToSocketType)
-        : atomUtils.getDefaultSocketUri(connectToAtom);
-
-      // establish connection
-      const cnctMsg = buildConnectMessage({
-        connectMessage: "",
-        socketUri: `${atomUri}${atomDraftSocketUri}`,
-        targetSocketUri: connectToSocketUri,
-      });
-
-      won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
-        // connect action to be dispatched when the
-        // ad hoc atom has been created:
-        const connectActionCallback = () => {
-          ownerApi.sendMessage(cnctMsg.message).then(jsonResp =>
-            dispatch({
-              type: actionTypes.atoms.connect,
-              payload: {
-                eventUri: jsonResp.messageUri,
-                message: jsonResp.message,
-                optimisticEvent: optimisticEvent,
-                targetSocketUri: connectToSocketUri,
-                socketUri: `${atomUri}${atomDraftSocketUri}`,
-                atomUri: atomUri,
-                targetAtomUri: get(connectToAtom, "uri"),
-              },
-            })
-          );
-        };
-
-        // register the connect action to be dispatched when
-        // atom creation is successful
+    ownerApi
+      .sendMessage(message)
+      .then(jsonResp => {
         dispatch({
-          type: actionTypes.messages.dispatchActionOn.registerSuccessOwn,
+          type: actionTypes.atoms.create, // TODO custom action
           payload: {
-            eventUri: eventUri,
-            connectActionCallback: connectActionCallback,
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
+            atomUri: atomUri,
+            atom: atomDraft,
           },
         });
+
+        dispatch(
+          actionCreators.router__stateGo("connections", {
+            useCase: undefined,
+            useCaseGroup: undefined,
+            fromAtomUri: undefined,
+            viewConnUri: undefined,
+            mode: undefined,
+          })
+        );
+      })
+      .then(() => {
+        // add persona if present
+        if (personaUri) {
+          const persona = getIn(state, ["atoms", personaUri]);
+          ownerApi
+            .serverSideConnect(
+              atomUtils.getSocketUri(persona, won.HOLD.HolderSocketCompacted),
+              `${atomUri}#holdableSocket`,
+              false,
+              true
+            )
+            .then(async response => {
+              if (!response.ok) {
+                const errorMsg = await response.text();
+                throw new Error(`Could not connect identity: ${errorMsg}`);
+              }
+            });
+        }
+
+        const getSocketFromDraft = atomDraft => {
+          const draftContent = atomDraft["content"];
+          const draftSockets = draftContent["sockets"];
+
+          if (draftSockets && atomDraftSocketType) {
+            for (let socketKey in draftSockets) {
+              if (draftSockets[socketKey] === atomDraftSocketType) {
+                return socketKey;
+              }
+            }
+          }
+
+          const defaultSocket = draftContent["defaultSocket"];
+          return defaultSocket && Object.keys(defaultSocket)[0];
+        };
+
+        const atomDraftSocketUri = getSocketFromDraft(atomDraft);
+
+        if (generalSelectors.isAtomOwned(state, connectToAtomUri)) {
+          const connectToSocketUri = connectToSocketType
+            ? atomUtils.getSocketUri(connectToAtom, connectToSocketType)
+            : atomUtils.getDefaultSocketUri(connectToAtom);
+
+          if (atomDraftSocketUri && connectToSocketUri) {
+            ownerApi
+              .serverSideConnect(
+                connectToSocketUri,
+                `${atomUri}${atomDraftSocketUri}`,
+                false,
+                true
+              )
+              .then(async response => {
+                if (!response.ok) {
+                  const errorMsg = await response.text();
+                  throw new Error(`Could not connect owned atoms: ${errorMsg}`);
+                }
+              });
+          } else {
+            throw new Error(
+              `Could not connect owned atoms did not find necessary sockets`
+            );
+          }
+        } else {
+          const connectToSocketUri = connectToSocketType
+            ? atomUtils.getSocketUri(connectToAtom, connectToSocketType)
+            : atomUtils.getDefaultSocketUri(connectToAtom);
+
+          // establish connection
+          const cnctMsg = buildConnectMessage({
+            connectMessage: "",
+            socketUri: `${atomUri}${atomDraftSocketUri}`,
+            targetSocketUri: connectToSocketUri,
+          });
+
+          won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
+            // connect action to be dispatched when the
+            // ad hoc atom has been created:
+
+            ownerApi.sendMessage(cnctMsg.message).then(jsonResp =>
+              dispatch({
+                type: actionTypes.atoms.connect,
+                payload: {
+                  eventUri: jsonResp.messageUri,
+                  message: jsonResp.message,
+                  optimisticEvent: optimisticEvent,
+                  targetSocketUri: connectToSocketUri,
+                  socketUri: `${atomUri}${atomDraftSocketUri}`,
+                  atomUri: atomUri,
+                  targetAtomUri: get(connectToAtom, "uri"),
+                },
+              })
+            );
+          });
+        }
       });
-    }
   });
 }
 
