@@ -65,16 +65,15 @@ export function connectionsChatMessageClaimOnSuccess(
       .then(msgData =>
         Promise.all([
           won.wonMessageFromJsonLd(msgData.message),
-          msgData.message,
+          ownerApi.sendMessage(msgData.message),
         ])
       )
-      .then(([optimisticEvent, jsonldMessage]) => {
-        //TODO: WRAP /rest/messages/send POST AROUND
+      .then(([optimisticEvent, jsonResp]) => {
         dispatch({
           type: actionTypes.connections.sendChatMessageClaimOnSuccess,
           payload: {
-            eventUri: optimisticEvent.getMessageUri(),
-            message: jsonldMessage,
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
             optimisticEvent,
           },
         });
@@ -225,18 +224,17 @@ export function connectionsChatMessage(
       .then(msgData =>
         Promise.all([
           won.wonMessageFromJsonLd(msgData.message),
-          msgData.message,
+          ownerApi.sendMessage(msgData.message),
         ])
       )
-      .then(([optimisticEvent, jsonldMessage]) => {
-        //TODO: WRAP /rest/messages/send POST AROUND
+      .then(([optimisticEvent, jsonResp]) => {
         dispatch({
           type: referencedContentUris
             ? actionTypes.connections.sendChatMessageRefreshDataOnSuccess //If there are references in the message we need to Refresh the Data from the backend on msg success
             : actionTypes.connections.sendChatMessage,
           payload: {
-            eventUri: optimisticEvent.getMessageUri(),
-            message: jsonldMessage,
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
             optimisticEvent,
           },
         });
@@ -284,16 +282,18 @@ export function connectionsOpen(connectionUri, textMessage) {
     );
 
     const optimisticEvent = await won.wonMessageFromJsonLd(openMsg.message);
-    //TODO: WRAP /rest/messages/send POST AROUND
-    dispatch({
-      type: actionTypes.connections.open,
-      payload: {
-        connectionUri,
-        textMessage,
-        eventUri: openMsg.eventUri,
-        message: openMsg.message,
-        optimisticEvent,
-      },
+
+    ownerApi.sendMessage(openMsg.message).then(jsonResp => {
+      dispatch({
+        type: actionTypes.connections.open,
+        payload: {
+          connectionUri,
+          textMessage,
+          eventUri: jsonResp.messageUri,
+          message: jsonResp.message,
+          optimisticEvent,
+        },
+      });
     });
   };
 }
@@ -339,26 +339,27 @@ function connectReactionAtom(
     );
 
     // create the new atom
-    //TODO: WRAP /rest/messages/send POST AROUND
-    dispatch({
-      type: actionTypes.atoms.create, // TODO custom action
-      payload: {
-        eventUri,
-        message,
-        atomUri,
-        atom: atomDraft,
-      },
-    });
+    ownerApi.sendMessage(message).then(jsonResp => {
+      dispatch({
+        type: actionTypes.atoms.create, // TODO custom action
+        payload: {
+          eventUri: jsonResp.messageUri,
+          message: jsonResp.message,
+          atomUri: atomUri,
+          atom: atomDraft,
+        },
+      });
 
-    dispatch(
-      actionCreators.router__stateGo("connections", {
-        useCase: undefined,
-        useCaseGroup: undefined,
-        fromAtomUri: undefined,
-        viewConnUri: undefined,
-        mode: undefined,
-      })
-    );
+      dispatch(
+        actionCreators.router__stateGo("connections", {
+          useCase: undefined,
+          useCaseGroup: undefined,
+          fromAtomUri: undefined,
+          viewConnUri: undefined,
+          mode: undefined,
+        })
+      );
+    });
 
     // add persona if present
     if (personaUri) {
@@ -578,15 +579,17 @@ function connectAdHoc(
       });
 
       // create the new atom
-      //TODO: WRAP /rest/messages/send POST AROUND
-      dispatch({
-        type: actionTypes.atoms.create, // TODO custom action
-        payload: {
-          eventUri,
-          message,
-          atomUri,
-          atom: adHocDraft,
-        },
+
+      ownerApi.sendMessage(message).then(jsonResp => {
+        dispatch({
+          type: actionTypes.atoms.create, // TODO custom action
+          payload: {
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
+            atomUri: atomUri,
+            atom: adHocDraft,
+          },
+        });
       });
     });
   });
@@ -618,17 +621,18 @@ export function connectionsClose(connectionUri) {
       get(ownedAtom, "nodeUri"),
       get(theirAtom, "nodeUri"),
       theirConnectionUri
-    ).then(({ eventUri, message }) => {
-      //TODO: WRAP /rest/messages/send POST AROUND
-      dispatch({
-        type: actionTypes.connections.close,
-        payload: {
-          connectionUri,
-          eventUri,
-          message,
-        },
+    )
+      .then(({ message }) => ownerApi.sendMessage(message))
+      .then(jsonResp => {
+        dispatch({
+          type: actionTypes.connections.close,
+          payload: {
+            connectionUri: connectionUri,
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
+          },
+        });
       });
-    });
   };
 }
 
@@ -648,15 +652,16 @@ export function connectionsCloseRemote(message) {
       ownNode,
       remoteNode,
       null
-    ).then(closeMessage => {
-      //TODO: WRAP /rest/messages/send POST AROUND
-      dispatch(
-        actionCreators.messages__send({
-          eventUri: closeMessage.eventUri,
-          message: closeMessage.message,
-        })
-      );
-    });
+    )
+      .then(closeMessage => ownerApi.sendMessage(closeMessage.message))
+      .then(jsonResp => {
+        dispatch(
+          actionCreators.messages__send({
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
+          })
+        );
+      });
   };
 }
 
@@ -700,15 +705,15 @@ export function connectionsRate(connectionUri, rating) {
           rating
         );
       })
-      .then(({ eventUri, message }) =>
-        //TODO: WRAP /rest/messages/send POST AROUND
+      .then(({ message }) => ownerApi.sendMessage(message))
+      .then(jsonResp =>
         dispatch({
           type: actionTypes.connections.rate,
           payload: {
-            connectionUri,
-            rating,
-            eventUri,
-            message,
+            connectionUri: connectionUri,
+            rating: rating,
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
           },
         })
       );

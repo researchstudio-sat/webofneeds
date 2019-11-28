@@ -64,17 +64,19 @@ export function atomsConnect(
       targetSocketUri: targetSocketUri,
     });
     const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
-    //TODO: WRAP /rest/messages/send POST AROUND
-    dispatch({
-      type: actionTypes.atoms.connect,
-      payload: {
-        eventUri: cnctMsg.eventUri,
-        message: cnctMsg.message,
-        ownConnectionUri: ownConnectionUri,
-        optimisticEvent: optimisticEvent,
-        socketUri: socketUri,
-        targetSocketUri: targetSocketUri,
-      },
+
+    return ownerApi.sendMessage(cnctMsg.message).then(jsonResp => {
+      dispatch({
+        type: actionTypes.atoms.connect,
+        payload: {
+          eventUri: jsonResp.messageUri,
+          message: jsonResp.message,
+          ownConnectionUri: ownConnectionUri,
+          optimisticEvent: optimisticEvent,
+          socketUri: socketUri,
+          targetSocketUri: targetSocketUri,
+        },
+      });
     });
   };
 }
@@ -85,12 +87,12 @@ export function atomsClose(atomUri) {
       atomUri,
       getState().getIn(["config", "defaultNodeUri"])
     )
-      .then(data => {
-        //TODO: WRAP /rest/messages/send POST AROUND
+      .then(data => ownerApi.sendMessage(data.message))
+      .then(jsonResp => {
         dispatch(
           actionCreators.messages__send({
-            eventUri: data.eventUri,
-            message: data.message,
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
           })
         );
 
@@ -121,12 +123,12 @@ export function atomsOpen(atomUri) {
       atomUri,
       getState().getIn(["config", "defaultNodeUri"])
     )
-      .then(data => {
+      .then(data => ownerApi.sendMessage(data.message))
+      .then(jsonResp => {
         dispatch(
-          //TODO: WRAP /rest/messages/send POST AROUND
           actionCreators.messages__send({
-            eventUri: data.eventUri,
-            message: data.message,
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
           })
         );
       })

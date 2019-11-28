@@ -46,17 +46,19 @@ async function connectReview(
     targetSocketUri: targetSocketUri,
   });
   const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
-  //TODO: WRAP /rest/messages/send POST AROUND
-  dispatch({
-    type: actionTypes.atoms.connect,
-    payload: {
-      eventUri: cnctMsg.eventUri,
-      message: cnctMsg.message,
-      ownConnectionUri: connectionUri,
-      optimisticEvent: optimisticEvent,
-      socketUri: socketUri,
-      targetSocketUri: targetSocketUri,
-    },
+
+  ownerApi.sendMessage(cnctMsg.message).then(jsonResp => {
+    dispatch({
+      type: actionTypes.atoms.connect,
+      payload: {
+        eventUri: jsonResp.messageUri,
+        message: jsonResp.message,
+        ownConnectionUri: connectionUri,
+        optimisticEvent: optimisticEvent,
+        socketUri: socketUri,
+        targetSocketUri: targetSocketUri,
+      },
+    });
   });
 }
 
@@ -110,17 +112,18 @@ export function disconnectPersona(atomUri, personaUri) {
       persona.get("nodeUri"),
       atom.get("nodeUri"),
       connection.get("targetConnectionUri")
-    ).then(({ eventUri, message }) => {
-      //TODO: WRAP /rest/messages/send POST AROUND
-      dispatch({
-        type: actionTypes.connections.close,
-        payload: {
-          connectionUri,
-          eventUri,
-          message,
-        },
+    )
+      .then(({ message }) => ownerApi.sendMessage(message))
+      .then(jsonResp => {
+        dispatch({
+          type: actionTypes.connections.close,
+          payload: {
+            connectionUri: connectionUri,
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
+          },
+        });
       });
-    });
   };
 }
 

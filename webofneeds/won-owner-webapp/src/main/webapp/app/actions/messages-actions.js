@@ -1196,16 +1196,15 @@ export function dispatchActionOnSuccessRemote(event) {
         .then(msgData =>
           Promise.all([
             won.wonMessageFromJsonLd(msgData.message),
-            msgData.message,
+            ownerApi.sendMessage(msgData.message),
           ])
         )
-        .then(([optimisticEvent, jsonldMessage]) => {
-          //TODO: WRAP /rest/messages/send POST AROUND
+        .then(([optimisticEvent, jsonResp]) => {
           dispatch({
             type: actionTypes.connections.sendChatMessageRefreshDataOnSuccess,
             payload: {
-              eventUri: optimisticEvent.getMessageUri(),
-              message: jsonldMessage,
+              eventUri: jsonResp.messageUri,
+              message: jsonResp.message,
               optimisticEvent,
             },
           });

@@ -364,8 +364,6 @@ export function runMessagingAgent(redux) {
     const messages = {};
 
     graphArray.forEach(graph => {
-      console.debug(graph["@id"], " --> ", graph["@id"].split("#")[0]);
-
       const msgUri = graph["@id"].split("#")[0];
       const singleMessage = messages[msgUri];
 
@@ -376,7 +374,7 @@ export function runMessagingAgent(redux) {
       }
     });
 
-    console.debug("messages", messages);
+    console.debug("WS received Msgs:", messages);
 
     for (const msgUri in messages) {
       const msg = messages[msgUri];
