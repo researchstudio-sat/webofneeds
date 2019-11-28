@@ -105,14 +105,26 @@ export function messagesReducer(messages = initialState, action = {}) {
       return messages.set("lostConnection", false).set("reconnecting", false);
 
     case actionTypes.messages.dispatchActionOn.registerSuccessOwn: {
-      const pathSO = ["dispatchOnSuccessOwn", action.payload.eventUri];
-      const toDispatchListSO = messages.getIn(pathSO);
-      if (!toDispatchListSO) {
-        return messages.setIn(pathSO, [action.payload.actionToDispatch]);
+      if (action.payload.connectActionCallback) {
+        const pathSO = ["executeOnSuccessOwn"];
+        const toExecuteListSO = messages.getIn(pathSO);
+
+        if (!toExecuteListSO) {
+          return messages.setIn(pathSO, [action.payload.connectActionCallback]);
+        }
+        return messages.updateIn(pathSO, list =>
+          list.push(action.payload.connectActionCallback)
+        );
+      } else {
+        const pathSO = ["dispatchOnSuccessOwn", action.payload.eventUri];
+        const toDispatchListSO = messages.getIn(pathSO);
+        if (!toDispatchListSO) {
+          return messages.setIn(pathSO, [action.payload.actionToDispatch]);
+        }
+        return messages.updateIn(pathSO, list =>
+          list.push(action.payload.actionToDispatch)
+        );
       }
-      return messages.updateIn(pathSO, list =>
-        list.push(action.payload.actionToDispatch)
-      );
     }
 
     case actionTypes.messages.dispatchActionOn.registerFailureOwn: {
@@ -152,6 +164,7 @@ export function messagesReducer(messages = initialState, action = {}) {
     case actionTypes.messages.dispatchActionOn.successOwn:
       //all the dispatching was done by the action creator. remove the queued actions now:
       return messages
+        .remove(["executeOnSuccessOwn"])
         .removeIn(["dispatchOnSuccessOwn", action.payload.eventUri])
         .removeIn(["dispatchOnFailureOwn", action.payload.eventUri]);
 
