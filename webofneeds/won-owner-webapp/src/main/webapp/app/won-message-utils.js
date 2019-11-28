@@ -193,7 +193,7 @@ export function buildConnectMessage({
 export function buildChatMessage({
   chatMessage,
   additionalContent,
-  referencedContentUris, //this is a map of corresponding uris to be e.g. proposes or retracted... (it already includes the correct uri -> remoteUri for received messages, and uri for sent messages)
+  referencedContentUris, //this is a map of corresponding uris to be e.g. proposes or retracted...
   isTTL,
   socketUri,
   targetSocketUri,

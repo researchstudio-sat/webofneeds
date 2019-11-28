@@ -2,7 +2,6 @@ import { parseMessage } from "./parse-message.js";
 import { markUriAsRead } from "../../won-localstorage.js";
 import { markConnectionAsRead } from "./reduce-connections.js";
 import { addAtomStub } from "./reduce-atoms.js";
-import { getOwnMessageUri } from "../../redux/utils/message-utils.js";
 import * as connectionSelectors from "../../redux/selectors/connection-selectors.js";
 import { getIn } from "../../utils.js";
 
@@ -525,10 +524,9 @@ export function markMessageAsRejected(
 
   if (proposedToCancelReferences) {
     proposedToCancelReferences.forEach(proposedToCancelRef => {
-      const correctMessageUri = getOwnMessageUri(messages, proposedToCancelRef);
       state = markMessageAsCancellationPending(
         state,
-        correctMessageUri,
+        proposedToCancelRef,
         connectionUri,
         atomUri,
         false
@@ -540,10 +538,9 @@ export function markMessageAsRejected(
 
   if (proposesReferences) {
     proposesReferences.forEach(proposesRef => {
-      const correctMessageUri = getOwnMessageUri(messages, proposesRef);
       state = markMessageAsProposed(
         state,
-        correctMessageUri,
+        proposesRef,
         connectionUri,
         atomUri,
         false
@@ -555,10 +552,9 @@ export function markMessageAsRejected(
 
   if (claimsReferences) {
     claimsReferences.forEach(claimsRef => {
-      const correctMessageUri = getOwnMessageUri(messages, claimsRef);
       state = markMessageAsClaimed(
         state,
-        correctMessageUri,
+        claimsRef,
         connectionUri,
         atomUri,
         false
@@ -632,10 +628,9 @@ export function markMessageAsRetracted(
 
   if (proposedToCancelReferences) {
     proposedToCancelReferences.forEach(proposedToCancelRef => {
-      const correctMessageUri = getOwnMessageUri(messages, proposedToCancelRef);
       state = markMessageAsCancellationPending(
         state,
-        correctMessageUri,
+        proposedToCancelRef,
         connectionUri,
         atomUri,
         false
@@ -647,10 +642,9 @@ export function markMessageAsRetracted(
 
   if (proposesReferences) {
     proposesReferences.forEach(proposesRef => {
-      const correctMessageUri = getOwnMessageUri(messages, proposesRef);
       state = markMessageAsProposed(
         state,
-        correctMessageUri,
+        proposesRef,
         connectionUri,
         atomUri,
         false
@@ -662,10 +656,9 @@ export function markMessageAsRetracted(
 
   if (claimsReferences) {
     claimsReferences.forEach(claimsRef => {
-      const correctMessageUri = getOwnMessageUri(messages, claimsRef);
       state = markMessageAsClaimed(
         state,
-        correctMessageUri,
+        claimsRef,
         connectionUri,
         atomUri,
         false
@@ -838,10 +831,9 @@ export function markMessageAsAccepted(
 
   if (proposedToCancelReferences) {
     proposedToCancelReferences.forEach(proposedToCancelRef => {
-      const correctMessageUri = getOwnMessageUri(messages, proposedToCancelRef);
       state = markMessageAsCancelled(
         state,
-        correctMessageUri,
+        proposedToCancelRef,
         connectionUri,
         atomUri,
         true

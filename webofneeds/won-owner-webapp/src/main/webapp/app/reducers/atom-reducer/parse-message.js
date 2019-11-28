@@ -41,9 +41,6 @@ export function parseMessage(
     belongsToUri: undefined,
     data: {
       uri: wonMessage.getMessageUri(),
-      remoteUri: !wonMessage.isFromOwner() //THIS HAS TO STAY UNDEFINED If the message is not a received message
-        ? wonMessage.getRemoteMessageUri()
-        : undefined,
       forwardMessage: forwardMessage,
       originatorUri: forwardMessage ? wonMessage.getSenderAtom() : undefined,
       content: {

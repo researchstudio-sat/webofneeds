@@ -106,7 +106,7 @@ export function connectionsChatMessage(
         let contentUris = [];
 
         referencedMessages.map(msg => {
-          const correctUri = get(msg, "remoteUri") || get(msg, "uri");
+          const correctUri = get(msg, "uri");
           if (correctUri)
             contentUris.push({
               "@id": correctUri,

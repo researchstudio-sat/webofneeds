@@ -1108,7 +1108,6 @@ class AtomMessages extends React.Component {
       this.props.chatMessagesWithUnknownState.forEach(msg => {
         let messageStatus = get(msg, "messageStatus");
         const msgUri = get(msg, "uri");
-        const remoteMsgUri = get(msg, "remoteUri");
 
         const acceptedUris = get(this.props.agreementData, "agreementUris");
         const rejectedUris = get(
@@ -1145,28 +1144,13 @@ class AtomMessages extends React.Component {
           "isCancellationPending"
         );
 
-        const isOldProposed = !!(
-          get(proposedUris, msgUri) || get(proposedUris, remoteMsgUri)
-        );
-        const isOldClaimed = !!(
-          get(claimedUris, msgUri) || get(claimedUris, remoteMsgUri)
-        );
-        const isOldAccepted = !!(
-          get(acceptedUris, msgUri) || get(acceptedUris, remoteMsgUri)
-        );
-        const isOldRejected = !!(
-          get(rejectedUris, msgUri) || get(rejectedUris, remoteMsgUri)
-        );
-        const isOldRetracted = !!(
-          get(retractedUris, msgUri) || get(retractedUris, remoteMsgUri)
-        );
-        const isOldCancelled = !!(
-          get(cancelledUris, msgUri) || get(cancelledUris, remoteMsgUri)
-        );
-        const isOldCancellationPending = !!(
-          get(cancellationPendingUris, msgUri) ||
-          get(cancellationPendingUris, remoteMsgUri)
-        );
+        const isOldProposed = !!get(proposedUris, msgUri);
+        const isOldClaimed = !!get(claimedUris, msgUri);
+        const isOldAccepted = !!get(acceptedUris, msgUri);
+        const isOldRejected = !!get(rejectedUris, msgUri);
+        const isOldRetracted = !!get(retractedUris, msgUri);
+        const isOldCancelled = !!get(cancelledUris, msgUri);
+        const isOldCancellationPending = !!get(cancellationPendingUris, msgUri);
 
         messageStatus = messageStatus
           .set("isProposed", isProposed || isOldProposed)

@@ -7,7 +7,6 @@ import { actionTypes, actionCreators } from "./actions.js";
 import { getIn } from "../utils.js";
 
 import Immutable from "immutable";
-import { getOwnMessageUri } from "../redux/utils/message-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 
 import {
@@ -386,14 +385,6 @@ export function processConnectionMessage(event) {
         atomUri = event.getRecipientAtom();
       }
 
-      const messages = getState().getIn([
-        "atoms",
-        atomUri,
-        "connections",
-        connectionUri,
-        "messages",
-      ]);
-
       //PETRINET DATA PART START *********************
       dispatch({
         type: actionTypes.connections.setLoadingPetriNetData,
@@ -449,14 +440,10 @@ export function processConnectionMessage(event) {
                     ? effect.acceptedMessageUri
                     : [effect.acceptedMessageUri];
                   acceptedMessageUris.forEach(acceptedMessageUri => {
-                    let messageUri = getOwnMessageUri(
-                      messages,
-                      acceptedMessageUri
-                    );
                     dispatch({
                       type: actionTypes.messages.messageStatus.markAsAccepted,
                       payload: {
-                        messageUri: messageUri,
+                        messageUri: acceptedMessageUri,
                         connectionUri: connectionUri,
                         atomUri: atomUri,
                         accepted: true,
@@ -471,15 +458,11 @@ export function processConnectionMessage(event) {
                     ? effect.claims
                     : [effect.claims];
 
-                  claimedMessageUris.forEach(claimedMessageUris => {
-                    let messageUri = getOwnMessageUri(
-                      messages,
-                      claimedMessageUris
-                    );
+                  claimedMessageUris.forEach(claimedMessageUri => {
                     dispatch({
                       type: actionTypes.messages.messageStatus.markAsClaimed,
                       payload: {
-                        messageUri: messageUri,
+                        messageUri: claimedMessageUri,
                         connectionUri: connectionUri,
                         atomUri: atomUri,
                         claimed: true,
@@ -496,14 +479,10 @@ export function processConnectionMessage(event) {
                     : [effect.proposes];
 
                   proposedMessageUris.forEach(proposedMessageUri => {
-                    let messageUri = getOwnMessageUri(
-                      messages,
-                      proposedMessageUri
-                    );
                     dispatch({
                       type: actionTypes.messages.messageStatus.markAsProposed,
                       payload: {
-                        messageUri: messageUri,
+                        messageUri: proposedMessageUri,
                         connectionUri: connectionUri,
                         atomUri: atomUri,
                         proposed: true,
@@ -520,16 +499,12 @@ export function processConnectionMessage(event) {
                     : [effect.proposesToCancel];
 
                   proposesToCancelUris.forEach(proposesToCancelURI => {
-                    let messageUri = getOwnMessageUri(
-                      messages,
-                      proposesToCancelURI
-                    );
                     dispatch({
                       type:
                         actionTypes.messages.messageStatus
                           .markAsCancellationPending,
                       payload: {
-                        messageUri: messageUri,
+                        messageUri: proposesToCancelURI,
                         connectionUri: connectionUri,
                         atomUri: atomUri,
                         cancellationPending: true,
@@ -548,14 +523,10 @@ export function processConnectionMessage(event) {
                     : [effect.rejectedMessageUri];
 
                   rejectedMessageUris.forEach(rejectedMessageUri => {
-                    let messageUri = getOwnMessageUri(
-                      messages,
-                      rejectedMessageUri
-                    );
                     dispatch({
                       type: actionTypes.messages.messageStatus.markAsRejected,
                       payload: {
-                        messageUri: messageUri,
+                        messageUri: rejectedMessageUri,
                         connectionUri: connectionUri,
                         atomUri: atomUri,
                         rejected: true,
@@ -574,14 +545,10 @@ export function processConnectionMessage(event) {
                     : [effect.retractedMessageUri];
 
                   retractedMessageUris.forEach(retractedMessageUri => {
-                    let messageUri = getOwnMessageUri(
-                      messages,
-                      retractedMessageUri
-                    );
                     dispatch({
                       type: actionTypes.messages.messageStatus.markAsRetracted,
                       payload: {
-                        messageUri: messageUri,
+                        messageUri: retractedMessageUri,
                         connectionUri: connectionUri,
                         atomUri: atomUri,
                         retracted: true,
@@ -754,18 +721,9 @@ export function processConnectMessage(event) {
 }
 
 export function markAsRetracted(event) {
-  return (dispatch, getState) => {
-    const messages = getState().getIn([
-      "atoms",
-      event.atomUri,
-      "connections",
-      event.connectionUri,
-      "messages",
-    ]);
-    const messageUri = getOwnMessageUri(messages, event.messageUri);
-
+  return dispatch => {
     const payload = {
-      messageUri: messageUri,
+      messageUri: event.messageUri,
       connectionUri: event.connectionUri,
       atomUri: event.atomUri,
       retracted: event.retracted,
@@ -779,18 +737,9 @@ export function markAsRetracted(event) {
 }
 
 export function updateMessageStatus(event) {
-  return (dispatch, getState) => {
-    const messages = getState().getIn([
-      "atoms",
-      event.atomUri,
-      "connections",
-      event.connectionUri,
-      "messages",
-    ]);
-    const messageUri = getOwnMessageUri(messages, event.messageUri);
-
+  return dispatch => {
     const payload = {
-      messageUri: messageUri,
+      messageUri: event.messageUri,
       connectionUri: event.connectionUri,
       atomUri: event.atomUri,
       messageStatus: event.messageStatus,
@@ -804,18 +753,9 @@ export function updateMessageStatus(event) {
 }
 
 export function markAsRejected(event) {
-  return (dispatch, getState) => {
-    const messages = getState().getIn([
-      "atoms",
-      event.atomUri,
-      "connections",
-      event.connectionUri,
-      "messages",
-    ]);
-    const messageUri = getOwnMessageUri(messages, event.messageUri);
-
+  return dispatch => {
     const payload = {
-      messageUri: messageUri,
+      messageUri: event.messageUri,
       connectionUri: event.connectionUri,
       atomUri: event.atomUri,
       rejected: event.rejected,
@@ -829,18 +769,9 @@ export function markAsRejected(event) {
 }
 
 export function markAsProposed(event) {
-  return (dispatch, getState) => {
-    const messages = getState().getIn([
-      "atoms",
-      event.atomUri,
-      "connections",
-      event.connectionUri,
-      "messages",
-    ]);
-    const messageUri = getOwnMessageUri(messages, event.messageUri);
-
+  return dispatch => {
     const payload = {
-      messageUri: messageUri,
+      messageUri: event.messageUri,
       connectionUri: event.connectionUri,
       atomUri: event.atomUri,
       proposed: event.proposed,
@@ -854,18 +785,9 @@ export function markAsProposed(event) {
 }
 
 export function markAsClaimed(event) {
-  return (dispatch, getState) => {
-    const messages = getState().getIn([
-      "atoms",
-      event.atomUri,
-      "connections",
-      event.connectionUri,
-      "messages",
-    ]);
-    const messageUri = getOwnMessageUri(messages, event.messageUri);
-
+  return dispatch => {
     const payload = {
-      messageUri: messageUri,
+      messageUri: event.messageUri,
       connectionUri: event.connectionUri,
       atomUri: event.atomUri,
       claimed: event.claimed,
@@ -879,18 +801,9 @@ export function markAsClaimed(event) {
 }
 
 export function markAsAccepted(event) {
-  return (dispatch, getState) => {
-    const messages = getState().getIn([
-      "atoms",
-      event.atomUri,
-      "connections",
-      event.connectionUri,
-      "messages",
-    ]);
-    const messageUri = getOwnMessageUri(messages, event.messageUri);
-
+  return dispatch => {
     const payload = {
-      messageUri: messageUri,
+      messageUri: event.messageUri,
       connectionUri: event.connectionUri,
       atomUri: event.atomUri,
       accepted: event.accepted,
@@ -904,18 +817,9 @@ export function markAsAccepted(event) {
 }
 
 export function markAsCancelled(event) {
-  return (dispatch, getState) => {
-    const messages = getState().getIn([
-      "atoms",
-      event.atomUri,
-      "connections",
-      event.connectionUri,
-      "messages",
-    ]);
-    const messageUri = getOwnMessageUri(messages, event.messageUri);
-
+  return dispatch => {
     const payload = {
-      messageUri: messageUri,
+      messageUri: event.messageUri,
       connectionUri: event.connectionUri,
       atomUri: event.atomUri,
       cancelled: event.cancelled,
@@ -929,18 +833,9 @@ export function markAsCancelled(event) {
 }
 
 export function markAsCancellationPending(event) {
-  return (dispatch, getState) => {
-    const messages = getState().getIn([
-      "atoms",
-      event.atomUri,
-      "connections",
-      event.connectionUri,
-      "messages",
-    ]);
-    const messageUri = getOwnMessageUri(messages, event.messageUri);
-
+  return dispatch => {
     const payload = {
-      messageUri: messageUri,
+      messageUri: event.messageUri,
       connectionUri: event.connectionUri,
       atomUri: event.atomUri,
       cancellationPending: event.cancellationPending,

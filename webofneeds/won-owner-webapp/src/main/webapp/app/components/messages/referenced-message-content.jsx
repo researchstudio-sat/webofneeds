@@ -579,17 +579,7 @@ class WonReferencedMessageContent extends React.Component {
     });
   }
   getReferencedMessage(messageUri) {
-    let referencedMessage = get(this.props.chatMessages, messageUri);
-    if (referencedMessage) {
-      return referencedMessage;
-    } else {
-      return (
-        this.props.chatMessages &&
-        this.props.chatMessages.find(
-          msg => get(msg, "remoteUri") === messageUri
-        )
-      );
-    }
+    return get(this.props.chatMessages, messageUri);
   }
 
   toggleReferenceExpansion(reference) {

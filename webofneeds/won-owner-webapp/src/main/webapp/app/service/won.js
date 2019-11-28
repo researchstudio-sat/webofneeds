@@ -1440,9 +1440,6 @@ WonMessage.prototype = {
   getSenderConnection: function() {
     return this.getProperty("https://w3id.org/won/message#sender");
   },
-  getRecipientNode: function() {
-    return this.getProperty("https://w3id.org/won/message#recipientNode");
-  },
   getTargetSocket: function() {
     return this.getProperty("https://w3id.org/won/message#recipientSocket");
   },
