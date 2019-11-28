@@ -27,6 +27,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -40,7 +41,9 @@ import org.slf4j.LoggerFactory;
  * Encapsulates a jena dataset for storing it in a relational db.
  */
 @Entity
-@Table(name = "rdf_datasets")
+@Table(name = "rdf_datasets", uniqueConstraints = {
+                @UniqueConstraint(name = "IDX_UNIQUE_DATASET_URI", columnNames = { "datasetURI" })
+})
 public class DatasetHolder {
     private static final int DEFAULT_BYTE_ARRAY_SIZE = 500;
     // the URI of the dataset
@@ -52,7 +55,7 @@ public class DatasetHolder {
     private int version = 0;
     @Transient
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    @Column(name = "datasetURI", unique = true)
+    @Column(name = "datasetURI")
     @Convert(converter = URIConverter.class)
     private URI uri;
     // the model as a byte array
