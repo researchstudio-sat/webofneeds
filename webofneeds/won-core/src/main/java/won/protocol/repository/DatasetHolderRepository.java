@@ -26,6 +26,9 @@ import won.protocol.model.DatasetHolder;
  * Repository for jena datasets (wrapped in DatasetHolders)
  */
 public interface DatasetHolderRepository extends CrudRepository<DatasetHolder, URI> {
+    @Query("select id from DatasetHolder d where d.uri = :uri")
+    Optional<Long> findIdByUri(URI uri);
+
     Optional<DatasetHolder> findOneByUriAndVersionNot(URI uri, Integer version);
 
     Optional<DatasetHolder> findOneByUri(URI uri);
