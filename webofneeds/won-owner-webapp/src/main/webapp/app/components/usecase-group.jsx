@@ -117,7 +117,7 @@ class WonUsecasePicker extends React.Component {
   }
 }
 WonUsecasePicker.propTypes = {
-  visibleUseCasesByConfig: PropTypes.arrayOf(PropTypes.string),
+  visibleUseCasesByConfig: PropTypes.objectOf(PropTypes.string),
   useCaseGroup: PropTypes.object,
   routerGoCurrent: PropTypes.func,
 };
