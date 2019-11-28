@@ -632,6 +632,11 @@ public class WonMessage implements Serializable {
         }
         headMessage.envelopeGraph = headMessage.completeDataset
                         .getNamedModel(headMessage.getEnvelopeURI().toString());
+        if (headMessage.envelopeGraph == null) {
+            throw new WonMessageNotWellFormedException(
+                            "Did not find required envelope graph '" + headMessage.getEnvelopeURI().toString()
+                                            + "' in message dataset");
+        }
         return headMessage.envelopeGraph;
     }
 
