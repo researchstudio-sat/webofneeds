@@ -34,18 +34,5 @@ ALTER TABLE connection ALTER COLUMN connectionuri SET NOT NULL;
 
 -- add the field for the serialized set of unconfirmed message uris
 ALTER TABLE message_container ADD COLUMN unconfirmed bytea NOT NULL;
-
--- add the table for pending confirmations
-CREATE TABLE public.pendingconfirmation
-(
-    id bigint NOT NULL,
-    confirmedmessageuri oid,
-    confirmingmessageuri character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    messagecontainer_id bigint NOT NULL,
-    CONSTRAINT pendingconfirmation_pkey PRIMARY KEY (id),
-    CONSTRAINT idx_pendingconfirmation_to_container_id UNIQUE (messagecontainer_id, confirmingmessageuri),
-    CONSTRAINT fk_pendingconfirmation FOREIGN KEY (messagecontainer_id)
-        REFERENCES public.message_container (id) MATCH SIMPLE
-        ON DELETE CASCADE
-)
-
+-- add the field for the serialized set of pending confirmations
+ALTER TABLE message_container ADD COLUMN pendingconfirmations bytea NOT NULL;

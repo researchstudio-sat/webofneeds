@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.camel.Predicate;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,8 +101,9 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
                             .build());
             toOwnerMockEndpoint.expectedMessageCount(3);
             toOwnerMockEndpoint.expectedMessagesMatches(
-                            or(isMessageAndResponse(textMsgFromOwner), isSuccessResponseTo(textMsgFromOwner),
-                                            isMessageAndResponseAndRemoteResponse(textMsgFromOwner)));
+                            isMessageAndResponse(textMsgFromOwner),
+                            isMessageAndResponseAndRemoteResponse(textMsgFromOwner),
+                            isSuccessResponseTo(textMsgFromOwner));
             toMatcherMockEndpoint.expectedMessageCount(0);
             sendFromOwner(textMsgFromOwner, OWNERAPPLICATION_ID_OWNER1);
         }));
@@ -349,22 +351,26 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
         toMatcherMockEndpoint.expectedMessageCount(0);
         toOwnerMockEndpoint.expectedMessageCount(3);
-        toOwnerMockEndpoint.expectedMessagesMatches(or(
-                        isMessageAndResponse(connectFromExternalMsg),
-                        isMessageAndResponseAndRemoteResponse(connectFromExternalMsg),
-                        isSuccessResponseTo(connectFromExternalMsg)));
+        toOwnerMockEndpoint.expectedMessagesMatches(
+                        and(isMessageAndResponse(connectFromExternalMsg), isOwnResponseConfirmsNPrevious(0)),
+                        and(isMessageAndResponseAndRemoteResponse(connectFromExternalMsg),
+                                        isRemoteResponseConfirmsNPrevious(1)),
+                        and(isSuccessResponseTo(connectFromExternalMsg), isMessageConfirmsNPrevious(1)));
         sendFromOwner(connectFromExternalMsg, OWNERAPPLICATION_ID_OWNER2);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
         WonMessage connectFromOwnerMsg = prepareFromOwner(WonMessageBuilder
                         .connect()
                         .sockets().sender(socketURI).recipient(socketURI2)
-                        .content().text("Unittest connect")
+                        .content().text("Unittest connect (completing the handshake)")
                         .build());
         toOwnerMockEndpoint.expectedMessageCount(3);
-        toOwnerMockEndpoint.expectedMessagesMatches(or(
-                        isMessageAndResponse(connectFromOwnerMsg),
-                        isMessageAndResponseAndRemoteResponse(connectFromOwnerMsg),
-                        isSuccessResponseTo(connectFromOwnerMsg)));
+        toOwnerMockEndpoint.expectedMessagesMatches(
+                        and(isMessageAndResponse(connectFromOwnerMsg),
+                                        isOwnResponseConfirmsNPrevious(1)),
+                        and(isMessageAndResponseAndRemoteResponse(connectFromOwnerMsg),
+                                        isRemoteResponseConfirmsNPrevious(2)),
+                        and(isSuccessResponseTo(connectFromOwnerMsg),
+                                        isMessageConfirmsNPrevious(2)));
         toMatcherMockEndpoint.expectedMessageCount(2);
         sendFromOwner(connectFromOwnerMsg, OWNERAPPLICATION_ID_OWNER1);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
@@ -379,10 +385,13 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
                         /**/.text("unittest message from " + socketURI)
                         .build());
         toOwnerMockEndpoint.expectedMessageCount(3);
-        toOwnerMockEndpoint.expectedMessagesMatches(or(
-                        isMessageAndResponse(textMsgFromOwner),
-                        isMessageAndResponseAndRemoteResponse(textMsgFromOwner),
-                        isSuccessResponseTo(textMsgFromOwner)));
+        toOwnerMockEndpoint.expectedMessagesMatches(
+                        and(isMessageAndResponse(textMsgFromOwner),
+                                        isOwnResponseConfirmsNPrevious(1)),
+                        and(isMessageAndResponseAndRemoteResponse(textMsgFromOwner),
+                                        isRemoteResponseConfirmsNPrevious(1)),
+                        and(isSuccessResponseTo(textMsgFromOwner),
+                                        isMessageConfirmsNPrevious(1)));
         toMatcherMockEndpoint.expectedMessageCount(0);
         sendFromOwner(textMsgFromOwner, OWNERAPPLICATION_ID_OWNER1);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
@@ -396,10 +405,10 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
                         .build());
         sendFromOwner(textMsgFromOwner, OWNERAPPLICATION_ID_OWNER1);
         toOwnerMockEndpoint.expectedMessageCount(3);
-        toOwnerMockEndpoint.expectedMessagesMatches(or(
-                        isMessageAndResponse(textMsgFromOwner),
-                        isMessageAndResponseAndRemoteResponse(textMsgFromOwner),
-                        isSuccessResponseTo(textMsgFromOwner)));
+        toOwnerMockEndpoint.expectedMessagesMatches(
+                        isSenderEcho(textMsgFromOwner, 1),
+                        or(isRecipientMessage(textMsgFromOwner, 1), isResponse(textMsgFromOwner, 1)),
+                        or(isRecipientMessage(textMsgFromOwner, 1), isResponse(textMsgFromOwner, 1)));
         toMatcherMockEndpoint.expectedMessageCount(0);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
         WonMessage textMsgFromOtherOwner = prepareFromExternalOwner(WonMessageBuilder
@@ -411,10 +420,75 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
                         /**/.text("unittest message from " + socketURI2)
                         .build());
         toOwnerMockEndpoint.expectedMessageCount(3);
-        toOwnerMockEndpoint.expectedMessagesMatches(or(
-                        isMessageAndResponse(textMsgFromOtherOwner),
-                        isMessageAndResponseAndRemoteResponse(textMsgFromOtherOwner),
-                        isSuccessResponseTo(textMsgFromOtherOwner)));
+        toOwnerMockEndpoint.expectedMessagesMatches(
+                        isSenderEcho(textMsgFromOtherOwner, 1),
+                        or(isRecipientMessage(textMsgFromOtherOwner, 2), isResponse(textMsgFromOtherOwner, 2)),
+                        or(isRecipientMessage(textMsgFromOtherOwner, 2), isResponse(textMsgFromOtherOwner, 2)));
+        logger.warn("Something goes wrong after this point concerning unconfirmed messages");
+        sendFromOwner(textMsgFromOtherOwner, OWNERAPPLICATION_ID_OWNER2);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        textMsgFromOtherOwner = prepareFromExternalOwner(WonMessageBuilder
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(con.get().getTargetSocketURI())
+                        /**/.recipient(con.get().getSocketURI())
+                        .content()
+                        /**/.text("unittest message from " + socketURI2)
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toOwnerMockEndpoint.expectedMessagesMatches(
+                        isSenderEcho(textMsgFromOtherOwner, 1),
+                        or(isRecipientMessage(textMsgFromOtherOwner, 1), isResponse(textMsgFromOtherOwner, 1)),
+                        or(isRecipientMessage(textMsgFromOtherOwner, 1), isResponse(textMsgFromOtherOwner, 1)));
+        sendFromOwner(textMsgFromOtherOwner, OWNERAPPLICATION_ID_OWNER2);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        textMsgFromOtherOwner = prepareFromExternalOwner(WonMessageBuilder
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(con.get().getTargetSocketURI())
+                        /**/.recipient(con.get().getSocketURI())
+                        .content()
+                        /**/.text("unittest message from " + socketURI2)
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toOwnerMockEndpoint.expectedMessagesMatches(
+                        isSenderEcho(textMsgFromOtherOwner, 1),
+                        or(isRecipientMessage(textMsgFromOtherOwner, 1), isResponse(textMsgFromOtherOwner, 1)),
+                        or(isRecipientMessage(textMsgFromOtherOwner, 1), isResponse(textMsgFromOtherOwner, 1)));
+        sendFromOwner(textMsgFromOtherOwner, OWNERAPPLICATION_ID_OWNER2);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        textMsgFromOtherOwner = prepareFromExternalOwner(WonMessageBuilder
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(con.get().getTargetSocketURI())
+                        /**/.recipient(con.get().getSocketURI())
+                        .content()
+                        /**/.text("unittest message from " + socketURI2)
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toOwnerMockEndpoint.expectedMessagesMatches(
+                        isSenderEcho(textMsgFromOtherOwner, 1),
+                        or(isRecipientMessage(textMsgFromOtherOwner, 1), isResponse(textMsgFromOtherOwner, 1)),
+                        or(isRecipientMessage(textMsgFromOtherOwner, 1), isResponse(textMsgFromOtherOwner, 1)));
+        sendFromOwner(textMsgFromOtherOwner, OWNERAPPLICATION_ID_OWNER2);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        textMsgFromOtherOwner = prepareFromExternalOwner(WonMessageBuilder
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(con.get().getTargetSocketURI())
+                        /**/.recipient(con.get().getSocketURI())
+                        .content()
+                        /**/.text("unittest message from " + socketURI2)
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toOwnerMockEndpoint.expectedMessagesMatches(
+                        isSenderEcho(textMsgFromOtherOwner, 1),
+                        or(isRecipientMessage(textMsgFromOtherOwner, 1), isResponse(textMsgFromOtherOwner, 1)),
+                        or(isRecipientMessage(textMsgFromOtherOwner, 1), isResponse(textMsgFromOtherOwner, 1)));
         sendFromOwner(textMsgFromOtherOwner, OWNERAPPLICATION_ID_OWNER2);
         toMatcherMockEndpoint.expectedMessageCount(0);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
@@ -422,6 +496,19 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         expected.setState(ConnectionState.CONNECTED);
         expected.setSocketURI(socketURI);
         expected.setTargetSocketURI(socketURI2);
+    }
+
+    private Predicate isSenderEcho(WonMessage forMessage, int confirmCount) {
+        return and(isMessageAndResponse(forMessage), isOwnResponseConfirmsNPrevious(confirmCount));
+    }
+
+    private Predicate isRecipientMessage(WonMessage forMessage, int remoteConfirmCount) {
+        return and(isMessageAndResponseAndRemoteResponse(forMessage),
+                        isRemoteResponseConfirmsNPrevious(remoteConfirmCount));
+    }
+
+    private Predicate isResponse(WonMessage forMessage, int remoteConfirmCount) {
+        return and(isSuccessResponseTo(forMessage), isMessageConfirmsNPrevious(remoteConfirmCount));
     }
 
     @Test
@@ -578,10 +665,10 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
                         .build());
         // expectations for connect
         toOwnerMockEndpoint.expectedMessageCount(3);
-        toOwnerMockEndpoint.expectedMessagesMatches(or(
-                        isMessageAndResponse(connectMsg),
-                        isMessageAndResponseAndRemoteResponse(connectMsg),
-                        isSuccessResponseTo(connectMsg)));
+        toOwnerMockEndpoint.expectedMessagesMatches(
+                        isSenderEcho(connectMsg, 1),
+                        or(isRecipientMessage(connectMsg, 1), isResponse(connectMsg, 1)),
+                        or(isRecipientMessage(connectMsg, 1), isResponse(connectMsg, 1)));
         toMatcherMockEndpoint.expectedMessageCount(0);
         sendFromOwner(connectMsg, OWNERAPPLICATION_ID_OWNER1);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
@@ -633,10 +720,9 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
                         .build());
         // expectations for connect
         toOwnerMockEndpoint.expectedMessageCount(3);
-        toOwnerMockEndpoint.expectedMessagesMatches(
-                        and(isMessageAndResponse(connectMsg), isOwnResponseConfirmsNPrevious(0)),
-                        and(isMessageAndResponseAndRemoteResponse(connectMsg), isRemoteResponseConfirmsNPrevious(1)),
-                        and(isSuccessResponseTo(connectMsg), isRemoteResponseConfirmsNPrevious(1)));
+        toOwnerMockEndpoint.expectedMessagesMatches(isSenderEcho(connectMsg, 0),
+                        or(isRecipientMessage(connectMsg, 1), isResponse(connectMsg, 1)),
+                        or(isRecipientMessage(connectMsg, 1), isResponse(connectMsg, 1)));
         toMatcherMockEndpoint.expectedMessageCount(0);
         sendFromOwner(connectMsg, OWNERAPPLICATION_ID_OWNER1);
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);

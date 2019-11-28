@@ -49,15 +49,20 @@ public class MessageReferencer {
                         && (Objects.equals(message.getConnectionURI(), parentURI)
                                         || Objects.equals(message.getAtomURI(), parentURI))) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Referencing unconfirmed messages in {} to message {}", parentURI,
+                logger.debug("Referencing unconfirmed messages in {} from message {}", parentURI,
                                 message.toShortStringForDebug());
             }
             Optional<MessageContainer> container = messageContainerRepository.findOneByParentUri(parentURI);
             if (container.isPresent()) {
-                message.addMessagePropertiesURI(WONMSG.previousMessage, container.get().getUnconfirmed());
+                message.addMessagePropertiesURI(WONMSG.previousMessage,
+                                container.get().getUnconfirmedAndIncrementAndCleanup());
+                // is
+                // visible in the MessageService
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Added {} references to message {}", container.get().getUnconfirmed().size(),
-                                    message.toShortStringForDebug());
+                    logger.debug("Added {} references to message {}: {}",
+                                    new Object[] { container.get().getUnconfirmedCount(),
+                                                    message.toShortStringForDebug(),
+                                                    container.get().peekAtUnconfirmed() });
                 }
             } else {
                 logger.debug("No unconfirmed messages found");

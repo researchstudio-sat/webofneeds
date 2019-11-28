@@ -4,10 +4,13 @@ import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.persistence.EntityManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +32,6 @@ import won.protocol.model.ConnectionMessageContainer;
 import won.protocol.model.DatasetHolder;
 import won.protocol.model.MessageContainer;
 import won.protocol.model.MessageEvent;
-import won.protocol.model.PendingConfirmation;
 import won.protocol.repository.AtomMessageContainerRepository;
 import won.protocol.repository.ConnectionContainerRepository;
 import won.protocol.repository.ConnectionMessageContainerRepository;
@@ -37,7 +39,6 @@ import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.DatasetHolderRepository;
 import won.protocol.repository.MessageContainerRepository;
 import won.protocol.repository.MessageEventRepository;
-import won.protocol.repository.PendingConfirmationRepository;
 
 @Component
 public class MessageService {
@@ -57,7 +58,7 @@ public class MessageService {
     @Autowired
     private MessageEventRepository messageEventRepository;
     @Autowired
-    private PendingConfirmationRepository pendingConfirmationRepository;
+    private EntityManager entityManager;
 
     public Optional<MessageEvent> getMessage(URI messageURI, URI parentURI) {
         return messageEventRepository.findOneByMessageURIAndParentURI(messageURI, parentURI);
@@ -166,18 +167,20 @@ public class MessageService {
             return;
         }
         sw.start("load pending");
-        Set<PendingConfirmation> pending = pendingConfirmationRepository
-                        .findAllByMessageContainerIdAndConfirmingMessageURIIn(container.getId(), previous);
+        Map<URI, Set<URI>> pending = container.getPendingConfirmations();
         sw.stop();
         sw.start("determine confirmed");
-        Set<URI> confirmed = pending.stream()
-                        .flatMap(pc -> pc.getConfirmedMessageURIs().stream())
+        Set<URI> confirmed = pending
+                        .entrySet()
+                        .stream()
+                        .filter(e -> previous.contains(e.getKey()))
+                        .flatMap(e -> e.getValue().stream())
                         .collect(Collectors.toSet());
         sw.stop();
         if (logger.isDebugEnabled()) {
-            logger.debug("{} unconfirmed for message container of {}, Removing {} ",
-                            new Object[] { container.getUnconfirmed().size(), parent, confirmed.size() });
-            logger.debug("unconfirmed: {}", container.getUnconfirmed());
+            logger.debug("{} unconfirmed for message container of {}, removing {} transitively confirmed",
+                            new Object[] { container.getUnconfirmedCount(), parent, confirmed.size() });
+            logger.debug("unconfirmed: {}", container.peekAtUnconfirmed());
             logger.debug("transitively confirmed: {}", confirmed);
         }
         sw.start("remove unconfirmed");
@@ -185,11 +188,11 @@ public class MessageService {
         sw.stop();
         sw.start("remove pending");
         // container.removePendingConfirmations(previous);
-        pendingConfirmationRepository.deleteByMessageContainerIdAndConfirmingMessageURIIn(container.getId(), previous);
+        container.removePendingConfirmations(previous);
         sw.stop();
         if (logger.isDebugEnabled()) {
             logger.debug("{} messages left in unconfirmed list of the message container of {}",
-                            new Object[] { container.getUnconfirmed().size(), parent });
+                            new Object[] { container.getUnconfirmedCount(), parent });
         }
         logger.debug("removing confirmed took {} millis", sw.getLastTaskTimeMillis());
         if (logger.isDebugEnabled()) {
@@ -198,15 +201,19 @@ public class MessageService {
     }
 
     public void saveMessage(final WonMessage messageOrDeliveryChain, URI parent) {
+        StopWatch sw = new StopWatch();
         for (WonMessage wonMessage : messageOrDeliveryChain.getAllMessages()) {
             logger.debug("STORING {} message {} under parent {}", new Object[] { wonMessage.getMessageType(),
                             wonMessage.getMessageURI(), parent });
+            sw.start("get message container");
             MessageContainer container = loadOrCreateMessageContainer(parent, wonMessage.getMessageType());
+            sw.stop();
             // unconfirmed list:
             // - add any success response message from partner in a connection
             // - add any of our system responses messages if we 're in an atom's message
             // container.
             if (wonMessage.getMessageTypeRequired().isSuccessResponse()) {
+                sw.start("check for duplicate response");
                 // make sure it's not a duplicate response
                 URI respondingTo = wonMessage.getRespondingToMessageURIRequired();
                 URI responseContainer = wonMessage.getAtomURI();
@@ -224,40 +231,77 @@ public class MessageService {
                                     "Detected duplicate response to {0} from container {1} in container {2}: {3}",
                                     respondingTo, responseContainer, parent, wonMessage.toShortStringForDebug()));
                 }
+                sw.stop();
             }
             if (isExternalSuccessResponseInConnection(parent, wonMessage)) {
+                sw.start("process external response in connection");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("In connection, processing external response {} to {} in container {}", new Object[] {
+                                    wonMessage.toShortStringForDebug(), wonMessage.getRespondingToMessageURI(),
+                                    parent });
+                }
                 removeConfirmed(container, wonMessage, parent);
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Adding as unconfirmed message: {}", wonMessage.getMessageURIRequired());
+                    logger.debug("Adding as unconfirmed message: {} in container {}",
+                                    wonMessage.getMessageURIRequired(), parent);
                 }
-                container.addUnconfirmed(wonMessage.getMessageURIRequired());
+                addUnconfirmed(container, wonMessage);
+                sw.stop();
             } else if (isOwnSuccessResponseInConnection(parent, wonMessage)) {
+                sw.start("process own response in connection's message container");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("In connection, processing own response {} to {} in container {}", new Object[] {
+                                    wonMessage.toShortStringForDebug(), wonMessage.getRespondingToMessageURI(),
+                                    parent });
+                }
                 // our message confirms a number of remote ones (those that were in the
-                // confirmed list). However, only when a remote message confirms ours, we can
+                // unconfirmed list). However, only when a remote message confirms ours, we can
                 // remove them from the unconfirmed list
                 List<URI> previous = wonMessage.getPreviousMessageURIs();
                 if (!previous.isEmpty()) {
-                    PendingConfirmation newPending = new PendingConfirmation(container,
+                    container.addPendingConfirmation(
                                     wonMessage.getMessageURIRequired(),
                                     previous.stream().collect(Collectors.toSet()));
-                    pendingConfirmationRepository.save(newPending);
                 }
+                sw.stop();
             } else if (isOwnSuccessResponseInAtom(parent, wonMessage)) {
+                sw.start("process own response in atom's message container");
                 removeConfirmed(container, wonMessage, parent);
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Adding as unconfirmed message: {}", wonMessage.getMessageURIRequired());
+                    logger.debug("Adding as unconfirmed message: {} in container {}",
+                                    wonMessage.getMessageURIRequired(), parent);
                 }
-                container.addUnconfirmed(wonMessage.getMessageURI());
+                addUnconfirmed(container, wonMessage);
+                sw.stop();
             }
+            sw.start("create event");
             MessageEvent event = new MessageEvent(parent, wonMessage, container);
             // a message can be in multiple containers (=parents), such messages share a
             // datasetholder
-            Optional<DatasetHolder> datasetHolder = datasetHolderRepository.findOneByUri(wonMessage.getMessageURI());
-            event.setDatasetHolder(datasetHolder.orElseGet(() -> new DatasetHolder(wonMessage.getMessageURI(),
-                            WonMessageEncoder.encodeAsDataset(wonMessage))));
-            messageContainerRepository.save(container);
-            messageEventRepository.save(event);
+            sw.stop();
+            sw.start("get event dataset id (if any)");
+            Optional<Long> datasetHolderId = datasetHolderRepository.findIdByUri(wonMessage.getMessageURIRequired());
+            sw.stop();
+            sw.start("Add dataset to message");
+            if (datasetHolderId.isPresent()) {
+                DatasetHolder datasetHolder = entityManager.getReference(DatasetHolder.class, datasetHolderId.get());
+                event.setDatasetHolder(datasetHolder);
+            } else {
+                event.setDatasetHolder(new DatasetHolder(wonMessage.getMessageURI(),
+                                WonMessageEncoder.encodeAsDataset(wonMessage)));
+            }
+            sw.stop();
+            sw.start("store message");
+            event = messageEventRepository.save(event);
+            sw.stop();
         }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Timing info:\n{}", sw.prettyPrint());
+        }
+    }
+
+    private void addUnconfirmed(MessageContainer container, WonMessage toAdd) {
+        container.addUnconfirmed(toAdd.getMessageURIRequired());
     }
 
     public boolean isOwnSuccessResponseInAtom(URI parent, WonMessage wonMessage) {
@@ -287,27 +331,27 @@ public class MessageService {
         if (WonMessageType.CREATE_ATOM.equals(messageType)) {
             // create an atom event container with null parent (because it will only be
             // persisted at a later point in time)
-            MessageContainer container = atomMessageContainerRepository.findOneByParentUriForUpdate(parent);
+            MessageContainer container = atomMessageContainerRepository.findOneByParentUri(parent);
             if (container != null)
                 return container;
             AtomMessageContainer nec = new AtomMessageContainer(null, parent);
-            atomMessageContainerRepository.saveAndFlush(nec);
+            nec = atomMessageContainerRepository.save(nec);
             return atomMessageContainerRepository.findOne(nec.getId());
         } else if (WonMessageType.CONNECT.equals(messageType)
                         || WonMessageType.SOCKET_HINT_MESSAGE.equals(messageType)) {
             // create a connection event container witn null parent (because it will only be
             // persisted at a later point in
             // time)
-            MessageContainer container = connectionMessageContainerRepository.findOneByParentUriForUpdate(parent);
+            MessageContainer container = connectionMessageContainerRepository.findOneByParentUri(parent);
             if (container != null)
                 return container;
             ConnectionMessageContainer cec = new ConnectionMessageContainer(null, parent);
-            connectionMessageContainerRepository.save(cec);
+            cec = connectionMessageContainerRepository.save(cec);
             return connectionMessageContainerRepository.findOne(cec.getId());
         }
-        return messageContainerRepository.findOneByParentUriForUpdate(parent)
-                        .orElseThrow(() -> new IncoherentDatabaseStateException(
-                                        "Cannot store '" + messageType + "' event: unable to find "
-                                                        + "event container with parent URI '" + parent + "'"));
+        Optional<MessageContainer> mc = messageContainerRepository.findOneByParentUri(parent);
+        return mc.orElseThrow(() -> new IncoherentDatabaseStateException(
+                        "Cannot store '" + messageType + "' event: unable to find "
+                                        + "event container with parent URI '" + parent + "'"));
     }
 }

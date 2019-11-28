@@ -10,9 +10,11 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -372,11 +374,11 @@ public abstract class WonMessageRoutesTest {
         @Override
         public boolean matches(Exchange exchange) {
             for (int i = 0; i < clauses.length; i++) {
-                if (clauses[i].matches(exchange)) {
-                    return true;
+                if (!clauses[i].matches(exchange)) {
+                    return false;
                 }
             }
-            return false;
+            return true;
         }
     }
 
@@ -584,6 +586,13 @@ public abstract class WonMessageRoutesTest {
             boolean result = Objects.equals(msgUri, msg.getMessageURIRequired())
                             && msg.getResponse().isPresent()
                             && msg.getRemoteResponse().isPresent();
+            if (result) {
+                Set<URI> s = new HashSet<>();
+                s.add(msg.getMessageURI());
+                s.add(msg.getResponse().get().getMessageURI());
+                s.add(msg.getRemoteResponse().get().getMessageURI());
+                result = s.size() == 3;
+            }
             if (!result) {
                 logMessageForFailedPredicate(getClass().getName(), "msgUri", msgUri, msg);
             }
@@ -622,6 +631,10 @@ public abstract class WonMessageRoutesTest {
         return new RemoteResponseConfirmsNPreviousMessages(n);
     }
 
+    protected Predicate isMessageConfirmsNPrevious(int n) {
+        return new MessageConfirmsNPreviousMessages(n);
+    }
+
     private class OwnResponseConfirmsNPreviousMessages implements Predicate {
         private final int n;
 
@@ -632,17 +645,18 @@ public abstract class WonMessageRoutesTest {
 
         @Override
         public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessageRequired(exchange);
+            WonMessage msg = getMessage(exchange);
             Optional<WonMessage> resp = msg.getResponse();
+            boolean result = false;
             if (resp.isPresent()) {
-                boolean result = resp.get().getPreviousMessageURIs().size() == n;
-                if (!result) {
-                    logMessageForFailedPredicate(getClass().getName(), "n", Integer.valueOf(n), msg);
-                }
-                return result;
+                result = resp.get().getPreviousMessageURIs().size() == n;
+            } else {
+                result = n == 0;
             }
-            // do not fail if we don't have a local response
-            return true;
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "n", Integer.valueOf(n), msg);
+            }
+            return result;
         }
     }
 
@@ -656,17 +670,38 @@ public abstract class WonMessageRoutesTest {
 
         @Override
         public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessageRequired(exchange);
+            WonMessage msg = getMessage(exchange);
             Optional<WonMessage> resp = msg.getRemoteResponse();
+            boolean result = false;
             if (resp.isPresent()) {
-                boolean result = resp.get().getPreviousMessageURIs().size() == n;
-                if (!result) {
-                    logMessageForFailedPredicate(getClass().getName(), "n", Integer.valueOf(n), msg);
-                }
-                return result;
+                result = resp.get().getPreviousMessageURIs().size() == n;
+            } else {
+                result = n == 0;
             }
-            // do not fail if we don't have a remote response
-            return true;
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "n", Integer.valueOf(n), msg);
+            }
+            return result;
+        }
+    }
+
+    private class MessageConfirmsNPreviousMessages implements Predicate {
+        private final int n;
+
+        public MessageConfirmsNPreviousMessages(int n) {
+            super();
+            this.n = n;
+        }
+
+        @Override
+        public boolean matches(Exchange exchange) {
+            WonMessage msg = getMessage(exchange);
+            boolean result = false;
+            result = msg.getPreviousMessageURIs().size() == n;
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "n", Integer.valueOf(n), msg);
+            }
+            return result;
         }
     }
 
@@ -700,7 +735,7 @@ public abstract class WonMessageRoutesTest {
         Mockito.when(socketLookup.isCompatible(socketURI, socketURI2)).thenReturn(true);
         Mockito.when(socketLookup.isCompatible(socketURI2, socketURI)).thenReturn(true);
         Mockito.when(socketLookup.isCompatibleSocketTypes(any(URI.class), any(URI.class))).thenReturn(true);
-        Mockito.when(socketLookup.getCapacityOfType(any(URI.class))).thenReturn(Optional.of(10));
+        Mockito.when(socketLookup.getCapacityOfType(any(URI.class))).then(x -> Optional.of(10));
         Mockito.when(messageRoutingInfoServiceWithLookup.senderSocketType(any(WonMessage.class)))
                         .thenReturn(Optional.of(URI.create(WXCHAT.ChatSocket.toString())));
         Mockito.when(messageRoutingInfoServiceWithLookup.recipientSocketType(any(WonMessage.class)))
@@ -1094,7 +1129,7 @@ public abstract class WonMessageRoutesTest {
             logger.info("predicate {} ({}: {}), does not match message {}:\n{}",
                             new Object[] { className, parameterName, parameterValue,
                                             msg.getMessageURI(),
-                                            RdfUtils.toString(msg.getCompleteDataset(),
+                                            RdfUtils.toString(Prefixer.setPrefixes(msg.getCompleteDataset()),
                                                             Lang_WON.TRIG_WON_CONVERSATION) });
         }
     }

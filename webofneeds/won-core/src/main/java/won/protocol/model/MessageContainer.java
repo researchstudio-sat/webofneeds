@@ -12,9 +12,15 @@ package won.protocol.model;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -22,19 +28,25 @@ import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Inheritance;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
 
+import won.protocol.WonConstants;
 import won.protocol.model.parentaware.VersionedEntity;
 
 @Entity
 @Inheritance
 @DiscriminatorColumn(name = "parent_type")
-@Table(name = "message_container")
+@Table(name = "message_container", indexes = {
+                @Index(name = "IDX_PARENT_URI", columnList = "parent_uri") }, uniqueConstraints = {
+                                @UniqueConstraint(name = "IDX_UNIQUE_PARENT_URI", columnNames = { "parent_uri" })
+                })
 public abstract class MessageContainer implements VersionedEntity {
     @Id
     @GeneratedValue
@@ -43,8 +55,10 @@ public abstract class MessageContainer implements VersionedEntity {
     @Column(name = "parent_uri", nullable = false, unique = true, updatable = false)
     @Convert(converter = URIConverter.class)
     private URI parentUri;
-    @Convert(converter = URISetConverter.class)
-    private Set<URI> unconfirmed = new HashSet<>();
+    @Convert(converter = URICountSetConverter.class)
+    private Set<URICount> unconfirmed = new HashSet<>();
+    @Convert(converter = URIMapToURISetConverter.class)
+    private Map<URI, Set<URI>> pendingConfirmations = new HashMap<>();
     @Column(name = "version", columnDefinition = "integer DEFAULT 0", nullable = false)
     private int version = 0;
     @Temporal(TemporalType.TIMESTAMP)
@@ -95,23 +109,72 @@ public abstract class MessageContainer implements VersionedEntity {
         this.parentUri = parentUri;
     }
 
-    public Set<URI> getUnconfirmed() {
-        return unconfirmed;
+    /**
+     * Returns the set of unconfirmed message URIs, increments the counter for each
+     * URI and removes the entries whose counts are now greater than
+     * <code>WonConstants.MAX_CONFIRMATIONS</code>.
+     * 
+     * @return the unconfirmed message URIs
+     */
+    public synchronized Set<URI> getUnconfirmedAndIncrementAndCleanup() {
+        Set<URI> result = unconfirmed.stream().map(uc -> uc.getUri()).collect(Collectors.toSet());
+        unconfirmed = unconfirmed.stream()
+                        .filter(uc -> uc.getCount() < WonConstants.MAX_CONFIRMATIONS)
+                        .map(uc -> uc.increment())
+                        .collect(Collectors.toSet());
+        return result;
     }
 
-    public void addUnconfirmed(URI toAdd) {
-        unconfirmed.add(toAdd);
+    /**
+     * Get the list of unconfirmed messages WITHOUT affecting counters. Should only
+     * be used for diagnostic purposes.
+     * 
+     * @return
+     */
+    public synchronized Set<URICount> peekAtUnconfirmed() {
+        return Collections.unmodifiableSet(unconfirmed);
     }
 
-    public void removeUnconfirmed(URI toRemove) {
-        unconfirmed.remove(toRemove);
+    public int getUnconfirmedCount() {
+        return unconfirmed.size();
     }
 
-    public void addUnconfirmed(Collection<URI> toAdd) {
-        unconfirmed.addAll(toAdd);
+    public synchronized void addUnconfirmed(URI toAdd) {
+        Objects.requireNonNull(toAdd);
+        // will not cause duplicates because URICount.equals only looks at the URI
+        if (!unconfirmed.stream().anyMatch(uc -> toAdd.equals(uc.getUri()))) {
+            unconfirmed.add(new URICount(toAdd, 0));
+        }
     }
 
-    public void removeUnconfirmed(Collection<URI> toRemove) {
-        unconfirmed.removeAll(toRemove);
+    public synchronized void removeUnconfirmed(URI toRemove) {
+        Iterator<URICount> it = unconfirmed.iterator();
+        while (it.hasNext()) {
+            URICount uc = it.next();
+            if (Objects.equals(uc.getUri(), toRemove)) {
+                it.remove();
+            }
+        }
+    }
+
+    public synchronized void removeUnconfirmed(Collection<URI> toRemove) {
+        Iterator<URICount> it = unconfirmed.iterator();
+        while (it.hasNext()) {
+            URICount uc = it.next();
+            if (toRemove.contains(uc.getUri()))
+                it.remove();
+        }
+    }
+
+    public synchronized Map<URI, Set<URI>> getPendingConfirmations() {
+        return Collections.unmodifiableMap(pendingConfirmations);
+    }
+
+    public synchronized void removePendingConfirmations(Collection<URI> toDelete) {
+        toDelete.forEach(uri -> pendingConfirmations.remove(uri));
+    }
+
+    public void addPendingConfirmation(URI toBeConfirmed, Set<URI> transitiveConfirmations) {
+        pendingConfirmations.put(toBeConfirmed, transitiveConfirmations);
     }
 }
