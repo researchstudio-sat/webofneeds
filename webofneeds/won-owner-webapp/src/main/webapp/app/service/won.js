@@ -1399,26 +1399,10 @@ WonMessage.prototype = {
       this.getProperty("https://w3id.org/won/message#forwardedMessage")
     );
   },
-  getReceivedTimestamp: function() {
-    return this.getPropertyFromLocalMessage(
-      "https://w3id.org/won/message#timestamp"
-    );
-  },
-  getSentTimestamp: function() {
-    return this.getPropertyFromLocalMessage(
-      "https://w3id.org/won/message#timestamp"
-    );
-  },
-  /**
-   * Returns the receivedTimestamp, which is the server timestamp. If that timestamp is not found in the message,
-   * returns the sentTimestamp as a fallback.
-   */
   getTimestamp: function() {
-    const ts = this.getReceivedTimestamp();
-    if (ts) {
-      return ts;
-    }
-    return this.getSentTimestamp();
+    return this.getPropertyFromLocalMessage(
+      "https://w3id.org/won/message#timestamp"
+    );
   },
   getTextMessage: function() {
     return this.getProperty("https://w3id.org/won/content#text");
@@ -2091,7 +2075,7 @@ won.MessageBuilder.prototype = {
     this.getMessageEventNode()["@type"] = won.WONMSG.FromOwnerCompacted;
     return this;
   },
-  sentTimestamp: function(timestamp) {
+  timestamp: function(timestamp) {
     this.getMessageEventNode()["msg:timestamp"] = timestamp;
     return this;
   },

@@ -42,7 +42,7 @@ export function buildRateMessage(
         .eventURI(eventUri)
         .ownerDirection()
         .forEnvelopeData(envelopeData)
-        .sentTimestamp(new Date().getTime().toString())
+        .timestamp(new Date().getTime().toString())
         .addRating(rating, msgToRateFor.connection.uri)
         .build();
       //const callback = createMessageCallbackForTargetAtomMessage(eventUri, won.EVENT.OPEN_SENT);
@@ -82,7 +82,7 @@ export function buildCloseMessage(
       .eventURI(eventUri)
       .forEnvelopeData(envelopeData)
       .ownerDirection()
-      .sentTimestamp(new Date().getTime().toString())
+      .timestamp(new Date().getTime().toString())
       .build();
     //const callback = createMessageCallbackForTargetAtomMessage(eventUri, won.EVENT.CLOSE_SENT);
     return { eventUri: eventUri, message: message };
@@ -112,7 +112,7 @@ export function buildCloseAtomMessage(atomUri) {
     const message = new won.MessageBuilder(won.WONMSG.closeAtomMessage)
       .eventURI(eventUri)
       .ownerDirection()
-      .sentTimestamp(new Date().getTime().toString())
+      .timestamp(new Date().getTime().toString())
       .forEnvelopeData(envelopeData)
       .build();
 
@@ -133,7 +133,7 @@ export function buildDeleteAtomMessage(atomUri) {
     const message = new won.MessageBuilder(won.WONMSG.deleteAtomMessage)
       .eventURI(eventUri)
       .ownerDirection()
-      .sentTimestamp(new Date().getTime().toString())
+      .timestamp(new Date().getTime().toString())
       .forEnvelopeData(envelopeData)
       .build();
 
@@ -154,7 +154,7 @@ export function buildOpenAtomMessage(atomUri) {
     const message = new won.MessageBuilder(won.WONMSG.activateAtomMessage)
       .eventURI(eventUri)
       .ownerDirection()
-      .sentTimestamp(new Date().getTime().toString())
+      .timestamp(new Date().getTime().toString())
       .forEnvelopeData(envelopeData)
       .build();
 
@@ -212,7 +212,7 @@ export function buildConnectMessage({
     messageBuilder.mergeIntoContentGraph(connectMessage);
   }
   messageBuilder.ownerDirection();
-  messageBuilder.sentTimestamp(new Date().getTime().toString());
+  messageBuilder.timestamp(new Date().getTime().toString());
   const message = messageBuilder.build();
 
   return { eventUri: eventUri, message: message };
@@ -256,7 +256,7 @@ export function buildChatMessage({
       )
         .forEnvelopeData(envelopeData)
         .ownerDirection()
-        .sentTimestamp(new Date().getTime().toString());
+        .timestamp(new Date().getTime().toString());
 
       if (isTTL && graphPayload) {
         wonMessageBuilder.mergeIntoContentGraph(graphPayload);
@@ -400,7 +400,7 @@ export function buildOpenMessage(
         .forEnvelopeData(envelopeData)
         .textMessage(chatMessage)
         .ownerDirection()
-        .sentTimestamp(new Date().getTime().toString())
+        .timestamp(new Date().getTime().toString())
         .build();
 
       return {

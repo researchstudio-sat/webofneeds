@@ -250,7 +250,7 @@ export default function(allAtomsInState = initialState, action = {}) {
               isParsable: !!optimisticEvent.getTextMessage(),
               hasContent: !!optimisticEvent.getTextMessage(),
               hasReferences: false,
-              date: msStringToDate(optimisticEvent.getSentTimestamp()),
+              date: msStringToDate(optimisticEvent.getTimestamp()),
               outgoingMessage: true,
               unread: false,
               messageType: won.WONMSG.connectMessage,
