@@ -27,7 +27,7 @@ import won.protocol.model.DatasetHolder;
  */
 public interface DatasetHolderRepository extends CrudRepository<DatasetHolder, URI> {
     @Query("select id from DatasetHolder d where d.uri = :uri")
-    Optional<Long> findIdByUri(URI uri);
+    Optional<Long> findIdByUri(@Param("uri") URI uri);
 
     Optional<DatasetHolder> findOneByUriAndVersionNot(URI uri, Integer version);
 
