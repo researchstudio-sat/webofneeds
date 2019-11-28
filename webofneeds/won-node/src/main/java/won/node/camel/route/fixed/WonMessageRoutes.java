@@ -80,9 +80,9 @@ public class WonMessageRoutes extends RouteBuilder {
         from("seda:msgFromOwner?concurrentConsumers=10")
                         .routeId("seda:msgFromOwner")
                         .to("direct:msgFromOwner_process")
-                        .to("direct:msgFromOwner_respondToOwner")
+                        .to("direct:msgFromOwner_react")
                         .to("direct:msgFromOwner_forwardToNode")
-                        .to("direct:msgFromOwner_react");
+                        .to("direct:msgFromOwner_respondToOwner");
         from("direct:msgFromOwner_process")
                         .routeId("direct:msgFromOwner_process")
                         .onException(Exception.class)
@@ -96,8 +96,8 @@ public class WonMessageRoutes extends RouteBuilder {
                          */
                         .transacted("PROPAGATION_REQUIRES_NEW")
                         .to("bean:wonMessageIntoCamelProcessor")
-                        .to("bean:parentLocker")
                         .to("direct:checkMessage")
+                        .to("bean:parentLocker")
                         // remember the connection state (if any)
                         .to("bean:connectionStateChangeBuilder")
                         // call the default implementation, which may alter the message.
@@ -111,8 +111,9 @@ public class WonMessageRoutes extends RouteBuilder {
                         /**//**/.routingSlip(method("socketTypeSlip"))
                         /**/.endChoice()
                         .end()
+                        .to("bean:persister") // store the incoming message as well as the response
                         .to("bean:successResponder") // now the successResponse is in the response header
-                        .to("bean:persister"); // store the incoming message as well as the response
+                        .to("bean:responsePersister");
         from("direct:msgFromOwner_respondToOwner") // to owner
                         .routeId("direct:msgFromOwner_respondToOwner")
                         // send the response+echo to the owner
@@ -179,9 +180,9 @@ public class WonMessageRoutes extends RouteBuilder {
         from("seda:msgFromExternal?concurrentConsumers=10")
                         .routeId("seda:msgFromExternal")
                         .to("direct:msgFromExternal_process")
+                        .to("direct:msgFromExternal_react")
                         .to("direct:msgFromExternal_respondToNode")
                         .to("direct:msgFromExternal_forwardToOwner")
-                        .to("direct:msgFromExternal_react")
                         .end();
         from("direct:msgFromExternal_process")
                         .routeId("direct:msgFromExternal_process")
@@ -194,8 +195,8 @@ public class WonMessageRoutes extends RouteBuilder {
                         .transacted("PROPAGATION_REQUIRES_NEW")
                         .setHeader(WonCamelConstants.DIRECTION_HEADER,
                                         new URIConstant(URI.create(WONMSG.FromExternal.getURI())))
-                        .to("bean:parentLocker")
                         .to("direct:checkMessage")
+                        .to("bean:parentLocker")
                         // remember the connection state (if any)
                         .to("bean:connectionStateChangeBuilder")
                         // call the default implementation, which may alter the message.
@@ -209,12 +210,13 @@ public class WonMessageRoutes extends RouteBuilder {
                         /**//**/.routingSlip(method("socketTypeSlip"))
                         /**/.endChoice()
                         .end()
+                        .to("bean:persister") // store the incoming message as well as the response, if there is any
                         .choice()
                         /**/.when(shouldRespond)
                         /**//**/.to("bean:successResponder") // now the successResponse may be the message header
+                        /**//**/.to("bean:responsePersister")
                         /**/.endChoice()
-                        .end()
-                        .to("bean:persister"); // store the incoming message as well as the response, if there is any
+                        .end();
         from("direct:msgFromExternal_respondToNode") // to node!
                         .routeId("direct:msgFromExternal_respondToNode")
                         .choice()

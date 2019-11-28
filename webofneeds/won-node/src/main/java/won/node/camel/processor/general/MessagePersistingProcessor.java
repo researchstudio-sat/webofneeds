@@ -12,7 +12,6 @@ package won.node.camel.processor.general;
 
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
-import java.util.Optional;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -27,7 +26,7 @@ import won.protocol.message.WonMessage;
 /**
  * Persists the message and if present, also the response.
  */
-public class PersistingWonMessageProcessor implements Processor {
+public class MessagePersistingProcessor implements Processor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     MessageService messageService;
@@ -40,9 +39,5 @@ public class PersistingWonMessageProcessor implements Processor {
             logger.debug("storing message {}", message.toStringForDebug(false));
         }
         messageService.saveMessage(message, parentURI);
-        Optional<WonMessage> response = WonCamelHelper.getResponse(exchange);
-        if (response.isPresent()) {
-            messageService.saveMessage(response.get(), parentURI);
-        }
     }
 }

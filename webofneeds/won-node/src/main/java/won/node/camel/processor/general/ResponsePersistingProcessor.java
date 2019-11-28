@@ -10,28 +10,34 @@
  */
 package won.node.camel.processor.general;
 
-import static won.node.camel.service.WonCamelHelper.*;
-
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import won.node.camel.service.WonCamelHelper;
+import won.node.service.persistence.MessageService;
 import won.protocol.message.WonMessage;
 
 /**
- * Created by fkleedorfer on 22.07.2016.
+ * Persists the message and if present, also the response.
  */
-public class ReferencesToResponseAdder implements Processor {
+public class ResponsePersistingProcessor implements Processor {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
-    private MessageReferencer messageReferencer;
+    MessageService messageService;
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        WonMessage msg = WonCamelHelper.getResponseRequired(exchange);
-        URI parent = getParentURIRequired(exchange);
-        WonCamelHelper.putResponse(exchange, messageReferencer.addMessageReferences(msg, parent));
+        WonMessage message = WonCamelHelper.getResponseRequired(exchange);
+        URI parentURI = WonCamelHelper.getParentURIRequired(exchange);
+        if (logger.isDebugEnabled()) {
+            logger.debug("storing response message {}", message.toStringForDebug(false));
+        }
+        messageService.saveMessage(message, parentURI);
     }
 }

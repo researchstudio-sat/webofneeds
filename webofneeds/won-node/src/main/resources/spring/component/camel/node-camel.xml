@@ -75,10 +75,6 @@
 			<bean class="won.protocol.message.processor.impl.SignatureCheckingWonMessageProcessor" />
 		</constructor-arg>
 	</bean>
-	<!-- referencing prevoiusly unrerferenced messages -->
-	<bean name="referencesToResponseAdder" class="won.node.camel.processor.general.ReferencesToResponseAdder" />
-	<bean name="referencesToMessageAdder" class="won.node.camel.processor.general.ReferencesToMessageAdder" />
-	
 	<!-- signing messages -->
 	<bean id="signatureAddingProcessor" class="won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor">
 		<property name="cryptographyService" ref="cryptographyService" />
@@ -99,7 +95,8 @@
 			</array>
 		</constructor-arg>
 	</bean>
-	<bean name="persister" class="won.node.camel.processor.general.PersistingWonMessageProcessor" />
+	<bean name="persister" class="won.node.camel.processor.general.MessagePersistingProcessor" />
+	<bean name="responsePersister" class="won.node.camel.processor.general.ResponsePersistingProcessor" />
 		
 	<!-- routing logic for wonMessages, computing which message-type specific processor -->
 	<bean name="fixedMessageProcessorSlip" class="won.node.camel.processor.general.MessageTypeSlipComputer">
