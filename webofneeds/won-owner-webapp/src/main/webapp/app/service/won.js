@@ -1443,7 +1443,7 @@ WonMessage.prototype = {
   getRecipientNode: function() {
     return this.getProperty("https://w3id.org/won/message#recipientNode");
   },
-  getRecipientSocket: function() {
+  getTargetSocket: function() {
     return this.getProperty("https://w3id.org/won/message#recipientSocket");
   },
   getAtom: function() {
@@ -2059,7 +2059,7 @@ won.MessageBuilder.prototype = {
     };
     return this;
   },
-  recipientSocket: function(recipientSocketURI) {
+  targetSocket: function(recipientSocketURI) {
     this.getMessageEventNode()[won.WONMSG.recipientSocketCompacted] = {
       "@id": recipientSocketURI,
     };
@@ -2105,30 +2105,6 @@ won.MessageBuilder.prototype = {
   },
   protocolVersion: function(version) {
     this.getMessageEventNode()["msg:protocolVersion"] = version;
-    return this;
-  },
-  /**
-   * Adds the specified socket as local sockets. Only needed for connect and
-   * openSuggested.
-   * @param recipientURI
-   * @returns {won.MessageBuilder}
-   */
-  socket: function(socketURI) {
-    this.getMessageEventNode()[won.WONMSG.senderSocketCompacted] = {
-      "@id": socketURI,
-    };
-    return this;
-  },
-  /**
-   * Adds the specified socket as local sockets. Only needed for connect and
-   * openSuggested.
-   * @param recipientURI
-   * @returns {won.MessageBuilder}
-   */
-  targetSocket: function(socketURI) {
-    this.getMessageEventNode()[won.WONMSG.recipientSocketCompacted] = {
-      "@id": socketURI,
-    };
     return this;
   },
   /**

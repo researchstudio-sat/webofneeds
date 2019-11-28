@@ -40,7 +40,6 @@ async function connectReview(
     socketUri: socketUri,
     targetSocketUri: targetSocketUri,
   });
-  const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
 
   ownerApi.sendMessage(cnctMsg.message).then(jsonResp => {
     dispatch({
@@ -49,7 +48,8 @@ async function connectReview(
         eventUri: jsonResp.messageUri,
         message: jsonResp.message,
         ownConnectionUri: connectionUri,
-        optimisticEvent: optimisticEvent,
+        atomUri: get(ownPersona, "uri"),
+        targetAtomUri: get(foreignPersona, "uri"),
         socketUri: socketUri,
         targetSocketUri: targetSocketUri,
       },

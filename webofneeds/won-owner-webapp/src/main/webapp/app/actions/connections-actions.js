@@ -409,6 +409,9 @@ function connectReactionAtom(
             message: cnctMsg.message,
             optimisticEvent: optimisticEvent,
             targetSocketUri: connectToSocketUri,
+            socketUri: undefined, //TODO: FIGURE OUT HOW TO HANDLE A NEWLY CREATED ATOM
+            atomUri: undefined, //TODO: FIGURE OUT HOW TO HANDLE A NEWLY CREATED ATOM
+            targetAtomUri: get(connectToAtom, "uri"),
           },
         };
 
@@ -508,6 +511,8 @@ function connectAdHoc(
           optimisticEvent: optimisticEvent,
           socketUri: socketUri,
           targetSocketUri: connectToSocketUri,
+          atomUri: atomUri,
+          targetAtomUri: theirAtomUri,
         },
       };
 

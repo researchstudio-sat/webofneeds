@@ -43,13 +43,13 @@ export function atomsConnect(
 
     if (socketType && !socketUri) {
       throw new Error(
-        `Atom ${ownedAtom.get("uri")} does not have a ${socketType}`
+        `Atom ${get(ownedAtom, "uri")} does not have a ${socketType}`
       );
     }
 
     if (targetSocketType && !targetSocketUri) {
       throw new Error(
-        `Atom ${theirAtom.get("uri")} does not have a ${targetSocketType}`
+        `Atom ${get(theirAtom, "uri")} does not have a ${targetSocketType}`
       );
     }
 
@@ -70,6 +70,8 @@ export function atomsConnect(
           optimisticEvent: optimisticEvent,
           socketUri: socketUri,
           targetSocketUri: targetSocketUri,
+          atomUri: get(ownedAtom, "uri"),
+          targetAtomUri: get(theirAtom, "uri"),
         },
       });
     });

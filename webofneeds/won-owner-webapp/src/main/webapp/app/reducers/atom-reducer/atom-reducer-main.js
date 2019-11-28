@@ -192,11 +192,11 @@ export default function(allAtomsInState = initialState, action = {}) {
       );
 
     case actionTypes.atoms.connect: {
-      // user has sent a connect request
       const optimisticEvent = action.payload.optimisticEvent;
-      const ownedAtomUri = optimisticEvent.getSenderAtom();
-      const theirAtomUri = optimisticEvent.getRecipientAtom();
-      const eventUri = optimisticEvent.getMessageUri();
+      // user has sent a connect request
+      const ownedAtomUri = action.payload.atomUri;
+      const theirAtomUri = action.payload.targetAtomUri;
+      const eventUri = action.payload.eventUri;
       let stateUpdated;
 
       if (action.payload.ownConnectionUri) {
