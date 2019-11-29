@@ -6,6 +6,7 @@ import {
 } from "../../utils.js";
 import { isUriRead } from "../../won-localstorage.js";
 import * as useCaseUtils from "../../usecase-utils.js";
+import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 
 /*
   "alreadyProcessed" flag sets the sentOwn/Remote flags to true
@@ -38,7 +39,6 @@ export function parseMessage(
   const detailsToParse = useCaseUtils.getAllDetails();
 
   let parsedMessage = {
-    belongsToUri: undefined,
     data: {
       uri: wonMessage.getMessageUri(),
       forwardMessage: forwardMessage,
@@ -69,7 +69,9 @@ export function parseMessage(
         !wonMessage.isFromOwner() &&
         !wonMessage.getSenderAtom() &&
         wonMessage.getSenderNode(),
-      senderUri: wonMessage.getSenderAtom() || wonMessage.getSenderNode(),
+      senderUri: generalSelectors.getAtomUriBySocketUri(
+        wonMessage.getSenderSocket()
+      ),
       messageType: wonMessage.getMessageType(),
       messageStatus: {
         isProposed: false,
@@ -114,14 +116,6 @@ export function parseMessage(
     },
   };
 
-  if (wonMessage.isFromOwner()) {
-    parsedMessage.belongsToUri = wonMessage.getSenderConnection();
-  } else if (wonMessage.isFromSystem()) {
-    parsedMessage.belongsToUri = wonMessage.getSenderConnection();
-  } else {
-    parsedMessage.belongsToUri = wonMessage.getRecipientConnection();
-  }
-
   if (
     wonMessage.getCompactFramedMessageContent() &&
     wonMessage.getCompactRawMessage()
@@ -143,7 +137,6 @@ export function parseMessage(
 
   if (
     !parsedMessage.data.uri ||
-    !parsedMessage.belongsToUri ||
     !parsedMessage.data.date ||
     !parsedMessage.data.senderUri
   ) {
@@ -156,8 +149,6 @@ export function parseMessage(
     return Immutable.fromJS(parsedMessage);
   }
 }
-window.parseMessage4dbg = parseMessage;
-
 function hasContent(content) {
   for (let prop in content) {
     if (

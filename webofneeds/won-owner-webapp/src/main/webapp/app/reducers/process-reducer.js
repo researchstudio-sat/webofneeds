@@ -5,8 +5,8 @@ import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
 import { get, getIn } from "../utils.js";
 import { parseAtom } from "./atom-reducer/parse-atom.js";
-import { parseMessage } from "./atom-reducer/parse-message.js";
 import * as processUtils from "../redux/utils/process-utils.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 
 const initialState = Immutable.fromJS({
   processingInitialLoad: true,
@@ -578,7 +578,7 @@ export default function(processState = initialState, action = {}) {
 
     //Necessary to flag the originatorUri of a message as atom toLoad if the atom is not currently in the state yet (e.g new groupmember sends message)
     case actionTypes.messages.processConnectionMessage:
-      return addOriginatorAtomToLoad(processState, action.payload);
+      return addMessageAtomsToLoad(processState, action.payload);
 
     case actionTypes.atoms.delete:
     case actionTypes.atoms.removeDeleted:
@@ -593,82 +593,38 @@ export default function(processState = initialState, action = {}) {
 }
 
 /*
- "alreadyProcessed" flag, which indicates that we do not care about the
- sent status anymore and assume that it has been successfully sent to each server (incl. the remote)
- "insertIntoConnUri" and "insertIntoAtomUri" are used for forwardedMessages so that the message is
- stored within the given connection/atom and not in the original atom or connection as we might not
- have these stored in the state
+ Some connectionMessages could be from another atom that is not known yet (e.g. groupchat) this behaviour ensures that we will load
+ these messages accordingly
  */
-export function addOriginatorAtomToLoad(
-  processState,
-  wonMessage,
-  alreadyProcessed = false,
-  insertIntoConnUri = undefined,
-  insertIntoAtomUri = undefined
-) {
-  // we used to exclude messages without content here, using
-  // if (wonMessage.getContentGraphs().length > 0) as the condition
-  // however, after moving the socket info of connect/open messages from
-  // content to envelope and making them optional, connect messages
-  // actually can have no content. This never happened before, and
-  // as one might expect, caused very weird behaviour when it did:
-  // It was processed correctly after a reload, but as an
-  // outgoing message, the success/failure responses coming in
-  // would still cause an entry to be created in the messages array,
-  // but holding only the 'isReceivedByOwn','isReceivedByRemote' etc fields,
-  // throwing off the message rendering.
-  // New solution: parse anything that is not a response, but allow responses with content
+export function addMessageAtomsToLoad(processState, wonMessage) {
   if (!wonMessage.isResponse() || wonMessage.getContentGraphs().length > 0) {
-    let parsedMessage = parseMessage(
-      wonMessage,
-      alreadyProcessed,
-      insertIntoConnUri && insertIntoAtomUri
+    const senderAtomUri = generalSelectors.getAtomUriBySocketUri(
+      wonMessage.getSenderSocket()
     );
-    if (parsedMessage) {
-      const connectionUri =
-        insertIntoConnUri || get(parsedMessage, "belongsToUri");
+    const targetAtomUri = generalSelectors.getAtomUriBySocketUri(
+      wonMessage.getTargetSocket()
+    );
 
-      let atomUri = insertIntoAtomUri;
-      if (!atomUri && getIn(parsedMessage, ["data", "outgoingMessage"])) {
-        // atomUri is the message's senderAtom
-        atomUri = wonMessage.getSenderAtom();
-      } else if (!atomUri) {
-        // atomUri is the remote message's recipientAtom
-        atomUri = wonMessage.getRecipientAtom();
-      }
+    if (
+      senderAtomUri &&
+      !processUtils.isAtomLoaded(processState, senderAtomUri)
+    ) {
+      console.debug("Sender Atom is not in the state yet, we need to add it");
+      processState = updateAtomProcess(processState, senderAtomUri, {
+        toLoad: true,
+        loading: false,
+      });
+    }
 
-      const originatorUri = getIn(parsedMessage, ["data", "originatorUri"]);
-
-      if (originatorUri) {
-        //Message is originally from another atom, we might need to add the atom as well
-        if (!processUtils.isAtomLoaded(processState, originatorUri)) {
-          console.debug(
-            "Originator Atom is not in the state yet, we need to add it"
-          );
-          processState = updateAtomProcess(processState, originatorUri, {
-            toLoad: true,
-            loading: false,
-          });
-        }
-      }
-
-      if (atomUri) {
-        const hasContainedForwardedWonMessages = wonMessage.hasContainedForwardedWonMessages();
-
-        if (hasContainedForwardedWonMessages) {
-          const containedForwardedWonMessages = wonMessage.getContainedForwardedWonMessages();
-          containedForwardedWonMessages.map(forwardedWonMessage => {
-            processState = addOriginatorAtomToLoad(
-              processState,
-              forwardedWonMessage,
-              true,
-              connectionUri,
-              atomUri
-            );
-            //PARSE MESSAGE DIFFERENTLY FOR FORWARDED MESSAGES
-          });
-        }
-      }
+    if (
+      targetAtomUri &&
+      !processUtils.isAtomLoaded(processState, targetAtomUri)
+    ) {
+      console.debug("Target Atom is not in the state yet, we need to add it");
+      processState = updateAtomProcess(processState, targetAtomUri, {
+        toLoad: true,
+        loading: false,
+      });
     }
   }
   return processState;

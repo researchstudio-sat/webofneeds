@@ -3,23 +3,11 @@ import { markUriAsRead } from "../../won-localstorage.js";
 import { markConnectionAsRead } from "./reduce-connections.js";
 import { addAtomStub } from "./reduce-atoms.js";
 import * as connectionSelectors from "../../redux/selectors/connection-selectors.js";
-import { getIn } from "../../utils.js";
+import * as generalSelectors from "../../redux/selectors/general-selectors.js";
+import * as connectionUtils from "../../redux/utils/connection-utils.js";
+import { get, getIn } from "../../utils.js";
 
-/*
- "alreadyProcessed" flag, which indicates that we do not care about the
- sent status anymore and assume that it has been successfully sent to each server (incl. the remote)
- "insertIntoConnUri" and "insertIntoAtomUri" are used for forwardedMessages so that the message is
- stored within the given connection/atom and not in the original atom or connection as we might not
- have these stored in the state
- */
-//TODO: ADD CORRECT EVENTURI
-export function addMessage(
-  state,
-  wonMessage,
-  alreadyProcessed = false,
-  insertIntoConnUri = undefined,
-  insertIntoAtomUri = undefined
-) {
+export function addMessage(state, wonMessage, alreadyProcessed = false) {
   // we used to exclude messages without content here, using
   // if (wonMessage.getContentGraphs().length > 0) as the condition
   // however, after moving the socket info of connect/open messages from
@@ -33,31 +21,57 @@ export function addMessage(
   // throwing off the message rendering.
   // New solution: parse anything that is not a response, but allow responses with content
   if (!wonMessage.isResponse() || wonMessage.getContentGraphs().length > 0) {
-    let parsedMessage = parseMessage(
-      wonMessage,
-      alreadyProcessed,
-      insertIntoConnUri && insertIntoAtomUri
-    );
+    let parsedMessage = parseMessage(wonMessage, alreadyProcessed, false);
     if (parsedMessage) {
-      const connectionUri =
-        insertIntoConnUri || parsedMessage.get("belongsToUri");
-      const hasContainedForwardedWonMessages = wonMessage.hasContainedForwardedWonMessages();
+      const allAtomsInState = state;
+      console.debug("addMessage -- allAtomsInState: ", allAtomsInState);
+      const senderSocketUri = wonMessage.getSenderSocket();
+      const targetSocketUri = wonMessage.getTargetSocket();
 
-      let atomUri = insertIntoAtomUri;
+      const senderAtomUri = generalSelectors.getAtomUriBySocketUri(
+        wonMessage.getSenderSocket()
+      );
+      const targetAtomUri = generalSelectors.getAtomUriBySocketUri(
+        wonMessage.getTargetSocket()
+      );
+      const senderAtom = get(allAtomsInState, senderAtomUri);
+      const targetAtom = get(allAtomsInState, targetAtomUri);
+
+      console.debug("senderSocketUri", senderSocketUri);
+      console.debug("senderAtom", senderAtom);
+      console.debug("targetSocketUri", targetSocketUri);
+      console.debug("targetAtom", targetAtom);
+
+      const senderConnection =
+        senderAtom &&
+        get(senderAtom, "connections").find(conn =>
+          connectionUtils.hasSocketUris(conn, senderSocketUri, targetSocketUri)
+        );
+      const targetConnection =
+        targetAtom &&
+        get(targetAtom, "connections").find(conn =>
+          connectionUtils.hasSocketUris(conn, senderSocketUri, targetSocketUri)
+        );
+
+      const connectionUri =
+        get(senderConnection, "uri") || get(targetConnection, "uri");
+
+      console.debug("connectionUri: ", connectionUri);
+
+      //OLD CODE (might still be valid):
+
+      let atomUri;
       if (!atomUri && parsedMessage.getIn(["data", "outgoingMessage"])) {
         // atomUri is the message's senderAtom
-        atomUri = wonMessage.getSenderAtom();
+        atomUri = senderAtomUri;
       } else if (!atomUri) {
         // atomUri is the remote message's recipientAtom
-        atomUri = wonMessage.getRecipientAtom();
+        atomUri = targetAtomUri;
         if (
           parsedMessage.getIn(["data", "unread"]) &&
-          !(
-            hasContainedForwardedWonMessages &&
-            connectionSelectors.isChatToGroupConnection(
-              state,
-              getIn(state, [atomUri, "connections", connectionUri])
-            )
+          !connectionSelectors.isChatToGroupConnection(
+            state,
+            getIn(state, [atomUri, "connections", connectionUri])
           )
         ) {
           //If there is a new message for the connection we will set the connection to newConnection
@@ -80,8 +94,7 @@ export function addMessage(
         connectionSelectors.isChatToGroupConnection(
           state,
           getIn(state, [atomUri, "connections", connectionUri])
-        ) &&
-        !hasContainedForwardedWonMessages
+        )
       ) {
         if (parsedMessage.getIn(["data", "unread"])) {
           //If there is a new message for the connection we will set the connection to newConnection
@@ -101,33 +114,16 @@ export function addMessage(
         }
       }
 
-      const originatorUri = parsedMessage.getIn(["data", "originatorUri"]);
-
-      if (originatorUri) {
-        //Message is originally from another atom, we might need to add the atom as well
-        if (!state.has(originatorUri)) {
-          console.debug(
-            "Originator Atom is not in the state yet, we need to add it"
-          );
-          state = addAtomStub(state, originatorUri);
-        }
+      if (targetAtomUri && !state.has(targetAtomUri)) {
+        console.debug("Target Atom is not in the state yet, we need to add it");
+        state = addAtomStub(state, targetAtomUri);
+      }
+      if (senderAtomUri && !state.has(senderAtomUri)) {
+        console.debug("Sender Atom is not in the state yet, we need to add it");
+        state = addAtomStub(state, senderAtomUri);
       }
 
       if (atomUri) {
-        if (hasContainedForwardedWonMessages) {
-          const containedForwardedWonMessages = wonMessage.getContainedForwardedWonMessages();
-          containedForwardedWonMessages.map(forwardedWonMessage => {
-            state = addMessage(
-              state,
-              forwardedWonMessage,
-              true,
-              connectionUri,
-              atomUri
-            );
-            //PARSE MESSAGE DIFFERENTLY FOR FORWARDED MESSAGES
-          });
-        }
-
         let messages = state.getIn([
           atomUri,
           "connections",
@@ -145,12 +141,9 @@ export function addMessage(
         the encapsulating message and not store it within our state.
         */
         if (
-          !(
-            hasContainedForwardedWonMessages &&
-            connectionSelectors.isChatToGroupConnection(
-              state,
-              getIn(state, [atomUri, "connections", connectionUri])
-            )
+          !connectionSelectors.isChatToGroupConnection(
+            state,
+            getIn(state, [atomUri, "connections", connectionUri])
           )
         ) {
           messages = messages.set(
