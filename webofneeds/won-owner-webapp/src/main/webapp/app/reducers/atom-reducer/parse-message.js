@@ -64,7 +64,7 @@ export function parseMessage(
       hasContent: false, //will be determined by the hasContent function
       isParsable: false, //will be determined by the clause (hasReferences || hasContent) function
       date: msStringToDate(wonMessage.getTimestamp()),
-      outgoingMessage: wonMessage.isOutgoingMessage(),
+      outgoingMessage: undefined,
       systemMessage:
         !wonMessage.isFromOwner() &&
         !wonMessage.getSenderAtom() &&

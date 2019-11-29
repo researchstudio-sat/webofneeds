@@ -71,6 +71,7 @@ export function addMessage(state, wonMessage, alreadyProcessed = false) {
         );
         connectionUri = get(senderConnection, "uri");
         atomUri = senderAtomUri;
+        parsedMessage = parsedMessage.setIn(["data", "outgoingMessage"], true);
       }
 
       if (targetConnection) {
@@ -80,6 +81,7 @@ export function addMessage(state, wonMessage, alreadyProcessed = false) {
         );
         connectionUri = get(targetConnection, "uri");
         atomUri = targetAtomUri;
+        parsedMessage = parsedMessage.setIn(["data", "outgoingMessage"], false);
 
         if (
           parsedMessage.getIn(["data", "unread"]) &&
