@@ -59,6 +59,19 @@ export function addMessage(state, wonMessage, alreadyProcessed = false) {
       console.debug("connectionUri: ", connectionUri);
 
       //OLD CODE (might still be valid):
+      if (senderConnection) {
+        console.debug(
+          "We have a stored senderConnection for message: ",
+          wonMessage
+        );
+      }
+
+      if (targetConnection) {
+        console.debug(
+          "We have a stored targetConnection for message: ",
+          wonMessage
+        );
+      }
 
       let atomUri;
       if (!atomUri && parsedMessage.getIn(["data", "outgoingMessage"])) {
