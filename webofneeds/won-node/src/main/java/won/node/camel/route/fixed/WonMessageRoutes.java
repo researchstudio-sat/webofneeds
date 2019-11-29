@@ -151,7 +151,7 @@ public class WonMessageRoutes extends RouteBuilder {
                                         new URIConstant(URI.create(WONMSG.FromSystemString)))
                         .to("bean:signatureToMessageAdder")
                         // route to message processing logic
-                        .to("direct:msgFromOwner");
+                        .to("seda:msgFromOwner");
         from("direct:reactToMessage")
                         .to("bean:parentLocker")
                         .routeId("direct:reactToMessage")

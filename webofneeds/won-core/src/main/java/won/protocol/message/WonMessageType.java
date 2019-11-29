@@ -63,7 +63,7 @@ public enum WonMessageType {
                     WONMSG.timestamp,
                     WONMSG.senderSocket,
                     WONMSG.recipientSocket),
-    DELETE(WONMSG.DeleteMessage, null,
+    DELETE(WONMSG.DeleteMessage, new Property[] { WONMSG.content },
                     WONMSG.protocolVersion,
                     RDF.type,
                     WONMSG.envelope,

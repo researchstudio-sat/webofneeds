@@ -10,18 +10,6 @@
  */
 package won.node.camel.processor.general;
 
-import org.apache.camel.Exchange;
-import org.apache.camel.Expression;
-import org.springframework.aop.support.AopUtils;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import won.node.camel.processor.annotation.DefaultSocketMessageProcessor;
-import won.node.camel.processor.annotation.SocketMessageProcessor;
-import won.protocol.exception.WonMessageProcessingException;
-import won.protocol.message.WonMessage;
-import won.protocol.message.processor.camel.WonCamelConstants;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
@@ -29,8 +17,26 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.camel.Exchange;
+import org.apache.camel.Expression;
+import org.springframework.aop.support.AopUtils;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+
+import won.node.camel.processor.annotation.DefaultSocketMessageProcessor;
+import won.node.camel.processor.annotation.SocketMessageProcessor;
+import won.node.camel.service.WonCamelHelper;
+import won.protocol.exception.WonMessageProcessingException;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageDirection;
+import won.protocol.message.WonMessageType;
+
 /**
- * User: syim Date: 11.03.2015
+ * Computes a 'slip' saying which pocessor should be used next. Selects the
+ * processor according to @SocketMessageProcessor
+ * and @DefaultSocketMessageProcessor annotations. If the message direction is
+ * FROM_SYSTEM, it is interpreted as FROM_OWNER. User: syim Date: 11.03.2015
  */
 public class SocketTypeSlipComputer implements InitializingBean, ApplicationContextAware, Expression {
     private HashMap<String, Object> socketMessageProcessorsMap;
@@ -47,15 +53,19 @@ public class SocketTypeSlipComputer implements InitializingBean, ApplicationCont
 
     @Override
     public <T> T evaluate(final Exchange exchange, final Class<T> type) {
-        WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
+        WonMessage message = WonCamelHelper.getMessageRequired(exchange);
         assert message != null : "wonMessage header must not be null";
         // exchange.getIn().setHeader();
-        URI messageType = (URI) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_TYPE_HEADER);
+        WonMessageType messageType = WonCamelHelper.getMessageTypeRequired(exchange);
         assert messageType != null : "messageType header must not be null";
-        URI direction = (URI) exchange.getIn().getHeader(WonCamelConstants.DIRECTION_HEADER);
+        WonMessageDirection direction = WonCamelHelper.getDirectionRequired(exchange);
+        if (direction.isFromSystem()) {
+            direction = WonMessageDirection.FROM_OWNER;
+        }
         assert direction != null : "direction header must not be null";
-        URI socketType = (URI) exchange.getIn().getHeader(WonCamelConstants.SOCKET_TYPE_URI_HEADER);
-        String slip = "bean:" + computeSocketSlip(messageType, socketType, direction) + "?method=process";
+        URI socketType = WonCamelHelper.getSocketTypeURIRequired(exchange);
+        String slip = "bean:" + computeSocketSlip(messageType.getURI(), socketType, direction.getURI())
+                        + "?method=process";
         return type.cast(slip);
     }
 
