@@ -50,20 +50,27 @@ export function addMessage(state, wonMessage, alreadyProcessed = false) {
       const targetConnection =
         targetAtom &&
         get(targetAtom, "connections").find(conn =>
-          connectionUtils.hasSocketUris(conn, senderSocketUri, targetSocketUri)
+          connectionUtils.hasSocketUris(conn, targetSocketUri, senderSocketUri)
         );
 
-      const connectionUri =
-        get(senderConnection, "uri") || get(targetConnection, "uri");
+      if (targetAtomUri && !state.has(targetAtomUri)) {
+        console.debug("Target Atom is not in the state yet, we need to add it");
+        state = addAtomStub(state, targetAtomUri);
+      }
+      if (senderAtomUri && !state.has(senderAtomUri)) {
+        console.debug("Sender Atom is not in the state yet, we need to add it");
+        state = addAtomStub(state, senderAtomUri);
+      }
 
-      console.debug("connectionUri: ", connectionUri);
-
-      //OLD CODE (might still be valid):
+      let connectionUri;
+      let atomUri;
       if (senderConnection) {
         console.debug(
           "We have a stored senderConnection for message: ",
           wonMessage
         );
+        connectionUri = get(senderConnection, "uri");
+        atomUri = senderAtomUri;
       }
 
       if (targetConnection) {
@@ -71,15 +78,9 @@ export function addMessage(state, wonMessage, alreadyProcessed = false) {
           "We have a stored targetConnection for message: ",
           wonMessage
         );
-      }
-
-      let atomUri;
-      if (!atomUri && parsedMessage.getIn(["data", "outgoingMessage"])) {
-        // atomUri is the message's senderAtom
-        atomUri = senderAtomUri;
-      } else if (!atomUri) {
-        // atomUri is the remote message's recipientAtom
+        connectionUri = get(targetConnection, "uri");
         atomUri = targetAtomUri;
+
         if (
           parsedMessage.getIn(["data", "unread"]) &&
           !connectionSelectors.isChatToGroupConnection(
@@ -102,38 +103,6 @@ export function addMessage(state, wonMessage, alreadyProcessed = false) {
             true
           );
         }
-      } else if (
-        atomUri &&
-        connectionSelectors.isChatToGroupConnection(
-          state,
-          getIn(state, [atomUri, "connections", connectionUri])
-        )
-      ) {
-        if (parsedMessage.getIn(["data", "unread"])) {
-          //If there is a new message for the connection we will set the connection to newConnection
-          state = state.setIn(
-            [atomUri, "lastUpdateDate"],
-            parsedMessage.getIn(["data", "date"])
-          );
-          state = state.setIn([atomUri, "unread"], true);
-          state = state.setIn(
-            [atomUri, "connections", connectionUri, "lastUpdateDate"],
-            parsedMessage.getIn(["data", "date"])
-          );
-          state = state.setIn(
-            [atomUri, "connections", connectionUri, "unread"],
-            true
-          );
-        }
-      }
-
-      if (targetAtomUri && !state.has(targetAtomUri)) {
-        console.debug("Target Atom is not in the state yet, we need to add it");
-        state = addAtomStub(state, targetAtomUri);
-      }
-      if (senderAtomUri && !state.has(senderAtomUri)) {
-        console.debug("Sender Atom is not in the state yet, we need to add it");
-        state = addAtomStub(state, senderAtomUri);
       }
 
       if (atomUri) {
