@@ -85,8 +85,14 @@ const mapDispatchToProps = dispatch => {
     connectionClose: connectionUri => {
       dispatch(actionCreators.connections__close(connectionUri));
     },
-    connectionOpen: (connectionUri, message) => {
-      dispatch(actionCreators.connections__open(connectionUri, message));
+    connectSockets: (senderSocketUri, targetSocketUri, message) => {
+      dispatch(
+        actionCreators.atoms__connectSockets(
+          senderSocketUri,
+          targetSocketUri,
+          message
+        )
+      );
     },
     rateConnection: (connectionUri, rating) => {
       dispatch(actionCreators.connections__rate(connectionUri, rating));
@@ -364,7 +370,9 @@ class WonAtomContentParticipants extends React.Component {
       this.props.connectionMarkAsRead(connUri, this.props.atomUri);
     }
 
-    this.props.connectionOpen(connUri, message);
+    const senderSocketUri = get(conn, "socketUri");
+    const targetSocketUri = get(conn, "targetSocketUri");
+    this.props.connectSockets(senderSocketUri, targetSocketUri, message);
   }
 
   sendRequest(conn, message = "") {
@@ -456,7 +464,7 @@ WonAtomContentParticipants.propTypes = {
   showModalDialog: PropTypes.func,
   connect: PropTypes.func,
   connectionClose: PropTypes.func,
-  connectionOpen: PropTypes.func,
+  connectSockets: PropTypes.func,
   rateConnection: PropTypes.func,
   routerGo: PropTypes.func,
 };

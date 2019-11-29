@@ -17,7 +17,6 @@ export function messagesReducer(messages = initialState, action = {}) {
     case actionTypes.account.reset:
       return initialState;
 
-    case actionTypes.connections.open:
     case actionTypes.connections.sendChatMessage:
     case actionTypes.connections.rate:
     case actionTypes.connections.close:

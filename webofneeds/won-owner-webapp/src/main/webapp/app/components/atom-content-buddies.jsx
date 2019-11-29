@@ -91,8 +91,14 @@ const mapDispatchToProps = dispatch => {
     connectionClose: connectionUri => {
       dispatch(actionCreators.connections__close(connectionUri));
     },
-    connectionOpen: (connectionUri, message) => {
-      dispatch(actionCreators.connections__open(connectionUri, message));
+    connectSockets: (senderSocketUri, targetSocketUri, message) => {
+      dispatch(
+        actionCreators.atoms__connectSockets(
+          senderSocketUri,
+          targetSocketUri,
+          message
+        )
+      );
     },
     connectAdHoc: (targetAtomUri, message, connectToSocketUri, persona) => {
       dispatch(
@@ -400,7 +406,10 @@ class WonAtomContentBuddies extends React.Component {
     if (connectionUtils.isUnread(conn)) {
       this.props.connectionMarkAsRead(connUri, this.props.atomUri);
     }
-    this.props.connectionOpen(connUri, message);
+
+    const senderSocketUri = get(conn, "socketUri");
+    const targetSocketUri = get(conn, "targetSocketUri");
+    this.props.connectSockets(senderSocketUri, targetSocketUri, message);
   }
 
   requestBuddy(targetAtomUri, message = "") {
@@ -527,7 +536,7 @@ WonAtomContentBuddies.propTypes = {
   hideModalDialog: PropTypes.func,
   showModalDialog: PropTypes.func,
   connectionClose: PropTypes.func,
-  connectionOpen: PropTypes.func,
+  connectSockets: PropTypes.func,
   connect: PropTypes.func,
   connectAdHoc: PropTypes.func,
   routerGo: PropTypes.func,

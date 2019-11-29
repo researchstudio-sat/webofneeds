@@ -135,8 +135,14 @@ const mapDispatchToProps = dispatch => {
         )
       );
     },
-    openRequest: (connectionUri, message) => {
-      dispatch(actionCreators.connections__open(connectionUri, message));
+    connectSockets: (senderSocketUri, targetSocketUri, message) => {
+      dispatch(
+        actionCreators.atoms__connectSockets(
+          senderSocketUri,
+          targetSocketUri,
+          message
+        )
+      );
     },
     rateConnection: (connectionUri, rating) => {
       dispatch(actionCreators.connections__rate(connectionUri, rating));
@@ -336,9 +342,18 @@ class GroupAtomMessages extends React.Component {
             submitButtonLabel="Accept&#160;Invite"
             allowEmptySubmit={true}
             allowDetails={false}
-            onSubmit={({ value }) =>
-              this.props.openRequest(this.props.connectionUri, value)
-            }
+            onSubmit={({ value }) => {
+              const senderSocketUri = get(this.props.connection, "socketUri");
+              const targetSocketUri = get(
+                this.props.connection,
+                "targetSocketUri"
+              );
+              this.props.connectSockets(
+                senderSocketUri,
+                targetSocketUri,
+                value
+              );
+            }}
           />
           <WonLabelledHr className="gpm__footer__labelledhr" label="Or" />
           <button
@@ -539,7 +554,7 @@ GroupAtomMessages.propTypes = {
   sendChatMessage: PropTypes.func,
   connect: PropTypes.func,
   connectAdHoc: PropTypes.func,
-  openRequest: PropTypes.func,
+  connectSockets: PropTypes.func,
   rateConnection: PropTypes.func,
   closeConnection: PropTypes.func,
   showMoreMessages: PropTypes.func,

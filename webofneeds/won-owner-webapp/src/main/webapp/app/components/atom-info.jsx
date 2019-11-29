@@ -161,8 +161,14 @@ const mapDispatchToProps = dispatch => {
         )
       );
     },
-    connectionsOpen: (connectionUri, message) => {
-      dispatch(actionCreators.connections__open(connectionUri, message));
+    connectSockets: (senderSocketUri, targetSocketUri, message) => {
+      dispatch(
+        actionCreators.atoms__connectSockets(
+          senderSocketUri,
+          targetSocketUri,
+          message
+        )
+      );
     },
     atomReopen: atomUri => dispatch(actionCreators.atoms__reopen(atomUri)),
   };
@@ -379,7 +385,13 @@ class AtomInfo extends React.Component {
               );
               */
             } else if (connectionUtils.isRequestReceived(personaConnection)) {
-              this.props.connectionsOpen(personaConnectionUri, message);
+              const senderSocketUri = get(personaConnection, "socketUri");
+              const targetSocketUri = get(personaConnection, "targetSocketUri");
+              this.props.connectSockets(
+                senderSocketUri,
+                targetSocketUri,
+                message
+              );
             } else if (connectionUtils.isConnected(personaConnection)) {
               this.props.sendChatMessage(
                 message,
@@ -461,7 +473,7 @@ AtomInfo.propTypes = {
   chatSocketUri: PropTypes.string,
   groupSocketUri: PropTypes.string,
   connect: PropTypes.func,
-  connectionsOpen: PropTypes.func,
+  connectSockets: PropTypes.func,
   sendChatMessage: PropTypes.func,
   atomReopen: PropTypes.func,
 };

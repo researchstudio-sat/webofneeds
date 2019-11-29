@@ -257,8 +257,14 @@ const mapDispatchToProps = dispatch => {
         )
       );
     },
-    openRequest: (connectionUri, message) => {
-      dispatch(actionCreators.connections__open(connectionUri, message));
+    connectSockets: (senderSocketUri, targetSocketUri, message) => {
+      dispatch(
+        actionCreators.atoms__connectSockets(
+          senderSocketUri,
+          targetSocketUri,
+          message
+        )
+      );
     },
     rateConnection: (connectionUri, rating) => {
       dispatch(actionCreators.connections__rate(connectionUri, rating));
@@ -764,12 +770,21 @@ class AtomMessages extends React.Component {
                 submitButtonLabel="Accept&#160;Chat"
                 allowEmptySubmit={true}
                 allowDetails={false}
-                onSubmit={({ value }) =>
-                  this.props.openRequest(
-                    this.props.selectedConnectionUri,
+                onSubmit={({ value }) => {
+                  const senderSocketUri = get(
+                    this.props.connection,
+                    "socketUri"
+                  );
+                  const targetSocketUri = get(
+                    this.props.connection,
+                    "targetSocketUri"
+                  );
+                  this.props.connectSockets(
+                    senderSocketUri,
+                    targetSocketUri,
                     value
-                  )
-                }
+                  );
+                }}
               />
               <WonLabelledHr className="pm__footer__labelledhr" label="Or" />
               <button
@@ -1240,7 +1255,7 @@ AtomMessages.propTypes = {
   sendChatMessage: PropTypes.func,
   connect: PropTypes.func,
   connectAdHoc: PropTypes.func,
-  openRequest: PropTypes.func,
+  connectSockets: PropTypes.func,
   rateConnection: PropTypes.func,
   closeConnection: PropTypes.func,
   selectMessage: PropTypes.func,
