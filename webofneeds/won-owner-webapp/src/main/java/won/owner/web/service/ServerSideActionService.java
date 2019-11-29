@@ -121,7 +121,6 @@ public class ServerSideActionService implements WonMessageProcessor {
 
     private boolean isConnectFromSocketForSocket(WonMessage msg, URI sender, URI receiver) {
         return msg.getMessageType() == WonMessageType.CONNECT
-                        && msg.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL
                         && msg.getSenderSocketURI() != null && sender.equals(msg.getSenderSocketURI())
                         && msg.getRecipientSocketURI() != null && receiver.equals(msg.getRecipientSocketURI());
     }
@@ -134,7 +133,7 @@ public class ServerSideActionService implements WonMessageProcessor {
                         .build();
         try {
             AuthenticationThreadLocal.setAuthentication(authentication);
-            ownerApplicationService.sendMessage(msgToSend);
+            ownerApplicationService.prepareAndSendMessage(msgToSend);
         } finally {
             // be sure to remove the principal from the threadlocal
             AuthenticationThreadLocal.remove();
