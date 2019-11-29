@@ -44,6 +44,8 @@ import {
   updatePetriNetStateData,
 } from "./reduce-connections.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
+import * as connectionUtils from "../../redux/utils/connection-utils.js";
+import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 
 const initialState = Immutable.fromJS({});
 
@@ -191,6 +193,102 @@ export default function(allAtomsInState = initialState, action = {}) {
         won.WON.Closed
       );
 
+    case actionTypes.atoms.connectSockets: {
+      const eventUri = action.payload.eventUri;
+      const optimisticEvent = action.payload.optimisticEvent;
+      const senderSocketUri = action.payload.senderSocketUri;
+      const targetSocketUri = action.payload.targetSocketUri;
+
+      const senderAtomUri = generalSelectors.getAtomUriBySocketUri(
+        senderSocketUri
+      );
+      const targetAtomUri = generalSelectors.getAtomUriBySocketUri(
+        targetSocketUri
+      );
+      const senderAtom = get(allAtomsInState, senderAtomUri);
+      const affectedConnection =
+        senderAtom &&
+        get(senderAtom, "connections").find(conn =>
+          connectionUtils.hasSocketUris(conn, senderSocketUri, targetSocketUri)
+        );
+
+      if (affectedConnection) {
+        const cnctStateUpdated = changeConnectionStateByFun(
+          allAtomsInState,
+          get(affectedConnection, "uri"),
+          state => {
+            if (!state) return won.WON.RequestSent; //fallback if no state present
+            if (state === won.WON.Connected) return won.WON.Connected; //stay in connected if it was already the case
+            if (state === won.WON.RequestReceived) return won.WON.Connected;
+            if (state === won.WON.Suggested) return won.WON.RequestSent;
+            if (state === won.WON.Closed) return won.WON.RequestSent;
+          }
+        );
+        return addMessage(cnctStateUpdated, action.payload.optimisticEvent);
+      } else {
+        const tmpConnectionUri = "connectionFrom:" + eventUri;
+
+        //need to wait for success-response to set that
+        const optimisticConnection = Immutable.fromJS({
+          uri: tmpConnectionUri,
+          usingTemporaryUri: true,
+          state: won.WON.RequestSent,
+          targetAtomUri: targetAtomUri,
+          targetConnectionUri: undefined,
+          unread: false,
+          socketUri: senderSocketUri,
+          targetSocketUri: targetSocketUri,
+          agreementData: {
+            agreementUris: Immutable.Set(),
+            pendingProposalUris: Immutable.Set(),
+            pendingCancellationProposalUris: Immutable.Set(),
+            cancellationPendingAgreementUris: Immutable.Set(),
+            acceptedCancellationProposalUris: Immutable.Set(),
+            cancelledAgreementUris: Immutable.Set(),
+            rejectedMessageUris: Immutable.Set(),
+            retractedMessageUris: Immutable.Set(),
+            proposedMessageUris: Immutable.Set(),
+            claimedMessageUris: Immutable.Set(),
+          },
+          petriNetData: Immutable.Map(),
+          creationDate: undefined,
+          lastUpdateDate: undefined,
+          isRated: false,
+          showAgreementData: false,
+          showPetriNetData: false,
+          multiSelectType: undefined,
+          messages: {
+            [eventUri]: {
+              uri: eventUri,
+              content: {
+                text: optimisticEvent.getTextMessage(),
+              },
+              isParsable: !!optimisticEvent.getTextMessage(),
+              hasContent: !!optimisticEvent.getTextMessage(),
+              hasReferences: false,
+              date: msStringToDate(optimisticEvent.getTimestamp()),
+              outgoingMessage: true,
+              unread: false,
+              messageType: won.WONMSG.connectMessage,
+              messageStatus: {
+                isProposed: false,
+                isClaimed: false,
+                isRetracted: false,
+                isRejected: false,
+                isAccepted: false,
+                isCancelled: false,
+                isCancellationPending: false,
+              },
+            },
+          },
+        });
+        return allAtomsInState.setIn(
+          [senderAtomUri, "connections", tmpConnectionUri],
+          optimisticConnection
+        );
+      }
+    }
+
     case actionTypes.atoms.connect: {
       const optimisticEvent = action.payload.optimisticEvent;
       // user has sent a connect request
@@ -323,21 +421,6 @@ export default function(allAtomsInState = initialState, action = {}) {
       return allAtomsInState;
     }
 
-    case actionTypes.connections.open: {
-      // user has sent an open request
-      const cnctStateUpdated = changeConnectionStateByFun(
-        allAtomsInState,
-        action.payload.connectionUri,
-        state => {
-          if (!state) return won.WON.RequestSent; //fallback if no state present
-          if (state === won.WON.Connected) return won.WON.Connected; //stay in connected if it was already the case
-          if (state === won.WON.RequestReceived) return won.WON.Connected;
-          if (state === won.WON.Suggested) return won.WON.RequestSent;
-          if (state === won.WON.Closed) return won.WON.RequestSent;
-        }
-      );
-      return addMessage(cnctStateUpdated, action.payload.optimisticEvent);
-    }
     case actionTypes.messages.open.failure:
       return changeConnectionState(
         allAtomsInState,

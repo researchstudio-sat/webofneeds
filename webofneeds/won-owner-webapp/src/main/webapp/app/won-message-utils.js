@@ -341,29 +341,6 @@ export function buildChatMessage({
   return messageP;
 }
 
-export function buildOpenMessage(chatMessage, socketUri, targetSocketUri) {
-  //TODO: REMOVE THIS ALTOGETHER
-  return won
-    .validateEnvelopeDataForConnection(socketUri, targetSocketUri)
-    .then(() => {
-      const eventUri = "wm:/SELF"; //mandatory
-      const message = new won.MessageBuilder(won.WONMSG.openMessage)
-        .protocolVersion("1.0")
-        .eventURI(eventUri)
-        .senderSocket(socketUri)
-        .targetSocket(targetSocketUri)
-        .textMessage(chatMessage)
-        .ownerDirection()
-        .timestamp(new Date().getTime().toString())
-        .build();
-
-      return {
-        eventUri,
-        message,
-      };
-    });
-}
-
 export async function buildEditMessage(editedAtomData, oldAtom) {
   const atomUriToEdit = oldAtom && oldAtom.get("uri");
 

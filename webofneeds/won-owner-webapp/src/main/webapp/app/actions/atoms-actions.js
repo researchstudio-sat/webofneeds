@@ -24,6 +24,43 @@ export function fetchUnloadedAtom(atomUri) {
     stateStore.fetchAtomAndDispatch(atomUri, dispatch, getState);
 }
 
+export function atomsConnectSockets(
+  senderSocketUri,
+  targetSocketUri,
+  connectMessage
+) {
+  return async dispatch => {
+    if (!senderSocketUri) {
+      throw new Error("SenderSocketUri not present");
+    }
+
+    if (!targetSocketUri) {
+      throw new Error("TargetSocketUri not present");
+    }
+
+    const cnctMsg = buildConnectMessage({
+      connectMessage: connectMessage,
+      socketUri: senderSocketUri,
+      targetSocketUri: targetSocketUri,
+    });
+
+    const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
+
+    return ownerApi.sendMessage(cnctMsg.message).then(jsonResp => {
+      dispatch({
+        type: actionTypes.atoms.connectSockets,
+        payload: {
+          eventUri: jsonResp.messageUri,
+          message: jsonResp.message,
+          optimisticEvent: optimisticEvent,
+          socketUri: senderSocketUri,
+          targetSocketUri: targetSocketUri,
+        },
+      });
+    });
+  };
+}
+
 //ownConnectionUri is optional - set if known
 export function atomsConnect(
   ownedAtomUri,

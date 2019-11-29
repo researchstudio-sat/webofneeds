@@ -18,7 +18,6 @@ import { actionTypes, actionCreators } from "./actions.js";
 
 import {
   buildCreateMessage,
-  buildOpenMessage,
   buildCloseMessage,
   buildChatMessage,
   buildRateMessage,
@@ -225,40 +224,6 @@ export function connectionsChatMessage(
           },
         });
       });
-  };
-}
-
-export function connectionsOpen(connectionUri, textMessage) {
-  return async (dispatch, getState) => {
-    const ownedAtom = get(getState(), "atoms").find(atom =>
-      getIn(atom, ["connections", connectionUri])
-    );
-    const socketUri = getIn(ownedAtom, ["connectionUri", "socketUri"]);
-    const targetSocketUri = getIn(ownedAtom, [
-      "connectionUri",
-      "targetSocketUri",
-    ]);
-
-    const openMsg = await buildOpenMessage(
-      textMessage,
-      socketUri,
-      targetSocketUri
-    );
-
-    const optimisticEvent = await won.wonMessageFromJsonLd(openMsg.message);
-
-    ownerApi.sendMessage(openMsg.message).then(jsonResp => {
-      dispatch({
-        type: actionTypes.connections.open,
-        payload: {
-          connectionUri,
-          textMessage,
-          eventUri: jsonResp.messageUri,
-          message: jsonResp.message,
-          optimisticEvent,
-        },
-      });
-    });
   };
 }
 

@@ -42,6 +42,7 @@ import {
   atomsClose,
   atomsClosedBySystem,
   atomsConnect,
+  atomsConnectSockets,
   atomsDelete,
   atomsOpen,
   fetchUnloadedAtom,
@@ -103,7 +104,6 @@ const actionHierarchy = {
   initialPageLoad: pageLoadAction,
   initialLoadFinished: INJ_DEFAULT,
   connections: {
-    open: cnct.connectionsOpen,
     connectAdHoc: cnct.connectionsConnectAdHoc,
     connectReactionAtom: cnct.connectionsConnectReactionAtom,
     close: cnct.connectionsClose,
@@ -149,6 +149,7 @@ const actionHierarchy = {
     closedBySystem: atomsClosedBySystem,
     failed: INJ_DEFAULT,
     connect: atomsConnect,
+    connectSockets: atomsConnectSockets,
     fetchUnloadedAtom: fetchUnloadedAtom,
 
     fetchMetaAtoms: INJ_DEFAULT,

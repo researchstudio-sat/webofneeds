@@ -584,12 +584,10 @@ export function processConnectMessage(event) {
     const state = getState();
 
     const recipientAtomUri = generalSelectors.getAtomUriBySocketUri(
-      state,
       targetSocketUri
     );
 
     const senderAtomUri = generalSelectors.getAtomUriBySocketUri(
-      state,
       senderSocketUri
     );
 
