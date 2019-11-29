@@ -159,16 +159,6 @@ const mapDispatchToProps = dispatch => {
         )
       );
     },
-    connect: (ownedAtomUri, connectionUri, targetAtomUri, message) => {
-      dispatch(
-        actionCreators.atoms__connect(
-          ownedAtomUri,
-          connectionUri,
-          targetAtomUri,
-          message
-        )
-      );
-    },
     showMoreMessages: (connectionUri, msgCount) => {
       dispatch(
         actionCreators.connections__showMoreMessages(connectionUri, msgCount)
@@ -473,10 +463,9 @@ class GroupAtomMessages extends React.Component {
         this.props.connectionUri,
         won.WONCON.binaryRatingGood
       );
-      this.props.connect(
-        get(this.props.ownedAtom, "uri"),
-        this.props.connectionUri,
-        this.props.targetAtomUri,
+      this.props.connectSockets(
+        get(this.props.connection, "socketUri"),
+        get(this.props.connection, "targetSocketUri"),
         message
       );
       this.props.routerGoCurrent({
@@ -552,7 +541,6 @@ GroupAtomMessages.propTypes = {
   routerGoResetParams: PropTypes.func,
   hideAddMessageContent: PropTypes.func,
   sendChatMessage: PropTypes.func,
-  connect: PropTypes.func,
   connectAdHoc: PropTypes.func,
   connectSockets: PropTypes.func,
   rateConnection: PropTypes.func,

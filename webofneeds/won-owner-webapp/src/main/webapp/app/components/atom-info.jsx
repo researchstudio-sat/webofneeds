@@ -363,13 +363,10 @@ class AtomInfo extends React.Component {
               connectionUtils.isSuggested(personaConnection) ||
               connectionUtils.isClosed(personaConnection)
             ) {
-              this.props.connect(
-                personaUri,
-                personaConnectionUri,
-                _atomUri,
-                message,
-                won.CHAT.ChatSocketCompacted,
-                targetSocketType
+              this.props.connectSockets(
+                get(personaConnection, "socketUri"),
+                get(personaConnection, "targetSocketUri"),
+                message
               );
             } else if (connectionUtils.isRequestSent(personaConnection)) {
               // Just go to the connection without sending another request
