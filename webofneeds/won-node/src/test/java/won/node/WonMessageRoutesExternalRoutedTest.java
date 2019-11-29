@@ -666,7 +666,7 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         // expectations for connect
         toOwnerMockEndpoint.expectedMessageCount(3);
         toOwnerMockEndpoint.expectedMessagesMatches(
-                        isSenderEcho(connectMsg, 1),
+                        isSenderEcho(connectMsg, 0),
                         or(isRecipientMessage(connectMsg, 1), isResponse(connectMsg, 1)),
                         or(isRecipientMessage(connectMsg, 1), isResponse(connectMsg, 1)));
         toMatcherMockEndpoint.expectedMessageCount(0);
