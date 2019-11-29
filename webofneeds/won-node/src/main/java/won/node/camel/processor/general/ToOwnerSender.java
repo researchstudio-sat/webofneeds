@@ -57,7 +57,7 @@ public class ToOwnerSender extends AbstractCamelProcessor {
         WonMessage msg = getMessageToSendRequired(exchange);
         Objects.requireNonNull(msg);
         URI recipientAtom = getRecipientAtomURIRequired(exchange);
-        Atom atom = atomService.getAtomRequired(recipientAtom);
+        Optional<Atom> atom = atomService.getAtom(recipientAtom);
         List<OwnerApplication> ownerApps = getOwnerApplications(msg, atom,
                         getOwnerApplicationId(exchange));
         // String methodName =headers.get("methodName").toString();
@@ -88,18 +88,21 @@ public class ToOwnerSender extends AbstractCamelProcessor {
      * @param msg
      * @param ownerApplicationId
      */
-    private List<OwnerApplication> getOwnerApplications(WonMessage msg, Atom atom,
+    private List<OwnerApplication> getOwnerApplications(WonMessage msg, Optional<Atom> atom,
                     Optional<String> fallbackOwnerApplicationId) {
         Objects.requireNonNull(msg);
         Objects.requireNonNull(atom);
         if (logger.isDebugEnabled()) {
             logger.debug("about to send this message to registered owner apps:" + msg.toStringForDebug(true));
         }
-        List<OwnerApplication> ownerApplications = atom != null ? atom.getAuthorizedApplications() : new ArrayList<>();
-        if (logger.isDebugEnabled()) {
-            logger.debug("Atom to send the message {} to: {}", msg.getMessageURI(), atom.getAtomURI());
-            logger.debug("Found these ownerapplicationids for message {} : {}", msg.getMessageURI(),
-                            ownerApplications);
+        List<OwnerApplication> ownerApplications = new ArrayList<>();
+        if (atom.isPresent()) {
+            ownerApplications.addAll(atom.get().getAuthorizedApplications());
+            if (logger.isDebugEnabled()) {
+                logger.debug("Atom to send the message {} to: {}", msg.getMessageURI(), atom.get().getAtomURI());
+                logger.debug("Found these ownerapplicationids for message {} : {}", msg.getMessageURI(),
+                                ownerApplications);
+            }
         }
         // if no owner application ids are authorized, we use the fallback specified (if
         // any)
