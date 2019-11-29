@@ -1141,6 +1141,18 @@ public class WonRdfUtils {
             }
         }
 
+        public static void setSocketCapacity(SocketDefinitionImpl socketConfiguration, Dataset dataset,
+                        URI socketDefinitionURI) {
+            socketConfiguration.setCapacity(getSocketCapacity(dataset, socketDefinitionURI));
+        }
+
+        public static Optional<Integer> getSocketCapacity(Dataset dataset, URI socketDefinitionURI) {
+            return RdfUtils.getObjectStreamOfProperty(dataset, socketDefinitionURI,
+                            URI.create(WON.socketCapacity.getURI()),
+                            node -> node.isLiteral() ? node.asLiteral().getInt() : null).filter(x -> x != null)
+                            .distinct().findFirst();
+        }
+
         public static Optional<URI> getAtomOfSocket(Dataset dataset, URI socketURI) {
             return RdfUtils.getFirstStatementMapped(dataset, null, URI.create(WON.socket.getURI()), socketURI,
                             s -> s.getSubject().isURIResource() ? URI.create(s.getSubject().getURI()) : null);

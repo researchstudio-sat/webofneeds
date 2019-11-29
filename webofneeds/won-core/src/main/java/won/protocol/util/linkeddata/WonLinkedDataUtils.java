@@ -559,10 +559,10 @@ public class WonLinkedDataUtils {
         }
         socketDef.setSocketDefinitionURI(socketDefinitionURI);
         WonRdfUtils.SocketUtils.setCompatibleSocketDefinitions(socketDef, dataset, socketDefinitionURI);
-        WonRdfUtils.SocketUtils.setAutoOpenOfSocket(socketDef, dataset, socketDefinitionURI);
-        WonRdfUtils.SocketUtils.setSocketCapacityOfSocket(socketDef, dataset, socketDefinitionURI);
-        WonRdfUtils.SocketUtils.setDerivationPropertiesOfSocket(socketDef, dataset, socketDefinitionURI);
-        WonRdfUtils.SocketUtils.setInverseDerivationPropertiesOfSocket(socketDef, dataset, socketDefinitionURI);
+        WonRdfUtils.SocketUtils.setAutoOpen(socketDef, dataset, socketDefinitionURI);
+        WonRdfUtils.SocketUtils.setSocketCapacity(socketDef, dataset, socketDefinitionURI);
+        WonRdfUtils.SocketUtils.setDerivationProperties(socketDef, dataset, socketDefinitionURI);
+        WonRdfUtils.SocketUtils.setInverseDerivationProperties(socketDef, dataset, socketDefinitionURI);
         linkedDataObjectCache.put(new Element(socketDefinitionURI, socketDef));
         return Optional.of(socketDef);
     }

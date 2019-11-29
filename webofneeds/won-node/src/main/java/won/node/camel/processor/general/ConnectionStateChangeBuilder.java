@@ -54,4 +54,10 @@ public class ConnectionStateChangeBuilder {
             return new ConnectionStateChange(newState.get());
         }
     }
+
+    @Override
+    public String toString() {
+        return "ConnectionStateChangeBuilder [oldState=" + oldState.map(ConnectionState::toString).orElse("(none)")
+                        + ", newState=" + newState.map(ConnectionState::toString).orElse("(none") + "]";
+    }
 }

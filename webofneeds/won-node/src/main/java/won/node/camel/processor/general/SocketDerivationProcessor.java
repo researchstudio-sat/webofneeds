@@ -55,13 +55,16 @@ public class SocketDerivationProcessor implements Processor {
         // only if there is enough data to make a connectionStateChange object, make it
         // and pass it to the data
         // derivation service.
-        if (stateChangeBuilder.canBuild()) {
-            ConnectionStateChange connectionStateChange = stateChangeBuilder.build();
-            if (!con.isPresent()) {
-                logger.warn("Cannot derive data: no connection found");
+        if (con.isPresent()) {
+            stateChangeBuilder.newState(con.get().getState());
+            if (stateChangeBuilder.canBuild()) {
+                ConnectionStateChange connectionStateChange = stateChangeBuilder.build();
+                if (!con.isPresent()) {
+                    logger.warn("Cannot derive data: no connection found");
+                }
+                Atom atom = atomService.getAtomRequired(con.get().getAtomURI());
+                dataDerivationService.deriveDataForStateChange(connectionStateChange, atom, con.get());
             }
-            Atom atom = atomService.getAtomRequired(con.get().getAtomURI());
-            dataDerivationService.deriveDataForStateChange(connectionStateChange, atom, con.get());
         }
     }
 }
