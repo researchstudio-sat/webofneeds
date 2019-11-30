@@ -74,7 +74,7 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
 ###  https://w3id.org/won/message#containsSignature
 :containsSignature rdf:type owl:ObjectProperty ;
                    rdfs:domain :EnvelopeGraph ;
-                   rdfs:range msg:Signature ;
+                   rdfs:range :Signature ;
                    rdfs:comment "Links an envelope to a signature it 'contains'."@en ;
                    rdfs:label "containsSignature" .
 
@@ -197,7 +197,7 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
 
 ###  https://w3id.org/won/message#signedGraph
 :signedGraph rdf:type owl:ObjectProperty ;
-             rdfs:domain msg:Signature ;
+             rdfs:domain :Signature ;
              rdfs:range :MessageGraph ;
              rdfs:comment "Links a signature to the graph it signs."@en ;
              rdfs:label "signedGraph" .
@@ -209,7 +209,7 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
 
 ###  https://w3id.org/won/message#hash
 :hash rdf:type owl:DatatypeProperty ;
-      rdfs:domain msg:Signature ;
+      rdfs:domain :Signature ;
       rdfs:range xsd:string ;
       rdfs:comment "The message hash."@en ;
       rdfs:label "hash" .
@@ -233,7 +233,7 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
 
 ###  https://w3id.org/won/message#publicKeyFingerprint
 :publicKeyFingerprint rdf:type owl:DatatypeProperty ;
-                      rdfs:domain msg:Signature ;
+                      rdfs:domain :Signature ;
                       rdfs:range xsd:string ;
                       rdfs:comment "The fingerprint of the sender's public key (SHA-256 hash)." ;
                       rdfs:label "publicKeyFingerprint" .
@@ -251,8 +251,10 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
 #    Classes
 #################################################################
 
-###  http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature
-msg:Signature rdf:type owl:Class .
+
+:Signature rdf:type owl:Class ;
+           rdfs:comment "The class of RDF signatures as used in WoN."@en ;
+           rdfs:label "Signature" .
 
 
 ###  https://w3id.org/won/core#Atom
