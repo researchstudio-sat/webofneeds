@@ -30,6 +30,12 @@
 		<!-- Warning! Only to be used in connection with the <dependencyManagement> 
             section in the parent pom! -->
 
+			<dependency>
+				<groupId>at.researchstudio.sat</groupId>
+				<artifactId>won-vocab</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
 			<!-- TEST build with openjdk12  -->
 			<dependency>
 				<groupId>javax.xml.bind</groupId>

@@ -21,13 +21,23 @@
 	<name>Vocabulary</name>
 	<artifactId>won-vocab</artifactId>
 	<version>0.7-SNAPSHOT</version>
-	<packaging>pom</packaging>
+	<packaging>jar</packaging>
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>net.revelc.code.formatter</groupId>
 				<artifactId>formatter-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-jar-plugin</artifactId>
+	            <configuration>
+	              <includes>
+	                <include>**/*.ttl</include>
+	              </includes>
+	            </configuration>
+			</plugin>
 		</plugins>
 	</build>
+	
 </project>

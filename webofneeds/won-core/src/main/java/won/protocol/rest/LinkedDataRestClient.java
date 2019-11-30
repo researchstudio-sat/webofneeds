@@ -13,8 +13,11 @@ package won.protocol.rest;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.Optional;
 
 import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -28,9 +31,15 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import won.protocol.util.LogMarkers;
+import won.protocol.util.linkeddata.IncludedWonOntologies;
 
 public abstract class LinkedDataRestClient {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final int FALLBACK_CACHE_MAX_AGE_SECONDS = 3600;
+    // the includedeWonOntologies caches all ontologies we cannot access online and
+    // therefore use in the packaged version. Obviously, this constitues a memory
+    // leak if there are many instances of the LinkedDataRestClient but we assume
+    // this is not the case
 
     /**
      * Retrieves RDF for the specified resource URI. Expects that the resource URI
@@ -95,20 +104,36 @@ public abstract class LinkedDataRestClient {
             }
             result = response.getBody();
         } catch (RestClientException e) {
+            // first, let's see if we can answer the request from loaded ontologies:
+            logger.debug("Could not fetch {} from the Web, searching fallback in included resources", resourceURI);
+            Optional<Model> fallbackResult = IncludedWonOntologies.get(resourceURI);
+            if (fallbackResult.isPresent()) {
+                logger.debug("Found fallback resource for {}, returning as result", resourceURI);
+                // we want the application to get a (possibly updated) version of this resource
+                // eventually, but we
+                // also want to avoid to keep making failing requests. We return the fallback
+                // result and use
+                // a caching period of one hour.
+                Dataset dataset = DatasetFactory.createGeneral();
+                dataset.setDefaultModel(fallbackResult.get());
+                HttpHeaders headers = new HttpHeaders();
+                headers.add(HttpHeaders.CACHE_CONTROL, "max-age=" + FALLBACK_CACHE_MAX_AGE_SECONDS);
+                return new DatasetResponseWithStatusCodeAndHeaders(dataset, 200, headers);
+            }
             if (e instanceof HttpClientErrorException) {
                 throw new LinkedDataFetchingException(resourceURI, MessageFormat.format(
-                                "caught a HttpClientErrorException exception, for {0}. Underlying error message is: {1}, response Body: {2}",
+                                "Caught a HttpClientErrorException exception, for {0}. Underlying error message is: {1}, response Body: {2}",
                                 resourceURI, e.getMessage(), ((HttpClientErrorException) e).getResponseBodyAsString()),
                                 e);
             }
             if (e instanceof HttpServerErrorException) {
                 throw new LinkedDataFetchingException(resourceURI, MessageFormat.format(
-                                "caught a HttpServerErrorException exception, for {0}. Underlying error message is: {1}, response Body: {2}",
+                                "Caught a HttpServerErrorException exception, for {0}. Underlying error message is: {1}, response Body: {2}",
                                 resourceURI, e.getMessage(), ((HttpServerErrorException) e).getResponseBodyAsString()),
                                 e);
             }
             throw new LinkedDataFetchingException(resourceURI,
-                            MessageFormat.format("caught a clientHandler exception, "
+                            MessageFormat.format("Caught a clientHandler exception, "
                                             + "which may indicate that the URI that was accessed isn''t a"
                                             + " linked data URI, please check {0}. Underlying error message is: {1}",
                                             resourceURI, e.getMessage()),
