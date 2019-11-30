@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.camel.EndpointInject;
+import org.apache.camel.Predicate;
 import org.apache.camel.builder.AdviceWithRouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.model.ModelCamelContext;
@@ -1287,7 +1288,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
         assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
         toOwnerMockEndpoint.expectedMessageCount(1);
         // toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(connectFromOwnerMsg));
-        toMatcherMockEndpoint.expectedMessageCount(0);
+        toMatcherMockEndpoint.expectedMessageCount(1);
         toNodeMockEndpoint.expectedMessageCount(1);
         // toNodeMockEndpoint.expectedMessagesMatches(isMessageAndResponse(connectFromOwnerMsg));
         sendFromOwner(connectFromOwnerMsg, OWNERAPPLICATION_ID_OWNER1);
@@ -1319,7 +1320,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
             toMatcherMockEndpoint.expectedMessageCount(2);
             toNodeMockEndpoint.expectedMessageCount(0);
             sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
-            sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER1);
+            sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER2);
             assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
             toOwnerMockEndpoint.expectedMessageCount(1);
             toMatcherMockEndpoint.expectedMessageCount(0);
@@ -1350,13 +1351,18 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
                             .content().text("Unittest connect")
                             .build());
             toOwnerMockEndpoint.expectedMessageCount(2);
+            Predicate pred1 = maxOnce(isMessageAndResponseAndRemoteResponse(msg));
+            Predicate pred2 = maxOnce(isMessageAndResponse(connectFromOwnerMsg));
             toOwnerMockEndpoint.expectedMessagesMatches(
-                            or(isMessageAndResponseAndRemoteResponse(msg), isMessageAndResponse(connectFromOwnerMsg)));
-            toMatcherMockEndpoint.expectedMessageCount(2);
+                            or(pred1, pred2),
+                            or(pred1, pred2));
+            toMatcherMockEndpoint.expectedMessageCount(1);
             toNodeMockEndpoint.expectedMessageCount(2);
+            pred1 = maxOnce(isSuccessResponseTo(msg));
+            pred2 = maxOnce(isMessageAndResponse(connectFromOwnerMsg));
             toNodeMockEndpoint.expectedMessagesMatches(
-                            or(isMessageAndResponse(connectFromOwnerMsg),
-                                            isSuccessResponseTo(msg)));
+                            or(pred1, pred2),
+                            or(pred1, pred2));
             Thread t1 = new Thread(() -> helper.doInSeparateTransaction(
                             () -> sendFromExternalOwner(msg)));
             Thread t2 = new Thread(() -> helper.doInSeparateTransaction(
@@ -1365,6 +1371,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
             t2.start();
             t1.join();
             t2.join();
+            Thread.sleep(i);
             assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint, toNodeMockEndpoint);
             Connection expected = new Connection();
             expected.setState(ConnectionState.CONNECTED);
