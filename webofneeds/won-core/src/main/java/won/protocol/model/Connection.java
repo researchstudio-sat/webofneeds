@@ -12,6 +12,7 @@ package won.protocol.model;
 
 import java.net.URI;
 import java.util.Date;
+import java.util.Optional;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -94,6 +95,9 @@ public class Connection implements ParentAware<ConnectionContainer>, VersionedEn
     @Column(name = "state", nullable = false)
     @Enumerated(EnumType.STRING)
     private ConnectionState state;
+    @Column(name = "previousstate", nullable = true)
+    @Enumerated(EnumType.STRING)
+    private ConnectionState previousState;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_atom_id")
     private ConnectionContainer parent;
@@ -208,6 +212,14 @@ public class Connection implements ParentAware<ConnectionContainer>, VersionedEn
 
     public void setState(final ConnectionState state) {
         this.state = state;
+    }
+
+    public void setPreviousState(ConnectionState previousState) {
+        this.previousState = previousState;
+    }
+
+    public Optional<ConnectionState> getPreviousState() {
+        return Optional.ofNullable(previousState);
     }
 
     protected void setVersion(final int version) {

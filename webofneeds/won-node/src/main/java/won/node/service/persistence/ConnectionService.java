@@ -168,7 +168,9 @@ public class ConnectionService {
         failForExceededCapacity(con.get().getSocketURI());
         failForIncompatibleSockets(con.get().getSocketURI(), con.get().getTargetSocketURI());
         // state transiation
-        con.get().setState(con.get().getState().transit(ConnectionEventType.OWNER_CONNECT));
+        ConnectionState nextState = con.get().getState().transit(ConnectionEventType.OWNER_CONNECT);
+        con.get().setPreviousState(con.get().getState());
+        con.get().setState(nextState);
         if (logger.isDebugEnabled()) {
             logger.debug("connect from owner: set connection {} state to: {}", con.get().getConnectionURI(),
                             con.get().getState());
@@ -245,7 +247,9 @@ public class ConnectionService {
                 logger.debug("connect from node: created new connection {}", con.getConnectionURI());
             }
         }
-        con.setState(con.getState().transit(ConnectionEventType.PARTNER_CONNECT));
+        ConnectionState nextState = con.getState().transit(ConnectionEventType.PARTNER_CONNECT);
+        con.setPreviousState(con.getState());
+        con.setState(nextState);
         if (logger.isDebugEnabled()) {
             logger.debug("connect from node: set connection {} state to: {}", con.getConnectionURI(), con.getState());
         }
@@ -426,6 +430,7 @@ public class ConnectionService {
         // perform state transit
         ConnectionState nextState = performStateTransit(con, connectionEventType);
         // set new state and save in the db
+        con.setPreviousState(con.getState());
         con.setState(nextState);
         // save in the db
         return connectionRepository.save(con);
@@ -436,6 +441,7 @@ public class ConnectionService {
         // perform state transit
         ConnectionState nextState = performStateTransit(con, connectionEventType);
         // set new state and save in the db
+        con.setPreviousState(con.getState());
         con.setState(nextState);
         // save in the db
         return connectionRepository.save(con);

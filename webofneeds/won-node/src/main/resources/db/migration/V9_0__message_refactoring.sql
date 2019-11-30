@@ -32,6 +32,9 @@ ALTER TABLE connection ALTER COLUMN socketuri SET NOT NULL;
 ALTER TABLE connection ALTER COLUMN targetsocketuri SET NOT NULL;
 ALTER TABLE connection ALTER COLUMN connectionuri SET NOT NULL;
 
+-- add the field for storing the previous connection state
+ALTER TABLE connection ADD COLUMN previousstate VARCHAR(255) DEFAULT NULL;
+
 -- add the field for the serialized set of unconfirmed message uris
 ALTER TABLE message_container ADD COLUMN unconfirmed bytea NOT NULL;
 -- add the field for the serialized set of pending confirmations

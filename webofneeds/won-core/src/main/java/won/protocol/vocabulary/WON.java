@@ -62,6 +62,7 @@ public class WON {
     public static final Resource ConnectionContainer = m.createResource(BASE_URI + "ConnectionContainer");
     public static final Resource Connection = m.createResource(BASE_URI + "Connection");
     public static final Property connectionState = m.createProperty(BASE_URI, "connectionState");
+    public static final Property previousConnectionState = m.createProperty(BASE_URI, "previousConnectionState");
     public static final Property targetConnection = m.createProperty(BASE_URI, "targetConnection");
     public static final Property targetAtom = m.createProperty(BASE_URI, "targetAtom");
     public static final Property sourceAtom = m.createProperty(BASE_URI, "sourceAtom");
