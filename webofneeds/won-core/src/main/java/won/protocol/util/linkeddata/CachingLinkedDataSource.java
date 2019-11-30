@@ -530,7 +530,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
         String cacheControlHeaderValue = responseData.getResponseHeaders().getFirst(HttpHeaders.CACHE_CONTROL);
         if (cacheControlHeaderValue == null)
             return null;
-        Pattern maxagePattern = Pattern.compile("[^\\s,]*max-age\\s*=\\s*(\\d+)[^\\d]*");
+        Pattern maxagePattern = Pattern.compile("$max-age=(\\d+)$");
         Matcher m = maxagePattern.matcher(cacheControlHeaderValue);
         if (!m.find())
             return null;
