@@ -403,7 +403,7 @@ public class WonMessageBuilder {
         dataAdder.accept(msgRes);
         return this;
     }
-    
+
     /**
      * Exposes the content graph, which is passed to the specified Consumer. If
      * there already is one content graph, that one is used. If there is none yet, a
@@ -415,7 +415,7 @@ public class WonMessageBuilder {
         dataAdder.accept(model);
         return this;
     }
-    
+
     /**
      * Adds the specified property once with each value.
      * 
@@ -428,7 +428,7 @@ public class WonMessageBuilder {
                         .withMessageResource(r -> r.addProperty(property, r.getModel().getResource(uri.toString()))));
         return this;
     }
-    
+
     /**
      * Adds the specified property once with each value.
      * 
@@ -439,7 +439,7 @@ public class WonMessageBuilder {
     public WonMessageBuilder addToMessageResource(Property property, URI... uriValues) {
         return addToMessageResource(property, Arrays.asList(uriValues));
     }
-    
+
     /**
      * Retrieves one of the possibly multiple Models that does not have a signature
      * yet. If there is none (all are signed or none is found at all), a new model
