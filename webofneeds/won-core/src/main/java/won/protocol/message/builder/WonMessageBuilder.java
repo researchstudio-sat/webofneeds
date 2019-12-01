@@ -16,6 +16,7 @@ import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
+import org.jboss.logging.Message;
 
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
@@ -470,14 +471,44 @@ public class WonMessageBuilder {
         return this;
     }
 
+    /**
+     * Adds a Text message to one of the message's content graphs. If only one graph
+     * is present, the text message is added to that graph. If more than one graph
+     * is present, and hence we cannot decide for any one of them, a new content
+     * graph is created for the text. If no content graphs are present, a new one is
+     * created.
+     * 
+     * @param textMessage
+     * @return
+     */
     WonMessageBuilder textMessage(String textMessage) {
         Objects.requireNonNull(textMessage);
-        Model model = ModelFactory.createDefaultModel();
+        Model model = getModelForAddingContent();
         RdfUtils.findOrCreateBaseResource(model);
         RdfUtils.replaceBaseResource(model, model.createResource(this.getMessageURI().toString()));
         WonRdfUtils.MessageUtils.addMessage(model, textMessage);
-        this.content(model);
         return this;
+    }
+
+    /**
+     * Returns a model for adding data to one of the message's content graphs. If
+     * only one graph is present, the text message is added to that graph. If more
+     * than one graph is present, and hence we cannot decide for any one of them, a
+     * new content graph is created for the text. If no content graphs are present,
+     * a new one is created.
+     * 
+     * @param textMessage
+     * @return
+     */
+    Model getModelForAddingContent() {
+        Model model = null;
+        if (this.contentMap.size() == 1) {
+            model = contentMap.values().stream().findFirst().get();
+        } else {
+            model = ModelFactory.createDefaultModel();
+            addContentInternal(model);
+        }
+        return model;
     }
 
     WonMessageBuilder previousMessage(URI previousMessageURI) {
