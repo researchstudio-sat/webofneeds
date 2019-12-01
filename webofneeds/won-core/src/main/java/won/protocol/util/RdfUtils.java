@@ -1459,6 +1459,18 @@ public class RdfUtils {
                         }, Characteristics.UNORDERED);
     }
 
+    public static Collector<Statement, Model, Model> collectToModel() {
+        return Collector.of((Supplier<Model>) () -> ModelFactory.createDefaultModel(),
+                        (BiConsumer<Model, Statement>) (model, stmt) -> model.add(stmt),
+                        (BinaryOperator<Model>) (left, right) -> {
+                            Iterator<Statement> rightStatementsIt = right.listStatements();
+                            while (rightStatementsIt.hasNext()) {
+                                left.add(rightStatementsIt.next());
+                            }
+                            return left;
+                        }, Characteristics.UNORDERED);
+    }
+
     public static Stream<Model> toModelStream(final Dataset dataset) {
         List<Model> ret = new LinkedList<>();
         Model model = dataset.getDefaultModel();
