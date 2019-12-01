@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -277,7 +278,7 @@ public abstract class WonMessageRoutesTest {
     protected Predicate isFailureResponseTo(URI messageURI) {
         Objects.requireNonNull(messageURI);
         return (Exchange ex) -> {
-            WonMessage msg = getMessage(ex);
+            WonMessage msg = getMessageRequired(ex);
             boolean result = (msg.getMessageTypeRequired().isFailureResponse()
                             && messageURI.equals(msg.getRespondingToMessageURI()));
             if (!result) {
@@ -297,7 +298,7 @@ public abstract class WonMessageRoutesTest {
 
         @Override
         public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessage(exchange);
+            WonMessage msg = getMessageRequired(exchange);
             boolean result = (msg.getMessageTypeRequired().isFailureResponse()
                             && messageURI.equals(msg.getRespondingToMessageURI()));
             if (!result) {
@@ -326,7 +327,7 @@ public abstract class WonMessageRoutesTest {
 
         @Override
         public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessage(exchange);
+            WonMessage msg = getMessageRequired(exchange);
             boolean result = (msg.getMessageTypeRequired().isSuccessResponse()
                             && messageURI.equals(msg.getRespondingToMessageURI()));
             if (!result) {
@@ -401,7 +402,7 @@ public abstract class WonMessageRoutesTest {
 
         @Override
         public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessage(exchange);
+            WonMessage msg = getMessageRequired(exchange);
             boolean result = msg.getMessageURIRequired().equals(messageURI) && (!msg.getResponse().isPresent());
             if (!result) {
                 logMessageForFailedPredicate(getClass().getName(), "messageURI", messageURI, msg);
@@ -424,7 +425,7 @@ public abstract class WonMessageRoutesTest {
 
         @Override
         public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessage(exchange);
+            WonMessage msg = getMessageRequired(exchange);
             boolean result = ((msg.getMessageTypeRequired().isSocketHintMessage()
                             && socketURI.equals(msg.getRecipientSocketURIRequired())));
             if (!result) {
@@ -448,7 +449,7 @@ public abstract class WonMessageRoutesTest {
 
         @Override
         public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessage(exchange);
+            WonMessage msg = getMessageRequired(exchange);
             boolean result = (msg.getMessageTypeRequired().isAtomCreatedNotification()
                             && msg.getSenderAtomURIRequired().equals(atomURI));
             if (!result) {
@@ -471,7 +472,7 @@ public abstract class WonMessageRoutesTest {
         }
 
         public boolean matches(Exchange ex) {
-            WonMessage msg = getMessage(ex);
+            WonMessage msg = getMessageRequired(ex);
             boolean result = (msg.getMessageTypeRequired().isChangeNotification()
                             && msg.getSenderAtomURIRequired().equals(atomURI));
             if (!result) {
@@ -481,8 +482,12 @@ public abstract class WonMessageRoutesTest {
         }
     }
 
-    public WonMessage getMessage(Exchange ex) {
+    public WonMessage getMessageRequired(Exchange ex) {
         return getMessageFromBody(ex).orElseGet(() -> getMessageToSendRequired(ex));
+    }
+
+    public Optional<WonMessage> getMessage(Exchange ex) {
+        return Optional.ofNullable(getMessageFromBody(ex).orElseGet(() -> getMessageToSend(ex).orElse(null)));
     }
 
     protected Predicate maxOnce(final Predicate pred) {
@@ -518,7 +523,7 @@ public abstract class WonMessageRoutesTest {
 
         @Override
         public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessage(exchange);
+            WonMessage msg = getMessageRequired(exchange);
             boolean ret = Objects.equals(msgUri, msg.getMessageURIRequired())
                             && msg.getResponse().isPresent()
                             && !msg.getRemoteResponse().isPresent();
@@ -539,7 +544,7 @@ public abstract class WonMessageRoutesTest {
 
         @Override
         public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessage(exchange);
+            WonMessage msg = getMessageRequired(exchange);
             Optional<WonMessage> resp = msg.getResponse();
             if (resp.isPresent()) {
                 if (resp.get().getConnectionURI() == null) {
@@ -582,7 +587,7 @@ public abstract class WonMessageRoutesTest {
 
         @Override
         public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessage(exchange);
+            WonMessage msg = getMessageRequired(exchange);
             boolean result = Objects.equals(msgUri, msg.getMessageURIRequired())
                             && msg.getResponse().isPresent()
                             && msg.getRemoteResponse().isPresent();
@@ -645,7 +650,7 @@ public abstract class WonMessageRoutesTest {
 
         @Override
         public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessage(exchange);
+            WonMessage msg = getMessageRequired(exchange);
             Optional<WonMessage> resp = msg.getResponse();
             boolean result = false;
             if (resp.isPresent()) {
@@ -670,7 +675,7 @@ public abstract class WonMessageRoutesTest {
 
         @Override
         public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessage(exchange);
+            WonMessage msg = getMessageRequired(exchange);
             Optional<WonMessage> resp = msg.getRemoteResponse();
             boolean result = false;
             if (resp.isPresent()) {
@@ -695,7 +700,7 @@ public abstract class WonMessageRoutesTest {
 
         @Override
         public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessage(exchange);
+            WonMessage msg = getMessageRequired(exchange);
             boolean result = false;
             result = msg.getPreviousMessageURIs().size() == n;
             if (!result) {
@@ -906,6 +911,15 @@ public abstract class WonMessageRoutesTest {
     protected void assertMockEndpointsSatisfiedAndReset(MockEndpoint... endpoints) throws Exception {
         for (int i = 0; i < endpoints.length; i++) {
             endpoints[i].assertIsSatisfied();
+            endpoints[i].reset();
+        }
+    }
+
+    protected void assertMockEndpointsSatisfiedAndReset(MessageCollector collector, MockEndpoint... endpoints)
+                    throws Exception {
+        for (int i = 0; i < endpoints.length; i++) {
+            endpoints[i].assertIsSatisfied();
+            collector.collectFrom(endpoints[i].getExchanges());
             endpoints[i].reset();
         }
     }
@@ -1145,4 +1159,23 @@ public abstract class WonMessageRoutesTest {
                             WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE));
         };
     };
+
+    protected class MessageCollector {
+        Dataset collected = DatasetFactory.createGeneral();
+
+        public void collectFrom(Collection<Exchange> exchanges) {
+            exchanges.forEach(this::collectFrom);
+        }
+
+        public void collectFrom(Exchange exchange) {
+            Optional<WonMessage> msg = getMessage(exchange);
+            if (msg.isPresent()) {
+                RdfUtils.addDatasetToDataset(collected, msg.get().getCompleteDataset());
+            }
+        }
+
+        public Dataset getCollected() {
+            return RdfUtils.cloneDataset(collected);
+        }
+    }
 }

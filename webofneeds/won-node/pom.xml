@@ -126,6 +126,12 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
+        <dependency>
+        	<groupId>at.researchstudio.sat</groupId>
+        	<artifactId>won-utils-conversation</artifactId>
+        	<version>${project.version}</version>
+        	<scope>test</scope>
+        </dependency>
        <dependency>
        		<!--  introduced so we can use @MockBean -->
 		    <groupId>org.springframework.boot</groupId>

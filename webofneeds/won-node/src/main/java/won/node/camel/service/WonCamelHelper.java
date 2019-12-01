@@ -249,7 +249,7 @@ public class WonCamelHelper {
     public static Optional<WonMessage> getMessageFromBody(Exchange exchange) {
         Objects.requireNonNull(exchange);
         String datasetAsString = (String) exchange.getIn().getBody();
-        if (datasetAsString == null) {
+        if (datasetAsString == null || datasetAsString.trim().length() == 0) {
             return Optional.empty();
         }
         return Optional.of(WonMessage.of(RdfUtils.readDatasetFromString(datasetAsString,

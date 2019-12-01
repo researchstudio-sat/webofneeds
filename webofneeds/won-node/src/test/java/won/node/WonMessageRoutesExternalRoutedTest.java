@@ -7,6 +7,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.camel.Predicate;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +19,7 @@ import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
 import won.node.test.WonMessageRoutesTestHelper;
+import won.protocol.agreement.AgreementProtocolState;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.model.Atom;
@@ -21,6 +27,9 @@ import won.protocol.model.AtomMessageContainer;
 import won.protocol.model.AtomState;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
+import won.protocol.util.Prefixer;
+import won.protocol.util.RdfUtils;
+import won.protocol.util.pretty.Lang_WON;
 
 /**
  * Tests that check the input/output behaviour of the WoN node.
@@ -316,12 +325,13 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
 
     @Test
     @Commit // @Rollback would't work as camel still commits
-    public void test_conversation() throws Exception {
+    public void test_conversation__proposal_accepted() throws Exception {
         URI atomURI = newAtomURI();
         URI socketURI = URI.create(atomURI.toString() + "#socket1");
         URI atomURI2 = newAtomURI();
         URI socketURI2 = URI.create(atomURI2.toString() + "#socket1");
         prepareMockitoStubs(atomURI, socketURI, atomURI2, socketURI2);
+        MessageCollector collector = new MessageCollector();
         WonMessage createAtom1Msg = prepareFromOwner(makeCreateAtomMessage(atomURI,
                         "/won/node/WonMessageRoutesTest/data/test-atom1.ttl"));
         WonMessage createAtom2Msg = prepareFromOwner(makeCreateAtomMessage(atomURI2,
@@ -338,7 +348,7 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
                         .hintTargetSocket(socketURI2)
                         .hintScore(0.5)
                         .build());
-        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
         toOwnerMockEndpoint.expectedMessageCount(1);
         toMatcherMockEndpoint.expectedMessageCount(0);
         sendFromMatcher(socketHintMessage);
@@ -348,155 +358,507 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
                         .sockets().sender(socketURI2).recipient(socketURI)
                         .content().text("Unittest connect")
                         .build());
-        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
         toMatcherMockEndpoint.expectedMessageCount(0);
         toOwnerMockEndpoint.expectedMessageCount(3);
-        toOwnerMockEndpoint.expectedMessagesMatches(
-                        and(isMessageAndResponse(connectFromExternalMsg), isOwnResponseConfirmsNPrevious(0)),
-                        and(isMessageAndResponseAndRemoteResponse(connectFromExternalMsg),
-                                        isRemoteResponseConfirmsNPrevious(1)),
-                        and(isSuccessResponseTo(connectFromExternalMsg), isMessageConfirmsNPrevious(1)));
         sendFromOwner(connectFromExternalMsg, OWNERAPPLICATION_ID_OWNER2);
-        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
         WonMessage connectFromOwnerMsg = prepareFromOwner(WonMessageBuilder
                         .connect()
                         .sockets().sender(socketURI).recipient(socketURI2)
                         .content().text("Unittest connect (completing the handshake)")
                         .build());
         toOwnerMockEndpoint.expectedMessageCount(3);
-        toOwnerMockEndpoint.expectedMessagesMatches(
-                        and(isMessageAndResponse(connectFromOwnerMsg),
-                                        isOwnResponseConfirmsNPrevious(1)),
-                        and(isMessageAndResponseAndRemoteResponse(connectFromOwnerMsg),
-                                        isRemoteResponseConfirmsNPrevious(2)),
-                        and(isSuccessResponseTo(connectFromOwnerMsg),
-                                        isMessageConfirmsNPrevious(2)));
         toMatcherMockEndpoint.expectedMessageCount(2);
         sendFromOwner(connectFromOwnerMsg, OWNERAPPLICATION_ID_OWNER1);
-        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        //// connect done
         Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI,
                         socketURI2);
-        WonMessage textMsgFromOwner = prepareFromOwner(WonMessageBuilder
+        //// send one message, which will be the content of the agreement
+        WonMessage contentForProposal = prepareFromOwner(WonMessageBuilder
                         .connectionMessage()
                         .sockets()
                         /**/.sender(con.get().getSocketURI())
                         /**/.recipient(con.get().getTargetSocketURI())
                         .content()
-                        /**/.text("unittest message from " + socketURI)
+                        /**/.text("We are best friends forever!") // something important
                         .build());
         toOwnerMockEndpoint.expectedMessageCount(3);
-        toOwnerMockEndpoint.expectedMessagesMatches(
-                        and(isMessageAndResponse(textMsgFromOwner),
-                                        isOwnResponseConfirmsNPrevious(1)),
-                        and(isMessageAndResponseAndRemoteResponse(textMsgFromOwner),
-                                        isRemoteResponseConfirmsNPrevious(1)),
-                        and(isSuccessResponseTo(textMsgFromOwner),
-                                        isMessageConfirmsNPrevious(1)));
         toMatcherMockEndpoint.expectedMessageCount(0);
-        sendFromOwner(textMsgFromOwner, OWNERAPPLICATION_ID_OWNER1);
-        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
-        textMsgFromOwner = prepareFromOwner(WonMessageBuilder
+        sendFromOwner(contentForProposal, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        // now propose the previous message formally
+        WonMessage proposal = prepareFromOwner(WonMessageBuilder
                         .connectionMessage()
                         .sockets()
                         /**/.sender(con.get().getSocketURI())
                         /**/.recipient(con.get().getTargetSocketURI())
                         .content()
-                        /**/.text("unittest message 2 from " + socketURI)
+                        /**/.text("I am hereby proposing to be best friends forever")
+                        .agreement().proposes(contentForProposal.getMessageURI())
                         .build());
-        sendFromOwner(textMsgFromOwner, OWNERAPPLICATION_ID_OWNER1);
         toOwnerMockEndpoint.expectedMessageCount(3);
-        toOwnerMockEndpoint.expectedMessagesMatches(
-                        isSenderEcho(textMsgFromOwner, 1),
-                        or(isRecipientMessage(textMsgFromOwner, 1), isResponse(textMsgFromOwner, 1)),
-                        or(isRecipientMessage(textMsgFromOwner, 1), isResponse(textMsgFromOwner, 1)));
         toMatcherMockEndpoint.expectedMessageCount(0);
-        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
-        WonMessage textMsgFromOtherOwner = prepareFromExternalOwner(WonMessageBuilder
+        sendFromOwner(proposal, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        // now accept the proposal from the other side
+        WonMessage acceptMessage = prepareFromExternalOwner(WonMessageBuilder
                         .connectionMessage()
                         .sockets()
                         /**/.sender(con.get().getTargetSocketURI())
                         /**/.recipient(con.get().getSocketURI())
                         .content()
-                        /**/.text("unittest message from " + socketURI2)
+                        /**/.text("Thank you so much, of course I accept!")
+                        .agreement().accepts(proposal.getMessageURI())
                         .build());
         toOwnerMockEndpoint.expectedMessageCount(3);
-        toOwnerMockEndpoint.expectedMessagesMatches(
-                        isSenderEcho(textMsgFromOtherOwner, 1),
-                        or(isRecipientMessage(textMsgFromOtherOwner, 2), isResponse(textMsgFromOtherOwner, 2)),
-                        or(isRecipientMessage(textMsgFromOtherOwner, 2), isResponse(textMsgFromOtherOwner, 2)));
-        sendFromOwner(textMsgFromOtherOwner, OWNERAPPLICATION_ID_OWNER2);
         toMatcherMockEndpoint.expectedMessageCount(0);
-        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
-        textMsgFromOtherOwner = prepareFromExternalOwner(WonMessageBuilder
+        sendFromOwner(acceptMessage, OWNERAPPLICATION_ID_OWNER2);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        RDFDataMgr.write(System.err, Prefixer.setPrefixes(collector.getCollected()), Lang_WON.TRIG_WON_CONVERSATION);
+        assertCorrectAgreements("Wrong agreement content", collector.getCollected(),
+                        collectIntoGraph(contentForProposal.getMessageContent(), proposal.getMessageURI()));
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_conversation__claim_accepted() throws Exception {
+        URI atomURI = newAtomURI();
+        URI socketURI = URI.create(atomURI.toString() + "#socket1");
+        URI atomURI2 = newAtomURI();
+        URI socketURI2 = URI.create(atomURI2.toString() + "#socket1");
+        prepareMockitoStubs(atomURI, socketURI, atomURI2, socketURI2);
+        MessageCollector collector = new MessageCollector();
+        WonMessage createAtom1Msg = prepareFromOwner(makeCreateAtomMessage(atomURI,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl"));
+        WonMessage createAtom2Msg = prepareFromOwner(makeCreateAtomMessage(atomURI2,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl"));
+        // set minimal expectations just so we can expect something and subsequently
+        // reset expectations
+        toOwnerMockEndpoint.expectedMessageCount(2);
+        toMatcherMockEndpoint.expectedMessageCount(2);
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER2);
+        WonMessage socketHintMessage = prepareFromMatcher(WonMessageBuilder
+                        .socketHint()
+                        .recipientSocket(socketURI)
+                        .hintTargetSocket(socketURI2)
+                        .hintScore(0.5)
+                        .build());
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromMatcher(socketHintMessage);
+        // start connecting
+        WonMessage connectFromExternalMsg = prepareFromExternalOwner(WonMessageBuilder
+                        .connect()
+                        .sockets().sender(socketURI2).recipient(socketURI)
+                        .content().text("Unittest connect")
+                        .build());
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        sendFromOwner(connectFromExternalMsg, OWNERAPPLICATION_ID_OWNER2);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        WonMessage connectFromOwnerMsg = prepareFromOwner(WonMessageBuilder
+                        .connect()
+                        .sockets().sender(socketURI).recipient(socketURI2)
+                        .content().text("Unittest connect (completing the handshake)")
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(2);
+        sendFromOwner(connectFromOwnerMsg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        //// connect done
+        Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI,
+                        socketURI2);
+        //// send one message, which will be the content of the agreement
+        WonMessage contentForProposal = prepareFromOwner(WonMessageBuilder
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(con.get().getSocketURI())
+                        /**/.recipient(con.get().getTargetSocketURI())
+                        .content()
+                        /**/.text("We are best friends forever!") // something important
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(contentForProposal, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        // now claim the previous message formally
+        WonMessage claim = prepareFromOwner(WonMessageBuilder
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(con.get().getSocketURI())
+                        /**/.recipient(con.get().getTargetSocketURI())
+                        .content()
+                        /**/.text("I am hereby claiming we actually are best friends forever")
+                        .agreement().claims(contentForProposal)
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(claim, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        // now accept the proposal from the other side
+        WonMessage acceptMessage = prepareFromExternalOwner(WonMessageBuilder
                         .connectionMessage()
                         .sockets()
                         /**/.sender(con.get().getTargetSocketURI())
                         /**/.recipient(con.get().getSocketURI())
                         .content()
-                        /**/.text("unittest message from " + socketURI2)
+                        /**/.text("Goes without saying!")
+                        .agreement().accepts(claim.getMessageURI())
                         .build());
         toOwnerMockEndpoint.expectedMessageCount(3);
-        toOwnerMockEndpoint.expectedMessagesMatches(
-                        isSenderEcho(textMsgFromOtherOwner, 1),
-                        or(isRecipientMessage(textMsgFromOtherOwner, 1), isResponse(textMsgFromOtherOwner, 1)),
-                        or(isRecipientMessage(textMsgFromOtherOwner, 1), isResponse(textMsgFromOtherOwner, 1)));
-        sendFromOwner(textMsgFromOtherOwner, OWNERAPPLICATION_ID_OWNER2);
         toMatcherMockEndpoint.expectedMessageCount(0);
-        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
-        textMsgFromOtherOwner = prepareFromExternalOwner(WonMessageBuilder
+        sendFromOwner(acceptMessage, OWNERAPPLICATION_ID_OWNER2);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        RDFDataMgr.write(System.err, Prefixer.setPrefixes(collector.getCollected()), Lang_WON.TRIG_WON_CONVERSATION);
+        assertCorrectAgreements("Wrong agreement content", collector.getCollected(),
+                        collectIntoGraph(contentForProposal.getMessageContent(), claim.getMessageURI()));
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_conversation__proposal_accepted__then_canceled() throws Exception {
+        URI atomURI = newAtomURI();
+        URI socketURI = URI.create(atomURI.toString() + "#socket1");
+        URI atomURI2 = newAtomURI();
+        URI socketURI2 = URI.create(atomURI2.toString() + "#socket1");
+        prepareMockitoStubs(atomURI, socketURI, atomURI2, socketURI2);
+        MessageCollector collector = new MessageCollector();
+        WonMessage createAtom1Msg = prepareFromOwner(makeCreateAtomMessage(atomURI,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl"));
+        WonMessage createAtom2Msg = prepareFromOwner(makeCreateAtomMessage(atomURI2,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl"));
+        // set minimal expectations just so we can expect something and subsequently
+        // reset expectations
+        toOwnerMockEndpoint.expectedMessageCount(2);
+        toMatcherMockEndpoint.expectedMessageCount(2);
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER2);
+        WonMessage socketHintMessage = prepareFromMatcher(WonMessageBuilder
+                        .socketHint()
+                        .recipientSocket(socketURI)
+                        .hintTargetSocket(socketURI2)
+                        .hintScore(0.5)
+                        .build());
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromMatcher(socketHintMessage);
+        // start connecting
+        WonMessage connectFromExternalMsg = prepareFromExternalOwner(WonMessageBuilder
+                        .connect()
+                        .sockets().sender(socketURI2).recipient(socketURI)
+                        .content().text("Unittest connect")
+                        .build());
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        sendFromOwner(connectFromExternalMsg, OWNERAPPLICATION_ID_OWNER2);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        WonMessage connectFromOwnerMsg = prepareFromOwner(WonMessageBuilder
+                        .connect()
+                        .sockets().sender(socketURI).recipient(socketURI2)
+                        .content().text("Unittest connect (completing the handshake)")
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(2);
+        sendFromOwner(connectFromOwnerMsg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        //// connect done
+        Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI,
+                        socketURI2);
+        //// send one message, which will be the content of the agreement
+        WonMessage contentForProposal = prepareFromOwner(WonMessageBuilder
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(con.get().getSocketURI())
+                        /**/.recipient(con.get().getTargetSocketURI())
+                        .content()
+                        /**/.text("We are best friends forever!") // something important
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(contentForProposal, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        // now propose the previous message formally
+        WonMessage proposal = prepareFromOwner(WonMessageBuilder
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(con.get().getSocketURI())
+                        /**/.recipient(con.get().getTargetSocketURI())
+                        .content()
+                        /**/.text("I am hereby proposing to be best friends forever")
+                        .agreement().proposes(contentForProposal.getMessageURI())
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(proposal, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        // now accept the proposal from the other side
+        WonMessage acceptMessage = prepareFromExternalOwner(WonMessageBuilder
                         .connectionMessage()
                         .sockets()
                         /**/.sender(con.get().getTargetSocketURI())
                         /**/.recipient(con.get().getSocketURI())
                         .content()
-                        /**/.text("unittest message from " + socketURI2)
+                        /**/.text("Thank you so much, of course I accept!")
+                        .agreement().accepts(proposal.getMessageURI())
                         .build());
         toOwnerMockEndpoint.expectedMessageCount(3);
-        toOwnerMockEndpoint.expectedMessagesMatches(
-                        isSenderEcho(textMsgFromOtherOwner, 1),
-                        or(isRecipientMessage(textMsgFromOtherOwner, 1), isResponse(textMsgFromOtherOwner, 1)),
-                        or(isRecipientMessage(textMsgFromOtherOwner, 1), isResponse(textMsgFromOtherOwner, 1)));
-        sendFromOwner(textMsgFromOtherOwner, OWNERAPPLICATION_ID_OWNER2);
         toMatcherMockEndpoint.expectedMessageCount(0);
-        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
-        textMsgFromOtherOwner = prepareFromExternalOwner(WonMessageBuilder
+        sendFromOwner(acceptMessage, OWNERAPPLICATION_ID_OWNER2);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        // now realize we made a mistake: propose to cancel
+        WonMessage proposalToCancel = prepareFromOwner(WonMessageBuilder
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(con.get().getSocketURI())
+                        /**/.recipient(con.get().getTargetSocketURI())
+                        .content()
+                        /**/.text("Hey, I realized I did not want this. Can we cancel?")
+                        .agreement().proposesToCancel(proposal) // remember, the uri of the agreement is the uri of the
+                                                                // propose message!
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(proposalToCancel, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        // the other side is gentle and accepts the cancellation
+        WonMessage acceptCancelMessage = prepareFromExternalOwner(WonMessageBuilder
                         .connectionMessage()
                         .sockets()
                         /**/.sender(con.get().getTargetSocketURI())
                         /**/.recipient(con.get().getSocketURI())
                         .content()
-                        /**/.text("unittest message from " + socketURI2)
+                        /**/.text("Bummer. Sure.")
+                        .agreement().accepts(proposalToCancel)
                         .build());
         toOwnerMockEndpoint.expectedMessageCount(3);
-        toOwnerMockEndpoint.expectedMessagesMatches(
-                        isSenderEcho(textMsgFromOtherOwner, 1),
-                        or(isRecipientMessage(textMsgFromOtherOwner, 1), isResponse(textMsgFromOtherOwner, 1)),
-                        or(isRecipientMessage(textMsgFromOtherOwner, 1), isResponse(textMsgFromOtherOwner, 1)));
-        sendFromOwner(textMsgFromOtherOwner, OWNERAPPLICATION_ID_OWNER2);
         toMatcherMockEndpoint.expectedMessageCount(0);
-        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
-        textMsgFromOtherOwner = prepareFromExternalOwner(WonMessageBuilder
+        sendFromOwner(acceptCancelMessage, OWNERAPPLICATION_ID_OWNER2);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        RDFDataMgr.write(System.err, Prefixer.setPrefixes(collector.getCollected()), Lang_WON.TRIG_WON_CONVERSATION);
+        assertCorrectAgreements("Wrong agreement content", collector.getCollected(), DatasetFactory.createGeneral());
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_conversation__proposal_retracted_but_then_accepted() throws Exception {
+        URI atomURI = newAtomURI();
+        URI socketURI = URI.create(atomURI.toString() + "#socket1");
+        URI atomURI2 = newAtomURI();
+        URI socketURI2 = URI.create(atomURI2.toString() + "#socket1");
+        prepareMockitoStubs(atomURI, socketURI, atomURI2, socketURI2);
+        MessageCollector collector = new MessageCollector();
+        WonMessage createAtom1Msg = prepareFromOwner(makeCreateAtomMessage(atomURI,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl"));
+        WonMessage createAtom2Msg = prepareFromOwner(makeCreateAtomMessage(atomURI2,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl"));
+        // set minimal expectations just so we can expect something and subsequently
+        // reset expectations
+        toOwnerMockEndpoint.expectedMessageCount(2);
+        toMatcherMockEndpoint.expectedMessageCount(2);
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER2);
+        WonMessage socketHintMessage = prepareFromMatcher(WonMessageBuilder
+                        .socketHint()
+                        .recipientSocket(socketURI)
+                        .hintTargetSocket(socketURI2)
+                        .hintScore(0.5)
+                        .build());
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromMatcher(socketHintMessage);
+        // start connecting
+        WonMessage connectFromExternalMsg = prepareFromExternalOwner(WonMessageBuilder
+                        .connect()
+                        .sockets().sender(socketURI2).recipient(socketURI)
+                        .content().text("Unittest connect")
+                        .build());
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        sendFromOwner(connectFromExternalMsg, OWNERAPPLICATION_ID_OWNER2);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        WonMessage connectFromOwnerMsg = prepareFromOwner(WonMessageBuilder
+                        .connect()
+                        .sockets().sender(socketURI).recipient(socketURI2)
+                        .content().text("Unittest connect (completing the handshake)")
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(2);
+        sendFromOwner(connectFromOwnerMsg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        //// connect done
+        Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI,
+                        socketURI2);
+        //// send one message, which will be the content of the agreement
+        WonMessage contentForProposal = prepareFromOwner(WonMessageBuilder
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(con.get().getSocketURI())
+                        /**/.recipient(con.get().getTargetSocketURI())
+                        .content()
+                        /**/.text("We are best friends forever!") // something important
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(contentForProposal, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        // now propose the previous message formally
+        WonMessage proposal = prepareFromOwner(WonMessageBuilder
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(con.get().getSocketURI())
+                        /**/.recipient(con.get().getTargetSocketURI())
+                        .content()
+                        /**/.text("I am hereby proposing to be best friends forever")
+                        .agreement().proposes(contentForProposal.getMessageURI())
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(proposal, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        // now realize we did not want to propose - retract proposal
+        WonMessage retract = prepareFromOwner(WonMessageBuilder
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(con.get().getSocketURI())
+                        /**/.recipient(con.get().getTargetSocketURI())
+                        .content()
+                        /**/.text("Whoopsie, did not mean that, sorry!")
+                        .modification().retracts(proposal)
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(retract, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        // now accept the proposal from the other side - this must not lead to an
+        // agreement
+        WonMessage acceptMessage = prepareFromExternalOwner(WonMessageBuilder
                         .connectionMessage()
                         .sockets()
                         /**/.sender(con.get().getTargetSocketURI())
                         /**/.recipient(con.get().getSocketURI())
                         .content()
-                        /**/.text("unittest message from " + socketURI2)
+                        /**/.text("Thank you so much, of course I accept!")
+                        .agreement().accepts(proposal.getMessageURI())
                         .build());
         toOwnerMockEndpoint.expectedMessageCount(3);
-        toOwnerMockEndpoint.expectedMessagesMatches(
-                        isSenderEcho(textMsgFromOtherOwner, 1),
-                        or(isRecipientMessage(textMsgFromOtherOwner, 1), isResponse(textMsgFromOtherOwner, 1)),
-                        or(isRecipientMessage(textMsgFromOtherOwner, 1), isResponse(textMsgFromOtherOwner, 1)));
-        sendFromOwner(textMsgFromOtherOwner, OWNERAPPLICATION_ID_OWNER2);
         toMatcherMockEndpoint.expectedMessageCount(0);
-        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
-        Connection expected = new Connection();
-        expected.setState(ConnectionState.CONNECTED);
-        expected.setSocketURI(socketURI);
-        expected.setTargetSocketURI(socketURI2);
-        con = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI, socketURI2);
-        assertConnectionAsExpected(expected, con);
+        sendFromOwner(acceptMessage, OWNERAPPLICATION_ID_OWNER2);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        RDFDataMgr.write(System.err, Prefixer.setPrefixes(collector.getCollected()), Lang_WON.TRIG_WON_CONVERSATION);
+        assertCorrectAgreements("Wrong agreement content", collector.getCollected(), DatasetFactory.createGeneral());
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_conversation__proposal_rejected() throws Exception {
+        URI atomURI = newAtomURI();
+        URI socketURI = URI.create(atomURI.toString() + "#socket1");
+        URI atomURI2 = newAtomURI();
+        URI socketURI2 = URI.create(atomURI2.toString() + "#socket1");
+        prepareMockitoStubs(atomURI, socketURI, atomURI2, socketURI2);
+        MessageCollector collector = new MessageCollector();
+        WonMessage createAtom1Msg = prepareFromOwner(makeCreateAtomMessage(atomURI,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl"));
+        WonMessage createAtom2Msg = prepareFromOwner(makeCreateAtomMessage(atomURI2,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl"));
+        // set minimal expectations just so we can expect something and subsequently
+        // reset expectations
+        toOwnerMockEndpoint.expectedMessageCount(2);
+        toMatcherMockEndpoint.expectedMessageCount(2);
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER2);
+        WonMessage socketHintMessage = prepareFromMatcher(WonMessageBuilder
+                        .socketHint()
+                        .recipientSocket(socketURI)
+                        .hintTargetSocket(socketURI2)
+                        .hintScore(0.5)
+                        .build());
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromMatcher(socketHintMessage);
+        // start connecting
+        WonMessage connectFromExternalMsg = prepareFromExternalOwner(WonMessageBuilder
+                        .connect()
+                        .sockets().sender(socketURI2).recipient(socketURI)
+                        .content().text("Unittest connect")
+                        .build());
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        sendFromOwner(connectFromExternalMsg, OWNERAPPLICATION_ID_OWNER2);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        WonMessage connectFromOwnerMsg = prepareFromOwner(WonMessageBuilder
+                        .connect()
+                        .sockets().sender(socketURI).recipient(socketURI2)
+                        .content().text("Unittest connect (completing the handshake)")
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(2);
+        sendFromOwner(connectFromOwnerMsg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        //// connect done
+        Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI,
+                        socketURI2);
+        //// send one message, which will be the content of the agreement
+        WonMessage contentForProposal = prepareFromOwner(WonMessageBuilder
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(con.get().getSocketURI())
+                        /**/.recipient(con.get().getTargetSocketURI())
+                        .content()
+                        /**/.text("We are best friends forever!") // something important
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(contentForProposal, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        // now propose the previous message formally
+        WonMessage proposal = prepareFromOwner(WonMessageBuilder
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(con.get().getSocketURI())
+                        /**/.recipient(con.get().getTargetSocketURI())
+                        .content()
+                        /**/.text("I am hereby proposing to be best friends forever")
+                        .agreement().proposes(contentForProposal)
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(proposal, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        // now accept the proposal from the other side
+        WonMessage rejectMessage = prepareFromExternalOwner(WonMessageBuilder
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(con.get().getTargetSocketURI())
+                        /**/.recipient(con.get().getSocketURI())
+                        .content()
+                        /**/.text("I am sorry, do I know you?")
+                        .agreement().rejects(proposal.getMessageURI())
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(rejectMessage, OWNERAPPLICATION_ID_OWNER2);
+        assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
+        RDFDataMgr.write(System.err, Prefixer.setPrefixes(collector.getCollected()), Lang_WON.TRIG_WON_CONVERSATION);
+        assertCorrectAgreements("Wrong agreement content", collector.getCollected(), DatasetFactory.createGeneral());
+    }
+
+    private Dataset collectIntoGraph(Dataset ds, URI graphURI) {
+        Dataset result = DatasetFactory.createGeneral();
+        Model m = RdfUtils.toStatementStream(ds).collect(RdfUtils.collectToModel());
+        result.addNamedModel(graphURI.toString(), m);
+        return result;
     }
 
     private Predicate isSenderEcho(WonMessage forMessage, int confirmCount) {
@@ -890,5 +1252,206 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         assertConnectionAsExpected(expected, con);
         Atom atom = atomService.getAtomRequired(atomURI2);
         Assert.assertEquals("atom should be in state DELETED", AtomState.DELETED, atom.getState());
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_conversation() throws Exception {
+        URI atomURI = newAtomURI();
+        URI socketURI = URI.create(atomURI.toString() + "#socket1");
+        URI atomURI2 = newAtomURI();
+        URI socketURI2 = URI.create(atomURI2.toString() + "#socket1");
+        prepareMockitoStubs(atomURI, socketURI, atomURI2, socketURI2);
+        WonMessage createAtom1Msg = prepareFromOwner(makeCreateAtomMessage(atomURI,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl"));
+        WonMessage createAtom2Msg = prepareFromOwner(makeCreateAtomMessage(atomURI2,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl"));
+        // set minimal expectations just so we can expect something and subsequently
+        // reset expectations
+        toOwnerMockEndpoint.expectedMessageCount(2);
+        toMatcherMockEndpoint.expectedMessageCount(2);
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER2);
+        WonMessage socketHintMessage = prepareFromMatcher(WonMessageBuilder
+                        .socketHint()
+                        .recipientSocket(socketURI)
+                        .hintTargetSocket(socketURI2)
+                        .hintScore(0.5)
+                        .build());
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromMatcher(socketHintMessage);
+        // start connecting
+        WonMessage connectFromExternalMsg = prepareFromExternalOwner(WonMessageBuilder
+                        .connect()
+                        .sockets().sender(socketURI2).recipient(socketURI)
+                        .content().text("Unittest connect")
+                        .build());
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toOwnerMockEndpoint.expectedMessagesMatches(
+                        and(isMessageAndResponse(connectFromExternalMsg), isOwnResponseConfirmsNPrevious(0)),
+                        and(isMessageAndResponseAndRemoteResponse(connectFromExternalMsg),
+                                        isRemoteResponseConfirmsNPrevious(1)),
+                        and(isSuccessResponseTo(connectFromExternalMsg), isMessageConfirmsNPrevious(1)));
+        sendFromOwner(connectFromExternalMsg, OWNERAPPLICATION_ID_OWNER2);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        WonMessage connectFromOwnerMsg = prepareFromOwner(WonMessageBuilder
+                        .connect()
+                        .sockets().sender(socketURI).recipient(socketURI2)
+                        .content().text("Unittest connect (completing the handshake)")
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toOwnerMockEndpoint.expectedMessagesMatches(
+                        and(isMessageAndResponse(connectFromOwnerMsg),
+                                        isOwnResponseConfirmsNPrevious(1)),
+                        and(isMessageAndResponseAndRemoteResponse(connectFromOwnerMsg),
+                                        isRemoteResponseConfirmsNPrevious(2)),
+                        and(isSuccessResponseTo(connectFromOwnerMsg),
+                                        isMessageConfirmsNPrevious(2)));
+        toMatcherMockEndpoint.expectedMessageCount(2);
+        sendFromOwner(connectFromOwnerMsg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI,
+                        socketURI2);
+        WonMessage textMsgFromOwner = prepareFromOwner(WonMessageBuilder
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(con.get().getSocketURI())
+                        /**/.recipient(con.get().getTargetSocketURI())
+                        .content()
+                        /**/.text("unittest message from " + socketURI)
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toOwnerMockEndpoint.expectedMessagesMatches(
+                        and(isMessageAndResponse(textMsgFromOwner),
+                                        isOwnResponseConfirmsNPrevious(1)),
+                        and(isMessageAndResponseAndRemoteResponse(textMsgFromOwner),
+                                        isRemoteResponseConfirmsNPrevious(1)),
+                        and(isSuccessResponseTo(textMsgFromOwner),
+                                        isMessageConfirmsNPrevious(1)));
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(textMsgFromOwner, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        textMsgFromOwner = prepareFromOwner(WonMessageBuilder
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(con.get().getSocketURI())
+                        /**/.recipient(con.get().getTargetSocketURI())
+                        .content()
+                        /**/.text("unittest message 2 from " + socketURI)
+                        .build());
+        sendFromOwner(textMsgFromOwner, OWNERAPPLICATION_ID_OWNER1);
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toOwnerMockEndpoint.expectedMessagesMatches(
+                        isSenderEcho(textMsgFromOwner, 1),
+                        or(isRecipientMessage(textMsgFromOwner, 1), isResponse(textMsgFromOwner, 1)),
+                        or(isRecipientMessage(textMsgFromOwner, 1), isResponse(textMsgFromOwner, 1)));
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        WonMessage textMsgFromOtherOwner = prepareFromExternalOwner(WonMessageBuilder
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(con.get().getTargetSocketURI())
+                        /**/.recipient(con.get().getSocketURI())
+                        .content()
+                        /**/.text("unittest message from " + socketURI2)
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toOwnerMockEndpoint.expectedMessagesMatches(
+                        isSenderEcho(textMsgFromOtherOwner, 1),
+                        or(isRecipientMessage(textMsgFromOtherOwner, 2), isResponse(textMsgFromOtherOwner, 2)),
+                        or(isRecipientMessage(textMsgFromOtherOwner, 2), isResponse(textMsgFromOtherOwner, 2)));
+        sendFromOwner(textMsgFromOtherOwner, OWNERAPPLICATION_ID_OWNER2);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        textMsgFromOtherOwner = prepareFromExternalOwner(WonMessageBuilder
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(con.get().getTargetSocketURI())
+                        /**/.recipient(con.get().getSocketURI())
+                        .content()
+                        /**/.text("unittest message from " + socketURI2)
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toOwnerMockEndpoint.expectedMessagesMatches(
+                        isSenderEcho(textMsgFromOtherOwner, 1),
+                        or(isRecipientMessage(textMsgFromOtherOwner, 1), isResponse(textMsgFromOtherOwner, 1)),
+                        or(isRecipientMessage(textMsgFromOtherOwner, 1), isResponse(textMsgFromOtherOwner, 1)));
+        sendFromOwner(textMsgFromOtherOwner, OWNERAPPLICATION_ID_OWNER2);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        textMsgFromOtherOwner = prepareFromExternalOwner(WonMessageBuilder
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(con.get().getTargetSocketURI())
+                        /**/.recipient(con.get().getSocketURI())
+                        .content()
+                        /**/.text("unittest message from " + socketURI2)
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toOwnerMockEndpoint.expectedMessagesMatches(
+                        isSenderEcho(textMsgFromOtherOwner, 1),
+                        or(isRecipientMessage(textMsgFromOtherOwner, 1), isResponse(textMsgFromOtherOwner, 1)),
+                        or(isRecipientMessage(textMsgFromOtherOwner, 1), isResponse(textMsgFromOtherOwner, 1)));
+        sendFromOwner(textMsgFromOtherOwner, OWNERAPPLICATION_ID_OWNER2);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        textMsgFromOtherOwner = prepareFromExternalOwner(WonMessageBuilder
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(con.get().getTargetSocketURI())
+                        /**/.recipient(con.get().getSocketURI())
+                        .content()
+                        /**/.text("unittest message from " + socketURI2)
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toOwnerMockEndpoint.expectedMessagesMatches(
+                        isSenderEcho(textMsgFromOtherOwner, 1),
+                        or(isRecipientMessage(textMsgFromOtherOwner, 1), isResponse(textMsgFromOtherOwner, 1)),
+                        or(isRecipientMessage(textMsgFromOtherOwner, 1), isResponse(textMsgFromOtherOwner, 1)));
+        sendFromOwner(textMsgFromOtherOwner, OWNERAPPLICATION_ID_OWNER2);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        textMsgFromOtherOwner = prepareFromExternalOwner(WonMessageBuilder
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(con.get().getTargetSocketURI())
+                        /**/.recipient(con.get().getSocketURI())
+                        .content()
+                        /**/.text("unittest message from " + socketURI2)
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toOwnerMockEndpoint.expectedMessagesMatches(
+                        isSenderEcho(textMsgFromOtherOwner, 1),
+                        or(isRecipientMessage(textMsgFromOtherOwner, 1), isResponse(textMsgFromOtherOwner, 1)),
+                        or(isRecipientMessage(textMsgFromOtherOwner, 1), isResponse(textMsgFromOtherOwner, 1)));
+        sendFromOwner(textMsgFromOtherOwner, OWNERAPPLICATION_ID_OWNER2);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        Connection expected = new Connection();
+        expected.setState(ConnectionState.CONNECTED);
+        expected.setSocketURI(socketURI);
+        expected.setTargetSocketURI(socketURI2);
+        con = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI, socketURI2);
+        assertConnectionAsExpected(expected, con);
+    }
+
+    public void assertCorrectAgreements(String errormessage, Dataset input, Dataset expectedOutput) {
+        input = RdfUtils.cloneDataset(input);
+        expectedOutput = RdfUtils.cloneDataset(expectedOutput);
+        // check that the computed dataset is the expected one
+        Dataset actual = AgreementProtocolState.of(input).getAgreements();
+        // TODO: remove before checking in
+        RdfUtils.Pair<Dataset> diff = RdfUtils.diff(expectedOutput, actual);
+        if (!(diff.getFirst().isEmpty() && diff.getSecond().isEmpty())) {
+            System.out.println("diff - only in expected:");
+            RDFDataMgr.write(System.out, diff.getFirst(), Lang.TRIG);
+            System.out.println("diff - only in actual:");
+            RDFDataMgr.write(System.out, diff.getSecond(), Lang.TRIG);
+        }
+        Assert.assertTrue(errormessage, RdfUtils.isIsomorphicWith(expectedOutput, actual));
     }
 }

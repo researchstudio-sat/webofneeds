@@ -1,5 +1,6 @@
 package won.protocol.agreement;
 
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,6 +12,8 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
@@ -21,12 +24,16 @@ import won.protocol.vocabulary.WONMOD;
 import won.protocol.vocabulary.WONMSG;
 
 public class ConversationMessagesReader {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     static final Map<Property, BiConsumer<Map<URI, ConversationMessage>, Statement>> handlers;
 
     public static Map<URI, ConversationMessage> readConversationMessages(Dataset dataset) {
         Map<URI, ConversationMessage> messages = new HashMap<>();
         RdfUtils.toStatementStream(dataset).forEach(stmt -> {
-            BiConsumer handler = handlers.get(stmt.getPredicate());
+            BiConsumer<Map<URI, ConversationMessage>, Statement> handler = handlers.get(stmt.getPredicate());
+            if (logger.isDebugEnabled()) {
+                logger.debug("handling {} with handler {}", stmt, handler);
+            }
             if (handler != null) {
                 handler.accept(messages, stmt);
             }
@@ -58,10 +65,8 @@ public class ConversationMessagesReader {
         inithandlers.put(WONMSG.connection,
                         (Map<URI, ConversationMessage> messages,
                                         Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))
-                                                        .setSenderAtomURI(
-                                                                        WonMessageUtils.stripAtomSuffix(WonMessageUtils
-                                                                                        .stripFragment(getUri(s
-                                                                                                        .getObject())))));
+                                                        .setSenderAtomURI(WonMessageUtils
+                                                                        .stripConnectionSuffix(getUri(s.getObject()))));
         inithandlers.put(WONMSG.senderSocket,
                         (Map<URI, ConversationMessage> messages,
                                         Statement s) -> getOrCreateMessage(messages, getUri(s.getSubject()))

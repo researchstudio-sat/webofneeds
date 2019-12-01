@@ -8,6 +8,8 @@ import java.util.OptionalInt;
 import java.util.Set;
 
 import org.apache.thrift.Option;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import won.protocol.agreement.effect.MessageEffect;
 import won.protocol.message.WonMessageDirection;
@@ -17,6 +19,7 @@ import won.protocol.message.WonMessageType;
  * @author fkleedorfer
  */
 public class ConversationMessage implements Comparable<ConversationMessage> {
+    private static final Logger logger = LoggerFactory.getLogger(ConversationMessage.class);
     URI messageURI;
     URI senderAtomURI;
     Set<URI> proposes = new HashSet<>();
@@ -232,7 +235,7 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
         return !this.getPreviousInverseRefs().isEmpty();
     }
 
-    public boolean isResponseTo(ConversationMessage other) {
+    public boolean respondingTo(ConversationMessage other) {
         return getRemotelyRespondingToRef() == other;
     }
 
@@ -240,7 +243,7 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
         return other.getRespondingToOption().orElse(null) == this;
     }
 
-    public boolean isRemoteResponseTo(ConversationMessage other) {
+    public boolean remotelyRespondingTo(ConversationMessage other) {
         return getRemotelyRespondingToRef() == other;
     }
 
@@ -267,9 +270,9 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
         if (o1dist != o2dist) {
             return o1dist - o2dist;
         }
-        if (this.isResponseTo(other))
+        if (this.respondingTo(other))
             return 1;
-        if (this.isRemoteResponseTo(other))
+        if (this.remotelyRespondingTo(other))
             return 1;
         if (this.isInSameDeliveryChain(other)) {
             if (this.isHeadOfDeliveryChain() || other.isEndOfDeliveryChain()) {
@@ -287,14 +290,20 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
         if (this.order.isPresent()) {
             return this.order.getAsInt();
         }
-        if (this.isResponse()) {
-            if (this.getRespondingToOption().isPresent()) {
-                return getRespondingToOption().get().getOrder() + 1;
-            } else if (this.getRemotelyRespondingToRef() != null) {
-                return getRemotelyRespondingToRef().getOrder() + 2;
-            }
+        if (this.isHeadOfDeliveryChain()) {
+            this.order = OptionalInt.of(
+                            Math.min(getRespondingToInverseRef() == null
+                                            ? 0
+                                            : getRespondingToInverseRef().getOrder(),
+                                            getRemotelyRespondingToInverseRef() == null
+                                                            ? 0
+                                                            : getRemotelyRespondingToInverseRef().getOrder()));
+            return this.order.getAsInt();
         }
-        OptionalInt mindist = getPreviousRefs().stream().mapToInt(msg -> msg.getOrder() + 1).min();
+        OptionalInt mindist = getPreviousRefs()
+                        .stream()
+                        .mapToInt(msg -> msg.getOrder() + 1)
+                        .min();
         this.order = OptionalInt.of(mindist.orElse(0));
         return this.order.getAsInt();
     }
@@ -328,68 +337,56 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
         return other.getReachableConversationRoots().stream().anyMatch(root -> myRoots.contains(root));
     }
 
-    public boolean isMessageOnPathToRoot(ConversationMessage other) {
+    public boolean isAfter(ConversationMessage other) {
         if (this == other)
             return false;
-        boolean foundIt = isOtherMessageOnPathToRoot(other, new HashSet<>());
+        boolean foundIt = isAfter(other, new HashSet<>());
         return foundIt;
     }
 
-    private boolean isOtherMessageOnPathToRoot(ConversationMessage other, Set<ConversationMessage> visited) {
-        if (this == other)
-            return true;
-        if (this.getOrder() < other.getOrder()) {
+    private boolean isAfter(ConversationMessage other, Set<ConversationMessage> visited) {
+        boolean result = false;
+        if (this == other) {
+            result = true;
+        } else if (this.getOrder() < other.getOrder()) {
             // if this is the case, it's impossible that the other message is on the path to
             // root
-            return false;
-        }
-        if (this.knownMessagesOnPathToRoot.contains(other)) {
-            return true;
-        }
-        visited.add(this);
-        Boolean foundIt = getPreviousRefs().stream().filter(msg -> !visited.contains(msg))
-                        .anyMatch(msg -> msg.isOtherMessageOnPathToRoot(other, visited));
-        if (foundIt) {
-            this.knownMessagesOnPathToRoot.add(other);
-            return true;
-        }
-        if (this.respondingToOption.isPresent()) {
-            if (!visited.contains(this.respondingToOption.get())) {
-                foundIt = this.respondingToOption.get().isOtherMessageOnPathToRoot(other, visited);
+            result = false;
+        } else if (this.knownMessagesOnPathToRoot.contains(other)) {
+            result = true;
+        } else if (isHeadOfDeliveryChain()) {
+            ConversationMessage resp = getRespondingToInverseRef();
+            ConversationMessage remoteResp = getRemotelyRespondingToInverseRef();
+            if (resp != null || remoteResp != null) {
+                boolean responseIsAfterOther = resp != null ? resp.isAfter(other, new HashSet<>()) : true;
+                boolean remoteResponseIsAfterOther = remoteResp != null
+                                ? remoteResp.isAfter(other, new HashSet<>())
+                                : true;
+                result = responseIsAfterOther || remoteResponseIsAfterOther;
             }
-        }
-        if (foundIt) {
-            this.knownMessagesOnPathToRoot.add(other);
-            return true;
-        }
-        if (this.remotelyRespondingToRef != null) {
-            if (!visited.contains(this.remotelyRespondingToRef)) {
-                foundIt = this.remotelyRespondingToRef.isOtherMessageOnPathToRoot(other, visited);
+        } else if (other.isHeadOfDeliveryChain()) {
+            ConversationMessage otherResp = other.getRespondingToInverseRef();
+            ConversationMessage otherRemoteResp = other.getRemotelyRespondingToInverseRef();
+            if (otherResp != null || otherRemoteResp != null) {
+                boolean isAfterOtherResponse = otherResp != null ? isAfter(otherResp, new HashSet<>()) : true;
+                boolean isAfterOtherRemoteResponse = otherRemoteResp != null
+                                ? isAfter(otherRemoteResp, new HashSet<>())
+                                : true;
+                result = isAfterOtherResponse && isAfterOtherRemoteResponse;
             }
+        } else {
+            visited.add(this);
+            result = getPreviousRefs().stream().filter(msg -> !visited.contains(msg))
+                            .anyMatch(msg -> msg.isAfter(other, visited));
         }
-        if (foundIt) {
+        if (result) {
             this.knownMessagesOnPathToRoot.add(other);
-            return true;
         }
-        if (this.respondingToInverseRef != null) {
-            if (!visited.contains(this.respondingToInverseRef)) {
-                foundIt = this.respondingToInverseRef.isOtherMessageOnPathToRoot(other, visited);
-            }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Checking if {} is after {}: {}",
+                            new Object[] { this.getMessageURI(), other.getMessageURI(), result });
         }
-        if (foundIt) {
-            this.knownMessagesOnPathToRoot.add(other);
-            return true;
-        }
-        if (this.remotelyRespondingToInverseRef != null) {
-            if (!visited.contains(this.remotelyRespondingToInverseRef)) {
-                foundIt = this.remotelyRespondingToInverseRef.isOtherMessageOnPathToRoot(other, visited);
-            }
-        }
-        if (foundIt) {
-            this.knownMessagesOnPathToRoot.add(other);
-            return true;
-        }
-        return false;
+        return result;
     }
 
     public boolean isAgreementProtocolMessage() {
@@ -605,8 +602,8 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
         return respondingTo;
     }
 
-    public void setRespondingTo(URI isResponseTo) {
-        this.respondingTo = isResponseTo;
+    public void setRespondingTo(URI respondingTo) {
+        this.respondingTo = respondingTo;
     }
 
     /**
@@ -627,8 +624,8 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
         return remotelyRespondingTo;
     }
 
-    public void setRemotelyRespondingTo(URI isRemoteResponseTo) {
-        this.remotelyRespondingTo = isRemoteResponseTo;
+    public void setRemotelyRespondingTo(URI remotelyRespondingTo) {
+        this.remotelyRespondingTo = remotelyRespondingTo;
     }
 
     public ConversationMessage getRemotelyRespondingToRef() {
@@ -763,11 +760,11 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
                         + rejectsRefs.size() + ", previous=" + previous + ", previousRefs:" + previousRefs.size()
                         + ", accepts=" + accepts + ", acceptsRefs:" + acceptsRefs.size() + ", retracts=" + retracts
                         + ", retractsRefs:" + retractsRefs.size() + ", proposesToCancel=" + proposesToCancel
-                        + ", proposesToCancelRefs:" + proposesToCancelRefs.size() + ", isResponseTo= " + respondingTo
-                        + ", isRemoteResponseTo=" + remotelyRespondingTo + ", isResponseToRef: "
-                        + messageUriOrNullString(respondingToOption) + ", isRemoteResponseToRef:"
-                        + messageUriOrNullString(remotelyRespondingToRef) + ", isResponseToInverse: "
-                        + messageUriOrNullString(respondingToInverseRef) + ", isRemoteResponseToInverse: "
+                        + ", proposesToCancelRefs:" + proposesToCancelRefs.size() + ", respondingTo= " + respondingTo
+                        + ", remotelyRespondingTo=" + remotelyRespondingTo + ", respondingToRef: "
+                        + messageUriOrNullString(respondingToOption) + ", remotelyRespondingToRef:"
+                        + messageUriOrNullString(remotelyRespondingToRef) + ", respondingToInverse: "
+                        + messageUriOrNullString(respondingToInverseRef) + ", remotelyRespondingToInverse: "
                         + messageUriOrNullString(remotelyRespondingToInverseRef) + ", isForwarded: "
                         + isForwardedMessage() + "]";
     }

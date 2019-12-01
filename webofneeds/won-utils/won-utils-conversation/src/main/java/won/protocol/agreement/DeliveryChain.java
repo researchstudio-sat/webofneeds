@@ -85,7 +85,7 @@ public class DeliveryChain {
     public boolean isAfter(DeliveryChain other) {
         return other.getMessages().stream().anyMatch(msg ->
         // is the head before msg?
-        this.getHead().isMessageOnPathToRoot(msg));
+        this.getHead().isAfter(msg));
     }
 
     /**
@@ -103,8 +103,8 @@ public class DeliveryChain {
         }
         return other.getMessages().stream().allMatch(msg -> {
             // is the head before and the end after msg?
-            boolean isHeadBeforeAllOtherMsgs = msg.isMessageOnPathToRoot(this.getHead());
-            boolean isEndAfterAllOtherMsgs = getEnd().isMessageOnPathToRoot(msg);
+            boolean isHeadBeforeAllOtherMsgs = msg.isAfter(this.getHead());
+            boolean isEndAfterAllOtherMsgs = getEnd().isAfter(msg);
             return isHeadBeforeAllOtherMsgs && isEndAfterAllOtherMsgs;
         });
     }
