@@ -7,7 +7,9 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 
 public class ConnectionMessageBuilder
-                extends ConnectionSpecificBuilderScaffold<ConnectionMessageBuilder> {
+                extends ConnectionSpecificBuilderScaffold<ConnectionMessageBuilder>
+                implements AgreementSpecificBuilderScaffold<ConnectionMessageBuilder>,
+                ModificationSpecificBuilderScaffold<ConnectionMessageBuilder> {
     public ConnectionMessageBuilder(WonMessageBuilder builder) {
         super(builder);
         builder.type(WonMessageType.CONNECTION_MESSAGE);
@@ -49,5 +51,15 @@ public class ConnectionMessageBuilder
     public ConnectionMessageBuilder injectIntoConnections(Collection<URI> injectionTargets) {
         builder.injectIntoConnections(injectionTargets);
         return this;
+    }
+
+    @Override
+    public AgreementBuilder<ConnectionMessageBuilder> agreement() {
+        return new AgreementBuilder<ConnectionMessageBuilder>(this);
+    }
+
+    @Override
+    public ModificationBuilder<ConnectionMessageBuilder> modification() {
+        return new ModificationBuilder<ConnectionMessageBuilder>(this);
     }
 }

@@ -2,6 +2,7 @@ package won.protocol.message.builder;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,12 +10,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.jboss.logging.Message;
 
@@ -395,6 +398,48 @@ public class WonMessageBuilder {
         return this;
     }
 
+    public WonMessageBuilder withMessageResource(Consumer<Resource> dataAdder) {
+        Resource msgRes = getModelForAddingContent().getResource(getMessageURI().toString());
+        dataAdder.accept(msgRes);
+        return this;
+    }
+    
+    /**
+     * Exposes the content graph, which is passed to the specified Consumer. If
+     * there already is one content graph, that one is used. If there is none yet, a
+     * new one is created. If there are more than one, another one is added, because
+     * we cannot decide for any of the existing ones.
+     */
+    public WonMessageBuilder withContentGraph(Consumer<Model> dataAdder) {
+        Model model = getModelForAddingContent();
+        dataAdder.accept(model);
+        return this;
+    }
+    
+    /**
+     * Adds the specified property once with each value.
+     * 
+     * @param property the property to add
+     * @param uriValues the values to add as objects
+     * @return
+     */
+    public WonMessageBuilder addToMessageResource(Property property, Collection<URI> uriValues) {
+        uriValues.stream().forEach(uri -> this
+                        .withMessageResource(r -> r.addProperty(property, r.getModel().getResource(uri.toString()))));
+        return this;
+    }
+    
+    /**
+     * Adds the specified property once with each value.
+     * 
+     * @param property the property to add
+     * @param uriValues the values to add as objects
+     * @return
+     */
+    public WonMessageBuilder addToMessageResource(Property property, URI... uriValues) {
+        return addToMessageResource(property, Arrays.asList(uriValues));
+    }
+    
     /**
      * Retrieves one of the possibly multiple Models that does not have a signature
      * yet. If there is none (all are signed or none is found at all), a new model
@@ -472,21 +517,37 @@ public class WonMessageBuilder {
     }
 
     /**
+     * <p>
      * Adds a Text message to one of the message's content graphs. If only one graph
      * is present, the text message is added to that graph. If more than one graph
      * is present, and hence we cannot decide for any one of them, a new content
      * graph is created for the text. If no content graphs are present, a new one is
-     * created.
+     * created. If the text is null or empty, this call has no effect.
+     * </p>
+     * <p>
+     * 
+     * <pre>
+     * .text("Hello, World!")
+     * </pre>
+     * 
+     * is equivalent to:
+     * 
+     * <pre>
+     * .withMessageResource(r -> r.addProperty(WONCON.text, "Hello, World!"))
+     * </pre>
+     * </p>
      * 
      * @param textMessage
-     * @return
+     * @return the parent builder
      */
     WonMessageBuilder textMessage(String textMessage) {
-        Objects.requireNonNull(textMessage);
-        Model model = getModelForAddingContent();
-        RdfUtils.findOrCreateBaseResource(model);
-        RdfUtils.replaceBaseResource(model, model.createResource(this.getMessageURI().toString()));
-        WonRdfUtils.MessageUtils.addMessage(model, textMessage);
+        if (textMessage != null && textMessage.trim().length() > 0) {
+            Objects.requireNonNull(textMessage);
+            Model model = getModelForAddingContent();
+            RdfUtils.findOrCreateBaseResource(model);
+            RdfUtils.replaceBaseResource(model, model.createResource(this.getMessageURI().toString()));
+            WonRdfUtils.MessageUtils.addMessage(model, textMessage);
+        }
         return this;
     }
 

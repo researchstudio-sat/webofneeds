@@ -19,7 +19,7 @@ import won.protocol.message.WonMessageDirection;
  * @param <THIS>
  * @param <PARENT>
  */
-class BuilderScaffold<THIS extends BuilderScaffold<THIS, PARENT>, PARENT extends BuilderScaffold<PARENT, ?>> {
+abstract class BuilderScaffold<THIS extends BuilderScaffold<THIS, PARENT>, PARENT extends BuilderScaffold<PARENT, ?>> {
     protected Optional<PARENT> parent = Optional.empty();
     protected WonMessageBuilder builder;
 
