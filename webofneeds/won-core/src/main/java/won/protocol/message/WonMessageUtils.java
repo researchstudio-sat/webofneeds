@@ -91,6 +91,24 @@ public class WonMessageUtils {
         return atomUri;
     }
 
+    /**
+     * Strip the connection suffix, return the atom URI.
+     * 
+     * @param connectionURI
+     * @return
+     */
+    public static URI stripConnectionSuffix(URI connectionURI) {
+        Objects.requireNonNull(connectionURI);
+        String uri = connectionURI.toString();
+        return URI.create(uri.replaceFirst("/c/.+$", ""));
+    }
+
+    /**
+     * Strip the atom suffix, return the WoN node URI.
+     * 
+     * @param atomURI
+     * @return
+     */
     public static URI stripAtomSuffix(URI atomURI) {
         Objects.requireNonNull(atomURI);
         String uri = atomURI.toString();
