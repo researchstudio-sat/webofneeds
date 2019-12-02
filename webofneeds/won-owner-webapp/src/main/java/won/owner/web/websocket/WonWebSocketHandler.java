@@ -145,18 +145,8 @@ public class WonWebSocketHandler extends TextWebSocketHandler
         }
     }
 
-    /*
-     * User user = getCurrentUser(); logger.info("New Atom:" +
-     * atomPojo.getTextDescription() + "/" + atomPojo.getCreationDate() + "/" +
-     * atomPojo.getLongitude() + "/" + atomPojo.getLatitude() + "/" +
-     * (atomPojo.getState() == AtomState.ACTIVE)); //TODO: using fixed Sockets -
-     * change this atomPojo.setSocketTypes(new String[]{
-     * SocketType.ChatSocket.getURI().toString()}); AtomPojo createdAtomPojo =
-     * resolve(atomPojo); Atom atom =
-     * atomRepository.findOne(createdAtomPojo.getAtomId());
-     * user.getAtoms().add(atom); wonUserDetailService.save(user); HttpHeaders
-     * headers = new HttpHeaders(); headers.setLocation(atom.getAtomURI()); return
-     * new ResponseEntity<AtomPojo>(createdAtomPojo, headers, HttpStatus.CREATED);
+    /**
+     * Receives a message from the client and passes it on to the WoN node.
      */
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, isolation = Isolation.READ_COMMITTED)
@@ -274,6 +264,9 @@ public class WonWebSocketHandler extends TextWebSocketHandler
         return true;
     }
 
+    /**
+     * Sends a message coming from the WoN node to the client.
+     */
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public WonMessage process(final WonMessage wonMessage) {
