@@ -7,7 +7,12 @@ import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import { get, getIn } from "../../utils.js";
 
-export function addMessage(state, wonMessage, alreadyProcessed = false) {
+export function addMessage(
+  state,
+  wonMessage,
+  alreadyProcessed = false,
+  eventUriOverride = undefined
+) {
   // we used to exclude messages without content here, using
   // if (wonMessage.getContentGraphs().length > 0) as the condition
   // however, after moving the socket info of connect/open messages from
@@ -23,6 +28,10 @@ export function addMessage(state, wonMessage, alreadyProcessed = false) {
   if (!wonMessage.isResponse() || wonMessage.getContentGraphs().length > 0) {
     let parsedMessage = parseMessage(wonMessage, alreadyProcessed, false);
     if (parsedMessage) {
+      if (eventUriOverride) {
+        // In Some cases (like if we send a message) we need to override the messageUri in the wonMessage with the correct one
+        parsedMessage = parsedMessage.setIn(["data", "uri"], eventUriOverride);
+      }
       const allAtomsInState = state;
       console.debug("addMessage -- allAtomsInState: ", allAtomsInState);
       const senderSocketUri = wonMessage.getSenderSocket();

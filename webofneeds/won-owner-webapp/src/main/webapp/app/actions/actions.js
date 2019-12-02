@@ -268,21 +268,6 @@ const actionHierarchy = {
     processAtomHintMessage: messages.processAtomHintMessage,
     processSocketHintMessage: messages.processSocketHintMessage,
 
-    // register a fully prepared action object to be dispatched
-    // after a specific message (identified by URI)  has been processed
-    // (when the respective success message is processed)
-    dispatchActionOn: {
-      // registers the action (in action.actionToDispatch)
-      registerFailureOwn: INJ_DEFAULT,
-      registerSuccessRemote: INJ_DEFAULT,
-      registerFailureRemote: INJ_DEFAULT,
-      // the action creator dispatches the registered actions
-      successRemote: messages.dispatchActionOnSuccessRemote,
-      // failure actions clear the list of registered success actions
-      // and vice versa
-      failureRemote: messages.dispatchActionOnFailureRemote,
-    },
-
     waitingForAnswer: INJ_DEFAULT,
   },
   account: {

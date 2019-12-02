@@ -104,51 +104,6 @@ export function messagesReducer(messages = initialState, action = {}) {
     case actionTypes.reconnect.success:
       return messages.set("lostConnection", false).set("reconnecting", false);
 
-    case actionTypes.messages.dispatchActionOn.registerFailureOwn: {
-      const pathFO = ["dispatchOnFailureOwn", action.payload.eventUri];
-      const toDispatchListFO = messages.getIn(pathFO);
-      if (!toDispatchListFO) {
-        return messages.setIn(pathFO, [action.payload.actionToDispatch]);
-      }
-      return messages.updateIn(pathFO, list =>
-        list.push(action.payload.actionToDispatch)
-      );
-    }
-
-    case actionTypes.messages.dispatchActionOn.registerSuccessRemote: {
-      const pathSR = ["dispatchOnSuccessRemote", action.payload.eventUri];
-      const toDispatchListSR = messages.getIn(pathSR);
-      if (!toDispatchListSR) {
-        return messages.setIn(pathSR, [action.payload.actionToDispatch]);
-      }
-      return messages.updateIn(pathSR, list =>
-        list.push(action.payload.actionToDispatch)
-      );
-    }
-
-    case actionTypes.messages.dispatchActionOn.registerFailureRemote: {
-      const pathFR = ["dispatchOnFailureRemote", action.payload.eventUri];
-      const toDispatchListFR = messages.getIn(pathFR);
-      if (!toDispatchListFR) {
-        return messages.setIn(pathFR, [action.payload.actionToDispatch]);
-      }
-      return messages.updateIn(pathFR, list =>
-        list.push(action.payload.actionToDispatch)
-      );
-    }
-
-    case actionTypes.messages.dispatchActionOn.failureRemote:
-      return messages
-        .removeIn(["dispatchOnSuccessRemote", action.payload.eventUri])
-        .removeIn(["dispatchOnFailureRemote", action.payload.eventUri]);
-
-    case actionTypes.messages.dispatchActionOn.successRemote:
-      return messages
-        .removeIn(["claimOnSuccess", action.payload.eventUri])
-        .removeIn(["refreshDataOnSuccess", action.payload.eventUri])
-        .removeIn(["dispatchOnSuccessRemote", action.payload.eventUri])
-        .removeIn(["dispatchOnFailureRemote", action.payload.eventUri]);
-
     default:
       return messages;
   }

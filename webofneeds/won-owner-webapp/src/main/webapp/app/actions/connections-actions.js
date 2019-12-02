@@ -88,9 +88,6 @@ export function connectionsChatMessage(
     const ownedAtom = getIn(getState(), ["atoms", senderAtomUri]);
 
     let referencedContentUris = undefined;
-    /*TODO: Since we set messages to be (successfully) claimed/proposed/accepted... before we even know if the transition was successful we might
-     need to rethink this implementation in favor of a dirtyState somehow, and remove the dirty state on successRemote of the message -> handling is in
-     messages-actions.js (dispatchActionOnSuccessRemote part if(toRefreshData) ... but for now this will do*/
     if (referencedContent) {
       referencedContentUris = new Map();
       referencedContent.forEach((referencedMessages, key) => {
@@ -195,6 +192,7 @@ export function connectionsChatMessage(
         ])
       )
       .then(([optimisticEvent, jsonResp]) => {
+        console.debug("sent chatMsg: ", jsonResp.messageUri);
         dispatch({
           type: referencedContentUris
             ? actionTypes.connections.sendChatMessageRefreshDataOnSuccess //If there are references in the message we need to Refresh the Data from the backend on msg success

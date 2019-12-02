@@ -223,7 +223,12 @@ export default function(allAtomsInState = initialState, action = {}) {
             if (state === won.WON.Closed) return won.WON.RequestSent;
           }
         );
-        return addMessage(cnctStateUpdated, action.payload.optimisticEvent);
+        return addMessage(
+          cnctStateUpdated,
+          action.payload.optimisticEvent,
+          false,
+          eventUri
+        );
       } else {
         const tmpConnectionUri = "connectionFrom:" + eventUri;
 
@@ -303,7 +308,7 @@ export default function(allAtomsInState = initialState, action = {}) {
           won.WON.RequestSent
         );
         //because we have a connection uri, we can add the message
-        return addMessage(stateUpdated, optimisticEvent);
+        return addMessage(stateUpdated, optimisticEvent, false, eventUri);
       } else {
         const tmpConnectionUri = "connectionFrom:" + eventUri;
         const socketUri = action.payload.socketUri;
@@ -380,7 +385,7 @@ export default function(allAtomsInState = initialState, action = {}) {
           senderConnectionUri,
           won.WON.RequestSent
         );
-        return addMessage(stateUpdated, action.payload.event);
+        return addMessage(stateUpdated, action.payload.event, false);
       } else {
         console.warn(
           "actionTypes.messages.connectMessageSent: senderConnectionUri was undefined for payload: ",
@@ -433,7 +438,7 @@ export default function(allAtomsInState = initialState, action = {}) {
       // changeConnectionState
       const wonMessage = action.payload;
       const eventUri = wonMessage.getIsResponseTo();
-      const connUri = wonMessage.getRecipientConnection();
+      const connUri = wonMessage.getConnection();
 
       const tmpConnUri = "connectionFrom:" + wonMessage.getIsResponseTo();
       const tmpAtom = getAtomByConnectionUri(allAtomsInState, tmpConnUri);
@@ -534,7 +539,7 @@ export default function(allAtomsInState = initialState, action = {}) {
     case actionTypes.messages.close.success:
       return changeConnectionState(
         allAtomsInState,
-        action.payload.getRecipientConnection(),
+        action.payload.getConnection(),
         won.WON.Closed
       );
     case actionTypes.messages.viewState.markExpandReference:
@@ -700,10 +705,12 @@ export default function(allAtomsInState = initialState, action = {}) {
     case actionTypes.messages.processConnectionMessage:
       // ADD RECEIVED CHAT MESSAGES
       // payload; { events }
-      return addMessage(allAtomsInState, action.payload);
+      return addMessage(allAtomsInState, action.payload, false);
 
+    case actionTypes.connections.sendChatMessage:
     case actionTypes.connections.sendChatMessageClaimOnSuccess:
     case actionTypes.connections.sendChatMessageRefreshDataOnSuccess: {
+      const eventUri = action.payload.eventUri;
       const senderSocketUri = action.payload.senderSocketUri;
       const targetSocketUri = action.payload.targetSocketUri;
       console.debug(
@@ -715,34 +722,22 @@ export default function(allAtomsInState = initialState, action = {}) {
         action.payload.optimisticEvent
       );
 
-      return addMessage(allAtomsInState, action.payload.optimisticEvent);
-    }
-
-    case actionTypes.connections.sendChatMessage: {
-      const senderSocketUri = action.payload.senderSocketUri;
-      const targetSocketUri = action.payload.targetSocketUri;
-      console.debug(
-        "Send Message: ",
-        senderSocketUri,
-        "->",
-        targetSocketUri,
-        " payload: ",
-        action.payload.optimisticEvent
+      return addMessage(
+        allAtomsInState,
+        action.payload.optimisticEvent,
+        false,
+        eventUri
       );
-      // ADD SENT TEXT MESSAGE
-      /*
-             * payload: { eventUri: optimisticEvent.uri, message,
-             * optimisticEvent, }
-             */
-      return addMessage(allAtomsInState, action.payload.optimisticEvent);
     }
 
     // update timestamp on success response
     case actionTypes.messages.chatMessage.successOwn: {
       const wonMessage = getIn(action, ["payload"]);
       const eventUri = wonMessage.getIsResponseTo();
-      const atomUri = wonMessage.getRecipientAtom();
-      const connectionUri = wonMessage.getRecipientConnection();
+      const atomUri = generalSelectors.getAtomUriBySocketUri(
+        wonMessage.getSenderSocket()
+      );
+      const connectionUri = wonMessage.getConnection();
       // we want to use the response date to update the original message
       // date
       // in order to use server timestamps everywhere
@@ -771,17 +766,24 @@ export default function(allAtomsInState = initialState, action = {}) {
           ],
           true
         );
+      } else {
+        console.error(
+          "chatMessage.successOwn for message that was not sent(or was not loaded in the state yet, wonMessage: ",
+          wonMessage,
+          "messageUri: ",
+          eventUri
+        );
       }
       return allAtomsInState;
     }
 
     case actionTypes.messages.chatMessage.failure: {
       const wonMessage = getIn(action, ["payload"]);
-      const eventUri = wonMessage.isFromExternal()
-        ? wonMessage.getIsRemoteResponseTo()
-        : wonMessage.getIsResponseTo();
-      const atomUri = wonMessage.getRecipientAtom();
-      const connectionUri = wonMessage.getRecipientConnection();
+      const eventUri = wonMessage.getIsResponseTo();
+      const atomUri = generalSelectors.getAtomUriBySocketUri(
+        wonMessage.getSenderSocket()
+      );
+      const connectionUri = wonMessage.getConnection();
 
       allAtomsInState = allAtomsInState.setIn(
         [
@@ -799,13 +801,24 @@ export default function(allAtomsInState = initialState, action = {}) {
 
     case actionTypes.messages.chatMessage.successRemote: {
       const wonMessage = getIn(action, ["payload"]);
-      const eventUri = wonMessage.getIsRemoteResponseTo();
-      const atomUri = wonMessage.getRecipientAtom();
-      const connectionUri = wonMessage.getRecipientConnection();
+      const eventUri = wonMessage.getIsResponseTo();
+      const atomUri = generalSelectors.getAtomUriBySocketUri(
+        wonMessage.getSenderSocket()
+      );
+      const senderAtom = get(allAtomsInState, atomUri);
+      const senderSocketUri = wonMessage.getSenderSocket();
+      const targetSocketUri = wonMessage.getTargetSocket();
+
+      const affectedConnection =
+        senderAtom &&
+        get(senderAtom, "connections").find(conn =>
+          connectionUtils.hasSocketUris(conn, senderSocketUri, targetSocketUri)
+        );
+
       const path = [
         atomUri,
         "connections",
-        connectionUri,
+        get(affectedConnection, "uri"),
         "messages",
         eventUri,
       ];
