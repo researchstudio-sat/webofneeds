@@ -148,6 +148,8 @@ const mapDispatchToProps = dispatch => {
       trimmedMsg,
       additionalContent,
       referencedContent,
+      senderSocketUri,
+      targetSocketUri,
       connectionUri,
       isTTL
     ) => {
@@ -156,6 +158,8 @@ const mapDispatchToProps = dispatch => {
           trimmedMsg,
           additionalContent,
           referencedContent,
+          senderSocketUri,
+          targetSocketUri,
           connectionUri,
           isTTL
         )
@@ -390,10 +394,14 @@ class AtomInfo extends React.Component {
                 message
               );
             } else if (connectionUtils.isConnected(personaConnection)) {
+              const senderSocketUri = get(personaConnection, "socketUri");
+              const targetSocketUri = get(personaConnection, "targetSocketUri");
               this.props.sendChatMessage(
                 message,
                 undefined,
                 undefined,
+                senderSocketUri,
+                targetSocketUri,
                 personaConnectionUri,
                 false
               );

@@ -380,11 +380,19 @@ export default function(processState = initialState, action = {}) {
 
     case actionTypes.connections.sendChatMessageClaimOnSuccess:
     case actionTypes.connections.sendChatMessageRefreshDataOnSuccess: {
-      const connUri = action.payload.optimisticEvent.getSenderConnection();
+      console.debug(
+        "sendChatMessageClaimOnSuccess/sendChatMessageRefreshDataOnSuccess -> needs to be implemented"
+      );
+      const senderSocketUri = action.payload.senderSocketUri;
+      const targetSocketUri = action.payload.targetSocketUri;
+      console.debug("senderSocketUri: ", senderSocketUri);
+      console.debug("targetSocketUri: ", targetSocketUri);
+      /* const connUri = action.payload.optimisticEvent.getSenderConnection(); // This has been removed
 
       return updateConnectionProcess(processState, connUri, {
         petriNetData: { dirty: true },
-      });
+      });*/
+      return processState; //todo figure out how to extract the connection based on the socketUris
     }
 
     case actionTypes.connections.updatePetriNetData: {

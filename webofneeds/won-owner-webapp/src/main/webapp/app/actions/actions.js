@@ -216,12 +216,6 @@ const actionHierarchy = {
       success: messages.successfulEdit,
       //TODO failure: messages.failedEdit
     },
-    open: {
-      successRemote: INJ_DEFAULT, //2nd successResponse
-      successOwn: INJ_DEFAULT, //1st successResponse
-      failure: INJ_DEFAULT,
-      //TODO failure: messages.failedOpen
-    },
     close: {
       //TODO: NAME SEEMS GENERIC EVEN THOUGH IT IS ONLY USED FOR CLOSING CONNECITONS; REFACTOR THIS SOMEDAY
       success: messages.successfulCloseConnection,
@@ -273,9 +267,6 @@ const actionHierarchy = {
     connectMessageSent: INJ_DEFAULT,
     processAtomHintMessage: messages.processAtomHintMessage,
     processSocketHintMessage: messages.processSocketHintMessage,
-    openMessageReceived: INJ_DEFAULT,
-    openMessageSent: INJ_DEFAULT,
-    processOpenMessage: messages.processOpenMessage,
 
     // register a fully prepared action object to be dispatched
     // after a specific message (identified by URI)  has been processed

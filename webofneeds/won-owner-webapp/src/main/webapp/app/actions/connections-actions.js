@@ -29,23 +29,15 @@ import * as processUtils from "../redux/utils/process-utils.js";
 export function connectionsChatMessageClaimOnSuccess(
   chatMessage,
   additionalContent,
-  connectionUri
+  senderSocketUri,
+  targetSocketUri
 ) {
-  return (dispatch, getState) => {
-    const ownedAtom = get(getState(), "atoms").find(atom =>
-      getIn(atom, ["connections", connectionUri])
-    );
-    const socketUri = getIn(ownedAtom, ["connectionUri", "socketUri"]);
-    const targetSocketUri = getIn(ownedAtom, [
-      "connectionUri",
-      "targetSocketUri",
-    ]);
-
+  return dispatch => {
     buildChatMessage({
       chatMessage: chatMessage,
       additionalContent: additionalContent,
       referencedContentUris: undefined,
-      socketUri: socketUri,
+      socketUri: senderSocketUri,
       targetSocketUri: targetSocketUri,
       isTTL: false,
     })
@@ -62,6 +54,8 @@ export function connectionsChatMessageClaimOnSuccess(
             eventUri: jsonResp.messageUri,
             message: jsonResp.message,
             optimisticEvent,
+            senderSocketUri,
+            targetSocketUri,
           },
         });
       })
@@ -82,18 +76,16 @@ export function connectionsChatMessage(
   chatMessage,
   additionalContent,
   referencedContent,
+  senderSocketUri,
+  targetSocketUri,
   connectionUri,
   isTTL = false
 ) {
   return (dispatch, getState) => {
-    const ownedAtom = get(getState(), "atoms").find(atom =>
-      getIn(atom, ["connections", connectionUri])
+    const senderAtomUri = generalSelectors.getAtomUriBySocketUri(
+      senderSocketUri
     );
-    const socketUri = getIn(ownedAtom, ["connectionUri", "socketUri"]);
-    const targetSocketUri = getIn(ownedAtom, [
-      "connectionUri",
-      "targetSocketUri",
-    ]);
+    const ownedAtom = getIn(getState(), ["atoms", senderAtomUri]);
 
     let referencedContentUris = undefined;
     /*TODO: Since we set messages to be (successfully) claimed/proposed/accepted... before we even know if the transition was successful we might
@@ -192,7 +184,7 @@ export function connectionsChatMessage(
       chatMessage: chatMessage,
       additionalContent: additionalContent,
       referencedContentUris: referencedContentUris,
-      socketUri: socketUri,
+      socketUri: senderSocketUri,
       targetSocketUri: targetSocketUri,
       isTTL,
     })
@@ -211,6 +203,8 @@ export function connectionsChatMessage(
             eventUri: jsonResp.messageUri,
             message: jsonResp.message,
             optimisticEvent,
+            socketUri: senderSocketUri,
+            targetSocketUri: targetSocketUri,
           },
         });
       })

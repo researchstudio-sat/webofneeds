@@ -226,9 +226,7 @@ won.WONMSG.atomStateMessage = won.WONMSG.baseUri + "AtomStateMessage";
 won.WONMSG.atomStateMessageCompacted = won.WONMSG.prefix + ":AtomStateMessage";
 won.WONMSG.closeMessage = won.WONMSG.baseUri + "CloseMessage";
 won.WONMSG.closeMessageCompacted = won.WONMSG.prefix + ":CloseMessage";
-won.WONMSG.openMessage = won.WONMSG.baseUri + "OpenMessage";
 won.WONMSG.feedbackMessage = won.WONMSG.baseUri + "HintFeedbackMessage";
-won.WONMSG.openMessageCompacted = won.WONMSG.prefix + ":OpenMessage";
 won.WONMSG.openSentMessage = won.WONMSG.baseUri + "OpenSentMessage";
 won.WONMSG.openSentMessageCompacted = won.WONMSG.prefix + ":OpenSentMessage";
 won.WONMSG.changeNotificationMessage =
@@ -1437,8 +1435,8 @@ WonMessage.prototype = {
   getSenderAtom: function() {
     return this.getProperty("https://w3id.org/won/message#senderAtom");
   },
-  getSenderConnection: function() {
-    return this.getProperty("https://w3id.org/won/message#sender");
+  getConnection: function() {
+    return this.getProperty("https://w3id.org/won/message#connection");
   },
   getTargetSocket: function() {
     return this.getProperty("https://w3id.org/won/message#recipientSocket");
@@ -1446,10 +1444,6 @@ WonMessage.prototype = {
   getAtom: function() {
     return this.getProperty("https://w3id.org/won/message#atom");
   },
-  getRecipientConnection: function() {
-    return this.getProperty("https://w3id.org/won/message#recipient");
-  },
-
   getProposedMessageUris: function() {
     return createArray(
       this.getProperty("https://w3id.org/won/agreement#proposes")
@@ -1507,13 +1501,6 @@ WonMessage.prototype = {
   isRetractMessage: function() {
     return !!this.getProperty("https://w3id.org/won/modification#retracts");
   },
-  isOutgoingMessage: function() {
-    return (
-      this.isFromOwner() ||
-      (this.isFromSystem() &&
-        this.getSenderConnection() !== this.getRecipientConnection())
-    );
-  },
   hasContainedForwardedWonMessages: function() {
     return (
       this.containedForwardedWonMessages &&
@@ -1558,9 +1545,6 @@ WonMessage.prototype = {
     return (
       this.getMessageType() === "https://w3id.org/won/message#ConnectMessage"
     );
-  },
-  isOpenMessage: function() {
-    return this.getMessageType() === "https://w3id.org/won/message#OpenMessage";
   },
   isConnectionMessage: function() {
     return (
@@ -1631,12 +1615,6 @@ WonMessage.prototype = {
     return (
       this.getRespondingToMessageType() ===
       "https://w3id.org/won/message#ConnectMessage"
-    );
-  },
-  isResponseToOpenMessage: function() {
-    return (
-      this.getRespondingToMessageType() ===
-      "https://w3id.org/won/message#OpenMessage"
     );
   },
   isResponseToConnectionMessage: function() {

@@ -182,135 +182,6 @@ export function successfulEdit(event) {
   };
 }
 
-export function processOpenMessage(event) {
-  return (dispatch, getState) => {
-    const recipientAtomUri = event.getRecipientAtom();
-    const receiverConnectionUri = event.getRecipientConnection();
-
-    const senderAtomUri = event.getSenderAtom();
-    const senderConnectionUri = event.getSenderConnection();
-
-    const state = getState();
-    const senderAtom = getIn(state, ["atoms", senderAtomUri]);
-    const recipientAtom = getIn(state, ["atoms", recipientAtomUri]);
-
-    const isOwnSenderAtom = generalSelectors.isAtomOwned(state, senderAtomUri);
-    const isOwnRecipientAtom = generalSelectors.isAtomOwned(
-      state,
-      recipientAtomUri
-    );
-
-    //check if the two connections are relevant to be stored within the state (if connUri is present, and if Atom belongs to self)
-    const isSenderConnectionRelevant = senderConnectionUri && isOwnSenderAtom;
-    const isReceiverConnectionRelevant =
-      receiverConnectionUri && isOwnRecipientAtom;
-
-    let senderAtomP;
-    if (isOwnSenderAtom) {
-      //We know that all own atoms are already stored within the state, so we do not have to retrieve it
-      senderAtomP = Promise.resolve(true);
-    } else {
-      senderAtomP = stateStore.fetchAtomAndDispatch(
-        senderAtomUri,
-        dispatch,
-        getState
-      );
-    }
-
-    let recipientAtomP;
-    if (isOwnRecipientAtom) {
-      //We know that all own atoms are already stored within the state, so we do not have to retrieve it
-      recipientAtomP = Promise.resolve(true);
-    } else {
-      recipientAtomP = stateStore.fetchAtomAndDispatch(
-        recipientAtomUri,
-        dispatch,
-        getState
-      );
-    }
-
-    let senderConnectionP;
-    if (!isSenderConnectionRelevant) {
-      console.debug(
-        "senderConnection not relevant, resolve with false -> ignore the connection"
-      );
-      senderConnectionP = Promise.resolve(false);
-    } else if (getIn(senderAtom, ["connections", senderConnectionUri])) {
-      console.debug(
-        "senderConnection relevant, resolve with true -> handle the connection"
-      );
-      senderConnectionP = Promise.resolve(true);
-    } else {
-      senderConnectionP = stateStore
-        .fetchActiveConnectionAndDispatch(
-          senderConnectionUri,
-          senderAtomUri,
-          dispatch
-        )
-        .then(() => true);
-    }
-
-    let receiverConnectionP;
-    if (!isReceiverConnectionRelevant) {
-      console.debug(
-        "receiverConnection not relevant, resolve with false -> ignore the connection"
-      );
-      receiverConnectionP = Promise.resolve(false);
-    } else if (getIn(recipientAtom, ["connections", receiverConnectionUri])) {
-      console.debug(
-        "receiverConnection relevant, resolve with true -> handle the connection"
-      );
-      receiverConnectionP = Promise.resolve(true);
-    } else {
-      receiverConnectionP = stateStore
-        .fetchActiveConnectionAndDispatch(
-          receiverConnectionUri,
-          recipientAtomUri,
-          dispatch
-        )
-        .then(() => true);
-    }
-
-    Promise.all([
-      senderConnectionP,
-      receiverConnectionP,
-      senderAtomP,
-      recipientAtomP,
-    ]).then(
-      ([
-        senderConnectionRelevant,
-        receiverConnectionRelevant,
-        senderAtom,
-        recipientAtom,
-      ]) => {
-        if (receiverConnectionRelevant) {
-          console.debug("Change ReceiverConnectionState ", recipientAtom);
-          dispatch({
-            type: actionTypes.messages.openMessageReceived,
-            payload: {
-              updatedConnectionUri: receiverConnectionUri,
-              ownedAtomUri: recipientAtomUri,
-              message: event,
-            },
-          });
-        }
-
-        if (senderConnectionRelevant) {
-          console.debug("Change SenderConnectionState ", senderAtom);
-          dispatch({
-            type: actionTypes.messages.openMessageSent,
-            payload: {
-              senderConnectionUri: senderConnectionUri,
-              senderAtomUri: senderAtomUri,
-              event: event,
-            },
-          });
-        }
-      }
-    );
-  };
-}
-
 export function processAgreementMessage(event) {
   return dispatch => {
     dispatch({
@@ -371,15 +242,19 @@ export function processChangeNotificationMessage(event) {
 export function processConnectionMessage(event) {
   return (dispatch, getState) => {
     if (isFetchMessageEffectsNeeded(event)) {
-      const _atomUri = event.getSenderAtom();
+      const _atomUri = generalSelectors.getAtomUriBySocketUri(
+        event.getSenderSocket()
+      );
       const isSentEvent = generalSelectors.isAtomOwned(getState(), _atomUri);
 
       let connectionUri;
       let atomUri;
 
+      //TODO: FIX THIS MESS
+
       if (isSentEvent) {
         connectionUri = event.getSenderConnection();
-        atomUri = event.getSenderAtom();
+        atomUri = _atomUri;
       } else {
         connectionUri = event.getRecipientConnection();
         atomUri = event.getRecipientAtom();

@@ -122,6 +122,8 @@ const mapDispatchToProps = dispatch => {
       trimmedMsg,
       additionalContent,
       referencedContent,
+      senderSocketUri,
+      targetSocketUri,
       connectionUri,
       isTTL
     ) => {
@@ -130,6 +132,8 @@ const mapDispatchToProps = dispatch => {
           trimmedMsg,
           additionalContent,
           referencedContent,
+          senderSocketUri,
+          targetSocketUri,
           connectionUri,
           isTTL
         )
@@ -441,10 +445,15 @@ class GroupAtomMessages extends React.Component {
 
     const trimmedMsg = chatMessage.trim();
     if (trimmedMsg || additionalContent || referencedContent) {
+      const senderSocketUri = get(this.props.connection, "socketUri");
+      const targetSocketUri = get(this.props.connection, "targetSocketUri");
+
       this.props.sendChatMessage(
         trimmedMsg,
         additionalContent,
         referencedContent,
+        senderSocketUri,
+        targetSocketUri,
         get(this.props.connection, "uri"),
         isTTL
       );

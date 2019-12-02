@@ -86,16 +86,6 @@ export function runMessagingAgent(redux) {
       return false;
     },
     function(message) {
-      if (message.isOpenMessage()) {
-        console.debug("Received Open Message: ", message);
-        console.debug("dispatch actionCreators.messages__processOpenMessage");
-        //someone accepted our contact request
-        redux.dispatch(actionCreators.messages__processOpenMessage(message));
-        return true;
-      }
-      return false;
-    },
-    function(message) {
       if (message.isConnectionMessage()) {
         console.debug("Received Connection Message: ", message);
         console.debug(
@@ -228,47 +218,6 @@ export function runMessagingAgent(redux) {
       return false;
     },
     function(message) {
-      if (message.isResponseToOpenMessage()) {
-        if (message.isSuccessResponse()) {
-          console.debug("Received Success to Open Message: ", message);
-          if (message.isFromExternal()) {
-            //TODO: isFromExternal was removed, adapt accordingly
-            console.debug(
-              "dispatch actionCreators.messages__open__successRemote"
-            );
-            // got the second success-response (from the remote-node) - 2nd ACK
-            redux.dispatch(
-              actionCreators.messages__open__successRemote(message)
-            );
-            return true;
-          } else {
-            console.debug("dispatch actionCreators.messages__open__successOwn");
-            // got the first success-response (from our own node) - 1st ACK
-            redux.dispatch(actionCreators.messages__open__successOwn(message));
-            return true;
-          }
-        } else if (message.isFailureResponse()) {
-          console.debug("Received Failure to Open Message: ", message);
-          console.debug("dispatch actionCreators.messages__open__failure");
-          redux.dispatch(actionCreators.messages__open__failure(message));
-          /*
-                     * as the failure should hit right after the open went out
-                     * and should be rather rare, we can redirect in the optimistic
-                     * case (see connection-actions.js) and go back if it fails.
-                     */
-
-          redux.dispatch(
-            actionCreators.router__stateGoAbs("connections", {
-              connectionUri: message.getSenderConnection(),
-            })
-          );
-          console.debug("dispatch actionCreators.router__stateGoAbs");
-          return true;
-        }
-      }
-      return false;
-    },
-    function(message) {
       if (message.isResponseToCloseMessage()) {
         if (message.isSuccessResponse()) {
           console.debug("Received Success to Close Message: ", message);
@@ -279,7 +228,7 @@ export function runMessagingAgent(redux) {
         } else if (message.isFailureResponse()) {
           console.debug("Received Failure to Close Message: ", message);
           //Resend the failed close message
-          const connectionUri = message.getSenderConnection();
+          const connectionUri = message.getConnection();
           if (connectionUri) {
             console.warn("RESEND CLOSE MESSAGE FOR: ", connectionUri);
             console.debug("dispatch actionCreators.connections__closeRemote");

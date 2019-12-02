@@ -157,7 +157,6 @@ export default function(allAtomsInState = initialState, action = {}) {
     case actionTypes.atoms.createSuccessful:
       return addAtom(allAtomsInState, action.payload.atom);
 
-    case actionTypes.messages.openMessageReceived:
     case actionTypes.messages.connectMessageReceived: {
       const ownedAtomFromState = allAtomsInState.get(
         action.payload.ownedAtomUri
@@ -392,43 +391,6 @@ export default function(allAtomsInState = initialState, action = {}) {
       return allAtomsInState;
     }
 
-    case actionTypes.messages.openMessageSent: {
-      const senderAtomUri = action.payload.senderAtomUri;
-      const senderConnectionUri = action.payload.senderConnectionUri;
-      let stateUpdated;
-
-      if (senderConnectionUri) {
-        const senderAtom = allAtomsInState.get(senderAtomUri);
-        const existingConnection =
-          senderAtom && senderAtom.getIn(["connections", senderConnectionUri]);
-
-        if (existingConnection) {
-          stateUpdated = changeConnectionState(
-            allAtomsInState,
-            senderConnectionUri,
-            won.WON.Connected //TODO EITHER SET TO REQUEST SENT OR CONNECTED DEPENDING ON THE CURRENT STATE
-          );
-          //because we have a connection uri, we can add the message
-          return addMessage(stateUpdated, action.payload.event);
-        }
-      } else {
-        console.warn(
-          "actionTypes.messages.openMessageSent: senderConnectionUri was undefined for payload: ",
-          action.payload,
-          " -> return unchangedState"
-        );
-      }
-      return allAtomsInState;
-    }
-
-    case actionTypes.messages.open.failure:
-      return changeConnectionState(
-        allAtomsInState,
-        action.payload.events["msg:FromSystem"].recipient,
-        won.WON.RequestReceived
-      );
-
-    case actionTypes.messages.open.successRemote:
     case actionTypes.messages.connect.successRemote: {
       // use the remote success message to obtain the remote connection
       // uri (which we may not have known)
@@ -742,19 +704,40 @@ export default function(allAtomsInState = initialState, action = {}) {
 
     case actionTypes.connections.sendChatMessageClaimOnSuccess:
     case actionTypes.connections.sendChatMessageRefreshDataOnSuccess: {
+      const senderSocketUri = action.payload.senderSocketUri;
+      const targetSocketUri = action.payload.targetSocketUri;
+      console.debug(
+        "Send Message: ",
+        senderSocketUri,
+        "->",
+        targetSocketUri,
+        " payload: ",
+        action.payload.optimisticEvent
+      );
+
       return addMessage(allAtomsInState, action.payload.optimisticEvent);
     }
 
-    case actionTypes.connections.sendChatMessage:
+    case actionTypes.connections.sendChatMessage: {
+      const senderSocketUri = action.payload.senderSocketUri;
+      const targetSocketUri = action.payload.targetSocketUri;
+      console.debug(
+        "Send Message: ",
+        senderSocketUri,
+        "->",
+        targetSocketUri,
+        " payload: ",
+        action.payload.optimisticEvent
+      );
       // ADD SENT TEXT MESSAGE
       /*
              * payload: { eventUri: optimisticEvent.uri, message,
              * optimisticEvent, }
              */
       return addMessage(allAtomsInState, action.payload.optimisticEvent);
+    }
 
     // update timestamp on success response
-    case actionTypes.messages.open.successOwn:
     case actionTypes.messages.chatMessage.successOwn: {
       const wonMessage = getIn(action, ["payload"]);
       const eventUri = wonMessage.getIsResponseTo();
