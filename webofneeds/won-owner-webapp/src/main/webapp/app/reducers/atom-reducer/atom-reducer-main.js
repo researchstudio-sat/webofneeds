@@ -735,7 +735,7 @@ export default function(allAtomsInState = initialState, action = {}) {
       const wonMessage = getIn(action, ["payload"]);
       const messageUri = wonMessage.getIsResponseTo();
       const atomUri = generalSelectors.getAtomUriBySocketUri(
-        wonMessage.getSenderSocket()
+        wonMessage.getTargetSocket()
       );
       const connectionUri = wonMessage.getConnection();
 
@@ -746,10 +746,7 @@ export default function(allAtomsInState = initialState, action = {}) {
       ]);
 
       if (!connection) {
-        console.debug(
-          "chatMessage.successOwn for message where the connection is not stored, ignore this wonMessage: ",
-          wonMessage
-        );
+        // If the connection is not stored we simply ignore the success of the chatMessage -> (success of a received msg)
         return allAtomsInState;
       }
 
@@ -803,7 +800,7 @@ export default function(allAtomsInState = initialState, action = {}) {
       const wonMessage = getIn(action, ["payload"]);
       const eventUri = wonMessage.getIsResponseTo();
       const atomUri = generalSelectors.getAtomUriBySocketUri(
-        wonMessage.getSenderSocket()
+        wonMessage.getTargetSocket()
       );
       const connectionUri = wonMessage.getConnection();
 
@@ -825,7 +822,7 @@ export default function(allAtomsInState = initialState, action = {}) {
       const wonMessage = getIn(action, ["payload"]);
       const eventUri = wonMessage.getIsResponseTo();
       const atomUri = generalSelectors.getAtomUriBySocketUri(
-        wonMessage.getSenderSocket()
+        wonMessage.getTargetSocket()
       );
       const senderAtom = get(allAtomsInState, atomUri);
       const senderSocketUri = wonMessage.getSenderSocket();
@@ -834,9 +831,13 @@ export default function(allAtomsInState = initialState, action = {}) {
       const affectedConnection =
         senderAtom &&
         get(senderAtom, "connections").find(conn =>
-          connectionUtils.hasSocketUris(conn, senderSocketUri, targetSocketUri)
+          connectionUtils.hasSocketUris(conn, targetSocketUri, senderSocketUri)
         );
 
+      if (!affectedConnection) {
+        // If the connection is not stored we simply ignore the success of the chatMessage -> (success of a received msg)
+        return allAtomsInState;
+      }
       const path = [
         atomUri,
         "connections",

@@ -64,9 +64,6 @@ export function runMessagingAgent(redux) {
       /* Other clients or matcher initiated stuff: */
       if (message.isSocketHintMessage()) {
         console.debug("Received SocketHint Message: ", message);
-        console.debug(
-          "dispatch actionCreators.messages__processSocketHintMessage"
-        );
         redux.dispatch(
           actionCreators.messages__processSocketHintMessage(message)
         );
@@ -77,9 +74,6 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isConnectMessage()) {
         console.debug("Received Connect Message: ", message);
-        console.debug(
-          "dispatch actionCreators.messages__processConnectMessage"
-        );
         redux.dispatch(actionCreators.messages__processConnectMessage(message));
         return true;
       }
@@ -88,9 +82,6 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isConnectionMessage()) {
         console.debug("Received Connection Message: ", message);
-        console.debug(
-          "dispatch actionCreators.messages__processConnectionMessage"
-        );
         redux.dispatch(
           actionCreators.messages__processConnectionMessage(message)
         );
@@ -101,9 +92,6 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isChangeNotificationMessage()) {
         console.debug("Received ChangeNotification Message: ", message);
-        console.debug(
-          "dispatch actionCreators.messages__processChangeNotificationMessage"
-        );
         redux.dispatch(
           actionCreators.messages__processChangeNotificationMessage(message)
         );
@@ -115,7 +103,6 @@ export function runMessagingAgent(redux) {
       if (message.isFromExternal() && message.isCloseMessage()) {
         //TODO: isFromExternal was removed, adapt accordingly
         console.debug("Received Close Message: ", message);
-        console.debug("dispatch actionCreators.messages__close__success");
         redux.dispatch(actionCreators.messages__close__success(message));
         return true;
       }
@@ -127,8 +114,6 @@ export function runMessagingAgent(redux) {
         message.isSuccessResponse() &&
         message.isResponseToCreateMessage()
       ) {
-        console.debug("Received Success to Create Message: ", message);
-        console.debug("dispatch actionCreators.messages__create__success");
         redux.dispatch(actionCreators.messages__create__success(message));
         return true;
       }
@@ -140,8 +125,6 @@ export function runMessagingAgent(redux) {
         message.isSuccessResponse() &&
         message.isResponseToReplaceMessage()
       ) {
-        console.debug("Received Success to Replace Message: ", message);
-        console.debug("dispatch actionCreators.messages__edit__success");
         redux.dispatch(actionCreators.messages__edit__success(message));
         return true;
       }
@@ -150,7 +133,6 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isResponseToConnectMessage()) {
         if (message.isSuccessResponse()) {
-          console.debug("Received Success to Connect Message: ", message);
           if (isFromRemote(redux, message)) {
             console.debug(
               "remoteSuccess for connect: ",
@@ -174,7 +156,6 @@ export function runMessagingAgent(redux) {
           }
         } else if (message.isFailureResponse()) {
           console.debug("Received Failure to Connect Message: ", message);
-          console.debug("dispatch actionCreators.messages__connect__failure");
           redux.dispatch(actionCreators.messages__connect__failure(message));
           return true;
         }
@@ -184,7 +165,6 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isResponseToConnectionMessage()) {
         if (message.isSuccessResponse()) {
-          console.debug("Received Success to Connection Message: ", message);
           if (isFromRemote(redux, message)) {
             console.debug(
               "remoteSuccess for chatmsg: ",
@@ -207,7 +187,6 @@ export function runMessagingAgent(redux) {
             return true;
           }
         } else if (message.isFailureResponse()) {
-          console.debug("Received Failure to Connection Message: ", message);
           redux.dispatch(
             actionCreators.messages__chatMessage__failure(message)
           );
@@ -219,18 +198,14 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isResponseToCloseMessage()) {
         if (message.isSuccessResponse()) {
-          console.debug("Received Success to Close Message: ", message);
-          console.debug("dispatch actionCreators.messages__close__success");
           //JUMP HERE AND ONLY HERE WHEN CLOSE MESSAGES COME IN!
           redux.dispatch(actionCreators.messages__close__success(message));
           return true;
         } else if (message.isFailureResponse()) {
-          console.debug("Received Failure to Close Message: ", message);
           //Resend the failed close message
           const connectionUri = message.getConnection();
           if (connectionUri) {
             console.warn("RESEND CLOSE MESSAGE FOR: ", connectionUri);
-            console.debug("dispatch actionCreators.connections__closeRemote");
             redux.dispatch(actionCreators.connections__closeRemote(message));
           }
           return true;
@@ -241,17 +216,9 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isResponseToActivateMessage()) {
         if (message.isSuccessResponse()) {
-          console.debug("Received Success to Activate Message: ", message);
-          console.debug(
-            "dispatch actionCreators.messages__reopenAtom__success"
-          );
           redux.dispatch(actionCreators.messages__reopenAtom__success(message));
           return true;
         } else {
-          console.debug("Received Failure to Activate Message: ", message);
-          console.debug(
-            "dispatch actionCreators.messages__reopenAtom__failure"
-          );
           redux.dispatch(actionCreators.messages__reopenAtom__failure(message));
           return true;
         }
@@ -261,13 +228,9 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isResponseToDeactivateMessage()) {
         if (message.isSuccessResponse()) {
-          console.debug("Received Success to DeActivate Message: ", message);
-          console.debug("dispatch actionCreators.messages__closeAtom__success");
           redux.dispatch(actionCreators.messages__closeAtom__success(message));
           return true;
         } else {
-          console.debug("Received Failure to DeActivate Message: ", message);
-          console.debug("dispatch actionCreators.messages__closeAtom__failure");
           redux.dispatch(actionCreators.messages__closeAtom__failure(message));
           return true;
         }
@@ -276,8 +239,6 @@ export function runMessagingAgent(redux) {
     },
     function(message) {
       if (message.isFromSystem() && message.isAtomMessage()) {
-        console.debug("Received Atom Message From System: ", message);
-        console.debug("dispatch actionCreators.messages__atomMessageReceived");
         redux.dispatch(actionCreators.messages__atomMessageReceived(message));
         return true;
       }
@@ -296,9 +257,6 @@ export function runMessagingAgent(redux) {
     },
     function(message) {
       if (message.isFromSystem() && message.isDeactivateMessage()) {
-        console.debug("Received DeActivate Message From System: ", message);
-        console.debug("dispatch actionCreators.atoms__closedBySystem");
-        console.debug("dispatch actionTypes.atoms.close");
         //dispatch an action that is suitable for displaying a toast
         redux.dispatch(actionCreators.atoms__closedBySystem(message));
         //adapt the state and GUI
@@ -314,7 +272,6 @@ export function runMessagingAgent(redux) {
     },
     function(message) {
       if (message.isDeleteMessage()) {
-        console.debug("Received Delete Message: ", message);
         return true;
       }
       return false;
@@ -322,8 +279,6 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isResponseToDeleteMessage()) {
         if (message.isSuccessResponse()) {
-          console.debug("Received Success to Delete Message: ", message);
-          console.debug("dispatch actionCreators.atoms__delete");
           redux.dispatch(actionCreators.atoms__delete(message.getAtom()));
           /*redux.dispatch({
             type: actionTypes.atoms.delete,
@@ -339,12 +294,10 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isResponseToHintFeedbackMessage()) {
         if (message.isSuccessResponse()) {
-          console.debug("Received Success to HintFeedback Message: ", message);
           //Rating successful
           //TODO?
           return true;
         } else {
-          console.debug("Received Failure to HintFeedback Message: ", message);
           //Failed Rating
           //TODO?
           return false;
@@ -378,7 +331,6 @@ export function runMessagingAgent(redux) {
     for (const msgUri in messages) {
       const msg = messages[msgUri];
       won.wonMessageFromJsonLd(msg).then(message => {
-        console.debug("Processing WonMessage from WS: ", message);
         won.addJsonLdData(msg);
 
         let messageProcessed = false;
@@ -600,7 +552,7 @@ function watchImmutableRdxState(redux, path, callback) {
 
 function isFromRemote(redux, wonMessage) {
   const senderSocketUri = wonMessage.getSenderSocket();
-  const targetSocketUri = wonMessage.getSenderSocket();
+  const targetSocketUri = wonMessage.getTargetSocket();
 
   return senderSocketUri !== targetSocketUri;
 }
