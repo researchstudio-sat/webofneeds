@@ -282,13 +282,13 @@ public class WonWebSocketHandler extends TextWebSocketHandler
             Optional<URI> connectionURI = WonLinkedDataUtils.getConnectionURIForIncomingMessage(wonMessage,
                             linkedDataSource);
             WebSocketMessage<String> webSocketMessage = new TextMessage(wonMessageJsonLdString);
-            URI atomUri = getOwnedAtomURI(wonMessage);
+            URI atomUri = getOwnedAtomURIForMessageFromNode(wonMessage);
             Set<WebSocketSession> webSocketSessions = webSocketSessionService.getWebSocketSessions(atomUri);
             Optional<User> userOpt = webSocketSessions == null ? Optional.empty()
                             : webSocketSessions.stream().filter(s -> s.isOpen()).findFirst()
                                             .map(s -> getUserForSession(s));
             if (!userOpt.isPresent()) {
-                userOpt = Optional.ofNullable(getUserForWonMessage(wonMessage));
+                userOpt = Optional.ofNullable(userRepository.findByAtomUri(atomUri));
             }
             User user = userOpt.orElse(null); // it's quite possible that we don't find the user object this way.
                                               // Methods below can handle that.
@@ -540,14 +540,26 @@ public class WonWebSocketHandler extends TextWebSocketHandler
         return ConnectionState.SUGGESTED.equals(ConnectionState.fromURI(state));
     }
 
-    private User getUserForWonMessage(final WonMessage wonMessage) {
-        URI atomUri = getOwnedAtomURI(wonMessage);
-        return userRepository.findByAtomUri(atomUri);
-    }
-
-    private URI getOwnedAtomURI(WonMessage message) {
-        return message.getEnvelopeType() == WonMessageDirection.FROM_SYSTEM ? message.getSenderAtomURI()
-                        : message.getRecipientAtomURI();
+    /**
+     * Determine which atom is the one owned by the user. In most cases, it's the
+     * atom of the recipient socket. However, if we are processing an echo it's the
+     * atom of the sender socket. An echo can be caused by another client as well as
+     * by the node (with a system-generated message on behalf of the atom).
+     * 
+     * @param message
+     * @return
+     */
+    private URI getOwnedAtomURIForMessageFromNode(WonMessage message) {
+        if (message.getMessageTypeRequired().isAtomSpecificMessage()) {
+            // atom-specific
+            return message.getRecipientAtomURI();
+        }
+        if (message.isMessageWithResponse()) {
+            // echos
+            return message.getSenderAtomURIRequired();
+        }
+        // incoming messages, responses etc.
+        return message.getRecipientAtomURIRequired();
     }
 
     private UserAtom getAtomOfUser(final User user, final URI atomUri) {
