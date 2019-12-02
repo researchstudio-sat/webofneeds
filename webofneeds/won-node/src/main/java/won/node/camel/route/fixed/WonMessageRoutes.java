@@ -250,8 +250,10 @@ public class WonMessageRoutes extends RouteBuilder {
          */
         from("activemq:queue:" + FROM_MATCHER_QUEUENAME + "?concurrentConsumers=5")
                         .onException(Exception.class) // we swallow exceptions caused by incoming hints
-                        /**/.log(LoggingLevel.DEBUG,
-                                        "Swallowed exception that occured during processing of incoming hint")
+                        /**/.log(LoggingLevel.WARN,
+                                        simple("failure during direct:onExceptionFailResponder, ignoring. "
+                                                        + "Exception message: ${exception.message}, "
+                                                        + "Stacktrace: ${exception.stacktrace}").getText())
                         /**/.handled(true)
                         .end()
                         .transacted("PROPAGATION_REQUIRES_NEW")
