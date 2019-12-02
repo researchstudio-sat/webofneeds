@@ -23,7 +23,6 @@ import { ownerBaseUrl } from "~/config/default.js";
 import urljoin from "url-join";
 
 import { actionTypes, actionCreators } from "./actions/actions.js";
-import * as generalSelectors from "./redux/selectors/general-selectors.js";
 import SockJS from "sockjs-client";
 
 const ECHO_STRING = "e";
@@ -600,17 +599,8 @@ function watchImmutableRdxState(redux, path, callback) {
 }
 
 function isFromRemote(redux, wonMessage) {
-  const state = redux.getState();
   const senderSocketUri = wonMessage.getSenderSocket();
-  const connectionUri = wonMessage.getConnection();
+  const targetSocketUri = wonMessage.getSenderSocket();
 
-  const senderAtomUri = generalSelectors.getAtomUriBySocketUri(senderSocketUri);
-  const senderConnection = getIn(state, [
-    "atoms",
-    senderAtomUri,
-    "connections",
-    connectionUri,
-  ]);
-
-  return !senderConnection;
+  return senderSocketUri !== targetSocketUri;
 }

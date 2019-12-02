@@ -733,11 +733,26 @@ export default function(allAtomsInState = initialState, action = {}) {
     // update timestamp on success response
     case actionTypes.messages.chatMessage.successOwn: {
       const wonMessage = getIn(action, ["payload"]);
-      const eventUri = wonMessage.getIsResponseTo();
+      const messageUri = wonMessage.getIsResponseTo();
       const atomUri = generalSelectors.getAtomUriBySocketUri(
         wonMessage.getSenderSocket()
       );
       const connectionUri = wonMessage.getConnection();
+
+      const connection = getIn(allAtomsInState, [
+        atomUri,
+        "connections",
+        connectionUri,
+      ]);
+
+      if (!connection) {
+        console.debug(
+          "chatMessage.successOwn for message where the connection is not stored, ignore this wonMessage: ",
+          wonMessage
+        );
+        return allAtomsInState;
+      }
+
       // we want to use the response date to update the original message
       // date
       // in order to use server timestamps everywhere
@@ -748,11 +763,18 @@ export default function(allAtomsInState = initialState, action = {}) {
         "connections",
         connectionUri,
         "messages",
-        eventUri,
+        messageUri,
       ]);
       if (eventToUpdate) {
         allAtomsInState = allAtomsInState.setIn(
-          [atomUri, "connections", connectionUri, "messages", eventUri, "date"],
+          [
+            atomUri,
+            "connections",
+            connectionUri,
+            "messages",
+            messageUri,
+            "date",
+          ],
           responseDateOnServer
         );
         allAtomsInState = allAtomsInState.setIn(
@@ -761,17 +783,17 @@ export default function(allAtomsInState = initialState, action = {}) {
             "connections",
             connectionUri,
             "messages",
-            eventUri,
+            messageUri,
             "isReceivedByOwn",
           ],
           true
         );
       } else {
         console.error(
-          "chatMessage.successOwn for message that was not sent(or was not loaded in the state yet, wonMessage: ",
+          "chatMessage.successOwn for message that was not sent(or was not loaded in the state) yet, wonMessage: ",
           wonMessage,
           "messageUri: ",
-          eventUri
+          messageUri
         );
       }
       return allAtomsInState;
