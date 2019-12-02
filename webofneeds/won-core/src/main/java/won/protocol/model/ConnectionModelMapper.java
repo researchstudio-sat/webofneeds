@@ -63,10 +63,13 @@ public class ConnectionModelMapper implements ModelMapper<Connection> {
         Resource connectionRes = model.getResource(connectionURI.toString());
         Connection connection = new Connection();
         connection.setConnectionURI(URI.create(connectionRes.getURI()));
-        URI previousconnectionStateURI = URI
-                        .create(connectionRes.getProperty(WON.previousConnectionState).getResource().getURI());
+        Statement prevStateRes = connectionRes.getProperty(WON.previousConnectionState);
+        URI previousconnectionStateURI = null;
+        if (prevStateRes != null) {
+            previousconnectionStateURI = URI.create(prevStateRes.getObject().asResource().getURI());
+            connection.setPreviousState(ConnectionState.parseString(previousconnectionStateURI.getFragment()));
+        }
         URI connectionStateURI = URI.create(connectionRes.getProperty(WON.connectionState).getResource().getURI());
-        connection.setPreviousState(ConnectionState.parseString(previousconnectionStateURI.getFragment()));
         connection.setState(ConnectionState.parseString(connectionStateURI.getFragment()));
         Statement targetConnectionStmt = connectionRes.getProperty(WON.targetConnection);
         if (targetConnectionStmt != null) {
