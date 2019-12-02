@@ -29,13 +29,14 @@ import won.protocol.vocabulary.WONMSG;
  * User: ypanchenko Date: 08.04.2015
  */
 public class WonMessageSignerVerifier {
-    public static WonMessage setMessageUriForContent(WonMessage message) throws Exception {
+    public static WonMessage seal(WonMessage message) throws Exception {
         Dataset ds = message.getCompleteDataset();
         calculateMessageUriForContent(ds);
         return WonMessage.of(ds);
     }
 
-    public static WonMessage sign(PrivateKey privateKey, PublicKey publicKey, String privateKeyUri, WonMessage message)
+    public static WonMessage signAndSeal(PrivateKey privateKey, PublicKey publicKey, String privateKeyUri,
+                    WonMessage message)
                     throws Exception {
         Dataset msgDataset = message.getCompleteDataset();
         SigningStage sigStage = new SigningStage(message);

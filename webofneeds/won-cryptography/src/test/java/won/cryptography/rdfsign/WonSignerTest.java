@@ -151,7 +151,7 @@ public class WonSignerTest {
             Dataset dataset = TestSigningUtils.prepareTestDataset("/createMessage.trig");
             WonMessage message = WonMessage.of(dataset);
             sw.start("signing");
-            WonMessage signed = WonMessageSignerVerifier.sign(keys.getPrivateKey(TestSigningUtils.atomCertUri),
+            WonMessage signed = WonMessageSignerVerifier.signAndSeal(keys.getPrivateKey(TestSigningUtils.atomCertUri),
                             keys.getPublicKey(TestSigningUtils.atomCertUri), TestSigningUtils.atomCertUri, message);
             sw.stop();
             sw.start("verifying");

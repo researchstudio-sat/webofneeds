@@ -26,7 +26,9 @@ import won.protocol.jms.MessagingService;
 import won.protocol.matcher.MatcherProtocolAtomServiceClientSide;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
+import won.protocol.message.WonMessageUtils;
 import won.protocol.message.processor.camel.WonCamelConstants;
+import won.protocol.message.processor.impl.WonMessageSignerVerifier;
 import won.protocol.util.RdfUtils;
 
 /**
@@ -54,6 +56,9 @@ public class MatcherProtocolAtomServiceClientJMSBased implements MatcherProtocol
         headerMap.put("content", RdfUtils.toString(content));
         headerMap.put(WonCamelConstants.REMOTE_BROKER_ENDPOINT_HEADER, endpoint);
         headerMap.put("methodName", "hint");
+        if (!WonMessageUtils.isValidMessageUri(wonMessage.getMessageURI())) {
+            wonMessage = WonMessageSignerVerifier.seal(wonMessage);
+        }
         messagingService.sendInOnlyMessage(null, headerMap, WonMessageEncoder.encode(wonMessage, Lang.TRIG),
                         startingEndpoint);
     }

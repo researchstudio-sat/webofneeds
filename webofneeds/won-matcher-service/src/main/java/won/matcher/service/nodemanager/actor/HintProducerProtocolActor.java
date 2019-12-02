@@ -77,7 +77,7 @@ public class HintProducerProtocolActor extends UntypedProducerActor {
         if (wonMessage.isPresent()) {
             WonMessage msg = null;
             try {
-                msg = WonMessageSignerVerifier.setMessageUriForContent(wonMessage.get());
+                msg = WonMessageSignerVerifier.seal(wonMessage.get());
                 Object body = WonMessageEncoder.encode(msg, Lang.TRIG);
                 CamelMessage camelMsg = new CamelMessage(body, headers);
                 // monitoring code

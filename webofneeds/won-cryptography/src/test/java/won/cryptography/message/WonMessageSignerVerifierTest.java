@@ -82,7 +82,7 @@ public class WonMessageSignerVerifierTest {
         Dataset testDataset = TestSigningUtils.prepareTestDataset(RESOURCE_OWNER_FILE_NOSIG);
         WonMessage testMsg = WonMessage.of(testDataset);
         // sign
-        testMsg = WonMessageSignerVerifier.sign(atomKey, pubKeysMap.get(TestSigningUtils.nodeCertUri),
+        testMsg = WonMessageSignerVerifier.signAndSeal(atomKey, pubKeysMap.get(TestSigningUtils.nodeCertUri),
                         TestSigningUtils.atomCertUri, testMsg);
         // pretend msg was serialized and deserialized in between
         // pretend it was serialized and deserialized
@@ -104,7 +104,7 @@ public class WonMessageSignerVerifierTest {
         Dataset testDataset = TestSigningUtils.prepareTestDataset(RESOURCE_NODE_FILE_NOSIG);
         WonMessage testMsg = WonMessage.of(testDataset);
         // sign
-        testMsg = WonMessageSignerVerifier.sign(nodeKey, pubKeysMap.get(TestSigningUtils.nodeCertUri),
+        testMsg = WonMessageSignerVerifier.signAndSeal(nodeKey, pubKeysMap.get(TestSigningUtils.nodeCertUri),
                         TestSigningUtils.nodeCertUri, testMsg);
         // pretend msg was serialized and deserialized in between
         // pretend it was serialized and deserialized

@@ -326,7 +326,7 @@ public class PersistenceTest {
 
     protected WonMessage prepareFromMatcher(WonMessage msg) throws Exception {
         // add signature:
-        return WonMessageSignerVerifier.setMessageUriForContent(msg);
+        return WonMessageSignerVerifier.seal(msg);
     }
 
     protected WonMessage prepareFromExternalOwner(WonMessage msg) {

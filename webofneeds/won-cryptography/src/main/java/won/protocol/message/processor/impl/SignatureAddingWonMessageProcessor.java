@@ -97,7 +97,7 @@ public class SignatureAddingWonMessageProcessor implements WonMessageProcessor {
             // we only sign a message if it still has the self message uri
             return wonMessage;
         }
-        WonMessage signed = WonMessageSignerVerifier.sign(privateKey, publicKey, privateKeyUri, wonMessage);
+        WonMessage signed = WonMessageSignerVerifier.signAndSeal(privateKey, publicKey, privateKeyUri, wonMessage);
         if (logger.isDebugEnabled()) {
             logger.debug("SIGNED with key " + privateKeyUri + ":\n"
                             + RdfUtils.toString(Prefixer.setPrefixes(signed.getCompleteDataset())));
