@@ -1154,7 +1154,7 @@ public class LinkedDataWebController implements InitializingBean {
             // if no preferred size provided by the client => the client does not support
             // paging, return everything:
             if (socket != null && targetSocket != null) {
-                rdfDataset = linkedDataService.listConnection(atomUri, connectionsURI, deep);
+                rdfDataset = linkedDataService.listConnection(URI.create(socket), URI.create(targetSocket), deep);
             } else if (preferedSize == null) {
                 // does not support date and type filtering for clients that do not support
                 // paging
