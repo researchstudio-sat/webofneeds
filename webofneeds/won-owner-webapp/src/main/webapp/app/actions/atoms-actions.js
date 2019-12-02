@@ -53,7 +53,7 @@ export function atomsConnectSockets(
           eventUri: jsonResp.messageUri,
           message: jsonResp.message,
           optimisticEvent: optimisticEvent,
-          socketUri: senderSocketUri,
+          senderSocketUri: senderSocketUri,
           targetSocketUri: targetSocketUri,
         },
       });

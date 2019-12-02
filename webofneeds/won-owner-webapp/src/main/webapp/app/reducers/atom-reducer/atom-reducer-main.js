@@ -397,15 +397,33 @@ export default function(allAtomsInState = initialState, action = {}) {
     }
 
     case actionTypes.messages.connect.successRemote: {
+      const wonMessage = getIn(action, ["payload"]);
+
+      const atomUri = generalSelectors.getAtomUriBySocketUri(
+        wonMessage.getTargetSocket()
+      );
+      const senderAtom = get(allAtomsInState, atomUri);
+      const senderSocketUri = wonMessage.getSenderSocket();
+      const targetSocketUri = wonMessage.getTargetSocket();
+
+      const affectedConnection =
+        senderAtom &&
+        get(senderAtom, "connections").find(conn =>
+          connectionUtils.hasSocketUris(conn, targetSocketUri, senderSocketUri)
+        );
+
+      if (!affectedConnection) {
+        // If the connection is not stored we simply ignore the success of the chatMessage -> (success of a received msg)
+        return allAtomsInState;
+      }
+
       // use the remote success message to obtain the remote connection
       // uri (which we may not have known)
-      const wonMessage = action.payload;
-      const connectionUri = wonMessage.getRecipientConnection();
-      const atomUri = wonMessage.getRecipientAtom();
-      const targetConnectionUri = wonMessage.getSenderConnection();
+      const connectionUri = get(affectedConnection, "uri");
+      const targetConnectionUri = wonMessage.getConnection();
 
       if (allAtomsInState.getIn([atomUri, "connections", connectionUri])) {
-        const eventUri = wonMessage.getIsRemoteResponseTo();
+        const eventUri = wonMessage.getIsResponseTo();
         // we want to use the response date to update the original message
         // date
         allAtomsInState = allAtomsInState.setIn(
@@ -491,10 +509,17 @@ export default function(allAtomsInState = initialState, action = {}) {
 
         if (atomByConnectionUri) {
           // connection has been stored as match first
-          allAtomsInState = changeConnectionState(
+          allAtomsInState = changeConnectionStateByFun(
             allAtomsInState,
             connUri,
-            won.WON.RequestSent
+            state => {
+              if (!state) return won.WON.RequestReceived; //fallback if no state present
+              if (state === won.WON.Connected) return won.WON.Connected; //stay in connected if it was already the case
+              if (state === won.WON.RequestSent) return won.WON.Connected;
+              if (state === won.WON.Suggested) return won.WON.RequestReceived;
+              if (state === won.WON.Closed) return won.WON.RequestReceived;
+              return won.WON.RequestReceived;
+            }
           );
 
           if (
