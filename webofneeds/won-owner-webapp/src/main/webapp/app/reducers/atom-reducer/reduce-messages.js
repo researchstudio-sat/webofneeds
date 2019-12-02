@@ -139,6 +139,22 @@ export function addMessage(
             getIn(state, [atomUri, "connections", connectionUri])
           )
         ) {
+          const existingMessage = messages.get(
+            parsedMessage.getIn(["data", "uri"])
+          );
+
+          const isReceivedByOwn = !!get(existingMessage, "isReceivedByOwn");
+          const isReceivedByRemote = !!get(
+            existingMessage,
+            "isReceivedByRemote"
+          );
+
+          if (!alreadyProcessed && (isReceivedByOwn || isReceivedByRemote)) {
+            parsedMessage = parsedMessage
+              .setIn(["data", "isReceivedByOwn"], isReceivedByOwn)
+              .setIn(["data", "isReceivedByRemote"], isReceivedByRemote);
+          }
+
           messages = messages.set(
             parsedMessage.getIn(["data", "uri"]),
             parsedMessage.get("data")
