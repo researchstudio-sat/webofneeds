@@ -388,17 +388,18 @@ class WonAtomContentParticipants extends React.Component {
           caption: "Yes",
           callback: () => {
             const connUri = get(conn, "uri");
-            const targetAtomUri = get(conn, "targetAtomUri");
+            const senderSocketUri = get(conn, "socketUri");
+            const targetSocketUri = get(conn, "targetSocketUri");
 
             if (connectionUtils.isUnread(conn)) {
               this.props.connectionMarkAsRead(connUri, this.props.atomUri);
             }
 
             this.props.rateConnection(connUri, won.WONCON.binaryRatingGood);
-            this.props.connect(
-              this.props.atomUri,
-              connUri,
-              targetAtomUri,
+
+            this.props.connectSockets(
+              senderSocketUri,
+              targetSocketUri,
               message
             );
             this.props.hideModalDialog();

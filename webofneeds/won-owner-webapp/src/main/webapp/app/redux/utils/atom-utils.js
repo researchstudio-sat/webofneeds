@@ -287,6 +287,24 @@ export function hasSocket(atom, socket) {
   );
 }
 
+export function getChatSocket(atom) {
+  return getSocket(atom, won.GROUP.ChatSocketCompacted);
+}
+
+export function getGroupSocket(atom) {
+  return getSocket(atom, won.GROUP.GroupSocketCompacted);
+}
+
+export function getSocket(atom, socket) {
+  return (
+    hasSocket(atom, socket) &&
+    getIn(atom, ["content", "sockets"])
+      .filter(sckt => sckt === socket)
+      .keySeq()
+      .first()
+  );
+}
+
 export function hasSuggestedConnections(atom) {
   return (
     get(atom, "connections") &&
