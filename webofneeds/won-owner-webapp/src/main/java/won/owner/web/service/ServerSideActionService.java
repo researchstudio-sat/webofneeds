@@ -62,8 +62,7 @@ public class ServerSideActionService implements WonMessageProcessor {
             @Override
             public Collection<EventTriggeredAction<WonMessage>> apply(Optional<WonMessage> msg) {
                 // process success responses for create
-                if (msg.isPresent() && atomCounter.get() < 2 && isResponseToCreateOfSockets(msg.get(), sockets)
-                                && isSuccessResponse(msg.get())) {
+                if (msg.isPresent() && atomCounter.get() < 2 && isResponseToCreateOfSockets(msg.get(), sockets)) {
                     // we're processing a response event for the creation of one of our atoms.
                     atomCounter.incrementAndGet();
                 }
@@ -105,21 +104,25 @@ public class ServerSideActionService implements WonMessageProcessor {
                         String.format("Connect %s and %s", fromSocket, toSocket), action));
     }
 
-    private boolean isSuccessResponse(WonMessage msg) {
-        return msg.getMessageType() == WonMessageType.SUCCESS_RESPONSE || msg.getResponse().isPresent();
-    }
-
     private boolean isResponseToCreateOfSockets(WonMessage msg, List<SocketToConnect> sockets) {
         return sockets.stream().anyMatch(socket -> socket.isPending() && isResponseToCreateOfSocket(msg, socket));
     }
 
     private boolean isResponseToCreateOfSocket(WonMessage msg, SocketToConnect socket) {
-        return msg.getRespondingToMessageType() == WonMessageType.CREATE_ATOM
-                        && msg.getEnvelopeType() == WonMessageDirection.FROM_SYSTEM
-                        && socket.getSocket().startsWith(msg.getRecipientAtomURI().toString() + "#");
+        if (!msg.isMessageWithResponse()) {
+            return false;
+        }
+        WonMessage response = msg.getResponse().get();
+        return response.getRespondingToMessageType() == WonMessageType.CREATE_ATOM
+                        && response.getEnvelopeType() == WonMessageDirection.FROM_SYSTEM
+                        && socket.getSocket().startsWith(msg.getAtomURI() + "#");
     }
 
     private boolean isConnectFromSocketForSocket(WonMessage msg, URI sender, URI receiver) {
+        if (!msg.isMessageWithBothResponses()) {
+            // we expect a message with responses from both nodes
+            return false;
+        }
         return msg.getMessageType() == WonMessageType.CONNECT
                         && msg.getSenderSocketURI() != null && sender.equals(msg.getSenderSocketURI())
                         && msg.getRecipientSocketURI() != null && receiver.equals(msg.getRecipientSocketURI());
