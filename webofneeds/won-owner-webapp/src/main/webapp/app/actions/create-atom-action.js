@@ -81,34 +81,37 @@ export function atomCreate(draft, personaUri, nodeUri) {
     return ensureLoggedIn(dispatch, getState).then(async () => {
       const { message, atomUri } = await buildCreateMessage(draft, nodeUri);
 
-      ownerApi.sendMessage(message).then(jsonResp => {
-        dispatch({
-          type: actionTypes.atoms.create,
-          payload: {
-            eventUri: jsonResp.messageUri,
-            message: jsonResp.message,
-            atomUri: atomUri,
-            atom: draft,
-          },
-        });
-      });
-
-      const persona = getIn(state, ["atoms", personaUri]);
-      if (persona) {
-        return ownerApi
-          .serverSideConnect(
-            atomUtils.getSocketUri(persona, won.HOLD.HolderSocketCompacted),
-            `${atomUri}#holdableSocket`,
-            false,
-            true
-          )
-          .then(async response => {
-            if (!response.ok) {
-              const errorMsg = await response.text();
-              throw new Error(`Could not connect identity: ${errorMsg}`);
-            }
+      ownerApi
+        .sendMessage(message)
+        .then(jsonResp => {
+          dispatch({
+            type: actionTypes.atoms.create,
+            payload: {
+              eventUri: jsonResp.messageUri,
+              message: jsonResp.message,
+              atomUri: atomUri,
+              atom: draft,
+            },
           });
-      }
+        })
+        .then(() => {
+          const persona = getIn(state, ["atoms", personaUri]);
+          if (persona) {
+            return ownerApi
+              .serverSideConnect(
+                atomUtils.getSocketUri(persona, won.HOLD.HolderSocketCompacted),
+                `${atomUri}#holdableSocket`,
+                false,
+                true
+              )
+              .then(async response => {
+                if (!response.ok) {
+                  const errorMsg = await response.text();
+                  throw new Error(`Could not connect identity: ${errorMsg}`);
+                }
+              });
+          }
+        });
     });
   };
 }

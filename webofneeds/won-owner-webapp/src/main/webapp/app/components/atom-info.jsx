@@ -41,14 +41,8 @@ const mapStateToProps = (state, ownProps) => {
     ownProps.atomUri
   );
 
-  const chatSocketUri = atomUtils.getSocketUri(
-    atom,
-    won.CHAT.ChatSocketCompacted
-  );
-  const groupSocketUri = atomUtils.getSocketUri(
-    atom,
-    won.GROUP.GroupSocketCompacted
-  );
+  const chatSocketUri = atomUtils.getChatSocket(atom);
+  const groupSocketUri = atomUtils.getGroupSocket(atom);
 
   const atomLoading =
     !atom || processSelectors.isAtomLoading(state, ownProps.atomUri);
@@ -342,11 +336,7 @@ class AtomInfo extends React.Component {
             .filter(conn => get(conn, "targetSocketUri") === connectToSocketUri)
             .filter(
               conn =>
-                get(conn, "socketUri") ===
-                atomUtils.getSocketUri(
-                  personaAtom,
-                  won.CHAT.ChatSocketCompacted
-                )
+                get(conn, "socketUri") === atomUtils.getChatSocket(personaAtom)
             );
 
           if (personaConnections.size == 0) {

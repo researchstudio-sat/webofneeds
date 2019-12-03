@@ -288,21 +288,11 @@ export function hasSocket(atom, socket) {
 }
 
 export function getChatSocket(atom) {
-  return getSocket(atom, won.GROUP.ChatSocketCompacted);
+  return getSocketUri(atom, won.GROUP.ChatSocketCompacted);
 }
 
 export function getGroupSocket(atom) {
-  return getSocket(atom, won.GROUP.GroupSocketCompacted);
-}
-
-export function getSocket(atom, socket) {
-  return (
-    hasSocket(atom, socket) &&
-    getIn(atom, ["content", "sockets"])
-      .filter(sckt => sckt === socket)
-      .keySeq()
-      .first()
-  );
+  return getSocketUri(atom, won.GROUP.GroupSocketCompacted);
 }
 
 export function hasSuggestedConnections(atom) {

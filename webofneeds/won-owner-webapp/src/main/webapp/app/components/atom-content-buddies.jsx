@@ -47,10 +47,7 @@ const mapStateToProps = (state, ownProps) => {
     isOwned &&
     connectionSelectors.getChatConnectionsByAtomUri(state, ownProps.atomUri);
 
-  const chatSocketUri = atomUtils.getSocketUri(
-    atom,
-    won.CHAT.ChatSocketCompacted
-  );
+  const chatSocketUri = atomUtils.getChatSocket(atom);
 
   return {
     atomUri: ownProps.atomUri,
