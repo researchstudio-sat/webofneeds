@@ -1166,10 +1166,16 @@ import won from "./won.js";
     );
   };
 
-  won.getWonMessage = (eventUri, fetchParams) => {
+  won.getWonMessage = (msgUri, fetchParams) => {
     return won
-      .getRawEvent(eventUri, fetchParams)
-      .then(rawEvent => won.wonMessageFromJsonLd(rawEvent));
+      .getRawEvent(msgUri, fetchParams)
+      .then(rawEvent => won.wonMessageFromJsonLd(rawEvent))
+      .catch(e => {
+        const msg = "Failed to get wonMessage " + msgUri + ".";
+        e.message += msg;
+        console.error(e.message);
+        throw e;
+      });
   };
 
   window.getWonMessage4dbg = won.getWonMessage;
