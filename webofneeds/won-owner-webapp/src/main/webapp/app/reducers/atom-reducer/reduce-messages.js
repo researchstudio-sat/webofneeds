@@ -33,7 +33,6 @@ export function addMessage(
         parsedMessage = parsedMessage.setIn(["data", "uri"], eventUriOverride);
       }
       const allAtomsInState = state;
-      console.debug("addMessage -- allAtomsInState: ", allAtomsInState);
       const senderSocketUri = wonMessage.getSenderSocket();
       const targetSocketUri = wonMessage.getTargetSocket();
 
@@ -45,11 +44,6 @@ export function addMessage(
       );
       const senderAtom = get(allAtomsInState, senderAtomUri);
       const targetAtom = get(allAtomsInState, targetAtomUri);
-
-      console.debug("senderSocketUri", senderSocketUri);
-      console.debug("senderAtom", senderAtom);
-      console.debug("targetSocketUri", targetSocketUri);
-      console.debug("targetAtom", targetAtom);
 
       const senderConnection =
         senderAtom &&
@@ -74,20 +68,12 @@ export function addMessage(
       let connectionUri;
       let atomUri;
       if (senderConnection) {
-        console.debug(
-          "We have a stored senderConnection for message: ",
-          wonMessage
-        );
         connectionUri = get(senderConnection, "uri");
         atomUri = senderAtomUri;
         parsedMessage = parsedMessage.setIn(["data", "outgoingMessage"], true);
       }
 
       if (targetConnection) {
-        console.debug(
-          "We have a stored targetConnection for message: ",
-          wonMessage
-        );
         connectionUri = get(targetConnection, "uri");
         atomUri = targetAtomUri;
         parsedMessage = parsedMessage.setIn(["data", "outgoingMessage"], false);
