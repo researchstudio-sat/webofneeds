@@ -318,7 +318,7 @@ export function hasUnreadSuggestedConnections(atom) {
   );
 }
 
-export function getConnectionUriBySocketUris(atom, socketUri, targetSocketUri) {
+export function getConnectionBySocketUris(atom, socketUri, targetSocketUri) {
   const connections = get(atom, "connections");
   return (
     connections &&

@@ -260,7 +260,7 @@ export function processConnectionMessage(wonMessage) {
 
       if (isSentEvent) {
         const senderAtom = get(state, ["atoms", senderAtomUri]);
-        const senderConnection = atomUtils.getConnectionUriBySocketUris(
+        const senderConnection = atomUtils.getConnectionBySocketUris(
           senderAtom,
           senderSocketUri,
           targetSocketUri
@@ -278,7 +278,7 @@ export function processConnectionMessage(wonMessage) {
 
       if (isReceivedEvent) {
         const targetAtom = get(state, ["atoms", targetAtomUri]);
-        const targetConnection = atomUtils.getConnectionUriBySocketUris(
+        const targetConnection = atomUtils.getConnectionBySocketUris(
           targetAtom,
           targetSocketUri,
           senderSocketUri
@@ -507,15 +507,21 @@ export function processConnectMessage(wonMessage) {
       recipientAtomUri
     );
 
-    const receiverConnectionUri = atomUtils.getConnectionUriBySocketUris(
-      senderAtom,
-      senderSocketUri,
-      targetSocketUri
+    const receiverConnectionUri = get(
+      atomUtils.getConnectionBySocketUris(
+        senderAtom,
+        senderSocketUri,
+        targetSocketUri
+      ),
+      "uri"
     );
-    const senderConnectionUri = atomUtils.getConnectionUriBySocketUris(
-      recipientAtom,
-      targetSocketUri,
-      senderSocketUri
+    const senderConnectionUri = get(
+      atomUtils.getConnectionBySocketUris(
+        recipientAtom,
+        targetSocketUri,
+        senderSocketUri
+      ),
+      "uri"
     );
 
     let senderAtomP;
@@ -620,7 +626,7 @@ export function processConnectMessage(wonMessage) {
 
         if (receiverConnectionRelevant) {
           const newRecipientAtom = getIn(newState, ["atoms", recipientAtomUri]);
-          const newReceiverConnectionUri = atomUtils.getConnectionUriBySocketUris(
+          const newReceiverConnectionUri = atomUtils.getConnectionBySocketUris(
             senderAtom,
             senderSocketUri,
             targetSocketUri
@@ -639,7 +645,7 @@ export function processConnectMessage(wonMessage) {
 
         if (senderConnectionRelevant) {
           const newSenderAtom = getIn(newState, ["atoms", senderAtomUri]);
-          const newSenderConnectionUri = atomUtils.getConnectionUriBySocketUris(
+          const newSenderConnectionUri = atomUtils.getConnectionBySocketUris(
             recipientAtom,
             targetSocketUri,
             senderSocketUri
@@ -832,7 +838,7 @@ export function processSocketHintMessage(wonMessage) {
       );
     }
 
-    const targetConnection = atomUtils.getConnectionUriBySocketUris(
+    const targetConnection = atomUtils.getConnectionBySocketUris(
       targetAtom,
       targetSocketUri,
       senderSocketUri
