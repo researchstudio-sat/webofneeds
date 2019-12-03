@@ -809,7 +809,7 @@ import won from "./won.js";
 
     let triplesAddedToDeepDocumentGraphsP = Promise.resolve();
     if (deep) {
-      if (!documentUri.endsWith("/events")) {
+      if (!documentUri.endsWith("/msg")) {
         //TODO hack; looking at uri
         console.error(
           "Adding a dataset loaded with `deep=true` " +

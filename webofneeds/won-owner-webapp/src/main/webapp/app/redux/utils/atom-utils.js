@@ -288,7 +288,7 @@ export function hasSocket(atom, socket) {
 }
 
 export function getChatSocket(atom) {
-  return getSocketUri(atom, won.GROUP.ChatSocketCompacted);
+  return getSocketUri(atom, won.CHAT.ChatSocketCompacted);
 }
 
 export function getGroupSocket(atom) {
