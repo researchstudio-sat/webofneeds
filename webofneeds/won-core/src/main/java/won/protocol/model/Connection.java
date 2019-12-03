@@ -214,6 +214,20 @@ public class Connection implements ParentAware<ConnectionContainer>, VersionedEn
         this.state = state;
     }
 
+    /**
+     * Sets the connection's <code>state</code> and <code>previousState</code>. The
+     * <code>previousState</code> is only set if <code>this.state</code> is
+     * different from the provided <code>state</code>.
+     * 
+     * @param state
+     */
+    public void changeStateTo(final ConnectionState state) {
+        if (this.state != state) {
+            setPreviousState(this.state);
+        }
+        this.state = state;
+    }
+
     public void setPreviousState(ConnectionState previousState) {
         this.previousState = previousState;
     }
