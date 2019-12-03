@@ -80,6 +80,46 @@ export function fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch) {
     });
 }
 
+export function fetchActiveConnectionAndDispatchBySocketUris(
+  senderSocketUri,
+  targetSocketUri,
+  atomUri,
+  dispatch
+) {
+  return won
+    .getConnectionWithEventUrisBySocket(senderSocketUri, targetSocketUri, {
+      requesterWebId: atomUri,
+    })
+    .then(connectionPromises =>
+      connectionPromises.map(connProm => {
+        connProm.then(conn => {
+          console.debug(
+            "fetchActiveConnectionAndDispatchBySocketUris - conn: ",
+            conn
+          );
+          dispatch({
+            type: actionTypes.connections.storeActive,
+            payload: Immutable.fromJS({ connections: { [conn.uri]: conn } }),
+          });
+          return conn;
+        });
+      })
+    )
+    .catch(() => {
+      /*dispatch({
+        type: actionTypes.connections.storeUriFailed,
+        payload: Immutable.fromJS({ uri: connUri }),
+      });*/
+      console.error(
+        "Store Connection of sockets",
+        senderSocketUri,
+        "<->",
+        targetSocketUri,
+        "failed"
+      );
+    });
+}
+
 /**
  * Fetches an atom (incl. the persona that holds it), the fetch is omitted if:
  * - the atom is already loaded
@@ -353,7 +393,7 @@ function storeMessages(dispatch, messages, connectionUri) {
   }
 }
 
-function fetchConnectionsOfAtomAndDispatch(atomUri, dispatch) {
+export function fetchConnectionsOfAtomAndDispatch(atomUri, dispatch) {
   return won
     .getConnectionUrisWithStateByAtomUri(atomUri, atomUri)
     .then(connectionsWithStateAndSocket => {

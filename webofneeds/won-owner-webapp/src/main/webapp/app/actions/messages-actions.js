@@ -449,10 +449,10 @@ export function processConnectionMessage(event) {
   };
 }
 
-export function processConnectMessage(event) {
+export function processConnectMessage(wonMessage) {
   return (dispatch, getState) => {
-    const senderSocketUri = event.getSenderSocket();
-    const targetSocketUri = event.getTargetSocket();
+    const senderSocketUri = wonMessage.getSenderSocket();
+    const targetSocketUri = wonMessage.getTargetSocket();
     const state = getState();
 
     const recipientAtomUri = generalSelectors.getAtomUriBySocketUri(
@@ -507,7 +507,16 @@ export function processConnectMessage(event) {
     }
 
     let senderCP;
-    if (!senderConnectionUri || !isOwnSenderAtom) {
+    if (!senderConnectionUri && isOwnSenderAtom) {
+      senderCP = stateStore
+        .fetchActiveConnectionAndDispatchBySocketUris(
+          senderSocketUri,
+          targetSocketUri,
+          senderAtomUri,
+          dispatch
+        )
+        .then(() => true);
+    } else if (!senderConnectionUri || !isOwnSenderAtom) {
       console.debug(
         "senderConnectionUri was null or senderAtom is not ownedAtom, resolve promise with undefined -> ignore the connection"
       );
@@ -531,7 +540,16 @@ export function processConnectMessage(event) {
     }
 
     let receiverCP;
-    if (!receiverConnectionUri || !isOwnRecipientAtom) {
+    if (!receiverConnectionUri && isOwnRecipientAtom) {
+      receiverCP = stateStore
+        .fetchActiveConnectionAndDispatchBySocketUris(
+          targetSocketUri,
+          senderSocketUri,
+          recipientAtomUri,
+          dispatch
+        )
+        .then(() => true);
+    } else if (!receiverConnectionUri || !isOwnRecipientAtom) {
       console.debug(
         "receiverConnectionUri was null or recipientAtom is not ownedAtom, resolve promise with undefined -> ignore the connection"
       );
@@ -562,26 +580,42 @@ export function processConnectMessage(event) {
         senderAtom,
         recipientAtom,
       ]) => {
+        const newState = getState();
+
         if (receiverConnectionRelevant) {
-          console.debug("Change ReceiverConnectionState ", recipientAtom);
+          const newRecipientAtom = getIn(newState, ["atoms", recipientAtomUri]);
+          const newReceiverConnectionUri = atomUtils.getConnectionUriBySocketUris(
+            senderAtom,
+            senderSocketUri,
+            targetSocketUri
+          );
+
+          console.debug("Change ReceiverConnectionState ", newRecipientAtom);
           dispatch({
             type: actionTypes.messages.connectMessageReceived,
             payload: {
-              updatedConnectionUri: receiverConnectionUri,
+              updatedConnectionUri: newReceiverConnectionUri,
               ownedAtomUri: recipientAtomUri,
-              message: event,
+              message: wonMessage,
             },
           });
         }
 
         if (senderConnectionRelevant) {
-          console.debug("Change SenderConnectionState ", senderAtom);
+          const newSenderAtom = getIn(newState, ["atoms", senderAtomUri]);
+          const newSenderConnectionUri = atomUtils.getConnectionUriBySocketUris(
+            recipientAtom,
+            targetSocketUri,
+            senderSocketUri
+          );
+
+          console.debug("Change SenderConnectionState ", newSenderAtom);
           dispatch({
             type: actionTypes.messages.connectMessageSent,
             payload: {
-              senderConnectionUri: senderConnectionUri,
+              senderConnectionUri: newSenderConnectionUri,
               senderAtomUri: senderAtomUri,
-              event: event,
+              event: wonMessage,
             },
           });
         }

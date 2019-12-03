@@ -1846,19 +1846,27 @@ WonMessage.prototype = {
   __isEnvelopeGraph: graph => {
     let graphUri = graph["@id"];
     let graphData = graph["@graph"];
-    return graphData.some(
-      resource =>
-        resource["@id"] === graphUri &&
-        resource["@type"].includes("https://w3id.org/won/message#EnvelopeGraph")
+    return (
+      graphData &&
+      graphData.some(
+        resource =>
+          resource["@id"] === graphUri &&
+          resource["@type"].includes(
+            "https://w3id.org/won/message#EnvelopeGraph"
+          )
+      )
     );
   },
   __isSignatureGraph: graph => {
     let graphUri = graph["@id"];
     let graphData = graph["@graph"];
-    return graphData.some(
-      resource =>
-        resource["@id"] === graphUri &&
-        resource["@type"].includes("https://w3id.org/won/message#Signature")
+    return (
+      graphData &&
+      graphData.some(
+        resource =>
+          resource["@id"] === graphUri &&
+          resource["@type"].includes("https://w3id.org/won/message#Signature")
+      )
     );
   },
   __getContainedEnvelopeUris: graph => {

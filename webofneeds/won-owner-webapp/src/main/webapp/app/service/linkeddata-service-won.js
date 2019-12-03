@@ -1120,6 +1120,52 @@ import won from "./won.js";
     );
   };
 
+  /**
+   * @param connectionUri
+   * @param fetchParams See `ensureLoaded`.
+   * @return {*} the connections predicates along with the uris of associated events
+   */
+  won.getConnectionWithEventUrisBySocket = function(
+    senderSocketUri,
+    targetSocketUri,
+    fetchParams
+  ) {
+    if (!is("String", senderSocketUri) || !is("String", targetSocketUri)) {
+      throw new Error(
+        "Tried to request connection infos for sthg that isn't an uri: " +
+          senderSocketUri +
+          " or " +
+          targetSocketUri
+      );
+    }
+
+    fetchParams.socket = senderSocketUri;
+    fetchParams.targetSocket = targetSocketUri;
+
+    return (
+      won
+        .getNode(senderSocketUri.split("#")[0] + "/c", fetchParams)
+        //add the eventUris
+        .then(jsonResp => jsonResp.member)
+        .then(connUris => {
+          let _connUris;
+          if (is("String", connUris)) {
+            _connUris = [connUris];
+          } else {
+            _connUris = connUris;
+          }
+
+          const newFetchParams = {
+            requesterWebId: fetchParams.requesterWebId,
+          };
+
+          return _connUris.map(connUri => {
+            return won.getConnectionWithEventUris(connUri, newFetchParams);
+          });
+        })
+    );
+  };
+
   won.getWonMessage = (eventUri, fetchParams) => {
     return won
       .getRawEvent(eventUri, fetchParams)
