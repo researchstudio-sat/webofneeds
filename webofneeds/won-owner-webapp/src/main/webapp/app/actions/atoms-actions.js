@@ -175,18 +175,18 @@ export function atomsOpen(atomUri) {
 export function atomsClosedBySystem(event) {
   return (dispatch, getState) => {
     //first check if we really have the 'own' atom in the state - otherwise we'll ignore the message
-    const atom = getState().getIn(["atoms", event.getRecipientAtom()]);
+    const atom = getState().getIn(["atoms", event.getAtom()]);
     if (!atom) {
       console.debug(
         "ignoring deactivateMessage for an atom that is not ours:",
-        event.getRecipientAtom()
+        event.getAtom()
       );
     }
     dispatch({
       type: actionTypes.atoms.closedBySystem,
       payload: {
-        atomUri: event.getRecipientAtom(),
-        humanReadable: atom.get("humanReadable"),
+        atomUri: event.getAtom(),
+        humanReadable: get(atom, "humanReadable"),
         message: event.getTextMessage(),
       },
     });

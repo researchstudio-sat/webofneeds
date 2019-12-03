@@ -280,12 +280,6 @@ export function runMessagingAgent(redux) {
       if (message.isResponseToDeleteMessage()) {
         if (message.isSuccessResponse()) {
           redux.dispatch(actionCreators.atoms__delete(message.getAtom()));
-          /*redux.dispatch({
-            type: actionTypes.atoms.delete,
-            payload: {
-              ownedAtomUri: message.getRecipientAtom(),
-            },
-          });*/
           return true;
         }
       }

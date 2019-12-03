@@ -48,7 +48,7 @@ export function successfulReopenAtom(event) {
 }
 export function failedCloseAtom(event) {
   return (dispatch, getState) => {
-    const atomUri = event.getRecipientAtom();
+    const atomUri = event.getAtom();
 
     won
       .clearStoreWithPromise()
@@ -61,7 +61,7 @@ export function failedCloseAtom(event) {
 
 export function failedReopenAtom(event) {
   return (dispatch, getState) => {
-    const atomUri = event.getRecipientAtom();
+    const atomUri = event.getAtom();
 
     won
       .clearStoreWithPromise()
@@ -188,9 +188,11 @@ export function processAgreementMessage(event) {
   };
 }
 
-export function processChangeNotificationMessage(event) {
+export function processChangeNotificationMessage(wonMessage) {
   return (dispatch, getState) => {
-    const atomUriToLoad = event.getSenderAtom();
+    const atomUriToLoad = generalSelectors.getAtomUriBySocketUri(
+      wonMessage.getSenderSocket()
+    );
 
     /*
     Workaround, there is a possibility of a racecondition between the functions processChangeNotificationMessage, and successfulEdit
@@ -231,222 +233,256 @@ export function processChangeNotificationMessage(event) {
 
     dispatch({
       type: actionTypes.messages.processChangeNotificationMessage,
-      payload: event,
+      payload: wonMessage,
     });
   };
 }
 
-export function processConnectionMessage(event) {
+export function processConnectionMessage(wonMessage) {
   return (dispatch, getState) => {
-    if (isFetchMessageEffectsNeeded(event)) {
-      const _atomUri = generalSelectors.getAtomUriBySocketUri(
-        event.getSenderSocket()
+    if (isFetchMessageEffectsNeeded(wonMessage)) {
+      const state = getState();
+      const senderSocketUri = wonMessage.getSenderSocket();
+      const targetSocketUri = wonMessage.getTargetSocket();
+
+      const senderAtomUri = generalSelectors.getAtomUriBySocketUri(
+        senderSocketUri
       );
-      const isSentEvent = generalSelectors.isAtomOwned(getState(), _atomUri);
+      const targetAtomUri = generalSelectors.getAtomUriBySocketUri(
+        targetSocketUri
+      );
 
-      let connectionUri;
-      let atomUri;
-
-      //TODO: FIX THIS MESS
+      const isSentEvent = generalSelectors.isAtomOwned(state, senderAtomUri);
+      const isReceivedEvent = generalSelectors.isAtomOwned(
+        state,
+        targetAtomUri
+      );
 
       if (isSentEvent) {
-        connectionUri = event.getSenderConnection();
-        atomUri = _atomUri;
-      } else {
-        connectionUri = event.getRecipientConnection();
-        atomUri = event.getRecipientAtom();
+        const senderAtom = get(state, ["atoms", senderAtomUri]);
+        const senderConnection = atomUtils.getConnectionUriBySocketUris(
+          senderAtom,
+          senderSocketUri,
+          targetSocketUri
+        );
+
+        const senderConnectionUri = get(senderConnection, "uri");
+
+        processMessageEffects(
+          wonMessage,
+          senderAtomUri,
+          senderConnectionUri,
+          dispatch
+        );
       }
 
-      //PETRINET DATA PART START *********************
+      if (isReceivedEvent) {
+        const targetAtom = get(state, ["atoms", targetAtomUri]);
+        const targetConnection = atomUtils.getConnectionUriBySocketUris(
+          targetAtom,
+          targetSocketUri,
+          senderSocketUri
+        );
+
+        const targetConnectionUri = get(targetConnection, "uri");
+
+        processMessageEffects(
+          wonMessage,
+          targetAtomUri,
+          targetConnectionUri,
+          dispatch
+        );
+      }
+    } else {
+      dispatch({
+        type: actionTypes.messages.processConnectionMessage,
+        payload: wonMessage,
+      });
+    }
+  };
+}
+
+function processMessageEffects(wonMessage, atomUri, connectionUri, dispatch) {
+  if (!atomUri || !connectionUri) {
+    return;
+  }
+
+  dispatch({
+    type: actionTypes.connections.setLoadingPetriNetData,
+    payload: {
+      connectionUri: connectionUri,
+      loadingPetriNetData: true,
+    },
+  });
+
+  ownerApi
+    .getPetriNetUris(connectionUri)
+    .then(response => {
+      const petriNetData = {};
+
+      response.forEach(entry => {
+        if (entry.processURI) {
+          petriNetData[entry.processURI] = entry;
+        }
+      });
+
+      const petriNetDataImm = Immutable.fromJS(petriNetData);
+
+      dispatch({
+        type: actionTypes.connections.updatePetriNetData,
+        payload: {
+          connectionUri: connectionUri,
+          petriNetData: petriNetDataImm,
+        },
+      });
+    })
+    .catch(error => {
+      console.error("Error:", error);
       dispatch({
         type: actionTypes.connections.setLoadingPetriNetData,
         payload: {
           connectionUri: connectionUri,
-          loadingPetriNetData: true,
+          loadingPetriNetData: false,
         },
       });
+    });
 
-      ownerApi
-        .getPetriNetUris(connectionUri)
-        .then(response => {
-          const petriNetData = {};
-
-          response.forEach(entry => {
-            if (entry.processURI) {
-              petriNetData[entry.processURI] = entry;
+  //PETRINET DATA PART END **************************
+  ownerApi
+    .getMessageEffects(connectionUri, wonMessage.getMessageUri())
+    .then(response => {
+      for (const effect of response) {
+        switch (effect.type) {
+          case "ACCEPTS":
+            if (effect.accepts) {
+              let acceptedMessageUris = Array.isArray(effect.acceptedMessageUri)
+                ? effect.acceptedMessageUri
+                : [effect.acceptedMessageUri];
+              acceptedMessageUris.forEach(acceptedMessageUri => {
+                dispatch({
+                  type: actionTypes.messages.messageStatus.markAsAccepted,
+                  payload: {
+                    messageUri: acceptedMessageUri,
+                    connectionUri: connectionUri,
+                    atomUri: atomUri,
+                    accepted: true,
+                  },
+                });
+              });
             }
-          });
+            break;
+          case "CLAIMS":
+            if (effect.claims) {
+              let claimedMessageUris = Array.isArray(effect.claims)
+                ? effect.claims
+                : [effect.claims];
 
-          const petriNetDataImm = Immutable.fromJS(petriNetData);
-
-          dispatch({
-            type: actionTypes.connections.updatePetriNetData,
-            payload: {
-              connectionUri: connectionUri,
-              petriNetData: petriNetDataImm,
-            },
-          });
-        })
-        .catch(error => {
-          console.error("Error:", error);
-          dispatch({
-            type: actionTypes.connections.setLoadingPetriNetData,
-            payload: {
-              connectionUri: connectionUri,
-              loadingPetriNetData: false,
-            },
-          });
-        });
-
-      //PETRINET DATA PART END **************************
-      ownerApi
-        .getMessageEffects(connectionUri, event.getMessageUri())
-        .then(response => {
-          for (const effect of response) {
-            switch (effect.type) {
-              case "ACCEPTS":
-                if (effect.accepts) {
-                  let acceptedMessageUris = Array.isArray(
-                    effect.acceptedMessageUri
-                  )
-                    ? effect.acceptedMessageUri
-                    : [effect.acceptedMessageUri];
-                  acceptedMessageUris.forEach(acceptedMessageUri => {
-                    dispatch({
-                      type: actionTypes.messages.messageStatus.markAsAccepted,
-                      payload: {
-                        messageUri: acceptedMessageUri,
-                        connectionUri: connectionUri,
-                        atomUri: atomUri,
-                        accepted: true,
-                      },
-                    });
-                  });
-                }
-                break;
-              case "CLAIMS":
-                if (effect.claims) {
-                  let claimedMessageUris = Array.isArray(effect.claims)
-                    ? effect.claims
-                    : [effect.claims];
-
-                  claimedMessageUris.forEach(claimedMessageUri => {
-                    dispatch({
-                      type: actionTypes.messages.messageStatus.markAsClaimed,
-                      payload: {
-                        messageUri: claimedMessageUri,
-                        connectionUri: connectionUri,
-                        atomUri: atomUri,
-                        claimed: true,
-                      },
-                    });
-                  });
-                }
-                break;
-
-              case "PROPOSES":
-                if (effect.proposes) {
-                  let proposedMessageUris = Array.isArray(effect.proposes)
-                    ? effect.proposes
-                    : [effect.proposes];
-
-                  proposedMessageUris.forEach(proposedMessageUri => {
-                    dispatch({
-                      type: actionTypes.messages.messageStatus.markAsProposed,
-                      payload: {
-                        messageUri: proposedMessageUri,
-                        connectionUri: connectionUri,
-                        atomUri: atomUri,
-                        proposed: true,
-                      },
-                    });
-                  });
-                }
-
-                if (effect.proposalType === "CANCELS") {
-                  let proposesToCancelUris = Array.isArray(
-                    effect.proposesToCancel
-                  )
-                    ? effect.proposesToCancel
-                    : [effect.proposesToCancel];
-
-                  proposesToCancelUris.forEach(proposesToCancelURI => {
-                    dispatch({
-                      type:
-                        actionTypes.messages.messageStatus
-                          .markAsCancellationPending,
-                      payload: {
-                        messageUri: proposesToCancelURI,
-                        connectionUri: connectionUri,
-                        atomUri: atomUri,
-                        cancellationPending: true,
-                      },
-                    });
-                  });
-                }
-                break;
-
-              case "REJECTS":
-                if (effect.rejects) {
-                  let rejectedMessageUris = Array.isArray(
-                    effect.rejectedMessageUri
-                  )
-                    ? effect.rejectedMessageUri
-                    : [effect.rejectedMessageUri];
-
-                  rejectedMessageUris.forEach(rejectedMessageUri => {
-                    dispatch({
-                      type: actionTypes.messages.messageStatus.markAsRejected,
-                      payload: {
-                        messageUri: rejectedMessageUri,
-                        connectionUri: connectionUri,
-                        atomUri: atomUri,
-                        rejected: true,
-                      },
-                    });
-                  });
-                }
-                break;
-
-              case "RETRACTS":
-                if (effect.retracts) {
-                  let retractedMessageUris = Array.isArray(
-                    effect.retractedMessageUri
-                  )
-                    ? effect.retractedMessageUri
-                    : [effect.retractedMessageUri];
-
-                  retractedMessageUris.forEach(retractedMessageUri => {
-                    dispatch({
-                      type: actionTypes.messages.messageStatus.markAsRetracted,
-                      payload: {
-                        messageUri: retractedMessageUri,
-                        connectionUri: connectionUri,
-                        atomUri: atomUri,
-                        retracted: true,
-                      },
-                    });
-                  });
-                }
-                break;
-
-              default:
-                break;
+              claimedMessageUris.forEach(claimedMessageUri => {
+                dispatch({
+                  type: actionTypes.messages.messageStatus.markAsClaimed,
+                  payload: {
+                    messageUri: claimedMessageUri,
+                    connectionUri: connectionUri,
+                    atomUri: atomUri,
+                    claimed: true,
+                  },
+                });
+              });
             }
-          }
+            break;
 
-          dispatch({
-            type: actionTypes.messages.processConnectionMessage,
-            payload: event,
-          });
-        });
-    } else {
+          case "PROPOSES":
+            if (effect.proposes) {
+              let proposedMessageUris = Array.isArray(effect.proposes)
+                ? effect.proposes
+                : [effect.proposes];
+
+              proposedMessageUris.forEach(proposedMessageUri => {
+                dispatch({
+                  type: actionTypes.messages.messageStatus.markAsProposed,
+                  payload: {
+                    messageUri: proposedMessageUri,
+                    connectionUri: connectionUri,
+                    atomUri: atomUri,
+                    proposed: true,
+                  },
+                });
+              });
+            }
+
+            if (effect.proposalType === "CANCELS") {
+              let proposesToCancelUris = Array.isArray(effect.proposesToCancel)
+                ? effect.proposesToCancel
+                : [effect.proposesToCancel];
+
+              proposesToCancelUris.forEach(proposesToCancelURI => {
+                dispatch({
+                  type:
+                    actionTypes.messages.messageStatus
+                      .markAsCancellationPending,
+                  payload: {
+                    messageUri: proposesToCancelURI,
+                    connectionUri: connectionUri,
+                    atomUri: atomUri,
+                    cancellationPending: true,
+                  },
+                });
+              });
+            }
+            break;
+
+          case "REJECTS":
+            if (effect.rejects) {
+              let rejectedMessageUris = Array.isArray(effect.rejectedMessageUri)
+                ? effect.rejectedMessageUri
+                : [effect.rejectedMessageUri];
+
+              rejectedMessageUris.forEach(rejectedMessageUri => {
+                dispatch({
+                  type: actionTypes.messages.messageStatus.markAsRejected,
+                  payload: {
+                    messageUri: rejectedMessageUri,
+                    connectionUri: connectionUri,
+                    atomUri: atomUri,
+                    rejected: true,
+                  },
+                });
+              });
+            }
+            break;
+
+          case "RETRACTS":
+            if (effect.retracts) {
+              let retractedMessageUris = Array.isArray(
+                effect.retractedMessageUri
+              )
+                ? effect.retractedMessageUri
+                : [effect.retractedMessageUri];
+
+              retractedMessageUris.forEach(retractedMessageUri => {
+                dispatch({
+                  type: actionTypes.messages.messageStatus.markAsRetracted,
+                  payload: {
+                    messageUri: retractedMessageUri,
+                    connectionUri: connectionUri,
+                    atomUri: atomUri,
+                    retracted: true,
+                  },
+                });
+              });
+            }
+            break;
+
+          default:
+            break;
+        }
+      }
+
       dispatch({
         type: actionTypes.messages.processConnectionMessage,
-        payload: event,
+        payload: wonMessage,
       });
-    }
-  };
+    });
 }
 
 export function processConnectMessage(wonMessage) {
@@ -752,49 +788,84 @@ export function markAsCancellationPending(event) {
   };
 }
 
-export function atomMessageReceived(event) {
+export function atomMessageReceived(wonMessage) {
   return (dispatch, getState) => {
     //first check if we really have the 'own' atom in the state - otherwise we'll ignore the hint
-    const atom = getState().getIn(["atoms", event.getRecipientAtom()]);
+    const targetAtomUri = generalSelectors.getAtomUriBySocketUri(
+      wonMessage.getTargetSocket()
+    );
+    const atom = getState().getIn(["atoms", targetAtomUri]);
     if (!atom) {
       console.debug(
         "ignoring atomMessage for an atom that is not ours:",
-        event.getRecipientAtom()
+        targetAtomUri
       );
     }
     dispatch({
       type: actionTypes.messages.atomMessageReceived,
       payload: {
-        atomUri: event.getRecipientAtom(),
+        atomUri: targetAtomUri,
         humanReadable: atom.get("humanReadable"),
-        message: event.getTextMessage(),
+        message: wonMessage.getTextMessage(),
       },
     });
   };
 }
 
-export function processSocketHintMessage(event) {
+export function processSocketHintMessage(wonMessage) {
   return (dispatch, getState) => {
-    const recipientAtomUri = event.getRecipientAtom();
-    //const targetSocketUri = event.getHintTargetSocket(); //we currently dont need to know the targetSocketUri of the message (is known by fetching the connection)
+    const targetSocketUri = wonMessage.getTargetSocket();
+    const senderSocketUri = wonMessage.getSenderSocket();
 
-    const currentState = getState();
-    const recipientConnUri = event.getRecipientConnection();
-    const recipientAtom = getIn(currentState, ["atoms", recipientAtomUri]);
+    const state = getState();
+    const targetAtomUri = generalSelectors.getAtomUriBySocketUri(
+      targetSocketUri
+    );
 
-    if (!recipientAtom) {
+    const targetAtom = getIn(state, ["atoms", targetAtomUri]);
+    const isOwnTargetAtom = generalSelectors.isAtomOwned(state, targetAtomUri);
+
+    if (!targetAtom) {
       console.debug(
         "ignoring hint for an atom that is not yet in the state (could be a targetAtom, or a non stored ownedAtom):",
-        recipientAtomUri
+        targetAtomUri
       );
-    } else if (!recipientConnUri) {
-      console.debug("ignoring hint without a receiver(Connection)Uri:", event);
+    }
+
+    const targetConnection = atomUtils.getConnectionUriBySocketUris(
+      targetAtom,
+      targetSocketUri,
+      senderSocketUri
+    );
+    const targetConnectionUri = get(targetConnection, "uri");
+
+    if (!targetConnectionUri && isOwnTargetAtom) {
+      return stateStore
+        .fetchActiveConnectionAndDispatchBySocketUris(
+          targetSocketUri,
+          senderSocketUri,
+          targetAtomUri,
+          dispatch
+        )
+        .then(() => true);
+    } else if (!targetConnectionUri || !isOwnTargetAtom) {
+      console.debug(
+        "receiverConnectionUri was null or recipientAtom is not ownedAtom, resolve promise with undefined -> ignore the connection"
+      );
+      return Promise.resolve(false);
+    } else if (targetConnection) {
+      console.debug(
+        "receiverConnection relevant, resolve with true -> handle the connection"
+      );
+      return Promise.resolve(true);
     } else {
-      stateStore.fetchActiveConnectionAndDispatch(
-        recipientConnUri,
-        recipientAtomUri,
-        dispatch
-      );
+      return stateStore
+        .fetchActiveConnectionAndDispatch(
+          targetConnectionUri,
+          targetAtomUri,
+          dispatch
+        )
+        .then(() => true);
     }
   };
 }

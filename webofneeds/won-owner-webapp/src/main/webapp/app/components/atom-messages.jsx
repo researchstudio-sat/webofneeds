@@ -913,20 +913,13 @@ class AtomMessages extends React.Component {
     }
   }
 
-  addMessageToState(eventUri, key) {
+  addMessageToState(messageUri) {
     const ownedAtomUri = get(this.props.ownedAtom, "uri");
-    return ownerApi.getMessage(ownedAtomUri, eventUri).then(response => {
+    return ownerApi.getMessage(ownedAtomUri, messageUri).then(response => {
       won.wonMessageFromJsonLd(response).then(msg => {
-        if (msg.isFromOwner() && msg.getRecipientAtom() === ownedAtomUri) {
-          /*if we find out that the recipientatom of the crawled event is actually our
-            atom we will call the method again but this time with the correct eventUri
-          */
-          this.addMessageToState(msg.getRemoteMessageUri(), key);
-        } else {
-          //If message isnt in the state we add it
-          if (!get(this.props.chatMessages, eventUri)) {
-            this.props.processAgreementMessage(msg);
-          }
+        //If message isnt in the state we add it
+        if (!get(this.props.chatMessages, messageUri)) {
+          this.props.processAgreementMessage(msg);
         }
       });
     });
@@ -1090,8 +1083,8 @@ class AtomMessages extends React.Component {
           );
 
           //Retrieve all the relevant messages
-          agreementDataImm.map((uriList, key) =>
-            uriList.map(uri => this.addMessageToState(uri, key))
+          agreementDataImm.map(uriList =>
+            uriList.map(uri => this.addMessageToState(uri))
           );
         })
         .catch(error => {
