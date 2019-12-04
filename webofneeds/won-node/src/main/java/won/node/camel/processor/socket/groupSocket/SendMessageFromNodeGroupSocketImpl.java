@@ -78,7 +78,7 @@ public class SendMessageFromNodeGroupSocketImpl extends AbstractCamelProcessor {
         }
         for (final Connection conToSendTo : consInGroup) {
             try {
-                if (!conToSendTo.equals(conOfIncomingMessage)) {
+                if (!conToSendTo.equals(conOfIncomingMessage.get())) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("forwarding message {} received from atom {} in group {} to group member {}",
                                         new Object[] { wonMessage.getMessageURI(), wonMessage.getSenderAtomURI(),
