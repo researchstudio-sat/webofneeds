@@ -10,8 +10,7 @@ export const labels = deepFreeze({
     ["https://w3id.org/won/core#Closed"]: "Conversation closed.",
   },
   messageType: {
-    ["https://w3id.org/won/message#ConnectMessage"]: "Contact Request",
-    ["https://w3id.org/won/message#OpenMessage"]: "Accepted Contact Request",
+    ["https://w3id.org/won/message#ConnectMessage"]: "Connect Message",
     ["https://w3id.org/won/message#CloseMessage"]: "Close Message",
     ["https://w3id.org/won/message#ConnectionMessage"]: "Chat Message",
     ["https://w3id.org/won/message#AtomHintMessage"]: "Atom Hint Message",
