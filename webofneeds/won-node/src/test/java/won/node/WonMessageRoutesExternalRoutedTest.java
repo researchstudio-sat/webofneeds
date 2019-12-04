@@ -1660,7 +1660,7 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
                         .content()
                         /**/.text("Message to the group from atom1")
                         .build());
-        toOwnerMockEndpoint.expectedMessageCount(5); // TODO this includes two responses to the group's owner, which
+        toOwnerMockEndpoint.expectedMessageCount(4); // TODO this includes two responses to the group's owner, which
                                                      // should not be delivered
         toMatcherMockEndpoint.expectedMessageCount(0);
         sendFromOwner(textMsgToGroup, OWNERAPPLICATION_ID_OWNER1);

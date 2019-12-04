@@ -205,10 +205,16 @@ public class WonCamelHelper {
         return getRecipientAtomURI(exchange).orElseThrow(expectedHeader(WonCamelConstants.RECIPIENT_ATOM_URI_HEADER));
     }
 
-    //// suppress
+    //// suppress to node
     public static void suppressMessageToNode(Exchange exchange) {
         Objects.requireNonNull(exchange);
         exchange.getIn().setHeader(WonCamelConstants.SUPPRESS_MESSAGE_TO_NODE_HEADER, true);
+    }
+
+    //// suppress to owner
+    public static void suppressMessageToOwner(Exchange exchange) {
+        Objects.requireNonNull(exchange);
+        exchange.getIn().setHeader(WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER_HEADER, true);
     }
 
     //// parent

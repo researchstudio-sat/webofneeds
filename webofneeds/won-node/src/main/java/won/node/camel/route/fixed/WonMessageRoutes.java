@@ -117,15 +117,18 @@ public class WonMessageRoutes extends RouteBuilder {
         from("direct:msgFromOwner_respondToOwner") // to owner
                         .routeId("direct:msgFromOwner_respondToOwner")
                         // send the response+echo to the owner
-                        .to("bean:responseRoutingInfoExtractor")
-                        .bean(messageAndResponseIntoToSendHeader)
-                        .to("direct:sendToOwner")
+                        .choice()
+                        /**/.when(shouldSendToOwner)
+                        /**/.to("bean:responseRoutingInfoExtractor")
+                        /**/.bean(messageAndResponseIntoToSendHeader)
+                        /**/.to("direct:sendToOwner")
+                        .end()
                         .to("bean:atomDeleter"); // if we are processing a delete, delete now (we needed the atom in the
-                                                 // db for routing!)
+        // db for routing!)
         from("direct:msgFromOwner_forwardToNode") // to node
                         .routeId("direct:msgFromOwner_forwardToNode")
                         .choice()
-                        /**/.when(and(causesOutgoingMessage, shouldSendFromOwnerToExternal))
+                        /**/.when(and(causesOutgoingMessage, shouldSendToExternal))
                         /**//**/.to("bean:routingInfoExtractor")
                         /**//**/.bean(messageAndResponseIntoToSendHeader)
                         /**//**/.to("direct:sendToNode")
@@ -229,7 +232,7 @@ public class WonMessageRoutes extends RouteBuilder {
         from("direct:msgFromExternal_forwardToOwner") // to owner!
                         .routeId("direct:msgFromExternal_forwardToOwner")
                         .choice()
-                        /**/.when(shouldSendExternalToOwner)
+                        /**/.when(shouldSendToOwner)
                         /**//**/.to("bean:routingInfoExtractor")
                         /**//**/.bean(messageAndResponseIntoToSendHeader)
                         /**//**/.to("direct:sendToOwner") // send response and echo as always
@@ -364,7 +367,7 @@ public class WonMessageRoutes extends RouteBuilder {
             return !messageType.isResponseMessage();
         }
     };
-    private Predicate shouldSendExternalToOwner = new Predicate() {
+    private Predicate shouldSendToOwner = new Predicate() {
         public boolean matches(Exchange exchange) {
             Boolean suppress = (Boolean) exchange.getIn().getHeader(WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER_HEADER);
             if (suppress != null && suppress == true) {
@@ -373,7 +376,7 @@ public class WonMessageRoutes extends RouteBuilder {
             return true;
         }
     };
-    private Predicate shouldSendFromOwnerToExternal = new Predicate() {
+    private Predicate shouldSendToExternal = new Predicate() {
         public boolean matches(Exchange exchange) {
             Boolean suppress = (Boolean) exchange.getIn().getHeader(WonCamelConstants.SUPPRESS_MESSAGE_TO_NODE_HEADER);
             if (suppress != null && suppress == true) {

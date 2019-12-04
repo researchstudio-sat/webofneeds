@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.SocketMessageProcessor;
+import won.node.camel.service.WonCamelHelper;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
@@ -40,7 +41,7 @@ public class SendMessageFromNodeGroupSocketImpl extends AbstractCamelProcessor {
     public void process(final Exchange exchange) throws Exception {
         final WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
         // whatever happens, this message is not sent to the owner:
-        exchange.getIn().setHeader(WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER_HEADER, Boolean.TRUE);
+        WonCamelHelper.suppressMessageToOwner(exchange);
         // avoid message duplication in larger group networks:
         // it is possible that we have already processed this message
         // and through connected groups it was forwarded back to us.
