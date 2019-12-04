@@ -25,7 +25,7 @@ public class OwnerManagementService implements ApplicationManagementService {
     @Override
     public String registerOwnerApplication(String ownerApplicationId) {
         logger.debug("ownerApplicationId: " + ownerApplicationId.toString());
-        if (ownerApplicationRepository.findByOwnerApplicationIdForUpdate(ownerApplicationId).isEmpty()) {
+        if (!ownerApplicationRepository.findOneByOwnerApplicationId(ownerApplicationId).isPresent()) {
             logger.info("Registering owner application for the first time with id: {}", ownerApplicationId);
             OwnerApplication ownerApplication = new OwnerApplication();
             ownerApplication.setOwnerApplicationId(ownerApplicationId.toString());
