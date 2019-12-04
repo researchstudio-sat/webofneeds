@@ -22,7 +22,6 @@ import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.util.WonRdfUtils;
-import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WONMSG;
 import won.protocol.vocabulary.WXGROUP;
 
@@ -50,16 +49,19 @@ public class SendMessageFromNodeGroupSocketImpl extends AbstractCamelProcessor {
         // message we have processed so far.
         // now check if we processed the message earlier
         URI parent = getParentURIRequired(exchange);
-        for (URI forwarded : wonMessage.getForwardedMessageURIs()) {
-            if (messageEventRepository.findOneByMessageURIAndParentURI(
-                            forwarded, parent).isPresent()) {
-                if (logger.isDebugEnabled()) {
-                    URI groupUri = wonMessage.getRecipientAtomURI();
-                    logger.debug("suppressing message {} " + "as its innermost message is {} which has already "
-                                    + "been processed by group {}",
-                                    new Object[] { wonMessage.getMessageURI(), forwarded, groupUri });
+        WonMessage headAndForwarded = wonMessage.getHeadAndForwarded(true);
+        for (WonMessage checkMsg : headAndForwarded.getAllMessages()) {
+            for (URI forwarded : checkMsg.getForwardedMessageURIs()) {
+                if (messageEventRepository.findOneByMessageURIAndParentURI(
+                                forwarded, parent).isPresent()) {
+                    if (logger.isDebugEnabled()) {
+                        URI groupUri = wonMessage.getRecipientAtomURI();
+                        logger.debug("suppressing message {} " + "as its innermost message is {} which has already "
+                                        + "been processed by group {}",
+                                        new Object[] { wonMessage.getMessageURI(), forwarded, groupUri });
+                    }
+                    return;
                 }
-                return;
             }
         }
         final Optional<Connection> conOfIncomingMessage = connectionRepository.findOneBySocketURIAndTargetSocketURI(
@@ -83,13 +85,11 @@ public class SendMessageFromNodeGroupSocketImpl extends AbstractCamelProcessor {
                                                         wonMessage.getRecipientAtomURI(),
                                                         conToSendTo.getTargetAtomURI() });
                     }
-                    URI remoteWonNodeUri = WonLinkedDataUtils.getWonNodeURIForAtomOrConnectionURI(
-                                    conToSendTo.getTargetConnectionURI(), linkedDataSource);
                     WonMessage newWonMessage = WonMessageBuilder
                                     .connectionMessage()
                                     .direction()
                                     /**/.fromSystem()
-                                    .forward(wonMessage)
+                                    .forward(headAndForwarded)
                                     .sockets()
                                     /**/.sender(conToSendTo.getSocketURI())
                                     /**/.recipient(conToSendTo.getTargetSocketURI())
