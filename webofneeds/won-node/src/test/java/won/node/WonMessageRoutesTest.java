@@ -331,7 +331,35 @@ public abstract class WonMessageRoutesTest {
             boolean result = (msg.getMessageTypeRequired().isSuccessResponse()
                             && messageURI.equals(msg.getRespondingToMessageURI()));
             if (!result) {
-                logMessageForFailedPredicate(getClass().getName(), "mesaggeURI", messageURI, msg);
+                logMessageForFailedPredicate(getClass().getName(), "messageURI", messageURI, msg);
+            }
+            return result;
+        }
+    }
+
+    public Predicate isMessageContained(WonMessage message) {
+        return isMessageContained(message.getMessageURIRequired());
+    }
+
+    public Predicate isMessageContained(URI messageURI) {
+        return new IsMessageContained(messageURI);
+    }
+
+    private class IsMessageContained implements Predicate {
+        private URI messageURI;
+
+        public IsMessageContained(URI messageURI) {
+            Objects.requireNonNull(messageURI);
+            this.messageURI = messageURI;
+        }
+
+        @Override
+        public boolean matches(Exchange exchange) {
+            WonMessage msg = getMessageRequired(exchange);
+            boolean result = msg.getAllMessages().stream()
+                            .anyMatch(m -> m.getMessageURIRequired().equals(this.messageURI));
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "messageURI", messageURI, msg);
             }
             return result;
         }
