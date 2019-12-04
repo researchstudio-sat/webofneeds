@@ -376,15 +376,23 @@ export default function(allAtomsInState = initialState, action = {}) {
     }
     case actionTypes.messages.connectMessageSent: {
       // received a message saying we sent a connect request
-      const senderConnectionUri = action.payload.senderConnectionUri;
+      const senderConnectionUri = action.payload.updatedConnectionUri;
       let stateUpdated;
 
       if (senderConnectionUri) {
-        stateUpdated = changeConnectionState(
+        stateUpdated = changeConnectionStateByFun(
           allAtomsInState,
           senderConnectionUri,
-          won.WON.RequestSent
+          state => {
+            if (!state) return won.WON.RequestSent; //fallback if no state present
+            if (state === won.WON.Connected) return won.WON.Connected; //stay in connected if it was already the case
+            if (state === won.WON.RequestReceived) return won.WON.Connected;
+            if (state === won.WON.Suggested) return won.WON.RequestSent;
+            if (state === won.WON.Closed) return won.WON.RequestSent;
+            return won.WON.RequestSent;
+          }
         );
+
         return addMessage(stateUpdated, action.payload.event, false);
       } else {
         console.warn(
@@ -513,11 +521,12 @@ export default function(allAtomsInState = initialState, action = {}) {
             allAtomsInState,
             connUri,
             state => {
-              if (!state) return won.WON.RequestReceived; //fallback if no state present
+              if (!state) return won.WON.RequestSent; //fallback if no state present
               if (state === won.WON.Connected) return won.WON.Connected; //stay in connected if it was already the case
-              if (state === won.WON.RequestSent) return won.WON.Connected;
-              if (state === won.WON.Suggested) return won.WON.RequestReceived;
-              if (state === won.WON.Closed) return won.WON.RequestReceived;
+              if (state === won.WON.RequestSent) return won.WON.RequestSent;
+              if (state === won.WON.RequestReceived) return won.WON.Connected;
+              if (state === won.WON.Suggested) return won.WON.RequestSent;
+              if (state === won.WON.Closed) return won.WON.RequestSent;
               return won.WON.RequestReceived;
             }
           );

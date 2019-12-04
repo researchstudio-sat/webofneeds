@@ -532,17 +532,17 @@ export function processConnectMessage(wonMessage) {
 
     const receiverConnectionUri = get(
       atomUtils.getConnectionBySocketUris(
-        senderAtom,
-        senderSocketUri,
-        targetSocketUri
+        recipientAtom,
+        targetSocketUri,
+        senderSocketUri
       ),
       "uri"
     );
     const senderConnectionUri = get(
       atomUtils.getConnectionBySocketUris(
-        recipientAtom,
-        targetSocketUri,
-        senderSocketUri
+        senderAtom,
+        senderSocketUri,
+        targetSocketUri
       ),
       "uri"
     );
@@ -649,17 +649,21 @@ export function processConnectMessage(wonMessage) {
 
         if (receiverConnectionRelevant) {
           const newRecipientAtom = getIn(newState, ["atoms", recipientAtomUri]);
-          const newReceiverConnectionUri = atomUtils.getConnectionBySocketUris(
-            senderAtom,
-            senderSocketUri,
-            targetSocketUri
+          const newReceiverConnection = atomUtils.getConnectionBySocketUris(
+            newRecipientAtom,
+            targetSocketUri,
+            senderSocketUri
           );
 
-          console.debug("Change ReceiverConnectionState ", newRecipientAtom);
+          console.debug(
+            "Change ReceiverConnectionState ",
+            newRecipientAtom,
+            recipientAtom
+          );
           dispatch({
             type: actionTypes.messages.connectMessageReceived,
             payload: {
-              updatedConnectionUri: newReceiverConnectionUri,
+              updatedConnectionUri: get(newReceiverConnection, "uri"),
               ownedAtomUri: recipientAtomUri,
               message: wonMessage,
             },
@@ -668,17 +672,21 @@ export function processConnectMessage(wonMessage) {
 
         if (senderConnectionRelevant) {
           const newSenderAtom = getIn(newState, ["atoms", senderAtomUri]);
-          const newSenderConnectionUri = atomUtils.getConnectionBySocketUris(
-            recipientAtom,
-            targetSocketUri,
-            senderSocketUri
+          const newSenderConnection = atomUtils.getConnectionBySocketUris(
+            newSenderAtom,
+            senderSocketUri,
+            targetSocketUri
           );
 
-          console.debug("Change SenderConnectionState ", newSenderAtom);
+          console.debug(
+            "Change SenderConnectionState ",
+            newSenderAtom,
+            senderAtom
+          );
           dispatch({
             type: actionTypes.messages.connectMessageSent,
             payload: {
-              senderConnectionUri: newSenderConnectionUri,
+              updatedConnectionUri: get(newSenderConnection, "uri"),
               senderAtomUri: senderAtomUri,
               event: wonMessage,
             },
