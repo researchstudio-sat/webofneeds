@@ -49,8 +49,8 @@ public class OwnerManagementService implements ApplicationManagementService {
     }
 
     public String getEndpointForMessage(String methodName, String ownerApplicationID) {
-        OwnerApplication ownerApplication = ownerApplicationRepository.findByOwnerApplicationId(ownerApplicationID)
-                        .get(0);
+        OwnerApplication ownerApplication = ownerApplicationRepository.findOneByOwnerApplicationId(ownerApplicationID)
+                        .get();
         List<String> queueNames = ownerApplication.getQueueNames();
         String endpoint = "";
         for (int i = 0; i < queueNames.size(); i++) {

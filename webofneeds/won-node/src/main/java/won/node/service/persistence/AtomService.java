@@ -420,14 +420,14 @@ public class AtomService {
         String stopwatchName = getClass().getName() + ".authorizeOwnerApplicationForAtom";
         Stopwatch stopwatch = SimonManager.getStopwatch(stopwatchName + "_phase1");
         Split split = stopwatch.start();
-        List<OwnerApplication> ownerApplications = ownerApplicationRepository
-                        .findByOwnerApplicationId(ownerApplicationID);
+        Optional<OwnerApplication> ownerApplications = ownerApplicationRepository
+                        .findOneByOwnerApplicationId(ownerApplicationID);
         split.stop();
         stopwatch = SimonManager.getStopwatch(stopwatchName + "_phase2");
         split = stopwatch.start();
-        if (ownerApplications.size() > 0) {
+        if (ownerApplications.isPresent()) {
             logger.debug("owner application is already known");
-            OwnerApplication ownerApplication = ownerApplications.get(0);
+            OwnerApplication ownerApplication = ownerApplications.get();
             List<OwnerApplication> authorizedApplications = atom.getAuthorizedApplications();
             if (authorizedApplications == null) {
                 authorizedApplications = new ArrayList<OwnerApplication>(1);
