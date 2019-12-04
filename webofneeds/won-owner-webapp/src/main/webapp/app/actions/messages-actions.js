@@ -258,6 +258,7 @@ export function processConnectionMessage(wonMessage) {
         targetAtomUri
       );
 
+      let sentEventPromise;
       if (isSentEvent) {
         const senderAtom = get(state, ["atoms", senderAtomUri]);
         const senderConnection = atomUtils.getConnectionBySocketUris(
@@ -268,14 +269,17 @@ export function processConnectionMessage(wonMessage) {
 
         const senderConnectionUri = get(senderConnection, "uri");
 
-        processMessageEffectsAndMessage(
+        sentEventPromise = processMessageEffectsAndMessage(
           wonMessage,
           senderAtomUri,
           senderConnectionUri,
           dispatch
-        );
+        ).then(() => true);
+      } else {
+        sentEventPromise.resolve(false);
       }
 
+      let receivedEventPromise;
       if (isReceivedEvent) {
         const targetAtom = get(state, ["atoms", targetAtomUri]);
         const targetConnection = atomUtils.getConnectionBySocketUris(
@@ -286,13 +290,31 @@ export function processConnectionMessage(wonMessage) {
 
         const targetConnectionUri = get(targetConnection, "uri");
 
-        processMessageEffectsAndMessage(
-          wonMessage,
-          targetAtomUri,
-          targetConnectionUri,
-          dispatch
-        );
+        receivedEventPromise
+          .processMessageEffectsAndMessage(
+            wonMessage,
+            targetAtomUri,
+            targetConnectionUri,
+            dispatch
+          )
+          .then(() => true);
+      } else {
+        receivedEventPromise.resolve(false);
       }
+
+      Promise.all([sentEventPromise, receivedEventPromise]).then(
+        ([isSentEvent, isReceivedEvent]) => {
+          isReceivedEvent &&
+            console.debug("connection Message is Relevant for receiver");
+          isSentEvent &&
+            console.debug("connection Message is Relevant for sender");
+
+          dispatch({
+            type: actionTypes.messages.processConnectionMessage,
+            payload: wonMessage,
+          });
+        }
+      );
     } else {
       dispatch({
         type: actionTypes.messages.processConnectionMessage,
@@ -320,7 +342,7 @@ function processMessageEffectsAndMessage(
     },
   });
 
-  ownerApi
+  const petriNetPromise = ownerApi
     .getPetriNetUris(connectionUri)
     .then(response => {
       const petriNetData = {};
@@ -352,8 +374,7 @@ function processMessageEffectsAndMessage(
       });
     });
 
-  //PETRINET DATA PART END **************************
-  ownerApi
+  const messageEffectsPromise = ownerApi
     .getMessageEffects(connectionUri, wonMessage.getMessageUri())
     .then(response => {
       for (const effect of response) {
@@ -482,12 +503,9 @@ function processMessageEffectsAndMessage(
             break;
         }
       }
-
-      dispatch({
-        type: actionTypes.messages.processConnectionMessage,
-        payload: wonMessage,
-      });
     });
+
+  return Promise.all([petriNetPromise, messageEffectsPromise]);
 }
 
 export function processConnectMessage(wonMessage) {

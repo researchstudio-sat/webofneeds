@@ -65,66 +65,27 @@ export function addMessage(
         state = addAtomStub(state, senderAtomUri);
       }
 
-      let connectionUri;
-      let atomUri;
       if (senderConnection) {
-        connectionUri = get(senderConnection, "uri");
-        atomUri = senderAtomUri;
+        const senderConnectionUri = get(senderConnection, "uri");
+        console.debug(
+          "Store message in senderConnection(",
+          senderConnectionUri,
+          "):",
+          senderConnection
+        );
         parsedMessage = parsedMessage.setIn(["data", "outgoingMessage"], true);
-      }
 
-      if (targetConnection) {
-        connectionUri = get(targetConnection, "uri");
-        atomUri = targetAtomUri;
-        parsedMessage = parsedMessage.setIn(["data", "outgoingMessage"], false);
-
-        if (
-          parsedMessage.getIn(["data", "unread"]) &&
-          !connectionSelectors.isChatToGroupConnection(
-            state,
-            getIn(state, [atomUri, "connections", connectionUri])
-          )
-        ) {
-          //If there is a new message for the connection we will set the connection to newConnection
-          state = state.setIn(
-            [atomUri, "lastUpdateDate"],
-            parsedMessage.getIn(["data", "date"])
-          );
-          state = state.setIn([atomUri, "unread"], true);
-          state = state.setIn(
-            [atomUri, "connections", connectionUri, "lastUpdateDate"],
-            parsedMessage.getIn(["data", "date"])
-          );
-          state = state.setIn(
-            [atomUri, "connections", connectionUri, "unread"],
-            true
-          );
-        }
-      }
-
-      if (atomUri) {
         let messages = state.getIn([
-          atomUri,
+          senderAtomUri,
           "connections",
-          connectionUri,
+          senderConnectionUri,
           "messages",
         ]);
-        if (!messages) {
+        console.debug("already stored messages: ", messages);
+        if (messages) {
+          console.debug("messages exist adding new message");
           //ignore messages for nonexistant connections
-          return state;
-        }
 
-        /*
-        Group Chat messages that are received are in the form of injected/referenced messages
-        But we do not want to display these messages in that manner, therefore we simply ignore
-        the encapsulating message and not store it within our state.
-        */
-        if (
-          !connectionSelectors.isChatToGroupConnection(
-            state,
-            getIn(state, [atomUri, "connections", connectionUri])
-          )
-        ) {
           const existingMessage = messages.get(
             parsedMessage.getIn(["data", "uri"])
           );
@@ -145,12 +106,103 @@ export function addMessage(
             parsedMessage.getIn(["data", "uri"]),
             parsedMessage.get("data")
           );
+          console.debug("new stored messages: ", messages);
+
+          state = state.setIn(
+            [senderAtomUri, "connections", senderConnectionUri, "messages"],
+            messages
+          );
+        }
+      }
+
+      if (targetConnection) {
+        const targetConnectionUri = get(targetConnection, "uri");
+        console.debug(
+          "Store message in targetConnection(",
+          targetConnectionUri,
+          "):",
+          targetConnection
+        );
+        parsedMessage = parsedMessage.setIn(["data", "outgoingMessage"], false);
+
+        if (
+          parsedMessage.getIn(["data", "unread"]) &&
+          !connectionSelectors.isChatToGroupConnection(
+            state,
+            getIn(state, [targetAtomUri, "connections", targetConnectionUri])
+          )
+        ) {
+          //If there is a new message for the connection we will set the connection to newConnection
+          state = state.setIn(
+            [targetAtomUri, "lastUpdateDate"],
+            parsedMessage.getIn(["data", "date"])
+          );
+          state = state.setIn([targetAtomUri, "unread"], true);
+          state = state.setIn(
+            [
+              targetAtomUri,
+              "connections",
+              targetConnectionUri,
+              "lastUpdateDate",
+            ],
+            parsedMessage.getIn(["data", "date"])
+          );
+          state = state.setIn(
+            [targetAtomUri, "connections", targetConnectionUri, "unread"],
+            true
+          );
         }
 
-        return state.setIn(
-          [atomUri, "connections", connectionUri, "messages"],
-          messages
-        );
+        let messages = state.getIn([
+          targetAtomUri,
+          "connections",
+          targetConnectionUri,
+          "messages",
+        ]);
+        console.debug("already stored messages: ", messages);
+        if (messages) {
+          console.debug("messages exist adding new message");
+          //ignore messages for nonexistant connections
+
+          /*
+            Group Chat messages that are received are in the form of injected/referenced messages
+            But we do not want to display these messages in that manner, therefore we simply ignore
+            the encapsulating message and not store it within our state.
+            */
+          if (
+            !connectionSelectors.isChatToGroupConnection(
+              state,
+              getIn(state, [targetAtomUri, "connections", targetConnectionUri])
+            )
+          ) {
+            const existingMessage = messages.get(
+              parsedMessage.getIn(["data", "uri"])
+            );
+
+            const isReceivedByOwn = !!get(existingMessage, "isReceivedByOwn");
+            const isReceivedByRemote = !!get(
+              existingMessage,
+              "isReceivedByRemote"
+            );
+
+            if (!alreadyProcessed && (isReceivedByOwn || isReceivedByRemote)) {
+              parsedMessage = parsedMessage
+                .setIn(["data", "isReceivedByOwn"], isReceivedByOwn)
+                .setIn(["data", "isReceivedByRemote"], isReceivedByRemote);
+            }
+
+            messages = messages.set(
+              parsedMessage.getIn(["data", "uri"]),
+              parsedMessage.get("data")
+            );
+            console.debug("new stored messages: ", messages);
+          }
+
+          state = state.setIn(
+            [targetAtomUri, "connections", targetConnectionUri, "messages"],
+            messages
+          );
+        }
       }
     }
   }
