@@ -571,129 +571,121 @@ export function processConnectMessage(wonMessage) {
       );
     }
 
-    let senderCP;
-    if (!senderConnectionUri && isOwnSenderAtom) {
-      senderCP = stateStore
-        .fetchActiveConnectionAndDispatchBySocketUris(
-          senderSocketUri,
-          targetSocketUri,
-          senderAtomUri,
-          dispatch
-        )
-        .then(() => true);
-    } else if (!senderConnectionUri || !isOwnSenderAtom) {
-      console.debug(
-        "senderConnectionUri was null or senderAtom is not ownedAtom, resolve promise with undefined -> ignore the connection"
-      );
-      senderCP = Promise.resolve(false);
-    } else if (
-      senderAtom &&
-      senderAtom.getIn(["connections", senderConnectionUri])
-    ) {
-      console.debug(
-        "senderConnection relevant, resolve with true -> handle the connection"
-      );
-      senderCP = Promise.resolve(true);
-    } else {
-      senderCP = stateStore
-        .fetchActiveConnectionAndDispatch(
-          senderConnectionUri,
-          senderAtomUri,
-          dispatch
-        )
-        .then(() => true);
-    }
-
-    let receiverCP;
-    if (!receiverConnectionUri && isOwnRecipientAtom) {
-      receiverCP = stateStore
-        .fetchActiveConnectionAndDispatchBySocketUris(
-          targetSocketUri,
-          senderSocketUri,
-          recipientAtomUri,
-          dispatch
-        )
-        .then(() => true);
-    } else if (!receiverConnectionUri || !isOwnRecipientAtom) {
-      console.debug(
-        "receiverConnectionUri was null or recipientAtom is not ownedAtom, resolve promise with undefined -> ignore the connection"
-      );
-      receiverCP = Promise.resolve(false);
-    } else if (
-      recipientAtom &&
-      recipientAtom.getIn(["connections", receiverConnectionUri])
-    ) {
-      console.debug(
-        "receiverConnection relevant, resolve with true -> handle the connection"
-      );
-      receiverCP = Promise.resolve(true);
-    } else {
-      receiverCP = stateStore
-        .fetchActiveConnectionAndDispatch(
-          receiverConnectionUri,
-          recipientAtomUri,
-          dispatch
-        )
-        .then(() => true);
-    }
-
-    //we have to retrieve the personas too
-    Promise.all([senderCP, receiverCP, senderAtomP, recipientAtomP]).then(
-      ([
-        senderConnectionRelevant,
-        receiverConnectionRelevant,
-        senderAtom,
-        recipientAtom,
-      ]) => {
-        const newState = getState();
-
-        if (receiverConnectionRelevant) {
-          const newRecipientAtom = getIn(newState, ["atoms", recipientAtomUri]);
-          const newReceiverConnection = atomUtils.getConnectionBySocketUris(
-            newRecipientAtom,
-            targetSocketUri,
-            senderSocketUri
-          );
-
-          console.debug(
-            "Change ReceiverConnectionState ",
-            newRecipientAtom,
-            recipientAtom
-          );
-          dispatch({
-            type: actionTypes.messages.connectMessageReceived,
-            payload: {
-              updatedConnectionUri: get(newReceiverConnection, "uri"),
-              ownedAtomUri: recipientAtomUri,
-              message: wonMessage,
-            },
-          });
-        }
-
-        if (senderConnectionRelevant) {
-          const newSenderAtom = getIn(newState, ["atoms", senderAtomUri]);
-          const newSenderConnection = atomUtils.getConnectionBySocketUris(
-            newSenderAtom,
+    Promise.all([senderAtomP, recipientAtomP]).then(() => {
+      let senderCP;
+      if (!senderConnectionUri && isOwnSenderAtom) {
+        senderCP = stateStore
+          .fetchActiveConnectionAndDispatchBySocketUris(
             senderSocketUri,
-            targetSocketUri
-          );
-
-          console.debug(
-            "Change SenderConnectionState ",
-            newSenderAtom,
-            senderAtom
-          );
-          dispatch({
-            type: actionTypes.messages.connectMessageSent,
-            payload: {
-              updatedConnectionUri: get(newSenderConnection, "uri"),
-              senderAtomUri: senderAtomUri,
-              event: wonMessage,
-            },
-          });
-        }
+            targetSocketUri,
+            senderAtomUri,
+            dispatch
+          )
+          .then(() => true);
+      } else if (!senderConnectionUri || !isOwnSenderAtom) {
+        console.debug(
+          "senderConnectionUri was null or senderAtom is not ownedAtom, resolve promise with undefined -> ignore the connection"
+        );
+        senderCP = Promise.resolve(false);
+      } else if (
+        senderAtom &&
+        senderAtom.getIn(["connections", senderConnectionUri])
+      ) {
+        console.debug(
+          "senderConnection relevant, resolve with true -> handle the connection"
+        );
+        senderCP = Promise.resolve(true);
+      } else {
+        senderCP = stateStore
+          .fetchActiveConnectionAndDispatch(
+            senderConnectionUri,
+            senderAtomUri,
+            dispatch
+          )
+          .then(() => true);
       }
-    );
+
+      let receiverCP;
+      if (!receiverConnectionUri && isOwnRecipientAtom) {
+        receiverCP = stateStore
+          .fetchActiveConnectionAndDispatchBySocketUris(
+            targetSocketUri,
+            senderSocketUri,
+            recipientAtomUri,
+            dispatch
+          )
+          .then(() => true);
+      } else if (!receiverConnectionUri || !isOwnRecipientAtom) {
+        console.debug(
+          "receiverConnectionUri was null or recipientAtom is not ownedAtom, resolve promise with undefined -> ignore the connection"
+        );
+        receiverCP = Promise.resolve(false);
+      } else if (
+        recipientAtom &&
+        recipientAtom.getIn(["connections", receiverConnectionUri])
+      ) {
+        console.debug(
+          "receiverConnection relevant, resolve with true -> handle the connection"
+        );
+        receiverCP = Promise.resolve(true);
+      } else {
+        receiverCP = stateStore
+          .fetchActiveConnectionAndDispatch(
+            receiverConnectionUri,
+            recipientAtomUri,
+            dispatch
+          )
+          .then(() => true);
+      }
+
+      //we have to retrieve the personas too
+      Promise.all([senderCP, receiverCP]).then(
+        ([senderConnectionRelevant, receiverConnectionRelevant]) => {
+          const newState = getState();
+
+          if (receiverConnectionRelevant) {
+            const newRecipientAtom = getIn(newState, [
+              "atoms",
+              recipientAtomUri,
+            ]);
+            const newReceiverConnection = atomUtils.getConnectionBySocketUris(
+              newRecipientAtom,
+              targetSocketUri,
+              senderSocketUri
+            );
+
+            console.debug("Change ReceiverConnectionState ", newRecipientAtom);
+            dispatch({
+              type: actionTypes.messages.connectMessageReceived,
+              payload: {
+                updatedConnectionUri: get(newReceiverConnection, "uri"),
+                ownedAtomUri: recipientAtomUri,
+                message: wonMessage,
+              },
+            });
+          }
+
+          if (senderConnectionRelevant) {
+            const newSenderAtom = getIn(newState, ["atoms", senderAtomUri]);
+            const newSenderConnection = atomUtils.getConnectionBySocketUris(
+              newSenderAtom,
+              senderSocketUri,
+              targetSocketUri
+            );
+
+            console.debug("Change SenderConnectionState ", newSenderAtom);
+            dispatch({
+              type: actionTypes.messages.connectMessageSent,
+              payload: {
+                updatedConnectionUri: get(newSenderConnection, "uri"),
+                senderAtomUri: senderAtomUri,
+                event: wonMessage,
+              },
+            });
+          }
+        }
+      );
+    });
   };
 }
 
