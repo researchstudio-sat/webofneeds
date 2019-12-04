@@ -929,48 +929,53 @@ won.DomainObjectFactory.prototype = {
   jsonLdToWonDomainObjects: function(/*jsonLdContent*/) {},
 };
 
-won.wonMessageFromJsonLd = async function(wonMessageAsJsonLD) {
-  const expandedJsonLd = await jsonld.promises.expand(wonMessageAsJsonLD);
-  const wonMessage = new WonMessage(expandedJsonLd);
+won.wonMessageFromJsonLd = function(wonMessageAsJsonLD) {
+  return jsonld.promises.expand(wonMessageAsJsonLD).then(expandedJsonLd => {
+    const wonMessage = new WonMessage(expandedJsonLd);
 
-  await wonMessage.frameInPromise();
-  await wonMessage.generateContentGraphTrig();
-  await wonMessage.generateCompactedFramedMessage();
-  await wonMessage.generateContainedForwardedWonMessages();
+    return wonMessage
+      .frameInPromise()
+      .then(() => wonMessage.generateContentGraphTrig())
+      .then(() => wonMessage.generateCompactedFramedMessage())
+      .then(() => wonMessage.generateContainedForwardedWonMessages())
+      .then(() => {
+        if (wonMessage.hasParseErrors() && !wonMessage.isResponse()) {
+          console.warn(
+            "wonMessage<",
+            wonMessage.getMessageUri(),
+            "> msgType<",
+            wonMessage.getMessageType(),
+            "> ParseError: {" + wonMessage.parseErrors,
+            "} wonMessage: ",
+            wonMessage
+          );
+        }
+        if (wonMessage.hasContainedForwardedWonMessages()) {
+          console.debug(
+            "wonMessage<",
+            wonMessage.getMessageUri(),
+            "> msgType<",
+            wonMessage.getMessageType(),
+            "> contains forwardedMessages wonMessage: ",
+            wonMessage
+          );
+          wonMessage
+            .getContainedForwardedWonMessages()
+            .map(forwardedWonMessage => {
+              console.debug(
+                "-- forwardedMessage<",
+                forwardedWonMessage.getMessageUri(),
+                "> msgType<",
+                forwardedWonMessage.getMessageType(),
+                ">, forwardedWonMessage: ",
+                forwardedWonMessage
+              );
+            });
+        }
 
-  if (wonMessage.hasParseErrors() && !wonMessage.isResponse()) {
-    console.warn(
-      "wonMessage<",
-      wonMessage.getMessageUri(),
-      "> msgType<",
-      wonMessage.getMessageType(),
-      "> ParseError: {" + wonMessage.parseErrors,
-      "} wonMessage: ",
-      wonMessage
-    );
-  }
-  if (wonMessage.hasContainedForwardedWonMessages()) {
-    console.debug(
-      "wonMessage<",
-      wonMessage.getMessageUri(),
-      "> msgType<",
-      wonMessage.getMessageType(),
-      "> contains forwardedMessages wonMessage: ",
-      wonMessage
-    );
-    wonMessage.getContainedForwardedWonMessages().map(forwardedWonMessage => {
-      console.debug(
-        "-- forwardedMessage<",
-        forwardedWonMessage.getMessageUri(),
-        "> msgType<",
-        forwardedWonMessage.getMessageType(),
-        ">, forwardedWonMessage: ",
-        forwardedWonMessage
-      );
-    });
-  }
-
-  return wonMessage;
+        return wonMessage;
+      });
+  });
 };
 
 /**
