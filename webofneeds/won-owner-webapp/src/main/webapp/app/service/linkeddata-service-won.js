@@ -1169,7 +1169,15 @@ import won from "./won.js";
   won.getWonMessage = (msgUri, fetchParams) => {
     return won
       .getRawEvent(msgUri, fetchParams)
-      .then(rawEvent => won.wonMessageFromJsonLd(rawEvent))
+      .then(rawEvent => {
+        console.debug(
+          "getWonMessage of rawEvent(uri:",
+          msgUri,
+          "): ",
+          rawEvent
+        );
+        return won.wonMessageFromJsonLd(rawEvent);
+      })
       .catch(e => {
         const msg = "Failed to get wonMessage " + msgUri + ".";
         e.message += msg;
@@ -1179,6 +1187,7 @@ import won from "./won.js";
   };
 
   window.getWonMessage4dbg = won.getWonMessage;
+  window.wonMessageFromJsonLd4dbg = won.wonMessageFromJsonLd;
 
   won.getRawEvent = (eventUri, fetchParams) => {
     return won

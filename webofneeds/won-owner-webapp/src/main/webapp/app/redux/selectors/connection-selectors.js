@@ -104,6 +104,7 @@ export function getBuddyConnectionsByAtomUri(
 export function getChatConnectionsToCrawl(state) {
   const allAtoms = getAtoms(state);
   const ownedAtoms = getOwnedAtoms(state);
+  const process = get(state, "process");
   const allConnections =
     ownedAtoms && ownedAtoms.flatMap(atom => atom.get("connections"));
 
@@ -112,12 +113,12 @@ export function getChatConnectionsToCrawl(state) {
     allConnections
       .filter(conn => {
         const connUri = get(conn, "uri");
-        const process = get(state, "process");
 
         return (
           !processUtils.isConnectionLoading(process, connUri) &&
           !processUtils.isConnectionLoadingMessages(process, connUri) &&
-          !processUtils.hasConnectionFailedToLoad(process, connUri)
+          !processUtils.hasConnectionFailedToLoad(process, connUri) &&
+          processUtils.hasMessagesToLoad(process, connUri)
         );
       })
       .filter(
