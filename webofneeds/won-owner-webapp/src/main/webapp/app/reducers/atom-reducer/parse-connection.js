@@ -1,6 +1,6 @@
 import Immutable from "immutable";
 import won from "../../won-es6.js";
-import { get } from "../../utils.js";
+import { get, is } from "../../utils.js";
 import { isUriRead } from "../../won-localstorage.js";
 
 export function parseMetaConnection(metaConnection) {
@@ -95,6 +95,7 @@ export function parseConnection(jsonldConnection) {
     data: {
       uri: get(jsonldConnectionImm, "uri"),
       state: get(jsonldConnectionImm, "connectionState"),
+      previousState: get(jsonldConnectionImm, "previousConnectionState"),
       messages: Immutable.Map(),
       socketUri: get(jsonldConnectionImm, "socket"),
       targetSocketUri: get(jsonldConnectionImm, "targetSocket"),
@@ -122,6 +123,32 @@ export function parseConnection(jsonldConnection) {
       multiSelectType: undefined,
     },
   };
+
+  /*THE CONTENT OF THIS IF CLAUSE IS THE MOST FUGLY WORKAROUND/QUICKFIX THAT I WAS ABLE TO IMAGINE
+  * this is supposed to fix the problem that sometimes connections are retrieved with two connectionStates
+  * due to our rdfstore use
+  * */
+  if (
+    parsedConnection.data.state &&
+    !is("String", parsedConnection.data.state)
+  ) {
+    console.debug(
+      "connectionState contains multiple states, initiating the f*gly workaround..."
+    );
+    const stateArray = parsedConnection.data.state.filter(
+      item => item !== parsedConnection.data.previousState
+    );
+    if (stateArray && stateArray.length == 1) {
+      parsedConnection.data.state = stateArray[0];
+    } else {
+      console.debug(
+        "Can't parse the connection(",
+        parsedConnection.data.uri,
+        ") due to multiple connectionStates stored: ",
+        stateArray
+      );
+    }
+  }
 
   if (
     !parsedConnection.data.socketUri ||

@@ -32,7 +32,9 @@ export async function ensureLoggedIn(dispatch, getState) {
 
   const privateId = wonUtils.generatePrivateId();
   try {
-    await accountRegister({ privateId })(dispatch, getState);
+    await accountRegister({ privateId })(dispatch, getState).then(
+      () => new Promise(resolve => setTimeout(resolve, 1500))
+    );
   } catch (err) {
     console.error(
       `Creating temporary account (${privateId}) has failed due to `,
