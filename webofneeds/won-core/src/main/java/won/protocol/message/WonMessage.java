@@ -312,11 +312,57 @@ public class WonMessage implements Serializable {
      */
     public Set<WonMessage> getForwardedMessages() {
         if (this.messages == null) {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
         return this.messages.entrySet().stream()
                         .filter(e -> headMessage.getForwardedMessageURIs().contains(e.getKey()))
                         .map(e -> e.getValue())
+                        .collect(Collectors.toSet());
+    }
+
+    public WonMessage getHeadAndForwarded(boolean recursive) {
+        Set<WonMessage> msgs = new HashSet<WonMessage>();
+        msgs.add(headMessage);
+        Set<WonMessage> forwarded = null;
+        if (recursive) {
+            forwarded = getForwardedByRecursively(headMessage.getMessageURIRequired(), new HashSet<URI>());
+        } else {
+            forwarded = getForwardedBy(headMessage.getMessageURIRequired());
+        }
+        msgs.addAll(forwarded);
+        return WonMessage.of(msgs);
+    }
+
+    private Set<WonMessage> getForwardedBy(URI msg) {
+        if (this.messages == null) {
+            return Collections.emptySet();
+        }
+        WonMessage forwarding = messages.get(msg);
+        if (forwarding == null) {
+            return Collections.emptySet();
+        }
+        return forwarding
+                        .getForwardedMessageURIs()
+                        .stream()
+                        .map(f -> messages.get(f))
+                        .filter(x -> x != null)
+                        .collect(Collectors.toSet());
+    }
+
+    private Set<WonMessage> getForwardedByRecursively(URI msg, Set<URI> visited) {
+        if (this.messages == null) {
+            return Collections.emptySet();
+        }
+        WonMessage forwarding = messages.get(msg);
+        if (forwarding == null) {
+            return Collections.emptySet();
+        }
+        visited.add(msg);
+        return forwarding
+                        .getForwardedMessageURIs()
+                        .stream()
+                        .filter(f -> !visited.contains(f))
+                        .flatMap(f -> getForwardedByRecursively(f, visited).stream())
                         .collect(Collectors.toSet());
     }
 

@@ -13,16 +13,17 @@ package won.protocol.util;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Optional;
 
-import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchAtomException;
+import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchOwnerApplicationException;
-import won.protocol.model.Connection;
 import won.protocol.model.Atom;
+import won.protocol.model.Connection;
 import won.protocol.model.OwnerApplication;
 import won.protocol.model.WonNode;
-import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.AtomRepository;
+import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.OwnerApplicationRepository;
 import won.protocol.repository.WonNodeRepository;
 
@@ -66,15 +67,11 @@ public class DataAccessUtils {
 
     public static String loadOwnerApplication(OwnerApplicationRepository ownerApplicationRepository,
                     final String ownerApplicationId) throws NoSuchOwnerApplicationException {
-        List<OwnerApplication> ownerApplications = ownerApplicationRepository
-                        .findByOwnerApplicationId(ownerApplicationId);
-        if (ownerApplications.size() == 0)
+        Optional<OwnerApplication> ownerApplications = ownerApplicationRepository
+                        .findOneByOwnerApplicationId(ownerApplicationId);
+        if (!ownerApplications.isPresent())
             throw new NoSuchOwnerApplicationException();
-        if (ownerApplications.size() > 1)
-            throw new IllegalStateException(MessageFormat.format(
-                            "Inconsistent database state detected: multiple connections found with URI {0}",
-                            ownerApplicationId));
-        return ownerApplications.get(0).getOwnerApplicationId();
+        return ownerApplications.get().getOwnerApplicationId();
     }
 
     public static Connection loadConnection(ConnectionRepository connectionRepository, final Long id)

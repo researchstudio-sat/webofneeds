@@ -1,0 +1,14 @@
+@prefix ex: <http://example.com/>.
+@prefix sub: <http://example.com/atom1#>.
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix won: <https://w3id.org/won/core#>.
+@prefix group: <https://w3id.org/won/ext/group#>.
+@prefix hold: <https://w3id.org/won/ext/hold#>.
+@prefix chat: <https://w3id.org/won/ext/chat#>.
+
+ex:atom1 a won:Atom ;
+    dc:title "Test Group" ;
+    won:socket sub:groupSocket ;
+    won:socket sub:socket2 .
+sub:groupSocket won:socketDefinition group:GroupSocket. 
+sub:socket2 won:socketDefinition hold:HoldableSocket. 

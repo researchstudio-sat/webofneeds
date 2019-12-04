@@ -54,7 +54,11 @@ public class SignatureAddingWonMessageProcessor implements WonMessageProcessor {
         String webId = cryptographyService.getDefaultPrivateKeyAlias();
         PublicKey publicKey = cryptographyService.getPublicKey(webId);
         try {
-            return processWithKey(message, webId, privateKey, publicKey);
+            List<WonMessage> ret = new ArrayList<WonMessage>();
+            for (WonMessage part : message.getAllMessages()) {
+                ret.add(processWithKey(part, webId, privateKey, publicKey));
+            }
+            return WonMessage.of(ret);
         } catch (Exception e) {
             logger.error("Failed to sign", e);
             throw new WonMessageProcessingException("Failed to sign message " + message.getMessageURI().toString());
