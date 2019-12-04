@@ -268,7 +268,7 @@ export function processConnectionMessage(wonMessage) {
 
         const senderConnectionUri = get(senderConnection, "uri");
 
-        processMessageEffects(
+        processMessageEffectsAndMessage(
           wonMessage,
           senderAtomUri,
           senderConnectionUri,
@@ -286,7 +286,7 @@ export function processConnectionMessage(wonMessage) {
 
         const targetConnectionUri = get(targetConnection, "uri");
 
-        processMessageEffects(
+        processMessageEffectsAndMessage(
           wonMessage,
           targetAtomUri,
           targetConnectionUri,
@@ -302,7 +302,12 @@ export function processConnectionMessage(wonMessage) {
   };
 }
 
-function processMessageEffects(wonMessage, atomUri, connectionUri, dispatch) {
+function processMessageEffectsAndMessage(
+  wonMessage,
+  atomUri,
+  connectionUri,
+  dispatch
+) {
   if (!atomUri || !connectionUri) {
     return;
   }

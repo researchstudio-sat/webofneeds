@@ -201,7 +201,7 @@ export function connectionsChatMessage(
             eventUri: jsonResp.messageUri,
             message: jsonResp.message,
             optimisticEvent,
-            socketUri: senderSocketUri,
+            senderSocketUri: senderSocketUri,
             targetSocketUri: targetSocketUri,
           },
         });
