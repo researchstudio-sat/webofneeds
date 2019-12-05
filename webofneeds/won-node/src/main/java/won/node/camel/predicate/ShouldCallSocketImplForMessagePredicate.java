@@ -37,10 +37,6 @@ public class ShouldCallSocketImplForMessagePredicate implements Predicate {
                 return false;
             case CREATE_ATOM:
                 return false;
-            case SUCCESS_RESPONSE:
-                return false;
-            case FAILURE_RESPONSE:
-                return false;
             case REPLACE:
                 return false;
             case CHANGE_NOTIFICATION:

@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.SocketMessageProcessor;
 import won.node.camel.service.WonCamelHelper;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageType;
 import won.protocol.vocabulary.WONMSG;
 import won.protocol.vocabulary.WXGROUP;
 
@@ -25,6 +27,9 @@ public class FailureResponseFromNodeGroupSocketImpl extends AbstractCamelProcess
 
     @Override
     public void process(final Exchange exchange) {
-        WonCamelHelper.suppressMessageToOwner(exchange);
+        WonMessage msg = WonCamelHelper.getMessageRequired(exchange);
+        if (msg.getRespondingToMessageTypeRequired() == WonMessageType.CONNECTION_MESSAGE) {
+            WonCamelHelper.suppressMessageToOwner(exchange);
+        }
     }
 }
