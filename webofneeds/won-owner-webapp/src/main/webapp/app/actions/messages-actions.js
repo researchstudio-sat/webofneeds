@@ -276,7 +276,7 @@ export function processConnectionMessage(wonMessage) {
           dispatch
         ).then(() => true);
       } else {
-        sentEventPromise.resolve(false);
+        sentEventPromise = Promise.resolve(false);
       }
 
       let receivedEventPromise;
@@ -290,16 +290,14 @@ export function processConnectionMessage(wonMessage) {
 
         const targetConnectionUri = get(targetConnection, "uri");
 
-        receivedEventPromise
-          .processMessageEffectsAndMessage(
-            wonMessage,
-            targetAtomUri,
-            targetConnectionUri,
-            dispatch
-          )
-          .then(() => true);
+        receivedEventPromise = processMessageEffectsAndMessage(
+          wonMessage,
+          targetAtomUri,
+          targetConnectionUri,
+          dispatch
+        ).then(() => true);
       } else {
-        receivedEventPromise.resolve(false);
+        receivedEventPromise = Promise.resolve(false);
       }
 
       Promise.all([sentEventPromise, receivedEventPromise]).then(
@@ -331,7 +329,7 @@ function processMessageEffectsAndMessage(
   dispatch
 ) {
   if (!atomUri || !connectionUri) {
-    return;
+    return Promise.resolve();
   }
 
   dispatch({
@@ -573,69 +571,51 @@ export function processConnectMessage(wonMessage) {
 
     Promise.all([senderAtomP, recipientAtomP]).then(() => {
       let senderCP;
-      if (!senderConnectionUri && isOwnSenderAtom) {
-        senderCP = stateStore
-          .fetchActiveConnectionAndDispatchBySocketUris(
-            senderSocketUri,
-            targetSocketUri,
-            senderAtomUri,
-            dispatch
-          )
-          .then(() => true);
-      } else if (!senderConnectionUri || !isOwnSenderAtom) {
+      if (isOwnSenderAtom) {
+        if (!senderConnectionUri) {
+          senderCP = stateStore
+            .fetchActiveConnectionAndDispatchBySocketUris(
+              senderSocketUri,
+              targetSocketUri,
+              senderAtomUri,
+              dispatch
+            )
+            .then(() => true);
+        } else {
+          console.debug(
+            "senderConnection relevant and we already have it, resolve with true -> handle the connection"
+          );
+          senderCP = Promise.resolve(true);
+        }
+      } else {
         console.debug(
-          "senderConnectionUri was null or senderAtom is not ownedAtom, resolve promise with undefined -> ignore the connection"
+          "senderAtom is not ownedAtom, resolve promise with undefined -> ignore the connection"
         );
         senderCP = Promise.resolve(false);
-      } else if (
-        senderAtom &&
-        senderAtom.getIn(["connections", senderConnectionUri])
-      ) {
-        console.debug(
-          "senderConnection relevant, resolve with true -> handle the connection"
-        );
-        senderCP = Promise.resolve(true);
-      } else {
-        senderCP = stateStore
-          .fetchActiveConnectionAndDispatch(
-            senderConnectionUri,
-            senderAtomUri,
-            dispatch
-          )
-          .then(() => true);
       }
 
       let receiverCP;
-      if (!receiverConnectionUri && isOwnRecipientAtom) {
-        receiverCP = stateStore
-          .fetchActiveConnectionAndDispatchBySocketUris(
-            targetSocketUri,
-            senderSocketUri,
-            recipientAtomUri,
-            dispatch
-          )
-          .then(() => true);
-      } else if (!receiverConnectionUri || !isOwnRecipientAtom) {
+      if (isOwnRecipientAtom) {
+        if (!receiverConnectionUri) {
+          receiverCP = stateStore
+            .fetchActiveConnectionAndDispatchBySocketUris(
+              targetSocketUri,
+              senderSocketUri,
+              recipientAtomUri,
+              dispatch
+            )
+            .then(() => true);
+        } else {
+          console.debug(
+            "targetConnection relevant and we already have it, resolve with true -> handle the connection"
+          );
+          receiverCP = Promise.resolve(true);
+        }
+      } else {
         console.debug(
-          "receiverConnectionUri was null or recipientAtom is not ownedAtom, resolve promise with undefined -> ignore the connection"
+          "targetAtom is not ownedAtom, resolve promise with undefined -> ignore the connection"
         );
         receiverCP = Promise.resolve(false);
-      } else if (
-        recipientAtom &&
-        recipientAtom.getIn(["connections", receiverConnectionUri])
-      ) {
-        console.debug(
-          "receiverConnection relevant, resolve with true -> handle the connection"
-        );
-        receiverCP = Promise.resolve(true);
-      } else {
-        receiverCP = stateStore
-          .fetchActiveConnectionAndDispatch(
-            receiverConnectionUri,
-            recipientAtomUri,
-            dispatch
-          )
-          .then(() => true);
       }
 
       //we have to retrieve the personas too
@@ -653,16 +633,24 @@ export function processConnectMessage(wonMessage) {
               targetSocketUri,
               senderSocketUri
             );
-
-            console.debug("Change ReceiverConnectionState ", newRecipientAtom);
-            dispatch({
-              type: actionTypes.messages.connectMessageReceived,
-              payload: {
-                updatedConnectionUri: get(newReceiverConnection, "uri"),
-                ownedAtomUri: recipientAtomUri,
-                message: wonMessage,
-              },
-            });
+            if (newReceiverConnection) {
+              console.debug(
+                "Change ReceiverConnectionState ",
+                newRecipientAtom
+              );
+              dispatch({
+                type: actionTypes.messages.connectMessageReceived,
+                payload: {
+                  updatedConnectionUri: get(newReceiverConnection, "uri"),
+                  ownedAtomUri: recipientAtomUri,
+                  message: wonMessage,
+                },
+              });
+            } else {
+              console.debug(
+                "Dont change ReceiverConnectionState, receiverConnection is not present yet"
+              );
+            }
           }
 
           if (senderConnectionRelevant) {
@@ -673,15 +661,21 @@ export function processConnectMessage(wonMessage) {
               targetSocketUri
             );
 
-            console.debug("Change SenderConnectionState ", newSenderAtom);
-            dispatch({
-              type: actionTypes.messages.connectMessageSent,
-              payload: {
-                updatedConnectionUri: get(newSenderConnection, "uri"),
-                senderAtomUri: senderAtomUri,
-                event: wonMessage,
-              },
-            });
+            if (newSenderConnection) {
+              console.debug("Change SenderConnectionState ", newSenderAtom);
+              dispatch({
+                type: actionTypes.messages.connectMessageSent,
+                payload: {
+                  updatedConnectionUri: get(newSenderConnection, "uri"),
+                  senderAtomUri: senderAtomUri,
+                  event: wonMessage,
+                },
+              });
+            } else {
+              console.debug(
+                "Dont change SenderConnectionState, senderConnection is not present yet"
+              );
+            }
           }
         }
       );
