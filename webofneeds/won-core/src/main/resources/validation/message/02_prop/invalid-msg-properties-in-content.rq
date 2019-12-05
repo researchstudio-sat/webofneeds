@@ -15,6 +15,7 @@ WHERE
     { 
       ?s ?p ?o 
       FILTER (STRSTARTS(str(?p),"https://w3id.org/won/message#"))
+      FILTER (STRSTARTS(str(?o),"https://w3id.org/won/message#"))
     } 
   } 
 }

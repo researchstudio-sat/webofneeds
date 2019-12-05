@@ -9,7 +9,7 @@ prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix local: <http://localhost:8080/won/resource/>
 prefix won:   <https://w3id.org/won/core#>
 prefix msg:   <https://w3id.org/won/message#>
-prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
+
 prefix ldp:   <http://www.w3.org/ns/ldp#>
 
 
@@ -21,16 +21,12 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
     ?numOfEnvelopes
 
     ?numOfEnvelopesWithoutParent
-    (if(?numOfEnvelopesWithoutParent!=1, "expected 1 parent envelope", "OK") AS ?parentEnvelopesCheck)
 
     ?numOfEnvelopesWithoutChild
-    (if(?numOfEnvelopesWithoutChild!=1, "expected 1 leaf envelope", "OK") AS ?leafEnvelopesCheck)
 
     ?numOfEnvelopesWithMultiChild
-    (if(?numOfEnvelopesWithMultiChild>0, "expected an envelope contains 1 or 0 child envelope", "OK") AS
-    ?multichildCheck)
 
-    (if(?numOfEnvelopesWithMultiChild>0 || ?numOfEnvelopesWithoutChild!=1 || ?numOfEnvelopesWithoutParent!=1, "FAIL", "OK") AS
+    (if(?numOfEnvelopes > 0 && ?numOfEnvelopes = ?numOfEnvelopesWithoutChild && ?numOfEnvelopes = ?numOfEnvelopesWithoutParent && ?numOfEnvelopesWithMultiChild = 0, "OK", "FAIL") AS
     ?check)
 
   WHERE

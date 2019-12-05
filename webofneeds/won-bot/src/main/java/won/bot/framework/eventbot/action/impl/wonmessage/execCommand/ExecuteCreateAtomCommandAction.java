@@ -10,11 +10,16 @@
  */
 package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -27,16 +32,12 @@ import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMATCH;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.List;
 
 /**
  * Action executing a CreateAtomCommandEvent, creating the specified atom.
@@ -84,9 +85,10 @@ public class ExecuteCreateAtomCommandAction extends BaseEventBotAction {
         WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         final URI atomURI = wonNodeInformationService.generateAtomURI(wonNodeUri);
         RdfUtils.renameResourceWithPrefix(atomDataset, atomResource.getURI(), atomURI.toString());
-        WonMessage createAtomMessage = createWonMessage(wonNodeInformationService, atomURI, wonNodeUri,
-                        atomDatasetWithSockets, createAtomCommandEvent.isUsedForTesting(),
+        WonMessage createAtomMessage = createWonMessage(atomURI, atomDatasetWithSockets,
+                        createAtomCommandEvent.isUsedForTesting(),
                         createAtomCommandEvent.isDoNotMatch());
+        createAtomMessage = getEventListenerContext().getWonMessageSender().prepareMessage(createAtomMessage);
         // remember the atom URI so we can react to success/failure responses
         EventBotActionUtils.rememberInList(getEventListenerContext(), atomURI, createAtomCommandEvent.getUriListName());
         EventListener successCallback = event12 -> {
@@ -107,12 +109,12 @@ public class ExecuteCreateAtomCommandAction extends BaseEventBotAction {
         EventBotActionUtils.makeAndSubscribeResponseListener(createAtomMessage, successCallback, failureCallback,
                         getEventListenerContext());
         logger.debug("registered listeners for response to message URI {}", createAtomMessage.getMessageURI());
-        getEventListenerContext().getWonMessageSender().sendWonMessage(createAtomMessage);
+        getEventListenerContext().getWonMessageSender().sendMessage(createAtomMessage);
         logger.debug("atom creation message sent with message URI {}", createAtomMessage.getMessageURI());
     }
 
-    private WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI atomURI,
-                    URI wonNodeURI, Dataset atomDataset, final boolean usedForTesting, final boolean doNotMatch)
+    private WonMessage createWonMessage(URI atomURI, Dataset atomDataset,
+                    final boolean usedForTesting, final boolean doNotMatch)
                     throws WonMessageBuilderException {
         RdfUtils.replaceBaseURI(atomDataset, atomURI.toString(), true);
         AtomModelWrapper atomModelWrapper = new AtomModelWrapper(atomDataset);
@@ -123,7 +125,11 @@ public class ExecuteCreateAtomCommandAction extends BaseEventBotAction {
         if (usedForTesting) {
             atomModelWrapper.addFlag(WONMATCH.UsedForTesting);
         }
-        return WonMessageBuilder.setMessagePropertiesForCreate(wonNodeInformationService.generateEventURI(wonNodeURI),
-                        atomURI, wonNodeURI).addContent(atomModelWrapper.copyDatasetWithoutSysinfo()).build();
+        return WonMessageBuilder
+                        .createAtom()
+                        .atom(atomURI)
+                        .content().dataset(atomModelWrapper.copyDatasetWithoutSysinfo())
+                        .direction().fromOwner()
+                        .build();
     }
 }

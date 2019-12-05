@@ -41,14 +41,8 @@ const mapStateToProps = (state, ownProps) => {
     ownProps.atomUri
   );
 
-  const chatSocketUri = atomUtils.getSocketUri(
-    atom,
-    won.CHAT.ChatSocketCompacted
-  );
-  const groupSocketUri = atomUtils.getSocketUri(
-    atom,
-    won.GROUP.GroupSocketCompacted
-  );
+  const chatSocketUri = atomUtils.getChatSocket(atom);
+  const groupSocketUri = atomUtils.getGroupSocket(atom);
 
   const atomLoading =
     !atom || processSelectors.isAtomLoading(state, ownProps.atomUri);
@@ -148,6 +142,8 @@ const mapDispatchToProps = dispatch => {
       trimmedMsg,
       additionalContent,
       referencedContent,
+      senderSocketUri,
+      targetSocketUri,
       connectionUri,
       isTTL
     ) => {
@@ -156,13 +152,21 @@ const mapDispatchToProps = dispatch => {
           trimmedMsg,
           additionalContent,
           referencedContent,
+          senderSocketUri,
+          targetSocketUri,
           connectionUri,
           isTTL
         )
       );
     },
-    connectionsOpen: (connectionUri, message) => {
-      dispatch(actionCreators.connections__open(connectionUri, message));
+    connectSockets: (senderSocketUri, targetSocketUri, message) => {
+      dispatch(
+        actionCreators.atoms__connectSockets(
+          senderSocketUri,
+          targetSocketUri,
+          message
+        )
+      );
     },
     atomReopen: atomUri => dispatch(actionCreators.atoms__reopen(atomUri)),
   };
@@ -332,11 +336,7 @@ class AtomInfo extends React.Component {
             .filter(conn => get(conn, "targetSocketUri") === connectToSocketUri)
             .filter(
               conn =>
-                get(conn, "socketUri") ===
-                atomUtils.getSocketUri(
-                  personaAtom,
-                  won.CHAT.ChatSocketCompacted
-                )
+                get(conn, "socketUri") === atomUtils.getChatSocket(personaAtom)
             );
 
           if (personaConnections.size == 0) {
@@ -357,13 +357,10 @@ class AtomInfo extends React.Component {
               connectionUtils.isSuggested(personaConnection) ||
               connectionUtils.isClosed(personaConnection)
             ) {
-              this.props.connect(
-                personaUri,
-                personaConnectionUri,
-                _atomUri,
-                message,
-                won.CHAT.ChatSocketCompacted,
-                targetSocketType
+              this.props.connectSockets(
+                get(personaConnection, "socketUri"),
+                get(personaConnection, "targetSocketUri"),
+                message
               );
             } else if (connectionUtils.isRequestSent(personaConnection)) {
               // Just go to the connection without sending another request
@@ -379,12 +376,22 @@ class AtomInfo extends React.Component {
               );
               */
             } else if (connectionUtils.isRequestReceived(personaConnection)) {
-              this.props.connectionsOpen(personaConnectionUri, message);
+              const senderSocketUri = get(personaConnection, "socketUri");
+              const targetSocketUri = get(personaConnection, "targetSocketUri");
+              this.props.connectSockets(
+                senderSocketUri,
+                targetSocketUri,
+                message
+              );
             } else if (connectionUtils.isConnected(personaConnection)) {
+              const senderSocketUri = get(personaConnection, "socketUri");
+              const targetSocketUri = get(personaConnection, "targetSocketUri");
               this.props.sendChatMessage(
                 message,
                 undefined,
                 undefined,
+                senderSocketUri,
+                targetSocketUri,
                 personaConnectionUri,
                 false
               );
@@ -461,7 +468,7 @@ AtomInfo.propTypes = {
   chatSocketUri: PropTypes.string,
   groupSocketUri: PropTypes.string,
   connect: PropTypes.func,
-  connectionsOpen: PropTypes.func,
+  connectSockets: PropTypes.func,
   sendChatMessage: PropTypes.func,
   atomReopen: PropTypes.func,
 };

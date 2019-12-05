@@ -23,13 +23,26 @@ import won.protocol.model.Connection;
  */
 public class WonMessageSentOnConnectionEvent extends WonMessageSentEvent
                 implements ConnectionSpecificEvent, AtomSpecificEvent, TargetAtomSpecificEvent {
-    public WonMessageSentOnConnectionEvent(final WonMessage message) {
+    private Connection con;
+
+    public WonMessageSentOnConnectionEvent(Connection con, final WonMessage message) {
         super(message);
+        this.con = con;
     }
 
     @Override
     public URI getConnectionURI() {
-        return getWonMessage().getSenderURI();
+        return getCon().getConnectionURI();
+    }
+
+    @Override
+    public URI getSocketURI() {
+        return getWonMessage().getSenderSocketURIRequired();
+    }
+
+    @Override
+    public URI getTargetSocketURI() {
+        return getWonMessage().getRecipientSocketURIRequired();
     }
 
     @Override
@@ -43,10 +56,6 @@ public class WonMessageSentOnConnectionEvent extends WonMessageSentEvent
     }
 
     public Connection getCon() {
-        Connection con = new Connection();
-        con.setConnectionURI(getConnectionURI());
-        con.setAtomURI(getAtomURI());
-        con.setTargetAtomURI(getTargetAtomURI());
         return con;
     }
 }

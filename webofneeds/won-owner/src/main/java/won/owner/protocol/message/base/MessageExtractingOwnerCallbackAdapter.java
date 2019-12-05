@@ -10,12 +10,19 @@
  */
 package won.owner.protocol.message.base;
 
+import java.net.URI;
+import java.util.Optional;
+
+import org.apache.jena.query.Dataset;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import won.owner.protocol.message.OwnerCallback;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
+import won.protocol.util.WonRdfUtils;
+import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
  * Simple implementation of the WonMessageHandlerAdapter that extracts the
@@ -25,6 +32,9 @@ import won.protocol.model.Connection;
  * part of messages. Use with care.
  */
 public class MessageExtractingOwnerCallbackAdapter extends OwnerCallbackAdapter {
+    @Autowired
+    private LinkedDataSource linkedDataSource;
+
     public MessageExtractingOwnerCallbackAdapter(OwnerCallback adaptee) {
         super(adaptee);
     }
@@ -45,12 +55,15 @@ public class MessageExtractingOwnerCallbackAdapter extends OwnerCallbackAdapter 
      * @param wonMessage or null if the message is not directed at a connection
      */
     private Connection toConnection(WonMessage wonMessage) {
-        Connection con = new Connection();
-        con.setConnectionURI(wonMessage.getRecipientURI());
-        con.setTargetConnectionURI(wonMessage.getSenderURI());
-        con.setAtomURI(wonMessage.getRecipientAtomURI());
-        con.setTargetAtomURI(wonMessage.getSenderAtomURI());
-        return con;
+        Optional<URI> connectionUri = WonLinkedDataUtils.getConnectionURIForIncomingMessage(wonMessage,
+                        linkedDataSource);
+        if (connectionUri.isPresent()) {
+            // fetch the rest of the connection data from the node and make a connection
+            // object for use in events.
+            Dataset ds = linkedDataSource.getDataForResource(connectionUri.get());
+            return WonRdfUtils.ConnectionUtils.getConnection(ds, connectionUri.get());
+        }
+        return null;
     }
 
     @Autowired(required = false)

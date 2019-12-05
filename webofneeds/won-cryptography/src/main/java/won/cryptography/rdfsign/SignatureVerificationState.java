@@ -1,8 +1,13 @@
 package won.cryptography.rdfsign;
 
-import won.protocol.message.WonSignatureData;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import java.util.*;
+import won.protocol.message.WonSignatureData;
 
 /**
  * User: ypanchenko Date: 24.03.2015
@@ -12,7 +17,7 @@ public class SignatureVerificationState {
     private String message = "";
     private final Map<String, List<String>> signedGraphNameToSignatureGraphName = new LinkedHashMap<>();
     private final Map<String, Boolean> signatureGraphNameToVerified = new HashMap<>();
-    private final Map<String, String> signatureGraphNameToSignedGraphName = new HashMap<>();
+    private final Map<String, List<String>> signatureGraphNameToSignedGraphName = new HashMap<>();
     private final Map<String, String> signatureGraphNameToSignatureValue = new HashMap<>();
     private final List<WonSignatureData> signatures = new ArrayList<>();
 
@@ -24,13 +29,16 @@ public class SignatureVerificationState {
 
     public void addSignatureData(WonSignatureData wonSignatureData) {
         signatures.add(wonSignatureData);
-        if (!signedGraphNameToSignatureGraphName.containsKey(wonSignatureData.getSignedGraphUri())) {
-            signedGraphNameToSignatureGraphName.put(wonSignatureData.getSignedGraphUri(), new ArrayList<>());
+        for (String signed : wonSignatureData.getSignedGraphUris()) {
+            List<String> sigs = signedGraphNameToSignatureGraphName.get(signed);
+            if (sigs == null) {
+                sigs = new ArrayList<>();
+            }
+            sigs.add(wonSignatureData.getSignatureUri());
+            signedGraphNameToSignatureGraphName.put(signed, sigs);
         }
         signatureGraphNameToSignedGraphName.put(wonSignatureData.getSignatureUri(),
-                        wonSignatureData.getSignedGraphUri());
-        signedGraphNameToSignatureGraphName.get(wonSignatureData.getSignedGraphUri())
-                        .add(wonSignatureData.getSignatureUri());
+                        wonSignatureData.getSignedGraphUris());
         signatureGraphNameToSignatureValue.put(wonSignatureData.getSignatureUri(),
                         wonSignatureData.getSignatureValue());
     }
@@ -74,7 +82,7 @@ public class SignatureVerificationState {
         return this.signatureGraphNameToSignatureValue.keySet();
     }
 
-    public String getSignedGraphName(String signatureGraphName) {
+    public List<String> getSignedGraphNames(String signatureGraphName) {
         return this.signatureGraphNameToSignedGraphName.get(signatureGraphName);
     }
 }

@@ -17,13 +17,9 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import won.node.camel.service.WonCamelHelper;
+import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageDirection;
-import won.protocol.message.WonMessageType;
-import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.message.processor.exception.MissingMessagePropertyException;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
-import won.protocol.vocabulary.WONMSG;
 
 /**
  * Computes a message slip for message processors that are annotated with
@@ -58,14 +54,14 @@ public class MessageTypeSlipComputer implements InitializingBean, ApplicationCon
 
     @Override
     public <T> T evaluate(final Exchange exchange, final Class<T> type) {
-        WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-        assert message != null : "wonMessage header must not be null";
+        WonMessage message = WonCamelHelper.getMessageRequired(exchange);
         String slip = "";
         // exchange.getIn().setHeader();
-        URI messageType = (URI) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_TYPE_HEADER);
-        assert messageType != null : "messageType header must not be null";
-        URI direction = (URI) exchange.getIn().getHeader(WonCamelConstants.DIRECTION_HEADER);
-        assert direction != null : "direction header must not be null";
+        URI messageType = WonCamelHelper.getMessageTypeRequired(exchange).getURI();
+        URI direction = WonCamelHelper.getDirectionRequired(exchange).getURI();
+        if (logger.isDebugEnabled()) {
+            logger.debug("Received {}", message.toShortStringForDebug());
+        }
         try {
             slip = computeMessageTypeSlip(messageType, direction);
             if (slip == null || slip.isEmpty()) {

@@ -1,5 +1,10 @@
 package won.node.camel.processor.socket.reviewSocket;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Map;
+import java.util.Optional;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.jena.query.Dataset;
@@ -10,19 +15,17 @@ import org.apache.jena.rdf.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.SocketMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Atom;
+import won.protocol.model.Connection;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.SCHEMA;
 import won.protocol.vocabulary.WONMSG;
 import won.protocol.vocabulary.WXREVIEW;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.Map;
 
 /**
  * User: MS Date: 12.12.2018
@@ -36,12 +39,12 @@ public class ConnectFromNodeReviewSocketImpl extends AbstractCamelProcessor {
     public void process(final Exchange exchange) {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
-        URI connectionUri = wonMessage.getRecipientURI();
-        // Connection con = connectionRepository.findOneByConnectionURI(connectionUri);
+        Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(
+                        wonMessage.getRecipientSocketURIRequired(), wonMessage.getSenderSocketURIRequired());
         try {
             Map<Property, String> reviewData = WonRdfUtils.MessageUtils.getReviewContent(wonMessage);
             if (reviewData != null) {
-                addReviewToAtom(reviewData, connectionUri);
+                addReviewToAtom(reviewData, con.get().getConnectionURI());
             } else {
                 logger.debug("No review data found in message: {}", wonMessage);
             }
@@ -55,7 +58,7 @@ public class ConnectFromNodeReviewSocketImpl extends AbstractCamelProcessor {
         Double rating = Double.parseDouble(reviewData.get(SCHEMA.RATING_VALUE)) > 0.0
                         ? Double.parseDouble(reviewData.get(SCHEMA.RATING_VALUE))
                         : 0.0;
-        Atom aboutAtom = atomRepository.findOneByAtomURI(URI.create(aboutAtomURI));
+        Atom aboutAtom = atomService.getAtomRequired(URI.create(aboutAtomURI));
         Dataset atomDataset = aboutAtom.getDatatsetHolder().getDataset();
         Model derivationModel = atomDataset.getNamedModel(aboutAtom.getAtomURI() + "#derivedData");
         Resource aboutAtomResource = derivationModel.getResource(aboutAtomURI);

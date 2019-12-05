@@ -1,10 +1,12 @@
 package won.cryptography.rdfsign;
 
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.NamedGraph;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.Prefix;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.Triple;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.trigplus.TriGPlusWriter;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -14,12 +16,11 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStreamWriter;
-import java.util.List;
-import java.util.Map;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.NamedGraph;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.Prefix;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.Triple;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.trigplus.TriGPlusWriter;
 
 /**
  * Created by ypanchenko on 09.07.2014.
@@ -57,10 +58,22 @@ public class ModelConverter {
      * GraphCollection stores the prefixes (if were present in the Datastore), but
      * they are not applied (for reasons, see namedGraphToModel() doc).
      */
-    public static GraphCollection modelToGraphCollection(String modelURI, Dataset modelDataset) {
-        Map<String, String> pm = modelDataset.getDefaultModel().getNsPrefixMap();
-        Model model = modelDataset.getNamedModel(modelURI);
-        return modelToGraphCollection(modelURI, model, pm);
+    public static GraphCollection modelToGraphCollection(String modelURI, Dataset dataset) {
+        Model model = dataset.getNamedModel(modelURI);
+        return modelToGraphCollection(modelURI, model);
+    }
+
+    public static GraphCollection modelsToGraphCollection(Dataset dataset, String... modelURIs) {
+        GraphCollection graphc = new GraphCollection();
+        for (int i = 0; i < modelURIs.length; i++) {
+            String name = modelURIs[i];
+            Model model = dataset.getNamedModel(name);
+            if (model == null) {
+                throw new IllegalArgumentException("No model named '" + name + "' found in dataset");
+            }
+            graphc.addGraph(fromModel(name, model));
+        }
+        return graphc;
     }
 
     private static Model namedGraphToModel(NamedGraph graph, List<Prefix> prefixes) throws Exception {
@@ -102,13 +115,37 @@ public class ModelConverter {
         }
     }
 
-    private static GraphCollection modelToGraphCollection(String name, Model model, Map<String, String> pm) {
+    public static GraphCollection fromDataset(Dataset dataset) {
+        GraphCollection graphc = new GraphCollection();
+        String name = null;
+        Iterator<String> namesIt = dataset.listNames();
+        while (namesIt.hasNext()) {
+            name = namesIt.next();
+            graphc.addGraph(fromModel(name, dataset.getNamedModel(name)));
+        }
+        return graphc;
+    }
+
+    private static GraphCollection modelToGraphCollection(String name, Model model) {
         // Convert each subj pred obj in Jena Statement into String and add to
         // SigningFramework's NamedGraph.
         // The simpler approach with just using Jena's writer and Signingframework's
         // reader to transform data between data structures won't work since
         // Signingframework has problems with recognizing the [] structure
         GraphCollection graphc = new GraphCollection();
+        NamedGraph namedGraph = fromModel(name, model);
+        graphc.addGraph(namedGraph);
+        // don't apply prefixes since it can result in funny things like:
+        // pref:/connections/, and also the collision on the prefix uris
+        // that starts the same. E.g. having prefixes below in atom rdf
+        // would cause errors
+        // @prefix : <http://www.example.com/resource/atom/12#> .
+        // @prefix atom: <http://www.example.com/resource/atom/12> .
+        // graphc.applyPrefixes();
+        return graphc;
+    }
+
+    public static NamedGraph fromModel(String name, Model model) {
         NamedGraph namedGraph = new NamedGraph(enclose(name, "<", ">"), 0, null);
         StmtIterator iterator = model.listStatements();
         while (iterator.hasNext()) {
@@ -119,18 +156,7 @@ public class ModelConverter {
             Triple gcTriple = new Triple(subjString, predString, objString);
             namedGraph.addTriple(gcTriple);
         }
-        graphc.addGraph(namedGraph);
-        for (String prefix : pm.keySet()) {
-            graphc.addPrefix(new Prefix(prefix + ":", "<" + pm.get(prefix) + ">"));
-        }
-        // don't apply prefixes since it can result in funny things like:
-        // pref:/connections/, and also the collision on the prefix uris
-        // that starts the same. E.g. having prefixes below in atom rdf
-        // would cause errors
-        // @prefix : <http://www.example.com/resource/atom/12#> .
-        // @prefix atom: <http://www.example.com/resource/atom/12> .
-        // graphc.applyPrefixes();
-        return graphc;
+        return namedGraph;
     }
 
     private static String rdfNodeAsString(final RDFNode rdfNode) {

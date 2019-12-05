@@ -10,12 +10,13 @@
  */
 package won.protocol.model;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import won.protocol.vocabulary.WON;
-
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import won.protocol.vocabulary.WON;
 
 /**
  * User: fkleedorfer Date: 30.10.12
@@ -34,9 +35,9 @@ public enum ConnectionState {
         switch (msg) {
             case MATCHER_HINT:
                 return SUGGESTED;
-            case OWNER_OPEN:
+            case OWNER_CONNECT:
                 return REQUEST_SENT;
-            case PARTNER_OPEN:
+            case PARTNER_CONNECT:
                 return REQUEST_RECEIVED;
         }
         throw new IllegalArgumentException("Connection creation failed: Wrong ConnectionEventType");
@@ -46,9 +47,9 @@ public enum ConnectionState {
         switch (this) {
             case SUGGESTED:
                 switch (msg) {
-                    case OWNER_OPEN:
+                    case OWNER_CONNECT:
                         return REQUEST_SENT;
-                    case PARTNER_OPEN:
+                    case PARTNER_CONNECT:
                         return REQUEST_RECEIVED;
                     case OWNER_CLOSE:
                     case PARTNER_CLOSE:
@@ -59,7 +60,7 @@ public enum ConnectionState {
             case REQUEST_SENT: // the owner has initiated the connection, the request was sent to the remote
                                // atom
                 switch (msg) {
-                    case PARTNER_OPEN:
+                    case PARTNER_CONNECT:
                         return CONNECTED; // the partner accepted
                     case OWNER_CLOSE:
                     case PARTNER_CLOSE:
@@ -69,7 +70,7 @@ public enum ConnectionState {
                 }
             case REQUEST_RECEIVED: // a remote atom has requested a connection
                 switch (msg) {
-                    case OWNER_OPEN:
+                    case OWNER_CONNECT:
                         return CONNECTED;
                     case OWNER_CLOSE:
                     case PARTNER_CLOSE:
@@ -87,9 +88,9 @@ public enum ConnectionState {
                 }
             case CLOSED:
                 switch (msg) {
-                    case OWNER_OPEN:
+                    case OWNER_CONNECT:
                         return REQUEST_SENT; // reopen connection
-                    case PARTNER_OPEN:
+                    case PARTNER_CONNECT:
                         return REQUEST_RECEIVED;
                     default:
                         return this;

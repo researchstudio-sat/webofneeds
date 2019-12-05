@@ -9,7 +9,7 @@ prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix local: <http://localhost:8080/won/resource/>
 prefix won:   <https://w3id.org/won/core#>
 prefix msg:   <https://w3id.org/won/message#>
-prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
+
 prefix ldp:   <http://www.w3.org/ns/ldp#>
 
 
@@ -21,14 +21,14 @@ ASK
   {
     GRAPH ?graph
     {
-            ?event msg:messageType|msg:content|msg:receivedTimestamp|msg:sentTimestamp|msg:recipient|msg:sender|msg:recipientAtom|msg:senderAtom|msg:recipientNode|msg:senderNode|msg:isResponseTo|msg:isRemoteResponseTo|msg:isResponseToMessageType|msg:containsSignature ?propobj .
+            ?event msg:messageType|msg:content|msg:timestamp|msg:timestamp|msg:recipient|msg:sender|msg:recipientAtom|msg:senderAtom|msg:recipientNode|msg:senderNode|msg:isResponseTo|msg:isRemoteResponseTo|msg:isResponseToMessageType|msg:containsSignature ?propobj .
             {
-              ?event msg:receivedTimestamp|msg:sentTimestamp ?timestamp
+              ?event msg:timestamp ?timestamp
             }
             UNION
             {
               ?event2 msg:correspondingRemoteMessage ?event .
-              ?event msg:receivedTimestamp ?timestamp
+              ?event msg:timestamp ?timestamp
             }
     } .
   }

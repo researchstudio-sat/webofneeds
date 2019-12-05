@@ -6,6 +6,7 @@
 		<version>0.7-SNAPSHOT</version>
 	</parent>
 	<artifactId>won-utils-batch</artifactId>
+		
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -30,4 +31,5 @@
 			<artifactId>logback-core</artifactId>
 		</dependency>
 	</dependencies>
+	
 </project>

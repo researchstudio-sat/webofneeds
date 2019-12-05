@@ -109,9 +109,9 @@ won:shapesGraph1 {
 
 <https://node.matchat.org/won/resource/event/6899375303355711000#envelope-sig> {
     <https://node.matchat.org/won/resource/event/6899375303355711000#envelope-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMF1IwRft6U5BQfIlvYbmC8KEpGTNGRqomfT5SqrL8tIRRRLg53ighboUo4+x/pKuJQIxAPkk+f2stNNB5vyGxfm/F2hBaqSEMTWTT0a7e9Iah8zMMnc/QueN3gC0e/e3gL9dAA==" ;
-            sig:hasVerificationCertificate  atom:3030440624813201400 ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMF1IwRft6U5BQfIlvYbmC8KEpGTNGRqomfT5SqrL8tIRRRLg53ighboUo4+x/pKuJQIxAPkk+f2stNNB5vyGxfm/F2hBaqSEMTWTT0a7e9Iah8zMMnc/QueN3gC0e/e3gL9dAA==" ;
+            msg:signer  atom:3030440624813201400 ;
             msg:hash                     "TOXHVyCftUBHw2loofg8HR/AlA4DDq4bhqvQtmERUKDvH/9gBK33zafg4nHUUMujHXV0lspccHOKPHNIloWglwLjoIuiMKi2Hhb/8/cSMvNMEpD2WarQnBpdX0AvlU0Pf4ed2ZfML8VjjNicZ+VE1TFq1eFn7q+zzgwLSqdqCpE=" ;
             msg:publicKeyFingerprint     "HZV68VsewihhUghglhznC+12v9Yp/6yitoLmgPAw5vg=" ;
             msg:signedGraph              <https://node.matchat.org/won/resource/event/6899375303355711000#envelope> .

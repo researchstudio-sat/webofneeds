@@ -1,7 +1,10 @@
 package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 
-import org.apache.jena.query.Dataset;
+import java.net.URI;
+import java.util.Set;
+
 import org.apache.jena.rdf.model.Model;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandNotSentEvent;
@@ -13,13 +16,10 @@ import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.service.WonNodeInformationService;
+import won.protocol.message.builder.ConnectionMessageBuilder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.util.RdfUtils;
-import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
-import java.util.Set;
+import won.protocol.util.WonMessageUriHelper;
 
 /**
  * Action executing a ConnectionMessageCommandEvent, creating a connection
@@ -27,7 +27,7 @@ import java.util.Set;
  * as the content of the message.
  */
 public class ExecuteConnectionMessageCommandAction
-                extends ExecuteSendMessageCommandAction<ConnectionMessageCommandEvent> {
+                extends ExecuteMessageCommandAction<ConnectionMessageCommandEvent> {
     public ExecuteConnectionMessageCommandAction(EventListenerContext eventListenerContext) {
         super(eventListenerContext, true);
     }
@@ -65,28 +65,16 @@ public class ExecuteConnectionMessageCommandAction
     @Override
     protected WonMessage createWonMessage(ConnectionMessageCommandEvent messageCommandEvent)
                     throws WonMessageBuilderException {
-        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         Model localMessageModel = RdfUtils.cloneModel(messageCommandEvent.getMessageModel());
-        Dataset connectionRDF = getEventListenerContext().getLinkedDataSource()
-                        .getDataForResource(messageCommandEvent.getConnectionURI());
-        URI targetAtom = WonRdfUtils.ConnectionUtils.getTargetAtomURIFromConnection(connectionRDF,
-                        messageCommandEvent.getConnectionURI());
-        URI localAtom = WonRdfUtils.ConnectionUtils.getLocalAtomURIFromConnection(connectionRDF,
-                        messageCommandEvent.getConnectionURI());
-        URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF,
-                        messageCommandEvent.getConnectionURI());
-        Dataset targetAtomRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(targetAtom);
-        URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
-        RdfUtils.replaceBaseURI(localMessageModel, messageURI.toString());
-        WonMessageBuilder wmb = WonMessageBuilder.setMessagePropertiesForConnectionMessage(messageURI,
-                        messageCommandEvent.getConnectionURI(), localAtom, wonNode,
-                        WonRdfUtils.ConnectionUtils.getTargetConnectionURIFromConnection(connectionRDF,
-                                        messageCommandEvent.getConnectionURI()),
-                        targetAtom, WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(targetAtomRDF, targetAtom),
-                        localMessageModel);
+        RdfUtils.replaceBaseURI(localMessageModel, WonMessageUriHelper.getSelfUri().toString());
+        ConnectionMessageBuilder wmb = WonMessageBuilder.connectionMessage()
+                        .sockets()
+                        /**/.sender(messageCommandEvent.getCon().getSocketURI())
+                        /**/.recipient(messageCommandEvent.getCon().getTargetSocketURI())
+                        .content().model(localMessageModel);
         Set<URI> injectionTargets = messageCommandEvent.getInjectIntoConnections();
         if (!injectionTargets.isEmpty()) {
-            wmb.setInjectIntoConnections(injectionTargets);
+            wmb.injectIntoConnections(injectionTargets);
         }
         return wmb.build();
     }

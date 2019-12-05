@@ -19,16 +19,20 @@ import won.protocol.model.ConnectionState;
  * User: fkleedorfer Date: 02.11.12
  */
 public class IllegalMessageForConnectionStateException extends WonProtocolException {
-    private String methodName;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 7086516120895015908L;
+    private String messageType;
     private ConnectionState connectionState;
     private URI connectionURI;
 
-    public IllegalMessageForConnectionStateException(final URI connectionURI, final String methodName,
+    public IllegalMessageForConnectionStateException(final URI connectionURI, final String messageType,
                     final ConnectionState connectionState) {
         super(MessageFormat.format(
-                        "It is  not allowed to call method {0} on connection {1}, as it is currently in state {2}.",
-                        methodName, safeToString(connectionURI), safeToString(connectionState)));
-        this.methodName = methodName;
+                        "Message type {0} not allowed in connection state {2} (connection: {1}).",
+                        messageType, safeToString(connectionURI), safeToString(connectionState)));
+        this.messageType = messageType;
         this.connectionState = connectionState;
         this.connectionURI = connectionURI;
     }
@@ -38,7 +42,7 @@ public class IllegalMessageForConnectionStateException extends WonProtocolExcept
     }
 
     public String getMethodName() {
-        return methodName;
+        return messageType;
     }
 
     public ConnectionState getConnectionState() {

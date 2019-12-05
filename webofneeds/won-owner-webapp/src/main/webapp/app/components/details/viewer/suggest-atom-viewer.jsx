@@ -72,6 +72,10 @@ const mapStateToProps = (state, ownProps) => {
     openedOwnPost,
     hasChatSocket: atomUtils.hasChatSocket(suggestedPost),
     hasGroupSocket: atomUtils.hasGroupSocket(suggestedPost),
+    chatSocketUri: atomUtils.getChatSocket(suggestedPost),
+    groupSocketUri: atomUtils.getGroupSocket(suggestedPost),
+    ownChatSocketUri: atomUtils.getChatSocket(openedOwnPost),
+    ownGroupSocketUri: atomUtils.getGroupSocket(openedOwnPost),
     isSuggestedOwned,
     showActions:
       failedToLoad ||
@@ -96,12 +100,11 @@ const mapDispatchToProps = dispatch => {
     fetchAtom: uri => {
       dispatch(actionCreators.atoms__fetchUnloadedAtom(uri));
     },
-    connect: (ownedAtomUri, connectionUri, targetAtomUri, message) => {
+    connectSockets: (senderSocketUri, targetSocketUri, message) => {
       dispatch(
-        actionCreators.atoms__connect(
-          ownedAtomUri,
-          connectionUri,
-          targetAtomUri,
+        actionCreators.atoms__connectSockets(
+          senderSocketUri,
+          targetSocketUri,
           message
         )
       );
@@ -240,10 +243,22 @@ class WonSuggestAtomViewer extends React.Component {
       this.props.suggestedPost && this.props.suggestedPost.get("uri");
 
     if (openedOwnPostUri && suggestedPostUri) {
-      this.props.connect(
-        this.props.openedOwnPost.get("uri"),
-        undefined,
-        this.props.suggestedPost.get("uri"),
+      let targetSocketUri;
+
+      if (this.props.groupSocketUri) {
+        targetSocketUri = this.props.groupSocketUri;
+      } else if (this.props.chatSocketUri) {
+        targetSocketUri = this.props.chatSocketUri;
+      }
+
+      let senderSocketUri;
+      if (this.props.ownChatSocketUri) {
+        senderSocketUri = this.props.ownChatSocketUri;
+      }
+
+      this.props.connectSockets(
+        senderSocketUri,
+        targetSocketUri,
         "Hey a Friend told me about you, let's chat!"
       );
     } else {
@@ -258,11 +273,15 @@ WonSuggestAtomViewer.propTypes = {
   content: PropTypes.string,
   className: PropTypes.string,
   fetchAtom: PropTypes.func,
-  connect: PropTypes.func,
+  connectSockets: PropTypes.func,
   suggestedPost: PropTypes.object,
   openedOwnPost: PropTypes.object,
   hasChatSocket: PropTypes.bool,
   hasGroupSocket: PropTypes.bool,
+  groupSocketUri: PropTypes.string,
+  chatSocketUri: PropTypes.string,
+  ownGroupSocketUri: PropTypes.string,
+  ownChatSocketUri: PropTypes.string,
   isSuggestedOwned: PropTypes.bool,
   showActions: PropTypes.bool,
   showConnectAction: PropTypes.bool,

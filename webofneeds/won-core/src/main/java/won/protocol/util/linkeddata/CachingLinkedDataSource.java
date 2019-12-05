@@ -10,22 +10,7 @@
  */
 package won.protocol.util.linkeddata;
 
-import net.sf.ehcache.CacheException;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.ehcache.EhCacheCacheManager;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
+import static java.util.EnumSet.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -45,7 +30,26 @@ import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.util.EnumSet.noneOf;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.ehcache.EhCacheCacheManager;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.util.StopWatch;
+
+import ch.qos.logback.core.util.Duration;
+import net.sf.ehcache.CacheException;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
+import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
+import won.protocol.util.LogMarkers;
 
 /**
  * LinkedDataSource implementation that uses an ehcache for caching.
@@ -92,7 +96,9 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
         if (resource == null) {
             return;
         }
-        logger.debug("invalidating cached resource {}", resource);
+        if (logger.isDebugEnabled()) {
+            logger.debug("invalidating cached resource {}", resource);
+        }
         cache.remove(makeCacheKey(resource, null));
     }
 
@@ -100,7 +106,9 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
         if (resource == null || requesterWebID == null) {
             return;
         }
-        logger.debug("invalidating cached resource {} for webid {}", resource, requesterWebID);
+        if (logger.isDebugEnabled()) {
+            logger.debug("invalidating cached resource {} for webid {}", resource, requesterWebID);
+        }
         cache.remove(makeCacheKey(resource, requesterWebID));
     }
 
@@ -128,31 +136,39 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     }
 
     public Dataset getDataForResource(URI resource, URI requesterWebID) {
-        if (resource == null)
-            throw new IllegalArgumentException("resource cannot be null");
-        Element element;
+        StopWatch sw = new StopWatch();
+        sw.start();
         try {
-            element = cache.get(makeCacheKey(resource, requesterWebID));
-        } catch (CacheException e) {
-            // logging on warn level as not reporting errors here can make misconfiguration
-            // hard to detect
-            logger.warn(String.format("Couldn't fetch resource %s", resource));
-            logger.debug("Exception is:", e);
-            return DatasetFactory.createGeneral();
-        }
-        LinkedDataCacheEntry linkedDataCacheEntry = null;
-        if (element != null) {
-            // cached element found
-            Object cachedObject = element.getObjectValue();
-            if (!(cachedObject instanceof LinkedDataCacheEntry)) {
-                // wrong type - how did that happen?
-                throw new IllegalStateException(new MessageFormat(
-                                "The underlying linkedDataCache should only contain Datasets, but we got a {0} for URI {1}")
-                                                .format(new Object[] { cachedObject.getClass(), resource }));
+            if (resource == null)
+                throw new IllegalArgumentException("resource cannot be null");
+            Element element;
+            try {
+                element = cache.get(makeCacheKey(resource, requesterWebID));
+            } catch (CacheException e) {
+                // logging on warn level as not reporting errors here can make misconfiguration
+                // hard to detect
+                logger.warn(String.format("Couldn't fetch resource %s", resource));
+                logger.debug("Exception is:", e);
+                return DatasetFactory.createGeneral();
             }
-            linkedDataCacheEntry = (LinkedDataCacheEntry) cachedObject;
+            LinkedDataCacheEntry linkedDataCacheEntry = null;
+            if (element != null) {
+                // cached element found
+                Object cachedObject = element.getObjectValue();
+                if (!(cachedObject instanceof LinkedDataCacheEntry)) {
+                    // wrong type - how did that happen?
+                    throw new IllegalStateException(new MessageFormat(
+                                    "The underlying linkedDataCache should only contain Datasets, but we got a {0} for URI {1}")
+                                                    .format(new Object[] { cachedObject.getClass(), resource }));
+                }
+                linkedDataCacheEntry = (LinkedDataCacheEntry) cachedObject;
+            }
+            return fetchOrUseCached(resource, requesterWebID, linkedDataCacheEntry).getDataset();
+        } finally {
+            sw.stop();
+            logger.debug(LogMarkers.TIMING, "obtaining (possibly cached) resource {} took {} millis", resource,
+                            sw.getLastTaskTimeMillis());
         }
-        return fetchOrUseCached(resource, requesterWebID, linkedDataCacheEntry).getDataset();
     }
 
     /**
@@ -190,7 +206,9 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
             if (linkedDataCacheEntry.isExpiredAtDate(now)) {
                 // cache item is expired. Remove from cache and fetch again
                 cache.remove(makeCacheKey(resource, requesterWebID));
-                logger.debug("cache item {} expired, fetching again.", resource);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("cache item {} expired, fetching again.", resource);
+                }
                 return fetchOnlyOnce(resource, requesterWebID, linkedDataCacheEntry, headers);
             }
             if (linkedDataCacheEntry.getCacheControlFlags().contains(CacheControlFlag.PRIVATE) && isSharedCache()) {
@@ -199,16 +217,22 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
                 // requesterWebID. The check is performed by the server. We cannot return a
                 // cached response
                 // immediately, but further down the line the ETAG based system can do that.
-                logger.debug("cache item {} is Cache-Control:private and we are a shared cache. Will return cached copy only after server checks ETAG (and client cert), "
-                                + "therefore sending request to server.", resource);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("cache item {} is Cache-Control:private and we are a shared cache. Will return cached copy only after server checks ETAG (and client cert), "
+                                    + "therefore sending request to server.", resource);
+                }
                 return fetchOnlyOnce(resource, requesterWebID, linkedDataCacheEntry, headers);
             }
-            logger.debug("returning cached version of {}", resource);
+            if (logger.isDebugEnabled()) {
+                logger.debug("returning cached version of {}", resource);
+            }
             // we can use the cached result directly
             return linkedDataCacheEntry.recreateResponse();
         }
         // nothing found in the cache, fetch the resource remotely
-        logger.debug("Nothing found in cache for {}, fetching remotely", resource);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Nothing found in cache for {}, fetching remotely", resource);
+        }
         responseData = fetchOnlyOnce(resource, requesterWebID, null, headers);
         // inform the crawler callback
         if (crawlerCallback != null) {
@@ -241,9 +265,11 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
         CountDownLatch preExistingLatch = countDownLatchMap.putIfAbsent(cacheKey, latch);
         try {
             if (preExistingLatch != null) {
-                logger.debug("resource " + cacheKey
-                                + " is being fetched in another thread, we wait for its result and use it "
-                                + "if it turns out to be cacheable");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("resource {}"
+                                    + " is being fetched in another thread, we wait for its result and use it "
+                                    + "if it turns out to be cacheable", cacheKey);
+                }
                 // in this case, another thread is already fetching the URI. Wait.
                 try {
                     preExistingLatch.await();
@@ -255,14 +281,18 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
                 // we have to fetch it again. We try:
                 Element element = cache.get(cacheKey);
                 if (element != null) {
-                    logger.debug("resource " + cacheKey + " turned out to be cacheable, using it");
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("resource {} turned out to be cacheable, using it", cacheKey);
+                    }
                     // ok, we'll recreate a response from the cache.
                     // Caution: this is not a copy, it's the SAME dataset - so manipulating the
                     // result causes side-effects.
                     LinkedDataCacheEntry entry = (LinkedDataCacheEntry) element.getObjectValue();
                     return entry.recreateResponse();
                 }
-                logger.debug("resource " + cacheKey + " did not turn out to be cacheable - fetching it, too");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("resource {} did not turn out to be cacheable - fetching it, too", cacheKey);
+                }
                 // so the cache still doesn't have it. We think it's better to let every thread
                 // fetch it for itself.
             }
@@ -291,6 +321,10 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
             if (expires != null && expires.getTime() == 0) {
                 // the expires header was invalid (e.g. '0'), which means: already expired.
                 // Don't cache.
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Fetched {}. Will not be cached due to invalid 'Expires' header sent by server",
+                                    resource);
+                }
                 return responseData;
             }
         }
@@ -300,7 +334,9 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
             // we are not allowed to cache the result
             // make sure it's not in the cache from a previous request
             cache.remove(makeCacheKey(resource, requesterWebID));
-            logger.debug("Fetched {}. Will not be cached due to Cache-Control headers sent by server", resource);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Fetched {}. Will not be cached due to Cache-Control headers sent by server", resource);
+            }
             return responseData;
         }
         Date responseDate = parseDateHeader(resource, responseData);
@@ -309,8 +345,10 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
             if (responseDate.equals(expires) || responseDate.after(expires)) {
                 // we are not allowed to cache the result
                 // make sure it's not in the cache from a previous request
-                logger.debug("Fetched {}. Will not be cached due to Expires/Date header combination sent by server",
-                                resource);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Fetched {}. Will not be cached due to Expires/Date header combination sent by server",
+                                    resource);
+                }
                 cache.remove(makeCacheKey(resource, requesterWebID));
                 return responseData;
             }
@@ -327,8 +365,9 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
                         writeDatasetToByteArray(responseData.getDataset()), cacheControlFlags,
                         responseData.getResponseHeaders(), responseData.getStatusCode());
         this.cache.put(new Element(makeCacheKey(resource, requesterWebID), entry));
-        logger.debug("Fetched and cached {} ", resource);
         if (logger.isDebugEnabled()) {
+            logger.debug("Fetched and cached {}, will {}", resource, expires == null ? "never expire"
+                            : "expire in " + new Duration(expires.getTime() - new Date().getTime()).toString());
             logger.debug("cache size: {} elements, in-memory size: {} bytes", cache.getSize(),
                             cache.calculateInMemorySize());
         }
@@ -363,22 +402,30 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
                     final URI requesterWebID, final LinkedDataCacheEntry linkedDataCacheEntry,
                     final HttpHeaders headers) {
         if (linkedDataCacheEntry == null || linkedDataCacheEntry.getEtag() == null) {
-            logger.debug("fetching from server without ETAG validation: {} ", resource);
+            if (logger.isDebugEnabled()) {
+                logger.debug("fetching from server without ETAG validation: {} ", resource);
+            }
             return fetch(resource, requesterWebID, headers);
         }
         // we already have an etag - use it for validating
         HttpHeaders myHeaders = headers != null ? headers : new HttpHeaders();
         myHeaders.add(HttpHeaders.IF_NONE_MATCH, linkedDataCacheEntry.getEtag());
-        logger.debug("fetching from server with ETAG validation: {} ", resource);
+        if (logger.isDebugEnabled()) {
+            logger.debug("fetching from server with ETAG validation: {} ", resource);
+        }
         DatasetResponseWithStatusCodeAndHeaders datasetResponse = fetch(resource, requesterWebID, myHeaders);
         if (datasetResponse.getStatusCode() == HttpStatus.NOT_MODIFIED.value()) {
             // replace dataset in response with the cached dataset
-            logger.debug("server said our ETAG is still valid, using cached dataset for URI {} ", resource);
+            if (logger.isDebugEnabled()) {
+                logger.debug("server said our ETAG is still valid, using cached dataset for URI {} ", resource);
+            }
             datasetResponse = new DatasetResponseWithStatusCodeAndHeaders(
                             readDatasetFromByteArray(linkedDataCacheEntry.getDataset()),
                             datasetResponse.getStatusCode(), datasetResponse.getResponseHeaders());
         } else {
-            logger.debug("server said our ETAG is not valid, not using cached result for URI {} ", resource);
+            if (logger.isDebugEnabled()) {
+                logger.debug("server said our ETAG is not valid, not using cached result for URI {} ", resource);
+            }
             // We would like to remove the item from the cache immediately because it is now
             // outdated. However, we cannot
             // remove the cached result from the cache here because we may have gotten any
@@ -402,15 +449,19 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
                     final HttpHeaders headers) {
         final DatasetResponseWithStatusCodeAndHeaders responseData;
         if (requesterWebID != null) {
-            logger.debug("fetching linked data for URI {} with WebID {}", resource, requesterWebID);
-            responseData = linkedDataRestClient.readResourceDataWithHeaders(resource, requesterWebID, headers);
+            if (logger.isDebugEnabled()) {
+                logger.debug("fetching linked data for URI {} with WebID {}", resource, requesterWebID);
+            }
+            URI resolvedResource = wonMessageUriResolver.toLocalMessageURI(resource, this);
+            responseData = linkedDataRestClient.readResourceDataWithHeaders(resolvedResource, requesterWebID, headers);
             if (logger.isTraceEnabled()) {
                 logger.trace("fetched resource {} with requesterWebID {}: ", resource, requesterWebID);
                 RDFDataMgr.write(System.out, responseData.getDataset(), Lang.TRIG);
             }
         } else {
             logger.debug("fetching linked data for URI {} without WebID", resource);
-            responseData = linkedDataRestClient.readResourceDataWithHeaders(resource, headers);
+            URI resolvedResource = wonMessageUriResolver.toLocalMessageURI(resource, this);
+            responseData = linkedDataRestClient.readResourceDataWithHeaders(resolvedResource, headers);
             if (logger.isTraceEnabled()) {
                 logger.trace("fetched resource {} without WebID", resource);
                 RDFDataMgr.write(System.out, responseData.getDataset(), Lang.TRIG);
@@ -431,8 +482,10 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
             expires = format.parse(expiresHeader);
         } catch (ParseException e) {
             // invalid dates mean 'already expired.' don't cache
-            logger.debug("could not parse 'Expires' header ' " + expiresHeader + "' obtained for '" + resource
-                            + "', marking as already expired");
+            if (logger.isDebugEnabled()) {
+                logger.debug("could not parse 'Expires' header ' " + expiresHeader + "' obtained for '" + resource
+                                + "', marking as already expired");
+            }
             return new Date(0);
         }
         return expires;
@@ -477,7 +530,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
         String cacheControlHeaderValue = responseData.getResponseHeaders().getFirst(HttpHeaders.CACHE_CONTROL);
         if (cacheControlHeaderValue == null)
             return null;
-        Pattern maxagePattern = Pattern.compile("[^\\s,]*max-age\\s*=\\s*(\\d+)[^\\d]*");
+        Pattern maxagePattern = Pattern.compile("$max-age=(\\d+)$");
         Matcher m = maxagePattern.matcher(cacheControlHeaderValue);
         if (!m.find())
             return null;
@@ -553,7 +606,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
 
     public static class LinkedDataCacheEntry {
         private String etag;
-        private Date expires;
+        private Date expires = null;
         private byte[] dataset;
         private EnumSet<CacheControlFlag> cacheControlFlags;
         private HttpHeaders headers;

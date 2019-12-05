@@ -1,5 +1,7 @@
 package won.protocol.message.processor.exception;
 
+import won.protocol.exception.WonMessageProcessingException;
+
 /**
  * Indicates that the message event has already been received and processed.
  * User: ypanchenko Date: 24.04.2015

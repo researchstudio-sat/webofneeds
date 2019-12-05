@@ -10,9 +10,14 @@
  */
 package won.bot.framework.eventbot.listener.impl;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Date;
+
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.Event;
@@ -22,13 +27,8 @@ import won.bot.framework.eventbot.filter.EventFilter;
 import won.bot.framework.eventbot.listener.AbstractHandleFirstNEventsListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.service.WonNodeInformationService;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.util.WonRdfUtils;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.Date;
 
 /**
  * Listener that responds to open and message events with automatic messages.
@@ -77,11 +77,12 @@ public class AutomaticMonitoredMessageResponderListener extends AbstractHandleFi
             String message = createMessage();
             URI connectionUri = messageEvent.getConnectionURI();
             WonMessage wonMessage = createWonMessage(connectionUri, message);
+            wonMessage = ctx.getWonMessageSender().prepareMessage(wonMessage);
             logger.debug("sending message " + message);
             try {
                 // fire start message sending monitor event (message sending includes signing)
                 ctx.getEventBus().publish(new MessageDispatchStartedEvent(wonMessage));
-                ctx.getWonMessageSender().sendWonMessage(wonMessage);
+                ctx.getWonMessageSender().sendMessage(wonMessage);
                 // fire message is sent monitor event
                 ctx.getEventBus().publish(new MessageDispatchedEvent(wonMessage));
             } catch (Exception e) {
@@ -106,19 +107,17 @@ public class AutomaticMonitoredMessageResponderListener extends AbstractHandleFi
     }
 
     private WonMessage createWonMessage(URI connectionURI, String message) throws WonMessageBuilderException {
-        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
         Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
-        URI targetAtom = WonRdfUtils.ConnectionUtils.getTargetAtomURIFromConnection(connectionRDF, connectionURI);
-        URI localAtom = WonRdfUtils.ConnectionUtils.getLocalAtomURIFromConnection(connectionRDF, connectionURI);
-        URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
-        Dataset targetAtomRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(targetAtom);
-        URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
+        URI socketURI = WonRdfUtils.ConnectionUtils.getSocketURIFromConnection(connectionRDF, connectionURI);
+        URI targetSocketURI = WonRdfUtils.ConnectionUtils.getTargetSocketURIFromConnection(connectionRDF,
+                        connectionURI);
         return WonMessageBuilder
-                        .setMessagePropertiesForConnectionMessage(messageURI, connectionURI, localAtom, wonNode,
-                                        WonRdfUtils.ConnectionUtils.getTargetConnectionURIFromConnection(connectionRDF,
-                                                        connectionURI),
-                                        targetAtom,
-                                        WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(targetAtomRDF, targetAtom), message)
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(socketURI)
+                        /**/.recipient(targetSocketURI)
+                        .content()
+                        /**/.text(message)
                         .build();
     }
 }

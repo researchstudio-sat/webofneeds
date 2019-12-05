@@ -13,18 +13,12 @@ package won.bot.framework.eventbot.action.impl.atomlifecycle;
 import java.net.URI;
 import java.util.Collection;
 
-import org.apache.jena.query.Dataset;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomDeactivatedEvent;
 import won.bot.framework.eventbot.listener.EventListener;
-import won.protocol.exception.WonMessageBuilderException;
-import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.service.WonNodeInformationService;
-import won.protocol.util.WonRdfUtils;
+import won.protocol.message.builder.WonMessageBuilder;
 
 /**
  * User: fkleedorfer Date: 28.03.14
@@ -38,18 +32,12 @@ public class DeactivateAllAtomsAction extends BaseEventBotAction {
     protected void doRun(Event event, EventListener executingListener) throws Exception {
         Collection<URI> toDeactivate = getEventListenerContext().getBotContext().retrieveAllAtomUris();
         for (URI uri : toDeactivate) {
-            getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(uri));
+            getEventListenerContext().getWonMessageSender().prepareAndSendMessage(WonMessageBuilder
+                            .deactivate()
+                            .direction().fromOwner()
+                            .atom(uri)
+                            .build());
             getEventListenerContext().getEventBus().publish(new AtomDeactivatedEvent(uri));
         }
-    }
-
-    private WonMessage createWonMessage(URI atomURI) throws WonMessageBuilderException {
-        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
-        Dataset ds = getEventListenerContext().getLinkedDataSource().getDataForResource(atomURI);
-        URI localWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(ds, atomURI);
-        return WonMessageBuilder
-                        .setMessagePropertiesForDeactivateFromOwner(
-                                        wonNodeInformationService.generateEventURI(localWonNode), atomURI, localWonNode)
-                        .build();
     }
 }

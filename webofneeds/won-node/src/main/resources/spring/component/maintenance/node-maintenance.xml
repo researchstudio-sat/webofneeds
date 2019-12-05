@@ -22,7 +22,7 @@
 
     <import resource="classpath:/spring/component/scheduling/node-scheduling.xml"/>
 
-    <bean id="atomManagementService" class="won.node.service.impl.AtomManagementService"/>
+    <bean id="atomManagementService" class="won.node.service.nodebehaviour.AtomManagementService"/>
 
     <bean id="inactivityChecker" class="won.node.maintenance.AtomInactivityChecker">
         <property name="taskScheduler" ref="taskScheduler"/>

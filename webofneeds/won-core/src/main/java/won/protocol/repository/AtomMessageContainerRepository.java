@@ -35,7 +35,7 @@ public interface AtomMessageContainerRepository extends WonRepository<AtomMessag
     void lockParentAndContainerByParentUriForUpdate(@Param("parentUri") URI parentUri);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select c from AtomMessageContainer c join MessageEventPlaceholder msg on msg.parentURI = c.parentUri where msg.messageURI = :messageUri")
+    @Query("select c from AtomMessageContainer c join MessageEvent msg on msg.parentURI = c.parentUri where msg.messageURI = :messageUri")
     AtomMessageContainer findOneByContainedMessageUriForUpdate(@Param("messageUri") URI messageUri);
 
     @Query("select case when (count(n) > 0) then true else false end "

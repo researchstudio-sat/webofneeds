@@ -244,6 +244,8 @@ const mapDispatchToProps = dispatch => {
       trimmedMsg,
       additionalContent,
       referencedContent,
+      senderSocketUri,
+      targetSocketUri,
       connectionUri,
       isTTL
     ) => {
@@ -252,13 +254,21 @@ const mapDispatchToProps = dispatch => {
           trimmedMsg,
           additionalContent,
           referencedContent,
+          senderSocketUri,
+          targetSocketUri,
           connectionUri,
           isTTL
         )
       );
     },
-    openRequest: (connectionUri, message) => {
-      dispatch(actionCreators.connections__open(connectionUri, message));
+    connectSockets: (senderSocketUri, targetSocketUri, message) => {
+      dispatch(
+        actionCreators.atoms__connectSockets(
+          senderSocketUri,
+          targetSocketUri,
+          message
+        )
+      );
     },
     rateConnection: (connectionUri, rating) => {
       dispatch(actionCreators.connections__rate(connectionUri, rating));
@@ -316,16 +326,6 @@ const mapDispatchToProps = dispatch => {
           targetAtomUri,
           message,
           persona
-        )
-      );
-    },
-    connect: (ownedAtomUri, connectionUri, targetAtomUri, message) => {
-      dispatch(
-        actionCreators.atoms__connect(
-          ownedAtomUri,
-          connectionUri,
-          targetAtomUri,
-          message
         )
       );
     },
@@ -764,12 +764,21 @@ class AtomMessages extends React.Component {
                 submitButtonLabel="Accept&#160;Chat"
                 allowEmptySubmit={true}
                 allowDetails={false}
-                onSubmit={({ value }) =>
-                  this.props.openRequest(
-                    this.props.selectedConnectionUri,
+                onSubmit={({ value }) => {
+                  const senderSocketUri = get(
+                    this.props.connection,
+                    "socketUri"
+                  );
+                  const targetSocketUri = get(
+                    this.props.connection,
+                    "targetSocketUri"
+                  );
+                  this.props.connectSockets(
+                    senderSocketUri,
+                    targetSocketUri,
                     value
-                  )
-                }
+                  );
+                }}
               />
               <WonLabelledHr className="pm__footer__labelledhr" label="Or" />
               <button
@@ -889,30 +898,28 @@ class AtomMessages extends React.Component {
 
     const trimmedMsg = chatMessage.trim();
     if (trimmedMsg || additionalContent || referencedContent) {
+      const senderSocketUri = get(this.props.connection, "socketUri");
+      const targetSocketUri = get(this.props.connection, "targetSocketUri");
+
       this.props.sendChatMessage(
         trimmedMsg,
         additionalContent,
         referencedContent,
+        senderSocketUri,
+        targetSocketUri,
         get(this.props.connection, "uri"),
         isTTL
       );
     }
   }
 
-  addMessageToState(eventUri, key) {
+  addMessageToState(messageUri) {
     const ownedAtomUri = get(this.props.ownedAtom, "uri");
-    return ownerApi.getMessage(ownedAtomUri, eventUri).then(response => {
+    return ownerApi.getMessage(ownedAtomUri, messageUri).then(response => {
       won.wonMessageFromJsonLd(response).then(msg => {
-        if (msg.isFromOwner() && msg.getRecipientAtom() === ownedAtomUri) {
-          /*if we find out that the recipientatom of the crawled event is actually our
-            atom we will call the method again but this time with the correct eventUri
-          */
-          this.addMessageToState(msg.getRemoteMessageUri(), key);
-        } else {
-          //If message isnt in the state we add it
-          if (!get(this.props.chatMessages, eventUri)) {
-            this.props.processAgreementMessage(msg);
-          }
+        //If message isnt in the state we add it
+        if (!get(this.props.chatMessages, messageUri)) {
+          this.props.processAgreementMessage(msg);
         }
       });
     });
@@ -930,10 +937,10 @@ class AtomMessages extends React.Component {
         this.props.selectedConnectionUri,
         won.WONCON.binaryRatingGood
       );
-      this.props.connect(
-        get(this.props.ownedAtom, "uri"),
-        this.props.selectedConnectionUri,
-        this.props.targetAtomUri,
+
+      this.props.connectSockets(
+        get(this.props.connection, "socketUri"),
+        get(this.props.connection, "targetSocketUri"),
         message
       );
       if (this.showOverlayConnection) {
@@ -1076,8 +1083,8 @@ class AtomMessages extends React.Component {
           );
 
           //Retrieve all the relevant messages
-          agreementDataImm.map((uriList, key) =>
-            uriList.map(uri => this.addMessageToState(uri, key))
+          agreementDataImm.map(uriList =>
+            uriList.map(uri => this.addMessageToState(uri))
           );
         })
         .catch(error => {
@@ -1108,7 +1115,6 @@ class AtomMessages extends React.Component {
       this.props.chatMessagesWithUnknownState.forEach(msg => {
         let messageStatus = get(msg, "messageStatus");
         const msgUri = get(msg, "uri");
-        const remoteMsgUri = get(msg, "remoteUri");
 
         const acceptedUris = get(this.props.agreementData, "agreementUris");
         const rejectedUris = get(
@@ -1145,28 +1151,13 @@ class AtomMessages extends React.Component {
           "isCancellationPending"
         );
 
-        const isOldProposed = !!(
-          get(proposedUris, msgUri) || get(proposedUris, remoteMsgUri)
-        );
-        const isOldClaimed = !!(
-          get(claimedUris, msgUri) || get(claimedUris, remoteMsgUri)
-        );
-        const isOldAccepted = !!(
-          get(acceptedUris, msgUri) || get(acceptedUris, remoteMsgUri)
-        );
-        const isOldRejected = !!(
-          get(rejectedUris, msgUri) || get(rejectedUris, remoteMsgUri)
-        );
-        const isOldRetracted = !!(
-          get(retractedUris, msgUri) || get(retractedUris, remoteMsgUri)
-        );
-        const isOldCancelled = !!(
-          get(cancelledUris, msgUri) || get(cancelledUris, remoteMsgUri)
-        );
-        const isOldCancellationPending = !!(
-          get(cancellationPendingUris, msgUri) ||
-          get(cancellationPendingUris, remoteMsgUri)
-        );
+        const isOldProposed = !!get(proposedUris, msgUri);
+        const isOldClaimed = !!get(claimedUris, msgUri);
+        const isOldAccepted = !!get(acceptedUris, msgUri);
+        const isOldRejected = !!get(rejectedUris, msgUri);
+        const isOldRetracted = !!get(retractedUris, msgUri);
+        const isOldCancelled = !!get(cancelledUris, msgUri);
+        const isOldCancellationPending = !!get(cancellationPendingUris, msgUri);
 
         messageStatus = messageStatus
           .set("isProposed", isProposed || isOldProposed)
@@ -1254,9 +1245,8 @@ AtomMessages.propTypes = {
   setShowAgreementData: PropTypes.func,
   hideAddMessageContent: PropTypes.func,
   sendChatMessage: PropTypes.func,
-  connect: PropTypes.func,
   connectAdHoc: PropTypes.func,
-  openRequest: PropTypes.func,
+  connectSockets: PropTypes.func,
   rateConnection: PropTypes.func,
   closeConnection: PropTypes.func,
   selectMessage: PropTypes.func,

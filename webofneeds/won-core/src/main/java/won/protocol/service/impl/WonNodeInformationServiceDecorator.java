@@ -11,6 +11,7 @@
 package won.protocol.service.impl;
 
 import java.net.URI;
+import java.util.Optional;
 
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInformationService;
@@ -35,23 +36,8 @@ public class WonNodeInformationServiceDecorator implements WonNodeInformationSer
     }
 
     @Override
-    public URI generateEventURI() {
-        return delegate.generateEventURI();
-    }
-
-    @Override
-    public URI generateEventURI(URI wonNodeURI) {
-        return delegate.generateEventURI(wonNodeURI);
-    }
-
-    @Override
-    public URI generateConnectionURI() {
-        return delegate.generateConnectionURI();
-    }
-
-    @Override
-    public URI generateConnectionURI(URI wonNodeURI) {
-        return delegate.generateConnectionURI(wonNodeURI);
+    public URI generateConnectionURI(URI atomURI) {
+        return delegate.generateConnectionURI(atomURI);
     }
 
     @Override
@@ -102,5 +88,15 @@ public class WonNodeInformationServiceDecorator implements WonNodeInformationSer
     @Override
     public boolean isValidAtomURI(URI atomURI, URI wonNodeURI) {
         return delegate.isValidAtomURI(atomURI, wonNodeURI);
+    }
+
+    @Override
+    public Optional<WonNodeInfo> getWonNodeInformationForURI(URI someURI, Optional<URI> requesterWebID) {
+        return delegate.getWonNodeInformationForURI(someURI, requesterWebID);
+    }
+
+    @Override
+    public WonNodeInfo getDefaultWonNodeInfo() {
+        return delegate.getDefaultWonNodeInfo();
     }
 }

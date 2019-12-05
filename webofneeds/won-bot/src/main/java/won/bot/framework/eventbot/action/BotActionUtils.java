@@ -21,7 +21,7 @@ import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent
 import won.bot.framework.eventbot.event.impl.wonmessage.SocketHintFromMatcherEvent;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
@@ -53,17 +53,14 @@ public class BotActionUtils {
                     final String message) throws WonMessageBuilderException {
         WonNodeInformationService wonNodeInformationService = context.getWonNodeInformationService();
         Dataset connectionRDF = context.getLinkedDataSource().getDataForResource(connectionURI);
-        URI targetAtom = WonRdfUtils.ConnectionUtils.getTargetAtomURIFromConnection(connectionRDF, connectionURI);
-        URI localAtom = WonRdfUtils.ConnectionUtils.getLocalAtomURIFromConnection(connectionRDF, connectionURI);
         URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
-        Dataset targetAtomRDF = context.getLinkedDataSource().getDataForResource(targetAtom);
-        URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
+        URI socketURI = WonRdfUtils.ConnectionUtils.getSocketURIFromConnection(connectionRDF, connectionURI);
+        URI targetSocketURI = WonRdfUtils.ConnectionUtils.getTargetSocketURIFromConnection(connectionRDF,
+                        connectionURI);
         return WonMessageBuilder
-                        .setMessagePropertiesForConnectionMessage(messageURI, connectionURI, localAtom, wonNode,
-                                        WonRdfUtils.ConnectionUtils.getTargetConnectionURIFromConnection(connectionRDF,
-                                                        connectionURI),
-                                        targetAtom,
-                                        WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(targetAtomRDF, targetAtom), message)
+                        .connectionMessage()
+                        .sockets().sender(socketURI).recipient(targetSocketURI)
+                        .content().text(message)
                         .build();
     }
 

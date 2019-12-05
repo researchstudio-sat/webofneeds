@@ -13,22 +13,23 @@ package won.node.camel.processor.fixed;
 import java.net.URI;
 import java.util.Collection;
 
+import javax.persistence.EntityManager;
+
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
+import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.WonMessageDirection;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
+import won.protocol.model.Atom;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
-import won.protocol.model.Atom;
-import won.protocol.util.DataAccessUtils;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -38,6 +39,8 @@ import won.protocol.vocabulary.WONMSG;
 @FixedMessageReactionProcessor(direction = WONMSG.FromOwnerString, messageType = WONMSG.DeactivateMessageString)
 public class DeactivateAtomMessageFromOwnerReactionProcessor extends AbstractCamelProcessor {
     Logger logger = LoggerFactory.getLogger(this.getClass());
+    @Autowired
+    EntityManager entityManager;
 
     public void process(final Exchange exchange) throws Exception {
         WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -45,12 +48,13 @@ public class DeactivateAtomMessageFromOwnerReactionProcessor extends AbstractCam
         logger.debug("DEACTIVATING atom. atomURI:{}", recipientAtomURI);
         if (recipientAtomURI == null)
             throw new WonMessageProcessingException("recipientAtomURI is not set");
-        Atom atom = DataAccessUtils.loadAtom(atomRepository, recipientAtomURI);
+        Atom atom = atomService.getAtomRequired(recipientAtomURI);
         matcherProtocolMatcherClient.atomDeactivated(atom.getAtomURI(), wonMessage);
         // close all connections
         Collection<Connection> conns = connectionRepository.findByAtomURIAndNotStateForUpdate(atom.getAtomURI(),
                         ConnectionState.CLOSED);
         for (Connection con : conns) {
+            entityManager.refresh(con);
             closeConnection(atom, con);
         }
     }
@@ -59,10 +63,16 @@ public class DeactivateAtomMessageFromOwnerReactionProcessor extends AbstractCam
         // send close from system to each connection
         // the close message is directed at our local connection. It will
         // be routed to the owner and forwarded to to remote connection
-        URI messageURI = wonNodeInformationService.generateEventURI();
-        WonMessage message = WonMessageBuilder.setMessagePropertiesForClose(messageURI, WonMessageDirection.FROM_SYSTEM,
-                        con.getConnectionURI(), con.getAtomURI(), atom.getWonNodeURI(), con.getConnectionURI(),
-                        con.getAtomURI(), atom.getWonNodeURI(), "Closed because Atom was deactivated").build();
-        sendSystemMessage(message);
+        WonMessage message = WonMessageBuilder
+                        .close()
+                        .sockets()
+                        /**/.sender(con.getSocketURI())
+                        /**/.recipient(con.getTargetSocketURI())
+                        .content()
+                        /**/.text("Closed because Atom was deactivated")
+                        .direction()
+                        /**/.fromSystem()
+                        .build();
+        camelWonMessageService.sendSystemMessage(message);
     }
 }

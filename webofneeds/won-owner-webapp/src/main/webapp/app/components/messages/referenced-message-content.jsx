@@ -566,30 +566,13 @@ class WonReferencedMessageContent extends React.Component {
     const ownedAtomUri = this.props.ownedAtomUri;
     return ownerApi.getMessage(ownedAtomUri, eventUri).then(response => {
       won.wonMessageFromJsonLd(response).then(msg => {
-        if (msg.isFromOwner() && msg.getRecipientAtom() === ownedAtomUri) {
-          /*if we find out that the recipientatom of the crawled event is actually our
-           atom we will call the method again but this time with the correct eventUri
-           */
-          this.addMessageToState(msg.getRemoteMessageUri());
-        } else {
-          //If message isnt in the state we add it
-          this.props.processAgreementMessage(msg);
-        }
+        //If message isnt in the state we add it
+        this.props.processAgreementMessage(msg);
       });
     });
   }
   getReferencedMessage(messageUri) {
-    let referencedMessage = get(this.props.chatMessages, messageUri);
-    if (referencedMessage) {
-      return referencedMessage;
-    } else {
-      return (
-        this.props.chatMessages &&
-        this.props.chatMessages.find(
-          msg => get(msg, "remoteUri") === messageUri
-        )
-      );
-    }
+    return get(this.props.chatMessages, messageUri);
   }
 
   toggleReferenceExpansion(reference) {

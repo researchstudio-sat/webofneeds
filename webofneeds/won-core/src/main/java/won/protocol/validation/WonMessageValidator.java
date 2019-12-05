@@ -17,7 +17,7 @@ public class WonMessageValidator extends BaseValidator {
     private static final String resourceDir = "validation/message/";
 
     public WonMessageValidator() {
-        String[] dirs = { resourceDir + "01_basic/", resourceDir + "02_prop/", resourceDir + "03_chain/",
+        String[] dirs = { resourceDir + "02_prop/", resourceDir + "03_chain/",
                         resourceDir + "04_uri/", resourceDir + "05_sign/" };
         this.loadSparqlValidatorsFromDirectories(dirs);
     }

@@ -32,63 +32,49 @@ export function buildRateMessage(
   ownNodeUri,
   theirNodeUri,
   theirConnectionUri,
-  rating
+  rating,
+  socketUri,
+  targetSocketUri
 ) {
   return new Promise(resolve => {
-    const buildMessage = function(envelopeData) {
+    const buildMessage = function() {
       //TODO: use event URI pattern specified by WoN node
-      const eventUri =
-        envelopeData[won.WONMSG.senderNode] +
-        "/event/" +
-        wonUtils.getRandomWonId();
+      const eventUri = "wm:/SELF"; //mandatory
       const message = new won.MessageBuilder(won.WONMSG.feedbackMessage) //TODO: Looks like a copy-paste-leftover from connect
+        .protocolVersion("1.0")
         .eventURI(eventUri)
         .ownerDirection()
-        .forEnvelopeData(envelopeData)
-        .sentTimestamp(new Date().getTime().toString())
+        .senderSocket(socketUri)
+        .targetSocket(targetSocketUri)
+        .timestamp(new Date().getTime().toString())
         .addRating(rating, msgToRateFor.connection.uri)
         .build();
-      //const callback = createMessageCallbackForTargetAtomMessage(eventUri, won.EVENT.OPEN_SENT);
+
       return { eventUri: eventUri, message: message };
     };
 
     //fetch all datan needed
     won
-      .getEnvelopeDataforConnection(
-        msgToRateFor.connection.uri,
-        ownedAtomUri,
-        theirAtomUri,
-        ownNodeUri,
-        theirNodeUri,
-        theirConnectionUri
-      )
-      .then(function(envelopeData) {
-        resolve(buildMessage(envelopeData, msgToRateFor.event));
+      .validateEnvelopeDataForConnection(socketUri, targetSocketUri)
+      .then(function() {
+        resolve(buildMessage(msgToRateFor.event));
       }, won.reportError(
         "cannot open connection " + msgToRateFor.connection.uri
       ));
   });
 }
 
-export function buildCloseMessage(
-  connectionUri,
-  ownedAtomUri,
-  theirAtomUri,
-  ownNodeUri,
-  theirNodeUri,
-  theirConnectionUri
-) {
-  const buildMessage = function(envelopeData) {
+export function buildCloseMessage(socketUri, targetSocketUri) {
+  const buildMessage = function() {
     //TODO: use event URI pattern specified by WoN node
-    const eventUri =
-      envelopeData[won.WONMSG.senderNode] +
-      "/event/" +
-      wonUtils.getRandomWonId();
+    const eventUri = "wm:/SELF"; //mandatory
     const message = new won.MessageBuilder(won.WONMSG.closeMessage)
+      .protocolVersion("1.0")
       .eventURI(eventUri)
-      .forEnvelopeData(envelopeData)
+      .senderSocket(socketUri)
+      .targetSocket(targetSocketUri)
       .ownerDirection()
-      .sentTimestamp(new Date().getTime().toString())
+      .timestamp(new Date().getTime().toString())
       .build();
     //const callback = createMessageCallbackForTargetAtomMessage(eventUri, won.EVENT.CLOSE_SENT);
     return { eventUri: eventUri, message: message };
@@ -96,93 +82,75 @@ export function buildCloseMessage(
 
   //fetch all datan needed
   return won
-    .getEnvelopeDataforConnection(
-      connectionUri,
-      ownedAtomUri,
-      theirAtomUri,
-      ownNodeUri,
-      theirNodeUri,
-      theirConnectionUri
-    )
-    .then(envelopeData => buildMessage(envelopeData))
+    .validateEnvelopeDataForConnection(socketUri, targetSocketUri)
+    .then(() => buildMessage())
     .catch(err => {
-      won.reportError(
-        "cannot close connection " + connectionUri + ": " + JSON.stringify(err)
-      );
+      won.reportError("cannot close connection " + JSON.stringify(err));
       throw err;
     });
 }
-export function buildCloseAtomMessage(atomUri, wonNodeUri) {
-  const buildMessage = function(envelopeData) {
-    const eventUri =
-      envelopeData[won.WONMSG.senderNode] +
-      "/event/" +
-      wonUtils.getRandomWonId();
+export function buildCloseAtomMessage(atomUri) {
+  const buildMessage = function() {
+    const eventUri = "wm:/SELF"; //mandatory
     const message = new won.MessageBuilder(won.WONMSG.closeAtomMessage)
+      .protocolVersion("1.0")
+      .atom(atomUri)
       .eventURI(eventUri)
-      .recipientNode(wonNodeUri)
       .ownerDirection()
-      .sentTimestamp(new Date().getTime().toString())
-      .forEnvelopeData(envelopeData)
+      .timestamp(new Date().getTime().toString())
       .build();
 
     return { eventUri: eventUri, message: message };
   };
 
   return won
-    .getEnvelopeDataForAtom(atomUri, wonNodeUri)
+    .validateEnvelopeDataForAtom(atomUri)
     .then(
-      envelopeData => buildMessage(envelopeData),
+      () => buildMessage(),
       () => won.reportError("cannot close atom " + atomUri)
     );
 }
 
-export function buildDeleteAtomMessage(atomUri, wonNodeUri) {
-  const buildMessage = function(envelopeData) {
-    const eventUri =
-      envelopeData[won.WONMSG.senderNode] +
-      "/event/" +
-      wonUtils.getRandomWonId();
+export function buildDeleteAtomMessage(atomUri) {
+  const buildMessage = function() {
+    const eventUri = "wm:/SELF"; //mandatory
     const message = new won.MessageBuilder(won.WONMSG.deleteAtomMessage)
+      .protocolVersion("1.0")
+      .atom(atomUri)
       .eventURI(eventUri)
-      .recipientNode(wonNodeUri)
       .ownerDirection()
-      .sentTimestamp(new Date().getTime().toString())
-      .forEnvelopeData(envelopeData)
+      .timestamp(new Date().getTime().toString())
       .build();
 
     return { eventUri: eventUri, message: message };
   };
 
   return won
-    .getEnvelopeDataForAtom(atomUri, wonNodeUri)
+    .validateEnvelopeDataForAtom(atomUri)
     .then(
-      envelopeData => buildMessage(envelopeData),
+      () => buildMessage(),
       () => won.reportError("cannot delete atom " + atomUri)
     );
 }
 
-export function buildOpenAtomMessage(atomUri, wonNodeUri) {
-  const buildMessage = function(envelopeData) {
-    const eventUri =
-      envelopeData[won.WONMSG.senderNode] +
-      "/event/" +
-      wonUtils.getRandomWonId();
+export function buildOpenAtomMessage(atomUri) {
+  const buildMessage = function() {
+    const eventUri = "wm:/SELF"; //mandatory
     const message = new won.MessageBuilder(won.WONMSG.activateAtomMessage)
+      .protocolVersion("1.0")
+      .atom(atomUri)
       .eventURI(eventUri)
-      .recipientNode(wonNodeUri)
       .ownerDirection()
-      .sentTimestamp(new Date().getTime().toString())
-      .forEnvelopeData(envelopeData)
+      .timestamp(new Date().getTime().toString())
       .build();
 
     return { eventUri: eventUri, message: message };
   };
 
   return won
-    .getEnvelopeDataForAtom(atomUri, wonNodeUri)
+    .validateEnvelopeDataForAtom(atomUri)
     .then(
-      envelopeData => buildMessage(envelopeData),
+      () => buildMessage(),
       () => won.reportError("cannot close atom " + atomUri)
     );
 }
@@ -194,44 +162,29 @@ export function buildOpenAtomMessage(atomUri, wonNodeUri) {
  * @returns {{eventUri, message}|*}
  */
 export function buildConnectMessage({
-  ownedAtomUri,
-  theirAtomUri,
-  ownNodeUri,
-  theirNodeUri,
   connectMessage,
-  optionalOwnConnectionUri,
   socketUri,
   targetSocketUri,
 }) {
-  const envelopeData = won.getEnvelopeDataforNewConnection(
-    ownedAtomUri,
-    theirAtomUri,
-    ownNodeUri,
-    theirNodeUri
-  );
-  if (optionalOwnConnectionUri) {
-    envelopeData[won.WONMSG.sender] = optionalOwnConnectionUri;
+  if (!socketUri || !targetSocketUri) {
+    throw new Error("buildConnectMessage is missing socketUris");
   }
-  if (socketUri) {
-    envelopeData[won.WONMSG.senderSocket] = socketUri;
-  }
-  if (targetSocketUri) {
-    envelopeData[won.WONMSG.recipientSocket] = targetSocketUri;
-  }
-  //TODO: use event URI pattern specified by WoN node
-  const eventUri =
-    envelopeData[won.WONMSG.senderNode] + "/event/" + wonUtils.getRandomWonId();
-  const messageBuilder = new won.MessageBuilder(won.WONMSG.connectMessage);
-  messageBuilder.eventURI(eventUri);
-  messageBuilder.forEnvelopeData(envelopeData);
-  //do not set sockets: connect the default sockets with each other
+
+  const eventUri = "wm:/SELF"; //mandatory
+  const messageBuilder = new won.MessageBuilder(won.WONMSG.connectMessage)
+    .protocolVersion("1.0")
+    .eventURI(eventUri)
+    .senderSocket(socketUri)
+    .targetSocket(targetSocketUri)
+    .ownerDirection()
+    .timestamp(new Date().getTime().toString());
+
   if (connectMessage && typeof connectMessage === "string") {
     messageBuilder.textMessage(connectMessage);
   } else if (connectMessage) {
     messageBuilder.mergeIntoContentGraph(connectMessage);
   }
-  messageBuilder.ownerDirection();
-  messageBuilder.sentTimestamp(new Date().getTime().toString());
+
   const message = messageBuilder.build();
 
   return { eventUri: eventUri, message: message };
@@ -240,34 +193,24 @@ export function buildConnectMessage({
 export function buildChatMessage({
   chatMessage,
   additionalContent,
-  referencedContentUris, //this is a map of corresponding uris to be e.g. proposes or retracted... (it already includes the correct uri -> remoteUri for received messages, and uri for sent messages)
-  connectionUri,
-  ownedAtomUri,
-  theirAtomUri,
-  ownNodeUri,
-  theirNodeUri,
-  theirConnectionUri,
+  referencedContentUris, //this is a map of corresponding uris to be e.g. proposes or retracted...
   isTTL,
+  socketUri,
+  targetSocketUri,
 }) {
   let jsonldGraphPayloadP = isTTL
     ? won.ttlToJsonLd(won.defaultTurtlePrefixes + "\n" + chatMessage)
     : Promise.resolve();
 
-  const envelopeDataP = won.getEnvelopeDataforConnection(
-    connectionUri,
-    ownedAtomUri,
-    theirAtomUri,
-    ownNodeUri,
-    theirNodeUri,
-    theirConnectionUri
+  const envelopeDataP = won.validateEnvelopeDataForConnection(
+    socketUri,
+    targetSocketUri
   );
 
   const messageP = Promise.all([envelopeDataP, jsonldGraphPayloadP]).then(
     ([envelopeData, graphPayload]) => {
-      const eventUri =
-        envelopeData[won.WONMSG.senderNode] +
-        "/event/" +
-        wonUtils.getRandomWonId();
+      envelopeData; //TODO remove this
+      const eventUri = "wm:/SELF"; //mandatory
 
       /*
              * Build the json-ld message that's signed on the owner-server
@@ -276,9 +219,11 @@ export function buildChatMessage({
       const wonMessageBuilder = new won.MessageBuilder(
         won.WONMSG.connectionMessage
       )
-        .forEnvelopeData(envelopeData)
+        .protocolVersion("1.0")
         .ownerDirection()
-        .sentTimestamp(new Date().getTime().toString());
+        .senderSocket(socketUri)
+        .targetSocket(targetSocketUri)
+        .timestamp(new Date().getTime().toString());
 
       if (isTTL && graphPayload) {
         wonMessageBuilder.mergeIntoContentGraph(graphPayload);
@@ -396,48 +341,7 @@ export function buildChatMessage({
   return messageP;
 }
 
-export function buildOpenMessage(
-  connectionUri,
-  ownedAtomUri,
-  theirAtomUri,
-  ownNodeUri,
-  theirNodeUri,
-  theirConnectionUri,
-  chatMessage
-) {
-  const messageP = won
-    .getEnvelopeDataforConnection(
-      connectionUri,
-      ownedAtomUri,
-      theirAtomUri,
-      ownNodeUri,
-      theirNodeUri,
-      theirConnectionUri
-    )
-    .then(envelopeData => {
-      //TODO: use event URI pattern specified by WoN node
-      const eventUri =
-        envelopeData[won.WONMSG.senderNode] +
-        "/event/" +
-        wonUtils.getRandomWonId();
-      const message = new won.MessageBuilder(won.WONMSG.openMessage)
-        .eventURI(eventUri)
-        .forEnvelopeData(envelopeData)
-        .textMessage(chatMessage)
-        .ownerDirection()
-        .sentTimestamp(new Date().getTime().toString())
-        .build();
-
-      return {
-        eventUri,
-        message,
-      };
-    });
-
-  return messageP;
-}
-
-export async function buildEditMessage(editedAtomData, oldAtom, wonNodeUri) {
+export async function buildEditMessage(editedAtomData, oldAtom) {
   const atomUriToEdit = oldAtom && oldAtom.get("uri");
 
   //if type  create -> use atomBuilder as well
@@ -464,10 +368,8 @@ export async function buildEditMessage(editedAtomData, oldAtom, wonNodeUri) {
     socket: editedAtomData.socket,
   });
 
-  const msgUri = wonNodeUri + "/event/" + wonUtils.getRandomWonId(); //mandatory
+  const msgUri = "wm:/SELF"; //mandatory
   const msgJson = won.buildMessageRdf(contentRdf, {
-    recipientNode: wonNodeUri, //mandatory
-    senderNode: wonNodeUri, //mandatory
     msgType: won.WONMSG.replaceMessage, //mandatory
     publishedContentUri: atomUriToEdit, //mandatory
     msgUri: msgUri,
@@ -531,10 +433,9 @@ export async function buildCreateMessage(atomData, wonNodeUri) {
     socket: atomData.socket,
   });
 
-  const msgUri = wonNodeUri + "/event/" + wonUtils.getRandomWonId(); //mandatory
+  const msgUri = "wm:/SELF"; //mandatory
   const msgJson = won.buildMessageRdf(contentRdf, {
-    recipientNode: wonNodeUri, //mandatory
-    senderNode: wonNodeUri, //mandatory
+    atom: publishedContentUri, //mandatory
     msgType: won.WONMSG.createMessage, //mandatory
     publishedContentUri: publishedContentUri, //mandatory
     msgUri: msgUri,

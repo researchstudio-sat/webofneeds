@@ -1,14 +1,23 @@
 package won.protocol.service.impl;
 
 import java.net.URI;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.apache.jena.query.Dataset;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
 import won.cryptography.service.RandomNumberService;
+import won.protocol.exception.IllegalAtomURIException;
+import won.protocol.message.WonMessageUtils;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInformationService;
+import won.protocol.util.WonMessageUriHelper;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
@@ -24,14 +33,34 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
     private LinkedDataSource linkedDataSource;
     @Value(value = "${uri.node.default}")
     private URI defaultWonNodeUri;
+    private final Ehcache wonNodeInfoCache;
+
+    public WonNodeInformationServiceImpl() {
+        CacheManager manager = CacheManager.getInstance();
+        this.wonNodeInfoCache = new Cache("wonNodeInformationServiceImpl", 100, false, false, 3600, 3600);
+        manager.addCache(wonNodeInfoCache);
+    }
+
+    private WonNodeInfo getFromCache(URI wonNodeURI) {
+        Element e = wonNodeInfoCache.get(wonNodeURI);
+        if (e == null) {
+            return null;
+        }
+        return (WonNodeInfo) e.getObjectValue();
+    }
 
     @Override
     public WonNodeInfo getWonNodeInformation(URI wonNodeURI) {
-        assert wonNodeURI != null;
+        Objects.requireNonNull(wonNodeURI);
+        WonNodeInfo info = getFromCache(wonNodeURI);
+        if (info != null) {
+            return info;
+        }
         Dataset nodeDataset = linkedDataSource.getDataForResource(wonNodeURI);
-        WonNodeInfo info = WonRdfUtils.WonNodeUtils.getWonNodeInfo(wonNodeURI, nodeDataset);
+        info = WonRdfUtils.WonNodeUtils.getWonNodeInfo(wonNodeURI, nodeDataset);
         if (info == null)
             throw new IllegalStateException("Could not obtain WonNodeInformation for URI " + wonNodeURI);
+        wonNodeInfoCache.put(new Element(wonNodeURI, info));
         return info;
     }
 
@@ -41,31 +70,22 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
     }
 
     @Override
-    public URI generateEventURI(URI wonNodeURI) {
-        WonNodeInfo wonNodeInformation = getWonNodeInformation(wonNodeURI);
-        return URI.create(wonNodeInformation.getEventURIPrefix() + "/" + generateRandomID());
-    }
-
-    @Override
     public boolean isValidEventURI(URI eventURI) {
-        return isValidEventURI(eventURI, getDefaultWonNodeURI());
+        return WonMessageUriHelper.isGenericMessageURI(eventURI);
     }
 
     @Override
     public boolean isValidEventURI(URI eventURI, URI wonNodeURI) {
-        WonNodeInfo wonNodeInformation = getWonNodeInformation(wonNodeURI);
-        return isValidURI(eventURI, wonNodeInformation.getEventURIPrefix());
+        return isValidEventURI(eventURI);
     }
 
     @Override
-    public URI generateConnectionURI() {
-        return generateConnectionURI(getDefaultWonNodeURI());
-    }
-
-    @Override
-    public URI generateConnectionURI(URI wonNodeURI) {
-        WonNodeInfo wonNodeInformation = getWonNodeInformation(wonNodeURI);
-        return URI.create(wonNodeInformation.getConnectionURIPrefix() + "/" + generateRandomID());
+    public URI generateConnectionURI(URI atomURI) {
+        if (!isValidAtomURI(atomURI)) {
+            throw new IllegalAtomURIException(
+                            "Atom URI " + atomURI + " does not conform to this WoN node's URI patterns");
+        }
+        return URI.create(WonMessageUtils.stripFragment(atomURI).toString() + "/c/" + generateRandomID());
     }
 
     @Override
@@ -77,11 +97,6 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
     public boolean isValidConnectionURI(URI connectionURI, URI wonNodeURI) {
         WonNodeInfo wonNodeInformation = getWonNodeInformation(wonNodeURI);
         return isValidURI(connectionURI, wonNodeInformation.getConnectionURIPrefix());
-    }
-
-    @Override
-    public URI generateEventURI() {
-        return generateEventURI(getDefaultWonNodeURI());
     }
 
     @Override
@@ -118,6 +133,10 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
         return defaultWonNodeUri;
     }
 
+    public WonNodeInfo getDefaultWonNodeInfo() {
+        return getWonNodeInformation(defaultWonNodeUri);
+    }
+
     public void setDefaultWonNodeUri(final URI defaultWonNodeUri) {
         this.defaultWonNodeUri = defaultWonNodeUri;
     }
@@ -139,5 +158,10 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
      */
     private String generateRandomID() {
         return randomNumberService.generateRandomString(RANDOM_ID_STRING_LENGTH);
+    }
+
+    @Override
+    public Optional<WonNodeInfo> getWonNodeInformationForURI(URI someURI, Optional<URI> requesterWebID) {
+        return WonLinkedDataUtils.findWonNode(someURI, requesterWebID, linkedDataSource);
     }
 }

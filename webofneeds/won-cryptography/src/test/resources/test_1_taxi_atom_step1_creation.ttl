@@ -41,8 +41,8 @@
 
 
 # signature of the whole data above:
-_:sig sig:signature [
+_:sig msg:Signature [
       rdf:type sig:WonSignature ;
       sig:signer <http://example.com/webid#key-5> ;
-      sig:signatureValue
+      msg:signatureValue
 "OGQzNGVkMzVmMmQ3ODIyOWM32MzQzNmExMgoYzI4ZDY3NjI4NTIyZTk=" . ] .

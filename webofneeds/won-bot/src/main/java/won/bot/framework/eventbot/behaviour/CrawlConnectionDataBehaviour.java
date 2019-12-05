@@ -10,6 +10,14 @@
  */
 package won.bot.framework.eventbot.behaviour;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.shared.PrefixMapping;
@@ -18,6 +26,7 @@ import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotAction;
@@ -42,14 +51,6 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Crawls the complete connection data. This behaviour is transient, it is only
@@ -84,12 +85,6 @@ public class CrawlConnectionDataBehaviour extends BotBehaviour {
                             linkedDataSource);
             ((CachingLinkedDataSource) linkedDataSource).invalidate(toInvalidate);
             ((CachingLinkedDataSource) linkedDataSource).invalidate(toInvalidate, command.getAtomURI());
-            URI targetConnectionUri = WonLinkedDataUtils
-                            .getTargetConnectionURIforConnectionURI(command.getConnectionURI(), linkedDataSource);
-            toInvalidate = WonLinkedDataUtils.getMessageContainerURIforConnectionURI(targetConnectionUri,
-                            linkedDataSource);
-            ((CachingLinkedDataSource) linkedDataSource).invalidate(toInvalidate);
-            ((CachingLinkedDataSource) linkedDataSource).invalidate(toInvalidate, command.getAtomURI());
         }
         context.getTaskScheduler().schedule(this::deactivate,
                         new Date(System.currentTimeMillis() + abortTimeout.toMillis()));
@@ -107,14 +102,7 @@ public class CrawlConnectionDataBehaviour extends BotBehaviour {
         propertyPaths.add(PathParser.parse("won:messageContainer/rdfs:member", pmap));
         propertyPaths.add(PathParser.parse("won:messageContainer/rdfs:member/msg:correspondingRemoteMessage", pmap));
         propertyPaths.add(PathParser.parse("won:targetAtom", pmap));
-        propertyPaths.add(PathParser.parse("won:targetAtom/won:messageContainer", pmap));
-        propertyPaths.add(PathParser.parse("won:targetAtom/won:messageContainer/rdfs:member", pmap));
         propertyPaths.add(PathParser.parse("won:targetConnection", pmap));
-        propertyPaths.add(PathParser.parse("won:targetConnection/won:messageContainer", pmap));
-        propertyPaths.add(PathParser.parse("won:targetConnection/won:messageContainer/rdfs:member", pmap));
-        propertyPaths.add(PathParser
-                        .parse("won:targetConnection/won:messageContainer/rdfs:member/msg:correspondingRemoteMessage",
-                                        pmap));
         CrawlCommandEvent crawlConnectionCommandEvent = new CrawlCommandEvent(command.getAtomURI(),
                         command.getConnectionURI(), propertyPaths, 10000, 5);
         Dataset crawledData = DatasetFactory.createGeneral();

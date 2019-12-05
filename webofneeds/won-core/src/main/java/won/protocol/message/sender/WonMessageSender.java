@@ -17,5 +17,41 @@ import won.protocol.message.sender.exception.WonMessageSenderException;
  * Interface for sending messages.
  */
 public interface WonMessageSender {
-    void sendWonMessage(WonMessage message) throws WonMessageSenderException;
+    /**
+     * Sends the message after signing it and setting its message URI.
+     * <p>
+     * Equivalent to
+     * 
+     * <pre>
+     * WonMessageSencer sender = ... // sender instance
+     * WonMessage msg = ... // message (unprepared)
+     * WonMessage msg =  sender.prepareMessage(msg);
+     *   sender.sendMessage(msg);
+     * </pre>
+     * </p>
+     * Only that you have no access to the prepared WonMessage object.
+     * 
+     * @param message
+     * @throws WonMessageSenderException
+     */
+    void prepareAndSendMessage(WonMessage message) throws WonMessageSenderException;
+
+    /**
+     * Signs the message, calculates its messageURI based on content.
+     * 
+     * @param message
+     * @return the updated, final message.
+     * @throws WonMessageSenderException
+     */
+    WonMessage prepareMessage(WonMessage message) throws WonMessageSenderException;
+
+    /**
+     * Sends the <b>prepared</b> message. Will fail if the message has not been
+     * prepared using <code>prepareMessage</code>.
+     * 
+     * @param message
+     * @return the updated, final message.
+     * @throws WonMessageSenderException
+     */
+    void sendMessage(WonMessage message) throws WonMessageSenderException;
 }

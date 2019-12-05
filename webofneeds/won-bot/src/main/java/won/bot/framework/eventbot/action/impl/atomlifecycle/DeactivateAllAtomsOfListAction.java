@@ -18,11 +18,7 @@ import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomDeactivatedEvent;
 import won.bot.framework.eventbot.listener.EventListener;
-import won.protocol.exception.WonMessageBuilderException;
-import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.service.WonNodeInformationService;
-import won.protocol.util.WonRdfUtils;
+import won.protocol.message.builder.WonMessageBuilder;
 
 /**
  * User: fkleedorfer Date: 28.03.14
@@ -40,18 +36,12 @@ public class DeactivateAllAtomsOfListAction extends BaseEventBotAction {
         EventListenerContext ctx = getEventListenerContext();
         Collection<URI> toDeactivate = ctx.getBotContext().getNamedAtomUriList(uriListName);
         for (URI uri : toDeactivate) {
-            ctx.getWonMessageSender().sendWonMessage(createWonMessage(uri));
+            ctx.getWonMessageSender().prepareAndSendMessage(WonMessageBuilder
+                            .deactivate()
+                            .direction().fromOwner()
+                            .atom(uri)
+                            .build());
             ctx.getEventBus().publish(new AtomDeactivatedEvent(uri));
         }
-    }
-
-    private WonMessage createWonMessage(URI atomURI) throws WonMessageBuilderException {
-        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
-        URI localWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(
-                        getEventListenerContext().getLinkedDataSource().getDataForResource(atomURI), atomURI);
-        return WonMessageBuilder
-                        .setMessagePropertiesForDeactivateFromOwner(
-                                        wonNodeInformationService.generateEventURI(localWonNode), atomURI, localWonNode)
-                        .build();
     }
 }

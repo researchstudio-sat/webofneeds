@@ -20,11 +20,7 @@ SELECT distinct ?msg ?direction ?msgType ?senderAtom ?retracts ?accepts ?propose
        } OPTIONAL {
         ?msg msg:previousMessage ?previous.
        } OPTIONAL {
-        ?msg msg:isResponseTo ?isResponseTo.
-       } OPTIONAL {
-        ?msg msg:isRemoteResponseTo ?isRemoteResponseTo.
-       } OPTIONAL {
-        ?msg msg:correspondingRemoteMessage ?correspondingRemoteMessage.
+        ?msg msg:respondingTo ?isResponseTo.
        } OPTIONAL {
         ?msg agr:proposes ?proposes.
        } OPTIONAL {

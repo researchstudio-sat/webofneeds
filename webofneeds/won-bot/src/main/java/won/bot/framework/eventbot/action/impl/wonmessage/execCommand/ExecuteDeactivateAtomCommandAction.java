@@ -1,8 +1,12 @@
 package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -15,12 +19,9 @@ import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
 
 /**
  * Created by fsuda on 17.05.2017.
@@ -44,6 +45,7 @@ public class ExecuteDeactivateAtomCommandAction extends BaseEventBotAction {
         final URI wonNodeUri = WonRdfUtils.ConnectionUtils.getWonNodeURIFromAtom(atomRDF, atomUri);
         WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
         WonMessage deactivateAtomMessage = createWonMessage(wonNodeInformationService, atomUri, wonNodeUri);
+        deactivateAtomMessage = ctx.getWonMessageSender().prepareMessage(deactivateAtomMessage);
         EventListener successCallback = event12 -> {
             logger.debug("atom creation successful, new atom URI is {}", atomUri);
             bus.publish(new DeactivateAtomCommandSuccessEvent(atomUri, deactivateAtomCommandEvent));
@@ -58,15 +60,16 @@ public class ExecuteDeactivateAtomCommandAction extends BaseEventBotAction {
         EventBotActionUtils.makeAndSubscribeResponseListener(deactivateAtomMessage, successCallback, failureCallback,
                         ctx);
         logger.debug("registered listeners for response to message URI {}", deactivateAtomMessage.getMessageURI());
-        ctx.getWonMessageSender().sendWonMessage(deactivateAtomMessage);
+        ctx.getWonMessageSender().sendMessage(deactivateAtomMessage);
         logger.debug("atom creation message sent with message URI {}", deactivateAtomMessage.getMessageURI());
     }
 
     private WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI atomURI,
                     URI wonNodeURI) throws WonMessageBuilderException {
         return WonMessageBuilder
-                        .setMessagePropertiesForDeactivateFromOwner(
-                                        wonNodeInformationService.generateEventURI(wonNodeURI), atomURI, wonNodeURI)
+                        .deactivate()
+                        .atom(atomURI)
+                        .direction().fromOwner()
                         .build();
     }
 }

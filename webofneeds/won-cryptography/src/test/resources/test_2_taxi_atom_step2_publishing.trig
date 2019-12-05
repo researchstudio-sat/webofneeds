@@ -37,23 +37,23 @@
  }
 
 #signature of the node-defined content
-:#NOD1 sig:signature [
+:#NOD1 msg:Signature [
           rdf:type sig:WonSignature ;
           sig:creator <http://example.com/webid#key-5>;
           sig:created
                   "2013-09-252T10:49:54.050+0000";
-          sig:signatureValue
+          msg:signatureValue
     "OGQzNGVkMzVmMmQ3ODIyOWM32MzQzNmExMgoYzI4ZDY3NjI4NTIyZTk=" . ] .
 
 # node cites owner's signature
 :#NOD-CITE1 {
 # signature of the owner's permanent part of data:
-   :#OWN1 sig:signature [
+   :#OWN1 msg:Signature [
          rdf:type sig:WonSignature ;
          sig:creator <http://example.com/webid#key-5>;
          sig:created
                  "2013-09-252T10:49:54.050+0000";
-         sig:signatureValue
+         msg:signatureValue
    "OGQzNGVkMzVmMmQ3ODIyOWM32MzQzNmExMgoYzI4ZDY3NjI4NTIyZTk=" . ] .
 }
 
@@ -62,17 +62,17 @@
 #  the full verification of this would require to verify the node signed
 #  data with this signature, and then the data of the owner with the
 #  owner's signature
-:#NOD-CITE1 sig:signature [
+:#NOD-CITE1 msg:Signature [
           rdf:type sig:WonSignature ;
           sig:creator <http://example.com/webid#key-5>;
           sig:created
                   "2013-09-252T10:49:54.050+0000";
-          sig:signatureValue
+          msg:signatureValue
     "OGQzNGVkMzVmMmQ3ODIyOWM32MzQzNmExMgoYzI4ZDY3NjI4NTIyZTk=" . ] .
 
 :#NOD-CITE2 {
   # signature of the transient part of data:
-  :#OWN2 sig:signature [
+  :#OWN2 msg:Signature [
         rdf:type sig:WonSignature ;
         sig:creator <http://example.com/webid#key-5>;
         sig:created
@@ -80,18 +80,18 @@
   "OGQzNGVkMzVmMmQ3ODIyOWM32MzQzNmExMgoYzI4ZDY3NjI4NTIyZTk=" . ] .
 }
 
-:#NOD-CITE2 sig:signature [
+:#NOD-CITE2 msg:Signature [
           rdf:type sig:WonSignature ;
           sig:creator <http://example.com/webid#key-5>;
           sig:created
                   "2013-09-252T10:49:54.050+0000";
-          sig:signatureValue
+          msg:signatureValue
     "OGQzNGVkMzVmMmQ3ODIyOWM32MzQzNmExMgoYzI4ZDY3NjI4NTIyZTk=" . ] .
 
 
 :#NOD-CITE3 {
   # signature of the webid
-  :#OWNER-WEBID sig:signature [
+  :#OWNER-WEBID msg:Signature [
         rdf:type sig:WonSignature ;
         sig:creator <http://example.com/webid#key-5>;
         sig:created
@@ -99,18 +99,18 @@
   "OGQzNGVkMzVmMmQ3ODIyOWM32MzQzNmExMgoYzI4ZDY3NjI4NTIyZTk=" . ] .
 }
 
-:#NOD-CITE3 sig:signature [
+:#NOD-CITE3 msg:Signature [
           rdf:type sig:WonSignature ;
           sig:creator <http://example.com/webid#key-5>;
           sig:created
                   "2013-09-252T10:49:54.050+0000";
-          sig:signatureValue
+          msg:signatureValue
     "OGQzNGVkMzVmMmQ3ODIyOWM32MzQzNmExMgoYzI4ZDY3NjI4NTIyZTk=" . ] .
 
 
 :#NOD-CITE4 {
   # signature of the webid
-  :#OWNER-INFO sig:signature [
+  :#OWNER-INFO msg:Signature [
         rdf:type sig:WonSignature ;
         sig:creator <http://example.com/webid#key-5>;
         sig:created
@@ -118,7 +118,7 @@
   "OGQzNGVkMzVmMmQ3ODIyOWM32MzQzNmExMgoYzI4ZDY3NjI4NTIyZTk=" . ] .
 }
 
-:#NOD-CITE4 sig:signature [
+:#NOD-CITE4 msg:Signature [
       rdf:type sig:WonSignature ;
       sig:creator <http://example.com/webid#key-5>;
       sig:created
@@ -127,7 +127,7 @@
 }
 
 :#NOD-CITE5 {
-  :#ACL sig:signature [
+  :#ACL msg:Signature [
       rdf:type sig:WonSignature ;
       sig:creator <http://example.com/webid#key-5>;
       sig:created
@@ -135,7 +135,7 @@
   "OGQzNGVkMzVmMmQ3ODIyOWM32MzQzNmExMgoYzI4ZDY3NjI4NTIyZTk=" . ] .
 }
 
-:#NOD-CITE5 sig:signature [
+:#NOD-CITE5 msg:Signature [
       rdf:type sig:WonSignature ;
       sig:creator <http://example.com/webid#key-5>;
       sig:created
@@ -144,7 +144,7 @@
 }
 
 :#NOD-CITE6 {
-  :#VERSIONING sig:signature [
+  :#VERSIONING msg:Signature [
       rdf:type sig:WonSignature ;
       sig:creator <http://example.com/webid#key-5>;
       sig:created
@@ -152,7 +152,7 @@
   "OGQzNGVkMzVmMmQ3ODIyOWM32MzQzNmExMgoYzI4ZDY3NjI4NTIyZTk=" . ] .
 }
 
-:#NOD-CITE6 sig:signature [
+:#NOD-CITE6 msg:Signature [
       rdf:type sig:WonSignature ;
       sig:creator <http://example.com/webid#key-5>;
       sig:created

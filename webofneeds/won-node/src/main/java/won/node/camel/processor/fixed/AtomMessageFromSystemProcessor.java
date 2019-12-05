@@ -10,8 +10,6 @@
  */
 package won.node.camel.processor.fixed;
 
-import java.net.URI;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
@@ -20,8 +18,6 @@ import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.message.processor.exception.MissingMessagePropertyException;
-import won.protocol.model.Atom;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -34,24 +30,6 @@ public class AtomMessageFromSystemProcessor extends AbstractCamelProcessor {
     public void process(Exchange exchange) throws Exception {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
-        URI recipientAtomURI = wonMessage.getRecipientAtomURI();
-        URI senderAtomURI = wonMessage.getSenderAtomURI();
-        if (recipientAtomURI == null) {
-            throw new MissingMessagePropertyException(URI.create(WONMSG.recipientAtom.toString()));
-        }
-        if (senderAtomURI == null) {
-            throw new MissingMessagePropertyException(URI.create(WONMSG.senderAtom.toString()));
-        }
-        if (!recipientAtomURI.equals(senderAtomURI)) {
-            throw new IllegalArgumentException("sender atom uri " + senderAtomURI + " does not equal receiver atom uri "
-                            + recipientAtomURI);
-        }
-        Atom atom = atomRepository.findOneByAtomURI(senderAtomURI);
-        if (atom == null) {
-            throw new IllegalArgumentException("atom not found - cannot send atom message to: " + senderAtomURI);
-        }
-        atom.getMessageContainer().getEvents()
-                        .add(messageEventRepository.findOneByMessageURIforUpdate(wonMessage.getMessageURI()));
-        atom = atomRepository.save(atom);
+        atomService.atomMessageFromSystem(wonMessage);
     }
 }

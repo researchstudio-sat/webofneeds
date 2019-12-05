@@ -1,0 +1,16 @@
+@prefix ex: <http://example.com/>.
+@prefix sub: <http://example.com/atom1#>.
+@prefix subpath: <http://example.com/atom1/>.
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix won: <https://w3id.org/won/core#>.
+@prefix chat: <https://w3id.org/won/ext/chat#>.
+@prefix hold: <https://w3id.org/won/ext/hold#>.
+
+ex:atom1 a won:Atom ;
+    dc:title "Test Atom 1" ;
+    won:socket sub:socket1 ;
+    won:socket sub:socket2 ;
+    ex:foo subpath:bar . # not allowed
+
+sub:socket1 won:socketDefinition chat:ChatSocket. 
+sub:socket2 won:socketDefinition hold:HoldableSocket. 

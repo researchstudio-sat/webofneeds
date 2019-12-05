@@ -4,10 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>webofneeds</artifactId>
-        <groupId>at.researchstudio.sat</groupId>
-        <version>0.7-SNAPSHOT</version>
-    </parent>
+<artifactId>won-parent-pom</artifactId>
+<relativePath>../won-parent-pom</relativePath>
+<groupId>at.researchstudio.sat</groupId>
+<version>0.7-SNAPSHOT</version>
+</parent>
     <artifactId>won-matcher</artifactId>
     <version>0.7-SNAPSHOT</version>
     <name>Matcher Client</name>
@@ -55,12 +56,7 @@
                 <directory>src/test/resources</directory>
             </testResource>
         </testResources>
-        <plugins>
-            <plugin>
-                <groupId>net.revelc.code.formatter</groupId>
-                <artifactId>formatter-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
+        
     </build>
 
 </project>

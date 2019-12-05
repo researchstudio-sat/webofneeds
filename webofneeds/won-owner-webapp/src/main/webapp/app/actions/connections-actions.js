@@ -18,7 +18,6 @@ import { actionTypes, actionCreators } from "./actions.js";
 
 import {
   buildCreateMessage,
-  buildOpenMessage,
   buildCloseMessage,
   buildChatMessage,
   buildRateMessage,
@@ -30,51 +29,33 @@ import * as processUtils from "../redux/utils/process-utils.js";
 export function connectionsChatMessageClaimOnSuccess(
   chatMessage,
   additionalContent,
-  connectionUri
+  senderSocketUri,
+  targetSocketUri
 ) {
-  return (dispatch, getState) => {
-    const ownedAtom = get(getState(), "atoms").find(atom =>
-      getIn(atom, ["connections", connectionUri])
-    );
-    const theirAtomUri = getIn(getState(), [
-      "atoms",
-      get(ownedAtom, "uri"),
-      "connections",
-      connectionUri,
-      "targetAtomUri",
-    ]);
-    const theirAtom = getIn(getState(), ["atoms", theirAtomUri]);
-    const theirConnectionUri = getIn(ownedAtom, [
-      "connections",
-      connectionUri,
-      "targetConnectionUri",
-    ]);
-
+  return dispatch => {
     buildChatMessage({
       chatMessage: chatMessage,
       additionalContent: additionalContent,
       referencedContentUris: undefined,
-      connectionUri,
-      ownedAtomUri: get(ownedAtom, "uri"),
-      theirAtomUri: theirAtomUri,
-      ownNodeUri: get(ownedAtom, "nodeUri"),
-      theirNodeUri: get(theirAtom, "nodeUri"),
-      theirConnectionUri,
+      socketUri: senderSocketUri,
+      targetSocketUri: targetSocketUri,
       isTTL: false,
     })
       .then(msgData =>
         Promise.all([
           won.wonMessageFromJsonLd(msgData.message),
-          msgData.message,
+          ownerApi.sendMessage(msgData.message),
         ])
       )
-      .then(([optimisticEvent, jsonldMessage]) => {
+      .then(([optimisticEvent, jsonResp]) => {
         dispatch({
           type: actionTypes.connections.sendChatMessageClaimOnSuccess,
           payload: {
-            eventUri: optimisticEvent.getMessageUri(),
-            message: jsonldMessage,
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
             optimisticEvent,
+            senderSocketUri,
+            targetSocketUri,
           },
         });
       })
@@ -95,38 +76,25 @@ export function connectionsChatMessage(
   chatMessage,
   additionalContent,
   referencedContent,
+  senderSocketUri,
+  targetSocketUri,
   connectionUri,
   isTTL = false
 ) {
   return (dispatch, getState) => {
-    const ownedAtom = get(getState(), "atoms").find(atom =>
-      getIn(atom, ["connections", connectionUri])
+    const senderAtomUri = generalSelectors.getAtomUriBySocketUri(
+      senderSocketUri
     );
-    const theirAtomUri = getIn(getState(), [
-      "atoms",
-      get(ownedAtom, "uri"),
-      "connections",
-      connectionUri,
-      "targetAtomUri",
-    ]);
-    const theirAtom = getIn(getState(), ["atoms", theirAtomUri]);
-    const theirConnectionUri = getIn(ownedAtom, [
-      "connections",
-      connectionUri,
-      "targetConnectionUri",
-    ]);
+    const ownedAtom = getIn(getState(), ["atoms", senderAtomUri]);
 
     let referencedContentUris = undefined;
-    /*TODO: Since we set messages to be (successfully) claimed/proposed/accepted... before we even know if the transition was successful we might
-     need to rethink this implementation in favor of a dirtyState somehow, and remove the dirty state on successRemote of the message -> handling is in
-     messages-actions.js (dispatchActionOnSuccessRemote part if(toRefreshData) ... but for now this will do*/
     if (referencedContent) {
       referencedContentUris = new Map();
       referencedContent.forEach((referencedMessages, key) => {
         let contentUris = [];
 
         referencedMessages.map(msg => {
-          const correctUri = get(msg, "remoteUri") || get(msg, "uri");
+          const correctUri = get(msg, "uri");
           if (correctUri)
             contentUris.push({
               "@id": correctUri,
@@ -213,29 +181,28 @@ export function connectionsChatMessage(
       chatMessage: chatMessage,
       additionalContent: additionalContent,
       referencedContentUris: referencedContentUris,
-      connectionUri,
-      ownedAtomUri: get(ownedAtom, "uri"),
-      theirAtomUri: theirAtomUri,
-      ownNodeUri: get(ownedAtom, "nodeUri"),
-      theirNodeUri: get(theirAtom, "nodeUri"),
-      theirConnectionUri,
+      socketUri: senderSocketUri,
+      targetSocketUri: targetSocketUri,
       isTTL,
     })
       .then(msgData =>
         Promise.all([
           won.wonMessageFromJsonLd(msgData.message),
-          msgData.message,
+          ownerApi.sendMessage(msgData.message),
         ])
       )
-      .then(([optimisticEvent, jsonldMessage]) => {
+      .then(([optimisticEvent, jsonResp]) => {
+        console.debug("sent chatMsg: ", jsonResp.messageUri);
         dispatch({
           type: referencedContentUris
             ? actionTypes.connections.sendChatMessageRefreshDataOnSuccess //If there are references in the message we need to Refresh the Data from the backend on msg success
             : actionTypes.connections.sendChatMessage,
           payload: {
-            eventUri: optimisticEvent.getMessageUri(),
-            message: jsonldMessage,
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
             optimisticEvent,
+            senderSocketUri: senderSocketUri,
+            targetSocketUri: targetSocketUri,
           },
         });
       })
@@ -249,50 +216,6 @@ export function connectionsChatMessage(
           },
         });
       });
-  };
-}
-
-export function connectionsOpen(connectionUri, textMessage) {
-  return async (dispatch, getState) => {
-    const ownedAtom = get(getState(), "atoms").find(atom =>
-      getIn(atom, ["connections", connectionUri])
-    );
-    const theirAtomUri = getIn(getState(), [
-      "atoms",
-      get(ownedAtom, "uri"),
-      "connections",
-      connectionUri,
-      "targetAtomUri",
-    ]);
-    const theirAtom = getIn(getState(), ["atoms", theirAtomUri]);
-    const theirConnectionUri = getIn(ownedAtom, [
-      "connections",
-      connectionUri,
-      "targetConnectionUri",
-    ]);
-
-    const openMsg = await buildOpenMessage(
-      connectionUri,
-      get(ownedAtom, "uri"),
-      theirAtomUri,
-      get(ownedAtom, "nodeUri"),
-      get(theirAtom, "nodeUri"),
-      theirConnectionUri,
-      textMessage
-    );
-
-    const optimisticEvent = await won.wonMessageFromJsonLd(openMsg.message);
-
-    dispatch({
-      type: actionTypes.connections.open,
-      payload: {
-        connectionUri,
-        textMessage,
-        eventUri: openMsg.eventUri,
-        message: openMsg.message,
-        optimisticEvent,
-      },
-    });
   };
 }
 
@@ -331,131 +254,126 @@ function connectReactionAtom(
     const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
 
     // create new atom
-    const { message, eventUri, atomUri } = await buildCreateMessage(
-      atomDraft,
-      nodeUri
-    );
+    const { message, atomUri } = await buildCreateMessage(atomDraft, nodeUri);
 
     // create the new atom
-    dispatch({
-      type: actionTypes.atoms.create, // TODO custom action
-      payload: {
-        eventUri,
-        message,
-        atomUri,
-        atom: atomDraft,
-      },
-    });
-
-    dispatch(
-      actionCreators.router__stateGo("connections", {
-        useCase: undefined,
-        useCaseGroup: undefined,
-        fromAtomUri: undefined,
-        viewConnUri: undefined,
-        mode: undefined,
-      })
-    );
-
-    // add persona if present
-    if (personaUri) {
-      const persona = getIn(state, ["atoms", personaUri]);
-      ownerApi
-        .serverSideConnect(
-          atomUtils.getSocketUri(persona, won.HOLD.HolderSocketCompacted),
-          `${atomUri}#holdableSocket`,
-          false,
-          true
-        )
-        .then(async response => {
-          if (!response.ok) {
-            const errorMsg = await response.text();
-            throw new Error(`Could not connect identity: ${errorMsg}`);
-          }
+    ownerApi
+      .sendMessage(message)
+      .then(jsonResp => {
+        dispatch({
+          type: actionTypes.atoms.create, // TODO custom action
+          payload: {
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
+            atomUri: atomUri,
+            atom: atomDraft,
+          },
         });
-    }
 
-    if (generalSelectors.isAtomOwned(state, connectToAtomUri)) {
-      const connectToSocketUri = connectToSocketType
-        ? atomUtils.getSocketUri(connectToAtom, connectToSocketType)
-        : atomUtils.getDefaultSocketUri(connectToAtom);
-
-      const getSocketFromDraft = atomDraft => {
-        const draftContent = atomDraft["content"];
-        const draftSockets = draftContent["sockets"];
-
-        if (draftSockets && atomDraftSocketType) {
-          for (let socketKey in draftSockets) {
-            if (draftSockets[socketKey] === atomDraftSocketType) {
-              return socketKey;
-            }
-          }
+        dispatch(
+          actionCreators.router__stateGo("connections", {
+            useCase: undefined,
+            useCaseGroup: undefined,
+            fromAtomUri: undefined,
+            viewConnUri: undefined,
+            mode: undefined,
+          })
+        );
+      })
+      .then(() => {
+        // add persona if present
+        if (personaUri) {
+          const persona = getIn(state, ["atoms", personaUri]);
+          ownerApi
+            .serverSideConnect(
+              atomUtils.getSocketUri(persona, won.HOLD.HolderSocketCompacted),
+              `${atomUri}#holdableSocket`,
+              false,
+              true
+            )
+            .then(async response => {
+              if (!response.ok) {
+                const errorMsg = await response.text();
+                throw new Error(`Could not connect identity: ${errorMsg}`);
+              }
+            });
         }
 
-        const defaultSocket = draftContent["defaultSocket"];
-        return defaultSocket && Object.keys(defaultSocket)[0];
-      };
+        const getSocketFromDraft = atomDraft => {
+          const draftContent = atomDraft["content"];
+          const draftSockets = draftContent["sockets"];
 
-      const atomDraftSocketUri = getSocketFromDraft(atomDraft);
-
-      if (atomDraftSocketUri && connectToSocketUri) {
-        ownerApi
-          .serverSideConnect(
-            connectToSocketUri,
-            `${atomUri}${atomDraftSocketUri}`,
-            false,
-            true
-          )
-          .then(async response => {
-            if (!response.ok) {
-              const errorMsg = await response.text();
-              throw new Error(`Could not connect owned atoms: ${errorMsg}`);
+          if (draftSockets && atomDraftSocketType) {
+            for (let socketKey in draftSockets) {
+              if (draftSockets[socketKey] === atomDraftSocketType) {
+                return socketKey;
+              }
             }
-          });
-      } else {
-        throw new Error(
-          `Could not connect owned atoms did not find necessary sockets`
-        );
-      }
-    } else {
-      // establish connection
-      const cnctMsg = buildConnectMessage({
-        ownedAtomUri: atomUri,
-        theirAtomUri: connectToAtomUri,
-        ownNodeUri: nodeUri,
-        theirNodeUri: get(connectToAtom, "nodeUri"),
-        connectMessage: "",
-      });
+          }
 
-      const connectToSocketUri = connectToSocketType
-        ? atomUtils.getSocketUri(connectToAtom, connectToSocketType)
-        : atomUtils.getDefaultSocketUri(connectToAtom);
-
-      won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
-        // connect action to be dispatched when the
-        // ad hoc atom has been created:
-        //TODO: FIGURE OUT WHICH SOCKETS WILL BE CONNECTED
-        const connectAction = {
-          type: actionTypes.atoms.connect,
-          payload: {
-            eventUri: cnctMsg.eventUri,
-            message: cnctMsg.message,
-            optimisticEvent: optimisticEvent,
-            targetSocketUri: connectToSocketUri,
-          },
+          const defaultSocket = draftContent["defaultSocket"];
+          return defaultSocket && Object.keys(defaultSocket)[0];
         };
 
-        // register the connect action to be dispatched when
-        // atom creation is successful
-        dispatch({
-          type: actionTypes.messages.dispatchActionOn.registerSuccessOwn,
-          payload: {
-            eventUri: eventUri,
-            actionToDispatch: connectAction,
-          },
-        });
+        const atomDraftSocketUri = getSocketFromDraft(atomDraft);
+
+        if (generalSelectors.isAtomOwned(state, connectToAtomUri)) {
+          const connectToSocketUri = connectToSocketType
+            ? atomUtils.getSocketUri(connectToAtom, connectToSocketType)
+            : atomUtils.getDefaultSocketUri(connectToAtom);
+
+          if (atomDraftSocketUri && connectToSocketUri) {
+            ownerApi
+              .serverSideConnect(
+                connectToSocketUri,
+                `${atomUri}${atomDraftSocketUri}`,
+                false,
+                true
+              )
+              .then(async response => {
+                if (!response.ok) {
+                  const errorMsg = await response.text();
+                  throw new Error(`Could not connect owned atoms: ${errorMsg}`);
+                }
+              });
+          } else {
+            throw new Error(
+              `Could not connect owned atoms did not find necessary sockets`
+            );
+          }
+        } else {
+          const connectToSocketUri = connectToSocketType
+            ? atomUtils.getSocketUri(connectToAtom, connectToSocketType)
+            : atomUtils.getDefaultSocketUri(connectToAtom);
+
+          // establish connection
+          const cnctMsg = buildConnectMessage({
+            connectMessage: "",
+            socketUri: `${atomUri}${atomDraftSocketUri}`,
+            targetSocketUri: connectToSocketUri,
+          });
+
+          won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
+            // connect action to be dispatched when the
+            // ad hoc atom has been created:
+
+            ownerApi.sendMessage(cnctMsg.message).then(jsonResp =>
+              dispatch({
+                type: actionTypes.atoms.connect,
+                payload: {
+                  eventUri: jsonResp.messageUri,
+                  message: jsonResp.message,
+                  optimisticEvent: optimisticEvent,
+                  targetSocketUri: connectToSocketUri,
+                  socketUri: `${atomUri}${atomDraftSocketUri}`,
+                  atomUri: atomUri,
+                  targetAtomUri: get(connectToAtom, "uri"),
+                },
+              })
+            );
+          });
+        }
       });
-    }
   });
 }
 
@@ -486,7 +404,6 @@ function connectAdHoc(
 ) {
   ensureLoggedIn(dispatch, getState).then(async () => {
     const state = getState();
-    const theirAtom = getIn(state, ["atoms", theirAtomUri]);
     const adHocDraft = {
       content: {
         responseToUri: theirAtomUri,
@@ -500,89 +417,66 @@ function connectAdHoc(
     const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
 
     // build create message for new atom
-    const { message, eventUri, atomUri } = await buildCreateMessage(
-      adHocDraft,
-      nodeUri
-    );
+    const { message, atomUri } = await buildCreateMessage(adHocDraft, nodeUri);
 
-    // add persona
-    if (personaUri) {
-      const persona = getIn(state, ["atoms", personaUri]);
-      const response = await ownerApi.serverSideConnect(
-        atomUtils.getSocketUri(persona, won.HOLD.HolderSocketCompacted),
-        `${atomUri}#holdableSocket`,
-        false,
-        true
-      );
-      if (!response.ok) {
-        const errorMsg = await response.text();
-        throw new Error(`Could not connect identity: ${errorMsg}`);
-      }
-    }
+    // create the new atom
+    ownerApi
+      .sendMessage(message)
+      .then(jsonResp => {
+        dispatch({
+          type: actionTypes.atoms.create, // TODO custom action
+          payload: {
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
+            atomUri: atomUri,
+            atom: adHocDraft,
+          },
+        });
+      })
+      .then(async () => {
+        // add persona
+        if (personaUri) {
+          const persona = getIn(state, ["atoms", personaUri]);
+          const response = await ownerApi.serverSideConnect(
+            atomUtils.getSocketUri(persona, won.HOLD.HolderSocketCompacted),
+            `${atomUri}#holdableSocket`,
+            false,
+            true
+          );
+          if (!response.ok) {
+            const errorMsg = await response.text();
+            throw new Error(`Could not connect identity: ${errorMsg}`);
+          }
+        }
+      })
+      .then(() => {
+        // set default socketUri
+        let socketUri = `${atomUri}#chatSocket`;
 
-    // set default socketUri
-    let socketUri = `${atomUri}#chatSocket`;
-
-    // establish connection
-    const cnctMsg = buildConnectMessage({
-      ownedAtomUri: atomUri,
-      theirAtomUri: theirAtomUri,
-      ownNodeUri: nodeUri,
-      theirNodeUri: get(theirAtom, "nodeUri"),
-      connectMessage: textMessage,
-      undefined,
-      socketUri,
-      connectToSocketUri,
-    });
-
-    won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
-      // connect action to be dispatched when the
-      // ad hoc atom has been created:
-      const connectAction = {
-        type: actionTypes.atoms.connect,
-        payload: {
-          eventUri: cnctMsg.eventUri,
-          message: cnctMsg.message,
-          optimisticEvent: optimisticEvent,
+        // establish connection
+        const cnctMsg = buildConnectMessage({
+          connectMessage: textMessage,
           socketUri: socketUri,
           targetSocketUri: connectToSocketUri,
-        },
-      };
+        });
 
-      // register a "stateGoCurrent" action to be dispatched messages-actions
-      // after connectionUri is available
-      dispatch({
-        type: actionTypes.messages.dispatchActionOn.registerSuccessRemote,
-        payload: {
-          eventUri: cnctMsg.eventUri,
-          actionToDispatch: {
-            effect: "stateGoCurrent",
-            connectionUri: "responseEvent::receiverUri",
-          },
-        },
+        won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
+          ownerApi.sendMessage(cnctMsg.message).then(jsonResp => {
+            dispatch({
+              type: actionTypes.atoms.connect,
+              payload: {
+                eventUri: jsonResp.messageUri,
+                message: jsonResp.message,
+                optimisticEvent: optimisticEvent,
+                socketUri: socketUri,
+                targetSocketUri: connectToSocketUri,
+                atomUri: atomUri,
+                targetAtomUri: theirAtomUri,
+              },
+            });
+          });
+        });
       });
-
-      // register the connect action to be dispatched when
-      // atom creation is successful
-      dispatch({
-        type: actionTypes.messages.dispatchActionOn.registerSuccessOwn,
-        payload: {
-          eventUri: eventUri,
-          actionToDispatch: connectAction,
-        },
-      });
-
-      // create the new atom
-      dispatch({
-        type: actionTypes.atoms.create, // TODO custom action
-        payload: {
-          eventUri,
-          message,
-          atomUri,
-          atom: adHocDraft,
-        },
-      });
-    });
   });
 }
 
@@ -591,64 +485,49 @@ export function connectionsClose(connectionUri) {
     const ownedAtom = get(getState(), "atoms").find(atom =>
       getIn(atom, ["connections", connectionUri])
     );
-    const theirAtomUri = getIn(getState(), [
-      "atoms",
-      get(ownedAtom, "uri"),
+
+    const socketUri = getIn(ownedAtom, [
       "connections",
       connectionUri,
-      "targetAtomUri",
+      "socketUri",
     ]);
-    const theirAtom = getIn(getState(), ["atoms", theirAtomUri]);
-    const theirConnectionUri = getIn(ownedAtom, [
+    const targetSocketUri = getIn(ownedAtom, [
       "connections",
       connectionUri,
-      "targetConnectionUri",
+      "targetSocketUri",
     ]);
 
-    buildCloseMessage(
-      connectionUri,
-      get(ownedAtom, "uri"),
-      theirAtomUri,
-      get(ownedAtom, "nodeUri"),
-      get(theirAtom, "nodeUri"),
-      theirConnectionUri
-    ).then(({ eventUri, message }) => {
-      dispatch({
-        type: actionTypes.connections.close,
-        payload: {
-          connectionUri,
-          eventUri,
-          message,
-        },
+    buildCloseMessage(socketUri, targetSocketUri)
+      .then(({ message }) => ownerApi.sendMessage(message))
+      .then(jsonResp => {
+        dispatch({
+          type: actionTypes.connections.close,
+          payload: {
+            connectionUri: connectionUri,
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
+          },
+        });
       });
-    });
   };
 }
 
 export function connectionsCloseRemote(message) {
   //Closes the 'targetConnection' again, if closeConnections(...) only closes the 'own' connection
   return dispatch => {
-    const connectionUri = message.getSenderConnection();
-    const targetAtomUri = message.getSenderAtom();
-    const remoteNode = message.getSenderNode();
-    const ownedAtomUri = message.getRecipientAtom();
-    const ownNode = message.getRecipientNode();
+    const socketUri = message.getSenderSocket();
+    const targetSocketUri = message.getTargetSocket();
 
-    buildCloseMessage(
-      connectionUri,
-      targetAtomUri,
-      ownedAtomUri,
-      ownNode,
-      remoteNode,
-      null
-    ).then(closeMessage => {
-      dispatch(
-        actionCreators.messages__send({
-          eventUri: closeMessage.eventUri,
-          message: closeMessage.message,
-        })
-      );
-    });
+    buildCloseMessage(socketUri, targetSocketUri)
+      .then(closeMessage => ownerApi.sendMessage(closeMessage.message))
+      .then(jsonResp => {
+        dispatch(
+          actionCreators.messages__send({
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
+          })
+        );
+      });
   };
 }
 
@@ -692,14 +571,15 @@ export function connectionsRate(connectionUri, rating) {
           rating
         );
       })
-      .then(({ eventUri, message }) =>
+      .then(({ message }) => ownerApi.sendMessage(message))
+      .then(jsonResp =>
         dispatch({
           type: actionTypes.connections.rate,
           payload: {
-            connectionUri,
-            rating,
-            eventUri,
-            message,
+            connectionUri: connectionUri,
+            rating: rating,
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
           },
         })
       );
@@ -830,7 +710,7 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
 
     const oldestMessageUri = get(sortedConnectionMessages.first(), "uri");
     const messageHashValue =
-      oldestMessageUri && oldestMessageUri.replace(/.*\/event\/(.*)/, "$1"); // everything following the `/event/`
+      oldestMessageUri && oldestMessageUri.replace(/wm:\/(.*)/, "$1"); // everything following the `wm:/`
 
     const fetchParams = {
       requesterWebId: atomUri,

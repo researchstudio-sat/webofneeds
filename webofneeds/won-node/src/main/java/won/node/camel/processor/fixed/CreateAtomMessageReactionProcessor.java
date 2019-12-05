@@ -10,28 +10,26 @@
  */
 package won.node.camel.processor.fixed;
 
+import static won.node.camel.service.WonCamelHelper.*;
+
+import java.lang.invoke.MethodHandles;
+
 import org.apache.camel.Exchange;
-import org.apache.camel.Message;
-import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
 import won.protocol.exception.NoSuchAtomException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.WonMessageDirection;
-import won.protocol.message.processor.camel.WonCamelConstants;
+import won.protocol.message.builder.WonMessageBuilder;
+import won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor;
 import won.protocol.model.Atom;
 import won.protocol.repository.AtomRepository;
-import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
 
 /**
  * Reacts to a CREATE message, informing matchers of the newly created atom.
@@ -42,22 +40,17 @@ public class CreateAtomMessageReactionProcessor extends AbstractCamelProcessor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     AtomRepository atomRepository;
+    @Autowired
+    SignatureAddingWonMessageProcessor signatureAdder;
 
     @Override
     public void process(final Exchange exchange) throws Exception {
-        Message message = exchange.getIn();
-        WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
-        Dataset atomContent = wonMessage.getMessageContent();
-        URI atomUri = getAtomURIFromWonMessage(atomContent);
-        if (atomUri == null) {
-            logger.warn("could not obtain atomURI from message " + wonMessage.getMessageURI());
-            return;
-        }
-        Atom atom = atomRepository.findOneByAtomURI(atomUri);
+        // Atom atom = getAtomRequired(exchange, atomService);
+        Atom atom = atomService.getAtomForMessageRequired(getMessageRequired(exchange), getDirectionRequired(exchange));
         try {
             WonMessage newAtomNotificationMessage = makeAtomCreatedMessageForMatcher(atom);
-            matcherProtocolMatcherClient.atomCreated(atomUri, ModelFactory.createDefaultModel(),
-                            newAtomNotificationMessage);
+            matcherProtocolMatcherClient.atomCreated(atom.getAtomURI(), ModelFactory.createDefaultModel(),
+                            signatureAdder.process(newAtomNotificationMessage));
         } catch (Exception e) {
             logger.warn("could not create AtomCreatedNotification", e);
         }
@@ -65,17 +58,7 @@ public class CreateAtomMessageReactionProcessor extends AbstractCamelProcessor {
 
     private WonMessage makeAtomCreatedMessageForMatcher(final Atom atom) throws NoSuchAtomException {
         return WonMessageBuilder
-                        .setMessagePropertiesForAtomCreatedNotification(wonNodeInformationService.generateEventURI(),
-                                        atom.getAtomURI(), atom.getWonNodeURI())
-                        .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build();
-    }
-
-    private URI getAtomURIFromWonMessage(final Dataset wonMessage) {
-        URI atomURI;
-        atomURI = WonRdfUtils.AtomUtils.getAtomURI(wonMessage);
-        if (atomURI == null) {
-            throw new IllegalArgumentException("at least one RDF node must be of type won:Atom");
-        }
-        return atomURI;
+                        .atomCreatedNotification()
+                        .atom(atom.getAtomURI()).build();
     }
 }

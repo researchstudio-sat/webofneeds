@@ -1,0 +1,10 @@
+@prefix ex: <http://example.com/>.
+@prefix sub: <http://example.com/atom1#>.
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix won: <https://w3id.org/won/core#>.
+@prefix chat: <https://w3id.org/won/ext/chat#>.
+
+ex:atom1 a won:Atom ;
+    dc:title "Test Atom 1 - replacement, removing a socket" ;
+    won:socket sub:socket1 .
+sub:socket1 won:socketDefinition chat:ChatSocket. 

@@ -20,8 +20,8 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
-import won.bot.framework.eventbot.filter.impl.OriginalMessageUriRemoteResponseEventFilter;
-import won.bot.framework.eventbot.filter.impl.OriginalMessageUriResponseEventFilter;
+import won.bot.framework.eventbot.filter.impl.RemoteResponseEventFilter;
+import won.bot.framework.eventbot.filter.impl.LocalResponseEventFilter;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnFirstEventListener;
 import won.protocol.message.WonMessage;
@@ -73,7 +73,7 @@ public class EventBotActionUtils {
         // create an event listener that processes the response to the wonMessage we're
         // about to send
         EventListener listener = new ActionOnFirstEventListener(context,
-                        OriginalMessageUriResponseEventFilter.forWonMessage(outgoingMessage),
+                        LocalResponseEventFilter.forWonMessage(outgoingMessage),
                         new BaseEventBotAction(context) {
                             @Override
                             protected void doRun(final Event event, EventListener executingListener) throws Exception {
@@ -106,7 +106,7 @@ public class EventBotActionUtils {
         // create an event listener that processes the remote response to the wonMessage
         // we're about to send
         EventListener listener = new ActionOnFirstEventListener(context,
-                        OriginalMessageUriRemoteResponseEventFilter.forWonMessage(outgoingMessage),
+                        RemoteResponseEventFilter.forWonMessage(outgoingMessage),
                         new BaseEventBotAction(context) {
                             @Override
                             protected void doRun(final Event event, EventListener executingListener) throws Exception {

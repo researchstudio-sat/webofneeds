@@ -2,7 +2,7 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import { get, getIn } from "../utils.js";
+import { get } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
 import * as atomUtils from "../redux/utils/atom-utils";
@@ -19,7 +19,8 @@ import VisibilitySensor from "react-visibility-sensor";
 import PropTypes from "prop-types";
 
 const mapStateToProps = (state, ownProps) => {
-  const post = getIn(state, ["atoms", ownProps.atomUri]);
+  const atoms = get(state, "atoms");
+  const post = get(atoms, ownProps.atomUri);
   const isOwned = generalSelectors.isAtomOwned(state, ownProps.atomUri);
 
   const hasGroupSocket = atomUtils.hasGroupSocket(post);
@@ -43,8 +44,10 @@ const mapStateToProps = (state, ownProps) => {
 
   return {
     atomUri: ownProps.atomUri,
+    atoms: atoms,
     isOwned,
     hasGroupSocket,
+    groupSocketUri: atomUtils.getGroupSocket(post),
     groupMembers: groupMembers && groupMembers.size > 0,
     hasGroupChatConnections:
       groupChatConnections && groupChatConnections.size > 0,
@@ -72,21 +75,17 @@ const mapDispatchToProps = dispatch => {
     showModalDialog: payload => {
       dispatch(actionCreators.view__showModalDialog(payload));
     },
-    connect: (ownedAtomUri, connectionUri, targetAtomUri, message) => {
-      dispatch(
-        actionCreators.atoms__connect(
-          ownedAtomUri,
-          connectionUri,
-          targetAtomUri,
-          message
-        )
-      );
-    },
     connectionClose: connectionUri => {
       dispatch(actionCreators.connections__close(connectionUri));
     },
-    connectionOpen: (connectionUri, message) => {
-      dispatch(actionCreators.connections__open(connectionUri, message));
+    connectSockets: (senderSocketUri, targetSocketUri, message) => {
+      dispatch(
+        actionCreators.atoms__connectSockets(
+          senderSocketUri,
+          targetSocketUri,
+          message
+        )
+      );
     },
     rateConnection: (connectionUri, rating) => {
       dispatch(actionCreators.connections__rate(connectionUri, rating));
@@ -364,7 +363,9 @@ class WonAtomContentParticipants extends React.Component {
       this.props.connectionMarkAsRead(connUri, this.props.atomUri);
     }
 
-    this.props.connectionOpen(connUri, message);
+    const senderSocketUri = get(conn, "socketUri");
+    const targetSocketUri = get(conn, "targetSocketUri");
+    this.props.connectSockets(senderSocketUri, targetSocketUri, message);
   }
 
   sendRequest(conn, message = "") {
@@ -380,17 +381,18 @@ class WonAtomContentParticipants extends React.Component {
           caption: "Yes",
           callback: () => {
             const connUri = get(conn, "uri");
-            const targetAtomUri = get(conn, "targetAtomUri");
+            const senderSocketUri = get(conn, "socketUri");
+            const targetSocketUri = get(conn, "targetSocketUri");
 
             if (connectionUtils.isUnread(conn)) {
               this.props.connectionMarkAsRead(connUri, this.props.atomUri);
             }
 
             this.props.rateConnection(connUri, won.WONCON.binaryRatingGood);
-            this.props.connect(
-              this.props.atomUri,
-              connUri,
-              targetAtomUri,
+
+            this.props.connectSockets(
+              senderSocketUri,
+              targetSocketUri,
               message
             );
             this.props.hideModalDialog();
@@ -420,7 +422,23 @@ class WonAtomContentParticipants extends React.Component {
         {
           caption: "Yes",
           callback: () => {
-            this.props.connect(this.props.atomUri, undefined, atomUri, message);
+            const participantToInvite = get(this.props.atoms, atomUri);
+            const connectToSocketUri =
+              atomUtils.getGroupSocket(participantToInvite) ||
+              atomUtils.getChatSocket(participantToInvite);
+            if (!connectToSocketUri) {
+              console.debug(
+                "participanToInvite doesnt have a chatSocket or groupSocket"
+              );
+
+              return;
+            } else {
+              this.props.connectSockets(
+                this.props.groupSocketUri,
+                connectToSocketUri,
+                message
+              );
+            }
             this.props.hideModalDialog();
           },
         },
@@ -443,7 +461,9 @@ class WonAtomContentParticipants extends React.Component {
 }
 WonAtomContentParticipants.propTypes = {
   atomUri: PropTypes.string.isRequired,
+  atoms: PropTypes.object,
   isOwned: PropTypes.bool,
+  groupSocketUri: PropTypes.string,
   hasGroupSocket: PropTypes.bool,
   groupMembers: PropTypes.bool,
   hasGroupChatConnections: PropTypes.bool,
@@ -454,9 +474,8 @@ WonAtomContentParticipants.propTypes = {
   connectionMarkAsRead: PropTypes.func,
   hideModalDialog: PropTypes.func,
   showModalDialog: PropTypes.func,
-  connect: PropTypes.func,
   connectionClose: PropTypes.func,
-  connectionOpen: PropTypes.func,
+  connectSockets: PropTypes.func,
   rateConnection: PropTypes.func,
   routerGo: PropTypes.func,
 };

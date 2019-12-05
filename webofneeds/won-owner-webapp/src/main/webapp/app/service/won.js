@@ -161,6 +161,8 @@ won.WONMSG.recipientNode = won.WONMSG.baseUri + "recipientNode";
 won.WONMSG.recipientNodeCompacted = won.WONMSG.prefix + ":recipientNode";
 won.WONMSG.recipientSocket = won.WONMSG.baseUri + "recipientSocket";
 won.WONMSG.recipientSocketCompacted = won.WONMSG.prefix + ":recipientSocket";
+won.WONMSG.atom = won.WONMSG.baseUri + "atom";
+won.WONMSG.atomCompacted = won.WONMSG.prefix + ":atom";
 won.WONMSG.senderAtom = won.WONMSG.baseUri + "senderAtom";
 won.WONMSG.senderAtomCompacted = won.WONMSG.prefix + ":senderAtom";
 won.WONMSG.sender = won.WONMSG.baseUri + "sender";
@@ -224,9 +226,7 @@ won.WONMSG.atomStateMessage = won.WONMSG.baseUri + "AtomStateMessage";
 won.WONMSG.atomStateMessageCompacted = won.WONMSG.prefix + ":AtomStateMessage";
 won.WONMSG.closeMessage = won.WONMSG.baseUri + "CloseMessage";
 won.WONMSG.closeMessageCompacted = won.WONMSG.prefix + ":CloseMessage";
-won.WONMSG.openMessage = won.WONMSG.baseUri + "OpenMessage";
 won.WONMSG.feedbackMessage = won.WONMSG.baseUri + "HintFeedbackMessage";
-won.WONMSG.openMessageCompacted = won.WONMSG.prefix + ":OpenMessage";
 won.WONMSG.openSentMessage = won.WONMSG.baseUri + "OpenSentMessage";
 won.WONMSG.openSentMessageCompacted = won.WONMSG.prefix + ":OpenSentMessage";
 won.WONMSG.changeNotificationMessage =
@@ -400,7 +400,7 @@ won.messageType2EventType = {
 
 //UTILS
 won.WONMSG.uriPlaceholder = Object.freeze({
-  event: "this:eventuri",
+  event: "wm:/SELF",
 });
 
 won.WON.contentNodeBlankUri = Object.freeze({
@@ -693,7 +693,6 @@ won.defaultContext = {
   xsd: "http://www.w3.org/2001/XMLSchema#",
   gr: "http://purl.org/goodrelations/v1#",
   ldp: "http://www.w3.org/ns/ldp#",
-  sig: "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#",
   sioc: "http://rdfs.org/sioc/ns#",
   dct: "http://purl.org/dc/terms/",
   cert: "http://www.w3.org/ns/auth/cert#",
@@ -845,7 +844,7 @@ won.addContentGraphReferencesToMessageGraph = function(
  */
 won.addMessageGraph = function(builder, graphURIs, messageType) {
   let graphs = builder.data["@graph"];
-  let unsetMessageGraphUri = won.WONMSG.uriPlaceholder.event + "#data";
+  let unsetMessageGraphUri = won.WONMSG.uriPlaceholder.event + "#envelope";
   //create the message graph, containing the message type
   const messageGraph = {
     "@graph": [
@@ -854,13 +853,13 @@ won.addMessageGraph = function(builder, graphURIs, messageType) {
         "msg:messageType": {
           "@id": messageType,
         },
+        "msg:envelope": {
+          "@id": unsetMessageGraphUri,
+        },
       },
       {
         "@id": unsetMessageGraphUri,
         "@type": "msg:EnvelopeGraph",
-        "rdfg:subGraphOf": {
-          "@id": won.WONMSG.uriPlaceholder.event,
-        },
       },
     ],
     "@id": unsetMessageGraphUri,
@@ -930,48 +929,39 @@ won.DomainObjectFactory.prototype = {
   jsonLdToWonDomainObjects: function(/*jsonLdContent*/) {},
 };
 
-won.wonMessageFromJsonLd = async function(wonMessageAsJsonLD) {
-  const expandedJsonLd = await jsonld.promises.expand(wonMessageAsJsonLD);
-  const wonMessage = new WonMessage(expandedJsonLd);
+won.wonMessageFromJsonLd = function(wonMessageAsJsonLD) {
+  return jsonld.promises.expand(wonMessageAsJsonLD).then(expandedJsonLd => {
+    const wonMessage = new WonMessage(expandedJsonLd);
 
-  await wonMessage.frameInPromise();
-  await wonMessage.generateContentGraphTrig();
-  await wonMessage.generateCompactedFramedMessage();
-  await wonMessage.generateContainedForwardedWonMessages();
+    return wonMessage
+      .frameInPromise()
+      .then(() => wonMessage.generateContentGraphTrig())
+      .then(() => wonMessage.generateCompactedFramedMessage())
+      .then(() => {
+        if (wonMessage.hasParseErrors() && !wonMessage.isResponse()) {
+          console.warn(
+            "wonMessage<",
+            wonMessage.getMessageUri(),
+            "> msgType<",
+            wonMessage.getMessageType(),
+            "> ParseError: {" + wonMessage.parseErrors,
+            "} wonMessage: ",
+            wonMessage
+          );
+        }
 
-  if (wonMessage.hasParseErrors() && !wonMessage.isResponse()) {
-    console.warn(
-      "wonMessage<",
-      wonMessage.getMessageUri(),
-      "> msgType<",
-      wonMessage.getMessageType(),
-      "> ParseError: {" + wonMessage.parseErrors,
-      "} wonMessage: ",
-      wonMessage
-    );
-  }
-  if (wonMessage.hasContainedForwardedWonMessages()) {
-    console.debug(
-      "wonMessage<",
-      wonMessage.getMessageUri(),
-      "> msgType<",
-      wonMessage.getMessageType(),
-      "> contains forwardedMessages wonMessage: ",
-      wonMessage
-    );
-    wonMessage.getContainedForwardedWonMessages().map(forwardedWonMessage => {
-      console.debug(
-        "-- forwardedMessage<",
-        forwardedWonMessage.getMessageUri(),
-        "> msgType<",
-        forwardedWonMessage.getMessageType(),
-        ">, forwardedWonMessage: ",
-        forwardedWonMessage
-      );
-    });
-  }
-
-  return wonMessage;
+        return wonMessage;
+      })
+      .catch(e => {
+        console.error(
+          "Error in wonMessageFromJsonLd: rawMessage: ",
+          wonMessageAsJsonLD,
+          " wonMessage: ",
+          wonMessage
+        );
+        rethrow(e);
+      });
+  });
 };
 
 /**
@@ -1103,7 +1093,6 @@ function WonMessage(jsonLdContent) {
   }
   this.rawMessage = jsonLdContent;
   this.parseErrors = [];
-  this.containedForwardedWonMessages = [];
   this.__init();
 }
 
@@ -1246,42 +1235,6 @@ WonMessage.prototype = {
       }
     }
   },
-  generateContainedForwardedWonMessages: async function() {
-    const forwardedMessageUris = this.getForwardedMessageUris();
-    if (forwardedMessageUris && forwardedMessageUris.length == 1) {
-      //TODO: RECURSIVELY CREATE wonMessageObjects from all the forwarded Messages within this message
-      //const forwardedMessages = wonMessage.compactFramedMessage["msg:forwardedMessage"];
-      const encapsulatingMessageUri = this.messageStructure.messageUri;
-      const rawMessageWithoutEncapsulatingUri = this.rawMessage.filter(
-        elem => !elem["@id"].startsWith(encapsulatingMessageUri)
-      );
-
-      /*console.debug(
-        "WonMessage\n",
-        this,
-        "\nforwardedMessageUris:\n",
-        forwardedMessageUris,
-        "\nencapsulatingMessageUri\n",
-        encapsulatingMessageUri,
-        "\nrawMessageWithouthEncapsulatingUri\n",
-        rawMessageWithoutEncapsulatingUri
-      );*/
-
-      const fwdMessage = await won.wonMessageFromJsonLd(
-        rawMessageWithoutEncapsulatingUri
-      );
-      this.containedForwardedWonMessages.push(fwdMessage);
-
-      return Promise.resolve(this.containedForwardedWonMessages);
-    } else if (forwardedMessageUris) {
-      this.parseErrors.push(
-        "WonMessage contains more than one forwardedMessage on the same level: omitting forwardMessages"
-      );
-      return Promise.resolve(this.containedForwardedWonMessages);
-    } else {
-      return Promise.resolve(this.containedForwardedWonMessages);
-    }
-  },
   frameInPromise: function() {
     if (this.framedMessage) {
       return Promise.resolve(this.framedMessage);
@@ -1374,14 +1327,6 @@ WonMessage.prototype = {
       return this.compactFramedMessage["msg:correspondingRemoteMessage"];
     }
   },
-  getCompactFramedForwardedMessageContent: function() {
-    const forwardedMessage =
-      this.compactFramedMessage &&
-      this.compactFramedMessage["msg:forwardedMessage"];
-    const forwardedMessageContent =
-      forwardedMessage && forwardedMessage["msg:correspondingRemoteMessage"];
-    return forwardedMessageContent;
-  },
   getCompactRawMessage: function() {
     return this.compactRawMessage;
   },
@@ -1398,26 +1343,10 @@ WonMessage.prototype = {
       this.getProperty("https://w3id.org/won/message#forwardedMessage")
     );
   },
-  getReceivedTimestamp: function() {
-    return this.getPropertyFromLocalMessage(
-      "https://w3id.org/won/message#receivedTimestamp"
-    );
-  },
-  getSentTimestamp: function() {
-    return this.getPropertyFromLocalMessage(
-      "https://w3id.org/won/message#sentTimestamp"
-    );
-  },
-  /**
-   * Returns the receivedTimestamp, which is the server timestamp. If that timestamp is not found in the message,
-   * returns the sentTimestamp as a fallback.
-   */
   getTimestamp: function() {
-    const ts = this.getReceivedTimestamp();
-    if (ts) {
-      return ts;
-    }
-    return this.getSentTimestamp();
+    return this.getPropertyFromLocalMessage(
+      "https://w3id.org/won/message#timestamp"
+    );
   },
   getTextMessage: function() {
     return this.getProperty("https://w3id.org/won/content#text");
@@ -1432,36 +1361,35 @@ WonMessage.prototype = {
     return this.getProperty("https://w3id.org/won/core#hintTargetSocket");
   },
   getIsResponseTo: function() {
-    return this.getProperty("https://w3id.org/won/message#isResponseTo");
+    return this.getProperty("https://w3id.org/won/message#respondingTo");
   },
   getIsRemoteResponseTo: function() {
     return this.getProperty("https://w3id.org/won/message#isRemoteResponseTo");
   },
-  getIsResponseToMessageType: function() {
+  getRespondingToMessageType: function() {
     return this.getProperty(
-      "https://w3id.org/won/message#isResponseToMessageType"
+      "https://w3id.org/won/message#respondingToMessageType"
     );
   },
 
   getSenderNode: function() {
     return this.getProperty("https://w3id.org/won/message#senderNode");
   },
+  getSenderSocket: function() {
+    return this.getProperty("https://w3id.org/won/message#senderSocket");
+  },
   getSenderAtom: function() {
     return this.getProperty("https://w3id.org/won/message#senderAtom");
   },
-  getSenderConnection: function() {
-    return this.getProperty("https://w3id.org/won/message#sender");
+  getConnection: function() {
+    return this.getProperty("https://w3id.org/won/message#connection");
   },
-  getRecipientNode: function() {
-    return this.getProperty("https://w3id.org/won/message#recipientNode");
+  getTargetSocket: function() {
+    return this.getProperty("https://w3id.org/won/message#recipientSocket");
   },
-  getRecipientAtom: function() {
-    return this.getProperty("https://w3id.org/won/message#recipientAtom");
+  getAtom: function() {
+    return this.getProperty("https://w3id.org/won/message#atom");
   },
-  getRecipientConnection: function() {
-    return this.getProperty("https://w3id.org/won/message#recipient");
-  },
-
   getProposedMessageUris: function() {
     return createArray(
       this.getProperty("https://w3id.org/won/agreement#proposes")
@@ -1519,24 +1447,8 @@ WonMessage.prototype = {
   isRetractMessage: function() {
     return !!this.getProperty("https://w3id.org/won/modification#retracts");
   },
-  isOutgoingMessage: function() {
-    return (
-      this.isFromOwner() ||
-      (this.isFromSystem() &&
-        this.getSenderConnection() !== this.getRecipientConnection())
-    );
-  },
-  hasContainedForwardedWonMessages: function() {
-    return (
-      this.containedForwardedWonMessages &&
-      this.containedForwardedWonMessages.length > 0
-    );
-  },
   hasParseErrors: function() {
     return this.parseErrors && this.parseErrors.length > 0;
-  },
-  getContainedForwardedWonMessages: function() {
-    return this.containedForwardedWonMessages;
   },
   isFromSystem: function() {
     let direction = this.getMessageDirection();
@@ -1570,9 +1482,6 @@ WonMessage.prototype = {
     return (
       this.getMessageType() === "https://w3id.org/won/message#ConnectMessage"
     );
-  },
-  isOpenMessage: function() {
-    return this.getMessageType() === "https://w3id.org/won/message#OpenMessage";
   },
   isConnectionMessage: function() {
     return (
@@ -1623,67 +1532,61 @@ WonMessage.prototype = {
   },
   isResponseToReplaceMessage: function() {
     return (
-      this.getIsResponseToMessageType() ===
+      this.getRespondingToMessageType() ===
       "https://w3id.org/won/message#ReplaceMessage"
     );
   },
   isResponseToAtomHintMessage: function() {
     return (
-      this.getIsResponseToMessageType() ===
+      this.getRespondingToMessageType() ===
       "https://w3id.org/won/message#AtomHintMessage"
     );
   },
   isResponseToCreateMessage: function() {
     return (
-      this.getIsResponseToMessageType() ===
+      this.getRespondingToMessageType() ===
       "https://w3id.org/won/message#CreateMessage"
     );
   },
   isResponseToConnectMessage: function() {
     return (
-      this.getIsResponseToMessageType() ===
+      this.getRespondingToMessageType() ===
       "https://w3id.org/won/message#ConnectMessage"
-    );
-  },
-  isResponseToOpenMessage: function() {
-    return (
-      this.getIsResponseToMessageType() ===
-      "https://w3id.org/won/message#OpenMessage"
     );
   },
   isResponseToConnectionMessage: function() {
     return (
-      this.getIsResponseToMessageType() ===
+      this.getRespondingToMessageType() ===
       "https://w3id.org/won/message#ConnectionMessage"
     );
   },
   isResponseToCloseMessage: function() {
     return (
-      this.getIsResponseToMessageType() ===
+      this.getRespondingToMessageType() ===
       "https://w3id.org/won/message#CloseMessage"
     );
   },
   isResponseToHintFeedbackMessage: function() {
     return (
-      this.getIsResponseToMessageType() ===
+      this.getRespondingToMessageType() ===
       "https://w3id.org/won/message#HintFeedbackMessage"
     );
   },
   isResponseToActivateMessage: function() {
     return (
-      this.getIsResponseToMessageType() ===
+      this.getRespondingToMessageType() ===
       "https://w3id.org/won/message#ActivateMessage"
     );
   },
   isResponseToDeactivateMessage: function() {
     return (
-      this.getIsResponseToMessageType() ===
+      this.getRespondingToMessageType() ===
       "https://w3id.org/won/message#DeactivateMessage"
     );
   },
   isResponseToDeleteMessage: function() {
     return (
-      this.getIsResponseToMessageType() ===
+      this.getRespondingToMessageType() ===
       "https://w3id.org/won/message#DeleteMessage"
     );
   },
@@ -1717,6 +1620,7 @@ WonMessage.prototype = {
 
   __init: function() {
     this.context = this.graphs = this.rawMessage;
+
     if (!Array.isArray(this.graphs)) {
       this.parseErrors.push("@graph not found or not an array");
     }
@@ -1728,6 +1632,7 @@ WonMessage.prototype = {
     let unreferencedEnvelopes = [];
     const innermostEnvelopes = [];
     const contentGraphUris = [];
+
     //first pass: create one node per envelope/content graph
     this.graphs.forEach(graph => {
       let graphUri = graph["@id"];
@@ -1784,10 +1689,10 @@ WonMessage.prototype = {
             uri => !containedEnvelopes.includes(uri)
           );
         }
-        if (node.correspondingRemoteMessageUri) {
+        if (node && node.correspondingRemoteMessageUri) {
           referencesOtherGraphs = true;
         }
-        if (node.forwardedMessageUri) {
+        if (node && node.forwardedMessageUri) {
           referencesOtherGraphs = true;
         }
         if (!referencesOtherGraphs) {
@@ -1848,7 +1753,7 @@ WonMessage.prototype = {
       this.graphs.forEach(graph => {
         let graphUri = graph["@id"];
         let node = nodes[graphUri];
-        if (node.forwardedMessageUri) {
+        if (node && node.forwardedMessageUri) {
           node.forwardedMessage = nodes[node.forwardedMessageUri];
           unreferencedEnvelopes = unreferencedEnvelopes.filter(
             uri => uri != node.forwardedMessageUri
@@ -1878,21 +1783,27 @@ WonMessage.prototype = {
   __isEnvelopeGraph: graph => {
     let graphUri = graph["@id"];
     let graphData = graph["@graph"];
-    return graphData.some(
-      resource =>
-        resource["@id"] === graphUri &&
-        resource["@type"].includes("https://w3id.org/won/message#EnvelopeGraph")
+    return (
+      graphData &&
+      graphData.some(
+        resource =>
+          resource["@id"] === graphUri &&
+          resource["@type"].includes(
+            "https://w3id.org/won/message#EnvelopeGraph"
+          )
+      )
     );
   },
   __isSignatureGraph: graph => {
     let graphUri = graph["@id"];
     let graphData = graph["@graph"];
-    return graphData.some(
-      resource =>
-        resource["@id"] === graphUri &&
-        resource["@type"].includes(
-          "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature"
-        )
+    return (
+      graphData &&
+      graphData.some(
+        resource =>
+          resource["@id"] === graphUri &&
+          resource["@type"].includes("https://w3id.org/won/message#Signature")
+      )
     );
   },
   __getContainedEnvelopeUris: graph => {
@@ -2050,9 +1961,27 @@ won.MessageBuilder.prototype = {
     }
     return this;
   },
+  atom: function(atomURI) {
+    this.getMessageEventNode()[won.WONMSG.atomCompacted] = {
+      "@id": atomURI,
+    };
+    return this;
+  },
   senderAtom: function(senderAtomURI) {
     this.getMessageEventNode()[won.WONMSG.senderAtomCompacted] = {
       "@id": senderAtomURI,
+    };
+    return this;
+  },
+  senderSocket: function(senderSocketURI) {
+    this.getMessageEventNode()[won.WONMSG.senderSocketCompacted] = {
+      "@id": senderSocketURI,
+    };
+    return this;
+  },
+  targetSocket: function(recipientSocketURI) {
+    this.getMessageEventNode()[won.WONMSG.recipientSocketCompacted] = {
+      "@id": recipientSocketURI,
     };
     return this;
   },
@@ -2090,32 +2019,12 @@ won.MessageBuilder.prototype = {
     this.getMessageEventNode()["@type"] = won.WONMSG.FromOwnerCompacted;
     return this;
   },
-  sentTimestamp: function(timestamp) {
-    this.getMessageEventNode()["msg:sentTimestamp"] = timestamp;
+  timestamp: function(timestamp) {
+    this.getMessageEventNode()["msg:timestamp"] = timestamp;
     return this;
   },
-  /**
-   * Adds the specified socket as local sockets. Only needed for connect and
-   * openSuggested.
-   * @param recipientURI
-   * @returns {won.MessageBuilder}
-   */
-  socket: function(socketURI) {
-    this.getMessageEventNode()[won.WONMSG.senderSocketCompacted] = {
-      "@id": socketURI,
-    };
-    return this;
-  },
-  /**
-   * Adds the specified socket as local sockets. Only needed for connect and
-   * openSuggested.
-   * @param recipientURI
-   * @returns {won.MessageBuilder}
-   */
-  targetSocket: function(socketURI) {
-    this.getMessageEventNode()[won.WONMSG.recipientSocketCompacted] = {
-      "@id": socketURI,
-    };
+  protocolVersion: function(version) {
+    this.getMessageEventNode()["msg:protocolVersion"] = version;
     return this;
   },
   /**
@@ -2203,6 +2112,31 @@ won.MessageBuilder.prototype = {
     return this.data;
   },
 };
+
+/**
+ * Optionally prepends a string, and then throws
+ * whatever it gets as proper javascript error.
+ * Note, that throwing an error will also
+ * reject in a `Promise`-constructor-callback.
+ * @param {*} e
+ * @param {*} prependedMsg
+ */
+function rethrow(e, prependedMsg = "") {
+  prependedMsg = prependedMsg ? prependedMsg + "\n" : "";
+
+  if (is("String", e)) {
+    throw new Error(prependedMsg + e);
+  } else if (e.stack && e.message) {
+    // a class defined
+    const g = new Error(prependedMsg + e.message);
+    g.stack = e.stack;
+    g.response = e.response; //we add the response so we can look up why a request threw an error
+
+    throw g;
+  } else {
+    throw new Error(prependedMsg + JSON.stringify(e));
+  }
+}
 
 //TODO replace with `export default` after switching everything to ES6-module-syntax
 export default won;

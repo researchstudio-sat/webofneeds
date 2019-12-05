@@ -122,6 +122,8 @@ const mapDispatchToProps = dispatch => {
       trimmedMsg,
       additionalContent,
       referencedContent,
+      senderSocketUri,
+      targetSocketUri,
       connectionUri,
       isTTL
     ) => {
@@ -130,13 +132,21 @@ const mapDispatchToProps = dispatch => {
           trimmedMsg,
           additionalContent,
           referencedContent,
+          senderSocketUri,
+          targetSocketUri,
           connectionUri,
           isTTL
         )
       );
     },
-    openRequest: (connectionUri, message) => {
-      dispatch(actionCreators.connections__open(connectionUri, message));
+    connectSockets: (senderSocketUri, targetSocketUri, message) => {
+      dispatch(
+        actionCreators.atoms__connectSockets(
+          senderSocketUri,
+          targetSocketUri,
+          message
+        )
+      );
     },
     rateConnection: (connectionUri, rating) => {
       dispatch(actionCreators.connections__rate(connectionUri, rating));
@@ -150,16 +160,6 @@ const mapDispatchToProps = dispatch => {
           targetAtomUri,
           message,
           persona
-        )
-      );
-    },
-    connect: (ownedAtomUri, connectionUri, targetAtomUri, message) => {
-      dispatch(
-        actionCreators.atoms__connect(
-          ownedAtomUri,
-          connectionUri,
-          targetAtomUri,
-          message
         )
       );
     },
@@ -336,9 +336,18 @@ class GroupAtomMessages extends React.Component {
             submitButtonLabel="Accept&#160;Invite"
             allowEmptySubmit={true}
             allowDetails={false}
-            onSubmit={({ value }) =>
-              this.props.openRequest(this.props.connectionUri, value)
-            }
+            onSubmit={({ value }) => {
+              const senderSocketUri = get(this.props.connection, "socketUri");
+              const targetSocketUri = get(
+                this.props.connection,
+                "targetSocketUri"
+              );
+              this.props.connectSockets(
+                senderSocketUri,
+                targetSocketUri,
+                value
+              );
+            }}
           />
           <WonLabelledHr className="gpm__footer__labelledhr" label="Or" />
           <button
@@ -436,10 +445,15 @@ class GroupAtomMessages extends React.Component {
 
     const trimmedMsg = chatMessage.trim();
     if (trimmedMsg || additionalContent || referencedContent) {
+      const senderSocketUri = get(this.props.connection, "socketUri");
+      const targetSocketUri = get(this.props.connection, "targetSocketUri");
+
       this.props.sendChatMessage(
         trimmedMsg,
         additionalContent,
         referencedContent,
+        senderSocketUri,
+        targetSocketUri,
         get(this.props.connection, "uri"),
         isTTL
       );
@@ -458,10 +472,9 @@ class GroupAtomMessages extends React.Component {
         this.props.connectionUri,
         won.WONCON.binaryRatingGood
       );
-      this.props.connect(
-        get(this.props.ownedAtom, "uri"),
-        this.props.connectionUri,
-        this.props.targetAtomUri,
+      this.props.connectSockets(
+        get(this.props.connection, "socketUri"),
+        get(this.props.connection, "targetSocketUri"),
         message
       );
       this.props.routerGoCurrent({
@@ -537,9 +550,8 @@ GroupAtomMessages.propTypes = {
   routerGoResetParams: PropTypes.func,
   hideAddMessageContent: PropTypes.func,
   sendChatMessage: PropTypes.func,
-  connect: PropTypes.func,
   connectAdHoc: PropTypes.func,
-  openRequest: PropTypes.func,
+  connectSockets: PropTypes.func,
   rateConnection: PropTypes.func,
   closeConnection: PropTypes.func,
   showMoreMessages: PropTypes.func,

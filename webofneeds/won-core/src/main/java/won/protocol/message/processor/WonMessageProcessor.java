@@ -10,8 +10,8 @@
  */
 package won.protocol.message.processor;
 
+import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
 
 /**
  * Processes WonMessages

@@ -17,8 +17,6 @@ WHERE
       ?msg msg:sender ?sender.
      }
      filter( (! bound(?senderConnection) )|| ?senderConnection = ?sender)  
-     OPTIONAL {
-      ?msg (msg:correspondingRemoteMessage|msg:forwardedMessage)*/con:text ?text.
      }
      OPTIONAL {
       ?msg agr:proposes ?proposes.

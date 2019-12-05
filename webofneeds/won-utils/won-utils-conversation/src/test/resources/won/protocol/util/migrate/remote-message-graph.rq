@@ -1,0 +1,10 @@
+PREFIX won:<https://w3id.org/won/core#>
+PREFIX msg:<https://w3id.org/won/message#>
+select ?msg ?rem where {
+	graph ?graph {
+		?rem msg:correspondingRemoteMessage ?msg.
+	}
+	graph ?graph2 {
+		?rem a msg:FromExternal .
+	}
+}

@@ -1,0 +1,21 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>webofneeds</artifactId>
+		<groupId>at.researchstudio.sat</groupId>
+		<version>0.7-SNAPSHOT</version>
+	</parent>
+	<artifactId>won-test</artifactId>
+	<name>Web of Needs Test </name>
+	<description>Provides utilities for testing</description>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>net.revelc.code.formatter</groupId>
+				<artifactId>formatter-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>

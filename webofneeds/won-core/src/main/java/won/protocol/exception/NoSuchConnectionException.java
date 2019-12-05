@@ -18,14 +18,35 @@ import java.text.MessageFormat;
  */
 public class NoSuchConnectionException extends WonProtocolException {
     private URI unknownConnectionURI;
+    private URI unknownSocketURI;
+    private URI unknownTargetSocketURI;
+
+    public NoSuchConnectionException(String message) {
+        super(message);
+    }
 
     public URI getUnknownConnectionURI() {
         return unknownConnectionURI;
     }
 
+    public URI getUnknownSocketURI() {
+        return unknownSocketURI;
+    }
+
+    public URI getUnknownTargetSocketURI() {
+        return unknownTargetSocketURI;
+    }
+
     public NoSuchConnectionException(final URI unknownConnectionURI) {
         super(MessageFormat.format("No connection with the URI {0} is known on this server.", unknownConnectionURI));
         this.unknownConnectionURI = unknownConnectionURI;
+    }
+
+    public NoSuchConnectionException(final URI unknownSocketURI, final URI unknownTargetSocketURI) {
+        super(MessageFormat.format("No connection between socket {0} and targetSocket {1} is known on this server.",
+                        unknownSocketURI, unknownTargetSocketURI));
+        this.unknownSocketURI = unknownSocketURI;
+        this.unknownTargetSocketURI = unknownTargetSocketURI;
     }
 
     public NoSuchConnectionException(final Long unknownConnectionID) {

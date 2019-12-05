@@ -1,18 +1,5 @@
 package won.bot.framework.extensions.textmessagecommand;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import won.bot.framework.eventbot.EventListenerContext;
-import won.bot.framework.eventbot.action.impl.wonmessage.SendMessageAction;
-import won.bot.framework.eventbot.behaviour.BotBehaviour;
-import won.bot.framework.eventbot.bus.EventBus;
-import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherAtomEvent;
-import won.bot.framework.eventbot.filter.EventFilter;
-import won.bot.framework.extensions.textmessagecommand.command.PatternMatcherTextMessageCommand;
-import won.bot.framework.extensions.textmessagecommand.command.TextMessageCommand;
-import won.protocol.model.Connection;
-
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +7,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import won.bot.framework.eventbot.EventListenerContext;
+import won.bot.framework.eventbot.action.impl.wonmessage.SendMessageAction;
+import won.bot.framework.eventbot.behaviour.BotBehaviour;
+import won.bot.framework.eventbot.bus.EventBus;
+import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
+import won.bot.framework.eventbot.filter.EventFilter;
+import won.bot.framework.extensions.textmessagecommand.command.PatternMatcherTextMessageCommand;
+import won.bot.framework.extensions.textmessagecommand.command.TextMessageCommand;
+import won.protocol.model.Connection;
 
 /**
  * Behaviour that checks for Matching command Strings, within a
@@ -101,7 +102,7 @@ public class TextMessageCommandBehaviour extends BotBehaviour {
         EventListenerContext ctx = this.context;
         EventBus bus = ctx.getEventBus();
         TextMessageCommandExecutor textMessageUsageCommandChecker = new TextMessageCommandExecutor(context, commands);
-        this.subscribeWithAutoCleanup(OpenFromOtherAtomEvent.class, eventFilter, textMessageUsageCommandChecker);
+        this.subscribeWithAutoCleanup(ConnectFromOtherAtomEvent.class, eventFilter, textMessageUsageCommandChecker);
         this.subscribeWithAutoCleanup(MessageFromOtherAtomEvent.class, eventFilter, textMessageUsageCommandChecker);
         // react to usage command event
         this.subscribeWithAutoCleanup(UsageCommandEvent.class, eventFilter,

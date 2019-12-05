@@ -17,4 +17,8 @@ import java.net.URI;
  */
 public interface ConnectionSpecificEvent {
     URI getConnectionURI();
+
+    URI getSocketURI();
+
+    URI getTargetSocketURI();
 }

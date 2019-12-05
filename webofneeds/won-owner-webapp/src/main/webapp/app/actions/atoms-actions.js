@@ -16,11 +16,49 @@ import {
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as stateStore from "../redux/state-store.js";
+import * as ownerApi from "../api/owner-api.js";
 import { get } from "../utils.js";
 
 export function fetchUnloadedAtom(atomUri) {
   return (dispatch, getState) =>
     stateStore.fetchAtomAndDispatch(atomUri, dispatch, getState);
+}
+
+export function atomsConnectSockets(
+  senderSocketUri,
+  targetSocketUri,
+  connectMessage
+) {
+  return async dispatch => {
+    if (!senderSocketUri) {
+      throw new Error("SenderSocketUri not present");
+    }
+
+    if (!targetSocketUri) {
+      throw new Error("TargetSocketUri not present");
+    }
+
+    const cnctMsg = buildConnectMessage({
+      connectMessage: connectMessage,
+      socketUri: senderSocketUri,
+      targetSocketUri: targetSocketUri,
+    });
+
+    const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
+
+    return ownerApi.sendMessage(cnctMsg.message).then(jsonResp => {
+      dispatch({
+        type: actionTypes.atoms.connectSockets,
+        payload: {
+          eventUri: jsonResp.messageUri,
+          message: jsonResp.message,
+          optimisticEvent: optimisticEvent,
+          senderSocketUri: senderSocketUri,
+          targetSocketUri: targetSocketUri,
+        },
+      });
+    });
+  };
 }
 
 //ownConnectionUri is optional - set if known
@@ -42,52 +80,50 @@ export function atomsConnect(
 
     if (socketType && !socketUri) {
       throw new Error(
-        `Atom ${ownedAtom.get("uri")} does not have a ${socketType}`
+        `Atom ${get(ownedAtom, "uri")} does not have a ${socketType}`
       );
     }
 
     if (targetSocketType && !targetSocketUri) {
       throw new Error(
-        `Atom ${theirAtom.get("uri")} does not have a ${targetSocketType}`
+        `Atom ${get(theirAtom, "uri")} does not have a ${targetSocketType}`
       );
     }
 
-    const cnctMsg = await buildConnectMessage({
-      ownedAtomUri: ownedAtomUri,
-      theirAtomUri: theirAtomUri,
-      ownNodeUri: ownedAtom.get("nodeUri"),
-      theirNodeUri: theirAtom.get("nodeUri"),
+    const cnctMsg = buildConnectMessage({
       connectMessage: connectMessage,
-      optionalOwnConnectionUri: ownConnectionUri,
       socketUri: socketUri,
       targetSocketUri: targetSocketUri,
     });
     const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
-    dispatch({
-      type: actionTypes.atoms.connect,
-      payload: {
-        eventUri: cnctMsg.eventUri,
-        message: cnctMsg.message,
-        ownConnectionUri: ownConnectionUri,
-        optimisticEvent: optimisticEvent,
-        socketUri: socketUri,
-        targetSocketUri: targetSocketUri,
-      },
+
+    return ownerApi.sendMessage(cnctMsg.message).then(jsonResp => {
+      dispatch({
+        type: actionTypes.atoms.connect,
+        payload: {
+          eventUri: jsonResp.messageUri,
+          message: jsonResp.message,
+          ownConnectionUri: ownConnectionUri,
+          optimisticEvent: optimisticEvent,
+          socketUri: socketUri,
+          targetSocketUri: targetSocketUri,
+          atomUri: get(ownedAtom, "uri"),
+          targetAtomUri: get(theirAtom, "uri"),
+        },
+      });
     });
   };
 }
 
 export function atomsClose(atomUri) {
   return (dispatch, getState) => {
-    buildCloseAtomMessage(
-      atomUri,
-      getState().getIn(["config", "defaultNodeUri"])
-    )
-      .then(data => {
+    buildCloseAtomMessage(atomUri)
+      .then(data => ownerApi.sendMessage(data.message))
+      .then(jsonResp => {
         dispatch(
           actionCreators.messages__send({
-            eventUri: data.eventUri,
-            message: data.message,
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
           })
         );
 
@@ -113,16 +149,14 @@ export function atomsClose(atomUri) {
 }
 
 export function atomsOpen(atomUri) {
-  return (dispatch, getState) => {
-    buildOpenAtomMessage(
-      atomUri,
-      getState().getIn(["config", "defaultNodeUri"])
-    )
-      .then(data => {
+  return dispatch => {
+    buildOpenAtomMessage(atomUri)
+      .then(data => ownerApi.sendMessage(data.message))
+      .then(jsonResp => {
         dispatch(
           actionCreators.messages__send({
-            eventUri: data.eventUri,
-            message: data.message,
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
           })
         );
       })
@@ -141,18 +175,18 @@ export function atomsOpen(atomUri) {
 export function atomsClosedBySystem(event) {
   return (dispatch, getState) => {
     //first check if we really have the 'own' atom in the state - otherwise we'll ignore the message
-    const atom = getState().getIn(["atoms", event.getRecipientAtom()]);
+    const atom = getState().getIn(["atoms", event.getAtom()]);
     if (!atom) {
       console.debug(
         "ignoring deactivateMessage for an atom that is not ours:",
-        event.getRecipientAtom()
+        event.getAtom()
       );
     }
     dispatch({
       type: actionTypes.atoms.closedBySystem,
       payload: {
-        atomUri: event.getRecipientAtom(),
-        humanReadable: atom.get("humanReadable"),
+        atomUri: event.getAtom(),
+        humanReadable: get(atom, "humanReadable"),
         message: event.getTextMessage(),
       },
     });
@@ -160,16 +194,14 @@ export function atomsClosedBySystem(event) {
 }
 
 export function atomsDelete(atomUri) {
-  return (dispatch, getState) => {
-    buildDeleteAtomMessage(
-      atomUri,
-      getState().getIn(["config", "defaultNodeUri"])
-    )
-      .then(data => {
+  return dispatch => {
+    buildDeleteAtomMessage(atomUri)
+      .then(data => ownerApi.sendMessage(data.message))
+      .then(jsonResp => {
         dispatch(
           actionCreators.messages__send({
-            eventUri: data.eventUri,
-            message: data.message,
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
           })
         );
       })

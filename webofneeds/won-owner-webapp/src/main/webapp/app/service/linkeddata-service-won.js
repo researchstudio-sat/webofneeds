@@ -809,7 +809,7 @@ import won from "./won.js";
 
     let triplesAddedToDeepDocumentGraphsP = Promise.resolve();
     if (deep) {
-      if (!documentUri.endsWith("/events")) {
+      if (!documentUri.endsWith("/msg")) {
         //TODO hack; looking at uri
         console.error(
           "Adding a dataset loaded with `deep=true` " +
@@ -1030,89 +1030,32 @@ import won from "./won.js";
     return triples.map(tripleToString).join("\n");
   }
 
-  won.getEnvelopeDataForAtom = function(atomUri, nodeUri) {
+  won.validateEnvelopeDataForAtom = function(atomUri) {
     if (typeof atomUri === "undefined" || atomUri == null) {
-      throw { message: "getEnvelopeDataForAtom: atomUri must not be null" };
+      throw {
+        message: "validateEnvelopeDataForAtom: atomUri must not be null",
+      };
     }
 
-    let ret = {};
-    ret[won.WONMSG.senderAtom] = atomUri;
-    ret[won.WONMSG.recipientAtom] = atomUri;
-
-    if (!(typeof nodeUri === "undefined" || nodeUri == null)) {
-      ret[won.WONMSG.senderNode] = nodeUri;
-      ret[won.WONMSG.recipientNode] = nodeUri;
-    }
-
-    return Promise.resolve(ret);
+    return Promise.resolve();
   };
 
-  won.getEnvelopeDataforNewConnection = function(
-    ownedAtomUri,
-    theirAtomUri,
-    ownNodeUri,
-    theirNodeUri
+  won.validateEnvelopeDataForConnection = async function(
+    socketUri,
+    targetSocketUri
   ) {
-    if (!ownedAtomUri) {
+    if (
+      typeof socketUri === "undefined" ||
+      socketUri == null ||
+      typeof targetSocketUri === "undefined" ||
+      targetSocketUri == null
+    ) {
       throw {
-        message:
-          "getEnvelopeDataforNewConnection: ownedAtomUri must not be null",
-      };
-    }
-    if (!theirAtomUri) {
-      throw {
-        message:
-          "getEnvelopeDataforNewConnection: theirAtomUri must not be null",
-      };
-    }
-    return {
-      [won.WONMSG.senderAtom]: ownedAtomUri,
-      [won.WONMSG.senderNode]: ownNodeUri,
-      [won.WONMSG.recipientAtom]: theirAtomUri,
-      [won.WONMSG.recipientNode]: theirNodeUri,
-    };
-  };
-
-  /**
-   * Fetches a structure that can be used directly (in a JSON-LD node) as the envelope data
-   * to send a message via the specified connectionUri (that is interpreted as a local connection.
-   * @param connectionUri
-   * @param ownedAtomUri
-   * @param theirAtomUri
-   * @param ownNodeUri
-   * @param theirNodeUri
-   * @param theirConnectionUri
-   * @returns a promise to the data
-   */
-  won.getEnvelopeDataforConnection = async function(
-    connectionUri,
-    ownedAtomUri,
-    theirAtomUri,
-    ownNodeUri,
-    theirNodeUri,
-    theirConnectionUri
-  ) {
-    if (typeof connectionUri === "undefined" || connectionUri == null) {
-      throw {
-        message: "getEnvelopeDataforConnection: connectionUri must not be null",
+        message: "getEnvelopeDataforConnection: socketUris must not be null",
       };
     }
 
-    const ret = {
-      [won.WONMSG.sender]: connectionUri,
-      [won.WONMSG.senderAtom]: ownedAtomUri,
-      [won.WONMSG.senderNode]: ownNodeUri,
-      [won.WONMSG.recipientAtom]: theirAtomUri,
-      [won.WONMSG.recipientNode]: theirNodeUri,
-    };
-    try {
-      if (theirConnectionUri) {
-        ret[won.WONMSG.recipient] = theirConnectionUri;
-      }
-    } catch (err) {
-      console.error("getEnvelopeDataforConnection: ", err.message, err.stack);
-    }
-    return Promise.resolve(ret);
+    return Promise.resolve();
   };
 
   won.getConnectionUrisWithStateByAtomUri = (atomUri, requesterWebId) => {
@@ -1177,13 +1120,74 @@ import won from "./won.js";
     );
   };
 
-  won.getWonMessage = (eventUri, fetchParams) => {
+  /**
+   * @param connectionUri
+   * @param fetchParams See `ensureLoaded`.
+   * @return {*} the connections predicates along with the uris of associated events
+   */
+  won.getConnectionWithEventUrisBySocket = function(
+    senderSocketUri,
+    targetSocketUri,
+    fetchParams
+  ) {
+    if (!is("String", senderSocketUri) || !is("String", targetSocketUri)) {
+      throw new Error(
+        "Tried to request connection infos for sthg that isn't an uri: " +
+          senderSocketUri +
+          " or " +
+          targetSocketUri
+      );
+    }
+
+    fetchParams.socket = senderSocketUri;
+    fetchParams.targetSocket = targetSocketUri;
+
+    return (
+      won
+        .getNode(senderSocketUri.split("#")[0] + "/c", fetchParams)
+        //add the eventUris
+        .then(jsonResp => jsonResp.member)
+        .then(connUris => {
+          let _connUris;
+          if (is("String", connUris)) {
+            _connUris = [connUris];
+          } else {
+            _connUris = connUris;
+          }
+
+          const newFetchParams = {
+            requesterWebId: fetchParams.requesterWebId,
+          };
+
+          return _connUris.map(connUri => {
+            return won.getConnectionWithEventUris(connUri, newFetchParams);
+          });
+        })
+    );
+  };
+
+  won.getWonMessage = (msgUri, fetchParams) => {
     return won
-      .getRawEvent(eventUri, fetchParams)
-      .then(rawEvent => won.wonMessageFromJsonLd(rawEvent));
+      .getRawEvent(msgUri, fetchParams)
+      .then(rawEvent => {
+        console.debug(
+          "getWonMessage of rawEvent(uri:",
+          msgUri,
+          "): ",
+          rawEvent
+        );
+        return won.wonMessageFromJsonLd(rawEvent);
+      })
+      .catch(e => {
+        const msg = "Failed to get wonMessage " + msgUri + ".";
+        e.message += msg;
+        console.error(e.message);
+        throw e;
+      });
   };
 
   window.getWonMessage4dbg = won.getWonMessage;
+  window.wonMessageFromJsonLd4dbg = won.wonMessageFromJsonLd;
 
   won.getRawEvent = (eventUri, fetchParams) => {
     return won

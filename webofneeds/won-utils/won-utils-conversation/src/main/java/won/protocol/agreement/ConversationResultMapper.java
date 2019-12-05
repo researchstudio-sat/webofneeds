@@ -56,17 +56,13 @@ public class ConversationResultMapper implements Function<QuerySolution, Convers
         if (accepts != null) {
             ret.addAccepts(accepts);
         }
-        URI correspondingRemoteMessage = getUriVar(solution, "correspondingRemoteMessage");
-        if (correspondingRemoteMessage != null) {
-            ret.setCorrespondingRemoteMessageURI(correspondingRemoteMessage);
-        }
         URI isResponseTo = getUriVar(solution, "isResponseTo");
         if (isResponseTo != null) {
-            ret.setIsResponseTo(isResponseTo);
+            ret.setRespondingTo(isResponseTo);
         }
         URI isRemoteResponseTo = getUriVar(solution, "isRemoteResponseTo");
         if (isRemoteResponseTo != null) {
-            ret.setIsRemoteResponseTo(isRemoteResponseTo);
+            ret.setRemotelyRespondingTo(isRemoteResponseTo);
         }
         URI type = getUriVar(solution, "msgType");
         if (type != null) {

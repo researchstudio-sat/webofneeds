@@ -1,0 +1,266 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>webofneeds</artifactId>
+		<groupId>at.researchstudio.sat</groupId>
+		<version>0.7-SNAPSHOT</version>
+	</parent>
+	<artifactId>won-parent-pom</artifactId>
+	<name>Web of Needs parent pom</name>
+	<description>Parent pom for all modules that build code</description>
+	<packaging>pom</packaging>
+	<dependencies>
+		<dependency>
+			<groupId>at.researchstudio.sat</groupId>
+			<artifactId>won-test</artifactId>
+			<scope>test</scope>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+	    <build>
+        <plugins>
+			<plugin>
+				<groupId>net.revelc.code.formatter</groupId>
+				<artifactId>formatter-maven-plugin</artifactId>
+			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.7</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>attach-javadoc</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        
+    </build>
+    <repositories>
+        <!-- jboss repo used for javax.jms -->
+        <repository>
+            <id>repository.jboss.org-public</id>
+            <name>JBoss repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public</url>
+        </repository>
+        <repository>
+            <id>central</id>
+            <name>Maven Repository Switchboard</name>
+            <layout>default</layout>
+            <url>http://repo1.maven.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+
+    
+
+    <profiles>
+        <profile>
+            <id>skip-tests</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        
+ 		<profile>
+            <id>skip-postgres-tests</id>
+            <activation><activeByDefault>true</activeByDefault></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludedGroups>won.test.category.RequiresPosgresServer</excludedGroups>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        
+        <profile>
+            <id>postgres-tests</id>
+            <activation><activeByDefault>true</activeByDefault></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <groups>won.test.category.RequiresPosgresServer</groups>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        
+        <profile>
+            <id>no-warn</id>
+            <properties>
+                <maven.compile.compilerargs>-Xlint:none</maven.compile.compilerargs>
+            </properties>
+        </profile>
+
+
+        <!-- copies the dependencies of each module to a subfolder inside 
+            that module -->
+        <profile>
+            <id>copy-module-dependencies</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-module-dependencies</id>
+                                <!-- technically, 'validate' is not the correct 
+                                    phase, but when put here, copying the dependencies can be executed isolated 
+                                    from all other tasks an thus runs faster. For only copying the dependencies 
+                                    run 'mvn validate -Pcopy-module-dependencies' -->
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/copiedDependencies</outputDirectory>
+                                    <overWriteReleases>false</overWriteReleases>
+                                    <overWriteSnapshots>false</overWriteSnapshots>
+                                    <overWriteIfNewer>true</overWriteIfNewer>
+                                    <!-- reasons for exclusions: webofneeds: 
+                                        because these are the libs we change frequently, they should not be put into 
+                                        a shared tomcat libs folder siren: because of some mechanism we don't fully 
+                                        understand, having the libs in a shared folder AND in a webapp (like [solr 
+                                        home]/lib) that causes problems with ClassCastExceptions servlet: conflicts 
+                                        with tomcat's version -->
+                                    <excludeGroupIds>webofneeds</excludeGroupIds>
+                                    <excludeArtifactIds>servlet-api</excludeArtifactIds>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <!-- copies all project dependencies to the folder where mvn 
+                is executed (<exec-dir>/target/copiedDependencies) -->
+            <id>copy-project-dependencies</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <!-- don't use this same id in module pom.xmls, 
+                                    say won-owner-webapp -->
+                                <id>copy-project-dependencies</id>
+                                <!-- technically, 'validate' is not the correct 
+                                    phase, but when put here, copying the dependencies can be executed isolated 
+                                    from all other tasks an thus runs faster. For only copying the dependencies 
+                                    run 'mvn validate -Pcopy-project-dependencies' -->
+                                <phase>validate</phase>
+
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${session.executionRootDirectory}/target/copiedDependencies</outputDirectory>
+                                    <overWriteReleases>false</overWriteReleases>
+                                    <overWriteSnapshots>false</overWriteSnapshots>
+                                    <overWriteIfNewer>true</overWriteIfNewer>
+                                    <!-- reasons for exclusions: see config 
+                                        of profile 'copy-module-dependencies' -->
+                                    <excludeGroupIds>webofneeds,org.sindice.siren,
+                                        org.apache.lucene</excludeGroupIds>
+                                    <excludeArtifactIds>servlet-api</excludeArtifactIds>
+                                    <excludeTypes>war</excludeTypes>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>skip-dependencies</id>
+            <properties>
+                <dependencies.scope>provided</dependencies.scope>
+            </properties>
+        </profile>
+        <profile>
+            <id>release-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+</project>

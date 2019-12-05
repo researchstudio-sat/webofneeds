@@ -6,7 +6,6 @@ import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
 
 const initialState = Immutable.fromJS({
-  enqueued: {},
   waitingForAnswer: {},
   claimOnSuccess: {},
   refreshDataOnSuccess: {},
@@ -18,19 +17,26 @@ export function messagesReducer(messages = initialState, action = {}) {
     case actionTypes.account.reset:
       return initialState;
 
-    case actionTypes.connections.open:
     case actionTypes.connections.sendChatMessage:
     case actionTypes.connections.rate:
     case actionTypes.connections.close:
     case actionTypes.messages.send:
     case actionTypes.atoms.edit:
     case actionTypes.atoms.connect:
-    case actionTypes.personas.create:
-    case actionTypes.atoms.create:
-      return messages.setIn(
-        ["enqueued", action.payload.eventUri],
+    case actionTypes.atoms.connectSockets:
+    case actionTypes.atoms.create: {
+      console.debug(
+        "Set waitingForAnswer for message(",
+        action.payload.eventUri,
+        "): ",
         action.payload.message
       );
+
+      return messages.setIn(
+        ["waitingForAnswer", action.payload.eventUri],
+        action.payload.message
+      );
+    }
 
     case actionTypes.atoms.editFailure: {
       //TODO: IMPL
@@ -47,17 +53,12 @@ export function messagesReducer(messages = initialState, action = {}) {
     case actionTypes.messages.chatMessage.success:
       return messages.removeIn(["waitingForAnswer", action.payload.eventUri]);
 
-    case actionTypes.messages.waitingForAnswer: {
-      const pendingEventUri = action.payload.eventUri;
-      const msg = messages.getIn(["enqueued", pendingEventUri]);
-      return messages
-        .removeIn(["enqueued", pendingEventUri])
-        .setIn(["waitingForAnswer", pendingEventUri], msg);
-    }
-
     case actionTypes.connections.sendChatMessageRefreshDataOnSuccess:
       return messages
-        .setIn(["enqueued", action.payload.eventUri], action.payload.message)
+        .setIn(
+          ["waitingForAnswer", action.payload.eventUri],
+          action.payload.message
+        )
         .setIn(
           ["refreshDataOnSuccess", action.payload.eventUri],
           action.payload.message
@@ -65,7 +66,10 @@ export function messagesReducer(messages = initialState, action = {}) {
 
     case actionTypes.connections.sendChatMessageClaimOnSuccess:
       return messages
-        .setIn(["enqueued", action.payload.eventUri], action.payload.message)
+        .setIn(
+          ["waitingForAnswer", action.payload.eventUri],
+          action.payload.message
+        )
         .setIn(
           ["claimOnSuccess", action.payload.eventUri],
           action.payload.message
@@ -99,69 +103,6 @@ export function messagesReducer(messages = initialState, action = {}) {
 
     case actionTypes.reconnect.success:
       return messages.set("lostConnection", false).set("reconnecting", false);
-
-    case actionTypes.messages.dispatchActionOn.registerSuccessOwn: {
-      const pathSO = ["dispatchOnSuccessOwn", action.payload.eventUri];
-      const toDispatchListSO = messages.getIn(pathSO);
-      if (!toDispatchListSO) {
-        return messages.setIn(pathSO, [action.payload.actionToDispatch]);
-      }
-      return messages.updateIn(pathSO, list =>
-        list.push(action.payload.actionToDispatch)
-      );
-    }
-
-    case actionTypes.messages.dispatchActionOn.registerFailureOwn: {
-      const pathFO = ["dispatchOnFailureOwn", action.payload.eventUri];
-      const toDispatchListFO = messages.getIn(pathFO);
-      if (!toDispatchListFO) {
-        return messages.setIn(pathFO, [action.payload.actionToDispatch]);
-      }
-      return messages.updateIn(pathFO, list =>
-        list.push(action.payload.actionToDispatch)
-      );
-    }
-
-    case actionTypes.messages.dispatchActionOn.registerSuccessRemote: {
-      const pathSR = ["dispatchOnSuccessRemote", action.payload.eventUri];
-      const toDispatchListSR = messages.getIn(pathSR);
-      if (!toDispatchListSR) {
-        return messages.setIn(pathSR, [action.payload.actionToDispatch]);
-      }
-      return messages.updateIn(pathSR, list =>
-        list.push(action.payload.actionToDispatch)
-      );
-    }
-
-    case actionTypes.messages.dispatchActionOn.registerFailureRemote: {
-      const pathFR = ["dispatchOnFailureRemote", action.payload.eventUri];
-      const toDispatchListFR = messages.getIn(pathFR);
-      if (!toDispatchListFR) {
-        return messages.setIn(pathFR, [action.payload.actionToDispatch]);
-      }
-      return messages.updateIn(pathFR, list =>
-        list.push(action.payload.actionToDispatch)
-      );
-    }
-
-    case actionTypes.messages.dispatchActionOn.failureOwn:
-    case actionTypes.messages.dispatchActionOn.successOwn:
-      //all the dispatching was done by the action creator. remove the queued actions now:
-      return messages
-        .removeIn(["dispatchOnSuccessOwn", action.payload.eventUri])
-        .removeIn(["dispatchOnFailureOwn", action.payload.eventUri]);
-
-    case actionTypes.messages.dispatchActionOn.failureRemote:
-      return messages
-        .removeIn(["dispatchOnSuccessRemote", action.payload.eventUri])
-        .removeIn(["dispatchOnFailureRemote", action.payload.eventUri]);
-
-    case actionTypes.messages.dispatchActionOn.successRemote:
-      return messages
-        .removeIn(["claimOnSuccess", action.payload.eventUri])
-        .removeIn(["refreshDataOnSuccess", action.payload.eventUri])
-        .removeIn(["dispatchOnSuccessRemote", action.payload.eventUri])
-        .removeIn(["dispatchOnFailureRemote", action.payload.eventUri]);
 
     default:
       return messages;

@@ -13,6 +13,8 @@ package won.owner.camel.routes.fixed;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 
+import won.protocol.message.processor.camel.WonCamelConstants;
+
 /**
  * User: LEIH-NB Date: 10.10.13
  */
@@ -21,10 +23,13 @@ public class AmqpToJms extends RouteBuilder {
     @Override
     public void configure() {
         from("seda:outgoingMessages?concurrentConsumers=1").routeId("Owner2NodeRoute").choice()
-                        .when(header("remoteBrokerEndpoint").isNull())
-                        .log(LoggingLevel.ERROR, "could not route message: remoteBrokerEndpoint is null")
+                        .when(header(WonCamelConstants.REMOTE_BROKER_ENDPOINT_HEADER).isNull())
+                        .log(LoggingLevel.ERROR,
+                                        "could not route message: " + WonCamelConstants.REMOTE_BROKER_ENDPOINT_HEADER
+                                                        + "  is null")
                         .throwException(new IllegalArgumentException(
-                                        "could not route message: remoteBrokerEndpoint is null"))
-                        .otherwise().recipientList(header("remoteBrokerEndpoint"));
+                                        "could not route message: " + WonCamelConstants.REMOTE_BROKER_ENDPOINT_HEADER
+                                                        + " is null"))
+                        .otherwise().recipientList(header(WonCamelConstants.REMOTE_BROKER_ENDPOINT_HEADER));
     }
 }

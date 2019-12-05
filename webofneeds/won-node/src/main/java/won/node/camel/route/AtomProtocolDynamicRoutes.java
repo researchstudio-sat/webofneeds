@@ -10,12 +10,14 @@
  */
 package won.node.camel.route;
 
+import java.lang.invoke.MethodHandles;
+
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.invoke.MethodHandles;
+import won.protocol.message.processor.camel.WonCamelConstants;
 
 /**
  * User: LEIH-NB Date: 25.11.13
@@ -32,6 +34,6 @@ public class AtomProtocolDynamicRoutes extends RouteBuilder {
     @Override
     public void configure() throws Exception {
         logger.info("adding dynamic route from({}) to the recipient found in the header 'remoteBrokerEndpoint'", from);
-        from(from).routeId(from).recipientList(header("remoteBrokerEndpoint"));
+        from(from).routeId(from).recipientList(header(WonCamelConstants.REMOTE_BROKER_ENDPOINT_HEADER));
     }
 }

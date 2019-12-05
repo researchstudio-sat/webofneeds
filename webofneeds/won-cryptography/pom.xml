@@ -2,18 +2,38 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
-        <artifactId>webofneeds</artifactId>
-        <groupId>at.researchstudio.sat</groupId>
-        <version>0.7-SNAPSHOT</version>
-    </parent>
+<artifactId>won-parent-pom</artifactId>
+<relativePath>../won-parent-pom</relativePath>
+<groupId>at.researchstudio.sat</groupId>
+<version>0.7-SNAPSHOT</version>
+</parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>won-cryptography</artifactId>
     <version>0.7-SNAPSHOT</version>
     <name>Cryptography</name>
+	
+	<repositories>
+	    <repository>
+	        <id>jitpack.io</id>
+	        <url>https://jitpack.io</url>
+	    </repository>
+  	</repositories>
 
     <dependencies>
 
+	    <dependency>
+	      <groupId>com.github.multiformats</groupId>
+	      <artifactId>java-multihash</artifactId>
+	      <version>v1.2.1</version>
+	    </dependency>
+  
+  		<dependency>
+            <groupId>com.github.multiformats</groupId>
+            <artifactId>java-multibase</artifactId>
+            <version>v1.0.1</version>
+        </dependency>
+  
         <dependency>
             <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-core</artifactId>
@@ -44,6 +64,11 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
+        
+        <dependency>
+    		<groupId>org.apache.commons</groupId>
+    		<artifactId>commons-pool2</artifactId>
+		</dependency>
 
         <!-- doesn't exist in the public repository -->
         <dependency>
@@ -90,10 +115,7 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>net.revelc.code.formatter</groupId>
-                <artifactId>formatter-maven-plugin</artifactId>
-            </plugin>
+            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -108,7 +130,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.parent.basedir}/target/required-libs</outputDirectory>
+                            <outputDirectory>${project.parent.parent.basedir}/target/required-libs</outputDirectory>
                             <includeGroupIds>org.bouncycastle</includeGroupIds>
                         </configuration>
                     </execution>

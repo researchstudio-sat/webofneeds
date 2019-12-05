@@ -92,7 +92,6 @@ $ngRedux.getState();
  },
  lastUpdateTime: timeinmillis,
  messages: {
-   enqueued: {...},
    lostConnection: true|false,
    reconnecting: true|false,
    waitingForAnswer: {...}
@@ -339,10 +338,6 @@ If it's **REST**-style, just use `fetch(...).then(...dispatch...)` in an action-
 
 If it's **linked-data-related**, use the utilities in `linkeddata-service-won.js`.
 They'll do standard HTTP(S) but will make sure to cache as much as possible via the local triplestore.
-
-If it's **push to the web-socket**, add a hook for the respective _user(!)_-action in `message-reducers.js`.
-The `messaging-agent.js` will pick up any messages in `$ngRedux.getState().getIn(['messages', 'enqueued'])`
-and push them to it's websocket. This solution appears rather hacky to me (see 'high-level interactions' under 'Action Creators') and I'd be thrilled to hear any alternative solutions :)
 
 If you want to **receive stuff the web-socket**, go to `actions.js` and add your handlers to the `messages__messageReceived`-actioncreator. The same I said about pushing to the web-socket also holds here.
 

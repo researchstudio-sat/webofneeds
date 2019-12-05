@@ -49,7 +49,7 @@
             msg:messageType       msg:CreateMessage ;
             msg:recipientNode      <http://localhost:8080/won/resource> ;
             msg:senderAtom        atom:o1ybhchandwvg6c8pv81 ;
-            msg:sentTimestamp     "1433774711093"^^xsd:long ;
+            msg:timestamp     "1433774711093"^^xsd:long ;
             msg:containsSignature  [ msg:signatureGraph  <http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#content-9ti7-sig> ;
                                        msg:signatureValue  "MGQCMDL5IYmwJcvsWWlni4PjJBf+prAiOxwdkmhJQZtievCDyVnvsBYQNNpbeVpYdoH3tQIwTCwZDCNOo3cO2TqxQqMd7Uo8xqy9am7RfMdjeXrLAUbOQMoYmmss5ayuxGuNvzhD" ;
                                        msg:signedGraph     <http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#content-9ti7>
@@ -65,7 +65,7 @@
 
     event:td3u9uqz1pismn4qtn92
             a                         msg:FromOwner ;
-            msg:receivedTimestamp  "1433774714580"^^xsd:long ;
+            msg:timestamp  "1433774714580"^^xsd:long ;
             msg:containsSignature   [ msg:signatureGraph  <http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#envelope-lxzj-sig> ;
                                         msg:signatureValue  "MGQCMExcdxNcScRr0xGW9GBSHnO41uQAMvO2nPx9wB1882PX9tlsMflxlvi2mbYRwezZuAIwPmlEZoI/FucXnE5GtzNQiE5B5rxaeZ89eg+9V+f0U4pR4N63aejHlWPCeoDW4Ny9" ;
                                         msg:signedGraph     <http://localhost:8080/won/resource/event/td3u9uqz1pismn4qtn92#envelope-lxzj>

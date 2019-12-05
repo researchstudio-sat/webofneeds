@@ -108,9 +108,9 @@ export const piwikMiddleware = () => next => action => {
       // log as category "Connections"
       "connections.sendChatMessage", // log this and following actions
       "messages.connectionMessageReceived",
-      "connections.open",
       "messages.processOpenMessage",
-      "connections.connect",
+      "atoms.connect",
+      "atoms.connectSockets",
       "messages.processConnectMessage",
       "connections.close",
     ],

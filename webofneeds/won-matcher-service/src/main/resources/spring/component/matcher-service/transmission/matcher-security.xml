@@ -72,4 +72,5 @@
     <bean id="linkedDataSource" class="won.protocol.util.linkeddata.LinkedDataSourceBase" >
         <property name="linkedDataRestClient" ref="linkedDataRestClient" />
     </bean>
+    <bean id="wonMessageUriResolver" class="won.protocol.util.linkeddata.uriresolver.WonMessageUriResolver" />
 </beans>

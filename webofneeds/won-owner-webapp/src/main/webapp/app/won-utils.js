@@ -204,10 +204,10 @@ export function parseRestErrorMessage(error) {
   return error;
 }
 
-export function genDetailBaseUri(baseUri, detailIdentifier) {
-  if (!baseUri || !detailIdentifier) {
+export function genDetailBaseUri(baseUri) {
+  if (!baseUri) {
     return undefined;
   }
   const randomId = generateIdString(10);
-  return baseUri + "/" + detailIdentifier + "/" + randomId;
+  return baseUri + "#" + randomId;
 }

@@ -1,5 +1,18 @@
 package won.bot.framework.eventbot.behaviour;
 
+import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -7,6 +20,7 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -14,7 +28,11 @@ import won.bot.framework.eventbot.action.impl.factory.model.Precondition;
 import won.bot.framework.eventbot.action.impl.factory.model.Proposal;
 import won.bot.framework.eventbot.action.impl.factory.model.ProposalState;
 import won.bot.framework.eventbot.bus.EventBus;
-import won.bot.framework.eventbot.event.*;
+import won.bot.framework.eventbot.event.AtomSpecificEvent;
+import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
+import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.event.MessageEvent;
+import won.bot.framework.eventbot.event.TargetAtomSpecificEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.agreement.AgreementCancellationAcceptedEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.agreement.ProposalAcceptedEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.precondition.PreconditionMetEvent;
@@ -22,7 +40,6 @@ import won.bot.framework.eventbot.event.impl.analyzation.precondition.Preconditi
 import won.bot.framework.eventbot.event.impl.analyzation.proposal.ProposalReceivedEvent;
 import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandSuccessEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageReceivedOnConnectionEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
@@ -36,14 +53,6 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.utils.goals.GoalInstantiationProducer;
 import won.utils.goals.GoalInstantiationResult;
-
-import java.io.StringWriter;
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
 
 public class AnalyzeBehaviour extends BotBehaviour {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -83,7 +92,6 @@ public class AnalyzeBehaviour extends BotBehaviour {
     protected void onActivate(Optional<Object> message) {
         ActionOnEventListener analyzeAction = new ActionOnEventListener(context, new AnalyzeAction(context));
         this.subscribeWithAutoCleanup(MessageFromOtherAtomEvent.class, analyzeAction);
-        this.subscribeWithAutoCleanup(OpenFromOtherAtomEvent.class, analyzeAction);
         this.subscribeWithAutoCleanup(ConnectionMessageCommandSuccessEvent.class, analyzeAction);
     }
 
@@ -125,7 +133,6 @@ public class AnalyzeBehaviour extends BotBehaviour {
             logger.trace("Message Information ------");
             logger.trace("Message Type: " + (receivedMessage ? "RECEIVED" : "SENT"));
             logger.trace("MessageUri: " + wonMessage.getMessageURI());
-            logger.trace("CorrespondingRemoteMessageURI: " + wonMessage.getCorrespondingRemoteMessageURI());
             logger.trace("AtomUri: " + atomUri);
             logger.trace("targetAtomUri: " + targetAtomUri);
             logger.trace("connectionUri: " + connectionUri);

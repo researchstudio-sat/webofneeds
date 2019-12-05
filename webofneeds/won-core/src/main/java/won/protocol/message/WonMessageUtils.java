@@ -10,24 +10,58 @@
  */
 package won.protocol.message;
 
-import static won.protocol.message.WonMessageType.FAILURE_RESPONSE;
-import static won.protocol.message.WonMessageType.SUCCESS_RESPONSE;
-
 import java.net.URI;
+import java.util.Objects;
+import java.util.Optional;
+
+import won.protocol.exception.WonMessageProcessingException;
+import won.protocol.util.WonMessageUriHelper;
+import won.protocol.vocabulary.WONMSG;
 
 /**
  * Utilities for working with wonMessage objects.
  */
 public class WonMessageUtils {
-    public static URI getParentEntityUri(final WonMessage message) {
-        URI parentURI = null;
-        WonMessageDirection direction = message.getEnvelopeType();
-        if (direction == WonMessageDirection.FROM_EXTERNAL) {
-            parentURI = getParentUriFromReceiverProperties(message);
-        } else if (direction == WonMessageDirection.FROM_OWNER || direction == WonMessageDirection.FROM_SYSTEM) {
-            parentURI = getParentUriFromSenderProperties(message);
+    public static Optional<URI> getSenderAtomURI(WonMessage msg) {
+        URI atomUri = msg.getSenderAtomURI();
+        if (atomUri == null) {
+            atomUri = getSenderAtomURIFromSenderSocketURI(msg, atomUri);
         }
-        return parentURI;
+        return Optional.ofNullable(atomUri);
+    }
+
+    public static URI getSenderAtomURIFromSenderSocketURI(WonMessage msg, URI atomUri) {
+        URI socketUri = msg.getSenderSocketURI();
+        if (socketUri != null) {
+            atomUri = stripFragment(socketUri);
+        }
+        return atomUri;
+    }
+
+    public static URI getSenderAtomURIRequired(WonMessage msg) {
+        return getSenderAtomURI(msg)
+                        .orElseThrow(() -> new WonMessageProcessingException("Could not obtain sender atom uri", msg));
+    }
+
+    public static Optional<URI> getRecipientAtomURI(WonMessage msg) {
+        URI atomUri = msg.getRecipientAtomURI();
+        if (atomUri == null) {
+            atomUri = getRecipientAtomURIFromRecipientSocketURI(msg);
+        }
+        return Optional.ofNullable(atomUri);
+    }
+
+    public static URI getRecipientAtomURIFromRecipientSocketURI(WonMessage msg) {
+        URI socketUri = msg.getRecipientSocketURI();
+        if (socketUri != null) {
+            return stripFragment(socketUri);
+        }
+        return null;
+    }
+
+    public static URI getRecipientAtomURIRequired(WonMessage msg) {
+        return getRecipientAtomURI(msg).orElseThrow(
+                        () -> new WonMessageProcessingException("Could not obtain recipient atom uri", msg));
     }
 
     /**
@@ -36,61 +70,86 @@ public class WonMessageUtils {
      * @param message
      * @return
      */
-    public static URI getParentAtomUri(final WonMessage message) {
-        WonMessageDirection direction = message.getEnvelopeType();
-        if (direction == WonMessageDirection.FROM_EXTERNAL) {
-            return message.getRecipientAtomURI();
-        } else if (direction == WonMessageDirection.FROM_OWNER || direction == WonMessageDirection.FROM_SYSTEM) {
-            return message.getSenderAtomURI();
+    public static Optional<URI> getParentAtomUri(final WonMessage message, WonMessageDirection direction) {
+        if (direction.isFromExternal()) {
+            return Optional.of(message.getRecipientAtomURI());
         } else {
-            throw new IllegalArgumentException("Unexpected message direction: " + direction);
+            return Optional.of(message.getSenderAtomURI());
         }
     }
 
-    private static URI getParentUriFromSenderProperties(WonMessage message) {
-        URI parentURI;
-        parentURI = message.getSenderURI();
-        if (parentURI == null) {
-            parentURI = message.getSenderAtomURI();
+    public static URI stripFragment(URI uriWithFragment) {
+        URI atomUri;
+        Objects.requireNonNull(uriWithFragment);
+        // just strip the fragment
+        String fragment = uriWithFragment.getRawFragment();
+        if (fragment == null) {
+            return uriWithFragment;
         }
-        if (parentURI == null) {
-            parentURI = message.getSenderNodeURI();
-        }
-        return parentURI;
-    }
-
-    private static URI getParentUriFromReceiverProperties(WonMessage message) {
-        URI parentURI;
-        parentURI = message.getRecipientURI();
-        if (parentURI == null) {
-            parentURI = message.getRecipientAtomURI();
-        }
-        if (parentURI == null) {
-            parentURI = message.getRecipientNodeURI();
-        }
-        return parentURI;
+        String uri = uriWithFragment.toString();
+        atomUri = URI.create(uri.substring(0, uri.length() - fragment.length() - 1));
+        return atomUri;
     }
 
     /**
-     * If the message is a ResponseMessage (SuccessResponse or FailureResponse) this
-     * method returns the message that was responded to and that belongs to the same
-     * parent as the specified message.
+     * Strip the connection suffix, return the atom URI.
      * 
-     * @param message
-     * @return the URI of the message that was responded to, or null if the
-     * specified message is not a ResponseMessage.
+     * @param connectionURI
+     * @return
      */
-    public static URI getLocalIsResponseToURI(WonMessage message) {
-        WonMessageType messageType = message.getMessageType();
-        if (messageType == SUCCESS_RESPONSE || messageType == FAILURE_RESPONSE) {
-            WonMessageDirection direction = message.getEnvelopeType();
-            if (direction == WonMessageDirection.FROM_EXTERNAL) {
-                return message.getIsRemoteResponseToMessageURI();
-            } else {
-                return message.getIsResponseToMessageURI();
+    public static URI stripConnectionSuffix(URI connectionURI) {
+        Objects.requireNonNull(connectionURI);
+        String uri = connectionURI.toString();
+        return URI.create(uri.replaceFirst("/c/.+$", ""));
+    }
+
+    /**
+     * Strip the atom suffix, return the WoN node URI.
+     * 
+     * @param atomURI
+     * @return
+     */
+    public static URI stripAtomSuffix(URI atomURI) {
+        Objects.requireNonNull(atomURI);
+        String uri = atomURI.toString();
+        return URI.create(uri.replaceFirst("/atom/.+$", ""));
+    }
+
+    /**
+     * Get the targetAtom of a hint (even if it is a SocketHint).
+     * 
+     * @param wonMessage
+     * @return
+     */
+    public static URI getHintTargetAtomURIRequired(WonMessage wonMessage) {
+        return getHintTargetAtomURI(wonMessage).orElseThrow(
+                        () -> new WonMessageProcessingException("Could not obtain target atom uri", wonMessage));
+    }
+
+    /**
+     * Get the targetAtom of a hint (even if it is a SocketHint).
+     * 
+     * @param wonMessage
+     * @return
+     */
+    public static Optional<URI> getHintTargetAtomURI(WonMessage wonMessage) {
+        URI atomUri = wonMessage.getHintTargetAtomURI();
+        if (atomUri == null) {
+            URI socketUri = wonMessage.getHintTargetSocketURI();
+            if (socketUri != null) {
+                atomUri = stripFragment(socketUri);
             }
-        } else {
-            return null;
         }
+        return Optional.ofNullable(atomUri);
+    }
+
+    public static boolean isValidMessageUri(URI messageURI) {
+        if (messageURI == null) {
+            return false;
+        }
+        if (Objects.equals(messageURI, WonMessageUriHelper.getSelfUri())) {
+            return false;
+        }
+        return messageURI.toString().startsWith(WONMSG.MESSAGE_URI_PREFIX);
     }
 }

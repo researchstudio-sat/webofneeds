@@ -26,10 +26,9 @@ import won.matcher.service.common.event.SocketHintEvent;
 import won.matcher.service.common.service.monitoring.MonitoringService;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageEncoder;
-import won.protocol.service.LinkedDataService;
+import won.protocol.message.builder.WonMessageBuilder;
+import won.protocol.message.processor.impl.WonMessageSignerVerifier;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
@@ -74,15 +73,19 @@ public class HintProducerProtocolActor extends UntypedProducerActor {
         HintEvent hint = (HintEvent) message;
         Map<String, Object> headers = new HashMap<>();
         headers.put("methodName", "hint");
-        URI eventUri = wonNodeInformationService.generateEventURI(URI.create(hint.getRecipientWonNodeUri()));
-        hint.setGeneratedEventUri(eventUri);
         Optional<WonMessage> wonMessage = createHintWonMessage(hint);
         if (wonMessage.isPresent()) {
-            Object body = WonMessageEncoder.encode(wonMessage.get(), Lang.TRIG);
-            CamelMessage camelMsg = new CamelMessage(body, headers);
-            // monitoring code
-            stopStopwatch(hint);
-            return camelMsg;
+            WonMessage msg = null;
+            try {
+                msg = WonMessageSignerVerifier.seal(wonMessage.get());
+                Object body = WonMessageEncoder.encode(msg, Lang.TRIG);
+                CamelMessage camelMsg = new CamelMessage(body, headers);
+                // monitoring code
+                stopStopwatch(hint);
+                return camelMsg;
+            } catch (Exception e) {
+                log.warning("Error preparing hint message", e);
+            }
         }
         return null;
     }
@@ -111,27 +114,24 @@ public class HintProducerProtocolActor extends UntypedProducerActor {
         if (hint instanceof AtomHintEvent) {
             AtomHintEvent ahe = (AtomHintEvent) hint;
             return Optional.of(WonMessageBuilder
-                            .setMessagePropertiesForHintToAtom(ahe.getGeneratedEventUri(),
-                                            URI.create(ahe.getRecipientAtomUri()),
-                                            URI.create(ahe.getRecipientWonNodeUri()),
-                                            URI.create(ahe.getTargetAtomUri()),
-                                            URI.create(ahe.getMatcherUri()),
-                                            hint.getScore())
-                            .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build());
+                            .atomHint()
+                            .atom(URI.create(ahe.getRecipientAtomUri()))
+                            .hintTargetAtom(URI.create(ahe.getTargetAtomUri()))
+                            .hintScore(ahe.getScore())
+                            .direction().fromExternal()
+                            .build());
         } else if (hint instanceof SocketHintEvent) {
             SocketHintEvent she = (SocketHintEvent) hint;
             Optional<URI> recipientAtomURI = WonLinkedDataUtils.getAtomOfSocket(URI.create(she.getRecipientSocketUri()),
                             linkedDataSource);
             if (recipientAtomURI.isPresent()) {
                 return Optional.of(WonMessageBuilder
-                                .setMessagePropertiesForHintToSocket(she.getGeneratedEventUri(),
-                                                recipientAtomURI.get(),
-                                                URI.create(she.getRecipientSocketUri()),
-                                                URI.create(she.getRecipientWonNodeUri()),
-                                                URI.create(she.getTargetSocketUri()),
-                                                URI.create(she.getMatcherUri()),
-                                                hint.getScore())
-                                .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL).build());
+                                .socketHint()
+                                .recipientSocket(URI.create(she.getRecipientSocketUri()))
+                                .hintTargetSocket(URI.create(she.getTargetSocketUri()))
+                                .hintScore(hint.getScore())
+                                .direction().fromExternal()
+                                .build());
             }
         }
         return Optional.empty();

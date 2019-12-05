@@ -1,13 +1,36 @@
 package won.protocol.agreement;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.PriorityQueue;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.ReadWrite;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.ResIterator;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.protocol.agreement.effect.MessageEffect;
 import won.protocol.agreement.effect.MessageEffectsBuilder;
 import won.protocol.agreement.effect.ProposalType;
@@ -18,13 +41,6 @@ import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WONAGR;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class AgreementProtocolState {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -530,19 +546,10 @@ public class AgreementProtocolState {
         Set<ConversationMessage> roots = new HashSet();
         Collection<ConversationMessage> messages = messagesByURI.values();
         Set<DeadReferenceConversationMessage> messagesWithDeadReferences = new HashSet<>();
+        // filter out messages we don't care about
+        messages = messages.stream().filter(m -> !m.getMessageType().isHintMessage()).collect(Collectors.toList());
         // iterate over messages and interconnect them
         messages.stream().forEach(message -> {
-            if (message.getCorrespondingRemoteMessageURI() != null
-                            && !message.getCorrespondingRemoteMessageURI().equals(message.getMessageURI())) {
-                ConversationMessage other = messagesByURI.get(message.getCorrespondingRemoteMessageURI());
-                if (other != null) {
-                    message.setCorrespondingRemoteMessageRef(other);
-                    other.setCorrespondingRemoteMessageRef(message);
-                } else {
-                    messagesWithDeadReferences.add(new DeadReferenceConversationMessage(message,
-                                    "msg:correspondingRemoteMessage", message.getCorrespondingRemoteMessageURI()));
-                }
-            }
             message.getPrevious().stream().filter(uri -> !uri.equals(message.getMessageURI())).forEach(uri -> {
                 ConversationMessage other = messagesByURI.get(uri);
                 if (other != null) {
@@ -618,25 +625,38 @@ public class AgreementProtocolState {
                     messagesWithDeadReferences.add(new DeadReferenceConversationMessage(message, "mod:retracts", uri));
                 }
             });
-            if (message.getIsResponseTo() != null && !message.getIsResponseTo().equals(message.getMessageURI())) {
-                ConversationMessage other = messagesByURI.get(message.getIsResponseTo());
+            if (message.getRespondingTo() != null && !message.getRespondingTo().equals(message.getMessageURI())) {
+                ConversationMessage other = messagesByURI.get(message.getRespondingTo());
                 if (other != null) {
-                    message.setIsResponseToRef(other);
-                    other.setIsResponseToInverseRef(message);
+                    if (other.getSenderAtomURI().equals(message.getSenderAtomURI())) {
+                        if (other.getRespondingToInverseRef() != null
+                                        && !message.equals(other.getRespondingToInverseRef())) {
+                            throw new InconsistentConversationDataException(
+                                            "Message " + other.getMessageURI() + " has more than one response: "
+                                                            + other.getRespondingToInverseRef().getMessageURI()
+                                                            + " and " + message.getMessageURI());
+                        }
+                        message.setRespondingToRef(other);
+                        other.setRespondingToInverseRef(message);
+                    } else {
+                        // change from respondingTo to remotelyRespondingTo
+                        if (other.getRemotelyRespondingToInverseRef() != null
+                                        && !message.equals(other.getRemotelyRespondingToInverseRef())) {
+                            throw new InconsistentConversationDataException(
+                                            "Message " + other.getMessageURI()
+                                                            + " has more than one remote response: "
+                                                            + other.getRemotelyRespondingToInverseRef().getMessageURI()
+                                                            + " and "
+                                                            + message.getMessageURI());
+                        }
+                        message.setRemotelyRespondingTo(message.getRespondingTo());
+                        message.setRespondingTo(null); // clear original reference
+                        message.setRemotelyRespondingToRef(other);
+                        other.setRemotelyRespondingToInverseRef(message);
+                    }
                 } else {
-                    messagesWithDeadReferences.add(new DeadReferenceConversationMessage(message, "msg:isResponseTo",
-                                    message.getIsResponseTo()));
-                }
-            }
-            if (message.getIsRemoteResponseTo() != null
-                            && !message.getIsRemoteResponseTo().equals(message.getMessageURI())) {
-                ConversationMessage other = messagesByURI.get(message.getIsRemoteResponseTo());
-                if (other != null) {
-                    message.setIsRemoteResponseToRef(other);
-                    other.setIsRemoteResponseToInverseRef(message);
-                } else {
-                    messagesWithDeadReferences.add(new DeadReferenceConversationMessage(message,
-                                    "msg:isRemoteResponseTo", message.getIsRemoteResponseTo()));
+                    messagesWithDeadReferences.add(new DeadReferenceConversationMessage(message, "msg:respondingTo",
+                                    message.getRespondingTo()));
                 }
             }
             if (message.getPrevious().isEmpty()) {
@@ -654,7 +674,7 @@ public class AgreementProtocolState {
                 // eg because it failed consistency checks
                 return;
             }
-            if (deadRef.message.isForwardedOrRemoteMessageOfForwarded()) {
+            if (deadRef.message.isForwardedMessage()) {
                 // we are lenient here because a forwarded message should not cause an
                 // exception, even
                 // if it points to a missing message
@@ -663,6 +683,9 @@ public class AgreementProtocolState {
             throw new IncompleteConversationDataException(deadRef.message.getMessageURI(), deadRef.deadReference,
                             deadRef.predicate);
         });
+        if (logger.isDebugEnabled()) {
+            messages.stream().forEach(m -> logger.debug(m.toString()));
+        }
         // link messages to deliveryChains
         deliveryChains = messages.stream().map(m -> {
             if (logger.isDebugEnabled()) {
@@ -718,7 +741,7 @@ public class AgreementProtocolState {
                 msg.getRetractsRefs().stream().filter(other -> msg != other)
                                 .filter(other -> other.getSenderAtomURI().equals(msg.getSenderAtomURI()))
                                 .filter(other -> other.isHeadOfDeliveryChain())
-                                .filter(other -> msg.isMessageOnPathToRoot(other)).forEach(other -> {
+                                .filter(other -> msg.isAfter(other)).forEach(other -> {
                                     if (logger.isDebugEnabled()) {
                                         logger.debug("{} retracts {}: valid, computing effects", msg.getMessageURI(),
                                                         other.getMessageURI());
@@ -736,6 +759,9 @@ public class AgreementProtocolState {
                                         effectsBuilder.retracts(other.getMessageURI());
                                     }
                                 });
+                if (logger.isDebugEnabled()) {
+                    logger.debug("agreement data: {}", agrDataToString());
+                }
             }
             if (msg.isRejectsMessage()) {
                 removeContentGraphs(conversation, msg);
@@ -749,7 +775,7 @@ public class AgreementProtocolState {
                                                 || other.isClaimsMessage())
                                 .filter(other -> other.isHeadOfDeliveryChain())
                                 .filter(other -> !other.getSenderAtomURI().equals(msg.getSenderAtomURI()))
-                                .filter(other -> msg.isMessageOnPathToRoot(other)).filter(other -> {
+                                .filter(other -> msg.isAfter(other)).filter(other -> {
                                     // check if msg also accepts other - in that case, the message is contradictory
                                     // in itself
                                     // Resolution: neither statement has any effect.
@@ -770,6 +796,9 @@ public class AgreementProtocolState {
                                         effectsBuilder.rejects(other.getMessageURI());
                                     }
                                 });
+                if (logger.isDebugEnabled()) {
+                    logger.debug("agreement data: {}", agrDataToString());
+                }
             }
             if (msg.isProposesMessage()) {
                 if (logger.isDebugEnabled()) {
@@ -780,7 +809,7 @@ public class AgreementProtocolState {
                 Model proposalContent = ModelFactory.createDefaultModel();
                 msg.getProposesRefs().stream().filter(other -> msg != other)
                                 .filter(other -> other.isHeadOfDeliveryChain())
-                                .filter(other -> msg.isMessageOnPathToRoot(other)).forEach(other -> {
+                                .filter(other -> msg.isAfter(other)).forEach(other -> {
                                     if (logger.isDebugEnabled()) {
                                         logger.debug("{} proposes {}: valid, computing effects", msg.getMessageURI(),
                                                         other.getMessageURI());
@@ -792,6 +821,9 @@ public class AgreementProtocolState {
                                     }
                                 });
                 pendingProposals.addNamedModel(msg.getMessageURI().toString(), proposalContent);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("agreement data: {}", agrDataToString());
+                }
             }
             if (msg.isClaimsMessage()) {
                 if (logger.isDebugEnabled()) {
@@ -802,7 +834,7 @@ public class AgreementProtocolState {
                 Model claimContent = ModelFactory.createDefaultModel();
                 msg.getClaimsRefs().stream().filter(other -> msg != other)
                                 .filter(other -> other.isHeadOfDeliveryChain())
-                                .filter(other -> msg.isMessageOnPathToRoot(other)).forEach(other -> {
+                                .filter(other -> msg.isAfter(other)).forEach(other -> {
                                     if (logger.isDebugEnabled()) {
                                         logger.debug("{} claims {}: valid, computing effects", msg.getMessageURI(),
                                                         other.getMessageURI());
@@ -814,6 +846,9 @@ public class AgreementProtocolState {
                                     }
                                 });
                 claims.addNamedModel(msg.getMessageURI().toString(), claimContent);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("agreement data: {}", agrDataToString());
+                }
             }
             if (msg.isAcceptsMessage()) {
                 if (logger.isDebugEnabled()) {
@@ -824,7 +859,7 @@ public class AgreementProtocolState {
                 msg.getAcceptsRefs().stream().filter(other -> msg != other)
                                 .filter(other -> other.isHeadOfDeliveryChain())
                                 .filter(other -> !other.getSenderAtomURI().equals(msg.getSenderAtomURI()))
-                                .filter(other -> msg.isMessageOnPathToRoot(other)).filter(other -> {
+                                .filter(other -> msg.isAfter(other)).filter(other -> {
                                     // check if msg also accepts other - in that case, the message is contradictory
                                     // in itself
                                     // Resolution: neither statement has any effect.
@@ -846,6 +881,9 @@ public class AgreementProtocolState {
                                                         .stream().collect(Collectors.toSet()));
                                     }
                                 });
+                if (logger.isDebugEnabled()) {
+                    logger.debug("agreement data: {}", agrDataToString());
+                }
             }
             if (msg.isProposesToCancelMessage()) {
                 if (logger.isDebugEnabled()) {
@@ -856,7 +894,7 @@ public class AgreementProtocolState {
                 final Model cancellationProposals = pendingProposals.getDefaultModel();
                 msg.getProposesToCancelRefs().stream().filter(other -> msg != other)
                                 .filter(other -> other.isHeadOfDeliveryChain())
-                                .filter(toCancel -> msg.isMessageOnPathToRoot(toCancel)).forEach(other -> {
+                                .filter(toCancel -> msg.isAfter(toCancel)).forEach(other -> {
                                     if (logger.isDebugEnabled()) {
                                         logger.debug("{} proposesToCancel {}: valid, computing effects",
                                                         msg.getMessageURI(), other.getMessageURI());
@@ -867,6 +905,9 @@ public class AgreementProtocolState {
                                                                     .getResource(other.getMessageURI().toString())));
                                     pendingProposals.setDefaultModel(cancellationProposals);
                                     effectsBuilder.proposesToCancel(other.getMessageURI());
+                                    if (logger.isDebugEnabled()) {
+                                        logger.debug("agreement data: {}", agrDataToString());
+                                    }
                                 });
             }
             msg.setEffects(effectsBuilder.build());
@@ -889,13 +930,39 @@ public class AgreementProtocolState {
         conversationDataset.end();
     }
 
+    private String agrDataToString() {
+        StringBuilder sb = new StringBuilder();
+        sb
+                        .append(singleDatasetToString("pending", pendingProposals)).append(", ")
+                        .append(singleDatasetToString("agreements", agreements)).append(", ")
+                        .append(singleDatasetToString("cancelledAgreements", cancelledAgreements)).append(", ")
+                        .append(singleDatasetToString("rejected", rejected)).append(", ")
+                        .append(singleDatasetToString("claims", claims));
+        return sb.toString();
+    }
+
+    private String singleDatasetToString(String name, Dataset ds) {
+        StringBuilder sb = new StringBuilder();
+        Model m = ds.getDefaultModel();
+        int count = 0;
+        Iterator<String> it = ds.listNames();
+        while (it.hasNext()) {
+            count++;
+            it.next();
+        }
+        sb.append(name).append("[");
+        if (m != null && !m.isEmpty()) {
+            sb.append("default graph: ")
+                            .append(m.size()).append(" triples, ");
+        }
+        sb.append(count).append(" named graphs]");
+        return sb.toString();
+    }
+
     private Dataset acknowledgedSelection(Dataset conversationDataset, Collection<ConversationMessage> messages) {
         Dataset copy = RdfUtils.cloneDataset(conversationDataset);
         messages.stream().forEach(message -> {
             if (message.getMessageType() == null) {
-                return;
-            }
-            if (message.getDirection() == WonMessageDirection.FROM_EXTERNAL) {
                 return;
             }
             if (message.getDirection() == WonMessageDirection.FROM_SYSTEM && !message.isResponse()) {
@@ -925,7 +992,6 @@ public class AgreementProtocolState {
                     }
                     break;
                 case CONNECT:
-                case OPEN:
                 case CONNECTION_MESSAGE:
                 case CLOSE:
                     if (!message.isAcknowledgedRemotely()) {
@@ -960,7 +1026,7 @@ public class AgreementProtocolState {
                                     // "interleaved" relationship is symmetric -> drop this message (chain), the
                                     // other message will be dropped when it is processed
                                     if (logger.isDebugEnabled()) {
-                                        logger.debug("dropping delivery chain {} as it is interleaved with {}",
+                                        logger.debug("ignoring delivery chain {} as it is interleaved with {}",
                                                         message.getMessageURI(), otherChain.getHead().getMessageURI());
                                     }
                                     notAcknowledged(copy, message);

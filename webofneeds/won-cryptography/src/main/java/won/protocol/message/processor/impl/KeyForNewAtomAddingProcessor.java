@@ -7,15 +7,16 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
 import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.cryptography.service.CryptographyService;
+import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
 
 /**
  * This processor is intended for use in owners (bot or webapp). If the message
@@ -30,7 +31,9 @@ import won.protocol.message.processor.exception.WonMessageProcessingException;
  */
 public class KeyForNewAtomAddingProcessor implements WonMessageProcessor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    @Autowired
     private CryptographyService cryptographyService;
+    @Autowired
     private KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy;
 
     public KeyForNewAtomAddingProcessor() {
@@ -44,7 +47,7 @@ public class KeyForNewAtomAddingProcessor implements WonMessageProcessor {
     public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
         try {
             if (message.getMessageType() == WonMessageType.CREATE_ATOM) {
-                String atomUri = message.getSenderAtomURI().toString();
+                String atomUri = message.getAtomURIRequired().toString();
                 Dataset msgDataset = WonMessageEncoder.encodeAsDataset(message);
                 // generate and add atom's public key to the atom content
                 String alias = keyPairAliasDerivationStrategy.getAliasForAtomUri(atomUri);
@@ -56,9 +59,9 @@ public class KeyForNewAtomAddingProcessor implements WonMessageProcessor {
                 String contentName = message.getContentGraphURIs().get(0);
                 Model contentModel = msgDataset.getNamedModel(contentName);
                 keyWriter.writeToModel(contentModel, contentModel.createResource(atomUri), pubKey);
-                return new WonMessage(msgDataset);
+                return WonMessage.of(msgDataset);
             } else if (message.getMessageType() == WonMessageType.REPLACE) {
-                String atomUri = message.getSenderAtomURI().toString();
+                String atomUri = message.getAtomURIRequired().toString();
                 Dataset msgDataset = WonMessageEncoder.encodeAsDataset(message);
                 // we should already have the key. If not, that's a problem!
                 String alias = keyPairAliasDerivationStrategy.getAliasForAtomUri(atomUri);
@@ -70,12 +73,12 @@ public class KeyForNewAtomAddingProcessor implements WonMessageProcessor {
                 String contentName = message.getContentGraphURIs().get(0);
                 Model contentModel = msgDataset.getNamedModel(contentName);
                 keyWriter.writeToModel(contentModel, contentModel.createResource(atomUri), pubKey);
-                return new WonMessage(msgDataset);
+                return WonMessage.of(msgDataset);
             }
         } catch (Exception e) {
             logger.error("Failed to add key", e);
             throw new WonMessageProcessingException(
-                            "Failed to add key for atom in message " + message.getMessageURI().toString());
+                            "Failed to add key for atom in message " + message.getMessageURI().toString(), e);
         }
         return message;
     }

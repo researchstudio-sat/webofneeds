@@ -15,36 +15,14 @@
 @prefix won:   <https://w3id.org/won/core#> .
 @prefix atom:  <https://node.matchat.org/won/resource/atom/> .
 @prefix event: <https://node.matchat.org/won/resource/event/> .
-
-p1:envelope-he7t {
-    p1:envelope-he7t  a            msg:EnvelopeGraph ;
-            rdfg:subGraphOf        event:bqvmlcrnkv3s ;
-            msg:containsEnvelope   p1:envelope ;
-            msg:containsSignature  p1:envelope-sig .
-    
-    event:bqvmlcrnkv3s
-            a                      msg:FromOwner ;
-            msg:protocolVersion    "1.0" ;
-            msg:receivedTimestamp  "1560428910428"^^xsd:long .
-    
-    p1:envelope-sig  a                      sig:Signature ;
-            sig:hasVerificationCertificate  atom:so20ub00h1de ;
-            sig:signatureValue              "MGYCMQCtCe16iMM4guNO+Y4ez9AcPDmHXfOh+1uP9vKf4oHcUjEjKcp+m+N56bdz0G99i60CMQD1useqNQZt8iaKkDxuF/HiaJO7u85MIFPafGTVEKI6DbE3pFUbfJFaxqCSQFIsEmM=" ;
+    p1:envelope-sig {
+    p1:envelope-sig  a                      msg:Signature ;
+            msg:signer  atom:so20ub00h1de ;
+            msg:signatureValue              "MGYCMQCtCe16iMM4guNO+Y4ez9AcPDmHXfOh+1uP9vKf4oHcUjEjKcp+m+N56bdz0G99i60CMQD1useqNQZt8iaKkDxuF/HiaJO7u85MIFPafGTVEKI6DbE3pFUbfJFaxqCSQFIsEmM=" ;
             msg:hash                        "TuNqxidQOnGoI34ysGM6fy2dQltfxvPQ1WQe52XY2A5a+DNpxqfpgSeFW5SPTwpahvsG0HBd5yeOfT4XOr2C8rMY9el8hKQEFEaGTR/JVwvRJpmxooQgQohvqm0r6DOTNzRhIaLSU1CZtAV+g2aE7Yds2bSpm8SCY867sjO/9tQ=" ;
             msg:publicKeyFingerprint        "753GyoDfN6gDf0SVDX3wkqtvVkDePUokg+TMYq9BUHU=" ;
             msg:signedGraph                 p1:envelope .
-}
-
-p1:envelope-he7t-sig {
-    p1:envelope-he7t-sig
-            a                               sig:Signature ;
-            sig:hasVerificationCertificate  node:resource ;
-            sig:signatureValue              "MGYCMQC+UEDFmELy49LHxswZvq0jRRmVL5LfPgU/zu85BgrXuIBC/mjvxhUj6opUGmBcbOsCMQCXp5u/GVknmbhXPr5mPsN5N67OsBhAYwO+pF3V4dpMIsJxn9srkIoKj9yuMXwaHfY=" ;
-            msg:hash                        "QHALC+Q2wT5maYROJXc6b9T6ZiohHqF/9pvykCRLHXcs5np0uOkdFFS6AhjVZk9GyOTRzBWl6xLxeL6Deg0mPAYC4BHM89AVRmM85Pad+UWFMqR/xgUEbHhG9Alt+Ffl58yRaa+kCpYQ3nnu/CnmN+qxFxfWjwQgQssPoSyyr8g=" ;
-            msg:publicKeyFingerprint        "lZnZ2k4d9Gj7vmf/j14wCepkNF2Mk2ph7YB93BCy1LQ=" ;
-            msg:signedGraph                 p1:envelope-he7t .
-}
-
+    }
 p1:envelope {
     event:bqvmlcrnkv3s
             a                  msg:FromOwner ;
@@ -59,9 +37,9 @@ p1:envelope {
             rdfg:subGraphOf        event:bqvmlcrnkv3s ;
             msg:containsSignature  p1:atom-sig .
     
-    p1:atom-sig  a                          sig:Signature ;
-            sig:hasVerificationCertificate  atom:so20ub00h1de ;
-            sig:signatureValue              "MGUCMQC69AkAHbM39unLEzv5B34E9cDTZ1aPwdIGaVJSV9zylXTrEi2QTbGNjdVzLXU4PAYCMBDndYMmReEkZj+cFPwIOsJw2zUCguIRMs3evIZNMYdSwWX/GCbpNYPSa1YpfDhlhA==" ;
+    p1:atom-sig  a                          msg:Signature ;
+            msg:signer  atom:so20ub00h1de ;
+            msg:signatureValue              "MGUCMQC69AkAHbM39unLEzv5B34E9cDTZ1aPwdIGaVJSV9zylXTrEi2QTbGNjdVzLXU4PAYCMBDndYMmReEkZj+cFPwIOsJw2zUCguIRMs3evIZNMYdSwWX/GCbpNYPSa1YpfDhlhA==" ;
             msg:hash                        "AK/bebuX3t9uftC5uBvqQvEu0V9Nne3MnlHMzJ7Q6GB75hwJGJMbU8yzOEUKSqUl9njWzIoRdJFxQgEiU8QKjH6JkASgfRLJsxTatT+dZOk3XGFwdvDwGxzAP/3V9T0/+8Qgw6pOTKtT4Vkd+z2eC/j6NSEzZoRGYyPDfbasp5XN" ;
             msg:publicKeyFingerprint        "753GyoDfN6gDf0SVDX3wkqtvVkDePUokg+TMYq9BUHU=" ;
             msg:signedGraph                 p1:atom .

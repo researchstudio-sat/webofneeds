@@ -25,12 +25,8 @@ public enum ConnectionEventType {
                     ConnectionState.CONNECTED, ConnectionState.CLOSED),
     PARTNER_CLOSE("PartnerClose", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT,
                     ConnectionState.REQUEST_RECEIVED, ConnectionState.CONNECTED, ConnectionState.CLOSED),
-    // open may always be called. It may re-open a connection, it does not change
-    // the state of connected connections
-    OWNER_OPEN("OwnerOpen", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT, ConnectionState.REQUEST_RECEIVED,
-                    ConnectionState.CONNECTED, ConnectionState.CLOSED),
-    PARTNER_OPEN("PartnerOpen", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT,
-                    ConnectionState.REQUEST_RECEIVED, ConnectionState.CONNECTED, ConnectionState.CLOSED),
+    OWNER_CONNECT("OwnerConnect", ConnectionState.SUGGESTED, ConnectionState.REQUEST_RECEIVED, ConnectionState.CLOSED),
+    PARTNER_CONNECT("PartnerConnect", ConnectionState.SUGGESTED, ConnectionState.REQUEST_SENT, ConnectionState.CLOSED),
     OWNER_MESSAGE("OwnerMessage", ConnectionState.CONNECTED),
     PARTNER_MESSAGE("PartnerMessage", ConnectionState.CONNECTED), MATCHER_HINT("Hint");
     private String name;

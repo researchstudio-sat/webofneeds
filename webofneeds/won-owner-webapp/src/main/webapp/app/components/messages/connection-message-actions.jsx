@@ -23,6 +23,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     messageUri: ownProps.messageUri,
     connectionUri: ownProps.connectionUri,
+    connection,
     ownedAtom,
     message,
     multiSelectType: get(connection, "multiSelectType"),
@@ -55,6 +56,8 @@ const mapDispatchToProps = dispatch => {
       trimmedMsg,
       additionalContent,
       referencedContent,
+      senderSocketUri,
+      targetSocketUri,
       connectionUri,
       isTTL
     ) => {
@@ -63,6 +66,8 @@ const mapDispatchToProps = dispatch => {
           trimmedMsg,
           additionalContent,
           referencedContent,
+          senderSocketUri,
+          targetSocketUri,
           connectionUri,
           isTTL
         )
@@ -202,6 +207,9 @@ class WonConnectionMessageActions extends React.Component {
 
   sendActionMessage(type) {
     this.setState({ clicked: true }, () => {
+      const senderSocketUri = get(this.props.connection, "socketUri");
+      const targetSocketUri = get(this.props.connection, "targetSocketUri");
+
       this.props.sendChatMessage(
         undefined,
         undefined,
@@ -209,6 +217,8 @@ class WonConnectionMessageActions extends React.Component {
           type,
           Immutable.Map().set(this.props.messageUri, this.props.message)
         ),
+        senderSocketUri,
+        targetSocketUri,
         this.props.connectionUri,
         false
       );
@@ -219,6 +229,7 @@ class WonConnectionMessageActions extends React.Component {
 
 WonConnectionMessageActions.propTypes = {
   messageUri: PropTypes.string.isRequired,
+  connection: PropTypes.object,
   connectionUri: PropTypes.string.isRequired,
   ownedAtom: PropTypes.object,
   message: PropTypes.object,

@@ -10,26 +10,24 @@
  */
 package won.bot.framework.eventbot.action.impl.wonmessage;
 
-import org.apache.jena.query.Dataset;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import won.bot.framework.eventbot.EventListenerContext;
-import won.bot.framework.eventbot.action.BaseEventBotAction;
-import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.listener.EventListener;
-import won.protocol.exception.WonMessageBuilderException;
-import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.service.WonNodeInformationService;
-import won.protocol.util.WonRdfUtils;
-import won.protocol.util.linkeddata.WonLinkedDataUtils;
-
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import won.bot.framework.eventbot.EventListenerContext;
+import won.bot.framework.eventbot.action.BaseEventBotAction;
+import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.listener.EventListener;
+import won.protocol.exception.WonMessageBuilderException;
+import won.protocol.message.WonMessage;
+import won.protocol.message.builder.WonMessageBuilder;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
  * BaseEventBotAction connecting two atoms on the specified sockets. The atom's
@@ -141,7 +139,7 @@ public class ConnectFromListToListAction extends BaseEventBotAction {
                     connectHook.onConnect(fromUri, toUri);
                 }
                 WonMessage connMessage = createWonMessage(fromUri, toUri);
-                getEventListenerContext().getWonMessageSender().sendWonMessage(connMessage);
+                getEventListenerContext().getWonMessageSender().prepareAndSendMessage(connMessage);
             } catch (Exception e) {
                 logger.warn("could not connect {} and {}", fromUri, toUri); // throws
                 logger.warn("caught exception", e);
@@ -150,23 +148,27 @@ public class ConnectFromListToListAction extends BaseEventBotAction {
     }
 
     private WonMessage createWonMessage(URI fromUri, URI toUri) throws WonMessageBuilderException {
-        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
-        Dataset localAtomRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(fromUri);
-        Dataset targetAtomRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(toUri);
-        URI localWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(localAtomRDF, fromUri);
-        URI remoteWonNode = WonRdfUtils.AtomUtils.getWonNodeURIFromAtom(targetAtomRDF, toUri);
-        return WonMessageBuilder.setMessagePropertiesForConnect(
-                        wonNodeInformationService.generateEventURI(localWonNode),
-                        fromSocketType.map(socketType -> WonLinkedDataUtils
-                                        .getSocketsOfType(fromUri, socketType,
-                                                        getEventListenerContext().getLinkedDataSource())
-                                        .stream().findFirst().orElse(null)),
-                        fromUri, localWonNode,
-                        toSocketType.map(socketType -> WonLinkedDataUtils
-                                        .getSocketsOfType(toUri, socketType,
-                                                        getEventListenerContext().getLinkedDataSource())
-                                        .stream().findFirst().orElse(null)),
-                        toUri, remoteWonNode, welcomeMessage).build();
+        URI localSocket = fromSocketType.map(socketType -> WonLinkedDataUtils
+                        .getSocketsOfType(fromUri, socketType,
+                                        getEventListenerContext().getLinkedDataSource())
+                        .stream().findFirst())
+                        .orElseThrow(() -> new IllegalStateException(
+                                        "No suitable sockets found for connect on " + fromUri))
+                        .get();
+        URI targetSocket = toSocketType.map(socketType -> WonLinkedDataUtils
+                        .getSocketsOfType(toUri, socketType,
+                                        getEventListenerContext().getLinkedDataSource())
+                        .stream().findFirst())
+                        .orElseThrow(() -> new IllegalStateException(
+                                        "No suitable sockets found for connect on " + fromUri))
+                        .get();
+        return WonMessageBuilder
+                        .connect()
+                        .sockets()
+                        /**/.sender(localSocket)
+                        /**/.recipient(targetSocket)
+                        .content().text(welcomeMessage)
+                        .build();
     }
 
     public static abstract class ConnectHook {

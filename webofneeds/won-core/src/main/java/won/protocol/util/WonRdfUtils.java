@@ -1,10 +1,44 @@
 package won.protocol.util;
 
+import static won.protocol.util.RdfUtils.*;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.query.*;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.ResIterator;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.riot.Lang;
@@ -26,25 +60,24 @@ import org.apache.jena.vocabulary.RDF;
 import org.hibernate.cfg.NotYetImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonSignatureData;
 import won.protocol.model.AtomGraphType;
+import won.protocol.model.Connection;
+import won.protocol.model.ConnectionModelMapper;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.SocketDefinitionImpl;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInfoBuilder;
-import won.protocol.util.RdfUtils.*;
-import won.protocol.vocabulary.*;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static won.protocol.util.RdfUtils.*;
+import won.protocol.util.RdfUtils.Pair;
+import won.protocol.vocabulary.SCHEMA;
+import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONAGR;
+import won.protocol.vocabulary.WONCON;
+import won.protocol.vocabulary.WONMOD;
+import won.protocol.vocabulary.WONMSG;
 
 /**
  * Utilities for populating/manipulating the RDF models used throughout the WON
@@ -58,13 +91,13 @@ public class WonRdfUtils {
         public static boolean isSignatureGraph(String graphUri, Model model) {
             // TODO check the presence of all the required triples
             Resource resource = model.getResource(graphUri);
-            StmtIterator si = model.listStatements(resource, RDF.type, SFSIG.SIGNATURE);
+            StmtIterator si = model.listStatements(resource, RDF.type, WONMSG.Signature);
             return si.hasNext();
         }
 
         public static boolean isSignature(Model model, String modelName) {
             // TODO check the presence of all the required triples
-            return model.contains(model.getResource(modelName), RDF.type, SFSIG.SIGNATURE);
+            return model.contains(model.getResource(modelName), RDF.type, WONMSG.Signature);
         }
 
         public static String getSignedGraphUri(String signatureGraphUri, Model signatureGraph) {
@@ -80,7 +113,7 @@ public class WonRdfUtils {
         public static String getSignatureValue(String signatureGraphUri, Model signatureGraph) {
             String signatureValue = null;
             Resource resource = signatureGraph.getResource(signatureGraphUri);
-            NodeIterator ni2 = signatureGraph.listObjectsOfProperty(resource, SFSIG.HAS_SIGNATURE_VALUE);
+            NodeIterator ni2 = signatureGraph.listObjectsOfProperty(resource, WONMSG.signatureValue);
             if (ni2.hasNext()) {
                 signatureValue = ni2.next().asLiteral().toString();
             }
@@ -92,17 +125,22 @@ public class WonRdfUtils {
         }
 
         public static WonSignatureData extractWonSignatureData(final Resource resource) {
-            Statement stmt = resource.getRequiredProperty(WONMSG.signedGraph);
-            String signedGraphUri = stmt.getObject().asResource().getURI();
-            stmt = resource.getRequiredProperty(SFSIG.HAS_SIGNATURE_VALUE);
+            List<String> signedGraphs = new ArrayList<>();
+            StmtIterator it = resource.listProperties(WONMSG.signedGraph);
+            while (it.hasNext()) {
+                Statement s = it.next();
+                String signedGraphUri = s.getObject().asResource().getURI();
+                signedGraphs.add(signedGraphUri);
+            }
+            Statement stmt = resource.getRequiredProperty(WONMSG.signatureValue);
             String signatureValue = stmt.getObject().asLiteral().getString();
             stmt = resource.getRequiredProperty(WONMSG.hash);
             String hash = stmt.getObject().asLiteral().getString();
             stmt = resource.getRequiredProperty(WONMSG.publicKeyFingerprint);
             String fingerprint = stmt.getObject().asLiteral().getString();
-            stmt = resource.getRequiredProperty(SFSIG.HAS_VERIFICATION_CERT);
+            stmt = resource.getRequiredProperty(WONMSG.signer);
             String cert = stmt.getObject().asResource().getURI();
-            return new WonSignatureData(signedGraphUri, resource.getURI(), signatureValue, hash, fingerprint, cert);
+            return new WonSignatureData(signedGraphs, resource.getURI(), signatureValue, hash, fingerprint, cert);
         }
 
         /**
@@ -116,16 +154,16 @@ public class WonRdfUtils {
             assert wonSignatureData.getHash() != null;
             assert wonSignatureData.getSignatureValue() != null;
             assert wonSignatureData.getPublicKeyFingerprint() != null;
-            assert wonSignatureData.getSignedGraphUri() != null;
+            assert wonSignatureData.getSignedGraphUris() != null;
             assert wonSignatureData.getVerificationCertificateUri() != null;
             Model containingGraph = subject.getModel();
-            subject.addProperty(RDF.type, SFSIG.SIGNATURE);
+            subject.addProperty(RDF.type, WONMSG.Signature);
             subject.addProperty(WONMSG.hash, wonSignatureData.getHash());
-            subject.addProperty(SFSIG.HAS_SIGNATURE_VALUE, wonSignatureData.getSignatureValue());
-            subject.addProperty(WONMSG.signedGraph,
-                            containingGraph.createResource(wonSignatureData.getSignedGraphUri()));
+            subject.addProperty(WONMSG.signatureValue, wonSignatureData.getSignatureValue());
+            wonSignatureData.getSignedGraphUris().forEach(
+                            uri -> subject.addProperty(WONMSG.signedGraph, containingGraph.createResource(uri)));
             subject.addProperty(WONMSG.publicKeyFingerprint, wonSignatureData.getPublicKeyFingerprint());
-            subject.addProperty(SFSIG.HAS_VERIFICATION_CERT,
+            subject.addProperty(WONMSG.signer,
                             containingGraph.createResource(wonSignatureData.getVerificationCertificateUri()));
         }
     }
@@ -141,18 +179,29 @@ public class WonRdfUtils {
          * @return
          */
         public static WonNodeInfo getWonNodeInfo(final URI wonNodeUri, Dataset dataset) {
-            assert wonNodeUri != null : "wonNodeUri must not be null";
-            assert dataset != null : "dataset must not be null";
+            return getWonNodeInfo(dataset);
+        }
+
+        /**
+         * Creates a WonNodeInfo object based on the specified dataset. The first model
+         * found in the dataset that seems to contain the data needed for a WonNodeInfo
+         * object is used.
+         * 
+         * @param wonNodeUri
+         * @param dataset
+         * @return
+         */
+        public static WonNodeInfo getWonNodeInfo(Dataset dataset) {
+            Objects.requireNonNull(dataset);
             return RdfUtils.findFirst(dataset, model -> {
                 // use the first blank node found for [wonNodeUri]
                 // won:hasUriPatternSpecification [blanknode]
-                NodeIterator it = model.listObjectsOfProperty(model.getResource(wonNodeUri.toString()),
-                                WON.uriPrefixSpecification);
+                NodeIterator it = model.listObjectsOfProperty(WON.uriPrefixSpecification);
                 if (!it.hasNext())
                     return null;
-                WonNodeInfoBuilder wonNodeInfoBuilder = new WonNodeInfoBuilder();
-                wonNodeInfoBuilder.setWonNodeURI(wonNodeUri.toString());
                 RDFNode node = it.next();
+                WonNodeInfoBuilder wonNodeInfoBuilder = new WonNodeInfoBuilder();
+                wonNodeInfoBuilder.setWonNodeURI(node.asResource().toString());
                 // set the URI prefixes
                 it = model.listObjectsOfProperty(node.asResource(), WON.atomUriPrefix);
                 if (!it.hasNext())
@@ -168,7 +217,7 @@ public class WonRdfUtils {
                     return null;
                 wonNodeInfoBuilder.setEventURIPrefix(it.next().asLiteral().getString());
                 // set the atom list URI
-                it = model.listObjectsOfProperty(model.getResource(wonNodeUri.toString()), WON.atomList);
+                it = model.listObjectsOfProperty(node.asResource(), WON.atomList);
                 if (it.hasNext()) {
                     wonNodeInfoBuilder.setAtomListURI(it.next().asNode().getURI());
                 } else {
@@ -581,9 +630,11 @@ public class WonRdfUtils {
         public static List<URI> getPreviousMessageUrisIncludingRemote(final WonMessage wonMessage) {
             List<URI> uris = new ArrayList<>();
             String queryString = "prefix msg:   <https://w3id.org/won/message#>\n"
-                            + "prefix agr:   <https://w3id.org/won/agreement#>\n" + "SELECT distinct ?prev where {\n"
-                            + "   {" + "    ?msg msg:previousMessage ?prev .\n" + "   } union {"
-                            + "    ?msg msg:correspondingRemoteMessage/msg:previousMessage ?prev " + "  }" + "}";
+                            + "SELECT distinct ?prev where {\n"
+                            + "   {"
+                            + "    ?msg msg:previousMessage ?prev .\n"
+                            + "   } "
+                            + "}";
             Query query = QueryFactory.create(queryString);
             try (QueryExecution qexec = QueryExecutionFactory.create(query, wonMessage.getCompleteDataset())) {
                 qexec.getContext().set(TDB.symUnionDefaultGraph, true);
@@ -652,7 +703,7 @@ public class WonRdfUtils {
         }
 
         public static WonMessage copyByDatasetSerialization(final WonMessage toWrap) {
-            return new WonMessage(RdfUtils.readDatasetFromString(
+            return WonMessage.of(RdfUtils.readDatasetFromString(
                             RdfUtils.writeDatasetToString(toWrap.getCompleteDataset(), Lang.TRIG), Lang.TRIG));
         }
     }
@@ -667,11 +718,7 @@ public class WonRdfUtils {
          * @return
          */
         public static URI getSocket(WonMessage message) {
-            if (message.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL) {
-                return message.getRecipientSocketURI();
-            } else {
-                return message.getSenderSocketURI();
-            }
+            return message.getSenderSocketURI();
         }
 
         /**
@@ -683,11 +730,7 @@ public class WonRdfUtils {
          * @return
          */
         public static URI getTargetSocket(WonMessage message) {
-            if (message.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL) {
-                return message.getSenderSocketURI();
-            } else {
-                return message.getRecipientSocketURI();
-            }
+            return message.getRecipientSocketURI();
         }
 
         /**
@@ -732,7 +775,7 @@ public class WonRdfUtils {
          * @return
          */
         public static boolean isSocketsCompatible(Dataset dataset, URI firstAtomSocket, URI secondAtomSocket) {
-            Set<URI> firstCompatibleDefs = getCompatibleSocketDefinitions(dataset, firstAtomSocket);
+            Set<URI> firstCompatibleDefs = getCompatibleSocketDefinitionsOfSocket(dataset, firstAtomSocket);
             Optional<URI> secondDef = getSocketDefinition(dataset, secondAtomSocket);
             if (!secondDef.isPresent()) {
                 throw new IllegalArgumentException("No socket definition found for " + secondAtomSocket);
@@ -740,7 +783,7 @@ public class WonRdfUtils {
             if (!firstCompatibleDefs.isEmpty() && !firstCompatibleDefs.contains(secondDef.get())) {
                 return false;
             }
-            Set<URI> secondCompatibleDefs = getCompatibleSocketDefinitions(dataset, secondAtomSocket);
+            Set<URI> secondCompatibleDefs = getCompatibleSocketDefinitionsOfSocket(dataset, secondAtomSocket);
             Optional<URI> firstDef = getSocketDefinition(dataset, firstAtomSocket);
             if (!firstDef.isPresent()) {
                 throw new IllegalArgumentException("No socket definition found for " + firstAtomSocket);
@@ -770,27 +813,6 @@ public class WonRdfUtils {
                 StmtIterator smtIter = contentGraph.getResource(messageURI.toString()).listProperties(property);
                 if (smtIter.hasNext()) {
                     return URI.create(smtIter.nextStatement().getObject().asResource().getURI());
-                }
-            }
-            return null;
-        }
-
-        /**
-         * Returns a property of the corresponding remote message (i.e. the object of
-         * the first triple ( [corresponding-remote-message-uri] [property] X ) found in
-         * one of the content graphs of the specified message.
-         */
-        private static URI getObjectOfRemoteMessageProperty(final WonMessage message, final Property property) {
-            List<String> contentGraphUris = message.getContentGraphURIs();
-            Dataset contentGraphs = message.getMessageContent();
-            URI messageURI = message.getCorrespondingRemoteMessageURI();
-            if (messageURI != null) {
-                for (String graphUri : contentGraphUris) {
-                    Model contentGraph = contentGraphs.getNamedModel(graphUri);
-                    StmtIterator smtIter = contentGraph.getResource(messageURI.toString()).listProperties(property);
-                    if (smtIter.hasNext()) {
-                        return URI.create(smtIter.nextStatement().getObject().asResource().getURI());
-                    }
                 }
             }
             return null;
@@ -998,57 +1020,90 @@ public class WonRdfUtils {
             return Optional.of(model);
         }
 
-        public static void setCompatibleSocketDefinitions(SocketDefinitionImpl socketConfiguration, Dataset dataset,
+        public static void setCompatibleSocketDefinitionsOfSocket(SocketDefinitionImpl socketConfiguration,
+                        Dataset dataset,
                         URI socketURI) {
-            socketConfiguration.setCompatibleSocketTypes(getCompatibleSocketDefinitions(dataset, socketURI));
+            socketConfiguration.setCompatibleSocketTypes(getCompatibleSocketDefinitionsOfSocket(dataset, socketURI));
         }
 
-        public static Set<URI> getCompatibleSocketDefinitions(Dataset dataset, URI socketURI) {
+        public static void setCompatibleSocketDefinitions(SocketDefinitionImpl socketConfiguration, Dataset dataset,
+                        URI socketDefinitionURI) {
+            socketConfiguration.setCompatibleSocketTypes(getCompatibleSocketDefinitions(dataset, socketDefinitionURI));
+        }
+
+        public static Set<URI> getCompatibleSocketDefinitionsOfSocket(Dataset dataset, URI socketURI) {
             return RdfUtils
                             .getObjectStreamOfProperty(dataset, socketURI, URI.create(WON.socketDefinition.getURI()),
                                             node -> node.isURIResource() ? URI.create(node.asResource().getURI())
                                                             : null)
-                            .flatMap(def -> RdfUtils.getObjectStreamOfProperty(dataset, def,
-                                            URI.create(WON.compatibleSocketDefinition.getURI()),
-                                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
-                                                            : null))
+                            .flatMap(def -> getCompatibleSocketDefinitions(dataset, def).stream())
                             .collect(Collectors.toSet());
         }
 
-        public static void setDerivationProperties(SocketDefinitionImpl socketConfiguration, Dataset dataset,
+        public static Set<URI> getCompatibleSocketDefinitions(Dataset dataset, URI socketDefinitionURI) {
+            return RdfUtils.getObjectStreamOfProperty(dataset, socketDefinitionURI,
+                            URI.create(WON.compatibleSocketDefinition.getURI()),
+                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                            : null)
+                            .collect(Collectors.toSet());
+        }
+
+        public static void setDerivationPropertiesOfSocket(SocketDefinitionImpl socketConfiguration, Dataset dataset,
                         URI socketURI) {
             socketConfiguration.setDerivationProperties(RdfUtils
                             .getObjectStreamOfProperty(dataset, socketURI, URI.create(WON.socketDefinition.getURI()),
                                             node -> node.isURIResource() ? URI.create(node.asResource().getURI())
                                                             : null)
-                            .flatMap(def -> RdfUtils.getObjectStreamOfProperty(dataset, def,
-                                            URI.create(WON.derivesAtomProperty.getURI()),
-                                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
-                                                            : null))
+                            .flatMap(def -> getDerivationProperties(dataset, def).stream())
                             .collect(Collectors.toSet()));
         }
 
-        public static void setInverseDerivationProperties(SocketDefinitionImpl socketConfiguration, Dataset dataset,
+        public static void setDerivationProperties(SocketDefinitionImpl socketConfiguration, Dataset dataset,
+                        URI socketDefinitionURI) {
+            socketConfiguration.setDerivationProperties(getDerivationProperties(dataset, socketDefinitionURI));
+        }
+
+        public static Set<URI> getDerivationProperties(Dataset dataset, URI socketDefinitionURI) {
+            return RdfUtils.getObjectStreamOfProperty(dataset, socketDefinitionURI,
+                            URI.create(WON.derivesAtomProperty.getURI()),
+                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                            : null)
+                            .collect(Collectors.toSet());
+        }
+
+        public static void setInverseDerivationPropertiesOfSocket(SocketDefinitionImpl socketConfiguration,
+                        Dataset dataset,
                         URI socketURI) {
             socketConfiguration.setInverseDerivationProperties(RdfUtils
                             .getObjectStreamOfProperty(dataset, socketURI, URI.create(WON.socketDefinition.getURI()),
                                             node -> node.isURIResource() ? URI.create(node.asResource().getURI())
                                                             : null)
-                            .flatMap(def -> RdfUtils.getObjectStreamOfProperty(dataset, def,
-                                            URI.create(WON.derivesInverseAtomProperty.getURI()),
-                                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
-                                                            : null))
+                            .flatMap(def -> getInverseDerivationProperties(dataset, def).stream())
                             .collect(Collectors.toSet()));
         }
 
-        public static void setAutoOpen(SocketDefinitionImpl socketConfiguration, Dataset dataset, URI socketURI) {
+        public static void setInverseDerivationProperties(SocketDefinitionImpl socketConfiguration, Dataset dataset,
+                        URI socketDefinitionURI) {
+            socketConfiguration.setInverseDerivationProperties(
+                            getInverseDerivationProperties(dataset, socketDefinitionURI));
+        }
+
+        public static Set<URI> getInverseDerivationProperties(Dataset dataset, URI socketDefinitionURI) {
+            return RdfUtils.getObjectStreamOfProperty(dataset, socketDefinitionURI,
+                            URI.create(WON.derivesInverseAtomProperty.getURI()),
+                            node -> node.isURIResource() ? URI.create(node.asResource().getURI())
+                                            : null)
+                            .collect(Collectors.toSet());
+        }
+
+        public static void setAutoOpenOfSocket(SocketDefinitionImpl socketConfiguration, Dataset dataset,
+                        URI socketURI) {
             Set<Boolean> autoOpens = RdfUtils
                             .getObjectStreamOfProperty(dataset, socketURI, URI.create(WON.socketDefinition.getURI()),
                                             node -> node.isURIResource() ? URI.create(node.asResource().getURI())
                                                             : null)
-                            .flatMap(def -> RdfUtils.getObjectStreamOfProperty(dataset, def,
-                                            URI.create(WON.autoOpen.getURI()),
-                                            node -> node.isLiteral() ? node.asLiteral().getBoolean() : null))
+                            .map(def -> isAutoOpen(dataset, def).orElse(null))
+                            .filter(x -> x != null)
                             .collect(Collectors.toSet());
             if (autoOpens.size() > 1) {
                 socketConfiguration.addInconsistentProperty(URI.create(WON.autoOpen.getURI()));
@@ -1057,7 +1112,20 @@ public class WonRdfUtils {
             }
         }
 
-        public static void setSocketCapacity(SocketDefinitionImpl socketConfiguration, Dataset dataset, URI socketURI) {
+        public static void setAutoOpen(SocketDefinitionImpl socketConfiguration, Dataset dataset,
+                        URI socketDefinitionURI) {
+            socketConfiguration.setAutoOpen(isAutoOpen(dataset, socketDefinitionURI));
+        }
+
+        public static Optional<Boolean> isAutoOpen(Dataset dataset, URI socketDefinitionURI) {
+            return RdfUtils.getObjectStreamOfProperty(dataset, socketDefinitionURI,
+                            URI.create(WON.autoOpen.getURI()),
+                            node -> node.isLiteral() ? node.asLiteral().getBoolean() : null).filter(x -> x != null)
+                            .distinct().findFirst();
+        }
+
+        public static void setSocketCapacityOfSocket(SocketDefinitionImpl socketConfiguration, Dataset dataset,
+                        URI socketURI) {
             Set<Integer> socketCapacities = RdfUtils
                             .getObjectStreamOfProperty(dataset, socketURI, URI.create(WON.socketDefinition.getURI()),
                                             node -> node.isURIResource() ? URI.create(node.asResource().getURI())
@@ -1073,6 +1141,18 @@ public class WonRdfUtils {
             }
         }
 
+        public static void setSocketCapacity(SocketDefinitionImpl socketConfiguration, Dataset dataset,
+                        URI socketDefinitionURI) {
+            socketConfiguration.setCapacity(getSocketCapacity(dataset, socketDefinitionURI));
+        }
+
+        public static Optional<Integer> getSocketCapacity(Dataset dataset, URI socketDefinitionURI) {
+            return RdfUtils.getObjectStreamOfProperty(dataset, socketDefinitionURI,
+                            URI.create(WON.socketCapacity.getURI()),
+                            node -> node.isLiteral() ? node.asLiteral().getInt() : null).filter(x -> x != null)
+                            .distinct().findFirst();
+        }
+
         public static Optional<URI> getAtomOfSocket(Dataset dataset, URI socketURI) {
             return RdfUtils.getFirstStatementMapped(dataset, null, URI.create(WON.socket.getURI()), socketURI,
                             s -> s.getSubject().isURIResource() ? URI.create(s.getSubject().getURI()) : null);
@@ -1080,6 +1160,11 @@ public class WonRdfUtils {
     }
 
     public static class ConnectionUtils {
+        public static Connection getConnection(Dataset connectionDataset, URI connectionURI) {
+            ConnectionModelMapper mapper = new ConnectionModelMapper();
+            return RdfUtils.findFirst(connectionDataset, model -> mapper.fromModel(model));
+        }
+
         public static boolean isConnected(Dataset connectionDataset, URI connectionUri) {
             URI connectionState = getConnectionState(connectionDataset, connectionUri);
             return ConnectionState.CONNECTED.getURI().equals(connectionState);
@@ -1118,6 +1203,16 @@ public class WonRdfUtils {
 
         public static URI getTargetConnectionURIFromConnection(Dataset dataset, final URI connectionURI) {
             return URI.create(findOnePropertyFromResource(dataset, connectionURI, WON.targetConnection).asResource()
+                            .getURI());
+        }
+
+        public static URI getSocketURIFromConnection(Dataset dataset, final URI connectionURI) {
+            return URI.create(findOnePropertyFromResource(dataset, connectionURI, WON.socket).asResource()
+                            .getURI());
+        }
+
+        public static URI getTargetSocketURIFromConnection(Dataset dataset, final URI connectionURI) {
+            return URI.create(findOnePropertyFromResource(dataset, connectionURI, WON.targetSocket).asResource()
                             .getURI());
         }
 
@@ -1215,8 +1310,27 @@ public class WonRdfUtils {
             pmap.withDefaultMappings(PrefixMapping.Standard);
             pmap.setNsPrefix("won", WON.getURI());
             pmap.setNsPrefix("msg", WONMSG.getURI());
-            Path path = PathParser.parse("won:hasConnectionContainer/rdfs:member/won:targetAtom", pmap);
+            Path path = PathParser.parse("won:connectionContainer/rdfs:member/won:targetAtom", pmap);
             return RdfUtils.getURIsForPropertyPath(dataset, atomURI, path);
+        }
+
+        public static Iterator<URI> getConnections(Dataset dataset, final URI connectionContainerURI) {
+            PrefixMapping pmap = new PrefixMappingImpl();
+            pmap.withDefaultMappings(PrefixMapping.Standard);
+            pmap.setNsPrefix("won", WON.getURI());
+            pmap.setNsPrefix("msg", WONMSG.getURI());
+            Path path = PathParser.parse("rdfs:member", pmap);
+            return RdfUtils.getURIsForPropertyPath(dataset, connectionContainerURI, path);
+        }
+
+        public static Optional<URI> getConnectionContainerOfAtom(Dataset dataset, final URI atomURI) {
+            PrefixMapping pmap = new PrefixMappingImpl();
+            pmap.withDefaultMappings(PrefixMapping.Standard);
+            pmap.setNsPrefix("won", WON.getURI());
+            pmap.setNsPrefix("msg", WONMSG.getURI());
+            Path path = PathParser.parse("won:connections", pmap);
+            Iterator<URI> it = RdfUtils.getURIsForPropertyPath(dataset, atomURI, path);
+            return it.hasNext() ? Optional.of(it.next()) : Optional.empty();
         }
 
         /**

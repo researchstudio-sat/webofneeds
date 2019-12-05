@@ -20,16 +20,10 @@ import org.apache.jena.vocabulary.XSD;
 
 import won.protocol.vocabulary.CERT;
 import won.protocol.vocabulary.SCHEMA;
-import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONCON;
 import won.protocol.vocabulary.WONMATCH;
 import won.protocol.vocabulary.WONMSG;
-import won.protocol.vocabulary.WXBUDDY;
-import won.protocol.vocabulary.WXCHAT;
-import won.protocol.vocabulary.WXGROUP;
-import won.protocol.vocabulary.WXHOLD;
-import won.protocol.vocabulary.WXREVIEW;
 
 /**
  * User: fkleedorfer Date: 27.09.13
@@ -54,7 +48,6 @@ public class DefaultPrefixUtils {
         prefixMapping.setNsPrefix(WONMSG.DEFAULT_PREFIX, WONMSG.getURI());
         prefixMapping.setNsPrefix(WONCON.DEFAULT_PREFIX, WONCON.getURI());
         prefixMapping.setNsPrefix(WONMATCH.DEFAULT_PREFIX, WONMATCH.getURI());
-        prefixMapping.setNsPrefix(SFSIG.DEFAULT_PREFIX, SFSIG.getURI());
         prefixMapping.setNsPrefix(CERT.DEFAULT_PREFIX, CERT.getURI());
         prefixMapping.setNsPrefix("rdf", RDF.getURI());
         prefixMapping.setNsPrefix("rdfs", RDFS.getURI());

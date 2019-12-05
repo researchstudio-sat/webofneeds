@@ -204,6 +204,12 @@ export function hasConnectionFailedToLoad(process, connUri) {
   return connUri && getIn(process, ["connections", connUri, "failedToLoad"]);
 }
 
+export function hasMessagesToLoad(process, connUri) {
+  const messages =
+    connUri && getIn(process, ["connections", connUri, "messages"]);
+  return !!(messages && messages.find(msg => get(msg, "toLoad")));
+}
+
 /**
  * Return true if any connUri is currently loading, if includeSubData is true, we also check the petriNetData and agreementData
  * @param process

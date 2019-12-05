@@ -10,18 +10,21 @@
  */
 package won.protocol.message.processor.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StopWatch;
+
+import won.protocol.exception.WonMessageNotWellFormedException;
+import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.WonMessageProcessor;
-import won.protocol.message.processor.exception.WonMessageNotWellFormedException;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
+import won.protocol.util.LogMarkers;
 import won.protocol.util.RdfUtils;
 import won.protocol.validation.WonMessageValidator;
-
-import java.lang.invoke.MethodHandles;
 
 /**
  * Checks WonMessages for integrity. The following steps are performed:
@@ -39,6 +42,18 @@ public class WellformednessCheckingWonMessageProcessor implements WonMessageProc
 
     @Override
     public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
+        StopWatch sw = new StopWatch();
+        sw.start();
+        for (WonMessage msg : message.getAllMessages()) {
+            checkMessage(msg);
+        }
+        sw.stop();
+        logger.debug(LogMarkers.TIMING, "checking message {} took {} millis", message.getMessageURIRequired(),
+                        sw.getLastTaskTimeMillis());
+        return message;
+    }
+
+    public void checkMessage(final WonMessage message) {
         Dataset dataset = message.getCompleteDataset();
         StringBuilder errorMessage = new StringBuilder("Message is not valid, failed at check ");
         boolean valid;
@@ -55,6 +70,5 @@ public class WellformednessCheckingWonMessageProcessor implements WonMessageProc
             }
             throw new WonMessageNotWellFormedException(errorMessage.toString());
         }
-        return message;
     }
 }

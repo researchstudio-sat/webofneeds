@@ -42,6 +42,7 @@ import {
   atomsClose,
   atomsClosedBySystem,
   atomsConnect,
+  atomsConnectSockets,
   atomsDelete,
   atomsOpen,
   fetchUnloadedAtom,
@@ -82,7 +83,6 @@ import {
 import { stateGo, stateReload } from "redux-ui-router";
 import {
   connectPersona,
-  createPersona,
   disconnectPersona,
   reviewPersona,
 } from "./persona-actions.js";
@@ -104,7 +104,6 @@ const actionHierarchy = {
   initialPageLoad: pageLoadAction,
   initialLoadFinished: INJ_DEFAULT,
   connections: {
-    open: cnct.connectionsOpen,
     connectAdHoc: cnct.connectionsConnectAdHoc,
     connectReactionAtom: cnct.connectionsConnectReactionAtom,
     close: cnct.connectionsClose,
@@ -150,6 +149,7 @@ const actionHierarchy = {
     closedBySystem: atomsClosedBySystem,
     failed: INJ_DEFAULT,
     connect: atomsConnect,
+    connectSockets: atomsConnectSockets,
     fetchUnloadedAtom: fetchUnloadedAtom,
 
     fetchMetaAtoms: INJ_DEFAULT,
@@ -170,7 +170,6 @@ const actionHierarchy = {
     selectTab: INJ_DEFAULT,
   },
   personas: {
-    create: createPersona,
     review: reviewPersona,
     connect: connectPersona,
     disconnect: disconnectPersona,
@@ -216,12 +215,6 @@ const actionHierarchy = {
     edit: {
       success: messages.successfulEdit,
       //TODO failure: messages.failedEdit
-    },
-    open: {
-      successRemote: INJ_DEFAULT, //2nd successResponse
-      successOwn: INJ_DEFAULT, //1st successResponse
-      failure: INJ_DEFAULT,
-      //TODO failure: messages.failedOpen
     },
     close: {
       //TODO: NAME SEEMS GENERIC EVEN THOUGH IT IS ONLY USED FOR CLOSING CONNECITONS; REFACTOR THIS SOMEDAY
@@ -274,27 +267,6 @@ const actionHierarchy = {
     connectMessageSent: INJ_DEFAULT,
     processAtomHintMessage: messages.processAtomHintMessage,
     processSocketHintMessage: messages.processSocketHintMessage,
-    openMessageReceived: INJ_DEFAULT,
-    openMessageSent: INJ_DEFAULT,
-    processOpenMessage: messages.processOpenMessage,
-
-    // register a fully prepared action object to be dispatched
-    // after a specific message (identified by URI)  has been processed
-    // (when the respective success message is processed)
-    dispatchActionOn: {
-      // registers the action (in action.actionToDispatch)
-      registerSuccessOwn: INJ_DEFAULT,
-      registerFailureOwn: INJ_DEFAULT,
-      registerSuccessRemote: INJ_DEFAULT,
-      registerFailureRemote: INJ_DEFAULT,
-      // the action creator dispatches the registered actions
-      successOwn: messages.dispatchActionOnSuccessOwn,
-      successRemote: messages.dispatchActionOnSuccessRemote,
-      // failure actions clear the list of registered success actions
-      // and vice versa
-      failureOwn: messages.dispatchActionOnSuccessOwn,
-      failureRemote: messages.dispatchActionOnSuccessOwn,
-    },
 
     waitingForAnswer: INJ_DEFAULT,
   },

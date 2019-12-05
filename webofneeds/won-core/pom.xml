@@ -10,10 +10,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>at.researchstudio.sat</groupId>
-		<artifactId>webofneeds</artifactId>
-		<version>0.7-SNAPSHOT</version>
-	</parent>
+<artifactId>won-parent-pom</artifactId>
+<relativePath>../won-parent-pom</relativePath>
+<groupId>at.researchstudio.sat</groupId>
+<version>0.7-SNAPSHOT</version>
+</parent>
 	<artifactId>won-core</artifactId>
 	<version>0.7-SNAPSHOT</version>
 	<name>Core</name>
@@ -28,6 +29,12 @@
 	<dependencies>
 		<!-- Warning! Only to be used in connection with the <dependencyManagement> 
             section in the parent pom! -->
+
+			<dependency>
+				<groupId>at.researchstudio.sat</groupId>
+				<artifactId>won-vocab</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 
 			<!-- TEST build with openjdk12  -->
 			<dependency>

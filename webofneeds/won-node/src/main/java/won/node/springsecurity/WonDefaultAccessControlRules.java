@@ -1,17 +1,18 @@
 package won.node.springsecurity;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import won.cryptography.webid.AccessControlRules;
-import won.node.service.impl.URIService;
-import won.protocol.repository.AtomMessageContainerRepository;
-import won.protocol.repository.ConnectionMessageContainerRepository;
-import won.protocol.repository.MessageEventRepository;
-
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import won.cryptography.webid.AccessControlRules;
+import won.node.service.nodeconfig.URIService;
+import won.protocol.repository.AtomMessageContainerRepository;
+import won.protocol.repository.ConnectionMessageContainerRepository;
+import won.protocol.repository.MessageEventRepository;
 
 /**
  * User: ypanchenko Date: 28.07.2015
@@ -46,7 +47,8 @@ public class WonDefaultAccessControlRules implements AccessControlRules {
                 logger.debug("checking access for event {} with webID {} ({} of {})",
                                 new Object[] { resourceUri, firstWebId, 1, requesterWebIDs.size() });
             }
-            return messageEventRepository.isReadPermittedForWebID(resourceUri, webId);
+            URI messageUri = uriService.toGenericMessageURI(resourceUri);
+            return messageEventRepository.isReadPermittedForWebID(messageUri, webId);
         } else if (uriService.isConnectionEventsURI(resourceUri)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("checking access for connectionEvent{} with webID {} ({} of {})",

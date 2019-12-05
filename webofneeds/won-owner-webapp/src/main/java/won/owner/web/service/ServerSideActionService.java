@@ -18,16 +18,15 @@ import won.owner.pojo.SocketToConnect;
 import won.owner.service.impl.OwnerApplicationService;
 import won.owner.web.service.serversideaction.EventTriggeredAction;
 import won.owner.web.service.serversideaction.EventTriggeredActionContainer;
+import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.WonMessageProcessor;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.AuthenticationThreadLocal;
 import won.protocol.util.linkeddata.LinkedDataSource;
-import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 @Component
 public class ServerSideActionService implements WonMessageProcessor {
@@ -63,8 +62,7 @@ public class ServerSideActionService implements WonMessageProcessor {
             @Override
             public Collection<EventTriggeredAction<WonMessage>> apply(Optional<WonMessage> msg) {
                 // process success responses for create
-                if (msg.isPresent() && atomCounter.get() < 2 && isResponseToCreateOfSockets(msg.get(), sockets)
-                                && isSuccessResponse(msg.get())) {
+                if (msg.isPresent() && atomCounter.get() < 2 && isResponseToCreateOfSockets(msg.get(), sockets)) {
                     // we're processing a response event for the creation of one of our atoms.
                     atomCounter.incrementAndGet();
                 }
@@ -84,7 +82,7 @@ public class ServerSideActionService implements WonMessageProcessor {
                         // we have sent the connect, check if we're processing the connect on the
                         // receiving end. If so, send an open.
                         if (isConnectFromSocketForSocket(msg.get(), fromSocket, toSocket)) {
-                            sendOpen(msg.get(), authentication);
+                            reactWithConnect(msg.get(), authentication);
                             // that's it - don't register any more actions
                         }
                     }
@@ -106,53 +104,54 @@ public class ServerSideActionService implements WonMessageProcessor {
                         String.format("Connect %s and %s", fromSocket, toSocket), action));
     }
 
-    private boolean isSuccessResponse(WonMessage msg) {
-        return msg.getMessageType() == WonMessageType.SUCCESS_RESPONSE;
-    }
-
     private boolean isResponseToCreateOfSockets(WonMessage msg, List<SocketToConnect> sockets) {
         return sockets.stream().anyMatch(socket -> socket.isPending() && isResponseToCreateOfSocket(msg, socket));
     }
 
     private boolean isResponseToCreateOfSocket(WonMessage msg, SocketToConnect socket) {
-        return msg.getIsResponseToMessageType() == WonMessageType.CREATE_ATOM
-                        && msg.getEnvelopeType() == WonMessageDirection.FROM_SYSTEM
-                        && socket.getSocket().startsWith(msg.getRecipientAtomURI().toString() + "#");
+        if (!msg.isMessageWithResponse()) {
+            return false;
+        }
+        WonMessage response = msg.getResponse().get();
+        return response.getRespondingToMessageType() == WonMessageType.CREATE_ATOM
+                        && response.getEnvelopeType() == WonMessageDirection.FROM_SYSTEM
+                        && socket.getSocket().startsWith(msg.getAtomURI() + "#");
     }
 
     private boolean isConnectFromSocketForSocket(WonMessage msg, URI sender, URI receiver) {
+        if (!msg.isMessageWithBothResponses()) {
+            // we expect a message with responses from both nodes
+            return false;
+        }
         return msg.getMessageType() == WonMessageType.CONNECT
-                        && msg.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL
                         && msg.getSenderSocketURI() != null && sender.equals(msg.getSenderSocketURI())
                         && msg.getRecipientSocketURI() != null && receiver.equals(msg.getRecipientSocketURI());
     }
 
     private void sendConnect(URI fromSocket, URI toSocket, Authentication authentication) {
-        URI fromAtomURI = URI.create(fromSocket.toString().replaceFirst("#.+$", ""));
-        URI toAtomURI = URI.create(toSocket.toString().replaceFirst("#.+$", ""));
-        URI fromWonNodeURI = WonLinkedDataUtils.getWonNodeURIForAtomOrConnectionURI(fromAtomURI, linkedDataSource);
-        URI toWonNodeURI = WonLinkedDataUtils.getWonNodeURIForAtomOrConnectionURI(toAtomURI, linkedDataSource);
-        URI messageURI = wonNodeInformationService.generateEventURI(fromWonNodeURI);
-        WonMessage msgToSend = WonMessageBuilder.setMessagePropertiesForConnect(messageURI, Optional.of(fromSocket),
-                        fromAtomURI, fromWonNodeURI, Optional.of(toSocket), toAtomURI, toWonNodeURI,
-                        "Connect message automatically sent by a server-side action").build();
+        WonMessage msgToSend = WonMessageBuilder
+                        .connect()
+                        .sockets().sender(fromSocket).recipient(toSocket)
+                        .content().text("Connect message automatically sent by a server-side action")
+                        .build();
         try {
             AuthenticationThreadLocal.setAuthentication(authentication);
-            ownerApplicationService.sendWonMessage(msgToSend);
+            ownerApplicationService.prepareAndSendMessage(msgToSend);
         } finally {
             // be sure to remove the principal from the threadlocal
             AuthenticationThreadLocal.remove();
         }
     }
 
-    private void sendOpen(WonMessage connectMessageToReactTo, Authentication authentication) {
-        URI fromWonNodeURI = connectMessageToReactTo.getRecipientNodeURI();
-        URI messageURI = wonNodeInformationService.generateEventURI(fromWonNodeURI);
-        WonMessage msgToSend = WonMessageBuilder.setMessagePropertiesForOpen(messageURI, connectMessageToReactTo,
-                        "Open message automatically sent by a server-side action").build();
+    private void reactWithConnect(WonMessage connectMessageToReactTo, Authentication authentication) {
+        WonMessage msgToSend = WonMessageBuilder
+                        .connect()
+                        .sockets().reactingTo(connectMessageToReactTo)
+                        .content().text("Open message automatically sent by a server-side action")
+                        .build();
         try {
             AuthenticationThreadLocal.setAuthentication(authentication);
-            ownerApplicationService.sendWonMessage(msgToSend);
+            ownerApplicationService.prepareAndSendMessage(msgToSend);
         } finally {
             // be sure to remove the principal from the threadlocal
             AuthenticationThreadLocal.remove();

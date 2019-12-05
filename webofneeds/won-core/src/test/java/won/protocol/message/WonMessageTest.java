@@ -1,7 +1,12 @@
 package won.protocol.message;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
+import static org.junit.Assert.*;
+
+import java.io.InputStream;
+import java.net.URI;
+import java.util.Iterator;
+import java.util.Set;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Resource;
@@ -13,17 +18,15 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonMessageUriHelper;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
-
-import java.io.InputStream;
-import java.net.URI;
-import java.util.Iterator;
-import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
 
 public class WonMessageTest {
     private InputStream getResourceAsStream(String name) {
@@ -37,30 +40,10 @@ public class WonMessageTest {
     }
 
     @Test
-    public void testForwardedMessage1() {
-        Dataset input = DatasetFactory.createGeneral();
-        RDFDataMgr.read(input, getResourceAsStream("wonmessage/forward/forwarded-msg-1.trig"), Lang.TRIG);
-        WonMessage msg = new WonMessage(input);
-        Assert.assertEquals(URI.create("https://satvm05.researchstudio.at/won/resource/event/hsvug43m3rvz9qei25zh"),
-                        msg.getMessageURI());
-        Assert.assertEquals(URI.create("https://satvm05.researchstudio.at/won/resource/event/pcunhsv1urpd2q3bfpan"),
-                        msg.getCorrespondingRemoteMessageURI());
-        Assert.assertEquals(
-                        URI.create("https://satvm05.researchstudio.at/won/resource/connection/zy478j5k7roa38f2ao9l"),
-                        msg.getSenderURI());
-        Assert.assertEquals(
-                        URI.create("https://satvm05.researchstudio.at/won/resource/connection/nz3dg71sop2v5f82j3lm"),
-                        msg.getRecipientURI());
-        Assert.assertEquals(URI.create("https://satvm05.researchstudio.at/won/resource/event/e5syo59w9t3if0y428r8"),
-                        msg.getForwardedMessageURI());
-        Assert.assertEquals(WonMessageDirection.FROM_EXTERNAL, msg.getEnvelopeType());
-    }
-
-    @Test
     public void testGetMessageContentDataset() {
         Dataset input = DatasetFactory.createGeneral();
         RDFDataMgr.read(input, getResourceAsStream("wonmessage/extract_content/create_message.trig"), Lang.TRIG);
-        WonMessage msg = new WonMessage(input);
+        WonMessage msg = WonMessage.of(input);
         Dataset content = msg.getMessageContent();
         int count = 0;
         for (Iterator<String> it = content.listNames(); it.hasNext(); it.next()) {
@@ -89,5 +72,53 @@ public class WonMessageTest {
         Assert.assertTrue(content.containsNamedModel("https://node.matchat.org/won/resource/atom/so20ub00h1de#atom"));
         Assert.assertTrue(content.getNamedModel("https://node.matchat.org/won/resource/atom/so20ub00h1de#atom")
                         .containsResource(new ResourceImpl("https://node.matchat.org/won/resource/atom/so20ub00h1de")));
+    }
+
+    @Test
+    public void test_message_and_response_in_same_dataset() {
+        WonMessage msg = WonMessageBuilder.connectionMessage()
+                        .sockets()
+                        .sender(URI.create("uri:/localAtom#socket"))
+                        .recipient(URI.create("uri:/targetAtom#socket"))
+                        .content().text("hello").build();
+        WonMessage response = WonMessageBuilder
+                        .response()
+                        .fromConnection(URI.create("uri:/conn1"))
+                        .respondingToMessageFromOwner(msg)
+                        .success()
+                        .build();
+        Dataset both = msg.getCompleteDataset();
+        RdfUtils.addDatasetToDataset(both, response.getCompleteDataset());
+        WonMessage msgAndResponse = WonMessage.of(both);
+        Assert.assertEquals("messageUri should be that of original message", WonMessageUriHelper.getSelfUri(),
+                        msgAndResponse.getMessageURI());
+    }
+
+    @Test
+    public void test_message_and_two_responses_in_same_dataset() {
+        WonMessage msg = WonMessageBuilder.connectionMessage()
+                        .sockets()
+                        .sender(URI.create("uri:/localAtom#socket"))
+                        .recipient(URI.create("uri:/targetAtom#socket"))
+                        .content().text("hello").build();
+        WonMessage response = WonMessageBuilder
+                        .response()
+                        .fromConnection(URI.create("uri:/conn1"))
+                        .respondingToMessageFromOwner(msg)
+                        .success()
+                        .build();
+        WonMessage response2 = WonMessageBuilder
+                        .response()
+                        .fromConnection(URI.create("uri:/conn2"))
+                        .respondingToMessageFromExternal(msg)
+                        .success()
+                        .build();
+        Dataset both = msg.getCompleteDataset();
+        RdfUtils.addDatasetToDataset(both, response.getCompleteDataset());
+        RdfUtils.addDatasetToDataset(both, response2.getCompleteDataset());
+        WonMessage msgAndResponse = WonMessage.of(both);
+        Assert.assertEquals("messageUri should be that of original message",
+                        WonMessageUriHelper.getSelfUri(),
+                        msgAndResponse.getMessageURI());
     }
 }

@@ -1,73 +1,70 @@
 package won.node.camel.processor.general;
 
-import java.net.URI;
+import static won.node.camel.service.WonCamelHelper.*;
+
 import java.util.Optional;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
-import won.node.protocol.impl.MatcherProtocolMatcherClientImpl;
-import won.node.socket.ConnectionStateChange;
-import won.node.socket.SocketService;
+import won.node.camel.service.WonCamelHelper;
+import won.node.service.nodebehaviour.ConnectionStateChange;
+import won.node.service.nodebehaviour.DataDerivationService;
+import won.node.service.persistence.AtomService;
+import won.node.service.persistence.ConnectionService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Atom;
 import won.protocol.model.Connection;
-import won.protocol.repository.AtomRepository;
-import won.protocol.repository.ConnectionRepository;
 
 /**
  * Compares the connection state found in the header of the 'in' message with
  * the state the connection is in now and triggers the data derivation.
  */
 public class SocketDerivationProcessor implements Processor {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
-    ConnectionRepository connectionRepository;
+    DataDerivationService dataDerivationService;
     @Autowired
-    AtomRepository atomRepository;
+    ConnectionService connectionService;
     @Autowired
-    SocketService derivationService;
+    AtomService atomService;
 
     public SocketDerivationProcessor() {
     }
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        Optional<Connection> con = Optional.empty();
+        WonMessage wonMessage = getMessageRequired(exchange);
+        if (!wonMessage.getMessageTypeRequired().isConnectionSpecificMessage()) {
+            return;
+        }
+        WonMessageDirection direction = getDirectionRequired(exchange);
         ConnectionStateChangeBuilder stateChangeBuilder = (ConnectionStateChangeBuilder) exchange.getIn()
                         .getHeader(WonCamelConstants.CONNECTION_STATE_CHANGE_BUILDER_HEADER);
         if (stateChangeBuilder == null) {
             throw new IllegalStateException("expecting to find a ConnectionStateBuilder in 'in' header '"
                             + WonCamelConstants.CONNECTION_STATE_CHANGE_BUILDER_HEADER + "'");
         }
-        // first, try to find the connection uri in the header:
-        URI conUri = (URI) exchange.getIn().getHeader(WonCamelConstants.CONNECTION_URI_HEADER);
-        if (conUri == null) {
-            // not found. get it from the message and put it in the header
-            WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-            conUri = wonMessage.getEnvelopeType() == WonMessageDirection.FROM_EXTERNAL ? wonMessage.getRecipientURI()
-                            : wonMessage.getSenderURI();
-        }
-        if (conUri != null) {
-            // found a connection. Put its URI in the header and load it
-            con = Optional.of(connectionRepository.findOneByConnectionURI(conUri));
-            stateChangeBuilder.newState(con.get().getState());
-        } else {
-            // found no connection. don't modify the builder
-        }
+        // first, try to find the connection
+        Optional<Connection> con = WonCamelHelper.getConnection(exchange, connectionService);
         // only if there is enough data to make a connectionStateChange object, make it
         // and pass it to the data
         // derivation service.
-        if (stateChangeBuilder.canBuild()) {
-            ConnectionStateChange connectionStateChange = stateChangeBuilder.build();
-            if (!con.isPresent()) {
-                con = Optional.of(connectionRepository.findOneByConnectionURI(conUri));
+        if (con.isPresent()) {
+            stateChangeBuilder.newState(con.get().getState());
+            if (stateChangeBuilder.canBuild()) {
+                ConnectionStateChange connectionStateChange = stateChangeBuilder.build();
+                if (!con.isPresent()) {
+                    logger.warn("Cannot derive data: no connection found");
+                }
+                Atom atom = atomService.getAtomRequired(con.get().getAtomURI());
+                dataDerivationService.deriveDataForStateChange(connectionStateChange, atom, con.get());
             }
-            Atom atom = atomRepository.findOneByAtomURI(con.get().getAtomURI());
-            derivationService.deriveDataForStateChange(connectionStateChange, atom, con.get());
         }
     }
 }

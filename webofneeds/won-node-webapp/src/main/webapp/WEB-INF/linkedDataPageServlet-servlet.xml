@@ -60,8 +60,6 @@
         <property name="resourceURIPrefix" value="${uri.path.resource}" />
         <property name="dataURIPrefix" value="${uri.path.data}" />
         <property name="pageURIPrefix" value="${uri.path.page}" />
-        <property name="connectionResourceURIPrefix" value="${uri.prefix.connection}" />
-        <property name="atomResourceURIPrefix" value="${uri.prefix.atom}" />
         <property name="nodeResourceURIPrefix" value="${uri.prefix.node}"/>
         <property name="uriService" ref="uriService" />
         <property name="registrationServer" ref="registrationServer" />

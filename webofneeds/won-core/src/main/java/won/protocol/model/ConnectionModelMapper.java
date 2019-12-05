@@ -26,6 +26,8 @@ public class ConnectionModelMapper implements ModelMapper<Connection> {
         Resource connectionMember = model.createResource(connection.getConnectionURI().toString())
                         .addProperty(WON.connectionState, WON.toResource(connection.getState()))
                         .addProperty(WON.sourceAtom, model.createResource(connection.getAtomURI().toString()));
+        connection.getPreviousState()
+                        .ifPresent(s -> connectionMember.addProperty(WON.previousConnectionState, WON.toResource(s)));
         connectionMember.addProperty(RDF.type, WON.Connection);
         if (connection.getTargetConnectionURI() != null) {
             Resource targetConnection = model.createResource(connection.getTargetConnectionURI().toString());
@@ -61,6 +63,12 @@ public class ConnectionModelMapper implements ModelMapper<Connection> {
         Resource connectionRes = model.getResource(connectionURI.toString());
         Connection connection = new Connection();
         connection.setConnectionURI(URI.create(connectionRes.getURI()));
+        Statement prevStateRes = connectionRes.getProperty(WON.previousConnectionState);
+        URI previousconnectionStateURI = null;
+        if (prevStateRes != null) {
+            previousconnectionStateURI = URI.create(prevStateRes.getObject().asResource().getURI());
+            connection.setPreviousState(ConnectionState.parseString(previousconnectionStateURI.getFragment()));
+        }
         URI connectionStateURI = URI.create(connectionRes.getProperty(WON.connectionState).getResource().getURI());
         connection.setState(ConnectionState.parseString(connectionStateURI.getFragment()));
         Statement targetConnectionStmt = connectionRes.getProperty(WON.targetConnection);

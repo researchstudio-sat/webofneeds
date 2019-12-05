@@ -1,19 +1,21 @@
 package won.bot.integration;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Date;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.TaskScheduler;
+
 import won.bot.exception.NoBotResponsibleException;
 import won.bot.framework.manager.BotManager;
 import won.owner.protocol.message.OwnerCallback;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.model.Connection;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.Date;
 
 /**
  * OwnerProtocolOwnerServiceCallback that dispatches the calls to the bots.
@@ -78,7 +80,7 @@ public class BotOwnerCallback implements OwnerCallback {
     @Override
     public void onConnectFromOtherAtom(final Connection con, final WonMessage wonMessage) {
         taskScheduler.schedule(() -> {
-            if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
+            if (true) { // TODO: figure out how to detect echoes
                 try {
                     logger.debug("onConnectFromOtherAtom called for connection {}, message {}",
                                     con.getConnectionURI(), wonMessage.getMessageURI());
@@ -95,26 +97,9 @@ public class BotOwnerCallback implements OwnerCallback {
     }
 
     @Override
-    public void onOpenFromOtherAtom(final Connection con, final WonMessage wonMessage) {
-        taskScheduler.schedule(() -> {
-            if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
-                try {
-                    botManager.getBotResponsibleForAtomUri(con.getAtomURI()).onOpenFromOtherAtom(con, wonMessage);
-                } catch (NoBotResponsibleException e) {
-                    logger.debug("error while handling onOpenFromOtherAtom() message: {}", e.getMessage());
-                } catch (Exception e) {
-                    logger.warn("error while handling onOpenFromOtherAtom()", e);
-                }
-            } else {
-                logger.debug("Received echo for onOpenFromOtherAtom");
-            }
-        }, new Date());
-    }
-
-    @Override
     public void onMessageFromOtherAtom(final Connection con, final WonMessage wonMessage) {
         taskScheduler.schedule(() -> {
-            if (wonMessage.getEnvelopeType() != WonMessageDirection.FROM_OWNER) {
+            if (true) { // TODO: figure out how to detect echoes
                 try {
                     logger.debug("onMessageFromOtherAtom for Connection {}, message {}", con.getConnectionURI(),
                                     wonMessage.getMessageURI());
@@ -131,12 +116,14 @@ public class BotOwnerCallback implements OwnerCallback {
     }
 
     @Override
-    public void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage) {
+    public void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage,
+                    Optional<Connection> con) {
         taskScheduler.schedule(() -> {
             try {
                 logger.debug("onSuccessResponse for message {} ", successfulMessageUri);
                 URI atomUri = wonMessage.getRecipientAtomURI();
-                botManager.getBotResponsibleForAtomUri(atomUri).onSuccessResponse(successfulMessageUri, wonMessage);
+                botManager.getBotResponsibleForAtomUri(atomUri).onSuccessResponse(successfulMessageUri, wonMessage,
+                                con);
             } catch (NoBotResponsibleException e) {
                 logger.debug("error while handling onSuccessResponse() message: {}", e.getMessage());
             } catch (Exception e) {
@@ -146,12 +133,12 @@ public class BotOwnerCallback implements OwnerCallback {
     }
 
     @Override
-    public void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage) {
+    public void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage, Optional<Connection> con) {
         taskScheduler.schedule(() -> {
             try {
                 logger.debug("onFailureResponse for message {} ", failedMessageUri);
                 URI atomUri = wonMessage.getRecipientAtomURI();
-                botManager.getBotResponsibleForAtomUri(atomUri).onFailureResponse(failedMessageUri, wonMessage);
+                botManager.getBotResponsibleForAtomUri(atomUri).onFailureResponse(failedMessageUri, wonMessage, con);
             } catch (NoBotResponsibleException e) {
                 logger.debug("error while handling onFailureResponse() message: {}", e.getMessage());
             } catch (Exception e) {

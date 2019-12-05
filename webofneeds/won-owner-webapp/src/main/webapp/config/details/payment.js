@@ -39,7 +39,7 @@ export const paypalPayment = {
     // TODO: error handling/sanity checking
     const idString =
       contentUri && identifier
-        ? contentUri + "/" + identifier + "/" + generateIdString(10)
+        ? contentUri + "#" + identifier + "-" + generateIdString(10)
         : undefined;
     return {
       "s:invoice": {

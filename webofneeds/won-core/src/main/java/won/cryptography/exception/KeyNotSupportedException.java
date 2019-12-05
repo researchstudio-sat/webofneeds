@@ -10,4 +10,8 @@ public class KeyNotSupportedException extends Exception {
     public KeyNotSupportedException(String msg) {
         super(msg);
     }
+
+    public KeyNotSupportedException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

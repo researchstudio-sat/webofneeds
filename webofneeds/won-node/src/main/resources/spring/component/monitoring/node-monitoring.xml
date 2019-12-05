@@ -38,8 +38,8 @@
                      pointcut="execution(* won.node.messaging.OwnerProtocolAtomServiceImplJMSBased.*(..))"/-->
         <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.protocol.impl.AtomProtocolAtomServiceImpl.*(..))"/>
         <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.protocol.impl.OwnerProtocolAtomServiceImpl.*(..))"/>
-        <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.service.impl.DataAccessServiceImpl.*(..))"/>
-        <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.service.impl.LinkedDataServiceImpl.*(..))"/>
+        <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.service.persistence.DataAccessService.*(..))"/>
+        <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.service.linkeddata.generate.LinkedDataServiceImpl.*(..))"/>
         <aop:advisor advice-ref="monitoringInterceptor"
                      pointcut="execution(* won.protocol.repository.rdfstorage.RDFStorageService.*(..))"/>
     </aop:config>

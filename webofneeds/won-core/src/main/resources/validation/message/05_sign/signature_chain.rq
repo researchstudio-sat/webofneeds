@@ -10,7 +10,7 @@ prefix rdfg:   <http://www.w3.org/2004/03/trix/rdfg-1/>
 prefix local: <http://localhost:8080/won/resource/>
 prefix won:   <https://w3id.org/won/core#>
 prefix msg:   <https://w3id.org/won/message#>
-prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
+
 prefix ldp:   <http://www.w3.org/ns/ldp#>
 
 # signature chain must be parallel to the content/envelope chain (assumes content/envelope chain has been validated
@@ -25,7 +25,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
     ?contentChainSize
     ?parallelContentSigChainSize
 
-    (if((bound(?type) && (?type = msg:AtomHintMessage || ?type = msg:SocketHintMessage )) || ! (?envChainSize != ?parallelEnvSigChainSize || ?contentChainSize != ?parallelContentSigChainSize), "OK",
+    (if((bound(?type) && (?type = msg:AtomHintMessage || ?type = msg:SocketHintMessage )) || ! (?envChainSize != ?parallelEnvSigChainSize || ?contentGraphs != ?signedContentGraphs), "OK",
     "FAIL")
     AS ?check)
 
@@ -37,7 +37,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
       { 
         optional {
           graph ?g{
-            ?g rdfg:subGraphOf ?event.
+            ?event msg:envelope ?g.
                  ?event msg:messageType ?type.
                ?event a msg:FromExternal
           }
@@ -69,7 +69,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
       }
     }
 
-    { SELECT (count(distinct ?g) as ?contentChainSize)
+    { SELECT (count(distinct ?g) as ?contentGraphs)
       WHERE
       {
         GRAPH ?envelope
@@ -79,15 +79,26 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
       }
     }
 
-    { SELECT (count(distinct ?g) as ?parallelContentSigChainSize)
+    { SELECT (count(distinct ?g) as ?signedContentGraphs)
       WHERE
       {
-        GRAPH ?envelope
         {
-          ?event msg:content ?g .
-          ?envelope msg:containsSignature ?ref .
-          ?ref msg:signedGraph ?g .
-        } .
+	        GRAPH ?envelope
+	        {
+	          ?event msg:content ?g .
+	          ?envelope msg:containsSignature ?ref .
+	          ?ref msg:signedGraph ?g .
+	        }
+	    } UNION {
+	    	GRAPH ?signature
+	    	{
+				?signature msg:signedGraph ?envelope, ?g	    	
+	    	}
+	        GRAPH ?envelope
+	        {
+	          ?event msg:content ?g .
+	        }
+	    }  
       }
     }
 

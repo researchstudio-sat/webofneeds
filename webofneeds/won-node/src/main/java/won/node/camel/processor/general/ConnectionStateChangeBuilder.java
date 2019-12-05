@@ -3,7 +3,7 @@ package won.node.camel.processor.general;
 import java.util.Objects;
 import java.util.Optional;
 
-import won.node.socket.ConnectionStateChange;
+import won.node.service.nodebehaviour.ConnectionStateChange;
 import won.protocol.model.ConnectionState;
 
 /**
@@ -53,5 +53,11 @@ public class ConnectionStateChangeBuilder {
         } else {
             return new ConnectionStateChange(newState.get());
         }
+    }
+
+    @Override
+    public String toString() {
+        return "ConnectionStateChangeBuilder [oldState=" + oldState.map(ConnectionState::toString).orElse("(none)")
+                        + ", newState=" + newState.map(ConnectionState::toString).orElse("(none") + "]";
     }
 }

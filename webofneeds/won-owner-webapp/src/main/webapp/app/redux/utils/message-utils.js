@@ -303,27 +303,3 @@ export function isChangeNotificationMessage(msg) {
 export function isParsable(msg) {
   return get(msg, "isParsable");
 }
-
-/**
- * Returns the own-messageUri for the given messageUri, this is due to the fact that referenced messages are
- * referenced by a messageUri that is not necessarily the owned messageUri, since our state maps are based
- * on the owned messageUri we need to determine the correct/own messageUri to ensure correct state updates
- * @param messages
- * @param messageUri
- * @returns {*}
- */
-export function getOwnMessageUri(messages, messageUri) {
-  if (messageUri) {
-    if (messages.find(msg => msg.get("uri") === messageUri)) {
-      return messageUri;
-    } else {
-      const messagesOfRemoteUri = messages.find(
-        msg => msg.get("remoteUri") === messageUri
-      );
-      if (messagesOfRemoteUri) {
-        return messagesOfRemoteUri.get("uri");
-      }
-    }
-  }
-  return undefined;
-}

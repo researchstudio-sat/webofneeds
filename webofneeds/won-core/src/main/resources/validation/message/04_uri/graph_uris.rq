@@ -10,84 +10,58 @@ prefix rdfg:   <http://www.w3.org/2004/03/trix/rdfg-1/>
 prefix local: <http://localhost:8080/won/resource/>
 prefix won:   <https://w3id.org/won/core#>
 prefix msg:   <https://w3id.org/won/message#>
-prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
+
 prefix ldp:   <http://www.w3.org/ns/ldp#>
 
-# Any graph name must be a hash URI based on the applicable message URI
-# (located at the sender’s and the recipient’s publishing services, respectively);
-# envelope graph uris should be the subject of the envelope
-# signature graph uri should be the subject of the signature
 
-#ASK
-#{
   SELECT
 
-    ?numGraphs
-    ?numContent
-    ?numEnv
-    ?numEnvelopeSig
+	?requiredGraphNames
+    (if(?requiredAndIllegalGraphs = if (bound(?type) && (?type = msg:AtomHintMessage || ?type = msg:SocketHintMessage ), 1,2) , "OK", "FAIL") AS ?check)
 
-
-    (if(?numGraphs != (?numContent + ?numEnv + ?numEnvelopeSig), "FAIL", "OK")
-    AS ?check)
-
-  WHERE
-  {
-
-    # count graph names
-    { SELECT (count(DISTINCT ?g) as ?numGraphs)
+  WHERE 
+  {     
+   {SELECT ?type
       WHERE
-      {
-        GRAPH ?g
-        {
-          ?a ?b ?c .
-        } .
+      { 
+        optional {
+          graph ?g{
+            ?event msg:envelope ?g.
+                 ?event msg:messageType ?type.
+               ?event a msg:FromExternal
+          }
+        }
       }
     }
-
-    # correct content graph names that have correct uris
-    { SELECT (count(?g) as ?numContent)
-      WHERE
-      {
-        GRAPH ?envelope
+  
+    {
+	  SELECT ( COUNT(DISTINCT(?g)) as ?requiredAndIllegalGraphs )
+	  WHERE
+	  {
         {
-          ?event msg:content ?g .
-          FILTER(STRSTARTS(STR(?g), CONCAT(STR(?event),"#")) && STRLEN(STR(?event)) + 1 < STRLEN(STR(?g)))
-        } .
-      }
-    }
-
-    # correct envelope graph names that have correct uris
-    { SELECT (count(?g) as ?numEnv)
-      WHERE
-      {
-        GRAPH ?g
-        {
-          ?g rdf:type msg:EnvelopeGraph .
-          ?g rdfg:subGraphOf ?event .
-          FILTER(STRSTARTS(STR(?g), CONCAT(STR(?event),"#")) && STRLEN(STR(?event)) + 1 < STRLEN(STR(?g)))
-        } .
-      }
-    }
-
-
-    # correct signature graphs of envelope graphs that have correct uris
-    { SELECT (count(?g) as ?numEnvelopeSig)
-      WHERE
-      {
-        GRAPH ?g
-        {
-          ?g rdf:type signature:Signature .
-          ?g msg:signedGraph ?signed .
-        } .
-        GRAPH ?signed
-        {
-          ?signed rdf:type msg:EnvelopeGraph .
-          ?signed rdfg:subGraphOf ?event .
-        } .
-        FILTER(STRSTARTS(STR(?g), CONCAT(STR(?event),"#")) && STRLEN(STR(?event)) + 1 < STRLEN(STR(?g)))
-      }
-    }
-
+          SELECT ?message 
+          WHERE
+          {
+              GRAPH ?envelope 
+              {
+                  ?message msg:envelope ?envelope .
+              } 
+              FILTER( REGEX( STR( ?envelope ), ".+#envelope$" ) )
+          }
+      	}
+        
+	  	GRAPH ?g
+	    {
+	      ?a ?b ?c .
+	    } 
+        # idea: select only envelope + signature (required) plus anything that's not a content graph (illegal), then fail if not the required number
+        FILTER(
+        	STR( ?g ) = CONCAT(STR(?message),"#envelope" ) 
+        	|| STR( ?g ) = CONCAT(STR(?message),"#signature" )
+            || ! STRSTARTS( STR( ?g ), CONCAT(STR(?message),"#" ))
+          )
+	  }
+	}
   }
-#}
+  
+  

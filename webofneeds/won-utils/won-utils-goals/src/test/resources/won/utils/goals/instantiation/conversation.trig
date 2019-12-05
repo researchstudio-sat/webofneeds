@@ -28,9 +28,9 @@
                     event:f0750556p5l2jyajdlzz .
     
     <https://localhost:8443/won/resource/event/fr3lnlg396jdzeibtiim#envelope-v6yk-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMBs07yjXeziJ3ihsCAqCVfj8epuYZgx4Bko1v5pjnq5PDtEXvoNXtFYux9hX5bXV6gIxAMRbzpN5w4Bd/0vtYRXIxgtazwUCq021RA9vfxkgw79XOVDfu1vsUPNqtiXXYdwpBg==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMBs07yjXeziJ3ihsCAqCVfj8epuYZgx4Bko1v5pjnq5PDtEXvoNXtFYux9hX5bXV6gIxAMRbzpN5w4Bd/0vtYRXIxgtazwUCq021RA9vfxkgw79XOVDfu1vsUPNqtiXXYdwpBg==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "NVRYxZiXRTid4FtjuSQHL3b6U7NSlRZ1fLZB9XnOh3CHrhUd37XcD4hoOg4ieT/Xmwzi0mF8a493TahQn0e3l2P8FeBRXEVPS3u/idVXxNJK/3ulV9tn4q8i2IuLju7D6snx/k+dfnQ7oVbSvQ4WxPoWgun7chG5NrJcZ/go3Y4=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/fr3lnlg396jdzeibtiim#envelope-v6yk> .
@@ -69,9 +69,9 @@
             msg:protocolVersion          "1.0" .
     
     <https://localhost:8443/won/resource/event/wqs9omw2hbdznhhw2ezo#envelope-im2q-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQCBLwSAjfw2lMIfLYSlHkCfrZMhb1p6GE6/Dw23w7GAtAWT/xw2OzZTmDUqRsvzmzkCMAubg0DGYAGANdbhcTLgtWMtj+d3Mu8ZxfRePUGZd7e2h4YVqwGM1sckC4u9M1bckQ==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQCBLwSAjfw2lMIfLYSlHkCfrZMhb1p6GE6/Dw23w7GAtAWT/xw2OzZTmDUqRsvzmzkCMAubg0DGYAGANdbhcTLgtWMtj+d3Mu8ZxfRePUGZd7e2h4YVqwGM1sckC4u9M1bckQ==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "QwDZaqkEWG9UpaWBAIM/nkb0uyN/sWSDAlQaZ3JZk2YXFpLMI27UHiidnGVrBNKOrz5XDtz6MD/zqGacgO6eUuxyVrpvjYDyPvv0dNXXXv3/lBOXIpRD6O1Jpqe+hkwNFd7daF6qrs2uhgKNpyEsDFJ+AUwWZecCehuSwwtI6pA=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/wqs9omw2hbdznhhw2ezo#envelope-im2q> .
@@ -79,9 +79,9 @@
 
 <https://localhost:8443/won/resource/event/f0750556p5l2jyajdlzz#envelope-my72-sig> {
     <https://localhost:8443/won/resource/event/f0750556p5l2jyajdlzz#envelope-my72-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQDczRHeEfopvjkrlPqUZ8E3MSQcv9U+TquAK9qV+Qly0plI+t5QSTR36bQOvwO+0qACMClezkO8hL9Mln/XQQ/km7jxU+WwBCpEjXYW1jcjM2yl7L1k2+oqpqwUyImO3kj6Ng==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQDczRHeEfopvjkrlPqUZ8E3MSQcv9U+TquAK9qV+Qly0plI+t5QSTR36bQOvwO+0qACMClezkO8hL9Mln/XQQ/km7jxU+WwBCpEjXYW1jcjM2yl7L1k2+oqpqwUyImO3kj6Ng==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "GEWjA3r0DyFZlM14vC1ouGTg0hMr7dgGobMOxD6pYaecM6S8Awb3rih41O98qIQJpuNZiLKQsmsgYza4VIwQ6KWQsVr458uyj5MWTs1wUe3esDEkFOavPC9zm2PqkdKl19DQwmQYF4vy3A6Dxb3lzDs7MEEuh5qC5JX9QPcc5fM=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/f0750556p5l2jyajdlzz#envelope-my72> .
@@ -102,25 +102,25 @@
                     event:f0750556p5l2jyajdlzz .
     
     <https://localhost:8443/won/resource/event/ntt27zffvjmff36zgufk#envelope-ziil-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQDK1kuQQTzxc0iqYHwZAZFH1q8KOG6Q1vTkFl3aeeJunRLIinRSl1hP82R8DfRdVfwCMQCmU9PnLUWN31X0a32/XhXtVz/fLDy5fEbp5mz1fwYSuhPZrERzGgDXRRnpmDMaBqg=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQDK1kuQQTzxc0iqYHwZAZFH1q8KOG6Q1vTkFl3aeeJunRLIinRSl1hP82R8DfRdVfwCMQCmU9PnLUWN31X0a32/XhXtVz/fLDy5fEbp5mz1fwYSuhPZrERzGgDXRRnpmDMaBqg=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "Wxq3RXCRVNRIAIMj/tIEe+pWvv3/grsm9inVbYjTciX2P0qcFXB+eM1CaKJZqshMNAktO+OD/tYWyYmkTXaM8Bq9ExCelUUm3MpndmGB6RrEkldJ0OmtK7HHlXBIGgdkfY3M/JiU6a0XnGAS9jKpxlWZ9xpM4uLDIK+b4RPh1O4=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/ntt27zffvjmff36zgufk#envelope-ziil> .
     
     <https://localhost:8443/won/resource/event/llc7hdkk9l4yt9easlyu#envelope-yscu-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQD56MTlKBQiOY09XaW1B8ufpjnaKC2iqh6nQGipXg7+qTZsp8Lkj0BYoeMgPTs8aU8CMGh7btU7t1TY7KW0g7rlDAK95z8XmKWyfh11Ozva+ij2ueT7hjVURBplp3JkPTrDMA==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQD56MTlKBQiOY09XaW1B8ufpjnaKC2iqh6nQGipXg7+qTZsp8Lkj0BYoeMgPTs8aU8CMGh7btU7t1TY7KW0g7rlDAK95z8XmKWyfh11Ozva+ij2ueT7hjVURBplp3JkPTrDMA==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "NXEkgPXBGDSAu31Z+simCxfHAtMdtM35jEaQDQ8DV1HIp7KWdWOT+KSQqCSBwI7iwu0eofmJg0F8MQPf36kq6B74Csvr88eIKi7BgcKTj13NHLz4fpi38ozIJFqnKA30uUz+njE3moYgFx3o4xEwt84kj+fsJXG6TYYszoAZ9y8=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/llc7hdkk9l4yt9easlyu#envelope-yscu> .
     
     <https://localhost:8443/won/resource/event/f0750556p5l2jyajdlzz#envelope-xf2s-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQDhpEqXVOllKsEbNR+X9q3scUlJZah2gzU0YgWd/fGkZMc4IwzBFoFBiHm/qbdtTCoCMQDXv5pwrQwk5kCW58voEs5AHuHx4aID55LXreFE521mV73gvzxhWpUOqWQyRu0fPMQ=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQDhpEqXVOllKsEbNR+X9q3scUlJZah2gzU0YgWd/fGkZMc4IwzBFoFBiHm/qbdtTCoCMQDXv5pwrQwk5kCW58voEs5AHuHx4aID55LXreFE521mV73gvzxhWpUOqWQyRu0fPMQ=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "JbXa9I84ItYK/XAqWb6Y9We40oXVDJi9pIMKKbnBHSvNgVYfTHdCTXc7wI5C1wWFRDe0eXeEeSNfzbaLuCY1bcoeIRW1Nd7kjc1V8DDak2YuUGKXmEfmcPXpmPuvUgo6C+nq3QyyfYy+LVV/lj07Q+nYRRdHPUwtWe/Pa0Xavoc=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/f0750556p5l2jyajdlzz#envelope-xf2s> .
@@ -146,9 +146,9 @@
 
 <https://localhost:8443/won/resource/event/ntt27zffvjmff36zgufk#envelope-ziil-sig> {
     <https://localhost:8443/won/resource/event/ntt27zffvjmff36zgufk#envelope-ziil-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQDK1kuQQTzxc0iqYHwZAZFH1q8KOG6Q1vTkFl3aeeJunRLIinRSl1hP82R8DfRdVfwCMQCmU9PnLUWN31X0a32/XhXtVz/fLDy5fEbp5mz1fwYSuhPZrERzGgDXRRnpmDMaBqg=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQDK1kuQQTzxc0iqYHwZAZFH1q8KOG6Q1vTkFl3aeeJunRLIinRSl1hP82R8DfRdVfwCMQCmU9PnLUWN31X0a32/XhXtVz/fLDy5fEbp5mz1fwYSuhPZrERzGgDXRRnpmDMaBqg=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "Wxq3RXCRVNRIAIMj/tIEe+pWvv3/grsm9inVbYjTciX2P0qcFXB+eM1CaKJZqshMNAktO+OD/tYWyYmkTXaM8Bq9ExCelUUm3MpndmGB6RrEkldJ0OmtK7HHlXBIGgdkfY3M/JiU6a0XnGAS9jKpxlWZ9xpM4uLDIK+b4RPh1O4=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/ntt27zffvjmff36zgufk#envelope-ziil> .
@@ -156,9 +156,9 @@
 
 <https://localhost:8443/won/resource/event/llc7hdkk9l4yt9easlyu#envelope-yscu-sig> {
     <https://localhost:8443/won/resource/event/llc7hdkk9l4yt9easlyu#envelope-yscu-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQD56MTlKBQiOY09XaW1B8ufpjnaKC2iqh6nQGipXg7+qTZsp8Lkj0BYoeMgPTs8aU8CMGh7btU7t1TY7KW0g7rlDAK95z8XmKWyfh11Ozva+ij2ueT7hjVURBplp3JkPTrDMA==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQD56MTlKBQiOY09XaW1B8ufpjnaKC2iqh6nQGipXg7+qTZsp8Lkj0BYoeMgPTs8aU8CMGh7btU7t1TY7KW0g7rlDAK95z8XmKWyfh11Ozva+ij2ueT7hjVURBplp3JkPTrDMA==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "NXEkgPXBGDSAu31Z+simCxfHAtMdtM35jEaQDQ8DV1HIp7KWdWOT+KSQqCSBwI7iwu0eofmJg0F8MQPf36kq6B74Csvr88eIKi7BgcKTj13NHLz4fpi38ozIJFqnKA30uUz+njE3moYgFx3o4xEwt84kj+fsJXG6TYYszoAZ9y8=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/llc7hdkk9l4yt9easlyu#envelope-yscu> .
@@ -166,9 +166,9 @@
 
 <https://localhost:8443/won/resource/event/ntt27zffvjmff36zgufk#envelope-ziil> {
     <https://localhost:8443/won/resource/event/llc7hdkk9l4yt9easlyu#envelope-yscu-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQD56MTlKBQiOY09XaW1B8ufpjnaKC2iqh6nQGipXg7+qTZsp8Lkj0BYoeMgPTs8aU8CMGh7btU7t1TY7KW0g7rlDAK95z8XmKWyfh11Ozva+ij2ueT7hjVURBplp3JkPTrDMA==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQD56MTlKBQiOY09XaW1B8ufpjnaKC2iqh6nQGipXg7+qTZsp8Lkj0BYoeMgPTs8aU8CMGh7btU7t1TY7KW0g7rlDAK95z8XmKWyfh11Ozva+ij2ueT7hjVURBplp3JkPTrDMA==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "NXEkgPXBGDSAu31Z+simCxfHAtMdtM35jEaQDQ8DV1HIp7KWdWOT+KSQqCSBwI7iwu0eofmJg0F8MQPf36kq6B74Csvr88eIKi7BgcKTj13NHLz4fpi38ozIJFqnKA30uUz+njE3moYgFx3o4xEwt84kj+fsJXG6TYYszoAZ9y8=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/llc7hdkk9l4yt9easlyu#envelope-yscu> .
@@ -212,17 +212,17 @@
                     event:llc7hdkk9l4yt9easlyu .
     
     <https://localhost:8443/won/resource/event/o4oqcgmgn6fpp6uk4g2a#envelope-0c8c-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMEvY7rfcm4eM2q5aVblgZLGqi0ZfJYkSjYC0eHVi6DfUhw6AM3g4q1tTVLjOtEyZ+QIxALkY8PB34byW/0QRv6NN7rLB09Gx6rf0QuBCmy3fCPfg6JVoH7l+XPQRRkhE8Vn1zw==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMEvY7rfcm4eM2q5aVblgZLGqi0ZfJYkSjYC0eHVi6DfUhw6AM3g4q1tTVLjOtEyZ+QIxALkY8PB34byW/0QRv6NN7rLB09Gx6rf0QuBCmy3fCPfg6JVoH7l+XPQRRkhE8Vn1zw==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AI7pe0QIN9XNSgtBCfmrrLbEx8CmtKwCKZ2u6Yjov53CV7k4WPQjnG1EtcGCOQG8391qBittY8lm4vqfIE6kkY9WdcgQ1lv5WXg9bPn+A6SRSCO0gMF+SpNETghRygC5tJGDVNpHZebmCv78eKc1wjtUBFgm+h7+Xazacc3JJdmf" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/o4oqcgmgn6fpp6uk4g2a#envelope-0c8c> .
     
     <https://localhost:8443/won/resource/event/llc7hdkk9l4yt9easlyu#envelope-5nul-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMET5NQWpjEB34jO+KJGd3uW861je4wa1aWP5bHUpUzgUUwkwups3SDyIuBS/0LDq7AIxAOpxMjaP9rPwU72RMbNGSpPdz5s53ZxrMTm2ZDV4K1BKpdBTiqIZzT6fynJNFWLQSQ==" ;
-            sig:hasVerificationCertificate  atom:8uiuri25l2b84oywmgsy ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMET5NQWpjEB34jO+KJGd3uW861je4wa1aWP5bHUpUzgUUwkwups3SDyIuBS/0LDq7AIxAOpxMjaP9rPwU72RMbNGSpPdz5s53ZxrMTm2ZDV4K1BKpdBTiqIZzT6fynJNFWLQSQ==" ;
+            msg:signer  atom:8uiuri25l2b84oywmgsy ;
             msg:hash                     "JhNt/0oc0LL3MvfxDoOE1ntWRhXQOW+bu6KZVAiffdBmx/Cm0oNa/LW7WVDZzlsiy+9LHAg7HhR8miPjpJS3lGjLTgyqxfjNvq4D7OXIL17ZuGbvv6AzYVpb00fplqQASzdqSFBWUoW5to8QF9jwh80VN9/eQZaJC1IonK7G430=" ;
             msg:publicKeyFingerprint     "QNpwnnPG5NoajDF6BzOaeaCul5lj7Jy6M0StVQf7+20=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/llc7hdkk9l4yt9easlyu#envelope-5nul> .
@@ -236,9 +236,9 @@
 
 <https://localhost:8443/won/resource/event/o4oqcgmgn6fpp6uk4g2a#envelope-0c8c-sig> {
     <https://localhost:8443/won/resource/event/o4oqcgmgn6fpp6uk4g2a#envelope-0c8c-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMEvY7rfcm4eM2q5aVblgZLGqi0ZfJYkSjYC0eHVi6DfUhw6AM3g4q1tTVLjOtEyZ+QIxALkY8PB34byW/0QRv6NN7rLB09Gx6rf0QuBCmy3fCPfg6JVoH7l+XPQRRkhE8Vn1zw==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMEvY7rfcm4eM2q5aVblgZLGqi0ZfJYkSjYC0eHVi6DfUhw6AM3g4q1tTVLjOtEyZ+QIxALkY8PB34byW/0QRv6NN7rLB09Gx6rf0QuBCmy3fCPfg6JVoH7l+XPQRRkhE8Vn1zw==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AI7pe0QIN9XNSgtBCfmrrLbEx8CmtKwCKZ2u6Yjov53CV7k4WPQjnG1EtcGCOQG8391qBittY8lm4vqfIE6kkY9WdcgQ1lv5WXg9bPn+A6SRSCO0gMF+SpNETghRygC5tJGDVNpHZebmCv78eKc1wjtUBFgm+h7+Xazacc3JJdmf" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/o4oqcgmgn6fpp6uk4g2a#envelope-0c8c> .
@@ -270,9 +270,9 @@
                     event:o4oqcgmgn6fpp6uk4g2a .
     
     <https://localhost:8443/won/resource/event/32mnd6j6ozfwr1fty4v3#envelope-2pwu-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQC+jgBk0IrqdSrypUNpt5JDtiZD7CrhR7b3H5y4uQvzmjh9ignHCGuTjonz3m3x/fYCMQDCyrfJJ5Q6t17f5ivhhSh3Vh/ZH6Onpq6ilsvpAoPqh8sUxQewu1UQeCS1GG5GJiY=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQC+jgBk0IrqdSrypUNpt5JDtiZD7CrhR7b3H5y4uQvzmjh9ignHCGuTjonz3m3x/fYCMQDCyrfJJ5Q6t17f5ivhhSh3Vh/ZH6Onpq6ilsvpAoPqh8sUxQewu1UQeCS1GG5GJiY=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "Cb5QWwFztdkIxoo0dqmbZSFO3rTiRfMYs9EJpZopQnawXQUOPBEXbtroLOMg8p7eP4bBII03uhguAqXhBahvBVFtsXb4Em4rhBR71eIAK5UhAoEHVLx6S1CXxImPzceiP4yn+HvzMcCbERkfbySVQ8ZymDo0UZu0v4obvViXnsI=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/32mnd6j6ozfwr1fty4v3#envelope-2pwu> .
@@ -299,9 +299,9 @@
                     event:llc7hdkk9l4yt9easlyu .
     
     <https://localhost:8443/won/resource/event/llc7hdkk9l4yt9easlyu#content-3chm-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQDrwPS044eZBOVllNIWCb3W1RgwF9MLjQbJVNH9Cw85LAsxIaJ+yvSE8Bgs2MZ05MACMQD+5mrjxD+Ehg+axe0IvqDMmGOOU93E0yu6+wcI6JaX1ZHt6mA2KtWUAfg/pD+qiKU=" ;
-            sig:hasVerificationCertificate  atom:8uiuri25l2b84oywmgsy ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQDrwPS044eZBOVllNIWCb3W1RgwF9MLjQbJVNH9Cw85LAsxIaJ+yvSE8Bgs2MZ05MACMQD+5mrjxD+Ehg+axe0IvqDMmGOOU93E0yu6+wcI6JaX1ZHt6mA2KtWUAfg/pD+qiKU=" ;
+            msg:signer  atom:8uiuri25l2b84oywmgsy ;
             msg:hash                     "ALNs2UTDIodwFyAkA57/S4xpXn6pTLvNmZqzm2oMxTdmypt/0/Y4eQ4AdVjOQetMTxvAiQ6J/tIRzEMWFTU0qrCRhGJ3SnpBwcSo4JFjvJO0Pd+/K/Gsx5tb2ypPWcHd8ulAmgewKD1SSNR9E27IJmQ/QYGCNcVi6AkYz436DZOR" ;
             msg:publicKeyFingerprint     "QNpwnnPG5NoajDF6BzOaeaCul5lj7Jy6M0StVQf7+20=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/llc7hdkk9l4yt9easlyu#content-3chm> .
@@ -329,17 +329,17 @@
             msg:protocolVersion       "1.0" .
     
     <https://localhost:8443/won/resource/event/asaf3gqkras06mottmaa#envelope-caih-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQDOpSEfI7SuvGjGkJi4rDApmn2wqdnCbQA3Ww89Rqkjal6gGV2zojPgDVYE2cq202wCMEUd52xb4daS7aHhb+j5h6X9lRW3XQrXWgRaMEvxeT9UkgqD2EABMOG3z6RkjVhz+g==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQDOpSEfI7SuvGjGkJi4rDApmn2wqdnCbQA3Ww89Rqkjal6gGV2zojPgDVYE2cq202wCMEUd52xb4daS7aHhb+j5h6X9lRW3XQrXWgRaMEvxeT9UkgqD2EABMOG3z6RkjVhz+g==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "KuuPsCHAsx4mSuwXw/lb2bNfHVxshPQN/aIjj5wr7mkSEH4HJW3GCzsIU1E2p22Q/9PEcjTiQhvduYRUWkhYRlI0g/RpN2rJ0t3ENjfidRVV10ETDcV4vu3hf4Cc5OPeFeyvyrQ+CziDIczTHETCI/8/NOMPiwigoyffTCmXM3Y=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/asaf3gqkras06mottmaa#envelope-caih> .
     
     <https://localhost:8443/won/resource/event/2178696747724085200#data-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMHgcZsLV4PSrbQR9mT7kG+Acg3Utp2ZxW6GnoIr405jBo8icEMoS6MPbB5mdOesiTQIxAJ02yj+4k/KzVb6fBaRF8Rk+tBnHh0AI0ur3s13MZM4jlfAO9OJWgjE5oQmWy82yIQ==" ;
-            sig:hasVerificationCertificate  atom:6462959329580403000 ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMHgcZsLV4PSrbQR9mT7kG+Acg3Utp2ZxW6GnoIr405jBo8icEMoS6MPbB5mdOesiTQIxAJ02yj+4k/KzVb6fBaRF8Rk+tBnHh0AI0ur3s13MZM4jlfAO9OJWgjE5oQmWy82yIQ==" ;
+            msg:signer  atom:6462959329580403000 ;
             msg:hash                     "TOnZ9rABpT/qMGli6EWeG1p4NivewqMivG8kElN+WrF3pyUcxyYKbIiWSn1ucxpp51rwuVIw5TgPylhwv6RYiFY/QGQ/Ssm+R5cwEcTScU4EZsJYZEKctagOjZMy2Lk4cq9/N/hc4zPB2bNFm3MdlIuVF2RCS3ExxJ8ae29U6CI=" ;
             msg:publicKeyFingerprint     "lpT4VEyi1WSXpfxqojE03HRE6MmjNJXOqDr2eCc1AgI=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/2178696747724085200#data> .
@@ -371,9 +371,9 @@
                     event:asaf3gqkras06mottmaa .
     
     <https://localhost:8443/won/resource/event/jcd130rfjx1sclzzcnj5#envelope-58vv-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQDwCDqH2oE6ouewl7jIy4picKxTM0sjBKSwUkPrB5eokkWyiqJN4UlwEVf08iT31ScCMFlSf/O0lhpIk/wpq36CYO1n1LZW5dBArQj2/CQCkX7uubfMyIt1FaZk/OxmkMV9Mw==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQDwCDqH2oE6ouewl7jIy4picKxTM0sjBKSwUkPrB5eokkWyiqJN4UlwEVf08iT31ScCMFlSf/O0lhpIk/wpq36CYO1n1LZW5dBArQj2/CQCkX7uubfMyIt1FaZk/OxmkMV9Mw==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "Cds8zX8fKJC7RTU7ej5FLgxb4WxCe+NrMLQY+TvoryIQ35zFcmb1RqA26VF6zYk/9XEiZa3v6No4m7VSt8X4bDjQ2insAEujeYhplkOhAUs9w4HbgHRLrKlU29bcW7MJDIhGzXpJ34t4vloD5NxaSCce58yq9wc96HOVo6DeYeU=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/jcd130rfjx1sclzzcnj5#envelope-58vv> .
@@ -399,9 +399,9 @@
                     event:2178696747724085200 .
     
     <https://localhost:8443/won/resource/event/2178696747724085200#content-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQDAWIPuzYvwyBacK2PyrfGjzCTDSlF2k3bytW86iFVv6awytR8PVq3D3XJn9r+uBhICMDz/RhDD9dkUt6UWgGeh4P/uyEg+jQ+D99C9MLCG7V9Lr056EKPXObGXtW412OhThA==" ;
-            sig:hasVerificationCertificate  atom:6462959329580403000 ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQDAWIPuzYvwyBacK2PyrfGjzCTDSlF2k3bytW86iFVv6awytR8PVq3D3XJn9r+uBhICMDz/RhDD9dkUt6UWgGeh4P/uyEg+jQ+D99C9MLCG7V9Lr056EKPXObGXtW412OhThA==" ;
+            msg:signer  atom:6462959329580403000 ;
             msg:hash                     "ALNs2UTDIodwFyAkA57/S4xpXn6pTLvNmZqzm2oMxTdmwE/9jqonbgJrHZIXxxwtFR+NGPLnZ44eay7AnzzEg/Q8t1qfieFBNjvkR9Xiyn4AQjKcxhdTWyQKK76J5jiq2Z0P5+D/N+gvD+BSFYyBUcoqFTlCpJ39kL6r7Idnp1Rz" ;
             msg:publicKeyFingerprint     "lpT4VEyi1WSXpfxqojE03HRE6MmjNJXOqDr2eCc1AgI=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/2178696747724085200#content> .
@@ -415,9 +415,9 @@
 
 <https://localhost:8443/won/resource/event/42aok9j00v5hcn00w618#envelope-es3d-sig> {
     <https://localhost:8443/won/resource/event/42aok9j00v5hcn00w618#envelope-es3d-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMDe6OBLhHndJnrbrFdRZPVHuj+kQogTl0hQIehn1eGM9Nf26DvRcaeU0b+d6uzFxuAIxAPgYNH/LEZhqtmb1XwdXClwsM5WD1BfIjYYN70yqeEU0d4onIRci3MgZ/5sHvJNuoQ==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMDe6OBLhHndJnrbrFdRZPVHuj+kQogTl0hQIehn1eGM9Nf26DvRcaeU0b+d6uzFxuAIxAPgYNH/LEZhqtmb1XwdXClwsM5WD1BfIjYYN70yqeEU0d4onIRci3MgZ/5sHvJNuoQ==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "bwzouujAmtR6L4I6fUKx9ork/6sHhTStTBk+iAEZLJ+Cve1d2jJsLyg2hVAuesv/bh2aj7EGZXydlcAcvBMv5FthbP66eKdoXx5R0v5tia8Zz/x+90GYL5twqqxaKrBGdCaLnudntiqBG9hvxZfgD46ZFCmm4m4TxqCcNUA9DgM=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/42aok9j00v5hcn00w618#envelope-es3d> .
@@ -439,17 +439,17 @@
                     event:42aok9j00v5hcn00w618 .
     
     <https://localhost:8443/won/resource/event/hgqbtjfoa0jxmy3r7bst#envelope-hm1u-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMFmCF+96POlHqI2npCzdVrZYWgPK3xVHSsUTpnS8ejw9jMNfSftlR2JFLrH/vaqsUwIwaiPbjA2dap9dtE8cAo2CN8UUXkmwjcAXDY//CPI6LVBQXdrQnWAiQb3yLCX6j0u8" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMFmCF+96POlHqI2npCzdVrZYWgPK3xVHSsUTpnS8ejw9jMNfSftlR2JFLrH/vaqsUwIwaiPbjA2dap9dtE8cAo2CN8UUXkmwjcAXDY//CPI6LVBQXdrQnWAiQb3yLCX6j0u8" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "O6C9mpbiKUdazL6o8mLe/FWbQVJlgYcokfFrjmJVNaS6lV+74And8TTw/LwthDKsvKHzevzZJ5TSF3SabMtej4SIYNMSy+PP9J8IeXhzQbV7q9yH2/TdvEX+I1CE2OlPltxtTPPENjEW9Kz8hEGQt0+vKlJUE32TneHsy+t2p58=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/hgqbtjfoa0jxmy3r7bst#envelope-hm1u> .
     
     <https://localhost:8443/won/resource/event/42aok9j00v5hcn00w618#envelope-9j4e-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQD4Scwm5BHeaWA4hmRvZcQ5HbIZPJQoOostkMmYbdJNQp8NXWQW4AaKRRfJdwnYO9ECMGnXAQVsBGB7AbrSsVUaElsrqSwkVM4baX3oSxQhxHag9b3bZI5MKJ9APW5YKXF5CQ==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQD4Scwm5BHeaWA4hmRvZcQ5HbIZPJQoOostkMmYbdJNQp8NXWQW4AaKRRfJdwnYO9ECMGnXAQVsBGB7AbrSsVUaElsrqSwkVM4baX3oSxQhxHag9b3bZI5MKJ9APW5YKXF5CQ==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "Nz7zEs7sX3baJhAIKD/fWEaLC2YgPweMtHKnaOPyEygv5iEA0D7XuTeHca0XSls5nnY2QjpQtO3zboVD71XOz2PupoB7qIKb5UET8o8JXX2ul23MlsCP+gHEhNKPZMN+ACLRS0A6lmKmd74WFIp1SgHcnyvK8g+8pMM7zFVlXXU=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/42aok9j00v5hcn00w618#envelope-9j4e> .
@@ -457,9 +457,9 @@
 
 <https://localhost:8443/won/resource/event/hgqbtjfoa0jxmy3r7bst#envelope-hm1u-sig> {
     <https://localhost:8443/won/resource/event/hgqbtjfoa0jxmy3r7bst#envelope-hm1u-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMFmCF+96POlHqI2npCzdVrZYWgPK3xVHSsUTpnS8ejw9jMNfSftlR2JFLrH/vaqsUwIwaiPbjA2dap9dtE8cAo2CN8UUXkmwjcAXDY//CPI6LVBQXdrQnWAiQb3yLCX6j0u8" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMFmCF+96POlHqI2npCzdVrZYWgPK3xVHSsUTpnS8ejw9jMNfSftlR2JFLrH/vaqsUwIwaiPbjA2dap9dtE8cAo2CN8UUXkmwjcAXDY//CPI6LVBQXdrQnWAiQb3yLCX6j0u8" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "O6C9mpbiKUdazL6o8mLe/FWbQVJlgYcokfFrjmJVNaS6lV+74And8TTw/LwthDKsvKHzevzZJ5TSF3SabMtej4SIYNMSy+PP9J8IeXhzQbV7q9yH2/TdvEX+I1CE2OlPltxtTPPENjEW9Kz8hEGQt0+vKlJUE32TneHsy+t2p58=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/hgqbtjfoa0jxmy3r7bst#envelope-hm1u> .
@@ -481,9 +481,9 @@
                     event:42aok9j00v5hcn00w618 .
     
     <https://localhost:8443/won/resource/event/2178696747724085200#envelope-0oug-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMFvZu0HgQzwNGeIb2k91r1uqzO/ETDY+FLP7h5IAypu1kEoB2w0ADKe5IiA1CvB1GwIwcOXWk1d2O1TVgfMKts9EeH6H+UGvZEA2RHjTWqGisjdNCyjyTlFoUQvCQqCXOdub" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMFvZu0HgQzwNGeIb2k91r1uqzO/ETDY+FLP7h5IAypu1kEoB2w0ADKe5IiA1CvB1GwIwcOXWk1d2O1TVgfMKts9EeH6H+UGvZEA2RHjTWqGisjdNCyjyTlFoUQvCQqCXOdub" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "UMd9ZeXJEZdPJWmhp0CtgZ0+kwQdkXqpvyecq4z8v0kQ8JohOD1hZo9oa+Ec7hAs1PpShIe/P7zUG5bKXOVfE7PjnWuXG/SVYn5zoTmipJno0MZC4eYk9mVDVVeNkt9mK9hlBGuhHw92A2pkQ8gr4rfiTFxh/ZVGGmN97bS0We0=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/2178696747724085200#envelope-0oug> .
@@ -504,25 +504,25 @@
                     event:hgqbtjfoa0jxmy3r7bst .
     
     <https://localhost:8443/won/resource/event/1dtx07j2vz545ljaz13j#envelope-ctzj-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQDn/nag1XYnKAINmBWIU8mAY/UZZ8eiFH5L7/T+Y0OWHiVd/iScdChzI72hZmLN82gCMHbhxQVXmAexX87huShfQ49tve3yWvTJt28JaMeJ3tY6YnaYBrkrwF3lf8CG7zLXdg==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQDn/nag1XYnKAINmBWIU8mAY/UZZ8eiFH5L7/T+Y0OWHiVd/iScdChzI72hZmLN82gCMHbhxQVXmAexX87huShfQ49tve3yWvTJt28JaMeJ3tY6YnaYBrkrwF3lf8CG7zLXdg==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AJsBqXf+6RkrRnVbcCiSC4FXuE5JztfjAGYynFVih7wE0eLn/JZl9L6QghX8baCrI4B1D1GiAliKKf1qJgJq8Tf5aanmNf0oXZd+3XnvVgBNeQ3LV31cGQUfcaz7xsvMPBeHBNDbuOSm14+9OBvQ6S9u5j2degdH6ZuQ+yw82GDZ" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/1dtx07j2vz545ljaz13j#envelope-ctzj> .
     
     <https://localhost:8443/won/resource/event/7mdtft0gjbr2m4kw2t13#envelope-97er-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQDBK7tGt46B45Qjtvnx3CGn1s3ZV0ObftWidqSF0cG0T/oe+TH17X/9+v4Bv37W7i4CMAbMBAYzryTSMrOuZ/9ONCywTqJe3JEbYMh70u3yKv1ppjytPW3Z33pQ5vyQ4rEBTw==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQDBK7tGt46B45Qjtvnx3CGn1s3ZV0ObftWidqSF0cG0T/oe+TH17X/9+v4Bv37W7i4CMAbMBAYzryTSMrOuZ/9ONCywTqJe3JEbYMh70u3yKv1ppjytPW3Z33pQ5vyQ4rEBTw==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "JnFXiQSGi4PaVIipNNxsvCFJ5zrNqVy5ck87QJW82mJD+xdl30GUBkkc2jk6cRKT2niCQ4FuSQOQ3yFk70qOwsWroWqn8R4aGfbxRevuEjoUl633+u3Fry11OpruwLFswejjOqH16cUWzdY8zxJfOBY+utIJWPolvjsa+uHapDI=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/7mdtft0gjbr2m4kw2t13#envelope-97er> .
     
     <https://localhost:8443/won/resource/event/hgqbtjfoa0jxmy3r7bst#envelope-6e0v-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQDDnmnRp44u3lzLU5UlWMdKKqU6hZZ9NJYS1QHt6H8pGe11KN6wtzVIU731tNCs8uACMQDhwlrPlWUdkF65Cc/YoEk3ty5vhTEL8s4X28GBs69w9oK6TM861PDFyZVijPRPgPA=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQDDnmnRp44u3lzLU5UlWMdKKqU6hZZ9NJYS1QHt6H8pGe11KN6wtzVIU731tNCs8uACMQDhwlrPlWUdkF65Cc/YoEk3ty5vhTEL8s4X28GBs69w9oK6TM861PDFyZVijPRPgPA=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "HU9IlGV3PaNFE03sCcQL97bSTlU4ORFhe8yhdFf7v5TGTxj0K5MwpB/u/slPS4YE46pcPA/al68etgKl6bqCwidSMLHtmANiKzY6F474TyQ0v60jE2On7mDdXhj08KbeZvywB2mcQCkFqFVi4a//yKKDFZpNeSQLI7V8rjhubY4=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/hgqbtjfoa0jxmy3r7bst#envelope-6e0v> .
@@ -530,9 +530,9 @@
 
 <https://localhost:8443/won/resource/event/obe3udbfjn2i9cfv3ys7#envelope-bnkv-sig> {
     <https://localhost:8443/won/resource/event/obe3udbfjn2i9cfv3ys7#envelope-bnkv-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMHf7WaaqqB6MY7F2KAfUMvTEfqvnrA1B7v/LNAk7hjLSRybUBDMiNQWjB6p6DFgz8wIxAPOD5xwrQys9xYKB7QBHRxelK+3hM3FZJRySaPpC7tcAReeTNlO2ZAI0s/n448N5jQ==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMHf7WaaqqB6MY7F2KAfUMvTEfqvnrA1B7v/LNAk7hjLSRybUBDMiNQWjB6p6DFgz8wIxAPOD5xwrQys9xYKB7QBHRxelK+3hM3FZJRySaPpC7tcAReeTNlO2ZAI0s/n448N5jQ==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "cXfLF873iFhGKAwOA3DnngXh81zwwE0pgalYlCVTcpGZhdSZEhs31EIIEqV9l7rBbPqBgQkHxf8k+k/cmVJ8dAZcjJ2cgsQ+s+zBlKOt6u5YGr4dO7LGYm39Tg5m1ucFIojoVYV28wj5EGn9NndUnzAq2dQIayv28uuOJWbfINg=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/obe3udbfjn2i9cfv3ys7#envelope-bnkv> .
@@ -561,9 +561,9 @@
                     event:obe3udbfjn2i9cfv3ys7 .
     
     <https://localhost:8443/won/resource/event/shbpua34q1oujs0x4r17#envelope-73l0-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQCwWXX5U3aYEtT9essrHCC3bgxNF27OYpwTFKcAkq7ZPf/vZiQHuKPyVbrmxi0ZWAkCMEErEF+eeI1H7EVxirZu58bA4Me3IpuPjMPzaEb53+o9ARuJt8U/jbB9aIYTPet9/w==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQCwWXX5U3aYEtT9essrHCC3bgxNF27OYpwTFKcAkq7ZPf/vZiQHuKPyVbrmxi0ZWAkCMEErEF+eeI1H7EVxirZu58bA4Me3IpuPjMPzaEb53+o9ARuJt8U/jbB9aIYTPet9/w==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "Vs03LoBaWrzTKHKlDf9D5sCnQYzHL1LpKv5JV9I3qqQnbFQ3KGouZxJa0mplHLwbhknFO/oCi82rTVH2/B9qEDWWDqRpmEF0d2zNExw+/HCHomVO/FkGav14HZ7Kk1Jia7vbBuhPXkb9yHznYAmgD8HvFZiEevS+neYLCRozvKI=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/shbpua34q1oujs0x4r17#envelope-73l0> .
@@ -571,9 +571,9 @@
 
 <https://localhost:8443/won/resource/event/shbpua34q1oujs0x4r17#envelope-73l0-sig> {
     <https://localhost:8443/won/resource/event/shbpua34q1oujs0x4r17#envelope-73l0-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQCwWXX5U3aYEtT9essrHCC3bgxNF27OYpwTFKcAkq7ZPf/vZiQHuKPyVbrmxi0ZWAkCMEErEF+eeI1H7EVxirZu58bA4Me3IpuPjMPzaEb53+o9ARuJt8U/jbB9aIYTPet9/w==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQCwWXX5U3aYEtT9essrHCC3bgxNF27OYpwTFKcAkq7ZPf/vZiQHuKPyVbrmxi0ZWAkCMEErEF+eeI1H7EVxirZu58bA4Me3IpuPjMPzaEb53+o9ARuJt8U/jbB9aIYTPet9/w==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "Vs03LoBaWrzTKHKlDf9D5sCnQYzHL1LpKv5JV9I3qqQnbFQ3KGouZxJa0mplHLwbhknFO/oCi82rTVH2/B9qEDWWDqRpmEF0d2zNExw+/HCHomVO/FkGav14HZ7Kk1Jia7vbBuhPXkb9yHznYAmgD8HvFZiEevS+neYLCRozvKI=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/shbpua34q1oujs0x4r17#envelope-73l0> .
@@ -596,17 +596,17 @@
                     event:shbpua34q1oujs0x4r17 .
     
     <https://localhost:8443/won/resource/event/dssbvofhtly928vl4i4m#envelope-g134-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQCfVVFAJ4RMcZcvu6scMXSUFuXA5tXihM6HwRqJWOUbUZUkyzVppp2ZlzrBoGh10wACMDXfw19NEg5/DIi0BczJofsmDAwFgi9J/x9ib8q5KciFtJB47qaZOzRq9/j4phWV0w==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQCfVVFAJ4RMcZcvu6scMXSUFuXA5tXihM6HwRqJWOUbUZUkyzVppp2ZlzrBoGh10wACMDXfw19NEg5/DIi0BczJofsmDAwFgi9J/x9ib8q5KciFtJB47qaZOzRq9/j4phWV0w==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "V63uix2B/8UOjjixRZo2EDfm5CoA5sTmBl+IDk34UCtZen1ucqPZoDvtXWXRBS9OJiMZqnhw/Ec09Af0wruV9u/vJRaHT1TQHD7e6rkkN5/pWgxWa9lkVOVYcqu5GNZ6kwziYXO0WE6Q6rnrGwJGdc/NO4MmkUCxcwaZZuW6/j8=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/dssbvofhtly928vl4i4m#envelope-g134> .
     
     <https://localhost:8443/won/resource/event/shbpua34q1oujs0x4r17#envelope-hoft-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQCwHsjl/8hx9t1dulwOjBbndWixGdg2AEMFNKGbXRp9XGpLgkOrr2QANaJw6I5fDMQCMARBUdyKXOIFXQC45y4sMNdCPyJNTkAOPhFxFCStPDINepQqX0ILJ2xrQmZijsrF/Q==" ;
-            sig:hasVerificationCertificate  atom:8uiuri25l2b84oywmgsy ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQCwHsjl/8hx9t1dulwOjBbndWixGdg2AEMFNKGbXRp9XGpLgkOrr2QANaJw6I5fDMQCMARBUdyKXOIFXQC45y4sMNdCPyJNTkAOPhFxFCStPDINepQqX0ILJ2xrQmZijsrF/Q==" ;
+            msg:signer  atom:8uiuri25l2b84oywmgsy ;
             msg:hash                     "R0SJeWMNCuAranhW9D8nt/fv8b4+YgWXJjrsc6nTHVOePzlbnHmVm82WuzCoNZ+8ufcqV9ACN+L9DUryovUALBxRNW8E5qTqKUEKF1sMSnfCQFThs1EkLzpoezEbQO//eUN6BPrqJfQTUQfQG7ujVS/l3laylYRRWEWkNW1/+Fg=" ;
             msg:publicKeyFingerprint     "QNpwnnPG5NoajDF6BzOaeaCul5lj7Jy6M0StVQf7+20=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/shbpua34q1oujs0x4r17#envelope-hoft> .
@@ -638,9 +638,9 @@
                     event:93idjir232ftcgfmkrk4 .
     
     <https://localhost:8443/won/resource/event/egr8himjgxrdrr6wupf8#envelope-zg5g-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQCsp9FYnekw4WYUbpleKdC195gYMbkoO5dItQZl+N+l/K7yuYYp33Eg+4I5QOylw9sCMQDeMdbvnUA9wvLBjZyAQOOCCKoT6SnJ+HMLSPd9k0wV8yilJ/neFyMYRJPA+NipbH8=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQCsp9FYnekw4WYUbpleKdC195gYMbkoO5dItQZl+N+l/K7yuYYp33Eg+4I5QOylw9sCMQDeMdbvnUA9wvLBjZyAQOOCCKoT6SnJ+HMLSPd9k0wV8yilJ/neFyMYRJPA+NipbH8=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "M07lAdnPOTdMmfgo4jr5GJ84OXY8d9Vq5QgBNF4xMwVhoXOk9XOoSXwKgnD9v/or+/jD4SphLffmbPpqCje/X0cebKcq+5yQdmFIevyj2j4wO07939nyLAkM3kEItqQYz9/0AcU6EcDxzUAzl/tsy8uIyEkt5zkA4k6zksX4bEE=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/egr8himjgxrdrr6wupf8#envelope-zg5g> .
@@ -648,9 +648,9 @@
 
 <https://localhost:8443/won/resource/event/egr8himjgxrdrr6wupf8#envelope-zg5g-sig> {
     <https://localhost:8443/won/resource/event/egr8himjgxrdrr6wupf8#envelope-zg5g-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQCsp9FYnekw4WYUbpleKdC195gYMbkoO5dItQZl+N+l/K7yuYYp33Eg+4I5QOylw9sCMQDeMdbvnUA9wvLBjZyAQOOCCKoT6SnJ+HMLSPd9k0wV8yilJ/neFyMYRJPA+NipbH8=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQCsp9FYnekw4WYUbpleKdC195gYMbkoO5dItQZl+N+l/K7yuYYp33Eg+4I5QOylw9sCMQDeMdbvnUA9wvLBjZyAQOOCCKoT6SnJ+HMLSPd9k0wV8yilJ/neFyMYRJPA+NipbH8=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "M07lAdnPOTdMmfgo4jr5GJ84OXY8d9Vq5QgBNF4xMwVhoXOk9XOoSXwKgnD9v/or+/jD4SphLffmbPpqCje/X0cebKcq+5yQdmFIevyj2j4wO07939nyLAkM3kEItqQYz9/0AcU6EcDxzUAzl/tsy8uIyEkt5zkA4k6zksX4bEE=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/egr8himjgxrdrr6wupf8#envelope-zg5g> .
@@ -671,17 +671,17 @@
                     event:egr8himjgxrdrr6wupf8 .
     
     <https://localhost:8443/won/resource/event/sj7d6a71slz8cvjuwawv#envelope-u1gl-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQCPTkM7exFmR9mo7w1HayUXqiZIYKb2A5RFT4dM7R1AdtnNIMpxGxPHlLsJFykUal0CMQCEvdJauSxU3HVTh1DTn/vH3093BQfxImHduN7HVIOmEBhZuZulBYqti/EuLm/6eO8=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQCPTkM7exFmR9mo7w1HayUXqiZIYKb2A5RFT4dM7R1AdtnNIMpxGxPHlLsJFykUal0CMQCEvdJauSxU3HVTh1DTn/vH3093BQfxImHduN7HVIOmEBhZuZulBYqti/EuLm/6eO8=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "A8hwsGQy6LyZNqhk7Ku2d3UcHH+UMoXep1G01gRMJiYfzObpv6JSJQMbOY6bRZz2BI3xkMdzjL/fnh+Pxe0z65FYRyfbdkyfnCnDRUoJwknaQfhBUE+88Ui3Xks9WMmuYtuCeB7GfkM2yppf9HNxNnrAJhMyY6BLbjdVlKie1Q4=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/sj7d6a71slz8cvjuwawv#envelope-u1gl> .
     
     <https://localhost:8443/won/resource/event/egr8himjgxrdrr6wupf8#envelope-18jf-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQCohNwUARflsGbfkm0dlnfhCG9HVsHkUyFOrphTuqFuAPkMzMadmQ0V6RnqjagB5lsCMDlZb55+o3YDTdMKeQQqKRS4kCJFN+TvZymmPJQ2lAPuQ76a8Ku1yuuNJqhTDbVDFw==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQCohNwUARflsGbfkm0dlnfhCG9HVsHkUyFOrphTuqFuAPkMzMadmQ0V6RnqjagB5lsCMDlZb55+o3YDTdMKeQQqKRS4kCJFN+TvZymmPJQ2lAPuQ76a8Ku1yuuNJqhTDbVDFw==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AIKX5Pl501pFbGAMo6zMY8o73u4xPcqEtDD5S9KQYN1lZyrJk9+klRo3mev4kZA6gaxmN0PUvL2FRYCAOFQP9PppCqblRjvKOSPCeMnKwJwd+6Ehy0bDqWBFsYsput7ORKltiLkbh37lfPXTYNGwPedkCotI8hEQBkqRTpn0QXs0" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/egr8himjgxrdrr6wupf8#envelope-18jf> .
@@ -689,9 +689,9 @@
 
 <https://localhost:8443/won/resource/event/93idjir232ftcgfmkrk4#envelope-n80f-sig> {
     <https://localhost:8443/won/resource/event/93idjir232ftcgfmkrk4#envelope-n80f-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQC1LV7nG9LbT5j3sgTVQOcPyJtYxAGPQfcuJqy5O+SsiYhpT2UDo8CAxdJkgv4OW/0CMQDAC9XtDHtMqHI+d7IyBDPJ8TTulBKlAA2Wa8KcX4OG1Qxeem7wqIJ6vQaCxHufLPg=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQC1LV7nG9LbT5j3sgTVQOcPyJtYxAGPQfcuJqy5O+SsiYhpT2UDo8CAxdJkgv4OW/0CMQDAC9XtDHtMqHI+d7IyBDPJ8TTulBKlAA2Wa8KcX4OG1Qxeem7wqIJ6vQaCxHufLPg=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AJvER956N5wkh6oEKyU3CzSeUYSdArefWmqreRElMetGuWRfSJbzVqBfV0lyhS1MdkXL00YZfLP8hxspQxCRmn73gYAN/xPHWqIURT6W6ke1jk/McxsuloUgFlRv19F7+txO5sH5N0BMF9BYyoc1B1pyNgu6vwve1BFwDmvOmmFN" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/93idjir232ftcgfmkrk4#envelope-n80f> .
@@ -699,9 +699,9 @@
 
 <https://localhost:8443/won/resource/event/ea4bcb9u4n90wzf6n2zs#envelope-5vd6-sig> {
     <https://localhost:8443/won/resource/event/ea4bcb9u4n90wzf6n2zs#envelope-5vd6-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMGq5CgitG5IdzsybJ4v6Qlc+bLxt6ci/u16VO1zFBO7LGI8Aw5Lno4baaTtC29TvXAIxAJpbjrJ8kCwtCa/O3msWtLK11RNjA0uxj6EO7gWJ142TsuomELznd3b0ZYjhSAhW5A==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMGq5CgitG5IdzsybJ4v6Qlc+bLxt6ci/u16VO1zFBO7LGI8Aw5Lno4baaTtC29TvXAIxAJpbjrJ8kCwtCa/O3msWtLK11RNjA0uxj6EO7gWJ142TsuomELznd3b0ZYjhSAhW5A==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AJKpUJ/+bGVgN5fC0lf5YPxI2bSVpgbhbdblVBe3FkXN4vpmYIyntoaJD114+kCSZ5b/qRZZoD1FfnCboL35GkreRtnHWtPTSa4lw77k/+7XLvfxOrbvCpbuPuy7D+UQGSIArwjTrHdMmF9tXlyGTVNT+06YzoLjxx1PP6/5RTSq" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/ea4bcb9u4n90wzf6n2zs#envelope-5vd6> .
@@ -733,9 +733,9 @@
                     event:ea4bcb9u4n90wzf6n2zs .
     
     <https://localhost:8443/won/resource/event/tbrd97jxdqcjfbo804nf#envelope-wg9e-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMHzoAFLSYHZ2Qn7jK5kgCegPWVuISQ+xypVu8gY774RnG3be4CxmVgfK08AQ3rhh0wIwEBSJhGEDl/p0I+VfVDtvsffv519KL2Jq3DFoP5bQK3jD8uiMu/zi/zZyE4IPDtQo" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMHzoAFLSYHZ2Qn7jK5kgCegPWVuISQ+xypVu8gY774RnG3be4CxmVgfK08AQ3rhh0wIwEBSJhGEDl/p0I+VfVDtvsffv519KL2Jq3DFoP5bQK3jD8uiMu/zi/zZyE4IPDtQo" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AIhLkVlUe2W1cZxbc87mnQvLvw7JJ4+w9mquOf0MOVAY0k/lGiPRzeax690+IomIb/l5T44jmqHW0zzwxE3c9XOE5jHpuv8gpNRUf1FabsmO4AY8gIcx2MVbm6C5Oaecy6OtespJ96qj5PbTN50wEFiBbIy5yUVKP5UfbwewPqp6" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/tbrd97jxdqcjfbo804nf#envelope-wg9e> .
@@ -743,9 +743,9 @@
 
 <https://localhost:8443/won/resource/event/tbrd97jxdqcjfbo804nf#envelope-wg9e-sig> {
     <https://localhost:8443/won/resource/event/tbrd97jxdqcjfbo804nf#envelope-wg9e-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMHzoAFLSYHZ2Qn7jK5kgCegPWVuISQ+xypVu8gY774RnG3be4CxmVgfK08AQ3rhh0wIwEBSJhGEDl/p0I+VfVDtvsffv519KL2Jq3DFoP5bQK3jD8uiMu/zi/zZyE4IPDtQo" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMHzoAFLSYHZ2Qn7jK5kgCegPWVuISQ+xypVu8gY774RnG3be4CxmVgfK08AQ3rhh0wIwEBSJhGEDl/p0I+VfVDtvsffv519KL2Jq3DFoP5bQK3jD8uiMu/zi/zZyE4IPDtQo" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AIhLkVlUe2W1cZxbc87mnQvLvw7JJ4+w9mquOf0MOVAY0k/lGiPRzeax690+IomIb/l5T44jmqHW0zzwxE3c9XOE5jHpuv8gpNRUf1FabsmO4AY8gIcx2MVbm6C5Oaecy6OtespJ96qj5PbTN50wEFiBbIy5yUVKP5UfbwewPqp6" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/tbrd97jxdqcjfbo804nf#envelope-wg9e> .
@@ -766,17 +766,17 @@
                     event:tbrd97jxdqcjfbo804nf .
     
     <https://localhost:8443/won/resource/event/gfh3389cfyfwp10afzi6#envelope-dp1h-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMBMfQxJcsXKuBRbxItlXwz/uoF87JSH9MZ9Hj60Go3udipcp/3auK6Q9XFim7mjjWAIwSjIVMgiXUmssdWyJEdIfpmMJxahc3Af9spwH/iGd4g5YTSzGcAN91ccCDLO+rCbl" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMBMfQxJcsXKuBRbxItlXwz/uoF87JSH9MZ9Hj60Go3udipcp/3auK6Q9XFim7mjjWAIwSjIVMgiXUmssdWyJEdIfpmMJxahc3Af9spwH/iGd4g5YTSzGcAN91ccCDLO+rCbl" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "Hr9h/9UPQlMyBRjF2qwKTLijjt4YVEBjKR140tb3uuKK4ugajhmT/a3Z5zZ4Yea1jA+D1GKAqWVkIT3elrYEiqcrOcRylLTYnH7E8IkkR9/G6yIaKTvijJeaSkUU9ZlCzykdQwOru4wQa4RwjQIEJr7GwdZW6nDdA07p/8YQ0nk=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/gfh3389cfyfwp10afzi6#envelope-dp1h> .
     
     <https://localhost:8443/won/resource/event/tbrd97jxdqcjfbo804nf#envelope-riyq-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQDq2GTCmI206fhkTcqo31boAwumfPL4jnmB/KgOFP0wsqQIdeakzVWpb9ZguarEhgoCMQDV6T7UlUcvvJNy3jw7nE4J/uIZFoQ008b1UuSN9FhGFXs7+0RazY2kMy3qVyJPecE=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQDq2GTCmI206fhkTcqo31boAwumfPL4jnmB/KgOFP0wsqQIdeakzVWpb9ZguarEhgoCMQDV6T7UlUcvvJNy3jw7nE4J/uIZFoQ008b1UuSN9FhGFXs7+0RazY2kMy3qVyJPecE=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "cPvocVRMnggtRX1c30Eekb7ytmUh0HOP4ftSTgXusrz0aLBuoMds8aRPEESej7YJaullLGEoX0Thji5knhG2SpIB29yQB7ex5MzoG9vd2GdELEZW8tiS2fIo6/yU3SX3aWT90ZUKNLdyz+h8agZS6s4uv34Q0Y732Vdeu8MsOUc=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/tbrd97jxdqcjfbo804nf#envelope-riyq> .
@@ -784,9 +784,9 @@
 
 <https://localhost:8443/won/resource/event/0wgrdt616bgkn51bzr1m#envelope-p59y-sig> {
     <https://localhost:8443/won/resource/event/0wgrdt616bgkn51bzr1m#envelope-p59y-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQCJfcxS7ZGEkRPjY7QgNeCf+Vwdr4MpQ2blVZUNI25ht9pZxDi3Lhbk3wps0V7kTngCMQCs7Rt9K0EduNz0y8QCbDJlrxudLz7ik99h65lvlV6dovDSdMGbqGXh3SXyJgWfw6M=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQCJfcxS7ZGEkRPjY7QgNeCf+Vwdr4MpQ2blVZUNI25ht9pZxDi3Lhbk3wps0V7kTngCMQCs7Rt9K0EduNz0y8QCbDJlrxudLz7ik99h65lvlV6dovDSdMGbqGXh3SXyJgWfw6M=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AKrrIfyEWqhrnSDfEJ7ltAu84tTb58Gx9pmhwswkZTBsj1x9NXHLCbB7lDmXYbfgVKYpRch/9zeLvBjhDByicJOzeFuwbkDhsWensMpEgn1x33/GwMn6VTjNYzhZjEJDxhBL/nBQxyT7KbyzJGbloIuQOO00u7VjGeLdcA34WbBZ" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/0wgrdt616bgkn51bzr1m#envelope-p59y> .
@@ -815,9 +815,9 @@
                     event:0wgrdt616bgkn51bzr1m .
     
     <https://localhost:8443/won/resource/event/k432v1ilpl2365r35ll6#envelope-ea1j-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQCL2Aj70kjMHZ5nD0Vk66r+GgNs4DbnVDGL7qyyRckWMm44GNOvGQhQ0kFw2z2K3D0CMHKpEvld2iJUciDWbUHlReEr34KUoouqXXO3epXia37TqAwfTlMBFDPXM3Z3ke/T2g==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQCL2Aj70kjMHZ5nD0Vk66r+GgNs4DbnVDGL7qyyRckWMm44GNOvGQhQ0kFw2z2K3D0CMHKpEvld2iJUciDWbUHlReEr34KUoouqXXO3epXia37TqAwfTlMBFDPXM3Z3ke/T2g==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "bGlx1NmOGUovhuHJQIAviijyc2vJGgUXb7tr7Nrq1Jw7u+adOqpTZWe/FkMyfnQi1oWBIV9/jDzs8a7pk+RM8P1c9j/B9ptOAx3Z680NRYr5QJiWsFs16CWDw7sQsOTZ8lfEURuEm95OTtZfohn0RWSuQWqxdKrILjmCrlek2ao=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/k432v1ilpl2365r35ll6#envelope-ea1j> .
@@ -825,9 +825,9 @@
 
 <https://localhost:8443/won/resource/event/k432v1ilpl2365r35ll6#envelope-ea1j-sig> {
     <https://localhost:8443/won/resource/event/k432v1ilpl2365r35ll6#envelope-ea1j-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQCL2Aj70kjMHZ5nD0Vk66r+GgNs4DbnVDGL7qyyRckWMm44GNOvGQhQ0kFw2z2K3D0CMHKpEvld2iJUciDWbUHlReEr34KUoouqXXO3epXia37TqAwfTlMBFDPXM3Z3ke/T2g==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQCL2Aj70kjMHZ5nD0Vk66r+GgNs4DbnVDGL7qyyRckWMm44GNOvGQhQ0kFw2z2K3D0CMHKpEvld2iJUciDWbUHlReEr34KUoouqXXO3epXia37TqAwfTlMBFDPXM3Z3ke/T2g==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "bGlx1NmOGUovhuHJQIAviijyc2vJGgUXb7tr7Nrq1Jw7u+adOqpTZWe/FkMyfnQi1oWBIV9/jDzs8a7pk+RM8P1c9j/B9ptOAx3Z680NRYr5QJiWsFs16CWDw7sQsOTZ8lfEURuEm95OTtZfohn0RWSuQWqxdKrILjmCrlek2ao=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/k432v1ilpl2365r35ll6#envelope-ea1j> .
@@ -850,17 +850,17 @@
                     event:k432v1ilpl2365r35ll6 .
     
     <https://localhost:8443/won/resource/event/golbvzem4lerfw6n7ryu#envelope-o04e-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQCKZzuG0MAoqiDZ4a13jr3WZV1HlTR7GsP+2tFCI4B6V5oifjxrAh9DlzdcZOMMX4MCMC2w7YvZOX5V59qY16eWyxCa0ABYQbY24GcGN8jL9ls3i4tx25hN+rQTRQquKb8vZA==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQCKZzuG0MAoqiDZ4a13jr3WZV1HlTR7GsP+2tFCI4B6V5oifjxrAh9DlzdcZOMMX4MCMC2w7YvZOX5V59qY16eWyxCa0ABYQbY24GcGN8jL9ls3i4tx25hN+rQTRQquKb8vZA==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "SA8oPtJdQ2yGILbhETov3WtTi3Jk466frlcqU9jytTLgciYXXATuJvkiQcQsGWTq5V/pLWBgC6ZVQzSRu+TltD0/nTas20K2TVqbdhkcdpSu/lqyCKDEovVBJ634CJ4bI+dfTdAvTU6Q2Q7jgbKsZ/Nn7H3Gkjnj43zYtxt6FE8=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/golbvzem4lerfw6n7ryu#envelope-o04e> .
     
     <https://localhost:8443/won/resource/event/k432v1ilpl2365r35ll6#envelope-lbop-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMFmQy1KXUwxfLw4HUIZsaTXqgJLTr6525mdWChYhTjdEoWOdeRSkDp+lmwZaLNy3YAIwHi4qRbN/kG2f1Q7RciAwqEC9BS+7CgEOrIxQtYaZXQppN5OzXSiXJ3psJK+lxFFZ" ;
-            sig:hasVerificationCertificate  atom:8uiuri25l2b84oywmgsy ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMFmQy1KXUwxfLw4HUIZsaTXqgJLTr6525mdWChYhTjdEoWOdeRSkDp+lmwZaLNy3YAIwHi4qRbN/kG2f1Q7RciAwqEC9BS+7CgEOrIxQtYaZXQppN5OzXSiXJ3psJK+lxFFZ" ;
+            msg:signer  atom:8uiuri25l2b84oywmgsy ;
             msg:hash                     "AJRMXjE1QoLWjicmq638NVSxCnut5Mhm0dphkBOCLB+7wLTxhxBMKc0FbaO4P/fFYlhlG5tRP8QrW4osxh9dxTCp5XX70Vh+7UdF5u3fIR5tql4EblCSq/AkvBRoe8Kb6WgejStNw7YSwSYo1/oQghyfH5nEBlhXUKtVN4rgndiO" ;
             msg:publicKeyFingerprint     "QNpwnnPG5NoajDF6BzOaeaCul5lj7Jy6M0StVQf7+20=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/k432v1ilpl2365r35ll6#envelope-lbop> .
@@ -868,9 +868,9 @@
 
 <https://localhost:8443/won/resource/event/sj7d6a71slz8cvjuwawv#envelope-u1gl-sig> {
     <https://localhost:8443/won/resource/event/sj7d6a71slz8cvjuwawv#envelope-u1gl-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQCPTkM7exFmR9mo7w1HayUXqiZIYKb2A5RFT4dM7R1AdtnNIMpxGxPHlLsJFykUal0CMQCEvdJauSxU3HVTh1DTn/vH3093BQfxImHduN7HVIOmEBhZuZulBYqti/EuLm/6eO8=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQCPTkM7exFmR9mo7w1HayUXqiZIYKb2A5RFT4dM7R1AdtnNIMpxGxPHlLsJFykUal0CMQCEvdJauSxU3HVTh1DTn/vH3093BQfxImHduN7HVIOmEBhZuZulBYqti/EuLm/6eO8=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "A8hwsGQy6LyZNqhk7Ku2d3UcHH+UMoXep1G01gRMJiYfzObpv6JSJQMbOY6bRZz2BI3xkMdzjL/fnh+Pxe0z65FYRyfbdkyfnCnDRUoJwknaQfhBUE+88Ui3Xks9WMmuYtuCeB7GfkM2yppf9HNxNnrAJhMyY6BLbjdVlKie1Q4=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/sj7d6a71slz8cvjuwawv#envelope-u1gl> .
@@ -884,17 +884,17 @@
             msg:protocolVersion       "1.0" .
     
     <https://localhost:8443/won/resource/event/0wgrdt616bgkn51bzr1m#envelope-p59y-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQCJfcxS7ZGEkRPjY7QgNeCf+Vwdr4MpQ2blVZUNI25ht9pZxDi3Lhbk3wps0V7kTngCMQCs7Rt9K0EduNz0y8QCbDJlrxudLz7ik99h65lvlV6dovDSdMGbqGXh3SXyJgWfw6M=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQCJfcxS7ZGEkRPjY7QgNeCf+Vwdr4MpQ2blVZUNI25ht9pZxDi3Lhbk3wps0V7kTngCMQCs7Rt9K0EduNz0y8QCbDJlrxudLz7ik99h65lvlV6dovDSdMGbqGXh3SXyJgWfw6M=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AKrrIfyEWqhrnSDfEJ7ltAu84tTb58Gx9pmhwswkZTBsj1x9NXHLCbB7lDmXYbfgVKYpRch/9zeLvBjhDByicJOzeFuwbkDhsWensMpEgn1x33/GwMn6VTjNYzhZjEJDxhBL/nBQxyT7KbyzJGbloIuQOO00u7VjGeLdcA34WbBZ" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/0wgrdt616bgkn51bzr1m#envelope-p59y> .
     
     <https://localhost:8443/won/resource/event/k432v1ilpl2365r35ll6#envelope-ea1j-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQCL2Aj70kjMHZ5nD0Vk66r+GgNs4DbnVDGL7qyyRckWMm44GNOvGQhQ0kFw2z2K3D0CMHKpEvld2iJUciDWbUHlReEr34KUoouqXXO3epXia37TqAwfTlMBFDPXM3Z3ke/T2g==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQCL2Aj70kjMHZ5nD0Vk66r+GgNs4DbnVDGL7qyyRckWMm44GNOvGQhQ0kFw2z2K3D0CMHKpEvld2iJUciDWbUHlReEr34KUoouqXXO3epXia37TqAwfTlMBFDPXM3Z3ke/T2g==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "bGlx1NmOGUovhuHJQIAviijyc2vJGgUXb7tr7Nrq1Jw7u+adOqpTZWe/FkMyfnQi1oWBIV9/jDzs8a7pk+RM8P1c9j/B9ptOAx3Z680NRYr5QJiWsFs16CWDw7sQsOTZ8lfEURuEm95OTtZfohn0RWSuQWqxdKrILjmCrlek2ao=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/k432v1ilpl2365r35ll6#envelope-ea1j> .
@@ -907,9 +907,9 @@
                     event:sj7d6a71slz8cvjuwawv .
     
     <https://localhost:8443/won/resource/event/sj7d6a71slz8cvjuwawv#envelope-m6sf-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQCwFPEythwwOO1gAiJudCGUsSS0JzyR5CRcJo5ZaYGpz8ookEmuZl7u7as16XUKOi0CMHrlZmmiGAiVB1w1vHAO2j7ixxE8krbKTrFn3ninBRULuDsyn8PNeav4AoCqXCOSXQ==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQCwFPEythwwOO1gAiJudCGUsSS0JzyR5CRcJo5ZaYGpz8ookEmuZl7u7as16XUKOi0CMHrlZmmiGAiVB1w1vHAO2j7ixxE8krbKTrFn3ninBRULuDsyn8PNeav4AoCqXCOSXQ==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AI4ntR2VQVUxKABEOHloqFKL1sog82qMj0dgDXxfLIRobpFidl7PGxZMQ6ZfQbsiCEzAduykUff1gkYwCi0HvDWBSGUCQ1+3ULaaWHz4UgiOCfkwg1zrjE1Ov6oy51V8oAEPEbayMoXHL8Vp/WJNKzp0qGYRKHTC7f8ILBjYe0Vg" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/sj7d6a71slz8cvjuwawv#envelope-m6sf> .
@@ -931,9 +931,9 @@
                     event:sj7d6a71slz8cvjuwawv .
     
     <https://localhost:8443/won/resource/event/tvso1oou56ke03otp4un#envelope-9jnb-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMH9cNrH+FePEEtdkvjIvJcnDUIhO4qGMN9QNUH502o8hWF7VDNoZmA9dHxzlkzDI3AIxAKiox3iZfxBuZS0jbfvLwkRi1XQ1at9f9pxRfSj0JMOk4BDvxqM8F/ozOUIgJClbSw==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMH9cNrH+FePEEtdkvjIvJcnDUIhO4qGMN9QNUH502o8hWF7VDNoZmA9dHxzlkzDI3AIxAKiox3iZfxBuZS0jbfvLwkRi1XQ1at9f9pxRfSj0JMOk4BDvxqM8F/ozOUIgJClbSw==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "JJ2j6kDbenZJXPdVXL0+wu1A5Onbwu7g/sOrKmTzEZxCgqh/7sWWLC2vTW2qTmMnrALRCZVjvuB9SI2ToKkbuzwIITN0d6im8VIVJVAYiZ9DnENQeUGrPyTbRS5s7f21ykrRCQGBNQs26V9ED875gnmTlveDRjLE87hceTeHyyM=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/tvso1oou56ke03otp4un#envelope-9jnb> .
@@ -965,9 +965,9 @@
             msg:protocolVersion          "1.0" .
     
     <https://localhost:8443/won/resource/event/7fn1rbfdld37vk519nii#envelope-26de-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMGpb6/8dq/8YvPMotHwGj3yw0hdlFNGR3seFsa5R3B6R5rXfF/tTmWk2m7NMQ706PAIxANPyptgtQzLzGALLBGt7O3Dnfys7HyF/uEyuohkVtc2madDFW1zwdZdZAjkOw3IXIA==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMGpb6/8dq/8YvPMotHwGj3yw0hdlFNGR3seFsa5R3B6R5rXfF/tTmWk2m7NMQ706PAIxANPyptgtQzLzGALLBGt7O3Dnfys7HyF/uEyuohkVtc2madDFW1zwdZdZAjkOw3IXIA==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AKj8jZnN+y0Xz9QcSt4Sh4yfAN1HC/zKxQKea9srLgD7zaDO0b/0Yz2X4tfe239jI272d/+C+o5JwdTAKC9Oi3JIHqV9Jo8vnBtBdsQTqBLgpIxjIWSzOM3019s3+6MlI77XcS2aCAgQ63ub7PDaxsRe+0mH7bSj5/ph/J2FUALx" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/7fn1rbfdld37vk519nii#envelope-26de> .
@@ -975,9 +975,9 @@
 
 <https://localhost:8443/won/resource/event/1dtx07j2vz545ljaz13j#envelope-ctzj-sig> {
     <https://localhost:8443/won/resource/event/1dtx07j2vz545ljaz13j#envelope-ctzj-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQDn/nag1XYnKAINmBWIU8mAY/UZZ8eiFH5L7/T+Y0OWHiVd/iScdChzI72hZmLN82gCMHbhxQVXmAexX87huShfQ49tve3yWvTJt28JaMeJ3tY6YnaYBrkrwF3lf8CG7zLXdg==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQDn/nag1XYnKAINmBWIU8mAY/UZZ8eiFH5L7/T+Y0OWHiVd/iScdChzI72hZmLN82gCMHbhxQVXmAexX87huShfQ49tve3yWvTJt28JaMeJ3tY6YnaYBrkrwF3lf8CG7zLXdg==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AJsBqXf+6RkrRnVbcCiSC4FXuE5JztfjAGYynFVih7wE0eLn/JZl9L6QghX8baCrI4B1D1GiAliKKf1qJgJq8Tf5aanmNf0oXZd+3XnvVgBNeQ3LV31cGQUfcaz7xsvMPBeHBNDbuOSm14+9OBvQ6S9u5j2degdH6ZuQ+yw82GDZ" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/1dtx07j2vz545ljaz13j#envelope-ctzj> .
@@ -1006,9 +1006,9 @@
                     event:1dtx07j2vz545ljaz13j .
     
     <https://localhost:8443/won/resource/event/7mdtft0gjbr2m4kw2t13#envelope-97er-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQDBK7tGt46B45Qjtvnx3CGn1s3ZV0ObftWidqSF0cG0T/oe+TH17X/9+v4Bv37W7i4CMAbMBAYzryTSMrOuZ/9ONCywTqJe3JEbYMh70u3yKv1ppjytPW3Z33pQ5vyQ4rEBTw==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQDBK7tGt46B45Qjtvnx3CGn1s3ZV0ObftWidqSF0cG0T/oe+TH17X/9+v4Bv37W7i4CMAbMBAYzryTSMrOuZ/9ONCywTqJe3JEbYMh70u3yKv1ppjytPW3Z33pQ5vyQ4rEBTw==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "JnFXiQSGi4PaVIipNNxsvCFJ5zrNqVy5ck87QJW82mJD+xdl30GUBkkc2jk6cRKT2niCQ4FuSQOQ3yFk70qOwsWroWqn8R4aGfbxRevuEjoUl633+u3Fry11OpruwLFswejjOqH16cUWzdY8zxJfOBY+utIJWPolvjsa+uHapDI=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/7mdtft0gjbr2m4kw2t13#envelope-97er> .
@@ -1016,9 +1016,9 @@
 
 <https://localhost:8443/won/resource/event/7mdtft0gjbr2m4kw2t13#envelope-97er-sig> {
     <https://localhost:8443/won/resource/event/7mdtft0gjbr2m4kw2t13#envelope-97er-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQDBK7tGt46B45Qjtvnx3CGn1s3ZV0ObftWidqSF0cG0T/oe+TH17X/9+v4Bv37W7i4CMAbMBAYzryTSMrOuZ/9ONCywTqJe3JEbYMh70u3yKv1ppjytPW3Z33pQ5vyQ4rEBTw==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQDBK7tGt46B45Qjtvnx3CGn1s3ZV0ObftWidqSF0cG0T/oe+TH17X/9+v4Bv37W7i4CMAbMBAYzryTSMrOuZ/9ONCywTqJe3JEbYMh70u3yKv1ppjytPW3Z33pQ5vyQ4rEBTw==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "JnFXiQSGi4PaVIipNNxsvCFJ5zrNqVy5ck87QJW82mJD+xdl30GUBkkc2jk6cRKT2niCQ4FuSQOQ3yFk70qOwsWroWqn8R4aGfbxRevuEjoUl633+u3Fry11OpruwLFswejjOqH16cUWzdY8zxJfOBY+utIJWPolvjsa+uHapDI=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/7mdtft0gjbr2m4kw2t13#envelope-97er> .
@@ -1042,17 +1042,17 @@
                     event:7mdtft0gjbr2m4kw2t13 .
     
     <https://localhost:8443/won/resource/event/7zc7w4ebflv7uf00654i#envelope-ypv8-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMHa6cQ/mQoAFXSmIr/e0PoQCo2aEfAVCYtnqJ2z4Iq4eLgfmyHW+xqvA1ex4wDOqJwIwPCiWrw8kw13ridYhFKhZ+pNMEndjAEDOwkTiDKL4Nme4nc2erFfJwFcHDjIuyRw7" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMHa6cQ/mQoAFXSmIr/e0PoQCo2aEfAVCYtnqJ2z4Iq4eLgfmyHW+xqvA1ex4wDOqJwIwPCiWrw8kw13ridYhFKhZ+pNMEndjAEDOwkTiDKL4Nme4nc2erFfJwFcHDjIuyRw7" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "ME1OyfC63ENlOme5ZKUtI5wU6cVroywpCNQUf7my8889skflXf3K6XWr9kUNYWS1IVq5TZmsDA+zcEj2s3ZLNq3GnUwACIVccEU3PObSWTJq185lRaVvYSaG4iyi9/4YdaNIBME1AYRF80cFP8vK9tfpob47/kLzfbEuOaXmMxg=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/7zc7w4ebflv7uf00654i#envelope-ypv8> .
     
     <https://localhost:8443/won/resource/event/7mdtft0gjbr2m4kw2t13#envelope-2eul-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQCY2D4ka0ILxnry3JJVSuu9793lthm8wEVh+sYG4PwO8qBA9t2Y2pAk5UbeFmvBtgACME1VwOnBn/c3nopnuZPGoCooS2s75Xb6VdAAqoT1V2iu1yuQ9x+IyPtPBLxUb2+FJw==" ;
-            sig:hasVerificationCertificate  atom:8uiuri25l2b84oywmgsy ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQCY2D4ka0ILxnry3JJVSuu9793lthm8wEVh+sYG4PwO8qBA9t2Y2pAk5UbeFmvBtgACME1VwOnBn/c3nopnuZPGoCooS2s75Xb6VdAAqoT1V2iu1yuQ9x+IyPtPBLxUb2+FJw==" ;
+            msg:signer  atom:8uiuri25l2b84oywmgsy ;
             msg:hash                     "YQS29qibfkP+yflMsHBmCsgcWmaj0VUY1DhCaQ4FKx0mdADjLT4fq6ppoCeIOB+vpRPrUds+hRgmvei+JeETPAPA5K8u+nvvMQrkM09u5rf/fPYj/23CralutZt7pqyFHyupCi/lp0/oBEfGwfXZ28xyG+vAhsiCE/U72b5yc+o=" ;
             msg:publicKeyFingerprint     "QNpwnnPG5NoajDF6BzOaeaCul5lj7Jy6M0StVQf7+20=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/7mdtft0gjbr2m4kw2t13#envelope-2eul> .
@@ -1060,9 +1060,9 @@
 
 <https://localhost:8443/won/resource/event/dyp34hpnew6f9j4ddg78#envelope-fq5n-sig> {
     <https://localhost:8443/won/resource/event/dyp34hpnew6f9j4ddg78#envelope-fq5n-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMDWLwAtKDwje+vMf4yg2WIYeYNItKWn2AZI4fRxvRroQa4Fkgus/nBAWdMEjNiE8eAIxAN+/RGkzTjHkyUuURFn2OL/IjCr4b+0h51YGtsEHiApy9LKDG6PCvbP+jwJJTdo8fg==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMDWLwAtKDwje+vMf4yg2WIYeYNItKWn2AZI4fRxvRroQa4Fkgus/nBAWdMEjNiE8eAIxAN+/RGkzTjHkyUuURFn2OL/IjCr4b+0h51YGtsEHiApy9LKDG6PCvbP+jwJJTdo8fg==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "QGebx3HqBJ7bbcFlucMClJHkkvwrqW7tgmZ2bwogCMSNRiFugZ/wB9uN+Ckit0/yDLpwj4H7c7NvOVLthM11fJfVFRKAV0JPs4xybdJlS98JwzfSJ5RvqMreb+Sui4Qahh754gjwdPQlGS+lDLtWSd7BKOLhfWHxmCknimHsctc=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/dyp34hpnew6f9j4ddg78#envelope-fq5n> .
@@ -1091,9 +1091,9 @@
                     event:dyp34hpnew6f9j4ddg78 .
     
     <https://localhost:8443/won/resource/event/3s32pqs80zz2n0sxnrwa#envelope-gaf7-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQDNPPNJ7fVWPELqz34F8+9GCl1MHPp1M/g4CPm7PrEOJch9aQtUfvNh44ma5Qg/caYCMQDzhJQfzznt7mVGr9lpOCmkNNK4uKgqcO7cXGZ7uSRbuQTKn0eAfq+vvEhc7xfOqEQ=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQDNPPNJ7fVWPELqz34F8+9GCl1MHPp1M/g4CPm7PrEOJch9aQtUfvNh44ma5Qg/caYCMQDzhJQfzznt7mVGr9lpOCmkNNK4uKgqcO7cXGZ7uSRbuQTKn0eAfq+vvEhc7xfOqEQ=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "eEnDOS53FNWtuQTA55rMmgBwQR05jOH7pVxwuyUkoOwDKANj7gVibamG1UIvB1bB22eDShDVk+cxe2Cb55nxM00LIFlWmh9p7UPHqOYYZGBFd1yNpvlFcqAc0vt5bU6ieNJtT42Lr4BZ0zAnow55/IKwTapV9rmRoEr49ZZFR3E=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/3s32pqs80zz2n0sxnrwa#envelope-gaf7> .
@@ -1101,9 +1101,9 @@
 
 <https://localhost:8443/won/resource/event/3s32pqs80zz2n0sxnrwa#envelope-gaf7-sig> {
     <https://localhost:8443/won/resource/event/3s32pqs80zz2n0sxnrwa#envelope-gaf7-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQDNPPNJ7fVWPELqz34F8+9GCl1MHPp1M/g4CPm7PrEOJch9aQtUfvNh44ma5Qg/caYCMQDzhJQfzznt7mVGr9lpOCmkNNK4uKgqcO7cXGZ7uSRbuQTKn0eAfq+vvEhc7xfOqEQ=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQDNPPNJ7fVWPELqz34F8+9GCl1MHPp1M/g4CPm7PrEOJch9aQtUfvNh44ma5Qg/caYCMQDzhJQfzznt7mVGr9lpOCmkNNK4uKgqcO7cXGZ7uSRbuQTKn0eAfq+vvEhc7xfOqEQ=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "eEnDOS53FNWtuQTA55rMmgBwQR05jOH7pVxwuyUkoOwDKANj7gVibamG1UIvB1bB22eDShDVk+cxe2Cb55nxM00LIFlWmh9p7UPHqOYYZGBFd1yNpvlFcqAc0vt5bU6ieNJtT42Lr4BZ0zAnow55/IKwTapV9rmRoEr49ZZFR3E=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/3s32pqs80zz2n0sxnrwa#envelope-gaf7> .
@@ -1119,9 +1119,9 @@
             msg:protocolVersion       "1.0" .
     
     <https://localhost:8443/won/resource/event/ea4bcb9u4n90wzf6n2zs#envelope-5vd6-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMGq5CgitG5IdzsybJ4v6Qlc+bLxt6ci/u16VO1zFBO7LGI8Aw5Lno4baaTtC29TvXAIxAJpbjrJ8kCwtCa/O3msWtLK11RNjA0uxj6EO7gWJ142TsuomELznd3b0ZYjhSAhW5A==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMGq5CgitG5IdzsybJ4v6Qlc+bLxt6ci/u16VO1zFBO7LGI8Aw5Lno4baaTtC29TvXAIxAJpbjrJ8kCwtCa/O3msWtLK11RNjA0uxj6EO7gWJ142TsuomELznd3b0ZYjhSAhW5A==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AJKpUJ/+bGVgN5fC0lf5YPxI2bSVpgbhbdblVBe3FkXN4vpmYIyntoaJD114+kCSZ5b/qRZZoD1FfnCboL35GkreRtnHWtPTSa4lw77k/+7XLvfxOrbvCpbuPuy7D+UQGSIArwjTrHdMmF9tXlyGTVNT+06YzoLjxx1PP6/5RTSq" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/ea4bcb9u4n90wzf6n2zs#envelope-5vd6> .
@@ -1134,9 +1134,9 @@
                     event:3s32pqs80zz2n0sxnrwa .
     
     <https://localhost:8443/won/resource/event/3s32pqs80zz2n0sxnrwa#envelope-e8u0-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQCDtc5Q0E6xKltfxiSVFxuQ8p5jrsN3TccNDhRrdw7h3iaTNF5Ld3xx6YMbwCdt6dcCMBAn+fQ+BBE6c/LZMpbMNe0T3UBkjI5hQZpKpmN8y/FYyXObho9KbWpPsm/gwshXPg==" ;
-            sig:hasVerificationCertificate  atom:8uiuri25l2b84oywmgsy ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQCDtc5Q0E6xKltfxiSVFxuQ8p5jrsN3TccNDhRrdw7h3iaTNF5Ld3xx6YMbwCdt6dcCMBAn+fQ+BBE6c/LZMpbMNe0T3UBkjI5hQZpKpmN8y/FYyXObho9KbWpPsm/gwshXPg==" ;
+            msg:signer  atom:8uiuri25l2b84oywmgsy ;
             msg:hash                     "XP2KbCd+N76lwNdR0DsfjhQsfi1wPeBrBpYJjgsTEc9HTFCACrzhwxqFo1GNIxRklj3V+yjqYKhoci5h0HXvS6EpwAKVAhSSHbaVt+mgJ/jDz4npmAvVJy/4NHiuQ+WO00BETHxHPbdwoBCm3blrtpif6hEz+lC538es84mOiRs=" ;
             msg:publicKeyFingerprint     "QNpwnnPG5NoajDF6BzOaeaCul5lj7Jy6M0StVQf7+20=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/3s32pqs80zz2n0sxnrwa#envelope-e8u0> .
@@ -1164,17 +1164,17 @@
                     event:9092731957586352000 .
     
     <https://localhost:8443/won/resource/event/r3vt2863pqnjcqrj1scj#envelope-emmi-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMDYULIWogFD2UKaheMmzQr4ru6ZavfeC6JmkehYjfqVhHEdSRTwZ8zBGcCvZx31hbQIwdxHz32F42VgOZDKdndqMwlTT+Muj+Ca4hybJ0iTZTbivhNQauUIkq9x7romfXYOf" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMDYULIWogFD2UKaheMmzQr4ru6ZavfeC6JmkehYjfqVhHEdSRTwZ8zBGcCvZx31hbQIwdxHz32F42VgOZDKdndqMwlTT+Muj+Ca4hybJ0iTZTbivhNQauUIkq9x7romfXYOf" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "YkySnWWQXtJCyt+W39t6LOq+/ra82owPzfLUFgDKxZPW7P8w6n5Cpin1qRgiQNbp6hqeLWm/TyDxEIYGvqikwZKGqQLUilJWqHMrbMaTVSIniF0QYu+6znGX+39qcCOO8aSWozv27u7gzBI1eLOI7JpOuu5zHhgELvdg5F9NkJ8=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/r3vt2863pqnjcqrj1scj#envelope-emmi> .
     
     <https://localhost:8443/won/resource/event/9092731957586352000#data-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMHARX/6cS18nHEo0X+c4+jIUFf9WayadPzrTdU+eO5qP8KzUnNUGJ3oW2Zo6yR9pqwIwfbNpgYmJ8ASSmZDvUdlV+wCaE3xB/a9eD4AVdutyUv1qnsFnuy8mJfZFk4DntJb1" ;
-            sig:hasVerificationCertificate  atom:6462959329580403000 ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMHARX/6cS18nHEo0X+c4+jIUFf9WayadPzrTdU+eO5qP8KzUnNUGJ3oW2Zo6yR9pqwIwfbNpgYmJ8ASSmZDvUdlV+wCaE3xB/a9eD4AVdutyUv1qnsFnuy8mJfZFk4DntJb1" ;
+            msg:signer  atom:6462959329580403000 ;
             msg:hash                     "NWwLPib90Q4Ad86SMUMn+qATku23+9Z0tKoAncxpld7SHAu7gMcKXZTMLn7b7FPA7OPWNBb+L8g5xv0TYBI9uYHOP65JHqJkcCI8bngJiKgZl9ecFEgyZNjMCOyEPLY3MVaIhNn3yPxVjMKM0Dlc2pYyjMkjcfnR7qjgF1W4wVI=" ;
             msg:publicKeyFingerprint     "lpT4VEyi1WSXpfxqojE03HRE6MmjNJXOqDr2eCc1AgI=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/9092731957586352000#data> .
@@ -1206,9 +1206,9 @@
             msg:protocolVersion          "1.0" .
     
     <https://localhost:8443/won/resource/event/j2ximhmq9hz7qt88zfja#envelope-bakg-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQDFcqfdQk7fcEK/fIIqtf1sZ19l7g9TmU9sljCct/E8ZeTOGeZsOTUNQgfc9kTXMRACMCBIsIoX62rVCxitU11tTX/yYJ+U1f1B5ZsqBJ13d+Dg17mNCcUCtuegpl0P3y72Dw==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQDFcqfdQk7fcEK/fIIqtf1sZ19l7g9TmU9sljCct/E8ZeTOGeZsOTUNQgfc9kTXMRACMCBIsIoX62rVCxitU11tTX/yYJ+U1f1B5ZsqBJ13d+Dg17mNCcUCtuegpl0P3y72Dw==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "TKUmITdttKIZIifT2nG6tU46GwoInhYBuF+4V+qdFCcZdUbTonSmmhm1bUi1jJFWMPhHpJH0vEGdPcQOFNQJ5rorQQLAVq+pwgGtnFfwLP7CnFTE/1MaU8zKwN4Ek898dYKq3SgUwzAyTPHB6H04HEjf9+qAFB15KnQTV9Dn69E=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/j2ximhmq9hz7qt88zfja#envelope-bakg> .
@@ -1234,9 +1234,9 @@
                     event:9092731957586352000 .
     
     <https://localhost:8443/won/resource/event/9092731957586352000#content-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQD0reuNx3ijBvAF9OwLmW0he7hngY5fTjQqfvIVlUkAYwo5zjcP45z9OdsRrD28YDQCMQCEntrsUPZksR+sBYaR9a25O+SZt/oH5yzlCqvIKLmEK/m3ESyR00CBQWVNpG4/fok=" ;
-            sig:hasVerificationCertificate  atom:6462959329580403000 ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQD0reuNx3ijBvAF9OwLmW0he7hngY5fTjQqfvIVlUkAYwo5zjcP45z9OdsRrD28YDQCMQCEntrsUPZksR+sBYaR9a25O+SZt/oH5yzlCqvIKLmEK/m3ESyR00CBQWVNpG4/fok=" ;
+            msg:signer  atom:6462959329580403000 ;
             msg:hash                     "ALNs2UTDIodwFyAkA57/S4xpXn6pTLvNmZqzm2oMxTdmypt/0/Y4eQ4AdVjOQetMTxvAiQ6J/tIRzEMWFTU0qrCTy07VuIYefE+r3ZtfwxVjN3wgtD8swDX+QzyD5nP4JfDlGT6zEAP7vDP4OPIfvFkCweyyZxRioO91JXKM6K8D" ;
             msg:publicKeyFingerprint     "lpT4VEyi1WSXpfxqojE03HRE6MmjNJXOqDr2eCc1AgI=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/9092731957586352000#content> .
@@ -1258,9 +1258,9 @@
                     event:tbrd97jxdqcjfbo804nf .
     
     <https://localhost:8443/won/resource/event/9092731957586352000#envelope-5ews-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMEzILeUM6AMFtewH9C6NjhFWekNntkg46YxeSlkVI9oc9YJOZnSMxwe9x6WngpawpAIwWWqfvgWGrKblPrhm96dlEt3Ia5OxwIONIMcm52Sgq0cGLTqdpVgOXuB0CniFIlWy" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMEzILeUM6AMFtewH9C6NjhFWekNntkg46YxeSlkVI9oc9YJOZnSMxwe9x6WngpawpAIwWWqfvgWGrKblPrhm96dlEt3Ia5OxwIONIMcm52Sgq0cGLTqdpVgOXuB0CniFIlWy" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "OaMggebVIbLvivIZQO+DfNICvZT+l3j0ssd9dZFsaclPFmDBMQxxHY6XgaWzWSBq+ePmQNHpHSmKjq/aoVB6ZCBNXsBccWqDJqZiZ9ZyxRidbF9RAS3T8x/4m9QeTYBl25967qF1s3vjiZ82oUq/s4tlbBIuLQj4cJ1b4k8cmX8=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/9092731957586352000#envelope-5ews> .
@@ -1268,9 +1268,9 @@
 
 <https://localhost:8443/won/resource/event/gfh3389cfyfwp10afzi6#envelope-dp1h-sig> {
     <https://localhost:8443/won/resource/event/gfh3389cfyfwp10afzi6#envelope-dp1h-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMBMfQxJcsXKuBRbxItlXwz/uoF87JSH9MZ9Hj60Go3udipcp/3auK6Q9XFim7mjjWAIwSjIVMgiXUmssdWyJEdIfpmMJxahc3Af9spwH/iGd4g5YTSzGcAN91ccCDLO+rCbl" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMBMfQxJcsXKuBRbxItlXwz/uoF87JSH9MZ9Hj60Go3udipcp/3auK6Q9XFim7mjjWAIwSjIVMgiXUmssdWyJEdIfpmMJxahc3Af9spwH/iGd4g5YTSzGcAN91ccCDLO+rCbl" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "Hr9h/9UPQlMyBRjF2qwKTLijjt4YVEBjKR140tb3uuKK4ugajhmT/a3Z5zZ4Yea1jA+D1GKAqWVkIT3elrYEiqcrOcRylLTYnH7E8IkkR9/G6yIaKTvijJeaSkUU9ZlCzykdQwOru4wQa4RwjQIEJr7GwdZW6nDdA07p/8YQ0nk=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/gfh3389cfyfwp10afzi6#envelope-dp1h> .
@@ -1284,17 +1284,17 @@
             msg:protocolVersion       "1.0" .
     
     <https://localhost:8443/won/resource/event/obe3udbfjn2i9cfv3ys7#envelope-bnkv-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMHf7WaaqqB6MY7F2KAfUMvTEfqvnrA1B7v/LNAk7hjLSRybUBDMiNQWjB6p6DFgz8wIxAPOD5xwrQys9xYKB7QBHRxelK+3hM3FZJRySaPpC7tcAReeTNlO2ZAI0s/n448N5jQ==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMHf7WaaqqB6MY7F2KAfUMvTEfqvnrA1B7v/LNAk7hjLSRybUBDMiNQWjB6p6DFgz8wIxAPOD5xwrQys9xYKB7QBHRxelK+3hM3FZJRySaPpC7tcAReeTNlO2ZAI0s/n448N5jQ==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "cXfLF873iFhGKAwOA3DnngXh81zwwE0pgalYlCVTcpGZhdSZEhs31EIIEqV9l7rBbPqBgQkHxf8k+k/cmVJ8dAZcjJ2cgsQ+s+zBlKOt6u5YGr4dO7LGYm39Tg5m1ucFIojoVYV28wj5EGn9NndUnzAq2dQIayv28uuOJWbfINg=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/obe3udbfjn2i9cfv3ys7#envelope-bnkv> .
     
     <https://localhost:8443/won/resource/event/shbpua34q1oujs0x4r17#envelope-73l0-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQCwWXX5U3aYEtT9essrHCC3bgxNF27OYpwTFKcAkq7ZPf/vZiQHuKPyVbrmxi0ZWAkCMEErEF+eeI1H7EVxirZu58bA4Me3IpuPjMPzaEb53+o9ARuJt8U/jbB9aIYTPet9/w==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQCwWXX5U3aYEtT9essrHCC3bgxNF27OYpwTFKcAkq7ZPf/vZiQHuKPyVbrmxi0ZWAkCMEErEF+eeI1H7EVxirZu58bA4Me3IpuPjMPzaEb53+o9ARuJt8U/jbB9aIYTPet9/w==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "Vs03LoBaWrzTKHKlDf9D5sCnQYzHL1LpKv5JV9I3qqQnbFQ3KGouZxJa0mplHLwbhknFO/oCi82rTVH2/B9qEDWWDqRpmEF0d2zNExw+/HCHomVO/FkGav14HZ7Kk1Jia7vbBuhPXkb9yHznYAmgD8HvFZiEevS+neYLCRozvKI=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/shbpua34q1oujs0x4r17#envelope-73l0> .
@@ -1307,9 +1307,9 @@
                     event:gfh3389cfyfwp10afzi6 .
     
     <https://localhost:8443/won/resource/event/gfh3389cfyfwp10afzi6#envelope-324k-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQDRdJj9Yzocd8hb2hSInEseDIwqEcuFQwJyRj28KwARh3Xa2MO+LZgkbyGjgoTlf7ACMFYC2SKt7y+Sk9mt1kMisXOKSgUHnsLG7uvS2e0okAjdzfinRuTn+GoA35qFQySvBw==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQDRdJj9Yzocd8hb2hSInEseDIwqEcuFQwJyRj28KwARh3Xa2MO+LZgkbyGjgoTlf7ACMFYC2SKt7y+Sk9mt1kMisXOKSgUHnsLG7uvS2e0okAjdzfinRuTn+GoA35qFQySvBw==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AJnYyPOOMdrB4KqAlUB29NBxDcQRLJFhsrkKwKgxcioUwnEkqJry5r5PAGX6KRyfQxog+CjnuZbuL6pZnE8JI4U/6gK/4YSkUU1Ht5yiDbmWFuwKMwsnhdl6GAV+B7K4JYmK20QT27HqWJJJiCbAaucONhH8O/v0weODzaypsLpi" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/gfh3389cfyfwp10afzi6#envelope-324k> .
@@ -1331,9 +1331,9 @@
                     event:egr8himjgxrdrr6wupf8 .
     
     <https://localhost:8443/won/resource/event/7741472099153082000#envelope-5mth-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQDVOdnNTU3s7/npLjS1/HDD41DIqLltEzGPW4lMf2bEzdweYRhI2+Ws79vcRtWXVG4CMQCui/BFTSXyr0rUdBPzVVY0FCrdFAvU2BPzksnFyiB37OvLogyh5vy2JGRH2uDFzP0=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQDVOdnNTU3s7/npLjS1/HDD41DIqLltEzGPW4lMf2bEzdweYRhI2+Ws79vcRtWXVG4CMQCui/BFTSXyr0rUdBPzVVY0FCrdFAvU2BPzksnFyiB37OvLogyh5vy2JGRH2uDFzP0=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "YqmZqQXGeg8ovE3zDa3XcvZraslsodQiAXPWtC4SRuzEeA4az+/Ez64hPXmctl1Zdl5YU8lFJ4qcSOu1mVvKUjYXWUwm5LrYO4dL2tTLJwvj2rBtbWoKh5mhqdQAAvh+AU8zWBCzOcqpz6I/ASnQPc9zxTIZAYv8wYqZmDWeQAk=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/7741472099153082000#envelope-5mth> .
@@ -1349,9 +1349,9 @@
             msg:protocolVersion       "1.0" .
     
     <https://localhost:8443/won/resource/event/tvso1oou56ke03otp4un#envelope-9jnb-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMH9cNrH+FePEEtdkvjIvJcnDUIhO4qGMN9QNUH502o8hWF7VDNoZmA9dHxzlkzDI3AIxAKiox3iZfxBuZS0jbfvLwkRi1XQ1at9f9pxRfSj0JMOk4BDvxqM8F/ozOUIgJClbSw==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMH9cNrH+FePEEtdkvjIvJcnDUIhO4qGMN9QNUH502o8hWF7VDNoZmA9dHxzlkzDI3AIxAKiox3iZfxBuZS0jbfvLwkRi1XQ1at9f9pxRfSj0JMOk4BDvxqM8F/ozOUIgJClbSw==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "JJ2j6kDbenZJXPdVXL0+wu1A5Onbwu7g/sOrKmTzEZxCgqh/7sWWLC2vTW2qTmMnrALRCZVjvuB9SI2ToKkbuzwIITN0d6im8VIVJVAYiZ9DnENQeUGrPyTbRS5s7f21ykrRCQGBNQs26V9ED875gnmTlveDRjLE87hceTeHyyM=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/tvso1oou56ke03otp4un#envelope-9jnb> .
@@ -1364,9 +1364,9 @@
                     event:7741472099153082000 .
     
     <https://localhost:8443/won/resource/event/7741472099153082000#data-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMAvlxqLi7vZ/LRIQ8exgUvh+601NsnDxakpOFqMM/wnvBU3cyJrzy8BKxHi+K5IsMgIwfObnMpuBUomD1Y2Pe03M5luVvjnoWlxY+gTZsgsoVazzPv+GYoyBMuMSMDQS1h3R" ;
-            sig:hasVerificationCertificate  atom:6462959329580403000 ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMAvlxqLi7vZ/LRIQ8exgUvh+601NsnDxakpOFqMM/wnvBU3cyJrzy8BKxHi+K5IsMgIwfObnMpuBUomD1Y2Pe03M5luVvjnoWlxY+gTZsgsoVazzPv+GYoyBMuMSMDQS1h3R" ;
+            msg:signer  atom:6462959329580403000 ;
             msg:hash                     "ebBWrFXm5ejlUWgw1p+tsaO3101V/n2l0kjSXVPfm5Y+QarVc7bysb94HbySRulIO/y5nLCbZgZ0OHlDF97yI0PUZoaXy89429aiKMRE1sc4LnU8uB4M2nGRkwnzQrTXjLCkABCiO0tpJNVwwsZQ5BiKC1XQ9JfOwObhiQm8jdY=" ;
             msg:publicKeyFingerprint     "lpT4VEyi1WSXpfxqojE03HRE6MmjNJXOqDr2eCc1AgI=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/7741472099153082000#data> .
@@ -1397,9 +1397,9 @@
                     event:7741472099153082000 .
     
     <https://localhost:8443/won/resource/event/7741472099153082000#content-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMAj/rnj0H1EXkY0hm48i9IIPyVO+ObctWt5PEOu+q4HkQx6nLzcMsM4vGZ8EDEDleQIwTUPPkgVTu9bv9QbCToPMfJwF2GrnWze5HliGhNLI1U66CXq9JgG0LvJ1iEY/A57N" ;
-            sig:hasVerificationCertificate  atom:6462959329580403000 ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMAj/rnj0H1EXkY0hm48i9IIPyVO+ObctWt5PEOu+q4HkQx6nLzcMsM4vGZ8EDEDleQIwTUPPkgVTu9bv9QbCToPMfJwF2GrnWze5HliGhNLI1U66CXq9JgG0LvJ1iEY/A57N" ;
+            msg:signer  atom:6462959329580403000 ;
             msg:hash                     "DMpKPWDcmaziwF1tRAtWDPJy/Kb84na1H+vnPSZaBtVJp6RIzRYuhWeCusdnfxOsBflfSQhzzwvAaduk91pe+A==" ;
             msg:publicKeyFingerprint     "lpT4VEyi1WSXpfxqojE03HRE6MmjNJXOqDr2eCc1AgI=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/7741472099153082000#content> .
@@ -1415,9 +1415,9 @@
             msg:protocolVersion       "1.0" .
     
     <https://localhost:8443/won/resource/event/93idjir232ftcgfmkrk4#envelope-n80f-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQC1LV7nG9LbT5j3sgTVQOcPyJtYxAGPQfcuJqy5O+SsiYhpT2UDo8CAxdJkgv4OW/0CMQDAC9XtDHtMqHI+d7IyBDPJ8TTulBKlAA2Wa8KcX4OG1Qxeem7wqIJ6vQaCxHufLPg=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQC1LV7nG9LbT5j3sgTVQOcPyJtYxAGPQfcuJqy5O+SsiYhpT2UDo8CAxdJkgv4OW/0CMQDAC9XtDHtMqHI+d7IyBDPJ8TTulBKlAA2Wa8KcX4OG1Qxeem7wqIJ6vQaCxHufLPg=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AJvER956N5wkh6oEKyU3CzSeUYSdArefWmqreRElMetGuWRfSJbzVqBfV0lyhS1MdkXL00YZfLP8hxspQxCRmn73gYAN/xPHWqIURT6W6ke1jk/McxsuloUgFlRv19F7+txO5sH5N0BMF9BYyoc1B1pyNgu6vwve1BFwDmvOmmFN" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/93idjir232ftcgfmkrk4#envelope-n80f> .
@@ -1430,9 +1430,9 @@
                     event:sf3zrqmkhe77jds4zsqu .
     
     <https://localhost:8443/won/resource/event/sf3zrqmkhe77jds4zsqu#envelope-5e2w-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCME/wu+SNDZOFkJnrDX9dSmLb6zTudkenIXSW3q+1vFfD/ZjjJXkjnnsafWNMiaJByAIxAM3UxqDmuXQFrFUKsWivAqT0QuFrzR9LZa0uB2Ankgpb3sBFnFdvpmajXR3S/9EEcQ==" ;
-            sig:hasVerificationCertificate  atom:8uiuri25l2b84oywmgsy ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCME/wu+SNDZOFkJnrDX9dSmLb6zTudkenIXSW3q+1vFfD/ZjjJXkjnnsafWNMiaJByAIxAM3UxqDmuXQFrFUKsWivAqT0QuFrzR9LZa0uB2Ankgpb3sBFnFdvpmajXR3S/9EEcQ==" ;
+            msg:signer  atom:8uiuri25l2b84oywmgsy ;
             msg:hash                     "TzEz/dPbSSCY4HkL29+bwJYWOXyp+YF9K6WfoIXCHRF1tPqT0vY002ZX3FNro87nYwN7YYAS0NqaVRaqRwj5FsCa4Qk9WodTpJZawMuWgb55i/avITHPYm3UAmIrUChPp8Wy06W0r7upQfkWN9k7det7TyuJfhG0J6XS9xGOl94=" ;
             msg:publicKeyFingerprint     "QNpwnnPG5NoajDF6BzOaeaCul5lj7Jy6M0StVQf7+20=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/sf3zrqmkhe77jds4zsqu#envelope-5e2w> .
@@ -1459,9 +1459,9 @@
                     event:sf3zrqmkhe77jds4zsqu .
     
     <https://localhost:8443/won/resource/event/sf3zrqmkhe77jds4zsqu#content-46rh-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMHL3/UF4GMdSt5DZEvjFxvAQWJWlSLA0GSyD8Ax6buVnVr9dz9cbZh9JiYZLkDKZzAIwOWkNztnrZNDV1mjCQlTeZME1C2f30WroDons0fxmz51uBFJncaD3QQSTf4SI/84f" ;
-            sig:hasVerificationCertificate  atom:8uiuri25l2b84oywmgsy ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMHL3/UF4GMdSt5DZEvjFxvAQWJWlSLA0GSyD8Ax6buVnVr9dz9cbZh9JiYZLkDKZzAIwOWkNztnrZNDV1mjCQlTeZME1C2f30WroDons0fxmz51uBFJncaD3QQSTf4SI/84f" ;
+            msg:signer  atom:8uiuri25l2b84oywmgsy ;
             msg:hash                     "B0Mrnm7XG3cIKmiTOaDwYyZ8O9KAnX0H7cDSxVxS3yxcJG3u2/aBtJ7RvjdmB0KwB1haei47SRmmiEMzseRdhA==" ;
             msg:publicKeyFingerprint     "QNpwnnPG5NoajDF6BzOaeaCul5lj7Jy6M0StVQf7+20=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/sf3zrqmkhe77jds4zsqu#content-46rh> .
@@ -1474,9 +1474,9 @@
 
 <https://localhost:8443/won/resource/event/sf3zrqmkhe77jds4zsqu#envelope-vlic-sig> {
     <https://localhost:8443/won/resource/event/sf3zrqmkhe77jds4zsqu#envelope-vlic-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQDWZVqGbbTE4WxJSsRRINvfFRw3L7vAbWySFkjhGrK3St/n+/wVzkTSh21trXsXYPoCMExf7nqLPhTCidzCAICOkUKWpORK/M2IkRklgCwep39Y7oyeEufyEafMK0BTeThwnw==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQDWZVqGbbTE4WxJSsRRINvfFRw3L7vAbWySFkjhGrK3St/n+/wVzkTSh21trXsXYPoCMExf7nqLPhTCidzCAICOkUKWpORK/M2IkRklgCwep39Y7oyeEufyEafMK0BTeThwnw==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AcQRSEzgBJNhZcqN7E01m5T4gRui+M+hvJMWdIjp/8dU+tRdcABlIY81tN7ZxcQPyAPeMgKpviOL919e+xFmy67RJJtVM4hGv12KDtAll0PQl9W5b9rnM+WOcY2JVx2xboRBJlzL/BWSJ2pcb0jnYNyAjODQqDjQa97uagLCOdo=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/sf3zrqmkhe77jds4zsqu#envelope-vlic> .
@@ -1491,9 +1491,9 @@
             msg:protocolVersion   "1.0" .
     
     <https://localhost:8443/won/resource/event/asaf3gqkras06mottmaa#envelope-caih-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQDOpSEfI7SuvGjGkJi4rDApmn2wqdnCbQA3Ww89Rqkjal6gGV2zojPgDVYE2cq202wCMEUd52xb4daS7aHhb+j5h6X9lRW3XQrXWgRaMEvxeT9UkgqD2EABMOG3z6RkjVhz+g==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQDOpSEfI7SuvGjGkJi4rDApmn2wqdnCbQA3Ww89Rqkjal6gGV2zojPgDVYE2cq202wCMEUd52xb4daS7aHhb+j5h6X9lRW3XQrXWgRaMEvxeT9UkgqD2EABMOG3z6RkjVhz+g==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "KuuPsCHAsx4mSuwXw/lb2bNfHVxshPQN/aIjj5wr7mkSEH4HJW3GCzsIU1E2p22Q/9PEcjTiQhvduYRUWkhYRlI0g/RpN2rJ0t3ENjfidRVV10ETDcV4vu3hf4Cc5OPeFeyvyrQ+CziDIczTHETCI/8/NOMPiwigoyffTCmXM3Y=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/asaf3gqkras06mottmaa#envelope-caih> .
@@ -1522,9 +1522,9 @@
                     event:vhz1ryv57oov3h9d26ua .
     
     <https://localhost:8443/won/resource/event/z34bjxm4z52ufq0atesh#envelope-bi2h-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMDE236hV9LlGA1XaSItoJ8l26KX+hso0tSoyBGNvMzrij6erd63pFEBoHq+DKrrbCAIxANYRga7e4RYCCvwNB+FSRTj6mwNC1kYEIOUxOz1msZlTsD3NDK50qs8gnOCkz4hK2w==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMDE236hV9LlGA1XaSItoJ8l26KX+hso0tSoyBGNvMzrij6erd63pFEBoHq+DKrrbCAIxANYRga7e4RYCCvwNB+FSRTj6mwNC1kYEIOUxOz1msZlTsD3NDK50qs8gnOCkz4hK2w==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AjiQzQjbf8cO94vPRwi5AAazE5fUIz9KWs3M+ioSOIjFqn4MuzuVxPtQVkK0AgJ8bXY4KyoYU8VwGuZg77df+mid5Dkojy8ceHka4E+HuKo0nf/8FG9wh9+a5+twLHTF8hP2k7nDUyqsd/QeuQdXC0qS4GTG2oyFLzt8KQ0wVk8=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/z34bjxm4z52ufq0atesh#envelope-bi2h> .
@@ -1556,9 +1556,9 @@
                     event:z34bjxm4z52ufq0atesh .
     
     <https://localhost:8443/won/resource/event/w5swkr4limc6t37tghoi#envelope-v53g-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMCvIfWhecfTpZsy5V0361gjsCZYbcRm6uN3LsmlBdKBmDx7O6uE7QsB2CxCYjIEhCgIxAIeXO2g35sHy+tG2l5RMy9lFw/+d5lWra45dsaL/5YQTogrTT+lWaZG9gt167JT9Aw==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMCvIfWhecfTpZsy5V0361gjsCZYbcRm6uN3LsmlBdKBmDx7O6uE7QsB2CxCYjIEhCgIxAIeXO2g35sHy+tG2l5RMy9lFw/+d5lWra45dsaL/5YQTogrTT+lWaZG9gt167JT9Aw==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "fmGd2yfp/3bjroZeaz7/ZGcxdsICMUjHO9+HPTIPgG2pWNzqfz4oW0lPfK2GW+3qmOfE0++DSnireKwUwvKBnJys90reLIVwuMW7XAmbW3U7wSGDXkosqZth243iLHt17U37nLlvp1Z3JC3JA/RFpjurJekEOnhXFKt36UrZgiE=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/w5swkr4limc6t37tghoi#envelope-v53g> .
@@ -1572,9 +1572,9 @@
             msg:protocolVersion       "1.0" .
     
     <https://localhost:8443/won/resource/event/sf3zrqmkhe77jds4zsqu#envelope-vlic-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQDWZVqGbbTE4WxJSsRRINvfFRw3L7vAbWySFkjhGrK3St/n+/wVzkTSh21trXsXYPoCMExf7nqLPhTCidzCAICOkUKWpORK/M2IkRklgCwep39Y7oyeEufyEafMK0BTeThwnw==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQDWZVqGbbTE4WxJSsRRINvfFRw3L7vAbWySFkjhGrK3St/n+/wVzkTSh21trXsXYPoCMExf7nqLPhTCidzCAICOkUKWpORK/M2IkRklgCwep39Y7oyeEufyEafMK0BTeThwnw==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AcQRSEzgBJNhZcqN7E01m5T4gRui+M+hvJMWdIjp/8dU+tRdcABlIY81tN7ZxcQPyAPeMgKpviOL919e+xFmy67RJJtVM4hGv12KDtAll0PQl9W5b9rnM+WOcY2JVx2xboRBJlzL/BWSJ2pcb0jnYNyAjODQqDjQa97uagLCOdo=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/sf3zrqmkhe77jds4zsqu#envelope-vlic> .
@@ -1587,17 +1587,17 @@
                     event:vhz1ryv57oov3h9d26ua .
     
     <https://localhost:8443/won/resource/event/a0yznz71dhn6g9wfb0ds#envelope-z8a7-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMDPJRlsWuVet79t4OHv0AvEhktqJNnVujCGWXtENHZxwRKIuEKU/E3OMq5nF0EuLvwIxAM/ZtT8jlgVFE92Mzmy5Ouw0QqsiuDma3kizqNzyJXNDU3c5Vgpi7PMd5kniF18FVg==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMDPJRlsWuVet79t4OHv0AvEhktqJNnVujCGWXtENHZxwRKIuEKU/E3OMq5nF0EuLvwIxAM/ZtT8jlgVFE92Mzmy5Ouw0QqsiuDma3kizqNzyJXNDU3c5Vgpi7PMd5kniF18FVg==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AJRcZo2j2zuPuWUJwsUjuGHuQjIjJXKJyW3s4H5QwzCI7xZGJHKxIB8AKuNQSTZ0M27JKheHIGCuZj0wVV25O0gNy8AQEXJiP3ttrgFvrC/OUXHl2UlSo4OtWBmhEaHf8KYoc0qEmpAkBxLKggq1TLFJwQVxuEVoNEhrBGrbLTiz" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/a0yznz71dhn6g9wfb0ds#envelope-z8a7> .
     
     <https://localhost:8443/won/resource/event/vhz1ryv57oov3h9d26ua#envelope-bel0-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMF17U6gzFSem6AX38GR9qbaO6nrDCNoulrl/zc+bQ0yH2vZqTgxQ72vIpRvxaEKNBAIwFhjIYUPZdLjlghJjBQNZ4HPhdBITQTVZJwfmS96J00GAxJW3bQJDi3c47UXlwugx" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMF17U6gzFSem6AX38GR9qbaO6nrDCNoulrl/zc+bQ0yH2vZqTgxQ72vIpRvxaEKNBAIwFhjIYUPZdLjlghJjBQNZ4HPhdBITQTVZJwfmS96J00GAxJW3bQJDi3c47UXlwugx" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "f5dCyOMLVI/j6pfmoBUHwPohRX9icOM/Nz7jCPC91cKy/4EAWveS7cZL2lPaKVEeZCUNUDdzNblgDCkB3WlqUoWchpIzafRcaLPY/1+aak9WRfMj0oKBKCBc8PP10HE1FfzqdEHGIB8hHyuFSgWO9g2epYGVS46M5oMHhaJvLPg=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/vhz1ryv57oov3h9d26ua#envelope-bel0> .
@@ -1605,9 +1605,9 @@
 
 <https://localhost:8443/won/resource/event/a0yznz71dhn6g9wfb0ds#envelope-z8a7-sig> {
     <https://localhost:8443/won/resource/event/a0yznz71dhn6g9wfb0ds#envelope-z8a7-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMDPJRlsWuVet79t4OHv0AvEhktqJNnVujCGWXtENHZxwRKIuEKU/E3OMq5nF0EuLvwIxAM/ZtT8jlgVFE92Mzmy5Ouw0QqsiuDma3kizqNzyJXNDU3c5Vgpi7PMd5kniF18FVg==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMDPJRlsWuVet79t4OHv0AvEhktqJNnVujCGWXtENHZxwRKIuEKU/E3OMq5nF0EuLvwIxAM/ZtT8jlgVFE92Mzmy5Ouw0QqsiuDma3kizqNzyJXNDU3c5Vgpi7PMd5kniF18FVg==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AJRcZo2j2zuPuWUJwsUjuGHuQjIjJXKJyW3s4H5QwzCI7xZGJHKxIB8AKuNQSTZ0M27JKheHIGCuZj0wVV25O0gNy8AQEXJiP3ttrgFvrC/OUXHl2UlSo4OtWBmhEaHf8KYoc0qEmpAkBxLKggq1TLFJwQVxuEVoNEhrBGrbLTiz" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/a0yznz71dhn6g9wfb0ds#envelope-z8a7> .
@@ -1630,9 +1630,9 @@
             msg:protocolVersion          "1.0" .
     
     <https://localhost:8443/won/resource/event/sf3zrqmkhe77jds4zsqu#envelope-vlic-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQDWZVqGbbTE4WxJSsRRINvfFRw3L7vAbWySFkjhGrK3St/n+/wVzkTSh21trXsXYPoCMExf7nqLPhTCidzCAICOkUKWpORK/M2IkRklgCwep39Y7oyeEufyEafMK0BTeThwnw==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQDWZVqGbbTE4WxJSsRRINvfFRw3L7vAbWySFkjhGrK3St/n+/wVzkTSh21trXsXYPoCMExf7nqLPhTCidzCAICOkUKWpORK/M2IkRklgCwep39Y7oyeEufyEafMK0BTeThwnw==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AcQRSEzgBJNhZcqN7E01m5T4gRui+M+hvJMWdIjp/8dU+tRdcABlIY81tN7ZxcQPyAPeMgKpviOL919e+xFmy67RJJtVM4hGv12KDtAll0PQl9W5b9rnM+WOcY2JVx2xboRBJlzL/BWSJ2pcb0jnYNyAjODQqDjQa97uagLCOdo=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/sf3zrqmkhe77jds4zsqu#envelope-vlic> .
@@ -1646,9 +1646,9 @@
 
 <https://localhost:8443/won/resource/event/vhz1ryv57oov3h9d26ua#envelope-mc0q-sig> {
     <https://localhost:8443/won/resource/event/vhz1ryv57oov3h9d26ua#envelope-mc0q-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQD39KASQUI1FEIU1OGuNpBhwk3rq9x2O+/RQG8aI+6eezpxVxC1anTCA3EYyTldel0CMQC9uIvWSEJWpAU/vyevZ0N+yB5+HQc2tZoxqC/jtwbNwWnUfKqp2ASdpC5Iv8U31Bk=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQD39KASQUI1FEIU1OGuNpBhwk3rq9x2O+/RQG8aI+6eezpxVxC1anTCA3EYyTldel0CMQC9uIvWSEJWpAU/vyevZ0N+yB5+HQc2tZoxqC/jtwbNwWnUfKqp2ASdpC5Iv8U31Bk=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "LpgmvfelQTomTHuSOqrwdkwyiXBYhuMCDYSsl1n8XYZMA8lxRw1N5J0U11eMujgRUaKna0ZiNpKX1Ynx0QqTBSKYazHVeUn2p8owP5YB9+0XqJ1jhnKO7iLSl7eeQqdNILTdjxzVcn/h+MFmkkrghogWS9bT11F1xefkR3a4N94=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/vhz1ryv57oov3h9d26ua#envelope-mc0q> .
@@ -1662,17 +1662,17 @@
             msg:protocolVersion       "1.0" .
     
     <https://localhost:8443/won/resource/event/dyp34hpnew6f9j4ddg78#envelope-fq5n-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMDWLwAtKDwje+vMf4yg2WIYeYNItKWn2AZI4fRxvRroQa4Fkgus/nBAWdMEjNiE8eAIxAN+/RGkzTjHkyUuURFn2OL/IjCr4b+0h51YGtsEHiApy9LKDG6PCvbP+jwJJTdo8fg==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMDWLwAtKDwje+vMf4yg2WIYeYNItKWn2AZI4fRxvRroQa4Fkgus/nBAWdMEjNiE8eAIxAN+/RGkzTjHkyUuURFn2OL/IjCr4b+0h51YGtsEHiApy9LKDG6PCvbP+jwJJTdo8fg==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "QGebx3HqBJ7bbcFlucMClJHkkvwrqW7tgmZ2bwogCMSNRiFugZ/wB9uN+Ckit0/yDLpwj4H7c7NvOVLthM11fJfVFRKAV0JPs4xybdJlS98JwzfSJ5RvqMreb+Sui4Qahh754gjwdPQlGS+lDLtWSd7BKOLhfWHxmCknimHsctc=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/dyp34hpnew6f9j4ddg78#envelope-fq5n> .
     
     <https://localhost:8443/won/resource/event/3s32pqs80zz2n0sxnrwa#envelope-gaf7-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQDNPPNJ7fVWPELqz34F8+9GCl1MHPp1M/g4CPm7PrEOJch9aQtUfvNh44ma5Qg/caYCMQDzhJQfzznt7mVGr9lpOCmkNNK4uKgqcO7cXGZ7uSRbuQTKn0eAfq+vvEhc7xfOqEQ=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQDNPPNJ7fVWPELqz34F8+9GCl1MHPp1M/g4CPm7PrEOJch9aQtUfvNh44ma5Qg/caYCMQDzhJQfzznt7mVGr9lpOCmkNNK4uKgqcO7cXGZ7uSRbuQTKn0eAfq+vvEhc7xfOqEQ=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "eEnDOS53FNWtuQTA55rMmgBwQR05jOH7pVxwuyUkoOwDKANj7gVibamG1UIvB1bB22eDShDVk+cxe2Cb55nxM00LIFlWmh9p7UPHqOYYZGBFd1yNpvlFcqAc0vt5bU6ieNJtT42Lr4BZ0zAnow55/IKwTapV9rmRoEr49ZZFR3E=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/3s32pqs80zz2n0sxnrwa#envelope-gaf7> .
@@ -1685,9 +1685,9 @@
                     event:pjlqfz70o43zy0bxigj9 .
     
     <https://localhost:8443/won/resource/event/pjlqfz70o43zy0bxigj9#envelope-oul2-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQC4bO3cp+fg09etu5t/rzId7SA9ACx/KCbmUE19mdFGPqxWczq1yqo7rhnFvsTWf2kCMFRDRByFywXFWNRnhsd2pE3LKAaZjlH12b4itJXQuiackX2vwPUQgGSy0PHJjluajg==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQC4bO3cp+fg09etu5t/rzId7SA9ACx/KCbmUE19mdFGPqxWczq1yqo7rhnFvsTWf2kCMFRDRByFywXFWNRnhsd2pE3LKAaZjlH12b4itJXQuiackX2vwPUQgGSy0PHJjluajg==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "YnV2EwAyzAmdbyRzU45qeNS6eBHgyIjxGRZBz8XARU/BpuMyYr98IO83ira2oRf5NPmEjyMz/eXPzVGhRMJwdzaSmjqVOULHAqTIwPky/1Bco2YOapSc2ZlyebN9vRNXYUreGVdEKpBWjmH65JsrJYfDiySuytuSMqYFyCDukh4=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/pjlqfz70o43zy0bxigj9#envelope-oul2> .
@@ -1709,9 +1709,9 @@
                     event:pjlqfz70o43zy0bxigj9 .
     
     <https://localhost:8443/won/resource/event/6xxy7qhy6d4b6j792ay7#envelope-sq5d-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQCrt3SpbOSaDkLuZxIVkp1BBYH/UbgBMpXKkUAiYsw0FDEwPlAA26o0xqxzuikLMy4CMCt7oHmsYncTZ3PNBHiqdXEj6+khj4I9so5wUicxpRYCcd+al6crPABnvciqZGn1Ow==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQCrt3SpbOSaDkLuZxIVkp1BBYH/UbgBMpXKkUAiYsw0FDEwPlAA26o0xqxzuikLMy4CMCt7oHmsYncTZ3PNBHiqdXEj6+khj4I9so5wUicxpRYCcd+al6crPABnvciqZGn1Ow==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AJpBPVAQ2QPowbdT6+w3xyd6OTCkiCqK1sIMQyIi30yLnY/ttTgyvjPT/8xyqZwFZPaXHmXbBSQ0qGUQDgzOBnhoaodVTpBVNP68rRHK6I0oLhZC2L6LIU6g5yFRgoyrQYSiyt1ZYWGmD5LT5z6xmHoceqPmcdMXa/I10F0EsZYX" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/6xxy7qhy6d4b6j792ay7#envelope-sq5d> .
@@ -1719,9 +1719,9 @@
 
 <https://localhost:8443/won/resource/event/pjlqfz70o43zy0bxigj9#envelope-x3lq-sig> {
     <https://localhost:8443/won/resource/event/pjlqfz70o43zy0bxigj9#envelope-x3lq-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMCT2OQYO+H7gDkG+NuMXF4yakNPhu5EfmnLhahuYCiP48epwrIJ8XVurNEFqf/wlOQIxAMbx3RGftxkOaCQcN++tkUOOwCTHd9cIsyd+rj+iiJedQcwGMUIvQTpXXU7TYybL3w==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMCT2OQYO+H7gDkG+NuMXF4yakNPhu5EfmnLhahuYCiP48epwrIJ8XVurNEFqf/wlOQIxAMbx3RGftxkOaCQcN++tkUOOwCTHd9cIsyd+rj+iiJedQcwGMUIvQTpXXU7TYybL3w==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "QMKpxwIow2iNVOEnLZJJbiZ97iSRBJF8hZDcL9R3mXCrIH+tVdybATnRkJmEYIU2WnsJkfwCuGU4ZbP8zyyGP88tiOzd2lEFxQvuYgYtshNGhB27fTd7awkKKKU2uR25xfBqznoUaBS+2bX+Qq5/V9I2WIfgItYCtp7lnylL7zM=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/pjlqfz70o43zy0bxigj9#envelope-x3lq> .
@@ -1753,9 +1753,9 @@
             msg:protocolVersion          "1.0" .
     
     <https://localhost:8443/won/resource/event/2p1eblckqohkqr625gfw#envelope-rhw2-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMGc4zlE0SqXjSTQwtSW2PZ52FCrk3mZTNY2ezxwAZXInydtiakdASXBfisW24mYQZAIxAJZhCJ2hPI+4jRD8imjCTVlgWePavRjEZ/Zu336oTDqqY85ZWkTPtuckVAiNbkNjnQ==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMGc4zlE0SqXjSTQwtSW2PZ52FCrk3mZTNY2ezxwAZXInydtiakdASXBfisW24mYQZAIxAJZhCJ2hPI+4jRD8imjCTVlgWePavRjEZ/Zu336oTDqqY85ZWkTPtuckVAiNbkNjnQ==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "Y2F9LXjSTW+CpArF/L2J2t80Gp1iXWRj5uLOVsDWEfRPZyAV0r8yoII+cctTFGKHbwBRlGcKY7a6i9LpCPk8TODLG+RVPEO+8mT39pedxV2g9jVA3rIZtQ/2QUiazWMNp5xRPy3o15cpacKEm/qOoK6c0mgXMyL2JzrXDt7bOao=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/2p1eblckqohkqr625gfw#envelope-rhw2> .
@@ -1782,9 +1782,9 @@
                     event:3s32pqs80zz2n0sxnrwa .
     
     <https://localhost:8443/won/resource/event/3s32pqs80zz2n0sxnrwa#content-uwyg-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQDv5PGL4GJAxdQpumH+Tj1nz8E1YjaXvb1Hbs5JXTPnq06+Ln/FpuG89sKEgghfOuMCMF38/5XVvSV6W7saH2TXBUoXtmyPbgim93AiYGHD/PSNTylck37EXuztrUk47tGELg==" ;
-            sig:hasVerificationCertificate  atom:8uiuri25l2b84oywmgsy ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQDv5PGL4GJAxdQpumH+Tj1nz8E1YjaXvb1Hbs5JXTPnq06+Ln/FpuG89sKEgghfOuMCMF38/5XVvSV6W7saH2TXBUoXtmyPbgim93AiYGHD/PSNTylck37EXuztrUk47tGELg==" ;
+            msg:signer  atom:8uiuri25l2b84oywmgsy ;
             msg:hash                     "ALNs2UTDIodwFyAkA57/S4xpXn6pTLvNmZqzm2oMxTdmypt/0/Y4eQ4AdVjOQetMTxvAiQ6J/tIRzEMWFTU0qrCZQRY6wNeWwQ6lAP91fEfSwAg5X0akFW/e5f6OCcvL2ELLyt8e9jHFocS0AfN+k/aWr5Rj0fnmC4IuNIfVeevp" ;
             msg:publicKeyFingerprint     "QNpwnnPG5NoajDF6BzOaeaCul5lj7Jy6M0StVQf7+20=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/3s32pqs80zz2n0sxnrwa#content-uwyg> .
@@ -1821,9 +1821,9 @@
                     event:dssbvofhtly928vl4i4m .
     
     <https://localhost:8443/won/resource/event/b02kmmdjr6fzdaow6rqt#envelope-4i5f-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQDSrnuziO516C0YD52CrmjVQSneTLf+u7Z3o/3hU1W65r8dAE8fNp/fO45VVgeBwNwCMQDBdH5JdtozQPkQJhW+dHFt2/YieFtvMfHOSnvasIZBmBeUFe5IJnXbbi8nq7cKmzs=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQDSrnuziO516C0YD52CrmjVQSneTLf+u7Z3o/3hU1W65r8dAE8fNp/fO45VVgeBwNwCMQDBdH5JdtozQPkQJhW+dHFt2/YieFtvMfHOSnvasIZBmBeUFe5IJnXbbi8nq7cKmzs=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "TCVh/FKAxxvxDJQhTS0QY3g44a7uaI9bk6pnu0h3G/2G1tNRv6CIhYjNFc4xSsamqaw+z02F0Rl9k+jp/lIjxyRZaYIiREhMH8gRuMoao0BQmbdUXuFnnfDtx+XMJ4HuFLVdYne4x6fOKSFY/QNbQLFJ+7+V4Uf6LcRgCKIiNKo=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/b02kmmdjr6fzdaow6rqt#envelope-4i5f> .
@@ -1831,9 +1831,9 @@
 
 <https://localhost:8443/won/resource/event/b02kmmdjr6fzdaow6rqt#envelope-4i5f-sig> {
     <https://localhost:8443/won/resource/event/b02kmmdjr6fzdaow6rqt#envelope-4i5f-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQDSrnuziO516C0YD52CrmjVQSneTLf+u7Z3o/3hU1W65r8dAE8fNp/fO45VVgeBwNwCMQDBdH5JdtozQPkQJhW+dHFt2/YieFtvMfHOSnvasIZBmBeUFe5IJnXbbi8nq7cKmzs=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQDSrnuziO516C0YD52CrmjVQSneTLf+u7Z3o/3hU1W65r8dAE8fNp/fO45VVgeBwNwCMQDBdH5JdtozQPkQJhW+dHFt2/YieFtvMfHOSnvasIZBmBeUFe5IJnXbbi8nq7cKmzs=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "TCVh/FKAxxvxDJQhTS0QY3g44a7uaI9bk6pnu0h3G/2G1tNRv6CIhYjNFc4xSsamqaw+z02F0Rl9k+jp/lIjxyRZaYIiREhMH8gRuMoao0BQmbdUXuFnnfDtx+XMJ4HuFLVdYne4x6fOKSFY/QNbQLFJ+7+V4Uf6LcRgCKIiNKo=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/b02kmmdjr6fzdaow6rqt#envelope-4i5f> .
@@ -1847,9 +1847,9 @@
             msg:protocolVersion       "1.0" .
     
     <https://localhost:8443/won/resource/event/vhz1ryv57oov3h9d26ua#envelope-mc0q-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQD39KASQUI1FEIU1OGuNpBhwk3rq9x2O+/RQG8aI+6eezpxVxC1anTCA3EYyTldel0CMQC9uIvWSEJWpAU/vyevZ0N+yB5+HQc2tZoxqC/jtwbNwWnUfKqp2ASdpC5Iv8U31Bk=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQD39KASQUI1FEIU1OGuNpBhwk3rq9x2O+/RQG8aI+6eezpxVxC1anTCA3EYyTldel0CMQC9uIvWSEJWpAU/vyevZ0N+yB5+HQc2tZoxqC/jtwbNwWnUfKqp2ASdpC5Iv8U31Bk=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "LpgmvfelQTomTHuSOqrwdkwyiXBYhuMCDYSsl1n8XYZMA8lxRw1N5J0U11eMujgRUaKna0ZiNpKX1Ynx0QqTBSKYazHVeUn2p8owP5YB9+0XqJ1jhnKO7iLSl7eeQqdNILTdjxzVcn/h+MFmkkrghogWS9bT11F1xefkR3a4N94=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/vhz1ryv57oov3h9d26ua#envelope-mc0q> .
@@ -1862,9 +1862,9 @@
                     event:b02kmmdjr6fzdaow6rqt .
     
     <https://localhost:8443/won/resource/event/b02kmmdjr6fzdaow6rqt#envelope-ui7k-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMANYuxIbn3XM10XpdvHaAQ3+Fbfw9oeZ0ZHJSiYn5UtXV13nE56htdpOyq2kIcRP6gIwb9JDJysSmykKatF7UakhGaeTkzUbLvXnj6DjuqxlxdvIBu1tqBeKsAWNzEwsG6hT" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMANYuxIbn3XM10XpdvHaAQ3+Fbfw9oeZ0ZHJSiYn5UtXV13nE56htdpOyq2kIcRP6gIwb9JDJysSmykKatF7UakhGaeTkzUbLvXnj6DjuqxlxdvIBu1tqBeKsAWNzEwsG6hT" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "IFytHjJv1e+P23LXSWgyXv2eyaAIg86lBrTlmFMmWLrRlPEefYYT9ufKG0gCDMvtb9g0LEk+3p07WO1cE7IrbSgSd1Q64T6ovkL28V2vhnbC1Ezkt9otMhstxkkUhuQPH2Wtn8aAxtb6w9sYR/ImwClczEist2T3m2XPGnyM3a0=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/b02kmmdjr6fzdaow6rqt#envelope-ui7k> .
@@ -1872,9 +1872,9 @@
 
 <https://localhost:8443/won/resource/event/dssbvofhtly928vl4i4m#envelope-g134-sig> {
     <https://localhost:8443/won/resource/event/dssbvofhtly928vl4i4m#envelope-g134-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQCfVVFAJ4RMcZcvu6scMXSUFuXA5tXihM6HwRqJWOUbUZUkyzVppp2ZlzrBoGh10wACMDXfw19NEg5/DIi0BczJofsmDAwFgi9J/x9ib8q5KciFtJB47qaZOzRq9/j4phWV0w==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQCfVVFAJ4RMcZcvu6scMXSUFuXA5tXihM6HwRqJWOUbUZUkyzVppp2ZlzrBoGh10wACMDXfw19NEg5/DIi0BczJofsmDAwFgi9J/x9ib8q5KciFtJB47qaZOzRq9/j4phWV0w==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "V63uix2B/8UOjjixRZo2EDfm5CoA5sTmBl+IDk34UCtZen1ucqPZoDvtXWXRBS9OJiMZqnhw/Ec09Af0wruV9u/vJRaHT1TQHD7e6rkkN5/pWgxWa9lkVOVYcqu5GNZ6kwziYXO0WE6Q6rnrGwJGdc/NO4MmkUCxcwaZZuW6/j8=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/dssbvofhtly928vl4i4m#envelope-g134> .
@@ -1889,9 +1889,9 @@
             msg:protocolVersion   "1.0" .
     
     <https://localhost:8443/won/resource/event/r3vt2863pqnjcqrj1scj#envelope-emmi-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMDYULIWogFD2UKaheMmzQr4ru6ZavfeC6JmkehYjfqVhHEdSRTwZ8zBGcCvZx31hbQIwdxHz32F42VgOZDKdndqMwlTT+Muj+Ca4hybJ0iTZTbivhNQauUIkq9x7romfXYOf" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMDYULIWogFD2UKaheMmzQr4ru6ZavfeC6JmkehYjfqVhHEdSRTwZ8zBGcCvZx31hbQIwdxHz32F42VgOZDKdndqMwlTT+Muj+Ca4hybJ0iTZTbivhNQauUIkq9x7romfXYOf" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "YkySnWWQXtJCyt+W39t6LOq+/ra82owPzfLUFgDKxZPW7P8w6n5Cpin1qRgiQNbp6hqeLWm/TyDxEIYGvqikwZKGqQLUilJWqHMrbMaTVSIniF0QYu+6znGX+39qcCOO8aSWozv27u7gzBI1eLOI7JpOuu5zHhgELvdg5F9NkJ8=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/r3vt2863pqnjcqrj1scj#envelope-emmi> .
@@ -1925,9 +1925,9 @@
                     event:k432v1ilpl2365r35ll6 .
     
     <https://localhost:8443/won/resource/event/k432v1ilpl2365r35ll6#content-cjru-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQDCq65sQpWR7YznJSQeJSB3pyyPDBi7/EvpbFjCp5057oRlwfzl4cmzSSuEvVtSgIwCMHbMuEHbnk0VGaIguc+VI/YntfO+BWdp7isaPw1xHqM+0bBVT4hnFnNUunHme+xx5Q==" ;
-            sig:hasVerificationCertificate  atom:8uiuri25l2b84oywmgsy ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQDCq65sQpWR7YznJSQeJSB3pyyPDBi7/EvpbFjCp5057oRlwfzl4cmzSSuEvVtSgIwCMHbMuEHbnk0VGaIguc+VI/YntfO+BWdp7isaPw1xHqM+0bBVT4hnFnNUunHme+xx5Q==" ;
+            msg:signer  atom:8uiuri25l2b84oywmgsy ;
             msg:hash                     "ALNs2UTDIodwFyAkA57/S4xpXn6pTLvNmZqzm2oMxTdmypt/0/Y4eQ4AdVjOQetMTxvAiQ6J/tIRzEMWFTU0qrCESg/vOfmoSOhgddGFIGgj/DSj0XJgecZusgIoaDs3ru38Auo/p8qIF3mP2Bu2zfFApUZ2DZkdSxxm4hG1iiIp" ;
             msg:publicKeyFingerprint     "QNpwnnPG5NoajDF6BzOaeaCul5lj7Jy6M0StVQf7+20=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/k432v1ilpl2365r35ll6#content-cjru> .
@@ -1940,9 +1940,9 @@
 
 <https://localhost:8443/won/resource/event/golbvzem4lerfw6n7ryu#envelope-o04e-sig> {
     <https://localhost:8443/won/resource/event/golbvzem4lerfw6n7ryu#envelope-o04e-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQCKZzuG0MAoqiDZ4a13jr3WZV1HlTR7GsP+2tFCI4B6V5oifjxrAh9DlzdcZOMMX4MCMC2w7YvZOX5V59qY16eWyxCa0ABYQbY24GcGN8jL9ls3i4tx25hN+rQTRQquKb8vZA==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQCKZzuG0MAoqiDZ4a13jr3WZV1HlTR7GsP+2tFCI4B6V5oifjxrAh9DlzdcZOMMX4MCMC2w7YvZOX5V59qY16eWyxCa0ABYQbY24GcGN8jL9ls3i4tx25hN+rQTRQquKb8vZA==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "SA8oPtJdQ2yGILbhETov3WtTi3Jk466frlcqU9jytTLgciYXXATuJvkiQcQsGWTq5V/pLWBgC6ZVQzSRu+TltD0/nTas20K2TVqbdhkcdpSu/lqyCKDEovVBJ634CJ4bI+dfTdAvTU6Q2Q7jgbKsZ/Nn7H3Gkjnj43zYtxt6FE8=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/golbvzem4lerfw6n7ryu#envelope-o04e> .
@@ -1968,9 +1968,9 @@
             msg:protocolVersion          "1.0" .
     
     <https://localhost:8443/won/resource/event/42aok9j00v5hcn00w618#envelope-es3d-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMDe6OBLhHndJnrbrFdRZPVHuj+kQogTl0hQIehn1eGM9Nf26DvRcaeU0b+d6uzFxuAIxAPgYNH/LEZhqtmb1XwdXClwsM5WD1BfIjYYN70yqeEU0d4onIRci3MgZ/5sHvJNuoQ==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMDe6OBLhHndJnrbrFdRZPVHuj+kQogTl0hQIehn1eGM9Nf26DvRcaeU0b+d6uzFxuAIxAPgYNH/LEZhqtmb1XwdXClwsM5WD1BfIjYYN70yqeEU0d4onIRci3MgZ/5sHvJNuoQ==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "bwzouujAmtR6L4I6fUKx9ork/6sHhTStTBk+iAEZLJ+Cve1d2jJsLyg2hVAuesv/bh2aj7EGZXydlcAcvBMv5FthbP66eKdoXx5R0v5tia8Zz/x+90GYL5twqqxaKrBGdCaLnudntiqBG9hvxZfgD46ZFCmm4m4TxqCcNUA9DgM=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/42aok9j00v5hcn00w618#envelope-es3d> .
@@ -1989,9 +1989,9 @@
 
 <https://localhost:8443/won/resource/event/5239455422558978000#envelope-c141> {
     <https://localhost:8443/won/resource/event/z34bjxm4z52ufq0atesh#envelope-bi2h-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMDE236hV9LlGA1XaSItoJ8l26KX+hso0tSoyBGNvMzrij6erd63pFEBoHq+DKrrbCAIxANYRga7e4RYCCvwNB+FSRTj6mwNC1kYEIOUxOz1msZlTsD3NDK50qs8gnOCkz4hK2w==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMDE236hV9LlGA1XaSItoJ8l26KX+hso0tSoyBGNvMzrij6erd63pFEBoHq+DKrrbCAIxANYRga7e4RYCCvwNB+FSRTj6mwNC1kYEIOUxOz1msZlTsD3NDK50qs8gnOCkz4hK2w==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AjiQzQjbf8cO94vPRwi5AAazE5fUIz9KWs3M+ioSOIjFqn4MuzuVxPtQVkK0AgJ8bXY4KyoYU8VwGuZg77df+mid5Dkojy8ceHka4E+HuKo0nf/8FG9wh9+a5+twLHTF8hP2k7nDUyqsd/QeuQdXC0qS4GTG2oyFLzt8KQ0wVk8=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/z34bjxm4z52ufq0atesh#envelope-bi2h> .
@@ -2012,9 +2012,9 @@
                     event:5239455422558978000 .
     
     <https://localhost:8443/won/resource/event/5239455422558978000#data-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQCxDU0bvdKaiM82IigxefoDBWT7NsLBoAivSc7jpPw0LP4V1kekwSgQntW5VAoAeOMCMFWYSxVlY43B5O0m/JVWPRXUQdK0uwo0KToFzcusVbluwYAgb4w/VTQ/2Vgjo+/Cew==" ;
-            sig:hasVerificationCertificate  atom:6462959329580403000 ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQCxDU0bvdKaiM82IigxefoDBWT7NsLBoAivSc7jpPw0LP4V1kekwSgQntW5VAoAeOMCMFWYSxVlY43B5O0m/JVWPRXUQdK0uwo0KToFzcusVbluwYAgb4w/VTQ/2Vgjo+/Cew==" ;
+            msg:signer  atom:6462959329580403000 ;
             msg:hash                     "AKo8oEo3fdvKt7XKRixm4PPBlmJCpUJwpduCrWZqi3iqqdto1KaRf+nWnyGyVDeqGis9XD6RjgJSRlLjSdtUSo6KGwvMZ7VTzGDBRqs2rIVA/Nfaf4cZPKUtMxKxCQLERMmMA/aOEmo+fYD2rW9UhRLsVMiGeutQfISfAba4oZJb" ;
             msg:publicKeyFingerprint     "lpT4VEyi1WSXpfxqojE03HRE6MmjNJXOqDr2eCc1AgI=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/5239455422558978000#data> .
@@ -2040,9 +2040,9 @@
                     event:5239455422558978000 .
     
     <https://localhost:8443/won/resource/event/5239455422558978000#content-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQCIPx+OeLbwa6jwkRkitU3QAMIT4mqY2VRjOdHe8ATsA91JDiMtBzqpmMnNHYGLZj8CMC3YpgYtPKYgBSN6zqVSdVdMJ4npo2o0gxH7KT9J0McEBZqGb1WAa/6Trv6aI/BpBQ==" ;
-            sig:hasVerificationCertificate  atom:6462959329580403000 ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQCIPx+OeLbwa6jwkRkitU3QAMIT4mqY2VRjOdHe8ATsA91JDiMtBzqpmMnNHYGLZj8CMC3YpgYtPKYgBSN6zqVSdVdMJ4npo2o0gxH7KT9J0McEBZqGb1WAa/6Trv6aI/BpBQ==" ;
+            msg:signer  atom:6462959329580403000 ;
             msg:hash                     "BZJE0gyWX6p68IPICM2Qi9Hq4rFayjqvKXZm/gX5H5aq2yMFVrWaEWX9qq2gD+GCjTg0ByujjJKLiOtjvWnhTA==" ;
             msg:publicKeyFingerprint     "lpT4VEyi1WSXpfxqojE03HRE6MmjNJXOqDr2eCc1AgI=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/5239455422558978000#content> .
@@ -2064,9 +2064,9 @@
                     event:b02kmmdjr6fzdaow6rqt .
     
     <https://localhost:8443/won/resource/event/5239455422558978000#envelope-c141-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQC1rdt2QU7Gic06SIO0RWyenIj4e9dfLShmbAQPza/mVrZW25vNs+bTGQP9/wZaB4ECMQD9IH7ZinhjIQKBU5DKQ75KS4goRyXIEah7aTkUmWp5judw2kNjgErxYdAFemDRsl8=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQC1rdt2QU7Gic06SIO0RWyenIj4e9dfLShmbAQPza/mVrZW25vNs+bTGQP9/wZaB4ECMQD9IH7ZinhjIQKBU5DKQ75KS4goRyXIEah7aTkUmWp5judw2kNjgErxYdAFemDRsl8=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "aeIR8ZLYj3ZKraQ6Qy/xJpgIfB3pPiFGC2pJhBbnY8dr/mcj/NiG6WmAFtIgNa9bfYQlYHyHyZZl+3yz0uLDxuGxaYJKwb8xwipfmu9UOkw1hss/mQspN/97NaPfe6q86KwXUO8RQnC/eVuNkRgmfpDUjoyrkk096tXM6ov6APs=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/5239455422558978000#envelope-c141> .
@@ -2098,9 +2098,9 @@
                     event:shbpua34q1oujs0x4r17 .
     
     <https://localhost:8443/won/resource/event/shbpua34q1oujs0x4r17#content-n68e-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQDWFO07+Hk0rNX4ztdW2ABhxtBz74ouN9dKNvk4yJlnQjXb8MyaVdWkbebYj8xX+Q4CMA4s9riup5P/OOkbIiljN91rG5t48jL5P3vokynJY9gCTl01xD6SZHvFlH+QDAcN7Q==" ;
-            sig:hasVerificationCertificate  atom:8uiuri25l2b84oywmgsy ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQDWFO07+Hk0rNX4ztdW2ABhxtBz74ouN9dKNvk4yJlnQjXb8MyaVdWkbebYj8xX+Q4CMA4s9riup5P/OOkbIiljN91rG5t48jL5P3vokynJY9gCTl01xD6SZHvFlH+QDAcN7Q==" ;
+            msg:signer  atom:8uiuri25l2b84oywmgsy ;
             msg:hash                     "ALNs2UTDIodwFyAkA57/S4xpXn6pTLvNmZqzm2oMxTdmypt/0/Y4eQ4AdVjOQetMTxvAiQ6J/tIRzEMWFTU0qrCNkCZkNWmQ5A3rbPaSOAAXqptdn02zU+V+vx9eMDo4SKA3KR8PdTV5ZCKi0DyUWj8i7LreL+ESUw49vHe4obVG" ;
             msg:publicKeyFingerprint     "QNpwnnPG5NoajDF6BzOaeaCul5lj7Jy6M0StVQf7+20=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/shbpua34q1oujs0x4r17#content-n68e> .
@@ -2125,9 +2125,9 @@
                     event:7mdtft0gjbr2m4kw2t13 .
     
     <https://localhost:8443/won/resource/event/7mdtft0gjbr2m4kw2t13#content-hf80-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQCwtdCHF1yhR2O4Kfd6HYa0pkuor65NscIDFiaMAjXlhfGD9BwsIZO9tJzgYvlqEtkCME2vgekcA0l4Sop+w3KGQ7U3AWSjQLYInyX6uLhC176fWCIaGEYmag2MrVVvnZEJJA==" ;
-            sig:hasVerificationCertificate  atom:8uiuri25l2b84oywmgsy ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQCwtdCHF1yhR2O4Kfd6HYa0pkuor65NscIDFiaMAjXlhfGD9BwsIZO9tJzgYvlqEtkCME2vgekcA0l4Sop+w3KGQ7U3AWSjQLYInyX6uLhC176fWCIaGEYmag2MrVVvnZEJJA==" ;
+            msg:signer  atom:8uiuri25l2b84oywmgsy ;
             msg:hash                     "ALNryB13bVykTFXZQiDZdQAE/F+4ybcS/T/r9XL5f2e5utyGwpEhnEogebKlEhVySCK5t5I+fLGSLs9O0q6sw/2rxrBh+MPp32LVAnhNMoJcc0C8wvNJGG6F80QAG2R5hnshB+vzNr+P/SQS/UzMc+TbK7XugzN+tDZ/0j/Oto83" ;
             msg:publicKeyFingerprint     "QNpwnnPG5NoajDF6BzOaeaCul5lj7Jy6M0StVQf7+20=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/7mdtft0gjbr2m4kw2t13#content-hf80> .
@@ -2160,9 +2160,9 @@
             msg:sentTimestamp  "1513009272654" .
     
     <https://localhost:8443/won/resource/event/900271114760450000#content-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQCaOU23Y7zMSzFrUpHS0nwuane+qPPrLubW5um5JGi/P/Ak2x35Ws9hCPiMMranR0kCMD7Lk9PczZgo/4PcnWMvOtxiFx2icPXePK8PWYQgtA0Ye5A7+rde2lnZR7Y2xaA5ag==" ;
-            sig:hasVerificationCertificate  atom:6462959329580403000 ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQCaOU23Y7zMSzFrUpHS0nwuane+qPPrLubW5um5JGi/P/Ak2x35Ws9hCPiMMranR0kCMD7Lk9PczZgo/4PcnWMvOtxiFx2icPXePK8PWYQgtA0Ye5A7+rde2lnZR7Y2xaA5ag==" ;
+            msg:signer  atom:6462959329580403000 ;
             msg:hash                     "BNIcFpgdTl/08zSmTZ7cd+rLSzxDGlN2w1jaH3zwrzoAd6HcPcbI+wP6N08zIGRETfUpClMjeyfXz8Y/vs2BJA==" ;
             msg:publicKeyFingerprint     "lpT4VEyi1WSXpfxqojE03HRE6MmjNJXOqDr2eCc1AgI=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/900271114760450000#content> .
@@ -2175,9 +2175,9 @@
 
 <https://localhost:8443/won/resource/event/32mnd6j6ozfwr1fty4v3#envelope-2pwu-sig> {
     <https://localhost:8443/won/resource/event/32mnd6j6ozfwr1fty4v3#envelope-2pwu-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQC+jgBk0IrqdSrypUNpt5JDtiZD7CrhR7b3H5y4uQvzmjh9ignHCGuTjonz3m3x/fYCMQDCyrfJJ5Q6t17f5ivhhSh3Vh/ZH6Onpq6ilsvpAoPqh8sUxQewu1UQeCS1GG5GJiY=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQC+jgBk0IrqdSrypUNpt5JDtiZD7CrhR7b3H5y4uQvzmjh9ignHCGuTjonz3m3x/fYCMQDCyrfJJ5Q6t17f5ivhhSh3Vh/ZH6Onpq6ilsvpAoPqh8sUxQewu1UQeCS1GG5GJiY=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "Cb5QWwFztdkIxoo0dqmbZSFO3rTiRfMYs9EJpZopQnawXQUOPBEXbtroLOMg8p7eP4bBII03uhguAqXhBahvBVFtsXb4Em4rhBR71eIAK5UhAoEHVLx6S1CXxImPzceiP4yn+HvzMcCbERkfbySVQ8ZymDo0UZu0v4obvViXnsI=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/32mnd6j6ozfwr1fty4v3#envelope-2pwu> .
@@ -2191,9 +2191,9 @@
             msg:protocolVersion       "1.0" .
     
     <https://localhost:8443/won/resource/event/pjlqfz70o43zy0bxigj9#envelope-x3lq-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMCT2OQYO+H7gDkG+NuMXF4yakNPhu5EfmnLhahuYCiP48epwrIJ8XVurNEFqf/wlOQIxAMbx3RGftxkOaCQcN++tkUOOwCTHd9cIsyd+rj+iiJedQcwGMUIvQTpXXU7TYybL3w==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMCT2OQYO+H7gDkG+NuMXF4yakNPhu5EfmnLhahuYCiP48epwrIJ8XVurNEFqf/wlOQIxAMbx3RGftxkOaCQcN++tkUOOwCTHd9cIsyd+rj+iiJedQcwGMUIvQTpXXU7TYybL3w==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "QMKpxwIow2iNVOEnLZJJbiZ97iSRBJF8hZDcL9R3mXCrIH+tVdybATnRkJmEYIU2WnsJkfwCuGU4ZbP8zyyGP88tiOzd2lEFxQvuYgYtshNGhB27fTd7awkKKKU2uR25xfBqznoUaBS+2bX+Qq5/V9I2WIfgItYCtp7lnylL7zM=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/pjlqfz70o43zy0bxigj9#envelope-x3lq> .
@@ -2206,9 +2206,9 @@
                     event:32mnd6j6ozfwr1fty4v3 .
     
     <https://localhost:8443/won/resource/event/32mnd6j6ozfwr1fty4v3#envelope-5klm-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMDwPzHENh/WM5R2Nr9H8smC7GW1NccBD8owC8kTgFQ10vXgidVStTHnVp4bSqQfgXwIxANxeRTZ5VfEfKjmfhXrDHWTRmDS2ses4zvZ1KqCi/3ygQeP13y9uBzVaR4nuo5jdcQ==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMDwPzHENh/WM5R2Nr9H8smC7GW1NccBD8owC8kTgFQ10vXgidVStTHnVp4bSqQfgXwIxANxeRTZ5VfEfKjmfhXrDHWTRmDS2ses4zvZ1KqCi/3ygQeP13y9uBzVaR4nuo5jdcQ==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "dWhFmu+4jyCd6RSxWwzDqPtZaRIokFW6ZAzRXq1oMStVgjbUx4uWrwjZ6cEnOkUP2eMWGiq6ln9RUFX3El7JZpnDA0GDEGtgOqW+NoFUsEEarQeaYN2iMLdqwgCjBSCRTxiQz7s6vuU3PIqje5fde98hBqdwmc3/gxN0a7RHTgU=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/32mnd6j6ozfwr1fty4v3#envelope-5klm> .
@@ -2216,9 +2216,9 @@
 
 <https://localhost:8443/won/resource/event/900271114760450000#envelope-gdjy> {
     <https://localhost:8443/won/resource/event/6xxy7qhy6d4b6j792ay7#envelope-sq5d-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMQCrt3SpbOSaDkLuZxIVkp1BBYH/UbgBMpXKkUAiYsw0FDEwPlAA26o0xqxzuikLMy4CMCt7oHmsYncTZ3PNBHiqdXEj6+khj4I9so5wUicxpRYCcd+al6crPABnvciqZGn1Ow==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMQCrt3SpbOSaDkLuZxIVkp1BBYH/UbgBMpXKkUAiYsw0FDEwPlAA26o0xqxzuikLMy4CMCt7oHmsYncTZ3PNBHiqdXEj6+khj4I9so5wUicxpRYCcd+al6crPABnvciqZGn1Ow==" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "AJpBPVAQ2QPowbdT6+w3xyd6OTCkiCqK1sIMQyIi30yLnY/ttTgyvjPT/8xyqZwFZPaXHmXbBSQ0qGUQDgzOBnhoaodVTpBVNP68rRHK6I0oLhZC2L6LIU6g5yFRgoyrQYSiyt1ZYWGmD5LT5z6xmHoceqPmcdMXa/I10F0EsZYX" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/6xxy7qhy6d4b6j792ay7#envelope-sq5d> .
@@ -2239,9 +2239,9 @@
                     event:900271114760450000 .
     
     <https://localhost:8443/won/resource/event/900271114760450000#data-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMCMr/0UHv/5IbSvnaGM6Ph/z9H7i+PjyJM+qbITP2HGn6XCU1SMhG7A+KMDhtk/g6AIwDEDmP0JC1bdRWaqbCZwi4/XgcK4QaS5zi8l9nzH9O96+Qglv+9ilSzLS6w4ado6d" ;
-            sig:hasVerificationCertificate  atom:6462959329580403000 ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMCMr/0UHv/5IbSvnaGM6Ph/z9H7i+PjyJM+qbITP2HGn6XCU1SMhG7A+KMDhtk/g6AIwDEDmP0JC1bdRWaqbCZwi4/XgcK4QaS5zi8l9nzH9O96+Qglv+9ilSzLS6w4ado6d" ;
+            msg:signer  atom:6462959329580403000 ;
             msg:hash                     "AIZ8gbKxW39gv6QQA9XGYJiYrPnu1DCgeF9YruCaqpnpLoDzEJCD+obvrPzly5uV/FiPmiPd0d3Sj8b0VpK1Es1XjWCbODe+wK5TXCwwnwtn/7GVgEQKc/Dr3EF9Ffu9tbC5+XhyzPldb6rSQxArRK1mgL5MjC0vCkrBmBSYyKjn" ;
             msg:publicKeyFingerprint     "lpT4VEyi1WSXpfxqojE03HRE6MmjNJXOqDr2eCc1AgI=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/900271114760450000#data> .
@@ -2263,9 +2263,9 @@
                     event:32mnd6j6ozfwr1fty4v3 .
     
     <https://localhost:8443/won/resource/event/900271114760450000#envelope-gdjy-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQCczlxSFACidBAFJcH78c1k+el/jK7AwSfFvWkP6Nr7uaA5OGgBc6mzKoAsjDFu3CcCMQDKWQRoZom4B+npReUDI1oIyXxFU7uxBnyhAYErgmwu/osqUI/CIEYWfEyRE5kNgdw=" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQCczlxSFACidBAFJcH78c1k+el/jK7AwSfFvWkP6Nr7uaA5OGgBc6mzKoAsjDFu3CcCMQDKWQRoZom4B+npReUDI1oIyXxFU7uxBnyhAYErgmwu/osqUI/CIEYWfEyRE5kNgdw=" ;
+            msg:signer  <https://localhost:8443/won/resource> ;
             msg:hash                     "CLQxCxTkQEWmVcIbHJP4tU0zXG1bcP0Dz9Lm8+yWI67Z6P478uZGE6nlxUcdQH/Eppq0fq4KUIHCLLs5PM0j4o3XYqYL6sjIddXB8JcnT+r3uZ+M+qkNCVT3yfENEsTfy8XcAj6SVw0gBy/3VfhsvEFNXPGnJadimzAQhSLSSrg=" ;
             msg:publicKeyFingerprint     "4hCV9jjEB5aGM0nNVkpSuHZ8sfUE0MkozPWKiupRZ4U=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/900271114760450000#envelope-gdjy> .

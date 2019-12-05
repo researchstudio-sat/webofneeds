@@ -11,6 +11,7 @@
 package won.owner.protocol.message;
 
 import java.net.URI;
+import java.util.Optional;
 
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
@@ -21,8 +22,6 @@ import won.protocol.model.Connection;
  */
 public interface OwnerCallback {
     public void onConnectFromOtherAtom(Connection con, final WonMessage wonMessage);
-
-    public void onOpenFromOtherAtom(Connection con, final WonMessage wonMessage);
 
     public void onCloseFromOtherAtom(Connection con, final WonMessage wonMessage);
 
@@ -38,8 +37,9 @@ public interface OwnerCallback {
      * 
      * @param failedMessageUri
      * @param wonMessage
+     * @param con TODO
      */
-    public void onFailureResponse(URI failedMessageUri, WonMessage wonMessage);
+    public void onFailureResponse(URI failedMessageUri, WonMessage wonMessage, Optional<Connection> con);
 
     /**
      * Called when a message is received that indicates successful processing of a
@@ -47,6 +47,7 @@ public interface OwnerCallback {
      * 
      * @param successfulMessageUri
      * @param wonMessage
+     * @param con TODO
      */
-    public void onSuccessResponse(URI successfulMessageUri, WonMessage wonMessage);
+    public void onSuccessResponse(URI successfulMessageUri, WonMessage wonMessage, Optional<Connection> con);
 }

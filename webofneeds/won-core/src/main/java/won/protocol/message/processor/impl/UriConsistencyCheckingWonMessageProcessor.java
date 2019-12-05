@@ -1,17 +1,31 @@
 package won.protocol.message.processor.impl;
 
+import java.net.URI;
+import java.util.Objects;
+import java.util.Optional;
+
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StopWatch;
+
+import won.protocol.exception.UriNodePathException;
+import won.protocol.exception.WonMessageNotWellFormedException;
+import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessage.EnvelopePropertyCheckResult;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
+import won.protocol.message.WonMessageUtils;
 import won.protocol.message.processor.WonMessageProcessor;
-import won.protocol.message.processor.exception.UriAlreadyInUseException;
-import won.protocol.message.processor.exception.UriNodePathException;
+import won.protocol.service.MessageRoutingInfoService;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInformationService;
+import won.protocol.util.LogMarkers;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
+import won.protocol.util.WonUriCheckHelper;
 
 /**
  * Checks if the event, graph or atom uri is well-formed according the node's
@@ -19,59 +33,104 @@ import java.net.URI;
  * Date: 23.04.2015
  */
 public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProcessor {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     protected WonNodeInformationService wonNodeInformationService;
+    @Autowired
+    MessageRoutingInfoService messageRoutingInfoService;
 
     @Override
-    public WonMessage process(final WonMessage message) throws UriAlreadyInUseException {
-        // extract info about local, remote and receiver nodes:
-        URI senderNode = message.getSenderNodeURI();
-        URI recipientNode = message.getRecipientNodeURI();
+    public WonMessage process(WonMessage message) {
+        StopWatch sw = new StopWatch();
+        if (message == null) {
+            throw new WonMessageProcessingException("No WonMessage object found in exchange");
+        }
+        sw.start("validMessageURI");
+        if (!WonMessageUtils.isValidMessageUri(message.getMessageURIRequired())) {
+            throw new WonMessageNotWellFormedException("Not a valid message URI: " + message.getMessageURI());
+        }
+        sw.stop();
+        sw.start("envelopePropertyCheck");
+        EnvelopePropertyCheckResult result = message.checkEnvelopeProperties();
+        if (!result.isValid()) {
+            throw new WonMessageNotWellFormedException(result.getMessage());
+        }
+        sw.stop();
+        sw.start("getNodeInfo");
+        Optional<URI> senderNode = messageRoutingInfoService.senderNode(message);
+        Optional<URI> recipientNode = messageRoutingInfoService.recipientNode(message);
+        if (!senderNode.isPresent() && !message.getMessageTypeRequired().isHintMessage()) {
+            throw new WonMessageProcessingException(
+                            "Cannot determine sender node for " + message.toShortStringForDebug());
+        }
+        if (!recipientNode.isPresent()) {
+            throw new WonMessageProcessingException(
+                            "Cannot determine recipient node for " + message.toShortStringForDebug());
+        }
         WonNodeInfo senderNodeInfo = null;
         WonNodeInfo recipientNodeInfo = null;
-        if (senderNode != null && !message.getMessageType().isHintMessage()) {
+        if (senderNode.isPresent() && !message.getMessageType().isHintMessage()) {
             // do not check the sender node for a hint
             // TODO: change this behaviour as soon as a matcher uses a WoN node
-            senderNodeInfo = wonNodeInformationService.getWonNodeInformation(senderNode);
+            senderNodeInfo = wonNodeInformationService.getWonNodeInformation(senderNode.get());
         }
         if (recipientNode != null) {
-            recipientNodeInfo = wonNodeInformationService.getWonNodeInformation(recipientNode);
+            recipientNodeInfo = wonNodeInformationService.getWonNodeInformation(recipientNode.get());
         }
-        WonNodeInfo localNodeInfo = null;
-        WonNodeInfo remoteNodeInfo = null;
-        URI msgUri = message.getMessageURI();
-        if (msgUri.getScheme().equals(senderNode.getScheme())
-                        && msgUri.getAuthority().equals(senderNode.getAuthority())) {
-            localNodeInfo = senderNodeInfo;
-            remoteNodeInfo = recipientNodeInfo;
-        } else if (msgUri.getScheme().equals(recipientNode.getScheme())
-                        && msgUri.getAuthority().equals(recipientNode.getAuthority())) {
-            localNodeInfo = recipientNodeInfo;
-            remoteNodeInfo = senderNodeInfo;
+        if (senderNodeInfo == null && !message.getMessageType().isHintMessage()) {
+            throw new WonMessageProcessingException(
+                            "Could not load sender WonNodeInfo (won node " + senderNode.get() + ")");
         }
-        URI localNode = URI.create(localNodeInfo.getWonNodeURI());
-        // do checks for consistency between these nodes and message direction, as well
-        // as atoms,
-        // events and connection uris:
-        // local node should be either receiver or sender node
-        checkHasNode(message, localNode);
-        // Any message URI used must conform to a URI pattern specified by the
-        // respective publishing service:
-        // Check that event URI corresponds to local pattern
-        checkLocalEventURI(message, localNodeInfo);
-        // Check that remote URI, if any, correspond to ?senderNode's event pattern
-        checkRemoteEventURI(message, remoteNodeInfo);
+        if (recipientNodeInfo == null) {
+            throw new WonMessageProcessingException(
+                            "Could not load recipient WonNodeInfo (won node " + recipientNode.get() + ")");
+        }
+        sw.stop();
+        sw.start("senderAtomUriCheck");
+        checkAtomUri(message.getSenderAtomURI(), senderNodeInfo);
+        sw.stop();
+        sw.start("senderSocketUriCheck");
+        checkSocketUri(message.getSenderSocketURI(), senderNodeInfo);
+        sw.stop();
+        sw.start("recipientAtomUriCheck");
+        checkAtomUri(message.getRecipientAtomURI(), recipientNodeInfo);
+        sw.stop();
+        sw.start("recipientSocketUriCheck");
+        checkSocketUri(message.getRecipientSocketURI(), recipientNodeInfo);
+        // there is no way atom or connection uri can be on the recipient node and the
+        // recipient node is different from the sender node
+        sw.stop();
+        sw.start("atomUriCheck");
+        checkAtomUri(message.getAtomURI(), senderNodeInfo);
+        sw.stop();
+        sw.start("connectionUriCheck");
+        checkConnectionUri(message.getConnectionURI(), senderNodeInfo);
         // Check that atom URI for create_atom message corresponds to local pattern
-        checkCreateMsgAtomURI(message, localNodeInfo);
-        // Specified sender-recipientAtom/Connection must conform to
-        // sender-recipientNode
-        // URI pattern
-        checkSenders(senderNodeInfo, message);
-        checkReceivers(recipientNodeInfo, message);
-        // Check that local node is sender or receiver node URI, depending on the
-        // message
-        // direction
-        checkDirection(message, localNode);
+        sw.stop();
+        sw.start("createMsgAtomUriCheck");
+        checkCreateMsgAtomURI(message, senderNodeInfo);
+        sw.stop();
+        sw.start("signerCheck");
+        WonMessageDirection statedDirection = message.getEnvelopeType();
+        if (statedDirection.isFromOwner()) {
+            if (!Objects.equals(message.getSenderAtomURIRequired(), message.getSignerURIRequired())) {
+                RDFDataMgr.write(System.out, message.getCompleteDataset(), Lang.TRIG);
+                throw new WonMessageNotWellFormedException("WonMessage " + message.toShortStringForDebug()
+                                + " is FROM_OWNER but not signed by its atom");
+            }
+        }
+        if (statedDirection.isFromSystem()) {
+            if (!Objects.equals(message.getSenderNodeURIRequired(), message.getSignerURIRequired())) {
+                RDFDataMgr.write(System.out, message.getCompleteDataset(), Lang.TRIG);
+                throw new WonMessageNotWellFormedException("WonMessage " + message.toShortStringForDebug()
+                                + " is FROM_SYSTEM but not signed by its node");
+            }
+        }
+        sw.stop();
+        if (logger.isDebugEnabled()) {
+            logger.debug(LogMarkers.TIMING, "URI Consistency check timing for message {}:\n{}",
+                            message.getMessageURIRequired(), sw.prettyPrint());
+        }
         return message;
     }
 
@@ -81,82 +140,41 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
         }
     }
 
-    private void checkReceivers(final WonNodeInfo recipientNodeInfo, final WonMessage message) {
-        checkNodeConformance(recipientNodeInfo, message.getRecipientAtomURI(), message.getRecipientURI(), null);
-    }
-
-    private void checkSenders(final WonNodeInfo senderNodeInfo, final WonMessage message) {
-        checkNodeConformance(senderNodeInfo, message.getSenderAtomURI(), message.getSenderURI(), null);
-    }
-
-    private void checkDirection(final WonMessage message, final URI localNode) {
-        WonMessageDirection direction = message.getEnvelopeType();
-        URI recipientNode = message.getRecipientNodeURI();
-        URI senderNode = message.getSenderNodeURI();
-        switch (direction) {
-            case FROM_EXTERNAL:
-                // local node should be a receiver node
-                if (!localNode.equals(recipientNode)) {
-                    throw new UriNodePathException(recipientNode + " is expected to be " + localNode);
-                }
-                break;
-            case FROM_OWNER:
-            case FROM_SYSTEM:
-                // local node should be a sender node
-                if (!localNode.equals(senderNode)) {
-                    throw new UriNodePathException(senderNode + " is expected to be " + localNode);
-                }
-                break;
-        }
-    }
-
-    private void checkLocalEventURI(final WonMessage message, WonNodeInfo localNodeInfo) {
-        checkNodeConformance(localNodeInfo, null, null, message.getMessageURI());
-    }
-
-    private void checkRemoteEventURI(final WonMessage message, final WonNodeInfo remoteNodeInfo) {
-        checkNodeConformance(remoteNodeInfo, null, null, message.getCorrespondingRemoteMessageURI());
-    }
-
-    private void checkCreateMsgAtomURI(final WonMessage message, final WonNodeInfo localNodeInfo) {
+    private void checkCreateMsgAtomURI(final WonMessage message, final WonNodeInfo nodeInfo) {
         // check only for create message
         if (message.getMessageType() == WonMessageType.CREATE_ATOM) {
             URI atomURI = WonRdfUtils.AtomUtils.getAtomURI(message.getCompleteDataset());
-            checkNodeConformance(localNodeInfo, atomURI, null, null);
+            checkAtomUri(atomURI, nodeInfo);
         }
     }
 
-    private void checkNodeConformance(final WonNodeInfo info, final URI atomURI, final URI connURI,
-                    final URI eventURI) {
-        if (info == null) {
+    private void checkAtomUri(URI atom, WonNodeInfo info) {
+        if (atom == null) {
             return;
         }
-        if (atomURI == null && connURI == null && eventURI == null) {
+        if (!atom.toString().startsWith(info.getAtomURIPrefix())) {
+            throw new WonMessageNotWellFormedException(
+                            atom + " is not a valid atom URI on node " + info.getWonNodeURI());
+        }
+    }
+
+    private void checkSocketUri(URI socket, WonNodeInfo info) {
+        if (socket == null) {
             return;
         }
-        String atomPrefix = info.getAtomURIPrefix();
-        String connPrefix = info.getConnectionURIPrefix();
-        String eventPrefix = info.getEventURIPrefix();
-        if (atomURI != null) {
-            checkPrefix(atomURI, atomPrefix);
-        }
-        if (connURI != null) {
-            checkPrefix(connURI, connPrefix);
-        }
-        if (eventURI != null) {
-            checkPrefix(eventURI, eventPrefix);
+        if (!WonUriCheckHelper.isValidSocketURI(info.getAtomURIPrefix(), socket.toString())) {
+            throw new WonMessageNotWellFormedException(
+                            socket + " is not a valid socket URI on node " + info.getWonNodeURI());
         }
     }
 
-    private String getPrefix(final URI atomURI) {
-        return atomURI.toString().substring(0, atomURI.toString().lastIndexOf("/"));
-    }
-
-    private void checkPrefix(URI uri, String expectedPrefix) {
-        String prefix = getPrefix(uri);
-        if (!prefix.equals(expectedPrefix)) {
-            throw new UriNodePathException(
-                            "URI '" + uri + "' does not start with the expected prefix '" + expectedPrefix + "'");
+    private void checkConnectionUri(URI connection, WonNodeInfo info) {
+        if (connection == null) {
+            return;
+        }
+        if (!WonUriCheckHelper.isValidConnectionURI(info.getAtomURIPrefix(), connection.toString())) {
+            throw new WonMessageNotWellFormedException(
+                            connection + " is not a valid connection URI on node " + info.getWonNodeURI());
         }
     }
 }

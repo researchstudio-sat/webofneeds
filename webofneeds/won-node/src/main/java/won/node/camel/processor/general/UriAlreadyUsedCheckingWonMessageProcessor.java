@@ -10,23 +10,32 @@
  */
 package won.node.camel.processor.general;
 
+import java.net.URI;
+import java.util.Optional;
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.util.IsoMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StopWatch;
+
+import won.node.camel.service.WonCamelHelper;
+import won.node.service.persistence.AtomService;
+import won.node.service.persistence.MessageService;
+import won.protocol.exception.UriAlreadyInUseException;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
-import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.EventAlreadyProcessedException;
-import won.protocol.message.processor.exception.UriAlreadyInUseException;
 import won.protocol.model.Atom;
-import won.protocol.model.MessageEventPlaceholder;
-import won.protocol.repository.AtomRepository;
-import won.protocol.repository.MessageEventRepository;
+import won.protocol.model.MessageEvent;
+import won.protocol.util.LogMarkers;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
 
 /**
  * Checks whether the event or atom URI is already used. It is possible that
@@ -38,24 +47,37 @@ import java.net.URI;
  * on the early stage, before the whole message processing logic is at work.
  * User: ypanchenko Date: 23.04.2015
  */
-public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProcessor {
+public class UriAlreadyUsedCheckingWonMessageProcessor implements Processor {
+    Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
-    private MessageEventRepository messageEventRepository;
+    private MessageService messageService;
     @Autowired
-    protected AtomRepository atomRepository;
+    protected AtomService atomService;
 
     @Override
-    public WonMessage process(final WonMessage message) throws UriAlreadyInUseException {
-        checkEventURI(message);
+    public void process(Exchange exchange) throws Exception {
+        StopWatch sw = new StopWatch();
+        sw.start();
+        WonMessage message = WonCamelHelper.getMessageRequired(exchange);
+        WonMessageDirection direction = WonCamelHelper.getDirectionRequired(exchange);
+        Optional<URI> parentUri = WonCamelHelper.getParentURI(exchange);
+        if (!parentUri.isPresent()) {
+            parentUri = messageService.getParentofMessage(message, direction);
+        }
+        if (parentUri.isPresent()) {
+            checkEventURI(message, parentUri.get());
+        }
         checkAtomURI(message);
-        return message;
+        sw.stop();
+        logger.debug(LogMarkers.TIMING, "URI in use check for message {} took {} milllis",
+                        message.getMessageURIRequired(), sw.getLastTaskTimeMillis());
     }
 
     private void checkAtomURI(final WonMessage message) {
         if (message.getMessageType() == WonMessageType.CREATE_ATOM) {
             URI atomURI = WonRdfUtils.AtomUtils.getAtomURI(message.getCompleteDataset());
-            Atom atom = atomRepository.findOneByAtomURI(atomURI);
-            if (atom == null) {
+            Optional<Atom> atom = atomService.getAtom(atomURI);
+            if (!atom.isPresent()) {
                 return;
             } else {
                 throw new UriAlreadyInUseException(message.getSenderAtomURI().toString());
@@ -64,12 +86,12 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProc
         return;
     }
 
-    private void checkEventURI(final WonMessage message) {
-        MessageEventPlaceholder event = messageEventRepository.findOneByMessageURI(message.getMessageURI());
-        if (event == null) {
+    private void checkEventURI(final WonMessage message, URI parentURI) {
+        Optional<MessageEvent> event = messageService.getMessage(message.getMessageURI(), parentURI);
+        if (!event.isPresent()) {
             return;
         } else {
-            if (hasResponse(event) && isDuplicateMessage(message, event)) {
+            if (isDuplicateMessage(message, event.get())) {
                 // the same massage as the one already processed is received
                 throw new EventAlreadyProcessedException(message.getMessageURI().toString());
             } else {
@@ -78,11 +100,7 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProc
         }
     }
 
-    private boolean hasResponse(final MessageEventPlaceholder event) {
-        return event.getResponseMessageURI() != null;
-    }
-
-    private boolean isDuplicateMessage(final WonMessage message, MessageEventPlaceholder event) {
+    private boolean isDuplicateMessage(final WonMessage message, MessageEvent event) {
         // retrieve already processed message
         Dataset processedDataset = event.getDatasetHolder().getDataset();
         // compare with received message
@@ -94,7 +112,7 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProc
         // envelope,
         // we compare here the main envelope data and the contents, without envelope
         // signatures.
-        WonMessage processedMessage = new WonMessage(processedDataset);
+        WonMessage processedMessage = WonMessage.of(processedDataset);
         boolean sameEnvelope = hasSameEnvelopeData(processedMessage, message);
         boolean sameContent = hasSameContent(processedMessage, message);
         if (sameEnvelope && sameContent) {
@@ -124,16 +142,14 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProc
                         && equalsOrBothNull(processedMessage.getRecipientAtomURI(), message.getRecipientAtomURI())
                         // the receiving side can add this info
                         // &&
-                        // equalsOrBothNull(processedMessage.getSenderURI(), message.getSenderURI())
-                        && equalsOrBothNull(processedMessage.getRecipientURI(), message.getRecipientURI())
                         && equalsOrBothNull(processedMessage.getSenderNodeURI(), message.getSenderNodeURI())
                         && equalsOrBothNull(processedMessage.getRecipientNodeURI(), message.getRecipientNodeURI())
                         // the receiving side can add this info
                         // &&
                         // equalsOrBothNull(processedMessage.getCorrespondingRemoteMessageURI(),
                         // message.getCorrespondingRemoteMessageURI())
-                        && equalsOrBothNull(processedMessage.getIsResponseToMessageURI(),
-                                        message.getIsResponseToMessageURI())
+                        && equalsOrBothNull(processedMessage.getRespondingToMessageURI(),
+                                        message.getRespondingToMessageURI())
                         && processedMessage.getContentGraphURIs().containsAll(message.getContentGraphURIs())
                         && equalsOrBothNull(processedMessage.getMessageType(), message.getMessageType())
                         && equalsOrBothNull(processedMessage.getHintTargetAtomURI(), message.getHintTargetAtomURI())

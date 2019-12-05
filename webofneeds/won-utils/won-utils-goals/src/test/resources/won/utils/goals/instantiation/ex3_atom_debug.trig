@@ -28,9 +28,9 @@
 
 <https://localhost:8443/won/resource/event/7zc7w4ebflv7uf00654i#envelope-3qqh-sig> {
     <https://localhost:8443/won/resource/event/7zc7w4ebflv7uf00654i#envelope-3qqh-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMGsi1cEIDcfFPF83YFBuXy/3v2hRW9UhXFPcW2qHj2uS++ObhavFzKCnm8kQP+QQ0AIwTlCocWGuslPjU9j6MsP1ZZEgZYn6E3MIITRsFfC1gSHNOr99EnS7/a+vUDmcekPW" ;
-            sig:hasVerificationCertificate  atom:8uiuri25l2b84oywmgsy ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMGsi1cEIDcfFPF83YFBuXy/3v2hRW9UhXFPcW2qHj2uS++ObhavFzKCnm8kQP+QQ0AIwTlCocWGuslPjU9j6MsP1ZZEgZYn6E3MIITRsFfC1gSHNOr99EnS7/a+vUDmcekPW" ;
+            msg:signer  atom:8uiuri25l2b84oywmgsy ;
             msg:hash                     "Mo1tIoTrHs1S3aYVgqj+HPMZkuO+nUFexTW/4NLVfucAS9WeRm1iujFs9IeyGR6GAoC0QqJ+nk/KZWhIfnYhKup/5LxIlAqeADMW4YZxbN5EKU2EPrYTa0+9tIIiOpgg0BHbLENmHnMgiAY/JNjC/pzAyVZSrsvqE1WZGDKPWBo=" ;
             msg:publicKeyFingerprint     "QNpwnnPG5NoajDF6BzOaeaCul5lj7Jy6M0StVQf7+20=" ;
             msg:signedGraph              <https://localhost:8443/won/resource/event/7zc7w4ebflv7uf00654i#envelope-3qqh> .

@@ -34,7 +34,7 @@
 }
 
 # signature of the permanent part of data:
-:#OWN1 sig:signature [
+:#OWN1 msg:Signature [
       rdf:type sig:WonSignature ;
       sig:creator <http://example.com/webid#key-5>;
       sig:created
@@ -54,7 +54,7 @@
       ] .
 }
 # signature of the transient part of data:
-:#OWN2 sig:signature [
+:#OWN2 msg:Signature [
       rdf:type sig:WonSignature ;
       sig:creator <http://example.com/webid#key-5>;
       sig:created

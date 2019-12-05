@@ -59,17 +59,17 @@
                     event:txutyhkuu9xj5us9l6ct .
 
     <https://satsrv04.researchstudio.at:8889/won/resource/event/adc5swwig03sakwtfafo#envelope-19xl-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGYCMQCe06mOOeXQOXu967xedL+xCt/irMV//FNO2THndFIY+SmC5Z5yNF8CjY6bNjAxQqQCMQDd8hIE4x/G2e8zgH/iVUL8LUznurxMcOk0NLz7xsguhd9JEoC9xwF7cBjZUqziHfQ=" ;
-            sig:hasVerificationCertificate  <https://satsrv04.researchstudio.at:8889/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGYCMQCe06mOOeXQOXu967xedL+xCt/irMV//FNO2THndFIY+SmC5Z5yNF8CjY6bNjAxQqQCMQDd8hIE4x/G2e8zgH/iVUL8LUznurxMcOk0NLz7xsguhd9JEoC9xwF7cBjZUqziHfQ=" ;
+            msg:signer  <https://satsrv04.researchstudio.at:8889/won/resource> ;
             msg:hash                     "AIfPwmpuPbb4OO/zzsHVX/t85NhbR+YsyxK1nxjIibiONxFTP8uzG+59SD4HkUphMDD0kM4dvssQKFSjj5mhSZF0kNgfkrSHGUVLUyanip6d7tXosdhftPyukMoIMdFlQ5HZJgSR098F16ttrmBAMRNSuRqfXjGONPZQNgSmlFuB" ;
             msg:publicKeyFingerprint     "dteGPcbZox6v1FEc0KCOJOsCH9eKabl1dr7C2E+LqHw=" ;
             msg:signedGraph              <https://satsrv04.researchstudio.at:8889/won/resource/event/adc5swwig03sakwtfafo#envelope-19xl> .
 
     <https://satsrv04.researchstudio.at:8889/won/resource/event/6yvv6j7qpz0t8nldtkyt#envelope-t0d8-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGQCMFqzfSI3MTDEU8c/lChkUOzMspfCMpr9p5xfjMBryUavQAuFAwsGOx0awvgEYhfWDgIwdXlS/STuZ7DlArst6nRZzj8EITIr669ePVxs1/PUZSPzAdq5adkl4VeC1ojuomyp" ;
-            sig:hasVerificationCertificate  <https://satsrv04.researchstudio.at:8889/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGQCMFqzfSI3MTDEU8c/lChkUOzMspfCMpr9p5xfjMBryUavQAuFAwsGOx0awvgEYhfWDgIwdXlS/STuZ7DlArst6nRZzj8EITIr669ePVxs1/PUZSPzAdq5adkl4VeC1ojuomyp" ;
+            msg:signer  <https://satsrv04.researchstudio.at:8889/won/resource> ;
             msg:hash                     "ILXqlg2BGL7wuP8w4Gsq6BPqEosNe4I9anYF9gmHOsvx3n2R5B2qFfh5NmZmyRTuWWNQgylajbtPLpPCAy7KYF520WgiIssIYCHvjRqanXc0gwm6fRq0Ms8W/pCgwjX2bw/oJ+XApUaxk2TbNE0xiCZUmvw4A7BemNSvZ3VDeOY=" ;
             msg:publicKeyFingerprint     "dteGPcbZox6v1FEc0KCOJOsCH9eKabl1dr7C2E+LqHw=" ;
             msg:signedGraph              <https://satsrv04.researchstudio.at:8889/won/resource/event/6yvv6j7qpz0t8nldtkyt#envelope-t0d8> .
@@ -77,9 +77,9 @@
 
 <https://satsrv04.researchstudio.at:8889/won/resource/event/txutyhkuu9xj5us9l6ct#envelope-1fu5-sig> {
     <https://satsrv04.researchstudio.at:8889/won/resource/event/txutyhkuu9xj5us9l6ct#envelope-1fu5-sig>
-            a                               sig:Signature ;
-            sig:signatureValue           "MGUCMAlxkgK/+9JriOMOxRaRTZxvyZxJ/mUmTIIqILEduNYhH52R45bEUoo6MSwBgW4ogQIxAP9V7vWqfeySs05RokqEa4+xMD4XMjlKSS1zEpsFZVtShyi5hL85U0MNnF3YZ0TsHA==" ;
-            sig:hasVerificationCertificate  <https://satsrv04.researchstudio.at:8889/won/resource> ;
+            a                               msg:Signature ;
+            msg:signatureValue           "MGUCMAlxkgK/+9JriOMOxRaRTZxvyZxJ/mUmTIIqILEduNYhH52R45bEUoo6MSwBgW4ogQIxAP9V7vWqfeySs05RokqEa4+xMD4XMjlKSS1zEpsFZVtShyi5hL85U0MNnF3YZ0TsHA==" ;
+            msg:signer  <https://satsrv04.researchstudio.at:8889/won/resource> ;
             msg:hash                     "YkxaGq2kHCLLqqKzTnfq742gQsN962t4vYhqSMooUU/vjnGDBsRw893j2ZuB6kD0lARUd7CJZbo+3QK/sTW4jc/GjNyOPgK+z6qIgnJYZHxkZwZ36irUdELcjY7nkTwfR1oXhuZJ2/xOJsMSaBQg54v/Kz1OeTo94Eflts8icIo=" ;
             msg:publicKeyFingerprint     "dteGPcbZox6v1FEc0KCOJOsCH9eKabl1dr7C2E+LqHw=" ;
             msg:signedGraph              <https://satsrv04.researchstudio.at:8889/won/resource/event/txutyhkuu9xj5us9l6ct#envelope-1fu5> .

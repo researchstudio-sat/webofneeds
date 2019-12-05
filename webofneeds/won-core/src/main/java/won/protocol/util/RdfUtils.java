@@ -1,15 +1,67 @@
 package won.protocol.util;
 
-import com.google.common.collect.Iterators;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
+import java.util.stream.Collector.Characteristics;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.query.*;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.query.ReadWrite;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.ResIterator;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
+import org.apache.jena.riot.RDFWriterRegistry;
 import org.apache.jena.shared.Lock;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.eval.PathEval;
 import org.apache.jena.sparql.util.Context;
@@ -18,17 +70,12 @@ import org.apache.jena.util.FileUtils;
 import org.apache.jena.util.ResourceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.protocol.exception.IncorrectPropertyCountException;
 
-import java.io.*;
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import com.google.common.collect.Iterators;
+
+import won.protocol.exception.IncorrectPropertyCountException;
+import won.protocol.util.pretty.ConversationDatasetWriterFactory;
+import won.protocol.util.pretty.Lang_WON;
 
 /**
  * Utilities for RDF manipulation with Jena.
@@ -37,6 +84,12 @@ public class RdfUtils {
     public static final RDFNode EMPTY_RDF_NODE = null;
     private static final CheapInsecureRandomString randomString = new CheapInsecureRandomString();
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    static {
+        if (!RDFWriterRegistry.contains(Lang_WON.TRIG_WON_CONVERSATION)) {
+            RDFWriterRegistry.register(Lang_WON.TRIG_WON_CONVERSATION,
+                            new ConversationDatasetWriterFactory());
+        }
+    }
 
     public static String toString(Model model) {
         String ret = "";
@@ -63,6 +116,16 @@ public class RdfUtils {
         if (dataset != null) {
             StringWriter sw = new StringWriter();
             RDFDataMgr.write(sw, dataset, RDFFormat.TRIG.getLang());
+            result = sw.toString();
+        }
+        return result;
+    }
+
+    public static String toString(Dataset dataset, RDFFormat format) {
+        String result = "";
+        if (dataset != null) {
+            StringWriter sw = new StringWriter();
+            RDFDataMgr.write(sw, dataset, format);
             result = sw.toString();
         }
         return result;
@@ -323,6 +386,37 @@ public class RdfUtils {
 
         public E getSecond() {
             return second;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((first == null) ? 0 : first.hashCode());
+            result = prime * result + ((second == null) ? 0 : second.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            Pair other = (Pair) obj;
+            if (first == null) {
+                if (other.first != null)
+                    return false;
+            } else if (!first.equals(other.first))
+                return false;
+            if (second == null) {
+                if (other.second != null)
+                    return false;
+            } else if (!second.equals(other.second))
+                return false;
+            return true;
         }
     }
 
@@ -1283,6 +1377,35 @@ public class RdfUtils {
         return toStatementStream(dataset, new DefaultModelSelector());
     }
 
+    public static Stream<Resource> toResourceStream(final Dataset dataset, boolean includePredicates) {
+        return toStatementStream(dataset).flatMap(stmt -> {
+            Resource subj = stmt.getSubject();
+            RDFNode obj = stmt.getObject();
+            if (includePredicates) {
+                Resource pred = stmt.getPredicate();
+                if (obj.isResource()) {
+                    return Stream.of(subj, pred, (Resource) obj);
+                } else {
+                    return Stream.of(subj, pred);
+                }
+            } else {
+                if (obj.isResource()) {
+                    return Stream.of(subj, (Resource) obj);
+                } else {
+                    return Stream.of(subj);
+                }
+            }
+        });
+    }
+
+    public static Stream<String> toURIStream(final Dataset dataset, boolean includePredicates) {
+        return toResourceStream(dataset, includePredicates).filter(r -> r.isURIResource()).map(r -> r.getURI());
+    }
+
+    public static Stream<URI> toURIStreamAsURI(final Dataset dataset, boolean includePredicates) {
+        return toURIStream(dataset, includePredicates).map(r -> URI.create(r));
+    }
+
     public static Stream<Statement> toStatementStream(final Dataset dataset, final ModelSelector modelSelector) {
         List<Statement> results = new LinkedList<>();
         for (Iterator<Model> modelIterator = modelSelector.select(dataset); modelIterator.hasNext();) {
@@ -1300,6 +1423,52 @@ public class RdfUtils {
             results.add(stmtIt.next());
         }
         return results.stream();
+    }
+
+    public static Dataset mapQuads(Dataset ds, Function<Quad, Optional<Quad>> mapper) {
+        Dataset ret = DatasetFactory.createGeneral();
+        DatasetGraph target = ret.asDatasetGraph();
+        Iterator<Quad> it = ds.asDatasetGraph().find();
+        while (it.hasNext()) {
+            Quad quad = it.next();
+            Optional<Quad> mapped = mapper.apply(quad);
+            if (mapped.isPresent()) {
+                target.add(mapped.get());
+            }
+        }
+        return ret;
+    }
+
+    public static Stream<Quad> toQuadStream(Dataset ds) {
+        Iterator<Quad> it = ds.asDatasetGraph().find();
+        return StreamSupport.stream(
+                        Spliterators.spliteratorUnknownSize(it, Spliterator.ORDERED),
+                        false);
+    }
+
+    public static Collector<Quad, Dataset, Dataset> collectToDataset() {
+        return Collector.of((Supplier<Dataset>) () -> DatasetFactory.createGeneral(),
+                        (BiConsumer<Dataset, Quad>) (dataset, quad) -> dataset.asDatasetGraph().add(quad),
+                        (BinaryOperator<Dataset>) (left, right) -> {
+                            Iterator<Quad> rightQuadsIt = right.asDatasetGraph().find();
+                            DatasetGraph leftDg = left.asDatasetGraph();
+                            while (rightQuadsIt.hasNext()) {
+                                leftDg.add(rightQuadsIt.next());
+                            }
+                            return left;
+                        }, Characteristics.UNORDERED);
+    }
+
+    public static Collector<Statement, Model, Model> collectToModel() {
+        return Collector.of((Supplier<Model>) () -> ModelFactory.createDefaultModel(),
+                        (BiConsumer<Model, Statement>) (model, stmt) -> model.add(stmt),
+                        (BinaryOperator<Model>) (left, right) -> {
+                            Iterator<Statement> rightStatementsIt = right.listStatements();
+                            while (rightStatementsIt.hasNext()) {
+                                left.add(rightStatementsIt.next());
+                            }
+                            return left;
+                        }, Characteristics.UNORDERED);
     }
 
     public static Stream<Model> toModelStream(final Dataset dataset) {

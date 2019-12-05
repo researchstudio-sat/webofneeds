@@ -10,24 +10,17 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>webofneeds</artifactId>
-        <groupId>at.researchstudio.sat</groupId>
-        <version>0.7-SNAPSHOT</version>
-        <relativePath>../../webofneeds/pom.xml</relativePath>
-    </parent>
+<artifactId>won-parent-pom</artifactId>
+<relativePath>../won-parent-pom</relativePath>
+<groupId>at.researchstudio.sat</groupId>
+<version>0.7-SNAPSHOT</version>
+</parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>won-ontology-validator</artifactId>
     <name>Ontology Validator</name>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>net.revelc.code.formatter</groupId>
-                <artifactId>formatter-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+    
     <dependencies>
         <!-- Warning! Only to be used in connection with the <dependencyManagement> 
             section in the parent pom! -->

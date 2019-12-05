@@ -10,7 +10,7 @@ prefix rdfg:   <http://www.w3.org/2004/03/trix/rdfg-1/>
 prefix local: <http://localhost:8080/won/resource/>
 prefix won:   <https://w3id.org/won/core#>
 prefix msg:   <https://w3id.org/won/message#>
-prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
+
 prefix ldp:   <http://www.w3.org/ns/ldp#>
 
 #message events check:
@@ -25,16 +25,14 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
 
 
 
-  ?numEvents
-      ?numRemoteEvents
+  	?numEvents
+      ?numResponseEvents
       ?numTypedEvents
       ?numForwardedEvents
 
 
-      (if(?numEvents != ?numForwardedEvents + ?numRemoteEvents + 1
-      || ?numTypedEvents != ?numForwardedEvents + 1
-      || ?numEvents != (1 + ?numRemoteEvents + ?numForwardedEvents),
-      "FAIL", "OK") AS ?check)
+      (if( ?numEvents = 1 || ?numEvents = ?numForwardedEvents + ?numResponseEvents + 1,
+      "OK", "FAIL") AS ?check)
 
     WHERE
     {
@@ -45,7 +43,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
           GRAPH ?envelope
           {
             ?envelope rdf:type msg:EnvelopeGraph .
-            ?envelope rdfg:subGraphOf ?event .
+            ?event msg:envelope ?envelope .
           } .
         }
       }
@@ -61,21 +59,22 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
         }
       }
 
-      # number of remote events with addressing and type correctly related to another event
-      { SELECT (count(DISTINCT ?revent) as ?numRemoteEvents)
+      # number of responses
+      { SELECT (count(DISTINCT ?revent) as ?numResponseEvents)
         WHERE
         {
           GRAPH ?envelope
           {
             ?envelope rdf:type msg:EnvelopeGraph .
-            ?event msg:correspondingRemoteMessage ?revent .
+            ?revent msg:respondingTo ?event .
           } .
           GRAPH ?renvelope
           {
             ?renvelope rdf:type msg:EnvelopeGraph .
-            ?revent msg:recipientAtom|msg:senderAtom|msg:recipientNode|msg:senderNode ?uri .
+            ?revent msg:recipientAtom|msg:senderAtom|msg:recipientNode|msg:senderNode|msg:recipientSocket|msg:senderSocket ?uri .
             ?revent msg:messageType ?type .
-            ?renvelope rdfg:subGraphOf ?revent .
+            ?revent msg:envelope ?renvelope .
+            filter (?type = msg:SuccessResponse || ?type = msg:FailureResponse)
           } .
         }
       }
@@ -92,7 +91,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
           GRAPH ?renvelope
           {
             ?renvelope rdf:type msg:EnvelopeGraph .
-            ?renvelope rdfg:subGraphOf ?revent .
+            ?revent msg:envelope ?renvelope .
           } .
         }
       }

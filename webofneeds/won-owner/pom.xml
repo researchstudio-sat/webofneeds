@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>webofneeds</artifactId>
-        <groupId>at.researchstudio.sat</groupId>
-        <version>0.7-SNAPSHOT</version>
-    </parent>
+<artifactId>won-parent-pom</artifactId>
+<relativePath>../won-parent-pom</relativePath>
+<groupId>at.researchstudio.sat</groupId>
+<version>0.7-SNAPSHOT</version>
+</parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>won-owner</artifactId>
@@ -100,7 +101,13 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
         </dependency>
-
+ 		<dependency>
+       		<!--  introduced so we can use @MockBean -->
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-test</artifactId>
+		    <version>${org.springframework.boot.version}</version>
+		    <scope>test</scope>
+		</dependency>
         <!-- security stuff -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
@@ -132,12 +139,7 @@
                 <directory>src/test/resources</directory>
             </testResource>
         </testResources>
-        <plugins>
-            <plugin>
-                <groupId>net.revelc.code.formatter</groupId>
-                <artifactId>formatter-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
+        
     </build>
 
 </project>

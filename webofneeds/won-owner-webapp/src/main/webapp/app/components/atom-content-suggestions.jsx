@@ -48,12 +48,11 @@ const mapDispatchToProps = dispatch => {
         })
       );
     },
-    connect: (ownedAtomUri, connectionUri, targetAtomUri, message) => {
+    connectSockets: (senderSocketUri, targetSocketUri, message) => {
       dispatch(
-        actionCreators.atoms__connect(
-          ownedAtomUri,
-          connectionUri,
-          targetAtomUri,
+        actionCreators.atoms__connectSockets(
+          senderSocketUri,
+          targetSocketUri,
           message
         )
       );
@@ -107,14 +106,17 @@ class WonAtomContentSuggestions extends React.Component {
     }
 
     const connUri = get(conn, "uri");
-    const targetAtomUri = get(conn, "targetAtomUri");
 
     if (connectionUtils.isUnread(conn)) {
       this.props.connectionMarkAsRead(connUri, this.props.atomUri);
     }
 
     this.props.rateConnection(connUri, won.WONCON.binaryRatingGood);
-    this.props.connect(this.props.atomUri, connUri, targetAtomUri, message);
+
+    const socketUri = get(conn, "socketUri");
+    const targetSocketUri = get(conn, "targetSocketUri");
+
+    this.props.connectSockets(socketUri, targetSocketUri, message);
     this.props.routerGo("connections", {
       connectionUri: connUri,
       viewConnUri: undefined,
@@ -193,7 +195,7 @@ WonAtomContentSuggestions.propTypes = {
   routerGo: PropTypes.func,
   connectionClose: PropTypes.func,
   connectionMarkAsRead: PropTypes.func,
-  connect: PropTypes.func,
+  connectSockets: PropTypes.func,
   rateConnection: PropTypes.func,
 };
 

@@ -1,0 +1,1726 @@
+@prefix msg:   <https://w3id.org/won/message#> .
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix p50:   <https://localhost:8443/won/resource/event/q3wcoxjougj7awlo805f#> .
+@prefix cert:  <http://www.w3.org/ns/auth/cert#> .
+@prefix p10:   <https://localhost:8443/won/resource/event/5669098069340991000#> .
+@prefix p12:   <https://localhost:8443/won/resource/event/attqb66yn0hd7rj0m483#> .
+@prefix p11:   <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#> .
+@prefix p14:   <https://localhost:8443/won/resource/event/oy525npzylaeic4w4kvg#> .
+@prefix p13:   <https://localhost:8443/won/resource/atom/> .
+@prefix p16:   <https://localhost:8443/won/resource/event/ej27d16ryg5cg6hos72l#> .
+@prefix p15:   <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#> .
+@prefix p18:   <https://localhost:8443/won/resource/event/qy3k0igvj310ejofcqa9#> .
+@prefix p17:   <https://localhost:8443/won/resource/event/bdlertk71nx2mtu6tgou#> .
+@prefix won:   <https://w3id.org/won/core#> .
+@prefix p19:   <https://localhost:8443/won/resource/event/557600936467257340#> .
+@prefix p21:   <https://localhost:8443/won/resource/event/v847jsnvnzhfjj43hdbh#> .
+@prefix p20:   <https://localhost:8443/won/resource/event/2gwtnta4od8xzqdubbkg#> .
+@prefix p23:   <https://localhost:8443/won/resource/event/qxy7d1ql59uzorccngdo#> .
+@prefix p22:   <https://localhost:8443/won/resource/event/1435888415723958200#> .
+@prefix p25:   <https://localhost:8443/won/resource/connection/> .
+@prefix p24:   <https://localhost:8443/won/resource/event/75z0ck8d0ijloyvzyo05#> .
+@prefix p27:   <https://localhost:8443/won/resource/event/9fhq1ef81bw0vwps12c5#> .
+@prefix p26:   <https://localhost:8443/won/resource/event/lkf3jxkjp5v9o71t8bsb#> .
+@prefix p29:   <https://localhost:8443/won/resource/event/tggbraefz9y07d2npt2m#> .
+@prefix p28:   <https://localhost:8443/won/resource/event/3jaz102f0678yab8vwx2#> .
+@prefix p0:    <https://localhost:8443/won/resource/atom/7820503869697675000#> .
+@prefix p1:    <https://w3id.org/won/modification#> .
+@prefix p2:    <https://localhost:8443/won/resource/event/1zp49xutzuw6w7etotxk#> .
+@prefix p3:    <https://localhost:8443/won/resource/event/gha3693zdigediknod00#> .
+@prefix p4:    <https://localhost:8443/won/resource/event/whryytxsc7il9og0zs2z#> .
+@prefix p5:    <https://localhost:8443/won/resource/atom/7820503869697675000/> .
+@prefix p6:    <https://localhost:8443/won/resource/event/ljkwmhkooz54bshrx1m5#> .
+@prefix rdfg:  <http://www.w3.org/2004/03/trix/rdfg-1/> .
+@prefix p7:    <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#> .
+@prefix p8:    <https://localhost:8443/won/resource/connection/4t9deo4t6bqx83jxk5ex/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix p9:    <https://localhost:8443/won/resource/event/wpvw8lkvi5tcgccuq2dc#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix p30:   <https://localhost:8443/won/resource/event/to1pxp688kcn0wo30yu6#> .
+@prefix p32:   <https://localhost:8443/won/resource/event/6671551888677331000#> .
+@prefix p31:   <https://w3id.org/won/agreement#> .
+@prefix p34:   <https://localhost:8443/won/resource/event/4240608697617289000#> .
+@prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
+@prefix p33:   <https://localhost:8443/won/resource/event/> .
+@prefix p36:   <https://localhost:8443/won/resource/event/krcmdz8802701wpzlzl8#> .
+@prefix p35:   <https://localhost:8443/won/resource/atom/nte803gz4pbiw6equ3qa#> .
+@prefix p38:   <https://localhost:8443/won/resource/atom/nte803gz4pbiw6equ3qa/> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix p37:   <https://localhost:8443/won/resource/connection/xq6jofxo2w8o05io6dre/> .
+@prefix p39:   <https://localhost:8443/won/> .
+@prefix match: <https://w3id.org/won/matching#> .
+@prefix p41:   <https://localhost:8443/won/resource/event/g4lse5fmv91tlzlc1zms#> .
+@prefix p40:   <https://localhost:8443/won/resource/event/omh6mnwfqczgjimg3sch#> .
+@prefix p43:   <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#> .
+@prefix p42:   <https://localhost:8443/won/resource/event/2i6eieqj3z44fc62loe3#> .
+@prefix p45:   <https://localhost:8443/won/resource/event/4672813835273634000#> .
+@prefix p44:   <https://localhost:8443/won/resource/event/diabwxkvjvkh53zrrwjd#> .
+@prefix p47:   <https://localhost:8443/won/resource/event/t1h3u3s5q6is5sewv843#> .
+@prefix p46:   <https://localhost:8443/won/resource/event/hp6hw2wa3bbww4wo8gfo#> .
+@prefix p49:   <https://localhost:8443/won/resource/event/2kt4vylzjcvoz4rtn5tn#> .
+@prefix p48:   <https://localhost:8443/won/resource/event/qzgytpo0swmz6korntqu#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+
+p32:data {
+    p32:data  a                    msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:6671551888677331000 ;
+            msg:containsSignature  p32:content-sig .
+    
+    p32:content-sig  a                      msg:Signature ;
+            msg:signer  p13:7820503869697675000 ;
+            msg:signatureValue              "MGUCMQC8s+IIJAoHkvcIdubHxzBik8L7E2Uu+xKrfWDJtcQ5XhZmY3bEehM5Y2CiPL5yPqcCMFhdd4j1wwHBJXnXadWBBd/aop9epzhHsT/MHN4PE8umyfaO5WzGxokS5a+eOnAzoQ==" ;
+            msg:hash                        "BoCZK0kl8NrdzpoBdkpm//8KQfVZ+3Rg4tdbpVmmdkamub63KXXiIMXFof9rELUExf4EOgdG3C1ih1IPNn67hkCH08Qs2n4zq+ZSe0UqigGE/erkTcF1BN2nBxzg0rJtk9GpIEcgPJVjmUr2p0bGc+PDN85dC9ec/FEp28aLwA==" ;
+            msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
+            msg:signedGraph                 p32:content .
+    
+    p33:6671551888677331000
+            a                    msg:FromOwner ;
+            msg:content          p32:content ;
+            msg:messageType      msg:ConnectMessage ;
+            msg:previousMessage  p33:6671551888677331000 ;
+            msg:recipientAtom    p13:nte803gz4pbiw6equ3qa ;
+            msg:recipientNode    p39:resource ;
+            msg:sender           p25:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom       p13:7820503869697675000 ;
+            msg:senderNode       p39:resource ;
+            msg:sentTimestamp    "1513345775875" .
+}
+
+p18:envelope-1vve {
+    p33:qy3k0igvj310ejofcqa9
+            a                            msg:FromSystem ;
+            msg:messageType              msg:SuccessResponse ;
+            msg:previousMessage          p33:qy3k0igvj310ejofcqa9 ;
+            msg:protocolVersion          "1.0" ;
+            msg:receivedTimestamp        1513345776433 ;
+            msg:recipient                p25:4t9deo4t6bqx83jxk5ex ;
+            msg:recipientAtom            p13:nte803gz4pbiw6equ3qa ;
+            msg:recipientNode            p39:resource ;
+            msg:respondingTo             p33:usi9yhill1lo2xi70sjx ;
+            msg:respondingToMessageType  msg:OpenMessage ;
+            msg:sender                   p25:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom               p13:7820503869697675000 ;
+            msg:senderNode               p39:resource .
+    
+    p49:envelope-ikk0-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMDEdA9yaGpxmvlWOr20dQ090oFgRuySbbRY0/bfms4Gv9BMQOdEG02Z2sqXgJMhJRQIwbIoIITiGBTX9aDIbHGkUAhF1pWvfB0GjIb0FNPQqTDCiJ62iIYx1DZqLbKc38DLT" ;
+            msg:hash                        "AI1JXq2JRf30m3OTyCa1BuKHGzriUbn88urWhmcG1D0TMICpl2iKrCHVgGcbmRWNQ/veW54H3h4PnZe/THXVPFFPmRKHrG4qVMZDAGFGVUrZS5hPza9R4bppv/XkR7pYehjXNJfQBXQ/oBjijpf37lcXqjzmi9XxXE9YcYndAvVh" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p49:envelope-ikk0 .
+    
+    p18:envelope-1vve
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:qy3k0igvj310ejofcqa9 ;
+            msg:containsSignature  p49:envelope-ikk0-sig .
+}
+
+p12:envelope-dm4n-sig {
+    p12:envelope-dm4n-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGUCME7vs+vj6DBFOGrAORkGB3ZhdKJhBfPUTMjX5ey6FXEmKi22qz36lArluEqQpXQJbgIxAOkODyq4TUQlV4N3hXayfjKqP3VkguUjExesH0c+qKAvDTUn8xAXuyueBTSLJOfX+Q==" ;
+            msg:hash                        "Lp3mhUAQ4yJ3PkY2/c99IgeAq0r8+kbmwpJN1a5DExAT5zpmZ0OKaizOrn38tIQ81WoyUNTA0Ui0UPMP2c8/YZjYqQdfs0vHVou8tGdP5bmpdY+zhwP85pcxSj6uVb8O+KOhKO91LerG3b4iUHa2kVnpTW9A9VGB47eyr5BKIrk=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p12:envelope-dm4n .
+}
+
+p28:envelope-7byg-sig {
+    p28:envelope-7byg-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGUCMQDjqWaOEmquNCaei/HWoU8Oyj+H6DHgmZcOY3Ch/zqXvtk3YjeTJ6/IM8cM2y20jM4CMH0i36AbyMMD/L8g/S0esn2SjaGqovfNObKZ/qkEhfSlIW8QB6L4kVnC2wrJD5M0QQ==" ;
+            msg:hash                        "EJvNE4Ag/2tM+qASghpMbmS+/EyPnRnkr9EGybKJiPwf0KXid1MZ44CG/dkYoGsEN6/1NY89F3yUJLLeQ6OQDlpoe35KsQhczWZVgfku/w03V+PST1jV3cz3tGAzCvV2O5FG14NaSpg0DvZRWe+y5Qvlwf387H1HNHS6fjvHImE=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p28:envelope-7byg .
+}
+
+p15:envelope-vnv7 {
+    p12:envelope-dm4n-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGUCME7vs+vj6DBFOGrAORkGB3ZhdKJhBfPUTMjX5ey6FXEmKi22qz36lArluEqQpXQJbgIxAOkODyq4TUQlV4N3hXayfjKqP3VkguUjExesH0c+qKAvDTUn8xAXuyueBTSLJOfX+Q==" ;
+            msg:hash                        "Lp3mhUAQ4yJ3PkY2/c99IgeAq0r8+kbmwpJN1a5DExAT5zpmZ0OKaizOrn38tIQ81WoyUNTA0Ui0UPMP2c8/YZjYqQdfs0vHVou8tGdP5bmpdY+zhwP85pcxSj6uVb8O+KOhKO91LerG3b4iUHa2kVnpTW9A9VGB47eyr5BKIrk=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p12:envelope-dm4n .
+    
+    p15:envelope-ua55-sig
+            a                               msg:Signature ;
+            msg:signer  p13:nte803gz4pbiw6equ3qa ;
+            msg:signatureValue              "MGYCMQC04AcJGOpxTA8nmUBnX5NjM/QWoHCjDPh89u6e7LAUyOeYxrpGTGHOf470os1w7HsCMQCWugfOoAhoFd0nOf2Z3nOkaSlrW1wBwM97iJhKvFaOneZNXL30feQmw0vutiT6DUs=" ;
+            msg:hash                        "AIhm9NU/Tiv2NGiF7/UcFMKOidywUXhazWcIZiAq1dZ6dQ9B84qLNbSvMMgDZdiXgFIBjPSLCMU1Ft/gAav+eXvwbGBg+xQ+U6mg6GFZgdAPnnzAt/7H+Nm/iuTyyKaa4PvtGBN0Z2C8LihC9N36dBoNw4SDP46Ukmtt1Br9zZKp" ;
+            msg:publicKeyFingerprint        "IwyZXueJ69uldEQMoR6tmjSICtahgt4Oji/iALKaL+4=" ;
+            msg:signedGraph                 p15:envelope-ua55 .
+    
+    p15:envelope-vnv7
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:mt1f8i41bogt7kc91fi6 ;
+            msg:containsEnvelope   p15:envelope-ua55 ;
+            msg:containsSignature  p12:envelope-dm4n-sig , p15:envelope-ua55-sig .
+    
+    p33:mt1f8i41bogt7kc91fi6
+            a                      msg:FromOwner ;
+            msg:previousMessage    p33:attqb66yn0hd7rj0m483 ;
+            msg:protocolVersion    "1.0" ;
+            msg:receivedTimestamp  1513345787497 .
+}
+
+p10:data {
+    p10:data  a                    msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:5669098069340991000 ;
+            msg:containsSignature  p10:content-sig .
+    
+    p33:5669098069340991000
+            a                    msg:FromOwner ;
+            msg:content          p10:content ;
+            msg:messageType      msg:ConnectionMessage ;
+            msg:previousMessage  p33:5669098069340991000 ;
+            msg:recipient        p25:4t9deo4t6bqx83jxk5ex ;
+            msg:recipientAtom    p13:nte803gz4pbiw6equ3qa ;
+            msg:recipientNode    p39:resource ;
+            msg:sender           p25:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom       p13:7820503869697675000 ;
+            msg:senderNode       p39:resource ;
+            msg:sentTimestamp    "1513345783513" .
+    
+    p10:content-sig  a                      msg:Signature ;
+            msg:signer  p13:7820503869697675000 ;
+            msg:signatureValue              "MGUCMGweBf3N9MAUNbvZcxpfueo4VIZWXgAW2EEbKyXDA4wea9SMq3q/5haZtAfLJv7FmAIxANdTyTcQ6IqlKhP8a655QF2gLdbEjMNao9xbgc7o5XotOKLUPVc145JnVXGIe1pvxg==" ;
+            msg:hash                        "ALNs2UTDIodwFyAkA57/S4xpXn6pTLvNmZqzm2oMxTdmypt/0/Y4eQ4AdVjOQetMTxvAiQ6J/tIRzEMWFTU0qrCVmaiEL2d5EhVqdEnQtqUO27UM/i5/5eGaBqNGJXiPrdrO3BNwsmUNd4KsjhR8QVfCiS/rmmpiE3JNYI1b0t1z" ;
+            msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
+            msg:signedGraph                 p10:content .
+}
+
+p34:atom {
+    p13:7820503869697675000
+            a           won:Atom ;
+            dc:title    "More Coffee" ;
+            cert:key    [ cert:PublicKey  [ a                  won:ECCPublicKey ;
+                                            won:ecc_algorithm  "EC" ;
+                                            won:ecc_curveId    "secp384r1" ;
+                                            won:ecc_qx         "3f79a7c1ecbf9ac18c6afc7cf9251f9d1091d4af0e4185ad90a685c926e9773e0f0d19f9340c8d44c2d2d4a81e53f332" ;
+                                            won:ecc_qy         "309741dd62848792098c5cd1b6528dad8def9e1b2de419fa858bbd5d1dda7c1fee091c19aeeea6db80a6bcf550a498eb"
+                                          ] ] ;
+            cert:key    [ cert:PublicKey  [ a                  won:ECCPublicKey ;
+                                            won:ecc_algorithm  "EC" ;
+                                            won:ecc_curveId    "secp384r1" ;
+                                            won:ecc_qx         "3f79a7c1ecbf9ac18c6afc7cf9251f9d1091d4af0e4185ad90a685c926e9773e0f0d19f9340c8d44c2d2d4a81e53f332" ;
+                                            won:ecc_qy         "309741dd62848792098c5cd1b6528dad8def9e1b2de419fa858bbd5d1dda7c1fee091c19aeeea6db80a6bcf550a498eb"
+                                          ] ] ;
+            cert:key    [ cert:PublicKey  [ a                  won:ECCPublicKey ;
+                                            won:ecc_algorithm  "EC" ;
+                                            won:ecc_curveId    "secp384r1" ;
+                                            won:ecc_qx         "3f79a7c1ecbf9ac18c6afc7cf9251f9d1091d4af0e4185ad90a685c926e9773e0f0d19f9340c8d44c2d2d4a81e53f332" ;
+                                            won:ecc_qy         "309741dd62848792098c5cd1b6528dad8def9e1b2de419fa858bbd5d1dda7c1fee091c19aeeea6db80a6bcf550a498eb"
+                                          ] ] ;
+            won:socket  won:ChatSocket ;
+            match:flag  match:UsedForTesting .
+}
+
+p19:content {
+    p33:557600936467257340
+            p31:proposes  p33:5669098069340991000 ;
+            con:text      "two" .
+}
+
+p3:envelope-u2li {
+    p33:gha3693zdigediknod00
+            a                            msg:FromSystem ;
+            msg:messageType              msg:SuccessResponse ;
+            msg:protocolVersion          "1.0" ;
+            msg:receivedTimestamp        1513345787604 ;
+            msg:recipient                p25:4t9deo4t6bqx83jxk5ex ;
+            msg:recipientAtom            p13:nte803gz4pbiw6equ3qa ;
+            msg:recipientNode            p39:resource ;
+            msg:respondingTo             p33:mt1f8i41bogt7kc91fi6 ;
+            msg:respondingToMessageType  msg:ConnectionMessage ;
+            msg:sender                   p25:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom               p13:7820503869697675000 ;
+            msg:senderNode               p39:resource .
+    
+    p3:envelope-u2li  a            msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:gha3693zdigediknod00 ;
+            msg:containsSignature  p9:envelope-3j0q-sig .
+    
+    p9:envelope-3j0q-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGUCMBaYnjba1p8HqPybVQ97bajXsIhgPzMTpK6Z3XiDiH0B1qsUG2LmTZeHyEZr7jw6oAIxAPnMV7kpW/GsLvJ1LNajYJD1Sq5OOiNDN98wZdPAcJR+lV8yVICMqpiAO/eLsLfvVw==" ;
+            msg:hash                        "YkDuMQGZg1UzsQStc9xXMn+KBAIVsOtDQbT/L9cBKoY6pgQYM7u9Anlk9ZkU64PpcmGdd/SzHmrZVZ2oVlOaolVspgeoS/RWJTMq+FFJnTx+cl+GCgV/eOzxqEJjA53tIqCPy00pAf7My12GB1DCd9PAPDicqWdVNdW+F5HfhTI=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p9:envelope-3j0q .
+}
+
+p12:envelope-dm4n {
+    p41:envelope-ed0k-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGYCMQCbBcNn+z17+7eT4dg9qGnjlmprLaSlVre17weEFTRbVpGb5OGtV8C0p02gRDtImbcCMQCLL4ZP5oHcftbXS5Ne55cyIy+omDfMMbiPNs8VSM1XG6K4tXipuGEyffhhZKkrNoc=" ;
+            msg:hash                        "AK5n/tH3cxBUCoThr41HUVh1sR/h9bCE1lnRSALL+af1++fcyPr18nQdS67h4QvBAdJiDyNNFqxOx9y4HNgS5sbubyUNc4bOYcyLppan2YbHLt82+bb94gJrUTEEDE1THY6qCQV4OBGg6p8+DZ0FkVXJ1aK6eF1vQgfHl/s0mMIu" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p41:envelope-ed0k .
+    
+    p33:attqb66yn0hd7rj0m483
+            a                            msg:FromSystem ;
+            msg:messageType              msg:SuccessResponse ;
+            msg:previousMessage          p33:attqb66yn0hd7rj0m483 ;
+            msg:protocolVersion          "1.0" ;
+            msg:receivedTimestamp        1513345787334 ;
+            msg:recipient                p25:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom            p13:7820503869697675000 ;
+            msg:recipientNode            p39:resource ;
+            msg:respondingTo             p33:1435888415723958200 ;
+            msg:respondingToMessageType  msg:ConnectionMessage ;
+            msg:sender                   p25:4t9deo4t6bqx83jxk5ex ;
+            msg:senderAtom               p13:nte803gz4pbiw6equ3qa ;
+            msg:senderNode               p39:resource .
+    
+    p12:envelope-dm4n
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:attqb66yn0hd7rj0m483 ;
+            msg:containsSignature  p41:envelope-ed0k-sig .
+}
+
+p15:envelope-ua55 {
+    p15:content-lqq1-sig
+            a                               msg:Signature ;
+            msg:signer  p13:nte803gz4pbiw6equ3qa ;
+            msg:signatureValue              "MGYCMQCdvBJ6busDMET+Cwm+X0G9F0h6cdZKyhAu5mRHnimH+NHgPxl3iXbCnrUUCDlrKbICMQCg7DDvZ8semfU7XtLUdEqaF6BxwtInpqXKY7euftsorqnBEJdvRHD4ZZCj4isTwJM=" ;
+            msg:hash                        "TSVmMl49sNiO/xne3gwUUt4fxfqcep2n6jJM5mhkda2dT4oraDtoJrZ7ktbkP05qsTuQsJo2hTtgJuJa1N4VSw==" ;
+            msg:publicKeyFingerprint        "IwyZXueJ69uldEQMoR6tmjSICtahgt4Oji/iALKaL+4=" ;
+            msg:signedGraph                 p15:content-lqq1 .
+    
+    p33:mt1f8i41bogt7kc91fi6
+            a                    msg:FromOwner ;
+            msg:content          p15:content-lqq1 ;
+            msg:messageType      msg:ConnectionMessage ;
+            msg:previousMessage  p33:mt1f8i41bogt7kc91fi6 ;
+            msg:protocolVersion  "1.0" ;
+            msg:recipient        p25:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom    p13:7820503869697675000 ;
+            msg:recipientNode    p39:resource ;
+            msg:sender           p25:4t9deo4t6bqx83jxk5ex ;
+            msg:senderAtom       p13:nte803gz4pbiw6equ3qa ;
+            msg:senderNode       p39:resource ;
+            msg:sentTimestamp    1513345787456 .
+    
+    p15:envelope-ua55
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:mt1f8i41bogt7kc91fi6 ;
+            msg:containsSignature  p15:content-lqq1-sig .
+}
+
+p42:envelope-m8nh-sig {
+    p42:envelope-m8nh-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMFkYMyMw9kJalRr/BqiB7xcSlGri1t7+w5Zqzq3gLyEcXljbTgkDh1R+1fcFgtjpIQIwMATJyEVHlwp7CehvnSCIu0/7P432WdTB0qTLC1aG1aMpBHw5yY/mq7C7aYTcNrE+" ;
+            msg:hash                        "AK073HiHdEciUwclUdlRiHTQF8f2z57d+2+CpDIGbhBTOKG7/vPaApvU+w2Ysb681AhMRdHbhiP5Xqxix63HYWiE1OLDUIpXzkn4La/8JKgJVCd8ePVA83tO/uu+MR2zts5+uDt2Eu/sxQiiqwqXtT8zTGHjJvTugDfIyCJCE1hV" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p42:envelope-m8nh .
+}
+
+p29:envelope-engq {
+    p29:envelope-engq
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:tggbraefz9y07d2npt2m ;
+            msg:containsSignature  p43:envelope-l74h-sig .
+    
+    p43:envelope-l74h-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGUCMQDNs+0WTJ68EkuUhqkRrxuu5523hdYmiL4hklfMqSsrM+ZcuMJJ36ZtAz/PWR3oVyACMGGajjHGtQucHUX+7bTs3U2iuTmbd2jZNEqbByI8uuQ+B4080BYH+xTud9yS0P47tw==" ;
+            msg:hash                        "PkvTzg6rT8TzBcpavSw2tgLPIKSr80+7AYU4xfO9RMT28Sc196egfBtp5KaURrl1QWqh710bNhB5de6QaB/iigf2feVni47KUyesCntnHiyrtDfKwIJirU20Eu2AVW/T2c9/pppG+48EmfaH0tEH73mGTtuKlC3fydDAT58ByeA=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p43:envelope-l74h .
+    
+    p33:tggbraefz9y07d2npt2m
+            a                            msg:FromSystem ;
+            msg:messageType              msg:SuccessResponse ;
+            msg:previousMessage          p33:ow321nn1va6clfidc4s0 ;
+            msg:protocolVersion          "1.0" ;
+            msg:receivedTimestamp        1513345785820 ;
+            msg:recipient                p25:4t9deo4t6bqx83jxk5ex ;
+            msg:recipientAtom            p13:nte803gz4pbiw6equ3qa ;
+            msg:recipientNode            p39:resource ;
+            msg:respondingTo             p33:ow321nn1va6clfidc4s0 ;
+            msg:respondingToMessageType  msg:ConnectionMessage ;
+            msg:sender                   p25:4t9deo4t6bqx83jxk5ex ;
+            msg:senderAtom               p13:nte803gz4pbiw6equ3qa ;
+            msg:senderNode               p39:resource .
+}
+
+p42:envelope-m8nh {
+    p32:envelope-pj9k-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMC1qFwNsbRCwDeGs5sBqve1gmMahi+GwAPITuSzA3MDJaMnGKE1RjrLHtyNYj0xDZwIwH/RNg7JluB5O+kJmPFkTzcvVUD+AHFCQ/5y2SLq/5lbGutnlB7iMPg1PNqTzEfkM" ;
+            msg:hash                        "YwC+ZwsKsdKfjTZGJGjETX1y7XdVHVwN4ocDTJgIJZjV6YPlvLAS+G25TNrYqwWLiHrNyfit4bgW6ECjSUncreMiwvnXwk83WmepYlDKlsXAkVphAeZ2Cf3Bm4NKtCJC4FZxA9BG1rirhRBOOVT4EseLwzRzB8wSb8v3St/NW9U=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p32:envelope-pj9k .
+    
+    p42:envelope-m8nh
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:2i6eieqj3z44fc62loe3 ;
+            msg:containsSignature  p32:envelope-pj9k-sig .
+    
+    p33:2i6eieqj3z44fc62loe3
+            a                            msg:FromSystem ;
+            msg:messageType              msg:SuccessResponse ;
+            msg:previousMessage          p33:6671551888677331000 ;
+            msg:protocolVersion          "1.0" ;
+            msg:receivedTimestamp        1513345775965 ;
+            msg:recipient                p25:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom            p13:7820503869697675000 ;
+            msg:recipientNode            p39:resource ;
+            msg:respondingTo             p33:6671551888677331000 ;
+            msg:respondingToMessageType  msg:ConnectMessage ;
+            msg:sender                   p25:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom               p13:7820503869697675000 ;
+            msg:senderNode               p39:resource .
+}
+
+p34:envelope-goia-sig {
+    p34:envelope-goia-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMHFbd98lJ8VEtN6nGpzNLbxY5z7yUuE4uHXkdaVcSxcDihH61eQ12cp7dAdPayvRbQIwZ3OGzL5BF6FVonqVh0nncQtsSyY+22Ti+Q6s3lxrAnB3wVagcIzwa1jEwpzhF7jJ" ;
+            msg:hash                        "R5CS0JbVblBh1msc6dYfNM898uTbuHf+Jo9CCRhkFC+RjLhDf7a/W0wrV9hUtsqV0aqUNE5ZTKYaMhEPqN+dIIxCwzJg0LEZgIcx3VojSh5du+X3KsHLsNhJPUCQoGmN/o8jHS8AUyF1o/rJxdzXaw+tVJN43/3amSoLXTHoGVQ=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p34:envelope-goia .
+}
+
+p11:envelope-r04c-sig {
+    p11:envelope-r04c-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMEUNfneCxlsUiN9SOY+KSCpYco9+CtnHttkrt5doDp+Z1AYsTSYSXT/t4ce4fGKBTQIwayEuVK8utWG/w/IcVP8iexY2OeBY9ePJF2tYHYWOjNy5fuNlpD/L68SK51Pj+VNU" ;
+            msg:hash                        "VaUnB4qpYrVUq5192++a60h6scH5tVL6jLNNkK370TQeVqRsJkw+EX34snGIoAwNCEt43w2jcmNHWREEiyLa1PjbWIr3WDxcV7zOFhB3e5Dnc2QfA5mEFSeTStdSDcuZJq9l72qRz33LAhWCAIwyCkLt974m3Tt2eL6ZteCIJRM=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p11:envelope-r04c .
+}
+
+p26:envelope-twcq-sig {
+    p26:envelope-twcq-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGYCMQDAZc8YUNHdsMxuJQ0DLhdJFTVveU0vS3Z7JUHFE7zkJVLHOGa90Tb2fFo4C0CQEAkCMQCAXNofwxdXV3hkH+FlR2/ci8kGCfzAyb8acuk/IpHh3Um7CtznGxKt7S7nOGd7I0Q=" ;
+            msg:hash                        "VqpDJcyGjGPcFCsOFpi4FsoxGO8zIQeM3kN2abA/IOVC+q3ti/1nn5C778/baE885x6wz9vBqIrZzbJ7zV/xz2sf94VR0R91QfUMLC/YZZnPsQiEoJCP4R1IAwzN9oje90DfAMiMDvHXgkeEcpyqyPbcytaQUl+oHSKNKcpP1wY=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p26:envelope-twcq .
+}
+
+p11:envelope-1ltm {
+    p11:envelope-1ltm
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:00d5wzbbf8hzzt2eewcc ;
+            msg:containsSignature  p11:content-tbn3-sig .
+    
+    p33:00d5wzbbf8hzzt2eewcc
+            a                    msg:FromOwner ;
+            msg:content          p11:content-tbn3 ;
+            msg:messageType      msg:ConnectionMessage ;
+            msg:previousMessage  p33:00d5wzbbf8hzzt2eewcc ;
+            msg:protocolVersion  "1.0" ;
+            msg:recipient        p25:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom    p13:7820503869697675000 ;
+            msg:recipientNode    p39:resource ;
+            msg:sender           p25:4t9deo4t6bqx83jxk5ex ;
+            msg:senderAtom       p13:nte803gz4pbiw6equ3qa ;
+            msg:senderNode       p39:resource ;
+            msg:sentTimestamp    1513345783797 .
+    
+    p11:content-tbn3-sig
+            a                               msg:Signature ;
+            msg:signer  p13:nte803gz4pbiw6equ3qa ;
+            msg:signatureValue              "MGYCMQCNVnk3VqhGgM8E6IDKZ0QlLY8YcssIyLff8VkIVkWHLjfHZ40hpLMuq62ptH+nWDYCMQC/TfcJZPQwf0Mck/3itkSVRw36RWXAAkPDud978+6xoyZdUSW6c0hhSuyXc7C0SMc=" ;
+            msg:hash                        "QMIxz7ronBfwS8qVTYLd+XZNoQERVtEeGImJtU1R14joB5435IM1dEwMI3okhvM+fA4NdicOFOKhmyFj2uA/bA==" ;
+            msg:publicKeyFingerprint        "IwyZXueJ69uldEQMoR6tmjSICtahgt4Oji/iALKaL+4=" ;
+            msg:signedGraph                 p11:content-tbn3 .
+}
+
+<https://localhost/won/resource/connection/xq6jofxo2w8o05io6dre#data> {
+    p33:4672813835273634000
+            con:feedback  [ con:binaryRating    con:Good ;
+                            con:feedbackTarget  p25:xq6jofxo2w8o05io6dre
+                          ] .
+    
+    p25:xq6jofxo2w8o05io6dre
+            a                     won:Connection ;
+            dct:modified          "2017-12-15T13:49:36.409Z"^^xsd:dateTime ;
+            con:feedbackEvent     p33:4672813835273634000 ;
+            won:additionalData    []  ;
+            won:connectionState   won:Connected ;
+            won:messageContainer  p37:events ;
+            won:socket            won:ChatSocket ;
+            won:sourceAtom        p13:7820503869697675000 ;
+            won:targetAtom        p13:nte803gz4pbiw6equ3qa ;
+            won:targetConnection  p25:4t9deo4t6bqx83jxk5ex ;
+            won:wonNode           p39:resource .
+    
+    p37:events  a        won:MessageContainer ;
+            rdfs:member  p33:gha3693zdigediknod00 .
+}
+
+p0:sysinfo {
+    p13:7820503869697675000
+            a                     won:Atom ;
+            dct:created           "2017-12-15T13:49:09.13Z"^^xsd:dateTime ;
+            dct:modified          "2017-12-15T13:49:09.133Z"^^xsd:dateTime ;
+            won:atomState         won:Active ;
+            won:connections       p5:connections ;
+            won:messageContainer  p0:events ;
+            won:wonNode           p39:resource .
+    
+    p0:events  a         won:MessageContainer ;
+            rdfs:member  p33:bdlertk71nx2mtu6tgou , p33:4240608697617289000 .
+}
+
+p14:envelope-dec7 {
+    p14:content-3ssv-sig
+            a                               msg:Signature ;
+            msg:signer  p13:nte803gz4pbiw6equ3qa ;
+            msg:signatureValue              "MGUCMDsRexnkM9aBm9No9DMy2KngGouc2oqNkuU63oGsi9t5UBHtgK7unhwWPWOJCwohxAIxAKmWfRhlBQyL3lFB57OUuEkXgUHu9uhSl14+zgy77vUOoTjjj2Hjk99fjp6Kld0uxQ==" ;
+            msg:hash                        "flOoxMv80L0iIY89g/TTWNU2GOrKcfgbr14mSwhUOfEkbRxy7WywlOyfZgwmiaGlxjV50OLymY1iWuyEU8cpH9iO3gfrc3hsV09I4bAbNpj0qTig2/HHVvQfIrSbf7IHKgVZa2BYRnfIW1lMtfkjvr+7yOCz03vbfOns86PQ8gc=" ;
+            msg:publicKeyFingerprint        "IwyZXueJ69uldEQMoR6tmjSICtahgt4Oji/iALKaL+4=" ;
+            msg:signedGraph                 p14:content-3ssv .
+    
+    p33:oy525npzylaeic4w4kvg
+            a                    msg:FromOwner ;
+            msg:content          p14:content-3ssv ;
+            msg:messageType      msg:CreateMessage ;
+            msg:protocolVersion  "1.0" ;
+            msg:recipientNode    p39:resource ;
+            msg:senderAtom       p13:nte803gz4pbiw6equ3qa ;
+            msg:senderNode       p39:resource ;
+            msg:sentTimestamp    1513345749218 .
+    
+    p14:envelope-dec7
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:oy525npzylaeic4w4kvg ;
+            msg:containsSignature  p14:content-3ssv-sig .
+}
+
+p45:envelope-jrbj {
+    p24:envelope-jglh-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMCpwQXjXgGiu3nKFb0Gr1ELBJ62zrPp+nSy2HmWecq7X31raChZ0wP6m8dj3TObY/QIwAc/B8lj/wZfbl1Zwa075E8aS4QVd0boWWmsOcJ+UbGB1LtQQylZQrHWyhJVzmmPz" ;
+            msg:hash                        "AIDhNZ3FQFty7JhCcevwb7aK/h9sBgS/XPRU5oWOwbS/V2HJBerBJ/LcFrBQyVGzADwxhuZ+fTJnxC9h227Zb3veUCZPofDMxuOuYyY71Rzz9zCi18yXrTmI8J5fukkSX1aLIsFitH34wrVUS7YsYUpUI57DEkDEeoEyP7qheppb" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p24:envelope-jglh .
+    
+    p33:4672813835273634000
+            a                      msg:FromOwner ;
+            msg:protocolVersion    "1.0" ;
+            msg:receivedTimestamp  1513345771398 .
+    
+    p45:data-sig  a                         msg:Signature ;
+            msg:signer  p13:7820503869697675000 ;
+            msg:signatureValue              "MGUCMHdZCr5bWgELom7iIFji+rva2pxSN6oKAEX2V62/BAWeptejodDOnFIzeKd13zLLywIxALXOeQLHkeEpGjsjgDn5iopRhoxF1tdZcVKdJUGB7/qVScJ8igUc/zhzBHd+EcluZA==" ;
+            msg:hash                        "duXwxaAnisuhtEVMauXsrdgEWygDgF4eCLXy2Ofd5XBT6TG0Mzci1iBHevBZQ11JU0/4b4GccYKmRvSmkp3q9Xm7HnrD+hR2zHDz7D1hbItq+BJ5SkV146rGJ7a6M/FdACCYcdekQTBZpwrIrTqAwzfJV3nJlHR4M6ghRk862Ts=" ;
+            msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
+            msg:signedGraph                 p45:data .
+    
+    p45:envelope-jrbj
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:4672813835273634000 ;
+            msg:containsEnvelope   p45:data ;
+            msg:containsSignature  p24:envelope-jglh-sig , p45:data-sig .
+}
+
+p4:envelope-yk1e {
+    p15:envelope-vnv7-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGUCMHVCSjsEM/gyeyRC33+ivJ2yCThu1JUe/G6mHiM+jPTOqiGnXN2VswTjhb1RozZyOAIxANFU9h+zHDqO/LGpr4jlFSmYPR6Zq1n7Q0gS5WpaY9MndmlrLJCoeesRIBIuQMybDw==" ;
+            msg:hash                        "AIIxesQPL9q1zM4iNjnklPlrvu2qPpseat5PbHCDOpQzQp9y9OT41fKcwkVm3xlcLJoieAB2MdeYiPbrTh0qQooIQAe0Ch8bJEbj4JpST5Ybu7bLtKhMOlVd8rAyBA3+NtHL/1qEVGQqE0n4E0VLzv/mbe4iygWauI8wVgRUkOIT" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p15:envelope-vnv7 .
+    
+    p33:whryytxsc7il9og0zs2z
+            a                            msg:FromSystem ;
+            msg:messageType              msg:SuccessResponse ;
+            msg:previousMessage          p33:mt1f8i41bogt7kc91fi6 ;
+            msg:protocolVersion          "1.0" ;
+            msg:receivedTimestamp        1513345787520 ;
+            msg:recipient                p25:4t9deo4t6bqx83jxk5ex ;
+            msg:recipientAtom            p13:nte803gz4pbiw6equ3qa ;
+            msg:recipientNode            p39:resource ;
+            msg:respondingTo             p33:mt1f8i41bogt7kc91fi6 ;
+            msg:respondingToMessageType  msg:ConnectionMessage ;
+            msg:sender                   p25:4t9deo4t6bqx83jxk5ex ;
+            msg:senderAtom               p13:nte803gz4pbiw6equ3qa ;
+            msg:senderNode               p39:resource .
+    
+    p4:envelope-yk1e  a            msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:whryytxsc7il9og0zs2z ;
+            msg:containsSignature  p15:envelope-vnv7-sig .
+}
+
+p7:envelope-0sio-sig {
+    p7:envelope-0sio-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMGJcaS/o1c+vzZhNbkecNFzkLKLgNBzhAr9XxXPgcR6uB2v4IeGo8SWDcJ0ur+JTUAIwY4ifOfo3+312U+nQ/Br1fJPTLuHpNU0dfcbjwnl0+VmCAttlO2NUgOYLEOg8dHMK" ;
+            msg:hash                        "MvQxlMP22+XTumpMJF2DTocqyQMLmETaw7xeLlS7WyfNjkg6ztuILsfrYYRrldJVVgNhIYxDu2lKqbyjdayBeAQzDGZ86wo4HHPAMYGUFcEoXnPSb+UdCkng1gCFfUrSjjGY2vfKv1aKjESbcSoHDs9IfPDfA3IKlxwPC1MOLc0=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p7:envelope-0sio .
+}
+
+p30:envelope-kxkb {
+    p30:envelope-kxkb
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:to1pxp688kcn0wo30yu6 ;
+            msg:containsSignature  p48:envelope-7ezq-sig .
+    
+    p48:envelope-7ezq-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGUCMDSVEw/mnhUVWBCvJatxDAqEWh/ZqfQMs1rwUsyFdE0UBz5mN4RE5RlvD/QWE2trUwIxAKLrmSjbOxQkV0gQxDJiwCNXG/8IjipHOV7C8r8YaZX6Vkb/P2EAmUI9XkBjzu9fXw==" ;
+            msg:hash                        "AJhIRXrKtWkJUlBsG/pV5dYj9ZpkWAz8JC9IUeA1MOQ5IhlkIONdkXLkSAyCyMu0UrQNUk7MAM3PfNDPi1t4zAtm3ByyNckZFZN6D6YYzqClamxfiApN/W+wkO4OzNnv0lyD507XYmWeu3OJfunszrXQLtGKwGfigg/5FNvig2/w" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p48:envelope-7ezq .
+    
+    p33:to1pxp688kcn0wo30yu6
+            a                            msg:FromSystem ;
+            msg:messageType              msg:SuccessResponse ;
+            msg:previousMessage          p33:to1pxp688kcn0wo30yu6 ;
+            msg:protocolVersion          "1.0" ;
+            msg:receivedTimestamp        1513345785891 ;
+            msg:recipient                p25:4t9deo4t6bqx83jxk5ex ;
+            msg:recipientAtom            p13:nte803gz4pbiw6equ3qa ;
+            msg:recipientNode            p39:resource ;
+            msg:respondingTo             p33:ow321nn1va6clfidc4s0 ;
+            msg:respondingToMessageType  msg:ConnectionMessage ;
+            msg:sender                   p25:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom               p13:7820503869697675000 ;
+            msg:senderNode               p39:resource .
+}
+
+p50:envelope-5mhl {
+    p33:q3wcoxjougj7awlo805f
+            a                            msg:FromSystem ;
+            msg:messageType              msg:SuccessResponse ;
+            msg:previousMessage          p33:00d5wzbbf8hzzt2eewcc ;
+            msg:protocolVersion          "1.0" ;
+            msg:receivedTimestamp        1513345783859 ;
+            msg:recipient                p25:4t9deo4t6bqx83jxk5ex ;
+            msg:recipientAtom            p13:nte803gz4pbiw6equ3qa ;
+            msg:recipientNode            p39:resource ;
+            msg:respondingTo             p33:00d5wzbbf8hzzt2eewcc ;
+            msg:respondingToMessageType  msg:ConnectionMessage ;
+            msg:sender                   p25:4t9deo4t6bqx83jxk5ex ;
+            msg:senderAtom               p13:nte803gz4pbiw6equ3qa ;
+            msg:senderNode               p39:resource .
+    
+    p50:envelope-5mhl
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:q3wcoxjougj7awlo805f ;
+            msg:containsSignature  p11:envelope-r04c-sig .
+    
+    p11:envelope-r04c-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMEUNfneCxlsUiN9SOY+KSCpYco9+CtnHttkrt5doDp+Z1AYsTSYSXT/t4ce4fGKBTQIwayEuVK8utWG/w/IcVP8iexY2OeBY9ePJF2tYHYWOjNy5fuNlpD/L68SK51Pj+VNU" ;
+            msg:hash                        "VaUnB4qpYrVUq5192++a60h6scH5tVL6jLNNkK370TQeVqRsJkw+EX34snGIoAwNCEt43w2jcmNHWREEiyLa1PjbWIr3WDxcV7zOFhB3e5Dnc2QfA5mEFSeTStdSDcuZJq9l72qRz33LAhWCAIwyCkLt974m3Tt2eL6ZteCIJRM=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p11:envelope-r04c .
+}
+
+p17:envelope-z4jb {
+    p33:bdlertk71nx2mtu6tgou
+            a                            msg:FromSystem ;
+            msg:messageType              msg:SuccessResponse ;
+            msg:previousMessage          p33:4240608697617289000 ;
+            msg:protocolVersion          "1.0" ;
+            msg:receivedTimestamp        1513345749147 ;
+            msg:recipientAtom            p13:7820503869697675000 ;
+            msg:recipientNode            p39:resource ;
+            msg:respondingTo             p33:4240608697617289000 ;
+            msg:respondingToMessageType  msg:CreateMessage ;
+            msg:senderAtom               p13:7820503869697675000 ;
+            msg:senderNode               p39:resource .
+    
+    p17:envelope-z4jb
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:bdlertk71nx2mtu6tgou ;
+            msg:containsSignature  p34:envelope-goia-sig .
+    
+    p34:envelope-goia-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMHFbd98lJ8VEtN6nGpzNLbxY5z7yUuE4uHXkdaVcSxcDihH61eQ12cp7dAdPayvRbQIwZ3OGzL5BF6FVonqVh0nncQtsSyY+22Ti+Q6s3lxrAnB3wVagcIzwa1jEwpzhF7jJ" ;
+            msg:hash                        "R5CS0JbVblBh1msc6dYfNM898uTbuHf+Jo9CCRhkFC+RjLhDf7a/W0wrV9hUtsqV0aqUNE5ZTKYaMhEPqN+dIIxCwzJg0LEZgIcx3VojSh5du+X3KsHLsNhJPUCQoGmN/o8jHS8AUyF1o/rJxdzXaw+tVJN43/3amSoLXTHoGVQ=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p34:envelope-goia .
+}
+
+p2:envelope-30wn {
+    p45:envelope-jrbj-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGUCMQDXbefj3ydejJ2UTwyiXpDikapjgRINBew+3Gd7+sVzXOTS9jZM1+9M/r5DnrO98nkCMD6WFYYtj7eCXji2SdV05JNbjpfb0+GImxQubSMzgcLcrd+hm8ahjrLWxBtQ97ALFw==" ;
+            msg:hash                        "VJzUItukPZoUQCCekcp9Byf5LmaEgO+TUIHljAD+kBdbgfxT2iK6fqjQryZ2utG/yVlTPjc3TaOP9waktvOo6ZWGebhb4ViIb59BdC/ELvYZ4H4WZIrstVe6EkCDYiMaTWpBcTMEsXOWg/47C4eCjZiqefz7m1zzUhYDfzSfOXM=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p45:envelope-jrbj .
+    
+    p33:1zp49xutzuw6w7etotxk
+            a                            msg:FromSystem ;
+            msg:messageType              msg:SuccessResponse ;
+            msg:previousMessage          p33:4672813835273634000 ;
+            msg:protocolVersion          "1.0" ;
+            msg:receivedTimestamp        1513345771416 ;
+            msg:recipient                p25:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom            p13:7820503869697675000 ;
+            msg:recipientNode            p39:resource ;
+            msg:respondingTo             p33:4672813835273634000 ;
+            msg:respondingToMessageType  msg:HintFeedbackMessage ;
+            msg:sender                   p25:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom               p13:7820503869697675000 ;
+            msg:senderNode               p39:resource .
+    
+    p2:envelope-30wn  a            msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:1zp49xutzuw6w7etotxk ;
+            msg:containsSignature  p45:envelope-jrbj-sig .
+}
+
+p34:envelope-goia {
+    p34:envelope-sig  a                     msg:Signature ;
+            msg:signer  p13:7820503869697675000 ;
+            msg:signatureValue              "MGUCMDCWztT5w6bzulB1Js0Oy6jOyTux91W1ymePV/uuiu8kfBC+EyPkUMKkGTF4MXUEewIxANli8byJCB+FNxxXM1GemCtyXxedjDKZfEwmg46ZMeokoyhp9YG+EOVqDlmveSNGnA==" ;
+            msg:hash                        "ah4WEk0+Blv0BrP1i17LWmxPJEVfGSn8WP/Z8VN68nis2tdxRO4XKoKClFDW25W/I06am11K4mC+kHIWfSUzIDz47B/Upjrc4N+xwIBNNZmTnV1nn/HzGUuXFTqZyAXl3mzoDK0GSnIphl9kDCIUNW8PpeacGo9tzbqxrr6BkjI=" ;
+            msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
+            msg:signedGraph                 p34:envelope .
+    
+    p34:envelope-goia
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:4240608697617289000 ;
+            msg:containsEnvelope   p34:envelope ;
+            msg:containsSignature  p34:envelope-sig .
+    
+    p33:4240608697617289000
+            a                      msg:FromOwner ;
+            msg:protocolVersion    "1.0" ;
+            msg:receivedTimestamp  1513345749128 .
+}
+
+p20:envelope-h151-sig {
+    p20:envelope-h151-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGUCMFRyXmiy0uHwZzgEQSOZdSf93TPZBpMV/qlnfgKLaexAcmCIPkjpceoT6xqI5Z0IUwIxAMoI7KD0T/2tzCvGIJkdxxLqc8530la7j8eIQhglBG1ZtMAxJkrbuUMQtotFGZa5cQ==" ;
+            msg:hash                        "AI73fczFmVY5ogs8ChpgvhPb8Jrfqw72Bx0yvaKJX+dQg7YcorGeV/lEFI1ovBJnujKwrXKfsuqTWkqrxUD/yZAMf+f2eDWZiPhOI6gIZhZ/nLhGp2aXw5WQcoXAjuG3389JNyKV4qdMda8Yq39/ciJ4mf2UemkRbObMK41UMvUP" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p20:envelope-h151 .
+}
+
+p47:envelope-i81z-sig {
+    p47:envelope-i81z-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGYCMQDyyJw+3HWSOPnKQExRPY5stbhVx2FydpMZFG/HM46RNzRkez3HdeqZfkzatj5rNlcCMQDmex0vveoKc4Xx9AKIwaNj8Z3eZ+HeuqfUZvw7nmxTnIQHJ5m0vpTHJrxcgLNLfZ8=" ;
+            msg:hash                        "B1g5eIUYkKPC7GaDQIkSifpE/SjOoJtNL9vmwHoVATyEP0kfENSPOnPVhykuM9p3ZvKdGWDf/66VI8szkOAviRWGjMImhmfGTgaB14N25nmKymc2lVgPq4bE6A4ZZuSZDR2nD5Iy34FSYUPAwuTCtrg2vijDt/3xt7ZWz9trn18=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p47:envelope-i81z .
+}
+
+p45:envelope-jrbj-sig {
+    p45:envelope-jrbj-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGUCMQDXbefj3ydejJ2UTwyiXpDikapjgRINBew+3Gd7+sVzXOTS9jZM1+9M/r5DnrO98nkCMD6WFYYtj7eCXji2SdV05JNbjpfb0+GImxQubSMzgcLcrd+hm8ahjrLWxBtQ97ALFw==" ;
+            msg:hash                        "VJzUItukPZoUQCCekcp9Byf5LmaEgO+TUIHljAD+kBdbgfxT2iK6fqjQryZ2utG/yVlTPjc3TaOP9waktvOo6ZWGebhb4ViIb59BdC/ELvYZ4H4WZIrstVe6EkCDYiMaTWpBcTMEsXOWg/47C4eCjZiqefz7m1zzUhYDfzSfOXM=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p45:envelope-jrbj .
+}
+
+p7:envelope-0sio {
+    p23:envelope-tico-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMD6p+UtbijQYaqQbihg61SoVap9E70jzoxjrm+eCpmpucad6Rg/S7t3fU6PYiCy7cQIwOTeJ+elxgjjocdNAFn9Hv36OLs3Fo+ZCQz9otegEOjKhQSVekXxzZeUtOgkqan0g" ;
+            msg:hash                        "AIJ4UZSQK85vJrqCxttUa1GeboKv008zRE0FyH1as1zsl4mtuL7wqilqiFSMNEoL6sOyy1k2NqI4b3DBQu1Om5r+MD0EWoQ7G5XxeZKhN2WXlO4Ac8ogkDRU1FgrpJk7Bc/HwYpQHLoI+XBFLOe+ZVQGE95G5DzVVeCLLzivPUYc" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p23:envelope-tico .
+    
+    p7:envelope-kn0t-sig
+            a                               msg:Signature ;
+            msg:signer  p13:nte803gz4pbiw6equ3qa ;
+            msg:signatureValue              "MGUCMQDRpT3AQ9mWAxXDyV2stXhtCtZdcnJmZxPm9WrPHta5rsf2l4f0yy4VHdapg5RbIrMCMCB5o1J3//zCnsQbEE9Qn9E/VEY414bpNtz+OizdU6Ply5v5ub0VQH+xfKlaHcpiOA==" ;
+            msg:hash                        "AIncp2745wkT9TywwSGwBUWJucfodFa8xhROn71VwfRCjUt1wAwcKj4I5q/NXpNTa8I52E3RRJws44iM/cN2wNyw0Mn1ukoVxj0+vN9IZNsI3781GYnQsN+katHP66TnQ/EtGnbgIW0X7lgDU7BiAnxAF7Mfj9yM7BqIbw7KI3gc" ;
+            msg:publicKeyFingerprint        "IwyZXueJ69uldEQMoR6tmjSICtahgt4Oji/iALKaL+4=" ;
+            msg:signedGraph                 p7:envelope-kn0t .
+    
+    p7:envelope-0sio  a            msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:usi9yhill1lo2xi70sjx ;
+            msg:containsEnvelope   p7:envelope-kn0t ;
+            msg:containsSignature  p23:envelope-tico-sig , p7:envelope-kn0t-sig .
+    
+    p33:usi9yhill1lo2xi70sjx
+            a                      msg:FromOwner ;
+            msg:previousMessage    p33:qxy7d1ql59uzorccngdo ;
+            msg:protocolVersion    "1.0" ;
+            msg:receivedTimestamp  1513345776314 .
+}
+
+<https://localhost/won/resource/connection/4t9deo4t6bqx83jxk5ex/events#data> {
+    p8:events  a         won:MessageContainer ;
+            rdfs:member  p33:whryytxsc7il9og0zs2z , p33:tggbraefz9y07d2npt2m , p33:attqb66yn0hd7rj0m483 , p33:usi9yhill1lo2xi70sjx , p33:ljkwmhkooz54bshrx1m5 , p33:00d5wzbbf8hzzt2eewcc , p33:9fhq1ef81bw0vwps12c5 , p33:2gwtnta4od8xzqdubbkg , p33:ow321nn1va6clfidc4s0 , p33:mt1f8i41bogt7kc91fi6 , p33:q3wcoxjougj7awlo805f , p33:qxy7d1ql59uzorccngdo .
+}
+
+p22:data {
+    p22:content-sig  a                      msg:Signature ;
+            msg:signer  p13:7820503869697675000 ;
+            msg:signatureValue              "MGUCMQCcFEv58uXwwSDbFOamPoxY5MNYWgS9NOIjsEuALKxNylZvOFKzMhWxjpZc+OPYspwCMDcZYt75XuGJH+P3SQ0B5iMXW+0P19rSWVsY98TT1cSeYnUGGIA+gaIp9bOyRUaEsA==" ;
+            msg:hash                        "ALNs2UTDIodwFyAkA57/S4xpXn6pTLvNmZqzm2oMxTdmypt/0/Y4eQ4AdVjOQetMTxvAiQ6J/tIRzEMWFTU0qrCQPVVGBnoaFQjEeNxzeOycBGhVAXaZaJaBCFS2NtP03hvPcULGNPs6LbgdMYP9veTaap8KLwDKpwa6wBOY1wTY" ;
+            msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
+            msg:signedGraph                 p22:content .
+    
+    p33:1435888415723958200
+            a                    msg:FromOwner ;
+            msg:content          p22:content ;
+            msg:messageType      msg:ConnectionMessage ;
+            msg:previousMessage  p33:1435888415723958200 ;
+            msg:recipient        p25:4t9deo4t6bqx83jxk5ex ;
+            msg:recipientAtom    p13:nte803gz4pbiw6equ3qa ;
+            msg:recipientNode    p39:resource ;
+            msg:sender           p25:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom       p13:7820503869697675000 ;
+            msg:senderNode       p39:resource ;
+            msg:sentTimestamp    "1513345787161" .
+    
+    p22:data  a                    msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:1435888415723958200 ;
+            msg:containsSignature  p22:content-sig .
+}
+
+p40:envelope-b7qv {
+    p33:omh6mnwfqczgjimg3sch
+            a                            msg:FromSystem ;
+            msg:messageType              msg:SuccessResponse ;
+            msg:previousMessage          p33:omh6mnwfqczgjimg3sch ;
+            msg:protocolVersion          "1.0" ;
+            msg:receivedTimestamp        1513345783929 ;
+            msg:recipient                p25:4t9deo4t6bqx83jxk5ex ;
+            msg:recipientAtom            p13:nte803gz4pbiw6equ3qa ;
+            msg:recipientNode            p39:resource ;
+            msg:respondingTo             p33:00d5wzbbf8hzzt2eewcc ;
+            msg:respondingToMessageType  msg:ConnectionMessage ;
+            msg:sender                   p25:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom               p13:7820503869697675000 ;
+            msg:senderNode               p39:resource .
+    
+    p40:envelope-b7qv
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:omh6mnwfqczgjimg3sch ;
+            msg:containsSignature  p36:envelope-qdj9-sig .
+    
+    p36:envelope-qdj9-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGUCMQDp4EW/TRcVjt36HYwuMqtupgfsFkedLfEw0AyMWociyv0Cd+sAir+FYbb97y88b8ACMDT19mFthP4FOu2hUqYH7f+GKDMGqRiCsg7mN96vwNy8wOcnLL7xMtoOY4CxBvEYwg==" ;
+            msg:hash                        "AJn3h4w+jd7mvcbsZBb700m26pJu+FZMWgXuSawF1zSbRAPpLqbURsL/FSea42XmDU94Fe1Ztuoj6dr4dDNsx4BucPanY3GrFKyvGM/zorObmvVHSE1uyrDja8ssZJ0tmCwzbNRW94n1boeygM/CaWa7V84qz+p/F7549APX+roC" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p36:envelope-qdj9 .
+}
+
+<https://localhost/won/resource/connection/4t9deo4t6bqx83jxk5ex#data> {
+    p8:events  a    won:MessageContainer .
+    
+    p25:4t9deo4t6bqx83jxk5ex
+            a                     won:Connection ;
+            dct:modified          "2017-12-15T13:49:36.317Z"^^xsd:dateTime ;
+            won:connectionState   won:Connected ;
+            won:messageContainer  p8:events ;
+            won:socket            won:ChatSocket ;
+            won:sourceAtom        p13:nte803gz4pbiw6equ3qa ;
+            won:targetAtom        p13:7820503869697675000 ;
+            won:targetConnection  p25:xq6jofxo2w8o05io6dre ;
+            won:wonNode           p39:resource .
+}
+
+p22:content {
+    p33:1435888415723958200
+            con:text  "validate" .
+}
+
+p4:envelope-yk1e-sig {
+    p4:envelope-yk1e-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGYCMQDhFH1neZ7C7838A3mhlCF0BZ3Ede2d9DMkZrr82jpL1hKdia7+5LEKAa2+XAbA9M4CMQCIvTifI4YQNZBaKBQd7V5Z16eLKFuoinj32aKq5EysedaMX+dHbCyY2hvHS0GUS4o=" ;
+            msg:hash                        "BJj+bsB7zFfZwzIaywWuYF7dc6w6xVPZJWgKtSVEwGHLeD/I4obyh3umPHfjCZz0byAfvYgZZ3RVJhyyzg/+whhghyohqa/YFgfxhQb6fRpXvbaEOe2S60R7SUC7l1Uq1JcXW5pDa9SE+OT3RNzqQtvYeVCkvgehLGOcjTseHxg=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p4:envelope-yk1e .
+}
+
+p43:envelope-l74h-sig {
+    p43:envelope-l74h-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGUCMQDNs+0WTJ68EkuUhqkRrxuu5523hdYmiL4hklfMqSsrM+ZcuMJJ36ZtAz/PWR3oVyACMGGajjHGtQucHUX+7bTs3U2iuTmbd2jZNEqbByI8uuQ+B4080BYH+xTud9yS0P47tw==" ;
+            msg:hash                        "PkvTzg6rT8TzBcpavSw2tgLPIKSr80+7AYU4xfO9RMT28Sc196egfBtp5KaURrl1QWqh710bNhB5de6QaB/iigf2feVni47KUyesCntnHiyrtDfKwIJirU20Eu2AVW/T2c9/pppG+48EmfaH0tEH73mGTtuKlC3fydDAT58ByeA=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p43:envelope-l74h .
+}
+
+p14:content-3ssv {
+    p13:nte803gz4pbiw6equ3qa
+            a               won:Atom ;
+            dc:description  "This is an atom automatically created by the DebugBot." ;
+            dc:title        "Debugging with initial hint: More Coffee" ;
+            cert:key        [ cert:PublicKey  [ a                  won:ECCPublicKey ;
+                                                won:ecc_algorithm  "EC" ;
+                                                won:ecc_curveId    "secp384r1" ;
+                                                won:ecc_qx         "700ec59acb2bafa4062215742820865af465a2cf06045c502de26e118e8d5700cd770a19d64b399312a2241ac02fcf3e" ;
+                                                won:ecc_qy         "71b5c247464363dd3a5b6727d1bcbaf89df20bab39664c334124dfb99a2a21467b9c575d9f4f54e8f86941eee142d8e0"
+                                              ] ] ;
+            cert:key        [ cert:PublicKey  [ a                  won:ECCPublicKey ;
+                                                won:ecc_algorithm  "EC" ;
+                                                won:ecc_curveId    "secp384r1" ;
+                                                won:ecc_qx         "700ec59acb2bafa4062215742820865af465a2cf06045c502de26e118e8d5700cd770a19d64b399312a2241ac02fcf3e" ;
+                                                won:ecc_qy         "71b5c247464363dd3a5b6727d1bcbaf89df20bab39664c334124dfb99a2a21467b9c575d9f4f54e8f86941eee142d8e0"
+                                              ] ] ;
+            cert:key        [ cert:PublicKey  [ a                  won:ECCPublicKey ;
+                                                won:ecc_algorithm  "EC" ;
+                                                won:ecc_curveId    "secp384r1" ;
+                                                won:ecc_qx         "700ec59acb2bafa4062215742820865af465a2cf06045c502de26e118e8d5700cd770a19d64b399312a2241ac02fcf3e" ;
+                                                won:ecc_qy         "71b5c247464363dd3a5b6727d1bcbaf89df20bab39664c334124dfb99a2a21467b9c575d9f4f54e8f86941eee142d8e0"
+                                              ] ] ;
+            won:socket      won:ChatSocket ;
+            match:seeks     [ dc:description  "This is an atom automatically created by the DebugBot." ;
+                              dc:title        "Debugging with initial hint: More Coffee"
+                            ] ;
+            match:seeks     [ dc:description  "This is an atom automatically created by the DebugBot." ;
+                              dc:title        "Debugging with initial hint: More Coffee"
+                            ] ;
+            match:seeks     [ dc:description  "This is an atom automatically created by the DebugBot." ;
+                              dc:title        "Debugging with initial hint: More Coffee"
+                            ] .
+}
+
+p34:envelope {
+    p34:envelope  a                msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:4240608697617289000 ;
+            msg:containsSignature  p34:atom-sig .
+    
+    p34:atom-sig  a                         msg:Signature ;
+            msg:signer  p13:7820503869697675000 ;
+            msg:signatureValue              "MGUCMCzR5WvSfYOt0bF+fHgITZJl7YGCJg1fs/6bIAdiqNQFi1O6RBFYQLi5L2KW9LJRYQIxAIllpz3hFBESOdTV4YNKvyv+QUsfDupMREQkmlrnQZlZeraxzJC12Ic3WMtSaPZrNg==" ;
+            msg:hash                        "XtGMwwT9OXHfU8C6L/+ApMK9PNJrgavB5tED/KsqT7FJaJXbyg0vyycM6UIDrNnx6gxeuIu0Wr3ZvHBhyp3GW5Ur0SH6Mqej3ItUImewnMDn+MTBDUoNrjRRB+aXIXkM/lT/zifqY2fe/QG9lWFt4m7JFZLetEL/CIC5+7LhAgg=" ;
+            msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
+            msg:signedGraph                 p34:atom .
+    
+    p33:4240608697617289000
+            a                  msg:FromOwner ;
+            msg:content        p34:atom ;
+            msg:messageType    msg:CreateMessage ;
+            msg:recipientNode  p39:resource ;
+            msg:senderAtom     p13:7820503869697675000 ;
+            msg:senderNode     p39:resource ;
+            msg:sentTimestamp  1513345749032 .
+}
+
+p15:envelope-vnv7-sig {
+    p15:envelope-vnv7-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGUCMHVCSjsEM/gyeyRC33+ivJ2yCThu1JUe/G6mHiM+jPTOqiGnXN2VswTjhb1RozZyOAIxANFU9h+zHDqO/LGpr4jlFSmYPR6Zq1n7Q0gS5WpaY9MndmlrLJCoeesRIBIuQMybDw==" ;
+            msg:hash                        "AIIxesQPL9q1zM4iNjnklPlrvu2qPpseat5PbHCDOpQzQp9y9OT41fKcwkVm3xlcLJoieAB2MdeYiPbrTh0qQooIQAe0Ch8bJEbj4JpST5Ybu7bLtKhMOlVd8rAyBA3+NtHL/1qEVGQqE0n4E0VLzv/mbe4iygWauI8wVgRUkOIT" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p15:envelope-vnv7 .
+}
+
+p3:envelope-u2li-sig {
+    p3:envelope-u2li-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGUCMD5qi3FdjivGrKu8X1jZiFIvR+8TOcQ8JeFO6ejJ9ChiXG0F2rpHngBM2n8t3Zh5tgIxAM0cK+YxvJYXNSNI+Zie0ddxEgXldwct3+mxnugGpKz3WZfVCQKVPkdksXyD86iDBw==" ;
+            msg:hash                        "J1LOQz3N53dtEVPKHhUmnNsyDovo+hQdIfh7uuxlVm1vTT39vrb1+PN9C467O3Tr8O2AuWWQp3MScb7q3yAY1Hl6BLQu7aeJDv7SQxvE96fQFAx1ZWv80/0w6LjiCibXVDBTv54b24w/q8akqE+eKe3Lj45DtRnDOGRfpgeqvNM=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p3:envelope-u2li .
+}
+
+p19:envelope-xg0i {
+    p33:557600936467257340
+            a                      msg:FromOwner ;
+            msg:previousMessage    p33:omh6mnwfqczgjimg3sch ;
+            msg:protocolVersion    "1.0" ;
+            msg:receivedTimestamp  1513345785526 .
+    
+    p19:envelope-xg0i
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:557600936467257340 ;
+            msg:containsEnvelope   p19:data ;
+            msg:containsSignature  p19:data-sig , p40:envelope-b7qv-sig .
+    
+    p40:envelope-b7qv-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMCMjAJ8u5TtpnKT/5N0TgnmeT0JbK2epep7sPAVe5jcJEayTK987rKRkr5DetW2I7AIwL0h/bh3pQSWz6nq7U8P3eoXQIkmQSbSt24sR4JYVdSVfOns+BPnbkAnKVzdLvrMM" ;
+            msg:hash                        "ShY3hdW9vTHBqXcZjIQuFRRimkaZ8ADFioXR5D3jeI1m77fSlmtPdwOAZT7J7VtGho053HpVx8HbWHctII7rwZX/dyCWB/hn+iYmlD7ouUKHdLYxAo+QC4JT+DIonbiUW/7XVoVg/ANoVMrSXJC7u3pQqx1teNORCJgYiI+h6fA=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p40:envelope-b7qv .
+    
+    p19:data-sig  a                         msg:Signature ;
+            msg:signer  p13:7820503869697675000 ;
+            msg:signatureValue              "MGYCMQCxGjx8fOsUiEBAHtUopbTGoeUTTeEp9zDv57ktaUjnZWtoDiVL9KxnJI85a6PB5MYCMQDKtIANs8qTjsQPjt1LXozY8sNxVn33Mq4yTbwHFCyqPxNYLZ70EH5AGNQ/0yGGAsw=" ;
+            msg:hash                        "AIfkmbHflvEm73NsMdO3umYnVfnN31wgC+fpTLW6M/eQx1RXTaQ2KYjIZB/3dVI7ZH0fqHaD27KFkLbsv6ZHzwohoOxuSpAS2FPlVaNtydn4SQrJw9vNASyKw3CtCISRZa9wASMZ2Gn0XlQNE0/8tOkpSpI52wCwksH0jpuPRkcx" ;
+            msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
+            msg:signedGraph                 p19:data .
+}
+
+p18:envelope-1vve-sig {
+    p18:envelope-1vve-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMGIEULjL8oMlO9l9FCFJ7T54P1yld2FvzFineIVu9CHzJygmf6k01TC8ZFXeLE3E+wIwN05ci2M22pvCkbU/C53MKmsm3p2IYl8bRmeUxKkh30CwI+o4LHhhTjZ1Ke5p/O6o" ;
+            msg:hash                        "AIcBYYzZ38UvybEJgDktKQWzJpW75o2hryGDKWTWdOTMJifc1hz1ti4yZPZjesgLK7rzODjktk4E98qBnsYi53v83wUGGqB6zhjKHLfsdPl9pfTpo3RCW8RfG9pKKW/416pF6dWitXCOSQiaZ1GkjsfMbfZ5qmKQW6seolj9Qczo" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p18:envelope-1vve .
+}
+
+p30:envelope-kxkb-sig {
+    p30:envelope-kxkb-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMH1xsE6eU6WNQGY16ZEV70ubqzx1zbrvxnUrRozvs6e3Zc1krfyq144fhnQB18kGlwIwG3SDOexc/y/+Q4GZyZBnqL6nc2Xh6Fse/1xDD96DrqPtxcrZh79SO1+qHNZn5MlT" ;
+            msg:hash                        "QnNO2fmVyDvsbVqoIpIHi2trFODcAc9/x7u4rCFb7ZT3ypnNI4kDiM05ZJZgCyAJQV9FqZMTRkRUaNHm/Qpmxdg1bGCFZFoJEk0vwcaQ+U+RwOYHPIaZa4XGXasYXRvy8lvxgAwMldOO1CrLyUGwq3uGrATNmkcfFhwPzlEAGJA=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p30:envelope-kxkb .
+}
+
+p32:content {
+    p33:6671551888677331000
+            con:text          "hi" ;
+            won:socket        won:ChatSocket ;
+            won:targetSocket  won:ChatSocket .
+}
+
+p10:envelope-ma7y {
+    p10:data-sig  a                         msg:Signature ;
+            msg:signer  p13:7820503869697675000 ;
+            msg:signatureValue              "MGQCMG2FKmIWT4Je9NzII0nUfiVfNC1l4G9lvPLmivGGbIdl5SYbfcYFgyETOPnpehwbLAIwFUVG5usf2rREyNPSf3+2joHobgl/LR6Q3sK5SJc+T1Dev9mPRhgqMlSkb2aJK/xX" ;
+            msg:hash                        "AI4OATbuvyw1inYycES79iLVi64uv8dwPoVVnfcFlQdJeB5rFr4C9c/tVMTYKGHaYtYdV80A9FLgjIv7KkRgqtUSI2hZ+vQn+aVFhk9QvigtY2Ho4puE3XmmLMf/bA/myt8u8xBfDMc43rvSIiEi26PcOaY2kEXAZbwH5gRannoK" ;
+            msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
+            msg:signedGraph                 p10:data .
+    
+    p18:envelope-1vve-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMGIEULjL8oMlO9l9FCFJ7T54P1yld2FvzFineIVu9CHzJygmf6k01TC8ZFXeLE3E+wIwN05ci2M22pvCkbU/C53MKmsm3p2IYl8bRmeUxKkh30CwI+o4LHhhTjZ1Ke5p/O6o" ;
+            msg:hash                        "AIcBYYzZ38UvybEJgDktKQWzJpW75o2hryGDKWTWdOTMJifc1hz1ti4yZPZjesgLK7rzODjktk4E98qBnsYi53v83wUGGqB6zhjKHLfsdPl9pfTpo3RCW8RfG9pKKW/416pF6dWitXCOSQiaZ1GkjsfMbfZ5qmKQW6seolj9Qczo" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p18:envelope-1vve .
+    
+    p10:envelope-ma7y
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:5669098069340991000 ;
+            msg:containsEnvelope   p10:data ;
+            msg:containsSignature  p18:envelope-1vve-sig , p10:data-sig .
+    
+    p33:5669098069340991000
+            a                      msg:FromOwner ;
+            msg:previousMessage    p33:qy3k0igvj310ejofcqa9 ;
+            msg:protocolVersion    "1.0" ;
+            msg:receivedTimestamp  1513345783581 .
+}
+
+p45:data {
+    p45:content-sig  a                      msg:Signature ;
+            msg:signer  p13:7820503869697675000 ;
+            msg:signatureValue              "MGUCMQCkUmfDJFXIcp7Wl4CbEfmFDlWEghuxsV+ZOwBFH2pRJWqLSUv5U/C1X5d8heePFTMCMBsbE0eugz/3/ahl1oP2wjeDDvLD5d/P9px+PvqvhnKa0rBeBLpesSJDW5eCkmBEXQ==" ;
+            msg:hash                        "GHLR9YCZos+IsIM5zJoHqtezGfRn1mkUNCsGuJM8QMm/0nEzoM4ChwxDIOQSFktk2pDs3YeXXGbfEPEWwHtoK0JQzFQeOs+2W1g97wsF2mjx143MMDHYMYOe1S6cBBdjwmuJ9UQW2CUSAVZiUqvMSI+8XTaIHCzKP1EsDI774Ig=" ;
+            msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
+            msg:signedGraph                 p45:content .
+    
+    p33:4672813835273634000
+            a                  msg:FromOwner ;
+            msg:content        p45:content ;
+            msg:messageType    msg:HintFeedbackMessage ;
+            msg:recipientAtom  p13:nte803gz4pbiw6equ3qa ;
+            msg:recipientNode  p39:resource ;
+            msg:sender         p25:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom     p13:7820503869697675000 ;
+            msg:senderNode     p39:resource ;
+            msg:sentTimestamp  "1513345771319" .
+    
+    p45:data  a                    msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:4672813835273634000 ;
+            msg:containsSignature  p45:content-sig .
+}
+
+p7:content-klsc {
+    p33:usi9yhill1lo2xi70sjx
+            con:text  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
+}
+
+p14:envelope-dec7-sig {
+    p14:envelope-dec7-sig
+            a                               msg:Signature ;
+            msg:signer  p13:nte803gz4pbiw6equ3qa ;
+            msg:signatureValue              "MGQCMDGRAg/WYKeOXQUZTmVItgLGRclCSy0OHUGcQpAXPfrbzEQvjtSFlihCIimpPoBhFQIwUUXNxto18jQx+wdXxm9PYEyZ4gHy6+Cc9ZqkYZu12stWMS+QjDwQk1kbqzcRoeHd" ;
+            msg:hash                        "bZ49MTg4UvJGrZGuZURRp/vx6O1dYmUPBkFaKVWSsj8UFaXOrFCoYBcSblp8aqk3TDt2f6SpPzyNxkgGuQh13a1nXO9QwKW9E7P8umnfXc8Y1xy91bkvBbgXSKhKLUOiOZK8DId/iAElY77MNTr6URTFYWkBPKeuXsmyjT4JDhk=" ;
+            msg:publicKeyFingerprint        "IwyZXueJ69uldEQMoR6tmjSICtahgt4Oji/iALKaL+4=" ;
+            msg:signedGraph                 p14:envelope-dec7 .
+}
+
+p26:envelope-twcq {
+    p33:lkf3jxkjp5v9o71t8bsb
+            a                            msg:FromSystem ;
+            msg:messageType              msg:SuccessResponse ;
+            msg:previousMessage          p33:oy525npzylaeic4w4kvg ;
+            msg:protocolVersion          "1.0" ;
+            msg:receivedTimestamp        1513345749373 ;
+            msg:recipientAtom            p13:nte803gz4pbiw6equ3qa ;
+            msg:recipientNode            p39:resource ;
+            msg:respondingTo             p33:oy525npzylaeic4w4kvg ;
+            msg:respondingToMessageType  msg:CreateMessage ;
+            msg:senderAtom               p13:nte803gz4pbiw6equ3qa ;
+            msg:senderNode               p39:resource .
+    
+    p14:envelope-talb-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGUCMQCTXKq2KY5Kw41U6mtz12zj7dEzuEzH/yLrcC6shZdzviFPhZjdDtrkMCB2hwb6XtYCMHpqUiPcSOYS9bAI8aITCkNk9/zVUsLZiYdukS5odFlc3lq3LBGW9cG/jTDMItYxcQ==" ;
+            msg:hash                        "RBEP7+mU4T6sbS5B68OoIs81reEHzv7M0Diui+G8gmmyrZFKqljDWcLEHvqzjIcbvCHopy8wHQWVoypyoDCkUMIJ07pdi5EJq9TwwZQaSCMFlx7WxrHeeg8PhM9VbPm/WLs2gKu1lhdyrP3jzzPdDVyanCECL8Db0B+Ol3RU76s=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p14:envelope-talb .
+    
+    p26:envelope-twcq
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:lkf3jxkjp5v9o71t8bsb ;
+            msg:containsSignature  p14:envelope-talb-sig .
+}
+
+p27:envelope-u0yx-sig {
+    p27:envelope-u0yx-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGUCMDlOI/Gj3axjChneiOXVvB2Z9zgBUkgrogf6Cz6Yyg2xKVLOCfuwWe5J2+Qr3QyPRgIxAIogWYBmM+9HbFegFaxc3PjJFiysZnChVxhG1OpIjUZM3fnVDWNZ+89in41VM6FOsw==" ;
+            msg:hash                        "bql8PcPUO7jwl9XBEifkxaFX8ebUonMdg/eXVr108iPXoU7IkM9weZCuHOINbn9zyN2JWyyiOsZeqCpOSzUGU0+6AE0HpY8Vmnnpu69CGeUUmoWGb+DDnAtaSzhzb8o+cHLSjZScp/5PFc7j4DAGNaBTclRs2v4VmUyzuBAEFnA=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p27:envelope-u0yx .
+}
+
+p27:envelope-u0yx {
+    p46:envelope-iy82-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMB3m1MpHnkobDdV+yilNqWW3idZWVLxdEPOTSr1hmDPh/Rw9YAXVSSw0ZVLxyGm01AIwA1Sk1vIUK8m4+L+0xxCU82obbPnSerIXPQh13svjeYn/56FPWUG0e9Nc2A7sey1c" ;
+            msg:hash                        "AJING3WFiAS5XgPAynRlNT/WOPf8u0F4DmzYNaA6zuna6Jn7vYuJu6evkuOwyz2Q8Jr1mRnlRs1j0/hvQVYdld0YUm/m6eyursWkI+1XYt7+vwfzlhjJipO2TGCpm5UXnoVVnHt6Pprpeu4mM3gKZEW8RSp4gHduI8enIPtCK1S0" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p46:envelope-iy82 .
+    
+    p33:9fhq1ef81bw0vwps12c5
+            a                            msg:FromSystem ;
+            msg:messageType              msg:SuccessResponse ;
+            msg:previousMessage          p33:9fhq1ef81bw0vwps12c5 ;
+            msg:protocolVersion          "1.0" ;
+            msg:receivedTimestamp        1513345785657 ;
+            msg:recipient                p25:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom            p13:7820503869697675000 ;
+            msg:recipientNode            p39:resource ;
+            msg:respondingTo             p33:557600936467257340 ;
+            msg:respondingToMessageType  msg:ConnectionMessage ;
+            msg:sender                   p25:4t9deo4t6bqx83jxk5ex ;
+            msg:senderAtom               p13:nte803gz4pbiw6equ3qa ;
+            msg:senderNode               p39:resource .
+    
+    p27:envelope-u0yx
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:9fhq1ef81bw0vwps12c5 ;
+            msg:containsSignature  p46:envelope-iy82-sig .
+}
+
+p23:envelope-tico {
+    p21:envelope-gdsa-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCME+l/ZnkqnIIEnPNoJqAe3G9W0iyMlHx+PV6BQ4OBEOO0Lw/qudoBF3RfCbgJF4aTwIwT+2WxIa9nY85dwRjVvYRAzFy/dI5H6lF1UAStyFQbaxJmw59ToyfNKanYeJoVajD" ;
+            msg:hash                        "ecqEktUiRxI1wLZWnyGEiXuiF+R7uEG6zJigpDueFNdCqnNyGp9uA33tvkQKPCD8tGCr9r9CWy77fIvEdG6w4K3z396Dem1YsRGyy5lEoVeBsPJeFBhHR4S4fQMzF2RvPeGz5aJFL+2N4U5AtoKc7BEcpIPUNCaBe61lEXhiJik=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p21:envelope-gdsa .
+    
+    p33:qxy7d1ql59uzorccngdo
+            a                            msg:FromSystem ;
+            msg:messageType              msg:SuccessResponse ;
+            msg:previousMessage          p33:qxy7d1ql59uzorccngdo ;
+            msg:protocolVersion          "1.0" ;
+            msg:receivedTimestamp        1513345776080 ;
+            msg:recipient                p25:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom            p13:7820503869697675000 ;
+            msg:recipientNode            p39:resource ;
+            msg:respondingTo             p33:6671551888677331000 ;
+            msg:respondingToMessageType  msg:ConnectMessage ;
+            msg:sender                   p25:4t9deo4t6bqx83jxk5ex ;
+            msg:senderAtom               p13:nte803gz4pbiw6equ3qa ;
+            msg:senderNode               p39:resource .
+    
+    p23:envelope-tico
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:qxy7d1ql59uzorccngdo ;
+            msg:containsSignature  p21:envelope-gdsa-sig .
+}
+
+p6:envelope-baaw {
+    p7:envelope-0sio-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMGJcaS/o1c+vzZhNbkecNFzkLKLgNBzhAr9XxXPgcR6uB2v4IeGo8SWDcJ0ur+JTUAIwY4ifOfo3+312U+nQ/Br1fJPTLuHpNU0dfcbjwnl0+VmCAttlO2NUgOYLEOg8dHMK" ;
+            msg:hash                        "MvQxlMP22+XTumpMJF2DTocqyQMLmETaw7xeLlS7WyfNjkg6ztuILsfrYYRrldJVVgNhIYxDu2lKqbyjdayBeAQzDGZ86wo4HHPAMYGUFcEoXnPSb+UdCkng1gCFfUrSjjGY2vfKv1aKjESbcSoHDs9IfPDfA3IKlxwPC1MOLc0=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p7:envelope-0sio .
+    
+    p33:ljkwmhkooz54bshrx1m5
+            a                            msg:FromSystem ;
+            msg:messageType              msg:SuccessResponse ;
+            msg:previousMessage          p33:usi9yhill1lo2xi70sjx ;
+            msg:protocolVersion          "1.0" ;
+            msg:receivedTimestamp        1513345776337 ;
+            msg:recipient                p25:4t9deo4t6bqx83jxk5ex ;
+            msg:recipientAtom            p13:nte803gz4pbiw6equ3qa ;
+            msg:recipientNode            p39:resource ;
+            msg:respondingTo             p33:usi9yhill1lo2xi70sjx ;
+            msg:respondingToMessageType  msg:OpenMessage ;
+            msg:sender                   p25:4t9deo4t6bqx83jxk5ex ;
+            msg:senderAtom               p13:nte803gz4pbiw6equ3qa ;
+            msg:senderNode               p39:resource .
+    
+    p6:envelope-baaw  a            msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:ljkwmhkooz54bshrx1m5 ;
+            msg:containsSignature  p7:envelope-0sio-sig .
+}
+
+p40:envelope-b7qv-sig {
+    p40:envelope-b7qv-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMCMjAJ8u5TtpnKT/5N0TgnmeT0JbK2epep7sPAVe5jcJEayTK987rKRkr5DetW2I7AIwL0h/bh3pQSWz6nq7U8P3eoXQIkmQSbSt24sR4JYVdSVfOns+BPnbkAnKVzdLvrMM" ;
+            msg:hash                        "ShY3hdW9vTHBqXcZjIQuFRRimkaZ8ADFioXR5D3jeI1m77fSlmtPdwOAZT7J7VtGho053HpVx8HbWHctII7rwZX/dyCWB/hn+iYmlD7ouUKHdLYxAo+QC4JT+DIonbiUW/7XVoVg/ANoVMrSXJC7u3pQqx1teNORCJgYiI+h6fA=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p40:envelope-b7qv .
+}
+
+p32:envelope-pj9k-sig {
+    p32:envelope-pj9k-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMC1qFwNsbRCwDeGs5sBqve1gmMahi+GwAPITuSzA3MDJaMnGKE1RjrLHtyNYj0xDZwIwH/RNg7JluB5O+kJmPFkTzcvVUD+AHFCQ/5y2SLq/5lbGutnlB7iMPg1PNqTzEfkM" ;
+            msg:hash                        "YwC+ZwsKsdKfjTZGJGjETX1y7XdVHVwN4ocDTJgIJZjV6YPlvLAS+G25TNrYqwWLiHrNyfit4bgW6ECjSUncreMiwvnXwk83WmepYlDKlsXAkVphAeZ2Cf3Bm4NKtCJC4FZxA9BG1rirhRBOOVT4EseLwzRzB8wSb8v3St/NW9U=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p32:envelope-pj9k .
+}
+
+p45:content {
+    p33:4672813835273634000
+            con:feedback  [ con:binaryRating    con:Good ;
+                            con:feedbackTarget  p25:xq6jofxo2w8o05io6dre
+                          ] .
+}
+
+<https://localhost/won/resource/connection/xq6jofxo2w8o05io6dre/events#data> {
+    p37:events  a        won:MessageContainer ;
+            rdfs:member  p33:t1h3u3s5q6is5sewv843 , p33:to1pxp688kcn0wo30yu6 , p33:4672813835273634000 , p33:1435888415723958200 , p33:qy3k0igvj310ejofcqa9 , p33:557600936467257340 , p33:gha3693zdigediknod00 , p33:6671551888677331000 , p33:diabwxkvjvkh53zrrwjd , p33:5669098069340991000 , p33:omh6mnwfqczgjimg3sch , p33:3jaz102f0678yab8vwx2 , p33:1zp49xutzuw6w7etotxk , p33:2i6eieqj3z44fc62loe3 .
+}
+
+p44:envelope-pc7l {
+    p44:envelope-pc7l
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:diabwxkvjvkh53zrrwjd ;
+            msg:containsSignature  p19:envelope-xg0i-sig .
+    
+    p19:envelope-xg0i-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMGVOVyMB9FstIrPmbdOLqpffTJgZaJ6avWe2UtTTTtxFeX/dxXpy7POaBNGmHSnvQwIwIFfFJmlhKCdbEduFO451QAXBOKr6H7kAIaCy/NUGjxjbYHH05AoGix0FoW09YrJj" ;
+            msg:hash                        "AK7ovAcUTa5/JQ/r7v8+GoXsOqxZSC4QB4zt0hYuZ1vvDrbLz4BKVl483Sn2Qx9d3i4nT5pqQZh8BU/K4r40wWjNPCCsuoLgBLBSKfhMA0aLX86lzXP1/HYgUtUWSevoctf9MlW56KEmwhloJYOoaYSz+x1439j1yyIJzqf5W2zO" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p19:envelope-xg0i .
+    
+    p33:diabwxkvjvkh53zrrwjd
+            a                            msg:FromSystem ;
+            msg:messageType              msg:SuccessResponse ;
+            msg:previousMessage          p33:557600936467257340 ;
+            msg:protocolVersion          "1.0" ;
+            msg:receivedTimestamp        1513345785544 ;
+            msg:recipient                p25:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom            p13:7820503869697675000 ;
+            msg:recipientNode            p39:resource ;
+            msg:respondingTo             p33:557600936467257340 ;
+            msg:respondingToMessageType  msg:ConnectionMessage ;
+            msg:sender                   p25:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom               p13:7820503869697675000 ;
+            msg:senderNode               p39:resource .
+}
+
+p22:envelope-wq0v-sig {
+    p22:envelope-wq0v-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGYCMQDQnP1YWZB5uaJObkesCjucKeJXln4dN3bAAmWaFLS/ccmGyngLKlbcE+ZhSpg/F5QCMQC5xu+Cgb9xrR57cuBURWcWL9YclgT+K/ZqZoIpPt8MdlE3IodKg0feEu+UpBBNsQM=" ;
+            msg:hash                        "KsfkgFc6QnLbYGAlO70SVpmVtRFBOAH7pk2P6l0tPTtAxBAxdpKB/SrC+Xs7BEtiD+qNd8f3eAtsgmsl+JPYnWYizfdw3/B7PMUCNMqP/787VLwHlqX2y5pJYqoCzK2VUY55QnzA0grE4OT2m7yFkfK2pQCXcxVXE2pU6f+WXjM=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p22:envelope-wq0v .
+}
+
+p50:envelope-5mhl-sig {
+    p50:envelope-5mhl-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMG//jgog2QiZkgYZ96J5RhmvT9LzL82al+2/eQKO5JzyzTKyvJr/1yo7jiWCI/yJjQIwCJt4rAwXe05bsbvGeaNlpetQIem3JkkFoT14MmZfSg3geJLITyk8IpxmzSXfMbeK" ;
+            msg:hash                        "KXHUQklAFGUm9nvPmsVKpA3Rb25/mqGkowijgjIa9W6ZiWRCBqj+2V0VCe6IvJQsnb0s1+ll1zVF0VKI9U2qAWQxn5yjdp2Rxg2RMtV5JHM5j6TEmYU6Hl91NcW2qj8jJCPVFTrKyOwMIizV1bsr5SNVcujGj+JjCYvCnX++oxI=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p50:envelope-5mhl .
+}
+
+p10:envelope-ma7y-sig {
+    p10:envelope-ma7y-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGUCMQD0H3I+Y3Y27WJgS6B3lLpDPhtI1odks1YXXd61zmYE0/DVLLWiMQoyDn6H8JQKY/ACMGz1OKAt2e+rg9xCOm53tP56gctuzUS6Qi6Es9Q6fZep8j20iihafRyE41uYcxvAtQ==" ;
+            msg:hash                        "C8nYCZS1IgqOdjLk3f73I9dSekaGxFlNEPKwAAfBFuA/P3aoLEE8ypNLylRearbSS+xx4CuRwulCIfdRxDkZlydctRvVPOFr48u1lS04nPNlL43EMI4r21myMUbjIlo1VEjopgSJoUc/M1IlXcBcN1ir/p4W5zVc5GMy+2Jh5eo=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p10:envelope-ma7y .
+}
+
+p11:content-tbn3 {
+    p33:00d5wzbbf8hzzt2eewcc
+            con:text  "I'm not sure I understand you fully." .
+}
+
+p2:envelope-30wn-sig {
+    p2:envelope-30wn-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMFplMNHAWOfPW9EfTh/Ejc7bHOJ+q3crX548PN3U2MuRrjdvHsscXaJkhVlqdOOiVAIwD0qjS/VlzsHtsbw/2MzjGAvqjrKKyVvGuo21vOqjpFR3xOew49QKzrG1BZ8GlGEq" ;
+            msg:hash                        "AIndLYiOGc3NpUl+mBuuwMOywlztyiQuh5dDuWD5+X3TY4e/HqOrHk7oYajHQsMM4g13hO3835w9Ts7lbWuoJsqmG6Go5mKpOaUXU2w7kMNWGoB9slR9m7CBFfZDLEf8CaRaheBk7+K29DkkSX8x6miIhY9TbYlVD1Y9jpJCygae" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p2:envelope-30wn .
+}
+
+p17:envelope-z4jb-sig {
+    p17:envelope-z4jb-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMAmccqgYrQcqqSTVfWMeQJFkjASxQ76uYjzUx8ZgZclZrqTyEDAmFDiySz7VejeM0QIwQWDgPqNzr0DTqK+1fUkcLcbyfGS8iyTEDqPU3hLDBLBWnmhRneZSHsLFlbEfnMwR" ;
+            msg:hash                        "AJIruPK6hthlGaY7Sc8hQ0mI3ggNfvBx9b8pasEw3EFTaDyDoSYdYEaa4FegHcGqbbL3/hGh4Mi4lagArZS/kHbf1WLE0TakCoKq28J2UyM+U/CAfXSLyL/5jba6v6hIZ2FtTl79pQemHwmPZVvHKtlT2gnAEzXN2z2wyTNe4mwb" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p17:envelope-z4jb .
+}
+
+p15:content-lqq1 {
+    p33:mt1f8i41bogt7kc91fi6
+            con:text     "Ok, I'm going to validate the data in our connection. This may take a while." ;
+            p1:retracts  p33:ow321nn1va6clfidc4s0 .
+}
+
+p44:envelope-pc7l-sig {
+    p44:envelope-pc7l-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMGQbRkIwGbdOiqQMMI7av550EuCucGcWkifeaUChoaujvCVXcNGN82Y5KIlTgAf7rwIwScUrSCjaTOQBfEF3C08s9lWaGBQhpR+6W3uQA5/CFwujoSEcdbqBR1S1NIb79EcD" ;
+            msg:hash                        "UcdCD2TlTiepxvjmjRTJCBcD1wpoum1WG2w/zB32yl0j0dRmzF08gI1yvITwtJXDoPlvT4PDYRS6X6x8hyVlgEw2nh1KCRISV+n7t22ngXrZplFzrKhuD5orBHebRL0qJHEcVgACU5iYrybfElzvwJ20TC8E2PAWz3KDKcyB/+Y=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p44:envelope-pc7l .
+}
+
+p28:envelope-7byg {
+    p28:envelope-7byg
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:3jaz102f0678yab8vwx2 ;
+            msg:containsSignature  p22:envelope-wq0v-sig .
+    
+    p33:3jaz102f0678yab8vwx2
+            a                            msg:FromSystem ;
+            msg:messageType              msg:SuccessResponse ;
+            msg:previousMessage          p33:1435888415723958200 ;
+            msg:protocolVersion          "1.0" ;
+            msg:receivedTimestamp        1513345787262 ;
+            msg:recipient                p25:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom            p13:7820503869697675000 ;
+            msg:recipientNode            p39:resource ;
+            msg:respondingTo             p33:1435888415723958200 ;
+            msg:respondingToMessageType  msg:ConnectionMessage ;
+            msg:sender                   p25:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom               p13:7820503869697675000 ;
+            msg:senderNode               p39:resource .
+    
+    p22:envelope-wq0v-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGYCMQDQnP1YWZB5uaJObkesCjucKeJXln4dN3bAAmWaFLS/ccmGyngLKlbcE+ZhSpg/F5QCMQC5xu+Cgb9xrR57cuBURWcWL9YclgT+K/ZqZoIpPt8MdlE3IodKg0feEu+UpBBNsQM=" ;
+            msg:hash                        "KsfkgFc6QnLbYGAlO70SVpmVtRFBOAH7pk2P6l0tPTtAxBAxdpKB/SrC+Xs7BEtiD+qNd8f3eAtsgmsl+JPYnWYizfdw3/B7PMUCNMqP/787VLwHlqX2y5pJYqoCzK2VUY55QnzA0grE4OT2m7yFkfK2pQCXcxVXE2pU6f+WXjM=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p22:envelope-wq0v .
+}
+
+p43:envelope-l74h {
+    p43:envelope-l74h
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:ow321nn1va6clfidc4s0 ;
+            msg:containsEnvelope   p43:envelope-w5bl ;
+            msg:containsSignature  p27:envelope-u0yx-sig , p43:envelope-w5bl-sig .
+    
+    p33:ow321nn1va6clfidc4s0
+            a                      msg:FromOwner ;
+            msg:previousMessage    p33:9fhq1ef81bw0vwps12c5 ;
+            msg:protocolVersion    "1.0" ;
+            msg:receivedTimestamp  1513345785798 .
+    
+    p27:envelope-u0yx-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGUCMDlOI/Gj3axjChneiOXVvB2Z9zgBUkgrogf6Cz6Yyg2xKVLOCfuwWe5J2+Qr3QyPRgIxAIogWYBmM+9HbFegFaxc3PjJFiysZnChVxhG1OpIjUZM3fnVDWNZ+89in41VM6FOsw==" ;
+            msg:hash                        "bql8PcPUO7jwl9XBEifkxaFX8ebUonMdg/eXVr108iPXoU7IkM9weZCuHOINbn9zyN2JWyyiOsZeqCpOSzUGU0+6AE0HpY8Vmnnpu69CGeUUmoWGb+DDnAtaSzhzb8o+cHLSjZScp/5PFc7j4DAGNaBTclRs2v4VmUyzuBAEFnA=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p27:envelope-u0yx .
+    
+    p43:envelope-w5bl-sig
+            a                               msg:Signature ;
+            msg:signer  p13:nte803gz4pbiw6equ3qa ;
+            msg:signatureValue              "MGUCMCBWmcTfYcEFb95HmBXYO+4L6SBRQeju26UmUDO2Vl40r5BMGNLVVRv7Mml+1YjbPgIxAKgXfRGAI5EUjY5Al3LmPDM73bl2kWYG6v+o7mDJdbVHKu/542ixljNHSBKWcqF6SQ==" ;
+            msg:hash                        "HiHkD2TL4JeOfT2C4DG8jD9yoQfy9SIxPA0wOdViN7eSYKTz0RDdRZqrE0lLxLJngzj0E2i42ohz7+jMU6Dq5UY9CpQtboFuJaX5ehIK02m3KBts2UhMnipEMvKFW4051IYhbk0yU4vj2r6EwVP0TQt8rBi0OAd3H7bXUT6wxOY=" ;
+            msg:publicKeyFingerprint        "IwyZXueJ69uldEQMoR6tmjSICtahgt4Oji/iALKaL+4=" ;
+            msg:signedGraph                 p43:envelope-w5bl .
+}
+
+p6:envelope-baaw-sig {
+    p6:envelope-baaw-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMBfmYoxsILGbd3E11B27lwvkvC536GhwbDjSrpOupktgOdaMt4MvKlSfzvaHCQ32jQIwEqFN/ENYMJmqte5N+/6TTZvT3uOgR502xkKZpbYc3fIZySpt3syNVDxfXY4m6DKJ" ;
+            msg:hash                        "Zvtvz2aR9A+SFGiWs014lshH6nTWwIB2Ii/YS0Wg0GhUElnDKG4nInyw3UVKA+U5x8cfaZMZ+Nf+Y4kbwUQhiTnCepzVrh7e/YIQtHYFA890z1/Vp+A84hKDYY6dc8gcqOoxCA24VbyFm56Ttq5y6hL5MqglviAbBRIeUZeSeys=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p6:envelope-baaw .
+}
+
+p14:envelope-talb-sig {
+    p14:envelope-talb-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGUCMQCTXKq2KY5Kw41U6mtz12zj7dEzuEzH/yLrcC6shZdzviFPhZjdDtrkMCB2hwb6XtYCMHpqUiPcSOYS9bAI8aITCkNk9/zVUsLZiYdukS5odFlc3lq3LBGW9cG/jTDMItYxcQ==" ;
+            msg:hash                        "RBEP7+mU4T6sbS5B68OoIs81reEHzv7M0Diui+G8gmmyrZFKqljDWcLEHvqzjIcbvCHopy8wHQWVoypyoDCkUMIJ07pdi5EJq9TwwZQaSCMFlx7WxrHeeg8PhM9VbPm/WLs2gKu1lhdyrP3jzzPdDVyanCECL8Db0B+Ol3RU76s=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p14:envelope-talb .
+}
+
+p14:envelope-talb {
+    p14:envelope-dec7-sig
+            a                               msg:Signature ;
+            msg:signer  p13:nte803gz4pbiw6equ3qa ;
+            msg:signatureValue              "MGQCMDGRAg/WYKeOXQUZTmVItgLGRclCSy0OHUGcQpAXPfrbzEQvjtSFlihCIimpPoBhFQIwUUXNxto18jQx+wdXxm9PYEyZ4gHy6+Cc9ZqkYZu12stWMS+QjDwQk1kbqzcRoeHd" ;
+            msg:hash                        "bZ49MTg4UvJGrZGuZURRp/vx6O1dYmUPBkFaKVWSsj8UFaXOrFCoYBcSblp8aqk3TDt2f6SpPzyNxkgGuQh13a1nXO9QwKW9E7P8umnfXc8Y1xy91bkvBbgXSKhKLUOiOZK8DId/iAElY77MNTr6URTFYWkBPKeuXsmyjT4JDhk=" ;
+            msg:publicKeyFingerprint        "IwyZXueJ69uldEQMoR6tmjSICtahgt4Oji/iALKaL+4=" ;
+            msg:signedGraph                 p14:envelope-dec7 .
+    
+    p33:oy525npzylaeic4w4kvg
+            a                      msg:FromOwner ;
+            msg:protocolVersion    "1.0" ;
+            msg:receivedTimestamp  1513345749318 .
+    
+    p14:envelope-talb
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:oy525npzylaeic4w4kvg ;
+            msg:containsEnvelope   p14:envelope-dec7 ;
+            msg:containsSignature  p14:envelope-dec7-sig .
+}
+
+p11:envelope-r04c {
+    p33:00d5wzbbf8hzzt2eewcc
+            a                      msg:FromOwner ;
+            msg:previousMessage    p33:2gwtnta4od8xzqdubbkg ;
+            msg:protocolVersion    "1.0" ;
+            msg:receivedTimestamp  1513345783842 .
+    
+    p20:envelope-h151-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGUCMFRyXmiy0uHwZzgEQSOZdSf93TPZBpMV/qlnfgKLaexAcmCIPkjpceoT6xqI5Z0IUwIxAMoI7KD0T/2tzCvGIJkdxxLqc8530la7j8eIQhglBG1ZtMAxJkrbuUMQtotFGZa5cQ==" ;
+            msg:hash                        "AI73fczFmVY5ogs8ChpgvhPb8Jrfqw72Bx0yvaKJX+dQg7YcorGeV/lEFI1ovBJnujKwrXKfsuqTWkqrxUD/yZAMf+f2eDWZiPhOI6gIZhZ/nLhGp2aXw5WQcoXAjuG3389JNyKV4qdMda8Yq39/ciJ4mf2UemkRbObMK41UMvUP" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p20:envelope-h151 .
+    
+    p11:envelope-1ltm-sig
+            a                               msg:Signature ;
+            msg:signer  p13:nte803gz4pbiw6equ3qa ;
+            msg:signatureValue              "MGYCMQDHmXzTqskktfFGaZjXuZNHsfa86iaAOHFLeey7Ll6Q3crzxLGW7fZXODfSUN9d/4ACMQDa53mS6rdsQWiSl+TVCWVb1crYV7cU+CCCMFy26yke5raK+cZRXyAz8/5oBGskSvI=" ;
+            msg:hash                        "KiQPp34Pjzx2F1HrQ0Xld8VOIL9UGfdekOZKRrH5G0lO3Zwp/lB/K/BuAfsgjuDSftirBzdUKfqJKrrCdZ+2HA7UMrRThlHm5FdZaCvhA7WBpfRz6HEMyyl8IJptYovDdbCvd4MIDHLVdAtQOJCkwHhCAs5qrB/9RUrmdaHHkd4=" ;
+            msg:publicKeyFingerprint        "IwyZXueJ69uldEQMoR6tmjSICtahgt4Oji/iALKaL+4=" ;
+            msg:signedGraph                 p11:envelope-1ltm .
+    
+    p11:envelope-r04c
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:00d5wzbbf8hzzt2eewcc ;
+            msg:containsEnvelope   p11:envelope-1ltm ;
+            msg:containsSignature  p20:envelope-h151-sig , p11:envelope-1ltm-sig .
+}
+
+p34:envelope-sig {
+    p34:envelope-sig  a                     msg:Signature ;
+            msg:signer  p13:7820503869697675000 ;
+            msg:signatureValue              "MGUCMDCWztT5w6bzulB1Js0Oy6jOyTux91W1ymePV/uuiu8kfBC+EyPkUMKkGTF4MXUEewIxANli8byJCB+FNxxXM1GemCtyXxedjDKZfEwmg46ZMeokoyhp9YG+EOVqDlmveSNGnA==" ;
+            msg:hash                        "ah4WEk0+Blv0BrP1i17LWmxPJEVfGSn8WP/Z8VN68nis2tdxRO4XKoKClFDW25W/I06am11K4mC+kHIWfSUzIDz47B/Upjrc4N+xwIBNNZmTnV1nn/HzGUuXFTqZyAXl3mzoDK0GSnIphl9kDCIUNW8PpeacGo9tzbqxrr6BkjI=" ;
+            msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
+            msg:signedGraph                 p34:envelope .
+}
+
+p7:envelope-kn0t {
+    p7:content-klsc-sig
+            a                               msg:Signature ;
+            msg:signer  p13:nte803gz4pbiw6equ3qa ;
+            msg:signatureValue              "MGUCME5ypn3jwfjH8INWy+tToqG81NU6rNcDiU5UeshZb7V9xc2Qw/mBJ/866NoF7bQ0QgIxAIwFu4j2LtTaOnTICJVoGT4rSOou+wF/Hd+9Xc1aUUvmTh6FHF1F1nYHYC/r1URUYw==" ;
+            msg:hash                        "Apw818wB88HbkNMBLNp8fdE88g+xFskXR45Tr9Sn5qTLM5QqmZBBz+cBlTeahIJCyQ0Yovp4e3Whr3IeTJYiGA==" ;
+            msg:publicKeyFingerprint        "IwyZXueJ69uldEQMoR6tmjSICtahgt4Oji/iALKaL+4=" ;
+            msg:signedGraph                 p7:content-klsc .
+    
+    p7:envelope-kn0t  a            msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:usi9yhill1lo2xi70sjx ;
+            msg:containsSignature  p7:content-klsc-sig .
+    
+    p33:usi9yhill1lo2xi70sjx
+            a                    msg:FromOwner ;
+            msg:content          p7:content-klsc ;
+            msg:messageType      msg:OpenMessage ;
+            msg:previousMessage  p33:usi9yhill1lo2xi70sjx ;
+            msg:protocolVersion  "1.0" ;
+            msg:recipient        p25:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom    p13:7820503869697675000 ;
+            msg:recipientNode    p39:resource ;
+            msg:sender           p25:4t9deo4t6bqx83jxk5ex ;
+            msg:senderAtom       p13:nte803gz4pbiw6equ3qa ;
+            msg:senderNode       p39:resource ;
+            msg:sentTimestamp    1513345776259 .
+}
+
+p20:envelope-h151 {
+    p20:envelope-h151
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:2gwtnta4od8xzqdubbkg ;
+            msg:containsSignature  p16:envelope-xm9b-sig .
+    
+    p16:envelope-xm9b-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGUCMFKhx97tjGDjZQm6fXkqqM98rD81g97YWiIhirU0UzMnyIsBRLIRjPsoSZ8coHVsFQIxAKIT+1HYcQI5m9DU96Q7l2L5v5Cfz/zwCU4jZID4MxVqW9y3aiFLhYvL9HWvn35xRQ==" ;
+            msg:hash                        "Jn/1M6AArmzFLhVeHd4Ar93WstPiCFvtlvgJUPoDJPSopHcvonVGyQP1231cLlRe1Hx7kz0Q7b/iIMRRQxxI0BTMMEm05ridJ4aqcmR51i+VSv/MqB6yLktCxQ7OpTcTOrNwIAADihgPUIzjWE1PXU7buCOcTp91KuaCk40fGB4=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p16:envelope-xm9b .
+    
+    p33:2gwtnta4od8xzqdubbkg
+            a                            msg:FromSystem ;
+            msg:messageType              msg:SuccessResponse ;
+            msg:previousMessage          p33:2gwtnta4od8xzqdubbkg ;
+            msg:protocolVersion          "1.0" ;
+            msg:receivedTimestamp        1513345783694 ;
+            msg:recipient                p25:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom            p13:7820503869697675000 ;
+            msg:recipientNode            p39:resource ;
+            msg:respondingTo             p33:5669098069340991000 ;
+            msg:respondingToMessageType  msg:ConnectionMessage ;
+            msg:sender                   p25:4t9deo4t6bqx83jxk5ex ;
+            msg:senderAtom               p13:nte803gz4pbiw6equ3qa ;
+            msg:senderNode               p39:resource .
+}
+
+p43:content-1o90 {
+    p33:ow321nn1va6clfidc4s0
+            p31:accepts  p33:557600936467257340 ;
+            con:text     "Please go on." .
+}
+
+p22:envelope-wq0v {
+    p22:data-sig  a                         msg:Signature ;
+            msg:signer  p13:7820503869697675000 ;
+            msg:signatureValue              "MGUCMQCga8Q74kKHLV/CuksgG65BQlguLl31J4VVCCX5KOZYXtq34jjwhKo2l66/KJ2uFjkCMHR51YF3LMxdkxdInO831LNQ7TaD8NBFLKpjFhLc+36XdXbO1gFnNiuJYu63hMtRxA==" ;
+            msg:hash                        "AKFruUJ/9xCpTg54oAT89hF5Hcie1ks2ITJyy1iH83J54iJajGL+p66QHGhmtjTz1Pu2ZHJC9cjLplyz93ZdvbVsorgN5Nx1WxjnVU09NwLN+IiwWthi1+f/QHEsTFi89mRrYbZG/slzLL4QF00PyLkOJIiOL3+pCog32yl5FbC6" ;
+            msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
+            msg:signedGraph                 p22:data .
+    
+    p22:envelope-wq0v
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:1435888415723958200 ;
+            msg:containsEnvelope   p22:data ;
+            msg:containsSignature  p22:data-sig , p30:envelope-kxkb-sig .
+    
+    p33:1435888415723958200
+            a                      msg:FromOwner ;
+            msg:previousMessage    p33:to1pxp688kcn0wo30yu6 ;
+            msg:protocolVersion    "1.0" ;
+            msg:receivedTimestamp  1513345787240 .
+    
+    p30:envelope-kxkb-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMH1xsE6eU6WNQGY16ZEV70ubqzx1zbrvxnUrRozvs6e3Zc1krfyq144fhnQB18kGlwIwG3SDOexc/y/+Q4GZyZBnqL6nc2Xh6Fse/1xDD96DrqPtxcrZh79SO1+qHNZn5MlT" ;
+            msg:hash                        "QnNO2fmVyDvsbVqoIpIHi2trFODcAc9/x7u4rCFb7ZT3ypnNI4kDiM05ZJZgCyAJQV9FqZMTRkRUaNHm/Qpmxdg1bGCFZFoJEk0vwcaQ+U+RwOYHPIaZa4XGXasYXRvy8lvxgAwMldOO1CrLyUGwq3uGrATNmkcfFhwPzlEAGJA=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p30:envelope-kxkb .
+}
+
+p23:envelope-tico-sig {
+    p23:envelope-tico-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMD6p+UtbijQYaqQbihg61SoVap9E70jzoxjrm+eCpmpucad6Rg/S7t3fU6PYiCy7cQIwOTeJ+elxgjjocdNAFn9Hv36OLs3Fo+ZCQz9otegEOjKhQSVekXxzZeUtOgkqan0g" ;
+            msg:hash                        "AIJ4UZSQK85vJrqCxttUa1GeboKv008zRE0FyH1as1zsl4mtuL7wqilqiFSMNEoL6sOyy1k2NqI4b3DBQu1Om5r+MD0EWoQ7G5XxeZKhN2WXlO4Ac8ogkDRU1FgrpJk7Bc/HwYpQHLoI+XBFLOe+ZVQGE95G5DzVVeCLLzivPUYc" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p23:envelope-tico .
+}
+
+p35:sysinfo {
+    p13:nte803gz4pbiw6equ3qa
+            a                     won:Atom ;
+            dct:created           "2017-12-15T13:49:09.351Z"^^xsd:dateTime ;
+            dct:modified          "2017-12-15T13:49:09.356Z"^^xsd:dateTime ;
+            won:atomState         won:Active ;
+            won:connections       p38:connections ;
+            won:messageContainer  p35:events ;
+            won:wonNode           p39:resource .
+    
+    p35:events  a        won:MessageContainer ;
+            rdfs:member  p33:lkf3jxkjp5v9o71t8bsb , p33:oy525npzylaeic4w4kvg .
+}
+
+p19:data {
+    p19:data  a                    msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:557600936467257340 ;
+            msg:containsSignature  p19:content-sig .
+    
+    p33:557600936467257340
+            a                    msg:FromOwner ;
+            msg:content          p19:content ;
+            msg:messageType      msg:ConnectionMessage ;
+            msg:previousMessage  p33:557600936467257340 ;
+            msg:recipient        p25:4t9deo4t6bqx83jxk5ex ;
+            msg:recipientAtom    p13:nte803gz4pbiw6equ3qa ;
+            msg:recipientNode    p39:resource ;
+            msg:sender           p25:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom       p13:7820503869697675000 ;
+            msg:senderNode       p39:resource ;
+            msg:sentTimestamp    "1513345785450" .
+    
+    p19:content-sig  a                      msg:Signature ;
+            msg:signer  p13:7820503869697675000 ;
+            msg:signatureValue              "MGUCMDEY7IlIrXWmAKaIOWY0L1yZjirZUlQfPx5ybdT1V1WJ3Vnq7ekiNAUBsXTr9qpY8gIxAKZy2sKwc5AgPYNTQ1Kt2yT2mJ+lghNjHd+uaPbXGDHefZe1X6EnhaKWzsWHdxmj9Q==" ;
+            msg:hash                        "Fh+pMtbJ7Jpl3BL38pq47oN7RAmmP5dw45rwsi9voe3W28WdeseacZjN2C6+pRok32meeqnL8tb9ElqJbG7xaA==" ;
+            msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
+            msg:signedGraph                 p19:content .
+}
+
+p29:envelope-engq-sig {
+    p29:envelope-engq-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGUCMQClv4q+/II4/vRdZk+mNVy7MqlemvVnJsWYmpVGqpLQ2/jyzVSt8xF1XkJ5sD7g7HQCMAI63vTGP0SiGckH3md9ineAWBurfiMLCkJQe3qpQT1jkYTDjJvtqMu6YZcof6pmRA==" ;
+            msg:hash                        "epf1/rNvhvwpj+8mTejVyG3nzTUmwuPHyx1LOE2SorObezmZq2PwO7ZGQDHR4PZbti3QEDVPVuU2wR+6ItfOLPyrsSe8X+xGPrFeDSkMQJhC1n+FkcGFrnAfg6sFpQnkAfjLGqz6wsSU7YPn5Hr4cOjlb93FEZyXwQwWQJpfX+0=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p29:envelope-engq .
+}
+
+p10:content {
+    p33:5669098069340991000
+            con:text  "one" .
+}
+
+p19:envelope-xg0i-sig {
+    p19:envelope-xg0i-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMGVOVyMB9FstIrPmbdOLqpffTJgZaJ6avWe2UtTTTtxFeX/dxXpy7POaBNGmHSnvQwIwIFfFJmlhKCdbEduFO451QAXBOKr6H7kAIaCy/NUGjxjbYHH05AoGix0FoW09YrJj" ;
+            msg:hash                        "AK7ovAcUTa5/JQ/r7v8+GoXsOqxZSC4QB4zt0hYuZ1vvDrbLz4BKVl483Sn2Qx9d3i4nT5pqQZh8BU/K4r40wWjNPCCsuoLgBLBSKfhMA0aLX86lzXP1/HYgUtUWSevoctf9MlW56KEmwhloJYOoaYSz+x1439j1yyIJzqf5W2zO" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p19:envelope-xg0i .
+}
+
+p32:envelope-pj9k {
+    p32:data-sig  a                         msg:Signature ;
+            msg:signer  p13:7820503869697675000 ;
+            msg:signatureValue              "MGQCMFNReqF/Ovg5KUpW0UV72n4qdPqsA1G9zPck/etm07eLwIByztPsxUmATjWqqApOLQIwKk7JZjNTurLvsQ//fpMwdcIuq50/UEQhwsI5Xitvi52iJrfywTZCIwbg4zFu209P" ;
+            msg:hash                        "fs4orqA2ZXWb5NRf7iDWHDdLyEAO8AREcmY/tg5gf1l+evJkXXzQv976FIO5iUedH0933wIeWSbbaiBMRg6w0wZ9QLe9/9+3Kr4iLOjEyc5P0mWKwoSkGrmMT0WTKdXDkxISQX6dbTZtejmbUBqzD732YXSDKuk/TRRYWpi/CAk=" ;
+            msg:publicKeyFingerprint        "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
+            msg:signedGraph                 p32:data .
+    
+    p33:6671551888677331000
+            a                      msg:FromOwner ;
+            msg:previousMessage    p33:1zp49xutzuw6w7etotxk ;
+            msg:protocolVersion    "1.0" ;
+            msg:receivedTimestamp  1513345775944 ;
+            msg:sender             p25:xq6jofxo2w8o05io6dre .
+    
+    p32:envelope-pj9k
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:6671551888677331000 ;
+            msg:containsEnvelope   p32:data ;
+            msg:containsSignature  p32:data-sig , p2:envelope-30wn-sig .
+    
+    p2:envelope-30wn-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGQCMFplMNHAWOfPW9EfTh/Ejc7bHOJ+q3crX548PN3U2MuRrjdvHsscXaJkhVlqdOOiVAIwD0qjS/VlzsHtsbw/2MzjGAvqjrKKyVvGuo21vOqjpFR3xOew49QKzrG1BZ8GlGEq" ;
+            msg:hash                        "AIndLYiOGc3NpUl+mBuuwMOywlztyiQuh5dDuWD5+X3TY4e/HqOrHk7oYajHQsMM4g13hO3835w9Ts7lbWuoJsqmG6Go5mKpOaUXU2w7kMNWGoB9slR9m7CBFfZDLEf8CaRaheBk7+K29DkkSX8x6miIhY9TbYlVD1Y9jpJCygae" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p2:envelope-30wn .
+}
+
+p47:envelope-i81z {
+    p47:envelope-i81z
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:t1h3u3s5q6is5sewv843 ;
+            msg:containsSignature  p10:envelope-ma7y-sig .
+    
+    p10:envelope-ma7y-sig
+            a                               msg:Signature ;
+            msg:signer  p39:resource ;
+            msg:signatureValue              "MGUCMQD0H3I+Y3Y27WJgS6B3lLpDPhtI1odks1YXXd61zmYE0/DVLLWiMQoyDn6H8JQKY/ACMGz1OKAt2e+rg9xCOm53tP56gctuzUS6Qi6Es9Q6fZep8j20iihafRyE41uYcxvAtQ==" ;
+            msg:hash                        "C8nYCZS1IgqOdjLk3f73I9dSekaGxFlNEPKwAAfBFuA/P3aoLEE8ypNLylRearbSS+xx4CuRwulCIfdRxDkZlydctRvVPOFr48u1lS04nPNlL43EMI4r21myMUbjIlo1VEjopgSJoUc/M1IlXcBcN1ir/p4W5zVc5GMy+2Jh5eo=" ;
+            msg:publicKeyFingerprint        "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
+            msg:signedGraph                 p10:envelope-ma7y .
+    
+    p33:t1h3u3s5q6is5sewv843
+            a                            msg:FromSystem ;
+            msg:messageType              msg:SuccessResponse ;
+            msg:previousMessage          p33:5669098069340991000 ;
+            msg:protocolVersion          "1.0" ;
+            msg:receivedTimestamp        1513345783608 ;
+            msg:recipient                p25:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom            p13:7820503869697675000 ;
+            msg:recipientNode            p39:resource ;
+            msg:respondingTo             p33:5669098069340991000 ;
+            msg:respondingToMessageType  msg:ConnectionMessage ;
+            msg:sender                   p25:xq6jofxo2w8o05io6dre ;
+            msg:senderAtom               p13:7820503869697675000 ;
+            msg:senderNode               p39:resource .
+}
+
+p43:envelope-w5bl {
+    p33:ow321nn1va6clfidc4s0
+            a                    msg:FromOwner ;
+            msg:content          p43:content-1o90 ;
+            msg:messageType      msg:ConnectionMessage ;
+            msg:previousMessage  p33:ow321nn1va6clfidc4s0 ;
+            msg:protocolVersion  "1.0" ;
+            msg:recipient        p25:xq6jofxo2w8o05io6dre ;
+            msg:recipientAtom    p13:7820503869697675000 ;
+            msg:recipientNode    p39:resource ;
+            msg:sender           p25:4t9deo4t6bqx83jxk5ex ;
+            msg:senderAtom       p13:nte803gz4pbiw6equ3qa ;
+            msg:senderNode       p39:resource ;
+            msg:sentTimestamp    1513345785764 .
+    
+    p43:envelope-w5bl
+            a                      msg:EnvelopeGraph ;
+            rdfg:subGraphOf        p33:ow321nn1va6clfidc4s0 ;
+            msg:containsSignature  p43:content-1o90-sig .
+    
+    p43:content-1o90-sig
+            a                               msg:Signature ;
+            msg:signer  p13:nte803gz4pbiw6equ3qa ;
+            msg:signatureValue              "MGYCMQD5Nwik6+m6Uo7mRcw8vhDA72HhVqADszGW+E1WQych1GPJ6pIajJ2u9EhhaCYtdbUCMQCJaOGoq7i0ZkWUC34fLwg3XVsnyc+m8ViFI3DFMaRTk1lwRpffsvB4EnvtRduijm0=" ;
+            msg:hash                        "ALNs2UTDIodwFyAkA57/S4xpXn6pTLvNmZqzm2oMxTdmypt/0/Y4eQ4AdVjOQetMTxvAiQ6J/tIRzEMWFTU0qrBh3XTELGoID/BTlfjk8DUxcBF9fKmaHKc8tQfbUk+IKsrGvsLFu364vQ5dBxVh14qcbwmXs1daUcWJ8NN6CcjD" ;
+            msg:publicKeyFingerprint        "IwyZXueJ69uldEQMoR6tmjSICtahgt4Oji/iALKaL+4=" ;
+            msg:signedGraph                 p43:content-1o90 .
+}

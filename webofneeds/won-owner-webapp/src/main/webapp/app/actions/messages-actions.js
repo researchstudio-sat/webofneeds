@@ -7,13 +7,9 @@ import { actionTypes, actionCreators } from "./actions.js";
 import { getIn } from "../utils.js";
 
 import Immutable from "immutable";
-import { getOwnMessageUri } from "../redux/utils/message-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 
-import {
-  isFetchMessageEffectsNeeded,
-  buildChatMessage,
-} from "../won-message-utils.js";
+import { isFetchMessageEffectsNeeded } from "../won-message-utils.js";
 import * as stateStore from "../redux/state-store.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as ownerApi from "../api/owner-api.js";
@@ -52,7 +48,7 @@ export function successfulReopenAtom(event) {
 }
 export function failedCloseAtom(event) {
   return (dispatch, getState) => {
-    const atomUri = event.getRecipientAtom();
+    const atomUri = event.getAtom();
 
     won
       .clearStoreWithPromise()
@@ -65,7 +61,7 @@ export function failedCloseAtom(event) {
 
 export function failedReopenAtom(event) {
   return (dispatch, getState) => {
-    const atomUri = event.getRecipientAtom();
+    const atomUri = event.getAtom();
 
     won
       .clearStoreWithPromise()
@@ -137,13 +133,13 @@ export function successfulCreate(event) {
     //get URI of newly created atom from message
 
     //load the data into the local rdf store and publish AtomCreatedEvent when done
-    const atomURI = event.getRecipientAtom();
+    const atomURI = event.getAtom();
 
     won.getAtom(atomURI).then(atom => {
       dispatch(
         actionCreators.atoms__createSuccessful({
           eventUri: event.getIsResponseTo(),
-          atomUri: event.getSenderAtom(),
+          atomUri: event.getAtom(),
           atom: atom,
         })
       );
@@ -156,7 +152,7 @@ export function successfulEdit(event) {
     console.debug("Received success replace message:", event);
     //const state = getState();
     //load the edited data into the local rdf store and publish AtomEditEvent when done
-    const atomURI = event.getRecipientAtom();
+    const atomURI = event.getAtom();
 
     const processState = get(getState(), "process");
 
@@ -174,141 +170,12 @@ export function successfulEdit(event) {
           dispatch(
             actionCreators.atoms__editSuccessful({
               eventUri: event.getIsResponseTo(),
-              atomUri: event.getSenderAtom(),
+              atomUri: event.getAtom(),
               //atom: atom,
             })
           );
         });
     }
-  };
-}
-
-export function processOpenMessage(event) {
-  return (dispatch, getState) => {
-    const recipientAtomUri = event.getRecipientAtom();
-    const receiverConnectionUri = event.getRecipientConnection();
-
-    const senderAtomUri = event.getSenderAtom();
-    const senderConnectionUri = event.getSenderConnection();
-
-    const state = getState();
-    const senderAtom = getIn(state, ["atoms", senderAtomUri]);
-    const recipientAtom = getIn(state, ["atoms", recipientAtomUri]);
-
-    const isOwnSenderAtom = generalSelectors.isAtomOwned(state, senderAtomUri);
-    const isOwnRecipientAtom = generalSelectors.isAtomOwned(
-      state,
-      recipientAtomUri
-    );
-
-    //check if the two connections are relevant to be stored within the state (if connUri is present, and if Atom belongs to self)
-    const isSenderConnectionRelevant = senderConnectionUri && isOwnSenderAtom;
-    const isReceiverConnectionRelevant =
-      receiverConnectionUri && isOwnRecipientAtom;
-
-    let senderAtomP;
-    if (isOwnSenderAtom) {
-      //We know that all own atoms are already stored within the state, so we do not have to retrieve it
-      senderAtomP = Promise.resolve(true);
-    } else {
-      senderAtomP = stateStore.fetchAtomAndDispatch(
-        senderAtomUri,
-        dispatch,
-        getState
-      );
-    }
-
-    let recipientAtomP;
-    if (isOwnRecipientAtom) {
-      //We know that all own atoms are already stored within the state, so we do not have to retrieve it
-      recipientAtomP = Promise.resolve(true);
-    } else {
-      recipientAtomP = stateStore.fetchAtomAndDispatch(
-        recipientAtomUri,
-        dispatch,
-        getState
-      );
-    }
-
-    let senderConnectionP;
-    if (!isSenderConnectionRelevant) {
-      console.debug(
-        "senderConnection not relevant, resolve with false -> ignore the connection"
-      );
-      senderConnectionP = Promise.resolve(false);
-    } else if (getIn(senderAtom, ["connections", senderConnectionUri])) {
-      console.debug(
-        "senderConnection relevant, resolve with true -> handle the connection"
-      );
-      senderConnectionP = Promise.resolve(true);
-    } else {
-      senderConnectionP = stateStore
-        .fetchActiveConnectionAndDispatch(
-          senderConnectionUri,
-          senderAtomUri,
-          dispatch
-        )
-        .then(() => true);
-    }
-
-    let receiverConnectionP;
-    if (!isReceiverConnectionRelevant) {
-      console.debug(
-        "receiverConnection not relevant, resolve with false -> ignore the connection"
-      );
-      receiverConnectionP = Promise.resolve(false);
-    } else if (getIn(recipientAtom, ["connections", receiverConnectionUri])) {
-      console.debug(
-        "receiverConnection relevant, resolve with true -> handle the connection"
-      );
-      receiverConnectionP = Promise.resolve(true);
-    } else {
-      receiverConnectionP = stateStore
-        .fetchActiveConnectionAndDispatch(
-          receiverConnectionUri,
-          recipientAtomUri,
-          dispatch
-        )
-        .then(() => true);
-    }
-
-    Promise.all([
-      senderConnectionP,
-      receiverConnectionP,
-      senderAtomP,
-      recipientAtomP,
-    ]).then(
-      ([
-        senderConnectionRelevant,
-        receiverConnectionRelevant,
-        senderAtom,
-        recipientAtom,
-      ]) => {
-        if (receiverConnectionRelevant) {
-          console.debug("Change ReceiverConnectionState ", recipientAtom);
-          dispatch({
-            type: actionTypes.messages.openMessageReceived,
-            payload: {
-              updatedConnectionUri: receiverConnectionUri,
-              ownedAtomUri: recipientAtomUri,
-              message: event,
-            },
-          });
-        }
-
-        if (senderConnectionRelevant) {
-          console.debug("Change SenderConnectionState ", senderAtom);
-          dispatch({
-            type: actionTypes.messages.openMessageSent,
-            payload: {
-              senderConnectionUri: senderConnectionUri,
-              senderAtomUri: senderAtomUri,
-              event: event,
-            },
-          });
-        }
-      }
-    );
   };
 }
 
@@ -321,9 +188,11 @@ export function processAgreementMessage(event) {
   };
 }
 
-export function processChangeNotificationMessage(event) {
+export function processChangeNotificationMessage(wonMessage) {
   return (dispatch, getState) => {
-    const atomUriToLoad = event.getSenderAtom();
+    const atomUriToLoad = generalSelectors.getAtomUriBySocketUri(
+      wonMessage.getSenderSocket()
+    );
 
     /*
     Workaround, there is a possibility of a racecondition between the functions processChangeNotificationMessage, and successfulEdit
@@ -364,267 +233,318 @@ export function processChangeNotificationMessage(event) {
 
     dispatch({
       type: actionTypes.messages.processChangeNotificationMessage,
-      payload: event,
+      payload: wonMessage,
     });
   };
 }
 
-export function processConnectionMessage(event) {
+export function processConnectionMessage(wonMessage) {
   return (dispatch, getState) => {
-    if (isFetchMessageEffectsNeeded(event)) {
-      const _atomUri = event.getSenderAtom();
-      const isSentEvent = generalSelectors.isAtomOwned(getState(), _atomUri);
+    if (isFetchMessageEffectsNeeded(wonMessage)) {
+      const state = getState();
+      const senderSocketUri = wonMessage.getSenderSocket();
+      const targetSocketUri = wonMessage.getTargetSocket();
 
-      let connectionUri;
-      let atomUri;
+      const senderAtomUri = generalSelectors.getAtomUriBySocketUri(
+        senderSocketUri
+      );
+      const targetAtomUri = generalSelectors.getAtomUriBySocketUri(
+        targetSocketUri
+      );
 
+      const isSentEvent = generalSelectors.isAtomOwned(state, senderAtomUri);
+      const isReceivedEvent = generalSelectors.isAtomOwned(
+        state,
+        targetAtomUri
+      );
+
+      let sentEventPromise;
       if (isSentEvent) {
-        connectionUri = event.getSenderConnection();
-        atomUri = event.getSenderAtom();
+        const senderAtom = get(state, ["atoms", senderAtomUri]);
+        const senderConnection = atomUtils.getConnectionBySocketUris(
+          senderAtom,
+          senderSocketUri,
+          targetSocketUri
+        );
+
+        const senderConnectionUri = get(senderConnection, "uri");
+
+        sentEventPromise = processMessageEffectsAndMessage(
+          wonMessage,
+          senderAtomUri,
+          senderConnectionUri,
+          dispatch
+        ).then(() => true);
       } else {
-        connectionUri = event.getRecipientConnection();
-        atomUri = event.getRecipientAtom();
+        sentEventPromise.resolve(false);
       }
 
-      const messages = getState().getIn([
-        "atoms",
-        atomUri,
-        "connections",
-        connectionUri,
-        "messages",
-      ]);
+      let receivedEventPromise;
+      if (isReceivedEvent) {
+        const targetAtom = get(state, ["atoms", targetAtomUri]);
+        const targetConnection = atomUtils.getConnectionBySocketUris(
+          targetAtom,
+          targetSocketUri,
+          senderSocketUri
+        );
 
-      //PETRINET DATA PART START *********************
-      dispatch({
-        type: actionTypes.connections.setLoadingPetriNetData,
-        payload: {
-          connectionUri: connectionUri,
-          loadingPetriNetData: true,
-        },
-      });
+        const targetConnectionUri = get(targetConnection, "uri");
 
-      ownerApi
-        .getPetriNetUris(connectionUri)
-        .then(response => {
-          const petriNetData = {};
+        receivedEventPromise
+          .processMessageEffectsAndMessage(
+            wonMessage,
+            targetAtomUri,
+            targetConnectionUri,
+            dispatch
+          )
+          .then(() => true);
+      } else {
+        receivedEventPromise.resolve(false);
+      }
 
-          response.forEach(entry => {
-            if (entry.processURI) {
-              petriNetData[entry.processURI] = entry;
-            }
-          });
-
-          const petriNetDataImm = Immutable.fromJS(petriNetData);
-
-          dispatch({
-            type: actionTypes.connections.updatePetriNetData,
-            payload: {
-              connectionUri: connectionUri,
-              petriNetData: petriNetDataImm,
-            },
-          });
-        })
-        .catch(error => {
-          console.error("Error:", error);
-          dispatch({
-            type: actionTypes.connections.setLoadingPetriNetData,
-            payload: {
-              connectionUri: connectionUri,
-              loadingPetriNetData: false,
-            },
-          });
-        });
-
-      //PETRINET DATA PART END **************************
-      ownerApi
-        .getMessageEffects(connectionUri, event.getMessageUri())
-        .then(response => {
-          for (const effect of response) {
-            switch (effect.type) {
-              case "ACCEPTS":
-                if (effect.accepts) {
-                  let acceptedMessageUris = Array.isArray(
-                    effect.acceptedMessageUri
-                  )
-                    ? effect.acceptedMessageUri
-                    : [effect.acceptedMessageUri];
-                  acceptedMessageUris.forEach(acceptedMessageUri => {
-                    let messageUri = getOwnMessageUri(
-                      messages,
-                      acceptedMessageUri
-                    );
-                    dispatch({
-                      type: actionTypes.messages.messageStatus.markAsAccepted,
-                      payload: {
-                        messageUri: messageUri,
-                        connectionUri: connectionUri,
-                        atomUri: atomUri,
-                        accepted: true,
-                      },
-                    });
-                  });
-                }
-                break;
-              case "CLAIMS":
-                if (effect.claims) {
-                  let claimedMessageUris = Array.isArray(effect.claims)
-                    ? effect.claims
-                    : [effect.claims];
-
-                  claimedMessageUris.forEach(claimedMessageUris => {
-                    let messageUri = getOwnMessageUri(
-                      messages,
-                      claimedMessageUris
-                    );
-                    dispatch({
-                      type: actionTypes.messages.messageStatus.markAsClaimed,
-                      payload: {
-                        messageUri: messageUri,
-                        connectionUri: connectionUri,
-                        atomUri: atomUri,
-                        claimed: true,
-                      },
-                    });
-                  });
-                }
-                break;
-
-              case "PROPOSES":
-                if (effect.proposes) {
-                  let proposedMessageUris = Array.isArray(effect.proposes)
-                    ? effect.proposes
-                    : [effect.proposes];
-
-                  proposedMessageUris.forEach(proposedMessageUri => {
-                    let messageUri = getOwnMessageUri(
-                      messages,
-                      proposedMessageUri
-                    );
-                    dispatch({
-                      type: actionTypes.messages.messageStatus.markAsProposed,
-                      payload: {
-                        messageUri: messageUri,
-                        connectionUri: connectionUri,
-                        atomUri: atomUri,
-                        proposed: true,
-                      },
-                    });
-                  });
-                }
-
-                if (effect.proposalType === "CANCELS") {
-                  let proposesToCancelUris = Array.isArray(
-                    effect.proposesToCancel
-                  )
-                    ? effect.proposesToCancel
-                    : [effect.proposesToCancel];
-
-                  proposesToCancelUris.forEach(proposesToCancelURI => {
-                    let messageUri = getOwnMessageUri(
-                      messages,
-                      proposesToCancelURI
-                    );
-                    dispatch({
-                      type:
-                        actionTypes.messages.messageStatus
-                          .markAsCancellationPending,
-                      payload: {
-                        messageUri: messageUri,
-                        connectionUri: connectionUri,
-                        atomUri: atomUri,
-                        cancellationPending: true,
-                      },
-                    });
-                  });
-                }
-                break;
-
-              case "REJECTS":
-                if (effect.rejects) {
-                  let rejectedMessageUris = Array.isArray(
-                    effect.rejectedMessageUri
-                  )
-                    ? effect.rejectedMessageUri
-                    : [effect.rejectedMessageUri];
-
-                  rejectedMessageUris.forEach(rejectedMessageUri => {
-                    let messageUri = getOwnMessageUri(
-                      messages,
-                      rejectedMessageUri
-                    );
-                    dispatch({
-                      type: actionTypes.messages.messageStatus.markAsRejected,
-                      payload: {
-                        messageUri: messageUri,
-                        connectionUri: connectionUri,
-                        atomUri: atomUri,
-                        rejected: true,
-                      },
-                    });
-                  });
-                }
-                break;
-
-              case "RETRACTS":
-                if (effect.retracts) {
-                  let retractedMessageUris = Array.isArray(
-                    effect.retractedMessageUri
-                  )
-                    ? effect.retractedMessageUri
-                    : [effect.retractedMessageUri];
-
-                  retractedMessageUris.forEach(retractedMessageUri => {
-                    let messageUri = getOwnMessageUri(
-                      messages,
-                      retractedMessageUri
-                    );
-                    dispatch({
-                      type: actionTypes.messages.messageStatus.markAsRetracted,
-                      payload: {
-                        messageUri: messageUri,
-                        connectionUri: connectionUri,
-                        atomUri: atomUri,
-                        retracted: true,
-                      },
-                    });
-                  });
-                }
-                break;
-
-              default:
-                break;
-            }
-          }
+      Promise.all([sentEventPromise, receivedEventPromise]).then(
+        ([isSentEvent, isReceivedEvent]) => {
+          isReceivedEvent &&
+            console.debug("connection Message is Relevant for receiver");
+          isSentEvent &&
+            console.debug("connection Message is Relevant for sender");
 
           dispatch({
             type: actionTypes.messages.processConnectionMessage,
-            payload: event,
+            payload: wonMessage,
           });
-        });
+        }
+      );
     } else {
       dispatch({
         type: actionTypes.messages.processConnectionMessage,
-        payload: event,
+        payload: wonMessage,
       });
     }
   };
 }
 
-export function processConnectMessage(event) {
+function processMessageEffectsAndMessage(
+  wonMessage,
+  atomUri,
+  connectionUri,
+  dispatch
+) {
+  if (!atomUri || !connectionUri) {
+    return;
+  }
+
+  dispatch({
+    type: actionTypes.connections.setLoadingPetriNetData,
+    payload: {
+      connectionUri: connectionUri,
+      loadingPetriNetData: true,
+    },
+  });
+
+  const petriNetPromise = ownerApi
+    .getPetriNetUris(connectionUri)
+    .then(response => {
+      const petriNetData = {};
+
+      response.forEach(entry => {
+        if (entry.processURI) {
+          petriNetData[entry.processURI] = entry;
+        }
+      });
+
+      const petriNetDataImm = Immutable.fromJS(petriNetData);
+
+      dispatch({
+        type: actionTypes.connections.updatePetriNetData,
+        payload: {
+          connectionUri: connectionUri,
+          petriNetData: petriNetDataImm,
+        },
+      });
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      dispatch({
+        type: actionTypes.connections.setLoadingPetriNetData,
+        payload: {
+          connectionUri: connectionUri,
+          loadingPetriNetData: false,
+        },
+      });
+    });
+
+  const messageEffectsPromise = ownerApi
+    .getMessageEffects(connectionUri, wonMessage.getMessageUri())
+    .then(response => {
+      for (const effect of response) {
+        switch (effect.type) {
+          case "ACCEPTS":
+            if (effect.accepts) {
+              let acceptedMessageUris = Array.isArray(effect.acceptedMessageUri)
+                ? effect.acceptedMessageUri
+                : [effect.acceptedMessageUri];
+              acceptedMessageUris.forEach(acceptedMessageUri => {
+                dispatch({
+                  type: actionTypes.messages.messageStatus.markAsAccepted,
+                  payload: {
+                    messageUri: acceptedMessageUri,
+                    connectionUri: connectionUri,
+                    atomUri: atomUri,
+                    accepted: true,
+                  },
+                });
+              });
+            }
+            break;
+          case "CLAIMS":
+            if (effect.claims) {
+              let claimedMessageUris = Array.isArray(effect.claims)
+                ? effect.claims
+                : [effect.claims];
+
+              claimedMessageUris.forEach(claimedMessageUri => {
+                dispatch({
+                  type: actionTypes.messages.messageStatus.markAsClaimed,
+                  payload: {
+                    messageUri: claimedMessageUri,
+                    connectionUri: connectionUri,
+                    atomUri: atomUri,
+                    claimed: true,
+                  },
+                });
+              });
+            }
+            break;
+
+          case "PROPOSES":
+            if (effect.proposes) {
+              let proposedMessageUris = Array.isArray(effect.proposes)
+                ? effect.proposes
+                : [effect.proposes];
+
+              proposedMessageUris.forEach(proposedMessageUri => {
+                dispatch({
+                  type: actionTypes.messages.messageStatus.markAsProposed,
+                  payload: {
+                    messageUri: proposedMessageUri,
+                    connectionUri: connectionUri,
+                    atomUri: atomUri,
+                    proposed: true,
+                  },
+                });
+              });
+            }
+
+            if (effect.proposalType === "CANCELS") {
+              let proposesToCancelUris = Array.isArray(effect.proposesToCancel)
+                ? effect.proposesToCancel
+                : [effect.proposesToCancel];
+
+              proposesToCancelUris.forEach(proposesToCancelURI => {
+                dispatch({
+                  type:
+                    actionTypes.messages.messageStatus
+                      .markAsCancellationPending,
+                  payload: {
+                    messageUri: proposesToCancelURI,
+                    connectionUri: connectionUri,
+                    atomUri: atomUri,
+                    cancellationPending: true,
+                  },
+                });
+              });
+            }
+            break;
+
+          case "REJECTS":
+            if (effect.rejects) {
+              let rejectedMessageUris = Array.isArray(effect.rejectedMessageUri)
+                ? effect.rejectedMessageUri
+                : [effect.rejectedMessageUri];
+
+              rejectedMessageUris.forEach(rejectedMessageUri => {
+                dispatch({
+                  type: actionTypes.messages.messageStatus.markAsRejected,
+                  payload: {
+                    messageUri: rejectedMessageUri,
+                    connectionUri: connectionUri,
+                    atomUri: atomUri,
+                    rejected: true,
+                  },
+                });
+              });
+            }
+            break;
+
+          case "RETRACTS":
+            if (effect.retracts) {
+              let retractedMessageUris = Array.isArray(
+                effect.retractedMessageUri
+              )
+                ? effect.retractedMessageUri
+                : [effect.retractedMessageUri];
+
+              retractedMessageUris.forEach(retractedMessageUri => {
+                dispatch({
+                  type: actionTypes.messages.messageStatus.markAsRetracted,
+                  payload: {
+                    messageUri: retractedMessageUri,
+                    connectionUri: connectionUri,
+                    atomUri: atomUri,
+                    retracted: true,
+                  },
+                });
+              });
+            }
+            break;
+
+          default:
+            break;
+        }
+      }
+    });
+
+  return Promise.all([petriNetPromise, messageEffectsPromise]);
+}
+
+export function processConnectMessage(wonMessage) {
   return (dispatch, getState) => {
-    const receiverConnectionUri = event.getRecipientConnection();
-    const recipientAtomUri = event.getRecipientAtom();
-
-    const senderAtomUri = event.getSenderAtom();
-    const senderConnectionUri = event.getSenderConnection();
-
+    const senderSocketUri = wonMessage.getSenderSocket();
+    const targetSocketUri = wonMessage.getTargetSocket();
     const state = getState();
+
+    const recipientAtomUri = generalSelectors.getAtomUriBySocketUri(
+      targetSocketUri
+    );
+
+    const senderAtomUri = generalSelectors.getAtomUriBySocketUri(
+      senderSocketUri
+    );
+
     const senderAtom = getIn(state, ["atoms", senderAtomUri]);
     const recipientAtom = getIn(state, ["atoms", recipientAtomUri]);
     const isOwnSenderAtom = generalSelectors.isAtomOwned(state, senderAtomUri);
     const isOwnRecipientAtom = generalSelectors.isAtomOwned(
       state,
       recipientAtomUri
+    );
+
+    const receiverConnectionUri = get(
+      atomUtils.getConnectionBySocketUris(
+        recipientAtom,
+        targetSocketUri,
+        senderSocketUri
+      ),
+      "uri"
+    );
+    const senderConnectionUri = get(
+      atomUtils.getConnectionBySocketUris(
+        senderAtom,
+        senderSocketUri,
+        targetSocketUri
+      ),
+      "uri"
     );
 
     let senderAtomP;
@@ -651,103 +571,128 @@ export function processConnectMessage(event) {
       );
     }
 
-    let senderCP;
-    if (!senderConnectionUri || !isOwnSenderAtom) {
-      console.debug(
-        "senderConnectionUri was null or senderAtom is not ownedAtom, resolve promise with undefined -> ignore the connection"
-      );
-      senderCP = Promise.resolve(false);
-    } else if (
-      senderAtom &&
-      senderAtom.getIn(["connections", senderConnectionUri])
-    ) {
-      console.debug(
-        "senderConnection relevant, resolve with true -> handle the connection"
-      );
-      senderCP = Promise.resolve(true);
-    } else {
-      senderCP = stateStore
-        .fetchActiveConnectionAndDispatch(
-          senderConnectionUri,
-          senderAtomUri,
-          dispatch
-        )
-        .then(() => true);
-    }
-
-    let receiverCP;
-    if (!receiverConnectionUri || !isOwnRecipientAtom) {
-      console.debug(
-        "receiverConnectionUri was null or recipientAtom is not ownedAtom, resolve promise with undefined -> ignore the connection"
-      );
-      receiverCP = Promise.resolve(false);
-    } else if (
-      recipientAtom &&
-      recipientAtom.getIn(["connections", receiverConnectionUri])
-    ) {
-      console.debug(
-        "receiverConnection relevant, resolve with true -> handle the connection"
-      );
-      receiverCP = Promise.resolve(true);
-    } else {
-      receiverCP = stateStore
-        .fetchActiveConnectionAndDispatch(
-          receiverConnectionUri,
-          recipientAtomUri,
-          dispatch
-        )
-        .then(() => true);
-    }
-
-    //we have to retrieve the personas too
-    Promise.all([senderCP, receiverCP, senderAtomP, recipientAtomP]).then(
-      ([
-        senderConnectionRelevant,
-        receiverConnectionRelevant,
-        senderAtom,
-        recipientAtom,
-      ]) => {
-        if (receiverConnectionRelevant) {
-          console.debug("Change ReceiverConnectionState ", recipientAtom);
-          dispatch({
-            type: actionTypes.messages.connectMessageReceived,
-            payload: {
-              updatedConnectionUri: receiverConnectionUri,
-              ownedAtomUri: recipientAtomUri,
-              message: event,
-            },
-          });
-        }
-
-        if (senderConnectionRelevant) {
-          console.debug("Change SenderConnectionState ", senderAtom);
-          dispatch({
-            type: actionTypes.messages.connectMessageSent,
-            payload: {
-              senderConnectionUri: senderConnectionUri,
-              senderAtomUri: senderAtomUri,
-              event: event,
-            },
-          });
-        }
+    Promise.all([senderAtomP, recipientAtomP]).then(() => {
+      let senderCP;
+      if (!senderConnectionUri && isOwnSenderAtom) {
+        senderCP = stateStore
+          .fetchActiveConnectionAndDispatchBySocketUris(
+            senderSocketUri,
+            targetSocketUri,
+            senderAtomUri,
+            dispatch
+          )
+          .then(() => true);
+      } else if (!senderConnectionUri || !isOwnSenderAtom) {
+        console.debug(
+          "senderConnectionUri was null or senderAtom is not ownedAtom, resolve promise with undefined -> ignore the connection"
+        );
+        senderCP = Promise.resolve(false);
+      } else if (
+        senderAtom &&
+        senderAtom.getIn(["connections", senderConnectionUri])
+      ) {
+        console.debug(
+          "senderConnection relevant, resolve with true -> handle the connection"
+        );
+        senderCP = Promise.resolve(true);
+      } else {
+        senderCP = stateStore
+          .fetchActiveConnectionAndDispatch(
+            senderConnectionUri,
+            senderAtomUri,
+            dispatch
+          )
+          .then(() => true);
       }
-    );
+
+      let receiverCP;
+      if (!receiverConnectionUri && isOwnRecipientAtom) {
+        receiverCP = stateStore
+          .fetchActiveConnectionAndDispatchBySocketUris(
+            targetSocketUri,
+            senderSocketUri,
+            recipientAtomUri,
+            dispatch
+          )
+          .then(() => true);
+      } else if (!receiverConnectionUri || !isOwnRecipientAtom) {
+        console.debug(
+          "receiverConnectionUri was null or recipientAtom is not ownedAtom, resolve promise with undefined -> ignore the connection"
+        );
+        receiverCP = Promise.resolve(false);
+      } else if (
+        recipientAtom &&
+        recipientAtom.getIn(["connections", receiverConnectionUri])
+      ) {
+        console.debug(
+          "receiverConnection relevant, resolve with true -> handle the connection"
+        );
+        receiverCP = Promise.resolve(true);
+      } else {
+        receiverCP = stateStore
+          .fetchActiveConnectionAndDispatch(
+            receiverConnectionUri,
+            recipientAtomUri,
+            dispatch
+          )
+          .then(() => true);
+      }
+
+      //we have to retrieve the personas too
+      Promise.all([senderCP, receiverCP]).then(
+        ([senderConnectionRelevant, receiverConnectionRelevant]) => {
+          const newState = getState();
+
+          if (receiverConnectionRelevant) {
+            const newRecipientAtom = getIn(newState, [
+              "atoms",
+              recipientAtomUri,
+            ]);
+            const newReceiverConnection = atomUtils.getConnectionBySocketUris(
+              newRecipientAtom,
+              targetSocketUri,
+              senderSocketUri
+            );
+
+            console.debug("Change ReceiverConnectionState ", newRecipientAtom);
+            dispatch({
+              type: actionTypes.messages.connectMessageReceived,
+              payload: {
+                updatedConnectionUri: get(newReceiverConnection, "uri"),
+                ownedAtomUri: recipientAtomUri,
+                message: wonMessage,
+              },
+            });
+          }
+
+          if (senderConnectionRelevant) {
+            const newSenderAtom = getIn(newState, ["atoms", senderAtomUri]);
+            const newSenderConnection = atomUtils.getConnectionBySocketUris(
+              newSenderAtom,
+              senderSocketUri,
+              targetSocketUri
+            );
+
+            console.debug("Change SenderConnectionState ", newSenderAtom);
+            dispatch({
+              type: actionTypes.messages.connectMessageSent,
+              payload: {
+                updatedConnectionUri: get(newSenderConnection, "uri"),
+                senderAtomUri: senderAtomUri,
+                event: wonMessage,
+              },
+            });
+          }
+        }
+      );
+    });
   };
 }
 
 export function markAsRetracted(event) {
-  return (dispatch, getState) => {
-    const messages = getState().getIn([
-      "atoms",
-      event.atomUri,
-      "connections",
-      event.connectionUri,
-      "messages",
-    ]);
-    const messageUri = getOwnMessageUri(messages, event.messageUri);
-
+  return dispatch => {
     const payload = {
-      messageUri: messageUri,
+      messageUri: event.messageUri,
       connectionUri: event.connectionUri,
       atomUri: event.atomUri,
       retracted: event.retracted,
@@ -761,18 +706,9 @@ export function markAsRetracted(event) {
 }
 
 export function updateMessageStatus(event) {
-  return (dispatch, getState) => {
-    const messages = getState().getIn([
-      "atoms",
-      event.atomUri,
-      "connections",
-      event.connectionUri,
-      "messages",
-    ]);
-    const messageUri = getOwnMessageUri(messages, event.messageUri);
-
+  return dispatch => {
     const payload = {
-      messageUri: messageUri,
+      messageUri: event.messageUri,
       connectionUri: event.connectionUri,
       atomUri: event.atomUri,
       messageStatus: event.messageStatus,
@@ -786,18 +722,9 @@ export function updateMessageStatus(event) {
 }
 
 export function markAsRejected(event) {
-  return (dispatch, getState) => {
-    const messages = getState().getIn([
-      "atoms",
-      event.atomUri,
-      "connections",
-      event.connectionUri,
-      "messages",
-    ]);
-    const messageUri = getOwnMessageUri(messages, event.messageUri);
-
+  return dispatch => {
     const payload = {
-      messageUri: messageUri,
+      messageUri: event.messageUri,
       connectionUri: event.connectionUri,
       atomUri: event.atomUri,
       rejected: event.rejected,
@@ -811,18 +738,9 @@ export function markAsRejected(event) {
 }
 
 export function markAsProposed(event) {
-  return (dispatch, getState) => {
-    const messages = getState().getIn([
-      "atoms",
-      event.atomUri,
-      "connections",
-      event.connectionUri,
-      "messages",
-    ]);
-    const messageUri = getOwnMessageUri(messages, event.messageUri);
-
+  return dispatch => {
     const payload = {
-      messageUri: messageUri,
+      messageUri: event.messageUri,
       connectionUri: event.connectionUri,
       atomUri: event.atomUri,
       proposed: event.proposed,
@@ -836,18 +754,9 @@ export function markAsProposed(event) {
 }
 
 export function markAsClaimed(event) {
-  return (dispatch, getState) => {
-    const messages = getState().getIn([
-      "atoms",
-      event.atomUri,
-      "connections",
-      event.connectionUri,
-      "messages",
-    ]);
-    const messageUri = getOwnMessageUri(messages, event.messageUri);
-
+  return dispatch => {
     const payload = {
-      messageUri: messageUri,
+      messageUri: event.messageUri,
       connectionUri: event.connectionUri,
       atomUri: event.atomUri,
       claimed: event.claimed,
@@ -861,18 +770,9 @@ export function markAsClaimed(event) {
 }
 
 export function markAsAccepted(event) {
-  return (dispatch, getState) => {
-    const messages = getState().getIn([
-      "atoms",
-      event.atomUri,
-      "connections",
-      event.connectionUri,
-      "messages",
-    ]);
-    const messageUri = getOwnMessageUri(messages, event.messageUri);
-
+  return dispatch => {
     const payload = {
-      messageUri: messageUri,
+      messageUri: event.messageUri,
       connectionUri: event.connectionUri,
       atomUri: event.atomUri,
       accepted: event.accepted,
@@ -886,18 +786,9 @@ export function markAsAccepted(event) {
 }
 
 export function markAsCancelled(event) {
-  return (dispatch, getState) => {
-    const messages = getState().getIn([
-      "atoms",
-      event.atomUri,
-      "connections",
-      event.connectionUri,
-      "messages",
-    ]);
-    const messageUri = getOwnMessageUri(messages, event.messageUri);
-
+  return dispatch => {
     const payload = {
-      messageUri: messageUri,
+      messageUri: event.messageUri,
       connectionUri: event.connectionUri,
       atomUri: event.atomUri,
       cancelled: event.cancelled,
@@ -911,18 +802,9 @@ export function markAsCancelled(event) {
 }
 
 export function markAsCancellationPending(event) {
-  return (dispatch, getState) => {
-    const messages = getState().getIn([
-      "atoms",
-      event.atomUri,
-      "connections",
-      event.connectionUri,
-      "messages",
-    ]);
-    const messageUri = getOwnMessageUri(messages, event.messageUri);
-
+  return dispatch => {
     const payload = {
-      messageUri: messageUri,
+      messageUri: event.messageUri,
       connectionUri: event.connectionUri,
       atomUri: event.atomUri,
       cancellationPending: event.cancellationPending,
@@ -935,49 +817,84 @@ export function markAsCancellationPending(event) {
   };
 }
 
-export function atomMessageReceived(event) {
+export function atomMessageReceived(wonMessage) {
   return (dispatch, getState) => {
     //first check if we really have the 'own' atom in the state - otherwise we'll ignore the hint
-    const atom = getState().getIn(["atoms", event.getRecipientAtom()]);
+    const targetAtomUri = generalSelectors.getAtomUriBySocketUri(
+      wonMessage.getTargetSocket()
+    );
+    const atom = getState().getIn(["atoms", targetAtomUri]);
     if (!atom) {
       console.debug(
         "ignoring atomMessage for an atom that is not ours:",
-        event.getRecipientAtom()
+        targetAtomUri
       );
     }
     dispatch({
       type: actionTypes.messages.atomMessageReceived,
       payload: {
-        atomUri: event.getRecipientAtom(),
+        atomUri: targetAtomUri,
         humanReadable: atom.get("humanReadable"),
-        message: event.getTextMessage(),
+        message: wonMessage.getTextMessage(),
       },
     });
   };
 }
 
-export function processSocketHintMessage(event) {
+export function processSocketHintMessage(wonMessage) {
   return (dispatch, getState) => {
-    const recipientAtomUri = event.getRecipientAtom();
-    //const targetSocketUri = event.getHintTargetSocket(); //we currently dont need to know the targetSocketUri of the message (is known by fetching the connection)
+    const targetSocketUri = wonMessage.getTargetSocket();
+    const senderSocketUri = wonMessage.getSenderSocket();
 
-    const currentState = getState();
-    const recipientConnUri = event.getRecipientConnection();
-    const recipientAtom = getIn(currentState, ["atoms", recipientAtomUri]);
+    const state = getState();
+    const targetAtomUri = generalSelectors.getAtomUriBySocketUri(
+      targetSocketUri
+    );
 
-    if (!recipientAtom) {
+    const targetAtom = getIn(state, ["atoms", targetAtomUri]);
+    const isOwnTargetAtom = generalSelectors.isAtomOwned(state, targetAtomUri);
+
+    if (!targetAtom) {
       console.debug(
         "ignoring hint for an atom that is not yet in the state (could be a targetAtom, or a non stored ownedAtom):",
-        recipientAtomUri
+        targetAtomUri
       );
-    } else if (!recipientConnUri) {
-      console.debug("ignoring hint without a receiver(Connection)Uri:", event);
+    }
+
+    const targetConnection = atomUtils.getConnectionBySocketUris(
+      targetAtom,
+      targetSocketUri,
+      senderSocketUri
+    );
+    const targetConnectionUri = get(targetConnection, "uri");
+
+    if (!targetConnectionUri && isOwnTargetAtom) {
+      return stateStore
+        .fetchActiveConnectionAndDispatchBySocketUris(
+          targetSocketUri,
+          senderSocketUri,
+          targetAtomUri,
+          dispatch
+        )
+        .then(() => true);
+    } else if (!targetConnectionUri || !isOwnTargetAtom) {
+      console.debug(
+        "receiverConnectionUri was null or recipientAtom is not ownedAtom, resolve promise with undefined -> ignore the connection"
+      );
+      return Promise.resolve(false);
+    } else if (targetConnection) {
+      console.debug(
+        "receiverConnection relevant, resolve with true -> handle the connection"
+      );
+      return Promise.resolve(true);
     } else {
-      stateStore.fetchActiveConnectionAndDispatch(
-        recipientConnUri,
-        recipientAtomUri,
-        dispatch
-      );
+      return stateStore
+        .fetchActiveConnectionAndDispatch(
+          targetConnectionUri,
+          targetAtomUri,
+          dispatch
+        )
+        .then(() => true);
     }
   };
 }
@@ -1023,252 +940,5 @@ export function processAtomHintMessage(event) {
           )
         );
     }
-  };
-}
-
-/**
- * Dispatches actions registered for the "successOwn" event for the specified message uri.
- * The corresponding reducer clears any registered actions for the "failureOwn" event
- */
-export function dispatchActionOnSuccessOwn(event) {
-  return (dispatch, getState) => {
-    const toDispatchList = getState().getIn([
-      "messages",
-      "dispatchOnSuccessOwn",
-      event.getIsResponseTo(),
-    ]);
-    if (toDispatchList) {
-      toDispatchList.forEach(d => {
-        dispatch(d);
-      });
-    }
-    //the reducer will delete the toDispatchList for successOwn and failureOwn
-    dispatch({
-      type: actionTypes.messages.dispatchActionOn.successOwn,
-      payload: {
-        eventUri: event.getIsResponseTo(),
-      },
-    });
-  };
-}
-
-/**
- * Dispatches actions registered for the "failureOwn" event for the specified message uri.
- * The corresponding reducer clears any registered actions for the "successOwn" event
- */
-export function dispatchActionOnFailureOwn(event) {
-  return (dispatch, getState) => {
-    const toDispatchList = getState().getIn([
-      "messages",
-      "dispatchOnFailureOwn",
-      event.getIsResponseTo(),
-    ]);
-    if (toDispatchList) {
-      toDispatchList.forEach(d => {
-        dispatch(d);
-      });
-    }
-    //the reducer will delete the toDispatchList for successOwn and failureOwn
-    dispatch({
-      type: actionTypes.messages.dispatchActionOn.failureOwn,
-      payload: {
-        eventUri: event.getIsResponseTo(),
-      },
-    });
-  };
-}
-
-/**
- * Dispatches actions registered for the "successRemote" event for the specified message uri.
- * The corresponding reducer clears any registered actions for the "failureRemote" event
- */
-export function dispatchActionOnSuccessRemote(event) {
-  return (dispatch, getState) => {
-    const messageUri = event.getIsRemoteResponseTo();
-    const connectionUri = event.getRecipientConnection();
-
-    const toDispatchList = getState().getIn([
-      "messages",
-      "dispatchOnSuccessRemote",
-      messageUri,
-    ]);
-
-    const toAutoClaim = getState().getIn([
-      "messages",
-      "claimOnSuccess",
-      messageUri,
-    ]);
-
-    const toRefreshData = getState().getIn([
-      "messages",
-      "refreshDataOnSuccess",
-      messageUri,
-    ]);
-
-    if (toRefreshData) {
-      dispatch({
-        type: actionTypes.connections.setLoadingPetriNetData,
-        payload: {
-          connectionUri: connectionUri,
-          loadingPetriNetData: true,
-        },
-      });
-
-      ownerApi
-        .getPetriNetUris(connectionUri)
-        .then(response => {
-          const petriNetData = {};
-
-          response.forEach(entry => {
-            if (entry.processURI) {
-              petriNetData[entry.processURI] = entry;
-            }
-          });
-
-          const petriNetDataImm = Immutable.fromJS(petriNetData);
-
-          dispatch({
-            type: actionTypes.connections.updatePetriNetData,
-            payload: {
-              connectionUri: connectionUri,
-              petriNetData: petriNetDataImm,
-            },
-          });
-        })
-        .catch(error => {
-          console.error("Error:", error);
-          dispatch({
-            type: actionTypes.connections.setLoadingPetriNetData,
-            payload: {
-              connectionUri: connectionUri,
-              loadingPetriNetData: false,
-            },
-          });
-        });
-    }
-
-    if (toAutoClaim) {
-      const theirConnectionUri = event.getSenderConnection();
-      const ownedAtomUri = event.getRecipientAtom();
-      const ownNodeUri = event.getRecipientNode();
-      const theirAtomUri = event.getSenderAtom();
-      const theirNodeUri = event.getSenderNode();
-
-      let referencedContentUris = new Map().set("claims", [
-        { "@id": event.getIsRemoteResponseTo() },
-      ]);
-
-      /*
-      This Dispatch is similar to the one we use in connection-actions.js ->
-        function connectionsChatMessage(...)
-        The part where we iterate over all the references and send the dispatches to mark the
-        message appropriately. usually we need to check whether the messageUri to be marked is
-        the remoteMessageUri or the ownMessageUri, but since the autoClaim will only be executed
-        on ownMessages we do not need this check here
-       */
-      /*TODO:
-       Since we set a messageToBe (successfully) claimed before we even know if the transition was successful
-       we might need to rethink this implementation in favor of a dirtyState somehow, and remove the dirty state on success
-       of the message(if(toRefreshData)-part above)... but for now and because
-       connectionsChateMessage does not do this either it will do...*/
-      dispatch({
-        type: actionTypes.messages.messageStatus.markAsClaimed,
-        payload: {
-          messageUri: event.getIsRemoteResponseTo(),
-          connectionUri: connectionUri,
-          atomUri: ownedAtomUri,
-          claimed: true,
-        },
-      });
-
-      buildChatMessage({
-        chatMessage: undefined,
-        additionalContent: undefined,
-        referencedContentUris: referencedContentUris,
-        connectionUri,
-        ownedAtomUri,
-        theirAtomUri,
-        ownNodeUri,
-        theirNodeUri,
-        theirConnectionUri,
-        isTTL: false,
-      })
-        .then(msgData =>
-          Promise.all([
-            won.wonMessageFromJsonLd(msgData.message),
-            msgData.message,
-          ])
-        )
-        .then(([optimisticEvent, jsonldMessage]) => {
-          dispatch({
-            type: actionTypes.connections.sendChatMessageRefreshDataOnSuccess,
-            payload: {
-              eventUri: optimisticEvent.getMessageUri(),
-              message: jsonldMessage,
-              optimisticEvent,
-            },
-          });
-        })
-        .catch(e => {
-          console.error("Error while processing chat message: ", e);
-          dispatch({
-            type: actionTypes.connections.sendChatMessageFailed,
-            payload: {
-              error: e,
-              message: e.message,
-            },
-          });
-        });
-    }
-
-    if (toDispatchList) {
-      toDispatchList.forEach(d => {
-        if (d.type) {
-          dispatch(d);
-        } else {
-          // if an adHocConnection was successfully created, go to the correct connectionUri
-          if (d.connectionUri === "responseEvent::receiverUri") {
-            dispatch(
-              actionCreators.router__stateGoCurrent({
-                connectionUri,
-              })
-            );
-          }
-        }
-      });
-    }
-    //the reducer will delete the toDispatchList for successOwn and failureOwn
-    dispatch({
-      type: actionTypes.messages.dispatchActionOn.successRemote,
-      payload: {
-        eventUri: messageUri,
-      },
-    });
-  };
-}
-
-/**
- * Dispatches actions registered for the "failureRemote" event for the specified message uri.
- * The corresponding reducer clears any registered actions for the "successRemote" event
- */
-export function dispatchActionOnFailureRemote(event) {
-  return (dispatch, getState) => {
-    const toDispatchList = getState().getIn([
-      "messages",
-      "dispatchOnFailureRemote",
-      event.getIsRemoteResponseTo(),
-    ]);
-    if (toDispatchList) {
-      toDispatchList.forEach(d => {
-        dispatch(d);
-      });
-    }
-    //the reducer will delete the toDispatchList for successOwn and failureOwn
-    dispatch({
-      type: actionTypes.messages.dispatchActionOn.failureRemote,
-      payload: {
-        eventUri: event.getIsRemoteResponseTo(),
-      },
-    });
   };
 }

@@ -72,12 +72,12 @@
 
 
  # signature of the owner's permanent part of data:
-  :OWN1 sig:signature [
+  :OWN1 msg:Signature [
         rdf:type sig:WonSignature ;
         sig:creator <http://example.com/webid#key-5>;
         sig:created
                 "2013-09-252T10:49:54.050+0000";
-        sig:signatureValue
+        msg:signatureValue
   "OGQzNGVkMzVmMmQ3ODIyOWM32MzQzNmExMgoYzI4ZDY3NjI4NTIyZTk=" . ] .
 }
 
@@ -85,10 +85,10 @@
 # the full varification of this would require to verify the node signed
 # data with this signature, and then the data of the owner with the
 # owner's signature
-:NOD1 sig:signature [
+:NOD1 msg:Signature [
       rdf:type sig:WonSignature ;
       sig:creator <http://example.com/webid#key-6>;
       sig:created
         "2013-09-252T10:49:54.054+0000";
-      sig:signatureValue
+      msg:signatureValue
   "ABCzNGVkMzVmMmQ3ODIyOWM32MzQzNmExMgoYzI4ZDY3NjI4NTIyOpN=" . ] .

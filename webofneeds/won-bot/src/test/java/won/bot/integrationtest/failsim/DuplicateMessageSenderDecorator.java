@@ -11,7 +11,9 @@
 package won.bot.integrationtest.failsim;
 
 import won.bot.framework.eventbot.EventListenerContext;
+import won.protocol.message.WonMessage;
 import won.protocol.message.sender.WonMessageSender;
+import won.protocol.message.sender.exception.WonMessageSenderException;
 
 /**
  * Decorates the EventListenerContext such that the bot sends each message
@@ -25,9 +27,22 @@ public class DuplicateMessageSenderDecorator extends BaseEventListenerContextDec
     @Override
     public WonMessageSender getWonMessageSender() {
         final WonMessageSender delegate = super.getWonMessageSender();
-        return message -> {
-            delegate.sendWonMessage(message);
-            delegate.sendWonMessage(message);
+        return new WonMessageSender() {
+            @Override
+            public void sendMessage(WonMessage message) throws WonMessageSenderException {
+                delegate.sendMessage(message);
+                delegate.sendMessage(message);
+            }
+
+            @Override
+            public WonMessage prepareMessage(WonMessage message) throws WonMessageSenderException {
+                return delegate.prepareMessage(message);
+            }
+
+            @Override
+            public void prepareAndSendMessage(WonMessage message) throws WonMessageSenderException {
+                sendMessage(prepareMessage(message));
+            }
         };
     }
 }

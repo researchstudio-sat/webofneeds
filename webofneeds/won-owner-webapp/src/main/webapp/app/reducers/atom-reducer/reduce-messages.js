@@ -2,23 +2,16 @@ import { parseMessage } from "./parse-message.js";
 import { markUriAsRead } from "../../won-localstorage.js";
 import { markConnectionAsRead } from "./reduce-connections.js";
 import { addAtomStub } from "./reduce-atoms.js";
-import { getOwnMessageUri } from "../../redux/utils/message-utils.js";
 import * as connectionSelectors from "../../redux/selectors/connection-selectors.js";
-import { getIn } from "../../utils.js";
+import * as generalSelectors from "../../redux/selectors/general-selectors.js";
+import * as connectionUtils from "../../redux/utils/connection-utils.js";
+import { get, getIn } from "../../utils.js";
 
-/*
- "alreadyProcessed" flag, which indicates that we do not care about the
- sent status anymore and assume that it has been successfully sent to each server (incl. the remote)
- "insertIntoConnUri" and "insertIntoAtomUri" are used for forwardedMessages so that the message is
- stored within the given connection/atom and not in the original atom or connection as we might not
- have these stored in the state
- */
 export function addMessage(
   state,
   wonMessage,
   alreadyProcessed = false,
-  insertIntoConnUri = undefined,
-  insertIntoAtomUri = undefined
+  eventUriOverride = undefined
 ) {
   // we used to exclude messages without content here, using
   // if (wonMessage.getContentGraphs().length > 0) as the condition
@@ -33,136 +26,183 @@ export function addMessage(
   // throwing off the message rendering.
   // New solution: parse anything that is not a response, but allow responses with content
   if (!wonMessage.isResponse() || wonMessage.getContentGraphs().length > 0) {
-    let parsedMessage = parseMessage(
-      wonMessage,
-      alreadyProcessed,
-      insertIntoConnUri && insertIntoAtomUri
-    );
+    let parsedMessage = parseMessage(wonMessage, alreadyProcessed, false);
     if (parsedMessage) {
-      const connectionUri =
-        insertIntoConnUri || parsedMessage.get("belongsToUri");
-      const hasContainedForwardedWonMessages = wonMessage.hasContainedForwardedWonMessages();
+      if (eventUriOverride) {
+        // In Some cases (like if we send a message) we need to override the messageUri in the wonMessage with the correct one
+        parsedMessage = parsedMessage.setIn(["data", "uri"], eventUriOverride);
+      }
+      const allAtomsInState = state;
+      const senderSocketUri = wonMessage.getSenderSocket();
+      const targetSocketUri = wonMessage.getTargetSocket();
 
-      let atomUri = insertIntoAtomUri;
-      if (!atomUri && parsedMessage.getIn(["data", "outgoingMessage"])) {
-        // atomUri is the message's senderAtom
-        atomUri = wonMessage.getSenderAtom();
-      } else if (!atomUri) {
-        // atomUri is the remote message's recipientAtom
-        atomUri = wonMessage.getRecipientAtom();
-        if (
-          parsedMessage.getIn(["data", "unread"]) &&
-          !(
-            hasContainedForwardedWonMessages &&
-            connectionSelectors.isChatToGroupConnection(
-              state,
-              getIn(state, [atomUri, "connections", connectionUri])
-            )
-          )
-        ) {
-          //If there is a new message for the connection we will set the connection to newConnection
-          state = state.setIn(
-            [atomUri, "lastUpdateDate"],
-            parsedMessage.getIn(["data", "date"])
-          );
-          state = state.setIn([atomUri, "unread"], true);
-          state = state.setIn(
-            [atomUri, "connections", connectionUri, "lastUpdateDate"],
-            parsedMessage.getIn(["data", "date"])
-          );
-          state = state.setIn(
-            [atomUri, "connections", connectionUri, "unread"],
-            true
-          );
-        }
-      } else if (
-        atomUri &&
-        connectionSelectors.isChatToGroupConnection(
-          state,
-          getIn(state, [atomUri, "connections", connectionUri])
-        ) &&
-        !hasContainedForwardedWonMessages
-      ) {
-        if (parsedMessage.getIn(["data", "unread"])) {
-          //If there is a new message for the connection we will set the connection to newConnection
-          state = state.setIn(
-            [atomUri, "lastUpdateDate"],
-            parsedMessage.getIn(["data", "date"])
-          );
-          state = state.setIn([atomUri, "unread"], true);
-          state = state.setIn(
-            [atomUri, "connections", connectionUri, "lastUpdateDate"],
-            parsedMessage.getIn(["data", "date"])
-          );
-          state = state.setIn(
-            [atomUri, "connections", connectionUri, "unread"],
-            true
-          );
-        }
+      const senderAtomUri = generalSelectors.getAtomUriBySocketUri(
+        wonMessage.getSenderSocket()
+      );
+      const targetAtomUri = generalSelectors.getAtomUriBySocketUri(
+        wonMessage.getTargetSocket()
+      );
+      const senderAtom = get(allAtomsInState, senderAtomUri);
+      const targetAtom = get(allAtomsInState, targetAtomUri);
+
+      const senderConnection =
+        senderAtom &&
+        get(senderAtom, "connections").find(conn =>
+          connectionUtils.hasSocketUris(conn, senderSocketUri, targetSocketUri)
+        );
+      const targetConnection =
+        targetAtom &&
+        get(targetAtom, "connections").find(conn =>
+          connectionUtils.hasSocketUris(conn, targetSocketUri, senderSocketUri)
+        );
+
+      if (targetAtomUri && !state.has(targetAtomUri)) {
+        console.debug("Target Atom is not in the state yet, we need to add it");
+        state = addAtomStub(state, targetAtomUri);
+      }
+      if (senderAtomUri && !state.has(senderAtomUri)) {
+        console.debug("Sender Atom is not in the state yet, we need to add it");
+        state = addAtomStub(state, senderAtomUri);
       }
 
-      const originatorUri = parsedMessage.getIn(["data", "originatorUri"]);
-
-      if (originatorUri) {
-        //Message is originally from another atom, we might need to add the atom as well
-        if (!state.has(originatorUri)) {
-          console.debug(
-            "Originator Atom is not in the state yet, we need to add it"
-          );
-          state = addAtomStub(state, originatorUri);
-        }
-      }
-
-      if (atomUri) {
-        if (hasContainedForwardedWonMessages) {
-          const containedForwardedWonMessages = wonMessage.getContainedForwardedWonMessages();
-          containedForwardedWonMessages.map(forwardedWonMessage => {
-            state = addMessage(
-              state,
-              forwardedWonMessage,
-              true,
-              connectionUri,
-              atomUri
-            );
-            //PARSE MESSAGE DIFFERENTLY FOR FORWARDED MESSAGES
-          });
-        }
+      if (senderConnection) {
+        const senderConnectionUri = get(senderConnection, "uri");
+        console.debug(
+          "Store message in senderConnection(",
+          senderConnectionUri,
+          "):",
+          senderConnection
+        );
+        parsedMessage = parsedMessage.setIn(["data", "outgoingMessage"], true);
 
         let messages = state.getIn([
-          atomUri,
+          senderAtomUri,
           "connections",
-          connectionUri,
+          senderConnectionUri,
           "messages",
         ]);
-        if (!messages) {
+        console.debug("already stored messages: ", messages);
+        if (messages) {
+          console.debug("messages exist adding new message");
           //ignore messages for nonexistant connections
-          return state;
-        }
 
-        /*
-        Group Chat messages that are received are in the form of injected/referenced messages
-        But we do not want to display these messages in that manner, therefore we simply ignore
-        the encapsulating message and not store it within our state.
-        */
-        if (
-          !(
-            hasContainedForwardedWonMessages &&
-            connectionSelectors.isChatToGroupConnection(
-              state,
-              getIn(state, [atomUri, "connections", connectionUri])
-            )
-          )
-        ) {
+          const existingMessage = messages.get(
+            parsedMessage.getIn(["data", "uri"])
+          );
+
+          const isReceivedByOwn = !!get(existingMessage, "isReceivedByOwn");
+          const isReceivedByRemote = !!get(
+            existingMessage,
+            "isReceivedByRemote"
+          );
+
+          if (!alreadyProcessed && (isReceivedByOwn || isReceivedByRemote)) {
+            parsedMessage = parsedMessage
+              .setIn(["data", "isReceivedByOwn"], isReceivedByOwn)
+              .setIn(["data", "isReceivedByRemote"], isReceivedByRemote);
+          }
+
           messages = messages.set(
             parsedMessage.getIn(["data", "uri"]),
             parsedMessage.get("data")
           );
+          console.debug("new stored messages: ", messages);
+
+          state = state.setIn(
+            [senderAtomUri, "connections", senderConnectionUri, "messages"],
+            messages
+          );
+        }
+      }
+
+      if (targetConnection) {
+        const targetConnectionUri = get(targetConnection, "uri");
+        console.debug(
+          "Store message in targetConnection(",
+          targetConnectionUri,
+          "):",
+          targetConnection
+        );
+        parsedMessage = parsedMessage.setIn(["data", "outgoingMessage"], false);
+
+        if (
+          parsedMessage.getIn(["data", "unread"]) &&
+          !connectionSelectors.isChatToGroupConnection(
+            state,
+            getIn(state, [targetAtomUri, "connections", targetConnectionUri])
+          )
+        ) {
+          //If there is a new message for the connection we will set the connection to newConnection
+          state = state.setIn(
+            [targetAtomUri, "lastUpdateDate"],
+            parsedMessage.getIn(["data", "date"])
+          );
+          state = state.setIn([targetAtomUri, "unread"], true);
+          state = state.setIn(
+            [
+              targetAtomUri,
+              "connections",
+              targetConnectionUri,
+              "lastUpdateDate",
+            ],
+            parsedMessage.getIn(["data", "date"])
+          );
+          state = state.setIn(
+            [targetAtomUri, "connections", targetConnectionUri, "unread"],
+            true
+          );
         }
 
-        return state.setIn(
-          [atomUri, "connections", connectionUri, "messages"],
-          messages
-        );
+        let messages = state.getIn([
+          targetAtomUri,
+          "connections",
+          targetConnectionUri,
+          "messages",
+        ]);
+        console.debug("already stored messages: ", messages);
+        if (messages) {
+          console.debug("messages exist adding new message");
+          //ignore messages for nonexistant connections
+
+          /*
+            Group Chat messages that are received are in the form of injected/referenced messages
+            But we do not want to display these messages in that manner, therefore we simply ignore
+            the encapsulating message and not store it within our state.
+            */
+          if (
+            !connectionSelectors.isChatToGroupConnection(
+              state,
+              getIn(state, [targetAtomUri, "connections", targetConnectionUri])
+            )
+          ) {
+            const existingMessage = messages.get(
+              parsedMessage.getIn(["data", "uri"])
+            );
+
+            const isReceivedByOwn = !!get(existingMessage, "isReceivedByOwn");
+            const isReceivedByRemote = !!get(
+              existingMessage,
+              "isReceivedByRemote"
+            );
+
+            if (!alreadyProcessed && (isReceivedByOwn || isReceivedByRemote)) {
+              parsedMessage = parsedMessage
+                .setIn(["data", "isReceivedByOwn"], isReceivedByOwn)
+                .setIn(["data", "isReceivedByRemote"], isReceivedByRemote);
+            }
+
+            messages = messages.set(
+              parsedMessage.getIn(["data", "uri"]),
+              parsedMessage.get("data")
+            );
+            console.debug("new stored messages: ", messages);
+          }
+
+          state = state.setIn(
+            [targetAtomUri, "connections", targetConnectionUri, "messages"],
+            messages
+          );
+        }
       }
     }
   }
@@ -525,10 +565,9 @@ export function markMessageAsRejected(
 
   if (proposedToCancelReferences) {
     proposedToCancelReferences.forEach(proposedToCancelRef => {
-      const correctMessageUri = getOwnMessageUri(messages, proposedToCancelRef);
       state = markMessageAsCancellationPending(
         state,
-        correctMessageUri,
+        proposedToCancelRef,
         connectionUri,
         atomUri,
         false
@@ -540,10 +579,9 @@ export function markMessageAsRejected(
 
   if (proposesReferences) {
     proposesReferences.forEach(proposesRef => {
-      const correctMessageUri = getOwnMessageUri(messages, proposesRef);
       state = markMessageAsProposed(
         state,
-        correctMessageUri,
+        proposesRef,
         connectionUri,
         atomUri,
         false
@@ -555,10 +593,9 @@ export function markMessageAsRejected(
 
   if (claimsReferences) {
     claimsReferences.forEach(claimsRef => {
-      const correctMessageUri = getOwnMessageUri(messages, claimsRef);
       state = markMessageAsClaimed(
         state,
-        correctMessageUri,
+        claimsRef,
         connectionUri,
         atomUri,
         false
@@ -632,10 +669,9 @@ export function markMessageAsRetracted(
 
   if (proposedToCancelReferences) {
     proposedToCancelReferences.forEach(proposedToCancelRef => {
-      const correctMessageUri = getOwnMessageUri(messages, proposedToCancelRef);
       state = markMessageAsCancellationPending(
         state,
-        correctMessageUri,
+        proposedToCancelRef,
         connectionUri,
         atomUri,
         false
@@ -647,10 +683,9 @@ export function markMessageAsRetracted(
 
   if (proposesReferences) {
     proposesReferences.forEach(proposesRef => {
-      const correctMessageUri = getOwnMessageUri(messages, proposesRef);
       state = markMessageAsProposed(
         state,
-        correctMessageUri,
+        proposesRef,
         connectionUri,
         atomUri,
         false
@@ -662,10 +697,9 @@ export function markMessageAsRetracted(
 
   if (claimsReferences) {
     claimsReferences.forEach(claimsRef => {
-      const correctMessageUri = getOwnMessageUri(messages, claimsRef);
       state = markMessageAsClaimed(
         state,
-        correctMessageUri,
+        claimsRef,
         connectionUri,
         atomUri,
         false
@@ -838,10 +872,9 @@ export function markMessageAsAccepted(
 
   if (proposedToCancelReferences) {
     proposedToCancelReferences.forEach(proposedToCancelRef => {
-      const correctMessageUri = getOwnMessageUri(messages, proposedToCancelRef);
       state = markMessageAsCancelled(
         state,
-        correctMessageUri,
+        proposedToCancelRef,
         connectionUri,
         atomUri,
         true

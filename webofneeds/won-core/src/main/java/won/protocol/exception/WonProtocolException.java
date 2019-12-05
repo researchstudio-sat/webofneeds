@@ -13,7 +13,7 @@ package won.protocol.exception;
 /**
  * User: fkleedorfer Date: 02.11.12
  */
-public class WonProtocolException extends Exception {
+public class WonProtocolException extends RuntimeException {
     public WonProtocolException() {
         super();
     }

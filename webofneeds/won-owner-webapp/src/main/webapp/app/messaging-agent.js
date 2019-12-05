@@ -23,7 +23,6 @@ import { ownerBaseUrl } from "~/config/default.js";
 import urljoin from "url-join";
 
 import { actionTypes, actionCreators } from "./actions/actions.js";
-//import './message-service.js'; //TODO still uses es5
 import SockJS from "sockjs-client";
 
 const ECHO_STRING = "e";
@@ -36,12 +35,23 @@ export function runMessagingAgent(redux) {
    */
   const messageProcessingArray = [
     function(message) {
-      /* Other clients or matcher initiated stuff: */
-      if (message.isFromExternal() && message.isAtomHintMessage()) {
-        console.warn(
-          "Omit further handling of received AtomHintMessage: ",
+      if (message.isCreateMessage()) {
+        console.debug(
+          "Received Create Message: ",
           message,
-          "TODO: IMPL"
+          "... no further handling for now"
+        );
+        return true;
+      }
+      return false;
+    },
+    function(message) {
+      /* Other clients or matcher initiated stuff: */
+      if (message.isAtomHintMessage()) {
+        console.debug(
+          "Received AtomHint Message: ",
+          message,
+          "... no further handling for now"
         );
         /*redux.dispatch(
           actionCreators.messages__processAtomHintMessage(message)
@@ -52,7 +62,8 @@ export function runMessagingAgent(redux) {
     },
     function(message) {
       /* Other clients or matcher initiated stuff: */
-      if (message.isFromExternal() && message.isSocketHintMessage()) {
+      if (message.isSocketHintMessage()) {
+        console.debug("Received SocketHint Message: ", message);
         redux.dispatch(
           actionCreators.messages__processSocketHintMessage(message)
         );
@@ -62,21 +73,15 @@ export function runMessagingAgent(redux) {
     },
     function(message) {
       if (message.isConnectMessage()) {
+        console.debug("Received Connect Message: ", message);
         redux.dispatch(actionCreators.messages__processConnectMessage(message));
         return true;
       }
       return false;
     },
     function(message) {
-      if (message.isOpenMessage()) {
-        //someone accepted our contact request
-        redux.dispatch(actionCreators.messages__processOpenMessage(message));
-        return true;
-      }
-      return false;
-    },
-    function(message) {
       if (message.isConnectionMessage()) {
+        console.debug("Received Connection Message: ", message);
         redux.dispatch(
           actionCreators.messages__processConnectionMessage(message)
         );
@@ -86,6 +91,7 @@ export function runMessagingAgent(redux) {
     },
     function(message) {
       if (message.isChangeNotificationMessage()) {
+        console.debug("Received ChangeNotification Message: ", message);
         redux.dispatch(
           actionCreators.messages__processChangeNotificationMessage(message)
         );
@@ -95,6 +101,8 @@ export function runMessagingAgent(redux) {
     },
     function(message) {
       if (message.isFromExternal() && message.isCloseMessage()) {
+        //TODO: isFromExternal was removed, adapt accordingly
+        console.debug("Received Close Message: ", message);
         redux.dispatch(actionCreators.messages__close__success(message));
         return true;
       }
@@ -125,13 +133,21 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isResponseToConnectMessage()) {
         if (message.isSuccessResponse()) {
-          if (message.isFromExternal()) {
+          if (isFromRemote(redux, message)) {
+            console.debug(
+              "remoteSuccess for connect: ",
+              message.getIsResponseTo()
+            );
             // got the second success-response (from the remote-node) - 2nd ACK
             redux.dispatch(
               actionCreators.messages__connect__successRemote(message)
             );
             return true;
           } else {
+            console.debug(
+              "ownSuccess for connect: ",
+              message.getIsResponseTo()
+            );
             // got the first success-response (from our own node) - 1st ACK
             redux.dispatch(
               actionCreators.messages__connect__successOwn(message)
@@ -139,6 +155,7 @@ export function runMessagingAgent(redux) {
             return true;
           }
         } else if (message.isFailureResponse()) {
+          console.debug("Received Failure to Connect Message: ", message);
           redux.dispatch(actionCreators.messages__connect__failure(message));
           return true;
         }
@@ -148,13 +165,21 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isResponseToConnectionMessage()) {
         if (message.isSuccessResponse()) {
-          if (message.isFromExternal()) {
+          if (isFromRemote(redux, message)) {
+            console.debug(
+              "remoteSuccess for chatmsg: ",
+              message.getIsResponseTo()
+            );
             // got the second success-response (from the remote-node) - 2nd ACK
             redux.dispatch(
               actionCreators.messages__chatMessage__successRemote(message)
             );
             return true;
           } else {
+            console.debug(
+              "ownSuccess for chatmsg: ",
+              message.getIsResponseTo()
+            );
             // got the first success-response (from our own node) - 1st ACK
             redux.dispatch(
               actionCreators.messages__chatMessage__successOwn(message)
@@ -171,38 +196,6 @@ export function runMessagingAgent(redux) {
       return false;
     },
     function(message) {
-      if (message.isResponseToOpenMessage()) {
-        if (message.isSuccessResponse()) {
-          if (message.isFromExternal()) {
-            // got the second success-response (from the remote-node) - 2nd ACK
-            redux.dispatch(
-              actionCreators.messages__open__successRemote(message)
-            );
-            return true;
-          } else {
-            // got the first success-response (from our own node) - 1st ACK
-            redux.dispatch(actionCreators.messages__open__successOwn(message));
-            return true;
-          }
-        } else if (message.isFailureResponse()) {
-          redux.dispatch(actionCreators.messages__open__failure(message));
-
-          /*
-                     * as the failure should hit right after the open went out
-                     * and should be rather rare, we can redirect in the optimistic
-                     * case (see connection-actions.js) and go back if it fails.
-                     */
-          redux.dispatch(
-            actionCreators.router__stateGoAbs("connections", {
-              connectionUri: message.getSenderConnection(),
-            })
-          );
-          return true;
-        }
-      }
-      return false;
-    },
-    function(message) {
       if (message.isResponseToCloseMessage()) {
         if (message.isSuccessResponse()) {
           //JUMP HERE AND ONLY HERE WHEN CLOSE MESSAGES COME IN!
@@ -210,7 +203,7 @@ export function runMessagingAgent(redux) {
           return true;
         } else if (message.isFailureResponse()) {
           //Resend the failed close message
-          const connectionUri = message.getSenderConnection();
+          const connectionUri = message.getConnection();
           if (connectionUri) {
             console.warn("RESEND CLOSE MESSAGE FOR: ", connectionUri);
             redux.dispatch(actionCreators.connections__closeRemote(message));
@@ -253,6 +246,7 @@ export function runMessagingAgent(redux) {
     },
     function(message) {
       if (message.isFromSystem() && message.isCloseMessage()) {
+        console.debug("Received Close Message From System: ", message);
         redux.dispatch({
           type: actionTypes.messages.close.success,
           payload: message,
@@ -269,7 +263,7 @@ export function runMessagingAgent(redux) {
         redux.dispatch({
           type: actionTypes.atoms.close,
           payload: {
-            ownedAtomUri: message.getRecipientAtom(),
+            ownedAtomUri: message.getAtom(),
           },
         });
         return true;
@@ -285,15 +279,7 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isResponseToDeleteMessage()) {
         if (message.isSuccessResponse()) {
-          redux.dispatch(
-            actionCreators.atoms__delete(message.getRecipientAtom())
-          );
-          /*redux.dispatch({
-            type: actionTypes.atoms.delete,
-            payload: {
-              ownedAtomUri: message.getRecipientAtom(),
-            },
-          });*/
+          redux.dispatch(actionCreators.atoms__delete(message.getAtom()));
           return true;
         }
       }
@@ -314,75 +300,56 @@ export function runMessagingAgent(redux) {
     },
   ];
 
-  // processors that are used for reacting to certain messages after they
-  // have been processed normally
-  const messagePostProcessingArray = [
-    function(message) {
-      if (message.isFromSystem() && message.isSuccessResponse()) {
-        redux.dispatch(
-          actionCreators.messages__dispatchActionOn__successOwn(message)
-        );
-        return true;
-      }
-      return false;
-    },
-    function(message) {
-      if (message.isFromSystem() && message.isFailureResponse()) {
-        redux.dispatch(
-          actionCreators.messages__dispatchActionOn__failureOwn(message)
-        );
-        return true;
-      }
-      return false;
-    },
-    function(message) {
-      if (message.isFromExternal() && message.isSuccessResponse()) {
-        redux.dispatch(
-          actionCreators.messages__dispatchActionOn__successRemote(message)
-        );
-        return true;
-      }
-      return false;
-    },
-    function(message) {
-      if (message.isFromExternal() && message.isFailureResponse()) {
-        redux.dispatch(
-          actionCreators.messages__dispatchActionOn__failureRemote(message)
-        );
-        return true;
-      }
-      return false;
-    },
-  ];
-
   function onMessage(receivedMsg) {
     //reset the heartbeat counter when we receive a message.
     missedHeartbeats = 0;
 
     const data = JSON.parse(receivedMsg.data);
 
-    won.wonMessageFromJsonLd(data).then(message => {
-      won.addJsonLdData(data);
+    const graphArray = data["@graph"];
+    const messages = {};
 
-      let messageProcessed = false;
+    graphArray.forEach(graph => {
+      const msgUri = graph["@id"].split("#")[0];
+      const singleMessage = messages[msgUri];
 
-      //process message
-      for (const messageProcessor of messageProcessingArray) {
-        messageProcessed = messageProcessed || messageProcessor(message);
-      }
-
-      //post-process message
-      for (const messagePostprocessor of messagePostProcessingArray) {
-        messagePostprocessor(message);
-      }
-
-      if (!messageProcessed) {
-        console.warn(
-          "MESSAGE WASN'T PROCESSED DUE TO MISSING HANDLER FOR ITS TYPE: ",
-          message
-        );
+      if (singleMessage) {
+        singleMessage["@graph"].push(graph);
+      } else {
+        messages[msgUri] = { "@graph": [graph] };
       }
     });
+
+    console.debug("WS received Msgs:", messages);
+
+    for (const msgUri in messages) {
+      const msg = messages[msgUri];
+      won.wonMessageFromJsonLd(msg).then(message => {
+        console.debug(
+          "      WS received: ",
+          message.getMessageType(),
+          " - ",
+          message.getMessageUri(),
+          " - ",
+          message.getTextMessage()
+        );
+        won.addJsonLdData(msg);
+
+        let messageProcessed = false;
+
+        //process message
+        for (const messageProcessor of messageProcessingArray) {
+          messageProcessed = messageProcessed || messageProcessor(message);
+        }
+
+        if (!messageProcessed) {
+          console.warn(
+            "MESSAGE WASN'T PROCESSED DUE TO MISSING HANDLER FOR ITS TYPE: ",
+            message
+          );
+        }
+      });
+    }
   }
 
   /* TODOs
@@ -464,38 +431,7 @@ export function runMessagingAgent(redux) {
       redux.dispatch(actionCreators.reconnect__success());
     }
 
-    const sendFirstInBuffer = function(newMsgBuffer) {
-      if (newMsgBuffer && !newMsgBuffer.isEmpty()) {
-        try {
-          const firstEntry = newMsgBuffer.entries().next().value;
-          if (firstEntry && ws.readyState === SockJS.OPEN) {
-            //undefined if queue is empty
-            if (firstEntry.length != 2) {
-              console.error(
-                "Could not send message, did not find a uri/message pair in the message buffer. The first Entry in the buffer is:",
-                firstEntry
-              );
-              return;
-            }
-            const [eventUri, msg] = firstEntry;
-            ws.send(JSON.stringify(msg));
-            // move message to next stat ("waitingForAnswer"). Also triggers this watch again as a result.
-            redux.dispatch(
-              actionCreators.messages__waitingForAnswer({ eventUri, msg })
-            );
-          }
-        } catch (error) {
-          console.error("could not send message due to this error", error);
-        }
-      }
-    };
-
     if (unsubscribeWatches.length === 0) {
-      const unsubscribeMsgQWatch = watchImmutableRdxState(
-        redux,
-        ["messages", "enqueued"],
-        newMsgBuffer => sendFirstInBuffer(newMsgBuffer)
-      );
       const unsubscribeReconnectWatch = watchImmutableRdxState(
         redux,
         ["messages", "reconnecting"],
@@ -515,13 +451,8 @@ export function runMessagingAgent(redux) {
         }
       );
 
-      unsubscribeWatches.push(unsubscribeMsgQWatch);
       unsubscribeWatches.push(unsubscribeReconnectWatch);
     }
-
-    //if there are enqueued messages, send the first one, (sending the rest should be triggered by the watch we just created)
-    const currentMsgBuffer = getIn(redux.getState(), ["messages", "enqueued"]);
-    sendFirstInBuffer(currentMsgBuffer);
   }
   function onError(e) {
     console.error("messaging-agent.js: websocket error: ", e);
@@ -619,4 +550,11 @@ function watchImmutableRdxState(redux, path, callback) {
   };
 
   return watch(redux.subscribe, () => getIn(redux.getState(), path), callback);
+}
+
+function isFromRemote(redux, wonMessage) {
+  const senderSocketUri = wonMessage.getSenderSocket();
+  const targetSocketUri = wonMessage.getTargetSocket();
+
+  return senderSocketUri !== targetSocketUri;
 }

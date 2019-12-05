@@ -5,16 +5,17 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.sparql.util.IsoMatcher;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import won.protocol.util.RdfUtils;
 
 /**
  * User: ypanchenko Date: 05.08.2014
  */
+@Ignore
 public class EncodeDecodeMessageTest {
     private static final Lang LANG = Lang.JSONLD;
     // private static final Lang LANG = Lang.TRIG;

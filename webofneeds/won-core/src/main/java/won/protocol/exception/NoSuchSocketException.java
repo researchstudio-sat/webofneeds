@@ -6,7 +6,7 @@ import java.text.MessageFormat;
 /**
  * User: LEIH-NB Date: 20.02.14
  */
-public class NoSuchSocketException extends Throwable {
+public class NoSuchSocketException extends WonProtocolException {
     private URI unknownSocketURI;
 
     public URI getUnknownAtomURI() {
@@ -14,7 +14,7 @@ public class NoSuchSocketException extends Throwable {
     }
 
     public NoSuchSocketException(final URI unknownSocketURI) {
-        super(MessageFormat.format("No atom with the URI {0} is known on this server.", unknownSocketURI));
+        super(MessageFormat.format("No socket with the URI {0} is known on this server.", unknownSocketURI));
         this.unknownSocketURI = unknownSocketURI;
     }
 }

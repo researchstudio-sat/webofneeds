@@ -13,6 +13,7 @@ package won.bot.framework.bot.base;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.Executor;
 
 import org.apache.jena.query.Dataset;
@@ -31,7 +32,6 @@ import won.bot.framework.eventbot.bus.impl.AsyncEventBusImpl;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomCreatedEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
-import won.bot.framework.eventbot.event.impl.lifecycle.ErrorEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.InitializeEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.ShutdownEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent;
@@ -39,14 +39,12 @@ import won.bot.framework.eventbot.event.impl.wonmessage.CloseFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SocketHintFromMatcherEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentOnConnectionEvent;
 import won.bot.framework.eventbot.filter.impl.AtomUriInNamedListFilter;
 import won.bot.framework.eventbot.filter.impl.NotFilter;
-import won.bot.framework.eventbot.listener.BaseEventListener;
 import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
 import won.protocol.matcher.MatcherProtocolAtomServiceClientSide;
@@ -58,6 +56,7 @@ import won.protocol.model.Connection;
 import won.protocol.model.SocketType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
  * Base class for bots that define their behaviour through event listeners. Once
@@ -159,17 +158,6 @@ public abstract class EventBot extends ScheduledTriggerBot {
     }
 
     @Override
-    public final void onOpenFromOtherAtom(final Connection con, final WonMessage wonMessage) {
-        logMessage(wonMessage);
-        if (getLifecyclePhase().isActive()) {
-            eventBus.publish(new OpenFromOtherAtomEvent(con, wonMessage));
-        } else {
-            logger.info("not publishing event for call to onOpenFromOtherAtom() as the bot is not in state {} but {}",
-                            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
-        }
-    }
-
-    @Override
     public void onConnectFromOtherAtom(final Connection con, final WonMessage wonMessage) {
         logMessage(wonMessage);
         if (getLifecyclePhase().isActive()) {
@@ -193,10 +181,11 @@ public abstract class EventBot extends ScheduledTriggerBot {
     }
 
     @Override
-    public final void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage) {
+    public final void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage,
+                    Optional<Connection> con) {
         logMessage(wonMessage);
         if (getLifecyclePhase().isActive()) {
-            eventBus.publish(new FailureResponseEvent(failedMessageUri, wonMessage));
+            eventBus.publish(new FailureResponseEvent(failedMessageUri, wonMessage, con));
         } else {
             logger.info("not publishing event for call to onFailureResponse() as the bot is not in state {} but {}",
                             BotLifecyclePhase.ACTIVE, getLifecyclePhase());
@@ -204,10 +193,11 @@ public abstract class EventBot extends ScheduledTriggerBot {
     }
 
     @Override
-    public final void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage) {
+    public final void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage,
+                    Optional<Connection> con) {
         logMessage(wonMessage);
         if (getLifecyclePhase().isActive()) {
-            eventBus.publish(new SuccessResponseEvent(successfulMessageUri, wonMessage));
+            eventBus.publish(new SuccessResponseEvent(successfulMessageUri, wonMessage, con));
         } else {
             logger.info("not publishing event for call to onSuccessResponse() as the bot is not in state {} but {}",
                             BotLifecyclePhase.ACTIVE, getLifecyclePhase());
@@ -238,7 +228,6 @@ public abstract class EventBot extends ScheduledTriggerBot {
         super.initialize();
         eventBus = new AsyncEventBusImpl(getExecutor());
         // add an eventHandler that reacts to errors
-        eventBus.subscribe(ErrorEvent.class, new ErrorEventListener(eventListenerContext));
         initializeEventListeners();
         eventBus.publish(new InitializeEvent());
     }
@@ -349,25 +338,6 @@ public abstract class EventBot extends ScheduledTriggerBot {
     }
 
     /**
-     * Event listener that will stop the bot by publishing a WorkDoneEvent if an
-     * ErrorEvent is seen. Expects to be registered for WorkDoneEvents and
-     * ErrorEvents and will not react to a WorkDoneEvent.
-     */
-    private class ErrorEventListener extends BaseEventListener {
-        public ErrorEventListener(EventListenerContext context) {
-            super(context);
-        }
-
-        @Override
-        protected void doOnEvent(final won.bot.framework.eventbot.event.Event event) throws Exception {
-            if (event instanceof ErrorEvent) {
-                Throwable t = ((ErrorEvent) event).getThrowable();
-                logger.info("Encountered an error:", t);
-            }
-        }
-    }
-
-    /**
      * Wraps a WonMessageSender so a WonMessageSentEvent can be published after a
      * message has been sent.
      */
@@ -379,22 +349,41 @@ public abstract class EventBot extends ScheduledTriggerBot {
         }
 
         @Override
-        public void sendWonMessage(final WonMessage message) throws WonMessageSenderException {
+        public void prepareAndSendMessage(WonMessage message) throws WonMessageSenderException {
+            sendMessage(prepareMessage(message));
+        }
+
+        @Override
+        public WonMessage prepareMessage(WonMessage message) throws WonMessageSenderException {
+            return delegate.prepareMessage(message);
+        }
+
+        @Override
+        public void sendMessage(final WonMessage message) throws WonMessageSenderException {
             if (logger.isDebugEnabled()) {
                 logger.debug("sending message " + message.toStringForDebug(true));
             }
-            delegate.sendWonMessage(message);
+            delegate.sendMessage(message);
             // publish the WonMessageSent event if no exception was raised
             WonMessageType type = message.getMessageType();
             Event event;
             // if the event is connection specific, raise a more specialized event
             switch (type) {
                 case CLOSE:
-                case CONNECT:
                 case CONNECTION_MESSAGE:
-                case OPEN:
-                    event = new WonMessageSentOnConnectionEvent(message);
+                    event = new WonMessageSentOnConnectionEvent(
+                                    WonLinkedDataUtils.getConnectionForOutgoingMessage(message, getLinkedDataSource())
+                                                    .orElseThrow(() -> new IllegalStateException(
+                                                                    "Could not obtain connection data for message "
+                                                                                    + message.toShortStringForDebug())),
+                                    message);
                     break;
+                case CONNECT:
+                    Optional<Connection> con = WonLinkedDataUtils.getConnectionForOutgoingMessage(message,
+                                    getLinkedDataSource());
+                    // in case of a connect, it's possible the connection does not exist yet.
+                    event = con.map(c -> (Event) new WonMessageSentOnConnectionEvent(c, message))
+                                    .orElseGet(() -> new WonMessageSentEvent(message));
                 default:
                     event = new WonMessageSentEvent(message);
             }

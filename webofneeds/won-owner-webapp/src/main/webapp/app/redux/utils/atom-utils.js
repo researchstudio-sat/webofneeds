@@ -287,6 +287,14 @@ export function hasSocket(atom, socket) {
   );
 }
 
+export function getChatSocket(atom) {
+  return getSocketUri(atom, won.CHAT.ChatSocketCompacted);
+}
+
+export function getGroupSocket(atom) {
+  return getSocketUri(atom, won.GROUP.GroupSocketCompacted);
+}
+
 export function hasSuggestedConnections(atom) {
   return (
     get(atom, "connections") &&
@@ -306,6 +314,18 @@ export function hasUnreadSuggestedConnections(atom) {
     get(atom, "connections") &&
     !!get(atom, "connections").find(
       conn => connectionUtils.isSuggested(conn) && get(conn, "unread")
+    )
+  );
+}
+
+export function getConnectionBySocketUris(atom, socketUri, targetSocketUri) {
+  const connections = get(atom, "connections");
+  return (
+    connections &&
+    connections.find(
+      conn =>
+        get(conn, "socketUri") === socketUri &&
+        get(conn, "targetSocketUri") === targetSocketUri
     )
   );
 }

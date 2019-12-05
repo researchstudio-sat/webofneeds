@@ -44,6 +44,8 @@ import {
   updatePetriNetStateData,
 } from "./reduce-connections.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
+import * as connectionUtils from "../../redux/utils/connection-utils.js";
+import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 
 const initialState = Immutable.fromJS({});
 
@@ -115,30 +117,6 @@ export default function(allAtomsInState = initialState, action = {}) {
     case actionTypes.atoms.delete:
       return deleteAtom(allAtomsInState, action.payload.get("uri"));
 
-    case actionTypes.personas.create: {
-      //FIXME: Please let us use the addAtom method as a single entry point to add Atoms(even Personas) to the State
-      return allAtomsInState.set(
-        action.payload.atomUri,
-        Immutable.fromJS({
-          jsonld: action.payload.persona,
-          isBeingCreated: true,
-          uri: action.payload.atomUri,
-          creationDate: new Date(),
-          content: {
-            type: Immutable.Set([
-              won.WON.AtomCompacted,
-              won.WON.PersonaCompacted,
-            ]),
-            sockets: Immutable.Map(),
-          },
-          connections: Immutable.Map(),
-          holds: Immutable.Set(),
-          buddies: Immutable.Set(),
-          rating: { aggregateRating: 0.0, reviewCount: 0 },
-        })
-      );
-    }
-
     case actionTypes.atoms.edit: {
       console.debug(
         "payload = {eventUri, message, atomUri, atom: draft, oldAtom}"
@@ -179,7 +157,6 @@ export default function(allAtomsInState = initialState, action = {}) {
     case actionTypes.atoms.createSuccessful:
       return addAtom(allAtomsInState, action.payload.atom);
 
-    case actionTypes.messages.openMessageReceived:
     case actionTypes.messages.connectMessageReceived: {
       const ownedAtomFromState = allAtomsInState.get(
         action.payload.ownedAtomUri
@@ -215,12 +192,113 @@ export default function(allAtomsInState = initialState, action = {}) {
         won.WON.Closed
       );
 
-    case actionTypes.atoms.connect: {
-      // user has sent a connect request
+    case actionTypes.atoms.connectSockets: {
+      const eventUri = action.payload.eventUri;
       const optimisticEvent = action.payload.optimisticEvent;
-      const ownedAtomUri = optimisticEvent.getSenderAtom();
-      const theirAtomUri = optimisticEvent.getRecipientAtom();
-      const eventUri = optimisticEvent.getMessageUri();
+      const senderSocketUri = action.payload.senderSocketUri;
+      const targetSocketUri = action.payload.targetSocketUri;
+
+      const senderAtomUri = generalSelectors.getAtomUriBySocketUri(
+        senderSocketUri
+      );
+      const targetAtomUri = generalSelectors.getAtomUriBySocketUri(
+        targetSocketUri
+      );
+      const senderAtom = get(allAtomsInState, senderAtomUri);
+      const affectedConnection =
+        senderAtom &&
+        get(senderAtom, "connections").find(conn =>
+          connectionUtils.hasSocketUris(conn, senderSocketUri, targetSocketUri)
+        );
+
+      if (affectedConnection) {
+        const cnctStateUpdated = changeConnectionStateByFun(
+          allAtomsInState,
+          get(affectedConnection, "uri"),
+          state => {
+            if (!state) return won.WON.RequestSent; //fallback if no state present
+            if (state === won.WON.Connected) return won.WON.Connected; //stay in connected if it was already the case
+            if (state === won.WON.RequestReceived) return won.WON.Connected;
+            if (state === won.WON.Suggested) return won.WON.RequestSent;
+            if (state === won.WON.Closed) return won.WON.RequestSent;
+          }
+        );
+        return addMessage(
+          cnctStateUpdated,
+          action.payload.optimisticEvent,
+          false,
+          eventUri
+        );
+      } else {
+        const tmpConnectionUri = "connectionFrom:" + eventUri;
+
+        //need to wait for success-response to set that
+        const optimisticConnection = Immutable.fromJS({
+          uri: tmpConnectionUri,
+          usingTemporaryUri: true,
+          state: won.WON.RequestSent,
+          targetAtomUri: targetAtomUri,
+          targetConnectionUri: undefined,
+          unread: false,
+          socketUri: senderSocketUri,
+          targetSocketUri: targetSocketUri,
+          agreementData: {
+            agreementUris: Immutable.Set(),
+            pendingProposalUris: Immutable.Set(),
+            pendingCancellationProposalUris: Immutable.Set(),
+            cancellationPendingAgreementUris: Immutable.Set(),
+            acceptedCancellationProposalUris: Immutable.Set(),
+            cancelledAgreementUris: Immutable.Set(),
+            rejectedMessageUris: Immutable.Set(),
+            retractedMessageUris: Immutable.Set(),
+            proposedMessageUris: Immutable.Set(),
+            claimedMessageUris: Immutable.Set(),
+          },
+          petriNetData: Immutable.Map(),
+          creationDate: undefined,
+          lastUpdateDate: undefined,
+          isRated: false,
+          showAgreementData: false,
+          showPetriNetData: false,
+          multiSelectType: undefined,
+          messages: {
+            [eventUri]: {
+              uri: eventUri,
+              content: {
+                text: optimisticEvent.getTextMessage(),
+              },
+              isParsable: !!optimisticEvent.getTextMessage(),
+              hasContent: !!optimisticEvent.getTextMessage(),
+              hasReferences: false,
+              date: msStringToDate(optimisticEvent.getTimestamp()),
+              outgoingMessage: true,
+              unread: false,
+              messageType: won.WONMSG.connectMessage,
+              messageStatus: {
+                isProposed: false,
+                isClaimed: false,
+                isRetracted: false,
+                isRejected: false,
+                isAccepted: false,
+                isCancelled: false,
+                isCancellationPending: false,
+              },
+            },
+          },
+        });
+        return allAtomsInState.setIn(
+          [senderAtomUri, "connections", tmpConnectionUri],
+          optimisticConnection
+        );
+      }
+    }
+
+    case actionTypes.atoms.connect: {
+      const optimisticEvent = action.payload.optimisticEvent;
+      // user has sent a connect request
+      const ownedAtomUri = action.payload.atomUri;
+      const theirAtomUri = action.payload.targetAtomUri;
+      const eventUri = action.payload.eventUri;
       let stateUpdated;
 
       if (action.payload.ownConnectionUri) {
@@ -230,7 +308,7 @@ export default function(allAtomsInState = initialState, action = {}) {
           won.WON.RequestSent
         );
         //because we have a connection uri, we can add the message
-        return addMessage(stateUpdated, optimisticEvent);
+        return addMessage(stateUpdated, optimisticEvent, false, eventUri);
       } else {
         const tmpConnectionUri = "connectionFrom:" + eventUri;
         const socketUri = action.payload.socketUri;
@@ -274,7 +352,7 @@ export default function(allAtomsInState = initialState, action = {}) {
               isParsable: !!optimisticEvent.getTextMessage(),
               hasContent: !!optimisticEvent.getTextMessage(),
               hasReferences: false,
-              date: msStringToDate(optimisticEvent.getSentTimestamp()),
+              date: msStringToDate(optimisticEvent.getTimestamp()),
               outgoingMessage: true,
               unread: false,
               messageType: won.WONMSG.connectMessage,
@@ -298,16 +376,24 @@ export default function(allAtomsInState = initialState, action = {}) {
     }
     case actionTypes.messages.connectMessageSent: {
       // received a message saying we sent a connect request
-      const senderConnectionUri = action.payload.senderConnectionUri;
+      const senderConnectionUri = action.payload.updatedConnectionUri;
       let stateUpdated;
 
       if (senderConnectionUri) {
-        stateUpdated = changeConnectionState(
+        stateUpdated = changeConnectionStateByFun(
           allAtomsInState,
           senderConnectionUri,
-          won.WON.RequestSent
+          state => {
+            if (!state) return won.WON.RequestSent; //fallback if no state present
+            if (state === won.WON.Connected) return won.WON.Connected; //stay in connected if it was already the case
+            if (state === won.WON.RequestReceived) return won.WON.Connected;
+            if (state === won.WON.Suggested) return won.WON.RequestSent;
+            if (state === won.WON.Closed) return won.WON.RequestSent;
+            return won.WON.RequestSent;
+          }
         );
-        return addMessage(stateUpdated, action.payload.event);
+
+        return addMessage(stateUpdated, action.payload.event, false);
       } else {
         console.warn(
           "actionTypes.messages.connectMessageSent: senderConnectionUri was undefined for payload: ",
@@ -318,68 +404,34 @@ export default function(allAtomsInState = initialState, action = {}) {
       return allAtomsInState;
     }
 
-    case actionTypes.messages.openMessageSent: {
-      const senderAtomUri = action.payload.senderAtomUri;
-      const senderConnectionUri = action.payload.senderConnectionUri;
-      let stateUpdated;
-
-      if (senderConnectionUri) {
-        const senderAtom = allAtomsInState.get(senderAtomUri);
-        const existingConnection =
-          senderAtom && senderAtom.getIn(["connections", senderConnectionUri]);
-
-        if (existingConnection) {
-          stateUpdated = changeConnectionState(
-            allAtomsInState,
-            senderConnectionUri,
-            won.WON.Connected //TODO EITHER SET TO REQUEST SENT OR CONNECTED DEPENDING ON THE CURRENT STATE
-          );
-          //because we have a connection uri, we can add the message
-          return addMessage(stateUpdated, action.payload.event);
-        }
-      } else {
-        console.warn(
-          "actionTypes.messages.openMessageSent: senderConnectionUri was undefined for payload: ",
-          action.payload,
-          " -> return unchangedState"
-        );
-      }
-      return allAtomsInState;
-    }
-
-    case actionTypes.connections.open: {
-      // user has sent an open request
-      const cnctStateUpdated = changeConnectionStateByFun(
-        allAtomsInState,
-        action.payload.connectionUri,
-        state => {
-          if (!state) return won.WON.RequestSent; //fallback if no state present
-          if (state === won.WON.Connected) return won.WON.Connected; //stay in connected if it was already the case
-          if (state === won.WON.RequestReceived) return won.WON.Connected;
-          if (state === won.WON.Suggested) return won.WON.RequestSent;
-          if (state === won.WON.Closed) return won.WON.RequestSent;
-        }
-      );
-      return addMessage(cnctStateUpdated, action.payload.optimisticEvent);
-    }
-    case actionTypes.messages.open.failure:
-      return changeConnectionState(
-        allAtomsInState,
-        action.payload.events["msg:FromSystem"].recipient,
-        won.WON.RequestReceived
-      );
-
-    case actionTypes.messages.open.successRemote:
     case actionTypes.messages.connect.successRemote: {
+      const wonMessage = getIn(action, ["payload"]);
+
+      const atomUri = generalSelectors.getAtomUriBySocketUri(
+        wonMessage.getTargetSocket()
+      );
+      const senderAtom = get(allAtomsInState, atomUri);
+      const senderSocketUri = wonMessage.getSenderSocket();
+      const targetSocketUri = wonMessage.getTargetSocket();
+
+      const affectedConnection =
+        senderAtom &&
+        get(senderAtom, "connections").find(conn =>
+          connectionUtils.hasSocketUris(conn, targetSocketUri, senderSocketUri)
+        );
+
+      if (!affectedConnection) {
+        // If the connection is not stored we simply ignore the success of the chatMessage -> (success of a received msg)
+        return allAtomsInState;
+      }
+
       // use the remote success message to obtain the remote connection
       // uri (which we may not have known)
-      const wonMessage = action.payload;
-      const connectionUri = wonMessage.getRecipientConnection();
-      const atomUri = wonMessage.getRecipientAtom();
-      const targetConnectionUri = wonMessage.getSenderConnection();
+      const connectionUri = get(affectedConnection, "uri");
+      const targetConnectionUri = wonMessage.getConnection();
 
       if (allAtomsInState.getIn([atomUri, "connections", connectionUri])) {
-        const eventUri = wonMessage.getIsRemoteResponseTo();
+        const eventUri = wonMessage.getIsResponseTo();
         // we want to use the response date to update the original message
         // date
         allAtomsInState = allAtomsInState.setIn(
@@ -412,7 +464,7 @@ export default function(allAtomsInState = initialState, action = {}) {
       // changeConnectionState
       const wonMessage = action.payload;
       const eventUri = wonMessage.getIsResponseTo();
-      const connUri = wonMessage.getRecipientConnection();
+      const connUri = wonMessage.getConnection();
 
       const tmpConnUri = "connectionFrom:" + wonMessage.getIsResponseTo();
       const tmpAtom = getAtomByConnectionUri(allAtomsInState, tmpConnUri);
@@ -465,10 +517,18 @@ export default function(allAtomsInState = initialState, action = {}) {
 
         if (atomByConnectionUri) {
           // connection has been stored as match first
-          allAtomsInState = changeConnectionState(
+          allAtomsInState = changeConnectionStateByFun(
             allAtomsInState,
             connUri,
-            won.WON.RequestSent
+            state => {
+              if (!state) return won.WON.RequestSent; //fallback if no state present
+              if (state === won.WON.Connected) return won.WON.Connected; //stay in connected if it was already the case
+              if (state === won.WON.RequestSent) return won.WON.RequestSent;
+              if (state === won.WON.RequestReceived) return won.WON.Connected;
+              if (state === won.WON.Suggested) return won.WON.RequestSent;
+              if (state === won.WON.Closed) return won.WON.RequestSent;
+              return won.WON.RequestReceived;
+            }
           );
 
           if (
@@ -513,7 +573,7 @@ export default function(allAtomsInState = initialState, action = {}) {
     case actionTypes.messages.close.success:
       return changeConnectionState(
         allAtomsInState,
-        action.payload.getRecipientConnection(),
+        action.payload.getConnection(),
         won.WON.Closed
       );
     case actionTypes.messages.viewState.markExpandReference:
@@ -679,28 +739,51 @@ export default function(allAtomsInState = initialState, action = {}) {
     case actionTypes.messages.processConnectionMessage:
       // ADD RECEIVED CHAT MESSAGES
       // payload; { events }
-      return addMessage(allAtomsInState, action.payload);
-
-    case actionTypes.connections.sendChatMessageClaimOnSuccess:
-    case actionTypes.connections.sendChatMessageRefreshDataOnSuccess: {
-      return addMessage(allAtomsInState, action.payload.optimisticEvent);
-    }
+      return addMessage(allAtomsInState, action.payload, false);
 
     case actionTypes.connections.sendChatMessage:
-      // ADD SENT TEXT MESSAGE
-      /*
-             * payload: { eventUri: optimisticEvent.uri, message,
-             * optimisticEvent, }
-             */
-      return addMessage(allAtomsInState, action.payload.optimisticEvent);
+    case actionTypes.connections.sendChatMessageClaimOnSuccess:
+    case actionTypes.connections.sendChatMessageRefreshDataOnSuccess: {
+      const eventUri = action.payload.eventUri;
+      const senderSocketUri = action.payload.senderSocketUri;
+      const targetSocketUri = action.payload.targetSocketUri;
+      console.debug(
+        "Send Message: ",
+        senderSocketUri,
+        "->",
+        targetSocketUri,
+        " payload: ",
+        action.payload.optimisticEvent
+      );
+
+      return addMessage(
+        allAtomsInState,
+        action.payload.optimisticEvent,
+        false,
+        eventUri
+      );
+    }
 
     // update timestamp on success response
-    case actionTypes.messages.open.successOwn:
     case actionTypes.messages.chatMessage.successOwn: {
       const wonMessage = getIn(action, ["payload"]);
-      const eventUri = wonMessage.getIsResponseTo();
-      const atomUri = wonMessage.getRecipientAtom();
-      const connectionUri = wonMessage.getRecipientConnection();
+      const messageUri = wonMessage.getIsResponseTo();
+      const atomUri = generalSelectors.getAtomUriBySocketUri(
+        wonMessage.getTargetSocket()
+      );
+      const connectionUri = wonMessage.getConnection();
+
+      const connection = getIn(allAtomsInState, [
+        atomUri,
+        "connections",
+        connectionUri,
+      ]);
+
+      if (!connection) {
+        // If the connection is not stored we simply ignore the success of the chatMessage -> (success of a received msg)
+        return allAtomsInState;
+      }
+
       // we want to use the response date to update the original message
       // date
       // in order to use server timestamps everywhere
@@ -711,11 +794,18 @@ export default function(allAtomsInState = initialState, action = {}) {
         "connections",
         connectionUri,
         "messages",
-        eventUri,
+        messageUri,
       ]);
       if (eventToUpdate) {
         allAtomsInState = allAtomsInState.setIn(
-          [atomUri, "connections", connectionUri, "messages", eventUri, "date"],
+          [
+            atomUri,
+            "connections",
+            connectionUri,
+            "messages",
+            messageUri,
+            "date",
+          ],
           responseDateOnServer
         );
         allAtomsInState = allAtomsInState.setIn(
@@ -724,10 +814,17 @@ export default function(allAtomsInState = initialState, action = {}) {
             "connections",
             connectionUri,
             "messages",
-            eventUri,
+            messageUri,
             "isReceivedByOwn",
           ],
           true
+        );
+      } else {
+        console.error(
+          "chatMessage.successOwn for message that was not sent(or was not loaded in the state) yet, wonMessage: ",
+          wonMessage,
+          "messageUri: ",
+          messageUri
         );
       }
       return allAtomsInState;
@@ -735,11 +832,11 @@ export default function(allAtomsInState = initialState, action = {}) {
 
     case actionTypes.messages.chatMessage.failure: {
       const wonMessage = getIn(action, ["payload"]);
-      const eventUri = wonMessage.isFromExternal()
-        ? wonMessage.getIsRemoteResponseTo()
-        : wonMessage.getIsResponseTo();
-      const atomUri = wonMessage.getRecipientAtom();
-      const connectionUri = wonMessage.getRecipientConnection();
+      const eventUri = wonMessage.getIsResponseTo();
+      const atomUri = generalSelectors.getAtomUriBySocketUri(
+        wonMessage.getTargetSocket()
+      );
+      const connectionUri = wonMessage.getConnection();
 
       allAtomsInState = allAtomsInState.setIn(
         [
@@ -757,13 +854,28 @@ export default function(allAtomsInState = initialState, action = {}) {
 
     case actionTypes.messages.chatMessage.successRemote: {
       const wonMessage = getIn(action, ["payload"]);
-      const eventUri = wonMessage.getIsRemoteResponseTo();
-      const atomUri = wonMessage.getRecipientAtom();
-      const connectionUri = wonMessage.getRecipientConnection();
+      const eventUri = wonMessage.getIsResponseTo();
+      const atomUri = generalSelectors.getAtomUriBySocketUri(
+        wonMessage.getTargetSocket()
+      );
+      const senderAtom = get(allAtomsInState, atomUri);
+      const senderSocketUri = wonMessage.getSenderSocket();
+      const targetSocketUri = wonMessage.getTargetSocket();
+
+      const affectedConnection =
+        senderAtom &&
+        get(senderAtom, "connections").find(conn =>
+          connectionUtils.hasSocketUris(conn, targetSocketUri, senderSocketUri)
+        );
+
+      if (!affectedConnection) {
+        // If the connection is not stored we simply ignore the success of the chatMessage -> (success of a received msg)
+        return allAtomsInState;
+      }
       const path = [
         atomUri,
         "connections",
-        connectionUri,
+        get(affectedConnection, "uri"),
         "messages",
         eventUri,
       ];

@@ -10,22 +10,18 @@
  */
 package won.node.camel.processor.fixed;
 
+import java.lang.invoke.MethodHandles;
+
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.message.processor.exception.MissingMessagePropertyException;
-import won.protocol.model.Atom;
-import won.protocol.model.AtomState;
-import won.protocol.util.DataAccessUtils;
 import won.protocol.vocabulary.WONMSG;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
 
 @Component
 @FixedMessageProcessor(direction = WONMSG.FromSystemString, messageType = WONMSG.DeactivateMessageString)
@@ -35,23 +31,6 @@ public class DeactivateMessageFromSystemProcessor extends AbstractCamelProcessor
     @Override
     public void process(Exchange exchange) throws Exception {
         WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-        URI recipientAtomURI = wonMessage.getRecipientAtomURI();
-        URI senderAtomURI = wonMessage.getSenderAtomURI();
-        if (recipientAtomURI == null) {
-            throw new MissingMessagePropertyException(URI.create(WONMSG.recipientAtom.toString()));
-        }
-        if (senderAtomURI == null) {
-            throw new MissingMessagePropertyException(URI.create(WONMSG.senderAtom.toString()));
-        }
-        if (!recipientAtomURI.equals(senderAtomURI)) {
-            throw new IllegalArgumentException("sender atom uri " + senderAtomURI + " does not equal receiver atom uri "
-                            + recipientAtomURI);
-        }
-        logger.debug("DEACTIVATING atom. atomURI:{}", recipientAtomURI);
-        Atom atom = DataAccessUtils.loadAtom(atomRepository, recipientAtomURI);
-        atom.getMessageContainer().getEvents()
-                        .add(messageEventRepository.findOneByMessageURIforUpdate(wonMessage.getMessageURI()));
-        atom.setState(AtomState.INACTIVE);
-        atom = atomRepository.save(atom);
+        atomService.deactivate(wonMessage);
     }
 }

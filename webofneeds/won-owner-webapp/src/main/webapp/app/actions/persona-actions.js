@@ -1,74 +1,11 @@
 import { generateIdString, get, getIn } from "../utils";
 import won from "../won-es6";
-import * as wonUtils from "../won-utils.js";
 import { actionTypes } from "./actions";
 import { getOwnedAtomByConnectionUri } from "../redux/selectors/general-selectors";
 import { getOwnedConnectionByUri } from "../redux/selectors/connection-selectors";
 import { buildCloseMessage, buildConnectMessage } from "../won-message-utils";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as ownerApi from "../api/owner-api.js";
-
-export function createPersona(persona, nodeUri) {
-  return (dispatch, getState) => {
-    const state = getState();
-    if (!nodeUri) {
-      nodeUri = getIn(state, ["config", "defaultNodeUri"]);
-    }
-
-    const publishedContentUri = nodeUri + "/atom/" + wonUtils.getRandomWonId();
-    const msgUri = nodeUri + "/event/" + wonUtils.getRandomWonId();
-
-    //FIXME: THIS SHOULD NOT USE ANY OF THE CODE BELOW BUT EXECUTE OUR ALREADY PRESENT ATOM-CREATION WITH A GIVEN DRAFT INSTEAD
-    const graph = {
-      "@id": publishedContentUri,
-      "@type": [won.WON.AtomCompacted, won.WON.PersonaCompacted],
-      "won:socket": [
-        {
-          "@id": "#holderSocket",
-          "won:socketDefinition": { "@id": "hold:HolderSocket" },
-        },
-        {
-          "@id": "#reviewSocket",
-          "won:socketDefinition": { "@id": "review:ReviewSocket" },
-        },
-        {
-          "@id": "#buddySocket",
-          "won:socketDefinition": { "@id": "buddy:BuddySocket" },
-        },
-      ],
-      "match:flag": [
-        { "@id": "match:NoHintForCounterpart" },
-        { "@id": "match:NoHintForMe" },
-      ],
-      "s:name": persona.displayName,
-      "s:description": persona.aboutMe || undefined,
-      "s:url": persona.website || undefined,
-    };
-    const graphEnvelope = {
-      "@graph": [graph],
-    };
-
-    const msg = won.buildMessageRdf(graphEnvelope, {
-      recipientNode: nodeUri, //mandatory
-      senderNode: nodeUri, //mandatory
-      msgType: won.WONMSG.createMessage, //mandatory
-      publishedContentUri: publishedContentUri, //mandatory
-      msgUri: msgUri,
-    });
-
-    msg["@context"]["@base"] = publishedContentUri;
-
-    dispatch({
-      type: actionTypes.personas.create,
-      payload: {
-        eventUri: msgUri,
-        message: msg,
-        atomUri: publishedContentUri,
-        persona: graph,
-      },
-    });
-  };
-}
 
 async function connectReview(
   dispatch,
@@ -99,26 +36,24 @@ async function connectReview(
   }
 
   const cnctMsg = buildConnectMessage({
-    ownedAtomUri: ownPersona.get("uri"),
-    theirAtomUri: foreignPersona.get("uri"),
-    ownNodeUri: ownPersona.get("nodeUri"),
-    theirNodeUri: foreignPersona.get("nodeUri"),
     connectMessage: connectMessage,
-    optionalOwnConnectionUri: connectionUri,
     socketUri: socketUri,
     targetSocketUri: targetSocketUri,
   });
-  const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
-  dispatch({
-    type: actionTypes.atoms.connect,
-    payload: {
-      eventUri: cnctMsg.eventUri,
-      message: cnctMsg.message,
-      ownConnectionUri: connectionUri,
-      optimisticEvent: optimisticEvent,
-      socketUri: socketUri,
-      targetSocketUri: targetSocketUri,
-    },
+
+  ownerApi.sendMessage(cnctMsg.message).then(jsonResp => {
+    dispatch({
+      type: actionTypes.atoms.connect,
+      payload: {
+        eventUri: jsonResp.messageUri,
+        message: jsonResp.message,
+        ownConnectionUri: connectionUri,
+        atomUri: get(ownPersona, "uri"),
+        targetAtomUri: get(foreignPersona, "uri"),
+        socketUri: socketUri,
+        targetSocketUri: targetSocketUri,
+      },
+    });
   });
 }
 
@@ -151,37 +86,31 @@ export function disconnectPersona(atomUri, personaUri) {
     const persona = getIn(state, ["atoms", personaUri]);
     const atom = getIn(state, ["atoms", atomUri]);
 
-    const connectionUri = get(persona, "connections")
-      .filter(connection => {
-        const socketUri = get(connection, "targetSocketUri");
-        const socketType = getIn(atom, ["content", "sockets", socketUri]);
-        return (
-          get(connection, "targetAtomUri") === atomUri &&
-          socketType === won.HOLD.HoldableSocketCompacted
-        );
-      })
-      .keySeq()
-      .first();
-
-    const connection = getOwnedConnectionByUri(state, connectionUri);
-
-    buildCloseMessage(
-      connectionUri,
-      personaUri,
-      atomUri,
-      persona.get("nodeUri"),
-      atom.get("nodeUri"),
-      connection.get("targetConnectionUri")
-    ).then(({ eventUri, message }) => {
-      dispatch({
-        type: actionTypes.connections.close,
-        payload: {
-          connectionUri,
-          eventUri,
-          message,
-        },
-      });
+    const connection = get(persona, "connections").find(conn => {
+      const socketUri = get(conn, "targetSocketUri");
+      const socketType = getIn(atom, ["content", "sockets", socketUri]);
+      return (
+        get(conn, "targetAtomUri") === atomUri &&
+        socketType === won.HOLD.HoldableSocketCompacted
+      );
     });
+
+    const socketUri = get(connection, "socketUri");
+    const targetSocketUri = get(connection, "targetSocketUri");
+    const connectionUri = get(connection, "uri");
+
+    buildCloseMessage(socketUri, targetSocketUri)
+      .then(({ message }) => ownerApi.sendMessage(message))
+      .then(jsonResp => {
+        dispatch({
+          type: actionTypes.connections.close,
+          payload: {
+            connectionUri: connectionUri,
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
+          },
+        });
+      });
   };
 }
 

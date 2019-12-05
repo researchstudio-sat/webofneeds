@@ -43,15 +43,13 @@ public class DeliveryChain {
             case DEACTIVATE:
             case ACTIVATE:
             case HINT_FEEDBACK_MESSAGE:
-            case HINT_NOTIFICATION:
             case ATOM_CREATED_NOTIFICATION:
+            case ATOM_HINT_MESSAGE:
+            case SOCKET_HINT_MESSAGE:
                 return head.hasResponse();
             default:
                 // all other message types have remote messages and responses
-                return head.hasResponse() && head.correspondingRemoteMessage()
-                                && head.getCorrespondingRemoteMessageRef().hasResponse()
-                                && head.getCorrespondingRemoteMessageRef().getIsResponseToInverseRef()
-                                                .correspondingRemoteMessage();
+                return head.hasResponse() && head.hasRemoteResponse();
         }
     }
 
@@ -64,15 +62,12 @@ public class DeliveryChain {
             case DEACTIVATE:
             case ACTIVATE:
             case HINT_FEEDBACK_MESSAGE:
-            case HINT_NOTIFICATION:
             case ATOM_CREATED_NOTIFICATION:
-                return head.getIsResponseToInverseRef();
+                return head.getRespondingToInverseRef();
             default:
                 // all other message types have remote messages and responses
-                if (head.hasResponse() && head.correspondingRemoteMessage()
-                                && head.getCorrespondingRemoteMessageRef().hasResponse()) {
-                    return head.getCorrespondingRemoteMessageRef().getIsResponseToInverseRef()
-                                    .getCorrespondingRemoteMessageRef();
+                if (head.hasResponse() && head.hasRemoteResponse()) {
+                    return head.getRemotelyRespondingToInverseRef();
                 } else {
                     return null;
                 }
@@ -90,10 +85,7 @@ public class DeliveryChain {
     public boolean isAfter(DeliveryChain other) {
         return other.getMessages().stream().anyMatch(msg ->
         // is the head before msg?
-        this.getHead().isMessageOnPathToRoot(msg)
-                        // is the remote message of head before msg?
-                        || (this.getHead().correspondingRemoteMessage() && this.getHead()
-                                        .getCorrespondingRemoteMessageRef().isMessageOnPathToRoot(msg)));
+        this.getHead().isAfter(msg));
     }
 
     /**
@@ -111,12 +103,8 @@ public class DeliveryChain {
         }
         return other.getMessages().stream().allMatch(msg -> {
             // is the head before and the end after msg?
-            boolean isHeadBeforeAllOtherMsgs = msg.isMessageOnPathToRoot(this.getHead())
-                            || (getHead().correspondingRemoteMessage()
-                                            && msg.isMessageOnPathToRoot(getHead().getCorrespondingRemoteMessageRef()));
-            boolean isEndAfterAllOtherMsgs = getEnd().isMessageOnPathToRoot(msg)
-                            || (getEnd().correspondingRemoteMessage()
-                                            && getEnd().getCorrespondingRemoteMessageRef().isMessageOnPathToRoot(msg));
+            boolean isHeadBeforeAllOtherMsgs = msg.isAfter(this.getHead());
+            boolean isEndAfterAllOtherMsgs = getEnd().isAfter(msg);
             return isHeadBeforeAllOtherMsgs && isEndAfterAllOtherMsgs;
         });
     }

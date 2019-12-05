@@ -13,23 +13,24 @@ package won.node.camel.processor.fixed;
 import java.net.URI;
 import java.util.Collection;
 
+import javax.persistence.EntityManager;
+
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
+import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.WonMessageDirection;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
-import won.protocol.model.Connection;
-import won.protocol.model.ConnectionState;
 import won.protocol.model.Atom;
 import won.protocol.model.AtomState;
-import won.protocol.util.DataAccessUtils;
+import won.protocol.model.Connection;
+import won.protocol.model.ConnectionState;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -39,6 +40,8 @@ import won.protocol.vocabulary.WONMSG;
 @FixedMessageProcessor(direction = WONMSG.FromOwnerString, messageType = WONMSG.DeleteMessageString)
 public class DeleteAtomMessageFromOwnerReactionProcessor extends AbstractCamelProcessor {
     Logger logger = LoggerFactory.getLogger(this.getClass());
+    @Autowired
+    EntityManager entityManager;
 
     public void process(final Exchange exchange) throws Exception {
         WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -47,7 +50,7 @@ public class DeleteAtomMessageFromOwnerReactionProcessor extends AbstractCamelPr
         if (recipientAtomURI == null) {
             throw new WonMessageProcessingException("recipientAtomURI is not set");
         }
-        Atom atom = DataAccessUtils.loadAtom(atomRepository, recipientAtomURI);
+        Atom atom = atomService.getAtomRequired(recipientAtomURI);
         matcherProtocolMatcherClient.atomDeleted(atom.getAtomURI(), wonMessage);
         // Check if atom already in State DELETED
         if (atom.getState() == AtomState.DELETED) {
@@ -55,6 +58,7 @@ public class DeleteAtomMessageFromOwnerReactionProcessor extends AbstractCamelPr
             Collection<Connection> conns = connectionRepository.findByAtomURIAndNotStateForUpdate(atom.getAtomURI(),
                             ConnectionState.DELETED);
             for (Connection con : conns) {
+                entityManager.refresh(con);
                 // Delete all connection data
                 messageEventRepository.deleteByParentURI(con.getConnectionURI());
                 connectionRepository.delete(con);
@@ -65,6 +69,7 @@ public class DeleteAtomMessageFromOwnerReactionProcessor extends AbstractCamelPr
                             ConnectionState.CLOSED);
             // Close open connections
             for (Connection con : conns) {
+                entityManager.refresh(con);
                 closeConnection(atom, con);
             }
         }
@@ -74,10 +79,12 @@ public class DeleteAtomMessageFromOwnerReactionProcessor extends AbstractCamelPr
         // send close from system to each connection
         // the close message is directed at our local connection. It will
         // be routed to the owner and forwarded to to remote connection
-        URI messageURI = wonNodeInformationService.generateEventURI();
-        WonMessage message = WonMessageBuilder.setMessagePropertiesForClose(messageURI, WonMessageDirection.FROM_SYSTEM,
-                        con.getConnectionURI(), con.getAtomURI(), atom.getWonNodeURI(), con.getConnectionURI(),
-                        con.getAtomURI(), atom.getWonNodeURI(), "Closed because Atom was deleted").build();
-        sendSystemMessage(message);
+        WonMessage message = WonMessageBuilder
+                        .close()
+                        .direction().fromSystem()
+                        .sockets().sender(con.getSocketURI()).recipient(con.getTargetSocketURI())
+                        .content().text("Closed because Atom was deleted")
+                        .build();
+        camelWonMessageService.sendSystemMessage(message);
     }
 }

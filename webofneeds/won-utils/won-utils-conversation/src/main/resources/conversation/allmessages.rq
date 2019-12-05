@@ -15,10 +15,5 @@ SELECT distinct ?first ?msg ?distance ?text ?msgType ?time ?rem WHERE {
    ?msg con:text ?text.
    ?msg msg:messageType ?msgType.
  }
- OPTIONAL {
-    ?msg msg:correspondingRemoteMessage ?rem . 
-    ?rem con:text ?text.
-    ?rem msg:messageType ?msgType.
- }
- ?msg msg:receivedTimestamp ?time.  
+ ?msg msg:timestamp ?time.  
 } ORDER BY ?first ?distance ?time

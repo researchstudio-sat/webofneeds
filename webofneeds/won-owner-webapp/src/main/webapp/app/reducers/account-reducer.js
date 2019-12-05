@@ -59,7 +59,6 @@ export default function(userData = initialState, action = {}) {
     }
 
     case actionTypes.atoms.create: //for optimistic additions
-    case actionTypes.personas.create: //for optimistic additions
     case actionTypes.atoms.createSuccessful: {
       const ownedAtomUris = userData.get("ownedAtomUris");
       return userData.set(

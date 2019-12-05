@@ -29,6 +29,16 @@ export function isUnread(connection) {
   return !!get(connection, "unread");
 }
 
+export function hasSocketUris(connection, socketUri, targetSocketUri) {
+  return (
+    !!socketUri &&
+    !!targetSocketUri &&
+    !!connection &&
+    get(connection, "socketUri") === socketUri &&
+    get(connection, "targetSocketUri") === targetSocketUri
+  );
+}
+
 /**
  * Creates a label of the participants and suggestions/requests/invites of a given set of groupChatConnections
  * @param groupChatConnections

@@ -21,15 +21,11 @@ import org.springframework.stereotype.Component;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.WonMessageDirection;
-import won.protocol.message.WonMessageType;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
+import won.protocol.model.Atom;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
-import won.protocol.model.Atom;
-import won.protocol.util.DataAccessUtils;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -47,7 +43,7 @@ public class ReplaceAtomMessageFromOwnerReactionProcessor extends AbstractCamelP
         if (atomURI == null)
             throw new IllegalArgumentException("senderAtomURI not found!");
         logger.debug("Reacting to atom replacement. AtomURI:{}", atomURI);
-        Atom atom = DataAccessUtils.loadAtom(atomRepository, atomURI);
+        Atom atom = atomService.getAtomRequired(atomURI);
         matcherProtocolMatcherClient.atomModified(atom.getAtomURI(), wonMessage);
         // notify all connections
         Collection<Connection> conns = connectionRepository.findByAtomURIAndState(atom.getAtomURI(),
@@ -59,11 +55,13 @@ public class ReplaceAtomMessageFromOwnerReactionProcessor extends AbstractCamelP
 
     private void sendChangeNotificationMessage(final Atom atom, final Connection con) {
         // send message from system via connection
-        URI messageURI = wonNodeInformationService.generateEventURI();
-        URI remoteWonNodeURI = wonNodeInformationService.getWonNodeUri(con.getTargetAtomURI());
-        WonMessage message = WonMessageBuilder.setMessagePropertiesForSystemChangeNotificationMessageToTargetAtom(
-                        messageURI, con.getConnectionURI(), con.getAtomURI(), atom.getWonNodeURI(),
-                        con.getTargetConnectionURI(), con.getTargetAtomURI(), remoteWonNodeURI).build();
-        sendSystemMessage(message);
+        WonMessage message = WonMessageBuilder
+                        .changeNotificatin()
+                        .direction().fromSystem()
+                        .sockets()
+                        /**/.sender(con.getSocketURI())
+                        /**/.recipient(con.getTargetSocketURI())
+                        .build();
+        camelWonMessageService.sendSystemMessage(message);
     }
 }

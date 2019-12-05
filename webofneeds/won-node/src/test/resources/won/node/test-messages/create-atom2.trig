@@ -1,0 +1,114 @@
+@prefix schema: <http://schema.org/> .
+@prefix msg:   <https://w3id.org/won/message#> .
+@prefix gsl:    <http://www.bigdata.com/rdf/geospatial/literals/v1#> .
+@prefix this:    <https://node.matchat.org/won/resource/event/createMessage2#> .
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix dbp:    <http://dbpedia.org/resource/> .
+@prefix newatom:    <https://node.matchat.org/won/resource/atom/newAtom2#> .
+@prefix rdfg:  <http://www.w3.org/2004/03/trix/rdfg-1/> .
+@prefix match: <https://w3id.org/won/matching#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix cert:  <http://www.w3.org/ns/auth/cert#> .
+@prefix hold:  <https://w3id.org/won/ext/hold#> .
+@prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
+@prefix node:  <https://node.matchat.org/won/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix chat:  <https://w3id.org/won/ext/chat#> .
+@prefix won:   <https://w3id.org/won/core#> .
+@prefix atom:  <https://node.matchat.org/won/resource/atom/> .
+@prefix event: <https://node.matchat.org/won/resource/event/> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+
+this:envelope-sig {
+   this:envelope-sig  a                      msg:Signature ;
+            msg:signer  atom:newAtom2 ;
+            msg:signatureValue              "MGYC[...]sDgg=" ;
+            msg:hash                        "UikX[...]uq7k=" ;
+            msg:publicKeyFingerprint        "drBD[...]6Tqk=" ;
+            msg:signedGraph                 this:envelope .
+    
+}
+
+this:envelope {
+    this:atom-sig  a                          msg:Signature ;
+            msg:signer  atom:newAtom2 ;
+            msg:signatureValue              "MGYC[...]HZgE=" ;
+            msg:hash                        "AK9b[...]sV6oZ" ;
+            msg:publicKeyFingerprint        "drBD[...]6Tqk=" ;
+            msg:signedGraph                 this:atom .
+    
+    event:createMessage2
+            a                  msg:FromOwner ;
+            msg:content        this:atom ;
+            msg:messageType    msg:CreateMessage ;
+            msg:atom           atom:newAtom2 ;
+            msg:sentTimestamp  1568107960343 .
+    
+    this:envelope  a                 msg:EnvelopeGraph ;
+            rdfg:subGraphOf        event:createMessage2 ;
+            msg:containsSignature  this:atom-sig .
+}
+
+this:atom {
+    newatom:fromLocation-0  a   schema:Place ;
+            schema:geo   newatom:geo-0 ;
+            schema:name  "Scheveningen, Den Haag, SÃ¼dholland, Niederlande, 2586AW, Niederlande" .
+    
+    newatom:geo-1  a                 schema:GeoCoordinates ;
+            schema:latitude   "52.952989" ;
+            schema:longitude  "4.826759" ;
+            con:geoSpatial    "52.952989#4.826759"^^gsl:lat-lon .
+    
+    newatom:toLocation-0  a     schema:Place ;
+            schema:geo   newatom:geo-1 ;
+            schema:name  "Den Helder, Nordholland, Niederlande" .
+    
+    newatom:travelAction-0  a             schema:TravelAction ;
+            schema:fromLocation  newatom:fromLocation-0 ;
+            schema:toLocation    newatom:toLocation-0 .
+    
+    newatom:holdableSocket
+            won:socketDefinition  hold:HoldableSocket .
+    
+    newatom:chatSocket  won:socketDefinition  chat:ChatSocket .
+    
+    newatom:geo-0  a                 schema:GeoCoordinates ;
+            schema:latitude   "52.106207" ;
+            schema:longitude  "4.275271" ;
+            con:geoSpatial    "52.106207#4.275271"^^gsl:lat-lon .
+    
+    atom:newAtom2
+            a                      won:Atom , schema:Product , dbp:Cargo ;
+            dc:title               "E-Piano Shipment" ;
+            schema:height          [ a                schema:QuantitativeValue ;
+                                     schema:unitCode  "CMT" ;
+                                     schema:value     "50"^^xsd:float
+                                   ] ;
+            schema:length          [ a                schema:QuantitativeValue ;
+                                     schema:unitCode  "CMT" ;
+                                     schema:value     "170"^^xsd:float
+                                   ] ;
+            schema:name            "* E-Piano \n* e-piano stand\n* electrical wiring" ;
+            schema:title           "E-Piano Shipment" ;
+            schema:weight          [ a                schema:QuantitativeValue ;
+                                     schema:unitCode  "KGM" ;
+                                     schema:value     "15"^^xsd:float
+                                   ] ;
+            schema:width           [ a                schema:QuantitativeValue ;
+                                     schema:unitCode  "CMT" ;
+                                     schema:value     "60"^^xsd:float
+                                   ] ;
+            cert:key               [ cert:PublicKey  [ a                  won:ECCPublicKey ;
+                                                       won:ecc_algorithm  "EC" ;
+                                                       won:ecc_curveId    "secp384r1" ;
+                                                       won:ecc_qx         "c6d1[...]4a7a5" ;
+                                                       won:ecc_qy         "2792[...]12629"
+                                                     ] ] ;
+            won:defaultSocket      newatom:chatSocket ;
+            won:socket             newatom:holdableSocket , newatom:chatSocket ;
+            match:doNotMatchAfter  "2019-09-10T10:02:40.339Z"^^xsd:dateTime ;
+            match:seeks            [ con:travelAction
+                              newatom:travelAction-0 ] ;
+            match:sparqlQuery      "PREFIX won: <https://w3id.org/won/core#>\nPREFIX s: <http://schema.org/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\nSELECT DISTINCT ?result ?score WHERE {\n  ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Atom, <http://dbpedia.org/resource/Transport>;\n    (won:location|s:location) ?location.\n  ?location s:geo ?location_geo.\n  ?location_geo s:latitude ?location_lat;\n    s:longitude ?location_lon.\n  BIND(ABS((xsd:decimal(?location_lat)) - \"52.1062075\"^^xsd:decimal) AS ?fromLatDiffRaw)\n  BIND(ABS((xsd:decimal(?location_lon)) - \"4.2752714\"^^xsd:decimal) AS ?fromLonDiff)\n  BIND(IF(?fromLatDiffRaw > 180 , 360  - ?fromLatDiffRaw, ?fromLatDiffRaw) AS ?fromLatDiff)\n  BIND((?fromLatDiff * ?fromLatDiff) + (?fromLonDiff * ?fromLonDiff) AS ?fromLocation_geoDistanceScore)\n  BIND(ABS((xsd:decimal(?location_lat)) - \"52.9529894\"^^xsd:decimal) AS ?latDiffRaw)\n  BIND(ABS((xsd:decimal(?location_lon)) - \"4.8267591994488\"^^xsd:decimal) AS ?toLonDiff)\n  BIND(IF(?toLatDiffRaw > 180 , 360  - ?toLatDiffRaw, ?toLatDiffRaw) AS ?toLatDiff)\n  BIND((?toLatDiff * ?toLatDiff) + (?toLonDiff * ?toLonDiff) AS ?toLocation_geoDistanceScore)\n  BIND(?fromLocation_geoDistanceScore + ?toLocation_geoDistanceScore AS ?distScore)\n}\nORDER BY (?distScore)" .
+}
+

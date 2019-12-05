@@ -519,20 +519,10 @@ function isInVisibleUseCaseArray(useCase, visibleUseCasesArray) {
     visibleUseCasesArray.size == 0 ||
     visibleUseCasesArray.contains("*")
   ) {
-    console.debug(
-      "No specific useCases within visibleUseCasesArray, allow all"
-    );
     return true;
   } else {
     const isUseCaseConfigured = !!visibleUseCasesArray.contains(
       get(useCase, "identifier") || useCase.identifier
-    );
-    console.debug(
-      "UseCase [",
-      get(useCase, "identifier") || useCase.identifier,
-      "] is ",
-      isUseCaseConfigured ? "" : "NOT",
-      "in visibleUseCaseArray"
     );
     return isUseCaseConfigured;
   }

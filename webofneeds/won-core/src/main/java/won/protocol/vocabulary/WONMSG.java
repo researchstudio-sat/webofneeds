@@ -1,11 +1,11 @@
 package won.protocol.vocabulary;
 
+import java.net.URI;
+
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
-
-import java.net.URI;
 
 /**
  * User: ypanchenko Date: 04.08.2014
@@ -14,11 +14,23 @@ public class WONMSG {
     // TODO check with existing code how they do it, do they have ontology objects
     // and
     // access the vocabulary from there? If yes, change to that all the enum classes
+    /**
+     * prefix of message URIs. Message IDs are to be added after adding 1 slash.
+     * e.g. wm:/1234
+     */
+    public static final String MESSAGE_URI_PREFIX = "wm:/";
+    /**
+     * URI used as message URI when creating a message, before its permanent URI is
+     * calculated. Likewise, this URI is used for verifying message
+     * signatures/contents: before verification, its permanent message URI is
+     * replaced with this one.
+     */
+    public static final String MESSAGE_SELF = "wm:/SELF";
     public static final String BASE_URI = "https://w3id.org/won/message#";
-    public static final String DEFAULT_PREFIX = "msg";;
+    public static final String DEFAULT_PREFIX = "msg";
     private static Model m = ModelFactory.createDefaultModel();
-    public static final String PROTOCOL_VERSION_STRING = BASE_URI + "protocolVersion";
-    public static final Property PROTOCOL_VERSION = m.createProperty(PROTOCOL_VERSION_STRING);
+    public static final String protocolVersionString = BASE_URI + "protocolVersion";
+    public static final Property protocolVersion = m.createProperty(protocolVersionString);
     public static final String FromOwnerString = BASE_URI + "FromOwner";
     public static final String FromSystemString = BASE_URI + "FromSystem";
     public static final String FromExternalString = BASE_URI + "FromExternal";
@@ -31,7 +43,6 @@ public class WONMSG {
     public static final String ConnectMessageString = BASE_URI + "ConnectMessage";
     public static final String DeactivateMessageString = BASE_URI + "DeactivateMessage";
     public static final String ActivateMessageString = BASE_URI + "ActivateMessage";
-    public static final String OpenMessageString = BASE_URI + "OpenMessage";
     public static final String CloseMessageString = BASE_URI + "CloseMessage";
     public static final String DeleteMessageString = BASE_URI + "DeleteMessage";
     public static final String ConnectionMessageString = BASE_URI + "ConnectionMessage";
@@ -48,7 +59,6 @@ public class WONMSG {
     public static final Resource ConnectMessage = m.createResource(ConnectMessageString);
     public static final Resource DeactivateMessage = m.createResource(DeactivateMessageString);
     public static final Resource ActivateMessage = m.createResource(ActivateMessageString);
-    public static final Resource OpenMessage = m.createResource(OpenMessageString);
     public static final Resource CloseMessage = m.createResource(CloseMessageString);
     public static final Resource DeleteMessage = m.createResource(DeleteMessageString);
     public static final Resource ConnectionMessage = m.createResource(ConnectionMessageString);
@@ -64,28 +74,6 @@ public class WONMSG {
     // TODO: delete if not needed
     public static final Resource AtomCreatedNotificationMessage = m
                     .createResource(BASE_URI + "AtomCreatedNotificationMessage");
-    // response types
-    // TODO: delete if not needed
-    public static final Resource CreateResponseMessage = m.createResource(BASE_URI + "CreateResponseMessage");
-    // TODO: delete if not needed
-    public static final Resource ConnectResponseMessage = m.createResource(BASE_URI + "ConnectResponseMessage");
-    // TODO: delete if not needed
-    public static final Resource AtomStateResponseMessage = m.createResource(BASE_URI + "AtomStateResponseMessage");
-    // TODO: delete if not needed
-    public static final Resource CloseResponseMessage = m.createResource(BASE_URI + "CloseResponseMessage");
-    // TODO: delete if not needed
-    public static final Resource OpenResponseMessage = m.createResource(BASE_URI + "OpenResponseMessage");
-    // TODO: delete if not needed
-    public static final Resource ConnectionMessageResponseMessage = m
-                    .createResource(BASE_URI + "ConnectionMessageResponseMessage");
-
-    // TODO: delete if not needed
-    public static boolean isResponseMessageType(Resource resource) {
-        return resource.equals(CreateResponseMessage) || resource.equals(ConnectResponseMessage)
-                        || resource.equals(AtomStateResponseMessage) || resource.equals(CloseResponseMessage)
-                        || resource.equals(OpenResponseMessage) || resource.equals(ConnectionMessageResponseMessage);
-    }
-
     // response states
     public static final Resource SuccessResponseState = m.createResource(BASE_URI + "SuccessResponse");
     public static final Resource FailureResponseState = m.createResource(BASE_URI + "FailureResponse");
@@ -111,24 +99,14 @@ public class WONMSG {
     // used to wrap an envelope inside another for forwarding and adding the
     // server-side envelope to a
     // client-generated message
-    public static final Property containsEnvelope = m.createProperty(BASE_URI, "containsEnvelope");
-    public static final Property recipient = m.createProperty(BASE_URI, "recipient");
-    public static final Property recipientAtom = m.createProperty(BASE_URI, "recipientAtom");
-    public static final Property recipientNode = m.createProperty(BASE_URI, "recipientNode");
-    public static final Property sender = m.createProperty(BASE_URI, "sender");
-    public static final Property senderAtom = m.createProperty(BASE_URI, "senderAtom");
-    public static final Property senderNode = m.createProperty(BASE_URI, "senderNode");
     public static final Property messageType = m.createProperty(BASE_URI, "messageType");
     public static final Property content = m.createProperty(BASE_URI, "content");
-    public static final Property isResponseTo = m.createProperty(BASE_URI, "isResponseTo");
-    public static final Property isRemoteResponseTo = m.createProperty(BASE_URI, "isRemoteResponseTo");
-    public static final Property isResponseToMessageType = m.createProperty(BASE_URI, "isResponseToMessageType");;
-    public static final Property correspondingRemoteMessage = m.createProperty(BASE_URI, "correspondingRemoteMessage");
+    public static final Property respondingTo = m.createProperty(BASE_URI, "respondingTo");
+    public static final Property respondingToMessageType = m.createProperty(BASE_URI, "respondingToMessageType");;
     public static final Property forwardedMessage = m.createProperty(BASE_URI, "forwardedMessage");
     public static final Property injectIntoConnection = m.createProperty(BASE_URI, "injectIntoConnection");
     public static final Property previousMessage = m.createProperty(BASE_URI + "previousMessage");
-    public static final Property sentTimestamp = m.createProperty(BASE_URI, "sentTimestamp");
-    public static final Property receivedTimestamp = m.createProperty(BASE_URI, "receivedTimestamp");
+    public static final Property timestamp = m.createProperty(BASE_URI, "timestamp");
     // added to support referencing signatures from the envelope
     public static final Property containsSignature = m.createProperty(BASE_URI, "containsSignature");
     // TODO maybe the three properties below could better belong to a separate
@@ -136,11 +114,17 @@ public class WONMSG {
     public static final Property signedGraph = m.createProperty(BASE_URI, "signedGraph");
     public static final Property signatureValue = m.createProperty(BASE_URI, "signatureValue");
     public static final Property hash = m.createProperty(BASE_URI, "hash");
+    public static final Property signer = m.createProperty(BASE_URI, "signer");
+    public static final Property Signature = m.createProperty(BASE_URI, "Signature");
+    public static final Property signature = m.createProperty(BASE_URI, "signature");
+    public static final Property envelope = m.createProperty(BASE_URI, "envelope");
     public static final Property signatureGraph = m.createProperty(BASE_URI, "signatureGraph");
     public static final Property publicKeyFingerprint = m.createProperty(BASE_URI, "publicKeyFingerprint");
     public static final Property recipientSocket = m.createProperty(BASE_URI, "recipientSocket");
     public static final Property senderSocket = m.createProperty(BASE_URI, "senderSocket");
     public static final Property contentType = m.createProperty(BASE_URI, "contentType");
+    public static final Property connection = m.createProperty(BASE_URI, "connection");
+    public static final Property atom = m.createProperty(BASE_URI, "atom");
     public static final Property hintScore = m.createProperty(BASE_URI, "hintScore");
     public static final Property hintTargetAtom = m.createProperty(BASE_URI, "hintTargetAtom");
     public static final Property hintTargetSocket = m.createProperty(BASE_URI, "hintTargetSocket");

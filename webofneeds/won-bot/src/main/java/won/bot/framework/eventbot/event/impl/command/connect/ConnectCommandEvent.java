@@ -12,12 +12,12 @@ package won.bot.framework.eventbot.event.impl.command.connect;
 
 import java.net.URI;
 import java.util.Objects;
-import java.util.Optional;
 
 import won.bot.framework.eventbot.event.BaseAtomSpecificEvent;
 import won.bot.framework.eventbot.event.TargetAtomSpecificEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.protocol.message.WonMessageType;
+import won.protocol.message.WonMessageUtils;
 
 /**
  * Instructs the bot to connect to the specified targetAtom on behalf of the
@@ -25,29 +25,31 @@ import won.protocol.message.WonMessageType;
  */
 public class ConnectCommandEvent extends BaseAtomSpecificEvent implements MessageCommandEvent, TargetAtomSpecificEvent {
     private URI targetAtomURI;
-    private Optional<URI> localSocket = Optional.empty();
-    private Optional<URI> targetSocket = Optional.empty();
+    private URI localSocket;
+    private URI targetSocket;
     private String welcomeMessage;
 
+    @Deprecated
     public ConnectCommandEvent(URI atomURI, URI targetAtomURI, URI localSocket, URI targetSocket,
                     String welcomeMessage) {
         super(atomURI);
         Objects.requireNonNull(localSocket);
         Objects.requireNonNull(targetSocket);
         this.targetAtomURI = targetAtomURI;
-        this.localSocket = Optional.of(localSocket);
-        this.targetSocket = Optional.of(targetSocket);
+        this.localSocket = localSocket;
+        this.targetSocket = targetSocket;
         this.welcomeMessage = welcomeMessage;
     }
 
-    public ConnectCommandEvent(URI atomURI, URI targetAtomURI, String welcomeMessage) {
-        super(atomURI);
-        this.targetAtomURI = targetAtomURI;
+    public ConnectCommandEvent(URI localSocket, URI targetSocket,
+                    String welcomeMessage) {
+        super(WonMessageUtils.stripFragment(localSocket));
+        Objects.requireNonNull(localSocket);
+        Objects.requireNonNull(targetSocket);
+        this.targetAtomURI = WonMessageUtils.stripFragment(targetSocket);
+        this.localSocket = localSocket;
+        this.targetSocket = targetSocket;
         this.welcomeMessage = welcomeMessage;
-    }
-
-    public ConnectCommandEvent(URI atomURI, URI targetAtomURI) {
-        this(atomURI, targetAtomURI, "Hello!");
     }
 
     @Override
@@ -59,11 +61,11 @@ public class ConnectCommandEvent extends BaseAtomSpecificEvent implements Messag
         return targetAtomURI;
     }
 
-    public Optional<URI> getLocalSocket() {
+    public URI getLocalSocket() {
         return localSocket;
     }
 
-    public Optional<URI> getTargetSocket() {
+    public URI getTargetSocket() {
         return targetSocket;
     }
 

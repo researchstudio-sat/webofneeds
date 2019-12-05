@@ -10,7 +10,8 @@
  */
 package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 
-import org.apache.jena.query.Dataset;
+import java.net.URI;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandNotSentEvent;
@@ -22,18 +23,14 @@ import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.service.WonNodeInformationService;
-import won.protocol.util.WonRdfUtils;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.vocabulary.WONCON;
-
-import java.net.URI;
 
 /**
  * Action executing a ConnectCommandEvent, connecting to the targetAtom on
  * behalf of the atom.
  */
-public class ExecuteFeedbackCommandAction extends ExecuteSendMessageCommandAction<FeedbackCommandEvent> {
+public class ExecuteFeedbackCommandAction extends ExecuteMessageCommandAction<FeedbackCommandEvent> {
     public ExecuteFeedbackCommandAction(final EventListenerContext eventListenerContext) {
         super(eventListenerContext, false);
     }
@@ -54,7 +51,8 @@ public class ExecuteFeedbackCommandAction extends ExecuteSendMessageCommandActio
     protected MessageCommandFailureEvent createLocalNodeFailureEvent(FeedbackCommandEvent originalCommand,
                     WonMessage messageSent, FailureResponseEvent failureResponseEvent) {
         return new FeedbackCommandFailureEvent(originalCommand, failureResponseEvent.getAtomURI(),
-                        failureResponseEvent.getTargetAtomURI(), failureResponseEvent.getConnectionURI());
+                        failureResponseEvent.getTargetAtomURI(), failureResponseEvent.getConnectionURI()
+                                        .orElseThrow(() -> new IllegalArgumentException("ConnectionUri must be set")));
     }
 
     @Override
@@ -71,16 +69,10 @@ public class ExecuteFeedbackCommandAction extends ExecuteSendMessageCommandActio
 
     protected WonMessage createWonMessage(FeedbackCommandEvent feedbackCommandEvent) throws WonMessageBuilderException {
         URI connectionURI = feedbackCommandEvent.getConnectionURI();
-        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
-        Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
-        URI localAtom = WonRdfUtils.ConnectionUtils.getLocalAtomURIFromConnection(connectionRDF, connectionURI);
-        URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
-        // TODO: make more generic by using the URIs specified in the command.
         return WonMessageBuilder
-                        .setMessagePropertiesForHintFeedback(wonNodeInformationService.generateEventURI(wonNode),
-                                        connectionURI,
-                                        localAtom, wonNode,
-                                        URI.create(WONCON.Good.getURI()).equals(feedbackCommandEvent.getValue()))
+                        .hintFeedbackMessage()
+                        .connection(connectionURI)
+                        .binaryFeedback(URI.create(WONCON.Good.getURI()).equals(feedbackCommandEvent.getValue()))
                         .build();
     }
 }

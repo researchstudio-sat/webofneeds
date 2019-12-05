@@ -11,9 +11,9 @@
 package won.protocol.message.sender.exception;
 
 /**
- * Base class for exceptions occurring during sending of messages.
+ * Exceptions occurring during sending of messages.
  */
-public abstract class WonMessageSenderException extends RuntimeException {
+public class WonMessageSenderException extends RuntimeException {
     public WonMessageSenderException() {
     }
 

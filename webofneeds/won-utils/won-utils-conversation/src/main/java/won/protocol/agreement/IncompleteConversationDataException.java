@@ -9,7 +9,7 @@ import java.net.URI;
  * 
  * @author fkleedorfer
  */
-public class IncompleteConversationDataException extends RuntimeException {
+public class IncompleteConversationDataException extends ConversationDataAnalysisException {
     URI referringMessageUri;
     URI missingMessageUri;
 

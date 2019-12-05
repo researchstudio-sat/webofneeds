@@ -20,8 +20,8 @@ public class SocketHintFromMatcherEvent extends HintFromMatcherEvent {
 
     public SocketHintFromMatcherEvent(final WonMessage wonMessage) {
         super(wonMessage);
-        this.hintTargetSocket = wonMessage.getHintTargetSocketURI();
-        this.recipientSocket = wonMessage.getRecipientSocketURI();
+        this.hintTargetSocket = wonMessage.getHintTargetSocketURIRequired();
+        this.recipientSocket = wonMessage.getRecipientSocketURIRequired();
     }
 
     public URI getHintTargetSocket() {

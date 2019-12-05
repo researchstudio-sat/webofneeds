@@ -12,12 +12,12 @@
       foaf:name "Manu Sporny" ;
       foaf:homepage <http://manu.sporny.org/> .
    }
-   :G1 sig:signature [
+   :G1 msg:Signature [
       rdf:type sig:JsonldSignature ;
       sig:signer <http://manu.sporny.org/webid#key-5> ;
-      sig:signatureValue "OGQzNGVkMzVmMmQ3ODIyOWM32MzQzNmExMgoYzI4ZDY3NjI4NTIyZTk=" . ] .
+      msg:signatureValue "OGQzNGVkMzVmMmQ3ODIyOWM32MzQzNmExMgoYzI4ZDY3NjI4NTIyZTk=" . ] .
 }
-:G2 sig:signature [
+:G2 msg:Signature [
    rdf:type sig:JsonldSignature ;
    sig:signer <http://authority.payswarm.com/webid#key-873> ;
-   sig:signatureValue "kMzVmMVDIyOWM32MzI4ZDY3NjI4mQ3OOGQzNGNTIyZTkQzNmExMgoYz=" . ] .
+   msg:signatureValue "kMzVmMVDIyOWM32MzI4ZDY3NjI4mQ3OOGQzNGNTIyZTkQzNmExMgoYz=" . ] .

@@ -65,14 +65,14 @@ public class WonMessageSignerVerifierTest {
     public void testVerify() throws Exception {
         // create signed dataset
         Dataset testDataset = TestSigningUtils.prepareTestDataset(RESOURCE_FILE_SIG);
-        WonMessage testMsg = new WonMessage(testDataset);
+        WonMessage testMsg = WonMessage.of(testDataset);
         // verify
         SignatureVerificationState result = WonMessageSignerVerifier.verify(pubKeysMap, testMsg);
         Assert.assertTrue(result.getMessage(), result.isVerificationPassed());
         Assert.assertEquals(3, result.getSignatureGraphNames().size());
-        Assert.assertEquals(ATOM_CORE_DATA_URI, result.getSignedGraphName(ATOM_CORE_DATA_SIG_URI));
-        Assert.assertEquals(EVENT_ENV1_URI, result.getSignedGraphName(EVENT_ENV1_SIG_URI));
-        Assert.assertEquals(EVENT_ENV2_URI, result.getSignedGraphName(EVENT_ENV2_SIG_URI));
+        Assert.assertEquals(ATOM_CORE_DATA_URI, result.getSignedGraphNames(ATOM_CORE_DATA_SIG_URI));
+        Assert.assertEquals(EVENT_ENV1_URI, result.getSignedGraphNames(EVENT_ENV1_SIG_URI));
+        Assert.assertEquals(EVENT_ENV2_URI, result.getSignedGraphNames(EVENT_ENV2_SIG_URI));
     }
 
     @Test
@@ -80,20 +80,20 @@ public class WonMessageSignerVerifierTest {
     public void signAndVerifyUnsignedMessage() throws Exception {
         // create signed dataset
         Dataset testDataset = TestSigningUtils.prepareTestDataset(RESOURCE_OWNER_FILE_NOSIG);
-        WonMessage testMsg = new WonMessage(testDataset);
+        WonMessage testMsg = WonMessage.of(testDataset);
         // sign
-        testMsg = WonMessageSignerVerifier.sign(atomKey, pubKeysMap.get(TestSigningUtils.nodeCertUri),
+        testMsg = WonMessageSignerVerifier.signAndSeal(atomKey, pubKeysMap.get(TestSigningUtils.nodeCertUri),
                         TestSigningUtils.atomCertUri, testMsg);
         // pretend msg was serialized and deserialized in between
         // pretend it was serialized and deserialized
         String datasetString = RdfUtils.writeDatasetToString(testMsg.getCompleteDataset(), Lang.TRIG);
-        testMsg = new WonMessage(RdfUtils.readDatasetFromString(datasetString, Lang.TRIG));
+        testMsg = WonMessage.of(RdfUtils.readDatasetFromString(datasetString, Lang.TRIG));
         // verify
         SignatureVerificationState result = WonMessageSignerVerifier.verify(pubKeysMap, testMsg);
         Assert.assertTrue(result.isVerificationPassed());
         Assert.assertEquals(2, result.getSignatureGraphNames().size());
-        Assert.assertEquals(ATOM_CORE_DATA_URI, result.getSignedGraphName(ATOM_CORE_DATA_SIG_URI));
-        Assert.assertEquals(EVENT_ENV1_URI, result.getSignedGraphName(EVENT_ENV1_SIG_URI));
+        Assert.assertEquals(ATOM_CORE_DATA_URI, result.getSignedGraphNames(ATOM_CORE_DATA_SIG_URI));
+        Assert.assertEquals(EVENT_ENV1_URI, result.getSignedGraphNames(EVENT_ENV1_SIG_URI));
         // write for debugging
         TestSigningUtils.writeToTempFile(testMsg.getCompleteDataset());
     }
@@ -102,21 +102,21 @@ public class WonMessageSignerVerifierTest {
     public void signAndVerifySignedMessageNode() throws Exception {
         // create signed dataset
         Dataset testDataset = TestSigningUtils.prepareTestDataset(RESOURCE_NODE_FILE_NOSIG);
-        WonMessage testMsg = new WonMessage(testDataset);
+        WonMessage testMsg = WonMessage.of(testDataset);
         // sign
-        testMsg = WonMessageSignerVerifier.sign(nodeKey, pubKeysMap.get(TestSigningUtils.nodeCertUri),
+        testMsg = WonMessageSignerVerifier.signAndSeal(nodeKey, pubKeysMap.get(TestSigningUtils.nodeCertUri),
                         TestSigningUtils.nodeCertUri, testMsg);
         // pretend msg was serialized and deserialized in between
         // pretend it was serialized and deserialized
         String datasetString = RdfUtils.writeDatasetToString(testMsg.getCompleteDataset(), Lang.TRIG);
-        testMsg = new WonMessage(RdfUtils.readDatasetFromString(datasetString, Lang.TRIG));
+        testMsg = WonMessage.of(RdfUtils.readDatasetFromString(datasetString, Lang.TRIG));
         // verify
         SignatureVerificationState result = WonMessageSignerVerifier.verify(pubKeysMap, testMsg);
         Assert.assertTrue(result.getMessage(), result.isVerificationPassed());
         Assert.assertEquals(3, result.getSignatureGraphNames().size());
-        Assert.assertEquals(ATOM_CORE_DATA_URI, result.getSignedGraphName(ATOM_CORE_DATA_SIG_URI));
-        Assert.assertEquals(EVENT_ENV1_URI, result.getSignedGraphName(EVENT_ENV1_SIG_URI));
-        Assert.assertEquals(EVENT_ENV2_URI, result.getSignedGraphName(EVENT_ENV2_SIG_URI));
+        Assert.assertEquals(ATOM_CORE_DATA_URI, result.getSignedGraphNames(ATOM_CORE_DATA_SIG_URI));
+        Assert.assertEquals(EVENT_ENV1_URI, result.getSignedGraphNames(EVENT_ENV1_SIG_URI));
+        Assert.assertEquals(EVENT_ENV2_URI, result.getSignedGraphNames(EVENT_ENV2_SIG_URI));
         // write for debugging
         TestSigningUtils.writeToTempFile(testMsg.getCompleteDataset());
     }

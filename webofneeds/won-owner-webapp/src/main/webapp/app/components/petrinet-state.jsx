@@ -57,6 +57,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     className: ownProps.className,
     processUri: ownProps.processUri,
+    connection: connection,
     connectionUri: connectionUri,
     multiSelectType: get(connection, "multiSelectType"),
     petriNetData: petriNetData,
@@ -76,7 +77,8 @@ const mapDispatchToProps = dispatch => {
     sendChatMessageClaimOnSuccess: (
       processUri,
       transitionUri,
-      connectionUri
+      senderSocketUri,
+      targetSocketUri
     ) => {
       dispatch(
         actionCreators.connections__sendChatMessageClaimOnSuccess(
@@ -85,7 +87,8 @@ const mapDispatchToProps = dispatch => {
             petriNetUri: processUri,
             transitionUri: transitionUri,
           }),
-          connectionUri
+          senderSocketUri,
+          targetSocketUri
         )
       );
     },
@@ -206,10 +209,14 @@ class WonPetrinetState extends React.Component {
         this.props.processUri
       );
 
+      const senderSocketUri = get(this.props.connection, "socketUri");
+      const targetSocketUri = get(this.props.connection, "targetSocketUri");
+
       this.props.sendChatMessageClaimOnSuccess(
         this.props.processUri,
         transitionUri,
-        this.props.connectionUri
+        senderSocketUri,
+        targetSocketUri
       );
     }
   }
@@ -217,6 +224,7 @@ class WonPetrinetState extends React.Component {
 WonPetrinetState.propTypes = {
   processUri: PropTypes.string.isRequired,
   className: PropTypes.string,
+  connection: PropTypes.object,
   connectionUri: PropTypes.string,
   multiSelectType: PropTypes.string,
   petriNetData: PropTypes.object,

@@ -1,0 +1,9 @@
+PREFIX won:<https://w3id.org/won/core#>
+PREFIX msg:<https://w3id.org/won/message#>
+select ?msg where {
+	graph ?graph {
+		?msg msg:isRemoteResponseTo ?remMsg .
+		?msg msg:isResponseTo ?localMsg .
+		
+	}
+}

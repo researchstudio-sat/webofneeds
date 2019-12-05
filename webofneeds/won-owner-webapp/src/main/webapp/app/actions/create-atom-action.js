@@ -15,13 +15,9 @@ import * as accountUtils from "../redux/utils/account-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as ownerApi from "../api/owner-api.js";
 
-export function atomEdit(draft, oldAtom, nodeUri) {
+export function atomEdit(draft, oldAtom) {
   return (dispatch, getState) => {
     const state = getState();
-
-    if (!nodeUri) {
-      nodeUri = getIn(state, ["config", "defaultNodeUri"]);
-    }
 
     let prevParams = getIn(state, ["router", "prevParams"]);
 
@@ -39,18 +35,22 @@ export function atomEdit(draft, oldAtom, nodeUri) {
     }
 
     return ensureLoggedIn(dispatch, getState).then(async () => {
-      const { message, eventUri, atomUri } = await buildEditMessage(
-        draft,
-        oldAtom,
-        nodeUri
-      );
+      const { message, atomUri } = await buildEditMessage(draft, oldAtom);
 
-      dispatch({
-        type: actionTypes.atoms.edit,
-        payload: { eventUri, message, atomUri, atom: draft, oldAtom },
+      ownerApi.sendMessage(message).then(jsonResp => {
+        dispatch({
+          type: actionTypes.atoms.edit,
+          payload: {
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
+            atomUri: atomUri,
+            atom: draft,
+            oldAtom,
+          },
+        });
+
+        dispatch(actionCreators.router__back());
       });
-
-      dispatch(actionCreators.router__back());
     });
   };
 }
@@ -79,32 +79,39 @@ export function atomCreate(draft, personaUri, nodeUri) {
     }
 
     return ensureLoggedIn(dispatch, getState).then(async () => {
-      const { message, eventUri, atomUri } = await buildCreateMessage(
-        draft,
-        nodeUri
-      );
+      const { message, atomUri } = await buildCreateMessage(draft, nodeUri);
 
-      dispatch({
-        type: actionTypes.atoms.create,
-        payload: { eventUri, message, atomUri, atom: draft },
-      });
-
-      const persona = getIn(state, ["atoms", personaUri]);
-      if (persona) {
-        return ownerApi
-          .serverSideConnect(
-            atomUtils.getSocketUri(persona, won.HOLD.HolderSocketCompacted),
-            `${atomUri}#holdableSocket`,
-            false,
-            true
-          )
-          .then(async response => {
-            if (!response.ok) {
-              const errorMsg = await response.text();
-              throw new Error(`Could not connect identity: ${errorMsg}`);
-            }
+      ownerApi
+        .sendMessage(message)
+        .then(jsonResp => {
+          dispatch({
+            type: actionTypes.atoms.create,
+            payload: {
+              eventUri: jsonResp.messageUri,
+              message: jsonResp.message,
+              atomUri: atomUri,
+              atom: draft,
+            },
           });
-      }
+        })
+        .then(() => {
+          const persona = getIn(state, ["atoms", personaUri]);
+          if (persona) {
+            return ownerApi
+              .serverSideConnect(
+                atomUtils.getSocketUri(persona, won.HOLD.HolderSocketCompacted),
+                `${atomUri}#holdableSocket`,
+                false,
+                true
+              )
+              .then(async response => {
+                if (!response.ok) {
+                  const errorMsg = await response.text();
+                  throw new Error(`Could not connect identity: ${errorMsg}`);
+                }
+              });
+          }
+        });
     });
   };
 }

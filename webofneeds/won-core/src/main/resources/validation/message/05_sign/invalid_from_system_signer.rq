@@ -9,67 +9,69 @@ prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix local: <http://localhost:8080/won/resource/>
 prefix won:   <https://w3id.org/won/core#>
 prefix msg:   <https://w3id.org/won/message#>
-prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
+
 prefix ldp:   <http://www.w3.org/ns/ldp#>
 
 
-# all 'fromSystem' envelopes should be signed by senderNode
+# 'fromOwner' envelopes should be signed by:
+# - if it is the envelope without child envelopes - by sender atom
+# - if it is any other envelope - by sender Node, if specified,
+# and by receiver Node, if senderNode is unspecified
 #ASK
 #{
   SELECT
 
-    ?correctSysenvNum
-
-    ?sysenvNum
-
-
-    (if(?sysenvNum != ?correctSysenvNum, "FAIL", "OK") AS ?check)
+    ?signer
+    
+    ?signerCount
+    ?signedCount
+    
+    ( if( (?signedCount = 0 || ?signerCount = 1), "OK", "FAIL") AS ?check)
 
 
   WHERE
   {
 
 
-    # count fromSystem envelopes that have correct signers
+    # count fromOwner leaf that have correct signers
     {SELECT
-    (count(DISTINCT ?env) as ?correctSysenvNum)
+    (count(DISTINCT ?signer) as ?signerCount )
+    (count(DISTINCT ?signedGraph) as ?signedCount )
     WHERE
     {
-      GRAPH ?g1
-      {
-          ?event msg:senderNode    ?envsigner
-      } .
-      GRAPH ?g2
-      {
-          ?event a msg:FromSystem .
-      } .
       GRAPH ?env
       {
           ?env a msg:EnvelopeGraph .
-          ?env <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf> ?event .
-      } .
-      GRAPH ?g3
-      {
-          ?envsig a signature:Signature .
-          ?envsig msg:signedGraph ?env .
-          ?envsig signature:hasVerificationCertificate ?envsigner .
-      } .
-    } ORDER BY ?event
-    }
-
-    # count all fromSystem envelopes
-        {SELECT
-        (count (DISTINCT ?g) AS ?sysenvNum)
-        WHERE
-        {
-          GRAPH ?g
+          ?event msg:envelope ?env ;
+                 a msg:FromOwner .
           {
-              ?event a msg:FromSystem .
-          } .
-        }
-        }
+          	?event msg:senderSocket  ?senderSocketOrAtom .
+          } union {
+          	?event msg:senderAtom  ?senderSocketOrAtom .
+          }  
+          
+      } 
+      BIND( IRI( replace( ?senderSocketOrAtom, "/atom/[a-zA-Z0-9#]+$", "" ) ) as ?signer )
+      GRAPH ?g1
+      {
+          ?sig a msg:Signature .
+          ?sig msg:signedGraph ?signedGraph .
+      } 
+      GRAPH ?g2
+      {
+          ?sig a msg:Signature .
+          ?sig msg:signedGraph ?signedGraph .
+          ?sig msg:signer ?signer .
+      }
+      FILTER NOT EXISTS {
+      	?env msg:content ?g1
+      }
+      FILTER NOT EXISTS {
+      	?env msg:content ?g2
+      } 
+    } 
 
   }
 
 
-#}
+}

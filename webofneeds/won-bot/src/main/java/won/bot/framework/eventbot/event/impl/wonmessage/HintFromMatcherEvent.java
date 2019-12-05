@@ -1,12 +1,12 @@
 package won.bot.framework.eventbot.event.impl.wonmessage;
 
+import java.net.URI;
+
 import won.bot.framework.eventbot.event.BaseEvent;
 import won.bot.framework.eventbot.event.MessageEvent;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
-
-import java.net.URI;
-import java.util.Optional;
+import won.protocol.message.WonMessageUtils;
 
 public abstract class HintFromMatcherEvent extends BaseEvent implements MessageEvent {
     private final WonMessage wonMessage;
@@ -17,20 +17,12 @@ public abstract class HintFromMatcherEvent extends BaseEvent implements MessageE
     HintFromMatcherEvent(WonMessage wonMessage) {
         this.wonMessage = wonMessage;
         this.hintScore = wonMessage.getHintScore();
-        this.targetAtomURI = wonMessage.getHintTargetAtomURI();
-        this.recipientAtomURI = wonMessage.getRecipientAtomURI();
+        this.targetAtomURI = WonMessageUtils.getHintTargetAtomURIRequired(wonMessage);
+        this.recipientAtomURI = WonMessageUtils.getRecipientAtomURIRequired(wonMessage);
     }
 
     public final double getHintScore() {
         return hintScore;
-    }
-
-    public Optional<URI> getTargetAtomURI() {
-        return Optional.of(targetAtomURI);
-    }
-
-    public Optional<URI> getRecipientAtomURI() {
-        return Optional.of(recipientAtomURI);
     }
 
     public URI getHintTargetAtom() {

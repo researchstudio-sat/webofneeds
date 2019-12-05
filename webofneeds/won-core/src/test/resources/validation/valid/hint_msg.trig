@@ -1,23 +1,9 @@
 @prefix con:   <https://w3id.org/won/content#> .
 @prefix match:   <https://w3id.org/won/matching#> .
-<https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc#envelope-7ema> {
-    <https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc>
-            a       <https://w3id.org/won/message#FromExternal> ;
-            <https://w3id.org/won/message#receivedTimestamp>
-                    "1537172373064"^^<http://www.w3.org/2001/XMLSchema#long> ;
-            <https://w3id.org/won/message#protocolVersion>
-                    "1.0" .
 
-    <https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc#envelope-7ema>
-            a       <https://w3id.org/won/message#EnvelopeGraph> ;
-            <https://w3id.org/won/message#containsEnvelope>
-                    <https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc#envelope-0w69> ;
-            <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
-                    <https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc> .
-}
 
-<https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc#envelope-0w69> {
-    <https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc#envelope-0w69>
+<https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc#envelope> {
+    <https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc#envelope>
             a       <https://w3id.org/won/message#EnvelopeGraph> ;
             <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
                     <https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc> .
@@ -36,7 +22,7 @@
                     <https://nodeblue.master.matchat.org/won/resource> ;
             <https://w3id.org/won/message#senderNode>
                     <http://localhost:8983/sparql/> ;
-            <https://w3id.org/won/message#sentTimestamp>
+            <https://w3id.org/won/message#timestamp>
                     "1537172135089"^^<http://www.w3.org/2001/XMLSchema#long> ;
             <https://w3id.org/won/message#protocolVersion>
                     "1.0" .

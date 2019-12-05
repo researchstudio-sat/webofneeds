@@ -546,6 +546,28 @@ export function getPetriNetUris(connectionUri) {
 }
 
 /**
+ * Send a message to the endpoint and return a promise with a json payload with messageUri and message as props
+ * @param msg
+ * @returns {*}
+ */
+export function sendMessage(msg) {
+  return fetch("/owner/rest/messages/send", {
+    body: JSON.stringify(msg),
+    method: "POST",
+    headers: new Headers({
+      "Content-Type": "application/ld+json",
+    }),
+    credentials: "include",
+  })
+    .then(checkHttpStatus)
+    .then(response => response.json())
+    .then(jsonResponse => ({
+      messageUri: jsonResponse.messageUri,
+      message: msg,
+    }));
+}
+
+/**
  * Throws an error if this isn't a good http-response
  * @param response
  * @returns {*}

@@ -55,7 +55,7 @@
     restricted access, we want to verify the WebID and we want no client-side caching. For public access, the WebID
     verification step is not needed, and we can be more open about caching.
      -->
-	<sec:http request-matcher="regex" pattern="/(resource|data|page)/((event/.+)|(atom/[a-zA-Z0-9]+/((deep.*)|(events/.+)|unread))|(connection/[a-zA-Z0-9]+/events.*))" entry-point-ref="authorizationEntryPoint" authentication-manager-ref="clientCertificateWebIdAuthenticationManager" access-decision-manager-ref="webIdBasedAccessDecisionManager">
+	<sec:http request-matcher="regex" pattern="/(resource|data|page)/((msg/.+)|(atom/[a-zA-Z0-9]+/((deep.*)|(msg/.+)|unread))|(atom/[a-zA-Z0-9]+/c/[a-zA-Z0-9]+/msg.*))" entry-point-ref="authorizationEntryPoint" authentication-manager-ref="clientCertificateWebIdAuthenticationManager" access-decision-manager-ref="webIdBasedAccessDecisionManager">
 		<sec:headers defaults-disabled="true">
 			<sec:content-type-options />
 			<sec:hsts />
@@ -101,7 +101,7 @@
 		</sec:headers>
 		<sec:intercept-url pattern="/(resource|data|page)(/atom)?(((\?.*)|/)?)" access="permitAll"/>
 		<sec:intercept-url pattern="/(resource|data|page)/connection(((\?.*)|/)?)" access="permitAll"/>
-		<sec:intercept-url pattern="/(resource|data|page)/((atom/[a-zA-Z0-9]+(/connections)?)|(connection/[a-zA-Z0-9]+))(((\?.*)|/)?)" access="permitAll"/>
+		<sec:intercept-url pattern="/(resource|data|page)/((atom/[a-zA-Z0-9]+(/c)?)|(atom/[a-zA-Z0-9]+/c/[a-zA-Z0-9]+))(((\?.*)|/)?)" access="permitAll"/>
 		<sec:intercept-url pattern=".*" access="denyAll"/>
 		<!-- we do not need CSRF protection for publicly accessible resources, as accessing them is not state-changing -->
 		<sec:csrf disabled="true" />

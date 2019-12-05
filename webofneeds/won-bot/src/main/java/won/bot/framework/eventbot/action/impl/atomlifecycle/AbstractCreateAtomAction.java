@@ -10,22 +10,22 @@
  */
 package won.bot.framework.eventbot.action.impl.atomlifecycle;
 
-import org.apache.jena.query.Dataset;
-import won.bot.framework.eventbot.EventListenerContext;
-import won.bot.framework.eventbot.action.BaseEventBotAction;
-import won.protocol.exception.WonMessageBuilderException;
-import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.model.SocketType;
-import won.protocol.service.WonNodeInformationService;
-import won.protocol.util.AtomModelWrapper;
-import won.protocol.util.RdfUtils;
-import won.protocol.vocabulary.WONMATCH;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.apache.jena.query.Dataset;
+
+import won.bot.framework.eventbot.EventListenerContext;
+import won.bot.framework.eventbot.action.BaseEventBotAction;
+import won.protocol.exception.WonMessageBuilderException;
+import won.protocol.message.WonMessage;
+import won.protocol.message.builder.WonMessageBuilder;
+import won.protocol.model.SocketType;
+import won.protocol.util.AtomModelWrapper;
+import won.protocol.util.RdfUtils;
+import won.protocol.vocabulary.WONMATCH;
 
 /**
  * Base class for actions that create atoms.
@@ -79,19 +79,17 @@ public abstract class AbstractCreateAtomAction extends BaseEventBotAction {
 
     protected WonMessage createWonMessage(URI atomURI, Dataset atomDataset, final boolean usedForTesting,
                     final boolean doNotMatch) {
-        return createWonMessage(getEventListenerContext().getWonNodeInformationService(), atomURI,
-                        getEventListenerContext().getNodeURISource().getNodeURI(), atomDataset, usedForTesting,
-                        doNotMatch);
+        return createWonMessage(atomURI, getEventListenerContext().getNodeURISource().getNodeURI(),
+                        atomDataset, usedForTesting, doNotMatch);
     }
 
-    protected WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI atomURI,
-                    URI wonNodeURI, Dataset atomDataset) throws WonMessageBuilderException {
-        return createWonMessage(wonNodeInformationService, atomURI, wonNodeURI, atomDataset, usedForTesting,
-                        doNotMatch);
+    protected WonMessage createWonMessage(URI atomURI, URI wonNodeURI,
+                    Dataset atomDataset) throws WonMessageBuilderException {
+        return createWonMessage(atomURI, wonNodeURI, atomDataset, usedForTesting, doNotMatch);
     }
 
-    protected WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI atomURI,
-                    URI wonNodeURI, Dataset atomDataset, final boolean usedForTesting, final boolean doNotMatch)
+    protected WonMessage createWonMessage(URI atomURI, URI wonNodeURI,
+                    Dataset atomDataset, final boolean usedForTesting, final boolean doNotMatch)
                     throws WonMessageBuilderException {
         AtomModelWrapper atomModelWrapper = new AtomModelWrapper(atomDataset);
         if (doNotMatch) {
@@ -102,8 +100,11 @@ public abstract class AbstractCreateAtomAction extends BaseEventBotAction {
             atomModelWrapper.addFlag(WONMATCH.UsedForTesting);
         }
         RdfUtils.replaceBaseURI(atomDataset, atomURI.toString(), true);
-        return WonMessageBuilder.setMessagePropertiesForCreate(wonNodeInformationService.generateEventURI(wonNodeURI),
-                        atomURI, wonNodeURI).addContent(atomModelWrapper.copyDatasetWithoutSysinfo()).build();
+        return WonMessageBuilder
+                        .createAtom()
+                        .atom(atomURI)
+                        .content().dataset(atomModelWrapper.copyDatasetWithoutSysinfo())
+                        .build();
     }
 
     public void setUsedForTesting(final boolean usedForTesting) {

@@ -10,7 +10,7 @@ SELECT distinct (?msg as ?uri) ?timestamp ?msgType ?text ?senderAtom ?retracts ?
  GRAPH <urn:x-arq:UnionGraph> {
    ?msg msg:senderAtom ?senderAtom.
    ?msg msg:messageType ?msgType.
-   ?msg msg:receivedTimestamp ?timestamp.
+   ?msg msg:timestamp ?timestamp.
    OPTIONAL {
     ?msg con:text ?text.
    }

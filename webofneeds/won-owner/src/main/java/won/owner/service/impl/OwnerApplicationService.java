@@ -1,5 +1,7 @@
 package won.owner.service.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +10,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.sender.WonMessageSender;
-
-import java.lang.invoke.MethodHandles;
+import won.protocol.message.sender.exception.WonMessageSenderException;
 
 /**
  * Service that connects client-side logic (e.g. the WonWebSocketHandler in
@@ -25,19 +26,29 @@ public class OwnerApplicationService implements WonMessageProcessor, WonMessageS
     // we don't do autowiring.
     private WonMessageProcessor messageProcessorDelegate = new NopOwnerApplicationServiceCallback();
 
+    @Override
+    public WonMessage prepareMessage(WonMessage message) throws WonMessageSenderException {
+        return wonMessageSenderDelegate.prepareMessage(message);
+    }
+
     /**
      * Sends a message to the won node.
      * 
      * @param wonMessage
      */
-    public void sendWonMessage(WonMessage wonMessage) {
+    public void sendMessage(WonMessage wonMessage) {
         try {
             // send to node:
-            wonMessageSenderDelegate.sendWonMessage(wonMessage);
+            wonMessageSenderDelegate.sendMessage(wonMessage);
         } catch (Exception e) {
             // TODO: send error message back to client!
             logger.info("could not send WonMessage", e);
         }
+    }
+
+    @Override
+    public void prepareAndSendMessage(WonMessage message) throws WonMessageSenderException {
+        sendMessage(prepareMessage(message));
     }
 
     /**

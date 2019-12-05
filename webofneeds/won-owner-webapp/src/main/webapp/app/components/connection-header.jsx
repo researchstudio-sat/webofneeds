@@ -10,7 +10,6 @@ import VisibilitySensor from "react-visibility-sensor";
 import { get, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
-import won from "../won-es6";
 import { labels, relativeTime } from "../won-label-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as messageSelectors from "../redux/selectors/message-selectors.js";
@@ -83,9 +82,7 @@ const mapStateToProps = (state, ownProps) => {
     isTargetAtomOwned &&
     get(targetAtom, "connections")
       .filter(
-        con =>
-          atomUtils.getSocketUri(targetAtom, won.GROUP.GroupSocketCompacted) ===
-          get(con, "socketUri")
+        con => atomUtils.getGroupSocket(targetAtom) === get(con, "socketUri")
       )
       .filter(con => connectionUtils.isRequestReceived(con));
 

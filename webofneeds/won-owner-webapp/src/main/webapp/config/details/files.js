@@ -26,7 +26,7 @@ export const files = {
         let f = {
           "@id":
             contentUri && identifier
-              ? contentUri + "/" + identifier + "/" + generateIdString(10)
+              ? contentUri + "#" + identifier + "-" + generateIdString(10)
               : undefined,
           "@type": "s:FileObject",
           "s:name": file.name,
@@ -112,7 +112,7 @@ export const images = {
         let img = {
           "@id":
             contentUri && identifier
-              ? contentUri + "/" + identifier + "/" + generateIdString(10)
+              ? contentUri + "#" + identifier + "-" + generateIdString(10)
               : undefined,
           "@type": "s:ImageObject",
           "s:name": image.name,

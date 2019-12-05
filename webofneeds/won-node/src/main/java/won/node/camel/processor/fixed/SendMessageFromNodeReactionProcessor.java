@@ -1,26 +1,29 @@
 package won.node.camel.processor.fixed;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
+import won.node.camel.service.WonCamelHelper;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
 import won.protocol.util.LoggingUtils;
+import won.protocol.util.Prefixer;
 import won.protocol.util.RdfUtils;
-import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WONMSG;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.List;
-import java.util.Objects;
 
 @Component
 @FixedMessageReactionProcessor(direction = WONMSG.FromExternalString, messageType = WONMSG.ConnectionMessageString)
@@ -45,14 +48,18 @@ public class SendMessageFromNodeReactionProcessor extends AbstractCamelProcessor
         injectTargets.forEach(target -> {
             try {
                 // don't inject into the connection we're currently on.
-                if (target.equals(wonMessage.getRecipientURI())) {
+                if (Objects.equals(target, WonCamelHelper.getConnectionURI(exchange))) {
                     return;
                 }
                 // only inject into those connections that belong to the receiver atom of this
                 // message
-                Connection con = connectionRepository.findOneByConnectionURI(target);
-                if (con.getAtomURI().equals(wonMessage.getRecipientAtomURI())) {
-                    forward(wonMessage, con);
+                Optional<Connection> con = connectionService.getConnection(target);
+                if (con.isPresent()) {
+                    if (con.get().getAtomURI().equals(wonMessage.getRecipientAtomURI())) {
+                        forward(wonMessage, con.get());
+                    }
+                } else {
+                    logger.debug("Could not inject message into connection {}: no connection found", target);
                 }
             } catch (Exception e) {
                 LoggingUtils.logMessageAsInfoAndStacktraceAsDebug(logger, e, "Could not forward message {}",
@@ -70,16 +77,19 @@ public class SendMessageFromNodeReactionProcessor extends AbstractCamelProcessor
                             new Object[] { wonMessage.getMessageURI(), wonMessage.getSenderAtomURI(),
                                             conToSendTo.getConnectionURI() });
         }
-        URI injectedMessageURI = wonNodeInformationService.generateEventURI(wonMessage.getRecipientNodeURI());
-        URI remoteWonNodeUri = WonLinkedDataUtils
-                        .getWonNodeURIForAtomOrConnectionURI(conToSendTo.getTargetConnectionURI(), linkedDataSource);
-        WonMessage newWonMessage = WonMessageBuilder.forwardReceivedNodeToNodeMessageAsNodeToNodeMessage(
-                        injectedMessageURI, wonMessage, conToSendTo.getConnectionURI(), conToSendTo.getAtomURI(),
-                        wonMessage.getRecipientNodeURI(), conToSendTo.getTargetConnectionURI(),
-                        conToSendTo.getTargetAtomURI(), remoteWonNodeUri);
+        WonMessage newWonMessage = WonMessageBuilder
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(conToSendTo.getSocketURI())
+                        /**/.recipient(conToSendTo.getTargetSocketURI())
+                        .forward(wonMessage)
+                        .direction()
+                        /**/.fromSystem()
+                        .build();
         if (logger.isDebugEnabled()) {
-            logger.debug("injecting this message: {} ", RdfUtils.toString(newWonMessage.getCompleteDataset()));
+            logger.debug("injecting this message: {} ",
+                            RdfUtils.toString(Prefixer.setPrefixes(newWonMessage.getCompleteDataset())));
         }
-        sendSystemMessage(newWonMessage);
+        camelWonMessageService.sendSystemMessage(newWonMessage);
     }
 }
