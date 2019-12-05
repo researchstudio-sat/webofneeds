@@ -42,7 +42,9 @@ export function parseMessage(
     data: {
       uri: wonMessage.getMessageUri(),
       forwardMessage: forwardMessage,
-      originatorUri: forwardMessage ? wonMessage.getSenderAtom() : undefined,
+      originatorUri: forwardMessage
+        ? generalSelectors.getAtomUriBySocketUri(wonMessage.getSenderSocket())
+        : undefined,
       content: {
         text: wonMessage.getTextMessage(),
         matchScore:

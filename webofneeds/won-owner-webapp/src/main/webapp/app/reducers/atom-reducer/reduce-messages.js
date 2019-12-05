@@ -27,6 +27,7 @@ export function addMessage(
   // New solution: parse anything that is not a response, but allow responses with content
   if (!wonMessage.isResponse() || wonMessage.getContentGraphs().length > 0) {
     let parsedMessage = parseMessage(wonMessage, alreadyProcessed, false);
+
     if (parsedMessage) {
       if (eventUriOverride) {
         // In Some cases (like if we send a message) we need to override the messageUri in the wonMessage with the correct one
@@ -81,9 +82,7 @@ export function addMessage(
           senderConnectionUri,
           "messages",
         ]);
-        console.debug("already stored messages: ", messages);
         if (messages) {
-          console.debug("messages exist adding new message");
           //ignore messages for nonexistant connections
 
           const existingMessage = messages.get(
@@ -106,7 +105,6 @@ export function addMessage(
             parsedMessage.getIn(["data", "uri"]),
             parsedMessage.get("data")
           );
-          console.debug("new stored messages: ", messages);
 
           state = state.setIn(
             [senderAtomUri, "connections", senderConnectionUri, "messages"],
@@ -159,9 +157,7 @@ export function addMessage(
           targetConnectionUri,
           "messages",
         ]);
-        console.debug("already stored messages: ", messages);
         if (messages) {
-          console.debug("messages exist adding new message");
           //ignore messages for nonexistant connections
 
           /*
@@ -195,7 +191,6 @@ export function addMessage(
               parsedMessage.getIn(["data", "uri"]),
               parsedMessage.get("data")
             );
-            console.debug("new stored messages: ", messages);
           }
 
           state = state.setIn(
@@ -203,6 +198,94 @@ export function addMessage(
             messages
           );
         }
+      }
+
+      const connections = connectionSelectors.getConnectionsToInjectMsgInto(
+        state,
+        targetSocketUri,
+        getIn(parsedMessage, ["data", "uri"])
+      );
+      if (connections && connections.size > 0) {
+        connections.map(conn => {
+          let forwardMessage = parseMessage(wonMessage, alreadyProcessed, true);
+          if (forwardMessage) {
+            if (eventUriOverride) {
+              // In Some cases (like if we send a message) we need to override the messageUri in the wonMessage with the correct one
+              forwardMessage = forwardMessage.setIn(
+                ["data", "uri"],
+                eventUriOverride
+              );
+            }
+
+            const connUri = get(conn, "uri");
+            const atomUri = get(
+              state.find(atom => !!getIn(atom, ["connections", connUri])),
+              "uri"
+            );
+
+            if (
+              connectionSelectors.isChatToGroupConnection(
+                state,
+                getIn(state, [atomUri, "connections", connUri])
+              ) &&
+              senderSocketUri !== get(conn, "socketUri")
+            ) {
+              let messages = state.getIn([
+                atomUri,
+                "connections",
+                connUri,
+                "messages",
+              ]);
+              if (messages) {
+                //ignore messages for nonexistant connections
+                console.debug(
+                  "Store message in injectIntoConnection: Msg:(",
+                  forwardMessage,
+                  ") ",
+                  senderSocketUri,
+                  "->",
+                  targetSocketUri,
+                  "will be added to connection(",
+                  connUri,
+                  ") :",
+                  conn
+                );
+
+                const existingMessage = messages.get(
+                  forwardMessage.getIn(["data", "uri"])
+                );
+
+                const isReceivedByOwn = !!get(
+                  existingMessage,
+                  "isReceivedByOwn"
+                );
+                const isReceivedByRemote = !!get(
+                  existingMessage,
+                  "isReceivedByRemote"
+                );
+
+                if (
+                  !alreadyProcessed &&
+                  (isReceivedByOwn || isReceivedByRemote)
+                ) {
+                  forwardMessage = forwardMessage
+                    .setIn(["data", "isReceivedByOwn"], isReceivedByOwn)
+                    .setIn(["data", "isReceivedByRemote"], isReceivedByRemote);
+                }
+
+                messages = messages.set(
+                  forwardMessage.getIn(["data", "uri"]),
+                  forwardMessage.get("data")
+                );
+
+                state = state.setIn(
+                  [atomUri, "connections", connUri, "messages"],
+                  messages
+                );
+              }
+            }
+          }
+        });
       }
     }
   }

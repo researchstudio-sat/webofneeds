@@ -555,7 +555,7 @@ export function sendMessage(msg) {
     body: JSON.stringify(msg),
     method: "POST",
     headers: new Headers({
-      "Content-Type": "application/ld+json",
+      "Content-Type": "application/ld+json;charset=UTF-8",
     }),
     credentials: "include",
   })
