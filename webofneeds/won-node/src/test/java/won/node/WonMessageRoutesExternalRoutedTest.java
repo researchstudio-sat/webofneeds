@@ -1660,7 +1660,163 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
                         .content()
                         /**/.text("Message to the group from atom1")
                         .build());
-        toOwnerMockEndpoint.expectedMessageCount(4); // TODO this includes two responses to the group's owner, which
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(textMsgToGroup, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+    }
+
+    @Test
+    @Commit // @Rollback would't work as camel still commits
+    public void test_group4__conversation() throws Exception {
+        URI atomURI = newAtomURI();
+        URI socketURI = URI.create(atomURI.toString() + "#socket1");
+        URI atomURI2 = newAtomURI();
+        URI socketURI2 = URI.create(atomURI2.toString() + "#socket1");
+        URI atomURI3 = newAtomURI();
+        URI socketURI3 = URI.create(atomURI3.toString() + "#socket1");
+        URI atomURI4 = newAtomURI();
+        URI socketURI4 = URI.create(atomURI4.toString() + "#socket1");
+        URI groupAtomURI = newAtomURI();
+        URI groupSocketURI = URI.create(groupAtomURI.toString() + "#groupSocket");
+        prepareMockitoStubs(atomURI, socketURI, atomURI2, socketURI2);
+        Mockito.when(linkedDataSource.getDataForResource(eq(groupAtomURI)))
+                        .then(x -> linkedDataService.getAtomDataset(groupAtomURI, false, null));
+        Mockito.when(linkedDataSource.getDataForResource(eq(atomURI3)))
+                        .then(x -> linkedDataService.getAtomDataset(atomURI3, false, null));
+        Mockito.when(linkedDataSource.getDataForResource(eq(atomURI4)))
+                        .then(x -> linkedDataService.getAtomDataset(atomURI4, false, null));
+        WonMessage createAtom1Msg = prepareFromOwner(makeCreateAtomMessage(atomURI,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl"));
+        WonMessage createAtom2Msg = prepareFromOwner(makeCreateAtomMessage(atomURI2,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl"));
+        WonMessage createAtom3Msg = prepareFromOwner(makeCreateAtomMessage(atomURI3,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl"));
+        WonMessage createAtom4Msg = prepareFromOwner(makeCreateAtomMessage(atomURI4,
+                        "/won/node/WonMessageRoutesTest/data/test-atom1.ttl"));
+        WonMessage createGroupAtomMsg = prepareFromOwner(
+                        makeCreateAtomMessage(groupAtomURI,
+                                        "/won/node/WonMessageRoutesTest/data/test-atom1__groupsocket.ttl"));
+        // set minimal expectations just so we can expect something and subsequently
+        // reset expectations
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        sendFromOwner(createAtom2Msg, OWNERAPPLICATION_ID_OWNER2);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        sendFromOwner(createAtom3Msg, OWNERAPPLICATION_ID_OWNER2);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        sendFromOwner(createAtom4Msg, OWNERAPPLICATION_ID_OWNER2);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        toOwnerMockEndpoint.expectedMessageCount(1);
+        toMatcherMockEndpoint.expectedMessageCount(1);
+        sendFromOwner(createGroupAtomMsg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        // start connecting
+        WonMessage connectFromAtomMsg = prepareFromOwner(WonMessageBuilder
+                        .connect()
+                        .sockets().sender(socketURI).recipient(groupSocketURI)
+                        .content().text("Unittest connect with group, atom 1")
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(connectFromAtomMsg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        WonMessage connectFromAtom2Msg = prepareFromExternalOwner(WonMessageBuilder
+                        .connect()
+                        .sockets().sender(socketURI2).recipient(groupSocketURI)
+                        .content().text("Unittest connect with group, atom 2")
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(connectFromAtom2Msg, OWNERAPPLICATION_ID_OWNER2);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        WonMessage connectFromAtom3Msg = prepareFromOwner(WonMessageBuilder
+                        .connect()
+                        .sockets().sender(socketURI3).recipient(groupSocketURI)
+                        .content().text("Unittest connect with group, atom 3")
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(connectFromAtom3Msg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        WonMessage connectFromAtom4Msg = prepareFromOwner(WonMessageBuilder
+                        .connect()
+                        .sockets().sender(socketURI4).recipient(groupSocketURI)
+                        .content().text("Unittest connect with group, atom 4")
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(0);
+        sendFromOwner(connectFromAtom4Msg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        // group: accept connects
+        WonMessage connectFromGroupMsg = prepareFromOwner(WonMessageBuilder
+                        .connect()
+                        .sockets().sender(groupSocketURI).recipient(socketURI)
+                        .content().text("Unittest connect (completing the group handshake with atom 1)")
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(2);
+        sendFromOwner(connectFromGroupMsg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        connectFromGroupMsg = prepareFromOwner(WonMessageBuilder
+                        .connect()
+                        .sockets().sender(groupSocketURI).recipient(socketURI2)
+                        .content().text("Unittest connect (completing the group handshake with atom 2)")
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(2);
+        sendFromOwner(connectFromGroupMsg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        connectFromGroupMsg = prepareFromOwner(WonMessageBuilder
+                        .connect()
+                        .sockets().sender(groupSocketURI).recipient(socketURI3)
+                        .content().text("Unittest connect (completing the group handshake with atom 3)")
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(2);
+        sendFromOwner(connectFromGroupMsg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        connectFromGroupMsg = prepareFromOwner(WonMessageBuilder
+                        .connect()
+                        .sockets().sender(groupSocketURI).recipient(socketURI4)
+                        .content().text("Unittest connect (completing the group handshake with atom 4)")
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(3);
+        toMatcherMockEndpoint.expectedMessageCount(2);
+        sendFromOwner(connectFromGroupMsg, OWNERAPPLICATION_ID_OWNER1);
+        assertMockEndpointsSatisfiedAndReset(toOwnerMockEndpoint, toMatcherMockEndpoint);
+        Optional<Connection> con = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI,
+                        groupSocketURI);
+        Connection expected = new Connection();
+        expected.setState(ConnectionState.CONNECTED);
+        expected.setSocketURI(socketURI);
+        expected.setTargetSocketURI(groupSocketURI);
+        assertConnectionAsExpected(expected, con);
+        con = connectionRepository.findOneBySocketURIAndTargetSocketURI(socketURI2,
+                        groupSocketURI);
+        expected = new Connection();
+        expected.setState(ConnectionState.CONNECTED);
+        expected.setSocketURI(socketURI2);
+        expected.setTargetSocketURI(groupSocketURI);
+        assertConnectionAsExpected(expected, con);
+        // send a message to the group
+        WonMessage textMsgToGroup = prepareFromOwner(WonMessageBuilder
+                        .connectionMessage()
+                        .sockets()
+                        /**/.sender(socketURI)
+                        /**/.recipient(groupSocketURI)
+                        .content()
+                        /**/.text("Message to the group from atom1")
+                        .build());
+        toOwnerMockEndpoint.expectedMessageCount(5); // TODO this includes two responses to the group's owner, which
                                                      // should not be delivered
         toMatcherMockEndpoint.expectedMessageCount(0);
         sendFromOwner(textMsgToGroup, OWNERAPPLICATION_ID_OWNER1);
