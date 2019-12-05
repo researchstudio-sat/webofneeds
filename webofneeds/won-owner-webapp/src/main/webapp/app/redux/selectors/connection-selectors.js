@@ -145,6 +145,16 @@ export function getChatConnectionsToCrawl(state) {
   return connectionsWithoutConnectMessage || Immutable.Map();
 }
 
+export function getConnectionsToInjectMsgInto(atoms, socketUri, msgUri) {
+  const allConnections =
+    atoms && atoms.flatMap(atom => atom.get("connections"));
+
+  return allConnections
+    .filter(conn => connectionUtils.isConnected(conn))
+    .filter(conn => get(conn, "targetSocketUri") === socketUri)
+    .filter(conn => !get(conn, "messages").contains(msgUri));
+}
+
 /**
  * Returns all connections of an atom that have the status "requestReceived".
  * @param state
