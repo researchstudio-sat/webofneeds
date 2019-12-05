@@ -138,7 +138,7 @@ export function parseConnection(jsonldConnection) {
     const stateArray = parsedConnection.data.state.filter(
       item => item !== parsedConnection.data.previousState
     );
-    if (stateArray && stateArray.length == 1) {
+    if (stateArray && stateArray.size == 1) {
       parsedConnection.data.state = stateArray[0];
     } else {
       console.debug(
