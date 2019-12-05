@@ -1,7 +1,9 @@
 package won.protocol.model.util.linkeddata;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.Collection;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.riot.Lang;
@@ -10,13 +12,13 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import won.protocol.service.WonNodeInfo;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WXCHAT;
 import won.protocol.vocabulary.WXGROUP;
-
-import java.io.InputStream;
-import java.net.URI;
-import java.util.Collection;
 
 public class WonRdfUtilsTest {
     private InputStream getResourceAsStream(String name) {
@@ -64,5 +66,14 @@ public class WonRdfUtilsTest {
                         URI.create("https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#groupSocket1")));
         Assert.assertTrue(sockets.contains(
                         URI.create("https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#groupSocket1")));
+    }
+
+    @Test
+    public void testGetWonNodeInfo() {
+        Dataset nodeDataset = loadTestDatasetFromClasspathResource("wonrdfutils/wonnode.trig");
+        WonNodeInfo info = WonRdfUtils.WonNodeUtils.getWonNodeInfo(nodeDataset);
+        Assert.assertEquals("won node uri is wrong", "https://satvm05.researchstudio.at/won/resource",
+                        info.getWonNodeURI());
+        System.out.println(info);
     }
 }

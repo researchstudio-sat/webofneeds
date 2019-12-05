@@ -1,0 +1,43 @@
+@prefix msg:   <https://w3id.org/won/message#> .
+@prefix conn:  <https://satvm05.researchstudio.at/won/resource/connection/> .
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix rdfg:  <http://www.w3.org/2004/03/trix/rdfg-1/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix match: <https://w3id.org/won/matching#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix cert:  <http://www.w3.org/ns/auth/cert#> .
+@prefix local: <https://satvm05.researchstudio.at/won/resource/> .
+@prefix s:     <http://schema.org/> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:   <https://w3id.org/won/core#> .
+@prefix event: <https://satvm05.researchstudio.at/won/resource/msg/> .
+@prefix atom:  <https://satvm05.researchstudio.at/won/resource/atom/> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+
+<https://satvm05.researchstudio.at/won/resource#data> {
+    <https://satvm05.researchstudio.at/won/resource>
+            cert:key                     [ cert:PublicKey
+                              [ a                  won:ECCPublicKey ;
+                                won:ecc_algorithm  "EC" ;
+                                won:ecc_curveId    "secp384r1" ;
+                                won:ecc_qx         "48d1c98e315c03662d0d89483e271a3df6d9f491f2683cbcb743c953e477816598b91119e8f4500f2412b01317aeeaaa" ;
+                                won:ecc_qy         "da6de9c468e16b43bbaa306302fd971e2fd520ac6e901d9a05ed8c599b1eda083da992976f7bf6a50b971a1586aa6b79"
+                              ] ] ;
+            won:atomList                 local:atom ;
+            won:supportsWonProtocolImpl  [ a                         won:WonOverActiveMq ;
+                                           won:atomActivatedTopic    "MatcherProtocol.Out.Atom" ;
+                                           won:atomCreatedTopic      "MatcherProtocol.Out.Atom" ;
+                                           won:atomDeactivatedTopic  "MatcherProtocol.Out.Atom" ;
+                                           won:atomDeletedTopic      "MatcherProtocol.Out.Atom" ;
+                                           won:brokerUri             <ssl://satvm05.researchstudio.at:61617> ;
+                                           won:matcherQueue          "MatcherProtocol.in" ;
+                                           won:nodeQueue             "AtomProtocol.in" ;
+                                           won:ownerQueue            "OwnerProtocol.in"
+                                         ] ;
+            won:uriPrefixSpecification   [ won:atomUriPrefix        "https://satvm05.researchstudio.at/won/resource/atom" ;
+                                           won:connectionUriPrefix  "https://satvm05.researchstudio.at/won/resource/connection" ;
+                                           won:eventUriPrefix       "https://satvm05.researchstudio.at/won/resource/msg"
+                                         ] .
+}
