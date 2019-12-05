@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>at.researchstudio.sat</groupId>
 		<artifactId>won-utils</artifactId>
-		<version>0.7</version>
+		<version>0.8-SNAPSHOT</version>
 	</parent>
 	<artifactId>won-utils-batch</artifactId>
 		

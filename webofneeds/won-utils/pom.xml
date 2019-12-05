@@ -4,12 +4,12 @@
         <artifactId>won-parent-pom</artifactId>
         <relativePath>../won-parent-pom</relativePath>
         <groupId>at.researchstudio.sat</groupId>
-        <version>0.7</version>
+        <version>0.8-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <name>Utilities</name>
     <artifactId>won-utils</artifactId>
-    <version>0.7</version>
+    <version>0.8-SNAPSHOT</version>
     <modules>
         <module>won-utils-import</module>
         <module>won-utils-mail</module>

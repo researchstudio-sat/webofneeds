@@ -5,11 +5,11 @@
 <artifactId>won-parent-pom</artifactId>
 <relativePath>../won-parent-pom</relativePath>
 <groupId>at.researchstudio.sat</groupId>
-<version>0.7</version>
+<version>0.8-SNAPSHOT</version>
 </parent>
 	<artifactId>won-bot</artifactId>
 	<packaging>jar</packaging>
-	<version>0.7</version>
+	<version>0.8-SNAPSHOT</version>
 	<name>Bot</name>
 	<url>http://maven.apache.org</url>
 	<properties>
