@@ -937,7 +937,6 @@ won.wonMessageFromJsonLd = function(wonMessageAsJsonLD) {
       .frameInPromise()
       .then(() => wonMessage.generateContentGraphTrig())
       .then(() => wonMessage.generateCompactedFramedMessage())
-      .then(() => wonMessage.generateContainedForwardedWonMessages())
       .then(() => {
         if (wonMessage.hasParseErrors() && !wonMessage.isResponse()) {
           console.warn(
@@ -949,28 +948,6 @@ won.wonMessageFromJsonLd = function(wonMessageAsJsonLD) {
             "} wonMessage: ",
             wonMessage
           );
-        }
-        if (wonMessage.hasContainedForwardedWonMessages()) {
-          console.debug(
-            "wonMessage<",
-            wonMessage.getMessageUri(),
-            "> msgType<",
-            wonMessage.getMessageType(),
-            "> contains forwardedMessages wonMessage: ",
-            wonMessage
-          );
-          wonMessage
-            .getContainedForwardedWonMessages()
-            .map(forwardedWonMessage => {
-              console.debug(
-                "-- forwardedMessage<",
-                forwardedWonMessage.getMessageUri(),
-                "> msgType<",
-                forwardedWonMessage.getMessageType(),
-                ">, forwardedWonMessage: ",
-                forwardedWonMessage
-              );
-            });
         }
 
         return wonMessage;
@@ -1116,7 +1093,6 @@ function WonMessage(jsonLdContent) {
   }
   this.rawMessage = jsonLdContent;
   this.parseErrors = [];
-  this.containedForwardedWonMessages = [];
   this.__init();
 }
 
@@ -1259,42 +1235,6 @@ WonMessage.prototype = {
       }
     }
   },
-  generateContainedForwardedWonMessages: async function() {
-    const forwardedMessageUris = this.getForwardedMessageUris();
-    if (forwardedMessageUris && forwardedMessageUris.length == 1) {
-      //TODO: RECURSIVELY CREATE wonMessageObjects from all the forwarded Messages within this message
-      //const forwardedMessages = wonMessage.compactFramedMessage["msg:forwardedMessage"];
-      const encapsulatingMessageUri = this.messageStructure.messageUri;
-      const rawMessageWithoutEncapsulatingUri = this.rawMessage.filter(
-        elem => !elem["@id"].startsWith(encapsulatingMessageUri)
-      );
-
-      /*console.debug(
-        "WonMessage\n",
-        this,
-        "\nforwardedMessageUris:\n",
-        forwardedMessageUris,
-        "\nencapsulatingMessageUri\n",
-        encapsulatingMessageUri,
-        "\nrawMessageWithouthEncapsulatingUri\n",
-        rawMessageWithoutEncapsulatingUri
-      );*/
-
-      const fwdMessage = await won.wonMessageFromJsonLd(
-        rawMessageWithoutEncapsulatingUri
-      );
-      this.containedForwardedWonMessages.push(fwdMessage);
-
-      return Promise.resolve(this.containedForwardedWonMessages);
-    } else if (forwardedMessageUris) {
-      this.parseErrors.push(
-        "WonMessage contains more than one forwardedMessage on the same level: omitting forwardMessages"
-      );
-      return Promise.resolve(this.containedForwardedWonMessages);
-    } else {
-      return Promise.resolve(this.containedForwardedWonMessages);
-    }
-  },
   frameInPromise: function() {
     if (this.framedMessage) {
       return Promise.resolve(this.framedMessage);
@@ -1386,14 +1326,6 @@ WonMessage.prototype = {
     } else {
       return this.compactFramedMessage["msg:correspondingRemoteMessage"];
     }
-  },
-  getCompactFramedForwardedMessageContent: function() {
-    const forwardedMessage =
-      this.compactFramedMessage &&
-      this.compactFramedMessage["msg:forwardedMessage"];
-    const forwardedMessageContent =
-      forwardedMessage && forwardedMessage["msg:correspondingRemoteMessage"];
-    return forwardedMessageContent;
   },
   getCompactRawMessage: function() {
     return this.compactRawMessage;
@@ -1515,17 +1447,8 @@ WonMessage.prototype = {
   isRetractMessage: function() {
     return !!this.getProperty("https://w3id.org/won/modification#retracts");
   },
-  hasContainedForwardedWonMessages: function() {
-    return (
-      this.containedForwardedWonMessages &&
-      this.containedForwardedWonMessages.length > 0
-    );
-  },
   hasParseErrors: function() {
     return this.parseErrors && this.parseErrors.length > 0;
-  },
-  getContainedForwardedWonMessages: function() {
-    return this.containedForwardedWonMessages;
   },
   isFromSystem: function() {
     let direction = this.getMessageDirection();
