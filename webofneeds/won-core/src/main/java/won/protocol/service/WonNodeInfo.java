@@ -71,4 +71,11 @@ public class WonNodeInfo {
     public String getAtomURIPrefix() {
         return atomURIPrefix;
     }
+
+    @Override
+    public String toString() {
+        return "WonNodeInfo [wonNodeURI=" + wonNodeURI + ", eventURIPrefix=" + eventURIPrefix + ", connectionURIPrefix="
+                        + connectionURIPrefix + ", atomURIPrefix=" + atomURIPrefix + ", atomListURI=" + atomListURI
+                        + ", supportedProtocolImpl=" + supportedProtocolImpl + "]";
+    }
 }

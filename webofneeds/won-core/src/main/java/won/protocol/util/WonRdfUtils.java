@@ -199,25 +199,30 @@ public class WonRdfUtils {
                 NodeIterator it = model.listObjectsOfProperty(WON.uriPrefixSpecification);
                 if (!it.hasNext())
                     return null;
-                RDFNode node = it.next();
+                RDFNode confignode = it.next();
+                StmtIterator stmtit = model.listStatements(null, WON.uriPrefixSpecification, confignode);
+                if (!stmtit.hasNext()) {
+                    return null;
+                }
+                Resource wonNode = stmtit.next().getSubject();
                 WonNodeInfoBuilder wonNodeInfoBuilder = new WonNodeInfoBuilder();
-                wonNodeInfoBuilder.setWonNodeURI(node.asResource().toString());
+                wonNodeInfoBuilder.setWonNodeURI(wonNode.asResource().toString());
                 // set the URI prefixes
-                it = model.listObjectsOfProperty(node.asResource(), WON.atomUriPrefix);
+                it = model.listObjectsOfProperty(confignode.asResource(), WON.atomUriPrefix);
                 if (!it.hasNext())
                     return null;
                 String atomUriPrefix = it.next().asLiteral().getString();
                 wonNodeInfoBuilder.setAtomURIPrefix(atomUriPrefix);
-                it = model.listObjectsOfProperty(node.asResource(), WON.connectionUriPrefix);
+                it = model.listObjectsOfProperty(confignode.asResource(), WON.connectionUriPrefix);
                 if (!it.hasNext())
                     return null;
                 wonNodeInfoBuilder.setConnectionURIPrefix(it.next().asLiteral().getString());
-                it = model.listObjectsOfProperty(node.asResource(), WON.eventUriPrefix);
+                it = model.listObjectsOfProperty(confignode.asResource(), WON.eventUriPrefix);
                 if (!it.hasNext())
                     return null;
                 wonNodeInfoBuilder.setEventURIPrefix(it.next().asLiteral().getString());
                 // set the atom list URI
-                it = model.listObjectsOfProperty(node.asResource(), WON.atomList);
+                it = model.listObjectsOfProperty(confignode.asResource(), WON.atomList);
                 if (it.hasNext()) {
                     wonNodeInfoBuilder.setAtomListURI(it.next().asNode().getURI());
                 } else {
