@@ -59,9 +59,9 @@ scp -3 won@satvm01:$live_base_folder/letsencrypt/certs/live/matchat.org/* root@s
 # TODO: change the explicit passing of tls params when docker-compose bug is fixed: https://github.com/docker/compose/issues/1427
 echo run docker containers using docker-compose on satvm02
 docker --tlsverify -H satvm02.researchstudio.at:2376 pull webofneeds/bigdata
-docker --tlsverify -H satvm05.researchstudio.at:2376 pull webofneeds/won-debugbot:latest
-docker --tlsverify -H satvm05.researchstudio.at:2376 pull webofneeds/won-spoco-raidbot:latest
-docker --tlsverify -H satvm05.researchstudio.at:2376 pull webofneeds/won-jobbot:latest
+docker --tlsverify -H satvm02.researchstudio.at:2376 pull webofneeds/won-debugbot:latest
+docker --tlsverify -H satvm02.researchstudio.at:2376 pull webofneeds/won-spoco-raidbot:latest
+docker --tlsverify -H satvm02.researchstudio.at:2376 pull webofneeds/won-jobbot:latest
 cd deploy/master_satvm02
 docker-compose --tlsverify --tlscacert=/var/lib/jenkins/.docker/ca.pem --tlscert=/var/lib/jenkins/.docker/cert.pem --tlskey=/var/lib/jenkins/.docker/key.pem -H satvm02.researchstudio.at:2376 down
 docker-compose --tlsverify --tlscacert=/var/lib/jenkins/.docker/ca.pem --tlscert=/var/lib/jenkins/.docker/cert.pem --tlskey=/var/lib/jenkins/.docker/key.pem -H satvm02.researchstudio.at:2376 up --build -d
