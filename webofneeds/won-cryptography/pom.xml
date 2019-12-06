@@ -5,12 +5,12 @@
 <artifactId>won-parent-pom</artifactId>
 <relativePath>../won-parent-pom</relativePath>
 <groupId>at.researchstudio.sat</groupId>
-<version>0.7-SNAPSHOT</version>
+<version>0.8-SNAPSHOT</version>
 </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>won-cryptography</artifactId>
-    <version>0.7-SNAPSHOT</version>
+    <version>0.8-SNAPSHOT</version>
     <name>Cryptography</name>
 	
 	<repositories>
