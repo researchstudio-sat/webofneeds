@@ -115,7 +115,9 @@ public class MessageEvent implements ParentAware<MessageContainer> {
     private URI responseMessageURI;
     @Column(name = "referencedByOtherMessage")
     private boolean referencedByOtherMessage;
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    // cascade when persisting but not when deleting. the dataset may be referenced
+    // by other messageEvents!
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private DatasetHolder datasetHolder;
 
     @PreUpdate

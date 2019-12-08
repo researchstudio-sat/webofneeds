@@ -38,7 +38,7 @@ public class DeleteAtomMessageProcessor extends AbstractCamelProcessor {
             if (atom.getState() == AtomState.DELETED) {
                 // Delete Atom
                 logger.debug("Set atom to state DELETED. atomURI:{}", recipientAtomURI);
-                Collection<Connection> conns = connectionRepository.findByAtomURIAndNotStateForUpdate(atom.getAtomURI(),
+                Collection<Connection> conns = connectionRepository.findByAtomURIAndNotState(atom.getAtomURI(),
                                 ConnectionState.CLOSED);
                 if (conns.size() > 0) {
                     // Still not closed connections

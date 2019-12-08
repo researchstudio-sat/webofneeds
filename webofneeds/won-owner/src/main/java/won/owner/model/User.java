@@ -5,7 +5,12 @@
 package won.owner.model;
 
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -26,7 +31,6 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
-import nl.martijndwars.webpush.Subscription;
 import org.springframework.data.domain.Persistable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -71,7 +75,7 @@ public class User implements UserDetails, Persistable<Long> {
     @OneToMany(fetch = FetchType.EAGER)
     @OrderBy("creationDate desc")
     @JoinTable(name = "wonuser_useratom", joinColumns = { @JoinColumn(name = "wonuser_id") })
-    private Set<UserAtom> userAtoms;
+    private Set<UserAtom> userAtoms = new HashSet<UserAtom>();
     @Column(name = "role")
     private String role;
     @Column(name = "email")

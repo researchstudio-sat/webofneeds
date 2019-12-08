@@ -7,6 +7,8 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.transaction.Transactional;
+
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +35,7 @@ import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDecoder;
 import won.protocol.message.WonMessageDirection;
+import won.protocol.message.WonMessageType;
 import won.protocol.message.sender.exception.WonMessageSenderException;
 import won.protocol.util.AuthenticationThreadLocal;
 
@@ -62,6 +65,7 @@ public class RestMessageController {
      * @param message
      * @return
      */
+    @Transactional
     @RequestMapping(value = "/send", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST, consumes = "application/ld+json")
     public ResponseEntity send(@RequestBody String serializedWonMessage) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -99,6 +103,13 @@ public class RestMessageController {
         // send it in a separate thread (so we can return our result immediately)
         try {
             final WonMessage preparedMessage = msg;
+            if (msg.getMessageType() == WonMessageType.DELETE) {
+                try {
+                    userAtomService.setAtomDeleted(atomURI);
+                } catch (Exception e) {
+                    logger.debug("Could not delete atom with  uri {} because of {}", atomURI, e);
+                }
+            }
             executor.submit(() -> {
                 ownerApplicationService.sendMessage(preparedMessage);
             });
