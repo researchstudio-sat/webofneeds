@@ -55,7 +55,7 @@ public class DeleteAtomMessageFromOwnerReactionProcessor extends AbstractCamelPr
         // Check if atom already in State DELETED
         if (atom.getState() == AtomState.DELETED) {
             // Get all connections of this atom
-            Collection<Connection> conns = connectionRepository.findByAtomURIAndNotStateForUpdate(atom.getAtomURI(),
+            Collection<Connection> conns = connectionRepository.findByAtomURIAndNotState(atom.getAtomURI(),
                             ConnectionState.DELETED);
             for (Connection con : conns) {
                 entityManager.refresh(con);
@@ -65,7 +65,7 @@ public class DeleteAtomMessageFromOwnerReactionProcessor extends AbstractCamelPr
             }
         } else {
             // Get only not closed connections of this atom to close them
-            Collection<Connection> conns = connectionRepository.findByAtomURIAndNotStateForUpdate(atom.getAtomURI(),
+            Collection<Connection> conns = connectionRepository.findByAtomURIAndNotState(atom.getAtomURI(),
                             ConnectionState.CLOSED);
             // Close open connections
             for (Connection con : conns) {
