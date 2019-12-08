@@ -289,7 +289,7 @@ public class ConnectionService {
         Optional<Connection> con = connectionRepository
                         .findOneBySocketURIAndTargetSocketURIForUpdate(socket.getSocketURI(), targetSocketURI);
         if (con.isPresent()) {
-            entityManager.refresh(con);
+            entityManager.refresh(con.get());
             if (logger.isDebugEnabled()) {
                 logger.debug("socket hint: connection {} - {} already exists", con.get().getSocketURI(),
                                 con.get().getTargetSocketURI());

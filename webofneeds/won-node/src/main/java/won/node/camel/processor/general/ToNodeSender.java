@@ -19,6 +19,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.impl.DefaultExchange;
+import org.apache.jena.riot.Lang;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,6 +27,7 @@ import won.protocol.jms.AtomProtocolCommunicationService;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
+import won.protocol.message.WonMessageEncoder;
 import won.protocol.service.MessageRoutingInfoService;
 
 /**
@@ -71,7 +73,7 @@ public class ToNodeSender implements Processor {
                         .getEndpoint(recipientNode.get());
         // messageService.sendInOnlyMessage(null, null, wonMessage,
         // wonMessage.getRecipientNodeURI().toString());
-        String msgBody = (String) exchange.getIn().getBody();
+        String msgBody = WonMessageEncoder.encode(msg, Lang.TRIG);
         if (logger.isDebugEnabled()) {
             logger.debug("sending message to node {}: {}", recipientNode,
                             msg.toStringForDebug(true));
