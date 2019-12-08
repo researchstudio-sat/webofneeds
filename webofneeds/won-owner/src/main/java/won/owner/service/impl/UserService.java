@@ -1,5 +1,16 @@
 package won.owner.service.impl;
 
+import java.lang.invoke.MethodHandles;
+import java.security.Key;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,16 +20,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import won.owner.model.*;
-import won.owner.repository.*;
-import won.protocol.util.ExpensiveSecureRandomString;
 
-import java.lang.invoke.MethodHandles;
-import java.security.*;
-import java.security.cert.Certificate;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.UUID;
+import won.owner.model.EmailVerificationToken;
+import won.owner.model.KeyStoreIOException;
+import won.owner.model.KeystoreHolder;
+import won.owner.model.KeystorePasswordHolder;
+import won.owner.model.PushSubscription;
+import won.owner.model.User;
+import won.owner.repository.EmailVerificationRepository;
+import won.owner.repository.KeystorePasswordRepository;
+import won.owner.repository.PersistentLoginRepository;
+import won.owner.repository.PushSubscriptionRepository;
+import won.owner.repository.UserRepository;
+import won.protocol.util.ExpensiveSecureRandomString;
 
 /**
  * Created by fsuda on 28.05.2018.
@@ -312,8 +326,7 @@ public class UserService {
             // keystoreHolder = keystoreHolderRepository.save(keystoreHolder);
             user.setKeystorePasswordHolder(keystorePassword);
             user.setKeystoreHolder(keystoreHolder);
-            save(user);
-            return user;
+            return save(user);
         } catch (DataIntegrityViolationException e) {
             // username is already in database
             throw new UserAlreadyExistsException();
@@ -355,12 +368,12 @@ public class UserService {
         return getEmailVerificationToken(verificationToken).getUser();
     }
 
-    public void save(User user) {
-        userRepository.save(user);
+    public User save(User user) {
+        return userRepository.save(user);
     }
 
-    public void addPushSubscription(User user, PushSubscription subscription) {
+    public User addPushSubscription(User user, PushSubscription subscription) {
         user.addPushSubscription(subscription);
-        save(user);
+        return save(user);
     }
 }

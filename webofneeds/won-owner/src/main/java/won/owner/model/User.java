@@ -72,7 +72,7 @@ public class User implements UserDetails, Persistable<Long> {
         registrationDate = new Date();
     }
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    @OneToMany(fetch = FetchType.EAGER)
     @OrderBy("creationDate desc")
     @JoinTable(name = "wonuser_useratom", joinColumns = { @JoinColumn(name = "wonuser_id") })
     private Set<UserAtom> userAtoms = new HashSet<UserAtom>();

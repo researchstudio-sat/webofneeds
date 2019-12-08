@@ -113,14 +113,19 @@ public class UserAtomService {
         URI atomUri = getOwnedAtomURI(wonMessage);
         // Get the atom from owner application db
         UserAtom userAtom = userAtomRepository.findByAtomUri(atomUri);
-        if (userAtom.getState() == AtomState.DELETED) {
-            // Delete atom in users atom list and save changes
-            user.removeUserAtom(userAtom);
-            userRepository.save(user);
-            // Delete atom in atom repository
-            userAtomRepository.delete(userAtom.getId());
-        } else {
-            throw new IllegalStateException("atom not in state deleted");
+        if (userAtom != null) {
+            if (userAtom.getState() == AtomState.DELETED) {
+                // reload the user so we can save it
+                // (the user object we get from getUserForSession is detached)
+                user = userRepository.findOne(user.getId());
+                // Delete atom in users atom list and save changes
+                user.getUserAtoms().remove(userAtom);
+                user = userRepository.save(user);
+                // Delete atom in atom repository
+                userAtomRepository.delete(userAtom);
+            } else {
+                throw new IllegalStateException("atom not in state deleted");
+            }
         }
     }
 }
