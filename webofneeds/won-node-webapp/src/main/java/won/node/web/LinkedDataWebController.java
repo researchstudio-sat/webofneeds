@@ -285,7 +285,7 @@ public class LinkedDataWebController implements InitializingBean {
      * @return
      */
     // webmvc controller method
-    @RequestMapping("${uri.path.page}/event/{identifier}")
+    @RequestMapping("${uri.path.page}/msg/{identifier}")
     public String showEventPage(@PathVariable(value = "identifier") String identifier, Model model,
                     HttpServletResponse response) {
         URI eventURI = uriService.createEventURIForId(identifier);
