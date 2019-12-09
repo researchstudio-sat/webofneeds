@@ -169,7 +169,7 @@ export function getDefaultImage(atom) {
       }
     }
 
-    const seeksImages = getIn(atom, ["content", "images"]);
+    const seeksImages = getIn(atom, ["seeks", "images"]);
 
     if (seeksImages) {
       const defaultImage = seeksImages.find(image => get(image, "default"));
