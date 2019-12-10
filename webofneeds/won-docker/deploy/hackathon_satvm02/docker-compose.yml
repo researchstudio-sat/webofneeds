@@ -188,7 +188,7 @@ services:
   matcher_sparql:
     restart: always
     build: ../../image/matcher-sparql
-    image: webofneeds/matcher_sparql:int
+    #image: webofneeds/matcher_sparql:int
     environment:
       - "node.host=satvm02.researchstudio.at"
       - "cluster.seedNodes=satvm02.researchstudio.at:2556"
