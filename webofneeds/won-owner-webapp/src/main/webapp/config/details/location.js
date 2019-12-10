@@ -102,7 +102,7 @@ export const travelAction = {
             name: getIn(value, ["fromLocation", "name"]),
             // excluding nwCorner and seCorner as travelaction calculates its bounding box differently
           },
-          baseUri: baseUri && baseUri + "#fromLocation",
+          baseUri: baseUri && baseUri + "-fromLocation",
         }),
 
         "s:toLocation": genSPlace({
@@ -112,7 +112,7 @@ export const travelAction = {
             name: getIn(value, ["toLocation", "name"]),
             // excluding nwCorner and seCorner as travelaction calculates its bounding box differently
           },
-          baseUri: baseUri && baseUri + "#toLocation",
+          baseUri: baseUri && baseUri + "-toLocation",
         }),
       },
     };
