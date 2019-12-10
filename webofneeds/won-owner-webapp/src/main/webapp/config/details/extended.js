@@ -25,3 +25,34 @@ export const isbn = {
     return undefined;
   },
 };
+
+export const author = {
+  identifier: "author",
+  label: "Author",
+  icon: "#ico36_detail_title",
+  placeholder: "Author Name",
+  component: WonTitlePicker,
+  viewerComponent: WonTitleViewer,
+  parseToRDF: function({ value }) {
+    const val = value ? value : undefined;
+    return {
+      "s:author": {
+        "@type": "s:Person",
+        "s:name": val,
+      },
+    };
+  },
+  parseFromRDF: function(jsonLDImm) {
+    return jsonLdUtils.parseFrom(
+      jsonLDImm,
+      ["s:author", "s:name"],
+      "xsd:string"
+    );
+  },
+  generateHumanReadable: function({ value, includeLabel }) {
+    if (value) {
+      return includeLabel ? this.label + ": " + value : value;
+    }
+    return undefined;
+  },
+};

@@ -87,6 +87,7 @@ export const details = {
   pokemonGymInfo: pokemonDetails.pokemonGymInfo,
   pokemonRaid: pokemonDetails.pokemonRaid,
   isbn: extendedDetails.isbn,
+  author: extendedDetails.author,
 };
 
 export const messageDetails = {
