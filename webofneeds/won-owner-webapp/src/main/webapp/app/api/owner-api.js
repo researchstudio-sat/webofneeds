@@ -372,7 +372,7 @@ export function getMessage(atomUri, eventUri) {
 export function getAllMetaAtoms(
   createdAfterDate,
   state = "ACTIVE",
-  limit = 200
+  limit = 3000
 ) {
   return getMetaAtoms(
     undefined,
@@ -468,7 +468,7 @@ export function getAllMetaAtomsNear(
   createdAfterDate,
   location,
   maxDistance = 5000,
-  limit = 200,
+  limit = 500,
   state = "ACTIVE"
 ) {
   if (location && location.lat && location.lng) {
