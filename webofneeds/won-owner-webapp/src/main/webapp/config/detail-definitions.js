@@ -8,6 +8,7 @@ import * as workflowDetails from "./details/workflow.js";
 import * as reviewDetails from "./details/review.js";
 import * as paymentDetails from "./details/payment.js";
 import * as pokemonDetails from "./details/pokemon.js";
+import * as extendedDetails from "./details/extended.js";
 
 import * as abstractDetails_ from "./details/abstract.js";
 export const abstractDetails = abstractDetails_; // reexport
@@ -85,6 +86,7 @@ export const details = {
   type: basicDetails.type,
   pokemonGymInfo: pokemonDetails.pokemonGymInfo,
   pokemonRaid: pokemonDetails.pokemonRaid,
+  isbn: extendedDetails.isbn,
 };
 
 export const messageDetails = {
