@@ -59,6 +59,22 @@ While event listeners and events generally provide the framework for when a bot 
 
 Behaviours act as a wrapper to `EventListener`s and `Action`s and can be activated and deactivated at any point. This is useful for `Event`/`Action` combinations that are used often or for `EventListener`s that should only trigger under certain conditions.
 
+## Bot Extensions
+
+There are some modules containing optional bot functionality called `Extensions`. This framework currently offers three extensions, the `MatcherExtension`, the `ServiceAtomExtension` and the `TextMessageCommandExtension`. To add any extension to a bot, the extension interface needs to be implemented by the bot. Extension functionality is generally wrapped in an extension behaviour that allows activating and deactivating extension methods and events.
+
+### ServiceAtomExtension
+
+This extension allows the creation of a single service atom that can be used to communicate with and control the bot. Use this extension if your bot only needs to have one atom to provide its functionality. 
+
+### MatcherExtension
+
+This extension allows the bot to register as a matcher on a node. As a result, the bot will receive events every time an atom on the node is created, deleted or modified. Use this extension to create a bot that reacts to new content on the server or to monitor atom changes on a node.
+
+### TextMessageCommandExtension
+
+This extension handles the interpretion of text messages sent to the bot. Use this extension to create interactive bots that are able to reply to users messaging them or to create bots that utilize user input. 
+
 ## Implementing a Bot
 
 To create a new bot, we recommend to use the [bot skeleton](https://github.com/researchstudio-sat/bot-skeleton) as a template, providing all needed functions for a bot in the WoN. Click [here](https://github.com/researchstudio-sat/bot-skeleton/generate) to go directly to the repository creation.
