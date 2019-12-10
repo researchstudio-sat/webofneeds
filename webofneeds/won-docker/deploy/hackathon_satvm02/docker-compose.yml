@@ -191,7 +191,7 @@ services:
     #image: webofneeds/matcher_sparql:int
     environment:
       - "node.host=satvm02.researchstudio.at"
-      - "cluster.seedNodes=satvm02.researchstudio.at:2556"
+      - "cluster.seedNodes=satvm02.researchstudio.at:2555"
       - "cluster.local.port=2556"
       - "matcher.sparql.uri.sparql.endpoint=http://satvm02.researchstudio.at:10000/blazegraph/namespace/kb/sparql"
       - "matcher.sparql.uri.public=http://satvm02.researchstudio.at/hackathonsparql/"
