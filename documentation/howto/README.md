@@ -1,13 +1,16 @@
-# Mini HowTo
+# Mini HowTos
 This document contains mini HowTos explaining how to use the WoN framework. *Bot HowTos* generally assume that you want to do something in a Bot's `initializeEventListeners()` method. Other HowTos are not bot-specific.
 
 ## HowTo: Processing RDF
-Situation: you have a `Model`(i.e. a set of `Statement`s), or a `Dataset`(i.e. a set of `Model`s) and you want to get at some of the data.
+Situation: you have a `Model`(i.e. a set of `Statement`s), or a `Dataset`(i.e. a set of `Model`s) and you want to get at some of the data or write some into it.
 
 1. Refer to the [Apache Jena documentation](https://jena.apache.org/documentation/rdf/index.html).
 2. Look at `won.protocol.util.RdfUtils`- generic RDF utils (not  WoN-specific) 
 3. Look at `won.protocol.util.WonRdfUtils`- WoN-specific utils, organized by type of entitiy (Atom/Socket/...)
-
+4. Many URIs you need for creating RDF are found as constants in 
+    - `won.protocol.vocabulary` (e.g. `WON.Atom`, `WONMSG.CreateMessage`, `WXCHAT.ChatSocket`)
+    - `org.apache.jena.vocabulary`
+    
 **Print to Stdout**
 
 Dataset: 
