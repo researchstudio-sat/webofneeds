@@ -236,6 +236,57 @@ Situation: you have an atom URI and you want to get its data:
 
 Now you have the atom's dataset. 
 
+## Bot HowTo: Adding Data to a Message
+
+Situation: you want to send some RDF triples as the content of a message.
+
+Let's say you want to embed the following triples:
+
+```
+@prefix schema:<http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+{messageURI}#meeting
+            schema:validFrom     "2019-12-11T20:17:34+01:00"^^xsd:dateTime ;
+            schema:validThrough  "2019-12-11T22:00:00+01:00"^^xsd:dateTime ;
+            schema:title        "Our Meeting" .
+```
+
+which is the shorter way of saying
+ 
+```
+@prefix schema:<http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+{messageURI}#meeting schema:validFrom "2019-12-11T20:00:00+01:00"^^xsd:dateTime .
+{messageURI}#meeting schema:validThrough "2019-12-11T22:00:00+01:00"^^xsd:dateTime .
+{messageURI}#meeting schema:title "Our Meeting" .
+```
+ 
+So we are saying there is a meeting, identified by `{messageURI}#meeting`, where {messageURI} is eventually replaced by the actual URI of the message. We want to use a unique identifier for it that nobody can confuse with any other object. By using a fragment (`#message`) of the message URI, we can be quite sure it's going to be unique.
+
+When authoring message content, a placeholder is used for the message URI whenever it is needed: `wm:/SELF`. So, the above triples have to be written as:
+
+```
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+<wm:/SELF#meeting> schema:validFrom "2019-12-11T20:00:00+01:00"^^xsd:dateTime .
+<wm:/SELF#meeting> schema:validThrough "2019-12-11T22:00:00+01:00"^^xsd:dateTime .
+<wm:/SELF#meeting> schema:title "Our Meeting" .
+```
+
+Follwing the same method as in the [HowTo on sending messages](#bot-howto-sending-a-message-and-processing-the-result), you would use the `ConnectionMessageCommandEvent`:
+
+```
+// first, make an RDF model containing the triples:
+Model model = ModelFactory.createDefaultModel();
+Resource meeting = model.getResource("wm:/SELF#meeting");
+meeting.addProperty(SCHEMA.VALID_FROM, "2019-12-11T20:00:00+01:00", XSDDatatype.XSDdateTime);
+meeting.addProperty(SCHEMA.VALID_THROUGH, "2019-12-11T22:00:00+01:00", XSDDatatype.XSDdateTime);
+meeting.addProperty(SCHEMA.TITLE, "Our Meeting");
+// then, create the command and publish it
+ConnectionMessageCommandEvent cmd = new ConnectionMessageCommandEvent(con, model);
+getEventListenerContext().getEventBus().publish(cmd);
+```
+
 
 ## HowTo: Getting the Message Content
 Situation: you received a `WonMessage msg` and you want to use its content.
@@ -254,6 +305,8 @@ You are expecting some other RDF triples: obtain the message's *content graphs* 
 Dataset content = msg.getMessageContent();  
 // now process the content
 ```
+
+
 
 ## HowTo: Processing Non-Standard Atom/Message Data 
 Situation: you have a `Dataset dataset` either obtained from a `WonMessage` or from an `Atom` (see respective How-Tos), and you want to extract some data structure from it. The generic approach is to use a SPARQL query on the dataset. Please refer to the [HowTo on processing RDF](#howto-processing-rdf).
