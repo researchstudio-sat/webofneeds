@@ -1,16 +1,56 @@
-Small HowTos:
+# Mini HowTo
+This document contains mini HowTos explaining how to use the WoN framework. *Bot HowTos* generally assume that you want to do something in a Bot's `initializeEventListeners()` method. Other HowTos are not bot-specific.
 
-## Bot HowTo: How to send any kind of message (and react when it succeeds/fails)
+## HowTo: Process RDF
+Situation: you have a `Model`(i.e. a set of `Statement`s), or a `Dataset`(i.e. a set of `Model`s) and you want to get at some of the data.
+
+1. Refer to the Apache Jena documentation.
+2. Look at `won.protocol.util.RdfUtils`- generic RDF utils (not  WoN-specific) 
+3. Look at `won.protocol.util.WonRdfUtils`- WoN-specific utils, organized by type of entitiy (Atom/Socket/...)
+
+**Print to Stdout**
+
+Dataset: 
+
+```
+RDFDataMgr.write(System.out, dataset, Lang.TRIG);
+```
+
+Model: 
+
+```
+RDFDataMgr.write(System.out, model, Lang.TTL);
+```
+
+**Execute a SPARQL query**
+
+Here, we use the query that finds all triples.
+
+```
+String queryString = "select * where {?a ?b ?c}";
+Query query = QueryFactory.create(queryString);
+try (QueryExecution qexec = QueryExecutionFactory.create(query, dataset)) {
+    qexec.getContext().set(TDB.symUnionDefaultGraph, true); // use this unless you know why not to - it will execute the query over the union of all graphs. Makes things easier.
+    ResultSet rs = qexec.execSelect();
+    if (rs.hasNext()) {
+        QuerySolution qs = rs.nextSolution();
+        System.out.println("?a:" + qs.get("a") + ", ?b:" + qs.get("b") + ", ?c: " + qs.get("c"));
+    }
+}
+```
+
+## Bot HowTo: Send a message (and react when it succeeds/fails)
 Situation: you want to send a message (e.g. to create a new Atom, connect, close, whatever). The easiest way to do this is to activate the `ExecuteMessageCommandBehaviour`:
 
 ```
 ExecuteWonMessageCommandBehaviour wonMessageCommandBehaviour = new ExecuteWonMessageCommandBehaviour(ctx);
 wonMessageCommandBehaviour.activate();
 ```
-and then publish the command, for example the `CreateAtomCommandEvent`:
+
+Then publish the command, for example `ConnectionMessageCommandEvent` or the `CreateAtomCommandEvent` as in the following example:
 
 ```
-Dataset ds = ... // dataset holding the atom content
+Dataset ds = ... // dataset holding the atom content (see Howto on creating atoms)
 CreateAtomCommandEvent createCommand = new CreateAtomCommandEvent(ds);
 //
 // ...(a) register result listener here, if needed (see (b) below)
@@ -21,7 +61,7 @@ The `ExecuteMessageCommandBehaviour` will send the messsage and publish events o
 
 ```
 // (b) this registers a listener that is activated when the message has been successful
-// insert at position (a) above, if needed
+// insert at position (a) above, if needed (because you want to register the listener before you publish the command)
 EventListenerContext ctx = getEventListenerContext();
 ctx.getEventBus().subscribe(
     CreateAtomCommandSuccessEvent.class, 
@@ -31,14 +71,14 @@ ctx.getEventBus().subscribe(
         new BaseEventBotAction(ctx) { 
                 @Override
                 protected void doRun(Event event, EventListener executingListener) {
-                                      //your action - whatever you want to do:  
+                                      //your action here
                 }
         }));
 ```
 Much in the same way, you can listen for Failure events (e.g. the `CreateAtomCommandFailureEvent`) or any kind of result (e.g., the `CreateAtomCommandResultEvent`).
 
 
-## Bot HowTo: How to connect to an Atom
+## Bot HowTo: How to Connect to an Atom 
 Situation: you have two atom URIs. One of them is an atom you control (the other, maybe, too). You know which socket types you want to connect, for example the [holder socket](https://w3id.org/won/ext/hold#HolderSocket) and the [holdable socket](https://w3id.org/won/ext/hold#HoldableSocket). Follow the next HowTo to find out how to get the Socket URIs. We'll assume you call them `senderSocketURI` and `recipientSocketURI`.
 
 ```
@@ -50,11 +90,38 @@ getEventBus().publish(connectCommandEvent);
 
 Note: this only works if you have activated the  `MessageCommandBehaviour`. 
 
+## Bot HowTo: How to Accept a Connect from another Atom
+Situation: you are expecing a Connect message from another atom and you want to accept the connection.
 
+1. Register a listener for the `ConnectFromOtherAtomEvent`
+2. Respond with a connect message.
+
+```
+// this code accepts any incoming connection request
+getEventListenerContext().getEventBus().subscribe(
+    ConnectFromOtherAtomEvent.class, 
+    new ActionOnEventListener(ctx, "open-reactor",
+                        new OpenConnectionAction(ctx, "Accepting Connection")));
+```
+
+## Bot HowTo: How to receive a Hint Message and Connect to the target Atom
+Situation: you are expecting Hint messages and want to establish connections with the Atoms that the hint points to.
+
+1. Register a listener for the `HintFromMatcherEvent`
+2. React by sending a connect message
+
+```
+// this reacts with connect to any hint
+getEventListenerContext().getEventBus().subscribe(
+    HintFromMatcherEvent.class, 
+    new ActionOnEventListener(ctx, "hint-reactor",
+                        new OpenConnectionAction(ctx, "Connecting because of a Hint I got")));
+```
 
 ## Bot HowTo: How to get Socket from Atom
 
 Situation: you have the URI of an atom you want to connect to. You know which socketType you want to use, for example, the [chat Socket](https://w3id.org/won/ext/chat#ChatSocket). Here is how you find the URI of the socket:
+
 ```
 URI atomURI = // your atom URI
 URI socketURI = WXCHAT.ChatSocket; //or any other socket type you want
@@ -67,7 +134,89 @@ if (sockets.isEmpty()){
 URI socket = sockets.get(0);
 ```
 
-## Bot HowTo: Get atom data from Atom
+## Bot HowTo: Create an atom
+Situation: you want to create an atom with some simple data (E.g. Title, Description, Tags, ...)
+What you have to do:
+1. Make sure you have the `ExecuteMessageCommandBehaviour` activated (see HowTo on sending messages)
+2. Create a new atom URI
+3. Use the `DefaultAtomModelWrapper` to create an RDF dataset with the atom's data
+4. Publish a `CreateAtomCommandEvent`.
+
+```
+
+// Create a new atom URI
+EventListenerContext ctx = getEventListenerContext();
+URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
+URI atomURI ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+
+// Set atom data - here only shown for commonly used (hence 'default') properties
+DefaultAtomModelWrapper atomWrapper = new DefaultAtomModelWrapper();
+atomWrapper.setTitle("Interested in H.P. Lovecraft");
+atomWrapper.setDescripiton("Contact me for all things Cthulhu, Yogge-Sothothe and R'lyeh");
+atomWrapper.addTag("Fantasy");
+atomWrapper.addTag("Fiction");
+atomWrapper.addTag("Lovecraft");
+
+//publish command
+CreateAtomCommandEvent createCommand = new CreateAtomCommandEvent(atomWrapper.getDataset());
+ctx.getEventBus().publish(createCommand);
+```
+Note: reacting to successful creation is explained in the HowTo on sending messages.
+
+## Bot HowTo: Set Non-Standard Data for Atom
+Situation: you want to create an atom containing data that you cannot produce with the methode explained in the HowTo on creating atoms.
+
+Let's assume you want to create the following structure:
+
+``` 
+@prefix match: <https://w3id.org/won/matching#> .
+@prefix schema: <http://schema.org/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+# {atomURI} to be replaced by the actual atomURI.
+{atomURI} match:seeks [
+    schema:isbn "1234-1234-1234";
+    schema:author [
+        a schema:Person ;
+        schema:name "H.P. Lovecraft";
+    ] .
+] .
+```
+
+Which is Turtle(TTL) format equivalent to the N-Triples form:
+
+```
+# omitted prefix declarations
+# {atomURI} to be replaced by the actual atomURI.
+{atomURI} match:seeks _:blank1 .
+_:blank1 schema:isbn "1234-1234-1234" .
+_:blank1 schema:author _:blank2 .
+_:blank2 rdf:type s:Person .
+_:blank2 s:name "H.P. Lovecraft" .
+```
+
+This means: you want to say the atom is connected via `match:seeks` to a blanknode (1), which in turn has an `schema:isbn` property and is connected to another blank node (2) via `schema:author`, which has properties `rdf:type` and `schema:name`.
+
+Use the `DefaultAtomModelWrapper`. Refer to the HowTo on creating atoms for how to make one with a new atom URI. Then:
+
+1. Create the 'seeks' blank node (1). 
+2. Add the `schema:isbn` property.
+3. Create another blank node (2). 
+4. Connect it to the first blank node via `schema:author`
+5. Add the `rdf:type` and `schema:name` properties to the second blank node
+
+```
+DefaultAtomModelWrapper atomWrapper = new DefaultAtomModelWrapper(atomURI); // we assume you have created a new atom URI
+atomWrapper.createSeeksNodeIfNonExist();  // sorry, this is ugly.
+Resource book = getSeeksNodes().get(0); // create the blank node that represents a book
+Resource author = book.getModel().createResource(); //create the second blank node (which represents an author)
+//set the properties
+book.addProperty(SCHEMA.ISBN, "1234-1234-1234");
+book.addProperty(SCHEMA.AUTHOR, author);
+author.addProperty(SCHEMA.NAME, "H.P. Lovecraft");
+author.addProperty(RDF.type, SCHEMA.PERSON);
+```
+
+## Bot HowTo: Get data from Atom
 
 First you need to cast your Event to a MatcherExtensionAtomCreatedEvent.
 ```MatcherExtensionAtomCreatedEvent atomCreatedEvent = (MatcherExtensionAtomCreatedEvent) event; ```
@@ -76,6 +225,7 @@ from this atom you need to get the data and parse it to the DefaultModelWrapper.
 From here on you have basic information about the atom. For example ```defaultAtomModelWrapper.getAllTags()``` 
 To get the information from the values in seek you need to get all seek nodes. If the resource is a string it can be retireved with the getContentPropertyStringValue Method from the DefaultAtomModelWrapper. It takes the resource containing the requested value and the value you want to get back.
 If it is an RDFNode you can get it with getContentPropertyObjects. 
+
 ``` MatcherExtensionAtomCreatedEvent atomCreatedEvent = (MatcherExtensionAtomCreatedEvent) event;
 
         DefaultAtomModelWrapper defaultAtomModelWrapper = new DefaultAtomModelWrapper(atomCreatedEvent.getAtomData());
@@ -85,4 +235,39 @@ If it is an RDFNode you can get it with getContentPropertyObjects.
             Coordinate locationCoordinate = defaultAtomModelWrapper.getLocationCoordinate(node);
             System.out.println(locationCoordinate.getLatitude()+", "+locationCoordinate.getLongitude());
             defaultAtomModelWrapper.getContentPropertyObjects(node,SCHEMA.LOCATION);
-        }); ```
+        }); 
+```
+
+## Bot HowTo: Get an Atom's Data if you only have its URI
+
+Situation: you have an atom URI and you want to get its data:
+
+```
+    Dataset atomData = getEventListenerContext().getLinkedDataSource().readResourceData(atomURI);
+```
+
+Now you have the atom's dataset. 
+
+
+## HowTo: Get the Message Content
+Situation: you received a `WonMessage msg` and you want to use its content.
+
+Options:
+
+You are expecting only a text message: 
+
+```
+WonRdfUtils.MessageUtils.getTextMessage(msg);
+```
+
+You are expecting some other RDF triples: obtain the message's *content graphs* and analyze them:
+
+```
+Dataset content = msg.getMessageContent();  
+// now process the content
+```
+
+## HowTo: Get Atom/Message data (more complex cases)
+Situation: you have a `Dataset dataset` either obtained from a `WonMessage` or from an `Atom` (see respective How-Tos), and you want to extract some data structure from it. The generic approach is to use a SPARQL query on the dataset. Please refer to the HowTo on processing RDF.
+
+
