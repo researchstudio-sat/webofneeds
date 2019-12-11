@@ -1,6 +1,29 @@
 # Mini HowTos
 This document contains mini HowTos explaining how to use the WoN framework. *Bot HowTos* generally assume that you want to do something in a Bot's `initializeEventListeners()` method. Other HowTos are not bot-specific.
 
+## Bot HowTo: Remember Your Atoms Across Sessions
+Situation: your bot creates atoms while it is running but forgets everything upon restart. You don't want that.
+1. Install [Mongodb](https://www.mongodb.com/)
+2. Create a `won` database and in it a `won` user with password `won`:
+using the mongo shell (`mongodb`)
+```
+use won
+db.runCommand({createUser:"won", pwd: "won", roles=["dbOwner"]})
+```
+3. Edit the `src/main/resources/application.conf` file:
+
+    1. Uncomment the lines containing  `botContext.mongodb.*` properties
+
+    2. Replace
+    
+      ```botContext.impl=memoryBotContext```
+      
+      with 
+      
+      ```botContext.impl=mongoBotContext```
+
+4. Rebuild the bot jar and restart the bot
+
 ## Bot HowTo: Creating an Atom
 Situation: you want to create an atom with some simple data (E.g. Title, Description, Tags, ...)
 What you have to do:
