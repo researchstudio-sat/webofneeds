@@ -1,7 +1,35 @@
 # Mini HowTos
 This document contains mini HowTos explaining how to use the WoN framework. *Bot HowTos* generally assume that you want to do something in a Bot's `initializeEventListeners()` method. Other HowTos are not bot-specific.
 
-## Bot HowTo: Remember Your Atoms Across Sessions
+## Bot HowTo: Storing Data and Keeping Track of Atoms
+
+Situation: you want to store some information - an atom URI, or another Object or a Collection of Objects - for later use, maybe in another part of your bot.
+
+Use the BotContext. It has a number of features for storing data and the underlying data store can be switched out from in-memory to persisted via mongodb.
+
+A few examples:
+
+```
+BotContext bc = getEventListenerContext().getBotContext();
+// single value
+bc.setSingleValue("APIKEY", "123abc");
+// Collection
+Collection<String> apples = Arrays.asList("grannysmith", "goldendelicious");
+getEventListenerContext().getBotContext().addToListMap("mybot:fruits", "apples", objects.toArray());
+```
+
+Remembering Atom URIs is a special case, it happens often. The concept used here is 'named' atom URI lists, to allow you to keep track of different types of atoms. For example, the ones your bot manages and the ones it is currently somehow interacting with.
+
+```
+// let's say you just connected to atomURI and you want to keep them in a list 'connected-atoms'
+getEventListenerContext().getBotContext().appendToNamedAtomUriList(atomURI, "connected-atoms");
+// because you are using a special atom URI list, you can do this:
+boolean isKnown = getEventListenerContext().getBotContext().isAtomKnown(atomURI); // isKnown is true
+```
+
+If you implement a bit more complex behaviour, managing all the names of lists, such as 'connected-atoms' above can become confusing or cumbersome. For such cases, you may consider writing a custom `BotContextWrapper` that provides access to the various collections you might need through service methods. If interested, take a look at the `SkeletonBotContextWrapper`, which is configured for the bot in the spring xml file `src/main/resources/spring/bot/bot.xml`.
+
+## Bot HowTo: Remembering Your Atoms Across Sessions
 Situation: your bot creates atoms while it is running but forgets everything upon restart. You don't want that.
 1. Install [Mongodb](https://www.mongodb.com/)
 2. Create a `won` database and in it a `won` user with password `won`:
