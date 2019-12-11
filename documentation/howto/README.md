@@ -27,7 +27,7 @@ RDFDataMgr.write(System.out, model, Lang.TTL);
 
 **Execute a SPARQL query**
 
-Here, we use the query that finds all triples.
+Here, we use the query that finds all triples in the `Dataset dataset`:
 
 ```
 String queryString = "select * where {?a ?b ?c}";
