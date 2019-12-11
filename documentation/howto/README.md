@@ -1,84 +1,35 @@
 # Mini HowTos
 This document contains mini HowTos explaining how to use the WoN framework. *Bot HowTos* generally assume that you want to do something in a Bot's `initializeEventListeners()` method. Other HowTos are not bot-specific.
 
-## HowTo: Processing RDF
-Situation: you have a `Model`(i.e. a set of `Statement`s), or a `Dataset`(i.e. a set of `Model`s) and you want to get at some of the data or write some into it.
-
-1. Refer to the [Apache Jena documentation](https://jena.apache.org/documentation/rdf/index.html).
-2. Look at `won.protocol.util.RdfUtils`- generic RDF utils (not  WoN-specific) 
-3. Look at `won.protocol.util.WonRdfUtils`- WoN-specific utils, organized by type of entitiy (Atom/Socket/...)
-4. Many URIs you need for creating RDF are found as constants in 
-    - `won.protocol.vocabulary` (e.g. `WON.Atom`, `WONMSG.CreateMessage`, `WXCHAT.ChatSocket`)
-    - `org.apache.jena.vocabulary`
-    
-**Print to Stdout**
-
-Dataset: 
+## Bot HowTo: Creating an Atom
+Situation: you want to create an atom with some simple data (E.g. Title, Description, Tags, ...)
+What you have to do:
+1. Make sure you have the `ExecuteMessageCommandBehaviour` activated (see [HowTo on sending messages](#bot-howto-sending-a-message-and-processing-the-result))
+2. Create a new atom URI
+3. Use the `DefaultAtomModelWrapper` to create an RDF dataset with the atom's data
+4. Publish a `CreateAtomCommandEvent`.
 
 ```
-RDFDataMgr.write(System.out, dataset, Lang.TRIG);
-```
 
-Model: 
-
-```
-RDFDataMgr.write(System.out, model, Lang.TTL);
-```
-
-**Execute a SPARQL query**
-
-Here, we use the query that finds all triples in the `Dataset dataset`:
-
-```
-String queryString = "select * where {?a ?b ?c}";
-Query query = QueryFactory.create(queryString);
-try (QueryExecution qexec = QueryExecutionFactory.create(query, dataset)) {
-    qexec.getContext().set(TDB.symUnionDefaultGraph, true); // use this unless you know why not to - it will execute the query over the union of all graphs. Makes things easier.
-    ResultSet rs = qexec.execSelect();
-    if (rs.hasNext()) {
-        QuerySolution qs = rs.nextSolution();
-        System.out.println("?a:" + qs.get("a") + ", ?b:" + qs.get("b") + ", ?c: " + qs.get("c"));
-    }
-}
-```
-
-## Bot HowTo: Sending a Message and Processing the Result
-Situation: you want to send a message (e.g. to create a new Atom, connect, close, whatever). The easiest way to do this is to activate the `ExecuteMessageCommandBehaviour`:
-
-```
-ExecuteWonMessageCommandBehaviour wonMessageCommandBehaviour = new ExecuteWonMessageCommandBehaviour(ctx);
-wonMessageCommandBehaviour.activate();
-```
-
-Then publish the command, for example `ConnectionMessageCommandEvent` or the `CreateAtomCommandEvent` as in the following example:
-
-```
-Dataset ds = ... // dataset holding the atom content 
-CreateAtomCommandEvent createCommand = new CreateAtomCommandEvent(ds);
-//
-// ...(a) register result listener here, if needed (see (b) below)
-//
-getEventListenerContext().getEventBus().publish(createCommand);
-```
-The `ExecuteMessageCommandBehaviour` will send the messsage and publish events on the eventBus when responses are received. You can register a result listener for the result of the message command:
-
-```
-// (b) this registers a listener that is activated when the message has been successful
-// insert at position (a) above, if needed (because you want to register the listener before you publish the command)
+// Create a new atom URI
 EventListenerContext ctx = getEventListenerContext();
-ctx.getEventBus().subscribe(
-    CreateAtomCommandSuccessEvent.class, 
-    new ActionOnFirstEventListener( //note the 'onFIRSTevent' in the name: the listener is destroyed after being invoked once.
-        ctx, 
-        new CommandResultFilter(createCommand),  // only listen for success to the command we just made
-        new BaseEventBotAction(ctx) { 
-                @Override
-                protected void doRun(Event event, EventListener executingListener) {
-                                      //your action here
-                }
-        }));
+URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
+URI atomURI ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+
+// Set atom data - here only shown for commonly used (hence 'default') properties
+DefaultAtomModelWrapper atomWrapper = new DefaultAtomModelWrapper();
+atomWrapper.setTitle("Interested in H.P. Lovecraft");
+atomWrapper.setDescripiton("Contact me for all things Cthulhu, Yogge-Sothothe and R'lyeh");
+atomWrapper.addTag("Fantasy");
+atomWrapper.addTag("Fiction");
+atomWrapper.addTag("Lovecraft");
+
+//publish command
+CreateAtomCommandEvent createCommand = new CreateAtomCommandEvent(atomWrapper.getDataset());
+ctx.getEventBus().publish(createCommand);
 ```
-Much in the same way, you can listen for Failure events (e.g. the `CreateAtomCommandFailureEvent`) or any kind of result (e.g., the `CreateAtomCommandResultEvent`).
+Note: reacting to successful creation is explained in the [HowTo on sending messages](#bot-howto-sending-a-message-and-processing-the-result).
+
 
 
 ## Bot HowTo: Connecting to another Atom
@@ -121,6 +72,45 @@ getEventListenerContext().getEventBus().subscribe(
                         new OpenConnectionAction(ctx, "Connecting because of a Hint I got")));
 ```
 
+## Bot HowTo: Sending a Message and Processing the Result
+Situation: you want to send a message (e.g. to create a new Atom, connect, close, whatever). The easiest way to do this is to activate the `ExecuteMessageCommandBehaviour`:
+
+```
+ExecuteWonMessageCommandBehaviour wonMessageCommandBehaviour = new ExecuteWonMessageCommandBehaviour(ctx);
+wonMessageCommandBehaviour.activate();
+```
+
+Then publish the command, for example `ConnectionMessageCommandEvent` or the `CreateAtomCommandEvent` as in the following example:
+
+```
+Dataset ds = ... // dataset holding the atom content 
+CreateAtomCommandEvent createCommand = new CreateAtomCommandEvent(ds);
+//
+// ...(a) register result listener here, if needed (see (b) below)
+//
+getEventListenerContext().getEventBus().publish(createCommand);
+```
+The `ExecuteMessageCommandBehaviour` will send the messsage and publish events on the eventBus when responses are received. You can register a result listener for the result of the message command:
+
+```
+// (b) this registers a listener that is activated when the message has been successful
+// insert at position (a) above, if needed (because you want to register the listener before you publish the command)
+EventListenerContext ctx = getEventListenerContext();
+ctx.getEventBus().subscribe(
+    CreateAtomCommandSuccessEvent.class, 
+    new ActionOnFirstEventListener( //note the 'onFIRSTevent' in the name: the listener is destroyed after being invoked once.
+        ctx, 
+        new CommandResultFilter(createCommand),  // only listen for success to the command we just made
+        new BaseEventBotAction(ctx) { 
+                @Override
+                protected void doRun(Event event, EventListener executingListener) {
+                                      //your action here
+                }
+        }));
+```
+Much in the same way, you can listen for Failure events (e.g. the `CreateAtomCommandFailureEvent`) or any kind of result (e.g., the `CreateAtomCommandResultEvent`).
+
+
 ## Bot HowTo: Obtaining an Atom's Socket(s)
 
 Situation: you have the URI of an atom you want to connect to. You know which socketType you want to use, for example, the [chat Socket](https://w3id.org/won/ext/chat#ChatSocket). Here is how you find the URI of the socket:
@@ -137,34 +127,6 @@ if (sockets.isEmpty()){
 URI socket = sockets.get(0);
 ```
 
-## Bot HowTo: Creating an Atom
-Situation: you want to create an atom with some simple data (E.g. Title, Description, Tags, ...)
-What you have to do:
-1. Make sure you have the `ExecuteMessageCommandBehaviour` activated (see [HowTo on sending messages](#bot-howto-sending-a-message-and-processing-the-result))
-2. Create a new atom URI
-3. Use the `DefaultAtomModelWrapper` to create an RDF dataset with the atom's data
-4. Publish a `CreateAtomCommandEvent`.
-
-```
-
-// Create a new atom URI
-EventListenerContext ctx = getEventListenerContext();
-URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
-URI atomURI ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
-
-// Set atom data - here only shown for commonly used (hence 'default') properties
-DefaultAtomModelWrapper atomWrapper = new DefaultAtomModelWrapper();
-atomWrapper.setTitle("Interested in H.P. Lovecraft");
-atomWrapper.setDescripiton("Contact me for all things Cthulhu, Yogge-Sothothe and R'lyeh");
-atomWrapper.addTag("Fantasy");
-atomWrapper.addTag("Fiction");
-atomWrapper.addTag("Lovecraft");
-
-//publish command
-CreateAtomCommandEvent createCommand = new CreateAtomCommandEvent(atomWrapper.getDataset());
-ctx.getEventBus().publish(createCommand);
-```
-Note: reacting to successful creation is explained in the [HowTo on sending messages](#bot-howto-sending-a-message-and-processing-the-result).
 
 ## Bot HowTo: Setting Non-Standard Data for Atom
 Situation: you want to create an atom containing data that you cannot produce with the methode explained in the [HowTo on creating atoms](#bot-howto-creating-an-atom).
@@ -274,4 +236,43 @@ Dataset content = msg.getMessageContent();
 ## HowTo: Processing Non-Standard Atom/Message Data 
 Situation: you have a `Dataset dataset` either obtained from a `WonMessage` or from an `Atom` (see respective How-Tos), and you want to extract some data structure from it. The generic approach is to use a SPARQL query on the dataset. Please refer to the [HowTo on processing RDF](#howto-processing-rdf).
 
+## HowTo: Processing RDF
+Situation: you have a `Model`(i.e. a set of `Statement`s), or a `Dataset`(i.e. a set of `Model`s) and you want to get at some of the data or write some into it.
 
+1. Refer to the [Apache Jena documentation](https://jena.apache.org/documentation/rdf/index.html).
+2. Look at `won.protocol.util.RdfUtils`- generic RDF utils (not  WoN-specific) 
+3. Look at `won.protocol.util.WonRdfUtils`- WoN-specific utils, organized by type of entitiy (Atom/Socket/...)
+4. Many URIs you need for creating RDF are found as constants in 
+    - `won.protocol.vocabulary` (e.g. `WON.Atom`, `WONMSG.CreateMessage`, `WXCHAT.ChatSocket`)
+    - `org.apache.jena.vocabulary`
+    
+**Print to Stdout**
+
+Dataset: 
+
+```
+RDFDataMgr.write(System.out, dataset, Lang.TRIG);
+```
+
+Model: 
+
+```
+RDFDataMgr.write(System.out, model, Lang.TTL);
+```
+
+**Execute a SPARQL query**
+
+Here, we use the query that finds all triples in the `Dataset dataset`:
+
+```
+String queryString = "select * where {?a ?b ?c}";
+Query query = QueryFactory.create(queryString);
+try (QueryExecution qexec = QueryExecutionFactory.create(query, dataset)) {
+    qexec.getContext().set(TDB.symUnionDefaultGraph, true); // use this unless you know why not to - it will execute the query over the union of all graphs. Makes things easier.
+    ResultSet rs = qexec.execSelect();
+    if (rs.hasNext()) {
+        QuerySolution qs = rs.nextSolution();
+        System.out.println("?a:" + qs.get("a") + ", ?b:" + qs.get("b") + ", ?c: " + qs.get("c"));
+    }
+}
+```
