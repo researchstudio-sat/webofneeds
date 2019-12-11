@@ -45,7 +45,7 @@ getEventBus().publish(connectCommandEvent);
 Note: this only works if you have activated the  `MessageCommandBehaviour`. 
 
 ## Bot HowTo: Accepting a Connect from another Atom
-Situation: you are expecing a Connect message from another atom and you want to accept the connection.
+Situation: you are expecting a Connect message from another atom and you want to accept the connection.
 
 1. Register a listener for the `ConnectFromOtherAtomEvent`
 2. Respond with a connect message.
@@ -117,19 +117,19 @@ Situation: you have the URI of an atom you want to connect to. You know which so
 
 ```
 URI atomURI = // your atom URI
-URI socketURI = WXCHAT.ChatSocket; //or any other socket type you want
-LinkedDataSource = getEventListenerContext().getLinkedDataSource();
-Collection<URI> sockets = WonLinkedDataUtils.getSocketsOfType(atomURI, socketURI, linkedDataSource).
+URI socketURI = URI.create(WXCHAT.ChatSocket.getURI()); //or any other socket type you want
+LinkedDataSource linkedDataSource = getEventListenerContext().getLinkedDataSource();
+Collection<URI> sockets = WonLinkedDataUtils.getSocketsOfType(atomURI, socketURI, linkedDataSource);
 //sockets should have 0 or 1 items
 if (sockets.isEmpty()){
     //did not find a socket of that type
 }
-URI socket = sockets.get(0);
+URI socket = sockets.iterator().next();
 ```
 
 
 ## Bot HowTo: Setting Non-Standard Data for Atom
-Situation: you want to create an atom containing data that you cannot produce with the methode explained in the [HowTo on creating atoms](#bot-howto-creating-an-atom).
+Situation: you want to create an atom containing data that you cannot produce with the method explained in the [HowTo on creating atoms](#bot-howto-creating-an-atom).
 
 Let's assume you want to create the following structure:
 
@@ -172,8 +172,7 @@ Use the `DefaultAtomModelWrapper`. Refer to the [HowTo on creating atoms](#bot-h
 ```
 // we assume you have created a new atom URI as 'atomURI'
 DefaultAtomModelWrapper atomWrapper = new DefaultAtomModelWrapper(atomURI); 
-atomWrapper.createSeeksNodeIfNonExist(); // (sorry, this is ugly.)
-Resource book = getSeeksNodes().get(0);  // get the blank node that represents a book
+Resource book = atomWrapper.createSeeksNode();  // create a blank node that represents a book
 Resource author = book.getModel().createResource(); //create the second blank node (which represents an author)
 //set the properties
 book.addProperty(SCHEMA.ISBN, "1234-1234-1234");
@@ -272,7 +271,7 @@ try (QueryExecution qexec = QueryExecutionFactory.create(query, dataset)) {
     ResultSet rs = qexec.execSelect();
     if (rs.hasNext()) {
         QuerySolution qs = rs.nextSolution();
-        System.out.println("?a:" + qs.get("a") + ", ?b:" + qs.get("b") + ", ?c: " + qs.get("c"));
+        System.out.println(String.format("?a: %s, ?b: %s, ?c: %s", qs.get("a"), qs.get("b"), qs.get("c"));
     }
 }
 ```
