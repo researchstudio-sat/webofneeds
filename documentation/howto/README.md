@@ -50,7 +50,7 @@ wonMessageCommandBehaviour.activate();
 Then publish the command, for example `ConnectionMessageCommandEvent` or the `CreateAtomCommandEvent` as in the following example:
 
 ```
-Dataset ds = ... // dataset holding the atom content (see [Howto on creating atoms](#howto-creating-atoms))
+Dataset ds = ... // dataset holding the atom content 
 CreateAtomCommandEvent createCommand = new CreateAtomCommandEvent(ds);
 //
 // ...(a) register result listener here, if needed (see (b) below)
@@ -164,7 +164,7 @@ ctx.getEventBus().publish(createCommand);
 Note: reacting to successful creation is explained in the [HowTo on sending messages](#bot-howto-sending-a-message-and-processing-the-result).
 
 ## Bot HowTo: Setting Non-Standard Data for Atom
-Situation: you want to create an atom containing data that you cannot produce with the methode explained in the [HowTo on creating atoms](#bot-howto-creating-atoms).
+Situation: you want to create an atom containing data that you cannot produce with the methode explained in the [HowTo on creating atoms](#bot-howto-creating-an-atom).
 
 Let's assume you want to create the following structure:
 
@@ -196,7 +196,7 @@ _:blank2 s:name "H.P. Lovecraft" .
 
 This means: you want to say the atom is connected via `match:seeks` to a blanknode (1), which in turn has an `schema:isbn` property and is connected to another blank node (2) via `schema:author`, which has properties `rdf:type` and `schema:name`.
 
-Use the `DefaultAtomModelWrapper`. Refer to the [HowTo on creating atoms](#bot-howto-creating-atoms) for how to make one with a new atom URI. Then:
+Use the `DefaultAtomModelWrapper`. Refer to the [HowTo on creating atoms](#bot-howto-creating-an-atom) for how to make one with a new atom URI. Then:
 
 1. Create the 'seeks' blank node (1). 
 2. Add the `schema:isbn` property.
