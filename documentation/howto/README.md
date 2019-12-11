@@ -79,7 +79,7 @@ Much in the same way, you can listen for Failure events (e.g. the `CreateAtomCom
 
 
 ## Bot HowTo: Connecting to another Atom
-Situation: you have two atom URIs. One of them is an atom you control (the other, maybe, too). You know which socket types you want to connect, for example the [holder socket](https://w3id.org/won/ext/hold#HolderSocket) and the [holdable socket](https://w3id.org/won/ext/hold#HoldableSocket). Follow the [HowTo on getting the Socket of an Atom](#howto-obtaining-an-atoms-sockets) to find out how to get the Socket URIs. We'll assume you call them `senderSocketURI` and `recipientSocketURI`.
+Situation: you have two atom URIs. One of them is an atom you control (the other, maybe, too). You know which socket types you want to connect, for example the [holder socket](https://w3id.org/won/ext/hold#HolderSocket) and the [holdable socket](https://w3id.org/won/ext/hold#HoldableSocket). Follow the [HowTo on getting the Socket of an Atom](#bot-howto-obtaining-an-atoms-sockets) to find out how to get the Socket URIs. We'll assume you call them `senderSocketURI` and `recipientSocketURI`.
 
 ```
 String message = "Hello, let's connect!"; //optional welcome message
