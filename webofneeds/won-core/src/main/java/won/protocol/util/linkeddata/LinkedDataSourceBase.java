@@ -94,6 +94,7 @@ public class LinkedDataSourceBase implements LinkedDataSource {
      * @param resource uri of the resource to request
      * @return dataset including http response headers
      */
+    @Override
     public DatasetResponseWithStatusCodeAndHeaders getDatasetWithHeadersForResource(URI resource,
                     HttpHeaders httpHeaders) {
         assert resource != null : "resource must not be null";
