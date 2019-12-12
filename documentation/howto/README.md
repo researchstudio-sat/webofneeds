@@ -279,7 +279,7 @@ If it is an RDFNode you can get it with getContentPropertyObjects.
         }); 
 ```
 
-## Bot HowTo: Getting an Atom's Data if you only have its URI
+## Bot HowTo: Getting an Atom's Data If You Only have its URI
 
 Situation: you have an atom URI and you want to get its data:
 
@@ -288,6 +288,21 @@ Situation: you have an atom URI and you want to get its data:
 ```
 
 Now you have the atom's dataset. 
+
+## Bot HowTo: Obtaining the Connection If You Only have the Socket URIs
+
+Situation: you need the `Connection` for sending a message, but you only know the two sockets that are connected.
+
+The connection can be obtained from the atom's linked data representation via `WonLinkedDataUtils` :
+
+```
+EventListenerContext ctx = getEventListenerContext();
+Optional<URI> connectionURI = WonLinkedDataUtils.getConnectionURIForSocketAndTargetSocket(socket, targetSocket, ctx.getLinkedDataSource());
+if (!connectionURI.isPresent()){
+    // handle: connection not found
+}
+Optional<Connection> con = getConnectionForConnectionURI(connectionURI.get());
+```
 
 ## Bot HowTo: Adding Data to a Message
 
