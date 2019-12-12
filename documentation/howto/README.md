@@ -12,11 +12,12 @@ A few examples:
 ```
 BotContext bc = getEventListenerContext().getBotContext();
 // single value
-bc.setSingleValue("APIKEY", "123abc");
+bc.setSingleValue("mybot:APIKEY", "123abc");
 // Collection
 Collection<String> apples = Arrays.asList("grannysmith", "goldendelicious");
-getEventListenerContext().getBotContext().addToListMap("mybot:fruits", "apples", objects.toArray());
+bc.addToListMap("mybot:fruits", "apples", objects.toArray());
 ```
+Note the `mybot:` key prefix in the above example. It is generally a good idea to use a separate prefix for each bot you are running, as this avoids name clashes. Those are not a problem as long as the `InMemoryBotContext` is used, but they matter when sharing a mongodb database between multiple bots.
 
 Remembering Atom URIs is a special case, it happens often. The concept used here is 'named' atom URI lists, to allow you to keep track of different types of atoms. For example, the ones your bot manages and the ones it is currently somehow interacting with.
 
