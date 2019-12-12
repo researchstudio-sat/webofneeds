@@ -372,7 +372,7 @@ export function getMessage(atomUri, eventUri) {
 export function getAllMetaAtoms(
   createdAfterDate,
   state = "ACTIVE",
-  limit = 3000
+  limit = 200
 ) {
   return getMetaAtoms(
     undefined,
