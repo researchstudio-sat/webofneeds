@@ -39,6 +39,7 @@ import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -49,6 +50,7 @@ import won.protocol.model.AtomState;
 import won.protocol.model.Connection;
 import won.protocol.model.SocketDefinition;
 import won.protocol.model.SocketDefinitionImpl;
+import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
 import won.protocol.rest.LinkedDataFetchingException;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.util.RdfUtils;
@@ -63,6 +65,7 @@ import won.protocol.vocabulary.WONMSG;
 public class WonLinkedDataUtils {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final Ehcache linkedDataObjectCache;
+    private static final Integer DEFAULT_FETCH_ATOM_URIS_PAGE_SIZE = 200;
     static {
         CacheManager manager = CacheManager.getInstance();
         linkedDataObjectCache = new Cache("linkedDataObjectCache", 1000, false, false, 3600, 3600);
@@ -193,16 +196,24 @@ public class WonLinkedDataUtils {
     }
 
     public static List<URI> getNodeAtomUris(URI nodeURI, LinkedDataSource linkedDataSource) {
-        return getNodeAtomUris(nodeURI, null, null, null, null, null, linkedDataSource);
+        return getNodeAtomUris(nodeURI, null, null, null, null, null, linkedDataSource, null, null);
     }
 
     public static List<URI> getNodeAtomUris(URI nodeURI, ZonedDateTime modifiedAfter, ZonedDateTime createdAfter,
                     AtomState atomState, URI filterBySocketTypeUri, URI filterByAtomTypeUri,
                     LinkedDataSource linkedDataSource) {
+        return getNodeAtomUris(nodeURI, modifiedAfter, createdAfter, atomState, filterBySocketTypeUri,
+                        filterByAtomTypeUri, linkedDataSource, null, null);
+    }
+
+    public static List<URI> getNodeAtomUris(URI nodeURI, ZonedDateTime modifiedAfter, ZonedDateTime createdAfter,
+                    AtomState atomState, URI filterBySocketTypeUri, URI filterByAtomTypeUri,
+                    LinkedDataSource linkedDataSource, Integer page, Integer pageSize) {
         Dataset nodeDataset = getDataForResource(nodeURI, linkedDataSource);
         WonNodeInfo wonNodeInfo = WonRdfUtils.WonNodeUtils.getWonNodeInfo(nodeURI, nodeDataset);
         URI atomListUri = URI.create(wonNodeInfo.getAtomListURI());
         String newQuery = atomListUri.getQuery();
+        HttpHeaders headers = new HttpHeaders();
         if (atomState != null) {
             String queryPart = "state=" + atomState;
             newQuery = (newQuery == null) ? queryPart : (newQuery + "&" + queryPart);
@@ -223,13 +234,28 @@ public class WonLinkedDataUtils {
             String queryPart = "filterBySocketTypeUri=" + filterBySocketTypeUri;
             newQuery = (newQuery == null) ? queryPart : (newQuery + "&" + queryPart);
         }
+        if (pageSize != null || page != null) {
+            // if we have a page, use a default page size
+            // if we only have a page size, use page 1 (first page in LDP Paging)
+            if (page == null) {
+                page = 1;
+            }
+            if (pageSize == null) {
+                pageSize = DEFAULT_FETCH_ATOM_URIS_PAGE_SIZE;
+            }
+            headers.set("Prefer", String.format("return=representation; max-member-count=\"%d\"", pageSize));
+        }
+        if (page != null) {
+            String queryPart = "p=" + page;
+            newQuery = (newQuery == null) ? queryPart : (newQuery + "&" + queryPart);
+        }
         try {
             atomListUri = new URI(atomListUri.getScheme(), atomListUri.getAuthority(), atomListUri.getPath(), newQuery,
                             atomListUri.getFragment());
         } catch (URISyntaxException e) {
             logger.warn("Could not append parameters to nodeURI, proceeding request without parameters");
         }
-        Dataset atomListDataset = getDataForResource(atomListUri, linkedDataSource);
+        Dataset atomListDataset = getDataForResourceWithHeaders(atomListUri, headers, linkedDataSource);
         return RdfUtils.visitFlattenedToList(atomListDataset, model -> {
             StmtIterator it = model.listStatements(null, RDFS.member, (RDFNode) null);
             List<URI> ret = new ArrayList<>();
@@ -347,13 +373,25 @@ public class WonLinkedDataUtils {
                         maxRequests, depth);
     }
 
-    public static Dataset getDataForResource(final URI connectionURI, final LinkedDataSource linkedDataSource) {
-        assert linkedDataSource != null : "linkedDataSource must not be null";
-        assert connectionURI != null : "connection URI must not be null";
-        logger.debug("loading model for connection {}", connectionURI);
-        Dataset dataset = linkedDataSource.getDataForResource(connectionURI);
+    public static Dataset getDataForResource(final URI resourceURI, final LinkedDataSource linkedDataSource) {
+        Objects.requireNonNull(resourceURI);
+        logger.debug("loading model for resource {}", resourceURI);
+        Dataset dataset = linkedDataSource.getDataForResource(resourceURI);
         if (dataset == null) {
-            throw new IllegalStateException("failed to load model for Connection " + connectionURI);
+            throw new IllegalStateException("failed to load model for resource " + resourceURI);
+        }
+        return dataset;
+    }
+
+    public static Dataset getDataForResourceWithHeaders(final URI resourceURI, HttpHeaders headers,
+                    final LinkedDataSource linkedDataSource) {
+        Objects.requireNonNull(resourceURI);
+        logger.debug("loading model for resource {}", resourceURI);
+        DatasetResponseWithStatusCodeAndHeaders response = linkedDataSource
+                        .getDatasetWithHeadersForResource(resourceURI, headers);
+        Dataset dataset = response.getDataset();
+        if (dataset == null) {
+            throw new IllegalStateException("failed to load model for resource " + resourceURI);
         }
         return dataset;
     }

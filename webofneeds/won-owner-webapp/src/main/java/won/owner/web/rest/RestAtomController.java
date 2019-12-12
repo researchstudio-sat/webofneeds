@@ -10,6 +10,17 @@
  */
 package won.owner.web.rest;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
@@ -23,7 +34,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import won.owner.model.Draft;
 import won.owner.model.User;
 import won.owner.model.UserAtom;
@@ -38,13 +54,6 @@ import won.protocol.rest.LinkedDataFetchingException;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
 
 @Controller
 @RequestMapping("/rest/atoms")
@@ -170,23 +179,42 @@ public class RestAtomController {
         if (filterByAtomTypeUriString != null) {
             filterByAtomTypeUri = URI.create(filterByAtomTypeUriString);
         }
-        List<URI> atomUris = WonLinkedDataUtils.getNodeAtomUris(nodeURI, modifiedAfter, createdAfter, state,
-                        filterBySocketTypeUri, filterByAtomTypeUri,
-                        linkedDataSource);
+        int pageSize = limit == null ? 200 : limit;
         Map<URI, AtomPojo> atomMap = new HashMap<>();
-        for (URI atomUri : atomUris) {
-            try {
-                Dataset atomDataset = WonLinkedDataUtils.getDataForResource(atomUri, linkedDataSource);
-                AtomPojo atom = new AtomPojo(atomDataset);
-                if (nearLocation == null
-                                || isNearLocation(nearLocation, atom.getLocation(), maxDistance)
-                                || isNearLocation(nearLocation, atom.getJobLocation(), maxDistance)) {
-                    atomMap.put(atom.getUri(), atom);
-                    if (limit != null && limit > 0 && atomMap.size() >= limit)
-                        break; // break fetching if the limit has been reached
+        // Limit to a large number of paged requests, just so it's
+        // never an infinite loop.
+        // Begin with 1 because in LDP paging, that's the first page
+        OUTER: for (int page = 1; page < 10000; page++) {
+            List<URI> atomUris = WonLinkedDataUtils.getNodeAtomUris(nodeURI, modifiedAfter, createdAfter, state,
+                            filterBySocketTypeUri, filterByAtomTypeUri,
+                            linkedDataSource, page, pageSize);
+            if (atomUris.isEmpty()) {
+                break;
+            }
+            for (URI atomUri : atomUris) {
+                try {
+                    Dataset atomDataset = WonLinkedDataUtils.getDataForResource(atomUri, linkedDataSource);
+                    AtomPojo atom = new AtomPojo(atomDataset);
+                    if (atom.getState() != AtomState.ACTIVE) {
+                        continue;
+                    }
+                    if (nearLocation == null
+                                    || isNearLocation(nearLocation, atom.getLocation(), maxDistance)
+                                    || isNearLocation(nearLocation, atom.getJobLocation(), maxDistance)) {
+                        atomMap.put(atom.getUri(), atom);
+                        if (limit != null && limit > 0 && atomMap.size() >= limit)
+                            break OUTER; // break fetching if the limit has been reached
+                    }
+                } catch (LinkedDataFetchingException e) {
+                    logger.debug("Could not retrieve atom<" + atomUri + "> cause: " + e.getMessage());
+                    break OUTER;
                 }
-            } catch (LinkedDataFetchingException e) {
-                logger.debug("Could not retrieve atom<" + atomUri + "> cause: " + e.getMessage());
+            }
+            if (limit != null && limit > 0 && atomUris.size() < limit) {
+                // we have a limit, but we fetched less than the limit
+                // this means that we are done, the next request would yield nothing
+                // save a request and finish now.
+                break;
             }
         }
         return atomMap;
