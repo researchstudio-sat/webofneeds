@@ -82,7 +82,31 @@ ctx.getEventBus().publish(createCommand);
 ```
 Note: reacting to successful creation is explained in the [HowTo on sending messages](#bot-howto-sending-a-message-and-processing-the-result).
 
+## Bot HowTo: Modifying an Atom
+Situation: you have created an atom, now you want to change its data.
 
+This is essentially the same process as [creating](#bot-howto-creating-an-atom), the only difference is that you send a `Replace` message. However:
+* All connected atoms receive a `ChangeNotificationMessage`
+* You can only change a socket if it has no established connections. 
+
+Here is how:
+1. Retrieve the atom's content as a dataset
+2. Extract the 'content' (as opposed to 'sysinfo', which is managed by the WoN node)
+3. Make your changes to the content
+4. Send the `Replace` message
+
+```
+EventListenerContext ctx = getEventListenerContext();
+// retrieve the atom dataset
+Dataset atomData = ctx.getLinkedDataSource().getDataForResource(atomURI);
+DefaultAtomModelWrapper atomModelWrapper = new DefaultAtomModelWrapper(atomData);
+// extract the content
+Dataset content = atomModelWrapper.copyDatasetWithoutSysinfo();
+// make changes
+// ...
+// send Replace message
+ctx.getEventBus().publish(new ReplaceCommandEvent(content));
+```
 
 ## Bot HowTo: Connecting to another Atom
 Situation: you have two atom URIs. One of them is an atom you control (the other, maybe, too). You know which socket types you want to connect, for example the [holder socket](https://w3id.org/won/ext/hold#HolderSocket) and the [holdable socket](https://w3id.org/won/ext/hold#HoldableSocket). Follow the [HowTo on getting the Socket of an Atom](#bot-howto-obtaining-an-atoms-sockets) to find out how to get the Socket URIs. We'll assume you call them `senderSocketURI` and `recipientSocketURI`.
