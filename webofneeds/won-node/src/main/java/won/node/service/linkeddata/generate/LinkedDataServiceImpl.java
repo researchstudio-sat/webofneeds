@@ -785,11 +785,18 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
         List<URI> uris = slice.getContent();
         URI resumeBefore = null;
         URI resumeAfter = null;
+        // very confusing but correct
+        // our collections are sorted newest first
+        // when we use resumeafter, it means we want the next page
+        // when we use resumebefore, it means we want the previous page
+        // so, for resumeafter, we want the oldest item, for resumebefore the newest
+        // the following works ONLY for a container whose order is newest-first (such as
+        // atoms)
         if (slice.getSort() != null && !uris.isEmpty()) {
             Iterator<Sort.Order> sortOrders = slice.getSort().iterator();
             if (sortOrders.hasNext()) {
                 Sort.Order sortOrder = sortOrders.next();
-                if (sortOrder.getDirection() == Sort.Direction.ASC) {
+                if (sortOrder.getDirection() == Sort.Direction.DESC) {
                     resumeBefore = uris.get(0);
                     resumeAfter = uris.get(uris.size() - 1);
                 } else {
