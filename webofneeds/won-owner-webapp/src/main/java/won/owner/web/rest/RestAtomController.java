@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -52,6 +53,7 @@ import won.protocol.model.AtomState;
 import won.protocol.model.Coordinate;
 import won.protocol.rest.LinkedDataFetchingException;
 import won.protocol.service.WonNodeInformationService;
+import won.protocol.util.linkeddata.LDPContainerPage;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
@@ -60,6 +62,9 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
 public class RestAtomController {
     private static final int DEFAULT_MAX_DISTANCE = 5000;
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final int FETCH_PAGE_SIZE_NO_LIMIT = 1000;
+    private static final int MIN_FETCH_PAGE_SIZE_FILLING_UP = 10;
+    private static final int MAX_FETCH_PAGE_SIZE_FILLING_UP = 2000;
     @Autowired
     private DraftRepository draftRepository;
     @Autowired
@@ -179,18 +184,43 @@ public class RestAtomController {
         if (filterByAtomTypeUriString != null) {
             filterByAtomTypeUri = URI.create(filterByAtomTypeUriString);
         }
-        int pageSize = limit == null ? 200 : limit;
         Map<URI, AtomPojo> atomMap = new HashMap<>();
+        int lastBatchSize = -1;
+        int lastPageSize = -1;
+        int pageSize = -1;
+        Optional<URI> nextLink = Optional.empty();
         // Limit to a large number of paged requests, just so it's
-        // never an infinite loop.
-        // Begin with 1 because in LDP paging, that's the first page
-        OUTER: for (int page = 1; page < 10000; page++) {
-            List<URI> atomUris = WonLinkedDataUtils.getNodeAtomUris(nodeURI, modifiedAfter, createdAfter, state,
-                            filterBySocketTypeUri, filterByAtomTypeUri,
-                            linkedDataSource, page, pageSize);
-            if (atomUris.isEmpty()) {
+        // never an infinite loop
+        OUTER: for (int batch = 0; batch < 10000; batch++) {
+            lastPageSize = pageSize;
+            LDPContainerPage<List<URI>> fetchResult = null;
+            if (batch == 0 || limit == null) {
+                // two options here:
+                // a) first batch. Just load the amount we want, hope we can use them all
+                // b) no limit. just keep fetching large pages
+                int page = batch + 1; // pages are 1-based
+                pageSize = limit != null ? limit : FETCH_PAGE_SIZE_NO_LIMIT;
+                fetchResult = WonLinkedDataUtils.getNodeAtomUrisPage(nodeURI, modifiedAfter, createdAfter, state,
+                                filterBySocketTypeUri, filterByAtomTypeUri,
+                                page, pageSize, linkedDataSource);
+            } else {
+                // * at least second batch
+                // * we have a limit we want to reach
+                // now we'll determine the page size and then figure out the page number we have
+                // to use in order
+                // to get approximately that many new atoms without missing one
+                int page = batch + 1; // pages are 1-based
+                pageSize = determinePageSize(atomMap.size(), lastBatchSize, lastPageSize, page, limit);
+                fetchResult = WonLinkedDataUtils.getNodeAtomUrisPageAfter(nodeURI, modifiedAfter, createdAfter, state,
+                                filterBySocketTypeUri, filterByAtomTypeUri,
+                                nextLink.orElse(null), pageSize, linkedDataSource);
+            }
+            if (fetchResult.getContent().isEmpty()) {
                 break;
             }
+            nextLink = fetchResult.getNextPageLink();
+            int beforeBatchSize = atomMap.size();
+            List<URI> atomUris = fetchResult.getContent();
             for (URI atomUri : atomUris) {
                 try {
                     Dataset atomDataset = WonLinkedDataUtils.getDataForResource(atomUri, linkedDataSource);
@@ -207,17 +237,49 @@ public class RestAtomController {
                     }
                 } catch (LinkedDataFetchingException e) {
                     logger.debug("Could not retrieve atom<" + atomUri + "> cause: " + e.getMessage());
-                    break OUTER;
+                    continue;
                 }
             }
-            if (limit != null && limit > 0 && atomUris.size() < limit) {
-                // we have a limit, but we fetched less than the limit
-                // this means that we are done, the next request would yield nothing
-                // save a request and finish now.
+            if (atomUris.size() < pageSize) {
+                // We retrieved less than pageSize results.
+                // This means that we are done, the next request would yield nothing.
+                // Save a request and finish now.
                 break;
             }
+            lastBatchSize = atomMap.size() - beforeBatchSize;
         }
         return atomMap;
+    }
+
+    private int determinePageSize(int loaded, int lastBatchSize, int lastPageSize, int page,
+                    int limit) {
+        if (limit <= 0) {
+            return FETCH_PAGE_SIZE_NO_LIMIT;
+        }
+        if (loaded == 0) {
+            // we still haven't loaded anything.
+            // seems like there are a lot of unusable atoms at the beginning of the list
+            // still, we don't want to get more than the limit each time because we
+            // care especially about fetching the freshest usable ones. If we fetch more
+            // than the limit now, we cannot guarantee including those.
+            return limit;
+        }
+        // we've loaded some, so the freshest ones are there. We can be more lenient
+        // now.
+        int desired = limit - loaded;
+        if (desired <= 0) {
+            // just in case
+            return 0;
+        }
+        // determine how many more than desired to load
+        int pageSize = desired * 2;
+        if (lastBatchSize == 0) {
+            // special case: did not use any in the last batch. Seems like a
+            // portion of unusable ones, fetch more this time
+            // (but only if this is more than we would otherwise)
+            pageSize = Math.max(lastPageSize * 2, pageSize);
+        }
+        return Math.min(Math.max(pageSize, MIN_FETCH_PAGE_SIZE_FILLING_UP), MAX_FETCH_PAGE_SIZE_FILLING_UP);
     }
 
     /**
