@@ -16,6 +16,9 @@ import java.util.Optional;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.sparql.path.Path;
+import org.springframework.http.HttpHeaders;
+
+import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
 
 /**
  * Interface for fetching linked data as a jena Model.
@@ -55,4 +58,6 @@ public interface LinkedDataSource {
 
     Dataset getDataForResourceWithPropertyPath(final URI resourceURI, Optional<URI> requesterWebID,
                     final List<Path> properties, int maxRequest, int maxDepth);
+
+    DatasetResponseWithStatusCodeAndHeaders getDatasetWithHeadersForResource(URI resource, HttpHeaders httpHeaders);
 }

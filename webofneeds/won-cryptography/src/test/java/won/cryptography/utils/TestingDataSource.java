@@ -15,9 +15,11 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.path.Path;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.springframework.http.HttpHeaders;
 
 import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.cryptography.service.keystore.FileBasedKeyStoreService;
+import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
 import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
@@ -89,6 +91,12 @@ public class TestingDataSource implements LinkedDataSource {
     @Override
     public Dataset getDataForResourceWithPropertyPath(URI resourceURI, Optional<URI> requesterWebID,
                     List<Path> properties, int maxRequest, int maxDepth) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public DatasetResponseWithStatusCodeAndHeaders getDatasetWithHeadersForResource(URI resource,
+                    HttpHeaders httpHeaders) {
         throw new UnsupportedOperationException();
     }
 }

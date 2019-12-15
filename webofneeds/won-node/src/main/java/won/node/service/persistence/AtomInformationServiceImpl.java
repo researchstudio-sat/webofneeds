@@ -121,11 +121,11 @@ public class AtomInformationServiceImpl implements AtomInformationService {
         if (atomState == null) {
             // use 'creationDate' to keep a constant atom order over requests
             slice = atomRepository.getAtomURIsAfter(referenceDate,
-                            new PageRequest(0, pageSize, Sort.Direction.ASC, "creationDate"));
+                            new PageRequest(0, pageSize, Sort.Direction.DESC, "creationDate"));
         } else {
             // use 'creationDate' to keep a constant atom order over requests
             slice = atomRepository.getAtomURIsAfter(referenceDate, atomState,
-                            new PageRequest(0, pageSize, Sort.Direction.ASC, "creationDate"));
+                            new PageRequest(0, pageSize, Sort.Direction.DESC, "creationDate"));
         }
         return slice;
     }

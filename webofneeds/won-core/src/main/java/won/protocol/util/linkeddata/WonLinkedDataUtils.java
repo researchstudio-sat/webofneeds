@@ -18,11 +18,16 @@ import java.net.URLEncoder;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
@@ -39,6 +44,8 @@ import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.util.StringUtils;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -49,6 +56,7 @@ import won.protocol.model.AtomState;
 import won.protocol.model.Connection;
 import won.protocol.model.SocketDefinition;
 import won.protocol.model.SocketDefinitionImpl;
+import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
 import won.protocol.rest.LinkedDataFetchingException;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.util.RdfUtils;
@@ -63,6 +71,7 @@ import won.protocol.vocabulary.WONMSG;
 public class WonLinkedDataUtils {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final Ehcache linkedDataObjectCache;
+    private static final Integer DEFAULT_FETCH_ATOM_URIS_PAGE_SIZE = 200;
     static {
         CacheManager manager = CacheManager.getInstance();
         linkedDataObjectCache = new Cache("linkedDataObjectCache", 1000, false, false, 3600, 3600);
@@ -193,44 +202,73 @@ public class WonLinkedDataUtils {
     }
 
     public static List<URI> getNodeAtomUris(URI nodeURI, LinkedDataSource linkedDataSource) {
-        return getNodeAtomUris(nodeURI, null, null, null, null, null, linkedDataSource);
+        return getNodeAtomUrisPage(nodeURI, null, null, null, null, null, null, null, linkedDataSource)
+                        .getContent();
     }
 
     public static List<URI> getNodeAtomUris(URI nodeURI, ZonedDateTime modifiedAfter, ZonedDateTime createdAfter,
                     AtomState atomState, URI filterBySocketTypeUri, URI filterByAtomTypeUri,
                     LinkedDataSource linkedDataSource) {
+        return getNodeAtomUrisPage(nodeURI, modifiedAfter, createdAfter, atomState, filterBySocketTypeUri,
+                        filterByAtomTypeUri, null, null, linkedDataSource).getContent();
+    }
+
+    /**
+     * Fetch <code>pageSize</code> atoms with specified restrictions, starting at
+     * page <code>page</code>.
+     * 
+     * @param nodeURI
+     * @param modifiedAfter
+     * @param createdAfter
+     * @param atomState
+     * @param filterBySocketTypeUri
+     * @param filterByAtomTypeUri
+     * @param linkedDataSource
+     * @param page the page index, 1-based
+     * @param pageSize
+     * @return
+     */
+    public static LDPContainerPage<List<URI>> getNodeAtomUrisPage(URI nodeURI, ZonedDateTime modifiedAfter,
+                    ZonedDateTime createdAfter,
+                    AtomState atomState, URI filterBySocketTypeUri, URI filterByAtomTypeUri,
+                    Integer page, Integer pageSize, LinkedDataSource linkedDataSource) {
         Dataset nodeDataset = getDataForResource(nodeURI, linkedDataSource);
         WonNodeInfo wonNodeInfo = WonRdfUtils.WonNodeUtils.getWonNodeInfo(nodeURI, nodeDataset);
         URI atomListUri = URI.create(wonNodeInfo.getAtomListURI());
-        String newQuery = atomListUri.getQuery();
-        if (atomState != null) {
-            String queryPart = "state=" + atomState;
-            newQuery = (newQuery == null) ? queryPart : (newQuery + "&" + queryPart);
+        Map<String, String> params = extractQueryParams(atomListUri.getQuery());
+        HttpHeaders headers = new HttpHeaders();
+        addOptionalQueryParam(params, "state", atomState);
+        addOptionalQueryParam(params, "createdafter", createdAfter);
+        addOptionalQueryParam(params, "modifiedafter", modifiedAfter);
+        addOptionalQueryParam(params, "filterByAtomTypeUri", filterByAtomTypeUri);
+        addOptionalQueryParam(params, "filterBySocketTypeUri", filterBySocketTypeUri);
+        if (pageSize != null || page != null) {
+            if (page <= 0) {
+                throw new IllegalArgumentException("The page index must be a positive integer");
+            }
+            // if we have a page, use a default page size
+            // if we only have a page size, use page 1 (first page in LDP Paging)
+            if (page == null) {
+                page = 1;
+            }
+            if (pageSize == null) {
+                pageSize = DEFAULT_FETCH_ATOM_URIS_PAGE_SIZE;
+            }
+            headers.set("Prefer", String.format("return=representation; max-member-count=\"%d\"", pageSize));
         }
-        if (modifiedAfter != null) {
-            String queryPart = "modifiedafter=" + modifiedAfter;
-            newQuery = (newQuery == null) ? queryPart : (newQuery + "&" + queryPart);
-        }
-        if (createdAfter != null) {
-            String queryPart = "createdafter=" + createdAfter;
-            newQuery = (newQuery == null) ? queryPart : (newQuery + "&" + queryPart);
-        }
-        if (filterByAtomTypeUri != null) {
-            String queryPart = "filterByAtomTypeUri=" + filterByAtomTypeUri;
-            newQuery = (newQuery == null) ? queryPart : (newQuery + "&" + queryPart);
-        }
-        if (filterBySocketTypeUri != null) {
-            String queryPart = "filterBySocketTypeUri=" + filterBySocketTypeUri;
-            newQuery = (newQuery == null) ? queryPart : (newQuery + "&" + queryPart);
+        if (page != null) {
+            addOptionalQueryParam(params, "p", page.toString());
         }
         try {
-            atomListUri = new URI(atomListUri.getScheme(), atomListUri.getAuthority(), atomListUri.getPath(), newQuery,
+            atomListUri = new URI(atomListUri.getScheme(), atomListUri.getAuthority(), atomListUri.getPath(),
+                            toQueryString(params),
                             atomListUri.getFragment());
         } catch (URISyntaxException e) {
             logger.warn("Could not append parameters to nodeURI, proceeding request without parameters");
         }
-        Dataset atomListDataset = getDataForResource(atomListUri, linkedDataSource);
-        return RdfUtils.visitFlattenedToList(atomListDataset, model -> {
+        DatasetResponseWithStatusCodeAndHeaders result = getDataForResourceWithHeaders(atomListUri, headers,
+                        linkedDataSource);
+        List<URI> uris = RdfUtils.visitFlattenedToList(result.getDataset(), model -> {
             StmtIterator it = model.listStatements(null, RDFS.member, (RDFNode) null);
             List<URI> ret = new ArrayList<>();
             while (it.hasNext()) {
@@ -238,6 +276,99 @@ public class WonLinkedDataUtils {
             }
             return ret;
         });
+        return new LDPContainerPage<List<URI>>(uris, result.getResponseHeaders());
+    }
+
+    /**
+     * Fetch <code>pageSize</code> atoms with specified restrictions, starting after
+     * the specified atom <code>resumeAfter</code>.
+     * 
+     * @param nodeURI
+     * @param modifiedAfter
+     * @param createdAfter
+     * @param atomState
+     * @param filterBySocketTypeUri
+     * @param filterByAtomTypeUri
+     * @param resumeAfter the next link URI as returned by the container. Must start
+     * with the node URI.
+     * @param pageSize
+     * @param linkedDataSource
+     * @return
+     */
+    public static LDPContainerPage<List<URI>> getNodeAtomUrisPageAfter(URI nodeURI, ZonedDateTime modifiedAfter,
+                    ZonedDateTime createdAfter,
+                    AtomState atomState, URI filterBySocketTypeUri, URI filterByAtomTypeUri,
+                    URI resumeAfter, int pageSize, LinkedDataSource linkedDataSource) {
+        URI atomListUri = null;
+        if (resumeAfter == null) {
+            Dataset nodeDataset = getDataForResource(nodeURI, linkedDataSource);
+            WonNodeInfo wonNodeInfo = WonRdfUtils.WonNodeUtils.getWonNodeInfo(nodeURI, nodeDataset);
+            atomListUri = URI.create(wonNodeInfo.getAtomListURI());
+        } else {
+            if (!resumeAfter.toString().startsWith(nodeURI.toString())) {
+                throw new IllegalArgumentException(String.format(
+                                "URI for resumeAfter is provided as '%s'but it does not start with node URI '%s'",
+                                resumeAfter, nodeURI));
+            }
+            atomListUri = resumeAfter;
+        }
+        Map<String, String> params = extractQueryParams(atomListUri.getQuery());
+        HttpHeaders headers = new HttpHeaders();
+        addOptionalQueryParam(params, "state", atomState);
+        addOptionalQueryParam(params, "createdafter", createdAfter);
+        addOptionalQueryParam(params, "modifiedafter", modifiedAfter);
+        addOptionalQueryParam(params, "filterByAtomTypeUri", filterByAtomTypeUri);
+        addOptionalQueryParam(params, "filterBySocketTypeUri", filterBySocketTypeUri);
+        if (pageSize <= 0) {
+            throw new IllegalArgumentException("The pageSize must be a positive integer");
+        }
+        headers.set("Prefer", String.format("return=representation; max-member-count=\"%d\"", pageSize));
+        try {
+            atomListUri = new URI(atomListUri.getScheme(), atomListUri.getAuthority(), atomListUri.getPath(),
+                            toQueryString(params),
+                            atomListUri.getFragment());
+        } catch (URISyntaxException e) {
+            logger.warn("Could not append parameters to nodeURI, proceeding request without parameters");
+        }
+        DatasetResponseWithStatusCodeAndHeaders result = getDataForResourceWithHeaders(atomListUri, headers,
+                        linkedDataSource);
+        List<URI> uris = RdfUtils.visitFlattenedToList(result.getDataset(), model -> {
+            StmtIterator it = model.listStatements(null, RDFS.member, (RDFNode) null);
+            List<URI> ret = new ArrayList<>();
+            while (it.hasNext()) {
+                ret.add(URI.create(it.next().getObject().toString()));
+            }
+            return ret;
+        });
+        return new LDPContainerPage<List<URI>>(uris, result.getResponseHeaders());
+    }
+
+    private static Map<String, String> extractQueryParams(String query) {
+        Map<String, String> result = new HashMap<>();
+        if (StringUtils.isEmpty(query)) {
+            return result;
+        }
+        String[] keyValuePairs = query.split("&");
+        for (int i = 0; i < keyValuePairs.length; i++) {
+            String[] keyValue = keyValuePairs[i].split("=");
+            result.put(keyValue[0], keyValue[1]);
+        }
+        return result;
+    }
+
+    private static void addOptionalQueryParam(Map<String, String> params, String paramName, Object paramValue) {
+        if (paramValue != null
+                        && !StringUtils.isEmpty(paramValue.toString())
+                        && !StringUtils.isEmpty(paramName)) {
+            // TODO: avoid duplicate query params
+            params.put(paramName, paramValue.toString());
+        }
+    }
+
+    private static String toQueryString(Map<String, String> params) {
+        return params.entrySet().stream()
+                        .map((e) -> e.getKey() + "=" + e.getValue())
+                        .collect(Collectors.joining("&"));
     }
 
     public static Dataset getFullAtomDataset(URI atomURI, LinkedDataSource linkedDataSource) {
@@ -347,15 +478,28 @@ public class WonLinkedDataUtils {
                         maxRequests, depth);
     }
 
-    public static Dataset getDataForResource(final URI connectionURI, final LinkedDataSource linkedDataSource) {
-        assert linkedDataSource != null : "linkedDataSource must not be null";
-        assert connectionURI != null : "connection URI must not be null";
-        logger.debug("loading model for connection {}", connectionURI);
-        Dataset dataset = linkedDataSource.getDataForResource(connectionURI);
+    public static Dataset getDataForResource(final URI resourceURI, final LinkedDataSource linkedDataSource) {
+        Objects.requireNonNull(resourceURI);
+        logger.debug("loading model for resource {}", resourceURI);
+        Dataset dataset = linkedDataSource.getDataForResource(resourceURI);
         if (dataset == null) {
-            throw new IllegalStateException("failed to load model for Connection " + connectionURI);
+            throw new IllegalStateException("failed to load model for resource " + resourceURI);
         }
         return dataset;
+    }
+
+    public static DatasetResponseWithStatusCodeAndHeaders getDataForResourceWithHeaders(final URI resourceURI,
+                    HttpHeaders headers,
+                    final LinkedDataSource linkedDataSource) {
+        Objects.requireNonNull(resourceURI);
+        logger.debug("loading model for resource {}", resourceURI);
+        DatasetResponseWithStatusCodeAndHeaders response = linkedDataSource
+                        .getDatasetWithHeadersForResource(resourceURI, headers);
+        Dataset dataset = response.getDataset();
+        if (dataset == null) {
+            throw new IllegalStateException("failed to load model for resource " + resourceURI);
+        }
+        return response;
     }
 
     public static Iterator<Dataset> getModelForURIs(final Iterator<URI> uriIterator,
@@ -659,5 +803,56 @@ public class WonLinkedDataUtils {
         }
         Iterator<URI> it = WonRdfUtils.AtomUtils.getConnections(connConnData.get(), connectionContainer.get());
         return it.hasNext() ? Optional.of(it.next()) : Optional.empty();
+    }
+
+    private static final Pattern LDP_PREV_LINK_PATTERN = Pattern.compile("<([^>]*)>; rel=\"prev\"");
+    private static final Pattern LDP_NEXT_LINK_PATTERN = Pattern.compile("<([^>]*)>; rel=\"next\"");
+
+    /**
+     * Extracts the prev page link from a list of HTTP 'Link' headers returned by an
+     * LDP container.
+     * 
+     * @see https://www.w3.org/TR/ldp-paging/#ldpp-ex-paging-other-links
+     * @param linkHeaders
+     * @return
+     */
+    public static Optional<URI> extractLDPPrevPageLinkFromLinkHeaders(List<String> linkHeaders) {
+        for (String header : linkHeaders) {
+            Matcher m = LDP_PREV_LINK_PATTERN.matcher(header);
+            if (m.find()) {
+                String link = null;
+                try {
+                    link = m.group(1);
+                    return Optional.of(new URI(link));
+                } catch (URISyntaxException e) {
+                    logger.info("Error parsing ldp prev link: {} ", link, e);
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Extracts the next page link from a list of HTTP 'Link' headers returned by an
+     * LDP container.
+     * 
+     * @see https://www.w3.org/TR/ldp-paging/#ldpp-ex-paging-other-links
+     * @param linkHeaders
+     * @return
+     */
+    public static Optional<URI> extractLDPNextPageLinkFromLinkHeaders(List<String> linkHeaders) {
+        for (String header : linkHeaders) {
+            Matcher m = LDP_NEXT_LINK_PATTERN.matcher(header);
+            if (m.find()) {
+                String link = null;
+                try {
+                    link = m.group(1);
+                    return Optional.of(new URI(link));
+                } catch (URISyntaxException e) {
+                    logger.info("Error parsing ldp next link: {} ", link, e);
+                }
+            }
+        }
+        return Optional.empty();
     }
 }

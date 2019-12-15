@@ -250,7 +250,7 @@ public class LinkedDataWebController implements InitializingBean {
                     throw new IllegalArgumentException("resumeBefore must be a full, valid message URI");
                 }
                 AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                                .listConnectionEventURIsBefore(connectionURI, referenceEvent, null, msgType, deep);
+                                .listConnectionEventURIsAfter(connectionURI, referenceEvent, null, msgType, deep);
                 rdfDataset = resource.getContent();
             } else {
                 // a page that follows the item identified by the resumeAfter is requested
@@ -261,7 +261,7 @@ public class LinkedDataWebController implements InitializingBean {
                     throw new IllegalArgumentException("resumeAfter must be a full, valid message URI");
                 }
                 AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                                .listConnectionEventURIsAfter(connectionURI, referenceEvent, null, msgType, deep);
+                                .listConnectionEventURIsBefore(connectionURI, referenceEvent, null, msgType, deep);
                 rdfDataset = resource.getContent();
             }
             model.addAttribute("rdfDataset", rdfDataset);
@@ -331,7 +331,7 @@ public class LinkedDataWebController implements InitializingBean {
                 throw new IllegalArgumentException("resumeBefore must be a full, valid atom URI");
             }
             AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                            .listPagedAtomURIsBefore(referenceAtom, null, atomState);
+                            .listPagedAtomURIsAfter(referenceAtom, null, atomState);
             rdfDataset = resource.getContent();
         } else if (resumeAfter != null) { // resumeAfter != null
             URI referenceAtom;
@@ -341,7 +341,7 @@ public class LinkedDataWebController implements InitializingBean {
                 throw new IllegalArgumentException("resumeAfter must be a full, valid atom URI");
             }
             AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                            .listPagedAtomURIsAfter(referenceAtom, null, atomState);
+                            .listPagedAtomURIsBefore(referenceAtom, null, atomState);
             rdfDataset = resource.getContent();
         } else if (createdAfter != null) {
             // do not support paging for now
@@ -364,8 +364,12 @@ public class LinkedDataWebController implements InitializingBean {
                     "application/trig", "application/n-quads" })
     public ResponseEntity<Dataset> listAtomURIs(HttpServletRequest request, HttpServletResponse response,
                     @RequestParam(value = "p", required = false) Integer page,
-                    @RequestParam(value = "resumebefore", required = false) String resumeBefore,
-                    @RequestParam(value = "resumeafter", required = false) String resumeAfter,
+                    @RequestParam(value = "resumebefore", required = false) String resumeBefore, // assumes newest-first
+                                                                                                 // ordering, newer than
+                                                                                                 // this
+                    @RequestParam(value = "resumeafter", required = false) String resumeAfter, // assumes newest-first
+                                                                                               // ordering, older than
+                                                                                               // this
                     @RequestParam(value = "modifiedafter", required = false) String modifiedAfter,
                     @RequestParam(value = "createdafter", required = false) String createdAfter,
                     @RequestParam(value = "filterBySocketTypeUri", required = false) String filterBySocketTypeUriString,
@@ -390,15 +394,14 @@ public class LinkedDataWebController implements InitializingBean {
                             preferedSize, atomState);
             rdfDataset = resource.getContent();
             addPagedResourceInSequenceHeader(headers, URI.create(this.atomResourceURIPrefix), resource, passableQuery);
-            // resume before parameter specified - display the connections with activities
-            // before the specified event id
         } else if (page != null) {
             AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listPagedAtomURIs(page,
                             preferedSize, atomState);
             rdfDataset = resource.getContent();
-            addPagedResourceInSequenceHeader(headers, URI.create(this.atomResourceURIPrefix), resource, page,
-                            passableQuery);
+            addPagedResourceInSequenceHeader(headers, URI.create(this.atomResourceURIPrefix), resource, passableQuery);
         } else if (resumeBefore != null) {
+            // resumebefore means we are paging and we are interested in atoms newer than
+            // the reference
             URI referenceAtom;
             try {
                 referenceAtom = new URI(resumeBefore);
@@ -406,10 +409,12 @@ public class LinkedDataWebController implements InitializingBean {
                 throw new IllegalArgumentException("resumeBefore must be a full, valid atom URI");
             }
             AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                            .listPagedAtomURIsBefore(referenceAtom, preferedSize, atomState);
+                            .listPagedAtomURIsAfter(referenceAtom, preferedSize, atomState);
             rdfDataset = resource.getContent();
             addPagedResourceInSequenceHeader(headers, URI.create(this.atomResourceURIPrefix), resource, passableQuery);
         } else if (resumeAfter != null) {
+            // resumebefore means we are paging and we are interested in atoms older than
+            // the reference
             URI referenceAtom;
             try {
                 referenceAtom = new URI(resumeAfter);
@@ -417,7 +422,7 @@ public class LinkedDataWebController implements InitializingBean {
                 throw new IllegalArgumentException("resumeAfter must be a full, valid atom URI");
             }
             AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                            .listPagedAtomURIsAfter(referenceAtom, preferedSize, atomState);
+                            .listPagedAtomURIsBefore(referenceAtom, preferedSize, atomState);
             rdfDataset = resource.getContent();
             addPagedResourceInSequenceHeader(headers, URI.create(this.atomResourceURIPrefix), resource, passableQuery);
         } else if (createdAfter != null) {
@@ -467,7 +472,7 @@ public class LinkedDataWebController implements InitializingBean {
                 } catch (URISyntaxException e) {
                     throw new IllegalArgumentException("resumeBefore must be a full, valid connection URI");
                 }
-                rdfDataset = linkedDataService.listConnectionsBefore(connURI, null, dateParam.getDate(), deep)
+                rdfDataset = linkedDataService.listConnectionsAfter(connURI, null, dateParam.getDate(), deep)
                                 .getContent();
             } else if (resumeAfter != null) {
                 URI connURI;
@@ -476,7 +481,7 @@ public class LinkedDataWebController implements InitializingBean {
                 } catch (URISyntaxException e) {
                     throw new IllegalArgumentException("resumeAfter must be a full, valid connection URI");
                 }
-                rdfDataset = linkedDataService.listConnectionsAfter(connURI, null, dateParam.getDate(), deep)
+                rdfDataset = linkedDataService.listConnectionsBefore(connURI, null, dateParam.getDate(), deep)
                                 .getContent();
             } else {
                 // all the connections; does not support date filtering for clients that do not
@@ -524,7 +529,7 @@ public class LinkedDataWebController implements InitializingBean {
                 } catch (URISyntaxException e) {
                     throw new IllegalArgumentException("resumeBefore must be a full, valid connection URI");
                 }
-                rdfDataset = linkedDataService.listConnectionsBefore(atomURI, connURI, null, eventsType,
+                rdfDataset = linkedDataService.listConnectionsAfter(atomURI, connURI, null, eventsType,
                                 dateParam.getDate(), deep, true).getContent();
             } else if (resumeAfter != null) {
                 URI connURI;
@@ -533,7 +538,7 @@ public class LinkedDataWebController implements InitializingBean {
                 } catch (URISyntaxException e) {
                     throw new IllegalArgumentException("resumeAfter must be a full, valid connection URI");
                 }
-                rdfDataset = linkedDataService.listConnectionsAfter(atomURI, connURI, null, eventsType,
+                rdfDataset = linkedDataService.listConnectionsBefore(atomURI, connURI, null, eventsType,
                                 dateParam.getDate(), deep, true).getContent();
             } else {
                 // all the connections of the atom; does not support type and date filtering for
@@ -760,7 +765,7 @@ public class LinkedDataWebController implements InitializingBean {
                         throw new IllegalArgumentException("resumeBefore must be a full, valid connection URI");
                     }
                     AtomInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
-                                    .listConnectionsBefore(resumeConnURI, preferedSize, dateParam.getDate(), deep);
+                                    .listConnectionsAfter(resumeConnURI, preferedSize, dateParam.getDate(), deep);
                     rdfDataset = resource.getContent();
                     addPagedConnectionResourceInSequenceHeader(headers, URI.create(this.connectionResourceURIPrefix),
                                     resource, passableMap);
@@ -774,7 +779,7 @@ public class LinkedDataWebController implements InitializingBean {
                         throw new IllegalArgumentException("resumeAfter must be a full, valid connection URI");
                     }
                     AtomInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
-                                    .listConnectionsAfter(resumeConnURI, preferedSize, dateParam.getDate(), deep);
+                                    .listConnectionsBefore(resumeConnURI, preferedSize, dateParam.getDate(), deep);
                     rdfDataset = resource.getContent();
                     addPagedConnectionResourceInSequenceHeader(headers, URI.create(this.connectionResourceURIPrefix),
                                     resource, passableMap);
@@ -970,7 +975,7 @@ public class LinkedDataWebController implements InitializingBean {
                     throw new IllegalArgumentException("resumeBefore must be a full, valid message URI");
                 }
                 AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                                .listConnectionEventURIsBefore(connectionUri, referenceEvent, preferedSize, msgType,
+                                .listConnectionEventURIsAfter(connectionUri, referenceEvent, preferedSize, msgType,
                                                 deep);
                 rdfDataset = resource.getContent();
                 addPagedResourceInSequenceHeader(headers, connectionEventsURI, resource, passableMap);
@@ -983,7 +988,7 @@ public class LinkedDataWebController implements InitializingBean {
                     throw new IllegalArgumentException("resumeAfter must be a full, valid message URI");
                 }
                 AtomInformationService.PagedResource<Dataset, URI> resource = linkedDataService
-                                .listConnectionEventURIsAfter(connectionUri, referenceEvent, preferedSize, msgType,
+                                .listConnectionEventURIsBefore(connectionUri, referenceEvent, preferedSize, msgType,
                                                 deep);
                 rdfDataset = resource.getContent();
                 addPagedResourceInSequenceHeader(headers, connectionEventsURI, resource, passableMap);
@@ -1181,7 +1186,7 @@ public class LinkedDataWebController implements InitializingBean {
                         throw new IllegalArgumentException("resumeBefore must be a full, valid connection URI");
                     }
                     AtomInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
-                                    .listConnectionsBefore(atomUri, resumeConnURI, preferedSize, eventsType,
+                                    .listConnectionsAfter(atomUri, resumeConnURI, preferedSize, eventsType,
                                                     dateParam.getDate(), deep, true);
                     rdfDataset = resource.getContent();
                     addPagedConnectionResourceInSequenceHeader(headers, connectionsURI, resource, passableQuery);
@@ -1195,7 +1200,7 @@ public class LinkedDataWebController implements InitializingBean {
                         throw new IllegalArgumentException("resumeAfter must be a full, valid connection URI");
                     }
                     AtomInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
-                                    .listConnectionsAfter(atomUri, resumeConnURI, preferedSize, eventsType,
+                                    .listConnectionsBefore(atomUri, resumeConnURI, preferedSize, eventsType,
                                                     dateParam.getDate(), deep, true);
                     rdfDataset = resource.getContent();
                     addPagedConnectionResourceInSequenceHeader(headers, connectionsURI, resource, passableQuery);
