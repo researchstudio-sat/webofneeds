@@ -285,6 +285,17 @@ author.addProperty(SCHEMA.NAME, "H.P. Lovecraft");
 author.addProperty(RDF.type, SCHEMA.PERSON);
 ```
 
+## Bot HowTo: Getting Service AtomURI:
+The Service Atom is the BotAtom, that is created by default implementing the ServiceAtomBehaiviour.
+```
+ServiceAtomBehaviour serviceAtomBehaviour = new ServiceAtomBehaviour(ctx);
+serviceAtomBehaviour.activate();
+```
+Class needs to implement ServiceAtomContext interface and cast BotContextWrapper to ServiceAtomContext:
+```
+URI atomURI = ((ServiceAtomContext) ctx.getBotContextWrapper()).getServiceAtomUri()
+```
+
 ## Bot HowTo: Getting Atom Data
 
 First you need to cast your Event to a MatcherExtensionAtomCreatedEvent.
