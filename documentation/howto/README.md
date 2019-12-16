@@ -153,6 +153,30 @@ getEventListenerContext().getEventBus().subscribe(
                         new OpenConnectionAction(ctx, "Connecting because of a Hint I got")));
 ```
 
+## Bot Howto: Getting Hints from Matchers
+Situation: You publish atoms that you want to connect to other atoms you do not control.
+
+To get matches, embed a SPARQL query in your atom. A matcher will execute that query in an RDF database containing all atoms that the matcher has seen so far.
+You do this while [creating](#bot-howto-creating-an-atom) or [modifying](#bot-howto-modifying-an-atom) your atom.
+
+```
+String query = // your sparql query
+DefaultAtomModelWrapper atomWrapper = new DefaultAtomModelWrapper();
+wrapper.addQuery(query);
+// add your other atom data
+```
+
+For example, this query finds all personas:
+
+```
+prefix won:<https://w3id.org/won/core#>
+select * where {
+  ?a a won:Persona .               
+}
+```
+
+Great! now you only need to [react to the hints](#bot-howto-reacting-to-a-hint) you receive.
+
 ## Bot HowTo: Sending a Message and Processing the Result
 Situation: you want to send a message (e.g. to create a new Atom, connect, close, whatever). The easiest way to do this is to activate the `ExecuteMessageCommandBehaviour`:
 
