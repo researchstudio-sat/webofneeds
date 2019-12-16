@@ -66,23 +66,22 @@ What you have to do:
 3. Use the `DefaultAtomModelWrapper` to create an RDF dataset with the atom's data
 4. Publish a `CreateAtomCommandEvent`.
 
-```
-
+```java
 // Create a new atom URI
 EventListenerContext ctx = getEventListenerContext();
 URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
-URI atomURI ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+URI atomURI = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
 
 // Set atom data - here only shown for commonly used (hence 'default') properties
-DefaultAtomModelWrapper atomWrapper = new DefaultAtomModelWrapper();
+DefaultAtomModelWrapper atomWrapper = new DefaultAtomModelWrapper(atomURI);
 atomWrapper.setTitle("Interested in H.P. Lovecraft");
-atomWrapper.setDescripiton("Contact me for all things Cthulhu, Yogge-Sothothe and R'lyeh");
+atomWrapper.setDescription("Contact me for all things Cthulhu, Yogge-Sothothe and R'lyeh");
 atomWrapper.addTag("Fantasy");
 atomWrapper.addTag("Fiction");
 atomWrapper.addTag("Lovecraft");
 
 //publish command
-CreateAtomCommandEvent createCommand = new CreateAtomCommandEvent(atomWrapper.getDataset());
+CreateAtomCommandEvent createCommand = new CreateAtomCommandEvent(atomWrapper.getDataset(), "atom_uris");
 ctx.getEventBus().publish(createCommand);
 ```
 Note: reacting to successful creation is explained in the [HowTo on sending messages](#bot-howto-sending-a-message-and-processing-the-result).
