@@ -1,6 +1,6 @@
 # Bots
 
-A bot is a so-called 'owner application'. It can communicate with WoN nodes and matchers, create and manage atoms and send messages to connected atoms. Further information on nodes, matchers and atoms can be found in the general [documentation on Github](https://github.com/researchstudio-sat/webofneeds).
+A bot is a so-called 'owner application'. It can communicate with WoN nodes, create and manage atoms and send messages to connected atoms. Further information on nodes, matchers and atoms can be found in the general [documentation on Github](https://github.com/researchstudio-sat/webofneeds).
 
 Bots in the Web of Needs are generally reactive. Each bot uses [event listeners](src/main/java/won/bot/framework/eventbot/listener) to listen to events published on the bot's [event bus](src/main/java/won/bot/framework/eventbot/bus/EventBus.java). If an event occurs, a predefined [action](src/main/java/won/bot/framework/eventbot/action) can be executed. Event listeners and actions can also be combined into [behaviours](src/main/java/won/bot/framework/eventbot/behaviour) that determine how the bot acts.
 
@@ -59,13 +59,17 @@ While event listeners and events generally provide the framework for when a bot 
 
 Behaviours act as a wrapper to `EventListener`s and `Action`s and can be activated and deactivated at any point. This is useful for `Event`/`Action` combinations that are used often or for `EventListener`s that should only trigger under certain conditions.
 
+### WonMessageSender
+
+The `WonMessageSender` is used to establish connections between atoms, to send text messages on existing connections and to communicate with the node. Note that the `TextMessageCommandExtension` detailed below is strongly recommended for sending and receiving messages on connections to other atoms. Contacting the node is part of the main framework.
+
 ## Bot Extensions
 
 There are some modules containing optional bot functionality called `Extensions`. This framework currently offers three extensions, the `MatcherExtension`, the `ServiceAtomExtension` and the `TextMessageCommandExtension`. To add any extension to a bot, the extension interface needs to be implemented by the bot. Extension functionality is generally wrapped in an extension behaviour that allows activating and deactivating extension methods and events.
 
 ### ServiceAtomExtension
 
-This extension allows the creation of a single service atom that can be used to communicate with and control the bot. Use this extension if your bot only needs to have one atom to provide its functionality. 
+This extension allows the creation of a single service atom that can be used to communicate with and control the bot. Use this extension if your bot only needs to have one atom to provide its functionality.
 
 ### MatcherExtension
 
@@ -73,7 +77,7 @@ This extension allows the bot to register as a matcher on a node. As a result, t
 
 ### TextMessageCommandExtension
 
-This extension handles the interpretion of text messages sent to the bot. Use this extension to create interactive bots that are able to reply to users messaging them or to create bots that utilize user input. 
+This extension handles the interpretion of text messages sent to the bot. Use this extension to create interactive bots that are able to reply to users messaging them or to create bots that utilize user input.
 
 ## Implementing a Bot
 
@@ -130,7 +134,7 @@ bus.subscribe(ActEvent.class, atomCreator);
 
 For doing anything on the Web of Needs, a bot must send messages to a node or to specific atoms. This is done in two steps:
 
-1. Creating a [WonMessage](/webofneeds/won-core/src/main/java/won/protocol/message/WonMessage.java) using the [WonMessageBuilder](/webofneeds/won-core/src/main/java/won/protocol/message/WonMessageBuilder.java)
+1. Creating a [WonMessage](/webofneeds/won-core/src/main/java/won/protocol/message/WonMessage.java) using the [WonMessageBuilder](/webofneeds/won-core/src/main/java/won/protocol/message/builder/WonMessageBuilder.java)
 2. Sending it using the `WonMessageSender` obtained from the `EventListenerContext`
 
 Note that the WoN node will always answer with a similar message (`SuccessResponse` or `FailureResponse`) that will tell you if what you did worked or not. It's possible to add callbacks for both responses so as to be able to take the necessary measures.
@@ -156,6 +160,7 @@ WonMessageBuilder builder = WonMessageBuilder
 ```
 
 ## Additional Resources
+
 A good starting point for understanding the framework is the [EchoBot](https://github.com/researchstudio-sat/won-echobot). This bot creates one atom at startup, and it registers with the WoN node configured with the `WON_NODE_URI` environment variable, so it is always notified when a new atom is created. When that happens, the bot attempts to establish a connection with the new atom and if the new atom accepts it, the bot echoes any text message received from the new atom.
 
 For an example of a bot for creating atoms, the [AtomCreatorBot](https://github.com/researchstudio-sat/won-atomcreatorbot) is a good example. This bot reads atom `Model`s from the configured `AtomProducer` and creates new atoms on the configured WoN nodes. It does that until the `AtomProducer` is exhausted.
