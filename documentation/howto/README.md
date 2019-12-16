@@ -37,7 +37,7 @@ Situation: your bot creates atoms while it is running but forgets everything upo
 using the mongo shell (`mongodb`)
 ```
 use won
-db.runCommand({createUser:"won", pwd: "won", roles=["dbOwner"]})
+db.runCommand({createUser:"won", pwd: "won", roles:["dbOwner"]})
 ```
 3. Edit the `src/main/resources/application.conf` file:
 
