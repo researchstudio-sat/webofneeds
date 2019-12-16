@@ -32,13 +32,18 @@ If you implement a bit more complex behaviour, managing all the names of lists, 
 
 ## Bot HowTo: Remembering Your Atoms Across Sessions
 Situation: your bot creates atoms while it is running but forgets everything upon restart. You don't want that.
-1. Install [Mongodb](https://www.mongodb.com/)
+1. Setup MongoDB
+    1. Using native installation: Install [Mongodb](https://www.mongodb.com/)
+    2. Using [Docker](https://hub.docker.com/_/mongo)
+    ```
+   docker run -d --name won_mongo_db -p 27017:27017 mongo
+    ```
 2. Create a `won` database and in it a `won` user with password `won`:
-using the mongo shell (`mongodb`)
-```
-use won
-db.runCommand({createUser:"won", pwd: "won", roles:["dbOwner"]})
-```
+using the mongo shell (`mongodb` or using docker: ```docker exec -it won_mongo_db mongo```)
+    ```
+    use won
+    db.runCommand({createUser:"won", pwd:"won", roles:["dbOwner"]})
+    ```
 3. Edit the `src/main/resources/application.conf` file:
 
     1. Uncomment the lines containing  `botContext.mongodb.*` properties
