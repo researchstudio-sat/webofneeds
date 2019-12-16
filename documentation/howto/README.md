@@ -170,8 +170,8 @@ For example, this query finds all personas:
 
 ```
 prefix won:<https://w3id.org/won/core#>
-select * where {
-  ?a a won:Persona .               
+select ?result where {
+  ?result a won:Persona .               
 }
 ```
 
