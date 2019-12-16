@@ -340,7 +340,7 @@ Optional<URI> connectionURI = WonLinkedDataUtils.getConnectionURIForSocketAndTar
 if (!connectionURI.isPresent()){
     // handle: connection not found
 }
-Optional<Connection> con = getConnectionForConnectionURI(connectionURI.get());
+Optional<Connection> con = WonLinkedDataUtils.getConnectionForConnectionURI(connectionURI.get());
 ```
 
 ## Bot HowTo: Adding Data to a Message
