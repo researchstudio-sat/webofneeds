@@ -184,8 +184,8 @@ The matchers do not communicate via atoms, so they cannot set a sender in the me
 ```
 WonMessage hint = WonMessageBuilder
     .socketHint()
-    .recipientSocket(URI.create(recipientSocket))
-    .hintTargetSocket(URI.create(targetSocket))
+    .recipientSocket(URI.create(recipientSocket)) // the recipient of the hint 
+    .hintTargetSocket(URI.create(targetSocket))   // the suggestion we make 
     .hintScore(score)
     .direction().fromExternal()
     .build();
