@@ -3,6 +3,8 @@ import { goodsServiceSearch } from "./uc-goods-service-search.js";
 import { serviceOffer } from "./uc-service-offer.js";
 import { goodsTransportSearch } from "./uc-goods-transport-search.js";
 import { goodsTransportOffer } from "./uc-goods-transport-offer.js";
+import { booksOffer } from "./uc-books-offer.js";
+import { booksSearch } from "./uc-books-search.js";
 
 /*
 TODO: create use case icons
@@ -19,5 +21,7 @@ export const classifiedsGroup = {
     // TODO: serviceSearch: serviceSearch,
     goodsTransportSearch: goodsTransportSearch,
     goodsTransportOffer: goodsTransportOffer,
+    booksOffer: booksOffer,
+    booksSearch: booksSearch,
   },
 };
