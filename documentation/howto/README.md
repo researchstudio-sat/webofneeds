@@ -177,6 +177,24 @@ select ?result where {
 
 Great! now you only need to [react to the hints](#bot-howto-reacting-to-a-hint) you receive.
 
+## Bot HowTo: Sending Hints
+Situation: you want your bot to act as a matcher, i.e. you want it to send a hint message to another atom.
+
+The matchers do not communicate via atoms, so they cannot set a sender in the message. The process is a little different than sending normally:
+```
+WonMessage hint = WonMessageBuilder
+    .socketHint()
+    .recipientSocket(URI.create(recipientSocket))
+    .hintTargetSocket(URI.create(targetSocket))
+    .hintScore(score)
+    .direction().fromExternal()
+    .build();
+//seal the message without signing it
+hint = WonMessageSignerVerifier.seal(hint);
+//send it
+getEventListenerContext().getWonMessageSender().sendMessage(hint);
+```
+
 ## Bot HowTo: Sending a Message and Processing the Result
 Situation: you want to send a message (e.g. to create a new Atom, connect, close, whatever). The easiest way to do this is to activate the `ExecuteMessageCommandBehaviour`:
 
