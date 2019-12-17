@@ -79,7 +79,8 @@ atomWrapper.setDescription("Contact me for all things Cthulhu, Yogge-Sothothe an
 atomWrapper.addTag("Fantasy");
 atomWrapper.addTag("Fiction");
 atomWrapper.addTag("Lovecraft");
-
+//an atom must have at least one socket
+atomWrapper.addSocket("#chatSocket", WXCHAT.ChatSocketString);
 //publish command
 CreateAtomCommandEvent createCommand = new CreateAtomCommandEvent(atomWrapper.getDataset(), "atom_uris");
 ctx.getEventBus().publish(createCommand);
