@@ -192,7 +192,9 @@ WonMessage hint = WonMessageBuilder
 //seal the message without signing it
 hint = WonMessageSignerVerifier.seal(hint);
 //send it
-getEventListenerContext().getWonMessageSender().sendMessage(hint);
+// the three URIs passed here don't matter, but they have to be valid URIs. Needs refactoring.
+getEventListenerContext().getMatcherProtocolAtomServiceClient().hint(hintRecipientAtomUri,
+                                hintTargetAtomUri, 0.9, matcherURI, null, sealed);
 ```
 
 ## Bot HowTo: Sending a Message and Processing the Result
