@@ -44,7 +44,7 @@ using the mongo shell (`mongodb` or using docker: ```docker exec -it won_mongo_d
     use won
     db.runCommand({createUser:"won", pwd:"won", roles:["dbOwner"]})
     ```
-3. Edit the `src/main/resources/application.conf` file:
+3. Edit the `src/main/resources/application.properties` file:
 
     1. Uncomment the lines containing  `botContext.mongodb.*` properties
 
