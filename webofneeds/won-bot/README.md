@@ -1,4 +1,4 @@
-# Bots
+w# Bots
 
 A bot is a so-called 'owner application'. It can communicate with WoN nodes, create and manage atoms and send messages to connected atoms. Further information on nodes, matchers and atoms can be found in the general [documentation on Github](https://github.com/researchstudio-sat/webofneeds).
 
@@ -12,7 +12,10 @@ The [base bot](src/main/java/won/bot/framework/bot/base) consists of several int
 
 Furthermore, the `FactoryBot` builds upon the `EventBot` and adds some additional functionality for creating `FactoryAtoms`. This results in a different structure in which a matching query can be used to filter which atoms are sent to the bot by the matcher. It also creates an additional atom representing the bot that may be visible to other users. See the [TaxiBot](https://github.com/researchstudio-sat/won-transport) for a possible use for `FactoryBot`.
 
-<!-- TODO: bot lifecycle -->
+<!--
+TODO: bot lifecycle
+TODO: bot data structure? - there seems to be a need for more info on that
+-->
 
 ## Components
 
@@ -91,7 +94,7 @@ To write a bot from scratch, you'll need to create a new spring boot app. The ma
 
 Bot implementations are best created by extending [EventBot](src/main/java/won/bot/framework/bot/base/EventBot.java) and implementing its `initializeEventListeners()` method. This method should then be used to set up all the event listeners required for the bot to perform its work.
 
-```
+```java
 public class MyBot extends EventBot
 {
 
@@ -109,7 +112,7 @@ A listener is registered by using `EventBus.subscribe(Class<T> eventClazz, Event
 
 **Example**: This Bot will publish a `WorkDoneEvent` when the first `ActEvent` is published on the bot's event bus. The bot is basically telling the framework to stop it as soon as the bot has started up. Not very useful, but very simple:
 
-```
+```java
 //first, let's remember the bot's context and the bus - we'll need them often
 final EventListenerContext ctx = getEventListenerContext();
 EventBus bus = getEventBus();
@@ -130,7 +133,7 @@ new ActionOnFirstNEventsListener(
 bus.subscribe(ActEvent.class, atomCreator);
 ```
 
-### Sending WoN messages
+<!-- ### Sending WoN messages
 
 For doing anything on the Web of Needs, a bot must send messages to a node or to specific atoms. This is done in two steps:
 
@@ -139,13 +142,13 @@ For doing anything on the Web of Needs, a bot must send messages to a node or to
 
 Note that the WoN node will always answer with a similar message (`SuccessResponse` or `FailureResponse`) that will tell you if what you did worked or not. It's possible to add callbacks for both responses so as to be able to take the necessary measures.
 
-### Creating Atoms
+### Create atoms
 
 Atoms are created by sending a specific message. If using the dedicated [CreateAtomsWithSocketsAction](src/main/java/won/bot/framework/eventbot/action/impl/atomlifecycle/CreateAtomWithSocketsAction.java), most of the boilerplate code is taken care of. If the bot is meant to publish an existing collection of resources, e.g. files or database objects in the form of atoms, it's a question of configuring the `AtomProducer` to access that data and produce a Jena RDF Model that represents an atom. (For an example, look at the [MailFileAtomProducer](src/main/java/won/bot/framework/component/atomproducer/impl/MailFileAtomProducer.java)
 
 For example, this is how [a bot creates a single Atom](src/main/java/won/bot/framework/eventbot/action/impl/atomlifecycle/AbstractCreateAtomAction.java):
 
-```
+```java
 //assuming
 //   * wonNodeURI contains a valid WonNodeURI,
 //   * atomURI has been newly created and conforms to the WoN node's URI pattern
@@ -157,7 +160,48 @@ WonMessageBuilder builder = WonMessageBuilder
       .addContent(atomModel, null);                                        // add the Atom's content
  WonMessage message = builder.build();                                     // build the Message object
  getEventListenerContext().getWonMessageSender().sendWonMessage(message);  //send it
+``` -->
+
+### Bot to Node Communication
+
+To publish, edit, delete or connect atoms, commands need to be sent to the node. This can be done activating the `ExecuteCommandMessageBehaviour` and sending Events containing all necessary information. For example, to create a new atom:
+
+```java
+// activate the execute command message behaviour
+ExecuteWonMessageCommandBehaviour wonMessageCommandBehaviour = new ExecuteWonMessageCommandBehaviour(ctx);
+wonMessageCommandBehaviour.activate();
 ```
+
+```java
+// get eventBus and generate a new atomURI
+final EventListenerContext ctx = getEventListenerContext();
+EventBus bus = getEventBus();
+URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
+URI atomURI = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+
+// create a new atom model detailing the atom to be created
+DefaultAtomModelWrapper atomWrapper = new DefaultAtomModelWrapper(atomURI);
+atomWrapper.setTitle("New Title");
+atomWrapper.setDescription("NewDescription");
+atomWrapper.addSocket("#chatSocket", WXCHAT.ChatSocketString);
+...
+
+bus.publish(new CreateAtomCommandEvent(atomWrapper.getDataset(), "atom_uris"));
+```
+
+The `ExecuteCommandMessageBehaviour` can be used to create, edit (replace), delete, deactivate or connect atoms, for information on the events to be sent or the needed data refer to the [method implementations](src/main/java/won/bot/framework/eventbot/event/impl/command/).
+
+<!-- ### Send messages on connections
+
+TBD -->
+
+### Store data and track atoms
+
+see [this HowTo](../documentation/howto/README.md#bot-howto-storing-data-and-keeping-track-of-atoms)
+
+## Use MongoDB to store data permanently
+
+see [this HowTo](../documentation/howto/README.md#bot-howto-remembering-your-atoms-across-sessions)
 
 ## Additional Resources
 
