@@ -34,59 +34,32 @@
 
     <broker xmlns="http://activemq.apache.org/schema/core" brokerName="wonBroker" persistent="false" >
 
-
-
-        <!--
-            For better performances use VM cursor and small memory limit.
-            For more information, see:
-
-            http://activemq.apache.org/message-cursors.html
-
-            Also, if your producer is "hanging", it's probably due to producer flow control.
-            For more information, see:
-            http://activemq.apache.org/producer-flow-control.html
-        -->
-        <!--destinations>
-            <queue physicalName="WON.CREATEATOM"></queue>
-        </destinations-->
         <destinationPolicy>
             <policyMap>
               <policyEntries>
-                <policyEntry topic=">" producerFlowControl="true">
-                    <!-- The constantPendingMessageLimitStrategy is used to prevent
-                         slow topic consumers to block producers and affect other consumers
-                         by limiting the number of messages that are retained
-                         For more information, see:
-
-                         http://activemq.apache.org/slow-consumer-handling.html
-
-                    -->
-                  <pendingMessageLimitStrategy>
-                    <constantPendingMessageLimitStrategy limit="50"/>
-                  </pendingMessageLimitStrategy>
-                </policyEntry>
-                <policyEntry queue=">" producerFlowControl="true" memoryLimit="10mb">
-                  <!-- Use VM cursor for better latency
-                       For more information, see:
-
-                       http://activemq.apache.org/message-cursors.html
-                   -->
-                  <pendingQueuePolicy>
-                    <vmQueueCursor/>
-                  </pendingQueuePolicy>
-
-                </policyEntry>
-                <policyEntry queue=">">
-					         <!-- 
-					           Tell the dead letter strategy not to process expired messages
-					           so that they will just be discarded instead of being sent to
-					           the DLQ 
-					         -->
-					         <deadLetterStrategy>
-					           <sharedDeadLetterStrategy processExpired="false" />
-					         </deadLetterStrategy>
-					       </policyEntry>
-              </policyEntries>
+              	<!-- producer flow control causes congestion in our setting. disable and discard pending messages -->
+              	<!-- decided after reviewing https://access.redhat.com/documentation/en-US/Fuse_ESB_Enterprise/7.1/html-single/ActiveMQ_Tuning_Guide/index.html -->
+              	<policyEntry topic=">" producerFlowControl="false" memoryLimit="5mb" optimizedDispatch="true" queuePrefetch="1">
+              		<pendingMessageLimitStrategy>
+                    	<constantPendingMessageLimitStrategy limit="10"/>
+                  	</pendingMessageLimitStrategy>
+              	</policyEntry>
+              	<policyEntry queue=">" producerFlowControl="false" memoryLimit="5mb" optimizedDispatch="true" queuePrefetch="1">
+              		<pendingMessageLimitStrategy>
+                    	<constantPendingMessageLimitStrategy limit="10"/> 
+                  	</pendingMessageLimitStrategy>
+              	</policyEntry>
+                	<policyEntry queue=">">
+						<!-- 
+				           Tell the dead letter strategy not to process expired messages
+				           so that they will just be discarded instead of being sent to
+				           the DLQ 
+				         -->
+				         <deadLetterStrategy>
+							<sharedDeadLetterStrategy processExpired="false" />
+				         </deadLetterStrategy>
+		       		</policyEntry>
+            	</policyEntries>
             </policyMap>
         </destinationPolicy>
 
@@ -167,9 +140,9 @@
             <!--transportConnector name="ssl"
                                 uri="${uri.protocol.activemq}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600&amp;needClientAuth=true&amp;trace=true" /-->
 
-            <transportConnector name="${activemq.broker.scheme}"
+	            <transportConnector name="${activemq.broker.scheme}"
                                 uri="${activemq.broker.scheme}://0.0.0.0:${activemq.broker.port}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600&amp;needClientAuth=true&amp;jms.useAsyncSend=true&amp;transport.useInactivityMonitor=false&amp;wireFormat.maxInactivityDuration=0&amp;maximumRedeliveries=0" />
-
+ 
             <!--transportConnector name="ssl"
                                 uri="${uri.protocol.activemq}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600&amp;needClientAuth=true&amp;transport.enabledProtocols=TLSv1.2" /-->
             <!-- &amp;transport.enabledProtocols=TLSv1.2-->
