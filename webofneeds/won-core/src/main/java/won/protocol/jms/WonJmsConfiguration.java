@@ -26,7 +26,7 @@ public class WonJmsConfiguration extends JmsConfiguration {
                                 // registration situation, when we actually want to get a result from the
                                 // wonnode.
         setDeliveryPersistent(false);
-        setAcknowledgementModeName("CLIENT_ACKNOWLEDGE"); // make each consumer explicitly acknowledge each message
+        setAcknowledgementModeName("DUPS_OK_ACKNOWLEDGE"); // make each consumer explicitly acknowledge each message
         setDisableReplyTo(true);
         setExplicitQosEnabled(true); // required for the TTL to have an effect
         setTimeToLive(10);
@@ -35,9 +35,10 @@ public class WonJmsConfiguration extends JmsConfiguration {
     }
 
     public void configureJmsConfigurationForQueues() {
-        setConcurrentConsumers(5);
+        setConcurrentConsumers(1);
     }
 
     public void configureJmsConfigurationForTopics() {
+        setConcurrentConsumers(1);
     }
 }
