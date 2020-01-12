@@ -114,6 +114,14 @@ xsd:duration rdf:type rdfs:Datatype .
                  rdfs:isDefinedBy <https://w3id.org/won/core> ;
                  rdfs:label "connectionState" .
 
+###  https://w3id.org/won/core#previousConnectionState
+:previousConnectionState rdf:type owl:ObjectProperty ,
+                          owl:FunctionalProperty ;
+                 rdfs:domain :Connection ;
+                 rdfs:range :previousConnectionState ;
+                 rdfs:comment "Indicates the state in which the Connection was before the current one."@en ;
+                 rdfs:isDefinedBy <https://w3id.org/won/core> ;
+                 rdfs:label "previousConnectionState" .
 
 ###  https://w3id.org/won/core#connections
 :connections rdf:type owl:ObjectProperty ;
