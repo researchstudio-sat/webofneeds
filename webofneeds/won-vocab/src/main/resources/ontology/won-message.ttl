@@ -113,7 +113,7 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
                          rdfs:domain :Message ;
                          rdfs:range :MessageType ;
                          rdfs:comment "Used in a response message to indicate the messageType of the original message."@en ;
-                         rdfs:label "isResponsToMessageType" .
+                         rdfs:label "respondingToMessageType" .
 
 
 ###  https://w3id.org/won/message#messageType
