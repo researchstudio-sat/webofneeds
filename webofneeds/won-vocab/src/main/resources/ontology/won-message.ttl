@@ -63,13 +63,6 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
 #    Object Properties
 #################################################################
 
-###  https://w3id.org/won/message#containsEnvelope
-:containsEnvelope rdf:type owl:ObjectProperty ;
-                  rdfs:domain :EnvelopeGraph ;
-                  rdfs:range :EnvelopeGraph ;
-                  rdfs:comment "Links an envelope to an envelope it 'contains'."@en ;
-                  rdfs:label "containsEnvelope" .
-
 
 ###  https://w3id.org/won/message#containsSignature
 :containsSignature rdf:type owl:ObjectProperty ;
@@ -133,48 +126,39 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
                  rdfs:label "previousMessage" .
 
 
-###  https://w3id.org/won/message#recipient
+###  https://w3id.org/won/message#recipientSocket
 :recipient rdf:type owl:ObjectProperty ;
            rdfs:domain :Message ;
-           rdfs:range [ rdf:type owl:Class ;
-                        owl:unionOf ( won:Atom
-                                      won:Connection
-                                    )
-                      ] ;
-           rdfs:comment "Indicates the receiver of the message, either Socket or Connection."@en ;
+           rdfs:range :Socket ;
+           rdfs:comment "Indicates the recipient socket of the message."@en ;
            rdfs:isDefinedBy <https://w3id.org/won/message> ;
-           rdfs:label "recipient" .
+           rdfs:label "recipientSocket" .
 
 
-###  https://w3id.org/won/message#recipientAtom
-:recipientAtom rdf:type owl:ObjectProperty ;
+###  https://w3id.org/won/message#atom
+:atom rdf:type owl:ObjectProperty ;
                rdfs:domain :Message ;
                rdfs:range won:Atom ;
-               rdfs:comment "Indicates the Atom that 'contains' the receiver of the message."@en ;
+               rdfs:comment "Links the message to its atom. Only used for messages directed at an atom, such as msg:Activate, msg:Deactivate, or msg:AtomHintMessage."@en ;
                rdfs:isDefinedBy <https://w3id.org/won/message> ;
-               rdfs:label "recipientAtom" .
+               rdfs:label "atom" .
 
-
-###  https://w3id.org/won/message#recipientNode
-:recipientNode rdf:type owl:ObjectProperty ;
+###  https://w3id.org/won/message#connection
+:connection rdf:type owl:ObjectProperty ;
                rdfs:domain :Message ;
-               rdfs:range won:Node ;
-               rdfs:comment "Indicates the WoN Node the message recipient is hosted on."@en ;
+               rdfs:range won:Connection ;
+               rdfs:comment "Links the message to its connection. Only used for response messages in a connection; the messages sent by either side of the connection use msg:senderSocket and msg:recipientSocket to identify the connection uniquely"@en ;
                rdfs:isDefinedBy <https://w3id.org/won/message> ;
-               rdfs:label "recipientNode" .
+               rdfs:label "connection" .
 
 
-###  https://w3id.org/won/message#sender
+###  https://w3id.org/won/message#senderSocket
 :sender rdf:type owl:ObjectProperty ;
         rdfs:domain :Message ;
-        rdfs:range [ rdf:type owl:Class ;
-                     owl:unionOf ( won:Atom
-                                   won:Connection
-                                 )
-                   ] ;
-        rdfs:comment "Indicates the sender of the message."@en ;
+        rdfs:range :Socket ;
+        rdfs:comment "Indicates the sender socket of the message."@en ;
         rdfs:isDefinedBy <https://w3id.org/won/message> ;
-        rdfs:label "sender" .
+        rdfs:label "senderSocket" .
 
 
 ###  https://w3id.org/won/message#senderAtom
@@ -201,6 +185,29 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
              rdfs:range :MessageGraph ;
              rdfs:comment "Links a signature to the graph it signs."@en ;
              rdfs:label "signedGraph" .
+
+###  https://w3id.org/won/message#signer
+:signer rdf:type owl:ObjectProperty ;
+             rdfs:domain :Signature ;
+             rdfs:range :Atom ;
+             rdfs:comment "Links a signature to its signer."@en ;
+             rdfs:label "signer" .
+
+###  https://w3id.org/won/message#signature
+:signature rdf:type owl:ObjectProperty ;
+             rdfs:domain :Message ;
+             rdfs:range :Signature ;
+             rdfs:comment "Links a message to its signature."@en ;
+             rdfs:label "signature" .
+
+###  https://w3id.org/won/message#envelope
+:envelope rdf:type owl:ObjectProperty ;
+             rdfs:domain :Message ;
+             rdfs:range :EnvelopeGraph ;
+             rdfs:comment "Links a message to its envelope."@en ;
+             rdfs:label "envelope" .
+
+
 
 
 #################################################################
@@ -438,6 +445,12 @@ won:Node rdf:type owl:Class .
                  rdfs:comment "Indicates that the message was processed successfully."@en ;
                  rdfs:isDefinedBy <https://w3id.org/won/message> ;
                  rdfs:label "SuccessResponse" .
+
+###  https://w3id.org/won/message#Signature
+:Signature rdf:type owl:NamedIndividual ;
+             rdfs:comment "Class of all signatures in WoN."@en ;
+             rdfs:isDefinedBy <https://w3id.org/won/message> ;             
+             rdfs:label "Signature" .
 
 
 #################################################################
