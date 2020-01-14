@@ -145,22 +145,6 @@
 <https://w3id.org/won/message#sender> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/message> .
 <https://w3id.org/won/message#sender> <http://www.w3.org/2000/01/rdf-schema#label> "senderSocket" .
 # 
-# https://w3id.org/won/message#senderAtom
-<https://w3id.org/won/message#senderAtom> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
-<https://w3id.org/won/message#senderAtom> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/message#Message> .
-<https://w3id.org/won/message#senderAtom> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#Atom> .
-<https://w3id.org/won/message#senderAtom> <http://www.w3.org/2000/01/rdf-schema#comment> "Indicates the Atom that 'contains' the sender of the message."@en .
-<https://w3id.org/won/message#senderAtom> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/message> .
-<https://w3id.org/won/message#senderAtom> <http://www.w3.org/2000/01/rdf-schema#label> "senderAtom" .
-# 
-# https://w3id.org/won/message#senderNode
-<https://w3id.org/won/message#senderNode> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
-<https://w3id.org/won/message#senderNode> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/message#Message> .
-<https://w3id.org/won/message#senderNode> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#Node> .
-<https://w3id.org/won/message#senderNode> <http://www.w3.org/2000/01/rdf-schema#comment> "Indicates the WoN Node the message sender is hosted on."@en .
-<https://w3id.org/won/message#senderNode> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/message> .
-<https://w3id.org/won/message#senderNode> <http://www.w3.org/2000/01/rdf-schema#label> "senderNode" .
-# 
 # https://w3id.org/won/message#signature
 <https://w3id.org/won/message#signature> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
 <https://w3id.org/won/message#signature> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/message#Message> .

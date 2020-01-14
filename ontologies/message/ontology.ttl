@@ -168,24 +168,6 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom's
         rdfs:label "senderSocket" .
 
 
-###  https://w3id.org/won/message#senderAtom
-:senderAtom rdf:type owl:ObjectProperty ;
-            rdfs:domain :Message ;
-            rdfs:range <https://w3id.org/won/core#Atom> ;
-            rdfs:comment "Indicates the Atom that 'contains' the sender of the message."@en ;
-            rdfs:isDefinedBy <https://w3id.org/won/message> ;
-            rdfs:label "senderAtom" .
-
-
-###  https://w3id.org/won/message#senderNode
-:senderNode rdf:type owl:ObjectProperty ;
-            rdfs:domain :Message ;
-            rdfs:range <https://w3id.org/won/core#Node> ;
-            rdfs:comment "Indicates the WoN Node the message sender is hosted on."@en ;
-            rdfs:isDefinedBy <https://w3id.org/won/message> ;
-            rdfs:label "senderNode" .
-
-
 ###  https://w3id.org/won/message#signature
 :signature rdf:type owl:ObjectProperty ;
            rdfs:domain :Message ;

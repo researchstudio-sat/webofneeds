@@ -69,12 +69,6 @@ This ontology has the following classes and properties.</span>
          title="https://w3id.org/won/message#respondingToMessageType">respondingToMessageType</a>
    </li>
    <li>
-      <a href="#senderAtom" title="https://w3id.org/won/message#senderAtom">senderAtom</a>
-   </li>
-   <li>
-      <a href="#senderNode" title="https://w3id.org/won/message#senderNode">senderNode</a>
-   </li>
-   <li>
       <a href="#sender" title="https://w3id.org/won/message#sender">senderSocket</a>
    </li>
    <li>

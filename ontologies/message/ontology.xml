@@ -266,32 +266,6 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom&a
     
 
 
-    <!-- https://w3id.org/won/message#senderAtom -->
-
-
-    <owl:ObjectProperty rdf:about="https://w3id.org/won/message#senderAtom">
-        <rdfs:domain rdf:resource="https://w3id.org/won/message#Message"/>
-        <rdfs:range rdf:resource="https://w3id.org/won/core#Atom"/>
-        <rdfs:comment xml:lang="en">Indicates the Atom that &apos;contains&apos; the sender of the message.</rdfs:comment>
-        <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/message"/>
-        <rdfs:label>senderAtom</rdfs:label>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- https://w3id.org/won/message#senderNode -->
-
-
-    <owl:ObjectProperty rdf:about="https://w3id.org/won/message#senderNode">
-        <rdfs:domain rdf:resource="https://w3id.org/won/message#Message"/>
-        <rdfs:range rdf:resource="https://w3id.org/won/core#Node"/>
-        <rdfs:comment xml:lang="en">Indicates the WoN Node the message sender is hosted on.</rdfs:comment>
-        <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/message"/>
-        <rdfs:label>senderNode</rdfs:label>
-    </owl:ObjectProperty>
-    
-
-
     <!-- https://w3id.org/won/message#signature -->
 
 
