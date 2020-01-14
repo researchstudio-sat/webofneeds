@@ -1,15 +1,51 @@
 [ {
   "@id" : "_:genid1",
-  "@type" : [ "http://www.w3.org/2002/07/owl#Class" ],
-  "http://www.w3.org/2002/07/owl#unionOf" : [ {
+  "@type" : [ "http://www.w3.org/2002/07/owl#AllDisjointClasses" ],
+  "http://www.w3.org/2002/07/owl#members" : [ {
     "@list" : [ {
-      "@id" : "https://w3id.org/won/core#Atom"
+      "@id" : "https://w3id.org/won/message#EnvelopeGraph"
     }, {
-      "@id" : "https://w3id.org/won/core#Connection"
+      "@id" : "https://w3id.org/won/message#Message"
+    }, {
+      "@id" : "https://w3id.org/won/message#MessageType"
+    }, {
+      "@id" : "https://w3id.org/won/message#ResponseType"
     } ]
   } ]
 }, {
-  "@id" : "_:genid12",
+  "@id" : "_:genid21",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AllDifferent" ],
+  "http://www.w3.org/2002/07/owl#distinctMembers" : [ {
+    "@list" : [ {
+      "@id" : "https://w3id.org/won/message#ActivateMessage"
+    }, {
+      "@id" : "https://w3id.org/won/message#AtomHintMessage"
+    }, {
+      "@id" : "https://w3id.org/won/message#AtomMessage"
+    }, {
+      "@id" : "https://w3id.org/won/message#ChangeNotificationMessage"
+    }, {
+      "@id" : "https://w3id.org/won/message#CloseMessage"
+    }, {
+      "@id" : "https://w3id.org/won/message#ConnectMessage"
+    }, {
+      "@id" : "https://w3id.org/won/message#ConnectionMessage"
+    }, {
+      "@id" : "https://w3id.org/won/message#CreateMessage"
+    }, {
+      "@id" : "https://w3id.org/won/message#DeactivateMessage"
+    }, {
+      "@id" : "https://w3id.org/won/message#FailureResponse"
+    }, {
+      "@id" : "https://w3id.org/won/message#OpenMessage"
+    }, {
+      "@id" : "https://w3id.org/won/message#ReplaceMessage"
+    }, {
+      "@id" : "https://w3id.org/won/message#SuccessResponse"
+    } ]
+  } ]
+}, {
+  "@id" : "_:genid6",
   "@type" : [ "http://www.w3.org/2002/07/owl#AllDifferent" ],
   "http://www.w3.org/2002/07/owl#distinctMembers" : [ {
     "@list" : [ {
@@ -42,65 +78,6 @@
       "@id" : "https://w3id.org/won/message#SuccessResponse"
     } ]
   } ]
-}, {
-  "@id" : "_:genid27",
-  "@type" : [ "http://www.w3.org/2002/07/owl#AllDifferent" ],
-  "http://www.w3.org/2002/07/owl#distinctMembers" : [ {
-    "@list" : [ {
-      "@id" : "https://w3id.org/won/message#ActivateMessage"
-    }, {
-      "@id" : "https://w3id.org/won/message#AtomHintMessage"
-    }, {
-      "@id" : "https://w3id.org/won/message#AtomMessage"
-    }, {
-      "@id" : "https://w3id.org/won/message#ChangeNotificationMessage"
-    }, {
-      "@id" : "https://w3id.org/won/message#CloseMessage"
-    }, {
-      "@id" : "https://w3id.org/won/message#ConnectMessage"
-    }, {
-      "@id" : "https://w3id.org/won/message#ConnectionMessage"
-    }, {
-      "@id" : "https://w3id.org/won/message#CreateMessage"
-    }, {
-      "@id" : "https://w3id.org/won/message#DeactivateMessage"
-    }, {
-      "@id" : "https://w3id.org/won/message#FailureResponse"
-    }, {
-      "@id" : "https://w3id.org/won/message#OpenMessage"
-    }, {
-      "@id" : "https://w3id.org/won/message#ReplaceMessage"
-    }, {
-      "@id" : "https://w3id.org/won/message#SuccessResponse"
-    } ]
-  } ]
-}, {
-  "@id" : "_:genid4",
-  "@type" : [ "http://www.w3.org/2002/07/owl#Class" ],
-  "http://www.w3.org/2002/07/owl#unionOf" : [ {
-    "@list" : [ {
-      "@id" : "https://w3id.org/won/core#Atom"
-    }, {
-      "@id" : "https://w3id.org/won/core#Connection"
-    } ]
-  } ]
-}, {
-  "@id" : "_:genid7",
-  "@type" : [ "http://www.w3.org/2002/07/owl#AllDisjointClasses" ],
-  "http://www.w3.org/2002/07/owl#members" : [ {
-    "@list" : [ {
-      "@id" : "https://w3id.org/won/message#EnvelopeGraph"
-    }, {
-      "@id" : "https://w3id.org/won/message#Message"
-    }, {
-      "@id" : "https://w3id.org/won/message#MessageType"
-    }, {
-      "@id" : "https://w3id.org/won/message#ResponseType"
-    } ]
-  } ]
-}, {
-  "@id" : "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature",
-  "@type" : [ "http://www.w3.org/2002/07/owl#Class" ]
 }, {
   "@id" : "http://purl.org/dc/elements/1.1/abstract",
   "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
@@ -181,6 +158,9 @@
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
     "@value" : "ActivateMessage"
   } ]
+}, {
+  "@id" : "https://w3id.org/won/message#Atom",
+  "@type" : [ "http://www.w3.org/2002/07/owl#Class" ]
 }, {
   "@id" : "https://w3id.org/won/message#AtomHintMessage",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/message#MessageType" ],
@@ -397,17 +377,7 @@
   } ]
 }, {
   "@id" : "https://w3id.org/won/message#OpenMessage",
-  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/message#MessageType" ],
-  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
-    "@language" : "en",
-    "@value" : "Type of Message used to (re)open an existing Connection."
-  } ],
-  "http://www.w3.org/2000/01/rdf-schema#isDefinedBy" : [ {
-    "@id" : "https://w3id.org/won/message"
-  } ],
-  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "OpenMessage"
-  } ]
+  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual" ]
 }, {
   "@id" : "https://w3id.org/won/message#ReplaceMessage",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/message#MessageType" ],
@@ -438,6 +408,25 @@
     "@id" : "https://w3id.org/won/message#MessageType"
   } ]
 }, {
+  "@id" : "https://w3id.org/won/message#Signature",
+  "@type" : [ "http://www.w3.org/2002/07/owl#Class", "http://www.w3.org/2002/07/owl#NamedIndividual" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Class of all signatures in WoN."
+  }, {
+    "@language" : "en",
+    "@value" : "The class of RDF signatures as used in WoN."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#isDefinedBy" : [ {
+    "@id" : "https://w3id.org/won/message"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "Signature"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/message#Socket",
+  "@type" : [ "http://www.w3.org/2002/07/owl#Class" ]
+}, {
   "@id" : "https://w3id.org/won/message#SocketHintMessage",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/message#MessageType" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
@@ -461,20 +450,42 @@
     "@value" : "SuccessResponse"
   } ]
 }, {
-  "@id" : "https://w3id.org/won/message#containsEnvelope",
+  "@id" : "https://w3id.org/won/message#atom",
   "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
     "@language" : "en",
-    "@value" : "Links an envelope to an envelope it 'contains'."
+    "@value" : "Links the message to its atom. Only used for messages directed at an atom, such as msg:Activate, msg:Deactivate, or msg:AtomHintMessage."
   } ],
   "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
-    "@id" : "https://w3id.org/won/message#EnvelopeGraph"
+    "@id" : "https://w3id.org/won/message#Message"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#isDefinedBy" : [ {
+    "@id" : "https://w3id.org/won/message"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "containsEnvelope"
+    "@value" : "atom"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#range" : [ {
-    "@id" : "https://w3id.org/won/message#EnvelopeGraph"
+    "@id" : "https://w3id.org/won/core#Atom"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/message#connection",
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Links the message to its connection. Only used for response messages in a connection; the messages sent by either side of the connection use msg:senderSocket and msg:recipientSocket to identify the connection uniquely"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
+    "@id" : "https://w3id.org/won/message#Message"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#isDefinedBy" : [ {
+    "@id" : "https://w3id.org/won/message"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "connection"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#range" : [ {
+    "@id" : "https://w3id.org/won/core#Connection"
   } ]
 }, {
   "@id" : "https://w3id.org/won/message#containsSignature",
@@ -490,7 +501,7 @@
     "@value" : "containsSignature"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#range" : [ {
-    "@id" : "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature"
+    "@id" : "https://w3id.org/won/message#Signature"
   } ]
 }, {
   "@id" : "https://w3id.org/won/message#content",
@@ -512,20 +523,20 @@
     "@id" : "https://w3id.org/won/message#ContentGraph"
   } ]
 }, {
-  "@id" : "https://w3id.org/won/message#correspondingRemoteMessage",
+  "@id" : "https://w3id.org/won/message#envelope",
   "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
     "@language" : "en",
-    "@value" : "Points to another message. Messages always exist in two copies: one on the sender's WoN node and one on the receiver's WoN node. The receiver's WoN node copies the message, mints a new URI for it and points to the original message using `msg:correspondingRemoteMessage`."
+    "@value" : "Links a message to its envelope."
   } ],
   "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
     "@id" : "https://w3id.org/won/message#Message"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "correspondingRemoteMessage"
+    "@value" : "envelope"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#range" : [ {
-    "@id" : "https://w3id.org/won/message#Message"
+    "@id" : "https://w3id.org/won/message#EnvelopeGraph"
   } ]
 }, {
   "@id" : "https://w3id.org/won/message#hash",
@@ -535,7 +546,7 @@
     "@value" : "The message hash."
   } ],
   "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
-    "@id" : "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature"
+    "@id" : "https://w3id.org/won/message#Signature"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
     "@value" : "hash"
@@ -578,48 +589,6 @@
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
     "@value" : "hintTargetSocket"
-  } ]
-}, {
-  "@id" : "https://w3id.org/won/message#isRemoteResponseTo",
-  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
-  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
-    "@language" : "en",
-    "@value" : "Links a response message on the recipientAtom's WoN node to the original message on the senderAtom's WoN node,"
-  } ],
-  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "isRemoteResponseTo"
-  } ]
-}, {
-  "@id" : "https://w3id.org/won/message#isResponseTo",
-  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
-  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
-    "@language" : "en",
-    "@value" : "Links a SuccessResponse or a FailureResponse to the message it is responding to."
-  } ],
-  "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
-    "@id" : "https://w3id.org/won/message#Message"
-  } ],
-  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "isResponseTo"
-  } ],
-  "http://www.w3.org/2000/01/rdf-schema#range" : [ {
-    "@id" : "https://w3id.org/won/message#Message"
-  } ]
-}, {
-  "@id" : "https://w3id.org/won/message#isResponseToMessageType",
-  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
-  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
-    "@language" : "en",
-    "@value" : "Used in a response message to indicate the messageType of the original message."
-  } ],
-  "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
-    "@id" : "https://w3id.org/won/message#Message"
-  } ],
-  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "isResponsToMessageType"
-  } ],
-  "http://www.w3.org/2000/01/rdf-schema#range" : [ {
-    "@id" : "https://w3id.org/won/message#MessageType"
   } ]
 }, {
   "@id" : "https://w3id.org/won/message#messageType",
@@ -679,7 +648,7 @@
     "@value" : "The fingerprint of the sender's public key (SHA-256 hash)."
   } ],
   "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
-    "@id" : "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature"
+    "@id" : "https://w3id.org/won/message#Signature"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
     "@value" : "publicKeyFingerprint"
@@ -688,27 +657,11 @@
     "@id" : "http://www.w3.org/2001/XMLSchema#string"
   } ]
 }, {
-  "@id" : "https://w3id.org/won/message#receivedTimestamp",
-  "@type" : [ "http://www.w3.org/2002/07/owl#DatatypeProperty" ],
-  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
-    "@language" : "en",
-    "@value" : "Holds the timestamp assigned when the WoN node received and saved the message."
-  } ],
-  "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
-    "@id" : "https://w3id.org/won/message#Message"
-  } ],
-  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "receivedTimestamp"
-  } ],
-  "http://www.w3.org/2000/01/rdf-schema#range" : [ {
-    "@id" : "http://www.w3.org/2001/XMLSchema#long"
-  } ]
-}, {
   "@id" : "https://w3id.org/won/message#recipient",
   "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
     "@language" : "en",
-    "@value" : "Indicates the receiver of the message, either Socket or Connection."
+    "@value" : "Indicates the recipient socket of the message."
   } ],
   "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
     "@id" : "https://w3id.org/won/message#Message"
@@ -717,55 +670,49 @@
     "@id" : "https://w3id.org/won/message"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "recipient"
+    "@value" : "recipientSocket"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#range" : [ {
-    "@id" : "_:genid1"
+    "@id" : "https://w3id.org/won/message#Socket"
   } ]
 }, {
-  "@id" : "https://w3id.org/won/message#recipientAtom",
+  "@id" : "https://w3id.org/won/message#respondingTo",
   "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
     "@language" : "en",
-    "@value" : "Indicates the Atom that 'contains' the receiver of the message."
+    "@value" : "Links a SuccessResponse or a FailureResponse to the message it is responding to."
   } ],
   "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
     "@id" : "https://w3id.org/won/message#Message"
   } ],
-  "http://www.w3.org/2000/01/rdf-schema#isDefinedBy" : [ {
-    "@id" : "https://w3id.org/won/message"
-  } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "recipientAtom"
+    "@value" : "respondingTo"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#range" : [ {
-    "@id" : "https://w3id.org/won/core#Atom"
+    "@id" : "https://w3id.org/won/message#Message"
   } ]
 }, {
-  "@id" : "https://w3id.org/won/message#recipientNode",
+  "@id" : "https://w3id.org/won/message#respondingToMessageType",
   "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
     "@language" : "en",
-    "@value" : "Indicates the WoN Node the message recipient is hosted on."
+    "@value" : "Used in a response message to indicate the messageType of the original message."
   } ],
   "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
     "@id" : "https://w3id.org/won/message#Message"
   } ],
-  "http://www.w3.org/2000/01/rdf-schema#isDefinedBy" : [ {
-    "@id" : "https://w3id.org/won/message"
-  } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "recipientNode"
+    "@value" : "respondingToMessageType"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#range" : [ {
-    "@id" : "https://w3id.org/won/core#Node"
+    "@id" : "https://w3id.org/won/message#MessageType"
   } ]
 }, {
   "@id" : "https://w3id.org/won/message#sender",
   "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
     "@language" : "en",
-    "@value" : "Indicates the sender of the message."
+    "@value" : "Indicates the sender socket of the message."
   } ],
   "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
     "@id" : "https://w3id.org/won/message#Message"
@@ -774,10 +721,10 @@
     "@id" : "https://w3id.org/won/message"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "sender"
+    "@value" : "senderSocket"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#range" : [ {
-    "@id" : "_:genid4"
+    "@id" : "https://w3id.org/won/message#Socket"
   } ]
 }, {
   "@id" : "https://w3id.org/won/message#senderAtom",
@@ -818,20 +765,20 @@
     "@id" : "https://w3id.org/won/core#Node"
   } ]
 }, {
-  "@id" : "https://w3id.org/won/message#sentTimestamp",
-  "@type" : [ "http://www.w3.org/2002/07/owl#DatatypeProperty" ],
+  "@id" : "https://w3id.org/won/message#signature",
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
     "@language" : "en",
-    "@value" : "Holds the timestamp assigned when the WoN node created and sent the message."
+    "@value" : "Links a message to its signature."
   } ],
   "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
     "@id" : "https://w3id.org/won/message#Message"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "sentTimestamp"
+    "@value" : "signature"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#range" : [ {
-    "@id" : "http://www.w3.org/2001/XMLSchema#long"
+    "@id" : "https://w3id.org/won/message#Signature"
   } ]
 }, {
   "@id" : "https://w3id.org/won/message#signedGraph",
@@ -841,12 +788,44 @@
     "@value" : "Links a signature to the graph it signs."
   } ],
   "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
-    "@id" : "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature"
+    "@id" : "https://w3id.org/won/message#Signature"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
     "@value" : "signedGraph"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#range" : [ {
     "@id" : "https://w3id.org/won/message#MessageGraph"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/message#signer",
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Links a signature to its signer."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
+    "@id" : "https://w3id.org/won/message#Signature"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "signer"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#range" : [ {
+    "@id" : "https://w3id.org/won/message#Atom"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/message#timestamp",
+  "@type" : [ "http://www.w3.org/2002/07/owl#DatatypeProperty" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Holds the timestamp assigned when the message was created, as obtained by the local system clock."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
+    "@id" : "https://w3id.org/won/message#Message"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "receivedTimestamp"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#range" : [ {
+    "@id" : "http://www.w3.org/2001/XMLSchema#long"
   } ]
 } ]

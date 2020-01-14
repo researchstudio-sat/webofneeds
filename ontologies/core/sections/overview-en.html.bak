@@ -33,6 +33,12 @@ This ontology has the following classes and properties.</span>
       <a href="#Node" title="https://w3id.org/won/core#Node">Node</a>
    </li>
    <li>
+      <a href="#previousConnectionState"
+         title="https://w3id.org/won/core#previousConnectionState">
+         <span>previousConnectionState</span>
+      </a>
+   </li>
+   <li>
       <a href="#Socket" title="https://w3id.org/won/core#Socket">Socket</a>
    </li>
    <li>

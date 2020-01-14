@@ -151,6 +151,13 @@ _:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/19
 <https://w3id.org/won/core#messageContainer> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
 <https://w3id.org/won/core#messageContainer> <http://www.w3.org/2000/01/rdf-schema#label> "messageContainer" .
 # 
+# https://w3id.org/won/core#previousConnectionState
+<https://w3id.org/won/core#previousConnectionState> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/core#previousConnectionState> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#FunctionalProperty> .
+<https://w3id.org/won/core#previousConnectionState> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Connection> .
+<https://w3id.org/won/core#previousConnectionState> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/core#previousConnectionState> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#previousConnectionState> .
+# 
 # https://w3id.org/won/core#socket
 <https://w3id.org/won/core#socket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
 <https://w3id.org/won/core#socket> <http://www.w3.org/2000/01/rdf-schema#domain> _:genid4 .
@@ -475,6 +482,8 @@ _:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/19
 <https://w3id.org/won/core#WonProtocol> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
 <https://w3id.org/won/core#WonProtocol> <http://www.w3.org/2000/01/rdf-schema#label> "WonProtocol" .
 # 
+# https://w3id.org/won/core#previousConnectionState
+# 
 # 
 # 
 # #################################################################
@@ -532,6 +541,19 @@ _:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/19
 <https://w3id.org/won/core#Suggested> <http://www.w3.org/2000/01/rdf-schema#comment> "Suggested state. The Connection has been created through a Hint Event but not yet been opened by either of the sides."@en .
 <https://w3id.org/won/core#Suggested> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
 <https://w3id.org/won/core#Suggested> <http://www.w3.org/2000/01/rdf-schema#label> "Suggested" .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Annotations
+# #
+# #################################################################
+# 
+# 
+<https://w3id.org/won/core#previousConnectionState> <http://www.w3.org/2000/01/rdf-schema#comment> "Indicates the state in which the Connection was before the current one."@en .
+<https://w3id.org/won/core#previousConnectionState> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#previousConnectionState> <http://www.w3.org/2000/01/rdf-schema#label> "previousConnectionState" .
 # 
 # 
 # 

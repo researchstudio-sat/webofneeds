@@ -143,18 +143,6 @@
     },
     "id" : "1"
   }, {
-    "iri" : "https://w3id.org/won/ext/demo#PaymentServiceRequest",
-    "baseIri" : "https://w3id.org/won/ext/demo",
-    "instances" : 0,
-    "label" : {
-      "IRI-based" : "PaymentServiceRequest",
-      "undefined" : "PaymentServiceRequest"
-    },
-    "comment" : {
-      "en" : "Demand for a payment service."
-    },
-    "id" : "2"
-  }, {
     "iri" : "https://w3id.org/won/ext/demo#RehearsalRoomRentOffer",
     "baseIri" : "https://w3id.org/won/ext/demo",
     "instances" : 0,
@@ -164,6 +152,18 @@
     },
     "comment" : {
       "en" : "Offer to rent out a rehearsal room for music bands."
+    },
+    "id" : "2"
+  }, {
+    "iri" : "https://w3id.org/won/ext/demo#PaymentServiceRequest",
+    "baseIri" : "https://w3id.org/won/ext/demo",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "PaymentServiceRequest",
+      "undefined" : "PaymentServiceRequest"
+    },
+    "comment" : {
+      "en" : "Demand for a payment service."
     },
     "id" : "3"
   }, {
@@ -179,18 +179,6 @@
     },
     "id" : "4"
   }, {
-    "iri" : "https://w3id.org/won/ext/demo#PureSearch",
-    "baseIri" : "https://w3id.org/won/ext/demo",
-    "instances" : 0,
-    "label" : {
-      "IRI-based" : "PureSearch",
-      "undefined" : "PureSearch"
-    },
-    "comment" : {
-      "en" : "Class for Atoms that are just searches (defining a search String via match:searchString)."
-    },
-    "id" : "5"
-  }, {
     "iri" : "https://w3id.org/won/ext/demo#PostDocSearch",
     "baseIri" : "https://w3id.org/won/ext/demo",
     "instances" : 0,
@@ -200,6 +188,18 @@
     },
     "comment" : {
       "en" : "Search for a PostDoc position"
+    },
+    "id" : "5"
+  }, {
+    "iri" : "https://w3id.org/won/ext/demo#PureSearch",
+    "baseIri" : "https://w3id.org/won/ext/demo",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "PureSearch",
+      "undefined" : "PureSearch"
+    },
+    "comment" : {
+      "en" : "Class for Atoms that are just searches (defining a search String via match:searchString)."
     },
     "id" : "6"
   }, {

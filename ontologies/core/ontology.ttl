@@ -167,6 +167,14 @@ xsd:duration rdf:type rdfs:Datatype .
                   rdfs:label "messageContainer" .
 
 
+###  https://w3id.org/won/core#previousConnectionState
+:previousConnectionState rdf:type owl:ObjectProperty ,
+                                  owl:FunctionalProperty ;
+                         rdfs:domain :Connection ;
+                         rdf:type owl:Class ;
+                         rdfs:range :previousConnectionState .
+
+
 ###  https://w3id.org/won/core#socket
 :socket rdf:type owl:ObjectProperty ;
         rdfs:domain [ rdf:type owl:Class ;
@@ -519,6 +527,10 @@ The container supports LDP paging as described here: https://github.com/research
              rdfs:label "WonProtocol" .
 
 
+###  https://w3id.org/won/core#previousConnectionState
+:previousConnectionState rdf:type owl:Class .
+
+
 #################################################################
 #    Individuals
 #################################################################
@@ -577,6 +589,15 @@ The container supports LDP paging as described here: https://github.com/research
            rdfs:comment "Suggested state. The Connection has been created through a Hint Event but not yet been opened by either of the sides."@en ;
            rdfs:isDefinedBy <https://w3id.org/won/core> ;
            rdfs:label "Suggested" .
+
+
+#################################################################
+#    Annotations
+#################################################################
+
+:previousConnectionState rdfs:comment "Indicates the state in which the Connection was before the current one."@en ;
+                         rdfs:isDefinedBy <https://w3id.org/won/core> ;
+                         rdfs:label "previousConnectionState" .
 
 
 #################################################################

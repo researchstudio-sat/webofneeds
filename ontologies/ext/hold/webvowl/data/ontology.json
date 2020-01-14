@@ -55,85 +55,100 @@
     "id" : "9",
     "type" : "owl:Class"
   }, {
-    "id" : "18",
-    "type" : "owl:Class"
-  }, {
-    "id" : "29",
-    "type" : "owl:Class"
-  }, {
     "id" : "16",
+    "type" : "owl:Class"
+  }, {
+    "id" : "34",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "35",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "31",
+    "type" : "owl:Class"
+  }, {
+    "id" : "19",
     "type" : "owl:Thing"
   }, {
-    "id" : "32",
-    "type" : "rdfs:Datatype"
-  }, {
-    "id" : "42",
-    "type" : "rdfs:Datatype"
-  }, {
-    "id" : "14",
+    "id" : "25",
     "type" : "rdfs:Datatype"
   }, {
     "id" : "5",
     "type" : "rdfs:Datatype"
   }, {
-    "id" : "45",
+    "id" : "47",
     "type" : "rdfs:Datatype"
   }, {
-    "id" : "47",
+    "id" : "42",
     "type" : "rdfs:Datatype"
   }, {
     "id" : "48",
     "type" : "rdfs:Datatype"
   }, {
-    "id" : "11",
+    "id" : "49",
     "type" : "rdfs:Datatype"
-  }, {
-    "id" : "34",
-    "type" : "owl:Class"
-  }, {
-    "id" : "13",
-    "type" : "owl:Class"
-  }, {
-    "id" : "28",
-    "type" : "owl:Class"
-  }, {
-    "id" : "53",
-    "type" : "owl:unionOf"
-  }, {
-    "id" : "40",
-    "type" : "owl:unionOf"
-  }, {
-    "id" : "36",
-    "type" : "rdfs:Datatype"
-  }, {
-    "id" : "25",
-    "type" : "owl:Class"
   }, {
     "id" : "52",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "14",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "54",
     "type" : "rdfs:Datatype"
   }, {
     "id" : "55",
     "type" : "rdfs:Datatype"
   }, {
+    "id" : "11",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "38",
+    "type" : "owl:Class"
+  }, {
+    "id" : "13",
+    "type" : "owl:Class"
+  }, {
+    "id" : "22",
+    "type" : "owl:Class"
+  }, {
+    "id" : "61",
+    "type" : "owl:unionOf"
+  }, {
+    "id" : "46",
+    "type" : "owl:unionOf"
+  }, {
+    "id" : "40",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "33",
+    "type" : "owl:Class"
+  }, {
+    "id" : "60",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "63",
+    "type" : "rdfs:Datatype"
+  }, {
     "id" : "2",
     "type" : "rdfs:Datatype"
   }, {
-    "id" : "44",
+    "id" : "51",
     "type" : "rdfs:Datatype"
   }, {
-    "id" : "57",
+    "id" : "65",
     "type" : "rdfs:Datatype"
   }, {
     "id" : "7",
     "type" : "owl:Class"
   }, {
-    "id" : "63",
+    "id" : "72",
     "type" : "owl:unionOf"
   }, {
-    "id" : "22",
+    "id" : "27",
     "type" : "owl:Class"
   }, {
-    "id" : "23",
+    "id" : "28",
     "type" : "owl:Class"
   }, {
     "id" : "1",
@@ -142,10 +157,10 @@
     "id" : "8",
     "type" : "owl:Class"
   }, {
-    "id" : "26",
+    "id" : "23",
     "type" : "owl:Class"
   }, {
-    "id" : "19",
+    "id" : "17",
     "type" : "owl:Class"
   } ],
   "classAttribute" : [ {
@@ -240,24 +255,6 @@
         "undefined" : "Connected"
       }
     }, {
-      "iri" : "https://w3id.org/won/core#RequestSent",
-      "baseIri" : "https://w3id.org/won/core",
-      "annotations" : {
-        "isDefinedBy" : [ {
-          "identifier" : "isDefinedBy",
-          "language" : "undefined",
-          "value" : "https://w3id.org/won/core",
-          "type" : "iri"
-        } ]
-      },
-      "comment" : {
-        "en" : "Half-open state. The Connection has been requested by the local end but not yet been accepted by the remote counterpart."
-      },
-      "labels" : {
-        "IRI-based" : "RequestSent",
-        "undefined" : "RequestSent"
-      }
-    }, {
       "iri" : "https://w3id.org/won/core#Closed",
       "baseIri" : "https://w3id.org/won/core",
       "annotations" : {
@@ -274,6 +271,24 @@
       "labels" : {
         "IRI-based" : "Closed",
         "undefined" : "Closed"
+      }
+    }, {
+      "iri" : "https://w3id.org/won/core#RequestSent",
+      "baseIri" : "https://w3id.org/won/core",
+      "annotations" : {
+        "isDefinedBy" : [ {
+          "identifier" : "isDefinedBy",
+          "language" : "undefined",
+          "value" : "https://w3id.org/won/core",
+          "type" : "iri"
+        } ]
+      },
+      "comment" : {
+        "en" : "Half-open state. The Connection has been requested by the local end but not yet been accepted by the remote counterpart."
+      },
+      "labels" : {
+        "IRI-based" : "RequestSent",
+        "undefined" : "RequestSent"
       }
     } ],
     "comment" : {
@@ -314,7 +329,21 @@
       "en" : "A Socket's definition."
     },
     "attributes" : [ "external" ],
-    "id" : "18"
+    "id" : "16"
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#integer",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "34",
+    "label" : {
+      "IRI-based" : "integer"
+    }
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#integer",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "35",
+    "label" : {
+      "IRI-based" : "integer"
+    }
   }, {
     "iri" : "https://w3id.org/won/core#MessageContainer",
     "baseIri" : "https://w3id.org/won/core",
@@ -335,35 +364,21 @@
       "en" : "Container for Messages. The container supports LDP paging as described here: https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md."
     },
     "attributes" : [ "external" ],
-    "id" : "29",
-    "superClasses" : [ "26" ]
+    "id" : "31",
+    "superClasses" : [ "23" ]
   }, {
     "iri" : "http://www.w3.org/2002/07/owl#Thing",
     "baseIri" : "http://owl2vowl.de",
-    "id" : "16",
+    "id" : "19",
     "label" : {
       "undefined" : "Thing"
     }
   }, {
     "iri" : "http://www.w3.org/2001/XMLSchema#integer",
     "baseIri" : "http://www.w3.org/2001/XMLSchema",
-    "id" : "32",
+    "id" : "25",
     "label" : {
       "IRI-based" : "integer"
-    }
-  }, {
-    "iri" : "http://www.w3.org/2001/XMLSchema#string",
-    "baseIri" : "http://www.w3.org/2001/XMLSchema",
-    "id" : "42",
-    "label" : {
-      "IRI-based" : "string"
-    }
-  }, {
-    "iri" : "http://www.w3.org/2001/XMLSchema#string",
-    "baseIri" : "http://www.w3.org/2001/XMLSchema",
-    "id" : "14",
-    "label" : {
-      "IRI-based" : "string"
     }
   }, {
     "iri" : "http://www.w3.org/2001/XMLSchema#string",
@@ -375,16 +390,16 @@
   }, {
     "iri" : "http://www.w3.org/2001/XMLSchema#string",
     "baseIri" : "http://www.w3.org/2001/XMLSchema",
-    "id" : "45",
+    "id" : "47",
     "label" : {
       "IRI-based" : "string"
     }
   }, {
-    "iri" : "http://www.w3.org/2001/XMLSchema#boolean",
+    "iri" : "http://www.w3.org/2001/XMLSchema#integer",
     "baseIri" : "http://www.w3.org/2001/XMLSchema",
-    "id" : "47",
+    "id" : "42",
     "label" : {
-      "IRI-based" : "boolean"
+      "IRI-based" : "integer"
     }
   }, {
     "iri" : "http://www.w3.org/2001/XMLSchema#string",
@@ -392,6 +407,41 @@
     "id" : "48",
     "label" : {
       "IRI-based" : "string"
+    }
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#integer",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "49",
+    "label" : {
+      "IRI-based" : "integer"
+    }
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#string",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "52",
+    "label" : {
+      "IRI-based" : "string"
+    }
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#string",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "14",
+    "label" : {
+      "IRI-based" : "string"
+    }
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#boolean",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "54",
+    "label" : {
+      "IRI-based" : "boolean"
+    }
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#integer",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "55",
+    "label" : {
+      "IRI-based" : "integer"
     }
   }, {
     "iri" : "http://www.w3.org/2001/XMLSchema#anyURI",
@@ -420,7 +470,7 @@
       "en" : "Represents a Connection to between two Atoms. Whenever two Atoms are connected, each Atom creates a dedicated Connection object which encapsulate all information about the connection."
     },
     "attributes" : [ "external" ],
-    "id" : "34"
+    "id" : "38"
   }, {
     "iri" : "https://w3id.org/won/core#UriPrefixSpecification",
     "baseIri" : "https://w3id.org/won/core",
@@ -454,22 +504,22 @@
       "en" : "Container for Connections. The container supports LDP paging as described here: https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md"
     },
     "attributes" : [ "external" ],
-    "id" : "28",
-    "superClasses" : [ "26" ]
+    "id" : "22",
+    "superClasses" : [ "23" ]
   }, {
     "instances" : 0,
-    "union" : [ "34", "7" ],
+    "union" : [ "38", "7" ],
     "attributes" : [ "union", "anonymous" ],
-    "id" : "53"
+    "id" : "61"
   }, {
     "instances" : 0,
-    "union" : [ "34", "7" ],
+    "union" : [ "38", "7" ],
     "attributes" : [ "union", "anonymous" ],
-    "id" : "40"
+    "id" : "46"
   }, {
     "iri" : "http://www.w3.org/2001/XMLSchema#string",
     "baseIri" : "http://www.w3.org/2001/XMLSchema",
-    "id" : "36",
+    "id" : "40",
     "label" : {
       "IRI-based" : "string"
     }
@@ -485,19 +535,19 @@
       "undefined" : "An LDP container with all the Atoms stored on the Node.\n\nThe container supports LDP paging as described here: https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md"
     },
     "attributes" : [ "external" ],
-    "id" : "25",
-    "superClasses" : [ "26" ]
+    "id" : "33",
+    "superClasses" : [ "23" ]
   }, {
     "iri" : "http://www.w3.org/2001/XMLSchema#string",
     "baseIri" : "http://www.w3.org/2001/XMLSchema",
-    "id" : "52",
+    "id" : "60",
     "label" : {
       "IRI-based" : "string"
     }
   }, {
     "iri" : "http://www.w3.org/2001/XMLSchema#string",
     "baseIri" : "http://www.w3.org/2001/XMLSchema",
-    "id" : "55",
+    "id" : "63",
     "label" : {
       "IRI-based" : "string"
     }
@@ -511,14 +561,14 @@
   }, {
     "iri" : "http://www.w3.org/2001/XMLSchema#string",
     "baseIri" : "http://www.w3.org/2001/XMLSchema",
-    "id" : "44",
+    "id" : "51",
     "label" : {
       "IRI-based" : "string"
     }
   }, {
     "iri" : "http://www.w3.org/2001/XMLSchema#string",
     "baseIri" : "http://www.w3.org/2001/XMLSchema",
-    "id" : "57",
+    "id" : "65",
     "label" : {
       "IRI-based" : "string"
     }
@@ -545,9 +595,9 @@
     "id" : "7"
   }, {
     "instances" : 0,
-    "union" : [ "34", "7" ],
+    "union" : [ "38", "7" ],
     "attributes" : [ "union", "anonymous" ],
-    "id" : "63"
+    "id" : "72"
   }, {
     "iri" : "https://w3id.org/won/core#Node",
     "baseIri" : "https://w3id.org/won/core",
@@ -560,7 +610,7 @@
       "en" : "A server storing Atoms and the data associated with them."
     },
     "attributes" : [ "external" ],
-    "id" : "22"
+    "id" : "27"
   }, {
     "iri" : "https://w3id.org/won/core#WonProtocol",
     "baseIri" : "https://w3id.org/won/core",
@@ -582,7 +632,7 @@
       "en" : "Superclass for Web of Needs protocol implementations."
     },
     "attributes" : [ "external" ],
-    "id" : "23"
+    "id" : "28"
   }, {
     "iri" : "https://w3id.org/won/core#WonOverActiveMq",
     "baseIri" : "https://w3id.org/won/core",
@@ -604,7 +654,7 @@
     },
     "attributes" : [ "external" ],
     "id" : "1",
-    "superClasses" : [ "23" ]
+    "superClasses" : [ "28" ]
   }, {
     "iri" : "https://w3id.org/won/core#AtomState",
     "baseIri" : "https://w3id.org/won/core",
@@ -678,9 +728,9 @@
     "label" : {
       "IRI-based" : "CompositeContainer"
     },
-    "subClasses" : [ "28", "25", "29" ],
+    "subClasses" : [ "22", "33", "31" ],
     "attributes" : [ "external" ],
-    "id" : "26"
+    "id" : "23"
   }, {
     "iri" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property",
     "baseIri" : "http://www.w3.org/1999/02/22-rdf-syntax-ns",
@@ -689,7 +739,7 @@
       "IRI-based" : "Property"
     },
     "attributes" : [ "external" ],
-    "id" : "19"
+    "id" : "17"
   } ],
   "property" : [ {
     "id" : "0",
@@ -710,89 +760,77 @@
     "id" : "15",
     "type" : "owl:objectProperty"
   }, {
-    "id" : "17",
+    "id" : "18",
     "type" : "owl:objectProperty"
   }, {
     "id" : "20",
     "type" : "owl:objectProperty"
   }, {
     "id" : "21",
-    "type" : "owl:objectProperty"
-  }, {
-    "id" : "24",
     "type" : "rdfs:SubClassOf"
   }, {
-    "id" : "27",
+    "id" : "24",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "26",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "29",
     "type" : "rdfs:SubClassOf"
   }, {
     "id" : "30",
     "type" : "rdfs:SubClassOf"
   }, {
-    "id" : "31",
-    "type" : "owl:datatypeProperty"
+    "id" : "32",
+    "type" : "rdfs:SubClassOf"
   }, {
-    "id" : "33",
-    "type" : "owl:objectProperty"
-  }, {
-    "id" : "35",
+    "id" : "36",
     "type" : "owl:datatypeProperty"
   }, {
     "id" : "37",
     "type" : "owl:objectProperty"
   }, {
-    "id" : "38",
-    "type" : "owl:objectProperty"
-  }, {
     "id" : "39",
-    "type" : "owl:objectProperty"
-  }, {
-    "id" : "41",
-    "type" : "rdfs:SubClassOf"
-  }, {
-    "id" : "43",
     "type" : "owl:datatypeProperty"
   }, {
-    "id" : "46",
+    "id" : "41",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "43",
     "type" : "owl:objectProperty"
   }, {
-    "id" : "49",
+    "id" : "44",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "45",
     "type" : "owl:objectProperty"
   }, {
     "id" : "50",
     "type" : "owl:datatypeProperty"
   }, {
-    "id" : "51",
-    "type" : "owl:datatypeProperty"
-  }, {
-    "id" : "54",
-    "type" : "owl:datatypeProperty"
+    "id" : "53",
+    "type" : "owl:objectProperty"
   }, {
     "id" : "56",
     "type" : "owl:objectProperty"
+  }, {
+    "id" : "57",
+    "type" : "owl:datatypeProperty"
   }, {
     "id" : "58",
     "type" : "owl:datatypeProperty"
   }, {
     "id" : "59",
-    "type" : "owl:objectProperty"
-  }, {
-    "id" : "60",
-    "type" : "owl:disjointWith"
-  }, {
-    "id" : "61",
-    "type" : "owl:objectProperty"
+    "type" : "owl:datatypeProperty"
   }, {
     "id" : "62",
-    "type" : "owl:objectProperty"
+    "type" : "owl:datatypeProperty"
   }, {
     "id" : "64",
     "type" : "owl:objectProperty"
   }, {
-    "id" : "65",
-    "type" : "owl:datatypeProperty"
-  }, {
     "id" : "66",
-    "type" : "owl:objectProperty"
+    "type" : "owl:datatypeProperty"
   }, {
     "id" : "67",
     "type" : "owl:datatypeProperty"
@@ -801,7 +839,7 @@
     "type" : "owl:objectProperty"
   }, {
     "id" : "69",
-    "type" : "owl:objectProperty"
+    "type" : "owl:disjointWith"
   }, {
     "id" : "70",
     "type" : "owl:objectProperty"
@@ -809,7 +847,34 @@
     "id" : "71",
     "type" : "owl:objectProperty"
   }, {
-    "id" : "72",
+    "id" : "73",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "74",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "75",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "76",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "77",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "78",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "79",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "80",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "81",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "82",
     "type" : "owl:datatypeProperty"
   } ],
   "propertyAttribute" : [ {
@@ -860,7 +925,7 @@
     "comment" : {
       "en" : "Defines the Atom object's state."
     },
-    "attributes" : [ "functional", "object", "external" ],
+    "attributes" : [ "external", "functional", "object" ],
     "id" : "6"
   }, {
     "iri" : "https://w3id.org/won/core#brokerUri",
@@ -891,9 +956,23 @@
     "attributes" : [ "datatype", "external" ],
     "id" : "12"
   }, {
+    "iri" : "https://w3id.org/won/core#derivesInverseAtomProperty",
+    "baseIri" : "https://w3id.org/won/core",
+    "range" : "17",
+    "label" : {
+      "IRI-based" : "derivesInverseAtomProperty",
+      "undefined" : "derivesInverseAtomProperty"
+    },
+    "domain" : "16",
+    "comment" : {
+      "en" : "Defines a property to be 'derived' when the connection is established. The property will be used to derive a triple '[targetAtom] [property] [sourceAtom]'."
+    },
+    "attributes" : [ "external", "object" ],
+    "id" : "15"
+  }, {
     "iri" : "https://w3id.org/won/core#contentGraph",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "16",
+    "range" : "19",
     "label" : {
       "IRI-based" : "contentGraph",
       "undefined" : "contentGraph"
@@ -902,40 +981,45 @@
     "comment" : {
       "en" : "Links an Atom to an RDF graph holding some of its RDF content."
     },
-    "attributes" : [ "object", "external" ],
-    "id" : "15"
-  }, {
-    "iri" : "https://w3id.org/won/core#derivesInverseAtomProperty",
-    "baseIri" : "https://w3id.org/won/core",
-    "range" : "19",
-    "label" : {
-      "IRI-based" : "derivesInverseAtomProperty",
-      "undefined" : "derivesInverseAtomProperty"
-    },
-    "domain" : "18",
-    "comment" : {
-      "en" : "Defines a property to be 'derived' when the connection is established. The property will be used to derive a triple '[targetAtom] [property] [sourceAtom]'."
-    },
-    "attributes" : [ "object", "external" ],
-    "id" : "17"
+    "attributes" : [ "external", "object" ],
+    "id" : "18"
   }, {
     "iri" : "https://w3id.org/won/core#derivesAtomProperty",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "19",
+    "range" : "17",
     "label" : {
       "IRI-based" : "derivesAtomProperty",
       "undefined" : "derivesAtomProperty"
     },
-    "domain" : "18",
+    "domain" : "16",
     "comment" : {
       "en" : "Defines a property to be 'derived' when the connection is established. The property will be used to derive a triple '[sourceAtom] [property] [targetAtom]'."
     },
-    "attributes" : [ "object", "external" ],
+    "attributes" : [ "external", "object" ],
     "id" : "20"
+  }, {
+    "range" : "23",
+    "domain" : "22",
+    "attributes" : [ "anonymous", "object" ],
+    "id" : "21"
+  }, {
+    "iri" : "https://w3id.org/won/core#suggestedCount",
+    "baseIri" : "https://w3id.org/won/core",
+    "range" : "25",
+    "label" : {
+      "IRI-based" : "suggestedCount",
+      "undefined" : "suggestedCount"
+    },
+    "domain" : "22",
+    "comment" : {
+      "en" : "The number of connections in the container that are in state SUGGESTED."
+    },
+    "attributes" : [ "datatype", "external" ],
+    "id" : "24"
   }, {
     "iri" : "https://w3id.org/won/core#supportsWonProtocolImpl",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "23",
+    "range" : "28",
     "annotations" : {
       "isDefinedBy" : [ {
         "identifier" : "isDefinedBy",
@@ -948,45 +1032,45 @@
       "IRI-based" : "supportsWonProtocolImpl",
       "undefined" : "supportsWonProtocolImpl"
     },
-    "domain" : "22",
+    "domain" : "27",
     "comment" : {
       "en" : "Connects an WoN Node object with a description of a WON protocol it supports."
     },
-    "attributes" : [ "object", "external" ],
-    "id" : "21"
+    "attributes" : [ "external", "object" ],
+    "id" : "26"
   }, {
-    "range" : "26",
-    "domain" : "25",
-    "attributes" : [ "object", "anonymous" ],
-    "id" : "24"
+    "range" : "28",
+    "domain" : "1",
+    "attributes" : [ "anonymous", "object" ],
+    "id" : "29"
   }, {
-    "range" : "26",
-    "domain" : "28",
-    "attributes" : [ "object", "anonymous" ],
-    "id" : "27"
-  }, {
-    "range" : "26",
-    "domain" : "29",
-    "attributes" : [ "object", "anonymous" ],
+    "range" : "23",
+    "domain" : "31",
+    "attributes" : [ "anonymous", "object" ],
     "id" : "30"
+  }, {
+    "range" : "23",
+    "domain" : "33",
+    "attributes" : [ "anonymous", "object" ],
+    "id" : "32"
   }, {
     "iri" : "https://w3id.org/won/core#socketCapacity",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "32",
+    "range" : "34",
     "label" : {
       "IRI-based" : "socketCapacity",
       "undefined" : "socketCapacity"
     },
-    "domain" : "18",
+    "domain" : "16",
     "comment" : {
       "en" : "Defines the maximum number of established connections supported by the socket."
     },
     "attributes" : [ "datatype", "external" ],
-    "id" : "31"
+    "id" : "36"
   }, {
     "iri" : "https://w3id.org/won/core#targetConnection",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "34",
+    "range" : "38",
     "annotations" : {
       "isDefinedBy" : [ {
         "identifier" : "isDefinedBy",
@@ -999,16 +1083,16 @@
       "IRI-based" : "targetConnection",
       "undefined" : "targetConnection"
     },
-    "domain" : "34",
+    "domain" : "38",
     "comment" : {
       "en" : "Links a Connection object to its remote counterpart."
     },
-    "attributes" : [ "functional", "object", "inverse functional", "symmetric", "external" ],
-    "id" : "33"
+    "attributes" : [ "external", "symmetric", "inverse functional", "functional", "object" ],
+    "id" : "37"
   }, {
     "iri" : "https://w3id.org/won/core#atomActivatedTopic",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "36",
+    "range" : "40",
     "label" : {
       "IRI-based" : "atomActivatedTopic",
       "undefined" : "atomActivatedTopic"
@@ -1018,7 +1102,21 @@
       "en" : "The activeMQ topic to subscribe to to be informed when an atom is activated."
     },
     "attributes" : [ "datatype", "external" ],
-    "id" : "35"
+    "id" : "39"
+  }, {
+    "iri" : "https://w3id.org/won/core#requestReceivedCount",
+    "baseIri" : "https://w3id.org/won/core",
+    "range" : "42",
+    "label" : {
+      "IRI-based" : "requestReceivedCount",
+      "undefined" : "requestReceivedCount"
+    },
+    "domain" : "22",
+    "comment" : {
+      "en" : "The number of connections in the container that are in state REQUEST_RECEIVED."
+    },
+    "attributes" : [ "datatype", "external" ],
+    "id" : "41"
   }, {
     "iri" : "https://w3id.org/won/core#targetAtom",
     "baseIri" : "https://w3id.org/won/core",
@@ -1035,12 +1133,12 @@
       "IRI-based" : "targetAtom",
       "undefined" : "targetAtom"
     },
-    "domain" : "34",
+    "domain" : "38",
     "comment" : {
       "en" : "links a Connection to its remote Atom. The remote Atom is the one holding the  targetConnection."
     },
-    "attributes" : [ "object", "external" ],
-    "id" : "37"
+    "attributes" : [ "external", "object" ],
+    "id" : "43"
   }, {
     "iri" : "https://w3id.org/won/core#uriPrefixSpecification",
     "baseIri" : "https://w3id.org/won/core",
@@ -1049,35 +1147,30 @@
       "IRI-based" : "uriPrefixSpecification",
       "undefined" : "uriPrefixSpecification"
     },
-    "domain" : "22",
+    "domain" : "27",
     "comment" : {
       "en" : "Specification of URI prefixes used by this WoN node."
     },
-    "attributes" : [ "object", "external" ],
-    "id" : "38"
+    "attributes" : [ "external", "object" ],
+    "id" : "44"
   }, {
     "iri" : "https://w3id.org/won/core#wonNode",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "22",
+    "range" : "27",
     "label" : {
       "IRI-based" : "wonNode",
       "undefined" : "wonNode"
     },
-    "domain" : "40",
+    "domain" : "46",
     "comment" : {
       "en" : "Links an Atom or Connection to their WoN node."
     },
-    "attributes" : [ "object", "external" ],
-    "id" : "39"
-  }, {
-    "range" : "23",
-    "domain" : "1",
-    "attributes" : [ "object", "anonymous" ],
-    "id" : "41"
+    "attributes" : [ "external", "object" ],
+    "id" : "45"
   }, {
     "iri" : "https://w3id.org/won/core#atomModifiedTopic",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "44",
+    "range" : "51",
     "label" : {
       "IRI-based" : "atomModifiedTopic",
       "undefined" : "atomModifiedTopic"
@@ -1087,11 +1180,11 @@
       "en" : "The activeMQ topic to subscribe to to be informed when an atom is modified."
     },
     "attributes" : [ "datatype", "external" ],
-    "id" : "43"
+    "id" : "50"
   }, {
     "iri" : "https://w3id.org/won/core#socketDefinition",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "18",
+    "range" : "16",
     "label" : {
       "IRI-based" : "socketDefinition",
       "undefined" : "socketDefinition"
@@ -1100,8 +1193,8 @@
     "comment" : {
       "en" : "Links the socket to its definition. A socket must have exactly one definition."
     },
-    "attributes" : [ "object", "external" ],
-    "id" : "46"
+    "attributes" : [ "external", "object" ],
+    "id" : "53"
   }, {
     "iri" : "https://w3id.org/won/core#targetSocket",
     "baseIri" : "https://w3id.org/won/core",
@@ -1118,12 +1211,12 @@
       "IRI-based" : "targetSocket",
       "undefined" : "targetSocket"
     },
-    "domain" : "34",
+    "domain" : "38",
     "comment" : {
       "en" : "Indicates that a remote atom or remote connection supports the specified socket (=behavior) or specifies the remote socket to connect with."
     },
-    "attributes" : [ "object", "external" ],
-    "id" : "49"
+    "attributes" : [ "external", "object" ],
+    "id" : "56"
   }, {
     "iri" : "https://w3id.org/won/core#connectionUriPrefix",
     "baseIri" : "https://w3id.org/won/core",
@@ -1137,11 +1230,25 @@
       "en" : "Specifies the prefix a connection must have on the node this specification applies to."
     },
     "attributes" : [ "datatype", "external" ],
-    "id" : "50"
+    "id" : "57"
+  }, {
+    "iri" : "https://w3id.org/won/core#closedCount",
+    "baseIri" : "https://w3id.org/won/core",
+    "range" : "55",
+    "label" : {
+      "IRI-based" : "closedCount",
+      "undefined" : "closedCount"
+    },
+    "domain" : "22",
+    "comment" : {
+      "en" : "The number of connections in the container that are in state CLOSED."
+    },
+    "attributes" : [ "datatype", "external" ],
+    "id" : "58"
   }, {
     "iri" : "https://w3id.org/won/core#atomCreatedTopic",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "52",
+    "range" : "60",
     "label" : {
       "IRI-based" : "atomCreatedTopic",
       "undefined" : "atomCreatedTopic"
@@ -1151,21 +1258,21 @@
       "en" : "The activeMQ topic to subscribe to to be informed when an atom is created."
     },
     "attributes" : [ "datatype", "external" ],
-    "id" : "51"
+    "id" : "59"
   }, {
     "iri" : "https://w3id.org/won/core#autoOpen",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "47",
+    "range" : "54",
     "label" : {
       "IRI-based" : "autoOpen",
       "undefined" : "autoOpen"
     },
-    "domain" : "18",
+    "domain" : "16",
     "comment" : {
       "en" : "Indicates that any incoming CONNECT/OPEN message will be answered with OPEN unless the facet configuration forbids it."
     },
     "attributes" : [ "datatype", "external" ],
-    "id" : "54"
+    "id" : "62"
   }, {
     "iri" : "https://w3id.org/won/core#socket",
     "baseIri" : "https://w3id.org/won/core",
@@ -1182,16 +1289,30 @@
       "IRI-based" : "socket",
       "undefined" : "socket"
     },
-    "domain" : "53",
+    "domain" : "61",
     "comment" : {
       "en" : "Indicates that an atom or connection supports the specified socket (=behavior)."
     },
-    "attributes" : [ "object", "external" ],
-    "id" : "56"
+    "attributes" : [ "external", "object" ],
+    "id" : "64"
+  }, {
+    "iri" : "https://w3id.org/won/core#requestSentCount",
+    "baseIri" : "https://w3id.org/won/core",
+    "range" : "35",
+    "label" : {
+      "IRI-based" : "requestSentCount",
+      "undefined" : "requestSentCount"
+    },
+    "domain" : "22",
+    "comment" : {
+      "en" : "The number of connections in the container that are in state REQUEST_RECEIVED."
+    },
+    "attributes" : [ "datatype", "external" ],
+    "id" : "66"
   }, {
     "iri" : "https://w3id.org/won/core#atomUriPrefix",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "57",
+    "range" : "65",
     "label" : {
       "IRI-based" : "atomUriPrefix",
       "undefined" : "atomUriPrefix"
@@ -1201,7 +1322,7 @@
       "en" : "Specifies the prefix an atom must have on the node this specification applies to. This specification allows clients to generate new valid new Atom URIs."
     },
     "attributes" : [ "datatype", "external" ],
-    "id" : "58"
+    "id" : "67"
   }, {
     "iri" : "https://w3id.org/won/core#sourceAtom",
     "baseIri" : "https://w3id.org/won/core",
@@ -1210,17 +1331,31 @@
       "IRI-based" : "sourceAtom",
       "undefined" : "sourceAtom"
     },
-    "domain" : "34",
+    "domain" : "38",
     "comment" : {
       "en" : "Links a Connection to the Atom it belongs to (the source of this Connection)"
     },
-    "attributes" : [ "object", "external" ],
-    "id" : "59"
+    "attributes" : [ "external", "object" ],
+    "id" : "68"
   }, {
-    "range" : "29",
-    "domain" : "28",
-    "attributes" : [ "object", "anonymous" ],
-    "id" : "60"
+    "range" : "31",
+    "domain" : "22",
+    "attributes" : [ "anonymous", "object" ],
+    "id" : "69"
+  }, {
+    "iri" : "https://w3id.org/won/core#atomList",
+    "baseIri" : "https://w3id.org/won/core",
+    "range" : "33",
+    "label" : {
+      "IRI-based" : "atomList",
+      "undefined" : "atomList"
+    },
+    "domain" : "27",
+    "comment" : {
+      "undefined" : "The Node's atoms, in a LDP-pageable container."
+    },
+    "attributes" : [ "external", "object" ],
+    "id" : "70"
   }, {
     "iri" : "https://w3id.org/won/core#defaultSocket",
     "baseIri" : "https://w3id.org/won/core",
@@ -1241,22 +1376,8 @@
     "comment" : {
       "en" : "Indicates the socket to connect to by default."
     },
-    "attributes" : [ "object", "external" ],
-    "id" : "61"
-  }, {
-    "iri" : "https://w3id.org/won/core#atomList",
-    "baseIri" : "https://w3id.org/won/core",
-    "range" : "25",
-    "label" : {
-      "IRI-based" : "atomList",
-      "undefined" : "atomList"
-    },
-    "domain" : "22",
-    "comment" : {
-      "undefined" : "The Node's atoms, in a LDP-pageable container."
-    },
-    "attributes" : [ "object", "external" ],
-    "id" : "62"
+    "attributes" : [ "external", "object" ],
+    "id" : "71"
   }, {
     "iri" : "https://w3id.org/won/core#connectionState",
     "baseIri" : "https://w3id.org/won/core",
@@ -1273,16 +1394,16 @@
       "IRI-based" : "connectionState",
       "undefined" : "connectionState"
     },
-    "domain" : "34",
+    "domain" : "38",
     "comment" : {
       "en" : "Indicates the state in which the Connection object is."
     },
-    "attributes" : [ "functional", "object", "external" ],
-    "id" : "64"
+    "attributes" : [ "external", "functional", "object" ],
+    "id" : "73"
   }, {
     "iri" : "https://w3id.org/won/core#matcherQueue",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "42",
+    "range" : "52",
     "label" : {
       "IRI-based" : "matcherQueue",
       "undefined" : "matcherQueue"
@@ -1292,7 +1413,21 @@
       "en" : "The activeMQ queue to be used by matchers to send messages to the node."
     },
     "attributes" : [ "datatype", "external" ],
-    "id" : "65"
+    "id" : "74"
+  }, {
+    "iri" : "https://w3id.org/won/core#connectedCount",
+    "baseIri" : "https://w3id.org/won/core",
+    "range" : "49",
+    "label" : {
+      "IRI-based" : "connectedCount",
+      "undefined" : "connectedCount"
+    },
+    "domain" : "22",
+    "comment" : {
+      "en" : "The number of connections in the container that are in state CONNECTED."
+    },
+    "attributes" : [ "datatype", "external" ],
+    "id" : "75"
   }, {
     "iri" : "https://w3id.org/won/ext/hold#holds",
     "baseIri" : "https://w3id.org/won/ext/hold",
@@ -1306,11 +1441,11 @@
       "en" : "Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control."
     },
     "attributes" : [ "object" ],
-    "id" : "66"
+    "id" : "76"
   }, {
     "iri" : "https://w3id.org/won/core#atomDeactivatedTopic",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "55",
+    "range" : "63",
     "label" : {
       "IRI-based" : "atomDeactivatedTopic",
       "undefined" : "atomDeactivatedTopic"
@@ -1320,11 +1455,11 @@
       "en" : "The activeMQ topic to subscribe to to be informed when an atom is deactivated."
     },
     "attributes" : [ "datatype", "external" ],
-    "id" : "67"
+    "id" : "77"
   }, {
     "iri" : "https://w3id.org/won/core#connections",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "28",
+    "range" : "22",
     "annotations" : {
       "isDefinedBy" : [ {
         "identifier" : "isDefinedBy",
@@ -1341,26 +1476,26 @@
     "comment" : {
       "en" : "Links the Atom object to its connections."
     },
-    "attributes" : [ "object", "external" ],
-    "id" : "68"
+    "attributes" : [ "external", "object" ],
+    "id" : "78"
   }, {
     "iri" : "https://w3id.org/won/core#compatibleSocketDefinition",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "18",
+    "range" : "16",
     "label" : {
       "IRI-based" : "compatibleSocketDefinition",
       "undefined" : "compatibleSocketDefinition"
     },
-    "domain" : "18",
+    "domain" : "16",
     "comment" : {
       "en" : "Identifies another SocketDefinition that is compatible with this one. Connections with other kinds of sockets will not be allowed unless they are explicitly annotated."
     },
-    "attributes" : [ "object", "external" ],
-    "id" : "69"
+    "attributes" : [ "external", "object" ],
+    "id" : "79"
   }, {
     "iri" : "https://w3id.org/won/core#messageContainer",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "29",
+    "range" : "31",
     "annotations" : {
       "isDefinedBy" : [ {
         "identifier" : "isDefinedBy",
@@ -1373,12 +1508,12 @@
       "IRI-based" : "messageContainer",
       "undefined" : "messageContainer"
     },
-    "domain" : "63",
+    "domain" : "72",
     "comment" : {
       "en" : "Links the Connection object to a container containing connection events (messages)."
     },
-    "attributes" : [ "functional", "object", "external" ],
-    "id" : "70"
+    "attributes" : [ "external", "functional", "object" ],
+    "id" : "80"
   }, {
     "iri" : "https://w3id.org/won/ext/hold#heldBy",
     "baseIri" : "https://w3id.org/won/ext/hold",
@@ -1392,11 +1527,11 @@
       "en" : "Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both."
     },
     "attributes" : [ "object" ],
-    "id" : "71"
+    "id" : "81"
   }, {
     "iri" : "https://w3id.org/won/core#nodeQueue",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "45",
+    "range" : "47",
     "label" : {
       "IRI-based" : "nodeQueue",
       "undefined" : "nodeQueue"
@@ -1406,6 +1541,6 @@
       "en" : "The activeMQ queue to be used by other nodes to send messages to the node."
     },
     "attributes" : [ "datatype", "external" ],
-    "id" : "72"
+    "id" : "82"
   } ]
 }

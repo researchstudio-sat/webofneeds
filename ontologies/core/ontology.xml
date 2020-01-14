@@ -271,6 +271,18 @@ Matching services can make suggestions which atoms to connect to. An Atom specif
     
 
 
+    <!-- https://w3id.org/won/core#previousConnectionState -->
+
+
+    <owl:Class rdf:about="https://w3id.org/won/core#previousConnectionState">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="https://w3id.org/won/core#Connection"/>
+        <rdfs:range rdf:resource="https://w3id.org/won/core#previousConnectionState"/>
+    </owl:Class>
+    
+
+
     <!-- https://w3id.org/won/core#socket -->
 
 
@@ -816,6 +828,13 @@ The container supports LDP paging as described here: https://github.com/research
     
 
 
+    <!-- https://w3id.org/won/core#previousConnectionState -->
+
+
+    <owl:Class rdf:about="https://w3id.org/won/core#previousConnectionState"/>
+    
+
+
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
@@ -909,6 +928,23 @@ The container supports LDP paging as described here: https://github.com/research
         <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/core"/>
         <rdfs:label>Suggested</rdfs:label>
     </owl:NamedIndividual>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotations
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    <rdf:Description rdf:about="https://w3id.org/won/core#previousConnectionState">
+        <rdfs:comment xml:lang="en">Indicates the state in which the Connection was before the current one.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/core"/>
+        <rdfs:label>previousConnectionState</rdfs:label>
+    </rdf:Description>
     
 
 

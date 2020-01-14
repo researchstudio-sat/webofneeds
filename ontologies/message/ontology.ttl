@@ -62,18 +62,28 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom's
 #    Object Properties
 #################################################################
 
-###  https://w3id.org/won/message#containsEnvelope
-:containsEnvelope rdf:type owl:ObjectProperty ;
-                  rdfs:domain :EnvelopeGraph ;
-                  rdfs:range :EnvelopeGraph ;
-                  rdfs:comment "Links an envelope to an envelope it 'contains'."@en ;
-                  rdfs:label "containsEnvelope" .
+###  https://w3id.org/won/message#atom
+:atom rdf:type owl:ObjectProperty ;
+      rdfs:domain :Message ;
+      rdfs:range <https://w3id.org/won/core#Atom> ;
+      rdfs:comment "Links the message to its atom. Only used for messages directed at an atom, such as msg:Activate, msg:Deactivate, or msg:AtomHintMessage."@en ;
+      rdfs:isDefinedBy <https://w3id.org/won/message> ;
+      rdfs:label "atom" .
+
+
+###  https://w3id.org/won/message#connection
+:connection rdf:type owl:ObjectProperty ;
+            rdfs:domain :Message ;
+            rdfs:range <https://w3id.org/won/core#Connection> ;
+            rdfs:comment "Links the message to its connection. Only used for response messages in a connection; the messages sent by either side of the connection use msg:senderSocket and msg:recipientSocket to identify the connection uniquely"@en ;
+            rdfs:isDefinedBy <https://w3id.org/won/message> ;
+            rdfs:label "connection" .
 
 
 ###  https://w3id.org/won/message#containsSignature
 :containsSignature rdf:type owl:ObjectProperty ;
                    rdfs:domain :EnvelopeGraph ;
-                   rdfs:range <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> ;
+                   rdfs:range :Signature ;
                    rdfs:comment "Links an envelope to a signature it 'contains'."@en ;
                    rdfs:label "containsSignature" .
 
@@ -87,12 +97,12 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom's
          rdfs:label "content" .
 
 
-###  https://w3id.org/won/message#correspondingRemoteMessage
-:correspondingRemoteMessage rdf:type owl:ObjectProperty ;
-                            rdfs:domain :Message ;
-                            rdfs:range :Message ;
-                            rdfs:comment "Points to another message. Messages always exist in two copies: one on the sender's WoN node and one on the receiver's WoN node. The receiver's WoN node copies the message, mints a new URI for it and points to the original message using `msg:correspondingRemoteMessage`."@en ;
-                            rdfs:label "correspondingRemoteMessage" .
+###  https://w3id.org/won/message#envelope
+:envelope rdf:type owl:ObjectProperty ;
+          rdfs:domain :Message ;
+          rdfs:range :EnvelopeGraph ;
+          rdfs:comment "Links a message to its envelope."@en ;
+          rdfs:label "envelope" .
 
 
 ###  https://w3id.org/won/message#hintTargetAtom
@@ -105,28 +115,6 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom's
 :hintTargetSocket rdf:type owl:ObjectProperty ;
                   rdfs:comment "The target Socket of a SocketHintMessage. By sending this message it is suggested to establish a connection between the recipientSocket and the targetSocket."@en ;
                   rdfs:label "hintTargetSocket" .
-
-
-###  https://w3id.org/won/message#isRemoteResponseTo
-:isRemoteResponseTo rdf:type owl:ObjectProperty ;
-                    rdfs:comment "Links a response message on the recipientAtom's WoN node to the original message on the senderAtom's WoN node,"@en ;
-                    rdfs:label "isRemoteResponseTo" .
-
-
-###  https://w3id.org/won/message#isResponseTo
-:isResponseTo rdf:type owl:ObjectProperty ;
-              rdfs:domain :Message ;
-              rdfs:range :Message ;
-              rdfs:comment "Links a SuccessResponse or a FailureResponse to the message it is responding to."@en ;
-              rdfs:label "isResponseTo" .
-
-
-###  https://w3id.org/won/message#isResponseToMessageType
-:isResponseToMessageType rdf:type owl:ObjectProperty ;
-                         rdfs:domain :Message ;
-                         rdfs:range :MessageType ;
-                         rdfs:comment "Used in a response message to indicate the messageType of the original message."@en ;
-                         rdfs:label "isResponsToMessageType" .
 
 
 ###  https://w3id.org/won/message#messageType
@@ -149,45 +137,35 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom's
 ###  https://w3id.org/won/message#recipient
 :recipient rdf:type owl:ObjectProperty ;
            rdfs:domain :Message ;
-           rdfs:range [ rdf:type owl:Class ;
-                        owl:unionOf ( <https://w3id.org/won/core#Atom>
-                                      <https://w3id.org/won/core#Connection>
-                                    )
-                      ] ;
-           rdfs:comment "Indicates the receiver of the message, either Socket or Connection."@en ;
+           rdfs:range :Socket ;
+           rdfs:comment "Indicates the recipient socket of the message."@en ;
            rdfs:isDefinedBy <https://w3id.org/won/message> ;
-           rdfs:label "recipient" .
+           rdfs:label "recipientSocket" .
 
 
-###  https://w3id.org/won/message#recipientAtom
-:recipientAtom rdf:type owl:ObjectProperty ;
-               rdfs:domain :Message ;
-               rdfs:range <https://w3id.org/won/core#Atom> ;
-               rdfs:comment "Indicates the Atom that 'contains' the receiver of the message."@en ;
-               rdfs:isDefinedBy <https://w3id.org/won/message> ;
-               rdfs:label "recipientAtom" .
+###  https://w3id.org/won/message#respondingTo
+:respondingTo rdf:type owl:ObjectProperty ;
+              rdfs:domain :Message ;
+              rdfs:range :Message ;
+              rdfs:comment "Links a SuccessResponse or a FailureResponse to the message it is responding to."@en ;
+              rdfs:label "respondingTo" .
 
 
-###  https://w3id.org/won/message#recipientNode
-:recipientNode rdf:type owl:ObjectProperty ;
-               rdfs:domain :Message ;
-               rdfs:range <https://w3id.org/won/core#Node> ;
-               rdfs:comment "Indicates the WoN Node the message recipient is hosted on."@en ;
-               rdfs:isDefinedBy <https://w3id.org/won/message> ;
-               rdfs:label "recipientNode" .
+###  https://w3id.org/won/message#respondingToMessageType
+:respondingToMessageType rdf:type owl:ObjectProperty ;
+                         rdfs:domain :Message ;
+                         rdfs:range :MessageType ;
+                         rdfs:comment "Used in a response message to indicate the messageType of the original message."@en ;
+                         rdfs:label "respondingToMessageType" .
 
 
 ###  https://w3id.org/won/message#sender
 :sender rdf:type owl:ObjectProperty ;
         rdfs:domain :Message ;
-        rdfs:range [ rdf:type owl:Class ;
-                     owl:unionOf ( <https://w3id.org/won/core#Atom>
-                                   <https://w3id.org/won/core#Connection>
-                                 )
-                   ] ;
-        rdfs:comment "Indicates the sender of the message."@en ;
+        rdfs:range :Socket ;
+        rdfs:comment "Indicates the sender socket of the message."@en ;
         rdfs:isDefinedBy <https://w3id.org/won/message> ;
-        rdfs:label "sender" .
+        rdfs:label "senderSocket" .
 
 
 ###  https://w3id.org/won/message#senderAtom
@@ -208,12 +186,28 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom's
             rdfs:label "senderNode" .
 
 
+###  https://w3id.org/won/message#signature
+:signature rdf:type owl:ObjectProperty ;
+           rdfs:domain :Message ;
+           rdfs:range :Signature ;
+           rdfs:comment "Links a message to its signature."@en ;
+           rdfs:label "signature" .
+
+
 ###  https://w3id.org/won/message#signedGraph
 :signedGraph rdf:type owl:ObjectProperty ;
-             rdfs:domain <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> ;
+             rdfs:domain :Signature ;
              rdfs:range :MessageGraph ;
              rdfs:comment "Links a signature to the graph it signs."@en ;
              rdfs:label "signedGraph" .
+
+
+###  https://w3id.org/won/message#signer
+:signer rdf:type owl:ObjectProperty ;
+        rdfs:domain :Signature ;
+        rdfs:range :Atom ;
+        rdfs:comment "Links a signature to its signer."@en ;
+        rdfs:label "signer" .
 
 
 #################################################################
@@ -222,7 +216,7 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom's
 
 ###  https://w3id.org/won/message#hash
 :hash rdf:type owl:DatatypeProperty ;
-      rdfs:domain <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> ;
+      rdfs:domain :Signature ;
       rdfs:range xsd:string ;
       rdfs:comment "The message hash."@en ;
       rdfs:label "hash" .
@@ -246,35 +240,23 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom's
 
 ###  https://w3id.org/won/message#publicKeyFingerprint
 :publicKeyFingerprint rdf:type owl:DatatypeProperty ;
-                      rdfs:domain <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> ;
+                      rdfs:domain :Signature ;
                       rdfs:range xsd:string ;
                       rdfs:comment "The fingerprint of the sender's public key (SHA-256 hash)." ;
                       rdfs:label "publicKeyFingerprint" .
 
 
-###  https://w3id.org/won/message#receivedTimestamp
-:receivedTimestamp rdf:type owl:DatatypeProperty ;
-                   rdfs:domain :Message ;
-                   rdfs:range xsd:long ;
-                   rdfs:comment "Holds the timestamp assigned when the WoN node received and saved the message."@en ;
-                   rdfs:label "receivedTimestamp" .
-
-
-###  https://w3id.org/won/message#sentTimestamp
-:sentTimestamp rdf:type owl:DatatypeProperty ;
-               rdfs:domain :Message ;
-               rdfs:range xsd:long ;
-               rdfs:comment "Holds the timestamp assigned when the WoN node created and sent the message."@en ;
-               rdfs:label "sentTimestamp" .
+###  https://w3id.org/won/message#timestamp
+:timestamp rdf:type owl:DatatypeProperty ;
+           rdfs:domain :Message ;
+           rdfs:range xsd:long ;
+           rdfs:comment "Holds the timestamp assigned when the message was created, as obtained by the local system clock."@en ;
+           rdfs:label "receivedTimestamp" .
 
 
 #################################################################
 #    Classes
 #################################################################
-
-###  http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature
-<http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature> rdf:type owl:Class .
-
 
 ###  https://w3id.org/won/core#Atom
 <https://w3id.org/won/core#Atom> rdf:type owl:Class .
@@ -286,6 +268,10 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom's
 
 ###  https://w3id.org/won/core#Node
 <https://w3id.org/won/core#Node> rdf:type owl:Class .
+
+
+###  https://w3id.org/won/message#Atom
+:Atom rdf:type owl:Class .
 
 
 ###  https://w3id.org/won/message#ContentGraph
@@ -349,6 +335,14 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom's
               rdfs:comment "Indicates the (success/error) state of a response message."@en ;
               rdfs:isDefinedBy <https://w3id.org/won/message> ;
               rdfs:label "ResponseType" .
+
+
+###  https://w3id.org/won/message#Signature
+:Signature rdf:type owl:Class .
+
+
+###  https://w3id.org/won/message#Socket
+:Socket rdf:type owl:Class .
 
 
 #################################################################
@@ -437,11 +431,7 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom's
 
 
 ###  https://w3id.org/won/message#OpenMessage
-:OpenMessage rdf:type owl:NamedIndividual ,
-                      :MessageType ;
-             rdfs:comment "Type of Message used to (re)open an existing Connection."@en ;
-             rdfs:isDefinedBy <https://w3id.org/won/message> ;
-             rdfs:label "OpenMessage" .
+:OpenMessage rdf:type owl:NamedIndividual .
 
 
 ###  https://w3id.org/won/message#ReplaceMessage
@@ -450,6 +440,10 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom's
                 rdfs:comment "Type of message sent to a WoN Node in order replace an Atom's content."@en ;
                 rdfs:isDefinedBy <https://w3id.org/won/message> ;
                 rdfs:label "ReplaceMessage" .
+
+
+###  https://w3id.org/won/message#Signature
+:Signature rdf:type owl:NamedIndividual .
 
 
 ###  https://w3id.org/won/message#SocketHintMessage
@@ -465,6 +459,16 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom's
                  rdfs:comment "Indicates that the message was processed successfully."@en ;
                  rdfs:isDefinedBy <https://w3id.org/won/message> ;
                  rdfs:label "SuccessResponse" .
+
+
+#################################################################
+#    Annotations
+#################################################################
+
+:Signature rdfs:comment "Class of all signatures in WoN."@en ,
+                        "The class of RDF signatures as used in WoN."@en ;
+           rdfs:isDefinedBy <https://w3id.org/won/message> ;
+           rdfs:label "Signature" .
 
 
 #################################################################

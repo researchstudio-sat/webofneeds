@@ -42,7 +42,7 @@
   },
   "namespace" : [ ],
   "class" : [ {
-    "id" : "6",
+    "id" : "9",
     "type" : "owl:Class"
   }, {
     "id" : "15",
@@ -60,7 +60,7 @@
     "id" : "32",
     "type" : "rdfs:Datatype"
   }, {
-    "id" : "33",
+    "id" : "34",
     "type" : "owl:Class"
   }, {
     "id" : "35",
@@ -81,7 +81,7 @@
     "id" : "2",
     "type" : "rdfs:Datatype"
   }, {
-    "id" : "8",
+    "id" : "7",
     "type" : "owl:Class"
   }, {
     "id" : "40",
@@ -90,7 +90,7 @@
     "id" : "4",
     "type" : "owl:unionOf"
   }, {
-    "id" : "9",
+    "id" : "8",
     "type" : "owl:Class"
   }, {
     "id" : "12",
@@ -149,7 +149,7 @@
     "comment" : {
       "en" : "Binary rating values."
     },
-    "id" : "6"
+    "id" : "9"
   }, {
     "iri" : "http://schema.org/GeoCoordinates",
     "baseIri" : "http://schema.org",
@@ -195,7 +195,7 @@
       "IRI-based" : "Connection"
     },
     "attributes" : [ "external" ],
-    "id" : "33"
+    "id" : "34"
   }, {
     "iri" : "http://www.w3.org/2001/XMLSchema#base64Binary",
     "baseIri" : "http://www.w3.org/2001/XMLSchema",
@@ -205,8 +205,8 @@
     }
   }, {
     "instances" : 0,
-    "union" : [ "12", "8" ],
-    "attributes" : [ "anonymous", "union" ],
+    "union" : [ "12", "7" ],
+    "attributes" : [ "union", "anonymous" ],
     "id" : "23"
   }, {
     "iri" : "http://www.w3.org/2001/XMLSchema#base64Binary",
@@ -224,8 +224,8 @@
     }
   }, {
     "instances" : 0,
-    "union" : [ "12", "8" ],
-    "attributes" : [ "anonymous", "union" ],
+    "union" : [ "12", "7" ],
+    "attributes" : [ "union", "anonymous" ],
     "id" : "1"
   }, {
     "iri" : "http://www.w3.org/2001/XMLSchema#base64Binary",
@@ -242,7 +242,7 @@
       "IRI-based" : "Message"
     },
     "attributes" : [ "external" ],
-    "id" : "8"
+    "id" : "7"
   }, {
     "iri" : "http://www.w3.org/2001/XMLSchema#boolean",
     "baseIri" : "http://www.w3.org/2001/XMLSchema",
@@ -252,8 +252,8 @@
     }
   }, {
     "instances" : 0,
-    "union" : [ "12", "8" ],
-    "attributes" : [ "anonymous", "union" ],
+    "union" : [ "12", "7" ],
+    "attributes" : [ "union", "anonymous" ],
     "id" : "4"
   }, {
     "iri" : "https://w3id.org/won/content#Feedback",
@@ -266,7 +266,7 @@
     "comment" : {
       "en" : "Feedback for an Atom or Connection"
     },
-    "id" : "9"
+    "id" : "8"
   }, {
     "iri" : "https://w3id.org/won/core#Atom",
     "baseIri" : "https://w3id.org/won/core",
@@ -291,13 +291,13 @@
     "id" : "14"
   }, {
     "instances" : 0,
-    "union" : [ "33", "12" ],
-    "attributes" : [ "anonymous", "union" ],
+    "union" : [ "34", "12" ],
+    "attributes" : [ "union", "anonymous" ],
     "id" : "28"
   }, {
     "instances" : 0,
-    "union" : [ "12", "8" ],
-    "attributes" : [ "anonymous", "union" ],
+    "union" : [ "12", "7" ],
+    "attributes" : [ "union", "anonymous" ],
     "id" : "39"
   }, {
     "iri" : "http://schema.org/Place",
@@ -351,7 +351,7 @@
     "id" : "3",
     "type" : "owl:datatypeProperty"
   }, {
-    "id" : "7",
+    "id" : "6",
     "type" : "owl:objectProperty"
   }, {
     "id" : "10",
@@ -384,7 +384,7 @@
     "id" : "30",
     "type" : "owl:objectProperty"
   }, {
-    "id" : "34",
+    "id" : "33",
     "type" : "owl:objectProperty"
   }, {
     "id" : "36",
@@ -436,17 +436,17 @@
   }, {
     "iri" : "https://w3id.org/won/content#feedback",
     "baseIri" : "https://w3id.org/won/content",
-    "range" : "9",
+    "range" : "8",
     "label" : {
       "IRI-based" : "feedback",
       "undefined" : "feedback"
     },
-    "domain" : "8",
+    "domain" : "7",
     "comment" : {
       "en" : "Adds feedback to a message."
     },
     "attributes" : [ "object" ],
-    "id" : "7"
+    "id" : "6"
   }, {
     "iri" : "https://w3id.org/won/content#inResponseTo",
     "baseIri" : "https://w3id.org/won/content",
@@ -483,7 +483,7 @@
       "IRI-based" : "suggestedAtom",
       "undefined" : "suggestedAtom"
     },
-    "domain" : "8",
+    "domain" : "7",
     "comment" : {
       "en" : "Suggests to the recipient of the message to connect to the Atom linked to with this property."
     },
@@ -520,7 +520,7 @@
   }, {
     "range" : "12",
     "domain" : "11",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "20"
   }, {
     "iri" : "https://w3id.org/won/content#file",
@@ -539,7 +539,7 @@
   }, {
     "range" : "12",
     "domain" : "26",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "25"
   }, {
     "iri" : "https://w3id.org/won/content#feedbackTarget",
@@ -549,7 +549,7 @@
       "IRI-based" : "feedbackTarget",
       "undefined" : "feedbackFor"
     },
-    "domain" : "9",
+    "domain" : "8",
     "comment" : {
       "en" : "Links a Feedback to its target."
     },
@@ -572,17 +572,17 @@
   }, {
     "iri" : "https://w3id.org/won/content#binaryRating",
     "baseIri" : "https://w3id.org/won/content",
-    "range" : "6",
+    "range" : "9",
     "label" : {
       "IRI-based" : "binaryRating",
       "undefined" : "binaryRating"
     },
-    "domain" : "9",
+    "domain" : "8",
     "comment" : {
       "en" : "Specifies a binary rating for a Feedback"
     },
     "attributes" : [ "object" ],
-    "id" : "34"
+    "id" : "33"
   }, {
     "iri" : "https://w3id.org/won/content#tag",
     "baseIri" : "https://w3id.org/won/content",
@@ -619,7 +619,7 @@
       "IRI-based" : "text",
       "undefined" : "text"
     },
-    "domain" : "8",
+    "domain" : "7",
     "comment" : {
       "en" : "The textual content of a Message."
     },
@@ -647,7 +647,7 @@
       "IRI-based" : "isProcessing",
       "undefined" : "isProcessing"
     },
-    "domain" : "8",
+    "domain" : "7",
     "comment" : {
       "en" : "Set on a Message sent to or by a bot to prevent it from re-evaluating its goals in reaction to the message."
     },
@@ -656,12 +656,12 @@
   }, {
     "iri" : "https://w3id.org/won/content#feedbackEvent",
     "baseIri" : "https://w3id.org/won/content",
-    "range" : "8",
+    "range" : "7",
     "label" : {
       "IRI-based" : "feedbackEvent",
       "en" : "feedbackEvent"
     },
-    "domain" : "33",
+    "domain" : "34",
     "comment" : {
       "en" : "Links a message containing Feedback to a Connection."
     },
