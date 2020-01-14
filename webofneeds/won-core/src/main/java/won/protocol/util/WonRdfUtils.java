@@ -217,7 +217,7 @@ public class WonRdfUtils {
                 if (!it.hasNext())
                     return null;
                 wonNodeInfoBuilder.setConnectionURIPrefix(it.next().asLiteral().getString());
-                it = model.listObjectsOfProperty(confignode.asResource(), WON.eventUriPrefix);
+                it = model.listObjectsOfProperty(confignode.asResource(), WON.messageUriPrefix);
                 if (!it.hasNext())
                     return null;
                 wonNodeInfoBuilder.setEventURIPrefix(it.next().asLiteral().getString());

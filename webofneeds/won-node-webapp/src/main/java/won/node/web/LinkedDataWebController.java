@@ -288,7 +288,7 @@ public class LinkedDataWebController implements InitializingBean {
     @RequestMapping("${uri.path.page}/msg/{identifier}")
     public String showEventPage(@PathVariable(value = "identifier") String identifier, Model model,
                     HttpServletResponse response) {
-        URI eventURI = uriService.createEventURIForId(identifier);
+        URI eventURI = uriService.createMessageURIForId(identifier);
         return createDatasetResponse(model, response, eventURI);
     }
 
@@ -661,8 +661,8 @@ public class LinkedDataWebController implements InitializingBean {
         // for /resource/atom and resource/connection so that crawlers always re-fetch
         // these data
         URI requestUriAsURI = URI.create(requestUri);
-        if (uriService.isConnectionEventsURI(requestUriAsURI)
-                        || uriService.isAtomEventsURI(requestUriAsURI)
+        if (uriService.isConnectionMessagesURI(requestUriAsURI)
+                        || uriService.isAtomMessagesURI(requestUriAsURI)
                         || uriService.isAtomURI(requestUriAsURI)) {
             addMutableResourceHeaders(headers);
         } else {
@@ -1035,7 +1035,7 @@ public class LinkedDataWebController implements InitializingBean {
         return getResponseEntity(identifier, request, new EtagSupportingDataLoader<Dataset>() {
             @Override
             public URI createUriForIdentifier(final String identifier) {
-                return uriService.createEventURIForId(identifier);
+                return uriService.createMessageURIForId(identifier);
             }
 
             @Override

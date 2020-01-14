@@ -19,16 +19,17 @@ import java.util.Set;
  */
 public class WonNodeInfo {
     private String wonNodeURI;
-    private String eventURIPrefix;
+    private String messageURIPrefix;
     private String connectionURIPrefix;
     private String atomURIPrefix;
     private String atomListURI;
     private Map<String, Map<String, String>> supportedProtocolImpl;
 
-    protected WonNodeInfo(String wonNodeURI, String eventURIPrefix, String connectionURIPattern, String atomURIPattern,
+    protected WonNodeInfo(String wonNodeURI, String messageURIPrefix, String connectionURIPattern,
+                    String atomURIPattern,
                     String atomListURI, Map<String, Map<String, String>> supportedProtocolImpl) {
         this.wonNodeURI = wonNodeURI;
-        this.eventURIPrefix = eventURIPrefix;
+        this.messageURIPrefix = messageURIPrefix;
         this.connectionURIPrefix = connectionURIPattern;
         this.atomURIPrefix = atomURIPattern;
         this.atomListURI = atomListURI;
@@ -60,8 +61,8 @@ public class WonNodeInfo {
         return protocolMap.keySet();
     }
 
-    public String getEventURIPrefix() {
-        return eventURIPrefix;
+    public String getMessageURIPrefix() {
+        return messageURIPrefix;
     }
 
     public String getConnectionURIPrefix() {
@@ -74,8 +75,8 @@ public class WonNodeInfo {
 
     @Override
     public String toString() {
-        return "WonNodeInfo [wonNodeURI=" + wonNodeURI + ", eventURIPrefix=" + eventURIPrefix + ", connectionURIPrefix="
-                        + connectionURIPrefix + ", atomURIPrefix=" + atomURIPrefix + ", atomListURI=" + atomListURI
-                        + ", supportedProtocolImpl=" + supportedProtocolImpl + "]";
+        return "WonNodeInfo [wonNodeURI=" + wonNodeURI + ", messageURIPrefix=" + messageURIPrefix
+                        + ", connectionURIPrefix=" + connectionURIPrefix + ", atomURIPrefix=" + atomURIPrefix
+                        + ", atomListURI=" + atomListURI + ", supportedProtocolImpl=" + supportedProtocolImpl + "]";
     }
 }
