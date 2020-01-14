@@ -151,7 +151,6 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
                rdfs:isDefinedBy <https://w3id.org/won/message> ;
                rdfs:label "connection" .
 
-
 ###  https://w3id.org/won/message#senderSocket
 :sender rdf:type owl:ObjectProperty ;
         rdfs:domain :Message ;
@@ -159,25 +158,6 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
         rdfs:comment "Indicates the sender socket of the message."@en ;
         rdfs:isDefinedBy <https://w3id.org/won/message> ;
         rdfs:label "senderSocket" .
-
-
-###  https://w3id.org/won/message#senderAtom
-:senderAtom rdf:type owl:ObjectProperty ;
-            rdfs:domain :Message ;
-            rdfs:range won:Atom ;
-            rdfs:comment "Indicates the Atom that 'contains' the sender of the message."@en ;
-            rdfs:isDefinedBy <https://w3id.org/won/message> ;
-            rdfs:label "senderAtom" .
-
-
-###  https://w3id.org/won/message#senderNode
-:senderNode rdf:type owl:ObjectProperty ;
-            rdfs:domain :Message ;
-            rdfs:range won:Node ;
-            rdfs:comment "Indicates the WoN Node the message sender is hosted on."@en ;
-            rdfs:isDefinedBy <https://w3id.org/won/message> ;
-            rdfs:label "senderNode" .
-
 
 ###  https://w3id.org/won/message#signedGraph
 :signedGraph rdf:type owl:ObjectProperty ;
@@ -206,8 +186,6 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
              rdfs:range :EnvelopeGraph ;
              rdfs:comment "Links a message to its envelope."@en ;
              rdfs:label "envelope" .
-
-
 
 
 #################################################################
