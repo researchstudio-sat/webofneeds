@@ -149,10 +149,10 @@ This ontology has the following classes and properties.</span>
       <a href="#connectionUriPrefix" title="https://w3id.org/won/core#connectionUriPrefix">connectionUriPrefix</a>
    </li>
    <li>
-      <a href="#eventUriPrefix" title="https://w3id.org/won/core#eventUriPrefix">eventUriPrefix</a>
+      <a href="#matcherQueue" title="https://w3id.org/won/core#matcherQueue">matcherQueue</a>
    </li>
    <li>
-      <a href="#matcherQueue" title="https://w3id.org/won/core#matcherQueue">matcherQueue</a>
+      <a href="#messageUriPrefix" title="https://w3id.org/won/core#messageUriPrefix">messageUriPrefix</a>
    </li>
    <li>
       <a href="#nodeQueue" title="https://w3id.org/won/core#nodeQueue">nodeQueue</a>

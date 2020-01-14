@@ -331,19 +331,19 @@ _:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/19
 <https://w3id.org/won/core#connectionUriPrefix> <http://www.w3.org/2000/01/rdf-schema#comment> "Specifies the prefix a connection must have on the node this specification applies to."@en .
 <https://w3id.org/won/core#connectionUriPrefix> <http://www.w3.org/2000/01/rdf-schema#label> "connectionUriPrefix" .
 # 
-# https://w3id.org/won/core#eventUriPrefix
-<https://w3id.org/won/core#eventUriPrefix> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
-<https://w3id.org/won/core#eventUriPrefix> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#UriPrefixSpecification> .
-<https://w3id.org/won/core#eventUriPrefix> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
-<https://w3id.org/won/core#eventUriPrefix> <http://www.w3.org/2000/01/rdf-schema#comment> "Specifies the prefix an event must have on the node this specification applies to. This specification allows clients to generate new valid new event (message) URIs."@en .
-<https://w3id.org/won/core#eventUriPrefix> <http://www.w3.org/2000/01/rdf-schema#label> "eventUriPrefix" .
-# 
 # https://w3id.org/won/core#matcherQueue
 <https://w3id.org/won/core#matcherQueue> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
 <https://w3id.org/won/core#matcherQueue> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#WonOverActiveMq> .
 <https://w3id.org/won/core#matcherQueue> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
 <https://w3id.org/won/core#matcherQueue> <http://www.w3.org/2000/01/rdf-schema#comment> "The activeMQ queue to be used by matchers to send messages to the node."@en .
 <https://w3id.org/won/core#matcherQueue> <http://www.w3.org/2000/01/rdf-schema#label> "matcherQueue" .
+# 
+# https://w3id.org/won/core#messageUriPrefix
+<https://w3id.org/won/core#messageUriPrefix> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/core#messageUriPrefix> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#UriPrefixSpecification> .
+<https://w3id.org/won/core#messageUriPrefix> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
+<https://w3id.org/won/core#messageUriPrefix> <http://www.w3.org/2000/01/rdf-schema#comment> "Specifies the prefix a message must have on the node to which this specification applies. This specification allows clients to convert between a message URI (prefix 'wm:/') and a dereferencable https URI."@en .
+<https://w3id.org/won/core#messageUriPrefix> <http://www.w3.org/2000/01/rdf-schema#label> "messageUriPrefix" .
 # 
 # https://w3id.org/won/core#nodeQueue
 <https://w3id.org/won/core#nodeQueue> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .

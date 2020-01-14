@@ -355,20 +355,20 @@ xsd:duration rdf:type rdfs:Datatype .
                      rdfs:label "connectionUriPrefix" .
 
 
-###  https://w3id.org/won/core#eventUriPrefix
-:eventUriPrefix rdf:type owl:DatatypeProperty ;
-                rdfs:domain :UriPrefixSpecification ;
-                rdfs:range xsd:string ;
-                rdfs:comment "Specifies the prefix an event must have on the node this specification applies to. This specification allows clients to generate new valid new event (message) URIs."@en ;
-                rdfs:label "eventUriPrefix" .
-
-
 ###  https://w3id.org/won/core#matcherQueue
 :matcherQueue rdf:type owl:DatatypeProperty ;
               rdfs:domain :WonOverActiveMq ;
               rdfs:range xsd:string ;
               rdfs:comment "The activeMQ queue to be used by matchers to send messages to the node."@en ;
               rdfs:label "matcherQueue" .
+
+
+###  https://w3id.org/won/core#messageUriPrefix
+:messageUriPrefix rdf:type owl:DatatypeProperty ;
+                  rdfs:domain :UriPrefixSpecification ;
+                  rdfs:range xsd:string ;
+                  rdfs:comment "Specifies the prefix a message must have on the node to which this specification applies. This specification allows clients to convert between a message URI (prefix 'wm:/') and a dereferencable https URI."@en ;
+                  rdfs:label "messageUriPrefix" .
 
 
 ###  https://w3id.org/won/core#nodeQueue

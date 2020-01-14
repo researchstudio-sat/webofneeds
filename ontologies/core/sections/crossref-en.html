@@ -420,7 +420,7 @@ The container supports LDP paging as described here: https://github.com/research
          <dd>
             <a href="#atomUriPrefix" title="https://w3id.org/won/core#atomUriPrefix">atomUriPrefix</a>
             <sup class="type-dp" title="data property">dp</sup>, <a href="#connectionUriPrefix" title="https://w3id.org/won/core#connectionUriPrefix">connectionUriPrefix</a>
-            <sup class="type-dp" title="data property">dp</sup>, <a href="#eventUriPrefix" title="https://w3id.org/won/core#eventUriPrefix">eventUriPrefix</a>
+            <sup class="type-dp" title="data property">dp</sup>, <a href="#messageUriPrefix" title="https://w3id.org/won/core#messageUriPrefix">messageUriPrefix</a>
             <sup class="type-dp" title="data property">dp</sup>
          </dd>
          <dt>is in range of</dt>
@@ -1150,10 +1150,10 @@ The container supports LDP paging as described here: https://github.com/research
          <a href="#connectionUriPrefix" title="https://w3id.org/won/core#connectionUriPrefix">connectionUriPrefix</a>
       </li>
       <li>
-         <a href="#eventUriPrefix" title="https://w3id.org/won/core#eventUriPrefix">eventUriPrefix</a>
+         <a href="#matcherQueue" title="https://w3id.org/won/core#matcherQueue">matcherQueue</a>
       </li>
       <li>
-         <a href="#matcherQueue" title="https://w3id.org/won/core#matcherQueue">matcherQueue</a>
+         <a href="#messageUriPrefix" title="https://w3id.org/won/core#messageUriPrefix">messageUriPrefix</a>
       </li>
       <li>
          <a href="#nodeQueue" title="https://w3id.org/won/core#nodeQueue">nodeQueue</a>
@@ -1438,30 +1438,6 @@ The container supports LDP paging as described here: https://github.com/research
          </dl>
       </div>
    </div>
-   <div class="entity" id="eventUriPrefix">
-      <h3>eventUriPrefix<sup class="type-dp" title="data property">dp</sup>
-         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
-         </span>
-      </h3>
-      <p>
-         <strong>IRI:</strong> https://w3id.org/won/core#eventUriPrefix</p>
-      <div class="comment">
-         <span class="markdown">Specifies the prefix an event must have on the node this specification applies to. This specification allows clients to generate new valid new event (message) URIs.</span>
-      </div>
-      <div class="description">
-         <dl>
-            <dt>has domain</dt>
-            <dd>
-               <a href="#UriPrefixSpecification" title="https://w3id.org/won/core#UriPrefixSpecification">UriPrefixSpecification</a>
-               <sup class="type-c" title="class">c</sup>
-            </dd>
-            <dt>has range</dt>
-            <dd>
-               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#string">string</span>
-            </dd>
-         </dl>
-      </div>
-   </div>
    <div class="entity" id="matcherQueue">
       <h3>matcherQueue<sup class="type-dp" title="data property">dp</sup>
          <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
@@ -1477,6 +1453,30 @@ The container supports LDP paging as described here: https://github.com/research
             <dt>has domain</dt>
             <dd>
                <a href="#WonOverActiveMq" title="https://w3id.org/won/core#WonOverActiveMq">WonOverActiveMq</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#string">string</span>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="messageUriPrefix">
+      <h3>messageUriPrefix<sup class="type-dp" title="data property">dp</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/core#messageUriPrefix</p>
+      <div class="comment">
+         <span class="markdown">Specifies the prefix a message must have on the node to which this specification applies. This specification allows clients to convert between a message URI (prefix 'wm:/') and a dereferencable https URI.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#UriPrefixSpecification" title="https://w3id.org/won/core#UriPrefixSpecification">UriPrefixSpecification</a>
                <sup class="type-c" title="class">c</sup>
             </dd>
             <dt>has range</dt>
