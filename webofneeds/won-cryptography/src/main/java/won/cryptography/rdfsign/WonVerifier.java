@@ -8,7 +8,6 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.security.PublicKey;
 import java.security.Signature;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -24,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
+import io.ipfs.multibase.Base58;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonSignatureData;
 import won.protocol.util.Prefixer;
@@ -174,7 +174,7 @@ public class WonVerifier {
             sig.initVerify(publicKey);
             sig.update(hashValue.toByteArray());
             // Verify
-            byte[] sigBytes = Base64.getDecoder().decode(sigString);
+            byte[] sigBytes = Base58.decode(sigString);
             if (!sig.verify(sigBytes)) {
                 verificationState.setVerificationFailed(wonSignatureData.getSignatureUri(),
                                 "Failed to verify " + wonSignatureData.getSignatureUri() + " with public key "
