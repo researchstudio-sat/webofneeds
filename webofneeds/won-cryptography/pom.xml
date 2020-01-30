@@ -25,13 +25,11 @@
 	    <dependency>
 	      <groupId>com.github.multiformats</groupId>
 	      <artifactId>java-multihash</artifactId>
-	      <version>v1.2.1</version>
 	    </dependency>
   
   		<dependency>
             <groupId>com.github.multiformats</groupId>
             <artifactId>java-multibase</artifactId>
-            <version>v1.0.1</version>
         </dependency>
   
         <dependency>
