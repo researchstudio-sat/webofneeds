@@ -42,27 +42,27 @@ public class WonDefaultAccessControlRules implements AccessControlRules {
             logger.warn("received more than 1 requester webids, only using first one: ", firstWebId);
         }
         URI webId = URI.create(firstWebId);
-        if (uriService.isEventURI(resourceUri)) {
+        if (uriService.isMessageURI(resourceUri)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("checking access for event {} with webID {} ({} of {})",
                                 new Object[] { resourceUri, firstWebId, 1, requesterWebIDs.size() });
             }
             URI messageUri = uriService.toGenericMessageURI(resourceUri);
             return messageEventRepository.isReadPermittedForWebID(messageUri, webId);
-        } else if (uriService.isConnectionEventsURI(resourceUri)) {
+        } else if (uriService.isConnectionMessagesURI(resourceUri)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("checking access for connectionEvent{} with webID {} ({} of {})",
                                 new Object[] { resourceUri, firstWebId, 1, requesterWebIDs.size() });
             }
             return connectionMessageContainerRepository.isReadPermittedForWebID(
-                            uriService.getConnectionURIofConnectionEventsURI(resourceUri), webId);
-        } else if (uriService.isAtomEventsURI(resourceUri)) {
+                            uriService.getConnectionURIofConnectionMessagesURI(resourceUri), webId);
+        } else if (uriService.isAtomMessagesURI(resourceUri)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("checking access for atomEvent {} with webID {} ({} of {})",
                                 new Object[] { resourceUri, firstWebId, 1, requesterWebIDs.size() });
             }
             return this.atomMessageContainerRepository
-                            .isReadPermittedForWebID(uriService.getAtomURIofAtomEventsURI(resourceUri), webId);
+                            .isReadPermittedForWebID(uriService.getAtomURIofAtomMessagesURI(resourceUri), webId);
         } else if (uriService.isAtomUnreadURI(resourceUri)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("checking access for unreadEventsRequest {} with webID {} ({} of {})",

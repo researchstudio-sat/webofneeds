@@ -64,7 +64,7 @@ public class WonMessageUriResolver {
      * if it could not be converted
      */
     public URI toGenericMessageURI(URI localMessageUri, WonNodeInfo wonNodeInfo) {
-        return WonMessageUriHelper.toGenericMessageURI(localMessageUri, wonNodeInfo.getEventURIPrefix());
+        return WonMessageUriHelper.toGenericMessageURI(localMessageUri, wonNodeInfo.getMessageURIPrefix());
     }
 
     /**
@@ -166,6 +166,6 @@ public class WonMessageUriResolver {
      * <code>genericMessageUri</code> if it could not be converted
      */
     public URI toLocalMessageURI(URI genericMessageUri, WonNodeInfo wonNodeInfo) {
-        return WonMessageUriHelper.toLocalMessageURI(genericMessageUri, wonNodeInfo.getEventURIPrefix());
+        return WonMessageUriHelper.toLocalMessageURI(genericMessageUri, wonNodeInfo.getMessageURIPrefix());
     }
 }

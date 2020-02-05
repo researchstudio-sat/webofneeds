@@ -90,7 +90,7 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
     // prefix of a connection resource
     private String connectionResourceURIPrefix;
     // prefix of a event resource
-    private String eventResourceURIPrefix;
+    private String messageResourceURIPrefix;
     // prefix for URIs referring to real-world things
     @Value("${uri.prefix.resource}")
     private String resourceURIPrefix;
@@ -135,9 +135,9 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
     public void afterPropertiesSet() throws Exception {
         this.atomResourceURIPrefix = this.resourceURIPrefix + "/atom";
         this.connectionResourceURIPrefix = this.resourceURIPrefix + "/connection";
-        this.eventResourceURIPrefix = this.resourceURIPrefix + "/msg";
+        this.messageResourceURIPrefix = this.resourceURIPrefix + "/msg";
         logger.info("setting prefixes: atom: {}, connection: {}, event: {}", new Object[] { this.atomResourceURIPrefix,
-                        this.connectionResourceURIPrefix, this.eventResourceURIPrefix });
+                        this.connectionResourceURIPrefix, this.messageResourceURIPrefix });
     }
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
@@ -392,7 +392,7 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
         res.addProperty(WON.uriPrefixSpecification, blankNodeUriSpec);
         blankNodeUriSpec.addProperty(WON.atomUriPrefix, model.createLiteral(this.atomResourceURIPrefix));
         blankNodeUriSpec.addProperty(WON.connectionUriPrefix, model.createLiteral(this.connectionResourceURIPrefix));
-        blankNodeUriSpec.addProperty(WON.eventUriPrefix, model.createLiteral(this.eventResourceURIPrefix));
+        blankNodeUriSpec.addProperty(WON.messageUriPrefix, model.createLiteral(this.messageResourceURIPrefix));
     }
 
     /**
@@ -676,7 +676,7 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
                     throws NoSuchConnectionException {
         Slice<MessageEvent> slice = atomInformationService.listConnectionEvents(connectionUri, pageNum,
                         preferedSize, msgType);
-        return eventsToContainerPage(this.uriService.createEventsURIForConnection(connectionUri).toString(), slice,
+        return eventsToContainerPage(this.uriService.createMessagesURIForConnection(connectionUri).toString(), slice,
                         deep);
     }
 
@@ -687,7 +687,7 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
                     throws NoSuchConnectionException {
         Slice<MessageEvent> slice = atomInformationService.listConnectionEventsAfter(connectionUri, msgURI,
                         preferedSize, msgType);
-        return eventsToContainerPage(this.uriService.createEventsURIForConnection(connectionUri).toString(), slice,
+        return eventsToContainerPage(this.uriService.createMessagesURIForConnection(connectionUri).toString(), slice,
                         deep);
     }
 
@@ -698,7 +698,7 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
                     throws NoSuchConnectionException {
         Slice<MessageEvent> slice = atomInformationService.listConnectionEventsBefore(connectionUri, msgURI,
                         preferedSize, msgType);
-        return eventsToContainerPage(this.uriService.createEventsURIForConnection(connectionUri).toString(), slice,
+        return eventsToContainerPage(this.uriService.createMessagesURIForConnection(connectionUri).toString(), slice,
                         deep);
     }
 
@@ -764,7 +764,7 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
         setNsPrefixes(dataset.getDefaultModel());
         addPrefixForSpecialResources(dataset, "local", this.resourceURIPrefix);
         addPrefixForSpecialResources(dataset, "atom", this.atomResourceURIPrefix);
-        addPrefixForSpecialResources(dataset, "event", this.eventResourceURIPrefix);
+        addPrefixForSpecialResources(dataset, "event", this.messageResourceURIPrefix);
         addPrefixForSpecialResources(dataset, "conn", this.connectionResourceURIPrefix);
         return dataset;
     }
@@ -915,7 +915,7 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
     }
 
     public void setEventResourceURIPrefix(final String eventResourceURIPrefix) {
-        this.eventResourceURIPrefix = eventResourceURIPrefix;
+        this.messageResourceURIPrefix = eventResourceURIPrefix;
     }
 
     public void setResourceURIPrefix(final String resourceURIPrefix) {

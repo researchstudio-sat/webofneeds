@@ -32,7 +32,7 @@ public class URIService implements InitializingBean {
     // prefix of a connection resource
     private String connectionResourceURIPrefix;
     // prefix of an event resource
-    private String eventResourceURIPrefix;
+    private String messageResourceURIPrefix;
     // prefix of an attachment resource
     private String attachmentResourceURIPrefix;
     // prefix for URISs of RDF data
@@ -41,9 +41,9 @@ public class URIService implements InitializingBean {
     private String resourceURIPrefix;
     // prefix for human readable pages
     private String pageURIPrefix;
-    private Pattern connectionEventsPattern;
+    private Pattern connectionMessagesPattern;
     private Pattern connectionUriPattern;
-    private Pattern atomEventsPattern;
+    private Pattern atomMessagesPattern;
     private Pattern atomUnreadPattern;
     private Pattern atomUriPattern;
 
@@ -51,19 +51,19 @@ public class URIService implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         this.atomResourceURIPrefix = this.resourceURIPrefix + "/atom";
         this.connectionResourceURIPrefix = this.resourceURIPrefix + "/connection";
-        this.eventResourceURIPrefix = this.resourceURIPrefix + "/msg";
+        this.messageResourceURIPrefix = this.resourceURIPrefix + "/msg";
         this.attachmentResourceURIPrefix = this.resourceURIPrefix + "/attachment";
-        this.connectionEventsPattern = Pattern.compile(atomResourceURIPrefix + "/[a-zA-Z0-9]+/c/[a-zA-Z0-9]+/msg");
+        this.connectionMessagesPattern = Pattern.compile(atomResourceURIPrefix + "/[a-zA-Z0-9]+/c/[a-zA-Z0-9]+/msg");
         this.connectionUriPattern = Pattern.compile(atomResourceURIPrefix + "/[a-zA-Z0-9]+/c/[a-zA-Z0-9]+");
-        this.atomEventsPattern = Pattern.compile(atomResourceURIPrefix + "/[a-zA-Z0-9]+/msg");
+        this.atomMessagesPattern = Pattern.compile(atomResourceURIPrefix + "/[a-zA-Z0-9]+/msg");
         this.atomUnreadPattern = Pattern.compile(atomResourceURIPrefix + "/[a-zA-Z0-9]+/unread");
         this.atomUriPattern = Pattern.compile(atomResourceURIPrefix + "/[a-zA-Z0-9]+");
     }
 
-    public boolean isEventURI(URI toCheck) {
+    public boolean isMessageURI(URI toCheck) {
         if (toCheck == null)
             return false;
-        return toCheck.toString().startsWith(eventResourceURIPrefix);
+        return toCheck.toString().startsWith(messageResourceURIPrefix);
     }
 
     public boolean isAtomURI(URI toCheck) {
@@ -78,10 +78,10 @@ public class URIService implements InitializingBean {
         return WonUriCheckHelper.isValidConnectionURI(this.atomResourceURIPrefix, toCheck.toString());
     }
 
-    public boolean isAtomEventsURI(URI toCheck) {
+    public boolean isAtomMessagesURI(URI toCheck) {
         if (toCheck == null)
             return false;
-        Matcher m = atomEventsPattern.matcher(toCheck.toString());
+        Matcher m = atomMessagesPattern.matcher(toCheck.toString());
         return m.lookingAt();
     }
 
@@ -92,25 +92,25 @@ public class URIService implements InitializingBean {
         return m.lookingAt();
     }
 
-    public boolean isConnectionEventsURI(URI toCheck) {
+    public boolean isConnectionMessagesURI(URI toCheck) {
         if (toCheck == null)
             return false;
-        Matcher m = connectionEventsPattern.matcher(toCheck.toString());
+        Matcher m = connectionMessagesPattern.matcher(toCheck.toString());
         return m.lookingAt();
     }
 
-    public URI getConnectionURIofConnectionEventsURI(URI connectionEventsURI) {
-        if (connectionEventsURI == null)
+    public URI getConnectionURIofConnectionMessagesURI(URI connectionMessagesURI) {
+        if (connectionMessagesURI == null)
             return null;
-        Matcher m = connectionUriPattern.matcher(connectionEventsURI.toString());
+        Matcher m = connectionUriPattern.matcher(connectionMessagesURI.toString());
         m.find();
         return URI.create(m.group());
     }
 
-    public URI getAtomURIofAtomEventsURI(URI atomEventsURI) {
-        if (atomEventsURI == null)
+    public URI getAtomURIofAtomMessagesURI(URI atomMessagesURI) {
+        if (atomMessagesURI == null)
             return null;
-        Matcher m = atomUriPattern.matcher(atomEventsURI.toString());
+        Matcher m = atomUriPattern.matcher(atomMessagesURI.toString());
         m.find();
         return URI.create(m.group());
     }
@@ -198,11 +198,11 @@ public class URIService implements InitializingBean {
         return URI.create(atomURI.toString() + "/c");
     }
 
-    public URI createEventsURIForConnection(URI connURI) {
+    public URI createMessagesURIForConnection(URI connURI) {
         return URI.create(connURI.toString() + "/msg");
     }
 
-    public URI createEventURIForId(String id) {
+    public URI createMessageURIForId(String id) {
         return WonMessageUriHelper.createMessageURIForId(id);
     }
 
@@ -214,8 +214,8 @@ public class URIService implements InitializingBean {
         return atomResourceURIPrefix;
     }
 
-    public String getEventResourceURIPrefix() {
-        return eventResourceURIPrefix;
+    public String getMessageResourceURIPrefix() {
+        return messageResourceURIPrefix;
     }
 
     public void setDataURIPrefix(final String dataURIPrefix) {
@@ -252,7 +252,7 @@ public class URIService implements InitializingBean {
      * @param eventURI
      * @return
      */
-    public Long getEventIdFromEventURI(final URI eventURI) {
+    public Long getMessageIdFromMessageURI(final URI eventURI) {
         String path = eventURI.getPath();
         return new Long(path.substring(path.lastIndexOf("/") + 1));
     }
@@ -262,10 +262,10 @@ public class URIService implements InitializingBean {
     }
 
     public URI toLocalMessageURI(URI messageURI) {
-        return WonMessageUriHelper.toLocalMessageURI(messageURI, this.eventResourceURIPrefix);
+        return WonMessageUriHelper.toLocalMessageURI(messageURI, this.messageResourceURIPrefix);
     }
 
     public URI toGenericMessageURI(URI localMessageURI) {
-        return WonMessageUriHelper.toGenericMessageURI(localMessageURI, this.eventResourceURIPrefix);
+        return WonMessageUriHelper.toGenericMessageURI(localMessageURI, this.messageResourceURIPrefix);
     }
 }

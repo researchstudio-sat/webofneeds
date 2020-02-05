@@ -2,14 +2,15 @@ package won.cryptography.rdfsign;
 
 import java.io.StringWriter;
 import java.lang.invoke.MethodHandles;
+import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.apache.jena.ext.com.google.common.collect.Streams;
@@ -21,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
+import io.ipfs.multibase.Base58;
 import io.ipfs.multihash.Multihash.Type;
 import won.protocol.message.WonSignatureData;
 
@@ -130,8 +132,7 @@ public class WonSigner {
         sig.initSign(privateKey);
         sig.update(sigData.getHash().toByteArray());
         byte[] signatureBytes = sig.sign();
-        // String signature = new BASE64Encoder().encode(signatureBytes);
-        String signature = Base64.getEncoder().encodeToString(signatureBytes);
+        String signature = Base58.encode(signatureBytes);
         // Update Signature Data
         sigData.setSignature(signature);
         sigData.setSignatureMethod(privateKey.getAlgorithm().toLowerCase());

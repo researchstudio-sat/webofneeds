@@ -38,7 +38,7 @@ public class WON {
     public static final Property uriPrefixSpecification = m.createProperty(BASE_URI, "uriPrefixSpecification");
     public static final Property atomUriPrefix = m.createProperty(BASE_URI, "atomUriPrefix");
     public static final Property connectionUriPrefix = m.createProperty(BASE_URI, "connectionUriPrefix");
-    public static final Property eventUriPrefix = m.createProperty(BASE_URI, "eventUriPrefix");
+    public static final Property messageUriPrefix = m.createProperty(BASE_URI, "messageUriPrefix");
     public static final Property atomList = m.createProperty(BASE_URI, "atomList");
     public static final Property supportsWonProtocolImpl = m.createProperty(BASE_URI + "supportsWonProtocolImpl");
     public static final Resource WonOverActiveMq = m.createResource(BASE_URI + "WonOverActiveMq");
