@@ -20,11 +20,12 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
-import won.bot.framework.eventbot.filter.impl.RemoteResponseEventFilter;
 import won.bot.framework.eventbot.filter.impl.LocalResponseEventFilter;
+import won.bot.framework.eventbot.filter.impl.RemoteResponseEventFilter;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnFirstEventListener;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageUtils;
 
 /**
  * User: fkleedorfer Date: 02.02.14
@@ -72,6 +73,7 @@ public class EventBotActionUtils {
                     EventListenerContext context) {
         // create an event listener that processes the response to the wonMessage we're
         // about to send
+        checkMessageURI(outgoingMessage);
         EventListener listener = new ActionOnFirstEventListener(context,
                         LocalResponseEventFilter.forWonMessage(outgoingMessage),
                         new BaseEventBotAction(context) {
@@ -87,6 +89,14 @@ public class EventBotActionUtils {
         context.getEventBus().subscribe(SuccessResponseEvent.class, listener);
         context.getEventBus().subscribe(FailureResponseEvent.class, listener);
         return listener;
+    }
+
+    public static void checkMessageURI(final WonMessage message) {
+        if (!WonMessageUtils.isValidMessageUri(message.getMessageURIRequired())) {
+            throw new IllegalArgumentException("Specified message has invalid message URI "
+                            + message.getMessageURIRequired()
+                            + ", cannot register a response listener. Make sure to prepare the message befor passing it here.");
+        }
     }
 
     /**
@@ -105,6 +115,7 @@ public class EventBotActionUtils {
                     EventListenerContext context) {
         // create an event listener that processes the remote response to the wonMessage
         // we're about to send
+        checkMessageURI(outgoingMessage);
         EventListener listener = new ActionOnFirstEventListener(context,
                         RemoteResponseEventFilter.forWonMessage(outgoingMessage),
                         new BaseEventBotAction(context) {
