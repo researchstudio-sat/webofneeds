@@ -6,12 +6,12 @@
 <artifactId>won-parent-pom</artifactId>
 <relativePath>../won-parent-pom</relativePath>
 <groupId>at.researchstudio.sat</groupId>
-<version>0.8-SNAPSHOT</version>
+<version>0.8</version>
 </parent>
 
     <groupId>at.researchstudio.sat</groupId>
     <artifactId>won-node</artifactId>
-    <version>0.8-SNAPSHOT</version>
+    <version>0.8</version>
     <name>Node</name>
     <url>http://maven.apache.org</url>
 
