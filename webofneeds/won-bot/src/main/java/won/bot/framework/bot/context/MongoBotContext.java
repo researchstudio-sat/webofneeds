@@ -26,6 +26,9 @@ public class MongoBotContext implements BotContext {
         this.template = template;
     }
 
+    /**
+     * @deprecated
+     */
     @Override
     public Set<URI> retrieveAllAtomUris() {
         Set<URI> uris = new HashSet<>();
@@ -53,6 +56,9 @@ public class MongoBotContext implements BotContext {
         save(collectionName, "singleVal", value);
     }
 
+    /**
+     * @deprecated
+     */
     @Override
     public boolean isAtomKnown(final URI atomURI) {
         // query the field "objectList" since this is the name of the member variable of
@@ -107,7 +113,7 @@ public class MongoBotContext implements BotContext {
     /**
      * Use this method to make sure that certain collections (atom and node uris)
      * are only accessed with non-generic methods
-     *
+     * @deprecated
      * @param collectionName
      */
     private void checkValidCollectionName(String collectionName) {

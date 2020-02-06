@@ -25,7 +25,7 @@ public interface BotContext {
 
     /**
      * Check if atom uri is known among all stored atom uris
-     *
+     * @deprecated
      * @param atomURI
      * @return
      */

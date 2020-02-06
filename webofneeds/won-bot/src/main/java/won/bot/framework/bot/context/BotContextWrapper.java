@@ -41,4 +41,8 @@ public class BotContextWrapper {
     public List<URI> getAtomCreateList() {
         return getBotContext().getNamedAtomUriList(atomCreateListName);
     }
+
+    public boolean isAtomKnown(URI atomUri) {
+        return getBotContext().isInNamedAtomUriList(atomUri, atomCreateListName);
+    }
 }
