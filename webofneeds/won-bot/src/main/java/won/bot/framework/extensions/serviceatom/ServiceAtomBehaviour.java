@@ -105,7 +105,7 @@ public class ServiceAtomBehaviour extends BotBehaviour {
                                                 RdfUtils.toString(Prefixer.setPrefixes(botServiceDataset)));
                                 WonMessage createAtomMessage = createWonMessage(atomUri, botServiceDataset);
                                 createAtomMessage = ctx.getWonMessageSender().prepareMessage(createAtomMessage);
-                                EventBotActionUtils.rememberInList(ctx, atomUri, uriListName);
+                                ctx.getBotContextWrapper().rememberAtomUri(atomUri);
                                 EventBus bus = ctx.getEventBus();
                                 EventListener successCallback = event -> {
                                     logger.info(
@@ -121,7 +121,7 @@ public class ServiceAtomBehaviour extends BotBehaviour {
                                                     .getTextMessage(((FailureResponseEvent) event).getFailureMessage());
                                     logger.error("BotServiceAtom creation failed for atom URI {}, original message URI: {}",
                                                     atomUri, textMessage);
-                                    EventBotActionUtils.removeFromList(ctx, atomUri, uriListName);
+                                    ctx.getBotContextWrapper().removeAtomUri(atomUri);
                                 };
                                 EventBotActionUtils.makeAndSubscribeResponseListener(createAtomMessage, successCallback,
                                                 failureCallback, ctx);

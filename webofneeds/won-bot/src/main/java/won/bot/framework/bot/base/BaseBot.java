@@ -76,7 +76,7 @@ public abstract class BaseBot implements Bot {
 
     @Override
     public boolean knowsNodeURI(final URI wonNodeURI) {
-        return this.botContextWrapper.getBotContext().isNodeKnown(wonNodeURI);
+        return this.botContextWrapper.isNodeKnown(wonNodeURI);
     }
 
     /**
@@ -181,7 +181,7 @@ public abstract class BaseBot implements Bot {
     @Qualifier("default")
     @Autowired()
     public void setMatcherProtocolAtomServiceClient(
-            final MatcherProtocolAtomServiceClientSide matcherProtocolAtomServiceClient) {
+                    final MatcherProtocolAtomServiceClientSide matcherProtocolAtomServiceClient) {
         this.matcherProtocolAtomServiceClient = matcherProtocolAtomServiceClient;
     }
 
@@ -192,7 +192,7 @@ public abstract class BaseBot implements Bot {
     @Qualifier("default")
     @Autowired()
     public void setMatcherProtocolMatcherService(
-            final MatcherProtocolMatcherServiceImplJMSBased matcherProtocolMatcherService) {
+                    final MatcherProtocolMatcherServiceImplJMSBased matcherProtocolMatcherService) {
         this.matcherProtocolMatcherService = matcherProtocolMatcherService;
     }
 

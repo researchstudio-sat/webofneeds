@@ -29,6 +29,10 @@ public class ConnectCommandEvent extends BaseAtomSpecificEvent implements Messag
     private URI targetSocket;
     private String welcomeMessage;
 
+    /**
+     * @deprecated use
+     * {@link ConnectCommandEvent#ConnectCommandEvent(URI, URI, String)} instead
+     */
     @Deprecated
     public ConnectCommandEvent(URI atomURI, URI targetAtomURI, URI localSocket, URI targetSocket,
                     String welcomeMessage) {

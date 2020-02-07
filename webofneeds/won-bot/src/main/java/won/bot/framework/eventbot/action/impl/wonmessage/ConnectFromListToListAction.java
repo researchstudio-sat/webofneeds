@@ -95,8 +95,8 @@ public class ConnectFromListToListAction extends BaseEventBotAction {
 
     @Override
     public void doRun(Event event, EventListener executingListener) {
-        List<URI> fromAtoms = getEventListenerContext().getBotContext().getNamedAtomUriList(fromListName);
-        List<URI> toAtoms = getEventListenerContext().getBotContext().getNamedAtomUriList(toListName);
+        List<URI> fromAtoms = getEventListenerContext().getBotContext().getUriList(fromListName);
+        List<URI> toAtoms = getEventListenerContext().getBotContext().getUriList(toListName);
         logger.debug("connecting atoms from list \"{}\" ({}) to atoms from list \"{}\" ({})",
                         new Object[] { fromListName, fromAtoms, toListName, toAtoms });
         long start = System.currentTimeMillis();

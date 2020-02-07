@@ -57,7 +57,7 @@ public class TwoPhaseCommitNoVoteDeactivateAllAtomsAction extends BaseEventBotAc
                                     WON_TX.COORDINATION_MESSAGE_ABORT.getURI(), coordinationMessageUri);
             }
         }
-        Collection<URI> toDeactivate = getEventListenerContext().getBotContext().retrieveAllAtomUris();
+        Collection<URI> toDeactivate = getEventListenerContext().getBotContextWrapper().retrieveAllAtomUris();
         for (URI uri : toDeactivate) {
             getEventListenerContext().getWonMessageSender().prepareAndSendMessage(createWonMessage(uri));
             getEventListenerContext().getEventBus().publish(new AtomDeactivatedEvent(uri));

@@ -37,7 +37,7 @@ public abstract class AbstractNamedUriListFilter extends EventListenerContextAwa
         URI uri = getURIFromEvent(event);
         if (uri == null)
             return false;
-        Collection<URI> uris = getContext().getBotContext().getNamedAtomUriList(listname);
+        Collection<URI> uris = getContext().getBotContext().getUriList(listname);
         if (uris == null) {
             logger.debug("filtering by named atom uri list, but no list found with name '{}'", listname);
             return false;

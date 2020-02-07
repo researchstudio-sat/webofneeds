@@ -4,40 +4,51 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Used by a bot to remember which atoms and nodes and it knows. Additionally
  * generic Java objects can be saved and retrieved.
  */
 public interface BotContext {
+    /**
+     * @deprecated will be removed in favor of BotContextWrapper/Bot specific naming
+     * use {@link BotContextWrapper#getAtomCreateListName()} instead
+     */
+    @Deprecated
     String DEFAULT_ATOM_LIST_NAME = "atom_uris";
 
     // ===============================
     // application specific methods
     // ===============================
     /**
-     * Return a set of all known atom uris stored in all named atom uri lists
-     *
-     * @return
-     */
-    Set<URI> retrieveAllAtomUris();
-
-    /**
-     * Check if atom uri is known among all stored atom uris
-     * @deprecated
-     * @param atomURI
-     * @return
-     */
-    boolean isAtomKnown(final URI atomURI);
-
-    /**
      * removeFromObjectMap an atom uri from a named atom uri list
      *
      * @param uri
      * @param name
+     * @deprecated will be removed, use
+     * {@link BotContext#removeFromUriList(URI, String)} instead
      */
+    @Deprecated
     void removeAtomUriFromNamedAtomUriList(URI uri, String name);
+
+    /**
+     * removes Uri from given list
+     *
+     * @param uri
+     * @param name
+     */
+    void removeFromUriList(URI uri, String name);
+
+    /**
+     * add an atom uri to a named atom uri list
+     *
+     * @param uri
+     * @param name
+     * @deprecated will be removed, use
+     * {@link BotContext#appendToUriList(URI, String)} instead
+     */
+    @Deprecated
+    void appendToNamedAtomUriList(URI uri, String name);
 
     /**
      * add an atom uri to a named atom uri list
@@ -45,43 +56,40 @@ public interface BotContext {
      * @param uri
      * @param name
      */
-    void appendToNamedAtomUriList(URI uri, String name);
+    void appendToUriList(URI uri, String name);
 
+    /**
+     * @deprecated will be removed, use {@link BotContext#isInUriList(URI, String)}
+     * instead
+     */
+    @Deprecated
     boolean isInNamedAtomUriList(URI uri, String name);
+
+    /**
+     * Checks if uri is stored in the list with the given name
+     * 
+     * @param uri to check
+     * @param name list name
+     * @return true if uri is in list
+     */
+    boolean isInUriList(URI uri, String name);
 
     /**
      * loadFromObjectMap all the atom from a named atom uri list
      *
      * @param name
+     * @deprecated will be removed, use {@link BotContext#getUriList(String)}
+     * instead
      * @return
      */
+    @Deprecated
     List<URI> getNamedAtomUriList(String name);
+
+    List<URI> getUriList(String name);
 
     Object getSingleValue(String name);
 
     void setSingleValue(String name, final Serializable value);
-
-    /**
-     * check if a node uri is known among all stored nodes
-     *
-     * @param wonNodeURI
-     * @return
-     */
-    boolean isNodeKnown(final URI wonNodeURI);
-
-    /**
-     * store a node uri
-     *
-     * @param uri
-     */
-    void rememberNodeUri(final URI uri);
-
-    /**
-     * removeFromObjectMap a node uri
-     *
-     * @param uri
-     */
-    void removeNodeUri(final URI uri);
 
     // ===============================
     // generic methods

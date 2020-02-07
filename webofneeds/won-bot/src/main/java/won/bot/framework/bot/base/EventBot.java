@@ -384,6 +384,7 @@ public abstract class EventBot extends ScheduledTriggerBot {
                     // in case of a connect, it's possible the connection does not exist yet.
                     event = con.map(c -> (Event) new WonMessageSentOnConnectionEvent(c, message))
                                     .orElseGet(() -> new WonMessageSentEvent(message));
+                    break;
                 default:
                     event = new WonMessageSentEvent(message);
             }

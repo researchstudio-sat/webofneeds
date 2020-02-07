@@ -39,7 +39,6 @@ import won.bot.framework.eventbot.event.impl.factory.StartFactoryAtomCreationEve
 import won.bot.framework.eventbot.event.impl.lifecycle.InitializeEvent;
 import won.bot.framework.eventbot.filter.impl.TargetCounterFilter;
 import won.bot.framework.eventbot.listener.EventListener;
-import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnFirstEventListener;
 import won.protocol.util.WonRdfUtils;
 
@@ -62,10 +61,28 @@ public class InitFactoryAction extends AbstractCreateAtomAction {
     private final Counter atomCreationFailedCounter = new CounterImpl("atomCreationFailed");
     private final Counter messagesInFlightCounter = new CounterImpl("messagesInflightCounter");
 
+    public InitFactoryAction(EventListenerContext eventListenerContext) {
+        super(eventListenerContext);
+    }
+
+    public InitFactoryAction(EventListenerContext eventListenerContext, int targetInFlightCount, int maxInFlightCount) {
+        super(eventListenerContext);
+        this.targetInFlightCount = targetInFlightCount;
+        this.maxInFlightCount = maxInFlightCount;
+    }
+
+    /**
+     * @deprecated sockets should be set within atomDataset
+     */
+    @Deprecated
     public InitFactoryAction(EventListenerContext eventListenerContext, URI... sockets) {
         this(eventListenerContext, 30, 50, sockets);
     }
 
+    /**
+     * @deprecated sockets should be set within atomDataset
+     */
+    @Deprecated
     public InitFactoryAction(EventListenerContext eventListenerContext, int targetInFlightCount, int maxInFlightCount,
                     URI... sockets) {
         super(eventListenerContext, null, false, false, sockets);
@@ -80,8 +97,6 @@ public class InitFactoryAction extends AbstractCreateAtomAction {
             logger.error("InitFactoryAction can only handle InitializeEvent with FactoryBotContextWrapper");
             return;
         }
-        final boolean usedForTesting = this.usedForTesting;
-        final boolean doNotMatch = this.doNotMatch;
         EventListenerContext ctx = getEventListenerContext();
         EventBus bus = ctx.getEventBus();
         FactoryBotContextWrapper botContextWrapper = (FactoryBotContextWrapper) ctx.getBotContextWrapper();
@@ -121,8 +136,7 @@ public class InitFactoryAction extends AbstractCreateAtomAction {
                                         bus.publish(new FactoryAtomCreationSkippedEvent());
                                     } else {
                                         bus.publish(new CreateAtomCommandEvent(dataset,
-                                                        botContextWrapper.getFactoryListName(),
-                                                        usedForTesting, doNotMatch));
+                                                        botContextWrapper.getFactoryListName()));
                                     }
                                 }
                             }

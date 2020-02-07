@@ -33,19 +33,37 @@ import won.protocol.message.WonMessageUtils;
 public class EventBotActionUtils {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    /**
+     * @deprecated use
+     * {@link won.bot.framework.bot.context.BotContextWrapper#rememberAtomUri(URI)}
+     * instead
+     */
+    @Deprecated
     public static void rememberInList(EventListenerContext ctx, URI uri, String uriListName) {
         if (uriListName != null && uriListName.trim().length() > 0) {
-            ctx.getBotContext().appendToNamedAtomUriList(uri, uriListName);
+            ctx.getBotContext().appendToUriList(uri, uriListName);
             logger.debug("remembering atom in NamedAtomList {} ", uri);
         } else {
             throw new IllegalArgumentException("'uriListName' must not not be null or empty");
         }
     }
 
+    /**
+     * @deprecated use
+     * {@link won.bot.framework.bot.context.BotContextWrapper#rememberNodeUri(URI)}
+     * instead
+     */
+    @Deprecated
     public static void rememberInNodeListIfNamePresent(EventListenerContext ctx, URI uri) {
-        ctx.getBotContext().rememberNodeUri(uri);
+        ctx.getBotContextWrapper().rememberNodeUri(uri);
     }
 
+    /**
+     * @deprecated use
+     * {@link won.bot.framework.bot.context.BotContextWrapper#removeAtomUri(URI)}
+     * instead
+     */
+    @Deprecated
     public static void removeFromList(EventListenerContext ctx, URI uri, String uriListName) {
         if (uriListName != null && uriListName.trim().length() > 0) {
             ctx.getBotContext().removeAtomUriFromNamedAtomUriList(uri, uriListName);
