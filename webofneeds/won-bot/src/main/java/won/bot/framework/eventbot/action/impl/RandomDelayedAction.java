@@ -21,22 +21,18 @@ import won.bot.framework.eventbot.action.EventBotAction;
  */
 public class RandomDelayedAction extends DelayedDelegatingAction {
     private long minDelay;
-    private long maxDelay;
     private long intervalLength;
-    private long salt;
     private Random random;
 
     public RandomDelayedAction(final EventListenerContext eventListenerContext, final long minDelay,
                     final long maxDelay, final long salt, final EventBotAction delegate) {
         super(eventListenerContext, delegate);
         this.minDelay = minDelay;
-        this.maxDelay = maxDelay;
-        this.salt = salt;
         assert this.minDelay >= 0 : "minDelay must be >= 0";
-        assert this.maxDelay >= 0 : "maxDelay must be >= 0";
-        assert this.minDelay <= this.maxDelay : "minDelay must be <= maxDelay";
-        this.random = new Random(System.currentTimeMillis() + this.salt);
-        this.intervalLength = this.maxDelay - this.minDelay;
+        assert maxDelay >= 0 : "maxDelay must be >= 0";
+        assert this.minDelay <= maxDelay : "minDelay must be <= maxDelay";
+        this.random = new Random(System.currentTimeMillis() + salt);
+        this.intervalLength = maxDelay - this.minDelay;
     }
 
     @Override

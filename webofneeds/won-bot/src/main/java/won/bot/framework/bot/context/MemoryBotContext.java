@@ -3,7 +3,6 @@ package won.bot.framework.bot.context;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * In memory context implementation using nested maps. This is the default
@@ -17,23 +16,23 @@ public class MemoryBotContext implements BotContext {
     private Map<String, List<URI>> namedAtomUriLists = new HashMap<>();
 
     @Override
-    public Set<URI> retrieveAllAtomUris() {
-        return namedAtomUriLists.values().stream().flatMap(List::stream).collect(Collectors.toSet());
-    }
-
-    @Override
-    public synchronized boolean isAtomKnown(final URI atomURI) {
-        return retrieveAllAtomUris().contains(atomURI);
-    }
-
-    @Override
     public synchronized void removeAtomUriFromNamedAtomUriList(URI uri, String name) {
+        removeFromUriList(uri, name);
+    }
+
+    @Override
+    public synchronized void removeFromUriList(URI uri, String name) {
         List<URI> uris = namedAtomUriLists.get(name);
         uris.remove(uri);
     }
 
     @Override
     public synchronized void appendToNamedAtomUriList(final URI uri, final String name) {
+        appendToUriList(uri, name);
+    }
+
+    @Override
+    public synchronized void appendToUriList(final URI uri, final String name) {
         List<URI> uris = this.namedAtomUriLists.get(name);
         if (uris == null) {
             uris = new ArrayList<>();
@@ -44,7 +43,12 @@ public class MemoryBotContext implements BotContext {
 
     @Override
     public synchronized boolean isInNamedAtomUriList(URI uri, String name) {
-        List<URI> uris = getNamedAtomUriList(name);
+        return isInUriList(uri, name);
+    }
+
+    @Override
+    public synchronized boolean isInUriList(URI uri, String name) {
+        List<URI> uris = getUriList(name);
         for (URI tmpUri : uris) {
             if (tmpUri.equals(uri)) {
                 return true;
@@ -55,6 +59,10 @@ public class MemoryBotContext implements BotContext {
 
     @Override
     public synchronized List<URI> getNamedAtomUriList(final String name) {
+        return getUriList(name);
+    }
+
+    public synchronized List<URI> getUriList(final String name) {
         List<URI> ret = new LinkedList<>();
         List<URI> namedList = this.namedAtomUriLists.get(name);
         if (namedList != null) {
@@ -64,28 +72,13 @@ public class MemoryBotContext implements BotContext {
     }
 
     @Override
-    public Object getSingleValue(String name) {
+    public synchronized Object getSingleValue(String name) {
         return this.contextMap.get(name);
     }
 
     @Override
-    public void setSingleValue(String name, Serializable value) {
+    public synchronized void setSingleValue(String name, Serializable value) {
         contextMap.put(name, value);
-    }
-
-    @Override
-    public synchronized boolean isNodeKnown(final URI wonNodeURI) {
-        return nodeUris.contains(wonNodeURI);
-    }
-
-    @Override
-    public synchronized void rememberNodeUri(final URI uri) {
-        nodeUris.add(uri);
-    }
-
-    @Override
-    public synchronized void removeNodeUri(final URI uri) {
-        nodeUris.remove(uri);
     }
 
     private Map<String, Object> getObjectMap(String collectionName) {

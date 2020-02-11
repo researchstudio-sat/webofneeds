@@ -28,18 +28,27 @@ public class CreateAtomCommandEvent implements MessageCommandEvent {
     // the model of the atom's content
     private Dataset atomDataset;
     // the sockets the new atom should have
+    @Deprecated
     private List<URI> sockets;
     // the name of the atom uri list to save the atom uri to
+    @Deprecated
     private String uriListName = BotContext.DEFAULT_ATOM_LIST_NAME;
     // sets the UsedForTesting flag
+    @Deprecated
     private boolean usedForTesting;
     // sets the do not match flag
+    @Deprecated
     private boolean doNotMatch;
 
+    /**
+     * @deprecated flags and sockets should be set directly in the atomDataset,
+     * uriListName should not be set within an Event anymore
+     */
+    @Deprecated
     public CreateAtomCommandEvent(Dataset atomDataset, String uriListName, boolean usedForTesting, boolean doNotMatch,
                     URI... sockets) {
         this.atomDataset = atomDataset;
-        if (this.uriListName != null) {
+        if (uriListName != null) {
             this.uriListName = uriListName;
         }
         if (sockets != null && sockets.length > 0) {
@@ -51,6 +60,11 @@ public class CreateAtomCommandEvent implements MessageCommandEvent {
         this.doNotMatch = doNotMatch;
     }
 
+    /**
+     * @deprecated sockets should be set directly in the atomDataset, uriListName
+     * should not be set within an Event anymore
+     */
+    @Deprecated
     public CreateAtomCommandEvent(Dataset atomDataset, String uriListName, URI... sockets) {
         this(atomDataset, uriListName, false, false, sockets);
     }
@@ -59,10 +73,17 @@ public class CreateAtomCommandEvent implements MessageCommandEvent {
         this(atomDataset, null, null);
     }
 
+    /**
+     * @deprecated sockets should be set directly in the atomDataset
+     */
+    @Deprecated
     public CreateAtomCommandEvent(Dataset atomDataset, URI... sockets) {
         this(atomDataset, null, sockets);
     }
 
+    /**
+     * @deprecated uriListName should not be set within an Event anymore
+     */
     public CreateAtomCommandEvent(Dataset atomDataset, String uriListName) {
         this(atomDataset, uriListName, null);
     }
@@ -76,18 +97,22 @@ public class CreateAtomCommandEvent implements MessageCommandEvent {
         return atomDataset;
     }
 
+    @Deprecated
     public String getUriListName() {
         return uriListName;
     }
 
+    @Deprecated
     public List<URI> getSockets() {
         return sockets;
     }
 
+    @Deprecated
     public boolean isUsedForTesting() {
         return usedForTesting;
     }
 
+    @Deprecated
     public boolean isDoNotMatch() {
         return doNotMatch;
     }

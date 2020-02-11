@@ -18,7 +18,7 @@ public class FactoryBotContextWrapper extends BotContextWrapper {
     private final String factoryOfferToFactoryAtomMapName;
 
     public FactoryBotContextWrapper(BotContext botContext, String botName) {
-        super(botContext, botName);
+        super(botContext, botName, botName + ":factoryList");
         this.factoryListName = botName + ":factoryList";
         this.factoryInternalIdName = botName + ":factoryInternalId";
         this.factoryOfferToFactoryAtomMapName = botName + ":factoryOfferToFactoryAtomMap";
@@ -29,7 +29,7 @@ public class FactoryBotContextWrapper extends BotContextWrapper {
     }
 
     public boolean isFactoryAtom(URI uri) {
-        return getBotContext().isInNamedAtomUriList(uri, factoryListName);
+        return getBotContext().isInUriList(uri, factoryListName);
     }
 
     public URI getURIFromInternal(URI uri) {

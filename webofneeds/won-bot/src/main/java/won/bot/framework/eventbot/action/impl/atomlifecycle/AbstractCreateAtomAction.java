@@ -13,6 +13,7 @@ package won.bot.framework.eventbot.action.impl.atomlifecycle;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.jena.query.Dataset;
@@ -31,17 +32,32 @@ import won.protocol.vocabulary.WONMATCH;
  * Base class for actions that create atoms.
  */
 public abstract class AbstractCreateAtomAction extends BaseEventBotAction {
+    @Deprecated
     protected List<URI> sockets;
+    @Deprecated
     protected String uriListName;
     // indicates if the won:DoNotMatch flag is to be set
+    @Deprecated
     protected boolean usedForTesting;
+    @Deprecated
     protected boolean doNotMatch;
+
+    public AbstractCreateAtomAction(EventListenerContext eventListenerContext) {
+        super(eventListenerContext);
+        this.sockets = Collections.emptyList();
+        this.doNotMatch = false;
+        this.usedForTesting = false;
+        this.uriListName = eventListenerContext.getBotContextWrapper().getAtomCreateListName();
+    }
 
     /**
      * Creates an atom with the specified sockets. If no socket is specified, the
      * chatSocket will be used, Flag 'UsedForTesting' will be set. uriListName is
      * used from the set botContextWrapper getAtomCreateListName
+     *
+     * @deprecated sockets should be set within the dataset of the atom
      */
+    @Deprecated
     public AbstractCreateAtomAction(EventListenerContext eventListenerContext, URI... sockets) {
         this(eventListenerContext, eventListenerContext.getBotContextWrapper().getAtomCreateListName(), sockets);
     }
@@ -49,7 +65,10 @@ public abstract class AbstractCreateAtomAction extends BaseEventBotAction {
     /**
      * Creates an atom with the specified sockets. If no socket is specified, the
      * chatSocket will be used, Flag 'UsedForTesting' will be set.
+     * 
+     * @deprecated sockets should be set within the dataset of the atom
      */
+    @Deprecated
     public AbstractCreateAtomAction(EventListenerContext eventListenerContext, String uriListName, URI... sockets) {
         this(eventListenerContext, uriListName, true, false, sockets);
     }
@@ -57,7 +76,10 @@ public abstract class AbstractCreateAtomAction extends BaseEventBotAction {
     /**
      * Creates an atom with the specified sockets. If no socket is specified, the
      * chatSocket will be used.
+     * 
+     * @deprecated sockets, and flags should be set within the dataset of the atom
      */
+    @Deprecated
     public AbstractCreateAtomAction(EventListenerContext eventListenerContext, String uriListName,
                     final boolean usedForTesting, final boolean doNotMatch, URI... sockets) {
         super(eventListenerContext);
@@ -74,20 +96,38 @@ public abstract class AbstractCreateAtomAction extends BaseEventBotAction {
     }
 
     protected WonMessage createWonMessage(URI atomURI, Dataset atomDataset) throws WonMessageBuilderException {
-        return createWonMessage(atomURI, atomDataset, false, false);
+        AtomModelWrapper atomModelWrapper = new AtomModelWrapper(atomDataset);
+        RdfUtils.replaceBaseURI(atomDataset, atomURI.toString(), true);
+        return WonMessageBuilder
+                        .createAtom()
+                        .atom(atomURI)
+                        .content().dataset(atomModelWrapper.copyDatasetWithoutSysinfo())
+                        .build();
     }
 
+    /**
+     * @deprecated flags should be set within the dataset of the atom
+     */
+    @Deprecated
     protected WonMessage createWonMessage(URI atomURI, Dataset atomDataset, final boolean usedForTesting,
                     final boolean doNotMatch) {
-        return createWonMessage(atomURI, getEventListenerContext().getNodeURISource().getNodeURI(),
-                        atomDataset, usedForTesting, doNotMatch);
+        return createWonMessage(atomURI, null, atomDataset, usedForTesting, doNotMatch);
     }
 
+    /**
+     * @deprecated wonNodeUri parameter is obsolete
+     */
+    @Deprecated
     protected WonMessage createWonMessage(URI atomURI, URI wonNodeURI,
                     Dataset atomDataset) throws WonMessageBuilderException {
-        return createWonMessage(atomURI, wonNodeURI, atomDataset, usedForTesting, doNotMatch);
+        return createWonMessage(atomURI, null, atomDataset, usedForTesting, doNotMatch);
     }
 
+    /**
+     * @deprecated wonNodeUri parameter is obsolete, flags should be set within
+     * atomDataset
+     */
+    @Deprecated
     protected WonMessage createWonMessage(URI atomURI, URI wonNodeURI,
                     Dataset atomDataset, final boolean usedForTesting, final boolean doNotMatch)
                     throws WonMessageBuilderException {
@@ -107,19 +147,19 @@ public abstract class AbstractCreateAtomAction extends BaseEventBotAction {
                         .build();
     }
 
+    /**
+     * @deprecated flags should be set within atomDataset
+     */
+    @Deprecated
     public void setUsedForTesting(final boolean usedForTesting) {
         this.usedForTesting = usedForTesting;
     }
 
+    /**
+     * @deprecated flags should be set within atomDataset
+     */
+    @Deprecated
     public void setDoNotMatch(final boolean doNotMatch) {
         this.doNotMatch = doNotMatch;
     }
-    // private boolean socket(SocketType socketToCheck) {
-    // for (URI socket : sockets) {
-    // if (socket.equals(socketToCheck.getURI())) {
-    // return true;
-    // }
-    // }
-    // return false;
-    // }
 }

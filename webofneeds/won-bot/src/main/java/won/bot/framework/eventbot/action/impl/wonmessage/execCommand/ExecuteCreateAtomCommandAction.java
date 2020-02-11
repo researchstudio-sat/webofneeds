@@ -53,12 +53,13 @@ public class ExecuteCreateAtomCommandAction extends BaseEventBotAction {
     protected void doRun(Event event, EventListener executingListener) throws Exception {
         if (!(event instanceof CreateAtomCommandEvent))
             return;
+        EventListenerContext ctx = getEventListenerContext();
         CreateAtomCommandEvent createAtomCommandEvent = (CreateAtomCommandEvent) event;
         Dataset atomDataset = createAtomCommandEvent.getAtomDataset();
         List<URI> sockets = createAtomCommandEvent.getSockets();
         if (atomDataset == null) {
             logger.warn("CreateAtomCommandEvent did not contain an atom model, aborting atom creation");
-            getEventListenerContext().getEventBus().publish(new AtomCreationAbortedEvent(null, null,
+            ctx.getEventBus().publish(new AtomCreationAbortedEvent(null, null,
                             createAtomCommandEvent,
                             "CreateAtomCommandEvent did not contain an atom model, aborting atom creation"));
             return;
@@ -79,21 +80,21 @@ public class ExecuteCreateAtomCommandAction extends BaseEventBotAction {
             atomModelWrapper.addSocket(atomUriBeforeCreation.toString() + "#socket" + i, socketURI.toString());
         }
         final Dataset atomDatasetWithSockets = atomModelWrapper.copyDatasetWithoutSysinfo();
-        final URI wonNodeUri = getEventListenerContext().getNodeURISource().getNodeURI();
+        final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
         logger.debug("creating atom on won node {} with content {} ", wonNodeUri,
                         StringUtils.abbreviate(RdfUtils.toString(atomDatasetWithSockets), 150));
-        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
+        WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
         final URI atomURI = wonNodeInformationService.generateAtomURI(wonNodeUri);
         RdfUtils.renameResourceWithPrefix(atomDataset, atomResource.getURI(), atomURI.toString());
         WonMessage createAtomMessage = createWonMessage(atomURI, atomDatasetWithSockets,
                         createAtomCommandEvent.isUsedForTesting(),
                         createAtomCommandEvent.isDoNotMatch());
-        createAtomMessage = getEventListenerContext().getWonMessageSender().prepareMessage(createAtomMessage);
+        createAtomMessage = ctx.getWonMessageSender().prepareMessage(createAtomMessage);
         // remember the atom URI so we can react to success/failure responses
-        EventBotActionUtils.rememberInList(getEventListenerContext(), atomURI, createAtomCommandEvent.getUriListName());
+        ctx.getBotContextWrapper().rememberAtomUri(atomURI);
         EventListener successCallback = event12 -> {
             logger.debug("atom creation successful, new atom URI is {}", atomURI);
-            getEventListenerContext().getEventBus().publish(new CreateAtomCommandSuccessEvent(atomURI,
+            ctx.getEventBus().publish(new CreateAtomCommandSuccessEvent(atomURI,
                             atomUriBeforeCreation, createAtomCommandEvent));
         };
         EventListener failureCallback = event1 -> {
@@ -101,15 +102,14 @@ public class ExecuteCreateAtomCommandAction extends BaseEventBotAction {
                             .getTextMessage(((FailureResponseEvent) event1).getFailureMessage());
             logger.debug("atom creation failed for atom URI {}, original message URI {}: {}", new Object[] {
                             atomURI, ((FailureResponseEvent) event1).getOriginalMessageURI(), textMessage });
-            getEventListenerContext().getEventBus().publish(new CreateAtomCommandFailureEvent(atomURI,
+            ctx.getEventBus().publish(new CreateAtomCommandFailureEvent(atomURI,
                             atomUriBeforeCreation, createAtomCommandEvent, textMessage));
-            EventBotActionUtils.removeFromList(getEventListenerContext(), atomURI,
-                            createAtomCommandEvent.getUriListName());
+            ctx.getBotContextWrapper().removeAtomUri(atomURI);
         };
         EventBotActionUtils.makeAndSubscribeResponseListener(createAtomMessage, successCallback, failureCallback,
-                        getEventListenerContext());
+                        ctx);
         logger.debug("registered listeners for response to message URI {}", createAtomMessage.getMessageURI());
-        getEventListenerContext().getWonMessageSender().sendMessage(createAtomMessage);
+        ctx.getWonMessageSender().sendMessage(createAtomMessage);
         logger.debug("atom creation message sent with message URI {}", createAtomMessage.getMessageURI());
     }
 

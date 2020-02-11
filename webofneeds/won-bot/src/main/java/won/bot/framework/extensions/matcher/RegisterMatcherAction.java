@@ -14,9 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
-import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.extensions.matcher.MatcherExtensionRegisterFailedEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 
 import java.lang.invoke.MethodHandles;
@@ -44,7 +42,7 @@ public class RegisterMatcherAction extends BaseEventBotAction {
             try {
                 if (!registeredNodes.contains(wonNodeUri)) {
                     logger.debug("registering matcher on won node {}", wonNodeUri);
-                    EventBotActionUtils.rememberInNodeListIfNamePresent(getEventListenerContext(), wonNodeUri);
+                    getEventListenerContext().getBotContextWrapper().rememberNodeUri(wonNodeUri);
                     getEventListenerContext().getMatcherProtocolMatcherService().register(wonNodeUri);
                     registeredNodes.add(wonNodeUri);
                     logger.info("matcher registered on won node {}", wonNodeUri);

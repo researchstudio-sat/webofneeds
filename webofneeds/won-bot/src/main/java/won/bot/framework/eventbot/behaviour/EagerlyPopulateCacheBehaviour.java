@@ -76,9 +76,7 @@ public class EagerlyPopulateCacheBehaviour extends BotBehaviour {
 
     public void addMessageOrWholeChainToCache(WonMessage responseWonMessage, URI webID) {
         if (responseWonMessage.isPartOfDeliveryChain()) {
-            responseWonMessage.getDeliveryChain().get().getAllMessages().forEach(msg -> {
-                addMessageToCache(msg, webID);
-            });
+            responseWonMessage.getDeliveryChain().get().getAllMessages().forEach(msg -> addMessageToCache(msg, webID));
         } else {
             addMessageToCache(responseWonMessage, webID);
         }

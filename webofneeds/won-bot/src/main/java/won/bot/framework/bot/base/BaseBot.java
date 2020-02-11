@@ -71,12 +71,12 @@ public abstract class BaseBot implements Bot {
     // void act() throws Exception;
     @Override
     public boolean knowsAtomURI(final URI atomURI) {
-        return this.botContextWrapper.getBotContext().isAtomKnown(atomURI);
+        return this.botContextWrapper.isAtomKnown(atomURI);
     }
 
     @Override
     public boolean knowsNodeURI(final URI wonNodeURI) {
-        return this.botContextWrapper.getBotContext().isNodeKnown(wonNodeURI);
+        return this.botContextWrapper.isNodeKnown(wonNodeURI);
     }
 
     /**

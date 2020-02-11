@@ -10,15 +10,12 @@
  */
 package won.bot.framework.eventbot.action.impl.atomlifecycle;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import won.bot.framework.bot.context.BotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.event.AtomCreationFailedEvent;
@@ -34,29 +31,23 @@ import won.protocol.util.Prefixer;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
 /**
- * Creates an atom with the specified sockets. If no socket is specified, the
- * chatSocket will be used.
- *
- * @deprecated use CreateAtomAction instead and supply a atomDataset with
- * sockets instead
+ * Creates an atom
  */
-@Deprecated
-public class CreateAtomWithSocketsAction extends AbstractCreateAtomAction {
+public class CreateAtomAction extends AbstractCreateAtomAction {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public CreateAtomWithSocketsAction(EventListenerContext eventListenerContext, String uriListName, URI... sockets) {
-        this(eventListenerContext, uriListName, true, false, sockets);
-    }
-
-    public CreateAtomWithSocketsAction(final EventListenerContext eventListenerContext, String uriListName,
-                    final boolean usedForTesting, final boolean doNotMatch, final URI... sockets) {
-        super(eventListenerContext, uriListName, usedForTesting, doNotMatch, sockets);
+    public CreateAtomAction(EventListenerContext eventListenerContext) {
+        super(eventListenerContext);
     }
 
     @Override
     protected void doRun(Event event, EventListener executingListener) throws Exception {
         EventListenerContext ctx = getEventListenerContext();
+        BotContextWrapper botContextWrapper = ctx.getBotContextWrapper();
         if (ctx.getAtomProducer().isExhausted()) {
             logger.info("the bot's atom producer is exhausted.");
             ctx.getEventBus().publish(new AtomProducerExhaustedEvent());
@@ -77,21 +68,16 @@ public class CreateAtomWithSocketsAction extends AbstractCreateAtomAction {
         }
         final URI atomUriBeforeCreation = atomUriFromProducer;
         AtomModelWrapper atomModelWrapper = new AtomModelWrapper(atomDataset);
-        int i = 1;
-        for (URI socket : sockets) {
-            atomModelWrapper.addSocket(atomUriBeforeCreation.toString() + "#socket" + i, socket.toString());
-            i++;
-        }
         final Dataset atomDatasetWithSockets = atomModelWrapper.copyDatasetWithoutSysinfo();
         final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
         logger.debug("creating atom on won node {} with content {} ", wonNodeUri,
                         StringUtils.abbreviate(RdfUtils.toString(Prefixer.setPrefixes(atomDatasetWithSockets)), 150));
         WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
         final URI atomURI = wonNodeInformationService.generateAtomURI(wonNodeUri);
-        WonMessage createAtomMessage = createWonMessage(atomURI, wonNodeUri, atomDatasetWithSockets);
+        WonMessage createAtomMessage = createWonMessage(atomURI, atomDatasetWithSockets);
         createAtomMessage = ctx.getWonMessageSender().prepareMessage(createAtomMessage);
         // remember the atom URI so we can react to success/failure responses
-        ctx.getBotContextWrapper().rememberAtomUri(atomURI);
+        botContextWrapper.rememberAtomUri(atomURI);
         EventListener successCallback = event12 -> {
             logger.debug("atom creation successful, new atom URI is {}", atomURI);
             ctx.getEventBus().publish(new AtomCreatedEvent(atomURI, wonNodeUri, atomDatasetWithSockets, null,
@@ -102,7 +88,7 @@ public class CreateAtomWithSocketsAction extends AbstractCreateAtomAction {
                             .getTextMessage(((FailureResponseEvent) event1).getFailureMessage());
             logger.debug("atom creation failed for atom URI {}, original message URI {}: {}", new Object[] {
                             atomURI, ((FailureResponseEvent) event1).getOriginalMessageURI(), textMessage });
-            ctx.getBotContextWrapper().removeAtomUri(atomURI);
+            botContextWrapper.removeAtomUri(atomURI);
             ctx.getEventBus().publish(new AtomCreationFailedEvent(wonNodeUri, atomUriBeforeCreation));
         };
         EventBotActionUtils.makeAndSubscribeResponseListener(createAtomMessage, successCallback, failureCallback, ctx);

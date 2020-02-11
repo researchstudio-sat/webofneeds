@@ -17,28 +17,11 @@ import java.util.stream.Collectors;
  * Created by hfriedrich on 27.10.2016.
  */
 public class MongoBotContext implements BotContext {
-    protected static final String ATOM_URI_COLLECTION = "atom_uris";
-    protected static final String NODE_URI_COLLECTION = "node_uris";
     @Autowired
     private MongoTemplate template;
 
     public void setTemplate(final MongoTemplate template) {
         this.template = template;
-    }
-
-    @Override
-    public Set<URI> retrieveAllAtomUris() {
-        Set<URI> uris = new HashSet<>();
-        List<MongoContextObjectList> contextObjects = template.findAll(MongoContextObjectList.class,
-                        ATOM_URI_COLLECTION);
-        for (MongoContextObjectList mco : contextObjects) {
-            List<Object> objectList = mco.getList();
-            if (objectList != null) {
-                Set<URI> tempSet = mco.getList().stream().map(x -> (URI) x).collect(Collectors.toSet());
-                uris.addAll(tempSet);
-            }
-        }
-        return uris;
     }
 
     @Override
@@ -54,15 +37,13 @@ public class MongoBotContext implements BotContext {
     }
 
     @Override
-    public boolean isAtomKnown(final URI atomURI) {
-        // query the field "objectList" since this is the name of the member variable of
-        // MongoContextObjectList
-        Query query = new Query(Criteria.where("objectList.string").is(atomURI.toString()));
-        return null != template.find(query, String.class, ATOM_URI_COLLECTION);
+    public void removeAtomUriFromNamedAtomUriList(final URI uri, final String name) {
+        MongoContextObject obj = new MongoContextObject(uri.toString(), uri);
+        template.remove(obj, name);
     }
 
     @Override
-    public void removeAtomUriFromNamedAtomUriList(final URI uri, final String name) {
+    public void removeFromUriList(final URI uri, final String name) {
         MongoContextObject obj = new MongoContextObject(uri.toString(), uri);
         template.remove(obj, name);
     }
@@ -74,13 +55,30 @@ public class MongoBotContext implements BotContext {
     }
 
     @Override
+    public void appendToUriList(final URI uri, final String name) {
+        MongoContextObject obj = new MongoContextObject(uri.toString(), uri);
+        template.insert(obj, name);
+    }
+
+    @Override
     public List<URI> getNamedAtomUriList(final String name) {
-        return template.findAll(URI.class, name);
+        return getUriList(name);
+    }
+
+    @Override
+    public List<URI> getUriList(final String name) {
+        return template.findAll(MongoContextObject.class, name).stream()
+                        .map(mongoContextObject -> (URI) mongoContextObject.getObject()).collect(Collectors.toList());
     }
 
     @Override
     public boolean isInNamedAtomUriList(URI uri, String name) {
-        List<URI> uris = getNamedAtomUriList(name);
+        return isInUriList(uri, name);
+    }
+
+    @Override
+    public boolean isInUriList(URI uri, String name) {
+        List<URI> uris = getUriList(name);
         for (URI tmpUri : uris) {
             if (tmpUri.equals(uri)) {
                 return true;
@@ -89,32 +87,15 @@ public class MongoBotContext implements BotContext {
         return false;
     }
 
-    @Override
-    public boolean isNodeKnown(final URI wonNodeURI) {
-        return null != get(NODE_URI_COLLECTION, wonNodeURI.toString());
-    }
-
-    @Override
-    public void rememberNodeUri(final URI uri) {
-        save(NODE_URI_COLLECTION, uri.toString(), uri);
-    }
-
-    @Override
-    public void removeNodeUri(final URI uri) {
-        remove(NODE_URI_COLLECTION, uri.toString());
-    }
-
     /**
      * Use this method to make sure that certain collections (atom and node uris)
      * are only accessed with non-generic methods
-     *
+     * 
      * @param collectionName
      */
     private void checkValidCollectionName(String collectionName) {
-        if (collectionName == null || collectionName.equals(ATOM_URI_COLLECTION)
-                        || collectionName.equals(NODE_URI_COLLECTION) || collectionName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Generic collection name must be valid and not one of the following:"
-                            + " " + NODE_URI_COLLECTION + ", " + ATOM_URI_COLLECTION);
+        if (collectionName == null || collectionName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Generic collection name must not be empty");
         }
     }
 

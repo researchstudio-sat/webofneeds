@@ -30,7 +30,7 @@ public class DeactivateAllAtomsAction extends BaseEventBotAction {
 
     @Override
     protected void doRun(Event event, EventListener executingListener) throws Exception {
-        Collection<URI> toDeactivate = getEventListenerContext().getBotContext().retrieveAllAtomUris();
+        Collection<URI> toDeactivate = getEventListenerContext().getBotContextWrapper().retrieveAllAtomUris();
         for (URI uri : toDeactivate) {
             getEventListenerContext().getWonMessageSender().prepareAndSendMessage(WonMessageBuilder
                             .deactivate()

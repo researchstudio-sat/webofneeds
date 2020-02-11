@@ -31,10 +31,10 @@ public class ServiceAtomCreatedAtomRelationFilter extends EventListenerContextAw
                 WonMessage wonMessage = messageEvent.getWonMessage();
                 if (Objects.equals(wonMessage.getRecipientAtomURI(), serviceAtomUri)) {
                     URI senderAtomUri = wonMessage.getSenderAtomURI();
-                    return getContext().getBotContext().isAtomKnown(senderAtomUri);
+                    return getContext().getBotContextWrapper().isAtomKnown(senderAtomUri);
                 } else if (Objects.equals(wonMessage.getSenderAtomURI(), serviceAtomUri)) {
                     URI recipientAtomUri = wonMessage.getRecipientAtomURI();
-                    return getContext().getBotContext().isAtomKnown(recipientAtomUri);
+                    return getContext().getBotContextWrapper().isAtomKnown(recipientAtomUri);
                 }
                 return false;
             }

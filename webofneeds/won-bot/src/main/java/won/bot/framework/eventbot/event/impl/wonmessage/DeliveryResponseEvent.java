@@ -48,24 +48,15 @@ public class DeliveryResponseEvent extends BaseEvent implements ResponseEvent {
     }
 
     public Optional<URI> getConnectionURI() {
-        if (con.isPresent()) {
-            return Optional.of(con.get().getConnectionURI());
-        }
-        return Optional.empty();
+        return con.map(Connection::getConnectionURI);
     }
 
     public Optional<URI> getSocketURI() {
-        if (con.isPresent()) {
-            return Optional.of(con.get().getSocketURI());
-        }
-        return Optional.empty();
+        return con.map(Connection::getSocketURI);
     }
 
     public Optional<URI> getTargetSocketURI() {
-        if (con.isPresent()) {
-            return Optional.of(con.get().getTargetSocketURI());
-        }
-        return Optional.empty();
+        return con.map(Connection::getTargetSocketURI);
     }
 
     @Override

@@ -59,12 +59,9 @@ public class PrintWonMessageAction extends BaseEventBotAction {
         int spare = width - text.length();
         int half = spare / 2;
         int rightHalf = (half * 2) == spare ? half : half + 1;
-        StringBuilder sb = new StringBuilder();
-        sb
-                        .append(rep(' ', half))
-                        .append(text)
-                        .append(rep(' ', rightHalf));
-        return sb.toString();
+        return rep(' ', half) +
+                        text +
+                        rep(' ', rightHalf);
     };
     private BiFunction<String, Integer, String> leftLayout = (text, width) -> {
         if (text == null) {
@@ -83,7 +80,7 @@ public class PrintWonMessageAction extends BaseEventBotAction {
 
     private String rep(char character, int times) {
         StringBuilder sb = new StringBuilder();
-        Stream.generate(() -> character).limit(times).forEach(c -> sb.append(c));
+        Stream.generate(() -> character).limit(times).forEach(sb::append);
         return sb.toString();
     }
 
@@ -126,7 +123,7 @@ public class PrintWonMessageAction extends BaseEventBotAction {
                                 .append('\n');
             } else {
                 formatted
-                                .append(line.substring(0, textWidth))
+                                .append(line, 0, textWidth)
                                 .append('\n');
                 lines[i] = line.substring(textWidth);
                 i--; // process same array item again
@@ -138,11 +135,11 @@ public class PrintWonMessageAction extends BaseEventBotAction {
     private String surround(String text, char filler, char border, int padding) {
         String[] lines = text.split("\\r?\\n");
         StringBuilder formatted = new StringBuilder();
-        for (int i = 0; i < lines.length; i++) {
+        for (String line : lines) {
             formatted
                             .append(border)
                             .append(rep(filler, padding))
-                            .append(lines[i])
+                            .append(line)
                             .append(rep(filler, padding))
                             .append(border)
                             .append('\n');
