@@ -37,30 +37,38 @@ const mapStateToProps = (state, ownProps) => {
 
   const atomImage = atomUtils.getDefaultImage(atom);
   const atomLocation = atomUtils.getLocation(atom);
-  const personaUri = atomUtils.getHeldByUri(atom);
-  const persona = getIn(state, ["atoms", personaUri]);
-  const personaName = get(persona, "humanReadable");
-  const personaHolds = persona && get(persona, "holds");
-  const personaVerified =
-    personaHolds && personaHolds.includes(ownProps.atomUri);
-  const personaIdenticonSvg = atomUtils.getIdenticonSvg(persona);
-  const personaImage = atomUtils.getDefaultPersonaImage(persona);
+
+  const holderUri = atomUtils.getHeldByUri(atom);
+  const holder = getIn(state, ["atoms", holderUri]);
+  const holderName = get(holder, "humanReadable");
+  const holderHolds = holder && get(holder, "holds");
+  const holderVerified = holderHolds && holderHolds.includes(ownProps.atomUri);
+  const isHolderPersona = atomUtils.isPersona(holder);
+  const personaIdenticonSvg = atomUtils.getIdenticonSvg(holder);
+  const personaImage = atomUtils.getDefaultPersonaImage(holder);
+  const showHolderIcon = !isHolderPersona;
+  const holderUseCaseIcon = !isHolderPersona
+    ? atomUtils.getMatchedUseCaseIcon(holder)
+    : undefined;
+  const holderUseCaseIconBackground = !isHolderPersona
+    ? atomUtils.getBackground(holder)
+    : undefined;
 
   return {
     atomUri: ownProps.atomUri,
     onAtomClick: ownProps.onAtomClick,
-    showPersona: ownProps.showPersona,
+    showHolder: ownProps.showHolder,
     showSuggestions: ownProps.showSuggestions,
     currentLocation: ownProps.currentLocation,
     isDirectResponse: isDirectResponse,
     isInactive: atomUtils.isInactive(atom),
     responseToAtom,
     atom,
-    persona,
-    personaName,
-    personaVerified,
-    personaWebsite: getIn(persona, ["content", "website"]),
-    personaUri,
+    holder,
+    holderName,
+    holderVerified,
+    holderWebsite: getIn(holder, ["content", "website"]),
+    holderUri,
     atomTypeLabel: atomUtils.generateTypeLabel(atom),
     atomHasHoldableSocket: atomUtils.hasHoldableSocket(atom),
     isGroupChatEnabled: atomUtils.hasGroupSocket(atom),
@@ -68,8 +76,12 @@ const mapStateToProps = (state, ownProps) => {
     friendlyTimestamp:
       atom &&
       relativeTime(selectLastUpdateTime(state), get(atom, "lastUpdateDate")),
-    showPersonaImage: !!personaImage,
-    showPersonaIdenticon: !personaImage && !!personaIdenticonSvg,
+    showHolderIcon,
+    holderUseCaseIcon,
+    holderUseCaseIconBackground,
+    showPersonaImage: isHolderPersona && !!personaImage,
+    showPersonaIdenticon:
+      isHolderPersona && !personaImage && !!personaIdenticonSvg,
     personaIdenticonSvg,
     personaImage,
     showMap: false, //!atomImage && atomLocation, //if no image is present but a location is, we display a map instead
@@ -105,7 +117,7 @@ class WonOtherCard extends React.Component {
   constructor(props) {
     super(props);
     this.atomClick = this.atomClick.bind(this);
-    this.personaClick = this.personaClick.bind(this);
+    this.holderClick = this.holderClick.bind(this);
   }
   render() {
     const style =
@@ -188,15 +200,15 @@ class WonOtherCard extends React.Component {
     );
 
     const cardPersonaInfo =
-      this.props.showPersona &&
-      this.props.persona &&
+      this.props.showHolder &&
+      this.props.holder &&
       this.props.atomHasHoldableSocket ? (
-        <div className="card__persona clickable" onClick={this.personaClick}>
-          {this.createPersonaInfoIcon()}
-          {this.props.personaName ? (
+        <div className="card__persona clickable" onClick={this.holderClick}>
+          {this.createHolderInfoIcon()}
+          {this.props.holderName ? (
             <div className="card__persona__name">
               <span className="card__persona__name__label">
-                {this.props.personaName}
+                {this.props.holderName}
               </span>
               {this.createVerificationLabel()}
             </div>
@@ -350,7 +362,7 @@ class WonOtherCard extends React.Component {
   }
 
   createPersonaWebsite() {
-    if (this.props.personaWebsite) {
+    if (this.props.holderWebsite) {
       return (
         <React.Fragment>
           <div className="card__persona__websitelabel">Website:</div>,
@@ -358,16 +370,16 @@ class WonOtherCard extends React.Component {
             className="card__persona__websitelink"
             target="_blank"
             rel="noopener noreferrer"
-            href={this.props.personaWebsite}
+            href={this.props.holderWebsite}
           >
-            {this.props.personaWebsite}
+            {this.props.holderWebsite}
           </a>
         </React.Fragment>
       );
     }
   }
   createVerificationLabel() {
-    if (this.props.personaVerified) {
+    if (this.props.holderVerified) {
       return (
         <span
           className="card__persona__name__verification card__persona__name__verification--verified"
@@ -388,8 +400,23 @@ class WonOtherCard extends React.Component {
     }
   }
 
-  createPersonaInfoIcon() {
-    if (this.props.showPersonaIdenticon) {
+  createHolderInfoIcon() {
+    if (this.props.showHolderIcon) {
+      const style = {
+        backgroundColor: this.props.holderUseCaseIconBackground,
+      };
+
+      return (
+        <div style={style} className="card__persona__icon holderUseCaseIcon">
+          <svg className="si__serviceatomicon">
+            <use
+              xlinkHref={this.props.holderUseCaseIcon}
+              href={this.props.holderUseCaseIcon}
+            />
+          </svg>
+        </div>
+      );
+    } else if (this.props.showPersonaIdenticon) {
       return (
         <img
           className="card__persona__icon"
@@ -422,14 +449,14 @@ class WonOtherCard extends React.Component {
       this.props.routerGo("post", { postUri: this.props.atomUri });
     }
   }
-  personaClick() {
-    this.props.selectAtomTab(this.props.personaUri, "DETAIL");
-    this.props.routerGo("post", { postUri: this.props.personaUri });
+  holderClick() {
+    this.props.selectAtomTab(this.props.holderUri, "DETAIL");
+    this.props.routerGo("post", { postUri: this.props.holderUri });
   }
 }
 WonOtherCard.propTypes = {
   atomUri: PropTypes.string.isRequired,
-  showPersona: PropTypes.bool,
+  showHolder: PropTypes.bool,
   showSuggestions: PropTypes.bool,
   currentLocation: PropTypes.object,
   onAtomClick: PropTypes.func,
@@ -440,16 +467,19 @@ WonOtherCard.propTypes = {
   isInactive: PropTypes.bool,
   responseToAtom: PropTypes.object,
   atom: PropTypes.object,
-  persona: PropTypes.object,
-  personaName: PropTypes.string,
-  personaVerified: PropTypes.bool,
-  personaWebsite: PropTypes.string,
-  personaUri: PropTypes.string,
+  holder: PropTypes.object,
+  holderName: PropTypes.string,
+  holderVerified: PropTypes.bool,
+  holderWebsite: PropTypes.string,
+  holderUri: PropTypes.string,
   atomTypeLabel: PropTypes.string,
   atomHasHoldableSocket: PropTypes.bool,
   isGroupChatEnabled: PropTypes.bool,
   isChatEnabled: PropTypes.bool,
   friendlyTimestamp: PropTypes.any,
+  showHolderIcon: PropTypes.bool,
+  holderUseCaseIconBackground: PropTypes.string,
+  holderUseCaseIcon: PropTypes.string,
   showPersonaImage: PropTypes.bool,
   showPersonaIdenticon: PropTypes.bool,
   personaIdenticonSvg: PropTypes.string,

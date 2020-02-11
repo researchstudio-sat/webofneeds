@@ -249,6 +249,13 @@ export function isPersona(atom) {
   );
 }
 
+export function isServiceAtom(atom) {
+  return (
+    getIn(atom, ["content", "type"]) &&
+    getIn(atom, ["content", "type"]).has(won.BOT.ServiceAtomCompacted)
+  );
+}
+
 export function isAtom(atom) {
   return (
     getIn(atom, ["content", "type"]) &&

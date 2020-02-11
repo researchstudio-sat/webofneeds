@@ -55,10 +55,11 @@ const mapStateToProps = (state, ownProps) => {
   );
   const heldByUri = atomUtils.getHeldByUri(atom);
   const isHeld = atomUtils.isHeld(atom);
-  const persona = getIn(state, ["atoms", heldByUri]);
-  const personaHasReviewSocket = atomUtils.hasReviewSocket(persona);
-  const personaAggregateRating =
-    personaHasReviewSocket && getIn(persona, ["rating", "aggregateRating"]);
+  const holder = getIn(state, ["atoms", heldByUri]);
+  const isHeldByServiceAtom = atomUtils.isServiceAtom(holder);
+  const holderHasReviewSocket = atomUtils.hasReviewSocket(holder);
+  const holderAggregateRating =
+    holderHasReviewSocket && getIn(holder, ["rating", "aggregateRating"]);
 
   const suggestions =
     isOwned &&
@@ -94,9 +95,10 @@ const mapStateToProps = (state, ownProps) => {
     isHoldable: atomUtils.hasHoldableSocket(atom),
     isOwned,
     isHeld,
-    personaHasReviewSocket,
-    personaAggregateRatingString:
-      personaAggregateRating && personaAggregateRating.toFixed(1),
+    isHeldByServiceAtom,
+    holderHasReviewSocket,
+    holderAggregateRatingString:
+      holderAggregateRating && holderAggregateRating.toFixed(1),
     hasHeldAtoms: heldAtomsSize > 0,
     hasUnreadSuggestedConnectionsInHeldAtoms,
     heldAtomsSize,
@@ -181,10 +183,12 @@ class WonAtomMenu extends React.Component {
           )}
           onClick={() => this.selectTab("HELDBY")}
         >
-          <span className="atom-menu__item__label">Persona</span>
-          {this.props.personaAggregateRatingString && (
+          <span className="atom-menu__item__label">
+            {this.props.isHeldByServiceAtom ? "Holder" : "Persona"}
+          </span>
+          {this.props.holderAggregateRatingString && (
             <span className="atom-menu__item__rating">
-              (★ {this.props.personaAggregateRatingString + ")"}
+              (★ {this.props.holderAggregateRatingString + ")"}
             </span>
           )}
         </div>
@@ -199,9 +203,9 @@ class WonAtomMenu extends React.Component {
           onClick={() => this.selectTab("HELDBY")}
         >
           <span className="atom-menu__item__label">+ Persona</span>
-          {this.props.personaAggregateRatingString && (
+          {this.props.holderAggregateRatingString && (
             <span className="atom-menu__item__rating">
-              {"(★ " + this.props.personaAggregateRatingString + ")"}
+              {"(★ " + this.props.holderAggregateRatingString + ")"}
             </span>
           )}
         </div>
@@ -378,8 +382,9 @@ WonAtomMenu.propTypes = {
   isHoldable: PropTypes.bool,
   isOwned: PropTypes.bool,
   isHeld: PropTypes.bool,
-  personaHasReviewSocket: PropTypes.bool,
-  personaAggregateRatingString: PropTypes.string,
+  isHeldByServiceAtom: PropTypes.bool,
+  holderHasReviewSocket: PropTypes.bool,
+  holderAggregateRatingString: PropTypes.string,
   hasHeldAtoms: PropTypes.bool,
   hasUnreadSuggestedConnectionsInHeldAtoms: PropTypes.bool,
   heldAtomsSize: PropTypes.number,

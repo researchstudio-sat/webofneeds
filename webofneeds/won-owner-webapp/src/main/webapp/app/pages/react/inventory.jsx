@@ -175,7 +175,7 @@ class PageInventory extends React.Component {
                   atomUris={this.props.sortedOwnedUnassignedAtomUriArray}
                   currentLocation={this.props.currentLocation}
                   showSuggestions={true}
-                  showPersona={true}
+                  showHolder={true}
                   showCreate={true}
                   showCreatePersona={true}
                 />
@@ -211,7 +211,7 @@ class PageInventory extends React.Component {
                       atomUris={this.props.sortedOwnedInactiveAtomUriArray}
                       currentLocation={this.props.currentLocation}
                       showSuggestions={false}
-                      showPersona={false}
+                      showHolder={false}
                       showCreate={false}
                     />
                   </div>

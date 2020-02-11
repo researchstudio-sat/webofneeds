@@ -91,6 +91,7 @@ public class Prefixer {
         prefixMapping.setNsPrefix(WXREVIEW.DEFAULT_PREFIX, WXREVIEW.BASE_URI);
         prefixMapping.setNsPrefix(WXBUDDY.DEFAULT_PREFIX, WXBUDDY.BASE_URI);
         prefixMapping.setNsPrefix("demo", "https://w3id.org/won/ext/demo#");
+        prefixMapping.setNsPrefix("wx-bot", "https://w3id.org/won/ext/bot#");
         prefixMapping.setNsPrefix("wxs", "https://w3id.org/won/ext/schema#");
         prefixMapping.setNsPrefix("pogo", "https://w3id.org/won/ext/pogo#");
         prefixMapping.setNsPrefix(CERT.DEFAULT_PREFIX, CERT.getURI());

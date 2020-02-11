@@ -50,7 +50,7 @@ class WonAtomContentHolds extends React.Component {
                 atomUri={atomUri}
                 currentLocation={this.props.currentLocation}
                 showSuggestions={this.props.isOwned}
-                showPersona={false}
+                showHolder={false}
               />
             );
           })

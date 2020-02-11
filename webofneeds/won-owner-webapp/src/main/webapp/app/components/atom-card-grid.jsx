@@ -19,7 +19,7 @@ const mapDispatchToProps = dispatch => {
 class WonAtomCardGrid extends React.Component {
   render() {
     const atomUris = this.props.atomUris;
-    const showPersona = this.props.showPersona;
+    const showHolder = this.props.showHolder;
     const showSuggestions = this.props.showSuggestions;
     const showCreate = this.props.showCreate;
     const showCreatePersona = this.props.showCreatePersona;
@@ -33,7 +33,7 @@ class WonAtomCardGrid extends React.Component {
           <WonAtomCard
             key={atomUri}
             atomUri={atomUri}
-            showPersona={showPersona}
+            showHolder={showHolder}
             showSuggestions={showSuggestions}
             currentLocation={currentLocation}
           />
@@ -77,7 +77,7 @@ class WonAtomCardGrid extends React.Component {
 
 WonAtomCardGrid.propTypes = {
   atomUris: PropTypes.arrayOf(PropTypes.string).isRequired,
-  showPersona: PropTypes.bool,
+  showHolder: PropTypes.bool,
   showSuggestions: PropTypes.bool,
   showCreate: PropTypes.bool,
   showCreatePersona: PropTypes.bool,

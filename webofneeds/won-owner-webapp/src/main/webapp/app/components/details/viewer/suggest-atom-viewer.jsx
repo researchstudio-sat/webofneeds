@@ -140,7 +140,7 @@ class WonSuggestAtomViewer extends React.Component {
             <WonAtomCard
               atomUri={this.props.content}
               currentLocation={this.props.currentLocation}
-              showPersona={true}
+              showHolder={true}
               showSuggestions={false}
             />
             {this.props.showActions ? (

@@ -204,7 +204,7 @@ class PageOverview extends React.Component {
                           )}
                           currentLocation={this.props.currentLocation}
                           showSuggestions={false}
-                          showPersona={true}
+                          showHolder={true}
                           showCreate={false}
                         />
                       </div>
@@ -247,7 +247,7 @@ class PageOverview extends React.Component {
                         atomUris={this.getSortedVisibleOtherAtomUriArray()}
                         currentLocation={this.props.currentLocation}
                         showSuggestions={false}
-                        showPersona={true}
+                        showHolder={true}
                         showCreate={false}
                       />
                     </div>

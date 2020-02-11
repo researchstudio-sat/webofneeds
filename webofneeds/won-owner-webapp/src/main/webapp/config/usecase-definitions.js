@@ -14,6 +14,7 @@ import { lunchPlan } from "./usecases/uc-lunch.js";
 import { cyclingPlan } from "./usecases/uc-cycling.js";
 import { pokemonGoRaid } from "./usecases/uc-pokemon.js";
 import { persona } from "./usecases/uc-persona.js";
+import { serviceAtom } from "./usecases/uc-serviceatom.js";
 
 /**
  * USE CASE REQUIREMENTS
@@ -76,6 +77,7 @@ export const hiddenUseCases = {
   lunchPlan: lunchPlan,
   cyclingPlan: cyclingPlan,
   persona: persona,
+  serviceAtom: serviceAtom,
 };
 
 // generate a list of usecases from all use case groups
