@@ -59,6 +59,7 @@ export const details = {
   title: basicDetails.title,
   personaName: basicDetails.personaName,
   description: basicDetails.description,
+  termsOfService: basicDetails.termsOfService,
   tags: basicDetails.tags,
   searchString: basicDetails.searchString,
 

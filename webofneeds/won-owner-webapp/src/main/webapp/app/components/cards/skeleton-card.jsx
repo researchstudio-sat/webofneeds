@@ -95,7 +95,7 @@ class WonSkeletonCard extends React.Component {
       );
 
     const cardPersona =
-      this.props.showPersona && !this.props.atomLoaded ? (
+      this.props.showHolder && !this.props.atomLoaded ? (
         <div className="card__nopersona" />
       ) : (
         undefined
@@ -145,7 +145,7 @@ class WonSkeletonCard extends React.Component {
 }
 WonSkeletonCard.propTypes = {
   atomUri: PropTypes.string.isRequired,
-  showPersona: PropTypes.bool,
+  showHolder: PropTypes.bool,
   showSuggestions: PropTypes.bool,
   atomLoaded: PropTypes.bool,
   atomLoading: PropTypes.bool,

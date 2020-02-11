@@ -155,6 +155,30 @@ export const description = {
   },
 };
 
+export const termsOfService = {
+  identifier: "termsOfService",
+  label: "Terms Of Service",
+  icon: "#ico36_detail_description",
+  placeholder: "Enter Description...",
+  component: WonDescriptionPicker,
+  viewerComponent: WonDescriptionViewer,
+  parseToRDF: function({ value }) {
+    const val = value ? value : undefined;
+    return {
+      "s:termsOfService": val,
+    };
+  },
+  parseFromRDF: function(jsonLDImm) {
+    return jsonLdUtils.parseFrom(jsonLDImm, ["s:termsOfService"], "xsd:string");
+  },
+  generateHumanReadable: function({ value, includeLabel }) {
+    if (value) {
+      return includeLabel ? this.label + ": " + value : value;
+    }
+    return undefined;
+  },
+};
+
 export const tags = {
   identifier: "tags",
   label: "Tags",

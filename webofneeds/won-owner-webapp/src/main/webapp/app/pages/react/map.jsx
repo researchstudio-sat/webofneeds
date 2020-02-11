@@ -385,7 +385,7 @@ class PageMap extends React.Component {
                 <WonAtomCardGrid
                   atomUris={this.props.sortedVisibleAtomUriArray}
                   currentLocation={this.props.lastWhatsAroundLocation}
-                  showPersona={true}
+                  showHolder={true}
                   showSuggestions={false}
                   showCreate={false}
                 />

@@ -35,7 +35,7 @@ const mapStateToProps = (state, ownProps) => {
   if (isSkeleton) {
     return {
       atomUri: ownProps.atomUri,
-      showPersona: ownProps.showPersona,
+      showHolder: ownProps.showHolder,
       showSuggestions: ownProps.showSuggestions,
       currentLocation: ownProps.currentLocation,
       onAtomClick: ownProps.onAtomClick,
@@ -47,7 +47,7 @@ const mapStateToProps = (state, ownProps) => {
   } else if (isPersona) {
     return {
       atomUri: ownProps.atomUri,
-      showPersona: ownProps.showPersona,
+      showHolder: ownProps.showHolder,
       showSuggestions: ownProps.showSuggestions,
       currentLocation: ownProps.currentLocation,
       onAtomClick: ownProps.onAtomClick,
@@ -59,7 +59,7 @@ const mapStateToProps = (state, ownProps) => {
   } else if (isPokemonRaid) {
     return {
       atomUri: ownProps.atomUri,
-      showPersona: ownProps.showPersona,
+      showHolder: ownProps.showHolder,
       showSuggestions: ownProps.showSuggestions,
       currentLocation: ownProps.currentLocation,
       onAtomClick: ownProps.onAtomClick,
@@ -71,7 +71,7 @@ const mapStateToProps = (state, ownProps) => {
   } else {
     return {
       atomUri: ownProps.atomUri,
-      showPersona: ownProps.showPersona,
+      showHolder: ownProps.showHolder,
       showSuggestions: ownProps.showSuggestions,
       currentLocation: ownProps.currentLocation,
       onAtomClick: ownProps.onAtomClick,
@@ -91,7 +91,7 @@ class WonAtomCard extends React.Component {
         <WonSkeletonCard
           atomUri={this.props.atomUri}
           showSuggestions={this.props.showSuggestions}
-          showPersona={this.props.showPersona}
+          showHolder={this.props.showHolder}
         />
       );
     } else if (this.props.isPersona) {
@@ -113,7 +113,7 @@ class WonAtomCard extends React.Component {
         <WonOtherCard
           atomUri={this.props.atomUri}
           showSuggestions={this.props.showSuggestions}
-          showPersona={this.props.showPersona}
+          showHolder={this.props.showHolder}
           onAtomClick={this.props.onAtomClick}
           currentLocation={this.props.currentLocation}
         />
@@ -126,7 +126,7 @@ class WonAtomCard extends React.Component {
 
 WonAtomCard.propTypes = {
   atomUri: PropTypes.string.isRequired,
-  showPersona: PropTypes.bool,
+  showHolder: PropTypes.bool,
   showSuggestions: PropTypes.bool,
   currentLocation: PropTypes.object,
   onAtomClick: PropTypes.func,

@@ -1,7 +1,7 @@
 import Immutable from "immutable";
 import won from "../../won-es6.js";
 import * as useCaseUtils from "../../usecase-utils.js";
-import { isPersona, isSearchAtom } from "../../redux/utils/atom-utils.js";
+import * as atomUtils from "../../redux/utils/atom-utils.js";
 import {
   generateHexColor,
   generateRgbColorArray,
@@ -118,7 +118,7 @@ export function parseMetaAtom(metaAtom) {
         eventObjectUri
           .replace(won.WON.baseUri, won.WON.prefix + ":")
           .replace(won.WONCON.baseUri, won.WONCON.prefix + ":")
-          .replace("https://w3id.org/won/ext/demo#", "demo:")
+          .replace(won.DEMO.baseUri, won.DEMO.prefix + ":")
           .replace(won.WONMATCH.baseUri, won.WONMATCH.prefix + ":")
           .replace("http://schema.org/", "s:")
       )
@@ -131,7 +131,8 @@ export function parseMetaAtom(metaAtom) {
         type
           .replace(won.WON.baseUri, won.WON.prefix + ":")
           .replace(won.WONCON.baseUri, won.WONCON.prefix + ":")
-          .replace("https://w3id.org/won/ext/demo#", "demo:")
+          .replace(won.DEMO.baseUri, won.DEMO.prefix + ":")
+          .replace(won.BOT.baseUri, won.BOT.prefix + ":")
           .replace(won.WONMATCH.baseUri, won.WONMATCH.prefix + ":")
           .replace("http://schema.org/", "s:")
       )
@@ -142,7 +143,7 @@ export function parseMetaAtom(metaAtom) {
       flag
         .replace(won.WON.baseUri, won.WON.prefix + ":")
         .replace(won.WONCON.baseUri, won.WONCON.prefix + ":")
-        .replace("https://w3id.org/won/ext/demo#", "demo:")
+        .replace(won.DEMO.baseUri, won.DEMO.prefix + ":")
         .replace(won.WONMATCH.baseUri, won.WONMATCH.prefix + ":")
         .replace("http://schema.org/", "s:")
     );
@@ -389,9 +390,9 @@ function getHumanReadableStringFromAtom(atomImm, detailsToParse) {
     const title = atomContent && atomContent.get("title");
     const seeksTitle = seeksBranch && seeksBranch.get("title");
 
-    if (isPersona(atomImm)) {
+    if (atomUtils.isServiceAtom(atomImm) || atomUtils.isPersona(atomImm)) {
       return getIn(atomImm, ["content", "personaName"]);
-    } else if (isSearchAtom(atomImm)) {
+    } else if (atomUtils.isSearchAtom(atomImm)) {
       const searchString = getIn(atomImm, ["content", "searchString"]);
 
       if (searchString) {

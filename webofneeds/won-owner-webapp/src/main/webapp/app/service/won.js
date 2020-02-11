@@ -259,6 +259,16 @@ won.HOLD.HoldableSocketCompacted = won.HOLD.prefix + ":HoldableSocket";
 won.HOLD.HolderSocket = won.HOLD.baseUri + "HolderSocket";
 won.HOLD.HolderSocketCompacted = won.HOLD.prefix + ":HolderSocket";
 
+won.BOT = {};
+won.BOT.baseUri = "https://w3id.org/won/ext/bot#";
+won.BOT.prefix = "wx-bot";
+won.BOT.ServiceAtom = won.BOT.baseUri + "ServiceAtom";
+won.BOT.ServiceAtomCompacted = won.BOT.prefix + ":ServiceAtom";
+
+won.DEMO = {};
+won.DEMO.baseUri = "https://w3id.org/won/ext/demo#";
+won.DEMO.prefix = "demo";
+
 won.CHAT = {};
 won.CHAT.baseUri = "https://w3id.org/won/ext/chat#";
 won.CHAT.prefix = "chat";
@@ -669,7 +679,8 @@ won.minimalContext = {
   won: "https://w3id.org/won/core#",
   con: won.WONCON.baseUri,
   match: won.WONMATCH.baseUri,
-  demo: "https://w3id.org/won/ext/demo#",
+  demo: won.DEMO.baseUri,
+  "wx-bot": won.BOT.baseUri,
   hold: won.HOLD.baseUri,
   chat: won.CHAT.baseUri,
   group: won.GROUP.baseUri,

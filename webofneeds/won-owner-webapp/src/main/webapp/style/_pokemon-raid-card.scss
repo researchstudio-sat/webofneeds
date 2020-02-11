@@ -130,6 +130,19 @@ pokemon-raid-card {
       border-radius: 100%;
       @include fixed-square(var(--persona-height));
       background: white;
+
+      &.holderUseCaseIcon {
+        background: unset;
+        padding: 0.2rem;
+        box-sizing: border-box;
+
+        & .si__serviceatomicon {
+          display: flex;
+          --local-primary: #{$won-secondary-text-color};
+          height: 100%;
+          width: 100%;
+        }
+      }
     }
 
     &__name {

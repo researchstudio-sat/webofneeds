@@ -7,7 +7,7 @@ import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 export const booksSearch = {
   identifier: "booksSearch",
   label: "Find a Book",
-  icon: "#ico36_plus",
+  icon: "#ico36_book",
   draft: {
     ...mergeInEmptyDraft({
       content: {

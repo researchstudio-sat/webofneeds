@@ -146,7 +146,7 @@ class WonAtomContentSuggestions extends React.Component {
                 atomUri={get(suggestion, "targetAtomUri")}
                 currentLocation={this.props.currentLocation}
                 showSuggestions={false}
-                showPersona={true}
+                showHolder={true}
                 onAtomClick={() => {
                   this.viewSuggestion(suggestion);
                 }}

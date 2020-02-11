@@ -29,18 +29,20 @@ export const isbn = {
 export const author = {
   identifier: "author",
   label: "Author",
-  icon: "#ico36_detail_title",
+  icon: "#ico36_detail_person",
   placeholder: "Author Name",
   component: WonTitlePicker,
   viewerComponent: WonTitleViewer,
   parseToRDF: function({ value }) {
-    const val = value ? value : undefined;
-    return {
-      "s:author": {
-        "@type": "s:Person",
-        "s:name": val,
-      },
-    };
+    if (value) {
+      return {
+        "s:author": {
+          "@type": "s:Person",
+          "s:name": value,
+        },
+      };
+    }
+    return undefined;
   },
   parseFromRDF: function(jsonLDImm) {
     return jsonLdUtils.parseFrom(

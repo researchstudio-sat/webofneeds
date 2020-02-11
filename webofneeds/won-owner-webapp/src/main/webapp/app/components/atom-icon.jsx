@@ -26,12 +26,22 @@ const mapStateToProps = (state, ownProps) => {
     : undefined;
 
   // Icons/Images of the AtomHolder
-  const personaUri = atomUtils.getHeldByUri(atom);
-  const persona = getIn(state, ["atoms", personaUri]);
-  const holderImage = atomUtils.getDefaultPersonaImage(persona);
-  const holderIdenticonSvg = atomUtils.getIdenticonSvg(persona);
-  const showHolderIdenticon = !holderImage && !!holderIdenticonSvg;
-  const showHolderImage = holderImage;
+  const holderUri = atomUtils.getHeldByUri(atom);
+  const holder = getIn(state, ["atoms", holderUri]);
+  const holderImage = atomUtils.getDefaultPersonaImage(holder);
+  const holderIdenticonSvg = atomUtils.getIdenticonSvg(holder);
+  const isHolderPersona = atomUtils.isPersona(holder);
+  const showHolderIdenticon =
+    isHolderPersona && !holderImage && !!holderIdenticonSvg;
+  const showHolderImage = isHolderPersona && holderImage;
+  const showHolderIcon = !isHolderPersona;
+
+  const holderUseCaseIcon = !isHolderPersona
+    ? atomUtils.getMatchedUseCaseIcon(holder)
+    : undefined;
+  const holderUseCaseIconBackground = !isHolderPersona
+    ? atomUtils.getBackground(holder)
+    : undefined;
 
   const process = get(state, "process");
   return {
@@ -43,11 +53,14 @@ const mapStateToProps = (state, ownProps) => {
     atomFailedToLoad:
       atom && processUtils.hasAtomFailedToLoad(process, ownProps.atomUri),
     useCaseIcon,
+    holderUseCaseIcon,
     useCaseIconBackground,
     showIdenticon: !image && !!identiconSvg,
     showImage: !!image,
     identiconSvg,
     image,
+    holderUseCaseIconBackground,
+    showHolderIcon,
     showHolderIdenticon,
     showHolderImage,
     holderImage,
@@ -80,6 +93,21 @@ class WonAtomIcon extends React.Component {
             this.props.holderImage.get("data")
           }
         />
+      );
+    } else if (this.props.showHolderIcon) {
+      const style = {
+        backgroundColor: this.props.holderUseCaseIconBackground,
+      };
+
+      holderIcon = (
+        <div style={style} className="holderIcon holderUseCaseIcon">
+          <svg className="si__serviceatomicon">
+            <use
+              xlinkHref={this.props.holderUseCaseIcon}
+              href={this.props.holderUseCaseIcon}
+            />
+          </svg>
+        </div>
       );
     }
 
@@ -149,10 +177,13 @@ WonAtomIcon.propTypes = {
   atomFailedToLoad: PropTypes.bool,
   useCaseIcon: PropTypes.string,
   useCaseIconBackground: PropTypes.string,
+  holderUseCaseIconBackground: PropTypes.string,
   showIdenticon: PropTypes.bool,
   showImage: PropTypes.bool,
   identiconSvg: PropTypes.string,
   image: PropTypes.object,
+  holderUseCaseIcon: PropTypes.string,
+  showHolderIcon: PropTypes.bool,
   showHolderIdenticon: PropTypes.bool,
   showHolderImage: PropTypes.bool,
   holderImage: PropTypes.object,
