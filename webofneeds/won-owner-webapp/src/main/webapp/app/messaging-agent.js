@@ -29,85 +29,12 @@ const ECHO_STRING = "e";
 
 export function runMessagingAgent(redux) {
   /**
-   * The messageProcessingArray encapsulates all currently implemented message handlers with their respective redux dispatch
+   * The messageProcessingArray and responseProcessingArray encapsulates all currently implemented message handlers with their respective redux dispatch
    * events, to process another message you add another anonymous function that checks on the necessary message properties/values
    * and dispatches the needed redux action/event
    */
-  const messageProcessingArray = [
-    function(message) {
-      if (message.isCreateMessage()) {
-        console.debug(
-          "Received Create Message: ",
-          message,
-          "... no further handling for now"
-        );
-        return true;
-      }
-      return false;
-    },
-    function(message) {
-      /* Other clients or matcher initiated stuff: */
-      if (message.isAtomHintMessage()) {
-        console.debug(
-          "Received AtomHint Message: ",
-          message,
-          "... no further handling for now"
-        );
-        /*redux.dispatch(
-          actionCreators.messages__processAtomHintMessage(message)
-        );
-        return true;*/
-      }
-      return false;
-    },
-    function(message) {
-      /* Other clients or matcher initiated stuff: */
-      if (message.isSocketHintMessage()) {
-        console.debug("Received SocketHint Message: ", message);
-        redux.dispatch(
-          actionCreators.messages__processSocketHintMessage(message)
-        );
-        return true;
-      }
-      return false;
-    },
-    function(message) {
-      if (message.isConnectMessage()) {
-        console.debug("Received Connect Message: ", message);
-        redux.dispatch(actionCreators.messages__processConnectMessage(message));
-        return true;
-      }
-      return false;
-    },
-    function(message) {
-      if (message.isConnectionMessage()) {
-        console.debug("Received Connection Message: ", message);
-        redux.dispatch(
-          actionCreators.messages__processConnectionMessage(message)
-        );
-        return true;
-      }
-      return false;
-    },
-    function(message) {
-      if (message.isChangeNotificationMessage()) {
-        console.debug("Received ChangeNotification Message: ", message);
-        redux.dispatch(
-          actionCreators.messages__processChangeNotificationMessage(message)
-        );
-        return true;
-      }
-      return false;
-    },
-    function(message) {
-      if (message.isFromExternal() && message.isCloseMessage()) {
-        //TODO: isFromExternal was removed, adapt accordingly
-        console.debug("Received Close Message: ", message);
-        redux.dispatch(actionCreators.messages__close__success(message));
-        return true;
-      }
-      return false;
-    },
+
+  const responseProcessingArray = [
     function(message) {
       if (
         message.isFromSystem() &&
@@ -238,6 +165,104 @@ export function runMessagingAgent(redux) {
       return false;
     },
     function(message) {
+      if (message.isResponseToDeleteMessage()) {
+        if (message.isSuccessResponse()) {
+          redux.dispatch(actionCreators.atoms__delete(message.getAtom()));
+          return true;
+        }
+      }
+      return false;
+    },
+    function(message) {
+      if (message.isResponseToHintFeedbackMessage()) {
+        if (message.isSuccessResponse()) {
+          //Rating successful
+          //TODO?
+          return true;
+        } else {
+          //Failed Rating
+          //TODO?
+          return false;
+        }
+      }
+    },
+  ];
+
+  const messageProcessingArray = [
+    function(message) {
+      if (message.isCreateMessage()) {
+        console.debug(
+          "Received Create Message: ",
+          message,
+          "... no further handling for now"
+        );
+        return true;
+      }
+      return false;
+    },
+    function(message) {
+      /* Other clients or matcher initiated stuff: */
+      if (message.isAtomHintMessage()) {
+        console.debug(
+          "Received AtomHint Message: ",
+          message,
+          "... no further handling for now"
+        );
+        /*redux.dispatch(
+          actionCreators.messages__processAtomHintMessage(message)
+        );
+        return true;*/
+      }
+      return false;
+    },
+    function(message) {
+      /* Other clients or matcher initiated stuff: */
+      if (message.isSocketHintMessage()) {
+        console.debug("Received SocketHint Message: ", message);
+        redux.dispatch(
+          actionCreators.messages__processSocketHintMessage(message)
+        );
+        return true;
+      }
+      return false;
+    },
+    function(message) {
+      if (message.isConnectMessage()) {
+        console.debug("Received Connect Message: ", message);
+        redux.dispatch(actionCreators.messages__processConnectMessage(message));
+        return true;
+      }
+      return false;
+    },
+    function(message) {
+      if (message.isConnectionMessage()) {
+        console.debug("Received Connection Message: ", message);
+        redux.dispatch(
+          actionCreators.messages__processConnectionMessage(message)
+        );
+        return true;
+      }
+      return false;
+    },
+    function(message) {
+      if (message.isChangeNotificationMessage()) {
+        console.debug("Received ChangeNotification Message: ", message);
+        redux.dispatch(
+          actionCreators.messages__processChangeNotificationMessage(message)
+        );
+        return true;
+      }
+      return false;
+    },
+    function(message) {
+      if (message.isCloseMessage()) {
+        console.debug("Received Close Message: ", message);
+        redux.dispatch(actionCreators.messages__close__success(message));
+        return true;
+      }
+      return false;
+    },
+    function(message) {
       if (message.isFromSystem() && message.isAtomMessage()) {
         redux.dispatch(actionCreators.messages__atomMessageReceived(message));
         return true;
@@ -276,28 +301,6 @@ export function runMessagingAgent(redux) {
       }
       return false;
     },
-    function(message) {
-      if (message.isResponseToDeleteMessage()) {
-        if (message.isSuccessResponse()) {
-          redux.dispatch(actionCreators.atoms__delete(message.getAtom()));
-          return true;
-        }
-      }
-      return false;
-    },
-    function(message) {
-      if (message.isResponseToHintFeedbackMessage()) {
-        if (message.isSuccessResponse()) {
-          //Rating successful
-          //TODO?
-          return true;
-        } else {
-          //Failed Rating
-          //TODO?
-          return false;
-        }
-      }
-    },
   ];
 
   function onMessage(receivedMsg) {
@@ -320,36 +323,105 @@ export function runMessagingAgent(redux) {
       }
     });
 
-    console.debug("WS received Msgs:", messages);
+    const promiseArray = [];
 
     for (const msgUri in messages) {
       const msg = messages[msgUri];
-      won.wonMessageFromJsonLd(msg).then(message => {
-        console.debug(
-          "      WS received: ",
-          message.getMessageType(),
-          " - ",
-          message.getMessageUri(),
-          " - ",
-          message.getTextMessage()
-        );
-        won.addJsonLdData(msg);
-
-        let messageProcessed = false;
-
-        //process message
-        for (const messageProcessor of messageProcessingArray) {
-          messageProcessed = messageProcessed || messageProcessor(message);
-        }
-
-        if (!messageProcessed) {
-          console.warn(
-            "MESSAGE WASN'T PROCESSED DUE TO MISSING HANDLER FOR ITS TYPE: ",
-            message
-          );
-        }
-      });
+      promiseArray.push(
+        won
+          .addJsonLdData(msg)
+          .catch(error => {
+            console.error(
+              "Could add JsonLdData of msg: ",
+              msg,
+              "error: ",
+              error
+            );
+          })
+          .then(() => won.wonMessageFromJsonLd(msg))
+          .catch(error => {
+            console.error(
+              "Could not parse msg to wonMessage: ",
+              msg,
+              "error: ",
+              error
+            );
+          })
+      );
     }
+
+    Promise.all(promiseArray)
+      .then(wonMessages => {
+        console.debug("## Received WS-Message:", wonMessages);
+
+        wonMessages
+          .filter(
+            wonMessage =>
+              wonMessage &&
+              !wonMessage.isSuccessResponse() &&
+              !wonMessage.isFailureResponse()
+          )
+          .map(wonMessage => {
+            console.debug(
+              "##### Processing Message: ",
+              wonMessage.getMessageType(),
+              " - ",
+              wonMessage.getMessageUri(),
+              " - ",
+              wonMessage.getTextMessage(),
+              " -- ",
+              wonMessage
+            );
+            let messageProcessed = false;
+
+            //process message
+            for (const messageProcessor of messageProcessingArray) {
+              messageProcessed =
+                messageProcessed || messageProcessor(wonMessage);
+            }
+
+            if (!messageProcessed) {
+              console.warn(
+                "MESSAGE WASN'T PROCESSED DUE TO MISSING HANDLER FOR ITS TYPE: ",
+                wonMessage
+              );
+            }
+          });
+
+        wonMessages
+          .filter(
+            wonMessage =>
+              wonMessage &&
+              (wonMessage.isSuccessResponse() || wonMessage.isFailureResponse())
+          )
+          .map(wonMessage => {
+            console.debug(
+              "##### Processing Response Message: ",
+              wonMessage.getMessageType(),
+              " - ",
+              wonMessage.getMessageUri(),
+              " -- ",
+              wonMessage
+            );
+            let messageProcessed = false;
+
+            //process message
+            for (const messageProcessor of responseProcessingArray) {
+              messageProcessed =
+                messageProcessed || messageProcessor(wonMessage);
+            }
+
+            if (!messageProcessed) {
+              console.warn(
+                "MESSAGE WASN'T PROCESSED DUE TO MISSING HANDLER FOR ITS TYPE: ",
+                wonMessage
+              );
+            }
+          });
+      })
+      .catch(error => {
+        console.warn("MESSAGE WASN'T PROCESSED DUE TO PARSING ERROR ", error);
+      });
   }
 
   /* TODOs

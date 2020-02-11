@@ -1144,7 +1144,10 @@ import won from "./won.js";
 
     return (
       won
-        .getNode(senderSocketUri.split("#")[0] + "/c", fetchParams)
+        .deleteDocumentFromStore(senderSocketUri.split("#")[0] + "/c")
+        .then(() =>
+          won.getNode(senderSocketUri.split("#")[0] + "/c", fetchParams)
+        )
         //add the eventUris
         .then(jsonResp => jsonResp.member)
         .then(connUris => {

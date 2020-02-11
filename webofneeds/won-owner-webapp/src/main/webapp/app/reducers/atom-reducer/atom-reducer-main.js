@@ -510,10 +510,12 @@ export default function(allAtomsInState = initialState, action = {}) {
         }
         return allAtomsInState;
       } else {
-        const atomByConnectionUri = getAtomByConnectionUri(
-          allAtomsInState,
-          connUri
-        );
+        const atomByConnectionUri =
+          getAtomByConnectionUri(allAtomsInState, connUri) ||
+          get(
+            allAtomsInState,
+            generalSelectors.getAtomUriBySocketUri(wonMessage.getTargetSocket())
+          );
 
         if (atomByConnectionUri) {
           // connection has been stored as match first
