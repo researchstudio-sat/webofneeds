@@ -204,13 +204,13 @@ class WonSuggestAtomViewer extends React.Component {
 
   getInfoText() {
     if (this.props.isLoading) {
-      return "Loading Suggestion...";
+      return "Loading Atom...";
     } else if (this.props.toLoad) {
-      return "Suggestion marked toLoad";
+      return "Atom marked toLoad";
     } else if (this.props.failedToLoad) {
-      return "Failed to load Suggestion";
+      return "Failed to load Atom";
     } else if (atomUtils.isInactive(this.props.suggestedPost)) {
-      return "This Suggestion is inactive";
+      return "This Atom is inactive";
     }
 
     if (atomUtils.isPersona(this.props.suggestedPost)) {
@@ -218,7 +218,7 @@ class WonSuggestAtomViewer extends React.Component {
         ? "This is one of your Personas"
         : "This is someone elses Persona";
     } else if (this.props.hasConnectionBetweenPosts) {
-      return "Already established a Connection with this Suggestion";
+      return "Already established a Connection with this Atom";
     } else if (this.props.isSuggestedOwned) {
       return "This is one of your own Atoms";
     } else if (this.props.hasChatSocket && !this.props.hasGroupSocket) {
