@@ -353,6 +353,12 @@ won:Node rdf:type owl:Class .
                            rdfs:isDefinedBy <https://w3id.org/won/message> ;
                            rdfs:label "ChangeNotificationMessage" .
 
+###  https://w3id.org/won/message#AtomCreatedNotificationMessage
+:AtomCreatedNotificationMessage rdf:type owl:NamedIndividual ,
+                                    :MessageType ;
+                           rdfs:comment "Type of message sent from a WoN Node to indicate that an Atom has been created."@en ;
+                           rdfs:isDefinedBy <https://w3id.org/won/message> ;
+                           rdfs:label "AtomCreatedNotificationMessage" .
 
 ###  https://w3id.org/won/message#CloseMessage
 :CloseMessage rdf:type owl:NamedIndividual ,
