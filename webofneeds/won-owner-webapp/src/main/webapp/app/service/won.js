@@ -305,7 +305,6 @@ won.EVENT.ACTIVATE_ATOM_SENT = "ActivateAtomSentEvent";
 won.EVENT.ACTIVATE_ATOM_RECEIVED = "ActivateAtomReceivedEvent";
 won.EVENT.CLOSE_ATOM_SENT = "DeactivateSentEvent";
 won.EVENT.CLOSE_ATOM_RECEIVED = "Deactivate_Received_Event";
-won.EVENT.OPEN_RECEIVED = "OpenReceivedEvent";
 won.EVENT.CLOSE_SENT = "CloseSentEvent";
 won.EVENT.CLOSE_RECEIVED = "CloseReceivedEvent";
 won.EVENT.CONNECTION_MESSAGE_RECEIVED = "ConnectionMessageReceivedEvent";
@@ -399,7 +398,6 @@ won.messageType2EventType = {
   [won.WONMSG.socketHintMessageCompacted]: won.EVENT.HINT_RECEIVED,
   [won.WONMSG.connectMessageCompacted]: won.EVENT.CONNECT_RECEIVED,
   [won.WONMSG.connectSentMessageCompacted]: won.EVENT.CONNECT_SENT,
-  [won.WONMSG.openMessageCompacted]: won.EVENT.OPEN_RECEIVED,
   [won.WONMSG.closeMessageCompacted]: won.EVENT.CLOSE_RECEIVED,
   [won.WONMSG.closeAtomMessageCompacted]: won.EVENT.CLOSE_ATOM_RECEIVED,
   [won.WONMSG.connectionMessageCompacted]:
@@ -546,11 +544,6 @@ won.getLocalName = function(uriOrQname) {
     return uriOrQname.substring(pos + 1);
   }
   return uriOrQname;
-};
-
-won.isJsonLdKeyword = function(propertyName) {
-  if (propertyName == null || typeof propertyName !== "string") return false;
-  return propertyName.indexOf("@") == 0;
 };
 
 won.reportError = function(message) {
@@ -1323,8 +1316,8 @@ WonMessage.prototype = {
   getContentGraphs: function() {
     // walk over graphs, copy all graphs to result that are content graphs
     // we identify content graphs by finding their URI in messageStructure.containedContent
-    return this.graphs.filter(
-      graph => this.contentGraphUris.indexOf(graph["@id"]) > -1
+    return this.graphs.filter(graph =>
+      this.contentGraphUris.includes(graph["@id"])
     );
   },
   getContentGraphsAsJsonLD: function() {
@@ -1363,13 +1356,13 @@ WonMessage.prototype = {
     return this.getProperty("https://w3id.org/won/content#text");
   },
   getHintScore: function() {
-    return this.getProperty("https://w3id.org/won/core#hintScore");
+    return this.getProperty("https://w3id.org/won/message#hintScore");
   },
   getHintTargetAtom: function() {
-    return this.getProperty("https://w3id.org/won/core#hintTargetAtom");
+    return this.getProperty("https://w3id.org/won/message#hintTargetAtom");
   },
   getHintTargetSocket: function() {
-    return this.getProperty("https://w3id.org/won/core#hintTargetSocket");
+    return this.getProperty("https://w3id.org/won/message#hintTargetSocket");
   },
   getIsResponseTo: function() {
     return this.getProperty("https://w3id.org/won/message#respondingTo");
@@ -1788,33 +1781,60 @@ WonMessage.prototype = {
       );
     }
     this.messageStructure = nodes[unreferencedEnvelopes[0]]; //set the pointer to the outermost envelope
+
+    if (!this.messageStructure) {
+      this.messageStructure = {};
+
+      const contentGraphs = this.graphs.filter(
+        graph =>
+          !(
+            graph["@type"].includes(
+              "https://w3id.org/won/message#EnvelopeGraph"
+            ) ||
+            graph["@type"].includes("https://w3id.org/won/message#Signature")
+          )
+      );
+
+      if (contentGraphs.length == 1) {
+        this.messageStructure.messageUri = contentGraphs[0]["@id"];
+        this.messageStructure.messageDirection = contentGraphs[0]["@type"];
+        contentGraphUris.push(this.messageStructure.messageUri);
+      }
+    }
+
     this.contentGraphUris = contentGraphUris;
   },
 
   __isEnvelopeGraph: graph => {
     let graphUri = graph["@id"];
     let graphData = graph["@graph"];
+    let graphType = graph["@type"];
     return (
-      graphData &&
-      graphData.some(
-        resource =>
-          resource["@id"] === graphUri &&
-          resource["@type"].includes(
-            "https://w3id.org/won/message#EnvelopeGraph"
-          )
-      )
+      (graphType &&
+        graphType.includes["https://w3id.org/won/message#EnvelopeGraph"]) ||
+      (graphData &&
+        graphData.some(
+          resource =>
+            resource["@id"] === graphUri &&
+            resource["@type"].includes(
+              "https://w3id.org/won/message#EnvelopeGraph"
+            )
+        ))
     );
   },
   __isSignatureGraph: graph => {
     let graphUri = graph["@id"];
     let graphData = graph["@graph"];
+    let graphType = graph["@type"];
     return (
-      graphData &&
-      graphData.some(
-        resource =>
-          resource["@id"] === graphUri &&
-          resource["@type"].includes("https://w3id.org/won/message#Signature")
-      )
+      (graphType &&
+        graphType.includes["https://w3id.org/won/message#Signature"]) ||
+      (graphData &&
+        graphData.some(
+          resource =>
+            resource["@id"] === graphUri &&
+            resource["@type"].includes("https://w3id.org/won/message#Signature")
+        ))
     );
   },
   __getContainedEnvelopeUris: graph => {
