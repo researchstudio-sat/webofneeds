@@ -149,26 +149,28 @@ class WonPetrinetState extends React.Component {
       if (this.props.hasEnabledTransitions) {
         enabledTransitionsElement = this.props.enabledTransitionsArray.map(
           (enabledTransition, index) => {
-            <div
-              className="ps__active__enabledTransition"
-              key={index + "-" + enabledTransition}
-            >
-              <div className="ps__active__enabledTransition__label">
-                {generateSimpleTransitionLabel(enabledTransition)}
-              </div>
-              {/*The button is labelled 'send' at the moment because we jsut send the transition but not claim it right away*/}
-              <button
-                className="ps__active__enabledTransition__button won-button--filled thin red"
-                disabled={
-                  this.props.multiSelectType || this.props.petriNetDataDirty
-                }
-                onClick={() => {
-                  this.sendClaim(enabledTransition);
-                }}
+            return (
+              <div
+                className="ps__active__enabledTransition"
+                key={index + "-" + enabledTransition}
               >
-                Claim
-              </button>
-            </div>;
+                <div className="ps__active__enabledTransition__label">
+                  {generateSimpleTransitionLabel(enabledTransition)}
+                </div>
+                {/*The button is labelled 'send' at the moment because we jsut send the transition but not claim it right away*/}
+                <button
+                  className="ps__active__enabledTransition__button won-button--filled thin red"
+                  disabled={
+                    this.props.multiSelectType || this.props.petriNetDataDirty
+                  }
+                  onClick={() => {
+                    this.sendClaim(enabledTransition);
+                  }}
+                >
+                  Claim
+                </button>
+              </div>
+            );
           }
         );
       } else {
