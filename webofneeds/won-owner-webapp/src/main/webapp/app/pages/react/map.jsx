@@ -170,8 +170,8 @@ class PageMap extends React.Component {
         const parsedResults = scrubSearchResults(searchResults, value);
 
         this.setState({
-          searchText: value,
-          searchResults: parsedResults,
+          searchResults: parsedResults || [],
+          lastWhatsAroundLocationName: value,
         });
       });
     }, 700);
@@ -434,11 +434,13 @@ class PageMap extends React.Component {
 
   updateWhatsAroundSuggestions({ value }) {
     const whatsAroundInputValue = value && value.trim();
-    if (!!whatsAroundInputValue && whatsAroundInputValue.length > 0) {
-      this.startSearch(value);
-    } else {
-      this.resetWhatsAroundInput();
-    }
+    this.setState({ searchText: value }, () => {
+      if (!!whatsAroundInputValue && whatsAroundInputValue.length > 0) {
+        this.startSearch(value);
+      } else {
+        this.resetWhatsAroundInput();
+      }
+    });
   }
 
   resetWhatsAroundInput() {
