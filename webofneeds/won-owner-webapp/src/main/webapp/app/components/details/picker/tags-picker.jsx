@@ -19,6 +19,7 @@ export default class WonTagsPicker extends React.Component {
           value={this.state.tags}
           onChange={this.changeTags.bind(this)}
           onlyUnique={true}
+          addOnBlur={true}
           renderInput={this.autosizingRenderInput}
           addKeys={[13, 188]}
         />

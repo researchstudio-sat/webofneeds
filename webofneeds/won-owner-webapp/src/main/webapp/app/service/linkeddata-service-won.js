@@ -1172,15 +1172,7 @@ import won from "./won.js";
   won.getWonMessage = (msgUri, fetchParams) => {
     return won
       .getRawEvent(msgUri, fetchParams)
-      .then(rawEvent => {
-        console.debug(
-          "getWonMessage of rawEvent(uri:",
-          msgUri,
-          "): ",
-          rawEvent
-        );
-        return won.wonMessageFromJsonLd(rawEvent);
-      })
+      .then(rawEvent => won.wonMessageFromJsonLd(rawEvent))
       .catch(e => {
         const msg = "Failed to get wonMessage " + msgUri + ".";
         e.message += msg;
