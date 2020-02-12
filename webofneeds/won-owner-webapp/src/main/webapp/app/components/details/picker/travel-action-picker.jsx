@@ -352,7 +352,7 @@ export default class WonTravelActionPicker extends React.Component {
   doneTypingFrom({ value }) {
     this.setState({ searchFrom: value }, () => {
       if (value) {
-        this.startSearchFrom();
+        this.startSearchFrom(value);
       } else {
         this.resetFromSearchResults();
       }
@@ -362,7 +362,7 @@ export default class WonTravelActionPicker extends React.Component {
   doneTypingTo({ value }) {
     this.setState({ searchTo: value }, () => {
       if (value) {
-        this.startSearchTo();
+        this.startSearchTo(value);
       } else {
         this.resetToSearchResults();
       }
