@@ -1,4 +1,4 @@
-@import "sizing-utils";
+@import "detail-viewer-mixin";
 
 won-title-viewer {
   @include won-detail-viewer("titlev");

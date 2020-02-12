@@ -1,5 +1,6 @@
 @import "won-config";
 @import "sizing-utils";
+@import "detail-viewer-mixin";
 
 pokemon-raidboss-viewer {
   @include won-detail-viewer("prbv");

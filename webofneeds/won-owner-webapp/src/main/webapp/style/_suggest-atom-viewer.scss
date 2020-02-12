@@ -1,5 +1,6 @@
 @import "sizing-utils";
 @import "won-config";
+@import "detail-viewer-mixin";
 
 won-suggest-atom-viewer {
   @include won-detail-viewer("suggestatomv");

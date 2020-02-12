@@ -1,0 +1,62 @@
+@import "won-config";
+
+/**
+ * Use this mixin on *-viewer elements to support uniform styling of the viewer-components
+ */
+@mixin won-detail-viewer($prefix) {
+  display: grid;
+  grid-auto-flow: row;
+  width: 100%;
+  box-sizing: border-box;
+
+  &.won-in-message {
+    grid-gap: 0.25rem;
+
+    .#{$prefix}__header {
+      display: flex;
+      align-items: center;
+      color: $won-subtitle-gray;
+
+      &__icon {
+        @include fixed-square($contentInfoHeaderIconSize);
+        --local-primary: #{$won-subtitle-gray};
+        margin-right: 0.25rem;
+      }
+
+      &__label {
+        font-size: $smallFontSize;
+      }
+    }
+    .#{$prefix}__content {
+      box-sizing: border-box;
+    }
+  }
+
+  &:not(.won-in-message) {
+    grid-gap: 0.25rem;
+
+    .#{$prefix}__header {
+      display: flex;
+      align-items: center;
+      color: $won-primary-text-color;
+
+      &__icon {
+        @include fixed-square($contentInfoHeaderIconSize);
+        --local-primary: #{$won-primary-text-color};
+        margin-right: 0.25rem;
+      }
+
+      &__label {
+        font-size: $normalFontSize;
+        font-weight: bold;
+      }
+    }
+
+    .#{$prefix}__content {
+      @media (min-width: $responsivenessBreakPoint) {
+        padding-left: calc(0.25rem + #{$contentInfoHeaderIconSize});
+      }
+      box-sizing: border-box;
+    }
+  }
+}

@@ -1,5 +1,6 @@
 @import "won-config";
 @import "sizing-utils";
+@import "detail-viewer-mixin";
 
 won-petrinet-viewer {
   @include won-detail-viewer("petrinetv");

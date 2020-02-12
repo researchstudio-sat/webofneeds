@@ -1,5 +1,6 @@
 @import "won-config";
 @import "sizing-utils";
+@import "detail-viewer-mixin";
 
 pokemon-gym-viewer {
   @include won-detail-viewer("pgv");
