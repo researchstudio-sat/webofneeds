@@ -135,17 +135,17 @@ export function parseConnection(jsonldConnection) {
     console.debug(
       "connectionState contains multiple states, initiating the f*gly workaround..."
     );
-    const stateArray = parsedConnection.data.state.filter(
+    const stateList = parsedConnection.data.state.filter(
       item => item !== parsedConnection.data.previousState
     );
-    if (stateArray && stateArray.size == 1) {
-      parsedConnection.data.state = stateArray[0];
+    if (stateList && stateList.size == 1) {
+      parsedConnection.data.state = stateList.first();
     } else {
       console.debug(
         "Can't parse the connection(",
         parsedConnection.data.uri,
         ") due to multiple connectionStates stored: ",
-        stateArray
+        stateList
       );
     }
   }
