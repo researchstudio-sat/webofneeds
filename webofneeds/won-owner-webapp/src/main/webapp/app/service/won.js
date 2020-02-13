@@ -293,51 +293,6 @@ won.BUDDY.prefix = "buddy";
 won.BUDDY.BuddySocket = won.BUDDY.baseUri + "BuddySocket";
 won.BUDDY.BuddySocketCompacted = won.BUDDY.prefix + ":BuddySocket";
 
-won.EVENT = {};
-won.EVENT.WON_MESSAGE_RECEIVED = "WonMessageReceived";
-won.EVENT.WON_SEARCH_RECEIVED = "SearchReceivedEvent";
-won.EVENT.ATOM_CREATED = "AtomCreatedEvent";
-won.EVENT.HINT_RECEIVED = "HintReceivedEvent";
-won.EVENT.CONNECT_SENT = "ConnectSentEvent";
-won.EVENT.CONNECT_RECEIVED = "ConnectReceivedEvent";
-won.EVENT.OPEN_SENT = "OpenSentEvent";
-won.EVENT.ACTIVATE_ATOM_SENT = "ActivateAtomSentEvent";
-won.EVENT.ACTIVATE_ATOM_RECEIVED = "ActivateAtomReceivedEvent";
-won.EVENT.CLOSE_ATOM_SENT = "DeactivateSentEvent";
-won.EVENT.CLOSE_ATOM_RECEIVED = "Deactivate_Received_Event";
-won.EVENT.CLOSE_SENT = "CloseSentEvent";
-won.EVENT.CLOSE_RECEIVED = "CloseReceivedEvent";
-won.EVENT.CONNECTION_MESSAGE_RECEIVED = "ConnectionMessageReceivedEvent";
-won.EVENT.CONNECTION_MESSAGE_SENT = "ConnectionMessageSentEvent";
-won.EVENT.ATOM_STATE_MESSAGE_RECEIVED = "AtomStateMessageReceivedEvent";
-won.EVENT.NO_CONNECTION = "NoConnectionErrorEvent";
-won.EVENT.NOT_TRANSMITTED = "NotTransmittedErrorEvent";
-won.EVENT.USER_SIGNED_IN = "UserSignedInEvent";
-won.EVENT.USER_SIGNED_OUT = "UserSignedOutEvent";
-//TODO: this temp event, before we find out how to deal with session timeout
-won.EVENT.WEBSOCKET_CLOSED_UNEXPECTED = "WebSocketClosedUnexpected";
-
-won.EVENT.APPSTATE_CURRENT_ATOM_CHANGED = "AppState.CurrentAtomChangedEvent";
-
-//keys for things that can be shown in the GUI as 'unread'
-won.UNREAD = {};
-won.UNREAD.TYPE = {};
-won.UNREAD.TYPE.CREATED = "created";
-won.UNREAD.TYPE.HINT = "hint";
-won.UNREAD.TYPE.MESSAGE = "message";
-won.UNREAD.TYPE.CONNECT = "connect";
-won.UNREAD.TYPE.CLOSE = "close";
-won.UNREAD.TYPES = [
-  won.UNREAD.TYPE.CREATED,
-  won.UNREAD.TYPE.HINT,
-  won.UNREAD.TYPE.MESSAGE,
-  won.UNREAD.TYPE.CONNECT,
-  won.UNREAD.TYPE.CLOSE,
-];
-won.UNREAD.GROUP = {};
-won.UNREAD.GROUP.ALL = "all";
-won.UNREAD.GROUP.BYATOM = "byAtom";
-
 //Code definitions as enum in RestStatusResponse.java
 won.RESPONSECODE = Object.freeze({
   USER_CREATED: 1200,
@@ -381,30 +336,6 @@ won.PRIVATEID_NOT_FOUND_ERROR = Object.freeze({
   code: 666,
   message: "invalid privateId",
 });
-
-/**
- * type of latest message for a connection in a given state.
- */
-won.cnctState2MessageType = Object.freeze({
-  [won.WON.Suggested]: won.WONMSG.socketHintMessage,
-  [won.WON.RequestReceived]: won.WONMSG.connectMessage,
-  [won.WON.RequestSent]: won.WONMSG.connectSentMessage,
-  [won.WON.Connected]: won.WONMSG.connectionMessage,
-  [won.WON.Closed]: won.WONMSG.closeMessage,
-});
-
-won.messageType2EventType = {
-  [won.WONMSG.atomHintMessageCompacted]: won.EVENT.HINT_RECEIVED,
-  [won.WONMSG.socketHintMessageCompacted]: won.EVENT.HINT_RECEIVED,
-  [won.WONMSG.connectMessageCompacted]: won.EVENT.CONNECT_RECEIVED,
-  [won.WONMSG.connectSentMessageCompacted]: won.EVENT.CONNECT_SENT,
-  [won.WONMSG.closeMessageCompacted]: won.EVENT.CLOSE_RECEIVED,
-  [won.WONMSG.closeAtomMessageCompacted]: won.EVENT.CLOSE_ATOM_RECEIVED,
-  [won.WONMSG.connectionMessageCompacted]:
-    won.EVENT.CONNECTION_MESSAGE_RECEIVED,
-  [won.WONMSG.atomStateMessageCompacted]: won.EVENT.ATOM_STATE_MESSAGE_RECEIVED,
-  [won.WONMSG.errorMessageCompacted]: won.EVENT.NOT_TRANSMITTED,
-};
 
 //UTILS
 won.WONMSG.uriPlaceholder = Object.freeze({
