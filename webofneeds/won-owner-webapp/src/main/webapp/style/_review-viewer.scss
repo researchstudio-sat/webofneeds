@@ -1,5 +1,4 @@
-@import "won-config";
-@import "sizing-utils";
+@import "detail-viewer-mixin";
 
 won-review-viewer {
   @include won-detail-viewer("reviewv");

@@ -76,7 +76,7 @@ export function buildCloseMessage(socketUri, targetSocketUri) {
       .ownerDirection()
       .timestamp(new Date().getTime().toString())
       .build();
-    //const callback = createMessageCallbackForTargetAtomMessage(eventUri, won.EVENT.CLOSE_SENT);
+
     return { eventUri: eventUri, message: message };
   };
 

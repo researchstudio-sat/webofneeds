@@ -1,4 +1,5 @@
 @import "sizing-utils";
+@import "detail-viewer-mixin";
 
 won-range-viewer {
   @include won-detail-viewer("rangev");

@@ -1,4 +1,4 @@
-@import "sizing-utils";
+@import "detail-viewer-mixin";
 
 won-datetime-viewer {
   @include won-detail-viewer("datetimev");

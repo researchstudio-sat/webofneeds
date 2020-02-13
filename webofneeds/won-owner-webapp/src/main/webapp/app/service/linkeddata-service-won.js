@@ -1144,7 +1144,10 @@ import won from "./won.js";
 
     return (
       won
-        .getNode(senderSocketUri.split("#")[0] + "/c", fetchParams)
+        .deleteDocumentFromStore(senderSocketUri.split("#")[0] + "/c")
+        .then(() =>
+          won.getNode(senderSocketUri.split("#")[0] + "/c", fetchParams)
+        )
         //add the eventUris
         .then(jsonResp => jsonResp.member)
         .then(connUris => {
@@ -1169,15 +1172,7 @@ import won from "./won.js";
   won.getWonMessage = (msgUri, fetchParams) => {
     return won
       .getRawEvent(msgUri, fetchParams)
-      .then(rawEvent => {
-        console.debug(
-          "getWonMessage of rawEvent(uri:",
-          msgUri,
-          "): ",
-          rawEvent
-        );
-        return won.wonMessageFromJsonLd(rawEvent);
-      })
+      .then(rawEvent => won.wonMessageFromJsonLd(rawEvent))
       .catch(e => {
         const msg = "Failed to get wonMessage " + msgUri + ".";
         e.message += msg;

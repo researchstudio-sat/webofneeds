@@ -838,7 +838,7 @@ export function atomMessageReceived(wonMessage) {
 export function processSocketHintMessage(wonMessage) {
   return (dispatch, getState) => {
     const targetSocketUri = wonMessage.getTargetSocket();
-    const senderSocketUri = wonMessage.getSenderSocket();
+    const senderSocketUri = wonMessage.getHintTargetSocket();
 
     const state = getState();
     const targetAtomUri = generalSelectors.getAtomUriBySocketUri(

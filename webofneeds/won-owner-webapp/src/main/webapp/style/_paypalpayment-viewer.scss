@@ -1,5 +1,6 @@
 @import "won-config";
 @import "sizing-utils";
+@import "detail-viewer-mixin";
 
 won-paypal-payment-viewer {
   @include won-detail-viewer("paypalpaymentv");

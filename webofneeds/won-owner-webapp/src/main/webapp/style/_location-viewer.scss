@@ -1,6 +1,7 @@
 @import "won-config";
 @import "sizing-utils";
 @import "animate";
+@import "detail-viewer-mixin";
 
 won-location-viewer {
   @include won-detail-viewer("lv");

@@ -20,11 +20,12 @@ const mapStateToProps = (state, ownProps) => {
   const atomLoaded =
     processUtils.isAtomLoaded(process, ownProps.atomUri) && !atomInCreation;
   const atomLoading = processUtils.isAtomLoading(process, ownProps.atomUri);
-  const atomToLoad = processUtils.isAtomToLoad(process, ownProps.atomUri);
   const atomFailedToLoad = processUtils.hasAtomFailedToLoad(
     process,
     ownProps.atomUri
   );
+  const atomToLoad =
+    processUtils.isAtomToLoad(process, ownProps.atomUri) || !atom;
 
   return {
     atomUri: ownProps.atomUri,

@@ -1,6 +1,7 @@
 @import "won-config";
 @import "sizing-utils";
 @import "animate";
+@import "detail-viewer-mixin";
 
 won-travel-action-viewer {
   @include won-detail-viewer("rv");
