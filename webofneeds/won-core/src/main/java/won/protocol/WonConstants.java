@@ -15,7 +15,7 @@ public final class WonConstants {
      * reference a growing number of other messages, congesting the system even
      * more. To alleviate the situation, the system keeps track of the number of
      * times an unconfirmed message has been referenced, and this number is bounded
-     * by N=<code>UNCONFIRMED_QUEUE_SIZE</code>, which means that every unconfirmed
+     * by N=<code>MAX_CONFIRMATIONS</code>, which means that every unconfirmed
      * message is referenced at most N times by a subsequent message. This may lead
      * to messages ending up unconfirmed.
      */

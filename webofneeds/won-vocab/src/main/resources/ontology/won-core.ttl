@@ -561,6 +561,12 @@ The container supports LDP paging as described here: https://github.com/research
           rdfs:isDefinedBy <https://w3id.org/won/core> ;
           rdfs:label "Inactive" .
 
+###  https://w3id.org/won/core#Deleted
+:Deleted rdf:type owl:NamedIndividual ,
+                   :AtomState ;
+          rdfs:comment "The deleted state. A deleted atom's URI is still remembered and associated with this state so that the WoN node can respond appropriately (410 GONE) when queried."@en ;
+          rdfs:isDefinedBy <https://w3id.org/won/core> ;
+          rdfs:label "Deleted" .
 
 ###  https://w3id.org/won/core#RequestReceived
 :RequestReceived rdf:type owl:NamedIndividual ,
