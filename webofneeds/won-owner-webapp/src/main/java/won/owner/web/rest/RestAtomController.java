@@ -51,7 +51,6 @@ import won.owner.repository.UserRepository;
 import won.owner.service.impl.WONUserDetailService;
 import won.protocol.model.AtomState;
 import won.protocol.model.Coordinate;
-import won.protocol.rest.LinkedDataFetchingException;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LDPContainerPage;
 import won.protocol.util.linkeddata.LinkedDataSource;
@@ -100,7 +99,9 @@ public class RestAtomController {
                                                                                                                       // getDataForResource...
                     AtomPojo atom = new AtomPojo(atomDataset);
                     atomMap.put(atom.getUri(), atom);
-                } catch (LinkedDataFetchingException e) {
+                } catch (Exception e) {
+                    // we catch all exceptions here as we want to be more robust against
+                    // unforseen error conditions down the stack
                     logger.debug("Could not retrieve atom<" + userAtom.getUri() + "> cause: " + e.getMessage());
                 }
             }
@@ -235,7 +236,9 @@ public class RestAtomController {
                         if (limit != null && limit > 0 && atomMap.size() >= limit)
                             break OUTER; // break fetching if the limit has been reached
                     }
-                } catch (LinkedDataFetchingException e) {
+                } catch (Exception e) {
+                    // we catch all exceptions here as we want to be more robust against
+                    // unforseen error conditions down the stack
                     logger.debug("Could not retrieve atom<" + atomUri + "> cause: " + e.getMessage());
                     continue;
                 }
