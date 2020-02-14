@@ -59,7 +59,6 @@ import won.owner.web.service.ServerSideActionService;
 import won.owner.web.service.UserAtomService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDecoder;
-import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
@@ -326,7 +325,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler
     }
 
     private void notifyPerPush(final User user, final URI atomUri, final WonMessage wonMessage) {
-        if (wonMessage.getEnvelopeType() == WonMessageDirection.FROM_OWNER) {
+        if (wonMessage.getFocalMessage().getMessageType().isResponseMessage()) {
             // we assume that this message, coming from the server here, can only be an
             // echoed message. don't send by email.
             logger.debug("not sending notification to user: message {} looks like an echo from the server",
@@ -353,6 +352,27 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                         linkedDataSource);
         switch (wonMessage.getMessageType()) {
             case CONNECTION_MESSAGE:
+                if (userAtom.isConversations()) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    ObjectNode rootNode = mapper.createObjectNode();
+                    rootNode.put("type", "MESSAGE");
+                    rootNode.put("atomUri", userAtom.getUri().toString());
+                    if (connectionURI.isPresent()) {
+                        rootNode.put("connectionUri", connectionURI.get().toString());
+                    } else {
+                        logger.warn("received ConnectionMessage for atom {} without recipientURI", userAtom.getUri());
+                        return; // we are not going to notify if the message is missing this
+                    }
+                    rootNode.put("icon", iconUrl);
+                    String stringifiedJson;
+                    try {
+                        stringifiedJson = mapper.writer().writeValueAsString(rootNode);
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                    pushSender.sendNotification(user, stringifiedJson);
+                }
+                return;
             case SOCKET_HINT_MESSAGE:
                 if (userAtom.isMatches()) {
                     if (!isConnectionInSuggestedState(connectionURI)) {
@@ -408,7 +428,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler
 
     private void notifyPerEmail(final User user, final URI atomUri, final Optional<URI> connectionURI,
                     final WonMessage wonMessage) {
-        if (wonMessage.getEnvelopeType() == WonMessageDirection.FROM_OWNER) {
+        if (wonMessage.getFocalMessage().getMessageType().isResponseMessage()) {
             // we assume that this message, coming from the server here, can only be an
             // echoed message. don't send by email.
             logger.debug("not sending email to user: message {} looks like an echo from the server",
