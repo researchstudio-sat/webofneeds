@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import { get, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import WonAtomHeaderBig from "./atom-header-big.jsx";
+import WonAtomHeader from "./atom-header.jsx";
 import WonAtomMenu from "./atom-menu.jsx";
 import WonAtomContent from "./atom-content.jsx";
 import ChatTextfield from "./chat-textfield.jsx";
@@ -20,6 +21,7 @@ import won from "../won-es6.js";
 import "~/style/_atom-info.scss";
 
 const mapStateToProps = (state, ownProps) => {
+  const ownedAtoms = generalSelectors.getOwnedAtoms(state);
   const atom = getIn(state, ["atoms", ownProps.atomUri]);
 
   const isOwned = generalSelectors.isAtomOwned(state, ownProps.atomUri);
@@ -31,6 +33,17 @@ const mapStateToProps = (state, ownProps) => {
 
   const showEnabledUseCases = isConnectible && isOwned && hasEnabledUseCases;
   const showReactionUseCases = isConnectible && !isOwned && hasReactionUseCases;
+
+  const reactionUseCases = atomUtils.getReactionUseCases(atom);
+  const enabledUseCases = atomUtils.getEnabledUseCases(atom);
+
+  const ownedReactionAtoms =
+    ownedAtoms &&
+    ownedAtoms.filter(
+      atom =>
+        atomUtils.matchesDefinitions(atom, reactionUseCases) ||
+        atomUtils.matchesDefinitions(atom, enabledUseCases)
+    );
 
   const showAdHocRequestField =
     !isOwned && isConnectible && !showEnabledUseCases && !showReactionUseCases;
@@ -49,8 +62,6 @@ const mapStateToProps = (state, ownProps) => {
 
   const holderUri = atomUtils.getHeldByUri(atom);
 
-  const ownedAtoms = generalSelectors.getOwnedAtoms(state);
-
   const ownedChatSocketAtoms =
     ownedAtoms && ownedAtoms.filter(atom => atomUtils.hasChatSocket(atom));
 
@@ -66,11 +77,12 @@ const mapStateToProps = (state, ownProps) => {
     showEnabledUseCases,
     showReactionUseCases,
     reactionUseCasesArray: showReactionUseCases
-      ? atomUtils.getReactionUseCases(atom).toArray()
+      ? reactionUseCases.toArray()
       : [],
-    enabledUseCasesArray: showEnabledUseCases
-      ? atomUtils.getEnabledUseCases(atom).toArray()
+    ownedReactionAtomsArray: ownedReactionAtoms
+      ? ownedReactionAtoms.toArray()
       : [],
+    enabledUseCasesArray: showEnabledUseCases ? enabledUseCases.toArray() : [],
     atomLoading,
     showFooter:
       !atomLoading &&
@@ -279,28 +291,58 @@ class AtomInfo extends React.Component {
     const ucSenderSocketType = get(useCase, "senderSocketType");
     const ucTargetSocketType = get(useCase, "targetSocketType");
 
+    const atomElements = this.props.ownedReactionAtomsArray
+      .filter(atom => atomUtils.matchesDefinition(atom, useCase))
+      .map((atom, index) => {
+        return (
+          <WonAtomHeader
+            key={get(atom, "uri") + "-" + index}
+            atomUri={get(atom, "uri")}
+            hideTimestamp={true}
+          />
+        );
+      });
+
     return (
-      <button
-        key={ucIdentifier + "-" + index}
-        className="won-button--filled red atom-info__footer__button"
-        onClick={() =>
-          this.selectUseCase(
-            ucIdentifier,
-            ucSenderSocketType,
-            ucTargetSocketType
-          )
-        }
-      >
-        {useCaseUtils.getUseCaseIcon(ucIdentifier) && (
-          <svg className="won-button-icon">
-            <use
-              xlinkHref={useCaseUtils.getUseCaseIcon(ucIdentifier)}
-              href={useCaseUtils.getUseCaseIcon(ucIdentifier)}
-            />
-          </svg>
+      <React.Fragment>
+        <div className="atom-info__footer__header">
+          Connect {ucSenderSocketType} with {ucTargetSocketType}:
+        </div>
+        {atomElements && atomElements.length > 0 ? (
+          <div className="atom-info__footer__owned">
+            <div className="atom-info__footer__owned__header">
+              These existing Atoms you own would match:
+            </div>
+            <div className="atom-info__footer__owned__list">{atomElements}</div>
+            <div className="atom-info__footer__owned__subheader">
+              or create a new one to connect with, with the Button below
+            </div>
+          </div>
+        ) : (
+          undefined
         )}
-        <span>{useCaseUtils.getUseCaseLabel(ucIdentifier)}</span>
-      </button>
+        <button
+          key={ucIdentifier + "-" + index}
+          className="won-button--filled red atom-info__footer__button"
+          onClick={() =>
+            this.selectUseCase(
+              ucIdentifier,
+              ucSenderSocketType,
+              ucTargetSocketType
+            )
+          }
+        >
+          {useCaseUtils.getUseCaseIcon(ucIdentifier) && (
+            <svg className="won-button-icon">
+              <use
+                xlinkHref={useCaseUtils.getUseCaseIcon(ucIdentifier)}
+                href={useCaseUtils.getUseCaseIcon(ucIdentifier)}
+              />
+            </svg>
+          )}
+          <span>{useCaseUtils.getUseCaseLabel(ucIdentifier)}</span>
+        </button>
+      </React.Fragment>
     );
   }
 
@@ -455,6 +497,7 @@ AtomInfo.propTypes = {
   showReactionUseCases: PropTypes.bool,
   reactionUseCasesArray: PropTypes.arrayOf(PropTypes.object),
   enabledUseCasesArray: PropTypes.arrayOf(PropTypes.object),
+  ownedReactionAtomsArray: PropTypes.arrayOf(PropTypes.object),
   atomLoading: PropTypes.bool,
   showFooter: PropTypes.bool,
   addHolderUri: PropTypes.string,

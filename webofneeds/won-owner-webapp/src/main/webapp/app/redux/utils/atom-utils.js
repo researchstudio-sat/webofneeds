@@ -35,6 +35,27 @@ export function getMatchedUseCaseIcon(atom) {
   return getIn(atom, ["matchedUseCase", "icon"]);
 }
 
+export function matchesDefinitions(atom, useCaseDefinitions) {
+  console.debug("useCaseDefinitions: ", useCaseDefinitions);
+  console.debug("atom: ", atom);
+
+  return (
+    !!useCaseDefinitions &&
+    !!useCaseDefinitions.find(useCaseDefinition =>
+      matchesDefinition(atom, useCaseDefinition)
+    )
+  );
+}
+
+export function matchesDefinition(atom, useCaseDefinition) {
+  return (
+    !!useCaseDefinition &&
+    get(useCaseDefinition, "identifier") ===
+      getMatchedUseCaseIdentifier(atom) &&
+    hasSocket(atom, get(useCaseDefinition, "senderSocketType"))
+  );
+}
+
 export function getBackground(atom) {
   return get(atom, "background");
 }
