@@ -113,6 +113,9 @@ const mapDispatchToProps = dispatch => {
     hideModalDialog: () => {
       dispatch(actionCreators.view__hideModalDialog());
     },
+    showModalDialog: payload => {
+      dispatch(actionCreators.view__showModalDialog(payload));
+    },
     showTermsDialog: payload => {
       dispatch(actionCreators.view__showTermsDialog(payload));
     },
@@ -299,6 +302,13 @@ class AtomInfo extends React.Component {
             key={get(atom, "uri") + "-" + index}
             atomUri={get(atom, "uri")}
             hideTimestamp={true}
+            onClick={() => {
+              this.connect(
+                get(atom, "uri"),
+                ucSenderSocketType,
+                ucTargetSocketType
+              );
+            }}
           />
         );
       });
@@ -358,6 +368,43 @@ class AtomInfo extends React.Component {
       mode: "CONNECT",
       holderUri: this.props.addHolderUri ? this.props.holderUri : undefined,
     });
+  }
+
+  connect(
+    selectedOwnedAtomUri,
+    senderSocketType,
+    targetSocketType,
+    message = ""
+  ) {
+    const dialogText = "Connect with this Atom?";
+
+    const payload = {
+      caption: "Buddy",
+      text: dialogText,
+      buttons: [
+        {
+          caption: "Yes",
+          callback: () => {
+            this.props.connect(
+              selectedOwnedAtomUri,
+              undefined,
+              this.props.atomUri,
+              message,
+              senderSocketType,
+              targetSocketType
+            );
+            this.props.hideModalDialog();
+          },
+        },
+        {
+          caption: "No",
+          callback: () => {
+            this.props.hideModalDialog();
+          },
+        },
+      ],
+    };
+    this.props.showModalDialog(payload);
   }
 
   sendAdHocRequest(message, connectToSocketUri, personaUri) {
@@ -506,6 +553,7 @@ AtomInfo.propTypes = {
   routerGo: PropTypes.func,
   routerGoResetParams: PropTypes.func,
   hideModalDialog: PropTypes.func,
+  showModalDialog: PropTypes.func,
   showTermsDialog: PropTypes.func,
   connectionsConnectAdHoc: PropTypes.func,
   ownedChatSocketAtoms: PropTypes.object,
