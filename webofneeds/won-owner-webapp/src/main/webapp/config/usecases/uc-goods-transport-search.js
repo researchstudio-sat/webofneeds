@@ -4,7 +4,7 @@ import {
   mergeInEmptyDraft,
 } from "../detail-definitions.js";
 import { sparqlQuery } from "../../app/sparql-builder-utils.js";
-import won from "../../app/won-es6.js";
+import won from "../../app/service/won.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 
 import { isValidNumber, get, getIn } from "../../app/utils.js";
@@ -23,7 +23,13 @@ export const goodsTransportSearch = {
     }),
   },
   enabledUseCases: undefined,
-  reactionUseCases: ["goodsTransportOffer"],
+  reactionUseCases: [
+    {
+      identifier: "goodsTransportOffer",
+      senderSocketType: won.CHAT.ChatSocketCompacted,
+      targetSocketType: won.CHAT.ChatSocketCompacted,
+    },
+  ],
   details: {
     title: { ...details.title },
     content: {

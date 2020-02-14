@@ -7,7 +7,7 @@ import {
   realEstateNumberOfRoomsDetail,
   realEstateFeaturesDetail,
 } from "../details/real-estate.js";
-import won from "../../app/won-es6.js";
+import won from "../../app/service/won.js";
 import { perHourRentDetail } from "../details/musician.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import {
@@ -34,7 +34,13 @@ export const rehearsalRoomOffer = {
       },
     }),
   },
-  reactionUseCases: ["rehearsalRoomSearch"],
+  reactionUseCases: [
+    {
+      identifier: "rehearsalRoomSearch",
+      senderSocketType: won.CHAT.ChatSocketCompacted,
+      targetSocketType: won.CHAT.ChatSocketCompacted,
+    },
+  ],
   details: {
     title: { ...details.title },
     description: { ...details.description },

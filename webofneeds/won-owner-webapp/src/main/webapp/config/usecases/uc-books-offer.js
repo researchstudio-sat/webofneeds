@@ -3,6 +3,7 @@
  */
 
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
+import won from "../../app/service/won.js";
 
 export const booksOffer = {
   identifier: "booksOffer",
@@ -18,7 +19,13 @@ export const booksOffer = {
       },
     }),
   },
-  reactionUseCases: ["booksSearch"],
+  reactionUseCases: [
+    {
+      identifier: "booksSearch",
+      senderSocketType: won.CHAT.ChatSocketCompacted,
+      targetSocketType: won.CHAT.ChatSocketCompacted,
+    },
+  ],
   details: {
     title: { ...details.title, mandatory: true },
     author: { ...details.author },

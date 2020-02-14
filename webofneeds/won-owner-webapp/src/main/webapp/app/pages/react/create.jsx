@@ -23,6 +23,7 @@ const mapStateToProps = state => {
   const useCaseGroup = generalSelectors.getUseCaseGroupFromRoute(state);
 
   const fromAtomUri = generalSelectors.getFromAtomUriFromRoute(state);
+
   const mode = generalSelectors.getModeFromRoute(state);
 
   const showCreateFromPost = !!(fromAtomUri && mode);

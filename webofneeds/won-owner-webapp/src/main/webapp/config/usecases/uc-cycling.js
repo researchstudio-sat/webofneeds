@@ -30,7 +30,13 @@ export const cyclingPlan = {
       seeks: {},
     }),
   },
-  reactionUseCases: ["cyclingInterest"],
+  reactionUseCases: [
+    {
+      identifier: "cyclingInterest",
+      senderSocketType: won.CHAT.ChatSocketCompacted,
+      targetSocketType: won.GROUP.GroupSocketCompacted,
+    },
+  ],
   details: {
     title: { ...details.title },
     description: { ...details.description },
@@ -107,8 +113,20 @@ export const cyclingInterest = {
       },
     }),
   },
-  enabledUseCases: ["cyclingPlan"],
-  reactionUseCases: ["cyclingPlan"],
+  enabledUseCases: [
+    {
+      identifier: "cyclingPlan",
+      senderSocketType: won.GROUP.GroupSocketCompacted,
+      targetSocketType: won.CHAT.ChatSocketCompacted,
+    },
+  ],
+  reactionUseCases: [
+    {
+      identifier: "cyclingPlan",
+      senderSocketType: won.GROUP.GroupSocketCompacted,
+      targetSocketType: won.CHAT.ChatSocketCompacted,
+    },
+  ],
   details: {
     title: { ...details.title },
     description: { ...details.description },

@@ -225,6 +225,20 @@ export const getUseCaseFromRoute = createSelector(
   }
 );
 
+export const getTargetSocketTypeFromRoute = createSelector(
+  state => state,
+  state => {
+    return getIn(state, ["router", "currentParams", "targetSocketType"]);
+  }
+);
+
+export const getSenderSocketTypeFromRoute = createSelector(
+  state => state,
+  state => {
+    return getIn(state, ["router", "currentParams", "senderSocketType"]);
+  }
+);
+
 export const getUseCaseGroupFromRoute = createSelector(
   state => state,
   state => {

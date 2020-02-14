@@ -46,6 +46,7 @@ import { actionCreators } from "../actions/actions";
 const mapStateToProps = state => {
   const fromAtomUri = generalSelectors.getFromAtomUriFromRoute(state);
   const mode = generalSelectors.getModeFromRoute(state);
+
   let fromAtom;
 
   let useCaseString;
@@ -59,6 +60,14 @@ const mapStateToProps = state => {
   let hasFromAtomFailedToLoad = false;
 
   const connectToAtomUri = mode === "CONNECT" ? fromAtomUri : undefined;
+  const atomDraftSocketType =
+    mode === "CONNECT"
+      ? generalSelectors.getSenderSocketTypeFromRoute(state)
+      : undefined;
+  const connectToSocketType =
+    mode === "CONNECT"
+      ? generalSelectors.getTargetSocketTypeFromRoute(state)
+      : undefined;
 
   if (isCreateFromAtom || isEditFromAtom) {
     isFromAtomLoading = processSelectors.isAtomLoading(state, fromAtomUri);
@@ -151,6 +160,8 @@ const mapStateToProps = state => {
       fromAtomUri
     ),
     isHoldable: useCaseUtils.isHoldable(useCase),
+    atomDraftSocketType,
+    connectToSocketType,
     hasFromAtomFailedToLoad,
     personas: generalSelectors.getOwnedCondensedPersonaList(state).toJS(),
     showCreateInput:
@@ -186,12 +197,20 @@ const mapDispatchToProps = dispatch => {
     showTermsDialog: payload => {
       dispatch(actionCreators.view__showTermsDialog(payload));
     },
-    connectionsConnectReactionAtom: (connectToAtomUri, draft, persona) => {
+    connectionsConnectReactionAtom: (
+      connectToAtomUri,
+      draft,
+      persona,
+      connectToSocketType,
+      atomDraftSocketType
+    ) => {
       dispatch(
         actionCreators.connections__connectReactionAtom(
           connectToAtomUri,
           draft,
-          persona
+          persona,
+          connectToSocketType,
+          atomDraftSocketType
         )
       );
     },
@@ -478,13 +497,17 @@ class CreateAtom extends React.Component {
     this.sanitizeDraftObject(() => {
       if (this.props.connectToAtomUri) {
         const tempConnectToAtomUri = this.props.connectToAtomUri;
+        const tempAtomDraftSocketType = this.props.atomDraftSocketType;
+        const tempConnectToSocketType = this.props.connectToSocketType;
         const tempDraft = this.state.draftObject;
 
         if (this.props.loggedIn) {
           this.props.connectionsConnectReactionAtom(
             tempConnectToAtomUri,
             tempDraft,
-            personaId
+            personaId,
+            tempConnectToSocketType,
+            tempAtomDraftSocketType
           );
           this.props.routerGo("connections", {
             useCase: undefined,
@@ -498,7 +521,9 @@ class CreateAtom extends React.Component {
                 this.props.connectionsConnectReactionAtom(
                   tempConnectToAtomUri,
                   tempDraft,
-                  personaId
+                  personaId,
+                  tempConnectToSocketType,
+                  tempAtomDraftSocketType
                 );
                 this.props.routerGo("connections", {
                   useCase: undefined,
@@ -546,6 +571,8 @@ CreateAtom.propTypes = {
   atomsCreate: PropTypes.func,
   atomsEdit: PropTypes.func,
   connectToAtomUri: PropTypes.string,
+  atomDraftSocketType: PropTypes.string,
+  connectToSocketType: PropTypes.string,
   connectionHasBeenLost: PropTypes.bool,
   fetchUnloadedAtom: PropTypes.func,
   fromAtom: PropTypes.object,

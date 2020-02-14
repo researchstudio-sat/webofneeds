@@ -180,48 +180,16 @@ class AtomInfo extends React.Component {
       const reactionUseCaseElements =
         this.props.showReactionUseCases &&
         this.props.reactionUseCasesArray &&
-        this.props.reactionUseCasesArray.map((ucIdentifier, index) => {
-          return (
-            <button
-              key={ucIdentifier + "-" + index}
-              className="won-button--filled red atom-info__footer__button"
-              onClick={() => this.selectUseCase(ucIdentifier)}
-            >
-              {useCaseUtils.getUseCaseIcon(ucIdentifier) && (
-                <svg className="won-button-icon">
-                  <use
-                    xlinkHref={useCaseUtils.getUseCaseIcon(ucIdentifier)}
-                    href={useCaseUtils.getUseCaseIcon(ucIdentifier)}
-                  />
-                </svg>
-              )}
-              <span>{useCaseUtils.getUseCaseLabel(ucIdentifier)}</span>
-            </button>
-          );
-        });
+        this.props.reactionUseCasesArray.map((useCase, index) =>
+          this.getUseCaseTypeButton(useCase, index)
+        );
 
       const enabledUseCaseElements =
         this.props.showEnabledUseCases &&
         this.props.enabledUseCasesArray &&
-        this.props.enabledUseCasesArray.map((ucIdentifier, index) => {
-          return (
-            <button
-              key={ucIdentifier + "-" + index}
-              className="won-button--filled red atom-info__footer__button"
-              onClick={() => this.selectUseCase(ucIdentifier)}
-            >
-              {useCaseUtils.getUseCaseIcon(ucIdentifier) && (
-                <svg className="won-button-icon">
-                  <use
-                    xlinkHref={useCaseUtils.getUseCaseIcon(ucIdentifier)}
-                    href={useCaseUtils.getUseCaseIcon(ucIdentifier)}
-                  />
-                </svg>
-              )}
-              <span>{useCaseUtils.getUseCaseLabel(ucIdentifier)}</span>
-            </button>
-          );
-        });
+        this.props.enabledUseCasesArray.map((useCase, index) =>
+          this.getUseCaseTypeButton(useCase, index)
+        );
 
       footerElement = (
         <div className="atom-info__footer">
@@ -305,12 +273,45 @@ class AtomInfo extends React.Component {
     );
   }
 
-  selectUseCase(ucIdentifier) {
+  getUseCaseTypeButton(useCase, index) {
+    console.debug("useCase: ", useCase);
+    const ucIdentifier = get(useCase, "identifier");
+    const ucSenderSocketType = get(useCase, "senderSocketType");
+    const ucTargetSocketType = get(useCase, "targetSocketType");
+
+    return (
+      <button
+        key={ucIdentifier + "-" + index}
+        className="won-button--filled red atom-info__footer__button"
+        onClick={() =>
+          this.selectUseCase(
+            ucIdentifier,
+            ucSenderSocketType,
+            ucTargetSocketType
+          )
+        }
+      >
+        {useCaseUtils.getUseCaseIcon(ucIdentifier) && (
+          <svg className="won-button-icon">
+            <use
+              xlinkHref={useCaseUtils.getUseCaseIcon(ucIdentifier)}
+              href={useCaseUtils.getUseCaseIcon(ucIdentifier)}
+            />
+          </svg>
+        )}
+        <span>{useCaseUtils.getUseCaseLabel(ucIdentifier)}</span>
+      </button>
+    );
+  }
+
+  selectUseCase(ucIdentifier, ucSenderSocketType, ucTargetSocketType) {
     this.props.routerGo("create", {
       useCase: ucIdentifier,
       useCaseGroup: undefined,
       connectionUri: undefined,
       fromAtomUri: this.props.atomUri,
+      senderSocketType: ucSenderSocketType,
+      targetSocketType: ucTargetSocketType,
       viewConnUri: undefined,
       mode: "CONNECT",
       holderUri: this.props.addHolderUri ? this.props.holderUri : undefined,

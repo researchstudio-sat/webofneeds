@@ -2,7 +2,7 @@
  * Created by fsuda on 18.09.2018.
  */
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
-import won from "../../app/won-es6.js";
+import won from "../../app/service/won.js";
 import { getIn, isValidDate } from "../../app/utils.js";
 import {
   filterAboutTime,
@@ -25,7 +25,13 @@ export const rideShareOffer = {
     }),
   },
   enabledUseCases: undefined,
-  reactionUseCases: ["personalTransportSearch"],
+  reactionUseCases: [
+    {
+      identifier: "personalTransportSearch",
+      senderSocketType: won.CHAT.ChatSocketCompacted,
+      targetSocketType: won.CHAT.ChatSocketCompacted,
+    },
+  ],
   details: {
     title: { ...details.title },
     description: { ...details.description },

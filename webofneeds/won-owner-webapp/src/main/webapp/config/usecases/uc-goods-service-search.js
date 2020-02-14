@@ -3,7 +3,7 @@
  */
 
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
-import won from "../../app/won-es6.js";
+import won from "../../app/service/won.js";
 import { getIn, is } from "../../app/utils.js";
 import {
   textSearchSubQuery,
@@ -27,7 +27,18 @@ export const goodsServiceSearch = {
       },
     }),
   },
-  reactionUseCases: ["serviceOffer", "goodsOffer"],
+  reactionUseCases: [
+    {
+      identifier: "serviceOffer",
+      senderSocketType: won.CHAT.ChatSocketCompacted,
+      targetSocketType: won.CHAT.ChatSocketCompacted,
+    },
+    {
+      identifier: "goodsOffer",
+      senderSocketType: won.CHAT.ChatSocketCompacted,
+      targetSocketType: won.CHAT.ChatSocketCompacted,
+    },
+  ],
   seeksDetails: {
     title: { ...details.title },
     tags: {
