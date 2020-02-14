@@ -201,16 +201,16 @@ const mapDispatchToProps = dispatch => {
       connectToAtomUri,
       draft,
       persona,
-      senderSocketType,
-      targetSocketType
+      connectToSocketType,
+      atomDraftSocketType
     ) => {
       dispatch(
         actionCreators.connections__connectReactionAtom(
           connectToAtomUri,
           draft,
           persona,
-          targetSocketType,
-          senderSocketType
+          connectToSocketType,
+          atomDraftSocketType
         )
       );
     },
