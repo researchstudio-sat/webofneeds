@@ -16,7 +16,7 @@ import {
   concatenateFilters,
   sparqlQuery,
 } from "../../app/sparql-builder-utils.js";
-import won from "../../app/won-es6.js";
+import won from "../../app/service/won.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 
 export const rentRealEstateSearch = {
@@ -37,7 +37,13 @@ export const rentRealEstateSearch = {
       },
     }),
   },
-  reactionUseCases: ["rentRealEstateOffer"],
+  reactionUseCases: [
+    {
+      identifier: "rentRealEstateOffer",
+      senderSocketType: won.CHAT.ChatSocketCompacted,
+      targetSocketType: won.CHAT.ChatSocketCompacted,
+    },
+  ],
   details: undefined,
   seeksDetails: {
     location: { ...details.location },

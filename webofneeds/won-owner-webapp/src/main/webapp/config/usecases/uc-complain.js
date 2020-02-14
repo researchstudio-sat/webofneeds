@@ -3,6 +3,7 @@
  */
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
+import won from "../../app/service/won.js";
 
 export const complain = {
   identifier: "complain",
@@ -22,7 +23,13 @@ export const complain = {
       },
     }),
   },
-  reactionUseCases: ["handleComplaint"],
+  reactionUseCases: [
+    {
+      identifier: "handleComplaint",
+      senderSocketType: won.CHAT.ChatSocketCompacted,
+      targetSocketType: won.CHAT.ChatSocketCompacted,
+    },
+  ],
   details: {
     title: { ...details.title },
     description: { ...details.description },

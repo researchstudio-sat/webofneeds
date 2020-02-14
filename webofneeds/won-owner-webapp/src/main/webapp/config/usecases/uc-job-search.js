@@ -13,7 +13,7 @@ import {
   sparqlQuery,
 } from "../../app/sparql-builder-utils.js";
 
-import won from "../../app/won-es6.js";
+import won from "../../app/service/won.js";
 
 import { getIn } from "../../app/utils.js";
 
@@ -36,7 +36,13 @@ export const jobSearch = {
       },
     }),
   },
-  reactionUseCases: ["jobOffer"],
+  reactionUseCases: [
+    {
+      identifier: "jobOffer",
+      senderSocketType: won.CHAT.ChatSocketCompacted,
+      targetSocketType: won.CHAT.ChatSocketCompacted,
+    },
+  ],
   details: {
     title: { ...details.title },
     description: { ...details.description },

@@ -46,6 +46,9 @@ import { actionCreators } from "../actions/actions";
 const mapStateToProps = state => {
   const fromAtomUri = generalSelectors.getFromAtomUriFromRoute(state);
   const mode = generalSelectors.getModeFromRoute(state);
+  const senderSocketType = generalSelectors.getSenderSocketTypeFromRoute(state);
+  const targetSocketType = generalSelectors.getSenderSocketTypeFromRoute(state);
+
   let fromAtom;
 
   let useCaseString;
@@ -151,6 +154,8 @@ const mapStateToProps = state => {
       fromAtomUri
     ),
     isHoldable: useCaseUtils.isHoldable(useCase),
+    senderSocketType,
+    targetSocketType,
     hasFromAtomFailedToLoad,
     personas: generalSelectors.getOwnedCondensedPersonaList(state).toJS(),
     showCreateInput:

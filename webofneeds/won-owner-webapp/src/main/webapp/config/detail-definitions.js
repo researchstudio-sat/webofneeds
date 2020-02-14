@@ -11,16 +11,17 @@ import * as pokemonDetails from "./details/pokemon.js";
 import * as extendedDetails from "./details/extended.js";
 
 import * as abstractDetails_ from "./details/abstract.js";
+import won from "../app/service/won.js";
 export const abstractDetails = abstractDetails_; // reexport
 import Immutable from "immutable";
 
 const emptyDraftImm = Immutable.fromJS({
   content: {
     sockets: {
-      "#chatSocket": "chat:ChatSocket",
-      "#holdableSocket": "hold:HoldableSocket",
+      "#chatSocket": won.CHAT.ChatSocketCompacted,
+      "#holdableSocket": won.HOLD.HoldableSocketCompacted,
     },
-    defaultSocket: { "#chatSocket": "chat:ChatSocket" },
+    defaultSocket: { "#chatSocket": won.CHAT.ChatSocketCompacted },
   },
   seeks: {},
 });

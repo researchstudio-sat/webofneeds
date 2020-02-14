@@ -42,6 +42,8 @@ export const resetParams = Object.freeze({
   token: undefined,
   privateId: undefined,
   fromAtomUri: undefined,
+  senderSocketType: undefined,
+  targetSocketType: undefined,
   mode: undefined,
 });
 
@@ -89,7 +91,8 @@ export const configRouting = [
         as: "map",
       },
       {
-        path: "/create?useCase?useCaseGroup?fromAtomUri?mode?holderUri",
+        path:
+          "/create?useCase?useCaseGroup?fromAtomUri?mode?holderUri?senderSocketType?targetSocketType",
         component: createComponent,
         as: "create",
       },

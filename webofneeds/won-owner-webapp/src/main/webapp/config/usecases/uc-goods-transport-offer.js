@@ -1,6 +1,6 @@
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
-import won from "../../app/won-es6.js";
+import won from "../../app/service/won.js";
 import { getIn } from "../../app/utils.js";
 import { sparqlQuery } from "../../app/sparql-builder-utils.js";
 
@@ -18,7 +18,13 @@ export const goodsTransportOffer = {
     }),
   },
   enabledUseCases: undefined,
-  reactionUseCases: ["goodsTransportSearch"],
+  reactionUseCases: [
+    {
+      identifier: "goodsTransportSearch",
+      senderSocketType: won.CHAT.ChatSocketCompacted,
+      targetSocketType: won.CHAT.ChatSocketCompacted,
+    },
+  ],
   details: {
     title: { ...details.title },
     location: { ...details.location },

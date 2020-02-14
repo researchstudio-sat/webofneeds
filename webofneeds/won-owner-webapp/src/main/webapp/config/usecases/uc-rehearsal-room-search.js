@@ -6,7 +6,7 @@ import {
   realEstateFeaturesDetail,
   realEstateFloorSizeRangeDetail,
 } from "../details/real-estate.js";
-import won from "../../app/won-es6.js";
+import won from "../../app/service/won.js";
 import { perHourRentRangeDetail } from "../details/musician.js";
 import {
   filterFloorSizeRange,
@@ -34,7 +34,13 @@ export const rehearsalRoomSearch = {
       },
     }),
   },
-  reactionUseCases: ["rehearsalRoomOffer"],
+  reactionUseCases: [
+    {
+      identifier: "rehearsalRoomOffer",
+      senderSocketType: won.CHAT.ChatSocketCompacted,
+      targetSocketType: won.CHAT.ChatSocketCompacted,
+    },
+  ],
   details: undefined,
   seeksDetails: {
     location: { ...details.location },

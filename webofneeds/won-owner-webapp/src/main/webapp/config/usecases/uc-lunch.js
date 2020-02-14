@@ -30,7 +30,13 @@ export const lunchPlan = {
       seeks: {},
     }),
   },
-  reactionUseCases: ["lunchInterest"],
+  reactionUseCases: [
+    {
+      identifier: "lunchInterest",
+      senderSocketType: won.CHAT.ChatSocketCompacted,
+      targetSocketType: won.GROUP.GroupSocketCompacted,
+    },
+  ],
   details: {
     title: { ...details.title },
     description: { ...details.description },
@@ -107,8 +113,20 @@ export const lunchInterest = {
       },
     }),
   },
-  enabledUseCases: ["lunchPlan"],
-  reactionUseCases: ["lunchPlan"],
+  enabledUseCases: [
+    {
+      identifier: "lunchPlan",
+      senderSocketType: won.GROUP.GroupSocketCompacted,
+      targetSocketType: won.CHAT.ChatSocketCompacted,
+    },
+  ],
+  reactionUseCases: [
+    {
+      identifier: "lunchPlan",
+      senderSocketType: won.GROUP.GroupSocketCompacted,
+      targetSocketType: won.CHAT.ChatSocketCompacted,
+    },
+  ],
   details: {
     title: { ...details.title },
     description: { ...details.description },

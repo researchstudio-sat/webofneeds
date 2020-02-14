@@ -24,7 +24,13 @@ export const pokemonGoRaid = {
       seeks: {},
     }),
   },
-  reactionUseCases: ["pokemonInterest"],
+  reactionUseCases: [
+    {
+      identifier: "pokemonInterest",
+      senderSocketType: won.CHAT.ChatSocketCompacted,
+      targetSocketType: won.GROUP.GroupSocketCompacted,
+    },
+  ],
   details: {
     pokemonRaid: { ...details.pokemonRaid, mandatory: true },
     location: { ...details.location, mandatory: true },
@@ -49,8 +55,20 @@ export const pokemonInterest = {
       },
     }),
   },
-  enabledUseCases: ["pokemonGoRaid"],
-  reactionUseCases: ["pokemonGoRaid"],
+  enabledUseCases: [
+    {
+      identifier: "pokemonGoRaid",
+      senderSocketType: won.GROUP.GroupSocketCompacted,
+      targetSocketType: won.CHAT.ChatSocketCompacted,
+    },
+  ],
+  reactionUseCases: [
+    {
+      identifier: "pokemonGoRaid",
+      senderSocketType: won.GROUP.GroupSocketCompacted,
+      targetSocketType: won.CHAT.ChatSocketCompacted,
+    },
+  ],
   details: {
     title: { ...details.title },
   },
