@@ -96,6 +96,7 @@ const mapStateToProps = (state, ownProps) => {
     chatSocketUri,
     groupSocketUri,
     ownedChatSocketAtoms,
+    ownedAtoms,
   };
 };
 
@@ -303,7 +304,7 @@ class AtomInfo extends React.Component {
             atomUri={get(atom, "uri")}
             hideTimestamp={true}
             onClick={() => {
-              this.connect(
+              this.connectAtomSockets(
                 get(atom, "uri"),
                 ucSenderSocketType,
                 ucTargetSocketType
@@ -318,40 +319,52 @@ class AtomInfo extends React.Component {
         <div className="atom-info__footer__header">
           Connect {ucSenderSocketType} with {ucTargetSocketType}:
         </div>
-        {atomElements && atomElements.length > 0 ? (
-          <div className="atom-info__footer__owned">
-            <div className="atom-info__footer__owned__header">
-              These existing Atoms you own would match:
-            </div>
-            <div className="atom-info__footer__owned__list">{atomElements}</div>
-            <div className="atom-info__footer__owned__subheader">
-              or create a new one to connect with, with the Button below
+        <div className="atom-info__footer__matches">
+          <div className="atom-info__footer__matches__header">
+            These existing Atoms you own would match:
+          </div>
+          <div className="atom-info__footer__matches__list">
+            {atomElements}
+            <div
+              key={ucIdentifier + "-" + index}
+              className="atom-info__footer__adhocbutton"
+              onClick={() =>
+                this.selectUseCase(
+                  ucIdentifier,
+                  ucSenderSocketType,
+                  ucTargetSocketType
+                )
+              }
+            >
+              <div className="atom-info__footer__adhocbutton__icon">
+                {useCaseUtils.getUseCaseIcon(ucIdentifier) ? (
+                  <svg className="atom-info__footer__adhocbutton__icon__svg">
+                    <use
+                      xlinkHref={useCaseUtils.getUseCaseIcon(ucIdentifier)}
+                      href={useCaseUtils.getUseCaseIcon(ucIdentifier)}
+                    />
+                  </svg>
+                ) : (
+                  <svg className="atom-info__footer__adhocbutton__icon__svg">
+                    <use xlinkHref="ico36_plus" href="ico36_plus" />
+                  </svg>
+                )}
+              </div>
+              <div className="atom-info__footer__adhocbutton__right">
+                <div className="atom-info__footer__adhocbutton__right__topline">
+                  <div className="atom-info__footer__adhocbutton__right__topline__notitle">
+                    + Connect with new Atom
+                  </div>
+                </div>
+                <div className="atom-info__footer__adhocbutton__right__subtitle">
+                  <span className="atom-info__footer__adhocbutton__right__subtitle__type">
+                    <span>{useCaseUtils.getUseCaseLabel(ucIdentifier)}</span>
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
-        ) : (
-          undefined
-        )}
-        <button
-          key={ucIdentifier + "-" + index}
-          className="won-button--filled red atom-info__footer__button"
-          onClick={() =>
-            this.selectUseCase(
-              ucIdentifier,
-              ucSenderSocketType,
-              ucTargetSocketType
-            )
-          }
-        >
-          {useCaseUtils.getUseCaseIcon(ucIdentifier) && (
-            <svg className="won-button-icon">
-              <use
-                xlinkHref={useCaseUtils.getUseCaseIcon(ucIdentifier)}
-                href={useCaseUtils.getUseCaseIcon(ucIdentifier)}
-              />
-            </svg>
-          )}
-          <span>{useCaseUtils.getUseCaseLabel(ucIdentifier)}</span>
-        </button>
+        </div>
       </React.Fragment>
     );
   }
@@ -370,41 +383,51 @@ class AtomInfo extends React.Component {
     });
   }
 
-  connect(
+  connectAtomSockets(
     selectedOwnedAtomUri,
     senderSocketType,
     targetSocketType,
     message = ""
   ) {
-    const dialogText = "Connect with this Atom?";
+    const connectToOwnedAtom = get(this.props.ownedAtoms, this.props.atomUri);
 
-    const payload = {
-      caption: "Buddy",
-      text: dialogText,
-      buttons: [
-        {
-          caption: "Yes",
-          callback: () => {
-            this.props.connect(
-              selectedOwnedAtomUri,
-              undefined,
-              this.props.atomUri,
-              message,
-              senderSocketType,
-              targetSocketType
-            );
-            this.props.hideModalDialog();
+    if (connectToOwnedAtom) {
+      //TODO: SERVER SIDE CONNECT OF TWO ATOMS THAT ARE OWNED
+    } else {
+      const dialogText = "Connect with this Atom?";
+
+      const payload = {
+        caption: "Connect",
+        text: dialogText,
+        buttons: [
+          {
+            caption: "Yes",
+            callback: () => {
+              this.props.connect(
+                selectedOwnedAtomUri,
+                undefined,
+                this.props.atomUri,
+                message,
+                senderSocketType,
+                targetSocketType
+              );
+              this.props.hideModalDialog();
+
+              if (senderSocketType === won.CHAT.ChatSocketCompacted) {
+                this.props.routerGoResetParams("connections");
+              }
+            },
           },
-        },
-        {
-          caption: "No",
-          callback: () => {
-            this.props.hideModalDialog();
+          {
+            caption: "No",
+            callback: () => {
+              this.props.hideModalDialog();
+            },
           },
-        },
-      ],
-    };
-    this.props.showModalDialog(payload);
+        ],
+      };
+      this.props.showModalDialog(payload);
+    }
   }
 
   sendAdHocRequest(message, connectToSocketUri, personaUri) {
@@ -556,6 +579,7 @@ AtomInfo.propTypes = {
   showModalDialog: PropTypes.func,
   showTermsDialog: PropTypes.func,
   connectionsConnectAdHoc: PropTypes.func,
+  ownedAtoms: PropTypes.object,
   ownedChatSocketAtoms: PropTypes.object,
   chatSocketUri: PropTypes.string,
   groupSocketUri: PropTypes.string,
