@@ -1,7 +1,7 @@
 import { parseAtom, parseMetaAtom } from "./parse-atom.js";
 import Immutable from "immutable";
 import { get, getIn } from "../../utils.js";
-import won from "../../won-es6.js";
+import vocab from "../../service/vocab.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 
 export function addAtom(atoms, jsonldAtom) {
@@ -167,7 +167,7 @@ export function addAtomInCreation(atoms, atomInCreation, atomUri) {
   if (atom) {
     atom = atom
       .set("uri", atomUri)
-      .set("state", won.WON.ActiveCompacted)
+      .set("state", vocab.WON.ActiveCompacted)
       .set("isBeingCreated", true)
       .set("connections", Immutable.Map());
 

@@ -25,6 +25,7 @@ import urljoin from "url-join";
 import rdfstore from "../../scripts/rdfstore-js/rdf_store.js";
 import jsonld from "jsonld/dist/jsonld.js";
 import won from "./won.js";
+import vocab from "./vocab.js";
 
 (function() {
   const NEWLINE_REPLACEMENT_STRING = "#%§%#§";
@@ -116,7 +117,7 @@ import won from "./won.js";
   won.clearStore = function() {
     //create an rdfstore-js based store as a cache for rdf data.
     privateData.store = rdfstore.create();
-    privateData.store.setPrefix("msg", "https://w3id.org/won/message#");
+    privateData.store.setPrefix(vocab.WONMSG.prefix, vocab.WONMSG.baseUri);
     privateData.store.setPrefix(
       "rdf",
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -126,7 +127,7 @@ import won from "./won.js";
       "http://www.w3.org/2000/01/rdf-schema#"
     );
     privateData.store.setPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
-    privateData.store.setPrefix("won", "https://w3id.org/won/core#");
+    privateData.store.setPrefix(vocab.WON.prefix, vocab.WON.baseUri);
 
     window.store4dbg = privateData.store;
 
@@ -1590,9 +1591,9 @@ import won from "./won.js";
         {
           prefixes:
             "prefix " +
-            won.WON.prefix +
+            vocab.WON.prefix +
             ": <" +
-            won.WON.baseUri +
+            vocab.WON.baseUri +
             "> " +
             "prefix dct: <http://purl.org/dc/terms/> " +
             "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",

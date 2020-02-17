@@ -1,5 +1,5 @@
 import Immutable from "immutable";
-import won from "../../won-es6.js";
+import vocab from "../../service/vocab.js";
 import * as useCaseUtils from "../../usecase-utils.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import {
@@ -21,14 +21,26 @@ export function parseAtom(jsonldAtom) {
     let parsedAtom = {
       uri: jsonldAtomImm.get("@id"),
       identiconSvg: generateIdenticon(jsonldAtomImm),
-      nodeUri: jsonldAtomImm.getIn(["won:wonNode", "@id"]),
+      nodeUri: jsonldAtomImm.getIn([vocab.WON.wonNodeCompacted, "@id"]),
       state: extractState(jsonldAtomImm),
-      heldBy: jsonLdUtils.parseFrom(jsonldAtomImm, ["hold:heldBy"], "xsd:ID"),
+      heldBy: jsonLdUtils.parseFrom(
+        jsonldAtomImm,
+        [vocab.HOLD.heldByCompacted],
+        "xsd:ID"
+      ),
       holds: Immutable.Set(
-        jsonLdUtils.parseListFrom(jsonldAtomImm, ["hold:holds"], "xsd:ID")
+        jsonLdUtils.parseListFrom(
+          jsonldAtomImm,
+          [vocab.HOLD.holdsCompacted],
+          "xsd:ID"
+        )
       ),
       buddies: Immutable.Set(
-        jsonLdUtils.parseListFrom(jsonldAtomImm, ["buddy:buddy"], "xsd:ID")
+        jsonLdUtils.parseListFrom(
+          jsonldAtomImm,
+          [vocab.BUDDY.buddyCompacted],
+          "xsd:ID"
+        )
       ),
       rating: extractRating(jsonldAtomImm),
       groupMembers: Immutable.Set(
@@ -116,10 +128,10 @@ export function parseMetaAtom(metaAtom) {
     Immutable.Set(
       eventObjectUris.map(eventObjectUri =>
         eventObjectUri
-          .replace(won.WON.baseUri, won.WON.prefix + ":")
-          .replace(won.WONCON.baseUri, won.WONCON.prefix + ":")
-          .replace(won.DEMO.baseUri, won.DEMO.prefix + ":")
-          .replace(won.WONMATCH.baseUri, won.WONMATCH.prefix + ":")
+          .replace(vocab.WON.baseUri, vocab.WON.prefix + ":")
+          .replace(vocab.WONCON.baseUri, vocab.WONCON.prefix + ":")
+          .replace(vocab.DEMO.baseUri, vocab.DEMO.prefix + ":")
+          .replace(vocab.WONMATCH.baseUri, vocab.WONMATCH.prefix + ":")
           .replace("http://schema.org/", "s:")
       )
     );
@@ -129,11 +141,11 @@ export function parseMetaAtom(metaAtom) {
     Immutable.Set(
       types.map(type =>
         type
-          .replace(won.WON.baseUri, won.WON.prefix + ":")
-          .replace(won.WONCON.baseUri, won.WONCON.prefix + ":")
-          .replace(won.DEMO.baseUri, won.DEMO.prefix + ":")
-          .replace(won.BOT.baseUri, won.BOT.prefix + ":")
-          .replace(won.WONMATCH.baseUri, won.WONMATCH.prefix + ":")
+          .replace(vocab.WON.baseUri, vocab.WON.prefix + ":")
+          .replace(vocab.WONCON.baseUri, vocab.WONCON.prefix + ":")
+          .replace(vocab.DEMO.baseUri, vocab.DEMO.prefix + ":")
+          .replace(vocab.BOT.baseUri, vocab.BOT.prefix + ":")
+          .replace(vocab.WONMATCH.baseUri, vocab.WONMATCH.prefix + ":")
           .replace("http://schema.org/", "s:")
       )
     );
@@ -141,10 +153,10 @@ export function parseMetaAtom(metaAtom) {
     flags &&
     flags.map(flag =>
       flag
-        .replace(won.WON.baseUri, won.WON.prefix + ":")
-        .replace(won.WONCON.baseUri, won.WONCON.prefix + ":")
-        .replace(won.DEMO.baseUri, won.DEMO.prefix + ":")
-        .replace(won.WONMATCH.baseUri, won.WONMATCH.prefix + ":")
+        .replace(vocab.WON.baseUri, vocab.WON.prefix + ":")
+        .replace(vocab.WONCON.baseUri, vocab.WONCON.prefix + ":")
+        .replace(vocab.DEMO.baseUri, vocab.DEMO.prefix + ":")
+        .replace(vocab.WONMATCH.baseUri, vocab.WONMATCH.prefix + ":")
         .replace("http://schema.org/", "s:")
     );
   const extractLocation = location =>
@@ -158,21 +170,21 @@ export function parseMetaAtom(metaAtom) {
     socketTypeUriMap &&
     socketTypeUriMap.map(socketType =>
       socketType
-        .replace(won.CHAT.baseUri, won.CHAT.prefix + ":")
-        .replace(won.GROUP.baseUri, won.GROUP.prefix + ":")
-        .replace(won.HOLD.baseUri, won.HOLD.prefix + ":")
-        .replace(won.REVIEW.baseUri, won.REVIEW.prefix + ":")
-        .replace(won.BUDDY.baseUri, won.BUDDY.prefix + ":")
+        .replace(vocab.CHAT.baseUri, vocab.CHAT.prefix + ":")
+        .replace(vocab.GROUP.baseUri, vocab.GROUP.prefix + ":")
+        .replace(vocab.HOLD.baseUri, vocab.HOLD.prefix + ":")
+        .replace(vocab.REVIEW.baseUri, vocab.REVIEW.prefix + ":")
+        .replace(vocab.BUDDY.baseUri, vocab.BUDDY.prefix + ":")
     );
 
   const extractStateFromMeta = state => {
     switch (state) {
       case "ACTIVE":
-        return won.WON.ActiveCompacted;
+        return vocab.WON.ActiveCompacted;
       case "INACTIVE":
-        return won.WON.InactiveCompacted;
+        return vocab.WON.InactiveCompacted;
       case "DELETED":
-        return won.WON.DeletedCompacted;
+        return vocab.WON.DeletedCompacted;
       default:
         return undefined;
     }
@@ -298,10 +310,10 @@ function extractState(atomJsonLd) {
   // we use to check for active
   // state and everything else
   // will be inactive
-  return atomJsonLd.getIn([won.WON.atomStateCompacted, "@id"]) ===
-    won.WON.ActiveCompacted
-    ? won.WON.ActiveCompacted
-    : won.WON.InactiveCompacted;
+  return atomJsonLd.getIn([vocab.WON.atomStateCompacted, "@id"]) ===
+    vocab.WON.ActiveCompacted
+    ? vocab.WON.ActiveCompacted
+    : vocab.WON.InactiveCompacted;
 }
 
 function generateIdenticon(atomJsonLd) {

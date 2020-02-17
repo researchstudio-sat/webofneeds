@@ -3,7 +3,7 @@
  */
 
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
-import won from "../../app/service/won.js";
+import vocab from "../../app/service/vocab.js";
 
 export const booksSearch = {
   identifier: "booksSearch",
@@ -22,8 +22,8 @@ export const booksSearch = {
   reactionUseCases: [
     {
       identifier: "booksOffer",
-      senderSocketType: won.CHAT.ChatSocketCompacted,
-      targetSocketType: won.CHAT.ChatSocketCompacted,
+      senderSocketType: vocab.CHAT.ChatSocketCompacted,
+      targetSocketType: vocab.CHAT.ChatSocketCompacted,
     },
   ],
   seeksDetails: {

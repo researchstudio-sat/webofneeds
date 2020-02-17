@@ -9,7 +9,7 @@ import {
   getAtoms,
 } from "./general-selectors.js";
 import * as connectionUtils from "../utils/connection-utils.js";
-import won from "../../won-es6.js";
+import vocab from "../../service/vocab.js";
 import { get, getIn } from "../../utils.js";
 import * as processUtils from "../utils/process-utils.js";
 
@@ -138,7 +138,7 @@ export function getChatConnectionsToCrawl(state) {
         !conn.get("messages") ||
         conn
           .get("messages")
-          .filter(msg => msg.get("messageType") === won.WONMSG.connectMessage)
+          .filter(msg => msg.get("messageType") === vocab.WONMSG.connectMessage)
           .size == 0
     );
 
@@ -226,8 +226,8 @@ export function isChatToChatConnection(allAtoms, connection) {
   const { socket, targetSocket } = getSockets(allAtoms, connection);
 
   return (
-    socket === won.CHAT.ChatSocketCompacted &&
-    targetSocket === won.CHAT.ChatSocketCompacted
+    socket === vocab.CHAT.ChatSocketCompacted &&
+    targetSocket === vocab.CHAT.ChatSocketCompacted
   );
 }
 
@@ -241,8 +241,8 @@ export function isBuddyConnection(allAtoms, connection) {
   const { socket, targetSocket } = getSockets(allAtoms, connection);
 
   return (
-    socket === won.BUDDY.BuddySocketCompacted &&
-    targetSocket === won.BUDDY.BuddySocketCompacted
+    socket === vocab.BUDDY.BuddySocketCompacted &&
+    targetSocket === vocab.BUDDY.BuddySocketCompacted
   );
 }
 
@@ -256,8 +256,8 @@ export function isChatToGroupConnection(allAtoms, connection) {
   const { socket, targetSocket } = getSockets(allAtoms, connection);
 
   return (
-    socket === won.CHAT.ChatSocketCompacted &&
-    targetSocket === won.GROUP.GroupSocketCompacted
+    socket === vocab.CHAT.ChatSocketCompacted &&
+    targetSocket === vocab.GROUP.GroupSocketCompacted
   );
 }
 
@@ -271,8 +271,8 @@ export function isGroupToChatConnection(allAtoms, connection) {
   const { socket, targetSocket } = getSockets(allAtoms, connection);
 
   return (
-    socket === won.GROUP.GroupSocketCompacted &&
-    targetSocket === won.CHAT.ChatSocketCompacted
+    socket === vocab.GROUP.GroupSocketCompacted &&
+    targetSocket === vocab.CHAT.ChatSocketCompacted
   );
 }
 
@@ -286,8 +286,8 @@ export function isGroupToGroupConnection(allAtoms, connection) {
   const { socket, targetSocket } = getSockets(allAtoms, connection);
 
   return (
-    socket === won.GROUP.GroupSocketCompacted &&
-    targetSocket === won.GROUP.GroupSocketCompacted
+    socket === vocab.GROUP.GroupSocketCompacted &&
+    targetSocket === vocab.GROUP.GroupSocketCompacted
   );
 }
 

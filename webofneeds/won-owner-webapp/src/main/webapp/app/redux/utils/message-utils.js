@@ -2,7 +2,7 @@
  * Created by fsuda on 05.11.2018.
  */
 
-import won from "../../won-es6.js";
+import vocab from "../../service/vocab.js";
 import { get } from "../../utils.js";
 
 /**
@@ -15,8 +15,8 @@ export function isMessageProposable(msg) {
   return (
     msg &&
     msg.get("hasContent") &&
-    msg.get("messageType") !== won.WONMSG.connectMessage &&
-    msg.get("messageType") !== won.WONMSG.changeNotificationMessage &&
+    msg.get("messageType") !== vocab.WONMSG.connectMessage &&
+    msg.get("messageType") !== vocab.WONMSG.changeNotificationMessage &&
     !msg.get("hasReferences")
   );
 }
@@ -31,8 +31,8 @@ export function isMessageClaimable(msg) {
   return (
     msg &&
     msg.get("hasContent") &&
-    msg.get("messageType") !== won.WONMSG.connectMessage &&
-    msg.get("messageType") !== won.WONMSG.changeNotificationMessage &&
+    msg.get("messageType") !== vocab.WONMSG.connectMessage &&
+    msg.get("messageType") !== vocab.WONMSG.changeNotificationMessage &&
     !msg.get("hasReferences")
   );
 }
@@ -285,19 +285,19 @@ export function isMessageAgreement(msg) {
 }
 
 export function isAtomHintMessage(msg) {
-  return get(msg, "messageType") === won.WONMSG.atomHintMessage;
+  return get(msg, "messageType") === vocab.WONMSG.atomHintMessage;
 }
 
 export function isSocketHintMessage(msg) {
-  return get(msg, "messageType") === won.WONMSG.socketHintMessage;
+  return get(msg, "messageType") === vocab.WONMSG.socketHintMessage;
 }
 
 export function isConnectionMessage(msg) {
-  return get(msg, "messageType") === won.WONMSG.connectionMessage;
+  return get(msg, "messageType") === vocab.WONMSG.connectionMessage;
 }
 
 export function isChangeNotificationMessage(msg) {
-  return get(msg, "messageType") === won.WONMSG.changeNotificationMessage;
+  return get(msg, "messageType") === vocab.WONMSG.changeNotificationMessage;
 }
 
 export function isParsable(msg) {

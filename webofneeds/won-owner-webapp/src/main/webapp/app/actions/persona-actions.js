@@ -1,5 +1,5 @@
 import { generateIdString, get, getIn } from "../utils";
-import won from "../won-es6";
+import vocab from "../service/vocab.js";
 import { actionTypes } from "./actions";
 import { getOwnedAtomByConnectionUri } from "../redux/selectors/general-selectors";
 import { getOwnedConnectionByUri } from "../redux/selectors/connection-selectors";
@@ -16,11 +16,11 @@ async function connectReview(
 ) {
   const socketUri = atomUtils.getSocketUri(
     ownPersona,
-    won.REVIEW.ReviewSocketCompacted
+    vocab.REVIEW.ReviewSocketCompacted
   );
   const targetSocketUri = atomUtils.getSocketUri(
     foreignPersona,
-    won.REVIEW.ReviewSocketCompacted
+    vocab.REVIEW.ReviewSocketCompacted
   );
 
   if (!socketUri) {
@@ -91,7 +91,7 @@ export function disconnectPersona(atomUri, personaUri) {
       const socketType = getIn(atom, ["content", "sockets", socketUri]);
       return (
         get(conn, "targetAtomUri") === atomUri &&
-        socketType === won.HOLD.HoldableSocketCompacted
+        socketType === vocab.HOLD.HoldableSocketCompacted
       );
     });
 
@@ -141,7 +141,7 @@ export function reviewPersona(reviewableConnectionUri, review) {
           ]);
           return (
             get(connection, "targetAtomUri") === get(foreignPersona, "uri") &&
-            socketType === won.REVIEW.ReviewSocketCompacted
+            socketType === vocab.REVIEW.ReviewSocketCompacted
           );
         })
         .keySeq()

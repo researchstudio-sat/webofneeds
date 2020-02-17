@@ -87,7 +87,7 @@ export const paypalPayment = {
 
     // TODO: this should work with personas too?
     // const customer = get(invoice, "s:customer");
-    // if (!customer || customer.get("@type") !== won.WON.AtomCompacted) {
+    // if (!customer || customer.get("@type") !== vocab.WON.AtomCompacted) {
     //   return undefined;
     // }
 

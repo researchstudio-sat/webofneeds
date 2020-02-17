@@ -3,6 +3,7 @@
  */
 
 import won from "./won-es6.js";
+import vocab from "./service/vocab.js";
 
 import * as wonUtils from "./won-utils.js";
 import * as useCaseUtils from "./usecase-utils.js";
@@ -40,7 +41,7 @@ export function buildRateMessage(
     const buildMessage = function() {
       //TODO: use event URI pattern specified by WoN node
       const eventUri = "wm:/SELF"; //mandatory
-      const message = new won.MessageBuilder(won.WONMSG.feedbackMessage) //TODO: Looks like a copy-paste-leftover from connect
+      const message = new won.MessageBuilder(vocab.WONMSG.feedbackMessage) //TODO: Looks like a copy-paste-leftover from connect
         .protocolVersion("1.0")
         .eventURI(eventUri)
         .ownerDirection()
@@ -68,7 +69,7 @@ export function buildCloseMessage(socketUri, targetSocketUri) {
   const buildMessage = function() {
     //TODO: use event URI pattern specified by WoN node
     const eventUri = "wm:/SELF"; //mandatory
-    const message = new won.MessageBuilder(won.WONMSG.closeMessage)
+    const message = new won.MessageBuilder(vocab.WONMSG.closeMessage)
       .protocolVersion("1.0")
       .eventURI(eventUri)
       .senderSocket(socketUri)
@@ -92,7 +93,7 @@ export function buildCloseMessage(socketUri, targetSocketUri) {
 export function buildCloseAtomMessage(atomUri) {
   const buildMessage = function() {
     const eventUri = "wm:/SELF"; //mandatory
-    const message = new won.MessageBuilder(won.WONMSG.closeAtomMessage)
+    const message = new won.MessageBuilder(vocab.WONMSG.closeAtomMessage)
       .protocolVersion("1.0")
       .atom(atomUri)
       .eventURI(eventUri)
@@ -114,7 +115,7 @@ export function buildCloseAtomMessage(atomUri) {
 export function buildDeleteAtomMessage(atomUri) {
   const buildMessage = function() {
     const eventUri = "wm:/SELF"; //mandatory
-    const message = new won.MessageBuilder(won.WONMSG.deleteAtomMessage)
+    const message = new won.MessageBuilder(vocab.WONMSG.deleteAtomMessage)
       .protocolVersion("1.0")
       .atom(atomUri)
       .eventURI(eventUri)
@@ -136,7 +137,7 @@ export function buildDeleteAtomMessage(atomUri) {
 export function buildOpenAtomMessage(atomUri) {
   const buildMessage = function() {
     const eventUri = "wm:/SELF"; //mandatory
-    const message = new won.MessageBuilder(won.WONMSG.activateAtomMessage)
+    const message = new won.MessageBuilder(vocab.WONMSG.activateAtomMessage)
       .protocolVersion("1.0")
       .atom(atomUri)
       .eventURI(eventUri)
@@ -171,7 +172,7 @@ export function buildConnectMessage({
   }
 
   const eventUri = "wm:/SELF"; //mandatory
-  const messageBuilder = new won.MessageBuilder(won.WONMSG.connectMessage)
+  const messageBuilder = new won.MessageBuilder(vocab.WONMSG.connectMessage)
     .protocolVersion("1.0")
     .eventURI(eventUri)
     .senderSocket(socketUri)
@@ -217,7 +218,7 @@ export function buildChatMessage({
              * and then send to the won-node.
              */
       const wonMessageBuilder = new won.MessageBuilder(
-        won.WONMSG.connectionMessage
+        vocab.WONMSG.connectionMessage
       )
         .protocolVersion("1.0")
         .ownerDirection()
@@ -233,7 +234,7 @@ export function buildChatMessage({
       ) {
         //add the chatMessage as normal text message
         if (chatMessage) {
-          wonMessageBuilder.addContentGraphData(won.WONCON.text, chatMessage);
+          wonMessageBuilder.addContentGraphData(vocab.WONCON.text, chatMessage);
         }
 
         if (additionalContent) {
@@ -286,26 +287,22 @@ export function buildChatMessage({
             if (uris && uris.length > 0) {
               switch (key) {
                 case "retracts":
-                  contentNode[
-                    "https://w3id.org/won/modification#retracts"
-                  ] = uris;
+                  contentNode[vocab.MOD.retracts] = uris;
                   break;
                 case "rejects":
-                  contentNode["https://w3id.org/won/agreement#rejects"] = uris;
+                  contentNode[vocab.AGR.rejects] = uris;
                   break;
                 case "proposes":
-                  contentNode["https://w3id.org/won/agreement#proposes"] = uris;
+                  contentNode[vocab.AGR.proposes] = uris;
                   break;
                 case "claims":
-                  contentNode["https://w3id.org/won/agreement#claims"] = uris;
+                  contentNode[vocab.AGR.claims] = uris;
                   break;
                 case "proposesToCancel":
-                  contentNode[
-                    "https://w3id.org/won/agreement#proposesToCancel"
-                  ] = uris;
+                  contentNode[vocab.AGR.proposesToCancel] = uris;
                   break;
                 case "accepts":
-                  contentNode["https://w3id.org/won/agreement#accepts"] = uris;
+                  contentNode[vocab.AGR.accepts] = uris;
                   break;
                 default:
                   console.error(
@@ -370,7 +367,7 @@ export async function buildEditMessage(editedAtomData, oldAtom) {
 
   const msgUri = "wm:/SELF"; //mandatory
   const msgJson = won.buildMessageRdf(contentRdf, {
-    msgType: won.WONMSG.replaceMessage, //mandatory
+    msgType: vocab.WONMSG.replaceMessage, //mandatory
     publishedContentUri: atomUriToEdit, //mandatory
     msgUri: msgUri,
   });
@@ -436,7 +433,7 @@ export async function buildCreateMessage(atomData, wonNodeUri) {
   const msgUri = "wm:/SELF"; //mandatory
   const msgJson = won.buildMessageRdf(contentRdf, {
     atom: publishedContentUri, //mandatory
-    msgType: won.WONMSG.createMessage, //mandatory
+    msgType: vocab.WONMSG.createMessage, //mandatory
     publishedContentUri: publishedContentUri, //mandatory
     msgUri: msgUri,
   });

@@ -16,7 +16,7 @@ import * as viewUtils from "../redux/utils/view-utils";
 import * as processSelectors from "../redux/selectors/process-selectors";
 import * as accountUtils from "../redux/utils/account-utils";
 import * as useCaseUtils from "../usecase-utils.js";
-import won from "../won-es6.js";
+import vocab from "../service/vocab.js";
 
 import "~/style/_atom-info.scss";
 
@@ -413,7 +413,7 @@ class AtomInfo extends React.Component {
               );
               this.props.hideModalDialog();
 
-              if (senderSocketType === won.CHAT.ChatSocketCompacted) {
+              if (senderSocketType === vocab.CHAT.ChatSocketCompacted) {
                 this.props.routerGoResetParams("connections");
               }
             },
@@ -440,8 +440,8 @@ class AtomInfo extends React.Component {
         if (personaAtom) {
           const targetSocketType =
             connectToSocketUri === this.props.chatSocketUri
-              ? won.CHAT.ChatSocketCompacted
-              : won.GROUP.GroupSocketCompacted;
+              ? vocab.CHAT.ChatSocketCompacted
+              : vocab.GROUP.GroupSocketCompacted;
 
           // if the personaAtom already contains a chatSocket we will just use the persona as the Atom that connects
           const personaConnections = get(personaAtom, "connections")
@@ -458,7 +458,7 @@ class AtomInfo extends React.Component {
               undefined,
               _atomUri,
               message,
-              won.CHAT.ChatSocketCompacted,
+              vocab.CHAT.ChatSocketCompacted,
               targetSocketType
             );
             this.props.routerGoResetParams("connections");
@@ -484,7 +484,7 @@ class AtomInfo extends React.Component {
                 personaConnectionUri,
                 _atomUri,
                 message,
-                won.CHAT.ChatSocketCompacted,
+                vocab.CHAT.ChatSocketCompacted,
                 targetSocketType
               );
               */

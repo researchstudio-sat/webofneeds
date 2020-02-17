@@ -3,6 +3,7 @@
  */
 
 import won from "../won-es6.js";
+import vocab from "../service/vocab.js";
 
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
@@ -286,7 +287,7 @@ function connectReactionAtom(
           const persona = getIn(state, ["atoms", personaUri]);
           ownerApi
             .serverSideConnect(
-              atomUtils.getSocketUri(persona, won.HOLD.HolderSocketCompacted),
+              atomUtils.getSocketUri(persona, vocab.HOLD.HolderSocketCompacted),
               `${atomUri}#holdableSocket`,
               false,
               true
@@ -438,7 +439,7 @@ function connectAdHoc(
         if (personaUri) {
           const persona = getIn(state, ["atoms", personaUri]);
           const response = await ownerApi.serverSideConnect(
-            atomUtils.getSocketUri(persona, won.HOLD.HolderSocketCompacted),
+            atomUtils.getSocketUri(persona, vocab.HOLD.HolderSocketCompacted),
             `${atomUri}#holdableSocket`,
             false,
             true

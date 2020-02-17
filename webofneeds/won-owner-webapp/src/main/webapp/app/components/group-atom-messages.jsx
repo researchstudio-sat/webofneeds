@@ -9,7 +9,7 @@ import { getUnreadMessagesByConnectionUri } from "../redux/selectors/message-sel
 import { get, getIn } from "../utils";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
-import won from "../won-es6.js";
+import vocab from "../service/vocab.js";
 
 import "~/style/_group-atom-messages.scss";
 import "~/style/_rdflink.scss";
@@ -25,12 +25,12 @@ import * as viewSelectors from "../redux/selectors/view-selectors";
 
 const rdfTextfieldHelpText =
   "Expects valid turtle. " +
-  `<${won.WONMSG.uriPlaceholder.event}> will ` +
+  `<${vocab.WONMSG.uriPlaceholder.event}> will ` +
   "be replaced by the uri generated for this message. " +
   "Use it, so your TTL can be found when parsing the messages. " +
   "See `won.defaultTurtlePrefixes` " +
   "for prefixes that will be added automatically. E.g." +
-  `\`<${won.WONMSG.uriPlaceholder.event}> con:text "hello world!". \``;
+  `\`<${vocab.WONMSG.uriPlaceholder.event}> con:text "hello world!". \``;
 
 const mapStateToProps = (state, ownProps) => {
   const connectionUri = generalSelectors.getConnectionUriFromRoute(state);
@@ -470,7 +470,7 @@ class GroupAtomMessages extends React.Component {
     } else {
       this.props.rateConnection(
         this.props.connectionUri,
-        won.WONCON.binaryRatingGood
+        vocab.WONCON.binaryRatingGood
       );
       this.props.connectSockets(
         get(this.props.connection, "socketUri"),
@@ -487,7 +487,7 @@ class GroupAtomMessages extends React.Component {
     if (rateBad) {
       this.props.rateConnection(
         get(this.props.connection, "uri"),
-        won.WONCON.binaryRatingBad
+        vocab.WONCON.binaryRatingBad
       );
     }
     this.props.closeConnection(get(this.props.connection, "uri"));

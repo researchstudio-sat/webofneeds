@@ -12,6 +12,7 @@ import WonTitlePicker from "../../app/components/details/picker/title-picker.jsx
 import WonDescriptionPicker from "../../app/components/details/picker/description-picker.jsx";
 import WonTagsPicker from "../../app/components/details/picker/tags-picker.jsx";
 import WonSuggestAtomPicker from "../../app/components/details/picker/suggest-atom-picker.jsx";
+import vocab from "../../app/service/vocab";
 
 export const title = {
   identifier: "title",
@@ -361,23 +362,23 @@ export const sockets = {
   multiSelect: true,
   options: [
     {
-      value: { "#chatSocket": "chat:ChatSocket" },
+      value: { "#chatSocket": vocab.CHAT.ChatSocketCompacted },
       label: "ChatSocket",
     },
     {
-      value: { "#groupSocket": "group:GroupSocket" },
+      value: { "#groupSocket": vocab.GROUP.GroupSocketCompacted },
       label: "GroupSocket",
     },
     {
-      value: { "#holderSocket": "hold:HolderSocket" },
+      value: { "#holderSocket": vocab.HOLD.HolderSocketCompacted },
       label: "HolderSocket",
     },
     {
-      value: { "#holdableSocket": "hold:HoldableSocket" },
+      value: { "#holdableSocket": vocab.HOLD.HoldableSocketCompacted },
       label: "HoldableSocket",
     },
     {
-      value: { "#reviewSocket": "review:ReviewSocket" },
+      value: { "#reviewSocket": vocab.REVIEW.ReviewSocketCompacted },
       label: "ReviewSocket",
     },
   ],

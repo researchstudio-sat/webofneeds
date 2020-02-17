@@ -8,6 +8,7 @@ import {
   realEstateFeaturesDetail,
 } from "../details/real-estate.js";
 import won from "../../app/service/won.js";
+import vocab from "../../app/service/vocab.js";
 import { perHourRentDetail } from "../details/musician.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import {
@@ -37,8 +38,8 @@ export const rehearsalRoomOffer = {
   reactionUseCases: [
     {
       identifier: "rehearsalRoomSearch",
-      senderSocketType: won.CHAT.ChatSocketCompacted,
-      targetSocketType: won.CHAT.ChatSocketCompacted,
+      senderSocketType: vocab.CHAT.ChatSocketCompacted,
+      targetSocketType: vocab.CHAT.ChatSocketCompacted,
     },
   ],
   details: {

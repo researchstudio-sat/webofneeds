@@ -9,7 +9,7 @@ import * as atomUtils from "../redux/utils/atom-utils";
 import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as connectionSelectors from "../redux/selectors/connection-selectors";
 import * as connectionUtils from "../redux/utils/connection-utils";
-import won from "../won-es6";
+import vocab from "../service/vocab.js";
 import WonLabelledHr from "./labelled-hr.jsx";
 import WonAtomContextSwipeableView from "./atom-context-swipeable-view";
 import WonSuggestAtomPicker from "./details/picker/suggest-atom-picker.jsx";
@@ -279,8 +279,8 @@ class WonAtomContentParticipants extends React.Component {
               detail={{ placeholder: "Insert AtomUri to invite" }}
               excludedUris={this.props.excludedFromInviteUris}
               allowedSockets={[
-                won.CHAT.ChatSocketCompacted,
-                won.GROUP.GroupSocketCompacted,
+                vocab.CHAT.ChatSocketCompacted,
+                vocab.GROUP.GroupSocketCompacted,
               ]}
               excludedText="Invitation does not work for atoms that are already part of the Group, or the group itself"
               notAllowedSocketText="Invitation does not work on atoms without Group or Chat Socket"
@@ -388,7 +388,7 @@ class WonAtomContentParticipants extends React.Component {
               this.props.connectionMarkAsRead(connUri, this.props.atomUri);
             }
 
-            this.props.rateConnection(connUri, won.WONCON.binaryRatingGood);
+            this.props.rateConnection(connUri, vocab.WONCON.binaryRatingGood);
 
             this.props.connectSockets(
               senderSocketUri,

@@ -1,5 +1,5 @@
 import React from "react";
-import won from "../won-es6";
+import vocab from "../service/vocab.js";
 import { connect } from "react-redux";
 import { get, getIn } from "../utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
@@ -32,7 +32,7 @@ const mapStateToProps = (state, ownProps) => {
       ownedBuddyOptions && ownedBuddyOptions.toArray(),
     targetBuddySocketUri: atomUtils.getSocketUri(
       atom,
-      won.BUDDY.BuddySocketCompacted
+      vocab.BUDDY.BuddySocketCompacted
     ),
     atomUri: ownProps.atomUri,
   };
@@ -351,8 +351,8 @@ class WonAddBuddy extends React.Component {
                 existingBuddyConnectionUri,
                 this.props.atomUri,
                 message,
-                won.BUDDY.BuddySocketCompacted,
-                won.BUDDY.BuddySocketCompacted
+                vocab.BUDDY.BuddySocketCompacted,
+                vocab.BUDDY.BuddySocketCompacted
               );
             }
             this.props.hideModalDialog();

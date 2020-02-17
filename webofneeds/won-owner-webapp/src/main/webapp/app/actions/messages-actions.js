@@ -79,18 +79,18 @@ export function failedReopenAtom(event) {
          event.uri
 
 
-         won.WONMSG.recipientAtom = won.WONMSG.baseUri + "recipientAtom";
-         won.WONMSG.recipientAtomCompacted = won.WONMSG.prefix + ":recipientAtom";
-         won.WONMSG.recipient = won.WONMSG.baseUri + "recipient"; // connection if connection event
-         won.WONMSG.recipientCompacted = won.WONMSG.prefix + ":recipient";
-         won.WONMSG.recipientNode = won.WONMSG.baseUri + "recipientNode";
-         won.WONMSG.recipientNodeCompacted = won.WONMSG.prefix + ":recipientNode";
-         won.WONMSG.senderAtom = won.WONMSG.baseUri + "senderAtom";
-         won.WONMSG.senderAtomCompacted = won.WONMSG.prefix + ":senderAtom";
-         won.WONMSG.sender = won.WONMSG.baseUri + "sender";
-         won.WONMSG.senderCompacted = won.WONMSG.prefix + ":sender";
-         won.WONMSG.senderNode = won.WONMSG.baseUri + "senderNode";
-         won.WONMSG.senderNodeCompacted = won.WONMSG.prefix + ":senderNode";
+         vocab.WONMSG.recipientAtom = vocab.WONMSG.baseUri + "recipientAtom";
+         vocab.WONMSG.recipientAtomCompacted = vocab.WONMSG.prefix + ":recipientAtom";
+         vocab.WONMSG.recipient = vocab.WONMSG.baseUri + "recipient"; // connection if connection event
+         vocab.WONMSG.recipientCompacted = vocab.WONMSG.prefix + ":recipient";
+         vocab.WONMSG.recipientNode = vocab.WONMSG.baseUri + "recipientNode";
+         vocab.WONMSG.recipientNodeCompacted = vocab.WONMSG.prefix + ":recipientNode";
+         vocab.WONMSG.senderAtom = vocab.WONMSG.baseUri + "senderAtom";
+         vocab.WONMSG.senderAtomCompacted = vocab.WONMSG.prefix + ":senderAtom";
+         vocab.WONMSG.sender = vocab.WONMSG.baseUri + "sender";
+         vocab.WONMSG.senderCompacted = vocab.WONMSG.prefix + ":sender";
+         vocab.WONMSG.senderNode = vocab.WONMSG.baseUri + "senderNode";
+         vocab.WONMSG.senderNodeCompacted = vocab.WONMSG.prefix + ":senderNode";
          */
 
 export function successfulCloseConnection(event) {

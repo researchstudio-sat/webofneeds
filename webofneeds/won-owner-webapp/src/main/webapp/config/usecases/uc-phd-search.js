@@ -4,7 +4,7 @@
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import { interestsDetail, skillsDetail } from "../details/person.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
-import won from "../../app/service/won.js";
+import vocab from "../../app/service/vocab.js";
 
 export const phdSearch = {
   identifier: "phdSearch",
@@ -27,8 +27,8 @@ export const phdSearch = {
   reactionUseCases: [
     {
       identifier: "phdOffer",
-      senderSocketType: won.CHAT.ChatSocketCompacted,
-      targetSocketType: won.CHAT.ChatSocketCompacted,
+      senderSocketType: vocab.CHAT.ChatSocketCompacted,
+      targetSocketType: vocab.CHAT.ChatSocketCompacted,
     },
   ],
   details: {

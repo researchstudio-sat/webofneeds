@@ -2,7 +2,7 @@
  * Created by ksinger on 04.08.2017.
  */
 
-import won from "../won-es6.js";
+import vocab from "../service/vocab.js";
 import { buildCreateMessage, buildEditMessage } from "../won-message-utils.js";
 
 import { actionCreators, actionTypes } from "./actions.js";
@@ -99,7 +99,10 @@ export function atomCreate(draft, personaUri, nodeUri) {
           if (persona) {
             return ownerApi
               .serverSideConnect(
-                atomUtils.getSocketUri(persona, won.HOLD.HolderSocketCompacted),
+                atomUtils.getSocketUri(
+                  persona,
+                  vocab.HOLD.HolderSocketCompacted
+                ),
                 `${atomUri}#holdableSocket`,
                 false,
                 true

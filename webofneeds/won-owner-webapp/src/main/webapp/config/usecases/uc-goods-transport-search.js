@@ -5,6 +5,7 @@ import {
 } from "../detail-definitions.js";
 import { sparqlQuery } from "../../app/sparql-builder-utils.js";
 import won from "../../app/service/won.js";
+import vocab from "../../app/service/vocab.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 
 import { isValidNumber, get, getIn } from "../../app/utils.js";
@@ -26,8 +27,8 @@ export const goodsTransportSearch = {
   reactionUseCases: [
     {
       identifier: "goodsTransportOffer",
-      senderSocketType: won.CHAT.ChatSocketCompacted,
-      targetSocketType: won.CHAT.ChatSocketCompacted,
+      senderSocketType: vocab.CHAT.ChatSocketCompacted,
+      targetSocketType: vocab.CHAT.ChatSocketCompacted,
     },
   ],
   details: {

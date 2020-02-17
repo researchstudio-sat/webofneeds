@@ -2,27 +2,27 @@
  * Created by fsuda on 05.11.2018.
  */
 
-import won from "../../won-es6.js";
+import vocab from "../../service/vocab.js";
 import { get } from "../../utils.js";
 
 export function isRequestSent(connection) {
-  return get(connection, "state") === won.WON.RequestSent;
+  return get(connection, "state") === vocab.WON.RequestSent;
 }
 
 export function isRequestReceived(connection) {
-  return get(connection, "state") === won.WON.RequestReceived;
+  return get(connection, "state") === vocab.WON.RequestReceived;
 }
 
 export function isSuggested(connection) {
-  return get(connection, "state") === won.WON.Suggested;
+  return get(connection, "state") === vocab.WON.Suggested;
 }
 
 export function isConnected(connection) {
-  return get(connection, "state") === won.WON.Connected;
+  return get(connection, "state") === vocab.WON.Connected;
 }
 
 export function isClosed(connection) {
-  return get(connection, "state") === won.WON.Closed;
+  return get(connection, "state") === vocab.WON.Closed;
 }
 
 export function isUnread(connection) {

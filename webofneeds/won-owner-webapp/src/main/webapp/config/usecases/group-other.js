@@ -1,4 +1,4 @@
-import won from "../../app/service/won.js";
+import vocab from "../../app/service/vocab.js";
 
 import { complain } from "./uc-complain.js";
 import { handleComplaint } from "./uc-handle-complaint.js";
@@ -22,10 +22,10 @@ export const otherGroup = {
         ...mergeInEmptyDraft({
           content: {
             sockets: {
-              "#groupSocket": won.GROUP.GroupSocketCompacted,
-              "#holdableSocket": won.HOLD.HoldableSocketCompacted,
+              "#groupSocket": vocab.GROUP.GroupSocketCompacted,
+              "#holdableSocket": vocab.HOLD.HoldableSocketCompacted,
             },
-            defaultSocket: { "#groupSocket": won.GROUP.GroupSocketCompacted },
+            defaultSocket: { "#groupSocket": vocab.GROUP.GroupSocketCompacted },
           },
         }),
       },

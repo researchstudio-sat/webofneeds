@@ -17,6 +17,7 @@ import {
   sparqlQuery,
 } from "../../app/sparql-builder-utils.js";
 import won from "../../app/service/won.js";
+import vocab from "../../app/service/vocab.js";
 
 export const rentRealEstateOffer = {
   identifier: "rentRealEstateOffer",
@@ -40,8 +41,8 @@ export const rentRealEstateOffer = {
   reactionUseCases: [
     {
       identifier: "rentRealEstateSearch",
-      senderSocketType: won.CHAT.ChatSocketCompacted,
-      targetSocketType: won.CHAT.ChatSocketCompacted,
+      senderSocketType: vocab.CHAT.ChatSocketCompacted,
+      targetSocketType: vocab.CHAT.ChatSocketCompacted,
     },
   ],
   details: {

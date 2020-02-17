@@ -9,7 +9,7 @@ import * as atomUtils from "../redux/utils/atom-utils";
 import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as connectionSelectors from "../redux/selectors/connection-selectors";
 import * as connectionUtils from "../redux/utils/connection-utils";
-import won from "../won-es6";
+import vocab from "../service/vocab.js";
 import WonAtomContextSwipeableView from "./atom-context-swipeable-view";
 import WonLabelledHr from "./labelled-hr.jsx";
 import WonSuggestAtomPicker from "./details/picker/suggest-atom-picker.jsx";
@@ -324,7 +324,7 @@ class WonAtomContentBuddies extends React.Component {
               onUpdate={({ value }) => this.requestBuddy(value)}
               detail={{ placeholder: "Insert AtomUri to invite" }}
               excludedUris={this.props.excludedFromRequestUris}
-              allowedSockets={[won.BUDDY.BuddySocketCompacted]}
+              allowedSockets={[vocab.BUDDY.BuddySocketCompacted]}
               excludedText="Requesting yourself or someone who is already your Buddy is not allowed"
               notAllowedSocketText="Request does not work on atoms without the Buddy Socket"
               noSuggestionsText="No known Personas available"
@@ -427,8 +427,8 @@ class WonAtomContentBuddies extends React.Component {
               undefined,
               targetAtomUri,
               message,
-              won.BUDDY.BuddySocketCompacted,
-              won.BUDDY.BuddySocketCompacted
+              vocab.BUDDY.BuddySocketCompacted,
+              vocab.BUDDY.BuddySocketCompacted
             );
             this.props.hideModalDialog();
           },
@@ -461,8 +461,8 @@ class WonAtomContentBuddies extends React.Component {
           undefined,
           get(connection, "targetAtomUri"),
           "",
-          won.CHAT.ChatSocketCompacted,
-          won.CHAT.ChatSocketCompacted
+          vocab.CHAT.ChatSocketCompacted,
+          vocab.CHAT.ChatSocketCompacted
         );
         this.props.routerGoResetParams("connections");
       } else if (chatConnections.length == 1) {
@@ -478,8 +478,8 @@ class WonAtomContentBuddies extends React.Component {
             undefined,
             chatConnectionUri,
             "",
-            won.CHAT.ChatSocketCompacted,
-            won.CHAT.ChatSocketCompacted
+            vocab.CHAT.ChatSocketCompacted,
+            vocab.CHAT.ChatSocketCompacted
           );
         } else if (
           connectionUtils.isConnected(chatConnection) ||
@@ -504,8 +504,8 @@ class WonAtomContentBuddies extends React.Component {
         undefined,
         get(connection, "targetAtomUri"),
         "",
-        won.CHAT.ChatSocketCompacted,
-        won.CHAT.ChatSocketCompacted
+        vocab.CHAT.ChatSocketCompacted,
+        vocab.CHAT.ChatSocketCompacted
       );
       this.props.routerGoResetParams("connections");
     }

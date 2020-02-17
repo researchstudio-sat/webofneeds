@@ -3,7 +3,7 @@
  */
 import { actionTypes } from "../../actions/actions.js";
 import Immutable from "immutable";
-import won from "../../won-es6.js";
+import vocab from "../../service/vocab.js";
 import { get, getIn, msStringToDate } from "../../utils.js";
 import {
   addAtom,
@@ -103,13 +103,13 @@ export default function(allAtomsInState = initialState, action = {}) {
     case actionTypes.atoms.reopen:
       return allAtomsInState.setIn(
         [action.payload.ownedAtomUri, "state"],
-        won.WON.ActiveCompacted
+        vocab.WON.ActiveCompacted
       );
 
     case actionTypes.atoms.close:
       return allAtomsInState.setIn(
         [action.payload.ownedAtomUri, "state"],
-        won.WON.InactiveCompacted
+        vocab.WON.InactiveCompacted
       );
 
     case actionTypes.atoms.removeDeleted:
@@ -173,12 +173,12 @@ export default function(allAtomsInState = initialState, action = {}) {
         allAtomsInState,
         action.payload.updatedConnectionUri,
         state => {
-          if (!state) return won.WON.RequestReceived; //fallback if no state present
-          if (state === won.WON.Connected) return won.WON.Connected; //stay in connected if it was already the case
-          if (state === won.WON.RequestSent) return won.WON.Connected;
-          if (state === won.WON.Suggested) return won.WON.RequestReceived;
-          if (state === won.WON.Closed) return won.WON.RequestReceived;
-          return won.WON.RequestReceived;
+          if (!state) return vocab.WON.RequestReceived; //fallback if no state present
+          if (state === vocab.WON.Connected) return vocab.WON.Connected; //stay in connected if it was already the case
+          if (state === vocab.WON.RequestSent) return vocab.WON.Connected;
+          if (state === vocab.WON.Suggested) return vocab.WON.RequestReceived;
+          if (state === vocab.WON.Closed) return vocab.WON.RequestReceived;
+          return vocab.WON.RequestReceived;
         }
       );
       return allAtomsInState;
@@ -189,7 +189,7 @@ export default function(allAtomsInState = initialState, action = {}) {
       return changeConnectionState(
         allAtomsInState,
         action.payload.connectionUri,
-        won.WON.Closed
+        vocab.WON.Closed
       );
 
     case actionTypes.atoms.connectSockets: {
@@ -216,11 +216,11 @@ export default function(allAtomsInState = initialState, action = {}) {
           allAtomsInState,
           get(affectedConnection, "uri"),
           state => {
-            if (!state) return won.WON.RequestSent; //fallback if no state present
-            if (state === won.WON.Connected) return won.WON.Connected; //stay in connected if it was already the case
-            if (state === won.WON.RequestReceived) return won.WON.Connected;
-            if (state === won.WON.Suggested) return won.WON.RequestSent;
-            if (state === won.WON.Closed) return won.WON.RequestSent;
+            if (!state) return vocab.WON.RequestSent; //fallback if no state present
+            if (state === vocab.WON.Connected) return vocab.WON.Connected; //stay in connected if it was already the case
+            if (state === vocab.WON.RequestReceived) return vocab.WON.Connected;
+            if (state === vocab.WON.Suggested) return vocab.WON.RequestSent;
+            if (state === vocab.WON.Closed) return vocab.WON.RequestSent;
           }
         );
         return addMessage(
@@ -236,7 +236,7 @@ export default function(allAtomsInState = initialState, action = {}) {
         const optimisticConnection = Immutable.fromJS({
           uri: tmpConnectionUri,
           usingTemporaryUri: true,
-          state: won.WON.RequestSent,
+          state: vocab.WON.RequestSent,
           targetAtomUri: targetAtomUri,
           targetConnectionUri: undefined,
           unread: false,
@@ -273,7 +273,7 @@ export default function(allAtomsInState = initialState, action = {}) {
               date: msStringToDate(optimisticEvent.getTimestamp()),
               outgoingMessage: true,
               unread: false,
-              messageType: won.WONMSG.connectMessage,
+              messageType: vocab.WONMSG.connectMessage,
               messageStatus: {
                 isProposed: false,
                 isClaimed: false,
@@ -305,7 +305,7 @@ export default function(allAtomsInState = initialState, action = {}) {
         stateUpdated = changeConnectionState(
           allAtomsInState,
           action.payload.ownConnectionUri,
-          won.WON.RequestSent
+          vocab.WON.RequestSent
         );
         //because we have a connection uri, we can add the message
         return addMessage(stateUpdated, optimisticEvent, false, eventUri);
@@ -318,7 +318,7 @@ export default function(allAtomsInState = initialState, action = {}) {
         const optimisticConnection = Immutable.fromJS({
           uri: tmpConnectionUri,
           usingTemporaryUri: true,
-          state: won.WON.RequestSent,
+          state: vocab.WON.RequestSent,
           targetAtomUri: theirAtomUri,
           targetConnectionUri: undefined,
           unread: false,
@@ -355,7 +355,7 @@ export default function(allAtomsInState = initialState, action = {}) {
               date: msStringToDate(optimisticEvent.getTimestamp()),
               outgoingMessage: true,
               unread: false,
-              messageType: won.WONMSG.connectMessage,
+              messageType: vocab.WONMSG.connectMessage,
               messageStatus: {
                 isProposed: false,
                 isClaimed: false,
@@ -384,12 +384,12 @@ export default function(allAtomsInState = initialState, action = {}) {
           allAtomsInState,
           senderConnectionUri,
           state => {
-            if (!state) return won.WON.RequestSent; //fallback if no state present
-            if (state === won.WON.Connected) return won.WON.Connected; //stay in connected if it was already the case
-            if (state === won.WON.RequestReceived) return won.WON.Connected;
-            if (state === won.WON.Suggested) return won.WON.RequestSent;
-            if (state === won.WON.Closed) return won.WON.RequestSent;
-            return won.WON.RequestSent;
+            if (!state) return vocab.WON.RequestSent; //fallback if no state present
+            if (state === vocab.WON.Connected) return vocab.WON.Connected; //stay in connected if it was already the case
+            if (state === vocab.WON.RequestReceived) return vocab.WON.Connected;
+            if (state === vocab.WON.Suggested) return vocab.WON.RequestSent;
+            if (state === vocab.WON.Closed) return vocab.WON.RequestSent;
+            return vocab.WON.RequestSent;
           }
         );
 
@@ -523,13 +523,14 @@ export default function(allAtomsInState = initialState, action = {}) {
             allAtomsInState,
             connUri,
             state => {
-              if (!state) return won.WON.RequestSent; //fallback if no state present
-              if (state === won.WON.Connected) return won.WON.Connected; //stay in connected if it was already the case
-              if (state === won.WON.RequestSent) return won.WON.RequestSent;
-              if (state === won.WON.RequestReceived) return won.WON.Connected;
-              if (state === won.WON.Suggested) return won.WON.RequestSent;
-              if (state === won.WON.Closed) return won.WON.RequestSent;
-              return won.WON.RequestReceived;
+              if (!state) return vocab.WON.RequestSent; //fallback if no state present
+              if (state === vocab.WON.Connected) return vocab.WON.Connected; //stay in connected if it was already the case
+              if (state === vocab.WON.RequestSent) return vocab.WON.RequestSent;
+              if (state === vocab.WON.RequestReceived)
+                return vocab.WON.Connected;
+              if (state === vocab.WON.Suggested) return vocab.WON.RequestSent;
+              if (state === vocab.WON.Closed) return vocab.WON.RequestSent;
+              return vocab.WON.RequestReceived;
             }
           );
 
@@ -576,7 +577,7 @@ export default function(allAtomsInState = initialState, action = {}) {
       return changeConnectionState(
         allAtomsInState,
         action.payload.getConnection(),
-        won.WON.Closed
+        vocab.WON.Closed
       );
     case actionTypes.messages.viewState.markExpandReference:
       return markMessageExpandReferences(

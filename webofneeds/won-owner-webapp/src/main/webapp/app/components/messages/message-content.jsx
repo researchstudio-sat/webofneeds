@@ -11,7 +11,7 @@ import * as usecaseUtils from "../../usecase-utils.js";
 
 import "~/style/_message-content.scss";
 import "~/style/_won-markdown.scss";
-import won from "../../won-es6";
+import vocab from "../../service/vocab.js";
 
 const noParsableContentPlaceholder =
   "«This message couldn't be displayed as it didn't contain," +
@@ -66,8 +66,8 @@ class WonMessageContent extends React.Component {
       );
 
       const noParsableContent =
-        this.props.messageType !== won.WONMSG.connectMessage &&
-        this.props.messageType !== won.WONMSG.openMessage &&
+        this.props.messageType !== vocab.WONMSG.connectMessage &&
+        this.props.messageType !== vocab.WONMSG.openMessage &&
         !get(this.props.message, "isParsable") ? (
           <div className="msg__text markdown">
             {noParsableContentPlaceholder}

@@ -25,6 +25,7 @@ import {
   isDisclaimerAccepted,
   setDisclaimerAccepted,
 } from "../won-localstorage.js";
+import vocab from "./vocab.js";
 import jsonld from "jsonld/dist/jsonld.js";
 
 import N3 from "n3";
@@ -44,254 +45,6 @@ won.clearReadUris = clearReadUris;
 won.isDisclaimerAccepted = isDisclaimerAccepted;
 won.clearDisclaimerAccepted = clearDisclaimerAccepted;
 won.setDisclaimerAccepted = setDisclaimerAccepted;
-
-won.WON = {};
-won.WON.baseUri = "https://w3id.org/won/core#";
-won.WON.matcherURI = "https://localhost:8443/matcher/search/";
-won.WON.prefix = "won";
-
-won.WON.wonNode = won.WON.baseUri + "wonNode";
-won.WON.wonNodeCompacted = won.WON.prefix + ":wonNode";
-won.WON.Active = won.WON.baseUri + "Active";
-won.WON.ActiveCompacted = won.WON.prefix + ":Active";
-won.WON.Closed = won.WON.baseUri + "Closed";
-won.WON.ClosedCompacted = won.WON.prefix + ":Closed";
-
-won.WON.Inactive = won.WON.baseUri + "Inactive";
-won.WON.InactiveCompacted = won.WON.prefix + ":Inactive";
-
-won.WON.Deleted = won.WON.baseUri + "Deleted";
-won.WON.DeletedCompacted = won.WON.prefix + ":Deleted";
-
-won.WON.atomState = won.WON.baseUri + "atomState";
-won.WON.atomStateCompacted = won.WON.prefix + ":atomState";
-won.WON.socket = won.WON.baseUri + "socket";
-won.WON.socketCompacted = won.WON.prefix + ":socket";
-won.WON.targetSocket = won.WON.baseUri + "targetSocket";
-won.WON.targetSocketCompacted = won.WON.prefix + ":targetSocket";
-
-won.WON.targetAtom = won.WON.baseUri + "targetAtom";
-won.WON.targetAtomCompacted = won.WON.prefix + ":targetAtom";
-won.WON.targetConnection = won.WON.baseUri + "targetConnection";
-won.WON.targetConnectionCompacted = won.WON.prefix + ":targetConnection";
-
-won.WON.connectionState = won.WON.baseUri + "connectionState";
-won.WON.connectionState = won.WON.prefix + ":connectionState";
-won.WON.Suggested = won.WON.baseUri + "Suggested";
-won.WON.SuggestedCompacted = won.WON.baseUri + ":Suggested";
-won.WON.RequestReceived = won.WON.baseUri + "RequestReceived";
-won.WON.RequestReceivedCompacted = won.WON.baseUri + ":RequestReceived";
-won.WON.RequestSent = won.WON.baseUri + "RequestSent";
-won.WON.RequestSentCompacted = won.WON.baseUri + ":RequestSent";
-
-won.WON.Connected = won.WON.baseUri + "Connected";
-
-//TOAST TYPES
-won.WON.infoToast = won.WON.baseUri + "InfoToast";
-won.WON.warnToast = won.WON.baseUri + "WarnToast";
-won.WON.errorToast = won.WON.baseUri + "ErrorToast";
-
-won.WON.graph = won.WON.baseUri + "graph";
-won.WON.graphCompacted = won.WON.prefix + ":graph";
-
-won.WON.Connection = won.WON.baseUri + "Connection";
-won.WON.ConnectionCompacted = won.WON.prefix + ":Connection";
-
-won.WON.Atom = won.WON.baseUri + "Atom";
-won.WON.AtomCompacted = won.WON.prefix + ":Atom";
-won.WON.sourceAtom = won.WON.baseUri + "sourceAtom";
-won.WON.sourceAtomCompacted = won.WON.prefix + ":sourceAtom";
-won.WON.connections = won.WON.baseUri + "connections";
-won.WON.connectionsCompacted = won.WON.prefix + ":connections";
-won.WON.connectionState = won.WON.baseUri + "connectionState";
-won.WON.connectionStateCompacted = won.WON.prefix + ":connectionState";
-won.WON.hasContent = won.WON.baseUri + "hasContent";
-won.WON.hasContentCompacted = won.WON.prefix + ":content";
-won.WON.messageContainer = won.WON.baseUri + "messageContainer";
-won.WON.messageContainerCompacted = won.WON.prefix + ":messageContainer";
-
-won.WON.Persona = won.WON.baseUri + "Persona";
-won.WON.PersonaCompacted = won.WON.prefix + ":Persona";
-
-won.WON.matchScore = won.WON.baseUri + "matchScore";
-won.WON.matchScoreCompacted = won.WON.prefix + ":matchScore";
-won.WON.matchCounterpart = won.WON.baseUri + "matchCounterpart";
-won.WON.matchCounterpart = won.WON.prefix + ":matchCounterpart";
-
-won.WON.searchResultURI = won.WON.baseUri + "uri";
-won.WON.searchResultPreview = won.WON.baseUri + "preview";
-//todo: change to SearchResult
-won.WON.searchResult = won.WON.baseUri + "Match";
-
-won.WON.usedForTesting = won.WON.prefix + "UserForTesting";
-
-won.WONCON = {};
-won.WONCON.baseUri = "https://w3id.org/won/content#";
-won.WONCON.prefix = "con";
-won.WONCON.text = won.WONCON.baseUri + "text";
-won.WONCON.textCompacted = won.WONCON.prefix + ":text";
-won.WONCON.tag = won.WONCON.baseUri + "tag";
-won.WONCON.tagCompacted = won.WONCON.prefix + ":tag";
-won.WONCON.binaryRatingGood = won.WONCON.baseUri + "Good";
-won.WONCON.binaryRatingBad = won.WONCON.baseUri + "Bad";
-won.WONCON.feedback = won.WONCON.baseUri + "feedback";
-won.WONCON.binaryRating = won.WONCON.baseUri + "binaryRating";
-won.WONCON.feedbackTarget = won.WON.baseUri + "feedbackTarget";
-won.WONCON.DirectResponse = won.WON.baseUri + "DirectResponse";
-won.WONCON.DirectResponseCompacted = won.WONCON.prefix + ":DirectResponse";
-
-won.WONMATCH = {};
-won.WONMATCH.baseUri = "https://w3id.org/won/matching#";
-won.WONMATCH.prefix = "match";
-won.WONMATCH.NoHintForCounterpartCompacted =
-  won.WONMATCH.prefix + ":NoHintForCounterpart";
-won.WONMATCH.UsedForTestingCompacted = won.WONMATCH.prefix + ":UsedForTesting";
-won.WONMATCH.NoHintForMeCompacted = won.WONMATCH.prefix + ":NoHintForMe";
-won.WONMATCH.flag = won.WONMATCH.baseUri + "flag";
-won.WONMATCH.flagCompacted = won.WONMATCH.prefix + ":flag";
-
-won.WONMSG = {};
-won.WONMSG.baseUri = "https://w3id.org/won/message#";
-won.WONMSG.prefix = "msg";
-won.WONMSG.recipientAtom = won.WONMSG.baseUri + "recipientAtom";
-won.WONMSG.recipientAtomCompacted = won.WONMSG.prefix + ":recipientAtom";
-won.WONMSG.recipient = won.WONMSG.baseUri + "recipient";
-won.WONMSG.recipientCompacted = won.WONMSG.prefix + ":recipient";
-won.WONMSG.recipientNode = won.WONMSG.baseUri + "recipientNode";
-won.WONMSG.recipientNodeCompacted = won.WONMSG.prefix + ":recipientNode";
-won.WONMSG.recipientSocket = won.WONMSG.baseUri + "recipientSocket";
-won.WONMSG.recipientSocketCompacted = won.WONMSG.prefix + ":recipientSocket";
-won.WONMSG.atom = won.WONMSG.baseUri + "atom";
-won.WONMSG.atomCompacted = won.WONMSG.prefix + ":atom";
-won.WONMSG.senderAtom = won.WONMSG.baseUri + "senderAtom";
-won.WONMSG.senderAtomCompacted = won.WONMSG.prefix + ":senderAtom";
-won.WONMSG.sender = won.WONMSG.baseUri + "sender";
-won.WONMSG.senderCompacted = won.WONMSG.prefix + ":sender";
-won.WONMSG.senderNode = won.WONMSG.baseUri + "senderNode";
-won.WONMSG.senderNodeCompacted = won.WONMSG.prefix + ":senderNode";
-won.WONMSG.senderSocket = won.WONMSG.baseUri + "senderSocket";
-won.WONMSG.senderSocketCompacted = won.WONMSG.prefix + ":senderSocket";
-won.WONMSG.messageType = won.WONMSG.baseUri + ":messageType";
-won.WONMSG.messageTypeCompacted = won.WONMSG.prefix + ":messageType";
-won.WONMSG.timestamp = won.WONMSG.baseUri + "timestamp";
-won.WONMSG.timestampCompacted = won.WONMSG.prefix + ":timestamp";
-won.WONMSG.isResponseTo = won.WONMSG.baseUri + "isResponseTo";
-won.WONMSG.isResponseToCompacted = won.WONMSG.prefix + ":isResponseTo";
-won.WONMSG.isRemoteResponseTo = won.WONMSG.baseUri + "isRemoteResponseTo";
-won.WONMSG.isRemoteResponseToCompacted =
-  won.WONMSG.prefix + ":isRemoteResponseTo";
-won.WONMSG.EnvelopeGraph = won.WONMSG.baseUri + "EnvelopeGraph";
-won.WONMSG.EnvelopeGraphCompacted = won.WONMSG.prefix + ":EnvelopeGraph";
-
-won.WONMSG.hasContent = won.WONMSG.baseUri + "hasContent";
-won.WONMSG.hasContentCompacted = won.WONMSG.prefix + ":content";
-
-won.WONMSG.FromOwner = won.WONMSG.baseUri + "FromOwner";
-won.WONMSG.FromOwnerCompacted = won.WONMSG.prefix + ":FromOwner";
-won.WONMSG.FromExternal = won.WONMSG.baseUri + "FromExternal";
-won.WONMSG.FromSystem = won.WONMSG.baseUri + "FromSystem";
-
-//message types
-won.WONMSG.createMessage = won.WONMSG.baseUri + "CreateMessage";
-won.WONMSG.createMessageCompacted = won.WONMSG.prefix + ":CreateMessage";
-won.WONMSG.replaceMessage = won.WONMSG.baseUri + "ReplaceMessage";
-won.WONMSG.replaceMessageCompacted = won.WONMSG.prefix + ":ReplaceMessage";
-won.WONMSG.activateAtomMessage = won.WONMSG.baseUri + "ActivateMessage";
-won.WONMSG.activateAtomMessageCompacted =
-  won.WONMSG.prefix + ":ActivateMessage";
-won.WONMSG.deleteAtomMessage = won.WONMSG.baseUri + "DeleteMessage";
-won.WONMSG.deleteAtomMessageCompacted = won.WONMSG.prefix + ":DeleteMessage";
-won.WONMSG.deleteAtomSentMessage = won.WONMSG.baseUri + "DeleteSentMessage";
-won.WONMSG.deleteAtomSentMessageCompacted =
-  won.WONMSG.prefix + ":DeleteSentMessage";
-won.WONMSG.closeAtomMessage = won.WONMSG.baseUri + "DeactivateMessage";
-won.WONMSG.closeAtomMessageCompacted = won.WONMSG.prefix + ":DeactivateMessage";
-won.WONMSG.closeAtomSentMessage = won.WONMSG.baseUri + "DeactivateSentMessage";
-won.WONMSG.closeAtomSentMessageCompacted =
-  won.WONMSG.prefix + ":DeactivateSentMessage";
-won.WONMSG.atomHintMessage = won.WONMSG.baseUri + "AtomHintMessage";
-won.WONMSG.atomHintMessageCompacted = won.WONMSG.prefix + ":AtomHintMessage";
-won.WONMSG.socketHintMessage = won.WONMSG.baseUri + "SocketHintMessage";
-won.WONMSG.socketHintMessageCompacted =
-  won.WONMSG.prefix + ":SocketHintMessage";
-won.WONMSG.hintFeedbackMessage = won.WONMSG.baseUri + "HintFeedbackMessage";
-won.WONMSG.hintFeedbackMessageCompacted =
-  won.WONMSG.prefix + ":HintFeedbackMessage";
-won.WONMSG.connectMessage = won.WONMSG.baseUri + "ConnectMessage";
-won.WONMSG.connectMessageCompacted = won.WONMSG.prefix + ":ConnectMessage";
-won.WONMSG.connectSentMessage = won.WONMSG.baseUri + "ConnectSentMessage";
-won.WONMSG.connectSentMessageCompacted =
-  won.WONMSG.prefix + ":ConnectSentMessage";
-won.WONMSG.atomStateMessage = won.WONMSG.baseUri + "AtomStateMessage";
-won.WONMSG.atomStateMessageCompacted = won.WONMSG.prefix + ":AtomStateMessage";
-won.WONMSG.closeMessage = won.WONMSG.baseUri + "CloseMessage";
-won.WONMSG.closeMessageCompacted = won.WONMSG.prefix + ":CloseMessage";
-won.WONMSG.feedbackMessage = won.WONMSG.baseUri + "HintFeedbackMessage";
-won.WONMSG.openSentMessage = won.WONMSG.baseUri + "OpenSentMessage";
-won.WONMSG.openSentMessageCompacted = won.WONMSG.prefix + ":OpenSentMessage";
-won.WONMSG.changeNotificationMessage =
-  won.WONMSG.baseUri + "ChangeNotificationMessage";
-won.WONMSG.changeNotificationMessageCompacted =
-  won.WONMSG.prefix + ":ChangeNotificationMessage";
-won.WONMSG.connectionMessage = won.WONMSG.baseUri + "ConnectionMessage";
-won.WONMSG.connectionMessageCompacted =
-  won.WONMSG.prefix + ":ConnectionMessage";
-won.WONMSG.connectionMessageSentMessage =
-  won.WONMSG.baseUri + "ConnectionMessageSentMessage";
-won.WONMSG.connectionMessageSentMessageCompacted =
-  won.WONMSG.prefix + ":ConnectionMessageSentMessage";
-won.WONMSG.connectionMessageReceivedMessage =
-  won.WONMSG.baseUri + "ConnectionMessageReceivedMessage";
-won.WONMSG.connectionMessageReceivedMessageCompacted =
-  won.WONMSG.prefix + ":ConnectionMessageReceivedMessage";
-
-//response types
-won.WONMSG.successResponse = won.WONMSG.baseUri + "SuccessResponse";
-won.WONMSG.successResponseCompacted = won.WONMSG.prefix + ":SuccessResponse";
-won.WONMSG.failureResponse = won.WONMSG.baseUri + "FailureResponse";
-won.WONMSG.failureResponseCompacted = won.WONMSG.prefix + ":FailureResponse";
-
-won.HOLD = {};
-won.HOLD.baseUri = "https://w3id.org/won/ext/hold#";
-won.HOLD.prefix = "hold";
-won.HOLD.HoldableSocket = won.HOLD.baseUri + "HoldableSocket";
-won.HOLD.HoldableSocketCompacted = won.HOLD.prefix + ":HoldableSocket";
-won.HOLD.HolderSocket = won.HOLD.baseUri + "HolderSocket";
-won.HOLD.HolderSocketCompacted = won.HOLD.prefix + ":HolderSocket";
-
-won.BOT = {};
-won.BOT.baseUri = "https://w3id.org/won/ext/bot#";
-won.BOT.prefix = "wx-bot";
-won.BOT.ServiceAtom = won.BOT.baseUri + "ServiceAtom";
-won.BOT.ServiceAtomCompacted = won.BOT.prefix + ":ServiceAtom";
-
-won.DEMO = {};
-won.DEMO.baseUri = "https://w3id.org/won/ext/demo#";
-won.DEMO.prefix = "demo";
-
-won.CHAT = {};
-won.CHAT.baseUri = "https://w3id.org/won/ext/chat#";
-won.CHAT.prefix = "chat";
-won.CHAT.ChatSocket = won.CHAT.baseUri + "ChatSocket";
-won.CHAT.ChatSocketCompacted = won.CHAT.prefix + ":ChatSocket";
-
-won.GROUP = {};
-won.GROUP.baseUri = "https://w3id.org/won/ext/group#";
-won.GROUP.prefix = "group";
-won.GROUP.GroupSocket = won.GROUP.baseUri + "GroupSocket";
-won.GROUP.GroupSocketCompacted = won.GROUP.prefix + ":GroupSocket";
-
-won.REVIEW = {};
-won.REVIEW.baseUri = "https://w3id.org/won/ext/review#";
-won.REVIEW.prefix = "review";
-won.REVIEW.ReviewSocket = won.REVIEW.baseUri + "ReviewSocket";
-won.REVIEW.ReviewSocketCompacted = won.REVIEW.prefix + ":ReviewSocket";
-
-won.BUDDY = {};
-won.BUDDY.baseUri = "https://w3id.org/won/ext/buddy#";
-won.BUDDY.prefix = "buddy";
-won.BUDDY.BuddySocket = won.BUDDY.baseUri + "BuddySocket";
-won.BUDDY.BuddySocketCompacted = won.BUDDY.prefix + ":BuddySocket";
 
 //Code definitions as enum in RestStatusResponse.java
 won.RESPONSECODE = Object.freeze({
@@ -335,15 +88,6 @@ won.RESPONSECODE = Object.freeze({
 won.PRIVATEID_NOT_FOUND_ERROR = Object.freeze({
   code: 666,
   message: "invalid privateId",
-});
-
-//UTILS
-won.WONMSG.uriPlaceholder = Object.freeze({
-  event: "wm:/SELF",
-});
-
-won.WON.contentNodeBlankUri = Object.freeze({
-  seeks: "_:seeksAtomContent",
 });
 
 /**
@@ -599,22 +343,22 @@ function context2ttlPrefixes(jsonldContext) {
 }
 
 won.minimalContext = {
-  msg: "https://w3id.org/won/message#",
-  won: "https://w3id.org/won/core#",
-  con: won.WONCON.baseUri,
-  match: won.WONMATCH.baseUri,
-  demo: won.DEMO.baseUri,
-  "wx-bot": won.BOT.baseUri,
-  hold: won.HOLD.baseUri,
-  chat: won.CHAT.baseUri,
-  group: won.GROUP.baseUri,
-  review: won.REVIEW.baseUri,
-  buddy: won.BUDDY.baseUri,
+  msg: vocab.WONMSG.baseUri,
+  won: vocab.WON.baseUri,
+  con: vocab.WONCON.baseUri,
+  match: vocab.WONMATCH.baseUri,
+  demo: vocab.DEMO.baseUri,
+  "wx-bot": vocab.BOT.baseUri,
+  hold: vocab.HOLD.baseUri,
+  chat: vocab.CHAT.baseUri,
+  group: vocab.GROUP.baseUri,
+  review: vocab.REVIEW.baseUri,
+  buddy: vocab.BUDDY.baseUri,
   rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-  agr: "https://w3id.org/won/agreement#",
-  pay: "https://w3id.org/won/payment#",
+  agr: vocab.AGR.baseUri,
+  pay: vocab.PAYMENT.baseUri,
   gr: "http://purl.org/goodrelations/v1#",
-  wf: "https://w3id.org/won/workflow#",
+  wf: vocab.WORKFLOW.baseUri,
   rdfg: "http://www.w3.org/2004/03/trix/rdfg-1/",
 };
 won.minimalTurtlePrefixes = context2ttlPrefixes(won.minimalContext);
@@ -635,7 +379,7 @@ won.defaultContext = {
   sh: "http://www.w3.org/ns/shacl#",
   foaf: "http://xmlns.com/foaf/0.1/",
   "msg:messageType": {
-    "@id": "https://w3id.org/won/message#messageType",
+    "@id": vocab.WONMSG.messageType,
     "@type": "@id",
   },
 };
@@ -750,7 +494,7 @@ won.addContentGraphReferencesToMessageGraph = function(
     if (won.isArray(graphURIs) && graphURIs.length > 0) {
       //if the message graph already contains content references, fetch them:
       const existingContentRefs =
-        messageGraph["@graph"][0][won.WONMSG.hasContentCompacted];
+        messageGraph["@graph"][0][vocab.WONMSG.contentCompacted];
       const contentGraphURIs =
         typeof existingContentRefs === "undefined" ||
         !isArray(existingContentRefs)
@@ -762,7 +506,7 @@ won.addContentGraphReferencesToMessageGraph = function(
         });
       }
       messageGraph["@graph"][0][
-        won.WONMSG.hasContentCompacted
+        vocab.WONMSG.contentCompacted
       ] = contentGraphURIs;
     }
   }
@@ -779,12 +523,12 @@ won.addContentGraphReferencesToMessageGraph = function(
  */
 won.addMessageGraph = function(builder, graphURIs, messageType) {
   let graphs = builder.data["@graph"];
-  let unsetMessageGraphUri = won.WONMSG.uriPlaceholder.event + "#envelope";
+  let unsetMessageGraphUri = vocab.WONMSG.uriPlaceholder.event + "#envelope";
   //create the message graph, containing the message type
   const messageGraph = {
     "@graph": [
       {
-        "@id": won.WONMSG.uriPlaceholder.event,
+        "@id": vocab.WONMSG.uriPlaceholder.event,
         "msg:messageType": {
           "@id": messageType,
         },
@@ -794,7 +538,7 @@ won.addMessageGraph = function(builder, graphURIs, messageType) {
       },
       {
         "@id": unsetMessageGraphUri,
-        "@type": "msg:EnvelopeGraph",
+        "@type": vocab.WONMSG.EnvelopeGraphCompacted,
       },
     ],
     "@id": unsetMessageGraphUri,
@@ -816,7 +560,7 @@ won.newGraph = function(hashFragement) {
   return {
     "@graph": [
       {
-        "@id": won.WONMSG.uriPlaceholder.event + "#" + hashFragement,
+        "@id": vocab.WONMSG.uriPlaceholder.event + "#" + hashFragement,
         "@graph": [],
       },
     ],
@@ -1039,9 +783,7 @@ WonMessage.prototype = {
   },
 
   getRemoteMessageUri: function() {
-    return this.getProperty(
-      "https://w3id.org/won/message#correspondingRemoteMessage"
-    );
+    return this.getProperty(vocab.WONMSG.correspondingRemoteMessage);
   },
 
   __getMessageUri: function(messageStructure) {
@@ -1223,7 +965,7 @@ WonMessage.prototype = {
   },
   getPropertyFromRemoteMessage: function(property) {
     const remoteMessage = this.__getFramedMessage()["@graph"][0][
-      "https://w3id.org/won/message#correspondingRemoteMessage"
+      vocab.WONMSG.correspondingRemoteMessage
     ];
     if (remoteMessage) {
       let val = remoteMessage[property];
@@ -1266,270 +1008,196 @@ WonMessage.prototype = {
     return this.compactRawMessage;
   },
   getMessageType: function() {
-    return this.getProperty("https://w3id.org/won/message#messageType");
+    return this.getProperty(vocab.WONMSG.messageType);
   },
   getInjectIntoConnectionUris: function() {
-    return createArray(
-      this.getProperty("https://w3id.org/won/message#injectIntoConnection")
-    );
+    return createArray(this.getProperty(vocab.WONMSG.injectIntoConnection));
   },
   getForwardedMessageUris: function() {
-    return createArray(
-      this.getProperty("https://w3id.org/won/message#forwardedMessage")
-    );
+    return createArray(this.getProperty(vocab.WONMSG.forwardedMessage));
   },
   getTimestamp: function() {
-    return this.getPropertyFromLocalMessage(
-      "https://w3id.org/won/message#timestamp"
-    );
+    return this.getPropertyFromLocalMessage(vocab.WONMSG.timestamp);
   },
   getTextMessage: function() {
-    return this.getProperty("https://w3id.org/won/content#text");
+    return this.getProperty(vocab.WONCON.text);
   },
   getHintScore: function() {
-    return this.getProperty("https://w3id.org/won/message#hintScore");
+    return this.getProperty(vocab.WONMSG.hintScore);
   },
   getHintTargetAtom: function() {
-    return this.getProperty("https://w3id.org/won/message#hintTargetAtom");
+    return this.getProperty(vocab.WONMSG.hintTargetAtom);
   },
   getHintTargetSocket: function() {
-    return this.getProperty("https://w3id.org/won/message#hintTargetSocket");
+    return this.getProperty(vocab.WONMSG.hintTargetSocket);
   },
   getIsResponseTo: function() {
-    return this.getProperty("https://w3id.org/won/message#respondingTo");
+    return this.getProperty(vocab.WONMSG.respondingTo);
   },
   getIsRemoteResponseTo: function() {
-    return this.getProperty("https://w3id.org/won/message#isRemoteResponseTo");
+    return this.getProperty(vocab.WONMSG.isRemoteResponseTo);
   },
   getRespondingToMessageType: function() {
-    return this.getProperty(
-      "https://w3id.org/won/message#respondingToMessageType"
-    );
+    return this.getProperty(vocab.WONMSG.respondingToMessageType);
   },
 
   getSenderNode: function() {
-    return this.getProperty("https://w3id.org/won/message#senderNode");
+    return this.getProperty(vocab.WONMSG.senderNode);
   },
   getSenderSocket: function() {
-    return this.getProperty("https://w3id.org/won/message#senderSocket");
+    return this.getProperty(vocab.WONMSG.senderSocket);
   },
   getSenderAtom: function() {
-    return this.getProperty("https://w3id.org/won/message#senderAtom");
+    return this.getProperty(vocab.WONMSG.senderAtom);
   },
   getConnection: function() {
-    return this.getProperty("https://w3id.org/won/message#connection");
+    return this.getProperty(vocab.WONMSG.connection);
   },
   getTargetSocket: function() {
-    return this.getProperty("https://w3id.org/won/message#recipientSocket");
+    return this.getProperty(vocab.WONMSG.recipientSocket);
   },
   getAtom: function() {
-    return this.getProperty("https://w3id.org/won/message#atom");
+    return this.getProperty(vocab.WONMSG.atom);
   },
   getProposedMessageUris: function() {
-    return createArray(
-      this.getProperty("https://w3id.org/won/agreement#proposes")
-    );
+    return createArray(this.getProperty(vocab.AGR.proposes));
   },
 
   getClaimsMessageUris: function() {
-    return createArray(
-      this.getProperty("https://w3id.org/won/agreement#claims")
-    );
+    return createArray(this.getProperty(vocab.AGR.claims));
   },
 
   getAcceptsMessageUris: function() {
-    return createArray(
-      this.getProperty("https://w3id.org/won/agreement#accepts")
-    );
+    return createArray(this.getProperty(vocab.AGR.accepts));
   },
   getProposedToCancelMessageUris: function() {
-    return createArray(
-      this.getProperty("https://w3id.org/won/agreement#proposesToCancel")
-    );
+    return createArray(this.getProperty(vocab.AGR.proposesToCancel));
   },
   getRejectsMessageUris: function() {
-    return createArray(
-      this.getProperty("https://w3id.org/won/agreement#rejects")
-    );
+    return createArray(this.getProperty(vocab.AGR.rejects));
   },
   getRetractsMessageUris: function() {
-    return createArray(
-      this.getProperty("https://w3id.org/won/modification#retracts")
-    );
+    return createArray(this.getProperty(vocab.MOD.retracts));
   },
 
   isProposeMessage: function() {
-    return !!this.getProperty("https://w3id.org/won/agreement#proposes");
+    return !!this.getProperty(vocab.AGR.proposes);
   },
   isAcceptMessage: function() {
-    return !!this.getProperty("https://w3id.org/won/agreement#accepts");
+    return !!this.getProperty(vocab.AGR.accepts);
   },
   isProposeToCancel: function() {
-    return !!this.getProperty(
-      "https://w3id.org/won/agreement#proposesToCancel"
-    );
+    return !!this.getProperty(vocab.AGR.proposesToCancel);
   },
   isProposal: function() {
-    return !!this.getProperty("https://w3id.org/won/agreement#Proposal");
+    return !!this.getProperty(vocab.AGR.Proposal);
   },
   isAgreement: function() {
-    return !!this.getProperty("https://w3id.org/won/agreement#Agreement");
+    return !!this.getProperty(vocab.AGR.Agreement);
   },
 
   isRejectMessage: function() {
-    return !!this.getProperty("https://w3id.org/won/agreement#rejects");
+    return !!this.getProperty(vocab.AGR.rejects);
   },
   isRetractMessage: function() {
-    return !!this.getProperty("https://w3id.org/won/modification#retracts");
+    return !!this.getProperty(vocab.MOD.retracts);
   },
   hasParseErrors: function() {
     return this.parseErrors && this.parseErrors.length > 0;
   },
   isFromSystem: function() {
     let direction = this.getMessageDirection();
-    return direction === "https://w3id.org/won/message#FromSystem";
+    return direction === vocab.WONMSG.FromSystem;
   },
   isFromOwner: function() {
     let direction = this.getMessageDirection();
-    return direction === "https://w3id.org/won/message#FromOwner";
+    return direction === vocab.WONMSG.FromOwner;
   },
   isFromExternal: function() {
     let direction = this.getMessageDirection();
-    return direction === "https://w3id.org/won/message#FromExternal";
+    return direction === vocab.WONMSG.FromExternal;
   },
 
   isAtomHintMessage: function() {
-    return (
-      this.getMessageType() === "https://w3id.org/won/message#AtomHintMessage"
-    );
+    return this.getMessageType() === vocab.WONMSG.atomHintMessage;
   },
   isSocketHintMessage: function() {
-    return (
-      this.getMessageType() === "https://w3id.org/won/message#SocketHintMessage"
-    );
+    return this.getMessageType() === vocab.WONMSG.socketHintMessage;
   },
   isCreateMessage: function() {
-    return (
-      this.getMessageType() === "https://w3id.org/won/message#CreateMessage"
-    );
+    return this.getMessageType() === vocab.WONMSG.createMessage;
   },
   isConnectMessage: function() {
-    return (
-      this.getMessageType() === "https://w3id.org/won/message#ConnectMessage"
-    );
+    return this.getMessageType() === vocab.WONMSG.connectMessage;
   },
   isConnectionMessage: function() {
-    return (
-      this.getMessageType() === "https://w3id.org/won/message#ConnectionMessage"
-    );
+    return this.getMessageType() === vocab.WONMSG.connectionMessage;
   },
   isCloseMessage: function() {
-    return (
-      this.getMessageType() === "https://w3id.org/won/message#CloseMessage"
-    );
+    return this.getMessageType() === vocab.WONMSG.closeMessage;
   },
   isHintFeedbackMessage: function() {
-    return (
-      this.getMessageType() ===
-      "https://w3id.org/won/message#HintFeedbackMessage"
-    );
+    return this.getMessageType() === vocab.WONMSG.hintFeedbackMessage;
   },
   isActivateMessage: function() {
-    return (
-      this.getMessageType() === "https://w3id.org/won/message#ActivateMessage"
-    );
+    return this.getMessageType() === vocab.WONMSG.activateAtomMessage;
   },
   isDeactivateMessage: function() {
-    return (
-      this.getMessageType() === "https://w3id.org/won/message#DeactivateMessage"
-    );
+    return this.getMessageType() === vocab.WONMSG.deactivateAtomMessage;
   },
   isDeleteMessage: function() {
-    return (
-      this.getMessageType() === "https://w3id.org/won/message#DeleteMessage"
-    );
+    return this.getMessageType() === vocab.WONMSG.deleteAtomMessage;
   },
   isAtomMessage: function() {
-    return this.getMessageType() === "https://w3id.org/won/message#AtomMessage";
+    return this.getMessageType() === vocab.WONMSG.AtomMessage;
   },
   isResponse: function() {
     return this.isSuccessResponse() || this.isFailureResponse();
   },
   isSuccessResponse: function() {
-    return (
-      this.getMessageType() === "https://w3id.org/won/message#SuccessResponse"
-    );
+    return this.getMessageType() === vocab.WONMSG.successResponse;
   },
   isFailureResponse: function() {
-    return (
-      this.getMessageType() === "https://w3id.org/won/message#FailureResponse"
-    );
+    return this.getMessageType() === vocab.WONMSG.failureResponse;
   },
   isResponseToReplaceMessage: function() {
-    return (
-      this.getRespondingToMessageType() ===
-      "https://w3id.org/won/message#ReplaceMessage"
-    );
+    return this.getRespondingToMessageType() === vocab.WONMSG.replaceMessage;
   },
   isResponseToAtomHintMessage: function() {
-    return (
-      this.getRespondingToMessageType() ===
-      "https://w3id.org/won/message#AtomHintMessage"
-    );
+    return this.getRespondingToMessageType() === vocab.WONMSG.atomHintMessage;
   },
   isResponseToCreateMessage: function() {
-    return (
-      this.getRespondingToMessageType() ===
-      "https://w3id.org/won/message#CreateMessage"
-    );
+    return this.getRespondingToMessageType() === vocab.WONMSG.createMessage;
   },
   isResponseToConnectMessage: function() {
-    return (
-      this.getRespondingToMessageType() ===
-      "https://w3id.org/won/message#ConnectMessage"
-    );
+    return this.getRespondingToMessageType() === vocab.WONMSG.connectMessage;
   },
   isResponseToConnectionMessage: function() {
-    return (
-      this.getRespondingToMessageType() ===
-      "https://w3id.org/won/message#ConnectionMessage"
-    );
+    return this.getRespondingToMessageType() === vocab.WONMSG.connectionMessage;
   },
   isResponseToCloseMessage: function() {
-    return (
-      this.getRespondingToMessageType() ===
-      "https://w3id.org/won/message#CloseMessage"
-    );
+    return this.getRespondingToMessageType() === vocab.WONMSG.closeMessage;
   },
   isResponseToHintFeedbackMessage: function() {
     return (
-      this.getRespondingToMessageType() ===
-      "https://w3id.org/won/message#HintFeedbackMessage"
+      this.getRespondingToMessageType() === vocab.WONMSG.hintFeedbackMessage
     );
   },
   isResponseToActivateMessage: function() {
     return (
-      this.getRespondingToMessageType() ===
-      "https://w3id.org/won/message#ActivateMessage"
+      this.getRespondingToMessageType() === vocab.WONMSG.activateAtomMessage
     );
   },
   isResponseToDeactivateMessage: function() {
     return (
-      this.getRespondingToMessageType() ===
-      "https://w3id.org/won/message#DeactivateMessage"
+      this.getRespondingToMessageType() === vocab.WONMSG.deactivateAtomMessage
     );
   },
   isResponseToDeleteMessage: function() {
-    return (
-      this.getRespondingToMessageType() ===
-      "https://w3id.org/won/message#DeleteMessage"
-    );
+    return this.getRespondingToMessageType() === vocab.WONMSG.deleteAtomMessage;
   },
   isChangeNotificationMessage: function() {
-    return (
-      this.getMessageType() ===
-      "https://w3id.org/won/message#ChangeNotificationMessage"
-    );
+    return this.getMessageType() === vocab.WONMSG.changeNotificationMessage;
   },
 
   __getMessageDirection: function(messageStructure) {
@@ -1661,10 +1329,7 @@ WonMessage.prototype = {
           if (remoteMessages.length == 1) {
             //we found a remote envelope. link to it from our node
             node.remoteEnvelope = remoteMessages[0];
-            if (
-              node.messageDirection ===
-              "https://w3id.org/won/message#FromExternal"
-            ) {
+            if (node.messageDirection === vocab.WONMSG.FromExternal) {
               //both messages can link to each other, but the FromExternal one
               //is the top level one. mark the other one as referenced
               unreferencedEnvelopes = unreferencedEnvelopes.filter(
@@ -1719,10 +1384,8 @@ WonMessage.prototype = {
       const contentGraphs = this.graphs.filter(
         graph =>
           !(
-            graph["@type"].includes(
-              "https://w3id.org/won/message#EnvelopeGraph"
-            ) ||
-            graph["@type"].includes("https://w3id.org/won/message#Signature")
+            graph["@type"].includes(vocab.WONMSG.EnvelopeGraph) ||
+            graph["@type"].includes(vocab.WONMSG.Signature)
           )
       );
 
@@ -1741,15 +1404,12 @@ WonMessage.prototype = {
     let graphData = graph["@graph"];
     let graphType = graph["@type"];
     return (
-      (graphType &&
-        graphType.includes["https://w3id.org/won/message#EnvelopeGraph"]) ||
+      (graphType && graphType.includes(vocab.WONMSG.EnvelopeGraph)) ||
       (graphData &&
         graphData.some(
           resource =>
             resource["@id"] === graphUri &&
-            resource["@type"].includes(
-              "https://w3id.org/won/message#EnvelopeGraph"
-            )
+            resource["@type"].includes(vocab.WONMSG.EnvelopeGraph)
         ))
     );
   },
@@ -1758,13 +1418,12 @@ WonMessage.prototype = {
     let graphData = graph["@graph"];
     let graphType = graph["@type"];
     return (
-      (graphType &&
-        graphType.includes["https://w3id.org/won/message#Signature"]) ||
+      (graphType && graphType.includes(vocab.WONMSG.Signature)) ||
       (graphData &&
         graphData.some(
           resource =>
             resource["@id"] === graphUri &&
-            resource["@type"].includes("https://w3id.org/won/message#Signature")
+            resource["@type"].includes(vocab.WONMSG.Signature)
         ))
     );
   },
@@ -1773,9 +1432,7 @@ WonMessage.prototype = {
     let graphData = graph["@graph"];
     let data = graphData
       .filter(resource => resource["@id"] == graphUri)
-      .map(
-        resource => resource["https://w3id.org/won/message#containsEnvelope"]
-      )
+      .map(resource => resource[vocab.WONMSG.containsEnvelope])
       .filter(x => x);
     if (data.length > 0) {
       return data[0].map(x => x["@id"]);
@@ -1787,7 +1444,7 @@ WonMessage.prototype = {
     let graphData = graph["@graph"];
     const contentUrisArray = graphData
       .filter(resource => resource["@id"] === messageUri)
-      .map(resource => resource["https://w3id.org/won/message#content"])
+      .map(resource => resource[vocab.WONMSG.content])
       .filter(x => x);
     if (contentUrisArray.length > 0) {
       return contentUrisArray[0].map(x => x["@id"] || x["@value"]);
@@ -1800,13 +1457,9 @@ WonMessage.prototype = {
     let data = graphData
       .filter(
         resource =>
-          resource["@type"].includes(
-            "https://w3id.org/won/message#FromExternal"
-          ) ||
-          resource["@type"].includes(
-            "https://w3id.org/won/message#FromOwner"
-          ) ||
-          resource["@type"].includes("https://w3id.org/won/message#FromSystem")
+          resource["@type"].includes(vocab.WONMSG.FromExternal) ||
+          resource["@type"].includes(vocab.WONMSG.FromOwner) ||
+          resource["@type"].includes(vocab.WONMSG.FromSystem)
       )
       .map(resource => ({
         messageUri: resource["@id"],
@@ -1824,16 +1477,11 @@ WonMessage.prototype = {
   __getMessageUriAndCorrespondingRemoteMessageUri: graph => {
     let graphData = graph["@graph"];
     let data = graphData
-      .filter(
-        resource =>
-          resource["https://w3id.org/won/message#correspondingRemoteMessage"]
-      )
+      .filter(resource => resource[vocab.WONMSG.correspondingRemoteMessage])
       .map(resource => ({
         messageUri: resource["@id"],
         correspondingRemoteMessageUri:
-          resource[
-            "https://w3id.org/won/message#correspondingRemoteMessage"
-          ][0]["@id"],
+          resource[vocab.WONMSG.correspondingRemoteMessage][0]["@id"],
       }))
       .filter(x => !!x); //if that property was not present, filter out undefineds
     if (Array.isArray(data)) {
@@ -1847,13 +1495,10 @@ WonMessage.prototype = {
   __getMessageUriAndForwardedMessageUri: graph => {
     let graphData = graph["@graph"];
     let data = graphData
-      .filter(
-        resource => resource["https://w3id.org/won/message#forwardedMessage"]
-      )
+      .filter(resource => resource[vocab.WONMSG.forwardedMessage])
       .map(resource => ({
         messageUri: resource["@id"],
-        forwardedMessageUri:
-          resource["https://w3id.org/won/message#forwardedMessage"][0]["@id"],
+        forwardedMessageUri: resource[vocab.WONMSG.forwardedMessage][0]["@id"],
       }))
       .filter(x => !!x); //if that property was not present, filter out undefineds
     if (Array.isArray(data)) {
@@ -1890,7 +1535,7 @@ won.MessageBuilder = function MessageBuilder(messageType, content) {
     };
   }
   this.messageGraph = null;
-  this.eventUriValue = won.WONMSG.uriPlaceholder.event;
+  this.eventUriValue = vocab.WONMSG.uriPlaceholder.event;
   won.addMessageGraph(this, graphNames, messageType);
 };
 
@@ -1898,8 +1543,8 @@ won.MessageBuilder.prototype = {
   constructor: won.MessageBuilder,
 
   eventURI: function(eventUri) {
-    this.getContext()[won.WONMSG.EnvelopeGraphCompacted] = {
-      "@id": "https://w3id.org/won/message#EnvelopeGraph",
+    this.getContext()[vocab.WONMSG.EnvelopeGraphCompacted] = {
+      "@id": vocab.WONMSG.EnvelopeGraph,
       "@type": "@id",
     };
     const regex = new RegExp(won.replaceRegExp(this.eventUriValue));
@@ -1924,61 +1569,61 @@ won.MessageBuilder.prototype = {
     return this;
   },
   atom: function(atomURI) {
-    this.getMessageEventNode()[won.WONMSG.atomCompacted] = {
+    this.getMessageEventNode()[vocab.WONMSG.atomCompacted] = {
       "@id": atomURI,
     };
     return this;
   },
   senderAtom: function(senderAtomURI) {
-    this.getMessageEventNode()[won.WONMSG.senderAtomCompacted] = {
+    this.getMessageEventNode()[vocab.WONMSG.senderAtomCompacted] = {
       "@id": senderAtomURI,
     };
     return this;
   },
   senderSocket: function(senderSocketURI) {
-    this.getMessageEventNode()[won.WONMSG.senderSocketCompacted] = {
+    this.getMessageEventNode()[vocab.WONMSG.senderSocketCompacted] = {
       "@id": senderSocketURI,
     };
     return this;
   },
   targetSocket: function(recipientSocketURI) {
-    this.getMessageEventNode()[won.WONMSG.recipientSocketCompacted] = {
+    this.getMessageEventNode()[vocab.WONMSG.recipientSocketCompacted] = {
       "@id": recipientSocketURI,
     };
     return this;
   },
   senderNode: function(senderNodeURI) {
-    this.getMessageEventNode()[won.WONMSG.senderNodeCompacted] = {
+    this.getMessageEventNode()[vocab.WONMSG.senderNodeCompacted] = {
       "@id": senderNodeURI,
     };
     return this;
   },
   sender: function(senderURI) {
-    this.getMessageEventNode()[won.WONMSG.senderCompacted] = {
+    this.getMessageEventNode()[vocab.WONMSG.senderCompacted] = {
       "@id": senderURI,
     };
     return this;
   },
   recipient: function(recipientURI) {
-    this.getMessageEventNode()[won.WONMSG.recipientCompacted] = {
+    this.getMessageEventNode()[vocab.WONMSG.recipientCompacted] = {
       "@id": recipientURI,
     };
     return this;
   },
   recipientAtom: function(recipientAtomURI) {
-    this.getMessageEventNode()[won.WONMSG.recipientAtomCompacted] = {
+    this.getMessageEventNode()[vocab.WONMSG.recipientAtomCompacted] = {
       "@id": recipientAtomURI,
     };
     return this;
   },
   recipientNode: function(recipientURI) {
-    this.getMessageEventNode()[won.WONMSG.recipientNodeCompacted] = {
+    this.getMessageEventNode()[vocab.WONMSG.recipientNodeCompacted] = {
       "@id": recipientURI,
     };
     return this;
   },
   ownerDirection: function() {
-    this.getMessageEventNode()["@type"] = won.WONMSG.FromOwnerCompacted;
+    this.getMessageEventNode()["@type"] = vocab.WONMSG.FromOwnerCompacted;
     return this;
   },
   timestamp: function(timestamp) {
@@ -2000,7 +1645,7 @@ won.MessageBuilder.prototype = {
       // text is either null, undefined, or empty
       // do nothing
     } else {
-      this.getContentGraphNode()[won.WONCON.textCompacted] = text;
+      this.getContentGraphNode()[vocab.WONCON.textCompacted] = text;
     }
     return this;
   },
@@ -2058,7 +1703,7 @@ won.MessageBuilder.prototype = {
   },
 
   addRating: function(rating, connectionUri) {
-    this.getContentGraphNode()[won.WONCON.feedback] = {
+    this.getContentGraphNode()[vocab.WONCON.feedback] = {
       "@id": "_:b0",
       "https://w3id.org/won/content#feedbackTarget": {
         "@id": connectionUri,

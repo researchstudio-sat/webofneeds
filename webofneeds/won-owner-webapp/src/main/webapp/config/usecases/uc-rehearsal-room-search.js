@@ -7,6 +7,7 @@ import {
   realEstateFloorSizeRangeDetail,
 } from "../details/real-estate.js";
 import won from "../../app/service/won.js";
+import vocab from "../../app/service/vocab.js";
 import { perHourRentRangeDetail } from "../details/musician.js";
 import {
   filterFloorSizeRange,
@@ -37,8 +38,8 @@ export const rehearsalRoomSearch = {
   reactionUseCases: [
     {
       identifier: "rehearsalRoomOffer",
-      senderSocketType: won.CHAT.ChatSocketCompacted,
-      targetSocketType: won.CHAT.ChatSocketCompacted,
+      senderSocketType: vocab.CHAT.ChatSocketCompacted,
+      targetSocketType: vocab.CHAT.ChatSocketCompacted,
     },
   ],
   details: undefined,

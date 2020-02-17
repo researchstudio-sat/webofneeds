@@ -3,6 +3,7 @@
  */
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import won from "../../app/service/won.js";
+import vocab from "../../app/service/vocab.js";
 import { genresDetail, instrumentsDetail } from "../details/musician.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import {
@@ -33,8 +34,8 @@ export const bandSearch = {
   reactionUseCases: [
     {
       identifier: "musicianSearch",
-      senderSocketType: won.CHAT.ChatSocketCompacted,
-      targetSocketType: won.CHAT.ChatSocketCompacted,
+      senderSocketType: vocab.CHAT.ChatSocketCompacted,
+      targetSocketType: vocab.CHAT.ChatSocketCompacted,
     },
   ],
   details: {

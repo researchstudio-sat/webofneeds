@@ -5,6 +5,7 @@
 //TODO switch to requirejs for dependency mngmt (so this lib isn't angular-bound)
 //TODO replace calls to `won` object to `require('util')`
 import won from "./won.js";
+import vocab from "./vocab.js";
 (function() {
   // <message-builder-js> scope
 
@@ -70,7 +71,7 @@ import won from "./won.js";
     const envelopeGraph = [
       {
         "@id": args.msgUri,
-        "@type": "msg:FromOwner",
+        "@type": vocab.WONMSG.FromOwnerCompacted,
         "msg:protocolVersion": "1.0",
         "msg:timestamp": new Date().getTime(),
         "msg:messageType": { "@id": args.msgType },
@@ -85,7 +86,7 @@ import won from "./won.js";
       },
       {
         "@id": msgDataUri,
-        "@type": "msg:EnvelopeGraph",
+        "@type": vocab.WONMSG.EnvelopeGraphCompacted,
       },
     ];
 
@@ -115,8 +116,8 @@ import won from "./won.js";
       //'dct' : 'http://purl.org/dc/terms/',
       cnt: "http://www.w3.org/2011/content#",
     };
-    o[won.WONMSG.EnvelopeGraphCompacted] = {
-      "@id": "https://w3id.org/won/message#EnvelopeGraph",
+    o[vocab.WONMSG.EnvelopeGraphCompacted] = {
+      "@id": vocab.WONMSG.EnvelopeGraph,
       "@type": "@id",
     };
     return o;

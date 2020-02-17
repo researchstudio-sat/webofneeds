@@ -6,6 +6,7 @@ import * as processUtils from "./utils/process-utils.js";
 import { parseMetaAtom } from "../reducers/atom-reducer/parse-atom.js";
 import { get, getIn, is, numOfEvts2pageSize } from "../utils.js";
 import won from "../won-es6";
+import vocab from "../service/vocab.js";
 
 export function fetchOwnedData(dispatch, getState) {
   return ownerApi
@@ -168,8 +169,11 @@ export function fetchAtomAndDispatch(
   return won
     .getAtom(atomUri)
     .then(atom => {
-      if (atom["hold:heldBy"] && atom["hold:heldBy"]["@id"]) {
-        const personaUri = atom["hold:heldBy"]["@id"];
+      if (
+        atom[vocab.HOLD.heldByCompacted] &&
+        atom[vocab.HOLD.heldByCompacted]["@id"]
+      ) {
+        const personaUri = atom[vocab.HOLD.heldByCompacted]["@id"];
         if (processUtils.isAtomLoaded(processState, personaUri)) {
           console.debug(
             "Omit Fetch of Persona<",
@@ -408,8 +412,8 @@ export function fetchConnectionsOfAtomAndDispatch(atomUri, dispatch) {
         }),
       });
       const activeConnectionUris = connectionsWithStateAndSocket
-        .filter(conn => conn.connectionState !== won.WON.Closed)
-        .filter(conn => conn.connectionState !== won.WON.Suggested)
+        .filter(conn => conn.connectionState !== vocab.WON.Closed)
+        .filter(conn => conn.connectionState !== vocab.WON.Suggested)
         .map(conn => conn.connectionUri);
 
       dispatch({
