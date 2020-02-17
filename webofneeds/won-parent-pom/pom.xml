@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>webofneeds</artifactId>
 		<groupId>at.researchstudio.sat</groupId>
-		<version>0.9</version>
+		<version>0.10-SNAPSHOT</version>
 	</parent>
 	<artifactId>won-parent-pom</artifactId>
 	<name>Web of Needs parent pom</name>

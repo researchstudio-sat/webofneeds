@@ -5,11 +5,11 @@
 <artifactId>won-parent-pom</artifactId>
 <relativePath>../won-parent-pom</relativePath>
 <groupId>at.researchstudio.sat</groupId>
-<version>0.9</version>
+<version>0.10-SNAPSHOT</version>
 </parent>
     <groupId>at.researchstudio.sat</groupId>
     <artifactId>won-node-webapp</artifactId>
-    <version>0.9</version>
+    <version>0.10-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>Node Webapp</name>
 
