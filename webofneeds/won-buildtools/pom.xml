@@ -4,11 +4,11 @@
 	<parent>
 		<artifactId>webofneeds</artifactId>
 		<groupId>at.researchstudio.sat</groupId>
-		<version>0.9-SNAPSHOT</version>
+		<version>0.9</version>
 	</parent>
 	<groupId>at.researchstudio.sat</groupId>
 	<artifactId>won-buildtools</artifactId>
-	<version>0.9-SNAPSHOT</version>
+	<version>0.9</version>
 	<name>won-buildtools</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

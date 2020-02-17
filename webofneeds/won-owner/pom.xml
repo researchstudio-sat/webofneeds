@@ -4,7 +4,7 @@
 <artifactId>won-parent-pom</artifactId>
 <relativePath>../won-parent-pom</relativePath>
 <groupId>at.researchstudio.sat</groupId>
-<version>0.9-SNAPSHOT</version>
+<version>0.9</version>
 </parent>
     <modelVersion>4.0.0</modelVersion>
 

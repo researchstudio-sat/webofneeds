@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>webofneeds</artifactId>
 		<groupId>at.researchstudio.sat</groupId>
-		<version>0.9-SNAPSHOT</version>
+		<version>0.9</version>
 	</parent>
 	<artifactId>won-test</artifactId>
 	<name>Web of Needs Test </name>
