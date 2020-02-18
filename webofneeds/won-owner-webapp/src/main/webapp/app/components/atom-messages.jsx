@@ -321,15 +321,6 @@ const mapDispatchToProps = dispatch => {
         })
       );
     },
-    connectAdHoc: (targetAtomUri, message, persona) => {
-      dispatch(
-        actionCreators.connections__connectAdHoc(
-          targetAtomUri,
-          message,
-          persona
-        )
-      );
-    },
     showMoreMessages: (connectionUri, msgCount) => {
       dispatch(
         actionCreators.connections__showMoreMessages(connectionUri, msgCount)
@@ -801,9 +792,7 @@ class AtomMessages extends React.Component {
                 allowEmptySubmit={true}
                 allowDetails={false}
                 showPersonas={!this.props.connection}
-                onSubmit={({ value, selectedPersona }) =>
-                  this.sendRequest(value, selectedPersona)
-                }
+                onSubmit={({ value }) => this.sendRequest(value)}
               />
               <WonLabelledHr className="pm__footer__labelledhr" label="Or" />
               <button
@@ -926,31 +915,23 @@ class AtomMessages extends React.Component {
     });
   }
 
-  sendRequest(message, persona) {
-    if (!this.props.connection) {
-      this.props.routerGoResetParams("connections");
+  sendRequest(message) {
+    this.props.rateConnection(
+      this.props.selectedConnectionUri,
+      vocab.WONCON.binaryRatingGood
+    );
 
-      if (this.props.targetAtomUri) {
-        this.props.connectAdHoc(this.props.targetAtomUri, message, persona);
-      }
+    this.props.connectSockets(
+      get(this.props.connection, "socketUri"),
+      get(this.props.connection, "targetSocketUri"),
+      message
+    );
+    if (this.showOverlayConnection) {
+      this.props.routerBack();
     } else {
-      this.props.rateConnection(
-        this.props.selectedConnectionUri,
-        vocab.WONCON.binaryRatingGood
-      );
-
-      this.props.connectSockets(
-        get(this.props.connection, "socketUri"),
-        get(this.props.connection, "targetSocketUri"),
-        message
-      );
-      if (this.showOverlayConnection) {
-        this.props.routerBack();
-      } else {
-        this.props.routerGoCurrent({
-          connectionUri: this.props.selectedConnectionUri,
-        });
-      }
+      this.props.routerGoCurrent({
+        connectionUri: this.props.selectedConnectionUri,
+      });
     }
   }
 
@@ -1246,7 +1227,6 @@ AtomMessages.propTypes = {
   setShowAgreementData: PropTypes.func,
   hideAddMessageContent: PropTypes.func,
   sendChatMessage: PropTypes.func,
-  connectAdHoc: PropTypes.func,
   connectSockets: PropTypes.func,
   rateConnection: PropTypes.func,
   closeConnection: PropTypes.func,

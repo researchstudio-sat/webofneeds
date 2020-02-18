@@ -154,15 +154,6 @@ const mapDispatchToProps = dispatch => {
     closeConnection: connectionUri => {
       dispatch(actionCreators.connections__close(connectionUri));
     },
-    connectAdHoc: (targetAtomUri, message, persona) => {
-      dispatch(
-        actionCreators.connections__connectAdHoc(
-          targetAtomUri,
-          message,
-          persona
-        )
-      );
-    },
     showMoreMessages: (connectionUri, msgCount) => {
       dispatch(
         actionCreators.connections__showMoreMessages(connectionUri, msgCount)
@@ -369,9 +360,7 @@ class GroupAtomMessages extends React.Component {
             allowEmptySubmit={true}
             allowDetails={false}
             showPersonas={!this.props.connection}
-            onSubmit={({ value, selectedPersona }) =>
-              this.sendRequest(value, selectedPersona)
-            }
+            onSubmit={({ value }) => this.sendRequest(value)}
           />
           <WonLabelledHr className="gpm__footer__labelledhr" label="Or" />
           <button
@@ -460,27 +449,19 @@ class GroupAtomMessages extends React.Component {
     }
   }
 
-  sendRequest(message, persona) {
-    if (!this.props.connection) {
-      this.props.routerGoResetParams("connections");
-
-      if (this.props.targetAtomUri) {
-        this.props.connectAdHoc(this.props.targetAtomUri, message, persona);
-      }
-    } else {
-      this.props.rateConnection(
-        this.props.connectionUri,
-        vocab.WONCON.binaryRatingGood
-      );
-      this.props.connectSockets(
-        get(this.props.connection, "socketUri"),
-        get(this.props.connection, "targetSocketUri"),
-        message
-      );
-      this.props.routerGoCurrent({
-        connectionUri: this.props.connectionUri,
-      });
-    }
+  sendRequest(message) {
+    this.props.rateConnection(
+      this.props.connectionUri,
+      vocab.WONCON.binaryRatingGood
+    );
+    this.props.connectSockets(
+      get(this.props.connection, "socketUri"),
+      get(this.props.connection, "targetSocketUri"),
+      message
+    );
+    this.props.routerGoCurrent({
+      connectionUri: this.props.connectionUri,
+    });
   }
 
   closeConnection(rateBad = false) {
@@ -550,7 +531,6 @@ GroupAtomMessages.propTypes = {
   routerGoResetParams: PropTypes.func,
   hideAddMessageContent: PropTypes.func,
   sendChatMessage: PropTypes.func,
-  connectAdHoc: PropTypes.func,
   connectSockets: PropTypes.func,
   rateConnection: PropTypes.func,
   closeConnection: PropTypes.func,
