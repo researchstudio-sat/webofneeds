@@ -36,9 +36,6 @@ export function getMatchedUseCaseIcon(atom) {
 }
 
 export function matchesDefinitions(atom, useCaseDefinitions) {
-  console.debug("useCaseDefinitions: ", useCaseDefinitions);
-  console.debug("atom: ", atom);
-
   return (
     !!useCaseDefinitions &&
     !!useCaseDefinitions.find(useCaseDefinition =>
