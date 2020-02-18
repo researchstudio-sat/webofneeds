@@ -29,7 +29,7 @@ export function atomsConnectSockets(
   targetSocketUri,
   connectMessage
 ) {
-  return async dispatch => {
+  return dispatch => {
     if (!senderSocketUri) {
       throw new Error("SenderSocketUri not present");
     }
@@ -44,20 +44,20 @@ export function atomsConnectSockets(
       targetSocketUri: targetSocketUri,
     });
 
-    const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
-
-    return ownerApi.sendMessage(cnctMsg.message).then(jsonResp => {
-      dispatch({
-        type: actionTypes.atoms.connectSockets,
-        payload: {
-          eventUri: jsonResp.messageUri,
-          message: jsonResp.message,
-          optimisticEvent: optimisticEvent,
-          senderSocketUri: senderSocketUri,
-          targetSocketUri: targetSocketUri,
-        },
-      });
-    });
+    return won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent =>
+      ownerApi.sendMessage(cnctMsg.message).then(jsonResp => {
+        dispatch({
+          type: actionTypes.atoms.connectSockets,
+          payload: {
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
+            optimisticEvent: optimisticEvent,
+            senderSocketUri: senderSocketUri,
+            targetSocketUri: targetSocketUri,
+          },
+        });
+      })
+    );
   };
 }
 
@@ -70,7 +70,7 @@ export function atomsConnect(
   socketType,
   targetSocketType
 ) {
-  return async (dispatch, getState) => {
+  return (dispatch, getState) => {
     const state = getState();
     const ownedAtom = state.getIn(["atoms", ownedAtomUri]);
     const theirAtom = state.getIn(["atoms", theirAtomUri]);
@@ -95,23 +95,23 @@ export function atomsConnect(
       socketUri: socketUri,
       targetSocketUri: targetSocketUri,
     });
-    const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
-
-    return ownerApi.sendMessage(cnctMsg.message).then(jsonResp => {
-      dispatch({
-        type: actionTypes.atoms.connect,
-        payload: {
-          eventUri: jsonResp.messageUri,
-          message: jsonResp.message,
-          ownConnectionUri: ownConnectionUri,
-          optimisticEvent: optimisticEvent,
-          socketUri: socketUri,
-          targetSocketUri: targetSocketUri,
-          atomUri: get(ownedAtom, "uri"),
-          targetAtomUri: get(theirAtom, "uri"),
-        },
-      });
-    });
+    return won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent =>
+      ownerApi.sendMessage(cnctMsg.message).then(jsonResp => {
+        dispatch({
+          type: actionTypes.atoms.connect,
+          payload: {
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
+            ownConnectionUri: ownConnectionUri,
+            optimisticEvent: optimisticEvent,
+            socketUri: socketUri,
+            targetSocketUri: targetSocketUri,
+            atomUri: get(ownedAtom, "uri"),
+            targetAtomUri: get(theirAtom, "uri"),
+          },
+        });
+      })
+    );
   };
 }
 
