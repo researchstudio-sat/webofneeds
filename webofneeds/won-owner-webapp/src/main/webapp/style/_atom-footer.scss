@@ -1,0 +1,114 @@
+@import "won-config";
+@import "sizing-utils";
+@import "animate";
+
+won-atom-footer {
+  .atom-footer__button {
+    width: 100%;
+
+    > svg.won-button-icon {
+      --local-primary: white;
+    }
+  }
+
+  & > *:not(:last-child) {
+    // a bit of space between elements in the footer
+    margin-bottom: 0.5rem;
+  }
+
+  .atom-footer__infolabel {
+    text-align: center;
+  }
+
+  .atom-footer__header {
+    font-size: $normalFontSize;
+    font-weight: bold;
+    color: $won-primary-text-color;
+  }
+  .atom-footer__matches {
+    &__header {
+      font-size: $smallFontSize;
+      color: $won-primary-text-color;
+      font-weight: lighter;
+    }
+
+    &__list {
+      display: grid;
+      grid-gap: 1rem;
+      padding: 0.5rem 0;
+
+      grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+
+      > .atom-footer__adhocbutton,
+      > won-atom-header {
+        padding: 0.5rem;
+        border: $thinGrayBorder;
+
+        &:hover {
+          background: $won-lighter-gray;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+  .atom-footer__adhocbutton {
+    display: grid;
+    grid-template-areas: "icon main";
+    grid-template-columns: min-content 1fr;
+    grid-column-gap: 0.5rem;
+    min-width: 0;
+
+    &__icon {
+      background: $won-primary-color;
+      box-sizing: border-box;
+      padding: 0.25rem;
+      @include fixed-square($postIconSize);
+
+      &__svg {
+        --local-primary: #{$won-secondary-text-color};
+        height: 100%;
+        width: 100%;
+      }
+    }
+
+    &__right {
+      grid-area: main;
+      display: grid;
+      grid-template-areas: "topline" "subtitle";
+      min-width: 0;
+
+      &__topline {
+        grid-area: topline;
+        min-width: 0;
+
+        &__notitle {
+          min-width: 0;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          font-weight: 400;
+          color: $won-subtitle-gray;
+        }
+      }
+
+      &__subtitle {
+        grid-area: subtitle;
+        display: grid;
+        grid-template-columns: 1fr min-content;
+        color: $won-subtitle-gray;
+        font-size: $smallFontSize;
+        min-width: 0;
+
+        &__type {
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+      }
+    }
+
+    > svg.won-button-icon {
+      --local-primary: white;
+    }
+  }
+}

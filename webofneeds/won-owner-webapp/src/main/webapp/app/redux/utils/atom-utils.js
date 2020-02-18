@@ -225,14 +225,6 @@ export function getDefaultPersonaImage(atom) {
 }
 
 /**
- * If an atom is active and has the chat or the group socket we can connect to it.
- * @param atom
- */
-export function isConnectible(atom) {
-  return isActive(atom) && (hasChatSocket(atom) || hasGroupSocket(atom));
-}
-
-/**
  * Determines if a given atom is a DirectResponse-Atom
  * @param atom
  * @returns {*|boolean}
