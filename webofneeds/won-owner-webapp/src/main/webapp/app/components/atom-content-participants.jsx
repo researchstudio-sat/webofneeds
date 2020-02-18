@@ -423,10 +423,10 @@ class WonAtomContentParticipants extends React.Component {
           caption: "Yes",
           callback: () => {
             const participantToInvite = get(this.props.atoms, atomUri);
-            const connectToSocketUri =
+            const targetSocketUri =
               atomUtils.getGroupSocket(participantToInvite) ||
               atomUtils.getChatSocket(participantToInvite);
-            if (!connectToSocketUri) {
+            if (!targetSocketUri) {
               console.debug(
                 "participanToInvite doesnt have a chatSocket or groupSocket"
               );
@@ -435,7 +435,7 @@ class WonAtomContentParticipants extends React.Component {
             } else {
               this.props.connectSockets(
                 this.props.groupSocketUri,
-                connectToSocketUri,
+                targetSocketUri,
                 message
               );
             }

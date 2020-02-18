@@ -145,13 +145,13 @@ export function getChatConnectionsToCrawl(state) {
   return connectionsWithoutConnectMessage || Immutable.Map();
 }
 
-export function getConnectionsToInjectMsgInto(atoms, socketUri, msgUri) {
+export function getConnectionsToInjectMsgInto(atoms, targetSocketUri, msgUri) {
   const allConnections =
     atoms && atoms.flatMap(atom => atom.get("connections"));
 
   return allConnections
     .filter(conn => connectionUtils.isConnected(conn))
-    .filter(conn => get(conn, "targetSocketUri") === socketUri)
+    .filter(conn => get(conn, "targetSocketUri") === targetSocketUri)
     .filter(conn => !get(conn, "messages").contains(msgUri));
 }
 

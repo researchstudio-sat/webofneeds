@@ -319,14 +319,14 @@ function connectReactionAtom(
         const atomDraftSocketUri = getSocketFromDraft(atomDraft);
 
         if (generalSelectors.isAtomOwned(state, connectToAtomUri)) {
-          const connectToSocketUri = connectToSocketType
+          const targetSocketUri = connectToSocketType
             ? atomUtils.getSocketUri(connectToAtom, connectToSocketType)
             : atomUtils.getDefaultSocketUri(connectToAtom);
 
-          if (atomDraftSocketUri && connectToSocketUri) {
+          if (atomDraftSocketUri && targetSocketUri) {
             ownerApi
               .serverSideConnect(
-                connectToSocketUri,
+                targetSocketUri,
                 `${atomUri}${atomDraftSocketUri}`,
                 false,
                 true
@@ -343,7 +343,7 @@ function connectReactionAtom(
             );
           }
         } else {
-          const connectToSocketUri = connectToSocketType
+          const targetSocketUri = connectToSocketType
             ? atomUtils.getSocketUri(connectToAtom, connectToSocketType)
             : atomUtils.getDefaultSocketUri(connectToAtom);
 
@@ -351,7 +351,7 @@ function connectReactionAtom(
           const cnctMsg = buildConnectMessage({
             connectMessage: "",
             socketUri: `${atomUri}${atomDraftSocketUri}`,
-            targetSocketUri: connectToSocketUri,
+            targetSocketUri: targetSocketUri,
           });
 
           won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
@@ -365,7 +365,7 @@ function connectReactionAtom(
                   eventUri: jsonResp.messageUri,
                   message: jsonResp.message,
                   optimisticEvent: optimisticEvent,
-                  targetSocketUri: connectToSocketUri,
+                  targetSocketUri: targetSocketUri,
                   socketUri: `${atomUri}${atomDraftSocketUri}`,
                   atomUri: atomUri,
                   targetAtomUri: get(connectToAtom, "uri"),
@@ -378,32 +378,23 @@ function connectReactionAtom(
   });
 }
 
-export function connectionsConnectAdHoc(
-  theirAtomUri,
-  textMessage,
-  connectToSocketUri,
-  persona
-) {
+export function connectionsConnectAdHoc(targetSocketUri, message, personaUri) {
   return (dispatch, getState) =>
-    connectAdHoc(
-      theirAtomUri,
-      textMessage,
-      connectToSocketUri,
-      persona,
-      dispatch,
-      getState
-    ); // moved to separate function to make transpilation work properly
+    connectAdHoc(targetSocketUri, message, personaUri, dispatch, getState); // moved to separate function to make transpilation work properly
 }
 
 function connectAdHoc(
-  theirAtomUri,
-  textMessage,
-  connectToSocketUri,
+  targetSocketUri,
+  message,
   personaUri,
   dispatch,
   getState
 ) {
   ensureLoggedIn(dispatch, getState).then(async () => {
+    const theirAtomUri = generalSelectors.getAtomUriBySocketUri(
+      targetSocketUri
+    );
+
     const state = getState();
     const adHocDraft = {
       content: {
@@ -456,9 +447,9 @@ function connectAdHoc(
 
         // establish connection
         const cnctMsg = buildConnectMessage({
-          connectMessage: textMessage,
+          connectMessage: message,
           socketUri: socketUri,
-          targetSocketUri: connectToSocketUri,
+          targetSocketUri: targetSocketUri,
         });
 
         won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
@@ -470,7 +461,7 @@ function connectAdHoc(
                 message: jsonResp.message,
                 optimisticEvent: optimisticEvent,
                 socketUri: socketUri,
-                targetSocketUri: connectToSocketUri,
+                targetSocketUri: targetSocketUri,
                 atomUri: atomUri,
                 targetAtomUri: theirAtomUri,
               },

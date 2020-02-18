@@ -26,13 +26,14 @@ const mapStateToProps = (state, ownProps) => {
 
   const isOwned = generalSelectors.isAtomOwned(state, ownProps.atomUri);
 
-  //checks for active and chatSocket || groupSocket
-  const isConnectible = atomUtils.isConnectible(atom);
-  const hasReactionUseCases = atomUtils.hasReactionUseCases(atom);
-  const hasEnabledUseCases = atomUtils.hasEnabledUseCases(atom);
-
-  const showEnabledUseCases = isConnectible && isOwned && hasEnabledUseCases;
-  const showReactionUseCases = isConnectible && !isOwned && hasReactionUseCases;
+  const showEnabledUseCases =
+    atomUtils.isConnectible(atom) &&
+    isOwned &&
+    atomUtils.hasEnabledUseCases(atom);
+  const showReactionUseCases =
+    atomUtils.isConnectible(atom) &&
+    !isOwned &&
+    atomUtils.hasReactionUseCases(atom);
 
   const reactionUseCases = atomUtils.getReactionUseCases(atom);
   const enabledUseCases = atomUtils.getEnabledUseCases(atom);
@@ -46,16 +47,16 @@ const mapStateToProps = (state, ownProps) => {
     );
 
   const showAdHocRequestField =
-    !isOwned && isConnectible && !showEnabledUseCases && !showReactionUseCases;
+    !isOwned &&
+    atomUtils.isConnectible(atom) &&
+    !showEnabledUseCases &&
+    !showReactionUseCases;
 
   const viewState = get(state, "view");
   const visibleTab = viewUtils.getVisibleTabByAtomUri(
     viewState,
     ownProps.atomUri
   );
-
-  const chatSocketUri = atomUtils.getChatSocket(atom);
-  const groupSocketUri = atomUtils.getGroupSocket(atom);
 
   const atomLoading =
     !atom || processSelectors.isAtomLoading(state, ownProps.atomUri);
@@ -65,24 +66,21 @@ const mapStateToProps = (state, ownProps) => {
   const ownedChatSocketAtoms =
     ownedAtoms && ownedAtoms.filter(atom => atomUtils.hasChatSocket(atom));
 
-  const isInactive = atomUtils.isInactive(atom);
   return {
     className: ownProps.className,
     atomUri: ownProps.atomUri,
+    atom: atom,
     defaultTab: ownProps.defaultTab,
     loggedIn: accountUtils.isLoggedIn(get(state, "account")),
-    isInactive: isInactive,
     isOwned: isOwned,
     showAdHocRequestField,
-    showEnabledUseCases,
-    showReactionUseCases,
     reactionUseCasesArray: showReactionUseCases
       ? reactionUseCases.toArray()
       : [],
+    enabledUseCasesArray: showEnabledUseCases ? enabledUseCases.toArray() : [],
     ownedReactionAtomsArray: ownedReactionAtoms
       ? ownedReactionAtoms.toArray()
       : [],
-    enabledUseCasesArray: showEnabledUseCases ? enabledUseCases.toArray() : [],
     atomLoading,
     showFooter:
       !atomLoading &&
@@ -90,13 +88,10 @@ const mapStateToProps = (state, ownProps) => {
       (showEnabledUseCases ||
         showReactionUseCases ||
         showAdHocRequestField ||
-        isInactive),
+        atomUtils.isInactive(atom)),
     addHolderUri: showEnabledUseCases ? holderUri : undefined,
     holderUri,
-    chatSocketUri,
-    groupSocketUri,
     ownedChatSocketAtoms,
-    ownedAtoms,
   };
 };
 
@@ -120,18 +115,12 @@ const mapDispatchToProps = dispatch => {
     showTermsDialog: payload => {
       dispatch(actionCreators.view__showTermsDialog(payload));
     },
-    connectionsConnectAdHoc: (
-      connectToAtomUri,
-      message,
-      connectToSocketUri,
-      persona
-    ) => {
+    connectionsConnectAdHoc: (targetSocketUri, message, personaUri) => {
       dispatch(
         actionCreators.connections__connectAdHoc(
-          connectToAtomUri,
+          targetSocketUri,
           message,
-          connectToSocketUri,
-          persona
+          personaUri
         )
       );
     },
@@ -193,44 +182,36 @@ class AtomInfo extends React.Component {
     let footerElement;
 
     if (this.props.showFooter) {
-      const reactionUseCaseElements =
-        this.props.showReactionUseCases &&
-        this.props.reactionUseCasesArray &&
-        this.props.reactionUseCasesArray.map((useCase, index) =>
-          this.getUseCaseTypeButton(useCase, index)
-        );
-
-      const enabledUseCaseElements =
-        this.props.showEnabledUseCases &&
-        this.props.enabledUseCasesArray &&
-        this.props.enabledUseCasesArray.map((useCase, index) =>
-          this.getUseCaseTypeButton(useCase, index)
-        );
-
-      footerElement = (
-        <div className="atom-info__footer">
-          {this.props.isInactive &&
-            (this.props.isOwned ? (
-              <React.Fragment>
-                <div className="atom-info__footer__infolabel">
-                  This Atom is inactive. Others will not be able to interact
-                  with it.
-                </div>
-                <button
-                  className="won-publish-button red won-button--filled"
-                  onClick={() => this.props.atomReopen(this.props.atomUri)}
-                >
-                  Reopen
-                </button>
-              </React.Fragment>
-            ) : (
+      if (atomUtils.isInactive(this.props.atom)) {
+        if (this.props.isOwned) {
+          footerElement = (
+            <div className="atom-info__footer">
+              <div className="atom-info__footer__infolabel">
+                This Atom is inactive. Others will not be able to interact with
+                it.
+              </div>
+              <button
+                className="won-publish-button red won-button--filled"
+                onClick={() => this.props.atomReopen(this.props.atomUri)}
+              >
+                Reopen
+              </button>
+            </div>
+          );
+        } else {
+          footerElement = (
+            <div className="atom-info__footer">
               <div className="atom-info__footer__infolabel">
                 Atom is inactive, no requests allowed
               </div>
-            ))}
-          {this.props.showAdHocRequestField && (
-            <React.Fragment>
-              {this.props.chatSocketUri && (
+            </div>
+          );
+        }
+      } else {
+        if (this.props.showAdHocRequestField) {
+          footerElement = (
+            <div className="atom-info__footer">
+              {atomUtils.getChatSocket(this.props.atom) && (
                 <ChatTextfield
                   placeholder="Message (optional)"
                   allowEmptySubmit={true}
@@ -239,13 +220,13 @@ class AtomInfo extends React.Component {
                   onSubmit={({ value, selectedPersona }) =>
                     this.sendAdHocRequest(
                       value,
-                      this.props.chatSocketUri,
+                      atomUtils.getChatSocket(this.props.atom),
                       selectedPersona && selectedPersona.personaId
                     )
                   }
                 />
               )}
-              {this.props.groupSocketUri && (
+              {atomUtils.getGroupSocket(this.props.atom) && (
                 <ChatTextfield
                   placeholder="Message (optional)"
                   allowEmptySubmit={true}
@@ -254,18 +235,31 @@ class AtomInfo extends React.Component {
                   onSubmit={({ value, selectedPersona }) =>
                     this.sendAdHocRequest(
                       value,
-                      this.props.groupSocketUri,
+                      atomUtils.getGroupSocket(this.props.atom),
                       selectedPersona && selectedPersona.personaId
                     )
                   }
                 />
               )}
-            </React.Fragment>
-          )}
-          {reactionUseCaseElements}
-          {enabledUseCaseElements}
-        </div>
-      );
+            </div>
+          );
+        } else {
+          const reactionUseCaseElements = this.props.reactionUseCasesArray.map(
+            (useCase, index) => this.getUseCaseTypeButton(useCase, index)
+          );
+
+          const enabledUseCaseElements = this.props.enabledUseCasesArray.map(
+            (useCase, index) => this.getUseCaseTypeButton(useCase, index)
+          );
+
+          footerElement = (
+            <div className="atom-info__footer">
+              {reactionUseCaseElements}
+              {enabledUseCaseElements}
+            </div>
+          );
+        }
+      }
     }
 
     return (
@@ -290,22 +284,23 @@ class AtomInfo extends React.Component {
   }
 
   getUseCaseTypeButton(useCase, index) {
-    console.debug("useCase: ", useCase);
     const ucIdentifier = get(useCase, "identifier");
     const ucSenderSocketType = get(useCase, "senderSocketType");
     const ucTargetSocketType = get(useCase, "targetSocketType");
 
     const atomElements = this.props.ownedReactionAtomsArray
-      .filter(atom => atomUtils.matchesDefinition(atom, useCase))
-      .map((atom, index) => {
+      .filter(reactionAtom =>
+        atomUtils.matchesDefinition(reactionAtom, useCase)
+      )
+      .map((reactionAtom, index) => {
         return (
           <WonAtomHeader
-            key={get(atom, "uri") + "-" + index}
-            atomUri={get(atom, "uri")}
+            key={get(reactionAtom, "uri") + "-" + index}
+            atomUri={get(reactionAtom, "uri")}
             hideTimestamp={true}
             onClick={() => {
               this.connectAtomSockets(
-                get(atom, "uri"),
+                reactionAtom,
                 ucSenderSocketType,
                 ucTargetSocketType
               );
@@ -384,14 +379,29 @@ class AtomInfo extends React.Component {
   }
 
   connectAtomSockets(
-    selectedOwnedAtomUri,
+    reactionAtom,
     senderSocketType,
     targetSocketType,
     message = ""
   ) {
-    const connectToOwnedAtom = get(this.props.ownedAtoms, this.props.atomUri);
+    const reactionAtomUri = get(reactionAtom, "uri");
+    const senderSocketUri = atomUtils.getSocketUri(
+      reactionAtom,
+      senderSocketType
+    );
+    const targetSocketUri = atomUtils.getSocketUri(
+      this.props.atom,
+      targetSocketType
+    );
 
-    if (connectToOwnedAtom) {
+    const existingConnections = get(reactionAtom, "connections")
+      .filter(conn => get(conn, "targetAtomUri") === this.props.atomUri)
+      .filter(conn => get(conn, "targetSocketUri") === targetSocketUri)
+      .filter(conn => get(conn, "socketUri") === senderSocketUri);
+
+    console.debug("ExistingConnections: ", existingConnections);
+
+    if (this.props.isOwned) {
       //TODO: SERVER SIDE CONNECT OF TWO ATOMS THAT ARE OWNED
     } else {
       const dialogText = "Connect with this Atom?";
@@ -404,7 +414,7 @@ class AtomInfo extends React.Component {
             caption: "Yes",
             callback: () => {
               this.props.connect(
-                selectedOwnedAtomUri,
+                reactionAtomUri,
                 undefined,
                 this.props.atomUri,
                 message,
@@ -430,7 +440,7 @@ class AtomInfo extends React.Component {
     }
   }
 
-  sendAdHocRequest(message, connectToSocketUri, personaUri) {
+  sendAdHocRequest(message, targetSocketUri, personaUri) {
     const _atomUri = this.props.atomUri;
 
     if (this.props.loggedIn) {
@@ -439,14 +449,14 @@ class AtomInfo extends React.Component {
 
         if (personaAtom) {
           const targetSocketType =
-            connectToSocketUri === this.props.chatSocketUri
+            targetSocketUri === atomUtils.getChatSocket(this.props.atom)
               ? vocab.CHAT.ChatSocketCompacted
               : vocab.GROUP.GroupSocketCompacted;
 
           // if the personaAtom already contains a chatSocket we will just use the persona as the Atom that connects
           const personaConnections = get(personaAtom, "connections")
             .filter(conn => get(conn, "targetAtomUri") === _atomUri)
-            .filter(conn => get(conn, "targetSocketUri") === connectToSocketUri)
+            .filter(conn => get(conn, "targetSocketUri") === targetSocketUri)
             .filter(
               conn =>
                 get(conn, "socketUri") === atomUtils.getChatSocket(personaAtom)
@@ -517,16 +527,15 @@ class AtomInfo extends React.Component {
             console.error(
               "more than one connection stored between two atoms that use the same exact sockets",
               personaAtom,
-              connectToSocketUri
+              targetSocketUri
             );
           }
         } else {
           this.props.routerGoResetParams("connections");
 
           this.props.connectionsConnectAdHoc(
-            _atomUri,
+            targetSocketUri,
             message,
-            connectToSocketUri,
             personaUri
           );
         }
@@ -538,14 +547,11 @@ class AtomInfo extends React.Component {
             this.props.hideModalDialog();
             this.props.routerGoResetParams("connections");
 
-            if (_atomUri) {
-              this.props.connectionsConnectAdHoc(
-                _atomUri,
-                message,
-                connectToSocketUri,
-                personaUri
-              );
-            }
+            this.props.connectionsConnectAdHoc(
+              targetSocketUri,
+              message,
+              personaUri
+            );
           },
           cancelCallback: () => {
             this.props.hideModalDialog();
@@ -558,13 +564,11 @@ class AtomInfo extends React.Component {
 
 AtomInfo.propTypes = {
   atomUri: PropTypes.string,
+  atom: PropTypes.object,
   defaultTab: PropTypes.string,
   loggedIn: PropTypes.bool,
-  isInactive: PropTypes.bool,
   isOwned: PropTypes.bool,
   showAdHocRequestField: PropTypes.bool,
-  showEnabledUseCases: PropTypes.bool,
-  showReactionUseCases: PropTypes.bool,
   reactionUseCasesArray: PropTypes.arrayOf(PropTypes.object),
   enabledUseCasesArray: PropTypes.arrayOf(PropTypes.object),
   ownedReactionAtomsArray: PropTypes.arrayOf(PropTypes.object),
@@ -579,10 +583,7 @@ AtomInfo.propTypes = {
   showModalDialog: PropTypes.func,
   showTermsDialog: PropTypes.func,
   connectionsConnectAdHoc: PropTypes.func,
-  ownedAtoms: PropTypes.object,
   ownedChatSocketAtoms: PropTypes.object,
-  chatSocketUri: PropTypes.string,
-  groupSocketUri: PropTypes.string,
   connect: PropTypes.func,
   connectSockets: PropTypes.func,
   sendChatMessage: PropTypes.func,
