@@ -31,7 +31,8 @@ export function connectionsChatMessageClaimOnSuccess(
   chatMessage,
   additionalContent,
   senderSocketUri,
-  targetSocketUri
+  targetSocketUri,
+  connectionUri
 ) {
   return dispatch => {
     buildChatMessage({
@@ -48,17 +49,34 @@ export function connectionsChatMessageClaimOnSuccess(
           ownerApi.sendMessage(msgData.message),
         ])
       )
-      .then(([optimisticEvent, jsonResp]) => {
-        dispatch({
-          type: actionTypes.connections.sendChatMessageClaimOnSuccess,
-          payload: {
-            eventUri: jsonResp.messageUri,
-            message: jsonResp.message,
-            optimisticEvent,
-            senderSocketUri,
-            targetSocketUri,
-          },
-        });
+      .then(([, jsonResp]) => {
+        // Send claim message
+        buildChatMessage({
+          referencedContentUris: new Map().set("claims", [jsonResp.messageUri]),
+          socketUri: senderSocketUri,
+          targetSocketUri: targetSocketUri,
+          isTTL: false,
+        })
+          .then(msgData =>
+            Promise.all([
+              won.wonMessageFromJsonLd(msgData.message),
+              ownerApi.sendMessage(msgData.message),
+            ])
+          )
+          .then(([optimisticEvent, jsonResp]) => {
+            //Deprecated
+            dispatch({
+              type: actionTypes.connections.sendChatMessageClaimOnSuccess,
+              payload: {
+                eventUri: jsonResp.messageUri,
+                message: jsonResp.message,
+                optimisticEvent,
+                senderSocketUri,
+                targetSocketUri,
+                connectionUri,
+              },
+            });
+          });
       })
       .catch(e => {
         console.error("Error while processing chat message: ", e);

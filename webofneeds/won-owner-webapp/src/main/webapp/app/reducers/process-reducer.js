@@ -385,14 +385,19 @@ export default function(processState = initialState, action = {}) {
       );
       const senderSocketUri = action.payload.senderSocketUri;
       const targetSocketUri = action.payload.targetSocketUri;
+      const connectionUri = action.payload.connectionUri;
       console.debug("senderSocketUri: ", senderSocketUri);
       console.debug("targetSocketUri: ", targetSocketUri);
-      /* const connUri = action.payload.optimisticEvent.getSenderConnection(); // This has been removed
 
-      return updateConnectionProcess(processState, connUri, {
+      console.debug("connectionUri", connectionUri);
+
+      return processState;
+      //Deprecated
+      /*
+      return updateConnectionProcess(processState, connectionUri, {
         petriNetData: { dirty: true },
       });*/
-      return processState; //todo figure out how to extract the connection based on the socketUris
+      //return processState; //todo figure out how to extract the connection based on the socketUris
     }
 
     case actionTypes.connections.updatePetriNetData: {
