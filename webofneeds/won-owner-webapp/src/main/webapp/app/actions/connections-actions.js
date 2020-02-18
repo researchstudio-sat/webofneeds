@@ -360,15 +360,13 @@ function connectReactionAtom(
 
             ownerApi.sendMessage(cnctMsg.message).then(jsonResp =>
               dispatch({
-                type: actionTypes.atoms.connect,
+                type: actionTypes.atoms.connectSockets,
                 payload: {
                   eventUri: jsonResp.messageUri,
                   message: jsonResp.message,
                   optimisticEvent: optimisticEvent,
+                  senderSocketUri: `${atomUri}${atomDraftSocketUri}`,
                   targetSocketUri: targetSocketUri,
-                  socketUri: `${atomUri}${atomDraftSocketUri}`,
-                  atomUri: atomUri,
-                  targetAtomUri: get(connectToAtom, "uri"),
                 },
               })
             );
@@ -443,27 +441,25 @@ function connectAdHoc(
       })
       .then(() => {
         // set default socketUri
-        let socketUri = `${atomUri}#chatSocket`;
+        let senderSocketUri = `${atomUri}#chatSocket`;
 
         // establish connection
         const cnctMsg = buildConnectMessage({
           connectMessage: message,
-          socketUri: socketUri,
+          socketUri: senderSocketUri,
           targetSocketUri: targetSocketUri,
         });
 
         won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
           ownerApi.sendMessage(cnctMsg.message).then(jsonResp => {
             dispatch({
-              type: actionTypes.atoms.connect,
+              type: actionTypes.atoms.connectSockets,
               payload: {
                 eventUri: jsonResp.messageUri,
                 message: jsonResp.message,
                 optimisticEvent: optimisticEvent,
-                socketUri: socketUri,
+                senderSocketUri: senderSocketUri,
                 targetSocketUri: targetSocketUri,
-                atomUri: atomUri,
-                targetAtomUri: theirAtomUri,
               },
             });
           });

@@ -111,21 +111,19 @@ const mapDispatchToProps = dispatch => {
       );
     },
     connect: (
-      ownedAtomUri,
-      connectionUri,
+      senderAtomUri,
       targetAtomUri,
-      message,
-      ownSocket,
-      targetSocket
+      senderSocketType,
+      targetSocketType,
+      message
     ) => {
       dispatch(
         actionCreators.atoms__connect(
-          ownedAtomUri,
-          connectionUri,
+          senderAtomUri,
           targetAtomUri,
-          message,
-          ownSocket,
-          targetSocket
+          senderSocketType,
+          targetSocketType,
+          message
         )
       );
     },
@@ -391,11 +389,10 @@ class AtomInfo extends React.Component {
             } else {
               this.props.connect(
                 reactionAtomUri,
-                undefined,
                 _atomUri,
-                message,
                 senderSocketType,
-                targetSocketType
+                targetSocketType,
+                message
               );
               this.props.hideModalDialog();
             }
@@ -444,11 +441,10 @@ class AtomInfo extends React.Component {
           if (personaConnections.size == 0) {
             this.props.connect(
               personaUri,
-              undefined,
               _atomUri,
-              message,
               vocab.CHAT.ChatSocketCompacted,
-              targetSocketType
+              targetSocketType,
+              message
             );
             this.props.routerGoResetParams("connections");
           } else if (personaConnections.size == 1) {
@@ -470,11 +466,10 @@ class AtomInfo extends React.Component {
               //Send another Request with a new message if there is a message present
               this.props.connect(
                 personaUri,
-                personaConnectionUri,
                 _atomUri,
-                message,
                 vocab.CHAT.ChatSocketCompacted,
-                targetSocketType
+                targetSocketType,
+                message
               );
               */
             } else if (connectionUtils.isRequestReceived(personaConnection)) {

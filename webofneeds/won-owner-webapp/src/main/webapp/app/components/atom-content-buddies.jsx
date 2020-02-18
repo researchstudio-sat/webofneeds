@@ -98,21 +98,19 @@ const mapDispatchToProps = dispatch => {
       );
     },
     connect: (
-      ownedAtomUri,
-      connectionUri,
+      senderAtomUri,
       targetAtomUri,
-      message,
-      ownSocket,
-      targetSocket
+      senderSocketType,
+      targetSocketType,
+      message
     ) => {
       dispatch(
         actionCreators.atoms__connect(
-          ownedAtomUri,
-          connectionUri,
+          senderAtomUri,
           targetAtomUri,
-          message,
-          ownSocket,
-          targetSocket
+          senderSocketType,
+          targetSocketType,
+          message
         )
       );
     },
@@ -414,11 +412,10 @@ class WonAtomContentBuddies extends React.Component {
           callback: () => {
             this.props.connect(
               this.props.atomUri,
-              undefined,
               targetAtomUri,
-              message,
               vocab.BUDDY.BuddySocketCompacted,
-              vocab.BUDDY.BuddySocketCompacted
+              vocab.BUDDY.BuddySocketCompacted,
+              message
             );
             this.props.hideModalDialog();
           },
@@ -448,9 +445,7 @@ class WonAtomContentBuddies extends React.Component {
         //No chatConnection between buddies exists => connect
         this.props.connect(
           this.props.atomUri,
-          undefined,
           get(connection, "targetAtomUri"),
-          "",
           vocab.CHAT.ChatSocketCompacted,
           vocab.CHAT.ChatSocketCompacted
         );
@@ -465,9 +460,7 @@ class WonAtomContentBuddies extends React.Component {
         ) {
           this.props.connect(
             this.props.atomUri,
-            undefined,
-            chatConnectionUri,
-            "",
+            get(chatConnection, "targetAtomUri"),
             vocab.CHAT.ChatSocketCompacted,
             vocab.CHAT.ChatSocketCompacted
           );
@@ -491,9 +484,7 @@ class WonAtomContentBuddies extends React.Component {
       //No chatConnection between buddies exists => connect
       this.props.connect(
         this.props.atomUri,
-        undefined,
         get(connection, "targetAtomUri"),
-        "",
         vocab.CHAT.ChatSocketCompacted,
         vocab.CHAT.ChatSocketCompacted
       );

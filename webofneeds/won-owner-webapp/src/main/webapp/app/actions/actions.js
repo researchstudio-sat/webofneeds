@@ -41,7 +41,7 @@ import { atomCreate, atomEdit } from "./create-atom-action.js";
 import {
   atomsClose,
   atomsClosedBySystem,
-  atomsConnect,
+  atomsConnectSocketTypes,
   atomsConnectSockets,
   atomsDelete,
   atomsOpen,
@@ -81,11 +81,7 @@ import {
   pageLoadAction,
 } from "./load-action.js";
 import { stateGo, stateReload } from "redux-ui-router";
-import {
-  connectPersona,
-  disconnectPersona,
-  reviewPersona,
-} from "./persona-actions.js";
+import { disconnectPersona, reviewPersona } from "./persona-actions.js";
 import { deepFreeze } from "../utils.js";
 import won from "../won-es6";
 
@@ -148,7 +144,7 @@ const actionHierarchy = {
     delete: atomsDelete,
     closedBySystem: atomsClosedBySystem,
     failed: INJ_DEFAULT,
-    connect: atomsConnect,
+    connect: atomsConnectSocketTypes,
     connectSockets: atomsConnectSockets,
     fetchUnloadedAtom: fetchUnloadedAtom,
 
@@ -171,7 +167,6 @@ const actionHierarchy = {
   },
   personas: {
     review: reviewPersona,
-    connect: connectPersona,
     disconnect: disconnectPersona,
 
     fetchPersonas: fetchPersonas,

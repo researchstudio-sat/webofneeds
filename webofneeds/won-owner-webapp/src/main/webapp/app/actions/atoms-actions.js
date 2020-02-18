@@ -17,7 +17,7 @@ import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as stateStore from "../redux/state-store.js";
 import * as ownerApi from "../api/owner-api.js";
-import { get } from "../utils.js";
+import { get, getIn } from "../utils.js";
 
 export function fetchUnloadedAtom(atomUri) {
   return (dispatch, getState) =>
@@ -61,56 +61,43 @@ export function atomsConnectSockets(
   };
 }
 
-//ownConnectionUri is optional - set if known
-export function atomsConnect(
-  ownedAtomUri,
-  ownConnectionUri,
-  theirAtomUri,
-  connectMessage,
-  socketType,
-  targetSocketType
+export function atomsConnectSocketTypes(
+  senderAtomUri,
+  targetAtomUri,
+  senderSocketType,
+  targetSocketType,
+  connectMessage
 ) {
   return (dispatch, getState) => {
     const state = getState();
-    const ownedAtom = state.getIn(["atoms", ownedAtomUri]);
-    const theirAtom = state.getIn(["atoms", theirAtomUri]);
+    const senderAtom = getIn(state, ["atoms", senderAtomUri]);
+    const targetAtom = getIn(state, ["atoms", targetAtomUri]);
 
-    const socketUri = atomUtils.getSocketUri(ownedAtom, socketType);
-    const targetSocketUri = atomUtils.getSocketUri(theirAtom, targetSocketType);
+    const senderSocketUri = atomUtils.getSocketUri(
+      senderAtom,
+      senderSocketType
+    );
+    const targetSocketUri = atomUtils.getSocketUri(
+      targetAtom,
+      targetSocketType
+    );
 
-    if (socketType && !socketUri) {
+    if (!senderSocketUri) {
       throw new Error(
-        `Atom ${get(ownedAtom, "uri")} does not have a ${socketType}`
+        `Atom ${get(senderAtom, "uri")} does not have a ${senderSocketType}`
       );
     }
 
-    if (targetSocketType && !targetSocketUri) {
+    if (!targetSocketUri) {
       throw new Error(
-        `Atom ${get(theirAtom, "uri")} does not have a ${targetSocketType}`
+        `Atom ${get(targetAtom, "uri")} does not have a ${targetSocketType}`
       );
     }
 
-    const cnctMsg = buildConnectMessage({
-      connectMessage: connectMessage,
-      socketUri: socketUri,
-      targetSocketUri: targetSocketUri,
-    });
-    return won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent =>
-      ownerApi.sendMessage(cnctMsg.message).then(jsonResp => {
-        dispatch({
-          type: actionTypes.atoms.connect,
-          payload: {
-            eventUri: jsonResp.messageUri,
-            message: jsonResp.message,
-            ownConnectionUri: ownConnectionUri,
-            optimisticEvent: optimisticEvent,
-            socketUri: socketUri,
-            targetSocketUri: targetSocketUri,
-            atomUri: get(ownedAtom, "uri"),
-            targetAtomUri: get(theirAtom, "uri"),
-          },
-        });
-      })
+    return atomsConnectSockets(
+      senderSocketUri,
+      targetSocketUri,
+      connectMessage
     );
   };
 }

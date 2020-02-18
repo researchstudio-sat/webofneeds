@@ -47,21 +47,19 @@ const mapDispatchToProps = dispatch => {
       dispatch(actionCreators.view__showModalDialog(payload));
     },
     connect: (
-      ownedAtomUri,
-      connectionUri,
+      senderAtomUri,
       targetAtomUri,
-      message,
-      ownSocket,
-      targetSocket
+      senderSocketType,
+      targetSocketType,
+      message
     ) => {
       dispatch(
         actionCreators.atoms__connect(
-          ownedAtomUri,
-          connectionUri,
+          senderAtomUri,
           targetAtomUri,
-          message,
-          ownSocket,
-          targetSocket
+          senderSocketType,
+          targetSocketType,
+          message
         )
       );
     },
@@ -348,11 +346,10 @@ class WonAddBuddy extends React.Component {
             } else {
               this.props.connect(
                 selectedAtomUri,
-                existingBuddyConnectionUri,
                 this.props.atomUri,
-                message,
                 vocab.BUDDY.BuddySocketCompacted,
-                vocab.BUDDY.BuddySocketCompacted
+                vocab.BUDDY.BuddySocketCompacted,
+                message
               );
             }
             this.props.hideModalDialog();
