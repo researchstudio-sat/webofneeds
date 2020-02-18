@@ -97,16 +97,6 @@ const mapDispatchToProps = dispatch => {
         )
       );
     },
-    connectAdHoc: (targetAtomUri, message, connectToSocketUri, persona) => {
-      dispatch(
-        actionCreators.connections__connectAdHoc(
-          targetAtomUri,
-          message,
-          connectToSocketUri,
-          persona
-        )
-      );
-    },
     connect: (
       ownedAtomUri,
       connectionUri,
@@ -535,7 +525,6 @@ WonAtomContentBuddies.propTypes = {
   connectionClose: PropTypes.func,
   connectSockets: PropTypes.func,
   connect: PropTypes.func,
-  connectAdHoc: PropTypes.func,
   routerGo: PropTypes.func,
   routerGoResetParams: PropTypes.func,
   chatSocketUri: PropTypes.string,
