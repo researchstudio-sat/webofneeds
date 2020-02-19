@@ -5,6 +5,10 @@
 import vocab from "../../service/vocab.js";
 import { get } from "../../utils.js";
 
+export function isUsingTemporaryUri(connection) {
+  return !!get(connection, "usingTemporaryUri");
+}
+
 export function isRequestSent(connection) {
   return get(connection, "state") === vocab.WON.RequestSent;
 }
