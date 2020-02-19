@@ -115,12 +115,6 @@ export function addMessage(
 
       if (targetConnection) {
         const targetConnectionUri = get(targetConnection, "uri");
-        console.debug(
-          "Store message in targetConnection(",
-          targetConnectionUri,
-          "):",
-          targetConnection
-        );
         parsedMessage = parsedMessage.setIn(["data", "outgoingMessage"], false);
 
         if (
@@ -238,18 +232,6 @@ export function addMessage(
               ]);
               if (messages) {
                 //ignore messages for nonexistant connections
-                console.debug(
-                  "Store message in injectIntoConnection: Msg:(",
-                  forwardMessage,
-                  ") ",
-                  senderSocketUri,
-                  "->",
-                  targetSocketUri,
-                  "will be added to connection(",
-                  connUri,
-                  ") :",
-                  conn
-                );
 
                 const existingMessage = messages.get(
                   forwardMessage.getIn(["data", "uri"])

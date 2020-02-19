@@ -24,13 +24,6 @@ export function messagesReducer(messages = initialState, action = {}) {
     case actionTypes.atoms.edit:
     case actionTypes.atoms.connectSockets:
     case actionTypes.atoms.create: {
-      console.debug(
-        "Set waitingForAnswer for message(",
-        action.payload.eventUri,
-        "): ",
-        action.payload.message
-      );
-
       return messages.setIn(
         ["waitingForAnswer", action.payload.eventUri],
         action.payload.message
