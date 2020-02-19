@@ -94,10 +94,25 @@ export function atomsConnectSocketTypes(
       );
     }
 
-    return atomsConnectSockets(
-      senderSocketUri,
-      targetSocketUri,
-      connectMessage
+    const cnctMsg = buildConnectMessage({
+      connectMessage: connectMessage,
+      socketUri: senderSocketUri,
+      targetSocketUri: targetSocketUri,
+    });
+
+    return won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent =>
+      ownerApi.sendMessage(cnctMsg.message).then(jsonResp => {
+        dispatch({
+          type: actionTypes.atoms.connectSockets,
+          payload: {
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
+            optimisticEvent: optimisticEvent,
+            senderSocketUri: senderSocketUri,
+            targetSocketUri: targetSocketUri,
+          },
+        });
+      })
     );
   };
 }
