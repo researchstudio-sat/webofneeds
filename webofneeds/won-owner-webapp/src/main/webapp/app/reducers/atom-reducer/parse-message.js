@@ -4,7 +4,6 @@ import {
   msStringToDate,
   trigPrefixesAndBody,
 } from "../../utils.js";
-import { isUriRead } from "../../won-localstorage.js";
 import * as useCaseUtils from "../../usecase-utils.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 
@@ -106,14 +105,10 @@ export function parseMessage(
       contentGraphTrigRaw: wonMessage.contentGraphTrig,
       contentGraphTrigError: wonMessage.contentGraphTrigError,
       //Receive Status Flags
-      unread:
-        !wonMessage.isFromOwner() &&
-        !wonMessage.isAtomHintMessage() &&
-        !wonMessage.isSocketHintMessage() &&
-        !isUriRead(wonMessage.getMessageUri()),
+      unread: false, //default is unread, but the real status is determined for non outgoing messages in the reducer
       //Send Status Flags
-      isReceivedByOwn: alreadyProcessed || !wonMessage.isFromOwner(), //if the message is not from the owner we know it has been received anyway
-      isReceivedByRemote: alreadyProcessed || !wonMessage.isFromOwner(), //if the message is not from the owner we know it has been received anyway
+      isReceivedByOwn: alreadyProcessed || !wonMessage.isFromOwner(), //this will be set properly in the reducer
+      isReceivedByRemote: alreadyProcessed || !wonMessage.isFromOwner(), //this will be set properly in the reducer
       failedToSend: false,
     },
   };

@@ -35,13 +35,7 @@ export function getReadUris() {
 }
 
 export function isUriRead(uri) {
-  for (const readUri of getReadUris()) {
-    if (readUri === uri) {
-      return true;
-    }
-  }
-
-  return false;
+  return getReadUris().includes(uri);
 }
 
 export function clearReadUris() {

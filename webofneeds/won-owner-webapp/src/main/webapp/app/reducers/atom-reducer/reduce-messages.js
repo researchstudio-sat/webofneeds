@@ -1,5 +1,5 @@
 import { parseMessage } from "./parse-message.js";
-import { markUriAsRead } from "../../won-localstorage.js";
+import { markUriAsRead, isUriRead } from "../../won-localstorage.js";
 import { markConnectionAsRead } from "./reduce-connections.js";
 import { addAtomStub } from "./reduce-atoms.js";
 import * as connectionSelectors from "../../redux/selectors/connection-selectors.js";
@@ -121,10 +121,19 @@ export function addMessage(
           "):",
           targetConnection
         );
-        parsedMessage = parsedMessage.setIn(["data", "outgoingMessage"], false);
+        parsedMessage = parsedMessage
+          .setIn(["data", "outgoingMessage"], false)
+          .setIn(
+            ["data", "unread"],
+            !wonMessage.isAtomHintMessage() &&
+              !wonMessage.isSocketHintMessage() &&
+              !isUriRead(getIn(parsedMessage, ["data", "uri"]))
+          )
+          .setIn(["data", "isReceivedByOwn"], true)
+          .setIn(["data", "isReceivedByRemote"], true);
 
         if (
-          parsedMessage.getIn(["data", "unread"]) &&
+          getIn(parsedMessage, ["data", "unread"]) &&
           !connectionSelectors.isChatToGroupConnection(
             state,
             getIn(state, [targetAtomUri, "connections", targetConnectionUri])
