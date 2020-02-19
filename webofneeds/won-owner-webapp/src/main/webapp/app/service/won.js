@@ -782,10 +782,6 @@ WonMessage.prototype = {
     return this.__getMessageUri(this.messageStructure);
   },
 
-  getRemoteMessageUri: function() {
-    return this.getProperty(vocab.WONMSG.correspondingRemoteMessage);
-  },
-
   __getMessageUri: function(messageStructure) {
     if (messageStructure.messageUri) {
       return messageStructure.messageUri;
@@ -954,7 +950,7 @@ WonMessage.prototype = {
     if (val) {
       return this.__singleValueOrArray(val);
     }
-    return this.getPropertyFromRemoteMessage(property);
+    return null;
   },
 
   getPropertyFromLocalMessage: function(property) {
@@ -962,18 +958,6 @@ WonMessage.prototype = {
     if (val) {
       return this.__singleValueOrArray(val);
     }
-  },
-  getPropertyFromRemoteMessage: function(property) {
-    const remoteMessage = this.__getFramedMessage()["@graph"][0][
-      vocab.WONMSG.correspondingRemoteMessage
-    ];
-    if (remoteMessage) {
-      let val = remoteMessage[property];
-      if (val) {
-        return this.__singleValueOrArray(val);
-      }
-    }
-    return null;
   },
 
   __singleValueOrArray: function(val) {
@@ -1000,9 +984,8 @@ WonMessage.prototype = {
     // Returns the compacted Framed Message depending on the message direction
     if (this.isFromOwner()) {
       return this.compactFramedMessage;
-    } else {
-      return this.compactFramedMessage["msg:correspondingRemoteMessage"];
     }
+    return null;
   },
   getCompactRawMessage: function() {
     return this.compactRawMessage;
@@ -1251,15 +1234,6 @@ WonMessage.prototype = {
           node.messageUri = msgUriAndDirection.messageUri;
           node.messageDirection = msgUriAndDirection.messageDirection;
         }
-        let messageUriAndCorrespondingRemoteMessageUri = this.__getMessageUriAndCorrespondingRemoteMessageUri(
-          graph
-        );
-        if (messageUriAndCorrespondingRemoteMessageUri) {
-          node.messageUri =
-            messageUriAndCorrespondingRemoteMessageUri.messageUri;
-          node.correspondingRemoteMessageUri =
-            messageUriAndCorrespondingRemoteMessageUri.correspondingRemoteMessageUri;
-        }
         let messageUriAndForwardedMessageUri = this.__getMessageUriAndForwardedMessageUri(
           graph
         );
@@ -1292,9 +1266,6 @@ WonMessage.prototype = {
             uri => !containedEnvelopes.includes(uri)
           );
         }
-        if (node && node.correspondingRemoteMessageUri) {
-          referencesOtherGraphs = true;
-        }
         if (node && node.forwardedMessageUri) {
           referencesOtherGraphs = true;
         }
@@ -1316,34 +1287,7 @@ WonMessage.prototype = {
         }
       }
     });
-    //now we should have the envelope inclusion trees for all messages
-    //unreferencedEnvelopes now points to all roots.
-    //walk over the roots and connect them via remoteMessage or forwardedMessage connections
-    if (unreferencedEnvelopes.length > 1) {
-      unreferencedEnvelopes.forEach(node => {
-        if (node.correspondingRemoteMessageUri) {
-          let remoteMessages = unreferencedEnvelopes.filter(
-            envelope =>
-              envelope.messageUri == node.correspondingRemoteMessageUri
-          );
-          if (remoteMessages.length == 1) {
-            //we found a remote envelope. link to it from our node
-            node.remoteEnvelope = remoteMessages[0];
-            if (node.messageDirection === vocab.WONMSG.FromExternal) {
-              //both messages can link to each other, but the FromExternal one
-              //is the top level one. mark the other one as referenced
-              unreferencedEnvelopes = unreferencedEnvelopes.filter(
-                env => env != node.remoteEnvelope
-              );
-            }
-          } else if (remoteMessages.length > 1) {
-            this.parseErrors.push(
-              "more than one candidate for the outermost remoteMessage envelope found"
-            );
-          }
-        }
-      });
-    }
+
     // if we still have more than 1 unreferenced envelope, it must be because there is
     // a forwarded message.
     if (unreferencedEnvelopes.length > 1) {
@@ -1402,15 +1346,16 @@ WonMessage.prototype = {
   __isEnvelopeGraph: graph => {
     let graphUri = graph["@id"];
     let graphData = graph["@graph"];
-    let graphType = graph["@type"];
+    // graphType and check where removed, because otherwise the hints wont work properly
+    // let graphType = graph["@type"];
     return (
-      (graphType && graphType.includes(vocab.WONMSG.EnvelopeGraph)) ||
-      (graphData &&
-        graphData.some(
-          resource =>
-            resource["@id"] === graphUri &&
-            resource["@type"].includes(vocab.WONMSG.EnvelopeGraph)
-        ))
+      // (graphType && graphType.includes(vocab.WONMSG.EnvelopeGraph) || //
+      graphData &&
+      graphData.some(
+        resource =>
+          resource["@id"] === graphUri &&
+          resource["@type"].includes(vocab.WONMSG.EnvelopeGraph)
+      )
     );
   },
   __isSignatureGraph: graph => {
@@ -1446,7 +1391,7 @@ WonMessage.prototype = {
       .filter(resource => resource["@id"] === messageUri)
       .map(resource => resource[vocab.WONMSG.content])
       .filter(x => x);
-    if (contentUrisArray.length > 0) {
+    if (contentUrisArray && contentUrisArray.length > 0) {
       return contentUrisArray[0].map(x => x["@id"] || x["@value"]);
     } else {
       return [];
@@ -1464,24 +1409,6 @@ WonMessage.prototype = {
       .map(resource => ({
         messageUri: resource["@id"],
         messageDirection: resource["@type"][0], //@type is an array in expanded jsonld
-      }))
-      .filter(x => !!x); //if that property was not present, filter out undefineds
-    if (Array.isArray(data)) {
-      if (data.length == 0) {
-        return null;
-      }
-      return data[0];
-    }
-    return data;
-  },
-  __getMessageUriAndCorrespondingRemoteMessageUri: graph => {
-    let graphData = graph["@graph"];
-    let data = graphData
-      .filter(resource => resource[vocab.WONMSG.correspondingRemoteMessage])
-      .map(resource => ({
-        messageUri: resource["@id"],
-        correspondingRemoteMessageUri:
-          resource[vocab.WONMSG.correspondingRemoteMessage][0]["@id"],
       }))
       .filter(x => !!x); //if that property was not present, filter out undefineds
     if (Array.isArray(data)) {

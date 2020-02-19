@@ -242,9 +242,6 @@ vocab.WONMSG.connectionMessageReceivedMessage =
 vocab.WONMSG.connectionMessageReceivedMessageCompacted =
   vocab.WONMSG.prefix + ":ConnectionMessageReceivedMessage";
 
-vocab.WONMSG.correspondingRemoteMessage =
-  vocab.WONMSG.prefix + "correspondingRemoteMessage";
-
 vocab.WONMSG.content = vocab.WONMSG.baseUri + "content";
 vocab.WONMSG.contentCompacted = vocab.WONMSG.prefix + ":content";
 vocab.WONMSG.connection = vocab.WONMSG.prefix + ":connection";
