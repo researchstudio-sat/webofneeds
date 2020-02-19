@@ -130,7 +130,7 @@ export function runMessagingAgent(redux) {
           return true;
         } else if (message.isFailureResponse()) {
           //Resend the failed close message
-          const connectionUri = message.getConnection();
+          const connectionUri = message.getConnection(); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           if (connectionUri) {
             console.warn("RESEND CLOSE MESSAGE FOR: ", connectionUri);
             redux.dispatch(actionCreators.connections__closeRemote(message));

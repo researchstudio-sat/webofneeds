@@ -12,6 +12,7 @@ import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import { isFetchMessageEffectsNeeded } from "../won-message-utils.js";
 import * as stateStore from "../redux/state-store.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as ownerApi from "../api/owner-api.js";
 import { get } from "../utils";
 import * as processUtils from "../redux/utils/process-utils";
@@ -504,6 +505,96 @@ function processMessageEffectsAndMessage(
     });
 
   return Promise.all([petriNetPromise, messageEffectsPromise]);
+}
+
+export function connectSuccessOwn(wonMessage) {
+  return (dispatch, getState) => {
+    const state = getState();
+    const atomUri = generalSelectors.getAtomUriBySocketUri(
+      wonMessage.getSenderSocket()
+    );
+
+    const atom = getIn(state, ["atoms", atomUri]);
+
+    const connection = getIn(atom, [
+      "connections",
+      "connectionFrom:" + wonMessage.getIsResponseTo(),
+    ]);
+
+    if (connection) {
+      let connUriPromise;
+
+      if (connectionUtils.isUsingTemporaryUri(connection)) {
+        connUriPromise = stateStore.fetchConnectionUriBySocketUris(
+          get(connection, "socketUri"),
+          get(connection, "targetSocketUri"),
+          atomUri
+        );
+      } else {
+        connUriPromise = Promise.resolve(get(connection, "uri"));
+      }
+
+      connUriPromise.then(connUri => {
+        dispatch({
+          type: actionTypes.messages.connect.successOwn,
+          payload: Immutable.fromJS({
+            message: wonMessage,
+            connUri: connUri,
+            atomUri: atomUri,
+          }),
+        });
+      });
+    }
+  };
+}
+
+export function connectSuccessRemote(wonMessage) {
+  return (dispatch, getState) => {
+    const state = getState();
+    const atomUri = generalSelectors.getAtomUriBySocketUri(
+      wonMessage.getTargetSocket()
+    );
+
+    const atom = getIn(state, ["atoms", atomUri]);
+    const targetSocketUri = wonMessage.getTargetSocket();
+    const senderSocketUri = wonMessage.getSenderSocket();
+
+    const connection =
+      atomUtils.getConnectionBySocketUris(
+        atom,
+        targetSocketUri,
+        senderSocketUri
+      ) ||
+      getIn(atom, [
+        "connections",
+        "connectionFrom:" + wonMessage.getIsResponseTo(),
+      ]);
+
+    if (connection) {
+      let connUriPromise;
+
+      if (connectionUtils.isUsingTemporaryUri(connection)) {
+        connUriPromise = stateStore.fetchConnectionUriBySocketUris(
+          targetSocketUri,
+          senderSocketUri,
+          atomUri
+        );
+      } else {
+        connUriPromise = Promise.resolve(get(connection, "uri"));
+      }
+
+      connUriPromise.then(connUri => {
+        dispatch({
+          type: actionTypes.messages.connect.successRemote,
+          payload: Immutable.fromJS({
+            message: wonMessage,
+            connUri: connUri,
+            atomUri: atomUri,
+          }),
+        });
+      });
+    }
+  };
 }
 
 export function processConnectMessage(wonMessage) {

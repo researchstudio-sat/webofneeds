@@ -84,6 +84,26 @@ export function fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch) {
     });
 }
 
+export function fetchConnectionUriBySocketUris(
+  senderSocketUri,
+  targetSocketUri,
+  atomUri
+) {
+  return won
+    .getConnectionUrisBySocket(senderSocketUri, targetSocketUri, {
+      requesterWebId: atomUri,
+    })
+    .catch(() => {
+      console.error(
+        "Fetch of ConnectionUri of sockets",
+        senderSocketUri,
+        "<->",
+        targetSocketUri,
+        "failed"
+      );
+    });
+}
+
 export function fetchActiveConnectionAndDispatchBySocketUris(
   senderSocketUri,
   targetSocketUri,

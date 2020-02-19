@@ -218,8 +218,8 @@ const actionHierarchy = {
     },
     connect: {
       //success: messages.successfulConnect,
-      successRemote: INJ_DEFAULT, //2nd successResponse
-      successOwn: INJ_DEFAULT, //1st successResponse
+      successRemote: messages.connectSuccessRemote, //2nd successResponse
+      successOwn: messages.connectSuccessOwn, //1st successResponse
       failure: INJ_DEFAULT,
     },
     chatMessage: {
