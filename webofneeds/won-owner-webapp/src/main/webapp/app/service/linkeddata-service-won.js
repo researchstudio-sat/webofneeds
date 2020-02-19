@@ -598,7 +598,6 @@ import vocab from "./vocab.js";
                     { ?s rdf:type msg:FromSystem } union
                     { ?s rdf:type msg:FromExternal } union
                     { ?s msg:messageType ?o } union
-                    { ?s won:correspondingRemoteMessage ?o } union
                     { ?s won:recipient ?o }.
                 }`
       );
@@ -643,13 +642,7 @@ import vocab from "./vocab.js";
                           prefix event: <${baseUriForEvents}>
                           prefix msg: <https://w3id.org/won/message#>
 
-                          select distinct ?graphOfMessage where {
-                              { <${messageUri}> msg:correspondingRemoteMessage ?graphOfMessage } union
-                              { ?graphOfMessage msg:correspondingRemoteMessage <${messageUri}> } union
-                              { <${messageUri}> msg:forwardedMessage ?graphOfMessage } union
-                              { <${messageUri}> msg:forwardedMessage/msg:correspondingRemoteMessage ?graphOfMessage }
-                          }
-                          `
+                          select distinct ?graphOfMessage where { <${messageUri}> msg:forwardedMessage ?graphOfMessage }`
           );
 
           const graphUrisOfMessage = queryResult.map(result =>
