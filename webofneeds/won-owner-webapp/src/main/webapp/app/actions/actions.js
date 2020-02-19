@@ -81,7 +81,11 @@ import {
   pageLoadAction,
 } from "./load-action.js";
 import { stateGo, stateReload } from "redux-ui-router";
-import { disconnectPersona, reviewPersona } from "./persona-actions.js";
+import {
+  disconnectPersona,
+  connectPersona,
+  reviewPersona,
+} from "./persona-actions.js";
 import { deepFreeze } from "../utils.js";
 import won from "../won-es6";
 
@@ -167,6 +171,7 @@ const actionHierarchy = {
   },
   personas: {
     review: reviewPersona,
+    connect: connectPersona,
     disconnect: disconnectPersona,
 
     fetchPersonas: fetchPersonas,
