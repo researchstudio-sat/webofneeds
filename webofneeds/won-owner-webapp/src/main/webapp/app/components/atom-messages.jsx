@@ -466,6 +466,7 @@ class AtomMessages extends React.Component {
             loadSpinnerElement}
           {!this.props.isSuggested &&
             !this.props.isConnectionLoading &&
+            !get(this.props.connection, "usingTemporaryUri") &&
             !this.props.isProcessingLoadingMessages &&
             this.props.hasConnectionMessagesToLoad && (
               <button
@@ -969,6 +970,7 @@ class AtomMessages extends React.Component {
     const INITIAL_MESSAGECOUNT = 15;
     if (
       this.props.connection &&
+      !get(this.props.connection, "usingTemporaryUri") &&
       !this.props.isConnectionLoading &&
       !this.props.isProcessingLoadingMessages &&
       get(this.props.connection, "messages").size < INITIAL_MESSAGECOUNT &&
@@ -985,6 +987,7 @@ class AtomMessages extends React.Component {
     if (
       forceFetch ||
       (this.props.isConnected &&
+        !get(this.props.connection, "usingTemporaryUri") &&
         !this.props.isProcessingLoadingPetriNetData &&
         !this.props.petriNetDataLoaded)
     ) {
@@ -1017,6 +1020,7 @@ class AtomMessages extends React.Component {
     if (
       forceFetch ||
       (this.props.isConnected &&
+        !get(this.props.connection, "usingTemporaryUri") &&
         !this.props.isProcessingLoadingAgreementData &&
         !this.props.agreementDataLoaded)
     ) {
@@ -1082,6 +1086,7 @@ class AtomMessages extends React.Component {
   ensureMessageStateIsUpToDate() {
     if (
       this.props.isConnected &&
+      !get(this.props.connection, "usingTemporaryUri") &&
       !this.props.isConnectionLoading &&
       !this.props.isProcessingLoadingAgreementData &&
       !this.props.isProcessingLoadingMessages &&
