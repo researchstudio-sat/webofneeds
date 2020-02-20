@@ -12,11 +12,11 @@ won-atom-content-suggestions {
     color: $won-line-gray;
     text-align: center;
     grid-column: 1 / -1;
+    font-weight: 300;
   }
 
   & > .acs__listheader {
-    font-size: $normalFontSize;
-    font-weight: bold;
+    font-weight: 300;
     color: $won-primary-text-color;
     grid-column: 1 / -1;
     margin-top: 1.5rem;
