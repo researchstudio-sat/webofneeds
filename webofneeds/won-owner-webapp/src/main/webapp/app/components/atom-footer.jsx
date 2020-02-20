@@ -157,6 +157,14 @@ const mapDispatchToProps = dispatch => {
         )
       );
     },
+    connectSocketsServerSide: (senderSocketUri, targetSocketUri) => {
+      dispatch(
+        actionCreators.atoms__connectSocketsServerSide(
+          senderSocketUri,
+          targetSocketUri
+        )
+      );
+    },
     atomReopen: atomUri => dispatch(actionCreators.atoms__reopen(atomUri)),
   };
 };
@@ -289,8 +297,8 @@ class AtomInfo extends React.Component {
             onClick={() =>
               this.connectAtomSockets(
                 reactionAtom,
-                ucSenderSocketType,
-                ucTargetSocketType
+                atomUtils.getSocketUri(reactionAtom, ucSenderSocketType),
+                atomUtils.getSocketUri(this.props.atom, ucTargetSocketType)
               )
             }
           />
@@ -367,14 +375,13 @@ class AtomInfo extends React.Component {
   }
 
   connectAtomSockets(
-    reactionAtom,
-    senderSocketType,
-    targetSocketType,
+    senderAtom,
+    senderSocketUri,
+    targetSocketUri,
     message = ""
   ) {
-    const reactionAtomUri = get(reactionAtom, "uri");
-    const _atomUri = this.props.atomUri;
-    const _footerType = this.props.footerType;
+    const targetAtom = this.props.atom;
+    const footerType = this.props.footerType;
     const dialogText = "Connect with this Atom?";
 
     const payload = {
@@ -384,19 +391,28 @@ class AtomInfo extends React.Component {
         {
           caption: "Yes",
           callback: () => {
-            if (_footerType === FooterType.ENABLED) {
-              //TODO: SERVER SIDE CONNECT OF TWO ATOMS THAT ARE OWNED
+            if (footerType === FooterType.ENABLED) {
+              this.props.connectSocketsServerSide(
+                senderSocketUri,
+                targetSocketUri
+              );
             } else {
-              this.props.connect(
-                reactionAtomUri,
-                _atomUri,
-                senderSocketType,
-                targetSocketType,
+              this.props.connectSockets(
+                senderSocketUri,
+                targetSocketUri,
                 message
               );
-              this.props.hideModalDialog();
             }
+            this.props.hideModalDialog();
 
+            const senderSocketType = atomUtils.getSocketType(
+              senderAtom,
+              senderSocketUri
+            );
+            const targetSocketType = atomUtils.getSocketType(
+              targetAtom,
+              targetSocketUri
+            );
             if (
               senderSocketType === vocab.CHAT.ChatSocketCompacted ||
               targetSocketType === vocab.CHAT.ChatSocketCompacted
@@ -555,6 +571,7 @@ AtomInfo.propTypes = {
   ownedChatSocketAtoms: PropTypes.object,
   connect: PropTypes.func,
   connectSockets: PropTypes.func,
+  connectSocketsServerSide: PropTypes.func,
   sendChatMessage: PropTypes.func,
   atomReopen: PropTypes.func,
 };

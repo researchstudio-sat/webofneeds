@@ -491,6 +491,10 @@ export function getSocketUri(atomImm, socketType) {
   );
 }
 
+export function getSocketType(atomImm, socketUri) {
+  return getIn(atomImm, ["content", "sockets", socketUri]);
+}
+
 export function getDefaultSocketUri(atomImm) {
   const defaultSocket = getIn(atomImm, ["content", "defaultSocket"]);
   return defaultSocket && defaultSocket.keySeq().first();

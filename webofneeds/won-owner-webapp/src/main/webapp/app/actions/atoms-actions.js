@@ -3,6 +3,7 @@
  */
 
 import won from "../won-es6.js";
+import vocab from "../service/vocab.js";
 
 import { actionTypes, actionCreators } from "./actions.js";
 import Immutable from "immutable";
@@ -12,19 +13,46 @@ import {
   buildCloseAtomMessage,
   buildOpenAtomMessage,
   buildDeleteAtomMessage,
+  buildCreateMessage,
+  buildEditMessage,
 } from "../won-message-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as stateStore from "../redux/state-store.js";
 import * as ownerApi from "../api/owner-api.js";
 import { get, getIn } from "../utils.js";
+import * as accountUtils from "../redux/utils/account-utils";
+import { ensureLoggedIn } from "./account-actions.js";
 
 export function fetchUnloadedAtom(atomUri) {
   return (dispatch, getState) =>
     stateStore.fetchAtomAndDispatch(atomUri, dispatch, getState);
 }
 
-export function atomsConnectSockets(
+export function connectSocketsServerSide(senderSocketUri, targetSocketUri) {
+  return () => {
+    if (!senderSocketUri) {
+      throw new Error("SenderSocketUri not present");
+    }
+
+    if (!targetSocketUri) {
+      throw new Error("TargetSocketUri not present");
+    }
+
+    return ownerApi
+      .serverSideConnect(senderSocketUri, targetSocketUri)
+      .then(async response => {
+        if (!response.ok) {
+          const errorMsg = await response.text();
+          throw new Error(
+            `Could not connect sockets(${senderSocketUri}<->${targetSocketUri}): ${errorMsg}`
+          );
+        }
+      });
+  };
+}
+
+export function connectSockets(
   senderSocketUri,
   targetSocketUri,
   connectMessage
@@ -61,7 +89,7 @@ export function atomsConnectSockets(
   };
 }
 
-export function atomsConnectSocketTypes(
+export function connectSocketTypes(
   senderAtomUri,
   targetAtomUri,
   senderSocketType,
@@ -117,7 +145,7 @@ export function atomsConnectSocketTypes(
   };
 }
 
-export function atomsClose(atomUri) {
+export function close(atomUri) {
   return (dispatch, getState) => {
     buildCloseAtomMessage(atomUri)
       .then(data => ownerApi.sendMessage(data.message))
@@ -150,7 +178,7 @@ export function atomsClose(atomUri) {
   };
 }
 
-export function atomsOpen(atomUri) {
+export function open(atomUri) {
   return dispatch => {
     buildOpenAtomMessage(atomUri)
       .then(data => ownerApi.sendMessage(data.message))
@@ -174,7 +202,7 @@ export function atomsOpen(atomUri) {
   };
 }
 
-export function atomsClosedBySystem(event) {
+export function closedBySystem(event) {
   return (dispatch, getState) => {
     //first check if we really have the 'own' atom in the state - otherwise we'll ignore the message
     const atom = getState().getIn(["atoms", event.getAtom()]);
@@ -195,7 +223,7 @@ export function atomsClosedBySystem(event) {
   };
 }
 
-export function atomsDelete(atomUri) {
+export function deleteAtom(atomUri) {
   return dispatch => {
     buildDeleteAtomMessage(atomUri)
       .then(data => ownerApi.sendMessage(data.message))
@@ -216,5 +244,107 @@ export function atomsDelete(atomUri) {
           }),
         })
       );
+  };
+}
+
+export function edit(draft, oldAtom) {
+  return (dispatch, getState) => {
+    const state = getState();
+
+    let prevParams = getIn(state, ["router", "prevParams"]);
+
+    if (
+      !accountUtils.isLoggedIn(get(state, "account")) &&
+      prevParams.privateId
+    ) {
+      /*
+       * `ensureLoggedIn` will generate a new privateId. should
+       * there be a previous privateId, we don't want to change
+       * back to that later.
+       */
+      prevParams = Object.assign({}, prevParams);
+      delete prevParams.privateId;
+    }
+
+    return ensureLoggedIn(dispatch, getState).then(async () => {
+      const { message, atomUri } = await buildEditMessage(draft, oldAtom);
+
+      ownerApi.sendMessage(message).then(jsonResp => {
+        dispatch({
+          type: actionTypes.atoms.edit,
+          payload: {
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
+            atomUri: atomUri,
+            atom: draft,
+            oldAtom,
+          },
+        });
+
+        dispatch(actionCreators.router__back());
+      });
+    });
+  };
+}
+
+export function create(draft, personaUri, nodeUri) {
+  return (dispatch, getState) => {
+    const state = getState();
+
+    if (!nodeUri) {
+      nodeUri = getIn(state, ["config", "defaultNodeUri"]);
+    }
+
+    let prevParams = getIn(state, ["router", "prevParams"]);
+
+    if (
+      !accountUtils.isLoggedIn(get(state, "account")) &&
+      prevParams.privateId
+    ) {
+      /*
+             * `ensureLoggedIn` will generate a new privateId. should
+             * there be a previous privateId, we don't want to change
+             * back to that later.
+             */
+      prevParams = Object.assign({}, prevParams);
+      delete prevParams.privateId;
+    }
+
+    return ensureLoggedIn(dispatch, getState).then(async () => {
+      const { message, atomUri } = await buildCreateMessage(draft, nodeUri);
+
+      ownerApi
+        .sendMessage(message)
+        .then(jsonResp => {
+          dispatch({
+            type: actionTypes.atoms.create,
+            payload: {
+              eventUri: jsonResp.messageUri,
+              message: jsonResp.message,
+              atomUri: atomUri,
+              atom: draft,
+            },
+          });
+        })
+        .then(() => {
+          const persona = getIn(state, ["atoms", personaUri]);
+          if (persona) {
+            const senderSocketUri = atomUtils.getSocketUri(
+              persona,
+              vocab.HOLD.HolderSocketCompacted
+            );
+            const targetSocketUri = `${atomUri}#holdableSocket`;
+
+            return ownerApi
+              .serverSideConnect(senderSocketUri, targetSocketUri, false, true)
+              .then(async response => {
+                if (!response.ok) {
+                  const errorMsg = await response.text();
+                  throw new Error(`Could not connect identity: ${errorMsg}`);
+                }
+              });
+          }
+        });
+    });
   };
 }

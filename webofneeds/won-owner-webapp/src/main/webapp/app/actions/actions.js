@@ -36,17 +36,7 @@
  */
 // <utils>
 
-import { atomCreate, atomEdit } from "./create-atom-action.js";
-
-import {
-  atomsClose,
-  atomsClosedBySystem,
-  atomsConnectSocketTypes,
-  atomsConnectSockets,
-  atomsDelete,
-  atomsOpen,
-  fetchUnloadedAtom,
-} from "./atoms-actions.js";
+import * as atomActions from "./atoms-actions.js";
 
 import {
   stateBack,
@@ -138,19 +128,20 @@ const actionHierarchy = {
   atoms: {
     received: INJ_DEFAULT,
     connectionsReceived: INJ_DEFAULT,
-    create: atomCreate,
-    edit: atomEdit,
+    create: atomActions.create,
+    edit: atomActions.edit,
     editSuccessful: INJ_DEFAULT,
     editFailure: INJ_DEFAULT,
     createSuccessful: INJ_DEFAULT,
-    reopen: atomsOpen,
-    close: atomsClose,
-    delete: atomsDelete,
-    closedBySystem: atomsClosedBySystem,
+    reopen: atomActions.open,
+    close: atomActions.close,
+    delete: atomActions.deleteAtom,
+    closedBySystem: atomActions.closedBySystem,
     failed: INJ_DEFAULT,
-    connect: atomsConnectSocketTypes,
-    connectSockets: atomsConnectSockets,
-    fetchUnloadedAtom: fetchUnloadedAtom,
+    connect: atomActions.connectSocketTypes,
+    connectSockets: atomActions.connectSockets,
+    connectSocketsServerSide: atomActions.connectSocketsServerSide,
+    fetchUnloadedAtom: atomActions.fetchUnloadedAtom,
 
     fetchMetaAtoms: INJ_DEFAULT,
     fetchWhatsNew: fetchWhatsNew,

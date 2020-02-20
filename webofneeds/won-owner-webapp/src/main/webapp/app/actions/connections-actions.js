@@ -285,13 +285,13 @@ function connectReactionAtom(
         // add persona if present
         if (personaUri) {
           const persona = getIn(state, ["atoms", personaUri]);
+          const senderSocketUri = atomUtils.getSocketUri(
+            persona,
+            vocab.HOLD.HolderSocketCompacted
+          );
+          const targetSocketUri = `${atomUri}#holdableSocket`;
           ownerApi
-            .serverSideConnect(
-              atomUtils.getSocketUri(persona, vocab.HOLD.HolderSocketCompacted),
-              `${atomUri}#holdableSocket`,
-              false,
-              true
-            )
+            .serverSideConnect(senderSocketUri, targetSocketUri, false, true)
             .then(async response => {
               if (!response.ok) {
                 const errorMsg = await response.text();
@@ -316,21 +316,18 @@ function connectReactionAtom(
           return defaultSocket && Object.keys(defaultSocket)[0];
         };
 
-        const atomDraftSocketUri = getSocketFromDraft(atomDraft);
+        const atomDraftSocketType = getSocketFromDraft(atomDraft);
 
         if (generalSelectors.isAtomOwned(state, connectToAtomUri)) {
           const targetSocketUri = connectToSocketType
             ? atomUtils.getSocketUri(connectToAtom, connectToSocketType)
             : atomUtils.getDefaultSocketUri(connectToAtom);
 
-          if (atomDraftSocketUri && targetSocketUri) {
+          if (atomDraftSocketType && targetSocketUri) {
+            const senderSocketUri = `${atomUri}${atomDraftSocketType}`;
+
             ownerApi
-              .serverSideConnect(
-                targetSocketUri,
-                `${atomUri}${atomDraftSocketUri}`,
-                false,
-                true
-              )
+              .serverSideConnect(targetSocketUri, senderSocketUri, false, true)
               .then(async response => {
                 if (!response.ok) {
                   const errorMsg = await response.text();
@@ -343,6 +340,7 @@ function connectReactionAtom(
             );
           }
         } else {
+          const senderSocketUri = `${atomUri}${atomDraftSocketType}`;
           const targetSocketUri = connectToSocketType
             ? atomUtils.getSocketUri(connectToAtom, connectToSocketType)
             : atomUtils.getDefaultSocketUri(connectToAtom);
@@ -350,7 +348,7 @@ function connectReactionAtom(
           // establish connection
           const cnctMsg = buildConnectMessage({
             connectMessage: "",
-            socketUri: `${atomUri}${atomDraftSocketUri}`,
+            socketUri: senderSocketUri,
             targetSocketUri: targetSocketUri,
           });
 
@@ -365,7 +363,7 @@ function connectReactionAtom(
                   eventUri: jsonResp.messageUri,
                   message: jsonResp.message,
                   optimisticEvent: optimisticEvent,
-                  senderSocketUri: `${atomUri}${atomDraftSocketUri}`,
+                  senderSocketUri: senderSocketUri,
                   targetSocketUri: targetSocketUri,
                 },
               })
@@ -427,9 +425,15 @@ function connectAdHoc(
         // add persona
         if (personaUri) {
           const persona = getIn(state, ["atoms", personaUri]);
+          const senderSocketUri = atomUtils.getSocketUri(
+            persona,
+            vocab.HOLD.HolderSocketCompacted
+          );
+          const targetSocketUri = `${atomUri}#holdableSocket`;
+
           const response = await ownerApi.serverSideConnect(
-            atomUtils.getSocketUri(persona, vocab.HOLD.HolderSocketCompacted),
-            `${atomUri}#holdableSocket`,
+            senderSocketUri,
+            targetSocketUri,
             false,
             true
           );
