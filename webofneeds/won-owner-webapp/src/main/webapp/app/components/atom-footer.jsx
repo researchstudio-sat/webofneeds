@@ -6,11 +6,12 @@ import { get, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import WonAtomHeader from "./atom-header.jsx";
 import ChatTextfield from "./chat-textfield.jsx";
-import * as generalSelectors from "../redux/selectors/general-selectors";
-import * as atomUtils from "../redux/utils/atom-utils";
-import * as connectionUtils from "../redux/utils/connection-utils";
-import * as accountUtils from "../redux/utils/account-utils";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 import * as useCaseUtils from "../usecase-utils.js";
+import * as wonLabelUtils from "../won-label-utils.js";
 import vocab from "../service/vocab.js";
 
 import "~/style/_atom-footer.scss";
@@ -305,15 +306,29 @@ class AtomInfo extends React.Component {
         );
       });
 
+    const type =
+      this.props.footerType === FooterType.ENABLED
+        ? "enabled"
+        : this.props.footerType === FooterType.REACTION
+          ? "reaction"
+          : undefined;
+    let headerText =
+      getIn(wonLabelUtils.reactionLabels, [
+        type,
+        ucSenderSocketType,
+        ucTargetSocketType,
+      ]) || `Connect ${ucSenderSocketType} with ${ucTargetSocketType}`;
+
     return (
       <React.Fragment>
-        <div className="atom-footer__header">
-          Connect {ucSenderSocketType} with {ucTargetSocketType}:
-        </div>
+        <div className="atom-footer__header">{headerText}</div>
         <div className="atom-footer__matches">
-          <div className="atom-footer__matches__header">
-            These existing Atoms you own would match:
-          </div>
+          {!!atomElements &&
+            atomElements.length > 0 && (
+              <div className="atom-footer__matches__header">
+                These existing Atoms you own would match
+              </div>
+            )}
           <div className="atom-footer__matches__list">
             {atomElements}
             <div
@@ -344,7 +359,7 @@ class AtomInfo extends React.Component {
               <div className="atom-footer__adhocbutton__right">
                 <div className="atom-footer__adhocbutton__right__topline">
                   <div className="atom-footer__adhocbutton__right__topline__notitle">
-                    + Connect with new Atom
+                    Create Atom
                   </div>
                 </div>
                 <div className="atom-footer__adhocbutton__right__subtitle">

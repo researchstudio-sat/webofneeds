@@ -11,11 +11,6 @@ won-atom-footer {
     }
   }
 
-  & > *:not(:last-child) {
-    // a bit of space between elements in the footer
-    margin-bottom: 0.5rem;
-  }
-
   .atom-footer__infolabel {
     text-align: center;
   }
@@ -35,7 +30,6 @@ won-atom-footer {
     &__list {
       display: grid;
       grid-gap: 1rem;
-      padding: 0.5rem 0;
 
       grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
 

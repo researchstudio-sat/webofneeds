@@ -1,8 +1,8 @@
 import { deepFreeze, isValidNumber } from "./utils.js";
+import Immutable from "immutable";
 import vocab from "./service/vocab.js";
 
 export const labels = deepFreeze({
-  //FIXME: USE THE CONSTANTS FROM won.js again, but be aware that that might causes a cyclic dependency we need to extract this away from won-es6.js or won.js
   connectionState: {
     [vocab.WON.Suggested]: "Conversation suggested.",
     [vocab.WON.RequestSent]: "Conversation requested by you.",
@@ -30,6 +30,39 @@ export const labels = deepFreeze({
     [vocab.HOLD.HolderSocketCompacted]: "Holder",
     [vocab.REVIEW.ReviewSocketCompacted]: "Review enabled",
     [vocab.BUDDY.BuddySocketCompacted]: "Buddy",
+  },
+});
+
+/**
+ * Usage: reactionLabels.[enabled|reaction].[senderSocketType].[targetSocketType]
+ *
+ * use enabled for enabled use-cases, and reaction for reaction usecases
+ */
+export const reactionLabels = Immutable.fromJS({
+  enabled: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.GROUP.GroupSocketCompacted]: "Join the Group Chat",
+    },
+    [vocab.GROUP.GroupSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: "Add to Group Chat",
+      [vocab.GROUP.GroupSocketCompacted]: "Add to Group Chat",
+    },
+    [vocab.HOLD.HolderSocketCompacted]: {
+      [vocab.HOLD.HoldableSocketCompacted]: "Add this Holder",
+    },
+    [vocab.HOLD.HoldableSocketCompacted]: {
+      [vocab.HOLD.HolderSocketCompacted]: "Add to Holder",
+    },
+  },
+  reaction: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: "Request to Chat",
+      [vocab.GROUP.GroupSocketCompacted]: "Request to Join the Group Chat",
+    },
+    [vocab.GROUP.GroupSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: "Invite to Group Chat",
+      [vocab.GROUP.GroupSocketCompacted]: "Invite to Group Chat",
+    },
   },
 });
 
