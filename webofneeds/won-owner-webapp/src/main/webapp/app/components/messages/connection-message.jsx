@@ -163,7 +163,7 @@ class WonConnectionMessage extends React.Component {
           onChange={isVisible => {
             isVisible && this.props.isUnread && this.markAsRead();
           }}
-          intervalDelay={MESSAGE_READ_TIMEOUT}
+          intervalDelay={2000}
         >
           <WonLabelledHr
             className="won-cm__modified"
@@ -284,7 +284,7 @@ class WonConnectionMessage extends React.Component {
             onChange={isVisible => {
               isVisible && this.props.isUnread && this.markAsRead();
             }}
-            intervalDelay={MESSAGE_READ_TIMEOUT}
+            intervalDelay={2000}
           >
             <div className={this.generateCenterCssClasses()}>
               <div className={this.generateCenterBubbleCssClasses()}>
@@ -443,11 +443,13 @@ class WonConnectionMessage extends React.Component {
 
   markAsRead() {
     if (this.props.isUnread) {
-      this.props.messageMarkAsRead(
-        this.props.messageUri,
-        this.props.connectionUri,
-        get(this.props.ownedAtom, "uri")
-      );
+      setTimeout(() => {
+        this.props.messageMarkAsRead(
+          this.props.messageUri,
+          this.props.connectionUri,
+          get(this.props.ownedAtom, "uri")
+        );
+      }, MESSAGE_READ_TIMEOUT);
     }
   }
 }

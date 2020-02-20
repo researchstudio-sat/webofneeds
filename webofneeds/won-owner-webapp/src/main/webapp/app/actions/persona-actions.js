@@ -55,6 +55,31 @@ function connectReview(dispatch, ownPersona, foreignPersona, connectMessage) {
   );
 }
 
+export function connectPersona(atomUri, personaUri) {
+  //TODO: ADDED BUT LET'S REPLACE THIS WITH OUR GENERIC CONNECT LOGIC
+
+  return dispatch => {
+    return ownerApi
+      .serverSideConnect(
+        `${personaUri}#holderSocket`,
+        `${atomUri}#holdableSocket`
+      )
+      .then(async response => {
+        if (!response.ok) {
+          const errorMsg = await response.text();
+          throw new Error(`Could not connect identity: ${errorMsg}`);
+        }
+        dispatch({
+          type: actionTypes.personas.connect,
+          payload: {
+            atomUri: atomUri,
+            personaUri: personaUri,
+          },
+        });
+      });
+  };
+}
+
 export function disconnectPersona(atomUri, personaUri) {
   return (dispatch, getState) => {
     const state = getState();
