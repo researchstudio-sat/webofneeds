@@ -1,7 +1,7 @@
 import urljoin from "url-join";
 import { ownerBaseUrl } from "~/config/default.js";
 import * as wonUtils from "../won-utils.js";
-import won from "../won-es6.js";
+import vocab from "../service/vocab.js";
 
 /**
  * Created by quasarchimaere on 11.06.2019.
@@ -391,8 +391,8 @@ export function getAllActiveMetaPersonas() {
     undefined,
     undefined,
     "ACTIVE",
-    won.BUDDY.BuddySocket,
-    won.WON.Persona,
+    vocab.BUDDY.BuddySocket,
+    vocab.WON.Persona,
     undefined,
     undefined,
     undefined

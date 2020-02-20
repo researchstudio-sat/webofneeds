@@ -1,5 +1,5 @@
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
-import won from "../../app/service/won.js";
+import vocab from "../../app/service/vocab.js";
 import { Generator } from "sparqljs";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 
@@ -16,10 +16,10 @@ export const pokemonGoRaid = {
         type: ["s:PlanAction"],
         eventObjectAboutUris: "http://dbpedia.org/resource/Pokemon_Go",
         sockets: {
-          "#groupSocket": won.GROUP.GroupSocketCompacted,
-          "#holdableSocket": won.HOLD.HoldableSocketCompacted,
+          "#groupSocket": vocab.GROUP.GroupSocketCompacted,
+          "#holdableSocket": vocab.HOLD.HoldableSocketCompacted,
         },
-        defaultSocket: { "#groupSocket": won.GROUP.GroupSocketCompacted },
+        defaultSocket: { "#groupSocket": vocab.GROUP.GroupSocketCompacted },
       },
       seeks: {},
     }),
@@ -27,8 +27,8 @@ export const pokemonGoRaid = {
   reactionUseCases: [
     {
       identifier: "pokemonInterest",
-      senderSocketType: won.CHAT.ChatSocketCompacted,
-      targetSocketType: won.GROUP.GroupSocketCompacted,
+      senderSocketType: vocab.CHAT.ChatSocketCompacted,
+      targetSocketType: vocab.GROUP.GroupSocketCompacted,
     },
   ],
   details: {
@@ -58,15 +58,15 @@ export const pokemonInterest = {
   enabledUseCases: [
     {
       identifier: "pokemonGoRaid",
-      senderSocketType: won.GROUP.GroupSocketCompacted,
-      targetSocketType: won.CHAT.ChatSocketCompacted,
+      senderSocketType: vocab.GROUP.GroupSocketCompacted,
+      targetSocketType: vocab.CHAT.ChatSocketCompacted,
     },
   ],
   reactionUseCases: [
     {
       identifier: "pokemonGoRaid",
-      senderSocketType: won.GROUP.GroupSocketCompacted,
-      targetSocketType: won.CHAT.ChatSocketCompacted,
+      senderSocketType: vocab.GROUP.GroupSocketCompacted,
+      targetSocketType: vocab.CHAT.ChatSocketCompacted,
     },
   ],
   details: {

@@ -23,29 +23,12 @@ won-atom-info {
     display: grid;
   }
 
-  .atom-info__footer {
+  > won-atom-footer {
     grid-area: footer;
     display: grid;
     grid-gap: 0.5rem;
     padding: 0.5rem;
     box-sizing: border-box;
     border-top: $thinGrayBorder;
-
-    &__button {
-      width: 100%;
-
-      > svg.won-button-icon {
-        --local-primary: white;
-      }
-    }
-
-    & > *:not(:last-child) {
-      // a bit of space between elements in the footer
-      margin-bottom: 0.5rem;
-    }
-
-    &__infolabel {
-      text-align: center;
-    }
   }
 }

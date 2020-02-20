@@ -12,6 +12,7 @@ import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import { isFetchMessageEffectsNeeded } from "../won-message-utils.js";
 import * as stateStore from "../redux/state-store.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as ownerApi from "../api/owner-api.js";
 import { get } from "../utils";
 import * as processUtils from "../redux/utils/process-utils";
@@ -79,18 +80,18 @@ export function failedReopenAtom(event) {
          event.uri
 
 
-         won.WONMSG.recipientAtom = won.WONMSG.baseUri + "recipientAtom";
-         won.WONMSG.recipientAtomCompacted = won.WONMSG.prefix + ":recipientAtom";
-         won.WONMSG.recipient = won.WONMSG.baseUri + "recipient"; // connection if connection event
-         won.WONMSG.recipientCompacted = won.WONMSG.prefix + ":recipient";
-         won.WONMSG.recipientNode = won.WONMSG.baseUri + "recipientNode";
-         won.WONMSG.recipientNodeCompacted = won.WONMSG.prefix + ":recipientNode";
-         won.WONMSG.senderAtom = won.WONMSG.baseUri + "senderAtom";
-         won.WONMSG.senderAtomCompacted = won.WONMSG.prefix + ":senderAtom";
-         won.WONMSG.sender = won.WONMSG.baseUri + "sender";
-         won.WONMSG.senderCompacted = won.WONMSG.prefix + ":sender";
-         won.WONMSG.senderNode = won.WONMSG.baseUri + "senderNode";
-         won.WONMSG.senderNodeCompacted = won.WONMSG.prefix + ":senderNode";
+         vocab.WONMSG.recipientAtom = vocab.WONMSG.baseUri + "recipientAtom";
+         vocab.WONMSG.recipientAtomCompacted = vocab.WONMSG.prefix + ":recipientAtom";
+         vocab.WONMSG.recipient = vocab.WONMSG.baseUri + "recipient"; // connection if connection event
+         vocab.WONMSG.recipientCompacted = vocab.WONMSG.prefix + ":recipient";
+         vocab.WONMSG.recipientNode = vocab.WONMSG.baseUri + "recipientNode";
+         vocab.WONMSG.recipientNodeCompacted = vocab.WONMSG.prefix + ":recipientNode";
+         vocab.WONMSG.senderAtom = vocab.WONMSG.baseUri + "senderAtom";
+         vocab.WONMSG.senderAtomCompacted = vocab.WONMSG.prefix + ":senderAtom";
+         vocab.WONMSG.sender = vocab.WONMSG.baseUri + "sender";
+         vocab.WONMSG.senderCompacted = vocab.WONMSG.prefix + ":sender";
+         vocab.WONMSG.senderNode = vocab.WONMSG.baseUri + "senderNode";
+         vocab.WONMSG.senderNodeCompacted = vocab.WONMSG.prefix + ":senderNode";
          */
 
 export function successfulCloseConnection(event) {
@@ -504,6 +505,96 @@ function processMessageEffectsAndMessage(
     });
 
   return Promise.all([petriNetPromise, messageEffectsPromise]);
+}
+
+export function connectSuccessOwn(wonMessage) {
+  return (dispatch, getState) => {
+    const state = getState();
+    const atomUri = generalSelectors.getAtomUriBySocketUri(
+      wonMessage.getSenderSocket()
+    );
+
+    const atom = getIn(state, ["atoms", atomUri]);
+
+    const connection = getIn(atom, [
+      "connections",
+      "connectionFrom:" + wonMessage.getIsResponseTo(),
+    ]);
+
+    if (connection) {
+      let connUriPromise;
+
+      if (connectionUtils.isUsingTemporaryUri(connection)) {
+        connUriPromise = stateStore.fetchConnectionUriBySocketUris(
+          get(connection, "socketUri"),
+          get(connection, "targetSocketUri"),
+          atomUri
+        );
+      } else {
+        connUriPromise = Promise.resolve(get(connection, "uri"));
+      }
+
+      connUriPromise.then(connUri => {
+        dispatch({
+          type: actionTypes.messages.connect.successOwn,
+          payload: Immutable.fromJS({
+            message: wonMessage,
+            connUri: connUri,
+            atomUri: atomUri,
+          }),
+        });
+      });
+    }
+  };
+}
+
+export function connectSuccessRemote(wonMessage) {
+  return (dispatch, getState) => {
+    const state = getState();
+    const atomUri = generalSelectors.getAtomUriBySocketUri(
+      wonMessage.getTargetSocket()
+    );
+
+    const atom = getIn(state, ["atoms", atomUri]);
+    const targetSocketUri = wonMessage.getTargetSocket();
+    const senderSocketUri = wonMessage.getSenderSocket();
+
+    const connection =
+      atomUtils.getConnectionBySocketUris(
+        atom,
+        targetSocketUri,
+        senderSocketUri
+      ) ||
+      getIn(atom, [
+        "connections",
+        "connectionFrom:" + wonMessage.getIsResponseTo(),
+      ]);
+
+    if (connection) {
+      let connUriPromise;
+
+      if (connectionUtils.isUsingTemporaryUri(connection)) {
+        connUriPromise = stateStore.fetchConnectionUriBySocketUris(
+          targetSocketUri,
+          senderSocketUri,
+          atomUri
+        );
+      } else {
+        connUriPromise = Promise.resolve(get(connection, "uri"));
+      }
+
+      connUriPromise.then(connUri => {
+        dispatch({
+          type: actionTypes.messages.connect.successRemote,
+          payload: Immutable.fromJS({
+            message: wonMessage,
+            connUri: connUri,
+            atomUri: atomUri,
+          }),
+        });
+      });
+    }
+  };
 }
 
 export function processConnectMessage(wonMessage) {

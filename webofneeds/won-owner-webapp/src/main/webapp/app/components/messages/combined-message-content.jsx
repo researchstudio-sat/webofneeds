@@ -13,7 +13,7 @@ import {
 import { get, getIn } from "../../utils.js";
 import { getOwnedConnections } from "../../redux/selectors/connection-selectors.js";
 import { labels } from "../../won-label-utils.js";
-import won from "../../won-es6";
+import vocab from "../../service/vocab.js";
 import WonTrig from "../trig.jsx";
 import WonMessageContent from "./message-content.jsx";
 import WonAtomIcon from "../atom-icon.jsx";
@@ -84,7 +84,7 @@ const mapStateToProps = (state, ownProps) => {
     originatorUri: message && message.get("originatorUri"),
     injectIntoArray: injectInto && Array.from(injectInto.toSet()),
     messageType,
-    isConnectionMessage: messageType === won.WONMSG.connectionMessage,
+    isConnectionMessage: messageType === vocab.WONMSG.connectionMessage,
   };
 };
 

@@ -1,35 +1,68 @@
 import { deepFreeze, isValidNumber } from "./utils.js";
+import Immutable from "immutable";
+import vocab from "./service/vocab.js";
 
 export const labels = deepFreeze({
-  //FIXME: USE THE CONSTANTS FROM won.js again, but be aware that that might causes a cyclic dependency we need to extract this away from won-es6.js or won.js
   connectionState: {
-    ["https://w3id.org/won/core#Suggested"]: "Conversation suggested.",
-    ["https://w3id.org/won/core#RequestSent"]: "Conversation requested by you.",
-    ["https://w3id.org/won/core#RequestReceived"]: "Conversation requested.",
-    ["https://w3id.org/won/core#Connected"]: "Conversation open.",
-    ["https://w3id.org/won/core#Closed"]: "Conversation closed.",
+    [vocab.WON.Suggested]: "Conversation suggested.",
+    [vocab.WON.RequestSent]: "Conversation requested by you.",
+    [vocab.WON.RequestReceived]: "Conversation requested.",
+    [vocab.WON.Connected]: "Conversation open.",
+    [vocab.WON.Closed]: "Conversation closed.",
   },
   messageType: {
-    ["https://w3id.org/won/message#ConnectMessage"]: "Connect Message",
-    ["https://w3id.org/won/message#CloseMessage"]: "Close Message",
-    ["https://w3id.org/won/message#ConnectionMessage"]: "Chat Message",
-    ["https://w3id.org/won/message#AtomHintMessage"]: "Atom Hint Message",
-    ["https://w3id.org/won/message#SocketHintMessage"]: "Socket Hint Message",
-    ["https://w3id.org/won/message#HintFeedbackMessage"]:
-      "Hint Feedback Message",
+    [vocab.WONMSG.connectMessage]: "Connect Message",
+    [vocab.WONMSG.closeMessage]: "Close Message",
+    [vocab.WONMSG.connectionMessage]: "Chat Message",
+    [vocab.WONMSG.atomHintMessage]: "Atom Hint Message",
+    [vocab.WONMSG.socketHintMessage]: "Socket Hint Message",
+    [vocab.WONMSG.hintFeedbackMessage]: "Hint Feedback Message",
   },
   flags: {
-    ["match:NoHintForCounterpart"]: "Invisible",
-    ["match:NoHintForMe"]: "Silent",
-    ["match:UsedForTesting"]: "Used For Testing",
+    [vocab.WONMATCH.NoHintForCounterpartCompacted]: "Invisible",
+    [vocab.WONMATCH.NoHintForMeCompacted]: "Silent",
+    [vocab.WONMATCH.UsedForTestingCompacted]: "Used For Testing",
   },
   sockets: {
-    ["group:GroupSocket"]: "Group Chat enabled",
-    ["chat:ChatSocket"]: "Chat enabled",
-    ["hold:HoldableSocket"]: "Holdable",
-    ["hold:HolderSocket"]: "Holder",
-    ["review:ReviewSocket"]: "Review enabled",
-    ["buddy:BuddySocket"]: "Buddy",
+    [vocab.GROUP.GroupSocketCompacted]: "Group Chat enabled",
+    [vocab.CHAT.ChatSocketCompacted]: "Chat enabled",
+    [vocab.HOLD.HoldableSocketCompacted]: "Holdable",
+    [vocab.HOLD.HolderSocketCompacted]: "Holder",
+    [vocab.REVIEW.ReviewSocketCompacted]: "Review enabled",
+    [vocab.BUDDY.BuddySocketCompacted]: "Buddy",
+  },
+});
+
+/**
+ * Usage: reactionLabels.[enabled|reaction].[senderSocketType].[targetSocketType]
+ *
+ * use enabled for enabled use-cases, and reaction for reaction usecases
+ */
+export const reactionLabels = Immutable.fromJS({
+  enabled: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.GROUP.GroupSocketCompacted]: "Join the Group Chat",
+    },
+    [vocab.GROUP.GroupSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: "Add to Group Chat",
+      [vocab.GROUP.GroupSocketCompacted]: "Add to Group Chat",
+    },
+    [vocab.HOLD.HolderSocketCompacted]: {
+      [vocab.HOLD.HoldableSocketCompacted]: "Add this Holder",
+    },
+    [vocab.HOLD.HoldableSocketCompacted]: {
+      [vocab.HOLD.HolderSocketCompacted]: "Add to Holder",
+    },
+  },
+  reaction: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: "Request to Chat",
+      [vocab.GROUP.GroupSocketCompacted]: "Request to Join the Group Chat",
+    },
+    [vocab.GROUP.GroupSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: "Invite to Group Chat",
+      [vocab.GROUP.GroupSocketCompacted]: "Invite to Group Chat",
+    },
   },
 });
 

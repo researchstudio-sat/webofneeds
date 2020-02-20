@@ -25,6 +25,7 @@ import urljoin from "url-join";
 import rdfstore from "../../scripts/rdfstore-js/rdf_store.js";
 import jsonld from "jsonld/dist/jsonld.js";
 import won from "./won.js";
+import vocab from "./vocab.js";
 
 (function() {
   const NEWLINE_REPLACEMENT_STRING = "#%§%#§";
@@ -116,7 +117,7 @@ import won from "./won.js";
   won.clearStore = function() {
     //create an rdfstore-js based store as a cache for rdf data.
     privateData.store = rdfstore.create();
-    privateData.store.setPrefix("msg", "https://w3id.org/won/message#");
+    privateData.store.setPrefix(vocab.WONMSG.prefix, vocab.WONMSG.baseUri);
     privateData.store.setPrefix(
       "rdf",
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -126,7 +127,7 @@ import won from "./won.js";
       "http://www.w3.org/2000/01/rdf-schema#"
     );
     privateData.store.setPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
-    privateData.store.setPrefix("won", "https://w3id.org/won/core#");
+    privateData.store.setPrefix(vocab.WON.prefix, vocab.WON.baseUri);
 
     window.store4dbg = privateData.store;
 
@@ -597,7 +598,6 @@ import won from "./won.js";
                     { ?s rdf:type msg:FromSystem } union
                     { ?s rdf:type msg:FromExternal } union
                     { ?s msg:messageType ?o } union
-                    { ?s won:correspondingRemoteMessage ?o } union
                     { ?s won:recipient ?o }.
                 }`
       );
@@ -642,13 +642,7 @@ import won from "./won.js";
                           prefix event: <${baseUriForEvents}>
                           prefix msg: <https://w3id.org/won/message#>
 
-                          select distinct ?graphOfMessage where {
-                              { <${messageUri}> msg:correspondingRemoteMessage ?graphOfMessage } union
-                              { ?graphOfMessage msg:correspondingRemoteMessage <${messageUri}> } union
-                              { <${messageUri}> msg:forwardedMessage ?graphOfMessage } union
-                              { <${messageUri}> msg:forwardedMessage/msg:correspondingRemoteMessage ?graphOfMessage }
-                          }
-                          `
+                          select distinct ?graphOfMessage where { <${messageUri}> msg:forwardedMessage ?graphOfMessage }`
           );
 
           const graphUrisOfMessage = queryResult.map(result =>
@@ -1121,7 +1115,52 @@ import won from "./won.js";
   };
 
   /**
-   * @param connectionUri
+   * @param senderSocketUri
+   * @param targetSocketUri
+   * @param fetchParams See `ensureLoaded`.
+   * @return {*} the connections predicates along with the uris of associated events
+   */
+  won.getConnectionUrisBySocket = function(
+    senderSocketUri,
+    targetSocketUri,
+    fetchParams
+  ) {
+    if (!is("String", senderSocketUri) || !is("String", targetSocketUri)) {
+      throw new Error(
+        "Tried to request connection infos for sthg that isn't an uri: " +
+          senderSocketUri +
+          " or " +
+          targetSocketUri
+      );
+    }
+
+    fetchParams.socket = senderSocketUri;
+    fetchParams.targetSocket = targetSocketUri;
+
+    return (
+      won
+        .deleteDocumentFromStore(senderSocketUri.split("#")[0] + "/c")
+        .then(() =>
+          won.getNode(senderSocketUri.split("#")[0] + "/c", fetchParams)
+        )
+        //add the eventUris
+        .then(jsonResp => jsonResp.member)
+        .then(connUris => {
+          let _connUris;
+          if (is("String", connUris)) {
+            _connUris = [connUris];
+          } else {
+            _connUris = connUris;
+          }
+
+          return _connUris[0];
+        })
+    );
+  };
+
+  /**
+   * @param senderSocketUri
+   * @param targetSocketUri
    * @param fetchParams See `ensureLoaded`.
    * @return {*} the connections predicates along with the uris of associated events
    */
@@ -1590,9 +1629,9 @@ import won from "./won.js";
         {
           prefixes:
             "prefix " +
-            won.WON.prefix +
+            vocab.WON.prefix +
             ": <" +
-            won.WON.baseUri +
+            vocab.WON.baseUri +
             "> " +
             "prefix dct: <http://purl.org/dc/terms/> " +
             "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",

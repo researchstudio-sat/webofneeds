@@ -4,6 +4,7 @@ import {
   sparqlQuery,
 } from "../../app/sparql-builder-utils.js";
 import won from "../../app/service/won.js";
+import vocab from "../../app/service/vocab.js";
 import { getIn } from "../../app/utils.js";
 import { Generator } from "sparqljs";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
@@ -22,10 +23,10 @@ export const cyclingPlan = {
         title: "Let's go for a bike ride!",
         eventObjectAboutUris: "http://dbpedia.org/resource/Cycling",
         sockets: {
-          "#groupSocket": won.GROUP.GroupSocketCompacted,
-          "#holdableSocket": won.HOLD.HoldableSocketCompacted,
+          "#groupSocket": vocab.GROUP.GroupSocketCompacted,
+          "#holdableSocket": vocab.HOLD.HoldableSocketCompacted,
         },
-        defaultSocket: { "#groupSocket": won.GROUP.GroupSocketCompacted },
+        defaultSocket: { "#groupSocket": vocab.GROUP.GroupSocketCompacted },
       },
       seeks: {},
     }),
@@ -33,8 +34,8 @@ export const cyclingPlan = {
   reactionUseCases: [
     {
       identifier: "cyclingInterest",
-      senderSocketType: won.CHAT.ChatSocketCompacted,
-      targetSocketType: won.GROUP.GroupSocketCompacted,
+      senderSocketType: vocab.CHAT.ChatSocketCompacted,
+      targetSocketType: vocab.GROUP.GroupSocketCompacted,
     },
   ],
   details: {
@@ -116,15 +117,15 @@ export const cyclingInterest = {
   enabledUseCases: [
     {
       identifier: "cyclingPlan",
-      senderSocketType: won.GROUP.GroupSocketCompacted,
-      targetSocketType: won.CHAT.ChatSocketCompacted,
+      senderSocketType: vocab.GROUP.GroupSocketCompacted,
+      targetSocketType: vocab.CHAT.ChatSocketCompacted,
     },
   ],
   reactionUseCases: [
     {
       identifier: "cyclingPlan",
-      senderSocketType: won.GROUP.GroupSocketCompacted,
-      targetSocketType: won.CHAT.ChatSocketCompacted,
+      senderSocketType: vocab.GROUP.GroupSocketCompacted,
+      targetSocketType: vocab.CHAT.ChatSocketCompacted,
     },
   ],
   details: {

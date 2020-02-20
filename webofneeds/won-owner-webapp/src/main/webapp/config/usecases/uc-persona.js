@@ -1,5 +1,5 @@
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
-import won from "../../app/service/won.js";
+import vocab from "../../app/service/vocab.js";
 import { Generator } from "sparqljs";
 
 window.SparqlGenerator4dbg = Generator;
@@ -11,12 +11,12 @@ export const persona = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: [won.WON.PersonaCompacted],
+        type: [vocab.WON.PersonaCompacted],
         sockets: {
-          "#chatSocket": won.CHAT.ChatSocketCompacted,
-          "#reviewSocket": won.REVIEW.ReviewSocketCompacted,
-          "#holderSocket": won.HOLD.HolderSocketCompacted,
-          "#buddySocket": won.BUDDY.BuddySocketCompacted,
+          "#chatSocket": vocab.CHAT.ChatSocketCompacted,
+          "#reviewSocket": vocab.REVIEW.ReviewSocketCompacted,
+          "#holderSocket": vocab.HOLD.HolderSocketCompacted,
+          "#buddySocket": vocab.BUDDY.BuddySocketCompacted,
         },
       },
       seeks: {},

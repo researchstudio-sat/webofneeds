@@ -1,6 +1,7 @@
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
 import won from "../won-es6.js";
+import vocab from "../service/vocab.js";
 import { getIn, get, generateIdString } from "../utils.js";
 import { parseRestErrorMessage } from "../won-utils.js";
 
@@ -9,9 +10,9 @@ const initialState = Immutable.fromJS({});
 export default function(allToasts = initialState, action = {}) {
   switch (action.type) {
     case actionTypes.toasts.test:
-      allToasts = pushNewToast(allToasts, "Error Toast", won.WON.errorToast);
-      allToasts = pushNewToast(allToasts, "Warning Toast", won.WON.warnToast);
-      allToasts = pushNewToast(allToasts, "Info Toast", won.WON.infoToast);
+      allToasts = pushNewToast(allToasts, "Error Toast", vocab.WON.errorToast);
+      allToasts = pushNewToast(allToasts, "Warning Toast", vocab.WON.warnToast);
+      allToasts = pushNewToast(allToasts, "Info Toast", vocab.WON.infoToast);
       return allToasts;
 
     case actionTypes.account.reset:
@@ -23,7 +24,7 @@ export default function(allToasts = initialState, action = {}) {
       return pushNewToast(
         allToasts,
         "Error while processing chat message: \n\n" + msg,
-        won.WON.errorToast
+        vocab.WON.errorToast
       );
     }
 
@@ -35,7 +36,7 @@ export default function(allToasts = initialState, action = {}) {
           "Sorry, something failed when posting/generating a new private-ID (the one in " +
             "your url-bar). Copy the text you've written somewhere safe, then log out / remove " +
             "the ID, then refresh the page and try posting again.",
-          won.WON.errorToast
+          vocab.WON.errorToast
         );
       } else {
         return allToasts;
@@ -46,7 +47,7 @@ export default function(allToasts = initialState, action = {}) {
       return pushNewToast(
         allToasts,
         "Failed to accept Terms Of Service",
-        won.WON.errorToast
+        vocab.WON.errorToast
       );
 
     case actionTypes.account.loginFailed: {
@@ -57,7 +58,7 @@ export default function(allToasts = initialState, action = {}) {
         return pushNewToast(
           allToasts,
           parseRestErrorMessage(loginError),
-          won.WON.errorToast
+          vocab.WON.errorToast
         );
       } else {
         return allToasts;
@@ -67,14 +68,14 @@ export default function(allToasts = initialState, action = {}) {
     case actionTypes.view.toggleDebugMode: {
       const debugmode = get(action, "payload");
       const text = debugmode ? "Debugmode On" : "Debugmode Off";
-      return pushNewToast(allToasts, text, won.WON.infoToast);
+      return pushNewToast(allToasts, text, vocab.WON.infoToast);
     }
 
     case actionTypes.toasts.push: {
       const text = getIn(action, ["payload", "text"]);
       if (text) {
         const type = getIn(action, ["payload", "type"]);
-        return pushNewToast(allToasts, text, type ? type : won.WON.infoToast);
+        return pushNewToast(allToasts, text, type ? type : vocab.WON.infoToast);
       } else {
         return allToasts;
       }
@@ -91,32 +92,32 @@ export default function(allToasts = initialState, action = {}) {
           "[Firefox](https://www.mozilla.org/en-US/firefox/geolocation/), " +
           "[Safari](https://support.apple.com/en-us/HT204690), " +
           "[Internet Explorer Edge](https://privacy.microsoft.com/en-us/windows-10-location-and-privacy).",
-        won.WON.warnToast
+        vocab.WON.warnToast
       );
 
-    //INFO TOASTS: won.WON.infoToast
+    //INFO TOASTS: vocab.WON.infoToast
 
-    //WARN TOASTS: won.WON.warnToast
-    //ERROR TOASTS: won.WON.errorToast
+    //WARN TOASTS: vocab.WON.warnToast
+    //ERROR TOASTS: vocab.WON.errorToast
     case actionTypes.messages.closeAtom.failed:
       return pushNewToast(
         allToasts,
         "Failed to close atom",
-        won.WON.errorToast
+        vocab.WON.errorToast
       );
 
     case actionTypes.messages.reopenAtom.failed:
       return pushNewToast(
         allToasts,
         "Failed to reopen atom",
-        won.WON.errorToast
+        vocab.WON.errorToast
       );
 
     case actionTypes.messages.chatMessage.failure:
       return pushNewToast(
         allToasts,
         "Failed to send chat message",
-        won.WON.errorToast
+        vocab.WON.errorToast
       );
 
     case actionTypes.messages.atomMessageReceived: {
@@ -125,7 +126,7 @@ export default function(allToasts = initialState, action = {}) {
       return pushNewToast(
         allToasts,
         "Notification for your posting '" + humanReadable + "': " + message,
-        won.WON.infoToast
+        vocab.WON.infoToast
       );
     }
 
@@ -135,7 +136,7 @@ export default function(allToasts = initialState, action = {}) {
       return pushNewToast(
         allToasts,
         "Closed your posting '" + humanReadable + "'. Cause: " + message,
-        won.WON.infoToast
+        vocab.WON.infoToast
       );
     }
 
@@ -143,7 +144,7 @@ export default function(allToasts = initialState, action = {}) {
       return pushNewToast(
         allToasts,
         "Could not get location. You may need to allow this in your browser",
-        won.WON.errorToast
+        vocab.WON.errorToast
       );
     }
 
@@ -166,7 +167,7 @@ export default function(allToasts = initialState, action = {}) {
 function pushNewToast(allToasts, msg, type) {
   let toastType = type;
   if (!toastType) {
-    toastType = won.WON.infoToast;
+    toastType = vocab.WON.infoToast;
   }
 
   const id = generateIdString(6);

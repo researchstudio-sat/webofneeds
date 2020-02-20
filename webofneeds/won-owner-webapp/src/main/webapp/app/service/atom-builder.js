@@ -6,6 +6,7 @@
 //TODO switch to requirejs for dependency mngmt (so this lib isn't angular-bound)
 //TODO replace calls to `won` object to `require('util')`
 import won from "./won.js";
+import vocab from "./vocab.js";
 import * as useCaseUtils from "../usecase-utils.js";
 import { is } from "../utils.js";
 
@@ -118,7 +119,7 @@ import { Generator } from "sparqljs";
       return addContent(contentNode, seeksData);
     };
 
-    let seeksContentUri = args.seeks && won.WON.contentNodeBlankUri.seeks;
+    let seeksContentUri = args.seeks && vocab.WON.contentNodeBlankUri.seeks;
 
     const useCase = useCaseUtils.getUseCase(args.useCase);
 
@@ -167,18 +168,18 @@ import { Generator } from "sparqljs";
         : args.seeks
           ? args.seeks.publishedContentUri
           : undefined,
-      "@type": [won.WON.AtomCompacted],
+      "@type": [vocab.WON.AtomCompacted],
       "match:seeks": seeksContentUri ? { "@id": seeksContentUri } : undefined,
       "won:socket": !(args.content && args.content.sockets)
         ? [
             {
               "@id": "#chatSocket",
-              "won:socketDefinition": { "@id": won.CHAT.ChatSocketCompacted },
+              "won:socketDefinition": { "@id": vocab.CHAT.ChatSocketCompacted },
             },
             {
               "@id": "#holdableSocket",
               "won:socketDefinition": {
-                "@id": won.HOLD.HoldableSocketCompacted,
+                "@id": vocab.HOLD.HoldableSocketCompacted,
               },
             },
           ]
@@ -187,7 +188,7 @@ import { Generator } from "sparqljs";
         ? [
             {
               "@id": "#chatSocket",
-              "won:socketDefinition": { "@id": won.CHAT.ChatSocketCompacted },
+              "won:socketDefinition": { "@id": vocab.CHAT.ChatSocketCompacted },
             },
           ]
         : undefined,

@@ -1,4 +1,4 @@
-import won from "../../won-es6.js";
+import vocab from "../../service/vocab.js";
 import { parseConnection, parseMetaConnection } from "./parse-connection.js";
 import { markUriAsRead } from "../../won-localstorage.js";
 
@@ -38,7 +38,7 @@ function addConnectionFull(atomState, connection) {
       const socketType = getIn(atom, ["content", "sockets", socketUri]);
 
       if (
-        socketType === won.HOLD.HolderSocketCompacted &&
+        socketType === vocab.HOLD.HolderSocketCompacted &&
         connectionUtils.isConnected(get(parsedConnection, "data"))
       ) {
         const holdsUri = targetAtomUri;
@@ -49,7 +49,7 @@ function addConnectionFull(atomState, connection) {
           );
         }
       } else if (
-        socketType === won.HOLD.HoldableSocketCompacted &&
+        socketType === vocab.HOLD.HoldableSocketCompacted &&
         connectionUtils.isConnected(get(parsedConnection, "data"))
       ) {
         //holdableSocket Connection from atom to persona -> need to add heldBy targetAtomUri to the atom
@@ -75,8 +75,8 @@ function addConnectionFull(atomState, connection) {
 
         if (
           connectionUtils.isConnected(get(parsedConnection, "data")) &&
-          socketType === won.BUDDY.BuddySocketCompacted &&
-          realTargetSocket === won.BUDDY.BuddySocketCompacted
+          socketType === vocab.BUDDY.BuddySocketCompacted &&
+          realTargetSocket === vocab.BUDDY.BuddySocketCompacted
         ) {
           atomState = atomState.updateIn([atomUri, "buddies"], buddies =>
             buddies.add(targetAtomUri)
@@ -198,20 +198,20 @@ export function changeConnectionState(allAtoms, connectionUri, newState) {
   const socketUri = getIn(atom, ["connections", connectionUri, "socketUri"]);
   const socketType = getIn(atom, ["content", "sockets", socketUri]);
 
-  if (socketType === won.HOLD.HolderSocketCompacted) {
-    if (newState === won.WON.Closed) {
+  if (socketType === vocab.HOLD.HolderSocketCompacted) {
+    if (newState === vocab.WON.Closed) {
       allAtoms = allAtoms.updateIn([atomUri, "holds"], holds =>
         holds.delete(targetAtomUri)
       );
-    } else if (newState === won.WON.Connected) {
+    } else if (newState === vocab.WON.Connected) {
       allAtoms = allAtoms.updateIn([atomUri, "holds"], holds =>
         holds.add(targetAtomUri)
       );
     }
-  } else if (socketType === won.HOLD.HoldableSocketCompacted) {
-    if (newState === won.WON.Closed) {
+  } else if (socketType === vocab.HOLD.HoldableSocketCompacted) {
+    if (newState === vocab.WON.Closed) {
       allAtoms = allAtoms.deleteIn([atomUri, "heldBy"]);
-    } else if (newState === won.WON.Connected) {
+    } else if (newState === vocab.WON.Connected) {
       allAtoms = allAtoms.setIn([atomUri, "heldBy"], targetAtomUri);
     }
   }

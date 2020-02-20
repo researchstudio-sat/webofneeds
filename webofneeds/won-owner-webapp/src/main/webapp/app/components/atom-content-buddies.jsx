@@ -9,7 +9,7 @@ import * as atomUtils from "../redux/utils/atom-utils";
 import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as connectionSelectors from "../redux/selectors/connection-selectors";
 import * as connectionUtils from "../redux/utils/connection-utils";
-import won from "../won-es6";
+import vocab from "../service/vocab.js";
 import WonAtomContextSwipeableView from "./atom-context-swipeable-view";
 import WonLabelledHr from "./labelled-hr.jsx";
 import WonSuggestAtomPicker from "./details/picker/suggest-atom-picker.jsx";
@@ -97,32 +97,20 @@ const mapDispatchToProps = dispatch => {
         )
       );
     },
-    connectAdHoc: (targetAtomUri, message, connectToSocketUri, persona) => {
-      dispatch(
-        actionCreators.connections__connectAdHoc(
-          targetAtomUri,
-          message,
-          connectToSocketUri,
-          persona
-        )
-      );
-    },
     connect: (
-      ownedAtomUri,
-      connectionUri,
+      senderAtomUri,
       targetAtomUri,
-      message,
-      ownSocket,
-      targetSocket
+      senderSocketType,
+      targetSocketType,
+      message
     ) => {
       dispatch(
         actionCreators.atoms__connect(
-          ownedAtomUri,
-          connectionUri,
+          senderAtomUri,
           targetAtomUri,
-          message,
-          ownSocket,
-          targetSocket
+          senderSocketType,
+          targetSocketType,
+          message
         )
       );
     },
@@ -324,7 +312,7 @@ class WonAtomContentBuddies extends React.Component {
               onUpdate={({ value }) => this.requestBuddy(value)}
               detail={{ placeholder: "Insert AtomUri to invite" }}
               excludedUris={this.props.excludedFromRequestUris}
-              allowedSockets={[won.BUDDY.BuddySocketCompacted]}
+              allowedSockets={[vocab.BUDDY.BuddySocketCompacted]}
               excludedText="Requesting yourself or someone who is already your Buddy is not allowed"
               notAllowedSocketText="Request does not work on atoms without the Buddy Socket"
               noSuggestionsText="No known Personas available"
@@ -424,11 +412,10 @@ class WonAtomContentBuddies extends React.Component {
           callback: () => {
             this.props.connect(
               this.props.atomUri,
-              undefined,
               targetAtomUri,
-              message,
-              won.BUDDY.BuddySocketCompacted,
-              won.BUDDY.BuddySocketCompacted
+              vocab.BUDDY.BuddySocketCompacted,
+              vocab.BUDDY.BuddySocketCompacted,
+              message
             );
             this.props.hideModalDialog();
           },
@@ -458,11 +445,9 @@ class WonAtomContentBuddies extends React.Component {
         //No chatConnection between buddies exists => connect
         this.props.connect(
           this.props.atomUri,
-          undefined,
           get(connection, "targetAtomUri"),
-          "",
-          won.CHAT.ChatSocketCompacted,
-          won.CHAT.ChatSocketCompacted
+          vocab.CHAT.ChatSocketCompacted,
+          vocab.CHAT.ChatSocketCompacted
         );
         this.props.routerGoResetParams("connections");
       } else if (chatConnections.length == 1) {
@@ -475,11 +460,9 @@ class WonAtomContentBuddies extends React.Component {
         ) {
           this.props.connect(
             this.props.atomUri,
-            undefined,
-            chatConnectionUri,
-            "",
-            won.CHAT.ChatSocketCompacted,
-            won.CHAT.ChatSocketCompacted
+            get(chatConnection, "targetAtomUri"),
+            vocab.CHAT.ChatSocketCompacted,
+            vocab.CHAT.ChatSocketCompacted
           );
         } else if (
           connectionUtils.isConnected(chatConnection) ||
@@ -501,11 +484,9 @@ class WonAtomContentBuddies extends React.Component {
       //No chatConnection between buddies exists => connect
       this.props.connect(
         this.props.atomUri,
-        undefined,
         get(connection, "targetAtomUri"),
-        "",
-        won.CHAT.ChatSocketCompacted,
-        won.CHAT.ChatSocketCompacted
+        vocab.CHAT.ChatSocketCompacted,
+        vocab.CHAT.ChatSocketCompacted
       );
       this.props.routerGoResetParams("connections");
     }
@@ -535,7 +516,6 @@ WonAtomContentBuddies.propTypes = {
   connectionClose: PropTypes.func,
   connectSockets: PropTypes.func,
   connect: PropTypes.func,
-  connectAdHoc: PropTypes.func,
   routerGo: PropTypes.func,
   routerGoResetParams: PropTypes.func,
   chatSocketUri: PropTypes.string,

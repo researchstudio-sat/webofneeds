@@ -1,5 +1,5 @@
 import Immutable from "immutable";
-import won from "../../won-es6.js";
+import vocab from "../../service/vocab.js";
 import { get, is } from "../../utils.js";
 import { isUriRead } from "../../won-localstorage.js";
 
@@ -58,11 +58,11 @@ export function parseMetaConnection(metaConnection) {
     );
   } else if (
     !(
-      parsedMetaConnection.data.state === won.WON.RequestReceived ||
-      parsedMetaConnection.data.state === won.WON.RequestSent ||
-      parsedMetaConnection.data.state === won.WON.Suggested ||
-      parsedMetaConnection.data.state === won.WON.Connected ||
-      parsedMetaConnection.data.state === won.WON.Closed
+      parsedMetaConnection.data.state === vocab.WON.RequestReceived ||
+      parsedMetaConnection.data.state === vocab.WON.RequestSent ||
+      parsedMetaConnection.data.state === vocab.WON.Suggested ||
+      parsedMetaConnection.data.state === vocab.WON.Connected ||
+      parsedMetaConnection.data.state === vocab.WON.Closed
     )
   ) {
     console.error(
@@ -169,11 +169,11 @@ export function parseConnection(jsonldConnection) {
     );
   } else if (
     !(
-      parsedConnection.data.state === won.WON.RequestReceived ||
-      parsedConnection.data.state === won.WON.RequestSent ||
-      parsedConnection.data.state === won.WON.Suggested ||
-      parsedConnection.data.state === won.WON.Connected ||
-      parsedConnection.data.state === won.WON.Closed
+      parsedConnection.data.state === vocab.WON.RequestReceived ||
+      parsedConnection.data.state === vocab.WON.RequestSent ||
+      parsedConnection.data.state === vocab.WON.Suggested ||
+      parsedConnection.data.state === vocab.WON.Connected ||
+      parsedConnection.data.state === vocab.WON.Closed
     )
   ) {
     console.error(

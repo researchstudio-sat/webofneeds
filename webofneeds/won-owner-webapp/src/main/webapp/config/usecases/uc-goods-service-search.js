@@ -4,6 +4,7 @@
 
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import won from "../../app/service/won.js";
+import vocab from "../../app/service/vocab.js";
 import { getIn, is } from "../../app/utils.js";
 import {
   textSearchSubQuery,
@@ -30,13 +31,13 @@ export const goodsServiceSearch = {
   reactionUseCases: [
     {
       identifier: "serviceOffer",
-      senderSocketType: won.CHAT.ChatSocketCompacted,
-      targetSocketType: won.CHAT.ChatSocketCompacted,
+      senderSocketType: vocab.CHAT.ChatSocketCompacted,
+      targetSocketType: vocab.CHAT.ChatSocketCompacted,
     },
     {
       identifier: "goodsOffer",
-      senderSocketType: won.CHAT.ChatSocketCompacted,
-      targetSocketType: won.CHAT.ChatSocketCompacted,
+      senderSocketType: vocab.CHAT.ChatSocketCompacted,
+      targetSocketType: vocab.CHAT.ChatSocketCompacted,
     },
   ],
   seeksDetails: {

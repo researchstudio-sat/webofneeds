@@ -12,7 +12,7 @@ import * as connectionSelectors from "../redux/selectors/connection-selectors.js
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import VisibilitySensor from "react-visibility-sensor";
 import { get } from "../utils.js";
-import won from "../won-es6";
+import vocab from "../service/vocab.js";
 import PropTypes from "prop-types";
 
 const mapStateToProps = (state, ownProps) => {
@@ -91,7 +91,7 @@ class WonAtomContentSuggestions extends React.Component {
     const connUri = get(conn, "uri");
 
     if (rateBad) {
-      this.props.rateConnection(connUri, won.WONCON.binaryRatingBad);
+      this.props.rateConnection(connUri, vocab.WONCON.binaryRatingBad);
     }
 
     if (connectionUtils.isUnread(conn)) {
@@ -111,7 +111,7 @@ class WonAtomContentSuggestions extends React.Component {
       this.props.connectionMarkAsRead(connUri, this.props.atomUri);
     }
 
-    this.props.rateConnection(connUri, won.WONCON.binaryRatingGood);
+    this.props.rateConnection(connUri, vocab.WONCON.binaryRatingGood);
 
     const socketUri = get(conn, "socketUri");
     const targetSocketUri = get(conn, "targetSocketUri");

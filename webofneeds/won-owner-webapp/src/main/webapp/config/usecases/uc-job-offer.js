@@ -13,6 +13,7 @@ import {
   sparqlQuery,
 } from "../../app/sparql-builder-utils.js";
 import won from "../../app/service/won.js";
+import vocab from "../../app/service/vocab.js";
 
 import { getIn } from "../../app/utils.js";
 
@@ -34,8 +35,8 @@ export const jobOffer = {
   reactionUseCases: [
     {
       identifier: "jobSearch",
-      senderSocketType: won.CHAT.ChatSocketCompacted,
-      targetSocketType: won.CHAT.ChatSocketCompacted,
+      senderSocketType: vocab.CHAT.ChatSocketCompacted,
+      targetSocketType: vocab.CHAT.ChatSocketCompacted,
     },
   ],
   details: {

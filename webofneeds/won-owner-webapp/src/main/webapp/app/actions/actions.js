@@ -36,17 +36,7 @@
  */
 // <utils>
 
-import { atomCreate, atomEdit } from "./create-atom-action.js";
-
-import {
-  atomsClose,
-  atomsClosedBySystem,
-  atomsConnect,
-  atomsConnectSockets,
-  atomsDelete,
-  atomsOpen,
-  fetchUnloadedAtom,
-} from "./atoms-actions.js";
+import * as atomActions from "./atoms-actions.js";
 
 import {
   stateBack,
@@ -82,8 +72,8 @@ import {
 } from "./load-action.js";
 import { stateGo, stateReload } from "redux-ui-router";
 import {
-  connectPersona,
   disconnectPersona,
+  connectPersona,
   reviewPersona,
 } from "./persona-actions.js";
 import { deepFreeze } from "../utils.js";
@@ -138,19 +128,20 @@ const actionHierarchy = {
   atoms: {
     received: INJ_DEFAULT,
     connectionsReceived: INJ_DEFAULT,
-    create: atomCreate,
-    edit: atomEdit,
+    create: atomActions.create,
+    edit: atomActions.edit,
     editSuccessful: INJ_DEFAULT,
     editFailure: INJ_DEFAULT,
     createSuccessful: INJ_DEFAULT,
-    reopen: atomsOpen,
-    close: atomsClose,
-    delete: atomsDelete,
-    closedBySystem: atomsClosedBySystem,
+    reopen: atomActions.open,
+    close: atomActions.close,
+    delete: atomActions.deleteAtom,
+    closedBySystem: atomActions.closedBySystem,
     failed: INJ_DEFAULT,
-    connect: atomsConnect,
-    connectSockets: atomsConnectSockets,
-    fetchUnloadedAtom: fetchUnloadedAtom,
+    connect: atomActions.connectSocketTypes,
+    connectSockets: atomActions.connectSockets,
+    connectSocketsServerSide: atomActions.connectSocketsServerSide,
+    fetchUnloadedAtom: atomActions.fetchUnloadedAtom,
 
     fetchMetaAtoms: INJ_DEFAULT,
     fetchWhatsNew: fetchWhatsNew,
@@ -223,8 +214,8 @@ const actionHierarchy = {
     },
     connect: {
       //success: messages.successfulConnect,
-      successRemote: INJ_DEFAULT, //2nd successResponse
-      successOwn: INJ_DEFAULT, //1st successResponse
+      successRemote: messages.connectSuccessRemote, //2nd successResponse
+      successOwn: messages.connectSuccessOwn, //1st successResponse
       failure: INJ_DEFAULT,
     },
     chatMessage: {

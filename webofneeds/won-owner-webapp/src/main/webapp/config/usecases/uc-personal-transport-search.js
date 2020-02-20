@@ -4,6 +4,7 @@
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import won from "../../app/service/won.js";
+import vocab from "../../app/service/vocab.js";
 import { getIn } from "../../app/utils.js";
 import { sparqlQuery } from "../../app/sparql-builder-utils.js";
 
@@ -24,13 +25,13 @@ export const personalTransportSearch = {
   reactionUseCases: [
     {
       identifier: "taxiOffer",
-      senderSocketType: won.CHAT.ChatSocketCompacted,
-      targetSocketType: won.CHAT.ChatSocketCompacted,
+      senderSocketType: vocab.CHAT.ChatSocketCompacted,
+      targetSocketType: vocab.CHAT.ChatSocketCompacted,
     },
     {
       identifier: "rideShareOffer",
-      senderSocketType: won.CHAT.ChatSocketCompacted,
-      targetSocketType: won.CHAT.ChatSocketCompacted,
+      senderSocketType: vocab.CHAT.ChatSocketCompacted,
+      targetSocketType: vocab.CHAT.ChatSocketCompacted,
     },
   ],
   // TODO: amount of people? other details?

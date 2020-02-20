@@ -13,7 +13,7 @@ import { connect } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 
 import * as connectionUtils from "../redux/utils/connection-utils.js";
-import won from "../won-es6";
+import vocab from "../service/vocab.js";
 
 const mapStateToProps = (state, ownProps) => {
   const atom = generalSelectors.getOwnedAtomByConnectionUri(
@@ -34,19 +34,19 @@ class WonConnectionState extends React.Component {
     let icon;
 
     switch (this.props.connectionState) {
-      case won.WON.Suggested:
+      case vocab.WON.Suggested:
         icon = <use xlinkHref="#ico36_match" href="#ico36_match" />;
         break;
-      case won.WON.RequestSent:
+      case vocab.WON.RequestSent:
         icon = <use xlinkHref="#ico36_outgoing" href="#ico36_outgoing" />;
         break;
-      case won.WON.RequestReceived:
+      case vocab.WON.RequestReceived:
         icon = <use xlinkHref="#ico36_incoming" href="#ico36_incoming" />;
         break;
-      case won.WON.Connected:
+      case vocab.WON.Connected:
         icon = <use xlinkHref="#ico36_message" href="#ico36_message" />;
         break;
-      case won.WON.Closed:
+      case vocab.WON.Closed:
       default:
         icon = (
           <use xlinkHref="#ico36_close_circle" href="#ico36_close_circle" />
@@ -61,7 +61,7 @@ class WonConnectionState extends React.Component {
           title={labels.connectionState[this.props.connectionState]}
         >
           {this.props.unread &&
-            this.props.connectionState === won.WON.Suggested && (
+            this.props.connectionState === vocab.WON.Suggested && (
               <svg
                 className={
                   "cs__state__icon " + (this.props.unread ? " won-unread " : "")

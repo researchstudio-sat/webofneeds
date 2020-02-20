@@ -1,5 +1,5 @@
 import React from "react";
-import won from "../won-es6";
+import vocab from "../service/vocab.js";
 import { connect } from "react-redux";
 import { get, getIn } from "../utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
@@ -32,7 +32,7 @@ const mapStateToProps = (state, ownProps) => {
       ownedBuddyOptions && ownedBuddyOptions.toArray(),
     targetBuddySocketUri: atomUtils.getSocketUri(
       atom,
-      won.BUDDY.BuddySocketCompacted
+      vocab.BUDDY.BuddySocketCompacted
     ),
     atomUri: ownProps.atomUri,
   };
@@ -47,21 +47,19 @@ const mapDispatchToProps = dispatch => {
       dispatch(actionCreators.view__showModalDialog(payload));
     },
     connect: (
-      ownedAtomUri,
-      connectionUri,
+      senderAtomUri,
       targetAtomUri,
-      message,
-      ownSocket,
-      targetSocket
+      senderSocketType,
+      targetSocketType,
+      message
     ) => {
       dispatch(
         actionCreators.atoms__connect(
-          ownedAtomUri,
-          connectionUri,
+          senderAtomUri,
           targetAtomUri,
-          message,
-          ownSocket,
-          targetSocket
+          senderSocketType,
+          targetSocketType,
+          message
         )
       );
     },
@@ -348,11 +346,10 @@ class WonAddBuddy extends React.Component {
             } else {
               this.props.connect(
                 selectedAtomUri,
-                existingBuddyConnectionUri,
                 this.props.atomUri,
-                message,
-                won.BUDDY.BuddySocketCompacted,
-                won.BUDDY.BuddySocketCompacted
+                vocab.BUDDY.BuddySocketCompacted,
+                vocab.BUDDY.BuddySocketCompacted,
+                message
               );
             }
             this.props.hideModalDialog();

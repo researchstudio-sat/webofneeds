@@ -6,7 +6,7 @@ import * as useCaseDefinitions from "../config/usecase-definitions.js";
 import { messageDetails } from "../config/detail-definitions.js";
 import { get, getIn } from "./utils.js";
 import { values } from "min-dash";
-import won from "./won-es6.js";
+import vocab from "./service/vocab.js";
 
 import Immutable from "immutable";
 
@@ -75,13 +75,13 @@ export function findUseCaseByAtom(atomImm) {
     getIn(atomImm, ["seeks", "type"]) &&
     getIn(atomImm, ["seeks", "type"])
       .toSet()
-      .remove(won.WON.AtomCompacted);
+      .remove(vocab.WON.AtomCompacted);
 
   const contentTypes =
     getIn(atomImm, ["content", "type"]) &&
     getIn(atomImm, ["content", "type"])
       .toSet()
-      .remove(won.WON.AtomCompacted);
+      .remove(vocab.WON.AtomCompacted);
 
   if (useCasesImm && useCasesImm.size > 0) {
     const hasExactMatchingTypes = (useCase, types, branch) => {
@@ -91,7 +91,7 @@ export function findUseCaseByAtom(atomImm) {
         useCase
           .getIn(["draft", branch, "type"])
           .toSet()
-          .remove(won.WON.AtomCompacted);
+          .remove(vocab.WON.AtomCompacted);
 
       const ucTypesSize = ucTypes ? ucTypes.size : 0;
 
@@ -500,7 +500,7 @@ export function isHoldable(useCase) {
     useCase.draft.content &&
     useCase.draft.content.sockets &&
     values(useCase.draft.content.sockets).includes(
-      won.HOLD.HoldableSocketCompacted
+      vocab.HOLD.HoldableSocketCompacted
     )
   );
 }

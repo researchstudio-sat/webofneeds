@@ -16,6 +16,7 @@ import { get, getIn } from "../utils";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import won from "../won-es6.js";
+import vocab from "../service/vocab.js";
 
 import "~/style/_atom-messages.scss";
 import "~/style/_rdflink.scss";
@@ -33,12 +34,12 @@ import Immutable from "immutable";
 
 const rdfTextfieldHelpText =
   "Expects valid turtle. " +
-  `<${won.WONMSG.uriPlaceholder.event}> will ` +
+  `<${vocab.WONMSG.uriPlaceholder.event}> will ` +
   "be replaced by the uri generated for this message. " +
   "Use it, so your TTL can be found when parsing the messages. " +
   "See `won.defaultTurtlePrefixes` " +
   "for prefixes that will be added automatically. E.g." +
-  `\`<${won.WONMSG.uriPlaceholder.event}> con:text "hello world!". \``;
+  `\`<${vocab.WONMSG.uriPlaceholder.event}> con:text "hello world!". \``;
 
 const mapStateToProps = (state, ownProps) => {
   const selectedConnectionUri = ownProps.connectionUri
@@ -320,15 +321,6 @@ const mapDispatchToProps = dispatch => {
         })
       );
     },
-    connectAdHoc: (targetAtomUri, message, persona) => {
-      dispatch(
-        actionCreators.connections__connectAdHoc(
-          targetAtomUri,
-          message,
-          persona
-        )
-      );
-    },
     showMoreMessages: (connectionUri, msgCount) => {
       dispatch(
         actionCreators.connections__showMoreMessages(connectionUri, msgCount)
@@ -474,6 +466,7 @@ class AtomMessages extends React.Component {
             loadSpinnerElement}
           {!this.props.isSuggested &&
             !this.props.isConnectionLoading &&
+            !connectionUtils.isUsingTemporaryUri(this.props.connection) &&
             !this.props.isProcessingLoadingMessages &&
             this.props.hasConnectionMessagesToLoad && (
               <button
@@ -800,9 +793,7 @@ class AtomMessages extends React.Component {
                 allowEmptySubmit={true}
                 allowDetails={false}
                 showPersonas={!this.props.connection}
-                onSubmit={({ value, selectedPersona }) =>
-                  this.sendRequest(value, selectedPersona)
-                }
+                onSubmit={({ value }) => this.sendRequest(value)}
               />
               <WonLabelledHr className="pm__footer__labelledhr" label="Or" />
               <button
@@ -925,31 +916,23 @@ class AtomMessages extends React.Component {
     });
   }
 
-  sendRequest(message, persona) {
-    if (!this.props.connection) {
-      this.props.routerGoResetParams("connections");
+  sendRequest(message) {
+    this.props.rateConnection(
+      this.props.selectedConnectionUri,
+      vocab.WONCON.binaryRatingGood
+    );
 
-      if (this.props.targetAtomUri) {
-        this.props.connectAdHoc(this.props.targetAtomUri, message, persona);
-      }
+    this.props.connectSockets(
+      get(this.props.connection, "socketUri"),
+      get(this.props.connection, "targetSocketUri"),
+      message
+    );
+    if (this.showOverlayConnection) {
+      this.props.routerBack();
     } else {
-      this.props.rateConnection(
-        this.props.selectedConnectionUri,
-        won.WONCON.binaryRatingGood
-      );
-
-      this.props.connectSockets(
-        get(this.props.connection, "socketUri"),
-        get(this.props.connection, "targetSocketUri"),
-        message
-      );
-      if (this.showOverlayConnection) {
-        this.props.routerBack();
-      } else {
-        this.props.routerGoCurrent({
-          connectionUri: this.props.selectedConnectionUri,
-        });
-      }
+      this.props.routerGoCurrent({
+        connectionUri: this.props.selectedConnectionUri,
+      });
     }
   }
 
@@ -957,7 +940,7 @@ class AtomMessages extends React.Component {
     if (rateBad) {
       this.props.rateConnection(
         get(this.props.connection, "uri"),
-        won.WONCON.binaryRatingBad
+        vocab.WONCON.binaryRatingBad
       );
     }
     this.props.closeConnection(get(this.props.connection, "uri"));
@@ -987,6 +970,7 @@ class AtomMessages extends React.Component {
     const INITIAL_MESSAGECOUNT = 15;
     if (
       this.props.connection &&
+      !connectionUtils.isUsingTemporaryUri(this.props.connection) &&
       !this.props.isConnectionLoading &&
       !this.props.isProcessingLoadingMessages &&
       get(this.props.connection, "messages").size < INITIAL_MESSAGECOUNT &&
@@ -1003,6 +987,7 @@ class AtomMessages extends React.Component {
     if (
       forceFetch ||
       (this.props.isConnected &&
+        !connectionUtils.isUsingTemporaryUri(this.props.connection) &&
         !this.props.isProcessingLoadingPetriNetData &&
         !this.props.petriNetDataLoaded)
     ) {
@@ -1035,6 +1020,7 @@ class AtomMessages extends React.Component {
     if (
       forceFetch ||
       (this.props.isConnected &&
+        !connectionUtils.isUsingTemporaryUri(this.props.connection) &&
         !this.props.isProcessingLoadingAgreementData &&
         !this.props.agreementDataLoaded)
     ) {
@@ -1100,6 +1086,7 @@ class AtomMessages extends React.Component {
   ensureMessageStateIsUpToDate() {
     if (
       this.props.isConnected &&
+      !connectionUtils.isUsingTemporaryUri(this.props.connection) &&
       !this.props.isConnectionLoading &&
       !this.props.isProcessingLoadingAgreementData &&
       !this.props.isProcessingLoadingMessages &&
@@ -1245,7 +1232,6 @@ AtomMessages.propTypes = {
   setShowAgreementData: PropTypes.func,
   hideAddMessageContent: PropTypes.func,
   sendChatMessage: PropTypes.func,
-  connectAdHoc: PropTypes.func,
   connectSockets: PropTypes.func,
   rateConnection: PropTypes.func,
   closeConnection: PropTypes.func,

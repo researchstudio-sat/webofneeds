@@ -7,7 +7,7 @@ import { get, getIn } from "../utils.js";
 import "~/style/_responsiveness-utils.scss";
 import "~/style/_toasts.scss";
 import "~/style/_won-markdown.scss";
-import won from "../won-es6.js";
+import vocab from "../service/vocab.js";
 import ReactMarkdown from "react-markdown";
 
 const mapStateToProps = state => {
@@ -34,7 +34,7 @@ class WonToasts extends React.Component {
         <div className="topnav__toasts">
           {this.props.toastsArray.map((toast, index) => {
             switch (get(toast, "type")) {
-              case won.WON.warnToast:
+              case vocab.WON.warnToast:
                 return (
                   <div className="topnav__toasts__element warn" key={index}>
                     <svg className="topnav__toasts__element__icon">
@@ -60,7 +60,7 @@ class WonToasts extends React.Component {
                   </div>
                 );
 
-              case won.WON.infoToast:
+              case vocab.WON.infoToast:
                 return (
                   <div className="topnav__toasts__element info" key={index}>
                     <svg className="topnav__toasts__element__icon">
@@ -86,7 +86,7 @@ class WonToasts extends React.Component {
                   </div>
                 );
 
-              case won.WON.errorToast:
+              case vocab.WON.errorToast:
               default:
                 return (
                   <div className="topnav__toasts__element error" key={index}>

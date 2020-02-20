@@ -2,7 +2,7 @@
  * Created by fsuda on 08.11.2018.
  */
 
-import won from "../../won-es6.js";
+import vocab from "../../service/vocab.js";
 import { get, getIn } from "../../utils.js";
 import { labels } from "../../won-label-utils.js";
 import * as connectionUtils from "./connection-utils.js";
@@ -15,7 +15,7 @@ import Immutable from "immutable";
  * @returns {*|boolean}
  */
 export function isActive(atom) {
-  return get(atom, "state") === won.WON.ActiveCompacted;
+  return get(atom, "state") === vocab.WON.ActiveCompacted;
 }
 
 /**
@@ -24,7 +24,7 @@ export function isActive(atom) {
  * @returns {*|boolean}
  */
 export function isInactive(atom) {
-  return get(atom, "state") === won.WON.InactiveCompacted;
+  return get(atom, "state") === vocab.WON.InactiveCompacted;
 }
 
 export function getIdenticonSvg(atom) {
@@ -33,6 +33,24 @@ export function getIdenticonSvg(atom) {
 
 export function getMatchedUseCaseIcon(atom) {
   return getIn(atom, ["matchedUseCase", "icon"]);
+}
+
+export function matchesDefinitions(atom, useCaseDefinitions) {
+  return (
+    !!useCaseDefinitions &&
+    !!useCaseDefinitions.find(useCaseDefinition =>
+      matchesDefinition(atom, useCaseDefinition)
+    )
+  );
+}
+
+export function matchesDefinition(atom, useCaseDefinition) {
+  return (
+    !!useCaseDefinition &&
+    get(useCaseDefinition, "identifier") ===
+      getMatchedUseCaseIdentifier(atom) &&
+    hasSocket(atom, get(useCaseDefinition, "senderSocketType"))
+  );
 }
 
 export function getBackground(atom) {
@@ -207,14 +225,6 @@ export function getDefaultPersonaImage(atom) {
 }
 
 /**
- * If an atom is active and has the chat or the group socket we can connect to it.
- * @param atom
- */
-export function isConnectible(atom) {
-  return isActive(atom) && (hasChatSocket(atom) || hasGroupSocket(atom));
-}
-
-/**
  * Determines if a given atom is a DirectResponse-Atom
  * @param atom
  * @returns {*|boolean}
@@ -223,7 +233,7 @@ export function isDirectResponseAtom(atom) {
   return (
     getIn(atom, ["content", "flags"]) &&
     getIn(atom, ["content", "flags"]).contains(
-      won.WONCON.DirectResponseCompacted
+      vocab.WONCON.DirectResponseCompacted
     )
   );
 }
@@ -237,7 +247,7 @@ export function isInvisibleAtom(atom) {
   return (
     getIn(atom, ["content", "flags"]) &&
     getIn(atom, ["content", "flags"]).contains(
-      won.WONMATCH.NoHintForCounterpartCompacted
+      vocab.WONMATCH.NoHintForCounterpartCompacted
     )
   );
 }
@@ -245,46 +255,46 @@ export function isInvisibleAtom(atom) {
 export function isPersona(atom) {
   return (
     getIn(atom, ["content", "type"]) &&
-    getIn(atom, ["content", "type"]).has(won.WON.PersonaCompacted)
+    getIn(atom, ["content", "type"]).has(vocab.WON.PersonaCompacted)
   );
 }
 
 export function isServiceAtom(atom) {
   return (
     getIn(atom, ["content", "type"]) &&
-    getIn(atom, ["content", "type"]).has(won.BOT.ServiceAtomCompacted)
+    getIn(atom, ["content", "type"]).has(vocab.BOT.ServiceAtomCompacted)
   );
 }
 
 export function isAtom(atom) {
   return (
     getIn(atom, ["content", "type"]) &&
-    getIn(atom, ["content", "type"]).has(won.WON.AtomCompacted)
+    getIn(atom, ["content", "type"]).has(vocab.WON.AtomCompacted)
   );
 }
 
 export function hasChatSocket(atom) {
-  return hasSocket(atom, won.CHAT.ChatSocketCompacted);
+  return hasSocket(atom, vocab.CHAT.ChatSocketCompacted);
 }
 
 export function hasGroupSocket(atom) {
-  return hasSocket(atom, won.GROUP.GroupSocketCompacted);
+  return hasSocket(atom, vocab.GROUP.GroupSocketCompacted);
 }
 
 export function hasHoldableSocket(atom) {
-  return hasSocket(atom, won.HOLD.HoldableSocketCompacted);
+  return hasSocket(atom, vocab.HOLD.HoldableSocketCompacted);
 }
 
 export function hasHolderSocket(atom) {
-  return hasSocket(atom, won.HOLD.HolderSocketCompacted);
+  return hasSocket(atom, vocab.HOLD.HolderSocketCompacted);
 }
 
 export function hasReviewSocket(atom) {
-  return hasSocket(atom, won.REVIEW.ReviewSocketCompacted);
+  return hasSocket(atom, vocab.REVIEW.ReviewSocketCompacted);
 }
 
 export function hasBuddySocket(atom) {
-  return hasSocket(atom, won.BUDDY.BuddySocketCompacted);
+  return hasSocket(atom, vocab.BUDDY.BuddySocketCompacted);
 }
 
 export function hasSocket(atom, socket) {
@@ -295,11 +305,11 @@ export function hasSocket(atom, socket) {
 }
 
 export function getChatSocket(atom) {
-  return getSocketUri(atom, won.CHAT.ChatSocketCompacted);
+  return getSocketUri(atom, vocab.CHAT.ChatSocketCompacted);
 }
 
 export function getGroupSocket(atom) {
-  return getSocketUri(atom, won.GROUP.GroupSocketCompacted);
+  return getSocketUri(atom, vocab.GROUP.GroupSocketCompacted);
 }
 
 export function hasSuggestedConnections(atom) {
@@ -427,7 +437,7 @@ export function generateShortSocketLabels(atomImm) {
       // rename sockets
       // TODO: check if this can be used anywhere or whether it should be Group Chat Enabled
       .map(socket => {
-        if (socket === won.GROUP.GroupSocketCompacted) {
+        if (socket === vocab.GROUP.GroupSocketCompacted) {
           return labels.sockets[socket] ? labels.sockets[socket] : socket;
         }
         return "";
@@ -448,10 +458,10 @@ export function generateShortFlagLabels(atomImm) {
       // rename flags
       // TODO: flags should have explanatory hovertext
       .map(flag => {
-        if (flag === won.WONMATCH.NoHintForCounterpartCompacted) {
+        if (flag === vocab.WONMATCH.NoHintForCounterpartCompacted) {
           return labels.flags[flag] ? labels.flags[flag] : flag;
         }
-        if (flag === won.WONMATCH.NoHintForMeCompacted) {
+        if (flag === vocab.WONMATCH.NoHintForMeCompacted) {
           return labels.flags[flag] ? labels.flags[flag] : flag;
         }
         return "";
@@ -479,6 +489,10 @@ export function getSocketUri(atomImm, socketType) {
       .keySeq()
       .first()
   );
+}
+
+export function getSocketType(atomImm, socketUri) {
+  return getIn(atomImm, ["content", "sockets", socketUri]);
 }
 
 export function getDefaultSocketUri(atomImm) {
@@ -559,17 +573,17 @@ export function sortByDistanceFrom(atomsImm, location, order = "ASC") {
 function getSocketKeysReset(socketsImm) {
   return socketsImm.mapKeys((key, value) => {
     switch (value) {
-      case won.CHAT.ChatSocketCompacted:
+      case vocab.CHAT.ChatSocketCompacted:
         return "#chatSocket";
-      case won.GROUP.GroupSocketCompacted:
+      case vocab.GROUP.GroupSocketCompacted:
         return "#groupSocket";
-      case won.HOLD.HolderSocketCompacted:
+      case vocab.HOLD.HolderSocketCompacted:
         return "#holderSocket";
-      case won.HOLD.HoldableSocketCompacted:
+      case vocab.HOLD.HoldableSocketCompacted:
         return "#holdableSocket";
-      case won.REVIEW.ReviewSocketCompacted:
+      case vocab.REVIEW.ReviewSocketCompacted:
         return "#reviewSocket";
-      case won.BUDDY.BuddySocketCompacted:
+      case vocab.BUDDY.BuddySocketCompacted:
         return "#buddySocket";
       default:
         console.warn("Trying to reset an unknown socket: ", value);

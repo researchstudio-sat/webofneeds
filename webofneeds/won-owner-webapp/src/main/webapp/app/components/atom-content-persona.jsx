@@ -95,10 +95,8 @@ const mapDispatchToProps = dispatch => {
     showModalDialog: payload => {
       dispatch(actionCreators.view__showModalDialog(payload));
     },
-    personaDisconnect: (ownPersonaUri, theirPersonaUri) => {
-      dispatch(
-        actionCreators.personas__disconnect(ownPersonaUri, theirPersonaUri)
-      );
+    personaDisconnect: (holdsUri, holderUri) => {
+      dispatch(actionCreators.personas__disconnect(holdsUri, holderUri));
     },
   };
 };

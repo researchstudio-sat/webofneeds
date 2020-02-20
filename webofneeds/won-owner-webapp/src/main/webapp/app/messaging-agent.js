@@ -61,20 +61,12 @@ export function runMessagingAgent(redux) {
       if (message.isResponseToConnectMessage()) {
         if (message.isSuccessResponse()) {
           if (isFromRemote(redux, message)) {
-            console.debug(
-              "remoteSuccess for connect: ",
-              message.getIsResponseTo()
-            );
             // got the second success-response (from the remote-node) - 2nd ACK
             redux.dispatch(
               actionCreators.messages__connect__successRemote(message)
             );
             return true;
           } else {
-            console.debug(
-              "ownSuccess for connect: ",
-              message.getIsResponseTo()
-            );
             // got the first success-response (from our own node) - 1st ACK
             redux.dispatch(
               actionCreators.messages__connect__successOwn(message)
@@ -82,7 +74,6 @@ export function runMessagingAgent(redux) {
             return true;
           }
         } else if (message.isFailureResponse()) {
-          console.debug("Received Failure to Connect Message: ", message);
           redux.dispatch(actionCreators.messages__connect__failure(message));
           return true;
         }
@@ -93,20 +84,12 @@ export function runMessagingAgent(redux) {
       if (message.isResponseToConnectionMessage()) {
         if (message.isSuccessResponse()) {
           if (isFromRemote(redux, message)) {
-            console.debug(
-              "remoteSuccess for chatmsg: ",
-              message.getIsResponseTo()
-            );
             // got the second success-response (from the remote-node) - 2nd ACK
             redux.dispatch(
               actionCreators.messages__chatMessage__successRemote(message)
             );
             return true;
           } else {
-            console.debug(
-              "ownSuccess for chatmsg: ",
-              message.getIsResponseTo()
-            );
             // got the first success-response (from our own node) - 1st ACK
             redux.dispatch(
               actionCreators.messages__chatMessage__successOwn(message)
@@ -130,7 +113,7 @@ export function runMessagingAgent(redux) {
           return true;
         } else if (message.isFailureResponse()) {
           //Resend the failed close message
-          const connectionUri = message.getConnection();
+          const connectionUri = message.getConnection(); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           if (connectionUri) {
             console.warn("RESEND CLOSE MESSAGE FOR: ", connectionUri);
             redux.dispatch(actionCreators.connections__closeRemote(message));
@@ -218,7 +201,6 @@ export function runMessagingAgent(redux) {
     function(message) {
       /* Other clients or matcher initiated stuff: */
       if (message.isSocketHintMessage()) {
-        console.debug("Received SocketHint Message: ", message);
         redux.dispatch(
           actionCreators.messages__processSocketHintMessage(message)
         );
@@ -228,7 +210,6 @@ export function runMessagingAgent(redux) {
     },
     function(message) {
       if (message.isConnectMessage()) {
-        console.debug("Received Connect Message: ", message);
         redux.dispatch(actionCreators.messages__processConnectMessage(message));
         return true;
       }
@@ -236,7 +217,6 @@ export function runMessagingAgent(redux) {
     },
     function(message) {
       if (message.isConnectionMessage()) {
-        console.debug("Received Connection Message: ", message);
         redux.dispatch(
           actionCreators.messages__processConnectionMessage(message)
         );
@@ -246,7 +226,6 @@ export function runMessagingAgent(redux) {
     },
     function(message) {
       if (message.isChangeNotificationMessage()) {
-        console.debug("Received ChangeNotification Message: ", message);
         redux.dispatch(
           actionCreators.messages__processChangeNotificationMessage(message)
         );
@@ -256,7 +235,6 @@ export function runMessagingAgent(redux) {
     },
     function(message) {
       if (message.isCloseMessage()) {
-        console.debug("Received Close Message: ", message);
         redux.dispatch(actionCreators.messages__close__success(message));
         return true;
       }
@@ -271,7 +249,6 @@ export function runMessagingAgent(redux) {
     },
     function(message) {
       if (message.isFromSystem() && message.isCloseMessage()) {
-        console.debug("Received Close Message From System: ", message);
         redux.dispatch({
           type: actionTypes.messages.close.success,
           payload: message,
@@ -352,8 +329,6 @@ export function runMessagingAgent(redux) {
 
     Promise.all(promiseArray)
       .then(wonMessages => {
-        console.debug("## Received WS-Message:", wonMessages);
-
         wonMessages
           .filter(
             wonMessage =>
@@ -362,16 +337,6 @@ export function runMessagingAgent(redux) {
               !wonMessage.isFailureResponse()
           )
           .map(wonMessage => {
-            console.debug(
-              "##### Processing Message: ",
-              wonMessage.getMessageType(),
-              " - ",
-              wonMessage.getMessageUri(),
-              " - ",
-              wonMessage.getTextMessage(),
-              " -- ",
-              wonMessage
-            );
             let messageProcessed = false;
 
             //process message
@@ -383,6 +348,12 @@ export function runMessagingAgent(redux) {
             if (!messageProcessed) {
               console.warn(
                 "MESSAGE WASN'T PROCESSED DUE TO MISSING HANDLER FOR ITS TYPE: ",
+                wonMessage.getMessageType(),
+                " - ",
+                wonMessage.getMessageUri(),
+                " - ",
+                wonMessage.getTextMessage(),
+                " -- ",
                 wonMessage
               );
             }
@@ -395,14 +366,6 @@ export function runMessagingAgent(redux) {
               (wonMessage.isSuccessResponse() || wonMessage.isFailureResponse())
           )
           .map(wonMessage => {
-            console.debug(
-              "##### Processing Response Message: ",
-              wonMessage.getMessageType(),
-              " - ",
-              wonMessage.getMessageUri(),
-              " -- ",
-              wonMessage
-            );
             let messageProcessed = false;
 
             //process message
@@ -413,7 +376,15 @@ export function runMessagingAgent(redux) {
 
             if (!messageProcessed) {
               console.warn(
-                "MESSAGE WASN'T PROCESSED DUE TO MISSING HANDLER FOR ITS TYPE: ",
+                "RESPONSE MESSAGE WASN'T PROCESSED DUE TO MISSING HANDLER FOR ITS TYPE: ",
+                wonMessage.getMessageType(),
+                " - ",
+                wonMessage.getRespondingToMessageType(),
+                " - ",
+                wonMessage.getMessageUri(),
+                " - ",
+                wonMessage.getTextMessage(),
+                " -- ",
                 wonMessage
               );
             }

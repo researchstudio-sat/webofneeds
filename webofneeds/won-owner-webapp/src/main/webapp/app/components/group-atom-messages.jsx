@@ -9,7 +9,7 @@ import { getUnreadMessagesByConnectionUri } from "../redux/selectors/message-sel
 import { get, getIn } from "../utils";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
-import won from "../won-es6.js";
+import vocab from "../service/vocab.js";
 
 import "~/style/_group-atom-messages.scss";
 import "~/style/_rdflink.scss";
@@ -25,12 +25,12 @@ import * as viewSelectors from "../redux/selectors/view-selectors";
 
 const rdfTextfieldHelpText =
   "Expects valid turtle. " +
-  `<${won.WONMSG.uriPlaceholder.event}> will ` +
+  `<${vocab.WONMSG.uriPlaceholder.event}> will ` +
   "be replaced by the uri generated for this message. " +
   "Use it, so your TTL can be found when parsing the messages. " +
   "See `won.defaultTurtlePrefixes` " +
   "for prefixes that will be added automatically. E.g." +
-  `\`<${won.WONMSG.uriPlaceholder.event}> con:text "hello world!". \``;
+  `\`<${vocab.WONMSG.uriPlaceholder.event}> con:text "hello world!". \``;
 
 const mapStateToProps = (state, ownProps) => {
   const connectionUri = generalSelectors.getConnectionUriFromRoute(state);
@@ -153,15 +153,6 @@ const mapDispatchToProps = dispatch => {
     },
     closeConnection: connectionUri => {
       dispatch(actionCreators.connections__close(connectionUri));
-    },
-    connectAdHoc: (targetAtomUri, message, persona) => {
-      dispatch(
-        actionCreators.connections__connectAdHoc(
-          targetAtomUri,
-          message,
-          persona
-        )
-      );
     },
     showMoreMessages: (connectionUri, msgCount) => {
       dispatch(
@@ -369,9 +360,7 @@ class GroupAtomMessages extends React.Component {
             allowEmptySubmit={true}
             allowDetails={false}
             showPersonas={!this.props.connection}
-            onSubmit={({ value, selectedPersona }) =>
-              this.sendRequest(value, selectedPersona)
-            }
+            onSubmit={({ value }) => this.sendRequest(value)}
           />
           <WonLabelledHr className="gpm__footer__labelledhr" label="Or" />
           <button
@@ -460,34 +449,26 @@ class GroupAtomMessages extends React.Component {
     }
   }
 
-  sendRequest(message, persona) {
-    if (!this.props.connection) {
-      this.props.routerGoResetParams("connections");
-
-      if (this.props.targetAtomUri) {
-        this.props.connectAdHoc(this.props.targetAtomUri, message, persona);
-      }
-    } else {
-      this.props.rateConnection(
-        this.props.connectionUri,
-        won.WONCON.binaryRatingGood
-      );
-      this.props.connectSockets(
-        get(this.props.connection, "socketUri"),
-        get(this.props.connection, "targetSocketUri"),
-        message
-      );
-      this.props.routerGoCurrent({
-        connectionUri: this.props.connectionUri,
-      });
-    }
+  sendRequest(message) {
+    this.props.rateConnection(
+      this.props.connectionUri,
+      vocab.WONCON.binaryRatingGood
+    );
+    this.props.connectSockets(
+      get(this.props.connection, "socketUri"),
+      get(this.props.connection, "targetSocketUri"),
+      message
+    );
+    this.props.routerGoCurrent({
+      connectionUri: this.props.connectionUri,
+    });
   }
 
   closeConnection(rateBad = false) {
     if (rateBad) {
       this.props.rateConnection(
         get(this.props.connection, "uri"),
-        won.WONCON.binaryRatingBad
+        vocab.WONCON.binaryRatingBad
       );
     }
     this.props.closeConnection(get(this.props.connection, "uri"));
@@ -550,7 +531,6 @@ GroupAtomMessages.propTypes = {
   routerGoResetParams: PropTypes.func,
   hideAddMessageContent: PropTypes.func,
   sendChatMessage: PropTypes.func,
-  connectAdHoc: PropTypes.func,
   connectSockets: PropTypes.func,
   rateConnection: PropTypes.func,
   closeConnection: PropTypes.func,

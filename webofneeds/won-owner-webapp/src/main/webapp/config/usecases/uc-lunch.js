@@ -6,6 +6,7 @@ import {
 import { getIn } from "../../app/utils.js";
 import { Generator } from "sparqljs";
 import won from "../../app/service/won.js";
+import vocab from "../../app/service/vocab.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 
 window.SparqlGenerator4dbg = Generator;
@@ -22,10 +23,10 @@ export const lunchPlan = {
         title: "Let's go get lunch!",
         eventObjectAboutUris: "http://dbpedia.org/resource/Lunch",
         sockets: {
-          "#groupSocket": won.GROUP.GroupSocketCompacted,
-          "#holdableSocket": won.HOLD.HoldableSocketCompacted,
+          "#groupSocket": vocab.GROUP.GroupSocketCompacted,
+          "#holdableSocket": vocab.HOLD.HoldableSocketCompacted,
         },
-        defaultSocket: { "#groupSocket": won.GROUP.GroupSocketCompacted },
+        defaultSocket: { "#groupSocket": vocab.GROUP.GroupSocketCompacted },
       },
       seeks: {},
     }),
@@ -33,8 +34,8 @@ export const lunchPlan = {
   reactionUseCases: [
     {
       identifier: "lunchInterest",
-      senderSocketType: won.CHAT.ChatSocketCompacted,
-      targetSocketType: won.GROUP.GroupSocketCompacted,
+      senderSocketType: vocab.CHAT.ChatSocketCompacted,
+      targetSocketType: vocab.GROUP.GroupSocketCompacted,
     },
   ],
   details: {
@@ -116,15 +117,15 @@ export const lunchInterest = {
   enabledUseCases: [
     {
       identifier: "lunchPlan",
-      senderSocketType: won.GROUP.GroupSocketCompacted,
-      targetSocketType: won.CHAT.ChatSocketCompacted,
+      senderSocketType: vocab.GROUP.GroupSocketCompacted,
+      targetSocketType: vocab.CHAT.ChatSocketCompacted,
     },
   ],
   reactionUseCases: [
     {
       identifier: "lunchPlan",
-      senderSocketType: won.GROUP.GroupSocketCompacted,
-      targetSocketType: won.CHAT.ChatSocketCompacted,
+      senderSocketType: vocab.GROUP.GroupSocketCompacted,
+      targetSocketType: vocab.CHAT.ChatSocketCompacted,
     },
   ],
   details: {
