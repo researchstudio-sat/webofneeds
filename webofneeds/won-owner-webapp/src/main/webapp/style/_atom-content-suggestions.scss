@@ -14,6 +14,18 @@ won-atom-content-suggestions {
     grid-column: 1 / -1;
   }
 
+  & > .acs__listheader {
+    font-size: $normalFontSize;
+    font-weight: bold;
+    color: $won-primary-text-color;
+    grid-column: 1 / -1;
+    margin-top: 1.5rem;
+
+    &:first-of-type {
+      margin-top: 0;
+    }
+  }
+
   & > .acs__atom {
     border: $thinGrayBorder;
     background: $won-light-gray;

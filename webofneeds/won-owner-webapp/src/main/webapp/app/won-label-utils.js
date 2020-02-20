@@ -64,6 +64,26 @@ export const reactionLabels = Immutable.fromJS({
       [vocab.GROUP.GroupSocketCompacted]: "Invite to Group Chat",
     },
   },
+  suggestions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: "Chat Suggestions",
+      [vocab.GROUP.GroupSocketCompacted]: "Group Chat Suggestions",
+    },
+    [vocab.GROUP.GroupSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: "Suggestions for your Group Chat",
+      [vocab.GROUP.GroupSocketCompacted]:
+        "Group Chat Suggestions for your Group Chat",
+    },
+    [vocab.BUDDY.BuddySocketCompacted]: {
+      [vocab.BUDDY.BuddySocketCompacted]: "Buddy Suggestions",
+    },
+    [vocab.HOLD.HolderSocketCompacted]: {
+      [vocab.HOLD.HoldableSocketCompacted]: "Holdable Suggestions",
+    },
+    [vocab.HOLD.HoldableSocketCompacted]: {
+      [vocab.HOLD.HolderSocketCompacted]: "Holder Suggestions",
+    },
+  },
 });
 
 /**

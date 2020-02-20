@@ -9,6 +9,7 @@ import {
   getAtoms,
 } from "./general-selectors.js";
 import * as connectionUtils from "../utils/connection-utils.js";
+import * as atomUtils from "../utils/atom-utils.js";
 import vocab from "../../service/vocab.js";
 import { get, getIn } from "../../utils.js";
 import * as processUtils from "../utils/process-utils.js";
@@ -68,6 +69,28 @@ export function getSuggestedConnectionsByAtomUri(state, atomUri) {
   return connections
     ? connections.filter(conn => connectionUtils.isSuggested(conn))
     : Immutable.Map();
+}
+
+export function getCategorizedSuggestedConnectionsByAtomUri(state, atomUri) {
+  const atoms = getAtoms(state);
+  const suggestedConnections = getSuggestedConnectionsByAtomUri(state, atomUri);
+  const categorizedConnections = {};
+
+  suggestedConnections.map(conn => {
+    const { senderSocketType, targetSocketType } = getSocketTypes(atoms, conn);
+
+    if (
+      categorizedConnections[senderSocketType] &&
+      categorizedConnections[senderSocketType][targetSocketType]
+    ) {
+      categorizedConnections[senderSocketType][targetSocketType].push(conn);
+    } else {
+      categorizedConnections[senderSocketType] = {};
+      categorizedConnections[senderSocketType][targetSocketType] = [conn];
+    }
+  });
+
+  return Immutable.fromJS(categorizedConnections);
 }
 
 /**
@@ -223,11 +246,14 @@ export function hasMessagesToLoad(state, connUri) {
  * @returns {boolean}
  */
 export function isChatToChatConnection(allAtoms, connection) {
-  const { socket, targetSocket } = getSockets(allAtoms, connection);
+  const { senderSocketType, targetSocketType } = getSocketTypes(
+    allAtoms,
+    connection
+  );
 
   return (
-    socket === vocab.CHAT.ChatSocketCompacted &&
-    targetSocket === vocab.CHAT.ChatSocketCompacted
+    senderSocketType === vocab.CHAT.ChatSocketCompacted &&
+    targetSocketType === vocab.CHAT.ChatSocketCompacted
   );
 }
 
@@ -238,11 +264,14 @@ export function isChatToChatConnection(allAtoms, connection) {
  * @returns {boolean}
  */
 export function isBuddyConnection(allAtoms, connection) {
-  const { socket, targetSocket } = getSockets(allAtoms, connection);
+  const { senderSocketType, targetSocketType } = getSocketTypes(
+    allAtoms,
+    connection
+  );
 
   return (
-    socket === vocab.BUDDY.BuddySocketCompacted &&
-    targetSocket === vocab.BUDDY.BuddySocketCompacted
+    senderSocketType === vocab.BUDDY.BuddySocketCompacted &&
+    targetSocketType === vocab.BUDDY.BuddySocketCompacted
   );
 }
 
@@ -253,11 +282,14 @@ export function isBuddyConnection(allAtoms, connection) {
  * @returns {boolean}
  */
 export function isChatToGroupConnection(allAtoms, connection) {
-  const { socket, targetSocket } = getSockets(allAtoms, connection);
+  const { senderSocketType, targetSocketType } = getSocketTypes(
+    allAtoms,
+    connection
+  );
 
   return (
-    socket === vocab.CHAT.ChatSocketCompacted &&
-    targetSocket === vocab.GROUP.GroupSocketCompacted
+    senderSocketType === vocab.CHAT.ChatSocketCompacted &&
+    targetSocketType === vocab.GROUP.GroupSocketCompacted
   );
 }
 
@@ -268,11 +300,14 @@ export function isChatToGroupConnection(allAtoms, connection) {
  * @returns {boolean}
  */
 export function isGroupToChatConnection(allAtoms, connection) {
-  const { socket, targetSocket } = getSockets(allAtoms, connection);
+  const { senderSocketType, targetSocketType } = getSocketTypes(
+    allAtoms,
+    connection
+  );
 
   return (
-    socket === vocab.GROUP.GroupSocketCompacted &&
-    targetSocket === vocab.CHAT.ChatSocketCompacted
+    senderSocketType === vocab.GROUP.GroupSocketCompacted &&
+    targetSocketType === vocab.CHAT.ChatSocketCompacted
   );
 }
 
@@ -283,11 +318,14 @@ export function isGroupToChatConnection(allAtoms, connection) {
  * @returns {boolean}
  */
 export function isGroupToGroupConnection(allAtoms, connection) {
-  const { socket, targetSocket } = getSockets(allAtoms, connection);
+  const { senderSocketType, targetSocketType } = getSocketTypes(
+    allAtoms,
+    connection
+  );
 
   return (
-    socket === vocab.GROUP.GroupSocketCompacted &&
-    targetSocket === vocab.GROUP.GroupSocketCompacted
+    senderSocketType === vocab.GROUP.GroupSocketCompacted &&
+    targetSocketType === vocab.GROUP.GroupSocketCompacted
   );
 }
 
@@ -321,24 +359,25 @@ export function isChatToXConnection(allAtoms, connection) {
  * Retrieves the used sockets of the given connection
  * @param allAtoms
  * @param connection
- * @returns {{socket, targetSocket}}
+ * @returns {{senderSocketType, targetSocketType}}
  */
-function getSockets(allAtoms, connection) {
-  let socket = undefined;
-  let targetSocket = undefined;
+function getSocketTypes(allAtoms, connection) {
+  let senderSocketType = undefined;
+  let targetSocketType = undefined;
 
   if (connection && allAtoms) {
-    const socketUri = get(connection, "socketUri");
+    const senderSocketUri = get(connection, "socketUri");
     const targetSocketUri = get(connection, "targetSocketUri");
 
-    if (socketUri && targetSocketUri) {
-      const atom =
+    if (senderSocketUri && targetSocketUri) {
+      const senderAtom =
         allAtoms &&
         allAtoms.find(atom =>
           getIn(atom, ["connections", get(connection, "uri")])
         );
-      socket = getIn(atom, ["content", "sockets", socketUri]);
-      targetSocket = getIn(allAtoms, [
+
+      senderSocketType = atomUtils.getSocketType(senderAtom, senderSocketUri);
+      targetSocketType = getIn(allAtoms, [
         get(connection, "targetAtomUri"),
         "content",
         "sockets",
@@ -346,10 +385,10 @@ function getSockets(allAtoms, connection) {
       ]);
 
       // Uncomment lines below for verbose debug output
-      // if (socket && targetSocket) {
+      // if (senderSocketType && targetSocketType) {
       //  console.debug(get(connection, "uri"), ":", socket, "-->", targetSocket);
       //}
     }
   }
-  return { socket, targetSocket };
+  return { senderSocketType, targetSocketType };
 }
