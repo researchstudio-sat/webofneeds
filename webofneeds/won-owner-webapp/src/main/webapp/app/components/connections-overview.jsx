@@ -160,7 +160,9 @@ class WonConnectionsOverview extends React.Component {
       const connNotConnected = !connectionUtils.isConnected(connection);
 
       if (connUnread && connNotConnected) {
-        this.props.connectionMarkAsRead(connectionUri, get(atom, "uri"));
+        setTimeout(() => {
+          this.props.connectionMarkAsRead(connectionUri, get(atom, "uri"));
+        }, 1500);
       }
     }
   }
