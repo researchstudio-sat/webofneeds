@@ -295,7 +295,7 @@ class WonAtomContentBuddies extends React.Component {
           }
         });
       } else {
-        buddies = <div className="acp__empty">No Buddies present.</div>;
+        buddies = <div className="acb__empty">No Buddies present.</div>;
       }
 
       return (
@@ -341,7 +341,7 @@ class WonAtomContentBuddies extends React.Component {
           );
         });
       } else {
-        buddies = <div className="acp__empty">No Buddies present.</div>;
+        buddies = <div className="acb__empty">No Buddies present.</div>;
       }
 
       return <won-atom-content-buddies>{buddies}</won-atom-content-buddies>;
@@ -494,7 +494,9 @@ class WonAtomContentBuddies extends React.Component {
 
   markAsRead(conn) {
     if (connectionUtils.isUnread(conn)) {
-      this.props.connectionMarkAsRead(get(conn, "uri"), this.props.atomUri);
+      setTimeout(() => {
+        this.props.connectionMarkAsRead(get(conn, "uri"), this.props.atomUri);
+      }, 1500);
     }
   }
 }

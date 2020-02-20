@@ -455,7 +455,9 @@ class WonAtomContentParticipants extends React.Component {
 
   markAsRead(conn) {
     if (connectionUtils.isUnread(conn)) {
-      this.props.connectionMarkAsRead(get(conn, "uri"), this.props.atomUri);
+      setTimeout(() => {
+        this.props.connectionMarkAsRead(get(conn, "uri"), this.props.atomUri);
+      }, 1500);
     }
   }
 }
