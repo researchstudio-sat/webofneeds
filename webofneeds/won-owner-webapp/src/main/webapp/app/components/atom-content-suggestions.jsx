@@ -22,16 +22,6 @@ const mapStateToProps = (state, ownProps) => {
     ownProps.atomUri
   );
 
-  categorizedSuggestions &&
-    console.debug(
-      "categorizedSuggestions: ",
-      categorizedSuggestions,
-      "state:",
-      state,
-      "atomUri:",
-      ownProps.atomUri
-    );
-
   return {
     atomUri: ownProps.atomUri,
     hasSuggestions: categorizedSuggestions && categorizedSuggestions.size > 0,
