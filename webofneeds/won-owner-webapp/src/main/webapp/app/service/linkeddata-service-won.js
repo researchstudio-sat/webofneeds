@@ -19,9 +19,7 @@
  */
 import { is, clone, getIn, get } from "../utils.js";
 
-import { ownerBaseUrl } from "~/config/default.js";
-import urljoin from "url-join";
-
+import * as ownerApi from "../api/owner-api.js";
 import rdfstore from "../../scripts/rdfstore-js/rdf_store.js";
 import jsonld from "jsonld/dist/jsonld.js";
 import won from "./won.js";
@@ -32,85 +30,6 @@ import vocab from "./vocab.js";
   const NEWLINE_REPLACEMENT_PATTERN = /#%§%#§/gm;
   const DOUBLEQUOTE_REPLACEMENT_STRING = "§#%§%#";
   const DOUBLEQUOTE_REPLACEMENT_PATTERN = /§#%§%#/gm;
-  /**
-   * paging parameters as found
-   * [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
-   * @type {string[]}
-   */
-  const legitQueryParameters = [
-    "p",
-    "resumebefore",
-    "resumeafter",
-    "type",
-    "state",
-    "timeof",
-    "deep",
-  ];
-
-  /**
-   * taken from: https://esdiscuss.org/topic/es6-iteration-over-object-values
-   *
-   * example usage:
-   *
-   * ```javascript
-   * for (let [key, value] of entries(o)) {
-   *   console.log(key, ' --> ', value)
-   * }
-   * ```
-   * @param obj the object to generate a (key,value)-pair iterator for
-   */
-  function* entries(obj) {
-    for (let key of Object.keys(obj)) {
-      yield [key, obj[key]];
-    }
-  }
-
-  /**
-   * This function is used to generate the query-strings.
-   * Should anything about the way the API is accessed changed,
-   * adapt this function.
-   * @param dataUri
-   * @param queryParams a config object whose fields get appended as get parameters.
-   *     important parameters include:
-   *         * requesterWebId: the WebID used to access the ressource (used
-   *                 by the owner-server to pick the right key-pair)
-   *         * deep: 'true' to automatically resolve containers (e.g.
-   *                 the message-container)
-   *         * paging parameters as found
-   *           [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
-   * @returns {string}
-   */
-  function queryString(dataUri, queryParams = {}) {
-    let queryOnOwner = urljoin(ownerBaseUrl, "/rest/linked-data/") + "?";
-
-    if (queryParams.requesterWebId) {
-      queryOnOwner +=
-        "requester=" + encodeURIComponent(queryParams.requesterWebId) + "&";
-    }
-
-    // The owner hands this part -- the one in the `uri=` paramater -- directly to the node.
-    let firstParam = true;
-    let queryOnNode = dataUri;
-
-    const contains = (arr, el) => {
-      return arr.indexOf(el) > 0;
-    };
-
-    for (let [paramName, paramValue] of entries(queryParams)) {
-      if (contains(legitQueryParameters, paramName)) {
-        queryOnNode = queryOnNode + (firstParam ? "?" : "&");
-        firstParam = false;
-        queryOnNode = queryOnNode + paramName + "=" + paramValue;
-      }
-    }
-
-    let query = queryOnOwner + "uri=" + encodeURIComponent(queryOnNode);
-
-    // server can't resolve uri-encoded colons. revert the encoding done in `queryString`.
-    query = query.replace(new RegExp("%3A", "g"), ":");
-
-    return query;
-  }
 
   const privateData = {};
 
@@ -458,7 +377,7 @@ import vocab from "./vocab.js";
    * @param fetchParams: optional paramters
    *        * requesterWebId: the WebID used to access the ressource (used
    *            by the owner-server to pick the right key-pair)
-   *        * queryParams: GET-params as documented for `queryString`
+   *        * queryParams: GET-params as documented for ownerApi.js `queryString`
    *        * pagingSize: if specified the server will return the first
    *            page (unless e.g. `queryParams.p=2` is specified when
    *            it will return the second page of size N)
@@ -468,6 +387,13 @@ import vocab from "./vocab.js";
     if (!uri) {
       throw { message: "ensureLoaded: uri must not be null" };
     }
+
+    console.debug(
+      "called won.ensureLoaded: ",
+      uri,
+      "fetchParams: ",
+      fetchParams
+    );
 
     //we allow suppressing the fetch - this is used when the data to be accessed is
     //known to be present in the local store
@@ -482,7 +408,21 @@ import vocab from "./vocab.js";
          * usually be accessed using some sort of paging, we skip them here
          * and thus always reload them.
          */
-    const partialFetch = fetchesPartialRessource(fetchParams);
+    let isPartialFetch;
+
+    if (fetchParams.pagingSize) {
+      isPartialFetch = true;
+    } else {
+      const qp = fetchParams.queryParams || fetchParams;
+      isPartialFetch = !!(
+        qp["p"] ||
+        qp["resumebefore"] ||
+        qp["resumeafter"] ||
+        qp["type"] ||
+        qp["state"] ||
+        qp["timeof"]
+      );
+    }
 
     // we might not even need to aquire a lock, if another call to ensureLoaded
     // has already finished.
@@ -503,14 +443,41 @@ import vocab from "./vocab.js";
       } else {
         // ok, we actually need to load the resource
         cacheItemMarkFetching(uri);
-        const dataset = await loadFromOwnServerIntoCache(
-          uri,
-          fetchParams,
-          true
-        );
+        const dataset = await ownerApi
+          .getJsonLdDataset(uri, fetchParams)
+          .then(
+            dataset =>
+              //make sure we've got a non-empty dataset
+              Object.keys(dataset).length === 0
+                ? Promise.reject(
+                    "failed to load " +
+                      uri +
+                      ": Object.keys(dataset).length == 0"
+                  )
+                : dataset
+          )
+          .then(dataset =>
+            Promise.resolve()
+              .then(() => {
+                if (!isPartialFetch) {
+                  /* as paging is only used for containers
+                         * and they don't lose entries, we can
+                         * simply merge on top of the already
+                         * loaded triples below. So we skip removing
+                         * the previously loaded data. For everything
+                         * remove any remaining stale data: */
+                  return won.deleteDocumentFromStore(uri, true);
+                }
+              })
+              .then(() =>
+                won.addJsonLdData(dataset, uri, get(fetchParams, "deep"))
+              )
+              .then(() => dataset)
+          )
+          .catch(e => rethrow(e, `failed to load ${uri} due to reason: `));
 
         if (!get(fetchParams, "deep")) {
-          cacheItemInsertOrOverwrite(uri, partialFetch);
+          cacheItemInsertOrOverwrite(uri, isPartialFetch);
           return uri;
         } else {
           const allLoadedResources = await selectLoadedDocumentUrisFromDataset(
@@ -525,7 +492,7 @@ import vocab from "./vocab.js";
                             */
             cacheItemInsertOrOverwrite(
               resourceUri,
-              partialFetch && resourceUri === uri
+              isPartialFetch && resourceUri === uri
             );
           });
           return allLoadedResources;
@@ -537,22 +504,6 @@ import vocab from "./vocab.js";
       lock.releaseUpdateLock();
     }
   };
-
-  function fetchesPartialRessource(requestParams) {
-    if (requestParams.pagingSize) {
-      return true;
-    } else {
-      const qp = requestParams.queryParams || requestParams;
-      return !!(
-        qp["p"] ||
-        qp["resumebefore"] ||
-        qp["resumeafter"] ||
-        qp["type"] ||
-        qp["state"] ||
-        qp["timeof"]
-      );
-    }
-  }
 
   /**
    * When you have loaded multiple documents via `deep=true`,
@@ -685,74 +636,6 @@ import vocab from "./vocab.js";
     );
 
     return mappings;
-  }
-
-  /**
-   *
-   * @param uri the uri of the ressource
-   * @param params: optional paramters
-   *        * requesterWebId: the WebID used to access the ressource (used
-   *            by the owner-server to pick the right key-pair)
-   *        * queryParams: GET-params as documented for `queryString`
-   *        * pagingSize: if specified the server will return the first
-   *            page (unless e.g. `queryParams.p=2` is specified when
-   *            it will return the second page of size N)
-   * @param removeCacheItem
-   * @return {Promise}
-   */
-  function loadFromOwnServerIntoCache(uri, params, removeCacheItem = false) {
-    let requestUri = queryString(uri, params);
-
-    return fetch(requestUri, {
-      method: "get",
-      credentials: "same-origin",
-      headers: {
-        Accept: "application/ld+json",
-        Prefer: params.pagingSize
-          ? `return=representation; max-member-count="${params.pagingSize}"`
-          : undefined,
-      },
-    })
-      .then(response => {
-        if (response.status === 200) return response;
-        else {
-          let error = new Error(
-            `${response.status} - ${
-              response.statusText
-            } for request ${uri}, ${JSON.stringify(params)}`
-          );
-
-          error.response = response;
-          throw error;
-        }
-      })
-      .then(dataset => dataset.json())
-      .then(
-        dataset =>
-          //make sure we've got a non-empty dataset
-          Object.keys(dataset).length === 0
-            ? Promise.reject(
-                "failed to load " + uri + ": Object.keys(dataset).length == 0"
-              )
-            : dataset
-      )
-      .then(dataset =>
-        Promise.resolve()
-          .then(() => {
-            if (!fetchesPartialRessource(params)) {
-              /* as paging is only used for containers
-                     * and they don't lose entries, we can
-                     * simply merge on top of the already
-                     * loaded triples below. So we skip removing
-                     * the previously loaded data. For everything
-                     * remove any remaining stale data: */
-              won.deleteDocumentFromStore(uri, removeCacheItem);
-            }
-          })
-          .then(() => won.addJsonLdData(dataset, uri, get(params, "deep")))
-          .then(() => dataset)
-      )
-      .catch(e => rethrow(e, `failed to load ${uri} due to reason: `));
   }
 
   /**
