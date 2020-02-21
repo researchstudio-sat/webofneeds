@@ -271,29 +271,31 @@ class CreateAtom extends React.Component {
     }
 
     if (this.props.showCreateInput) {
-      const createContentFragment = this.props.useCase.details && (
-        <React.Fragment>
-          <div className="cp__content__branchheader">
-            Your offer or self description
-          </div>
-          <WonCreateIsSeeks
-            detailList={this.props.useCase.details}
-            initialDraft={this.props.useCase.draft.content}
-            onUpdate={this.updateDraftContent}
-          />
-        </React.Fragment>
-      );
+      const createContentFragment = this.props.useCase.details &&
+        Object.keys(this.props.useCase.details).length > 0 && (
+          <React.Fragment>
+            <div className="cp__content__branchheader">
+              Your offer or self description
+            </div>
+            <WonCreateIsSeeks
+              detailList={this.props.useCase.details}
+              initialDraft={this.props.useCase.draft.content}
+              onUpdate={this.updateDraftContent}
+            />
+          </React.Fragment>
+        );
 
-      const createSeeksFragment = this.props.useCase.seeksDetails && (
-        <React.Fragment>
-          <div className="cp__content__branchheader">Looking For</div>
-          <WonCreateIsSeeks
-            detailList={this.props.useCase.seeksDetails}
-            initialDraft={this.props.useCase.draft.seeks}
-            onUpdate={this.updateDraftSeeks}
-          />
-        </React.Fragment>
-      );
+      const createSeeksFragment = this.props.useCase.seeksDetails &&
+        Object.keys(this.props.useCase.seeksDetails).length > 0 && (
+          <React.Fragment>
+            <div className="cp__content__branchheader">Looking For</div>
+            <WonCreateIsSeeks
+              detailList={this.props.useCase.seeksDetails}
+              initialDraft={this.props.useCase.draft.seeks}
+              onUpdate={this.updateDraftSeeks}
+            />
+          </React.Fragment>
+        );
 
       return (
         <won-create-atom>

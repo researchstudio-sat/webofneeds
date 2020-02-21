@@ -276,6 +276,13 @@ export function addMessage(
                     .setIn(["data", "isReceivedByRemote"], isReceivedByRemote);
                 }
 
+                forwardMessage = forwardMessage.setIn(
+                  ["data", "unread"],
+                  !wonMessage.isAtomHintMessage() &&
+                    !wonMessage.isSocketHintMessage() &&
+                    !isUriRead(getIn(parsedMessage, ["data", "uri"]))
+                );
+
                 messages = messages.set(
                   forwardMessage.getIn(["data", "uri"]),
                   forwardMessage.get("data")
