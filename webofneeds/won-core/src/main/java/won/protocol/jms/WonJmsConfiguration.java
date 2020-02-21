@@ -31,7 +31,6 @@ public class WonJmsConfiguration extends JmsConfiguration {
         setAsyncConsumer(true); // this may improve performance for most cases, but it bites us in the
         // registration situation, when we actually want to get a result from the
         // wonnode.
-
         logger.info("default jms configuration setup done");
     }
 
