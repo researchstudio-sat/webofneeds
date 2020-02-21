@@ -39,26 +39,32 @@
               <policyEntries>
               	<!-- producer flow control causes congestion in our setting. disable and discard pending messages -->
               	<!-- decided after reviewing https://access.redhat.com/documentation/en-US/Fuse_ESB_Enterprise/7.1/html-single/ActiveMQ_Tuning_Guide/index.html -->
-              	<policyEntry topic=">" producerFlowControl="false" memoryLimit="5mb" optimizedDispatch="true" queuePrefetch="1">
+              	<policyEntry topic=">" producerFlowControl="false" memoryLimit="10mb" optimizedDispatch="true" queuePrefetch="1">
               		<pendingMessageLimitStrategy>
                     	<constantPendingMessageLimitStrategy limit="10"/>
                   	</pendingMessageLimitStrategy>
+                  	<!-- 
+			           Tell the dead letter strategy not to process expired messages
+		    	       so that they will just be discarded instead of being sent to
+			           the DLQ
+			         -->
+			         <deadLetterStrategy>
+						<sharedDeadLetterStrategy processExpired="false"/>
+			         </deadLetterStrategy>
               	</policyEntry>
-              	<policyEntry queue=">" producerFlowControl="false" memoryLimit="5mb" optimizedDispatch="true" queuePrefetch="1">
+              	<policyEntry queue=">" producerFlowControl="false" memoryLimit="10mb" optimizedDispatch="true" queuePrefetch="1">
               		<pendingMessageLimitStrategy>
                     	<constantPendingMessageLimitStrategy limit="10"/> 
                   	</pendingMessageLimitStrategy>
-              	</policyEntry>
-                	<policyEntry queue=">">
-						<!-- 
+                  	<!-- 
 				           Tell the dead letter strategy not to process expired messages
 				           so that they will just be discarded instead of being sent to
-				           the DLQ 
+				           the DLQ
 				         -->
-				         <deadLetterStrategy>
-							<sharedDeadLetterStrategy processExpired="false" />
-				         </deadLetterStrategy>
-		       		</policyEntry>
+			         <deadLetterStrategy>
+						<sharedDeadLetterStrategy processExpired="false"/>
+			         </deadLetterStrategy>
+              	</policyEntry>
             	</policyEntries>
             </policyMap>
         </destinationPolicy>

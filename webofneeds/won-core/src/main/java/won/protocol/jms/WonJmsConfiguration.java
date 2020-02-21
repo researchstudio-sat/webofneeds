@@ -22,15 +22,16 @@ public class WonJmsConfiguration extends JmsConfiguration {
     public void configureDefaultJmsConfiguration() {
         // setDisableTimeToLive(true);
         // setRequestTimeout(0);
-        setAsyncConsumer(true); // this may improve performance for most cases, but it bites us in the
-                                // registration situation, when we actually want to get a result from the
-                                // wonnode.
         setDeliveryPersistent(false);
         setAcknowledgementModeName("DUPS_OK_ACKNOWLEDGE"); // make each consumer explicitly acknowledge each message
         setDisableReplyTo(true);
         setExplicitQosEnabled(true); // required for the TTL to have an effect
         setTimeToLive(10);
         setTransacted(false);
+        setAsyncConsumer(true); // this may improve performance for most cases, but it bites us in the
+        // registration situation, when we actually want to get a result from the
+        // wonnode.
+
         logger.info("default jms configuration setup done");
     }
 
