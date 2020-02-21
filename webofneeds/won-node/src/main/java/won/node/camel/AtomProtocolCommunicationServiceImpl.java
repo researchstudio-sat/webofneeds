@@ -10,17 +10,22 @@
  */
 package won.node.camel;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import won.cryptography.service.RegistrationClient;
 import won.cryptography.service.RegistrationRestClientHttps;
 import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.jms.*;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
+import won.protocol.jms.ActiveMQService;
+import won.protocol.jms.AtomProtocolCamelConfigurator;
+import won.protocol.jms.AtomProtocolCommunicationService;
+import won.protocol.jms.CamelConfiguration;
+import won.protocol.jms.CamelConfigurator;
 
 /**
  * User: syim Date: 27.01.14
@@ -65,6 +70,8 @@ public class AtomProtocolCommunicationServiceImpl implements AtomProtocolCommuni
                             atomProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
             ActiveMQComponent activeMQComponent = (ActiveMQComponent) atomProtocolCamelConfigurator.getCamelContext()
                             .getComponent(atomProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
+            activeMQComponent.setTransacted(false);
+            activeMQComponent.setUsePooledConnection(true);
             logger.info("ActiveMQ Service Status : {}", activeMQComponent.getStatus().toString());
             activeMQComponent.start();
         }

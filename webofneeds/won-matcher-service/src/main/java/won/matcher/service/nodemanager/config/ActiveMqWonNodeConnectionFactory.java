@@ -1,16 +1,22 @@
 package won.matcher.service.nodemanager.config;
 
-import akka.actor.ActorRef;
-import akka.actor.Props;
-import akka.actor.UntypedActorContext;
-import akka.camel.Camel;
-import akka.camel.CamelExtension;
+import java.util.UUID;
+
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.TrustManager;
+
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQSslConnectionFactory;
 import org.apache.camel.FailedToCreateConsumerException;
 import org.apache.camel.component.jms.JmsComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import akka.actor.ActorRef;
+import akka.actor.Props;
+import akka.actor.UntypedActorContext;
+import akka.camel.Camel;
+import akka.camel.CamelExtension;
 import won.cryptography.ssl.MessagingContext;
 import won.matcher.service.common.spring.SpringExtension;
 import won.matcher.service.nodemanager.actor.AtomConsumerProtocolActor;
@@ -18,10 +24,6 @@ import won.matcher.service.nodemanager.actor.HintProducerProtocolActor;
 import won.matcher.service.nodemanager.pojo.WonNodeConnection;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.vocabulary.WON;
-
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.TrustManager;
-import java.util.UUID;
 
 /**
  * Factory for creating a
@@ -62,7 +64,8 @@ public class ActiveMqWonNodeConnectionFactory {
         Camel camel = CamelExtension.get(context.system());
         camel.context().addComponent(componentName, JmsComponent.jmsComponent(connectionFactory));
         // create the actors that receive the messages (atom events)
-        String createdComponent = componentName + ":topic:" + createdTopic + "?testConnectionOnStartup=false";
+        String createdComponent = componentName + ":topic:" + createdTopic
+                        + "?testConnectionOnStartup=false&transacted=false";
         Props createdProps = SpringExtension.SpringExtProvider.get(context.system())
                         .props(AtomConsumerProtocolActor.class, createdComponent);
         ActorRef created = context.actorOf(createdProps, "ActiveMqAtomCreatedConsumerProtocolActor-" + uuid);
@@ -70,7 +73,8 @@ public class ActiveMqWonNodeConnectionFactory {
                         wonNodeInfo.getWonNodeURI());
         ActorRef activated = created;
         if (!activatedTopic.equals(createdTopic)) {
-            String activatedComponent = componentName + ":topic:" + activatedTopic + "?testConnectionOnStartup=false";
+            String activatedComponent = componentName + ":topic:" + activatedTopic
+                            + "?testConnectionOnStartup=false&transacted=false";
             Props activatedProps = SpringExtension.SpringExtProvider.get(context.system())
                             .props(AtomConsumerProtocolActor.class, activatedComponent);
             activated = context.actorOf(activatedProps, "ActiveMqAtomActivatedConsumerProtocolActor-" + uuid);
@@ -84,7 +88,7 @@ public class ActiveMqWonNodeConnectionFactory {
             deactivated = activated;
         } else {
             String deactivatedComponent = componentName + ":topic:" + deactivatedTopic
-                            + "?testConnectionOnStartup=false";
+                            + "?testConnectionOnStartup=false&transacted=false";
             Props deactivatedProps = SpringExtension.SpringExtProvider.get(context.system())
                             .props(AtomConsumerProtocolActor.class, deactivatedComponent);
             deactivated = context.actorOf(deactivatedProps, "ActiveMqAtomDeactivatedConsumerProtocolActor-" + uuid);
@@ -92,7 +96,7 @@ public class ActiveMqWonNodeConnectionFactory {
                             wonNodeInfo.getWonNodeURI());
         }
         // create the actor that sends messages (hint events)
-        String hintComponent = componentName + ":queue:" + hintQueue;
+        String hintComponent = componentName + ":queue:" + hintQueue + "?transacted=false";
         Props hintProps = SpringExtension.SpringExtProvider.get(context.system()).props(HintProducerProtocolActor.class,
                         hintComponent, null);
         ActorRef hintProducer = context.actorOf(hintProps, "ActiveMqHintProducerProtocolActor-" + uuid);

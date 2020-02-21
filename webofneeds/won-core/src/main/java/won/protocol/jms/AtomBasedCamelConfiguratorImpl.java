@@ -10,20 +10,22 @@
  */
 package won.protocol.jms;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
 import org.apache.camel.RoutesBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+
 import won.cryptography.ssl.MessagingContext;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.model.MessagingType;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
 
 // import won.node.camel.routes.AtomProtocolDynamicRoutes;
 /**
@@ -68,6 +70,8 @@ public abstract class AtomBasedCamelConfiguratorImpl implements AtomProtocolCame
         if (camelContext.getComponent(brokerComponentName) == null) {
             activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent(brokerUri,
                             MessagingType.Queue, messagingContext);
+            activeMQComponent.setTransacted(false);
+            activeMQComponent.setUsePooledConnection(true);
             logger.info("adding activemqComponent for brokerUri {}", brokerUri);
             camelContext.addComponent(brokerComponentName, activeMQComponent);
             try {

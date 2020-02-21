@@ -91,6 +91,8 @@ public class BrokerComponentFactory {
         }
         ActiveMQComponent activeMQComponent = ActiveMQComponent.activeMQComponent();
         activeMQComponent.setConfiguration(jmsConfiguration);
+        activeMQComponent.setTransacted(false);
+        activeMQComponent.setUsePooledConnection(true);
         return activeMQComponent;
     }
 
