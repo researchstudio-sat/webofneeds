@@ -1,16 +1,23 @@
 package won.matcher.protocol.impl;
 
-import org.apache.activemq.camel.component.ActiveMQComponent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import won.cryptography.service.RegistrationRestClientHttps;
-import won.protocol.exception.CamelConfigurationFailedException;
-import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.jms.*;
-
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.Set;
+
+import org.apache.activemq.camel.component.ActiveMQComponent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import won.cryptography.service.RegistrationRestClientHttps;
+import won.protocol.exception.CamelConfigurationFailedException;
+import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.jms.ActiveMQService;
+import won.protocol.jms.AtomProtocolCamelConfigurator;
+import won.protocol.jms.CamelConfiguration;
+import won.protocol.jms.CamelConfigurator;
+import won.protocol.jms.MatcherActiveMQService;
+import won.protocol.jms.MatcherProtocolCamelConfigurator;
+import won.protocol.jms.MatcherProtocolCommunicationService;
 
 /**
  * User: ypanchenko Date: 02.09.2015
@@ -60,6 +67,8 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
             ActiveMQComponent activeMQComponent = (ActiveMQComponent) matcherProtocolCamelConfigurator.getCamelContext()
                             .getComponent(matcherProtocolCamelConfigurator
                                             .getBrokerComponentNameWithBrokerUri(brokerUri));
+            activeMQComponent.setTransacted(false);
+            activeMQComponent.setUsePooledConnection(true);
             logger.info("ActiveMQ Service Status : {}", activeMQComponent.getStatus().toString());
             activeMQComponent.start();
         }

@@ -32,7 +32,8 @@ public class Matcher2NodeDynamicRoutes extends RouteBuilder {
 
     @Override
     public void configure() {
-        from("seda:MatcherProtocol.Out.Hint?concurrentConsumers=2").routeId("Matcher2NodeRoute")
+        from("seda:MatcherProtocol.Out.Hint?concurrentConsumers=2&transacted=false&usePooledConnection=true")
+                        .routeId("Matcher2NodeRoute")
                         .recipientList(header(WonCamelConstants.REMOTE_BROKER_ENDPOINT_HEADER));
     }
 }

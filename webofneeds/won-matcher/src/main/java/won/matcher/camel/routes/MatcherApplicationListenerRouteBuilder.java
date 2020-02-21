@@ -38,7 +38,7 @@ public class MatcherApplicationListenerRouteBuilder extends RouteBuilder {
         while (iter.hasNext())
             for (int i = 0; i < endpoints.size(); i++) {
                 String endpoint = "activemq" + remoteEndpoint.toString().replaceAll("[/:]", "") + ":topic:"
-                                + iter.next();
+                                + iter.next() + "?transacted=false&usePooledConnection=true";
                 endpointsList.add(endpoint);
             }
         this.endpoints = endpointsList;

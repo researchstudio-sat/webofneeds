@@ -131,6 +131,8 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
         if (camelContext.getComponent(brokerComponentName, false) == null) {
             ActiveMQComponent activeMQComponent = (ActiveMQComponent) brokerComponentFactory
                             .getBrokerComponent(brokerURI, MessagingType.Queue, messagingContext);
+            activeMQComponent.setTransacted(false);
+            activeMQComponent.setUsePooledConnection(true);
             camelContext.addComponent(brokerComponentName, activeMQComponent);
             logger.info("adding component with component name {}", brokerComponentName);
             if (!brokerComponentMap.containsKey(brokerURI))
