@@ -65,7 +65,7 @@ public class ActiveMqWonNodeConnectionFactory {
         camel.context().addComponent(componentName, JmsComponent.jmsComponent(connectionFactory));
         // create the actors that receive the messages (atom events)
         String createdComponent = componentName + ":topic:" + createdTopic
-                        + "?testConnectionOnStartup=false&transacted=false&usePooledConnection=true";
+                        + "?testConnectionOnStartup=false&transacted=false";
         Props createdProps = SpringExtension.SpringExtProvider.get(context.system())
                         .props(AtomConsumerProtocolActor.class, createdComponent);
         ActorRef created = context.actorOf(createdProps, "ActiveMqAtomCreatedConsumerProtocolActor-" + uuid);
@@ -74,7 +74,7 @@ public class ActiveMqWonNodeConnectionFactory {
         ActorRef activated = created;
         if (!activatedTopic.equals(createdTopic)) {
             String activatedComponent = componentName + ":topic:" + activatedTopic
-                            + "?testConnectionOnStartup=false&transacted=false&usePooledConnection=true";
+                            + "?testConnectionOnStartup=false&transacted=false";
             Props activatedProps = SpringExtension.SpringExtProvider.get(context.system())
                             .props(AtomConsumerProtocolActor.class, activatedComponent);
             activated = context.actorOf(activatedProps, "ActiveMqAtomActivatedConsumerProtocolActor-" + uuid);
@@ -88,7 +88,7 @@ public class ActiveMqWonNodeConnectionFactory {
             deactivated = activated;
         } else {
             String deactivatedComponent = componentName + ":topic:" + deactivatedTopic
-                            + "?testConnectionOnStartup=false&transacted=false&usePooledConnection=true";
+                            + "?testConnectionOnStartup=false&transacted=false";
             Props deactivatedProps = SpringExtension.SpringExtProvider.get(context.system())
                             .props(AtomConsumerProtocolActor.class, deactivatedComponent);
             deactivated = context.actorOf(deactivatedProps, "ActiveMqAtomDeactivatedConsumerProtocolActor-" + uuid);
@@ -96,7 +96,7 @@ public class ActiveMqWonNodeConnectionFactory {
                             wonNodeInfo.getWonNodeURI());
         }
         // create the actor that sends messages (hint events)
-        String hintComponent = componentName + ":queue:" + hintQueue + "?transacted=false&usePooledConnection=true";
+        String hintComponent = componentName + ":queue:" + hintQueue + "?transacted=false";
         Props hintProps = SpringExtension.SpringExtProvider.get(context.system()).props(HintProducerProtocolActor.class,
                         hintComponent, null);
         ActorRef hintProducer = context.actorOf(hintProps, "ActiveMqHintProducerProtocolActor-" + uuid);
