@@ -34,6 +34,8 @@ echo build the docker containers
 docker --tlsverify -H satvm01.researchstudio.at:2376 pull webofneeds/bigdata
 docker --tlsverify -H satvm01.researchstudio.at:2376 pull webofneeds/won-debugbot:latest
 docker --tlsverify -H satvm01.researchstudio.at:2376 pull webofneeds/won-jobbot:latest
+docker --tlsverify -H satvm01.researchstudio.at:2376 pull webofneeds/won-spoco-raidbot:latest
+
 # TODO: change the explicit passing of tls params when docker-compose bug is fixed: https://github.com/docker/compose/issues/1427
 cd deploy/live_satvm01
 docker-compose --tlsverify --tlscacert=/var/lib/jenkins/.docker/ca.pem --tlscert=/var/lib/jenkins/.docker/cert.pem --tlskey=/var/lib/jenkins/.docker/key.pem -H satvm01.researchstudio.at:2376 build
