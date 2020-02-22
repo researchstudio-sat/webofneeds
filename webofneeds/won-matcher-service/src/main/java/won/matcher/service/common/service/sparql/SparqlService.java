@@ -1,6 +1,31 @@
 package won.matcher.service.common.service.sparql;
 
-import org.apache.jena.query.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.lang.invoke.MethodHandles;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.query.ParameterizedSparqlString;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QueryParseException;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
@@ -18,15 +43,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import won.protocol.util.RdfUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.lang.invoke.MethodHandles;
-import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
+import won.protocol.util.RdfUtils;
 
 /**
  * Service to access of Sparql enpoint database to save or query linked data.
@@ -34,8 +52,13 @@ import java.util.Iterator;
  */
 @Component
 public class SparqlService {
+    // ran into a stack overflow at about 1000 triples with the same subject. The
+    // current value of this constant chosen lower, with limited amount of though
+    // having gone into it.
+    private static final int MAX_INSERT_TRIPLES_COUNT = 250;
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     protected String sparqlEndpoint;
+    private ExecutorService executorService = Executors.newFixedThreadPool(5);
     // protected DatasetAccessor accessor;
 
     public static Dataset deserializeDataset(String serializedResource, Lang format) throws IOException {
@@ -57,19 +80,49 @@ public class SparqlService {
 
     /**
      * Update named graph by first deleting it and afterwards inserting the triples
-     * of the new model.
+     * of the new model. If there are too many triples in the model, split them up
+     * in multiple insert statements. We need to perfom input chunking because the
+     * jena sparql parser cannot handle arbitrarily long input.
      *
      * @param graph named graph to be updated
      * @param model model that holds triples to set
      */
-    public String createUpdateNamedGraphQuery(String graph, Model model) {
-        StringWriter sw = new StringWriter();
-        RDFDataMgr.write(sw, model, Lang.NTRIPLES);
-        String query = "\nCLEAR GRAPH ?g;\n" + "\nINSERT DATA { GRAPH ?g { " + sw + "}};\n";
+    public Optional<String> createUpdateNamedGraphQueryChunked(String graph, Model model) {
+        StringBuilder query = new StringBuilder();
+        query.append("\nCLEAR GRAPH ?g;\n");
+        // write the model into a pipedInputStream in a separate thread,
+        // read from the connected pipedOutputStream and write triples into the
+        // query in chunks
+        List<String> chunks = null;
+        try {
+            final PipedOutputStream pout = new PipedOutputStream();
+            final PipedInputStream pin = new PipedInputStream(pout);
+            System.out.println("writing to the pipedwriter");
+            executorService.execute(() -> {
+                try {
+                    RDFDataMgr.write(pout, model, Lang.NTRIPLES);
+                    pout.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+            chunks = readInChunks(pin, MAX_INSERT_TRIPLES_COUNT);
+            pin.close();
+        } catch (IOException e) {
+            logger.warn("Error making chunks of ntriples", e);
+        }
+        if (chunks == null)
+            return Optional.empty();
+        for (String chunk : chunks) {
+            query
+                            .append("\nINSERT DATA { GRAPH ?g { ")
+                            .append(chunk)
+                            .append("}};\n");
+        }
         ParameterizedSparqlString pps = new ParameterizedSparqlString();
-        pps.setCommandText(query);
+        pps.setCommandText(query.toString());
         pps.setIri("g", graph);
-        return pps.toString();
+        return Optional.of(pps.toString());
     }
 
     /**
@@ -79,18 +132,16 @@ public class SparqlService {
      * @param ds
      */
     public void updateNamedGraphsOfDataset(Dataset ds) {
-        String query = "";
+        StringBuilder query = new StringBuilder();
         Iterator<String> graphNames = ds.listNames();
         while (graphNames.hasNext()) {
             logger.debug("Save dataset");
             String graphName = graphNames.next();
             Model model = ds.getNamedModel(graphName);
-            query += createUpdateNamedGraphQuery(graphName, model);
-            // Update can also be done with accessor - use put/add?
-            // accessor.add(graphName, model);
+            createUpdateNamedGraphQueryChunked(graphName, model).map(query::append);
         }
-        if (query != "") {
-            executeUpdateQuery(query);
+        if (query.length() > 0) {
+            executeUpdateQuery(query.toString());
         }
     }
 
@@ -151,5 +202,26 @@ public class SparqlService {
         } catch (QueryParseException e) {
             logger.warn("Error parsing update query: " + updateQuery, e);
         }
+    }
+
+    private List<String> readInChunks(final PipedInputStream pr, final int chunkSize) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(pr));
+        String line = null;
+        List<String> chunks = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        int linecnt = 0;
+        while ((line = br.readLine()) != null) {
+            sb.append(line).append("\n");
+            linecnt++;
+            if (linecnt % chunkSize == 0) {
+                chunks.add(sb.toString());
+                sb = new StringBuilder();
+            }
+        }
+        if (sb.length() > 0) {
+            chunks.add(sb.toString());
+        }
+        br.close();
+        return chunks;
     }
 }
