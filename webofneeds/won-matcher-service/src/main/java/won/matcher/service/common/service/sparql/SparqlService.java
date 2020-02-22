@@ -97,7 +97,6 @@ public class SparqlService {
         try {
             final PipedOutputStream pout = new PipedOutputStream();
             final PipedInputStream pin = new PipedInputStream(pout);
-            System.out.println("writing to the pipedwriter");
             executorService.execute(() -> {
                 try {
                     RDFDataMgr.write(pout, model, Lang.NTRIPLES);
