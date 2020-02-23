@@ -1,8 +1,8 @@
 package won.matcher.service.rematch.actor;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.apache.jena.query.Dataset;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,13 +107,17 @@ public class RematchActor extends UntypedActor {
     }
 
     private void rematch() {
-        BulkAtomEvent rematchEvent = rematchSparqlService.findAtomsForRematching();
-        if (!rematchEvent.getAtomEvents().isEmpty()) {
-            pubSubMediator.tell(new DistributedPubSubMediator.Publish(rematchEvent.getClass().getName(), rematchEvent),
-                            getSelf());
+        Set<BulkAtomEvent> rematchBulks = rematchSparqlService.findAtomsForRematching();
+        if (!rematchBulks.isEmpty()) {
+            rematchBulks.stream().forEach(rematchEvent -> {
+                pubSubMediator.tell(
+                                new DistributedPubSubMediator.Publish(rematchEvent.getClass().getName(), rematchEvent),
+                                getSelf());
+            });
         }
         if (log.isDebugEnabled()) {
-            log.debug("Found " + rematchEvent.getAtomEvents().size() + " atoms for rematching");
+            int cnt = rematchBulks.stream().map(b -> b.getAtomEvents().size()).reduce(0, (a, b) -> a + b);
+            log.debug("Found {} atoms for rematching", cnt);
         }
     }
 
