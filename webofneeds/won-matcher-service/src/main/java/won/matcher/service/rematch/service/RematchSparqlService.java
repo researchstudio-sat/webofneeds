@@ -198,6 +198,7 @@ public class RematchSparqlService extends SparqlService {
         pps.setLiteral("now", System.currentTimeMillis());
         Set<BulkAtomEvent> bulks = new HashSet<>();
         BulkAtomEvent bulkAtomEvent = new BulkAtomEvent();
+        bulks.add(bulkAtomEvent);
         try (QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery())) {
             ResultSet results = qexec.execSelect();
             // load all the atoms into one bulk atom event
@@ -214,8 +215,8 @@ public class RematchSparqlService extends SparqlService {
                                     Cause.SCHEDULED_FOR_REMATCH);
                     bulkAtomEvent.addAtomEvent(atomEvent);
                     if (++i >= MAX_ATOMS_PER_REMATCH_BULK) {
-                        bulks.add(bulkAtomEvent);
                         bulkAtomEvent = new BulkAtomEvent();
+                        bulks.add(bulkAtomEvent);
                     }
                 }
             }
