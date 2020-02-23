@@ -1,14 +1,31 @@
 package won.matcher.service.rematch.service;
 
-import org.apache.jena.query.*;
+import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.ParameterizedSparqlString;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
+import org.apache.jena.update.UpdateRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+
 import won.matcher.service.common.event.AtomEvent;
 import won.matcher.service.common.event.AtomEvent.TYPE;
 import won.matcher.service.common.event.BulkAtomEvent;
@@ -17,14 +34,6 @@ import won.matcher.service.common.service.sparql.SparqlService;
 import won.matcher.service.crawler.config.CrawlConfig;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.linkeddata.LinkedDataSource;
-
-import java.io.StringWriter;
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
 
 /**
  * Sparql service extended with methods for rematching
@@ -63,11 +72,29 @@ public class RematchSparqlService extends SparqlService {
      * @param msg multiple messages that describe crawling meta data to update
      */
     public void registerMatchingAttempts(BulkAtomEvent msg) {
+        final AtomicInteger counter = new AtomicInteger();
         StringBuilder builder = new StringBuilder();
-        msg.getAtomEvents().stream().map(e -> createMatchAttemptUpdate(e))
-                        .forEach(upd -> upd.ifPresent(updateString -> builder.append(updateString)));
-        // execute the bulk query
-        executeUpdateQuery(builder.toString());
+        msg.getAtomEvents()
+                        .stream()
+                        .map(e -> createMatchAttemptUpdate(e))
+                        .filter(o -> o.isPresent())
+                        .map(o -> o.get())
+                        .map(updateString -> parseUpdateQuery(updateString))
+                        .filter(o -> o.isPresent())
+                        .map(o -> o.get())
+                        // collect the UpdateRequests into bins of size MAX_UPDATES_PER_REQUEST
+                        .collect(Collectors.groupingBy(x -> counter.getAndIncrement() % MAX_UPDATES_PER_REQUEST))
+                        .values()
+                        .stream() // stream of list of updateRequest
+                        .forEach(requests -> {
+                            requests.stream()
+                                            // reduce the list of UpdateRequest into one UpdateRequest
+                                            .reduce((UpdateRequest left, UpdateRequest right) -> {
+                                                right.getOperations().stream().forEach(left::add);
+                                                return left;
+                                            })
+                                            .ifPresent(request -> executeUpdate(request));
+                        });
     }
 
     private Optional<String> createMatchAttemptUpdate(AtomEvent msg) {

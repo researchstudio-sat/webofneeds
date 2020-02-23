@@ -53,9 +53,14 @@ import won.protocol.util.RdfUtils;
 @Component
 public class SparqlService {
     // ran into a stack overflow at about 1000 triples with the same subject. The
-    // current value of this constant chosen lower, with limited amount of though
+    // current value of this constant chosen lower, with limited amount of thought
     // having gone into it.
-    private static final int MAX_INSERT_TRIPLES_COUNT = 250;
+    protected static final int MAX_INSERT_TRIPLES_COUNT = 250;
+    // ran into a stack overflow in RematchSparqlService due to too many update
+    // where statements in one request. the recursion depth was 1000. Using the same
+    // limit as for triples, for now, although that would not work for a combination
+    // of both.
+    protected static final int MAX_UPDATES_PER_REQUEST = 250;
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     protected String sparqlEndpoint;
     private ExecutorService executorService = Executors.newFixedThreadPool(5);
@@ -192,14 +197,40 @@ public class SparqlService {
      */
     public void executeUpdateQuery(String updateQuery) {
         try {
-            logger.debug("Update SPARQL Endpoint: {}", sparqlEndpoint);
-            logger.debug("Execute query: {}", updateQuery);
-            UpdateRequest query = UpdateFactory.create(updateQuery);
-            UpdateProcessRemote riStore = (UpdateProcessRemote) UpdateExecutionFactory.createRemote(query,
-                            sparqlEndpoint);
-            riStore.execute();
+            parseUpdateQuery(updateQuery).ifPresent(r -> executeUpdate(r));
+        } catch (Exception e) {
+            logger.warn("Error executing update: " + updateQuery, e);
+        }
+    }
+
+    /**
+     * Parse a SPARQL Update query and generate an UpdateRequest
+     *
+     * @param updateQuery
+     */
+    public Optional<UpdateRequest> parseUpdateQuery(String updateQuery) {
+        try {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Parsing update: {}", updateQuery);
+            }
+            return Optional.of(UpdateFactory.create(updateQuery));
         } catch (QueryParseException e) {
             logger.warn("Error parsing update query: " + updateQuery, e);
+        }
+        return Optional.empty();
+    }
+
+    public void executeUpdate(UpdateRequest updateRequest) {
+        try {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Update SPARQL Endpoint: {}", sparqlEndpoint);
+                logger.debug("number of updates: {}", updateRequest.getOperations().size());
+            }
+            UpdateProcessRemote riStore = (UpdateProcessRemote) UpdateExecutionFactory.createRemote(updateRequest,
+                            sparqlEndpoint);
+            riStore.execute();
+        } catch (Exception e) {
+            logger.warn("Error sending update request: {} ", updateRequest, e);
         }
     }
 
