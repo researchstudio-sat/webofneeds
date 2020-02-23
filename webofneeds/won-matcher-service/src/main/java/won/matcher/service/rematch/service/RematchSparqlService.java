@@ -42,6 +42,7 @@ import won.protocol.util.linkeddata.LinkedDataSource;
  */
 @Component
 public class RematchSparqlService extends SparqlService {
+    int MAX_ATOMS_PER_REMATCH_BULK = 10;
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String HTTP_HEADER_SEPARATOR = ", ";
     @Autowired
@@ -174,7 +175,7 @@ public class RematchSparqlService extends SparqlService {
         return new HashSet(Arrays.asList(splitValues));
     }
 
-    public BulkAtomEvent findAtomsForRematching() {
+    public Set<BulkAtomEvent> findAtomsForRematching() {
         logger.debug("searching atoms for rematching");
         StringBuilder builder = new StringBuilder();
         // Selects atomUris using a back-off strategy, each time doubling
@@ -195,10 +196,12 @@ public class RematchSparqlService extends SparqlService {
         pps.setNsPrefix("won", "https://w3id.org/won/core#");
         pps.setCommandText(builder.toString());
         pps.setLiteral("now", System.currentTimeMillis());
+        Set<BulkAtomEvent> bulks = new HashSet<>();
         BulkAtomEvent bulkAtomEvent = new BulkAtomEvent();
         try (QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery())) {
             ResultSet results = qexec.execSelect();
             // load all the atoms into one bulk atom event
+            int i = 0;
             while (results.hasNext()) {
                 QuerySolution qs = results.nextSolution();
                 String atomUri = qs.get("atomUri").asResource().getURI();
@@ -210,11 +213,15 @@ public class RematchSparqlService extends SparqlService {
                                     System.currentTimeMillis(), sw.toString(), RDFFormat.TRIG.getLang(),
                                     Cause.SCHEDULED_FOR_REMATCH);
                     bulkAtomEvent.addAtomEvent(atomEvent);
+                    if (++i >= MAX_ATOMS_PER_REMATCH_BULK) {
+                        bulks.add(bulkAtomEvent);
+                        bulkAtomEvent = new BulkAtomEvent();
+                    }
                 }
             }
         }
         logger.debug("atomEvents for rematching: " + bulkAtomEvent.getAtomEvents().size());
-        return bulkAtomEvent;
+        return bulks;
     }
 
     public void setLinkedDataSource(LinkedDataSource linkedDataSource) {
