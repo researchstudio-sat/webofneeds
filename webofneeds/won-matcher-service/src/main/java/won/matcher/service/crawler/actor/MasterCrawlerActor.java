@@ -28,7 +28,6 @@ import won.matcher.service.crawler.exception.CrawlWrapperException;
 import won.matcher.service.crawler.msg.CrawlUriMessage;
 import won.matcher.service.crawler.msg.ResourceCrawlUriMessage;
 import won.matcher.service.crawler.service.CrawlSparqlService;
-import won.protocol.model.Atom;
 import won.protocol.model.AtomState;
 import won.protocol.service.WonNodeInfo;
 
@@ -186,8 +185,7 @@ public class MasterCrawlerActor extends UntypedActor {
      */
     private void processCrawlUriMessage(CrawlUriMessage msg) {
         log.debug("Process message: {}", msg);
-        if (msg.getStatus().equals(CrawlUriMessage.STATUS.PROCESS)
-                        || msg.getStatus().equals(CrawlUriMessage.STATUS.SAVE)) {
+        if (msg.getStatus().equals(CrawlUriMessage.STATUS.PROCESS)) {
             // multiple extractions of the same URI can happen quite often since the
             // extraction
             // query uses property path from base URI which may return URIs that are already
@@ -229,6 +227,15 @@ public class MasterCrawlerActor extends UntypedActor {
             updateMetaDataWorker.tell(msg, getSelf());
             pendingMessages.remove(msg.getUri());
             failedMessages.put(msg.getUri(), msg);
+            logStatus();
+        } else if (msg.getStatus().equals(CrawlUriMessage.STATUS.SAVE)) {
+            // received data through push, just update metadata and make
+            // sure we don't regard the uri as pending
+            log.debug("Successfully processed URI: {}", msg.getUri());
+            updateMetaDataWorker.tell(msg, getSelf());
+            pendingMessages.remove(msg.getUri());
+            // let the crawler store the dataset contained in the message in the rdf store
+            crawlingWorker.tell(msg, getSelf());
             logStatus();
         }
     }
