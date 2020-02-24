@@ -192,4 +192,14 @@ public class KeystoreEnabledPersistentRememberMeServices extends PersistentToken
         }
         return null;
     }
+
+    @Override
+    protected void cancelCookie(HttpServletRequest request, HttpServletResponse response) {
+        super.cancelCookie(request, response);
+        logger.debug("Cancelling unlock cookie");
+        Cookie cookie = new Cookie(UNLOCK_COOKIE_NAME, null);
+        cookie.setMaxAge(0);
+        cookie.setPath(getCookiePath(request));
+        response.addCookie(cookie);
+    }
 }
