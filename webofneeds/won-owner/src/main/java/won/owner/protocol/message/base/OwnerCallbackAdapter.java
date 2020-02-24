@@ -12,6 +12,8 @@ package won.owner.protocol.message.base;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
@@ -35,6 +37,7 @@ import won.protocol.util.RdfUtils;
 public abstract class OwnerCallbackAdapter implements WonMessageProcessor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private OwnerCallback adaptee;
+    private Executor executor = Executors.newSingleThreadExecutor();
 
     protected OwnerCallbackAdapter() {
     }
@@ -56,54 +59,57 @@ public abstract class OwnerCallbackAdapter implements WonMessageProcessor {
     public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
         assert adaptee != null : "adaptee is not set";
         logger.debug("processing message {} and calling appropriate method on adaptee", message.getMessageURI());
-        // if we get only one message, (case succ2), we don't have an option anyway
-        // if we get all 3, the interesting one is the head (case: message from remote)
-        // if we get a message plus a response, it's the local response and we want to
-        // process that one.
-        WonMessage focalMessage = message.getFocalMessage();
-        WonMessageType messageType = focalMessage.getMessageType();
-        switch (messageType) {
-            case ATOM_HINT_MESSAGE:
-                adaptee.onAtomHintFromMatcher(focalMessage);
-                break;
-            case SOCKET_HINT_MESSAGE:
-                adaptee.onSocketHintFromMatcher(focalMessage);
-                break;
-            case CONNECT:
-                adaptee.onConnectFromOtherAtom(makeConnection(message), focalMessage);
-                break;
-            case CONNECTION_MESSAGE:
-                adaptee.onMessageFromOtherAtom(makeConnection(message), focalMessage);
-                break;
-            case CLOSE:
-                adaptee.onCloseFromOtherAtom(makeConnection(message), focalMessage);
-                break;
-            case SUCCESS_RESPONSE:
-                adaptee.onSuccessResponse(focalMessage.getRespondingToMessageURI(), focalMessage,
-                                Optional.ofNullable(makeConnection(message)));
-                break;
-            case FAILURE_RESPONSE:
-                adaptee.onFailureResponse(focalMessage.getRespondingToMessageURI(), focalMessage,
-                                Optional.ofNullable(makeConnection(message)));
-                break;
-            case CREATE_ATOM:
-                logger.debug("Handling CREATE_ATOM for message {}", focalMessage);
-                break;
-            case DELETE:
-                logger.debug("Handling DELETE for message {}", focalMessage);
-                break;
-            case REPLACE:
-                logger.debug("Handling REPLACE for message {}", focalMessage);
-                break;
-            case DEACTIVATE:
-                logger.debug("Handling DEACTIVATE for message {}", focalMessage);
-                break;
-            default:
-                logger.info("could not find callback method for wonMessage of type {}", focalMessage);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("message: {}", RdfUtils.writeDatasetToString(message.getCompleteDataset(), Lang.TRIG));
-                }
-        }
+        executor.execute(() -> {
+            // if we get only one message, (case succ2), we don't have an option anyway
+            // if we get all 3, the interesting one is the head (case: message from remote)
+            // if we get a message plus a response, it's the local response and we want to
+            // process that one.
+            WonMessage focalMessage = message.getFocalMessage();
+            WonMessageType messageType = focalMessage.getMessageType();
+            switch (messageType) {
+                case ATOM_HINT_MESSAGE:
+                    adaptee.onAtomHintFromMatcher(focalMessage);
+                    break;
+                case SOCKET_HINT_MESSAGE:
+                    adaptee.onSocketHintFromMatcher(focalMessage);
+                    break;
+                case CONNECT:
+                    adaptee.onConnectFromOtherAtom(makeConnection(message), focalMessage);
+                    break;
+                case CONNECTION_MESSAGE:
+                    adaptee.onMessageFromOtherAtom(makeConnection(message), focalMessage);
+                    break;
+                case CLOSE:
+                    adaptee.onCloseFromOtherAtom(makeConnection(message), focalMessage);
+                    break;
+                case SUCCESS_RESPONSE:
+                    adaptee.onSuccessResponse(focalMessage.getRespondingToMessageURI(), focalMessage,
+                                    Optional.ofNullable(makeConnection(message)));
+                    break;
+                case FAILURE_RESPONSE:
+                    adaptee.onFailureResponse(focalMessage.getRespondingToMessageURI(), focalMessage,
+                                    Optional.ofNullable(makeConnection(message)));
+                    break;
+                case CREATE_ATOM:
+                    logger.debug("Handling CREATE_ATOM for message {}", focalMessage);
+                    break;
+                case DELETE:
+                    logger.debug("Handling DELETE for message {}", focalMessage);
+                    break;
+                case REPLACE:
+                    logger.debug("Handling REPLACE for message {}", focalMessage);
+                    break;
+                case DEACTIVATE:
+                    logger.debug("Handling DEACTIVATE for message {}", focalMessage);
+                    break;
+                default:
+                    logger.info("could not find callback method for wonMessage of type {}", focalMessage);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("message: {}",
+                                        RdfUtils.writeDatasetToString(message.getCompleteDataset(), Lang.TRIG));
+                    }
+            }
+        });
         // return the message for further processing
         return message;
     }

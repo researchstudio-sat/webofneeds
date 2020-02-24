@@ -1,6 +1,8 @@
 package won.matcher.service.nodemanager.actor;
 
 import java.net.URI;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
@@ -51,6 +53,7 @@ public class AtomConsumerProtocolActor extends UntypedConsumerActor {
     private MonitoringService monitoringService;
     @Autowired
     private LinkedDataSource linkedDataSource;
+    private Executor executor = Executors.newSingleThreadExecutor();
 
     public AtomConsumerProtocolActor(String endpoint) {
         this.endpoint = endpoint;
@@ -65,64 +68,72 @@ public class AtomConsumerProtocolActor extends UntypedConsumerActor {
     @Override
     public void onReceive(final Object message) throws Exception {
         if (message instanceof CamelMessage) {
-            CamelMessage camelMsg = (CamelMessage) message;
-            String atomUri = (String) camelMsg.getHeaders().get(MSG_HEADER_ATOM_URI);
-            String wonNodeUri = (String) camelMsg.getHeaders().get(MSG_HEADER_WON_NODE_URI);
-            // monitoring code
-            monitoringService.startClock(MonitoringService.ATOM_HINT_STOPWATCH, atomUri);
-            // process the incoming atom event
-            if (atomUri != null && wonNodeUri != null) {
-                Object methodName = camelMsg.getHeaders().get(MSG_HEADER_METHODNAME);
-                if (methodName != null) {
-                    log.debug("Received event '{}' for atomUri '{}' and wonAtomUri '{}' and publish it to matchers",
-                                    methodName, atomUri, wonNodeUri);
-                    // publish an atom event to all the (distributed) matchers
-                    AtomEvent event = null;
-                    long crawlDate = System.currentTimeMillis();
-                    Dataset ds = linkedDataSource.getDataForResource(URI.create(atomUri));
-                    if (AtomModelWrapper.isAAtom(ds)) {
-                        if (methodName.equals(MSG_HEADER_METHODNAME_ATOMCREATED)) {
-                            event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.ACTIVE, crawlDate, ds,
-                                            Cause.PUSHED);
+            final CamelMessage camelMsg = (CamelMessage) message;
+            final String atomUri = (String) camelMsg.getHeaders().get(MSG_HEADER_ATOM_URI);
+            final String wonNodeUri = (String) camelMsg.getHeaders().get(MSG_HEADER_WON_NODE_URI);
+            // handle in separate thread so the camel message handling isn't held up
+            executor.execute(() -> {
+                // monitoring code
+                monitoringService.startClock(MonitoringService.ATOM_HINT_STOPWATCH, atomUri);
+                // process the incoming atom event
+                if (atomUri != null && wonNodeUri != null) {
+                    Object methodName = camelMsg.getHeaders().get(MSG_HEADER_METHODNAME);
+                    if (methodName != null) {
+                        log.debug("Received event '{}' for atomUri '{}' and wonAtomUri '{}' and publish it to matchers",
+                                        methodName, atomUri, wonNodeUri);
+                        // publish an atom event to all the (distributed) matchers
+                        AtomEvent event = null;
+                        long crawlDate = System.currentTimeMillis();
+                        Dataset ds = linkedDataSource.getDataForResource(URI.create(atomUri));
+                        if (AtomModelWrapper.isAAtom(ds)) {
+                            if (methodName.equals(MSG_HEADER_METHODNAME_ATOMCREATED)) {
+                                event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.ACTIVE, crawlDate, ds,
+                                                Cause.PUSHED);
+                                pubSubMediator.tell(
+                                                new DistributedPubSubMediator.Publish(event.getClass().getName(),
+                                                                event),
+                                                getSelf());
+                            } else if (methodName.equals(MSG_HEADER_METHODNAME_ATOMMODIFIED)) {
+                                event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.ACTIVE, crawlDate, ds,
+                                                Cause.PUSHED);
+                                pubSubMediator.tell(
+                                                new DistributedPubSubMediator.Publish(event.getClass().getName(),
+                                                                event),
+                                                getSelf());
+                            } else if (methodName.equals(MSG_HEADER_METHODNAME_ATOMACTIVATED)) {
+                                event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.ACTIVE, crawlDate, ds,
+                                                Cause.PUSHED);
+                                pubSubMediator.tell(
+                                                new DistributedPubSubMediator.Publish(event.getClass().getName(),
+                                                                event),
+                                                getSelf());
+                            } else if (methodName.equals(MSG_HEADER_METHODNAME_ATOMDEACTIVATED)) {
+                                event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.INACTIVE, crawlDate, ds,
+                                                Cause.PUSHED);
+                                pubSubMediator.tell(
+                                                new DistributedPubSubMediator.Publish(event.getClass().getName(),
+                                                                event),
+                                                getSelf());
+                            } else {
+                                unhandled(message);
+                            }
+                            // let the crawler save the data of this event too
+                            ResourceCrawlUriMessage resMsg = new ResourceCrawlUriMessage(atomUri, atomUri, wonNodeUri,
+                                            CrawlUriMessage.STATUS.SAVE, crawlDate, null);
+                            resMsg.setSerializedResource(camelMsg.body().toString());
+                            resMsg.setSerializationFormat(Lang.TRIG);
                             pubSubMediator.tell(
-                                            new DistributedPubSubMediator.Publish(event.getClass().getName(), event),
+                                            new DistributedPubSubMediator.Publish(resMsg.getClass().getName(), resMsg),
                                             getSelf());
-                        } else if (methodName.equals(MSG_HEADER_METHODNAME_ATOMMODIFIED)) {
-                            event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.ACTIVE, crawlDate, ds,
-                                            Cause.PUSHED);
-                            pubSubMediator.tell(
-                                            new DistributedPubSubMediator.Publish(event.getClass().getName(), event),
-                                            getSelf());
-                        } else if (methodName.equals(MSG_HEADER_METHODNAME_ATOMACTIVATED)) {
-                            event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.ACTIVE, crawlDate, ds,
-                                            Cause.PUSHED);
-                            pubSubMediator.tell(
-                                            new DistributedPubSubMediator.Publish(event.getClass().getName(), event),
-                                            getSelf());
-                        } else if (methodName.equals(MSG_HEADER_METHODNAME_ATOMDEACTIVATED)) {
-                            event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.INACTIVE, crawlDate, ds,
-                                            Cause.PUSHED);
-                            pubSubMediator.tell(
-                                            new DistributedPubSubMediator.Publish(event.getClass().getName(), event),
-                                            getSelf());
-                        } else {
-                            unhandled(message);
+                            return;
                         }
-                        // let the crawler save the data of this event too
-                        ResourceCrawlUriMessage resMsg = new ResourceCrawlUriMessage(atomUri, atomUri, wonNodeUri,
-                                        CrawlUriMessage.STATUS.SAVE, crawlDate, null);
-                        resMsg.setSerializedResource(camelMsg.body().toString());
-                        resMsg.setSerializationFormat(Lang.TRIG);
-                        pubSubMediator.tell(new DistributedPubSubMediator.Publish(resMsg.getClass().getName(), resMsg),
-                                        getSelf());
-                        return;
+                    } else {
+                        log.warning("Message not processed; methodName is null");
                     }
                 } else {
-                    log.warning("Message not processed; methodName is null");
+                    log.warning("Message not processed; atomURI or wonNodeURI is null");
                 }
-            } else {
-                log.warning("Message not processed; atomURI or wonNodeURI is null");
-            }
+            });
         }
         unhandled(message);
     }

@@ -1,6 +1,8 @@
 package won.owner.service.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,8 @@ public class OwnerApplicationService implements WonMessageProcessor, WonMessageS
     // dependency here
     // we don't do autowiring.
     private WonMessageProcessor messageProcessorDelegate = new NopOwnerApplicationServiceCallback();
+    private Executor toOwnerExecutor = Executors.newSingleThreadExecutor();
+    private Executor toNodeExecutor = Executors.newSingleThreadExecutor();
 
     @Override
     public WonMessage prepareMessage(WonMessage message) throws WonMessageSenderException {
@@ -39,7 +43,9 @@ public class OwnerApplicationService implements WonMessageProcessor, WonMessageS
     public void sendMessage(WonMessage wonMessage) {
         try {
             // send to node:
-            wonMessageSenderDelegate.sendMessage(wonMessage);
+            toNodeExecutor.execute(() -> {
+                wonMessageSenderDelegate.sendMessage(wonMessage);
+            });
         } catch (Exception e) {
             // TODO: send error message back to client!
             logger.info("could not send WonMessage", e);
@@ -55,10 +61,15 @@ public class OwnerApplicationService implements WonMessageProcessor, WonMessageS
      * Sends a message to the owner.
      * 
      * @param wonMessage
+     * @return null - this is not a normal WonMessageProcessor, it does not return
+     * an altered message.
      */
     @Override
     public WonMessage process(final WonMessage wonMessage) {
-        return messageProcessorDelegate.process(wonMessage);
+        toOwnerExecutor.execute(() -> {
+            messageProcessorDelegate.process(wonMessage);
+        });
+        return null;
     }
 
     public void setMessageProcessorDelegate(final WonMessageProcessor messageProcessorDelegate) {
