@@ -526,23 +526,25 @@ export function getAgreementProtocolUris(connectionUri) {
     .then(response => response.json());
 }
 
-export function getPetriNetUris(connectionUri) {
+export async function getPetriNetUris(connectionUri) {
   const url = urljoin(
     ownerBaseUrl,
     "/rest/petrinet/getPetriNetUris",
     `?connectionUri=${connectionUri}`
   );
 
-  return fetch(url, {
+  const response = await fetch(url, {
     method: "get",
     headers: {
       Accept: "application/ld+json",
       "Content-Type": "application/ld+json",
     },
     credentials: "include",
-  })
-    .then(checkHttpStatus)
-    .then(response => response.json());
+  });
+  console.debug("RESPONSE", response);
+  //.then(checkHttpStatus)
+  const jsonResponse = response.json();
+  return jsonResponse;
 }
 
 /**

@@ -31,10 +31,10 @@ export function connectionsChatMessageClaimOnSuccess(
   chatMessage,
   additionalContent,
   senderSocketUri,
-  targetSocketUri,
-  connectionUri
+  targetSocketUri
 ) {
   return dispatch => {
+    let referencedContentUris = undefined;
     buildChatMessage({
       chatMessage: chatMessage,
       additionalContent: additionalContent,
@@ -51,8 +51,16 @@ export function connectionsChatMessageClaimOnSuccess(
       )
       .then(([, jsonResp]) => {
         // Send claim message
+        let contentUris = [];
+        const correctUri = jsonResp.messageUri;
+        if (correctUri)
+          contentUris.push({
+            "@id": correctUri,
+          });
+        referencedContentUris = new Map();
+        referencedContentUris.set("claims", contentUris);
         buildChatMessage({
-          referencedContentUris: new Map().set("claims", [jsonResp.messageUri]),
+          referencedContentUris: referencedContentUris,
           socketUri: senderSocketUri,
           targetSocketUri: targetSocketUri,
           isTTL: false,
@@ -64,7 +72,21 @@ export function connectionsChatMessageClaimOnSuccess(
             ])
           )
           .then(([optimisticEvent, jsonResp]) => {
-            //Deprecated
+            console.debug("sent chatMsg: ", jsonResp.messageUri);
+            dispatch({
+              type: referencedContentUris
+                ? actionTypes.connections.sendChatMessageRefreshDataOnSuccess //If there are references in the message we need to Refresh the Data from the backend on msg success
+                : actionTypes.connections.sendChatMessage,
+              payload: {
+                eventUri: jsonResp.messageUri,
+                message: jsonResp.message,
+                optimisticEvent,
+                senderSocketUri: senderSocketUri,
+                targetSocketUri: targetSocketUri,
+              },
+            });
+          });
+        /*
             dispatch({
               type: actionTypes.connections.sendChatMessageClaimOnSuccess,
               payload: {
@@ -76,7 +98,7 @@ export function connectionsChatMessageClaimOnSuccess(
                 connectionUri,
               },
             });
-          });
+          */
       })
       .catch(e => {
         console.error("Error while processing chat message: ", e);
