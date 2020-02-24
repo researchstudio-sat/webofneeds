@@ -62,6 +62,11 @@ public class HintProducerProtocolActor extends UntypedProducerActor {
         return endpoint;
     }
 
+    @Override
+    public boolean isOneway() {
+        return true;
+    }
+
     /**
      * transform hint events to camel messages that can be sent to the won node
      *
