@@ -235,8 +235,9 @@ public class MasterCrawlerActor extends UntypedActor {
             updateMetaDataWorker.tell(msg, getSelf());
             pendingMessages.remove(msg.getUri());
             // let the crawler store the dataset contained in the message in the rdf store
-            crawlingWorker.tell(msg, getSelf());
-            logStatus();
+            if (!skipWonNodeUris.contains(msg.getWonNodeUri())) {
+                crawlingWorker.tell(msg, getSelf());
+            }
         }
     }
 
