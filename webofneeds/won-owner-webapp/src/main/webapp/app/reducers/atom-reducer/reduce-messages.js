@@ -94,7 +94,16 @@ export function addMessage(
             existingMessage,
             "isReceivedByRemote"
           );
-
+          if (existingMessage) {
+            parsedMessage = parsedMessage.setIn(
+              ["data", "messageStatus"],
+              existingMessage.get("messageStatus")
+            );
+            parsedMessage = parsedMessage.setIn(
+              ["data", "viewState"],
+              existingMessage.get("viewState")
+            );
+          }
           if (!alreadyProcessed && (isReceivedByOwn || isReceivedByRemote)) {
             parsedMessage = parsedMessage
               .setIn(["data", "isReceivedByOwn"], isReceivedByOwn)

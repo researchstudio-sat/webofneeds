@@ -392,12 +392,6 @@ export default function(processState = initialState, action = {}) {
       console.debug("connectionUri", connectionUri);
 
       return processState;
-      //Deprecated
-      /*
-      return updateConnectionProcess(processState, connectionUri, {
-        petriNetData: { dirty: true },
-      });*/
-      //return processState; //todo figure out how to extract the connection based on the socketUris
     }
 
     case actionTypes.connections.updatePetriNetData: {

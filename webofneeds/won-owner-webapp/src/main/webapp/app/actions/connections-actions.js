@@ -31,10 +31,17 @@ export function connectionsChatMessageClaimOnSuccess(
   chatMessage,
   additionalContent,
   senderSocketUri,
-  targetSocketUri
+  targetSocketUri,
+  connectionUri
 ) {
   return dispatch => {
+    const ownedAtomUri = generalSelectors.getAtomUriBySocketUri(
+      senderSocketUri
+    );
+
     let referencedContentUris = undefined;
+    let messageUriToClaim = undefined;
+
     buildChatMessage({
       chatMessage: chatMessage,
       additionalContent: additionalContent,
@@ -49,18 +56,35 @@ export function connectionsChatMessageClaimOnSuccess(
           ownerApi.sendMessage(msgData.message),
         ])
       )
-      .then(([, jsonResp]) => {
+      .then(([optimisticEvent, jsonResp]) => {
+        dispatch({
+          type: actionTypes.connections.sendChatMessage,
+          payload: {
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
+            optimisticEvent,
+            senderSocketUri: senderSocketUri,
+            targetSocketUri: targetSocketUri,
+            connectionUri,
+            atomUri: ownedAtomUri,
+            claimed: true, // message needs to be marked as claimed directly
+          },
+        });
+
         // Send claim message
         let contentUris = [];
-        const correctUri = jsonResp.messageUri;
-        if (correctUri)
+        messageUriToClaim = jsonResp.messageUri;
+        if (messageUriToClaim)
           contentUris.push({
-            "@id": correctUri,
+            "@id": messageUriToClaim,
           });
         referencedContentUris = new Map();
         referencedContentUris.set("claims", contentUris);
         buildChatMessage({
+          chatMessage: undefined,
+          additionalContent: undefined,
           referencedContentUris: referencedContentUris,
+          optimisticEvent,
           socketUri: senderSocketUri,
           targetSocketUri: targetSocketUri,
           isTTL: false,
@@ -83,22 +107,10 @@ export function connectionsChatMessageClaimOnSuccess(
                 optimisticEvent,
                 senderSocketUri: senderSocketUri,
                 targetSocketUri: targetSocketUri,
-              },
-            });
-          });
-        /*
-            dispatch({
-              type: actionTypes.connections.sendChatMessageClaimOnSuccess,
-              payload: {
-                eventUri: jsonResp.messageUri,
-                message: jsonResp.message,
-                optimisticEvent,
-                senderSocketUri,
-                targetSocketUri,
                 connectionUri,
               },
             });
-          */
+          });
       })
       .catch(e => {
         console.error("Error while processing chat message: ", e);
