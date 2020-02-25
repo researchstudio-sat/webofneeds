@@ -12,7 +12,6 @@ package won.protocol.jms;
 
 import java.net.URI;
 
-import javax.jms.ConnectionFactory;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.TrustManager;
 
@@ -22,7 +21,6 @@ import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jms.connection.CachingConnectionFactory;
 
 import won.cryptography.ssl.MessagingContext;
 import won.protocol.model.MessagingType;
@@ -39,7 +37,7 @@ public class BrokerComponentFactory {
         // TODO: make this configurable for different broker implementations.
         logger.info("establishing activemq connection for brokerUri {} (with specified type)", brokerURI);
         ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(
-                        brokerURI + "?jms.prefetchPolicy.all=50&jms.useAsyncSend=true");
+                        brokerURI + "?jms.prefetchPolicy.all=1&jms.useAsyncSend=true");
         return getBrokerComponent(type, activeMQConnectionFactory);
     }
 
@@ -52,7 +50,7 @@ public class BrokerComponentFactory {
         // to overflowing with messages,
         // see http://activemq.apache.org/what-is-the-prefetch-limit-for.html
         ActiveMQSslConnectionFactory activeMQConnectionFactory = new ActiveMQSslConnectionFactory(
-                        brokerURI + "?jms.prefetchPolicy.all=50&jms.useAsyncSend=true");
+                        brokerURI + "?jms.prefetchPolicy.all=1&jms.useAsyncSend=true");
         activeMQConnectionFactory.setKeyAndTrustManagers(new KeyManager[] { keyManager },
                         new TrustManager[] { trustManager }, null);
         return getBrokerComponent(type, activeMQConnectionFactory);
@@ -78,9 +76,7 @@ public class BrokerComponentFactory {
     }
 
     private synchronized Component getBrokerComponent(MessagingType type, ActiveMQConnectionFactory connectionFactory) {
-        CachingConnectionFactory cachingConnectionFactory = (CachingConnectionFactory) configureCachingConnectionFactory(
-                        connectionFactory);
-        WonJmsConfiguration jmsConfiguration = new WonJmsConfiguration(cachingConnectionFactory);
+        WonJmsConfiguration jmsConfiguration = new WonJmsConfiguration(connectionFactory);
         switch (type) {
             case Queue:
                 jmsConfiguration.configureJmsConfigurationForQueues();
@@ -89,15 +85,6 @@ public class BrokerComponentFactory {
                 jmsConfiguration.configureJmsConfigurationForTopics();
                 break;
         }
-        ActiveMQComponent activeMQComponent = ActiveMQComponent.activeMQComponent();
-        activeMQComponent.setConfiguration(jmsConfiguration);
-        activeMQComponent.setTransacted(false);
-        activeMQComponent.setUsePooledConnection(true);
-        return activeMQComponent;
-    }
-
-    public synchronized ConnectionFactory configureCachingConnectionFactory(
-                    ActiveMQConnectionFactory connectionFactory) {
         // for non-persistent messages setting "AlwaysSyncSend" to true makes it slow,
         // but ensures that a producer is immediately informed
         // about the memory issues on broker (is blocked or gets exception depending on
@@ -106,9 +93,11 @@ public class BrokerComponentFactory {
         connectionFactory.setAlwaysSyncSend(false);
         // disable timestamps by default so that ttl of messages is not checked
         connectionFactory.setDisableTimeStampsByDefault(true);
-        CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(connectionFactory);
-        cachingConnectionFactory.setCacheConsumers(true);
-        cachingConnectionFactory.setCacheProducers(true);
-        return cachingConnectionFactory;
+        connectionFactory.setDispatchAsync(true);
+        ActiveMQComponent activeMQComponent = ActiveMQComponent.activeMQComponent();
+        activeMQComponent.setConfiguration(jmsConfiguration);
+        activeMQComponent.setTransacted(false);
+        activeMQComponent.setUsePooledConnection(true);
+        return activeMQComponent;
     }
 }
