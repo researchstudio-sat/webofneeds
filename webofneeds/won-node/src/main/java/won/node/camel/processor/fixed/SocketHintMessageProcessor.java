@@ -45,6 +45,10 @@ public class SocketHintMessageProcessor extends AbstractCamelProcessor {
             return;
         }
         Connection con = connectionService.socketHint(wonMessage);
+        if (con == null) {
+            exchange.getIn().setHeader(WonCamelConstants.IGNORE_HINT_HEADER, Boolean.TRUE);
+            return;
+        }
         WonCamelHelper.putParentURI(exchange, con.getConnectionURI());
     }
 

@@ -4,7 +4,18 @@
  */
 package won.owner.web.rest;
 
-import nl.martijndwars.webpush.Subscription;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +23,11 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.*;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.CredentialsExpiredException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,12 +39,36 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
-import won.owner.model.*;
-import won.owner.pojo.*;
+
+import nl.martijndwars.webpush.Subscription;
+import won.owner.model.EmailVerificationToken;
+import won.owner.model.KeyStoreIOException;
+import won.owner.model.PushSubscription;
+import won.owner.model.TokenPurpose;
+import won.owner.model.User;
+import won.owner.model.UserAtom;
+import won.owner.pojo.AnonymousLinkPojo;
+import won.owner.pojo.ChangePasswordPojo;
+import won.owner.pojo.ResetPasswordPojo;
+import won.owner.pojo.RestStatusResponse;
+import won.owner.pojo.TransferUserPojo;
+import won.owner.pojo.UserPojo;
+import won.owner.pojo.UserSettingsPojo;
+import won.owner.pojo.UsernamePojo;
+import won.owner.pojo.VerificationTokenPojo;
 import won.owner.repository.UserAtomRepository;
-import won.owner.service.impl.*;
+import won.owner.service.impl.IncorrectPasswordException;
+import won.owner.service.impl.KeystoreEnabledPersistentRememberMeServices;
+import won.owner.service.impl.KeystoreEnabledUserDetails;
+import won.owner.service.impl.UserAlreadyExistsException;
+import won.owner.service.impl.UserNotFoundException;
+import won.owner.service.impl.UserService;
 import won.owner.web.WonOwnerMailSender;
 import won.owner.web.events.OnExportUserEvent;
 import won.owner.web.events.OnPasswordChangedEvent;
@@ -38,17 +77,6 @@ import won.owner.web.events.OnRegistrationCompleteEvent;
 import won.owner.web.validator.PasswordChangeValidator;
 import won.owner.web.validator.ResetPasswordValidator;
 import won.owner.web.validator.UserRegisterValidator;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * User: t.kozel Date: 11/12/13
@@ -102,6 +130,7 @@ public class RestUserController {
     // TODO: move transactionality annotation into the service layer
     @Transactional(propagation = Propagation.REQUIRED)
     public ResponseEntity registerUser(@RequestBody UserPojo user, Errors errors, WebRequest request) {
+        logger.debug("processing POST request to / (registers user)");
         try {
             userRegisterValidator.validate(user, errors);
             if (errors.hasErrors()) {
@@ -148,6 +177,7 @@ public class RestUserController {
     @Transactional(propagation = Propagation.REQUIRED)
     public ResponseEntity changePassword(@RequestBody ChangePasswordPojo changePasswordPojo, Errors errors,
                     HttpServletRequest request, HttpServletResponse response) {
+        logger.debug("processing request to /changePassword");
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         if (username == null) {
             return generateStatusResponse(RestStatusResponse.USER_NOT_SIGNED_IN);
@@ -195,6 +225,7 @@ public class RestUserController {
     @Transactional(propagation = Propagation.REQUIRED)
     public ResponseEntity resetPassword(@RequestBody ResetPasswordPojo resetPasswordPojo, Errors errors,
                     HttpServletRequest request, HttpServletResponse response) {
+        logger.debug("processing request to /resetPassword");
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         if (username == null) {
             return generateStatusResponse(RestStatusResponse.USER_NOT_SIGNED_IN);
@@ -240,6 +271,7 @@ public class RestUserController {
     @Transactional(propagation = Propagation.REQUIRED)
     public ResponseEntity transferUser(@RequestBody TransferUserPojo transferUserPojo, Errors errors,
                     WebRequest request) {
+        logger.debug("processing request to /transfer");
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         // cannot use user object from context since hw doesn't know about created in
         // this session atom,
@@ -287,6 +319,7 @@ public class RestUserController {
     @ResponseBody
     @RequestMapping(value = "/settings", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public UserSettingsPojo getUserSettings(@RequestParam("uri") String uri) {
+        logger.debug("processing request to /settings");
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         // cannot use user object from context since hw doesn't know about created in
         // this session atom,
@@ -316,6 +349,7 @@ public class RestUserController {
     // TODO: move transactionality annotation into the service layer
     @Transactional(propagation = Propagation.SUPPORTS)
     public ResponseEntity setUserSettings(@RequestBody UserSettingsPojo userSettingsPojo) {
+        logger.debug("processing POST request to /settings");
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         // cannot use user object from context since hw doesn't know about created in
         // this session atom,
@@ -371,6 +405,7 @@ public class RestUserController {
     public ResponseEntity logIn(@RequestParam("username") String username, @RequestParam("password") String password,
                     @RequestParam(name = "privateId", required = false) String privateId, HttpServletRequest request,
                     HttpServletResponse response) {
+        logger.debug("processing request to /signin");
         Optional<User> user = Optional.empty();
         try {
             user = Optional.of(performLoginForUser(username, password, request, response));
@@ -389,6 +424,7 @@ public class RestUserController {
 
     private User performLoginForUser(String username, String password, HttpServletRequest request,
                     HttpServletResponse response) throws BadCredentialsException, CredentialsExpiredException {
+        logger.debug("performing login");
         SecurityContext context = SecurityContextHolder.getContext();
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
         Authentication auth = authenticationManager.authenticate(token);
@@ -412,6 +448,7 @@ public class RestUserController {
     @Transactional(propagation = Propagation.REQUIRED)
     // TODO: move transactionality annotation into the service layer
     public ResponseEntity isSignedIn(HttpServletRequest request, HttpServletResponse response) {
+        logger.debug("processing request to /isSignedIn");
         // Execution will only get here, if the session is still valid, so sending OK
         // here is enough. Spring sends an error
         // code by itself if the session isn't valid any more
@@ -442,6 +479,7 @@ public class RestUserController {
     @RequestMapping(value = "/subscribeNotifications", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional(propagation = Propagation.REQUIRED)
     public ResponseEntity subscribeNotifications(@RequestBody Subscription subscription) {
+        logger.debug("processing request to /subscribeNotifications");
         SecurityContext context = SecurityContextHolder.getContext();
         String userName = context.getAuthentication().getName();
         User user = userService.getByUsername(userName);
@@ -454,6 +492,7 @@ public class RestUserController {
 
     @RequestMapping(value = "/signout", method = RequestMethod.POST)
     public ResponseEntity logOut(HttpServletRequest request, HttpServletResponse response) {
+        logger.debug("processing request to /signout");
         SecurityContext context = SecurityContextHolder.getContext();
         if (context.getAuthentication() == null) {
             return new ResponseEntity("\"No user is signed in, ignoring this request.\"", HttpStatus.NOT_MODIFIED);
@@ -474,6 +513,7 @@ public class RestUserController {
     @RequestMapping(value = "/confirmRegistration", method = RequestMethod.POST)
     @Transactional(propagation = Propagation.SUPPORTS)
     public ResponseEntity confirmRegistration(@RequestBody VerificationTokenPojo token) {
+        logger.debug("processing request to /confirmRegistration");
         EmailVerificationToken verificationToken = userService.getEmailVerificationToken(token.getToken());
         if (verificationToken == null) {
             return generateStatusResponse(RestStatusResponse.TOKEN_NOT_FOUND);
@@ -495,6 +535,7 @@ public class RestUserController {
     @RequestMapping(value = "/exportAccount", method = RequestMethod.POST)
     public ResponseEntity exportAccount(
                     @RequestParam(name = "keyStorePassword", required = false) String keyStorePassword) {
+        logger.debug("processing request to /exportAccount");
         SecurityContext securityContext = SecurityContextHolder.getContext();
         User authUser = ((KeystoreEnabledUserDetails) securityContext.getAuthentication().getPrincipal()).getUser();
         User user = userService.getByUsername(authUser.getUsername());
@@ -513,6 +554,7 @@ public class RestUserController {
     @RequestMapping(value = "/acceptTermsOfService", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     @Transactional(propagation = Propagation.SUPPORTS)
     public ResponseEntity acceptTermsOfService() {
+        logger.debug("processing request to /acceptTermsOfService");
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         // cannot use user object from context since hw doesn't know about created in
         // this session atom,
@@ -534,6 +576,7 @@ public class RestUserController {
     @RequestMapping(value = "/resendVerificationEmail", method = RequestMethod.POST)
     @Transactional(propagation = Propagation.SUPPORTS)
     public ResponseEntity resendVerificationEmail(@RequestBody UsernamePojo usernamePojo) {
+        logger.debug("processing request to /resendVerificationEmail");
         User user = userService.getByUsername(usernamePojo.getUsername());
         if (user == null) {
             return generateStatusResponse(RestStatusResponse.USER_NOT_FOUND);
@@ -559,6 +602,7 @@ public class RestUserController {
     @RequestMapping(value = "/sendAnonymousLinkEmail", method = RequestMethod.POST)
     @Transactional(propagation = Propagation.SUPPORTS)
     public ResponseEntity sendAnonymousEmail(@RequestBody AnonymousLinkPojo anonymousLinkPojo) {
+        logger.debug("processing request to /sendAnonymousLinkEmail");
         emailSender.sendAnonymousLinkMessage(anonymousLinkPojo.getEmail(), anonymousLinkPojo.getPrivateId());
         return generateStatusResponse(RestStatusResponse.USER_ANONYMOUSLINK_SENT);
     }

@@ -88,9 +88,15 @@ services:
       - "activemq.broker.port=61616"
       - "client.authentication.behind.proxy=true"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62918,server=y,suspend=n
+      -Dcom.sun.management.jmxremote.port=9018 -Dcom.sun.management.jmxremote.authenticate=false
+      -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9018
+      -Djava.rmi.server.hostname=satvm01.researchstudio.at"
     ports:
       - "8443:8443"
       - "61617:61616"
+      - "62918:62918"
+      - "9018:9018"      
     volumes:
       - $base_folder/letsencrypt/certs/live/matchat.org/fullchain.pem:/usr/local/tomcat/conf/ssl/t-cert.pem
       - $base_folder/letsencrypt/certs/live/matchat.org/privkey.pem:/usr/local/tomcat/conf/ssl/t-key.pem

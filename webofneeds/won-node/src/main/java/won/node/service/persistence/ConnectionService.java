@@ -294,7 +294,8 @@ public class ConnectionService {
                 logger.debug("socket hint: connection {} - {} already exists", con.get().getSocketURI(),
                                 con.get().getTargetSocketURI());
             }
-            return con.get();
+            // indicate: not a new connection, suppress hint.
+            return null;
         }
         Connection newCon = createConnection(recipientAtomURI, targetAtomURI,
                         recipientSocketURI, socket.getTypeURI(), targetSocketURI, Optional.empty(),
