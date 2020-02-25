@@ -983,7 +983,7 @@ class AtomMessages extends React.Component {
     }
   }
 
-  ensurePetriNetDataIsLoaded(forceFetch = false) {
+  async ensurePetriNetDataIsLoaded(forceFetch = false) {
     if (
       forceFetch ||
       (this.props.isConnected &&
@@ -995,24 +995,22 @@ class AtomMessages extends React.Component {
 
       this.props.setLoadingPetriNetData(connectionUri, true);
 
-      ownerApi
-        .getPetriNetUris(connectionUri)
-        .then(response => {
-          const petriNetData = {};
+      try {
+        const response = await ownerApi.getPetriNetUris(connectionUri);
+        const petriNetData = {};
 
-          response.forEach(entry => {
-            if (entry.processURI) {
-              petriNetData[entry.processURI] = entry;
-            }
-          });
-
-          const petriNetDataImm = Immutable.fromJS(petriNetData);
-          this.props.updatePetriNetData(connectionUri, petriNetDataImm);
-        })
-        .catch(error => {
-          console.error("Error:", error);
-          this.props.setLoadingPetriNetData(connectionUri, false);
+        response.forEach(entry => {
+          if (entry.processURI) {
+            petriNetData[entry.processURI] = entry;
+          }
         });
+
+        const petriNetDataImm = Immutable.fromJS(petriNetData);
+        this.props.updatePetriNetData(connectionUri, petriNetDataImm);
+      } catch (error) {
+        console.error("Error:", error);
+        this.props.setLoadingPetriNetData(connectionUri, false);
+      }
     }
   }
 

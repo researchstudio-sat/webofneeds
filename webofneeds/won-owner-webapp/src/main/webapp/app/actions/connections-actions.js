@@ -31,9 +31,17 @@ export function connectionsChatMessageClaimOnSuccess(
   chatMessage,
   additionalContent,
   senderSocketUri,
-  targetSocketUri
+  targetSocketUri,
+  connectionUri
 ) {
   return dispatch => {
+    const ownedAtomUri = generalSelectors.getAtomUriBySocketUri(
+      senderSocketUri
+    );
+
+    let referencedContentUris = undefined;
+    let messageUriToClaim = undefined;
+
     buildChatMessage({
       chatMessage: chatMessage,
       additionalContent: additionalContent,
@@ -50,15 +58,59 @@ export function connectionsChatMessageClaimOnSuccess(
       )
       .then(([optimisticEvent, jsonResp]) => {
         dispatch({
-          type: actionTypes.connections.sendChatMessageClaimOnSuccess,
+          type: actionTypes.connections.sendChatMessage,
           payload: {
             eventUri: jsonResp.messageUri,
             message: jsonResp.message,
             optimisticEvent,
-            senderSocketUri,
-            targetSocketUri,
+            senderSocketUri: senderSocketUri,
+            targetSocketUri: targetSocketUri,
+            connectionUri,
+            atomUri: ownedAtomUri,
+            claimed: true, // message needs to be marked as claimed directly
           },
         });
+
+        // Send claim message
+        let contentUris = [];
+        messageUriToClaim = jsonResp.messageUri;
+        if (messageUriToClaim)
+          contentUris.push({
+            "@id": messageUriToClaim,
+          });
+        referencedContentUris = new Map();
+        referencedContentUris.set("claims", contentUris);
+        buildChatMessage({
+          chatMessage: undefined,
+          additionalContent: undefined,
+          referencedContentUris: referencedContentUris,
+          optimisticEvent,
+          socketUri: senderSocketUri,
+          targetSocketUri: targetSocketUri,
+          isTTL: false,
+        })
+          .then(msgData =>
+            Promise.all([
+              won.wonMessageFromJsonLd(msgData.message),
+              ownerApi.sendMessage(msgData.message),
+            ])
+          )
+          .then(([optimisticEvent, jsonResp]) => {
+            console.debug("sent chatMsg: ", jsonResp.messageUri);
+            dispatch({
+              type: referencedContentUris
+                ? actionTypes.connections.sendChatMessageRefreshDataOnSuccess //If there are references in the message we need to Refresh the Data from the backend on msg success
+                : actionTypes.connections.sendChatMessage,
+              payload: {
+                eventUri: jsonResp.messageUri,
+                message: jsonResp.message,
+                optimisticEvent,
+                senderSocketUri: senderSocketUri,
+                targetSocketUri: targetSocketUri,
+                connectionUri,
+              },
+            });
+          });
       })
       .catch(e => {
         console.error("Error while processing chat message: ", e);

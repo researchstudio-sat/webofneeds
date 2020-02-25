@@ -637,14 +637,25 @@ export default function(allAtomsInState = initialState, action = {}) {
     case actionTypes.connections.sendChatMessage:
     case actionTypes.connections.sendChatMessageClaimOnSuccess:
     case actionTypes.connections.sendChatMessageRefreshDataOnSuccess: {
-      const messageUri = action.payload.eventUri;
+      //const messageUri = action.payload.eventUri;
 
-      return addMessage(
+      let state = addMessage(
         allAtomsInState,
         action.payload.optimisticEvent,
         false,
-        messageUri
+        action.payload.eventUri
       );
+      if (action.payload.claimed) {
+        return markMessageAsClaimed(
+          state,
+          action.payload.eventUri,
+          action.payload.connectionUri,
+          action.payload.atomUri,
+          action.payload.claimed
+        );
+      } else {
+        return state;
+      }
     }
 
     // update timestamp on success response

@@ -78,7 +78,8 @@ const mapDispatchToProps = dispatch => {
       processUri,
       transitionUri,
       senderSocketUri,
-      targetSocketUri
+      targetSocketUri,
+      connectionUri
     ) => {
       dispatch(
         actionCreators.connections__sendChatMessageClaimOnSuccess(
@@ -88,7 +89,8 @@ const mapDispatchToProps = dispatch => {
             transitionUri: transitionUri,
           }),
           senderSocketUri,
-          targetSocketUri
+          targetSocketUri,
+          connectionUri
         )
       );
     },
@@ -218,7 +220,8 @@ class WonPetrinetState extends React.Component {
         this.props.processUri,
         transitionUri,
         senderSocketUri,
-        targetSocketUri
+        targetSocketUri,
+        this.props.connectionUri
       );
     }
   }
