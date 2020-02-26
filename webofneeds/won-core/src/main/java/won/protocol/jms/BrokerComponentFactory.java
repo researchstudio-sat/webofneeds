@@ -11,7 +11,6 @@
 package won.protocol.jms;
 
 import java.net.URI;
-import java.util.UUID;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.TrustManager;
@@ -100,7 +99,7 @@ public class BrokerComponentFactory {
         activeMQComponent.setTransacted(false);
         activeMQComponent.setUsePooledConnection(true);
         activeMQComponent.setDeliveryPersistent(false);
-        activeMQComponent.setClientId(UUID.randomUUID().toString());
+        activeMQComponent.setClientId(null);
         return activeMQComponent;
     }
 }
