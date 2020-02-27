@@ -69,7 +69,7 @@ public class OwnerApplicationService implements WonMessageProcessor, WonMessageS
         logger.debug("about to pass message {} to separate thread", wonMessage.getMessageURI());
         toOwnerExecutor.execute(() -> {
             messageProcessorDelegate.process(wonMessage);
-            logger.debug("message {} has been sent to {} in separate thread", wonMessage.getMessageURI(),
+            logger.debug("message {} has been processed by {} in separate thread", wonMessage.getMessageURI(),
                             messageProcessorDelegate.getClass().getName());
         });
         return null;

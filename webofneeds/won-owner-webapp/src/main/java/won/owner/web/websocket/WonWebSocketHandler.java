@@ -270,22 +270,34 @@ public class WonWebSocketHandler extends TextWebSocketHandler
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public WonMessage process(final WonMessage wonMessage) {
         try {
+            logger.debug("processing message {} incoming from node", wonMessage.getMessageURI());
             String wonMessageJsonLdString = WonMessageEncoder.encodeAsJsonLd(wonMessage);
             Optional<URI> connectionURI = WonLinkedDataUtils.getConnectionURIForIncomingMessage(wonMessage,
                             linkedDataSource);
             WebSocketMessage<String> webSocketMessage = new TextMessage(wonMessageJsonLdString);
+            logger.debug("determining which owned atom is to be informed of message {} ", wonMessage.getMessageURI());
             URI atomUri = getOwnedAtomURIForMessageFromNode(wonMessage);
+            logger.debug("obtaining WebSocketSessions for message {} ", wonMessage.getMessageURI());
             Set<WebSocketSession> webSocketSessions = webSocketSessionService.getWebSocketSessions(atomUri);
             Optional<User> userOpt = webSocketSessions == null ? Optional.empty()
                             : webSocketSessions.stream().filter(s -> s.isOpen()).findFirst()
                                             .map(s -> getUserForSession(s));
+            logger.debug("found {} sessions for message {} ", webSocketSessions.size(), wonMessage.getMessageURI());
+            logger.debug("found user for message {} via session: {} ", wonMessage.getMessageURI(), userOpt.isPresent());
             if (!userOpt.isPresent()) {
                 userOpt = Optional.ofNullable(userRepository.findByAtomUri(atomUri));
             }
+            logger.debug("found user for message {} atom uri: {} ", wonMessage.getMessageURI(), userOpt.isPresent());
             User user = userOpt.orElse(null); // it's quite possible that we don't find the user object this way.
                                               // Methods below can handle that.
+            logger.debug("updating user-atom association for message {}, user has been found:{} ",
+                            wonMessage.getMessageURI(), userOpt.isPresent());
             userAtomService.updateUserAtomAssociation(wonMessage, user);
+            logger.debug("possible send push notification for message {} , user has been found:{}",
+                            wonMessage.getMessageURI(), userOpt.isPresent());
             notifyPerPush(user, atomUri, wonMessage);
+            logger.debug("trying to find WebSocketSessions for message{}, atom {}, user has been found:{}",
+                            new Object[] { wonMessage.getMessageURI(), atomUri, userOpt.isPresent() });
             webSocketSessions = webSocketSessionService.findWebSocketSessionsForAtomAndUser(atomUri, user);
             // check if we can deliver the message. If not, send email.
             if (webSocketSessions.size() == 0) {
@@ -298,12 +310,15 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                 return wonMessage;
             }
             // we can send it - pre-cache the delivery chain:
+            logger.debug("put message {} into cache before sending on websocket", wonMessage.getMessageURI());
             eagerlyCachePopulatingProcessor.process(wonMessage);
             // send to owner webapp
             int successfullySent = 0;
             for (WebSocketSession session : webSocketSessions) {
+                logger.debug("sending message {} via websocket session", wonMessage.getMessageURI());
                 successfullySent += sendMessageForSession(wonMessage, webSocketMessage, session, atomUri, user) ? 1 : 0;
             }
+            logger.debug("sent message {} via {} websocket sessions", wonMessage.getMessageURI(), successfullySent);
             if (successfullySent == 0) {
                 // we did not manage to send the message via the websocket, send it by email.
                 if (logger.isDebugEnabled()) {
@@ -320,6 +335,8 @@ public class WonWebSocketHandler extends TextWebSocketHandler
         } finally {
             // in any case, let the serversideactionservice do its work, if there is any to
             // do:
+            logger.debug("processing server side actions for message {} if any are registered",
+                            wonMessage.getMessageURI());
             serverSideActionService.process(wonMessage);
         }
     }
