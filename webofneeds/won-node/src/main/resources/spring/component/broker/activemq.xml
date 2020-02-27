@@ -32,7 +32,9 @@
     <!-- This bean extends the the abstract PPC bean in the parent context -->
     <spring:bean id="propertySourcesPlaceholderConfigurer" parent="abstractPropertySourcesPlaceholderConfigurer" />
 
+
     <broker xmlns="http://activemq.apache.org/schema/core" brokerName="wonBroker" persistent="false" >
+
 
         <destinationPolicy>
             <policyMap>
@@ -152,7 +154,7 @@
             <!--transportConnector name="ssl"
                                 uri="${uri.protocol.activemq}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600&amp;needClientAuth=true&amp;transport.enabledProtocols=TLSv1.2" /-->
             <!-- &amp;transport.enabledProtocols=TLSv1.2-->
-            <transportConnector name="vm" uri="vm://localhost?marshal=false&amp;broker.persistent=false&amp;maximumRedeliveries=0&amp;wireFormat.maxInactivityDuration=30000&amp;wireFormat.maxInactivityDurationInitalDelay=10000&amp;transport.useKeepAlive=true" />
+            <!-- transportConnector name="vm" uri="vm://localhost?marshal=false&amp;broker.persistent=false&amp;maximumRedeliveries=0&amp;wireFormat.maxInactivityDuration=30000&amp;wireFormat.maxInactivityDurationInitalDelay=10000&amp;transport.useKeepAlive=true" /-->
 
         </transportConnectors>
         <sslContext>
