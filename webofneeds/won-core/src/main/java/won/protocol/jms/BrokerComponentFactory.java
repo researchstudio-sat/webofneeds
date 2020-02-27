@@ -18,6 +18,7 @@ import javax.net.ssl.TrustManager;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQSslConnectionFactory;
 import org.apache.activemq.camel.component.ActiveMQComponent;
+import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.camel.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +77,9 @@ public class BrokerComponentFactory {
     }
 
     private synchronized Component getBrokerComponent(MessagingType type, ActiveMQConnectionFactory connectionFactory) {
-        WonJmsConfiguration jmsConfiguration = new WonJmsConfiguration(connectionFactory);
+        PooledConnectionFactory pooledFactory = new PooledConnectionFactory(connectionFactory);
+        logger.info("Using pooled connectionfactory for BrokerComponent");
+        WonJmsConfiguration jmsConfiguration = new WonJmsConfiguration(pooledFactory);
         switch (type) {
             case Queue:
                 jmsConfiguration.configureJmsConfigurationForQueues();
@@ -98,6 +101,8 @@ public class BrokerComponentFactory {
         activeMQComponent.setConfiguration(jmsConfiguration);
         activeMQComponent.setTransacted(false);
         activeMQComponent.setUsePooledConnection(true);
+        activeMQComponent.setDeliveryPersistent(false);
+        activeMQComponent.setClientId(null);
         return activeMQComponent;
     }
 }

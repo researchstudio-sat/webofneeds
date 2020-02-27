@@ -12,12 +12,12 @@
 	<!--camel:camelContext id="wonNodeCamel" trace="false"  we comment this out for testing if using the 'trace'
     attribute causes the resources for tracing to be allocated (CamelInternalProcessor$BacklogTracerAdvice with 100k
     elements in its queue) -->
-	<camel:camelContext id="wonNodeCamel">
+	<camel:camelContext id="wonNodeCamel" >
 		<camel:packageScan>
 			<camel:package>won.node.camel.route.fixed</camel:package>
 			<camel:excludes>won.node.camel.route.fixed.NewWonMessageRoutes</camel:excludes>
 		</camel:packageScan>
-		<camel:template id="producerTemplate" defaultEndpoint="direct:JMS" />
+		<camel:template id="producerTemplate" />
 	</camel:camelContext>
 	
 	<!-- transaction manager for '.transacted' routes -->
