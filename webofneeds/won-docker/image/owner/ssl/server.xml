@@ -61,6 +61,7 @@
                          certificateKeystoreFile="/usr/local/tomcat/conf/ssl/t-keystore.jks"
                          certificateKeystorePassword="${CERTIFICATE_PASSWORD}"/>
         </SSLHostConfig>
+ 	<UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" />	
         
   </Connector>
    
