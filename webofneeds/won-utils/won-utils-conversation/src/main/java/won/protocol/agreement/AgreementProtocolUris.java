@@ -32,6 +32,10 @@ public class AgreementProtocolUris {
         this.claimedUris.addAll(uris);
     }
 
+    public void addClaimedMessageUri(URI uri) {
+        this.claimedUris.add(uri);
+    }
+
     public void addAgreementUris(Collection<URI> uris) {
         this.agreementUris.addAll(uris);
     }

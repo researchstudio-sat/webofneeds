@@ -106,9 +106,17 @@ public class AgreementProtocolState {
                 uris.addPendingProposal(proposal);
             }
         });
+        // walk over claim messages and collect the relevant uris:
+        messagesByURI.values().stream().filter(m -> isClaim(m.getMessageURI())).forEach(m -> {
+            // so this is a claim message
+            // determine what it claims
+            Set<URI> claims = m.getClaims();
+            if (!claims.isEmpty()) {
+                claims.stream().forEach(claimURI -> uris.addClaimedMessageUri(claimURI));
+            }
+        });
         uris.addRejectedMessageUris(getRejectedUris());
         uris.addRetractedMessageUris(getRetractedUris());
-        uris.addClaimedMessageUris(getClaimedUris());
         return uris;
     }
 
