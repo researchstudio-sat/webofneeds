@@ -58,7 +58,12 @@ public class SCHEMA {
     public static final Property VALID_FROM = m.createProperty(BASE_URI + "validFrom");
     public static final Property VALID_THROUGH = m.createProperty(BASE_URI + "validThrough");
     public static final Property TERMS_OF_SERVICE = m.createProperty(BASE_URI + "termsOfService");
+    public static final Property FILE_OBJECT = m.createProperty(BASE_URI + "FileObject");
+    public static final Property IMAGE_OBJECT = m.createProperty(BASE_URI + "ImagesObject");
+    public static final Property TYPE = m.createProperty(BASE_URI + "type");
+    public static final Property DATA = m.createProperty(BASE_URI + "data");
     public static final RDFDatatype TEXT = new BaseDatatype(BASE_URI + "Text");
+    public static final RDFDatatype FILE = new BaseDatatype(BASE_URI + "FileObject");
 
     /**
      * returns the URI for this schema
