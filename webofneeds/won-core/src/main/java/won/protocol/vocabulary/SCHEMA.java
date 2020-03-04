@@ -63,7 +63,6 @@ public class SCHEMA {
     public static final Property TYPE = m.createProperty(BASE_URI + "type");
     public static final Property DATA = m.createProperty(BASE_URI + "data");
     public static final RDFDatatype TEXT = new BaseDatatype(BASE_URI + "Text");
-    public static final RDFDatatype FILE = new BaseDatatype(BASE_URI + "FileObject");
 
     /**
      * returns the URI for this schema
