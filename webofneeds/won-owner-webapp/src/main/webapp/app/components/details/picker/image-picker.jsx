@@ -43,7 +43,9 @@ export default class WonImagePicker extends React.Component {
                   className="imagep__preview__item__image"
                   onClick={() => this.setImageAsDefault(image)}
                   alt={image.name}
-                  src={"data:" + image.type + ";base64," + image.data}
+                  src={
+                    "data:" + image.escodingFormat + ";base64," + image.encoding
+                  }
                 />
                 <div
                   className="imagep__preview__item__default"
@@ -90,7 +92,7 @@ export default class WonImagePicker extends React.Component {
   }
 
   isImage(file) {
-    return file && /^image\//.test(file.type);
+    return file && /^image\//.test(file.encodingFormat);
   }
 
   removeImage(imageToRemove) {

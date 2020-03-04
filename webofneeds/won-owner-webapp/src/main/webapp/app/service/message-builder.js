@@ -50,8 +50,8 @@ import vocab from "./vocab.js";
 
             // using ContentAsBase64: http://www.w3.org/TR/Content-in-RDF10/#ContentAsBase64Class
             "cnt:ContentAsBase64": {
-              "cnt:bytes": attachment.data,
-              "msg:contentType": attachment.type,
+              "cnt:bytes": attachment.encoding,
+              "msg:contentType": attachment.encodingFormat,
               //'dct:isFormatOf : { '@id' : 'http://...png' }
               //'dct:format' : { '@id' : 'mime:png' }
             },

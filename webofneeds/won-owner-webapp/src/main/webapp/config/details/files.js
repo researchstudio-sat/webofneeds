@@ -22,16 +22,16 @@ export const files = {
     }
     let payload = [];
     value.forEach(file => {
-      if (file.name && file.type && file.data) {
+      if (file.name && file.encodingFormat && file.encoding) {
         let f = {
           "@id":
             contentUri && identifier
               ? contentUri + "#" + identifier + "-" + generateIdString(10)
               : undefined,
-          "@type": "s:FileObject",
+          "@type": "s:MediaObject",
           "s:name": file.name,
-          "s:type": file.type,
-          "s:data": file.data,
+          "s:encodingFormat": file.encodingFormat,
+          "s:encoding": file.encoding,
         };
 
         payload.push(f);
@@ -51,20 +51,20 @@ export const files = {
         files.forEach(file => {
           let f = {
             name: get(file, "s:name"),
-            type: get(file, "s:type"),
-            data: get(file, "s:data"),
+            encodingFormat: get(file, "s:encodingFormat"),
+            encoding: get(file, "s:encoding"),
           };
-          if (f.name && f.type && f.data) {
+          if (f.name && f.encodingFormat && f.encoding) {
             parsedFiles.push(f);
           }
         });
     } else {
       let f = {
         name: get(files, "s:name"),
-        type: get(files, "s:type"),
-        data: get(files, "s:data"),
+        encodingFormat: get(files, "s:encodingFormat"),
+        encoding: get(files, "s:encoding"),
       };
-      if (f.name && f.type && f.data) {
+      if (f.name && f.encodingFormat && f.encoding) {
         return Immutable.fromJS([f]);
       }
     }
@@ -105,19 +105,19 @@ export const images = {
     value.forEach(image => {
       if (
         image.name &&
-        image.type &&
-        image.data &&
-        /^image\//.test(image.type)
+        image.encodingFormat &&
+        image.encoding &&
+        /^image\//.test(image.encodingFormat)
       ) {
         let img = {
           "@id":
             contentUri && identifier
               ? contentUri + "#" + identifier + "-" + generateIdString(10)
               : undefined,
-          "@type": "s:ImageObject",
+          "@type": "s:MediaObject",
           "s:name": image.name,
-          "s:type": image.type,
-          "s:data": image.data,
+          "s:encodingFormat": image.encodingFormat,
+          "s:encoding": image.encoding,
           "s:representativeOfPage": image.default,
         };
 
@@ -138,22 +138,32 @@ export const images = {
         images.forEach(image => {
           let img = {
             name: get(image, "s:name"),
-            type: get(image, "s:type"),
-            data: get(image, "s:data"),
+            encodingFormat: get(image, "s:encodingFormat"),
+            encoding: get(image, "s:encoding"),
             default: JSON.parse(get(image, "s:representativeOfPage")),
           };
-          if (img.name && img.type && img.data && /^image\//.test(img.type)) {
+          if (
+            img.name &&
+            img.encodingFormat &&
+            img.encoding &&
+            /^image\//.test(img.encodingFormat)
+          ) {
             imgs.push(img);
           }
         });
     } else {
       let img = {
         name: get(images, "s:name"),
-        type: get(images, "s:type"),
-        data: get(images, "s:data"),
+        encodingFormat: get(images, "s:encodingFormat"),
+        encoding: get(images, "s:encoding"),
         default: get(images, "s:representativeOfPage"),
       };
-      if (img.name && img.type && img.data && /^image\//.test(img.type)) {
+      if (
+        img.name &&
+        img.encodingFormat &&
+        img.encoding &&
+        /^image\//.test(img.encodingFormat)
+      ) {
         return Immutable.fromJS([img]);
       }
     }

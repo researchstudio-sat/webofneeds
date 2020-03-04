@@ -294,14 +294,14 @@ public class WonRdfUtils {
          * @param message: Message to be send as well
          * @return
          */
-        public static Model fileMessage(String fileString, String fileName, String message) {
+        public static Model fileMessage(String fileString, String fileName, String MIMEtype, String message) {
             Model messageModel = createModelWithBaseResource();
             Resource baseRes = RdfUtils.getBaseResource(messageModel);
             Resource fileResource = messageModel.createResource();
             fileResource.addProperty(SCHEMA.NAME, fileName);
-            fileResource.addProperty(SCHEMA.TYPE, "text/plain");
-            fileResource.addProperty(SCHEMA.DATA, fileString);
-            fileResource.addProperty(RDF.type, SCHEMA.FILE_OBJECT);
+            fileResource.addProperty(SCHEMA.ENCODING_FORMAT, MIMEtype);
+            fileResource.addProperty(SCHEMA.ENCODING, fileString);
+            fileResource.addProperty(RDF.type, SCHEMA.MEDIA_OBJECT);
             baseRes.addProperty(RDF.type, WONMSG.ConnectionMessage);
             baseRes.addProperty(WONCON.file, fileResource);
             baseRes.addProperty(WONCON.text, message, XSDDatatype.XSDstring);
