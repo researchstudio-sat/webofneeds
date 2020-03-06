@@ -768,22 +768,22 @@ import vocab from "./vocab.js";
    * to get the connection-uris. Thus it's faster.
    */
   won.getAtom = atomUri =>
-    won
-      .ensureLoaded(atomUri)
-      .then(
-        () =>
-          new Promise(resolve =>
-            privateData.store.graph(atomUri, (a, b) => resolve(b))
-          )
+    ownerApi
+      .getJsonLdDataset(atomUri)
+      .then(jsonLdData =>
+        JSON.parse(JSON.stringify(jsonLdData).replace(/@type/g, "rdf:type"))
       )
-      .then(atomGraph =>
-        triples2framedJson(atomUri, atomGraph.triples, {
-          /* frame */
+      .then(jsonLdData =>
+        jsonld.promises.frame(jsonLdData, {
           "@id": atomUri, // start the framing from this uri. Otherwise will generate all possible nesting-variants.
           "@context": won.defaultContext,
         })
       )
+      .then(jsonLdData =>
+        JSON.parse(JSON.stringify(jsonLdData).replace(/rdf:type/g, "@type"))
+      )
       .then(atomJsonLd => {
+        console.debug("atomJsonLd from store: ", atomJsonLd);
         // usually the atom-data will be in a single object in the '@graph' array.
         // We can flatten this and still have valid json-ld
         const flattenedAtomJsonLd = getIn(atomJsonLd, ["@graph", 0])
@@ -806,78 +806,6 @@ import vocab from "./vocab.js";
 
         return flattenedAtomJsonLd;
       });
-
-  function triples2framedJson(atomUri, triples, frame) {
-    const jsonldjsQuads = {
-      // everything in our rdfstore is in the default-graph atm
-      "@default": triples.map(triple => ({
-        subject: rdfstorejsToJsonldjs(triple.subject),
-        predicate: rdfstorejsToJsonldjs(triple.predicate),
-        object: rdfstorejsToJsonldjs(triple.object),
-        //object.datatype: ? //TODO
-      })),
-    };
-
-    const context = frame["@context"] ? clone(frame["@context"]) : {}; //TODO
-    context.useNativeTypes = true; //do some of the parsing from strings to numbers
-
-    return jsonld.promises
-      .fromRDF(jsonldjsQuads, context)
-      .then(complexJsonLd => {
-        //the framing algorithm expects an js-object with an `@graph`-property
-        const complexJsonLd_ = complexJsonLd["@graph"]
-          ? complexJsonLd
-          : { "@graph": complexJsonLd };
-
-        return jsonld.promises.frame(complexJsonLd_, frame);
-      })
-      .then(framed => {
-        return framed;
-      })
-      .catch(err => {
-        console.error("Failed to frame atom-data.", atomUri, err);
-        throw err;
-      });
-  }
-
-  /**
-   * Receives a subject, predicate or object in rdfstorejs-style
-   * and returns it's pendant in jsonldjs-style.
-   * @param element
-   * @return {{value: *, type: undefined}}
-   */
-  function rdfstorejsToJsonldjs(element) {
-    const result = {
-      value: element.nominalValue,
-      type: undefined,
-    };
-
-    switch (element.interfaceName) {
-      case "Literal":
-        result.type = "literal";
-        break;
-      case "NamedNode":
-        result.type = "IRI";
-        break;
-      case "BlankNode":
-        result.type = "blank node";
-        break;
-      default:
-        throw new Error(
-          "Encountered triple with object of unknown type: " +
-            element.object.interfaceName +
-            "\n" +
-            element.subject.nominalValue +
-            " " +
-            element.predicate.nominalValue +
-            " " +
-            element.object.nominalValue +
-            " "
-        );
-    }
-
-    return result;
-  }
 
   function rdfstoreTriplesToString(triples, graphUri) {
     const toToken = x => {
@@ -1703,6 +1631,9 @@ function groupByGraphs(jsonldData, addDefaultContext = true) {
       return Promise.all(flattenedData.map(graph => cleanUpGraph(graph)));
     });
 }
+
+window.groupByGraphs4dbg = groupByGraphs;
+window.jsonld4dbg = jsonld;
 
 /**
  * Optionally prepends a string, and then throws

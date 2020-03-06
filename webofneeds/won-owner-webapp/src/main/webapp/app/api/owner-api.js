@@ -399,7 +399,7 @@ export function getAllActiveMetaPersonas() {
   );
 }
 
-export function getJsonLdDataset(uri, params) {
+export function getJsonLdDataset(uri, params = {}) {
   /**
    * This function is used to generate the query-strings.
    * Should anything about the way the API is accessed changed,
@@ -512,7 +512,11 @@ export function getJsonLdDataset(uri, params) {
         throw error;
       }
     })
-    .then(dataset => dataset.json());
+    .then(dataset => dataset.json())
+    .then(datasetJson => {
+      console.debug("datasetJson from fetch: ", datasetJson);
+      return datasetJson;
+    });
 }
 
 export function getMetaAtoms(
@@ -642,25 +646,23 @@ export function getAgreementProtocolUris(connectionUri) {
     .then(response => response.json());
 }
 
-export async function getPetriNetUris(connectionUri) {
+export function getPetriNetUris(connectionUri) {
   const url = urljoin(
     ownerBaseUrl,
     "/rest/petrinet/getPetriNetUris",
     `?connectionUri=${connectionUri}`
   );
 
-  const response = await fetch(url, {
+  return fetch(url, {
     method: "get",
     headers: {
       Accept: "application/ld+json",
       "Content-Type": "application/ld+json",
     },
     credentials: "include",
-  });
-  console.debug("RESPONSE", response);
-  //.then(checkHttpStatus)
-  const jsonResponse = response.json();
-  return jsonResponse;
+  })
+    .then(checkHttpStatus)
+    .then(response => response.json());
 }
 
 /**
