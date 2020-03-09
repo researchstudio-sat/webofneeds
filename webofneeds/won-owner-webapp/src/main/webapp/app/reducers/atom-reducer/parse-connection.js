@@ -9,7 +9,7 @@ export function parseMetaConnection(metaConnection) {
   let parsedMetaConnection = {
     belongsToUri: get(metaConnectionImm, "atomUri"),
     data: {
-      uri: get(metaConnectionImm, "connectionUri"),
+      uri: get(metaConnectionImm, "uri"),
       state: get(metaConnectionImm, "connectionState"),
       messages: Immutable.Map(),
       socketUri: get(metaConnectionImm, "socketUri"),

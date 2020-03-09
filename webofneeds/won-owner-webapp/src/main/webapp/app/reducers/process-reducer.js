@@ -434,7 +434,7 @@ export default function(processState = initialState, action = {}) {
         connections.map(conn => {
           processState = updateConnectionProcess(
             processState,
-            get(conn, "connectionUri"),
+            get(conn, "uri"),
             {
               toLoad: true,
             }

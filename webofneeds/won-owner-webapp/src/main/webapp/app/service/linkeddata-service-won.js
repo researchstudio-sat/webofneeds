@@ -140,15 +140,13 @@ import vocab from "./vocab.js";
       .then(result =>
         result.map(x => {
           return {
-            connectionUri: x.uri,
+            uri: x.uri,
             connectionState: x.connectionState,
             socketUri: x.socketUri,
-            socketType: x.socketType,
             atomUri: x.atomUri,
             targetAtomUri: x.targetAtomUri,
             targetConnectionUri: x.targetConnectionUri,
             targetSocketUri: x.targetSocketUri,
-            targetSocketType: x.targetSocketType,
             modified: x.modified,
           };
         })
@@ -276,9 +274,9 @@ import vocab from "./vocab.js";
         .then(connUris => {
           let _connUris;
           if (is("Array", connUris)) {
-            _connUris = [connUris.map(connUri => connUri["@id"])];
+            _connUris = connUris.map(connUri => connUri["@id"]);
           } else {
-            _connUris = connUris["@id"];
+            _connUris = [connUris["@id"]];
           }
 
           return _connUris[0];
@@ -323,9 +321,9 @@ import vocab from "./vocab.js";
         .then(connUris => {
           let _connUris;
           if (is("Array", connUris)) {
-            _connUris = [connUris.map(connUri => connUri["@id"])];
+            _connUris = connUris.map(connUri => connUri["@id"]);
           } else {
-            _connUris = connUris["@id"];
+            _connUris = [connUris["@id"]];
           }
 
           const newFetchParams = {
