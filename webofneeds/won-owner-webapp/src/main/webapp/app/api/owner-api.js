@@ -512,11 +512,7 @@ export function getJsonLdDataset(uri, params = {}) {
         throw error;
       }
     })
-    .then(dataset => dataset.json())
-    .then(datasetJson => {
-      console.debug("datasetJson from fetch: ", datasetJson);
-      return datasetJson;
-    });
+    .then(dataset => dataset.json());
 }
 
 export function getMetaAtoms(
