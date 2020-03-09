@@ -26,11 +26,6 @@ import won from "./won.js";
 import vocab from "./vocab.js";
 
 (function() {
-  const NEWLINE_REPLACEMENT_STRING = "#%§%#§";
-  const NEWLINE_REPLACEMENT_PATTERN = /#%§%#§/gm;
-  const DOUBLEQUOTE_REPLACEMENT_STRING = "§#%§%#";
-  const DOUBLEQUOTE_REPLACEMENT_PATTERN = /§#%§%#/gm;
-
   const privateData = {};
 
   won.clearStore = function() {
@@ -387,13 +382,6 @@ import vocab from "./vocab.js";
     if (!uri) {
       throw { message: "ensureLoaded: uri must not be null" };
     }
-
-    console.debug(
-      "called won.ensureLoaded: ",
-      uri,
-      "fetchParams: ",
-      fetchParams
-    );
 
     //we allow suppressing the fetch - this is used when the data to be accessed is
     //known to be present in the local store
@@ -771,7 +759,14 @@ import vocab from "./vocab.js";
     ownerApi
       .getJsonLdDataset(atomUri)
       .then(jsonLdData =>
-        JSON.parse(JSON.stringify(jsonLdData).replace(/@type/g, "rdf:type"))
+        /* JsonLd seems to have a framing issue when it comes to @type -> to ensure all the attributes are used in the data
+         we need to replace @type with the rdf:type, and also replace @value with rdf:value otherwise the framing would not work
+         */
+        JSON.parse(
+          JSON.stringify(jsonLdData)
+            .replace(/@type/g, "rdf:xtype")
+            .replace(/@value/g, "rdf:xvalue")
+        )
       )
       .then(jsonLdData =>
         jsonld.promises.frame(jsonLdData, {
@@ -780,10 +775,19 @@ import vocab from "./vocab.js";
         })
       )
       .then(jsonLdData =>
-        JSON.parse(JSON.stringify(jsonLdData).replace(/rdf:type/g, "@type"))
+        /* After framing we replace the rdf:type and rdf:value with @type and @value again
+         */
+        JSON.parse(
+          JSON.stringify(jsonLdData)
+            .replace(/rdf:xtype/g, "@type")
+            .replace(/rdf:xvalue/g, "@value")
+        )
+      )
+      .then(jsonLdData =>
+        //Compacting is necessary because our replacement did not compact all uris, before because it assumed literals
+        jsonld.promises.compact(jsonLdData, won.defaultContext)
       )
       .then(atomJsonLd => {
-        console.debug("atomJsonLd from store: ", atomJsonLd);
         // usually the atom-data will be in a single object in the '@graph' array.
         // We can flatten this and still have valid json-ld
         const flattenedAtomJsonLd = getIn(atomJsonLd, ["@graph", 0])
@@ -806,34 +810,6 @@ import vocab from "./vocab.js";
 
         return flattenedAtomJsonLd;
       });
-
-  function rdfstoreTriplesToString(triples, graphUri) {
-    const toToken = x => {
-      switch (x.interfaceName) {
-        case "NamedNode":
-          return `<${x.nominalValue}>`;
-        case "Literal":
-          return `"${x.nominalValue
-            .replace(/(\r\n|\n|\r)/gm, NEWLINE_REPLACEMENT_STRING)
-            .replace(/"/gm, DOUBLEQUOTE_REPLACEMENT_STRING)}"`; //TODO: REMOVE FUGLY FIX ONCE n3.js is not having issues with newlines or doublequotes anymore
-        case "BlankNode":
-          return x.nominalValue;
-        default:
-          throw new Error("Can't parse token: " + JSON.stringify(x));
-      }
-    };
-    const tripleToString = t =>
-      toToken(t.subject) +
-      " " +
-      toToken(t.predicate) +
-      " " +
-      toToken(t.object) +
-      " " +
-      (graphUri ? `<${graphUri}>` : "") +
-      ".";
-
-    return triples.map(tripleToString).join("\n");
-  }
 
   won.validateEnvelopeDataForAtom = function(atomUri) {
     if (typeof atomUri === "undefined" || atomUri == null) {
@@ -1020,8 +996,8 @@ import vocab from "./vocab.js";
   };
 
   won.getWonMessage = (msgUri, fetchParams) => {
-    return won
-      .getRawEvent(msgUri, fetchParams)
+    return ownerApi
+      .getJsonLdDataset(msgUri, fetchParams)
       .then(rawEvent => won.wonMessageFromJsonLd(rawEvent))
       .catch(e => {
         const msg = "Failed to get wonMessage " + msgUri + ".";
@@ -1033,57 +1009,6 @@ import vocab from "./vocab.js";
 
   window.getWonMessage4dbg = won.getWonMessage;
   window.wonMessageFromJsonLd4dbg = won.wonMessageFromJsonLd;
-
-  won.getRawEvent = (eventUri, fetchParams) => {
-    return won
-      .ensureLoaded(eventUri, fetchParams)
-      .then(() => {
-        return Promise.all(
-          Array.from(privateData.documentToGraph[eventUri]).map(graphUri => {
-            return won
-              .getCachedGraphTriples(graphUri)
-              .then(graphTriples =>
-                jsonld.promises.fromRDF(
-                  rdfstoreTriplesToString(graphTriples, graphUri),
-                  {
-                    format: "application/nquads",
-                  }
-                )
-              )
-              .then(parsedJsonLd => {
-                if (parsedJsonLd.length !== 1) {
-                  throw new Error(
-                    "Got more or less than the expected one graph " +
-                      JSON.stringify(parsedJsonLd)
-                  );
-                } else {
-                  parsedJsonLd = parsedJsonLd[0];
-                }
-                let jsonLdString = JSON.stringify(parsedJsonLd)
-                  .replace(NEWLINE_REPLACEMENT_PATTERN, "\\n")
-                  .replace(DOUBLEQUOTE_REPLACEMENT_PATTERN, '\\"');
-
-                return JSON.parse(jsonLdString); //TODO: REMOVE FUGLY FIX AND JUST RETURN parsedJsonLd ONCE n3.js is not having issues with newlines anymore
-              });
-          })
-        );
-      })
-      .then(eventGraphs => {
-        if (!is("Array", eventGraphs)) {
-          throw new Error(
-            "event graphs weren't an array. something didn't go as expected: " +
-              JSON.stringify(eventGraphs)
-          );
-        }
-
-        return {
-          "@graph": eventGraphs,
-          "@context": clone(won.defaultContext),
-        };
-      });
-  };
-
-  window.getRawEvent4dbg = won.getRawEvent;
 
   /**
    * Fetches the triples where URI is subject and add objects of those triples to the
@@ -1099,6 +1024,7 @@ import vocab from "./vocab.js";
    * @param fetchParams See `ensureLoaded`.
    */
   won.getNode = function(uri, fetchParams) {
+    console.debug("won.getNode: ", uri, "fetchParams:", fetchParams);
     if (!uri) {
       return Promise.reject({ message: "getNode: uri must not be null" });
     }
@@ -1163,6 +1089,10 @@ import vocab from "./vocab.js";
         });
         node.uri = uri;
         releaseLock && releaseLock();
+        return node;
+      })
+      .then(node => {
+        console.debug("Result-> getNode(", uri, fetchParams, "): ", node);
         return node;
       })
       .catch(e => {
@@ -1402,9 +1332,10 @@ import vocab from "./vocab.js";
         return executeQuery(crawlableQuery.query, baseUri, relevantResources);
       } else {
         Array.prototype.push.apply(relevantResources, resolvedUris);
-        const loadedPromises = resolvedUris.map(x =>
-          won.ensureLoaded(x, { requesterWebId })
-        );
+        const loadedPromises = resolvedUris.map(x => {
+          console.debug("fetchUri: ", x, "fetchParams: ", { requesterWebId });
+          return won.ensureLoaded(x, { requesterWebId });
+        });
         return Promise.all(loadedPromises)
           .then(() =>
             resolvePropertyPathsFromBaseUri(
