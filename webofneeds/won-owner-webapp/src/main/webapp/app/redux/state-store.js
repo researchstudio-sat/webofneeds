@@ -65,10 +65,7 @@ export function fetchDataForOwnedAtoms(ownedAtomUris, dispatch, getState) {
 
 export function fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch) {
   return won
-    .deleteDocumentFromStore(connUri, true)
-    .then(() =>
-      won.getConnectionWithEventUris(connUri, { requesterWebId: atomUri })
-    )
+    .getConnectionWithEventUris(connUri, { requesterWebId: atomUri })
     .then(connection => {
       dispatch({
         type: actionTypes.connections.storeActive,

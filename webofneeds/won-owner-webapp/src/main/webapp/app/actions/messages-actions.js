@@ -51,11 +51,8 @@ export function failedCloseAtom(event) {
   return (dispatch, getState) => {
     const atomUri = event.getAtom();
 
-    won
-      .clearStoreWithPromise()
-      .then(() =>
-        stateStore.fetchDataForOwnedAtoms([atomUri], dispatch, getState)
-      )
+    stateStore
+      .fetchDataForOwnedAtoms([atomUri], dispatch, getState)
       .then(() => dispatch({ type: actionTypes.messages.closeAtom.failed }));
   };
 }
@@ -64,11 +61,8 @@ export function failedReopenAtom(event) {
   return (dispatch, getState) => {
     const atomUri = event.getAtom();
 
-    won
-      .clearStoreWithPromise()
-      .then(() =>
-        stateStore.fetchDataForOwnedAtoms([atomUri], dispatch, getState)
-      )
+    stateStore
+      .fetchDataForOwnedAtoms([atomUri], dispatch, getState)
       .then(() => dispatch({ type: actionTypes.messages.reopenAtom.failed }));
   };
 }
@@ -162,11 +156,8 @@ export function successfulEdit(event) {
         "successfulEdit: Atom is currently loading DO NOT FETCH AGAIN"
       );
     } else {
-      won
-        .clearStoreWithPromise()
-        .then(() =>
-          stateStore.fetchDataForOwnedAtoms([atomURI], dispatch, getState)
-        )
+      stateStore
+        .fetchDataForOwnedAtoms([atomURI], dispatch, getState)
         .then(() => {
           dispatch(
             actionCreators.atoms__editSuccessful({
@@ -211,16 +202,7 @@ export function processChangeNotificationMessage(wonMessage) {
       atomUriToLoad
     );
     if (!isAtomLoading && !isAtomProcessingUpdate) {
-      won
-        .clearStoreWithPromise()
-        .then(() =>
-          stateStore.fetchAtomAndDispatch(
-            atomUriToLoad,
-            dispatch,
-            getState,
-            true
-          )
-        );
+      stateStore.fetchAtomAndDispatch(atomUriToLoad, dispatch, getState, true);
     } else {
       console.debug(
         "Omit fetch for processChangeNotificationMessage, fetch is currently in progress for atom: ",
