@@ -127,9 +127,15 @@ import vocab from "./vocab.js";
         won.getJsonLdNode(connectionContainerUri, requesterWebId)
       )
       .then(connectionContainer => {
-        const connections = connectionContainer["@graph"][0]["rdfs:member"];
+        const connectionsGraph =
+          connectionContainer &&
+          connectionContainer["@graph"] &&
+          connectionContainer["@graph"][0];
+        const connections = connectionsGraph && connectionsGraph["rdfs:member"];
 
-        if (is("Array", connections)) {
+        if (!connections) {
+          return [];
+        } else if (is("Array", connections)) {
           return Promise.all(
             connections.map(connection => getConnection(connection["@id"]))
           );
@@ -221,17 +227,24 @@ import vocab from "./vocab.js";
         ])
       )
       .then(([connection, messageContainer]) => {
-        const members = messageContainer["@graph"][0]["rdfs:member"];
+        const messageContainerGraph =
+          messageContainer &&
+          messageContainer["@graph"] &&
+          messageContainer["@graph"][0];
+        const messages =
+          messageContainerGraph && messageContainerGraph["rdfs:member"];
 
         /*
            * if there's only a single rdfs:member in the event
            * container, getJsonLdNode will not return an array, so we
            * need to make sure it's one from here on out.
            */
-        if (is("Array", members)) {
-          connection.hasEvents = members.map(member => member["@id"]);
+        if (!messages) {
+          connection.hasEvents = [];
+        } else if (is("Array", messages)) {
+          connection.hasEvents = messages.map(message => message["@id"]);
         } else {
-          connection.hasEvents = [members["@id"]];
+          connection.hasEvents = [messages["@id"]];
         }
         return connection;
       });
@@ -270,7 +283,10 @@ import vocab from "./vocab.js";
       won
         .getJsonLdNode(senderSocketUri.split("#")[0] + "/c", fetchParams)
         //add the eventUris
-        .then(jsonResp => jsonResp["@graph"][0]["rdfs:member"])
+        .then(jsonResp => {
+          console.debug("won.getConnectionUrisBySocket jsonResp:", jsonResp);
+          return jsonResp["@graph"][0]["rdfs:member"];
+        })
         .then(connUris => {
           let _connUris;
           if (is("Array", connUris)) {
@@ -317,7 +333,13 @@ import vocab from "./vocab.js";
       won
         .getJsonLdNode(senderSocketUri.split("#")[0] + "/c", fetchParams)
         //add the eventUris
-        .then(jsonResp => jsonResp["@graph"][0]["rdfs:member"])
+        .then(jsonResp => {
+          console.debug(
+            "won.getConnectionWithEventUrisBySocket jsonResp:",
+            jsonResp
+          );
+          return jsonResp["@graph"][0]["rdfs:member"];
+        })
         .then(connUris => {
           let _connUris;
           if (is("Array", connUris)) {
