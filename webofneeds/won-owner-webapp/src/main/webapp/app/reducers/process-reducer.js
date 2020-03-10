@@ -439,7 +439,7 @@ export default function(processState = initialState, action = {}) {
               toLoad: true,
             }
           );
-          const targetAtomUri = get(conn, "targetAtomUri");
+          const targetAtomUri = get(conn, "targetAtom");
           if (!processUtils.isAtomLoaded(processState, targetAtomUri)) {
             processState = updateAtomProcess(processState, targetAtomUri, {
               toLoad: true,
