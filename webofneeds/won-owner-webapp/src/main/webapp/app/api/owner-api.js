@@ -482,12 +482,12 @@ export function getJsonLdDataset(uri, params = {}) {
 
   const requestUri = queryString(uri, params);
 
-  console.debug(
+  /*console.debug(
     "called ownerApi.getJsonLdDataset: ",
     requestUri,
     "params: ",
     params
-  );
+  );*/
 
   return fetch(requestUri, {
     method: "get",

@@ -142,21 +142,7 @@ import vocab from "./vocab.js";
         } else {
           return Promise.all([getConnection(connections["@id"])]);
         }
-      })
-      .then(result =>
-        result.map(x => {
-          return {
-            uri: x.uri,
-            connectionState: x.connectionState,
-            socketUri: x.socketUri,
-            atomUri: x.atomUri,
-            targetAtomUri: x.targetAtomUri,
-            targetConnectionUri: x.targetConnectionUri,
-            targetSocketUri: x.targetSocketUri,
-            modified: x.modified,
-          };
-        })
-      );
+      });
   };
 
   function getConnection(connectionUri, fetchParams) {

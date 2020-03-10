@@ -7,13 +7,13 @@ export function parseMetaConnection(metaConnection) {
   const metaConnectionImm = Immutable.fromJS(metaConnection);
 
   let parsedMetaConnection = {
-    belongsToUri: get(metaConnectionImm, "atomUri"),
+    belongsToUri: get(metaConnectionImm, "sourceAtom"),
     data: {
       uri: get(metaConnectionImm, "uri"),
       state: get(metaConnectionImm, "connectionState"),
       messages: Immutable.Map(),
-      socketUri: get(metaConnectionImm, "socketUri"),
-      targetSocketUri: get(metaConnectionImm, "targetSocketUri"),
+      socketUri: get(metaConnectionImm, "socket"),
+      targetSocketUri: get(metaConnectionImm, "targetSocket"),
       agreementData: {
         agreementUris: Immutable.Set(),
         pendingProposalUris: Immutable.Set(),
@@ -27,8 +27,8 @@ export function parseMetaConnection(metaConnection) {
         claimedMessageUris: Immutable.Set(),
       },
       petriNetData: Immutable.Map(),
-      targetAtomUri: get(metaConnectionImm, "targetAtomUri"),
-      targetConnectionUri: get(metaConnectionImm, "targetConnectionUri"),
+      targetAtomUri: get(metaConnectionImm, "targetAtom"),
+      targetConnectionUri: get(metaConnectionImm, "targetConnection"),
       creationDate: undefined,
       lastUpdateDate: undefined,
       unread: undefined,
