@@ -1,0 +1,104 @@
+@prefix msg:   <https://w3id.org/won/message#> .
+@prefix conn:  <https://node.matchat.org/won/resource/connection/> .
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix rdfg:  <http://www.w3.org/2004/03/trix/rdfg-1/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix match: <https://w3id.org/won/matching#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix cert:  <http://www.w3.org/ns/auth/cert#> .
+@prefix local: <https://node.matchat.org/won/resource/> .
+@prefix s:     <http://schema.org/> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:   <https://w3id.org/won/core#> .
+@prefix event: <https://node.matchat.org/won/resource/msg/> .
+@prefix atom:  <https://node.matchat.org/won/resource/atom/> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+
+<https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#atom-sig> {
+    <https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#atom-sig>
+            a                         msg:Signature ;
+            msg:hash                  "W1gTrQWiMBCWeJLnJ3XfyxFP2sAGf2HheygmfbWmfaiNAH" ;
+            msg:publicKeyFingerprint  "W1iRFqdtFRa6SmLKHNZxg4iR2sxfRcjLGS6TWcDfsQ1vd9" ;
+            msg:signatureValue        "de28RyaJP8FohC8ChGFqcspinEZTa3s1ZV1NM6kKSJkwVH8ogzqbkq6nTmzyeYYRnhxtwa9K8BnALjdQLMNpbZLRAcUF5BRkNTWGmZFewWFE9etgu9ZZvykvHvCKxcggH88SSRF2Fqu" ;
+            msg:signedGraph           <https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#atom> ;
+            msg:signer                atom:nfl1vnt75gmh .
+}
+
+<https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#atom> {
+    <https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#6evtuarene-fromLocation-geo>
+            a               s:GeoCoordinates ;
+            s:latitude      "48.227710" ;
+            s:longitude     "16.364119" ;
+            con:geoSpatial  "48.227710#16.364119"^^<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon> .
+    
+    <https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#6evtuarene-toLocation>
+            a       s:Place ;
+            s:geo   <https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#6evtuarene-toLocation-geo> ;
+            s:name  "Am Brigittenauer Sporn, KG Brigittenau, Brigittenau, Wien, 1200, Austria" .
+    
+    <https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#6evtuarene-fromLocation>
+            a       s:Place ;
+            s:geo   <https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#6evtuarene-fromLocation-geo> ;
+            s:name  "Friedensbrücke, Spittelauer Lände, Thurygrund II, KG Alsergrund, Alsergrund, Wien, 1090, Austria" .
+    
+    <https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#6evtuarene>
+            a               s:TravelAction ;
+            s:fromLocation  <https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#6evtuarene-fromLocation> ;
+            s:toLocation    <https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#6evtuarene-toLocation> .
+    
+    <https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#holdableSocket>
+            won:socketDefinition  <https://w3id.org/won/ext/hold#HoldableSocket> .
+    
+    <https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#6evtuarene-toLocation-geo>
+            a               s:GeoCoordinates ;
+            s:latitude      "48.258273" ;
+            s:longitude     "16.370342" ;
+            con:geoSpatial  "48.258273#16.370342"^^<http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon> .
+    
+    atom:nfl1vnt75gmh
+            a                      <https://w3id.org/won/ext/demo#PersonalTransportSearch> , won:Atom ;
+            dc:title               "Need a lift" ;
+            s:title                "Need a lift" ;
+            cert:key               [ cert:PublicKey  [ a                  won:ECCPublicKey ;
+                                                       won:ecc_algorithm  "EC" ;
+                                                       won:ecc_curveId    "secp384r1" ;
+                                                       won:ecc_qx         "2035f0523d1033ed5b334c00a779b8bb9b31598c99b1dfdf17599ecbd4eef80da37d848f9f03aa7055f7be5cc863dc5d" ;
+                                                       won:ecc_qy         "bad330236f5af09fc33e29dda5530b7f15f9e3189d79295607cd907d88bd43bac9d92f3dfdfa41fa07a6f65654b9aa9f"
+                                                     ] ] ;
+            won:defaultSocket      <https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#chatSocket> ;
+            won:socket             <https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#holdableSocket> , <https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#chatSocket> ;
+            match:doNotMatchAfter  "2020-02-13T18:34:40.680Z"^^xsd:dateTime ;
+            match:seeks            [ con:travelAction
+                              <https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#6evtuarene> ] ;
+            match:sparqlQuery      "PREFIX won: <https://w3id.org/won/core#>\nPREFIX s: <http://schema.org/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\nPREFIX con: <https://w3id.org/won/content#>\nSELECT DISTINCT ?result ?score WHERE {\n  ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Atom.\n  {\n    {\n      ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/resource/Ridesharing>.\n      OPTIONAL {\n        ?result (con:travelAction/s:fromLocation) ?fromLocation.\n        ?fromLocation s:geo ?fromLocation_geo.\n        ?fromLocation_geo s:latitude ?fromLocation_lat;\n          s:longitude ?fromLocation_lon.\n        BIND(ABS((xsd:decimal(?fromLocation_lat)) - \"48.22771\"^^xsd:decimal) AS ?fromLatDiffRaw)\n        BIND(ABS((xsd:decimal(?fromLocation_lon)) - \"16.364119\"^^xsd:decimal) AS ?fromLonDiff)\n        BIND(IF(?fromLatDiffRaw > 180 , 360  - ?fromLatDiffRaw, ?fromLatDiffRaw) AS ?fromLatDiff)\n        BIND((?fromLatDiff * ?fromLatDiff) + (?fromLonDiff * ?fromLonDiff) AS ?fromLocation_geoDistanceScore)\n      }\n      OPTIONAL {\n        ?result (con:travelAction/s:toLocation) ?toLocation.\n        ?toLocation s:geo ?toLocation_geo.\n        ?toLocation_geo s:latitude ?toLocation_lat;\n          s:longitude ?toLocation_lon.\n        BIND(ABS((xsd:decimal(?toLocation_lat)) - \"48.2582733\"^^xsd:decimal) AS ?toLatDiffRaw)\n        BIND(ABS((xsd:decimal(?toLocation_lon)) - \"16.3703424\"^^xsd:decimal) AS ?toLonDiff)\n        BIND(IF(?toLatDiffRaw > 180 , 360  - ?toLatDiffRaw, ?toLatDiffRaw) AS ?toLatDiff)\n        BIND((?toLatDiff * ?toLatDiff) + (?toLonDiff * ?toLonDiff) AS ?toLocation_geoDistanceScore)\n      }\n      FILTER((BOUND(?fromLocation_geoDistanceScore)) && (BOUND(?toLocation_geoDistanceScore)))\n      BIND(IF(BOUND(?fromLocation_geoDistanceScore), ?fromLocation_geoDistanceScore, ?toLocation_geoDistanceScore) AS ?fromScore)\n      BIND(IF(BOUND(?toLocation_geoDistanceScore), ?toLocation_geoDistanceScore, ?fromLocation_geoDistanceScore) AS ?toScore)\n      BIND((?toScore + ?fromScore) / 2  AS ?score)\n    }\n    UNION\n    {\n      ?result <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> s:TaxiService;\n        (won:location|s:location) ?location.\n      ?location s:geo ?location_geo.\n      ?location_geo s:latitude ?location_lat;\n        s:longitude ?location_lon.\n      BIND(ABS((xsd:decimal(?location_lat)) - \"48.22771\"^^xsd:decimal) AS ?fromLatDiffRaw)\n      BIND(ABS((xsd:decimal(?location_lon)) - \"16.364119\"^^xsd:decimal) AS ?fromLonDiff)\n      BIND(IF(?fromLatDiffRaw > 180 , 360  - ?fromLatDiffRaw, ?fromLatDiffRaw) AS ?fromLatDiff)\n      BIND((?fromLatDiff * ?fromLatDiff) + (?fromLonDiff * ?fromLonDiff) AS ?fromLocation_geoDistanceScore)\n      BIND(ABS((xsd:decimal(?location_lat)) - \"48.2582733\"^^xsd:decimal) AS ?toLatDiffRaw)\n      BIND(ABS((xsd:decimal(?location_lon)) - \"16.3703424\"^^xsd:decimal) AS ?toLonDiff)\n      BIND(IF(?toLatDiffRaw > 180 , 360  - ?toLatDiffRaw, ?toLatDiffRaw) AS ?toLatDiff)\n      BIND((?toLatDiff * ?toLatDiff) + (?toLonDiff * ?toLonDiff) AS ?toLocation_geoDistanceScore)\n      BIND((?fromLocation_geoDistanceScore + ?toLocation_geoDistanceScore) / 2  AS ?score)\n    }\n  }\n}\nORDER BY (?distScore)" .
+    
+    <https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#chatSocket>
+            won:socketDefinition  <https://w3id.org/won/ext/chat#ChatSocket> .
+}
+
+<https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#sysinfo> {
+    <https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#sysinfo>
+            rdfg:subGraphOf  atom:nfl1vnt75gmh .
+    
+    atom:nfl1vnt75gmh
+            a                     won:Atom ;
+            dct:created           "2020-02-13T18:04:42.601Z"^^xsd:dateTime ;
+            dct:modified          "2020-02-26T13:55:53.847Z"^^xsd:dateTime ;
+            won:atomState         won:Active ;
+            won:connections       <https://node.matchat.org/won/resource/atom/nfl1vnt75gmh/c> ;
+            won:contentGraph      <https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#derivedData> , <https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#atom-sig> , <https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#atom> ;
+            won:messageContainer  <https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#msg> ;
+            won:wonNode           <https://node.matchat.org/won/resource> .
+    
+    <https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#msg>
+            a            won:MessageContainer ;
+            rdfs:member  <wm:/W1nMmaybytXwS2Sy5sHZXPb926cJmZwuzrLAHDkPapFmLX> , <wm:/W1h1YgzmHr7RjTM8HkBpNavcwfoDuBzUWksqHK6fvqgunG> .
+}
+
+<https://node.matchat.org/won/resource/atom/nfl1vnt75gmh#derivedData> {
+    atom:nfl1vnt75gmh
+            <https://w3id.org/won/ext/hold#heldBy>
+                    atom:wysduej4gqj1 .
+}

@@ -1,4 +1,5 @@
 @prefix con:   <https://w3id.org/won/content#> .
+@prefix demo:   <https://w3id.org/won/ext/demo#> .
 @prefix match:   <https://w3id.org/won/matching#> .
 @prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://satvm05.researchstudio.at/won/resource/connection/> .

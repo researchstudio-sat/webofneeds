@@ -1,0 +1,13 @@
+SELECT  ?result ?score
+WHERE
+  { { { OPTIONAL
+          { ?result  a                     <http://schema.org/TravelAction>
+            BIND(1 AS ?v_0)
+          }
+        ?result  a                     <https://w3id.org/won/core#Atom>
+      }
+      BIND(( if(bound(?v_0), ?v_0, 0) / 1 ) AS ?score)
+    }
+    FILTER ( ?score > 0 )
+  }
+

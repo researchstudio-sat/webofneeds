@@ -17,6 +17,8 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.algebra.Algebra;
@@ -25,10 +27,11 @@ import org.apache.jena.sparql.algebra.OpAsQuery;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.tdb.TDB;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
+import won.matcher.sparql.actor.QueryByExampleBuilder;
 import won.matcher.sparql.actor.SparqlMatcherUtils;
+import won.protocol.util.AtomModelWrapper;
 
 /**
  * Test for experimenting with in-memory datasets and queries.
@@ -54,7 +57,8 @@ public class SparqlQueryTest {
     }
 
     @Test
-    @Ignore // useful for trying things out, does not make so much sense as a unit test
+    // @Ignore // useful for trying things out, does not make so much sense as a
+    // unit test
     public void testQuery() throws Exception {
         Dataset dataset = DatasetFactory.create();
         RDFDataMgr.read(dataset, getResourceAsStream("sparqlquerytest/atom2.trig"), Lang.TRIG);
@@ -218,6 +222,23 @@ public class SparqlQueryTest {
         Assert.assertEquals(expected, actual);
     }
 
+    @Test
+    public void testQueryByExampleBuilder() throws Exception {
+        Dataset dataset = DatasetFactory.create();
+        RDFDataMgr.read(dataset, getResourceAsStream("atommodel/seeks-example.trig"), Lang.TRIG);
+        AtomModelWrapper wrapper = new AtomModelWrapper(dataset);
+        Model model = wrapper.getAtomModel();
+        Resource atomResource = wrapper.getAtomContentNode();
+        QueryByExampleBuilder qbeBuilder = new QueryByExampleBuilder(model, atomResource, Var.alloc("result"),
+                        Var.alloc("score"));
+        Set<Op> queries = qbeBuilder.build();
+        queries.forEach(q -> {
+            System.out.println(q);
+            Query query = OpAsQuery.asQuery(q);
+            System.out.println(query);
+        });
+    }
+
     private void checkResult(String queryString, String expectedQueryString, Function<Op, Op> transform) {
         Query query = QueryFactory.create(queryString);
         Op queryOp = Algebra.compile(query);
@@ -232,5 +253,16 @@ public class SparqlQueryTest {
          * System.out.println(actualOp); System.out.println(actual);
          */
         Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void showQueryAlgebra() throws Exception {
+        String queryString = getResourceAsString("sparqlquerytest/queryalgebra/input.rq");
+        Query query = QueryFactory.create(queryString);
+        Op queryOp = Algebra.compile(query);
+        System.out.println(query);
+        System.out.println(queryOp);
+        Query queryFromOP = OpAsQuery.asQuery(queryOp);
+        System.out.println(queryFromOP);
     }
 }
