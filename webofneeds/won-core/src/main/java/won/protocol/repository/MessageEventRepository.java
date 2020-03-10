@@ -164,7 +164,7 @@ public interface MessageEventRepository extends WonRepository<MessageEvent> {
     Slice<MessageEvent> findByParentURIBefore(@Param("parent") URI parentURI,
                     @Param("referenceDate") Date referenceDate, Pageable pageable);
 
-    @Query("select msg from MessageEvent msg left join fetch msg.datasetHolder where msg.parentURI = :parent and msg.creationDate < :referenceDate")
+    @Query("select distinct msg from MessageEvent msg left join fetch msg.datasetHolder where msg.parentURI = :parent and msg.creationDate < :referenceDate")
     Slice<MessageEvent> findByParentURIBeforeFetchDatasetEagerly(@Param("parent") URI parentURI,
                     @Param("referenceDate") Date referenceDate, Pageable pageable);
 
