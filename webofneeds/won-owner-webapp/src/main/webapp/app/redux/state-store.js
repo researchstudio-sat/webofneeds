@@ -4,7 +4,7 @@ import { actionTypes } from "../actions/actions.js";
 import * as atomUtils from "./utils/atom-utils.js";
 import * as processUtils from "./utils/process-utils.js";
 import { parseMetaAtom } from "../reducers/atom-reducer/parse-atom.js";
-import { get, getIn, is, numOfEvts2pageSize } from "../utils.js";
+import { get, is } from "../utils.js";
 import won from "../won-es6";
 import vocab from "../service/vocab.js";
 
@@ -319,9 +319,16 @@ export function fetchMessages(
   state,
   connectionUri,
   atomUri,
-  numberOfEvents,
-  fetchParams
+  numberOfMessages,
+  resumeAfter /*msgUri: load numberOfEvents before this msgUri*/
 ) {
+  const fetchParams = {
+    requesterWebId: atomUri,
+    pagingSize: numOfMsgs2pageSize(numberOfMessages),
+    deep: true,
+    resumeafter: resumeAfter,
+  };
+
   dispatch({
     type: actionTypes.connections.fetchMessagesStart,
     payload: Immutable.fromJS({ connectionUri: connectionUri }),
@@ -329,15 +336,27 @@ export function fetchMessages(
 
   return won
     .getConnectionWithEventUris(connectionUri, fetchParams)
-    .then(connection =>
-      getMessageUrisToLoad(
-        dispatch,
-        state,
-        connection,
+    .then(connection => {
+      console.debug(
+        "fetchMessages(",
         connectionUri,
-        numberOfEvents
-      )
-    )
+        fetchParams,
+        ") -> ",
+        connection
+      );
+
+      console.debug("Messages to Fetch: ", connection.hasEvents);
+
+      dispatch({
+        type: actionTypes.connections.messageUrisInLoading,
+        payload: Immutable.fromJS({
+          connectionUri: connectionUri,
+          uris: connection.hasEvents,
+        }),
+      });
+
+      return connection.hasEvents;
+    })
     .then(eventUris => {
       return urisToLookupSuccessAndFailedMap(
         eventUris,
@@ -348,30 +367,53 @@ export function fetchMessages(
     .then(events => storeMessages(dispatch, events, connectionUri));
 }
 
-async function getMessageUrisToLoad(
-  dispatch,
+/**
+ * Helper Method to make sure we only load numberOfEvents messages into the store, seems that the cache is not doing what its supposed to do otherwise
+ * FIXME: remove this once the fetchpaging works again (or at all)
+ * @param state
+ * @param connection
+ * @param connectionUri
+ * @param numberOfEvents
+ * @returns {Array}
+ */
+/*function limitNumberOfMessagesToFetchInConnection(
   state,
   connection,
   connectionUri,
-  numberOfEvents
+  numberOfMessages
 ) {
-  const messagesToFetch = limitNumberOfEventsToFetchInConnection(
-    state,
-    connection,
-    connectionUri,
-    numberOfEvents
-  );
+  const connectionImm = Immutable.fromJS(connection);
 
-  dispatch({
-    type: actionTypes.connections.messageUrisInLoading,
-    payload: Immutable.fromJS({
-      connectionUri: connectionUri,
-      uris: messagesToFetch,
-    }),
-  });
+  const allMessagesToLoad = getIn(state, [
+    "process",
+    "connections",
+    connectionUri,
+    "messages",
+  ]).filter(msg => get(msg, "toLoad") && !get(msg, "failedToLoad"));
+  let messagesToFetch = [];
+
+  const fetchedConnectionEvents =
+    connectionImm &&
+    get(connectionImm, "hasEvents") &&
+    get(connectionImm, "hasEvents").filter(eventUri => !!eventUri); //Filter out undefined/null values
+
+  if (fetchedConnectionEvents && fetchedConnectionEvents.size > 0) {
+    fetchedConnectionEvents.map(eventUri => {
+      if (
+        allMessagesToLoad.has(eventUri) &&
+        messagesToFetch.length < numOfMsgs2pageSize(numberOfMessages)
+      ) {
+        messagesToFetch.push(eventUri);
+      }
+    });
+  } else {
+    allMessagesToLoad.map((messageStatus, messageUri) => {
+      messagesToFetch.push(messageUri);
+    });
+  }
 
   return messagesToFetch;
-}
+}*/
 
 /**
  * Helper function that stores dispatches the success and failed actions for a given set of messages
@@ -497,54 +539,6 @@ function fetchOwnedAtomAndDispatch(atomUri, dispatch, getState) {
 }
 
 /**
- * Helper Method to make sure we only load numberOfEvents messages into the store, seems that the cache is not doing what its supposed to do otherwise
- * FIXME: remove this once the fetchpaging works again (or at all)
- * @param state
- * @param connection
- * @param connectionUri
- * @param numberOfEvents
- * @returns {Array}
- */
-function limitNumberOfEventsToFetchInConnection(
-  state,
-  connection,
-  connectionUri,
-  numberOfEvents
-) {
-  const connectionImm = Immutable.fromJS(connection);
-
-  const allMessagesToLoad = getIn(state, [
-    "process",
-    "connections",
-    connectionUri,
-    "messages",
-  ]).filter(msg => get(msg, "toLoad") && !get(msg, "failedToLoad"));
-  let messagesToFetch = [];
-
-  const fetchedConnectionEvents =
-    connectionImm &&
-    get(connectionImm, "hasEvents") &&
-    get(connectionImm, "hasEvents").filter(eventUri => !!eventUri); //Filter out undefined/null values
-
-  if (fetchedConnectionEvents && fetchedConnectionEvents.size > 0) {
-    fetchedConnectionEvents.map(eventUri => {
-      if (
-        allMessagesToLoad.has(eventUri) &&
-        messagesToFetch.length < numOfEvts2pageSize(numberOfEvents)
-      ) {
-        messagesToFetch.push(eventUri);
-      }
-    });
-  } else {
-    allMessagesToLoad.map((messageStatus, messageUri) => {
-      messagesToFetch.push(messageUri);
-    });
-  }
-
-  return messagesToFetch;
-}
-
-/**
  * Takes a single uri or an array of uris, performs the lookup function on each
  * of them seperately, collects the results and builds an map/object
  * with the uris as keys and the results as values.
@@ -648,4 +642,9 @@ function urisToLookupSuccessAndFailedMap(
     });
     return lookupMap;
   });
+}
+
+function numOfMsgs2pageSize(numberOfMessages) {
+  // `*3*` to compensate for the *roughly* 2 additional success messages per chat message
+  return numberOfMessages * 3;
 }

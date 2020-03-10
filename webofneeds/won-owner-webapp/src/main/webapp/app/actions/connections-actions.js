@@ -11,7 +11,7 @@ import * as ownerApi from "../api/owner-api.js";
 import * as stateStore from "../redux/state-store.js";
 import { getOwnedConnectionByUri } from "../redux/selectors/connection-selectors.js";
 
-import { get, getIn, numOfEvts2pageSize } from "../utils.js";
+import { get, getIn } from "../utils.js";
 
 import { ensureLoggedIn } from "./account-actions";
 
@@ -662,18 +662,12 @@ export function showLatestMessages(connectionUriParam, numberOfEvents) {
       return Promise.resolve(); //only load if not already started and connection itself not loading
     }
 
-    const fetchParams = {
-      requesterWebId: atomUri,
-      pagingSize: numOfEvts2pageSize(numberOfEvents),
-      deep: true,
-    };
     return stateStore.fetchMessages(
       dispatch,
       state,
       connectionUri,
       atomUri,
-      numberOfEvents,
-      fetchParams
+      numberOfEvents
     );
   };
 }
@@ -700,19 +694,12 @@ export function loadLatestMessagesOfConnection({
     return Promise.resolve(); //only load if not already started and connection itself not loading
   }
 
-  const fetchParams = {
-    requesterWebId: atomUri,
-    pagingSize: numOfEvts2pageSize(numberOfEvents),
-    deep: true,
-  };
-
   stateStore.fetchMessages(
     dispatch,
     state,
     connectionUri,
     atomUri,
-    numberOfEvents,
-    fetchParams
+    numberOfEvents
   );
 }
 
@@ -753,15 +740,7 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
       .sort((msg1, msg2) => get(msg1, "date") - get(msg2, "date"));
 
     const oldestMessageUri = get(sortedConnectionMessages.first(), "uri");
-    const messageHashValue =
-      oldestMessageUri && oldestMessageUri.replace(/wm:\/(.*)/, "$1"); // everything following the `wm:/`
-
-    const fetchParams = {
-      requesterWebId: atomUri,
-      pagingSize: numOfEvts2pageSize(numberOfEvents),
-      deep: true,
-      resumebefore: messageHashValue,
-    };
+    const messageHashValue = oldestMessageUri;
 
     return stateStore.fetchMessages(
       dispatch,
@@ -769,7 +748,7 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
       connectionUri,
       atomUri,
       numberOfEvents,
-      fetchParams
+      messageHashValue
     );
   };
 }

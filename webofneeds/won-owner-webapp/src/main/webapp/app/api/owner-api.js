@@ -465,7 +465,7 @@ export function getJsonLdDataset(uri, params = {}) {
     };
 
     for (let [paramName, paramValue] of entries(queryParams)) {
-      if (contains(legitQueryParameters, paramName)) {
+      if (contains(legitQueryParameters, paramName) && paramValue) {
         queryOnNode = queryOnNode + (firstParam ? "?" : "&");
         firstParam = false;
         queryOnNode = queryOnNode + paramName + "=" + paramValue;
