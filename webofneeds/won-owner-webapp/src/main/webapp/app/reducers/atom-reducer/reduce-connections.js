@@ -1,5 +1,5 @@
 import vocab from "../../service/vocab.js";
-import { parseConnection, parseMetaConnection } from "./parse-connection.js";
+import { parseConnection } from "./parse-connection.js";
 import { markUriAsRead } from "../../won-localstorage.js";
 
 import { markAtomAsRead } from "./reduce-atoms.js";
@@ -389,7 +389,7 @@ function addMetaConnection(atomState, atomUri, conn) {
     get(conn, "connectionUri"),
   ]);
 
-  const parsedMetaConnection = parseMetaConnection(conn);
+  const parsedMetaConnection = parseConnection(conn);
 
   if (!!storedAtom && !storedConnection && parsedMetaConnection) {
     const connectionUri = getIn(parsedMetaConnection, ["data", "uri"]);
