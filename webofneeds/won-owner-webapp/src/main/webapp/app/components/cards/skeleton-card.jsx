@@ -61,6 +61,7 @@ class WonSkeletonCard extends React.Component {
         }}
         intervalDelay={200}
         partialVisibility={true}
+        delayedCall={true}
         offset={{ top: -300, bottom: -300 }}
       >
         <div className="card__icon__skeleton" />
