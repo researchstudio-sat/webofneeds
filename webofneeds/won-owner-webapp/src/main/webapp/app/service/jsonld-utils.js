@@ -451,5 +451,11 @@ function throwParsingError(val, type, prependedMsg = "") {
     prependedMsg +
     ` Failed to parse jsonld value of type \`${type}\`:\n` +
     JSON.stringify(val);
+  console.error(
+    "Failed to parse jsonld value of type: ",
+    type,
+    "for value: ",
+    val
+  );
   throw new Error(fullMsg.trim());
 }
