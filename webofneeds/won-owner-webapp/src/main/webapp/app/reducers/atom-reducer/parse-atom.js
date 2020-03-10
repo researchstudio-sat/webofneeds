@@ -65,7 +65,6 @@ export function parseAtom(jsonldAtom) {
       background: generateBackground(get(jsonldAtomImm, "@id")),
       unread: false,
       isBeingCreated: false,
-      jsonld: jsonldAtom,
       connections: Immutable.Map(),
     };
 
@@ -236,7 +235,6 @@ export function parseMetaAtom(metaAtom) {
       background: generateBackground(get(metaAtomImm, "uri")),
       unread: false,
       isBeingCreated: false,
-      jsonld: undefined,
       connections: Immutable.Map(),
     };
 
