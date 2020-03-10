@@ -106,8 +106,8 @@ export const pokemonRaid = {
       if (value.hatched) {
         return {
           "won:raid": {
-            "won:level": { "@value": value.level, "@type": "xsd:int" },
-            "won:pokemonid": { "@value": value.id, "@type": "xsd:int" },
+            "won:level": { "@value": value.level, "@type": "xsd:long" },
+            "won:pokemonid": { "@value": value.id, "@type": "xsd:long" },
             "won:pokemonform": value.form
               ? { "@value": value.form, "@type": "xsd:string" }
               : undefined,
@@ -120,7 +120,7 @@ export const pokemonRaid = {
       } else {
         return {
           "won:raid": {
-            "won:level": { "@value": value.level, "@type": "xsd:int" },
+            "won:level": { "@value": value.level, "@type": "xsd:long" },
             "s:validFrom": {
               "@value": toLocalISODateString(value.hatches),
               "@type": "xsd:dateTime",
@@ -139,7 +139,7 @@ export const pokemonRaid = {
     const level = jsonLdUtils.parseFrom(
       jsonLDImm,
       ["won:raid", "won:level"],
-      "xsd:int"
+      "xsd:long"
     );
     const expires = jsonLdUtils.parseFrom(
       jsonLDImm,
@@ -151,7 +151,7 @@ export const pokemonRaid = {
       const id = jsonLdUtils.parseFrom(
         jsonLDImm,
         ["won:raid", "won:pokemonid"],
-        "xsd:int"
+        "xsd:long"
       );
       const hatched = !!id;
       const hatches =

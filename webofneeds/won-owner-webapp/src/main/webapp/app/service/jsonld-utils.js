@@ -385,6 +385,7 @@ function parseJsonldLeaf(val, type) {
     case "s:Float":
     case "s:Integer":
     case "xsd:int":
+    case "xsd:long":
     case "xsd:float": {
       const parsedVal = Number(unwrappedVal);
       if (!isValidNumber(parsedVal)) {
