@@ -141,7 +141,7 @@ export default function(processState = initialState, action = {}) {
       const atomUris = metaAtoms && [...metaAtoms.keys()];
       atomUris &&
         atomUris.forEach(atomUri => {
-          if (!processUtils.isAtomLoaded(processState, atomUri)) {
+          if (!processUtils.isAtomProcessExisting(processState, atomUri)) {
             processState = updateAtomProcess(processState, atomUri, {
               toLoad: true,
             });
@@ -155,7 +155,7 @@ export default function(processState = initialState, action = {}) {
 
       metaAtoms &&
         metaAtoms.map((metaAtom, metaAtomUri) => {
-          if (!processUtils.isAtomLoaded(processState, metaAtomUri)) {
+          if (!processUtils.isAtomProcessExisting(processState, metaAtomUri)) {
             processState = updateAtomProcess(processState, metaAtomUri, {
               toLoad: true,
             });
@@ -170,7 +170,7 @@ export default function(processState = initialState, action = {}) {
       const atomUris = metaAtoms && [...metaAtoms.keys()];
       atomUris &&
         atomUris.forEach(atomUri => {
-          if (!processUtils.isAtomLoaded(processState, atomUri)) {
+          if (!processUtils.isAtomProcessExisting(processState, atomUri)) {
             processState = updateAtomProcess(processState, atomUri, {
               toLoad: true,
             });
@@ -434,13 +434,15 @@ export default function(processState = initialState, action = {}) {
         connections.map(conn => {
           processState = updateConnectionProcess(
             processState,
-            get(conn, "connectionUri"),
+            get(conn, "uri"),
             {
               toLoad: true,
             }
           );
-          const targetAtomUri = get(conn, "targetAtomUri");
-          if (!processUtils.isAtomLoaded(processState, targetAtomUri)) {
+          const targetAtomUri = get(conn, "targetAtom");
+          if (
+            !processUtils.isAtomProcessExisting(processState, targetAtomUri)
+          ) {
             processState = updateAtomProcess(processState, targetAtomUri, {
               toLoad: true,
             });
@@ -476,8 +478,7 @@ export default function(processState = initialState, action = {}) {
           const sourceAtomUri = get(conn, "sourceAtom");
           if (
             targetAtomUri &&
-            !processUtils.isAtomLoaded(processState, targetAtomUri) &&
-            !processUtils.isAtomLoading(processState, targetAtomUri)
+            !processUtils.isAtomProcessExisting(processState, targetAtomUri)
           ) {
             processState = updateAtomProcess(processState, targetAtomUri, {
               toLoad: true,
@@ -485,8 +486,7 @@ export default function(processState = initialState, action = {}) {
           }
           if (
             sourceAtomUri &&
-            !processUtils.isAtomLoaded(processState, sourceAtomUri) &&
-            !processUtils.isAtomLoading(processState, sourceAtomUri)
+            !processUtils.isAtomProcessExisting(processState, sourceAtomUri)
           ) {
             processState = updateAtomProcess(processState, sourceAtomUri, {
               toLoad: true,
@@ -528,7 +528,9 @@ export default function(processState = initialState, action = {}) {
 
             const heldAtomUris = get(parsedAtom, "holds");
             heldAtomUris.map(heldAtomUri => {
-              if (!processUtils.isAtomLoaded(processState, heldAtomUri)) {
+              if (
+                !processUtils.isAtomProcessExisting(processState, heldAtomUri)
+              ) {
                 processState = updateAtomProcess(processState, heldAtomUri, {
                   toLoad: true,
                 });
@@ -537,7 +539,12 @@ export default function(processState = initialState, action = {}) {
 
             const groupMemberUris = get(parsedAtom, "groupMembers");
             groupMemberUris.map(groupMemberUri => {
-              if (!processUtils.isAtomLoaded(processState, groupMemberUri)) {
+              if (
+                !processUtils.isAtomProcessExisting(
+                  processState,
+                  groupMemberUri
+                )
+              ) {
                 processState = updateAtomProcess(processState, groupMemberUri, {
                   toLoad: true,
                 });
@@ -546,7 +553,7 @@ export default function(processState = initialState, action = {}) {
 
             const buddyUris = get(parsedAtom, "buddies");
             buddyUris.map(buddyUri => {
-              if (!processUtils.isAtomLoaded(processState, buddyUri)) {
+              if (!processUtils.isAtomProcessExisting(processState, buddyUri)) {
                 processState = updateAtomProcess(processState, buddyUri, {
                   toLoad: true,
                 });
@@ -614,7 +621,7 @@ export function addMessageAtomsToLoad(processState, wonMessage) {
 
     if (
       senderAtomUri &&
-      !processUtils.isAtomLoaded(processState, senderAtomUri)
+      !processUtils.isAtomProcessExisting(processState, senderAtomUri)
     ) {
       console.debug("Sender Atom is not in the state yet, we need to add it");
       processState = updateAtomProcess(processState, senderAtomUri, {
@@ -625,7 +632,7 @@ export function addMessageAtomsToLoad(processState, wonMessage) {
 
     if (
       targetAtomUri &&
-      !processUtils.isAtomLoaded(processState, targetAtomUri)
+      !processUtils.isAtomProcessExisting(processState, targetAtomUri)
     ) {
       console.debug("Target Atom is not in the state yet, we need to add it");
       processState = updateAtomProcess(processState, targetAtomUri, {

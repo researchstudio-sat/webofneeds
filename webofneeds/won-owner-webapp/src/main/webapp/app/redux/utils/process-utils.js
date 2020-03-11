@@ -141,6 +141,10 @@ export function isAtomLoaded(process, atomUri) {
   return atomUri && getIn(process, ["atoms", atomUri, "loaded"]);
 }
 
+export function isAtomProcessExisting(process, atomUri) {
+  return atomUri && !!getIn(process, ["atoms", atomUri]);
+}
+
 /**
  * Return true if given atomUri is set toLoad
  * @param process (full process from state)

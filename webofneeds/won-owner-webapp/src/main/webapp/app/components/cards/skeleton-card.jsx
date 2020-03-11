@@ -46,6 +46,13 @@ const mapDispatchToProps = dispatch => {
 };
 
 class WonSkeletonCard extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      localFetchInitiated: false,
+    };
+  }
+
   render() {
     const cardIconSkeleton = !this.props.atomLoaded ? (
       <VisibilitySensor
@@ -54,6 +61,7 @@ class WonSkeletonCard extends React.Component {
         }}
         intervalDelay={200}
         partialVisibility={true}
+        delayedCall={true}
         offset={{ top: -300, bottom: -300 }}
       >
         <div className="card__icon__skeleton" />
@@ -140,7 +148,11 @@ class WonSkeletonCard extends React.Component {
 
   onChange(isVisible) {
     if (isVisible) {
-      this.ensureAtomIsLoaded();
+      if (!this.state.localFetchInitiated) {
+        this.setState({ localFetchInitiated: true }, () => {
+          this.ensureAtomIsLoaded();
+        });
+      }
     }
   }
 }

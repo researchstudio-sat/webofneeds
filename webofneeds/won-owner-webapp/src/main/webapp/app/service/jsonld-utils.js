@@ -385,6 +385,7 @@ function parseJsonldLeaf(val, type) {
     case "s:Float":
     case "s:Integer":
     case "xsd:int":
+    case "xsd:long":
     case "xsd:float": {
       const parsedVal = Number(unwrappedVal);
       if (!isValidNumber(parsedVal)) {
@@ -451,5 +452,11 @@ function throwParsingError(val, type, prependedMsg = "") {
     prependedMsg +
     ` Failed to parse jsonld value of type \`${type}\`:\n` +
     JSON.stringify(val);
+  console.error(
+    "Failed to parse jsonld value of type: ",
+    type,
+    "for value: ",
+    val
+  );
   throw new Error(fullMsg.trim());
 }

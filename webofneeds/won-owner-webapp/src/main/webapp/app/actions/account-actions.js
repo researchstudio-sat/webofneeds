@@ -183,7 +183,6 @@ export function accountLogout() {
       })
       .then(() => dispatch({ type: actionTypes.downgradeHttpSession }))
       .then(() => dispatch({ type: actionTypes.account.reset }))
-      .then(() => won.clearStore())
       .then(() => {
         _logoutInProcess = false;
       })

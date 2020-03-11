@@ -4,7 +4,7 @@ import { actionTypes } from "../actions/actions.js";
 import * as atomUtils from "./utils/atom-utils.js";
 import * as processUtils from "./utils/process-utils.js";
 import { parseMetaAtom } from "../reducers/atom-reducer/parse-atom.js";
-import { get, getIn, is, numOfEvts2pageSize } from "../utils.js";
+import { get, is } from "../utils.js";
 import won from "../won-es6";
 import vocab from "../service/vocab.js";
 
@@ -65,10 +65,7 @@ export function fetchDataForOwnedAtoms(ownedAtomUris, dispatch, getState) {
 
 export function fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch) {
   return won
-    .deleteDocumentFromStore(connUri, true)
-    .then(() =>
-      won.getConnectionWithEventUris(connUri, { requesterWebId: atomUri })
-    )
+    .getConnectionWithEventUris(connUri, { requesterWebId: atomUri })
     .then(connection => {
       dispatch({
         type: actionTypes.connections.storeActive,
@@ -322,58 +319,46 @@ export function fetchMessages(
   state,
   connectionUri,
   atomUri,
-  numberOfEvents,
-  fetchParams
+  numberOfMessages,
+  resumeAfter /*msgUri: load numberOfEvents before this msgUri*/
 ) {
+  const fetchParams = {
+    requesterWebId: atomUri,
+    pagingSize: numOfMsgs2pageSize(numberOfMessages),
+    deep: true,
+    resumeafter: resumeAfter,
+  };
+
   dispatch({
     type: actionTypes.connections.fetchMessagesStart,
     payload: Immutable.fromJS({ connectionUri: connectionUri }),
   });
-
   return won
-    .getConnectionWithEventUris(connectionUri, fetchParams)
-    .then(connection =>
-      getMessageUrisToLoad(
-        dispatch,
-        state,
-        connection,
-        connectionUri,
-        numberOfEvents
-      )
-    )
-    .then(eventUris => {
-      return urisToLookupSuccessAndFailedMap(
-        eventUris,
-        eventUri => won.getWonMessage(eventUri, { requesterWebId: atomUri }),
-        []
-      );
+    .getMessagesOfConnection(connectionUri, fetchParams)
+    .then(messages => {
+      const lookupMap = { success: {}, failed: {} };
+      const loadingArray = [];
+      messages.map(message => {
+        loadingArray.push(message.msgUri);
+
+        if (message.wonMessage) {
+          lookupMap["success"][message.msgUri] = message.wonMessage;
+        } else {
+          lookupMap["failed"][message.msgUri] = undefined;
+        }
+      });
+
+      dispatch({
+        type: actionTypes.connections.messageUrisInLoading,
+        payload: Immutable.fromJS({
+          connectionUri: connectionUri,
+          uris: loadingArray,
+        }),
+      });
+
+      return lookupMap;
     })
-    .then(events => storeMessages(dispatch, events, connectionUri));
-}
-
-async function getMessageUrisToLoad(
-  dispatch,
-  state,
-  connection,
-  connectionUri,
-  numberOfEvents
-) {
-  const messagesToFetch = limitNumberOfEventsToFetchInConnection(
-    state,
-    connection,
-    connectionUri,
-    numberOfEvents
-  );
-
-  dispatch({
-    type: actionTypes.connections.messageUrisInLoading,
-    payload: Immutable.fromJS({
-      connectionUri: connectionUri,
-      uris: messagesToFetch,
-    }),
-  });
-
-  return messagesToFetch;
+    .then(messages => storeMessages(dispatch, messages, connectionUri));
 }
 
 /**
@@ -432,9 +417,12 @@ export function fetchConnectionsOfAtomAndDispatch(atomUri, dispatch) {
         }),
       });
       const activeConnectionUris = connectionsWithStateAndSocket
-        .filter(conn => conn.connectionState !== vocab.WON.Closed)
-        .filter(conn => conn.connectionState !== vocab.WON.Suggested)
-        .map(conn => conn.connectionUri);
+        .filter(
+          conn =>
+            conn.connectionState !== vocab.WON.Closed &&
+            conn.connectionState !== vocab.WON.Suggested
+        )
+        .map(conn => conn.uri);
 
       dispatch({
         type: actionTypes.connections.storeActiveUrisInLoading,
@@ -494,54 +482,6 @@ function fetchOwnedAtomAndDispatch(atomUri, dispatch, getState) {
         payload: Immutable.fromJS({ uri: atomUri }),
       });
     });
-}
-
-/**
- * Helper Method to make sure we only load numberOfEvents messages into the store, seems that the cache is not doing what its supposed to do otherwise
- * FIXME: remove this once the fetchpaging works again (or at all)
- * @param state
- * @param connection
- * @param connectionUri
- * @param numberOfEvents
- * @returns {Array}
- */
-function limitNumberOfEventsToFetchInConnection(
-  state,
-  connection,
-  connectionUri,
-  numberOfEvents
-) {
-  const connectionImm = Immutable.fromJS(connection);
-
-  const allMessagesToLoad = getIn(state, [
-    "process",
-    "connections",
-    connectionUri,
-    "messages",
-  ]).filter(msg => get(msg, "toLoad") && !get(msg, "failedToLoad"));
-  let messagesToFetch = [];
-
-  const fetchedConnectionEvents =
-    connectionImm &&
-    get(connectionImm, "hasEvents") &&
-    get(connectionImm, "hasEvents").filter(eventUri => !!eventUri); //Filter out undefined/null values
-
-  if (fetchedConnectionEvents && fetchedConnectionEvents.size > 0) {
-    fetchedConnectionEvents.map(eventUri => {
-      if (
-        allMessagesToLoad.has(eventUri) &&
-        messagesToFetch.length < numOfEvts2pageSize(numberOfEvents)
-      ) {
-        messagesToFetch.push(eventUri);
-      }
-    });
-  } else {
-    allMessagesToLoad.map((messageStatus, messageUri) => {
-      messagesToFetch.push(messageUri);
-    });
-  }
-
-  return messagesToFetch;
 }
 
 /**
@@ -605,47 +545,7 @@ function urisToLookupMap(
   });
 }
 
-/**
- * Takes a single uri or an array of uris, performs the lookup function on each
- * of them seperately, collects the results and builds an map/object
- * with the uris as keys and the results as values.
- * If any call to the asyncLookupFunction fails, the corresponding
- * key-value-pair will not be contained in the success-result but rather in the failed-results.
- * @param uris
- * @param asyncLookupFunction
- * @param excludeUris uris to exclude from lookup
- * @return {*}
- */
-function urisToLookupSuccessAndFailedMap(
-  uris,
-  asyncLookupFunction,
-  excludeUris = []
-) {
-  //make sure we have an array and not a single uri.
-  const urisAsArray = is("Array", uris) ? uris : [uris];
-  const excludeUrisAsArray = is("Array", excludeUris)
-    ? excludeUris
-    : [excludeUris];
-
-  const urisAsArrayWithoutExcludes = urisAsArray.filter(
-    uri => excludeUrisAsArray.indexOf(uri) < 0
-  );
-
-  const asyncLookups = urisAsArrayWithoutExcludes.map(uri =>
-    asyncLookupFunction(uri).catch(error => {
-      return error;
-    })
-  );
-  return Promise.all(asyncLookups).then(dataObjects => {
-    const lookupMap = { success: {}, failed: {} };
-    //make sure there's the same
-    uris.forEach((uri, i) => {
-      if (dataObjects[i] instanceof Error) {
-        lookupMap["failed"][uri] = dataObjects[i];
-      } else if (dataObjects[i]) {
-        lookupMap["success"][uri] = dataObjects[i];
-      }
-    });
-    return lookupMap;
-  });
+function numOfMsgs2pageSize(numberOfMessages) {
+  // `*3*` to compensate for the *roughly* 2 additional success messages per chat message
+  return numberOfMessages * 3;
 }

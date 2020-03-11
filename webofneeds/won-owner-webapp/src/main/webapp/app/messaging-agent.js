@@ -305,25 +305,14 @@ export function runMessagingAgent(redux) {
     for (const msgUri in messages) {
       const msg = messages[msgUri];
       promiseArray.push(
-        won
-          .addJsonLdData(msg)
-          .catch(error => {
-            console.error(
-              "Could add JsonLdData of msg: ",
-              msg,
-              "error: ",
-              error
-            );
-          })
-          .then(() => won.wonMessageFromJsonLd(msg))
-          .catch(error => {
-            console.error(
-              "Could not parse msg to wonMessage: ",
-              msg,
-              "error: ",
-              error
-            );
-          })
+        won.wonMessageFromJsonLd(msg).catch(error => {
+          console.error(
+            "Could not parse msg to wonMessage: ",
+            msg,
+            "error: ",
+            error
+          );
+        })
       );
     }
 

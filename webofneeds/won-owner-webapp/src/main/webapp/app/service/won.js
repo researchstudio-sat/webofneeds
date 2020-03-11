@@ -201,26 +201,6 @@ won.getSafeJsonLdValue = function(dataItem) {
   return null;
 };
 
-won.getLocalName = function(uriOrQname) {
-  if (uriOrQname == null || typeof uriOrQname !== "string") return null;
-  //first, try to get the URI hash fragment (without hash)
-  let pos = uriOrQname.lastIndexOf("#");
-  if (pos > -1 && pos < uriOrQname.length) {
-    return uriOrQname.substring(pos + 1);
-  }
-  //try portion after last trailing slash
-  pos = uriOrQname.lastIndexOf("/");
-  if (pos > -1 && pos < uriOrQname.length) {
-    return uriOrQname.substring(pos + 1);
-  }
-  //take portion after last ':'
-  pos = uriOrQname.lastIndexOf(":");
-  if (pos > -1 && pos < uriOrQname.length) {
-    return uriOrQname.substring(pos + 1);
-  }
-  return uriOrQname;
-};
-
 won.reportError = function(message) {
   if (arguments.length == 1) {
     return function(reason) {
@@ -614,8 +594,18 @@ won.wonMessageFromJsonLd = function(wonMessageAsJsonLD) {
 
     return wonMessage
       .frameInPromise()
-      .then(() => wonMessage.generateContentGraphTrig())
-      .then(() => wonMessage.generateCompactedFramedMessage())
+      .then(() => {
+        if (!wonMessage.isResponse()) {
+          return wonMessage.generateContentGraphTrig();
+        }
+        return;
+      })
+      .then(() => {
+        if (!wonMessage.isResponse()) {
+          return wonMessage.generateCompactedFramedMessage();
+        }
+        return;
+      })
       .then(() => {
         if (wonMessage.hasParseErrors() && !wonMessage.isResponse()) {
           console.warn(
@@ -642,6 +632,8 @@ won.wonMessageFromJsonLd = function(wonMessageAsJsonLD) {
       });
   });
 };
+
+window.wonMessageFromJsonLd4dbg = won.wonMessageFromJsonLd;
 
 /**
  * Serializes the jsonldData into trig.

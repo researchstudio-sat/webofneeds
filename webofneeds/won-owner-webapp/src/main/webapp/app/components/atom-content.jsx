@@ -17,7 +17,6 @@ import WonAtomContentGeneral from "./atom-content-general.jsx";
 import WonAtomContentPersona from "./atom-content-persona.jsx";
 import WonAtomContentDetails from "./atom-content-details.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
-import WonTrig from "./trig.jsx";
 import ElmReact from "./elm-react.jsx";
 import { Elm } from "../../elm/AddPersona.elm";
 
@@ -242,9 +241,6 @@ class WonAtomContent extends React.Component {
                 </svg>
                 <span className="rdflink__label">Connection</span>
               </a>
-            )}
-            {this.props.atom.get("jsonld") && (
-              <WonTrig jsonld={this.props.atom.get("jsonld")} />
             )}
           </div>
         );

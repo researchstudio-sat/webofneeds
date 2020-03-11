@@ -967,7 +967,7 @@ class AtomMessages extends React.Component {
 
   ensureMessagesAreLoaded() {
     // make sure latest messages are loaded
-    const INITIAL_MESSAGECOUNT = 15;
+    const INITIAL_MESSAGECOUNT = 10;
     if (
       this.props.connection &&
       !connectionUtils.isUsingTemporaryUri(this.props.connection) &&

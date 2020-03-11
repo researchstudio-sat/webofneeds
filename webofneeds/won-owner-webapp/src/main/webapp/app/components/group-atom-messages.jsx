@@ -476,7 +476,7 @@ class GroupAtomMessages extends React.Component {
   }
 
   ensureMessagesAreLoaded() {
-    const INITIAL_MESSAGECOUNT = 15;
+    const INITIAL_MESSAGECOUNT = 10;
     if (
       this.props.connection &&
       !this.props.isConnectionLoading &&

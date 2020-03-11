@@ -1,101 +1,18 @@
 import Immutable from "immutable";
 import vocab from "../../service/vocab.js";
-import { get, is } from "../../utils.js";
+import { get } from "../../utils.js";
 import { isUriRead } from "../../won-localstorage.js";
-
-export function parseMetaConnection(metaConnection) {
-  const metaConnectionImm = Immutable.fromJS(metaConnection);
-
-  let parsedMetaConnection = {
-    belongsToUri: get(metaConnectionImm, "atomUri"),
-    data: {
-      uri: get(metaConnectionImm, "connectionUri"),
-      state: get(metaConnectionImm, "connectionState"),
-      messages: Immutable.Map(),
-      socketUri: get(metaConnectionImm, "socketUri"),
-      targetSocketUri: get(metaConnectionImm, "targetSocketUri"),
-      agreementData: {
-        agreementUris: Immutable.Set(),
-        pendingProposalUris: Immutable.Set(),
-        pendingCancellationProposalUris: Immutable.Set(),
-        cancellationPendingAgreementUris: Immutable.Set(),
-        acceptedCancellationProposalUris: Immutable.Set(),
-        cancelledAgreementUris: Immutable.Set(),
-        rejectedMessageUris: Immutable.Set(),
-        retractedMessageUris: Immutable.Set(),
-        proposedMessageUris: Immutable.Set(),
-        claimedMessageUris: Immutable.Set(),
-      },
-      petriNetData: Immutable.Map(),
-      targetAtomUri: get(metaConnectionImm, "targetAtomUri"),
-      targetConnectionUri: get(metaConnectionImm, "targetConnectionUri"),
-      creationDate: undefined,
-      lastUpdateDate: undefined,
-      unread: undefined,
-      isRated: false,
-      showAgreementData: false,
-      showPetriNetData: false,
-      multiSelectType: undefined,
-    },
-  };
-
-  if (
-    !parsedMetaConnection.data.socketUri ||
-    !parsedMetaConnection.data.targetSocketUri
-  ) {
-    console.error(
-      "Cant parse connection, at least one of the mandatory socketUris is empty: ",
-      metaConnection.toJS()
-    );
-  } else if (
-    !parsedMetaConnection.data.uri ||
-    !parsedMetaConnection.belongsToUri ||
-    !parsedMetaConnection.data.targetAtomUri
-  ) {
-    console.error(
-      "Cant parse connection, data is an invalid connection-object (mandatory uris could not be retrieved): ",
-      metaConnection.toJS()
-    );
-  } else if (
-    !(
-      parsedMetaConnection.data.state === vocab.WON.RequestReceived ||
-      parsedMetaConnection.data.state === vocab.WON.RequestSent ||
-      parsedMetaConnection.data.state === vocab.WON.Suggested ||
-      parsedMetaConnection.data.state === vocab.WON.Connected ||
-      parsedMetaConnection.data.state === vocab.WON.Closed
-    )
-  ) {
-    console.error(
-      "Cant parse connection, data is an invalid connection-object (faulty state): ",
-      metaConnection.toJS()
-    );
-  } else {
-    parsedMetaConnection.data.unread = !isUriRead(
-      parsedMetaConnection.data.uri
-    );
-
-    const creationDate = metaConnection.get("modified");
-
-    if (creationDate) {
-      parsedMetaConnection.data.creationDate = new Date(creationDate);
-      parsedMetaConnection.data.lastUpdateDate =
-        parsedMetaConnection.data.creationDate;
-    }
-
-    return Immutable.fromJS(parsedMetaConnection);
-  }
-  return undefined;
-}
 
 export function parseConnection(jsonldConnection) {
   const jsonldConnectionImm = Immutable.fromJS(jsonldConnection);
 
   let parsedConnection = {
-    belongsToUri: jsonldConnectionImm.get("sourceAtom"),
+    belongsToUri: get(jsonldConnectionImm, "sourceAtom"),
     data: {
       uri: get(jsonldConnectionImm, "uri"),
       state: get(jsonldConnectionImm, "connectionState"),
       previousState: get(jsonldConnectionImm, "previousConnectionState"),
+      messageContainerUri: get(jsonldConnectionImm, "messageContainer"),
       messages: Immutable.Map(),
       socketUri: get(jsonldConnectionImm, "socket"),
       targetSocketUri: get(jsonldConnectionImm, "targetSocket"),
@@ -123,32 +40,6 @@ export function parseConnection(jsonldConnection) {
       multiSelectType: undefined,
     },
   };
-
-  /*THE CONTENT OF THIS IF CLAUSE IS THE MOST FUGLY WORKAROUND/QUICKFIX THAT I WAS ABLE TO IMAGINE
-  * this is supposed to fix the problem that sometimes connections are retrieved with two connectionStates
-  * due to our rdfstore use
-  * */
-  if (
-    parsedConnection.data.state &&
-    !is("String", parsedConnection.data.state)
-  ) {
-    console.debug(
-      "connectionState contains multiple states, initiating the f*gly workaround..."
-    );
-    const stateList = parsedConnection.data.state.filter(
-      item => item !== parsedConnection.data.previousState
-    );
-    if (stateList && stateList.size == 1) {
-      parsedConnection.data.state = stateList.first();
-    } else {
-      console.debug(
-        "Can't parse the connection(",
-        parsedConnection.data.uri,
-        ") due to multiple connectionStates stored: ",
-        stateList
-      );
-    }
-  }
 
   if (
     !parsedConnection.data.socketUri ||
@@ -183,7 +74,7 @@ export function parseConnection(jsonldConnection) {
   } else {
     parsedConnection.data.unread = !isUriRead(parsedConnection.data.uri);
 
-    const creationDate = jsonldConnectionImm.get("modified");
+    const creationDate = get(jsonldConnectionImm, "modified");
     if (creationDate) {
       parsedConnection.data.creationDate = new Date(creationDate);
       parsedConnection.data.lastUpdateDate = parsedConnection.data.creationDate;

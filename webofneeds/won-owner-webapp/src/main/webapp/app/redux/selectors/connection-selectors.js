@@ -134,6 +134,11 @@ export function getChatConnectionsToCrawl(state) {
   const chatConnections =
     allConnections &&
     allConnections
+      .filter(
+        conn =>
+          isChatToXConnection(allAtoms, conn) ||
+          isGroupToXConnection(allAtoms, conn)
+      )
       .filter(conn => {
         const connUri = get(conn, "uri");
 
@@ -143,12 +148,7 @@ export function getChatConnectionsToCrawl(state) {
           !processUtils.hasConnectionFailedToLoad(process, connUri) &&
           processUtils.hasMessagesToLoad(process, connUri)
         );
-      })
-      .filter(
-        conn =>
-          isChatToXConnection(allAtoms, conn) ||
-          isGroupToXConnection(allAtoms, conn)
-      );
+      });
 
   const connectionsInStateConnected =
     chatConnections &&

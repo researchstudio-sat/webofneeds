@@ -399,6 +399,122 @@ export function getAllActiveMetaPersonas() {
   );
 }
 
+export function getJsonLdDataset(uri, params = {}) {
+  /**
+   * This function is used to generate the query-strings.
+   * Should anything about the way the API is accessed changed,
+   * adapt this function.
+   * @param dataUri
+   * @param queryParams a config object whose fields get appended as get parameters.
+   *     important parameters include:
+   *         * requesterWebId: the WebID used to access the ressource (used
+   *                 by the owner-server to pick the right key-pair)
+   *         * deep: 'true' to automatically resolve containers (e.g.
+   *                 the message-container)
+   *         * paging parameters as found
+   *           [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
+   * @returns {string}
+   */
+  const queryString = (dataUri, queryParams = {}) => {
+    let queryOnOwner = urljoin(ownerBaseUrl, "/rest/linked-data/") + "?";
+
+    if (queryParams.requesterWebId) {
+      queryOnOwner +=
+        "requester=" + encodeURIComponent(queryParams.requesterWebId) + "&";
+    }
+
+    // The owner hands this part -- the one in the `uri=` paramater -- directly to the node.
+    let firstParam = true;
+    let queryOnNode = dataUri;
+
+    const contains = (arr, el) => {
+      return arr.indexOf(el) > 0;
+    };
+
+    /**
+     * paging parameters as found
+     * [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
+     * @type {string[]}
+     */
+    const legitQueryParameters = [
+      "p",
+      "resumebefore",
+      "resumeafter",
+      "type",
+      "state",
+      "timeof",
+      "deep",
+    ];
+
+    /**
+     * taken from: https://esdiscuss.org/topic/es6-iteration-over-object-values
+     *
+     * example usage:
+     *
+     * ```javascript
+     * for (let [key, value] of entries(o)) {
+     *   console.log(key, ' --> ', value)
+     * }
+     * ```
+     * @param obj the object to generate a (key,value)-pair iterator for
+     */
+    const entries = function*(obj) {
+      for (let key of Object.keys(obj)) {
+        yield [key, obj[key]];
+      }
+    };
+
+    for (let [paramName, paramValue] of entries(queryParams)) {
+      if (contains(legitQueryParameters, paramName) && paramValue) {
+        queryOnNode = queryOnNode + (firstParam ? "?" : "&");
+        firstParam = false;
+        queryOnNode = queryOnNode + paramName + "=" + paramValue;
+      }
+    }
+
+    let query = queryOnOwner + "uri=" + encodeURIComponent(queryOnNode);
+
+    // server can't resolve uri-encoded colons. revert the encoding done in `queryString`.
+    query = query.replace(new RegExp("%3A", "g"), ":");
+
+    return query;
+  };
+
+  const requestUri = queryString(uri, params);
+
+  /*console.debug(
+    "called ownerApi.getJsonLdDataset: ",
+    requestUri,
+    "params: ",
+    params
+  );*/
+
+  return fetch(requestUri, {
+    method: "get",
+    credentials: "same-origin",
+    headers: {
+      Accept: "application/ld+json",
+      Prefer: params.pagingSize
+        ? `return=representation; max-member-count="${params.pagingSize}"`
+        : undefined,
+    },
+  })
+    .then(response => {
+      if (response.status === 200) return response;
+      else {
+        let error = new Error(
+          `${response.status} - ${
+            response.statusText
+          } for request ${uri}, ${JSON.stringify(params)}`
+        );
+
+        error.response = response;
+        throw error;
+      }
+    })
+    .then(dataset => dataset.json());
+}
+
 export function getMetaAtoms(
   modifiedAfterDate,
   createdAfterDate,
@@ -526,25 +642,23 @@ export function getAgreementProtocolUris(connectionUri) {
     .then(response => response.json());
 }
 
-export async function getPetriNetUris(connectionUri) {
+export function getPetriNetUris(connectionUri) {
   const url = urljoin(
     ownerBaseUrl,
     "/rest/petrinet/getPetriNetUris",
     `?connectionUri=${connectionUri}`
   );
 
-  const response = await fetch(url, {
+  return fetch(url, {
     method: "get",
     headers: {
       Accept: "application/ld+json",
       "Content-Type": "application/ld+json",
     },
     credentials: "include",
-  });
-  console.debug("RESPONSE", response);
-  //.then(checkHttpStatus)
-  const jsonResponse = response.json();
-  return jsonResponse;
+  })
+    .then(checkHttpStatus)
+    .then(response => response.json());
 }
 
 /**

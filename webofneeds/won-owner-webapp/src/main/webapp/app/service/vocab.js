@@ -30,8 +30,6 @@ vocab.WON.targetAtomCompacted = vocab.WON.prefix + ":targetAtom";
 vocab.WON.targetConnection = vocab.WON.baseUri + "targetConnection";
 vocab.WON.targetConnectionCompacted = vocab.WON.prefix + ":targetConnection";
 
-vocab.WON.connectionState = vocab.WON.baseUri + "connectionState";
-vocab.WON.connectionState = vocab.WON.prefix + ":connectionState";
 vocab.WON.Suggested = vocab.WON.baseUri + "Suggested";
 vocab.WON.SuggestedCompacted = vocab.WON.baseUri + ":Suggested";
 vocab.WON.RequestReceived = vocab.WON.baseUri + "RequestReceived";
@@ -60,6 +58,10 @@ vocab.WON.connections = vocab.WON.baseUri + "connections";
 vocab.WON.connectionsCompacted = vocab.WON.prefix + ":connections";
 vocab.WON.connectionState = vocab.WON.baseUri + "connectionState";
 vocab.WON.connectionStateCompacted = vocab.WON.prefix + ":connectionState";
+vocab.WON.previousConnectionState =
+  vocab.WON.baseUri + "previousConnectionState";
+vocab.WON.previousConnectionStateCompacted =
+  vocab.WON.prefix + ":previousConnectionState";
 vocab.WON.hasContent = vocab.WON.baseUri + "hasContent";
 vocab.WON.hasContentCompacted = vocab.WON.prefix + ":content";
 vocab.WON.messageContainer = vocab.WON.baseUri + "messageContainer";

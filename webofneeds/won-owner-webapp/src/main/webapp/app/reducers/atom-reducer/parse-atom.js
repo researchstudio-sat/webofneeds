@@ -65,7 +65,6 @@ export function parseAtom(jsonldAtom) {
       background: generateBackground(get(jsonldAtomImm, "@id")),
       unread: false,
       isBeingCreated: false,
-      jsonld: jsonldAtom,
       connections: Immutable.Map(),
     };
 
@@ -236,7 +235,6 @@ export function parseMetaAtom(metaAtom) {
       background: generateBackground(get(metaAtomImm, "uri")),
       unread: false,
       isBeingCreated: false,
-      jsonld: undefined,
       connections: Immutable.Map(),
     };
 
@@ -350,7 +348,7 @@ function extractCreationDate(atomJsonLd) {
     atomJsonLd.get("dct:created") ||
     atomJsonLd.get("http://purl.org/dc/terms/created");
   if (creationDate) {
-    return new Date(creationDate);
+    return new Date(get(creationDate, "@value"));
   }
   return undefined;
 }
@@ -360,7 +358,7 @@ function extractLastModifiedDate(atomJsonLd) {
     atomJsonLd.get("dct:modified") ||
     atomJsonLd.get("http://purl.org/dc/terms/modified");
   if (lastModifiedDate) {
-    return new Date(lastModifiedDate);
+    return new Date(get(lastModifiedDate, "@value"));
   }
   return undefined;
 }
