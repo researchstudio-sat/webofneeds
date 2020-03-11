@@ -153,7 +153,6 @@ import vocab from "./vocab.js";
         .then(jsonLdConnection => jsonld.promises.expand(jsonLdConnection))
         .then(jsonLdConnection => {
           const connectionContentGraph = jsonLdConnection[0];
-
           const connection = {
             uri: connectionContentGraph["@id"],
             type: connectionContentGraph["@type"][0],
@@ -233,6 +232,85 @@ import vocab from "./vocab.js";
           connection.hasEvents = [messages["@id"]];
         }
         return connection;
+      });
+  };
+
+  /**
+   * @param connectionUri
+   * @param fetchParams: optional paramters
+   *        * requesterWebId: the WebID used to access the ressource (used
+   *            by the owner-server to pick the right key-pair)
+   *        * queryParams: GET-params as documented for ownerApi.js `queryString`
+   *        * pagingSize: if specified the server will return the first
+   *            page (unless e.g. `queryParams.p=2` is specified when
+   *            it will return the second page of size N)
+   * @return {*} the connections predicates along with the fetched messages
+   */
+  won.getMessagesOfConnection = function(connectionUri, fetchParams) {
+    if (!is("String", connectionUri)) {
+      throw new Error(
+        "Tried to request connection infos for sthg that isn't an uri: " +
+          connectionUri
+      );
+    }
+    return getConnection(connectionUri)
+      .then(connection =>
+        won.getJsonLdNode(connection.messageContainer, fetchParams)
+      )
+      .then(messageContainer => {
+        console.debug(
+          "Received MessageContainer For Connection(",
+          connectionUri,
+          ") with fetchParams: ",
+          fetchParams,
+          "RESULT: ",
+          messageContainer
+        );
+
+        const messageContainerGraph =
+          messageContainer &&
+          messageContainer["@graph"] &&
+          messageContainer["@graph"][0];
+        const messages =
+          messageContainerGraph && messageContainerGraph["rdfs:member"];
+
+        let rawMessageArray;
+        /*
+           * if there's only a single rdfs:member in the event
+           * container, getJsonLdNode will not return an array, so we
+           * need to make sure it's one from here on out.
+           */
+        if (!messages) {
+          rawMessageArray = [];
+        } else if (is("Array", messages)) {
+          rawMessageArray = messages;
+        } else {
+          rawMessageArray = [messages];
+        }
+
+        return Promise.all(
+          rawMessageArray.map(rawMessage => {
+            console.debug("rawMessage: ", rawMessage);
+            const msgUri = rawMessage["@id"];
+            return jsonld.promises
+              .frame(messageContainer, {
+                "@id": msgUri,
+                "@context": won.defaultContext,
+              })
+              .then(jsonLdMessage => won.wonMessageFromJsonLd(jsonLdMessage))
+              .then(wonMessage => ({
+                msgUri: msgUri,
+                wonMessage: wonMessage,
+              }))
+              .catch(e => {
+                const msg =
+                  "Failed to frame or parse to wonMessage " + msgUri + ".";
+                e.message += msg;
+                console.error(e.message);
+                return { msgUri: msgUri, wonMessage: undefined };
+              });
+          })
+        );
       });
   };
 

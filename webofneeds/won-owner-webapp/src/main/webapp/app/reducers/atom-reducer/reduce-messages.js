@@ -25,7 +25,11 @@ export function addMessage(
   // but holding only the 'isReceivedByOwn','isReceivedByRemote' etc fields,
   // throwing off the message rendering.
   // New solution: parse anything that is not a response, but allow responses with content
-  if (!wonMessage.isResponse() || wonMessage.getContentGraphs().length > 0) {
+  // Somehow the success responses would be visible on initial/reload or fetch of more Messages, thats why we avoid adding if the alreadyProcessed flag is set
+  if (
+    !wonMessage.isResponse() ||
+    (wonMessage.getContentGraphs().length > 0 && !alreadyProcessed)
+  ) {
     let parsedMessage = parseMessage(wonMessage, alreadyProcessed, false);
 
     if (parsedMessage) {

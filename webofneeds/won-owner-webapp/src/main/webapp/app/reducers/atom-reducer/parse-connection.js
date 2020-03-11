@@ -12,6 +12,7 @@ export function parseConnection(jsonldConnection) {
       uri: get(jsonldConnectionImm, "uri"),
       state: get(jsonldConnectionImm, "connectionState"),
       previousState: get(jsonldConnectionImm, "previousConnectionState"),
+      messageContainerUri: get(jsonldConnectionImm, "messageContainer"),
       messages: Immutable.Map(),
       socketUri: get(jsonldConnectionImm, "socket"),
       targetSocketUri: get(jsonldConnectionImm, "targetSocket"),

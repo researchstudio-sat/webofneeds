@@ -333,87 +333,33 @@ export function fetchMessages(
     type: actionTypes.connections.fetchMessagesStart,
     payload: Immutable.fromJS({ connectionUri: connectionUri }),
   });
-
   return won
-    .getConnectionWithEventUris(connectionUri, fetchParams)
-    .then(connection => {
-      console.debug(
-        "fetchMessages(",
-        connectionUri,
-        fetchParams,
-        ") -> ",
-        connection
-      );
+    .getMessagesOfConnection(connectionUri, fetchParams)
+    .then(messages => {
+      const lookupMap = { success: {}, failed: {} };
+      const loadingArray = [];
+      messages.map(message => {
+        loadingArray.push(message.msgUri);
 
-      console.debug("Messages to Fetch: ", connection.hasEvents);
+        if (message.wonMessage) {
+          lookupMap["success"][message.msgUri] = message.wonMessage;
+        } else {
+          lookupMap["failed"][message.msgUri] = undefined;
+        }
+      });
 
       dispatch({
         type: actionTypes.connections.messageUrisInLoading,
         payload: Immutable.fromJS({
           connectionUri: connectionUri,
-          uris: connection.hasEvents,
+          uris: loadingArray,
         }),
       });
 
-      return connection.hasEvents;
+      return lookupMap;
     })
-    .then(eventUris => {
-      return urisToLookupSuccessAndFailedMap(
-        eventUris,
-        eventUri => won.getWonMessage(eventUri, { requesterWebId: atomUri }),
-        []
-      );
-    })
-    .then(events => storeMessages(dispatch, events, connectionUri));
+    .then(messages => storeMessages(dispatch, messages, connectionUri));
 }
-
-/**
- * Helper Method to make sure we only load numberOfEvents messages into the store, seems that the cache is not doing what its supposed to do otherwise
- * FIXME: remove this once the fetchpaging works again (or at all)
- * @param state
- * @param connection
- * @param connectionUri
- * @param numberOfEvents
- * @returns {Array}
- */
-/*function limitNumberOfMessagesToFetchInConnection(
-  state,
-  connection,
-  connectionUri,
-  numberOfMessages
-) {
-  const connectionImm = Immutable.fromJS(connection);
-
-  const allMessagesToLoad = getIn(state, [
-    "process",
-    "connections",
-    connectionUri,
-    "messages",
-  ]).filter(msg => get(msg, "toLoad") && !get(msg, "failedToLoad"));
-  let messagesToFetch = [];
-
-  const fetchedConnectionEvents =
-    connectionImm &&
-    get(connectionImm, "hasEvents") &&
-    get(connectionImm, "hasEvents").filter(eventUri => !!eventUri); //Filter out undefined/null values
-
-  if (fetchedConnectionEvents && fetchedConnectionEvents.size > 0) {
-    fetchedConnectionEvents.map(eventUri => {
-      if (
-        allMessagesToLoad.has(eventUri) &&
-        messagesToFetch.length < numOfMsgs2pageSize(numberOfMessages)
-      ) {
-        messagesToFetch.push(eventUri);
-      }
-    });
-  } else {
-    allMessagesToLoad.map((messageStatus, messageUri) => {
-      messagesToFetch.push(messageUri);
-    });
-  }
-
-  return messagesToFetch;
-}*/
 
 /**
  * Helper function that stores dispatches the success and failed actions for a given set of messages
@@ -593,51 +539,6 @@ function urisToLookupMap(
     uris.forEach((uri, i) => {
       if (dataObjects[i]) {
         lookupMap[uri] = dataObjects[i];
-      }
-    });
-    return lookupMap;
-  });
-}
-
-/**
- * Takes a single uri or an array of uris, performs the lookup function on each
- * of them seperately, collects the results and builds an map/object
- * with the uris as keys and the results as values.
- * If any call to the asyncLookupFunction fails, the corresponding
- * key-value-pair will not be contained in the success-result but rather in the failed-results.
- * @param uris
- * @param asyncLookupFunction
- * @param excludeUris uris to exclude from lookup
- * @return {*}
- */
-function urisToLookupSuccessAndFailedMap(
-  uris,
-  asyncLookupFunction,
-  excludeUris = []
-) {
-  //make sure we have an array and not a single uri.
-  const urisAsArray = is("Array", uris) ? uris : [uris];
-  const excludeUrisAsArray = is("Array", excludeUris)
-    ? excludeUris
-    : [excludeUris];
-
-  const urisAsArrayWithoutExcludes = urisAsArray.filter(
-    uri => excludeUrisAsArray.indexOf(uri) < 0
-  );
-
-  const asyncLookups = urisAsArrayWithoutExcludes.map(uri =>
-    asyncLookupFunction(uri).catch(error => {
-      return error;
-    })
-  );
-  return Promise.all(asyncLookups).then(dataObjects => {
-    const lookupMap = { success: {}, failed: {} };
-    //make sure there's the same
-    uris.forEach((uri, i) => {
-      if (dataObjects[i] instanceof Error) {
-        lookupMap["failed"][uri] = dataObjects[i];
-      } else if (dataObjects[i]) {
-        lookupMap["success"][uri] = dataObjects[i];
       }
     });
     return lookupMap;
