@@ -594,8 +594,18 @@ won.wonMessageFromJsonLd = function(wonMessageAsJsonLD) {
 
     return wonMessage
       .frameInPromise()
-      .then(() => wonMessage.generateContentGraphTrig())
-      .then(() => wonMessage.generateCompactedFramedMessage())
+      .then(() => {
+        if (!wonMessage.isResponse()) {
+          return wonMessage.generateContentGraphTrig();
+        }
+        return;
+      })
+      .then(() => {
+        if (!wonMessage.isResponse()) {
+          return wonMessage.generateCompactedFramedMessage();
+        }
+        return;
+      })
       .then(() => {
         if (wonMessage.hasParseErrors() && !wonMessage.isResponse()) {
           console.warn(
@@ -622,6 +632,8 @@ won.wonMessageFromJsonLd = function(wonMessageAsJsonLD) {
       });
   });
 };
+
+window.wonMessageFromJsonLd4dbg = won.wonMessageFromJsonLd;
 
 /**
  * Serializes the jsonldData into trig.

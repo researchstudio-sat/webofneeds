@@ -290,18 +290,31 @@ import vocab from "./vocab.js";
 
         return Promise.all(
           rawMessageArray.map(rawMessage => {
-            console.debug("rawMessage: ", rawMessage);
             const msgUri = rawMessage["@id"];
+
+            console.debug("rawMessage: ", rawMessage);
             return jsonld.promises
               .frame(messageContainer, {
                 "@id": msgUri,
                 "@context": won.defaultContext,
               })
-              .then(jsonLdMessage => won.wonMessageFromJsonLd(jsonLdMessage))
-              .then(wonMessage => ({
-                msgUri: msgUri,
-                wonMessage: wonMessage,
-              }))
+              .then(jsonLdMessage => {
+                console.debug(
+                  "won.getMessagesOfConnection framedMessage: ",
+                  jsonLdMessage
+                );
+                return won.wonMessageFromJsonLd(jsonLdMessage);
+              })
+              .then(wonMessage => {
+                console.debug(
+                  "won.getMessagesOfConnection wonMessageFromJsonLd: ",
+                  wonMessage
+                );
+                return {
+                  msgUri: msgUri,
+                  wonMessage: wonMessage,
+                };
+              })
               .catch(e => {
                 const msg =
                   "Failed to frame or parse to wonMessage " + msgUri + ".";

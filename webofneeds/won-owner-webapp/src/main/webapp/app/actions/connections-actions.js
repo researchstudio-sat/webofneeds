@@ -740,7 +740,6 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
       .sort((msg1, msg2) => get(msg1, "date") - get(msg2, "date"));
 
     const oldestMessageUri = get(sortedConnectionMessages.first(), "uri");
-    const messageHashValue = oldestMessageUri;
 
     return stateStore.fetchMessages(
       dispatch,
@@ -748,7 +747,7 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
       connectionUri,
       atomUri,
       numberOfEvents,
-      messageHashValue
+      oldestMessageUri
     );
   };
 }
