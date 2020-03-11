@@ -164,11 +164,11 @@ public interface MessageEventRepository extends WonRepository<MessageEvent> {
     Slice<MessageEvent> findByParentURIBefore(@Param("parent") URI parentURI,
                     @Param("referenceDate") Date referenceDate, Pageable pageable);
 
-    @Query("select distinct msg from MessageEvent msg left join fetch msg.datasetHolder where msg.parentURI = :parent and msg.creationDate < :referenceDate")
+    @Query("select msg from MessageEvent msg left join fetch msg.datasetHolder where msg.parentURI = :parent and msg.creationDate < :referenceDate")
     Slice<MessageEvent> findByParentURIBeforeFetchDatasetEagerly(@Param("parent") URI parentURI,
                     @Param("referenceDate") Date referenceDate, Pageable pageable);
 
-    @Query("select msg from MessageEvent msg left join fetch msg.datasetHolder where msg.parentURI = :parent and msg.creationDate < (select distinct msg2.creationDate from MessageEvent msg2 where msg2.messageURI = :referenceMessageUri )")
+    @Query("select msg from MessageEvent msg left join fetch msg.datasetHolder where msg.parentURI = :parent and msg.creationDate < (select max(msg2.creationDate) from MessageEvent msg2 where msg2.messageURI = :referenceMessageUri)")
     Slice<MessageEvent> findByParentURIBeforeFetchDatasetEagerly(@Param("parent") URI parentURI,
                     @Param("referenceMessageUri") URI referenceMessageUri, Pageable pageable);
 
@@ -187,7 +187,7 @@ public interface MessageEventRepository extends WonRepository<MessageEvent> {
                     @Param("referenceDate") Date referenceDate, @Param("messageType") WonMessageType messageType,
                     Pageable pageable);
 
-    @Query("select msg from MessageEvent msg left join fetch msg.datasetHolder where msg.parentURI = :parent and msg.messageType = :messageType and msg.creationDate < (select distinct msg2.creationDate from MessageEvent msg2 where msg2.messageURI = :referenceMessageUri )")
+    @Query("select msg from MessageEvent msg left join fetch msg.datasetHolder where msg.parentURI = :parent and msg.messageType = :messageType and msg.creationDate < (select max(msg2.creationDate) from MessageEvent msg2 where msg2.messageURI = :referenceMessageUri )")
     Slice<MessageEvent> findByParentURIAndTypeBeforeFetchDatasetEagerly(@Param("parent") URI parentURI,
                     @Param("referenceMessageUri") URI referenceMessageURI,
                     @Param("messageType") WonMessageType messageType, Pageable pageable);
