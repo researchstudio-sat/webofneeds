@@ -452,11 +452,11 @@ function hierarchy2Creators(actionHierarchy) {
           /* leaf can either be a defined creator or a
                  * placeholder asking to generate one.
                  */
-          const potentialCreator = won.lookup(actionHierarchy, path);
+          const potentialCreator = lookup(actionHierarchy, path);
           if (typeof potentialCreator === "function") {
             return potentialCreator; //already a defined creator. hopefully.
           } else {
-            const type = won.lookup(actionTypes, path);
+            const type = lookup(actionTypes, path);
             return createActionCreator(type);
           }
         },
@@ -466,6 +466,28 @@ function hierarchy2Creators(actionHierarchy) {
       "__"
     )
   );
+}
+
+/**
+ * Traverses a path of properties over the object, where the folllowing holds:
+ *
+ *     o.propA[1].moreprop === lookup(o, ['propA', 1, 'moreprop'])
+ *
+ * @param o
+ * @param propertyPath
+ * @returns {*}
+ */
+function lookup(o, propertyPath) {
+  //TODO this should be in a utils file
+  if (!o || !propertyPath) {
+    return undefined;
+  }
+  const resolvedStep = o[propertyPath[0]];
+  if (propertyPath.length === 1) {
+    return resolvedStep;
+  } else {
+    return lookup(resolvedStep, propertyPath.slice(1));
+  }
 }
 
 function createActionCreator(type) {
