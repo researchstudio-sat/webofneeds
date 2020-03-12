@@ -460,3 +460,25 @@ function throwParsingError(val, type, prependedMsg = "") {
   );
   throw new Error(fullMsg.trim());
 }
+
+// Helper Method to get Data out of jsonld, since the jsonld update some messages dont have a @graph array wrapped around the content (["@graph"][0])
+export function getProperty(jsonld, property) {
+  if (jsonld && property) {
+    if (jsonld["@graph"] && jsonld["@graph"][0]) {
+      return jsonld["@graph"][0][property];
+    } else {
+      return jsonld[property];
+    }
+  }
+  return undefined;
+}
+
+export function setProperty(jsonld, property, val) {
+  if (jsonld && property && val) {
+    if (jsonld["@graph"] && jsonld["@graph"][0]) {
+      jsonld["@graph"][0][property] = val;
+    } else {
+      jsonld[property] = val;
+    }
+  }
+}
