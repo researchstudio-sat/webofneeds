@@ -83,14 +83,14 @@ export default class WonPetrinetTransitionPicker extends React.Component {
       this.state.selectedTransitionUri &&
       this.state.selectedTransitionUri.trim().length > 0
     ) {
-      this.onUpdate({
+      this.props.onUpdate({
         value: {
           petriNetUri: this.state.selectedPetriNetUri,
           transitionUri: this.state.selectedTransitionUri,
         },
       });
     } else {
-      this.onUpdate({ value: undefined });
+      this.props.onUpdate({ value: undefined });
     }
   }
 
