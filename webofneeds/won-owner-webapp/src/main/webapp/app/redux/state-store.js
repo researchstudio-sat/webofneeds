@@ -417,11 +417,7 @@ export function fetchConnectionsOfAtomAndDispatch(atomUri, dispatch) {
         }),
       });
       const activeConnectionUris = connectionsWithStateAndSocket
-        .filter(
-          conn =>
-            conn.connectionState !== vocab.WON.Closed &&
-            conn.connectionState !== vocab.WON.Suggested
-        )
+        .filter(conn => conn.connectionState !== vocab.WON.Closed)
         .map(conn => conn.uri);
 
       dispatch({

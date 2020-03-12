@@ -18,7 +18,7 @@
  * Created by LEIH-NB on 19.08.2014.
  */
 "format es6" /* required to force babel to transpile this so the minifier is happy */;
-import { clone, is, isArray } from "../utils.js";
+import { clone, is } from "../utils.js";
 import {
   clearDisclaimerAccepted,
   clearReadUris,
@@ -27,6 +27,7 @@ import {
 } from "../won-localstorage.js";
 import vocab from "./vocab.js";
 import jsonld from "jsonld/dist/jsonld.js";
+import * as jsonldUtils from "./jsonld-utils.js";
 
 import N3 from "n3";
 
@@ -90,22 +91,6 @@ won.PRIVATEID_NOT_FOUND_ERROR = Object.freeze({
   message: "invalid privateId",
 });
 
-/**
- * Compacts the passed string if possible.
- * e.g. "https://w3id.org/won/core#Demand" -> "won:Demand"
- * @param {*} longValue
- * @param {*} context
- */
-won.toCompacted = function(longValue, context = won.defaultContext) {
-  if (!longValue) return;
-  for (let k in context) {
-    if (longValue.startsWith(context[k])) {
-      return longValue.replace(context[k], k + ":"); // replace first occurance
-    }
-  }
-  return longValue;
-};
-
 won.clone = function(obj) {
   if (obj === undefined) return undefined;
   else return JSON.parse(JSON.stringify(obj));
@@ -115,7 +100,6 @@ won.clone = function(obj) {
  * Copies all arguments properties recursively into a
  * new object and returns that.
  */
-
 won.merge = function(/*args...*/) {
   const o = {};
   for (const argument of arguments) {
@@ -139,44 +123,11 @@ won.mergeIntoLast = function(/*args...*/) {
     obj1 = arguments[arguments.length - 1];
     const obj2 = argument;
     for (const p in obj2) {
-      try {
-        // Property in destination object set; update its value.
-        if (obj2[p].constructor == Object) {
-          obj1[p] = won.mergeRecursive(obj1[p], obj2[p]);
-        } else {
-          obj1[p] = obj2[p];
-        }
-      } catch (e) {
-        // Property in destination object not set; create it and set its value.
-        obj1[p] = obj2[p];
-      }
+      obj1[p] = obj2[p];
     }
   }
   return obj1;
 };
-
-won.lookup = lookup;
-/**
- * Traverses a path of properties over the object, where the folllowing holds:
- *
- *     o.propA[1].moreprop === lookup(o, ['propA', 1, 'moreprop'])
- *
- * @param o
- * @param propertyPath
- * @returns {*}
- */
-function lookup(o, propertyPath) {
-  //TODO this should be in a utils file
-  if (!o || !propertyPath) {
-    return undefined;
-  }
-  const resolvedStep = o[propertyPath[0]];
-  if (propertyPath.length === 1) {
-    return resolvedStep;
-  } else {
-    return lookup(resolvedStep, propertyPath.slice(1));
-  }
-}
 
 /**
  * Method that checks if the given element is already an array, if so return it, if not
@@ -185,7 +136,7 @@ function lookup(o, propertyPath) {
  * @returns {*}
  */
 function createArray(elements) {
-  return !elements || Array.isArray(elements) ? elements : [elements];
+  return !elements || is("Array", elements) ? elements : [elements];
 }
 
 //get the URI from a jsonld resource (expects an object with an '@id' property)
@@ -213,51 +164,8 @@ won.reportError = function(message) {
   }
 };
 
-won.isNull = function(value) {
-  return typeof value === "undefined" || value == null;
-};
-
-//helper function: is x an array?
-won.isArray = function(x) {
-  return Object.prototype.toString.call(x) === "[object Array]";
-};
-
 won.replaceRegExp = function(string) {
   return string.replace(/([.*+?^=!:${}()|[\]/\\])/g, "\\$1");
-};
-
-/**
- * Deletes every element of the array for which the
- * test function returns true.
- * @param array
- * @param test
- */
-won.deleteWhere = function(array, test) {
-  array.filter(entry => !test(entry));
-};
-
-won.containsAll = function(array, subArray) {
-  for (const skey in subArray) {
-    let found = false;
-    for (const key in array) {
-      if (subArray[skey] === array[key]) {
-        found = true;
-        break;
-      }
-    }
-    if (found == false) return false;
-  }
-  return true;
-};
-
-/**
- * Deletes all null entries in the specified array.
- * @param array
- */
-won.deleteWhereNull = function(array) {
-  return won.deleteWhere(array, function(x) {
-    return x == null;
-  });
 };
 
 /**
@@ -267,7 +175,7 @@ won.deleteWhereNull = function(array) {
  */
 won.visitDepthFirst = function(data, callback, currentKey, currentContainer) {
   if (data == null) return;
-  if (won.isArray(data) && data.length > 0) {
+  if (is("Array", data) && data.length > 0) {
     for (let key in data) {
       won.visitDepthFirst(data[key], callback, key, data);
     }
@@ -347,7 +255,7 @@ won.defaultContext = {
   ...won.minimalContext,
   webID: "http://www.example.com/webids/",
   dc: "http://purl.org/dc/elements/1.1/",
-  rdfs: "http://www.w3.org/2000/01/rdf-schema#",
+  rdfs: vocab.RDFS.baseUri,
   geo: "http://www.w3.org/2003/01/geo/wgs84_pos#",
   xsd: "http://www.w3.org/2001/XMLSchema#",
   gr: "http://purl.org/goodrelations/v1#",
@@ -378,7 +286,7 @@ won.JsonLdHelper = {
     if (graphs == null) {
       return graphURIs;
     }
-    if (won.isArray(graphs) && graphs.length > 0) {
+    if (is("Array", graphs) && graphs.length > 0) {
       for (const graph of graphs) {
         const graphURI = graph["@id"];
         if (graphURI != null) {
@@ -471,13 +379,15 @@ won.addContentGraphReferencesToMessageGraph = function(
   graphURIs
 ) {
   if (graphURIs != null) {
-    if (won.isArray(graphURIs) && graphURIs.length > 0) {
+    if (is("Array", graphURIs) && graphURIs.length > 0) {
       //if the message graph already contains content references, fetch them:
-      const existingContentRefs =
-        messageGraph["@graph"][0][vocab.WONMSG.contentCompacted];
+      const existingContentRefs = jsonldUtils.getProperty(
+        messageGraph,
+        vocab.WONMSG.contentCompacted
+      );
       const contentGraphURIs =
         typeof existingContentRefs === "undefined" ||
-        !isArray(existingContentRefs)
+        !is("Array", existingContentRefs)
           ? []
           : existingContentRefs;
       for (const graphURI of graphURIs) {
@@ -485,9 +395,11 @@ won.addContentGraphReferencesToMessageGraph = function(
           "@id": graphURI,
         });
       }
-      messageGraph["@graph"][0][
-        vocab.WONMSG.contentCompacted
-      ] = contentGraphURIs;
+      jsonldUtils.setProperty(
+        messageGraph,
+        vocab.WONMSG.contentCompacted,
+        contentGraphURIs
+      );
     }
   }
 };
@@ -589,7 +501,7 @@ won.DomainObjectFactory.prototype = {
 };
 
 won.wonMessageFromJsonLd = function(wonMessageAsJsonLD) {
-  return jsonld.promises.expand(wonMessageAsJsonLD).then(expandedJsonLd => {
+  return jsonld.expand(wonMessageAsJsonLD).then(expandedJsonLd => {
     const wonMessage = new WonMessage(expandedJsonLd);
 
     return wonMessage
@@ -644,7 +556,7 @@ window.wonMessageFromJsonLd4dbg = won.wonMessageFromJsonLd;
  *   `jsonldData` that's always used.)
  */
 won.jsonLdToTrig = async function(jsonldData, addDefaultContext = true) {
-  const quadString = await jsonld.promises.toRDF(jsonldData, {
+  const quadString = await jsonld.toRDF(jsonldData, {
     format: "application/nquads",
   });
   const { quads } = await won.n3Parse(quadString, {
@@ -734,7 +646,7 @@ won.ttlToJsonLd = async function(ttl) {
       format: "application/n-quads",
     });
 
-    const parsedJsonld = await jsonld.promises.fromRDF(quadString, {
+    const parsedJsonld = await jsonld.fromRDF(quadString, {
       format: "application/n-quads",
     });
 
@@ -906,7 +818,7 @@ WonMessage.prototype = {
     }
     const type = this.getMessageDirection();
     const that = this;
-    return jsonld.promises
+    return jsonld
       .frame(this.rawMessage, {
         "@type": type,
       })
@@ -938,23 +850,16 @@ WonMessage.prototype = {
   },
 
   getProperty: function(property) {
-    let val = this.__getFramedMessage()["@graph"][0][property];
+    let val = jsonldUtils.getProperty(this.__getFramedMessage(), property);
     if (val) {
       return this.__singleValueOrArray(val);
     }
     return null;
   },
 
-  getPropertyFromLocalMessage: function(property) {
-    let val = this.__getFramedMessage()["@graph"][0][property];
-    if (val) {
-      return this.__singleValueOrArray(val);
-    }
-  },
-
   __singleValueOrArray: function(val) {
     if (!val) return null;
-    if (Array.isArray(val)) {
+    if (is("Array", val)) {
       if (val.length == 1) {
         return won.getSafeJsonLdValue(val);
       }
@@ -992,7 +897,7 @@ WonMessage.prototype = {
     return createArray(this.getProperty(vocab.WONMSG.forwardedMessage));
   },
   getTimestamp: function() {
-    return this.getPropertyFromLocalMessage(vocab.WONMSG.timestamp);
+    return this.getProperty(vocab.WONMSG.timestamp);
   },
   getTextMessage: function() {
     return this.getProperty(vocab.WONCON.text);
@@ -1199,11 +1104,11 @@ WonMessage.prototype = {
   __init: function() {
     this.context = this.graphs = this.rawMessage;
 
-    if (!Array.isArray(this.graphs)) {
+    if (!is("Array", this.graphs)) {
       this.parseErrors.push("@graph not found or not an array");
     }
     this.graphUris = this.graphs.map(g => g["@id"]);
-    if (!Array.isArray(this.graphUris)) {
+    if (!is("Array", this.graphUris)) {
       this.parseErrors.push("GraphUris not found or not an array");
     }
     const nodes = {};
@@ -1403,7 +1308,7 @@ WonMessage.prototype = {
         messageDirection: resource["@type"][0], //@type is an array in expanded jsonld
       }))
       .filter(x => !!x); //if that property was not present, filter out undefineds
-    if (Array.isArray(data)) {
+    if (is("Array", data)) {
       if (data.length == 0) {
         return null;
       }
@@ -1420,7 +1325,7 @@ WonMessage.prototype = {
         forwardedMessageUri: resource[vocab.WONMSG.forwardedMessage][0]["@id"],
       }))
       .filter(x => !!x); //if that property was not present, filter out undefineds
-    if (Array.isArray(data)) {
+    if (is("Array", data)) {
       if (data.length == 0) {
         return null;
       }
@@ -1573,7 +1478,12 @@ won.MessageBuilder.prototype = {
     return this.messageGraph;
   },
   getMessageEventNode: function() {
-    return this.getMessageEventGraph()["@graph"][0];
+    return (
+      (this.getMessageEventGraph() &&
+        this.getMessageEventGraph()["@graph"] &&
+        this.getMessageEventGraph()["@graph"][0]) ||
+      this.getMessageEventGraph()
+    );
   },
   /**
    * Fetches the content graph, creating it if it doesn't exist.
@@ -1604,10 +1514,19 @@ won.MessageBuilder.prototype = {
     return contentGraph;
   },
   getContentGraphNode: function() {
-    return this.getContentGraph()["@graph"][0];
+    return (
+      (this.getContentGraph() &&
+        this.getContentGraph()["@graph"] &&
+        this.getContentGraph()["@graph"][0]) ||
+      this.getContentGraph()
+    );
   },
   getContentGraphNodes: function() {
-    return this.getContentGraph()["@graph"];
+    if (this.getContentGraph() && this.getContentGraph()["@graph"]) {
+      return this.getContentGraph()["@graph"];
+    } else {
+      return [this.getContentGraph()];
+    }
   },
   /**
    * takes a lists of json-ld-objects and merges them into the content-graph

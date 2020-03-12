@@ -1,5 +1,11 @@
 let vocab = {};
 
+vocab.RDFS = {};
+vocab.RDFS.prefix = "rdfs";
+vocab.RDFS.baseUri = "http://www.w3.org/2000/01/rdf-schema#";
+vocab.RDFS.memberCompacted = vocab.RDFS.prefix + ":member";
+vocab.RDFS.member = vocab.RDFS.baseUri + "member";
+
 vocab.WON = {};
 vocab.WON.baseUri = "https://w3id.org/won/core#";
 vocab.WON.matcherURI = "https://localhost:8443/matcher/search/";
