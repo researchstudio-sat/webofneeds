@@ -23,6 +23,7 @@ import * as ownerApi from "../api/owner-api.js";
 import jsonld from "jsonld/dist/jsonld.js";
 import won from "./won.js";
 import vocab from "./vocab.js";
+import * as jsonldUtils from "./jsonld-utils";
 
 (function() {
   /**
@@ -34,33 +35,11 @@ import vocab from "./vocab.js";
     ownerApi
       .getJsonLdDataset(atomUri)
       .then(jsonLdData =>
-        /* JsonLd seems to have a framing issue when it comes to @type -> to ensure all the attributes are used in the data
-         we need to replace @type with the rdf:type, and also replace @value with rdf:value otherwise the framing would not work
-         */
-        JSON.parse(
-          JSON.stringify(jsonLdData)
-            .replace(/@type/g, "rdf:xtype")
-            .replace(/@value/g, "rdf:xvalue")
-        )
-      )
-      .then(jsonLdData =>
-        jsonld.promises.frame(jsonLdData, {
+        jsonld.frame(jsonLdData, {
           "@id": atomUri, // start the framing from this uri. Otherwise will generate all possible nesting-variants.
           "@context": won.defaultContext,
+          "@embed": "@always",
         })
-      )
-      .then(jsonLdData =>
-        /* After framing we replace the rdf:type and rdf:value with @type and @value again
-         */
-        JSON.parse(
-          JSON.stringify(jsonLdData)
-            .replace(/rdf:xtype/g, "@type")
-            .replace(/rdf:xvalue/g, "@value")
-        )
-      )
-      .then(jsonLdData =>
-        //Compacting is necessary because our replacement did not compact all uris, before because it assumed literals
-        jsonld.promises.compact(jsonLdData, won.defaultContext)
       )
       .then(atomJsonLd => {
         // usually the atom-data will be in a single object in the '@graph' array.
@@ -84,6 +63,12 @@ import vocab from "./vocab.js";
         }
 
         return flattenedAtomJsonLd;
+      })
+      .catch(e => {
+        const msg = "Failed to get atom " + atomUri + ".";
+        e.message += msg;
+        console.error(e.message);
+        throw e;
       });
 
   won.validateEnvelopeDataForAtom = function(atomUri) {
@@ -117,7 +102,7 @@ import vocab from "./vocab.js";
   won.getConnectionUrisWithStateByAtomUri = (atomUri, requesterWebId) => {
     return won
       .getJsonLdNode(atomUri, requesterWebId)
-      .then(jsonLdAtom => jsonld.promises.expand(jsonLdAtom))
+      .then(jsonLdAtom => jsonld.expand(jsonLdAtom))
       .then(jsonLdAtom => {
         const jsonLdContentGraph = jsonLdAtom[0];
 
@@ -127,11 +112,10 @@ import vocab from "./vocab.js";
         won.getJsonLdNode(connectionContainerUri, requesterWebId)
       )
       .then(connectionContainer => {
-        const connectionsGraph =
-          connectionContainer &&
-          connectionContainer["@graph"] &&
-          connectionContainer["@graph"][0];
-        const connections = connectionsGraph && connectionsGraph["rdfs:member"];
+        const connections = jsonldUtils.getProperty(
+          connectionContainer,
+          vocab.RDFS.memberCompacted
+        );
 
         if (!connections) {
           return [];
@@ -150,7 +134,7 @@ import vocab from "./vocab.js";
       won
         //add the eventUris
         .getJsonLdNode(connectionUri, fetchParams)
-        .then(jsonLdConnection => jsonld.promises.expand(jsonLdConnection))
+        .then(jsonLdConnection => jsonld.expand(jsonLdConnection))
         .then(jsonLdConnection => {
           const connectionContentGraph = jsonLdConnection[0];
           const connection = {
@@ -183,6 +167,12 @@ import vocab from "./vocab.js";
 
           return connection;
         })
+        .catch(e => {
+          const msg = "Failed to get connection " + connectionUri + ".";
+          e.message += msg;
+          console.error(e.message);
+          throw e;
+        })
     );
   }
 
@@ -212,12 +202,10 @@ import vocab from "./vocab.js";
         ])
       )
       .then(([connection, messageContainer]) => {
-        const messageContainerGraph =
-          messageContainer &&
-          messageContainer["@graph"] &&
-          messageContainer["@graph"][0];
-        const messages =
-          messageContainerGraph && messageContainerGraph["rdfs:member"];
+        const messages = jsonldUtils.getProperty(
+          messageContainer,
+          vocab.RDFS.memberCompacted
+        );
 
         /*
            * if there's only a single rdfs:member in the event
@@ -258,21 +246,10 @@ import vocab from "./vocab.js";
         won.getJsonLdNode(connection.messageContainer, fetchParams)
       )
       .then(messageContainer => {
-        console.debug(
-          "Received MessageContainer For Connection(",
-          connectionUri,
-          ") with fetchParams: ",
-          fetchParams,
-          "RESULT: ",
-          messageContainer
+        const messages = jsonldUtils.getProperty(
+          messageContainer,
+          vocab.RDFS.memberCompacted
         );
-
-        const messageContainerGraph =
-          messageContainer &&
-          messageContainer["@graph"] &&
-          messageContainer["@graph"][0];
-        const messages =
-          messageContainerGraph && messageContainerGraph["rdfs:member"];
 
         let rawMessageArray;
         /*
@@ -292,24 +269,14 @@ import vocab from "./vocab.js";
           rawMessageArray.map(rawMessage => {
             const msgUri = rawMessage["@id"];
 
-            console.debug("rawMessage: ", rawMessage);
-            return jsonld.promises
-              .frame(messageContainer, {
-                "@id": msgUri,
+            // console.time("WonMsg parseTime for: " + msgUri);
+            return won
+              .wonMessageFromJsonLd({
+                "@graph": [rawMessage],
                 "@context": won.defaultContext,
               })
-              .then(jsonLdMessage => {
-                console.debug(
-                  "won.getMessagesOfConnection framedMessage: ",
-                  jsonLdMessage
-                );
-                return won.wonMessageFromJsonLd(jsonLdMessage);
-              })
               .then(wonMessage => {
-                console.debug(
-                  "won.getMessagesOfConnection wonMessageFromJsonLd: ",
-                  wonMessage
-                );
+                // console.timeEnd("WonMsg parseTime for: " + msgUri);
                 return {
                   msgUri: msgUri,
                   wonMessage: wonMessage,
@@ -320,6 +287,7 @@ import vocab from "./vocab.js";
                   "Failed to frame or parse to wonMessage " + msgUri + ".";
                 e.message += msg;
                 console.error(e.message);
+                // console.timeEnd("WonMsg parseTime for: " + msgUri);
                 return { msgUri: msgUri, wonMessage: undefined };
               });
           })
@@ -361,8 +329,7 @@ import vocab from "./vocab.js";
         .getJsonLdNode(senderSocketUri.split("#")[0] + "/c", fetchParams)
         //add the eventUris
         .then(jsonResp => {
-          console.debug("won.getConnectionUrisBySocket jsonResp:", jsonResp);
-          return jsonResp["@graph"][0]["rdfs:member"];
+          return jsonldUtils.getProperty(jsonResp, vocab.RDFS.memberCompacted);
         })
         .then(connUris => {
           let _connUris;
@@ -411,11 +378,7 @@ import vocab from "./vocab.js";
         .getJsonLdNode(senderSocketUri.split("#")[0] + "/c", fetchParams)
         //add the eventUris
         .then(jsonResp => {
-          console.debug(
-            "won.getConnectionWithEventUrisBySocket jsonResp:",
-            jsonResp
-          );
-          return jsonResp["@graph"][0]["rdfs:member"];
+          return jsonldUtils.getProperty(jsonResp, vocab.RDFS.memberCompacted);
         })
         .then(connUris => {
           let _connUris;
@@ -478,9 +441,10 @@ import vocab from "./vocab.js";
     return ownerApi
       .getJsonLdDataset(uri, fetchParams)
       .then(jsonLdData =>
-        jsonld.promises.frame(jsonLdData, {
+        jsonld.frame(jsonLdData, {
           "@id": uri,
           "@context": won.defaultContext,
+          "@embed": "@always",
         })
       )
       .then(jsonLdDataFramed => {

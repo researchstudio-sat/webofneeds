@@ -202,7 +202,7 @@ class WonTopnav extends React.Component {
   }
 
   componentDidUpdate() {
-    const MESSAGECOUNT = 10;
+    const MESSAGECOUNT = 3;
 
     if (
       this.props.connectionsToCrawl &&
@@ -220,7 +220,8 @@ class WonTopnav extends React.Component {
 
         if (messageCount == 0) {
           this.props.showLatestMessages(get(conn, "uri"), MESSAGECOUNT);
-        } else {
+        } /* else {
+          // WORKAROUND FOR SLOW LOAD: Remove loading of more Messages until a read one appears will be excluded
           const receivedMessages = messages.filter(
             msg => !get(msg, "outgoingMessage")
           );
@@ -231,7 +232,7 @@ class WonTopnav extends React.Component {
           if (!receivedMessagesReadPresent) {
             this.props.showMoreMessages(get(conn, "uri"), MESSAGECOUNT);
           }
-        }
+        } */
       });
     }
   }
