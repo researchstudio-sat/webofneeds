@@ -183,7 +183,9 @@ vocab.WONMSG.EnvelopeGraphCompacted = vocab.WONMSG.prefix + ":EnvelopeGraph";
 vocab.WONMSG.FromOwner = vocab.WONMSG.baseUri + "FromOwner";
 vocab.WONMSG.FromOwnerCompacted = vocab.WONMSG.prefix + ":FromOwner";
 vocab.WONMSG.FromExternal = vocab.WONMSG.baseUri + "FromExternal";
+vocab.WONMSG.FromExternalCompacted = vocab.WONMSG.prefix + ":FromExternal";
 vocab.WONMSG.FromSystem = vocab.WONMSG.baseUri + "FromSystem";
+vocab.WONMSG.FromSystemCompacted = vocab.WONMSG.prefix + ":FromSystem";
 vocab.WONMSG.Signature = vocab.WONMSG.baseUri + "Signature";
 
 //message types

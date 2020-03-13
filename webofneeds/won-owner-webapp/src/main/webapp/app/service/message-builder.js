@@ -159,8 +159,6 @@ import vocab from "./vocab.js";
 
  see won-service:548f
 
- forEnvelopeData(?)
-
  sender
  senderAtom (used)
 
