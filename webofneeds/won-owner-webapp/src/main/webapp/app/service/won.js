@@ -18,7 +18,7 @@
  * Created by LEIH-NB on 19.08.2014.
  */
 "format es6" /* required to force babel to transpile this so the minifier is happy */;
-import { clone, is } from "../utils.js";
+import { is } from "../utils.js";
 import {
   clearDisclaimerAccepted,
   clearReadUris,
@@ -501,79 +501,47 @@ won.DomainObjectFactory.prototype = {
 };
 
 won.wonMessageFromJsonLd = function(wonMessageAsJsonLD) {
-  return jsonld.expand(wonMessageAsJsonLD).then(expandedJsonLd => {
-    const wonMessage = new WonMessage(expandedJsonLd);
+  return jsonld
+    .expand(wonMessageAsJsonLD)
+    .then(expandedJsonLd => new WonMessage(expandedJsonLd))
+    .then(wonMessage =>
+      wonMessage
+        .frameInPromise()
+        .then(
+          () =>
+            //Only generate compactedFramedMessage if it is not a response or not from Owner
+            wonMessage.isResponse() ||
+            (wonMessage.isFromOwner() &&
+              wonMessage.generateCompactedFramedMessage())
+        )
+        .then(() => {
+          if (wonMessage.hasParseErrors() && !wonMessage.isResponse()) {
+            console.warn(
+              "wonMessage<",
+              wonMessage.getMessageUri(),
+              "> msgType<",
+              wonMessage.getMessageType(),
+              "> ParseError: {" + wonMessage.parseErrors,
+              "} wonMessage: ",
+              wonMessage
+            );
+          }
 
-    return wonMessage
-      .frameInPromise()
-      .then(() => {
-        if (!wonMessage.isResponse()) {
-          return wonMessage.generateContentGraphTrig();
-        }
-        return;
-      })
-      .then(() => {
-        if (!wonMessage.isResponse()) {
-          return wonMessage.generateCompactedFramedMessage();
-        }
-        return;
-      })
-      .then(() => {
-        if (wonMessage.hasParseErrors() && !wonMessage.isResponse()) {
-          console.warn(
-            "wonMessage<",
-            wonMessage.getMessageUri(),
-            "> msgType<",
-            wonMessage.getMessageType(),
-            "> ParseError: {" + wonMessage.parseErrors,
-            "} wonMessage: ",
+          return wonMessage;
+        })
+        .catch(e => {
+          console.error(
+            "Error in wonMessageFromJsonLd: rawMessage: ",
+            wonMessageAsJsonLD,
+            " wonMessage: ",
             wonMessage
           );
-        }
-
-        return wonMessage;
-      })
-      .catch(e => {
-        console.error(
-          "Error in wonMessageFromJsonLd: rawMessage: ",
-          wonMessageAsJsonLD,
-          " wonMessage: ",
-          wonMessage
-        );
-        rethrow(e);
-      });
-  });
+          rethrow(e);
+        })
+    );
 };
 
 window.wonMessageFromJsonLd4dbg = won.wonMessageFromJsonLd;
-
-/**
- * Serializes the jsonldData into trig.
- *
- * @param {*} jsonldData
- * @param {*} addDefaultContext whether or not `won.defaultContext` should be
- *   used for shortening urls (in addition to any `@context` at the root of
- *   `jsonldData` that's always used.)
- */
-won.jsonLdToTrig = async function(jsonldData, addDefaultContext = true) {
-  const quadString = await jsonld.toRDF(jsonldData, {
-    format: "application/nquads",
-  });
-  const { quads } = await won.n3Parse(quadString, {
-    format: "application/n-quads",
-  });
-
-  const prefixes_ = addDefaultContext
-    ? Object.assign(clone(won.defaultContext), jsonldData["@context"])
-    : jsonldData["@context"] || {};
-  const trig = await won.n3Write(quads, {
-    format: "application/trig",
-    prefixes: prefixes_,
-  });
-
-  return trig;
-};
-window.jsonLdToTrig4dbg = won.jsonLdToTrig;
 
 /**
  * An wrapper for N3's writer that returns a promise
@@ -638,28 +606,21 @@ won.n3Parse = async function(rdf, parserArgs) {
  * @param {string} ttl
  * @param {boolean} prependWonPrefixes
  */
-won.ttlToJsonLd = async function(ttl) {
-  const tryConversion = async () => {
-    const { quads /*prefixes*/ } = await won.n3Parse(ttl);
-
-    const quadString = await won.n3Write(quads, {
-      format: "application/n-quads",
+won.ttlToJsonLd = function(ttl) {
+  return won
+    .n3Parse(ttl)
+    .then(({ quads }) => won.n3Write(quads, { format: "application/n-quads" }))
+    .then(quadString =>
+      jsonld.fromRDF(quadString, { format: "application/n-quads" })
+    )
+    .catch(e => {
+      e.message =
+        "error while parsing the following turtle:\n\n" +
+        ttl +
+        "\n\n----\n\n" +
+        e.message;
+      throw e;
     });
-
-    const parsedJsonld = await jsonld.fromRDF(quadString, {
-      format: "application/n-quads",
-    });
-
-    return parsedJsonld;
-  };
-  return tryConversion().catch(e => {
-    e.message =
-      "error while parsing the following turtle:\n\n" +
-      ttl +
-      "\n\n----\n\n" +
-      e.message;
-    throw e;
-  });
 };
 
 window.ttlToJsonLd4dbg = won.ttlToJsonLd;
@@ -708,73 +669,11 @@ WonMessage.prototype = {
   },
 
   getMessageDirection: function() {
-    return this.__getMessageDirection(this.messageStructure);
-  },
-
-  generateContentGraphTrig: async function() {
-    if (this.contentGraphTrig) {
-      return this.contentGraphTrig;
+    const messageDirection = this.__getMessageDirection(this.messageStructure);
+    if (is("Array", messageDirection) && messageDirection.length == 1) {
+      return messageDirection[0];
     }
-    const contentGraphs = this.getContentGraphs();
-    if (contentGraphs && contentGraphs.length > 0) {
-      try {
-        if (!is("Array", contentGraphs)) {
-          throw new Error(
-            "Unexpected content-graph structure: \n\n" +
-              JSON.stringify(contentGraphs)
-          );
-        }
-        /**
-         * Parses an rdf-uri and gets the base-uri, i.e.
-         * the part before and including the fragment identifier
-         * ("#") or last slash ("/").
-         * @param {*} uri
-         */
-        const prefixOfUri = uri => {
-          // if there's hash-tags, the first of these
-          // is the fragment identifier and everything
-          // after is the id. remove everything following it.
-          let prefix = uri.replace(/#.*/, "#");
-
-          // if there's no fragment-identifier, the
-          // everything after the last slash is removed.
-          if (!prefix.endsWith("#")) {
-            prefix = prefix.replace(/\/([^/]*)$/, "/");
-          }
-
-          return prefix;
-        };
-
-        const eventUriPrefix = prefixOfUri(this.getMessageUri());
-        const jsonldData = {
-          "@context": Object.assign(
-            {
-              event: eventUriPrefix,
-            },
-            won.defaultContext
-          ),
-          "@graph": contentGraphs,
-        };
-        this.jsonldData = jsonldData;
-        this.contentGraphTrig = await won.jsonLdToTrig(jsonldData);
-        return this.contentGraphTrig;
-      } catch (e) {
-        console.error(
-          "Failed to generate trig for message ",
-          this.getMessageUri(),
-          "\n\n",
-          e
-        );
-        const msg =
-          "Failed to generate trig for message " +
-          this.getMessageUri() +
-          "\n\n" +
-          e.message +
-          "\n\n" +
-          e.stack;
-        this.contentGraphTrigError = msg;
-      }
-    }
+    return messageDirection;
   },
   generateCompactedFramedMessage: async function() {
     //TODO: change it so it returns all the contentgraphscontent
@@ -845,12 +744,8 @@ WonMessage.prototype = {
       });
   },
 
-  __getFramedMessage: function() {
-    return this.framedMessage;
-  },
-
   getProperty: function(property) {
-    let val = jsonldUtils.getProperty(this.__getFramedMessage(), property);
+    let val = jsonldUtils.getProperty(this.framedMessage, property);
     if (val) {
       return this.__singleValueOrArray(val);
     }
@@ -878,11 +773,7 @@ WonMessage.prototype = {
     return JSON.stringify(this.getContentGraphs());
   },
   getCompactFramedMessageContent: function() {
-    // Returns the compacted Framed Message depending on the message direction
-    if (this.isFromOwner()) {
-      return this.compactFramedMessage;
-    }
-    return null;
+    return this.compactFramedMessage;
   },
   getCompactRawMessage: function() {
     return this.compactRawMessage;
@@ -1102,7 +993,7 @@ WonMessage.prototype = {
   },
 
   __init: function() {
-    this.context = this.graphs = this.rawMessage;
+    this.graphs = this.rawMessage;
 
     if (!is("Array", this.graphs)) {
       this.parseErrors.push("@graph not found or not an array");
@@ -1382,15 +1273,6 @@ won.MessageBuilder.prototype = {
   },
   getContext: function() {
     return this.data["@context"];
-  },
-  forEnvelopeData: function(envelopeData) {
-    const node = this.getMessageEventNode();
-    for (let key in envelopeData) {
-      node[key] = {
-        "@id": envelopeData[key],
-      };
-    }
-    return this;
   },
   atom: function(atomURI) {
     this.getMessageEventNode()[vocab.WONMSG.atomCompacted] = {

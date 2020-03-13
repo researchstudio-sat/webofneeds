@@ -14,13 +14,11 @@ import { get, getIn } from "../../utils.js";
 import { getOwnedConnections } from "../../redux/selectors/connection-selectors.js";
 import { labels } from "../../won-label-utils.js";
 import vocab from "../../service/vocab.js";
-import WonTrig from "../trig.jsx";
 import WonMessageContent from "./message-content.jsx";
 import WonAtomIcon from "../atom-icon.jsx";
 import WonReferencedMessageContent from "./referenced-message-content.jsx";
 
 import "~/style/_combined-message-content.scss";
-import * as viewSelectors from "../../redux/selectors/view-selectors";
 
 const mapStateToProps = (state, ownProps) => {
   const ownedAtom =
@@ -72,8 +70,6 @@ const mapStateToProps = (state, ownProps) => {
     allConnections,
     personaName,
     multiSelectType: connection && connection.get("multiSelectType"),
-    contentGraphTrig: get(message, "contentGraphTrigRaw"),
-    shouldShowRdf: viewSelectors.showRdf(state),
     hasContent: message && message.get("hasContent"),
     hasNotBeenLoaded: !message,
     hasReferences,
@@ -98,13 +94,6 @@ const mapDispatchToProps = dispatch => {
 
 class WonCombinedMessageContent extends React.Component {
   render() {
-    const trigElement =
-      this.props.shouldShowRdf && this.props.contentGraphTrig ? (
-        <WonTrig trig={this.props.contentGraphTrig} />
-      ) : (
-        undefined
-      );
-
     const messageContentElement =
       this.props.hasContent || this.props.hasNotBeenLoaded ? (
         <WonMessageContent
@@ -228,7 +217,6 @@ class WonCombinedMessageContent extends React.Component {
         {messageHeaderInjectInElement}
         {messageContentElement}
         {referencedMessageElements}
-        {trigElement}
       </won-combined-message-content>
     );
   }
@@ -329,8 +317,6 @@ WonCombinedMessageContent.propTypes = {
   allConnections: PropTypes.object,
   personaName: PropTypes.string,
   multiSelectType: PropTypes.string,
-  contentGraphTrig: PropTypes.string,
-  shouldShowRdf: PropTypes.bool,
   hasContent: PropTypes.bool,
   hasNotBeenLoaded: PropTypes.bool,
   hasReferences: PropTypes.bool,

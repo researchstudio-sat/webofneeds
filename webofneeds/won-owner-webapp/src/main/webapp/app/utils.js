@@ -316,34 +316,6 @@ export function toAbsoluteURL(pathOrURL) {
 }
 
 /**
- * Splits a string of TRIG into prefixes and body (e.g. to allow hiding either)
- * Also adds some empty lines to the body, so it stays readable when
- * the lines wrap.
- * @param {*} trigString
- */
-export function trigPrefixesAndBody(trigString) {
-  const lines = (trigString || "").split("\n");
-
-  //seperating off header/@prefix-statements, so they can be folded in
-  const prefixes = lines.filter(line => line.startsWith("@prefix")).join("\n");
-
-  const body = lines
-    .filter(line => !line.startsWith("@prefix"))
-    .map(line =>
-      line
-        // add some extra white-space between statements, so they stay readable even when they wrap.
-        .replace(/\.$/, ".\n")
-        .replace(/;$/, ";\n")
-        .replace(/\{$/, "{\n")
-        .replace(/^\}$/, "\n}")
-    )
-    .join("\n")
-    .trim();
-
-  return { trigPrefixes: prefixes, trigBody: body };
-}
-
-/**
  * NOTE: don't pass recursive structures!
  * NOTE: don't pass immutablejs structures
  * @param {*} fieldName

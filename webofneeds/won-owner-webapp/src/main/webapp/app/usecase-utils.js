@@ -14,7 +14,8 @@ const useCasesImm = Immutable.fromJS(useCaseDefinitions.getAllUseCases());
 const useCaseGroupsImm = Immutable.fromJS(
   useCaseDefinitions.getAllUseCaseGroups()
 );
-const allDetailsImm = Immutable.fromJS(initializeAllDetails());
+const allDetails = initializeAllDetails();
+const allDetailsImm = Immutable.fromJS(allDetails);
 const allMessageDetailsImm = Immutable.fromJS(initializeAllMessageDetails());
 
 console.debug("useCasesImm: ", useCasesImm);
@@ -32,7 +33,7 @@ window.allMessageDetailsImm4dbg = allMessageDetailsImm;
  * and in the messageDetails
  */
 export function getAllDetails() {
-  return allDetailsImm.toJS();
+  return allDetails;
 }
 
 /**
