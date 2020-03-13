@@ -1,9 +1,5 @@
 import Immutable from "immutable";
-import {
-  isValidNumber,
-  msStringToDate,
-  trigPrefixesAndBody,
-} from "../../utils.js";
+import { isValidNumber, msStringToDate } from "../../utils.js";
 import * as useCaseUtils from "../../usecase-utils.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 
@@ -18,11 +14,6 @@ export function parseMessage(
   alreadyProcessed = false,
   forwardMessage = false
 ) {
-  //seperating off header/@prefix-statements, so they can be folded in
-  const { trigPrefixes, trigBody } = trigPrefixesAndBody(
-    wonMessage.contentGraphTrig
-  );
-
   const injectInto = wonMessage.getInjectIntoConnectionUris();
   const forwardedMessages = wonMessage.getForwardedMessageUris();
 
@@ -97,12 +88,7 @@ export function parseMessage(
         },
       },
       isMessageStatusUpToDate: false,
-      contentGraphTrig: {
-        prefixes: trigPrefixes,
-        body: trigBody,
-      },
       contentGraphs: wonMessage.getContentGraphs(),
-      contentGraphTrigRaw: wonMessage.contentGraphTrig,
       //Receive Status Flags
       unread: false, //default is unread, but the real status is determined for non outgoing messages in the reducer
       //Send Status Flags
