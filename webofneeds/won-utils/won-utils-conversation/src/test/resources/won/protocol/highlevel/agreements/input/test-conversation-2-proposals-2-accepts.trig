@@ -1,11 +1,3 @@
-# Proposing Message with: "JUnit Proposal 1" and accepting it twice.
-# Should only resume to 1 accepted proposal = Agreement
-# Proposal: wm:/W1pm7C7p3iUbSATDFdSVFrVSMDTnWnX7sti1LKE6acbsye
-# Accept 1: wm:/W1hvCjr3rwH85dniga9Vt5ZSc3ZacDGPGFC7jNzwDHhTNE
-# Accept 2: wm:/W1bGKxYmsx6w5ohdLtuEutV9sMF1GrvZXpPwexy6CMtL1k
-
-
-
 @prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://localhost:8443/won/resource/connection/> .
 @prefix con:   <https://w3id.org/won/content#> .
@@ -2498,7 +2490,8 @@
 
 <wm:/W1kFB7BiaoqdKAfybFebcMbBHuecnMbBYueERHUvvz8L41#content> {
     <wm:/W1kFB7BiaoqdKAfybFebcMbBHuecnMbBYueERHUvvz8L41>
-            con:text  "This was a proposal" .
+            <https://w3id.org/won/agreement#proposes>
+                    <wm:/W1hrYgeDqaQN8junkfYAERekzYkSfi3wjjNjUW4M6n4NTx> .
 }
 
 <wm:/W1kFB7BiaoqdKAfybFebcMbBHuecnMbBYueERHUvvz8L41#envelope> {
@@ -3363,8 +3356,8 @@
 <wm:/W1bGKxYmsx6w5ohdLtuEutV9sMF1GrvZXpPwexy6CMtL1k#content-q9fg> {
     <wm:/W1bGKxYmsx6w5ohdLtuEutV9sMF1GrvZXpPwexy6CMtL1k>
             <https://w3id.org/won/agreement#accepts>
-                    <wm:/W1pm7C7p3iUbSATDFdSVFrVSMDTnWnX7sti1LKE6acbsye> ;
-            con:text  "Ok, I am hereby accepting your latest proposal (uri: wm:/W1pm7C7p3iUbSATDFdSVFrVSMDTnWnX7sti1LKE6acbsye).\n The query for finding it took 0 seconds." .
+                    <wm:/W1kFB7BiaoqdKAfybFebcMbBHuecnMbBYueERHUvvz8L41> ;
+            con:text  "Ok, I am hereby accepting your latest proposal (uri: wm:/W1kFB7BiaoqdKAfybFebcMbBHuecnMbBYueERHUvvz8L41).\n The query for finding it took 0 seconds." .
 }
 
 <wm:/W1bGKxYmsx6w5ohdLtuEutV9sMF1GrvZXpPwexy6CMtL1k#envelope> {

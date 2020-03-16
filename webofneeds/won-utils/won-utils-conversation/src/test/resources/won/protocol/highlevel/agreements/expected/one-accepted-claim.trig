@@ -1,26 +1,36 @@
-@prefix con:   <https://w3id.org/won/content#> .
-@prefix match:   <https://w3id.org/won/matching#> .
-@prefix msg:   <https://w3id.org/won/message#> .
-@prefix conn:  <https://localhost:8443/won/resource/connection/> .
-@prefix woncrypt: <https://w3id.org/won/core#> .
-@prefix atom:  <https://localhost:8443/won/resource/atom/> .
-@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
-@prefix cert:  <http://www.w3.org/ns/auth/cert#> .
-@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix local: <https://localhost:8443/won/resource/> .
-@prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
-@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
-@prefix s:     <http://schema.org/> .
-@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix sh:    <http://www.w3.org/ns/shacl#> .
-@prefix won:   <https://w3id.org/won/core#> .
-@prefix ldp:   <http://www.w3.org/ns/ldp#> .
-@prefix event: <https://localhost:8443/won/resource/event/> .
-@prefix sioc:  <http://rdfs.org/sioc/ns#> .
-@prefix dc:    <http://purl.org/dc/elements/1.1/> .
-@prefix agr: <https://w3id.org/won/agreement#> .
+@prefix msg: <https://w3id.org/won/message#>.
+@prefix won: <https://w3id.org/won/core#>.
+@prefix con: <https://w3id.org/won/content#>.
+@prefix match: <https://w3id.org/won/matching#>.
+@prefix demo: <https://w3id.org/won/ext/demo#>.
+@prefix wx-bot: <https://w3id.org/won/ext/bot#>.
+@prefix hold: <https://w3id.org/won/ext/hold#>.
+@prefix chat: <https://w3id.org/won/ext/chat#>.
+@prefix group: <https://w3id.org/won/ext/group#>.
+@prefix review: <https://w3id.org/won/ext/review#>.
+@prefix buddy: <https://w3id.org/won/ext/buddy#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix agr: <https://w3id.org/won/agreement#>.
+@prefix pay: <https://w3id.org/won/payment#>.
+@prefix gr: <http://purl.org/goodrelations/v1#>.
+@prefix wf: <https://w3id.org/won/workflow#>.
+@prefix rdfg: <http://www.w3.org/2004/03/trix/rdfg-1/>.
+@prefix webID: <http://www.example.com/webids/>.
+@prefix dc: <http://purl.org/dc/elements/1.1/>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix ldp: <http://www.w3.org/ns/ldp#>.
+@prefix sioc: <http://rdfs.org/sioc/ns#>.
+@prefix dct: <http://purl.org/dc/terms/>.
+@prefix cert: <http://www.w3.org/ns/auth/cert#>.
+@prefix s: <http://schema.org/>.
+@prefix sh: <http://www.w3.org/ns/shacl#>.
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+@prefix event: <wm:/>.
 
-<https://localhost:8443/won/resource/event/557600936467257340> {
-    <https://localhost:8443/won/resource/event/5669098069340991000>	con:text	"one" .
+<wm:/W1jsiJVmvDJmsyWBQ3yREnUiWnQLBQTntqEmFddG8Ypt6J> {
+    <wm:/W1ctdqGUW5DA6xKmmvj6W51SZWWPQ4359mjH3r3JEWXCmN>
+            <https://w3id.org/won/content#text>
+                    "claim" .
 }
-
