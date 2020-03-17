@@ -857,30 +857,25 @@ class AtomMessages extends React.Component {
     if (!this.state.snapBottom) {
       this.setState({ snapBottom: true });
     }
-    this.scrollToBottom();
   }
   unsnapFromBottom() {
-    this.setState({ snapBottom: false });
+    if (this.state.snapBottom) {
+      this.setState({ snapBottom: false });
+    }
   }
 
   scrollToBottom() {
     this.chatContainerRef.current.scrollTop = this.chatContainerRef.current.scrollHeight;
   }
   onScroll() {
-    //TODO IMPL PROGRAMMATIC SCROLLING
-    /*console.debug("called onScroll, needs to be implemented still");
-    if (!this._programmaticallyScrolling) {
-      //only unsnap if the user scrolled themselves
+    const sc = this.chatContainerRef.current;
+    const isAlmostAtBottom =
+      sc.scrollTop + sc.offsetHeight >= sc.scrollHeight - 75;
+    if (isAlmostAtBottom) {
+      this.snapToBottom();
+    } else {
       this.unsnapFromBottom();
     }
-
-    const sc = this.chatContainerRef.current;
-    const isAtBottom = sc.scrollTop + sc.offsetHeight >= sc.scrollHeight;
-    if (isAtBottom) {
-      this.snapToBottom();
-    }
-
-    this._programmaticallyScrolling = false;*/
   }
 
   send(chatMessage, additionalContent, referencedContent, isTTL = false) {
