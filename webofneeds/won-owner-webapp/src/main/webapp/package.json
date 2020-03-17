@@ -65,7 +65,7 @@
     "clean": "rimraf ./generated ./.cache"
   },
   "devDependencies": {
-    "acorn": "^6.1.1",
+    "acorn": "^6.4.1",
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.2.6",
     "babel-plugin-transform-custom-element-classes": "^0.1.0",
