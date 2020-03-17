@@ -23,7 +23,7 @@ export default class WonFilePicker extends React.Component {
               <img
                 className="filep__preview__item__image"
                 alt={file.name}
-                src={"data:" + file.type + ";base64," + file.data}
+                src={"data:" + file.encodingFormat + ";base64," + file.encoding}
               />
             ) : (
               <svg className="filep__preview__item__typeicon">
@@ -72,7 +72,7 @@ export default class WonFilePicker extends React.Component {
   }
 
   isImage(file) {
-    return file && /^image\//.test(file.type);
+    return file && /^image\//.test(file.encodingFormat);
   }
 
   removeFile(fileToRemove) {

@@ -1,6 +1,8 @@
 package won.protocol.util;
 
-import static won.protocol.util.RdfUtils.*;
+import static won.protocol.util.RdfUtils.findOnePropertyFromResource;
+import static won.protocol.util.RdfUtils.findOrCreateBaseResource;
+import static won.protocol.util.RdfUtils.visit;
 
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
@@ -280,6 +282,28 @@ public class WonRdfUtils {
         public static Model textMessage(String message) {
             Model messageModel = createModelWithBaseResource();
             Resource baseRes = messageModel.createResource(messageModel.getNsPrefixURI(""));
+            baseRes.addProperty(WONCON.text, message, XSDDatatype.XSDstring);
+            return messageModel;
+        }
+
+        /**
+         * Creates an RDF Model containing an file encoded in Base64
+         * 
+         * @param fileString: Base64 encoded file
+         * @param fileName: Name of the file
+         * @param message: Message to be send as well
+         * @return
+         */
+        public static Model fileMessage(String fileString, String fileName, String MIMEtype, String message) {
+            Model messageModel = createModelWithBaseResource();
+            Resource baseRes = RdfUtils.getBaseResource(messageModel);
+            Resource fileResource = messageModel.createResource();
+            fileResource.addProperty(SCHEMA.NAME, fileName);
+            fileResource.addProperty(SCHEMA.ENCODING_FORMAT, MIMEtype);
+            fileResource.addProperty(SCHEMA.ENCODING, fileString);
+            fileResource.addProperty(RDF.type, SCHEMA.MEDIA_OBJECT);
+            baseRes.addProperty(RDF.type, WONMSG.ConnectionMessage);
+            baseRes.addProperty(WONCON.file, fileResource);
             baseRes.addProperty(WONCON.text, message, XSDDatatype.XSDstring);
             return messageModel;
         }

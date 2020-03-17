@@ -58,6 +58,10 @@ public class SCHEMA {
     public static final Property VALID_FROM = m.createProperty(BASE_URI + "validFrom");
     public static final Property VALID_THROUGH = m.createProperty(BASE_URI + "validThrough");
     public static final Property TERMS_OF_SERVICE = m.createProperty(BASE_URI + "termsOfService");
+    public static final Property MEDIA_OBJECT = m.createProperty(BASE_URI + "MediaObject");
+    public static final Property ENCODING_FORMAT = m.createProperty(BASE_URI + "encodingFormat");
+    public static final Property ENCODES_CREATIVE_WORK = m.createProperty(BASE_URI + "encodesCreativeWork");
+    public static final Property ENCODING = m.createProperty(BASE_URI + "encoding");
     public static final RDFDatatype TEXT = new BaseDatatype(BASE_URI + "Text");
 
     /**

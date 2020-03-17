@@ -44,7 +44,10 @@ export default class WonImageViewer extends React.Component {
                 onClick={() => this.changeSelectedIndex(index)}
                 alt={get(file, "name")}
                 src={
-                  "data:" + get(file, "type") + ";base64," + get(file, "data")
+                  "data:" +
+                  get(file, "encodingFormat") +
+                  ";base64," +
+                  get(file, "encoding")
                 }
               />
             </div>
@@ -66,9 +69,9 @@ export default class WonImageViewer extends React.Component {
               alt={this.getSelectedImage().get("name")}
               src={
                 "data:" +
-                this.getSelectedImage().get("type") +
+                this.getSelectedImage().get("encodingFormat") +
                 ";base64," +
-                this.getSelectedImage().get("data")
+                this.getSelectedImage().get("encoding")
               }
             />
           </div>
@@ -81,7 +84,7 @@ export default class WonImageViewer extends React.Component {
   }
 
   isImage(file) {
-    return file && /^image\//.test(file.get("type"));
+    return file && /^image\//.test(file.get("encodingFormat"));
   }
 
   changeSelectedIndex(index) {
@@ -98,7 +101,11 @@ export default class WonImageViewer extends React.Component {
   openImageInNewTab(file) {
     if (file) {
       let image = new Image();
-      image.src = "data:" + get(file, "type") + ";base64," + get(file, "data");
+      image.src =
+        "data:" +
+        get(file, "encodingFormat") +
+        ";base64," +
+        get(file, "encoding");
 
       let w = window.open("");
       w.document.write(image.outerHTML);

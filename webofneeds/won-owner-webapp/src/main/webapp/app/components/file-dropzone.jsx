@@ -16,8 +16,8 @@ export default function WonFileDropzone(props) {
           const b64data = dataUrl.split("base64,")[1];
           const fileData = {
             name: file.name,
-            type: file.type,
-            data: b64data,
+            encodingFormat: file.type,
+            encoding: b64data,
           };
           return fileData;
         })
