@@ -35,7 +35,7 @@ import * as jsonldUtils from "./jsonld-utils";
     ownerApi
       .getJsonLdDataset(atomUri)
       .then(jsonLdData => {
-        //console.time("Atom parseTime for: " + atomUri);
+        // console.time("Atom parseTime for: " + atomUri);
         return jsonld.frame(jsonLdData, {
           "@id": atomUri, // start the framing from this uri. Otherwise will generate all possible nesting-variants.
           "@context": won.defaultContext,
@@ -62,14 +62,14 @@ import * as jsonldUtils from "./jsonld-utils";
           );
           return { "@context": flattenedAtomJsonLd["@context"] };
         }
-        //console.timeEnd("Atom parseTime for: " + atomUri);
+        // console.timeEnd("Atom parseTime for: " + atomUri);
         return flattenedAtomJsonLd;
       })
       .catch(e => {
         const msg = "Failed to get atom " + atomUri + ".";
         e.message += msg;
         console.error(e.message);
-        //console.timeEnd("Atom parseTime for: " + atomUri);
+        // console.timeEnd("Atom parseTime for: " + atomUri);
         throw e;
       });
 
@@ -246,58 +246,57 @@ import * as jsonldUtils from "./jsonld-utils";
     // console.time("Connection parseTime for: " + connectionUri);
     return getConnection(connectionUri)
       .then(connection =>
-        won.getJsonLdNode(connection.messageContainer, fetchParams)
+        ownerApi.getJsonLdDataset(connection.messageContainer, fetchParams)
       )
-      .then(messageContainer => {
-        const messages = jsonldUtils.getProperty(
-          messageContainer,
-          vocab.RDFS.memberCompacted
-        );
-        // console.timeEnd("Connection parseTime for: " + connectionUri);
-        let rawMessageArray;
-        /*
-           * if there's only a single rdfs:member in the event
-           * container, getJsonLdNode will not return an array, so we
-           * need to make sure it's one from here on out.
-           */
-        if (!messages) {
-          rawMessageArray = [];
-        } else if (is("Array", messages)) {
-          rawMessageArray = messages;
-        } else {
-          rawMessageArray = [messages];
-        }
+      .then(jsonLdData => jsonld.expand(jsonLdData))
+      .then(jsonLdData => {
+        const messages = {};
 
-        return Promise.all(
-          rawMessageArray.map(rawMessage => {
-            const msgUri = rawMessage["@id"];
+        jsonLdData &&
+          jsonLdData
+            .filter(graph => graph["@id"].indexOf("wm:/") === 0)
+            .forEach(graph => {
+              const msgUri = graph["@id"].split("#")[0];
+              const singleMessage = messages[msgUri];
 
-            // console.time("WonMsg parseTime for: " + msgUri);
-            return won
-              .wonMessageFromJsonLd(
-                {
-                  "@graph": [rawMessage],
-                  "@context": won.defaultContext,
-                },
-                msgUri
-              )
-              .then(wonMessage => {
-                // console.timeEnd("WonMsg parseTime for: " + msgUri);
-                return {
-                  msgUri: msgUri,
-                  wonMessage: wonMessage,
-                };
+              if (singleMessage) {
+                singleMessage["@graph"].push(graph);
+              } else {
+                messages[msgUri] = { "@graph": [graph] };
+              }
+            });
+
+        const promiseArray = [];
+        for (const msgUri in messages) {
+          const msg = messages[msgUri];
+          promiseArray.push(
+            jsonld
+              .frame(msg, { "@id": msgUri, "@embed": "@always" })
+              .then(framedJsonLd => {
+                // console.time("WonMsg parseTime for: " + msgUri);
+                return won
+                  .wonMessageFromJsonLd(framedJsonLd, msgUri)
+                  .then(wonMessage => {
+                    // console.timeEnd("WonMsg parseTime for: " + msgUri);
+                    return {
+                      msgUri: msgUri,
+                      wonMessage: wonMessage,
+                    };
+                  });
               })
-              .catch(e => {
-                const msg =
-                  "Failed to frame or parse to wonMessage " + msgUri + ".";
-                e.message += msg;
-                console.error(e.message);
+              .catch(error => {
+                console.error(
+                  "Could not parse msg to wonMessage: ",
+                  msg,
+                  "error: ",
+                  error
+                );
                 // console.timeEnd("WonMsg parseTime for: " + msgUri);
                 return { msgUri: msgUri, wonMessage: undefined };
-              });
-          })
-        );
+              })
+          );
+        }
+        return Promise.all(promiseArray);
       });
   };
 
@@ -444,18 +443,13 @@ import * as jsonldUtils from "./jsonld-utils";
       return Promise.reject({ message: "getJsonLdNode: uri must not be null" });
     }
 
-    return ownerApi
-      .getJsonLdDataset(uri, fetchParams)
-      .then(jsonLdData =>
-        jsonld.frame(jsonLdData, {
-          "@id": uri,
-          "@context": won.defaultContext,
-          "@embed": "@always",
-        })
-      )
-      .then(jsonLdDataFramed => {
-        return jsonLdDataFramed;
-      });
+    return ownerApi.getJsonLdDataset(uri, fetchParams).then(jsonLdData =>
+      jsonld.frame(jsonLdData, {
+        "@id": uri,
+        "@context": won.defaultContext,
+        "@embed": "@always",
+      })
+    );
   };
 })();
 
