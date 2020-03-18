@@ -50,66 +50,70 @@ export function connectionsChatMessageClaimOnSuccess(
       targetSocketUri: targetSocketUri,
       isTTL: false,
     })
-      .then(msgData =>
-        Promise.all([
-          won.wonMessageFromJsonLd(msgData.message),
-          ownerApi.sendMessage(msgData.message),
-        ])
-      )
-      .then(([optimisticEvent, jsonResp]) => {
-        dispatch({
-          type: actionTypes.connections.sendChatMessage,
-          payload: {
-            eventUri: jsonResp.messageUri,
-            message: jsonResp.message,
-            optimisticEvent,
-            senderSocketUri: senderSocketUri,
-            targetSocketUri: targetSocketUri,
-            connectionUri,
-            atomUri: ownedAtomUri,
-            claimed: true, // message needs to be marked as claimed directly
-          },
-        });
-
-        // Send claim message
-        let contentUris = [];
-        messageUriToClaim = jsonResp.messageUri;
-        if (messageUriToClaim)
-          contentUris.push({
-            "@id": messageUriToClaim,
-          });
-        referencedContentUris = new Map();
-        referencedContentUris.set("claims", contentUris);
-        buildChatMessage({
-          chatMessage: undefined,
-          additionalContent: undefined,
-          referencedContentUris: referencedContentUris,
-          optimisticEvent,
-          socketUri: senderSocketUri,
-          targetSocketUri: targetSocketUri,
-          isTTL: false,
-        })
-          .then(msgData =>
-            Promise.all([
-              won.wonMessageFromJsonLd(msgData.message),
-              ownerApi.sendMessage(msgData.message),
-            ])
+      .then(message => ownerApi.sendMessage(message))
+      .then(jsonResp => {
+        return won
+          .wonMessageFromJsonLd(
+            jsonResp.message,
+            vocab.WONMSG.uriPlaceholder.event
           )
-          .then(([optimisticEvent, jsonResp]) => {
-            console.debug("sent chatMsg: ", jsonResp.messageUri);
+          .then(wonMessage => {
             dispatch({
-              type: referencedContentUris
-                ? actionTypes.connections.sendChatMessageRefreshDataOnSuccess //If there are references in the message we need to Refresh the Data from the backend on msg success
-                : actionTypes.connections.sendChatMessage,
+              type: actionTypes.connections.sendChatMessage,
               payload: {
                 eventUri: jsonResp.messageUri,
                 message: jsonResp.message,
-                optimisticEvent,
+                optimisticEvent: wonMessage,
                 senderSocketUri: senderSocketUri,
                 targetSocketUri: targetSocketUri,
                 connectionUri,
+                atomUri: ownedAtomUri,
+                claimed: true, // message needs to be marked as claimed directly
               },
             });
+
+            // Send claim message
+            let contentUris = [];
+            messageUriToClaim = jsonResp.messageUri;
+            if (messageUriToClaim)
+              contentUris.push({
+                "@id": messageUriToClaim,
+              });
+            referencedContentUris = new Map();
+            referencedContentUris.set("claims", contentUris);
+            return buildChatMessage({
+              chatMessage: undefined,
+              additionalContent: undefined,
+              referencedContentUris: referencedContentUris,
+              optimisticEvent: wonMessage,
+              socketUri: senderSocketUri,
+              targetSocketUri: targetSocketUri,
+              isTTL: false,
+            })
+              .then(message => ownerApi.sendMessage(message))
+              .then(jsonResp =>
+                won
+                  .wonMessageFromJsonLd(
+                    jsonResp.message,
+                    vocab.WONMSG.uriPlaceholder.event
+                  )
+                  .then(wonMessage =>
+                    dispatch({
+                      type: referencedContentUris
+                        ? actionTypes.connections
+                            .sendChatMessageRefreshDataOnSuccess //If there are references in the message we need to Refresh the Data from the backend on msg success
+                        : actionTypes.connections.sendChatMessage,
+                      payload: {
+                        eventUri: jsonResp.messageUri,
+                        message: jsonResp.message,
+                        wonMessage,
+                        senderSocketUri: senderSocketUri,
+                        targetSocketUri: targetSocketUri,
+                        connectionUri,
+                      },
+                    })
+                  )
+              );
           });
       })
       .catch(e => {
@@ -238,27 +242,28 @@ export function connectionsChatMessage(
       targetSocketUri: targetSocketUri,
       isTTL,
     })
-      .then(msgData =>
-        Promise.all([
-          won.wonMessageFromJsonLd(msgData.message),
-          ownerApi.sendMessage(msgData.message),
-        ])
+      .then(message => ownerApi.sendMessage(message))
+      .then(jsonResp =>
+        won
+          .wonMessageFromJsonLd(
+            jsonResp.message,
+            vocab.WONMSG.uriPlaceholder.event
+          )
+          .then(wonMessage =>
+            dispatch({
+              type: referencedContentUris
+                ? actionTypes.connections.sendChatMessageRefreshDataOnSuccess //If there are references in the message we need to Refresh the Data from the backend on msg success
+                : actionTypes.connections.sendChatMessage,
+              payload: {
+                eventUri: jsonResp.messageUri,
+                message: jsonResp.message,
+                optimisticEvent: wonMessage,
+                senderSocketUri: senderSocketUri,
+                targetSocketUri: targetSocketUri,
+              },
+            })
+          )
       )
-      .then(([optimisticEvent, jsonResp]) => {
-        console.debug("sent chatMsg: ", jsonResp.messageUri);
-        dispatch({
-          type: referencedContentUris
-            ? actionTypes.connections.sendChatMessageRefreshDataOnSuccess //If there are references in the message we need to Refresh the Data from the backend on msg success
-            : actionTypes.connections.sendChatMessage,
-          payload: {
-            eventUri: jsonResp.messageUri,
-            message: jsonResp.message,
-            optimisticEvent,
-            senderSocketUri: senderSocketUri,
-            targetSocketUri: targetSocketUri,
-          },
-        });
-      })
       .catch(e => {
         console.error("Error while processing chat message: ", e);
         dispatch({
@@ -404,23 +409,28 @@ function connectReactionAtom(
             targetSocketUri: targetSocketUri,
           });
 
-          won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
+          ownerApi.sendMessage(cnctMsg).then(jsonResp =>
             // connect action to be dispatched when the
             // ad hoc atom has been created:
 
-            ownerApi.sendMessage(cnctMsg.message).then(jsonResp =>
-              dispatch({
-                type: actionTypes.atoms.connectSockets,
-                payload: {
-                  eventUri: jsonResp.messageUri,
-                  message: jsonResp.message,
-                  optimisticEvent: optimisticEvent,
-                  senderSocketUri: senderSocketUri,
-                  targetSocketUri: targetSocketUri,
-                },
-              })
-            );
-          });
+            won
+              .wonMessageFromJsonLd(
+                jsonResp.message,
+                vocab.WONMSG.uriPlaceholder.event
+              )
+              .then(wonMessage =>
+                dispatch({
+                  type: actionTypes.atoms.connectSockets,
+                  payload: {
+                    eventUri: jsonResp.messageUri,
+                    message: jsonResp.message,
+                    optimisticEvent: wonMessage,
+                    senderSocketUri: senderSocketUri,
+                    targetSocketUri: targetSocketUri,
+                  },
+                })
+              )
+          );
         }
       });
   });
@@ -506,20 +516,25 @@ function connectAdHoc(
           targetSocketUri: targetSocketUri,
         });
 
-        won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
-          ownerApi.sendMessage(cnctMsg.message).then(jsonResp => {
-            dispatch({
-              type: actionTypes.atoms.connectSockets,
-              payload: {
-                eventUri: jsonResp.messageUri,
-                message: jsonResp.message,
-                optimisticEvent: optimisticEvent,
-                senderSocketUri: senderSocketUri,
-                targetSocketUri: targetSocketUri,
-              },
-            });
-          });
-        });
+        ownerApi.sendMessage(cnctMsg).then(jsonResp =>
+          won
+            .wonMessageFromJsonLd(
+              jsonResp.message,
+              vocab.WONMSG.uriPlaceholder.event
+            )
+            .then(wonMessage =>
+              dispatch({
+                type: actionTypes.atoms.connectSockets,
+                payload: {
+                  eventUri: jsonResp.messageUri,
+                  message: jsonResp.message,
+                  optimisticEvent: wonMessage,
+                  senderSocketUri: senderSocketUri,
+                  targetSocketUri: targetSocketUri,
+                },
+              })
+            )
+        );
       });
   });
 }
@@ -542,7 +557,7 @@ export function connectionsClose(connectionUri) {
     ]);
 
     buildCloseMessage(socketUri, targetSocketUri)
-      .then(({ message }) => ownerApi.sendMessage(message))
+      .then(message => ownerApi.sendMessage(message))
       .then(jsonResp => {
         dispatch({
           type: actionTypes.connections.close,
@@ -563,7 +578,7 @@ export function connectionsCloseRemote(message) {
     const targetSocketUri = message.getTargetSocket();
 
     buildCloseMessage(socketUri, targetSocketUri)
-      .then(closeMessage => ownerApi.sendMessage(closeMessage.message))
+      .then(message => ownerApi.sendMessage(message))
       .then(jsonResp => {
         dispatch(
           actionCreators.messages__send({
@@ -615,7 +630,7 @@ export function connectionsRate(connectionUri, rating) {
           rating
         );
       })
-      .then(({ message }) => ownerApi.sendMessage(message))
+      .then(message => ownerApi.sendMessage(message))
       .then(jsonResp =>
         dispatch({
           type: actionTypes.connections.rate,
@@ -631,7 +646,7 @@ export function connectionsRate(connectionUri, rating) {
 }
 
 /**
- * @param connectionUri
+ * @param connectionUriParam
  * @param numberOfEvents
  *   The approximate number of chat-message
  *   that the view atoms. Note that the
@@ -704,7 +719,7 @@ export function loadLatestMessagesOfConnection({
 }
 
 /**
- * @param connectionUri
+ * @param connectionUriParam
  * @param numberOfEvents
  *   The approximate number of chat-message
  *   that the view needs. Note that the

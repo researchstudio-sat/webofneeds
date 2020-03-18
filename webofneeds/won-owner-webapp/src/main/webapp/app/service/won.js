@@ -459,48 +459,13 @@ won.newGraph = function(hashFragement) {
   };
 };
 
-/**
- *  Work in progress: for generating any number/structure of domain objects
- *  (atom, connection container, connection ,event container, event (=wonMessage)
- *  from json-ld
- *
- */
-
-won.WonDomainObjects = function() {};
-
-won.WonDomainObjects.prototype = {
-  constructor: won.WonDomainObjects,
-  /**
-   * Returns the atomURIs.
-   */
-  getAtomUris: function() {},
-  /**
-   * Returns the connection URIs.
-   */
-  getConnectionUris: function() {},
-  /**
-   * Returns the event URIs.
-   */
-  getEventUris: function() {},
-  /**
-   * Returns the domain object with the specified URI.
-   * @param uri
-   */
-  getDomainObject: function(/*uri*/) {},
-};
-
-won.DomainObjectFactory = function() {};
-
-won.DomainObjectFactory.prototype = {
-  constructor: won.DomainObjectFactory,
-  /**
-   * Generates domain objects with the specified JSON-LD content. Returns a WonDomainObjects
-   * instance containing all domain objects found in the JSON-LD content.
-   */
-  jsonLdToWonDomainObjects: function(/*jsonLdContent*/) {},
-};
-
-won.wonMessageFromJsonLd = function(wonMessageAsJsonLD) {
+won.wonMessageFromJsonLd = function(wonMessageAsJsonLD, msgUri) {
+  console.debug(
+    "wonMessageAsJsonLD: ",
+    wonMessageAsJsonLD,
+    " msgUri: ",
+    msgUri
+  );
   return jsonld
     .expand(wonMessageAsJsonLD)
     .then(expandedJsonLd => new WonMessage(expandedJsonLd))
@@ -768,9 +733,6 @@ WonMessage.prototype = {
     return this.graphs.filter(graph =>
       this.contentGraphUris.includes(graph["@id"])
     );
-  },
-  getContentGraphsAsJsonLD: function() {
-    return JSON.stringify(this.getContentGraphs());
   },
   getCompactFramedMessageContent: function() {
     return this.compactFramedMessage;

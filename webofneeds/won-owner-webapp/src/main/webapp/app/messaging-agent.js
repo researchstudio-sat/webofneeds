@@ -20,6 +20,7 @@ import won from "./won-es6.js";
 import { getIn } from "./utils.js";
 
 import { ownerBaseUrl } from "~/config/default.js";
+import jsonld from "jsonld/dist/jsonld.js";
 import urljoin from "url-join";
 
 import { actionTypes, actionCreators } from "./actions/actions.js";
@@ -305,14 +306,17 @@ export function runMessagingAgent(redux) {
     for (const msgUri in messages) {
       const msg = messages[msgUri];
       promiseArray.push(
-        won.wonMessageFromJsonLd(msg).catch(error => {
-          console.error(
-            "Could not parse msg to wonMessage: ",
-            msg,
-            "error: ",
-            error
-          );
-        })
+        jsonld
+          .frame(msg, { "@id": msgUri, "@embed": "@always" })
+          .then(framedJsonLd => won.wonMessageFromJsonLd(framedJsonLd, msgUri))
+          .catch(error => {
+            console.error(
+              "Could not parse msg to wonMessage: ",
+              msg,
+              "error: ",
+              error
+            );
+          })
       );
     }
 

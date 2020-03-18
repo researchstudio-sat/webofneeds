@@ -72,19 +72,24 @@ export function connectSockets(
       targetSocketUri: targetSocketUri,
     });
 
-    return won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent =>
-      ownerApi.sendMessage(cnctMsg.message).then(jsonResp => {
-        dispatch({
-          type: actionTypes.atoms.connectSockets,
-          payload: {
-            eventUri: jsonResp.messageUri,
-            message: jsonResp.message,
-            optimisticEvent: optimisticEvent,
-            senderSocketUri: senderSocketUri,
-            targetSocketUri: targetSocketUri,
-          },
-        });
-      })
+    return ownerApi.sendMessage(cnctMsg).then(jsonResp =>
+      won
+        .wonMessageFromJsonLd(
+          jsonResp.message,
+          vocab.WONMSG.uriPlaceholder.event
+        )
+        .then(wonMessage =>
+          dispatch({
+            type: actionTypes.atoms.connectSockets,
+            payload: {
+              eventUri: jsonResp.messageUri,
+              message: jsonResp.message,
+              optimisticEvent: wonMessage,
+              senderSocketUri: senderSocketUri,
+              targetSocketUri: targetSocketUri,
+            },
+          })
+        )
     );
   };
 }
@@ -128,19 +133,24 @@ export function connectSocketTypes(
       targetSocketUri: targetSocketUri,
     });
 
-    return won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent =>
-      ownerApi.sendMessage(cnctMsg.message).then(jsonResp => {
-        dispatch({
-          type: actionTypes.atoms.connectSockets,
-          payload: {
-            eventUri: jsonResp.messageUri,
-            message: jsonResp.message,
-            optimisticEvent: optimisticEvent,
-            senderSocketUri: senderSocketUri,
-            targetSocketUri: targetSocketUri,
-          },
-        });
-      })
+    return ownerApi.sendMessage(cnctMsg).then(jsonResp =>
+      won
+        .wonMessageFromJsonLd(
+          jsonResp.message,
+          vocab.WONMSG.uriPlaceholder.event
+        )
+        .then(wonMessage =>
+          dispatch({
+            type: actionTypes.atoms.connectSockets,
+            payload: {
+              eventUri: jsonResp.messageUri,
+              message: jsonResp.message,
+              optimisticEvent: wonMessage,
+              senderSocketUri: senderSocketUri,
+              targetSocketUri: targetSocketUri,
+            },
+          })
+        )
     );
   };
 }
@@ -148,7 +158,7 @@ export function connectSocketTypes(
 export function close(atomUri) {
   return (dispatch, getState) => {
     buildCloseAtomMessage(atomUri)
-      .then(data => ownerApi.sendMessage(data.message))
+      .then(message => ownerApi.sendMessage(message))
       .then(jsonResp => {
         dispatch(
           actionCreators.messages__send({
@@ -181,7 +191,7 @@ export function close(atomUri) {
 export function open(atomUri) {
   return dispatch => {
     buildOpenAtomMessage(atomUri)
-      .then(data => ownerApi.sendMessage(data.message))
+      .then(message => ownerApi.sendMessage(message))
       .then(jsonResp => {
         dispatch(
           actionCreators.messages__send({
@@ -226,7 +236,7 @@ export function closedBySystem(event) {
 export function deleteAtom(atomUri) {
   return dispatch => {
     buildDeleteAtomMessage(atomUri)
-      .then(data => ownerApi.sendMessage(data.message))
+      .then(message => ownerApi.sendMessage(message))
       .then(jsonResp => {
         dispatch(
           actionCreators.messages__send({

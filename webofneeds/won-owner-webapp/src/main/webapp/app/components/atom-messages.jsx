@@ -902,7 +902,7 @@ class AtomMessages extends React.Component {
   addMessageToState(messageUri) {
     const ownedAtomUri = get(this.props.ownedAtom, "uri");
     return ownerApi.getMessage(ownedAtomUri, messageUri).then(response => {
-      won.wonMessageFromJsonLd(response).then(msg => {
+      won.wonMessageFromJsonLd(response, messageUri).then(msg => {
         //If message isnt in the state we add it
         if (!get(this.props.chatMessages, messageUri)) {
           this.props.processAgreementMessage(msg);

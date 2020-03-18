@@ -39,19 +39,21 @@ function connectReview(dispatch, ownPersona, foreignPersona, connectMessage) {
     targetSocketUri: targetSocketUri,
   });
 
-  return won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent =>
-    ownerApi.sendMessage(cnctMsg.message).then(jsonResp => {
-      dispatch({
-        type: actionTypes.atoms.connectSockets,
-        payload: {
-          eventUri: jsonResp.messageUri,
-          message: jsonResp.message,
-          optimisticEvent: optimisticEvent,
-          senderSocketUri: senderSocketUri,
-          targetSocketUri: targetSocketUri,
-        },
-      });
-    })
+  return ownerApi.sendMessage(cnctMsg).then(jsonResp =>
+    won
+      .wonMessageFromJsonLd(jsonResp.message, vocab.WONMSG.uriPlaceholder.event)
+      .then(wonMessage =>
+        dispatch({
+          type: actionTypes.atoms.connectSockets,
+          payload: {
+            eventUri: jsonResp.messageUri,
+            message: jsonResp.message,
+            optimisticEvent: wonMessage,
+            senderSocketUri: senderSocketUri,
+            targetSocketUri: targetSocketUri,
+          },
+        })
+      )
   );
 }
 
@@ -93,7 +95,7 @@ export function disconnectPersona(atomUri, personaUri) {
     const connectionUri = get(connection, "uri");
 
     buildCloseMessage(socketUri, targetSocketUri)
-      .then(({ message }) => ownerApi.sendMessage(message))
+      .then(message => ownerApi.sendMessage(message))
       .then(jsonResp => {
         dispatch({
           type: actionTypes.connections.close,

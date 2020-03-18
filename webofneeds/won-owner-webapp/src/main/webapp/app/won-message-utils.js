@@ -39,11 +39,9 @@ export function buildRateMessage(
 ) {
   return new Promise(resolve => {
     const buildMessage = function() {
-      //TODO: use event URI pattern specified by WoN node
-      const eventUri = "wm:/SELF"; //mandatory
       const message = new won.MessageBuilder(vocab.WONMSG.feedbackMessage) //TODO: Looks like a copy-paste-leftover from connect
         .protocolVersion("1.0")
-        .eventURI(eventUri)
+        .eventURI(vocab.WONMSG.uriPlaceholder.event)
         .ownerDirection()
         .senderSocket(socketUri)
         .targetSocket(targetSocketUri)
@@ -51,7 +49,7 @@ export function buildRateMessage(
         .addRating(rating, msgToRateFor.connection.uri)
         .build();
 
-      return { eventUri: eventUri, message: message };
+      return message;
     };
 
     //fetch all datan needed
@@ -67,18 +65,16 @@ export function buildRateMessage(
 
 export function buildCloseMessage(socketUri, targetSocketUri) {
   const buildMessage = function() {
-    //TODO: use event URI pattern specified by WoN node
-    const eventUri = "wm:/SELF"; //mandatory
     const message = new won.MessageBuilder(vocab.WONMSG.closeMessage)
       .protocolVersion("1.0")
-      .eventURI(eventUri)
+      .eventURI(vocab.WONMSG.uriPlaceholder.event)
       .senderSocket(socketUri)
       .targetSocket(targetSocketUri)
       .ownerDirection()
       .timestamp(new Date().getTime().toString())
       .build();
 
-    return { eventUri: eventUri, message: message };
+    return message;
   };
 
   //fetch all datan needed
@@ -92,16 +88,13 @@ export function buildCloseMessage(socketUri, targetSocketUri) {
 }
 export function buildCloseAtomMessage(atomUri) {
   const buildMessage = function() {
-    const eventUri = "wm:/SELF"; //mandatory
-    const message = new won.MessageBuilder(vocab.WONMSG.closeAtomMessage)
+    return new won.MessageBuilder(vocab.WONMSG.closeAtomMessage)
       .protocolVersion("1.0")
       .atom(atomUri)
-      .eventURI(eventUri)
+      .eventURI(vocab.WONMSG.uriPlaceholder.event)
       .ownerDirection()
       .timestamp(new Date().getTime().toString())
       .build();
-
-    return { eventUri: eventUri, message: message };
   };
 
   return won
@@ -114,16 +107,13 @@ export function buildCloseAtomMessage(atomUri) {
 
 export function buildDeleteAtomMessage(atomUri) {
   const buildMessage = function() {
-    const eventUri = "wm:/SELF"; //mandatory
-    const message = new won.MessageBuilder(vocab.WONMSG.deleteAtomMessage)
+    return new won.MessageBuilder(vocab.WONMSG.deleteAtomMessage)
       .protocolVersion("1.0")
       .atom(atomUri)
-      .eventURI(eventUri)
+      .eventURI(vocab.WONMSG.uriPlaceholder.event)
       .ownerDirection()
       .timestamp(new Date().getTime().toString())
       .build();
-
-    return { eventUri: eventUri, message: message };
   };
 
   return won
@@ -136,16 +126,13 @@ export function buildDeleteAtomMessage(atomUri) {
 
 export function buildOpenAtomMessage(atomUri) {
   const buildMessage = function() {
-    const eventUri = "wm:/SELF"; //mandatory
-    const message = new won.MessageBuilder(vocab.WONMSG.activateAtomMessage)
+    return new won.MessageBuilder(vocab.WONMSG.activateAtomMessage)
       .protocolVersion("1.0")
       .atom(atomUri)
-      .eventURI(eventUri)
+      .eventURI(vocab.WONMSG.uriPlaceholder.event)
       .ownerDirection()
       .timestamp(new Date().getTime().toString())
       .build();
-
-    return { eventUri: eventUri, message: message };
   };
 
   return won
@@ -160,7 +147,7 @@ export function buildOpenAtomMessage(atomUri) {
  * Builds json-ld for a connect-message in reaction to an atom.
  * @param connectionUri
  * @param textMessage
- * @returns {{eventUri, message}|*}
+ * @returns message
  */
 export function buildConnectMessage({
   connectMessage,
@@ -171,10 +158,9 @@ export function buildConnectMessage({
     throw new Error("buildConnectMessage is missing socketUris");
   }
 
-  const eventUri = "wm:/SELF"; //mandatory
   const messageBuilder = new won.MessageBuilder(vocab.WONMSG.connectMessage)
     .protocolVersion("1.0")
-    .eventURI(eventUri)
+    .eventURI(vocab.WONMSG.uriPlaceholder.event)
     .senderSocket(socketUri)
     .targetSocket(targetSocketUri)
     .ownerDirection()
@@ -186,9 +172,7 @@ export function buildConnectMessage({
     messageBuilder.mergeIntoContentGraph(connectMessage);
   }
 
-  const message = messageBuilder.build();
-
-  return { eventUri: eventUri, message: message };
+  return messageBuilder.build();
 }
 
 export function buildChatMessage({
@@ -208,10 +192,9 @@ export function buildChatMessage({
     targetSocketUri
   );
 
-  const messageP = Promise.all([envelopeDataP, jsonldGraphPayloadP]).then(
+  return Promise.all([envelopeDataP, jsonldGraphPayloadP]).then(
     ([envelopeData, graphPayload]) => {
       envelopeData; //TODO remove this
-      const eventUri = "wm:/SELF"; //mandatory
 
       /*
              * Build the json-ld message that's signed on the owner-server
@@ -248,7 +231,7 @@ export function buildChatMessage({
               detail.parseToRDF({
                 value: value,
                 identifier: detail.identifier,
-                contentUri: eventUri,
+                contentUri: vocab.WONMSG.uriPlaceholder.event,
               });
 
             if (detailRDF) {
@@ -326,16 +309,10 @@ export function buildChatMessage({
         );
       }
 
-      wonMessageBuilder.eventURI(eventUri); // replace placeholders with proper event-uri
-      const message = wonMessageBuilder.build();
-
-      return {
-        eventUri,
-        message,
-      };
+      wonMessageBuilder.eventURI(vocab.WONMSG.uriPlaceholder.event); // replace placeholders with proper event-uri
+      return wonMessageBuilder.build();
     }
   );
-  return messageP;
 }
 
 export async function buildEditMessage(editedAtomData, oldAtom) {
@@ -365,18 +342,16 @@ export async function buildEditMessage(editedAtomData, oldAtom) {
     socket: editedAtomData.socket,
   });
 
-  const msgUri = "wm:/SELF"; //mandatory
   const msgJson = won.buildMessageRdf(contentRdf, {
     msgType: vocab.WONMSG.replaceMessage, //mandatory
     publishedContentUri: atomUriToEdit, //mandatory
-    msgUri: msgUri,
+    msgUri: vocab.WONMSG.uriPlaceholder.event,
   });
   //add the @base definition to the @context so we can use #fragments in the atom structure
   msgJson["@context"]["@base"] = atomUriToEdit;
 
   return {
     message: msgJson,
-    eventUri: msgUri,
     atomUri: atomUriToEdit,
   };
 }
@@ -395,7 +370,6 @@ export async function buildEditMessage(editedAtomData, oldAtom) {
  *      {@id}|
  *      {@graph, @context}
  *    ),
- *    eventUri: string,
  *    atomUri: string
  * }}
  */
@@ -430,18 +404,16 @@ export async function buildCreateMessage(atomData, wonNodeUri) {
     socket: atomData.socket,
   });
 
-  const msgUri = "wm:/SELF"; //mandatory
   const msgJson = won.buildMessageRdf(contentRdf, {
     atom: publishedContentUri, //mandatory
     msgType: vocab.WONMSG.createMessage, //mandatory
     publishedContentUri: publishedContentUri, //mandatory
-    msgUri: msgUri,
+    msgUri: vocab.WONMSG.uriPlaceholder.event,
   });
   //add the @base definition to the @context so we can use #fragments in the atom structure
   msgJson["@context"]["@base"] = publishedContentUri;
   return {
     message: msgJson,
-    eventUri: msgUri,
     atomUri: publishedContentUri,
   };
 }

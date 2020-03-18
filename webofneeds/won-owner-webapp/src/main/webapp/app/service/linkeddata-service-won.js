@@ -34,13 +34,14 @@ import * as jsonldUtils from "./jsonld-utils";
   won.getAtom = atomUri =>
     ownerApi
       .getJsonLdDataset(atomUri)
-      .then(jsonLdData =>
-        jsonld.frame(jsonLdData, {
+      .then(jsonLdData => {
+        //console.time("Atom parseTime for: " + atomUri);
+        return jsonld.frame(jsonLdData, {
           "@id": atomUri, // start the framing from this uri. Otherwise will generate all possible nesting-variants.
           "@context": won.defaultContext,
           "@embed": "@always",
-        })
-      )
+        });
+      })
       .then(atomJsonLd => {
         // usually the atom-data will be in a single object in the '@graph' array.
         // We can flatten this and still have valid json-ld
@@ -61,13 +62,14 @@ import * as jsonldUtils from "./jsonld-utils";
           );
           return { "@context": flattenedAtomJsonLd["@context"] };
         }
-
+        //console.timeEnd("Atom parseTime for: " + atomUri);
         return flattenedAtomJsonLd;
       })
       .catch(e => {
         const msg = "Failed to get atom " + atomUri + ".";
         e.message += msg;
         console.error(e.message);
+        //console.timeEnd("Atom parseTime for: " + atomUri);
         throw e;
       });
 
@@ -241,6 +243,7 @@ import * as jsonldUtils from "./jsonld-utils";
           connectionUri
       );
     }
+    // console.time("Connection parseTime for: " + connectionUri);
     return getConnection(connectionUri)
       .then(connection =>
         won.getJsonLdNode(connection.messageContainer, fetchParams)
@@ -250,7 +253,7 @@ import * as jsonldUtils from "./jsonld-utils";
           messageContainer,
           vocab.RDFS.memberCompacted
         );
-
+        // console.timeEnd("Connection parseTime for: " + connectionUri);
         let rawMessageArray;
         /*
            * if there's only a single rdfs:member in the event
@@ -271,10 +274,13 @@ import * as jsonldUtils from "./jsonld-utils";
 
             // console.time("WonMsg parseTime for: " + msgUri);
             return won
-              .wonMessageFromJsonLd({
-                "@graph": [rawMessage],
-                "@context": won.defaultContext,
-              })
+              .wonMessageFromJsonLd(
+                {
+                  "@graph": [rawMessage],
+                  "@context": won.defaultContext,
+                },
+                msgUri
+              )
               .then(wonMessage => {
                 // console.timeEnd("WonMsg parseTime for: " + msgUri);
                 return {
@@ -402,7 +408,7 @@ import * as jsonldUtils from "./jsonld-utils";
   won.getWonMessage = (msgUri, fetchParams) => {
     return ownerApi
       .getJsonLdDataset(msgUri, fetchParams)
-      .then(rawEvent => won.wonMessageFromJsonLd(rawEvent))
+      .then(rawEvent => won.wonMessageFromJsonLd(rawEvent, msgUri))
       .catch(e => {
         const msg = "Failed to get wonMessage " + msgUri + ".";
         e.message += msg;
