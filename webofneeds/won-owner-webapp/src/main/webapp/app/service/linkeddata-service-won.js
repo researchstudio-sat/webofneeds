@@ -270,20 +270,12 @@ import * as jsonldUtils from "./jsonld-utils";
         for (const msgUri in messages) {
           const msg = messages[msgUri];
           promiseArray.push(
-            jsonld
-              .frame(msg, { "@id": msgUri, "@embed": "@always" })
-              .then(framedJsonLd => {
-                // console.time("WonMsg parseTime for: " + msgUri);
-                return won
-                  .wonMessageFromJsonLd(framedJsonLd, msgUri)
-                  .then(wonMessage => {
-                    // console.timeEnd("WonMsg parseTime for: " + msgUri);
-                    return {
-                      msgUri: msgUri,
-                      wonMessage: wonMessage,
-                    };
-                  });
-              })
+            won
+              .wonMessageFromJsonLd(msg, msgUri)
+              .then(wonMessage => ({
+                msgUri: msgUri,
+                wonMessage: wonMessage,
+              }))
               .catch(error => {
                 console.error(
                   "Could not parse msg to wonMessage: ",
@@ -403,21 +395,6 @@ import * as jsonldUtils from "./jsonld-utils";
         })
     );
   };
-
-  won.getWonMessage = (msgUri, fetchParams) => {
-    return ownerApi
-      .getJsonLdDataset(msgUri, fetchParams)
-      .then(rawEvent => won.wonMessageFromJsonLd(rawEvent, msgUri))
-      .catch(e => {
-        const msg = "Failed to get wonMessage " + msgUri + ".";
-        e.message += msg;
-        console.error(e.message);
-        throw e;
-      });
-  };
-
-  window.getWonMessage4dbg = won.getWonMessage;
-  window.wonMessageFromJsonLd4dbg = won.wonMessageFromJsonLd;
 
   /**
    * Fetches the triples where URI is subject and add objects of those triples to the

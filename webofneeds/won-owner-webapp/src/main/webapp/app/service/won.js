@@ -467,7 +467,7 @@ won.wonMessageFromJsonLd = function(wonMessageAsJsonLD, msgUri) {
     msgUri
   );
   return jsonld
-    .expand(wonMessageAsJsonLD)
+    .frame(wonMessageAsJsonLD, { "@id": msgUri, "@embed": "@always" })
     .then(expandedJsonLd => new WonMessage(expandedJsonLd))
     .then(wonMessage =>
       wonMessage
