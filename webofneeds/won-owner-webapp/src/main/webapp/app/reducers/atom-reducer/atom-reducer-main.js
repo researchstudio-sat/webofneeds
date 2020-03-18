@@ -501,7 +501,6 @@ export default function(allAtomsInState = initialState, action = {}) {
         action.payload.showActions
       );
     case actionTypes.messages.markAsRead: {
-      console.debug("mark Message As Read", action.payload);
       return markMessageAsRead(
         allAtomsInState,
         action.payload.messageUri,
