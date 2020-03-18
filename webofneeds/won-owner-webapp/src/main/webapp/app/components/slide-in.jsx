@@ -373,39 +373,32 @@ class WonSlideIn extends React.Component {
             </svg>
             <div className="si__text">
               <h3>You are posting with an anonymous account. This means:</h3>
-              <p>
-                <ul>
-                  <li>
-                    You may not notice when <b>other users want to connect.</b>
-                  </li>
-                  <li>
-                    You need the <b>login link</b> to access your postings
-                    later.
-                  </li>
-                </ul>
-              </p>
+              <ul>
+                <li>
+                  You may not notice when <b>other users want to connect.</b>
+                </li>
+                <li>
+                  You need the <b>login link</b> to access your postings later.
+                </li>
+              </ul>
               <br />
               <h3>Therefore:</h3>
-              <p>
-                <ul>
-                  <li>
-                    <b>
-                      <a
-                        className="clickable"
-                        onClick={() => this.props.routerGo("signup")}
-                      >
-                        Consider signing up!
-                      </a>
-                    </b>{" "}
-                    It will allow us to contact you if there is relevant
-                    activity.
-                  </li>
-                  <li>
-                    Alternatively, we can <b>send you the login link</b> by
-                    email.
-                  </li>
-                </ul>
-              </p>
+              <ul>
+                <li>
+                  <b>
+                    <a
+                      className="clickable"
+                      onClick={() => this.props.routerGo("signup")}
+                    >
+                      Consider signing up!
+                    </a>
+                  </b>{" "}
+                  It will allow us to contact you if there is relevant activity.
+                </li>
+                <li>
+                  Alternatively, we can <b>send you the login link</b> by email.
+                </li>
+              </ul>
             </div>
             <button
               className=" si__buttonSignup"
