@@ -562,10 +562,10 @@ class WonReferencedMessageContent extends React.Component {
     }
   }
 
-  addMessageToState(eventUri) {
+  addMessageToState(msgUri) {
     const ownedAtomUri = this.props.ownedAtomUri;
-    return ownerApi.getMessage(ownedAtomUri, eventUri).then(response => {
-      won.wonMessageFromJsonLd(response).then(msg => {
+    return ownerApi.getMessage(ownedAtomUri, msgUri).then(response => {
+      won.wonMessageFromJsonLd(response, msgUri).then(msg => {
         //If message isnt in the state we add it
         this.props.processAgreementMessage(msg);
       });

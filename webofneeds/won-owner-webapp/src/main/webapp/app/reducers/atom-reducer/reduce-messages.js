@@ -13,23 +13,7 @@ export function addMessage(
   alreadyProcessed = false,
   eventUriOverride = undefined
 ) {
-  // we used to exclude messages without content here, using
-  // if (wonMessage.getContentGraphs().length > 0) as the condition
-  // however, after moving the socket info of connect/open messages from
-  // content to envelope and making them optional, connect messages
-  // actually can have no content. This never happened before, and
-  // as one might expect, caused very weird behaviour when it did:
-  // It was processed correctly after a reload, but as an
-  // outgoing message, the success/failure responses coming in
-  // would still cause an entry to be created in the messages array,
-  // but holding only the 'isReceivedByOwn','isReceivedByRemote' etc fields,
-  // throwing off the message rendering.
-  // New solution: parse anything that is not a response, but allow responses with content
-  // Somehow the success responses would be visible on initial/reload or fetch of more Messages, thats why we avoid adding if the alreadyProcessed flag is set
-  if (
-    !wonMessage.isResponse() ||
-    (wonMessage.getContentGraphs().length > 0 && !alreadyProcessed)
-  ) {
+  if (!wonMessage.isResponse()) {
     let parsedMessage = parseMessage(wonMessage, alreadyProcessed, false);
 
     if (parsedMessage) {

@@ -305,7 +305,7 @@ export function runMessagingAgent(redux) {
     for (const msgUri in messages) {
       const msg = messages[msgUri];
       promiseArray.push(
-        won.wonMessageFromJsonLd(msg).catch(error => {
+        won.wonMessageFromJsonLd(msg, msgUri).catch(error => {
           console.error(
             "Could not parse msg to wonMessage: ",
             msg,

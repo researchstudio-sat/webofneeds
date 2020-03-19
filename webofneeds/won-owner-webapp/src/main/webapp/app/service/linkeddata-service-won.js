@@ -34,13 +34,14 @@ import * as jsonldUtils from "./jsonld-utils";
   won.getAtom = atomUri =>
     ownerApi
       .getJsonLdDataset(atomUri)
-      .then(jsonLdData =>
-        jsonld.frame(jsonLdData, {
+      .then(jsonLdData => {
+        // console.time("Atom parseTime for: " + atomUri);
+        return jsonld.frame(jsonLdData, {
           "@id": atomUri, // start the framing from this uri. Otherwise will generate all possible nesting-variants.
           "@context": won.defaultContext,
           "@embed": "@always",
-        })
-      )
+        });
+      })
       .then(atomJsonLd => {
         // usually the atom-data will be in a single object in the '@graph' array.
         // We can flatten this and still have valid json-ld
@@ -61,13 +62,14 @@ import * as jsonldUtils from "./jsonld-utils";
           );
           return { "@context": flattenedAtomJsonLd["@context"] };
         }
-
+        // console.timeEnd("Atom parseTime for: " + atomUri);
         return flattenedAtomJsonLd;
       })
       .catch(e => {
         const msg = "Failed to get atom " + atomUri + ".";
         e.message += msg;
         console.error(e.message);
+        // console.timeEnd("Atom parseTime for: " + atomUri);
         throw e;
       });
 
@@ -241,57 +243,51 @@ import * as jsonldUtils from "./jsonld-utils";
           connectionUri
       );
     }
+
     return getConnection(connectionUri)
       .then(connection =>
-        won.getJsonLdNode(connection.messageContainer, fetchParams)
+        ownerApi.getJsonLdDataset(connection.messageContainer, fetchParams)
       )
-      .then(messageContainer => {
-        const messages = jsonldUtils.getProperty(
-          messageContainer,
-          vocab.RDFS.memberCompacted
-        );
+      .then(jsonLdData => jsonld.expand(jsonLdData))
+      .then(jsonLdData => {
+        const messages = {};
 
-        let rawMessageArray;
-        /*
-           * if there's only a single rdfs:member in the event
-           * container, getJsonLdNode will not return an array, so we
-           * need to make sure it's one from here on out.
-           */
-        if (!messages) {
-          rawMessageArray = [];
-        } else if (is("Array", messages)) {
-          rawMessageArray = messages;
-        } else {
-          rawMessageArray = [messages];
-        }
+        jsonLdData &&
+          jsonLdData
+            .filter(graph => graph["@id"].indexOf("wm:/") === 0)
+            .forEach(graph => {
+              const msgUri = graph["@id"].split("#")[0];
+              const singleMessage = messages[msgUri];
 
-        return Promise.all(
-          rawMessageArray.map(rawMessage => {
-            const msgUri = rawMessage["@id"];
+              if (singleMessage) {
+                singleMessage["@graph"].push(graph);
+              } else {
+                messages[msgUri] = { "@graph": [graph] };
+              }
+            });
 
-            // console.time("WonMsg parseTime for: " + msgUri);
-            return won
-              .wonMessageFromJsonLd({
-                "@graph": [rawMessage],
-                "@context": won.defaultContext,
-              })
-              .then(wonMessage => {
-                // console.timeEnd("WonMsg parseTime for: " + msgUri);
-                return {
-                  msgUri: msgUri,
-                  wonMessage: wonMessage,
-                };
-              })
-              .catch(e => {
-                const msg =
-                  "Failed to frame or parse to wonMessage " + msgUri + ".";
-                e.message += msg;
-                console.error(e.message);
-                // console.timeEnd("WonMsg parseTime for: " + msgUri);
+        const promiseArray = [];
+        for (const msgUri in messages) {
+          const msg = messages[msgUri];
+          promiseArray.push(
+            won
+              .wonMessageFromJsonLd(msg, msgUri)
+              .then(wonMessage => ({
+                msgUri: msgUri,
+                wonMessage: wonMessage,
+              }))
+              .catch(error => {
+                console.error(
+                  "Could not parse msg to wonMessage: ",
+                  msg,
+                  "error: ",
+                  error
+                );
                 return { msgUri: msgUri, wonMessage: undefined };
-              });
-          })
-        );
+              })
+          );
+        }
+        return Promise.all(promiseArray);
       });
   };
 
@@ -399,21 +395,6 @@ import * as jsonldUtils from "./jsonld-utils";
     );
   };
 
-  won.getWonMessage = (msgUri, fetchParams) => {
-    return ownerApi
-      .getJsonLdDataset(msgUri, fetchParams)
-      .then(rawEvent => won.wonMessageFromJsonLd(rawEvent))
-      .catch(e => {
-        const msg = "Failed to get wonMessage " + msgUri + ".";
-        e.message += msg;
-        console.error(e.message);
-        throw e;
-      });
-  };
-
-  window.getWonMessage4dbg = won.getWonMessage;
-  window.wonMessageFromJsonLd4dbg = won.wonMessageFromJsonLd;
-
   /**
    * Fetches the triples where URI is subject and add objects of those triples to the
    * resulting structure by the localname of the predicate.
@@ -438,18 +419,13 @@ import * as jsonldUtils from "./jsonld-utils";
       return Promise.reject({ message: "getJsonLdNode: uri must not be null" });
     }
 
-    return ownerApi
-      .getJsonLdDataset(uri, fetchParams)
-      .then(jsonLdData =>
-        jsonld.frame(jsonLdData, {
-          "@id": uri,
-          "@context": won.defaultContext,
-          "@embed": "@always",
-        })
-      )
-      .then(jsonLdDataFramed => {
-        return jsonLdDataFramed;
-      });
+    return ownerApi.getJsonLdDataset(uri, fetchParams).then(jsonLdData =>
+      jsonld.frame(jsonLdData, {
+        "@id": uri,
+        "@context": won.defaultContext,
+        "@embed": "@always",
+      })
+    );
   };
 })();
 

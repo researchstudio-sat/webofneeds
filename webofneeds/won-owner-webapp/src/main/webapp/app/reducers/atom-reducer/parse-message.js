@@ -88,7 +88,6 @@ export function parseMessage(
         },
       },
       isMessageStatusUpToDate: false,
-      contentGraphs: wonMessage.getContentGraphs(),
       //Receive Status Flags
       unread: false, //default is unread, but the real status is determined for non outgoing messages in the reducer
       //Send Status Flags
