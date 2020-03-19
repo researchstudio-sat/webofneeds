@@ -469,9 +469,8 @@ won.wonMessageFromJsonLd = function(wonMessageAsJsonLD, msgUri) {
   return jsonld
     .frame(wonMessageAsJsonLD, { "@id": msgUri, "@embed": "@always" })
     .then(expandedJsonLd => new WonMessage(expandedJsonLd))
-    .then(wonMessage =>
-      wonMessage
-        .frameInPromise()
+    .then(wonMessage => {
+      return Promise.resolve()
         .then(
           () =>
             //Only generate compactedFramedMessage if it is not a response or not from Owner
@@ -479,21 +478,7 @@ won.wonMessageFromJsonLd = function(wonMessageAsJsonLD, msgUri) {
             (wonMessage.isFromOwner() &&
               wonMessage.generateCompactedFramedMessage())
         )
-        .then(() => {
-          if (wonMessage.hasParseErrors() && !wonMessage.isResponse()) {
-            console.warn(
-              "wonMessage<",
-              wonMessage.getMessageUri(),
-              "> msgType<",
-              wonMessage.getMessageType(),
-              "> ParseError: {" + wonMessage.parseErrors,
-              "} wonMessage: ",
-              wonMessage
-            );
-          }
-
-          return wonMessage;
-        })
+        .then(() => wonMessage)
         .catch(e => {
           console.error(
             "Error in wonMessageFromJsonLd: rawMessage: ",
@@ -502,8 +487,8 @@ won.wonMessageFromJsonLd = function(wonMessageAsJsonLD, msgUri) {
             wonMessage
           );
           rethrow(e);
-        })
-    );
+        });
+    });
 };
 
 window.wonMessageFromJsonLd4dbg = won.wonMessageFromJsonLd;
@@ -596,12 +581,14 @@ window.ttlToJsonLd4dbg = won.ttlToJsonLd;
  * @param jsonLdContent
  * @constructor
  */
-function WonMessage(jsonLdContent) {
+function WonMessage(framedJsonLdMessage) {
   if (!(this instanceof WonMessage)) {
-    return new WonMessage(jsonLdContent);
+    return new WonMessage(framedJsonLdMessage);
   }
-  this.rawMessage = jsonLdContent;
-  this.parseErrors = [];
+  this.framedMessage = framedJsonLdMessage;
+
+  this.rawMessage = framedJsonLdMessage; //FIXME: can probably be deleted at some point
+  console.debug("this.rawMessage: ", this.rawMessage);
   this.__init();
 }
 
@@ -609,36 +596,11 @@ WonMessage.prototype = {
   constructor: WonMessage,
 
   getMessageUri: function() {
-    return this.__getMessageUri(this.messageStructure);
-  },
-
-  __getMessageUri: function(messageStructure) {
-    if (messageStructure.messageUri) {
-      return messageStructure.messageUri;
-    }
-    if (messageStructure.containedEnvelopes) {
-      let uris = messageStructure.containedEnvelopes.map(envelope =>
-        this.__getMessageUri(envelope)
-      );
-      if (uris.length > 1) {
-        throw new Error(
-          "Found more than one contained envelope in message with message uris: " +
-            uris
-        );
-      }
-      if (uris.length == 0) {
-        throw new Error("Did not find any contained envelopes in message");
-      }
-      return uris[0];
-    }
+    return this.messageStructure && this.messageStructure.messageUri;
   },
 
   getMessageDirection: function() {
-    const messageDirection = this.__getMessageDirection(this.messageStructure);
-    if (is("Array", messageDirection) && messageDirection.length == 1) {
-      return messageDirection[0];
-    }
-    return messageDirection;
+    return this.messageStructure && this.messageStructure.messageDirection;
   },
   generateCompactedFramedMessage: async function() {
     //TODO: change it so it returns all the contentgraphscontent
@@ -676,39 +638,6 @@ WonMessage.prototype = {
       }
     }
   },
-  frameInPromise: function() {
-    if (this.framedMessage) {
-      return Promise.resolve(this.framedMessage);
-    }
-    const type = this.getMessageDirection();
-    const that = this;
-    return jsonld
-      .frame(this.rawMessage, {
-        "@type": type,
-      })
-      .then(result => {
-        const graphs = result["@graph"];
-        if (graphs && graphs.length > 1) {
-          const msgUri = that.getMessageUri();
-          const msgGraphIndex = graphs.findIndex(
-            elem => elem["@id"] === msgUri
-          );
-          if (msgGraphIndex != 0 && msgGraphIndex != -1) {
-            let newGraphs = [];
-            newGraphs.push(graphs[msgGraphIndex]);
-            result["@graph"] = newGraphs.concat(
-              graphs.filter(elem => elem["@id"] === msgUri)
-            );
-
-            that.framedMessage = result;
-            return result;
-          }
-        }
-        that.framedMessage = result;
-        return result;
-      });
-  },
-
   getProperty: function(property) {
     let val = jsonldUtils.getProperty(this.framedMessage, property);
     if (val) {
@@ -726,13 +655,6 @@ WonMessage.prototype = {
       return val.map(x => won.getSafeJsonLdValue(x));
     }
     return won.getSafeJsonLdValue(val);
-  },
-  getContentGraphs: function() {
-    // walk over graphs, copy all graphs to result that are content graphs
-    // we identify content graphs by finding their URI in messageStructure.containedContent
-    return this.graphs.filter(graph =>
-      this.contentGraphUris.includes(graph["@id"])
-    );
   },
   getCompactFramedMessageContent: function() {
     return this.compactFramedMessage;
@@ -834,9 +756,6 @@ WonMessage.prototype = {
   },
   isRetractMessage: function() {
     return !!this.getProperty(vocab.MOD.retracts);
-  },
-  hasParseErrors: function() {
-    return this.parseErrors && this.parseErrors.length > 0;
   },
   isFromSystem: function() {
     let direction = this.getMessageDirection();
@@ -955,236 +874,9 @@ WonMessage.prototype = {
   },
 
   __init: function() {
-    this.graphs = this.rawMessage;
-
-    if (!is("Array", this.graphs)) {
-      this.parseErrors.push("@graph not found or not an array");
-    }
-    this.graphUris = this.graphs.map(g => g["@id"]);
-    if (!is("Array", this.graphUris)) {
-      this.parseErrors.push("GraphUris not found or not an array");
-    }
-    const nodes = {};
-    let unreferencedEnvelopes = [];
-    const innermostEnvelopes = [];
-    const contentGraphUris = [];
-
-    //first pass: create one node per envelope/content graph
-    this.graphs.forEach(graph => {
-      let graphUri = graph["@id"];
-      if (this.__isEnvelopeGraph(graph)) {
-        let node = {
-          uri: graphUri,
-        };
-        unreferencedEnvelopes.push(graphUri);
-        let msgUriAndDirection = this.__getMessageUriAndDirection(graph);
-        if (msgUriAndDirection) {
-          // it's possible that we don't find a triple <messageUri> a <type>
-          // in the envelope, and we can't add it to the node here.
-          node.messageUri = msgUriAndDirection.messageUri;
-          node.messageDirection = msgUriAndDirection.messageDirection;
-        }
-        let messageUriAndForwardedMessageUri = this.__getMessageUriAndForwardedMessageUri(
-          graph
-        );
-        if (messageUriAndForwardedMessageUri) {
-          node.forwardedMessageUri =
-            messageUriAndForwardedMessageUri.forwardedMessageUri;
-        }
-        nodes[graphUri] = node;
-      } else if (this.__isSignatureGraph(graph)) {
-        //do nothing - we don't want to handle signatures in the client for now
-      } else {
-        //content graph
-        nodes[graphUri] = {
-          uri: graphUri,
-        };
-      }
-    });
-    //second pass: connect the nodes so we get a tree
-    this.graphs.forEach(graph => {
-      let graphUri = graph["@id"];
-      let node = nodes[graphUri];
-      if (this.__isEnvelopeGraph(graph)) {
-        let containedEnvelopes = this.__getContainedEnvelopeUris(graph);
-        let referencesOtherGraphs = false;
-        if (containedEnvelopes.length > 0) {
-          referencesOtherGraphs = true;
-          node.containsEnvelopes = containedEnvelopes.map(uri => nodes[uri]);
-          //remember that these envelopes are now referenced
-          unreferencedEnvelopes = unreferencedEnvelopes.filter(
-            uri => !containedEnvelopes.includes(uri)
-          );
-        }
-        if (node && node.forwardedMessageUri) {
-          referencesOtherGraphs = true;
-        }
-        if (!referencesOtherGraphs) {
-          //remember that this envelope contains no envelopes (and points to no remote messages)
-          innermostEnvelopes.push(graphUri);
-        }
-        if (node.messageUri) {
-          //if we know the message uri, we can look for content in this envelope
-          let containedContent = this.__getContainedContentGraphUris(
-            graph,
-            node.messageUri
-          );
-          if (containedContent.length > 0) {
-            node.containedContent = containedContent.map(uri => nodes[uri]);
-            //remember the content graphs
-            containedContent.forEach(uri => contentGraphUris.push(uri));
-          }
-        }
-      }
-    });
-
-    // if we still have more than 1 unreferenced envelope, it must be because there is
-    // a forwarded message.
-    if (unreferencedEnvelopes.length > 1) {
-      // one more pass: we did not connect the message and the forwardedMessage so their
-      // respective local and remote messages could be connected. now we connect
-      // them and remove the forwarded message from the unreferenced list
-      this.graphs.forEach(graph => {
-        let graphUri = graph["@id"];
-        let node = nodes[graphUri];
-        if (node && node.forwardedMessageUri) {
-          node.forwardedMessage = nodes[node.forwardedMessageUri];
-          unreferencedEnvelopes = unreferencedEnvelopes.filter(
-            uri => uri != node.forwardedMessageUri
-          );
-        }
-      });
-    }
-
-    if (innermostEnvelopes.length == 0) {
-      this.parseErrors.push("no innermost envelope found");
-    }
-    if (innermostEnvelopes.length > 1) {
-      this.parseErrors.push("more than one innermost envelope found");
-    }
-    if (unreferencedEnvelopes.length == 0) {
-      this.parseErrors.push("no unreferenced (i.e. outermost) envelope found");
-    }
-    if (unreferencedEnvelopes.length > 1) {
-      this.parseErrors.push(
-        "more than one unreferenced (i.e. outermost) envelope found"
-      );
-    }
-    this.messageStructure = nodes[unreferencedEnvelopes[0]]; //set the pointer to the outermost envelope
-
-    if (!this.messageStructure) {
-      this.messageStructure = {};
-
-      const contentGraphs = this.graphs.filter(
-        graph =>
-          !(
-            graph["@type"].includes(vocab.WONMSG.EnvelopeGraph) ||
-            graph["@type"].includes(vocab.WONMSG.Signature)
-          )
-      );
-
-      if (contentGraphs.length == 1) {
-        this.messageStructure.messageUri = contentGraphs[0]["@id"];
-        this.messageStructure.messageDirection = contentGraphs[0]["@type"];
-        contentGraphUris.push(this.messageStructure.messageUri);
-      }
-    }
-
-    this.contentGraphUris = contentGraphUris;
-  },
-
-  __isEnvelopeGraph: graph => {
-    let graphUri = graph["@id"];
-    let graphData = graph["@graph"];
-    // graphType and check where removed, because otherwise the hints wont work properly
-    // let graphType = graph["@type"];
-    return (
-      // (graphType && graphType.includes(vocab.WONMSG.EnvelopeGraph) || //
-      graphData &&
-      graphData.some(
-        resource =>
-          resource["@id"] === graphUri &&
-          resource["@type"].includes(vocab.WONMSG.EnvelopeGraph)
-      )
-    );
-  },
-  __isSignatureGraph: graph => {
-    let graphUri = graph["@id"];
-    let graphData = graph["@graph"];
-    let graphType = graph["@type"];
-    return (
-      (graphType && graphType.includes(vocab.WONMSG.Signature)) ||
-      (graphData &&
-        graphData.some(
-          resource =>
-            resource["@id"] === graphUri &&
-            resource["@type"].includes(vocab.WONMSG.Signature)
-        ))
-    );
-  },
-  __getContainedEnvelopeUris: graph => {
-    let graphUri = graph["@id"];
-    let graphData = graph["@graph"];
-    let data = graphData
-      .filter(resource => resource["@id"] == graphUri)
-      .map(resource => resource[vocab.WONMSG.containsEnvelope])
-      .filter(x => x);
-    if (data.length > 0) {
-      return data[0].map(x => x["@id"]);
-    } else {
-      return [];
-    }
-  },
-  __getContainedContentGraphUris: (graph, messageUri) => {
-    let graphData = graph["@graph"];
-    const contentUrisArray = graphData
-      .filter(resource => resource["@id"] === messageUri)
-      .map(resource => resource[vocab.WONMSG.content])
-      .filter(x => x);
-    if (contentUrisArray && contentUrisArray.length > 0) {
-      return contentUrisArray[0].map(x => x["@id"] || x["@value"]);
-    } else {
-      return [];
-    }
-  },
-  __getMessageUriAndDirection: graph => {
-    let graphData = graph["@graph"];
-    let data = graphData
-      .filter(
-        resource =>
-          resource["@type"].includes(vocab.WONMSG.FromExternal) ||
-          resource["@type"].includes(vocab.WONMSG.FromOwner) ||
-          resource["@type"].includes(vocab.WONMSG.FromSystem)
-      )
-      .map(resource => ({
-        messageUri: resource["@id"],
-        messageDirection: resource["@type"][0], //@type is an array in expanded jsonld
-      }))
-      .filter(x => !!x); //if that property was not present, filter out undefineds
-    if (is("Array", data)) {
-      if (data.length == 0) {
-        return null;
-      }
-      return data[0];
-    }
-    return data;
-  },
-  __getMessageUriAndForwardedMessageUri: graph => {
-    let graphData = graph["@graph"];
-    let data = graphData
-      .filter(resource => resource[vocab.WONMSG.forwardedMessage])
-      .map(resource => ({
-        messageUri: resource["@id"],
-        forwardedMessageUri: resource[vocab.WONMSG.forwardedMessage][0]["@id"],
-      }))
-      .filter(x => !!x); //if that property was not present, filter out undefineds
-    if (is("Array", data)) {
-      if (data.length == 0) {
-        return null;
-      }
-      return data[0];
-    }
-    return data;
+    this.messageStructure = {};
+    this.messageStructure.messageUri = this.rawMessage["@id"];
+    this.messageStructure.messageDirection = this.rawMessage["@type"];
   },
 };
 

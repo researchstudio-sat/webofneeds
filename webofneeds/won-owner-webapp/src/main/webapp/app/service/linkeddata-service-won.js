@@ -243,7 +243,7 @@ import * as jsonldUtils from "./jsonld-utils";
           connectionUri
       );
     }
-    // console.time("Connection parseTime for: " + connectionUri);
+
     return getConnection(connectionUri)
       .then(connection =>
         ownerApi.getJsonLdDataset(connection.messageContainer, fetchParams)
@@ -283,7 +283,6 @@ import * as jsonldUtils from "./jsonld-utils";
                   "error: ",
                   error
                 );
-                // console.timeEnd("WonMsg parseTime for: " + msgUri);
                 return { msgUri: msgUri, wonMessage: undefined };
               })
           );

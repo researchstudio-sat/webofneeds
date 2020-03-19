@@ -611,7 +611,7 @@ export default function(processState = initialState, action = {}) {
  these messages accordingly
  */
 export function addMessageAtomsToLoad(processState, wonMessage) {
-  if (!wonMessage.isResponse() || wonMessage.getContentGraphs().length > 0) {
+  if (!wonMessage.isResponse()) {
     const senderAtomUri = generalSelectors.getAtomUriBySocketUri(
       wonMessage.getSenderSocket()
     );
