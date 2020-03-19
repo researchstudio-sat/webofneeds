@@ -459,16 +459,13 @@ won.newGraph = function(hashFragement) {
   };
 };
 
-won.wonMessageFromJsonLd = function(wonMessageAsJsonLD, msgUri) {
-  console.debug(
-    "wonMessageAsJsonLD: ",
-    wonMessageAsJsonLD,
-    " msgUri: ",
-    msgUri
-  );
+won.wonMessageFromJsonLd = function(rawMessageJsonLd, msgUri) {
   return jsonld
-    .frame(wonMessageAsJsonLD, { "@id": msgUri, "@embed": "@always" })
-    .then(expandedJsonLd => new WonMessage(expandedJsonLd))
+    .frame(rawMessageJsonLd, { "@id": msgUri, "@embed": "@always" })
+    .then(
+      framedMessageJsonLd =>
+        new WonMessage(framedMessageJsonLd, rawMessageJsonLd)
+    )
     .then(wonMessage => {
       return Promise.resolve()
         .then(
@@ -482,7 +479,7 @@ won.wonMessageFromJsonLd = function(wonMessageAsJsonLD, msgUri) {
         .catch(e => {
           console.error(
             "Error in wonMessageFromJsonLd: rawMessage: ",
-            wonMessageAsJsonLD,
+            rawMessageJsonLd,
             " wonMessage: ",
             wonMessage
           );
@@ -578,18 +575,20 @@ window.ttlToJsonLd4dbg = won.ttlToJsonLd;
 /**
  * Like the JSONLD-Helper, an object that wraps a won message and
  * offers convenience functions on it.
- * @param jsonLdContent
+ * @param framedMessageJsonLd
+ * @param rawMessageJsonLd
  * @constructor
  */
-function WonMessage(framedJsonLdMessage) {
+function WonMessage(framedMessageJsonLd, rawMessageJsonLd) {
   if (!(this instanceof WonMessage)) {
-    return new WonMessage(framedJsonLdMessage);
+    return new WonMessage(framedMessageJsonLd);
   }
-  this.framedMessage = framedJsonLdMessage;
+  this.framedMessage = framedMessageJsonLd;
+  this.rawMessage = rawMessageJsonLd;
 
-  this.rawMessage = framedJsonLdMessage; //FIXME: can probably be deleted at some point
-  console.debug("this.rawMessage: ", this.rawMessage);
-  this.__init();
+  this.messageStructure = {};
+  this.messageStructure.messageUri = this.framedMessage["@id"];
+  this.messageStructure.messageDirection = this.framedMessage["@type"];
 }
 
 WonMessage.prototype = {
@@ -850,33 +849,6 @@ WonMessage.prototype = {
   },
   isChangeNotificationMessage: function() {
     return this.getMessageType() === vocab.WONMSG.changeNotificationMessage;
-  },
-
-  __getMessageDirection: function(messageStructure) {
-    if (messageStructure.messageDirection) {
-      return messageStructure.messageDirection;
-    }
-    if (messageStructure.containedEnvelopes) {
-      let uris = messageStructure.containedEnvelopes.map(envelope =>
-        this.__getMessageDirection(envelope)
-      );
-      if (uris.length > 1) {
-        throw new Error(
-          "Found more than one contained envelope in message with message uris: " +
-            uris
-        );
-      }
-      if (uris.length == 0) {
-        throw new Error("Did not find any contained envelopes in message");
-      }
-      return uris[0];
-    }
-  },
-
-  __init: function() {
-    this.messageStructure = {};
-    this.messageStructure.messageUri = this.rawMessage["@id"];
-    this.messageStructure.messageDirection = this.rawMessage["@type"];
   },
 };
 
