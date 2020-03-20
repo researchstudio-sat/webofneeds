@@ -113,22 +113,37 @@ import * as jsonldUtils from "./jsonld-utils";
       .then(connectionContainerUri =>
         won.getJsonLdNode(connectionContainerUri, requesterWebId)
       )
-      .then(connectionContainer => {
-        const connections = jsonldUtils.getProperty(
-          connectionContainer,
-          vocab.RDFS.memberCompacted
-        );
-
-        if (!connections) {
-          return [];
-        } else if (is("Array", connections)) {
-          return Promise.all(
-            connections.map(connection => getConnection(connection["@id"]))
-          );
-        } else {
-          return Promise.all([getConnection(connections["@id"])]);
-        }
-      });
+      .then(
+        connectionContainer =>
+          connectionContainer && connectionContainer["@id"]
+            ? jsonld.frame(connectionContainer, {
+                "@id": connectionContainer["@id"],
+                "@embed": "@always",
+              })
+            : undefined
+      )
+      .then(
+        connectionContainerFramed =>
+          connectionContainerFramed
+            ? connectionContainerFramed[vocab.RDFS.member].map(
+                jsonLdConnection => ({
+                  uri: jsonLdConnection["@id"],
+                  type: jsonLdConnection["@type"],
+                  modified:
+                    jsonLdConnection["http://purl.org/dc/terms/modified"][
+                      "@value"
+                    ],
+                  socket: jsonLdConnection[vocab.WON.socket]["@id"],
+                  connectionState:
+                    jsonLdConnection[vocab.WON.connectionState]["@id"],
+                  sourceAtom: jsonLdConnection[vocab.WON.sourceAtom]["@id"],
+                  targetAtom: jsonLdConnection[vocab.WON.targetAtom]["@id"],
+                  targetSocket: jsonLdConnection[vocab.WON.targetSocket]["@id"],
+                  hasEvents: [],
+                })
+              )
+            : []
+      );
   };
 
   function getConnection(connectionUri, fetchParams) {
