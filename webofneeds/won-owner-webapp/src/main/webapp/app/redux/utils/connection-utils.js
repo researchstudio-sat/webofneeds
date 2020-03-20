@@ -43,6 +43,12 @@ export function hasSocketUris(connection, socketUri, targetSocketUri) {
   );
 }
 
+export function hasSocketUri(connection, socketUri) {
+  return (
+    !!connection && !!socketUri && get(connection, "socketUri") === socketUri
+  );
+}
+
 /**
  * Creates a label of the participants and suggestions/requests/invites of a given set of groupChatConnections
  * @param groupChatConnections

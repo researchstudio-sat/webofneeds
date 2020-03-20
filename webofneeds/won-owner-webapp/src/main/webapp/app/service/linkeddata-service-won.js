@@ -124,7 +124,8 @@ import * as jsonldUtils from "./jsonld-utils";
       )
       .then(
         connectionContainerFramed =>
-          connectionContainerFramed
+          connectionContainerFramed &&
+          is("Array", connectionContainerFramed[vocab.RDFS.member])
             ? connectionContainerFramed[vocab.RDFS.member].map(
                 jsonLdConnection => ({
                   uri: jsonLdConnection["@id"],

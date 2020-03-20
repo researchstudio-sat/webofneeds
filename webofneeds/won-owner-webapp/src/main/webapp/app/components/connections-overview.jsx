@@ -3,7 +3,6 @@ import Immutable from "immutable";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
-import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import { get, getIn, sortByDate } from "../utils.js";
 import * as processUtils from "../redux/utils/process-utils";
 import * as atomUtils from "../redux/utils/atom-utils.js";
@@ -173,13 +172,21 @@ class WonConnectionsOverview extends React.Component {
     if (!atom) {
       return undefined;
     }
+
+    const chatSocketUri = atomUtils.getChatSocket(atom);
+    const groupSocketUri = atomUtils.getGroupSocket(atom);
+
     const sortedConnections = sortByDate(
       atom.get("connections").filter(conn => {
         if (
-          !connectionSelectors.isChatToXConnection(allAtoms, conn) &&
-          !connectionSelectors.isGroupToXConnection(allAtoms, conn)
+          !connectionUtils.hasSocketUri(conn, chatSocketUri) &&
+          !connectionUtils.hasSocketUri(conn, groupSocketUri)
         )
           return false;
+
+        if (connectionUtils.isClosed(conn) || connectionUtils.isSuggested(conn))
+          return false;
+
         if (processUtils.isConnectionLoading(process, conn.get("uri")))
           return true; //if connection is currently loading we assume its a connection we want to show
 
@@ -194,11 +201,7 @@ class WonConnectionsOverview extends React.Component {
           process.getIn(["atoms", targetAtomUri, "failedToLoad"]) ||
           atomUtils.isActive(get(allAtoms, targetAtomUri));
 
-        return (
-          targetAtomActiveOrLoading &&
-          !connectionUtils.isClosed(conn) &&
-          !connectionUtils.isSuggested(conn)
-        );
+        return targetAtomActiveOrLoading;
       }),
       "creationDate"
     );

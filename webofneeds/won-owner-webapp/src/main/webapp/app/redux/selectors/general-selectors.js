@@ -18,9 +18,15 @@ export const getRouterParams = state =>
 
 export const getAtoms = state => get(state, "atoms");
 export const getOwnedAtoms = state => {
-  const accountState = get(state, "account");
-  return getAtoms(state).filter(atom =>
-    accountUtils.isAtomOwned(accountState, get(atom, "uri"))
+  const ownedAtomUris = getIn(state, ["account", "ownedAtomUris"]);
+
+  const allAtoms = ownedAtomUris && getAtoms(state);
+  return (
+    ownedAtomUris &&
+    ownedAtomUris
+      .toMap()
+      .map(atomUri => get(allAtoms, atomUri))
+      .filter(atom => !!atom)
   );
 };
 
@@ -67,18 +73,20 @@ export function getChatAtoms(state) {
     allOwnedAtoms
       .filter(atom => atomUtils.isActive(atom))
       .filter(atom => atomUtils.hasChatSocket(atom))
-      .filter(
-        atom =>
+      .filter(atom => {
+        const chatSocketUri = atomUtils.getChatSocket(atom);
+        return (
           !!get(atom, "connections") &&
           !!get(atom, "connections").find(
             conn =>
+              connectionUtils.hasSocketUri(conn, chatSocketUri) &&
               !(
                 connectionUtils.isClosed(conn) ||
                 connectionUtils.isSuggested(conn)
-              ) &&
-              connectionSelectors.isChatToXConnection(get(state, "atoms"), conn)
+              )
           )
-      )
+        );
+      })
   );
 }
 
@@ -195,8 +203,12 @@ export const selectIsConnected = state =>
  * @param connectionUri to find corresponding atom for
  */
 export function getOwnedAtomByConnectionUri(state, connectionUri) {
-  let atoms = getOwnedAtoms(state); //we only check own atoms as these are the only ones who have connections stored
-  return atoms.find(atom => atom.getIn(["connections", connectionUri]));
+  const atoms = connectionUri && getOwnedAtoms(state); //we only check own atoms as these are the only ones who have connections stored
+  return (
+    atoms &&
+    (getIn(atoms, connectionUri.split("/c")[0]) ||
+      atoms.find(atom => atom.getIn(["connections", connectionUri])))
+  );
 }
 
 export const getCurrentParamsFromRoute = createSelector(
