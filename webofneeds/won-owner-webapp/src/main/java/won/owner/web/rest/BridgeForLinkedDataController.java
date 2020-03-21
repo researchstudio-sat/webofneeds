@@ -177,24 +177,22 @@ public class BridgeForLinkedDataController implements InitializingBean {
             response.setStatus(originalResponse.getRawStatusCode());
         } else {
             if (RDFMediaType.isRDFMediaType(originalResponseMediaType)
-                            || originalResponseMediaType.equals(MediaType.TEXT_HTML)) {
+                            || originalResponseMediaType.isCompatibleWith(MediaType.TEXT_HTML)) {
                 copyLinkedDataResponseRelevantHeaders(originalResponse.getHeaders(), response);
                 response.setStatus(originalResponse.getRawStatusCode());
                 // create response body
                 copyResponseBody(originalResponse, response);
                 // close response output stream
             } else {
-                // the content type is not an RDF media type. We don't like to handle such
-                // requests. indicate this with
-                // the BAD GATEWAY response status
-                copyResponseBody(originalResponse, response);
+                // the content type is not an RDF media type and not text/html, which we need
+                // for the human-readable view of linked data resources. We don't like to handle
+                // such requests. Indicate this with the BAD GATEWAY response status and explain
+                // in the response body.
                 response.setStatus(HttpStatus.SC_BAD_GATEWAY);
-                /*
-                 * response.getOutputStream().print("The nodes' response was of type " +
-                 * originalResponseMediaType +
-                 * ". For security reasons the owner-server only forwards responses of the following types "
-                 * + RDFMediaType.rdfMediaTypes.toString());
-                 */
+                response.getOutputStream().print("The target server's response was of type " +
+                                originalResponseMediaType +
+                                ". We only forward responses of the following types "
+                                + RDFMediaType.rdfMediaTypes.toString() + " and " + MediaType.TEXT_HTML_VALUE);
             }
         }
         response.getOutputStream().flush();
