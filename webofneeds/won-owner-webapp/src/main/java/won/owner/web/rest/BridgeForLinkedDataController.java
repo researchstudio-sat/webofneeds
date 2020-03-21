@@ -8,6 +8,8 @@ import java.net.URISyntaxException;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -141,7 +143,12 @@ public class BridgeForLinkedDataController implements InitializingBean {
         restTemplate.execute(resourceUri, HttpMethod.valueOf(request.getMethod()), new RequestCallback() {
             @Override
             public void doWithRequest(final ClientHttpRequest request) throws IOException {
-                request.getHeaders().setAll(requestHeaders.toSingleValueMap());
+                HttpHeaders newHeaders = request.getHeaders();
+                for (Map.Entry<String, List<String>> header : requestHeaders.entrySet()) {
+                    for (String headerValue : header.getValue()) {
+                        newHeaders.add(header.getKey(), headerValue);
+                    }
+                }
             }
         }, new ResponseExtractor<Object>() {
             @Override
@@ -169,7 +176,8 @@ public class BridgeForLinkedDataController implements InitializingBean {
             copyLinkedDataResponseRelevantHeaders(originalResponse.getHeaders(), response);
             response.setStatus(originalResponse.getRawStatusCode());
         } else {
-            if (RDFMediaType.isRDFMediaType(originalResponseMediaType)) {
+            if (RDFMediaType.isRDFMediaType(originalResponseMediaType)
+                            || originalResponseMediaType.equals(MediaType.TEXT_HTML)) {
                 copyLinkedDataResponseRelevantHeaders(originalResponse.getHeaders(), response);
                 response.setStatus(originalResponse.getRawStatusCode());
                 // create response body
@@ -240,14 +248,21 @@ public class BridgeForLinkedDataController implements InitializingBean {
      */
     private void copyLinkedDataResponseRelevantHeaders(final HttpHeaders fromHeaders,
                     final HttpServletResponse toResponse) {
-        for (String headerName : fromHeaders.keySet()) {
-            for (String headerValue : fromHeaders.get(headerName)) {
-                if ((headerName != "Transfer-Encoding")
-                                || (headerValue != "chunked") && !toResponse.containsHeader(headerName)) {
-                    // we allow all transfer codings except chunked, because we don't do chunking
-                    // here!
-                    toResponse.setHeader(headerName, headerValue);
+        Set<String> preexistingHeaders = new HashSet<String>(toResponse.getHeaderNames());
+        for (Map.Entry<String, List<String>> header : fromHeaders.entrySet()) {
+            for (String headerValue : header.getValue()) {
+                String headerName = header.getKey();
+                if (headerName.equals("Transfer-Encoding") &&
+                                headerValue.equals("chunked")) {
+                    // we allow all transfer codings except chunked, because we
+                    // don't do chunking here!
+                    continue;
                 }
+                if (preexistingHeaders.contains(headerName)) {
+                    // existing headers are not mixed with the ones from the response
+                    continue;
+                }
+                toResponse.addHeader(headerName, headerValue);
             }
         }
     }

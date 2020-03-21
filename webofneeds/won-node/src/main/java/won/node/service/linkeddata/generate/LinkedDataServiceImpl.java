@@ -814,7 +814,8 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
         }
         Dataset dataset = newDatasetWithNamedModel(createDataGraphUriFromResource(atomListPageResource), model);
         addBaseUriAndDefaultPrefixes(dataset);
-        return new AtomInformationService.PagedResource(dataset, resumeBefore, resumeAfter);
+        return new AtomInformationService.PagedResource(dataset, slice.hasPrevious() ? resumeBefore : null,
+                        slice.hasNext() ? resumeAfter : null);
     }
 
     private AtomInformationService.PagedResource<Dataset, Connection> toConnectionsContainerPage(String containerUri,
@@ -837,7 +838,8 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
         }
         Dataset dataset = makeConnectionContainer(containerUri, connections);
         addBaseUriAndDefaultPrefixes(dataset);
-        return new AtomInformationService.PagedResource(dataset, resumeBefore, resumeAfter);
+        return new AtomInformationService.PagedResource(dataset, slice.hasPrevious() ? resumeBefore : null,
+                        slice.hasNext() ? resumeAfter : null);
     }
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
@@ -895,7 +897,8 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
         Dataset dataset = aggregator.aggregate();
         dataset.addNamedModel(createDataGraphUriFromResource(atomListPageResource), model);
         addBaseUriAndDefaultPrefixes(dataset);
-        return new AtomInformationService.PagedResource(dataset, resumeBefore, resumeAfter);
+        return new AtomInformationService.PagedResource(dataset, slice.hasPrevious() ? resumeBefore : null,
+                        slice.hasNext() ? resumeAfter : null);
     }
 
     private void addDeepConnectionData(Dataset dataset, List<URI> connectionURIs) {
