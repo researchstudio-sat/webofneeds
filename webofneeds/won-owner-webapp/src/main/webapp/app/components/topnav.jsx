@@ -218,7 +218,7 @@ class WonTopnav extends React.Component {
         const messages = get(conn, "messages");
         const messageCount = messages ? messages.size : 0;
 
-        if (messageCount == 0) {
+        if (messageCount === 0) {
           this.props.showLatestMessages(get(conn, "uri"), MESSAGECOUNT);
         } /* else {
           // WORKAROUND FOR SLOW LOAD: Remove loading of more Messages until a read one appears will be excluded

@@ -134,10 +134,13 @@ export function getChatConnectionsToCrawl(state) {
   const chatConnections =
     allConnections &&
     allConnections
+      .filter(conn => connectionUtils.isConnected(conn))
       .filter(
-        conn =>
-          isChatToXConnection(allAtoms, conn) ||
-          isGroupToXConnection(allAtoms, conn)
+        conn => !conn.get("messages") || conn.get("messages").size === 0
+        // the check below (if connectMessage was present) was replaced by if any messages are available (if any are there this connection is not to be fetched anymore)
+        // !!conn
+        //   .get("messages")
+        //   .find(msg => msg.get("messageType") === vocab.WONMSG.connectMessage)
       )
       .filter(conn => {
         const connUri = get(conn, "uri");
@@ -148,24 +151,14 @@ export function getChatConnectionsToCrawl(state) {
           !processUtils.hasConnectionFailedToLoad(process, connUri) &&
           processUtils.hasMessagesToLoad(process, connUri)
         );
-      });
+      })
+      .filter(
+        conn =>
+          isChatToXConnection(allAtoms, conn) ||
+          isGroupToXConnection(allAtoms, conn)
+      );
 
-  const connectionsInStateConnected =
-    chatConnections &&
-    chatConnections.filter(conn => connectionUtils.isConnected(conn));
-
-  const connectionsWithoutConnectMessage =
-    connectionsInStateConnected &&
-    connectionsInStateConnected.filter(
-      conn =>
-        !conn.get("messages") ||
-        conn
-          .get("messages")
-          .filter(msg => msg.get("messageType") === vocab.WONMSG.connectMessage)
-          .size == 0
-    );
-
-  return connectionsWithoutConnectMessage || Immutable.Map();
+  return chatConnections || Immutable.Map();
 }
 
 export function getConnectionsToInjectMsgInto(atoms, targetSocketUri, msgUri) {
@@ -330,29 +323,27 @@ export function isGroupToGroupConnection(allAtoms, connection) {
 }
 
 /**
- * Returns true if socket is GroupSocket and targetSocket is either GroupSocket or ChatSocket
+ * Returns true if socket is GroupSocket and targetSocket is any socket
  * @param allAtoms
  * @param connection
  * @returns {boolean}
  */
 export function isGroupToXConnection(allAtoms, connection) {
-  return (
-    isGroupToChatConnection(allAtoms, connection) ||
-    isGroupToGroupConnection(allAtoms, connection)
-  );
+  const { senderSocketType } = getSocketTypes(allAtoms, connection);
+
+  return senderSocketType === vocab.GROUP.GroupSocketCompacted;
 }
 
 /**
- * Returns true if socket is ChatSocket and targetSocket is either GroupSocket or ChatSocket
+ * Returns true if socket is ChatSocket and targetSocket is any socket
  * @param allAtoms
  * @param connection
  * @returns {boolean}
  */
 export function isChatToXConnection(allAtoms, connection) {
-  return (
-    isChatToChatConnection(allAtoms, connection) ||
-    isChatToGroupConnection(allAtoms, connection)
-  );
+  const { senderSocketType } = getSocketTypes(allAtoms, connection);
+
+  return senderSocketType === vocab.CHAT.ChatSocketCompacted;
 }
 
 /**
