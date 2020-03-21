@@ -1264,33 +1264,37 @@ public class LinkedDataWebController implements InitializingBean {
     private void addPagedResourceInSequenceHeader(final HttpHeaders headers, final URI canonicalURI,
                     final AtomInformationService.PagedResource<Dataset, URI> resource, final int page,
                     String queryPart) {
-        headers.add("Link",
+        headers.add(HttpHeaders.LINK,
                         "<http://www.w3.org/ns/ldp#Resource>; rel=\"type\", <http://www.w3.org/ns/ldp#Page>; rel=\"type\"");
         // Link: <http://example.org/customer-relations?p=2>; rel="next"
         if (resource.hasNext()) {
             int nextPage = page + 1;
-            headers.add("Link", "<" + canonicalURI.toString() + "?p=" + nextPage + queryPart + ">; rel=\"next\"");
+            headers.add(HttpHeaders.LINK,
+                            "<" + canonicalURI.toString() + "?p=" + nextPage + queryPart + ">; rel=\"next\"");
         }
         if (resource.hasPrevious() && page > 1) {
             int prevPage = page - 1;
-            headers.add("Link", "<" + canonicalURI.toString() + "?p=" + prevPage + queryPart + ">; rel=\"prev\"");
+            headers.add(HttpHeaders.LINK,
+                            "<" + canonicalURI.toString() + "?p=" + prevPage + queryPart + ">; rel=\"prev\"");
         }
-        headers.add("Link", "<" + canonicalURI.toString() + ">; rel=\"canonical\"");
+        headers.add(HttpHeaders.LINK, "<" + canonicalURI.toString() + ">; rel=\"canonical\"");
     }
 
     private void addPagedResourceInSequenceHeader(final HttpHeaders headers, final URI canonicalURI,
                     final AtomInformationService.PagedResource<Dataset, URI> resource, String queryPart) {
-        headers.add("Link",
+        headers.add(HttpHeaders.LINK,
                         "<http://www.w3.org/ns/ldp#Resource>; rel=\"type\", <http://www.w3.org/ns/ldp#Page>; rel=\"type\"");
         if (resource.hasNext()) {
             String id = resource.getResumeAfter().toString();
-            headers.add("Link", "<" + canonicalURI.toString() + "?resumeafter=" + id + queryPart + ">; rel=\"next\"");
+            headers.add(HttpHeaders.LINK,
+                            "<" + canonicalURI.toString() + "?resumeafter=" + id + queryPart + ">; rel=\"next\"");
         }
         if (resource.hasPrevious()) {
             String id = resource.getResumeBefore().toString();
-            headers.add("Link", "<" + canonicalURI.toString() + "?resumebefore=" + id + queryPart + ">; rel=\"prev\"");
+            headers.add(HttpHeaders.LINK,
+                            "<" + canonicalURI.toString() + "?resumebefore=" + id + queryPart + ">; rel=\"prev\"");
         }
-        headers.add("Link", "<" + canonicalURI.toString() + ">; rel=\"canonical\"");
+        headers.add(HttpHeaders.LINK, "<" + canonicalURI.toString() + ">; rel=\"canonical\"");
     }
 
     /**
@@ -1314,33 +1318,37 @@ public class LinkedDataWebController implements InitializingBean {
     private void addPagedConnectionResourceInSequenceHeader(final HttpHeaders headers, final URI canonicalURI,
                     final AtomInformationService.PagedResource<Dataset, Connection> resource, final int page,
                     String queryPart) {
-        headers.add("Link",
+        headers.add(HttpHeaders.LINK,
                         "<http://www.w3.org/ns/ldp#Resource>; rel=\"type\", <http://www.w3.org/ns/ldp#Page>; rel=\"type\"");
         // Link: <http://example.org/customer-relations?p=2>; rel="next"
         if (resource.hasNext()) {
             int nextPage = page + 1;
-            headers.add("Link", "<" + canonicalURI.toString() + "?p=" + nextPage + queryPart + ">; rel=\"next\"");
+            headers.add(HttpHeaders.LINK,
+                            "<" + canonicalURI.toString() + "?p=" + nextPage + queryPart + ">; rel=\"next\"");
         }
         if (resource.hasPrevious() && page > 1) {
             int prevPage = page - 1;
-            headers.add("Link", "<" + canonicalURI.toString() + "?p=" + prevPage + queryPart + ">; rel=\"prev\"");
+            headers.add(HttpHeaders.LINK,
+                            "<" + canonicalURI.toString() + "?p=" + prevPage + queryPart + ">; rel=\"prev\"");
         }
-        headers.add("Link", "<" + canonicalURI.toString() + ">; rel=\"canonical\"");
+        headers.add(HttpHeaders.LINK, "<" + canonicalURI.toString() + ">; rel=\"canonical\"");
     }
 
     private void addPagedConnectionResourceInSequenceHeader(final HttpHeaders headers, final URI canonicalURI,
                     final AtomInformationService.PagedResource<Dataset, Connection> resource, String queryPart) {
-        headers.add("Link",
+        headers.add(HttpHeaders.LINK,
                         "<http://www.w3.org/ns/ldp#Resource>; rel=\"type\", <http://www.w3.org/ns/ldp#Page>; rel=\"type\"");
         if (resource.hasNext()) {
             String id = resource.getResumeAfter().getConnectionURI().toString();
-            headers.add("Link", "<" + canonicalURI.toString() + "?resumeafter=" + id + queryPart + ">; rel=\"next\"");
+            headers.add(HttpHeaders.LINK,
+                            "<" + canonicalURI.toString() + "?resumeafter=" + id + queryPart + ">; rel=\"next\"");
         }
         if (resource.hasPrevious()) {
             String id = resource.getResumeBefore().getConnectionURI().toString();
-            headers.add("Link", "<" + canonicalURI.toString() + "?resumebefore=" + id + queryPart + ">; rel=\"prev\"");
+            headers.add(HttpHeaders.LINK,
+                            "<" + canonicalURI.toString() + "?resumebefore=" + id + queryPart + ">; rel=\"prev\"");
         }
-        headers.add("Link", "<" + canonicalURI.toString() + ">; rel=\"canonical\"");
+        headers.add(HttpHeaders.LINK, "<" + canonicalURI.toString() + ">; rel=\"canonical\"");
     }
 
     private String getPassableQueryMap(String... nameValue) {
