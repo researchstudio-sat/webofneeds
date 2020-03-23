@@ -16,59 +16,77 @@ export const selectLastUpdateTime = state => state.get("lastUpdateTime");
 export const getRouterParams = state =>
   getIn(state, ["router", "currentParams"]);
 
-export const getAtoms = state => get(state, "atoms");
-export const getOwnedAtoms = state => {
-  const ownedAtomUris = getIn(state, ["account", "ownedAtomUris"]);
+export const getAccountState = state => get(state, "account");
 
-  const allAtoms = ownedAtomUris && getAtoms(state);
-  return (
+export const getAtoms = createSelector(
+  state => state,
+  state => get(state, "atoms")
+);
+
+export const getOwnedAtomUris = createSelector(getAccountState, account =>
+  get(account, "ownedAtomUris")
+);
+
+export const getOwnedAtoms = createSelector(
+  getOwnedAtomUris,
+  getAtoms,
+  (ownedAtomUris, allAtoms) =>
     ownedAtomUris &&
     ownedAtomUris
       .toMap()
       .map(atomUri => get(allAtoms, atomUri))
       .filter(atom => !!atom)
-  );
-};
+);
 
-export const getWhatsNewAtoms = state => {
-  return getAtoms(state).filter(
-    (atom, atomUri) => !!getIn(state, ["owner", "whatsNewUris", atomUri])
-  );
-};
+export const getWhatsNewUris = state => getIn(state, ["owner", "whatsNewUris"]);
+export const getWhatsAroundUris = state =>
+  getIn(state, ["owner", "whatsAroundUris"]);
 
-export const getWhatsAroundAtoms = state => {
-  return getAtoms(state).filter(
-    (atom, atomUri) => !!getIn(state, ["owner", "whatsAroundUris", atomUri])
-  );
-};
+export const getWhatsNewAtoms = createSelector(
+  getWhatsNewUris,
+  getAtoms,
+  (whatsNewAtomUris, allAtoms) =>
+    whatsNewAtomUris &&
+    whatsNewAtomUris
+      .toMap()
+      .map(atomUri => get(allAtoms, atomUri))
+      .filter(atom => !!atom)
+);
 
-export function getPosts(state) {
-  const atoms = getAtoms(state);
-  return atoms.filter(atom => {
+export const getWhatsAroundAtoms = createSelector(
+  getWhatsAroundUris,
+  getAtoms,
+  (whatsAroundAtomUris, allAtoms) =>
+    whatsAroundAtomUris &&
+    whatsAroundAtomUris
+      .toMap()
+      .map(atomUri => get(allAtoms, atomUri))
+      .filter(atom => !!atom)
+);
+
+export const getPosts = createSelector(getAtoms, atoms =>
+  atoms.filter(atom => {
     if (!atom.getIn(["content", "type"])) return true;
 
     return atomUtils.isAtom(atom) && !atomUtils.isPersona(atom);
-  });
-}
+  })
+);
 
-export const getOwnedPosts = state => {
-  const accountState = get(state, "account");
-  return getPosts(state).filter(atom =>
-    accountUtils.isAtomOwned(accountState, get(atom, "uri"))
-  );
-};
+export const getOwnedPosts = createSelector(
+  getOwnedAtoms,
+  ownedAtoms =>
+    ownedAtoms &&
+    ownedAtoms
+      .filter(ownedAtom => !getIn(ownedAtom, ["content", "type"]))
+      .filter(
+        ownedAtom =>
+          atomUtils.isAtom(ownedAtom) && !atomUtils.isPersona(ownedAtom)
+      )
+);
 
-/**
- * Gets all Atoms that...
- *  - are Active
- *  - have the ChatSocket
- *  - have at least one non-closed non-suggested ChatSocket connection
- * @param state
- */
-export function getChatAtoms(state) {
-  const allOwnedAtoms = getOwnedAtoms(state);
-
-  return (
+export const getChatAtoms = createSelector(
+  getOwnedAtoms,
+  allOwnedAtoms =>
     allOwnedAtoms &&
     allOwnedAtoms
       .filter(atom => atomUtils.isActive(atom))
@@ -87,13 +105,12 @@ export function getChatAtoms(state) {
           )
         );
       })
-  );
-}
+);
 
-export function hasChatAtoms(state) {
-  const chatAtoms = getChatAtoms(state);
-  return chatAtoms && chatAtoms.size > 0;
-}
+export const hasChatAtoms = createSelector(
+  getChatAtoms,
+  chatAtoms => chatAtoms && chatAtoms.size > 0
+);
 
 /**
  * Determines if there are any connections that are unread and suggested
@@ -101,16 +118,14 @@ export function hasChatAtoms(state) {
  * @param state
  * @returns {boolean}
  */
-export function hasUnreadSuggestedConnections(state) {
-  const allOwnedAtoms = getOwnedAtoms(state);
-
-  return (
-    allOwnedAtoms &&
-    !!allOwnedAtoms
+export const hasUnreadSuggestedConnections = createSelector(
+  getOwnedAtoms,
+  ownedAtoms =>
+    ownedAtoms &&
+    !!ownedAtoms
       .filter(atom => atomUtils.isActive(atom))
       .find(atom => atomUtils.hasUnreadSuggestedConnections(atom))
-  );
-}
+);
 
 export function hasUnreadSuggestedConnectionsInHeldAtoms(state, atomUri) {
   const allAtoms = getAtoms(state);
@@ -156,42 +171,37 @@ export function hasUnreadBuddyConnections(
   );
 }
 
-export function hasUnreadChatConnections(state) {
-  const chatAtoms = getChatAtoms(state);
-
-  return (
+export const hasUnreadChatConnections = createSelector(
+  getChatAtoms,
+  chatAtoms =>
     chatAtoms &&
-    !!chatAtoms.find(
-      atom =>
-        !!get(atom, "connections") &&
-        !!get(atom, "connections").find(
+    !!chatAtoms.find(atom => {
+      const connections = get(atom, "connections");
+      return (
+        !!connections &&
+        !!connections.find(
           conn =>
             !(
               connectionUtils.isClosed(conn) ||
               connectionUtils.isSuggested(conn)
             ) &&
-            connectionSelectors.isChatToXConnection(
-              get(state, "atoms"),
-              conn
-            ) &&
-            connectionUtils.isUnread(conn)
+            connectionUtils.isUnread(conn) &&
+            connectionSelectors.isChatToXConnection(chatAtoms, conn)
         )
-    )
-  );
-}
+      );
+    })
+);
 
-export function getActiveAtoms(state) {
-  const allAtoms = getAtoms(state);
-  return allAtoms && allAtoms.filter(atom => atomUtils.isActive(atom));
-}
+export const getActiveAtoms = createSelector(
+  getAtoms,
+  allAtoms => allAtoms && allAtoms.filter(atom => atomUtils.isActive(atom))
+);
 
-export function getOwnedAtomsInCreation(state) {
-  const allOwnedAtoms = getOwnedAtoms(state);
-  // atoms that have been created but are not confirmed by the server yet
-  return (
-    allOwnedAtoms && allOwnedAtoms.filter(post => post.get("isBeingCreated"))
-  );
-}
+export const getOwnedAtomsInCreation = createSelector(
+  getOwnedAtoms,
+  ownedAtoms =>
+    ownedAtoms && ownedAtoms.filter(atom => get(atom, "isBeingCreated"))
+);
 
 export const selectIsConnected = state =>
   !state.getIn(["messages", "reconnecting"]) &&
@@ -344,15 +354,17 @@ export const getAboutSectionFromRoute = createSelector(
   }
 );
 
-export function getOwnedPersonas(state) {
-  const atoms = getOwnedAtoms(state);
-  return atoms && atoms.filter(atom => atomUtils.isPersona(atom));
-}
+export const getOwnedPersonas = createSelector(
+  getOwnedAtoms,
+  ownedAtoms =>
+    ownedAtoms && ownedAtoms.filter(atom => atomUtils.isPersona(atom))
+);
 
-export function getOwnedAtomsWithBuddySocket(state) {
-  const atoms = getOwnedAtoms(state);
-  return atoms && atoms.filter(atom => atomUtils.hasBuddySocket(atom));
-}
+export const getOwnedAtomsWithBuddySocket = createSelector(
+  getOwnedAtoms,
+  ownedAtoms =>
+    ownedAtoms && ownedAtoms.filter(atom => atomUtils.hasBuddySocket(atom))
+);
 
 /**
  * Returns all owned Personas as a List, condenses the information of the persona so that only some attributes are included.
@@ -360,25 +372,26 @@ export function getOwnedAtomsWithBuddySocket(state) {
  * @param state
  * @returns {Iterable<K, {website: *, saved: boolean, displayName: *, url: *, aboutMe: *, timestamp: string | * | number | void}>}
  */
-export function getOwnedCondensedPersonaList(state, includeArchived = false) {
-  const atoms = getOwnedAtoms(state);
-  const personas = atoms
-    .toList()
-    .filter(atom => atomUtils.isPersona(atom))
-    .filter(atom => includeArchived || atomUtils.isActive(atom));
-  return personas
-    .map(persona => {
-      return {
-        displayName: getIn(persona, ["content", "personaName"]),
-        website: getIn(persona, ["content", "website"]),
-        aboutMe: getIn(persona, ["content", "description"]),
-        url: get(persona, "uri"),
-        saved: !get(persona, "isBeingCreated"),
-        timestamp: get(persona, "creationDate").toISOString(),
-      };
-    })
-    .filter(persona => !!persona.displayName);
-}
+export const getOwnedCondensedPersonaList = createSelector(
+  getOwnedPersonas,
+  ownedPersonas => {
+    return (
+      ownedPersonas &&
+      ownedPersonas
+        .filter(persona => atomUtils.isActive(persona))
+        .map(persona => ({
+          displayName: getIn(persona, ["content", "personaName"]),
+          website: getIn(persona, ["content", "website"]),
+          aboutMe: getIn(persona, ["content", "description"]),
+          url: get(persona, "uri"),
+          saved: !get(persona, "isBeingCreated"),
+          timestamp: get(persona, "creationDate").toISOString(),
+        }))
+        .filter(persona => !!persona.displayName)
+        .toList()
+    );
+  }
+);
 
 //TODO: move this method to a place that makes more sense, its not really a selector function
 export function currentSkin() {
@@ -401,7 +414,7 @@ export function currentSkin() {
  */
 export function isAtomOwned(state, atomUri) {
   if (atomUri) {
-    const accountState = get(state, "account");
+    const accountState = getAccountState(state);
     return accountUtils.isAtomOwned(accountState, atomUri);
   }
   return false;
@@ -435,15 +448,15 @@ export function isAtomEditable(state, atomUri) {
   );
 }
 
-export function isLocationAccessDenied(state) {
-  const viewState = get(state, "view");
-  return viewState && viewUtils.isLocationAccessDenied(viewState);
-}
+export const isLocationAccessDenied = createSelector(
+  state => get(state, "view"),
+  viewState => viewState && viewUtils.isLocationAccessDenied(viewState)
+);
 
-export function getCurrentLocation(state) {
-  const viewState = get(state, "view");
-  return viewState && viewUtils.getCurrentLocation(viewState);
-}
+export const getCurrentLocation = createSelector(
+  state => get(state, "view"),
+  viewState => viewState && viewUtils.getCurrentLocation(viewState)
+);
 
 export function getAtomUriBySocketUri(socketUri) {
   return socketUri && socketUri.split("#")[0];

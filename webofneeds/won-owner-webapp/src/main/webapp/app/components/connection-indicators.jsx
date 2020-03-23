@@ -9,17 +9,19 @@ import React from "react";
 import { connect } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
-import { get, getIn, sortByDate } from "../utils.js";
+import * as processSelectors from "../redux/selectors/process-selectors.js";
+import { get, sortByDate } from "../utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 
 import "~/style/_connection-indicators.scss";
 import PropTypes from "prop-types";
+import vocab from "../service/vocab";
 
 const mapStateToProps = (state, ownProps) => {
-  const ownedPosts = generalSelectors.getOwnedPosts(state);
-  const allPosts = generalSelectors.getPosts(state);
-  const ownedPost = ownedPosts && ownedPosts.get(ownProps.atomUri);
+  const ownedAtoms = generalSelectors.getOwnedAtoms(state);
+  const allAtoms = generalSelectors.getAtoms(state);
+  const ownedAtom = get(ownedAtoms, ownProps.atomUri);
   const chatConnectionsByAtomUri =
     ownProps.atomUri &&
     connectionSelectors.getChatConnectionsByAtomUri(state, ownProps.atomUri);
@@ -27,19 +29,32 @@ const mapStateToProps = (state, ownProps) => {
   const connected =
     chatConnectionsByAtomUri &&
     chatConnectionsByAtomUri.filter(conn => {
-      const targetAtomUri = conn.get("targetAtomUri");
-      const targetAtomActiveOrLoading =
-        targetAtomUri &&
-        allPosts &&
-        allPosts.get(targetAtomUri) &&
-        (getIn(state, ["process", "atoms", targetAtomUri, "loading"]) ||
-          atomUtils.isActive(get(allPosts, targetAtomUri)));
+      const senderSocketUri = get(conn, "socketUri");
+      const senderSocketType = atomUtils.getSocketType(
+        ownedAtom,
+        senderSocketUri
+      );
+
+      if (
+        !(
+          senderSocketType === vocab.CHAT.ChatSocketCompacted ||
+          senderSocketType === vocab.GROUP.GroupSocketCompacted
+        )
+      ) {
+        return false;
+      }
+
+      if (connectionUtils.isSuggested(conn) || connectionUtils.isClosed(conn)) {
+        return false;
+      }
+
+      const targetAtomUri = get(conn, "targetAtomUri");
+      const targetAtom = get(allAtoms, targetAtomUri);
 
       return (
-        targetAtomActiveOrLoading &&
-        (connectionSelectors.isChatToXConnection(allPosts, conn) ||
-          connectionSelectors.isGroupToXConnection(allPosts, conn)) &&
-        !(connectionUtils.isSuggested(conn) || connectionUtils.isClosed(conn))
+        targetAtom &&
+        (atomUtils.isActive(targetAtom) ||
+          processSelectors.isAtomLoading(state, targetAtomUri))
       );
     });
 
@@ -53,7 +68,7 @@ const mapStateToProps = (state, ownProps) => {
    */
   const retrieveLatestUri = elements => {
     const unreadElements =
-      elements && elements.filter(conn => conn.get("unread"));
+      elements && elements.filter(conn => get(conn, "unread"));
 
     const sortedUnreadElements = sortByDate(unreadElements);
     const unreadUri =
@@ -74,10 +89,8 @@ const mapStateToProps = (state, ownProps) => {
   return {
     atomUri: ownProps.atomUri,
     onClick: ownProps.onClick,
-    ownedPost,
     postLoading:
-      !ownedPost ||
-      getIn(state, ["process", "atoms", ownedPost.get("uri"), "loading"]),
+      !ownedAtom || processSelectors.isAtomLoading(state, ownProps.atomUri),
     unreadConnected,
     latestConnectedUri: retrieveLatestUri(connected),
   };
@@ -135,7 +148,6 @@ class WonConnectionIndicators extends React.Component {
 WonConnectionIndicators.propTypes = {
   atomUri: PropTypes.string.isRequired,
   onClick: PropTypes.func.isRequired,
-  ownedPost: PropTypes.object,
   postLoading: PropTypes.bool,
   unreadConnected: PropTypes.bool,
   latestConnectedUri: PropTypes.string,

@@ -4,15 +4,18 @@
 import { get, getIn } from "../../utils.js";
 import * as processUtils from "../utils/process-utils.js";
 
+import { createSelector } from "reselect";
+
+export const getProcessState = state => get(state, "process");
+
 /**
  * Check if anything in the state sub-map of process is currently marked as loading
  * @param state (full redux-state)
  * @returns true if anything is currently loading
  */
-export function isLoading(state) {
-  const process = get(state, "process");
-
-  return (
+export const isLoading = createSelector(
+  getProcessState,
+  process =>
     processUtils.isProcessingInitialLoad(process) ||
     processUtils.isProcessingWhatsAround(process) ||
     processUtils.isProcessingMetaAtoms(process) ||
@@ -27,46 +30,47 @@ export function isLoading(state) {
     processUtils.isAnyAtomLoading(process) ||
     processUtils.isAnyConnectionLoading(process, true) ||
     processUtils.isAnyMessageLoading(process)
-  );
-}
+);
 
-export function isProcessingWhatsNew(state) {
-  return processUtils.isProcessingWhatsNew(get(state, "process"));
-}
+export const isProcessingWhatsNew = createSelector(getProcessState, process =>
+  processUtils.isProcessingWhatsNew(process)
+);
 
-export function isProcessingPublish(state) {
-  return processUtils.isProcessingPublish(get(state, "process"));
-}
+export const isProcessingPublish = createSelector(getProcessState, process =>
+  processUtils.isProcessingPublish(process)
+);
 
-export function isProcessingAcceptTermsOfService(state) {
-  return processUtils.isProcessingAcceptTermsOfService(get(state, "process"));
-}
+export const isProcessingAcceptTermsOfService = createSelector(
+  getProcessState,
+  process => processUtils.isProcessingAcceptTermsOfService(process)
+);
 
-export function isProcessingVerifyEmailAddress(state) {
-  return processUtils.isProcessingVerifyEmailAddress(get(state, "process"));
-}
+export const isProcessingVerifyEmailAddress = createSelector(
+  getProcessState,
+  process => processUtils.isProcessingVerifyEmailAddress(process)
+);
 
-export function isProcessingResendVerificationEmail(state) {
-  return processUtils.isProcessingResendVerificationEmail(
-    get(state, "process")
-  );
-}
+export const isProcessingResendVerificationEmail = createSelector(
+  getProcessState,
+  process => processUtils.isProcessingResendVerificationEmail(process)
+);
 
-export function isProcessingSendAnonymousLinkEmail(state) {
-  return processUtils.isProcessingSendAnonymousLinkEmail(get(state, "process"));
-}
+export const isProcessingSendAnonymousLinkEmail = createSelector(
+  getProcessState,
+  process => processUtils.isProcessingSendAnonymousLinkEmail(process)
+);
 
 export function isAtomLoading(state, atomUri) {
-  return processUtils.isAtomLoading(get(state, "process"), atomUri);
+  return processUtils.isAtomLoading(getProcessState(state), atomUri);
 }
 
 export function isAtomToLoad(state, atomUri) {
   return (
     !getIn(state, ["atoms", atomUri]) ||
-    processUtils.isAtomToLoad(get(state, "process"), atomUri)
+    processUtils.isAtomToLoad(getProcessState(state), atomUri)
   );
 }
 
 export function hasAtomFailedToLoad(state, atomUri) {
-  return processUtils.hasAtomFailedToLoad(get(state, "process"), atomUri);
+  return processUtils.hasAtomFailedToLoad(getProcessState(state), atomUri);
 }

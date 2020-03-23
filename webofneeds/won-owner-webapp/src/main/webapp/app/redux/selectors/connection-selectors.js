@@ -2,6 +2,8 @@
  * Created by fsuda on 05.11.2018.
  */
 
+import { createSelector } from "reselect";
+
 import Immutable from "immutable";
 import {
   getOwnedAtomByConnectionUri,
@@ -22,24 +24,6 @@ import * as processUtils from "../utils/process-utils.js";
 export function getOwnedConnectionByUri(state, connectionUri) {
   let atom = getOwnedAtomByConnectionUri(state, connectionUri);
   return getIn(atom, ["connections", connectionUri]);
-}
-
-/**
- * Get all connections stored within your own atoms as a map
- * @returns Immutable.Map with all connections
- */
-export function getOwnedConnections(state) {
-  const atoms = getOwnedAtoms(state); //we only check own atoms as these are the only ones who have connections stored
-  const connections = atoms && atoms.flatMap(atom => atom.get("connections"));
-  return connections;
-}
-
-/**
- * Get all the connectionUris storid within the state
- */
-export function getOwnedConnectionUris(state) {
-  const connections = getOwnedConnections(state);
-  return connections && connections.keySeq().toSet();
 }
 
 export function getChatConnectionsByAtomUri(state, atomUri) {
@@ -112,54 +96,67 @@ export function getBuddyConnectionsByAtomUri(
 
   return connections
     ? connections
-        .filter(conn => isBuddyConnection(atoms, conn))
         .filter(conn => !(excludeClosed && connectionUtils.isClosed(conn)))
         .filter(
           conn => !(excludeSuggested && connectionUtils.isSuggested(conn))
         )
+        .filter(conn => isBuddyConnection(atoms, conn))
     : Immutable.Map();
 }
 
 /**
- * @param state
- * @returns {Immutable.Map|*}
+ * Get all connections stored within your own atoms as a map
+ * @returns Immutable.Map with all connections
  */
-export function getChatConnectionsToCrawl(state) {
-  const allAtoms = getAtoms(state);
-  const ownedAtoms = getOwnedAtoms(state);
-  const process = get(state, "process");
-  const allConnections =
-    ownedAtoms && ownedAtoms.flatMap(atom => atom.get("connections"));
+export const getOwnedConnections = createSelector(
+  getOwnedAtoms,
+  ownedAtoms =>
+    ownedAtoms && ownedAtoms.flatMap(atom => get(atom, "connections"))
+);
 
-  const chatConnections =
-    allConnections &&
-    allConnections
-      .filter(conn => connectionUtils.isConnected(conn))
-      .filter(
-        conn => !conn.get("messages") || conn.get("messages").size === 0
-        // the check below (if connectMessage was present) was replaced by if any messages are available (if any are there this connection is not to be fetched anymore)
-        // !!conn
-        //   .get("messages")
-        //   .find(msg => msg.get("messageType") === vocab.WONMSG.connectMessage)
-      )
-      .filter(conn => {
-        const connUri = get(conn, "uri");
+/**
+ * Get all the connectionUris storid within the state
+ */
+export const getOwnedConnectionUris = createSelector(
+  getOwnedConnections,
+  ownedConnections => ownedConnections && ownedConnections.keySeq().toSet()
+);
 
-        return (
-          !processUtils.isConnectionLoading(process, connUri) &&
-          !processUtils.isConnectionLoadingMessages(process, connUri) &&
-          !processUtils.hasConnectionFailedToLoad(process, connUri) &&
-          processUtils.hasMessagesToLoad(process, connUri)
+export const getChatConnectionsToCrawl = createSelector(
+  getAtoms,
+  state => get(state, "process"),
+  getOwnedConnections,
+  (allAtoms, process, allConnections) => {
+    const chatConnections =
+      allConnections &&
+      allConnections
+        .filter(conn => connectionUtils.isConnected(conn))
+        .filter(
+          conn => !conn.get("messages") || conn.get("messages").size === 0
+          // the check below (if connectMessage was present) was replaced by if any messages are available (if any are there this connection is not to be fetched anymore)
+          // !!conn
+          //   .get("messages")
+          //   .find(msg => msg.get("messageType") === vocab.WONMSG.connectMessage)
+        )
+        .filter(conn => {
+          const connUri = get(conn, "uri");
+
+          return (
+            !processUtils.isConnectionLoading(process, connUri) &&
+            !processUtils.isConnectionLoadingMessages(process, connUri) &&
+            !processUtils.hasConnectionFailedToLoad(process, connUri) &&
+            processUtils.hasMessagesToLoad(process, connUri)
+          );
+        })
+        .filter(
+          conn =>
+            isChatToXConnection(allAtoms, conn) ||
+            isGroupToXConnection(allAtoms, conn)
         );
-      })
-      .filter(
-        conn =>
-          isChatToXConnection(allAtoms, conn) ||
-          isGroupToXConnection(allAtoms, conn)
-      );
 
-  return chatConnections || Immutable.Map();
-}
+    return chatConnections || Immutable.Map();
+  }
+);
 
 export function getConnectionsToInjectMsgInto(atoms, targetSocketUri, msgUri) {
   const allConnections =
@@ -239,14 +236,10 @@ export function hasMessagesToLoad(state, connUri) {
  * @returns {boolean}
  */
 export function isChatToChatConnection(allAtoms, connection) {
-  const { senderSocketType, targetSocketType } = getSocketTypes(
-    allAtoms,
-    connection
-  );
-
   return (
-    senderSocketType === vocab.CHAT.ChatSocketCompacted &&
-    targetSocketType === vocab.CHAT.ChatSocketCompacted
+    getSenderSocketType(allAtoms, connection) ===
+      vocab.CHAT.ChatSocketCompacted &&
+    getTargetSocketType(allAtoms, connection) === vocab.CHAT.ChatSocketCompacted
   );
 }
 
@@ -257,14 +250,11 @@ export function isChatToChatConnection(allAtoms, connection) {
  * @returns {boolean}
  */
 export function isBuddyConnection(allAtoms, connection) {
-  const { senderSocketType, targetSocketType } = getSocketTypes(
-    allAtoms,
-    connection
-  );
-
   return (
-    senderSocketType === vocab.BUDDY.BuddySocketCompacted &&
-    targetSocketType === vocab.BUDDY.BuddySocketCompacted
+    getSenderSocketType(allAtoms, connection) ===
+      vocab.BUDDY.BuddySocketCompacted &&
+    getTargetSocketType(allAtoms, connection) ===
+      vocab.BUDDY.BuddySocketCompacted
   );
 }
 
@@ -275,14 +265,11 @@ export function isBuddyConnection(allAtoms, connection) {
  * @returns {boolean}
  */
 export function isChatToGroupConnection(allAtoms, connection) {
-  const { senderSocketType, targetSocketType } = getSocketTypes(
-    allAtoms,
-    connection
-  );
-
   return (
-    senderSocketType === vocab.CHAT.ChatSocketCompacted &&
-    targetSocketType === vocab.GROUP.GroupSocketCompacted
+    getSenderSocketType(allAtoms, connection) ===
+      vocab.CHAT.ChatSocketCompacted &&
+    getTargetSocketType(allAtoms, connection) ===
+      vocab.GROUP.GroupSocketCompacted
   );
 }
 
@@ -293,14 +280,10 @@ export function isChatToGroupConnection(allAtoms, connection) {
  * @returns {boolean}
  */
 export function isGroupToChatConnection(allAtoms, connection) {
-  const { senderSocketType, targetSocketType } = getSocketTypes(
-    allAtoms,
-    connection
-  );
-
   return (
-    senderSocketType === vocab.GROUP.GroupSocketCompacted &&
-    targetSocketType === vocab.CHAT.ChatSocketCompacted
+    getSenderSocketType(allAtoms, connection) ===
+      vocab.GROUP.GroupSocketCompacted &&
+    getTargetSocketType(allAtoms, connection) === vocab.CHAT.ChatSocketCompacted
   );
 }
 
@@ -311,14 +294,11 @@ export function isGroupToChatConnection(allAtoms, connection) {
  * @returns {boolean}
  */
 export function isGroupToGroupConnection(allAtoms, connection) {
-  const { senderSocketType, targetSocketType } = getSocketTypes(
-    allAtoms,
-    connection
-  );
-
   return (
-    senderSocketType === vocab.GROUP.GroupSocketCompacted &&
-    targetSocketType === vocab.GROUP.GroupSocketCompacted
+    getSenderSocketType(allAtoms, connection) ===
+      vocab.GROUP.GroupSocketCompacted &&
+    getTargetSocketType(allAtoms, connection) ===
+      vocab.GROUP.GroupSocketCompacted
   );
 }
 
@@ -329,7 +309,7 @@ export function isGroupToGroupConnection(allAtoms, connection) {
  * @returns {boolean}
  */
 export function isGroupToXConnection(allAtoms, connection) {
-  const { senderSocketType } = getSocketTypes(allAtoms, connection);
+  const senderSocketType = getSenderSocketType(allAtoms, connection);
 
   return senderSocketType === vocab.GROUP.GroupSocketCompacted;
 }
@@ -341,11 +321,32 @@ export function isGroupToXConnection(allAtoms, connection) {
  * @returns {boolean}
  */
 export function isChatToXConnection(allAtoms, connection) {
-  const { senderSocketType } = getSocketTypes(allAtoms, connection);
+  const senderSocketType = getSenderSocketType(allAtoms, connection);
 
   return senderSocketType === vocab.CHAT.ChatSocketCompacted;
 }
 
+export const getSenderSocketType = (allAtoms, connection) => {
+  const connectionUri = get(connection, "uri");
+  const senderSocketUri = get(connection, "socketUri");
+  const senderAtom =
+    connectionUri &&
+    allAtoms &&
+    (getIn(allAtoms, connectionUri.split("/c")[0]) ||
+      allAtoms.find(atom => getIn(atom, ["connections", connectionUri])));
+
+  return senderAtom && atomUtils.getSocketType(senderAtom, senderSocketUri);
+};
+
+export const getTargetSocketType = (allAtoms, connection) => {
+  const targetAtomUri = get(connection, "targetAtomUri");
+  const targetSocketUri = get(connection, "targetSocketUri");
+
+  return (
+    targetSocketUri &&
+    getIn(allAtoms, [targetAtomUri, "content", "sockets", targetSocketUri])
+  );
+};
 /**
  * Retrieves the used sockets of the given connection
  * @param allAtoms
@@ -353,33 +354,8 @@ export function isChatToXConnection(allAtoms, connection) {
  * @returns {{senderSocketType, targetSocketType}}
  */
 function getSocketTypes(allAtoms, connection) {
-  let senderSocketType = undefined;
-  let targetSocketType = undefined;
+  let senderSocketType = getSenderSocketType(allAtoms, connection);
+  let targetSocketType = getTargetSocketType(allAtoms, connection);
 
-  if (connection && allAtoms) {
-    const senderSocketUri = get(connection, "socketUri");
-    const targetSocketUri = get(connection, "targetSocketUri");
-
-    if (senderSocketUri && targetSocketUri) {
-      const senderAtom =
-        allAtoms &&
-        allAtoms.find(atom =>
-          getIn(atom, ["connections", get(connection, "uri")])
-        );
-
-      senderSocketType = atomUtils.getSocketType(senderAtom, senderSocketUri);
-      targetSocketType = getIn(allAtoms, [
-        get(connection, "targetAtomUri"),
-        "content",
-        "sockets",
-        targetSocketUri,
-      ]);
-
-      // Uncomment lines below for verbose debug output
-      // if (senderSocketType && targetSocketType) {
-      //  console.debug(get(connection, "uri"), ":", socket, "-->", targetSocket);
-      //}
-    }
-  }
   return { senderSocketType, targetSocketType };
 }
