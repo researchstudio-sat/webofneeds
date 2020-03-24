@@ -1,7 +1,7 @@
-# Proposing Message with: "JUnit Proposal 1" and accepting it once + retract at same time.
-# Outcome: 0 Agreements
-# Proposal: wm:/W1pm7C7p3iUbSATDFdSVFrVSMDTnWnX7sti1LKE6acbsye
-# Accept & Retract: wm:/W1hvCjr3rwH85dniga9Vt5ZSc3ZacDGPGFC7jNzwDHhTNE
+# Claim 1 message
+# Outcome: No accepted claims, no agreements
+# Claimed message: wm:/W1nk43sqZ7VsH2t7uJkcqctXpH1p2g5SRA4GXvF5j9Zs54
+# Claim: wm:/W1pm7C7p3iUbSATDFdSVFrVSMDTnWnX7sti1LKE6acbsye
 
 
 @prefix msg:   <https://w3id.org/won/message#> .
@@ -1079,7 +1079,7 @@
 
 <wm:/W1nk43sqZ7VsH2t7uJkcqctXpH1p2g5SRA4GXvF5j9Zs54#content> {
     <wm:/W1nk43sqZ7VsH2t7uJkcqctXpH1p2g5SRA4GXvF5j9Zs54>
-            con:text  "JUnit Proposal 1" .
+            con:text  "Claim 1" .
 }
 
 <wm:/W1nk43sqZ7VsH2t7uJkcqctXpH1p2g5SRA4GXvF5j9Zs54#envelope> {
@@ -1114,7 +1114,7 @@
 
 <wm:/W1pm7C7p3iUbSATDFdSVFrVSMDTnWnX7sti1LKE6acbsye#content> {
     <wm:/W1pm7C7p3iUbSATDFdSVFrVSMDTnWnX7sti1LKE6acbsye>
-            <https://w3id.org/won/agreement#proposes>
+            <https://w3id.org/won/agreement#claims>
                     <wm:/W1nk43sqZ7VsH2t7uJkcqctXpH1p2g5SRA4GXvF5j9Zs54> .
 }
 
@@ -1150,14 +1150,8 @@
 
 <wm:/W1hvCjr3rwH85dniga9Vt5ZSc3ZacDGPGFC7jNzwDHhTNE#content-yhjs> {
     <wm:/W1hvCjr3rwH85dniga9Vt5ZSc3ZacDGPGFC7jNzwDHhTNE>
-    <https://w3id.org/won/modification#rejects>
-                    <wm:/W1pm7C7p3iUbSATDFdSVFrVSMDTnWnX7sti1LKE6acbsye> ;
-        <https://w3id.org/won/agreement#accepts>
-                    <wm:/W1pm7C7p3iUbSATDFdSVFrVSMDTnWnX7sti1LKE6acbsye> ;
-            con:text  "Ok, I am hereby accepting your latest proposal (uri: wm:/W1pm7C7p3iUbSATDFdSVFrVSMDTnWnX7sti1LKE6acbsye).\n The query for finding it took 0 seconds." .
-
-            
-           }
+            con:text  "Ok, message" .
+}
 
 <wm:/W1hvCjr3rwH85dniga9Vt5ZSc3ZacDGPGFC7jNzwDHhTNE#envelope> {
     <wm:/W1hvCjr3rwH85dniga9Vt5ZSc3ZacDGPGFC7jNzwDHhTNE>
@@ -2500,7 +2494,7 @@
 
 <wm:/W1kFB7BiaoqdKAfybFebcMbBHuecnMbBYueERHUvvz8L41#content> {
     <wm:/W1kFB7BiaoqdKAfybFebcMbBHuecnMbBYueERHUvvz8L41>
-            con:text  "This was a proposal" .
+            con:text  "no proposal anymore" .
 }
 
 <wm:/W1kFB7BiaoqdKAfybFebcMbBHuecnMbBYueERHUvvz8L41#envelope> {
@@ -3364,7 +3358,7 @@
 
 <wm:/W1bGKxYmsx6w5ohdLtuEutV9sMF1GrvZXpPwexy6CMtL1k#content-q9fg> {
     <wm:/W1bGKxYmsx6w5ohdLtuEutV9sMF1GrvZXpPwexy6CMtL1k>
-           con:text  "Not an accept anymore" .
+            con:text  "Ok, message." .
 }
 
 <wm:/W1bGKxYmsx6w5ohdLtuEutV9sMF1GrvZXpPwexy6CMtL1k#envelope> {

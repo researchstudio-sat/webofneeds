@@ -1,9 +1,9 @@
-# Proposing Connect Message and accepting it.
-# Outcome: 1 Agreement
-# ConnectMessage to propose: wm:/W1fEu1n1bw5m6qr4JtsAjpWRr8zu6bueunnpSAdqgnUrD8
-# Proposal: wm:/W1pm7C7p3iUbSATDFdSVFrVSMDTnWnX7sti1LKE6acbsye
-# Accept 1: wm:/W1hvCjr3rwH85dniga9Vt5ZSc3ZacDGPGFC7jNzwDHhTNE
-
+# Proposing Message with: "JUnit Proposal 1" and "JUnit Proposal 2" and accept it with one message
+# Should resume to 2 accepted proposal = 2 Agreements
+# Proposal 1: wm:/W1pm7C7p3iUbSATDFdSVFrVSMDTnWnX7sti1LKE6acbsye
+# Proposal 2: wm:/W1kFB7BiaoqdKAfybFebcMbBHuecnMbBYueERHUvvz8L41
+# Accept: wm:/W1hvCjr3rwH85dniga9Vt5ZSc3ZacDGPGFC7jNzwDHhTNE
+# Accept: wm:/W1bGKxYmsx6w5ohdLtuEutV9sMF1GrvZXpPwexy6CMtL1k
 
 
 @prefix msg:   <https://w3id.org/won/message#> .
@@ -1117,7 +1117,7 @@
 <wm:/W1pm7C7p3iUbSATDFdSVFrVSMDTnWnX7sti1LKE6acbsye#content> {
     <wm:/W1pm7C7p3iUbSATDFdSVFrVSMDTnWnX7sti1LKE6acbsye>
             <https://w3id.org/won/agreement#proposes>
-                    <wm:/W1fEu1n1bw5m6qr4JtsAjpWRr8zu6bueunnpSAdqgnUrD8> .
+                    <wm:/W1nk43sqZ7VsH2t7uJkcqctXpH1p2g5SRA4GXvF5j9Zs54> .
 }
 
 <wm:/W1pm7C7p3iUbSATDFdSVFrVSMDTnWnX7sti1LKE6acbsye#envelope> {
@@ -1148,14 +1148,13 @@
             msg:signer                atom:lsmuf4bgtaeq .
 }
 
-# graphs of entity wm:/W1hvCjr3rwH85dniga9Vt5ZSc3ZacDGPGFC7jNzwDHhTNE
+# graphs of entity wm:/W1hvCjr3rwH85dniga9Vt5ZSc3ZacDGPGFC7jNzwDHhTNE .
 
 <wm:/W1hvCjr3rwH85dniga9Vt5ZSc3ZacDGPGFC7jNzwDHhTNE#content-yhjs> {
-    <wm:/W1hvCjr3rwH85dniga9Vt5ZSc3ZacDGPGFC7jNzwDHhTNE>
-            <https://w3id.org/won/agreement#accepts>
-                    <wm:/W1pm7C7p3iUbSATDFdSVFrVSMDTnWnX7sti1LKE6acbsye> ;
-            con:text  "Ok, I am hereby accepting your latest proposal (uri: wm:/W1pm7C7p3iUbSATDFdSVFrVSMDTnWnX7sti1LKE6acbsye).\n The query for finding it took 0 seconds." .
+	<wm:/W1hvCjr3rwH85dniga9Vt5ZSc3ZacDGPGFC7jNzwDHhTNE>
+            con:text  "Old accept: Ok, I am hereby accepting your latest proposal (uri: wm:/W1pm7C7p3iUbSATDFdSVFrVSMDTnWnX7sti1LKE6acbsye).\n The query for finding it took 0 seconds." .
 }
+
 
 <wm:/W1hvCjr3rwH85dniga9Vt5ZSc3ZacDGPGFC7jNzwDHhTNE#envelope> {
     <wm:/W1hvCjr3rwH85dniga9Vt5ZSc3ZacDGPGFC7jNzwDHhTNE>
@@ -2498,7 +2497,8 @@
 
 <wm:/W1kFB7BiaoqdKAfybFebcMbBHuecnMbBYueERHUvvz8L41#content> {
     <wm:/W1kFB7BiaoqdKAfybFebcMbBHuecnMbBYueERHUvvz8L41>
-            con:text  "This was a proposal" .
+            <https://w3id.org/won/agreement#proposes>
+                    <wm:/W1hrYgeDqaQN8junkfYAERekzYkSfi3wjjNjUW4M6n4NTx> .
 }
 
 <wm:/W1kFB7BiaoqdKAfybFebcMbBHuecnMbBYueERHUvvz8L41#envelope> {
@@ -3362,8 +3362,15 @@
 
 <wm:/W1bGKxYmsx6w5ohdLtuEutV9sMF1GrvZXpPwexy6CMtL1k#content-q9fg> {
     <wm:/W1bGKxYmsx6w5ohdLtuEutV9sMF1GrvZXpPwexy6CMtL1k>
-           con:text  "Not an accept anymore" .
+            <https://w3id.org/won/agreement#accepts>
+                    <wm:/W1pm7C7p3iUbSATDFdSVFrVSMDTnWnX7sti1LKE6acbsye> ;
+            con:text  "Ok, I am hereby accepting your latest proposal (uri: wm:/W1pm7C7p3iUbSATDFdSVFrVSMDTnWnX7sti1LKE6acbsye).\n The query for finding it took 0 seconds." .
+	<wm:/W1bGKxYmsx6w5ohdLtuEutV9sMF1GrvZXpPwexy6CMtL1k>
+			<https://w3id.org/won/agreement#accepts>
+                    <wm:/W1kFB7BiaoqdKAfybFebcMbBHuecnMbBYueERHUvvz8L41> ;
+            con:text  "Ok, I am hereby accepting your latest proposal (uri: wm:/W1kFB7BiaoqdKAfybFebcMbBHuecnMbBYueERHUvvz8L41).\n The query for finding it took 0 seconds." .
 }
+
 
 <wm:/W1bGKxYmsx6w5ohdLtuEutV9sMF1GrvZXpPwexy6CMtL1k#envelope> {
     <wm:/W1bGKxYmsx6w5ohdLtuEutV9sMF1GrvZXpPwexy6CMtL1k>

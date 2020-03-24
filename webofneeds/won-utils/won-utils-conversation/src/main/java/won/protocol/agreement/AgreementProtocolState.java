@@ -106,15 +106,27 @@ public class AgreementProtocolState {
                 uris.addPendingProposal(proposal);
             }
         });
+        // get Effects
+        // public enum MessageEffectType {
+        // PROPOSES, ACCEPTS, REJECTS, RETRACTS, CLAIMS;
+        // }
+        // messagesByURI.values().stream().forEach(m -> {
+        // Set<MessageEffect> effects = getEffects(m.getMessageURI());
+        // effects.stream().forEach(effect -> {
+        // if (effect.isClaims()) {
+        // uris.addClaimedMessageUri(effect.asClaims().getClaimedMessageUri());
+        // }
+        // });
+        // });
         // walk over claim messages and collect the relevant uris:
-        messagesByURI.values().stream().filter(m -> isClaim(m.getMessageURI())).forEach(m -> {
-            // so this is a claim message
-            // determine what it claims
-            Set<URI> claims = m.getClaims();
-            if (!claims.isEmpty()) {
-                claims.stream().forEach(claimURI -> uris.addClaimedMessageUri(claimURI));
-            }
-        });
+        /*
+         * messagesByURI.values().stream().filter(m ->
+         * isClaim(m.getMessageURI())).forEach(m -> { // so this is a claim message //
+         * determine what it claims Set<URI> claims = m.getClaims(); if
+         * (!claims.isEmpty()) { claims.stream().forEach(claimURI ->
+         * uris.addClaimedMessageUri(claimURI)); } });
+         */
+        uris.addClaimedMessageUris(getClaimedUris());
         uris.addRejectedMessageUris(getRejectedUris());
         uris.addRetractedMessageUris(getRetractedUris());
         return uris;
@@ -261,7 +273,28 @@ public class AgreementProtocolState {
     }
 
     public Set<URI> getClaimedUris() {
-        return claimedUris;
+        // claims.addNamedModel(msg.getMessageURI().toString(), claimContent);
+        Model claimed = claims.getDefaultModel();
+        if (claimed == null) {
+            return Collections.EMPTY_SET;
+        }
+        Set<URI> ret = new HashSet<URI>();
+        NodeIterator it = claimed.listObjectsOfProperty(WONAGR.claims);
+        while (it.hasNext()) {
+            String uri = it.next().asResource().getURI();
+            ret.add(URI.create(uri));
+        }
+        logger.info("RET {}", ret.toString());
+        // return ret;
+        ret.stream().forEach(uri -> {
+            Set<MessageEffect> effects = getEffects(uri);
+            effects.stream().forEach(effect -> {
+                if (effect.isClaims()) {
+                    this.claimedUris.add(effect.asClaims().getClaimedMessageUri());
+                }
+            });
+        });
+        return this.claimedUris;
     }
 
     public Set<URI> getAcceptedCancellationProposalUris() {

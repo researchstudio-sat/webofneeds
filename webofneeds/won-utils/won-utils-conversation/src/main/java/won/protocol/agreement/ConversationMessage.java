@@ -390,8 +390,85 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
     }
 
     public boolean isAgreementProtocolMessage() {
-        return this.isRetractsMessage() || this.isProposesMessage() || this.isProposesToCancelMessage()
-                        || this.isAcceptsMessage() || this.isRejectsMessage() || this.isClaimsMessage();
+        boolean isAgreementProtocolMessage = this.isRetractsMessage() || this.isProposesMessage() ||
+                        this.isProposesToCancelMessage()
+                        || this.isAcceptsMessage() || this.isRejectsMessage() ||
+                        this.isClaimsMessage();
+        if (!isAgreementProtocolMessage) {
+            return false;
+        }
+        return intesectionOfAllSets();
+        // TODO: Throw Exception?
+    }
+
+    private boolean intesectionOfAllSets() {
+        if (intersectionOfSets(this.retractsRefs, this.acceptsRefs)) {
+            return false;
+        }
+        // retract & propose
+        if (intersectionOfSets(this.retractsRefs, this.proposesRefs)) {
+            return false;
+        }
+        // retract & claims
+        if (intersectionOfSets(this.retractsRefs, this.claimsRefs)) {
+            return false;
+        }
+        // retract & rejectsRefs
+        if (intersectionOfSets(this.retractsRefs, this.rejectsRefs)) {
+            return false;
+        }
+        // retract & proposesToCancelRefs
+        if (intersectionOfSets(this.retractsRefs, this.proposesToCancelRefs)) {
+            return false;
+        }
+        // accepts & propose
+        if (intersectionOfSets(this.acceptsRefs, this.proposesRefs)) {
+            return false;
+        }
+        // accepts & claims
+        if (intersectionOfSets(this.acceptsRefs, this.claimsRefs)) {
+            return false;
+        }
+        // accepts & rejectsRefs
+        if (intersectionOfSets(this.acceptsRefs, this.rejectsRefs)) {
+            return false;
+        }
+        // accepts & proposesToCancelRefs
+        if (intersectionOfSets(this.acceptsRefs, this.proposesToCancelRefs)) {
+            return false;
+        }
+        // proposes & claims
+        if (intersectionOfSets(this.proposesRefs, this.claimsRefs)) {
+            return false;
+        }
+        // proposes & rejectsRefs
+        if (intersectionOfSets(this.proposesRefs, this.rejectsRefs)) {
+            return false;
+        }
+        // proposes & proposesToCancelRefs
+        if (intersectionOfSets(this.proposesRefs, this.proposesToCancelRefs)) {
+            return false;
+        }
+        // claims & rejectsRefs
+        if (intersectionOfSets(this.claimsRefs, this.rejectsRefs)) {
+            return false;
+        }
+        // claims & proposesToCancelRefs
+        if (intersectionOfSets(this.claimsRefs, this.proposesToCancelRefs)) {
+            return false;
+        }
+        // rejects & proposesToCancelRefs
+        if (intersectionOfSets(this.rejectsRefs, this.proposesToCancelRefs)) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean intersectionOfSets(Set<ConversationMessage> a, Set<ConversationMessage> b) {
+        Set<ConversationMessage> c = new HashSet<ConversationMessage>();
+        c.addAll(a);
+        c.retainAll(b);
+        return c.size() == 0 ? false : true;
     }
 
     public boolean isFromOwner() {
