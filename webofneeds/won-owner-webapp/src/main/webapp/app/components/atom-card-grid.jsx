@@ -8,6 +8,9 @@ import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
+import ico32_buddy_add from "~/images/won-icons/ico32_buddy_add.svg";
+import ico36_plus from "~/images/won-icons/ico36_plus.svg";
+
 const mapDispatchToProps = dispatch => {
   return {
     routerGo: (path, props) => {
@@ -44,7 +47,7 @@ class WonAtomCardGrid extends React.Component {
     const createAtom = showCreate ? (
       <won-create-card onClick={() => this.props.routerGo("create")}>
         <svg className="createcard__icon" title="Create a new post">
-          <use xlinkHref="#ico36_plus" href="#ico36_plus" />
+          <use xlinkHref={ico36_plus} href={ico36_plus} />
         </svg>
         <span className="createcard__label">New</span>
       </won-create-card>
@@ -57,7 +60,7 @@ class WonAtomCardGrid extends React.Component {
         onClick={() => this.props.routerGo("create", { useCase: "persona" })}
       >
         <svg className="createcard__icon" title="Create a new post">
-          <use xlinkHref="#ico32_buddy_add" href="#ico32_buddy_add" />
+          <use xlinkHref={ico32_buddy_add} href={ico32_buddy_add} />
         </svg>
         <span className="createcard__label">New Persona</span>
       </won-create-card>

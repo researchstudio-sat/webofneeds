@@ -20,6 +20,7 @@ import WonConnectionsOverview from "../../components/connections-overview.jsx";
 import "~/style/_connections.scss";
 import "~/style/_responsiveness-utils.scss";
 import "~/style/_connection-overlay.scss";
+import ico36_message from "~/images/won-icons/ico36_message.svg";
 
 const mapStateToProps = state => {
   const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
@@ -119,7 +120,7 @@ class PageConnections extends React.Component {
                 className="overview__rightempty__noselection__icon"
                 title="Messages"
               >
-                <use xlinkHref="#ico36_message" href="#ico36_message" />
+                <use xlinkHref={ico36_message} href={ico36_message} />
               </svg>
               <div className="overview__rightempty__noselection__text">
                 No Chat selected
@@ -140,7 +141,7 @@ class PageConnections extends React.Component {
           <main className="overview__nochats">
             <div className="overview__nochats__empty">
               <svg className="overview__nochats__empty__icon" title="Messages">
-                <use xlinkHref="#ico36_message" href="#ico36_message" />
+                <use xlinkHref={ico36_message} href={ico36_message} />
               </svg>
               <div className="overview__nochats__empty__text">
                 No Open Chats available

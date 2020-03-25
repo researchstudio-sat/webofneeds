@@ -7,6 +7,7 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
 import "~/style/_petrinet-state.scss";
+import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 
 const mapStateToProps = (state, ownProps) => {
   const connectionUri = generalSelectors.getConnectionUriFromRoute(state); //TODO: create selector that returns the correct connectionUri without looking up the open one
@@ -103,7 +104,7 @@ class WonPetrinetState extends React.Component {
       (this.props.petriNetDataLoading || this.props.petriNetDataDirty) && (
         <div className="ps__loading">
           <svg className="ps__loading__spinner">
-            <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+            <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
           </svg>
           <div className="ps__loading__label">
             The PetriNet-State, is currently being calculated

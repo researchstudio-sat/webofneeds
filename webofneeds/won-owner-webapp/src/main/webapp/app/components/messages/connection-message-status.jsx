@@ -10,6 +10,8 @@ import { connect } from "react-redux";
 import { getOwnedAtomByConnectionUri } from "../../redux/selectors/general-selectors.js";
 
 import "~/style/_connection-message-status.scss";
+import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.svg";
+import ico36_added_circle from "~/images/won-icons/ico16_indicator_warning.svg";
 
 const mapStateToProps = (state, ownProps) => {
   const ownedAtom =
@@ -48,8 +50,8 @@ class WonConnectionMessageStatus extends React.Component {
             style={{ "--local-primary": "red" }}
           >
             <use
-              xlinkHref="#ico16_indicator_warning"
-              href="#ico16_indicator_warning"
+              xlinkHref={ico16_indicator_warning}
+              href={ico16_indicator_warning}
             />
           </svg>
         );
@@ -62,7 +64,7 @@ class WonConnectionMessageStatus extends React.Component {
                 (isReceivedByOwn ? " received " : "")
               }
             >
-              <use xlinkHref="#ico36_added_circle" href="#ico36_added_circle" />
+              <use xlinkHref={ico36_added_circle} href={ico36_added_circle} />
             </svg>
             <svg
               className={
@@ -70,7 +72,7 @@ class WonConnectionMessageStatus extends React.Component {
                 (isReceivedByRemote ? " received " : "")
               }
             >
-              <use xlinkHref="#ico36_added_circle" href="#ico36_added_circle" />
+              <use xlinkHref={ico36_added_circle} href={ico36_added_circle} />
             </svg>
           </React.Fragment>
         );

@@ -5,6 +5,8 @@ import { actionCreators } from "../actions/actions.js";
 import { getIn } from "../utils.js";
 
 import "~/style/_menu.scss";
+import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.svg";
+import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import Immutable from "immutable";
@@ -121,8 +123,8 @@ class WonMenu extends React.Component {
             >
               <svg className="menu__slideintoggle__icon">
                 <use
-                  xlinkHref="#ico16_indicator_warning"
-                  href="#ico16_indicator_warning"
+                  xlinkHref={ico16_indicator_warning}
+                  href={ico16_indicator_warning}
                 />
               </svg>
               <svg
@@ -133,7 +135,7 @@ class WonMenu extends React.Component {
                     : "")
                 }
               >
-                <use xlinkHref="#ico16_arrow_down" href="#ico16_arrow_down" />
+                <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
               </svg>
               <span className="menu__slideintoggle__label">
                 {this.props.isSlideInsVisible ? (

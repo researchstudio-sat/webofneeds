@@ -15,6 +15,12 @@ import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import vocab from "../service/vocab.js";
 
+import ico36_match from "~/images/won-icons/ico36_match.svg";
+import ico36_outgoing from "~/images/won-icons/ico36_outgoing.svg";
+import ico36_incoming from "~/images/won-icons/ico36_incoming.svg";
+import ico36_message from "~/images/won-icons/ico36_message.svg";
+import ico36_close_circle from "~/images/won-icons/ico36_close_circle.svg";
+
 const mapStateToProps = (state, ownProps) => {
   const atom = generalSelectors.getOwnedAtomByConnectionUri(
     state,
@@ -35,22 +41,20 @@ class WonConnectionState extends React.Component {
 
     switch (this.props.connectionState) {
       case vocab.WON.Suggested:
-        icon = <use xlinkHref="#ico36_match" href="#ico36_match" />;
+        icon = <use xlinkHref={ico36_match} href={ico36_match} />;
         break;
       case vocab.WON.RequestSent:
-        icon = <use xlinkHref="#ico36_outgoing" href="#ico36_outgoing" />;
+        icon = <use xlinkHref={ico36_outgoing} href={ico36_outgoing} />;
         break;
       case vocab.WON.RequestReceived:
-        icon = <use xlinkHref="#ico36_incoming" href="#ico36_incoming" />;
+        icon = <use xlinkHref={ico36_incoming} href={ico36_incoming} />;
         break;
       case vocab.WON.Connected:
-        icon = <use xlinkHref="#ico36_message" href="#ico36_message" />;
+        icon = <use xlinkHref={ico36_message} href={ico36_message} />;
         break;
       case vocab.WON.Closed:
       default:
-        icon = (
-          <use xlinkHref="#ico36_close_circle" href="#ico36_close_circle" />
-        );
+        icon = <use xlinkHref={ico36_close_circle} href={ico36_close_circle} />;
         break;
     }
 

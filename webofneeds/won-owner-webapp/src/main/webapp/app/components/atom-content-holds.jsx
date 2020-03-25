@@ -10,6 +10,7 @@ import * as generalSelectors from "../redux/selectors/general-selectors";
 import WonAtomCard from "./atom-card.jsx";
 
 import "~/style/_atom-content-holds.scss";
+import ico36_plus from "~/images/won-icons/ico36_plus.svg";
 import PropTypes from "prop-types";
 
 const mapStateToProps = (state, ownProps) => {
@@ -64,7 +65,7 @@ class WonAtomContentHolds extends React.Component {
           }}
         >
           <svg className="ach__createatom__icon" title="Create a new post">
-            <use xlinkHref="#ico36_plus" href="#ico36_plus" />
+            <use xlinkHref={ico36_plus} href={ico36_plus} />
           </svg>
           <span className="ach__createatom__label">New</span>
         </div>

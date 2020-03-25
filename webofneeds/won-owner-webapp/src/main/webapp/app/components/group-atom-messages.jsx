@@ -13,6 +13,9 @@ import vocab from "../service/vocab.js";
 
 import "~/style/_group-atom-messages.scss";
 import "~/style/_rdflink.scss";
+import rdf_logo_1 from "~/images/won-icons/rdf_logo_1.svg";
+import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
+import ico36_backarrow from "~/images/won-icons/ico36_backarrow.svg";
 import WonConnectionHeader from "./connection-header.jsx";
 import WonShareDropdown from "./share-dropdown.jsx";
 import WonConnectionContextDropdown from "./connection-context-dropdown.jsx";
@@ -187,7 +190,7 @@ class GroupAtomMessages extends React.Component {
         href={this.props.connectionUri}
       >
         <svg className="rdflink__small">
-          <use xlinkHref="#rdf_logo_1" href="#rdf_logo_1" />
+          <use xlinkHref={rdf_logo_1} href={rdf_logo_1} />
         </svg>
         <span className="rdflink__label">Connection</span>
       </a>
@@ -210,7 +213,7 @@ class GroupAtomMessages extends React.Component {
     const loadSpinnerElement = (
       <div className="gpm__content__loadspinner">
         <svg className="hspinner">
-          <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+          <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
         </svg>
       </div>
     );
@@ -223,7 +226,7 @@ class GroupAtomMessages extends React.Component {
             onClick={this.props.routerBack.bind(this)}
           >
             <svg className="gpm__header__back__button__icon">
-              <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
+              <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
             </svg>
           </a>
           <a
@@ -233,7 +236,7 @@ class GroupAtomMessages extends React.Component {
             }
           >
             <svg className="gpm__header__back__button__icon">
-              <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
+              <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
             </svg>
           </a>
         </div>

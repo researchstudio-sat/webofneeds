@@ -12,6 +12,10 @@ import WonAccountMenu from "./account-menu.jsx";
 
 import "~/style/_responsiveness-utils.scss";
 import "~/style/_topnav.scss";
+import ico16_burger from "~/images/won-icons/ico16_burger.svg";
+import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.svg";
+import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
+import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 
 const mapStateToProps = (state, ownProps) => {
   const currentRoute = getIn(state, ["router", "currentState", "name"]);
@@ -85,7 +89,7 @@ class WonTopnav extends React.Component {
             }
             onClick={this.menuAction}
           >
-            <use xlinkHref="#ico16_burger" href="#ico16_burger" />
+            <use xlinkHref={ico16_burger} href={ico16_burger} />
           </svg>
           <div className="topnav__logo clickable">
             <img
@@ -132,7 +136,7 @@ class WonTopnav extends React.Component {
           {this.props.showLoadingIndicator && (
             <div className="topnav__loading">
               <svg className="topnav__loading__spinner hspinner">
-                <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+                <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
               </svg>
             </div>
           )}
@@ -143,8 +147,8 @@ class WonTopnav extends React.Component {
             >
               <svg className="topnav__slideintoggle__icon">
                 <use
-                  xlinkHref="#ico16_indicator_warning"
-                  href="#ico16_indicator_warning"
+                  xlinkHref={ico16_indicator_warning}
+                  href={ico16_indicator_warning}
                 />
               </svg>
               <svg
@@ -155,7 +159,7 @@ class WonTopnav extends React.Component {
                     : "")
                 }
               >
-                <use xlinkHref="#ico16_arrow_down" href="#ico16_arrow_down" />
+                <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
               </svg>
             </div>
           )}

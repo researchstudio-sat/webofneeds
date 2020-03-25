@@ -9,6 +9,7 @@ import VisibilitySensor from "react-visibility-sensor";
 import PropTypes from "prop-types";
 
 import "leaflet/dist/leaflet.css";
+import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 
 const currentLocationIcon = L.divIcon({
   className: "wonCurrentLocationMarkerIcon",
@@ -94,8 +95,8 @@ export default class WonAtomMap extends React.Component {
                   <div className="atom-map__mapmount atom-map__mapmount--loading">
                     <svg className="won-atom-map__spinner hspinner">
                       <use
-                        xlinkHref="#ico_loading_anim"
-                        href="#ico_loading_anim"
+                        xlinkHref={ico_loading_anim}
+                        href={ico_loading_anim}
                       />
                     </svg>
                   </div>

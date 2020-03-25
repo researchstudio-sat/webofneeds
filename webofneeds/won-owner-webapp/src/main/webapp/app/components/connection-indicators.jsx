@@ -15,6 +15,7 @@ import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 
 import "~/style/_connection-indicators.scss";
+import ico36_message from "~/images/won-icons/ico36_message.svg";
 import PropTypes from "prop-types";
 import vocab from "../service/vocab";
 
@@ -103,7 +104,7 @@ class WonConnectionIndicators extends React.Component {
         <won-connection-indicators class="won-is-loading">
           <div className="indicators__item indicators__item--skeleton">
             <svg className="indicators__item__icon">
-              <use xlinkHref="#ico36_message" href="#ico36_message" />
+              <use xlinkHref={ico36_message} href={ico36_message} />
             </svg>
             <span className="indicators__item__caption" />
           </div>
@@ -131,7 +132,7 @@ class WonConnectionIndicators extends React.Component {
               className="indicators__item__icon"
               title="Show latest message/request"
             >
-              <use xlinkHref="#ico36_message" href="#ico36_message" />
+              <use xlinkHref={ico36_message} href={ico36_message} />
             </svg>
           </a>
         </won-connection-indicators>

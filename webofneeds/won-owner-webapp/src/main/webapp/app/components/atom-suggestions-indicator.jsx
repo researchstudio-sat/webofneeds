@@ -10,6 +10,7 @@ import { getIn } from "../utils.js";
 
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import "~/style/_atom-suggestions-indicator.scss";
+import ico36_match from "~/images/won-icons/ico36_match.svg";
 
 const mapStateToProps = (state, ownProps) => {
   const atom = getIn(state, ["atoms", ownProps.atomUri]);
@@ -70,7 +71,7 @@ class WonAtomSuggestionsIndicator extends React.Component {
               : "asi__icon--reads")
           }
         >
-          <use xlinkHref="#ico36_match" href="#ico36_match" />
+          <use xlinkHref={ico36_match} href={ico36_match} />
         </svg>
         <div className="asi__right">
           <div className="asi__right__topline">

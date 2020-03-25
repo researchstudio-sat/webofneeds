@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import ReactMarkdown from "react-markdown";
 
 import "~/style/_accordion.scss";
+import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
+import ico16_arrow_up from "~/images/won-icons/ico16_arrow_up.svg";
 
 export default class WonAccordion extends React.Component {
   constructor(props) {
@@ -26,12 +28,12 @@ export default class WonAccordion extends React.Component {
             <div className="header clickable">{item.title}</div>
             {index !== this.state.selectedIdx ? (
               <svg className="arrow clickable">
-                <use xlinkHref="#ico16_arrow_down" href="#ico16_arrow_down" />
+                <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
               </svg>
             ) : (
               <React.Fragment>
                 <svg className="arrow clickable">
-                  <use xlinkHref="#ico16_arrow_up" href="#ico16_arrow_up" />
+                  <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
                 </svg>
                 <ReactMarkdown
                   className="detail markdown"

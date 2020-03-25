@@ -22,6 +22,7 @@ import WonFooter from "../../components/footer";
 
 import "~/style/_overview.scss";
 import "~/style/_connection-overlay.scss";
+import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 
 const mapStateToProps = state => {
   const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
@@ -191,8 +192,8 @@ class PageOverview extends React.Component {
                         }
                       >
                         <use
-                          xlinkHref="#ico16_arrow_down"
-                          href="#ico16_arrow_down"
+                          xlinkHref={ico16_arrow_down}
+                          href={ico16_arrow_down}
                         />
                       </svg>
                     </div>
@@ -234,8 +235,8 @@ class PageOverview extends React.Component {
                         }
                       >
                         <use
-                          xlinkHref="#ico16_arrow_down"
-                          href="#ico16_arrow_down"
+                          xlinkHref={ico16_arrow_down}
+                          href={ico16_arrow_down}
                         />
                       </svg>
                     </div>

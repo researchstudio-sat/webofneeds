@@ -14,6 +14,8 @@ import L from "leaflet";
 import _ from "lodash";
 
 import "leaflet/dist/leaflet.css";
+import ico16_indicator_location from "~/images/won-icons/ico16_indicator_location.svg";
+import ico36_location_current from "~/images/won-icons/ico36_location_current.svg";
 
 const locationIcon = L.divIcon({
   className: "wonLocationMarkerIcon",
@@ -130,8 +132,8 @@ export default class WonTravelActionPicker extends React.Component {
         >
           <svg className="rp__searchresult__icon">
             <use
-              xlinkHref="#ico16_indicator_location"
-              href="#ico16_indicator_location"
+              xlinkHref={ico16_indicator_location}
+              href={ico16_indicator_location}
             />
           </svg>
           <span className="rp__searchresult__text">{result.name}</span>
@@ -147,8 +149,8 @@ export default class WonTravelActionPicker extends React.Component {
       >
         <svg className="rp__searchresult__icon">
           <use
-            xlinkHref="#ico16_indicator_location"
-            href="#ico16_indicator_location"
+            xlinkHref={ico16_indicator_location}
+            href={ico16_indicator_location}
           />
         </svg>
         <span className="rp__searchresult__text">{result.name}</span>
@@ -230,8 +232,8 @@ export default class WonTravelActionPicker extends React.Component {
             >
               <svg className="rp__searchresult__icon">
                 <use
-                  xlinkHref="#ico16_indicator_location"
-                  href="#ico36_location_current"
+                  xlinkHref={ico36_location_current}
+                  href={ico36_location_current}
                 />
               </svg>
               <span className="rp__searchresult__text">
@@ -250,8 +252,8 @@ export default class WonTravelActionPicker extends React.Component {
               <svg className="rp__searchresult__icon">
                 {/*<!-- TODO: create and use a more appropriate icon here -->*/}
                 <use
-                  xlinkHref="#ico16_indicator_location"
-                  href="#ico16_indicator_location"
+                  xlinkHref={ico16_indicator_location}
+                  href={ico16_indicator_location}
                 />
               </svg>
               <span className="rp__searchresult__text">
@@ -284,8 +286,8 @@ export default class WonTravelActionPicker extends React.Component {
             >
               <svg className="rp__searchresult__icon">
                 <use
-                  xlinkHref="#ico16_indicator_location"
-                  href="#ico36_location_current"
+                  xlinkHref={ico16_indicator_location}
+                  href={ico36_location_current}
                 />
               </svg>
               <span className="rp__searchresult__text">
@@ -304,8 +306,8 @@ export default class WonTravelActionPicker extends React.Component {
               <svg className="rp__searchresult__icon">
                 {/*<!-- TODO: create and use a more appropriate icon here -->*/}
                 <use
-                  xlinkHref="#ico16_indicator_location"
-                  href="#ico16_indicator_location"
+                  xlinkHref={ico16_indicator_location}
+                  href={ico16_indicator_location}
                 />
               </svg>
               <span className="rp__searchresult__text">

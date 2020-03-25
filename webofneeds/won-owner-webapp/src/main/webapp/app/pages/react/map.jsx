@@ -31,6 +31,10 @@ import _ from "lodash";
 
 import "~/style/_map.scss";
 import "~/style/_connection-overlay.scss";
+import ico36_detail_location from "~/images/won-icons/ico36_detail_location.svg";
+import ico36_location_current from "~/images/won-icons/ico36_location_current.svg";
+import ico16_indicator_location from "~/images/won-icons/ico16_indicator_location.svg";
+import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg";
 
 const mapStateToProps = state => {
   const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
@@ -204,8 +208,8 @@ class PageMap extends React.Component {
                 >
                   <svg className="ownermap__header__location__icon">
                     <use
-                      xlinkHref="#ico36_detail_location"
-                      href="#ico36_detail_location"
+                      xlinkHref={ico36_detail_location}
+                      href={ico36_detail_location}
                     />
                   </svg>
                   <span className="ownermap__header__location__label">
@@ -222,8 +226,8 @@ class PageMap extends React.Component {
                     onClick={() => this.setState({ showLocationInput: false })}
                   >
                     <use
-                      xlinkHref="#ico36_detail_location"
-                      href="#ico36_detail_location"
+                      xlinkHref={ico36_detail_location}
+                      href={ico36_detail_location}
                     />
                   </svg>
                   <WonTitlePicker
@@ -286,8 +290,8 @@ class PageMap extends React.Component {
                 >
                   <svg className="ownermap__searchresults__result__icon">
                     <use
-                      xlinkHref="#ico36_location_current"
-                      href="#ico36_location_current"
+                      xlinkHref={ico36_location_current}
+                      href={ico36_location_current}
                     />
                   </svg>
                   <div className="ownermap__searchresults__result__label">
@@ -303,8 +307,8 @@ class PageMap extends React.Component {
                 >
                   <svg className="ownermap__searchresults__result__icon">
                     <use
-                      xlinkHref="#ico16_indicator_location"
-                      href="#ico16_indicator_location"
+                      xlinkHref={ico16_indicator_location}
+                      href={ico16_indicator_location}
                     />
                   </svg>
                   <div className="ownermap__searchresults__result__label">
@@ -320,8 +324,8 @@ class PageMap extends React.Component {
                   <div className="ownermap__searchresults__deniedlocation">
                     <svg className="ownermap__searchresults__deniedlocation__icon">
                       <use
-                        xlinkHref="#ico16_indicator_error"
-                        href="#ico16_indicator_error"
+                        xlinkHref={ico16_indicator_error}
+                        href={ico16_indicator_error}
                       />
                     </svg>
                     <div className="ownermap__searchresults__deniedlocation__label">
@@ -339,8 +343,8 @@ class PageMap extends React.Component {
               <div className="ownermap__nolocation">
                 <svg className="ownermap__nolocation__icon">
                   <use
-                    xlinkHref="#ico36_detail_location"
-                    href="#ico36_detail_location"
+                    xlinkHref={ico36_detail_location}
+                    href={ico36_detail_location}
                   />
                 </svg>
                 <div className="ownermap__nolocation__label">

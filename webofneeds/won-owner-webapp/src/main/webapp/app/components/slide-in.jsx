@@ -12,6 +12,10 @@ import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as processSelectors from "../redux/selectors/process-selectors.js";
 
 import "~/style/_slidein.scss";
+import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.svg";
+import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
+import ico16_indicator_info from "~/images/won-icons/ico16_indicator_info.svg";
+import ico36_close from "~/images/won-icons/ico36_close.svg";
 
 const mapStateToProps = state => {
   const verificationToken = getVerificationTokenFromRoute(state);
@@ -150,8 +154,8 @@ class WonSlideIn extends React.Component {
           <div className="si__connectionlost">
             <svg className="si__icon">
               <use
-                xlinkHref="#ico16_indicator_warning"
-                href="#ico16_indicator_warning"
+                xlinkHref={ico16_indicator_warning}
+                href={ico16_indicator_warning}
               />
             </svg>
             <span className="si__title">
@@ -169,7 +173,7 @@ class WonSlideIn extends React.Component {
               )}
             {this.props.reconnecting && (
               <svg className="hspinner">
-                <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+                <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
               </svg>
             )}
           </div>
@@ -178,8 +182,8 @@ class WonSlideIn extends React.Component {
           <div className="si__emailverification">
             <svg className="si__icon">
               <use
-                xlinkHref="#ico16_indicator_warning"
-                href="#ico16_indicator_warning"
+                xlinkHref={ico16_indicator_warning}
+                href={ico16_indicator_warning}
               />
             </svg>
             {!this.props.verificationToken &&
@@ -219,7 +223,7 @@ class WonSlideIn extends React.Component {
             {(this.props.isProcessingVerifyEmailAddress ||
               this.props.isProcessingResendVerificationEmail) && (
               <svg className="hspinner">
-                <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+                <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
               </svg>
             )}
             {!this.props.isProcessingVerifyEmailAddress &&
@@ -248,7 +252,7 @@ class WonSlideIn extends React.Component {
                     this.props.routerGoCurrent({ token: undefined })
                   }
                 >
-                  <use xlinkHref="#ico36_close" href="#ico36_close" />
+                  <use xlinkHref={ico36_close} href={ico36_close} />
                 </svg>
               )}
             {!this.props.isProcessingVerifyEmailAddress &&
@@ -257,7 +261,7 @@ class WonSlideIn extends React.Component {
                   className="si__close"
                   onClick={this.props.accountVerifyEmailAddressSuccess}
                 >
-                  <use xlinkHref="#ico36_close" href="#ico36_close" />
+                  <use xlinkHref={ico36_close} href={ico36_close} />
                 </svg>
               )}
           </div>
@@ -266,8 +270,8 @@ class WonSlideIn extends React.Component {
           <div className="si__termsofservice">
             <svg className="si__icon">
               <use
-                xlinkHref="#ico16_indicator_warning"
-                href="#ico16_indicator_warning"
+                xlinkHref={ico16_indicator_warning}
+                href={ico16_indicator_warning}
               />
             </svg>
             <span className="si__title">
@@ -283,7 +287,7 @@ class WonSlideIn extends React.Component {
             </span>
             {this.props.isProcessingAcceptTermsOfService ? (
               <svg className="hspinner">
-                <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+                <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
               </svg>
             ) : (
               <button
@@ -299,8 +303,8 @@ class WonSlideIn extends React.Component {
           <div className="si__disclaimer">
             <svg className="si__icon">
               <use
-                xlinkHref="#ico16_indicator_warning"
-                href="#ico16_indicator_info"
+                xlinkHref={ico16_indicator_info}
+                href={ico16_indicator_info}
               />
             </svg>
             <div className="si__title">
@@ -358,8 +362,8 @@ class WonSlideIn extends React.Component {
           >
             <svg className="si__icon">
               <use
-                xlinkHref="#ico16_indicator_warning"
-                href="#ico16_indicator_warning"
+                xlinkHref={ico16_indicator_warning}
+                href={ico16_indicator_warning}
               />
             </svg>
             <span className="si__title">
@@ -369,7 +373,7 @@ class WonSlideIn extends React.Component {
               className="si__close"
               onClick={this.props.hideAnonymousSlideIn}
             >
-              <use xlinkHref="#ico36_close" href="#ico36_close" />
+              <use xlinkHref={ico36_close} href={ico36_close} />
             </svg>
             <div className="si__text">
               <h3>You are posting with an anonymous account. This means:</h3>
@@ -444,7 +448,7 @@ class WonSlideIn extends React.Component {
               )}
             {this.props.isProcessingSendAnonymousLinkEmail && (
               <svg className="hspinner">
-                <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+                <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
               </svg>
             )}
           </div>
@@ -453,8 +457,8 @@ class WonSlideIn extends React.Component {
           <div className="si__anonymoussuccess">
             <svg className="si__icon">
               <use
-                xlinkHref="#ico16_indicator_info"
-                href="#ico16_indicator_info"
+                xlinkHref={ico16_indicator_info}
+                href={ico16_indicator_info}
               />
             </svg>
             {this.props.anonymousLinkSent && (
@@ -469,7 +473,7 @@ class WonSlideIn extends React.Component {
               className="si__close"
               onClick={this.props.hideAnonymousSlideIn}
             >
-              <use xlinkHref="#ico36_close" href="#ico36_close" />
+              <use xlinkHref={ico36_close} href={ico36_close} />
             </svg>
           </div>
         )}

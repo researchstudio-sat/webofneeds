@@ -13,6 +13,7 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
 import "~/style/_context-dropdown.scss";
+import ico16_contextmenu from "~/images/won-icons/ico16_contextmenu.svg";
 
 const mapStateToProps = (state, ownProps) => {
   const atom = ownProps.atomUri && getIn(state, ["atoms", ownProps.atomUri]);
@@ -82,14 +83,14 @@ class WonAtomContextDropdown extends React.Component {
     const iconElement =
       this.props.atomLoading || this.props.atomFailedToLoad ? (
         <svg className="cdd__icon__small">
-          <use xlinkHref="#ico16_contextmenu" href="#ico16_contextmenu" />
+          <use xlinkHref={ico16_contextmenu} href={ico16_contextmenu} />
         </svg>
       ) : (
         <svg
           className="cdd__icon__small clickable"
           onClick={() => this.setState({ contextMenuOpen: true })}
         >
-          <use xlinkHref="#ico16_contextmenu" href="#ico16_contextmenu" />
+          <use xlinkHref={ico16_contextmenu} href={ico16_contextmenu} />
         </svg>
       );
 
@@ -194,7 +195,7 @@ class WonAtomContextDropdown extends React.Component {
           >
             <div className="topline">
               <svg className="cdd__icon__small__contextmenu clickable">
-                <use xlinkHref="#ico16_contextmenu" href="#ico16_contextmenu" />
+                <use xlinkHref={ico16_contextmenu} href={ico16_contextmenu} />
               </svg>
             </div>
             {/* Buttons when connection is available -->*/}

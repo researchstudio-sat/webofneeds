@@ -13,6 +13,7 @@ import WonFooter from "../../components/footer";
 import WonLabelledHr from "../../components/labelled-hr.jsx";
 
 import "~/style/_signup.scss";
+import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.svg";
 import { actionCreators } from "../../actions/actions";
 
 const mapStateToProps = state => {
@@ -111,8 +112,8 @@ class PageSignUp extends React.Component {
                   <div className="signup__content__form__errormsg">
                     <svg className="signup__content__form__errormsg__icon">
                       <use
-                        xlinkHref="#ico16_indicator_warning"
-                        href="#ico16_indicator_warning"
+                        xlinkHref={ico16_indicator_warning}
+                        href={ico16_indicator_warning}
                       />
                     </svg>
                     Not a valid E-Mail address
@@ -122,8 +123,8 @@ class PageSignUp extends React.Component {
                 <div className="signup__content__form__errormsg">
                   <svg className="signup__content__form__errormsg__icon">
                     <use
-                      xlinkHref="#ico16_indicator_warning"
-                      href="#ico16_indicator_warning"
+                      xlinkHref={ico16_indicator_warning}
+                      href={ico16_indicator_warning}
                     />
                   </svg>
                   {this.props.registerError}
@@ -144,8 +145,8 @@ class PageSignUp extends React.Component {
                   <div className="signup__content__form__errormsg">
                     <svg className="signup__content__form__errormsg__icon">
                       <use
-                        xlinkHref="#ico16_indicator_warning"
-                        href="#ico16_indicator_warning"
+                        xlinkHref={ico16_indicator_warning}
+                        href={ico16_indicator_warning}
                       />
                     </svg>
                     {"Password too short, must be at least " +
@@ -168,8 +169,8 @@ class PageSignUp extends React.Component {
                   <div className="signup__content__form__errormsg">
                     <svg className="signup__content__form__errormsg__icon">
                       <use
-                        xlinkHref="#ico16_indicator_warning"
-                        href="#ico16_indicator_warning"
+                        xlinkHref={ico16_indicator_warning}
+                        href={ico16_indicator_warning}
                       />
                     </svg>
                     Password is not equal

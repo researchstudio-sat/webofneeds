@@ -19,6 +19,9 @@ import VisibilitySensor from "react-visibility-sensor";
 
 import "~/style/_connection-message.scss";
 import "~/style/_rdflink.scss";
+import rdf_logo_2 from "~/images/won-icons/rdf_logo_2.svg";
+import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
+import ico16_arrow_up from "~/images/won-icons/ico16_arrow_up.svg";
 import * as viewSelectors from "../../redux/selectors/view-selectors";
 
 const MESSAGE_READ_TIMEOUT = 1500;
@@ -253,12 +256,9 @@ class WonConnectionMessage extends React.Component {
               >
                 <svg>
                   {this.props.showActions ? (
-                    <use xlinkHref="#ico16_arrow_up" href="#ico16_arrow_up" />
+                    <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
                   ) : (
-                    <use
-                      xlinkHref="#ico16_arrow_down"
-                      href="#ico16_arrow_down"
-                    />
+                    <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
                   )}
                 </svg>
               </div>
@@ -301,7 +301,7 @@ class WonConnectionMessage extends React.Component {
                   href={this.props.rdfLinkURL}
                 >
                   <svg className="rdflink__small clickable">
-                    <use xlinkHref="#rdf_logo_2" href="#rdf_logo_2" />
+                    <use xlinkHref={rdf_logo_2} href={rdf_logo_2} />
                   </svg>
                 </a>
               ) : (

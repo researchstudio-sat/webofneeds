@@ -20,6 +20,9 @@ import WonFooter from "../../components/footer.jsx";
 import WonHowTo from "../../components/howto.jsx";
 import WonAtomCardGrid from "../../components/atom-card-grid.jsx";
 
+import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
+import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
+
 import "~/style/_inventory.scss";
 import "~/style/_connection-overlay.scss";
 
@@ -138,7 +141,7 @@ class PageInventory extends React.Component {
           this.props.isInitialLoadInProgress ? (
             <main className="ownerloading">
               <svg className="ownerloading__spinner hspinner">
-                <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+                <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
               </svg>
               <span className="ownerloading__label">
                 Gathering your Atoms...
@@ -197,10 +200,7 @@ class PageInventory extends React.Component {
                     }
                     onClick={this.props.toggleClosedAtoms}
                   >
-                    <use
-                      xlinkHref="#ico16_arrow_down"
-                      href="#ico16_arrow_down"
-                    />
+                    <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
                   </svg>
                 </div>
               )}

@@ -15,6 +15,10 @@ import WonAtomContextSwipeableView from "./atom-context-swipeable-view";
 import WonSuggestAtomPicker from "./details/picker/suggest-atom-picker.jsx";
 
 import "~/style/_atom-content-participants.scss";
+import ico32_buddy_deny from "~/images/won-icons/ico32_buddy_deny.svg";
+import ico32_buddy_accept from "~/images/won-icons/ico32_buddy_accept.svg";
+import ico32_buddy_waiting from "~/images/won-icons/ico32_buddy_waiting.svg";
+
 import VisibilitySensor from "react-visibility-sensor";
 import PropTypes from "prop-types";
 
@@ -128,8 +132,8 @@ class WonAtomContentParticipants extends React.Component {
                     onClick={() => this.openRequest(conn)}
                   >
                     <use
-                      xlinkHref="#ico32_buddy_accept"
-                      href="#ico32_buddy_accept"
+                      xlinkHref={ico32_buddy_accept}
+                      href={ico32_buddy_accept}
                     />
                   </svg>
                   <svg
@@ -138,10 +142,7 @@ class WonAtomContentParticipants extends React.Component {
                       this.closeConnection(conn, "Reject Participant Request?")
                     }
                   >
-                    <use
-                      xlinkHref="#ico32_buddy_deny"
-                      href="#ico32_buddy_deny"
-                    />
+                    <use xlinkHref={ico32_buddy_deny} href={ico32_buddy_deny} />
                   </svg>
                 </div>
               );
@@ -154,8 +155,8 @@ class WonAtomContentParticipants extends React.Component {
                     onClick={() => this.sendRequest(conn)}
                   >
                     <use
-                      xlinkHref="#ico32_buddy_accept"
-                      href="#ico32_buddy_accept"
+                      xlinkHref={ico32_buddy_accept}
+                      href={ico32_buddy_accept}
                     />
                   </svg>
                   <svg
@@ -167,10 +168,7 @@ class WonAtomContentParticipants extends React.Component {
                       )
                     }
                   >
-                    <use
-                      xlinkHref="#ico32_buddy_deny"
-                      href="#ico32_buddy_deny"
-                    />
+                    <use xlinkHref={ico32_buddy_deny} href={ico32_buddy_deny} />
                   </svg>
                 </div>
               );
@@ -183,8 +181,8 @@ class WonAtomContentParticipants extends React.Component {
                     disabled={true}
                   >
                     <use
-                      xlinkHref="#ico32_buddy_waiting"
-                      href="#ico32_buddy_waiting"
+                      xlinkHref={ico32_buddy_waiting}
+                      href={ico32_buddy_waiting}
                     />
                   </svg>
                   <svg
@@ -193,10 +191,7 @@ class WonAtomContentParticipants extends React.Component {
                       this.closeConnection(conn, "Cancel Participant Request?")
                     }
                   >
-                    <use
-                      xlinkHref="#ico32_buddy_deny"
-                      href="#ico32_buddy_deny"
-                    />
+                    <use xlinkHref={ico32_buddy_deny} href={ico32_buddy_deny} />
                   </svg>
                 </div>
               );
@@ -207,10 +202,7 @@ class WonAtomContentParticipants extends React.Component {
                     className="acp__participant__actions__icon secondary won-icon"
                     onClick={() => this.closeConnection(conn)}
                   >
-                    <use
-                      xlinkHref="#ico32_buddy_deny"
-                      href="#ico32_buddy_deny"
-                    />
+                    <use xlinkHref={ico32_buddy_deny} href={ico32_buddy_deny} />
                   </svg>
                 </div>
               );

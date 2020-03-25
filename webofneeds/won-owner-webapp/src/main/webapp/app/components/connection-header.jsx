@@ -24,6 +24,7 @@ import Immutable from "immutable";
 import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
 
 import "~/style/_connection-header.scss";
+import ico36_incoming from "~/images/won-icons/ico36_incoming.svg";
 
 const mapStateToProps = (state, ownProps) => {
   const ownedAtom = generalSelectors.getOwnedAtomByConnectionUri(
@@ -355,7 +356,7 @@ class WonConnectionHeader extends React.Component {
                 //TODO
                 onClick={() => this.selectMembersTab()}
               >
-                <use xlinkHref="#ico36_incoming" href="#ico36_incoming" />
+                <use xlinkHref={ico36_incoming} href={ico36_incoming} />
               </svg>
             </won-connection-indicators>
           </div>

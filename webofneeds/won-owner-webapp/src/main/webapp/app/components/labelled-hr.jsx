@@ -5,6 +5,8 @@
 import React from "react";
 
 import "~/style/_labelledhr.scss";
+import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
+import ico16_arrow_up from "~/images/won-icons/ico16_arrow_up.svg";
 import PropTypes from "prop-types";
 
 export default class WonLabelledHr extends React.Component {
@@ -20,14 +22,14 @@ export default class WonLabelledHr extends React.Component {
             >
               <use
                 xlinkHref={
-                  this.props.arrow == "down"
-                    ? "#ico16_arrow_down"
-                    : "#ico16_arrow_up"
+                  this.props.arrow === "down"
+                    ? ico16_arrow_down
+                    : ico16_arrow_up
                 }
                 href={
-                  this.props.arrow == "down"
-                    ? "#ico16_arrow_down"
-                    : "#ico16_arrow_up"
+                  this.props.arrow === "down"
+                    ? ico16_arrow_down
+                    : ico16_arrow_up
                 }
               />
             </svg>

@@ -10,6 +10,8 @@ import { get, getIn } from "../utils.js";
 import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 
 import "~/style/_atom-connections-indicator.scss";
+import ico36_message from "~/images/won-icons/ico36_message.svg";
+import ico36_incoming from "~/images/won-icons/ico36_incoming.svg";
 
 const mapStateToProps = (state, ownProps) => {
   const atom = getIn(state, ["atoms", ownProps.atomUri]);
@@ -79,11 +81,9 @@ class WonAtomConnectionsIndicator extends React.Component {
         >
           <use
             xlinkHref={
-              this.props.hasUnreadChats ? "#ico36_message" : "#ico36_incoming"
+              this.props.hasUnreadChats ? ico36_message : ico36_incoming
             }
-            href={
-              this.props.hasUnreadChats ? "#ico36_message" : "#ico36_incoming"
-            }
+            href={this.props.hasUnreadChats ? ico36_message : ico36_incoming}
           />
         </svg>
         <div className="asi__right">

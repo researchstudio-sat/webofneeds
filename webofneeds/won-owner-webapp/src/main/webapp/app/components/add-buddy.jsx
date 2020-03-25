@@ -10,6 +10,11 @@ import WonAtomHeader from "../components/atom-header.jsx";
 import PropTypes from "prop-types";
 
 import "~/style/_add-buddy.scss";
+import ico32_buddy_add from "~/images/won-icons/ico32_buddy_add.svg";
+import ico32_buddy_waiting from "~/images/won-icons/ico32_buddy_waiting.svg";
+import ico32_buddy_accept from "~/images/won-icons/ico32_buddy_accept.svg";
+import ico32_buddy_deny from "~/images/won-icons/ico32_buddy_deny.svg";
+
 import { actionCreators } from "../actions/actions";
 
 const mapStateToProps = (state, ownProps) => {
@@ -103,29 +108,29 @@ class WonAddBuddy extends React.Component {
 
         if (connectionUtils.isConnected(existingBuddyConnection)) {
           connectionStateClass = "connected";
-          connectionStateIcon = "#ico32_buddy_accept";
+          connectionStateIcon = ico32_buddy_accept;
           onClickAction = () => {
             this.removeBuddy(existingBuddyConnection);
           };
         } else if (connectionUtils.isRequestSent(existingBuddyConnection)) {
           connectionStateClass = "sent";
-          connectionStateIcon = "#ico32_buddy_waiting";
+          connectionStateIcon = ico32_buddy_waiting;
           onClickAction = () => {
             this.removeBuddy(existingBuddyConnection);
           };
         } else if (connectionUtils.isClosed(existingBuddyConnection)) {
           connectionStateClass = "closed";
-          connectionStateIcon = "#ico32_buddy_deny";
+          connectionStateIcon = ico32_buddy_deny;
         } else if (connectionUtils.isRequestReceived(existingBuddyConnection)) {
           connectionStateClass = "received";
-          connectionStateIcon = "#ico32_buddy_accept";
+          connectionStateIcon = ico32_buddy_accept;
           onClickAction = () => {
             this.connectBuddy(get(atom, "uri"), existingBuddyConnection);
           };
         } else {
           // also includes suggested (BuddySocket)Connections
           connectionStateClass = "requestable";
-          connectionStateIcon = "#ico32_buddy_add";
+          connectionStateIcon = ico32_buddy_add;
           onClickAction = () => {
             this.connectBuddy(get(atom, "uri"), existingBuddyConnection);
           };
@@ -157,7 +162,7 @@ class WonAddBuddy extends React.Component {
               onClick={() => this.setState({ contextMenuOpen: false })}
             >
               <svg className="add-buddy__addbuddymenu__header__icon">
-                <use xlinkHref="#ico32_buddy_add" href="#ico32_buddy_add" />
+                <use xlinkHref={ico32_buddy_add} href={ico32_buddy_add} />
               </svg>
               <span className="add-buddy__addbuddymenu__header__text hide-in-responsive">
                 Add as Buddy&#8230;
@@ -188,25 +193,25 @@ class WonAddBuddy extends React.Component {
 
       if (connectionUtils.isConnected(existingBuddyConnection)) {
         connectionStateClass = "connected";
-        connectionStateIcon = "#ico32_buddy_accept";
+        connectionStateIcon = ico32_buddy_accept;
         connectionStateLabel = "Already a Buddy";
         onClickAction = () => {
           this.removeBuddy(existingBuddyConnection);
         };
       } else if (connectionUtils.isRequestSent(existingBuddyConnection)) {
         connectionStateClass = "sent";
-        connectionStateIcon = "#ico32_buddy_waiting";
+        connectionStateIcon = ico32_buddy_waiting;
         connectionStateLabel = "Buddy Request sent";
         onClickAction = () => {
           this.removeBuddy(existingBuddyConnection);
         };
       } else if (connectionUtils.isClosed(existingBuddyConnection)) {
         connectionStateClass = "closed";
-        connectionStateIcon = "#ico32_buddy_deny";
+        connectionStateIcon = ico32_buddy_deny;
         connectionStateLabel = "Buddy Request denied";
       } else if (connectionUtils.isRequestReceived(existingBuddyConnection)) {
         connectionStateClass = "received";
-        connectionStateIcon = "#ico32_buddy_accept";
+        connectionStateIcon = ico32_buddy_accept;
         connectionStateLabel = "Accept Buddy Request";
         onClickAction = () => {
           this.connectBuddy(
@@ -217,7 +222,7 @@ class WonAddBuddy extends React.Component {
       } else {
         // also includes suggested (BuddySocket)Connections
         connectionStateClass = "requestable";
-        connectionStateIcon = "#ico32_buddy_add";
+        connectionStateIcon = ico32_buddy_add;
         connectionStateLabel = "Add as Buddy";
         onClickAction = () => {
           this.connectBuddy(
@@ -247,7 +252,7 @@ class WonAddBuddy extends React.Component {
           onClick={() => this.setState({ contextMenuOpen: true })}
         >
           <svg className="add-buddy__addbuddymenu__header__icon">
-            <use xlinkHref="#ico32_buddy_add" href="#ico32_buddy_add" />
+            <use xlinkHref={ico32_buddy_add} href={ico32_buddy_add} />
           </svg>
           <span className="add-buddy__addbuddymenu__header__text hide-in-responsive">
             Add as Buddy&#8230;

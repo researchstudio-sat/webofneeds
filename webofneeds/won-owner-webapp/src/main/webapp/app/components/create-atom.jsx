@@ -14,6 +14,9 @@ import * as accountUtils from "../redux/utils/account-utils.js";
 
 import "~/style/_create-atom.scss";
 import "~/style/_responsiveness-utils.scss";
+import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
+import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg";
+
 import Immutable from "immutable";
 import WonCreateIsSeeks from "./create-isseeks.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
@@ -369,7 +372,7 @@ class CreateAtom extends React.Component {
         unavailableContentElement = (
           <div className="cp__content__loading">
             <svg className="cp__content__loading__spinner hspinner">
-              <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+              <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
             </svg>
             <span className="cp__content__loading__label">Loading...</span>
           </div>
@@ -379,8 +382,8 @@ class CreateAtom extends React.Component {
           <div className="cp__content__failed">
             <svg className="cp__content__failed__icon">
               <use
-                xlinkHref="#ico16_indicator_error"
-                href="#ico16_indicator_error"
+                xlinkHref={ico16_indicator_error}
+                href={ico16_indicator_error}
               />
             </svg>
             <span className="cp__content__failed__label">

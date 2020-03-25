@@ -7,6 +7,11 @@ import { get, getIn } from "../utils.js";
 import "~/style/_responsiveness-utils.scss";
 import "~/style/_toasts.scss";
 import "~/style/_won-markdown.scss";
+import ico27_close from "~/images/won-icons/ico27_close.svg";
+import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.svg";
+import ico16_indicator_info from "~/images/won-icons/ico16_indicator_info.svg";
+import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg";
+
 import vocab from "../service/vocab.js";
 import ReactMarkdown from "react-markdown";
 
@@ -39,8 +44,8 @@ class WonToasts extends React.Component {
                   <div className="topnav__toasts__element warn" key={index}>
                     <svg className="topnav__toasts__element__icon">
                       <use
-                        xlinkHref="#ico16_indicator_warning"
-                        href="#ico16_indicator_warning"
+                        xlinkHref={ico16_indicator_warning}
+                        href={ico16_indicator_warning}
                       />
                     </svg>
 
@@ -55,7 +60,7 @@ class WonToasts extends React.Component {
                       className="topnav__toasts__element__close clickable"
                       onClick={() => this.props.toastDelete(toast)}
                     >
-                      <use xlinkHref="#ico27_close" href="#ico27_close" />
+                      <use xlinkHref={ico27_close} href={ico27_close} />
                     </svg>
                   </div>
                 );
@@ -65,8 +70,8 @@ class WonToasts extends React.Component {
                   <div className="topnav__toasts__element info" key={index}>
                     <svg className="topnav__toasts__element__icon">
                       <use
-                        xlinkHref="#ico16_indicator_info"
-                        href="#ico16_indicator_info"
+                        xlinkHref={ico16_indicator_info}
+                        href={ico16_indicator_info}
                       />
                     </svg>
 
@@ -81,7 +86,7 @@ class WonToasts extends React.Component {
                       className="topnav__toasts__element__close clickable"
                       onClick={() => this.props.toastDelete(toast)}
                     >
-                      <use xlinkHref="#ico27_close" href="#ico27_close" />
+                      <use xlinkHref={ico27_close} href={ico27_close} />
                     </svg>
                   </div>
                 );
@@ -92,8 +97,8 @@ class WonToasts extends React.Component {
                   <div className="topnav__toasts__element error" key={index}>
                     <svg className="topnav__toasts__element__icon">
                       <use
-                        xlinkHref="#ico16_indicator_error"
-                        href="#ico16_indicator_error"
+                        xlinkHref={ico16_indicator_error}
+                        href={ico16_indicator_error}
                       />
                     </svg>
 
@@ -114,7 +119,7 @@ class WonToasts extends React.Component {
                       className="topnav__toasts__element__close clickable"
                       onClick={() => this.props.toastDelete(toast)}
                     >
-                      <use xlinkHref="#ico27_close" href="#ico27_close" />
+                      <use xlinkHref={ico27_close} href={ico27_close} />
                     </svg>
                   </div>
                 );

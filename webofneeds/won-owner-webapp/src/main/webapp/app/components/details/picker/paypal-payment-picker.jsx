@@ -1,6 +1,7 @@
 import React from "react";
 
 import "~/style/_paypalpaymentpicker.scss";
+import ico36_close from "~/images/won-icons/ico36_close.svg";
 import PropTypes from "prop-types";
 import { isValidNumber } from "../../../utils";
 
@@ -31,7 +32,7 @@ export default class WonPaypalPaymentPicker extends React.Component {
                 className="paypalpaymentp__input__reset__icon"
                 onClick={() => this.resetNumber(true)}
               >
-                <use xlinkHref="#ico36_close" href="#ico36_close" />
+                <use xlinkHref={ico36_close} href={ico36_close} />
               </svg>
             )}
           </div>
@@ -84,7 +85,7 @@ export default class WonPaypalPaymentPicker extends React.Component {
                 className="paypalpaymentp__textinput__reset__icon"
                 onClick={this.resetReceiver.bind(this)}
               >
-                <use xlinkHref="#ico36_close" href="#ico36_close" />
+                <use xlinkHref={ico36_close} href={ico36_close} />
               </svg>
             )}
           </div>

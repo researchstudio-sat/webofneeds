@@ -18,6 +18,8 @@ import WonFooter from "../../components/footer.jsx";
 
 import "~/style/_post.scss";
 import "~/style/_connection-overlay.scss";
+import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
+import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg";
 
 const mapStateToProps = state => {
   const atomUri = generalSelectors.getPostUriFromRoute(state);
@@ -79,7 +81,7 @@ class PagePost extends React.Component {
           {this.props.atomLoading && (
             <div className="pc__loading">
               <svg className="pc__loading__spinner hspinner">
-                <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+                <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
               </svg>
               <span className="pc__loading__label">Loading...</span>
             </div>
@@ -88,8 +90,8 @@ class PagePost extends React.Component {
             <div className="pc__failed">
               <svg className="pc__failed__icon">
                 <use
-                  xlinkHref="#ico16_indicator_error"
-                  href="#ico16_indicator_error"
+                  xlinkHref={ico16_indicator_error}
+                  href={ico16_indicator_error}
                 />
               </svg>
               <span className="pc__failed__label">

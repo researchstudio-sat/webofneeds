@@ -17,6 +17,11 @@ import "~/style/_atom-content-buddies.scss";
 import VisibilitySensor from "react-visibility-sensor";
 import PropTypes from "prop-types";
 
+import ico32_buddy_accept from "~/images/won-icons/ico32_buddy_accept.svg";
+import ico32_buddy_deny from "~/images/won-icons/ico32_buddy_deny.svg";
+import ico32_buddy_waiting from "~/images/won-icons/ico32_buddy_waiting.svg";
+import ico36_message from "~/images/won-icons/ico36_message.svg";
+
 const mapStateToProps = (state, ownProps) => {
   const atom = getIn(state, ["atoms", ownProps.atomUri]);
   const isOwned = generalSelectors.isAtomOwned(state, ownProps.atomUri);
@@ -160,8 +165,8 @@ class WonAtomContentBuddies extends React.Component {
                     onClick={() => this.openRequest(conn)}
                   >
                     <use
-                      xlinkHref="#ico32_buddy_accept"
-                      href="#ico32_buddy_accept"
+                      xlinkHref={ico32_buddy_accept}
+                      href={ico32_buddy_accept}
                     />
                   </svg>
                   <svg
@@ -170,10 +175,7 @@ class WonAtomContentBuddies extends React.Component {
                       this.closeConnection(conn, "Reject Buddy Request?")
                     }
                   >
-                    <use
-                      xlinkHref="#ico32_buddy_deny"
-                      href="#ico32_buddy_deny"
-                    />
+                    <use xlinkHref={ico32_buddy_deny} href={ico32_buddy_deny} />
                   </svg>
                 </div>
               );
@@ -186,8 +188,8 @@ class WonAtomContentBuddies extends React.Component {
                     onClick={() => this.requestBuddy(conn)}
                   >
                     <use
-                      xlinkHref="#ico32_buddy_accept"
-                      href="#ico32_buddy_accept"
+                      xlinkHref={ico32_buddy_accept}
+                      href={ico32_buddy_accept}
                     />
                   </svg>
                   <svg
@@ -196,10 +198,7 @@ class WonAtomContentBuddies extends React.Component {
                       this.closeConnection(conn, "Reject Buddy Suggestion?")
                     }
                   >
-                    <use
-                      xlinkHref="#ico32_buddy_deny"
-                      href="#ico32_buddy_deny"
-                    />
+                    <use xlinkHref={ico32_buddy_deny} href={ico32_buddy_deny} />
                   </svg>
                 </div>
               );
@@ -212,8 +211,8 @@ class WonAtomContentBuddies extends React.Component {
                     disabled={true}
                   >
                     <use
-                      xlinkHref="#ico32_buddy_waiting"
-                      href="#ico32_buddy_waiting"
+                      xlinkHref={ico32_buddy_waiting}
+                      href={ico32_buddy_waiting}
                     />
                   </svg>
                   <svg
@@ -222,10 +221,7 @@ class WonAtomContentBuddies extends React.Component {
                       this.closeConnection(conn, "Cancel Buddy Request?")
                     }
                   >
-                    <use
-                      xlinkHref="#ico32_buddy_deny"
-                      href="#ico32_buddy_deny"
-                    />
+                    <use xlinkHref={ico32_buddy_deny} href={ico32_buddy_deny} />
                   </svg>
                 </div>
               );
@@ -237,16 +233,13 @@ class WonAtomContentBuddies extends React.Component {
                     className="acb__buddy__actions__icon primary won-icon"
                     onClick={() => this.sendChatMessage(conn)}
                   >
-                    <use xlinkHref="#ico36_message" href="#ico36_message" />
+                    <use xlinkHref={ico36_message} href={ico36_message} />
                   </svg>
                   <svg
                     className="acb__buddy__actions__icon secondary won-icon"
                     onClick={() => this.closeConnection(conn)}
                   >
-                    <use
-                      xlinkHref="#ico32_buddy_deny"
-                      href="#ico32_buddy_deny"
-                    />
+                    <use xlinkHref={ico32_buddy_deny} href={ico32_buddy_deny} />
                   </svg>
                 </div>
               );

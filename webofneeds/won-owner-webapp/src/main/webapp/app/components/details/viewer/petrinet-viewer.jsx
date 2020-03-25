@@ -1,6 +1,7 @@
 import React from "react";
 
 import "~/style/_petrinet-viewer.scss";
+import ico36_uc_transport_demand from "~/images/won-icons/ico36_uc_transport_demand.svg";
 import PropTypes from "prop-types";
 import WonPetrinetState from "../../petrinet-state";
 import { get } from "../../../utils.js";
@@ -39,8 +40,8 @@ export default class WonPetrinetViewer extends React.Component {
       >
         <svg className="petrinetv__content__download__typeicon">
           <use
-            xlinkHref="#ico36_uc_transport_demand"
-            href="#ico36_uc_transport_demand"
+            xlinkHref={ico36_uc_transport_demand}
+            href={ico36_uc_transport_demand}
           />
         </svg>
         <div className="petrinetv__content__download__label clickable">
