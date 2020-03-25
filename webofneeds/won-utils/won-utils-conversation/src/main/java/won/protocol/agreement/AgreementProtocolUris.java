@@ -10,6 +10,7 @@ public class AgreementProtocolUris {
     private Set<URI> rejectedUris = new HashSet<URI>();
     private Set<URI> claimedUris = new HashSet<URI>();
     private Set<URI> agreementUris = new HashSet<URI>();
+    private Set<URI> acceptedUris = new HashSet<URI>();
     private Set<URI> pendingProposalUris = new HashSet<URI>();
     private Set<URI> cancelledAgreementUris = new HashSet<URI>();
     private Set<URI> cancellationPendingAgreementUris = new HashSet<URI>();
@@ -38,6 +39,14 @@ public class AgreementProtocolUris {
 
     public void addAgreementUris(Collection<URI> uris) {
         this.agreementUris.addAll(uris);
+    }
+
+    public void addAcceptedUris(Set<URI> acceptedUris) {
+        this.acceptedUris.addAll(acceptedUris);
+    }
+
+    public void addAcceptedUri(URI acceptedUri) {
+        this.acceptedUris.add(acceptedUri);
     }
 
     public void addPendingProposalUris(Collection<URI> uris) {
@@ -86,6 +95,10 @@ public class AgreementProtocolUris {
 
     public Set<URI> getAgreementUris() {
         return agreementUris;
+    }
+
+    public Set<URI> getAcceptedUris() {
+        return acceptedUris;
     }
 
     public Set<URI> getPendingProposalUris() {

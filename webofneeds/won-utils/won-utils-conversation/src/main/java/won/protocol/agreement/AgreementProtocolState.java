@@ -50,7 +50,7 @@ public class AgreementProtocolState {
     private final Dataset cancelledAgreements = DatasetFactory.createGeneral();
     private final Dataset rejected = DatasetFactory.createGeneral();
     private Dataset conversation = null;
-    private final Set<URI> retractedUris = new HashSet<URI>();
+    private final Set<URI> retractedUris = new HashSet<URI>(); // TODO: Check!
     private final Set<URI> claimedUris = new HashSet<URI>();
     private final Set<URI> acceptedCancellationProposalUris = new HashSet<URI>();
     private Map<URI, ConversationMessage> messagesByURI = new HashMap<>();
@@ -74,6 +74,7 @@ public class AgreementProtocolState {
     public AgreementProtocolUris getAgreementProtocolUris() {
         AgreementProtocolUris uris = new AgreementProtocolUris();
         uris.addAgreementUris(getAgreementUris());
+        uris.addAcceptedUris(getAcceptedUris());
         uris.addAcceptedCancellationProposalUris(getAcceptedCancellationProposalUris());
         uris.addCancelledAgreementUris(getCancelledAreementUris());
         // walk over pending proposals and collect the relevant uris:
@@ -90,7 +91,7 @@ public class AgreementProtocolState {
             boolean isProposal = false;
             if (!cancelled.isEmpty()) {
                 // remember this is a pending proposal that would cancel stuff
-                uris.addPendingCancellationProposalUri(m.getMessageURI());
+                // uris.addPendingCancellationProposalUri(m.getMessageURI());
                 isProposal = true;
             }
             if (!proposed.isEmpty()) {
@@ -106,26 +107,8 @@ public class AgreementProtocolState {
                 uris.addPendingProposal(proposal);
             }
         });
-        // get Effects
-        // public enum MessageEffectType {
-        // PROPOSES, ACCEPTS, REJECTS, RETRACTS, CLAIMS;
-        // }
-        // messagesByURI.values().stream().forEach(m -> {
-        // Set<MessageEffect> effects = getEffects(m.getMessageURI());
-        // effects.stream().forEach(effect -> {
-        // if (effect.isClaims()) {
-        // uris.addClaimedMessageUri(effect.asClaims().getClaimedMessageUri());
-        // }
-        // });
-        // });
-        // walk over claim messages and collect the relevant uris:
-        /*
-         * messagesByURI.values().stream().filter(m ->
-         * isClaim(m.getMessageURI())).forEach(m -> { // so this is a claim message //
-         * determine what it claims Set<URI> claims = m.getClaims(); if
-         * (!claims.isEmpty()) { claims.stream().forEach(claimURI ->
-         * uris.addClaimedMessageUri(claimURI)); } });
-         */
+
+        uris.addPendingCancellationProposalUris(getCancellationPendingAgreementUris());
         uris.addClaimedMessageUris(getClaimedUris());
         uris.addRejectedMessageUris(getRejectedUris());
         uris.addRetractedMessageUris(getRetractedUris());
@@ -147,7 +130,7 @@ public class AgreementProtocolState {
     public Set<MessageEffect> getEffects(URI messageUri) {
         ConversationMessage message = messagesByURI.get(messageUri);
         if (message == null) {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
         return message.getDeliveryChain().getHead().getEffects();
     }
@@ -196,7 +179,7 @@ public class AgreementProtocolState {
 
     public Set<URI> getClauseUrisProposedByPendingProposal(URI proposalUri) {
         if (!isPendingProposal(proposalUri)) {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
         ConversationMessage msg = messagesByURI.get(proposalUri);
         return msg.getEffects().stream().filter(e -> e.isProposes()).map(e -> e.asProposes())
@@ -205,7 +188,7 @@ public class AgreementProtocolState {
 
     public Set<URI> getAgreementUrisCancelledByPendingProposal(URI proposalUri) {
         if (!isPendingProposal(proposalUri)) {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
         ConversationMessage msg = messagesByURI.get(proposalUri);
         return msg.getEffects().stream().filter(e -> e.isProposes()).map(e -> e.asProposes())
@@ -216,15 +199,41 @@ public class AgreementProtocolState {
     public Set<URI> getPendingCancellationProposalUris() {
         Model cancellations = pendingProposals.getDefaultModel();
         if (cancellations == null) {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
-        Set ret = new HashSet<URI>();
+        Set<URI> ret = new HashSet<URI>();
         ResIterator it = cancellations.listSubjectsWithProperty(WONAGR.proposesToCancel);
         while (it.hasNext()) {
             String uri = it.next().asResource().getURI();
             ret.add(URI.create(uri));
         }
         return ret;
+    }
+
+    public Set<URI> getAcceptedUris() {
+        Iterator<String> agreementIt = agreements.listNames();
+        Set<URI> acceptedProposalClaimUris = new HashSet<URI>();
+        while (agreementIt.hasNext()) {
+            Set<MessageEffect> effects = getEffects(URI.create(agreementIt.next()));
+            effects.stream().forEach(effect -> {
+                if (effect.isAccepts()) {
+                    acceptedProposalClaimUris.add(effect.asAccepts().getAcceptedMessageUri());
+                }
+            });
+        }
+        Set<URI> acceptedUris = new HashSet<URI>();
+        acceptedProposalClaimUris.forEach(messageUri -> {
+            Set<MessageEffect> effects = getEffects(messageUri);
+            effects.stream().forEach(effect -> {
+                if (effect.isClaims()) {
+                    acceptedUris.add(effect.asClaims().getClaimedMessageUri());
+                } else if (effect.isProposes()) {
+                    acceptedUris.addAll(effect.asProposes().getProposes());
+                    acceptedUris.addAll(effect.asProposes().getProposesToCancel());
+                }
+            });
+        });
+        return acceptedUris;
     }
 
     public Dataset getCancelledAgreements() {
@@ -273,27 +282,6 @@ public class AgreementProtocolState {
     }
 
     public Set<URI> getClaimedUris() {
-        // claims.addNamedModel(msg.getMessageURI().toString(), claimContent);
-        Model claimed = claims.getDefaultModel();
-        if (claimed == null) {
-            return Collections.EMPTY_SET;
-        }
-        Set<URI> ret = new HashSet<URI>();
-        NodeIterator it = claimed.listObjectsOfProperty(WONAGR.claims);
-        while (it.hasNext()) {
-            String uri = it.next().asResource().getURI();
-            ret.add(URI.create(uri));
-        }
-        logger.info("RET {}", ret.toString());
-        // return ret;
-        ret.stream().forEach(uri -> {
-            Set<MessageEffect> effects = getEffects(uri);
-            effects.stream().forEach(effect -> {
-                if (effect.isClaims()) {
-                    this.claimedUris.add(effect.asClaims().getClaimedMessageUri());
-                }
-            });
-        });
         return this.claimedUris;
     }
 
@@ -302,17 +290,20 @@ public class AgreementProtocolState {
     }
 
     public Set<URI> getCancellationPendingAgreementUris() {
-        Model cancellations = pendingProposals.getDefaultModel();
-        if (cancellations == null) {
+        Iterator<String> pendingProposalUris = pendingProposals.listNames();
+        if (pendingProposalUris == null) {
             return Collections.EMPTY_SET;
         }
-        Set ret = new HashSet<URI>();
-        NodeIterator it = cancellations.listObjectsOfProperty(WONAGR.proposesToCancel);
-        while (it.hasNext()) {
-            String uri = it.next().asResource().getURI();
-            ret.add(URI.create(uri));
+        Set<URI> cancelationUris = new HashSet<URI>();
+        while (pendingProposalUris.hasNext()) {
+            Set<MessageEffect> effects = getEffects(URI.create(pendingProposalUris.next()));
+            effects.stream().forEach(effect -> {
+                if (effect.isProposes()) {
+                    cancelationUris.addAll(effect.asProposes().getProposesToCancel());
+                }
+            });
         }
-        return ret;
+        return cancelationUris;
     }
 
     public Set<URI> getRejectedUris() {
@@ -584,7 +575,7 @@ public class AgreementProtocolState {
         claims.begin(ReadWrite.WRITE);
         conversationDataset.begin(ReadWrite.READ);
         this.messagesByURI = ConversationMessagesReader.readConversationMessages(conversationDataset);
-        Set<ConversationMessage> roots = new HashSet();
+        Set<ConversationMessage> roots = new HashSet<ConversationMessage>();
         Collection<ConversationMessage> messages = messagesByURI.values();
         Set<DeadReferenceConversationMessage> messagesWithDeadReferences = new HashSet<>();
         // filter out messages we don't care about
@@ -969,6 +960,17 @@ public class AgreementProtocolState {
         rejected.commit();
         claims.commit();
         conversationDataset.end();
+        // recalculate claimedUris
+        this.claimedUris.clear();
+        Iterator<String> claimUris = claims.listNames();
+        while (claimUris.hasNext()) {
+            Set<MessageEffect> effects = getEffects(URI.create(claimUris.next()));
+            effects.stream().forEach(effect -> {
+                if (effect.isClaims()) {
+                    this.claimedUris.add(effect.asClaims().getClaimedMessageUri());
+                }
+            });
+        }
     }
 
     private String agrDataToString() {

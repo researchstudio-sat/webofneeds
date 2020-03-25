@@ -397,78 +397,43 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
         if (!isAgreementProtocolMessage) {
             return false;
         }
-        return intesectionOfAllSets();
-        // TODO: Throw Exception?
+        boolean intersection = intesectionOfAllSets();
+        if (!intersection && logger.isDebugEnabled()) {
+            logger.debug("Message {} contains multiple references for one message",
+                            new Object[] { this.getMessageURI() });
+        }
+        return intersection;
     }
 
     private boolean intesectionOfAllSets() {
-        if (intersectionOfSets(this.retractsRefs, this.acceptsRefs)) {
+        Set<ConversationMessage> sumSet = new HashSet<ConversationMessage>();
+        int sumOfSets = this.retractsRefs.size() + this.acceptsRefs.size();
+        sumSet.addAll(this.retractsRefs);
+        sumSet.addAll(this.acceptsRefs);
+        if (sumOfSets != sumSet.size()) {
             return false;
         }
-        // retract & propose
-        if (intersectionOfSets(this.retractsRefs, this.proposesRefs)) {
+        sumOfSets += this.proposesRefs.size();
+        sumSet.addAll(this.proposesRefs);
+        if (sumOfSets != sumSet.size()) {
             return false;
         }
-        // retract & claims
-        if (intersectionOfSets(this.retractsRefs, this.claimsRefs)) {
+        sumOfSets += this.claimsRefs.size();
+        sumSet.addAll(this.claimsRefs);
+        if (sumOfSets != sumSet.size()) {
             return false;
         }
-        // retract & rejectsRefs
-        if (intersectionOfSets(this.retractsRefs, this.rejectsRefs)) {
+        sumOfSets += this.rejectsRefs.size();
+        sumSet.addAll(this.rejectsRefs);
+        if (sumOfSets != sumSet.size()) {
             return false;
         }
-        // retract & proposesToCancelRefs
-        if (intersectionOfSets(this.retractsRefs, this.proposesToCancelRefs)) {
-            return false;
-        }
-        // accepts & propose
-        if (intersectionOfSets(this.acceptsRefs, this.proposesRefs)) {
-            return false;
-        }
-        // accepts & claims
-        if (intersectionOfSets(this.acceptsRefs, this.claimsRefs)) {
-            return false;
-        }
-        // accepts & rejectsRefs
-        if (intersectionOfSets(this.acceptsRefs, this.rejectsRefs)) {
-            return false;
-        }
-        // accepts & proposesToCancelRefs
-        if (intersectionOfSets(this.acceptsRefs, this.proposesToCancelRefs)) {
-            return false;
-        }
-        // proposes & claims
-        if (intersectionOfSets(this.proposesRefs, this.claimsRefs)) {
-            return false;
-        }
-        // proposes & rejectsRefs
-        if (intersectionOfSets(this.proposesRefs, this.rejectsRefs)) {
-            return false;
-        }
-        // proposes & proposesToCancelRefs
-        if (intersectionOfSets(this.proposesRefs, this.proposesToCancelRefs)) {
-            return false;
-        }
-        // claims & rejectsRefs
-        if (intersectionOfSets(this.claimsRefs, this.rejectsRefs)) {
-            return false;
-        }
-        // claims & proposesToCancelRefs
-        if (intersectionOfSets(this.claimsRefs, this.proposesToCancelRefs)) {
-            return false;
-        }
-        // rejects & proposesToCancelRefs
-        if (intersectionOfSets(this.rejectsRefs, this.proposesToCancelRefs)) {
+        sumOfSets += this.proposesToCancelInverseRefs.size();
+        sumSet.addAll(this.proposesToCancelInverseRefs);
+        if (sumOfSets != sumSet.size()) {
             return false;
         }
         return true;
-    }
-
-    private boolean intersectionOfSets(Set<ConversationMessage> a, Set<ConversationMessage> b) {
-        Set<ConversationMessage> c = new HashSet<ConversationMessage>();
-        c.addAll(a);
-        c.retainAll(b);
-        return c.size() == 0 ? false : true;
     }
 
     public boolean isFromOwner() {

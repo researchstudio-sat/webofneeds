@@ -1,3 +1,9 @@
+# Claim 1 Message and accept the Claim
+# Claimed msg: W1ctdqGUW5DA6xKmmvj6W51SZWWPQ4359mjH3r3JEWXCmN
+# Claim: wm:/W1jsiJVmvDJmsyWBQ3yREnUiWnQLBQTntqEmFddG8Ypt6J
+# Accept: W1gSuoLen3c1RQ5B2jsfArGoALEtmQasnoqtYpuxa4GUyM
+
+
 @prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://localhost:8443/won/resource/connection/> .
 @prefix con:   <https://w3id.org/won/content#> .

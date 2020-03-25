@@ -1,5 +1,8 @@
 package won.owner.web.rest;
 
+import java.net.URI;
+import java.util.Set;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,15 +12,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
 import won.protocol.agreement.AgreementProtocolState;
 import won.protocol.agreement.AgreementProtocolUris;
 import won.protocol.agreement.effect.MessageEffect;
 import won.protocol.util.AuthenticationThreadLocal;
 import won.protocol.util.WonConversationUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
-
-import java.net.URI;
-import java.util.Set;
 
 @Controller
 @RequestMapping("/rest/agreement")
@@ -63,6 +64,12 @@ public class AgreementProtocolController {
     public ResponseEntity<Model> getAgreement(URI connectionUri, String agreementUri) {
         Model agreement = getAgreementProtocolState(connectionUri).getAgreement(URI.create(agreementUri));
         return new ResponseEntity<>(agreement, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/getAcceptedUris", method = RequestMethod.GET)
+    public ResponseEntity<Set<URI>> getAcceptedUris(URI connectionUri, String agreementUri) {
+        Set<URI> uris = getAgreementProtocolState(connectionUri).getAcceptedUris();
+        return new ResponseEntity<>(uris, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/getPendingProposals", method = RequestMethod.GET)

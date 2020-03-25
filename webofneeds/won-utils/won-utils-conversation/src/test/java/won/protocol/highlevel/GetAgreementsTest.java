@@ -51,12 +51,30 @@ public class GetAgreementsTest {
         test(input, expectedOutput);
     }
 
+    // This is the case where there is one agreement. That is one proposal and one
+    // accept making one agreement. This agreement is proposed to cancel
+    @Test
+    public void oneAgreementProposedToCancelTest() throws IOException {
+        Dataset input = loadDataset(inputFolder + "one-agreement-proposedtocancel.trig");
+        Dataset expectedOutput = loadDataset(expectedOutputFolder + "one-agreement-proposedtocancel.trig");
+        test(input, expectedOutput);
+    }
+
     // This is the case where there is one claim. The output
     // should be a claim.
     @Test
     public void oneClaimTest() throws IOException {
         Dataset input = loadDataset(inputFolder + "one-claim.trig");
         Dataset expectedOutput = loadDataset(expectedOutputFolder + "one-claim.trig");
+        test(input, expectedOutput);
+    }
+
+    // This is the case where there are three claims. One claim is rejected The
+    // output should be two claims and one rejected.
+    @Test
+    public void threeClaimsOneRejectedTest() throws IOException {
+        Dataset input = loadDataset(inputFolder + "three-claims-one-rejected.trig");
+        Dataset expectedOutput = loadDataset(expectedOutputFolder + "three-claims-one-rejected.trig");
         test(input, expectedOutput);
     }
 
@@ -413,12 +431,22 @@ public class GetAgreementsTest {
         test(input, expectedOutput);
     }
 
-    // twoProposalsOneClaimOneAgreementsClaimRetractedInAccept.trig
+    // This includes two proposals both are accepted, but one is also rejected in
+    // the same accept message
     @Test
-    public void twoProposalsOneClaimOneAgreementClaimRetractedInAccept() throws IOException {
-        Dataset input = loadDataset(inputFolder + "2roposals-1claim-1agreement-claim-retracted-in-accept.trig");
+    public void twoProposalsTwoAcceptsOneProposalRejectedInAccept() throws IOException {
+        Dataset input = loadDataset(inputFolder + "2roposals-2accepts-1proposal-rejected-in-accept.trig");
         Dataset expectedOutput = loadDataset(
-                        expectedOutputFolder + "2roposals-1claim-1agreement-claim-retracted-in-accept.trig");
+                        expectedOutputFolder + "2roposals-2accepts-1proposal-rejected-in-accept.trig");
+        test(input, expectedOutput);
+    }
+
+    // This includes a claim, claiming a SuccesResponse and accepting the claim
+    @Test
+    public void OneAgreementClaimsSuccesResponse() throws IOException {
+        Dataset input = loadDataset(inputFolder + "one-agreement-claims-succes-response.trig");
+        Dataset expectedOutput = loadDataset(
+                        expectedOutputFolder + "one-agreement-claims-succes-response.trig");
         test(input, expectedOutput);
     }
 
