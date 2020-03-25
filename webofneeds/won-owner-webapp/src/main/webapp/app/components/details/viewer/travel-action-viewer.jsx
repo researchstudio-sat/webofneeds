@@ -2,8 +2,8 @@ import React from "react";
 
 import "~/style/_travel-action-viewer.scss";
 import ico_filter_map from "~/images/won-icons/ico-filter_map.svg";
-import ico16_arrow_up from "~/images/won-icons/ico-ico16_arrow_up.svg";
-import ico16_arrow_down from "~/images/won-icons/ico-ico16_arrow_down.svg";
+import ico16_arrow_up from "~/images/won-icons/ico16_arrow_up.svg";
+import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 import PropTypes from "prop-types";
 import { get } from "../../../utils.js";
 import WonAtomMap from "../../atom-map";
