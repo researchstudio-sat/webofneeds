@@ -74,7 +74,7 @@ public class AgreementProtocolState {
     public AgreementProtocolUris getAgreementProtocolUris() {
         AgreementProtocolUris uris = new AgreementProtocolUris();
         uris.addAgreementUris(getAgreementUris());
-        uris.addAcceptedUris(getAgreedMessageUris());
+        uris.addAgreedMessageUris(getAgreedMessageUris());
         uris.addAcceptedCancellationProposalUris(getAcceptedCancellationProposalUris());
         uris.addCancelledAgreementUris(getCancelledAreementUris());
         // walk over pending proposals and collect the relevant uris:
