@@ -66,9 +66,9 @@ public class AgreementProtocolController {
         return new ResponseEntity<>(agreement, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/getAcceptedUris", method = RequestMethod.GET)
-    public ResponseEntity<Set<URI>> getAcceptedUris(URI connectionUri, String agreementUri) {
-        Set<URI> uris = getAgreementProtocolState(connectionUri).getAcceptedUris();
+    @RequestMapping(value = "/getAgreedMessageUris", method = RequestMethod.GET)
+    public ResponseEntity<Set<URI>> getAgreedMessageUris(URI connectionUri, String agreementUri) {
+        Set<URI> uris = getAgreementProtocolState(connectionUri).getAgreedMessageUris();
         return new ResponseEntity<>(uris, HttpStatus.OK);
     }
 

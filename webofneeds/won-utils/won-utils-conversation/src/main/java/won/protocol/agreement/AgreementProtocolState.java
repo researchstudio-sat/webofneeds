@@ -74,7 +74,7 @@ public class AgreementProtocolState {
     public AgreementProtocolUris getAgreementProtocolUris() {
         AgreementProtocolUris uris = new AgreementProtocolUris();
         uris.addAgreementUris(getAgreementUris());
-        uris.addAcceptedUris(getAcceptedUris());
+        uris.addAcceptedUris(getAgreedMessageUris());
         uris.addAcceptedCancellationProposalUris(getAcceptedCancellationProposalUris());
         uris.addCancelledAgreementUris(getCancelledAreementUris());
         // walk over pending proposals and collect the relevant uris:
@@ -210,7 +210,7 @@ public class AgreementProtocolState {
         return ret;
     }
 
-    public Set<URI> getAcceptedUris() {
+    public Set<URI> getAgreedMessageUris() {
         Iterator<String> agreementIt = agreements.listNames();
         Set<URI> acceptedProposalClaimUris = new HashSet<URI>();
         while (agreementIt.hasNext()) {
@@ -221,19 +221,19 @@ public class AgreementProtocolState {
                 }
             });
         }
-        Set<URI> acceptedUris = new HashSet<URI>();
+        Set<URI> agreedMessageUris = new HashSet<URI>();
         acceptedProposalClaimUris.forEach(messageUri -> {
             Set<MessageEffect> effects = getEffects(messageUri);
             effects.stream().forEach(effect -> {
                 if (effect.isClaims()) {
-                    acceptedUris.add(effect.asClaims().getClaimedMessageUri());
+                    agreedMessageUris.add(effect.asClaims().getClaimedMessageUri());
                 } else if (effect.isProposes()) {
-                    acceptedUris.addAll(effect.asProposes().getProposes());
-                    acceptedUris.addAll(effect.asProposes().getProposesToCancel());
+                    agreedMessageUris.addAll(effect.asProposes().getProposes());
+                    agreedMessageUris.addAll(effect.asProposes().getProposesToCancel());
                 }
             });
         });
-        return acceptedUris;
+        return agreedMessageUris;
     }
 
     public Dataset getCancelledAgreements() {
