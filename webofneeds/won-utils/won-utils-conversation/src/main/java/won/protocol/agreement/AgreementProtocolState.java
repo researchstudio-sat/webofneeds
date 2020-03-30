@@ -107,7 +107,6 @@ public class AgreementProtocolState {
                 uris.addPendingProposal(proposal);
             }
         });
-
         uris.addPendingCancellationProposalUris(getCancellationPendingAgreementUris());
         uris.addClaimedMessageUris(getClaimedUris());
         uris.addRejectedMessageUris(getRejectedUris());
