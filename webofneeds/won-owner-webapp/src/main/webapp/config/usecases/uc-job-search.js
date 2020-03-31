@@ -17,14 +17,12 @@ import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
 
 import { getIn } from "../../app/utils.js";
-
-import { Generator } from "sparqljs";
-window.SparqlGenerator4dbg = Generator;
+import ico36_uc_consortium_search from "../../images/won-icons/ico36_uc_consortium-search.svg";
 
 export const jobSearch = {
   identifier: "jobSearch",
   label: "Search a Job",
-  icon: "#ico36_uc_consortium-search", //TODO proper icon
+  icon: ico36_uc_consortium_search, //TODO proper icon
   doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({

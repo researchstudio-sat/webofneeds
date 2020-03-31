@@ -9,10 +9,12 @@ import { postdocSearch } from "./uc-postdoc-search.js";
 import { consortiumSearch } from "./uc-consortium-search.js";
 import { consortiumOffer } from "./uc-consortium-offer.js";
 
+import ico36_uc_phd from "../../images/won-icons/ico36_uc_phd.svg";
+
 export const academicGroup = {
   identifier: "academicGroup",
   label: "Academia",
-  icon: "#ico36_uc_phd",
+  icon: ico36_uc_phd,
   subItems: {
     phdOffer: phdOffer,
     phdSearch: phdSearch,

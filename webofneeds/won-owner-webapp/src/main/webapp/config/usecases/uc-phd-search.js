@@ -5,11 +5,12 @@ import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import { interestsDetail, skillsDetail } from "../details/person.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import vocab from "../../app/service/vocab.js";
+import ico36_uc_phd from "../../images/won-icons/ico36_uc_phd.svg";
 
 export const phdSearch = {
   identifier: "phdSearch",
   label: "Find a PhD position",
-  icon: "#ico36_uc_phd",
+  icon: ico36_uc_phd,
   doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({

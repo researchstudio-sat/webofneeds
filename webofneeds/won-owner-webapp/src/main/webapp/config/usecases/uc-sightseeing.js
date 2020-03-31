@@ -4,11 +4,12 @@
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import { interestsDetail } from "../details/person.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
+import ico36_uc_sightseeing from "../../images/won-icons/ico36_uc_sightseeing.svg";
 
 export const sightseeing = {
   identifier: "sightseeing",
   label: "Go sightseeing",
-  icon: "#ico36_uc_sightseeing",
+  icon: ico36_uc_sightseeing,
   doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({

@@ -7,11 +7,12 @@ import vocab from "../../app/service/vocab.js";
 import { getIn } from "../../app/utils.js";
 import { sparqlQuery } from "../../app/sparql-builder-utils.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
+import ico36_uc_taxi_offer from "../../images/won-icons/ico36_uc_taxi_offer.svg";
 
 export const taxiOffer = {
   identifier: "taxiOffer",
   label: "Offer Taxi Service",
-  icon: "#ico36_uc_taxi_offer",
+  icon: ico36_uc_taxi_offer,
   doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({

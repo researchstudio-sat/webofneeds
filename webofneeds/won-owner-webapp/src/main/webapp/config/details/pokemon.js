@@ -5,11 +5,13 @@ import PokemonGymViewer from "../../app/components/details/viewer/pokemon-gym-vi
 import PokemonRaidbossViewer from "../../app/components/details/viewer/pokemon-raidboss-viewer.jsx";
 import PokemonGymPicker from "../../app/components/details/picker/pokemon-gym-picker";
 import PokemonRaidbossPicker from "../../app/components/details/picker/pokemon-raidboss-picker.jsx";
+import ico36_dumbbell from "../../images/won-icons/ico36_dumbbell.svg";
+import ico36_pokeball from "../../images/won-icons/ico36_pokeball.svg";
 
 export const pokemonGymInfo = {
   identifier: "pokemonGymInfo",
   label: "Additional Gym Info",
-  icon: "#ico36_dumbbell", //TODO: Create and use better icon
+  icon: ico36_dumbbell, //TODO: Create and use better icon
   messageEnabled: false,
   component: PokemonGymPicker,
   viewerComponent: PokemonGymViewer,
@@ -43,7 +45,7 @@ export const pokemonGymInfo = {
 export const pokemonRaid = {
   identifier: "pokemonRaid",
   label: "Raid Boss",
-  icon: "#ico36_pokeball", //TODO: Create and use better icon
+  icon: ico36_pokeball, //TODO: Create and use better icon
   messageEnabled: false,
   component: PokemonRaidbossPicker,
   viewerComponent: PokemonRaidbossViewer,

@@ -4,11 +4,12 @@ import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
 import { getIn } from "../../app/utils.js";
 import { sparqlQuery } from "../../app/sparql-builder-utils.js";
+import ico36_uc_transport_offer from "../../images/won-icons/ico36_uc_transport_offer.svg";
 
 export const goodsTransportOffer = {
   identifier: "goodsTransportOffer",
   label: "Offer goods transport",
-  icon: "#ico36_uc_transport_offer",
+  icon: ico36_uc_transport_offer,
   doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({

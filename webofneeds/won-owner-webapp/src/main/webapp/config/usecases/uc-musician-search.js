@@ -13,11 +13,12 @@ import {
 } from "../../app/sparql-builder-utils.js";
 
 import { getIn } from "../../app/utils.js";
+import ico36_uc_find_musician from "../../images/won-icons/ico36_uc_find_musician.svg";
 
 export const musicianSearch = {
   identifier: "musicianSearch",
   label: "Find Musician",
-  icon: "#ico36_uc_find_musician",
+  icon: ico36_uc_find_musician,
   timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 30,
   doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {

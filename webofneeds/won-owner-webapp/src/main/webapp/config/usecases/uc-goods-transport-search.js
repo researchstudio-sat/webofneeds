@@ -9,11 +9,14 @@ import vocab from "../../app/service/vocab.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 
 import { isValidNumber, get, getIn } from "../../app/utils.js";
+import ico36_detail_measurement from "../../images/won-icons/ico36_detail_measurement.svg";
+import ico36_uc_transport_demand from "../../images/won-icons/ico36_uc_transport_demand.svg";
+import ico36_detail_weight from "../../images/won-icons/ico36_detail_weight.svg";
 
 export const goodsTransportSearch = {
   identifier: "goodsTransportSearch",
   label: "Send something",
-  icon: "#ico36_uc_transport_demand",
+  icon: ico36_uc_transport_demand,
   doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
@@ -63,7 +66,7 @@ export const goodsTransportSearch = {
       ...abstractDetails.number,
       identifier: "weight",
       label: "Weight in kg",
-      icon: "#ico36_detail_weight",
+      icon: ico36_detail_weight,
       parseToRDF: function({ value }) {
         if (!isValidNumber(value)) {
           return { "s:weight": undefined };
@@ -114,7 +117,7 @@ export const goodsTransportSearch = {
       ...abstractDetails.number,
       identifier: "length",
       label: "Length in cm",
-      icon: "#ico36_detail_measurement",
+      icon: ico36_detail_measurement,
       parseToRDF: function({ value }) {
         if (!isValidNumber(value)) {
           return { "s:length": undefined };
@@ -165,7 +168,7 @@ export const goodsTransportSearch = {
       ...abstractDetails.number,
       identifier: "width",
       label: "Width in cm",
-      icon: "#ico36_detail_measurement",
+      icon: ico36_detail_measurement,
       parseToRDF: function({ value }) {
         if (!isValidNumber(value)) {
           return { "s:width": undefined };
@@ -216,7 +219,7 @@ export const goodsTransportSearch = {
       ...abstractDetails.number,
       identifier: "height",
       label: "Height in cm",
-      icon: "#ico36_detail_measurement",
+      icon: ico36_detail_measurement,
       parseToRDF: function({ value }) {
         if (!isValidNumber(value)) {
           return { "s:height": undefined };

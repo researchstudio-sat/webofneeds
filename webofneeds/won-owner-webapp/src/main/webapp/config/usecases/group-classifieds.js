@@ -6,6 +6,8 @@ import { goodsTransportOffer } from "./uc-goods-transport-offer.js";
 import { booksOffer } from "./uc-books-offer.js";
 import { booksSearch } from "./uc-books-search.js";
 
+import ico36_detail_price from "../../images/won-icons/ico36_detail_price.svg";
+
 /*
 TODO: create use case icons
 */
@@ -13,7 +15,7 @@ TODO: create use case icons
 export const classifiedsGroup = {
   identifier: "classifiedsgroup",
   label: "Buy & Sell",
-  icon: "#ico36_detail_price",
+  icon: ico36_detail_price,
   subItems: {
     goodsOffer: goodsOffer,
     goodsServiceSearch: goodsServiceSearch,

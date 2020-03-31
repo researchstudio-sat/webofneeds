@@ -7,11 +7,12 @@ import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
 import { getIn } from "../../app/utils.js";
 import { sparqlQuery } from "../../app/sparql-builder-utils.js";
+import ico36_uc_route_demand from "../../images/won-icons/ico36_uc_route_demand.svg";
 
 export const personalTransportSearch = {
   identifier: "personalTransportSearch",
   label: "Need a Lift",
-  icon: "#ico36_uc_route_demand",
+  icon: ico36_uc_route_demand,
   doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({

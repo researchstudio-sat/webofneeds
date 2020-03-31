@@ -5,11 +5,13 @@ import WonImageViewer from "../../app/components/details/viewer/image-viewer.jsx
 
 import WonFilePicker from "../../app/components/details/picker/file-picker.jsx";
 import WonImagePicker from "../../app/components/details/picker/image-picker.jsx";
+import ico36_detail_files from "../../images/won-icons/ico36_detail_files.svg";
+import ico36_detail_media from "../../images/won-icons/ico36_detail_media.svg";
 
 export const files = {
   identifier: "files",
   label: "Files",
-  icon: "#ico36_detail_files",
+  icon: ico36_detail_files,
   placeholder: "",
   accepts: "",
   multiSelect: true,
@@ -90,7 +92,7 @@ export const files = {
 export const images = {
   identifier: "images",
   label: "Images",
-  icon: "#ico36_detail_media",
+  icon: ico36_detail_media,
   placeholder: "",
   accepts: "image/*",
   multiSelect: true,

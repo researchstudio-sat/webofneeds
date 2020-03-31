@@ -1,8 +1,5 @@
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
-import { Generator } from "sparqljs";
-
-window.SparqlGenerator4dbg = Generator;
 
 export const persona = {
   identifier: "persona",

@@ -14,10 +14,15 @@ import WonTagsPicker from "../../app/components/details/picker/tags-picker.jsx";
 import WonSuggestAtomPicker from "../../app/components/details/picker/suggest-atom-picker.jsx";
 import vocab from "../../app/service/vocab";
 
+import ico36_detail_title from "../../images/won-icons/ico36_detail_title.svg";
+import ico36_search from "../../images/won-icons/ico36_search.svg";
+import ico36_detail_description from "../../images/won-icons/ico36_detail_description.svg";
+import ico36_detail_tags from "../../images/won-icons/ico36_detail_tags.svg";
+
 export const title = {
   identifier: "title",
   label: "Title",
-  icon: "#ico36_detail_title",
+  icon: ico36_detail_title,
   placeholder: "What? (Short title shown in lists)",
   component: WonTitlePicker,
   viewerComponent: WonTitleViewer,
@@ -49,7 +54,7 @@ export const title = {
 export const personaName = {
   identifier: "personaName",
   label: "Name",
-  icon: "#ico36_detail_title",
+  icon: ico36_detail_title,
   placeholder: "Your Name",
   component: WonTitlePicker,
   viewerComponent: WonTitleViewer,
@@ -74,7 +79,7 @@ export const website = {
   //FIXME: Implement URL Picker once the persona-creator also generates url type urls, instead of strings
   identifier: "website",
   label: "Website",
-  icon: "#ico36_detail_title",
+  icon: ico36_detail_title,
   placeholder: "Website",
   component: WonTitlePicker,
   viewerComponent: WonTitleViewer,
@@ -98,7 +103,7 @@ export const website = {
 export const searchString = {
   identifier: "searchString",
   label: "Searching for",
-  icon: "#ico36_search",
+  icon: ico36_search,
   placeholder: "What do you look for?",
   component: WonTitlePicker,
   viewerComponent: WonTitleViewer,
@@ -126,7 +131,7 @@ export const searchString = {
 export const description = {
   identifier: "description",
   label: "Description",
-  icon: "#ico36_detail_description",
+  icon: ico36_detail_description,
   placeholder: "Enter Description...",
   component: WonDescriptionPicker,
   viewerComponent: WonDescriptionViewer,
@@ -159,7 +164,7 @@ export const description = {
 export const termsOfService = {
   identifier: "termsOfService",
   label: "Terms Of Service",
-  icon: "#ico36_detail_description",
+  icon: ico36_detail_description,
   placeholder: "Enter Description...",
   component: WonDescriptionPicker,
   viewerComponent: WonDescriptionViewer,
@@ -183,7 +188,7 @@ export const termsOfService = {
 export const tags = {
   identifier: "tags",
   label: "Tags",
-  icon: "#ico36_detail_tags",
+  icon: ico36_detail_tags,
   placeholder: "e.g. couch, free",
   component: WonTagsPicker,
   viewerComponent: WonTagsViewer,
@@ -210,7 +215,7 @@ export const tags = {
 export const suggestPost = {
   identifier: "suggestPost",
   label: "Suggest Post",
-  icon: "#ico36_detail_title", //TODO: CORRECT ICON
+  icon: ico36_detail_title, //TODO: CORRECT ICON
   placeholder: "Insert PostUri and Accept",
   component: WonSuggestAtomPicker,
   viewerComponent: WonSuggestAtomViewer,
@@ -239,7 +244,7 @@ export const suggestPost = {
 export const responseToUri = {
   identifier: "responseToUri",
   label: "Response To Post",
-  icon: "#ico36_detail_title", //TODO: CORRECT ICON
+  icon: ico36_detail_title, //TODO: CORRECT ICON
   placeholder: "Insert PostUri and Accept",
   component: WonSuggestAtomPicker,
   viewerComponent: WonSuggestAtomViewer,
@@ -270,7 +275,7 @@ export const flags = {
   ...select,
   identifier: "flags",
   label: "Flags",
-  icon: "#ico36_detail_title", //TODO: CORRECT ICON
+  icon: ico36_detail_title, //TODO: CORRECT ICON
   viewerComponent: undefined, //this is so we do not display this with a detail-viewer,
   component: undefined, //this is so we do not display the component as a detail-picker, but are still able to use the parseToRDF, parseFromRDF functions
   multiSelect: true,
@@ -310,7 +315,7 @@ export const type = {
   ...select,
   identifier: "type",
   label: "Types",
-  icon: "#ico36_detail_title", //TODO: CORRECT ICON
+  icon: ico36_detail_title, //TODO: CORRECT ICON
   viewerComponent: undefined, //this is so we do not display this with a detail-viewer,
   component: undefined, //this is so we do not display the component as a detail-picker, but are still able to use the parseToRDF, parseFromRDF functions
   multiSelect: true,
@@ -356,7 +361,7 @@ export const sockets = {
   ...select,
   identifier: "sockets",
   label: "Sockets",
-  icon: "#ico36_detail_title", //TODO: CORRECT ICON
+  icon: ico36_detail_title, //TODO: CORRECT ICON
   viewerComponent: undefined, //this is so we do not display this with a detail-viewer,
   component: undefined,
   multiSelect: true,
@@ -438,7 +443,7 @@ export const defaultSocket = {
   ...sockets,
   identifier: "defaultSocket",
   label: "Default Socket",
-  icon: "#ico36_detail_title", //TODO: CORRECT ICON
+  icon: ico36_detail_title, //TODO: CORRECT ICON
   viewerComponent: undefined, //this is so we do not display this with a detail-viewer,
   component: undefined,
   multiSelect: false,
@@ -501,7 +506,7 @@ export const defaultSocket = {
 export const eventObjectAboutUris = {
   identifier: "eventObjectAboutUris",
   label: "Event",
-  icon: "#ico36_detail_title",
+  icon: ico36_detail_title,
   placeholder: "What? (Short title shown in lists)",
   parseToRDF: function({ value }) {
     if (!value) {

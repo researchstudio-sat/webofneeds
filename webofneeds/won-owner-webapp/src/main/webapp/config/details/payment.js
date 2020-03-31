@@ -2,12 +2,13 @@ import { generateIdString, get } from "../../app/utils.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import WonPaypalPaymentViewer from "../../app/components/details/viewer/paypal-payment-viewer.jsx";
 import WonPaypalPaymentPicker from "../../app/components/details/picker/paypal-payment-picker.jsx";
+import ico36_detail_price from "../../images/won-icons/ico36_detail_price.svg";
 
 // TODO: don't demand customer info
 export const paypalPayment = {
   identifier: "paypalPayment",
   label: "PayPal Payment",
-  icon: "#ico36_detail_price", //TODO: create and use better icon
+  icon: ico36_detail_price, //TODO: create and use better icon
   amountLabel: "Price:",
   amountPlaceholder: "Enter Amount...",
   receiverLabel: "Recipient:",

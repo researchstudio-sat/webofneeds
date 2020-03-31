@@ -5,12 +5,13 @@ import { generateIdString } from "../../app/utils.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import WonReviewViewer from "../../app/components/details/viewer/review-viewer.jsx";
 import WonReviewPicker from "../../app/components/details/picker/review-picker.jsx";
+import ico36_detail_title from "../../images/won-icons/ico36_detail_title.svg";
 
 /*Detail based on https://schema.org/Review*/
 export const review = {
   identifier: "review",
   label: "Review",
-  icon: "#ico36_detail_title" /*TODO: REVIEW/RATING ICON*/,
+  icon: ico36_detail_title /*TODO: REVIEW/RATING ICON*/,
   component: WonReviewPicker,
   viewerComponent: WonReviewViewer,
   placeholder: "Review Text (optional)",

@@ -10,11 +10,12 @@ import WonPetrinetTransitionViewer from "../../app/components/details/viewer/pet
 import WonWorkflowPicker from "../../app/components/details/picker/workflow-picker.jsx";
 import WonPetrinetPicker from "../../app/components/details/picker/petrinet-picker.jsx";
 import WonPetrinetTransitionPicker from "../../app/components/details/picker/petrinettransition-picker.jsx";
+import ico36_detail_workflow from "../../images/won-icons/ico36_detail_workflow.svg";
 
 export const bpmnWorkflow = {
   identifier: "bpmnWorkflow",
   label: "BPMN",
-  icon: "#ico36_detail_workflow",
+  icon: ico36_detail_workflow,
   placeholder: "",
   //accepts: "application/octet-stream",
   accepts: "",
@@ -64,7 +65,7 @@ export const bpmnWorkflow = {
 export const petriNetWorkflow = {
   identifier: "petriNetWorkflow",
   label: "Petrinet",
-  icon: "#ico36_detail_workflow",
+  icon: ico36_detail_workflow,
   placeholder: "",
   //accepts: "application/octet-stream",
   accepts: "",
@@ -118,7 +119,7 @@ export const petriNetWorkflow = {
 export const petriNetTransition = {
   identifier: "petriNetTransition",
   label: "Transition",
-  icon: "#ico36_detail_workflow", //TODO: CORRECT ICON
+  icon: ico36_detail_workflow, //TODO: CORRECT ICON
   component: WonPetrinetTransitionPicker,
   viewerComponent: WonPetrinetTransitionViewer,
   messageEnabled: true,
