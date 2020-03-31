@@ -2,11 +2,11 @@ import React from "react";
 import PropTypes from "prop-types";
 import { getIn } from "../utils.js";
 import { connect } from "react-redux";
-import { actionCreators } from "../actions/actions.js";
 import WonTitlePicker from "./details/picker/title-picker.jsx";
 import * as useCaseUtils from "../usecase-utils.js";
 
 import "~/style/_usecase-picker.scss";
+import { Link, withRouter } from "react-router-dom";
 
 const mapStateToProps = state => {
   const visibleUseCasesByConfig = getIn(state, [
@@ -36,14 +36,6 @@ const mapStateToProps = state => {
     visibleUseCaseGroups,
     ungroupedUseCases,
     visibleUseCasesByConfig,
-  };
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    routerGoCurrent: props => {
-      dispatch(actionCreators.router__stateGoCurrent(props));
-    },
   };
 };
 
@@ -82,10 +74,10 @@ class WonUsecasePicker extends React.Component {
           this.state.searchText.trim().length > 1 ? (
             this.state.searchResults.length > 0 ? (
               this.state.searchResults.map((useCase, index) => (
-                <div
+                <Link
                   key={useCase.identifier + "-" + index}
                   className="ucp__main__searchresult clickable"
-                  onClick={() => this.startFrom(useCase)}
+                  to={location => this.startFromRoute(location, useCase)}
                 >
                   {!!useCase.icon && (
                     <svg className="ucp__main__searchresult__icon">
@@ -97,7 +89,7 @@ class WonUsecasePicker extends React.Component {
                       {useCase.label}
                     </div>
                   )}
-                </div>
+                </Link>
               ))
             ) : (
               <React.Fragment>
@@ -105,9 +97,11 @@ class WonUsecasePicker extends React.Component {
                   {"No Results found for '" + this.state.searchText + "'."}
                 </div>
                 {!!this.props.customUseCase && (
-                  <div
+                  <Link
                     className="ucp__main__newcustom clickable"
-                    onClick={() => this.startFrom(this.props.customUseCase)}
+                    to={location =>
+                      this.startFromRoute(location, this.props.customUseCase)
+                    }
                   >
                     {!!this.props.customUseCase.icon && (
                       <svg className="ucp__main__newcustom__icon">
@@ -122,7 +116,7 @@ class WonUsecasePicker extends React.Component {
                         {this.props.customUseCase.label}
                       </div>
                     )}
-                  </div>
+                  </Link>
                 )}
               </React.Fragment>
             )
@@ -132,10 +126,10 @@ class WonUsecasePicker extends React.Component {
               {!!this.props.visibleUseCaseGroups &&
                 Object.values(this.props.visibleUseCaseGroups).map(
                   (ucg, index) => (
-                    <div
+                    <Link
                       key={ucg.identifier + "-" + index}
                       className="ucp__main__usecase-group clickable"
-                      onClick={() => this.viewUseCaseGroup(ucg)}
+                      to={location => this.viewUseCaseGroupRoute(location, ucg)}
                     >
                       {!!ucg.icon && (
                         <svg className="ucp__main__usecase-group__icon">
@@ -147,17 +141,17 @@ class WonUsecasePicker extends React.Component {
                           {ucg.label}
                         </div>
                       )}
-                    </div>
+                    </Link>
                   )
                 )}
               {/*<!-- USE CASES WITHOUT GROUPS -->*/}
               {!!this.props.ungroupedUseCases &&
                 Object.values(this.props.ungroupedUseCases).map(
                   (useCase, index) => (
-                    <div
+                    <Link
                       key={useCase.identifier + "-" + index}
                       className="ucp__main__usecase-group clickable"
-                      onClick={() => this.startFrom(useCase)}
+                      to={location => this.startFromRoute(location, useCase)}
                     >
                       {!!useCase.icon && (
                         <svg className="ucp__main__usecase-group__icon">
@@ -169,7 +163,7 @@ class WonUsecasePicker extends React.Component {
                           {useCase.label}
                         </div>
                       )}
-                    </div>
+                    </Link>
                   )
                 )}
             </React.Fragment>
@@ -179,30 +173,27 @@ class WonUsecasePicker extends React.Component {
     );
   }
 
-  startFrom(selectedUseCase) {
+  startFromRoute(location, selectedUseCase) {
     const selectedUseCaseIdentifier =
       selectedUseCase && selectedUseCase.identifier;
 
     if (selectedUseCaseIdentifier) {
-      this.props.routerGoCurrent({
-        useCase: encodeURIComponent(selectedUseCaseIdentifier),
-      });
+      return `${location.pathname}?useCase=${encodeURIComponent(
+        selectedUseCaseIdentifier
+      )}`;
     } else {
-      console.warn(
-        "No usecase identifier found for given usecase, ",
-        selectedUseCase
-      );
+      console.warn("No identifier found for given usecase, ", selectedUseCase);
     }
   }
 
-  viewUseCaseGroup(selectedUseCaseGroup) {
+  viewUseCaseGroupRoute(location, selectedUseCaseGroup) {
     const selectedGroupIdentifier =
       selectedUseCaseGroup && selectedUseCaseGroup.identifier;
 
     if (selectedGroupIdentifier) {
-      this.props.routerGoCurrent({
-        useCaseGroup: encodeURIComponent(selectedGroupIdentifier),
-      });
+      return `${location.pathname}?useCaseGroup=${encodeURIComponent(
+        selectedGroupIdentifier
+      )}`;
     } else {
       console.warn(
         "No identifier found for given usecase group, ",
@@ -247,14 +238,11 @@ class WonUsecasePicker extends React.Component {
   }
 }
 WonUsecasePicker.propTypes = {
-  routerGoCurrent: PropTypes.func,
+  location: PropTypes.object,
   customUseCase: PropTypes.object,
   visibleUseCaseGroups: PropTypes.objectOf(PropTypes.object),
   visibleUseCasesByConfig: PropTypes.objectOf(PropTypes.object),
   ungroupedUseCases: PropTypes.objectOf(PropTypes.object),
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonUsecasePicker);
+export default withRouter(connect(mapStateToProps)(WonUsecasePicker));

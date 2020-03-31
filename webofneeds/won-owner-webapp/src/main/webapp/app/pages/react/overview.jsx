@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { actionCreators } from "../../actions/actions.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
-import { get, getIn, sortByDate } from "../../utils.js";
+import { get, getIn, sortByDate, getQueryParams } from "../../utils.js";
 import * as processSelectors from "../../redux/selectors/process-selectors.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as useCaseUtils from "../../usecase-utils.js";
@@ -23,9 +23,10 @@ import WonFooter from "../../components/footer";
 import "~/style/_overview.scss";
 import "~/style/_connection-overlay.scss";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
+import { withRouter } from "react-router-dom";
 
-const mapStateToProps = state => {
-  const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
+const mapStateToProps = (state, ownProps) => {
+  const { viewConnUri } = getQueryParams(ownProps.location);
 
   const debugModeEnabled = viewSelectors.isDebugModeEnabled(state);
 
@@ -362,7 +363,9 @@ PageOverview.propTypes = {
   fetchWhatsNew: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(PageOverview);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(PageOverview)
+);

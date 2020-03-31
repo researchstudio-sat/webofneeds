@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors";
-import { get, getIn, toAbsoluteURL } from "../utils";
+import { get, getIn, getQueryParams, toAbsoluteURL } from "../utils";
 import * as connectionSelectors from "../redux/selectors/connection-selectors";
 import * as connectionUtils from "../redux/utils/connection-utils";
 import * as processUtils from "../redux/utils/process-utils";
@@ -12,9 +12,10 @@ import { ownerBaseUrl } from "~/config/default.js";
 
 import "~/style/_context-dropdown.scss";
 import ico16_contextmenu from "~/images/won-icons/ico16_contextmenu.svg";
+import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
-  const connectionUri = generalSelectors.getConnectionUriFromRoute(state);
+  const { connectionUri } = getQueryParams(ownProps.location);
 
   const post =
     connectionUri &&
@@ -325,7 +326,9 @@ WonConnectionContextDropdown.propTypes = {
   connectionClose: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonConnectionContextDropdown);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonConnectionContextDropdown)
+);

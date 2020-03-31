@@ -15,6 +15,7 @@ import * as wonLabelUtils from "../won-label-utils.js";
 import vocab from "../service/vocab.js";
 
 import "~/style/_atom-footer.scss";
+import { Link } from "react-router-dom";
 
 const FooterType = {
   INACTIVE: 1,
@@ -331,16 +332,14 @@ class AtomInfo extends React.Component {
             )}
           <div className="atom-footer__matches__list">
             {atomElements}
-            <div
+            <Link
               key={ucIdentifier + "-" + index}
               className="atom-footer__adhocbutton"
-              onClick={() =>
-                this.selectUseCase(
-                  ucIdentifier,
-                  ucSenderSocketType,
-                  ucTargetSocketType
-                )
-              }
+              to={this.selectUseCaseRoute(
+                ucIdentifier,
+                ucSenderSocketType,
+                ucTargetSocketType
+              )}
             >
               <div className="atom-footer__adhocbutton__icon">
                 {useCaseUtils.getUseCaseIcon(ucIdentifier) ? (
@@ -368,25 +367,27 @@ class AtomInfo extends React.Component {
                   </span>
                 </div>
               </div>
-            </div>
+            </Link>
           </div>
         </div>
       </React.Fragment>
     );
   }
 
-  selectUseCase(ucIdentifier, ucSenderSocketType, ucTargetSocketType) {
-    this.props.routerGo("create", {
-      useCase: ucIdentifier,
-      useCaseGroup: undefined,
-      connectionUri: undefined,
-      fromAtomUri: this.props.atomUri,
-      senderSocketType: ucSenderSocketType,
-      targetSocketType: ucTargetSocketType,
-      viewConnUri: undefined,
-      mode: "CONNECT",
-      holderUri: this.props.addHolderUri,
-    });
+  selectUseCaseRoute(ucIdentifier, ucSenderSocketType, ucTargetSocketType) {
+    return (
+      "/create?useCase=" +
+      ucIdentifier +
+      "&fromAtomUri=" +
+      this.props.atomUri +
+      "&senderSocketType" +
+      ucSenderSocketType +
+      "&targetSocketType" +
+      ucTargetSocketType +
+      "&mode=" +
+      "CONNECT" +
+      (this.props.addHolderUri ? "&holderUri=" + this.props.addHolderUri : "")
+    );
   }
 
   connectAtomSockets(

@@ -16,6 +16,7 @@ import ico36_message from "~/images/won-icons/ico36_message.svg";
 import ico36_location_current from "~/images/won-icons/ico36_location_current.svg";
 import ico36_backarrow from "~/images/won-icons/ico36_backarrow.svg";
 import ico36_uc_question from "~/images/won-icons/ico36_uc_question.svg";
+import { Link, withRouter } from "react-router-dom";
 
 const howItWorksSteps = [
   {
@@ -59,9 +60,6 @@ const mapDispatchToProps = dispatch => {
   return {
     locationAccessDenied: () => {
       dispatch(actionCreators.view__locationAccessDenied());
-    },
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
     },
     updateCurrentLocation: locImm => {
       dispatch(actionCreators.view__updateCurrentLocation(locImm));
@@ -193,24 +191,22 @@ class WonHowTo extends React.Component {
             className="labelledHr howto__createx__labelledhr"
             label="Or"
           />
-          <button
+          <Link
+            to="/create?useCase=persona"
             className="won-button--filled red howto__createx__spanbutton"
-            onClick={() =>
-              this.props.routerGo("create", { useCase: "persona" })
-            }
           >
             <span>Create your Persona!</span>
-          </button>
+          </Link>
           <WonLabelledHr
             className="labelledHr howto__createx__labelledhr"
             label="Or"
           />
-          <button
+          <Link
+            to="/create"
             className="won-button--filled red howto__createx__spanbutton"
-            onClick={() => this.props.routerGo("create")}
           >
             <span>Post something now!</span>
-          </button>
+          </Link>
         </div>
       </won-how-to>
     );
@@ -228,13 +224,13 @@ class WonHowTo extends React.Component {
 
   viewWhatsAround() {
     this.viewWhatsX(() => {
-      this.props.routerGo("map");
+      this.history.push("/map");
     });
   }
 
   viewWhatsNew() {
     this.viewWhatsX(() => {
-      this.props.routerGo("overview");
+      this.history.push("/overview");
     });
   }
 
@@ -280,12 +276,13 @@ WonHowTo.propTypes = {
   className: PropTypes.string,
   appTitle: PropTypes.string,
   isLocationAccessDenied: PropTypes.bool,
-  routerGo: PropTypes.func,
   updateCurrentLocation: PropTypes.func,
   locationAccessDenied: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonHowTo);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonHowTo)
+);

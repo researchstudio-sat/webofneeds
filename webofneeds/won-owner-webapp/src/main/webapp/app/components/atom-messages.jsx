@@ -12,7 +12,7 @@ import {
   getProposalMessagesByConnectionUri,
   getUnreadMessagesByConnectionUri,
 } from "../redux/selectors/message-selectors";
-import { get, getIn } from "../utils";
+import { get, getIn, getQueryParams } from "../utils";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import won from "../won-es6.js";
@@ -36,6 +36,7 @@ import WonConnectionMessage from "./messages/connection-message.jsx";
 import { actionCreators } from "../actions/actions.js";
 import * as ownerApi from "../api/owner-api.js";
 import Immutable from "immutable";
+import { withRouter } from "react-router-dom";
 
 const rdfTextfieldHelpText =
   "Expects valid turtle. " +
@@ -47,9 +48,10 @@ const rdfTextfieldHelpText =
   `\`<${vocab.WONMSG.uriPlaceholder.event}> con:text "hello world!". \``;
 
 const mapStateToProps = (state, ownProps) => {
+  const { connectionUri } = getQueryParams(ownProps.location);
   const selectedConnectionUri = ownProps.connectionUri
     ? ownProps.connectionUri
-    : generalSelectors.getConnectionUriFromRoute(state);
+    : connectionUri;
   const ownedAtom = generalSelectors.getOwnedAtomByConnectionUri(
     state,
     selectedConnectionUri
@@ -1244,7 +1246,9 @@ AtomMessages.propTypes = {
   showLatestMessages: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(AtomMessages);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(AtomMessages)
+);

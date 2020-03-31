@@ -11,10 +11,6 @@ import accountReducer from "./account-reducer.js";
 import toastReducer from "./toast-reducer.js";
 import viewReducer from "./view-reducer.js";
 import processReducer from "./process-reducer.js";
-/*
- * this reducer attaches a 'router' object to our state that keeps the routing state.
- */
-import { router } from "redux-ui-router";
 
 const initialOwnerState = Immutable.fromJS({
   whatsNewUris: Immutable.Set(),
@@ -28,8 +24,6 @@ const initialOwnerState = Immutable.fromJS({
 const initialConfigState = Immutable.fromJS({ theme: { name: "current" } });
 
 const reducers = {
-  router,
-
   /**
      * Example for a simple reducer:
      *

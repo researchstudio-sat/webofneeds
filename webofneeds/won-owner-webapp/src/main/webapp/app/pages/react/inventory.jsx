@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { actionCreators } from "../../actions/actions.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
-import { get, getIn, sortByDate } from "../../utils.js";
+import { get, getIn, sortByDate, getQueryParams } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import * as processUtils from "../../redux/utils/process-utils.js";
@@ -25,9 +25,10 @@ import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 
 import "~/style/_inventory.scss";
 import "~/style/_connection-overlay.scss";
+import { withRouter } from "react-router-dom";
 
-const mapStateToProps = state => {
-  const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
+const mapStateToProps = (state, ownProps) => {
+  const { viewConnUri } = getQueryParams(ownProps.location);
 
   const ownedActivePersonas = generalSelectors
     .getOwnedPersonas(state)
@@ -258,7 +259,9 @@ PageInventory.propTypes = {
   toggleClosedAtoms: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(PageInventory);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(PageInventory)
+);

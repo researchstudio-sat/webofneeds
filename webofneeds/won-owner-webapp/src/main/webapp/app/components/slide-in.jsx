@@ -3,8 +3,7 @@ import PropTypes from "prop-types";
 import won from "../won-es6";
 import { connect } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
-import { getVerificationTokenFromRoute } from "../redux/selectors/general-selectors.js";
-import { get, getIn, toAbsoluteURL } from "../utils.js";
+import { get, getIn, toAbsoluteURL, getQueryParams } from "../utils.js";
 import { parseRestErrorMessage } from "../won-utils.js";
 import { ownerBaseUrl } from "~/config/default.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
@@ -16,9 +15,11 @@ import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.
 import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 import ico16_indicator_info from "~/images/won-icons/ico16_indicator_info.svg";
 import ico36_close from "~/images/won-icons/ico36_close.svg";
+import { Link, withRouter } from "react-router-dom";
 
-const mapStateToProps = state => {
-  const verificationToken = getVerificationTokenFromRoute(state);
+const mapStateToProps = (state, ownProps) => {
+  const { token } = getQueryParams(ownProps.location);
+  const verificationToken = token;
 
   const accountState = get(state, "account");
 
@@ -120,9 +121,6 @@ const mapDispatchToProps = dispatch => {
     },
     routerGoCurrent: props => {
       dispatch(actionCreators.router__stateGoCurrent(props));
-    },
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
     },
     routerGoAbs: (path, props) => {
       dispatch(actionCreators.router__stateGoAbs(path, props));
@@ -390,12 +388,9 @@ class WonSlideIn extends React.Component {
               <ul>
                 <li>
                   <b>
-                    <a
-                      className="clickable"
-                      onClick={() => this.props.routerGo("signup")}
-                    >
+                    <Link className="clickable" to="/signup">
                       Consider signing up!
-                    </a>
+                    </Link>
                   </b>{" "}
                   It will allow us to contact you if there is relevant activity.
                 </li>
@@ -546,13 +541,14 @@ WonSlideIn.propTypes = {
   accountAcceptDisclaimer: PropTypes.func,
   reconnectStart: PropTypes.func,
   routerGoCurrent: PropTypes.func,
-  routerGo: PropTypes.func,
   routerGoAbs: PropTypes.func,
   hideAnonymousSlideIn: PropTypes.func,
   showEmailInput: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonSlideIn);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonSlideIn)
+);

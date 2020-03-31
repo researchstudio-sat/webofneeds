@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { actionCreators } from "../../actions/actions.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
-import { get, getIn } from "../../utils.js";
+import { get, getIn, getQueryParams } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import * as processUtils from "../../redux/utils/process-utils.js";
@@ -20,10 +20,11 @@ import "~/style/_post.scss";
 import "~/style/_connection-overlay.scss";
 import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg";
+import { withRouter } from "react-router-dom";
 
-const mapStateToProps = state => {
-  const atomUri = generalSelectors.getPostUriFromRoute(state);
-  const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
+const mapStateToProps = (state, ownProps) => {
+  const { viewConnUri, postUri } = getQueryParams(ownProps.location);
+  const atomUri = postUri;
   const atom = getIn(state, ["atoms", atomUri]);
 
   const process = get(state, "process");
@@ -163,7 +164,9 @@ PagePost.propTypes = {
   fetchAtom: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(PagePost);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(PagePost)
+);

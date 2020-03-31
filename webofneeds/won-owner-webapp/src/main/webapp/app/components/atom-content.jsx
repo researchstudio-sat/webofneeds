@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
-import { get, getIn } from "../utils.js";
+import { get, getIn, getQueryParams } from "../utils.js";
 
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
@@ -25,9 +25,11 @@ import "~/style/_rdflink.scss";
 import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg";
 import rdf_logo_1 from "~/images/won-icons/rdf_logo_1.svg";
 import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
+import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
-  const openConnectionUri = generalSelectors.getConnectionUriFromRoute(state);
+  const { connectionUri } = getQueryParams(ownProps.location);
+  const openConnectionUri = connectionUri;
   const atom = getIn(state, ["atoms", ownProps.atomUri]);
   const isOwned = generalSelectors.isAtomOwned(state, ownProps.atomUri);
   const isActive = atomUtils.isActive(atom);
@@ -292,7 +294,9 @@ WonAtomContent.propTypes = {
   fetchAtom: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonAtomContent);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonAtomContent)
+);

@@ -12,6 +12,17 @@ export function dispatchEvent(elem, eventName, eventData) {
   elem.dispatchEvent(event);
 }
 
+export function getQueryParams(location) {
+  let pairs = location.search.slice(1).split("&");
+
+  let result = {};
+  pairs.forEach(function(pair) {
+    pair = pair.split("=");
+    result[pair[0]] = decodeURIComponent(pair[1] || "");
+  });
+
+  return JSON.parse(JSON.stringify(result));
+}
 /*
  * Freezes an object recursively.
  *

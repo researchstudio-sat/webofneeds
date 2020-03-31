@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { actionCreators } from "../../actions/actions.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
-import { get, getIn } from "../../utils.js";
+import { get, getIn, getQueryParams } from "../../utils.js";
 import * as processUtils from "../../redux/utils/process-utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as wonLabelUtils from "../../won-label-utils.js";
@@ -35,9 +35,10 @@ import ico36_detail_location from "~/images/won-icons/ico36_detail_location.svg"
 import ico36_location_current from "~/images/won-icons/ico36_location_current.svg";
 import ico16_indicator_location from "~/images/won-icons/ico16_indicator_location.svg";
 import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg";
+import { withRouter } from "react-router-dom";
 
-const mapStateToProps = state => {
-  const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
+const mapStateToProps = (state, ownProps) => {
+  const { viewConnUri } = getQueryParams(ownProps.location);
 
   const isLocationAccessDenied = generalSelectors.isLocationAccessDenied(state);
   const currentLocation = generalSelectors.getCurrentLocation(state);
@@ -608,7 +609,9 @@ PageMap.propTypes = {
   updateCurrentLocation: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(PageMap);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(PageMap)
+);

@@ -12,6 +12,7 @@ import * as connectionSelectors from "../redux/selectors/connection-selectors.js
 import "~/style/_atom-connections-indicator.scss";
 import ico36_message from "~/images/won-icons/ico36_message.svg";
 import ico36_incoming from "~/images/won-icons/ico36_incoming.svg";
+import { Link } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const atom = getIn(state, ["atoms", ownProps.atomUri]);
@@ -53,23 +54,25 @@ const mapDispatchToProps = dispatch => {
 class WonAtomConnectionsIndicator extends React.Component {
   constructor(props) {
     super(props);
-    this.showAtomConnections = this.showAtomConnections.bind(this);
   }
 
-  showAtomConnections() {
+  getRoute() {
     const connUri = this.props.hasUnreadChats
       ? get(this.props.unreadChats.first(), "uri")
       : get(this.props.unreadRequests.first(), "uri");
-    this.props.routerGo("connections", { connectionUri: connUri });
+    return "/connections?connectionUri=" + connUri;
   }
 
   render() {
     const hasNoUnreadConnections =
       !this.props.requestsCount > 0 && !this.props.hasUnreadChats;
     return (
-      <won-atom-connections-indicator
-        class={hasNoUnreadConnections ? "won-no-connections" : ""}
-        onClick={this.showAtomConnections}
+      <Link
+        className={
+          "won-atom-connections-indicator " +
+          (hasNoUnreadConnections ? "won-no-connections" : "")
+        }
+        to={this.getRoute()}
       >
         <svg
           className={
@@ -108,7 +111,7 @@ class WonAtomConnectionsIndicator extends React.Component {
             </div>
           </div>
         </div>
-      </won-atom-connections-indicator>
+      </Link>
     );
   }
 }

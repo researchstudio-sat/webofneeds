@@ -16,6 +16,7 @@ import ico16_burger from "~/images/won-icons/ico16_burger.svg";
 import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.svg";
 import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
+import { Link } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const currentRoute = getIn(state, ["router", "currentState", "name"]);
@@ -47,9 +48,6 @@ const mapDispatchToProps = dispatch => {
     },
     toggleMenu: () => {
       dispatch(actionCreators.view__toggleMenu());
-    },
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
     },
     routerGoDefault: () => {
       dispatch(actionCreators.router__stateGoDefault());
@@ -166,12 +164,12 @@ class WonTopnav extends React.Component {
           {!this.props.isSignUpView &&
             !this.props.loggedIn &&
             !this.props.mainMenuVisible && (
-              <button
-                onClick={() => this.props.routerGo("signup")}
+              <Link
+                to="/signup"
                 className="topnav__signupbtn won-button--filled red hide-in-responsive"
               >
                 Sign up
-              </button>
+              </Link>
             )}
           <WonAccountMenu />
         </nav>
@@ -257,7 +255,6 @@ WonTopnav.propTypes = {
   toggleSlideIns: PropTypes.func,
   hideMenu: PropTypes.func,
   toggleMenu: PropTypes.func,
-  routerGo: PropTypes.func,
   routerGoDefault: PropTypes.func,
   showMoreMessages: PropTypes.func,
   showLatestMessages: PropTypes.func,

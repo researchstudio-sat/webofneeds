@@ -23,6 +23,8 @@ import WonLabelledHr from "./labelled-hr.jsx";
 import ElmReact from "./elm-react.jsx";
 import { Elm } from "../../elm/PublishButton.elm";
 import { actionCreators } from "../actions/actions";
+import { getQueryParams } from "../utils";
+import { withRouter } from "react-router-dom";
 
 //TODO: figure out setting initial draft
 //TODO: figure out initial load of atom
@@ -46,14 +48,18 @@ import { actionCreators } from "../actions/actions";
   }
  */
 
-const mapStateToProps = state => {
-  const fromAtomUri = generalSelectors.getFromAtomUriFromRoute(state);
-  const mode = generalSelectors.getModeFromRoute(state);
+const mapStateToProps = (state, ownProps) => {
+  const {
+    fromAtomUri,
+    mode,
+    senderSocketType,
+    targetSocketType,
+    useCase,
+    holderUri,
+  } = getQueryParams(ownProps.location);
 
   let fromAtom;
-
-  let useCaseString;
-  let useCase;
+  let useCaseObject;
 
   const isCreateFromAtom = !!(fromAtomUri && mode === "DUPLICATE");
   const isEditFromAtom = !!(fromAtomUri && mode === "EDIT");
@@ -63,14 +69,8 @@ const mapStateToProps = state => {
   let hasFromAtomFailedToLoad = false;
 
   const connectToAtomUri = mode === "CONNECT" ? fromAtomUri : undefined;
-  const atomDraftSocketType =
-    mode === "CONNECT"
-      ? generalSelectors.getSenderSocketTypeFromRoute(state)
-      : undefined;
-  const connectToSocketType =
-    mode === "CONNECT"
-      ? generalSelectors.getTargetSocketTypeFromRoute(state)
-      : undefined;
+  const atomDraftSocketType = mode === "CONNECT" ? senderSocketType : undefined;
+  const connectToSocketType = mode === "CONNECT" ? targetSocketType : undefined;
 
   if (isCreateFromAtom || isEditFromAtom) {
     isFromAtomLoading = processSelectors.isAtomLoading(state, fromAtomUri);
@@ -89,8 +89,9 @@ const mapStateToProps = state => {
         fromAtom
       );
 
-      useCaseString = matchedUseCaseIdentifier || "customUseCase";
-      useCase = useCaseUtils.getUseCase(useCaseString);
+      useCaseObject = useCaseUtils.getUseCase(
+        matchedUseCaseIdentifier || "customUseCase"
+      );
 
       const fromAtomContent = get(fromAtom, "content");
       const fromAtomSeeks = get(fromAtom, "seeks");
@@ -106,34 +107,32 @@ const mapStateToProps = state => {
       );
 
       if (fromAtomContent) {
-        useCase.draft.content = fromAtomContent.toJS();
+        useCaseObject.draft.content = fromAtomContent.toJS();
       }
       if (fromAtomSeeks) {
-        useCase.draft.seeks = fromAtomSeeks.toJS();
+        useCaseObject.draft.seeks = fromAtomSeeks.toJS();
       }
 
       if (!isEditFromAtom) {
         if (socketsReset) {
-          useCase.draft.content.sockets = socketsReset.toJS();
+          useCaseObject.draft.content.sockets = socketsReset.toJS();
         }
         if (defaultSocketReset) {
-          useCase.draft.content.defaultSocket = defaultSocketReset.toJS();
+          useCaseObject.draft.content.defaultSocket = defaultSocketReset.toJS();
         }
 
         if (seeksSocketsReset) {
-          useCase.draft.seeks.sockets = seeksSocketsReset.toJS();
+          useCaseObject.draft.seeks.sockets = seeksSocketsReset.toJS();
         }
         if (seeksDefaultSocketReset) {
-          useCase.draft.seeks.defaultSocket = seeksDefaultSocketReset.toJS();
+          useCaseObject.draft.seeks.defaultSocket = seeksDefaultSocketReset.toJS();
         }
       }
     }
   } else {
-    useCaseString = generalSelectors.getUseCaseFromRoute(state);
-    useCase = useCaseUtils.getUseCase(useCaseString);
+    useCaseObject = useCaseUtils.getUseCase(useCase);
   }
 
-  const holderUri = generalSelectors.getHolderUriFromRoute(state);
   const isHolderOwned = accountUtils.isAtomOwned(
     get(state, "account"),
     holderUri
@@ -149,7 +148,7 @@ const mapStateToProps = state => {
     connectToAtomUri,
     processingPublish: processSelectors.isProcessingPublish(state),
     connectionHasBeenLost: !generalSelectors.selectIsConnected(state),
-    useCase,
+    useCase: useCaseObject,
     fromAtom,
     fromAtomUri,
     isFromAtomOwned: generalSelectors.isAtomOwned(state, fromAtomUri),
@@ -162,13 +161,13 @@ const mapStateToProps = state => {
       state,
       fromAtomUri
     ),
-    isHoldable: useCaseUtils.isHoldable(useCase),
+    isHoldable: useCaseUtils.isHoldable(useCaseObject),
     atomDraftSocketType,
     connectToSocketType,
     hasFromAtomFailedToLoad,
     personas: generalSelectors.getOwnedCondensedPersonaList(state).toJS(),
     showCreateInput:
-      useCase &&
+      useCaseObject &&
       !(
         isCreateFromAtom &&
         isEditFromAtom &&
@@ -572,6 +571,7 @@ class CreateAtom extends React.Component {
 }
 
 CreateAtom.propTypes = {
+  location: PropTypes.object,
   defaultNodeUri: PropTypes.string,
   atomsCreate: PropTypes.func,
   atomsEdit: PropTypes.func,
@@ -605,10 +605,12 @@ CreateAtom.propTypes = {
   useCase: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(CreateAtom);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(CreateAtom)
+);
 
 // returns true if the branch has any content present
 function isBranchContentPresent(isOrSeeks, includeType = false) {

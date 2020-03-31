@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
-import { get, getIn } from "../../utils.js";
+import { get, getIn, getQueryParams } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import * as connectionSelectors from "../../redux/selectors/connection-selectors.js";
@@ -21,13 +21,12 @@ import "~/style/_connections.scss";
 import "~/style/_responsiveness-utils.scss";
 import "~/style/_connection-overlay.scss";
 import ico36_message from "~/images/won-icons/ico36_message.svg";
+import { withRouter } from "react-router-dom";
 
-const mapStateToProps = state => {
-  const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
+const mapStateToProps = (state, ownProps) => {
+  const { viewConnUri, connectionUri } = getQueryParams(ownProps.location);
 
-  const selectedConnectionUri = generalSelectors.getConnectionUriFromRoute(
-    state
-  );
+  const selectedConnectionUri = connectionUri;
 
   const atom =
     selectedConnectionUri &&
@@ -176,4 +175,4 @@ PageConnections.propTypes = {
   hideFooterInResponsive: PropTypes.bool,
 };
 
-export default connect(mapStateToProps)(PageConnections);
+export default withRouter(connect(mapStateToProps)(PageConnections));

@@ -5,14 +5,16 @@ import WonAtomCard from "../../atom-card.jsx";
 import { connect } from "react-redux";
 import * as generalSelectors from "../../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../../redux/utils/atom-utils.js";
-import { get, getIn } from "../../../utils.js";
+import { get, getIn, getQueryParams } from "../../../utils.js";
 import { actionCreators } from "../../../actions/actions.js";
 
 import "~/style/_suggest-atom-viewer.scss";
 import * as processSelectors from "../../../redux/selectors/process-selectors";
+import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
-  const openedConnectionUri = generalSelectors.getConnectionUriFromRoute(state);
+  const { connectionUri } = getQueryParams(ownProps.location);
+  const openedConnectionUri = connectionUri;
   const openedOwnPost =
     openedConnectionUri &&
     generalSelectors.getOwnedAtomByConnectionUri(state, openedConnectionUri);
@@ -296,7 +298,9 @@ WonSuggestAtomViewer.propTypes = {
   routerGoCurrent: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonSuggestAtomViewer);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonSuggestAtomViewer)
+);

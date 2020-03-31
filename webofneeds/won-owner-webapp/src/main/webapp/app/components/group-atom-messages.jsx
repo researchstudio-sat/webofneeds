@@ -6,7 +6,7 @@ import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as messageUtils from "../redux/utils/message-utils";
 import { hasMessagesToLoad } from "../redux/selectors/connection-selectors";
 import { getUnreadMessagesByConnectionUri } from "../redux/selectors/message-selectors";
-import { get, getIn } from "../utils";
+import { get, getIn, getQueryParams } from "../utils";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import vocab from "../service/vocab.js";
@@ -25,6 +25,7 @@ import WonAtomContentMessage from "./messages/atom-content-message.jsx";
 import WonConnectionMessage from "./messages/connection-message.jsx";
 import { actionCreators } from "../actions/actions.js";
 import * as viewSelectors from "../redux/selectors/view-selectors";
+import { withRouter } from "react-router-dom";
 
 const rdfTextfieldHelpText =
   "Expects valid turtle. " +
@@ -36,7 +37,7 @@ const rdfTextfieldHelpText =
   `\`<${vocab.WONMSG.uriPlaceholder.event}> con:text "hello world!". \``;
 
 const mapStateToProps = (state, ownProps) => {
-  const connectionUri = generalSelectors.getConnectionUriFromRoute(state);
+  const { connectionUri } = getQueryParams(ownProps.location);
   const ownedAtom = generalSelectors.getOwnedAtomByConnectionUri(
     state,
     connectionUri
@@ -538,7 +539,9 @@ GroupAtomMessages.propTypes = {
   showLatestMessages: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(GroupAtomMessages);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(GroupAtomMessages)
+);

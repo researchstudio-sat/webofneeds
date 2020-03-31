@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import Immutable from "immutable";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
-import { get, getIn } from "../utils.js";
+import { get, getIn, getQueryParams } from "../utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -15,9 +15,10 @@ import WonDescriptionViewer from "./details/viewer/description-viewer.jsx";
 import { details } from "../../config/detail-definitions.js";
 import "~/style/_atom-content-persona.scss";
 import ElmReact from "./elm-react";
+import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
-  const connectionUri = generalSelectors.getConnectionUriFromRoute(state);
+  const { connectionUri } = getQueryParams(ownProps.location);
   const connection = connectionSelectors.getOwnedConnectionByUri(
     state,
     connectionUri
@@ -317,7 +318,9 @@ WonAtomContentPersona.propTypes = {
   personaDisconnect: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonAtomContentPersona);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonAtomContentPersona)
+);

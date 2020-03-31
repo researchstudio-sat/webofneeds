@@ -1,8 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import * as generalSelectors from "../../redux/selectors/general-selectors.js";
-import { get } from "../../utils.js";
+import { withRouter } from "react-router-dom";
+import { get, getQueryParams } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import WonModalDialog from "../../components/modal-dialog.jsx";
@@ -19,65 +19,57 @@ import "~/style/_create.scss";
 import "~/style/_responsiveness-utils.scss";
 
 const mapStateToProps = state => {
-  const useCase = generalSelectors.getUseCaseFromRoute(state);
-  const useCaseGroup = generalSelectors.getUseCaseGroupFromRoute(state);
-
-  const fromAtomUri = generalSelectors.getFromAtomUriFromRoute(state);
-
-  const mode = generalSelectors.getModeFromRoute(state);
-
-  const showCreateFromPost = !!(fromAtomUri && mode);
-
-  const showUseCaseGroup = !useCase && !!useCaseGroup;
-  const showCreatePost = showCreateFromPost || !!useCase;
-
   const accountState = get(state, "account");
 
   return {
     isLoggedIn: accountUtils.isLoggedIn(accountState),
     showModalDialog: viewSelectors.showModalDialog(state),
-    showUseCasePicker: !(showUseCaseGroup || showCreatePost),
-    showUseCaseGroup,
-    showCreatePost,
     showSlideIns:
       viewSelectors.hasSlideIns(state) &&
       viewSelectors.isSlideInsVisible(state),
   };
 };
 
-class PageCreate extends React.Component {
-  render() {
-    let contentElement;
+function PageCreate(props) {
+  let { useCase, useCaseGroup, fromAtomUri, mode } = getQueryParams(
+    props.location
+  );
+  let contentElement;
 
-    if (this.props.showCreatePost) {
-      contentElement = <WonCreateAtom />;
-    } else if (this.props.showUseCaseGroup) {
-      contentElement = <WonUseCaseGroup />;
-    } else if (this.props.showUseCasePicker) {
-      contentElement = <WonUseCasePicker />;
-    }
+  let showCreateFromPost = !!(fromAtomUri && mode);
+  let showUseCaseGroup = !useCase && !!useCaseGroup;
 
-    return (
-      <section className={!this.props.isLoggedIn ? "won-signed-out" : ""}>
-        {this.props.showModalDialog && <WonModalDialog />}
-        <WonTopnav pageTitle="Create" />
-        {this.props.isLoggedIn && <WonMenu />}
-        <WonToasts />
-        {this.props.showSlideIns && <WonSlideIn />}
-        {/* RIGHT SIDE */}
-        <main className="ownercreate">{contentElement}</main>
-        <WonFooter />
-      </section>
-    );
+  let showCreatePost = showCreateFromPost || !!useCase;
+
+  let showUseCasePicker = !(showUseCaseGroup || showCreatePost);
+
+  if (showCreatePost) {
+    contentElement = <WonCreateAtom />;
+  } else if (showUseCaseGroup) {
+    contentElement = <WonUseCaseGroup />;
+  } else if (showUseCasePicker) {
+    contentElement = <WonUseCasePicker />;
   }
+
+  return (
+    <section className={!props.isLoggedIn ? "won-signed-out" : ""}>
+      {props.showModalDialog && <WonModalDialog />}
+      <WonTopnav pageTitle="Create" />
+      {props.isLoggedIn && <WonMenu />}
+      <WonToasts />
+      {props.showSlideIns && <WonSlideIn />}
+      {/* RIGHT SIDE */}
+      <main className="ownercreate">{contentElement}</main>
+      <WonFooter />
+    </section>
+  );
 }
+
 PageCreate.propTypes = {
+  location: PropTypes.object,
   isLoggedIn: PropTypes.bool,
   showModalDialog: PropTypes.bool,
-  showUseCasePicker: PropTypes.bool,
-  showUseCaseGroup: PropTypes.bool,
-  showCreatePost: PropTypes.bool,
   showSlideIns: PropTypes.bool,
 };
 
-export default connect(mapStateToProps)(PageCreate);
+export default withRouter(connect(mapStateToProps)(PageCreate));

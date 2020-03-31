@@ -3,7 +3,7 @@ import Immutable from "immutable";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
-import { get, getIn, sortByDate } from "../utils.js";
+import { get, getIn, sortByDate, getQueryParams } from "../utils.js";
 import * as processUtils from "../redux/utils/process-utils";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
@@ -13,13 +13,14 @@ import WonAtomHeader from "./atom-header.jsx";
 
 import "~/style/_connections-overview.scss";
 import PropTypes from "prop-types";
+import { withRouter } from "react-router-dom";
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
   const allAtoms = generalSelectors.getAtoms(state);
   const ownedAtoms = generalSelectors.getOwnedAtoms(state);
   const openAtoms = generalSelectors.getChatAtoms(state);
 
-  const connUriInRoute = generalSelectors.getConnectionUriFromRoute(state);
+  const { connectionUri } = getQueryParams(ownProps.location);
 
   const sortedOpenAtoms = sortByDate(openAtoms, "creationDate");
   const process = get(state, "process");
@@ -28,7 +29,7 @@ const mapStateToProps = state => {
     ownedAtoms,
     allAtoms,
     process,
-    connUriInRoute,
+    connUriInRoute: connectionUri,
     sortedOpenAtomUris: sortedOpenAtoms
       ? [...sortedOpenAtoms.flatMap(atom => atom.get("uri"))]
       : [],
@@ -224,7 +225,9 @@ WonConnectionsOverview.propTypes = {
   connectionMarkAsRead: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonConnectionsOverview);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonConnectionsOverview)
+);

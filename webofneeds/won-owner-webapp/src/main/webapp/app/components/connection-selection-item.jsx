@@ -9,8 +9,13 @@ import * as connectionUtils from "../redux/utils/connection-utils.js";
 import WonConnectionHeader from "./connection-header.jsx";
 
 import "~/style/_connection-selection-item-line.scss";
+import { getQueryParams } from "../utils";
+import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
+  const { connectionUri } = getQueryParams(ownProps.location);
+  const openConnectionUri = connectionUri;
+
   const ownedAtom = generalSelectors.getOwnedAtomByConnectionUri(
     state,
     ownProps.connectionUri
@@ -21,7 +26,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     connectionUri: ownProps.connectionUri,
     onClick: ownProps.onClick,
-    openConnectionUri: generalSelectors.getConnectionUriFromRoute(state),
+    openConnectionUri: openConnectionUri,
     lastUpdateTimestamp: get(connection, "lastUpdateDate"),
     targetAtomFailedToLoad: processUtils.hasAtomFailedToLoad(
       processState,
@@ -97,7 +102,9 @@ WonConnectionSelectionItem.propTypes = {
   routerGoCurrent: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonConnectionSelectionItem);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonConnectionSelectionItem)
+);
