@@ -138,6 +138,7 @@ $ngRedux.getState();
                            isRetracted: true|false //if the message was retracted
                            isRejected: true|false //if the message was rejected
                            isAccepted: true|false //if the message was accepted
+                           isAgreed: true|false //if the message is part of an agreement
                            isCancellationPending: true|false //if the message is pending to be cancelled
                            isCancelled: true|false //if the message was cancelled
                        },
@@ -165,6 +166,7 @@ $ngRedux.getState();
                },
                agreementData: { //contains agreementData that is necessary to display for the user
                    agreementUris: Immutable.Set(),
+                   agreedMessageUris: Immutable.Set(),
                    pendingProposalUris: Immutable.Set(),
                    pendingCancellationProposalUris: Immutable.Set(),
                    cancellationPendingAgreementUris: Immutable.Set(),
