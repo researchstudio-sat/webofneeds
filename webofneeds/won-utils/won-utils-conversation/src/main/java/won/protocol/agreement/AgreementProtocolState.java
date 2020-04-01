@@ -214,7 +214,6 @@ public class AgreementProtocolState {
         if (agreementIt == null) {
             return Collections.emptySet();
         }
-        Set<URI> acceptedProposalClaimUris = new HashSet<URI>();
         Set<URI> agreedMessageUris = new HashSet<URI>();
         while (agreementIt.hasNext()) {
             Set<MessageEffect> effects = getEffects(URI.create(agreementIt.next()));
@@ -225,21 +224,10 @@ public class AgreementProtocolState {
                     agreedMessageUris.addAll(effect.asProposes().getProposes());
                     agreedMessageUris.addAll(effect.asProposes().getProposesToCancel());
                 }
-                // if (effect.isAccepts()) {
-                // acceptedProposalClaimUris.add(effect.asAccepts().getAcceptedMessageUri());
-                // }
+
             });
         }
-        /*
-         * acceptedProposalClaimUris.forEach(messageUri -> { Set<MessageEffect> effects
-         * = getEffects(messageUri); effects.stream().forEach(effect -> { if
-         * (effect.isClaims()) {
-         * agreedMessageUris.add(effect.asClaims().getClaimedMessageUri()); } else if
-         * (effect.isProposes()) {
-         * agreedMessageUris.addAll(effect.asProposes().getProposes());
-         * agreedMessageUris.addAll(effect.asProposes().getProposesToCancel()); } });
-         * });
-         */
+
         return agreedMessageUris;
     }
 
