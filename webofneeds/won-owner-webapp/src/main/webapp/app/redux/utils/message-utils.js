@@ -38,6 +38,25 @@ export function isMessageClaimable(msg) {
 }
 
 /**
+ * Determines if a given message can be agreed on
+ * @param msg
+ * @returns {*|boolean}
+ */
+export function isMessageAgreeable(msg) {
+  return (
+    msg &&
+    (hasClaimsReferences(msg) ||
+      hasProposesReferences(msg) ||
+      hasProposesToCancelReferences(msg)) &&
+    !isMessageAccepted(msg) &&
+    !isMessageCancelled(msg) &&
+    !isMessageCancellationPending(msg) &&
+    !isMessageRetracted(msg) &&
+    !isMessageRejected(msg)
+  );
+}
+
+/**
  * Determines if a given message can be Canceled
  * @param msg
  * @returns {*|boolean}
@@ -64,6 +83,7 @@ export function isMessageRetractable(msg) {
     msg &&
     msg.get("outgoingMessage") &&
     !isMessageAccepted(msg) &&
+    !isMessageAgreedOn(msg) &&
     !isMessageCancelled(msg) &&
     !isMessageCancellationPending(msg) &&
     !isMessageRetracted(msg) &&
@@ -84,6 +104,7 @@ export function isMessageAcceptable(msg) {
       hasProposesToCancelReferences(msg)) &&
     !msg.get("outgoingMessage") &&
     !isMessageAccepted(msg) &&
+    !isMessageAgreedOn(msg) &&
     !isMessageCancelled(msg) &&
     !isMessageCancellationPending(msg) &&
     !isMessageRetracted(msg) &&
@@ -104,6 +125,7 @@ export function isMessageRejectable(msg) {
       hasProposesToCancelReferences(msg)) &&
     !msg.get("outgoingMessage") &&
     !isMessageAccepted(msg) &&
+    !isMessageAgreedOn(msg) &&
     !isMessageCancelled(msg) &&
     !isMessageCancellationPending(msg) &&
     !isMessageRetracted(msg) &&
@@ -189,6 +211,16 @@ export function isMessageRejected(msg) {
 export function isMessageAccepted(msg) {
   const messageStatus = msg && msg.get("messageStatus");
   return messageStatus && messageStatus.get("isAccepted");
+}
+
+/**
+ * Determines if a given message is in the state agreed
+ * @param msg
+ * @returns {*|boolean}
+ */
+export function isMessageAgreedOn(msg) {
+  const messageStatus = msg && msg.get("messageStatus");
+  return messageStatus && messageStatus.get("isAgreed");
 }
 
 /**

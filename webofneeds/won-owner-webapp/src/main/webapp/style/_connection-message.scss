@@ -115,6 +115,9 @@ won-connection-message {
   &.won-is-accepted {
     //TODO: STYLING
   }
+  &.won-is-agreed {
+    //TODO: STYLING
+  }
 
   &.won-is-retracted:not(.won-is-collapsed) {
     opacity: 0.35;

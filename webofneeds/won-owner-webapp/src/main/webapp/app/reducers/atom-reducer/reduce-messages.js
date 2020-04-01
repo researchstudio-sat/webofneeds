@@ -871,6 +871,63 @@ export function markMessageAsClaimed(
     claimed
   );
 }
+
+/**
+ * Sets the given messageUri messageStatus->isAgreed to the given parameter (isAgreedOn).
+ * Additionally calls markMessageAsCollapsed to the given parameter (isAgreedOn) as well
+ * @param state
+ * @param messageUri
+ * @param connectionUri
+ * @param atomUri
+ * @param isAgreedOn
+ * @returns {*}
+ */
+export function markMessageAsAgreed(
+  state,
+  messageUri,
+  connectionUri,
+  atomUri,
+  isAgreedOn
+) {
+  let atom = state.get(atomUri);
+  let connection = atom && atom.getIn(["connections", connectionUri]);
+  let messages = connection && connection.get("messages");
+  let message = messages && messages.get(messageUri);
+
+  if (!message) {
+    console.error(
+      "No message with messageUri: <",
+      messageUri,
+      "> found within atomUri: <",
+      atomUri,
+      "> connectionUri: <",
+      connectionUri,
+      ">"
+    );
+    return state;
+  }
+  state = markMessageAsCollapsed(
+    state,
+    messageUri,
+    connectionUri,
+    atomUri,
+    isAgreedOn
+  );
+
+  return state.setIn(
+    [
+      atomUri,
+      "connections",
+      connectionUri,
+      "messages",
+      messageUri,
+      "messageStatus",
+      "isAgreed",
+    ],
+    isAgreedOn
+  );
+}
+
 /**
  * Sets the given messageUri messageStatus->isProposed to the given parameter (proposed).
  * Additionally calls markMessageAsCollapsed to the given parameter (proposed) as well
@@ -1151,6 +1208,7 @@ export function updateMessageStatus(
   const hasCollapsedMessageState =
     messageStatus.get("isProposed") ||
     messageStatus.get("isClaimed") ||
+    messageStatus.get("isAgreed") ||
     messageStatus.get("isRejected") ||
     messageStatus.get("isRetracted");
 

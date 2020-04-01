@@ -16,6 +16,7 @@ import {
   addExistingMessages,
   addMessage,
   markMessageAsAccepted,
+  markMessageAsAgreed,
   markMessageAsCancellationPending,
   markMessageAsCancelled,
   markMessageAsClaimed,
@@ -275,6 +276,7 @@ export default function(allAtomsInState = initialState, action = {}) {
                 isRetracted: false,
                 isRejected: false,
                 isAccepted: false,
+                isAgreed: false,
                 isCancelled: false,
                 isCancellationPending: false,
               },
@@ -562,6 +564,15 @@ export default function(allAtomsInState = initialState, action = {}) {
         action.payload.connectionUri,
         action.payload.atomUri,
         action.payload.accepted
+      );
+
+    case actionTypes.messages.messageStatus.markAsAgreed:
+      return markMessageAsAgreed(
+        allAtomsInState,
+        action.payload.messageUri,
+        action.payload.connectionUri,
+        action.payload.atomUri,
+        action.payload.agreed
       );
 
     case actionTypes.messages.messageStatus.markAsCancelled:

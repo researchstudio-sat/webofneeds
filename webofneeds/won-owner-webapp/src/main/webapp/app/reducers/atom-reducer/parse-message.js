@@ -71,6 +71,7 @@ export function parseMessage(
         isRetracted: false,
         isRejected: false,
         isAccepted: false,
+        isAgreed: false,
         isCancellationPending: false,
         isCancelled: false,
       },

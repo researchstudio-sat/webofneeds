@@ -41,12 +41,12 @@ public class AgreementProtocolUris {
         this.agreementUris.addAll(uris);
     }
 
-    public void addAgreedMessageUris(Set<URI> acceptedUris) {
-        this.agreedMessageUris.addAll(acceptedUris);
+    public void addAgreedMessageUris(Set<URI> agreedMessageUris) {
+        this.agreedMessageUris.addAll(agreedMessageUris);
     }
 
-    public void addAgreedMessageUri(URI acceptedUri) {
-        this.agreedMessageUris.add(acceptedUri);
+    public void addAgreedMessageUri(URI agreedMessageUri) {
+        this.agreedMessageUris.add(agreedMessageUri);
     }
 
     public void addPendingProposalUris(Collection<URI> uris) {
@@ -97,7 +97,7 @@ public class AgreementProtocolUris {
         return agreementUris;
     }
 
-    public Set<URI> getAcceptedUris() {
+    public Set<URI> getAgreedMessageUris() {
         return agreedMessageUris;
     }
 
@@ -128,7 +128,8 @@ public class AgreementProtocolUris {
     @Override
     public String toString() {
         return "AgreementProtocolUris [retracted=" + retractedUris + ", rejected=" + rejectedUris + ", claimed="
-                        + claimedUris + ", agreements=" + agreementUris + ", pendingProposals=" + pendingProposalUris
+                        + claimedUris + ", agreements=" + agreementUris + ", agreedMessageUris=" + agreedMessageUris
+                        + ", pendingProposals=" + pendingProposalUris
                         + ", cancelledAgreements=" + cancelledAgreementUris + ", cancellationPendingAgreements="
                         + cancellationPendingAgreementUris + ", pendingCancellationProposals="
                         + pendingCancellationProposalUris + ", acceptedCancellationProposals="

@@ -89,6 +89,7 @@ const mapStateToProps = (state, ownProps) => {
     isClaimed: messageUtils.isMessageClaimed(message),
     isProposed: messageUtils.isMessageProposed(message),
     isAccepted: messageUtils.isMessageAccepted(message),
+    isAgreed: messageUtils.isMessageAgreedOn(message),
     isRejected: messageUtils.isMessageRejected(message),
     isRetracted: messageUtils.isMessageRetracted(message),
     isCancellationPending: messageUtils.isMessageCancellationPending(message),
@@ -103,6 +104,7 @@ const mapStateToProps = (state, ownProps) => {
     isRetractable: messageUtils.isMessageRetractable(message),
     isRejectable: messageUtils.isMessageRejectable(message),
     isAcceptable: messageUtils.isMessageAcceptable(message),
+    isAgreeable: messageUtils.isMessageAgreeable(message),
     isUnread: messageUtils.isMessageUnread(message),
     isInjectIntoMessage: injectInto && injectInto.size > 0,
     injectInto: injectInto,
@@ -335,6 +337,7 @@ class WonConnectionMessage extends React.Component {
     this.props.isRejected && cssClassNames.push("won-is-rejected");
     this.props.isRetracted && cssClassNames.push("won-is-retracted");
     this.props.isAccepted && cssClassNames.push("won-is-accepted");
+    this.props.isAgreed && cssClassNames.push("won-is-agreed");
     this.props.isCancelled && cssClassNames.push("won-is-cancelled");
     this.props.isCollapsed && cssClassNames.push("won-is-collapsed");
     this.props.isChangeNotificationMessage &&
@@ -379,6 +382,7 @@ class WonConnectionMessage extends React.Component {
       if (this.props.isClaimed) label = "Message was claimed.";
       else if (this.props.isProposed) label = "Message was proposed.";
       else if (this.props.isAccepted) label = "Message was accepted.";
+      else if (this.props.isAgreed) label = "Message is part of an agreement";
       else if (this.props.isRejected) label = "Message was rejected.";
       else if (this.props.isRetracted) label = "Message was retracted.";
       else if (this.props.isCancellationPending)
@@ -392,6 +396,7 @@ class WonConnectionMessage extends React.Component {
   }
 
   isSelectable() {
+    //TODO: Not allowed for certain high-level protocol states
     if (this.props.message && this.props.multiSelectType) {
       switch (this.props.multiSelectType) {
         case "rejects":
@@ -412,6 +417,7 @@ class WonConnectionMessage extends React.Component {
   }
 
   expandMessage() {
+    //TODO: Not allowed for certain high-level protocol states
     if (this.props.message && !this.props.multiSelectType) {
       this.props.messageMarkAsCollapsed(
         get(this.props.message, "uri"),
@@ -476,6 +482,7 @@ WonConnectionMessage.propTypes = {
   isClaimed: PropTypes.bool,
   isProposed: PropTypes.bool,
   isAccepted: PropTypes.bool,
+  isAgreed: PropTypes.bool,
   isRejected: PropTypes.bool,
   isRetracted: PropTypes.bool,
   isCancellationPending: PropTypes.bool,
@@ -486,6 +493,7 @@ WonConnectionMessage.propTypes = {
   isRetractable: PropTypes.bool,
   isRejectable: PropTypes.bool,
   isAcceptable: PropTypes.bool,
+  isAgreeable: PropTypes.bool,
   isUnread: PropTypes.bool,
   isInjectIntoMessage: PropTypes.bool,
   injectInto: PropTypes.object,

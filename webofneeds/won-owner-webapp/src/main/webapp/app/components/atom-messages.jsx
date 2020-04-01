@@ -1042,6 +1042,7 @@ class AtomMessages extends React.Component {
 
           const agreementDataImm = Immutable.fromJS({
             agreementUris: Immutable.Set(response.agreementUris),
+            agreedMessageUris: Immutable.Set(response.agreedMessageUris),
             pendingProposalUris: Immutable.Set(response.pendingProposalUris),
             acceptedCancellationProposalUris: Immutable.Set(
               response.acceptedCancellationProposalUris
@@ -1102,6 +1103,7 @@ class AtomMessages extends React.Component {
         const msgUri = get(msg, "uri");
 
         const acceptedUris = get(this.props.agreementData, "agreementUris");
+        const agreedUris = get(this.props.agreementData, "agreedMessageUris");
         const rejectedUris = get(
           this.props.agreementData,
           "rejectedMessageUris"
@@ -1128,6 +1130,7 @@ class AtomMessages extends React.Component {
         const isProposed = get(messageStatus, "isProposed");
         const isClaimed = get(messageStatus, "isClaimed");
         const isAccepted = get(messageStatus, "isAccepted");
+        const isAgreed = get(messageStatus, "isAgreed");
         const isRejected = get(messageStatus, "isRejected");
         const isRetracted = get(messageStatus, "isRetracted");
         const isCancelled = get(messageStatus, "isCancelled");
@@ -1139,6 +1142,7 @@ class AtomMessages extends React.Component {
         const isOldProposed = !!get(proposedUris, msgUri);
         const isOldClaimed = !!get(claimedUris, msgUri);
         const isOldAccepted = !!get(acceptedUris, msgUri);
+        const isOldAgreed = !!get(agreedUris, msgUri);
         const isOldRejected = !!get(rejectedUris, msgUri);
         const isOldRetracted = !!get(retractedUris, msgUri);
         const isOldCancelled = !!get(cancelledUris, msgUri);
@@ -1148,6 +1152,7 @@ class AtomMessages extends React.Component {
           .set("isProposed", isProposed || isOldProposed)
           .set("isClaimed", isClaimed || isOldClaimed)
           .set("isAccepted", isAccepted || isOldAccepted)
+          .set("isAgreed", isAgreed || isOldAgreed)
           .set("isRejected", isRejected || isOldRejected)
           .set("isRetracted", isRetracted || isOldRetracted)
           .set("isCancelled", isCancelled || isOldCancelled)
