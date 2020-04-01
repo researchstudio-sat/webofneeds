@@ -852,6 +852,22 @@ export function markAsAccepted(event) {
   };
 }
 
+export function markAsAgreed(event) {
+  return dispatch => {
+    const payload = {
+      messageUri: event.messageUri,
+      connectionUri: event.connectionUri,
+      atomUri: event.atomUri,
+      agreed: event.agreed,
+    };
+
+    dispatch({
+      type: actionTypes.messages.messageStatus.markAsAgreed,
+      payload: payload,
+    });
+  };
+}
+
 export function markAsCancelled(event) {
   return dispatch => {
     const payload = {
