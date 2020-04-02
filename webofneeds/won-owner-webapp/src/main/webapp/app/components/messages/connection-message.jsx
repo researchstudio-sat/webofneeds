@@ -428,6 +428,7 @@ class WonConnectionMessage extends React.Component {
     }
   }
 
+  //TODO: Not allowed for certain high-level protocol states
   showActionButtons() {
     return (
       !this.props.groupChatMessage &&

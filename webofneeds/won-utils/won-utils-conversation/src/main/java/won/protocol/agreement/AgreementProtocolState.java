@@ -287,7 +287,7 @@ public class AgreementProtocolState {
     public Set<URI> getCancellationPendingAgreementUris() {
         Iterator<String> pendingProposalUris = pendingProposals.listNames();
         if (pendingProposalUris == null) {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
         Set<URI> cancelationUris = new HashSet<URI>();
         while (pendingProposalUris.hasNext()) {

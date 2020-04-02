@@ -17,7 +17,9 @@ export function isMessageProposable(msg) {
     msg.get("hasContent") &&
     msg.get("messageType") !== vocab.WONMSG.connectMessage &&
     msg.get("messageType") !== vocab.WONMSG.changeNotificationMessage &&
-    !msg.get("hasReferences")
+    !msg.get("hasReferences") &&
+    !isMessageRetracted(msg) &&
+    !isMessageRejected(msg)
   );
 }
 
@@ -33,7 +35,9 @@ export function isMessageClaimable(msg) {
     msg.get("hasContent") &&
     msg.get("messageType") !== vocab.WONMSG.connectMessage &&
     msg.get("messageType") !== vocab.WONMSG.changeNotificationMessage &&
-    !msg.get("hasReferences")
+    !msg.get("hasReferences") &&
+    !isMessageRetracted(msg) &&
+    !isMessageRejected(msg)
   );
 }
 
@@ -45,6 +49,7 @@ export function isMessageClaimable(msg) {
 export function isMessageAgreeable(msg) {
   return (
     msg &&
+    msg.get("hasContent") &&
     (hasClaimsReferences(msg) ||
       hasProposesReferences(msg) ||
       hasProposesToCancelReferences(msg)) &&
@@ -87,7 +92,8 @@ export function isMessageRetractable(msg) {
     !isMessageCancelled(msg) &&
     !isMessageCancellationPending(msg) &&
     !isMessageRetracted(msg) &&
-    !isMessageRejected(msg)
+    !isMessageRejected(msg) &&
+    !isMessageClaimed
   );
 }
 
@@ -129,7 +135,8 @@ export function isMessageRejectable(msg) {
     !isMessageCancelled(msg) &&
     !isMessageCancellationPending(msg) &&
     !isMessageRetracted(msg) &&
-    !isMessageRejected(msg)
+    !isMessageRejected(msg) &&
+    !isMessageClaimed
   );
 }
 
