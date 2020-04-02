@@ -74,13 +74,14 @@ class WonLoginForm extends React.Component {
     return (
       <won-login-form class={this.props.className ? this.props.className : ""}>
         <form
-          onSubmit={() =>
+          onSubmit={e => {
+            e.preventDefault();
             this.props.login(
               this.state.email,
               this.state.password,
               this.state.rememberMe
-            )
-          }
+            );
+          }}
           id="loginForm"
           className="loginForm"
         >
