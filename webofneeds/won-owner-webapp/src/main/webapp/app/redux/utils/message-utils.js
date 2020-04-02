@@ -93,7 +93,7 @@ export function isMessageRetractable(msg) {
     !isMessageCancellationPending(msg) &&
     !isMessageRetracted(msg) &&
     !isMessageRejected(msg) &&
-    !isMessageClaimed
+    !isMessageClaimed(msg)
   );
 }
 
@@ -136,7 +136,7 @@ export function isMessageRejectable(msg) {
     !isMessageCancellationPending(msg) &&
     !isMessageRetracted(msg) &&
     !isMessageRejected(msg) &&
-    !isMessageClaimed
+    !isMessageClaimed(msg)
   );
 }
 

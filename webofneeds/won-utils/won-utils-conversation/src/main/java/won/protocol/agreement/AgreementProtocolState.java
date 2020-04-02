@@ -224,10 +224,8 @@ public class AgreementProtocolState {
                     agreedMessageUris.addAll(effect.asProposes().getProposes());
                     agreedMessageUris.addAll(effect.asProposes().getProposesToCancel());
                 }
-
             });
         }
-
         return agreedMessageUris;
     }
 
