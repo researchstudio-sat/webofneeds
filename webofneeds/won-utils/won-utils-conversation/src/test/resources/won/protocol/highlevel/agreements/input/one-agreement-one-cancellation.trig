@@ -1,3 +1,11 @@
+#Proposed Message 1 W1mpiBwvxnEkXGrgxyqRLEFrNuhxDFSNFJq1DQoy1ZdETY
+#Proposal 1 W1hKvWidd3Tq3GSGUq2rCtZMFBT7P9jS9GsMXb53NrC3sG
+
+#AcceptMsg W1jXvEQbnfEVyCVXiWftZvPReNbUZuJAYV4jNgXY65nT3k -> W1hKvWidd3Tq3GSGUq2rCtZMFBT7P9jS9GsMXb53NrC3sG
+#ProposeToCancel W1bSLVzZSVx6yqHeHnPzLzYi6d4PYjVNHtE8t9UDHCwF3C
+#PropoesToCancel: W1hKvWidd3Tq3GSGUq2rCtZMFBT7P9jS9GsMXb53NrC3sG
+#Accepting proposeToCancel: W1qKVL8KzCuvJJUnbSb42oJXtUMcSPQpJeM7q4MTpLRaJV
+
 @prefix msg:   <https://w3id.org/won/message#> .
 @prefix conn:  <https://localhost:8443/won/resource/connection/> .
 @prefix con:   <https://w3id.org/won/content#> .
@@ -1813,8 +1821,7 @@
 
 <wm:/W1ojFzgNEjQpQVAegsJe8TcZRVz5suQf5eXmgmFXhk8R78#content> {
     <wm:/W1ojFzgNEjQpQVAegsJe8TcZRVz5suQf5eXmgmFXhk8R78>
-            <https://w3id.org/won/agreement#proposes>
-                    <wm:/W1hNF7MZ3x8xNgd5BhCmjFWigASTZ68ADZsVXskcfrxYyj> .
+    		con:text  "What?" .
 }
 
 <wm:/W1hozM6AhETn1Dr6bsxvb9wMzaNznPriF1Lsky4UaYMrnT#signature> {
@@ -4205,7 +4212,9 @@
 
 <wm:/W1qKVL8KzCuvJJUnbSb42oJXtUMcSPQpJeM7q4MTpLRaJV#content-cz7o> {
     <wm:/W1qKVL8KzCuvJJUnbSb42oJXtUMcSPQpJeM7q4MTpLRaJV>
-            con:text  "ok, I'll accept your latest proposal - but I'll need to crawl the connection data first, please be patient." .
+    	<https://w3id.org/won/agreement#accepts>
+            <wm:/W1bSLVzZSVx6yqHeHnPzLzYi6d4PYjVNHtE8t9UDHCwF3C> ;
+        con:text  "ok, I'll accept your latest proposeToCancel." .
 }
 
 <wm:/W1kbHHJ95VmvpWMcz3KojCZ3bJLpeE71hKps6khuyCQq5N#signature> {

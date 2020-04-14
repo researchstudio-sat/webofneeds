@@ -9,6 +9,8 @@ public class AgreementProtocolUris {
     private Set<URI> retractedUris = new HashSet<URI>();
     private Set<URI> rejectedUris = new HashSet<URI>();
     private Set<URI> claimedUris = new HashSet<URI>();
+    private Set<URI> proposedUris = new HashSet<URI>();
+    private Set<URI> proposedToCancelUris = new HashSet<URI>();
     private Set<URI> agreementUris = new HashSet<URI>();
     private Set<URI> agreedMessageUris = new HashSet<URI>();
     private Set<URI> pendingProposalUris = new HashSet<URI>();
@@ -27,6 +29,22 @@ public class AgreementProtocolUris {
 
     public void addRejectedMessageUris(Collection<URI> uris) {
         this.rejectedUris.addAll(uris);
+    }
+
+    public void addProposedMessageUris(Collection<URI> uris) {
+        this.proposedUris.addAll(uris);
+    }
+
+    public void addProposedMessageUri(URI uri) {
+        this.proposedUris.add(uri);
+    }
+
+    public void addProposedToCancelUris(Set<URI> uris) {
+        this.proposedToCancelUris.addAll(uris);
+    }
+
+    public void addProposedToCancelUri(URI uri) {
+        this.proposedToCancelUris.add(uri);
     }
 
     public void addClaimedMessageUris(Collection<URI> uris) {
@@ -89,6 +107,14 @@ public class AgreementProtocolUris {
         return rejectedUris;
     }
 
+    public Set<URI> getProposedMessageUris() {
+        return proposedUris;
+    }
+
+    public Set<URI> getProposedToCancelUris() {
+        return proposedToCancelUris;
+    }
+
     public Set<URI> getClaimedMessageUris() {
         return claimedUris;
     }
@@ -133,6 +159,6 @@ public class AgreementProtocolUris {
                         + ", cancelledAgreements=" + cancelledAgreementUris + ", cancellationPendingAgreements="
                         + cancellationPendingAgreementUris + ", pendingCancellationProposals="
                         + pendingCancellationProposalUris + ", acceptedCancellationProposals="
-                        + acceptedCancellationProposalUris + "]";
+                        + acceptedCancellationProposalUris + ", proposedToCancelUris=" + proposedToCancelUris + "]";
     }
 }

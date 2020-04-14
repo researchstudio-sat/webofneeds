@@ -22,12 +22,8 @@ import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.ResIterator;
-import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
-import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,6 +80,7 @@ public class AgreementProtocolState {
             Set<URI> cancelled = m.getEffects().stream().filter(e -> e.isProposes()).map(e -> e.asProposes())
                             .flatMap(e -> e.getProposesToCancel().stream()).filter(this::isAgreement)
                             .collect(Collectors.toSet());
+            // TODO
             uris.addCancellationPendingAgreementUris(cancelled);
             // determine what it proposes
             Set<URI> proposed = m.getEffects().stream().filter(e -> e.isProposes()).map(e -> e.asProposes())
@@ -96,6 +93,7 @@ public class AgreementProtocolState {
             }
             if (!proposed.isEmpty()) {
                 // remember this is a pending proposal that proposes stuff
+                // TODO
                 uris.addPendingProposalUri(m.getMessageURI());
                 isProposal = true;
             }
@@ -104,10 +102,13 @@ public class AgreementProtocolState {
                 ProposalUris proposal = new ProposalUris(m.getMessageURI(), m.getSenderAtomURI());
                 proposal.addProposes(proposed);
                 proposal.addProposesToCancel(cancelled);
+                // TODO
                 uris.addPendingProposal(proposal);
             }
         });
         uris.addPendingCancellationProposalUris(getCancellationPendingAgreementUris());
+        uris.addProposedMessageUris(getProposedUris());
+        uris.addProposedToCancelUris(getProposedToCancelUris());
         uris.addClaimedMessageUris(getClaimedUris());
         uris.addRejectedMessageUris(getRejectedUris());
         uris.addRetractedMessageUris(getRetractedUris());
@@ -170,6 +171,7 @@ public class AgreementProtocolState {
         return pendingProposals.containsNamedModel(proposalUri.toString()) || isPendingCancellation(proposalUri);
     }
 
+    @Deprecated
     public Set<URI> getPendingProposalUris() {
         Set<URI> uris = RdfUtils.getGraphUris(pendingProposals);
         uris.addAll(getPendingCancellationProposalUris());
@@ -195,18 +197,22 @@ public class AgreementProtocolState {
                         .collect(Collectors.toSet());
     }
 
+    @Deprecated
     public Set<URI> getPendingCancellationProposalUris() {
-        Model cancellations = pendingProposals.getDefaultModel();
-        if (cancellations == null) {
+        Iterator<String> pendingProposalsIt = pendingProposals.listNames();
+        if (pendingProposalsIt == null) {
             return Collections.emptySet();
         }
-        Set<URI> ret = new HashSet<URI>();
-        ResIterator it = cancellations.listSubjectsWithProperty(WONAGR.proposesToCancel);
-        while (it.hasNext()) {
-            String uri = it.next().asResource().getURI();
-            ret.add(URI.create(uri));
+        Set<URI> proposedToCancelUris = new HashSet<URI>();
+        while (pendingProposalsIt.hasNext()) {
+            Set<MessageEffect> effects = getEffects(URI.create(pendingProposalsIt.next()));
+            effects.stream().forEach(effect -> {
+                if (effect.isProposes()) {
+                    proposedToCancelUris.addAll(effect.asProposes().getProposesToCancel());
+                }
+            });
         }
-        return ret;
+        return proposedToCancelUris;
     }
 
     public Set<URI> getAgreedMessageUris() {
@@ -253,10 +259,12 @@ public class AgreementProtocolState {
         return rejected.containsNamedModel(rejectedProposalUri.toString());
     }
 
+    @Deprecated
     public Model getPendingCancellations() {
         return pendingProposals.getDefaultModel();
     }
 
+    @Deprecated
     public boolean isPendingCancellation(URI proposalUri) {
         return pendingProposals.getDefaultModel().contains(new ResourceImpl(proposalUri.toString()),
                         WONAGR.proposesToCancel, (RDFNode) null);
@@ -274,6 +282,40 @@ public class AgreementProtocolState {
         return retractedUris;
     }
 
+    public Set<URI> getProposedUris() {
+        Iterator<String> pendingProposalsIt = pendingProposals.listNames();
+        if (pendingProposalsIt == null) {
+            return Collections.emptySet();
+        }
+        Set<URI> proposedUris = new HashSet<URI>();
+        while (pendingProposalsIt.hasNext()) {
+            Set<MessageEffect> effects = getEffects(URI.create(pendingProposalsIt.next()));
+            effects.stream().forEach(effect -> {
+                if (effect.isProposes()) {
+                    proposedUris.addAll(effect.asProposes().getProposes());
+                }
+            });
+        }
+        return proposedUris;
+    }
+
+    public Set<URI> getProposedToCancelUris() {
+        Iterator<String> pendingProposalsIt = pendingProposals.listNames();
+        if (pendingProposalsIt == null) {
+            return Collections.emptySet();
+        }
+        Set<URI> proposedToCancelUris = new HashSet<URI>();
+        while (pendingProposalsIt.hasNext()) {
+            Set<MessageEffect> effects = getEffects(URI.create(pendingProposalsIt.next()));
+            effects.stream().forEach(effect -> {
+                if (effect.isProposes()) {
+                    proposedToCancelUris.addAll(effect.asProposes().getProposesToCancel());
+                }
+            });
+        }
+        return proposedToCancelUris;
+    }
+
     public Set<URI> getClaimedUris() {
         return this.claimedUris;
     }
@@ -282,6 +324,7 @@ public class AgreementProtocolState {
         return acceptedCancellationProposalUris;
     }
 
+    @Deprecated
     public Set<URI> getCancellationPendingAgreementUris() {
         Iterator<String> pendingProposalUris = pendingProposals.listNames();
         if (pendingProposalUris == null) {
@@ -850,6 +893,33 @@ public class AgreementProtocolState {
                     logger.debug("agreement data: {}", agrDataToString());
                 }
             }
+            if (msg.isProposesToCancelMessage()) {
+                if (logger.isDebugEnabled()) {
+                    msg.getProposesToCancelRefs().forEach(other -> {
+                        logger.debug("{} proposesToCancel {}", msg.getMessageURI(),
+                                        other.getMessageURI());
+                    });
+                }
+                Model proposeToCancelContent = ModelFactory.createDefaultModel();
+                msg.getProposesToCancelRefs().stream().filter(other -> msg != other)
+                                .filter(other -> other.isHeadOfDeliveryChain())
+                                .filter(toCancel -> msg.isAfter(toCancel)).forEach(other -> {
+                                    if (logger.isDebugEnabled()) {
+                                        logger.debug("{} proposesToCancel {}: valid, computing effects",
+                                                        msg.getMessageURI(), other.getMessageURI());
+                                    }
+                                    boolean changedSomething = propose(conversationDataset, other.getContentGraphs(),
+                                                    proposeToCancelContent);
+                                    if (changedSomething) {
+                                        effectsBuilder.proposesToCancel(other.getMessageURI());
+                                    }
+                                });
+                pendingProposals.addNamedModel(msg.getMessageURI().toString(),
+                                proposeToCancelContent);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("agreement data: {}", agrDataToString());
+                }
+            }
             if (msg.isClaimsMessage()) {
                 if (logger.isDebugEnabled()) {
                     msg.getClaimsRefs().forEach(other -> {
@@ -909,31 +979,6 @@ public class AgreementProtocolState {
                 if (logger.isDebugEnabled()) {
                     logger.debug("agreement data: {}", agrDataToString());
                 }
-            }
-            if (msg.isProposesToCancelMessage()) {
-                if (logger.isDebugEnabled()) {
-                    msg.getProposesToCancelRefs().forEach(other -> {
-                        logger.debug("{} proposesToCancel {}", msg.getMessageURI(), other.getMessageURI());
-                    });
-                }
-                final Model cancellationProposals = pendingProposals.getDefaultModel();
-                msg.getProposesToCancelRefs().stream().filter(other -> msg != other)
-                                .filter(other -> other.isHeadOfDeliveryChain())
-                                .filter(toCancel -> msg.isAfter(toCancel)).forEach(other -> {
-                                    if (logger.isDebugEnabled()) {
-                                        logger.debug("{} proposesToCancel {}: valid, computing effects",
-                                                        msg.getMessageURI(), other.getMessageURI());
-                                    }
-                                    cancellationProposals.add(new StatementImpl(
-                                                    cancellationProposals.getResource(msg.getMessageURI().toString()),
-                                                    WONAGR.proposesToCancel, cancellationProposals
-                                                                    .getResource(other.getMessageURI().toString())));
-                                    pendingProposals.setDefaultModel(cancellationProposals);
-                                    effectsBuilder.proposesToCancel(other.getMessageURI());
-                                    if (logger.isDebugEnabled()) {
-                                        logger.debug("agreement data: {}", agrDataToString());
-                                    }
-                                });
             }
             msg.setEffects(effectsBuilder.build());
             if (logger.isDebugEnabled() && !msg.getEffects().isEmpty()) {
@@ -1143,18 +1188,19 @@ public class AgreementProtocolState {
         // first process proposeToCancel triples - this avoids that a message can
         // successfully propose to cancel itself, as agreements are only made after the
         // cancellations are processed.
-        Model cancellationProposals = pendingProposals.getDefaultModel();
-        NodeIterator nIt = cancellationProposals.listObjectsOfProperty(
-                        cancellationProposals.getResource(proposalUri.toString()), WONAGR.proposesToCancel);
-        if (nIt.hasNext()) {
-            // remember that this proposal contained a cancellation
-            this.acceptedCancellationProposalUris.add(proposalUri);
-            changedSomething = true;
-        }
-        while (nIt.hasNext()) {
-            RDFNode agreementToCancelUri = nIt.next();
-            changedSomething = cancelAgreement(URI.create(agreementToCancelUri.asResource().getURI()))
-                            || changedSomething;
+
+        Set<MessageEffect> effects = getEffects(proposalUri);
+        if (effects.size() > 0) {
+            for (MessageEffect effect : effects) {
+                if (effect.isProposes() && effect.asProposes().getProposesToCancel().size() > 0) {
+                    this.acceptedCancellationProposalUris.addAll(effect.asProposes().getProposesToCancel());
+                    changedSomething = true;
+                }
+                for (URI toCancel : effect.asProposes().getProposesToCancel()) {
+                    changedSomething = cancelAgreement(toCancel)
+                                    || changedSomething;
+                }
+            }
         }
         changedSomething = removeCancellationProposal(proposalUri) || changedSomething;
         // move proposal to agreements
@@ -1241,12 +1287,15 @@ public class AgreementProtocolState {
      */
     private boolean removeCancellationProposal(URI proposalUri) {
         boolean changedSomething = false;
-        Model cancellationProposals = pendingProposals.getDefaultModel();
-        StmtIterator it = cancellationProposals.listStatements(
-                        cancellationProposals.getResource(proposalUri.toString()), WONAGR.proposesToCancel,
-                        (RDFNode) null);
-        changedSomething = it.hasNext();
-        cancellationProposals.remove(it);
+        Set<MessageEffect> effects = getEffects(proposalUri);
+        if (effects.size() > 0) {
+            for (MessageEffect effect : effects) {
+                if (effect.isProposes() && effect.asProposes().getProposesToCancel().size() > 0) {
+                    changedSomething = true;
+                    pendingProposals.removeNamedModel(proposalUri.toString());
+                }
+            }
+        }
         return changedSomething;
     }
 

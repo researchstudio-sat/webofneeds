@@ -7,25 +7,25 @@ import java.util.Set;
 
 public class Accepts extends MessageEffect {
     private URI acceptedProposalUri;
-    private Set<URI> cancelledAgreementURIs = new HashSet<URI>();
+    private Set<URI> cancelledAgreementUris = new HashSet<URI>();
 
     public Accepts(URI messageUri, URI acceptedMessageUri, Collection<URI> cancelledAgreementUris) {
         super(messageUri, MessageEffectType.ACCEPTS);
         this.acceptedProposalUri = acceptedMessageUri;
-        this.cancelledAgreementURIs.addAll(cancelledAgreementURIs);
+        this.cancelledAgreementUris.addAll(cancelledAgreementUris);
     }
 
     public URI getAcceptedMessageUri() {
-        return acceptedProposalUri;
+        return this.acceptedProposalUri;
     }
 
     public Set<URI> getCancelledAgreementURIs() {
-        return cancelledAgreementURIs;
+        return this.cancelledAgreementUris;
     }
 
     @Override
     public String toString() {
         return "Accepts [acceptedProposalUri=" + acceptedProposalUri + ", cancelledAgreementURIs="
-                        + cancelledAgreementURIs + "]";
+                        + this.cancelledAgreementUris + "]";
     }
 }
