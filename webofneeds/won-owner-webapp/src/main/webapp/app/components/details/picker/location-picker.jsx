@@ -123,7 +123,11 @@ export default class WonLocationPicker extends React.Component {
 
     if (selectedLocationCoordinates) {
       selectedLocationMarker = (
-        <Marker position={selectedLocationCoordinates} icon={locationIcon} />
+        <Marker
+          position={selectedLocationCoordinates}
+          icon={locationIcon}
+          onClick={() => false}
+        />
       );
     }
 
@@ -184,6 +188,7 @@ export default class WonLocationPicker extends React.Component {
         <Map
           className="lp__mapmount"
           zoom={13}
+          onClick={e => this.mapClicked(e)}
           center={
             selectedLocationCoordinates ||
             currentLocationCoordinates || [48.210033, 16.363449]
@@ -253,6 +258,7 @@ export default class WonLocationPicker extends React.Component {
   }
 
   selectLocation(location) {
+    console.log(location);
     this.setState(
       {
         pickedLocation: location,
@@ -264,6 +270,10 @@ export default class WonLocationPicker extends React.Component {
         this.update();
       }
     );
+  }
+
+  mapClicked({ latlng }) {
+    this.selectLocation({ ...latlng, name: `${latlng.lat}, ${latlng.lng}` });
   }
 
   resetLocation(callback) {
