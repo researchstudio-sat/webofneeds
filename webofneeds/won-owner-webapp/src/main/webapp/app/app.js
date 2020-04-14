@@ -11,85 +11,62 @@ import "babel-polyfill";
 import svgs from "../images/won-icons/*.svg";
 import "../style/won.scss";
 
-import angular from "angular";
-import "angular-marked";
+import React from "react";
+import ReactDOM from "react-dom";
+import { applyMiddleware, createStore } from "redux";
+import { HashRouter, Switch, Route } from "react-router-dom";
 import "whatwg-fetch"; //polyfill for window.fetch (for backward-compatibility with older browsers)
 import "redux";
-import ngReduxModule from "ng-redux";
-import ngReduxRouterModule from "redux-ui-router";
-import uiRouterModule from "angular-ui-router";
-/* angular-ui-router-shim (release/stateEvents.js) used to enable legacy $stateChange* events in ui-router (see
- * here for details: https://ui-router.github.io/guide/ng1/migrate-to-1_0#state-change-events)
- *
- * delete at your own peril
- */
-import "angular-ui-router/release/stateEvents.js";
-import { delay } from "./utils.js";
+// import { delay } from "./utils.js";
 //---------- Config -----------
-import {
-  configRouting,
-  runAccessControl,
-  registerEmailVerificationTrigger,
-} from "./configRouting.js";
-import configRedux from "./configRedux.js";
-//--------- Actions -----------
+// import {
+//   configRouting,
+//   runAccessControl,
+//   registerEmailVerificationTrigger,
+// } from "./configRouting.js";
+// import configRedux from "./configRedux.js";
+// //--------- Actions -----------
 import { actionCreators } from "./actions/actions.js";
-//-------- Components ---------
-import connectionsComponent from "./pages/connections.jsx";
-import overviewComponent from "./pages/overview.jsx";
-import mapComponent from "./pages/map.jsx";
-import postComponent from "./pages/post.jsx";
-import aboutComponent from "./pages/about.jsx";
-import signupComponent from "./pages/signup.jsx";
-import settingsComponent from "./pages/settings.jsx";
-import inventoryComponent from "./pages/inventory.jsx";
-import createComponent from "./pages/create.jsx";
-import preactModule from "./components/preact-module.js";
+
 //won import (used so you can access the debugmode variable without reloading the page)
 import won from "./service/won.js";
-/* TODO this fragment is part of an attempt to sketch a different
- * approach to asynchronity (Remove it or the thunk-based
- * solution afterwards)
- */
-import { runMessagingAgent } from "./messaging-agent.js";
 
-import { runPushAgent } from "./push-agent";
 import { enableNotifications } from "../config/default";
 
+// import PropTypes from "prop-types";
 console.log(svgs);
 
-window.angular = angular; // for compatibility with pre-ES6/commonjs scripts
 window.won = won;
 
-let app = angular.module("won.owner", [
+/*let app = angular.module("won.owner", [
   /* to enable legacy $stateChange* events in ui-router (see
      * here for details: https://ui-router.github.io/guide/ng1/migrate-to-1_0#state-change-events)
      */
-  "ui.router.state.events",
-  "hc.marked",
-  ngReduxModule,
-  uiRouterModule,
-  ngReduxRouterModule,
+// "ui.router.state.events",
+// "hc.marked",
+// ngReduxModule,
+// uiRouterModule,
+// ngReduxRouterModule,
+//
+// //components
+// preactModule,
 
-  //components
-  preactModule,
-
-  //views
-  connectionsComponent.module,
-  overviewComponent.module,
-  mapComponent.module,
-  postComponent.module,
-  aboutComponent.module,
-  signupComponent.module,
-  settingsComponent.module,
-  inventoryComponent.module,
-  createComponent.module,
-]);
+//views
+// connectionsComponent.module,
+// overviewComponent.module,
+// mapComponent.module,
+// postComponent.module,
+// aboutComponent.module,
+// signupComponent.module,
+// settingsComponent.module,
+// inventoryComponent.module,
+// createComponent.module,
+//]);
 
 /* create store, register middlewares, set up redux-devtool-support, etc */
-configRedux(app);
+//configRedux(app);
 
-app.config(configRouting).config([
+/*app.config(configRouting).config([
   "$compileProvider",
   "markedProvider",
   function($compileProvider, markedProvider) {
@@ -130,25 +107,52 @@ app.config(configRouting).config([
       },
     });
   },
-]);
-app.run(["$ngRedux", $ngRedux => runMessagingAgent($ngRedux)]);
+]);*/
+
+import PageInventory from "./pages/react/inventory";
+import PageSignUp from "./pages/react/signup";
+import PageAbout from "./pages/react/about";
+import PageMap from "./pages/react/map";
+import PageCreate from "./pages/react/create";
+import PageConnections from "./pages/react/connections";
+import PageOverview from "./pages/react/overview";
+import PagePost from "./pages/react/post";
+import PageSettings from "./pages/react/settings";
+import { Provider } from "react-redux";
+import reducer from "./reducers/reducers.js";
+import thunk from "redux-thunk";
+import { piwikMiddleware } from "./piwik.js";
+import { runMessagingAgent } from "./messaging-agent";
+// import { runPushAgent } from "./push-agent";
+
+export const store = createStore(
+  reducer,
+  applyMiddleware(thunk, piwikMiddleware)
+);
+
+window.store4dbg = store;
+
+export const states = [];
+
+// Initialize Configuration (set IconColors, imprint etc.)
+store.dispatch(actionCreators.config__init());
+
+// app.run(["$ngRedux", $ngRedux => runMessagingAgent($ngRedux)]);
+runMessagingAgent(store);
 
 if (enableNotifications) {
-  app.run(["$ngRedux", $ngRedux => runPushAgent($ngRedux)]);
+  //app.run(["$ngRedux", $ngRedux => runPushAgent($ngRedux)]);
+  // runPushAgent(store); // TODO: runPushAgent used to get $ngRedux and ngRedux had a connect method attached -> not sure if that can be applied to the given store though
 }
 
-app.run([
-  "$ngRedux",
-  $ngRedux => $ngRedux.dispatch(actionCreators.config__init()),
-]);
+// app.run(runAccessControl);
 
-app.run(runAccessControl);
-
-app.run(registerEmailVerificationTrigger);
+// app.run(registerEmailVerificationTrigger);
 
 //check login status. TODO: this should actually be baked-in data (to avoid the extra roundtrip)
-//app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.verifyLogin())]);
-app.run([
+//app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.verifyLogin())]); //FIXME: SEEMS LIKE THE verifyLogin function doesnt even exist anymore
+
+/*app.run([
   "$ngRedux",
   "$state",
   "$urlRouter",
@@ -159,30 +163,68 @@ app.run([
       $ngRedux.dispatch(actionCreators.initialPageLoad());
     });
   },
-]);
+]);*/
+// TODO: ALLOW EVERY PAGE TO BE ACCESSED WITHOUT A USER EXCEPT SETTINGS
+// TODO: SIGNUP SHOULD REDIRECT TO INVENTORY IF THERE IS A LOGGED IN USER THAT IS NOT A PRIVATE USER
+store.dispatch(actionCreators.initialPageLoad());
 
 /*
  * this action-creator dispatches once per minute thus making
  * sure the gui is updated at least that often (so relative
  * timestamps are up-to-date)
  */
-app.run(["$ngRedux", $ngRedux => $ngRedux.dispatch(actionCreators.tick())]);
+//app.run(["$ngRedux", $ngRedux => $ngRedux.dispatch(actionCreators.tick())]);
+store.dispatch(actionCreators.tick());
 
-/**
- * create the parent element for angular. This could live in the build config, but since it is very angular specific, it should probably live here
- */
-document.addEventListener("DOMContentLoaded", () => {
-  const uiView = document.createElement("section");
-  uiView.setAttribute("ui-view", "");
-  document.body.appendChild(uiView);
+ReactDOM.render(
+  <Provider store={store}>
+    <HashRouter hashType="hashbang">
+      <Switch>
+        <Route exact path="/">
+          <PageInventory />
+        </Route>
+        <Route path="/create">
+          <PageCreate />
+        </Route>
+        <Route path="/signup">
+          <PageSignUp />
+        </Route>
+        <Route path="/about">
+          <PageAbout />
+        </Route>
+        <Route path="/map">
+          <PageMap />
+        </Route>
+        <Route path="/inventory">
+          <PageInventory />
+        </Route>
+        <Route path="/connections">
+          <PageConnections />
+        </Route>
+        <Route path="/overview">
+          <PageOverview />
+        </Route>
+        <Route path="/post">
+          <PagePost />
+        </Route>
+        <Route path="/settings">
+          <PageSettings />
+        </Route>
+      </Switch>
+    </HashRouter>
+  </Provider>,
+  document.getElementById("root")
+);
 
-  //let app = angular.module('won.owner',[...other modules...]);
-  angular.bootstrap(document, ["won.owner"], {
-    // make sure dependency injection works after minification (or
-    // at least angular explains about sloppy imports with a
-    // reference to the right place)
-    // see https://docs.angularjs.org/guide/production
-    // and https://docs.angularjs.org/guide/di#dependency-annotation
-    strictDi: true,
-  });
-});
+/*<Route exact path="/"><PageInventory />:viewConnUri:token:privateId}
+
+<Route path="/create"><PageCreate />:useCase:useCaseGroup:fromAtomUri:mode:holderUri:senderSocketType:targetSocketType
+<Route path="/signup"><PageSignUp />
+<Route path="/about"><PageAbout />:aboutSection
+<Route path="/map"><PageMap />:viewConnUri
+<Route path="/inventory"><PageInventory />:viewConnUri:token:privateId
+<Route path="/connections"><PageConnections />:connectionUri:viewConnUri
+<Route path="/overview"><PageOverview />:viewConnUri
+<Route path="/post"><PagePost />:postUri:viewConnUri
+<Route path="/settings"><PageSettings />
+*/

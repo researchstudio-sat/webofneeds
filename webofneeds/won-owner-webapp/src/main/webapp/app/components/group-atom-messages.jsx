@@ -110,14 +110,8 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    routerBack: () => {
-      dispatch(actionCreators.router__back());
-    },
     routerGoCurrent: props => {
       dispatch(actionCreators.router__stateGoCurrent(props));
-    },
-    routerGoResetParams: path => {
-      dispatch(actionCreators.router__stateGoResetParams(path));
     },
     hideAddMessageContent: () => {
       dispatch(actionCreators.view__hideAddMessageContent());
@@ -224,7 +218,7 @@ class GroupAtomMessages extends React.Component {
         <div className="gpm__header__back">
           <a
             className="gpm__header__back__button clickable show-in-responsive"
-            onClick={this.props.routerBack.bind(this)}
+            onClick={this.props.history.goBack}
           >
             <svg className="gpm__header__back__button__icon">
               <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
@@ -527,9 +521,7 @@ GroupAtomMessages.propTypes = {
   hasConnectionMessagesToLoad: PropTypes.bool,
   connectionOrAtomsLoading: PropTypes.bool,
   isConnectionLoading: PropTypes.bool,
-  routerBack: PropTypes.func,
   routerGoCurrent: PropTypes.func,
-  routerGoResetParams: PropTypes.func,
   hideAddMessageContent: PropTypes.func,
   sendChatMessage: PropTypes.func,
   connectSockets: PropTypes.func,
@@ -537,6 +529,7 @@ GroupAtomMessages.propTypes = {
   closeConnection: PropTypes.func,
   showMoreMessages: PropTypes.func,
   showLatestMessages: PropTypes.func,
+  history: PropTypes.object,
 };
 
 export default withRouter(

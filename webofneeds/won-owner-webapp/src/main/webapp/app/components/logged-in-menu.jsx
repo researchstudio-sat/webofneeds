@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
 import { get } from "../utils";
 import * as accountUtils from "../redux/utils/account-utils";
+import { Link } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const accountState = get(state, "account");
@@ -17,9 +18,6 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
     hideMainMenu: () => {
       dispatch(actionCreators.view__hideMainMenu());
     },
@@ -32,8 +30,7 @@ const mapDispatchToProps = dispatch => {
 class WonLoggedInMenu extends React.Component {
   constructor(props) {
     super(props);
-    this.goToSettings = this.goToSettings.bind(this);
-    this.goToSignUp = this.goToSignUp.bind(this);
+    this.closeMenu = this.closeMenu.bind(this);
   }
   render() {
     return (
@@ -48,19 +45,21 @@ class WonLoggedInMenu extends React.Component {
         </span>
         <hr className="show-in-responsive" />
         {this.props.isAnonymous && (
-          <button
+          <Link
             className="won-button--outlined thin red wlim__button--signup"
-            onClick={this.goToSignUp}
+            onClick={this.closeMenu}
+            to="/signup"
           >
             <span>Sign up</span>
-          </button>
+          </Link>
         )}
-        <button
+        <Link
           className="won-button--outlined thin red"
-          onClick={this.goToSettings}
+          onClick={this.closeMenu}
+          to="/settings"
         >
           <span>Account Settings</span>
-        </button>
+        </Link>
         <hr />
         <button
           className="won-button--filled lighterblue"
@@ -73,21 +72,14 @@ class WonLoggedInMenu extends React.Component {
     );
   }
 
-  goToSignUp() {
+  closeMenu() {
     this.props.hideMainMenu();
-    this.props.routerGo("signup");
-  }
-
-  goToSettings() {
-    this.props.hideMainMenu();
-    this.props.routerGo("settings");
   }
 }
 WonLoggedInMenu.propTypes = {
   className: PropTypes.string,
   isAnonymous: PropTypes.bool,
   email: PropTypes.string,
-  routerGo: PropTypes.func,
   hideMainMenu: PropTypes.func,
   logout: PropTypes.func,
 };

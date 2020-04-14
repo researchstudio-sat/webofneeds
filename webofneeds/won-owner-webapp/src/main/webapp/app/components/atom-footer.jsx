@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import Immutable from "immutable";
 import { connect } from "react-redux";
-import { get, getIn } from "../utils.js";
+import { get, getIn, generateQueryString } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import WonAtomHeader from "./atom-header.jsx";
 import ChatTextfield from "./chat-textfield.jsx";
@@ -15,7 +15,7 @@ import * as wonLabelUtils from "../won-label-utils.js";
 import vocab from "../service/vocab.js";
 
 import "~/style/_atom-footer.scss";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 
 const FooterType = {
   INACTIVE: 1,
@@ -88,12 +88,6 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
-    routerGoResetParams: path => {
-      dispatch(actionCreators.router__stateGoResetParams(path));
-    },
     hideModalDialog: () => {
       dispatch(actionCreators.view__hideModalDialog());
     },
@@ -433,7 +427,7 @@ class AtomInfo extends React.Component {
               senderSocketType === vocab.CHAT.ChatSocketCompacted ||
               targetSocketType === vocab.CHAT.ChatSocketCompacted
             ) {
-              this.props.routerGoResetParams("connections");
+              this.props.history.push("/connections");
             }
           },
         },
@@ -478,7 +472,7 @@ class AtomInfo extends React.Component {
               targetSocketType,
               message
             );
-            this.props.routerGoResetParams("connections");
+            this.props.history.push("/connections");
           } else if (personaConnections.size == 1) {
             const personaConnection = personaConnections.first();
             const personaConnectionUri = get(personaConnection, "uri");
@@ -526,9 +520,11 @@ class AtomInfo extends React.Component {
               );
             }
 
-            this.props.routerGo("connections", {
-              connectionUri: personaConnectionUri,
-            });
+            this.props.history.push(
+              generateQueryString("/connections", {
+                connectionUri: personaConnectionUri,
+              })
+            );
           } else {
             console.error(
               "more than one connection stored between two atoms that use the same exact sockets",
@@ -537,7 +533,7 @@ class AtomInfo extends React.Component {
             );
           }
         } else {
-          this.props.routerGoResetParams("connections");
+          this.props.history.push("/connections");
 
           this.props.connectionsConnectAdHoc(
             targetSocketUri,
@@ -551,7 +547,7 @@ class AtomInfo extends React.Component {
         Immutable.fromJS({
           acceptCallback: () => {
             this.props.hideModalDialog();
-            this.props.routerGoResetParams("connections");
+            this.props.history.push("/connections");
 
             this.props.connectionsConnectAdHoc(
               targetSocketUri,
@@ -578,8 +574,6 @@ AtomInfo.propTypes = {
   ownedReactionAtomsArray: PropTypes.arrayOf(PropTypes.object),
   addHolderUri: PropTypes.string,
   className: PropTypes.string,
-  routerGo: PropTypes.func,
-  routerGoResetParams: PropTypes.func,
   hideModalDialog: PropTypes.func,
   showModalDialog: PropTypes.func,
   showTermsDialog: PropTypes.func,
@@ -590,9 +584,12 @@ AtomInfo.propTypes = {
   connectSocketsServerSide: PropTypes.func,
   sendChatMessage: PropTypes.func,
   atomReopen: PropTypes.func,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(AtomInfo);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(AtomInfo)
+);

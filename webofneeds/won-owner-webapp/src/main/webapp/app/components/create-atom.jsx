@@ -181,12 +181,6 @@ const mapDispatchToProps = dispatch => {
     fetchUnloadedAtom: atomUri => {
       dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
     },
-    routerBack: () => {
-      dispatch(actionCreators.router__back());
-    },
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
     atomsEdit: (draft, atom) => {
       dispatch(actionCreators.atoms__edit(draft, atom));
     },
@@ -339,7 +333,7 @@ class CreateAtom extends React.Component {
                   </button>
                   <button
                     className="cp__footer__edit__cancel won-button--outlined thin red"
-                    onClick={this.props.routerBack}
+                    onClick={this.props.history.goBack}
                   >
                     Cancel
                   </button>
@@ -470,7 +464,11 @@ class CreateAtom extends React.Component {
   save() {
     if (this.props.loggedIn && this.props.isFromAtomOwned) {
       this.sanitizeDraftObject(() => {
-        this.props.atomsEdit(this.state.draftObject, this.props.fromAtom);
+        this.props.atomsEdit(
+          this.state.draftObject,
+          this.props.fromAtom,
+          this.props.history.goBack
+        );
       });
     }
   }
@@ -513,10 +511,7 @@ class CreateAtom extends React.Component {
             tempConnectToSocketType,
             tempAtomDraftSocketType
           );
-          this.props.routerGo("connections", {
-            useCase: undefined,
-            connectionUri: undefined,
-          });
+          this.props.history.push("/connections");
         } else {
           this.props.showTermsDialog(
             Immutable.fromJS({
@@ -529,10 +524,7 @@ class CreateAtom extends React.Component {
                   tempConnectToSocketType,
                   tempAtomDraftSocketType
                 );
-                this.props.routerGo("connections", {
-                  useCase: undefined,
-                  connectionUri: undefined,
-                });
+                this.props.history.push("/connections");
               },
               cancelCallback: () => {
                 this.props.hideModalDialog();
@@ -546,7 +538,7 @@ class CreateAtom extends React.Component {
 
         if (this.props.loggedIn) {
           this.props.atomsCreate(tempDraft, personaId, tempDefaultNodeUri);
-          this.props.routerGo("inventory");
+          this.props.history.push("/inventory");
         } else {
           this.props.showTermsDialog(
             Immutable.fromJS({
@@ -557,7 +549,7 @@ class CreateAtom extends React.Component {
                   personaId,
                   tempDefaultNodeUri
                 );
-                this.props.routerGo("inventory");
+                this.props.history.push("/inventory");
               },
               cancelCallback: () => {
                 this.props.hideModalDialog();
@@ -597,12 +589,11 @@ CreateAtom.propTypes = {
   loggedIn: PropTypes.bool,
   personas: PropTypes.arrayOf(PropTypes.object),
   processingPublish: PropTypes.bool,
-  routerBack: PropTypes.func,
-  routerGo: PropTypes.func,
   showCreateInput: PropTypes.bool,
   showTermsDialog: PropTypes.func,
   connectionsConnectReactionAtom: PropTypes.func,
   useCase: PropTypes.object,
+  history: PropTypes.object,
 };
 
 export default withRouter(

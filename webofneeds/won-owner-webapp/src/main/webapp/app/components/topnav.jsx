@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
-import { get, getIn } from "../utils.js";
+import { get, getIn, getPathname } from "../utils.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import { isLoading } from "../redux/selectors/process-selectors.js";
@@ -16,10 +16,10 @@ import ico16_burger from "~/images/won-icons/ico16_burger.svg";
 import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.svg";
 import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
-  const currentRoute = getIn(state, ["router", "currentState", "name"]);
+  const currentPath = getPathname(ownProps.location);
   const accountState = get(state, "account");
 
   return {
@@ -31,7 +31,7 @@ const mapStateToProps = (state, ownProps) => {
     themeName: getIn(state, ["config", "theme", "name"]),
     appTitle: getIn(state, ["config", "theme", "title"]),
     loggedIn: accountUtils.isLoggedIn(accountState),
-    isSignUpView: currentRoute === "signup",
+    isSignUpView: currentPath === "/signup",
     showLoadingIndicator: isLoading(state),
     connectionsToCrawl: connectionSelectors.getChatConnectionsToCrawl(state),
     hasUnreads:
@@ -48,9 +48,6 @@ const mapDispatchToProps = dispatch => {
     },
     toggleMenu: () => {
       dispatch(actionCreators.view__toggleMenu());
-    },
-    routerGoDefault: () => {
-      dispatch(actionCreators.router__stateGoDefault());
     },
     toggleSlideIns: () => {
       dispatch(actionCreators.view__toggleSlideIns());
@@ -191,7 +188,7 @@ class WonTopnav extends React.Component {
 
   goDefault() {
     this.hideMenu();
-    this.props.routerGoDefault();
+    this.props.history.push("/");
   }
 
   menuAction() {
@@ -199,7 +196,7 @@ class WonTopnav extends React.Component {
       this.props.toggleMenu();
     } else {
       this.hideMenu();
-      this.props.routerGoDefault();
+      this.props.history.push("/");
     }
   }
 
@@ -255,12 +252,14 @@ WonTopnav.propTypes = {
   toggleSlideIns: PropTypes.func,
   hideMenu: PropTypes.func,
   toggleMenu: PropTypes.func,
-  routerGoDefault: PropTypes.func,
   showMoreMessages: PropTypes.func,
   showLatestMessages: PropTypes.func,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonTopnav);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonTopnav)
+);

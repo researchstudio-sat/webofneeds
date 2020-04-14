@@ -16,6 +16,7 @@ import { details } from "../../config/detail-definitions.js";
 import "~/style/_atom-content-persona.scss";
 import ElmReact from "./elm-react";
 import { withRouter } from "react-router-dom";
+import { generateQueryString } from "../utils";
 
 const mapStateToProps = (state, ownProps) => {
   const { connectionUri } = getQueryParams(ownProps.location);
@@ -80,9 +81,6 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
     selectTab: (atomUri, tab) => {
       dispatch(
         actionCreators.atoms__selectTab(
@@ -271,23 +269,29 @@ class WonAtomContentPersona extends React.Component {
 
   viewPersonaPosts() {
     this.props.selectTab(this.props.personaUri, "HOLDS");
-    this.props.routerGo("post", {
-      postUri: this.props.personaUri,
-    });
+    this.props.history.push(
+      generateQueryString("/post", {
+        postUri: this.props.personaUri,
+      })
+    );
   }
 
   viewPersonaBuddies() {
     this.props.selectTab(this.props.personaUri, "BUDDIES");
-    this.props.routerGo("post", {
-      postUri: this.props.personaUri,
-    });
+    this.props.history.push(
+      generateQueryString("/post", {
+        postUri: this.props.personaUri,
+      })
+    );
   }
 
   viewPersonaReviews() {
     this.props.selectTab(this.props.personaUri, "REVIEWS");
-    this.props.routerGo("post", {
-      postUri: this.props.personaUri,
-    });
+    this.props.history.push(
+      generateQueryString("/post", {
+        postUri: this.props.personaUri,
+      })
+    );
   }
 }
 WonAtomContentPersona.propTypes = {
@@ -312,10 +316,10 @@ WonAtomContentPersona.propTypes = {
   aggregateRatingRounded: PropTypes.number,
   ratingConnectionUri: PropTypes.string,
   selectTab: PropTypes.func,
-  routerGo: PropTypes.func,
   showModalDialog: PropTypes.func,
   hideModalDialog: PropTypes.func,
   personaDisconnect: PropTypes.func,
+  history: PropTypes.object,
 };
 
 export default withRouter(

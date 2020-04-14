@@ -12,6 +12,10 @@ export function dispatchEvent(elem, eventName, eventData) {
   elem.dispatchEvent(event);
 }
 
+export function getPathname(location) {
+  return location && location.pathname;
+}
+
 export function getQueryParams(location) {
   let pairs = location.search.slice(1).split("&");
 
@@ -22,6 +26,18 @@ export function getQueryParams(location) {
   });
 
   return JSON.parse(JSON.stringify(result));
+}
+
+export function generateQueryString(path, params = {}) {
+  const queryParamsString = generateQueryParamsString(params);
+
+  return path + queryParamsString;
+}
+
+function generateQueryParamsString(params) {
+  console.debug("params: ", params);
+  //TODO: QUERY PARAMS STRING
+  return "";
 }
 /*
  * Freezes an object recursively.

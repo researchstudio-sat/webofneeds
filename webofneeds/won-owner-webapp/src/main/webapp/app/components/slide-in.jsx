@@ -122,9 +122,6 @@ const mapDispatchToProps = dispatch => {
     routerGoCurrent: props => {
       dispatch(actionCreators.router__stateGoCurrent(props));
     },
-    routerGoAbs: (path, props) => {
-      dispatch(actionCreators.router__stateGoAbs(path, props));
-    },
     hideAnonymousSlideIn: () => {
       dispatch(actionCreators.view__anonymousSlideIn__hide());
     },
@@ -399,12 +396,9 @@ class WonSlideIn extends React.Component {
                 </li>
               </ul>
             </div>
-            <button
-              className=" si__buttonSignup"
-              onClick={() => this.props.routerGoAbs("signup")}
-            >
+            <Link className=" si__buttonSignup" to="/signup">
               Sign up
-            </button>
+            </Link>
             <button
               className="si__buttonCopy"
               onClick={this.copyLinkToClipboard}
@@ -541,7 +535,6 @@ WonSlideIn.propTypes = {
   accountAcceptDisclaimer: PropTypes.func,
   reconnectStart: PropTypes.func,
   routerGoCurrent: PropTypes.func,
-  routerGoAbs: PropTypes.func,
   hideAnonymousSlideIn: PropTypes.func,
   showEmailInput: PropTypes.func,
 };

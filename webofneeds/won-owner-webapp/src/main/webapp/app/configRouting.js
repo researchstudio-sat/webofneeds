@@ -4,25 +4,25 @@
 
 import Immutable from "immutable";
 import { actionCreators } from "./actions/actions.js";
-import { accountLogin } from "./actions/account-actions.js";
+// import { accountLogin } from "./actions/account-actions.js";
 import { getCurrentParamsFromRoute } from "./redux/selectors/general-selectors.js";
-import * as wonUtils from "./won-utils.js";
+// import * as wonUtils from "./won-utils.js";
 
 import { get, getIn } from "./utils.js";
 import * as accountUtils from "./redux/utils/account-utils.js";
-import * as processUtils from "./redux/utils/process-utils.js";
+// import * as processUtils from "./redux/utils/process-utils.js";
 
-import settingsComponent from "./pages/settings.jsx";
-import postComponent from "./pages/post.jsx";
-import overviewComponent from "./pages/overview.jsx";
-import mapComponent from "./pages/map.jsx";
-import createComponent from "./pages/create.jsx";
-import aboutComponent from "./pages/about.jsx";
-import connectionsComponent from "./pages/connections.jsx";
-import signupComponent from "./pages/signup.jsx";
-import inventoryComponent from "./pages/inventory.jsx";
+// import settingsComponent from "./pages/settings.jsx";
+// import postComponent from "./pages/post.jsx";
+// import overviewComponent from "./pages/overview.jsx";
+// import mapComponent from "./pages/map.jsx";
+// import createComponent from "./pages/create.jsx";
+// import aboutComponent from "./pages/about.jsx";
+// import connectionsComponent from "./pages/connections.jsx";
+// import signupComponent from "./pages/signup.jsx";
+// import inventoryComponent from "./pages/inventory.jsx";
 
-import jsxRenderer from "@depack/render";
+// import jsxRenderer from "@depack/render";
 
 /**
  * As we have configured our router to keep parameters unchanged,
@@ -59,82 +59,82 @@ export const defaultRoute = "inventory";
  * @param $urlRouterProvider
  * @param $stateProvider
  */
-export const configRouting = [
-  "$urlRouterProvider",
-  "$stateProvider",
-  ($urlRouterProvider, $stateProvider) => {
-    $urlRouterProvider.otherwise(($injector, $location) => {
-      $location.path(`/${defaultRoute}`); // change route to connections overview as default
-
-      const origParams = $location.search();
-      if (origParams) {
-        $location.search(addConstParams({}, origParams));
-      }
-
-      //return updatedRoute;
-    });
-
-    [
-      {
-        path: "/signup",
-        component: signupComponent,
-        as: "signup",
-      },
-      {
-        path: "/about?aboutSection",
-        component: aboutComponent,
-        as: "about",
-      },
-      {
-        path: "/map?viewConnUri",
-        component: mapComponent,
-        as: "map",
-      },
-      {
-        path:
-          "/create?useCase?useCaseGroup?fromAtomUri?mode?holderUri?senderSocketType?targetSocketType",
-        component: createComponent,
-        as: "create",
-      },
-      {
-        path: "/inventory?viewConnUri?token?privateId",
-        component: inventoryComponent,
-        as: "inventory",
-      },
-      {
-        path: "/connections?connectionUri?viewConnUri",
-        component: connectionsComponent,
-        as: "connections",
-      },
-      {
-        path: "/overview?viewConnUri",
-        component: overviewComponent,
-        as: "overview",
-      },
-      {
-        path: "/post/?postUri?viewConnUri",
-        component: postComponent,
-        as: "post",
-      },
-      {
-        //path: "/settings{settingsParams:.*}",
-        path: "/settings",
-        component: settingsComponent,
-        as: "settings",
-      },
-    ].forEach(({ path, component, as }) => {
-      $stateProvider.state(as, {
-        url: path,
-        template: component.template.children
-          .map(vnode => jsxRenderer(vnode))
-          .join(""),
-        controller: component.controller,
-        controllerAs: "self",
-        scope: {},
-      });
-    });
-  },
-];
+// export const configRouting = [
+//   "$urlRouterProvider",
+//   "$stateProvider",
+//   ($urlRouterProvider, $stateProvider) => {
+//     $urlRouterProvider.otherwise(($injector, $location) => {
+//       $location.path(`/${defaultRoute}`); // change route to connections overview as default
+//
+//       const origParams = $location.search();
+//       if (origParams) {
+//         $location.search(addConstParams({}, origParams));
+//       }
+//
+//       //return updatedRoute;
+//     });
+//
+//     [
+//       {
+//         path: "/signup",
+//         component: signupComponent,
+//         as: "signup",
+//       },
+//       {
+//         path: "/about?aboutSection",
+//         component: aboutComponent,
+//         as: "about",
+//       },
+//       {
+//         path: "/map?viewConnUri",
+//         component: mapComponent,
+//         as: "map",
+//       },
+//       {
+//         path:
+//           "/create?useCase?useCaseGroup?fromAtomUri?mode?holderUri?senderSocketType?targetSocketType",
+//         component: createComponent,
+//         as: "create",
+//       },
+//       {
+//         path: "/inventory?viewConnUri?token?privateId",
+//         component: inventoryComponent,
+//         as: "inventory",
+//       },
+//       {
+//         path: "/connections?connectionUri?viewConnUri",
+//         component: connectionsComponent,
+//         as: "connections",
+//       },
+//       {
+//         path: "/overview?viewConnUri",
+//         component: overviewComponent,
+//         as: "overview",
+//       },
+//       {
+//         path: "/post/?postUri?viewConnUri",
+//         component: postComponent,
+//         as: "post",
+//       },
+//       {
+//         //path: "/settings{settingsParams:.*}",
+//         path: "/settings",
+//         component: settingsComponent,
+//         as: "settings",
+//       },
+//     ].forEach(({ path, component, as }) => {
+//       $stateProvider.state(as, {
+//         url: path,
+//         template: component.template.children
+//           .map(vnode => jsxRenderer(vnode))
+//           .join(""),
+//         controller: component.controller,
+//         controllerAs: "self",
+//         scope: {},
+//       });
+//     });
+//   },
+// ];
 
 export const runAccessControl = [
   "$transitions",
@@ -159,77 +159,78 @@ export const runAccessControl = [
   },
 ];
 
-export function accessControl({
+export function accessControl(/*{
   event,
   toState,
   toParams,
   fromParams,
   dispatch,
   getState,
-}) {
-  reactToPrivateIdChanges(
-    fromParams["privateId"],
-    toParams["privateId"],
-    dispatch,
-    getState
-  );
-
-  const state = getState();
-  const errorString =
-    'Tried to access view "' +
-    (toState && toState.name) +
-    "\" that won't work" +
-    "without logging in. Blocking route-change.";
-  switch (toState.name) {
-    case "post": {
-      const postUriFromRoute = toParams["postUri"];
-
-      if (!postUriFromRoute) {
-        dispatch(actionCreators.router__stateGoResetParams(defaultRoute));
-      }
-      return;
-    }
-
-    case "settings":
-      if (!accountUtils.isLoggedIn(get(state, "account"))) {
-        if (event) {
-          event.preventDefault();
-        }
-        dispatch(actionCreators.router__stateGoResetParams(defaultRoute));
-      }
-      return;
-
-    case defaultRoute:
-    case "connections":
-    case "create":
-    case "inventory":
-    case "overview":
-    case "map":
-    case "signup":
-    case "about":
-      return; // can always access these pages.
-
-    default:
-      //FOR ALL OTHER ROUTES
-      if (!processUtils.isProcessingInitialLoad(get(state, "process"))) {
-        if (accountUtils.isLoggedIn(get(state, "account"))) {
-          return; // logged in. continue route-change as intended.
-        } else {
-          //sure to be logged out
-          if (event) {
-            event.preventDefault();
-          } else {
-            // this is a check with a route that's already fixed, redirect to defaultRoute instead.
-            dispatch(actionCreators.router__stateGoResetParams(defaultRoute));
-          }
-
-          console.error(errorString);
-        }
-      } else {
-        // still loading
-        return; // no access control while loading. the page-load actions will call `accessControl` once the logged-in status has been checked
-      }
-  }
+}*/) {
+  return;
+  // reactToPrivateIdChanges(
+  //   fromParams && fromParams["privateId"],
+  //   toParams && toParams["privateId"],
+  //   dispatch,
+  //   getState
+  // );
+  //
+  // const state = getState();
+  // const errorString =
+  //   'Tried to access view "' +
+  //   (toState && toState.name) +
+  //   "\" that won't work" +
+  //   "without logging in. Blocking route-change.";
+  // switch (toState.name) {
+  //   case "post": {
+  //     const postUriFromRoute = toParams["postUri"];
+  //
+  //     if (!postUriFromRoute) {
+  //       dispatch(actionCreators.router__stateGoResetParams(defaultRoute));
+  //     }
+  //     return;
+  //   }
+  //
+  //   case "settings":
+  //     if (!accountUtils.isLoggedIn(get(state, "account"))) {
+  //       if (event) {
+  //         event.preventDefault();
+  //       }
+  //       dispatch(actionCreators.router__stateGoResetParams(defaultRoute));
+  //     }
+  //     return;
+  //
+  //   case defaultRoute:
+  //   case "connections":
+  //   case "create":
+  //   case "inventory":
+  //   case "overview":
+  //   case "map":
+  //   case "signup":
+  //   case "about":
+  //     return; // can always access these pages.
+  //
+  //   default:
+  //     //FOR ALL OTHER ROUTES
+  //     if (!processUtils.isProcessingInitialLoad(get(state, "process"))) {
+  //       if (accountUtils.isLoggedIn(get(state, "account"))) {
+  //         return; // logged in. continue route-change as intended.
+  //       } else {
+  //         //sure to be logged out
+  //         if (event) {
+  //           event.preventDefault();
+  //         } else {
+  //           // this is a check with a route that's already fixed, redirect to defaultRoute instead.
+  //           dispatch(actionCreators.router__stateGoResetParams(defaultRoute));
+  //         }
+  //
+  //         console.error(errorString);
+  //       }
+  //     } else {
+  //       // still loading
+  //       return; // no access control while loading. the page-load actions will call `accessControl` once the logged-in status has been checked
+  //     }
+  // }
 }
 
 /**
@@ -253,7 +254,7 @@ export function checkAccessToCurrentRoute(dispatch, getState) {
   });
 }
 
-function reactToPrivateIdChanges(
+/*function reactToPrivateIdChanges(
   fromPrivateId,
   toPrivateId,
   dispatch,
@@ -288,7 +289,7 @@ function reactToPrivateIdChanges(
     };
     return accountLogin(credentials)(dispatch, getState);
   }
-}
+}*/
 
 /**
  * Merges any "constant"-parameters (e.g. `privateId`) that are contained in `paramsInState`

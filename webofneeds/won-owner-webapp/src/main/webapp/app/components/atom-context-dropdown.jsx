@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors";
-import { get, getIn, toAbsoluteURL } from "../utils";
+import { generateQueryString, get, getIn, toAbsoluteURL } from "../utils";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils";
 import { ownerBaseUrl } from "~/config/default.js";
@@ -14,6 +14,7 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 
 import "~/style/_context-dropdown.scss";
 import ico16_contextmenu from "~/images/won-icons/ico16_contextmenu.svg";
+import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const atom = ownProps.atomUri && getIn(state, ["atoms", ownProps.atomUri]);
@@ -49,9 +50,6 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    routerGoAbs: (path, props) => {
-      dispatch(actionCreators.router__stateGoAbs(path, props));
-    },
     atomReOpen: atomUri => {
       dispatch(actionCreators.atoms__reopen(atomUri));
     },
@@ -114,10 +112,12 @@ class WonAtomContextDropdown extends React.Component {
             key="duplicate"
             className="won-button--outlined thin red"
             onClick={() =>
-              this.props.routerGoAbs("create", {
-                fromAtomUri: this.props.atomUri,
-                mode: "DUPLICATE",
-              })
+              this.props.history.push(
+                generateQueryString("/create", {
+                  fromAtomUri: this.props.atomUri,
+                  mode: "DUPLICATE",
+                })
+              )
             }
           >
             Post this too!
@@ -129,10 +129,12 @@ class WonAtomContextDropdown extends React.Component {
             key="edit"
             className="won-button--outlined thin red"
             onClick={() =>
-              this.props.routerGoAbs("create", {
-                fromAtomUri: this.props.atomUri,
-                mode: "EDIT",
-              })
+              this.props.history.push(
+                generateQueryString("create", {
+                  fromAtomUri: this.props.atomUri,
+                  mode: "EDIT",
+                })
+              )
             }
           >
             Edit
@@ -252,8 +254,8 @@ class WonAtomContextDropdown extends React.Component {
             caption: "Yes",
             callback: () => {
               this.props.atomDelete(this.props.atomUri);
-              this.props.routerGoAbs("inventory");
               this.props.hideModalDialog();
+              this.props.history.push("/inventory");
             },
           },
           {
@@ -328,15 +330,17 @@ WonAtomContextDropdown.propTypes = {
   atomLoading: PropTypes.bool,
   atomFailedToLoad: PropTypes.bool,
   linkToAtom: PropTypes.string,
-  routerGoAbs: PropTypes.func,
   atomReOpen: PropTypes.func,
   atomClose: PropTypes.func,
   atomDelete: PropTypes.func,
   hideModalDialog: PropTypes.func,
   showModalDialog: PropTypes.func,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonAtomContextDropdown);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonAtomContextDropdown)
+);

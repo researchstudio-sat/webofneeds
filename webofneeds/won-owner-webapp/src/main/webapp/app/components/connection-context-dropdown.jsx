@@ -4,7 +4,13 @@ import PropTypes from "prop-types";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors";
-import { get, getIn, getQueryParams, toAbsoluteURL } from "../utils";
+import {
+  get,
+  getIn,
+  getQueryParams,
+  toAbsoluteURL,
+  generateQueryString,
+} from "../utils";
 import * as connectionSelectors from "../redux/selectors/connection-selectors";
 import * as connectionUtils from "../redux/utils/connection-utils";
 import * as processUtils from "../redux/utils/process-utils";
@@ -71,12 +77,6 @@ const mapDispatchToProps = dispatch => {
     },
     routerGoCurrent: props => {
       dispatch(actionCreators.router__stateGoCurrent(props));
-    },
-    routerGoAbs: (path, props) => {
-      dispatch(actionCreators.router__stateGoAbs(path, props));
-    },
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
     },
     connectionClose: connectionUri => {
       dispatch(actionCreators.connections__close(connectionUri));
@@ -154,10 +154,12 @@ class WonConnectionContextDropdown extends React.Component {
             key="duplicate"
             className="won-button--outlined thin red"
             onClick={() =>
-              this.props.routerGoAbs("create", {
-                fromAtomUri: this.props.targetAtomUri,
-                mode: "DUPLICATE",
-              })
+              this.props.history.push(
+                generateQueryString("/create", {
+                  fromAtomUri: this.props.targetAtomUri,
+                  mode: "DUPLICATE",
+                })
+              )
             }
           >
             Post this too!
@@ -169,10 +171,12 @@ class WonConnectionContextDropdown extends React.Component {
             key="edit"
             className="won-button--outlined thin red"
             onClick={() =>
-              this.props.routerGoAbs("create", {
-                fromAtomUri: this.props.targetAtomUri,
-                mode: "EDIT",
-              })
+              this.props.history.push(
+                generateQueryString("/create", {
+                  fromAtomUri: this.props.targetAtomUri,
+                  mode: "EDIT",
+                })
+              )
             }
           >
             Edit
@@ -279,9 +283,11 @@ class WonConnectionContextDropdown extends React.Component {
   }
 
   goToPost(postUri) {
-    this.props.routerGo("post", {
-      postUri: postUri,
-    });
+    this.props.history.push(
+      generateQueryString("/post", {
+        postUri: postUri,
+      })
+    );
   }
 
   componentWillMount() {
@@ -321,9 +327,8 @@ WonConnectionContextDropdown.propTypes = {
   hideModalDialog: PropTypes.func,
   showModalDialog: PropTypes.func,
   routerGoCurrent: PropTypes.func,
-  routerGoAbs: PropTypes.func,
-  routerGo: PropTypes.func,
   connectionClose: PropTypes.func,
+  history: PropTypes.object,
 };
 
 export default withRouter(

@@ -3,7 +3,7 @@
  */
 import React from "react";
 import { connect } from "react-redux";
-import { get, getIn } from "../../utils.js";
+import { get, getIn, generateQueryString } from "../../utils.js";
 import Immutable from "immutable";
 import { actionCreators } from "../../actions/actions.js";
 import PropTypes from "prop-types";
@@ -16,6 +16,7 @@ import { selectLastUpdateTime } from "../../redux/selectors/general-selectors.js
 import { details } from "../../../config/detail-definitions.js";
 
 import "~/style/_pokemon-raid-card.scss";
+import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const atom = getIn(state, ["atoms", ownProps.atomUri]);
@@ -102,9 +103,6 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
     selectAtomTab: (atomUri, selectTab) => {
       dispatch(
         actionCreators.atoms__selectTab(
@@ -425,12 +423,16 @@ class PokemonRaidCard extends React.Component {
       this.props.onAtomClick();
     } else {
       this.props.selectAtomTab(this.props.atomUri, "DETAIL");
-      this.props.routerGo("post", { postUri: this.props.atomUri });
+      this.props.history.push(
+        generateQueryString("/post", { postUri: this.props.atomUri })
+      );
     }
   }
   holderClick() {
     this.props.selectAtomTab(this.props.holderUri, "DETAIL");
-    this.props.routerGo("post", { postUri: this.props.holderUri });
+    this.props.history.push(
+      generateQueryString("/post", { postUri: this.props.holderUri })
+    );
   }
 }
 PokemonRaidCard.propTypes = {
@@ -439,7 +441,6 @@ PokemonRaidCard.propTypes = {
   showSuggestions: PropTypes.bool,
   currentLocation: PropTypes.object,
   onAtomClick: PropTypes.func,
-  routerGo: PropTypes.func,
   selectAtomTab: PropTypes.func,
   pokemonImageUrl: PropTypes.string,
   isDirectResponse: PropTypes.bool,
@@ -469,9 +470,12 @@ PokemonRaidCard.propTypes = {
   useCaseIcon: PropTypes.string,
   iconBackground: PropTypes.string,
   identiconSvg: PropTypes.string,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(PokemonRaidCard);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(PokemonRaidCard)
+);

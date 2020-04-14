@@ -224,13 +224,13 @@ class WonHowTo extends React.Component {
 
   viewWhatsAround() {
     this.viewWhatsX(() => {
-      this.history.push("/map");
+      this.props.history.push("/map");
     });
   }
 
   viewWhatsNew() {
     this.viewWhatsX(() => {
-      this.history.push("/overview");
+      this.props.history.push("/overview");
     });
   }
 
@@ -278,6 +278,7 @@ WonHowTo.propTypes = {
   isLocationAccessDenied: PropTypes.bool,
   updateCurrentLocation: PropTypes.func,
   locationAccessDenied: PropTypes.func,
+  history: PropTypes.object,
 };
 
 export default withRouter(

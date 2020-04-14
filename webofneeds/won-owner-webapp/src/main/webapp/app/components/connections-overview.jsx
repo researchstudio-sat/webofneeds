@@ -3,7 +3,13 @@ import Immutable from "immutable";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
-import { get, getIn, sortByDate, getQueryParams } from "../utils.js";
+import {
+  get,
+  getIn,
+  sortByDate,
+  getQueryParams,
+  generateQueryString,
+} from "../utils.js";
 import * as processUtils from "../redux/utils/process-utils";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
@@ -44,9 +50,6 @@ const mapDispatchToProps = dispatch => {
           Immutable.fromJS({ atomUri: atomUri, selectTab: tab })
         )
       );
-    },
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
     },
     routerGoCurrent: props => {
       dispatch(actionCreators.router__stateGoCurrent(props));
@@ -130,7 +133,7 @@ class WonConnectionsOverview extends React.Component {
 
   showAtomTab(atomUri, tab = "DETAIL") {
     this.props.selectTab(atomUri, tab);
-    this.props.routerGo("post", { postUri: atomUri });
+    this.props.history.push(generateQueryString("/post", { postUri: atomUri }));
   }
 
   isConnectionUnread(atomUri, connUri) {
@@ -220,9 +223,9 @@ WonConnectionsOverview.propTypes = {
   connUriInRoute: PropTypes.string,
   sortedOpenAtomUris: PropTypes.arrayOf(PropTypes.string),
   selectTab: PropTypes.func,
-  routerGo: PropTypes.func,
   routerGoCurrent: PropTypes.func,
   connectionMarkAsRead: PropTypes.func,
+  history: PropTypes.object,
 };
 
 export default withRouter(

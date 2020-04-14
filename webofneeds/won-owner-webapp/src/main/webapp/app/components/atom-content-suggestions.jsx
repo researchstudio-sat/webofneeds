@@ -12,9 +12,10 @@ import * as connectionSelectors from "../redux/selectors/connection-selectors.js
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as wonLabelUtils from "../won-label-utils.js";
 import VisibilitySensor from "react-visibility-sensor";
-import { get, getIn } from "../utils.js";
+import { get, getIn, generateQueryString } from "../utils.js";
 import vocab from "../service/vocab.js";
 import PropTypes from "prop-types";
+import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const categorizedSuggestions = connectionSelectors.getCategorizedSuggestedConnectionsByAtomUri(
@@ -34,9 +35,6 @@ const mapDispatchToProps = dispatch => {
   return {
     routerGoCurrent: props => {
       dispatch(actionCreators.router__stateGoCurrent(props));
-    },
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
     },
     connectionClose: connectionUri => {
       dispatch(actionCreators.connections__close(connectionUri));
@@ -120,10 +118,12 @@ class WonAtomContentSuggestions extends React.Component {
     const targetSocketUri = get(conn, "targetSocketUri");
 
     this.props.connectSockets(socketUri, targetSocketUri, message);
-    this.props.routerGo("connections", {
-      connectionUri: connUri,
-      viewConnUri: undefined,
-    });
+    this.props.history.push(
+      generateQueryString("/connections", {
+        connectionUri: connUri,
+        viewConnUri: undefined,
+      })
+    );
   }
 
   render() {
@@ -220,14 +220,16 @@ WonAtomContentSuggestions.propTypes = {
   categorizedSuggestions: PropTypes.objectOf(PropTypes.object),
   currentLocation: PropTypes.object,
   routerGoCurrent: PropTypes.func,
-  routerGo: PropTypes.func,
   connectionClose: PropTypes.func,
   connectionMarkAsRead: PropTypes.func,
   connectSockets: PropTypes.func,
   rateConnection: PropTypes.func,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonAtomContentSuggestions);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonAtomContentSuggestions)
+);

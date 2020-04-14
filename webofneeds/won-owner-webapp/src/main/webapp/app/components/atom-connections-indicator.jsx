@@ -4,7 +4,6 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { actionCreators } from "../actions/actions.js";
 import { get, getIn } from "../utils.js";
 
 import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
@@ -40,14 +39,6 @@ const mapStateToProps = (state, ownProps) => {
     unreadRequests,
     hasUnreadChats,
     unreadChats,
-  };
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
   };
 };
 
@@ -123,11 +114,7 @@ WonAtomConnectionsIndicator.propTypes = {
   requestsCount: PropTypes.number,
   unreadRequestsCount: PropTypes.number,
   unreadRequests: PropTypes.object,
-  routerGo: PropTypes.func,
   selectAtomTab: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonAtomConnectionsIndicator);
+export default connect(mapStateToProps)(WonAtomConnectionsIndicator);

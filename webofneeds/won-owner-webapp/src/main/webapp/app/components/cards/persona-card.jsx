@@ -5,11 +5,12 @@ import React from "react";
 import Immutable from "immutable";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { get, getIn } from "../../utils.js";
+import { get, getIn, generateQueryString } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 
 import "~/style/_persona-card.scss";
+import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const atom = getIn(state, ["atoms", ownProps.atomUri]);
@@ -30,9 +31,6 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
     selectAtomTab: (atomUri, selectTab) => {
       dispatch(
         actionCreators.atoms__selectTab(
@@ -101,7 +99,9 @@ class WonPersonaCard extends React.Component {
       this.props.onAtomClick();
     } else {
       this.props.selectAtomTab(this.props.atomUri, "DETAIL");
-      this.props.routerGo("post", { postUri: this.props.atomUri });
+      this.props.history.push(
+        generateQueryString("/post", { postUri: this.props.atomUri })
+      );
     }
   }
 }
@@ -109,16 +109,18 @@ WonPersonaCard.propTypes = {
   atomUri: PropTypes.string.isRequired,
   onAtomClick: PropTypes.func,
   selectAtomTab: PropTypes.func,
-  routerGo: PropTypes.func,
   atom: PropTypes.object,
   isInactive: PropTypes.bool,
   personaName: PropTypes.string,
   atomImage: PropTypes.string,
   showDefaultIcon: PropTypes.bool,
   identiconSvg: PropTypes.string,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonPersonaCard);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonPersonaCard)
+);

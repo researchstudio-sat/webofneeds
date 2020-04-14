@@ -2,7 +2,7 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import { get, getIn } from "../utils.js";
+import { get, getIn, generateQueryString } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
 import * as atomUtils from "../redux/utils/atom-utils";
@@ -118,12 +118,6 @@ const mapDispatchToProps = dispatch => {
           message
         )
       );
-    },
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
-    routerGoResetParams: path => {
-      dispatch(actionCreators.router__stateGoResetParams(path));
     },
   };
 };
@@ -277,9 +271,11 @@ class WonAtomContentBuddies extends React.Component {
                     actionButtons={actionButtons}
                     atomUri={get(conn, "targetAtomUri")}
                     onClick={() =>
-                      this.props.routerGo("post", {
-                        postUri: get(conn, "targetAtomUri"),
-                      })
+                      this.props.history.push(
+                        generateQueryString("/post", {
+                          postUri: get(conn, "targetAtomUri"),
+                        })
+                      )
                     }
                   />
                 </div>
@@ -325,9 +321,11 @@ class WonAtomContentBuddies extends React.Component {
               <WonAtomContextSwipeableView
                 atomUri={memberUri}
                 onClick={() =>
-                  this.props.routerGo("post", {
-                    postUri: memberUri,
-                  })
+                  this.props.history.push(
+                    generateQueryString("/post", {
+                      postUri: memberUri,
+                    })
+                  )
                 }
               />
             </div>
@@ -442,7 +440,7 @@ class WonAtomContentBuddies extends React.Component {
           vocab.CHAT.ChatSocketCompacted,
           vocab.CHAT.ChatSocketCompacted
         );
-        this.props.routerGoResetParams("connections");
+        this.props.history.push("/connections");
       } else if (chatConnections.length == 1) {
         const chatConnection = chatConnections[0];
         const chatConnectionUri = get(chatConnection, "uri");
@@ -462,9 +460,11 @@ class WonAtomContentBuddies extends React.Component {
           connectionUtils.isRequestSent(chatConnection) ||
           connectionUtils.isRequestReceived(chatConnection)
         ) {
-          this.props.routerGo("connections", {
-            connectionUri: chatConnectionUri,
-          });
+          this.props.history.push(
+            generateQueryString("/connections", {
+              connectionUri: chatConnectionUri,
+            })
+          );
         }
       } else {
         console.error(
@@ -481,7 +481,7 @@ class WonAtomContentBuddies extends React.Component {
         vocab.CHAT.ChatSocketCompacted,
         vocab.CHAT.ChatSocketCompacted
       );
-      this.props.routerGoResetParams("connections");
+      this.props.history.push("/connections");
     }
   }
 
@@ -511,11 +511,10 @@ WonAtomContentBuddies.propTypes = {
   connectionClose: PropTypes.func,
   connectSockets: PropTypes.func,
   connect: PropTypes.func,
-  routerGo: PropTypes.func,
-  routerGoResetParams: PropTypes.func,
   chatSocketUri: PropTypes.string,
   chatConnectionsArray: PropTypes.arrayOf(PropTypes.object),
   hasChatConnections: PropTypes.bool,
+  history: PropTypes.object,
 };
 
 export default connect(

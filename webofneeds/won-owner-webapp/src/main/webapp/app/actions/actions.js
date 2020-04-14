@@ -38,14 +38,7 @@
 
 import * as atomActions from "./atoms-actions.js";
 
-import {
-  stateBack,
-  stateGoAbs,
-  stateGoCurrent,
-  stateGoDefault,
-  stateGoKeepParams,
-  stateGoResetParams,
-} from "./cstm-router-actions.js";
+import { stateGoCurrent, stateGoResetParams } from "./cstm-router-actions.js";
 import {
   accountAcceptDisclaimer,
   accountAcceptTermsOfService,
@@ -168,13 +161,8 @@ const actionHierarchy = {
   },
   router: {
     stateGo: (to, params) => console.error("stateGo was removed: ", to, params), // only overwrites parameters that are explicitly mentioned, unless called without queryParams object (which also resets "pervasive" parameters, that shouldn't be removed
-    stateGoAbs, // reset's all parameters but the one passed as arguments
     stateGoResetParams, // goes to new state and resets all parameters (except for "pervasive" ones like `privateId`)
-    stateGoKeepParams, // goes to new state and keeps listed parameters at their current values
     stateGoCurrent,
-    stateGoDefault,
-    //stateTransitionTo, // should not be used directly
-    back: stateBack,
   },
 
   /**

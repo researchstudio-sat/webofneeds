@@ -13,8 +13,6 @@ import * as viewUtils from "../utils/view-utils.js";
 import Color from "color";
 
 export const selectLastUpdateTime = state => state.get("lastUpdateTime");
-export const getRouterParams = state =>
-  getIn(state, ["router", "currentParams"]);
 
 export const getAccountState = state => get(state, "account");
 
@@ -228,46 +226,6 @@ export const getCurrentParamsFromRoute = createSelector(
   }
 );
 
-export const getViewConnectionUriFromRoute = createSelector(
-  state => state,
-  state => {
-    const encodedConnUri = getIn(state, [
-      "router",
-      "currentParams",
-      "viewConnUri",
-    ]);
-    return decodeUriComponentProperly(encodedConnUri);
-  }
-);
-
-export const getUseCaseFromRoute = createSelector(
-  state => state,
-  state => {
-    return getIn(state, ["router", "currentParams", "useCase"]);
-  }
-);
-
-export const getTargetSocketTypeFromRoute = createSelector(
-  state => state,
-  state => {
-    return getIn(state, ["router", "currentParams", "targetSocketType"]);
-  }
-);
-
-export const getSenderSocketTypeFromRoute = createSelector(
-  state => state,
-  state => {
-    return getIn(state, ["router", "currentParams", "senderSocketType"]);
-  }
-);
-
-export const getUseCaseGroupFromRoute = createSelector(
-  state => state,
-  state => {
-    return getIn(state, ["router", "currentParams", "useCaseGroup"]);
-  }
-);
-
 export const getPrivateIdFromRoute = createSelector(
   state => state,
   state => {
@@ -279,78 +237,6 @@ export const getVerificationTokenFromRoute = createSelector(
   state => state,
   state => {
     return getIn(state, ["router", "currentParams", "token"]);
-  }
-);
-
-export const getConnectionUriFromRoute = createSelector(
-  getRouterParams,
-  routerParams => {
-    //de-escaping is lost in transpiling if not done in two steps :|
-    const openConnectionUri = decodeUriComponentProperly(
-      routerParams["connectionUri"] || routerParams["openConversation"]
-    );
-
-    if (openConnectionUri) {
-      return openConnectionUri;
-    } else {
-      return undefined;
-    }
-  }
-);
-
-export const getFromAtomUriFromRoute = createSelector(
-  state => state,
-  state => {
-    const encodedAtomUri = getIn(state, [
-      "router",
-      "currentParams",
-      "fromAtomUri",
-    ]);
-    return decodeUriComponentProperly(encodedAtomUri);
-  }
-);
-
-export const getHolderUriFromRoute = createSelector(
-  state => state,
-  state => {
-    const encodedHolderUri = getIn(state, [
-      "router",
-      "currentParams",
-      "holderUri",
-    ]);
-    return decodeUriComponentProperly(encodedHolderUri);
-  }
-);
-
-export const getModeFromRoute = createSelector(
-  state => state,
-  state => {
-    const mode = getIn(state, ["router", "currentParams", "mode"]);
-
-    if (mode) {
-      if (mode === "CONNECT") {
-        return "CONNECT";
-      } else if (mode === "EDIT") {
-        return "EDIT";
-      }
-      return "DUPLICATE";
-    }
-    return undefined;
-  }
-);
-
-export const getPostUriFromRoute = createSelector(
-  state => state,
-  state => {
-    const encodedPostUri = getIn(state, ["router", "currentParams", "postUri"]);
-    return decodeUriComponentProperly(encodedPostUri);
-  }
-);
-
-export const getAboutSectionFromRoute = createSelector(
-  state => state,
-  state => {
-    return getIn(state, ["router", "currentParams", "aboutSection"]);
   }
 );
 
@@ -460,10 +346,4 @@ export const getCurrentLocation = createSelector(
 
 export function getAtomUriBySocketUri(socketUri) {
   return socketUri && socketUri.split("#")[0];
-}
-
-function decodeUriComponentProperly(encodedUri) {
-  if (!encodedUri) return undefined;
-  //for some reason decodeUri(undefined) yields "undefined"
-  else return decodeURIComponent(encodedUri);
 }

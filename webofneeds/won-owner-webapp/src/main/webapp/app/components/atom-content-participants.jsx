@@ -2,7 +2,7 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import { get } from "../utils.js";
+import { get, generateQueryString } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
 import * as atomUtils from "../redux/utils/atom-utils";
@@ -21,6 +21,7 @@ import ico32_buddy_waiting from "~/images/won-icons/ico32_buddy_waiting.svg";
 
 import VisibilitySensor from "react-visibility-sensor";
 import PropTypes from "prop-types";
+import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const atoms = get(state, "atoms");
@@ -93,9 +94,6 @@ const mapDispatchToProps = dispatch => {
     },
     rateConnection: (connectionUri, rating) => {
       dispatch(actionCreators.connections__rate(connectionUri, rating));
-    },
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
     },
   };
 };
@@ -240,9 +238,11 @@ class WonAtomContentParticipants extends React.Component {
                     actionButtons={actionButtons}
                     atomUri={get(conn, "targetAtomUri")}
                     onClick={() =>
-                      this.props.routerGo("post", {
-                        postUri: get(conn, "targetAtomUri"),
-                      })
+                      this.props.history.push(
+                        generateQueryString("/post", {
+                          postUri: get(conn, "targetAtomUri"),
+                        })
+                      )
                     }
                   />
                 </div>
@@ -291,7 +291,9 @@ class WonAtomContentParticipants extends React.Component {
               <WonAtomContextSwipeableView
                 atomUri={memberUri}
                 onClick={() =>
-                  this.props.routerGo("post", { postUri: memberUri })
+                  this.props.history.push(
+                    generateQueryString("/post", { postUri: memberUri })
+                  )
                 }
               />
             </div>
@@ -471,10 +473,12 @@ WonAtomContentParticipants.propTypes = {
   connectionClose: PropTypes.func,
   connectSockets: PropTypes.func,
   rateConnection: PropTypes.func,
-  routerGo: PropTypes.func,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonAtomContentParticipants);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonAtomContentParticipants)
+);
