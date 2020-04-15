@@ -369,19 +369,14 @@ class AtomInfo extends React.Component {
   }
 
   selectUseCaseRoute(ucIdentifier, ucSenderSocketType, ucTargetSocketType) {
-    return (
-      "/create?useCase=" +
-      ucIdentifier +
-      "&fromAtomUri=" +
-      this.props.atomUri +
-      "&senderSocketType" +
-      ucSenderSocketType +
-      "&targetSocketType" +
-      ucTargetSocketType +
-      "&mode=" +
-      "CONNECT" +
-      (this.props.addHolderUri ? "&holderUri=" + this.props.addHolderUri : "")
-    );
+    return generateQueryString("/create", {
+      useCase: ucIdentifier,
+      fromAtomUri: this.props.atomUri,
+      senderSocketType: ucSenderSocketType,
+      targetSocketType: ucTargetSocketType,
+      mode: "CONNECT",
+      holderUri: this.props.addHolderUri,
+    });
   }
 
   connectAtomSockets(

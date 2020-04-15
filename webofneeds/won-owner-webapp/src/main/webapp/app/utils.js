@@ -31,13 +31,30 @@ export function getQueryParams(location) {
 export function generateQueryString(path, params = {}) {
   const queryParamsString = generateQueryParamsString(params);
 
-  return path + queryParamsString;
+  if (queryParamsString) {
+    return path + queryParamsString;
+  } else {
+    return path;
+  }
 }
 
 function generateQueryParamsString(params) {
-  console.debug("params: ", params);
-  //TODO: QUERY PARAMS STRING
-  return "";
+  if (params) {
+    const keyValueArray = [];
+
+    for (const key in params) {
+      const value = params[key];
+
+      if (value) {
+        keyValueArray.push(key + "=" + encodeURIComponent(value));
+      }
+    }
+
+    if (keyValueArray.length > 0) {
+      return "?" + keyValueArray.join("&");
+    }
+  }
+  return undefined;
 }
 /*
  * Freezes an object recursively.
