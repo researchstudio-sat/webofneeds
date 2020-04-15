@@ -74,12 +74,11 @@ export const getOwnedPosts = createSelector(
   getOwnedAtoms,
   ownedAtoms =>
     ownedAtoms &&
-    ownedAtoms
-      .filter(ownedAtom => !getIn(ownedAtom, ["content", "type"]))
-      .filter(
-        ownedAtom =>
-          atomUtils.isAtom(ownedAtom) && !atomUtils.isPersona(ownedAtom)
-      )
+    ownedAtoms.filter(
+      ownedAtom =>
+        !getIn(ownedAtom, ["content", "type"]) ||
+        (atomUtils.isAtom(ownedAtom) && !atomUtils.isPersona(ownedAtom))
+    )
 );
 
 export const getChatAtoms = createSelector(

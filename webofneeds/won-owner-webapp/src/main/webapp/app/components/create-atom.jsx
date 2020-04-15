@@ -181,8 +181,8 @@ const mapDispatchToProps = dispatch => {
     fetchUnloadedAtom: atomUri => {
       dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
     },
-    atomsEdit: (draft, atom) => {
-      dispatch(actionCreators.atoms__edit(draft, atom));
+    atomsEdit: (draft, atom, callback) => {
+      dispatch(actionCreators.atoms__edit(draft, atom, callback));
     },
     atomsCreate: (draft, persona, nodeUri) => {
       dispatch(actionCreators.atoms__create(draft, persona, nodeUri));

@@ -11,7 +11,7 @@ import { getOwnedAtomByConnectionUri } from "../../redux/selectors/general-selec
 
 import "~/style/_connection-message-status.scss";
 import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.svg";
-import ico36_added_circle from "~/images/won-icons/ico16_indicator_warning.svg";
+import ico36_added_circle from "~/images/won-icons/ico36_added_circle.svg";
 
 const mapStateToProps = (state, ownProps) => {
   const ownedAtom =
