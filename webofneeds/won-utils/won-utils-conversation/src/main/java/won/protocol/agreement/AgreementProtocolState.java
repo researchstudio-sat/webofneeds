@@ -22,8 +22,6 @@ import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +34,6 @@ import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
-import won.protocol.vocabulary.WONAGR;
 
 public class AgreementProtocolState {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -47,8 +44,7 @@ public class AgreementProtocolState {
     private final Dataset rejected = DatasetFactory.createGeneral();
     private Dataset conversation = null;
     private final Set<URI> retractedUris = new HashSet<URI>(); // TODO: Check!
-    private final Set<URI> claimedUris = new HashSet<URI>();
-    private final Set<URI> acceptedCancellationProposalUris = new HashSet<URI>();
+    private final Set<URI> acceptedCancellationProposalUris = new HashSet<URI>(); // TODO: Check!
     private Map<URI, ConversationMessage> messagesByURI = new HashMap<>();
     private Set<DeliveryChain> deliveryChains = new HashSet<>();
 
@@ -171,7 +167,6 @@ public class AgreementProtocolState {
         return pendingProposals.containsNamedModel(proposalUri.toString()) || isPendingCancellation(proposalUri);
     }
 
-    @Deprecated
     public Set<URI> getPendingProposalUris() {
         Set<URI> uris = RdfUtils.getGraphUris(pendingProposals);
         uris.addAll(getPendingCancellationProposalUris());
@@ -197,22 +192,21 @@ public class AgreementProtocolState {
                         .collect(Collectors.toSet());
     }
 
-    @Deprecated
     public Set<URI> getPendingCancellationProposalUris() {
         Iterator<String> pendingProposalsIt = pendingProposals.listNames();
         if (pendingProposalsIt == null) {
             return Collections.emptySet();
         }
-        Set<URI> proposedToCancelUris = new HashSet<URI>();
+        Set<URI> proposeToCancelUris = new HashSet<URI>();
         while (pendingProposalsIt.hasNext()) {
-            Set<MessageEffect> effects = getEffects(URI.create(pendingProposalsIt.next()));
-            effects.stream().forEach(effect -> {
-                if (effect.isProposes()) {
-                    proposedToCancelUris.addAll(effect.asProposes().getProposesToCancel());
+            getEffects(URI.create(pendingProposalsIt.next())).stream().forEach(effect -> {
+                if (effect.isProposes() && effect.asProposes().getProposesToCancel().size() > 0) {
+                    proposeToCancelUris.add(URI.create(pendingProposalsIt.next()));
+                    return;
                 }
             });
         }
-        return proposedToCancelUris;
+        return proposeToCancelUris;
     }
 
     public Set<URI> getAgreedMessageUris() {
@@ -222,8 +216,7 @@ public class AgreementProtocolState {
         }
         Set<URI> agreedMessageUris = new HashSet<URI>();
         while (agreementIt.hasNext()) {
-            Set<MessageEffect> effects = getEffects(URI.create(agreementIt.next()));
-            effects.stream().forEach(effect -> {
+            getEffects(URI.create(agreementIt.next())).stream().forEach(effect -> {
                 if (effect.isClaims()) {
                     agreedMessageUris.add(effect.asClaims().getClaimedMessageUri());
                 } else if (effect.isProposes()) {
@@ -259,15 +252,16 @@ public class AgreementProtocolState {
         return rejected.containsNamedModel(rejectedProposalUri.toString());
     }
 
-    @Deprecated
     public Model getPendingCancellations() {
-        return pendingProposals.getDefaultModel();
+        Model cancellationProposals = ModelFactory.createDefaultModel();
+        getPendingCancellationProposalUris().stream().forEach(uri -> {
+            cancellationProposals.add(pendingProposals.getNamedModel(uri.toString()));
+        });
+        return cancellationProposals;
     }
 
-    @Deprecated
     public boolean isPendingCancellation(URI proposalUri) {
-        return pendingProposals.getDefaultModel().contains(new ResourceImpl(proposalUri.toString()),
-                        WONAGR.proposesToCancel, (RDFNode) null);
+        return (getPendingCancellationProposalUris().contains(proposalUri));
     }
 
     public Set<URI> getAgreementUris() {
@@ -289,8 +283,7 @@ public class AgreementProtocolState {
         }
         Set<URI> proposedUris = new HashSet<URI>();
         while (pendingProposalsIt.hasNext()) {
-            Set<MessageEffect> effects = getEffects(URI.create(pendingProposalsIt.next()));
-            effects.stream().forEach(effect -> {
+            getEffects(URI.create(pendingProposalsIt.next())).stream().forEach(effect -> {
                 if (effect.isProposes()) {
                     proposedUris.addAll(effect.asProposes().getProposes());
                 }
@@ -306,8 +299,7 @@ public class AgreementProtocolState {
         }
         Set<URI> proposedToCancelUris = new HashSet<URI>();
         while (pendingProposalsIt.hasNext()) {
-            Set<MessageEffect> effects = getEffects(URI.create(pendingProposalsIt.next()));
-            effects.stream().forEach(effect -> {
+            getEffects(URI.create(pendingProposalsIt.next())).stream().forEach(effect -> {
                 if (effect.isProposes()) {
                     proposedToCancelUris.addAll(effect.asProposes().getProposesToCancel());
                 }
@@ -317,14 +309,22 @@ public class AgreementProtocolState {
     }
 
     public Set<URI> getClaimedUris() {
-        return this.claimedUris;
+        Set<URI> claimedUris = new HashSet<URI>();
+        Iterator<String> claimUris = claims.listNames();
+        while (claimUris.hasNext()) {
+            getEffects(URI.create(claimUris.next())).stream().forEach(effect -> {
+                if (effect.isClaims()) {
+                    claimedUris.add(effect.asClaims().getClaimedMessageUri());
+                }
+            });
+        }
+        return claimedUris;
     }
 
     public Set<URI> getAcceptedCancellationProposalUris() {
         return acceptedCancellationProposalUris;
     }
 
-    @Deprecated
     public Set<URI> getCancellationPendingAgreementUris() {
         Iterator<String> pendingProposalUris = pendingProposals.listNames();
         if (pendingProposalUris == null) {
@@ -332,8 +332,7 @@ public class AgreementProtocolState {
         }
         Set<URI> cancelationUris = new HashSet<URI>();
         while (pendingProposalUris.hasNext()) {
-            Set<MessageEffect> effects = getEffects(URI.create(pendingProposalUris.next()));
-            effects.stream().forEach(effect -> {
+            getEffects(URI.create(pendingProposalUris.next())).stream().forEach(effect -> {
                 if (effect.isProposes()) {
                     cancelationUris.addAll(effect.asProposes().getProposesToCancel());
                 }
@@ -998,17 +997,6 @@ public class AgreementProtocolState {
         rejected.commit();
         claims.commit();
         conversationDataset.end();
-        // recalculate claimedUris
-        this.claimedUris.clear();
-        Iterator<String> claimUris = claims.listNames();
-        while (claimUris.hasNext()) {
-            Set<MessageEffect> effects = getEffects(URI.create(claimUris.next()));
-            effects.stream().forEach(effect -> {
-                if (effect.isClaims()) {
-                    this.claimedUris.add(effect.asClaims().getClaimedMessageUri());
-                }
-            });
-        }
     }
 
     private String agrDataToString() {
@@ -1188,7 +1176,6 @@ public class AgreementProtocolState {
         // first process proposeToCancel triples - this avoids that a message can
         // successfully propose to cancel itself, as agreements are only made after the
         // cancellations are processed.
-
         Set<MessageEffect> effects = getEffects(proposalUri);
         if (effects.size() > 0) {
             for (MessageEffect effect : effects) {
