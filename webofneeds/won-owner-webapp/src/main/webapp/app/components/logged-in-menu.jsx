@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
 import { get } from "../utils";
 import * as accountUtils from "../redux/utils/account-utils";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const accountState = get(state, "account");
@@ -21,8 +21,8 @@ const mapDispatchToProps = dispatch => {
     hideMainMenu: () => {
       dispatch(actionCreators.view__hideMainMenu());
     },
-    logout: () => {
-      dispatch(actionCreators.account__logout());
+    logout: history => {
+      dispatch(actionCreators.account__logout(history));
     },
   };
 };
@@ -31,6 +31,7 @@ class WonLoggedInMenu extends React.Component {
   constructor(props) {
     super(props);
     this.closeMenu = this.closeMenu.bind(this);
+    this.logout = this.logout.bind(this);
   }
   render() {
     return (
@@ -64,12 +65,16 @@ class WonLoggedInMenu extends React.Component {
         <button
           className="won-button--filled lighterblue"
           style={{ width: "100%" }}
-          onClick={this.props.logout}
+          onClick={this.logout}
         >
           <span>Sign out</span>
         </button>
       </won-logged-in-menu>
     );
+  }
+
+  logout() {
+    this.props.logout(this.props.history);
   }
 
   closeMenu() {
@@ -82,9 +87,12 @@ WonLoggedInMenu.propTypes = {
   email: PropTypes.string,
   hideMainMenu: PropTypes.func,
   logout: PropTypes.func,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonLoggedInMenu);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonLoggedInMenu)
+);

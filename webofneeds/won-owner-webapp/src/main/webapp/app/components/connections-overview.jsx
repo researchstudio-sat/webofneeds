@@ -20,6 +20,7 @@ import WonAtomHeader from "./atom-header.jsx";
 import "~/style/_connections-overview.scss";
 import PropTypes from "prop-types";
 import { withRouter } from "react-router-dom";
+import { getPathname } from "../utils";
 
 const mapStateToProps = (state, ownProps) => {
   const allAtoms = generalSelectors.getAtoms(state);
@@ -50,9 +51,6 @@ const mapDispatchToProps = dispatch => {
           Immutable.fromJS({ atomUri: atomUri, selectTab: tab })
         )
       );
-    },
-    routerGoCurrent: props => {
-      dispatch(actionCreators.router__stateGoCurrent(props));
     },
     connectionMarkAsRead: (connectionUri, atomUri) => {
       dispatch(
@@ -147,7 +145,11 @@ class WonConnectionsOverview extends React.Component {
 
   selectConnection(connectionUri) {
     this.markAsRead(connectionUri);
-    this.props.routerGoCurrent({ connectionUri: connectionUri });
+    this.props.history.push(
+      generateQueryString(getPathname(this.props.history.location), {
+        connectionUri: connectionUri,
+      })
+    );
   }
 
   markAsRead(connectionUri) {
@@ -223,7 +225,6 @@ WonConnectionsOverview.propTypes = {
   connUriInRoute: PropTypes.string,
   sortedOpenAtomUris: PropTypes.arrayOf(PropTypes.string),
   selectTab: PropTypes.func,
-  routerGoCurrent: PropTypes.func,
   connectionMarkAsRead: PropTypes.func,
   history: PropTypes.object,
 };

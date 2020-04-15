@@ -10,6 +10,7 @@ import {
   getQueryParams,
   toAbsoluteURL,
   generateQueryString,
+  getPathname,
 } from "../utils";
 import * as connectionSelectors from "../redux/selectors/connection-selectors";
 import * as connectionUtils from "../redux/utils/connection-utils";
@@ -18,7 +19,7 @@ import { ownerBaseUrl } from "~/config/default.js";
 
 import "~/style/_context-dropdown.scss";
 import ico16_contextmenu from "~/images/won-icons/ico16_contextmenu.svg";
-import { withRouter } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const { connectionUri } = getQueryParams(ownProps.location);
@@ -74,9 +75,6 @@ const mapDispatchToProps = dispatch => {
     },
     showModalDialog: payload => {
       dispatch(actionCreators.view__showModalDialog(payload));
-    },
-    routerGoCurrent: props => {
-      dispatch(actionCreators.router__stateGoCurrent(props));
     },
     connectionClose: connectionUri => {
       dispatch(actionCreators.connections__close(connectionUri));
@@ -150,37 +148,29 @@ class WonConnectionContextDropdown extends React.Component {
         );
       this.props.isTargetAtomUsableAsTemplate &&
         buttons.push(
-          <button
+          <Link
             key="duplicate"
             className="won-button--outlined thin red"
-            onClick={() =>
-              this.props.history.push(
-                generateQueryString("/create", {
-                  fromAtomUri: this.props.targetAtomUri,
-                  mode: "DUPLICATE",
-                })
-              )
-            }
+            to={generateQueryString("/create", {
+              fromAtomUri: this.props.targetAtomUri,
+              mode: "DUPLICATE",
+            })}
           >
             Post this too!
-          </button>
+          </Link>
         );
       this.props.isTargetAtomEditable &&
         buttons.push(
-          <button
+          <Link
             key="edit"
             className="won-button--outlined thin red"
-            onClick={() =>
-              this.props.history.push(
-                generateQueryString("/create", {
-                  fromAtomUri: this.props.targetAtomUri,
-                  mode: "EDIT",
-                })
-              )
-            }
+            to={generateQueryString("/create", {
+              fromAtomUri: this.props.targetAtomUri,
+              mode: "EDIT",
+            })}
           >
             Edit
-          </button>
+          </Link>
         );
       this.props.adminEmail &&
         buttons.push(
@@ -264,10 +254,12 @@ class WonConnectionContextDropdown extends React.Component {
           caption: "Yes",
           callback: () => {
             this.props.connectionClose(this.props.connectionUri);
-            this.props.routerGoCurrent({
-              useCase: undefined,
-              connectionUri: undefined,
-            });
+            this.props.history.push(
+              generateQueryString(getPathname(this.props.history.location), {
+                useCase: undefined,
+                connectionUri: undefined,
+              })
+            );
             this.props.hideModalDialog();
           },
         },
@@ -326,7 +318,6 @@ WonConnectionContextDropdown.propTypes = {
   className: PropTypes.string,
   hideModalDialog: PropTypes.func,
   showModalDialog: PropTypes.func,
-  routerGoCurrent: PropTypes.func,
   connectionClose: PropTypes.func,
   history: PropTypes.object,
 };

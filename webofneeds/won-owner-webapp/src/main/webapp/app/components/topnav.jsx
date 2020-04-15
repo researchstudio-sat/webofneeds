@@ -24,7 +24,7 @@ const mapStateToProps = (state, ownProps) => {
 
   return {
     pageTitle: ownProps.pageTitle,
-    hasSlideIns: viewSelectors.hasSlideIns(state),
+    hasSlideIns: viewSelectors.hasSlideIns(state, ownProps.history),
     isSlideInsVisible: viewSelectors.isSlideInsVisible(state),
     mainMenuVisible: getIn(state, ["view", "showMainMenu"]),
     isMenuVisible: viewSelectors.isMenuVisible(state),

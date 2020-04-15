@@ -16,6 +16,7 @@ import { get, getIn, generateQueryString } from "../utils.js";
 import vocab from "../service/vocab.js";
 import PropTypes from "prop-types";
 import { withRouter } from "react-router-dom";
+import { getPathname } from "../utils";
 
 const mapStateToProps = (state, ownProps) => {
   const categorizedSuggestions = connectionSelectors.getCategorizedSuggestedConnectionsByAtomUri(
@@ -33,9 +34,6 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    routerGoCurrent: props => {
-      dispatch(actionCreators.router__stateGoCurrent(props));
-    },
     connectionClose: connectionUri => {
       dispatch(actionCreators.connections__close(connectionUri));
     },
@@ -81,7 +79,11 @@ class WonAtomContentSuggestions extends React.Component {
     if (connectionUtils.isUnread(conn)) {
       this.props.connectionMarkAsRead(connUri, this.props.atomUri);
     }
-    this.props.routerGoCurrent({ viewConnUri: connUri });
+    this.props.history.push(
+      generateQueryString(getPathname(this.props.history.location), {
+        viewConnUri: connUri,
+      })
+    );
   }
 
   closeConnection(conn, rateBad = false) {
@@ -219,7 +221,6 @@ WonAtomContentSuggestions.propTypes = {
   hasSuggestions: PropTypes.bool,
   categorizedSuggestions: PropTypes.objectOf(PropTypes.object),
   currentLocation: PropTypes.object,
-  routerGoCurrent: PropTypes.func,
   connectionClose: PropTypes.func,
   connectionMarkAsRead: PropTypes.func,
   connectSockets: PropTypes.func,

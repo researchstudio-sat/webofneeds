@@ -18,14 +18,14 @@ import WonUseCasePicker from "../../components/usecase-picker.jsx";
 import "~/style/_create.scss";
 import "~/style/_responsiveness-utils.scss";
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
   const accountState = get(state, "account");
 
   return {
     isLoggedIn: accountUtils.isLoggedIn(accountState),
     showModalDialog: viewSelectors.showModalDialog(state),
     showSlideIns:
-      viewSelectors.hasSlideIns(state) &&
+      viewSelectors.hasSlideIns(state, ownProps.history) &&
       viewSelectors.isSlideInsVisible(state),
   };
 };
@@ -70,6 +70,7 @@ PageCreate.propTypes = {
   isLoggedIn: PropTypes.bool,
   showModalDialog: PropTypes.bool,
   showSlideIns: PropTypes.bool,
+  history: PropTypes.object,
 };
 
 export default withRouter(connect(mapStateToProps)(PageCreate));

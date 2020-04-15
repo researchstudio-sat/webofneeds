@@ -87,7 +87,7 @@ const mapStateToProps = (state, ownProps) => {
     isOwnerAtomUrisLoading,
     isOwnerAtomUrisToLoad,
     showSlideIns:
-      viewSelectors.hasSlideIns(state) &&
+      viewSelectors.hasSlideIns(state, ownProps.history) &&
       viewSelectors.isSlideInsVisible(state),
     showModalDialog: viewSelectors.showModalDialog(state),
     showConnectionOverlay: !!viewConnUri,

@@ -38,7 +38,7 @@ import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg"
 import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
-  const { viewConnUri } = getQueryParams(ownProps.location);
+  const { viewConnUri } = getQueryParams(ownProps.history.location);
 
   const isLocationAccessDenied = generalSelectors.isLocationAccessDenied(state);
   const currentLocation = generalSelectors.getCurrentLocation(state);
@@ -129,7 +129,7 @@ const mapStateToProps = (state, ownProps) => {
     isOwnerAtomUrisLoading,
     isOwnerAtomUrisToLoad,
     showSlideIns:
-      viewSelectors.hasSlideIns(state) &&
+      viewSelectors.hasSlideIns(state, ownProps.history) &&
       viewSelectors.isSlideInsVisible(state),
     showModalDialog: viewSelectors.showModalDialog(state),
     showConnectionOverlay: !!viewConnUri,

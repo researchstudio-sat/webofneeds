@@ -16,6 +16,7 @@ import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 import ico16_indicator_info from "~/images/won-icons/ico16_indicator_info.svg";
 import ico36_close from "~/images/won-icons/ico36_close.svg";
 import { Link, withRouter } from "react-router-dom";
+import { generateQueryString, getPathname } from "../utils";
 
 const mapStateToProps = (state, ownProps) => {
   const { token } = getQueryParams(ownProps.location);
@@ -80,7 +81,10 @@ const mapStateToProps = (state, ownProps) => {
     showAnonymous: viewSelectors.showSlideInAnonymous(state),
     showDisclaimer: viewSelectors.showSlideInDisclaimer(state),
     showTermsOfService: viewSelectors.showSlideInTermsOfService(state),
-    showEmailVerification: viewSelectors.showSlideInEmailVerification(state),
+    showEmailVerification: viewSelectors.showSlideInEmailVerification(
+      state,
+      ownProps.history
+    ),
     showConnectionLost: viewSelectors.showSlideInConnectionLost(state),
     inclAnonymousLinkInput:
       !connectionHasBeenLost &&
@@ -118,9 +122,6 @@ const mapDispatchToProps = dispatch => {
     },
     reconnectStart: () => {
       dispatch(actionCreators.reconnect__start());
-    },
-    routerGoCurrent: props => {
-      dispatch(actionCreators.router__stateGoCurrent(props));
     },
     hideAnonymousSlideIn: () => {
       dispatch(actionCreators.view__anonymousSlideIn__hide());
@@ -244,7 +245,14 @@ class WonSlideIn extends React.Component {
                 <svg
                   className="si__close"
                   onClick={() =>
-                    this.props.routerGoCurrent({ token: undefined })
+                    this.props.history.replace(
+                      generateQueryString(
+                        getPathname(this.props.history.location),
+                        {
+                          token: undefined,
+                        }
+                      )
+                    )
                   }
                 >
                   <use xlinkHref={ico36_close} href={ico36_close} />
@@ -534,9 +542,9 @@ WonSlideIn.propTypes = {
   accountAcceptTermsOfService: PropTypes.func,
   accountAcceptDisclaimer: PropTypes.func,
   reconnectStart: PropTypes.func,
-  routerGoCurrent: PropTypes.func,
   hideAnonymousSlideIn: PropTypes.func,
   showEmailInput: PropTypes.func,
+  history: PropTypes.object,
 };
 
 export default withRouter(

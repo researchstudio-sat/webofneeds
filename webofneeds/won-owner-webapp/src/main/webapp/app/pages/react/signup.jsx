@@ -17,7 +17,7 @@ import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.
 import { actionCreators } from "../../actions/actions";
 import { Link } from "react-router-dom";
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
   const accountState = get(state, "account");
   return {
     isLoggedIn: accountUtils.isLoggedIn(accountState),
@@ -26,7 +26,7 @@ const mapStateToProps = state => {
     privateId: accountUtils.getPrivateId(accountState),
     showModalDialog: viewSelectors.showModalDialog(state),
     showSlideIns:
-      viewSelectors.hasSlideIns(state) &&
+      viewSelectors.hasSlideIns(state, ownProps.history) &&
       viewSelectors.isSlideInsVisible(state),
   };
 };

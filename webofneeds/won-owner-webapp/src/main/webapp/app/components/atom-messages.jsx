@@ -12,7 +12,13 @@ import {
   getProposalMessagesByConnectionUri,
   getUnreadMessagesByConnectionUri,
 } from "../redux/selectors/message-selectors";
-import { get, getIn, getQueryParams } from "../utils";
+import {
+  generateQueryString,
+  get,
+  getIn,
+  getPathname,
+  getQueryParams,
+} from "../utils";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import won from "../won-es6.js";
@@ -204,9 +210,6 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    routerGoCurrent: props => {
-      dispatch(actionCreators.router__stateGoCurrent(props));
-    },
     setShowPetriNetData: (connectionUri, showPetriNetData) => {
       dispatch(
         actionCreators.connections__showPetriNetData({
@@ -410,7 +413,7 @@ class AtomMessages extends React.Component {
           </a>
           <Link
             className="pm__header__back__button clickable hide-in-responsive"
-            to={location => `${location.pathname}`}
+            to={location => location.pathname}
           >
             <svg className="pm__header__back__button__icon">
               <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
@@ -924,9 +927,11 @@ class AtomMessages extends React.Component {
     if (this.showOverlayConnection) {
       this.props.history.goBack();
     } else {
-      this.props.routerGoCurrent({
-        connectionUri: this.props.selectedConnectionUri,
-      });
+      this.props.history.push(
+        generateQueryString(getPathname(this.props.history.location), {
+          connectionUri: this.props.selectedConnectionUri,
+        })
+      );
     }
   }
 
@@ -942,7 +947,11 @@ class AtomMessages extends React.Component {
     if (this.showOverlayConnection) {
       this.props.history.goBack();
     } else {
-      this.props.routerGoCurrent({ connectionUri: null });
+      this.props.history.push(
+        generateQueryString(getPathname(this.props.history.location), {
+          connectionUri: undefined,
+        })
+      );
     }
   }
 
@@ -1217,7 +1226,6 @@ AtomMessages.propTypes = {
   isConnectionLoading: PropTypes.bool,
   showPostContentMessage: PropTypes.bool,
   showOverlayConnection: PropTypes.bool,
-  routerGoCurrent: PropTypes.func,
   setShowPetriNetData: PropTypes.func,
   setShowAgreementData: PropTypes.func,
   hideAddMessageContent: PropTypes.func,

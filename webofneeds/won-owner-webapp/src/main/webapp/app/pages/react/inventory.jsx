@@ -98,7 +98,7 @@ const mapStateToProps = (state, ownProps) => {
     hasOwnedActivePersonas: sortedOwnedActivePersonaUriArray.length > 0,
     sortedOwnedActivePersonaUriArray,
     showSlideIns:
-      viewSelectors.hasSlideIns(state) &&
+      viewSelectors.hasSlideIns(state, ownProps.history) &&
       viewSelectors.isSlideInsVisible(state),
     showModalDialog: viewSelectors.showModalDialog(state),
     showConnectionOverlay: !!viewConnUri,
@@ -257,6 +257,7 @@ PageInventory.propTypes = {
   viewConnUri: PropTypes.string,
   showClosedAtoms: PropTypes.bool,
   toggleClosedAtoms: PropTypes.func,
+  history: PropTypes.object,
 };
 
 export default withRouter(

@@ -70,7 +70,7 @@ const mapStateToProps = (state, ownProps) => {
         connectionUtils.isRequestSent(selectedConnection) ||
         connectionUtils.isSuggested(selectedConnection)),
     showSlideIns:
-      viewSelectors.hasSlideIns(state) &&
+      viewSelectors.hasSlideIns(state, ownProps.history) &&
       viewSelectors.isSlideInsVisible(state),
     showConnectionOverlay: !!viewConnUri,
     viewConnUri,
@@ -173,6 +173,7 @@ PageConnections.propTypes = {
   hideListSideInResponsive: PropTypes.bool,
   hideNoSelectionInResponsive: PropTypes.bool,
   hideFooterInResponsive: PropTypes.bool,
+  history: PropTypes.object,
 };
 
 export default withRouter(connect(mapStateToProps)(PageConnections));

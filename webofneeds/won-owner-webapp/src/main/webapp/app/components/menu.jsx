@@ -11,8 +11,8 @@ import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import Immutable from "immutable";
 import { NavLink, withRouter } from "react-router-dom";
 
-const mapStateToProps = state => ({
-  hasSlideIns: viewSelectors.hasSlideIns(state),
+const mapStateToProps = (state, ownProps) => ({
+  hasSlideIns: viewSelectors.hasSlideIns(state, ownProps.history),
   isMenuVisible: viewSelectors.isMenuVisible(state),
   isSlideInsVisible: viewSelectors.isSlideInsVisible(state),
   isLocationAccessDenied: generalSelectors.isLocationAccessDenied(state),
@@ -255,6 +255,7 @@ WonMenu.propTypes = {
   locationAccessDenied: PropTypes.func,
   updateCurrentLocation: PropTypes.func,
   toggleSlideIns: PropTypes.func,
+  history: PropTypes.object,
 };
 
 export default withRouter(

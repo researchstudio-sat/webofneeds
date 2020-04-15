@@ -172,7 +172,7 @@ const mapStateToProps = (state, ownProps) => {
     peopleGrid: peopleGrid({ themeName }),
     showModalDialog: viewSelectors.showModalDialog(state),
     showSlideIns:
-      viewSelectors.hasSlideIns(state) &&
+      viewSelectors.hasSlideIns(state, ownProps.history) &&
       viewSelectors.isSlideInsVisible(state),
   };
 };
@@ -314,6 +314,7 @@ PageAbout.propTypes = {
   tosTemplateHtml: PropTypes.string,
   imprintTemplateHtml: PropTypes.string,
   peopleGrid: PropTypes.arrayOf(PropTypes.object),
+  history: PropTypes.object,
 };
 
 export default withRouter(connect(mapStateToProps)(PageAbout));

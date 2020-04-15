@@ -9,7 +9,7 @@ import * as connectionUtils from "../redux/utils/connection-utils.js";
 import WonConnectionHeader from "./connection-header.jsx";
 
 import "~/style/_connection-selection-item-line.scss";
-import { getQueryParams } from "../utils";
+import { generateQueryString, getPathname, getQueryParams } from "../utils";
 import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
@@ -38,9 +38,6 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    routerGoCurrent: props => {
-      dispatch(actionCreators.router__stateGoCurrent(props));
-    },
     connectionClose: connectionUri => {
       dispatch(actionCreators.connections__close(connectionUri));
     },
@@ -84,10 +81,12 @@ class WonConnectionSelectionItem extends React.Component {
 
   closeConnection() {
     this.props.connectionClose(this.props.connectionUri);
-    this.props.routerGoCurrent({
-      useCase: undefined,
-      connectionUri: undefined,
-    });
+    this.props.history.push(
+      generateQueryString(getPathname(this.props.history.location), {
+        useCase: undefined,
+        connectionUri: undefined,
+      })
+    );
   }
 }
 
@@ -99,7 +98,7 @@ WonConnectionSelectionItem.propTypes = {
   targetAtomFailedToLoad: PropTypes.bool,
   isUnread: PropTypes.bool,
   connectionClose: PropTypes.func,
-  routerGoCurrent: PropTypes.func,
+  history: PropTypes.object,
 };
 
 export default withRouter(

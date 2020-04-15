@@ -6,10 +6,8 @@ import { createSelector } from "reselect";
 import { get, getIn } from "../../utils.js";
 import * as viewUtils from "../utils/view-utils.js";
 import * as accountUtils from "../utils/account-utils.js";
-import {
-  getVerificationTokenFromRoute,
-  getAccountState,
-} from "./general-selectors.js";
+import { getAccountState } from "./general-selectors.js";
+import { getQueryParams } from "../../utils";
 
 export const getViewState = state => get(state, "view");
 
@@ -92,8 +90,8 @@ export function showSlideInTermsOfService(state) {
   );
 }
 
-export function showSlideInEmailVerification(state) {
-  const verificationToken = getVerificationTokenFromRoute(state);
+export function showSlideInEmailVerification(state, history) {
+  const { token } = getQueryParams(history.location);
   const accountState = getAccountState(state);
   const isLoggedIn = accountUtils.isLoggedIn(accountState);
   const isAnonymous = accountUtils.isAnonymous(accountState);
@@ -101,7 +99,7 @@ export function showSlideInEmailVerification(state) {
 
   return !!(
     !showSlideInConnectionLost(state) &&
-    (verificationToken || (isLoggedIn && !isEmailVerified && !isAnonymous))
+    (token || (isLoggedIn && !isEmailVerified && !isAnonymous))
   );
 }
 
@@ -109,13 +107,13 @@ export function showSlideInConnectionLost(state) {
   return getIn(state, ["messages", "lostConnection"]);
 }
 
-export function hasSlideIns(state) {
+export function hasSlideIns(state, history) {
   return !!(
     showSlideInAnonymous(state) ||
     showSlideInAnonymousSuccess(state) ||
     showSlideInDisclaimer(state) ||
     showSlideInTermsOfService(state) ||
-    showSlideInEmailVerification(state) ||
+    showSlideInEmailVerification(state, history) ||
     showSlideInConnectionLost(state)
   );
 }

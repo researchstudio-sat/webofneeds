@@ -9,16 +9,15 @@ import * as stateStore from "../redux/state-store.js";
 import * as wonUtils from "../won-utils.js";
 import * as ownerApi from "../api/owner-api.js";
 import { setDisclaimerAccepted } from "../won-localstorage.js";
-import { stateGoCurrent } from "./cstm-router-actions.js";
 import { checkAccessToCurrentRoute } from "../configRouting.js";
 
 import { get } from "../utils.js";
 import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import { loadLatestMessagesOfConnection } from "./connections-actions.js";
-import { getPrivateIdFromRoute } from "../redux/selectors/general-selectors.js";
 
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
+import { getPathname, getQueryParams } from "../utils";
 
 /**
  * Makes sure user is either logged in
@@ -155,7 +154,7 @@ let _logoutInProcess;
  * Processes logout
  * @returns {Function}
  */
-export function accountLogout() {
+export function accountLogout(history) {
   return (dispatch, getState) => {
     const state = getState();
 
@@ -177,8 +176,9 @@ export function accountLogout() {
       })
       .then(() => {
         // for the case that we've been logged in to an anonymous account, we need to remove the privateId here.
-        if (getPrivateIdFromRoute(state)) {
-          return stateGoCurrent({ privateId: null })(dispatch, getState);
+        const { privateId } = getQueryParams(history.location);
+        if (privateId) {
+          history.replace(getPathname(history.location));
         }
       })
       .then(() => dispatch({ type: actionTypes.downgradeHttpSession }))

@@ -6,7 +6,13 @@ import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as messageUtils from "../redux/utils/message-utils";
 import { hasMessagesToLoad } from "../redux/selectors/connection-selectors";
 import { getUnreadMessagesByConnectionUri } from "../redux/selectors/message-selectors";
-import { get, getIn, getQueryParams } from "../utils";
+import {
+  generateQueryString,
+  get,
+  getIn,
+  getPathname,
+  getQueryParams,
+} from "../utils";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import vocab from "../service/vocab.js";
@@ -25,7 +31,7 @@ import WonAtomContentMessage from "./messages/atom-content-message.jsx";
 import WonConnectionMessage from "./messages/connection-message.jsx";
 import { actionCreators } from "../actions/actions.js";
 import * as viewSelectors from "../redux/selectors/view-selectors";
-import { withRouter } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
 
 const rdfTextfieldHelpText =
   "Expects valid turtle. " +
@@ -110,9 +116,6 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    routerGoCurrent: props => {
-      dispatch(actionCreators.router__stateGoCurrent(props));
-    },
     hideAddMessageContent: () => {
       dispatch(actionCreators.view__hideAddMessageContent());
     },
@@ -224,16 +227,18 @@ class GroupAtomMessages extends React.Component {
               <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
             </svg>
           </a>
-          <a
+          <Link
             className="gpm__header__back__button clickable hide-in-responsive"
-            onClick={() =>
-              this.props.routerGoCurrent({ connectionUri: undefined })
+            to={location =>
+              generateQueryString(getPathname(location), {
+                connectionUri: undefined,
+              })
             }
           >
             <svg className="gpm__header__back__button__icon">
               <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
             </svg>
-          </a>
+          </Link>
         </div>
         <WonConnectionHeader connectionUri={this.props.connectionUri} />
         <WonShareDropdown atomUri={this.props.targetAtomUri} />
@@ -454,9 +459,11 @@ class GroupAtomMessages extends React.Component {
       get(this.props.connection, "targetSocketUri"),
       message
     );
-    this.props.routerGoCurrent({
-      connectionUri: this.props.connectionUri,
-    });
+    this.props.history.push(
+      generateQueryString(getPathname(this.props.history.location), {
+        connectionUri: this.props.connectionUri,
+      })
+    );
   }
 
   closeConnection(rateBad = false) {
@@ -467,7 +474,11 @@ class GroupAtomMessages extends React.Component {
       );
     }
     this.props.closeConnection(get(this.props.connection, "uri"));
-    this.props.routerGoCurrent({ connectionUri: null });
+    this.props.history.push(
+      generateQueryString(getPathname(this.props.history.location), {
+        connectionUri: undefined,
+      })
+    );
   }
 
   ensureMessagesAreLoaded() {
@@ -521,7 +532,6 @@ GroupAtomMessages.propTypes = {
   hasConnectionMessagesToLoad: PropTypes.bool,
   connectionOrAtomsLoading: PropTypes.bool,
   isConnectionLoading: PropTypes.bool,
-  routerGoCurrent: PropTypes.func,
   hideAddMessageContent: PropTypes.func,
   sendChatMessage: PropTypes.func,
   connectSockets: PropTypes.func,

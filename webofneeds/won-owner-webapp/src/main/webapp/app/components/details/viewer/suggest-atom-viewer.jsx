@@ -10,7 +10,8 @@ import { actionCreators } from "../../../actions/actions.js";
 
 import "~/style/_suggest-atom-viewer.scss";
 import * as processSelectors from "../../../redux/selectors/process-selectors";
-import { withRouter } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
+import { generateQueryString, getPathname } from "../../../utils";
 
 const mapStateToProps = (state, ownProps) => {
   const { connectionUri } = getQueryParams(ownProps.location);
@@ -111,9 +112,6 @@ const mapDispatchToProps = dispatch => {
         )
       );
     },
-    routerGoCurrent: props => {
-      dispatch(actionCreators.router__stateGoCurrent(props));
-    },
   };
 };
 
@@ -178,16 +176,16 @@ class WonSuggestAtomViewer extends React.Component {
                   undefined
                 )}
                 {this.props.hasConnectionBetweenPosts ? (
-                  <button
+                  <Link
                     className="suggestatomv__content__post__actions__button won-button--outlined thin red"
-                    onClick={() =>
-                      this.props.routerGoCurrent({
+                    to={location =>
+                      generateQueryString(getPathname(location), {
                         connectionUri: this.props.establishedConnectionUri,
                       })
                     }
                   >
                     View Chat
-                  </button>
+                  </Link>
                 ) : (
                   undefined
                 )}
@@ -295,7 +293,6 @@ WonSuggestAtomViewer.propTypes = {
   multiSelectType: PropTypes.string,
   hasConnectionBetweenPosts: PropTypes.bool,
   establishedConnectionUri: PropTypes.string,
-  routerGoCurrent: PropTypes.func,
 };
 
 export default withRouter(

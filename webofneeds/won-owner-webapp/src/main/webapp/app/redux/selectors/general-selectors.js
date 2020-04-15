@@ -226,20 +226,6 @@ export const getCurrentParamsFromRoute = createSelector(
   }
 );
 
-export const getPrivateIdFromRoute = createSelector(
-  state => state,
-  state => {
-    return getIn(state, ["router", "currentParams", "privateId"]);
-  }
-);
-
-export const getVerificationTokenFromRoute = createSelector(
-  state => state,
-  state => {
-    return getIn(state, ["router", "currentParams", "token"]);
-  }
-);
-
 export const getOwnedPersonas = createSelector(
   getOwnedAtoms,
   ownedAtoms =>
