@@ -1029,21 +1029,11 @@ class AtomMessages extends React.Component {
       ownerApi
         .getAgreementProtocolUris(get(this.props.connection, "uri"))
         .then(response => {
-          let proposedMessageUris = [];
-          const pendingProposals = response.pendingProposals;
-
-          if (pendingProposals) {
-            pendingProposals.forEach(prop => {
-              if (prop.proposes) {
-                proposedMessageUris = proposedMessageUris.concat(prop.proposes);
-              }
-            });
-          }
-
           const agreementDataImm = Immutable.fromJS({
             agreementUris: Immutable.Set(response.agreementUris),
             agreedMessageUris: Immutable.Set(response.agreedMessageUris),
             pendingProposalUris: Immutable.Set(response.pendingProposalUris),
+
             acceptedCancellationProposalUris: Immutable.Set(
               response.acceptedCancellationProposalUris
             ),
@@ -1056,9 +1046,11 @@ class AtomMessages extends React.Component {
             cancelledAgreementUris: Immutable.Set(
               response.cancelledAgreementUris
             ),
+
             rejectedMessageUris: Immutable.Set(response.rejectedMessageUris),
             retractedMessageUris: Immutable.Set(response.retractedMessageUris),
-            proposedMessageUris: Immutable.Set(proposedMessageUris),
+            proposedMessageUris: Immutable.Set(response.proposedMessageUris),
+            proposedToCancelUris: Immutable.Set(response.proposedToCancelUris),
             claimedMessageUris: Immutable.Set(response.claimedMessageUris),
           });
 

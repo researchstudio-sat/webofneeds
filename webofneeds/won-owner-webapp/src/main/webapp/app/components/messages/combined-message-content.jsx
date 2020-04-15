@@ -226,6 +226,7 @@ class WonCombinedMessageContent extends React.Component {
   }
 
   getAgreementHeaderLabel() {
+    //TODO: integrate agreed message cases
     if (this.props.hasClaims && this.props.hasProposes) {
       if (this.props.messageStatus) {
         if (this.props.messageStatus.get("isCancelled"))
