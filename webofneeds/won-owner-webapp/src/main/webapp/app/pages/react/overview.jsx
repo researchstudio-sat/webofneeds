@@ -338,7 +338,8 @@ class PageOverview extends React.Component {
   reload() {
     if (!this.props.isOwnerAtomUrisLoading) {
       const modifiedAfterDate =
-        new Date(this.props.lastAtomUrisUpdateDate) ||
+        (this.props.lastAtomUrisUpdateDate &&
+          new Date(this.props.lastAtomUrisUpdateDate)) ||
         new Date(Date.now() - 30 /*Days before*/ * 86400000);
       this.props.fetchWhatsNew(modifiedAfterDate);
     }
