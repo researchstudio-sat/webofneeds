@@ -94,6 +94,15 @@ const mapStateToProps = (state, ownProps) => {
     isRetracted: messageUtils.isMessageRetracted(message),
     isCancellationPending: messageUtils.isMessageCancellationPending(message),
     isCancelled: messageUtils.isMessageCancelled(message),
+    isCollapsible:
+      messageUtils.isMessageClaimed(message) ||
+      messageUtils.isMessageProposed(message) ||
+      messageUtils.isMessageAccepted(message) ||
+      messageUtils.isMessageAgreedOn(message) ||
+      messageUtils.isMessageRejected(message) ||
+      messageUtils.isMessageRetracted(message) ||
+      messageUtils.isMessageCancellationPending(message) ||
+      messageUtils.isMessageCancelled(message),
     isProposable:
       connectionUtils.isConnected(connection) &&
       messageUtils.isMessageProposable(message),
@@ -233,7 +242,7 @@ class WonConnectionMessage extends React.Component {
         messageCenterContentElement = (
           <div
             className="won-cm__center__bubble__collapsed clickable"
-            onClick={() => this.expandMessage()}
+            onClick={() => this.expandMessage(false)}
           >
             {this.generateCollapsedLabel()}
           </div>
@@ -241,6 +250,16 @@ class WonConnectionMessage extends React.Component {
       } else {
         messageCenterContentElement = (
           <React.Fragment>
+            {this.props.isCollapsible ? (
+              <div
+                className="won-cm__center__bubble__collapsed clickable"
+                onClick={() => this.expandMessage(true)}
+              >
+                Click to collapse again
+              </div>
+            ) : (
+              undefined
+            )}
             <WonCombinedMessageContent
               messageUri={this.props.messageUri}
               connectionUri={this.props.connectionUri}
@@ -340,6 +359,7 @@ class WonConnectionMessage extends React.Component {
     this.props.isAgreed && cssClassNames.push("won-is-agreed");
     this.props.isCancelled && cssClassNames.push("won-is-cancelled");
     this.props.isCollapsed && cssClassNames.push("won-is-collapsed");
+    this.props.isCollapsible && cssClassNames.push("won-is-collapsible");
     this.props.isChangeNotificationMessage &&
       cssClassNames.push("won-is-changeNotification");
     this.props.isCancellationPending &&
@@ -416,14 +436,14 @@ class WonConnectionMessage extends React.Component {
     return false;
   }
 
-  expandMessage() {
+  expandMessage(expand) {
     //TODO: Not allowed for certain high-level protocol states
     if (this.props.message && !this.props.multiSelectType) {
       this.props.messageMarkAsCollapsed(
         get(this.props.message, "uri"),
         this.props.connectionUri,
         get(this.props.ownedAtom, "uri"),
-        false
+        expand
       );
     }
   }
@@ -475,6 +495,7 @@ WonConnectionMessage.propTypes = {
   isChangeNotificationMessage: PropTypes.bool,
   isSelected: PropTypes.bool,
   isCollapsed: PropTypes.bool,
+  isCollapsible: PropTypes.bool,
   showActions: PropTypes.bool,
   multiSelectType: PropTypes.string,
   shouldShowRdf: PropTypes.bool,

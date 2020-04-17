@@ -52,6 +52,11 @@ won-connection-message {
     @include square-image($postIconSizeCollapsed, 0 0.5rem 0 0);
   }
 
+  &.won-is-collapsible {
+    filter: opacity(25%);
+    @include square-image($postIconSizeCollapsed, 0 0.5rem 0 0);
+  }
+
   &.won-is-loading {
     @include animateOpacityHeartBeat();
 
