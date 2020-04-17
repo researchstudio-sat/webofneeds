@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { getIn } from "../utils.js";
+import { getIn, generateLink } from "../utils.js";
 import { connect } from "react-redux";
 import WonTitlePicker from "./details/picker/title-picker.jsx";
 import * as useCaseUtils from "../usecase-utils.js";
@@ -191,9 +191,7 @@ class WonUsecasePicker extends React.Component {
       selectedUseCaseGroup && selectedUseCaseGroup.identifier;
 
     if (selectedGroupIdentifier) {
-      return `${location.pathname}?useCaseGroup=${encodeURIComponent(
-        selectedGroupIdentifier
-      )}`;
+      return generateLink(location, { useCaseGroup: selectedGroupIdentifier });
     } else {
       console.warn(
         "No identifier found for given usecase group, ",

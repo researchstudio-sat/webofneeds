@@ -6,13 +6,7 @@ import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as messageUtils from "../redux/utils/message-utils";
 import { hasMessagesToLoad } from "../redux/selectors/connection-selectors";
 import { getUnreadMessagesByConnectionUri } from "../redux/selectors/message-selectors";
-import {
-  generateQueryString,
-  get,
-  getIn,
-  getPathname,
-  getQueryParams,
-} from "../utils";
+import { get, getIn, getQueryParams, generateLink } from "../utils";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import vocab from "../service/vocab.js";
@@ -230,7 +224,7 @@ class GroupAtomMessages extends React.Component {
           <Link
             className="gpm__header__back__button clickable hide-in-responsive"
             to={location =>
-              generateQueryString(getPathname(location), {
+              generateLink(location, {
                 connectionUri: undefined,
               })
             }
@@ -460,7 +454,7 @@ class GroupAtomMessages extends React.Component {
       message
     );
     this.props.history.push(
-      generateQueryString(getPathname(this.props.history.location), {
+      generateLink(this.props.history.location, {
         connectionUri: this.props.connectionUri,
       })
     );
@@ -475,7 +469,7 @@ class GroupAtomMessages extends React.Component {
     }
     this.props.closeConnection(get(this.props.connection, "uri"));
     this.props.history.push(
-      generateQueryString(getPathname(this.props.history.location), {
+      generateLink(this.props.history.location, {
         connectionUri: undefined,
       })
     );

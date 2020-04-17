@@ -12,11 +12,10 @@ import * as connectionSelectors from "../redux/selectors/connection-selectors.js
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as wonLabelUtils from "../won-label-utils.js";
 import VisibilitySensor from "react-visibility-sensor";
-import { get, getIn, generateQueryString } from "../utils.js";
+import { get, getIn, generateLink } from "../utils.js";
 import vocab from "../service/vocab.js";
 import PropTypes from "prop-types";
 import { withRouter } from "react-router-dom";
-import { getPathname } from "../utils";
 
 const mapStateToProps = (state, ownProps) => {
   const categorizedSuggestions = connectionSelectors.getCategorizedSuggestedConnectionsByAtomUri(
@@ -80,9 +79,7 @@ class WonAtomContentSuggestions extends React.Component {
       this.props.connectionMarkAsRead(connUri, this.props.atomUri);
     }
     this.props.history.push(
-      generateQueryString(getPathname(this.props.history.location), {
-        viewConnUri: connUri,
-      })
+      generateLink(this.props.history.location, { viewConnUri: connUri })
     );
   }
 
@@ -121,10 +118,14 @@ class WonAtomContentSuggestions extends React.Component {
 
     this.props.connectSockets(socketUri, targetSocketUri, message);
     this.props.history.push(
-      generateQueryString("/connections", {
-        connectionUri: connUri,
-        viewConnUri: undefined,
-      })
+      generateLink(
+        this.props.history.location,
+        {
+          connectionUri: connUri,
+          viewConnUri: undefined,
+        },
+        "/connections"
+      )
     );
   }
 

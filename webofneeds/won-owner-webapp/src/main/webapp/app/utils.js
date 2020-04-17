@@ -22,13 +22,38 @@ export function getQueryParams(location) {
   let result = {};
   pairs.forEach(function(pair) {
     pair = pair.split("=");
-    result[pair[0]] = decodeURIComponent(pair[1] || "");
+    result[pair[0]] = pair[1] ? decodeURIComponent(pair[1]) : undefined;
   });
 
   return JSON.parse(JSON.stringify(result));
 }
 
-export function generateQueryString(path, params = {}) {
+/**
+ * Generates A Link String for React Router
+ * @param currentLocation current location object (e.g. this.props.history.location - injected in the component by withRouter)
+ * @param newParams - parameters that should be set
+ * @param path - path to go to -> if left empty link will use the current pathname of the location
+ * @param keepExistingParams - default true, if set to false, only newParams will be added to the link
+ * @returns {*}
+ */
+export function generateLink(
+  currentLocation,
+  newParams,
+  path,
+  keepExistingParams = true
+) {
+  const previousParams = keepExistingParams
+    ? getQueryParams(currentLocation)
+    : {};
+  const mergedParams = { ...previousParams, ...newParams };
+
+  return generateQueryString(
+    path ? path : getPathname(currentLocation),
+    mergedParams
+  );
+}
+
+function generateQueryString(path, params = {}) {
   const queryParamsString = generateQueryParamsString(params);
 
   if (queryParamsString) {

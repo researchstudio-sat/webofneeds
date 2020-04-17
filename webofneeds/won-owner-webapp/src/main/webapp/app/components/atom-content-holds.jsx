@@ -2,7 +2,7 @@
  * Created by quasarchimaere on 05.08.2019.
  */
 import React from "react";
-import { getIn, generateQueryString } from "../utils";
+import { getIn, generateLink } from "../utils";
 import { connect } from "react-redux";
 import * as atomUtils from "../redux/utils/atom-utils";
 import * as generalSelectors from "../redux/selectors/general-selectors";
@@ -29,7 +29,11 @@ const mapStateToProps = (state, ownProps) => {
 class WonAtomContentHolds extends React.Component {
   createAtom() {
     this.props.history.push(
-      generateQueryString("/create", { holderUri: this.props.atomUri })
+      generateLink(
+        this.props.history.location,
+        { holderUri: this.props.atomUri },
+        "/create"
+      )
     );
   }
 

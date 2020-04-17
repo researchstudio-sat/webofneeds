@@ -3,7 +3,13 @@ import PropTypes from "prop-types";
 import won from "../won-es6";
 import { connect } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
-import { get, getIn, toAbsoluteURL, getQueryParams } from "../utils.js";
+import {
+  get,
+  getIn,
+  toAbsoluteURL,
+  getQueryParams,
+  generateLink,
+} from "../utils.js";
 import { parseRestErrorMessage } from "../won-utils.js";
 import { ownerBaseUrl } from "~/config/default.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
@@ -16,7 +22,6 @@ import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 import ico16_indicator_info from "~/images/won-icons/ico16_indicator_info.svg";
 import ico36_close from "~/images/won-icons/ico36_close.svg";
 import { Link, withRouter } from "react-router-dom";
-import { generateQueryString, getPathname } from "../utils";
 
 const mapStateToProps = (state, ownProps) => {
   const { token } = getQueryParams(ownProps.location);
@@ -246,12 +251,9 @@ class WonSlideIn extends React.Component {
                   className="si__close"
                   onClick={() =>
                     this.props.history.replace(
-                      generateQueryString(
-                        getPathname(this.props.history.location),
-                        {
-                          token: undefined,
-                        }
-                      )
+                      generateLink(this.props.history.location, {
+                        token: undefined,
+                      })
                     )
                   }
                 >

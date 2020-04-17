@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import Immutable from "immutable";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
-import { get, getIn, getQueryParams } from "../utils.js";
+import { get, getIn, getQueryParams, generateLink } from "../utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -16,7 +16,6 @@ import { details } from "../../config/detail-definitions.js";
 import "~/style/_atom-content-persona.scss";
 import ElmReact from "./elm-react";
 import { withRouter } from "react-router-dom";
-import { generateQueryString } from "../utils";
 
 const mapStateToProps = (state, ownProps) => {
   const { connectionUri } = getQueryParams(ownProps.location);
@@ -270,27 +269,39 @@ class WonAtomContentPersona extends React.Component {
   viewPersonaPosts() {
     this.props.selectTab(this.props.personaUri, "HOLDS");
     this.props.history.push(
-      generateQueryString("/post", {
-        postUri: this.props.personaUri,
-      })
+      generateLink(
+        this.props.history.location,
+        {
+          postUri: this.props.personaUri,
+        },
+        "/post"
+      )
     );
   }
 
   viewPersonaBuddies() {
     this.props.selectTab(this.props.personaUri, "BUDDIES");
     this.props.history.push(
-      generateQueryString("/post", {
-        postUri: this.props.personaUri,
-      })
+      generateLink(
+        this.props.history.location,
+        {
+          postUri: this.props.personaUri,
+        },
+        "/post"
+      )
     );
   }
 
   viewPersonaReviews() {
     this.props.selectTab(this.props.personaUri, "REVIEWS");
     this.props.history.push(
-      generateQueryString("/post", {
-        postUri: this.props.personaUri,
-      })
+      generateLink(
+        this.props.history.location,
+        {
+          postUri: this.props.personaUri,
+        },
+        "/post"
+      )
     );
   }
 }

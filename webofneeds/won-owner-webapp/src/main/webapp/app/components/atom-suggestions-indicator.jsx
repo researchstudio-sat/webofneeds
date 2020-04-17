@@ -6,7 +6,7 @@ import Immutable from "immutable";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
-import { getIn, generateQueryString } from "../utils.js";
+import { getIn, generateLink } from "../utils.js";
 
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import "~/style/_atom-suggestions-indicator.scss";
@@ -53,7 +53,11 @@ class WonAtomSuggestionsIndicator extends React.Component {
   showAtomSuggestions() {
     this.props.selectAtomTab(this.props.atomUri, "SUGGESTIONS");
     this.props.history.push(
-      generateQueryString("/post", { postUri: this.props.atomUri })
+      generateLink(
+        this.props.history.location,
+        { postUri: this.props.atomUri },
+        "/post"
+      )
     );
   }
 

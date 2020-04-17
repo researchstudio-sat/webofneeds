@@ -9,7 +9,7 @@ import {
   getAtoms,
   getOwnedAtomByConnectionUri,
 } from "../../redux/selectors/general-selectors.js";
-import { get, getIn, generateQueryString, getPathname } from "../../utils.js";
+import { get, getIn, generateLink } from "../../utils.js";
 import { getOwnedConnections } from "../../redux/selectors/connection-selectors.js";
 import { labels } from "../../won-label-utils.js";
 import vocab from "../../service/vocab.js";
@@ -159,12 +159,9 @@ class WonCombinedMessageContent extends React.Component {
                       !this.props.multiSelectType &&
                         this.isInjectIntoConnectionPresent(connUri) &&
                         this.props.history.push(
-                          generateQueryString(
-                            getPathname(this.props.history.location),
-                            {
-                              connectionUri: connUri,
-                            }
-                          )
+                          generateLink(this.props.history.location, {
+                            connectionUri: connUri,
+                          })
                         );
                     }}
                   />

@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import Immutable from "immutable";
 import { connect } from "react-redux";
-import { get, getIn, generateQueryString } from "../utils.js";
+import { get, getIn, generateLink } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import WonAtomHeader from "./atom-header.jsx";
 import ChatTextfield from "./chat-textfield.jsx";
@@ -369,14 +369,18 @@ class AtomInfo extends React.Component {
   }
 
   selectUseCaseRoute(ucIdentifier, ucSenderSocketType, ucTargetSocketType) {
-    return generateQueryString("/create", {
-      useCase: ucIdentifier,
-      fromAtomUri: this.props.atomUri,
-      senderSocketType: ucSenderSocketType,
-      targetSocketType: ucTargetSocketType,
-      mode: "CONNECT",
-      holderUri: this.props.addHolderUri,
-    });
+    return generateLink(
+      this.props.history.location,
+      {
+        useCase: ucIdentifier,
+        fromAtomUri: this.props.atomUri,
+        senderSocketType: ucSenderSocketType,
+        targetSocketType: ucTargetSocketType,
+        mode: "CONNECT",
+        holderUri: this.props.addHolderUri,
+      },
+      "/create"
+    );
   }
 
   connectAtomSockets(
@@ -516,9 +520,13 @@ class AtomInfo extends React.Component {
             }
 
             this.props.history.push(
-              generateQueryString("/connections", {
-                connectionUri: personaConnectionUri,
-              })
+              generateLink(
+                this.props.history.location,
+                {
+                  connectionUri: personaConnectionUri,
+                },
+                "/connections"
+              )
             );
           } else {
             console.error(

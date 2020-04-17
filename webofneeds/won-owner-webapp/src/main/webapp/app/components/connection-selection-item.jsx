@@ -9,7 +9,7 @@ import * as connectionUtils from "../redux/utils/connection-utils.js";
 import WonConnectionHeader from "./connection-header.jsx";
 
 import "~/style/_connection-selection-item-line.scss";
-import { generateQueryString, getPathname, getQueryParams } from "../utils";
+import { generateLink, getQueryParams } from "../utils";
 import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
@@ -82,7 +82,7 @@ class WonConnectionSelectionItem extends React.Component {
   closeConnection() {
     this.props.connectionClose(this.props.connectionUri);
     this.props.history.push(
-      generateQueryString(getPathname(this.props.history.location), {
+      generateLink(this.props.history.location, {
         useCase: undefined,
         connectionUri: undefined,
       })

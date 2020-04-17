@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors";
-import { generateQueryString, get, getIn, toAbsoluteURL } from "../utils";
+import { generateLink, get, getIn, toAbsoluteURL } from "../utils";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils";
 import { ownerBaseUrl } from "~/config/default.js";
@@ -113,10 +113,14 @@ class WonAtomContextDropdown extends React.Component {
             className="won-button--outlined thin red"
             onClick={() =>
               this.props.history.push(
-                generateQueryString("/create", {
-                  fromAtomUri: this.props.atomUri,
-                  mode: "DUPLICATE",
-                })
+                generateLink(
+                  this.props.history.location,
+                  {
+                    fromAtomUri: this.props.atomUri,
+                    mode: "DUPLICATE",
+                  },
+                  "/create"
+                )
               )
             }
           >
@@ -130,10 +134,14 @@ class WonAtomContextDropdown extends React.Component {
             className="won-button--outlined thin red"
             onClick={() =>
               this.props.history.push(
-                generateQueryString("create", {
-                  fromAtomUri: this.props.atomUri,
-                  mode: "EDIT",
-                })
+                generateLink(
+                  this.props.history.location,
+                  {
+                    fromAtomUri: this.props.atomUri,
+                    mode: "EDIT",
+                  },
+                  "/create"
+                )
               )
             }
           >

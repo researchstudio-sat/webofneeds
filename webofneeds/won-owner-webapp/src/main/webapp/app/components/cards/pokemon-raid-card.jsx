@@ -3,7 +3,7 @@
  */
 import React from "react";
 import { connect } from "react-redux";
-import { get, getIn, generateQueryString } from "../../utils.js";
+import { get, getIn, generateLink } from "../../utils.js";
 import Immutable from "immutable";
 import { actionCreators } from "../../actions/actions.js";
 import PropTypes from "prop-types";
@@ -424,14 +424,22 @@ class PokemonRaidCard extends React.Component {
     } else {
       this.props.selectAtomTab(this.props.atomUri, "DETAIL");
       this.props.history.push(
-        generateQueryString("/post", { postUri: this.props.atomUri })
+        generateLink(
+          this.props.history.location,
+          { postUri: this.props.atomUri },
+          "/post"
+        )
       );
     }
   }
   holderClick() {
     this.props.selectAtomTab(this.props.holderUri, "DETAIL");
     this.props.history.push(
-      generateQueryString("/post", { postUri: this.props.holderUri })
+      generateLink(
+        this.props.history.location,
+        { postUri: this.props.holderUri },
+        "/post"
+      )
     );
   }
 }

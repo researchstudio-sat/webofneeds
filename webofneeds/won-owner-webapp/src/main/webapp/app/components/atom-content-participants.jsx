@@ -2,7 +2,7 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import { get, generateQueryString } from "../utils.js";
+import { get, generateLink } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
 import * as atomUtils from "../redux/utils/atom-utils";
@@ -239,9 +239,13 @@ class WonAtomContentParticipants extends React.Component {
                     atomUri={get(conn, "targetAtomUri")}
                     onClick={() =>
                       this.props.history.push(
-                        generateQueryString("/post", {
-                          postUri: get(conn, "targetAtomUri"),
-                        })
+                        generateLink(
+                          this.props.history.location,
+                          {
+                            postUri: get(conn, "targetAtomUri"),
+                          },
+                          "/post"
+                        )
                       )
                     }
                   />
@@ -292,7 +296,13 @@ class WonAtomContentParticipants extends React.Component {
                 atomUri={memberUri}
                 onClick={() =>
                   this.props.history.push(
-                    generateQueryString("/post", { postUri: memberUri })
+                    generateLink(
+                      this.props.history.location,
+                      {
+                        postUri: memberUri,
+                      },
+                      "/post"
+                    )
                   )
                 }
               />

@@ -9,8 +9,7 @@ import {
   getIn,
   getQueryParams,
   toAbsoluteURL,
-  generateQueryString,
-  getPathname,
+  generateLink,
 } from "../utils";
 import * as connectionSelectors from "../redux/selectors/connection-selectors";
 import * as connectionUtils from "../redux/utils/connection-utils";
@@ -151,10 +150,16 @@ class WonConnectionContextDropdown extends React.Component {
           <Link
             key="duplicate"
             className="won-button--outlined thin red"
-            to={generateQueryString("/create", {
-              fromAtomUri: this.props.targetAtomUri,
-              mode: "DUPLICATE",
-            })}
+            to={location =>
+              generateLink(
+                location,
+                {
+                  fromAtomUri: this.props.targetAtomUri,
+                  mode: "DUPLICATE",
+                },
+                "/create"
+              )
+            }
           >
             Post this too!
           </Link>
@@ -164,10 +169,16 @@ class WonConnectionContextDropdown extends React.Component {
           <Link
             key="edit"
             className="won-button--outlined thin red"
-            to={generateQueryString("/create", {
-              fromAtomUri: this.props.targetAtomUri,
-              mode: "EDIT",
-            })}
+            to={location =>
+              generateLink(
+                location,
+                {
+                  fromAtomUri: this.props.targetAtomUri,
+                  mode: "EDIT",
+                },
+                "/create"
+              )
+            }
           >
             Edit
           </Link>
@@ -255,7 +266,7 @@ class WonConnectionContextDropdown extends React.Component {
           callback: () => {
             this.props.connectionClose(this.props.connectionUri);
             this.props.history.push(
-              generateQueryString(getPathname(this.props.history.location), {
+              generateLink(this.props.history.location, {
                 useCase: undefined,
                 connectionUri: undefined,
               })
@@ -276,9 +287,13 @@ class WonConnectionContextDropdown extends React.Component {
 
   goToPost(postUri) {
     this.props.history.push(
-      generateQueryString("/post", {
-        postUri: postUri,
-      })
+      generateLink(
+        this.props.history.location,
+        {
+          postUri: postUri,
+        },
+        "/post"
+      )
     );
   }
 

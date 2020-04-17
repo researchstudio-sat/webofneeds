@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
+import { withRouter } from "react-router-dom";
 import { get } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
@@ -50,4 +51,4 @@ PageSettings.propTypes = {
   showSlideIns: PropTypes.bool,
 };
 
-export default connect(mapStateToProps)(PageSettings);
+export default withRouter(connect(mapStateToProps)(PageSettings));

@@ -55,17 +55,19 @@ won-account-menu {
         white-space: nowrap;
         overflow: hidden;
       }
-      button {
+      button,
+      a {
         width: 100%;
       }
-      button.wlim__button--signup {
+      a.wlim__button--signup {
         margin-bottom: 0.5rem;
       }
     }
     > won-login-form {
       display: block;
 
-      button {
+      button,
+      a {
         width: 100%;
       }
     }

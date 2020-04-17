@@ -44,6 +44,7 @@ a.won-atom-connections-indicator {
       grid-area: topline;
       min-width: 0;
       &__title {
+        color: $won-primary-text-color;
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;

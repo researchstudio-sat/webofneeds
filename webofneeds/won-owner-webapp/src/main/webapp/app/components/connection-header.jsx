@@ -7,7 +7,7 @@ import WonGroupIcon from "./group-icon.jsx";
 import WonConnectionState from "./connection-state.jsx";
 import PropTypes from "prop-types";
 import VisibilitySensor from "react-visibility-sensor";
-import { get, getIn, generateQueryString } from "../utils.js";
+import { get, getIn, generateLink } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
 import { labels, relativeTime } from "../won-label-utils.js";
@@ -387,7 +387,11 @@ class WonConnectionHeader extends React.Component {
   selectMembersTab() {
     this.props.selectTab(this.props.targetAtomUri, "PARTICIPANTS");
     this.props.history.push(
-      generateQueryString("/post", { postUri: this.props.targetAtomUri })
+      generateLink(
+        this.props.history.location,
+        { postUri: this.props.targetAtomUri },
+        "/post"
+      )
     );
   }
 

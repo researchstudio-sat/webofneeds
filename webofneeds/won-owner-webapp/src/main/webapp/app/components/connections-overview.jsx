@@ -8,7 +8,7 @@ import {
   getIn,
   sortByDate,
   getQueryParams,
-  generateQueryString,
+  generateLink,
 } from "../utils.js";
 import * as processUtils from "../redux/utils/process-utils";
 import * as atomUtils from "../redux/utils/atom-utils.js";
@@ -20,7 +20,6 @@ import WonAtomHeader from "./atom-header.jsx";
 import "~/style/_connections-overview.scss";
 import PropTypes from "prop-types";
 import { withRouter } from "react-router-dom";
-import { getPathname } from "../utils";
 
 const mapStateToProps = (state, ownProps) => {
   const allAtoms = generalSelectors.getAtoms(state);
@@ -131,7 +130,9 @@ class WonConnectionsOverview extends React.Component {
 
   showAtomTab(atomUri, tab = "DETAIL") {
     this.props.selectTab(atomUri, tab);
-    this.props.history.push(generateQueryString("/post", { postUri: atomUri }));
+    this.props.history.push(
+      generateLink(this.props.history.location, { postUri: atomUri }, "/post")
+    );
   }
 
   isConnectionUnread(atomUri, connUri) {
@@ -146,7 +147,7 @@ class WonConnectionsOverview extends React.Component {
   selectConnection(connectionUri) {
     this.markAsRead(connectionUri);
     this.props.history.push(
-      generateQueryString(getPathname(this.props.history.location), {
+      generateLink(this.props.history.location, {
         connectionUri: connectionUri,
       })
     );

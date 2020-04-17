@@ -5,7 +5,7 @@ import React from "react";
 import Immutable from "immutable";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { get, getIn, generateQueryString } from "../../utils.js";
+import { get, getIn, generateLink } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 
@@ -100,7 +100,11 @@ class WonPersonaCard extends React.Component {
     } else {
       this.props.selectAtomTab(this.props.atomUri, "DETAIL");
       this.props.history.push(
-        generateQueryString("/post", { postUri: this.props.atomUri })
+        generateLink(
+          this.props.history.location,
+          { postUri: this.props.atomUri },
+          "/post"
+        )
       );
     }
   }

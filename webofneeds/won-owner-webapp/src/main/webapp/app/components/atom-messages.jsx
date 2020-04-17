@@ -12,13 +12,7 @@ import {
   getProposalMessagesByConnectionUri,
   getUnreadMessagesByConnectionUri,
 } from "../redux/selectors/message-selectors";
-import {
-  generateQueryString,
-  get,
-  getIn,
-  getPathname,
-  getQueryParams,
-} from "../utils";
+import { get, getIn, generateLink, getQueryParams } from "../utils";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import won from "../won-es6.js";
@@ -928,7 +922,7 @@ class AtomMessages extends React.Component {
       this.props.history.goBack();
     } else {
       this.props.history.push(
-        generateQueryString(getPathname(this.props.history.location), {
+        generateLink(this.props.history.location, {
           connectionUri: this.props.selectedConnectionUri,
         })
       );
@@ -948,7 +942,7 @@ class AtomMessages extends React.Component {
       this.props.history.goBack();
     } else {
       this.props.history.push(
-        generateQueryString(getPathname(this.props.history.location), {
+        generateLink(this.props.history.location, {
           connectionUri: undefined,
         })
       );

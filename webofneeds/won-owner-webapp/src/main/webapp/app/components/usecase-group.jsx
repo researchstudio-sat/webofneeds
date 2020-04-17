@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import * as useCaseUtils from "../usecase-utils.js";
 
 import "~/style/_usecase-group.scss";
-import { getIn, getQueryParams } from "../utils";
+import { getIn, getQueryParams, generateLink } from "../utils";
 import { Link, withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
@@ -96,13 +96,9 @@ class WonUsecasePicker extends React.Component {
 
     if (subItemIdentifier) {
       if (useCaseUtils.isUseCaseGroup(subItem)) {
-        return `${location.pathname}?useCaseGroup=${encodeURIComponent(
-          subItemIdentifier
-        )}`;
+        return generateLink(location, { useCaseGroup: subItemIdentifier });
       } else {
-        return `${location.pathname}?useCase=${encodeURIComponent(
-          subItemIdentifier
-        )}`;
+        return generateLink(location, { useCase: subItemIdentifier });
       }
     } else {
       console.warn("No identifier found for given usecase, ", subItem);

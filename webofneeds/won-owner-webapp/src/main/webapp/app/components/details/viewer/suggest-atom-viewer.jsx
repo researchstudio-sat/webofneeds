@@ -5,13 +5,12 @@ import WonAtomCard from "../../atom-card.jsx";
 import { connect } from "react-redux";
 import * as generalSelectors from "../../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../../redux/utils/atom-utils.js";
-import { get, getIn, getQueryParams } from "../../../utils.js";
+import { get, getIn, getQueryParams, generateLink } from "../../../utils.js";
 import { actionCreators } from "../../../actions/actions.js";
 
 import "~/style/_suggest-atom-viewer.scss";
 import * as processSelectors from "../../../redux/selectors/process-selectors";
 import { withRouter, Link } from "react-router-dom";
-import { generateQueryString, getPathname } from "../../../utils";
 
 const mapStateToProps = (state, ownProps) => {
   const { connectionUri } = getQueryParams(ownProps.location);
@@ -179,7 +178,7 @@ class WonSuggestAtomViewer extends React.Component {
                   <Link
                     className="suggestatomv__content__post__actions__button won-button--outlined thin red"
                     to={location =>
-                      generateQueryString(getPathname(location), {
+                      generateLink(location, {
                         connectionUri: this.props.establishedConnectionUri,
                       })
                     }

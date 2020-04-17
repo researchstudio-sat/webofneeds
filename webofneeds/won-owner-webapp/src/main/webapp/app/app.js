@@ -14,57 +14,44 @@ import "../style/won.scss";
 import React from "react";
 import ReactDOM from "react-dom";
 import { applyMiddleware, createStore } from "redux";
+import { composeWithDevTools } from "redux-devtools-extension";
 import { HashRouter, Switch, Route } from "react-router-dom";
 import "whatwg-fetch"; //polyfill for window.fetch (for backward-compatibility with older browsers)
 import "redux";
-// import { delay } from "./utils.js";
+
 //---------- Config -----------
 // import {
 //   configRouting,
 //   runAccessControl,
 //   registerEmailVerificationTrigger,
 // } from "./configRouting.js";
-// import configRedux from "./configRedux.js";
 // //--------- Actions -----------
 import { actionCreators } from "./actions/actions.js";
 
 //won import (used so you can access the debugmode variable without reloading the page)
 import won from "./service/won.js";
-
 import { enableNotifications } from "../config/default";
-
+import PageInventory from "./pages/react/inventory";
+import PageSignUp from "./pages/react/signup";
+import PageAbout from "./pages/react/about";
+import PageMap from "./pages/react/map";
+import PageCreate from "./pages/react/create";
+import PageConnections from "./pages/react/connections";
+import PageOverview from "./pages/react/overview";
+import PagePost from "./pages/react/post";
+import PageSettings from "./pages/react/settings";
+import { Provider } from "react-redux";
+import reducer from "./reducers/reducers.js";
+import thunk from "redux-thunk";
+import { piwikMiddleware } from "./piwik.js";
+import { runMessagingAgent } from "./messaging-agent";
+import Immutable from "immutable";
+// import { runPushAgent } from "./push-agent";
 // import PropTypes from "prop-types";
+
 console.log(svgs);
 
 window.won = won;
-
-/*let app = angular.module("won.owner", [
-  /* to enable legacy $stateChange* events in ui-router (see
-     * here for details: https://ui-router.github.io/guide/ng1/migrate-to-1_0#state-change-events)
-     */
-// "ui.router.state.events",
-// "hc.marked",
-// ngReduxModule,
-// uiRouterModule,
-// ngReduxRouterModule,
-//
-// //components
-// preactModule,
-
-//views
-// connectionsComponent.module,
-// overviewComponent.module,
-// mapComponent.module,
-// postComponent.module,
-// aboutComponent.module,
-// signupComponent.module,
-// settingsComponent.module,
-// inventoryComponent.module,
-// createComponent.module,
-//]);
-
-/* create store, register middlewares, set up redux-devtool-support, etc */
-//configRedux(app);
 
 /*app.config(configRouting).config([
   "$compileProvider",
@@ -109,25 +96,22 @@ window.won = won;
   },
 ]);*/
 
-import PageInventory from "./pages/react/inventory";
-import PageSignUp from "./pages/react/signup";
-import PageAbout from "./pages/react/about";
-import PageMap from "./pages/react/map";
-import PageCreate from "./pages/react/create";
-import PageConnections from "./pages/react/connections";
-import PageOverview from "./pages/react/overview";
-import PagePost from "./pages/react/post";
-import PageSettings from "./pages/react/settings";
-import { Provider } from "react-redux";
-import reducer from "./reducers/reducers.js";
-import thunk from "redux-thunk";
-import { piwikMiddleware } from "./piwik.js";
-import { runMessagingAgent } from "./messaging-agent";
-// import { runPushAgent } from "./push-agent";
+/*
+* store enhancer that allows using the redux-devtools
+* see https://github.com/zalmoxisus/redux-devtools-extension and
+* https://www.npmjs.com/package/ng-redux#using-devtools for details.
+*/
+const composeEnhancers = composeWithDevTools({
+  trace: true,
+  traceLimit: 10,
+  serialize: {
+    immutable: Immutable,
+  },
+});
 
 export const store = createStore(
   reducer,
-  applyMiddleware(thunk, piwikMiddleware)
+  composeEnhancers(applyMiddleware(thunk, piwikMiddleware))
 );
 
 window.store4dbg = store;
@@ -152,6 +136,7 @@ if (enableNotifications) {
 //check login status. TODO: this should actually be baked-in data (to avoid the extra roundtrip)
 //app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.verifyLogin())]); //FIXME: SEEMS LIKE THE verifyLogin function doesnt even exist anymore
 
+// import { delay } from "./utils.js";
 /*app.run([
   "$ngRedux",
   "$state",

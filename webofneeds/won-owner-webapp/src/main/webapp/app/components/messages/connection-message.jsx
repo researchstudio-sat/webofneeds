@@ -4,7 +4,7 @@ import urljoin from "url-join";
 import PropTypes from "prop-types";
 import * as messageUtils from "../../redux/utils/message-utils.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
-import { get, getIn, generateQueryString } from "../../utils.js";
+import { get, getIn, generateLink } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { connect } from "react-redux";
 import { getOwnedAtomByConnectionUri } from "../../redux/selectors/general-selectors.js";
@@ -187,9 +187,11 @@ class WonConnectionMessage extends React.Component {
               !this.props.onClick
                 ? () => {
                     this.props.history.push(
-                      generateQueryString("/post", {
-                        postUri: get(this.props.theirAtom, "uri"),
-                      })
+                      generateLink(
+                        this.props.history.location,
+                        { postUri: get(this.props.theirAtom, "uri") },
+                        "/post"
+                      )
                     );
                   }
                 : undefined
@@ -211,9 +213,11 @@ class WonConnectionMessage extends React.Component {
               !this.props.onClick
                 ? () => {
                     this.props.history.push(
-                      generateQueryString("/post", {
-                        postUri: this.props.originatorUri,
-                      })
+                      generateLink(
+                        this.props.history.location,
+                        { postUri: this.props.originatorUri },
+                        "/post"
+                      )
                     );
                   }
                 : undefined

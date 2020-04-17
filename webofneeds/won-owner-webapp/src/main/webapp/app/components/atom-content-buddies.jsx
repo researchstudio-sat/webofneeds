@@ -2,9 +2,10 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import { get, getIn, generateQueryString } from "../utils.js";
+import { get, getIn, generateLink } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
+import { withRouter } from "react-router-dom";
 import * as atomUtils from "../redux/utils/atom-utils";
 import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as connectionSelectors from "../redux/selectors/connection-selectors";
@@ -272,9 +273,13 @@ class WonAtomContentBuddies extends React.Component {
                     atomUri={get(conn, "targetAtomUri")}
                     onClick={() =>
                       this.props.history.push(
-                        generateQueryString("/post", {
-                          postUri: get(conn, "targetAtomUri"),
-                        })
+                        generateLink(
+                          this.props.history.location,
+                          {
+                            postUri: get(conn, "targetAtomUri"),
+                          },
+                          "/post"
+                        )
                       )
                     }
                   />
@@ -322,9 +327,11 @@ class WonAtomContentBuddies extends React.Component {
                 atomUri={memberUri}
                 onClick={() =>
                   this.props.history.push(
-                    generateQueryString("/post", {
-                      postUri: memberUri,
-                    })
+                    generateLink(
+                      this.props.history.location,
+                      { postUri: memberUri },
+                      "/post"
+                    )
                   )
                 }
               />
@@ -461,9 +468,11 @@ class WonAtomContentBuddies extends React.Component {
           connectionUtils.isRequestReceived(chatConnection)
         ) {
           this.props.history.push(
-            generateQueryString("/connections", {
-              connectionUri: chatConnectionUri,
-            })
+            generateLink(
+              this.props.history.location,
+              { connectionUri: chatConnectionUri },
+              "/connections"
+            )
           );
         }
       } else {
@@ -517,7 +526,9 @@ WonAtomContentBuddies.propTypes = {
   history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonAtomContentBuddies);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonAtomContentBuddies)
+);
