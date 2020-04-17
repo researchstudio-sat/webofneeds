@@ -85,7 +85,6 @@ public class AgreementProtocolState {
             boolean isProposal = false;
             if (!cancelled.isEmpty()) {
                 // remember this is a pending proposal that would cancel stuff
-                // uris.addPendingCancellationProposalUri(m.getMessageURI());
                 isProposal = true;
             }
             if (!proposed.isEmpty()) {
