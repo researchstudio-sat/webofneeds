@@ -5,7 +5,7 @@ import React from "react";
 import ElmComponent from "react-elm-components";
 import { ReactReduxContext } from "react-redux";
 import * as accountUtils from "../redux/utils/account-utils.js";
-import { get } from "../utils";
+import { get, getIn } from "../utils";
 import { Elm } from "../../elm/Settings.elm";
 
 import { currentSkin } from "../redux/selectors/general-selectors.js";
@@ -32,7 +32,7 @@ class WonSettingsWrapper extends React.Component {
 
   setupPorts(ports) {
     const getState = this.context.store.getState;
-    const connect = this.context.store.connect;
+    const subscribe = this.context.store.subscribe;
 
     //// set up listeners on out-ports
 
@@ -54,15 +54,16 @@ class WonSettingsWrapper extends React.Component {
 
     //// stream theme updates to the elm component
 
-    const selectSkinFromState = state => ({
-      skin: state.getIn(["config", "theme"]),
-    });
+    const selectSkinFromState = () => {
+      skinPseudoComponent();
+      return {
+        skin: getIn(getState(), ["config", "theme"]),
+      };
+    };
     const skinPseudoComponent = () => {
       ports.skin.send(currentSkin());
     };
-    const disconnectSkinPort = connect(selectSkinFromState)(
-      skinPseudoComponent
-    );
+    const disconnectSkinPort = subscribe(selectSkinFromState);
 
     //// attach ports reference to component for use elsewhere
 
