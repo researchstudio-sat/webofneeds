@@ -43,8 +43,8 @@ public class AgreementProtocolState {
     private final Dataset cancelledAgreements = DatasetFactory.createGeneral();
     private final Dataset rejected = DatasetFactory.createGeneral();
     private Dataset conversation = null;
-    private final Set<URI> retractedUris = new HashSet<URI>(); // TODO: Check!
-    private final Set<URI> acceptedCancellationProposalUris = new HashSet<URI>(); // TODO: Check!
+    private final Set<URI> retractedUris = new HashSet<URI>();
+    private final Set<URI> acceptedCancellationProposalUris = new HashSet<URI>();
     private Map<URI, ConversationMessage> messagesByURI = new HashMap<>();
     private Set<DeliveryChain> deliveryChains = new HashSet<>();
 
@@ -70,13 +70,14 @@ public class AgreementProtocolState {
         uris.addAcceptedCancellationProposalUris(getAcceptedCancellationProposalUris());
         uris.addCancelledAgreementUris(getCancelledAreementUris());
         // walk over pending proposals and collect the relevant uris:
+        // TODO: Calculate all proposals directly from the pendingProposals Dataset and
+        // not again from all messages
         messagesByURI.values().stream().filter(m -> isPendingProposal(m.getMessageURI())).forEach(m -> {
             // so this is a pending proposal.
             // determine what it would cancel
             Set<URI> cancelled = m.getEffects().stream().filter(e -> e.isProposes()).map(e -> e.asProposes())
                             .flatMap(e -> e.getProposesToCancel().stream()).filter(this::isAgreement)
                             .collect(Collectors.toSet());
-            // TODO
             uris.addCancellationPendingAgreementUris(cancelled);
             // determine what it proposes
             Set<URI> proposed = m.getEffects().stream().filter(e -> e.isProposes()).map(e -> e.asProposes())
@@ -89,7 +90,6 @@ public class AgreementProtocolState {
             }
             if (!proposed.isEmpty()) {
                 // remember this is a pending proposal that proposes stuff
-                // TODO
                 uris.addPendingProposalUri(m.getMessageURI());
                 isProposal = true;
             }
@@ -98,7 +98,6 @@ public class AgreementProtocolState {
                 ProposalUris proposal = new ProposalUris(m.getMessageURI(), m.getSenderAtomURI());
                 proposal.addProposes(proposed);
                 proposal.addProposesToCancel(cancelled);
-                // TODO
                 uris.addPendingProposal(proposal);
             }
         });
