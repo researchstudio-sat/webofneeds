@@ -15,7 +15,7 @@ import WonLabelledHr from "../../components/labelled-hr.jsx";
 import "~/style/_signup.scss";
 import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.svg";
 import { actionCreators } from "../../actions/actions";
-import { Link } from "react-router-dom";
+import { Link, Redirect, withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const accountState = get(state, "account");
@@ -83,7 +83,9 @@ class PageSignUp extends React.Component {
   }
 
   render() {
-    return (
+    return this.props.isLoggedIn && !this.props.isAnonymous ? (
+      <Redirect to="/" />
+    ) : (
       <section className={!this.props.isLoggedIn ? "won-signed-out" : ""}>
         {this.props.showModalDialog && <WonModalDialog />}
         <WonTopnav pageTitle="Sign Up" />
@@ -322,7 +324,9 @@ PageSignUp.propTypes = {
   clearRegisterError: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(PageSignUp);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(PageSignUp)
+);

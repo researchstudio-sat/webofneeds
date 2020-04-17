@@ -218,13 +218,6 @@ export function getOwnedAtomByConnectionUri(state, connectionUri) {
   );
 }
 
-export const getCurrentParamsFromRoute = createSelector(
-  state => state,
-  state => {
-    return getIn(state, ["router", "currentParams"]);
-  }
-);
-
 export const getOwnedPersonas = createSelector(
   getOwnedAtoms,
   ownedAtoms =>

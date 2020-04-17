@@ -16,6 +16,22 @@ export function getPathname(location) {
   return location && location.pathname;
 }
 
+/*
+Currently Used/possible Parameters:
+  {
+    connectionUri: undefined,
+    viewConnUri: undefined,
+    postUri: undefined,
+    useCase: undefined,
+    useCaseGroup: undefined,
+    token: undefined,
+    privateId: undefined,
+    fromAtomUri: undefined,
+    senderSocketType: undefined,
+    targetSocketType: undefined,
+    mode: undefined,
+  }
+*/
 export function getQueryParams(location) {
   let pairs = location.search.slice(1).split("&");
 

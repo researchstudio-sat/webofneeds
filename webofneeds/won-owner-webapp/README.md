@@ -57,25 +57,11 @@ Once a refined/stable boilerplate version has emerged, it should be documented h
 
 ## Routing
 
-We use [ui-router](https://github.com/angular-ui/ui-router/wiki/Quick-Reference) and in particular the [redux-wrapper for it](https://github.com/neilff/redux-ui-router)
+We use [react-router](https://reacttraining.com/react-router/)
 
-Routing(-states, aka URLs) are configured in `configRouting.js`.
-State changes can be triggered via `actionCreators.router__stateGo(stateName)`.
+Routing(-states, aka URLs) are configured in `app.js`.
+State changes can be triggered via `<Link to=... />` or programmatically with `this.props.history.push(...)` within components that wrap the `withRouter` function around the component.
 The current routing-state and -parameters can be found in our app-state:
-
-```javascript
-$ngRedux.getState().get("router");
-/* =>
-{
- currentParams: {...},
- currentState: {...},
- prevParams: {...},
- prevState: {...}
-}
-*/
-```
-
-Also see: [Routing and Redux](https://github.com/researchstudio-sat/webofneeds/issues/344)
 
 ## State Structure
 
@@ -207,12 +193,6 @@ $ngRedux.getState();
        seeks: {...}
    },
    ...
- },
- router: {
-   currentParams: {...},
-   currentState: {...},
-   prevParams: {...},
-   prevState: {...}
  },
  toasts: {...},
  account: {

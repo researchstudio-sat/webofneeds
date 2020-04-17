@@ -19,12 +19,6 @@ import { HashRouter, Switch, Route } from "react-router-dom";
 import "whatwg-fetch"; //polyfill for window.fetch (for backward-compatibility with older browsers)
 import "redux";
 
-//---------- Config -----------
-// import {
-//   configRouting,
-//   runAccessControl,
-//   registerEmailVerificationTrigger,
-// } from "./configRouting.js";
 // //--------- Actions -----------
 import { actionCreators } from "./actions/actions.js";
 
@@ -53,7 +47,7 @@ console.log(svgs);
 
 window.won = won;
 
-/*app.config(configRouting).config([
+/*app.config([
   "$compileProvider",
   "markedProvider",
   function($compileProvider, markedProvider) {
@@ -129,28 +123,39 @@ if (enableNotifications) {
   // runPushAgent(store); // TODO: runPushAgent used to get $ngRedux and ngRedux had a connect method attached -> not sure if that can be applied to the given store though
 }
 
-// app.run(runAccessControl);
+// app.run(registerEmailVerificationTrigger); -> should have triggered function below:
+/*
+function verifyEmailIfNecessary(toParams, fromParams, $ngRedux) {
+  const dispatch = $ngRedux.dispatch;
+  const state = $ngRedux.getState();
+  const accountState = get(state, "account");
+  const isEmailVerified = accountUtils.isEmailVerified(accountState);
+  const emailVerificationError = accountUtils.getEmailVerificationError(
+    accountState
+  );
 
-// app.run(registerEmailVerificationTrigger);
+  const previousToken = get(fromParams, "token");
+  const verificationToken = get(toParams, "token");
+  const tokenHasChanged =
+    verificationToken && previousToken !== verificationToken;
 
-//check login status. TODO: this should actually be baked-in data (to avoid the extra roundtrip)
-//app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.verifyLogin())]); //FIXME: SEEMS LIKE THE verifyLogin function doesnt even exist anymore
+  const verificationNeeded = !(isEmailVerified || emailVerificationError);
 
-// import { delay } from "./utils.js";
-/*app.run([
-  "$ngRedux",
-  "$state",
-  "$urlRouter",
-  ($ngRedux, $uiRouterState, $urlRouter) => {
-    $urlRouter.sync();
-    delay(0).then(() => {
-      //to make sure the the route is synchronised and in the state.
-      $ngRedux.dispatch(actionCreators.initialPageLoad());
-    });
-  },
-]);*/
-// TODO: ALLOW EVERY PAGE TO BE ACCESSED WITHOUT A USER EXCEPT SETTINGS
-// TODO: SIGNUP SHOULD REDIRECT TO INVENTORY IF THERE IS A LOGGED IN USER THAT IS NOT A PRIVATE USER
+  const alreadyProcessing = getIn(state, [
+    "process",
+    "processingVerifyEmailAddress",
+  ]);
+  // const alreadyProcessing = processSelectors.isProcessingVerifyEmailAddress(
+  //   state
+  // );
+
+  if (tokenHasChanged && !alreadyProcessing && verificationNeeded) {
+    dispatch(actionCreators.account__verifyEmailAddress(verificationToken));
+  }
+}
+*/
+
+// Initiate the initial load
 store.dispatch(actionCreators.initialPageLoad());
 
 /*

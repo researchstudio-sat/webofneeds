@@ -9,7 +9,6 @@ import * as stateStore from "../redux/state-store.js";
 import * as wonUtils from "../won-utils.js";
 import * as ownerApi from "../api/owner-api.js";
 import { setDisclaimerAccepted } from "../won-localstorage.js";
-import { checkAccessToCurrentRoute } from "../configRouting.js";
 
 import { get } from "../utils.js";
 import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
@@ -50,7 +49,7 @@ let _loginInProcessFor;
  * @param redirectToFeed def. false, whether or not to redirect to the feed after signing in (needs `redirects` to be true)
  * @returns {Function}
  */
-export function accountLogin(credentials, redirectToFeed = false) {
+export function accountLogin(credentials) {
   return (dispatch, getState) => {
     const state = getState();
 
@@ -134,15 +133,6 @@ export function accountLogin(credentials, redirectToFeed = false) {
         })
       )
       .then(() => {
-        if (redirectToFeed) {
-          return dispatch(
-            actionCreators.router__stateGoResetParams("inventory")
-          );
-        }
-        return Promise.resolve();
-      })
-      .then(() => checkAccessToCurrentRoute(dispatch, getState))
-      .then(() => {
         _loginInProcessFor = undefined;
       });
   };
@@ -186,8 +176,7 @@ export function accountLogout(history) {
       .then(() => {
         _logoutInProcess = false;
       })
-      .then(() => dispatch({ type: actionTypes.account.logoutFinished }))
-      .then(() => checkAccessToCurrentRoute(dispatch, getState));
+      .then(() => dispatch({ type: actionTypes.account.logoutFinished }));
   };
 }
 
@@ -199,7 +188,7 @@ export function accountRegister(credentials) {
   return (dispatch, getState) =>
     ownerApi
       .registerAccount(credentials)
-      .then(() => accountLogin(credentials, true)(dispatch, getState))
+      .then(() => accountLogin(credentials)(dispatch, getState))
       .catch(error => {
         //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
         const registerError =
@@ -222,7 +211,7 @@ export function accountTransfer(credentials) {
       .transferPrivateAccount(credentials)
       .then(() => {
         credentials.privateId = undefined;
-        return accountLogin(credentials, true)(dispatch, getState);
+        return accountLogin(credentials)(dispatch, getState);
       })
       .catch(error => {
         //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.

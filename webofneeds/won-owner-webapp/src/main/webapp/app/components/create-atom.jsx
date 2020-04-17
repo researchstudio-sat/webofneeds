@@ -198,7 +198,8 @@ const mapDispatchToProps = dispatch => {
       draft,
       persona,
       connectToSocketType,
-      atomDraftSocketType
+      atomDraftSocketType,
+      history
     ) => {
       dispatch(
         actionCreators.connections__connectReactionAtom(
@@ -206,7 +207,8 @@ const mapDispatchToProps = dispatch => {
           draft,
           persona,
           connectToSocketType,
-          atomDraftSocketType
+          atomDraftSocketType,
+          history
         )
       );
     },
@@ -509,7 +511,8 @@ class CreateAtom extends React.Component {
             tempDraft,
             personaId,
             tempConnectToSocketType,
-            tempAtomDraftSocketType
+            tempAtomDraftSocketType,
+            this.props.history
           );
           this.props.history.push("/connections");
         } else {
@@ -522,7 +525,8 @@ class CreateAtom extends React.Component {
                   tempDraft,
                   personaId,
                   tempConnectToSocketType,
-                  tempAtomDraftSocketType
+                  tempAtomDraftSocketType,
+                  this.props.history
                 );
                 this.props.history.push("/connections");
               },
