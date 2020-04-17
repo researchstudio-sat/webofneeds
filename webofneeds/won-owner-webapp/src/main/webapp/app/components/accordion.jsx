@@ -38,6 +38,7 @@ export default class WonAccordion extends React.Component {
                 <ReactMarkdown
                   className="detail markdown"
                   source={item.detail}
+                  linkTarget="_blank"
                 />
               </React.Fragment>
             )}

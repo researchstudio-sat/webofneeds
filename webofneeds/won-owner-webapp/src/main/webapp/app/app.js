@@ -55,49 +55,6 @@ console.log(svgs);
 
 window.won = won;
 
-/*app.config([
-  "$compileProvider",
-  "markedProvider",
-  function($compileProvider, markedProvider) {
-    const urlSanitizationRegex = /^\s*(https?|ftp|mailto|tel|file|blob|data):/;
-
-    $compileProvider.aHrefSanitizationWhitelist(urlSanitizationRegex);
-    markedProvider.setOptions({ sanitize: true });
-    //removed this codesnippet due to problems with link rendering -> xss vulnerability
-    markedProvider.setRenderer({
-      link: function(href, title, text) {
-        if (urlSanitizationRegex.test(href)) {
-          if (text === href) {
-            return (
-              '<a href="' +
-              href +
-              '"' +
-              (title ? ' title="' + title + '"' : "") +
-              ' target="_blank" rel="noopener noreferrer">' +
-              text +
-              "</a>"
-            );
-          } else {
-            return (
-              "[" +
-              text +
-              '](<a href="' +
-              href +
-              '"' +
-              (title ? ' title="' + title + '"' : "") +
-              ' target="_blank" rel="noopener noreferrer">' +
-              href +
-              "</a>)"
-            );
-          }
-        } else {
-          return text;
-        }
-      },
-    });
-  },
-]);*/
-
 /*
 * store enhancer that allows using the redux-devtools
 * see https://github.com/zalmoxisus/redux-devtools-extension and

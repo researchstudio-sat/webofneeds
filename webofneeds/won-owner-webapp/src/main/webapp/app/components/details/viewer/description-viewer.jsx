@@ -22,7 +22,11 @@ export default class WonDescriptionViewer extends React.Component {
           {icon}
           {label}
         </div>
-        <ReactMarkdown className="markdown" source={this.props.content} />
+        <ReactMarkdown
+          className="markdown"
+          source={this.props.content}
+          linkTarget="_blank"
+        />
       </won-description-viewer>
     );
   }

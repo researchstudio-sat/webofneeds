@@ -39,6 +39,7 @@ export default class WonDescriptionPicker extends React.Component {
           <ReactMarkdown
             className="dp__preview__content markdown"
             source={this.state.value}
+            linkTarget="_blank"
           />
         ) : (
           <div className="dp__preview__content--empty">
