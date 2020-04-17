@@ -15,7 +15,13 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { applyMiddleware, createStore } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
-import { HashRouter, Switch, Route } from "react-router-dom";
+import {
+  HashRouter,
+  Switch,
+  Route,
+  useLocation,
+  Redirect,
+} from "react-router-dom";
 import "whatwg-fetch"; //polyfill for window.fetch (for backward-compatibility with older browsers)
 import "redux";
 
@@ -34,14 +40,16 @@ import PageConnections from "./pages/react/connections";
 import PageOverview from "./pages/react/overview";
 import PagePost from "./pages/react/post";
 import PageSettings from "./pages/react/settings";
-import { Provider } from "react-redux";
+import { Provider, useSelector, useDispatch } from "react-redux";
 import reducer from "./reducers/reducers.js";
 import thunk from "redux-thunk";
 import { piwikMiddleware } from "./piwik.js";
 import { runMessagingAgent } from "./messaging-agent";
 import Immutable from "immutable";
-// import { runPushAgent } from "./push-agent";
-// import PropTypes from "prop-types";
+import { getQueryParams, get } from "./utils.js";
+import * as accountUtils from "./redux/utils/account-utils.js";
+import * as processUtils from "./redux/utils/process-utils.js";
+import { runPushAgent } from "./push-agent";
 
 console.log(svgs);
 
@@ -103,6 +111,7 @@ const composeEnhancers = composeWithDevTools({
   },
 });
 
+console.debug("create reduxStore");
 export const store = createStore(
   reducer,
   composeEnhancers(applyMiddleware(thunk, piwikMiddleware))
@@ -110,50 +119,17 @@ export const store = createStore(
 
 window.store4dbg = store;
 
-export const states = [];
-
 // Initialize Configuration (set IconColors, imprint etc.)
+console.debug("dispatch config__init");
 store.dispatch(actionCreators.config__init());
 
-// app.run(["$ngRedux", $ngRedux => runMessagingAgent($ngRedux)]);
+console.debug("runMessagingAgent");
 runMessagingAgent(store);
 
 if (enableNotifications) {
-  //app.run(["$ngRedux", $ngRedux => runPushAgent($ngRedux)]);
-  // runPushAgent(store); // TODO: runPushAgent used to get $ngRedux and ngRedux had a connect method attached -> not sure if that can be applied to the given store though
+  console.debug("runPushAgent");
+  runPushAgent(store); // TODO: runPushAgent used to get $ngRedux and ngRedux had a connect method attached -> not sure if that can be applied to the given store though
 }
-
-// app.run(registerEmailVerificationTrigger); -> should have triggered function below:
-/*
-function verifyEmailIfNecessary(toParams, fromParams, $ngRedux) {
-  const dispatch = $ngRedux.dispatch;
-  const state = $ngRedux.getState();
-  const accountState = get(state, "account");
-  const isEmailVerified = accountUtils.isEmailVerified(accountState);
-  const emailVerificationError = accountUtils.getEmailVerificationError(
-    accountState
-  );
-
-  const previousToken = get(fromParams, "token");
-  const verificationToken = get(toParams, "token");
-  const tokenHasChanged =
-    verificationToken && previousToken !== verificationToken;
-
-  const verificationNeeded = !(isEmailVerified || emailVerificationError);
-
-  const alreadyProcessing = getIn(state, [
-    "process",
-    "processingVerifyEmailAddress",
-  ]);
-  // const alreadyProcessing = processSelectors.isProcessingVerifyEmailAddress(
-  //   state
-  // );
-
-  if (tokenHasChanged && !alreadyProcessing && verificationNeeded) {
-    dispatch(actionCreators.account__verifyEmailAddress(verificationToken));
-  }
-}
-*/
 
 // Initiate the initial load
 store.dispatch(actionCreators.initialPageLoad());
@@ -166,41 +142,73 @@ store.dispatch(actionCreators.initialPageLoad());
 //app.run(["$ngRedux", $ngRedux => $ngRedux.dispatch(actionCreators.tick())]);
 store.dispatch(actionCreators.tick());
 
+function AppRoutes() {
+  const dispatch = useDispatch();
+  const location = useLocation();
+  const accountState = useSelector(state => get(state, "account"));
+  const processState = useSelector(state => get(state, "process"));
+
+  const isLoggedIn = accountUtils.isLoggedIn(accountState);
+  const isAnonymous = accountUtils.isAnonymous(accountState);
+
+  const { postUri, token } = getQueryParams(location);
+
+  //******************************** EMAIL TOKEN VERIFICATION
+  const isEmailVerified = accountUtils.isEmailVerified(accountState);
+  const emailVerificationError = accountUtils.getEmailVerificationError(
+    accountState
+  );
+
+  const verificationNeeded = !(isEmailVerified || emailVerificationError);
+
+  const alreadyProcessing = processUtils.isProcessingVerifyEmailAddress(
+    processState
+  );
+
+  if (token && !alreadyProcessing && verificationNeeded) {
+    console.debug("Dispatching account__verifyEmailAddress");
+    dispatch(actionCreators.account__verifyEmailAddress(token));
+  }
+  //********************************
+
+  return (
+    <Switch>
+      <Route exact path="/">
+        <PageInventory />
+      </Route>
+      <Route path="/create">
+        <PageCreate />
+      </Route>
+      <Route path="/signup">
+        {isLoggedIn && !isAnonymous ? <Redirect to="/" /> : <PageSignUp />}
+      </Route>
+      <Route path="/about">
+        <PageAbout />
+      </Route>
+      <Route path="/map">
+        <PageMap />
+      </Route>
+      <Route path="/inventory">
+        <PageInventory />
+      </Route>
+      <Route path="/connections">
+        <PageConnections />
+      </Route>
+      <Route path="/overview">
+        <PageOverview />
+      </Route>
+      <Route path="/post">{postUri ? <PagePost /> : <Redirect to="/" />}</Route>
+      <Route path="/settings">
+        {isLoggedIn ? <PageSettings /> : <Redirect to="/" />}
+      </Route>
+    </Switch>
+  );
+}
+
 ReactDOM.render(
   <Provider store={store}>
     <HashRouter hashType="hashbang">
-      <Switch>
-        <Route exact path="/">
-          <PageInventory />
-        </Route>
-        <Route path="/create">
-          <PageCreate />
-        </Route>
-        <Route path="/signup">
-          <PageSignUp />
-        </Route>
-        <Route path="/about">
-          <PageAbout />
-        </Route>
-        <Route path="/map">
-          <PageMap />
-        </Route>
-        <Route path="/inventory">
-          <PageInventory />
-        </Route>
-        <Route path="/connections">
-          <PageConnections />
-        </Route>
-        <Route path="/overview">
-          <PageOverview />
-        </Route>
-        <Route path="/post">
-          <PagePost />
-        </Route>
-        <Route path="/settings">
-          <PageSettings />
-        </Route>
-      </Switch>
+      <AppRoutes />
     </HashRouter>
   </Provider>,
   document.getElementById("root")

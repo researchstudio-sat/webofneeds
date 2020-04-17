@@ -20,7 +20,7 @@ import "~/style/_post.scss";
 import "~/style/_connection-overlay.scss";
 import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg";
-import { withRouter, Redirect } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const { viewConnUri, postUri } = getQueryParams(ownProps.location);
@@ -64,7 +64,7 @@ class PagePost extends React.Component {
   }
 
   render() {
-    return this.props.atomUri ? (
+    return (
       <section className={!this.props.isLoggedIn ? "won-signed-out" : ""}>
         {this.props.showModalDialog && <WonModalDialog />}
         {this.props.showConnectionOverlay && (
@@ -111,8 +111,6 @@ class PagePost extends React.Component {
         </main>
         <WonFooter />
       </section>
-    ) : (
-      <Redirect to="/" />
     );
   }
 
