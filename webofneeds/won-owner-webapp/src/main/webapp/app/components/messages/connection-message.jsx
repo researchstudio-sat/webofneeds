@@ -89,10 +89,20 @@ const mapStateToProps = (state, ownProps) => {
     isClaimed: messageUtils.isMessageClaimed(message),
     isProposed: messageUtils.isMessageProposed(message),
     isAccepted: messageUtils.isMessageAccepted(message),
+    isAgreed: messageUtils.isMessageAgreedOn(message),
     isRejected: messageUtils.isMessageRejected(message),
     isRetracted: messageUtils.isMessageRetracted(message),
     isCancellationPending: messageUtils.isMessageCancellationPending(message),
     isCancelled: messageUtils.isMessageCancelled(message),
+    isCollapsible:
+      messageUtils.isMessageClaimed(message) ||
+      messageUtils.isMessageProposed(message) ||
+      messageUtils.isMessageAccepted(message) ||
+      messageUtils.isMessageAgreedOn(message) ||
+      messageUtils.isMessageRejected(message) ||
+      messageUtils.isMessageRetracted(message) ||
+      messageUtils.isMessageCancellationPending(message) ||
+      messageUtils.isMessageCancelled(message),
     isProposable:
       connectionUtils.isConnected(connection) &&
       messageUtils.isMessageProposable(message),
@@ -103,6 +113,7 @@ const mapStateToProps = (state, ownProps) => {
     isRetractable: messageUtils.isMessageRetractable(message),
     isRejectable: messageUtils.isMessageRejectable(message),
     isAcceptable: messageUtils.isMessageAcceptable(message),
+    isAgreeable: messageUtils.isMessageAgreeable(message),
     isUnread: messageUtils.isMessageUnread(message),
     isInjectIntoMessage: injectInto && injectInto.size > 0,
     injectInto: injectInto,
@@ -231,7 +242,7 @@ class WonConnectionMessage extends React.Component {
         messageCenterContentElement = (
           <div
             className="won-cm__center__bubble__collapsed clickable"
-            onClick={() => this.expandMessage()}
+            onClick={() => this.expandMessage(false)}
           >
             {this.generateCollapsedLabel()}
           </div>
@@ -239,6 +250,16 @@ class WonConnectionMessage extends React.Component {
       } else {
         messageCenterContentElement = (
           <React.Fragment>
+            {this.props.isCollapsible ? (
+              <div
+                className="won-cm__center__bubble__collapsed clickable"
+                onClick={() => this.expandMessage(true)}
+              >
+                Click to collapse again
+              </div>
+            ) : (
+              undefined
+            )}
             <WonCombinedMessageContent
               messageUri={this.props.messageUri}
               connectionUri={this.props.connectionUri}
@@ -335,8 +356,10 @@ class WonConnectionMessage extends React.Component {
     this.props.isRejected && cssClassNames.push("won-is-rejected");
     this.props.isRetracted && cssClassNames.push("won-is-retracted");
     this.props.isAccepted && cssClassNames.push("won-is-accepted");
+    this.props.isAgreed && cssClassNames.push("won-is-agreed");
     this.props.isCancelled && cssClassNames.push("won-is-cancelled");
     this.props.isCollapsed && cssClassNames.push("won-is-collapsed");
+    this.props.isCollapsible && cssClassNames.push("won-is-collapsible");
     this.props.isChangeNotificationMessage &&
       cssClassNames.push("won-is-changeNotification");
     this.props.isCancellationPending &&
@@ -379,6 +402,7 @@ class WonConnectionMessage extends React.Component {
       if (this.props.isClaimed) label = "Message was claimed.";
       else if (this.props.isProposed) label = "Message was proposed.";
       else if (this.props.isAccepted) label = "Message was accepted.";
+      else if (this.props.isAgreed) label = "Message is part of an agreement";
       else if (this.props.isRejected) label = "Message was rejected.";
       else if (this.props.isRetracted) label = "Message was retracted.";
       else if (this.props.isCancellationPending)
@@ -392,6 +416,7 @@ class WonConnectionMessage extends React.Component {
   }
 
   isSelectable() {
+    //TODO: Not allowed for certain high-level protocol states
     if (this.props.message && this.props.multiSelectType) {
       switch (this.props.multiSelectType) {
         case "rejects":
@@ -411,17 +436,19 @@ class WonConnectionMessage extends React.Component {
     return false;
   }
 
-  expandMessage() {
+  expandMessage(expand) {
+    //TODO: Not allowed for certain high-level protocol states
     if (this.props.message && !this.props.multiSelectType) {
       this.props.messageMarkAsCollapsed(
         get(this.props.message, "uri"),
         this.props.connectionUri,
         get(this.props.ownedAtom, "uri"),
-        false
+        expand
       );
     }
   }
 
+  //TODO: Not allowed for certain high-level protocol states
   showActionButtons() {
     return (
       !this.props.groupChatMessage &&
@@ -468,6 +495,7 @@ WonConnectionMessage.propTypes = {
   isChangeNotificationMessage: PropTypes.bool,
   isSelected: PropTypes.bool,
   isCollapsed: PropTypes.bool,
+  isCollapsible: PropTypes.bool,
   showActions: PropTypes.bool,
   multiSelectType: PropTypes.string,
   shouldShowRdf: PropTypes.bool,
@@ -476,6 +504,7 @@ WonConnectionMessage.propTypes = {
   isClaimed: PropTypes.bool,
   isProposed: PropTypes.bool,
   isAccepted: PropTypes.bool,
+  isAgreed: PropTypes.bool,
   isRejected: PropTypes.bool,
   isRetracted: PropTypes.bool,
   isCancellationPending: PropTypes.bool,
@@ -486,6 +515,7 @@ WonConnectionMessage.propTypes = {
   isRetractable: PropTypes.bool,
   isRejectable: PropTypes.bool,
   isAcceptable: PropTypes.bool,
+  isAgreeable: PropTypes.bool,
   isUnread: PropTypes.bool,
   isInjectIntoMessage: PropTypes.bool,
   injectInto: PropTypes.object,

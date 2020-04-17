@@ -38,6 +38,8 @@ const mapStateToProps = (state, ownProps) => {
   const hasReferences = message && message.get("hasReferences");
   const references = message && message.get("references");
   const referencesProposes = references && references.get("proposes");
+  const referencesProposesToCancel =
+    references && references.get("proposesToCancel");
   const referencesClaims = references && references.get("claims");
 
   const allConnections = getOwnedConnections(state);
@@ -75,6 +77,8 @@ const mapStateToProps = (state, ownProps) => {
     hasReferences,
     hasClaims: referencesClaims && referencesClaims.size > 0,
     hasProposes: referencesProposes && referencesProposes.size > 0,
+    hasProposesToCancel:
+      referencesProposesToCancel && referencesProposesToCancel.size > 0,
     messageStatus: message && message.get("messageStatus"),
     isInjectIntoMessage: injectInto && injectInto.size > 0, //contains the targetConnectionUris
     originatorUri: message && message.get("originatorUri"),
@@ -222,6 +226,7 @@ class WonCombinedMessageContent extends React.Component {
   }
 
   getAgreementHeaderLabel() {
+    //TODO: integrate agreed message cases
     if (this.props.hasClaims && this.props.hasProposes) {
       if (this.props.messageStatus) {
         if (this.props.messageStatus.get("isCancelled"))

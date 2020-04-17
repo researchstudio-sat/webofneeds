@@ -41,6 +41,7 @@ work
 thumbs.db
 Thumbs.db
 bin/setenv.*
+.DS_Store
 
 #application specific
 /webofneeds/won-cryptography/keys.jks

@@ -9,7 +9,10 @@ public class AgreementProtocolUris {
     private Set<URI> retractedUris = new HashSet<URI>();
     private Set<URI> rejectedUris = new HashSet<URI>();
     private Set<URI> claimedUris = new HashSet<URI>();
+    private Set<URI> proposedUris = new HashSet<URI>();
+    private Set<URI> proposedToCancelUris = new HashSet<URI>();
     private Set<URI> agreementUris = new HashSet<URI>();
+    private Set<URI> agreedMessageUris = new HashSet<URI>();
     private Set<URI> pendingProposalUris = new HashSet<URI>();
     private Set<URI> cancelledAgreementUris = new HashSet<URI>();
     private Set<URI> cancellationPendingAgreementUris = new HashSet<URI>();
@@ -28,6 +31,22 @@ public class AgreementProtocolUris {
         this.rejectedUris.addAll(uris);
     }
 
+    public void addProposedMessageUris(Collection<URI> uris) {
+        this.proposedUris.addAll(uris);
+    }
+
+    public void addProposedMessageUri(URI uri) {
+        this.proposedUris.add(uri);
+    }
+
+    public void addProposedToCancelUris(Set<URI> uris) {
+        this.proposedToCancelUris.addAll(uris);
+    }
+
+    public void addProposedToCancelUri(URI uri) {
+        this.proposedToCancelUris.add(uri);
+    }
+
     public void addClaimedMessageUris(Collection<URI> uris) {
         this.claimedUris.addAll(uris);
     }
@@ -38,6 +57,14 @@ public class AgreementProtocolUris {
 
     public void addAgreementUris(Collection<URI> uris) {
         this.agreementUris.addAll(uris);
+    }
+
+    public void addAgreedMessageUris(Set<URI> agreedMessageUris) {
+        this.agreedMessageUris.addAll(agreedMessageUris);
+    }
+
+    public void addAgreedMessageUri(URI agreedMessageUri) {
+        this.agreedMessageUris.add(agreedMessageUri);
     }
 
     public void addPendingProposalUris(Collection<URI> uris) {
@@ -80,12 +107,24 @@ public class AgreementProtocolUris {
         return rejectedUris;
     }
 
+    public Set<URI> getProposedMessageUris() {
+        return proposedUris;
+    }
+
+    public Set<URI> getProposedToCancelUris() {
+        return proposedToCancelUris;
+    }
+
     public Set<URI> getClaimedMessageUris() {
         return claimedUris;
     }
 
     public Set<URI> getAgreementUris() {
         return agreementUris;
+    }
+
+    public Set<URI> getAgreedMessageUris() {
+        return agreedMessageUris;
     }
 
     public Set<URI> getPendingProposalUris() {
@@ -115,10 +154,11 @@ public class AgreementProtocolUris {
     @Override
     public String toString() {
         return "AgreementProtocolUris [retracted=" + retractedUris + ", rejected=" + rejectedUris + ", claimed="
-                        + claimedUris + ", agreements=" + agreementUris + ", pendingProposals=" + pendingProposalUris
+                        + claimedUris + ", agreements=" + agreementUris + ", agreedMessageUris=" + agreedMessageUris
+                        + ", pendingProposals=" + pendingProposalUris
                         + ", cancelledAgreements=" + cancelledAgreementUris + ", cancellationPendingAgreements="
                         + cancellationPendingAgreementUris + ", pendingCancellationProposals="
                         + pendingCancellationProposalUris + ", acceptedCancellationProposals="
-                        + acceptedCancellationProposalUris + "]";
+                        + acceptedCancellationProposalUris + ", proposedToCancelUris=" + proposedToCancelUris + "]";
     }
 }

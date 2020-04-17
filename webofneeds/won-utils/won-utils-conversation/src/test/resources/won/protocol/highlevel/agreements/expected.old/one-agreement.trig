@@ -1,0 +1,26 @@
+@prefix con:   <https://w3id.org/won/content#> .
+@prefix match:   <https://w3id.org/won/matching#> .
+@prefix msg:   <https://w3id.org/won/message#> .
+@prefix conn:  <https://localhost:8443/won/resource/connection/> .
+@prefix woncrypt: <https://w3id.org/won/core#> .
+@prefix atom:  <https://localhost:8443/won/resource/atom/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix cert:  <http://www.w3.org/ns/auth/cert#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix local: <https://localhost:8443/won/resource/> .
+@prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix s:     <http://schema.org/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix won:   <https://w3id.org/won/core#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+@prefix event: <https://localhost:8443/won/resource/event/> .
+@prefix sioc:  <http://rdfs.org/sioc/ns#> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+@prefix agr: <https://w3id.org/won/agreement#> .
+
+<https://localhost:8443/won/resource/event/557600936467257340> {
+    <https://localhost:8443/won/resource/event/5669098069340991000>	con:text	"one" .
+}
+
