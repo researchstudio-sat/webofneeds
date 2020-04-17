@@ -58,7 +58,7 @@ window.won = won;
 /*
 * store enhancer that allows using the redux-devtools
 * see https://github.com/zalmoxisus/redux-devtools-extension and
-* https://www.npmjs.com/package/ng-redux#using-devtools for details.
+* https://github.com/reduxjs/redux-devtools for details.
 */
 const composeEnhancers = composeWithDevTools({
   trace: true,
