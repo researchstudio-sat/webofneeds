@@ -90,7 +90,7 @@ class WonAtomIcon extends React.Component {
             "data:" +
             get(this.props.holderImage, "encodingFormat") +
             ";base64," +
-            get(this.props.holderImage.get, "encoding")
+            get(this.props.holderImage, "encoding")
           }
         />
       );
