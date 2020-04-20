@@ -273,7 +273,12 @@ export default class WonLocationPicker extends React.Component {
   }
 
   mapClicked({ latlng }) {
-    this.selectLocation({ ...latlng, name: `${latlng.lat}, ${latlng.lng}` });
+    this.selectLocation({
+      ...latlng,
+      name: `${latlng.lat}, ${latlng.lng}`,
+      nwCorner: latlng,
+      seCorner: latlng,
+    });
   }
 
   resetLocation(callback) {
