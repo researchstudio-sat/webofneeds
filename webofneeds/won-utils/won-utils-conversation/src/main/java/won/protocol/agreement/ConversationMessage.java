@@ -390,8 +390,50 @@ public class ConversationMessage implements Comparable<ConversationMessage> {
     }
 
     public boolean isAgreementProtocolMessage() {
-        return this.isRetractsMessage() || this.isProposesMessage() || this.isProposesToCancelMessage()
-                        || this.isAcceptsMessage() || this.isRejectsMessage() || this.isClaimsMessage();
+        boolean isAgreementProtocolMessage = this.isRetractsMessage() || this.isProposesMessage() ||
+                        this.isProposesToCancelMessage()
+                        || this.isAcceptsMessage() || this.isRejectsMessage() ||
+                        this.isClaimsMessage();
+        if (!isAgreementProtocolMessage) {
+            return false;
+        }
+        boolean intersection = intesectionOfAllSets();
+        if (!intersection && logger.isDebugEnabled()) {
+            logger.debug("Message {} contains multiple references for one message",
+                            new Object[] { this.getMessageURI() });
+        }
+        return intersection;
+    }
+
+    private boolean intesectionOfAllSets() {
+        Set<ConversationMessage> sumSet = new HashSet<ConversationMessage>();
+        int sumOfSets = this.retractsRefs.size() + this.acceptsRefs.size();
+        sumSet.addAll(this.retractsRefs);
+        sumSet.addAll(this.acceptsRefs);
+        if (sumOfSets != sumSet.size()) {
+            return false;
+        }
+        sumOfSets += this.proposesRefs.size();
+        sumSet.addAll(this.proposesRefs);
+        if (sumOfSets != sumSet.size()) {
+            return false;
+        }
+        sumOfSets += this.claimsRefs.size();
+        sumSet.addAll(this.claimsRefs);
+        if (sumOfSets != sumSet.size()) {
+            return false;
+        }
+        sumOfSets += this.rejectsRefs.size();
+        sumSet.addAll(this.rejectsRefs);
+        if (sumOfSets != sumSet.size()) {
+            return false;
+        }
+        sumOfSets += this.proposesToCancelInverseRefs.size();
+        sumSet.addAll(this.proposesToCancelInverseRefs);
+        if (sumOfSets != sumSet.size()) {
+            return false;
+        }
+        return true;
     }
 
     public boolean isFromOwner() {

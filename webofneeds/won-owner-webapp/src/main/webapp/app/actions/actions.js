@@ -212,6 +212,7 @@ const actionHierarchy = {
       markAsRetracted: messages.markAsRetracted,
       markAsRejected: messages.markAsRejected,
       markAsAccepted: messages.markAsAccepted,
+      markAsAgreed: messages.markAsAgreed,
       markAsCancelled: messages.markAsCancelled,
       markAsCancellationPending: messages.markAsCancellationPending,
     },
