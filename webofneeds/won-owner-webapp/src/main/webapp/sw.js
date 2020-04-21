@@ -75,7 +75,7 @@ async function openNotifiedPage(event) {
   });
   const targetUri =
     type === "HINT"
-      ? `${self.registration.scope}#!/post/?postUri=${atomUri}` // when deeplink works, append &viewConnUri=${connectionUri}` see https://github.com/researchstudio-sat/webofneeds/issues/2985
+      ? `${self.registration.scope}#!/post?postUri=${atomUri}` // when deeplink works, append &viewConnUri=${connectionUri}` see https://github.com/researchstudio-sat/webofneeds/issues/2985
       : `${
           self.registration.scope
         }#!/connections?connectionUri=${connectionUri}`;

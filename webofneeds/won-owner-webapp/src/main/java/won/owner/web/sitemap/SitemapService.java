@@ -32,7 +32,7 @@ public final class SitemapService {
     public String createSitemap() throws MalformedURLException {
         WebSitemapGenerator sitemap = new WebSitemapGenerator(uriService.getOwnerProtocolOwnerURI().toString());
         for (UserAtom atom : userAtomRepository.findAll()) {
-            sitemap.addUrl(uriService.getOwnerProtocolOwnerURI() + "/#!post/?postUri=" + atom.getUri());
+            sitemap.addUrl(uriService.getOwnerProtocolOwnerURI() + "/#!/post?postUri=" + atom.getUri());
         }
         return String.join("", sitemap.writeAsStrings());
     }
