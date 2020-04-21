@@ -26,28 +26,6 @@ import { actionCreators } from "../actions/actions";
 import { getQueryParams } from "../utils";
 import { withRouter } from "react-router-dom";
 
-//TODO: figure out setting initial draft
-//TODO: figure out initial load of atom
-
-/* old code:
-      this.$scope.$watch(
-        () => this.isFromAtomToLoad,
-        () => delay(0).then(() => this.ensureFromAtomIsLoaded())
-      );
-
-      this.$scope.$watch(
-        () => this.showCreateInput,
-        () => delay(0).then(() => this.loadInitialDraft())
-      );
-
-  //was called if "isFromAtomToLoad" was true
-  ensureFromAtomIsLoaded() {
-    if (this.props.isFromAtomToLoad) {
-      this.props.fetchUnloadedAtom(this.props.fromAtomUri);
-    }
-  }
- */
-
 const mapStateToProps = (state, ownProps) => {
   const {
     fromAtomUri,
@@ -130,6 +108,15 @@ const mapStateToProps = (state, ownProps) => {
       }
     }
   } else {
+    if (fromAtomUri) {
+      // necessary to push atom into the state otherwise a connectTo the fromAtomUri might not find the necessary socketUris for the atom
+      isFromAtomLoading = processSelectors.isAtomLoading(state, fromAtomUri);
+      isFromAtomToLoad = processSelectors.isAtomToLoad(state, fromAtomUri);
+      hasFromAtomFailedToLoad = processSelectors.hasAtomFailedToLoad(
+        state,
+        fromAtomUri
+      );
+    }
     useCaseObject = useCaseUtils.getUseCase(useCase);
   }
 
@@ -230,12 +217,23 @@ class CreateAtom extends React.Component {
     this.updateDraftSeeks = this.updateDraftSeeks.bind(this);
   }
 
-  componentDidMount() {
-    if (this.props.showCreateInput && this.props.useCase.draft) {
-      // deep clone of draft
+  componentDidUpdate(prevProps, prevState) {
+    // if createInput is shown and draftObject is still empty we initialize it
+    if (
+      this.props.showCreateInput &&
+      this.props.useCase.draft &&
+      Object.keys(prevState.draftObject).length === 0
+    ) {
+      console.debug("Setting initialDraft for create");
       this.setState({
         draftObject: JSON.parse(JSON.stringify(this.props.useCase.draft)),
       });
+    }
+
+    // if isFromAtomToLoad changes and is still true we fetch the atom into the state
+    if (this.props.isFromAtomToLoad) {
+      console.debug("Loading Atom with uri: ", this.props.fromAtomUri);
+      this.props.fetchUnloadedAtom(this.props.fromAtomUri);
     }
   }
 
