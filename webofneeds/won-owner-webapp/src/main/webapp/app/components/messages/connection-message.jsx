@@ -339,7 +339,6 @@ class WonConnectionMessage extends React.Component {
         </React.Fragment>
       );
     }
-    //!this.props.hasReferences || this.props.shouldShowRdf ?
     return (
       <won-connection-message
         class={this.generateParentCssClasses()}
