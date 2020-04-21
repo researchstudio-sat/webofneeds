@@ -125,7 +125,7 @@ won-connection-message {
   }
 
   &.won-is-retracted:not(.won-is-collapsed) {
-    opacity: 0.35;
+    opacity: 0.5;
     .won-cm__center__bubble {
       won-combined-message-content {
         text-decoration: line-through;
@@ -135,7 +135,7 @@ won-connection-message {
   }
 
   &.won-is-rejected:not(.won-is-collapsed) {
-    opacity: 0.35;
+    opacity: 0.5;
     .won-cm__center__bubble {
       won-combined-message-content {
         text-decoration: line-through;
