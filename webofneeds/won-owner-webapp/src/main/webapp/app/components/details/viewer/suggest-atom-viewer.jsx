@@ -5,14 +5,16 @@ import WonAtomCard from "../../atom-card.jsx";
 import { connect } from "react-redux";
 import * as generalSelectors from "../../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../../redux/utils/atom-utils.js";
-import { get, getIn } from "../../../utils.js";
+import { get, getIn, getQueryParams, generateLink } from "../../../utils.js";
 import { actionCreators } from "../../../actions/actions.js";
 
 import "~/style/_suggest-atom-viewer.scss";
 import * as processSelectors from "../../../redux/selectors/process-selectors";
+import { withRouter, Link } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
-  const openedConnectionUri = generalSelectors.getConnectionUriFromRoute(state);
+  const { connectionUri } = getQueryParams(ownProps.location);
+  const openedConnectionUri = connectionUri;
   const openedOwnPost =
     openedConnectionUri &&
     generalSelectors.getOwnedAtomByConnectionUri(state, openedConnectionUri);
@@ -109,9 +111,6 @@ const mapDispatchToProps = dispatch => {
         )
       );
     },
-    routerGoCurrent: props => {
-      dispatch(actionCreators.router__stateGoCurrent(props));
-    },
   };
 };
 
@@ -176,16 +175,16 @@ class WonSuggestAtomViewer extends React.Component {
                   undefined
                 )}
                 {this.props.hasConnectionBetweenPosts ? (
-                  <button
+                  <Link
                     className="suggestatomv__content__post__actions__button won-button--outlined thin red"
-                    onClick={() =>
-                      this.props.routerGoCurrent({
+                    to={location =>
+                      generateLink(location, {
                         connectionUri: this.props.establishedConnectionUri,
                       })
                     }
                   >
                     View Chat
-                  </button>
+                  </Link>
                 ) : (
                   undefined
                 )}
@@ -293,10 +292,11 @@ WonSuggestAtomViewer.propTypes = {
   multiSelectType: PropTypes.string,
   hasConnectionBetweenPosts: PropTypes.bool,
   establishedConnectionUri: PropTypes.string,
-  routerGoCurrent: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonSuggestAtomViewer);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonSuggestAtomViewer)
+);

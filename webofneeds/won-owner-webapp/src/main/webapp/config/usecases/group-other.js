@@ -7,10 +7,12 @@ import { contactPaymentBot } from "./uc-contact-payment-bot.js";
 
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 
+import ico36_plus from "../../images/won-icons/ico36_plus.svg";
+
 export const otherGroup = {
   identifier: "othergroup",
   label: "More...",
-  icon: "#ico36_plus",
+  icon: ico36_plus,
   subItems: {
     complain: complain,
     handleComplaint: handleComplaint,

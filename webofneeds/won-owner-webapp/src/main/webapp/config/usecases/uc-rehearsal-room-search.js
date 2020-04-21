@@ -16,11 +16,12 @@ import {
   sparqlQuery,
 } from "../../app/sparql-builder-utils.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
+import ico36_uc_realestate from "../../images/won-icons/ico36_uc_realestate.svg";
 
 export const rehearsalRoomSearch = {
   identifier: "rehearsalRoomSearch",
   label: "Find Rehearsal Room",
-  icon: "#ico36_uc_realestate",
+  icon: ico36_uc_realestate,
   timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 7,
   doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {

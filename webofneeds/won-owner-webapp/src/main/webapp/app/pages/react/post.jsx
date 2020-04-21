@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { actionCreators } from "../../actions/actions.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
-import { get, getIn } from "../../utils.js";
+import { get, getIn, getQueryParams } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import * as processUtils from "../../redux/utils/process-utils.js";
@@ -18,10 +18,13 @@ import WonFooter from "../../components/footer.jsx";
 
 import "~/style/_post.scss";
 import "~/style/_connection-overlay.scss";
+import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
+import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg";
+import { withRouter } from "react-router-dom";
 
-const mapStateToProps = state => {
-  const atomUri = generalSelectors.getPostUriFromRoute(state);
-  const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
+const mapStateToProps = (state, ownProps) => {
+  const { viewConnUri, postUri } = getQueryParams(ownProps.location);
+  const atomUri = postUri;
   const atom = getIn(state, ["atoms", atomUri]);
 
   const process = get(state, "process");
@@ -34,7 +37,7 @@ const mapStateToProps = state => {
     atom,
     atomTitle: get(atom, "humanReadable"),
     showSlideIns:
-      viewSelectors.hasSlideIns(state) &&
+      viewSelectors.hasSlideIns(state, ownProps.history) &&
       viewSelectors.isSlideInsVisible(state),
     showModalDialog: viewSelectors.showModalDialog(state),
     showConnectionOverlay: !!viewConnUri,
@@ -79,7 +82,7 @@ class PagePost extends React.Component {
           {this.props.atomLoading && (
             <div className="pc__loading">
               <svg className="pc__loading__spinner hspinner">
-                <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+                <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
               </svg>
               <span className="pc__loading__label">Loading...</span>
             </div>
@@ -88,8 +91,8 @@ class PagePost extends React.Component {
             <div className="pc__failed">
               <svg className="pc__failed__icon">
                 <use
-                  xlinkHref="#ico16_indicator_error"
-                  href="#ico16_indicator_error"
+                  xlinkHref={ico16_indicator_error}
+                  href={ico16_indicator_error}
                 />
               </svg>
               <span className="pc__failed__label">
@@ -161,7 +164,9 @@ PagePost.propTypes = {
   fetchAtom: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(PagePost);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(PagePost)
+);

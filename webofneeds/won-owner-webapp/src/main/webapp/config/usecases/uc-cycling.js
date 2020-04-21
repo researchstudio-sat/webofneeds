@@ -6,15 +6,13 @@ import {
 import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
 import { getIn } from "../../app/utils.js";
-import { Generator } from "sparqljs";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
-
-window.SparqlGenerator4dbg = Generator;
+import ico36_uc_cycling_cropped from "../../images/won-icons/ico36_uc_cycling_cropped.svg";
 
 export const cyclingPlan = {
   identifier: "cyclingPlan",
   label: "Plan a Ride!",
-  icon: "#ico36_uc_cycling_cropped",
+  icon: ico36_uc_cycling_cropped,
   doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
@@ -101,7 +99,7 @@ export const cyclingPlan = {
 export const cyclingInterest = {
   identifier: "cyclingInterest",
   label: "Add Cycling Interest",
-  icon: "#ico36_uc_cycling_cropped",
+  icon: ico36_uc_cycling_cropped,
   draft: {
     ...mergeInEmptyDraft({
       content: {

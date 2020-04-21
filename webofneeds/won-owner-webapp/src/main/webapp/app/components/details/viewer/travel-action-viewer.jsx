@@ -1,6 +1,9 @@
 import React from "react";
 
 import "~/style/_travel-action-viewer.scss";
+import ico_filter_map from "~/images/won-icons/ico-filter_map.svg";
+import ico16_arrow_up from "~/images/won-icons/ico16_arrow_up.svg";
+import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 import PropTypes from "prop-types";
 import { get } from "../../../utils.js";
 import WonAtomMap from "../../atom-map";
@@ -56,13 +59,13 @@ export default class WonTravelActionViewer extends React.Component {
             )}
           </div>
           <svg className="rv__content__text__carret">
-            <use xlinkHref="#ico-filter_map" href="#ico-filter_map" />
+            <use xlinkHref={ico_filter_map} href={ico_filter_map} />
           </svg>
           <svg className="rv__content__text__carret">
             {this.state.locationExpanded ? (
-              <use xlinkHref="#ico16_arrow_up" href="#ico16_arrow_up" />
+              <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
             ) : (
-              <use xlinkHref="#ico16_arrow_down" href="#ico16_arrow_down" />
+              <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
             )}
           </svg>
         </div>

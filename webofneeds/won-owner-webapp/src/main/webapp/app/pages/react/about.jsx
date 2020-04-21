@@ -2,8 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { ownerBaseUrl } from "~/config/default.js";
-import * as generalSelectors from "../../redux/selectors/general-selectors.js";
-import { get, getIn, toAbsoluteURL } from "../../utils.js";
+import { get, getIn, toAbsoluteURL, getQueryParams } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import WonFooter from "../../components/footer.jsx";
@@ -17,6 +16,9 @@ import WonSlideIn from "../../components/slide-in.jsx";
 import WonFlexGrid from "../../components/flexgrid.jsx";
 
 import "~/style/_about.scss";
+import ico16_arrow_up from "~/images/won-icons/ico16_arrow_up.svg";
+import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
+import { withRouter } from "react-router-dom";
 
 const peopleGrid = ({ themeName }) => [
   {
@@ -157,20 +159,20 @@ const questions = [
   },
 ];
 
-const mapStateToProps = state => {
-  const visibleSection = generalSelectors.getAboutSectionFromRoute(state);
+const mapStateToProps = (state, ownProps) => {
+  const { aboutSection } = getQueryParams(ownProps.location);
   const theme = getIn(state, ["config", "theme"]);
   const themeName = get(theme, "name");
   return {
     isLoggedIn: accountUtils.isLoggedIn(get(state, "account")),
-    visibleSection,
+    visibleSection: aboutSection,
     tosTemplateHtml: get(theme, "tosTemplate"),
     imprintTemplateHtml: get(theme, "imprintTemplate"),
     privacyPolicyTemplateHtml: get(theme, "privacyPolicyTemplate"),
     peopleGrid: peopleGrid({ themeName }),
     showModalDialog: viewSelectors.showModalDialog(state),
     showSlideIns:
-      viewSelectors.hasSlideIns(state) &&
+      viewSelectors.hasSlideIns(state, ownProps.history) &&
       viewSelectors.isSlideInsVisible(state),
   };
 };
@@ -222,12 +224,9 @@ class PageAbout extends React.Component {
                   onClick={this.toggleMoreInfo}
                 >
                   {this.state.moreInfo ? (
-                    <use xlinkHref="#ico16_arrow_up" href="#ico16_arrow_up" />
+                    <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
                   ) : (
-                    <use
-                      xlinkHref="#ico16_arrow_down"
-                      href="#ico16_arrow_down"
-                    />
+                    <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
                   )}
                 </svg>
 
@@ -305,6 +304,7 @@ class PageAbout extends React.Component {
     });
   }
 }
+
 PageAbout.propTypes = {
   showModalDialog: PropTypes.bool,
   isLoggedIn: PropTypes.bool,
@@ -314,6 +314,7 @@ PageAbout.propTypes = {
   tosTemplateHtml: PropTypes.string,
   imprintTemplateHtml: PropTypes.string,
   peopleGrid: PropTypes.arrayOf(PropTypes.object),
+  history: PropTypes.object,
 };
 
-export default connect(mapStateToProps)(PageAbout);
+export default withRouter(connect(mapStateToProps)(PageAbout));

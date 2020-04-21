@@ -4,17 +4,15 @@ import {
   sparqlQuery,
 } from "../../app/sparql-builder-utils.js";
 import { getIn } from "../../app/utils.js";
-import { Generator } from "sparqljs";
 import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
-
-window.SparqlGenerator4dbg = Generator;
+import ico36_uc_meal_half from "../../images/won-icons/ico36_uc_meal-half.svg";
 
 export const lunchPlan = {
   identifier: "lunchPlan",
   label: "Plan Lunch!",
-  icon: "#ico36_uc_meal-half",
+  icon: ico36_uc_meal_half,
   doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
@@ -101,7 +99,7 @@ export const lunchPlan = {
 export const lunchInterest = {
   identifier: "lunchInterest",
   label: "Add Lunch Interest",
-  icon: "#ico36_uc_meal-half",
+  icon: ico36_uc_meal_half,
   draft: {
     ...mergeInEmptyDraft({
       content: {

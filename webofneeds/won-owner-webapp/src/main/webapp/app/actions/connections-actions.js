@@ -282,7 +282,8 @@ export function connectionsConnectReactionAtom(
   atomDraft,
   persona,
   connectToSocketType,
-  atomDraftSocketType
+  atomDraftSocketType,
+  history
 ) {
   return (dispatch, getState) =>
     connectReactionAtom(
@@ -291,6 +292,7 @@ export function connectionsConnectReactionAtom(
       persona,
       connectToSocketType,
       atomDraftSocketType,
+      history,
       dispatch,
       getState
     ); // moved to separate function to make transpilation work properly
@@ -302,6 +304,7 @@ function connectReactionAtom(
   personaUri,
   connectToSocketType,
   atomDraftSocketType,
+  history,
   dispatch,
   getState
 ) {
@@ -328,15 +331,7 @@ function connectReactionAtom(
           },
         });
 
-        dispatch(
-          actionCreators.router__stateGo("connections", {
-            useCase: undefined,
-            useCaseGroup: undefined,
-            fromAtomUri: undefined,
-            viewConnUri: undefined,
-            mode: undefined,
-          })
-        );
+        history.push("/connections");
       })
       .then(() => {
         // add persona if present
@@ -646,7 +641,7 @@ export function connectionsRate(connectionUri, rating) {
 }
 
 /**
- * @param connectionUriParam
+ * @param connectionUri
  * @param numberOfEvents
  *   The approximate number of chat-message
  *   that the view atoms. Note that the
@@ -656,11 +651,9 @@ export function connectionsRate(connectionUri, rating) {
  *   events that include the latter.
  * @return {Function}
  */
-export function showLatestMessages(connectionUriParam, numberOfEvents) {
+export function showLatestMessages(connectionUri, numberOfEvents) {
   return (dispatch, getState) => {
     const state = getState();
-    const connectionUri =
-      connectionUriParam || generalSelectors.getConnectionUriFromRoute(state);
     const atom =
       connectionUri &&
       generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri);
@@ -719,7 +712,7 @@ export function loadLatestMessagesOfConnection({
 }
 
 /**
- * @param connectionUriParam
+ * @param connectionUri
  * @param numberOfEvents
  *   The approximate number of chat-message
  *   that the view needs. Note that the
@@ -729,11 +722,9 @@ export function loadLatestMessagesOfConnection({
  *   events that include the latter.
  * @return {Function}
  */
-export function showMoreMessages(connectionUriParam, numberOfEvents) {
+export function showMoreMessages(connectionUri, numberOfEvents) {
   return (dispatch, getState) => {
     const state = getState();
-    const connectionUri =
-      connectionUriParam || generalSelectors.getConnectionUriFromRoute(state);
     const atom =
       connectionUri &&
       generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri);

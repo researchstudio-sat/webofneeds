@@ -3,7 +3,13 @@ import Immutable from "immutable";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
-import { get, getIn, sortByDate } from "../utils.js";
+import {
+  get,
+  getIn,
+  sortByDate,
+  getQueryParams,
+  generateLink,
+} from "../utils.js";
 import * as processUtils from "../redux/utils/process-utils";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
@@ -13,13 +19,14 @@ import WonAtomHeader from "./atom-header.jsx";
 
 import "~/style/_connections-overview.scss";
 import PropTypes from "prop-types";
+import { withRouter } from "react-router-dom";
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
   const allAtoms = generalSelectors.getAtoms(state);
   const ownedAtoms = generalSelectors.getOwnedAtoms(state);
   const openAtoms = generalSelectors.getChatAtoms(state);
 
-  const connUriInRoute = generalSelectors.getConnectionUriFromRoute(state);
+  const { connectionUri } = getQueryParams(ownProps.location);
 
   const sortedOpenAtoms = sortByDate(openAtoms, "creationDate");
   const process = get(state, "process");
@@ -28,7 +35,7 @@ const mapStateToProps = state => {
     ownedAtoms,
     allAtoms,
     process,
-    connUriInRoute,
+    connUriInRoute: connectionUri,
     sortedOpenAtomUris: sortedOpenAtoms
       ? [...sortedOpenAtoms.flatMap(atom => atom.get("uri"))]
       : [],
@@ -43,12 +50,6 @@ const mapDispatchToProps = dispatch => {
           Immutable.fromJS({ atomUri: atomUri, selectTab: tab })
         )
       );
-    },
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
-    routerGoCurrent: props => {
-      dispatch(actionCreators.router__stateGoCurrent(props));
     },
     connectionMarkAsRead: (connectionUri, atomUri) => {
       dispatch(
@@ -129,7 +130,9 @@ class WonConnectionsOverview extends React.Component {
 
   showAtomTab(atomUri, tab = "DETAIL") {
     this.props.selectTab(atomUri, tab);
-    this.props.routerGo("post", { postUri: atomUri });
+    this.props.history.push(
+      generateLink(this.props.history.location, { postUri: atomUri }, "/post")
+    );
   }
 
   isConnectionUnread(atomUri, connUri) {
@@ -143,7 +146,11 @@ class WonConnectionsOverview extends React.Component {
 
   selectConnection(connectionUri) {
     this.markAsRead(connectionUri);
-    this.props.routerGoCurrent({ connectionUri: connectionUri });
+    this.props.history.push(
+      generateLink(this.props.history.location, {
+        connectionUri: connectionUri,
+      })
+    );
   }
 
   markAsRead(connectionUri) {
@@ -219,12 +226,13 @@ WonConnectionsOverview.propTypes = {
   connUriInRoute: PropTypes.string,
   sortedOpenAtomUris: PropTypes.arrayOf(PropTypes.string),
   selectTab: PropTypes.func,
-  routerGo: PropTypes.func,
-  routerGoCurrent: PropTypes.func,
   connectionMarkAsRead: PropTypes.func,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonConnectionsOverview);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonConnectionsOverview)
+);

@@ -9,6 +9,9 @@ import "~/style/_atom-context-layout.scss";
 import WonAtomHeader from "./atom-header.jsx";
 import PropTypes from "prop-types";
 
+import ico16_contextmenu from "~/images/won-icons/ico16_contextmenu.svg";
+import ico32_buddy_add from "~/images/won-icons/ico32_buddy_add.svg";
+
 const mapStateToProps = (state, ownProps) => {
   return {
     atomUri: ownProps.atomUri,
@@ -64,19 +67,19 @@ class WonAtomContextSwipeableView extends React.Component {
             className="cl__trigger cl__trigger--waiting"
             onClick={() => this.handleClick(show)}
           >
-            <use xlinkHref="#ico16_contextmenu" href="#ico16_contextmenu" />
+            <use xlinkHref={ico16_contextmenu} href={ico16_contextmenu} />
           </svg>
           <svg
             className="cl__trigger cl__trigger--add"
             onClick={() => this.handleClick(show)}
           >
-            <use xlinkHref="#ico32_buddy_add" href="#ico32_buddy_add" />
+            <use xlinkHref={ico32_buddy_add} href={ico32_buddy_add} />
           </svg>
           <svg
             className="cl__trigger cl__trigger--default"
             onClick={() => this.handleClick(show)}
           >
-            <use xlinkHref="#ico16_contextmenu" href="#ico16_contextmenu" />
+            <use xlinkHref={ico16_contextmenu} href={ico16_contextmenu} />
           </svg>
         </React.Fragment>
       );

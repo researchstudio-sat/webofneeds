@@ -10,6 +10,7 @@ import won from "../won-es6";
 
 import "~/style/_won-markdown.scss";
 import WonLabelledHr from "./labelled-hr";
+import { Link } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const accountState = get(state, "account");
@@ -32,9 +33,6 @@ const mapDispatchToProps = dispatch => {
   return {
     accountResendVerificationEmail: email => {
       dispatch(actionCreators.account__resendVerificationEmail(email));
-    },
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
     },
     hideMainMenu: () => {
       dispatch(actionCreators.view__hideMainMenu());
@@ -63,7 +61,7 @@ class WonLoginForm extends React.Component {
       rememberMe: false,
     };
 
-    this.goToSignUp = this.goToSignUp.bind(this);
+    this.closeMenu = this.closeMenu.bind(this);
     this.formKeyUp = this.formKeyUp.bind(this);
     this.changeEmail = this.changeEmail.bind(this);
     this.changePassword = this.changePassword.bind(this);
@@ -139,17 +137,20 @@ class WonLoginForm extends React.Component {
         </form>
         <WonLabelledHr label="Or" />
         <div className="wl__register">
-          <button className="won-button--filled red" onClick={this.goToSignUp}>
+          <Link
+            className="won-button--filled red"
+            onClick={this.closeMenu}
+            to="/signup"
+          >
             Sign up
-          </button>
+          </Link>
         </div>
       </won-login-form>
     );
   }
 
-  goToSignUp() {
+  closeMenu() {
     this.props.hideMainMenu();
-    this.props.routerGo("signup");
   }
 
   formKeyUp(event) {
@@ -188,7 +189,6 @@ WonLoginForm.propTypes = {
   isNotVerified: PropTypes.bool,
   accountResendVerificationEmail: PropTypes.func,
   hideMainMenu: PropTypes.func,
-  routerGo: PropTypes.func,
   login: PropTypes.func,
   clearLoginError: PropTypes.func,
 };

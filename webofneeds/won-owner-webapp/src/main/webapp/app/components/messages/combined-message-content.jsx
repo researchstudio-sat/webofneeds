@@ -2,7 +2,6 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import { actionCreators } from "../../actions/actions.js";
 import { connect } from "react-redux";
 
 import PropTypes from "prop-types";
@@ -10,7 +9,7 @@ import {
   getAtoms,
   getOwnedAtomByConnectionUri,
 } from "../../redux/selectors/general-selectors.js";
-import { get, getIn } from "../../utils.js";
+import { get, getIn, generateLink } from "../../utils.js";
 import { getOwnedConnections } from "../../redux/selectors/connection-selectors.js";
 import { labels } from "../../won-label-utils.js";
 import vocab from "../../service/vocab.js";
@@ -19,6 +18,7 @@ import WonAtomIcon from "../atom-icon.jsx";
 import WonReferencedMessageContent from "./referenced-message-content.jsx";
 
 import "~/style/_combined-message-content.scss";
+import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const ownedAtom =
@@ -85,14 +85,6 @@ const mapStateToProps = (state, ownProps) => {
     injectIntoArray: injectInto && Array.from(injectInto.toSet()),
     messageType,
     isConnectionMessage: messageType === vocab.WONMSG.connectionMessage,
-  };
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    routerGoCurrent: props => {
-      dispatch(actionCreators.router__stateGoCurrent(props));
-    },
   };
 };
 
@@ -170,9 +162,11 @@ class WonCombinedMessageContent extends React.Component {
                     onClick={() => {
                       !this.props.multiSelectType &&
                         this.isInjectIntoConnectionPresent(connUri) &&
-                        this.props.routerGoCurrent({
-                          connectionUri: connUri,
-                        });
+                        this.props.history.push(
+                          generateLink(this.props.history.location, {
+                            connectionUri: connUri,
+                          })
+                        );
                     }}
                   />
                 );
@@ -333,10 +327,7 @@ WonCombinedMessageContent.propTypes = {
   injectIntoArray: PropTypes.arrayOf(PropTypes.string),
   messageType: PropTypes.string,
   isConnectionMessage: PropTypes.bool,
-  routerGoCurrent: PropTypes.func,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonCombinedMessageContent);
+export default withRouter(connect(mapStateToProps)(WonCombinedMessageContent));

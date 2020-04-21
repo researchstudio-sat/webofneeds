@@ -1,11 +1,13 @@
 import WonTitlePicker from "../../app/components/details/picker/title-picker";
 import WonTitleViewer from "../../app/components/details/viewer/title-viewer";
 import * as jsonLdUtils from "../../app/service/jsonld-utils";
+import ico36_detail_title from "../../images/won-icons/ico36_detail_title.svg";
+import ico36_detail_person from "../../images/won-icons/ico36_detail_person.svg";
 
 export const isbn = {
   identifier: "isbn",
   label: "ISBN",
-  icon: "#ico36_detail_title",
+  icon: ico36_detail_title,
   placeholder: "ISBN Number",
   component: WonTitlePicker,
   viewerComponent: WonTitleViewer,
@@ -29,7 +31,7 @@ export const isbn = {
 export const author = {
   identifier: "author",
   label: "Author",
-  icon: "#ico36_detail_person",
+  icon: ico36_detail_person,
   placeholder: "Author Name",
   component: WonTitlePicker,
   viewerComponent: WonTitleViewer,

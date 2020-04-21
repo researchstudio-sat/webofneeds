@@ -13,9 +13,11 @@ import WonFooter from "../../components/footer";
 import WonLabelledHr from "../../components/labelled-hr.jsx";
 
 import "~/style/_signup.scss";
+import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.svg";
 import { actionCreators } from "../../actions/actions";
+import { Link, withRouter } from "react-router-dom";
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
   const accountState = get(state, "account");
   return {
     isLoggedIn: accountUtils.isLoggedIn(accountState),
@@ -24,15 +26,12 @@ const mapStateToProps = state => {
     privateId: accountUtils.getPrivateId(accountState),
     showModalDialog: viewSelectors.showModalDialog(state),
     showSlideIns:
-      viewSelectors.hasSlideIns(state) &&
+      viewSelectors.hasSlideIns(state, ownProps.history) &&
       viewSelectors.isSlideInsVisible(state),
   };
 };
 const mapDispatchToProps = dispatch => {
   return {
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
     clearRegisterError: () => {
       dispatch(actionCreators.view__clearRegisterError());
     },
@@ -81,7 +80,6 @@ class PageSignUp extends React.Component {
     this.changePasswordAgain = this.changePasswordAgain.bind(this);
     this.changeRememberMe = this.changeRememberMe.bind(this);
     this.changeAcceptToS = this.changeAcceptToS.bind(this);
-    this.goToToS = this.goToToS.bind(this);
   }
 
   render() {
@@ -111,8 +109,8 @@ class PageSignUp extends React.Component {
                   <div className="signup__content__form__errormsg">
                     <svg className="signup__content__form__errormsg__icon">
                       <use
-                        xlinkHref="#ico16_indicator_warning"
-                        href="#ico16_indicator_warning"
+                        xlinkHref={ico16_indicator_warning}
+                        href={ico16_indicator_warning}
                       />
                     </svg>
                     Not a valid E-Mail address
@@ -122,8 +120,8 @@ class PageSignUp extends React.Component {
                 <div className="signup__content__form__errormsg">
                   <svg className="signup__content__form__errormsg__icon">
                     <use
-                      xlinkHref="#ico16_indicator_warning"
-                      href="#ico16_indicator_warning"
+                      xlinkHref={ico16_indicator_warning}
+                      href={ico16_indicator_warning}
                     />
                   </svg>
                   {this.props.registerError}
@@ -144,8 +142,8 @@ class PageSignUp extends React.Component {
                   <div className="signup__content__form__errormsg">
                     <svg className="signup__content__form__errormsg__icon">
                       <use
-                        xlinkHref="#ico16_indicator_warning"
-                        href="#ico16_indicator_warning"
+                        xlinkHref={ico16_indicator_warning}
+                        href={ico16_indicator_warning}
                       />
                     </svg>
                     {"Password too short, must be at least " +
@@ -168,8 +166,8 @@ class PageSignUp extends React.Component {
                   <div className="signup__content__form__errormsg">
                     <svg className="signup__content__form__errormsg__icon">
                       <use
-                        xlinkHref="#ico16_indicator_warning"
-                        href="#ico16_indicator_warning"
+                        xlinkHref={ico16_indicator_warning}
+                        href={ico16_indicator_warning}
                       />
                     </svg>
                     Password is not equal
@@ -195,9 +193,12 @@ class PageSignUp extends React.Component {
                 />
                 <label htmlFor="acceptToS">
                   I accept the{" "}
-                  <a className="clickable" onChange={this.goToToS}>
+                  <Link
+                    className="clickable"
+                    to="/about?aboutSection=aboutTermsOfService"
+                  >
                     Terms Of Service
-                  </a>
+                  </Link>
                 </label>
               </div>
             </div>
@@ -229,10 +230,6 @@ class PageSignUp extends React.Component {
         <WonFooter />
       </section>
     );
-  }
-
-  goToToS() {
-    this.props.routerGo("about", { aboutSection: "aboutTermsOfService" });
   }
 
   transfer() {
@@ -322,11 +319,12 @@ PageSignUp.propTypes = {
   showSlideIns: PropTypes.bool,
   register: PropTypes.func,
   transfer: PropTypes.func,
-  routerGo: PropTypes.func,
   clearRegisterError: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(PageSignUp);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(PageSignUp)
+);

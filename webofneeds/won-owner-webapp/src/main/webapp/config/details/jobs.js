@@ -1,13 +1,14 @@
 import { details } from "../detail-definitions.js";
 import { is } from "../../app/utils.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils";
+import ico36_detail_tags from "../../images/won-icons/ico36_detail_tags.svg";
 
 export const industryDetail = {
   ...details.tags,
   identifier: "industry",
   label: "Industries and Fields",
   placeholder: "e.g. construction, graphic design, metal industry, etc",
-  icon: "#ico36_detail_tags", //TODO proper icon
+  icon: ico36_detail_tags, //TODO proper icon
   parseToRDF: function({ value }) {
     if (!value) {
       return { "s:industry": undefined };
@@ -25,7 +26,7 @@ export const employmentTypesDetail = {
   identifier: "employmentTypes",
   label: "Employment Types",
   placeholder: "e.g. full-time, part-time, internship, self-employed, etc",
-  icon: "#ico36_detail_tags", //TODO proper icon
+  icon: ico36_detail_tags, //TODO proper icon
   parseToRDF: function({ value }) {
     if (!value) {
       return { "s:employmentType": undefined };
@@ -48,7 +49,7 @@ export const organizationNamesDetail = {
   label: "Organization Name(s)",
   placeholder:
     "e.g. Shiawase Corp., Simmerling Constructions, Daily Bugle, etc",
-  icon: "#ico36_detail_tags", //TODO proper icon
+  icon: ico36_detail_tags, //TODO proper icon
   parseToRDF: function({ value }) {
     if (!value) {
       return { "s:hiringOrganization": undefined };

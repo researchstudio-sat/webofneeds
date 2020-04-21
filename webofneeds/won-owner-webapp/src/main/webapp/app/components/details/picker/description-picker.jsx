@@ -4,6 +4,7 @@ import "~/style/_descriptionpicker.scss";
 import PropTypes from "prop-types";
 import ReactMarkdown from "react-markdown";
 import TextareaAutosize from "react-autosize-textarea";
+import ico36_close from "~/images/won-icons/ico36_close.svg";
 
 export default class WonDescriptionPicker extends React.Component {
   constructor(props) {
@@ -22,7 +23,7 @@ export default class WonDescriptionPicker extends React.Component {
               className="dp__input__icon clickable"
               onClick={this.reset.bind(this)}
             >
-              <use xlinkHref="#ico36_close" href="#ico36_close" />
+              <use xlinkHref={ico36_close} href={ico36_close} />
             </svg>
           )}
           <TextareaAutosize
@@ -38,6 +39,7 @@ export default class WonDescriptionPicker extends React.Component {
           <ReactMarkdown
             className="dp__preview__content markdown"
             source={this.state.value}
+            linkTarget="_blank"
           />
         ) : (
           <div className="dp__preview__content--empty">

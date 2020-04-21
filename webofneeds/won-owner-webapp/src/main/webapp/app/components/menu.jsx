@@ -2,64 +2,51 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
-import { getIn } from "../utils.js";
 
 import "~/style/_menu.scss";
+import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.svg";
+import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import Immutable from "immutable";
+import { NavLink, withRouter } from "react-router-dom";
 
-const mapStateToProps = state => {
-  const currentRoute = getIn(state, ["router", "currentState", "name"]);
+const mapStateToProps = (state, ownProps) => ({
+  hasSlideIns: viewSelectors.hasSlideIns(state, ownProps.history),
+  isMenuVisible: viewSelectors.isMenuVisible(state),
+  isSlideInsVisible: viewSelectors.isSlideInsVisible(state),
+  isLocationAccessDenied: generalSelectors.isLocationAccessDenied(state),
+  hasChatAtoms: generalSelectors.hasChatAtoms(state),
+  hasUnreadSuggestedConnections: generalSelectors.hasUnreadSuggestedConnections(
+    state
+  ),
+  hasUnreadBuddyConnections: generalSelectors.hasUnreadBuddyConnections(
+    state,
+    true,
+    false
+  ),
+  hasUnreadChatConnections: generalSelectors.hasUnreadChatConnections(state),
+});
 
-  return {
-    hasSlideIns: viewSelectors.hasSlideIns(state),
-    isMenuVisible: viewSelectors.isMenuVisible(state),
-    isSlideInsVisible: viewSelectors.isSlideInsVisible(state),
-    isLocationAccessDenied: generalSelectors.isLocationAccessDenied(state),
-    showInventory: currentRoute === "inventory",
-    showChats: currentRoute === "connections",
-    showCreate: currentRoute === "create",
-    showWhatsNew: currentRoute === "overview",
-    showWhatsAround: currentRoute === "map",
-    hasChatAtoms: generalSelectors.hasChatAtoms(state),
-    hasUnreadSuggestedConnections: generalSelectors.hasUnreadSuggestedConnections(
-      state
-    ),
-    hasUnreadBuddyConnections: generalSelectors.hasUnreadBuddyConnections(
-      state,
-      true,
-      false
-    ),
-    hasUnreadChatConnections: generalSelectors.hasUnreadChatConnections(state),
-  };
-};
-const mapDispatchToProps = dispatch => {
-  return {
-    hideMenu: () => {
-      dispatch(actionCreators.view__hideMenu());
-    },
-    locationAccessDenied: () => {
-      dispatch(actionCreators.view__locationAccessDenied());
-    },
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
-    updateCurrentLocation: locImm => {
-      dispatch(actionCreators.view__updateCurrentLocation(locImm));
-    },
-    toggleSlideIns: () => {
-      dispatch(actionCreators.view__toggleSlideIns());
-    },
-  };
-};
+const mapDispatchToProps = dispatch => ({
+  hideMenu: () => {
+    dispatch(actionCreators.view__hideMenu());
+  },
+  locationAccessDenied: () => {
+    dispatch(actionCreators.view__locationAccessDenied());
+  },
+  updateCurrentLocation: locImm => {
+    dispatch(actionCreators.view__updateCurrentLocation(locImm));
+  },
+  toggleSlideIns: () => {
+    dispatch(actionCreators.view__toggleSlideIns());
+  },
+});
 
 class WonMenu extends React.Component {
   constructor(props) {
     super(props);
-    this.viewChats = this.viewChats.bind(this);
-    this.viewCreate = this.viewCreate.bind(this);
-    this.viewInventory = this.viewInventory.bind(this);
+    this.hideMenuIfVisible = this.hideMenuIfVisible.bind(this);
     this.viewWhatsAround = this.viewWhatsAround.bind(this);
     this.viewWhatsNew = this.viewWhatsNew.bind(this);
     this.toggleSlideIns = this.toggleSlideIns.bind(this);
@@ -73,47 +60,55 @@ class WonMenu extends React.Component {
         ref={node => (this.node = node)}
       >
         <div className="menu">
-          <a
+          <NavLink
             className={this.generateTabClasses(
-              this.props.showInventory,
               false,
               this.props.hasUnreadSuggestedConnections ||
                 this.props.hasUnreadBuddyConnections
             )}
-            onClick={this.viewInventory}
+            activeClassName="menu__tab--selected"
+            onClick={this.hideMenuIfVisible}
+            to="/inventory"
           >
             <span className="menu__tab__unread" />
             <span className="menu__tab__label">Inventory</span>
-          </a>
-          <a
+          </NavLink>
+          <NavLink
             className={this.generateTabClasses(
-              this.props.showChats,
               !this.props.hasChatAtoms,
               this.props.hasUnreadChatConnections
             )}
-            onClick={this.viewChats}
+            activeClassName="menu__tab--selected"
+            onClick={this.hideMenuIfVisible}
+            to="/connections"
           >
             <span className="menu__tab__unread" />
             <span className="menu__tab__label">Chats</span>
-          </a>
-          <a
-            className={this.generateTabClasses(this.props.showCreate)}
-            onClick={this.viewCreate}
+          </NavLink>
+          <NavLink
+            className={this.generateTabClasses()}
+            activeClassName="menu__tab--selected"
+            onClick={this.hideMenuIfVisible}
+            to="/create"
           >
             <span className="menu__tab__label">Create</span>
-          </a>
-          <a
-            className={this.generateTabClasses(this.props.showWhatsNew)}
+          </NavLink>
+          <NavLink
+            className={this.generateTabClasses()}
+            activeClassName="menu__tab--selected"
             onClick={this.viewWhatsNew}
+            to="/overview"
           >
             <span className="menu__tab__label">{"What's New"}</span>
-          </a>
-          <a
-            className={this.generateTabClasses(this.props.showWhatsAround)}
+          </NavLink>
+          <NavLink
+            className={this.generateTabClasses()}
+            activeClassName="menu__tab--selected"
             onClick={this.viewWhatsAround}
+            to="/map"
           >
             <span className="menu__tab__label">{"What's Around"}</span>
-          </a>
+          </NavLink>
           {this.props.hasSlideIns ? (
             <div
               className="menu__slideintoggle hide-in-responsive"
@@ -121,8 +116,8 @@ class WonMenu extends React.Component {
             >
               <svg className="menu__slideintoggle__icon">
                 <use
-                  xlinkHref="#ico16_indicator_warning"
-                  href="#ico16_indicator_warning"
+                  xlinkHref={ico16_indicator_warning}
+                  href={ico16_indicator_warning}
                 />
               </svg>
               <svg
@@ -133,7 +128,7 @@ class WonMenu extends React.Component {
                     : "")
                 }
               >
-                <use xlinkHref="#ico16_arrow_down" href="#ico16_arrow_down" />
+                <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
               </svg>
               <span className="menu__slideintoggle__label">
                 {this.props.isSlideInsVisible ? (
@@ -151,10 +146,9 @@ class WonMenu extends React.Component {
     );
   }
 
-  generateTabClasses(selected = false, inactive = false, unread = false) {
+  generateTabClasses(inactive = false, unread = false) {
     const classes = ["menu__tab"];
 
-    selected && classes.push("menu__tab--selected");
     inactive && classes.push("menu__tab--inactive");
     unread && classes.push("menu__tab--unread");
 
@@ -171,48 +165,25 @@ class WonMenu extends React.Component {
   }
 
   toggleSlideIns() {
-    if (this.props.isMenuVisible) {
-      this.props.hideMenu();
-    }
+    this.hideMenuIfVisible();
     this.props.toggleSlideIns();
   }
 
-  viewCreate() {
+  hideMenuIfVisible() {
     if (this.props.isMenuVisible) {
       this.props.hideMenu();
     }
-    this.props.routerGo("create");
-  }
-
-  viewChats() {
-    if (this.props.isMenuVisible) {
-      this.props.hideMenu();
-    }
-    this.props.routerGo("connections");
-  }
-
-  viewInventory() {
-    if (this.props.isMenuVisible) {
-      this.props.hideMenu();
-    }
-    this.props.routerGo("inventory");
   }
 
   viewWhatsAround() {
     this.viewWhatsX(() => {
-      if (this.props.isMenuVisible) {
-        this.props.hideMenu();
-      }
-      this.props.routerGo("map");
+      this.hideMenuIfVisible();
     });
   }
 
   viewWhatsNew() {
     this.viewWhatsX(() => {
-      if (this.props.isMenuVisible) {
-        this.props.hideMenu();
-      }
-      this.props.routerGo("overview");
+      this.hideMenuIfVisible();
     });
   }
 
@@ -276,23 +247,20 @@ WonMenu.propTypes = {
   isMenuVisible: PropTypes.bool,
   isSlideInsVisible: PropTypes.bool,
   isLocationAccessDenied: PropTypes.bool,
-  showInventory: PropTypes.bool,
-  showChats: PropTypes.bool,
-  showCreate: PropTypes.bool,
-  showWhatsNew: PropTypes.bool,
-  showWhatsAround: PropTypes.bool,
   hasChatAtoms: PropTypes.bool,
   hasUnreadSuggestedConnections: PropTypes.bool,
   hasUnreadBuddyConnections: PropTypes.bool,
   hasUnreadChatConnections: PropTypes.bool,
   hideMenu: PropTypes.func,
   locationAccessDenied: PropTypes.func,
-  routerGo: PropTypes.func,
   updateCurrentLocation: PropTypes.func,
   toggleSlideIns: PropTypes.func,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonMenu);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonMenu)
+);

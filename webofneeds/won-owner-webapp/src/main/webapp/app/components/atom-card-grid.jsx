@@ -4,17 +4,12 @@
 
 import React from "react";
 import WonAtomCard from "./atom-card.jsx";
-import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
-const mapDispatchToProps = dispatch => {
-  return {
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
-  };
-};
+import ico32_buddy_add from "~/images/won-icons/ico32_buddy_add.svg";
+import ico36_plus from "~/images/won-icons/ico36_plus.svg";
+import { Link } from "react-router-dom";
 
 class WonAtomCardGrid extends React.Component {
   render() {
@@ -42,25 +37,23 @@ class WonAtomCardGrid extends React.Component {
     }
 
     const createAtom = showCreate ? (
-      <won-create-card onClick={() => this.props.routerGo("create")}>
+      <Link className="won-create-card" to="/create">
         <svg className="createcard__icon" title="Create a new post">
-          <use xlinkHref="#ico36_plus" href="#ico36_plus" />
+          <use xlinkHref={ico36_plus} href={ico36_plus} />
         </svg>
         <span className="createcard__label">New</span>
-      </won-create-card>
+      </Link>
     ) : (
       undefined
     );
 
     const createPersonaAtom = showCreatePersona ? (
-      <won-create-card
-        onClick={() => this.props.routerGo("create", { useCase: "persona" })}
-      >
+      <Link className="won-create-card" to="/create?useCase=persona">
         <svg className="createcard__icon" title="Create a new post">
-          <use xlinkHref="#ico32_buddy_add" href="#ico32_buddy_add" />
+          <use xlinkHref={ico32_buddy_add} href={ico32_buddy_add} />
         </svg>
         <span className="createcard__label">New Persona</span>
-      </won-create-card>
+      </Link>
     ) : (
       undefined
     );
@@ -82,10 +75,6 @@ WonAtomCardGrid.propTypes = {
   showCreate: PropTypes.bool,
   showCreatePersona: PropTypes.bool,
   currentLocation: PropTypes.object,
-  routerGo: PropTypes.func,
 };
 
-export default connect(
-  undefined,
-  mapDispatchToProps
-)(WonAtomCardGrid);
+export default connect(undefined)(WonAtomCardGrid);

@@ -12,7 +12,7 @@ import {
   getProposalMessagesByConnectionUri,
   getUnreadMessagesByConnectionUri,
 } from "../redux/selectors/message-selectors";
-import { get, getIn } from "../utils";
+import { get, getIn, generateLink, getQueryParams } from "../utils";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import won from "../won-es6.js";
@@ -20,6 +20,11 @@ import vocab from "../service/vocab.js";
 
 import "~/style/_atom-messages.scss";
 import "~/style/_rdflink.scss";
+import ico36_close from "~/images/won-icons/ico36_close.svg";
+import ico36_backarrow from "~/images/won-icons/ico36_backarrow.svg";
+import rdf_logo_1 from "~/images/won-icons/rdf_logo_1.svg";
+import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
+
 import WonConnectionHeader from "./connection-header.jsx";
 import WonShareDropdown from "./share-dropdown.jsx";
 import WonConnectionContextDropdown from "./connection-context-dropdown.jsx";
@@ -31,6 +36,7 @@ import WonConnectionMessage from "./messages/connection-message.jsx";
 import { actionCreators } from "../actions/actions.js";
 import * as ownerApi from "../api/owner-api.js";
 import Immutable from "immutable";
+import { Link, withRouter } from "react-router-dom";
 
 const rdfTextfieldHelpText =
   "Expects valid turtle. " +
@@ -42,9 +48,10 @@ const rdfTextfieldHelpText =
   `\`<${vocab.WONMSG.uriPlaceholder.event}> con:text "hello world!". \``;
 
 const mapStateToProps = (state, ownProps) => {
+  const { connectionUri } = getQueryParams(ownProps.location);
   const selectedConnectionUri = ownProps.connectionUri
     ? ownProps.connectionUri
-    : generalSelectors.getConnectionUriFromRoute(state);
+    : connectionUri;
   const ownedAtom = generalSelectors.getOwnedAtomByConnectionUri(
     state,
     selectedConnectionUri
@@ -197,15 +204,6 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    routerBack: () => {
-      dispatch(actionCreators.router__back());
-    },
-    routerGoCurrent: props => {
-      dispatch(actionCreators.router__stateGoCurrent(props));
-    },
-    routerGoResetParams: path => {
-      dispatch(actionCreators.router__stateGoResetParams(path));
-    },
     setShowPetriNetData: (connectionUri, showPetriNetData) => {
       dispatch(
         actionCreators.connections__showPetriNetData({
@@ -356,7 +354,7 @@ class AtomMessages extends React.Component {
         href={this.props.selectedConnectionUri}
       >
         <svg className="rdflink__small">
-          <use xlinkHref="#rdf_logo_1" href="#rdf_logo_1" />
+          <use xlinkHref={rdf_logo_1} href={rdf_logo_1} />
         </svg>
         <span className="rdflink__label">Connection</span>
       </a>
@@ -379,7 +377,7 @@ class AtomMessages extends React.Component {
     const loadSpinnerElement = (
       <div className="pm__content__loadspinner">
         <svg className="hspinner">
-          <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+          <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
         </svg>
       </div>
     );
@@ -388,35 +386,33 @@ class AtomMessages extends React.Component {
       const backButtonElement = this.props.showOverlayConnection ? (
         <a
           className="pm__header__back__button clickable"
-          onClick={this.props.routerBack.bind(this)}
+          onClick={this.props.history.goBack}
         >
           <svg className="pm__header__back__button__icon clickable hide-in-responsive">
-            <use xlinkHref="#ico36_close" href="#ico36_close" />
+            <use xlinkHref={ico36_close} href={ico36_close} />
           </svg>
           <svg className="pm__header__back__button__icon clickable show-in-responsive">
-            <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
+            <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
           </svg>
         </a>
       ) : (
         <React.Fragment>
           <a
             className="pm__header__back__button clickable show-in-responsive"
-            onClick={this.props.routerBack.bind(this)}
+            onClick={this.props.history.goBack}
           >
             <svg className="pm__header__back__button__icon">
-              <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
+              <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
             </svg>
           </a>
-          <a
+          <Link
             className="pm__header__back__button clickable hide-in-responsive"
-            onClick={() =>
-              this.props.routerGoCurrent({ connectionUri: undefined })
-            }
+            to={location => location.pathname}
           >
             <svg className="pm__header__back__button__icon">
-              <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
+              <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
             </svg>
-          </a>
+          </Link>
         </React.Fragment>
       );
 
@@ -496,7 +492,7 @@ class AtomMessages extends React.Component {
               }
             >
               <svg className="pm__header__back__button__icon clickable">
-                <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
+                <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
               </svg>
             </a>
           </div>
@@ -642,7 +638,7 @@ class AtomMessages extends React.Component {
               }
             >
               <svg className="pm__header__back__button__icon clickable">
-                <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
+                <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
               </svg>
             </a>
           </div>
@@ -923,11 +919,13 @@ class AtomMessages extends React.Component {
       message
     );
     if (this.showOverlayConnection) {
-      this.props.routerBack();
+      this.props.history.goBack();
     } else {
-      this.props.routerGoCurrent({
-        connectionUri: this.props.selectedConnectionUri,
-      });
+      this.props.history.push(
+        generateLink(this.props.history.location, {
+          connectionUri: this.props.selectedConnectionUri,
+        })
+      );
     }
   }
 
@@ -941,9 +939,13 @@ class AtomMessages extends React.Component {
     this.props.closeConnection(get(this.props.connection, "uri"));
 
     if (this.showOverlayConnection) {
-      this.props.routerBack();
+      this.props.history.goBack();
     } else {
-      this.props.routerGoCurrent({ connectionUri: null });
+      this.props.history.push(
+        generateLink(this.props.history.location, {
+          connectionUri: undefined,
+        })
+      );
     }
   }
 
@@ -1215,9 +1217,6 @@ AtomMessages.propTypes = {
   isConnectionLoading: PropTypes.bool,
   showPostContentMessage: PropTypes.bool,
   showOverlayConnection: PropTypes.bool,
-  routerBack: PropTypes.func,
-  routerGoCurrent: PropTypes.func,
-  routerGoResetParams: PropTypes.func,
   setShowPetriNetData: PropTypes.func,
   setShowAgreementData: PropTypes.func,
   hideAddMessageContent: PropTypes.func,
@@ -1234,9 +1233,12 @@ AtomMessages.propTypes = {
   updateAgreementData: PropTypes.func,
   showMoreMessages: PropTypes.func,
   showLatestMessages: PropTypes.func,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(AtomMessages);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(AtomMessages)
+);

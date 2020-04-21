@@ -7,7 +7,7 @@ import WonGroupIcon from "./group-icon.jsx";
 import WonConnectionState from "./connection-state.jsx";
 import PropTypes from "prop-types";
 import VisibilitySensor from "react-visibility-sensor";
-import { get, getIn } from "../utils.js";
+import { get, getIn, generateLink } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
 import { labels, relativeTime } from "../won-label-utils.js";
@@ -24,6 +24,8 @@ import Immutable from "immutable";
 import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
 
 import "~/style/_connection-header.scss";
+import ico36_incoming from "~/images/won-icons/ico36_incoming.svg";
+import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const ownedAtom = generalSelectors.getOwnedAtomByConnectionUri(
@@ -154,9 +156,6 @@ const mapDispatchToProps = dispatch => {
           Immutable.fromJS({ atomUri: atomUri, selectTab: tab })
         )
       );
-    },
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
     },
   };
 };
@@ -355,7 +354,7 @@ class WonConnectionHeader extends React.Component {
                 //TODO
                 onClick={() => this.selectMembersTab()}
               >
-                <use xlinkHref="#ico36_incoming" href="#ico36_incoming" />
+                <use xlinkHref={ico36_incoming} href={ico36_incoming} />
               </svg>
             </won-connection-indicators>
           </div>
@@ -387,7 +386,13 @@ class WonConnectionHeader extends React.Component {
 
   selectMembersTab() {
     this.props.selectTab(this.props.targetAtomUri, "PARTICIPANTS");
-    this.props.routerGo("post", { postUri: this.props.targetAtomUri });
+    this.props.history.push(
+      generateLink(
+        this.props.history.location,
+        { postUri: this.props.targetAtomUri },
+        "/post"
+      )
+    );
   }
 
   ensureAtomIsLoaded() {
@@ -404,7 +409,6 @@ WonConnectionHeader.propTypes = {
   connectionUri: PropTypes.string.isRequired,
   onClick: PropTypes.func,
   selectTab: PropTypes.func,
-  routerGo: PropTypes.func,
   connection: PropTypes.object,
   groupMembersArray: PropTypes.arrayOf(PropTypes.object),
   groupMembersSize: PropTypes.number,
@@ -428,9 +432,12 @@ WonConnectionHeader.propTypes = {
   targetAtomFailedToLoad: PropTypes.bool,
   connectionOrAtomsLoading: PropTypes.bool,
   fetchAtom: PropTypes.func,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonConnectionHeader);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonConnectionHeader)
+);

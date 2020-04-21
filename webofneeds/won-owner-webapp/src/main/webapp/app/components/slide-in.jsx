@@ -3,8 +3,13 @@ import PropTypes from "prop-types";
 import won from "../won-es6";
 import { connect } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
-import { getVerificationTokenFromRoute } from "../redux/selectors/general-selectors.js";
-import { get, getIn, toAbsoluteURL } from "../utils.js";
+import {
+  get,
+  getIn,
+  toAbsoluteURL,
+  getQueryParams,
+  generateLink,
+} from "../utils.js";
 import { parseRestErrorMessage } from "../won-utils.js";
 import { ownerBaseUrl } from "~/config/default.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
@@ -12,9 +17,15 @@ import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as processSelectors from "../redux/selectors/process-selectors.js";
 
 import "~/style/_slidein.scss";
+import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.svg";
+import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
+import ico16_indicator_info from "~/images/won-icons/ico16_indicator_info.svg";
+import ico36_close from "~/images/won-icons/ico36_close.svg";
+import { Link, withRouter } from "react-router-dom";
 
-const mapStateToProps = state => {
-  const verificationToken = getVerificationTokenFromRoute(state);
+const mapStateToProps = (state, ownProps) => {
+  const { token } = getQueryParams(ownProps.location);
+  const verificationToken = token;
 
   const accountState = get(state, "account");
 
@@ -75,7 +86,10 @@ const mapStateToProps = state => {
     showAnonymous: viewSelectors.showSlideInAnonymous(state),
     showDisclaimer: viewSelectors.showSlideInDisclaimer(state),
     showTermsOfService: viewSelectors.showSlideInTermsOfService(state),
-    showEmailVerification: viewSelectors.showSlideInEmailVerification(state),
+    showEmailVerification: viewSelectors.showSlideInEmailVerification(
+      state,
+      ownProps.history
+    ),
     showConnectionLost: viewSelectors.showSlideInConnectionLost(state),
     inclAnonymousLinkInput:
       !connectionHasBeenLost &&
@@ -114,15 +128,6 @@ const mapDispatchToProps = dispatch => {
     reconnectStart: () => {
       dispatch(actionCreators.reconnect__start());
     },
-    routerGoCurrent: props => {
-      dispatch(actionCreators.router__stateGoCurrent(props));
-    },
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
-    routerGoAbs: (path, props) => {
-      dispatch(actionCreators.router__stateGoAbs(path, props));
-    },
     hideAnonymousSlideIn: () => {
       dispatch(actionCreators.view__anonymousSlideIn__hide());
     },
@@ -150,8 +155,8 @@ class WonSlideIn extends React.Component {
           <div className="si__connectionlost">
             <svg className="si__icon">
               <use
-                xlinkHref="#ico16_indicator_warning"
-                href="#ico16_indicator_warning"
+                xlinkHref={ico16_indicator_warning}
+                href={ico16_indicator_warning}
               />
             </svg>
             <span className="si__title">
@@ -169,7 +174,7 @@ class WonSlideIn extends React.Component {
               )}
             {this.props.reconnecting && (
               <svg className="hspinner">
-                <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+                <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
               </svg>
             )}
           </div>
@@ -178,8 +183,8 @@ class WonSlideIn extends React.Component {
           <div className="si__emailverification">
             <svg className="si__icon">
               <use
-                xlinkHref="#ico16_indicator_warning"
-                href="#ico16_indicator_warning"
+                xlinkHref={ico16_indicator_warning}
+                href={ico16_indicator_warning}
               />
             </svg>
             {!this.props.verificationToken &&
@@ -219,7 +224,7 @@ class WonSlideIn extends React.Component {
             {(this.props.isProcessingVerifyEmailAddress ||
               this.props.isProcessingResendVerificationEmail) && (
               <svg className="hspinner">
-                <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+                <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
               </svg>
             )}
             {!this.props.isProcessingVerifyEmailAddress &&
@@ -245,10 +250,14 @@ class WonSlideIn extends React.Component {
                 <svg
                   className="si__close"
                   onClick={() =>
-                    this.props.routerGoCurrent({ token: undefined })
+                    this.props.history.replace(
+                      generateLink(this.props.history.location, {
+                        token: undefined,
+                      })
+                    )
                   }
                 >
-                  <use xlinkHref="#ico36_close" href="#ico36_close" />
+                  <use xlinkHref={ico36_close} href={ico36_close} />
                 </svg>
               )}
             {!this.props.isProcessingVerifyEmailAddress &&
@@ -257,7 +266,7 @@ class WonSlideIn extends React.Component {
                   className="si__close"
                   onClick={this.props.accountVerifyEmailAddressSuccess}
                 >
-                  <use xlinkHref="#ico36_close" href="#ico36_close" />
+                  <use xlinkHref={ico36_close} href={ico36_close} />
                 </svg>
               )}
           </div>
@@ -266,8 +275,8 @@ class WonSlideIn extends React.Component {
           <div className="si__termsofservice">
             <svg className="si__icon">
               <use
-                xlinkHref="#ico16_indicator_warning"
-                href="#ico16_indicator_warning"
+                xlinkHref={ico16_indicator_warning}
+                href={ico16_indicator_warning}
               />
             </svg>
             <span className="si__title">
@@ -283,7 +292,7 @@ class WonSlideIn extends React.Component {
             </span>
             {this.props.isProcessingAcceptTermsOfService ? (
               <svg className="hspinner">
-                <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+                <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
               </svg>
             ) : (
               <button
@@ -299,8 +308,8 @@ class WonSlideIn extends React.Component {
           <div className="si__disclaimer">
             <svg className="si__icon">
               <use
-                xlinkHref="#ico16_indicator_warning"
-                href="#ico16_indicator_info"
+                xlinkHref={ico16_indicator_info}
+                href={ico16_indicator_info}
               />
             </svg>
             <div className="si__title">
@@ -358,8 +367,8 @@ class WonSlideIn extends React.Component {
           >
             <svg className="si__icon">
               <use
-                xlinkHref="#ico16_indicator_warning"
-                href="#ico16_indicator_warning"
+                xlinkHref={ico16_indicator_warning}
+                href={ico16_indicator_warning}
               />
             </svg>
             <span className="si__title">
@@ -369,7 +378,7 @@ class WonSlideIn extends React.Component {
               className="si__close"
               onClick={this.props.hideAnonymousSlideIn}
             >
-              <use xlinkHref="#ico36_close" href="#ico36_close" />
+              <use xlinkHref={ico36_close} href={ico36_close} />
             </svg>
             <div className="si__text">
               <h3>You are posting with an anonymous account. This means:</h3>
@@ -386,12 +395,9 @@ class WonSlideIn extends React.Component {
               <ul>
                 <li>
                   <b>
-                    <a
-                      className="clickable"
-                      onClick={() => this.props.routerGo("signup")}
-                    >
+                    <Link className="clickable" to="/signup">
                       Consider signing up!
-                    </a>
+                    </Link>
                   </b>{" "}
                   It will allow us to contact you if there is relevant activity.
                 </li>
@@ -400,12 +406,9 @@ class WonSlideIn extends React.Component {
                 </li>
               </ul>
             </div>
-            <button
-              className=" si__buttonSignup"
-              onClick={() => this.props.routerGoAbs("signup")}
-            >
+            <Link className=" si__buttonSignup" to="/signup">
               Sign up
-            </button>
+            </Link>
             <button
               className="si__buttonCopy"
               onClick={this.copyLinkToClipboard}
@@ -444,7 +447,7 @@ class WonSlideIn extends React.Component {
               )}
             {this.props.isProcessingSendAnonymousLinkEmail && (
               <svg className="hspinner">
-                <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+                <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
               </svg>
             )}
           </div>
@@ -453,8 +456,8 @@ class WonSlideIn extends React.Component {
           <div className="si__anonymoussuccess">
             <svg className="si__icon">
               <use
-                xlinkHref="#ico16_indicator_info"
-                href="#ico16_indicator_info"
+                xlinkHref={ico16_indicator_info}
+                href={ico16_indicator_info}
               />
             </svg>
             {this.props.anonymousLinkSent && (
@@ -469,7 +472,7 @@ class WonSlideIn extends React.Component {
               className="si__close"
               onClick={this.props.hideAnonymousSlideIn}
             >
-              <use xlinkHref="#ico36_close" href="#ico36_close" />
+              <use xlinkHref={ico36_close} href={ico36_close} />
             </svg>
           </div>
         )}
@@ -541,14 +544,14 @@ WonSlideIn.propTypes = {
   accountAcceptTermsOfService: PropTypes.func,
   accountAcceptDisclaimer: PropTypes.func,
   reconnectStart: PropTypes.func,
-  routerGoCurrent: PropTypes.func,
-  routerGo: PropTypes.func,
-  routerGoAbs: PropTypes.func,
   hideAnonymousSlideIn: PropTypes.func,
   showEmailInput: PropTypes.func,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonSlideIn);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonSlideIn)
+);

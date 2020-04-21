@@ -4,12 +4,14 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { actionCreators } from "../actions/actions.js";
 import { get, getIn } from "../utils.js";
 
 import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 
 import "~/style/_atom-connections-indicator.scss";
+import ico36_message from "~/images/won-icons/ico36_message.svg";
+import ico36_incoming from "~/images/won-icons/ico36_incoming.svg";
+import { Link } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const atom = getIn(state, ["atoms", ownProps.atomUri]);
@@ -40,34 +42,28 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
-  return {
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
-  };
-};
-
 class WonAtomConnectionsIndicator extends React.Component {
   constructor(props) {
     super(props);
-    this.showAtomConnections = this.showAtomConnections.bind(this);
   }
 
-  showAtomConnections() {
+  getRoute() {
     const connUri = this.props.hasUnreadChats
       ? get(this.props.unreadChats.first(), "uri")
       : get(this.props.unreadRequests.first(), "uri");
-    this.props.routerGo("connections", { connectionUri: connUri });
+    return "/connections?connectionUri=" + connUri;
   }
 
   render() {
     const hasNoUnreadConnections =
       !this.props.requestsCount > 0 && !this.props.hasUnreadChats;
     return (
-      <won-atom-connections-indicator
-        class={hasNoUnreadConnections ? "won-no-connections" : ""}
-        onClick={this.showAtomConnections}
+      <Link
+        className={
+          "won-atom-connections-indicator " +
+          (hasNoUnreadConnections ? "won-no-connections" : "")
+        }
+        to={this.getRoute()}
       >
         <svg
           className={
@@ -79,11 +75,9 @@ class WonAtomConnectionsIndicator extends React.Component {
         >
           <use
             xlinkHref={
-              this.props.hasUnreadChats ? "#ico36_message" : "#ico36_incoming"
+              this.props.hasUnreadChats ? ico36_message : ico36_incoming
             }
-            href={
-              this.props.hasUnreadChats ? "#ico36_message" : "#ico36_incoming"
-            }
+            href={this.props.hasUnreadChats ? ico36_message : ico36_incoming}
           />
         </svg>
         <div className="asi__right">
@@ -108,7 +102,7 @@ class WonAtomConnectionsIndicator extends React.Component {
             </div>
           </div>
         </div>
-      </won-atom-connections-indicator>
+      </Link>
     );
   }
 }
@@ -120,11 +114,7 @@ WonAtomConnectionsIndicator.propTypes = {
   requestsCount: PropTypes.number,
   unreadRequestsCount: PropTypes.number,
   unreadRequests: PropTypes.object,
-  routerGo: PropTypes.func,
   selectAtomTab: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonAtomConnectionsIndicator);
+export default connect(mapStateToProps)(WonAtomConnectionsIndicator);

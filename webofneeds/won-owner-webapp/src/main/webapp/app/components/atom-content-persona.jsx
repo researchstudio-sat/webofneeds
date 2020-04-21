@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import Immutable from "immutable";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
-import { get, getIn } from "../utils.js";
+import { get, getIn, getQueryParams, generateLink } from "../utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -15,9 +15,10 @@ import WonDescriptionViewer from "./details/viewer/description-viewer.jsx";
 import { details } from "../../config/detail-definitions.js";
 import "~/style/_atom-content-persona.scss";
 import ElmReact from "./elm-react";
+import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
-  const connectionUri = generalSelectors.getConnectionUriFromRoute(state);
+  const { connectionUri } = getQueryParams(ownProps.location);
   const connection = connectionSelectors.getOwnedConnectionByUri(
     state,
     connectionUri
@@ -79,9 +80,6 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
     selectTab: (atomUri, tab) => {
       dispatch(
         actionCreators.atoms__selectTab(
@@ -270,23 +268,41 @@ class WonAtomContentPersona extends React.Component {
 
   viewPersonaPosts() {
     this.props.selectTab(this.props.personaUri, "HOLDS");
-    this.props.routerGo("post", {
-      postUri: this.props.personaUri,
-    });
+    this.props.history.push(
+      generateLink(
+        this.props.history.location,
+        {
+          postUri: this.props.personaUri,
+        },
+        "/post"
+      )
+    );
   }
 
   viewPersonaBuddies() {
     this.props.selectTab(this.props.personaUri, "BUDDIES");
-    this.props.routerGo("post", {
-      postUri: this.props.personaUri,
-    });
+    this.props.history.push(
+      generateLink(
+        this.props.history.location,
+        {
+          postUri: this.props.personaUri,
+        },
+        "/post"
+      )
+    );
   }
 
   viewPersonaReviews() {
     this.props.selectTab(this.props.personaUri, "REVIEWS");
-    this.props.routerGo("post", {
-      postUri: this.props.personaUri,
-    });
+    this.props.history.push(
+      generateLink(
+        this.props.history.location,
+        {
+          postUri: this.props.personaUri,
+        },
+        "/post"
+      )
+    );
   }
 }
 WonAtomContentPersona.propTypes = {
@@ -311,13 +327,15 @@ WonAtomContentPersona.propTypes = {
   aggregateRatingRounded: PropTypes.number,
   ratingConnectionUri: PropTypes.string,
   selectTab: PropTypes.func,
-  routerGo: PropTypes.func,
   showModalDialog: PropTypes.func,
   hideModalDialog: PropTypes.func,
   personaDisconnect: PropTypes.func,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonAtomContentPersona);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonAtomContentPersona)
+);

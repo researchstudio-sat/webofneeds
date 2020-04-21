@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { actionCreators } from "../../actions/actions.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
-import { get, getIn, sortByDate } from "../../utils.js";
+import { get, getIn, sortByDate, getQueryParams } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import * as processUtils from "../../redux/utils/process-utils.js";
@@ -20,11 +20,15 @@ import WonFooter from "../../components/footer.jsx";
 import WonHowTo from "../../components/howto.jsx";
 import WonAtomCardGrid from "../../components/atom-card-grid.jsx";
 
+import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
+import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
+
 import "~/style/_inventory.scss";
 import "~/style/_connection-overlay.scss";
+import { withRouter } from "react-router-dom";
 
-const mapStateToProps = state => {
-  const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
+const mapStateToProps = (state, ownProps) => {
+  const { viewConnUri } = getQueryParams(ownProps.location);
 
   const ownedActivePersonas = generalSelectors
     .getOwnedPersonas(state)
@@ -94,7 +98,7 @@ const mapStateToProps = state => {
     hasOwnedActivePersonas: sortedOwnedActivePersonaUriArray.length > 0,
     sortedOwnedActivePersonaUriArray,
     showSlideIns:
-      viewSelectors.hasSlideIns(state) &&
+      viewSelectors.hasSlideIns(state, ownProps.history) &&
       viewSelectors.isSlideInsVisible(state),
     showModalDialog: viewSelectors.showModalDialog(state),
     showConnectionOverlay: !!viewConnUri,
@@ -138,7 +142,7 @@ class PageInventory extends React.Component {
           this.props.isInitialLoadInProgress ? (
             <main className="ownerloading">
               <svg className="ownerloading__spinner hspinner">
-                <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+                <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
               </svg>
               <span className="ownerloading__label">
                 Gathering your Atoms...
@@ -197,10 +201,7 @@ class PageInventory extends React.Component {
                     }
                     onClick={this.props.toggleClosedAtoms}
                   >
-                    <use
-                      xlinkHref="#ico16_arrow_down"
-                      href="#ico16_arrow_down"
-                    />
+                    <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
                   </svg>
                 </div>
               )}
@@ -256,9 +257,12 @@ PageInventory.propTypes = {
   viewConnUri: PropTypes.string,
   showClosedAtoms: PropTypes.bool,
   toggleClosedAtoms: PropTypes.func,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(PageInventory);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(PageInventory)
+);

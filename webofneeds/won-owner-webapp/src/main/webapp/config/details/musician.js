@@ -5,12 +5,15 @@ import Immutable from "immutable";
 import { details } from "../detail-definitions.js";
 
 import { is } from "../../app/utils.js";
+import ico36_detail_instrument from "../../images/won-icons/ico36_detail_instrument.svg";
+import ico36_detail_genre from "../../images/won-icons/ico36_detail_genre.svg";
+import ico36_detail_rent from "../../images/won-icons/ico36_detail_rent.svg";
 
 export const instrumentsDetail = {
   ...details.tags,
   identifier: "instruments",
   label: "Instruments",
-  icon: "#ico36_detail_instrument",
+  icon: ico36_detail_instrument,
   placeholder: "e.g. Guitar, Vocals",
   messageEnabled: false,
   parseToRDF: function({ value }) {
@@ -44,7 +47,7 @@ export const genresDetail = {
   ...details.tags,
   identifier: "genres",
   label: "Genres",
-  icon: "#ico36_detail_genre",
+  icon: ico36_detail_genre,
   placeholder: "e.g. Rock, Pop",
   messageEnabled: false,
   parseToRDF: function({ value }) {
@@ -78,7 +81,7 @@ export const perHourRentDetail = {
   ...details.price,
   identifier: "rent",
   label: "Rent",
-  icon: "#ico36_detail_rent",
+  icon: ico36_detail_rent,
   currency: [{ value: "EUR", label: "€", default: true }],
   unitCode: [{ value: "HUR", label: "per hour", default: true }],
   messageEnabled: false,
@@ -96,7 +99,7 @@ export const perHourRentRangeDetail = {
   maxLabel: "To",
   currency: [{ value: "EUR", label: "€", default: true }],
   unitCode: [{ value: "HUR", label: "per hour", default: true }],
-  icon: "#ico36_detail_rent",
+  icon: ico36_detail_rent,
   messageEnabled: false,
   parseFromRDF: function() {
     return undefined;

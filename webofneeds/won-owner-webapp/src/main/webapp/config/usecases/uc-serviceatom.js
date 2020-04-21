@@ -1,13 +1,11 @@
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
-import { Generator } from "sparqljs";
-
-window.SparqlGenerator4dbg = Generator;
+import ico36_robot from "../../images/won-icons/ico36_robot.svg";
 
 export const serviceAtom = {
   identifier: "serviceAtom",
   label: "Bot",
-  icon: "#ico36_robot",
+  icon: ico36_robot,
   draft: {
     ...mergeInEmptyDraft({
       content: {

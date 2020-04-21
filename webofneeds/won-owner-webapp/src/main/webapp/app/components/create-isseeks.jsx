@@ -1,6 +1,7 @@
 import React from "react";
 
 import "~/style/_create-isseeks.scss";
+import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.svg";
 import PropTypes from "prop-types";
 import { clone } from "../utils.js";
 
@@ -81,8 +82,8 @@ export default class WonCreateIsSeeks extends React.Component {
                     >
                       <svg className="cis__mandatory__icon">
                         <use
-                          xlinkHref="#ico16_indicator_warning"
-                          href="#ico16_indicator_warning"
+                          xlinkHref={ico16_indicator_warning}
+                          href={ico16_indicator_warning}
                         />
                       </svg>
                     </div>

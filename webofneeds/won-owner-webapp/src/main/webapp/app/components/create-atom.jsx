@@ -14,43 +14,30 @@ import * as accountUtils from "../redux/utils/account-utils.js";
 
 import "~/style/_create-atom.scss";
 import "~/style/_responsiveness-utils.scss";
+import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
+import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg";
+
 import Immutable from "immutable";
 import WonCreateIsSeeks from "./create-isseeks.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
 import ElmReact from "./elm-react.jsx";
 import { Elm } from "../../elm/PublishButton.elm";
 import { actionCreators } from "../actions/actions";
+import { getQueryParams } from "../utils";
+import { withRouter } from "react-router-dom";
 
-//TODO: figure out setting initial draft
-//TODO: figure out initial load of atom
-
-/* old code:
-      this.$scope.$watch(
-        () => this.isFromAtomToLoad,
-        () => delay(0).then(() => this.ensureFromAtomIsLoaded())
-      );
-
-      this.$scope.$watch(
-        () => this.showCreateInput,
-        () => delay(0).then(() => this.loadInitialDraft())
-      );
-
-  //was called if "isFromAtomToLoad" was true
-  ensureFromAtomIsLoaded() {
-    if (this.props.isFromAtomToLoad) {
-      this.props.fetchUnloadedAtom(this.props.fromAtomUri);
-    }
-  }
- */
-
-const mapStateToProps = state => {
-  const fromAtomUri = generalSelectors.getFromAtomUriFromRoute(state);
-  const mode = generalSelectors.getModeFromRoute(state);
+const mapStateToProps = (state, ownProps) => {
+  const {
+    fromAtomUri,
+    mode,
+    senderSocketType,
+    targetSocketType,
+    useCase,
+    holderUri,
+  } = getQueryParams(ownProps.location);
 
   let fromAtom;
-
-  let useCaseString;
-  let useCase;
+  let useCaseObject;
 
   const isCreateFromAtom = !!(fromAtomUri && mode === "DUPLICATE");
   const isEditFromAtom = !!(fromAtomUri && mode === "EDIT");
@@ -60,14 +47,8 @@ const mapStateToProps = state => {
   let hasFromAtomFailedToLoad = false;
 
   const connectToAtomUri = mode === "CONNECT" ? fromAtomUri : undefined;
-  const atomDraftSocketType =
-    mode === "CONNECT"
-      ? generalSelectors.getSenderSocketTypeFromRoute(state)
-      : undefined;
-  const connectToSocketType =
-    mode === "CONNECT"
-      ? generalSelectors.getTargetSocketTypeFromRoute(state)
-      : undefined;
+  const atomDraftSocketType = mode === "CONNECT" ? senderSocketType : undefined;
+  const connectToSocketType = mode === "CONNECT" ? targetSocketType : undefined;
 
   if (isCreateFromAtom || isEditFromAtom) {
     isFromAtomLoading = processSelectors.isAtomLoading(state, fromAtomUri);
@@ -86,8 +67,9 @@ const mapStateToProps = state => {
         fromAtom
       );
 
-      useCaseString = matchedUseCaseIdentifier || "customUseCase";
-      useCase = useCaseUtils.getUseCase(useCaseString);
+      useCaseObject = useCaseUtils.getUseCase(
+        matchedUseCaseIdentifier || "customUseCase"
+      );
 
       const fromAtomContent = get(fromAtom, "content");
       const fromAtomSeeks = get(fromAtom, "seeks");
@@ -103,34 +85,41 @@ const mapStateToProps = state => {
       );
 
       if (fromAtomContent) {
-        useCase.draft.content = fromAtomContent.toJS();
+        useCaseObject.draft.content = fromAtomContent.toJS();
       }
       if (fromAtomSeeks) {
-        useCase.draft.seeks = fromAtomSeeks.toJS();
+        useCaseObject.draft.seeks = fromAtomSeeks.toJS();
       }
 
       if (!isEditFromAtom) {
         if (socketsReset) {
-          useCase.draft.content.sockets = socketsReset.toJS();
+          useCaseObject.draft.content.sockets = socketsReset.toJS();
         }
         if (defaultSocketReset) {
-          useCase.draft.content.defaultSocket = defaultSocketReset.toJS();
+          useCaseObject.draft.content.defaultSocket = defaultSocketReset.toJS();
         }
 
         if (seeksSocketsReset) {
-          useCase.draft.seeks.sockets = seeksSocketsReset.toJS();
+          useCaseObject.draft.seeks.sockets = seeksSocketsReset.toJS();
         }
         if (seeksDefaultSocketReset) {
-          useCase.draft.seeks.defaultSocket = seeksDefaultSocketReset.toJS();
+          useCaseObject.draft.seeks.defaultSocket = seeksDefaultSocketReset.toJS();
         }
       }
     }
   } else {
-    useCaseString = generalSelectors.getUseCaseFromRoute(state);
-    useCase = useCaseUtils.getUseCase(useCaseString);
+    if (fromAtomUri) {
+      // necessary to push atom into the state otherwise a connectTo the fromAtomUri might not find the necessary socketUris for the atom
+      isFromAtomLoading = processSelectors.isAtomLoading(state, fromAtomUri);
+      isFromAtomToLoad = processSelectors.isAtomToLoad(state, fromAtomUri);
+      hasFromAtomFailedToLoad = processSelectors.hasAtomFailedToLoad(
+        state,
+        fromAtomUri
+      );
+    }
+    useCaseObject = useCaseUtils.getUseCase(useCase);
   }
 
-  const holderUri = generalSelectors.getHolderUriFromRoute(state);
   const isHolderOwned = accountUtils.isAtomOwned(
     get(state, "account"),
     holderUri
@@ -146,7 +135,7 @@ const mapStateToProps = state => {
     connectToAtomUri,
     processingPublish: processSelectors.isProcessingPublish(state),
     connectionHasBeenLost: !generalSelectors.selectIsConnected(state),
-    useCase,
+    useCase: useCaseObject,
     fromAtom,
     fromAtomUri,
     isFromAtomOwned: generalSelectors.isAtomOwned(state, fromAtomUri),
@@ -159,13 +148,13 @@ const mapStateToProps = state => {
       state,
       fromAtomUri
     ),
-    isHoldable: useCaseUtils.isHoldable(useCase),
+    isHoldable: useCaseUtils.isHoldable(useCaseObject),
     atomDraftSocketType,
     connectToSocketType,
     hasFromAtomFailedToLoad,
     personas: generalSelectors.getOwnedCondensedPersonaList(state).toJS(),
     showCreateInput:
-      useCase &&
+      useCaseObject &&
       !(
         isCreateFromAtom &&
         isEditFromAtom &&
@@ -179,14 +168,8 @@ const mapDispatchToProps = dispatch => {
     fetchUnloadedAtom: atomUri => {
       dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
     },
-    routerBack: () => {
-      dispatch(actionCreators.router__back());
-    },
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
-    atomsEdit: (draft, atom) => {
-      dispatch(actionCreators.atoms__edit(draft, atom));
+    atomsEdit: (draft, atom, callback) => {
+      dispatch(actionCreators.atoms__edit(draft, atom, callback));
     },
     atomsCreate: (draft, persona, nodeUri) => {
       dispatch(actionCreators.atoms__create(draft, persona, nodeUri));
@@ -202,7 +185,8 @@ const mapDispatchToProps = dispatch => {
       draft,
       persona,
       connectToSocketType,
-      atomDraftSocketType
+      atomDraftSocketType,
+      history
     ) => {
       dispatch(
         actionCreators.connections__connectReactionAtom(
@@ -210,7 +194,8 @@ const mapDispatchToProps = dispatch => {
           draft,
           persona,
           connectToSocketType,
-          atomDraftSocketType
+          atomDraftSocketType,
+          history
         )
       );
     },
@@ -232,12 +217,23 @@ class CreateAtom extends React.Component {
     this.updateDraftSeeks = this.updateDraftSeeks.bind(this);
   }
 
-  componentDidMount() {
-    if (this.props.showCreateInput && this.props.useCase.draft) {
-      // deep clone of draft
+  componentDidUpdate(prevProps, prevState) {
+    // if createInput is shown and draftObject is still empty we initialize it
+    if (
+      this.props.showCreateInput &&
+      this.props.useCase.draft &&
+      Object.keys(prevState.draftObject).length === 0
+    ) {
+      console.debug("Setting initialDraft for create");
       this.setState({
         draftObject: JSON.parse(JSON.stringify(this.props.useCase.draft)),
       });
+    }
+
+    // if isFromAtomToLoad changes and is still true we fetch the atom into the state
+    if (this.props.isFromAtomToLoad) {
+      console.debug("Loading Atom with uri: ", this.props.fromAtomUri);
+      this.props.fetchUnloadedAtom(this.props.fromAtomUri);
     }
   }
 
@@ -337,7 +333,7 @@ class CreateAtom extends React.Component {
                   </button>
                   <button
                     className="cp__footer__edit__cancel won-button--outlined thin red"
-                    onClick={this.props.routerBack}
+                    onClick={this.props.history.goBack}
                   >
                     Cancel
                   </button>
@@ -369,7 +365,7 @@ class CreateAtom extends React.Component {
         unavailableContentElement = (
           <div className="cp__content__loading">
             <svg className="cp__content__loading__spinner hspinner">
-              <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+              <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
             </svg>
             <span className="cp__content__loading__label">Loading...</span>
           </div>
@@ -379,8 +375,8 @@ class CreateAtom extends React.Component {
           <div className="cp__content__failed">
             <svg className="cp__content__failed__icon">
               <use
-                xlinkHref="#ico16_indicator_error"
-                href="#ico16_indicator_error"
+                xlinkHref={ico16_indicator_error}
+                href={ico16_indicator_error}
               />
             </svg>
             <span className="cp__content__failed__label">
@@ -468,7 +464,11 @@ class CreateAtom extends React.Component {
   save() {
     if (this.props.loggedIn && this.props.isFromAtomOwned) {
       this.sanitizeDraftObject(() => {
-        this.props.atomsEdit(this.state.draftObject, this.props.fromAtom);
+        this.props.atomsEdit(
+          this.state.draftObject,
+          this.props.fromAtom,
+          this.props.history.goBack
+        );
       });
     }
   }
@@ -509,12 +509,10 @@ class CreateAtom extends React.Component {
             tempDraft,
             personaId,
             tempConnectToSocketType,
-            tempAtomDraftSocketType
+            tempAtomDraftSocketType,
+            this.props.history
           );
-          this.props.routerGo("connections", {
-            useCase: undefined,
-            connectionUri: undefined,
-          });
+          this.props.history.push("/connections");
         } else {
           this.props.showTermsDialog(
             Immutable.fromJS({
@@ -525,12 +523,10 @@ class CreateAtom extends React.Component {
                   tempDraft,
                   personaId,
                   tempConnectToSocketType,
-                  tempAtomDraftSocketType
+                  tempAtomDraftSocketType,
+                  this.props.history
                 );
-                this.props.routerGo("connections", {
-                  useCase: undefined,
-                  connectionUri: undefined,
-                });
+                this.props.history.push("/connections");
               },
               cancelCallback: () => {
                 this.props.hideModalDialog();
@@ -544,7 +540,7 @@ class CreateAtom extends React.Component {
 
         if (this.props.loggedIn) {
           this.props.atomsCreate(tempDraft, personaId, tempDefaultNodeUri);
-          this.props.routerGo("inventory");
+          this.props.history.push("/inventory");
         } else {
           this.props.showTermsDialog(
             Immutable.fromJS({
@@ -555,7 +551,7 @@ class CreateAtom extends React.Component {
                   personaId,
                   tempDefaultNodeUri
                 );
-                this.props.routerGo("inventory");
+                this.props.history.push("/inventory");
               },
               cancelCallback: () => {
                 this.props.hideModalDialog();
@@ -569,6 +565,7 @@ class CreateAtom extends React.Component {
 }
 
 CreateAtom.propTypes = {
+  location: PropTypes.object,
   defaultNodeUri: PropTypes.string,
   atomsCreate: PropTypes.func,
   atomsEdit: PropTypes.func,
@@ -594,18 +591,19 @@ CreateAtom.propTypes = {
   loggedIn: PropTypes.bool,
   personas: PropTypes.arrayOf(PropTypes.object),
   processingPublish: PropTypes.bool,
-  routerBack: PropTypes.func,
-  routerGo: PropTypes.func,
   showCreateInput: PropTypes.bool,
   showTermsDialog: PropTypes.func,
   connectionsConnectReactionAtom: PropTypes.func,
   useCase: PropTypes.object,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(CreateAtom);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(CreateAtom)
+);
 
 // returns true if the branch has any content present
 function isBranchContentPresent(isOrSeeks, includeType = false) {

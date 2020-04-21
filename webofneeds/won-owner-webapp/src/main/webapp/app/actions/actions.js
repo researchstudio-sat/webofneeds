@@ -39,14 +39,6 @@
 import * as atomActions from "./atoms-actions.js";
 
 import {
-  stateBack,
-  stateGoAbs,
-  stateGoCurrent,
-  stateGoDefault,
-  stateGoKeepParams,
-  stateGoResetParams,
-} from "./cstm-router-actions.js";
-import {
   accountAcceptDisclaimer,
   accountAcceptTermsOfService,
   accountChangePassword,
@@ -70,7 +62,6 @@ import {
   fetchWhatsNew,
   pageLoadAction,
 } from "./load-action.js";
-import { stateGo, stateReload } from "redux-ui-router";
 import {
   disconnectPersona,
   connectPersona,
@@ -78,12 +69,6 @@ import {
 } from "./persona-actions.js";
 import { deepFreeze } from "../utils.js";
 import won from "../won-es6";
-
-// </utils>
-
-// <action-creators>
-
-// </action-creators>
 
 /**
  * all values equal to this string will be replaced by action-creators that simply
@@ -173,18 +158,6 @@ const actionHierarchy = {
     storeUriFailed: INJ_DEFAULT,
     removeDeleted: INJ_DEFAULT,
   },
-  router: {
-    stateGo, // only overwrites parameters that are explicitly mentioned, unless called without queryParams object (which also resets "pervasive" parameters, that shouldn't be removed
-    stateGoAbs, // reset's all parameters but the one passed as arguments
-    stateGoResetParams, // goes to new state and resets all parameters (except for "pervasive" ones like `privateId`)
-    stateGoKeepParams, // goes to new state and keeps listed parameters at their current values
-    stateGoCurrent,
-    stateGoDefault,
-    stateReload,
-    //stateTransitionTo, // should not be used directly
-    back: stateBack,
-  },
-
   /**
    * Server triggered interactions (aka received messages)
    */
@@ -528,7 +501,7 @@ function reduceAndMapTreeKeys(reducer, mapper, acc, obj) {
  * actionCreators are functions that take the payload and output
  * an action object, thus prebinding the action-type.
  * This object follows the structure of the actionTypes-object,
- * but is flattened for use with ng-redux. Thus calling
+ * but is flattened for use with react-redux. Thus calling
  * `$ngRedux.dispatch(actionCreators.drafts__new(myDraft))` will trigger an action
  * `{type: actionTypes.drafts.new, payload: myDraft}`
  *

@@ -2,15 +2,16 @@
  * Created by quasarchimaere on 05.08.2019.
  */
 import React from "react";
-import { getIn } from "../utils";
-import { actionCreators } from "../actions/actions.js";
+import { getIn, generateLink } from "../utils";
 import { connect } from "react-redux";
 import * as atomUtils from "../redux/utils/atom-utils";
 import * as generalSelectors from "../redux/selectors/general-selectors";
 import WonAtomCard from "./atom-card.jsx";
 
 import "~/style/_atom-content-holds.scss";
+import ico36_plus from "~/images/won-icons/ico36_plus.svg";
 import PropTypes from "prop-types";
+import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const atom = getIn(state, ["atoms", ownProps.atomUri]);
@@ -25,19 +26,15 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
-  return {
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
-  };
-};
-
 class WonAtomContentHolds extends React.Component {
   createAtom() {
-    this.props.routerGo("create", {
-      holderUri: this.props.atomUri,
-    });
+    this.props.history.push(
+      generateLink(
+        this.props.history.location,
+        { holderUri: this.props.atomUri },
+        "/create"
+      )
+    );
   }
 
   render() {
@@ -64,7 +61,7 @@ class WonAtomContentHolds extends React.Component {
           }}
         >
           <svg className="ach__createatom__icon" title="Create a new post">
-            <use xlinkHref="#ico36_plus" href="#ico36_plus" />
+            <use xlinkHref={ico36_plus} href={ico36_plus} />
           </svg>
           <span className="ach__createatom__label">New</span>
         </div>
@@ -93,10 +90,7 @@ WonAtomContentHolds.propTypes = {
   hasHeldAtoms: PropTypes.bool,
   heldAtomUrisArray: PropTypes.arrayOf(PropTypes.string),
   currentLocation: PropTypes.object,
-  routerGo: PropTypes.func,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonAtomContentHolds);
+export default withRouter(connect(mapStateToProps)(WonAtomContentHolds));

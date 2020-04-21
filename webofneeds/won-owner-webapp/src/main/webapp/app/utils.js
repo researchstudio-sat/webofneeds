@@ -12,6 +12,91 @@ export function dispatchEvent(elem, eventName, eventData) {
   elem.dispatchEvent(event);
 }
 
+export function getPathname(location) {
+  return location && location.pathname;
+}
+
+/*
+Currently Used/possible Parameters:
+  {
+    connectionUri: undefined,
+    viewConnUri: undefined,
+    postUri: undefined,
+    useCase: undefined,
+    useCaseGroup: undefined,
+    token: undefined,
+    privateId: undefined,
+    fromAtomUri: undefined,
+    senderSocketType: undefined,
+    targetSocketType: undefined,
+    mode: undefined,
+  }
+*/
+export function getQueryParams(location) {
+  let pairs = location.search.slice(1).split("&");
+
+  let result = {};
+  pairs.forEach(function(pair) {
+    pair = pair.split("=");
+    result[pair[0]] = pair[1] ? decodeURIComponent(pair[1]) : undefined;
+  });
+
+  return JSON.parse(JSON.stringify(result));
+}
+
+/**
+ * Generates A Link String for React Router
+ * @param currentLocation current location object (e.g. this.props.history.location - injected in the component by withRouter)
+ * @param newParams - parameters that should be set
+ * @param path - path to go to -> if left empty link will use the current pathname of the location
+ * @param keepExistingParams - default true, if set to false, only newParams will be added to the link
+ * @returns {*}
+ */
+export function generateLink(
+  currentLocation,
+  newParams,
+  path,
+  keepExistingParams = true
+) {
+  const previousParams = keepExistingParams
+    ? getQueryParams(currentLocation)
+    : {};
+  const mergedParams = { ...previousParams, ...newParams };
+
+  return generateQueryString(
+    path ? path : getPathname(currentLocation),
+    mergedParams
+  );
+}
+
+function generateQueryString(path, params = {}) {
+  const queryParamsString = generateQueryParamsString(params);
+
+  if (queryParamsString) {
+    return path + queryParamsString;
+  } else {
+    return path;
+  }
+}
+
+function generateQueryParamsString(params) {
+  if (params) {
+    const keyValueArray = [];
+
+    for (const key in params) {
+      const value = params[key];
+
+      if (value) {
+        keyValueArray.push(key + "=" + encodeURIComponent(value));
+      }
+    }
+
+    if (keyValueArray.length > 0) {
+      return "?" + keyValueArray.join("&");
+    }
+  }
+  return undefined;
+}
 /*
  * Freezes an object recursively.
  *

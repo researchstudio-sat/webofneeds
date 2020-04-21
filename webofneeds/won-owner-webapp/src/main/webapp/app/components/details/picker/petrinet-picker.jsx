@@ -4,6 +4,8 @@ import WonFileDropzone from "../../file-dropzone.jsx";
 import PropTypes from "prop-types";
 
 import "~/style/_petrinetpicker.scss";
+import ico36_close from "~/images/won-icons/ico36_close.svg";
+import ico36_uc_transport_demand from "~/images/won-icons/ico36_uc_transport_demand.svg";
 
 export default class WonPetrinetPicker extends React.Component {
   constructor(props) {
@@ -28,12 +30,12 @@ export default class WonPetrinetPicker extends React.Component {
               className="petrinetp__preview__remove"
               onClick={this.removeWorkflow}
             >
-              <use xlinkHref="#ico36_close" href="#ico36_close" />
+              <use xlinkHref={ico36_close} href={ico36_close} />
             </svg>
             <svg className="petrinetp__preview__typeicon">
               <use
-                xlinkHref="#ico36_uc_transport_demand"
-                href="#ico36_uc_transport_demand"
+                xlinkHref={ico36_uc_transport_demand}
+                href={ico36_uc_transport_demand}
               />
             </svg>
           </div>

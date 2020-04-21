@@ -18,11 +18,12 @@ import {
 } from "../../app/sparql-builder-utils.js";
 import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
+import ico36_uc_realestate from "../../images/won-icons/ico36_uc_realestate.svg";
 
 export const rentRealEstateOffer = {
   identifier: "rentRealEstateOffer",
   label: "Rent a place out",
-  icon: "#ico36_uc_realestate",
+  icon: ico36_uc_realestate,
   timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 30 * 3,
   doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {

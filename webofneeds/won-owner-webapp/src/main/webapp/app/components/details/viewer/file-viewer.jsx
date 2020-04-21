@@ -2,6 +2,7 @@ import React from "react";
 
 import { get } from "../../../utils.js";
 import "~/style/_file-viewer.scss";
+import ico36_uc_transport_demand from "~/images/won-icons/ico36_uc_transport_demand.svg";
 import PropTypes from "prop-types";
 
 export default class WonFileViewer extends React.Component {
@@ -35,8 +36,8 @@ export default class WonFileViewer extends React.Component {
             >
               <svg className="filev__content__item__inner__typeicon">
                 <use
-                  xlinkHref="#ico36_uc_transport_demand"
-                  href="#ico36_uc_transport_demand"
+                  xlinkHref={ico36_uc_transport_demand}
+                  href={ico36_uc_transport_demand}
                 />
               </svg>
               <div className="filev__content__item__inner__label">

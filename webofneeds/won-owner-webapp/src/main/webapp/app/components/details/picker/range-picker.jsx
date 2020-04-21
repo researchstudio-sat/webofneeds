@@ -1,6 +1,7 @@
 import React from "react";
 
 import "~/style/_rangepicker.scss";
+import ico36_close from "~/images/won-icons/ico36_close.svg";
 import PropTypes from "prop-types";
 import { isValidNumber } from "../../../utils.js";
 
@@ -30,7 +31,7 @@ export default class WonRangePicker extends React.Component {
                 className="rangep__input__reset__icon clickable"
                 onClick={() => this.resetMin(true)}
               >
-                <use xlinkHref="#ico36_close" href="#ico36_close" />
+                <use xlinkHref={ico36_close} href={ico36_close} />
               </svg>
             )}
           </div>
@@ -56,7 +57,7 @@ export default class WonRangePicker extends React.Component {
                 className="rangep__input__reset__icon clickable"
                 onClick={() => this.resetMax(true)}
               >
-                <use xlinkHref="#ico36_close" href="#ico36_close" />
+                <use xlinkHref={ico36_close} href={ico36_close} />
               </svg>
             )}
           </div>

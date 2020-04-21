@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
-import { get, getIn } from "../utils.js";
+import { get, getIn, getQueryParams } from "../utils.js";
 
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
@@ -22,9 +22,14 @@ import { Elm } from "../../elm/AddPersona.elm";
 
 import "~/style/_atom-content.scss";
 import "~/style/_rdflink.scss";
+import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg";
+import rdf_logo_1 from "~/images/won-icons/rdf_logo_1.svg";
+import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
+import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
-  const openConnectionUri = generalSelectors.getConnectionUriFromRoute(state);
+  const { connectionUri } = getQueryParams(ownProps.location);
+  const openConnectionUri = connectionUri;
   const atom = getIn(state, ["atoms", ownProps.atomUri]);
   const isOwned = generalSelectors.isAtomOwned(state, ownProps.atomUri);
   const isActive = atomUtils.isActive(atom);
@@ -117,8 +122,8 @@ class WonAtomContent extends React.Component {
           <div className="atom-failedtoload">
             <svg className="atom-failedtoload__icon">
               <use
-                xlinkHref="#ico16_indicator_error"
-                href="#ico16_indicator_error"
+                xlinkHref={ico16_indicator_error}
+                href={ico16_indicator_error}
               />
             </svg>
             <span className="atom-failedtoload__label">
@@ -139,7 +144,7 @@ class WonAtomContent extends React.Component {
       const processingUpdateElement = this.props.atomProcessingUpdate && (
         <div className="atom-content__updateindicator">
           <svg className="hspinner atom-content__updateindicator__spinner">
-            <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+            <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
           </svg>
           <span className="atom-content__updateindicator__label">
             Processing changes...
@@ -225,7 +230,7 @@ class WonAtomContent extends React.Component {
               href={this.props.atomUri}
             >
               <svg className="rdflink__small">
-                <use xlinkHref="#rdf_logo_1" href="#rdf_logo_1" />
+                <use xlinkHref={rdf_logo_1} href={rdf_logo_1} />
               </svg>
               <span className="rdflink__label">Atom</span>
             </a>
@@ -237,7 +242,7 @@ class WonAtomContent extends React.Component {
                 href={this.props.openConnectionUri}
               >
                 <svg className="rdflink__small">
-                  <use xlinkHref="#rdf_logo_1" href="#rdf_logo_1" />
+                  <use xlinkHref={rdf_logo_1} href={rdf_logo_1} />
                 </svg>
                 <span className="rdflink__label">Connection</span>
               </a>
@@ -289,7 +294,9 @@ WonAtomContent.propTypes = {
   fetchAtom: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonAtomContent);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonAtomContent)
+);

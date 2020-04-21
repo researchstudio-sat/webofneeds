@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import Immutable from "immutable";
 import { connect } from "react-redux";
-import { get, getIn } from "../utils.js";
+import { get, getIn, generateLink } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import WonAtomHeader from "./atom-header.jsx";
 import ChatTextfield from "./chat-textfield.jsx";
@@ -15,6 +15,7 @@ import * as wonLabelUtils from "../won-label-utils.js";
 import vocab from "../service/vocab.js";
 
 import "~/style/_atom-footer.scss";
+import { Link, withRouter } from "react-router-dom";
 
 const FooterType = {
   INACTIVE: 1,
@@ -87,12 +88,6 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
-    routerGoResetParams: path => {
-      dispatch(actionCreators.router__stateGoResetParams(path));
-    },
     hideModalDialog: () => {
       dispatch(actionCreators.view__hideModalDialog());
     },
@@ -331,16 +326,14 @@ class AtomInfo extends React.Component {
             )}
           <div className="atom-footer__matches__list">
             {atomElements}
-            <div
+            <Link
               key={ucIdentifier + "-" + index}
               className="atom-footer__adhocbutton"
-              onClick={() =>
-                this.selectUseCase(
-                  ucIdentifier,
-                  ucSenderSocketType,
-                  ucTargetSocketType
-                )
-              }
+              to={this.selectUseCaseRoute(
+                ucIdentifier,
+                ucSenderSocketType,
+                ucTargetSocketType
+              )}
             >
               <div className="atom-footer__adhocbutton__icon">
                 {useCaseUtils.getUseCaseIcon(ucIdentifier) ? (
@@ -368,25 +361,26 @@ class AtomInfo extends React.Component {
                   </span>
                 </div>
               </div>
-            </div>
+            </Link>
           </div>
         </div>
       </React.Fragment>
     );
   }
 
-  selectUseCase(ucIdentifier, ucSenderSocketType, ucTargetSocketType) {
-    this.props.routerGo("create", {
-      useCase: ucIdentifier,
-      useCaseGroup: undefined,
-      connectionUri: undefined,
-      fromAtomUri: this.props.atomUri,
-      senderSocketType: ucSenderSocketType,
-      targetSocketType: ucTargetSocketType,
-      viewConnUri: undefined,
-      mode: "CONNECT",
-      holderUri: this.props.addHolderUri,
-    });
+  selectUseCaseRoute(ucIdentifier, ucSenderSocketType, ucTargetSocketType) {
+    return generateLink(
+      this.props.history.location,
+      {
+        useCase: ucIdentifier,
+        fromAtomUri: this.props.atomUri,
+        senderSocketType: ucSenderSocketType,
+        targetSocketType: ucTargetSocketType,
+        mode: "CONNECT",
+        holderUri: this.props.addHolderUri,
+      },
+      "/create"
+    );
   }
 
   connectAtomSockets(
@@ -432,7 +426,7 @@ class AtomInfo extends React.Component {
               senderSocketType === vocab.CHAT.ChatSocketCompacted ||
               targetSocketType === vocab.CHAT.ChatSocketCompacted
             ) {
-              this.props.routerGoResetParams("connections");
+              this.props.history.push("/connections");
             }
           },
         },
@@ -477,7 +471,7 @@ class AtomInfo extends React.Component {
               targetSocketType,
               message
             );
-            this.props.routerGoResetParams("connections");
+            this.props.history.push("/connections");
           } else if (personaConnections.size == 1) {
             const personaConnection = personaConnections.first();
             const personaConnectionUri = get(personaConnection, "uri");
@@ -525,9 +519,15 @@ class AtomInfo extends React.Component {
               );
             }
 
-            this.props.routerGo("connections", {
-              connectionUri: personaConnectionUri,
-            });
+            this.props.history.push(
+              generateLink(
+                this.props.history.location,
+                {
+                  connectionUri: personaConnectionUri,
+                },
+                "/connections"
+              )
+            );
           } else {
             console.error(
               "more than one connection stored between two atoms that use the same exact sockets",
@@ -536,7 +536,7 @@ class AtomInfo extends React.Component {
             );
           }
         } else {
-          this.props.routerGoResetParams("connections");
+          this.props.history.push("/connections");
 
           this.props.connectionsConnectAdHoc(
             targetSocketUri,
@@ -550,7 +550,7 @@ class AtomInfo extends React.Component {
         Immutable.fromJS({
           acceptCallback: () => {
             this.props.hideModalDialog();
-            this.props.routerGoResetParams("connections");
+            this.props.history.push("/connections");
 
             this.props.connectionsConnectAdHoc(
               targetSocketUri,
@@ -577,8 +577,6 @@ AtomInfo.propTypes = {
   ownedReactionAtomsArray: PropTypes.arrayOf(PropTypes.object),
   addHolderUri: PropTypes.string,
   className: PropTypes.string,
-  routerGo: PropTypes.func,
-  routerGoResetParams: PropTypes.func,
   hideModalDialog: PropTypes.func,
   showModalDialog: PropTypes.func,
   showTermsDialog: PropTypes.func,
@@ -589,9 +587,12 @@ AtomInfo.propTypes = {
   connectSocketsServerSide: PropTypes.func,
   sendChatMessage: PropTypes.func,
   atomReopen: PropTypes.func,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(AtomInfo);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(AtomInfo)
+);

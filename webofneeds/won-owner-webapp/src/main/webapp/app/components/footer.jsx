@@ -6,6 +6,7 @@ import { getIn } from "../utils.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 
 import "~/style/_footer.scss";
+import { Link } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -19,9 +20,6 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
     toastPush: toastImm => {
       dispatch(actionCreators.toasts__push(toastImm));
     },
@@ -46,45 +44,30 @@ class WonFooter extends React.Component {
         </div>
         <div class="footer__tagLine">Web of Needs</div>-->*/}
           <div className="footer__linksdesktop hide-in-responsive">
-            <a
-              className="footer__linksdesktop__link"
-              onClick={() =>
-                this.props.routerGo("about", { aboutSection: undefined })
-              }
-            >
+            <Link className="footer__linksdesktop__link" to="/about">
               About
-            </a>
+            </Link>
             <span className="footer__linksdesktop__divider">|</span>
-            <a
+            <Link
               className="footer__linksdesktop__link"
-              onClick={() =>
-                this.props.routerGo("about", {
-                  aboutSection: "aboutPrivacyPolicy",
-                })
-              }
+              to="/about?aboutSection=aboutPrivacyPolicy"
             >
               Privacy
-            </a>
+            </Link>
             <span className="footer__linksdesktop__divider">|</span>
-            <a
+            <Link
               className="footer__linksdesktop__link"
-              onClick={() =>
-                this.props.routerGo("about", { aboutSection: "aboutFaq" })
-              }
+              to="/about?aboutSection=aboutFaq"
             >
               FAQ
-            </a>
+            </Link>
             <span className="footer__linksdesktop__divider">|</span>
-            <a
+            <Link
               className="footer__linksdesktop__link"
-              onClick={() =>
-                this.props.routerGo("about", {
-                  aboutSection: "aboutTermsOfService",
-                })
-              }
+              to="/about?aboutSection=aboutTermsOfService"
             >
               Terms Of Service
-            </a>
+            </Link>
             <span className="footer__linksdesktop__divider">|</span>
             <span
               className="footer__linksdesktop__link"
@@ -103,42 +86,27 @@ class WonFooter extends React.Component {
             </span>
           </div>
           <div className="footer__linksmobile show-in-responsive">
-            <a
-              className="footer__linksmobile__link"
-              onClick={() =>
-                this.props.routerGo("about", { aboutSection: undefined })
-              }
-            >
+            <Link className="footer__linksmobile__link" to="/about">
               About
-            </a>
-            <a
+            </Link>
+            <Link
               className="footer__linksmobile__link"
-              onClick={() =>
-                this.props.routerGo("about", {
-                  aboutSection: "aboutPrivacyPolicy",
-                })
-              }
+              to="/about?aboutSection=aboutPrivacyPolicy"
             >
               Privacy
-            </a>
-            <a
+            </Link>
+            <Link
               className="footer__linksmobile__link"
-              onClick={() =>
-                this.props.routerGo("about", { aboutSection: "aboutFaq" })
-              }
+              to="/about?aboutSection=aboutFaq"
             >
               FAQ
-            </a>
-            <a
+            </Link>
+            <Link
               className="footer__linksmobile__link"
-              onClick={() =>
-                this.props.routerGo("about", {
-                  aboutSection: "aboutTermsOfService",
-                })
-              }
+              to="/about?aboutSection=aboutTermsOfService"
             >
               Terms Of Service
-            </a>
+            </Link>
             <span
               className="footer__linksmobile__link"
               onClick={() => this.props.toggleDebugMode()}
@@ -169,7 +137,6 @@ WonFooter.propTypes = {
   appTitle: PropTypes.string,
   shouldShowRdf: PropTypes.bool,
   debugMode: PropTypes.bool,
-  routerGo: PropTypes.func,
   toastPush: PropTypes.func,
   toggleRdf: PropTypes.func,
   toggleDebugMode: PropTypes.func,

@@ -1,47 +1,53 @@
 /**
  * Created by quasarchimaere on 21.01.2019.
  */
+import { createSelector } from "reselect";
+
 import { get, getIn } from "../../utils.js";
 import * as viewUtils from "../utils/view-utils.js";
 import * as accountUtils from "../utils/account-utils.js";
-import { getVerificationTokenFromRoute } from "./general-selectors.js";
+import { getAccountState } from "./general-selectors.js";
+import { getQueryParams } from "../../utils";
+
+export const getViewState = state => get(state, "view");
 
 /**
  * Check if showSlideIns is true
  * @param state (full redux-state)
  * @returns {*}
  */
-export function isSlideInsVisible(state) {
-  return viewUtils.isSlideInsVisible(get(state, "view"));
-}
+export const isSlideInsVisible = createSelector(getViewState, viewState =>
+  viewUtils.isSlideInsVisible(viewState)
+);
 
-export function showModalDialog(state) {
-  return viewUtils.showModalDialog(get(state, "view"));
-}
+export const showModalDialog = createSelector(getViewState, viewState =>
+  viewUtils.showModalDialog(viewState)
+);
 
-export function showRdf(state) {
-  return viewUtils.showRdf(get(state, "view"));
-}
+export const showRdf = createSelector(getViewState, viewState =>
+  viewUtils.showRdf(viewState)
+);
 
-export function isDebugModeEnabled(state) {
-  return viewUtils.isDebugModeEnabled(get(state, "view"));
-}
+export const isDebugModeEnabled = createSelector(getViewState, viewState =>
+  viewUtils.isDebugModeEnabled(viewState)
+);
 
-export function isMenuVisible(state) {
-  return viewUtils.isMenuVisible(get(state, "view"));
-}
+export const isMenuVisible = createSelector(getViewState, viewState =>
+  viewUtils.isMenuVisible(viewState)
+);
 
-export function isAnonymousLinkSent(state) {
-  return viewUtils.isAnonymousLinkSent(get(state, "view"));
-}
+export const isAnonymousLinkSent = createSelector(getViewState, viewState =>
+  viewUtils.isAnonymousLinkSent(viewState)
+);
 
-export function isAnonymousLinkCopied(state) {
-  return viewUtils.isAnonymousLinkCopied(get(state, "view"));
-}
+export const isAnonymousLinkCopied = createSelector(getViewState, viewState =>
+  viewUtils.isAnonymousLinkCopied(viewState)
+);
 
-export function showAnonymousSlideInEmailInput(state) {
-  return viewUtils.showAnonymousSlideInEmailInput(get(state, "view"));
-}
+export const showAnonymousSlideInEmailInput = createSelector(
+  getViewState,
+  viewState => viewUtils.showAnonymousSlideInEmailInput(viewState)
+);
 
 export function showSlideInAnonymousSuccess(state) {
   const isAnonymous = accountUtils.isAnonymous(get(state, "account"));
@@ -84,16 +90,16 @@ export function showSlideInTermsOfService(state) {
   );
 }
 
-export function showSlideInEmailVerification(state) {
-  const verificationToken = getVerificationTokenFromRoute(state);
-  const accountState = get(state, "account");
+export function showSlideInEmailVerification(state, history) {
+  const { token } = getQueryParams(history.location);
+  const accountState = getAccountState(state);
   const isLoggedIn = accountUtils.isLoggedIn(accountState);
   const isAnonymous = accountUtils.isAnonymous(accountState);
   const isEmailVerified = accountUtils.isEmailVerified(accountState);
 
   return !!(
     !showSlideInConnectionLost(state) &&
-    (verificationToken || (isLoggedIn && !isEmailVerified && !isAnonymous))
+    (token || (isLoggedIn && !isEmailVerified && !isAnonymous))
   );
 }
 
@@ -101,13 +107,13 @@ export function showSlideInConnectionLost(state) {
   return getIn(state, ["messages", "lostConnection"]);
 }
 
-export function hasSlideIns(state) {
+export function hasSlideIns(state, history) {
   return !!(
     showSlideInAnonymous(state) ||
     showSlideInAnonymousSuccess(state) ||
     showSlideInDisclaimer(state) ||
     showSlideInTermsOfService(state) ||
-    showSlideInEmailVerification(state) ||
+    showSlideInEmailVerification(state, history) ||
     showSlideInConnectionLost(state)
   );
 }

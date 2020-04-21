@@ -1,6 +1,7 @@
 import React from "react";
 
 import "~/style/_titlepicker.scss";
+import ico36_close from "~/images/won-icons/ico36_close.svg";
 import PropTypes from "prop-types";
 
 export default function WonTitlePicker(props) {
@@ -19,7 +20,7 @@ export default function WonTitlePicker(props) {
       <div className="titlep__input">
         {props.initialValue && (
           <svg className="titlep__input__icon clickable" onClick={reset}>
-            <use xlinkHref="#ico36_close" href="#ico36_close" />
+            <use xlinkHref={ico36_close} href={ico36_close} />
           </svg>
         )}
         <input

@@ -5,6 +5,9 @@ import PropTypes from "prop-types";
 import { useDropzone } from "react-dropzone";
 import { readAsDataURL } from "../utils.js";
 
+import ico36_close from "~/images/won-icons/ico36_close.svg";
+import illu_drag_here from "~/images/won-icons/illu_drag_here.svg";
+
 export default function WonFileDropzone(props) {
   const onDrop = useCallback(acceptedFiles => {
     //Do something with the files
@@ -34,7 +37,7 @@ export default function WonFileDropzone(props) {
     isDragAccept,
   } = useDropzone({ onDrop });
 
-  const icon = isDragReject ? "#ico36_close" : "#illu_drag_here";
+  const icon = isDragReject ? ico36_close : illu_drag_here;
 
   return (
     <won-file-dropzone>

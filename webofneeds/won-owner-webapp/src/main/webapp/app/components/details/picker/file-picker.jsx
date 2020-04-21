@@ -4,6 +4,9 @@ import "~/style/_filepicker.scss";
 import PropTypes from "prop-types";
 import WonFileDropzone from "../../file-dropzone";
 
+import ico36_close from "~/images/won-icons/ico36_close.svg";
+import ico36_uc_transport_demand from "~/images/won-icons/ico36_uc_transport_demand.svg";
+
 export default class WonFilePicker extends React.Component {
   constructor(props) {
     super(props);
@@ -28,8 +31,8 @@ export default class WonFilePicker extends React.Component {
             ) : (
               <svg className="filep__preview__item__typeicon">
                 <use
-                  xlinkHref="#ico36_uc_transport_demand"
-                  href="#ico36_uc_transport_demand"
+                  xlinkHref={ico36_uc_transport_demand}
+                  href={ico36_uc_transport_demand}
                 />
               </svg>
             )}
@@ -39,7 +42,7 @@ export default class WonFilePicker extends React.Component {
               className="filep__preview__item__remove"
               onClick={() => this.removeFile(file)}
             >
-              <use xlinkHref="#ico36_close" href="#ico36_close" />
+              <use xlinkHref={ico36_close} href={ico36_close} />
             </svg>
           </div>
         )

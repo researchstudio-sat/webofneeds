@@ -1,5 +1,10 @@
 import React from "react";
-import { generateSimpleTransitionLabel, get, getIn } from "../utils.js";
+import {
+  generateSimpleTransitionLabel,
+  get,
+  getIn,
+  getQueryParams,
+} from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import { connect } from "react-redux";
@@ -7,9 +12,11 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
 import "~/style/_petrinet-state.scss";
+import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
+import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
-  const connectionUri = generalSelectors.getConnectionUriFromRoute(state); //TODO: create selector that returns the correct connectionUri without looking up the open one
+  const { connectionUri } = getQueryParams(ownProps.location); //TODO: create selector that returns the correct connectionUri without looking up the open one
   const atom =
     connectionUri &&
     generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri);
@@ -103,7 +110,7 @@ class WonPetrinetState extends React.Component {
       (this.props.petriNetDataLoading || this.props.petriNetDataDirty) && (
         <div className="ps__loading">
           <svg className="ps__loading__spinner">
-            <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+            <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
           </svg>
           <div className="ps__loading__label">
             The PetriNet-State, is currently being calculated
@@ -244,7 +251,9 @@ WonPetrinetState.propTypes = {
   sendChatMessageClaimOnSuccess: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonPetrinetState);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonPetrinetState)
+);

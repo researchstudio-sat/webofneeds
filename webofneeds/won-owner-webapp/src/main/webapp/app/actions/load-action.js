@@ -4,9 +4,6 @@
 
 import Immutable from "immutable";
 import { actionCreators, actionTypes } from "./actions.js";
-
-import { checkAccessToCurrentRoute } from "../configRouting.js";
-
 import * as ownerApi from "../api/owner-api.js";
 import * as stateStore from "../redux/state-store.js";
 
@@ -20,11 +17,8 @@ export const pageLoadAction = () => (dispatch, getState) => {
         payload: Immutable.fromJS(data),
       })
     )
-    .then(() => {
-      return loadingWhileSignedIn(dispatch, getState);
-    })
-    .catch(() => handleNotLoggedIn()) //do not remove this line
-    .then(() => checkAccessToCurrentRoute(dispatch, getState))
+    .then(() => loadingWhileSignedIn(dispatch, getState))
+    .catch(() => handleNotLoggedIn())
     .then(() => dispatch({ type: actionTypes.initialLoadFinished }));
 };
 

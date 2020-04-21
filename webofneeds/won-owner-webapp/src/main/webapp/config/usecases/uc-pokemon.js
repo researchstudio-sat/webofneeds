@@ -1,14 +1,13 @@
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
-import { Generator } from "sparqljs";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
-
-window.SparqlGenerator4dbg = Generator;
+import ico36_pokemon_raid from "../../images/won-icons/ico36_pokemon-raid.svg";
+import ico36_pokeball from "../../images/won-icons/ico36_pokeball.svg";
 
 export const pokemonGoRaid = {
   identifier: "pokemonGoRaid",
   label: "Plan a Pokémon Raid",
-  icon: "#ico36_pokemon-raid", //TODO: Better Icon
+  icon: ico36_pokemon_raid, //TODO: Better Icon
   doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
@@ -43,7 +42,7 @@ export const pokemonGoRaid = {
 export const pokemonInterest = {
   identifier: "pokemonInterest",
   label: "Add Interest in Pokémon Go",
-  icon: "#ico36_pokeball", //TODO: Better Icon
+  icon: ico36_pokeball, //TODO: Better Icon
   draft: {
     ...mergeInEmptyDraft({
       content: {

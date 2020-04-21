@@ -16,11 +16,12 @@ import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
 
 import { getIn } from "../../app/utils.js";
+import ico36_uc_consortium_offer from "../../images/won-icons/ico36_uc_consortium-offer.svg";
 
 export const jobOffer = {
   identifier: "jobOffer",
   label: "Find people for a Job",
-  icon: "#ico36_uc_consortium-offer", //TODO proper icon
+  icon: ico36_uc_consortium_offer, //TODO proper icon
   doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({

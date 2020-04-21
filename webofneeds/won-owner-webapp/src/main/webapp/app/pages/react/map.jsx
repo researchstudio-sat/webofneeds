@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { actionCreators } from "../../actions/actions.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
-import { get, getIn } from "../../utils.js";
+import { get, getIn, getQueryParams } from "../../utils.js";
 import * as processUtils from "../../redux/utils/process-utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as wonLabelUtils from "../../won-label-utils.js";
@@ -31,9 +31,14 @@ import _ from "lodash";
 
 import "~/style/_map.scss";
 import "~/style/_connection-overlay.scss";
+import ico36_detail_location from "~/images/won-icons/ico36_detail_location.svg";
+import ico36_location_current from "~/images/won-icons/ico36_location_current.svg";
+import ico16_indicator_location from "~/images/won-icons/ico16_indicator_location.svg";
+import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg";
+import { withRouter } from "react-router-dom";
 
-const mapStateToProps = state => {
-  const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
+const mapStateToProps = (state, ownProps) => {
+  const { viewConnUri } = getQueryParams(ownProps.history.location);
 
   const isLocationAccessDenied = generalSelectors.isLocationAccessDenied(state);
   const currentLocation = generalSelectors.getCurrentLocation(state);
@@ -124,7 +129,7 @@ const mapStateToProps = state => {
     isOwnerAtomUrisLoading,
     isOwnerAtomUrisToLoad,
     showSlideIns:
-      viewSelectors.hasSlideIns(state) &&
+      viewSelectors.hasSlideIns(state, ownProps.history) &&
       viewSelectors.isSlideInsVisible(state),
     showModalDialog: viewSelectors.showModalDialog(state),
     showConnectionOverlay: !!viewConnUri,
@@ -204,8 +209,8 @@ class PageMap extends React.Component {
                 >
                   <svg className="ownermap__header__location__icon">
                     <use
-                      xlinkHref="#ico36_detail_location"
-                      href="#ico36_detail_location"
+                      xlinkHref={ico36_detail_location}
+                      href={ico36_detail_location}
                     />
                   </svg>
                   <span className="ownermap__header__location__label">
@@ -222,8 +227,8 @@ class PageMap extends React.Component {
                     onClick={() => this.setState({ showLocationInput: false })}
                   >
                     <use
-                      xlinkHref="#ico36_detail_location"
-                      href="#ico36_detail_location"
+                      xlinkHref={ico36_detail_location}
+                      href={ico36_detail_location}
                     />
                   </svg>
                   <WonTitlePicker
@@ -286,8 +291,8 @@ class PageMap extends React.Component {
                 >
                   <svg className="ownermap__searchresults__result__icon">
                     <use
-                      xlinkHref="#ico36_location_current"
-                      href="#ico36_location_current"
+                      xlinkHref={ico36_location_current}
+                      href={ico36_location_current}
                     />
                   </svg>
                   <div className="ownermap__searchresults__result__label">
@@ -303,8 +308,8 @@ class PageMap extends React.Component {
                 >
                   <svg className="ownermap__searchresults__result__icon">
                     <use
-                      xlinkHref="#ico16_indicator_location"
-                      href="#ico16_indicator_location"
+                      xlinkHref={ico16_indicator_location}
+                      href={ico16_indicator_location}
                     />
                   </svg>
                   <div className="ownermap__searchresults__result__label">
@@ -320,8 +325,8 @@ class PageMap extends React.Component {
                   <div className="ownermap__searchresults__deniedlocation">
                     <svg className="ownermap__searchresults__deniedlocation__icon">
                       <use
-                        xlinkHref="#ico16_indicator_error"
-                        href="#ico16_indicator_error"
+                        xlinkHref={ico16_indicator_error}
+                        href={ico16_indicator_error}
                       />
                     </svg>
                     <div className="ownermap__searchresults__deniedlocation__label">
@@ -339,8 +344,8 @@ class PageMap extends React.Component {
               <div className="ownermap__nolocation">
                 <svg className="ownermap__nolocation__icon">
                   <use
-                    xlinkHref="#ico36_detail_location"
-                    href="#ico36_detail_location"
+                    xlinkHref={ico36_detail_location}
+                    href={ico36_detail_location}
                   />
                 </svg>
                 <div className="ownermap__nolocation__label">
@@ -604,7 +609,9 @@ PageMap.propTypes = {
   updateCurrentLocation: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(PageMap);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(PageMap)
+);

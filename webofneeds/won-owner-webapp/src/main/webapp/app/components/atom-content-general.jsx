@@ -4,21 +4,21 @@
 import React from "react";
 import PropTypes from "prop-types";
 import {
-  getConnectionUriFromRoute,
   getOwnedAtomByConnectionUri,
   selectLastUpdateTime,
 } from "../redux/selectors/general-selectors";
 import { getOwnedConnectionByUri } from "../redux/selectors/connection-selectors.js";
-import { get, getIn } from "../utils.js";
+import { get, getIn, getQueryParams } from "../utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import { relativeTime } from "../won-label-utils.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
 import { connect } from "react-redux";
 
 import "~/style/_atom-content-general.scss";
+import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
-  const connectionUri = getConnectionUriFromRoute(state);
+  const { connectionUri } = getQueryParams(ownProps.location);
   const connection = getOwnedConnectionByUri(state, connectionUri);
 
   const ownAtom = getOwnedAtomByConnectionUri(state, connectionUri);
@@ -161,4 +161,4 @@ AtomContentGeneral.propTypes = {
   shouldShowRdf: PropTypes.bool,
 };
 
-export default connect(mapStateToProps)(AtomContentGeneral);
+export default withRouter(connect(mapStateToProps)(AtomContentGeneral));

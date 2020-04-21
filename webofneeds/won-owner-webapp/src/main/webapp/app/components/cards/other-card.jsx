@@ -3,7 +3,7 @@
  */
 import React from "react";
 import { connect } from "react-redux";
-import { get, getIn } from "../../utils.js";
+import { get, getIn, generateLink } from "../../utils.js";
 import Immutable from "immutable";
 import { actionCreators } from "../../actions/actions.js";
 import PropTypes from "prop-types";
@@ -19,6 +19,7 @@ import {
 } from "../../redux/selectors/general-selectors.js";
 
 import "~/style/_other-card.scss";
+import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const atom = getIn(state, ["atoms", ownProps.atomUri]);
@@ -97,9 +98,6 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
     selectAtomTab: (atomUri, selectTab) => {
       dispatch(
         actionCreators.atoms__selectTab(
@@ -446,12 +444,24 @@ class WonOtherCard extends React.Component {
       this.props.onAtomClick();
     } else {
       this.props.selectAtomTab(this.props.atomUri, "DETAIL");
-      this.props.routerGo("post", { postUri: this.props.atomUri });
+      this.props.history.push(
+        generateLink(
+          this.props.history.location,
+          { postUri: this.props.atomUri },
+          "/post"
+        )
+      );
     }
   }
   holderClick() {
     this.props.selectAtomTab(this.props.holderUri, "DETAIL");
-    this.props.routerGo("post", { postUri: this.props.holderUri });
+    this.props.history.push(
+      generateLink(
+        this.props.history.location,
+        { postUri: this.props.holderUri },
+        "/post"
+      )
+    );
   }
 }
 WonOtherCard.propTypes = {
@@ -460,7 +470,6 @@ WonOtherCard.propTypes = {
   showSuggestions: PropTypes.bool,
   currentLocation: PropTypes.object,
   onAtomClick: PropTypes.func,
-  routerGo: PropTypes.func,
   selectAtomTab: PropTypes.func,
 
   isDirectResponse: PropTypes.bool,
@@ -492,9 +501,12 @@ WonOtherCard.propTypes = {
   iconBackground: PropTypes.string,
   identiconSvg: PropTypes.string,
   hasUnreadChatConnections: PropTypes.bool,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonOtherCard);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonOtherCard)
+);

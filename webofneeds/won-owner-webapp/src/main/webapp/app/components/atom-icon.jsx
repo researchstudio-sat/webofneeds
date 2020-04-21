@@ -85,12 +85,12 @@ class WonAtomIcon extends React.Component {
       holderIcon = (
         <img
           className="holderIcon"
-          alt={this.props.holderImage.get("name")}
+          alt={get(this.props.holderImage, "name")}
           src={
             "data:" +
-            this.props.holderImage.get("type") +
+            get(this.props.holderImage, "encodingFormat") +
             ";base64," +
-            this.props.holderImage.get("data")
+            get(this.props.holderImage, "encoding")
           }
         />
       );
@@ -123,12 +123,12 @@ class WonAtomIcon extends React.Component {
       atomIcon = (
         <img
           className="image"
-          alt={this.props.image.get("name")}
+          alt={get(this.props.image, "name")}
           src={
             "data:" +
-            this.props.image.get("type") +
+            get(this.props.image, "encodingFormat") +
             ";base64," +
-            this.props.image.get("data")
+            get(this.props.image, "encoding")
           }
         />
       );

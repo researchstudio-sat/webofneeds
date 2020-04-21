@@ -17,7 +17,7 @@ body {
   @include default-font;
   background-color: $won-lighter-gray;
 
-  > section.ng-scope > won-preact > section {
+  > section.ng-scope > section {
     display: grid;
     min-height: 100vh;
 

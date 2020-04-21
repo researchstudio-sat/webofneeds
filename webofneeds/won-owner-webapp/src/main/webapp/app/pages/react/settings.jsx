@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
+import { withRouter } from "react-router-dom";
 import { get } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
@@ -15,14 +16,14 @@ import WonSettingsWrapper from "../../components/settings-wrapper";
 
 import "~/style/_signup.scss";
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
   const accountState = get(state, "account");
 
   return {
     isLoggedIn: accountUtils.isLoggedIn(accountState),
     showModalDialog: viewSelectors.showModalDialog(state),
     showSlideIns:
-      viewSelectors.hasSlideIns(state) &&
+      viewSelectors.hasSlideIns(state, ownProps.history) &&
       viewSelectors.isSlideInsVisible(state),
   };
 };
@@ -50,4 +51,4 @@ PageSettings.propTypes = {
   showSlideIns: PropTypes.bool,
 };
 
-export default connect(mapStateToProps)(PageSettings);
+export default withRouter(connect(mapStateToProps)(PageSettings));

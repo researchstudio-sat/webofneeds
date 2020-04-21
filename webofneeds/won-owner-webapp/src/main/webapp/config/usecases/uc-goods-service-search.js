@@ -13,11 +13,12 @@ import {
   concatenateFilters,
   sparqlQuery,
 } from "../../app/sparql-builder-utils.js";
+import ico36_plus from "../../images/won-icons/ico36_plus.svg";
 
 export const goodsServiceSearch = {
   identifier: "goodsServiceSearch",
   label: "Look for something",
-  icon: "#ico36_plus",
+  icon: ico36_plus,
   draft: {
     ...mergeInEmptyDraft({
       content: {

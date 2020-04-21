@@ -18,7 +18,7 @@ function sendSubscriptionToServer(subscription) {
   });
 }
 
-export function runPushAgent(redux) {
+export function runPushAgent(store) {
   if (!("serviceWorker" in navigator)) {
     return;
   }
@@ -35,7 +35,8 @@ export function runPushAgent(redux) {
 
   let initialized = false;
 
-  redux.connect(state => {
+  store.subscribe(() => {
+    const state = store.getState();
     const ownedAtomUris = state.getIn(["account", "ownedAtomUris"]);
     return { numAtoms: ownedAtomUris ? ownedAtomUris.size : 0 };
   })(({ numAtoms }) => {

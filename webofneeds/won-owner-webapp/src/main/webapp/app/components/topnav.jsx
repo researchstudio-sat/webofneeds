@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
-import { get, getIn } from "../utils.js";
+import { get, getIn, getPathname } from "../utils.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import { isLoading } from "../redux/selectors/process-selectors.js";
@@ -12,21 +12,26 @@ import WonAccountMenu from "./account-menu.jsx";
 
 import "~/style/_responsiveness-utils.scss";
 import "~/style/_topnav.scss";
+import ico16_burger from "~/images/won-icons/ico16_burger.svg";
+import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.svg";
+import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
+import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
+import { Link, withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
-  const currentRoute = getIn(state, ["router", "currentState", "name"]);
+  const currentPath = getPathname(ownProps.location);
   const accountState = get(state, "account");
 
   return {
     pageTitle: ownProps.pageTitle,
-    hasSlideIns: viewSelectors.hasSlideIns(state),
+    hasSlideIns: viewSelectors.hasSlideIns(state, ownProps.history),
     isSlideInsVisible: viewSelectors.isSlideInsVisible(state),
     mainMenuVisible: getIn(state, ["view", "showMainMenu"]),
     isMenuVisible: viewSelectors.isMenuVisible(state),
     themeName: getIn(state, ["config", "theme", "name"]),
     appTitle: getIn(state, ["config", "theme", "title"]),
     loggedIn: accountUtils.isLoggedIn(accountState),
-    isSignUpView: currentRoute === "signup",
+    isSignUpView: currentPath === "/signup",
     showLoadingIndicator: isLoading(state),
     connectionsToCrawl: connectionSelectors.getChatConnectionsToCrawl(state),
     hasUnreads:
@@ -43,12 +48,6 @@ const mapDispatchToProps = dispatch => {
     },
     toggleMenu: () => {
       dispatch(actionCreators.view__toggleMenu());
-    },
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
-    routerGoDefault: () => {
-      dispatch(actionCreators.router__stateGoDefault());
     },
     toggleSlideIns: () => {
       dispatch(actionCreators.view__toggleSlideIns());
@@ -85,7 +84,7 @@ class WonTopnav extends React.Component {
             }
             onClick={this.menuAction}
           >
-            <use xlinkHref="#ico16_burger" href="#ico16_burger" />
+            <use xlinkHref={ico16_burger} href={ico16_burger} />
           </svg>
           <div className="topnav__logo clickable">
             <img
@@ -132,7 +131,7 @@ class WonTopnav extends React.Component {
           {this.props.showLoadingIndicator && (
             <div className="topnav__loading">
               <svg className="topnav__loading__spinner hspinner">
-                <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+                <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
               </svg>
             </div>
           )}
@@ -143,8 +142,8 @@ class WonTopnav extends React.Component {
             >
               <svg className="topnav__slideintoggle__icon">
                 <use
-                  xlinkHref="#ico16_indicator_warning"
-                  href="#ico16_indicator_warning"
+                  xlinkHref={ico16_indicator_warning}
+                  href={ico16_indicator_warning}
                 />
               </svg>
               <svg
@@ -155,19 +154,19 @@ class WonTopnav extends React.Component {
                     : "")
                 }
               >
-                <use xlinkHref="#ico16_arrow_down" href="#ico16_arrow_down" />
+                <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
               </svg>
             </div>
           )}
           {!this.props.isSignUpView &&
             !this.props.loggedIn &&
             !this.props.mainMenuVisible && (
-              <button
-                onClick={() => this.props.routerGo("signup")}
+              <Link
+                to="/signup"
                 className="topnav__signupbtn won-button--filled red hide-in-responsive"
               >
                 Sign up
-              </button>
+              </Link>
             )}
           <WonAccountMenu />
         </nav>
@@ -189,7 +188,7 @@ class WonTopnav extends React.Component {
 
   goDefault() {
     this.hideMenu();
-    this.props.routerGoDefault();
+    this.props.history.push("/");
   }
 
   menuAction() {
@@ -197,7 +196,7 @@ class WonTopnav extends React.Component {
       this.props.toggleMenu();
     } else {
       this.hideMenu();
-      this.props.routerGoDefault();
+      this.props.history.push("/");
     }
   }
 
@@ -253,13 +252,14 @@ WonTopnav.propTypes = {
   toggleSlideIns: PropTypes.func,
   hideMenu: PropTypes.func,
   toggleMenu: PropTypes.func,
-  routerGo: PropTypes.func,
-  routerGoDefault: PropTypes.func,
   showMoreMessages: PropTypes.func,
   showLatestMessages: PropTypes.func,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonTopnav);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonTopnav)
+);

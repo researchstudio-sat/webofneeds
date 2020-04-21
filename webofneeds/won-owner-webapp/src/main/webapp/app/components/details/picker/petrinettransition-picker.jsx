@@ -1,6 +1,7 @@
 import React from "react";
 
 import "~/style/_petrinettransitionpicker.scss";
+import ico36_close from "~/images/won-icons/ico36_close.svg";
 import PropTypes from "prop-types";
 
 export default class WonPetrinetTransitionPicker extends React.Component {
@@ -33,7 +34,7 @@ export default class WonPetrinetTransitionPicker extends React.Component {
                 className="petrinettransitionp__petrineturi__input__icon clickable"
                 onClick={this.resetPetriNetUri.bind(this)}
               >
-                <use xlinkHref="#ico36_close" href="#ico36_close" />
+                <use xlinkHref={ico36_close} href={ico36_close} />
               </svg>
             ) : (
               undefined
@@ -56,7 +57,7 @@ export default class WonPetrinetTransitionPicker extends React.Component {
                 className="petrinettransitionp__transitionuri__input__icon clickable"
                 onClick={this.resetTransitionUri.bind(this)}
               >
-                <use xlinkHref="#ico36_close" href="#ico36_close" />
+                <use xlinkHref={ico36_close} href={ico36_close} />
               </svg>
             ) : (
               undefined

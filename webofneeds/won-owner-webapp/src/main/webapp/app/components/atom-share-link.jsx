@@ -8,6 +8,8 @@ import * as wonUtils from "../won-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 
 import "~/style/_atom-share-link.scss";
+import ico16_copy_to_clipboard from "~/images/won-icons/ico16_copy_to_clipboard.svg";
+import ico16_checkmark from "~/images/won-icons/ico16_checkmark.svg";
 
 const mapStateToProps = (state, ownProps) => {
   const atom = ownProps.atomUri && getIn(state, ["atoms", ownProps.atomUri]);
@@ -73,11 +75,11 @@ class WonAtomShareLink extends React.Component {
           >
             <svg className="asl__link__copyfield__copy-button__icon">
               {this.state.copied ? (
-                <use xlinkHref="#ico16_checkmark" href="#ico16_checkmark" />
+                <use xlinkHref={ico16_checkmark} href={ico16_checkmark} />
               ) : (
                 <use
-                  xlinkHref="#ico16_copy_to_clipboard"
-                  href="#ico16_copy_to_clipboard"
+                  xlinkHref={ico16_copy_to_clipboard}
+                  href={ico16_copy_to_clipboard}
                 />
               )}
             </svg>

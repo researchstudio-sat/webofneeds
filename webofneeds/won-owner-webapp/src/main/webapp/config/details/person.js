@@ -7,12 +7,15 @@ import Immutable from "immutable";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import WonPersonViewer from "../../app/components/details/viewer/person-viewer.jsx";
 import WonPersonPicker from "../../app/components/details/picker/person-picker.jsx";
+import ico36_detail_skill from "../../images/won-icons/ico36_detail_skill.svg";
+import ico36_detail_interests from "../../images/won-icons/ico36_detail_interests.svg";
+import ico36_detail_person from "../../images/won-icons/ico36_detail_person.svg";
 
 export const skillsDetail = {
   ...basicDetails.tags,
   identifier: "skills",
   label: "Skills",
-  icon: "#ico36_detail_skill",
+  icon: ico36_detail_skill,
   placeholder: "e.g. RDF, project-management",
   messageEnabled: false,
   parseToRDF: function({ value }) {
@@ -30,7 +33,7 @@ export const interestsDetail = {
   ...basicDetails.tags,
   identifier: "interests",
   label: "Interests",
-  icon: "#ico36_detail_interests",
+  icon: ico36_detail_interests,
   placeholder: "e.g. food, cats",
   messageEnabled: false,
   parseToRDF: function({ value }) {
@@ -47,7 +50,7 @@ export const interestsDetail = {
 export const person = {
   identifier: "person",
   label: "Person",
-  icon: "#ico36_detail_person",
+  icon: ico36_detail_person,
   placeholder: undefined,
   component: WonPersonPicker,
   viewerComponent: WonPersonViewer,

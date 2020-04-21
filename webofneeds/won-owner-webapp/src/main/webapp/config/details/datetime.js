@@ -8,10 +8,12 @@ import WonDateTimeViewer from "../../app/components/details/viewer/datetime-view
 import WonDateTimePicker from "../../app/components/details/picker/datetime-picker.jsx";
 import WonDateTimeRangePicker from "../../app/components/details/picker/datetime-range-picker.jsx";
 
+import ico36_detail_datetime from "../../images/won-icons/ico36_detail_datetime.svg";
+
 export const fromDatetime = {
   identifier: "fromDatetime",
   label: "Starting at",
-  icon: "#ico36_detail_datetime",
+  icon: ico36_detail_datetime,
   placeholder: "Enter Date and Time...",
   component: WonDateTimePicker,
   viewerComponent: WonDateTimeViewer,
@@ -45,7 +47,7 @@ export const fromDatetime = {
 export const throughDatetime = {
   identifier: "throughDatetime",
   label: "Ending at",
-  icon: "#ico36_detail_datetime",
+  icon: ico36_detail_datetime,
   placeholder: "Enter Date and Time...",
   component: WonDateTimePicker,
   viewerComponent: WonDateTimeViewer,
@@ -82,7 +84,7 @@ export const throughDatetime = {
 export const datetimeRange = {
   identifier: "datetimeRange",
   label: "Timerange",
-  icon: "#ico36_detail_datetime",
+  icon: ico36_detail_datetime,
   placeholder: undefined,
   component: WonDateTimeRangePicker,
   viewerComponent: WonDateTimeViewer,

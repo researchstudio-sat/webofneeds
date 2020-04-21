@@ -13,6 +13,9 @@ import WonAtomHeader from "../../atom-header.jsx";
 import WonLabelledHr from "../../labelled-hr.jsx";
 
 import "~/style/_suggest-atom-picker.scss";
+import ico16_checkmark from "~/images/won-icons/ico16_checkmark.svg";
+import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
+import ico36_close from "~/images/won-icons/ico36_close.svg";
 
 const mapStateToProps = (state, ownProps) => {
   const hasAtLeastOneAllowedSocket = (atom, allowedSockets) => {
@@ -201,7 +204,7 @@ class WonSuggestAtomPicker extends React.Component {
     if (this.state.uriToFetchLoading) {
       suggestPostInputIcon = (
         <svg className="sap__input__icon hspinner">
-          <use xlinkHref="#ico_loading_anim" href="#ico_loading_anim" />
+          <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
         </svg>
       );
     } else if (this.fetchAtomUriFieldHasText()) {
@@ -211,7 +214,7 @@ class WonSuggestAtomPicker extends React.Component {
             className="sap__input__icon clickable"
             onClick={this.fetchAtom.bind(this)}
           >
-            <use xlinkHref="#ico16_checkmark" href="#ico16_checkmark" />
+            <use xlinkHref={ico16_checkmark} href={ico16_checkmark} />
           </svg>
         );
       } else if (this.state.showResetButton || this.state.uriToFetchFailed) {
@@ -220,7 +223,7 @@ class WonSuggestAtomPicker extends React.Component {
             className="sap__input__icon clickable"
             onClick={this.resetAtomUriField.bind(this)}
           >
-            <use xlinkHref="#ico36_close" href="#ico36_close" />
+            <use xlinkHref={ico36_close} href={ico36_close} />
           </svg>
         );
       }

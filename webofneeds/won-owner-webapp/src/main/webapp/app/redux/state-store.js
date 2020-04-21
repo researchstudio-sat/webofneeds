@@ -33,13 +33,26 @@ export function fetchOwnedData(dispatch, getState) {
     );
 }
 
-export function fetchDataForOwnedAtoms(ownedAtomUris, dispatch, getState) {
+/**
+ * fetches Data incl. connections for given array of atomUris
+ * @param ownedAtomUris atomUris to be fetched
+ * @param dispatch redux dispatcher
+ * @param getState redux state
+ * @param forceFetch bool if true, then fetch will be executed even if atom is already in the state (useful on edit)
+ * @returns {Promise<void>|*}
+ */
+export function fetchDataForOwnedAtoms(
+  ownedAtomUris,
+  dispatch,
+  getState,
+  forceFetch = false
+) {
   if (!is("Array", ownedAtomUris) || ownedAtomUris.length === 0) {
     return Promise.resolve();
   }
 
   return urisToLookupMap(ownedAtomUris, uri =>
-    fetchOwnedAtomAndDispatch(uri, dispatch, getState)
+    fetchOwnedAtomAndDispatch(uri, dispatch, getState, forceFetch)
   )
     .then(() =>
       urisToLookupMap(ownedAtomUris, atomUri =>
@@ -441,13 +454,26 @@ export function fetchConnectionsOfAtomAndDispatch(atomUri, dispatch) {
     );
 }
 
-function fetchOwnedAtomAndDispatch(atomUri, dispatch, getState) {
+/**
+ * fetches Data for atomUri
+ * @param atomUri uri to be fetched
+ * @param dispatch redux dispatcher
+ * @param getState redux state
+ * @param forceFetch bool if true, then fetch will be executed even if atom is already in the state (useful on edit)
+ * @returns {Promise<void>|*}
+ */
+function fetchOwnedAtomAndDispatch(
+  atomUri,
+  dispatch,
+  getState,
+  forceFetch = false
+) {
   const processState = get(getState(), "process");
 
-  if (processUtils.isAtomLoaded(processState, atomUri)) {
+  if (!forceFetch && processUtils.isAtomLoaded(processState, atomUri)) {
     console.debug("Omit Fetch of Atom<", atomUri, ">, it is already loaded...");
     return Promise.resolve();
-  } else if (processUtils.isAtomLoading(processState, atomUri)) {
+  } else if (!forceFetch && processUtils.isAtomLoading(processState, atomUri)) {
     console.debug(
       "Omit Fetch of Atom<",
       atomUri,

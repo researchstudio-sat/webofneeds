@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
-import { get, getIn } from "../../utils.js";
+import { get, getIn, getQueryParams } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import * as connectionSelectors from "../../redux/selectors/connection-selectors.js";
@@ -20,13 +20,13 @@ import WonConnectionsOverview from "../../components/connections-overview.jsx";
 import "~/style/_connections.scss";
 import "~/style/_responsiveness-utils.scss";
 import "~/style/_connection-overlay.scss";
+import ico36_message from "~/images/won-icons/ico36_message.svg";
+import { withRouter } from "react-router-dom";
 
-const mapStateToProps = state => {
-  const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
+const mapStateToProps = (state, ownProps) => {
+  const { viewConnUri, connectionUri } = getQueryParams(ownProps.location);
 
-  const selectedConnectionUri = generalSelectors.getConnectionUriFromRoute(
-    state
-  );
+  const selectedConnectionUri = connectionUri;
 
   const atom =
     selectedConnectionUri &&
@@ -70,7 +70,7 @@ const mapStateToProps = state => {
         connectionUtils.isRequestSent(selectedConnection) ||
         connectionUtils.isSuggested(selectedConnection)),
     showSlideIns:
-      viewSelectors.hasSlideIns(state) &&
+      viewSelectors.hasSlideIns(state, ownProps.history) &&
       viewSelectors.isSlideInsVisible(state),
     showConnectionOverlay: !!viewConnUri,
     viewConnUri,
@@ -119,7 +119,7 @@ class PageConnections extends React.Component {
                 className="overview__rightempty__noselection__icon"
                 title="Messages"
               >
-                <use xlinkHref="#ico36_message" href="#ico36_message" />
+                <use xlinkHref={ico36_message} href={ico36_message} />
               </svg>
               <div className="overview__rightempty__noselection__text">
                 No Chat selected
@@ -140,7 +140,7 @@ class PageConnections extends React.Component {
           <main className="overview__nochats">
             <div className="overview__nochats__empty">
               <svg className="overview__nochats__empty__icon" title="Messages">
-                <use xlinkHref="#ico36_message" href="#ico36_message" />
+                <use xlinkHref={ico36_message} href={ico36_message} />
               </svg>
               <div className="overview__nochats__empty__text">
                 No Open Chats available
@@ -173,6 +173,7 @@ PageConnections.propTypes = {
   hideListSideInResponsive: PropTypes.bool,
   hideNoSelectionInResponsive: PropTypes.bool,
   hideFooterInResponsive: PropTypes.bool,
+  history: PropTypes.object,
 };
 
-export default connect(mapStateToProps)(PageConnections);
+export default withRouter(connect(mapStateToProps)(PageConnections));

@@ -53,6 +53,7 @@ class WonMessageContent extends React.Component {
         <ReactMarkdown
           className="msg__text markdown"
           source={this.props.text}
+          linkTarget="_blank"
         />
       ) : (
         undefined

@@ -2,7 +2,7 @@
 
 We're using the redux-architecture for the client.
 
-**Before you read anything else, check out [redux](http://redux.js.org/) and [ng-redux](https://github.com/wbuchwalter/ng-redux)**. The documentation on these two pages is very good and there's no need to repeat them here. Thus anything below will assume you have a basic understanding of actions, reducers, the store and components, as well as how they look like in angular. The purpose of this text is to document additional architectural details, specific coding style and learnings not documented in these two as well as any cases in which our architecture diverges from theirs.
+**Before you read anything else, check out [redux](http://redux.js.org/) and [react-redux](https://react-redux.js.org/)**. The documentation on these two pages is very good and there's no need to repeat them here. Thus anything below will assume you have a basic understanding of actions, reducers, the store and components, as well as how they look like in angular. The purpose of this text is to document additional architectural details, specific coding style and learnings not documented in these two as well as any cases in which our architecture diverges from theirs.
 
 ![redux architecture in client-side owner-app](http://researchstudio-sat.github.io/webofneeds/images/owner_app_redux_architecture.svg)
 
@@ -57,25 +57,11 @@ Once a refined/stable boilerplate version has emerged, it should be documented h
 
 ## Routing
 
-We use [ui-router](https://github.com/angular-ui/ui-router/wiki/Quick-Reference) and in particular the [redux-wrapper for it](https://github.com/neilff/redux-ui-router)
+We use [react-router](https://reacttraining.com/react-router/)
 
-Routing(-states, aka URLs) are configured in `configRouting.js`.
-State changes can be triggered via `actionCreators.router__stateGo(stateName)`.
+Routing(-states, aka URLs) are configured in `app.js`.
+State changes can be triggered via `<Link to=... />` or programmatically with `this.props.history.push(...)` within components that wrap the `withRouter` function around the component.
 The current routing-state and -parameters can be found in our app-state:
-
-```javascript
-$ngRedux.getState().get("router");
-/* =>
-{
- currentParams: {...},
- currentState: {...},
- prevParams: {...},
- prevState: {...}
-}
-*/
-```
-
-Also see: [Routing and Redux](https://github.com/researchstudio-sat/webofneeds/issues/344)
 
 ## State Structure
 
@@ -209,12 +195,6 @@ $ngRedux.getState();
        seeks: {...}
    },
    ...
- },
- router: {
-   currentParams: {...},
-   currentState: {...},
-   prevParams: {...},
-   prevState: {...}
  },
  toasts: {...},
  account: {

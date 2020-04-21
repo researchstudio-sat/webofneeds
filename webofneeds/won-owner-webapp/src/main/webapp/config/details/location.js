@@ -7,11 +7,13 @@ import WonLocationViewer from "../../app/components/details/viewer/location-view
 import WonTravelActionViewer from "../../app/components/details/viewer/travel-action-viewer.jsx";
 import WonLocationPicker from "../../app/components/details/picker/location-picker.jsx";
 import WonTravelActionPicker from "../../app/components/details/picker/travel-action-picker.jsx";
+import ico36_detail_location from "../../images/won-icons/ico36_detail_location.svg";
+import ico36_detail_travelaction from "../../images/won-icons/ico36_detail_travelaction.svg";
 
 export const location = {
   identifier: "location",
   label: "Location",
-  icon: "#ico36_detail_location",
+  icon: ico36_detail_location,
   placeholder: "Search for location",
   component: WonLocationPicker,
   viewerComponent: WonLocationViewer,
@@ -46,7 +48,7 @@ export const jobLocation = {
   identifier: "jobLocation",
   label: "Job Location",
   placeholder: "Search for location",
-  icon: "#ico36_detail_location",
+  icon: ico36_detail_location,
   component: WonLocationPicker,
   viewerComponent: WonLocationViewer,
   messageEnabled: true,
@@ -77,7 +79,7 @@ export const jobLocation = {
 export const travelAction = {
   identifier: "travelAction",
   label: "Route (From - To)",
-  icon: "#ico36_detail_travelaction",
+  icon: ico36_detail_travelaction,
   placeholder: {
     departure: "Start location",
     destination: "Destination",

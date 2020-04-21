@@ -2,9 +2,10 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import { get, getIn } from "../utils.js";
+import { get, getIn, generateLink } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
+import { withRouter } from "react-router-dom";
 import * as atomUtils from "../redux/utils/atom-utils";
 import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as connectionSelectors from "../redux/selectors/connection-selectors";
@@ -16,6 +17,11 @@ import WonSuggestAtomPicker from "./details/picker/suggest-atom-picker.jsx";
 import "~/style/_atom-content-buddies.scss";
 import VisibilitySensor from "react-visibility-sensor";
 import PropTypes from "prop-types";
+
+import ico32_buddy_accept from "~/images/won-icons/ico32_buddy_accept.svg";
+import ico32_buddy_deny from "~/images/won-icons/ico32_buddy_deny.svg";
+import ico32_buddy_waiting from "~/images/won-icons/ico32_buddy_waiting.svg";
+import ico36_message from "~/images/won-icons/ico36_message.svg";
 
 const mapStateToProps = (state, ownProps) => {
   const atom = getIn(state, ["atoms", ownProps.atomUri]);
@@ -114,12 +120,6 @@ const mapDispatchToProps = dispatch => {
         )
       );
     },
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
-    routerGoResetParams: path => {
-      dispatch(actionCreators.router__stateGoResetParams(path));
-    },
   };
 };
 
@@ -160,8 +160,8 @@ class WonAtomContentBuddies extends React.Component {
                     onClick={() => this.openRequest(conn)}
                   >
                     <use
-                      xlinkHref="#ico32_buddy_accept"
-                      href="#ico32_buddy_accept"
+                      xlinkHref={ico32_buddy_accept}
+                      href={ico32_buddy_accept}
                     />
                   </svg>
                   <svg
@@ -170,10 +170,7 @@ class WonAtomContentBuddies extends React.Component {
                       this.closeConnection(conn, "Reject Buddy Request?")
                     }
                   >
-                    <use
-                      xlinkHref="#ico32_buddy_deny"
-                      href="#ico32_buddy_deny"
-                    />
+                    <use xlinkHref={ico32_buddy_deny} href={ico32_buddy_deny} />
                   </svg>
                 </div>
               );
@@ -186,8 +183,8 @@ class WonAtomContentBuddies extends React.Component {
                     onClick={() => this.requestBuddy(conn)}
                   >
                     <use
-                      xlinkHref="#ico32_buddy_accept"
-                      href="#ico32_buddy_accept"
+                      xlinkHref={ico32_buddy_accept}
+                      href={ico32_buddy_accept}
                     />
                   </svg>
                   <svg
@@ -196,10 +193,7 @@ class WonAtomContentBuddies extends React.Component {
                       this.closeConnection(conn, "Reject Buddy Suggestion?")
                     }
                   >
-                    <use
-                      xlinkHref="#ico32_buddy_deny"
-                      href="#ico32_buddy_deny"
-                    />
+                    <use xlinkHref={ico32_buddy_deny} href={ico32_buddy_deny} />
                   </svg>
                 </div>
               );
@@ -212,8 +206,8 @@ class WonAtomContentBuddies extends React.Component {
                     disabled={true}
                   >
                     <use
-                      xlinkHref="#ico32_buddy_waiting"
-                      href="#ico32_buddy_waiting"
+                      xlinkHref={ico32_buddy_waiting}
+                      href={ico32_buddy_waiting}
                     />
                   </svg>
                   <svg
@@ -222,10 +216,7 @@ class WonAtomContentBuddies extends React.Component {
                       this.closeConnection(conn, "Cancel Buddy Request?")
                     }
                   >
-                    <use
-                      xlinkHref="#ico32_buddy_deny"
-                      href="#ico32_buddy_deny"
-                    />
+                    <use xlinkHref={ico32_buddy_deny} href={ico32_buddy_deny} />
                   </svg>
                 </div>
               );
@@ -237,16 +228,13 @@ class WonAtomContentBuddies extends React.Component {
                     className="acb__buddy__actions__icon primary won-icon"
                     onClick={() => this.sendChatMessage(conn)}
                   >
-                    <use xlinkHref="#ico36_message" href="#ico36_message" />
+                    <use xlinkHref={ico36_message} href={ico36_message} />
                   </svg>
                   <svg
                     className="acb__buddy__actions__icon secondary won-icon"
                     onClick={() => this.closeConnection(conn)}
                   >
-                    <use
-                      xlinkHref="#ico32_buddy_deny"
-                      href="#ico32_buddy_deny"
-                    />
+                    <use xlinkHref={ico32_buddy_deny} href={ico32_buddy_deny} />
                   </svg>
                 </div>
               );
@@ -284,9 +272,15 @@ class WonAtomContentBuddies extends React.Component {
                     actionButtons={actionButtons}
                     atomUri={get(conn, "targetAtomUri")}
                     onClick={() =>
-                      this.props.routerGo("post", {
-                        postUri: get(conn, "targetAtomUri"),
-                      })
+                      this.props.history.push(
+                        generateLink(
+                          this.props.history.location,
+                          {
+                            postUri: get(conn, "targetAtomUri"),
+                          },
+                          "/post"
+                        )
+                      )
                     }
                   />
                 </div>
@@ -332,9 +326,13 @@ class WonAtomContentBuddies extends React.Component {
               <WonAtomContextSwipeableView
                 atomUri={memberUri}
                 onClick={() =>
-                  this.props.routerGo("post", {
-                    postUri: memberUri,
-                  })
+                  this.props.history.push(
+                    generateLink(
+                      this.props.history.location,
+                      { postUri: memberUri },
+                      "/post"
+                    )
+                  )
                 }
               />
             </div>
@@ -449,7 +447,7 @@ class WonAtomContentBuddies extends React.Component {
           vocab.CHAT.ChatSocketCompacted,
           vocab.CHAT.ChatSocketCompacted
         );
-        this.props.routerGoResetParams("connections");
+        this.props.history.push("/connections");
       } else if (chatConnections.length == 1) {
         const chatConnection = chatConnections[0];
         const chatConnectionUri = get(chatConnection, "uri");
@@ -469,9 +467,13 @@ class WonAtomContentBuddies extends React.Component {
           connectionUtils.isRequestSent(chatConnection) ||
           connectionUtils.isRequestReceived(chatConnection)
         ) {
-          this.props.routerGo("connections", {
-            connectionUri: chatConnectionUri,
-          });
+          this.props.history.push(
+            generateLink(
+              this.props.history.location,
+              { connectionUri: chatConnectionUri },
+              "/connections"
+            )
+          );
         }
       } else {
         console.error(
@@ -488,7 +490,7 @@ class WonAtomContentBuddies extends React.Component {
         vocab.CHAT.ChatSocketCompacted,
         vocab.CHAT.ChatSocketCompacted
       );
-      this.props.routerGoResetParams("connections");
+      this.props.history.push("/connections");
     }
   }
 
@@ -518,14 +520,15 @@ WonAtomContentBuddies.propTypes = {
   connectionClose: PropTypes.func,
   connectSockets: PropTypes.func,
   connect: PropTypes.func,
-  routerGo: PropTypes.func,
-  routerGoResetParams: PropTypes.func,
   chatSocketUri: PropTypes.string,
   chatConnectionsArray: PropTypes.arrayOf(PropTypes.object),
   hasChatConnections: PropTypes.bool,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonAtomContentBuddies);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonAtomContentBuddies)
+);

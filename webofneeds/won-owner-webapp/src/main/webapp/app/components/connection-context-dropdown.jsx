@@ -4,16 +4,24 @@ import PropTypes from "prop-types";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors";
-import { get, getIn, toAbsoluteURL } from "../utils";
+import {
+  get,
+  getIn,
+  getQueryParams,
+  toAbsoluteURL,
+  generateLink,
+} from "../utils";
 import * as connectionSelectors from "../redux/selectors/connection-selectors";
 import * as connectionUtils from "../redux/utils/connection-utils";
 import * as processUtils from "../redux/utils/process-utils";
 import { ownerBaseUrl } from "~/config/default.js";
 
 import "~/style/_context-dropdown.scss";
+import ico16_contextmenu from "~/images/won-icons/ico16_contextmenu.svg";
+import { withRouter, Link } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
-  const connectionUri = generalSelectors.getConnectionUriFromRoute(state);
+  const { connectionUri } = getQueryParams(ownProps.location);
 
   const post =
     connectionUri &&
@@ -67,15 +75,6 @@ const mapDispatchToProps = dispatch => {
     showModalDialog: payload => {
       dispatch(actionCreators.view__showModalDialog(payload));
     },
-    routerGoCurrent: props => {
-      dispatch(actionCreators.router__stateGoCurrent(props));
-    },
-    routerGoAbs: (path, props) => {
-      dispatch(actionCreators.router__stateGoAbs(path, props));
-    },
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
     connectionClose: connectionUri => {
       dispatch(actionCreators.connections__close(connectionUri));
     },
@@ -94,14 +93,14 @@ class WonConnectionContextDropdown extends React.Component {
   render() {
     const iconElement = this.props.connectionLoading ? (
       <svg className="cdd__icon__small">
-        <use xlinkHref="#ico16_contextmenu" href="#ico16_contextmenu" />
+        <use xlinkHref={ico16_contextmenu} href={ico16_contextmenu} />
       </svg>
     ) : (
       <svg
         className="cdd__icon__small clickable"
         onClick={() => this.setState({ contextMenuOpen: true })}
       >
-        <use xlinkHref="#ico16_contextmenu" href="#ico16_contextmenu" />
+        <use xlinkHref={ico16_contextmenu} href={ico16_contextmenu} />
       </svg>
     );
 
@@ -148,33 +147,41 @@ class WonConnectionContextDropdown extends React.Component {
         );
       this.props.isTargetAtomUsableAsTemplate &&
         buttons.push(
-          <button
+          <Link
             key="duplicate"
             className="won-button--outlined thin red"
-            onClick={() =>
-              this.props.routerGoAbs("create", {
-                fromAtomUri: this.props.targetAtomUri,
-                mode: "DUPLICATE",
-              })
+            to={location =>
+              generateLink(
+                location,
+                {
+                  fromAtomUri: this.props.targetAtomUri,
+                  mode: "DUPLICATE",
+                },
+                "/create"
+              )
             }
           >
             Post this too!
-          </button>
+          </Link>
         );
       this.props.isTargetAtomEditable &&
         buttons.push(
-          <button
+          <Link
             key="edit"
             className="won-button--outlined thin red"
-            onClick={() =>
-              this.props.routerGoAbs("create", {
-                fromAtomUri: this.props.targetAtomUri,
-                mode: "EDIT",
-              })
+            to={location =>
+              generateLink(
+                location,
+                {
+                  fromAtomUri: this.props.targetAtomUri,
+                  mode: "EDIT",
+                },
+                "/create"
+              )
             }
           >
             Edit
-          </button>
+          </Link>
         );
       this.props.adminEmail &&
         buttons.push(
@@ -209,7 +216,7 @@ class WonConnectionContextDropdown extends React.Component {
           >
             <div className="topline">
               <svg className="cdd__icon__small__contextmenu clickable">
-                <use xlinkHref="#ico16_contextmenu" href="#ico16_contextmenu" />
+                <use xlinkHref={ico16_contextmenu} href={ico16_contextmenu} />
               </svg>
             </div>
             {/* Buttons when connection is available -->*/}
@@ -258,10 +265,12 @@ class WonConnectionContextDropdown extends React.Component {
           caption: "Yes",
           callback: () => {
             this.props.connectionClose(this.props.connectionUri);
-            this.props.routerGoCurrent({
-              useCase: undefined,
-              connectionUri: undefined,
-            });
+            this.props.history.push(
+              generateLink(this.props.history.location, {
+                useCase: undefined,
+                connectionUri: undefined,
+              })
+            );
             this.props.hideModalDialog();
           },
         },
@@ -277,9 +286,15 @@ class WonConnectionContextDropdown extends React.Component {
   }
 
   goToPost(postUri) {
-    this.props.routerGo("post", {
-      postUri: postUri,
-    });
+    this.props.history.push(
+      generateLink(
+        this.props.history.location,
+        {
+          postUri: postUri,
+        },
+        "/post"
+      )
+    );
   }
 
   componentWillMount() {
@@ -318,13 +333,13 @@ WonConnectionContextDropdown.propTypes = {
   className: PropTypes.string,
   hideModalDialog: PropTypes.func,
   showModalDialog: PropTypes.func,
-  routerGoCurrent: PropTypes.func,
-  routerGoAbs: PropTypes.func,
-  routerGo: PropTypes.func,
   connectionClose: PropTypes.func,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonConnectionContextDropdown);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonConnectionContextDropdown)
+);

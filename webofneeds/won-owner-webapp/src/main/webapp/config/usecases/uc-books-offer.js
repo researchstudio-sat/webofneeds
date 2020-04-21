@@ -4,11 +4,12 @@
 
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
+import ico36_book from "../../images/won-icons/ico36_book.svg";
 
 export const booksOffer = {
   identifier: "booksOffer",
   label: "Offer a Book",
-  icon: "#ico36_book",
+  icon: ico36_book,
   draft: {
     ...mergeInEmptyDraft({
       content: {

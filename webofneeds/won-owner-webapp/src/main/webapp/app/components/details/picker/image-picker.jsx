@@ -1,6 +1,7 @@
 import React from "react";
 
 import "~/style/_imagepicker.scss";
+import ico36_close from "~/images/won-icons/ico36_close.svg";
 import PropTypes from "prop-types";
 import WonFileDropzone from "../../file-dropzone";
 
@@ -37,7 +38,7 @@ export default class WonImagePicker extends React.Component {
                   className="imagep__preview__item__remove"
                   onClick={() => this.removeImage(image)}
                 >
-                  <use xlinkHref="#ico36_close" href="#ico36_close" />
+                  <use xlinkHref={ico36_close} href={ico36_close} />
                 </svg>
                 <img
                   className="imagep__preview__item__image"

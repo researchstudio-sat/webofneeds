@@ -9,30 +9,38 @@ import { getIn } from "../utils.js";
 import WonLabelledHr from "./labelled-hr.jsx";
 
 import "~/style/_howto.scss";
+import ico36_description from "~/images/won-icons/ico36_description.svg";
+import ico36_match from "~/images/won-icons/ico36_match.svg";
+import ico36_incoming from "~/images/won-icons/ico36_incoming.svg";
+import ico36_message from "~/images/won-icons/ico36_message.svg";
+import ico36_location_current from "~/images/won-icons/ico36_location_current.svg";
+import ico36_backarrow from "~/images/won-icons/ico36_backarrow.svg";
+import ico36_uc_question from "~/images/won-icons/ico36_uc_question.svg";
+import { Link, withRouter } from "react-router-dom";
 
 const howItWorksSteps = [
   {
-    svgSrc: "#ico36_description",
+    svgSrc: ico36_description,
     title: "Post your atom anonymously",
     text:
       "Atoms can be very personal, so privacy is important. You don't have to reveal your identity here.",
   },
   {
-    svgSrc: "#ico36_match",
+    svgSrc: ico36_match,
     title: "Get matches",
     text:
       "Based on the" +
       " information you provide, we will try to connect you with others",
   },
   {
-    svgSrc: "#ico36_incoming",
+    svgSrc: ico36_incoming,
     title: "Request contact – or be contacted",
     text:
       "If you're interested," +
       " make a contact request - or get one if your counterpart is faster than you",
   },
   {
-    svgSrc: "#ico36_message",
+    svgSrc: ico36_message,
     title: "Interact and exchange",
     text:
       "You found someone" +
@@ -52,9 +60,6 @@ const mapDispatchToProps = dispatch => {
   return {
     locationAccessDenied: () => {
       dispatch(actionCreators.view__locationAccessDenied());
-    },
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
     },
     updateCurrentLocation: locImm => {
       dispatch(actionCreators.view__updateCurrentLocation(locImm));
@@ -131,7 +136,7 @@ class WonHowTo extends React.Component {
               )
             }
           >
-            <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
+            <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
           </svg>
           <div className="howto__steps__detail">
             <div className="howto__detail__title">
@@ -154,7 +159,7 @@ class WonHowTo extends React.Component {
               )
             }
           >
-            <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
+            <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
           </svg>
         </div>
         <h2 className="howto__title">Ready to start?</h2>
@@ -170,8 +175,8 @@ class WonHowTo extends React.Component {
           >
             <svg className="won-button-icon">
               <use
-                xlinkHref="#ico36_location_current"
-                href="#ico36_location_current"
+                xlinkHref={ico36_location_current}
+                href={ico36_location_current}
               />
             </svg>
             <span>{"What's in your Area?"}</span>
@@ -186,24 +191,22 @@ class WonHowTo extends React.Component {
             className="labelledHr howto__createx__labelledhr"
             label="Or"
           />
-          <button
+          <Link
+            to="/create?useCase=persona"
             className="won-button--filled red howto__createx__spanbutton"
-            onClick={() =>
-              this.props.routerGo("create", { useCase: "persona" })
-            }
           >
             <span>Create your Persona!</span>
-          </button>
+          </Link>
           <WonLabelledHr
             className="labelledHr howto__createx__labelledhr"
             label="Or"
           />
-          <button
+          <Link
+            to="/create"
             className="won-button--filled red howto__createx__spanbutton"
-            onClick={() => this.props.routerGo("create")}
           >
             <span>Post something now!</span>
-          </button>
+          </Link>
         </div>
       </won-how-to>
     );
@@ -216,18 +219,18 @@ class WonHowTo extends React.Component {
   }
 
   getSvgIconFromItem(item) {
-    return item.svgSrc ? item.svgSrc : "#ico36_uc_question";
+    return item.svgSrc ? item.svgSrc : ico36_uc_question;
   }
 
   viewWhatsAround() {
     this.viewWhatsX(() => {
-      this.props.routerGo("map");
+      this.props.history.push("/map");
     });
   }
 
   viewWhatsNew() {
     this.viewWhatsX(() => {
-      this.props.routerGo("overview");
+      this.props.history.push("/overview");
     });
   }
 
@@ -273,12 +276,14 @@ WonHowTo.propTypes = {
   className: PropTypes.string,
   appTitle: PropTypes.string,
   isLocationAccessDenied: PropTypes.bool,
-  routerGo: PropTypes.func,
   updateCurrentLocation: PropTypes.func,
   locationAccessDenied: PropTypes.func,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonHowTo);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonHowTo)
+);

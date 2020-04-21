@@ -14,6 +14,8 @@ import won from "../../won-es6";
 import WonCombinedMessageContent from "./combined-message-content.jsx";
 
 import "~/style/_referenced-message-content.scss";
+import ico16_arrow_up from "~/images/won-icons/ico16_arrow_up.svg";
+import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 
 const mapStateToProps = (state, ownProps) => {
   const ownedAtom =
@@ -172,9 +174,9 @@ class WonReferencedMessageContent extends React.Component {
             <div className="refmsgcontent__fragment__header__carret">
               <svg>
                 {this.isReferenceExpanded("claims") ? (
-                  <use xlinkHref="#ico16_arrow_up" href="#ico16_arrow_up" />
+                  <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
                 ) : (
-                  <use xlinkHref="#ico16_arrow_down" href="#ico16_arrow_down" />
+                  <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
                 )}
               </svg>
             </div>
@@ -232,9 +234,9 @@ class WonReferencedMessageContent extends React.Component {
             <div className="refmsgcontent__fragment__header__carret">
               <svg>
                 {this.isReferenceExpanded("accepts") ? (
-                  <use xlinkHref="#ico16_arrow_up" href="#ico16_arrow_up" />
+                  <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
                 ) : (
-                  <use xlinkHref="#ico16_arrow_down" href="#ico16_arrow_down" />
+                  <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
                 )}
               </svg>
             </div>
@@ -292,9 +294,9 @@ class WonReferencedMessageContent extends React.Component {
             <div className="refmsgcontent__fragment__header__carret clickable">
               <svg>
                 {this.isReferenceExpanded("retracts") ? (
-                  <use xlinkHref="#ico16_arrow_up" href="#ico16_arrow_up" />
+                  <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
                 ) : (
-                  <use xlinkHref="#ico16_arrow_down" href="#ico16_arrow_down" />
+                  <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
                 )}
               </svg>
             </div>
@@ -352,9 +354,9 @@ class WonReferencedMessageContent extends React.Component {
             <div className="refmsgcontent__fragment__header__carret">
               <svg>
                 {this.isReferenceExpanded("rejects") ? (
-                  <use xlinkHref="#ico16_arrow_up" href="#ico16_arrow_up" />
+                  <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
                 ) : (
-                  <use xlinkHref="#ico16_arrow_down" href="#ico16_arrow_down" />
+                  <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
                 )}
               </svg>
             </div>
@@ -412,9 +414,9 @@ class WonReferencedMessageContent extends React.Component {
             <div className="refmsgcontent__fragment__header__carret">
               <svg>
                 {this.isReferenceExpanded("proposes") ? (
-                  <use xlinkHref="#ico16_arrow_up" href="#ico16_arrow_up" />
+                  <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
                 ) : (
-                  <use xlinkHref="#ico16_arrow_down" href="#ico16_arrow_down" />
+                  <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
                 )}
               </svg>
             </div>
@@ -474,9 +476,9 @@ class WonReferencedMessageContent extends React.Component {
             <div className="refmsgcontent__fragment__header__carret">
               <svg>
                 {this.isReferenceExpanded("proposesToCancel") ? (
-                  <use xlinkHref="#ico16_arrow_up" href="#ico16_arrow_up" />
+                  <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
                 ) : (
-                  <use xlinkHref="#ico16_arrow_down" href="#ico16_arrow_down" />
+                  <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
                 )}
               </svg>
             </div>
@@ -525,9 +527,9 @@ class WonReferencedMessageContent extends React.Component {
             <div className="refmsgcontent__fragment__header__carret">
               <svg>
                 {this.isReferenceExpanded("forwards") ? (
-                  <use xlinkHref="#ico16_arrow_up" href="#ico16_arrow_up" />
+                  <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
                 ) : (
-                  <use xlinkHref="#ico16_arrow_down" href="#ico16_arrow_down" />
+                  <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
                 )}
               </svg>
             </div>

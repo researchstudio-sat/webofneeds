@@ -1,34 +1,25 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { actionCreators } from "../actions/actions.js";
 import * as useCaseUtils from "../usecase-utils.js";
-import { getUseCaseGroupFromRoute } from "../redux/selectors/general-selectors.js";
 
 import "~/style/_usecase-group.scss";
-import { getIn } from "../utils";
+import { getIn, getQueryParams, generateLink } from "../utils";
+import { Link, withRouter } from "react-router-dom";
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
   const visibleUseCasesByConfig = getIn(state, [
     "config",
     "theme",
     "visibleUseCases",
   ]);
 
-  const selectedGroup = getUseCaseGroupFromRoute(state);
+  const { useCaseGroup } = getQueryParams(ownProps.location);
   return {
     visibleUseCasesByConfig,
     useCaseGroup:
       visibleUseCasesByConfig &&
-      useCaseUtils.getUseCaseGroupByIdentifier(selectedGroup),
-  };
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    routerGoCurrent: props => {
-      dispatch(actionCreators.router__stateGoCurrent(props));
-    },
+      useCaseUtils.getUseCaseGroupByIdentifier(useCaseGroup),
   };
 };
 
@@ -64,10 +55,12 @@ class WonUsecasePicker extends React.Component {
                       )
                     ) {
                       return (
-                        <div
+                        <Link
                           key={subItem.identifier + "-" + index}
                           className="ucg__main__usecase clickable"
-                          onClick={() => this.startFrom(subItem)}
+                          to={location =>
+                            this.startFromRoute(location, subItem)
+                          }
                         >
                           {!!subItem.icon && (
                             <svg className="ucg__main__usecase__icon">
@@ -82,7 +75,7 @@ class WonUsecasePicker extends React.Component {
                               {subItem.label}
                             </div>
                           )}
-                        </div>
+                        </Link>
                       );
                     }
                   }
@@ -98,18 +91,14 @@ class WonUsecasePicker extends React.Component {
     );
   }
 
-  startFrom(subItem) {
+  startFromRoute(location, subItem) {
     const subItemIdentifier = subItem && subItem.identifier;
 
     if (subItemIdentifier) {
       if (useCaseUtils.isUseCaseGroup(subItem)) {
-        this.props.routerGoCurrent({
-          useCaseGroup: encodeURIComponent(subItemIdentifier),
-        });
+        return generateLink(location, { useCaseGroup: subItemIdentifier });
       } else {
-        this.props.routerGoCurrent({
-          useCase: encodeURIComponent(subItemIdentifier),
-        });
+        return generateLink(location, { useCase: subItemIdentifier });
       }
     } else {
       console.warn("No identifier found for given usecase, ", subItem);
@@ -117,12 +106,9 @@ class WonUsecasePicker extends React.Component {
   }
 }
 WonUsecasePicker.propTypes = {
+  location: PropTypes.object,
   visibleUseCasesByConfig: PropTypes.objectOf(PropTypes.string),
   useCaseGroup: PropTypes.object,
-  routerGoCurrent: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonUsecasePicker);
+export default withRouter(connect(mapStateToProps)(WonUsecasePicker));

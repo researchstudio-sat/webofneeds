@@ -21,7 +21,6 @@ import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as stateStore from "../redux/state-store.js";
 import * as ownerApi from "../api/owner-api.js";
 import { get, getIn } from "../utils.js";
-import * as accountUtils from "../redux/utils/account-utils";
 import { ensureLoggedIn } from "./account-actions.js";
 
 export function fetchUnloadedAtom(atomUri) {
@@ -257,25 +256,8 @@ export function deleteAtom(atomUri) {
   };
 }
 
-export function edit(draft, oldAtom) {
+export function edit(draft, oldAtom, callback) {
   return (dispatch, getState) => {
-    const state = getState();
-
-    let prevParams = getIn(state, ["router", "prevParams"]);
-
-    if (
-      !accountUtils.isLoggedIn(get(state, "account")) &&
-      prevParams.privateId
-    ) {
-      /*
-       * `ensureLoggedIn` will generate a new privateId. should
-       * there be a previous privateId, we don't want to change
-       * back to that later.
-       */
-      prevParams = Object.assign({}, prevParams);
-      delete prevParams.privateId;
-    }
-
     return ensureLoggedIn(dispatch, getState).then(async () => {
       const { message, atomUri } = await buildEditMessage(draft, oldAtom);
 
@@ -290,8 +272,7 @@ export function edit(draft, oldAtom) {
             oldAtom,
           },
         });
-
-        dispatch(actionCreators.router__back());
+        callback();
       });
     });
   };
@@ -303,21 +284,6 @@ export function create(draft, personaUri, nodeUri) {
 
     if (!nodeUri) {
       nodeUri = getIn(state, ["config", "defaultNodeUri"]);
-    }
-
-    let prevParams = getIn(state, ["router", "prevParams"]);
-
-    if (
-      !accountUtils.isLoggedIn(get(state, "account")) &&
-      prevParams.privateId
-    ) {
-      /*
-             * `ensureLoggedIn` will generate a new privateId. should
-             * there be a previous privateId, we don't want to change
-             * back to that later.
-             */
-      prevParams = Object.assign({}, prevParams);
-      delete prevParams.privateId;
     }
 
     return ensureLoggedIn(dispatch, getState).then(async () => {

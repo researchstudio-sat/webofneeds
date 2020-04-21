@@ -9,8 +9,13 @@ import * as connectionUtils from "../redux/utils/connection-utils.js";
 import WonConnectionHeader from "./connection-header.jsx";
 
 import "~/style/_connection-selection-item-line.scss";
+import { generateLink, getQueryParams } from "../utils";
+import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
+  const { connectionUri } = getQueryParams(ownProps.location);
+  const openConnectionUri = connectionUri;
+
   const ownedAtom = generalSelectors.getOwnedAtomByConnectionUri(
     state,
     ownProps.connectionUri
@@ -21,7 +26,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     connectionUri: ownProps.connectionUri,
     onClick: ownProps.onClick,
-    openConnectionUri: generalSelectors.getConnectionUriFromRoute(state),
+    openConnectionUri: openConnectionUri,
     lastUpdateTimestamp: get(connection, "lastUpdateDate"),
     targetAtomFailedToLoad: processUtils.hasAtomFailedToLoad(
       processState,
@@ -33,9 +38,6 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    routerGoCurrent: props => {
-      dispatch(actionCreators.router__stateGoCurrent(props));
-    },
     connectionClose: connectionUri => {
       dispatch(actionCreators.connections__close(connectionUri));
     },
@@ -79,10 +81,12 @@ class WonConnectionSelectionItem extends React.Component {
 
   closeConnection() {
     this.props.connectionClose(this.props.connectionUri);
-    this.props.routerGoCurrent({
-      useCase: undefined,
-      connectionUri: undefined,
-    });
+    this.props.history.push(
+      generateLink(this.props.history.location, {
+        useCase: undefined,
+        connectionUri: undefined,
+      })
+    );
   }
 }
 
@@ -94,10 +98,12 @@ WonConnectionSelectionItem.propTypes = {
   targetAtomFailedToLoad: PropTypes.bool,
   isUnread: PropTypes.bool,
   connectionClose: PropTypes.func,
-  routerGoCurrent: PropTypes.func,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonConnectionSelectionItem);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonConnectionSelectionItem)
+);

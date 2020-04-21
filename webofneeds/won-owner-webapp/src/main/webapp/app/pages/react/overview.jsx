@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { actionCreators } from "../../actions/actions.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
-import { get, getIn, sortByDate } from "../../utils.js";
+import { get, getIn, sortByDate, getQueryParams } from "../../utils.js";
 import * as processSelectors from "../../redux/selectors/process-selectors.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as useCaseUtils from "../../usecase-utils.js";
@@ -22,9 +22,11 @@ import WonFooter from "../../components/footer";
 
 import "~/style/_overview.scss";
 import "~/style/_connection-overlay.scss";
+import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
+import { withRouter } from "react-router-dom";
 
-const mapStateToProps = state => {
-  const viewConnUri = generalSelectors.getViewConnectionUriFromRoute(state);
+const mapStateToProps = (state, ownProps) => {
+  const { viewConnUri } = getQueryParams(ownProps.location);
 
   const debugModeEnabled = viewSelectors.isDebugModeEnabled(state);
 
@@ -85,7 +87,7 @@ const mapStateToProps = state => {
     isOwnerAtomUrisLoading,
     isOwnerAtomUrisToLoad,
     showSlideIns:
-      viewSelectors.hasSlideIns(state) &&
+      viewSelectors.hasSlideIns(state, ownProps.history) &&
       viewSelectors.isSlideInsVisible(state),
     showModalDialog: viewSelectors.showModalDialog(state),
     showConnectionOverlay: !!viewConnUri,
@@ -191,8 +193,8 @@ class PageOverview extends React.Component {
                         }
                       >
                         <use
-                          xlinkHref="#ico16_arrow_down"
-                          href="#ico16_arrow_down"
+                          xlinkHref={ico16_arrow_down}
+                          href={ico16_arrow_down}
                         />
                       </svg>
                     </div>
@@ -234,8 +236,8 @@ class PageOverview extends React.Component {
                         }
                       >
                         <use
-                          xlinkHref="#ico16_arrow_down"
-                          href="#ico16_arrow_down"
+                          xlinkHref={ico16_arrow_down}
+                          href={ico16_arrow_down}
                         />
                       </svg>
                     </div>
@@ -336,7 +338,8 @@ class PageOverview extends React.Component {
   reload() {
     if (!this.props.isOwnerAtomUrisLoading) {
       const modifiedAfterDate =
-        new Date(this.props.lastAtomUrisUpdateDate) ||
+        (this.props.lastAtomUrisUpdateDate &&
+          new Date(this.props.lastAtomUrisUpdateDate)) ||
         new Date(Date.now() - 30 /*Days before*/ * 86400000);
       this.props.fetchWhatsNew(modifiedAfterDate);
     }
@@ -361,7 +364,9 @@ PageOverview.propTypes = {
   fetchWhatsNew: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(PageOverview);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(PageOverview)
+);

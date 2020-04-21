@@ -12,8 +12,7 @@ won-usecase-group {
   box-sizing: border-box;
   padding: $gridRowGap;
 
-  & .clickable,
-  & button {
+  & .clickable {
     transform: translate3d(0, 0, 0);
   }
 

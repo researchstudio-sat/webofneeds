@@ -4,11 +4,12 @@
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import vocab from "../../app/service/vocab.js";
+import ico36_uc_wtf_interest from "../../images/won-icons/ico36_uc_wtf_interest.svg";
 
 export const handleComplaint = {
   identifier: "handleComplaint",
   label: "Handle complaints",
-  icon: "#ico36_uc_wtf_interest",
+  icon: ico36_uc_wtf_interest,
   timeToLiveMillisDefault: 1000 * 60 * 60 * 24 * 30,
   doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {

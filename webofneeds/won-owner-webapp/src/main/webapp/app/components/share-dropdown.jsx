@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import WonAtomShareLink from "./atom-share-link.jsx";
 
 import "~/style/_share-dropdown.scss";
+import ico16_share from "~/images/won-icons/ico16_share.svg";
 
 export default class WonShareDropdown extends React.Component {
   constructor(props) {
@@ -23,7 +24,7 @@ export default class WonShareDropdown extends React.Component {
               className="sdd__icon__small__sharemenu clickable"
               onClick={() => this.setState({ contextMenuOpen: false })}
             >
-              <use xlinkHref="#ico16_share" href="#ico16_share" />
+              <use xlinkHref={ico16_share} href={ico16_share} />
             </svg>
           </div>
           <WonAtomShareLink atomUri={this.props.atomUri} />
@@ -40,7 +41,7 @@ export default class WonShareDropdown extends React.Component {
           className="sdd__icon__small clickable"
           onClick={() => this.setState({ contextMenuOpen: true })}
         >
-          <use xlinkHref="#ico16_share" href="#ico16_share" />
+          <use xlinkHref={ico16_share} href={ico16_share} />
         </svg>
         {dropdownElement}
       </won-share-dropdown>

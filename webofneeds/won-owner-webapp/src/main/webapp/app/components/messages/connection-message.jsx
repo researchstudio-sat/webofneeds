@@ -4,7 +4,7 @@ import urljoin from "url-join";
 import PropTypes from "prop-types";
 import * as messageUtils from "../../redux/utils/message-utils.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
-import { get, getIn } from "../../utils.js";
+import { get, getIn, generateLink } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { connect } from "react-redux";
 import { getOwnedAtomByConnectionUri } from "../../redux/selectors/general-selectors.js";
@@ -19,7 +19,11 @@ import VisibilitySensor from "react-visibility-sensor";
 
 import "~/style/_connection-message.scss";
 import "~/style/_rdflink.scss";
+import rdf_logo_2 from "~/images/won-icons/rdf_logo_2.svg";
+import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
+import ico16_arrow_up from "~/images/won-icons/ico16_arrow_up.svg";
 import * as viewSelectors from "../../redux/selectors/view-selectors";
+import { withRouter } from "react-router-dom";
 
 const MESSAGE_READ_TIMEOUT = 1500;
 
@@ -129,9 +133,6 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
     messageMarkAsCollapsed: (messageUri, connectionUri, atomUri, collapsed) => {
       dispatch(
         actionCreators.messages__viewState__markAsCollapsed({
@@ -196,9 +197,13 @@ class WonConnectionMessage extends React.Component {
             onClick={
               !this.props.onClick
                 ? () => {
-                    this.props.routerGo("post", {
-                      postUri: get(this.props.theirAtom, "uri"),
-                    });
+                    this.props.history.push(
+                      generateLink(
+                        this.props.history.location,
+                        { postUri: get(this.props.theirAtom, "uri") },
+                        "/post"
+                      )
+                    );
                   }
                 : undefined
             }
@@ -218,9 +223,13 @@ class WonConnectionMessage extends React.Component {
             onClick={
               !this.props.onClick
                 ? () => {
-                    this.props.routerGo("post", {
-                      postUri: this.props.originatorUri,
-                    });
+                    this.props.history.push(
+                      generateLink(
+                        this.props.history.location,
+                        { postUri: this.props.originatorUri },
+                        "/post"
+                      )
+                    );
                   }
                 : undefined
             }
@@ -274,12 +283,9 @@ class WonConnectionMessage extends React.Component {
               >
                 <svg>
                   {this.props.showActions ? (
-                    <use xlinkHref="#ico16_arrow_up" href="#ico16_arrow_up" />
+                    <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
                   ) : (
-                    <use
-                      xlinkHref="#ico16_arrow_down"
-                      href="#ico16_arrow_down"
-                    />
+                    <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
                   )}
                 </svg>
               </div>
@@ -322,7 +328,7 @@ class WonConnectionMessage extends React.Component {
                   href={this.props.rdfLinkURL}
                 >
                   <svg className="rdflink__small clickable">
-                    <use xlinkHref="#rdf_logo_2" href="#rdf_logo_2" />
+                    <use xlinkHref={rdf_logo_2} href={rdf_logo_2} />
                   </svg>
                 </a>
               ) : (
@@ -526,13 +532,15 @@ WonConnectionMessage.propTypes = {
   isPartiallyLoaded: PropTypes.bool,
   isFromSystem: PropTypes.bool,
   hasReferences: PropTypes.bool,
-  routerGo: PropTypes.func,
   messageMarkAsCollapsed: PropTypes.func,
   messageMarkAsRead: PropTypes.func,
   showMessageActions: PropTypes.func,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonConnectionMessage);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonConnectionMessage)
+);

@@ -1,6 +1,7 @@
 import React from "react";
 
 import "~/style/_numberpicker.scss";
+import ico36_close from "~/images/won-icons/ico36_close.svg";
 import PropTypes from "prop-types";
 import { isValidNumber } from "../../../utils.js";
 
@@ -24,7 +25,7 @@ export default class WonNumberPicker extends React.Component {
                   className="numberp__input__reset__icon clickable"
                   onClick={() => this.reset(true)}
                 >
-                  <use xlinkHref="#ico36_close" href="#ico36_close" />
+                  <use xlinkHref={ico36_close} href={ico36_close} />
                 </svg>
               )}
           </div>

@@ -4,6 +4,7 @@ import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import WonPriceViewer from "../../app/components/details/viewer/price-viewer.jsx";
 import WonPricePicker from "../../app/components/details/picker/price-picker.jsx";
 import WonPriceRangePicker from "../../app/components/details/picker/price-range-picker.jsx";
+import ico36_detail_price from "../../images/won-icons/ico36_detail_price.svg";
 
 export const pricerange = {
   identifier: "pricerange",
@@ -12,7 +13,7 @@ export const pricerange = {
   maxLabel: "Max",
   minPlaceholder: "Min Price",
   maxPlaceholder: "Max Price",
-  icon: "#ico36_detail_price",
+  icon: ico36_detail_price,
   currency: [
     { value: "EUR", label: "€", default: true },
     { value: "USD", label: "$" },
@@ -147,7 +148,7 @@ export const pricerange = {
 export const price = {
   identifier: "price",
   label: "Price",
-  icon: "#ico36_detail_price",
+  icon: ico36_detail_price,
   placeholder: "Enter Price...",
   component: WonPricePicker,
   viewerComponent: WonPriceViewer,

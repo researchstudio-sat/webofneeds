@@ -14,11 +14,13 @@ import L from "leaflet";
 import _ from "lodash";
 
 import "leaflet/dist/leaflet.css";
+import ico16_indicator_location from "~/images/won-icons/ico16_indicator_location.svg";
+import ico36_location_current from "~/images/won-icons/ico36_location_current.svg";
 
 const locationIcon = L.divIcon({
   className: "wonLocationMarkerIcon",
   html:
-    "<svg class='marker__icon'><use xlink:href='#ico36_detail_location' href='#ico36_detail_location' /></svg>",
+    "<svg class='marker__icon'><use xlink:href='~/images/won-icons/ico36_detail_location.svg' href='~/images/won-icons/ico36_detail_location.svg' /></svg>",
 });
 
 //TODO: SELECT LOCATION BY CLICKING ON THE MAP
@@ -99,8 +101,8 @@ export default class WonLocationPicker extends React.Component {
       >
         <svg className="lp__searchresult__icon">
           <use
-            xlinkHref="#ico16_indicator_location"
-            href="#ico16_indicator_location"
+            xlinkHref={ico16_indicator_location}
+            href={ico16_indicator_location}
           />
         </svg>
         <span className="lp__searchresult__text">{result.name}</span>
@@ -152,8 +154,8 @@ export default class WonLocationPicker extends React.Component {
             >
               <svg className="lp__searchresult__icon">
                 <use
-                  xlinkHref="#ico16_indicator_location"
-                  href="#ico36_location_current"
+                  xlinkHref={ico16_indicator_location}
+                  href={ico36_location_current}
                 />
               </svg>
               <span className="lp__searchresult__text">
@@ -170,8 +172,8 @@ export default class WonLocationPicker extends React.Component {
               <svg className="lp__searchresult__icon">
                 {/*<!-- TODO: create and use a more appropriate icon here -->*/}
                 <use
-                  xlinkHref="#ico16_indicator_location"
-                  href="#ico16_indicator_location"
+                  xlinkHref={ico16_indicator_location}
+                  href={ico16_indicator_location}
                 />
               </svg>
               <span className="lp__searchresult__text">

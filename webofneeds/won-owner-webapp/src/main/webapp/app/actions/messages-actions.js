@@ -157,7 +157,7 @@ export function successfulEdit(event) {
       );
     } else {
       stateStore
-        .fetchDataForOwnedAtoms([atomURI], dispatch, getState)
+        .fetchDataForOwnedAtoms([atomURI], dispatch, getState, true)
         .then(() => {
           dispatch(
             actionCreators.atoms__editSuccessful({

@@ -7,6 +7,10 @@ import { details, abstractDetails } from "../detail-definitions.js";
 import { is, isValidNumber } from "../../app/utils.js";
 import won from "../../app/won-es6.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
+import ico36_detail_floorsize from "../../images/won-icons/ico36_detail_floorsize.svg";
+import ico36_detail_feature from "../../images/won-icons/ico36_detail_feature.svg";
+import ico36_detail_number_of_rooms from "../../images/won-icons/ico36_detail_number-of-rooms.svg";
+import ico36_detail_rent from "../../images/won-icons/ico36_detail_rent.svg";
 
 function minMaxLabel(min, max) {
   const min_ = Number.parseFloat(min);
@@ -28,7 +32,7 @@ export const realEstateFloorSizeDetail = {
   ...abstractDetails.number,
   identifier: "floorSize",
   label: "Floor size in square meters",
-  icon: "#ico36_detail_floorsize",
+  icon: ico36_detail_floorsize,
   messageEnabled: false,
   parseToRDF: function({ value }) {
     if (!isValidNumber(value)) {
@@ -81,7 +85,7 @@ export const realEstateNumberOfRoomsDetail = {
   ...abstractDetails.number,
   identifier: "numberOfRooms",
   label: "Number of Rooms",
-  icon: "#ico36_detail_number-of-rooms",
+  icon: ico36_detail_number_of_rooms,
   messageEnabled: false,
   parseToRDF: function({ value }) {
     if (!isValidNumber(value)) {
@@ -109,7 +113,7 @@ export const realEstateNumberOfRoomsRangeDetail = {
   minLabel: "From",
   maxLabel: "To",
   messageEnabled: false,
-  icon: "#ico36_detail_number-of-rooms",
+  icon: ico36_detail_number_of_rooms,
   parseToRDF: function({ value }) {
     if (!value) {
       return {};
@@ -183,7 +187,7 @@ export const realEstateFloorSizeRangeDetail = {
   label: "Floor size in square meters",
   minLabel: "From",
   maxLabel: "To",
-  icon: "#ico36_detail_floorsize",
+  icon: ico36_detail_floorsize,
   messageEnabled: false,
   parseToRDF: function({ value }) {
     if (!value) {
@@ -257,7 +261,7 @@ export const realEstateFeaturesDetail = {
   ...details.tags,
   identifier: "features",
   label: "Features",
-  icon: "#ico36_detail_feature",
+  icon: ico36_detail_feature,
   placeholder: "e.g. balcony, bathtub",
   messageEnabled: false,
   parseToRDF: function({ value }) {
@@ -286,7 +290,7 @@ export const realEstateRentDetail = {
   ...details.price,
   identifier: "rent",
   label: "Rent",
-  icon: "#ico36_detail_rent",
+  icon: ico36_detail_rent,
   currency: [{ value: "EUR", label: "€", default: true }],
   unitCode: [{ value: "MON", label: "per month", default: true }],
   messageEnabled: false,
@@ -304,7 +308,7 @@ export const realEstateRentRangeDetail = {
   maxLabel: "To",
   currency: [{ value: "EUR", label: "€", default: true }],
   unitCode: [{ value: "MON", label: "per month", default: true }],
-  icon: "#ico36_detail_rent",
+  icon: ico36_detail_rent,
   messageEnabled: false,
   parseFromRDF: function() {
     return undefined;

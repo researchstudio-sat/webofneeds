@@ -6,10 +6,12 @@ import Immutable from "immutable";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
-import { getIn } from "../utils.js";
+import { getIn, generateLink } from "../utils.js";
 
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import "~/style/_atom-suggestions-indicator.scss";
+import ico36_match from "~/images/won-icons/ico36_match.svg";
+import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const atom = getIn(state, ["atoms", ownProps.atomUri]);
@@ -30,9 +32,6 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    routerGo: (path, props) => {
-      dispatch(actionCreators.router__stateGo(path, props));
-    },
     selectAtomTab: (atomUri, selectTab) => {
       dispatch(
         actionCreators.atoms__selectTab(
@@ -53,7 +52,13 @@ class WonAtomSuggestionsIndicator extends React.Component {
   }
   showAtomSuggestions() {
     this.props.selectAtomTab(this.props.atomUri, "SUGGESTIONS");
-    this.props.routerGo("post", { postUri: this.props.atomUri });
+    this.props.history.push(
+      generateLink(
+        this.props.history.location,
+        { postUri: this.props.atomUri },
+        "/post"
+      )
+    );
   }
 
   render() {
@@ -70,7 +75,7 @@ class WonAtomSuggestionsIndicator extends React.Component {
               : "asi__icon--reads")
           }
         >
-          <use xlinkHref="#ico36_match" href="#ico36_match" />
+          <use xlinkHref={ico36_match} href={ico36_match} />
         </svg>
         <div className="asi__right">
           <div className="asi__right__topline">
@@ -93,11 +98,13 @@ WonAtomSuggestionsIndicator.propTypes = {
   atomUri: PropTypes.string.isRequired,
   suggestionsCount: PropTypes.number,
   unreadSuggestionsCount: PropTypes.number,
-  routerGo: PropTypes.func,
   selectAtomTab: PropTypes.func,
+  history: PropTypes.object,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonAtomSuggestionsIndicator);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WonAtomSuggestionsIndicator)
+);

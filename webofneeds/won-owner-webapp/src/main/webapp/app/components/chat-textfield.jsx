@@ -21,6 +21,12 @@ import * as useCaseUtils from "../usecase-utils.js";
 
 import "~/style/_chattextfield.scss";
 import "~/style/_textfield.scss";
+import ico36_close from "~/images/won-icons/ico36_close.svg";
+import ico36_plus from "~/images/won-icons/ico36_plus.svg";
+import ico36_backarrow from "~/images/won-icons/ico36_backarrow.svg";
+import ico36_plus_circle from "~/images/won-icons/ico36_plus_circle.svg";
+import ico36_added_circle from "~/images/won-icons/ico36_added_circle.svg";
+import ico36_close_circle from "~/images/won-icons/ico36_close_circle.svg";
 
 const allMessageDetailsImm = useCaseUtils.getAllMessageDetailsImm();
 
@@ -222,7 +228,7 @@ class ChatTextfield extends React.Component {
                     )
                   }
                 >
-                  <use xlinkHref="#ico36_close" href="#ico36_close" />
+                  <use xlinkHref={ico36_close} href={ico36_close} />
                 </svg>
               </div>
             );
@@ -328,7 +334,7 @@ class ChatTextfield extends React.Component {
                 className="cts__details__input__header__back clickable"
                 onClick={this.props.viewRemoveAddMessageContent}
               >
-                <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
+                <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
               </svg>
               <svg className="cts__details__input__header__icon">
                 <use
@@ -371,10 +377,10 @@ class ChatTextfield extends React.Component {
                   )
                 }
               >
-                <use xlinkHref="#ico36_backarrow" href="#ico36_backarrow" />
+                <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
               </svg>
               <svg className="cts__details__input__header__icon">
-                <use xlinkHref="#ico36_plus_circle" href="#ico36_plus_circle" />
+                <use xlinkHref={ico36_plus_circle} href={ico36_plus_circle} />
               </svg>
               <div className="cts__details__input__header__label hide-in-responsive">
                 {this.getMultiSelectActionLabel()} (
@@ -389,8 +395,8 @@ class ChatTextfield extends React.Component {
               >
                 <svg className="cts__details__input__header__add__icon">
                   <use
-                    xlinkHref="#ico36_added_circle"
-                    href="#ico36_added_circle"
+                    xlinkHref={ico36_added_circle}
+                    href={ico36_added_circle}
                   />
                 </svg>
                 <span className="cts__details__input__header__add__label hide-in-responsive">
@@ -403,8 +409,8 @@ class ChatTextfield extends React.Component {
               >
                 <svg className="cts__details__input__header__discard__icon">
                   <use
-                    xlinkHref="#ico36_close_circle"
-                    href="#ico36_close_circle"
+                    xlinkHref={ico36_close_circle}
+                    href={ico36_close_circle}
                   />
                 </svg>
                 <span className="cts__details__input__header__discard__label hide-in-responsive">
@@ -430,9 +436,9 @@ class ChatTextfield extends React.Component {
       >
         <svg className="cts__add__icon">
           {this.props.showAddMessageContent ? (
-            <use xlinkHref="#ico36_close" href="#ico36_close" />
+            <use xlinkHref={ico36_close} href={ico36_close} />
           ) : (
-            <use xlinkHref="#ico36_plus" href="#ico36_plus" />
+            <use xlinkHref={ico36_plus} href={ico36_plus} />
           )}
         </svg>
       </button>
@@ -495,7 +501,7 @@ class ChatTextfield extends React.Component {
                 className="cts__additionalcontent__list__item__icon clickable"
                 onClick={() => this.activateMultiSelect(ref)}
               >
-                <use xlinkHref="#ico36_plus" href="#ico36_plus" />
+                <use xlinkHref={ico36_plus} href={ico36_plus} />
               </svg>
               <span
                 className="cts__additionalcontent__list__item__label clickable"
@@ -507,7 +513,7 @@ class ChatTextfield extends React.Component {
                 className="cts__additionalcontent__list__item__discard clickable"
                 onClick={() => this.removeReferencedContent(ref)}
               >
-                <use xlinkHref="#ico36_close" href="#ico36_close" />
+                <use xlinkHref={ico36_close} href={ico36_close} />
               </svg>
             </div>
           );
@@ -551,7 +557,7 @@ class ChatTextfield extends React.Component {
                 className="cts__additionalcontent__list__item__discard clickable"
                 onClick={() => this.updateDetail(key, undefined, true)}
               >
-                <use xlinkHref="#ico36_close" href="#ico36_close" />
+                <use xlinkHref={ico36_close} href={ico36_close} />
               </svg>
             </div>
           );

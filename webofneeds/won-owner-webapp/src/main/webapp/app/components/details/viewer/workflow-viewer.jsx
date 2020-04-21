@@ -1,6 +1,7 @@
 import React from "react";
 
 import "~/style/_workflow-viewer.scss";
+import ico36_uc_transport_demand from "~/images/won-icons/ico36_uc_transport_demand.svg";
 import { get } from "../../../utils.js";
 
 import PropTypes from "prop-types";
@@ -32,8 +33,8 @@ export default class WonWorkflowViewer extends React.Component {
       >
         <svg className="workflowv__content__download__typeicon">
           <use
-            xlinkHref="#ico36_uc_transport_demand"
-            href="#ico36_uc_transport_demand"
+            xlinkHref={ico36_uc_transport_demand}
+            href={ico36_uc_transport_demand}
           />
         </svg>
         <div className="workflowv__content__download__label clickable">

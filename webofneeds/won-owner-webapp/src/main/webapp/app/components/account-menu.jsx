@@ -9,6 +9,8 @@ import WonLoginForm from "./login-form.jsx";
 
 import "~/style/_login.scss";
 import "~/style/_account-menu.scss";
+import ico36_person from "~/images/won-icons/ico36_person.svg";
+import ico36_person_anon from "~/images/won-icons/ico36_person_anon.svg";
 
 const mapStateToProps = state => {
   const accountState = get(state, "account");
@@ -60,9 +62,9 @@ class WonAccountMenu extends React.Component {
           </span>
           <svg className="wam__header__icon">
             {this.props.isAnonymous ? (
-              <use xlinkHref="#ico36_person_anon" href="#ico36_person_anon" />
+              <use xlinkHref={ico36_person_anon} href={ico36_person_anon} />
             ) : (
-              <use xlinkHref="#ico36_person" href="#ico36_person" />
+              <use xlinkHref={ico36_person} href={ico36_person} />
             )}
           </svg>
         </div>
