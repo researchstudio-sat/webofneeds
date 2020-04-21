@@ -32,7 +32,7 @@ const mapStateToProps = (state, ownProps) => {
 
   let linkToPost;
   if (ownerBaseUrl && targetAtomUri) {
-    const path = "#!post/" + `?postUri=${encodeURI(targetAtomUri)}`;
+    const path = "#!/post" + `?postUri=${encodeURI(targetAtomUri)}`;
 
     linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
   }

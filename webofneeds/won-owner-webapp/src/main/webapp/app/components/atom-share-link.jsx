@@ -16,7 +16,7 @@ const mapStateToProps = (state, ownProps) => {
 
   let linkToPost;
   if (ownerBaseUrl && atom) {
-    const path = "#!post/" + `?postUri=${encodeURI(ownProps.atomUri)}`;
+    const path = "#!/post" + `?postUri=${encodeURI(ownProps.atomUri)}`;
 
     linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
   }

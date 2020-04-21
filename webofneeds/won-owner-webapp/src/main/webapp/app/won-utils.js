@@ -133,7 +133,7 @@ export function createDocumentDefinitionFromPost(post) {
   }
 
   if (ownerBaseUrl && post) {
-    const path = "#!post/" + `?postUri=${encodeURI(post.get("uri"))}`;
+    const path = "#!/post" + `?postUri=${encodeURI(post.get("uri"))}`;
     const linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
 
     if (linkToPost) {
