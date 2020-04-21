@@ -145,6 +145,16 @@ won-connection-message {
     }
   }
 
+  &.won-is-rejected:not(.won-is-collapsed) {
+    opacity: 0.35;
+    .won-cm__center__bubble {
+      won-combined-message-content {
+        text-decoration: line-through;
+        text-decoration-color: black;
+      }
+    }
+  }
+
   .won-cm__center {
     grid-area: content;
     font-size: $smallFontSize;
