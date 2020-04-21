@@ -459,7 +459,10 @@ class WonConnectionMessage extends React.Component {
         ? true
         : !this.props.hasReferences ||
             this.props.shouldShowRdf ||
-            this.showActionButtons();
+            this.props.showActions ||
+            messageUtils.hasProposesReferences(this.props.message) ||
+            messageUtils.hasClaimsReferences(this.props.message) ||
+            messageUtils.hasProposesToCancelReferences(this.props.message);
     }
     return true;
   }
@@ -468,6 +471,8 @@ class WonConnectionMessage extends React.Component {
   showActionButtons() {
     return (
       !this.props.groupChatMessage &&
+      !this.props.isRetracted &&
+      !this.props.isRejected &&
       (this.props.showActions ||
         messageUtils.hasProposesReferences(this.props.message) ||
         messageUtils.hasClaimsReferences(this.props.message) ||
