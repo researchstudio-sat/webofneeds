@@ -2,6 +2,7 @@ import urljoin from "url-join";
 import { ownerBaseUrl } from "~/config/default.js";
 import * as wonUtils from "../won-utils.js";
 import vocab from "../service/vocab.js";
+import { bestfetch } from "bestfetch";
 
 /**
  * Created by quasarchimaere on 11.06.2019.
@@ -482,17 +483,11 @@ export function getJsonLdDataset(uri, params = {}) {
 
   const requestUri = queryString(uri, params);
 
-  /*console.debug(
-    "called ownerApi.getJsonLdDataset: ",
-    requestUri,
-    "params: ",
-    params
-  );*/
-
-  return fetch(requestUri, {
+  return bestfetch(requestUri, {
     method: "get",
     credentials: "same-origin",
     headers: {
+      cachePolicy: "network-only",
       Accept: "application/ld+json",
       Prefer: params.pagingSize
         ? `return=representation; max-member-count="${params.pagingSize}"`
@@ -512,7 +507,7 @@ export function getJsonLdDataset(uri, params = {}) {
         throw error;
       }
     })
-    .then(dataset => dataset.json());
+    .then(dataset => dataset.data);
 }
 
 export function getMetaAtoms(
