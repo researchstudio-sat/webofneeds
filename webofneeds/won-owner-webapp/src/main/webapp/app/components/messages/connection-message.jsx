@@ -339,13 +339,12 @@ class WonConnectionMessage extends React.Component {
         </React.Fragment>
       );
     }
-
     return (
       <won-connection-message
         class={this.generateParentCssClasses()}
         onClick={this.props.onClick}
       >
-        {messageContentElement}
+        {this.showMessageAlways() ? messageContentElement : undefined}
       </won-connection-message>
     );
   }
@@ -454,10 +453,26 @@ class WonConnectionMessage extends React.Component {
     }
   }
 
+  showMessageAlways() {
+    if (this.props.message) {
+      return getIn(this.props.message, ["content", "text"])
+        ? true
+        : !this.props.hasReferences ||
+            this.props.shouldShowRdf ||
+            this.props.showActions ||
+            messageUtils.hasProposesReferences(this.props.message) ||
+            messageUtils.hasClaimsReferences(this.props.message) ||
+            messageUtils.hasProposesToCancelReferences(this.props.message);
+    }
+    return true;
+  }
+
   //TODO: Not allowed for certain high-level protocol states
   showActionButtons() {
     return (
       !this.props.groupChatMessage &&
+      !this.props.isRetracted &&
+      !this.props.isRejected &&
       (this.props.showActions ||
         messageUtils.hasProposesReferences(this.props.message) ||
         messageUtils.hasClaimsReferences(this.props.message) ||

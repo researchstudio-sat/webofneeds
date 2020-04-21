@@ -167,30 +167,6 @@ class WonConnectionMessageActions extends React.Component {
       undefined
     );
 
-    const cancelledButton = this.props.isCancelled ? (
-      <button className="won-button--filled thin red" disabled={true}>
-        Cancelled
-      </button>
-    ) : (
-      undefined
-    );
-
-    const rejectedButton = this.props.isRejected ? (
-      <button className="won-button--filled thin red" disabled={true}>
-        Rejected
-      </button>
-    ) : (
-      undefined
-    );
-
-    const retractedButton = this.props.isRetracted ? (
-      <button className="won-button--filled thin red" disabled={true}>
-        Retracted
-      </button>
-    ) : (
-      undefined
-    );
-
     return (
       <won-connection-message-actions>
         {proposeButton}
@@ -200,9 +176,6 @@ class WonConnectionMessageActions extends React.Component {
         {retractButton}
         {cancelButton}
         {cancelationPendingButton}
-        {cancelledButton}
-        {rejectedButton}
-        {retractedButton}
       </won-connection-message-actions>
     );
   }
