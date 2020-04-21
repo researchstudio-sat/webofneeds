@@ -339,13 +339,13 @@ class WonConnectionMessage extends React.Component {
         </React.Fragment>
       );
     }
-
+    //!this.props.hasReferences || this.props.shouldShowRdf ?
     return (
       <won-connection-message
         class={this.generateParentCssClasses()}
         onClick={this.props.onClick}
       >
-        {messageContentElement}
+        {this.showMessageAlways() ? messageContentElement : undefined}
       </won-connection-message>
     );
   }
@@ -452,6 +452,17 @@ class WonConnectionMessage extends React.Component {
         expand
       );
     }
+  }
+
+  showMessageAlways() {
+    if (this.props.message) {
+      return getIn(this.props.message, ["content", "text"])
+        ? true
+        : !this.props.hasReferences ||
+            this.props.shouldShowRdf ||
+            this.showActionButtons();
+    }
+    return true;
   }
 
   //TODO: Not allowed for certain high-level protocol states
