@@ -342,6 +342,7 @@ class WonConnectionMessage extends React.Component {
         </React.Fragment>
       );
     }
+
     return (
       <won-connection-message
         class={this.generateParentCssClasses()}
