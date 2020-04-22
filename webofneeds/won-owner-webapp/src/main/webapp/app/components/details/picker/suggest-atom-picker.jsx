@@ -134,7 +134,6 @@ class WonSuggestAtomPicker extends React.Component {
       !uriToFetchLoading &&
       !uriToFetchFailedToLoad &&
       get(props.allSuggestableAtoms, state.uriToFetch);
-    console.debug("TODO: HANDLE URITOFETCHSUCCESS: ", uriToFetchSuccess);
     const uriToFetchFailed =
       state.uriToFetch &&
       !uriToFetchLoading &&
@@ -142,7 +141,7 @@ class WonSuggestAtomPicker extends React.Component {
         uriToFetchIsExcluded ||
         uriToFetchIsNotAllowed);
 
-    if (uriToFetchSuccess) {
+    if (uriToFetchSuccess && state.fetching) {
       if (state.uriToFetch && state.uriToFetch.trim().length > 0) {
         props.onUpdate({ value: state.uriToFetch });
       } else {
@@ -156,6 +155,7 @@ class WonSuggestAtomPicker extends React.Component {
         uriToFetchIsNotAllowed: uriToFetchIsNotAllowed,
         uriToFetchIsExcluded: uriToFetchIsExcluded,
         uriToFetch: "",
+        fetching: false,
         showResetButton: false,
         showFetchButton: false,
       };
@@ -327,7 +327,9 @@ class WonSuggestAtomPicker extends React.Component {
       !getIn(this.props.allSuggestableAtoms, this.state.uriToFetch) &&
       !get(this.props.allForbiddenAtoms, this.state.uriToFetch)
     ) {
-      this.props.fetchAtom(this.state.uriToFetch);
+      this.setState({ fetching: true }, () =>
+        this.props.fetchAtom(this.state.uriToFetch)
+      );
     } else {
       this.update(this.state.uriToFetch);
     }
@@ -342,6 +344,7 @@ class WonSuggestAtomPicker extends React.Component {
     }
   }
 }
+
 WonSuggestAtomPicker.propTypes = {
   initialValue: PropTypes.any,
   detail: PropTypes.any,
