@@ -81,6 +81,7 @@ public interface MessageEventRepository extends WonRepository<MessageEvent> {
                     + "    from Connection c join MessageEvent m on \n"
                     + "    	c.connectionURI = m.parentURI\n" + "    left join MessageEvent last on \n"
                     + "        m.parentURI = last.parentURI\n"
+                    + "        and m.senderAtomURI != c.atomURI\n"
                     + "        and last.messageURI in :lastSeenMessageUris \n" + "    where \n"
                     + "        c.atomURI = :atomUri \n"
                     + "		and m.messageType not in ('SUCCESS_RESPONSE', 'FAILURE_RESPONSE') \n"
