@@ -790,7 +790,7 @@ public class WonLinkedDataUtils {
             connConnData = Optional.ofNullable(linkedDataSource.getDataForResource(
                             URI.create(connectionContainer.get().toString()
                                             + "?socket=" + URLEncoder.encode(socket.toString(), "UTF-8")
-                                            + "?targetSocket="
+                                            + "&targetSocket="
                                             + URLEncoder.encode(targetSocket.toString(), "UTF-8")),
                             atomUri.get()));
         } catch (UnsupportedEncodingException e) {

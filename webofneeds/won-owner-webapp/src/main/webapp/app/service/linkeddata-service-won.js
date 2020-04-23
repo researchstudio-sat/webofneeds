@@ -336,24 +336,25 @@ import * as jsonldUtils from "./jsonld-utils";
     fetchParams.socket = senderSocketUri;
     fetchParams.targetSocket = targetSocketUri;
 
-    return (
-      won
-        .getJsonLdNode(senderSocketUri.split("#")[0] + "/c", fetchParams)
-        //add the eventUris
-        .then(jsonResp => {
-          return jsonldUtils.getProperty(jsonResp, vocab.RDFS.memberCompacted);
-        })
-        .then(connUris => {
-          let _connUris;
-          if (is("Array", connUris)) {
-            _connUris = connUris.map(connUri => connUri["@id"]);
-          } else {
-            _connUris = [connUris["@id"]];
-          }
+    return ownerApi
+      .getJsonLdDataset(senderSocketUri.split("#")[0] + "/c", fetchParams)
+      .then(jsonLdData => {
+        console.debug(
+          "Result when retrieving connection for socket(",
+          senderSocketUri,
+          ") - targetSocket(",
+          targetSocketUri,
+          ") => ",
+          jsonLdData
+        );
 
-          return _connUris[0];
-        })
-    );
+        return jsonld.frame(jsonLdData, {
+          "@type": vocab.WON.Connection,
+          "@context": won.defaultContext,
+          "@embed": "@always",
+        });
+      })
+      .then(jsonResp => jsonResp && jsonResp["@id"]);
   };
 
   /**
@@ -386,28 +387,31 @@ import * as jsonldUtils from "./jsonld-utils";
     fetchParams.targetSocket = targetSocketUri;
 
     return (
-      won
-        .getJsonLdNode(senderSocketUri.split("#")[0] + "/c", fetchParams)
-        //add the eventUris
-        .then(jsonResp => {
-          return jsonldUtils.getProperty(jsonResp, vocab.RDFS.memberCompacted);
-        })
-        .then(connUris => {
-          let _connUris;
-          if (is("Array", connUris)) {
-            _connUris = connUris.map(connUri => connUri["@id"]);
-          } else {
-            _connUris = [connUris["@id"]];
-          }
+      ownerApi
+        .getJsonLdDataset(senderSocketUri.split("#")[0] + "/c", fetchParams)
+        .then(jsonLdData => {
+          console.debug(
+            "Result when retrieving connection for socket(",
+            senderSocketUri,
+            ") - targetSocket(",
+            targetSocketUri,
+            ") => ",
+            jsonLdData
+          );
 
-          const newFetchParams = {
-            requesterWebId: fetchParams.requesterWebId,
-          };
-
-          return _connUris.map(connUri => {
-            return won.getConnectionWithEventUris(connUri, newFetchParams);
+          return jsonld.frame(jsonLdData, {
+            "@type": vocab.WON.Connection,
+            "@context": won.defaultContext,
+            "@embed": "@always",
           });
         })
+        //add the eventUris
+        .then(jsonResp => jsonResp && jsonResp["@id"])
+        .then(connUri =>
+          won.getConnectionWithEventUris(connUri, {
+            requesterWebId: fetchParams.requesterWebId,
+          })
+        )
     );
   };
 

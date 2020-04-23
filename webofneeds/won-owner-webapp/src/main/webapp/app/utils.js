@@ -79,7 +79,7 @@ function generateQueryString(path, params = {}) {
   }
 }
 
-function generateQueryParamsString(params) {
+export function generateQueryParamsString(params) {
   if (params) {
     const keyValueArray = [];
 

@@ -1,8 +1,9 @@
 import urljoin from "url-join";
 import { ownerBaseUrl } from "~/config/default.js";
 import * as wonUtils from "../won-utils.js";
+import { generateQueryParamsString } from "../utils.js";
 import vocab from "../service/vocab.js";
-import { bestfetch } from "bestfetch";
+// import { bestfetch } from "bestfetch";
 
 /**
  * Created by quasarchimaere on 11.06.2019.
@@ -414,7 +415,21 @@ export function getJsonLdDataset(uri, params = {}) {
    *                 the message-container)
    *         * paging parameters as found
    *           [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
+   *         * "p",
+   *         * "resumebefore",
+   *         * "resumeafter",
+   *         * "type",
+   *         * "state",
+   *         * "socket",
+   *         * "targetSocket",
+   *         * "timeof",
+   *         * "deep"
    * @returns {string}
+   */
+  /**
+   * paging parameters as found
+   * [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
+   * @type {string[]}
    */
   const queryString = (dataUri, queryParams = {}) => {
     let queryOnOwner = urljoin(ownerBaseUrl, "/rest/linked-data/") + "?";
@@ -424,90 +439,50 @@ export function getJsonLdDataset(uri, params = {}) {
         "requester=" + encodeURIComponent(queryParams.requesterWebId) + "&";
     }
 
-    // The owner hands this part -- the one in the `uri=` paramater -- directly to the node.
-    let firstParam = true;
-    let queryOnNode = dataUri;
-
-    const contains = (arr, el) => {
-      return arr.indexOf(el) > 0;
-    };
-
-    /**
-     * paging parameters as found
-     * [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
-     * @type {string[]}
-     */
-    const legitQueryParameters = [
-      "p",
-      "resumebefore",
-      "resumeafter",
-      "type",
-      "state",
-      "timeof",
-      "deep",
-    ];
-
-    /**
-     * taken from: https://esdiscuss.org/topic/es6-iteration-over-object-values
-     *
-     * example usage:
-     *
-     * ```javascript
-     * for (let [key, value] of entries(o)) {
-     *   console.log(key, ' --> ', value)
-     * }
-     * ```
-     * @param obj the object to generate a (key,value)-pair iterator for
-     */
-    const entries = function*(obj) {
-      for (let key of Object.keys(obj)) {
-        yield [key, obj[key]];
-      }
-    };
-
-    for (let [paramName, paramValue] of entries(queryParams)) {
-      if (contains(legitQueryParameters, paramName) && paramValue) {
-        queryOnNode = queryOnNode + (firstParam ? "?" : "&");
-        firstParam = false;
-        queryOnNode = queryOnNode + paramName + "=" + paramValue;
-      }
-    }
-
-    let query = queryOnOwner + "uri=" + encodeURIComponent(queryOnNode);
-
-    // server can't resolve uri-encoded colons. revert the encoding done in `queryString`.
-    query = query.replace(new RegExp("%3A", "g"), ":");
+    const paramsString = generateQueryParamsString({
+      ...queryParams,
+      requesterWebId: undefined,
+    });
+    let query = (
+      queryOnOwner +
+      "uri=" +
+      encodeURIComponent(dataUri + (paramsString ? paramsString : ""))
+    ).replace(new RegExp("%3A", "g"), ":"); // server can't resolve uri-encoded colons. revert the encoding done in `queryString`.
 
     return query;
   };
 
   const requestUri = queryString(uri, params);
 
-  return bestfetch(requestUri, {
-    method: "get",
-    credentials: "same-origin",
-    headers: {
-      cachePolicy: "network-only",
-      Accept: "application/ld+json",
-      Prefer: params.pagingSize
-        ? `return=representation; max-member-count="${params.pagingSize}"`
-        : undefined,
-    },
-  })
-    .then(response => {
-      if (response.status === 200) return response;
-      else {
-        let error = new Error(
-          `${response.status} - ${
-            response.statusText
-          } for request ${uri}, ${JSON.stringify(params)}`
-        );
-
-        error.response = response;
-        throw error;
-      }
+  // return bestfetch(requestUri, {
+  return (
+    fetch(requestUri, {
+      method: "get",
+      credentials: "same-origin",
+      headers: {
+        // cachePolicy: "network-only",
+        Accept: "application/ld+json",
+        Prefer: params.pagingSize
+          ? `return=representation; max-member-count="${params.pagingSize}"`
+          : undefined,
+      },
     })
-    .then(dataset => dataset.data);
+      .then(response => {
+        if (response.status === 200) return response;
+        else {
+          let error = new Error(
+            `${response.status} - ${
+              response.statusText
+            } for request ${uri}, ${JSON.stringify(params)}`
+          );
+
+          error.response = response;
+          throw error;
+        }
+      })
+      //.then(dataset => dataset.data);
+      .then(dataset => dataset.json())
+  );
 }
 
 export function getMetaAtoms(
