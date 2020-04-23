@@ -124,21 +124,17 @@ export function fetchActiveConnectionAndDispatchBySocketUris(
     .getConnectionWithEventUrisBySocket(senderSocketUri, targetSocketUri, {
       requesterWebId: atomUri,
     })
-    .then(connectionPromises =>
-      connectionPromises.map(connProm => {
-        connProm.then(conn => {
-          console.debug(
-            "fetchActiveConnectionAndDispatchBySocketUris - conn: ",
-            conn
-          );
-          dispatch({
-            type: actionTypes.connections.storeActive,
-            payload: Immutable.fromJS({ connections: { [conn.uri]: conn } }),
-          });
-          return conn;
-        });
-      })
-    )
+    .then(conn => {
+      console.debug(
+        "fetchActiveConnectionAndDispatchBySocketUris - conn: ",
+        conn
+      );
+      dispatch({
+        type: actionTypes.connections.storeActive,
+        payload: Immutable.fromJS({ connections: { [conn.uri]: conn } }),
+      });
+      return conn;
+    })
     .catch(() => {
       /*dispatch({
         type: actionTypes.connections.storeUriFailed,
