@@ -104,7 +104,6 @@ const mapStateToProps = (state, ownProps) => {
     isCollapsible:
       messageUtils.isMessageClaimed(connection, message) ||
       messageUtils.isMessageProposed(connection, message) ||
-      messageUtils.isMessageAccepted(connection, message) ||
       messageUtils.isMessageAgreedOn(connection, message) ||
       messageUtils.isMessageRejected(connection, message) ||
       messageUtils.isMessageRetracted(connection, message) ||
