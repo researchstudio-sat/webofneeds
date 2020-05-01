@@ -39,7 +39,7 @@ Each bot provides a [BotContext](src/main/java/won/bot/framework/bot/context/Bot
 
 The `BotContext` is used by a bot to keep track of atoms, nodes or other objects it knows or is responsible for. This information can be used by both the bot itself and the framework to decide which events should be routed to which bot.
 
-While it is necessary that each bot remembers which atoms it created, all other information stored within the `BotContext` depends on the intended purpose of any given bot. In addition to the `BotContext`, a [BotContextWrapper](src/main/java/won/bot/framework/bot/context/BotContextWrapper.java) provides access utility methods to interact with the `BotContext`.
+While it is necessary that each bot remembers which atoms it created, all other information stored within the `BotContext` depends on the intended purpose of any given bot. To interact with the `BotContext`, use the utility methods provided by the [BotContextWrapper](src/main/java/won/bot/framework/bot/context/BotContextWrapper.java).
 
 ---
 
@@ -121,6 +121,43 @@ Note that the WoN node will always answer with a similar message (`SuccessRespon
 
 ### Creating Atoms
 
+To create an atom, an atom creation command message has to be sent to a WoN node. To successfully create a new atom, both an atom URI and atom data has to be provided. 
+
+```java
+// creating a new atom URI
+EventListenerContext ctx = getEventListenerContext();
+URI wonNodeURI = ctx.getNodeURISource.getNodeURI(); // note that nodeUriSource may contain multiple URIs if the bot is configured to use multiple WoN nodes
+URI atomURI = ctx.getWonNodeInformationService().generateAtomURI(wonNodeURI); //TODO: verify this!
+```
+
+To set atom data, several wrappers and utility methods are provided for commonly used properties. In this example, the [DefaultAtomModelWrapper](/webofneeds/won-core/src/main/java/won/protocol/util/DefaultAtomModelWrapper.java) is used. If there is no available utility method for a specific RDF triple, additional triples can be added using Apache Jena. To manually add complex information, we recommend extending `DefaultAtomModelWrapper`.
+
+```java
+// create a model wrapper instance for the new data set
+DefaultAtomModelWrapper atomData = new DefaultAtomModelWrapper(atomURI);
+atomData.setTitle("Short title of an atom");
+atomData.addTag("relevant tag 1");
+atomData.addTag("relevant tag 2");
+
+// additional triples can be added manually
+atomData.addPropertyStringValue(SCHEMA.URL, "");
+
+// add sockets as each atom must have at least one socket
+atomData.addSocket("#HoldableSocket", WXHOLD.HoldableSocketString);
+atomData.addSocket("#chatSocket", WXCHAT.ChatSocketString);
+
+// add appropriate flags
+atomData.addFlag(WONMATCH.usedForTesting);
+```
+
+To successfully cerate an atom, a command message needs to be sent to the node. For this, the `ExecuteMessageCommandBehaviour` can be activated to create and handle an `CreateAtomCommandEvent`:
+
+```java
+CreateAtomCommandEvent createCommand = new CreateAtomCommandEvent(atomWrapper.getDataset());
+ctx.getEventBus().publish(createCommand);
+```
+
+<!-- alternate deprecated(?) method
 Atoms are created by sending a specific message. If using the dedicated [CreateAtomsWithSocketsAction](src/main/java/won/bot/framework/eventbot/action/impl/atomlifecycle/CreateAtomWithSocketsAction.java), most of the boilerplate code is taken care of. If the bot is meant to publish an existing collection of resources, e.g. files or database objects in the form of atoms, it's a question of configuring the `AtomProducer` to access that data and produce a Jena RDF Model that represents an atom. (For an example, look at the [MailFileAtomProducer](src/main/java/won/bot/framework/component/atomproducer/impl/MailFileAtomProducer.java)
 
 For example, this is how [a bot creates a single Atom](src/main/java/won/bot/framework/eventbot/action/impl/atomlifecycle/AbstractCreateAtomAction.java):
@@ -138,6 +175,7 @@ WonMessageBuilder builder = WonMessageBuilder
  WonMessage message = builder.build();                                     // build the Message object
  getEventListenerContext().getWonMessageSender().sendWonMessage(message);  //send it
 ```
+-->
 
 ## Additional Resources
 A good starting point for understanding the framework is the [EchoBot](https://github.com/researchstudio-sat/won-echobot). This bot creates one atom at startup, and it registers with the WoN node configured with the `WON_NODE_URI` environment variable, so it is always notified when a new atom is created. When that happens, the bot attempts to establish a connection with the new atom and if the new atom accepts it, the bot echoes any text message received from the new atom.
