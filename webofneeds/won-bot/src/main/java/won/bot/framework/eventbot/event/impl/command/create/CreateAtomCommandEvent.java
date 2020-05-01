@@ -84,6 +84,7 @@ public class CreateAtomCommandEvent implements MessageCommandEvent {
     /**
      * @deprecated uriListName should not be set within an Event anymore
      */
+    @Deprecated
     public CreateAtomCommandEvent(Dataset atomDataset, String uriListName) {
         this(atomDataset, uriListName, null);
     }

@@ -73,6 +73,7 @@ public class ExecuteCloseCommandAction extends ExecuteMessageCommandAction<Close
         return new MessageCommandNotSentEvent<>(message, originalCommand);
     }
 
+    @Override
     protected WonMessage createWonMessage(CloseCommandEvent connectCommandEvent) throws WonMessageBuilderException {
         URI connectionURI = connectCommandEvent.getConnectionURI();
         Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);

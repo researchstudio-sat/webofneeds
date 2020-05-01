@@ -28,6 +28,7 @@ public class WonMessageReceivedOnConnectionEvent extends BaseAtomAndConnectionSp
         this.wonMessage = wonMessage;
     }
 
+    @Override
     public WonMessage getWonMessage() {
         return wonMessage;
     }

@@ -68,6 +68,7 @@ public class ExecuteConnectCommandAction extends ExecuteMessageCommandAction<Con
         return new MessageCommandNotSentEvent<>(message, originalCommand);
     }
 
+    @Override
     protected WonMessage createWonMessage(ConnectCommandEvent connectCommandEvent) throws WonMessageBuilderException {
         return WonMessageBuilder
                         .connect()

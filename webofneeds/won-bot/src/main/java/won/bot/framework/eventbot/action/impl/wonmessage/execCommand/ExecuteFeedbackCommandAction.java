@@ -67,6 +67,7 @@ public class ExecuteFeedbackCommandAction extends ExecuteMessageCommandAction<Fe
         return new MessageCommandNotSentEvent<>(message, originalCommand);
     }
 
+    @Override
     protected WonMessage createWonMessage(FeedbackCommandEvent feedbackCommandEvent) throws WonMessageBuilderException {
         URI connectionURI = feedbackCommandEvent.getConnectionURI();
         return WonMessageBuilder

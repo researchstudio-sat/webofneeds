@@ -62,6 +62,7 @@ public class MemoryBotContext implements BotContext {
         return getUriList(name);
     }
 
+    @Override
     public synchronized List<URI> getUriList(final String name) {
         List<URI> ret = new LinkedList<>();
         List<URI> namedList = this.namedAtomUriLists.get(name);

@@ -256,10 +256,12 @@ public abstract class EventBot extends ScheduledTriggerBot {
      * bots need to access.
      */
     public class MyEventListenerContext implements EventListenerContext {
+        @Override
         public TaskScheduler getTaskScheduler() {
             return EventBot.this.getTaskScheduler();
         }
 
+        @Override
         public NodeURISource getNodeURISource() {
             return EventBot.this.getNodeURISource();
         }
@@ -269,10 +271,12 @@ public abstract class EventBot extends ScheduledTriggerBot {
             return EventBot.this.getMatcherNodeURISource();
         }
 
+        @Override
         public WonMessageSender getWonMessageSender() {
             return getWonMessageSenderWrapperLazily();
         }
 
+        @Override
         public MatcherProtocolAtomServiceClientSide getMatcherProtocolAtomServiceClient() {
             return EventBot.this.getMatcherProtocolAtomServiceClient();
         }
@@ -282,10 +286,12 @@ public abstract class EventBot extends ScheduledTriggerBot {
             return EventBot.this.getMatcherProtocolMatcherService();
         }
 
+        @Override
         public AtomProducer getAtomProducer() {
             return EventBot.this.getAtomProducer();
         }
 
+        @Override
         public void cancelTrigger() {
             EventBot.this.cancelTrigger();
         }
@@ -295,6 +301,7 @@ public abstract class EventBot extends ScheduledTriggerBot {
             EventBot.this.workIsDone();
         }
 
+        @Override
         public EventBus getEventBus() {
             return EventBot.this.getEventBus();
         }
@@ -315,6 +322,7 @@ public abstract class EventBot extends ScheduledTriggerBot {
          * 
          * @return
          */
+        @Override
         public Executor getExecutor() {
             return EventBot.this.getExecutor();
         }

@@ -39,6 +39,7 @@ public class DeliveryResponseEvent extends BaseEvent implements ResponseEvent {
         this.con = con;
     }
 
+    @Override
     public URI getOriginalMessageURI() {
         return originalMessageURI;
     }

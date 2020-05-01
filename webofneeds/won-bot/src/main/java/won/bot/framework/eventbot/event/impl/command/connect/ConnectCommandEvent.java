@@ -61,6 +61,7 @@ public class ConnectCommandEvent extends BaseAtomSpecificEvent implements Messag
         return WonMessageType.CONNECT;
     }
 
+    @Override
     public URI getTargetAtomURI() {
         return targetAtomURI;
     }

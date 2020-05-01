@@ -80,10 +80,12 @@ public abstract class AbstractDoOnceAfterNEventsListener extends BaseEventListen
 
     protected abstract void doOnce(final Event event) throws Exception;
 
+    @Override
     public int getTargetCount() {
         return targetCount;
     }
 
+    @Override
     public int getCount() {
         return count;
     }

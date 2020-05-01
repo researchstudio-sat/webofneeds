@@ -34,6 +34,7 @@ public class MatcherBehaviour extends BotBehaviour {
         this.retryInterval = retryInterval;
     }
 
+    @Override
     protected void onActivate(Optional<Object> message) {
         // register as matcher on node
         RegisterMatcherAction registerMatcher = new RegisterMatcherAction(context);

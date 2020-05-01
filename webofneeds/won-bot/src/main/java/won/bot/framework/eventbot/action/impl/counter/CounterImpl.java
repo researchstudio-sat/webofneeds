@@ -43,6 +43,7 @@ public class CounterImpl implements Counter {
         return count.decrementAndGet();
     }
 
+    @Override
     public String getName() {
         return name;
     }

@@ -179,6 +179,7 @@ public class MongoBotContext implements BotContext {
         pull(collectionName, key, values);
     }
 
+    @Override
     public void removeLeavesFromListMap(String collectionName, final Serializable... values) {
         checkValidCollectionName(collectionName);
         for (String key : loadListMap(collectionName).keySet()) {

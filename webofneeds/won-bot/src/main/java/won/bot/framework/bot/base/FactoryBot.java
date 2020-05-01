@@ -46,6 +46,7 @@ public abstract class FactoryBot extends EventBot {
      */
     protected abstract void initializeFactoryEventListeners();
 
+    @Override
     public final FactoryBotContextWrapper getBotContextWrapper() {
         return (FactoryBotContextWrapper) super.getBotContextWrapper();
     }

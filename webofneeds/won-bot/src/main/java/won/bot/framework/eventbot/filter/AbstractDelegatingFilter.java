@@ -20,6 +20,7 @@ public abstract class AbstractDelegatingFilter implements DelegatingFilter {
         this.delegate = delegate;
     }
 
+    @Override
     public EventFilter getDelegate() {
         return delegate;
     }
