@@ -135,8 +135,7 @@ public class InitFactoryAction extends AbstractCreateAtomAction {
                                     if (atomURI != null) {
                                         bus.publish(new FactoryAtomCreationSkippedEvent());
                                     } else {
-                                        bus.publish(new CreateAtomCommandEvent(dataset,
-                                                        botContextWrapper.getFactoryListName()));
+                                        bus.publish(new CreateAtomCommandEvent(dataset));
                                     }
                                 }
                             }

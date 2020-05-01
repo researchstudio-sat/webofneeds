@@ -56,7 +56,6 @@ public class ExecuteCreateAtomCommandAction extends BaseEventBotAction {
         EventListenerContext ctx = getEventListenerContext();
         CreateAtomCommandEvent createAtomCommandEvent = (CreateAtomCommandEvent) event;
         Dataset atomDataset = createAtomCommandEvent.getAtomDataset();
-        List<URI> sockets = createAtomCommandEvent.getSockets();
         if (atomDataset == null) {
             logger.warn("CreateAtomCommandEvent did not contain an atom model, aborting atom creation");
             ctx.getEventBus().publish(new AtomCreationAbortedEvent(null, null,
@@ -74,21 +73,21 @@ public class ExecuteCreateAtomCommandAction extends BaseEventBotAction {
         }
         final URI atomUriBeforeCreation = atomUriFromProducer;
         AtomModelWrapper atomModelWrapper = new AtomModelWrapper(atomDataset);
-        int i = 0;
-        for (URI socketURI : sockets) {
-            i++;
-            atomModelWrapper.addSocket(atomUriBeforeCreation.toString() + "#socket" + i, socketURI.toString());
-        }
-        final Dataset atomDatasetWithSockets = atomModelWrapper.copyDatasetWithoutSysinfo();
+        if (atomModelWrapper.getSocketUris().isEmpty()) {
+            logger.warn("CreateAtomCommandEvent atom model did not contain socket uris, aborting atom creation");
+            ctx.getEventBus().publish(new AtomCreationAbortedEvent(null, null,
+                            createAtomCommandEvent,
+                            "CreateAtomCommandEvent atom model did not contain socket uris, aborting atom creation"));
+            return;
+        } 
+        final Dataset atomDatasetCopy = atomModelWrapper.copyDatasetWithoutSysinfo();
         final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
         logger.debug("creating atom on won node {} with content {} ", wonNodeUri,
-                        StringUtils.abbreviate(RdfUtils.toString(atomDatasetWithSockets), 150));
+                        StringUtils.abbreviate(RdfUtils.toString(atomDatasetCopy), 150));
         WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
         final URI atomURI = wonNodeInformationService.generateAtomURI(wonNodeUri);
         RdfUtils.renameResourceWithPrefix(atomDataset, atomResource.getURI(), atomURI.toString());
-        WonMessage createAtomMessage = createWonMessage(atomURI, atomDatasetWithSockets,
-                        createAtomCommandEvent.isUsedForTesting(),
-                        createAtomCommandEvent.isDoNotMatch());
+        WonMessage createAtomMessage = createWonMessage(atomURI, atomDatasetCopy);
         createAtomMessage = ctx.getWonMessageSender().prepareMessage(createAtomMessage);
         // remember the atom URI so we can react to success/failure responses
         ctx.getBotContextWrapper().rememberAtomUri(atomURI);
@@ -113,18 +112,10 @@ public class ExecuteCreateAtomCommandAction extends BaseEventBotAction {
         logger.debug("atom creation message sent with message URI {}", createAtomMessage.getMessageURI());
     }
 
-    private WonMessage createWonMessage(URI atomURI, Dataset atomDataset,
-                    final boolean usedForTesting, final boolean doNotMatch)
+    private WonMessage createWonMessage(URI atomURI, Dataset atomDataset)
                     throws WonMessageBuilderException {
         RdfUtils.replaceBaseURI(atomDataset, atomURI.toString(), true);
         AtomModelWrapper atomModelWrapper = new AtomModelWrapper(atomDataset);
-        if (doNotMatch) {
-            atomModelWrapper.addFlag(WONMATCH.NoHintForMe);
-            atomModelWrapper.addFlag(WONMATCH.NoHintForCounterpart);
-        }
-        if (usedForTesting) {
-            atomModelWrapper.addFlag(WONMATCH.UsedForTesting);
-        }
         return WonMessageBuilder
                         .createAtom()
                         .atom(atomURI)
