@@ -8,6 +8,7 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix vann: <http://purl.org/vocab/vann/> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix schema:  <http://schema.org/> .
 @base <https://w3id.org/won/workflow> .
 
 <https://w3id.org/won/workflow> rdf:type owl:Ontology ;
@@ -66,10 +67,18 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
 
 ###  https://w3id.org/won/workflow#inlinePetriNetDefinition
 :inlinePetriNetDefinition  rdf:type owl:DatatypeProperty ;
-        rdfs:domain msg:Message ;
-        rdfs:range xsd:base64Binary;
-        rdfs:comment "Using this property, a Message can specify a Petri net inline. The object of the triple is a base64 encoded XML serialization of the Petri net in PNML. By making the message part of an agreement, the Petri net is to be considered instantiated with its initial markings. Places and transitions must use URIs as their 'id' attribute. This allows for firing transitions using wf:firesTransition and for referencing places in other RDF triples."@en ;
+        rdfs:domain schema:FileObject ;
+        rdfs:range xsd:base64Binary ;
+        rdfs:comment "Using this property, a Message can specify a schema:FileObject with an inline definition of a Petri net. The object of the triple is a base64 encoded XML serialization of the Petri net in PNML. By making the message part of an agreement, the Petri net is to be considered instantiated with its initial markings. Places and transitions must use URIs as their 'id' attribute. This allows for firing transitions using wf:firesTransition and for referencing places in other RDF triples."@en ;
         rdfs:label "inlinePetriNetDefinition" .
+
+###  https://w3id.org/won/workflow#petriNet
+:petriNet  rdf:type owl:ObjectProperty ;
+        rdfs:domain msg:Message ;
+        rdfs:range schema:FileObject ;
+        rdfs:comment "Using this property, a Message can specify a schema:FileObject specifying a Petri net."@en ;
+        rdfs:label "petriNet" .
+
 
 #################################################################
 #    Classes
