@@ -59,9 +59,9 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
 
 ###  https://w3id.org/won/workflow#firesTransition
 :firesTransition rdf:type owl:ObjectProperty ;
-         rdfs:domain msg:Message ;
+         rdfs:domain :PetriNet ;
          rdfs:range :Transition ;
-         rdfs:comment "By referencing a Transition via `wf:firesTransition` in the ContentGraph of a Message, and subsequently claiming or agreeing on that message, the respective transition is regarded as fired in all agreed-upon Petri net(s) containing the transition."@en ;
+         rdfs:comment "By embedding a triple ([petri net] wf:firesTransition [transition]) in the ContentGraph of a Message, and subsequently claiming or agreeing on that message, the respective transition is regarded as fired in the referenced Petri net."@en ;
          rdfs:label "firesTransition" .
 
 
@@ -85,6 +85,11 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
 :Place rdf:type owl:Class ;
            rdfs:comment "Class of all places in Petri Nets."@en ;
            rdfs:label "Place" .
+
+###  https://w3id.org/won/workflow#PetriNet
+:PetriNet rdf:type owl:Class ;
+           rdfs:comment "Class of all Petri Nets."@en ;
+           rdfs:label "PetriNet" .           
 
 #################################################################
 #    General axioms
