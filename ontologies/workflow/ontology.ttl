@@ -1,0 +1,117 @@
+@prefix : <https://w3id.org/won/workflow#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <https://w3id.org/won/workflow> .
+
+<https://w3id.org/won/workflow> rdf:type owl:Ontology ;
+                                 owl:versionIRI <https://w3id.org/won/workflow/1.0> ;
+                                 owl:imports <https://w3id.org/won/message/1.0> ;
+                                 <http://purl.org/dc/elements/1.1/abstract> "Ontology for including executable workflow specifications (in the form of Petri nets) in a conversation and for firing transitions using agreements."@en ;
+                                 <http://purl.org/dc/elements/1.1/creator> "Florian Kleedorfer" ;
+                                 <http://purl.org/dc/elements/1.1/title> "Web of Needs Workflow Ontology"@en ;
+                                 <http://purl.org/dc/terms/created> "2020-05-01"^^xsd:date ;
+                                 <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> ;
+                                 <http://purl.org/vocab/vann/preferredNamespacePrefix> "wf" .
+
+#################################################################
+#    Annotation properties
+#################################################################
+
+###  http://purl.org/dc/elements/1.1/abstract
+<http://purl.org/dc/elements/1.1/abstract> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/creator
+<http://purl.org/dc/elements/1.1/creator> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/date
+<http://purl.org/dc/elements/1.1/date> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/description
+<http://purl.org/dc/elements/1.1/description> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/title
+<http://purl.org/dc/elements/1.1/title> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/created
+<http://purl.org/dc/terms/created> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/license
+<http://purl.org/dc/terms/license> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/vocab/vann/preferredNamespacePrefix
+<http://purl.org/vocab/vann/preferredNamespacePrefix> rdf:type owl:AnnotationProperty .
+
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  https://w3id.org/won/workflow#firesTransition
+:firesTransition rdf:type owl:ObjectProperty ;
+                 rdfs:domain :PetriNet ;
+                 rdfs:range :Transition ;
+                 owl:propertyDisjointWith :inlinePetriNetDefinition ;
+                 rdfs:comment "By embedding a triple ([petri net] wf:firesTransition [transition]) in the ContentGraph of a Message, and subsequently claiming or agreeing on that message, the respective transition is regarded as fired in the referenced Petri net."@en ;
+                 rdfs:label "firesTransition" .
+
+
+###  https://w3id.org/won/workflow#inlinePetriNetDefinition
+:inlinePetriNetDefinition rdf:type owl:ObjectProperty .
+
+
+#################################################################
+#    Data properties
+#################################################################
+
+###  https://w3id.org/won/workflow#inlinePetriNetDefinition
+:inlinePetriNetDefinition rdf:type owl:DatatypeProperty ;
+                          rdfs:domain <http://schema.org/FileObject> ;
+                          rdfs:range xsd:base64Binary .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://schema.org/FileObject
+<http://schema.org/FileObject> rdf:type owl:Class .
+
+
+###  https://w3id.org/won/workflow#PetriNet
+:PetriNet rdf:type owl:Class ;
+          rdfs:comment "Class of all Petri Nets."@en ;
+          rdfs:label "PetriNet" .
+
+
+###  https://w3id.org/won/workflow#Place
+:Place rdf:type owl:Class ;
+       owl:disjointWith :Transition ;
+       rdfs:comment "Class of all places in Petri Nets."@en ;
+       rdfs:label "Place" .
+
+
+###  https://w3id.org/won/workflow#Transition
+:Transition rdf:type owl:Class ;
+            rdfs:comment "Class of all transitions in Petri Nets."@en ;
+            rdfs:label "Transition" .
+
+
+#################################################################
+#    Annotations
+#################################################################
+
+:inlinePetriNetDefinition rdfs:comment "Using this property, a Message can specify a schema:FileObject with an inline definition of a Petri net. The object of the triple is a base64 encoded XML serialization of the Petri net in PNML. By making the message part of an agreement, the Petri net is to be considered instantiated with its initial markings. Places and transitions must use URIs as their 'id' attribute. This allows for firing transitions using wf:firesTransition and for referencing places in other RDF triples."@en ;
+                          rdfs:label "inlinePetriNetDefinition" .
+
+
+###  Generated by the OWL API (version 5.1.9) https://github.com/owlcs/owlapi/

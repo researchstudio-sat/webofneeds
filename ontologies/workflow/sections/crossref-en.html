@@ -1,0 +1,149 @@
+<html><h2 id="crossreference" class="list">Cross reference for Web of Needs Workflow Ontology classes, properties and dataproperties <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
+This section provides details for each class and property defined by Web of Needs Workflow Ontology.
+<div id="classes">
+   <h3 id="classes-headline" class="list">Classes</h3>
+   <ul class="hlist">
+      <li>
+         <a href="#PetriNet" title="https://w3id.org/won/workflow#PetriNet">PetriNet</a>
+      </li>
+      <li>
+         <a href="#Place" title="https://w3id.org/won/workflow#Place">Place</a>
+      </li>
+      <li>
+         <a href="#Transition" title="https://w3id.org/won/workflow#Transition">Transition</a>
+      </li>
+   </ul>
+   <div class="entity" id="PetriNet">
+      <h3>PetriNet<sup class="type-c" title="class">c</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#classes">Class ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/workflow#PetriNet</p>
+      <div class="comment">
+         <span class="markdown">Class of all Petri Nets.</span>
+      </div>
+      <dl class="description">
+         <dt>is in domain of</dt>
+         <dd>
+            <a href="#firesTransition" title="https://w3id.org/won/workflow#firesTransition">firesTransition</a>
+            <sup class="type-op" title="object property">op</sup>
+         </dd>
+      </dl>
+   </div>
+   <div class="entity" id="Place">
+      <h3>Place<sup class="type-c" title="class">c</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#classes">Class ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/workflow#Place</p>
+      <div class="comment">
+         <span class="markdown">Class of all places in Petri Nets.</span>
+      </div>
+      <dl class="description">
+         <dt>is disjoint with</dt>
+         <dd>
+            <a href="#Transition" title="https://w3id.org/won/workflow#Transition">Transition</a>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
+      </dl>
+   </div>
+   <div class="entity" id="Transition">
+      <h3>Transition<sup class="type-c" title="class">c</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#classes">Class ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/workflow#Transition</p>
+      <div class="comment">
+         <span class="markdown">Class of all transitions in Petri Nets.</span>
+      </div>
+      <dl class="description">
+         <dt>is in range of</dt>
+         <dd>
+            <a href="#firesTransition" title="https://w3id.org/won/workflow#firesTransition">firesTransition</a>
+            <sup class="type-op" title="object property">op</sup>
+         </dd>
+         <dt>is disjoint with</dt>
+         <dd>
+            <a href="#Place" title="https://w3id.org/won/workflow#Place">Place</a>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
+      </dl>
+   </div>
+</div><div id="objectproperties">
+   <h3 id="properties" class="list">Object Properties</h3>
+   <ul class="hlist">
+      <li>
+         <a href="#firesTransition" title="https://w3id.org/won/workflow#firesTransition">firesTransition</a>
+      </li>
+   </ul>
+   <div class="entity" id="firesTransition">
+      <h3>firesTransition<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/workflow#firesTransition</p>
+      <div class="comment">
+         <span class="markdown">By embedding a triple ([petri net] wf:firesTransition [transition]) in the ContentGraph of a Message, and subsequently claiming or agreeing on that message, the respective transition is regarded as fired in the referenced Petri net.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#PetriNet" title="https://w3id.org/won/workflow#PetriNet">PetriNet</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <a href="#Transition" title="https://w3id.org/won/workflow#Transition">Transition</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
+</div><div id="dataproperties">
+   <h3 id="dataproperties-headline" class="list">Data Properties</h3>
+   <ul class="hlist">
+      <li>
+         <a href="#inlinePetriNetDefinition"
+            title="https://w3id.org/won/workflow#inlinePetriNetDefinition">
+            <span>inlinePetriNetDefinition</span>
+         </a>
+      </li>
+   </ul>
+   <div class="entity" id="inlinePetriNetDefinition">
+      <h3>inlinePetriNetDefinition<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/workflow#inlinePetriNetDefinition</p>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <span class="dotted" title="http://schema.org/FileObject">file object</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#base64Binary">base64 binary</span>
+            </dd>
+            <dt>is also defined as</dt>
+            <dd>object property</dd>
+         </dl>
+      </div>
+   </div>
+</div><div id="legend">
+<h2>Legend <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
+<div   class="entity">
+<sup class="type-c" title="Classes">c</sup>: Classes <br/>
+<sup class="type-op" title="Object Properties">op</sup>: Object Properties <br/>
+<sup class="type-dp" title="Data Properties">dp</sup>: Data Properties <br/>
+<sup class="type-ni" title="Named Individuals">ni</sup>: Named Individuals
+</div>
+</div>
+</html>

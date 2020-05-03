@@ -1,0 +1,174 @@
+{
+  "_comment" : "Created with OWL2VOWL (version 0.3.5), http://vowl.visualdataweb.org",
+  "header" : {
+    "languages" : [ "en", "undefined" ],
+    "baseIris" : [ "http://www.w3.org/1999/02/22-rdf-syntax-ns", "http://schema.org", "http://www.w3.org/2000/01/rdf-schema", "http://www.w3.org/2001/XMLSchema", "https://w3id.org/won/workflow" ],
+    "title" : {
+      "en" : "Web of Needs Workflow Ontology"
+    },
+    "iri" : "https://w3id.org/won/workflow",
+    "author" : [ "Florian Kleedorfer" ],
+    "other" : {
+      "license" : [ {
+        "identifier" : "license",
+        "language" : "undefined",
+        "value" : "https://creativecommons.org/licenses/by/4.0/",
+        "type" : "iri"
+      } ],
+      "creator" : [ {
+        "identifier" : "creator",
+        "language" : "undefined",
+        "value" : "Florian Kleedorfer",
+        "type" : "label"
+      } ],
+      "created" : [ {
+        "identifier" : "created",
+        "language" : "undefined",
+        "value" : "2020-05-01",
+        "type" : "label"
+      } ],
+      "preferredNamespacePrefix" : [ {
+        "identifier" : "preferredNamespacePrefix",
+        "language" : "undefined",
+        "value" : "wf",
+        "type" : "label"
+      } ],
+      "abstract" : [ {
+        "identifier" : "abstract",
+        "language" : "en",
+        "value" : "Ontology for including executable workflow specifications (in the form of Petri nets) in a conversation and for firing transitions using agreements.",
+        "type" : "label"
+      } ],
+      "title" : [ {
+        "identifier" : "title",
+        "language" : "en",
+        "value" : "Web of Needs Workflow Ontology",
+        "type" : "label"
+      } ]
+    }
+  },
+  "namespace" : [ ],
+  "class" : [ {
+    "id" : "6",
+    "type" : "owl:Thing"
+  }, {
+    "id" : "1",
+    "type" : "owl:Class"
+  }, {
+    "id" : "4",
+    "type" : "owl:Class"
+  }, {
+    "id" : "5",
+    "type" : "owl:Class"
+  }, {
+    "id" : "7",
+    "type" : "owl:Class"
+  }, {
+    "id" : "2",
+    "type" : "rdfs:Datatype"
+  } ],
+  "classAttribute" : [ {
+    "iri" : "http://www.w3.org/2002/07/owl#Thing",
+    "baseIri" : "http://owl2vowl.de",
+    "id" : "6",
+    "label" : {
+      "undefined" : "Thing"
+    }
+  }, {
+    "iri" : "http://schema.org/FileObject",
+    "baseIri" : "http://schema.org",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "FileObject"
+    },
+    "attributes" : [ "external" ],
+    "id" : "1"
+  }, {
+    "iri" : "https://w3id.org/won/workflow#PetriNet",
+    "baseIri" : "https://w3id.org/won/workflow",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "PetriNet",
+      "undefined" : "PetriNet"
+    },
+    "comment" : {
+      "en" : "Class of all Petri Nets."
+    },
+    "id" : "4"
+  }, {
+    "iri" : "https://w3id.org/won/workflow#Transition",
+    "baseIri" : "https://w3id.org/won/workflow",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "Transition",
+      "undefined" : "Transition"
+    },
+    "comment" : {
+      "en" : "Class of all transitions in Petri Nets."
+    },
+    "id" : "5"
+  }, {
+    "iri" : "https://w3id.org/won/workflow#Place",
+    "baseIri" : "https://w3id.org/won/workflow",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "Place",
+      "undefined" : "Place"
+    },
+    "comment" : {
+      "en" : "Class of all places in Petri Nets."
+    },
+    "id" : "7"
+  }, {
+    "iri" : "http://www.w3.org/2001/XMLSchema#base64Binary",
+    "baseIri" : "http://www.w3.org/2001/XMLSchema",
+    "id" : "2",
+    "label" : {
+      "IRI-based" : "base64Binary"
+    }
+  } ],
+  "property" : [ {
+    "id" : "0",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "3",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "8",
+    "type" : "owl:disjointWith"
+  } ],
+  "propertyAttribute" : [ {
+    "iri" : "https://w3id.org/won/workflow#inlinePetriNetDefinition",
+    "baseIri" : "https://w3id.org/won/workflow",
+    "range" : "2",
+    "label" : {
+      "IRI-based" : "inlinePetriNetDefinition",
+      "undefined" : "inlinePetriNetDefinition"
+    },
+    "domain" : "1",
+    "comment" : {
+      "en" : "Using this property, a Message can specify a schema:FileObject with an inline definition of a Petri net. The object of the triple is a base64 encoded XML serialization of the Petri net in PNML. By making the message part of an agreement, the Petri net is to be considered instantiated with its initial markings. Places and transitions must use URIs as their 'id' attribute. This allows for firing transitions using wf:firesTransition and for referencing places in other RDF triples."
+    },
+    "attributes" : [ "datatype" ],
+    "id" : "0"
+  }, {
+    "iri" : "https://w3id.org/won/workflow#firesTransition",
+    "baseIri" : "https://w3id.org/won/workflow",
+    "range" : "5",
+    "label" : {
+      "IRI-based" : "firesTransition",
+      "undefined" : "firesTransition"
+    },
+    "domain" : "4",
+    "comment" : {
+      "en" : "By embedding a triple ([petri net] wf:firesTransition [transition]) in the ContentGraph of a Message, and subsequently claiming or agreeing on that message, the respective transition is regarded as fired in the referenced Petri net."
+    },
+    "attributes" : [ "object" ],
+    "id" : "3"
+  }, {
+    "range" : "5",
+    "domain" : "7",
+    "attributes" : [ "object", "anonymous" ],
+    "id" : "8"
+  } ]
+}

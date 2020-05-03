@@ -1,0 +1,26 @@
+<html><h2 id="overv" class="list">Web of Needs Workflow Ontology: Overview <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
+<span class="markdown">
+This ontology has the following classes and properties.</span>
+<h4>Classes</h4>
+<ul class="hlist">
+   <li>
+      <a href="#PetriNet" title="https://w3id.org/won/workflow#PetriNet">PetriNet</a>
+   </li>
+   <li>
+      <a href="#Place" title="https://w3id.org/won/workflow#Place">Place</a>
+   </li>
+   <li>
+      <a href="#Transition" title="https://w3id.org/won/workflow#Transition">Transition</a>
+   </li>
+</ul><h4>Object Properties</h4><ul class="hlist">
+   <li>
+      <a href="#firesTransition" title="https://w3id.org/won/workflow#firesTransition">firesTransition</a>
+   </li>
+</ul><h4>Data Properties</h4><ul class="hlist">
+   <li>
+      <a href="#inlinePetriNetDefinition"
+         title="https://w3id.org/won/workflow#inlinePetriNetDefinition">
+         <span>inlinePetriNetDefinition</span>
+      </a>
+   </li>
+</ul></html>
