@@ -8,7 +8,6 @@
 
 //---- app.js-Dependencies ----
 import "babel-polyfill";
-import svgs from "../images/won-icons/*.svg";
 import "../style/won.scss";
 
 import React from "react";
@@ -50,8 +49,6 @@ import { getQueryParams, get } from "./utils.js";
 import * as accountUtils from "./redux/utils/account-utils.js";
 import * as processUtils from "./redux/utils/process-utils.js";
 import { runPushAgent } from "./push-agent";
-
-console.log(svgs);
 
 window.won = won;
 
