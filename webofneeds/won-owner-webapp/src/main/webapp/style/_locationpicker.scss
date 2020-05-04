@@ -43,6 +43,25 @@ won-location-picker {
 
     list-style-type: none;
 
+    .lp__loadingspinner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem 0.5rem;
+      font-size: $normalFontSize;
+
+      .hspinner {
+        @include fixed-square(1.5rem);
+      }
+    }
+
+    .lp__noresults {
+      text-align: center;
+      font-szie: $normalFontSize;
+      padding: 1rem 0.5rem;
+      color: $won-line-gray;
+    }
+
     .lp__searchresult {
       display: flex;
       align-items: center;

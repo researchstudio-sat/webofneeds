@@ -16,6 +16,7 @@ import _ from "lodash";
 import "leaflet/dist/leaflet.css";
 import ico16_indicator_location from "~/images/won-icons/ico16_indicator_location.svg";
 import ico36_location_current from "~/images/won-icons/ico36_location_current.svg";
+import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 
 const locationIcon = L.divIcon({
   className: "wonLocationMarkerIcon",
@@ -35,18 +36,23 @@ export default class WonLocationPicker extends React.Component {
       alternativeName: "",
       currentLocation: undefined,
       searchTerm: (props.initialValue && props.initialValue.name) || "",
+      searchState: "IDLE",
     };
     this.doneTyping = this.doneTyping.bind(this);
     this.setAlternativeName = this.setAlternativeName.bind(this);
     this.update = this.update.bind(this);
 
     this.startSearch = _.debounce(value => {
+      this.setState({
+        searchState: "RUNNING",
+      });
       searchNominatim(value).then(searchResults => {
         const parsedResults = scrubSearchResults(searchResults, value);
 
         this.setState({
           searchResults: parsedResults || [],
           lastSearchedFor: value,
+          searchState: "DONE",
         });
       });
     }, 700);
@@ -88,10 +94,31 @@ export default class WonLocationPicker extends React.Component {
       !this.state.pickedLocation && !!this.state.currentLocation;
     const showPrevLocationResult =
       !this.state.pickedLocation && !!this.state.previousLocation;
+
+    let searchNotice;
+    if (
+      this.state.searchTerm != "" &&
+      this.state.searchTerm != this.state.lastSearchedFor
+    ) {
+      searchNotice = (
+        <div className="lp__loadingspinner">
+          <svg className="hspinner">
+            <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
+          </svg>
+        </div>
+      );
+    } else if (
+      this.state.searchState == "DONE" &&
+      this.state.searchResults.length == 0
+    ) {
+      searchNotice = <div className="lp__noresults">No results found</div>;
+    }
+
     const showResultDropDown =
       this.state.searchResults.length > 0 ||
       showPrevLocationResult ||
-      showCurrentLocationResult;
+      showCurrentLocationResult ||
+      searchNotice;
 
     const searchResults = this.state.searchResults.map((result, index) => (
       <li
@@ -151,6 +178,7 @@ export default class WonLocationPicker extends React.Component {
               : "lp__searchresults--empty")
           }
         >
+          {searchNotice}
           {showCurrentLocationResult && (
             <li
               className="lp__searchresult"
@@ -220,6 +248,7 @@ export default class WonLocationPicker extends React.Component {
     this.setState({
       searchResults: [],
       lastSearchedFor: undefined,
+      searchState: "IDLE",
     });
   }
 
