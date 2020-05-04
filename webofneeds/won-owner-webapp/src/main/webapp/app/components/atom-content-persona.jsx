@@ -16,6 +16,7 @@ import { details } from "../../config/detail-definitions.js";
 import "~/style/_atom-content-persona.scss";
 import ElmReact from "./elm-react";
 import { withRouter } from "react-router-dom";
+import vocab from "../service/vocab.js";
 
 const mapStateToProps = (state, ownProps) => {
   const { connectionUri } = getQueryParams(ownProps.location);
@@ -267,7 +268,10 @@ class WonAtomContentPersona extends React.Component {
   }
 
   viewPersonaPosts() {
-    this.props.selectTab(this.props.personaUri, "HOLDS");
+    this.props.selectTab(
+      this.props.personaUri,
+      vocab.HOLD.HolderSocketCompacted
+    );
     this.props.history.push(
       generateLink(
         this.props.history.location,
@@ -280,7 +284,10 @@ class WonAtomContentPersona extends React.Component {
   }
 
   viewPersonaBuddies() {
-    this.props.selectTab(this.props.personaUri, "BUDDIES");
+    this.props.selectTab(
+      this.props.personaUri,
+      vocab.BUDDY.BuddySocketCompacted
+    );
     this.props.history.push(
       generateLink(
         this.props.history.location,
@@ -293,7 +300,10 @@ class WonAtomContentPersona extends React.Component {
   }
 
   viewPersonaReviews() {
-    this.props.selectTab(this.props.personaUri, "REVIEWS");
+    this.props.selectTab(
+      this.props.personaUri,
+      vocab.REVIEW.ReviewSocketCompacted
+    );
     this.props.history.push(
       generateLink(
         this.props.history.location,

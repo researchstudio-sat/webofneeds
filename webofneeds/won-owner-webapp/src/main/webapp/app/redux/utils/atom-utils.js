@@ -298,10 +298,8 @@ export function hasBuddySocket(atom) {
 }
 
 export function hasSocket(atom, socket) {
-  return (
-    getIn(atom, ["content", "sockets"]) &&
-    getIn(atom, ["content", "sockets"]).contains(socket)
-  );
+  const sockets = getSockets(atom);
+  return sockets && sockets.contains(socket);
 }
 
 export function getChatSocket(atom) {
@@ -390,7 +388,7 @@ export function generateFullFlagLabels(atomImm) {
  * Generates an array that contains all atom sockets, using a human readable label if available.
  */
 export function generateFullSocketLabels(atomImm) {
-  const sockets = atomImm && atomImm.getIn(["content", "sockets"]);
+  const sockets = getSockets(atomImm);
   const socketsArray =
     sockets &&
     sockets
@@ -429,7 +427,7 @@ export function generateTypeLabel(atomImm) {
  * Generates an array that contains some atom sockets, using a human readable label if possible.
  */
 export function generateShortSocketLabels(atomImm) {
-  const sockets = atomImm && atomImm.get(["content", "sockets"]);
+  const sockets = getSockets(atomImm);
   const socketsArray =
     sockets &&
     sockets
@@ -470,17 +468,23 @@ export function generateShortFlagLabels(atomImm) {
   return flagsArray;
 }
 
-export function getSocketsWithKeysReset(atomImm) {
-  const sockets = getIn(atomImm, ["content", "sockets"]);
+export function getSockets(atomImm) {
+  return getIn(atomImm, ["content", "sockets"]);
+}
 
-  if (sockets) {
-    return getSocketKeysReset(sockets);
-  }
-  return undefined;
+export function getSocketTypeArray(atomImm) {
+  const sockets = getSockets(atomImm);
+  return sockets ? sockets.valueSeq().toArray() : [];
+}
+
+export function getSocketsWithKeysReset(atomImm) {
+  const sockets = getSockets(atomImm);
+
+  return sockets ? getSocketKeysReset(sockets) : undefined;
 }
 
 export function getSocketUri(atomImm, socketType) {
-  const sockets = getIn(atomImm, ["content", "sockets"]);
+  const sockets = getSockets(atomImm);
 
   return (
     sockets &&

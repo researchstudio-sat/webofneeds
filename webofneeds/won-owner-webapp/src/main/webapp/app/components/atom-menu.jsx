@@ -12,6 +12,8 @@ import * as connectionSelectors from "../redux/selectors/connection-selectors.js
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
+import * as wonLabelUtils from "../won-label-utils.js";
+import vocab from "../service/vocab.js";
 import Immutable from "immutable";
 
 import "~/style/_atom-menu.scss";
@@ -21,18 +23,12 @@ const mapStateToProps = (state, ownProps) => {
   const isPersona = atomUtils.isPersona(atom);
   const isOwned = generalSelectors.isAtomOwned(state, ownProps.atomUri);
 
-  const hasHolderSocket = atomUtils.hasHolderSocket(atom);
-  const hasGroupSocket = atomUtils.hasGroupSocket(atom);
-  const hasReviewSocket = atomUtils.hasReviewSocket(atom);
-  const hasBuddySocket = atomUtils.hasBuddySocket(atom);
-  const reviewCount = hasReviewSocket
-    ? getIn(atom, ["rating", "reviewCount"])
-    : 0;
+  const reviewCount = getIn(atom, ["rating", "reviewCount"]) || 0;
 
-  const groupMembers = hasGroupSocket ? get(atom, "groupMembers") : 0;
+  const groupMembers = get(atom, "groupMembers") || 0;
   const groupChatConnections =
     isOwned &&
-    hasGroupSocket &&
+    atomUtils.hasGroupSocket(atom) &&
     connectionSelectors.getGroupChatConnectionsByAtomUri(
       state,
       ownProps.atomUri
@@ -47,7 +43,7 @@ const mapStateToProps = (state, ownProps) => {
         !(connectionUtils.isConnected(conn) || connectionUtils.isClosed(conn))
     );
 
-  const heldAtoms = hasHolderSocket && get(atom, "holds");
+  const heldAtoms = get(atom, "holds");
 
   const hasUnreadSuggestedConnectionsInHeldAtoms = generalSelectors.hasUnreadSuggestedConnectionsInHeldAtoms(
     state,
@@ -102,10 +98,6 @@ const mapStateToProps = (state, ownProps) => {
     hasHeldAtoms: heldAtomsSize > 0,
     hasUnreadSuggestedConnectionsInHeldAtoms,
     heldAtomsSize,
-    hasHolderSocket,
-    hasGroupSocket,
-    hasReviewSocket,
-    hasBuddySocket,
     hasUnreadBuddyConnections:
       !!buddyConnections &&
       !!buddyConnections.find(conn => connectionUtils.isUnread(conn)),
@@ -138,6 +130,7 @@ const mapStateToProps = (state, ownProps) => {
     atomFailedToLoad:
       atom && processUtils.hasAtomFailedToLoad(process, ownProps.atomUri),
     shouldShowRdf: viewUtils.showRdf(viewState),
+    socketTypeArray: atomUtils.getSocketTypeArray(atom),
     visibleTab: viewUtils.getVisibleTabByAtomUri(
       viewState,
       ownProps.atomUri,
@@ -174,82 +167,6 @@ class WonAtomMenu extends React.Component {
       </div>
     );
 
-    if (this.props.isHeld) {
-      buttons.push(
-        <div
-          key="heldby"
-          className={this.generateAtomItemCssClasses(
-            this.isSelectedTab("HELDBY")
-          )}
-          onClick={() => this.selectTab("HELDBY")}
-        >
-          <span className="atom-menu__item__label">
-            {this.props.isHeldByServiceAtom ? "Holder" : "Persona"}
-          </span>
-          {this.props.holderAggregateRatingString && (
-            <span className="atom-menu__item__rating">
-              (★ {this.props.holderAggregateRatingString + ")"}
-            </span>
-          )}
-        </div>
-      );
-    } else if (this.props.isHoldable && this.props.isOwned) {
-      buttons.push(
-        <div
-          key="heldby"
-          className={this.generateAtomItemCssClasses(
-            this.isSelectedTab("HELDBY")
-          )}
-          onClick={() => this.selectTab("HELDBY")}
-        >
-          <span className="atom-menu__item__label">+ Persona</span>
-          {this.props.holderAggregateRatingString && (
-            <span className="atom-menu__item__rating">
-              {"(★ " + this.props.holderAggregateRatingString + ")"}
-            </span>
-          )}
-        </div>
-      );
-    }
-
-    if (this.props.hasGroupSocket) {
-      this.props.isOwned
-        ? buttons.push(
-            <div
-              key="participants"
-              className={this.generateAtomItemCssClasses(
-                this.isSelectedTab("PARTICIPANTS"),
-                false,
-                this.props.hasUnreadGroupChatRequests
-              )}
-              onClick={() => this.selectTab("PARTICIPANTS")}
-            >
-              <span className="atom-menu__item__unread" />
-              <span className="atom-menu__item__label">Group Members</span>
-              {!!this.props.connectedGroupChatConnectionsSize && (
-                <span className="atom-menu__item__count">
-                  {"(" + this.props.connectedGroupChatConnectionsSize + ")"}
-                </span>
-              )}
-            </div>
-          )
-        : buttons.push(
-            <div
-              key="participants"
-              className={this.generateAtomItemCssClasses(
-                this.isSelectedTab("PARTICIPANTS"),
-                !this.props.groupMembers
-              )}
-              onClick={() => this.selectTab("PARTICIPANTS")}
-            >
-              <span className="atom-menu__item__label">Group Members</span>
-              <span className="atom-menu__item__count">
-                {"(" + this.props.groupMembersSize + ")"}
-              </span>
-            </div>
-          );
-    }
-
     this.props.isOwned &&
       this.props.hasChatSocket &&
       buttons.push(
@@ -270,62 +187,80 @@ class WonAtomMenu extends React.Component {
         </div>
       );
 
-    this.props.hasHolderSocket &&
-      buttons.push(
-        <div
-          key="holds"
-          className={this.generateAtomItemCssClasses(
-            this.isSelectedTab("HOLDS"),
-            !this.props.hasHeldAtoms,
-            this.props.hasUnreadSuggestedConnectionsInHeldAtoms
-          )}
-          onClick={() => this.selectTab("HOLDS")}
-        >
-          <span className="atom-menu__item__unread" />
-          <span className="atom-menu__item__label">Posts</span>
-          <span className="atom-menu__item__count">
-            {"(" + this.props.heldAtomsSize + ")"}
-          </span>
-        </div>
-      );
+    // Add generic Tabs based on available Sockets
+    this.props.socketTypeArray.map((socketType, index) => {
+      let label = wonLabelUtils.labels.socketTabs[socketType] || socketType;
+      let countLabel;
 
-    this.props.hasBuddySocket &&
+      const selected = this.isSelectedTab(socketType);
+      let inactive = false;
+      let unread = false;
+
+      switch (socketType) {
+        case vocab.GROUP.GroupSocketCompacted:
+          if (this.props.isOwned) {
+            unread = this.props.hasUnreadGroupChatRequests;
+            countLabel =
+              "(" + this.props.connectedGroupChatConnectionsSize + ")";
+          } else {
+            inactive = !this.props.groupMembers;
+            countLabel = "(" + this.props.groupMembersSize + ")";
+          }
+          break;
+
+        case vocab.HOLD.HoldableSocketCompacted:
+          if (this.props.isHeld) {
+            countLabel =
+              this.props.holderAggregateRatingString &&
+              "(★ " + this.props.holderAggregateRatingString + ")";
+          } else if (this.props.isHoldable && this.props.isOwned) {
+            countLabel =
+              this.props.holderAggregateRatingString &&
+              "(★ " + this.props.holderAggregateRatingString + ")";
+            label = "+ " + label;
+          }
+          break;
+
+        case vocab.HOLD.HolderSocketCompacted:
+          inactive = !this.props.hasHeldAtoms;
+          unread = this.props.hasUnreadSuggestedConnectionsInHeldAtoms;
+          countLabel = "(" + this.props.heldAtomsSize + ")";
+          break;
+
+        case vocab.BUDDY.BuddySocketCompacted:
+          inactive = !this.props.hasBuddies;
+          unread = this.props.hasUnreadBuddyConnections;
+          countLabel = "(" + this.props.buddyCount + ")";
+          break;
+
+        case vocab.REVIEW.ReviewSocketCompacted:
+          inactive = !this.props.hasReviews;
+          countLabel =
+            this.props.hasReviews && "(" + this.props.reviewCount + ")";
+          break;
+      }
+
       buttons.push(
         <div
-          key="buddies"
+          key={socketType + "-" + index}
           className={this.generateAtomItemCssClasses(
-            this.isSelectedTab("BUDDIES"),
-            !this.props.hasBuddies,
-            this.props.hasUnreadBuddyConnections
+            selected,
+            inactive,
+            unread
           )}
-          onClick={() => this.selectTab("BUDDIES")}
+          onClick={() => this.selectTab(socketType)}
         >
           <span className="atom-menu__item__unread" />
-          <span className="atom-menu__item__label">Buddies</span>
-          <span className="atom-menu__item__count">
-            {"(" + this.props.buddyCount + ")"}
-          </span>
-        </div>
-      );
-    this.props.hasReviewSocket &&
-      buttons.push(
-        <div
-          key="reviews"
-          className={this.generateAtomItemCssClasses(
-            this.isSelectedTab("REVIEWS"),
-            !this.props.hasReviews,
-            false
-          )}
-          onClick={() => this.selectTab("REVIEWS")}
-        >
-          <span className="atom-menu__item__label">Reviews</span>
-          {this.props.hasReviews && (
-            <span className="atom-menu__item__rating">
-              {"(" + this.props.reviewCount + ")"}
-            </span>
+          <span className="atom-menu__item__label">{label}</span>
+          {countLabel ? (
+            <span className="atom-menu__item__count">{countLabel}</span>
+          ) : (
+            undefined
           )}
         </div>
       );
+    });
+
     this.props.shouldShowRdf &&
       buttons.push(
         <div
@@ -388,10 +323,6 @@ WonAtomMenu.propTypes = {
   hasHeldAtoms: PropTypes.bool,
   hasUnreadSuggestedConnectionsInHeldAtoms: PropTypes.bool,
   heldAtomsSize: PropTypes.number,
-  hasHolderSocket: PropTypes.bool,
-  hasGroupSocket: PropTypes.bool,
-  hasReviewSocket: PropTypes.bool,
-  hasBuddySocket: PropTypes.bool,
   hasUnreadBuddyConnections: PropTypes.bool,
   hasBuddies: PropTypes.bool,
   buddyCount: PropTypes.number,
@@ -409,6 +340,7 @@ WonAtomMenu.propTypes = {
   atomFailedToLoad: PropTypes.bool,
   shouldShowRdf: PropTypes.bool,
   visibleTab: PropTypes.string,
+  socketTypeArray: PropTypes.arrayOf(PropTypes.string),
 };
 
 export default connect(

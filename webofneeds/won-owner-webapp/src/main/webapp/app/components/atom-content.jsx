@@ -8,6 +8,7 @@ import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
+import vocab from "../service/vocab.js";
 
 import WonAtomContentHolds from "./atom-content-holds.jsx";
 import WonAtomContentSuggestions from "./atom-content-suggestions.jsx";
@@ -153,102 +154,114 @@ class WonAtomContent extends React.Component {
       );
 
       let visibleTabFragment;
-      if (this.isSelectedTab("DETAIL")) {
-        visibleTabFragment = (
-          <React.Fragment>
-            <WonAtomContentGeneral atomUri={this.props.atomUri} />
+      switch (this.props.visibleTab) {
+        case "DETAIL":
+          visibleTabFragment = (
+            <React.Fragment>
+              <WonAtomContentGeneral atomUri={this.props.atomUri} />
 
-            {this.props.hasContent && (
-              <WonAtomContentDetails
-                atomUri={this.props.atomUri}
-                branch="content"
-              />
-            )}
-            {this.props.hasContent &&
-              this.props.hasSeeksBranch && (
-                <WonLabelledHr label="Search" className="cp__labelledhr" />
+              {this.props.hasContent && (
+                <WonAtomContentDetails
+                  atomUri={this.props.atomUri}
+                  branch="content"
+                />
               )}
-            {this.props.hasSeeksBranch && (
-              <WonAtomContentDetails
-                atomUri={this.props.atomUri}
-                branch="seeks"
+              {this.props.hasContent &&
+                this.props.hasSeeksBranch && (
+                  <WonLabelledHr label="Search" className="cp__labelledhr" />
+                )}
+              {this.props.hasSeeksBranch && (
+                <WonAtomContentDetails
+                  atomUri={this.props.atomUri}
+                  branch="seeks"
+                />
+              )}
+            </React.Fragment>
+          );
+          break;
+        case vocab.HOLD.HoldableSocketCompacted:
+          if (this.props.isHeld) {
+            visibleTabFragment = (
+              <WonAtomContentPersona holdsUri={this.props.atomUri} />
+            );
+          } else if (
+            this.props.isActive &&
+            this.props.hasHoldableSocket &&
+            this.props.isOwned
+          ) {
+            visibleTabFragment = (
+              <ElmReact
+                src={Elm.AddPersona}
+                flags={{
+                  post: this.props.atom.toJS(),
+                  personas: this.props.personas.toJS(),
+                }}
               />
-            )}
-          </React.Fragment>
-        );
-      } else if (this.isSelectedTab("HELDBY")) {
-        if (this.props.isHeld) {
+            );
+          }
+          break;
+        case vocab.GROUP.GroupSocketCompacted:
           visibleTabFragment = (
-            <WonAtomContentPersona holdsUri={this.props.atomUri} />
+            <WonAtomContentParticipants atomUri={this.props.atomUri} />
           );
-        } else if (
-          this.props.isActive &&
-          this.props.hasHoldableSocket &&
-          this.props.isOwned
-        ) {
+          break;
+        case vocab.BUDDY.BuddySocketCompacted:
           visibleTabFragment = (
-            <ElmReact
-              src={Elm.AddPersona}
-              flags={{
-                post: this.props.atom.toJS(),
-                personas: this.props.personas.toJS(),
-              }}
-            />
+            <WonAtomContentBuddies atomUri={this.props.atomUri} />
           );
-        }
-      } else if (this.isSelectedTab("PARTICIPANTS")) {
-        visibleTabFragment = (
-          <WonAtomContentParticipants atomUri={this.props.atomUri} />
-        );
-      } else if (this.isSelectedTab("BUDDIES")) {
-        visibleTabFragment = (
-          <WonAtomContentBuddies atomUri={this.props.atomUri} />
-        );
-      } else if (this.isSelectedTab("REVIEWS")) {
-        visibleTabFragment = (
-          <div className="atom-content__reviews">
-            <div className="atom-content__reviews__empty">
-              No Reviews to display.
+          break;
+        case vocab.REVIEW.ReviewSocketCompacted:
+          visibleTabFragment = (
+            <div className="atom-content__reviews">
+              <div className="atom-content__reviews__empty">
+                No Reviews to display.
+              </div>
             </div>
-          </div>
-        );
-      } else if (this.isSelectedTab("SUGGESTIONS")) {
-        visibleTabFragment = (
-          <WonAtomContentSuggestions atomUri={this.props.atomUri} />
-        );
-      } else if (this.isSelectedTab("HOLDS")) {
-        visibleTabFragment = (
-          <WonAtomContentHolds atomUri={this.props.atomUri} />
-        );
-      } else if (this.isSelectedTab("RDF")) {
-        visibleTabFragment = (
-          <div className="atom-info__content__rdf">
-            <a
-              className="rdflink clickable"
-              target="_blank"
-              rel="noopener noreferrer"
-              href={this.props.atomUri}
-            >
-              <svg className="rdflink__small">
-                <use xlinkHref={rdf_logo_1} href={rdf_logo_1} />
-              </svg>
-              <span className="rdflink__label">Atom</span>
-            </a>
-            {this.props.openConnectionUri && (
+          );
+          break;
+        case vocab.HOLD.HolderSocketCompacted:
+          visibleTabFragment = (
+            <WonAtomContentHolds atomUri={this.props.atomUri} />
+          );
+          break;
+        case "SUGGESTIONS":
+          visibleTabFragment = (
+            <WonAtomContentSuggestions atomUri={this.props.atomUri} />
+          );
+          break;
+        case "RDF":
+          visibleTabFragment = (
+            <div className="atom-info__content__rdf">
               <a
                 className="rdflink clickable"
                 target="_blank"
                 rel="noopener noreferrer"
-                href={this.props.openConnectionUri}
+                href={this.props.atomUri}
               >
                 <svg className="rdflink__small">
                   <use xlinkHref={rdf_logo_1} href={rdf_logo_1} />
                 </svg>
-                <span className="rdflink__label">Connection</span>
+                <span className="rdflink__label">Atom</span>
               </a>
-            )}
-          </div>
-        );
+              {this.props.openConnectionUri && (
+                <a
+                  className="rdflink clickable"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={this.props.openConnectionUri}
+                >
+                  <svg className="rdflink__small">
+                    <use xlinkHref={rdf_logo_1} href={rdf_logo_1} />
+                  </svg>
+                  <span className="rdflink__label">Connection</span>
+                </a>
+              )}
+            </div>
+          );
+          break;
+        default:
+          visibleTabFragment = <div> Unknown Socket TODO: IMPL STUFF </div>;
+          break;
       }
 
       return (
@@ -266,10 +279,6 @@ class WonAtomContent extends React.Component {
     if (this.props.atomUri && this.props.atomFailedToLoad) {
       this.props.fetchAtom(this.props.atomUri);
     }
-  }
-
-  isSelectedTab(tabName) {
-    return tabName === this.props.visibleTab;
   }
 }
 WonAtomContent.propTypes = {
