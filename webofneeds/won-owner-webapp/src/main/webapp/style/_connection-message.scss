@@ -118,10 +118,14 @@ won-connection-message {
   }
   &.won-is-proposed:not(.won-is-collapsed),
   &.won-is-claimed:not(.won-is-collapsed),
-  &.won-is-accepted:not(.won-is-collapsed),
   &.won-is-agreed:not(.won-is-collapsed) {
     opacity: 0.5;
     border: $thinGrayBorder;
+  }
+
+  &.won-is-accepted:not(.won-is-collapsed) {
+    opacity: 1;
+    //TODO styling
   }
 
   &.won-is-retracted:not(.won-is-collapsed),

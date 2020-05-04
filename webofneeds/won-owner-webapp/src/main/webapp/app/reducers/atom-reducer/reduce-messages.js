@@ -6,6 +6,7 @@ import * as connectionSelectors from "../../redux/selectors/connection-selectors
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import { get, getIn } from "../../utils.js";
+import Immutable from "immutable";
 
 export function addMessage(
   state,
@@ -682,17 +683,23 @@ export function markMessageAsRejected(
     rejected
   );
 
+  const rejectedMessageUris =
+    connection && connection.getIn(["agreementData", "rejectedMessageUris"]);
+
   return state.setIn(
     [
       atomUri,
       "connections",
       connectionUri,
-      "messages",
-      messageUri,
-      "messageStatus",
-      "isRejected",
+      "agreementData",
+      "retractedMessageUris",
     ],
     rejected
+      ? (rejectedMessageUris && rejectedMessageUris.add(messageUri)) ||
+        Immutable.Set(messageUri)
+      : (rejectedMessageUris &&
+          rejectedMessageUris.filter(uri => uri != messageUri)) ||
+        Immutable.Set()
   );
 }
 
@@ -786,17 +793,23 @@ export function markMessageAsRetracted(
     retracted
   );
 
+  const retractedMessageUris =
+    connection && connection.getIn(["agreementData", "retractedMessageUris"]);
+
   return state.setIn(
     [
       atomUri,
       "connections",
       connectionUri,
-      "messages",
-      messageUri,
-      "messageStatus",
-      "isRetracted",
+      "agreementData",
+      "retractedMessageUris",
     ],
     retracted
+      ? (retractedMessageUris && retractedMessageUris.add(messageUri)) ||
+        Immutable.Set(messageUri)
+      : (retractedMessageUris &&
+          retractedMessageUris.filter(uri => uri != messageUri)) ||
+        Immutable.Set()
   );
 }
 
@@ -842,17 +855,23 @@ export function markMessageAsClaimed(
     claimed
   );
 
+  const claimedMessageUris =
+    connection && connection.getIn(["agreementData", "claimedMessageUris"]);
+
   return state.setIn(
     [
       atomUri,
       "connections",
       connectionUri,
-      "messages",
-      messageUri,
-      "messageStatus",
-      "isClaimed",
+      "agreementData",
+      "claimedMessageUris",
     ],
     claimed
+      ? (claimedMessageUris && claimedMessageUris.add(messageUri)) ||
+        Immutable.Set(messageUri)
+      : (claimedMessageUris &&
+          claimedMessageUris.filter(uri => uri != messageUri)) ||
+        Immutable.Set()
   );
 }
 
@@ -898,17 +917,23 @@ export function markMessageAsAgreed(
     isAgreedOn
   );
 
+  const agreedMessageUris =
+    connection && connection.getIn(["agreementData", "agreedMessageUris"]);
+
   return state.setIn(
     [
       atomUri,
       "connections",
       connectionUri,
-      "messages",
-      messageUri,
-      "messageStatus",
-      "isAgreed",
+      "agreementData",
+      "agreedMessageUris",
     ],
     isAgreedOn
+      ? (agreedMessageUris && agreedMessageUris.add(messageUri)) ||
+        Immutable.Set(messageUri)
+      : (agreedMessageUris &&
+          agreedMessageUris.filter(uri => uri != messageUri)) ||
+        Immutable.Set()
   );
 }
 
@@ -955,17 +980,24 @@ export function markMessageAsProposed(
     proposed
   );
 
+  //if !proposed remove from set because message was retracted/rejected
+  const proposedMessageUris =
+    connection && connection.getIn(["agreementData", "proposedMessageUris"]);
+
   return state.setIn(
     [
       atomUri,
       "connections",
       connectionUri,
-      "messages",
-      messageUri,
-      "messageStatus",
-      "isProposed",
+      "agreementData",
+      "proposedMessageUris",
     ],
     proposed
+      ? (proposedMessageUris && proposedMessageUris.add(messageUri)) ||
+        Immutable.Set([messageUri])
+      : (proposedMessageUris &&
+          proposedMessageUris.filter(uri => uri != messageUri)) ||
+        Immutable.Set()
   );
 }
 
@@ -1010,45 +1042,39 @@ export function markMessageAsAccepted(
     });
   }
 
+  // remove from cancelled and cancellationPending sets because of not pending anymore
   if (accepted) {
-    state = state.setIn(
-      [
-        atomUri,
-        "connections",
-        connectionUri,
-        "messages",
-        messageUri,
-        "messageStatus",
-        "isCancelled",
-      ],
-      false
-    );
+    const cancelledUris =
+      connection &&
+      connection.getIn(["agreementData", "cancelledAgreementUris"]);
 
     state = state.setIn(
       [
         atomUri,
         "connections",
         connectionUri,
-        "messages",
-        messageUri,
-        "messageStatus",
-        "isCancellationPending",
+        "agreementData",
+        "cancelledAgreementUris",
       ],
+      (cancelledUris && cancelledUris.filter(uri => uri != messageUri)) ||
+        Immutable.Set()
+    );
+    state = markMessageAsCancellationPending(
+      state,
+      messageUri,
+      connectionUri,
+      atomUri,
       false
     );
   }
 
+  const agreementUris =
+    connection && connection.getIn(["agreementData", "agreementUris"]);
+
   return state.setIn(
-    [
-      atomUri,
-      "connections",
-      connectionUri,
-      "messages",
-      messageUri,
-      "messageStatus",
-      "isAccepted",
-    ],
-    accepted
+    [atomUri, "connections", connectionUri, "agreementData", "agreementUris"],
+    (agreementUris && agreementUris.add(messageUri)) ||
+      Immutable.Set(messageUri)
   );
 }
 
@@ -1077,43 +1103,51 @@ export function markMessageAsCancelled(
     return state;
   }
 
-  state = state.setIn(
-    [
-      atomUri,
-      "connections",
-      connectionUri,
-      "messages",
-      messageUri,
-      "messageStatus",
-      "isCancelled",
-    ],
-    cancelled
-  );
+  //if cancelled remove from accepted/agreementUris and cancellationPending sets
+  if (cancelled) {
+    const agreementUris =
+      connection && connection.getIn(["agreementData", "agreementUris"]);
 
-  state = state.setIn(
-    [
-      atomUri,
-      "connections",
-      connectionUri,
-      "messages",
-      messageUri,
-      "messageStatus",
-      "isAccepted",
-    ],
-    false
-  );
+    state = state.setIn(
+      [atomUri, "connections", connectionUri, "agreementData", "agreementUris"],
+      (agreementUris && agreementUris.filter(uri => uri != messageUri)) ||
+        Immutable.Set()
+    );
 
+    const cancellationPendingAgreementUris =
+      connection &&
+      connection.getIn(["agreementData", "cancellationPendingAgreementUris"]);
+
+    state = state.setIn(
+      [
+        atomUri,
+        "connections",
+        connectionUri,
+        "agreementData",
+        "cancellationPendingAgreementUris",
+      ],
+      (cancellationPendingAgreementUris &&
+        cancellationPendingAgreementUris.filter(uri => uri != messageUri)) ||
+        Immutable.Set()
+    );
+  }
+
+  const cancelledAgreementUris =
+    connection && connection.getIn(["agreementData", "cancelledAgreementUris"]);
   return state.setIn(
     [
       atomUri,
       "connections",
       connectionUri,
-      "messages",
-      messageUri,
-      "messageStatus",
-      "isCancellationPending",
+      "agreementData",
+      "cancelledAgreementUris",
     ],
-    false
+    cancelled
+      ? (cancelledAgreementUris && cancelledAgreementUris.add(messageUri)) ||
+        Immutable.Set(messageUri)
+      : (cancelledAgreementUris &&
+          cancelledAgreementUris.filter(uri => uri != messageUri)) ||
+        Immutable.Set()
   );
 }
 
@@ -1141,19 +1175,29 @@ export function markMessageAsCancellationPending(
     return state;
   }
 
+  const cancellationPendingUris =
+    connection &&
+    connection.getIn(["agreementData", "cancellationPendingAgreementUris"]);
+
+  // if !cancellationPending remove from set because message was retracted/rejected
   return state.setIn(
     [
       atomUri,
       "connections",
       connectionUri,
-      "messages",
-      messageUri,
-      "messageStatus",
-      "isCancellationPending",
+      "agreementData",
+      "cancellationPendingAgreementUris",
     ],
+
     cancellationPending
+      ? (cancellationPendingUris && cancellationPendingUris.add(messageUri)) ||
+        Immutable.Set([messageUri])
+      : (cancellationPendingUris &&
+          cancellationPendingUris.filter(uri => uri != messageUri)) ||
+        Immutable.Set()
   );
 }
+
 /**
  * Sets the given messageUri messageStatus to the given parameter (messageStatus).
  * Additionally calls markMessageAsCollapsed to the bool-exp from messageStatus data => (isProposed || isClaimed ||isRejected || isRetracted)
@@ -1163,14 +1207,9 @@ export function markMessageAsCancellationPending(
  * @param atomUri
  * @param messageStatus
  * @returns {*}
+ *
  */
-export function updateMessageStatus(
-  state,
-  messageUri,
-  connectionUri,
-  atomUri,
-  messageStatus
-) {
+export function updateMessageStatus(state, messageUri, connectionUri, atomUri) {
   let atom = state.get(atomUri);
   let connection = atom && atom.getIn(["connections", connectionUri]);
   let message = connection && connection.getIn(["messages", messageUri]);
@@ -1189,12 +1228,22 @@ export function updateMessageStatus(
   }
 
   //Check if there is any "positive" messageStatus, we assume that we do not want to display this message "fully"
+  const agreementData = connection && connection.get("agreementData");
+
+  const isProposed =
+    agreementData && !!agreementData.getIn(["proposedMessageUris", messageUri]);
+  const isClaimed =
+    agreementData && !!agreementData.getIn(["claimedMessageUris", messageUri]);
+  const isAgreed =
+    agreementData && !!agreementData.getIn(["agreedMessageUris", messageUri]);
+  const isRejected =
+    agreementData && !!agreementData.getIn(["rejectedMessageUris", messageUri]);
+  const isRetracted =
+    agreementData &&
+    !!agreementData.getIn(["retractedMessageUris", messageUri]);
+
   const hasCollapsedMessageState =
-    messageStatus.get("isProposed") ||
-    messageStatus.get("isClaimed") ||
-    messageStatus.get("isAgreed") ||
-    messageStatus.get("isRejected") ||
-    messageStatus.get("isRetracted");
+    isProposed || isClaimed || isAgreed || isRejected || isRetracted;
 
   state = markMessageAsCollapsed(
     state,
@@ -1204,27 +1253,15 @@ export function updateMessageStatus(
     hasCollapsedMessageState
   );
 
-  return state
-    .setIn(
-      [
-        atomUri,
-        "connections",
-        connectionUri,
-        "messages",
-        messageUri,
-        "messageStatus",
-      ],
-      messageStatus
-    )
-    .setIn(
-      [
-        atomUri,
-        "connections",
-        connectionUri,
-        "messages",
-        messageUri,
-        "isMessageStatusUpToDate",
-      ],
-      true
-    );
+  return state.setIn(
+    [
+      atomUri,
+      "connections",
+      connectionUri,
+      "messages",
+      messageUri,
+      "isMessageStatusUpToDate",
+    ],
+    true
+  );
 }
