@@ -39,7 +39,6 @@ won-atom-menu {
         border-bottom-color: 0.2rem solid $won-line-gray;
       }
 
-      & > .atom-menu__item__rating,
       & > .atom-menu__item__count {
         height: 0;
         width: 0;
@@ -51,7 +50,6 @@ won-atom-menu {
     }
 
     &.atom-menu__item--unread {
-      & > .atom-menu__item__rating,
       & > .atom-menu__item__count,
       & > .atom-menu__item__label {
         color: $won-unread-attention;
@@ -93,13 +91,11 @@ won-atom-menu {
       border-bottom: 0.2rem solid $won-primary-color-light;
     }
 
-    & > .atom-menu__item__rating,
     & > .atom-menu__item__count,
     & > .atom-menu__item__label {
       font-size: $normalFontSize;
     }
 
-    & > .atom-menu__item__rating,
     & > .atom-menu__item__count {
       display: inline-block;
       margin-left: 0.25rem;

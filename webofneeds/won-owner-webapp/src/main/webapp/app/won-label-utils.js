@@ -31,6 +31,14 @@ export const labels = deepFreeze({
     [vocab.REVIEW.ReviewSocketCompacted]: "Review enabled",
     [vocab.BUDDY.BuddySocketCompacted]: "Buddy",
   },
+  socketTabs: {
+    [vocab.GROUP.GroupSocketCompacted]: "Group Members",
+    [vocab.CHAT.ChatSocketCompacted]: "Chats",
+    [vocab.HOLD.HoldableSocketCompacted]: "Holder",
+    [vocab.HOLD.HolderSocketCompacted]: "Posts",
+    [vocab.REVIEW.ReviewSocketCompacted]: "Reviews",
+    [vocab.BUDDY.BuddySocketCompacted]: "Buddies",
+  },
 });
 
 /**

@@ -27,6 +27,7 @@
       justify-content: center;
       background: white;
       @include fixed-square($size);
+      object-fit: cover;
 
       &.usecaseimage {
         box-sizing: border-box;
@@ -51,6 +52,7 @@
       right: $size/7 * -1;
       bottom: $size/7 * -1;
       z-index: 2;
+      object-fit: cover;
 
       &.holderUseCaseIcon {
         background: unset;

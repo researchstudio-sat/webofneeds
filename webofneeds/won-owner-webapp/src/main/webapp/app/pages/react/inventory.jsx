@@ -26,6 +26,7 @@ import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 import "~/style/_inventory.scss";
 import "~/style/_connection-overlay.scss";
 import { withRouter } from "react-router-dom";
+import vocab from "../../service/vocab.js";
 
 const mapStateToProps = (state, ownProps) => {
   const { viewConnUri } = getQueryParams(ownProps.location);
@@ -158,7 +159,7 @@ class PageInventory extends React.Component {
                         key={personaUri + "-" + index}
                         className="ownerinventory__personas__persona"
                         atomUri={personaUri}
-                        defaultTab="HOLDS"
+                        defaultTab={vocab.HOLD.HolderSocketCompacted}
                       />
                     )
                   )}

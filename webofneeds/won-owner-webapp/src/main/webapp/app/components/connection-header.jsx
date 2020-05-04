@@ -19,6 +19,7 @@ import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as messageUtils from "../redux/utils/message-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
+import vocab from "../service/vocab.js";
 import Immutable from "immutable";
 
 import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
@@ -385,7 +386,10 @@ class WonConnectionHeader extends React.Component {
   }
 
   selectMembersTab() {
-    this.props.selectTab(this.props.targetAtomUri, "PARTICIPANTS");
+    this.props.selectTab(
+      this.props.targetAtomUri,
+      vocab.GROUP.GroupSocketCompacted
+    );
     this.props.history.push(
       generateLink(
         this.props.history.location,
