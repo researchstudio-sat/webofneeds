@@ -162,9 +162,9 @@ class WonOtherCard extends React.Component {
             alt={this.props.atomImage.get("name")}
             src={
               "data:" +
-              this.props.atomImage.get("type") +
+              this.props.atomImage.get("encodingFormat") +
               ";base64," +
-              this.props.atomImage.get("data")
+              this.props.atomImage.get("encoding")
             }
           />
         ) : (

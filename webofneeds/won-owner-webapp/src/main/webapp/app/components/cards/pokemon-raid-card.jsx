@@ -409,9 +409,9 @@ class PokemonRaidCard extends React.Component {
           alt={this.props.personaImage.get("name")}
           src={
             "data:" +
-            this.props.personaImage.get("type") +
+            this.props.personaImage.get("encodingFormat") +
             ";base64," +
-            this.props.personaImage.get("data")
+            this.props.personaImage.get("encoding")
           }
         />
       );
