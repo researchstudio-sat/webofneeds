@@ -1,5 +1,7 @@
 import "@webcomponents/custom-elements";
 
+import icons from "../../images/won-icons/*.svg";
+
 class SvgIcon extends HTMLElement {
   static get observedAttributes() {
     return ["icon", "color"];
@@ -18,9 +20,9 @@ class SvgIcon extends HTMLElement {
     useElement.setAttributeNS(
       "http://www.w3.org/1999/xlink",
       "xlink:href",
-      "#" + this.getAttribute("icon")
+      icons[this.getAttribute("icon")]
     );
-    useElement.setAttribute("href", "#" + this.getAttribute("icon"));
+    useElement.setAttribute("href", icons[this.getAttribute("icon")]);
     svgElement.appendChild(useElement);
     this.appendChild(svgElement);
   }
@@ -33,9 +35,9 @@ class SvgIcon extends HTMLElement {
           link.setAttributeNS(
             "http://www.w3.org/1999/xlink",
             "xlink:href",
-            "#" + newValue
+            icons[newValue]
           );
-          link.setAttribute("href", "#" + newValue);
+          link.setAttribute("href", icons[newValue]);
         }
         break;
       }
