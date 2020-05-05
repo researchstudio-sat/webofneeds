@@ -595,3 +595,21 @@ function getSocketKeysReset(socketsImm) {
     }
   });
 }
+
+/**
+ * Return all Active (non-closed) connections of the given atom
+ * @param atomImm immutable atom that stores connections
+ * @param socketType compactedSocketType Uri (senderSocket)
+ */
+export function getActiveConnectionsOfAtom(atomImm, socketType) {
+  const socketUri = getSocketUri(atomImm, socketType);
+
+  const connections = get(atomImm, "connections");
+
+  return (
+    connections &&
+    connections
+      .filter(conn => !connectionUtils.isClosed(conn))
+      .filter(conn => connectionUtils.hasSocketUri(conn, socketUri))
+  );
+}

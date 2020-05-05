@@ -55,28 +55,6 @@ export function getSuggestedConnectionsByAtomUri(state, atomUri) {
     : Immutable.Map();
 }
 
-export function getCategorizedSuggestedConnectionsByAtomUri(state, atomUri) {
-  const atoms = getAtoms(state);
-  const suggestedConnections = getSuggestedConnectionsByAtomUri(state, atomUri);
-  const categorizedConnections = {};
-
-  suggestedConnections.map(conn => {
-    const { senderSocketType, targetSocketType } = getSocketTypes(atoms, conn);
-
-    if (
-      categorizedConnections[senderSocketType] &&
-      categorizedConnections[senderSocketType][targetSocketType]
-    ) {
-      categorizedConnections[senderSocketType][targetSocketType].push(conn);
-    } else {
-      categorizedConnections[senderSocketType] = {};
-      categorizedConnections[senderSocketType][targetSocketType] = [conn];
-    }
-  });
-
-  return Immutable.fromJS(categorizedConnections);
-}
-
 /**
  * Returns all buddyConnections of an atom
  * @param state
@@ -347,15 +325,3 @@ export const getTargetSocketType = (allAtoms, connection) => {
     getIn(allAtoms, [targetAtomUri, "content", "sockets", targetSocketUri])
   );
 };
-/**
- * Retrieves the used sockets of the given connection
- * @param allAtoms
- * @param connection
- * @returns {{senderSocketType, targetSocketType}}
- */
-function getSocketTypes(allAtoms, connection) {
-  let senderSocketType = getSenderSocketType(allAtoms, connection);
-  let targetSocketType = getTargetSocketType(allAtoms, connection);
-
-  return { senderSocketType, targetSocketType };
-}
