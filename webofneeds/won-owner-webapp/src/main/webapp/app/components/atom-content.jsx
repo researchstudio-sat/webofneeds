@@ -12,7 +12,6 @@ import vocab from "../service/vocab.js";
 
 import WonAtomContentHolds from "./atom-content-holds.jsx";
 import WonAtomContentChats from "./atom-content-chats.jsx";
-import WonAtomContentSuggestions from "./atom-content-suggestions.jsx";
 import WonAtomContentBuddies from "./atom-content-buddies.jsx";
 import WonAtomContentParticipants from "./atom-content-participants.jsx";
 import WonAtomContentGeneral from "./atom-content-general.jsx";
@@ -228,11 +227,6 @@ class WonAtomContent extends React.Component {
         case vocab.CHAT.ChatSocketCompacted:
           visibleTabFragment = (
             <WonAtomContentChats atomUri={this.props.atomUri} />
-          );
-          break;
-        case "SUGGESTIONS":
-          visibleTabFragment = (
-            <WonAtomContentSuggestions atomUri={this.props.atomUri} />
           );
           break;
         case "RDF":

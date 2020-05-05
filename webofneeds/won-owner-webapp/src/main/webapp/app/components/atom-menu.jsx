@@ -167,26 +167,6 @@ class WonAtomMenu extends React.Component {
       </div>
     );
 
-    this.props.isOwned &&
-      this.props.hasChatSocket &&
-      buttons.push(
-        <div
-          key="suggestions"
-          className={this.generateAtomItemCssClasses(
-            this.isSelectedTab("SUGGESTIONS"),
-            !this.props.hasSuggestions,
-            this.props.hasUnreadSuggestions
-          )}
-          onClick={() => this.selectTab("SUGGESTIONS")}
-        >
-          <span className="atom-menu__item__unread" />
-          <span className="atom-menu__item__label">Suggestions</span>
-          <span className="atom-menu__item__count">
-            {"(" + this.props.suggestionsSize + ")"}
-          </span>
-        </div>
-      );
-
     // Add generic Tabs based on available Sockets
     this.props.socketTypeArray.map((socketType, index) => {
       let label = wonLabelUtils.labels.socketTabs[socketType] || socketType;
@@ -238,6 +218,23 @@ class WonAtomMenu extends React.Component {
           countLabel =
             this.props.hasReviews && "(" + this.props.reviewCount + ")";
           break;
+
+        default: {
+          const activeConnections = atomUtils.getActiveConnectionsOfAtom(
+            this.props.atom,
+            socketType
+          );
+
+          inactive = !activeConnections || activeConnections.size === 0;
+          countLabel =
+            activeConnections && activeConnections.size > 0
+              ? "(" + activeConnections.size + ")"
+              : undefined;
+          unread =
+            activeConnections &&
+            !!activeConnections.find(conn => connectionUtils.isUnread(conn));
+          break;
+        }
       }
 
       buttons.push(

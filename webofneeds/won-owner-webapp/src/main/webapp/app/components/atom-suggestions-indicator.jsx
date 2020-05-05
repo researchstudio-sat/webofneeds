@@ -12,6 +12,7 @@ import * as atomUtils from "../redux/utils/atom-utils.js";
 import "~/style/_atom-suggestions-indicator.scss";
 import ico36_match from "~/images/won-icons/ico36_match.svg";
 import { withRouter } from "react-router-dom";
+import vocab from "../service/vocab";
 
 const mapStateToProps = (state, ownProps) => {
   const atom = getIn(state, ["atoms", ownProps.atomUri]);
@@ -51,7 +52,10 @@ class WonAtomSuggestionsIndicator extends React.Component {
     this.showAtomSuggestions = this.showAtomSuggestions.bind(this);
   }
   showAtomSuggestions() {
-    this.props.selectAtomTab(this.props.atomUri, "SUGGESTIONS");
+    this.props.selectAtomTab(
+      this.props.atomUri,
+      vocab.CHAT.ChatSocketCompacted
+    ); //TODO: The suggestions indicator should link to the latest type of connection (since the atomTab SUGGESTIONS is not available any longer)
     this.props.history.push(
       generateLink(
         this.props.history.location,
