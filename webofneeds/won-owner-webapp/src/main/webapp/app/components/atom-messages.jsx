@@ -20,7 +20,6 @@ import vocab from "../service/vocab.js";
 
 import "~/style/_atom-messages.scss";
 import "~/style/_rdflink.scss";
-import ico36_close from "~/images/won-icons/ico36_close.svg";
 import ico36_backarrow from "~/images/won-icons/ico36_backarrow.svg";
 import rdf_logo_1 from "~/images/won-icons/rdf_logo_1.svg";
 import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
@@ -36,7 +35,7 @@ import WonConnectionMessage from "./messages/connection-message.jsx";
 import { actionCreators } from "../actions/actions.js";
 import * as ownerApi from "../api/owner-api.js";
 import Immutable from "immutable";
-import { Link, withRouter } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 
 const rdfTextfieldHelpText =
   "Expects valid turtle. " +
@@ -198,7 +197,6 @@ const mapStateToProps = (state, ownProps) => {
       !multiSelectType &&
       targetAtomUri
     ),
-    showOverlayConnection: !!ownProps.connectionUri,
   };
 };
 
@@ -368,36 +366,16 @@ class AtomMessages extends React.Component {
     );
 
     if (this.props.showChatData) {
-      const backButtonElement = this.props.showOverlayConnection ? (
-        <a
-          className="pm__header__back__button clickable"
-          onClick={this.props.history.goBack}
-        >
-          <svg className="pm__header__back__button__icon clickable hide-in-responsive">
-            <use xlinkHref={ico36_close} href={ico36_close} />
-          </svg>
-          <svg className="pm__header__back__button__icon clickable show-in-responsive">
-            <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
-          </svg>
-        </a>
-      ) : (
+      const backButtonElement = (
         <React.Fragment>
           <a
-            className="pm__header__back__button clickable show-in-responsive"
+            className="pm__header__back__button clickable"
             onClick={this.props.history.goBack}
           >
             <svg className="pm__header__back__button__icon">
               <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
             </svg>
           </a>
-          <Link
-            className="pm__header__back__button clickable hide-in-responsive"
-            to={location => location.pathname}
-          >
-            <svg className="pm__header__back__button__icon">
-              <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
-            </svg>
-          </Link>
         </React.Fragment>
       );
 
@@ -902,15 +880,11 @@ class AtomMessages extends React.Component {
       get(this.props.connection, "targetSocketUri"),
       message
     );
-    if (this.showOverlayConnection) {
-      this.props.history.goBack();
-    } else {
-      this.props.history.push(
-        generateLink(this.props.history.location, {
-          connectionUri: this.props.selectedConnectionUri,
-        })
-      );
-    }
+    this.props.history.push(
+      generateLink(this.props.history.location, {
+        connectionUri: this.props.selectedConnectionUri,
+      })
+    );
   }
 
   closeConnection(rateBad = false) {
@@ -921,16 +895,7 @@ class AtomMessages extends React.Component {
       );
     }
     this.props.closeConnection(get(this.props.connection, "uri"));
-
-    if (this.showOverlayConnection) {
-      this.props.history.goBack();
-    } else {
-      this.props.history.push(
-        generateLink(this.props.history.location, {
-          connectionUri: undefined,
-        })
-      );
-    }
+    this.props.history.goBack();
   }
 
   selectMessage(msgUri) {
@@ -1110,7 +1075,6 @@ AtomMessages.propTypes = {
   connectionOrAtomsLoading: PropTypes.bool,
   isConnectionLoading: PropTypes.bool,
   showPostContentMessage: PropTypes.bool,
-  showOverlayConnection: PropTypes.bool,
   setShowPetriNetData: PropTypes.func,
   setShowAgreementData: PropTypes.func,
   hideAddMessageContent: PropTypes.func,

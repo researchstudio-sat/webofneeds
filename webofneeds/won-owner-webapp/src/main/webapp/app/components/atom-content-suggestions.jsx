@@ -79,7 +79,12 @@ class WonAtomContentSuggestions extends React.Component {
       this.props.connectionMarkAsRead(connUri, this.props.atomUri);
     }
     this.props.history.push(
-      generateLink(this.props.history.location, { viewConnUri: connUri })
+      generateLink(
+        this.props.history.location,
+        { connectionUri: connUri },
+        "/connections",
+        false
+      )
     );
   }
 
@@ -122,7 +127,6 @@ class WonAtomContentSuggestions extends React.Component {
         this.props.history.location,
         {
           connectionUri: connUri,
-          viewConnUri: undefined,
         },
         "/connections"
       )

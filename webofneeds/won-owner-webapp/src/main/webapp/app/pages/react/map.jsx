@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { actionCreators } from "../../actions/actions.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
-import { get, getIn, getQueryParams } from "../../utils.js";
+import { get, getIn } from "../../utils.js";
 import * as processUtils from "../../redux/utils/process-utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as wonLabelUtils from "../../won-label-utils.js";
@@ -18,7 +18,6 @@ import {
 
 import WonTopnav from "../../components/topnav.jsx";
 import WonModalDialog from "../../components/modal-dialog.jsx";
-import WonAtomMessages from "../../components/atom-messages.jsx";
 import WonAtomMap from "../../components/atom-map.jsx";
 import WonMenu from "../../components/menu.jsx";
 import WonToasts from "../../components/toasts.jsx";
@@ -30,7 +29,6 @@ import WonTitlePicker from "../../components/details/picker/title-picker.jsx";
 import _ from "lodash";
 
 import "~/style/_map.scss";
-import "~/style/_connection-overlay.scss";
 import ico36_detail_location from "~/images/won-icons/ico36_detail_location.svg";
 import ico36_location_current from "~/images/won-icons/ico36_location_current.svg";
 import ico16_indicator_location from "~/images/won-icons/ico16_indicator_location.svg";
@@ -38,8 +36,6 @@ import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg"
 import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
-  const { viewConnUri } = getQueryParams(ownProps.history.location);
-
   const isLocationAccessDenied = generalSelectors.isLocationAccessDenied(state);
   const currentLocation = generalSelectors.getCurrentLocation(state);
 
@@ -132,8 +128,6 @@ const mapStateToProps = (state, ownProps) => {
       viewSelectors.hasSlideIns(state, ownProps.history) &&
       viewSelectors.isSlideInsVisible(state),
     showModalDialog: viewSelectors.showModalDialog(state),
-    showConnectionOverlay: !!viewConnUri,
-    viewConnUri,
   };
 };
 
@@ -186,11 +180,6 @@ class PageMap extends React.Component {
     return (
       <section className={!this.props.isLoggedIn ? "won-signed-out" : ""}>
         {this.props.showModalDialog && <WonModalDialog />}
-        {this.props.showConnectionOverlay && (
-          <div className="won-modal-connectionview">
-            <WonAtomMessages connectionUri={this.props.viewConnUri} />
-          </div>
-        )}
         <WonTopnav pageTitle="What's around" />
         {this.props.isLoggedIn && <WonMenu />}
         <WonToasts />
@@ -602,8 +591,6 @@ PageMap.propTypes = {
   isOwnerAtomUrisToLoad: PropTypes.bool,
   showSlideIns: PropTypes.bool,
   showModalDialog: PropTypes.bool,
-  showConnectionOverlay: PropTypes.bool,
-  viewConnUri: PropTypes.string,
   fetchWhatsAround: PropTypes.func,
   locationAccessDenied: PropTypes.func,
   updateCurrentLocation: PropTypes.func,

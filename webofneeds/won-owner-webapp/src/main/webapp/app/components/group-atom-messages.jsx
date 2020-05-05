@@ -25,7 +25,7 @@ import WonAtomContentMessage from "./messages/atom-content-message.jsx";
 import WonConnectionMessage from "./messages/connection-message.jsx";
 import { actionCreators } from "../actions/actions.js";
 import * as viewSelectors from "../redux/selectors/view-selectors";
-import { withRouter, Link } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 
 const rdfTextfieldHelpText =
   "Expects valid turtle. " +
@@ -214,25 +214,13 @@ class GroupAtomMessages extends React.Component {
       <div className="gpm__header">
         <div className="gpm__header__back">
           <a
-            className="gpm__header__back__button clickable show-in-responsive"
+            className="gpm__header__back__button clickable"
             onClick={this.props.history.goBack}
           >
             <svg className="gpm__header__back__button__icon">
               <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
             </svg>
           </a>
-          <Link
-            className="gpm__header__back__button clickable hide-in-responsive"
-            to={location =>
-              generateLink(location, {
-                connectionUri: undefined,
-              })
-            }
-          >
-            <svg className="gpm__header__back__button__icon">
-              <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
-            </svg>
-          </Link>
         </div>
         <WonConnectionHeader connectionUri={this.props.connectionUri} />
         <WonShareDropdown atomUri={this.props.targetAtomUri} />
