@@ -1,9 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { get, getIn } from "../utils.js";
+import { get } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
-import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import WonConnectionHeader from "./connection-header.jsx";
@@ -16,22 +15,17 @@ const mapStateToProps = (state, ownProps) => {
   const { connectionUri } = getQueryParams(ownProps.location);
   const openConnectionUri = connectionUri;
 
-  const ownedAtom = generalSelectors.getOwnedAtomByConnectionUri(
-    state,
-    ownProps.connectionUri
-  );
-  const connection = getIn(ownedAtom, ["connections", ownProps.connectionUri]);
-  const targetAtomUri = get(connection, "targetAtomUri");
+  const targetAtomUri = get(ownProps.connection, "targetAtomUri");
   const processState = get(state, "process");
   return {
-    connectionUri: ownProps.connectionUri,
+    connectionUri: get(ownProps.connection, "uri"),
     openConnectionUri: openConnectionUri,
-    lastUpdateTimestamp: get(connection, "lastUpdateDate"),
+    lastUpdateTimestamp: get(ownProps.connection, "lastUpdateDate"),
     targetAtomFailedToLoad: processUtils.hasAtomFailedToLoad(
       processState,
       targetAtomUri
     ),
-    isUnread: connectionUtils.isUnread(connection),
+    isUnread: connectionUtils.isUnread(ownProps.connection),
   };
 };
 
@@ -70,7 +64,7 @@ class WonConnectionSelectionItem extends React.Component {
         }
       >
         <WonConnectionHeader
-          connectionUri={this.props.connectionUri}
+          connection={this.props.connection}
           toLink={this.props.toLink}
         />
         {closeButton}
@@ -90,7 +84,8 @@ class WonConnectionSelectionItem extends React.Component {
 }
 
 WonConnectionSelectionItem.propTypes = {
-  connectionUri: PropTypes.string.isRequired,
+  connection: PropTypes.object.isRequired,
+  connectionUri: PropTypes.string,
   toLink: PropTypes.string,
   openConnectionUri: PropTypes.string,
   lastUpdateTimestamp: PropTypes.any,

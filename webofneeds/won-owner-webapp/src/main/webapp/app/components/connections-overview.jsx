@@ -65,15 +65,16 @@ const mapDispatchToProps = dispatch => {
 class WonConnectionsOverview extends React.Component {
   render() {
     const atomElements = this.props.sortedOpenAtomUris.map(atomUri => {
-      const connectionUris = this.getOpenChatConnectionUrisArraySorted(
+      const connections = this.getOpenChatConnectionArraySorted(
         atomUri,
         this.props.allAtoms,
         this.props.process
       );
 
       const connectionElements =
-        connectionUris &&
-        connectionUris.map(connUri => {
+        connections &&
+        connections.map(conn => {
+          const connUri = get(conn, "uri");
           return (
             <div
               className={
@@ -85,7 +86,7 @@ class WonConnectionsOverview extends React.Component {
               key={connUri}
             >
               <WonConnectionSelectionItem
-                connectionUri={connUri}
+                connection={conn}
                 toLink={generateLink(this.props.history.location, {
                   connectionUri: connUri,
                 })}
@@ -177,7 +178,7 @@ class WonConnectionsOverview extends React.Component {
     }
   }
 
-  getOpenChatConnectionUrisArraySorted(atomUri, allAtoms, process) {
+  getOpenChatConnectionArraySorted(atomUri, allAtoms, process) {
     const atom = get(allAtoms, atomUri);
 
     if (!atom) {
@@ -216,11 +217,7 @@ class WonConnectionsOverview extends React.Component {
       }),
       "creationDate"
     );
-    return (
-      sortedConnections && [
-        ...sortedConnections.flatMap(conn => conn.get("uri")),
-      ]
-    );
+    return sortedConnections || [];
   }
 }
 WonConnectionsOverview.propTypes = {

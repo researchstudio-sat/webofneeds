@@ -382,9 +382,7 @@ class AtomMessages extends React.Component {
       headerElement = (
         <div className="pm__header">
           <div className="pm__header__back">{backButtonElement}</div>
-          <WonConnectionHeader
-            connectionUri={this.props.selectedConnectionUri}
-          />
+          <WonConnectionHeader connection={this.props.connection} />
           <WonShareDropdown atomUri={this.props.targetAtomUri} />
           <WonConnectionContextDropdown
             showPetriNetDataField={this.showPetriNetDataField.bind(this)}
