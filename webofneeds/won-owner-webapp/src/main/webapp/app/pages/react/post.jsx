@@ -8,7 +8,6 @@ import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import * as processUtils from "../../redux/utils/process-utils.js";
 import WonModalDialog from "../../components/modal-dialog.jsx";
-import WonAtomMessages from "../../components/atom-messages.jsx";
 import WonAtomInfo from "../../components/atom-info.jsx";
 import WonTopnav from "../../components/topnav.jsx";
 import WonMenu from "../../components/menu.jsx";
@@ -17,13 +16,12 @@ import WonSlideIn from "../../components/slide-in.jsx";
 import WonFooter from "../../components/footer.jsx";
 
 import "~/style/_post.scss";
-import "~/style/_connection-overlay.scss";
 import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg";
 import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
-  const { viewConnUri, postUri } = getQueryParams(ownProps.location);
+  const { postUri } = getQueryParams(ownProps.location);
   const atomUri = postUri;
   const atom = getIn(state, ["atoms", atomUri]);
 
@@ -40,8 +38,6 @@ const mapStateToProps = (state, ownProps) => {
       viewSelectors.hasSlideIns(state, ownProps.history) &&
       viewSelectors.isSlideInsVisible(state),
     showModalDialog: viewSelectors.showModalDialog(state),
-    showConnectionOverlay: !!viewConnUri,
-    viewConnUri,
     atomLoading: !atom || processUtils.isAtomLoading(process, atomUri),
     atomToLoad: !atom || processUtils.isAtomToLoad(process, atomUri),
     atomFailedToLoad:
@@ -67,11 +63,6 @@ class PagePost extends React.Component {
     return (
       <section className={!this.props.isLoggedIn ? "won-signed-out" : ""}>
         {this.props.showModalDialog && <WonModalDialog />}
-        {this.props.showConnectionOverlay && (
-          <div className="won-modal-connectionview">
-            <WonAtomMessages connectionUri={this.props.viewConnUri} />
-          </div>
-        )}
         <WonTopnav pageTitle={this.props.atomTitle} />
         {this.props.isLoggedIn && <WonMenu />}
         <WonToasts />
@@ -156,8 +147,6 @@ PagePost.propTypes = {
   atomTitle: PropTypes.string,
   showSlideIns: PropTypes.bool,
   showModalDialog: PropTypes.bool,
-  showConnectionOverlay: PropTypes.bool,
-  viewConnUri: PropTypes.string,
   atomLoading: PropTypes.bool,
   atomToLoad: PropTypes.bool,
   atomFailedToLoad: PropTypes.bool,

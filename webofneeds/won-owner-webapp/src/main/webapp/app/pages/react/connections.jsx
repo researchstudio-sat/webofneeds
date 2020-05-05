@@ -19,12 +19,11 @@ import WonConnectionsOverview from "../../components/connections-overview.jsx";
 
 import "~/style/_connections.scss";
 import "~/style/_responsiveness-utils.scss";
-import "~/style/_connection-overlay.scss";
 import ico36_message from "~/images/won-icons/ico36_message.svg";
 import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
-  const { viewConnUri, connectionUri } = getQueryParams(ownProps.location);
+  const { connectionUri } = getQueryParams(ownProps.location);
 
   const selectedConnectionUri = connectionUri;
 
@@ -72,8 +71,6 @@ const mapStateToProps = (state, ownProps) => {
     showSlideIns:
       viewSelectors.hasSlideIns(state, ownProps.history) &&
       viewSelectors.isSlideInsVisible(state),
-    showConnectionOverlay: !!viewConnUri,
-    viewConnUri,
     hideListSideInResponsive: !hasChatAtoms || !!selectedConnection,
     hideNoSelectionInResponsive: hasChatAtoms,
     hideFooterInResponsive: !!selectedConnection,
@@ -85,11 +82,6 @@ class PageConnections extends React.Component {
     return (
       <section className={!this.props.isLoggedIn ? "won-signed-out" : ""}>
         {this.props.showModalDialog && <WonModalDialog />}
-        {this.props.showConnectionOverlay && (
-          <div className="won-modal-connectionview">
-            <WonAtomMessages connectionUri={this.props.viewConnUri} />
-          </div>
-        )}
         <WonTopnav pageTitle="Chats" />
         {this.props.isLoggedIn && <WonMenu />}
         <WonToasts />
@@ -168,8 +160,6 @@ PageConnections.propTypes = {
   showPostMessages: PropTypes.bool,
   showGroupPostMessages: PropTypes.bool,
   showSlideIns: PropTypes.bool,
-  showConnectionOverlay: PropTypes.bool,
-  viewConnUri: PropTypes.string,
   hideListSideInResponsive: PropTypes.bool,
   hideNoSelectionInResponsive: PropTypes.bool,
   hideFooterInResponsive: PropTypes.bool,

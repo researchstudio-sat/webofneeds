@@ -168,15 +168,15 @@ ReactDOM.render(
   document.getElementById("root")
 );
 
-/*<Route exact path="/"><PageInventory />:viewConnUri:token:privateId}
+/*<Route exact path="/"><PageInventory />:token:privateId}
 
 <Route path="/create"><PageCreate />:useCase:useCaseGroup:fromAtomUri:mode:holderUri:senderSocketType:targetSocketType
 <Route path="/signup"><PageSignUp />
 <Route path="/about"><PageAbout />:aboutSection
-<Route path="/map"><PageMap />:viewConnUri
-<Route path="/inventory"><PageInventory />:viewConnUri:token:privateId
-<Route path="/connections"><PageConnections />:connectionUri:viewConnUri
-<Route path="/overview"><PageOverview />:viewConnUri
-<Route path="/post"><PagePost />:postUri:viewConnUri
+<Route path="/map"><PageMap />
+<Route path="/inventory"><PageInventory />:token:privateId
+<Route path="/connections"><PageConnections />:connectionUri
+<Route path="/overview"><PageOverview />
+<Route path="/post"><PagePost />:postUri
 <Route path="/settings"><PageSettings />
 */

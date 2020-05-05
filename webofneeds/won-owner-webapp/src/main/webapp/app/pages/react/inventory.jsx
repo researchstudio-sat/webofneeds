@@ -3,14 +3,13 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { actionCreators } from "../../actions/actions.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
-import { get, getIn, sortByDate, getQueryParams } from "../../utils.js";
+import { get, getIn, sortByDate } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import * as processUtils from "../../redux/utils/process-utils.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import * as viewUtils from "../../redux/utils/view-utils.js";
 import WonModalDialog from "../../components/modal-dialog.jsx";
-import WonAtomMessages from "../../components/atom-messages.jsx";
 import WonAtomInfo from "../../components/atom-info.jsx";
 import WonTopnav from "../../components/topnav.jsx";
 import WonMenu from "../../components/menu.jsx";
@@ -24,13 +23,10 @@ import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 
 import "~/style/_inventory.scss";
-import "~/style/_connection-overlay.scss";
 import { withRouter } from "react-router-dom";
 import vocab from "../../service/vocab.js";
 
 const mapStateToProps = (state, ownProps) => {
-  const { viewConnUri } = getQueryParams(ownProps.location);
-
   const ownedActivePersonas = generalSelectors
     .getOwnedPersonas(state)
     .filter(atom => atomUtils.isActive(atom));
@@ -102,8 +98,6 @@ const mapStateToProps = (state, ownProps) => {
       viewSelectors.hasSlideIns(state, ownProps.history) &&
       viewSelectors.isSlideInsVisible(state),
     showModalDialog: viewSelectors.showModalDialog(state),
-    showConnectionOverlay: !!viewConnUri,
-    viewConnUri,
     showClosedAtoms: viewUtils.showClosedAtoms(viewState),
   };
 };
@@ -129,11 +123,6 @@ class PageInventory extends React.Component {
     return (
       <section className={!this.props.isLoggedIn ? "won-signed-out" : ""}>
         {this.props.showModalDialog && <WonModalDialog />}
-        {this.props.showConnectionOverlay && (
-          <div className="won-modal-connectionview">
-            <WonAtomMessages connectionUri={this.props.viewConnUri} />
-          </div>
-        )}
         <WonTopnav pageTitle="Inventory" />
         {this.props.isLoggedIn && <WonMenu />}
         <WonToasts />
@@ -254,8 +243,6 @@ PageInventory.propTypes = {
   sortedOwnedActivePersonaUriArray: PropTypes.arrayOf(PropTypes.string),
   showSlideIns: PropTypes.bool,
   showModalDialog: PropTypes.bool,
-  showConnectionOverlay: PropTypes.bool,
-  viewConnUri: PropTypes.string,
   showClosedAtoms: PropTypes.bool,
   toggleClosedAtoms: PropTypes.func,
   history: PropTypes.object,

@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { actionCreators } from "../../actions/actions.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
-import { get, getIn, sortByDate, getQueryParams } from "../../utils.js";
+import { get, getIn, sortByDate } from "../../utils.js";
 import * as processSelectors from "../../redux/selectors/process-selectors.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as useCaseUtils from "../../usecase-utils.js";
@@ -13,7 +13,6 @@ import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 
 import WonTopnav from "../../components/topnav.jsx";
 import WonModalDialog from "../../components/modal-dialog.jsx";
-import WonAtomMessages from "../../components/atom-messages.jsx";
 import WonMenu from "../../components/menu.jsx";
 import WonToasts from "../../components/toasts.jsx";
 import WonSlideIn from "../../components/slide-in.jsx";
@@ -21,13 +20,10 @@ import WonAtomCardGrid from "../../components/atom-card-grid";
 import WonFooter from "../../components/footer";
 
 import "~/style/_overview.scss";
-import "~/style/_connection-overlay.scss";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
-  const { viewConnUri } = getQueryParams(ownProps.location);
-
   const debugModeEnabled = viewSelectors.isDebugModeEnabled(state);
 
   const whatsNewAtoms = generalSelectors
@@ -90,8 +86,6 @@ const mapStateToProps = (state, ownProps) => {
       viewSelectors.hasSlideIns(state, ownProps.history) &&
       viewSelectors.isSlideInsVisible(state),
     showModalDialog: viewSelectors.showModalDialog(state),
-    showConnectionOverlay: !!viewConnUri,
-    viewConnUri,
   };
 };
 
@@ -116,11 +110,6 @@ class PageOverview extends React.Component {
     return (
       <section className={!this.props.isLoggedIn ? "won-signed-out" : ""}>
         {this.props.showModalDialog && <WonModalDialog />}
-        {this.props.showConnectionOverlay && (
-          <div className="won-modal-connectionview">
-            <WonAtomMessages connectionUri={this.props.viewConnUri} />
-          </div>
-        )}
         <WonTopnav pageTitle="What's New" />
         {this.props.isLoggedIn && <WonMenu />}
         <WonToasts />
@@ -359,8 +348,6 @@ PageOverview.propTypes = {
   isOwnerAtomUrisToLoad: PropTypes.bool,
   showSlideIns: PropTypes.bool,
   showModalDialog: PropTypes.bool,
-  showConnectionOverlay: PropTypes.bool,
-  viewConnUri: PropTypes.string,
   fetchWhatsNew: PropTypes.func,
 };
 
