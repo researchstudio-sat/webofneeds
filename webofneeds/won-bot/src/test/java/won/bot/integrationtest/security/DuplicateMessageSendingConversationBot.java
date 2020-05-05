@@ -15,7 +15,7 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.impl.MultipleActions;
 import won.bot.framework.eventbot.action.impl.PublishEventAction;
-import won.bot.framework.eventbot.action.impl.atomlifecycle.CreateAtomWithSocketsAction;
+import won.bot.framework.eventbot.action.impl.atomlifecycle.CreateAtomAction;
 import won.bot.framework.eventbot.action.impl.atomlifecycle.DeactivateAllAtomsAction;
 import won.bot.framework.eventbot.action.impl.lifecycle.SignalWorkDoneAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.CloseConnectionAction;
@@ -65,9 +65,7 @@ public class DuplicateMessageSendingConversationBot extends IntegrationtestBot {
             }
         }));
         // create atoms every trigger execution until 2 atoms are created
-        bus.subscribe(ActEvent.class, new ActionOnEventListener(ctx,
-                        new CreateAtomWithSocketsAction(ctx, getBotContextWrapper().getAtomCreateListName()),
-                        NO_OF_ATOMS));
+        bus.subscribe(ActEvent.class, new ActionOnEventListener(ctx, new CreateAtomAction(ctx), NO_OF_ATOMS));
         // connect atoms
         bus.subscribe(AtomCreatedEvent.class, new ActionOnceAfterNEventsListener(ctx, "atomConnector", NO_OF_ATOMS * 2,
                         new ConnectFromListToListAction(ctx, getBotContextWrapper().getAtomCreateListName(),
