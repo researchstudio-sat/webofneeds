@@ -78,13 +78,17 @@ class WonConnectionsOverview extends React.Component {
             <div
               className={
                 "co__item__connections__item " +
-                (this.isConnectionUnread(atomUri, connUri) && " won-unread ")
+                (this.isConnectionUnread(atomUri, connUri)
+                  ? " won-unread "
+                  : "")
               }
               key={connUri}
             >
               <WonConnectionSelectionItem
                 connectionUri={connUri}
-                onClick={() => this.selectConnection(connUri)}
+                toLink={generateLink(this.props.history.location, {
+                  connectionUri: connUri,
+                })}
               />
             </div>
           );

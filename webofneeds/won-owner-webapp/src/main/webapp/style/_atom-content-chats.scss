@@ -1,0 +1,9 @@
+@import "won-config";
+
+won-atom-content-chats {
+  & > .acc__empty {
+    color: $won-line-gray;
+    text-align: center;
+    font-weight: 300;
+  }
+}

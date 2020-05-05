@@ -2,6 +2,7 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
+import { Link } from "react-router-dom";
 import WonAtomIcon from "./atom-icon.jsx";
 import WonGroupIcon from "./group-icon.jsx";
 import WonConnectionState from "./connection-state.jsx";
@@ -97,7 +98,6 @@ const mapStateToProps = (state, ownProps) => {
 
   return {
     connectionUri: ownProps.connectionUri,
-    onClick: ownProps.onClick,
     connection,
     groupMembersArray: groupMembers && groupMembers.toArray(),
     groupMembersSize: groupMembers ? groupMembers.size : 0,
@@ -190,20 +190,18 @@ class WonConnectionHeader extends React.Component {
         </won-connection-header>
       );
     } else {
-      const headerIcon = this.props.isConnectionToGroup ? (
-        <div
-          className="ch__icon"
-          onClick={this.props.onClick ? () => this.props.onClick() : undefined}
-        >
-          <WonGroupIcon connectionUri={this.props.connectionUri} />
-        </div>
+      const headerIconElement = this.props.isConnectionToGroup ? (
+        <WonGroupIcon connectionUri={this.props.connectionUri} />
       ) : (
-        <div
-          className="ch__icon"
-          onClick={this.props.onClick ? () => this.props.onClick() : undefined}
-        >
-          <WonAtomIcon atomUri={get(this.props.targetAtom, "uri")} />
-        </div>
+        <WonAtomIcon atomUri={get(this.props.targetAtom, "uri")} />
+      );
+
+      const headerIcon = this.props.toLink ? (
+        <Link className="ch__icon" to={this.props.toLink}>
+          {headerIconElement}
+        </Link>
+      ) : (
+        <div className="ch__icon">{headerIconElement}</div>
       );
 
       let headerRightContent;
@@ -364,16 +362,15 @@ class WonConnectionHeader extends React.Component {
         );
 
       return (
-        <won-connection-header class={this.props.onClick ? "clickable" : ""}>
+        <won-connection-header class={this.props.toLink ? "clickable" : ""}>
           {headerIcon}
-          <div
-            className="ch__right"
-            onClick={
-              this.props.onClick ? () => this.props.onClick() : undefined
-            }
-          >
-            {headerRightContent}
-          </div>
+          {this.props.toLink ? (
+            <Link className="ch__right" to={this.props.toLink}>
+              {headerRightContent}
+            </Link>
+          ) : (
+            <div className="ch__right">{headerRightContent}</div>
+          )}
           {incomingRequestsIcon}
         </won-connection-header>
       );
@@ -411,7 +408,7 @@ class WonConnectionHeader extends React.Component {
 }
 WonConnectionHeader.propTypes = {
   connectionUri: PropTypes.string.isRequired,
-  onClick: PropTypes.func,
+  toLink: PropTypes.string,
   selectTab: PropTypes.func,
   connection: PropTypes.object,
   groupMembersArray: PropTypes.arrayOf(PropTypes.object),

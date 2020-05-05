@@ -25,7 +25,6 @@ const mapStateToProps = (state, ownProps) => {
   const processState = get(state, "process");
   return {
     connectionUri: ownProps.connectionUri,
-    onClick: ownProps.onClick,
     openConnectionUri: openConnectionUri,
     lastUpdateTimestamp: get(connection, "lastUpdateDate"),
     targetAtomFailedToLoad: processUtils.hasAtomFailedToLoad(
@@ -72,7 +71,7 @@ class WonConnectionSelectionItem extends React.Component {
       >
         <WonConnectionHeader
           connectionUri={this.props.connectionUri}
-          onClick={this.props.onClick}
+          toLink={this.props.toLink}
         />
         {closeButton}
       </won-connection-selection-item>
@@ -92,7 +91,7 @@ class WonConnectionSelectionItem extends React.Component {
 
 WonConnectionSelectionItem.propTypes = {
   connectionUri: PropTypes.string.isRequired,
-  onClick: PropTypes.func,
+  toLink: PropTypes.string,
   openConnectionUri: PropTypes.string,
   lastUpdateTimestamp: PropTypes.any,
   targetAtomFailedToLoad: PropTypes.bool,
