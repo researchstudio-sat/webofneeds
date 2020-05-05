@@ -11,6 +11,7 @@ import * as viewUtils from "../redux/utils/view-utils.js";
 import vocab from "../service/vocab.js";
 
 import WonAtomContentHolds from "./atom-content-holds.jsx";
+import WonAtomContentChats from "./atom-content-chats.jsx";
 import WonAtomContentSuggestions from "./atom-content-suggestions.jsx";
 import WonAtomContentBuddies from "./atom-content-buddies.jsx";
 import WonAtomContentParticipants from "./atom-content-participants.jsx";
@@ -222,6 +223,11 @@ class WonAtomContent extends React.Component {
         case vocab.HOLD.HolderSocketCompacted:
           visibleTabFragment = (
             <WonAtomContentHolds atomUri={this.props.atomUri} />
+          );
+          break;
+        case vocab.CHAT.ChatSocketCompacted:
+          visibleTabFragment = (
+            <WonAtomContentChats atomUri={this.props.atomUri} />
           );
           break;
         case "SUGGESTIONS":

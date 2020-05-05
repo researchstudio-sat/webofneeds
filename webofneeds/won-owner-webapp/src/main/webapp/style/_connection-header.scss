@@ -65,6 +65,7 @@ won-connection-header {
     &__topline {
       grid-area: topline;
       min-width: 0;
+      color: $won-primary-text-color;
 
       &__notitle,
       &__title {
