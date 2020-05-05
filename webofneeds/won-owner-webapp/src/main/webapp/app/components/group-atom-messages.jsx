@@ -222,7 +222,7 @@ class GroupAtomMessages extends React.Component {
             </svg>
           </a>
         </div>
-        <WonConnectionHeader connectionUri={this.props.connectionUri} />
+        <WonConnectionHeader connection={this.props.connection} />
         <WonShareDropdown atomUri={this.props.targetAtomUri} />
         <WonConnectionContextDropdown />
       </div>

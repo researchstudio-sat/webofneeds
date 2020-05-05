@@ -28,12 +28,12 @@ export default function AtomContentChats({ atomUri }) {
             <div
               key={connUri + "-" + index}
               className={
-                "co__item__connections__item " +
+                "acc__item " +
                 (connectionUtils.isUnread(conn) ? " won-unread " : "")
               }
             >
               <WonConnectionSelectionItem
-                connectionUri={connUri}
+                connection={conn}
                 toLink={generateLink(
                   history.location,
                   {

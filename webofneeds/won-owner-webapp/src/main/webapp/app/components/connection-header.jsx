@@ -30,20 +30,22 @@ import ico36_incoming from "~/images/won-icons/ico36_incoming.svg";
 import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
+  const connection = ownProps.connection;
+  const connectionUri = get(connection, "uri");
   const ownedAtom = generalSelectors.getOwnedAtomByConnectionUri(
     state,
-    ownProps.connectionUri
+    connectionUri
   );
-  const connection = getIn(ownedAtom, ["connections", ownProps.connectionUri]);
+
   const targetAtomUri = get(connection, "targetAtomUri");
   const targetAtom = get(generalSelectors.getAtoms(state), targetAtomUri);
   const allMessages = messageSelectors.getMessagesByConnectionUri(
     state,
-    ownProps.connectionUri
+    connectionUri
   );
   const unreadMessages = messageSelectors.getUnreadMessagesByConnectionUri(
     state,
-    ownProps.connectionUri
+    connectionUri
   );
 
   const sortedMessages = allMessages && allMessages.toArray();
@@ -97,7 +99,7 @@ const mapStateToProps = (state, ownProps) => {
   );
 
   return {
-    connectionUri: ownProps.connectionUri,
+    connectionUri,
     connection,
     groupMembersArray: groupMembers && groupMembers.toArray(),
     groupMembersSize: groupMembers ? groupMembers.size : 0,
@@ -323,9 +325,7 @@ class WonConnectionHeader extends React.Component {
               <span className="ch__right__subtitle__type">
                 {personaName}
                 {groupChatLabel}
-                <WonConnectionState
-                  connectionUri={get(this.props.connection, "uri")}
-                />
+                <WonConnectionState connectionUri={this.props.connectionUri} />
                 {unreadCount}
                 {messageOrState}
               </span>
@@ -407,10 +407,10 @@ class WonConnectionHeader extends React.Component {
   }
 }
 WonConnectionHeader.propTypes = {
-  connectionUri: PropTypes.string.isRequired,
+  connection: PropTypes.object.isRequired,
+  connectionUri: PropTypes.string,
   toLink: PropTypes.string,
   selectTab: PropTypes.func,
-  connection: PropTypes.object,
   groupMembersArray: PropTypes.arrayOf(PropTypes.object),
   groupMembersSize: PropTypes.number,
   ownedAtom: PropTypes.object,
