@@ -65,16 +65,6 @@ export function parseMessage(
         wonMessage.getSenderSocket()
       ),
       messageType: wonMessage.getMessageType(),
-      messageStatus: {
-        isProposed: false,
-        isClaimed: false,
-        isRetracted: false,
-        isRejected: false,
-        isAccepted: false,
-        isAgreed: false,
-        isCancellationPending: false,
-        isCancelled: false,
-      },
       viewState: {
         isSelected: false,
         isCollapsed: false,

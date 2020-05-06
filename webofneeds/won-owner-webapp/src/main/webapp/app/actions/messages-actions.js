@@ -367,7 +367,7 @@ function processMessageEffectsAndMessage(
                 : [effect.acceptedMessageUri];
               acceptedMessageUris.forEach(acceptedMessageUri => {
                 dispatch({
-                  type: actionTypes.messages.messageStatus.markAsAccepted,
+                  type: actionTypes.connections.agreementData.markAsAccepted,
                   payload: {
                     messageUri: acceptedMessageUri,
                     connectionUri: connectionUri,
@@ -386,7 +386,7 @@ function processMessageEffectsAndMessage(
 
               claimedMessageUris.forEach(claimedMessageUri => {
                 dispatch({
-                  type: actionTypes.messages.messageStatus.markAsClaimed,
+                  type: actionTypes.connections.agreementData.markAsClaimed,
                   payload: {
                     messageUri: claimedMessageUri,
                     connectionUri: connectionUri,
@@ -406,7 +406,7 @@ function processMessageEffectsAndMessage(
 
               proposedMessageUris.forEach(proposedMessageUri => {
                 dispatch({
-                  type: actionTypes.messages.messageStatus.markAsProposed,
+                  type: actionTypes.connections.agreementData.markAsProposed,
                   payload: {
                     messageUri: proposedMessageUri,
                     connectionUri: connectionUri,
@@ -425,7 +425,7 @@ function processMessageEffectsAndMessage(
               proposesToCancelUris.forEach(proposesToCancelURI => {
                 dispatch({
                   type:
-                    actionTypes.messages.messageStatus
+                    actionTypes.connections.agreementData
                       .markAsCancellationPending,
                   payload: {
                     messageUri: proposesToCancelURI,
@@ -446,7 +446,7 @@ function processMessageEffectsAndMessage(
 
               rejectedMessageUris.forEach(rejectedMessageUri => {
                 dispatch({
-                  type: actionTypes.messages.messageStatus.markAsRejected,
+                  type: actionTypes.connections.agreementData.markAsRejected,
                   payload: {
                     messageUri: rejectedMessageUri,
                     connectionUri: connectionUri,
@@ -468,7 +468,7 @@ function processMessageEffectsAndMessage(
 
               retractedMessageUris.forEach(retractedMessageUri => {
                 dispatch({
-                  type: actionTypes.messages.messageStatus.markAsRetracted,
+                  type: actionTypes.connections.agreementData.markAsRetracted,
                   payload: {
                     messageUri: retractedMessageUri,
                     connectionUri: connectionUri,
@@ -756,22 +756,6 @@ export function processConnectMessage(wonMessage) {
   };
 }
 
-export function markAsRetracted(event) {
-  return dispatch => {
-    const payload = {
-      messageUri: event.messageUri,
-      connectionUri: event.connectionUri,
-      atomUri: event.atomUri,
-      retracted: event.retracted,
-    };
-
-    dispatch({
-      type: actionTypes.messages.messageStatus.markAsRetracted,
-      payload: payload,
-    });
-  };
-}
-
 export function updateMessageStatus(event) {
   return dispatch => {
     const payload = {
@@ -783,118 +767,6 @@ export function updateMessageStatus(event) {
 
     dispatch({
       type: actionTypes.messages.updateMessageStatus,
-      payload: payload,
-    });
-  };
-}
-
-export function markAsRejected(event) {
-  return dispatch => {
-    const payload = {
-      messageUri: event.messageUri,
-      connectionUri: event.connectionUri,
-      atomUri: event.atomUri,
-      rejected: event.rejected,
-    };
-
-    dispatch({
-      type: actionTypes.messages.messageStatus.markAsRejected,
-      payload: payload,
-    });
-  };
-}
-
-export function markAsProposed(event) {
-  return dispatch => {
-    const payload = {
-      messageUri: event.messageUri,
-      connectionUri: event.connectionUri,
-      atomUri: event.atomUri,
-      proposed: event.proposed,
-    };
-
-    dispatch({
-      type: actionTypes.messages.messageStatus.markAsProposed,
-      payload: payload,
-    });
-  };
-}
-
-export function markAsClaimed(event) {
-  return dispatch => {
-    const payload = {
-      messageUri: event.messageUri,
-      connectionUri: event.connectionUri,
-      atomUri: event.atomUri,
-      claimed: event.claimed,
-    };
-
-    dispatch({
-      type: actionTypes.messages.messageStatus.markAsClaimed,
-      payload: payload,
-    });
-  };
-}
-
-export function markAsAccepted(event) {
-  return dispatch => {
-    const payload = {
-      messageUri: event.messageUri,
-      connectionUri: event.connectionUri,
-      atomUri: event.atomUri,
-      accepted: event.accepted,
-    };
-
-    dispatch({
-      type: actionTypes.messages.messageStatus.markAsAccepted,
-      payload: payload,
-    });
-  };
-}
-
-export function markAsAgreed(event) {
-  return dispatch => {
-    const payload = {
-      messageUri: event.messageUri,
-      connectionUri: event.connectionUri,
-      atomUri: event.atomUri,
-      agreed: event.agreed,
-    };
-
-    dispatch({
-      type: actionTypes.messages.messageStatus.markAsAgreed,
-      payload: payload,
-    });
-  };
-}
-
-export function markAsCancelled(event) {
-  return dispatch => {
-    const payload = {
-      messageUri: event.messageUri,
-      connectionUri: event.connectionUri,
-      atomUri: event.atomUri,
-      cancelled: event.cancelled,
-    };
-
-    dispatch({
-      type: actionTypes.messages.messageStatus.markAsCancelled,
-      payload: payload,
-    });
-  };
-}
-
-export function markAsCancellationPending(event) {
-  return dispatch => {
-    const payload = {
-      messageUri: event.messageUri,
-      connectionUri: event.connectionUri,
-      atomUri: event.atomUri,
-      cancellationPending: event.cancellationPending,
-    };
-
-    dispatch({
-      type: actionTypes.messages.messageStatus.markAsCancellationPending,
       payload: payload,
     });
   };

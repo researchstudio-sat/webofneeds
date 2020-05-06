@@ -1205,7 +1205,6 @@ export function markMessageAsCancellationPending(
  * @param messageUri
  * @param connectionUri
  * @param atomUri
- * @param messageStatus
  * @returns {*}
  *
  */
