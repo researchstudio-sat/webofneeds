@@ -29,10 +29,12 @@ won-connections-overview {
         min-width: 0;
 
         & > won-atom-header,
+        & > a.won-atom-header,
         & > won-connection-indicators {
           max-height: 2.5rem;
         }
 
+        & > a.won-atom-header,
         & > won-atom-header {
           padding-right: 0.5rem;
         }

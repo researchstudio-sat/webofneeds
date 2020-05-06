@@ -3,6 +3,7 @@
 @import "square-image";
 @import "animate";
 
+a.won-atom-header,
 won-atom-header {
   &.won-is-loading {
     @include animateOpacityHeartBeat();
@@ -49,6 +50,7 @@ won-atom-header {
     min-width: 0;
 
     &__topline {
+      color: $won-primary-text-color;
       grid-area: topline;
       min-width: 0;
 

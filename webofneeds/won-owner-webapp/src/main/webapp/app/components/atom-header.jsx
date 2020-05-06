@@ -2,6 +2,7 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
+import { Link } from "react-router-dom";
 import { get, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { relativeTime } from "../won-label-utils.js";
@@ -34,6 +35,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     atomUri: ownProps.atomUri,
     onClick: ownProps.onClick,
+    toLink: ownProps.toLink,
     responseToAtom,
     atom,
     atomTypeLabel: atom && atomUtils.generateTypeLabel(atom),
@@ -174,9 +176,31 @@ class WonAtomHeader extends React.Component {
       );
     }
 
-    return (
+    return this.props.toLink ? (
+      <Link
+        className={
+          "won-atom-header " +
+          (this.props.atomLoading ? " won-is-loading " : "") +
+          (this.props.atomToLoad ? " won-to-load " : "") +
+          (this.props.className ? " " + this.props.className + " " : "")
+        }
+        to={this.props.toLink}
+      >
+        {atomHeaderIcon}
+        <VisibilitySensor
+          onChange={isVisible => {
+            this.onChange(isVisible);
+          }}
+          intervalDelay={200}
+          partialVisibility={true}
+          offset={{ top: -300, bottom: -300 }}
+        >
+          {atomHeaderContent}
+        </VisibilitySensor>
+      </Link>
+    ) : (
       <won-atom-header
-        class={
+        className={
           (this.props.atomLoading ? " won-is-loading " : "") +
           (this.props.atomToLoad ? " won-to-load " : "") +
           (this.props.onClick ? " clickable " : "") +
@@ -236,6 +260,7 @@ WonAtomHeader.propTypes = {
   atomUri: PropTypes.string.isRequired,
   hideTimestamp: PropTypes.bool,
   onClick: PropTypes.func,
+  toLink: PropTypes.string,
   fetchAtom: PropTypes.func,
   responseToAtom: PropTypes.object,
   atom: PropTypes.object,

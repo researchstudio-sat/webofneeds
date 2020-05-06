@@ -237,17 +237,13 @@ class WonAtomContentParticipants extends React.Component {
                     className={headerClassName}
                     actionButtons={actionButtons}
                     atomUri={get(conn, "targetAtomUri")}
-                    onClick={() =>
-                      this.props.history.push(
-                        generateLink(
-                          this.props.history.location,
-                          {
-                            postUri: get(conn, "targetAtomUri"),
-                          },
-                          "/post"
-                        )
-                      )
-                    }
+                    toLink={generateLink(
+                      this.props.history.location,
+                      {
+                        postUri: get(conn, "targetAtomUri"),
+                      },
+                      "/post"
+                    )}
                   />
                 </div>
               </VisibilitySensor>
@@ -294,17 +290,13 @@ class WonAtomContentParticipants extends React.Component {
             <div className="acp__participant" key={memberUri}>
               <WonAtomContextSwipeableView
                 atomUri={memberUri}
-                onClick={() =>
-                  this.props.history.push(
-                    generateLink(
-                      this.props.history.location,
-                      {
-                        postUri: memberUri,
-                      },
-                      "/post"
-                    )
-                  )
-                }
+                toLink={generateLink(
+                  this.props.history.location,
+                  {
+                    postUri: memberUri,
+                  },
+                  "/post"
+                )}
               />
             </div>
           );
