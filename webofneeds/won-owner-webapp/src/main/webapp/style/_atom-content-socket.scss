@@ -1,0 +1,123 @@
+@import "won-config";
+@import "sizing-utils";
+@import "animate";
+
+won-atom-content-socket {
+  .acs__segment {
+    &__header {
+      display: grid;
+      grid-template-columns: min-content 1fr min-content;
+      grid-template-areas: "ouch_icon ouch_title ouch_carret";
+      border-bottom: $thinGrayBorder;
+      padding: 0.5rem;
+      @media (min-width: $maxContentWidth) {
+        padding-right: 0;
+      }
+      align-items: center;
+
+      &__icon {
+        grid-area: ouch_icon;
+        margin-right: 0.5rem;
+        @include fixed-square($iconSize);
+        --local-primary: #{$won-primary-text-color};
+      }
+
+      &__title {
+        grid-area: ouch_title;
+        margin-right: 0.5rem;
+        font-size: $normalFontSize;
+        font-weight: 300;
+        &__count {
+          display: inline-block;
+          margin-left: 0.25rem;
+        }
+      }
+
+      &__carret {
+        grid-area: ouch_carret;
+        @include fixed-square(1.5rem);
+        --local-primary: black;
+        cursor: pointer;
+
+        &:hover {
+          --local-primary: #{$won-primary-color};
+        }
+
+        &--expanded {
+          transform: rotate(-180deg);
+          transition: all linear 0.2s;
+        }
+
+        &--collapsed {
+          transition: all linear 0.2s;
+        }
+      }
+    }
+
+    &__content {
+      display: grid;
+      grid-gap: 1rem;
+
+      grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+
+      .acs__item {
+        border: $thinGrayBorder;
+        background: $won-light-gray;
+
+        a.won-atom-header,
+        won-atom-header {
+          padding: 0.5rem;
+
+          &.status--sent {
+            opacity: 0.25;
+          }
+
+          &.status--closed {
+            //TODO: Filter grayscale or something
+          }
+
+          &.status--suggested,
+          &.status--received {
+            @include animateOpacityHeartBeat();
+          }
+        }
+
+        &.won-unread {
+          border-color: $won-unread-attention;
+          /*box-shadow: 0px 0px 5px 5px var(--won-primary-color);*/
+        }
+
+        &__actions {
+          display: grid;
+          grid-auto-flow: column;
+          grid-gap: 0.5rem;
+          padding: 0.5rem;
+          height: 100%;
+          box-sizing: border-box;
+
+          &__button.won-button--filled.red,
+          &__button.won-button--outlined.red.thin {
+            font-size: $smallFontSize;
+            padding: 0.5rem;
+          }
+
+          &__icon.won-icon.primary,
+          &__icon.won-icon.secondary,
+          &__icon.won-icon.disabled,
+          &__icon.won-icon.request {
+            display: flex;
+            align-self: center;
+            margin: auto;
+            @include fixed-square($postIconSize);
+          }
+        }
+      }
+
+      & > .acs__empty {
+        color: $won-line-gray;
+        text-align: center;
+        font-weight: 300;
+      }
+    }
+  }
+}

@@ -17,6 +17,7 @@ import vocab from "../service/vocab.js";
 import Immutable from "immutable";
 
 import "~/style/_atom-menu.scss";
+import { getSocketTypeArray } from "../redux/utils/atom-utils";
 
 const mapStateToProps = (state, ownProps) => {
   const atom = getIn(state, ["atoms", ownProps.atomUri]);
@@ -84,6 +85,8 @@ const mapStateToProps = (state, ownProps) => {
   const groupMembersSize = groupMembers ? groupMembers.size : 0;
   const heldAtomsSize = heldAtoms ? heldAtoms.size : 0;
 
+  const socketTypeArray = getSocketTypeArray(atom);
+
   return {
     atomUri: ownProps.atomUri,
     atom,
@@ -130,7 +133,11 @@ const mapStateToProps = (state, ownProps) => {
     atomFailedToLoad:
       atom && processUtils.hasAtomFailedToLoad(process, ownProps.atomUri),
     shouldShowRdf: viewUtils.showRdf(viewState),
-    socketTypeArray: atomUtils.getSocketTypeArray(atom),
+    socketTypeArray: isOwned
+      ? socketTypeArray
+      : socketTypeArray.filter(
+          socketType => socketType !== vocab.CHAT.ChatSocketCompacted
+        ), //filter the chat Socket so we do not display it as a menu item for non owned atoms
     visibleTab: viewUtils.getVisibleTabByAtomUri(
       viewState,
       ownProps.atomUri,
