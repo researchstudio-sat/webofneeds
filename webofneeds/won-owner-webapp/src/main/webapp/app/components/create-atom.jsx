@@ -207,7 +207,7 @@ class CreateAtom extends React.Component {
     super(props);
 
     this.state = {
-      isNew: true,
+      initialDraftLoaded: false,
       draftObject: {},
     };
 
@@ -218,14 +218,10 @@ class CreateAtom extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    // if createInput is shown and draftObject is still empty we initialize it
-    if (
-      this.props.showCreateInput &&
-      this.props.useCase.draft &&
-      Object.keys(prevState.draftObject).length === 0
-    ) {
-      console.debug("Setting initialDraft for create");
+    // if createInput is shown and draftObject has not been initialized we initialize it
+    if (this.props.useCase.draft && !prevState.initialDraftLoaded) {
       this.setState({
+        initialDraftLoaded: true,
         draftObject: JSON.parse(JSON.stringify(this.props.useCase.draft)),
       });
     }
@@ -446,19 +442,13 @@ class CreateAtom extends React.Component {
   }
 
   updateDraft(updatedDraft, branch) {
+    console.debug(this.state.draftObject);
     const _draftObject = this.state.draftObject;
     _draftObject[branch] = updatedDraft;
 
-    if (this.state.isNew) {
-      this.setState({
-        isNew: false,
-        draftObject: _draftObject,
-      });
-    } else {
-      this.setState({
-        draftObject: _draftObject,
-      });
-    }
+    this.setState({
+      draftObject: _draftObject,
+    });
   }
 
   save() {
