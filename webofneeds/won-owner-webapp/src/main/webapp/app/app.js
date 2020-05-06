@@ -105,7 +105,7 @@ function AppRoutes() {
   const isLoggedIn = accountUtils.isLoggedIn(accountState);
   const isAnonymous = accountUtils.isAnonymous(accountState);
 
-  const { postUri, token } = getQueryParams(location);
+  const { postUri, token, privateId } = getQueryParams(location);
 
   //******************************** EMAIL TOKEN VERIFICATION
   const isEmailVerified = accountUtils.isEmailVerified(accountState);
@@ -118,10 +118,16 @@ function AppRoutes() {
   const alreadyProcessing = processUtils.isProcessingVerifyEmailAddress(
     processState
   );
+  const loginProcessing = processUtils.isProcessingLogin(processState);
 
   if (token && !alreadyProcessing && verificationNeeded) {
     console.debug("Dispatching account__verifyEmailAddress");
     dispatch(actionCreators.account__verifyEmailAddress(token));
+  }
+
+  if (privateId && !loginProcessing && !isLoggedIn) {
+    console.debug("Dispatchin privateId Login");
+    dispatch(actionCreators.account__login({ privateId: privateId }));
   }
   //********************************
 
@@ -143,7 +149,7 @@ function AppRoutes() {
         <PageMap />
       </Route>
       <Route path="/inventory">
-        <PageInventory />
+        {privateId ? <Redirect to="/" /> : <PageInventory />}
       </Route>
       <Route path="/connections">
         <PageConnections />
