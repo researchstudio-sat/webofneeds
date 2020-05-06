@@ -70,6 +70,8 @@ const mapStateToProps = (state, ownProps) => {
 
   const process = get(state, "process");
 
+  const isConnected = connectionUtils.isConnected(connection);
+
   return {
     className: ownProps.className,
     ownedAtom,
@@ -89,7 +91,7 @@ const mapStateToProps = (state, ownProps) => {
     isSentRequest: connection && connectionUtils.isRequestSent(connection),
     isReceivedRequest:
       connection && connectionUtils.isRequestReceived(connection),
-    isConnected: connection && connectionUtils.isConnected(connection),
+    isConnected: isConnected,
     isSuggested: connection && connectionUtils.isSuggested(connection),
     shouldShowRdf: viewSelectors.showRdf(state),
     // if the connect-message is here, everything else should be as well
@@ -105,6 +107,7 @@ const mapStateToProps = (state, ownProps) => {
       process,
       connectionUri
     ),
+    showAtomContentMessage: !!(targetAtomUri && !isConnected),
   };
 };
 
@@ -248,7 +251,7 @@ class GroupAtomMessages extends React.Component {
         onScroll={this.onScroll.bind(this)}
       >
         {unreadIndicatorElement}
-        {this.props.targetAtomUri && (
+        {this.props.showAtomContentMessage && (
           <WonAtomContentMessage atomUri={this.props.targetAtomUri} />
         )}
         {(this.props.isConnectionLoading ||
@@ -521,6 +524,7 @@ GroupAtomMessages.propTypes = {
   closeConnection: PropTypes.func,
   showMoreMessages: PropTypes.func,
   showLatestMessages: PropTypes.func,
+  showAtomContentMessage: PropTypes.bool,
   history: PropTypes.object,
 };
 
