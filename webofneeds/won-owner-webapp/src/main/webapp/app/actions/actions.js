@@ -102,6 +102,16 @@ const actionHierarchy = {
     showPetriNetData: INJ_DEFAULT,
     setMultiSelectType: INJ_DEFAULT,
     updateAgreementData: INJ_DEFAULT, //cnct.loadAgreementData,
+    agreementData: {
+      markAsRetracted: cnct.markAsRetracted,
+      markAsRejected: cnct.markAsRejected,
+      markAsProposed: cnct.markAsProposed,
+      markAsClaimed: cnct.markAsClaimed,
+      markAsAccepted: cnct.markAsAccepted,
+      markAsAgreed: cnct.markAsAgreed,
+      markAsCancelled: cnct.markAsCancelled,
+      markAsCancellationPending: cnct.markAsCancellationPending,
+    },
     updatePetriNetData: INJ_DEFAULT,
 
     storeActiveUrisInLoading: INJ_DEFAULT,
@@ -206,16 +216,6 @@ const actionHierarchy = {
       failure: messages.failedReopenAtom,
     },
     markAsRead: INJ_DEFAULT,
-    messageStatus: {
-      markAsProposed: messages.markAsProposed,
-      markAsClaimed: messages.markAsClaimed,
-      markAsRetracted: messages.markAsRetracted,
-      markAsRejected: messages.markAsRejected,
-      markAsAccepted: messages.markAsAccepted,
-      markAsAgreed: messages.markAsAgreed,
-      markAsCancelled: messages.markAsCancelled,
-      markAsCancellationPending: messages.markAsCancellationPending,
-    },
     viewState: {
       markAsCollapsed: INJ_DEFAULT,
       markAsSelected: INJ_DEFAULT,
