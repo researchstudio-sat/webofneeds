@@ -14,6 +14,7 @@ import WonAtomContentHolds from "./atom-content-holds.jsx";
 import WonAtomContentChats from "./atom-content-chats.jsx";
 import WonAtomContentBuddies from "./atom-content-buddies.jsx";
 import WonAtomContentParticipants from "./atom-content-participants.jsx";
+import WonAtomContentSocket from "./atom-content-socket.jsx";
 import WonAtomContentGeneral from "./atom-content-general.jsx";
 import WonAtomContentPersona from "./atom-content-persona.jsx";
 import WonAtomContentDetails from "./atom-content-details.jsx";
@@ -179,6 +180,7 @@ class WonAtomContent extends React.Component {
             </React.Fragment>
           );
           break;
+
         case vocab.HOLD.HoldableSocketCompacted:
           if (this.props.isHeld) {
             visibleTabFragment = (
@@ -200,16 +202,19 @@ class WonAtomContent extends React.Component {
             );
           }
           break;
+
         case vocab.GROUP.GroupSocketCompacted:
           visibleTabFragment = (
             <WonAtomContentParticipants atomUri={this.props.atomUri} />
           );
           break;
+
         case vocab.BUDDY.BuddySocketCompacted:
           visibleTabFragment = (
             <WonAtomContentBuddies atomUri={this.props.atomUri} />
           );
           break;
+
         case vocab.REVIEW.ReviewSocketCompacted:
           visibleTabFragment = (
             <div className="atom-content__reviews">
@@ -219,14 +224,17 @@ class WonAtomContent extends React.Component {
             </div>
           );
           break;
+
         case vocab.HOLD.HolderSocketCompacted:
           visibleTabFragment = (
             <WonAtomContentHolds atomUri={this.props.atomUri} />
           );
           break;
+
         case vocab.CHAT.ChatSocketCompacted:
           visibleTabFragment = <WonAtomContentChats atom={this.props.atom} />;
           break;
+
         case "RDF":
           visibleTabFragment = (
             <div className="atom-info__content__rdf">
@@ -257,8 +265,14 @@ class WonAtomContent extends React.Component {
             </div>
           );
           break;
+
         default:
-          visibleTabFragment = <div> Unknown Socket TODO: IMPL STUFF </div>;
+          visibleTabFragment = (
+            <WonAtomContentSocket
+              atom={this.props.atom}
+              socketType={this.props.visibleTab}
+            />
+          );
           break;
       }
 
