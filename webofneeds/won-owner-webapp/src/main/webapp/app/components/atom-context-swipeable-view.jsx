@@ -15,7 +15,6 @@ import ico32_buddy_add from "~/images/won-icons/ico32_buddy_add.svg";
 const mapStateToProps = (state, ownProps) => {
   return {
     atomUri: ownProps.atomUri,
-    onClick: ownProps.onClick,
     actionButtons: ownProps.actionButtons ? ownProps.actionButtons : undefined,
     className: ownProps.className,
     enableMouseEvents: false,
@@ -47,7 +46,7 @@ class WonAtomContextSwipeableView extends React.Component {
       <WonAtomHeader
         atomUri={this.props.atomUri}
         hideTimestamp={this.props.hideTimestamp}
-        onClick={this.props.onClick}
+        toLink={this.props.toLink}
       />
     );
 
@@ -106,7 +105,7 @@ class WonAtomContextSwipeableView extends React.Component {
 
 WonAtomContextSwipeableView.propTypes = {
   atomUri: PropTypes.string,
-  onClick: PropTypes.func,
+  toLink: PropTypes.string,
   actionButtons: PropTypes.object,
   className: PropTypes.string,
   enableMouseEvents: PropTypes.bool,

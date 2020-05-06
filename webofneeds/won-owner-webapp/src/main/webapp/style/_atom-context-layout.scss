@@ -27,6 +27,7 @@ won-atom-context-layout {
   }
 
   &.status--sent {
+    a.won-atom-header,
     won-atom-header {
       opacity: 0.25;
     }
@@ -49,6 +50,7 @@ won-atom-context-layout {
 
   &.status--suggested,
   &.status--received {
+    a.won-atom-header,
     won-atom-header {
       @include animateOpacityHeartBeat();
     }

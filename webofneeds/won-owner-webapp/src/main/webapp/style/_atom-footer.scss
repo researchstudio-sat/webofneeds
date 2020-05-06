@@ -33,6 +33,7 @@ won-atom-footer {
       grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
 
       > .atom-footer__adhocbutton,
+      > a.won-atom-header,
       > won-atom-header {
         padding: 0.5rem;
         border: $thinGrayBorder;
