@@ -57,7 +57,6 @@ const mapStateToProps = (state, ownProps) => {
 
   return {
     atomUri: ownProps.atomUri,
-    onAtomClick: ownProps.onAtomClick,
     showHolder: ownProps.showHolder,
     showSuggestions: ownProps.showSuggestions,
     currentLocation: ownProps.currentLocation,
@@ -440,18 +439,14 @@ class WonOtherCard extends React.Component {
   }
 
   atomClick() {
-    if (this.props.onAtomClick) {
-      this.props.onAtomClick();
-    } else {
-      this.props.selectAtomTab(this.props.atomUri, "DETAIL");
-      this.props.history.push(
-        generateLink(
-          this.props.history.location,
-          { postUri: this.props.atomUri },
-          "/post"
-        )
-      );
-    }
+    this.props.selectAtomTab(this.props.atomUri, "DETAIL");
+    this.props.history.push(
+      generateLink(
+        this.props.history.location,
+        { postUri: this.props.atomUri },
+        "/post"
+      )
+    );
   }
   holderClick() {
     this.props.selectAtomTab(this.props.holderUri, "DETAIL");
@@ -469,9 +464,7 @@ WonOtherCard.propTypes = {
   showHolder: PropTypes.bool,
   showSuggestions: PropTypes.bool,
   currentLocation: PropTypes.object,
-  onAtomClick: PropTypes.func,
   selectAtomTab: PropTypes.func,
-
   isDirectResponse: PropTypes.bool,
   isInactive: PropTypes.bool,
   responseToAtom: PropTypes.object,
