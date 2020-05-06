@@ -146,6 +146,7 @@ pokemon-raid-card {
     }
 
     &__name {
+      color: $won-primary-text-color;
       grid-area: card__persona__name;
       display: flex;
       align-items: center;
@@ -215,6 +216,7 @@ pokemon-raid-card {
     }
 
     &__topline {
+      color: $won-primary-text-color;
       grid-area: card__main__topline;
       min-width: 0;
 

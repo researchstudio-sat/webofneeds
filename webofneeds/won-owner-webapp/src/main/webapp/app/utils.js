@@ -29,6 +29,7 @@ Currently Used/possible Parameters:
     senderSocketType: undefined,
     targetSocketType: undefined,
     mode: undefined,
+    tab: undefined,
   }
 */
 export function getQueryParams(location) {

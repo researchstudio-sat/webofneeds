@@ -143,6 +143,7 @@ won-other-card {
     }
 
     &__name {
+      color: $won-primary-text-color;
       grid-area: card__persona__name;
       display: flex;
       align-items: center;
@@ -212,6 +213,7 @@ won-other-card {
     }
 
     &__topline {
+      color: $won-primary-text-color;
       grid-area: card__main__topline;
       min-width: 0;
 
