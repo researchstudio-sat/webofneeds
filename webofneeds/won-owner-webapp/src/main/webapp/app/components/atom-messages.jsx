@@ -117,6 +117,8 @@ const mapStateToProps = (state, ownProps) => {
 
   const process = get(state, "process");
 
+  const isConnected = connectionUtils.isConnected(connection);
+
   return {
     className: ownProps.className,
     connectionUri: ownProps.connectionUri,
@@ -168,7 +170,7 @@ const mapStateToProps = (state, ownProps) => {
     lastUpdateTimestamp: get(connection, "lastUpdateDate"),
     isSentRequest: connectionUtils.isRequestSent(connection),
     isReceivedRequest: connectionUtils.isRequestReceived(connection),
-    isConnected: connectionUtils.isConnected(connection),
+    isConnected: isConnected,
     isSuggested: connectionUtils.isSuggested(connection),
     shouldShowRdf: viewSelectors.showRdf(state),
     hasConnectionMessagesToLoad,
@@ -192,8 +194,9 @@ const mapStateToProps = (state, ownProps) => {
       process,
       selectedConnectionUri
     ),
-    showPostContentMessage: !!(
+    showAtomContentMessage: !!(
       showChatData &&
+      !isConnected &&
       !multiSelectType &&
       targetAtomUri
     ),
@@ -415,7 +418,7 @@ class AtomMessages extends React.Component {
           onScroll={this.onScroll.bind(this)}
         >
           {unreadIndicatorElement}
-          {this.props.showPostContentMessage && (
+          {this.props.showAtomContentMessage && (
             <WonAtomContentMessage atomUri={this.props.targetAtomUri} />
           )}
           {(this.props.isConnectionLoading ||
@@ -1072,7 +1075,7 @@ AtomMessages.propTypes = {
   cancellationPendingMessageArray: PropTypes.arrayOf(PropTypes.object),
   connectionOrAtomsLoading: PropTypes.bool,
   isConnectionLoading: PropTypes.bool,
-  showPostContentMessage: PropTypes.bool,
+  showAtomContentMessage: PropTypes.bool,
   setShowPetriNetData: PropTypes.func,
   setShowAgreementData: PropTypes.func,
   hideAddMessageContent: PropTypes.func,
