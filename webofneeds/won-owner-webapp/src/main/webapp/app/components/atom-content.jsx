@@ -225,9 +225,7 @@ class WonAtomContent extends React.Component {
           );
           break;
         case vocab.CHAT.ChatSocketCompacted:
-          visibleTabFragment = (
-            <WonAtomContentChats atomUri={this.props.atomUri} />
-          );
+          visibleTabFragment = <WonAtomContentChats atom={this.props.atom} />;
           break;
         case "RDF":
           visibleTabFragment = (
