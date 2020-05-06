@@ -77,6 +77,7 @@ export function isMessageCancelable(con, msg) {
       hasProposesReferences(msg) ||
       hasProposesToCancelReferences(msg)) &&
     isMessageAccepted(con, msg) &&
+    !(hasProposesToCancelReferences(msg) && isMessageAccepted(con, msg)) &&
     !isMessageCancelled(con, msg) &&
     !isMessageCancellationPending(con, msg)
   );
@@ -234,7 +235,15 @@ export function isMessageAccepted(con, msg) {
   const agreementData = con && con.get("agreementData");
   const acceptedMessageUris =
     agreementData && agreementData.get("agreementUris");
-  return acceptedMessageUris && acceptedMessageUris.has(msg.get("uri"));
+
+  const acceptedCancellationProposalUris =
+    agreementData && agreementData.get("acceptedCancellationProposalUris");
+
+  return (
+    (acceptedMessageUris && acceptedMessageUris.has(msg.get("uri"))) ||
+    (acceptedCancellationProposalUris &&
+      acceptedCancellationProposalUris.has(msg.get("uri")))
+  );
 }
 
 /**

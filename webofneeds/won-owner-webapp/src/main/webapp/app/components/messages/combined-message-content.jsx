@@ -79,7 +79,7 @@ const mapStateToProps = (state, ownProps) => {
     hasProposes: referencesProposes && referencesProposes.size > 0,
     hasProposesToCancel:
       referencesProposesToCancel && referencesProposesToCancel.size > 0,
-    messageStatus: message && message.get("messageStatus"),
+    agreementData: connection && connection.get("agreementData"),
     isInjectIntoMessage: injectInto && injectInto.size > 0, //contains the targetConnectionUris
     originatorUri: message && message.get("originatorUri"),
     injectIntoArray: injectInto && Array.from(injectInto.toSet()),
@@ -222,43 +222,119 @@ class WonCombinedMessageContent extends React.Component {
   getAgreementHeaderLabel() {
     //TODO: integrate agreed message cases
     if (this.props.hasClaims && this.props.hasProposes) {
-      if (this.props.messageStatus) {
-        if (this.props.messageStatus.get("isCancelled"))
+      if (this.props.agreementData) {
+        if (
+          this.props.agreementData.getIn([
+            "cancelledAgreementUris",
+            this.props.messageUri,
+          ])
+        )
           return "Agreement/Claim - Cancelled";
-        if (this.props.messageStatus.get("isCancellationPending"))
+        if (
+          this.props.agreementData.getIn([
+            "pendingCancellationProposalUris",
+            this.props.messageUri,
+          ])
+        )
           return "Agreement/Claim - Accepted(Pending Cancellation)";
-        if (this.props.messageStatus.get("isAccepted"))
+        if (
+          this.props.agreementData.getIn([
+            "agreementUris",
+            this.props.messageUri,
+          ])
+        )
           return "Agreement/Claim - Accepted";
-        if (this.props.messageStatus.get("isRetracted"))
+        if (
+          this.props.agreementData.getIn([
+            "retractedMessageUris",
+            this.props.messageUri,
+          ])
+        )
           return "Proposal/Claim - Retracted";
-        if (this.props.messageStatus.get("isRejected"))
+        if (
+          this.props.agreementData.getIn([
+            "rejectedMessageUris",
+            this.props.messageUri,
+          ])
+        )
           return "Proposal/Claim - Rejected";
       }
       return "Proposal/Claim";
     } else if (this.props.hasClaims) {
-      if (this.props.messageStatus) {
-        if (this.props.messageStatus.get("isCancelled"))
+      if (this.props.agreementData) {
+        if (
+          this.props.agreementData.getIn([
+            "cancelledAgreementUris",
+            this.props.messageUri,
+          ])
+        )
           return "Claim - Cancelled";
-        if (this.props.messageStatus.get("isCancellationPending"))
+        if (
+          this.props.agreementData.getIn([
+            "pendingCancellationProposalUris",
+            this.props.messageUri,
+          ])
+        )
           return "Claim - Accepted(Pending Cancellation)";
-        if (this.props.messageStatus.get("isAccepted"))
+        if (
+          this.props.agreementData.getIn([
+            "agreementUris",
+            this.props.messageUri,
+          ])
+        )
           return "Claim - Accepted";
-        if (this.props.messageStatus.get("isRetracted"))
+        if (
+          this.props.agreementData.getIn([
+            "retractedMessageUris",
+            this.props.messageUri,
+          ])
+        )
           return "Claim - Retracted";
-        if (this.props.messageStatus.get("isRejected"))
-          return "Claim - Rejected";
+        if (
+          this.props.agreementData.getIn([
+            "rejectedMessageUris",
+            this.props.messageUri,
+          ])
+        )
+          return "Claim - Retracted";
       }
       return "Claim";
     } else if (this.props.hasProposes) {
-      if (this.props.messageStatus) {
-        if (this.props.messageStatus.get("isCancelled"))
+      if (this.props.agreementData) {
+        if (
+          this.props.agreementData.getIn([
+            "cancelledAgreementUris",
+            this.props.messageUri,
+          ])
+        )
           return "Agreement - Cancelled";
-        if (this.props.messageStatus.get("isCancellationPending"))
+        if (
+          this.props.agreementData.getIn([
+            "pendingCancellationProposalUris",
+            this.props.messageUri,
+          ])
+        )
           return "Agreement - Pending Cancellation";
-        if (this.props.messageStatus.get("isAccepted")) return "Agreement";
-        if (this.props.messageStatus.get("isRetracted"))
+        if (
+          this.props.agreementData.getIn([
+            "agreementUris",
+            this.props.messageUri,
+          ])
+        )
+          return "Agreement";
+        if (
+          this.props.agreementData.getIn([
+            "retractedMessageUris",
+            this.props.messageUri,
+          ])
+        )
           return "Proposal - Retracted";
-        if (this.props.messageStatus.get("isRejected"))
+        if (
+          this.props.agreementData.getIn([
+            "rejectedMessageUris",
+            this.props.messageUri,
+          ])
+        )
           return "Proposal - Rejected";
       }
       return "Proposal";
@@ -321,7 +397,7 @@ WonCombinedMessageContent.propTypes = {
   hasReferences: PropTypes.bool,
   hasClaims: PropTypes.bool,
   hasProposes: PropTypes.bool,
-  messageStatus: PropTypes.object,
+  agreementData: PropTypes.object,
   isInjectIntoMessage: PropTypes.bool,
   originatorUri: PropTypes.string,
   injectIntoArray: PropTypes.arrayOf(PropTypes.string),

@@ -1177,8 +1177,8 @@ public class AgreementProtocolState {
         Set<MessageEffect> effects = getEffects(proposalUri);
         if (effects.size() > 0) {
             for (MessageEffect effect : effects) {
-                if (effect.isProposes() && effect.asProposes().getProposesToCancel().size() > 0) {
-                    this.acceptedCancellationProposalUris.addAll(effect.asProposes().getProposesToCancel());
+                if (!changedSomething && effect.isProposes() && effect.asProposes().getProposesToCancel().size() > 0) {
+                    this.acceptedCancellationProposalUris.add(proposalUri);
                     changedSomething = true;
                 }
                 for (URI toCancel : effect.asProposes().getProposesToCancel()) {

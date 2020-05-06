@@ -128,6 +128,7 @@ won-connection-message {
     //TODO styling
   }
 
+  &.won-is-cancelled:not(.won-is-collapsed),
   &.won-is-retracted:not(.won-is-collapsed),
   &.won-is-rejected:not(.won-is-collapsed) {
     opacity: 0.5;
