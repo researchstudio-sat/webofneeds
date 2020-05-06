@@ -10,7 +10,7 @@ import { actionCreators } from "../../actions/actions.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 
 import "~/style/_persona-card.scss";
-import { withRouter } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const atom = getIn(state, ["atoms", ownProps.atomUri]);
@@ -46,7 +46,6 @@ const mapDispatchToProps = dispatch => {
 class WonPersonaCard extends React.Component {
   constructor(props) {
     super(props);
-    this.atomClick = this.atomClick.bind(this);
   }
 
   render() {
@@ -77,7 +76,14 @@ class WonPersonaCard extends React.Component {
     );
 
     return (
-      <won-persona-card onClick={this.atomClick}>
+      <Link
+        className="won-persona-card"
+        to={generateLink(
+          this.props.history.location,
+          { postUri: this.props.atomUri, tab: "DETAIL" },
+          "/post"
+        )}
+      >
         <div
           className={
             "card__icon clickable " + (this.props.isInactive ? "inactive" : "")
@@ -89,18 +95,7 @@ class WonPersonaCard extends React.Component {
         <div className="card__main clickable">
           <div className="card__main__name">{this.props.personaName}</div>
         </div>
-      </won-persona-card>
-    );
-  }
-
-  atomClick() {
-    this.props.selectAtomTab(this.props.atomUri, "DETAIL");
-    this.props.history.push(
-      generateLink(
-        this.props.history.location,
-        { postUri: this.props.atomUri },
-        "/post"
-      )
+      </Link>
     );
   }
 }

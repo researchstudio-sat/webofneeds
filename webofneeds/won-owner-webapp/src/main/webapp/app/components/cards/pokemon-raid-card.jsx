@@ -16,7 +16,7 @@ import { selectLastUpdateTime } from "../../redux/selectors/general-selectors.js
 import { details } from "../../../config/detail-definitions.js";
 
 import "~/style/_pokemon-raid-card.scss";
-import { withRouter } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const atom = getIn(state, ["atoms", ownProps.atomUri]);
@@ -116,11 +116,6 @@ const mapDispatchToProps = dispatch => {
 };
 
 class PokemonRaidCard extends React.Component {
-  constructor(props) {
-    super(props);
-    this.atomClick = this.atomClick.bind(this);
-    this.holderClick = this.holderClick.bind(this);
-  }
   render() {
     const style =
       this.props.showDefaultIcon && this.props.iconBackground
@@ -184,24 +179,35 @@ class PokemonRaidCard extends React.Component {
     );
 
     const cardMain = (
-      <div
+      <Link
         className={
           "card__main clickable " +
           (!this.props.showDefaultIcon ? "card__main--showIcon" : "")
         }
-        onClick={this.atomClick}
+        to={generateLink(
+          this.props.history.location,
+          { postUri: this.props.atomUri, tab: "DETAIL" },
+          "/post"
+        )}
       >
         {this.createCardMainIcon()}
         {this.createCardMainTopline()}
         {this.createCardMainSubtitle()}
-      </div>
+      </Link>
     );
 
     const cardPersonaInfo =
       this.props.showHolder &&
       this.props.holder &&
       this.props.atomHasHoldableSocket ? (
-        <div className="card__persona clickable" onClick={this.holderClick}>
+        <Link
+          className="card__persona clickable"
+          to={generateLink(
+            this.props.history.location,
+            { postUri: this.props.holderUri, tab: "DETAIL" },
+            "/post"
+          )}
+        >
           {this.createHolderInfoIcon()}
           {this.props.holderName ? (
             <div className="card__persona__name">
@@ -214,7 +220,7 @@ class PokemonRaidCard extends React.Component {
             undefined
           )}
           {this.createPersonaWebsite()}
-        </div>
+        </Link>
       ) : (
         undefined
       );
@@ -415,27 +421,6 @@ class PokemonRaidCard extends React.Component {
         />
       );
     }
-  }
-
-  atomClick() {
-    this.props.selectAtomTab(this.props.atomUri, "DETAIL");
-    this.props.history.push(
-      generateLink(
-        this.props.history.location,
-        { postUri: this.props.atomUri },
-        "/post"
-      )
-    );
-  }
-  holderClick() {
-    this.props.selectAtomTab(this.props.holderUri, "DETAIL");
-    this.props.history.push(
-      generateLink(
-        this.props.history.location,
-        { postUri: this.props.holderUri },
-        "/post"
-      )
-    );
   }
 }
 PokemonRaidCard.propTypes = {

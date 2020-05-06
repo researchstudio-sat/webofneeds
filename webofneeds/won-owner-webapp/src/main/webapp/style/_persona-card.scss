@@ -2,7 +2,7 @@
 @import "sizing-utils";
 @import "animate";
 
-won-persona-card {
+a.won-persona-card {
   grid-area: card;
   display: grid;
   grid-template-areas: "card__main" "card__icon";
@@ -44,6 +44,7 @@ won-persona-card {
     overflow: hidden;
 
     &__name {
+      color: $won-primary-text-color;
       min-width: 0;
       white-space: nowrap;
       text-overflow: ellipsis;

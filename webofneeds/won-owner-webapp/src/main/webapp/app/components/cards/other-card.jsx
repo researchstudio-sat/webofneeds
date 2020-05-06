@@ -19,7 +19,7 @@ import {
 } from "../../redux/selectors/general-selectors.js";
 
 import "~/style/_other-card.scss";
-import { withRouter } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const atom = getIn(state, ["atoms", ownProps.atomUri]);
@@ -111,11 +111,6 @@ const mapDispatchToProps = dispatch => {
 };
 
 class WonOtherCard extends React.Component {
-  constructor(props) {
-    super(props);
-    this.atomClick = this.atomClick.bind(this);
-    this.holderClick = this.holderClick.bind(this);
-  }
   render() {
     const style =
       this.props.showDefaultIcon && this.props.iconBackground
@@ -125,13 +120,17 @@ class WonOtherCard extends React.Component {
         : undefined;
 
     const cardIcon = (
-      <div
+      <Link
         className={
-          "card__icon clickable " +
+          "card__icon " +
           (this.props.isInactive ? " inactive " : "") +
           (this.props.showMap ? "card__icon--map" : "")
         }
-        onClick={this.atomClick}
+        to={generateLink(
+          this.props.history.location,
+          { postUri: this.props.atomUri, tab: "DETAIL" },
+          "/post"
+        )}
         style={style}
       >
         {this.props.showDefaultIcon && this.props.useCaseIcon ? (
@@ -179,28 +178,39 @@ class WonOtherCard extends React.Component {
         ) : (
           undefined
         )}
-      </div>
+      </Link>
     );
 
     const cardMain = (
-      <div
+      <Link
         className={
           "card__main clickable " +
           (!this.props.showDefaultIcon ? "card__main--showIcon" : "")
         }
-        onClick={this.atomClick}
+        to={generateLink(
+          this.props.history.location,
+          { postUri: this.props.atomUri, tab: "DETAIL" },
+          "/post"
+        )}
       >
         {this.createCardMainIcon()}
         {this.createCardMainTopline()}
         {this.createCardMainSubtitle()}
-      </div>
+      </Link>
     );
 
     const cardPersonaInfo =
       this.props.showHolder &&
       this.props.holder &&
       this.props.atomHasHoldableSocket ? (
-        <div className="card__persona clickable" onClick={this.holderClick}>
+        <Link
+          className="card__persona clickable"
+          to={generateLink(
+            this.props.history.location,
+            { postUri: this.props.holderUri, tab: "DETAIL" },
+            "/post"
+          )}
+        >
           {this.createHolderInfoIcon()}
           {this.props.holderName ? (
             <div className="card__persona__name">
@@ -213,7 +223,7 @@ class WonOtherCard extends React.Component {
             undefined
           )}
           {this.createPersonaWebsite()}
-        </div>
+        </Link>
       ) : (
         undefined
       );
@@ -436,27 +446,6 @@ class WonOtherCard extends React.Component {
         />
       );
     }
-  }
-
-  atomClick() {
-    this.props.selectAtomTab(this.props.atomUri, "DETAIL");
-    this.props.history.push(
-      generateLink(
-        this.props.history.location,
-        { postUri: this.props.atomUri },
-        "/post"
-      )
-    );
-  }
-  holderClick() {
-    this.props.selectAtomTab(this.props.holderUri, "DETAIL");
-    this.props.history.push(
-      generateLink(
-        this.props.history.location,
-        { postUri: this.props.holderUri },
-        "/post"
-      )
-    );
   }
 }
 WonOtherCard.propTypes = {
