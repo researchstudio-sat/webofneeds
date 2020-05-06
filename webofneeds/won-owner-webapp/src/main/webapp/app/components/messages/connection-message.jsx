@@ -475,6 +475,10 @@ class WonConnectionMessage extends React.Component {
       !this.props.groupChatMessage &&
       !this.props.isRetracted &&
       !this.props.isRejected &&
+      !(
+        messageUtils.hasProposesToCancelReferences(this.props.message) &&
+        this.props.isAccepted
+      ) &&
       (this.props.showActions ||
         this.props.isCancelable ||
         messageUtils.hasProposesReferences(this.props.message) ||
