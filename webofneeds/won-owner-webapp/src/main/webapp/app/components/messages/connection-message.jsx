@@ -477,6 +477,7 @@ class WonConnectionMessage extends React.Component {
       !this.props.isRetracted &&
       !this.props.isRejected &&
       (this.props.showActions ||
+        this.props.isCancelable ||
         messageUtils.hasProposesReferences(this.props.message) ||
         messageUtils.hasClaimsReferences(this.props.message) ||
         messageUtils.hasProposesToCancelReferences(this.props.message))
