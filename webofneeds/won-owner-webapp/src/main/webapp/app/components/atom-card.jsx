@@ -38,7 +38,6 @@ const mapStateToProps = (state, ownProps) => {
       showHolder: ownProps.showHolder,
       showSuggestions: ownProps.showSuggestions,
       currentLocation: ownProps.currentLocation,
-      onAtomClick: ownProps.onAtomClick,
       isPersona: false,
       isPokemonRaid: false,
       isOtherAtom: false,
@@ -50,7 +49,6 @@ const mapStateToProps = (state, ownProps) => {
       showHolder: ownProps.showHolder,
       showSuggestions: ownProps.showSuggestions,
       currentLocation: ownProps.currentLocation,
-      onAtomClick: ownProps.onAtomClick,
       isPersona: true,
       isPokemonRaid: false,
       isOtherAtom: false,
@@ -62,7 +60,6 @@ const mapStateToProps = (state, ownProps) => {
       showHolder: ownProps.showHolder,
       showSuggestions: ownProps.showSuggestions,
       currentLocation: ownProps.currentLocation,
-      onAtomClick: ownProps.onAtomClick,
       isPersona: false,
       isPokemonRaid: true,
       isOtherAtom: false,
@@ -74,7 +71,6 @@ const mapStateToProps = (state, ownProps) => {
       showHolder: ownProps.showHolder,
       showSuggestions: ownProps.showSuggestions,
       currentLocation: ownProps.currentLocation,
-      onAtomClick: ownProps.onAtomClick,
       isPersona: false,
       isPokemonRaid: false,
       isOtherAtom: true,
@@ -95,26 +91,15 @@ class WonAtomCard extends React.Component {
         />
       );
     } else if (this.props.isPersona) {
-      cardContent = (
-        <WonPersonaCard
-          atomUri={this.props.atomUri}
-          onAtomClick={this.props.onAtomClick}
-        />
-      );
+      cardContent = <WonPersonaCard atomUri={this.props.atomUri} />;
     } else if (this.props.isPokemonRaid) {
-      cardContent = (
-        <PokemonRaidCard
-          atomUri={this.props.atomUri}
-          onAtomClick={this.props.onAtomClick}
-        />
-      );
+      cardContent = <PokemonRaidCard atomUri={this.props.atomUri} />;
     } else {
       cardContent = (
         <WonOtherCard
           atomUri={this.props.atomUri}
           showSuggestions={this.props.showSuggestions}
           showHolder={this.props.showHolder}
-          onAtomClick={this.props.onAtomClick}
           currentLocation={this.props.currentLocation}
         />
       );
@@ -129,7 +114,6 @@ WonAtomCard.propTypes = {
   showHolder: PropTypes.bool,
   showSuggestions: PropTypes.bool,
   currentLocation: PropTypes.object,
-  onAtomClick: PropTypes.func,
   isPersona: PropTypes.bool,
   isPokemonRaid: PropTypes.bool,
   isOtherAtom: PropTypes.bool,

@@ -19,7 +19,6 @@ const mapStateToProps = (state, ownProps) => {
 
   return {
     atomUri: ownProps.atomUri,
-    onAtomClick: ownProps.onAtomClick,
     isInactive: atomUtils.isInactive(atom),
     atom,
     personaName: get(atom, "humanReadable"),
@@ -95,23 +94,18 @@ class WonPersonaCard extends React.Component {
   }
 
   atomClick() {
-    if (this.props.onAtomClick) {
-      this.props.onAtomClick();
-    } else {
-      this.props.selectAtomTab(this.props.atomUri, "DETAIL");
-      this.props.history.push(
-        generateLink(
-          this.props.history.location,
-          { postUri: this.props.atomUri },
-          "/post"
-        )
-      );
-    }
+    this.props.selectAtomTab(this.props.atomUri, "DETAIL");
+    this.props.history.push(
+      generateLink(
+        this.props.history.location,
+        { postUri: this.props.atomUri },
+        "/post"
+      )
+    );
   }
 }
 WonPersonaCard.propTypes = {
   atomUri: PropTypes.string.isRequired,
-  onAtomClick: PropTypes.func,
   selectAtomTab: PropTypes.func,
   atom: PropTypes.object,
   isInactive: PropTypes.bool,
