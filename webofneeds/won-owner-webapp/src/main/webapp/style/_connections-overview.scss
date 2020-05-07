@@ -12,32 +12,28 @@ won-connections-overview {
   }
 
   .co__item {
-    &__connections {
-      &__item {
-        display: grid;
-        grid-template-columns: min-content 1fr;
-        align-items: center;
+    display: grid;
+    grid-template-columns: min-content 1fr;
+    align-items: center;
 
-        &__own {
-          @include square-image($postIconSize);
+    &__own {
+      @include square-image($postIconSize);
+    }
+
+    &__remote {
+      padding-left: 0.5rem;
+      &:not(.won-unread) {
+        background-color: $won-line-gray;
+        border-left: $thinGrayBorder;
+        @media (max-width: $responsivenessBreakPoint) {
+          border-left: none;
         }
-
-        &__remote {
-          padding-left: 0.5rem;
-          &:not(.won-unread) {
-            background-color: $won-line-gray;
-            border-left: $thinGrayBorder;
-            @media (max-width: $responsivenessBreakPoint) {
-              border-left: none;
-            }
-          }
-          &.won-unread {
-            background-color: $won-unread-attention;
-            border-left: $thinBorderWidth solid $won-unread-attention;
-            @media (max-width: $responsivenessBreakPoint) {
-              border-left: none;
-            }
-          }
+      }
+      &.won-unread {
+        background-color: $won-unread-attention;
+        border-left: $thinBorderWidth solid $won-unread-attention;
+        @media (max-width: $responsivenessBreakPoint) {
+          border-left: none;
         }
       }
     }

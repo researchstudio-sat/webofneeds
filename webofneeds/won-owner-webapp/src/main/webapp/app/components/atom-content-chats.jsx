@@ -83,7 +83,7 @@ export default function AtomContentChats({ atom }) {
         <WonTitlePicker
           onUpdate={setSearchText}
           initialValue={searchText.value}
-          detail={{ placeholder: "Search for Chats" }}
+          detail={{ placeholder: "Filter Chats" }}
         />
       </div>
       {activeChatConnections.size > 0 ? (

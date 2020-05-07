@@ -342,7 +342,7 @@ export default function WonAtomContentSocket({ atom, socketType }) {
         <WonTitlePicker
           onUpdate={setSearchText}
           initialValue={searchText.value}
-          detail={{ placeholder: "Search for Connections" }}
+          detail={{ placeholder: "Filter Connections" }}
         />
       </div>
       {activeConnections.size > 0 ? (
