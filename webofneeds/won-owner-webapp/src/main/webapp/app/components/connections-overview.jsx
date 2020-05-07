@@ -78,8 +78,8 @@ export default function WonConnectionsOverview() {
       const connUri = get(conn, "uri");
       const atomUri = connUri.split("/c")[0];
       return (
-        <div className={"co__item__connections__item "} key={connUri}>
-          <div className="co__item__connections__item__own">
+        <div className="co__item" key={connUri}>
+          <div className="co__item__own">
             <WonAtomIcon
               atomUri={atomUri}
               onClick={() => showAtomDetails(atomUri)}
@@ -87,7 +87,7 @@ export default function WonConnectionsOverview() {
           </div>
           <div
             className={
-              "co__item__connections__item__remote " +
+              "co__item__remote " +
               (connectionUtils.isUnread(conn) ? " won-unread " : "")
             }
           >
@@ -108,12 +108,10 @@ export default function WonConnectionsOverview() {
         <WonTitlePicker
           onUpdate={setSearchText}
           initialValue={searchText.value}
-          detail={{ placeholder: "Search for Chats" }}
+          detail={{ placeholder: "Filter Chats" }}
         />
       </div>
-      <div className="co__item">
-        <div className="co__item__connections">{connectionElements}</div>
-      </div>
+      {connectionElements}
     </won-connections-overview>
   );
 }

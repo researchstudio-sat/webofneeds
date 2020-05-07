@@ -65,7 +65,7 @@ class WonUsecasePicker extends React.Component {
             <WonTitlePicker
               onUpdate={this.updateSearch.bind(this)}
               initialValue={this.state.searchText}
-              detail={{ placeholder: "Search for Usecases" }}
+              detail={{ placeholder: "Filter Usecases" }}
             />
           </div>
           {/*<!-- SEARCH RESULTS -->*/}
