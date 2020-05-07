@@ -7,6 +7,7 @@ won-atom-menu {
   background-color: $won-lighter-gray;
   border-bottom: $thinGrayBorder;
   padding: 0.5rem 0.5rem 0 0.5rem;
+  overflow-x: auto;
 
   &.won-failed-to-load,
   &.won-is-loading {
@@ -32,6 +33,7 @@ won-atom-menu {
     cursor: pointer;
     padding: 0.25rem 0.5rem;
     border-bottom: 0.2rem solid $won-lighter-gray;
+    word-break: keep-all;
 
     &.atom-menu__item--inactive {
       color: $won-line-gray;
