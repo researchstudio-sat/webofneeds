@@ -6,7 +6,6 @@ import { get, getIn, getQueryParams } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import * as connectionSelectors from "../../redux/selectors/connection-selectors.js";
-import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import WonModalDialog from "../../components/modal-dialog.jsx";
 import WonTopnav from "../../components/topnav.jsx";
 import WonMenu from "../../components/menu.jsx";
@@ -39,40 +38,22 @@ const mapStateToProps = (state, ownProps) => {
     selectedConnection
   );
 
-  const chatAtoms = generalSelectors.getChatAtoms(state);
-
-  const hasChatAtoms = chatAtoms && chatAtoms.size > 0;
+  const hasChatConnections = generalSelectors.hasChatConnections(state);
 
   const accountState = get(state, "account");
 
   return {
     isLoggedIn: accountUtils.isLoggedIn(accountState),
     showModalDialog: viewSelectors.showModalDialog(state),
-    showListSide: hasChatAtoms,
-    showNoSelectionSide:
-      (hasChatAtoms && !selectedConnection) ||
-      connectionUtils.isClosed(selectedConnection),
-    showContentSide:
-      hasChatAtoms &&
-      selectedConnection &&
-      !connectionUtils.isClosed(selectedConnection),
-    showPostMessages:
-      !isSelectedConnectionGroupChat &&
-      (connectionUtils.isConnected(selectedConnection) ||
-        connectionUtils.isRequestReceived(selectedConnection) ||
-        connectionUtils.isRequestSent(selectedConnection) ||
-        connectionUtils.isSuggested(selectedConnection)),
-    showGroupPostMessages:
-      isSelectedConnectionGroupChat &&
-      (connectionUtils.isConnected(selectedConnection) ||
-        connectionUtils.isRequestReceived(selectedConnection) ||
-        connectionUtils.isRequestSent(selectedConnection) ||
-        connectionUtils.isSuggested(selectedConnection)),
+    showListSide: hasChatConnections,
+    showNoSelectionSide: hasChatConnections && !selectedConnection,
+    showContentSide: hasChatConnections && selectedConnection,
+    isSelectedConnectionGroupChat,
     showSlideIns:
       viewSelectors.hasSlideIns(state, ownProps.history) &&
       viewSelectors.isSlideInsVisible(state),
-    hideListSideInResponsive: !hasChatAtoms || !!selectedConnection,
-    hideNoSelectionInResponsive: hasChatAtoms,
+    hideListSideInResponsive: !hasChatConnections || !!selectedConnection,
+    hideNoSelectionInResponsive: hasChatConnections,
     hideFooterInResponsive: !!selectedConnection,
   };
 };
@@ -124,8 +105,11 @@ class PageConnections extends React.Component {
         )}
         {this.props.showContentSide && (
           <main className="overview__right">
-            {this.props.showPostMessages && <WonAtomMessages />}
-            {this.props.showGroupPostMessages && <WonGroupAtomMessages />}
+            {this.props.isSelectedConnectionGroupChat ? (
+              <WonGroupAtomMessages />
+            ) : (
+              <WonAtomMessages />
+            )}
           </main>
         )}
         {!this.props.showListSide && (
@@ -157,8 +141,7 @@ PageConnections.propTypes = {
   showListSide: PropTypes.bool,
   showNoSelectionSide: PropTypes.bool,
   showContentSide: PropTypes.bool,
-  showPostMessages: PropTypes.bool,
-  showGroupPostMessages: PropTypes.bool,
+  isSelectedConnectionGroupChat: PropTypes.bool,
   showSlideIns: PropTypes.bool,
   hideListSideInResponsive: PropTypes.bool,
   hideNoSelectionInResponsive: PropTypes.bool,

@@ -50,6 +50,7 @@ const mapStateToProps = (state, ownProps) => {
     ),
     showAgreementData: get(connection, "showAgreementData"),
     showPetriNetData: get(connection, "showPetriNetData"),
+    isClosed: connectionUtils.isClosed(connection),
     isConnected: connectionUtils.isConnected(connection),
     isSentRequest: connectionUtils.isRequestSent(connection),
     isReceivedRequest: connectionUtils.isRequestReceived(connection),
@@ -203,6 +204,7 @@ class WonConnectionContextDropdown extends React.Component {
           key="close"
           className="won-button--filled red"
           onClick={() => this.closeConnection()}
+          disabled={this.props.isClosed}
         >
           {this.generateCloseConnectionLabel()}
         </button>
@@ -253,6 +255,8 @@ class WonConnectionContextDropdown extends React.Component {
       return "Cancel Request";
     } else if (this.props.isReceivedRequest) {
       return "Deny Request";
+    } else if (this.props.isClosed) {
+      return "Connection closed";
     }
   }
 
@@ -321,6 +325,7 @@ WonConnectionContextDropdown.propTypes = {
   isConnectionToGroup: PropTypes.bool,
   showAgreementData: PropTypes.bool,
   showPetriNetData: PropTypes.bool,
+  isClosed: PropTypes.bool,
   isConnected: PropTypes.bool,
   isSentRequest: PropTypes.bool,
   isReceivedRequest: PropTypes.bool,

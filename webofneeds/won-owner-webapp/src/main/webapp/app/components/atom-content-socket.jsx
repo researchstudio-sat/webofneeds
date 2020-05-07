@@ -13,7 +13,12 @@ import ico36_close from "~/images/won-icons/ico36_close.svg";
 import ico36_outgoing from "~/images/won-icons/ico36_outgoing.svg";
 import VisibilitySensor from "react-visibility-sensor";
 
-import { get, generateLink, sortByDate } from "../utils.js";
+import {
+  get,
+  generateLink,
+  sortByDate,
+  filterConnectionsBySearchValue,
+} from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 
 import * as atomUtils from "../redux/utils/atom-utils";
@@ -24,6 +29,7 @@ import WonAtomContextSwipeableView from "./atom-context-swipeable-view";
 import WonTitlePicker from "./details/picker/title-picker.jsx";
 
 import "~/style/_atom-content-socket.scss";
+import * as generalSelectors from "../redux/selectors/general-selectors";
 
 export default function WonAtomContentSocket({ atom, socketType }) {
   const dispatch = useDispatch();
@@ -36,21 +42,15 @@ export default function WonAtomContentSocket({ atom, socketType }) {
   const [showClosed, toggleClosed] = useState(false);
   const [searchText, setSearchText] = useState({ value: "" });
 
-  const storedAtoms = useSelector(state => get(state, "atoms"));
+  const storedAtoms = useSelector(state => generalSelectors.getAtoms(state));
 
-  const connections = get(atom, "connections")
-    .filter(conn => get(conn, "socketUri") === socketUri)
-    .filter(conn => {
-      const tempSearchText = searchText.value.trim();
-      if (tempSearchText.length > 0) {
-        const targetAtom = get(storedAtoms, get(conn, "targetAtomUri"));
-        const targetAtomTitle = get(targetAtom, "humanReadable") || "";
-
-        return targetAtomTitle.indexOf(tempSearchText) > -1;
-      } else {
-        return true;
-      }
-    });
+  const connections = filterConnectionsBySearchValue(
+    get(atom, "connections").filter(
+      conn => get(conn, "socketUri") === socketUri
+    ),
+    storedAtoms,
+    searchText
+  );
 
   // If an atom is owned we display all connStates, if the atom is not owned we only display connected states
   const activeConnections = isAtomOwned
