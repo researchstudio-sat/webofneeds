@@ -13,7 +13,7 @@ import ico36_close from "~/images/won-icons/ico36_close.svg";
 import ico36_outgoing from "~/images/won-icons/ico36_outgoing.svg";
 import VisibilitySensor from "react-visibility-sensor";
 
-import { get, generateLink } from "../utils.js";
+import { get, generateLink, sortByDate } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 
 import * as atomUtils from "../redux/utils/atom-utils";
@@ -21,6 +21,7 @@ import * as accountUtils from "../redux/utils/account-utils";
 import * as connectionUtils from "../redux/utils/connection-utils";
 import vocab from "../service/vocab.js";
 import WonAtomContextSwipeableView from "./atom-context-swipeable-view";
+import WonTitlePicker from "./details/picker/title-picker.jsx";
 
 import "~/style/_atom-content-socket.scss";
 
@@ -33,10 +34,23 @@ export default function WonAtomContentSocket({ atom, socketType }) {
 
   const [showSuggestions, toggleSuggestions] = useState(false);
   const [showClosed, toggleClosed] = useState(false);
+  const [searchText, setSearchText] = useState({ value: "" });
 
-  const connections = get(atom, "connections").filter(
-    conn => get(conn, "socketUri") === socketUri
-  );
+  const storedAtoms = useSelector(state => get(state, "atoms"));
+
+  const connections = get(atom, "connections")
+    .filter(conn => get(conn, "socketUri") === socketUri)
+    .filter(conn => {
+      const tempSearchText = searchText.value.trim();
+      if (tempSearchText.length > 0) {
+        const targetAtom = get(storedAtoms, get(conn, "targetAtomUri"));
+        const targetAtomTitle = get(targetAtom, "humanReadable") || "";
+
+        return targetAtomTitle.indexOf(tempSearchText) > -1;
+      } else {
+        return true;
+      }
+    });
 
   // If an atom is owned we display all connStates, if the atom is not owned we only display connected states
   const activeConnections = isAtomOwned
@@ -185,7 +199,7 @@ export default function WonAtomContentSocket({ atom, socketType }) {
   }
 
   function generateConnectionItems(connections) {
-    const connectionsArray = (connections && connections.toArray()) || [];
+    const connectionsArray = sortByDate(connections) || [];
 
     return connectionsArray.map(conn => {
       let actionButtons;
@@ -265,7 +279,7 @@ export default function WonAtomContentSocket({ atom, socketType }) {
           actionButtons = isAtomOwned ? (
             <div className="acs__item__actions">
               <svg
-                className="acs__item_actions__icon request won-icon"
+                className="acs__item__actions__icon request won-icon"
                 onClick={() => sendRequest(conn)}
               >
                 <use xlinkHref={ico16_checkmark} href={ico16_checkmark} />
@@ -324,6 +338,13 @@ export default function WonAtomContentSocket({ atom, socketType }) {
 
   return (
     <won-atom-content-socket>
+      <div className="acs__search">
+        <WonTitlePicker
+          onUpdate={setSearchText}
+          initialValue={searchText.value}
+          detail={{ placeholder: "Search for Connections" }}
+        />
+      </div>
       {activeConnections.size > 0 ? (
         <div className="acs__segment">
           <div className="acs__segment__content">
@@ -333,7 +354,11 @@ export default function WonAtomContentSocket({ atom, socketType }) {
       ) : (
         <div className="acs__segment">
           <div className="acs__segment__content">
-            <div className="acs__empty">No Connections</div>
+            <div className="acs__empty">
+              {searchText.value.trim().length > 0
+                ? "No Results"
+                : "No Connections"}
+            </div>
           </div>
         </div>
       )}

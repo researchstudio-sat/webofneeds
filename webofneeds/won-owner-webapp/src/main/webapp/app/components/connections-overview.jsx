@@ -214,8 +214,7 @@ class WonConnectionsOverview extends React.Component {
           atomUtils.isActive(get(allAtoms, targetAtomUri));
 
         return targetAtomActiveOrLoading;
-      }),
-      "creationDate"
+      })
     );
     return sortedConnections || [];
   }
