@@ -5,12 +5,13 @@
 won-atom-content-socket {
   .acs__search {
     padding-bottom: 0.5rem;
+
+    + .acs__segment {
+      padding-top: 0;
+    }
   }
 
   .acs__segment {
-    &:first-of-type {
-      padding-top: 0;
-    }
     padding-top: 1rem;
 
     &__header {
