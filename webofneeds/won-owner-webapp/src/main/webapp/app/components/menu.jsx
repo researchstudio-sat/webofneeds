@@ -16,7 +16,7 @@ const mapStateToProps = (state, ownProps) => ({
   isMenuVisible: viewSelectors.isMenuVisible(state),
   isSlideInsVisible: viewSelectors.isSlideInsVisible(state),
   isLocationAccessDenied: generalSelectors.isLocationAccessDenied(state),
-  hasChatAtoms: generalSelectors.hasChatAtoms(state),
+  hasChatConnections: generalSelectors.hasChatConnections(state),
   hasUnreadSuggestedConnections: generalSelectors.hasUnreadSuggestedConnections(
     state
   ),
@@ -75,7 +75,7 @@ class WonMenu extends React.Component {
           </NavLink>
           <NavLink
             className={this.generateTabClasses(
-              !this.props.hasChatAtoms,
+              !this.props.hasChatConnections,
               this.props.hasUnreadChatConnections
             )}
             activeClassName="menu__tab--selected"
@@ -247,7 +247,7 @@ WonMenu.propTypes = {
   isMenuVisible: PropTypes.bool,
   isSlideInsVisible: PropTypes.bool,
   isLocationAccessDenied: PropTypes.bool,
-  hasChatAtoms: PropTypes.bool,
+  hasChatConnections: PropTypes.bool,
   hasUnreadSuggestedConnections: PropTypes.bool,
   hasUnreadBuddyConnections: PropTypes.bool,
   hasUnreadChatConnections: PropTypes.bool,

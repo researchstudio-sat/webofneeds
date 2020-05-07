@@ -2,7 +2,12 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import { useHistory } from "react-router-dom";
-import { get, generateLink, sortByDate } from "../utils.js";
+import {
+  get,
+  generateLink,
+  sortByDate,
+  filterConnectionsBySearchValue,
+} from "../utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import WonConnectionSelectionItem from "./connection-selection-item.jsx";
@@ -11,6 +16,7 @@ import WonTitlePicker from "./details/picker/title-picker.jsx";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 
 import "~/style/_atom-content-chats.scss";
+import * as generalSelectors from "../redux/selectors/general-selectors";
 
 export default function AtomContentChats({ atom }) {
   //const dispatch = useDispatch();
@@ -21,21 +27,15 @@ export default function AtomContentChats({ atom }) {
   const [showClosed, toggleClosed] = useState(false);
   const [searchText, setSearchText] = useState({ value: "" });
 
-  const storedAtoms = useSelector(state => get(state, "atoms"));
+  const storedAtoms = useSelector(state => generalSelectors.getAtoms(state));
 
-  const chatConnections = get(atom, "connections")
-    .filter(conn => get(conn, "socketUri") === chatSocketUri)
-    .filter(conn => {
-      const tempSearchText = searchText.value.trim();
-      if (tempSearchText.length > 0) {
-        const targetAtom = get(storedAtoms, get(conn, "targetAtomUri"));
-        const targetAtomTitle = get(targetAtom, "humanReadable") || "";
-
-        return targetAtomTitle.indexOf(tempSearchText) > -1;
-      } else {
-        return true;
-      }
-    });
+  const chatConnections = filterConnectionsBySearchValue(
+    get(atom, "connections").filter(
+      conn => get(conn, "socketUri") === chatSocketUri
+    ),
+    storedAtoms,
+    searchText
+  );
 
   const activeChatConnections = chatConnections.filter(
     conn =>

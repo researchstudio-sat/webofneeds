@@ -1,61 +1,42 @@
 @import "sizing-utils";
 @import "speech-bubble";
+@import "square-image";
 @import "animate";
 
 won-connections-overview {
   display: block;
   margin: 0;
 
+  .co__search {
+    padding: 0.5rem;
+  }
+
   .co__item {
-    margin-top: 2.5rem;
-
-    &:first-of-type {
-      margin-top: 0;
-    }
-
-    &__atom {
-      display: grid;
-      grid-auto-flow: column;
-      grid-template-columns: 1fr;
-      align-items: center;
-      border-bottom: $thinGrayBorder;
-      box-sizing: border-box;
-      overflow: hidden;
-
-      &__header {
-        padding: 0.5rem;
-        display: grid;
-        grid-template-columns: 1fr auto;
-        min-width: 0;
-
-        & > won-atom-header,
-        & > a.won-atom-header,
-        & > won-connection-indicators {
-          max-height: 2.5rem;
-        }
-
-        & > a.won-atom-header,
-        & > won-atom-header {
-          padding-right: 0.5rem;
-        }
-      }
-    }
     &__connections {
-      margin-left: 1rem;
       &__item {
-        padding-left: 0.5rem;
-        &:not(.won-unread) {
-          background-color: $won-line-gray;
-          border-left: $thinGrayBorder;
-          @media (max-width: $responsivenessBreakPoint) {
-            border-left: none;
-          }
+        display: grid;
+        grid-template-columns: min-content 1fr;
+        align-items: center;
+
+        &__own {
+          @include square-image($postIconSize);
         }
-        &.won-unread {
-          background-color: $won-unread-attention;
-          border-left: $thinBorderWidth solid $won-unread-attention;
-          @media (max-width: $responsivenessBreakPoint) {
-            border-left: none;
+
+        &__remote {
+          padding-left: 0.5rem;
+          &:not(.won-unread) {
+            background-color: $won-line-gray;
+            border-left: $thinGrayBorder;
+            @media (max-width: $responsivenessBreakPoint) {
+              border-left: none;
+            }
+          }
+          &.won-unread {
+            background-color: $won-unread-attention;
+            border-left: $thinBorderWidth solid $won-unread-attention;
+            @media (max-width: $responsivenessBreakPoint) {
+              border-left: none;
+            }
           }
         }
       }

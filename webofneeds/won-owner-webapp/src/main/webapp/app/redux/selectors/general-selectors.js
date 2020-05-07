@@ -81,32 +81,28 @@ export const getOwnedPosts = createSelector(
     )
 );
 
-export const getChatAtoms = createSelector(
+export const getAllChatConnections = createSelector(
   getOwnedAtoms,
   allOwnedAtoms =>
     allOwnedAtoms &&
     allOwnedAtoms
       .filter(atom => atomUtils.isActive(atom))
       .filter(atom => atomUtils.hasChatSocket(atom))
-      .filter(atom => {
-        const chatSocketUri = atomUtils.getChatSocket(atom);
-        return (
-          !!get(atom, "connections") &&
-          !!get(atom, "connections").find(
-            conn =>
-              connectionUtils.hasSocketUri(conn, chatSocketUri) &&
-              !(
-                connectionUtils.isClosed(conn) ||
-                connectionUtils.isSuggested(conn)
-              )
-          )
-        );
-      })
+      .flatMap(atom =>
+        get(atom, "connections").filter(
+          conn =>
+            connectionUtils.hasSocketUri(conn, atomUtils.getChatSocket(atom)) &&
+            !(
+              connectionUtils.isClosed(conn) ||
+              connectionUtils.isSuggested(conn)
+            )
+        )
+      )
 );
 
-export const hasChatAtoms = createSelector(
-  getChatAtoms,
-  chatAtoms => chatAtoms && chatAtoms.size > 0
+export const hasChatConnections = createSelector(
+  getAllChatConnections,
+  chatConnections => chatConnections && chatConnections.size > 0
 );
 
 /**
@@ -169,24 +165,15 @@ export function hasUnreadBuddyConnections(
 }
 
 export const hasUnreadChatConnections = createSelector(
-  getChatAtoms,
-  chatAtoms =>
-    chatAtoms &&
-    !!chatAtoms.find(atom => {
-      const connections = get(atom, "connections");
-      return (
-        !!connections &&
-        !!connections.find(
-          conn =>
-            !(
-              connectionUtils.isClosed(conn) ||
-              connectionUtils.isSuggested(conn)
-            ) &&
-            connectionUtils.isUnread(conn) &&
-            connectionSelectors.isChatToXConnection(chatAtoms, conn)
-        )
-      );
-    })
+  getAllChatConnections,
+  chatConnections =>
+    chatConnections &&
+    !!chatConnections.find(
+      conn =>
+        !(
+          connectionUtils.isClosed(conn) || connectionUtils.isSuggested(conn)
+        ) && connectionUtils.isUnread(conn)
+    )
 );
 
 export const getActiveAtoms = createSelector(

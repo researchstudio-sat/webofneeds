@@ -323,6 +323,45 @@ export function sortByDate(
 }
 
 /**
+ * Filters given Map of connections by occurence of a given searchText Object { value: searchString }
+ * check only looks into the humanReadable of the atom(s)
+ * @param connectionsImm connections map to apply filter on
+ * @param allAtomsImm all stored Atoms in the state
+ * @param value searchValue
+ * @param includeSenderAtom if true, also searches in senderAtom
+ * @returns {*}
+ */
+export function filterConnectionsBySearchValue(
+  connectionsImm,
+  allAtomsImm,
+  { value },
+  includeSenderAtom = false
+) {
+  const tempSearchText = value.trim();
+
+  if (connectionsImm && tempSearchText.length > 0) {
+    const regExp = new RegExp(tempSearchText, "i");
+
+    return connectionsImm.filter(conn => {
+      const targetAtom = get(allAtomsImm, get(conn, "targetAtomUri"));
+      const targetAtomTitle = get(targetAtom, "humanReadable") || "";
+
+      if (includeSenderAtom) {
+        const senderAtom = get(allAtomsImm, get(conn, "uri").split("/c")[0]);
+        const senderAtomTitle = get(senderAtom, "humanReadable") || "";
+
+        return (
+          targetAtomTitle.search(regExp) !== -1 ||
+          senderAtomTitle.search(regExp) !== -1
+        );
+      }
+      return targetAtomTitle.search(regExp) !== -1;
+    });
+  }
+  return connectionsImm;
+}
+
+/**
  * Sorts the elements by Selector (default order is ascending)
  * @param elementsImm elements from state that need to be returned as a sorted array
  * @param selector selector for the date that will be used to sort the elements (default is "lastUpdateDate")
