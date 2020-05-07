@@ -166,6 +166,102 @@ export function addMessage(
               getIn(state, [targetAtomUri, "connections", targetConnectionUri])
             )
           ) {
+            /**
+             * if this message has any higher level protocol references, we need to update the state of the referenced messages as well
+             */
+            const references = parsedMessage.getIn(["data", "references"]);
+            let hadReferences = false;
+            if (references.get("claims")) {
+              const claimedMessageUris = references.get("claims");
+              claimedMessageUris.forEach(messageUri => {
+                state = markMessageAsClaimed(
+                  state,
+                  messageUri,
+                  targetConnectionUri,
+                  targetAtomUri,
+                  true
+                );
+              });
+              hadReferences = true;
+            }
+            if (references.get("proposes")) {
+              const proposedMessageUris = references.get("proposes");
+              proposedMessageUris.forEach(messageUri => {
+                state = markMessageAsProposed(
+                  state,
+                  messageUri,
+                  targetConnectionUri,
+                  targetAtomUri,
+                  true
+                );
+              });
+              hadReferences = true;
+            }
+            if (references.get("proposesToCancel")) {
+              const proposesToCancelMessageUris = references.get(
+                "proposesToCancel"
+              );
+              proposesToCancelMessageUris.forEach(messageUri => {
+                state = markMessageAsCancellationPending(
+                  state,
+                  messageUri,
+                  targetConnectionUri,
+                  targetAtomUri,
+                  true
+                );
+              });
+              hadReferences = true;
+            }
+            if (references.get("accepts")) {
+              const acceptedMessageUris = references.get("accepts");
+              acceptedMessageUris.forEach(messageUri => {
+                state = markMessageAsAccepted(
+                  state,
+                  messageUri,
+                  targetConnectionUri,
+                  targetAtomUri,
+                  true
+                );
+              });
+              hadReferences = true;
+            }
+            if (references.get("rejects")) {
+              const rejectedMessageUris = references.get("rejects");
+              rejectedMessageUris.forEach(messageUri => {
+                state = markMessageAsRejected(
+                  state,
+                  messageUri,
+                  targetConnectionUri,
+                  targetAtomUri,
+                  true
+                );
+              });
+              hadReferences = true;
+            }
+            if (references.get("retracts")) {
+              const retractedMessageUris = references.get("retracts");
+              retractedMessageUris.forEach(messageUri => {
+                state = markMessageAsRetracted(
+                  state,
+                  messageUri,
+                  targetConnectionUri,
+                  targetAtomUri,
+                  true
+                );
+              });
+              hadReferences = true;
+            }
+
+            //re-get messages after state changes from references
+            if (hadReferences) {
+              messages = state.getIn([
+                targetAtomUri,
+                "connections",
+                targetConnectionUri,
+                "messages",
+              ]);
+            }
+
             const existingMessage = messages.get(
               parsedMessage.getIn(["data", "uri"])
             );
@@ -692,7 +788,7 @@ export function markMessageAsRejected(
       "connections",
       connectionUri,
       "agreementData",
-      "retractedMessageUris",
+      "rejectedMessageUris",
     ],
     rejected
       ? (rejectedMessageUris && rejectedMessageUris.add(messageUri)) ||
@@ -832,21 +928,18 @@ export function markMessageAsClaimed(
 ) {
   let atom = state.get(atomUri);
   let connection = atom && atom.getIn(["connections", connectionUri]);
-  let messages = connection && connection.get("messages");
-  let message = messages && messages.get(messageUri);
 
-  if (!message) {
+  if (!connection) {
     console.error(
-      "No message with messageUri: <",
-      messageUri,
+      "No connection with connectionUri: <",
+      connectionUri,
       "> found within atomUri: <",
       atomUri,
-      "> connectionUri: <",
-      connectionUri,
       ">"
     );
     return state;
   }
+
   state = markMessageAsCollapsed(
     state,
     messageUri,
@@ -894,21 +987,18 @@ export function markMessageAsAgreed(
 ) {
   let atom = state.get(atomUri);
   let connection = atom && atom.getIn(["connections", connectionUri]);
-  let messages = connection && connection.get("messages");
-  let message = messages && messages.get(messageUri);
 
-  if (!message) {
+  if (!connection) {
     console.error(
-      "No message with messageUri: <",
-      messageUri,
+      "No connection with connectionUri: <",
+      connectionUri,
       "> found within atomUri: <",
       atomUri,
-      "> connectionUri: <",
-      connectionUri,
       ">"
     );
     return state;
   }
+
   state = markMessageAsCollapsed(
     state,
     messageUri,
@@ -956,17 +1046,13 @@ export function markMessageAsProposed(
 ) {
   let atom = state.get(atomUri);
   let connection = atom && atom.getIn(["connections", connectionUri]);
-  let messages = connection && connection.get("messages");
-  let message = messages && messages.get(messageUri);
 
-  if (!message) {
+  if (!connection) {
     console.error(
-      "No message with messageUri: <",
-      messageUri,
+      "No connection with connectionUri: <",
+      connectionUri,
       "> found within atomUri: <",
       atomUri,
-      "> connectionUri: <",
-      connectionUri,
       ">"
     );
     return state;
@@ -1044,21 +1130,6 @@ export function markMessageAsAccepted(
 
   // remove from cancelled and cancellationPending sets because of not pending anymore
   if (accepted) {
-    const cancelledUris =
-      connection &&
-      connection.getIn(["agreementData", "cancelledAgreementUris"]);
-
-    state = state.setIn(
-      [
-        atomUri,
-        "connections",
-        connectionUri,
-        "agreementData",
-        "cancelledAgreementUris",
-      ],
-      (cancelledUris && cancelledUris.filter(uri => uri != messageUri)) ||
-        Immutable.Set()
-    );
     state = markMessageAsCancellationPending(
       state,
       messageUri,
@@ -1087,17 +1158,13 @@ export function markMessageAsCancelled(
 ) {
   let atom = state.get(atomUri);
   let connection = atom && atom.getIn(["connections", connectionUri]);
-  let messages = connection && connection.get("messages");
-  let message = messages && messages.get(messageUri);
 
-  if (!message) {
+  if (!connection) {
     console.error(
-      "No message with messageUri: <",
-      messageUri,
+      "No connection with connectionUri: <",
+      connectionUri,
       "> found within atomUri: <",
       atomUri,
-      "> connectionUri: <",
-      connectionUri,
       ">"
     );
     return state;
@@ -1160,16 +1227,13 @@ export function markMessageAsCancellationPending(
 ) {
   let atom = state.get(atomUri);
   let connection = atom && atom.getIn(["connections", connectionUri]);
-  let message = connection && connection.getIn(["messages", messageUri]);
 
-  if (!message) {
+  if (!connection) {
     console.error(
-      "No message with messageUri: <",
-      messageUri,
+      "No connection with connectionUri: <",
+      connectionUri,
       "> found within atomUri: <",
       atomUri,
-      "> connectionUri: <",
-      connectionUri,
       ">"
     );
     return state;
