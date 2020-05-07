@@ -4,12 +4,13 @@
 won-atom-content-chats {
   .acc__search {
     padding-bottom: 0.5rem;
+
+    + .acc__segment {
+      padding-top: 0;
+    }
   }
 
   .acc__segment {
-    &:first-of-type {
-      padding-top: 0;
-    }
     padding-top: 1rem;
 
     &__header {
