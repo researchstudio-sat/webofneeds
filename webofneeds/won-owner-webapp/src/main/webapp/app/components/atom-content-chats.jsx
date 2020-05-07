@@ -54,13 +54,7 @@ export default function AtomContentChats({ atom }) {
     return connectionsArray.map((conn, index) => {
       const connUri = get(conn, "uri");
       return (
-        <div
-          key={connUri + "-" + index}
-          className={
-            "acc__item " +
-            (connectionUtils.isUnread(conn) ? " won-unread " : "")
-          }
-        >
+        <div key={connUri + "-" + index} className="acc__item">
           <WonConnectionSelectionItem
             connection={conn}
             toLink={generateLink(

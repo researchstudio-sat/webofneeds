@@ -6,44 +6,20 @@
 @import "speech-bubble";
 
 won-connection-selection-item {
-  $triangleCutoutSize: $speechBubbleTailSize;
-  $padding: 0.5rem;
   display: grid;
-  grid-template-columns: 1fr min-content;
+  grid-template-columns: min-content 1fr min-content;
   grid-auto-flow: column;
   position: relative; // to allow positioning the contextmenu in relation to this component-root
-  padding-left: $padding + $triangleCutoutSize;
-  padding-right: $padding;
-  padding-top: $padding;
-  padding-bottom: $padding;
+  padding: 0.5rem;
 
   background-color: $won-light-gray;
 
   &:not(.won-unread) {
-    @include speech-bubble-left-inward(
-      $won-line-gray,
-      $won-line-gray,
-      $triangleCutoutSize,
-      $thinBorderWidth,
-      50%,
-      "before" /* needed so there can be another tail*/
-    );
-    border-left: $thinGrayBorder;
+    border-left: 0.25rem solid $won-light-gray;
   }
   &.won-unread {
-    @include speech-bubble-left-inward(
-      $won-unread-attention,
-      $won-unread-attention,
-      $triangleCutoutSize,
-      $thinBorderWidth,
-      50%,
-      "before" /* needed so there can be another tail*/
-    );
-    border-left: $thinBorderWidth solid $won-unread-attention;
+    border-left: 0.25rem solid $won-unread-attention;
   }
-
-  $invisibleBorder: $thinBorderWidth solid $won-light-gray;
-  border-bottom: $thinGrayBorder;
 
   &:hover,
   &.selected {
@@ -62,5 +38,9 @@ won-connection-selection-item {
     font-size: $smallFontSize;
     padding: 0.5rem;
     margin-left: 0.25rem;
+  }
+  & .csi__senderAtom {
+    @include square-image($postIconSize);
+    padding-right: 0.5rem;
   }
 }
