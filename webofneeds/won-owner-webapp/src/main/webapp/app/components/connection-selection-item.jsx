@@ -2,102 +2,89 @@ import React from "react";
 import PropTypes from "prop-types";
 import { get } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { connect } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import WonConnectionHeader from "./connection-header.jsx";
 
 import "~/style/_connection-selection-item-line.scss";
 import { generateLink, getQueryParams } from "../utils";
-import { withRouter } from "react-router-dom";
+import { useHistory, Link } from "react-router-dom";
+import WonAtomIcon from "./atom-icon";
 
-const mapStateToProps = (state, ownProps) => {
-  const { connectionUri } = getQueryParams(ownProps.location);
-  const openConnectionUri = connectionUri;
+export default function WonConnectionSelectionItem({
+  senderAtom,
+  connection,
+  toLink,
+}) {
+  const history = useHistory();
+  const dispatch = useDispatch();
+  const openConnectionUri = getQueryParams(history.location).connectionUri;
 
-  const targetAtomUri = get(ownProps.connection, "targetAtomUri");
-  const processState = get(state, "process");
-  return {
-    connectionUri: get(ownProps.connection, "uri"),
-    openConnectionUri: openConnectionUri,
-    lastUpdateTimestamp: get(ownProps.connection, "lastUpdateDate"),
-    targetAtomFailedToLoad: processUtils.hasAtomFailedToLoad(
-      processState,
-      targetAtomUri
-    ),
-    isUnread: connectionUtils.isUnread(ownProps.connection),
-  };
-};
+  const targetAtomUri = get(connection, "targetAtomUri");
+  const processState = useSelector(state => get(state, "process"));
 
-const mapDispatchToProps = dispatch => {
-  return {
-    connectionClose: connectionUri => {
-      dispatch(actionCreators.connections__close(connectionUri));
-    },
-  };
-};
+  const connectionUri = get(connection, "uri");
+  const targetAtomFailedToLoad = processUtils.hasAtomFailedToLoad(
+    processState,
+    targetAtomUri
+  );
+  const isUnread = connectionUtils.isUnread(connection);
 
-class WonConnectionSelectionItem extends React.Component {
-  constructor(props) {
-    super(props);
-    this.closeConnection = this.closeConnection.bind(this);
-  }
+  const closeButton = targetAtomFailedToLoad ? (
+    <button
+      className="csi__closebutton red won-button--outlined thin"
+      onClick={closeConnection}
+    >
+      Close
+    </button>
+  ) : (
+    undefined
+  );
 
-  render() {
-    const closeButton = this.props.targetAtomFailedToLoad ? (
-      <button
-        className="csi__closebutton red won-button--outlined thin"
-        onClick={this.closeConnection}
-      >
-        Close
-      </button>
-    ) : (
-      undefined
-    );
-
-    return (
-      <won-connection-selection-item
-        class={
-          (this.props.openConnectionUri === this.props.connectionUri
-            ? "selected "
-            : "") + (this.props.isUnread ? "won-unread" : "")
-        }
-      >
-        <WonConnectionHeader
-          connection={this.props.connection}
-          toLink={this.props.toLink}
-        />
-        {closeButton}
-      </won-connection-selection-item>
-    );
-  }
-
-  closeConnection() {
-    this.props.connectionClose(this.props.connectionUri);
-    this.props.history.push(
-      generateLink(this.props.history.location, {
+  function closeConnection() {
+    dispatch(actionCreators.connections__close(connectionUri));
+    history.push(
+      generateLink(history.location, {
         useCase: undefined,
         connectionUri: undefined,
       })
     );
   }
+
+  return (
+    <won-connection-selection-item
+      class={
+        (openConnectionUri === connectionUri ? "selected " : "") +
+        (isUnread ? "won-unread" : "")
+      }
+    >
+      {senderAtom ? (
+        <Link
+          className="csi__senderAtom"
+          to={generateLink(
+            history.location,
+            {
+              postUri: get(senderAtom, "uri"),
+              tab: "DETAIL",
+            },
+            "/post",
+            false
+          )}
+        >
+          <WonAtomIcon atomUri={get(senderAtom, "uri")} />
+        </Link>
+      ) : (
+        <div />
+      )}
+      <WonConnectionHeader connection={connection} toLink={toLink} />
+      {closeButton}
+    </won-connection-selection-item>
+  );
 }
 
 WonConnectionSelectionItem.propTypes = {
+  senderAtom: PropTypes.object,
   connection: PropTypes.object.isRequired,
-  connectionUri: PropTypes.string,
   toLink: PropTypes.string,
-  openConnectionUri: PropTypes.string,
-  lastUpdateTimestamp: PropTypes.any,
-  targetAtomFailedToLoad: PropTypes.bool,
-  isUnread: PropTypes.bool,
-  connectionClose: PropTypes.func,
-  history: PropTypes.object,
 };
-
-export default withRouter(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(WonConnectionSelectionItem)
-);

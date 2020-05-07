@@ -64,24 +64,11 @@ won-atom-content-chats {
     }
 
     &__content {
-      &.borderTop {
-        border-top: $thinGrayBorder;
-      }
-
       .acc__item {
-        padding-left: 0.5rem;
-
-        &:not(.won-unread) {
-          background-color: $won-line-gray;
-          border-left: $thinGrayBorder;
-        }
-        &.won-unread {
-          background-color: $won-unread-attention;
-          border-left: $thinBorderWidth solid $won-unread-attention;
-        }
-
         won-connection-selection-item {
           border-right: $thinGrayBorder;
+          border-left: $thinGrayBorder;
+          border-bottom: $thinGrayBorder;
         }
       }
 

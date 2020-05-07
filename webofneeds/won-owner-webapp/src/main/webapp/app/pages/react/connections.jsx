@@ -47,7 +47,7 @@ const mapStateToProps = (state, ownProps) => {
     showModalDialog: viewSelectors.showModalDialog(state),
     showListSide: hasChatConnections,
     showNoSelectionSide: hasChatConnections && !selectedConnection,
-    showContentSide: hasChatConnections && selectedConnection,
+    showContentSide: hasChatConnections && !!selectedConnection,
     isSelectedConnectionGroupChat,
     showSlideIns:
       viewSelectors.hasSlideIns(state, ownProps.history) &&
