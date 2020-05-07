@@ -2,7 +2,16 @@
 @import "sizing-utils";
 
 won-atom-content-chats {
+  .acc__search {
+    padding-bottom: 0.5rem;
+  }
+
   .acc__segment {
+    &:first-of-type {
+      padding-top: 0;
+    }
+    padding-top: 1rem;
+
     &__header {
       display: grid;
       grid-template-columns: min-content 1fr min-content;

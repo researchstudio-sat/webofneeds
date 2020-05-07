@@ -3,13 +3,23 @@
 @import "animate";
 
 won-atom-content-socket {
+  .acs__search {
+    padding-bottom: 0.5rem;
+  }
+
   .acs__segment {
+    &:first-of-type {
+      padding-top: 0;
+    }
+    padding-top: 1rem;
+
     &__header {
       display: grid;
       grid-template-columns: min-content 1fr min-content;
       grid-template-areas: "ouch_icon ouch_title ouch_carret";
       border-bottom: $thinGrayBorder;
       padding: 0.5rem;
+      margin-bottom: 0.5rem;
       @media (min-width: $maxContentWidth) {
         padding-right: 0;
       }
@@ -117,6 +127,7 @@ won-atom-content-socket {
         color: $won-line-gray;
         text-align: center;
         font-weight: 300;
+        grid-column: 1 / -1;
       }
     }
   }
