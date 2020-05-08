@@ -41,17 +41,23 @@ const mapStateToProps = (state, ownProps) => {
   const selectedMessages =
     messages && messages.filter(msg => messageUtils.isMessageSelected(msg));
   const rejectableMessages =
-    messages && messages.filter(msg => messageUtils.isMessageRejectable(msg));
+    messages &&
+    messages.filter(msg => messageUtils.isMessageRejectable(connection, msg));
   const retractableMessages =
-    messages && messages.filter(msg => messageUtils.isMessageRetractable(msg));
+    messages &&
+    messages.filter(msg => messageUtils.isMessageRetractable(connection, msg));
   const acceptableMessages =
-    messages && messages.filter(msg => messageUtils.isMessageAcceptable(msg));
+    messages &&
+    messages.filter(msg => messageUtils.isMessageAcceptable(connection, msg));
   const proposableMessages =
-    messages && messages.filter(msg => messageUtils.isMessageProposable(msg));
+    messages &&
+    messages.filter(msg => messageUtils.isMessageProposable(connection, msg));
   const cancelableMessages =
-    messages && messages.filter(msg => messageUtils.isMessageCancelable(msg));
+    messages &&
+    messages.filter(msg => messageUtils.isMessageCancelable(connection, msg));
   const claimableMessages =
-    messages && messages.filter(msg => messageUtils.isMessageClaimable(msg));
+    messages &&
+    messages.filter(msg => messageUtils.isMessageClaimable(connection, msg));
 
   const hasRejectableMessages =
     rejectableMessages && rejectableMessages.size > 0;

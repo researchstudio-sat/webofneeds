@@ -288,21 +288,6 @@ const mapDispatchToProps = dispatch => {
     processAgreementMessage: message => {
       dispatch(actionCreators.messages__processAgreementMessage(message));
     },
-    updateMessageStatus: (
-      messageUri,
-      connectionUri,
-      atomUri,
-      messageStatus
-    ) => {
-      dispatch(
-        actionCreators.messages__updateMessageStatus({
-          messageUri: messageUri,
-          connectionUri: connectionUri,
-          atomUri: atomUri,
-          messageStatus: messageStatus,
-        })
-      );
-    },
     updateAgreementData: (connectionUri, agreementDataImm) => {
       dispatch(
         actionCreators.connections__updateAgreementData({
@@ -826,7 +811,6 @@ class AtomMessages extends React.Component {
     this.ensureMessagesAreLoaded();
     this.ensureAgreementDataIsLoaded();
     this.ensurePetriNetDataIsLoaded();
-    this.ensureMessageStateIsUpToDate();
   }
 
   showAgreementDataField() {
@@ -1070,96 +1054,6 @@ class AtomMessages extends React.Component {
         });
     }
   }
-
-  ensureMessageStateIsUpToDate() {
-    if (
-      this.props.isConnected &&
-      !connectionUtils.isUsingTemporaryUri(this.props.connection) &&
-      !this.props.isConnectionLoading &&
-      !this.props.isProcessingLoadingAgreementData &&
-      !this.props.isProcessingLoadingMessages &&
-      this.props.agreementDataLoaded &&
-      this.props.chatMessagesWithUnknownState &&
-      this.props.chatMessagesWithUnknownState.size > 0
-    ) {
-      console.debug(
-        "Ensure Message Status is up-to-date for: ",
-        this.props.chatMessagesWithUnknownState.size,
-        " Messages"
-      );
-      this.props.chatMessagesWithUnknownState.forEach(msg => {
-        let messageStatus = get(msg, "messageStatus");
-        const msgUri = get(msg, "uri");
-
-        const acceptedUris = get(this.props.agreementData, "agreementUris");
-        const agreedUris = get(this.props.agreementData, "agreedMessageUris");
-        const rejectedUris = get(
-          this.props.agreementData,
-          "rejectedMessageUris"
-        );
-
-        const retractedUris = get(
-          this.props.agreementData,
-          "retractedMessageUris"
-        );
-        const cancelledUris = get(
-          this.props.agreementData,
-          "cancelledAgreementUris"
-        );
-        const cancellationPendingUris = get(
-          this.props.agreementData,
-          "cancellationPendingAgreementUris"
-        );
-        const claimedUris = get(this.props.agreementData, "claimedMessageUris");
-        const proposedUris = get(
-          this.props.agreementData,
-          "proposedMessageUris"
-        );
-
-        const isProposed = get(messageStatus, "isProposed");
-        const isClaimed = get(messageStatus, "isClaimed");
-        const isAccepted = get(messageStatus, "isAccepted");
-        const isAgreed = get(messageStatus, "isAgreed");
-        const isRejected = get(messageStatus, "isRejected");
-        const isRetracted = get(messageStatus, "isRetracted");
-        const isCancelled = get(messageStatus, "isCancelled");
-        const isCancellationPending = get(
-          messageStatus,
-          "isCancellationPending"
-        );
-
-        const isOldProposed = !!get(proposedUris, msgUri);
-        const isOldClaimed = !!get(claimedUris, msgUri);
-        const isOldAccepted = !!get(acceptedUris, msgUri);
-        const isOldAgreed = !!get(agreedUris, msgUri);
-        const isOldRejected = !!get(rejectedUris, msgUri);
-        const isOldRetracted = !!get(retractedUris, msgUri);
-        const isOldCancelled = !!get(cancelledUris, msgUri);
-        const isOldCancellationPending = !!get(cancellationPendingUris, msgUri);
-
-        messageStatus = messageStatus
-          .set("isProposed", isProposed || isOldProposed)
-          .set("isClaimed", isClaimed || isOldClaimed)
-          .set("isAccepted", isAccepted || isOldAccepted)
-          .set("isAgreed", isAgreed || isOldAgreed)
-          .set("isRejected", isRejected || isOldRejected)
-          .set("isRetracted", isRetracted || isOldRetracted)
-          .set("isCancelled", isCancelled || isOldCancelled)
-          .set(
-            "isCancellationPending",
-            isCancellationPending || isOldCancellationPending
-          );
-
-        this.props.updateMessageStatus(
-          msgUri,
-          this.props.selectedConnectionUri,
-          get(this.props.ownedAtom, "uri"),
-          messageStatus
-        );
-      });
-    }
-  }
-
   loadPreviousMessages() {
     const MORE_MESSAGECOUNT = 5;
     if (

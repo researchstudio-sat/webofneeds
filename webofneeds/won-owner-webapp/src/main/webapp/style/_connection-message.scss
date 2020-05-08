@@ -48,12 +48,11 @@ won-connection-message {
   }
 
   &.won-is-collapsed {
-    filter: opacity(25%);
+    filter: opacity(50%);
     @include square-image($postIconSizeCollapsed, 0 0.5rem 0 0);
   }
 
   &.won-is-collapsible {
-    filter: opacity(25%);
     @include square-image($postIconSizeCollapsed, 0 0.5rem 0 0);
   }
 
@@ -117,15 +116,22 @@ won-connection-message {
       }
     }
   }
-  &.won-is-accepted {
-    //TODO: STYLING
-  }
-  &.won-is-agreed {
-    //TODO: STYLING
+  &.won-is-proposed:not(.won-is-collapsed),
+  &.won-is-claimed:not(.won-is-collapsed),
+  &.won-is-agreed:not(.won-is-collapsed) {
+    opacity: 0.5;
+    border: $thinGrayBorder;
   }
 
-  &.won-is-retracted:not(.won-is-collapsed) {
-    opacity: 0.35;
+  &.won-is-accepted:not(.won-is-collapsed) {
+    opacity: 1;
+    //TODO styling
+  }
+
+  &.won-is-cancelled:not(.won-is-collapsed),
+  &.won-is-retracted:not(.won-is-collapsed),
+  &.won-is-rejected:not(.won-is-collapsed) {
+    opacity: 0.5;
     .won-cm__center__bubble {
       won-combined-message-content {
         text-decoration: line-through;

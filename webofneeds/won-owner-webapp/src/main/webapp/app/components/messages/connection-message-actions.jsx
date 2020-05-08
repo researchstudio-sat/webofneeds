@@ -27,25 +27,28 @@ const mapStateToProps = (state, ownProps) => {
     ownedAtom,
     message,
     multiSelectType: get(connection, "multiSelectType"),
-    isProposed: messageUtils.isMessageProposed(message),
-    isClaimed: messageUtils.isMessageClaimed(message),
-    isAccepted: messageUtils.isMessageAccepted(message),
-    isAgreed: messageUtils.isMessageAgreedOn(message),
-    isRejected: messageUtils.isMessageRejected(message),
-    isRetracted: messageUtils.isMessageRetracted(message),
-    isCancellationPending: messageUtils.isMessageCancellationPending(message),
-    isCancelled: messageUtils.isMessageCancelled(message),
+    isProposed: messageUtils.isMessageProposed(connection, message),
+    isClaimed: messageUtils.isMessageClaimed(connection, message),
+    isAccepted: messageUtils.isMessageAccepted(connection, message),
+    isAgreed: messageUtils.isMessageAgreedOn(connection, message),
+    isRejected: messageUtils.isMessageRejected(connection, message),
+    isRetracted: messageUtils.isMessageRetracted(connection, message),
+    isCancellationPending: messageUtils.isMessageCancellationPending(
+      connection,
+      message
+    ),
+    isCancelled: messageUtils.isMessageCancelled(connection, message),
     isProposable:
       connectionUtils.isConnected(connection) &&
-      messageUtils.isMessageProposable(message),
+      messageUtils.isMessageProposable(connection, message),
     isClaimable:
       connectionUtils.isConnected(connection) &&
-      messageUtils.isMessageClaimable(message),
-    isCancelable: messageUtils.isMessageCancelable(message),
-    isRetractable: messageUtils.isMessageRetractable(message),
-    isRejectable: messageUtils.isMessageRejectable(message),
-    isAcceptable: messageUtils.isMessageAcceptable(message),
-    isAgreeable: messageUtils.isMessageAgreeable(message),
+      messageUtils.isMessageClaimable(connection, message),
+    isCancelable: messageUtils.isMessageCancelable(connection, message),
+    isRetractable: messageUtils.isMessageRetractable(connection, message),
+    isRejectable: messageUtils.isMessageRejectable(connection, message),
+    isAcceptable: messageUtils.isMessageAcceptable(connection, message),
+    isAgreeable: messageUtils.isMessageAgreeable(connection, message),
     isUnread: messageUtils.isMessageUnread(message),
     isFromSystem: get(message, "systemMessage"),
     hasReferences: get(message, "hasReferences"),
@@ -167,30 +170,6 @@ class WonConnectionMessageActions extends React.Component {
       undefined
     );
 
-    const cancelledButton = this.props.isCancelled ? (
-      <button className="won-button--filled thin red" disabled={true}>
-        Cancelled
-      </button>
-    ) : (
-      undefined
-    );
-
-    const rejectedButton = this.props.isRejected ? (
-      <button className="won-button--filled thin red" disabled={true}>
-        Rejected
-      </button>
-    ) : (
-      undefined
-    );
-
-    const retractedButton = this.props.isRetracted ? (
-      <button className="won-button--filled thin red" disabled={true}>
-        Retracted
-      </button>
-    ) : (
-      undefined
-    );
-
     return (
       <won-connection-message-actions>
         {proposeButton}
@@ -200,9 +179,6 @@ class WonConnectionMessageActions extends React.Component {
         {retractButton}
         {cancelButton}
         {cancelationPendingButton}
-        {cancelledButton}
-        {rejectedButton}
-        {retractedButton}
       </won-connection-message-actions>
     );
   }

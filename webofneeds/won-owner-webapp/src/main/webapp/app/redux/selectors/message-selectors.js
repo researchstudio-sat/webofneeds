@@ -18,7 +18,11 @@ export function getMessagesByConnectionUri(state, connectionUri) {
 
 export function getAgreementMessagesByConnectionUri(state, connectionUri) {
   const messages = getMessagesByConnectionUri(state, connectionUri);
-  return messages && messages.filter(msg => isMessageAgreement(msg));
+  const atom = getOwnedAtomByConnectionUri(state, connectionUri);
+  const connection = atom.getIn(["connections", connectionUri]);
+  return (
+    messages && messages.filter(msg => isMessageAgreement(connection, msg))
+  );
 }
 
 export function getCancellationPendingMessagesByConnectionUri(
@@ -31,12 +35,16 @@ export function getCancellationPendingMessagesByConnectionUri(
 
 export function getProposalMessagesByConnectionUri(state, connectionUri) {
   const messages = getMessagesByConnectionUri(state, connectionUri);
-  return messages && messages.filter(msg => isMessageProposal(msg));
+  const atom = getOwnedAtomByConnectionUri(state, connectionUri);
+  const connection = atom.getIn(["connections", connectionUri]);
+  return messages && messages.filter(msg => isMessageProposal(connection, msg));
 }
 
 export function getClaimMessagesByConnectionUri(state, connectionUri) {
   const messages = getMessagesByConnectionUri(state, connectionUri);
-  return messages && messages.filter(msg => isMessageClaim(msg));
+  const atom = getOwnedAtomByConnectionUri(state, connectionUri);
+  const connection = atom.getIn(["connections", connectionUri]);
+  return messages && messages.filter(msg => isMessageClaim(connection, msg));
 }
 
 export function getUnreadMessagesByConnectionUri(state, connectionUri) {

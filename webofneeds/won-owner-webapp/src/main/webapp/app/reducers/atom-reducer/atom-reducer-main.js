@@ -270,16 +270,6 @@ export default function(allAtomsInState = initialState, action = {}) {
               outgoingMessage: true,
               unread: false,
               messageType: vocab.WONMSG.connectMessage,
-              messageStatus: {
-                isProposed: false,
-                isClaimed: false,
-                isRetracted: false,
-                isRejected: false,
-                isAccepted: false,
-                isAgreed: false,
-                isCancelled: false,
-                isCancellationPending: false,
-              },
             },
           },
         });
@@ -520,7 +510,7 @@ export default function(allAtomsInState = initialState, action = {}) {
         action.payload.messageStatus
       );
 
-    case actionTypes.messages.messageStatus.markAsProposed:
+    case actionTypes.connections.agreementData.markAsProposed:
       return markMessageAsProposed(
         allAtomsInState,
         action.payload.messageUri,
@@ -529,7 +519,7 @@ export default function(allAtomsInState = initialState, action = {}) {
         action.payload.proposed
       );
 
-    case actionTypes.messages.messageStatus.markAsClaimed:
+    case actionTypes.connections.agreementData.markAsClaimed:
       return markMessageAsClaimed(
         allAtomsInState,
         action.payload.messageUri,
@@ -538,7 +528,7 @@ export default function(allAtomsInState = initialState, action = {}) {
         action.payload.claimed
       );
 
-    case actionTypes.messages.messageStatus.markAsRejected:
+    case actionTypes.connections.agreementData.markAsRejected:
       return markMessageAsRejected(
         allAtomsInState,
         action.payload.messageUri,
@@ -547,7 +537,7 @@ export default function(allAtomsInState = initialState, action = {}) {
         action.payload.rejected
       );
 
-    case actionTypes.messages.messageStatus.markAsRetracted:
+    case actionTypes.connections.agreementData.markAsRetracted:
       return markMessageAsRetracted(
         allAtomsInState,
         action.payload.messageUri,
@@ -556,7 +546,7 @@ export default function(allAtomsInState = initialState, action = {}) {
         action.payload.retracted
       );
 
-    case actionTypes.messages.messageStatus.markAsAccepted:
+    case actionTypes.connections.agreementData.markAsAccepted:
       return markMessageAsAccepted(
         allAtomsInState,
         action.payload.messageUri,
@@ -565,7 +555,7 @@ export default function(allAtomsInState = initialState, action = {}) {
         action.payload.accepted
       );
 
-    case actionTypes.messages.messageStatus.markAsAgreed:
+    case actionTypes.connections.agreementData.markAsAgreed:
       return markMessageAsAgreed(
         allAtomsInState,
         action.payload.messageUri,
@@ -574,7 +564,7 @@ export default function(allAtomsInState = initialState, action = {}) {
         action.payload.agreed
       );
 
-    case actionTypes.messages.messageStatus.markAsCancelled:
+    case actionTypes.connections.agreementData.markAsCancelled:
       return markMessageAsCancelled(
         allAtomsInState,
         action.payload.messageUri,
@@ -583,7 +573,7 @@ export default function(allAtomsInState = initialState, action = {}) {
         action.payload.cancelled
       );
 
-    case actionTypes.messages.messageStatus.markAsCancellationPending:
+    case actionTypes.connections.agreementData.markAsCancellationPending:
       return markMessageAsCancellationPending(
         allAtomsInState,
         action.payload.messageUri,

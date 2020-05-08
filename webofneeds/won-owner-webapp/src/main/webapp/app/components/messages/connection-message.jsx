@@ -90,34 +90,36 @@ const mapStateToProps = (state, ownProps) => {
     shouldShowRdf,
     rdfLinkURL,
     isParsable: messageUtils.isParsable(message),
-    isClaimed: messageUtils.isMessageClaimed(message),
-    isProposed: messageUtils.isMessageProposed(message),
-    isAccepted: messageUtils.isMessageAccepted(message),
-    isAgreed: messageUtils.isMessageAgreedOn(message),
-    isRejected: messageUtils.isMessageRejected(message),
-    isRetracted: messageUtils.isMessageRetracted(message),
-    isCancellationPending: messageUtils.isMessageCancellationPending(message),
-    isCancelled: messageUtils.isMessageCancelled(message),
+    isClaimed: messageUtils.isMessageClaimed(connection, message),
+    isProposed: messageUtils.isMessageProposed(connection, message),
+    isAccepted: messageUtils.isMessageAccepted(connection, message),
+    isAgreed: messageUtils.isMessageAgreedOn(connection, message),
+    isRejected: messageUtils.isMessageRejected(connection, message),
+    isRetracted: messageUtils.isMessageRetracted(connection, message),
+    isCancellationPending: messageUtils.isMessageCancellationPending(
+      connection,
+      message
+    ),
+    isCancelled: messageUtils.isMessageCancelled(connection, message),
     isCollapsible:
-      messageUtils.isMessageClaimed(message) ||
-      messageUtils.isMessageProposed(message) ||
-      messageUtils.isMessageAccepted(message) ||
-      messageUtils.isMessageAgreedOn(message) ||
-      messageUtils.isMessageRejected(message) ||
-      messageUtils.isMessageRetracted(message) ||
-      messageUtils.isMessageCancellationPending(message) ||
-      messageUtils.isMessageCancelled(message),
+      messageUtils.isMessageClaimed(connection, message) ||
+      messageUtils.isMessageProposed(connection, message) ||
+      messageUtils.isMessageAgreedOn(connection, message) ||
+      messageUtils.isMessageRejected(connection, message) ||
+      messageUtils.isMessageRetracted(connection, message) ||
+      messageUtils.isMessageCancellationPending(connection, message) ||
+      messageUtils.isMessageCancelled(connection, message),
     isProposable:
       connectionUtils.isConnected(connection) &&
-      messageUtils.isMessageProposable(message),
+      messageUtils.isMessageProposable(connection, message),
     isClaimable:
       connectionUtils.isConnected(connection) &&
-      messageUtils.isMessageClaimable(message),
-    isCancelable: messageUtils.isMessageCancelable(message),
-    isRetractable: messageUtils.isMessageRetractable(message),
-    isRejectable: messageUtils.isMessageRejectable(message),
-    isAcceptable: messageUtils.isMessageAcceptable(message),
-    isAgreeable: messageUtils.isMessageAgreeable(message),
+      messageUtils.isMessageClaimable(connection, message),
+    isCancelable: messageUtils.isMessageCancelable(connection, message),
+    isRetractable: messageUtils.isMessageRetractable(connection, message),
+    isRejectable: messageUtils.isMessageRejectable(connection, message),
+    isAcceptable: messageUtils.isMessageAcceptable(connection, message),
+    isAgreeable: messageUtils.isMessageAgreeable(connection, message),
     isUnread: messageUtils.isMessageUnread(message),
     isInjectIntoMessage: injectInto && injectInto.size > 0,
     injectInto: injectInto,
@@ -345,7 +347,7 @@ class WonConnectionMessage extends React.Component {
         class={this.generateParentCssClasses()}
         onClick={this.props.onClick}
       >
-        {messageContentElement}
+        {this.showMessageAlways() ? messageContentElement : undefined}
       </won-connection-message>
     );
   }
@@ -454,11 +456,32 @@ class WonConnectionMessage extends React.Component {
     }
   }
 
+  showMessageAlways() {
+    if (this.props.message) {
+      return getIn(this.props.message, ["content", "text"])
+        ? true
+        : !this.props.hasReferences ||
+            this.props.shouldShowRdf ||
+            this.props.showActions ||
+            messageUtils.hasProposesReferences(this.props.message) ||
+            messageUtils.hasClaimsReferences(this.props.message) ||
+            messageUtils.hasProposesToCancelReferences(this.props.message);
+    }
+    return true;
+  }
+
   //TODO: Not allowed for certain high-level protocol states
   showActionButtons() {
     return (
       !this.props.groupChatMessage &&
+      !this.props.isRetracted &&
+      !this.props.isRejected &&
+      !(
+        messageUtils.hasProposesToCancelReferences(this.props.message) &&
+        this.props.isAccepted
+      ) &&
       (this.props.showActions ||
+        this.props.isCancelable ||
         messageUtils.hasProposesReferences(this.props.message) ||
         messageUtils.hasClaimsReferences(this.props.message) ||
         messageUtils.hasProposesToCancelReferences(this.props.message))

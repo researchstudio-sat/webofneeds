@@ -160,7 +160,7 @@ export function connectionsChatMessage(
           switch (key) {
             case "retracts":
               dispatch({
-                type: actionTypes.messages.messageStatus.markAsRetracted,
+                type: actionTypes.connections.agreementData.markAsRetracted,
                 payload: {
                   messageUri: get(msg, "uri"),
                   connectionUri: connectionUri,
@@ -171,7 +171,7 @@ export function connectionsChatMessage(
               break;
             case "rejects":
               dispatch({
-                type: actionTypes.messages.messageStatus.markAsRejected,
+                type: actionTypes.connections.agreementData.markAsRejected,
                 payload: {
                   messageUri: get(msg, "uri"),
                   connectionUri: connectionUri,
@@ -183,7 +183,8 @@ export function connectionsChatMessage(
             case "proposesToCancel":
               dispatch({
                 type:
-                  actionTypes.messages.messageStatus.markAsCancellationPending,
+                  actionTypes.connections.agreementData
+                    .markAsCancellationPending,
                 payload: {
                   messageUri: get(msg, "uri"),
                   connectionUri: connectionUri,
@@ -194,7 +195,7 @@ export function connectionsChatMessage(
               break;
             case "accepts":
               dispatch({
-                type: actionTypes.messages.messageStatus.markAsAccepted,
+                type: actionTypes.connections.agreementData.markAsAccepted,
                 payload: {
                   messageUri: get(msg, "uri"),
                   connectionUri: connectionUri,
@@ -205,7 +206,7 @@ export function connectionsChatMessage(
               break;
             case "claims":
               dispatch({
-                type: actionTypes.messages.messageStatus.markAsClaimed,
+                type: actionTypes.connections.agreementData.markAsClaimed,
                 payload: {
                   messageUri: get(msg, "uri"),
                   connectionUri: connectionUri,
@@ -216,7 +217,7 @@ export function connectionsChatMessage(
               break;
             case "proposes":
               dispatch({
-                type: actionTypes.messages.messageStatus.markAsProposed,
+                type: actionTypes.connections.agreementData.markAsProposed,
                 payload: {
                   messageUri: get(msg, "uri"),
                   connectionUri: connectionUri,
@@ -755,5 +756,131 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
       numberOfEvents,
       oldestMessageUri
     );
+  };
+}
+export function markAsRetracted(event) {
+  return dispatch => {
+    const payload = {
+      messageUri: event.messageUri,
+      connectionUri: event.connectionUri,
+      atomUri: event.atomUri,
+      retracted: event.retracted,
+    };
+
+    dispatch({
+      type: actionTypes.connections.agreementData.markAsRetracted,
+      payload: payload,
+    });
+  };
+}
+export function markAsRejected(event) {
+  return dispatch => {
+    const payload = {
+      messageUri: event.messageUri,
+      connectionUri: event.connectionUri,
+      atomUri: event.atomUri,
+      rejected: event.rejected,
+    };
+
+    dispatch({
+      type: actionTypes.connections.agreementData.markAsRejected,
+      payload: payload,
+    });
+  };
+}
+
+export function markAsProposed(event) {
+  return dispatch => {
+    const payload = {
+      messageUri: event.messageUri,
+      connectionUri: event.connectionUri,
+      atomUri: event.atomUri,
+      proposed: event.proposed,
+    };
+
+    dispatch({
+      type: actionTypes.connections.agreementData.markAsProposed,
+      payload: payload,
+    });
+  };
+}
+
+export function markAsClaimed(event) {
+  return dispatch => {
+    const payload = {
+      messageUri: event.messageUri,
+      connectionUri: event.connectionUri,
+      atomUri: event.atomUri,
+      claimed: event.claimed,
+    };
+
+    dispatch({
+      type: actionTypes.connections.agreementData.markAsClaimed,
+      payload: payload,
+    });
+  };
+}
+
+export function markAsAccepted(event) {
+  return dispatch => {
+    const payload = {
+      messageUri: event.messageUri,
+      connectionUri: event.connectionUri,
+      atomUri: event.atomUri,
+      accepted: event.accepted,
+    };
+
+    dispatch({
+      type: actionTypes.connections.agreementData.markAsAccepted,
+      payload: payload,
+    });
+  };
+}
+
+export function markAsAgreed(event) {
+  return dispatch => {
+    const payload = {
+      messageUri: event.messageUri,
+      connectionUri: event.connectionUri,
+      atomUri: event.atomUri,
+      agreed: event.agreed,
+    };
+
+    dispatch({
+      type: actionTypes.connections.agreementData.markAsAgreed,
+      payload: payload,
+    });
+  };
+}
+
+export function markAsCancelled(event) {
+  return dispatch => {
+    const payload = {
+      messageUri: event.messageUri,
+      connectionUri: event.connectionUri,
+      atomUri: event.atomUri,
+      cancelled: event.cancelled,
+    };
+
+    dispatch({
+      type: actionTypes.connections.agreementData.markAsCancelled,
+      payload: payload,
+    });
+  };
+}
+
+export function markAsCancellationPending(event) {
+  return dispatch => {
+    const payload = {
+      messageUri: event.messageUri,
+      connectionUri: event.connectionUri,
+      atomUri: event.atomUri,
+      cancellationPending: event.cancellationPending,
+    };
+
+    dispatch({
+      type: actionTypes.connections.agreementData.markAsCancellationPending,
+      payload: payload,
+    });
   };
 }

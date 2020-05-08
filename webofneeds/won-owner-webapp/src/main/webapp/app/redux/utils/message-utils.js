@@ -7,10 +7,11 @@ import { get } from "../../utils.js";
 
 /**
  * Determines if a given message can be Proposed
+ * @param con
  * @param msg
  * @returns {*|boolean}
  */
-export function isMessageProposable(msg) {
+export function isMessageProposable(con, msg) {
   //TODO: should a message be proposable if it was already proposed? or even accepted? and what if the ref are only forwardedMessages?
   return (
     msg &&
@@ -18,17 +19,18 @@ export function isMessageProposable(msg) {
     msg.get("messageType") !== vocab.WONMSG.connectMessage &&
     msg.get("messageType") !== vocab.WONMSG.changeNotificationMessage &&
     !msg.get("hasReferences") &&
-    !isMessageRetracted(msg) &&
-    !isMessageRejected(msg)
+    !isMessageRetracted(con, msg) &&
+    !isMessageRejected(con, msg)
   );
 }
 
 /**
  * Determines if a given message can be Claimed
+ * @param con
  * @param msg
  * @returns {*|boolean}
  */
-export function isMessageClaimable(msg) {
+export function isMessageClaimable(con, msg) {
   //TODO: should a message be claimable if it was already claimed or proposed or even accepted? what if the ref are only forwardedMessages?
   return (
     msg &&
@@ -36,105 +38,111 @@ export function isMessageClaimable(msg) {
     msg.get("messageType") !== vocab.WONMSG.connectMessage &&
     msg.get("messageType") !== vocab.WONMSG.changeNotificationMessage &&
     !msg.get("hasReferences") &&
-    !isMessageRetracted(msg) &&
-    !isMessageRejected(msg)
+    !isMessageRetracted(con, msg) &&
+    !isMessageRejected(con, msg)
   );
 }
 
 /**
  * Determines if a given message can be agreed on
+ * @param con
  * @param msg
  * @returns {*|boolean}
  */
-export function isMessageAgreeable(msg) {
+export function isMessageAgreeable(con, msg) {
   return (
     msg &&
     msg.get("hasContent") &&
-    (hasClaimsReferences(msg) ||
-      hasProposesReferences(msg) ||
-      hasProposesToCancelReferences(msg)) &&
-    !isMessageAccepted(msg) &&
-    !isMessageCancelled(msg) &&
-    !isMessageCancellationPending(msg) &&
-    !isMessageRetracted(msg) &&
-    !isMessageRejected(msg)
+    (hasClaimsReferences(con, msg) ||
+      hasProposesReferences(con, msg) ||
+      hasProposesToCancelReferences(con, msg)) &&
+    !isMessageAccepted(con, msg) &&
+    !isMessageCancelled(con, msg) &&
+    !isMessageCancellationPending(con, msg) &&
+    !isMessageRetracted(con, msg) &&
+    !isMessageRejected(con, msg)
   );
 }
 
 /**
  * Determines if a given message can be Canceled
+ * @param con
  * @param msg
  * @returns {*|boolean}
  */
-export function isMessageCancelable(msg) {
+export function isMessageCancelable(con, msg) {
   return (
     msg &&
     (hasClaimsReferences(msg) ||
       hasProposesReferences(msg) ||
       hasProposesToCancelReferences(msg)) &&
-    isMessageAccepted(msg) &&
-    !isMessageCancelled(msg) &&
-    !isMessageCancellationPending(msg)
-  );
-}
-
-/**
- * Determines if a given message can be Retracted
- * @param msg
- * @returns {*|boolean}
- */
-export function isMessageRetractable(msg) {
-  return (
-    msg &&
-    msg.get("outgoingMessage") &&
-    !isMessageAccepted(msg) &&
-    !isMessageAgreedOn(msg) &&
-    !isMessageCancelled(msg) &&
-    !isMessageCancellationPending(msg) &&
-    !isMessageRetracted(msg) &&
-    !isMessageRejected(msg)
+    isMessageAccepted(con, msg) &&
+    !(hasProposesToCancelReferences(msg) && isMessageAccepted(con, msg)) &&
+    !isMessageCancelled(con, msg) &&
+    !isMessageCancellationPending(con, msg)
   );
 }
 
 /**
  * Determines if a given message can be Accepted
+ * @param con
  * @param msg
  * @returns {*|boolean}
  */
-export function isMessageAcceptable(msg) {
+export function isMessageAcceptable(con, msg) {
   return (
     msg &&
     (hasClaimsReferences(msg) ||
       hasProposesReferences(msg) ||
       hasProposesToCancelReferences(msg)) &&
     !msg.get("outgoingMessage") &&
-    !isMessageAccepted(msg) &&
-    !isMessageAgreedOn(msg) &&
-    !isMessageCancelled(msg) &&
-    !isMessageCancellationPending(msg) &&
-    !isMessageRetracted(msg) &&
-    !isMessageRejected(msg)
+    !isMessageAccepted(con, msg) &&
+    !isMessageAgreedOn(con, msg) &&
+    !isMessageCancelled(con, msg) &&
+    !isMessageCancellationPending(con, msg) &&
+    !isMessageRetracted(con, msg) &&
+    !isMessageRejected(con, msg)
+  );
+}
+
+/**
+ * Determines if a given message can be Retracted
+ * @param con
+ * @param msg
+ * @returns {*|boolean}
+ */
+export function isMessageRetractable(con, msg) {
+  return (
+    msg &&
+    msg.get("outgoingMessage") &&
+    !isMessageAccepted(con, msg) &&
+    !isMessageAgreedOn(con, msg) &&
+    !isMessageCancelled(con, msg) &&
+    !isMessageCancellationPending(con, msg) &&
+    !isMessageRetracted(con, msg) &&
+    !isMessageRejected(con, msg)
   );
 }
 
 /**
  * Determines if a given message can be Rejected
+ * @param con
  * @param msg
  * @returns {*|boolean}
  */
-export function isMessageRejectable(msg) {
+export function isMessageRejectable(con, msg) {
   return (
     msg &&
     (hasClaimsReferences(msg) ||
       hasProposesReferences(msg) ||
       hasProposesToCancelReferences(msg)) &&
     !msg.get("outgoingMessage") &&
-    !isMessageAccepted(msg) &&
-    !isMessageAgreedOn(msg) &&
-    !isMessageCancelled(msg) &&
-    !isMessageCancellationPending(msg) &&
-    !isMessageRetracted(msg) &&
-    !isMessageRejected(msg)
+    !isMessageAccepted(con, msg) &&
+    !isMessageAgreedOn(con, msg) &&
+    !isMessageCancelled(con, msg) &&
+    !isMessageCancellationPending(con, msg) &&
+    !isMessageRetracted(con, msg) &&
+    !isMessageRejected(con, msg)
   );
 }
 
@@ -180,82 +188,114 @@ export function hasProposesToCancelReferences(msg) {
 
 /**
  * Determines if a given message is in the state proposed
+ * @param con
  * @param msg
  * @returns {*|boolean}
  */
-export function isMessageProposed(msg) {
-  const messageStatus = msg && msg.get("messageStatus");
-  return messageStatus && messageStatus.get("isProposed");
+export function isMessageProposed(con, msg) {
+  const agreementData = con && con.get("agreementData");
+  const proposedMessageUris =
+    agreementData && agreementData.get("proposedMessageUris");
+  return proposedMessageUris && proposedMessageUris.has(msg.get("uri"));
 }
 
 /**
  * Determines if a given message is in the state claimed
+ * @param con
  * @param msg
  * @returns {*|boolean}
  */
-export function isMessageClaimed(msg) {
-  const messageStatus = msg && msg.get("messageStatus");
-  return messageStatus && messageStatus.get("isClaimed");
+export function isMessageClaimed(con, msg) {
+  const agreementData = con && con.get("agreementData");
+  const claimedMessageUris =
+    agreementData && agreementData.get("claimedMessageUris");
+  return claimedMessageUris && claimedMessageUris.has(msg.get("uri"));
 }
 
 /**
  * Determines if a given message is in the state rejected
+ * @param con
  * @param msg
  * @returns {*|boolean}
  */
-export function isMessageRejected(msg) {
-  const messageStatus = msg && msg.get("messageStatus");
-  return messageStatus && messageStatus.get("isRejected");
+export function isMessageRejected(con, msg) {
+  const agreementData = con && con.get("agreementData");
+  const rejectedMessageUris =
+    agreementData && agreementData.get("rejectedMessageUris");
+  return rejectedMessageUris && rejectedMessageUris.has(msg.get("uri"));
 }
 
 /**
  * Determines if a given message is in the state accepted
+ * @param con
  * @param msg
  * @returns {*|boolean}
  */
-export function isMessageAccepted(msg) {
-  const messageStatus = msg && msg.get("messageStatus");
-  return messageStatus && messageStatus.get("isAccepted");
+export function isMessageAccepted(con, msg) {
+  const agreementData = con && con.get("agreementData");
+  const acceptedMessageUris =
+    agreementData && agreementData.get("agreementUris");
+
+  const acceptedCancellationProposalUris =
+    agreementData && agreementData.get("acceptedCancellationProposalUris");
+
+  return (
+    (acceptedMessageUris && acceptedMessageUris.has(msg.get("uri"))) ||
+    (acceptedCancellationProposalUris &&
+      acceptedCancellationProposalUris.has(msg.get("uri")))
+  );
 }
 
 /**
  * Determines if a given message is in the state agreed
+ * @param con
  * @param msg
  * @returns {*|boolean}
  */
-export function isMessageAgreedOn(msg) {
-  const messageStatus = msg && msg.get("messageStatus");
-  return messageStatus && messageStatus.get("isAgreed");
+export function isMessageAgreedOn(con, msg) {
+  const agreementData = con && con.get("agreementData");
+  const agreedMessageUris =
+    agreementData && agreementData.get("agreedMessageUris");
+  return agreedMessageUris && agreedMessageUris.has(msg.get("uri"));
 }
 
 /**
  * Determines if a given message is in the state retracted
+ * @param con
  * @param msg
  * @returns {*|boolean}
  */
-export function isMessageRetracted(msg) {
-  const messageStatus = msg && msg.get("messageStatus");
-  return messageStatus && messageStatus.get("isRetracted");
+export function isMessageRetracted(con, msg) {
+  const agreementData = con && con.get("agreementData");
+  const retractedMessageUris =
+    agreementData && agreementData.get("retractedMessageUris");
+  return retractedMessageUris && retractedMessageUris.has(msg.get("uri"));
 }
 
 /**
  * Determines if a given message is in the state Cancelled
+ * @param con
  * @param msg
  * @returns {*|boolean}
  */
-export function isMessageCancelled(msg) {
-  const messageStatus = msg && msg.get("messageStatus");
-  return messageStatus && messageStatus.get("isCancelled");
+export function isMessageCancelled(con, msg) {
+  const agreementData = con && con.get("agreementData");
+  const cancelledMessageUris =
+    agreementData && agreementData.get("cancelledAgreementUris");
+  return cancelledMessageUris && cancelledMessageUris.has(msg.get("uri"));
 }
 
 /**
  * Determines if a given message is in the state CancellationPending
+ * @param con
  * @param msg
  * @returns {*|boolean}
  */
-export function isMessageCancellationPending(msg) {
-  const messageStatus = msg && msg.get("messageStatus");
-  return messageStatus && messageStatus.get("isCancellationPending");
+export function isMessageCancellationPending(con, msg) {
+  const agreementData = con && con.get("agreementData");
+  const cancellationPendingUris =
+    agreementData && agreementData.get("cancellationPendingAgreementUris");
+  return cancellationPendingUris && cancellationPendingUris.has(msg.get("uri"));
 }
 
 /**
@@ -278,47 +318,50 @@ export function isMessageSelected(msg) {
 
 /**
  * Determines if a given message is considered a proposal
+ * @param con
  * @param msg
  * @returns {*|boolean}
  */
-export function isMessageProposal(msg) {
+export function isMessageProposal(con, msg) {
   return (
     (hasProposesToCancelReferences(msg) || hasProposesReferences(msg)) &&
     !(
-      isMessageAccepted(msg) ||
-      isMessageCancellationPending(msg) ||
-      isMessageCancelled(msg) ||
-      isMessageRejected(msg) ||
-      isMessageRetracted(msg)
+      isMessageAccepted(con, msg) ||
+      isMessageCancellationPending(con, msg) ||
+      isMessageCancelled(con, msg) ||
+      isMessageRejected(con, msg) ||
+      isMessageRetracted(con, msg)
     )
   );
 }
 
 /**
  * Determines if a given message is considered a claim
+ * @param con
  * @param msg
  * @returns {*|boolean}
  */
-export function isMessageClaim(msg) {
+export function isMessageClaim(con, msg) {
   return (
     hasClaimsReferences(msg) &&
     !(
-      isMessageAccepted(msg) ||
-      isMessageCancellationPending(msg) ||
-      isMessageCancelled(msg) ||
-      isMessageRejected(msg) ||
-      isMessageRetracted(msg)
+      isMessageAccepted(con, msg) ||
+      isMessageCancellationPending(con, msg) ||
+      isMessageCancelled(con, msg) ||
+      isMessageRejected(con, msg) ||
+      isMessageRetracted(con, msg)
     )
   );
 }
 
 /**
  * Determines if a given message is an agreement
+ * @param con
  * @param msg
  * @returns {*|boolean}
  */
-export function isMessageAgreement(msg) {
-  return isMessageAccepted(msg) && !isMessageCancellationPending(msg);
+export function isMessageAgreement(con, msg) {
+  return isMessageAccepted(con, msg) && !isMessageCancellationPending(con, msg);
 }
 
 export function isAtomHintMessage(msg) {
