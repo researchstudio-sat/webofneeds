@@ -11,10 +11,12 @@ won-connections-overview {
     padding: 0.5rem;
   }
 
-  .co__item {
-    won-connection-selection-item {
-      border-left: $thinGrayBorder;
-      border-bottom: $thinGrayBorder;
+  won-connection-selection-item {
+    &:first-of-type {
+      border-top: $thinGrayBorder;
     }
+
+    border-left: $thinGrayBorder;
+    border-bottom: $thinGrayBorder;
   }
 }

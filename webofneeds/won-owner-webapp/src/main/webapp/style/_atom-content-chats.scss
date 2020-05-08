@@ -64,12 +64,14 @@ won-atom-content-chats {
     }
 
     &__content {
-      .acc__item {
-        won-connection-selection-item {
-          border-right: $thinGrayBorder;
-          border-left: $thinGrayBorder;
-          border-bottom: $thinGrayBorder;
-        }
+      &.borderTop {
+        border-top: $thinGrayBorder;
+      }
+
+      won-connection-selection-item {
+        border-right: $thinGrayBorder;
+        border-left: $thinGrayBorder;
+        border-bottom: $thinGrayBorder;
       }
 
       & > .acc__empty {
