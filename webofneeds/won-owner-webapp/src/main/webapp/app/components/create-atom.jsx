@@ -442,7 +442,6 @@ class CreateAtom extends React.Component {
   }
 
   updateDraft(updatedDraft, branch) {
-    console.debug(this.state.draftObject);
     const _draftObject = this.state.draftObject;
     _draftObject[branch] = updatedDraft;
 
