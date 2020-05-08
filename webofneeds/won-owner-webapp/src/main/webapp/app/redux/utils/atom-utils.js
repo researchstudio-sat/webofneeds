@@ -318,17 +318,31 @@ export function hasSuggestedConnections(atom) {
 }
 
 export function getSuggestedConnections(atom) {
-  return (
-    get(atom, "connections") &&
-    get(atom, "connections").filter(conn => connectionUtils.isSuggested(conn))
-  );
+  return get(atom, "connections")
+    ? get(atom, "connections").filter(conn => connectionUtils.isSuggested(conn))
+    : Immutable.Map();
+}
+
+export function getRequestReceivedConnections(atom) {
+  return get(atom, "connections")
+    ? get(atom, "connections").filter(conn =>
+        connectionUtils.isRequestReceived(conn)
+      )
+    : Immutable.Map();
+}
+
+export function getConnectedConnections(atom) {
+  return get(atom, "connections")
+    ? get(atom, "connections").filter(conn => connectionUtils.isConnected(conn))
+    : Immutable.Map();
 }
 
 export function hasUnreadSuggestedConnections(atom) {
   return (
     get(atom, "connections") &&
     !!get(atom, "connections").find(
-      conn => connectionUtils.isSuggested(conn) && get(conn, "unread")
+      conn =>
+        connectionUtils.isSuggested(conn) && connectionUtils.isUnread(conn)
     )
   );
 }

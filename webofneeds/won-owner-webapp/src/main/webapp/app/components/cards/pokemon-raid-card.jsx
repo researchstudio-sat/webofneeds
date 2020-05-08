@@ -65,9 +65,7 @@ export default function PokemonRaidCard({
   const atomHasHoldableSocket = atomUtils.hasHoldableSocket(atom);
   const isGroupChatEnabled = atomUtils.hasGroupSocket(atom);
   const isChatEnabled = atomUtils.hasChatSocket(atom);
-  const globalLastUpdateTime = useSelector(state =>
-    selectLastUpdateTime(state)
-  );
+  const globalLastUpdateTime = useSelector(selectLastUpdateTime);
   const friendlyTimestamp =
     atom && relativeTime(globalLastUpdateTime, get(atom, "lastUpdateDate"));
   const showPersonaImage = isHolderPersona && !!personaImage;
@@ -347,7 +345,7 @@ export default function PokemonRaidCard({
   const cardSuggestionIndicators = showSuggestions ? (
     hasUnreadChatConnections ? (
       <div className="card__indicators">
-        <WonAtomConnectionsIndicator atomUri={atomUri} />
+        <WonAtomConnectionsIndicator atom={atom} />
       </div>
     ) : (
       <div className="card__indicators">

@@ -34,7 +34,7 @@ const mapStateToProps = (state, ownProps) => {
   const buddyConnections =
     isOwned &&
     hasBuddySocket &&
-    connectionSelectors.getBuddyConnectionsByAtomUri(
+    generalSelectors.getBuddyConnectionsByAtomUri(
       state,
       ownProps.atomUri,
       true,
