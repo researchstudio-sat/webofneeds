@@ -54,19 +54,18 @@ export default function AtomContentChats({ atom }) {
     return connectionsArray.map((conn, index) => {
       const connUri = get(conn, "uri");
       return (
-        <div key={connUri + "-" + index} className="acc__item">
-          <WonConnectionSelectionItem
-            connection={conn}
-            toLink={generateLink(
-              history.location,
-              {
-                connectionUri: connUri,
-              },
-              "/connections",
-              false
-            )}
-          />
-        </div>
+        <WonConnectionSelectionItem
+          connection={conn}
+          toLink={generateLink(
+            history.location,
+            {
+              connectionUri: connUri,
+            },
+            "/connections",
+            false
+          )}
+          key={connUri + "-" + index}
+        />
       );
     });
   }

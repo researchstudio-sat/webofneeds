@@ -58,15 +58,14 @@ export default function WonConnectionsOverview() {
       const connUri = get(conn, "uri");
       const atomUri = connUri.split("/c")[0];
       return (
-        <div className="co__item" key={connUri}>
-          <WonConnectionSelectionItem
-            connection={conn}
-            senderAtom={get(storedAtoms, atomUri)}
-            toLink={generateLink(history.location, {
-              connectionUri: connUri,
-            })}
-          />
-        </div>
+        <WonConnectionSelectionItem
+          connection={conn}
+          senderAtom={get(storedAtoms, atomUri)}
+          toLink={generateLink(history.location, {
+            connectionUri: connUri,
+          })}
+          key={connUri}
+        />
       );
     });
 
