@@ -63,19 +63,19 @@ class WonAtomContextSwipeableView extends React.Component {
       let triggerIcon = (
         <React.Fragment>
           <svg
-            className="cl__trigger cl__trigger--waiting"
+            className="cl__trigger cl__trigger--waiting clickable"
             onClick={() => this.handleClick(show)}
           >
             <use xlinkHref={ico16_contextmenu} href={ico16_contextmenu} />
           </svg>
           <svg
-            className="cl__trigger cl__trigger--add"
+            className="cl__trigger cl__trigger--add clickable"
             onClick={() => this.handleClick(show)}
           >
             <use xlinkHref={ico32_buddy_add} href={ico32_buddy_add} />
           </svg>
           <svg
-            className="cl__trigger cl__trigger--default"
+            className="cl__trigger cl__trigger--default clickable"
             onClick={() => this.handleClick(show)}
           >
             <use xlinkHref={ico16_contextmenu} href={ico16_contextmenu} />

@@ -268,7 +268,7 @@ export default function WonAtomContentSocket({ atom, socketType }) {
         case vocab.WON.Closed:
           headerClassName = "status--closed";
           actionButtons = isAtomOwned ? (
-            <div className="acs__item__actions">Member has been removed</div>
+            <div className="acs__item__actions">Connection has been closed</div>
           ) : (
             undefined
           );

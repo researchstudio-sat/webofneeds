@@ -7,15 +7,21 @@
 
 won-connection-selection-item {
   display: grid;
-  grid-template-columns: min-content 1fr min-content;
-  grid-auto-flow: column;
-  position: relative; // to allow positioning the contextmenu in relation to this component-root
+  grid-template-areas: "main trigger";
+  grid-template-columns: 1fr min-content;
+  align-items: center;
   padding: 0.5rem;
-
+  box-sizing: border-box;
+  position: relative; // to allow positioning the contextmenu in relation to this component-root
   background-color: $won-light-gray;
 
   &:not(.won-unread) {
     border-left: 0.25rem solid $won-light-gray;
+
+    &:hover,
+    &.selected {
+      border-left: 0.25rem solid white;
+    }
   }
   &.won-unread {
     border-left: 0.25rem solid $won-unread-attention;
@@ -34,13 +40,50 @@ won-connection-selection-item {
       50%
     );
   }
-  & .csi__closebutton.won-button--outlined.red.thin {
-    font-size: $smallFontSize;
-    padding: 0.5rem;
-    margin-left: 0.25rem;
+  .csi__main {
+    grid-area: main;
+    &__connection {
+      display: grid;
+      grid-template-columns: min-content 1fr min-content;
+      grid-auto-flow: column;
+      & .csi__closebutton.won-button--outlined.red.thin {
+        font-size: $smallFontSize;
+        padding: 0.5rem;
+        margin-left: 0.25rem;
+      }
+      & .csi__senderAtom {
+        @include square-image($postIconSize);
+        padding-right: 0.5rem;
+      }
+    }
+    &__actions {
+      display: grid;
+      grid-auto-flow: column;
+      grid-gap: 0.5rem;
+      height: 100%;
+      &__button.won-button--filled.red,
+      &__button.won-button--outlined.red.thin {
+        cursor: pointer;
+        font-size: $smallFontSize;
+        padding: 0.5rem;
+      }
+      &__icon.won-icon.primary,
+      &__icon.won-icon.secondary,
+      &__icon.won-icon.disabled,
+      &__icon.won-icon.request {
+        cursor: pointer;
+        display: flex;
+        align-self: center;
+        margin: auto;
+        @include fixed-square($postIconSize);
+      }
+    }
   }
-  & .csi__senderAtom {
-    @include square-image($postIconSize);
-    padding-right: 0.5rem;
+  .csi__trigger {
+    grid-area: trigger;
+    padding: 0.5rem;
+
+    --local-primary: #{$won-secondary-color};
+    @include fixed-square($postIconSizeMobile);
   }
 }
