@@ -5,14 +5,15 @@
 import { createSelector } from "reselect";
 
 import { getIn, get } from "../../utils.js";
-import * as connectionSelectors from "./connection-selectors.js";
 import * as atomUtils from "../utils/atom-utils.js";
 import * as connectionUtils from "../utils/connection-utils.js";
 import * as accountUtils from "../utils/account-utils.js";
 import * as viewUtils from "../utils/view-utils.js";
 import Color from "color";
+import Immutable from "immutable";
+import vocab from "../../service/vocab";
 
-export const selectLastUpdateTime = state => state.get("lastUpdateTime");
+export const selectLastUpdateTime = state => get(state, "lastUpdateTime");
 
 export const getAccountState = state => get(state, "account");
 
@@ -145,15 +146,55 @@ export function hasUnreadBuddyConnections(
       .filter(atom => atomUtils.isActive(atom))
       .find(
         atom =>
-          !!connectionSelectors
-            .getBuddyConnectionsByAtomUri(
-              state,
-              get(atom, "uri"),
-              excludeClosed,
-              excludeSuggested
-            )
-            .find(conn => connectionUtils.isUnread(conn))
+          !!getBuddyConnectionsByAtomUri(
+            state,
+            get(atom, "uri"),
+            excludeClosed,
+            excludeSuggested
+          ).find(conn => connectionUtils.isUnread(conn))
       )
+  );
+}
+
+/**
+ * Returns all buddyConnections of an atom
+ * @param state
+ * @param atomUri
+ * @param excludeClosed  -> exclude Closed connections
+ * @param excludeSuggested -> exclude Suggested connections
+ * @returns {*}
+ */
+export function getBuddyConnectionsByAtomUri(
+  state,
+  atomUri,
+  excludeClosed = false,
+  excludeSuggested = false
+) {
+  const atoms = getAtoms(state);
+  const connections = getIn(atoms, [atomUri, "connections"]);
+
+  return connections
+    ? connections
+        .filter(conn => !(excludeClosed && connectionUtils.isClosed(conn)))
+        .filter(
+          conn => !(excludeSuggested && connectionUtils.isSuggested(conn))
+        )
+        .filter(conn => isBuddyConnection(atoms, conn))
+    : Immutable.Map();
+}
+
+/**
+ * Returns true if both sockets are BuddySockets
+ * @param allAtoms all atoms of the state
+ * @param connection to check sockettypes of
+ * @returns {boolean}
+ */
+export function isBuddyConnection(allAtoms, connection) {
+  return (
+    getSenderSocketType(allAtoms, connection) ===
+      vocab.BUDDY.BuddySocketCompacted &&
+    getTargetSocketType(allAtoms, connection) ===
+      vocab.BUDDY.BuddySocketCompacted
   );
 }
 
@@ -305,3 +346,25 @@ export const getCurrentLocation = createSelector(
 export function getAtomUriBySocketUri(socketUri) {
   return socketUri && socketUri.split("#")[0];
 }
+
+export const getSenderSocketType = (allAtoms, connection) => {
+  const connectionUri = get(connection, "uri");
+  const senderSocketUri = get(connection, "socketUri");
+  const senderAtom =
+    connectionUri &&
+    allAtoms &&
+    (getIn(allAtoms, connectionUri.split("/c")[0]) ||
+      allAtoms.find(atom => getIn(atom, ["connections", connectionUri])));
+
+  return senderAtom && atomUtils.getSocketType(senderAtom, senderSocketUri);
+};
+
+export const getTargetSocketType = (allAtoms, connection) => {
+  const targetAtomUri = get(connection, "targetAtomUri");
+  const targetSocketUri = get(connection, "targetSocketUri");
+
+  return (
+    targetSocketUri &&
+    getIn(allAtoms, [targetAtomUri, "content", "sockets", targetSocketUri])
+  );
+};

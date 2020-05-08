@@ -11,7 +11,7 @@ import WonAtomSuggestionsIndicator from "../atom-suggestions-indicator.jsx";
 import WonAtomConnectionsIndicator from "../atom-connections-indicator.jsx";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import { relativeTime } from "../../won-label-utils.js";
-import * as generalSelectors from "../../redux/selectors/general-selectors.js";
+import { selectLastUpdateTime } from "../../redux/selectors/general-selectors.js";
 
 import "~/style/_other-card.scss";
 import { Link } from "react-router-dom";
@@ -57,9 +57,7 @@ export default function WonOtherCard({
   const atomHasHoldableSocket = atomUtils.hasHoldableSocket(atom);
   const isGroupChatEnabled = atomUtils.hasGroupSocket(atom);
   const isChatEnabled = atomUtils.hasChatSocket(atom);
-  const globalLastUpdateTime = useSelector(state =>
-    generalSelectors.selectLastUpdateTime(state)
-  );
+  const globalLastUpdateTime = useSelector(selectLastUpdateTime);
   const friendlyTimestamp =
     atom && relativeTime(globalLastUpdateTime, get(atom, "lastUpdateDate"));
   const showPersonaImage = isHolderPersona && !!personaImage;
@@ -349,7 +347,7 @@ export default function WonOtherCard({
   const cardConnectionIndicators = showSuggestions ? (
     hasUnreadChatConnections ? (
       <div className="card__indicators">
-        <WonAtomConnectionsIndicator atomUri={atomUri} />
+        <WonAtomConnectionsIndicator atom={atom} />
       </div>
     ) : (
       <div className="card__indicators">
