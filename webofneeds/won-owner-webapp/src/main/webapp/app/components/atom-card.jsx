@@ -93,7 +93,14 @@ class WonAtomCard extends React.Component {
     } else if (this.props.isPersona) {
       cardContent = <WonPersonaCard atomUri={this.props.atomUri} />;
     } else if (this.props.isPokemonRaid) {
-      cardContent = <PokemonRaidCard atomUri={this.props.atomUri} />;
+      cardContent = (
+        <PokemonRaidCard
+          atomUri={this.props.atomUri}
+          showSuggestions={this.props.showSuggestions}
+          showHolder={this.props.showHolder}
+          currentLocation={this.props.currentLocation}
+        />
+      );
     } else {
       cardContent = (
         <WonOtherCard
