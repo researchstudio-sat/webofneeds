@@ -43,7 +43,7 @@ export default function WonConnectionSelectionItem({
   const closeButton = targetAtomFailedToLoad ? (
     <button
       className="csi__closebutton red won-button--outlined thin"
-      onClick={closeConnection}
+      onClick={() => closeConnection()}
     >
       Close
     </button>
@@ -54,10 +54,9 @@ export default function WonConnectionSelectionItem({
   let actionButtons;
 
   function closeConnection(
-    conn,
     dialogText = "Do you want to remove the Connection?"
   ) {
-    if (!conn) {
+    if (!connection) {
       return;
     }
 
@@ -68,24 +67,24 @@ export default function WonConnectionSelectionItem({
         {
           caption: "Yes",
           callback: () => {
-            const connUri = get(conn, "uri");
-
-            if (connectionUtils.isUnread(conn)) {
+            if (connectionUtils.isUnread(connection)) {
               dispatch(
                 actionCreators.connections__markAsRead({
-                  connectionUri: get(conn, "uri"),
+                  connectionUri: connectionUri,
                   atomUri: senderAtomUri,
                 })
               );
             }
 
-            dispatch(actionCreators.connections__close(connUri));
+            dispatch(actionCreators.connections__close(connectionUri));
+            setShowActions(!showActions);
             dispatch(actionCreators.view__hideModalDialog());
           },
         },
         {
           caption: "No",
           callback: () => {
+            setShowActions(!showActions);
             dispatch(actionCreators.view__hideModalDialog());
           },
         },
@@ -94,22 +93,23 @@ export default function WonConnectionSelectionItem({
     dispatch(actionCreators.view__showModalDialog(payload));
   }
 
-  function openRequest(conn, message = "") {
-    if (!conn) {
+  function openRequest(message = "") {
+    if (!connection) {
       return;
     }
 
-    if (connectionUtils.isUnread(conn)) {
+    if (connectionUtils.isUnread(connection)) {
       dispatch(
         actionCreators.connections__markAsRead({
-          connectionUri: get(conn, "uri"),
+          connectionUri: connectionUri,
           atomUri: senderAtomUri,
         })
       );
     }
 
-    const senderSocketUri = get(conn, "socketUri");
-    const targetSocketUri = get(conn, "targetSocketUri");
+    const senderSocketUri = get(connection, "socketUri");
+    const targetSocketUri = get(connection, "targetSocketUri");
+    setShowActions(!showActions);
     dispatch(
       actionCreators.atoms__connectSockets(
         senderSocketUri,
@@ -119,8 +119,8 @@ export default function WonConnectionSelectionItem({
     );
   }
 
-  function sendRequest(conn, message = "") {
-    if (!conn) {
+  function sendRequest(message = "") {
+    if (!connection) {
       return;
     }
 
@@ -131,14 +131,13 @@ export default function WonConnectionSelectionItem({
         {
           caption: "Yes",
           callback: () => {
-            const connUri = get(conn, "uri");
-            const senderSocketUri = get(conn, "socketUri");
-            const targetSocketUri = get(conn, "targetSocketUri");
+            const senderSocketUri = get(connection, "socketUri");
+            const targetSocketUri = get(connection, "targetSocketUri");
 
-            if (connectionUtils.isUnread(conn)) {
+            if (connectionUtils.isUnread(connection)) {
               dispatch(
                 actionCreators.connections__markAsRead({
-                  connectionUri: get(conn, "uri"),
+                  connectionUri: connectionUri,
                   atomUri: senderAtomUri,
                 })
               );
@@ -146,7 +145,7 @@ export default function WonConnectionSelectionItem({
 
             dispatch(
               actionCreators.connections__rate(
-                connUri,
+                connectionUri,
                 vocab.WONCON.binaryRatingGood
               )
             );
@@ -158,12 +157,14 @@ export default function WonConnectionSelectionItem({
                 message
               )
             );
+            setShowActions(!showActions);
             dispatch(actionCreators.view__hideModalDialog());
           },
         },
         {
           caption: "No",
           callback: () => {
+            setShowActions(!showActions);
             dispatch(actionCreators.view__hideModalDialog());
           },
         },
@@ -178,13 +179,13 @@ export default function WonConnectionSelectionItem({
         <React.Fragment>
           <svg
             className="csi__main__actions__icon request won-icon"
-            onClick={() => openRequest(connection)}
+            onClick={() => openRequest()}
           >
             <use xlinkHref={ico16_checkmark} href={ico16_checkmark} />
           </svg>
           <svg
             className="csi__main__actions__icon primary won-icon"
-            onClick={() => closeConnection(connection, "Reject Request?")}
+            onClick={() => closeConnection("Reject Request?")}
           >
             <use xlinkHref={ico36_close} href={ico36_close} />
           </svg>
@@ -203,7 +204,7 @@ export default function WonConnectionSelectionItem({
           </svg>
           <svg
             className="csi__main__actions__icon secondary won-icon"
-            onClick={() => closeConnection(connection, "Cancel Request?")}
+            onClick={() => closeConnection("Cancel Request?")}
           >
             <use xlinkHref={ico36_close} href={ico36_close} />
           </svg>
@@ -216,7 +217,7 @@ export default function WonConnectionSelectionItem({
         <React.Fragment>
           <svg
             className="csi__main__actions__icon secondary won-icon"
-            onClick={() => closeConnection(connection)}
+            onClick={() => closeConnection()}
           >
             <use xlinkHref={ico36_close} href={ico36_close} />
           </svg>
@@ -235,13 +236,13 @@ export default function WonConnectionSelectionItem({
         <React.Fragment>
           <svg
             className="csi__main__actions__icon request won-icon"
-            onClick={() => sendRequest(connection)}
+            onClick={() => sendRequest()}
           >
             <use xlinkHref={ico16_checkmark} href={ico16_checkmark} />
           </svg>
           <svg
             className="csi__main__actions__icon primary won-icon"
-            onClick={() => closeConnection(connection, "Remove Suggestion?")}
+            onClick={() => closeConnection("Remove Suggestion?")}
           >
             <use xlinkHref={ico36_close} href={ico36_close} />
           </svg>
@@ -253,6 +254,31 @@ export default function WonConnectionSelectionItem({
       actionButtons = <React.Fragment>Unknown State</React.Fragment>;
   }
 
+  const connectionContent = (
+    <div className="csi__main__connection">
+      {senderAtom ? (
+        <Link
+          className="csi__senderAtom"
+          to={generateLink(
+            history.location,
+            {
+              postUri: get(senderAtom, "uri"),
+              tab: "DETAIL",
+            },
+            "/post",
+            false
+          )}
+        >
+          <WonAtomIcon atomUri={get(senderAtom, "uri")} />
+        </Link>
+      ) : (
+        <div />
+      )}
+      <WonConnectionHeader connection={connection} toLink={toLink} />
+      {closeButton}
+    </div>
+  );
+
   return (
     <won-connection-selection-item
       class={
@@ -260,43 +286,28 @@ export default function WonConnectionSelectionItem({
         (isUnread ? "won-unread" : "")
       }
     >
-      <div className="csi__main">
-        <SwipeableViews
-          index={showActions ? 1 : 0}
-          enableMouseEvents={false}
-          animateHeight={true}
-        >
-          <div className="csi__main__connection">
-            {senderAtom ? (
-              <Link
-                className="csi__senderAtom"
-                to={generateLink(
-                  history.location,
-                  {
-                    postUri: get(senderAtom, "uri"),
-                    tab: "DETAIL",
-                  },
-                  "/post",
-                  false
-                )}
-              >
-                <WonAtomIcon atomUri={get(senderAtom, "uri")} />
-              </Link>
-            ) : (
-              <div />
-            )}
-            <WonConnectionHeader connection={connection} toLink={toLink} />
-            {closeButton}
+      {openConnectionUri === connectionUri ? (
+        <div className="csi__main">{connectionContent}</div>
+      ) : (
+        <React.Fragment>
+          <div className="csi__main">
+            <SwipeableViews
+              index={showActions ? 1 : 0}
+              enableMouseEvents={false}
+              animateHeight={true}
+            >
+              {connectionContent}
+              <div className="csi__main__actions">{actionButtons}</div>
+            </SwipeableViews>
           </div>
-          <div className="csi__main__actions">{actionButtons}</div>
-        </SwipeableViews>
-      </div>
-      <svg
-        className="csi__trigger clickable"
-        onClick={() => setShowActions(!showActions)}
-      >
-        <use xlinkHref={ico16_contextmenu} href={ico16_contextmenu} />
-      </svg>
+          <svg
+            className="csi__trigger clickable"
+            onClick={() => setShowActions(!showActions)}
+          >
+            <use xlinkHref={ico16_contextmenu} href={ico16_contextmenu} />
+          </svg>
+        </React.Fragment>
+      )}
     </won-connection-selection-item>
   );
 }
