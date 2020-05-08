@@ -103,6 +103,7 @@ function AppRoutes() {
   const processState = useSelector(state => get(state, "process"));
 
   const isLoggedIn = accountUtils.isLoggedIn(accountState);
+  const hasLoginError = !!accountUtils.getLoginError(accountState);
   const isAnonymous = accountUtils.isAnonymous(accountState);
 
   const { postUri, token, privateId } = getQueryParams(location);
@@ -125,7 +126,7 @@ function AppRoutes() {
     dispatch(actionCreators.account__verifyEmailAddress(token));
   }
 
-  if (privateId && !loginProcessing && !isLoggedIn) {
+  if (privateId && !loginProcessing && !isLoggedIn && !hasLoginError) {
     console.debug("Dispatchin privateId Login");
     dispatch(actionCreators.account__login({ privateId: privateId }));
   }
