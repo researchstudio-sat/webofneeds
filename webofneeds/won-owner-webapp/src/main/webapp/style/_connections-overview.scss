@@ -9,13 +9,13 @@ won-connections-overview {
 
   .co__search {
     padding: 0.5rem;
-  }
 
-  won-connection-selection-item {
-    &:first-of-type {
+    + .co__item {
       border-top: $thinGrayBorder;
     }
+  }
 
+  .co__item {
     border-left: $thinGrayBorder;
     border-bottom: $thinGrayBorder;
   }

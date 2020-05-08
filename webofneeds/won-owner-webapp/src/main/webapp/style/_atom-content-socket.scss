@@ -108,6 +108,7 @@ won-atom-content-socket {
 
           &__button.won-button--filled.red,
           &__button.won-button--outlined.red.thin {
+            cursor: pointer;
             font-size: $smallFontSize;
             padding: 0.5rem;
           }
@@ -116,6 +117,7 @@ won-atom-content-socket {
           &__icon.won-icon.secondary,
           &__icon.won-icon.disabled,
           &__icon.won-icon.request {
+            cursor: pointer;
             display: flex;
             align-self: center;
             margin: auto;
