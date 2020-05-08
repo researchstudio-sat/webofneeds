@@ -4,126 +4,81 @@
 import React from "react";
 import { get, getIn } from "../utils.js";
 
-import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import WonOtherCard from "./cards/other-card.jsx";
 import WonSkeletonCard from "./cards/skeleton-card.jsx";
 import WonPersonaCard from "./cards/persona-card.jsx";
 import PokemonRaidCard from "./cards/pokemon-raid-card.jsx";
 import PropTypes from "prop-types";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 
 import "~/style/_atom-card.scss";
 
-const mapStateToProps = (state, ownProps) => {
-  const atom = getIn(state, ["atoms", ownProps.atomUri]);
-  const isPersona = atomUtils.isPersona(atom);
-  const process = get(state, "process");
+export default function WonAtomCard({
+  atomUri,
+  showHolder,
+  showSuggestions,
+  currentLocation,
+}) {
+  const atom = useSelector(state => getIn(state, ["atoms", atomUri]));
+  const processState = useSelector(state => get(state, "process"));
+
   const isSkeleton =
     !(
-      processUtils.isAtomLoaded(process, ownProps.atomUri) &&
+      processUtils.isAtomLoaded(processState, atomUri) &&
       !get(atom, "isBeingCreated")
     ) ||
     get(atom, "isBeingCreated") ||
-    processUtils.hasAtomFailedToLoad(process, ownProps.atomUri) ||
-    processUtils.isAtomLoading(process, ownProps.atomUri) ||
-    processUtils.isAtomToLoad(process, ownProps.atomUri);
+    processUtils.hasAtomFailedToLoad(processState, atomUri) ||
+    processUtils.isAtomLoading(processState, atomUri) ||
+    processUtils.isAtomToLoad(processState, atomUri);
 
-  const isPokemonRaid =
-    getIn(atom, ["matchedUseCase", "identifier"]) === "pokemonGoRaid";
+  const matchedUseCase = getIn(atom, ["matchedUseCase", "identifier"]);
+
+  let cardContent;
 
   if (isSkeleton) {
-    return {
-      atomUri: ownProps.atomUri,
-      showHolder: ownProps.showHolder,
-      showSuggestions: ownProps.showSuggestions,
-      currentLocation: ownProps.currentLocation,
-      isPersona: false,
-      isPokemonRaid: false,
-      isOtherAtom: false,
-      isSkeleton: true,
-    };
-  } else if (isPersona) {
-    return {
-      atomUri: ownProps.atomUri,
-      showHolder: ownProps.showHolder,
-      showSuggestions: ownProps.showSuggestions,
-      currentLocation: ownProps.currentLocation,
-      isPersona: true,
-      isPokemonRaid: false,
-      isOtherAtom: false,
-      isSkeleton: false,
-    };
-  } else if (isPokemonRaid) {
-    return {
-      atomUri: ownProps.atomUri,
-      showHolder: ownProps.showHolder,
-      showSuggestions: ownProps.showSuggestions,
-      currentLocation: ownProps.currentLocation,
-      isPersona: false,
-      isPokemonRaid: true,
-      isOtherAtom: false,
-      isSkeleton: false,
-    };
+    cardContent = (
+      <WonSkeletonCard
+        atomUri={atomUri}
+        showSuggestions={showSuggestions}
+        showHolder={showHolder}
+      />
+    );
   } else {
-    return {
-      atomUri: ownProps.atomUri,
-      showHolder: ownProps.showHolder,
-      showSuggestions: ownProps.showSuggestions,
-      currentLocation: ownProps.currentLocation,
-      isPersona: false,
-      isPokemonRaid: false,
-      isOtherAtom: true,
-      isSkeleton: false,
-    };
-  }
-};
-
-class WonAtomCard extends React.Component {
-  render() {
-    let cardContent;
-    if (this.props.isSkeleton) {
-      cardContent = (
-        <WonSkeletonCard
-          atomUri={this.props.atomUri}
-          showSuggestions={this.props.showSuggestions}
-          showHolder={this.props.showHolder}
-        />
-      );
-    } else if (this.props.isPersona) {
-      cardContent = <WonPersonaCard atomUri={this.props.atomUri} />;
-    } else if (this.props.isPokemonRaid) {
-      cardContent = (
-        <PokemonRaidCard
-          atomUri={this.props.atomUri}
-          showSuggestions={this.props.showSuggestions}
-          showHolder={this.props.showHolder}
-          currentLocation={this.props.currentLocation}
-        />
-      );
-    } else {
-      cardContent = (
-        <WonOtherCard
-          atomUri={this.props.atomUri}
-          showSuggestions={this.props.showSuggestions}
-          showHolder={this.props.showHolder}
-          currentLocation={this.props.currentLocation}
-        />
-      );
+    // We already know that we have the atom thats why we can push it directly into the card-components
+    switch (matchedUseCase) {
+      case "persona":
+        cardContent = <WonPersonaCard atomUri={atomUri} atom={atom} />;
+        break;
+      case "pokemonGoRaid":
+        cardContent = (
+          <PokemonRaidCard
+            atom={atom}
+            showSuggestions={showSuggestions}
+            showHolder={showHolder}
+            currentLocation={currentLocation}
+          />
+        );
+        break;
+      default:
+        cardContent = (
+          <WonOtherCard
+            atom={atom}
+            showSuggestions={showSuggestions}
+            showHolder={showHolder}
+            currentLocation={currentLocation}
+          />
+        );
+        break;
     }
-
-    return <won-atom-card>{cardContent}</won-atom-card>;
   }
-}
 
+  return <won-atom-card>{cardContent}</won-atom-card>;
+}
 WonAtomCard.propTypes = {
   atomUri: PropTypes.string.isRequired,
   showHolder: PropTypes.bool,
   showSuggestions: PropTypes.bool,
   currentLocation: PropTypes.object,
-  isPersona: PropTypes.bool,
-  isPokemonRaid: PropTypes.bool,
-  isOtherAtom: PropTypes.bool,
-  isSkeleton: PropTypes.bool,
 };
-export default connect(mapStateToProps)(WonAtomCard);
