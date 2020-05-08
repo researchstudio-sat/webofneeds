@@ -6,7 +6,7 @@ won-atom-content-participants {
   display: grid;
   grid-gap: 1rem;
 
-  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
 
   & .acp__empty {
     color: $won-line-gray;

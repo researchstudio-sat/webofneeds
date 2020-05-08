@@ -124,10 +124,10 @@ const mapStateToProps = (state, ownProps) => {
         ? unreadMessages.size
         : undefined,
     friendlyTimestamp:
-      targetAtom &&
+      connection &&
       relativeTime(
         generalSelectors.selectLastUpdateTime(state),
-        get(targetAtom, "lastUpdateDate")
+        get(connection, "lastUpdateDate")
       ),
     targetAtomFailedToLoad:
       targetAtom &&
