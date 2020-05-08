@@ -2,43 +2,45 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import { connect } from "react-redux";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { get, getIn, generateLink } from "../../utils.js";
-import Immutable from "immutable";
-import { actionCreators } from "../../actions/actions.js";
 import PropTypes from "prop-types";
 
 import WonAtomMap from "../atom-map.jsx";
 import WonAtomSuggestionsIndicator from "../atom-suggestions-indicator.jsx";
+import WonAtomConnectionsIndicator from "../atom-connections-indicator.jsx";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import { relativeTime } from "../../won-label-utils.js";
 import { selectLastUpdateTime } from "../../redux/selectors/general-selectors.js";
 import { details } from "../../../config/detail-definitions.js";
 
 import "~/style/_pokemon-raid-card.scss";
-import { withRouter, Link } from "react-router-dom";
 
-const mapStateToProps = (state, ownProps) => {
-  const atom = getIn(state, ["atoms", ownProps.atomUri]);
+export default function PokemonRaidCard({
+  atom,
+  showSuggestions,
+  showHolder,
+  currentLocation,
+}) {
+  const atomUri = get(atom, "uri");
   const useCaseIcon = atomUtils.getMatchedUseCaseIcon(atom);
   const iconBackground = atomUtils.getBackground(atom);
   const identiconSvg = !useCaseIcon
     ? atomUtils.getIdenticonSvg(atom)
     : undefined;
-
   const isDirectResponse = atomUtils.isDirectResponseAtom(atom);
   const responseToUri =
     isDirectResponse && getIn(atom, ["content", "responseToUri"]);
-  const responseToAtom = responseToUri
-    ? getIn(state, ["atoms", responseToUri])
-    : undefined;
-
+  const responseToAtom = useSelector(state =>
+    getIn(state, ["atoms", responseToUri])
+  );
   const atomLocation = atomUtils.getLocation(atom);
   const holderUri = atomUtils.getHeldByUri(atom);
-  const holder = getIn(state, ["atoms", holderUri]);
+  const holder = useSelector(state => getIn(state, ["atoms", holderUri]));
   const holderName = get(holder, "humanReadable");
   const holderHolds = holder && get(holder, "holds");
-  const holderVerified = holderHolds && holderHolds.includes(ownProps.atomUri);
+  const holderVerified = holderHolds && holderHolds.includes(atomUri);
   const isHolderPersona = atomUtils.isPersona(holder);
   const personaIdenticonSvg = atomUtils.getIdenticonSvg(holder);
   const personaImage = atomUtils.getDefaultPersonaImage(holder);
@@ -49,206 +51,41 @@ const mapStateToProps = (state, ownProps) => {
   const holderUseCaseIconBackground = !isHolderPersona
     ? atomUtils.getBackground(holder)
     : undefined;
-
   const pokemonId = getIn(atom, ["content", "pokemonRaid", "id"]);
   const pokemonForm = getIn(atom, ["content", "pokemonRaid", "form"]);
-
   const pokemon =
     pokemonId &&
     details.pokemonRaid &&
     details.pokemonRaid.findPokemonById &&
     details.pokemonRaid.findPokemonById(pokemonId, pokemonForm);
-
   const pokemonImageUrl = pokemon && pokemon.imageUrl;
+  const isInactive = atomUtils.isInactive(atom);
+  const holderWebsite = getIn(holder, ["content", "website"]);
+  const atomTypeLabel = atomUtils.generateTypeLabel(atom);
+  const atomHasHoldableSocket = atomUtils.hasHoldableSocket(atom);
+  const isGroupChatEnabled = atomUtils.hasGroupSocket(atom);
+  const isChatEnabled = atomUtils.hasChatSocket(atom);
+  const globalLastUpdateTime = useSelector(state =>
+    selectLastUpdateTime(state)
+  );
+  const friendlyTimestamp =
+    atom && relativeTime(globalLastUpdateTime, get(atom, "lastUpdateDate"));
+  const showPersonaImage = isHolderPersona && !!personaImage;
+  const showPersonaIdenticon =
+    isHolderPersona && !personaImage && !!personaIdenticonSvg;
+  const showMap = false; //!pokemonImageUrl && atomLocation, //if no image is present but a location is, we display a map instead
+  const showDefaultIcon = !pokemonImageUrl; //&& !atomLocation; //if no image and no location are present we display the defaultIcon in the card__icon area, instead of next to the title
 
-  return {
-    atomUri: ownProps.atomUri,
-    showHolder: ownProps.showHolder,
-    showSuggestions: ownProps.showSuggestions,
-    currentLocation: ownProps.currentLocation,
-    isDirectResponse: isDirectResponse,
-    isInactive: atomUtils.isInactive(atom),
-    responseToAtom,
-    atom,
-    holder,
-    holderName,
-    holderVerified,
-    pokemonImageUrl,
-    holderWebsite: getIn(holder, ["content", "website"]),
-    holderUri,
-    atomTypeLabel: atomUtils.generateTypeLabel(atom),
-    atomHasHoldableSocket: atomUtils.hasHoldableSocket(atom),
-    isGroupChatEnabled: atomUtils.hasGroupSocket(atom),
-    isChatEnabled: atomUtils.hasChatSocket(atom),
-    friendlyTimestamp:
-      atom &&
-      relativeTime(selectLastUpdateTime(state), get(atom, "lastUpdateDate")),
-    showHolderIcon,
-    holderUseCaseIcon,
-    holderUseCaseIconBackground,
-    showPersonaImage: isHolderPersona && !!personaImage,
-    showPersonaIdenticon:
-      isHolderPersona && !personaImage && !!personaIdenticonSvg,
-    personaIdenticonSvg,
-    personaImage,
-    showMap: false, //!pokemonImageUrl && atomLocation, //if no image is present but a location is, we display a map instead
-    atomLocation,
-    showDefaultIcon: !pokemonImageUrl, //&& !atomLocation, //if no image and no location are present we display the defaultIcon in the card__icon area, instead of next to the title
-    useCaseIcon,
-    iconBackground,
-    identiconSvg,
-  };
-};
+  const hasUnreadChatConnections = atomUtils.hasUnreadNonClosedNonSuggestedChatConnections(
+    atom
+  );
 
-const mapDispatchToProps = dispatch => {
-  return {
-    selectAtomTab: (atomUri, selectTab) => {
-      dispatch(
-        actionCreators.atoms__selectTab(
-          Immutable.fromJS({
-            atomUri: atomUri,
-            selectTab: selectTab,
-          })
-        )
-      );
-    },
-  };
-};
-
-class PokemonRaidCard extends React.Component {
-  render() {
-    const style =
-      this.props.showDefaultIcon && this.props.iconBackground
-        ? {
-            backgroundColor: this.props.iconBackground,
-          }
-        : undefined;
-
-    const cardIcon = (
-      <div
-        className={
-          "card__icon clickable " +
-          (this.props.isInactive ? " inactive " : "") +
-          (this.props.showMap ? "card__icon--map" : "") +
-          (this.props.pokemonImageUrl ? "card__icon--pkm" : "")
-        }
-        onClick={this.atomClick}
-        style={style}
-      >
-        {this.props.showDefaultIcon && this.props.useCaseIcon ? (
-          <div className="identicon usecaseimage">
-            <svg>
-              <use
-                xlinkHref={this.props.useCaseIcon}
-                href={this.props.useCaseIcon}
-              />
-            </svg>
-          </div>
-        ) : (
-          undefined
-        )}
-        {this.props.showDefaultIcon && this.props.identiconSvg ? (
-          <img
-            className="identicon"
-            alt="Auto-generated title image"
-            src={"data:image/svg+xml;base64," + this.props.identiconSvg}
-          />
-        ) : (
-          undefined
-        )}
-        {this.props.pokemonImageUrl ? (
-          <img
-            className="image"
-            alt={this.props.pokemonImageUrl}
-            src={this.props.pokemonImageUrl}
-          />
-        ) : (
-          undefined
-        )}
-        {this.props.showMap ? (
-          <WonAtomMap
-            className="location"
-            locations={[this.props.atomLocation]}
-            currentLocation={this.props.currentLocation}
-            disableControls={true}
-          />
-        ) : (
-          undefined
-        )}
-      </div>
-    );
-
-    const cardMain = (
-      <Link
-        className={
-          "card__main clickable " +
-          (!this.props.showDefaultIcon ? "card__main--showIcon" : "")
-        }
-        to={generateLink(
-          this.props.history.location,
-          { postUri: this.props.atomUri, tab: "DETAIL" },
-          "/post"
-        )}
-      >
-        {this.createCardMainIcon()}
-        {this.createCardMainTopline()}
-        {this.createCardMainSubtitle()}
-      </Link>
-    );
-
-    const cardPersonaInfo =
-      this.props.showHolder &&
-      this.props.holder &&
-      this.props.atomHasHoldableSocket ? (
-        <Link
-          className="card__persona clickable"
-          to={generateLink(
-            this.props.history.location,
-            { postUri: this.props.holderUri, tab: "DETAIL" },
-            "/post"
-          )}
-        >
-          {this.createHolderInfoIcon()}
-          {this.props.holderName ? (
-            <div className="card__persona__name">
-              <span className="card__persona__name__label">
-                {this.props.holderName}
-              </span>
-              {this.createVerificationLabel()}
-            </div>
-          ) : (
-            undefined
-          )}
-          {this.createPersonaWebsite()}
-        </Link>
-      ) : (
-        undefined
-      );
-
-    const cardSuggestionIndicators = this.props.showSuggestions ? (
-      <div className="card__indicators">
-        <WonAtomSuggestionsIndicator atomUri={this.props.atomUri} />
-      </div>
-    ) : (
-      undefined
-    );
-
-    return (
-      <pokemon-raid-card>
-        {cardIcon}
-        {cardMain}
-        {cardPersonaInfo}
-        {cardSuggestionIndicators}
-      </pokemon-raid-card>
-    );
-  }
-
-  createCardMainSubtitle() {
+  function createCardMainSubtitle() {
     const createGroupChatLabel = () => {
-      if (this.props.isGroupChatEnabled) {
+      if (isGroupChatEnabled) {
         return (
           <span className="card__main__subtitle__type__groupchat">
-            {"Group Chat" + (this.props.isChatEnabled ? " enabled" : "")}
+            {"Group Chat" + (isChatEnabled ? " enabled" : "")}
           </span>
         );
       }
@@ -259,29 +96,27 @@ class PokemonRaidCard extends React.Component {
       <div className="card__main__subtitle">
         <span className="card__main__subtitle__type">
           {createGroupChatLabel()}
-          <span>{this.props.atomTypeLabel}</span>
+          <span>{atomTypeLabel}</span>
         </span>
-        <div className="card__main__subtitle__date">
-          {this.props.friendlyTimestamp}
-        </div>
+        <div className="card__main__subtitle__date">{friendlyTimestamp}</div>
       </div>
     );
   }
 
-  createCardMainTopline() {
+  function createCardMainTopline() {
     const hasTitle = () => {
-      if (this.props.isDirectResponse && this.props.responseToAtom) {
-        return !!this.props.responseToAtom.get("humanReadable");
+      if (isDirectResponse && responseToAtom) {
+        return !!get(responseToAtom, "humanReadable");
       } else {
-        return !!this.props.atom && !!this.props.atom.get("humanReadable");
+        return !!get(atom, "humanReadable");
       }
     };
 
     const generateTitleString = () => {
-      if (this.props.isDirectResponse && this.props.responseToAtom) {
-        return "Re: " + this.props.responseToAtom.get("humanReadable");
+      if (isDirectResponse && responseToAtom) {
+        return "Re: " + get(responseToAtom, "humanReadable");
       } else {
-        return this.props.atom && this.props.atom.get("humanReadable");
+        return get(atom, "humanReadable");
       }
     };
 
@@ -293,7 +128,7 @@ class PokemonRaidCard extends React.Component {
           </div>
         );
       } else {
-        if (this.props.isDirectResponse) {
+        if (isDirectResponse) {
           return <div className="card__main__topline__notitle">no title</div>;
         } else {
           return (
@@ -306,34 +141,31 @@ class PokemonRaidCard extends React.Component {
     return <div className="card__main__topline">{generateCardTitle()}</div>;
   }
 
-  createCardMainIcon() {
-    if (!this.props.showDefaultIcon) {
+  function createCardMainIcon() {
+    if (!showDefaultIcon) {
       const style =
-        this.props.pokemonImageUrl && this.props.iconBackground
+        pokemonImageUrl && iconBackground
           ? {
-              backgroundColor: this.props.iconBackground,
+              backgroundColor: iconBackground,
             }
           : undefined;
 
       return (
         <div className="card__main__icon" style={style}>
-          {this.props.useCaseIcon ? (
+          {useCaseIcon ? (
             <div className="card__main__icon__usecaseimage">
               <svg>
-                <use
-                  xlinkHref={this.props.useCaseIcon}
-                  href={this.props.useCaseIcon}
-                />
+                <use xlinkHref={useCaseIcon} href={useCaseIcon} />
               </svg>
             </div>
           ) : (
             undefined
           )}
-          {this.props.identiconSvg ? (
+          {identiconSvg ? (
             <img
               className="card__main__icon__identicon"
               alt="Auto-generated title image"
-              src={"data:image/svg+xml;base64," + this.props.identiconSvg}
+              src={"data:image/svg+xml;base64," + identiconSvg}
             />
           ) : (
             undefined
@@ -343,8 +175,8 @@ class PokemonRaidCard extends React.Component {
     }
   }
 
-  createPersonaWebsite() {
-    if (this.props.holderWebsite) {
+  function createPersonaWebsite() {
+    if (holderWebsite) {
       return (
         <React.Fragment>
           <div className="card__persona__websitelabel">Website:</div>,
@@ -352,16 +184,16 @@ class PokemonRaidCard extends React.Component {
             className="card__persona__websitelink"
             target="_blank"
             rel="noopener noreferrer"
-            href={this.props.holderWebsite}
+            href={holderWebsite}
           >
-            {this.props.holderWebsite}
+            {holderWebsite}
           </a>
         </React.Fragment>
       );
     }
   }
-  createVerificationLabel() {
-    if (this.props.holderVerified) {
+  function createVerificationLabel() {
+    if (holderVerified) {
       return (
         <span
           className="card__persona__name__verification card__persona__name__verification--verified"
@@ -382,87 +214,163 @@ class PokemonRaidCard extends React.Component {
     }
   }
 
-  createHolderInfoIcon() {
-    if (this.props.showHolderIcon) {
+  function createHolderInfoIcon() {
+    if (showHolderIcon) {
       const style = {
-        backgroundColor: this.props.holderUseCaseIconBackground,
+        backgroundColor: holderUseCaseIconBackground,
       };
 
       return (
         <div style={style} className="card__persona__icon holderUseCaseIcon">
           <svg className="si__serviceatomicon">
-            <use
-              xlinkHref={this.props.holderUseCaseIcon}
-              href={this.props.holderUseCaseIcon}
-            />
+            <use xlinkHref={holderUseCaseIcon} href={holderUseCaseIcon} />
           </svg>
         </div>
       );
-    } else if (this.props.showPersonaIdenticon) {
+    } else if (showPersonaIdenticon) {
       return (
         <img
           className="card__persona__icon"
           alt="Auto-generated title image for persona that holds the atom"
-          src={"data:image/svg+xml;base64," + this.props.personaIdenticonSvg}
+          src={"data:image/svg+xml;base64," + personaIdenticonSvg}
         />
       );
     }
-    if (this.props.showPersonaImage) {
+    if (showPersonaImage) {
       return (
         <img
           className="card__persona__icon"
-          alt={this.props.personaImage.get("name")}
+          alt={get(personaImage, "name")}
           src={
             "data:" +
-            this.props.personaImage.get("encodingFormat") +
+            get(personaImage, "encodingFormat") +
             ";base64," +
-            this.props.personaImage.get("encoding")
+            get(personaImage, "encoding")
           }
         />
       );
     }
   }
+
+  const style =
+    showDefaultIcon && iconBackground
+      ? {
+          backgroundColor: iconBackground,
+        }
+      : undefined;
+
+  const cardIcon = (
+    <div
+      className={
+        "card__icon clickable " +
+        (isInactive ? " inactive " : "") +
+        (showMap ? "card__icon--map" : "") +
+        (pokemonImageUrl ? "card__icon--pkm" : "")
+      }
+      style={style}
+    >
+      {showDefaultIcon && useCaseIcon ? (
+        <div className="identicon usecaseimage">
+          <svg>
+            <use xlinkHref={useCaseIcon} href={useCaseIcon} />
+          </svg>
+        </div>
+      ) : (
+        undefined
+      )}
+      {showDefaultIcon && identiconSvg ? (
+        <img
+          className="identicon"
+          alt="Auto-generated title image"
+          src={"data:image/svg+xml;base64," + identiconSvg}
+        />
+      ) : (
+        undefined
+      )}
+      {pokemonImageUrl ? (
+        <img className="image" alt={pokemonImageUrl} src={pokemonImageUrl} />
+      ) : (
+        undefined
+      )}
+      {showMap ? (
+        <WonAtomMap
+          className="location"
+          locations={[atomLocation]}
+          currentLocation={currentLocation}
+          disableControls={true}
+        />
+      ) : (
+        undefined
+      )}
+    </div>
+  );
+
+  const cardMain = (
+    <Link
+      className={
+        "card__main clickable " +
+        (!showDefaultIcon ? "card__main--showIcon" : "")
+      }
+      to={location =>
+        generateLink(location, { postUri: atomUri, tab: "DETAIL" }, "/post")
+      }
+    >
+      {createCardMainIcon()}
+      {createCardMainTopline()}
+      {createCardMainSubtitle()}
+    </Link>
+  );
+
+  const cardPersonaInfo =
+    showHolder && holder && atomHasHoldableSocket ? (
+      <Link
+        className="card__persona clickable"
+        to={location =>
+          generateLink(location, { postUri: holderUri, tab: "DETAIL" }, "/post")
+        }
+      >
+        {createHolderInfoIcon()}
+        {holderName ? (
+          <div className="card__persona__name">
+            <span className="card__persona__name__label">{holderName}</span>
+            {createVerificationLabel()}
+          </div>
+        ) : (
+          undefined
+        )}
+        {createPersonaWebsite()}
+      </Link>
+    ) : (
+      undefined
+    );
+
+  const cardSuggestionIndicators = showSuggestions ? (
+    hasUnreadChatConnections ? (
+      <div className="card__indicators">
+        <WonAtomConnectionsIndicator atomUri={atomUri} />
+      </div>
+    ) : (
+      <div className="card__indicators">
+        <WonAtomSuggestionsIndicator atomUri={atomUri} />
+      </div>
+    )
+  ) : (
+    undefined
+  );
+
+  return (
+    <pokemon-raid-card>
+      {cardIcon}
+      {cardMain}
+      {cardPersonaInfo}
+      {cardSuggestionIndicators}
+    </pokemon-raid-card>
+  );
 }
+
 PokemonRaidCard.propTypes = {
-  atomUri: PropTypes.string.isRequired,
+  atom: PropTypes.object.isRequired,
   showHolder: PropTypes.bool,
   showSuggestions: PropTypes.bool,
   currentLocation: PropTypes.object,
-  selectAtomTab: PropTypes.func,
-  pokemonImageUrl: PropTypes.string,
-  isDirectResponse: PropTypes.bool,
-  isInactive: PropTypes.bool,
-  responseToAtom: PropTypes.object,
-  atom: PropTypes.object,
-  holder: PropTypes.object,
-  holderName: PropTypes.string,
-  holderVerified: PropTypes.bool,
-  holderWebsite: PropTypes.string,
-  holderUri: PropTypes.string,
-  atomTypeLabel: PropTypes.string,
-  atomHasHoldableSocket: PropTypes.bool,
-  isGroupChatEnabled: PropTypes.bool,
-  isChatEnabled: PropTypes.bool,
-  friendlyTimestamp: PropTypes.any,
-  showHolderIcon: PropTypes.bool,
-  holderUseCaseIconBackground: PropTypes.string,
-  holderUseCaseIcon: PropTypes.string,
-  showPersonaImage: PropTypes.bool,
-  showPersonaIdenticon: PropTypes.bool,
-  personaIdenticonSvg: PropTypes.string,
-  personaImage: PropTypes.string,
-  showMap: PropTypes.bool,
-  atomLocation: PropTypes.object,
-  showDefaultIcon: PropTypes.bool,
-  useCaseIcon: PropTypes.string,
-  iconBackground: PropTypes.string,
-  identiconSvg: PropTypes.string,
-  history: PropTypes.object,
 };
-
-export default withRouter(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(PokemonRaidCard)
-);

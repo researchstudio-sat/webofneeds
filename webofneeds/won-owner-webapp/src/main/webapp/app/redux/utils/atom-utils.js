@@ -613,3 +613,19 @@ export function getActiveConnectionsOfAtom(atomImm, socketType) {
       .filter(conn => connectionUtils.hasSocketUri(conn, socketUri))
   );
 }
+
+export function getAllNonClosedNonSuggestedChatConnections(atomImm) {
+  return atomImm
+    ? get(atomImm, "connections").filter(
+        conn =>
+          connectionUtils.hasSocketUri(conn, getChatSocket(atomImm)) &&
+          !(connectionUtils.isClosed(conn) || connectionUtils.isSuggested(conn))
+      )
+    : Immutable.Map();
+}
+
+export function hasUnreadNonClosedNonSuggestedChatConnections(atom) {
+  return getAllNonClosedNonSuggestedChatConnections(atom).find(conn =>
+    connectionUtils.isUnread(conn)
+  );
+}

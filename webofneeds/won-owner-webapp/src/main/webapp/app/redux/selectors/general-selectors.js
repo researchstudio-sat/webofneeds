@@ -89,14 +89,7 @@ export const getAllChatConnections = createSelector(
       .filter(atom => atomUtils.isActive(atom))
       .filter(atom => atomUtils.hasChatSocket(atom))
       .flatMap(atom =>
-        get(atom, "connections").filter(
-          conn =>
-            connectionUtils.hasSocketUri(conn, atomUtils.getChatSocket(atom)) &&
-            !(
-              connectionUtils.isClosed(conn) ||
-              connectionUtils.isSuggested(conn)
-            )
-        )
+        atomUtils.getAllNonClosedNonSuggestedChatConnections(atom)
       )
 );
 
