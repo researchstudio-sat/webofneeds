@@ -468,7 +468,11 @@ export function getJsonLdDataset(uri, params = {}) {
       },
     })
       .then(response => {
-        if (response.status === 200) return response;
+        if (
+          (response.status >= 200 && response.status < 300) ||
+          response.status === 304
+        )
+          return response;
         else {
           let error = new Error(
             `${response.status} - ${
