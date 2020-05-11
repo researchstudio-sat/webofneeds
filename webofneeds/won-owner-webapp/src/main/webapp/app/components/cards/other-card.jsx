@@ -7,7 +7,6 @@ import { get, getIn, generateLink } from "../../utils.js";
 import PropTypes from "prop-types";
 
 import WonAtomMap from "../atom-map.jsx";
-import WonAtomSuggestionsIndicator from "../atom-suggestions-indicator.jsx";
 import WonAtomConnectionsIndicator from "../atom-connections-indicator.jsx";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import { relativeTime } from "../../won-label-utils.js";
@@ -65,9 +64,6 @@ export default function WonOtherCard({
     isHolderPersona && !personaImage && !!personaIdenticonSvg;
   const showMap = false; //!atomImage && atomLocation; //if no image is present but a location is, we display a map instead
   const showDefaultIcon = !atomImage; //&& !atomLocation; //if no image and no location are present we display the defaultIcon in the card__icon area, instead of next to the title
-  const hasUnreadChatConnections = atomUtils.hasUnreadNonClosedNonSuggestedChatConnections(
-    atom
-  );
 
   function createCardMainSubtitle() {
     const createGroupChatLabel = () => {
@@ -345,15 +341,9 @@ export default function WonOtherCard({
     );
 
   const cardConnectionIndicators = showSuggestions ? (
-    hasUnreadChatConnections ? (
-      <div className="card__indicators">
-        <WonAtomConnectionsIndicator atom={atom} />
-      </div>
-    ) : (
-      <div className="card__indicators">
-        <WonAtomSuggestionsIndicator atomUri={atomUri} />
-      </div>
-    )
+    <div className="card__indicators">
+      <WonAtomConnectionsIndicator atom={atom} />
+    </div>
   ) : (
     undefined
   );

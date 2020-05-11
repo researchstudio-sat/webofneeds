@@ -2,9 +2,8 @@
 @import "sizing-utils";
 @import "fonts";
 @import "flex-layout";
-@import "square-image";
-@import "speech-bubble";
 
+won-atom-connections-indicator,
 a.won-atom-connections-indicator {
   display: grid;
   grid-template-columns: min-content 1fr;
@@ -35,6 +34,7 @@ a.won-atom-connections-indicator {
       --local-primary: #{$won-primary-color-light};
     }
   }
+
   .asi__right {
     display: grid;
     grid-template-areas: "topline" "subtitle";

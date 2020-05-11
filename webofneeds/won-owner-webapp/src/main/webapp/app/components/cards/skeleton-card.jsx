@@ -9,7 +9,7 @@ import { connect } from "react-redux";
 
 import "~/style/_skeleton-card.scss";
 import * as processUtils from "../../redux/utils/process-utils.js";
-import WonAtomSuggestionsIndicator from "../atom-suggestions-indicator.jsx";
+import WonAtomConnectionsIndicator from "../atom-connections-indicator.jsx";
 import PropTypes from "prop-types";
 
 const mapStateToProps = (state, ownProps) => {
@@ -111,7 +111,7 @@ class WonSkeletonCard extends React.Component {
       );
 
     const cardSuggestions = this.props.showSuggestions ? (
-      <WonAtomSuggestionsIndicator atomUri={this.props.atomUri} />
+      <WonAtomConnectionsIndicator />
     ) : (
       undefined
     );
