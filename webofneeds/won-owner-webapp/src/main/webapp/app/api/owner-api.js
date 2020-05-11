@@ -663,7 +663,10 @@ export function sendMessage(msg) {
  * @returns {*}
  */
 function checkHttpStatus(response) {
-  if (response.status >= 200 && response.status < 300) {
+  if (
+    (response.status >= 200 && response.status < 300) ||
+    response.status === 304
+  ) {
     return response;
   } else {
     const error = new Error(response.statusText);
