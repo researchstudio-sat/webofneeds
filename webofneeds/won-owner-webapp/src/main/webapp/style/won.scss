@@ -42,9 +42,9 @@ body {
           "footer footer footer footer";
         grid-template-rows: min-content min-content min-content max-content 1fr min-content;
         grid-template-columns:
-          1fr minmax(min-content, $maxContentWidth/2) minmax(
+          1fr minmax(min-content, $maxContentWidth/3) minmax(
             min-content,
-            $maxContentWidth/2
+            (($maxContentWidth/3) * 2)
           )
           1fr;
       }
