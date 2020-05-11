@@ -26,6 +26,8 @@ import Immutable from "immutable";
 import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
 
 import "~/style/_connection-header.scss";
+import "~/style/_connection-indicators.scss";
+
 import ico36_incoming from "~/images/won-icons/ico36_incoming.svg";
 import { withRouter } from "react-router-dom";
 
