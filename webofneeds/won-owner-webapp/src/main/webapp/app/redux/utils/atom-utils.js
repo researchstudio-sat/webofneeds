@@ -616,15 +616,26 @@ function getSocketKeysReset(socketsImm) {
  * @param socketType compactedSocketType Uri (senderSocket)
  */
 export function getNonClosedConnectionsOfAtom(atomImm, socketType) {
+  const connections = getConnectionsOfAtom(atomImm, socketType);
+
+  return (
+    connections && connections.filter(conn => !connectionUtils.isClosed(conn))
+  );
+}
+
+/**
+ * Return all connections of the given atom
+ * @param atomImm immutable atom that stores connections
+ * @param socketType compactedSocketType Uri (senderSocket)
+ */
+export function getConnectionsOfAtom(atomImm, socketType) {
   const socketUri = getSocketUri(atomImm, socketType);
 
   const connections = get(atomImm, "connections");
 
   return (
     connections &&
-    connections
-      .filter(conn => !connectionUtils.isClosed(conn))
-      .filter(conn => connectionUtils.hasSocketUri(conn, socketUri))
+    connections.filter(conn => connectionUtils.hasSocketUri(conn, socketUri))
   );
 }
 
@@ -634,15 +645,10 @@ export function getNonClosedConnectionsOfAtom(atomImm, socketType) {
  * @param socketType compactedSocketType Uri (senderSocket)
  */
 export function getConnectedConnectionsOfAtom(atomImm, socketType) {
-  const socketUri = getSocketUri(atomImm, socketType);
-
-  const connections = get(atomImm, "connections");
+  const connections = getConnectionsOfAtom(atomImm, socketType);
 
   return (
-    connections &&
-    connections
-      .filter(conn => connectionUtils.isConnected(conn))
-      .filter(conn => connectionUtils.hasSocketUri(conn, socketUri))
+    connections && connections.filter(conn => connectionUtils.isConnected(conn))
   );
 }
 

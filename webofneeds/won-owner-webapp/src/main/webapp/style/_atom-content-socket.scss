@@ -71,61 +71,6 @@ won-atom-content-socket {
 
       grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
 
-      .acs__item {
-        border: $thinGrayBorder;
-        background: $won-light-gray;
-
-        a.won-atom-header,
-        won-atom-header {
-          padding: 0.5rem;
-
-          &.status--sent {
-            opacity: 0.25;
-          }
-
-          &.status--closed {
-            //TODO: Filter grayscale or something
-          }
-
-          &.status--suggested,
-          &.status--received {
-            @include animateOpacityHeartBeat();
-          }
-        }
-
-        &.won-unread {
-          border-color: $won-unread-attention;
-          /*box-shadow: 0px 0px 5px 5px var(--won-primary-color);*/
-        }
-
-        &__actions {
-          display: grid;
-          grid-auto-flow: column;
-          grid-gap: 0.5rem;
-          padding: 0.5rem;
-          height: 100%;
-          box-sizing: border-box;
-
-          &__button.won-button--filled.red,
-          &__button.won-button--outlined.red.thin {
-            cursor: pointer;
-            font-size: $smallFontSize;
-            padding: 0.5rem;
-          }
-
-          &__icon.won-icon.primary,
-          &__icon.won-icon.secondary,
-          &__icon.won-icon.disabled,
-          &__icon.won-icon.request {
-            cursor: pointer;
-            display: flex;
-            align-self: center;
-            margin: auto;
-            @include fixed-square($postIconSize);
-          }
-        }
-      }
-
       & > .acs__empty {
         color: $won-line-gray;
         text-align: center;
