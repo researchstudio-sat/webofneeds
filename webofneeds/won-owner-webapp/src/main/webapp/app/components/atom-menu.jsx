@@ -8,7 +8,6 @@ import { actionCreators } from "../actions/actions.js";
 import { get, getIn } from "../utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
-import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
@@ -28,23 +27,6 @@ export default function WonAtomMenu({ atom, defaultTab }) {
 
   const reviewCount = getIn(atom, ["rating", "reviewCount"]) || 0;
 
-  const groupMembers = get(atom, "groupMembers") || 0;
-  const groupChatConnections = useSelector(
-    state =>
-      isOwned &&
-      atomUtils.hasGroupSocket(atom) &&
-      connectionSelectors.getGroupChatConnectionsByAtomUri(state, atomUri)
-  );
-  const connectedGroupChatConnections =
-    groupChatConnections &&
-    groupChatConnections.filter(conn => connectionUtils.isConnected(conn));
-  const nonClosedNonConnectedGroupChatConnections =
-    groupChatConnections &&
-    groupChatConnections.filter(
-      conn =>
-        !(connectionUtils.isConnected(conn) || connectionUtils.isClosed(conn))
-    );
-
   const heldByUri = atomUtils.getHeldByUri(atom);
   const isHeld = atomUtils.isHeld(atom);
   const holder = useSelector(state => getIn(state, ["atoms", heldByUri]));
@@ -52,42 +34,14 @@ export default function WonAtomMenu({ atom, defaultTab }) {
   const holderAggregateRating =
     holderHasReviewSocket && getIn(holder, ["rating", "aggregateRating"]);
 
-  const buddyConnections = useSelector(
-    state =>
-      isOwned &&
-      generalSelectors.getBuddyConnectionsByAtomUri(state, atomUri, true, false)
-  );
-
-  const buddies = isOwned
-    ? buddyConnections.filter(conn => connectionUtils.isConnected(conn))
-    : get(atom, "buddies");
-
   const viewState = useSelector(state => get(state, "view"));
   const process = useSelector(state => get(state, "process"));
 
-  const groupMembersSize = groupMembers ? groupMembers.size : 0;
   const isHoldable = atomUtils.hasHoldableSocket(atom);
   const holderAggregateRatingString =
     holderAggregateRating && holderAggregateRating.toFixed(1);
-  const hasUnreadBuddyConnections =
-    !!buddyConnections &&
-    !!buddyConnections.find(conn => connectionUtils.isUnread(conn));
-  const hasBuddies = buddyConnections
-    ? buddyConnections.size > 0
-    : buddies
-      ? buddies.size > 0
-      : false;
-  const buddyCount = buddies ? buddies.size : 0;
+
   const hasReviews = reviewCount > 0;
-  const hasGroupMembers = groupMembersSize > 0;
-  const connectedGroupChatConnectionsSize = connectedGroupChatConnections
-    ? connectedGroupChatConnections.size
-    : 0;
-  const hasUnreadGroupChatRequests = nonClosedNonConnectedGroupChatConnections
-    ? nonClosedNonConnectedGroupChatConnections.filter(conn =>
-        get(conn, "unread")
-      ).size > 0
-    : false;
   const atomLoading = !atom || processUtils.isAtomLoading(process, atomUri);
   const atomFailedToLoad =
     atom && processUtils.hasAtomFailedToLoad(process, atomUri);
@@ -154,16 +108,6 @@ export default function WonAtomMenu({ atom, defaultTab }) {
     let unread = false;
 
     switch (socketType) {
-      case vocab.GROUP.GroupSocketCompacted:
-        if (isOwned) {
-          unread = hasUnreadGroupChatRequests;
-          countLabel = "(" + connectedGroupChatConnectionsSize + ")";
-        } else {
-          inactive = !hasGroupMembers;
-          countLabel = "(" + groupMembersSize + ")";
-        }
-        break;
-
       case vocab.HOLD.HoldableSocketCompacted:
         if (isHeld) {
           countLabel =
@@ -178,12 +122,6 @@ export default function WonAtomMenu({ atom, defaultTab }) {
           // if there is currently no holder in a non-owned atom we set the label to undefined to remove the tab from being displayed
           label = undefined;
         }
-        break;
-
-      case vocab.BUDDY.BuddySocketCompacted:
-        inactive = !hasBuddies;
-        unread = hasUnreadBuddyConnections;
-        countLabel = "(" + buddyCount + ")";
         break;
 
       case vocab.REVIEW.ReviewSocketCompacted:
