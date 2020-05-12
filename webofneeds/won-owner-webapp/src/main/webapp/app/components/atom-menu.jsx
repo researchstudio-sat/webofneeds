@@ -2,9 +2,9 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import { actionCreators } from "../actions/actions.js";
-import { connect } from "react-redux";
 import { get, getIn } from "../utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
@@ -19,21 +19,22 @@ import Immutable from "immutable";
 import "~/style/_atom-menu.scss";
 import { getSocketTypeArray } from "../redux/utils/atom-utils";
 
-const mapStateToProps = (state, ownProps) => {
-  const atom = getIn(state, ["atoms", ownProps.atomUri]);
-  const isPersona = atomUtils.isPersona(atom);
-  const isOwned = generalSelectors.isAtomOwned(state, ownProps.atomUri);
+export default function WonAtomMenu({ atom, defaultTab }) {
+  const atomUri = get(atom, "uri");
+  const dispatch = useDispatch();
+  const isOwned = useSelector(state =>
+    generalSelectors.isAtomOwned(state, atomUri)
+  );
 
   const reviewCount = getIn(atom, ["rating", "reviewCount"]) || 0;
 
   const groupMembers = get(atom, "groupMembers") || 0;
-  const groupChatConnections =
-    isOwned &&
-    atomUtils.hasGroupSocket(atom) &&
-    connectionSelectors.getGroupChatConnectionsByAtomUri(
-      state,
-      ownProps.atomUri
-    );
+  const groupChatConnections = useSelector(
+    state =>
+      isOwned &&
+      atomUtils.hasGroupSocket(atom) &&
+      connectionSelectors.getGroupChatConnectionsByAtomUri(state, atomUri)
+  );
   const connectedGroupChatConnections =
     groupChatConnections &&
     groupChatConnections.filter(conn => connectionUtils.isConnected(conn));
@@ -44,254 +45,74 @@ const mapStateToProps = (state, ownProps) => {
         !(connectionUtils.isConnected(conn) || connectionUtils.isClosed(conn))
     );
 
-  const heldAtoms = get(atom, "holds");
-
-  const hasUnreadSuggestedConnectionsInHeldAtoms = generalSelectors.hasUnreadSuggestedConnectionsInHeldAtoms(
-    state,
-    ownProps.atomUri
-  );
   const heldByUri = atomUtils.getHeldByUri(atom);
   const isHeld = atomUtils.isHeld(atom);
-  const holder = getIn(state, ["atoms", heldByUri]);
-  const isHeldByServiceAtom = atomUtils.isServiceAtom(holder);
+  const holder = useSelector(state => getIn(state, ["atoms", heldByUri]));
   const holderHasReviewSocket = atomUtils.hasReviewSocket(holder);
   const holderAggregateRating =
     holderHasReviewSocket && getIn(holder, ["rating", "aggregateRating"]);
 
-  const suggestions =
-    isOwned &&
-    connectionSelectors.getSuggestedConnectionsByAtomUri(
-      state,
-      ownProps.atomUri
-    );
-
-  const buddyConnections =
-    isOwned &&
-    generalSelectors.getBuddyConnectionsByAtomUri(
-      state,
-      ownProps.atomUri,
-      true,
-      false
-    );
+  const buddyConnections = useSelector(
+    state =>
+      isOwned &&
+      generalSelectors.getBuddyConnectionsByAtomUri(state, atomUri, true, false)
+  );
 
   const buddies = isOwned
     ? buddyConnections.filter(conn => connectionUtils.isConnected(conn))
     : get(atom, "buddies");
 
-  const viewState = get(state, "view");
-  const process = get(state, "process");
+  const viewState = useSelector(state => get(state, "view"));
+  const process = useSelector(state => get(state, "process"));
 
-  const suggestionsSize = suggestions ? suggestions.size : 0;
   const groupMembersSize = groupMembers ? groupMembers.size : 0;
-  const heldAtomsSize = heldAtoms ? heldAtoms.size : 0;
+  const isHoldable = atomUtils.hasHoldableSocket(atom);
+  const holderAggregateRatingString =
+    holderAggregateRating && holderAggregateRating.toFixed(1);
+  const hasUnreadBuddyConnections =
+    !!buddyConnections &&
+    !!buddyConnections.find(conn => connectionUtils.isUnread(conn));
+  const hasBuddies = buddyConnections
+    ? buddyConnections.size > 0
+    : buddies
+      ? buddies.size > 0
+      : false;
+  const buddyCount = buddies ? buddies.size : 0;
+  const hasReviews = reviewCount > 0;
+  const hasGroupMembers = groupMembersSize > 0;
+  const connectedGroupChatConnectionsSize = connectedGroupChatConnections
+    ? connectedGroupChatConnections.size
+    : 0;
+  const hasUnreadGroupChatRequests = nonClosedNonConnectedGroupChatConnections
+    ? nonClosedNonConnectedGroupChatConnections.filter(conn =>
+        get(conn, "unread")
+      ).size > 0
+    : false;
+  const atomLoading = !atom || processUtils.isAtomLoading(process, atomUri);
+  const atomFailedToLoad =
+    atom && processUtils.hasAtomFailedToLoad(process, atomUri);
+  const shouldShowRdf = viewUtils.showRdf(viewState);
+  const socketTypeArray = isOwned
+    ? getSocketTypeArray(atom)
+    : getSocketTypeArray(atom).filter(
+        socketType => socketType !== vocab.CHAT.ChatSocketCompacted
+      ); //filter the chat Socket so we do not display it as a menu item for non owned atoms
 
-  const socketTypeArray = getSocketTypeArray(atom);
+  const visibleTab = viewUtils.getVisibleTabByAtomUri(
+    viewState,
+    atomUri,
+    defaultTab
+  );
 
-  return {
-    atomUri: ownProps.atomUri,
-    atom,
-    isPersona,
-    isHoldable: atomUtils.hasHoldableSocket(atom),
-    isOwned,
-    isHeld,
-    isHeldByServiceAtom,
-    holderHasReviewSocket,
-    holderAggregateRatingString:
-      holderAggregateRating && holderAggregateRating.toFixed(1),
-    hasHeldAtoms: heldAtomsSize > 0,
-    hasUnreadSuggestedConnectionsInHeldAtoms,
-    heldAtomsSize,
-    hasUnreadBuddyConnections:
-      !!buddyConnections &&
-      !!buddyConnections.find(conn => connectionUtils.isUnread(conn)),
-    hasBuddies: buddyConnections
-      ? buddyConnections.size > 0
-      : buddies
-        ? buddies.size > 0
-        : false,
-    buddyCount: buddies ? buddies.size : 0,
-    hasReviews: reviewCount > 0,
-    reviewCount,
-    hasChatSocket: atomUtils.hasChatSocket(atom),
-    groupMembers: groupMembersSize > 0,
-    groupMembersSize,
-    connectedGroupChatConnectionsSize: connectedGroupChatConnections
-      ? connectedGroupChatConnections.size
-      : 0,
-    hasUnreadGroupChatRequests: nonClosedNonConnectedGroupChatConnections
-      ? nonClosedNonConnectedGroupChatConnections.filter(conn =>
-          get(conn, "unread")
-        ).size > 0
-      : false,
-    hasSuggestions: suggestionsSize > 0,
-    hasUnreadSuggestions:
-      suggestionsSize > 0
-        ? !!suggestions.find(conn => get(conn, "unread"))
-        : false,
-    suggestionsSize,
-    atomLoading: !atom || processUtils.isAtomLoading(process, ownProps.atomUri),
-    atomFailedToLoad:
-      atom && processUtils.hasAtomFailedToLoad(process, ownProps.atomUri),
-    shouldShowRdf: viewUtils.showRdf(viewState),
-    socketTypeArray: isOwned
-      ? socketTypeArray
-      : socketTypeArray.filter(
-          socketType => socketType !== vocab.CHAT.ChatSocketCompacted
-        ), //filter the chat Socket so we do not display it as a menu item for non owned atoms
-    visibleTab: viewUtils.getVisibleTabByAtomUri(
-      viewState,
-      ownProps.atomUri,
-      ownProps.defaultTab
-    ),
-  };
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    selectTab: (atomUri, tab) => {
-      dispatch(
-        actionCreators.atoms__selectTab(
-          Immutable.fromJS({ atomUri: atomUri, selectTab: tab })
-        )
-      );
-    },
-  };
-};
-
-class WonAtomMenu extends React.Component {
-  render() {
-    const buttons = [];
-
-    buttons.push(
-      <div
-        key="detail"
-        className={this.generateAtomItemCssClasses(
-          this.isSelectedTab("DETAIL")
-        )}
-        onClick={() => this.selectTab("DETAIL")}
-      >
-        <span className="atom-menu__item__label">Detail</span>
-      </div>
-    );
-
-    // Add generic Tabs based on available Sockets
-    this.props.socketTypeArray.map((socketType, index) => {
-      let label = wonLabelUtils.labels.socketTabs[socketType] || socketType;
-      let countLabel;
-
-      const selected = this.isSelectedTab(socketType);
-      let inactive = false;
-      let unread = false;
-
-      switch (socketType) {
-        case vocab.GROUP.GroupSocketCompacted:
-          if (this.props.isOwned) {
-            unread = this.props.hasUnreadGroupChatRequests;
-            countLabel =
-              "(" + this.props.connectedGroupChatConnectionsSize + ")";
-          } else {
-            inactive = !this.props.groupMembers;
-            countLabel = "(" + this.props.groupMembersSize + ")";
-          }
-          break;
-
-        case vocab.HOLD.HoldableSocketCompacted:
-          if (this.props.isHeld) {
-            countLabel =
-              this.props.holderAggregateRatingString &&
-              "(★ " + this.props.holderAggregateRatingString + ")";
-          } else if (this.props.isHoldable && this.props.isOwned) {
-            countLabel =
-              this.props.holderAggregateRatingString &&
-              "(★ " + this.props.holderAggregateRatingString + ")";
-            label = "+ " + label;
-          }
-          break;
-
-        case vocab.HOLD.HolderSocketCompacted:
-          inactive = !this.props.hasHeldAtoms;
-          unread = this.props.hasUnreadSuggestedConnectionsInHeldAtoms;
-          countLabel = "(" + this.props.heldAtomsSize + ")";
-          break;
-
-        case vocab.BUDDY.BuddySocketCompacted:
-          inactive = !this.props.hasBuddies;
-          unread = this.props.hasUnreadBuddyConnections;
-          countLabel = "(" + this.props.buddyCount + ")";
-          break;
-
-        case vocab.REVIEW.ReviewSocketCompacted:
-          inactive = !this.props.hasReviews;
-          countLabel =
-            this.props.hasReviews && "(" + this.props.reviewCount + ")";
-          break;
-
-        default: {
-          const activeConnections = atomUtils.getActiveConnectionsOfAtom(
-            this.props.atom,
-            socketType
-          );
-
-          inactive = !activeConnections || activeConnections.size === 0;
-          countLabel =
-            activeConnections && activeConnections.size > 0
-              ? "(" + activeConnections.size + ")"
-              : undefined;
-          unread =
-            activeConnections &&
-            !!activeConnections.find(conn => connectionUtils.isUnread(conn));
-          break;
-        }
-      }
-
-      buttons.push(
-        <div
-          key={socketType + "-" + index}
-          className={this.generateAtomItemCssClasses(
-            selected,
-            inactive,
-            unread
-          )}
-          onClick={() => this.selectTab(socketType)}
-        >
-          <span className="atom-menu__item__unread" />
-          <span className="atom-menu__item__label">{label}</span>
-          {countLabel ? (
-            <span className="atom-menu__item__count">{countLabel}</span>
-          ) : (
-            undefined
-          )}
-        </div>
-      );
-    });
-
-    this.props.shouldShowRdf &&
-      buttons.push(
-        <div
-          key="rdf"
-          className={this.generateAtomItemCssClasses(this.isSelectedTab("RDF"))}
-          onClick={() => this.selectTab("RDF")}
-        >
-          <span className="atom-menu__item__label">RDF</span>
-        </div>
-      );
-
-    return (
-      <won-atom-menu class={this.generateParentCssClasses()}>
-        {buttons}
-      </won-atom-menu>
-    );
-  }
-
-  generateParentCssClasses() {
+  function generateParentCssClasses() {
     const cssClassNames = [];
-    this.props.atomLoading && cssClassNames.push("won-is-loading");
-    this.props.atomFailedToLoad && cssClassNames.push("won-failed-to-load");
+    atomLoading && cssClassNames.push("won-is-loading");
+    atomFailedToLoad && cssClassNames.push("won-failed-to-load");
 
     return cssClassNames.join(" ");
   }
 
-  generateAtomItemCssClasses(
+  function generateAtomItemCssClasses(
     selected = false,
     inactive = false,
     unread = false
@@ -305,49 +126,136 @@ class WonAtomMenu extends React.Component {
     return cssClassNames.join(" ");
   }
 
-  isSelectedTab(tabName) {
-    return tabName === this.props.visibleTab;
-  }
+  const buttons = [];
 
-  selectTab(tabName) {
-    this.props.selectTab(this.props.atomUri, tabName);
-  }
+  buttons.push(
+    <div
+      key="detail"
+      className={generateAtomItemCssClasses(visibleTab === "DETAIL")}
+      onClick={() =>
+        dispatch(
+          actionCreators.atoms__selectTab(
+            Immutable.fromJS({ atomUri: atomUri, selectTab: "DETAIL" })
+          )
+        )
+      }
+    >
+      <span className="atom-menu__item__label">Detail</span>
+    </div>
+  );
+
+  // Add generic Tabs based on available Sockets
+  socketTypeArray.map((socketType, index) => {
+    let label = wonLabelUtils.labels.socketTabs[socketType] || socketType;
+    let countLabel;
+
+    const selected = visibleTab === socketType;
+    let inactive = false;
+    let unread = false;
+
+    switch (socketType) {
+      case vocab.GROUP.GroupSocketCompacted:
+        if (isOwned) {
+          unread = hasUnreadGroupChatRequests;
+          countLabel = "(" + connectedGroupChatConnectionsSize + ")";
+        } else {
+          inactive = !hasGroupMembers;
+          countLabel = "(" + groupMembersSize + ")";
+        }
+        break;
+
+      case vocab.HOLD.HoldableSocketCompacted:
+        if (isHeld) {
+          countLabel =
+            holderAggregateRatingString &&
+            "(★ " + holderAggregateRatingString + ")";
+        } else if (isHoldable && isOwned) {
+          countLabel =
+            holderAggregateRatingString &&
+            "(★ " + holderAggregateRatingString + ")";
+          label = "+ " + label;
+        } else {
+          // if there is currently no holder in a non-owned atom we set the label to undefined to remove the tab from being displayed
+          label = undefined;
+        }
+        break;
+
+      case vocab.BUDDY.BuddySocketCompacted:
+        inactive = !hasBuddies;
+        unread = hasUnreadBuddyConnections;
+        countLabel = "(" + buddyCount + ")";
+        break;
+
+      case vocab.REVIEW.ReviewSocketCompacted:
+        inactive = !hasReviews;
+        countLabel = hasReviews && "(" + reviewCount + ")";
+        break;
+
+      default: {
+        const activeConnections = isOwned
+          ? atomUtils.getNonClosedConnectionsOfAtom(atom, socketType)
+          : atomUtils.getConnectedConnectionsOfAtom(atom, socketType);
+
+        inactive = !activeConnections || activeConnections.size === 0;
+        countLabel =
+          activeConnections && activeConnections.size > 0
+            ? "(" + activeConnections.size + ")"
+            : undefined;
+        unread =
+          activeConnections &&
+          !!activeConnections.find(conn => connectionUtils.isUnread(conn));
+        break;
+      }
+    }
+
+    if (label) {
+      buttons.push(
+        <div
+          key={socketType + "-" + index}
+          className={generateAtomItemCssClasses(selected, inactive, unread)}
+          onClick={() =>
+            dispatch(
+              actionCreators.atoms__selectTab(
+                Immutable.fromJS({ atomUri: atomUri, selectTab: socketType })
+              )
+            )
+          }
+        >
+          <span className="atom-menu__item__unread" />
+          <span className="atom-menu__item__label">{label}</span>
+          {countLabel ? (
+            <span className="atom-menu__item__count">{countLabel}</span>
+          ) : (
+            undefined
+          )}
+        </div>
+      );
+    }
+  });
+
+  shouldShowRdf &&
+    buttons.push(
+      <div
+        key="rdf"
+        className={generateAtomItemCssClasses(visibleTab === "RDF")}
+        onClick={() =>
+          dispatch(
+            actionCreators.atoms__selectTab(
+              Immutable.fromJS({ atomUri: atomUri, selectTab: "RDF" })
+            )
+          )
+        }
+      >
+        <span className="atom-menu__item__label">RDF</span>
+      </div>
+    );
+
+  return (
+    <won-atom-menu class={generateParentCssClasses()}>{buttons}</won-atom-menu>
+  );
 }
-WonAtomMenu.propTypes = {
-  atomUri: PropTypes.string.isRequired,
-  selectTab: PropTypes.func,
-  atom: PropTypes.object,
-  isPersona: PropTypes.bool,
-  isHoldable: PropTypes.bool,
-  isOwned: PropTypes.bool,
-  isHeld: PropTypes.bool,
-  isHeldByServiceAtom: PropTypes.bool,
-  holderHasReviewSocket: PropTypes.bool,
-  holderAggregateRatingString: PropTypes.string,
-  hasHeldAtoms: PropTypes.bool,
-  hasUnreadSuggestedConnectionsInHeldAtoms: PropTypes.bool,
-  heldAtomsSize: PropTypes.number,
-  hasUnreadBuddyConnections: PropTypes.bool,
-  hasBuddies: PropTypes.bool,
-  buddyCount: PropTypes.number,
-  hasReviews: PropTypes.bool,
-  reviewCount: PropTypes.number,
-  hasChatSocket: PropTypes.bool,
-  groupMembers: PropTypes.bool,
-  groupMembersSize: PropTypes.number,
-  connectedGroupChatConnectionsSize: PropTypes.number,
-  hasUnreadGroupChatRequests: PropTypes.bool,
-  hasSuggestions: PropTypes.bool,
-  hasUnreadSuggestions: PropTypes.bool,
-  suggestionsSize: PropTypes.number,
-  atomLoading: PropTypes.bool,
-  atomFailedToLoad: PropTypes.bool,
-  shouldShowRdf: PropTypes.bool,
-  visibleTab: PropTypes.string,
-  socketTypeArray: PropTypes.arrayOf(PropTypes.string),
-};
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonAtomMenu);
+WonAtomMenu.propTypes = {
+  atom: PropTypes.object.isRequired,
+  defaultTab: PropTypes.string,
+};
