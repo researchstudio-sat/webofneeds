@@ -12,12 +12,13 @@ import vocab from "../service/vocab.js";
 
 import WonAtomContentHolds from "./atom-content-holds.jsx";
 import WonAtomContentChats from "./atom-content-chats.jsx";
-import WonAtomContentBuddies from "./atom-content-buddies.jsx";
-import WonAtomContentParticipants from "./atom-content-participants.jsx";
 import WonAtomContentSocket from "./atom-content-socket.jsx";
 import WonAtomContentGeneral from "./atom-content-general.jsx";
 import WonAtomContentPersona from "./atom-content-persona.jsx";
 import WonAtomContentDetails from "./atom-content-details.jsx";
+import WonBuddyItem from "./socket-items/buddy-item.jsx";
+import WonParticipantItem from "./socket-items/participant-item.jsx";
+import WonGenericItem from "./socket-items/generic-item.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
 import ElmReact from "./elm-react.jsx";
 import { Elm } from "../../elm/AddPersona.elm";
@@ -181,11 +182,25 @@ export default function WonAtomContent({ atom, defaultTab }) {
         break;
 
       case vocab.GROUP.GroupSocketCompacted:
-        visibleTabFragment = <WonAtomContentParticipants atomUri={atomUri} />;
+        visibleTabFragment = (
+          <WonAtomContentSocket
+            atom={atom}
+            socketType={visibleTab}
+            ItemComponent={WonParticipantItem}
+            showSuggestPicker={true}
+          />
+        );
         break;
 
       case vocab.BUDDY.BuddySocketCompacted:
-        visibleTabFragment = <WonAtomContentBuddies atomUri={atomUri} />;
+        visibleTabFragment = (
+          <WonAtomContentSocket
+            atom={atom}
+            socketType={visibleTab}
+            ItemComponent={WonBuddyItem}
+            showSuggestPicker={true}
+          />
+        );
         break;
 
       case vocab.REVIEW.ReviewSocketCompacted:
@@ -239,7 +254,11 @@ export default function WonAtomContent({ atom, defaultTab }) {
 
       default:
         visibleTabFragment = (
-          <WonAtomContentSocket atom={atom} socketType={visibleTab} />
+          <WonAtomContentSocket
+            atom={atom}
+            socketType={visibleTab}
+            ItemComponent={WonGenericItem}
+          />
         );
         break;
     }
