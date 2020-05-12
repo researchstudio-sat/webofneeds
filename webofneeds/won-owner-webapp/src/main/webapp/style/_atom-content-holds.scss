@@ -4,9 +4,12 @@
 won-atom-content-holds {
   display: grid;
   grid-gap: 1rem;
-  padding: 0.5rem;
 
   grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+
+  & > .ach__search {
+    grid-column: 1/-1;
+  }
 
   & > .ach__empty {
     color: $won-line-gray;

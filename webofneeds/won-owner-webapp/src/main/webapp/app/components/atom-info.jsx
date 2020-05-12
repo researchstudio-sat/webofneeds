@@ -39,6 +39,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     className: ownProps.className,
     atomUri: ownProps.atomUri,
+    atom,
     defaultTab: ownProps.defaultTab,
     atomLoading,
     showFooter,
@@ -56,11 +57,11 @@ class AtomInfo extends React.Component {
       >
         <WonAtomHeaderBig atomUri={this.props.atomUri} />
         <WonAtomMenu
-          atomUri={this.props.atomUri}
+          atom={this.props.atom}
           defaultTab={this.props.defaultTab}
         />
         <WonAtomContent
-          atomUri={this.props.atomUri}
+          atom={this.props.atom}
           defaultTab={this.props.defaultTab}
         />
         {this.props.showFooter ? (
@@ -75,6 +76,7 @@ class AtomInfo extends React.Component {
 
 AtomInfo.propTypes = {
   atomUri: PropTypes.string,
+  atom: PropTypes.object,
   defaultTab: PropTypes.string,
   atomLoading: PropTypes.bool,
   showFooter: PropTypes.bool,

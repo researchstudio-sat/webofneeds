@@ -26,8 +26,8 @@ const AtomContentMessage = props => {
     <won-atom-content-message class={props.atomLoading ? "won-is-loading" : ""}>
       <div className="won-cm__center">
         <div className="won-cm__center__bubble">
-          <WonAtomMenu atomUri={props.atomUri} />
-          <WonAtomContent atomUri={props.atomUri} />
+          <WonAtomMenu atom={props.atom} />
+          <WonAtomContent atom={props.atom} />
         </div>
       </div>
     </won-atom-content-message>
