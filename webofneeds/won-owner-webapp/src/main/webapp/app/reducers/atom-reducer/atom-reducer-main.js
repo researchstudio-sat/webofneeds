@@ -497,7 +497,8 @@ export default function(allAtomsInState = initialState, action = {}) {
         allAtomsInState,
         action.payload.messageUri,
         action.payload.connectionUri,
-        action.payload.atomUri
+        action.payload.atomUri,
+        action.payload.read
       );
     }
 
