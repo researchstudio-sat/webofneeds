@@ -14,7 +14,7 @@ import WonAtomContentHolds from "./atom-content-holds.jsx";
 import WonAtomContentChats from "./atom-content-chats.jsx";
 import WonAtomContentSocket from "./atom-content-socket.jsx";
 import WonAtomContentGeneral from "./atom-content-general.jsx";
-import WonAtomContentPersona from "./atom-content-persona.jsx";
+import WonAtomContentHolder from "./atom-content-holder.jsx";
 import WonAtomContentDetails from "./atom-content-details.jsx";
 import WonBuddyItem from "./socket-items/buddy-item.jsx";
 import WonParticipantItem from "./socket-items/participant-item.jsx";
@@ -167,7 +167,7 @@ export default function WonAtomContent({ atom, defaultTab }) {
 
       case vocab.HOLD.HoldableSocketCompacted:
         if (isHeld) {
-          visibleTabFragment = <WonAtomContentPersona holdsUri={atomUri} />;
+          visibleTabFragment = <WonAtomContentHolder holdsUri={atomUri} />;
         } else if (isActive && hasHoldableSocket && isOwned) {
           visibleTabFragment = (
             <ElmReact
