@@ -154,6 +154,7 @@ body {
       }
     }
 
+    > main.overview__justconnection,
     > main.overview__right {
       grid-area: content;
 
@@ -173,6 +174,14 @@ body {
       > won-group-atom-messages,
       > won-atom-messages {
         height: calc(100vh - var(--headerHeight) - var(--menuHeight));
+      }
+    }
+
+    > main.overview__justconnection {
+      grid-column: 2 / 4;
+
+      > * {
+        border-left: $thinGrayBorder;
       }
     }
 

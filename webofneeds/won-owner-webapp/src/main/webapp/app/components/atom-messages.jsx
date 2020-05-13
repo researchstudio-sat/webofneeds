@@ -47,7 +47,7 @@ const rdfTextfieldHelpText =
   `\`<${vocab.WONMSG.uriPlaceholder.event}> con:text "hello world!". \``;
 
 const mapStateToProps = (state, ownProps) => {
-  const { connectionUri } = getQueryParams(ownProps.location);
+  const { connectionUri, postUri } = getQueryParams(ownProps.location);
   const selectedConnectionUri = ownProps.connectionUri
     ? ownProps.connectionUri
     : connectionUri;
@@ -120,6 +120,7 @@ const mapStateToProps = (state, ownProps) => {
   const isConnected = connectionUtils.isConnected(connection);
 
   return {
+    backToChats: !postUri, //if there is no postUri in the route we know that we just want to go back to the chats overview (achieved by clearing the params)
     className: ownProps.className,
     connectionUri: ownProps.connectionUri,
     ownedAtom,
@@ -373,7 +374,11 @@ class AtomMessages extends React.Component {
         <React.Fragment>
           <a
             className="pm__header__back__button clickable"
-            onClick={this.props.history.goBack}
+            onClick={
+              this.props.backToChats
+                ? () => this.props.history.push("/connections")
+                : this.props.history.goBack
+            }
           >
             <svg className="pm__header__back__button__icon">
               <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
@@ -896,7 +901,15 @@ class AtomMessages extends React.Component {
       );
     }
     this.props.closeConnection(get(this.props.connection, "uri"));
-    this.props.history.goBack();
+    if (this.props.backToChats) {
+      this.props.history.push(
+        generateLink(this.props.history.location, {
+          connectionUri: undefined,
+        })
+      );
+    } else {
+      this.props.history.goBack();
+    }
   }
 
   selectMessage(msgUri) {
@@ -1036,6 +1049,7 @@ class AtomMessages extends React.Component {
 }
 
 AtomMessages.propTypes = {
+  backToChats: PropTypes.bool,
   connectionUri: PropTypes.string,
   className: PropTypes.string,
   ownedAtom: PropTypes.object,

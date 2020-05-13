@@ -188,7 +188,7 @@ export default function WonBuddyItem({ connection, atom, isOwned }) {
           history.push(
             generateLink(
               history.location,
-              { connectionUri: chatConnectionUri },
+              { postUri: atomUri, connectionUri: chatConnectionUri },
               "/connections"
             )
           );
