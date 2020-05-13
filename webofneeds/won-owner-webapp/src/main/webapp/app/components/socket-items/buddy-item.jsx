@@ -24,8 +24,7 @@ export default function WonBuddyItem({ connection, atom, isOwned }) {
 
   const hasBuddySocket = atomUtils.hasBuddySocket(atom);
   const chatConnections =
-    isOwned &&
-    atomUtils.getConnectionsOfAtom(atom, vocab.CHAT.ChatSocketCompacted);
+    isOwned && atomUtils.getConnections(atom, vocab.CHAT.ChatSocketCompacted);
 
   const hasChatConnections = chatConnections && chatConnections.size > 0;
   const chatConnectionsArray = chatConnections && chatConnections.toArray();
