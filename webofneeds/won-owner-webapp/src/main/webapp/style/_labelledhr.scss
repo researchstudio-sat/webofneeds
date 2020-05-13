@@ -35,6 +35,19 @@ won-labelled-hr {
       position: relative;
       padding: 0 0.3rem;
       top: 0.3em;
+
+      &:hover {
+        --local-primary: #{$won-primary-color};
+      }
+
+      &--expanded {
+        transform: rotate(-180deg);
+        transition: all linear 0.2s;
+      }
+
+      &--collapsed {
+        transition: all linear 0.2s;
+      }
     }
   }
 }

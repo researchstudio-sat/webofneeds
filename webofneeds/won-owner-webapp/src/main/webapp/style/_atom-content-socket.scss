@@ -11,6 +11,23 @@ won-atom-content-socket {
     }
   }
 
+  > won-labelled-hr {
+    .wlh__label__carret,
+    .wlh__label__text {
+      background: white;
+    }
+  }
+
+  > won-suggest-atom-picker {
+    > .sap__posts > .sap__posts__post {
+      background: $won-light-gray;
+    }
+
+    > won-labelled-hr > .wlh__label > .wlh__label__text {
+      background: white;
+    }
+  }
+
   .acs__segment {
     padding-top: 1rem;
 
