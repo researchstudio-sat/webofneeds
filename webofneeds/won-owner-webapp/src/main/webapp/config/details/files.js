@@ -142,7 +142,9 @@ export const images = {
             name: get(image, "s:name"),
             encodingFormat: get(image, "s:encodingFormat"),
             encoding: get(image, "s:encoding"),
-            default: JSON.parse(get(image, "s:representativeOfPage")),
+            default:
+              get(image, "s:representativeOfPage") &&
+              JSON.parse(get(image, "s:representativeOfPage")),
           };
           if (
             img.name &&
@@ -158,7 +160,9 @@ export const images = {
         name: get(images, "s:name"),
         encodingFormat: get(images, "s:encodingFormat"),
         encoding: get(images, "s:encoding"),
-        default: get(images, "s:representativeOfPage"),
+        default:
+          get(images, "s:representativeOfPage") &&
+          get(images, "s:representativeOfPage"),
       };
       if (
         img.name &&
