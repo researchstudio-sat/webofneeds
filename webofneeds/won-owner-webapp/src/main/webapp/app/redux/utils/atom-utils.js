@@ -331,12 +331,6 @@ export function getRequestReceivedConnections(atom) {
     : Immutable.Map();
 }
 
-export function getConnectedConnections(atom) {
-  return get(atom, "connections")
-    ? get(atom, "connections").filter(conn => connectionUtils.isConnected(conn))
-    : Immutable.Map();
-}
-
 export function hasUnreadSuggestedConnections(atom) {
   return (
     get(atom, "connections") &&
@@ -615,8 +609,8 @@ function getSocketKeysReset(socketsImm) {
  * @param atomImm immutable atom that stores connections
  * @param socketType compactedSocketType Uri (senderSocket)
  */
-export function getNonClosedConnectionsOfAtom(atomImm, socketType) {
-  const connections = getConnectionsOfAtom(atomImm, socketType);
+export function getNonClosedConnections(atomImm, socketType) {
+  const connections = getConnections(atomImm, socketType);
 
   return (
     connections && connections.filter(conn => !connectionUtils.isClosed(conn))
@@ -628,15 +622,20 @@ export function getNonClosedConnectionsOfAtom(atomImm, socketType) {
  * @param atomImm immutable atom that stores connections
  * @param socketType compactedSocketType Uri (senderSocket)
  */
-export function getConnectionsOfAtom(atomImm, socketType) {
+export function getConnections(atomImm, socketType) {
   const socketUri = getSocketUri(atomImm, socketType);
 
   const connections = get(atomImm, "connections");
 
-  return (
-    connections &&
-    connections.filter(conn => connectionUtils.hasSocketUri(conn, socketUri))
-  );
+  if (socketUri) {
+    return connections
+      ? connections.filter(conn =>
+          connectionUtils.hasSocketUri(conn, socketUri)
+        )
+      : Immutable.Map();
+  } else {
+    return connections || Immutable.Map();
+  }
 }
 
 /**
@@ -644,8 +643,8 @@ export function getConnectionsOfAtom(atomImm, socketType) {
  * @param atomImm immutable atom that stores connections
  * @param socketType compactedSocketType Uri (senderSocket)
  */
-export function getConnectedConnectionsOfAtom(atomImm, socketType) {
-  const connections = getConnectionsOfAtom(atomImm, socketType);
+export function getConnectedConnections(atomImm, socketType) {
+  const connections = getConnections(atomImm, socketType);
 
   return (
     connections && connections.filter(conn => connectionUtils.isConnected(conn))

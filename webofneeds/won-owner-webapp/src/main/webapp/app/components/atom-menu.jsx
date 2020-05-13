@@ -131,8 +131,8 @@ export default function WonAtomMenu({ atom, defaultTab }) {
 
       default: {
         const activeConnections = isOwned
-          ? atomUtils.getNonClosedConnectionsOfAtom(atom, socketType)
-          : atomUtils.getConnectedConnectionsOfAtom(atom, socketType);
+          ? atomUtils.getNonClosedConnections(atom, socketType)
+          : atomUtils.getConnectedConnections(atom, socketType);
 
         inactive = !activeConnections || activeConnections.size === 0;
         countLabel =

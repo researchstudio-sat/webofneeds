@@ -39,7 +39,7 @@ export default function WonAtomContentSocket({
 
   const storedAtoms = useSelector(state => generalSelectors.getAtoms(state));
 
-  const allAtomConnections = atomUtils.getConnectionsOfAtom(atom, socketType);
+  const allAtomConnections = atomUtils.getConnections(atom, socketType);
 
   let excludedFromRequestUris = [get(atom, "uri")];
 
