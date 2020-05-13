@@ -145,13 +145,13 @@ const mapDispatchToProps = dispatch => {
         })
       );
     },
-    messageMarkAsRead: (messageUri, connectionUri, atomUri, read) => {
+    messageMarkAsRead: (messageUri, connectionUri, atomUri) => {
       dispatch(
         actionCreators.messages__markAsRead({
           messageUri: messageUri,
           connectionUri: connectionUri,
           atomUri: atomUri,
-          read: (read && read) || true,
+          read: true,
         })
       );
     },
@@ -176,7 +176,7 @@ class WonConnectionMessage extends React.Component {
       messageContentElement = (
         <VisibilitySensor
           onChange={isVisible => {
-            isVisible && this.props.isUnread && this.markAsRead(true);
+            isVisible && this.props.isUnread && this.markAsRead();
           }}
           intervalDelay={2000}
         >
@@ -190,7 +190,7 @@ class WonConnectionMessage extends React.Component {
       if (this.props.isUnread) {
         <VisibilitySensor
           onChange={isVisible => {
-            isVisible && this.props.isUnread && this.markAsRead(true);
+            isVisible && this.props.isUnread && this.markAsRead();
           }}
           intervalDelay={2000}
         />;
@@ -506,14 +506,13 @@ class WonConnectionMessage extends React.Component {
     );
   }
 
-  markAsRead(read = true) {
+  markAsRead() {
     if (this.props.isUnread) {
       setTimeout(() => {
         this.props.messageMarkAsRead(
           this.props.messageUri,
           this.props.connectionUri,
-          get(this.props.ownedAtom, "uri"),
-          read
+          get(this.props.ownedAtom, "uri")
         );
       }, MESSAGE_READ_TIMEOUT);
     }
