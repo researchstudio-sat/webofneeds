@@ -57,7 +57,7 @@ export default function WonAtomConnectionsIndicator({ atom }) {
 
     return generateLink(
       history.location,
-      { connectionUri: connUri },
+      { postUri: atomUri, connectionUri: connUri },
       "/connections",
       false
     );

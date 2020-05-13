@@ -60,6 +60,7 @@ export default function AtomContentChats({ atom }) {
             toLink={generateLink(
               history.location,
               {
+                postUri: get(atom, "uri"),
                 connectionUri: connUri,
               },
               "/connections",

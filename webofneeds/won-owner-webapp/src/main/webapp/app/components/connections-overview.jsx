@@ -4,9 +4,7 @@ import { useHistory } from "react-router-dom";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import {
   get,
-  getIn,
   sortByDate,
-  getQueryParams,
   generateLink,
   filterConnectionsBySearchValue,
 } from "../utils.js";
@@ -27,28 +25,6 @@ export default function WonConnectionsOverview() {
     searchText,
     true
   );
-
-  const { connectionUri } = getQueryParams(history.location);
-
-  const connUriInRoute = connectionUri;
-
-  const isConnUriInRoutePresent = !!get(allChatConnections, connUriInRoute);
-
-  const connectionInRoute = useSelector(state => {
-    const atom = generalSelectors.getOwnedAtomByConnectionUri(
-      state,
-      connUriInRoute
-    );
-    return getIn(atom, ["connections", connUriInRoute]);
-  });
-
-  // If the connection from the Uri was not present and there is a connection within the uri we add it to our map
-  if (!isConnUriInRoutePresent && connectionInRoute) {
-    allChatConnections = allChatConnections.set(
-      connUriInRoute,
-      connectionInRoute
-    );
-  }
 
   const connections = sortByDate(allChatConnections) || [];
 
