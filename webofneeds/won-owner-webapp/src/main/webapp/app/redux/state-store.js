@@ -230,6 +230,11 @@ export function fetchAtomAndDispatch(
               });
               return atom;
             })
+            .then(atom => {
+              //Fetch All MetaConnections Of NonOwnedPersonaAndDispatch //TODO: ENHANCE LOADING PROCESS BY LOADING CONNECTIONS ONLY ON POST VIEW
+              fetchConnectionsOfNonOwnedAtomAndDispatch(personaUri, dispatch);
+              return atom;
+            })
             .catch(err => {
               const errResponse = err && err.response;
               const isDeleted = !!(errResponse && errResponse.status == 410);
@@ -252,6 +257,11 @@ export function fetchAtomAndDispatch(
         type: actionTypes.atoms.store,
         payload: Immutable.fromJS({ atoms: { [atomUri]: atom } }),
       });
+      return atom;
+    })
+    .then(atom => {
+      //Fetch All MetaConnections Of NonOwnedAtomAndDispatch //TODO: ENHANCE LOADING PROCESS BY LOADING CONNECTIONS ONLY ON POST VIEW
+      fetchConnectionsOfNonOwnedAtomAndDispatch(atomUri, dispatch);
       return atom;
     })
     .catch(err => {
@@ -448,6 +458,24 @@ export function fetchConnectionsOfAtomAndDispatch(atomUri, dispatch) {
         fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch)
       )
     );
+}
+
+export function fetchConnectionsOfNonOwnedAtomAndDispatch(atomUri, dispatch) {
+  return won
+    .getConnectionUrisWithStateByAtomUri(atomUri, atomUri)
+    .then(connectionsWithStateAndSocket => {
+      const connectedConnections = connectionsWithStateAndSocket.filter(
+        conn => conn.connectionState === vocab.WON.Connected
+      );
+
+      dispatch({
+        type: actionTypes.connections.storeMetaConnections,
+        payload: Immutable.fromJS({
+          atomUri: atomUri,
+          connections: connectedConnections,
+        }),
+      });
+    });
 }
 
 /**
