@@ -63,14 +63,6 @@ export const getWhatsAroundAtoms = createSelector(
       .filter(atom => !!atom)
 );
 
-export const getPosts = createSelector(getAtoms, atoms =>
-  atoms.filter(atom => {
-    if (!atom.getIn(["content", "type"])) return true;
-
-    return atomUtils.isAtom(atom) && !atomUtils.isPersona(atom);
-  })
-);
-
 export const getOwnedPosts = createSelector(
   getOwnedAtoms,
   ownedAtoms =>
@@ -113,19 +105,6 @@ export const hasUnreadSuggestedConnections = createSelector(
       .filter(atom => atomUtils.isActive(atom))
       .find(atom => atomUtils.hasUnreadSuggestedConnections(atom))
 );
-
-export function hasUnreadSuggestedConnectionsInHeldAtoms(state, atomUri) {
-  const allAtoms = getAtoms(state);
-  const atom = get(allAtoms, atomUri);
-  const holds = atomUtils.getHeldAtomUris(atom);
-
-  return (
-    holds &&
-    !!holds.find(holdsUri =>
-      atomUtils.hasUnreadSuggestedConnections(get(allAtoms, holdsUri))
-    )
-  );
-}
 
 /**
  * Determines if there are any buddy connections that are unread
@@ -189,7 +168,7 @@ export function getBuddyConnectionsByAtomUri(
  * @param connection to check sockettypes of
  * @returns {boolean}
  */
-export function isBuddyConnection(allAtoms, connection) {
+function isBuddyConnection(allAtoms, connection) {
   return (
     getSenderSocketType(allAtoms, connection) ===
       vocab.BUDDY.BuddySocketCompacted &&
@@ -213,12 +192,6 @@ export const hasUnreadChatConnections = createSelector(
 export const getActiveAtoms = createSelector(
   getAtoms,
   allAtoms => allAtoms && allAtoms.filter(atom => atomUtils.isActive(atom))
-);
-
-export const getOwnedAtomsInCreation = createSelector(
-  getOwnedAtoms,
-  ownedAtoms =>
-    ownedAtoms && ownedAtoms.filter(atom => get(atom, "isBeingCreated"))
 );
 
 export const selectIsConnected = state =>
