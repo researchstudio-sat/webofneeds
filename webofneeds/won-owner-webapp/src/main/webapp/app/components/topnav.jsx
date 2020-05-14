@@ -33,7 +33,7 @@ const mapStateToProps = (state, ownProps) => {
     loggedIn: accountUtils.isLoggedIn(accountState),
     isSignUpView: currentPath === "/signup",
     showLoadingIndicator: isLoading(state),
-    connectionsToCrawl: connectionSelectors.getChatConnectionsToCrawl(state),
+    connectionsToCrawl: connectionSelectors.getConnectionsToCrawl(state),
     hasUnreads:
       generalSelectors.hasUnreadSuggestedConnections(state) ||
       generalSelectors.hasUnreadBuddyConnections(state, true, false) ||

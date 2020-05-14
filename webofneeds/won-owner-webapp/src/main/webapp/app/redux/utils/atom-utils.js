@@ -652,12 +652,29 @@ export function getConnectedConnections(atomImm, socketType) {
 }
 
 export function getAllNonClosedNonSuggestedChatConnections(atomImm) {
+  const chatSocketUri = getChatSocket(atomImm);
+
   return atomImm
     ? get(atomImm, "connections").filter(
         conn =>
-          connectionUtils.hasSocketUri(conn, getChatSocket(atomImm)) &&
+          connectionUtils.hasSocketUri(conn, chatSocketUri) &&
           !(connectionUtils.isClosed(conn) || connectionUtils.isSuggested(conn))
       )
+    : Immutable.Map();
+}
+
+export function getAllConnectedChatAndGroupConnections(atomImm) {
+  const groupSocketUri = getGroupSocket(atomImm);
+  const chatSocketUri = getChatSocket(atomImm);
+
+  return atomImm
+    ? get(atomImm, "connections")
+        .filter(conn => connectionUtils.isConnected(conn))
+        .filter(
+          conn =>
+            connectionUtils.hasSocketUri(conn, chatSocketUri) ||
+            connectionUtils.hasSocketUri(conn, groupSocketUri)
+        )
     : Immutable.Map();
 }
 

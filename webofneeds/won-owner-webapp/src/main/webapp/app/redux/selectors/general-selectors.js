@@ -86,6 +86,18 @@ export const getAllChatConnections = createSelector(
       )
 );
 
+export const getAllConnectedChatAndGroupConnections = createSelector(
+  getOwnedAtoms,
+  allOwnedAtoms =>
+    allOwnedAtoms &&
+    allOwnedAtoms
+      .filter(atom => atomUtils.isActive(atom))
+      .filter(
+        atom => atomUtils.hasChatSocket(atom) || atomUtils.hasGroupSocket(atom)
+      )
+      .flatMap(atom => atomUtils.getAllConnectedChatAndGroupConnections(atom))
+);
+
 export const hasChatConnections = createSelector(
   getAllChatConnections,
   chatConnections => chatConnections && chatConnections.size > 0
