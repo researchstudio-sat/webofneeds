@@ -8,9 +8,9 @@ import Immutable from "immutable";
 import {
   getOwnedAtomByConnectionUri,
   getOwnedAtoms,
-  getAtoms,
   getSenderSocketType,
   getTargetSocketType,
+  getAllConnectedChatAndGroupConnections,
 } from "./general-selectors.js";
 import * as connectionUtils from "../utils/connection-utils.js";
 import vocab from "../../service/vocab.js";
@@ -45,40 +45,30 @@ export const getOwnedConnectionUris = createSelector(
   ownedConnections => ownedConnections && ownedConnections.keySeq().toSet()
 );
 
-export const getChatConnectionsToCrawl = createSelector(
-  getAtoms,
+export const getConnectionsToCrawl = createSelector(
   state => get(state, "process"),
-  getOwnedConnections,
-  (allAtoms, process, allConnections) => {
-    const chatConnections =
-      allConnections &&
-      allConnections
-        .filter(conn => connectionUtils.isConnected(conn))
-        .filter(
-          conn => !conn.get("messages") || conn.get("messages").size === 0
-          // the check below (if connectMessage was present) was replaced by if any messages are available (if any are there this connection is not to be fetched anymore)
-          // !!conn
-          //   .get("messages")
-          //   .find(msg => msg.get("messageType") === vocab.WONMSG.connectMessage)
-        )
-        .filter(conn => {
-          const connUri = get(conn, "uri");
+  getAllConnectedChatAndGroupConnections,
+  (process, connections) =>
+    connections
+      ? connections
+          .filter(
+            conn => !conn.get("messages") || conn.get("messages").size === 0
+            // the check below (if connectMessage was present) was replaced by if any messages are available (if any are there this connection is not to be fetched anymore)
+            // !!conn
+            //   .get("messages")
+            //   .find(msg => msg.get("messageType") === vocab.WONMSG.connectMessage)
+          )
+          .filter(conn => {
+            const connUri = get(conn, "uri");
 
-          return (
-            !processUtils.isConnectionLoading(process, connUri) &&
-            !processUtils.isConnectionLoadingMessages(process, connUri) &&
-            !processUtils.hasConnectionFailedToLoad(process, connUri) &&
-            processUtils.hasMessagesToLoad(process, connUri)
-          );
-        })
-        .filter(
-          conn =>
-            isChatToXConnection(allAtoms, conn) ||
-            isGroupToXConnection(allAtoms, conn)
-        );
-
-    return chatConnections || Immutable.Map();
-  }
+            return (
+              !processUtils.isConnectionLoading(process, connUri) &&
+              !processUtils.isConnectionLoadingMessages(process, connUri) &&
+              !processUtils.hasConnectionFailedToLoad(process, connUri) &&
+              processUtils.hasMessagesToLoad(process, connUri)
+            );
+          })
+      : Immutable.Map()
 );
 
 export function getConnectionsToInjectMsgInto(atoms, targetSocketUri, msgUri) {
@@ -115,28 +105,4 @@ export function isChatToGroupConnection(allAtoms, connection) {
     getTargetSocketType(allAtoms, connection) ===
       vocab.GROUP.GroupSocketCompacted
   );
-}
-
-/**
- * Returns true if socket is GroupSocket and targetSocket is any socket
- * @param allAtoms
- * @param connection
- * @returns {boolean}
- */
-export function isGroupToXConnection(allAtoms, connection) {
-  const senderSocketType = getSenderSocketType(allAtoms, connection);
-
-  return senderSocketType === vocab.GROUP.GroupSocketCompacted;
-}
-
-/**
- * Returns true if socket is ChatSocket and targetSocket is any socket
- * @param allAtoms
- * @param connection
- * @returns {boolean}
- */
-export function isChatToXConnection(allAtoms, connection) {
-  const senderSocketType = getSenderSocketType(allAtoms, connection);
-
-  return senderSocketType === vocab.CHAT.ChatSocketCompacted;
 }
