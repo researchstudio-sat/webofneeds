@@ -685,7 +685,7 @@ class AtomMessages extends React.Component {
           <div className="pm__footer">
             <ChatTextfield
               className="pm__footer__chattextfield"
-              connectionUri={this.props.selectedConnectionUri}
+              connection={this.props.connection}
               placeholder={
                 this.props.shouldShowRdf ? "Enter TTL..." : "Your message..."
               }
@@ -717,7 +717,7 @@ class AtomMessages extends React.Component {
             <div className="pm__footer">
               <ChatTextfield
                 className="pm__footer__chattextfield"
-                connectionUri={this.props.selectedConnectionUri}
+                connection={this.props.connection}
                 placeholder="Message (optional)"
                 submitButtonLabel="Accept&#160;Chat"
                 allowEmptySubmit={true}
@@ -752,7 +752,7 @@ class AtomMessages extends React.Component {
             <div className="pm__footer">
               <ChatTextfield
                 className="pm__footer__chattextfield"
-                connectionUri={this.props.selectedConnectionUri}
+                connection={this.props.connection}
                 placeholder="Message (optional)"
                 submitButtonLabel="Ask&#160;to&#160;Chat"
                 allowEmptySubmit={true}

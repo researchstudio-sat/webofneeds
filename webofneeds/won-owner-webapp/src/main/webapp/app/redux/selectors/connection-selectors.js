@@ -8,12 +8,9 @@ import Immutable from "immutable";
 import {
   getOwnedAtomByConnectionUri,
   getOwnedAtoms,
-  getSenderSocketType,
-  getTargetSocketType,
   getAllConnectedChatAndGroupConnections,
 } from "./general-selectors.js";
 import * as connectionUtils from "../utils/connection-utils.js";
-import vocab from "../../service/vocab.js";
 import { get, getIn } from "../../utils.js";
 import * as processUtils from "../utils/process-utils.js";
 
@@ -90,19 +87,4 @@ export function hasMessagesToLoad(state, connUri) {
   ]);
 
   return messageProcess && !!messageProcess.find(msg => msg.get("toLoad"));
-}
-
-/**
- * Returns true if socket is a ChatSocket and targetSocket is a GroupSocket
- * @param allAtoms all atoms of the state
- * @param connection to check sockettypes of
- * @returns {boolean}
- */
-export function isChatToGroupConnection(allAtoms, connection) {
-  return (
-    getSenderSocketType(allAtoms, connection) ===
-      vocab.CHAT.ChatSocketCompacted &&
-    getTargetSocketType(allAtoms, connection) ===
-      vocab.GROUP.GroupSocketCompacted
-  );
 }

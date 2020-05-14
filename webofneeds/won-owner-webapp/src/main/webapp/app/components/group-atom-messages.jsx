@@ -284,7 +284,7 @@ class GroupAtomMessages extends React.Component {
         <div className="gpm__footer">
           <ChatTextfield
             className="gpm__footer__chattextfield"
-            connectionUri={this.props.connectionUri}
+            connection={this.props.connection}
             placeholder={
               this.props.shouldShowRdf ? "Enter TTL..." : "Your message..."
             }
@@ -315,7 +315,7 @@ class GroupAtomMessages extends React.Component {
         <div className="gpm__footer">
           <ChatTextfield
             className="gpm__footer__chattextfield"
-            connectionUri={this.props.connectionUri}
+            connection={this.props.connection}
             placeholder="Message (optional)"
             submitButtonLabel="Accept&#160;Invite"
             allowEmptySubmit={true}
@@ -347,7 +347,7 @@ class GroupAtomMessages extends React.Component {
         <div className="gpm__footer">
           <ChatTextfield
             className="gpm__footer__chattextfield"
-            connectionUri={this.props.connectionUri}
+            connection={this.props.connection}
             placeholder="Message (optional)"
             submitButtonLabel="Ask&#160;to&#160;Join"
             allowEmptySubmit={true}
