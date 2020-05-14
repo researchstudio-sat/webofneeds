@@ -151,6 +151,7 @@ const mapDispatchToProps = dispatch => {
           messageUri: messageUri,
           connectionUri: connectionUri,
           atomUri: atomUri,
+          read: true,
         })
       );
     },
@@ -186,6 +187,14 @@ class WonConnectionMessage extends React.Component {
         </VisibilitySensor>
       );
     } else {
+      if (this.props.isUnread) {
+        <VisibilitySensor
+          onChange={isVisible => {
+            isVisible && this.props.isUnread && this.markAsRead();
+          }}
+          intervalDelay={2000}
+        />;
+      }
       const messageIcon = [];
 
       if (

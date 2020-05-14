@@ -254,6 +254,7 @@ export function addMessage(
 
             //re-get messages after state changes from references
             if (hadReferences) {
+              parsedMessage = parsedMessage.setIn(["data", "unread"], false);
               messages = state.getIn([
                 targetAtomUri,
                 "connections",
@@ -650,11 +651,16 @@ export function markMessageShowActions(
   );
 }
 
-export function markMessageAsRead(state, messageUri, connectionUri, atomUri) {
+export function markMessageAsRead(
+  state,
+  messageUri,
+  connectionUri,
+  atomUri,
+  read = true
+) {
   const atom = state.get(atomUri);
   const connection = atom && atom.getIn(["connections", connectionUri]);
   const message = connection && connection.getIn(["messages", messageUri]);
-
   markUriAsRead(messageUri);
 
   if (!message) {
@@ -672,7 +678,7 @@ export function markMessageAsRead(state, messageUri, connectionUri, atomUri) {
 
   state = state.setIn(
     [atomUri, "connections", connectionUri, "messages", messageUri, "unread"],
-    false
+    !read
   );
 
   if (
@@ -685,7 +691,7 @@ export function markMessageAsRead(state, messageUri, connectionUri, atomUri) {
 
   return state.setIn(
     [atomUri, "connections", connectionUri, "messages", messageUri, "unread"],
-    false
+    !read
   );
 }
 
@@ -770,6 +776,8 @@ export function markMessageAsRejected(
       );
     });
   }
+
+  state = markMessageAsRead(state, messageUri, connectionUri, atomUri, false);
 
   state = markMessageAsCollapsed(
     state,
@@ -881,6 +889,8 @@ export function markMessageAsRetracted(
     });
   }
 
+  state = markMessageAsRead(state, messageUri, connectionUri, atomUri, false);
+
   state = markMessageAsCollapsed(
     state,
     messageUri,
@@ -948,6 +958,8 @@ export function markMessageAsClaimed(
     claimed
   );
 
+  state = markMessageAsRead(state, messageUri, connectionUri, atomUri, false);
+
   const claimedMessageUris =
     connection && connection.getIn(["agreementData", "claimedMessageUris"]);
 
@@ -998,6 +1010,8 @@ export function markMessageAsAgreed(
     );
     return state;
   }
+
+  state = markMessageAsRead(state, messageUri, connectionUri, atomUri, false);
 
   state = markMessageAsCollapsed(
     state,
@@ -1057,6 +1071,8 @@ export function markMessageAsProposed(
     );
     return state;
   }
+
+  state = markMessageAsRead(state, messageUri, connectionUri, atomUri, false);
 
   state = markMessageAsCollapsed(
     state,
@@ -1139,6 +1155,8 @@ export function markMessageAsAccepted(
     );
   }
 
+  state = markMessageAsRead(state, messageUri, connectionUri, atomUri, false);
+
   const agreementUris =
     connection && connection.getIn(["agreementData", "agreementUris"]);
 
@@ -1199,6 +1217,8 @@ export function markMessageAsCancelled(
     );
   }
 
+  state = markMessageAsRead(state, messageUri, connectionUri, atomUri, false);
+
   const cancelledAgreementUris =
     connection && connection.getIn(["agreementData", "cancelledAgreementUris"]);
   return state.setIn(
@@ -1238,6 +1258,8 @@ export function markMessageAsCancellationPending(
     );
     return state;
   }
+
+  state = markMessageAsRead(state, messageUri, connectionUri, atomUri, false);
 
   const cancellationPendingUris =
     connection &&
