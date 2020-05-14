@@ -4,7 +4,6 @@ import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import { get, getIn, getQueryParams } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
-import * as connectionSelectors from "../../redux/selectors/connection-selectors.js";
 import WonModalDialog from "../../components/modal-dialog.jsx";
 import WonTopnav from "../../components/topnav.jsx";
 import WonMenu from "../../components/menu.jsx";
@@ -19,6 +18,7 @@ import "~/style/_connections.scss";
 import "~/style/_responsiveness-utils.scss";
 import ico36_message from "~/images/won-icons/ico36_message.svg";
 import { useHistory } from "react-router-dom";
+import * as atomUtils from "../../redux/utils/atom-utils";
 
 export default function PageConnections() {
   const history = useHistory();
@@ -37,12 +37,14 @@ export default function PageConnections() {
     "connections",
     selectedConnectionUri,
   ]);
-  const isSelectedConnectionGroupChat = useSelector(state =>
-    connectionSelectors.isChatToGroupConnection(
-      get(state, "atoms"),
-      selectedConnection
-    )
+  const selectedTargetAtom = useSelector(state =>
+    getIn(state, "atoms", get(selectedConnection, "targetAtomUri"))
   );
+
+  const isSelectedConnectionGroupChat =
+    selectedConnection &&
+    atomUtils.getGroupSocket(selectedTargetAtom) ===
+      get(selectedConnection, "targetSocketUri");
   const hasChatConnections = useSelector(state =>
     generalSelectors.hasChatConnections(state)
   );
