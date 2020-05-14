@@ -178,10 +178,12 @@ body {
     }
 
     > main.overview__justconnection {
-      grid-column: 2 / 4;
+      @media (min-width: $responsivenessBreakPoint) {
+        grid-column: 2 / 4;
 
-      > * {
-        border-left: $thinGrayBorder;
+        > * {
+          border-left: $thinGrayBorder;
+        }
       }
     }
 
