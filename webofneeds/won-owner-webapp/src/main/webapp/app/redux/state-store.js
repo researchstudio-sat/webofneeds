@@ -248,14 +248,9 @@ export function fetchAtomAndDispatch(
       fetchConnectionsOfNonOwnedAtomAndDispatch(atomUri, dispatch);
       return atom;
     })
-    .catch(err => {
-      const errResponse = err && err.response;
-      const isDeleted = !!(errResponse && errResponse.status == 410);
-
+    .catch(() => {
       dispatch({
-        type: isDeleted
-          ? actionTypes.atoms.removeDeleted
-          : actionTypes.atoms.storeUriFailed,
+        type: actionTypes.atoms.storeUriFailed,
         payload: Immutable.fromJS({ uri: atomUri }),
       });
     });
