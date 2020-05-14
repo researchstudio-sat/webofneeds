@@ -10,7 +10,6 @@ import { actionCreators } from "../actions/actions.js";
 
 import { Elm } from "../../elm/PublishButton.elm";
 
-import { getMessagesByConnectionUri } from "../redux/selectors/message-selectors.js";
 import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as messageUtils from "../redux/utils/message-utils.js";
@@ -36,7 +35,7 @@ const mapStateToProps = (state, ownProps) => {
     generalSelectors.getOwnedAtomByConnectionUri(state, ownProps.connectionUri);
   const connection = getIn(atom, ["connections", ownProps.connectionUri]);
 
-  const messages = getMessagesByConnectionUri(state, ownProps.connectionUri);
+  const messages = get(connection, "messages");
 
   const selectedMessages =
     messages && messages.filter(msg => messageUtils.isMessageSelected(msg));

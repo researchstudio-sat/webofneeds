@@ -11,7 +11,7 @@ import {
 } from "../utils/message-utils.js";
 import { getOwnedAtomByConnectionUri } from "./general-selectors.js";
 
-export function getMessagesByConnectionUri(state, connectionUri) {
+function getMessagesByConnectionUri(state, connectionUri) {
   const atom = getOwnedAtomByConnectionUri(state, connectionUri);
   return atom && atom.getIn(["connections", connectionUri, "messages"]);
 }
