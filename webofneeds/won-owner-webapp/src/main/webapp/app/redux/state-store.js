@@ -53,27 +53,11 @@ export function fetchDataForOwnedAtoms(
 
   return urisToLookupMap(ownedAtomUris, uri =>
     fetchOwnedAtomAndDispatch(uri, dispatch, getState, forceFetch)
-  )
-    .then(() =>
-      urisToLookupMap(ownedAtomUris, atomUri =>
-        fetchConnectionsOfAtomAndDispatch(atomUri, dispatch)
-      )
+  ).then(() =>
+    urisToLookupMap(ownedAtomUris, atomUri =>
+      fetchConnectionsOfAtomAndDispatch(atomUri, dispatch)
     )
-    .then(atomConnectionMap => {
-      const theirAtomUris = Immutable.fromJS(atomConnectionMap)
-        .filter(connections => connections.size > 0)
-        .flatMap(entry => entry)
-        .map(conn => conn.get("targetAtom"))
-        .toSet()
-        .toArray();
-
-      return theirAtomUris;
-    })
-    .then(theirAtomUris =>
-      urisToLookupMap(theirAtomUris, uri =>
-        fetchAtomAndDispatch(uri, dispatch, getState)
-      )
-    );
+  );
 }
 
 export function fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch) {

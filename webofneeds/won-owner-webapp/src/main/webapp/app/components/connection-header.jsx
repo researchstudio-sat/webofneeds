@@ -142,6 +142,7 @@ const mapStateToProps = (state, ownProps) => {
     connectionOrAtomsLoading:
       !connection ||
       !targetAtom ||
+      processUtils.isAtomToLoad(processState, targetAtomUri) ||
       !ownedAtom ||
       processUtils.isAtomLoading(processState, get(ownedAtom, "uri")) ||
       targetAtomLoading ||

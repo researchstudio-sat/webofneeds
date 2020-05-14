@@ -5,6 +5,7 @@ import { markUriAsRead } from "../../won-localstorage.js";
 import { markAtomAsRead } from "./reduce-atoms.js";
 import { getIn, get } from "../../utils.js";
 import * as connectionUtils from "../../redux/utils/connection-utils";
+import { addAtomStub } from "./reduce-atoms";
 
 export function storeConnectionsData(state, connectionsToStore) {
   if (connectionsToStore && connectionsToStore.size > 0) {
@@ -402,6 +403,9 @@ function addMetaConnection(atomState, atomUri, conn) {
       );
       atomState = atomState.setIn([atomUri, "unread"], true);
     }
+
+    const targetAtomUri = get(conn, "targetAtom");
+    atomState = addAtomStub(atomState, targetAtomUri);
 
     return atomState.mergeDeepIn(
       [atomUri, "connections", connectionUri],
