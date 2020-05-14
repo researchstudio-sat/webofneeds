@@ -27,35 +27,6 @@ export function getOwnedConnectionByUri(state, connectionUri) {
   return getIn(atom, ["connections", connectionUri]);
 }
 
-export function getChatConnectionsByAtomUri(state, atomUri) {
-  const atoms = getAtoms(state);
-  const atom = atoms && atoms.get(atomUri);
-  const connections = atom && atom.get("connections");
-
-  return (
-    connections && connections.filter(conn => isChatToXConnection(atoms, conn))
-  );
-}
-
-export function getGroupChatConnectionsByAtomUri(state, atomUri) {
-  const atoms = getAtoms(state);
-  const atom = atoms && atoms.get(atomUri);
-  const connections = atom && atom.get("connections");
-
-  return connections
-    ? connections.filter(conn => isGroupToXConnection(atoms, conn))
-    : Immutable.Map();
-}
-
-export function getSuggestedConnectionsByAtomUri(state, atomUri) {
-  const atoms = getAtoms(state);
-  const connections = getIn(atoms, [atomUri, "connections"]);
-
-  return connections
-    ? connections.filter(conn => connectionUtils.isSuggested(conn))
-    : Immutable.Map();
-}
-
 /**
  * Get all connections stored within your own atoms as a map
  * @returns Immutable.Map with all connections
@@ -120,56 +91,6 @@ export function getConnectionsToInjectMsgInto(atoms, targetSocketUri, msgUri) {
     .filter(conn => !get(conn, "messages").contains(msgUri));
 }
 
-/**
- * Returns all connections of an atom that have the status "requestReceived".
- * @param state
- * @param atom
- */
-export function getRequestedConnections(state, atom) {
-  const atoms = getAtoms(state);
-  const connections = get(atom, "connections");
-  return (
-    connections &&
-    connections.filter(
-      conn =>
-        connectionUtils.isRequestReceived(conn) &&
-        isChatToXConnection(atoms, conn)
-    )
-  );
-}
-
-/**
- * Returns all connections of an atom that have the status "requestReceived" and are unread.
- * @param state
- * @param atom
- */
-export function getUnreadRequestedConnections(state, atom) {
-  const requestedConnections = getRequestedConnections(state, atom);
-  return (
-    requestedConnections &&
-    requestedConnections.filter(conn => get(conn, "unread"))
-  );
-}
-
-/**
- * Returns all chat connections that are open and unread, which should cover only chat messages.
- * @param state
- * @param atom
- */
-export function getUnreadChatMessageConnections(state, atom) {
-  const atoms = getAtoms(state);
-  const connections = get(atom, "connections");
-  return (
-    connections &&
-    connections.filter(
-      conn =>
-        isChatToXConnection(atoms, conn) &&
-        connectionUtils.isConnected(conn) &&
-        connectionUtils.isUnread(conn)
-    )
-  );
-}
-
 export function hasMessagesToLoad(state, connUri) {
   const messageProcess = getIn(state, [
     "process",
@@ -182,20 +103,6 @@ export function hasMessagesToLoad(state, connUri) {
 }
 
 /**
- * Returns true if both sockets are ChatSockets
- * @param allAtoms all atoms of the state
- * @param connection to check sockettypes of
- * @returns {boolean}
- */
-export function isChatToChatConnection(allAtoms, connection) {
-  return (
-    getSenderSocketType(allAtoms, connection) ===
-      vocab.CHAT.ChatSocketCompacted &&
-    getTargetSocketType(allAtoms, connection) === vocab.CHAT.ChatSocketCompacted
-  );
-}
-
-/**
  * Returns true if socket is a ChatSocket and targetSocket is a GroupSocket
  * @param allAtoms all atoms of the state
  * @param connection to check sockettypes of
@@ -205,35 +112,6 @@ export function isChatToGroupConnection(allAtoms, connection) {
   return (
     getSenderSocketType(allAtoms, connection) ===
       vocab.CHAT.ChatSocketCompacted &&
-    getTargetSocketType(allAtoms, connection) ===
-      vocab.GROUP.GroupSocketCompacted
-  );
-}
-
-/**
- * Returns true if socket is a GroupSocket and targetSocket is a ChatSocket
- * @param allAtoms all atoms of the state
- * @param connection to check sockettypes of
- * @returns {boolean}
- */
-export function isGroupToChatConnection(allAtoms, connection) {
-  return (
-    getSenderSocketType(allAtoms, connection) ===
-      vocab.GROUP.GroupSocketCompacted &&
-    getTargetSocketType(allAtoms, connection) === vocab.CHAT.ChatSocketCompacted
-  );
-}
-
-/**
- * Returns true if both sockets are GroupSockets
- * @param allAtoms all atoms of the state
- * @param connection to check sockettypes of
- * @returns {boolean}
- */
-export function isGroupToGroupConnection(allAtoms, connection) {
-  return (
-    getSenderSocketType(allAtoms, connection) ===
-      vocab.GROUP.GroupSocketCompacted &&
     getTargetSocketType(allAtoms, connection) ===
       vocab.GROUP.GroupSocketCompacted
   );
