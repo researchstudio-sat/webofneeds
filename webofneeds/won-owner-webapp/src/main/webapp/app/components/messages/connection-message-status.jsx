@@ -7,7 +7,10 @@ import PropTypes from "prop-types";
 import { relativeTime } from "../../won-label-utils.js";
 import { get, getIn } from "../../utils.js";
 import { connect } from "react-redux";
-import { getOwnedAtomByConnectionUri } from "../../redux/selectors/general-selectors.js";
+import {
+  getOwnedAtomByConnectionUri,
+  selectLastUpdateTime,
+} from "../../redux/selectors/general-selectors.js";
 
 import "~/style/_connection-message-status.scss";
 import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.svg";
@@ -28,7 +31,7 @@ const mapStateToProps = (state, ownProps) => {
     connectionUri: ownProps.connectionUri,
     connection,
     message,
-    lastUpdateTime: get(state, "lastUpdateTime"),
+    lastUpdateTime: selectLastUpdateTime(state),
   };
 };
 
