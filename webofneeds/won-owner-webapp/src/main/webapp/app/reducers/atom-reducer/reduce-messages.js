@@ -2,11 +2,16 @@ import { parseMessage } from "./parse-message.js";
 import { markUriAsRead, isUriRead } from "../../won-localstorage.js";
 import { markConnectionAsRead } from "./reduce-connections.js";
 import { addAtomStub } from "./reduce-atoms.js";
+import vocab from "../../service/vocab.js";
 import * as connectionSelectors from "../../redux/selectors/connection-selectors.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import { get, getIn } from "../../utils.js";
 import Immutable from "immutable";
+import {
+  getSenderSocketType,
+  getTargetSocketType,
+} from "../../redux/selectors/general-selectors";
 
 export function addMessage(
   state,
@@ -120,7 +125,7 @@ export function addMessage(
 
         if (
           getIn(parsedMessage, ["data", "unread"]) &&
-          !connectionSelectors.isChatToGroupConnection(
+          !isChatToGroupConnection(
             state,
             getIn(state, [targetAtomUri, "connections", targetConnectionUri])
           )
@@ -161,7 +166,7 @@ export function addMessage(
             the encapsulating message and not store it within our state.
             */
           if (
-            !connectionSelectors.isChatToGroupConnection(
+            !isChatToGroupConnection(
               state,
               getIn(state, [targetAtomUri, "connections", targetConnectionUri])
             )
@@ -316,7 +321,7 @@ export function addMessage(
             );
 
             if (
-              connectionSelectors.isChatToGroupConnection(
+              isChatToGroupConnection(
                 state,
                 getIn(state, [atomUri, "connections", connUri])
               ) &&
@@ -1348,5 +1353,20 @@ export function updateMessageStatus(state, messageUri, connectionUri, atomUri) {
       "isMessageStatusUpToDate",
     ],
     true
+  );
+}
+
+/**
+ * Returns true if socket is a ChatSocket and targetSocket is a GroupSocket
+ * @param allAtoms all atoms of the state
+ * @param connection to check sockettypes of
+ * @returns {boolean}
+ */
+function isChatToGroupConnection(allAtoms, connection) {
+  return (
+    getSenderSocketType(allAtoms, connection) ===
+      vocab.CHAT.ChatSocketCompacted &&
+    getTargetSocketType(allAtoms, connection) ===
+      vocab.GROUP.GroupSocketCompacted
   );
 }

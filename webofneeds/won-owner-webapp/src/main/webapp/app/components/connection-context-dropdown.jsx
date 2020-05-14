@@ -11,7 +11,6 @@ import {
   toAbsoluteURL,
   generateLink,
 } from "../utils";
-import * as connectionSelectors from "../redux/selectors/connection-selectors";
 import * as connectionUtils from "../redux/utils/connection-utils";
 import * as processUtils from "../redux/utils/process-utils";
 import { ownerBaseUrl } from "~/config/default.js";
@@ -19,6 +18,7 @@ import { ownerBaseUrl } from "~/config/default.js";
 import "~/style/_context-dropdown.scss";
 import ico16_contextmenu from "~/images/won-icons/ico16_contextmenu.svg";
 import { withRouter, Link } from "react-router-dom";
+import * as atomUtils from "../redux/utils/atom-utils";
 
 const mapStateToProps = (state, ownProps) => {
   const { connectionUri } = getQueryParams(ownProps.location);
@@ -29,6 +29,7 @@ const mapStateToProps = (state, ownProps) => {
   const connection = post && post.getIn(["connections", connectionUri]);
 
   const targetAtomUri = getIn(connection, ["targetAtomUri"]);
+  const targetAtom = getIn(state, ["atoms", targetAtomUri]);
 
   let linkToPost;
   if (ownerBaseUrl && targetAtomUri) {
@@ -44,10 +45,9 @@ const mapStateToProps = (state, ownProps) => {
     adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
     targetAtomUri,
     linkToPost,
-    isConnectionToGroup: connectionSelectors.isChatToGroupConnection(
-      get(state, "atoms"),
-      connection
-    ),
+    isConnectionToGroup:
+      atomUtils.getGroupSocket(targetAtom) ===
+      get(connection, "targetSocketUri"),
     showAgreementData: get(connection, "showAgreementData"),
     showPetriNetData: get(connection, "showPetriNetData"),
     isClosed: connectionUtils.isClosed(connection),
