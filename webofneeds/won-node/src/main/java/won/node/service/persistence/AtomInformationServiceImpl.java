@@ -214,7 +214,11 @@ public class AtomInformationServiceImpl implements AtomInformationService {
     @Override
     public Collection<Connection> listConnections(final URI atomURI, ConnectionState filterByConnectionState)
                     throws NoSuchAtomException {
-        return connectionRepository.findByAtomURIAndState(atomURI, filterByConnectionState);
+        if(filterByConnectionState != null) {
+            return connectionRepository.findByAtomURIAndState(atomURI, filterByConnectionState);
+        } else {
+            return connectionRepository.findByAtomURI(atomURI);
+        }
     }
 
     @Override
