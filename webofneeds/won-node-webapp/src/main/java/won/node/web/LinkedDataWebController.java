@@ -517,14 +517,13 @@ public class LinkedDataWebController implements InitializingBean {
                     Model model, HttpServletResponse response) {
         URI atomURI = uriService.createAtomURIForId(identifier);
         try {
-            // TODO: IMPLEMENT CONN-STATE FILTER
             ConnectionState connectionState = getConnectionState(state);
             DateParameter dateParam = new DateParameter(timestamp);
             WonMessageType eventsType = getMessageType(type);
             Dataset rdfDataset;
             if (page != null) {
                 rdfDataset = linkedDataService
-                                .listConnections(page, atomURI, null, eventsType, dateParam.getDate(), deep, true)
+                                .listConnections(page, atomURI, null, eventsType, dateParam.getDate(), deep, true, connectionState)
                                 .getContent();
             } else if (resumeBefore != null) {
                 URI connURI;
@@ -534,7 +533,7 @@ public class LinkedDataWebController implements InitializingBean {
                     throw new IllegalArgumentException("resumeBefore must be a full, valid connection URI");
                 }
                 rdfDataset = linkedDataService.listConnectionsAfter(atomURI, connURI, null, eventsType,
-                                dateParam.getDate(), deep, true).getContent();
+                                dateParam.getDate(), deep, true, connectionState).getContent();
             } else if (resumeAfter != null) {
                 URI connURI;
                 try {
@@ -543,12 +542,12 @@ public class LinkedDataWebController implements InitializingBean {
                     throw new IllegalArgumentException("resumeAfter must be a full, valid connection URI");
                 }
                 rdfDataset = linkedDataService.listConnectionsBefore(atomURI, connURI, null, eventsType,
-                                dateParam.getDate(), deep, true).getContent();
+                                dateParam.getDate(), deep, true, connectionState).getContent();
             } else {
                 // all the connections of the atom; does not support type and date filtering for
                 // clients that do not support
                 // paging
-                rdfDataset = linkedDataService.listConnections(atomURI, deep, true).getContent();
+                rdfDataset = linkedDataService.listConnections(atomURI, deep, true, connectionState).getContent();
             }
             model.addAttribute("rdfDataset", rdfDataset);
             model.addAttribute("resourceURI",
@@ -1165,7 +1164,6 @@ public class LinkedDataWebController implements InitializingBean {
         Integer preferedSize = getPreferredSize(request);
         URI connectionsURI = URI.create(atomUri.toString() + "/c");
         try {
-            // TODO: IMPLEMENT CONN-STATE FILTER
             ConnectionState connectionState = getConnectionState(state);
             WonMessageType eventsType = getMessageType(type);
             DateParameter dateParam = new DateParameter(timestamp);
@@ -1178,16 +1176,16 @@ public class LinkedDataWebController implements InitializingBean {
             } else if (preferedSize == null) {
                 // does not support date and type filtering for clients that do not support
                 // paging
-                rdfDataset = linkedDataService.listConnections(atomUri, deep, true).getContent();
+                rdfDataset = linkedDataService.listConnections(atomUri, deep, true, connectionState).getContent();
                 // if no page or resume parameter is specified, display the latest connections:
             } else if (page == null && resumeBefore == null && resumeAfter == null) {
                 AtomInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
-                                .listConnections(1, atomUri, preferedSize, eventsType, dateParam.getDate(), deep, true);
+                                .listConnections(1, atomUri, preferedSize, eventsType, dateParam.getDate(), deep, true, connectionState);
                 rdfDataset = resource.getContent();
                 addPagedConnectionResourceInSequenceHeader(headers, connectionsURI, resource, passableQuery);
             } else if (page != null) {
                 AtomInformationService.PagedResource<Dataset, Connection> resource = linkedDataService.listConnections(
-                                page, atomUri, preferedSize, eventsType, dateParam.getDate(), deep, true);
+                                page, atomUri, preferedSize, eventsType, dateParam.getDate(), deep, true, connectionState);
                 rdfDataset = resource.getContent();
                 addPagedConnectionResourceInSequenceHeader(headers, connectionsURI, resource, page, passableQuery);
             } else {
@@ -1202,7 +1200,7 @@ public class LinkedDataWebController implements InitializingBean {
                     }
                     AtomInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
                                     .listConnectionsAfter(atomUri, resumeConnURI, preferedSize, eventsType,
-                                                    dateParam.getDate(), deep, true);
+                                                    dateParam.getDate(), deep, true, connectionState);
                     rdfDataset = resource.getContent();
                     addPagedConnectionResourceInSequenceHeader(headers, connectionsURI, resource, passableQuery);
                     // resume after parameter specified - display the connections with activities
@@ -1216,7 +1214,7 @@ public class LinkedDataWebController implements InitializingBean {
                     }
                     AtomInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
                                     .listConnectionsBefore(atomUri, resumeConnURI, preferedSize, eventsType,
-                                                    dateParam.getDate(), deep, true);
+                                                    dateParam.getDate(), deep, true, connectionState);
                     rdfDataset = resource.getContent();
                     addPagedConnectionResourceInSequenceHeader(headers, connectionsURI, resource, passableQuery);
                 }
