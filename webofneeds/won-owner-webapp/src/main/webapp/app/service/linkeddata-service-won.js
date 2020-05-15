@@ -122,29 +122,35 @@ import * as jsonldUtils from "./jsonld-utils";
               })
             : undefined
       )
-      .then(
-        connectionContainerFramed =>
-          connectionContainerFramed &&
-          is("Array", connectionContainerFramed[vocab.RDFS.member])
-            ? connectionContainerFramed[vocab.RDFS.member].map(
-                jsonLdConnection => ({
-                  uri: jsonLdConnection["@id"],
-                  type: jsonLdConnection["@type"],
-                  modified:
-                    jsonLdConnection["http://purl.org/dc/terms/modified"][
-                      "@value"
-                    ],
-                  socket: jsonLdConnection[vocab.WON.socket]["@id"],
-                  connectionState:
-                    jsonLdConnection[vocab.WON.connectionState]["@id"],
-                  sourceAtom: jsonLdConnection[vocab.WON.sourceAtom]["@id"],
-                  targetAtom: jsonLdConnection[vocab.WON.targetAtom]["@id"],
-                  targetSocket: jsonLdConnection[vocab.WON.targetSocket]["@id"],
-                  hasEvents: [],
-                })
-              )
-            : []
-      );
+      .then(connectionContainerFramed => {
+        if (connectionContainerFramed) {
+          const parseJsonLdConnection = jsonLdConnection => ({
+            uri: jsonLdConnection["@id"],
+            type: jsonLdConnection["@type"],
+            modified:
+              jsonLdConnection["http://purl.org/dc/terms/modified"]["@value"],
+            socket: jsonLdConnection[vocab.WON.socket]["@id"],
+            connectionState: jsonLdConnection[vocab.WON.connectionState]["@id"],
+            sourceAtom: jsonLdConnection[vocab.WON.sourceAtom]["@id"],
+            targetAtom: jsonLdConnection[vocab.WON.targetAtom]["@id"],
+            targetSocket: jsonLdConnection[vocab.WON.targetSocket]["@id"],
+            hasEvents: [],
+          });
+          if (is("Array", connectionContainerFramed[vocab.RDFS.member])) {
+            return connectionContainerFramed[vocab.RDFS.member].map(
+              parseJsonLdConnection
+            );
+          } else {
+            return [
+              parseJsonLdConnection(
+                connectionContainerFramed[vocab.RDFS.member]
+              ),
+            ];
+          }
+        } else {
+          return [];
+        }
+      });
   };
 
   function getConnection(connectionUri, fetchParams) {

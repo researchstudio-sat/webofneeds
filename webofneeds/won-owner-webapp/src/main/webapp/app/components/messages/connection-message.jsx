@@ -472,7 +472,6 @@ class WonConnectionMessage extends React.Component {
         : !this.props.hasReferences ||
             this.props.shouldShowRdf ||
             this.props.showActions ||
-            messageUtils.hasForwardsReferences(this.props.message) ||
             messageUtils.hasProposesReferences(this.props.message) ||
             messageUtils.hasClaimsReferences(this.props.message) ||
             messageUtils.hasProposesToCancelReferences(this.props.message);
