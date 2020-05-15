@@ -3,7 +3,7 @@
  */
 
 import vocab from "../../service/vocab.js";
-import { get } from "../../utils.js";
+import { get, getIn } from "../../utils.js";
 
 /**
  * Determines if a given message can be Proposed
@@ -14,11 +14,10 @@ import { get } from "../../utils.js";
 export function isMessageProposable(con, msg) {
   //TODO: should a message be proposable if it was already proposed? or even accepted? and what if the ref are only forwardedMessages?
   return (
-    msg &&
-    msg.get("hasContent") &&
-    msg.get("messageType") !== vocab.WONMSG.connectMessage &&
-    msg.get("messageType") !== vocab.WONMSG.changeNotificationMessage &&
-    !msg.get("hasReferences") &&
+    get(msg, "hasContent") &&
+    get(msg, "messageType") !== vocab.WONMSG.connectMessage &&
+    get(msg, "messageType") !== vocab.WONMSG.changeNotificationMessage &&
+    !get(msg, "hasReferences") &&
     !isMessageRetracted(con, msg) &&
     !isMessageRejected(con, msg)
   );
@@ -33,11 +32,10 @@ export function isMessageProposable(con, msg) {
 export function isMessageClaimable(con, msg) {
   //TODO: should a message be claimable if it was already claimed or proposed or even accepted? what if the ref are only forwardedMessages?
   return (
-    msg &&
-    msg.get("hasContent") &&
-    msg.get("messageType") !== vocab.WONMSG.connectMessage &&
-    msg.get("messageType") !== vocab.WONMSG.changeNotificationMessage &&
-    !msg.get("hasReferences") &&
+    get(msg, "hasContent") &&
+    get(msg, "messageType") !== vocab.WONMSG.connectMessage &&
+    get(msg, "messageType") !== vocab.WONMSG.changeNotificationMessage &&
+    !get(msg, "hasReferences") &&
     !isMessageRetracted(con, msg) &&
     !isMessageRejected(con, msg)
   );
@@ -51,8 +49,7 @@ export function isMessageClaimable(con, msg) {
  */
 export function isMessageAgreeable(con, msg) {
   return (
-    msg &&
-    msg.get("hasContent") &&
+    get(msg, "hasContent") &&
     (hasClaimsReferences(con, msg) ||
       hasProposesReferences(con, msg) ||
       hasProposesToCancelReferences(con, msg)) &&
@@ -72,7 +69,6 @@ export function isMessageAgreeable(con, msg) {
  */
 export function isMessageCancelable(con, msg) {
   return (
-    msg &&
     (hasClaimsReferences(msg) ||
       hasProposesReferences(msg) ||
       hasProposesToCancelReferences(msg)) &&
@@ -91,11 +87,10 @@ export function isMessageCancelable(con, msg) {
  */
 export function isMessageAcceptable(con, msg) {
   return (
-    msg &&
     (hasClaimsReferences(msg) ||
       hasProposesReferences(msg) ||
       hasProposesToCancelReferences(msg)) &&
-    !msg.get("outgoingMessage") &&
+    !get(msg, "outgoingMessage") &&
     !isMessageAccepted(con, msg) &&
     !isMessageAgreedOn(con, msg) &&
     !isMessageCancelled(con, msg) &&
@@ -113,8 +108,7 @@ export function isMessageAcceptable(con, msg) {
  */
 export function isMessageRetractable(con, msg) {
   return (
-    msg &&
-    msg.get("outgoingMessage") &&
+    get(msg, "outgoingMessage") &&
     !isMessageAccepted(con, msg) &&
     !isMessageAgreedOn(con, msg) &&
     !isMessageCancelled(con, msg) &&
@@ -132,11 +126,10 @@ export function isMessageRetractable(con, msg) {
  */
 export function isMessageRejectable(con, msg) {
   return (
-    msg &&
     (hasClaimsReferences(msg) ||
       hasProposesReferences(msg) ||
       hasProposesToCancelReferences(msg)) &&
-    !msg.get("outgoingMessage") &&
+    !get(msg, "outgoingMessage") &&
     !isMessageAccepted(con, msg) &&
     !isMessageAgreedOn(con, msg) &&
     !isMessageCancelled(con, msg) &&
@@ -152,12 +145,18 @@ export function isMessageRejectable(con, msg) {
  * @returns {*|boolean}
  */
 export function hasProposesReferences(msg) {
-  const references = msg && msg.get("references");
-  return (
-    references &&
-    references.get("proposes") &&
-    references.get("proposes").size > 0
-  );
+  const references = get(msg, "references");
+  return get(references, "proposes") && get(references, "proposes").size > 0;
+}
+
+/**
+ * Determines if a given message has proposes references
+ * @param msg
+ * @returns {*|boolean}
+ */
+export function hasForwardsReferences(msg) {
+  const references = get(msg, "references");
+  return get(references, "forwards") && get(references, "forwards").size > 0;
 }
 
 /**
@@ -166,10 +165,8 @@ export function hasProposesReferences(msg) {
  * @returns {*|boolean}
  */
 export function hasClaimsReferences(msg) {
-  const references = msg && msg.get("references");
-  return (
-    references && references.get("claims") && references.get("claims").size > 0
-  );
+  const references = get(msg, "references");
+  return get(references, "claims") && get(references, "claims").size > 0;
 }
 
 /**
@@ -178,11 +175,10 @@ export function hasClaimsReferences(msg) {
  * @returns {*|boolean}
  */
 export function hasProposesToCancelReferences(msg) {
-  const references = msg && msg.get("references");
+  const references = get(msg, "references");
   return (
-    references &&
-    references.get("proposesToCancel") &&
-    references.get("proposesToCancel").size > 0
+    get(references, "proposesToCancel") &&
+    get(references, "proposesToCancel").size > 0
   );
 }
 
@@ -193,10 +189,9 @@ export function hasProposesToCancelReferences(msg) {
  * @returns {*|boolean}
  */
 export function isMessageProposed(con, msg) {
-  const agreementData = con && con.get("agreementData");
-  const proposedMessageUris =
-    agreementData && agreementData.get("proposedMessageUris");
-  return proposedMessageUris && proposedMessageUris.has(msg.get("uri"));
+  const agreementData = get(con, "agreementData");
+  const proposedMessageUris = get(agreementData, "proposedMessageUris");
+  return proposedMessageUris && proposedMessageUris.has(get(msg, "uri"));
 }
 
 /**
@@ -206,10 +201,9 @@ export function isMessageProposed(con, msg) {
  * @returns {*|boolean}
  */
 export function isMessageClaimed(con, msg) {
-  const agreementData = con && con.get("agreementData");
-  const claimedMessageUris =
-    agreementData && agreementData.get("claimedMessageUris");
-  return claimedMessageUris && claimedMessageUris.has(msg.get("uri"));
+  const agreementData = get(con, "agreementData");
+  const claimedMessageUris = get(agreementData, "claimedMessageUris");
+  return claimedMessageUris && claimedMessageUris.has(get(msg, "uri"));
 }
 
 /**
@@ -219,10 +213,9 @@ export function isMessageClaimed(con, msg) {
  * @returns {*|boolean}
  */
 export function isMessageRejected(con, msg) {
-  const agreementData = con && con.get("agreementData");
-  const rejectedMessageUris =
-    agreementData && agreementData.get("rejectedMessageUris");
-  return rejectedMessageUris && rejectedMessageUris.has(msg.get("uri"));
+  const agreementData = get(con, "agreementData");
+  const rejectedMessageUris = get(agreementData, "rejectedMessageUris");
+  return rejectedMessageUris && rejectedMessageUris.has(get(msg, "uri"));
 }
 
 /**
@@ -232,17 +225,18 @@ export function isMessageRejected(con, msg) {
  * @returns {*|boolean}
  */
 export function isMessageAccepted(con, msg) {
-  const agreementData = con && con.get("agreementData");
-  const acceptedMessageUris =
-    agreementData && agreementData.get("agreementUris");
+  const agreementData = get(con, "agreementData");
+  const acceptedMessageUris = get(agreementData, "agreementUris");
 
-  const acceptedCancellationProposalUris =
-    agreementData && agreementData.get("acceptedCancellationProposalUris");
+  const acceptedCancellationProposalUris = get(
+    agreementData,
+    "acceptedCancellationProposalUris"
+  );
 
   return (
-    (acceptedMessageUris && acceptedMessageUris.has(msg.get("uri"))) ||
+    (acceptedMessageUris && acceptedMessageUris.has(get(msg, "uri"))) ||
     (acceptedCancellationProposalUris &&
-      acceptedCancellationProposalUris.has(msg.get("uri")))
+      acceptedCancellationProposalUris.has(get(msg, "uri")))
   );
 }
 
@@ -253,10 +247,9 @@ export function isMessageAccepted(con, msg) {
  * @returns {*|boolean}
  */
 export function isMessageAgreedOn(con, msg) {
-  const agreementData = con && con.get("agreementData");
-  const agreedMessageUris =
-    agreementData && agreementData.get("agreedMessageUris");
-  return agreedMessageUris && agreedMessageUris.has(msg.get("uri"));
+  const agreementData = get(con, "agreementData");
+  const agreedMessageUris = get(agreementData, "agreedMessageUris");
+  return agreedMessageUris && agreedMessageUris.has(get(msg, "uri"));
 }
 
 /**
@@ -266,10 +259,9 @@ export function isMessageAgreedOn(con, msg) {
  * @returns {*|boolean}
  */
 export function isMessageRetracted(con, msg) {
-  const agreementData = con && con.get("agreementData");
-  const retractedMessageUris =
-    agreementData && agreementData.get("retractedMessageUris");
-  return retractedMessageUris && retractedMessageUris.has(msg.get("uri"));
+  const agreementData = get(con, "agreementData");
+  const retractedMessageUris = get(agreementData, "retractedMessageUris");
+  return retractedMessageUris && retractedMessageUris.has(get(msg, "uri"));
 }
 
 /**
@@ -279,10 +271,9 @@ export function isMessageRetracted(con, msg) {
  * @returns {*|boolean}
  */
 export function isMessageCancelled(con, msg) {
-  const agreementData = con && con.get("agreementData");
-  const cancelledMessageUris =
-    agreementData && agreementData.get("cancelledAgreementUris");
-  return cancelledMessageUris && cancelledMessageUris.has(msg.get("uri"));
+  const agreementData = get(con, "agreementData");
+  const cancelledMessageUris = get(agreementData, "cancelledAgreementUris");
+  return cancelledMessageUris && cancelledMessageUris.has(get(msg, "uri"));
 }
 
 /**
@@ -292,10 +283,14 @@ export function isMessageCancelled(con, msg) {
  * @returns {*|boolean}
  */
 export function isMessageCancellationPending(con, msg) {
-  const agreementData = con && con.get("agreementData");
-  const cancellationPendingUris =
-    agreementData && agreementData.get("cancellationPendingAgreementUris");
-  return cancellationPendingUris && cancellationPendingUris.has(msg.get("uri"));
+  const agreementData = get(con, "agreementData");
+  const cancellationPendingUris = get(
+    agreementData,
+    "cancellationPendingAgreementUris"
+  );
+  return (
+    cancellationPendingUris && cancellationPendingUris.has(get(msg, "uri"))
+  );
 }
 
 /**
@@ -304,7 +299,7 @@ export function isMessageCancellationPending(con, msg) {
  * @returns {*}
  */
 export function isMessageUnread(msg) {
-  return msg && msg.get("unread");
+  return !!get(msg, "unread");
 }
 
 /**
@@ -313,7 +308,7 @@ export function isMessageUnread(msg) {
  * @returns {*|any}
  */
 export function isMessageSelected(msg) {
-  return msg && msg.getIn(["viewState", "isSelected"]);
+  return getIn(msg, ["viewState", "isSelected"]);
 }
 
 /**

@@ -71,6 +71,7 @@ import won.protocol.exception.WonProtocolException;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.AtomState;
 import won.protocol.model.Connection;
+import won.protocol.model.ConnectionState;
 import won.protocol.model.DataWithEtag;
 import won.protocol.rest.WonEtagHelper;
 import won.protocol.util.RdfUtils;
@@ -511,10 +512,13 @@ public class LinkedDataWebController implements InitializingBean {
                     @RequestParam(value = "resumebefore", required = false) String resumeBefore,
                     @RequestParam(value = "resumeafter", required = false) String resumeAfter,
                     @RequestParam(value = "type", required = false) String type,
-                    @RequestParam(value = "timeof", required = false) String timestamp, HttpServletRequest request,
+                    @RequestParam(value = "timeof", required = false) String timestamp,
+                    @RequestParam(value = "state", required = false) String state, HttpServletRequest request,
                     Model model, HttpServletResponse response) {
         URI atomURI = uriService.createAtomURIForId(identifier);
         try {
+            // TODO: IMPLEMENT CONN-STATE FILTER
+            ConnectionState connectionState = getConnectionState(state);
             DateParameter dateParam = new DateParameter(timestamp);
             WonMessageType eventsType = getMessageType(type);
             Dataset rdfDataset;
@@ -674,6 +678,14 @@ public class LinkedDataWebController implements InitializingBean {
     private static AtomState getAtomState(final String state) {
         if (state != null) {
             return AtomState.parseString(state);
+        } else {
+            return null;
+        }
+    }
+
+    private static ConnectionState getConnectionState(final String state) {
+        if (state != null) {
+            return ConnectionState.parseString(state);
         } else {
             return null;
         }
@@ -1144,7 +1156,8 @@ public class LinkedDataWebController implements InitializingBean {
                     @RequestParam(value = "resumebefore", required = false) String resumeBefore,
                     @RequestParam(value = "resumeafter", required = false) String resumeAfter,
                     @RequestParam(value = "type", required = false) String type,
-                    @RequestParam(value = "timeof", required = false) String timestamp) {
+                    @RequestParam(value = "timeof", required = false) String timestamp,
+                    @RequestParam(value = "state", required = false) String state) {
         logger.debug("readConnectionsOfAtom() called");
         URI atomUri = uriService.createAtomURIForId(identifier);
         Dataset rdfDataset;
@@ -1152,6 +1165,8 @@ public class LinkedDataWebController implements InitializingBean {
         Integer preferedSize = getPreferredSize(request);
         URI connectionsURI = URI.create(atomUri.toString() + "/c");
         try {
+            // TODO: IMPLEMENT CONN-STATE FILTER
+            ConnectionState connectionState = getConnectionState(state);
             WonMessageType eventsType = getMessageType(type);
             DateParameter dateParam = new DateParameter(timestamp);
             String passableQuery = getPassableQueryMap("type", type, "timeof", dateParam.getTimestamp(), "deep",
