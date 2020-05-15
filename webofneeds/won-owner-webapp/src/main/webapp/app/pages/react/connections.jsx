@@ -38,7 +38,7 @@ export default function PageConnections() {
     selectedConnectionUri,
   ]);
   const selectedTargetAtom = useSelector(state =>
-    getIn(state, "atoms", get(selectedConnection, "targetAtomUri"))
+    getIn(state, ["atoms", get(selectedConnection, "targetAtomUri")])
   );
 
   const isSelectedConnectionGroupChat =

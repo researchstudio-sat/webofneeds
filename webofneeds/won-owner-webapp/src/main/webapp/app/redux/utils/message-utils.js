@@ -150,16 +150,6 @@ export function hasProposesReferences(msg) {
 }
 
 /**
- * Determines if a given message has proposes references
- * @param msg
- * @returns {*|boolean}
- */
-export function hasForwardsReferences(msg) {
-  const references = get(msg, "references");
-  return get(references, "forwards") && get(references, "forwards").size > 0;
-}
-
-/**
  * Determines if a given message has claims references
  * @param msg
  * @returns {*|boolean}
