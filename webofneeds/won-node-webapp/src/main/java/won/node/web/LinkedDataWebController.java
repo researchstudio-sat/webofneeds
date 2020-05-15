@@ -523,7 +523,8 @@ public class LinkedDataWebController implements InitializingBean {
             Dataset rdfDataset;
             if (page != null) {
                 rdfDataset = linkedDataService
-                                .listConnections(page, atomURI, null, eventsType, dateParam.getDate(), deep, true, connectionState)
+                                .listConnections(page, atomURI, null, eventsType, dateParam.getDate(), deep, true,
+                                                connectionState)
                                 .getContent();
             } else if (resumeBefore != null) {
                 URI connURI;
@@ -1180,12 +1181,14 @@ public class LinkedDataWebController implements InitializingBean {
                 // if no page or resume parameter is specified, display the latest connections:
             } else if (page == null && resumeBefore == null && resumeAfter == null) {
                 AtomInformationService.PagedResource<Dataset, Connection> resource = linkedDataService
-                                .listConnections(1, atomUri, preferedSize, eventsType, dateParam.getDate(), deep, true, connectionState);
+                                .listConnections(1, atomUri, preferedSize, eventsType, dateParam.getDate(), deep, true,
+                                                connectionState);
                 rdfDataset = resource.getContent();
                 addPagedConnectionResourceInSequenceHeader(headers, connectionsURI, resource, passableQuery);
             } else if (page != null) {
                 AtomInformationService.PagedResource<Dataset, Connection> resource = linkedDataService.listConnections(
-                                page, atomUri, preferedSize, eventsType, dateParam.getDate(), deep, true, connectionState);
+                                page, atomUri, preferedSize, eventsType, dateParam.getDate(), deep, true,
+                                connectionState);
                 rdfDataset = resource.getContent();
                 addPagedConnectionResourceInSequenceHeader(headers, connectionsURI, resource, page, passableQuery);
             } else {

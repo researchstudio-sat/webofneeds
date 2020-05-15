@@ -111,7 +111,7 @@ import * as jsonldUtils from "./jsonld-utils";
         return jsonLdContentGraph[vocab.WON.connections][0]["@id"];
       })
       .then(connectionContainerUri =>
-        won.getJsonLdNode(connectionContainerUri, requesterWebId)
+        won.getJsonLdNode(connectionContainerUri, { state: "Connected" })
       )
       .then(
         connectionContainer =>

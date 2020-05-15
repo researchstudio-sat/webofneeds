@@ -534,9 +534,10 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public AtomInformationService.PagedResource<Dataset, Connection> listConnections(final URI atomURI, boolean deep,
-                                                                                     boolean addMetadata, ConnectionState filterByConnectionState) throws NoSuchAtomException, NoSuchConnectionException {
-        //TODO: impl filterByConnectionState
-        List<Connection> connections = new ArrayList<>(atomInformationService.listConnections(atomURI));
+                    boolean addMetadata, ConnectionState filterByConnectionState)
+                    throws NoSuchAtomException, NoSuchConnectionException {
+        List<Connection> connections = new ArrayList<>(
+                        atomInformationService.listConnections(atomURI, filterByConnectionState));
         URI connectionsUri = this.uriService.createConnectionsURIForAtom(atomURI);
         AtomInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
                         connectionsUri.toString(), new SliceImpl<>(connections));
@@ -553,11 +554,11 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public AtomInformationService.PagedResource<Dataset, Connection> listConnections(final int page, final URI atomURI,
-                                                                                     final Integer preferredSize, final WonMessageType messageType, final Date timeSpot, boolean deep,
-                                                                                     boolean addMetadata, ConnectionState filterByConnectionState) throws NoSuchAtomException, NoSuchConnectionException {
-        //TODO: impl filterByConnectionState
+                    final Integer preferredSize, final WonMessageType messageType, final Date timeSpot, boolean deep,
+                    boolean addMetadata, ConnectionState filterByConnectionState)
+                    throws NoSuchAtomException, NoSuchConnectionException {
         Slice<Connection> slice = atomInformationService.listConnections(atomURI, page, preferredSize, messageType,
-                        timeSpot);
+                        timeSpot, filterByConnectionState);
         URI connectionsUri = this.uriService.createConnectionsURIForAtom(atomURI);
         AtomInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
                         connectionsUri.toString(), slice);
@@ -574,12 +575,11 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public AtomInformationService.PagedResource<Dataset, Connection> listConnectionsBefore(final URI atomURI,
-                                                                                           URI beforeEventURI, final Integer preferredSize, final WonMessageType messageType,
-                                                                                           final Date timeSpot, boolean deep, boolean addMetadata, ConnectionState filterByConnectionState)
+                    URI beforeEventURI, final Integer preferredSize, final WonMessageType messageType,
+                    final Date timeSpot, boolean deep, boolean addMetadata, ConnectionState filterByConnectionState)
                     throws NoSuchAtomException, NoSuchConnectionException {
-        //TODO: impl filterByConnectionState
         Slice<Connection> slice = atomInformationService.listConnectionsBefore(atomURI, beforeEventURI, preferredSize,
-                        messageType, timeSpot);
+                        messageType, timeSpot, filterByConnectionState);
         URI connectionsUri = this.uriService.createConnectionsURIForAtom(atomURI);
         AtomInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
                         connectionsUri.toString(), slice);
@@ -596,11 +596,11 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public AtomInformationService.PagedResource<Dataset, Connection> listConnectionsAfter(final URI atomURI,
-                                                                                          URI resumeConnURI, final Integer preferredSize, final WonMessageType messageType,
-                                                                                          final Date timeSpot, boolean deep, boolean addMetadata, ConnectionState filterByConnectionState)
+                    URI resumeConnURI, final Integer preferredSize, final WonMessageType messageType,
+                    final Date timeSpot, boolean deep, boolean addMetadata, ConnectionState filterByConnectionState)
                     throws NoSuchAtomException, NoSuchConnectionException {
         Slice<Connection> slice = atomInformationService.listConnectionsAfter(atomURI, resumeConnURI, preferredSize,
-                        messageType, timeSpot);
+                        messageType, timeSpot, filterByConnectionState);
         URI connectionsUri = this.uriService.createConnectionsURIForAtom(atomURI);
         AtomInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
                         connectionsUri.toString(), slice);
