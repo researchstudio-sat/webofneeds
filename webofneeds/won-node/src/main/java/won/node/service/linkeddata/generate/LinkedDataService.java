@@ -24,6 +24,7 @@ import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.AtomState;
 import won.protocol.model.Connection;
+import won.protocol.model.ConnectionState;
 import won.protocol.model.DataWithEtag;
 
 /**
@@ -249,37 +250,39 @@ public interface LinkedDataService {
      * atom.
      *
      * @param atomURI
-     * @param addMetadata - if true, a metadata graph is added to the dataset
+     * @param deep if true, connection data is added (not only connection URIs)
+     * @param addMetadata if true, a metadata graph is added to the dataset
      * containing counts by connection state
-     * @param deep - if true, connection data is added (not only connection URIs)
+     * @param filterByConnectionState if not null, only return connections with the given state
      * @return
      * @throws NoSuchAtomException
      */
     AtomInformationService.PagedResource<Dataset, Connection> listConnections(final URI atomURI, boolean deep,
-                    final boolean addMetadata) throws NoSuchAtomException, NoSuchConnectionException;
+                                                                              final boolean addMetadata, ConnectionState filterByConnectionState) throws NoSuchAtomException, NoSuchConnectionException;
 
     /**
      * Returns paged resource containing all connections belonging to the specified
      * atom.
      *
      * @param page number
+     * @param atomURI local atom the connections of which are retrieved
      * @param preferredSize preferred number of connection uris per page (null means
      * use default)
-     * @param atomURI local atom the connections of which are retrieved
      * @param messageType the event type that should be used for defining connection
      * latest activity; null {@literal =>} all event types
      * @param timeSpot time at which we want the list state to be fixed
      * @param deep if true, the resource data of those connection uris is also part
      * of the resource
-     * @param addMetadata - if true, a metadata graph is added to the dataset
+     * @param addMetadata if true, a metadata graph is added to the dataset
      * containing counts by connection state
+     * @param filterByConnectionState if not null, only return connections with the given state
      * @return
      * @throws NoSuchAtomException when specified atom is not found
      * @throws NoSuchConnectionException only in case deep is set to true and
      * connection data for a member connection uri cannot be retrieved.
      */
     AtomInformationService.PagedResource<Dataset, Connection> listConnections(int page, URI atomURI,
-                    Integer preferredSize, WonMessageType messageType, Date timeSpot, boolean deep, boolean addMetadata)
+                                                                              Integer preferredSize, WonMessageType messageType, Date timeSpot, boolean deep, boolean addMetadata, ConnectionState filterByConnectionState)
                     throws NoSuchAtomException, NoSuchConnectionException;
 
     /**
@@ -297,16 +300,17 @@ public interface LinkedDataService {
      * @param timeSpot time at which we want the list state to be fixed
      * @param deep if true, the resource data of those connection uris is also part
      * of the resource
-     * @param addMetadata - if true, a metadata graph is added to the dataset
+     * @param addMetadata if true, a metadata graph is added to the dataset
      * containing counts by connection state
+     * @param filterByConnectionState if not null, only return connections with the given state
      * @return
      * @throws NoSuchAtomException when specified atom is not found
      * @throws NoSuchConnectionException only in case deep is set to true and
      * connection data for a member connection uri cannot be retrieved.
      */
     AtomInformationService.PagedResource<Dataset, Connection> listConnectionsBefore(URI atomURI,
-                    URI resumeConnURI, Integer preferredSize, WonMessageType messageType, Date timeSpot, boolean deep,
-                    boolean addMetadata) throws NoSuchAtomException, NoSuchConnectionException;
+                                                                                    URI resumeConnURI, Integer preferredSize, WonMessageType messageType, Date timeSpot, boolean deep,
+                                                                                    boolean addMetadata, ConnectionState filterByConnectionState) throws NoSuchAtomException, NoSuchConnectionException;
 
     /**
      * Returns paged resource containing all connections belonging to the specified
@@ -323,16 +327,17 @@ public interface LinkedDataService {
      * @param timeSpot time at which we want the list state to be fixed
      * @param deep if true, the resource data of those connection uris is also part
      * of the resource
-     * @param addMetadata - if true, a metadata graph is added to the dataset
+     * @param addMetadata if true, a metadata graph is added to the dataset
      * containing counts by connection state
+     * @param filterByConnectionState if not null, only return connections with the given state
      * @return
      * @throws NoSuchAtomException when specified atom is not found
      * @throws NoSuchConnectionException only in case deep is set to true and
      * connection data for a member connection uri cannot be retrieved.
      */
     AtomInformationService.PagedResource<Dataset, Connection> listConnectionsAfter(URI atomURI,
-                    URI resumeConnURI, Integer preferredSize, WonMessageType messageType, Date timeSpot, boolean deep,
-                    boolean addMetadata) throws NoSuchAtomException, NoSuchConnectionException;
+                                                                                   URI resumeConnURI, Integer preferredSize, WonMessageType messageType, Date timeSpot, boolean deep,
+                                                                                   boolean addMetadata, ConnectionState filterByConnectionState) throws NoSuchAtomException, NoSuchConnectionException;
 
     /**
      * Returns a dataset describing the atom, if the etag indicates that it has
