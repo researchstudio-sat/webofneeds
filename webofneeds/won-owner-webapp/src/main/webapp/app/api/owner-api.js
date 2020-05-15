@@ -424,6 +424,7 @@ export function getJsonLdDataset(uri, params = {}) {
    *         * "targetSocket",
    *         * "timeof",
    *         * "deep"
+   *         * "state"
    * @returns {string}
    */
   /**

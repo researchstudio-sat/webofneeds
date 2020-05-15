@@ -21,11 +21,7 @@ import org.springframework.data.domain.Slice;
 import won.protocol.exception.NoSuchAtomException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessageType;
-import won.protocol.model.Atom;
-import won.protocol.model.AtomState;
-import won.protocol.model.Connection;
-import won.protocol.model.DataWithEtag;
-import won.protocol.model.MessageEvent;
+import won.protocol.model.*;
 
 /**
  * Service for obtaining information about atoms and connections in the system
@@ -203,11 +199,14 @@ public interface AtomInformationService {
      * URI.
      *
      * @param atomURI the URI of the atom
+     * @param filterByConnectionState if not null, only return connections with the
+     * given connectionState
      * @return a collection of connections.
      * @throws won.protocol.exception.NoSuchAtomException if atomURI is not a known
      * atom URI
      */
-    Collection<Connection> listConnections(URI atomURI) throws NoSuchAtomException;
+    Collection<Connection> listConnections(URI atomURI, ConnectionState filterByConnectionState)
+                    throws NoSuchAtomException;
 
     /**
      * Retrieves slice of the list of connection URIs for the specified local atom
@@ -237,10 +236,12 @@ public interface AtomInformationService {
      * latest activity; null {@literal =>} all event types
      * @param timeSpot time at which we want the list state to be fixed, if null -
      * current state
+     * @param filterByConnectionState if not null, only return connections with the
+     * given connectionState
      * @return a collection of connections.
      */
     Slice<Connection> listConnections(URI atomURI, int page, Integer preferredSize, WonMessageType messageType,
-                    Date timeSpot);
+                    Date timeSpot, ConnectionState filterByConnectionState);
 
     /**
      * Retrieves slice of the connections for the specified local atom URI that
@@ -256,10 +257,12 @@ public interface AtomInformationService {
      * latest activity; null {@literal =>} all event types
      * @param timeSpot time at which we want the list state to be fixed, cannot be
      * null
+     * @param filterByConnectionState if not null, only return connections with the
+     * given connectionState
      * @return a slice of connection URIs.
      */
     Slice listConnectionsBefore(URI atomURI, URI resumeConnURI, Integer preferredPageSize,
-                    WonMessageType messageType, Date timeSpot);
+                    WonMessageType messageType, Date timeSpot, ConnectionState filterByConnectionState);
 
     /**
      * Retrieves slice of the connections that follows the given connection URI from
@@ -274,10 +277,12 @@ public interface AtomInformationService {
      * latest activity; null {@literal =>} all event types
      * @param timeSpot time at which we want the list state to be fixed, cannot be
      * null
+     * @param filterByConnectionState if not null, only return connections with the
+     * given connectionState
      * @return a slice of connection URIs.
      */
     Slice listConnectionsAfter(URI atomURI, URI resumeConnURI, Integer preferredPageSize,
-                    WonMessageType messageType, Date timeSpot);
+                    WonMessageType messageType, Date timeSpot, ConnectionState filterByConnectionState);
 
     /**
      * Read general information about the atom.

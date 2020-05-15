@@ -28,11 +28,7 @@ import won.protocol.exception.NoSuchAtomException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchMessageException;
 import won.protocol.message.WonMessageType;
-import won.protocol.model.Atom;
-import won.protocol.model.AtomState;
-import won.protocol.model.Connection;
-import won.protocol.model.DataWithEtag;
-import won.protocol.model.MessageEvent;
+import won.protocol.model.*;
 import won.protocol.repository.AtomRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MessageEventRepository;
@@ -216,8 +212,9 @@ public class AtomInformationServiceImpl implements AtomInformationService {
     }
 
     @Override
-    public Collection<Connection> listConnections(final URI atomURI) throws NoSuchAtomException {
-        return connectionRepository.findByAtomURI(atomURI);
+    public Collection<Connection> listConnections(final URI atomURI, ConnectionState filterByConnectionState)
+                    throws NoSuchAtomException {
+        return connectionRepository.findByAtomURIAndState(atomURI, filterByConnectionState);
     }
 
     @Override
@@ -248,7 +245,8 @@ public class AtomInformationServiceImpl implements AtomInformationService {
 
     @Override
     public Slice<Connection> listConnections(final URI atomURI, int page, Integer preferedPageSize,
-                    WonMessageType messageType, Date timeSpot) {
+                    WonMessageType messageType, Date timeSpot, ConnectionState filterByConnectionState) {
+        // TODO: filterByConnectionState IMPLEMENT
         Slice<Connection> slice = null;
         int pageSize = getPageSize(preferedPageSize);
         int pageNum = page - 1;
@@ -272,7 +270,9 @@ public class AtomInformationServiceImpl implements AtomInformationService {
 
     @Override
     public Slice<Connection> listConnectionsBefore(final URI atomURI, final URI resumeConnURI,
-                    final Integer preferredPageSize, WonMessageType messageType, final Date timeSpot) {
+                    final Integer preferredPageSize, WonMessageType messageType, final Date timeSpot,
+                    ConnectionState filterByConnectionState) {
+        // TODO: filterByConnectionState IMPLEMENT
         Date resume;
         int pageSize = getPageSize(preferredPageSize);
         Slice<Connection> slice;
@@ -292,7 +292,9 @@ public class AtomInformationServiceImpl implements AtomInformationService {
 
     @Override
     public Slice<Connection> listConnectionsAfter(final URI atomURI, final URI resumeConnURI,
-                    final Integer preferredPageSize, final WonMessageType messageType, final Date timeSpot) {
+                    final Integer preferredPageSize, final WonMessageType messageType, final Date timeSpot,
+                    ConnectionState filterByConnectionState) {
+        // TODO: filterByConnectionState IMPLEMENT
         Date resume;
         int pageSize = getPageSize(preferredPageSize);
         Slice<Connection> slice;
