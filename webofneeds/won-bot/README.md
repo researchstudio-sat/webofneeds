@@ -61,7 +61,7 @@ Behaviours act as a wrapper to `EventListener`s and `Action`s and can be activat
 
 ## Implementing a Bot
 
-To create a new bot, we recommend to use the [bot skeleton](https://github.com/researchstudio-sat/bot-skeleton) as a template, providing all needed functions for a bot in the WoN. Click [here](https://github.com/researchstudio-sat/bot-skeleton/generate) to go directly to the repository creation.
+To create a new bot, we recommend to use the [bot skeleton](https://github.com/researchstudio-sat/bot-skeleton) as a template, providing all needed functions for a bot in the WoN. Click [here](https://github.com/researchstudio-sat/bot-skeleton/generate) to go directly to the repository creation. In addition, several examples for common tasks are provided below. To deal with RDF, refer to the [Apache Jena documentation](https://jena.apache.org/documentation/rdf/index.html).
 
 ### Starting from scratch
 
@@ -89,7 +89,7 @@ A listener is registered by using `EventBus.subscribe(Class<T> eventClazz, Event
 
 **Example**: This Bot will publish a `WorkDoneEvent` when the first `ActEvent` is published on the bot's event bus. The bot is basically telling the framework to stop it as soon as the bot has started up. Not very useful, but very simple:
 
-```
+```java
 //first, let's remember the bot's context and the bus - we'll need them often
 final EventListenerContext ctx = getEventListenerContext();
 EventBus bus = getEventBus();
@@ -119,9 +119,13 @@ For doing anything on the Web of Needs, a bot must send messages to a node or to
 
 Note that the WoN node will always answer with a similar message (`SuccessResponse` or `FailureResponse`) that will tell you if what you did worked or not. It's possible to add callbacks for both responses so as to be able to take the necessary measures.
 
-### Creating Atoms
+### Handling Matcher Hints
 
-To create an atom, an atom creation command message has to be sent to a WoN node. To successfully create a new atom, both an atom URI and atom data has to be provided. 
+### Handling Atoms
+
+#### Create, Modify, Delete
+
+To create an atom, an atom creation command message has to be sent to a WoN node. To successfully create a new atom, both an atom URI and atom data has to be provided. After creation, a `CreateAtomCommandResultEvent` is generated to indicate success or failure. Use `EventListeners` to react appropriately.
 
 ```java
 // creating a new atom URI
@@ -150,12 +154,14 @@ atomData.addSocket("#chatSocket", WXCHAT.ChatSocketString);
 atomData.addFlag(WONMATCH.usedForTesting);
 ```
 
-To successfully cerate an atom, a command message needs to be sent to the node. For this, the `ExecuteMessageCommandBehaviour` can be activated to create and handle an `CreateAtomCommandEvent`:
+To successfully create an atom, a command message needs to be sent to the node. For this, the `ExecuteMessageCommandBehaviour` can be activated to create and handle an `CreateAtomCommandEvent`:
 
 ```java
 CreateAtomCommandEvent createCommand = new CreateAtomCommandEvent(atomWrapper.getDataset());
 ctx.getEventBus().publish(createCommand);
 ```
+
+Other [command events](src/main/java/won/bot/framework/eventbot/event/command) can be used to modify, activate, deactivate or delete atoms. Note that providing an atom dataset is needed for atom modification, as the `ReplaceCommandEvent` instructs the node to replace an atom's content.
 
 <!-- alternate deprecated(?) method
 Atoms are created by sending a specific message. If using the dedicated [CreateAtomsWithSocketsAction](src/main/java/won/bot/framework/eventbot/action/impl/atomlifecycle/CreateAtomWithSocketsAction.java), most of the boilerplate code is taken care of. If the bot is meant to publish an existing collection of resources, e.g. files or database objects in the form of atoms, it's a question of configuring the `AtomProducer` to access that data and produce a Jena RDF Model that represents an atom. (For an example, look at the [MailFileAtomProducer](src/main/java/won/bot/framework/component/atomproducer/impl/MailFileAtomProducer.java)
@@ -176,6 +182,33 @@ WonMessageBuilder builder = WonMessageBuilder
  getEventListenerContext().getWonMessageSender().sendWonMessage(message);  //send it
 ```
 -->
+
+#### Connect
+
+To establish a connection between different atoms, the `ExecuteMessageCommandBehaviour` can be used to create and handle `ConnectCommandEvent`. To do so successfully, URIs of matching sockets (e.g. [Holder](https://w3id.org/won/ext/hold#HolderSocket) and [Holdable](https://w3id.org/won/ext/hold#HoldableSocket)). This can be used both to link atoms to personas and to connect different atoms. 
+
+TODO: 
+- get atom URIs
+- get socket URIs
+```java
+URI atomURI = // your atom URI
+URI socketURI = URI.create(WXCHAT.ChatSocket.getURI()); //or any other socket type you want
+LinkedDataSource linkedDataSource = getEventListenerContext().getLinkedDataSource();
+Collection<URI> sockets = WonLinkedDataUtils.getSocketsOfType(atomURI, socketURI, linkedDataSource);
+//sockets should have 0 or 1 items
+if (sockets.isEmpty()){
+    //did not find a socket of that type
+}
+URI socket = sockets.iterator().next();
+```
+
+- send event
+- done!
+- accept incoming connections
+
+### Storage
+
+
 
 ## Additional Resources
 A good starting point for understanding the framework is the [EchoBot](https://github.com/researchstudio-sat/won-echobot). This bot creates one atom at startup, and it registers with the WoN node configured with the `WON_NODE_URI` environment variable, so it is always notified when a new atom is created. When that happens, the bot attempts to establish a connection with the new atom and if the new atom accepts it, the bot echoes any text message received from the new atom.
