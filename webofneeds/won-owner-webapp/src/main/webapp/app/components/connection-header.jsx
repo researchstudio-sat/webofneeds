@@ -150,7 +150,7 @@ export default function WonConnectionHeader({ connection, toLink }) {
     const headerIconElement = isConnectionToGroup ? (
       <WonGroupIcon connectionUri={connectionUri} />
     ) : (
-      <WonAtomIcon atomUri={get(targetAtom, "uri")} />
+      <WonAtomIcon atom={targetAtom} />
     );
 
     const headerIcon = toLink ? (

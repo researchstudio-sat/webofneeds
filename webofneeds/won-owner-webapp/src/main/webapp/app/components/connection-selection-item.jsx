@@ -269,7 +269,7 @@ export default function WonConnectionSelectionItem({
             false
           )}
         >
-          <WonAtomIcon atomUri={get(senderAtom, "uri")} />
+          <WonAtomIcon atom={senderAtom} />
         </Link>
       ) : (
         <div />

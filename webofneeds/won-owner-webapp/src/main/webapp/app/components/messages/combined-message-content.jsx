@@ -61,6 +61,7 @@ export default function WonCombinedMessageContent({
   const agreementData = get(connection, "agreementData");
   const isInjectIntoMessage = injectInto && injectInto.size > 0; //contains the targetConnectionUris
   const originatorUri = get(message, "originatorUri");
+  const originatorAtom = originatorUri && get(allAtoms, originatorUri);
   const injectIntoArray = injectInto && Array.from(injectInto.toSet());
   const isConnectionMessage = messageType === vocab.WONMSG.connectionMessage;
 
@@ -136,12 +137,12 @@ export default function WonCombinedMessageContent({
     }
   }
 
-  function getInjectIntoAtomUri(connectionUri) {
+  function getInjectIntoAtom(connectionUri) {
     //TODO: THIS MIGHT BE A CONNECTION THAT WE DONT EVEN OWN, SO WE NEED TO BE MORE SMART ABOUT IT
     let connection = get(allConnections, connectionUri);
 
     if (connection) {
-      return get(connection, "targetAtomUri");
+      return get(allAtoms, get(connection, "targetAtomUri"));
     } else {
       connection =
         allConnections &&
@@ -150,9 +151,10 @@ export default function WonCombinedMessageContent({
         );
 
       if (connection) {
-        return get(connection, "targetAtomUri");
+        return get(allAtoms, get(connection, "targetAtomUri"));
       }
     }
+
     return undefined;
   }
 
@@ -193,12 +195,12 @@ export default function WonCombinedMessageContent({
       }
 
       if (!groupChatMessage) {
-        messageHeaderOriginatorElement = originatorUri ? (
+        messageHeaderOriginatorElement = originatorAtom ? (
           <div className="msg__header msg__header--forwarded-from">
             <div className="msg__header__type">Forwarded from:</div>
             <WonAtomIcon
               className="msg__header msg__header__originator"
-              atomUri={originatorUri}
+              atom={originatorAtom}
             />
           </div>
         ) : (
@@ -216,7 +218,7 @@ export default function WonCombinedMessageContent({
                     "msg__header__inject " +
                     (isInjectIntoConnectionPresent(connUri) ? "clickable" : "")
                   }
-                  atomUri={getInjectIntoAtomUri(connUri)}
+                  atom={getInjectIntoAtom(connUri)}
                   onClick={() => {
                     !multiSelectType &&
                       isInjectIntoConnectionPresent(connUri) &&

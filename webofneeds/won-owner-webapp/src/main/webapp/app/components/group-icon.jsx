@@ -38,6 +38,7 @@ const mapStateToProps = (state, ownProps) => {
   }
 
   return {
+    allAtoms: generalSelectors.getAtoms(state),
     atomUri: ownProps.atomUri,
     connectionUri: ownProps.connectionUri,
     groupMembersArray: groupMembers ? groupMembers.toArray() : [],
@@ -60,7 +61,7 @@ class WonGroupIcon extends React.Component {
                   : "")
               }
             >
-              <WonAtomIcon atomUri={groupMemberUri} />
+              <WonAtomIcon atomUri={get(this.props.allAtoms, groupMemberUri)} />
             </div>
           );
         }
@@ -101,6 +102,7 @@ class WonGroupIcon extends React.Component {
 }
 WonGroupIcon.propTypes = {
   connectionUri: PropTypes.string,
+  allAtoms: PropTypes.object,
   atomUri: PropTypes.string,
   groupMembersArray: PropTypes.arrayOf(PropTypes.string),
   groupMembersSize: PropTypes.number,

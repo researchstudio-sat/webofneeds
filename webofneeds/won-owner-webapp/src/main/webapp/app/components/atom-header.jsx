@@ -84,7 +84,7 @@ class WonAtomHeader extends React.Component {
       );
     } else if (get(this.props.atom, "isBeingCreated")) {
       //In Creation View
-      atomHeaderIcon = <WonAtomIcon atomUri={this.props.atomUri} />;
+      atomHeaderIcon = <WonAtomIcon atom={this.props.atom} />;
       atomHeaderContent = (
         <div className="ph__right">
           <div className="ph__right__topline">
@@ -117,7 +117,7 @@ class WonAtomHeader extends React.Component {
       );
     } else if (this.props.atomFailedToLoad) {
       //FailedToLoad View
-      atomHeaderIcon = <WonAtomIcon atomUri={this.props.atomUri} />;
+      atomHeaderIcon = <WonAtomIcon atom={this.props.atom} />;
       atomHeaderContent = (
         <div className="ph__right">
           <div className="ph__right__topline">
@@ -134,7 +134,7 @@ class WonAtomHeader extends React.Component {
       );
     } else {
       //Normal View
-      atomHeaderIcon = <WonAtomIcon atomUri={this.props.atomUri} />;
+      atomHeaderIcon = <WonAtomIcon atom={this.props.atom} />;
       atomHeaderContent = (
         <div className="ph__right">
           <div className="ph__right__topline">

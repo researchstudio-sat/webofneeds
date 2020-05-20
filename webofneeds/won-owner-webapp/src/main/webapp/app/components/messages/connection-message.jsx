@@ -76,6 +76,14 @@ export default function WonConnectionMessage({
 
   const messageSenderUri = get(message, "senderUri");
   const originatorUri = get(message, "originatorUri");
+
+  const messageSenderAtom = useSelector(
+    state => messageSenderUri && get(state, messageSenderUri)
+  );
+  const originatorAtom = useSelector(
+    state => originatorUri && get(state, originatorUri)
+  );
+
   const isConnectionMessage = messageUtils.isConnectionMessage(message);
   const isChangeNotificationMessage = messageUtils.isChangeNotificationMessage(
     message
@@ -306,7 +314,7 @@ export default function WonConnectionMessage({
       messageIcon.push(
         <WonAtomIcon
           key="theirAtomUri"
-          atomUri={get(theirAtom, "uri")}
+          atom={theirAtom}
           onClick={
             !onClick
               ? () => {
@@ -328,7 +336,7 @@ export default function WonConnectionMessage({
       messageIcon.push(
         <WonAtomIcon
           key="originatorUri"
-          atomUri={originatorUri}
+          atom={originatorAtom}
           onClick={
             !onClick
               ? () => {
@@ -348,7 +356,7 @@ export default function WonConnectionMessage({
 
     if (isFromSystem) {
       messageIcon.push(
-        <WonAtomIcon key="messageSenderUri" atomUri={messageSenderUri} />
+        <WonAtomIcon key="messageSenderUri" atom={messageSenderAtom} />
       );
     }
 

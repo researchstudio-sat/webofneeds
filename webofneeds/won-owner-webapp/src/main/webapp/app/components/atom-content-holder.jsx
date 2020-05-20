@@ -197,7 +197,7 @@ export default function WonAtomContentHolder({ holdsUri }) {
   return (
     <won-atom-content-holder>
       <div className="ac-holder__header">
-        {!holderLoading && <WonAtomIcon atomUri={holderUri} />}
+        {!holderLoading && <WonAtomIcon atom={holderAtom} />}
         {holderNameElement}
         {websiteFragment}
       </div>

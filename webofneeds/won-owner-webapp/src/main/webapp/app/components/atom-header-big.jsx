@@ -91,7 +91,7 @@ class WonAtomHeaderBig extends React.Component {
       <won-atom-header-big>
         <nav className="atom-header-big">
           <div className="ahb__inner">
-            <WonAtomIcon atomUri={this.props.atomUri} />
+            <WonAtomIcon atom={this.props.atom} />
             <hgroup>
               {titleElement}
 
