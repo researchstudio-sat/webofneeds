@@ -80,9 +80,7 @@ const mapStateToProps = (state, ownProps) => {
     targetAtomUri,
     connectionUri,
     connection,
-    sortedMessageUris: sortedMessages && [
-      ...sortedMessages.flatMap(msg => msg.get("uri")),
-    ],
+    sortedMessagesArray: sortedMessages,
     chatMessages,
     unreadMessageCount: unreadMessages && unreadMessages.size,
     isProcessingLoadingMessages:
@@ -237,13 +235,13 @@ class GroupAtomMessages extends React.Component {
     );
 
     const chatMessages =
-      this.props.sortedMessageUris &&
-      this.props.sortedMessageUris.map((msgUri, index) => {
+      this.props.sortedMessagesArray &&
+      this.props.sortedMessagesArray.map((msg, index) => {
         return (
           <WonConnectionMessage
-            key={msgUri + "-" + index}
-            messageUri={msgUri}
-            connectionUri={this.props.connectionUri}
+            key={get(msg, "uri") + "-" + index}
+            message={msg}
+            connection={this.props.connection}
             groupChatMessage={true}
           />
         );
@@ -257,7 +255,7 @@ class GroupAtomMessages extends React.Component {
       >
         {unreadIndicatorElement}
         {this.props.showAtomContentMessage && (
-          <WonAtomContentMessage atomUri={this.props.targetAtomUri} />
+          <WonAtomContentMessage atomUri={this.props.targetAtom} />
         )}
         {(this.props.isConnectionLoading ||
           this.props.isProcessingLoadingMessages) &&
@@ -514,7 +512,7 @@ GroupAtomMessages.propTypes = {
   targetAtom: PropTypes.object,
   targetAtomUri: PropTypes.string,
   connection: PropTypes.object,
-  sortedMessageUris: PropTypes.arrayOf(PropTypes.string),
+  sortedMessagesArray: PropTypes.arrayOf(PropTypes.object),
   chatMessages: PropTypes.object,
   unreadMessageCount: PropTypes.number,
   isProcessingLoadingMessages: PropTypes.bool,

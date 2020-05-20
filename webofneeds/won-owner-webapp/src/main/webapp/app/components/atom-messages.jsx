@@ -128,9 +128,7 @@ const mapStateToProps = (state, ownProps) => {
     targetAtomUri,
     selectedConnectionUri,
     connection,
-    sortedMessageUris: sortedMessages && [
-      ...sortedMessages.flatMap(msg => get(msg, "uri")),
-    ],
+    sortedMessagesArray: sortedMessages,
     chatMessages,
     chatMessagesWithUnknownState,
     unreadMessageCount: unreadMessages && unreadMessages.size,
@@ -400,16 +398,16 @@ class AtomMessages extends React.Component {
       );
 
       const chatMessages =
-        this.props.sortedMessageUris &&
-        this.props.sortedMessageUris.map((msgUri, index) => {
+        this.props.sortedMessagesArray &&
+        this.props.sortedMessagesArray.map((msg, index) => {
           return (
             <WonConnectionMessage
-              key={msgUri + "-" + index}
-              messageUri={msgUri}
-              connectionUri={this.props.selectedConnectionUri}
+              key={get(msg, "uri") + "-" + index}
+              message={msg}
+              connection={this.props.connection}
               onClick={
                 this.props.multiSelectType
-                  ? () => this.selectMessage(msgUri)
+                  ? () => this.selectMessage(get(msg, "uri"))
                   : undefined
               }
             />
@@ -424,7 +422,7 @@ class AtomMessages extends React.Component {
         >
           {unreadIndicatorElement}
           {this.props.showAtomContentMessage && (
-            <WonAtomContentMessage atomUri={this.props.targetAtomUri} />
+            <WonAtomContentMessage atomUri={this.props.targetAtom} />
           )}
           {(this.props.isConnectionLoading ||
             this.props.isProcessingLoadingMessages) &&
@@ -490,8 +488,8 @@ class AtomMessages extends React.Component {
           return (
             <WonConnectionMessage
               key={get(msg, "uri") + "-" + index}
-              messageUri={get(msg, "uri")}
-              connectionUri={this.props.selectedConnectionUri}
+              message={msg}
+              connection={this.props.connection}
               onClick={
                 this.props.multiSelectType
                   ? () => this.selectMessage(get(msg, "uri"))
@@ -508,8 +506,8 @@ class AtomMessages extends React.Component {
           return (
             <WonConnectionMessage
               key={get(msg, "uri") + "-" + index}
-              messageUri={get(msg, "uri")}
-              connectionUri={this.props.selectedConnectionUri}
+              message={msg}
+              connection={this.props.connection}
               onClick={
                 this.props.multiSelectType
                   ? () => this.selectMessage(get(msg, "uri"))
@@ -526,8 +524,8 @@ class AtomMessages extends React.Component {
           return (
             <WonConnectionMessage
               key={get(msg, "uri") + "-" + index}
-              messageUri={get(msg, "uri")}
-              connectionUri={this.props.selectedConnectionUri}
+              message={msg}
+              connection={this.props.connection}
               onClick={
                 this.props.multiSelectType
                   ? () => this.selectMessage(get(msg, "uri"))
@@ -1057,7 +1055,7 @@ AtomMessages.propTypes = {
   targetAtomUri: PropTypes.string,
   selectedConnectionUri: PropTypes.string,
   connection: PropTypes.object,
-  sortedMessageUris: PropTypes.arrayOf(PropTypes.string),
+  sortedMessagesArray: PropTypes.arrayOf(PropTypes.object),
   chatMessages: PropTypes.object,
   chatMessagesWithUnknownState: PropTypes.object,
   unreadMessageCount: PropTypes.number,

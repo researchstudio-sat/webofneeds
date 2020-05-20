@@ -1,12 +1,11 @@
 import React from "react";
-import Immutable from "immutable";
 import urljoin from "url-join";
 import PropTypes from "prop-types";
 import * as messageUtils from "../../redux/utils/message-utils.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import { get, getIn, generateLink } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
-import { connect } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getOwnedAtomByConnectionUri } from "../../redux/selectors/general-selectors.js";
 import { ownerBaseUrl } from "~/config/default.js";
 
@@ -23,22 +22,28 @@ import rdf_logo_2 from "~/images/won-icons/rdf_logo_2.svg";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 import ico16_arrow_up from "~/images/won-icons/ico16_arrow_up.svg";
 import * as viewSelectors from "../../redux/selectors/view-selectors";
-import { withRouter } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 const MESSAGE_READ_TIMEOUT = 1500;
 
-const mapStateToProps = (state, ownProps) => {
-  const ownedAtom =
-    ownProps.connectionUri &&
-    getOwnedAtomByConnectionUri(state, ownProps.connectionUri);
-  const connection = getIn(ownedAtom, ["connections", ownProps.connectionUri]);
-  const theirAtom = getIn(state, ["atoms", get(connection, "targetAtomUri")]);
-  const message =
-    connection && ownProps.messageUri
-      ? getIn(connection, ["messages", ownProps.messageUri])
-      : Immutable.Map();
-
-  const shouldShowRdf = viewSelectors.showRdf(state);
+export default function WonConnectionMessage({
+  message,
+  connection,
+  onClick,
+  groupChatMessage,
+}) {
+  const dispatch = useDispatch();
+  const history = useHistory();
+  const ownedAtom = useSelector(
+    state =>
+      connection && getOwnedAtomByConnectionUri(state, get(connection, "uri"))
+  );
+  const messageUri = get(message, "uri");
+  const connectionUri = get(connection, "uri");
+  const theirAtom = useSelector(state =>
+    getIn(state, ["atoms", get(connection, "targetAtomUri")])
+  );
+  const shouldShowRdf = useSelector(state => viewSelectors.showRdf(state));
 
   let rdfLinkURL;
   if (shouldShowRdf && ownerBaseUrl && ownedAtom && message) {
@@ -69,362 +74,110 @@ const mapStateToProps = (state, ownProps) => {
 
   const injectInto = get(message, "injectInto");
 
-  return {
-    connectionUri: ownProps.connectionUri,
-    messageUri: ownProps.messageUri,
-    onClick: ownProps.onClick,
-    groupChatMessage: ownProps.groupChatMessage,
-    ownedAtom,
-    theirAtom,
-    message,
-    messageSenderUri: get(message, "senderUri"),
-    originatorUri: get(message, "originatorUri"),
-    isConnectionMessage: messageUtils.isConnectionMessage(message),
-    isChangeNotificationMessage: messageUtils.isChangeNotificationMessage(
-      message
-    ),
-    isSelected: getIn(message, ["viewState", "isSelected"]),
-    isCollapsed: getIn(message, ["viewState", "isCollapsed"]),
-    showActions: getIn(message, ["viewState", "showActions"]),
-    multiSelectType: get(connection, "multiSelectType"),
-    shouldShowRdf,
-    rdfLinkURL,
-    isParsable: messageUtils.isParsable(message),
-    isClaimed: messageUtils.isMessageClaimed(connection, message),
-    isProposed: messageUtils.isMessageProposed(connection, message),
-    isAccepted: messageUtils.isMessageAccepted(connection, message),
-    isAgreed: messageUtils.isMessageAgreedOn(connection, message),
-    isRejected: messageUtils.isMessageRejected(connection, message),
-    isRetracted: messageUtils.isMessageRetracted(connection, message),
-    isCancellationPending: messageUtils.isMessageCancellationPending(
-      connection,
-      message
-    ),
-    isCancelled: messageUtils.isMessageCancelled(connection, message),
-    isCollapsible:
-      messageUtils.isMessageClaimed(connection, message) ||
-      messageUtils.isMessageProposed(connection, message) ||
-      messageUtils.isMessageAgreedOn(connection, message) ||
-      messageUtils.isMessageRejected(connection, message) ||
-      messageUtils.isMessageRetracted(connection, message) ||
-      messageUtils.isMessageCancellationPending(connection, message) ||
-      messageUtils.isMessageCancelled(connection, message),
-    isProposable:
-      connectionUtils.isConnected(connection) &&
-      messageUtils.isMessageProposable(connection, message),
-    isClaimable:
-      connectionUtils.isConnected(connection) &&
-      messageUtils.isMessageClaimable(connection, message),
-    isCancelable: messageUtils.isMessageCancelable(connection, message),
-    isRetractable: messageUtils.isMessageRetractable(connection, message),
-    isRejectable: messageUtils.isMessageRejectable(connection, message),
-    isAcceptable: messageUtils.isMessageAcceptable(connection, message),
-    isAgreeable: messageUtils.isMessageAgreeable(connection, message),
-    isUnread: messageUtils.isMessageUnread(message),
-    isInjectIntoMessage: injectInto && injectInto.size > 0,
-    injectInto: injectInto,
-    isReceived,
-    isSent,
-    isFailedToSend,
-    isPending,
-    isPartiallyLoaded,
-    isFromSystem: get(message, "systemMessage"),
-    hasReferences: get(message, "hasReferences"),
-  };
-};
+  const messageSenderUri = get(message, "senderUri");
+  const originatorUri = get(message, "originatorUri");
+  const isConnectionMessage = messageUtils.isConnectionMessage(message);
+  const isChangeNotificationMessage = messageUtils.isChangeNotificationMessage(
+    message
+  );
+  const isSelected = getIn(message, ["viewState", "isSelected"]);
+  const isCollapsed = getIn(message, ["viewState", "isCollapsed"]);
+  const showActions = getIn(message, ["viewState", "showActions"]);
+  const multiSelectType = get(connection, "multiSelectType");
+  const isParsable = messageUtils.isParsable(message);
+  const isClaimed = messageUtils.isMessageClaimed(connection, message);
+  const isProposed = messageUtils.isMessageProposed(connection, message);
+  const isAccepted = messageUtils.isMessageAccepted(connection, message);
+  const isAgreed = messageUtils.isMessageAgreedOn(connection, message);
+  const isRejected = messageUtils.isMessageRejected(connection, message);
+  const isRetracted = messageUtils.isMessageRetracted(connection, message);
+  const isCancellationPending = messageUtils.isMessageCancellationPending(
+    connection,
+    message
+  );
+  const isCancelled = messageUtils.isMessageCancelled(connection, message);
+  const isCollapsible =
+    messageUtils.isMessageClaimed(connection, message) ||
+    messageUtils.isMessageProposed(connection, message) ||
+    messageUtils.isMessageAgreedOn(connection, message) ||
+    messageUtils.isMessageRejected(connection, message) ||
+    messageUtils.isMessageRetracted(connection, message) ||
+    messageUtils.isMessageCancellationPending(connection, message) ||
+    messageUtils.isMessageCancelled(connection, message);
+  const isProposable =
+    connectionUtils.isConnected(connection) &&
+    messageUtils.isMessageProposable(connection, message);
+  const isClaimable =
+    connectionUtils.isConnected(connection) &&
+    messageUtils.isMessageClaimable(connection, message);
+  const isCancelable = messageUtils.isMessageCancelable(connection, message);
+  const isRetractable = messageUtils.isMessageRetractable(connection, message);
+  const isRejectable = messageUtils.isMessageRejectable(connection, message);
+  const isAcceptable = messageUtils.isMessageAcceptable(connection, message);
+  const isUnread = messageUtils.isMessageUnread(message);
+  const isInjectIntoMessage = injectInto && injectInto.size > 0;
+  const isFromSystem = get(message, "systemMessage");
+  const hasReferences = get(message, "hasReferences");
 
-const mapDispatchToProps = dispatch => {
-  return {
-    messageMarkAsCollapsed: (messageUri, connectionUri, atomUri, collapsed) => {
-      dispatch(
-        actionCreators.messages__viewState__markAsCollapsed({
-          messageUri: messageUri,
-          connectionUri: connectionUri,
-          atomUri: atomUri,
-          isCollapsed: collapsed,
-        })
-      );
-    },
-    messageMarkAsRead: (messageUri, connectionUri, atomUri) => {
-      dispatch(
-        actionCreators.messages__markAsRead({
-          messageUri: messageUri,
-          connectionUri: connectionUri,
-          atomUri: atomUri,
-          read: true,
-        })
-      );
-    },
-    showMessageActions: (messageUri, connectionUri, atomUri, showActions) => {
-      dispatch(
-        actionCreators.messages__viewState__markShowActions({
-          messageUri: messageUri,
-          connectionUri: connectionUri,
-          atomUri: atomUri,
-          showActions: showActions,
-        })
-      );
-    },
-  };
-};
-
-class WonConnectionMessage extends React.Component {
-  render() {
-    let messageContentElement;
-
-    if (this.props.isChangeNotificationMessage) {
-      messageContentElement = (
-        <VisibilitySensor
-          onChange={isVisible => {
-            isVisible && this.props.isUnread && this.markAsRead();
-          }}
-          intervalDelay={2000}
-        >
-          <WonLabelledHr
-            className="won-cm__modified"
-            label="Post has been modified"
-          />
-        </VisibilitySensor>
-      );
-    } else {
-      if (this.props.isUnread) {
-        <VisibilitySensor
-          onChange={isVisible => {
-            isVisible && this.props.isUnread && this.markAsRead();
-          }}
-          intervalDelay={2000}
-        />;
-      }
-      const messageIcon = [];
-
-      if (
-        !this.props.isSent &&
-        !(this.props.groupChatMessage && this.props.originatorUri)
-      ) {
-        messageIcon.push(
-          <WonAtomIcon
-            key="theirAtomUri"
-            atomUri={get(this.props.theirAtom, "uri")}
-            onClick={
-              !this.props.onClick
-                ? () => {
-                    this.props.history.push(
-                      generateLink(
-                        this.props.history.location,
-                        { postUri: get(this.props.theirAtom, "uri") },
-                        "/post"
-                      )
-                    );
-                  }
-                : undefined
-            }
-          />
-        );
-      }
-
-      if (
-        this.props.isReceived &&
-        this.props.groupChatMessage &&
-        this.props.originatorUri
-      ) {
-        messageIcon.push(
-          <WonAtomIcon
-            key="originatorUri"
-            atomUri={this.props.originatorUri}
-            onClick={
-              !this.props.onClick
-                ? () => {
-                    this.props.history.push(
-                      generateLink(
-                        this.props.history.location,
-                        { postUri: this.props.originatorUri },
-                        "/post"
-                      )
-                    );
-                  }
-                : undefined
-            }
-          />
-        );
-      }
-
-      if (this.props.isFromSystem) {
-        messageIcon.push(
-          <WonAtomIcon
-            key="messageSenderUri"
-            atomUri={this.props.messageSenderUri}
-          />
-        );
-      }
-
-      let messageCenterContentElement;
-      if (this.props.isCollapsed) {
-        messageCenterContentElement = (
-          <div
-            className="won-cm__center__bubble__collapsed clickable"
-            onClick={() => this.expandMessage(false)}
-          >
-            {this.generateCollapsedLabel()}
-          </div>
-        );
-      } else {
-        messageCenterContentElement = (
-          <React.Fragment>
-            {this.props.isCollapsible ? (
-              <div
-                className="won-cm__center__bubble__collapsed clickable"
-                onClick={() => this.expandMessage(true)}
-              >
-                Click to collapse again
-              </div>
-            ) : (
-              undefined
-            )}
-            <WonCombinedMessageContent
-              messageUri={this.props.messageUri}
-              connectionUri={this.props.connectionUri}
-              groupChatMessage={this.props.groupChatMessage}
-            />
-            {!this.props.groupChatMessage &&
-            (this.props.isProposable || this.props.isClaimable) &&
-            !this.props.multiSelectType ? (
-              <div
-                className="won-cm__center__bubble__carret clickable"
-                onClick={() => this.toggleActions()}
-              >
-                <svg>
-                  {this.props.showActions ? (
-                    <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
-                  ) : (
-                    <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-                  )}
-                </svg>
-              </div>
-            ) : (
-              undefined
-            )}
-            {this.showActionButtons() ? (
-              <WonConnectionMessageActions
-                messageUri={this.props.messageUri}
-                connectionUri={this.props.connectionUri}
-              />
-            ) : (
-              undefined
-            )}
-          </React.Fragment>
-        );
-      }
-
-      messageContentElement = (
-        <React.Fragment>
-          {messageIcon}
-          <VisibilitySensor
-            onChange={isVisible => {
-              isVisible && this.props.isUnread && this.markAsRead();
-            }}
-            intervalDelay={2000}
-          >
-            <div className={this.generateCenterCssClasses()}>
-              <div className={this.generateCenterBubbleCssClasses()}>
-                {messageCenterContentElement}
-              </div>
-              <WonConnectionMessageStatus
-                messageUri={this.props.messageUri}
-                connectionUri={this.props.connectionUri}
-              />
-              {this.props.rdfLinkURL ? (
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href={this.props.rdfLinkURL}
-                >
-                  <svg className="rdflink__small clickable">
-                    <use xlinkHref={rdf_logo_2} href={rdf_logo_2} />
-                  </svg>
-                </a>
-              ) : (
-                undefined
-              )}
-            </div>
-          </VisibilitySensor>
-        </React.Fragment>
-      );
-    }
-
-    return (
-      <won-connection-message
-        class={this.generateParentCssClasses()}
-        onClick={this.props.onClick}
-      >
-        {this.showMessageAlways() ? messageContentElement : undefined}
-      </won-connection-message>
-    );
-  }
-
-  generateParentCssClasses() {
+  function generateParentCssClasses() {
     const cssClassNames = [];
-    this.props.isReceived && cssClassNames.push("won-cm--left");
-    this.props.isSent && cssClassNames.push("won-cm--right");
-    !!this.props.multiSelectType && cssClassNames.push("won-is-multiSelect");
-    !this.isSelectable() && cssClassNames.push("won-not-selectable");
-    this.props.isSelected && cssClassNames.push("won-is-selected");
-    this.props.isProposed && cssClassNames.push("won-is-proposed");
-    this.props.isClaimed && cssClassNames.push("won-is-claimed");
-    this.props.isRejected && cssClassNames.push("won-is-rejected");
-    this.props.isRetracted && cssClassNames.push("won-is-retracted");
-    this.props.isAccepted && cssClassNames.push("won-is-accepted");
-    this.props.isAgreed && cssClassNames.push("won-is-agreed");
-    this.props.isCancelled && cssClassNames.push("won-is-cancelled");
-    this.props.isCollapsed && cssClassNames.push("won-is-collapsed");
-    this.props.isCollapsible && cssClassNames.push("won-is-collapsible");
-    this.props.isChangeNotificationMessage &&
+    isReceived && cssClassNames.push("won-cm--left");
+    isSent && cssClassNames.push("won-cm--right");
+    !!multiSelectType && cssClassNames.push("won-is-multiSelect");
+    !isSelectable() && cssClassNames.push("won-not-selectable");
+    isSelected && cssClassNames.push("won-is-selected");
+    isProposed && cssClassNames.push("won-is-proposed");
+    isClaimed && cssClassNames.push("won-is-claimed");
+    isRejected && cssClassNames.push("won-is-rejected");
+    isRetracted && cssClassNames.push("won-is-retracted");
+    isAccepted && cssClassNames.push("won-is-accepted");
+    isAgreed && cssClassNames.push("won-is-agreed");
+    isCancelled && cssClassNames.push("won-is-cancelled");
+    isCollapsed && cssClassNames.push("won-is-collapsed");
+    isCollapsible && cssClassNames.push("won-is-collapsible");
+    isChangeNotificationMessage &&
       cssClassNames.push("won-is-changeNotification");
-    this.props.isCancellationPending &&
-      cssClassNames.push("won-is-cancellationPending");
-    this.props.isUnread && cssClassNames.push("won-unread");
+    isCancellationPending && cssClassNames.push("won-is-cancellationPending");
+    isUnread && cssClassNames.push("won-unread");
 
     return cssClassNames.join(" ");
   }
 
-  generateCenterCssClasses() {
+  function generateCenterCssClasses() {
     const cssClassNames = ["won-cm__center"];
 
-    this.props.isConnectionMessage &&
-      !this.props.isParsable &&
+    isConnectionMessage &&
+      !isParsable &&
       cssClassNames.push("won-cm__center--nondisplayable");
-    this.props.isFromSystem && cssClassNames.push("won-cm__center--system");
-    this.props.isInjectIntoMessage &&
-      cssClassNames.push("won-cm__center--inject-into");
+    isFromSystem && cssClassNames.push("won-cm__center--system");
+    isInjectIntoMessage && cssClassNames.push("won-cm__center--inject-into");
 
     return cssClassNames.join(" ");
   }
 
-  generateCenterBubbleCssClasses() {
+  function generateCenterBubbleCssClasses() {
     const cssClassNames = ["won-cm__center__bubble"];
 
-    this.props.hasReferences && cssClassNames.push("references");
-    this.props.isPending && cssClassNames.push("pending");
-    this.props.isPartiallyLoaded && cssClassNames.push("partiallyLoaded");
-    this.props.isSent &&
-      this.props.isFailedToSend &&
-      cssClassNames.push("failure");
+    hasReferences && cssClassNames.push("references");
+    isPending && cssClassNames.push("pending");
+    isPartiallyLoaded && cssClassNames.push("partiallyLoaded");
+    isSent && isFailedToSend && cssClassNames.push("failure");
 
     return cssClassNames.join(" ");
   }
 
-  generateCollapsedLabel() {
-    if (this.props.message) {
+  function generateCollapsedLabel() {
+    if (message) {
       let label;
 
-      if (this.props.isClaimed) label = "Message was claimed.";
-      else if (this.props.isProposed) label = "Message was proposed.";
-      else if (this.props.isAccepted) label = "Message was accepted.";
-      else if (this.props.isAgreed) label = "Message is part of an agreement";
-      else if (this.props.isRejected) label = "Message was rejected.";
-      else if (this.props.isRetracted) label = "Message was retracted.";
-      else if (this.props.isCancellationPending)
-        label = "Cancellation pending.";
-      else if (this.props.isCancelled) label = "Cancelled.";
+      if (isClaimed) label = "Message was claimed.";
+      else if (isProposed) label = "Message was proposed.";
+      else if (isAccepted) label = "Message was accepted.";
+      else if (isAgreed) label = "Message is part of an agreement";
+      else if (isRejected) label = "Message was rejected.";
+      else if (isRetracted) label = "Message was retracted.";
+      else if (isCancellationPending) label = "Cancellation pending.";
+      else if (isCancelled) label = "Cancelled.";
       else label = "Message collapsed.";
 
       return label + " Click to expand.";
@@ -432,147 +185,272 @@ class WonConnectionMessage extends React.Component {
     return undefined;
   }
 
-  isSelectable() {
+  function isSelectable() {
     //TODO: Not allowed for certain high-level protocol states
-    if (this.props.message && this.props.multiSelectType) {
-      switch (this.props.multiSelectType) {
+    if (message && multiSelectType) {
+      switch (multiSelectType) {
         case "rejects":
-          return this.props.isRejectable;
+          return isRejectable;
         case "retracts":
-          return this.props.isRetractable;
+          return isRetractable;
         case "proposesToCancel":
-          return this.props.isCancelable;
+          return isCancelable;
         case "accepts":
-          return this.props.isAcceptable;
+          return isAcceptable;
         case "proposes":
-          return this.props.isProposable;
+          return isProposable;
         case "claims":
-          return this.props.isClaimable;
+          return isClaimable;
       }
     }
     return false;
   }
 
-  expandMessage(expand) {
+  function expandMessage(expand) {
     //TODO: Not allowed for certain high-level protocol states
-    if (this.props.message && !this.props.multiSelectType) {
-      this.props.messageMarkAsCollapsed(
-        get(this.props.message, "uri"),
-        this.props.connectionUri,
-        get(this.props.ownedAtom, "uri"),
-        expand
+    if (message && !multiSelectType) {
+      dispatch(
+        actionCreators.messages__viewState__markAsCollapsed({
+          messageUri: get(message, "uri"),
+          connectionUri: connectionUri,
+          atomUri: get(ownedAtom, "uri"),
+          isCollapsed: expand,
+        })
       );
     }
   }
 
-  showMessageAlways() {
-    if (this.props.message) {
-      return getIn(this.props.message, ["content", "text"])
+  function showMessageAlways() {
+    if (message) {
+      return getIn(message, ["content", "text"])
         ? true
-        : !this.props.hasReferences ||
-            this.props.shouldShowRdf ||
-            this.props.showActions ||
-            messageUtils.hasProposesReferences(this.props.message) ||
-            messageUtils.hasClaimsReferences(this.props.message) ||
-            messageUtils.hasProposesToCancelReferences(this.props.message);
+        : !hasReferences ||
+            shouldShowRdf ||
+            showActions ||
+            messageUtils.hasProposesReferences(message) ||
+            messageUtils.hasClaimsReferences(message) ||
+            messageUtils.hasProposesToCancelReferences(message);
     }
     return true;
   }
 
   //TODO: Not allowed for certain high-level protocol states
-  showActionButtons() {
+  function showActionButtons() {
     return (
-      !this.props.groupChatMessage &&
-      !this.props.isRetracted &&
-      !this.props.isRejected &&
-      !(
-        messageUtils.hasProposesToCancelReferences(this.props.message) &&
-        this.props.isAccepted
-      ) &&
-      (this.props.showActions ||
-        this.props.isCancelable ||
-        messageUtils.hasProposesReferences(this.props.message) ||
-        messageUtils.hasClaimsReferences(this.props.message) ||
-        messageUtils.hasProposesToCancelReferences(this.props.message))
+      !groupChatMessage &&
+      !isRetracted &&
+      !isRejected &&
+      !(messageUtils.hasProposesToCancelReferences(message) && isAccepted) &&
+      (showActions ||
+        isCancelable ||
+        messageUtils.hasProposesReferences(message) ||
+        messageUtils.hasClaimsReferences(message) ||
+        messageUtils.hasProposesToCancelReferences(message))
     );
   }
 
-  toggleActions() {
-    this.props.showMessageActions(
-      get(this.props.message, "uri"),
-      this.props.connectionUri,
-      get(this.props.ownedAtom, "uri"),
-      !this.props.showActions
+  function toggleActions() {
+    dispatch(
+      actionCreators.messages__viewState__markShowActions({
+        messageUri: get(message, "uri"),
+        connectionUri: connectionUri,
+        atomUri: get(ownedAtom, "uri"),
+        showActions: !showActions,
+      })
     );
   }
 
-  markAsRead() {
-    if (this.props.isUnread) {
+  function markAsRead() {
+    if (isUnread) {
       setTimeout(() => {
-        this.props.messageMarkAsRead(
-          this.props.messageUri,
-          this.props.connectionUri,
-          get(this.props.ownedAtom, "uri")
+        dispatch(
+          actionCreators.messages__markAsRead({
+            messageUri: messageUri,
+            connectionUri: connectionUri,
+            atomUri: get(ownedAtom, "uri"),
+            read: true,
+          })
         );
       }, MESSAGE_READ_TIMEOUT);
     }
   }
+
+  let messageContentElement;
+
+  if (isChangeNotificationMessage) {
+    messageContentElement = (
+      <VisibilitySensor
+        onChange={isVisible => {
+          isVisible && isUnread && markAsRead();
+        }}
+        intervalDelay={2000}
+      >
+        <WonLabelledHr
+          className="won-cm__modified"
+          label="Post has been modified"
+        />
+      </VisibilitySensor>
+    );
+  } else {
+    if (isUnread) {
+      <VisibilitySensor
+        onChange={isVisible => {
+          isVisible && isUnread && markAsRead();
+        }}
+        intervalDelay={2000}
+      />;
+    }
+    const messageIcon = [];
+
+    if (!isSent && !(groupChatMessage && originatorUri)) {
+      messageIcon.push(
+        <WonAtomIcon
+          key="theirAtomUri"
+          atomUri={get(theirAtom, "uri")}
+          onClick={
+            !onClick
+              ? () => {
+                  history.push(
+                    generateLink(
+                      history.location,
+                      { postUri: get(theirAtom, "uri") },
+                      "/post"
+                    )
+                  );
+                }
+              : undefined
+          }
+        />
+      );
+    }
+
+    if (isReceived && groupChatMessage && originatorUri) {
+      messageIcon.push(
+        <WonAtomIcon
+          key="originatorUri"
+          atomUri={originatorUri}
+          onClick={
+            !onClick
+              ? () => {
+                  history.push(
+                    generateLink(
+                      history.location,
+                      { postUri: originatorUri },
+                      "/post"
+                    )
+                  );
+                }
+              : undefined
+          }
+        />
+      );
+    }
+
+    if (isFromSystem) {
+      messageIcon.push(
+        <WonAtomIcon key="messageSenderUri" atomUri={messageSenderUri} />
+      );
+    }
+
+    let messageCenterContentElement;
+    if (isCollapsed) {
+      messageCenterContentElement = (
+        <div
+          className="won-cm__center__bubble__collapsed clickable"
+          onClick={() => expandMessage(false)}
+        >
+          {generateCollapsedLabel()}
+        </div>
+      );
+    } else {
+      messageCenterContentElement = (
+        <React.Fragment>
+          {isCollapsible ? (
+            <div
+              className="won-cm__center__bubble__collapsed clickable"
+              onClick={() => expandMessage(true)}
+            >
+              Click to collapse again
+            </div>
+          ) : (
+            undefined
+          )}
+          <WonCombinedMessageContent
+            message={message}
+            connection={connection}
+            groupChatMessage={groupChatMessage}
+          />
+          {!groupChatMessage &&
+          (isProposable || isClaimable) &&
+          !multiSelectType ? (
+            <div
+              className="won-cm__center__bubble__carret clickable"
+              onClick={() => toggleActions()}
+            >
+              <svg>
+                {showActions ? (
+                  <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
+                ) : (
+                  <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
+                )}
+              </svg>
+            </div>
+          ) : (
+            undefined
+          )}
+          {showActionButtons() ? (
+            <WonConnectionMessageActions
+              message={message}
+              connection={connection}
+            />
+          ) : (
+            undefined
+          )}
+        </React.Fragment>
+      );
+    }
+
+    messageContentElement = (
+      <React.Fragment>
+        {messageIcon}
+        <VisibilitySensor
+          onChange={isVisible => {
+            isVisible && isUnread && markAsRead();
+          }}
+          intervalDelay={2000}
+        >
+          <div className={generateCenterCssClasses()}>
+            <div className={generateCenterBubbleCssClasses()}>
+              {messageCenterContentElement}
+            </div>
+            <WonConnectionMessageStatus message={message} />
+            {rdfLinkURL ? (
+              <a target="_blank" rel="noopener noreferrer" href={rdfLinkURL}>
+                <svg className="rdflink__small clickable">
+                  <use xlinkHref={rdf_logo_2} href={rdf_logo_2} />
+                </svg>
+              </a>
+            ) : (
+              undefined
+            )}
+          </div>
+        </VisibilitySensor>
+      </React.Fragment>
+    );
+  }
+
+  return (
+    <won-connection-message
+      class={generateParentCssClasses()}
+      onClick={onClick}
+    >
+      {showMessageAlways() ? messageContentElement : undefined}
+    </won-connection-message>
+  );
 }
-
 WonConnectionMessage.propTypes = {
-  messageUri: PropTypes.string.isRequired,
-  connectionUri: PropTypes.string.isRequired,
-  groupChatMessage: PropTypes.bool,
+  message: PropTypes.object.isRequired,
+  connection: PropTypes.object.isRequired,
   onClick: PropTypes.func,
-  ownedAtom: PropTypes.object,
-  theirAtom: PropTypes.object,
-  message: PropTypes.object,
-  messageSenderUri: PropTypes.string,
-  originatorUri: PropTypes.string,
-  isConnectionMessage: PropTypes.bool,
-  isChangeNotificationMessage: PropTypes.bool,
-  isSelected: PropTypes.bool,
-  isCollapsed: PropTypes.bool,
-  isCollapsible: PropTypes.bool,
-  showActions: PropTypes.bool,
-  multiSelectType: PropTypes.string,
-  shouldShowRdf: PropTypes.bool,
-  rdfLinkURL: PropTypes.string,
-  isParsable: PropTypes.bool,
-  isClaimed: PropTypes.bool,
-  isProposed: PropTypes.bool,
-  isAccepted: PropTypes.bool,
-  isAgreed: PropTypes.bool,
-  isRejected: PropTypes.bool,
-  isRetracted: PropTypes.bool,
-  isCancellationPending: PropTypes.bool,
-  isCancelled: PropTypes.bool,
-  isProposable: PropTypes.bool,
-  isClaimable: PropTypes.bool,
-  isCancelable: PropTypes.bool,
-  isRetractable: PropTypes.bool,
-  isRejectable: PropTypes.bool,
-  isAcceptable: PropTypes.bool,
-  isAgreeable: PropTypes.bool,
-  isUnread: PropTypes.bool,
-  isInjectIntoMessage: PropTypes.bool,
-  injectInto: PropTypes.object,
-  isReceived: PropTypes.bool,
-  isSent: PropTypes.bool,
-  isFailedToSend: PropTypes.bool,
-  isPending: PropTypes.bool,
-  isPartiallyLoaded: PropTypes.bool,
-  isFromSystem: PropTypes.bool,
-  hasReferences: PropTypes.bool,
-  messageMarkAsCollapsed: PropTypes.func,
-  messageMarkAsRead: PropTypes.func,
-  showMessageActions: PropTypes.func,
-  history: PropTypes.object,
+  groupChatMessage: PropTypes.bool,
 };
-
-export default withRouter(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(WonConnectionMessage)
-);
