@@ -1,6 +1,5 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import { ownerBaseUrl } from "~/config/default.js";
 import { get, getIn, toAbsoluteURL, getQueryParams } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
@@ -18,9 +17,9 @@ import WonFlexGrid from "../../components/flexgrid.jsx";
 import "~/style/_about.scss";
 import ico16_arrow_up from "~/images/won-icons/ico16_arrow_up.svg";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
-import { withRouter } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
-const peopleGrid = ({ themeName }) => [
+const getPeopleGrid = ({ themeName }) => [
   {
     imageSrc: `skin/${themeName}/images/face1.png`,
     text: '"I have something to offer"',
@@ -159,162 +158,125 @@ const questions = [
   },
 ];
 
-const mapStateToProps = (state, ownProps) => {
-  const { aboutSection } = getQueryParams(ownProps.location);
-  const theme = getIn(state, ["config", "theme"]);
+export default function PageAbout() {
+  const history = useHistory();
+  const [moreInfo, setMoreInfo] = useState(false);
+  const { aboutSection } = getQueryParams(history.location);
+
+  const theme = useSelector(state => getIn(state, ["config", "theme"]));
   const themeName = get(theme, "name");
-  return {
-    isLoggedIn: accountUtils.isLoggedIn(get(state, "account")),
-    visibleSection: aboutSection,
-    tosTemplateHtml: get(theme, "tosTemplate"),
-    imprintTemplateHtml: get(theme, "imprintTemplate"),
-    privacyPolicyTemplateHtml: get(theme, "privacyPolicyTemplate"),
-    peopleGrid: peopleGrid({ themeName }),
-    showModalDialog: viewSelectors.showModalDialog(state),
-    showSlideIns:
-      viewSelectors.hasSlideIns(state, ownProps.history) &&
-      viewSelectors.isSlideInsVisible(state),
-  };
-};
 
-class PageAbout extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      moreInfo: false,
-    };
+  const isLoggedIn = useSelector(state =>
+    accountUtils.isLoggedIn(get(state, "account"))
+  );
+  const tosTemplateHtml = get(theme, "tosTemplate");
+  const imprintTemplateHtml = get(theme, "imprintTemplate");
+  const privacyPolicyTemplateHtml = get(theme, "privacyPolicyTemplate");
+  const peopleGrid = getPeopleGrid({ themeName });
+  const showModalDialog = useSelector(viewSelectors.showModalDialog);
+  const showSlideIns = useSelector(
+    state =>
+      viewSelectors.hasSlideIns(state, history) &&
+      viewSelectors.isSlideInsVisible(state)
+  );
 
-    this.toggleMoreInfo = this.toggleMoreInfo.bind(this);
+  function toggleMoreInfo() {
+    setMoreInfo(!moreInfo);
   }
 
-  render() {
-    return (
-      <section className={!this.props.isLoggedIn ? "won-signed-out" : ""}>
-        {this.props.showModalDialog && <WonModalDialog />}
-        <WonTopnav pageTitle="About" />
-        {this.props.isLoggedIn && <WonMenu />}
-        <WonToasts />
-        {this.props.showSlideIns && <WonSlideIn />}
-        <main className="about" id="allSections">
-          {!this.props.visibleSection && (
-            <section className="about__welcome">
-              <div className="about__welcome__title">
-                What is the Web of Needs?
-              </div>
-              <WonFlexGrid
-                items={this.props.peopleGrid}
-                className="about__welcome__grid"
-              />
-              <div className="about__welcome__description">
-                <span className="about__welcome__description__title">
-                  What is an &laquo;atom&raquo;?
-                </span>
-                <span className="about__welcome__description__text">
-                  An atom helps you find people who can help you - or who share
-                  your interest.
-                </span>
-                <span
-                  className="about__welcome__description__more clickable"
-                  onClick={this.toggleMoreInfo}
-                >
-                  Read more
-                </span>
-                <svg
-                  className="about__welcome__description__arrow clickable"
-                  onClick={this.toggleMoreInfo}
-                >
-                  {this.state.moreInfo ? (
-                    <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
-                  ) : (
-                    <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-                  )}
-                </svg>
-
-                {this.state.moreInfo && (
-                  <span className="about__welcome__description__text">
-                    An atom is much like an automatic classified ad. You say
-                    what you are looking for, and other such ads will be matched
-                    with yours. You could think of it as of a long-lived search
-                    query that can itself be found by others. Once you found a
-                    useful match, you can connect to it and start to chat.
-                  </span>
+  return (
+    <section className={!isLoggedIn ? "won-signed-out" : ""}>
+      {showModalDialog && <WonModalDialog />}
+      <WonTopnav pageTitle="About" />
+      {isLoggedIn && <WonMenu />}
+      <WonToasts />
+      {showSlideIns && <WonSlideIn />}
+      <main className="about" id="allSections">
+        {!aboutSection && (
+          <section className="about__welcome">
+            <div className="about__welcome__title">
+              What is the Web of Needs?
+            </div>
+            <WonFlexGrid items={peopleGrid} className="about__welcome__grid" />
+            <div className="about__welcome__description">
+              <span className="about__welcome__description__title">
+                What is an &laquo;atom&raquo;?
+              </span>
+              <span className="about__welcome__description__text">
+                An atom helps you find people who can help you - or who share
+                your interest.
+              </span>
+              <span
+                className="about__welcome__description__more clickable"
+                onClick={toggleMoreInfo}
+              >
+                Read more
+              </span>
+              <svg
+                className="about__welcome__description__arrow clickable"
+                onClick={toggleMoreInfo}
+              >
+                {moreInfo ? (
+                  <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
+                ) : (
+                  <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
                 )}
-              </div>
-            </section>
-          )}
-          {(!this.props.visibleSection ||
-            this.props.visibleSection === "aboutHowTo") && (
-            <WonHowTo className="about__howto" />
-          )}
-          {(!this.props.visibleSection ||
-            this.props.visibleSection === "aboutPrivacyPolicy") && (
-            <section className="about__privacyPolicy">
-              <div className="about__privacyPolicy__title">Privacy Policy</div>
-              <div
-                className="about__privacyPolicy__text"
-                dangerouslySetInnerHTML={{
-                  __html: this.props.privacyPolicyTemplateHtml,
-                }}
-              />
-            </section>
-          )}
-          {(!this.props.visibleSection ||
-            this.props.visibleSection === "aboutTermsOfService") && (
-            <section className="about__termsOfService">
-              <div className="about__termsOfService__title">
-                Terms Of Service
-              </div>
-              <div
-                className="about__termsOfService__text"
-                dangerouslySetInnerHTML={{ __html: this.props.tosTemplateHtml }}
-              />
-            </section>
-          )}
-          {(!this.props.visibleSection ||
-            this.props.visibleSection === "aboutImprint") && (
-            <section className="about__imprint">
-              <div className="about__imprint__title">Imprint</div>
-              <div
-                className="about__imprint__text"
-                dangerouslySetInnerHTML={{
-                  __html: this.props.imprintTemplateHtml,
-                }}
-              />
-            </section>
-          )}
-          {(!this.props.visibleSection ||
-            this.props.visibleSection === "aboutFaq") && (
-            <section className="about__faq">
-              <div className="about__faq__title">FAQs</div>
-              <WonAccordion
-                items={questions}
-                className="about__faq__questions"
-              />
-            </section>
-          )}
-        </main>
-        <WonFooter />
-      </section>
-    );
-  }
+              </svg>
 
-  toggleMoreInfo() {
-    this.setState({
-      moreInfo: !this.state.moreInfo,
-    });
-  }
+              {moreInfo && (
+                <span className="about__welcome__description__text">
+                  An atom is much like an automatic classified ad. You say what
+                  you are looking for, and other such ads will be matched with
+                  yours. You could think of it as of a long-lived search query
+                  that can itself be found by others. Once you found a useful
+                  match, you can connect to it and start to chat.
+                </span>
+              )}
+            </div>
+          </section>
+        )}
+        {(!aboutSection || aboutSection === "aboutHowTo") && (
+          <WonHowTo className="about__howto" />
+        )}
+        {(!aboutSection || aboutSection === "aboutPrivacyPolicy") && (
+          <section className="about__privacyPolicy">
+            <div className="about__privacyPolicy__title">Privacy Policy</div>
+            <div
+              className="about__privacyPolicy__text"
+              dangerouslySetInnerHTML={{
+                __html: privacyPolicyTemplateHtml,
+              }}
+            />
+          </section>
+        )}
+        {(!aboutSection || aboutSection === "aboutTermsOfService") && (
+          <section className="about__termsOfService">
+            <div className="about__termsOfService__title">Terms Of Service</div>
+            <div
+              className="about__termsOfService__text"
+              dangerouslySetInnerHTML={{ __html: tosTemplateHtml }}
+            />
+          </section>
+        )}
+        {(!aboutSection || aboutSection === "aboutImprint") && (
+          <section className="about__imprint">
+            <div className="about__imprint__title">Imprint</div>
+            <div
+              className="about__imprint__text"
+              dangerouslySetInnerHTML={{
+                __html: imprintTemplateHtml,
+              }}
+            />
+          </section>
+        )}
+        {(!aboutSection || aboutSection === "aboutFaq") && (
+          <section className="about__faq">
+            <div className="about__faq__title">FAQs</div>
+            <WonAccordion items={questions} className="about__faq__questions" />
+          </section>
+        )}
+      </main>
+      <WonFooter />
+    </section>
+  );
 }
-
-PageAbout.propTypes = {
-  showModalDialog: PropTypes.bool,
-  isLoggedIn: PropTypes.bool,
-  showSlideIns: PropTypes.bool,
-  visibleSection: PropTypes.string,
-  privacyPolicyTemplateHtml: PropTypes.string,
-  tosTemplateHtml: PropTypes.string,
-  imprintTemplateHtml: PropTypes.string,
-  peopleGrid: PropTypes.arrayOf(PropTypes.object),
-  history: PropTypes.object,
-};
-
-export default withRouter(connect(mapStateToProps)(PageAbout));

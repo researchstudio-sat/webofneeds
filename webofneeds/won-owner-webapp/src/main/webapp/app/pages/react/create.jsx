@@ -1,7 +1,6 @@
 import React from "react";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import { withRouter } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 import { get, getQueryParams } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
@@ -18,22 +17,21 @@ import WonUseCasePicker from "../../components/usecase-picker.jsx";
 import "~/style/_create.scss";
 import "~/style/_responsiveness-utils.scss";
 
-const mapStateToProps = (state, ownProps) => {
-  const accountState = get(state, "account");
-
-  return {
-    isLoggedIn: accountUtils.isLoggedIn(accountState),
-    showModalDialog: viewSelectors.showModalDialog(state),
-    showSlideIns:
-      viewSelectors.hasSlideIns(state, ownProps.history) &&
-      viewSelectors.isSlideInsVisible(state),
-  };
-};
-
-function PageCreate(props) {
-  let { useCase, useCaseGroup, fromAtomUri, mode } = getQueryParams(
-    props.location
+export default function PageCreate() {
+  const history = useHistory();
+  const { useCase, useCaseGroup, fromAtomUri, mode } = getQueryParams(
+    history.location
   );
+
+  const accountState = useSelector(state => get(state, "account"));
+  const isLoggedIn = accountUtils.isLoggedIn(accountState);
+  const showModalDialog = useSelector(viewSelectors.showModalDialog);
+  const showSlideIns = useSelector(
+    state =>
+      viewSelectors.hasSlideIns(state, history) &&
+      viewSelectors.isSlideInsVisible(state)
+  );
+
   let contentElement;
 
   let showCreateFromPost = !!(fromAtomUri && mode);
@@ -52,25 +50,15 @@ function PageCreate(props) {
   }
 
   return (
-    <section className={!props.isLoggedIn ? "won-signed-out" : ""}>
-      {props.showModalDialog && <WonModalDialog />}
+    <section className={!isLoggedIn ? "won-signed-out" : ""}>
+      {showModalDialog && <WonModalDialog />}
       <WonTopnav pageTitle="Create" />
-      {props.isLoggedIn && <WonMenu />}
+      {isLoggedIn && <WonMenu />}
       <WonToasts />
-      {props.showSlideIns && <WonSlideIn />}
+      {showSlideIns && <WonSlideIn />}
       {/* RIGHT SIDE */}
       <main className="ownercreate">{contentElement}</main>
       <WonFooter />
     </section>
   );
 }
-
-PageCreate.propTypes = {
-  location: PropTypes.object,
-  isLoggedIn: PropTypes.bool,
-  showModalDialog: PropTypes.bool,
-  showSlideIns: PropTypes.bool,
-  history: PropTypes.object,
-};
-
-export default withRouter(connect(mapStateToProps)(PageCreate));
