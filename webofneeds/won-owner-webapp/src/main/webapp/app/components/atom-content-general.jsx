@@ -3,63 +3,41 @@
  */
 import React from "react";
 import PropTypes from "prop-types";
-import {
-  getOwnedAtomByConnectionUri,
-  selectLastUpdateTime,
-} from "../redux/selectors/general-selectors";
-import { getOwnedConnectionByUri } from "../redux/selectors/connection-selectors.js";
-import { get, getIn, getQueryParams } from "../utils.js";
+import { selectLastUpdateTime } from "../redux/selectors/general-selectors";
+import { get } from "../utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import { relativeTime } from "../won-label-utils.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 
 import "~/style/_atom-content-general.scss";
-import { withRouter } from "react-router-dom";
 
-const mapStateToProps = (state, ownProps) => {
-  const { connectionUri } = getQueryParams(ownProps.location);
-  const connection = getOwnedConnectionByUri(state, connectionUri);
-
-  const ownAtom = getOwnedAtomByConnectionUri(state, connectionUri);
-
-  const ratingConnectionUri =
-    get(connection, "targetAtomUri") == ownProps.atomUri &&
-    atomUtils.getHeldByUri(ownAtom)
-      ? connectionUri
-      : null;
-
-  const atom = ownProps.atomUri && getIn(state, ["atoms", ownProps.atomUri]);
-  const viewState = get(state, "view");
+export default function WonAtomContentGeneral({ atom }) {
+  const viewState = useSelector(state => get(state, "view"));
 
   const creationDate = get(atom, "creationDate");
   const modifiedDate = get(atom, "modifiedDate");
 
-  return {
-    atomUri: ownProps.atomUri,
-    typeLabel: atom && atomUtils.generateTypeLabel(atom),
-    fullFlagLabels: atom && atomUtils.generateFullFlagLabels(atom),
-    shortFlagLabels: atom && atomUtils.generateShortFlagLabels(atom),
-    fullSocketLabels: atom && atomUtils.generateFullSocketLabels(atom),
-    shortSocketLabels: atom && atomUtils.generateShortSocketLabels(atom),
-    friendlyCreationDate:
-      creationDate && relativeTime(selectLastUpdateTime(state), creationDate),
-    friendlyModifiedDate:
-      modifiedDate &&
-      modifiedDate != creationDate &&
-      relativeTime(selectLastUpdateTime(state), modifiedDate),
-    ratingConnectionUri: ratingConnectionUri,
-    shouldShowRdf: viewUtils.showRdf(viewState),
-  };
-};
+  const typeLabel = atom && atomUtils.generateTypeLabel(atom);
+  const fullFlagLabels = atom && atomUtils.generateFullFlagLabels(atom);
+  const shortFlagLabels = atom && atomUtils.generateShortFlagLabels(atom);
+  const fullSocketLabels = atom && atomUtils.generateFullSocketLabels(atom);
+  const shortSocketLabels = atom && atomUtils.generateShortSocketLabels(atom);
+  const globalLastUpdateTime = useSelector(selectLastUpdateTime);
+  const friendlyCreationDate =
+    creationDate && relativeTime(globalLastUpdateTime, creationDate);
+  const friendlyModifiedDate =
+    modifiedDate &&
+    modifiedDate != creationDate &&
+    relativeTime(globalLastUpdateTime, modifiedDate);
+  const shouldShowRdf = viewUtils.showRdf(viewState);
 
-const AtomContentGeneral = props => {
   let flags;
   let sockets;
 
-  if (props.shouldShowRdf) {
-    if (props.fullFlagLabels && props.fullFlagLabels.length > 0) {
-      const flagArray = props.fullFlagLabels.map((flag, index) => {
+  if (shouldShowRdf) {
+    if (fullFlagLabels && fullFlagLabels.length > 0) {
+      const flagArray = fullFlagLabels.map((flag, index) => {
         return (
           <span key={flag + "-" + index} className="acg__item__value__flag">
             {flag}
@@ -75,8 +53,8 @@ const AtomContentGeneral = props => {
       );
     }
 
-    if (props.fullSocketLabels && props.fullSocketLabels.length > 0) {
-      const socketArray = props.fullSocketLabels.map((socket, index) => {
+    if (fullSocketLabels && fullSocketLabels.length > 0) {
+      const socketArray = fullSocketLabels.map((socket, index) => {
         return (
           <span key={socket + "-" + index} className="acg__item__value__socket">
             {socket}
@@ -91,8 +69,8 @@ const AtomContentGeneral = props => {
       );
     }
   } else {
-    if (props.shortFlagLabels && props.shortFlagLabels.length > 0) {
-      const flagArray = props.shortFlagLabels.map((flag, index) => {
+    if (shortFlagLabels && shortFlagLabels.length > 0) {
+      const flagArray = shortFlagLabels.map((flag, index) => {
         return (
           <span key={flag + "-" + index} className="acg__item__value__flag">
             {flag}
@@ -107,8 +85,8 @@ const AtomContentGeneral = props => {
         </div>
       );
     }
-    if (props.shortSocketLabels && props.shortSocketLabels.length > 0) {
-      const socketArray = props.shortSocketLabels.map((socket, index) => {
+    if (shortSocketLabels && shortSocketLabels.length > 0) {
+      const socketArray = shortSocketLabels.map((socket, index) => {
         return (
           <span key={socket + "-" + index} className="acg__item__value__socket">
             {socket}
@@ -126,39 +104,27 @@ const AtomContentGeneral = props => {
 
   return (
     <won-atom-content-general>
-      {props.friendlyCreationDate && (
+      {friendlyCreationDate && (
         <div className="acg__item">
           <div className="acg__item__label">Created</div>
-          <div className="acg__item__value">{props.friendlyCreationDate}</div>
+          <div className="acg__item__value">{friendlyCreationDate}</div>
         </div>
       )}
       <div className="acg__item">
         <div className="acg__item__label">Type</div>
-        <div className="acg__item__value">{props.typeLabel}</div>
+        <div className="acg__item__value">{typeLabel}</div>
       </div>
-      {props.friendlyModifiedDate && (
+      {friendlyModifiedDate && (
         <div className="acg__item">
           <div className="acg__item__label">Modified</div>
-          <div className="acg__item__value">{props.friendlyModifiedDate}</div>
+          <div className="acg__item__value">{friendlyModifiedDate}</div>
         </div>
       )}
       {flags}
       {sockets}
     </won-atom-content-general>
   );
+}
+WonAtomContentGeneral.propTypes = {
+  atom: PropTypes.object.isRequired,
 };
-
-AtomContentGeneral.propTypes = {
-  atomUri: PropTypes.string.isRequired,
-  typeLabel: PropTypes.string,
-  fullFlagLabels: PropTypes.arrayOf(PropTypes.string),
-  shortFlagLabels: PropTypes.arrayOf(PropTypes.string),
-  fullSocketLabels: PropTypes.arrayOf(PropTypes.string),
-  shortSocketLabels: PropTypes.arrayOf(PropTypes.string),
-  friendlyCreationDate: PropTypes.string,
-  friendlyModifiedDate: PropTypes.string,
-  ratingConnectionUri: PropTypes.string,
-  shouldShowRdf: PropTypes.bool,
-};
-
-export default withRouter(connect(mapStateToProps)(AtomContentGeneral));

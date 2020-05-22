@@ -149,17 +149,17 @@ export default function WonAtomContent({ atom, defaultTab }) {
       case "DETAIL":
         visibleTabFragment = (
           <React.Fragment>
-            <WonAtomContentGeneral atomUri={atomUri} />
+            <WonAtomContentGeneral atom={atom} />
 
             {hasContent && (
-              <WonAtomContentDetails atomUri={atomUri} branch="content" />
+              <WonAtomContentDetails atom={atom} branch="content" />
             )}
             {hasContent &&
               hasSeeksBranch && (
                 <WonLabelledHr label="Search" className="cp__labelledhr" />
               )}
             {hasSeeksBranch && (
-              <WonAtomContentDetails atomUri={atomUri} branch="seeks" />
+              <WonAtomContentDetails atom={atom} branch="seeks" />
             )}
           </React.Fragment>
         );
