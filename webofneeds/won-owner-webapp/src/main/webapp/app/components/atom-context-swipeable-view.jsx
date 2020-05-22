@@ -5,6 +5,7 @@ import React from "react";
 import { connect } from "react-redux";
 import SwipeableViews from "react-swipeable-views";
 import "~/style/_atom-context-layout.scss";
+import { getIn } from "../utils.js";
 
 import WonAtomHeader from "./atom-header.jsx";
 import PropTypes from "prop-types";
@@ -13,8 +14,9 @@ import ico16_contextmenu from "~/images/won-icons/ico16_contextmenu.svg";
 import ico32_buddy_add from "~/images/won-icons/ico32_buddy_add.svg";
 
 const mapStateToProps = (state, ownProps) => {
+  const atom = getIn(state, ["atoms", ownProps.atomUri]);
   return {
-    atomUri: ownProps.atomUri,
+    atom,
     actionButtons: ownProps.actionButtons ? ownProps.actionButtons : undefined,
     className: ownProps.className,
     enableMouseEvents: false,
@@ -44,7 +46,7 @@ class WonAtomContextSwipeableView extends React.Component {
   render() {
     const headerElement = (
       <WonAtomHeader
-        atomUri={this.props.atomUri}
+        atom={this.props.atom}
         hideTimestamp={this.props.hideTimestamp}
         toLink={this.props.toLink}
       />
@@ -104,6 +106,7 @@ class WonAtomContextSwipeableView extends React.Component {
 }
 
 WonAtomContextSwipeableView.propTypes = {
+  atom: PropTypes.object,
   atomUri: PropTypes.string,
   toLink: PropTypes.string,
   actionButtons: PropTypes.object,

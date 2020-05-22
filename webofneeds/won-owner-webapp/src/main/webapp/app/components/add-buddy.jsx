@@ -145,7 +145,7 @@ class WonAddBuddy extends React.Component {
             key={get(atom, "uri")}
             onClick={onClickAction}
           >
-            <WonAtomHeader atomUri={get(atom, "uri")} hideTimestamp={true} />
+            <WonAtomHeader atom={atom} hideTimestamp={true} />
             <svg className="add-buddy__addbuddymenu__content__selection__buddy__status">
               <use xlinkHref={connectionStateIcon} href={connectionStateIcon} />
             </svg>

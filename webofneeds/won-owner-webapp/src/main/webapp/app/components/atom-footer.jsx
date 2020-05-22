@@ -288,7 +288,7 @@ class AtomInfo extends React.Component {
         return (
           <WonAtomHeader
             key={get(reactionAtom, "uri") + "-" + index}
-            atomUri={get(reactionAtom, "uri")}
+            atom={reactionAtom}
             hideTimestamp={true}
             onClick={() =>
               this.connectAtomSockets(
