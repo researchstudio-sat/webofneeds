@@ -55,7 +55,7 @@ class AtomInfo extends React.Component {
           (this.props.atomLoading ? " won-is-loading " : "")
         }
       >
-        <WonAtomHeaderBig atomUri={this.props.atomUri} />
+        <WonAtomHeaderBig atom={this.props.atom} />
         <WonAtomMenu
           atom={this.props.atom}
           defaultTab={this.props.defaultTab}
