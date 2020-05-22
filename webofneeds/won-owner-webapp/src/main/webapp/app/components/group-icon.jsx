@@ -33,7 +33,7 @@ export default function WonGroupIcon({ connection }) {
             (groupMembersSize == 1 ? " gi__icons__icon--spanCol " : "")
           }
         >
-          <WonAtomIcon atomUri={get(allAtoms, groupMemberUri)} />
+          <WonAtomIcon atom={get(allAtoms, groupMemberUri)} />
         </div>
       );
     }

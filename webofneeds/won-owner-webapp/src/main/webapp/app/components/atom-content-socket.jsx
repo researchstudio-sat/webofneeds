@@ -79,7 +79,12 @@ export default function WonAtomContentSocket({
 
     return connectionsArray.map((conn, index) => (
       <React.Fragment key={get(conn, "uri") + "-" + index}>
-        <ItemComponent connection={conn} atom={atom} isOwned={isAtomOwned} />
+        <ItemComponent
+          connection={conn}
+          atom={atom}
+          targetAtom={get(storedAtoms, get(conn, "targetAtomUri"))}
+          isOwned={isAtomOwned}
+        />
       </React.Fragment>
     ));
   }

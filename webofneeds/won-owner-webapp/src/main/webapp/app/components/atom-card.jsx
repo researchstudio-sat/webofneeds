@@ -48,7 +48,7 @@ export default function WonAtomCard({
     // We already know that we have the atom thats why we can push it directly into the card-components
     switch (matchedUseCase) {
       case "persona":
-        cardContent = <WonPersonaCard atomUri={atomUri} atom={atom} />;
+        cardContent = <WonPersonaCard atom={atom} />;
         break;
       case "pokemonGoRaid":
         cardContent = (

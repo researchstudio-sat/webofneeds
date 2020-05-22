@@ -187,7 +187,7 @@ class WonSuggestAtomPicker extends React.Component {
               (this.isSelected(atom) ? "won--selected" : "")
             }
           >
-            <WonAtomHeader atomUri={atom} />
+            <WonAtomHeader atom={atom} />
           </div>
         );
       });

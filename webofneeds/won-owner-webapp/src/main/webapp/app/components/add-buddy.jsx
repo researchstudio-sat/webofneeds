@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import vocab from "../service/vocab.js";
-import { connect } from "react-redux";
-import { get, getIn } from "../utils.js";
+import { useSelector, useDispatch } from "react-redux";
+import { get } from "../utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
@@ -17,277 +17,46 @@ import ico32_buddy_deny from "~/images/won-icons/ico32_buddy_deny.svg";
 
 import { actionCreators } from "../actions/actions";
 
-const mapStateToProps = (state, ownProps) => {
-  const ownedAtomsWithBuddySocket = generalSelectors.getOwnedAtomsWithBuddySocket(
-    state
+// TODO: Change Icon: suggestion maybe a PersonIcon with a Plus
+export default function WonAddBuddy({ atom, className }) {
+  const dispatch = useDispatch();
+  const [contextMenuOpen, setContextMenuOpen] = useState(false);
+  let thisNode;
+  const ownedAtomsWithBuddySocket = useSelector(state =>
+    generalSelectors.getOwnedAtomsWithBuddySocket(state)
   );
-
-  const atom = getIn(state, ["atoms", ownProps.atomUri]);
 
   const ownedBuddyOptions =
     ownedAtomsWithBuddySocket &&
     ownedAtomsWithBuddySocket
       .filter(atom => atomUtils.isActive(atom))
-      .filter(atom => get(atom, "uri") !== ownProps.atomUri);
+      .filter(atom => get(atom, "uri") !== get(atom, "uri"));
 
-  return {
-    immediateConnectBuddy:
-      ownedBuddyOptions.size == 1 ? ownedBuddyOptions.first() : undefined,
-    ownedAtomsWithBuddySocketArray:
-      ownedBuddyOptions && ownedBuddyOptions.toArray(),
-    targetBuddySocketUri: atomUtils.getSocketUri(
-      atom,
-      vocab.BUDDY.BuddySocketCompacted
-    ),
-    atomUri: ownProps.atomUri,
-  };
-};
+  const immediateConnectBuddy =
+    ownedBuddyOptions.size == 1 ? ownedBuddyOptions.first() : undefined;
+  const ownedAtomsWithBuddySocketArray =
+    ownedBuddyOptions && ownedBuddyOptions.toArray();
+  const targetBuddySocketUri = atomUtils.getSocketUri(
+    atom,
+    vocab.BUDDY.BuddySocketCompacted
+  );
 
-const mapDispatchToProps = dispatch => {
-  return {
-    hideModalDialog: () => {
-      dispatch(actionCreators.view__hideModalDialog());
-    },
-    showModalDialog: payload => {
-      dispatch(actionCreators.view__showModalDialog(payload));
-    },
-    connect: (
-      senderAtomUri,
-      targetAtomUri,
-      senderSocketType,
-      targetSocketType,
-      message
-    ) => {
-      dispatch(
-        actionCreators.atoms__connect(
-          senderAtomUri,
-          targetAtomUri,
-          senderSocketType,
-          targetSocketType,
-          message
-        )
-      );
-    },
-    connectSockets: (senderSocketUri, targetSocketUri, message) => {
-      dispatch(
-        actionCreators.atoms__connectSockets(
-          senderSocketUri,
-          targetSocketUri,
-          message
-        )
-      );
-    },
-    connectionClose: (connectionUri, message) => {
-      dispatch(actionCreators.connections__close(connectionUri, message));
-    },
-  };
-};
+  useEffect(() => {
+    function handleClick(e) {
+      if (!thisNode.contains(e.target) && contextMenuOpen) {
+        setContextMenuOpen(false);
 
-// TODO: Change Icon: suggestion maybe a PersonIcon with a Plus
-class WonAddBuddy extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      contextMenuOpen: false,
-    };
-    this.handleClick = this.handleClick.bind(this);
-  }
-
-  render() {
-    let buddySelectionElement =
-      this.props.ownedAtomsWithBuddySocketArray &&
-      this.props.ownedAtomsWithBuddySocketArray.map(atom => {
-        const existingBuddyConnection = get(atom, "connections").find(
-          conn =>
-            get(conn, "targetSocketUri") === this.props.targetBuddySocketUri
-        );
-
-        let connectionStateClass;
-        let onClickAction = undefined;
-        let connectionStateIcon;
-
-        if (connectionUtils.isConnected(existingBuddyConnection)) {
-          connectionStateClass = "connected";
-          connectionStateIcon = ico32_buddy_accept;
-          onClickAction = () => {
-            this.removeBuddy(existingBuddyConnection);
-          };
-        } else if (connectionUtils.isRequestSent(existingBuddyConnection)) {
-          connectionStateClass = "sent";
-          connectionStateIcon = ico32_buddy_waiting;
-          onClickAction = () => {
-            this.removeBuddy(existingBuddyConnection);
-          };
-        } else if (connectionUtils.isClosed(existingBuddyConnection)) {
-          connectionStateClass = "closed";
-          connectionStateIcon = ico32_buddy_deny;
-        } else if (connectionUtils.isRequestReceived(existingBuddyConnection)) {
-          connectionStateClass = "received";
-          connectionStateIcon = ico32_buddy_accept;
-          onClickAction = () => {
-            this.connectBuddy(get(atom, "uri"), existingBuddyConnection);
-          };
-        } else {
-          // also includes suggested (BuddySocket)Connections
-          connectionStateClass = "requestable";
-          connectionStateIcon = ico32_buddy_add;
-          onClickAction = () => {
-            this.connectBuddy(get(atom, "uri"), existingBuddyConnection);
-          };
-        }
-
-        return (
-          <div
-            className={
-              "add-buddy__addbuddymenu__content__selection__buddy " +
-              connectionStateClass
-            }
-            key={get(atom, "uri")}
-            onClick={onClickAction}
-          >
-            <WonAtomHeader atom={atom} hideTimestamp={true} />
-            <svg className="add-buddy__addbuddymenu__content__selection__buddy__status">
-              <use xlinkHref={connectionStateIcon} href={connectionStateIcon} />
-            </svg>
-          </div>
-        );
-      });
-
-    const dropdownElement = this.state.contextMenuOpen && (
-      <div className="add-buddy__addbuddymenu">
-        <div className="add-buddy__addbuddymenu__content">
-          <div className="topline">
-            <div
-              className="add-buddy__addbuddymenu__header clickable"
-              onClick={() => this.setState({ contextMenuOpen: false })}
-            >
-              <svg className="add-buddy__addbuddymenu__header__icon">
-                <use xlinkHref={ico32_buddy_add} href={ico32_buddy_add} />
-              </svg>
-              <span className="add-buddy__addbuddymenu__header__text hide-in-responsive">
-                Add as Buddy&#8230;
-              </span>
-            </div>
-          </div>
-          <div className="add-buddy__addbuddymenu__content__selection">
-            {buddySelectionElement}
-          </div>
-        </div>
-      </div>
-    );
-
-    let actionButton;
-
-    if (this.props.immediateConnectBuddy) {
-      const existingBuddyConnection = get(
-        this.props.immediateConnectBuddy,
-        "connections"
-      ).find(
-        conn => get(conn, "targetSocketUri") === this.props.targetBuddySocketUri
-      );
-
-      let connectionStateClass;
-      let onClickAction = undefined;
-      let connectionStateIcon;
-      let connectionStateLabel;
-
-      if (connectionUtils.isConnected(existingBuddyConnection)) {
-        connectionStateClass = "connected";
-        connectionStateIcon = ico32_buddy_accept;
-        connectionStateLabel = "Already a Buddy";
-        onClickAction = () => {
-          this.removeBuddy(existingBuddyConnection);
-        };
-      } else if (connectionUtils.isRequestSent(existingBuddyConnection)) {
-        connectionStateClass = "sent";
-        connectionStateIcon = ico32_buddy_waiting;
-        connectionStateLabel = "Buddy Request sent";
-        onClickAction = () => {
-          this.removeBuddy(existingBuddyConnection);
-        };
-      } else if (connectionUtils.isClosed(existingBuddyConnection)) {
-        connectionStateClass = "closed";
-        connectionStateIcon = ico32_buddy_deny;
-        connectionStateLabel = "Buddy Request denied";
-      } else if (connectionUtils.isRequestReceived(existingBuddyConnection)) {
-        connectionStateClass = "received";
-        connectionStateIcon = ico32_buddy_accept;
-        connectionStateLabel = "Accept Buddy Request";
-        onClickAction = () => {
-          this.connectBuddy(
-            get(this.props.immediateConnectBuddy, "uri"),
-            existingBuddyConnection
-          );
-        };
-      } else {
-        // also includes suggested (BuddySocket)Connections
-        connectionStateClass = "requestable";
-        connectionStateIcon = ico32_buddy_add;
-        connectionStateLabel = "Add as Buddy";
-        onClickAction = () => {
-          this.connectBuddy(
-            get(this.props.immediateConnectBuddy, "uri"),
-            existingBuddyConnection
-          );
-        };
+        return;
       }
-
-      actionButton = (
-        <div
-          className={"add-buddy__addbuddymenu__header " + connectionStateClass}
-          onClick={onClickAction}
-        >
-          <svg className="add-buddy__addbuddymenu__header__icon">
-            <use xlinkHref={connectionStateIcon} href={connectionStateIcon} />
-          </svg>
-          <span className="add-buddy__addbuddymenu__header__text hide-in-responsive">
-            {connectionStateLabel}
-          </span>
-        </div>
-      );
-    } else {
-      actionButton = (
-        <div
-          className="add-buddy__addbuddymenu__header clickable"
-          onClick={() => this.setState({ contextMenuOpen: true })}
-        >
-          <svg className="add-buddy__addbuddymenu__header__icon">
-            <use xlinkHref={ico32_buddy_add} href={ico32_buddy_add} />
-          </svg>
-          <span className="add-buddy__addbuddymenu__header__text hide-in-responsive">
-            Add as Buddy&#8230;
-          </span>
-        </div>
-      );
     }
+    document.addEventListener("mousedown", handleClick, false);
 
-    return (
-      <won-add-buddy
-        class={this.props.className ? this.props.className : ""}
-        ref={node => (this.node = node)}
-      >
-        {actionButton}
-        {dropdownElement}
-      </won-add-buddy>
-    );
-  }
+    return function cleanup() {
+      document.removeEventListener("mousedown", handleClick, false);
+    };
+  });
 
-  componentWillMount() {
-    document.addEventListener("mousedown", this.handleClick, false);
-  }
-  componentWillUnmount() {
-    document.removeEventListener("mousedown", this.handleClick, false);
-  }
-
-  handleClick(e) {
-    if (!this.node.contains(e.target) && this.state.contextMenuOpen) {
-      this.setState({ contextMenuOpen: false });
-
-      return;
-    }
-  }
-
-  removeBuddy(existingBuddyConnection, message = "") {
+  function removeBuddy(existingBuddyConnection, message = "") {
     let dialogText;
     if (connectionUtils.isConnected(existingBuddyConnection)) {
       dialogText = "Remove Buddy?";
@@ -306,22 +75,31 @@ class WonAddBuddy extends React.Component {
         {
           caption: "Yes",
           callback: () => {
-            this.props.connectionClose(existingBuddyConnectionUri, message);
-            this.props.hideModalDialog();
+            dispatch(
+              actionCreators.connections__close(
+                existingBuddyConnectionUri,
+                message
+              )
+            );
+            dispatch(actionCreators.view__hideModalDialog());
           },
         },
         {
           caption: "No",
           callback: () => {
-            this.props.hideModalDialog();
+            dispatch(actionCreators.view__hideModalDialog());
           },
         },
       ],
     };
-    this.props.showModalDialog(payload);
+    dispatch(actionCreators.view__showModalDialog(payload));
   }
 
-  connectBuddy(selectedAtomUri, existingBuddyConnection, message = "") {
+  function connectBuddy(
+    selectedAtomUri,
+    existingBuddyConnection,
+    message = ""
+  ) {
     const dialogText = connectionUtils.isRequestReceived(
       existingBuddyConnection
     )
@@ -343,52 +121,222 @@ class WonAddBuddy extends React.Component {
                 existingBuddyConnection,
                 "targetSocketUri"
               );
-              this.props.connectSockets(
-                senderSocketUri,
-                targetSocketUri,
-                message
+              dispatch(
+                actionCreators.atoms__connectSockets(
+                  senderSocketUri,
+                  targetSocketUri,
+                  message
+                )
               );
             } else {
-              this.props.connect(
-                selectedAtomUri,
-                this.props.atomUri,
-                vocab.BUDDY.BuddySocketCompacted,
-                vocab.BUDDY.BuddySocketCompacted,
-                message
+              dispatch(
+                actionCreators.atoms__connect(
+                  selectedAtomUri,
+                  get(atom, "uri"),
+                  vocab.BUDDY.BuddySocketCompacted,
+                  vocab.BUDDY.BuddySocketCompacted,
+                  message
+                )
               );
             }
-            this.props.hideModalDialog();
+            dispatch(actionCreators.view__hideModalDialog());
           },
         },
         {
           caption: "No",
           callback: () => {
             if (connectionUtils.isRequestReceived(existingBuddyConnection)) {
-              this.props.connectionClose(existingBuddyConnectionUri, message);
+              dispatch(
+                actionCreators.connections__close(
+                  existingBuddyConnectionUri,
+                  message
+                )
+              );
             }
 
-            this.props.hideModalDialog();
+            dispatch(actionCreators.view__hideModalDialog());
           },
         },
       ],
     };
-    this.props.showModalDialog(payload);
+    dispatch(actionCreators.view__showModalDialog(payload));
   }
+
+  let buddySelectionElement =
+    ownedAtomsWithBuddySocketArray &&
+    ownedAtomsWithBuddySocketArray.map(atom => {
+      const existingBuddyConnection = get(atom, "connections").find(
+        conn => get(conn, "targetSocketUri") === targetBuddySocketUri
+      );
+
+      let connectionStateClass;
+      let onClickAction = undefined;
+      let connectionStateIcon;
+
+      if (connectionUtils.isConnected(existingBuddyConnection)) {
+        connectionStateClass = "connected";
+        connectionStateIcon = ico32_buddy_accept;
+        onClickAction = () => {
+          removeBuddy(existingBuddyConnection);
+        };
+      } else if (connectionUtils.isRequestSent(existingBuddyConnection)) {
+        connectionStateClass = "sent";
+        connectionStateIcon = ico32_buddy_waiting;
+        onClickAction = () => {
+          removeBuddy(existingBuddyConnection);
+        };
+      } else if (connectionUtils.isClosed(existingBuddyConnection)) {
+        connectionStateClass = "closed";
+        connectionStateIcon = ico32_buddy_deny;
+      } else if (connectionUtils.isRequestReceived(existingBuddyConnection)) {
+        connectionStateClass = "received";
+        connectionStateIcon = ico32_buddy_accept;
+        onClickAction = () => {
+          connectBuddy(get(atom, "uri"), existingBuddyConnection);
+        };
+      } else {
+        // also includes suggested (BuddySocket)Connections
+        connectionStateClass = "requestable";
+        connectionStateIcon = ico32_buddy_add;
+        onClickAction = () => {
+          connectBuddy(get(atom, "uri"), existingBuddyConnection);
+        };
+      }
+
+      return (
+        <div
+          className={
+            "add-buddy__addbuddymenu__content__selection__buddy " +
+            connectionStateClass
+          }
+          key={get(atom, "uri")}
+          onClick={onClickAction}
+        >
+          <WonAtomHeader atom={atom} hideTimestamp={true} />
+          <svg className="add-buddy__addbuddymenu__content__selection__buddy__status">
+            <use xlinkHref={connectionStateIcon} href={connectionStateIcon} />
+          </svg>
+        </div>
+      );
+    });
+
+  const dropdownElement = contextMenuOpen && (
+    <div className="add-buddy__addbuddymenu">
+      <div className="add-buddy__addbuddymenu__content">
+        <div className="topline">
+          <div
+            className="add-buddy__addbuddymenu__header clickable"
+            onClick={() => setContextMenuOpen(false)}
+          >
+            <svg className="add-buddy__addbuddymenu__header__icon">
+              <use xlinkHref={ico32_buddy_add} href={ico32_buddy_add} />
+            </svg>
+            <span className="add-buddy__addbuddymenu__header__text hide-in-responsive">
+              Add as Buddy&#8230;
+            </span>
+          </div>
+        </div>
+        <div className="add-buddy__addbuddymenu__content__selection">
+          {buddySelectionElement}
+        </div>
+      </div>
+    </div>
+  );
+
+  let actionButton;
+
+  if (immediateConnectBuddy) {
+    const existingBuddyConnection = get(
+      immediateConnectBuddy,
+      "connections"
+    ).find(conn => get(conn, "targetSocketUri") === targetBuddySocketUri);
+
+    let connectionStateClass;
+    let onClickAction = undefined;
+    let connectionStateIcon;
+    let connectionStateLabel;
+
+    if (connectionUtils.isConnected(existingBuddyConnection)) {
+      connectionStateClass = "connected";
+      connectionStateIcon = ico32_buddy_accept;
+      connectionStateLabel = "Already a Buddy";
+      onClickAction = () => {
+        removeBuddy(existingBuddyConnection);
+      };
+    } else if (connectionUtils.isRequestSent(existingBuddyConnection)) {
+      connectionStateClass = "sent";
+      connectionStateIcon = ico32_buddy_waiting;
+      connectionStateLabel = "Buddy Request sent";
+      onClickAction = () => {
+        removeBuddy(existingBuddyConnection);
+      };
+    } else if (connectionUtils.isClosed(existingBuddyConnection)) {
+      connectionStateClass = "closed";
+      connectionStateIcon = ico32_buddy_deny;
+      connectionStateLabel = "Buddy Request denied";
+    } else if (connectionUtils.isRequestReceived(existingBuddyConnection)) {
+      connectionStateClass = "received";
+      connectionStateIcon = ico32_buddy_accept;
+      connectionStateLabel = "Accept Buddy Request";
+      onClickAction = () => {
+        connectBuddy(
+          get(immediateConnectBuddy, "uri"),
+          existingBuddyConnection
+        );
+      };
+    } else {
+      // also includes suggested (BuddySocket)Connections
+      connectionStateClass = "requestable";
+      connectionStateIcon = ico32_buddy_add;
+      connectionStateLabel = "Add as Buddy";
+      onClickAction = () => {
+        connectBuddy(
+          get(immediateConnectBuddy, "uri"),
+          existingBuddyConnection
+        );
+      };
+    }
+
+    actionButton = (
+      <div
+        className={"add-buddy__addbuddymenu__header " + connectionStateClass}
+        onClick={onClickAction}
+      >
+        <svg className="add-buddy__addbuddymenu__header__icon">
+          <use xlinkHref={connectionStateIcon} href={connectionStateIcon} />
+        </svg>
+        <span className="add-buddy__addbuddymenu__header__text hide-in-responsive">
+          {connectionStateLabel}
+        </span>
+      </div>
+    );
+  } else {
+    actionButton = (
+      <div
+        className="add-buddy__addbuddymenu__header clickable"
+        onClick={() => setContextMenuOpen(true)}
+      >
+        <svg className="add-buddy__addbuddymenu__header__icon">
+          <use xlinkHref={ico32_buddy_add} href={ico32_buddy_add} />
+        </svg>
+        <span className="add-buddy__addbuddymenu__header__text hide-in-responsive">
+          Add as Buddy&#8230;
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <won-add-buddy
+      class={className ? className : ""}
+      ref={node => (thisNode = node)}
+    >
+      {actionButton}
+      {dropdownElement}
+    </won-add-buddy>
+  );
 }
 WonAddBuddy.propTypes = {
-  atomUri: PropTypes.string.isRequired,
+  atom: PropTypes.object.isRequired,
   className: PropTypes.string,
-  ownedAtomsWithBuddySocketArray: PropTypes.arrayOf(PropTypes.object),
-  immediateConnectBuddy: PropTypes.object,
-  targetBuddySocketUri: PropTypes.string,
-  hideModalDialog: PropTypes.func,
-  showModalDialog: PropTypes.func,
-  connect: PropTypes.func,
-  connectSockets: PropTypes.func,
-  connectionClose: PropTypes.func,
 };
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonAddBuddy);
