@@ -65,9 +65,15 @@ export default function PageConnections() {
     contentElements = (
       <main className="overview__justconnection">
         {isSelectedConnectionGroupChat ? (
-          <WonGroupAtomMessages />
+          <WonGroupAtomMessages
+            connection={selectedConnection}
+            backToChats={!postUri}
+          />
         ) : (
-          <WonAtomMessages />
+          <WonAtomMessages
+            connection={selectedConnection}
+            backToChats={!postUri}
+          />
         )}
       </main>
     );
@@ -84,9 +90,15 @@ export default function PageConnections() {
         {selectedConnection ? (
           <main className="overview__right">
             {isSelectedConnectionGroupChat ? (
-              <WonGroupAtomMessages />
+              <WonGroupAtomMessages
+                connection={selectedConnection}
+                backToChats={!postUri}
+              />
             ) : (
-              <WonAtomMessages />
+              <WonAtomMessages
+                connection={selectedConnection}
+                backToChats={!postUri}
+              />
             )}
           </main>
         ) : (

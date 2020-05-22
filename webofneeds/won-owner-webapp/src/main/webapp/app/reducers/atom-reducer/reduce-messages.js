@@ -1335,24 +1335,12 @@ export function updateMessageStatus(state, messageUri, connectionUri, atomUri) {
   const hasCollapsedMessageState =
     isProposed || isClaimed || isAgreed || isRejected || isRetracted;
 
-  state = markMessageAsCollapsed(
+  return markMessageAsCollapsed(
     state,
     messageUri,
     connectionUri,
     atomUri,
     hasCollapsedMessageState
-  );
-
-  return state.setIn(
-    [
-      atomUri,
-      "connections",
-      connectionUri,
-      "messages",
-      messageUri,
-      "isMessageStatusUpToDate",
-    ],
-    true
   );
 }
 

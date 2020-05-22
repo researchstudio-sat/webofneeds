@@ -1,12 +1,12 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { connect } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as messageUtils from "../redux/utils/message-utils";
+import { rdfTextfieldHelpText } from "../won-label-utils.js";
 import { hasMessagesToLoad } from "../redux/selectors/connection-selectors";
-import { getUnreadMessagesByConnectionUri } from "../redux/selectors/message-selectors";
-import { get, getIn, getQueryParams, generateLink } from "../utils";
+import { get, getIn, generateLink } from "../utils";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import vocab from "../service/vocab.js";
@@ -25,105 +25,134 @@ import WonAtomContentMessage from "./messages/atom-content-message.jsx";
 import WonConnectionMessage from "./messages/connection-message.jsx";
 import { actionCreators } from "../actions/actions.js";
 import * as viewSelectors from "../redux/selectors/view-selectors";
-import { withRouter } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
-const rdfTextfieldHelpText =
-  "Expects valid turtle. " +
-  `<${vocab.WONMSG.uriPlaceholder.event}> will ` +
-  "be replaced by the uri generated for this message. " +
-  "Use it, so your TTL can be found when parsing the messages. " +
-  "See `won.defaultTurtlePrefixes` " +
-  "for prefixes that will be added automatically. E.g." +
-  `\`<${vocab.WONMSG.uriPlaceholder.event}> con:text "hello world!". \``;
+export default function WonGroupAtomMessages({
+  connection,
+  backToChats,
+  className,
+}) {
+  const history = useHistory();
+  const dispatch = useDispatch();
+  const chatContainerRef = React.createRef();
+  useEffect(() => {
+    if (snapBottom) {
+      scrollToBottom();
+    }
 
-const mapStateToProps = (state, ownProps) => {
-  const { connectionUri, postUri } = getQueryParams(ownProps.location);
-  const ownedAtom = generalSelectors.getOwnedAtomByConnectionUri(
-    state,
-    connectionUri
+    ensureMessagesAreLoaded();
+  });
+  const [snapBottom, setSnapBottom] = useState(true);
+
+  const connectionUri = get(connection, "uri");
+  const senderAtom = useSelector(state =>
+    generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri)
   );
-  const connection = getIn(ownedAtom, ["connections", connectionUri]);
+  const senderAtomUri = get(senderAtom, "uri");
   const targetAtomUri = get(connection, "targetAtomUri");
-  const targetAtom = getIn(state, ["atoms", targetAtomUri]);
+  const targetAtom = useSelector(state =>
+    getIn(state, ["atoms", targetAtomUri])
+  );
   const allChatMessages = get(connection, "messages");
   const chatMessages =
     allChatMessages &&
     allChatMessages
-      .filter(msg => !msg.getIn(["references", "forwards"])) //FILTER OUT ALL FORWARD MESSAGE ENVELOPES JUST IN CASE
+      .filter(msg => !getIn(msg, ["references", "forwards"])) //FILTER OUT ALL FORWARD MESSAGE ENVELOPES JUST IN CASE
       .filter(msg => !messageUtils.isAtomHintMessage(msg)) //FILTER OUT ALL HINT MESSAGES
       .filter(msg => !messageUtils.isSocketHintMessage(msg));
-  const hasConnectionMessagesToLoad = hasMessagesToLoad(state, connectionUri);
+  const hasConnectionMessagesToLoad = useSelector(state =>
+    hasMessagesToLoad(state, connectionUri)
+  );
 
-  let sortedMessages = chatMessages && chatMessages.toArray();
-  sortedMessages &&
-    sortedMessages.sort(function(a, b) {
-      const aDate = a.get("date");
-      const bDate = b.get("date");
+  const sortedMessages = chatMessages
+    ? chatMessages.toArray().sort(function(a, b) {
+        const aDate = get(a, "date");
+        const bDate = get(b, "date");
 
-      const aTime = aDate && aDate.getTime();
-      const bTime = bDate && bDate.getTime();
+        const aTime = aDate && aDate.getTime();
+        const bTime = bDate && bDate.getTime();
 
-      return aTime - bTime;
-    });
+        return aTime - bTime;
+      })
+    : [];
 
-  const unreadMessages = getUnreadMessagesByConnectionUri(state, connectionUri);
+  const unreadMessages =
+    chatMessages &&
+    chatMessages.filter(msg => messageUtils.isMessageUnread(msg));
 
-  const process = get(state, "process");
+  const processState = useSelector(state => get(state, "process"));
 
   const isConnected = connectionUtils.isConnected(connection);
+  const unreadMessageCount = unreadMessages && unreadMessages.size;
+  const isProcessingLoadingMessages =
+    connection &&
+    processUtils.isConnectionLoadingMessages(processState, connectionUri);
+  const isSentRequest = connection && connectionUtils.isRequestSent(connection);
+  const isReceivedRequest =
+    connection && connectionUtils.isRequestReceived(connection);
 
-  return {
-    backToChats: !postUri, //if there is no postUri in the route we know that we just want to go back to the chats overview (achieved by clearing the params)
-    className: ownProps.className,
-    ownedAtom,
-    targetAtom,
-    targetAtomUri,
-    connectionUri,
-    connection,
-    sortedMessagesArray: sortedMessages,
-    chatMessages,
-    unreadMessageCount: unreadMessages && unreadMessages.size,
-    isProcessingLoadingMessages:
-      connection &&
-      processUtils.isConnectionLoadingMessages(process, connectionUri),
-    lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
-    isSentRequest: connection && connectionUtils.isRequestSent(connection),
-    isReceivedRequest:
-      connection && connectionUtils.isRequestReceived(connection),
-    isConnected: isConnected,
-    isSuggested: connection && connectionUtils.isSuggested(connection),
-    shouldShowRdf: viewSelectors.showRdf(state),
-    // if the connect-message is here, everything else should be as well
-    hasConnectionMessagesToLoad,
-    connectionOrAtomsLoading:
-      !connection ||
-      !targetAtom ||
-      !ownedAtom ||
-      processUtils.isAtomLoading(process, ownedAtom.get("uri")) ||
-      processUtils.isAtomLoading(process, targetAtomUri) ||
-      processUtils.isConnectionLoading(process, connectionUri),
-    isConnectionLoading: processUtils.isConnectionLoading(
-      process,
-      connectionUri
-    ),
-    showAtomContentMessage: !!(targetAtomUri && !isConnected),
-  };
-};
+  const isSuggested = connection && connectionUtils.isSuggested(connection);
+  const shouldShowRdf = useSelector(viewSelectors.showRdf);
+  // if the connect-message is here, everything else should be as well
 
-const mapDispatchToProps = dispatch => {
-  return {
-    hideAddMessageContent: () => {
-      dispatch(actionCreators.view__hideAddMessageContent());
-    },
-    sendChatMessage: (
-      trimmedMsg,
-      additionalContent,
-      referencedContent,
-      senderSocketUri,
-      targetSocketUri,
-      connectionUri,
-      isTTL
-    ) => {
+  const isConnectionLoading = processUtils.isConnectionLoading(
+    processState,
+    connectionUri
+  );
+  const connectionOrAtomsLoading =
+    !connection ||
+    !targetAtom ||
+    !senderAtom ||
+    processUtils.isAtomLoading(processState, senderAtomUri) ||
+    processUtils.isAtomLoading(processState, targetAtomUri) ||
+    isConnectionLoading;
+
+  const showAtomContentMessage = !!(targetAtomUri && !isConnected);
+
+  function goToUnreadMessages() {
+    snapToBottom();
+  }
+
+  function snapToBottom() {
+    if (!snapBottom) {
+      setSnapBottom(true);
+    }
+    scrollToBottom();
+  }
+
+  function unsnapFromBottom() {
+    if (snapBottom) {
+      setSnapBottom(false);
+    }
+  }
+
+  function scrollToBottom() {
+    chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+  }
+  function onScroll() {
+    const sc = chatContainerRef.current;
+    const isAlmostAtBottom =
+      sc.scrollTop + sc.offsetHeight >= sc.scrollHeight - 75;
+    if (isAlmostAtBottom) {
+      snapToBottom();
+    } else {
+      unsnapFromBottom();
+    }
+  }
+
+  function send(
+    chatMessage,
+    additionalContent,
+    referencedContent,
+    isTTL = false
+  ) {
+    dispatch(actionCreators.view__hideAddMessageContent());
+
+    const trimmedMsg = chatMessage.trim();
+    if (trimmedMsg || additionalContent || referencedContent) {
+      const senderSocketUri = get(connection, "socketUri");
+      const targetSocketUri = get(connection, "targetSocketUri");
+
       dispatch(
         actionCreators.connections__sendChatMessage(
           trimmedMsg,
@@ -135,410 +164,268 @@ const mapDispatchToProps = dispatch => {
           isTTL
         )
       );
-    },
-    connectSockets: (senderSocketUri, targetSocketUri, message) => {
-      dispatch(
-        actionCreators.atoms__connectSockets(
-          senderSocketUri,
-          targetSocketUri,
-          message
-        )
-      );
-    },
-    rateConnection: (connectionUri, rating) => {
-      dispatch(actionCreators.connections__rate(connectionUri, rating));
-    },
-    closeConnection: connectionUri => {
-      dispatch(actionCreators.connections__close(connectionUri));
-    },
-    showMoreMessages: (connectionUri, msgCount) => {
-      dispatch(
-        actionCreators.connections__showMoreMessages(connectionUri, msgCount)
-      );
-    },
-    showLatestMessages: (connectionUri, msgCount) => {
-      dispatch(
-        actionCreators.connections__showLatestMessages(connectionUri, msgCount)
-      );
-    },
-  };
-};
-
-class GroupAtomMessages extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      snapBottom: true,
-    };
-    this.chatContainerRef = React.createRef();
-  }
-
-  render() {
-    let footerElement = undefined;
-
-    const rdfLinkToConnection = this.props.shouldShowRdf && (
-      <a
-        className="rdflink clickable"
-        target="_blank"
-        rel="noopener noreferrer"
-        href={this.props.connectionUri}
-      >
-        <svg className="rdflink__small">
-          <use xlinkHref={rdf_logo_1} href={rdf_logo_1} />
-        </svg>
-        <span className="rdflink__label">Connection</span>
-      </a>
-    );
-
-    const unreadIndicatorElement =
-      this.props.unreadMessageCount && !this.state.snapBottom ? (
-        <div className="gpm__content__unreadindicator">
-          <div
-            className="gpm__content__unreadindicator__content won-button--filled red"
-            onClick={this.goToUnreadMessages.bind(this)}
-          >
-            {this.props.unreadMessageCount} unread Messages
-          </div>
-        </div>
-      ) : (
-        undefined
-      );
-
-    const loadSpinnerElement = (
-      <div className="gpm__content__loadspinner">
-        <svg className="hspinner">
-          <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
-        </svg>
-      </div>
-    );
-
-    const headerElement = (
-      <div className="gpm__header">
-        <div className="gpm__header__back">
-          <a
-            className="gpm__header__back__button clickable"
-            onClick={
-              this.props.backToChats
-                ? () => this.props.history.push("/connections")
-                : this.props.history.goBack
-            }
-          >
-            <svg className="gpm__header__back__button__icon">
-              <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
-            </svg>
-          </a>
-        </div>
-        <WonConnectionHeader connection={this.props.connection} />
-        <WonShareDropdown atom={this.props.targetAtom} />
-        <WonConnectionContextDropdown connection={this.props.connection} />
-      </div>
-    );
-
-    const chatMessages =
-      this.props.sortedMessagesArray &&
-      this.props.sortedMessagesArray.map((msg, index) => {
-        return (
-          <WonConnectionMessage
-            key={get(msg, "uri") + "-" + index}
-            message={msg}
-            connection={this.props.connection}
-            groupChatMessage={true}
-          />
-        );
-      });
-
-    const contentElement = (
-      <div
-        className="gpm__content"
-        ref={this.chatContainerRef}
-        onScroll={this.onScroll.bind(this)}
-      >
-        {unreadIndicatorElement}
-        {this.props.showAtomContentMessage && (
-          <WonAtomContentMessage atom={this.props.targetAtom} />
-        )}
-        {(this.props.isConnectionLoading ||
-          this.props.isProcessingLoadingMessages) &&
-          loadSpinnerElement}
-        {!this.props.isSuggested &&
-          !this.props.isConnectionLoading &&
-          !this.props.isProcessingLoadingMessages &&
-          this.props.hasConnectionMessagesToLoad && (
-            <button
-              className="gpm__content__loadbutton won-button--outlined thin red"
-              onClick={this.loadPreviousMessages.bind(this)}
-            >
-              Load previous messages
-            </button>
-          )}
-
-        {chatMessages}
-        {rdfLinkToConnection}
-      </div>
-    );
-
-    if (this.props.isConnected) {
-      footerElement = (
-        <div className="gpm__footer">
-          <ChatTextfield
-            className="gpm__footer__chattextfield"
-            connection={this.props.connection}
-            placeholder={
-              this.props.shouldShowRdf ? "Enter TTL..." : "Your message..."
-            }
-            submitButtonLabel={this.props.shouldShowRdf ? "Send RDF" : "Send"}
-            helpText={this.props.shouldShowRdf ? rdfTextfieldHelpText : ""}
-            allowEmptySubmit={false}
-            allowDetails={!this.props.shouldShowRdf}
-            isCode={this.props.shouldShowRdf}
-            onSubmit={({ value, additionalContent, referencedContent }) =>
-              this.send(
-                value,
-                additionalContent,
-                referencedContent,
-                this.props.shouldShowRdf
-              )
-            }
-          />
-        </div>
-      );
-    } else if (this.props.isSentRequest) {
-      footerElement = (
-        <div className="gpm__footer">
-          Waiting for the Group Administrator to accept your request.
-        </div>
-      );
-    } else if (this.props.isReceivedRequest) {
-      footerElement = (
-        <div className="gpm__footer">
-          <ChatTextfield
-            className="gpm__footer__chattextfield"
-            connection={this.props.connection}
-            placeholder="Message (optional)"
-            submitButtonLabel="Accept&#160;Invite"
-            allowEmptySubmit={true}
-            allowDetails={false}
-            onSubmit={({ value }) => {
-              const senderSocketUri = get(this.props.connection, "socketUri");
-              const targetSocketUri = get(
-                this.props.connection,
-                "targetSocketUri"
-              );
-              this.props.connectSockets(
-                senderSocketUri,
-                targetSocketUri,
-                value
-              );
-            }}
-          />
-          <WonLabelledHr className="gpm__footer__labelledhr" label="Or" />
-          <button
-            className="gpm__footer__button won-button--filled black"
-            onClick={() => this.closeConnection()}
-          >
-            Decline
-          </button>
-        </div>
-      );
-    } else if (this.props.isSuggested) {
-      footerElement = (
-        <div className="gpm__footer">
-          <ChatTextfield
-            className="gpm__footer__chattextfield"
-            connection={this.props.connection}
-            placeholder="Message (optional)"
-            submitButtonLabel="Ask&#160;to&#160;Join"
-            allowEmptySubmit={true}
-            allowDetails={false}
-            showPersonas={!this.props.connection}
-            onSubmit={({ value }) => this.sendRequest(value)}
-          />
-          <WonLabelledHr className="gpm__footer__labelledhr" label="Or" />
-          <button
-            className="gpm__footer__button won-button--filled black"
-            onClick={() => this.closeConnection(true)}
-          >
-            Bad match - remove!
-          </button>
-        </div>
-      );
-    }
-
-    return (
-      <won-group-atom-messages
-        class={
-          (this.props.className || "") +
-          (this.props.connectionOrAtomsLoading ? " won-is-loading " : "")
-        }
-      >
-        {headerElement}
-        {contentElement}
-        {footerElement}
-      </won-group-atom-messages>
-    );
-  }
-
-  componentDidUpdate() {
-    if (this.state.snapBottom) {
-      this.scrollToBottom();
-    }
-
-    this.ensureMessagesAreLoaded();
-  }
-
-  goToUnreadMessages() {
-    this.snapToBottom();
-  }
-
-  snapToBottom() {
-    if (!this.state.snapBottom) {
-      this.setState({ snapBottom: true });
-    }
-    this.scrollToBottom();
-  }
-
-  unsnapFromBottom() {
-    if (this.state.snapBottom) {
-      this.setState({ snapBottom: false });
     }
   }
 
-  scrollToBottom() {
-    this.chatContainerRef.current.scrollTop = this.chatContainerRef.current.scrollHeight;
-  }
-  onScroll() {
-    const sc = this.chatContainerRef.current;
-    const isAlmostAtBottom =
-      sc.scrollTop + sc.offsetHeight >= sc.scrollHeight - 75;
-    if (isAlmostAtBottom) {
-      this.snapToBottom();
-    } else {
-      this.unsnapFromBottom();
-    }
-  }
-
-  send(chatMessage, additionalContent, referencedContent, isTTL = false) {
-    this.props.hideAddMessageContent();
-
-    const trimmedMsg = chatMessage.trim();
-    if (trimmedMsg || additionalContent || referencedContent) {
-      const senderSocketUri = get(this.props.connection, "socketUri");
-      const targetSocketUri = get(this.props.connection, "targetSocketUri");
-
-      this.props.sendChatMessage(
-        trimmedMsg,
-        additionalContent,
-        referencedContent,
-        senderSocketUri,
-        targetSocketUri,
-        get(this.props.connection, "uri"),
-        isTTL
-      );
-    }
-  }
-
-  sendRequest(message) {
-    this.props.rateConnection(
-      this.props.connectionUri,
-      vocab.WONCON.binaryRatingGood
+  function sendRequest(message) {
+    dispatch(
+      actionCreators.connections__rate(
+        connectionUri,
+        vocab.WONCON.binaryRatingGood
+      )
     );
-    this.props.connectSockets(
-      get(this.props.connection, "socketUri"),
-      get(this.props.connection, "targetSocketUri"),
-      message
+    dispatch(
+      actionCreators.atoms__connectSockets(
+        get(connection, "socketUri"),
+        get(connection, "targetSocketUri"),
+        message
+      )
     );
-    this.props.history.push(
-      generateLink(this.props.history.location, {
-        connectionUri: this.props.connectionUri,
+    history.push(
+      generateLink(history.location, {
+        connectionUri: connectionUri,
       })
     );
   }
 
-  closeConnection(rateBad = false) {
+  function closeConnection(rateBad = false) {
     if (rateBad) {
-      this.props.rateConnection(
-        get(this.props.connection, "uri"),
-        vocab.WONCON.binaryRatingBad
+      dispatch(
+        actionCreators.connections__rate(
+          connectionUri,
+          vocab.WONCON.binaryRatingBad
+        )
       );
     }
-    this.props.closeConnection(get(this.props.connection, "uri"));
-    if (this.props.backToChats) {
-      this.props.history.push(
-        generateLink(this.props.history.location, {
+    dispatch(actionCreators.connections__close(connectionUri));
+    if (backToChats) {
+      history.push(
+        generateLink(history.location, {
           connectionUri: undefined,
         })
       );
     } else {
-      this.props.history.goBack();
+      history.goBack();
     }
   }
 
-  ensureMessagesAreLoaded() {
+  function ensureMessagesAreLoaded() {
     const INITIAL_MESSAGECOUNT = 10;
     if (
-      this.props.connection &&
-      !this.props.isConnectionLoading &&
-      !this.props.isProcessingLoadingMessages &&
-      get(this.props.connection, "messages").size < INITIAL_MESSAGECOUNT &&
-      this.props.hasConnectionMessagesToLoad
+      connection &&
+      !isConnectionLoading &&
+      !isProcessingLoadingMessages &&
+      get(connection, "messages").size < INITIAL_MESSAGECOUNT &&
+      hasConnectionMessagesToLoad
     ) {
-      this.props.showLatestMessages(
-        get(this.props.connection, "uri"),
-        INITIAL_MESSAGECOUNT
+      dispatch(
+        actionCreators.connections__showLatestMessages(
+          connectionUri,
+          INITIAL_MESSAGECOUNT
+        )
       );
     }
   }
 
-  loadPreviousMessages() {
+  function loadPreviousMessages() {
     const MORE_MESSAGECOUNT = 5;
-    if (
-      this.props.connection &&
-      !this.props.isConnectionLoading &&
-      !this.props.isProcessingLoadingMessages
-    ) {
-      this.props.showMoreMessages(
-        get(this.props.connection, "uri"),
-        MORE_MESSAGECOUNT
+    if (connection && !isConnectionLoading && !isProcessingLoadingMessages) {
+      dispatch(
+        actionCreators.connections__showMoreMessages(
+          connectionUri,
+          MORE_MESSAGECOUNT
+        )
       );
     }
   }
+
+  let footerElement = undefined;
+
+  const rdfLinkToConnection = shouldShowRdf && (
+    <a
+      className="rdflink clickable"
+      target="_blank"
+      rel="noopener noreferrer"
+      href={connectionUri}
+    >
+      <svg className="rdflink__small">
+        <use xlinkHref={rdf_logo_1} href={rdf_logo_1} />
+      </svg>
+      <span className="rdflink__label">Connection</span>
+    </a>
+  );
+
+  const unreadIndicatorElement =
+    unreadMessageCount && !snapBottom ? (
+      <div className="gpm__content__unreadindicator">
+        <div
+          className="gpm__content__unreadindicator__content won-button--filled red"
+          onClick={goToUnreadMessages.bind(this)}
+        >
+          {unreadMessageCount} unread Messages
+        </div>
+      </div>
+    ) : (
+      undefined
+    );
+
+  const loadSpinnerElement = (
+    <div className="gpm__content__loadspinner">
+      <svg className="hspinner">
+        <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
+      </svg>
+    </div>
+  );
+
+  const headerElement = (
+    <div className="gpm__header">
+      <div className="gpm__header__back">
+        <a
+          className="gpm__header__back__button clickable"
+          onClick={
+            backToChats ? () => history.push("/connections") : history.goBack
+          }
+        >
+          <svg className="gpm__header__back__button__icon">
+            <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
+          </svg>
+        </a>
+      </div>
+      <WonConnectionHeader connection={connection} />
+      <WonShareDropdown atom={targetAtom} />
+      <WonConnectionContextDropdown connection={connection} />
+    </div>
+  );
+
+  const contentElement = (
+    <div
+      className="gpm__content"
+      ref={chatContainerRef}
+      onScroll={onScroll.bind(this)}
+    >
+      {unreadIndicatorElement}
+      {showAtomContentMessage && <WonAtomContentMessage atom={targetAtom} />}
+      {(isConnectionLoading || isProcessingLoadingMessages) &&
+        loadSpinnerElement}
+      {!isSuggested &&
+        !isConnectionLoading &&
+        !isProcessingLoadingMessages &&
+        hasConnectionMessagesToLoad && (
+          <button
+            className="gpm__content__loadbutton won-button--outlined thin red"
+            onClick={loadPreviousMessages.bind(this)}
+          >
+            Load previous messages
+          </button>
+        )}
+
+      {sortedMessages.map((msg, index) => {
+        return (
+          <WonConnectionMessage
+            key={get(msg, "uri") + "-" + index}
+            message={msg}
+            connection={connection}
+            groupChatMessage={true}
+          />
+        );
+      })}
+      {rdfLinkToConnection}
+    </div>
+  );
+
+  if (isConnected) {
+    footerElement = (
+      <div className="gpm__footer">
+        <ChatTextfield
+          className="gpm__footer__chattextfield"
+          connection={connection}
+          placeholder={shouldShowRdf ? "Enter TTL..." : "Your message..."}
+          submitButtonLabel={shouldShowRdf ? "Send RDF" : "Send"}
+          helpText={shouldShowRdf ? rdfTextfieldHelpText : ""}
+          allowEmptySubmit={false}
+          allowDetails={!shouldShowRdf}
+          isCode={shouldShowRdf}
+          onSubmit={({ value, additionalContent, referencedContent }) =>
+            send(value, additionalContent, referencedContent, shouldShowRdf)
+          }
+        />
+      </div>
+    );
+  } else if (isSentRequest) {
+    footerElement = (
+      <div className="gpm__footer">
+        Waiting for the Group Administrator to accept your request.
+      </div>
+    );
+  } else if (isReceivedRequest) {
+    footerElement = (
+      <div className="gpm__footer">
+        <ChatTextfield
+          className="gpm__footer__chattextfield"
+          connection={connection}
+          placeholder="Message (optional)"
+          submitButtonLabel="Accept&#160;Invite"
+          allowEmptySubmit={true}
+          allowDetails={false}
+          onSubmit={({ value }) => {
+            const senderSocketUri = get(connection, "socketUri");
+            const targetSocketUri = get(connection, "targetSocketUri");
+            dispatch(
+              actionCreators.atoms__connectSockets(
+                senderSocketUri,
+                targetSocketUri,
+                value
+              )
+            );
+          }}
+        />
+        <WonLabelledHr className="gpm__footer__labelledhr" label="Or" />
+        <button
+          className="gpm__footer__button won-button--filled black"
+          onClick={() => closeConnection()}
+        >
+          Decline
+        </button>
+      </div>
+    );
+  } else if (isSuggested) {
+    footerElement = (
+      <div className="gpm__footer">
+        <ChatTextfield
+          className="gpm__footer__chattextfield"
+          connection={connection}
+          placeholder="Message (optional)"
+          submitButtonLabel="Ask&#160;to&#160;Join"
+          allowEmptySubmit={true}
+          allowDetails={false}
+          showPersonas={!connection}
+          onSubmit={({ value }) => sendRequest(value)}
+        />
+        <WonLabelledHr className="gpm__footer__labelledhr" label="Or" />
+        <button
+          className="gpm__footer__button won-button--filled black"
+          onClick={() => closeConnection(true)}
+        >
+          Bad match - remove!
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <won-group-atom-messages
+      class={
+        (className || "") + (connectionOrAtomsLoading ? " won-is-loading " : "")
+      }
+    >
+      {headerElement}
+      {contentElement}
+      {footerElement}
+    </won-group-atom-messages>
+  );
 }
-
-GroupAtomMessages.propTypes = {
-  backToChats: PropTypes.bool,
-  connectionUri: PropTypes.string,
-  className: PropTypes.string,
-  ownedAtom: PropTypes.object,
-  targetAtom: PropTypes.object,
-  targetAtomUri: PropTypes.string,
+WonGroupAtomMessages.propTypes = {
   connection: PropTypes.object,
-  sortedMessagesArray: PropTypes.arrayOf(PropTypes.object),
-  chatMessages: PropTypes.object,
-  unreadMessageCount: PropTypes.number,
-  isProcessingLoadingMessages: PropTypes.bool,
-  lastUpdateTimestamp: PropTypes.any,
-  isSentRequest: PropTypes.bool,
-  isReceivedRequest: PropTypes.bool,
-  isConnected: PropTypes.bool,
-  isSuggested: PropTypes.bool,
-  shouldShowRdf: PropTypes.bool,
-  hasConnectionMessagesToLoad: PropTypes.bool,
-  connectionOrAtomsLoading: PropTypes.bool,
-  isConnectionLoading: PropTypes.bool,
-  hideAddMessageContent: PropTypes.func,
-  sendChatMessage: PropTypes.func,
-  connectSockets: PropTypes.func,
-  rateConnection: PropTypes.func,
-  closeConnection: PropTypes.func,
-  showMoreMessages: PropTypes.func,
-  showLatestMessages: PropTypes.func,
-  showAtomContentMessage: PropTypes.bool,
-  history: PropTypes.object,
+  backToChats: PropTypes.bool,
+  className: PropTypes.string,
 };
-
-export default withRouter(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(GroupAtomMessages)
-);
