@@ -190,7 +190,7 @@ class PageOverview extends React.Component {
                     {this.isUseCaseExpanded(ucIdentifier) && (
                       <div className="owneroverview__usecases__usecase__atoms">
                         <WonAtomCardGrid
-                          atomUris={this.getSortedVisibleAtomUriArrayByUseCase(
+                          atoms={this.getSortedVisibleAtomsByUseCase(
                             ucIdentifier
                           )}
                           currentLocation={this.props.currentLocation}
@@ -235,7 +235,7 @@ class PageOverview extends React.Component {
                   {this.isUseCaseExpanded(undefined) && (
                     <div className="owneroverview__usecases__usecase__atoms">
                       <WonAtomCardGrid
-                        atomUris={this.getSortedVisibleOtherAtomUriArray()}
+                        atoms={this.getSortedVisibleOtherAtoms()}
                         currentLocation={this.props.currentLocation}
                         showSuggestions={false}
                         showHolder={true}
@@ -278,28 +278,18 @@ class PageOverview extends React.Component {
     return useCaseAtoms ? useCaseAtoms.size : 0;
   }
 
-  getSortedVisibleAtomUriArrayByUseCase(ucIdentifier) {
+  getSortedVisibleAtomsByUseCase(ucIdentifier) {
     const useCaseAtoms = this.props.whatsNewAtoms.filter(
       atom => atomUtils.getMatchedUseCaseIdentifier(atom) === ucIdentifier
     );
-    const sortedUseCaseAtoms = sortByDate(useCaseAtoms, "creationDate");
-    return (
-      sortedUseCaseAtoms && [
-        ...sortedUseCaseAtoms.flatMap(atom => get(atom, "uri")),
-      ]
-    );
+    return sortByDate(useCaseAtoms, "creationDate") || [];
   }
 
-  getSortedVisibleOtherAtomUriArray() {
+  getSortedVisibleOtherAtoms() {
     const useCaseAtoms = this.props.whatsNewAtoms.filter(
       atom => !atomUtils.hasMatchedUseCase(atom)
     );
-    const sortedUseCaseAtoms = sortByDate(useCaseAtoms, "creationDate");
-    return (
-      sortedUseCaseAtoms && [
-        ...sortedUseCaseAtoms.flatMap(atom => get(atom, "uri")),
-      ]
-    );
+    return sortByDate(useCaseAtoms, "creationDate") || [];
   }
 
   isUseCaseExpanded(ucIdentifier) {

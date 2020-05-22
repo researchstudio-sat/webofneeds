@@ -80,10 +80,6 @@ const mapStateToProps = (state, ownProps) => {
     whatsAroundMetaAtoms,
     lastWhatsAroundLocation
   );
-  const sortedVisibleAtomUriArray = sortedVisibleAtoms && [
-    ...sortedVisibleAtoms.flatMap(visibleAtom => get(visibleAtom, "uri")),
-  ];
-
   const lastAtomUrisUpdateDate = getIn(state, [
     "owner",
     "lastWhatsAroundUpdateTime",
@@ -116,12 +112,9 @@ const mapStateToProps = (state, ownProps) => {
         generalSelectors.selectLastUpdateTime(state),
         lastAtomUrisUpdateDate
       ),
-    sortedVisibleAtomUriArray,
-    hasVisibleAtomUris:
-      sortedVisibleAtomUriArray && sortedVisibleAtomUriArray.length > 0,
-    sortedVisibleAtomUriSize: sortedVisibleAtomUriArray
-      ? sortedVisibleAtomUriArray.length
-      : 0,
+    sortedVisibleAtoms,
+    hasVisibleAtoms: sortedVisibleAtoms.length > 0,
+    sortedVisibleAtomsSize: sortedVisibleAtoms.length,
     isOwnerAtomUrisLoading,
     isOwnerAtomUrisToLoad,
     showSlideIns:
@@ -309,7 +302,7 @@ class PageMap extends React.Component {
 
               {this.props.isLocationAccessDenied &&
                 !this.props.lastWhatsAroundLocation &&
-                !this.props.hasVisibleAtomUris &&
+                !this.props.hasVisibleAtoms &&
                 !(this.state.searchResults.length > 0) && (
                   <div className="ownermap__searchresults__deniedlocation">
                     <svg className="ownermap__searchresults__deniedlocation__icon">
@@ -374,10 +367,10 @@ class PageMap extends React.Component {
             undefined
           )}
           {this.props.lastWhatsAroundLocation &&
-            (this.props.hasVisibleAtomUris ? (
+            (this.props.hasVisibleAtoms ? (
               <div className="ownermap__content">
                 <WonAtomCardGrid
-                  atomUris={this.props.sortedVisibleAtomUriArray}
+                  atoms={this.props.sortedVisibleAtoms}
                   currentLocation={this.props.lastWhatsAroundLocation}
                   showHolder={true}
                   showSuggestions={false}
@@ -584,9 +577,9 @@ PageMap.propTypes = {
   locations: PropTypes.arrayOf(PropTypes.object),
   lastAtomUrisUpdateDate: PropTypes.number,
   friendlyLastAtomUrisUpdateTimestamp: PropTypes.string,
-  sortedVisibleAtomUriArray: PropTypes.arrayOf(PropTypes.string),
-  hasVisibleAtomUris: PropTypes.bool,
-  sortedVisibleAtomUriSize: PropTypes.number,
+  sortedVisibleAtoms: PropTypes.arrayOf(PropTypes.object),
+  hasVisibleAtoms: PropTypes.bool,
+  sortedVisibleAtomsSize: PropTypes.number,
   isOwnerAtomUrisLoading: PropTypes.bool,
   isOwnerAtomUrisToLoad: PropTypes.bool,
   showSlideIns: PropTypes.bool,

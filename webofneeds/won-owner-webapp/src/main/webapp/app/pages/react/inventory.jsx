@@ -45,26 +45,13 @@ export default function PageInventory() {
       .filter(atom => atomUtils.isInactive(atom))
   );
 
-  const sortedOwnedUnassignedActivePosts = sortByDate(
-    ownedUnassignedActivePosts,
-    "creationDate"
-  );
-  const sortedOwnedUnassignedAtomUriArray = sortedOwnedUnassignedActivePosts
-    ? [...sortedOwnedUnassignedActivePosts.flatMap(atom => get(atom, "uri"))]
-    : [];
+  const sortedOwnedUnassignedActivePosts =
+    sortByDate(ownedUnassignedActivePosts, "creationDate") || [];
 
-  const sortedOwnedInactiveAtoms = sortByDate(
-    ownedInactiveAtoms,
-    "creationDate"
-  );
-  const sortedOwnedInactiveAtomUriArray = sortedOwnedInactiveAtoms
-    ? [...sortedOwnedInactiveAtoms.flatMap(atom => get(atom, "uri"))]
-    : [];
-
-  const sortedOwnedActivePersonas = sortByDate(
-    ownedActivePersonas,
-    "modifiedDate"
-  );
+  const sortedOwnedInactiveAtoms =
+    sortByDate(ownedInactiveAtoms, "creationDate") || [];
+  const sortedOwnedActivePersonas =
+    sortByDate(ownedActivePersonas, "modifiedDate") || [];
 
   const viewState = useSelector(state => get(state, "view"));
 
@@ -81,18 +68,12 @@ export default function PageInventory() {
       : undefined;
   const currentLocation = useSelector(generalSelectors.getCurrentLocation);
   const hasOwnedUnassignedAtomUris =
-    sortedOwnedUnassignedAtomUriArray &&
-    sortedOwnedUnassignedAtomUriArray.length > 0;
-  const hasOwnedInactiveAtomUris =
-    sortedOwnedInactiveAtomUriArray &&
-    sortedOwnedInactiveAtomUriArray.length > 0;
-  const unassignedAtomSize = sortedOwnedUnassignedAtomUriArray
-    ? sortedOwnedUnassignedAtomUriArray.length
-    : 0;
-  const inactiveAtomUriSize = sortedOwnedInactiveAtomUriArray
-    ? sortedOwnedInactiveAtomUriArray.length
-    : 0;
+    sortedOwnedUnassignedActivePosts.length > 0;
+
+  const hasOwnedInactiveAtomUris = sortedOwnedInactiveAtoms.length > 0;
   const hasOwnedActivePersonas = sortedOwnedActivePersonas.length > 0;
+  const unassignedAtomSize = sortedOwnedUnassignedActivePosts.length;
+  const inactiveAtomUriSize = sortedOwnedInactiveAtoms.length;
 
   const showSlideIns = useSelector(
     state =>
@@ -154,7 +135,7 @@ export default function PageInventory() {
             </div>
             <div className="ownerinventory__content">
               <WonAtomCardGrid
-                atomUris={sortedOwnedUnassignedAtomUriArray}
+                atoms={sortedOwnedUnassignedActivePosts}
                 currentLocation={currentLocation}
                 showSuggestions={true}
                 showHolder={true}
@@ -189,7 +170,7 @@ export default function PageInventory() {
               hasOwnedInactiveAtomUris && (
                 <div className="ownerinventory__content">
                   <WonAtomCardGrid
-                    atomUris={sortedOwnedInactiveAtomUriArray}
+                    atoms={sortedOwnedInactiveAtoms}
                     currentLocation={currentLocation}
                     showSuggestions={false}
                     showHolder={false}
