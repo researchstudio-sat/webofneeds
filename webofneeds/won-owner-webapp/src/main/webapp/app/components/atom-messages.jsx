@@ -389,7 +389,7 @@ class AtomMessages extends React.Component {
         <div className="pm__header">
           <div className="pm__header__back">{backButtonElement}</div>
           <WonConnectionHeader connection={this.props.connection} />
-          <WonShareDropdown atomUri={this.props.targetAtomUri} />
+          <WonShareDropdown atom={this.props.targetAtom} />
           <WonConnectionContextDropdown
             connection={this.props.connection}
             showPetriNetDataField={this.showPetriNetDataField.bind(this)}
@@ -423,7 +423,7 @@ class AtomMessages extends React.Component {
         >
           {unreadIndicatorElement}
           {this.props.showAtomContentMessage && (
-            <WonAtomContentMessage atomUri={this.props.targetAtom} />
+            <WonAtomContentMessage atom={this.props.targetAtom} />
           )}
           {(this.props.isConnectionLoading ||
             this.props.isProcessingLoadingMessages) &&

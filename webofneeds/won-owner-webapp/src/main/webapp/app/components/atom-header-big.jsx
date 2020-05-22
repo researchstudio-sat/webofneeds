@@ -102,7 +102,7 @@ export default function WonAtomHeaderBig({ atom }) {
           </hgroup>
         </div>
         {buddyActionElement}
-        <WonShareDropdown atomUri={atomUri} />
+        <WonShareDropdown atom={atom} />
         <WonAtomContextDropdown atom={atom} />
       </nav>
     </won-atom-header-big>

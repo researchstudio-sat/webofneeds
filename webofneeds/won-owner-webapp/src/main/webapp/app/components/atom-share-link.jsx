@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 
 import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import { get, getIn, toAbsoluteURL } from "../utils.js";
+import { useSelector } from "react-redux";
+import { get, toAbsoluteURL } from "../utils.js";
 import { ownerBaseUrl } from "~/config/default.js";
 import * as wonUtils from "../won-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
@@ -11,124 +11,29 @@ import "~/style/_atom-share-link.scss";
 import ico16_copy_to_clipboard from "~/images/won-icons/ico16_copy_to_clipboard.svg";
 import ico16_checkmark from "~/images/won-icons/ico16_checkmark.svg";
 
-const mapStateToProps = (state, ownProps) => {
-  const atom = ownProps.atomUri && getIn(state, ["atoms", ownProps.atomUri]);
-
+export default function WonAtomShareLink({ atom, className }) {
+  const [showLink, setShowLink] = useState(true);
+  const [copied, setCopied] = useState(false);
+  const atomUri = get(atom, "uri");
   let linkToPost;
   if (ownerBaseUrl && atom) {
-    const path = "#!/post" + `?postUri=${encodeURI(ownProps.atomUri)}`;
+    const path = "#!/post" + `?postUri=${encodeURI(atomUri)}`;
 
     linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
   }
   let svgQrCodeToPost = wonUtils.generateSvgQrCode(linkToPost);
 
-  return {
-    atomUri: ownProps.atomUri,
-    className: ownProps.className,
-    hasConnections: get(atom, "connections")
-      ? get(atom, "connections").size > 0
-      : false,
-    isOwned: generalSelectors.isAtomOwned(state, ownProps.atomUri),
-    linkToPost,
-    svgQrCodeToPost,
-  };
-};
+  const hasConnections = get(atom, "connections")
+    ? get(atom, "connections").size > 0
+    : false;
+  const isOwned = useSelector(state =>
+    generalSelectors.isAtomOwned(state, atomUri)
+  );
 
-class WonAtomShareLink extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      showLink: true,
-      copied: false,
-    };
-  }
+  let linkInput;
 
-  render() {
-    if (!this.state) {
-      console.debug("render with null state");
-      return <div />;
-    }
-
-    const labelElement = ((this.props.hasConnections && this.props.isOwned) ||
-      !this.props.isOwned) && (
-      <p className="asl__text">
-        Know someone who might also be interested in this atom? Consider sharing
-        the link below in social media.
-      </p>
-    );
-
-    const linkElement = this.state.showLink ? (
-      <div className="asl__link">
-        <div className="asl__link__copyfield">
-          <input
-            ref={linkInput => (this.linkInput = linkInput)}
-            className="asl__link__copyfield__input"
-            value={this.props.linkToPost}
-            readOnly
-            type="text"
-            onFocus={() => this.selectLink()}
-            onBlur={() => this.clearSelection()}
-          />
-          <button
-            className="red won-button--filled asl__link__copyfield__copy-button"
-            onClick={() => this.copyLink()}
-          >
-            <svg className="asl__link__copyfield__copy-button__icon">
-              {this.state.copied ? (
-                <use xlinkHref={ico16_checkmark} href={ico16_checkmark} />
-              ) : (
-                <use
-                  xlinkHref={ico16_copy_to_clipboard}
-                  href={ico16_copy_to_clipboard}
-                />
-              )}
-            </svg>
-          </button>
-        </div>
-      </div>
-    ) : (
-      <div className="asl__qrcode">
-        <img
-          className="asl__qrcode__code"
-          src={"data:image/svg+xml;utf8," + this.props.svgQrCodeToPost}
-        />
-      </div>
-    );
-
-    return (
-      <won-atom-share-link
-        class={this.props.className ? this.props.className : ""}
-      >
-        <div className="asl__content">
-          {labelElement}
-          <div className="asl__tabs">
-            <div
-              className={
-                "asl__tabs__tab clickable " +
-                (this.state.showLink ? " asl__tabs__tab--selected " : "")
-              }
-              onClick={() => this.setState({ showLink: true })}
-            >
-              Link
-            </div>
-            <div
-              className={
-                "asl__tabs__tab clickable " +
-                (!this.state.showLink ? " asl__tabs__tab--selected " : "")
-              }
-              onClick={() => this.setState({ showLink: false })}
-            >
-              QR-Code
-            </div>
-          </div>
-          {linkElement}
-        </div>
-      </won-atom-share-link>
-    );
-  }
-
-  copyLink() {
-    const linkEl = this.linkInput;
+  function copyLink() {
+    const linkEl = linkInput;
     if (linkEl) {
       linkEl.focus();
       linkEl.setSelectionRange(0, linkEl.value.length);
@@ -142,35 +47,103 @@ class WonAtomShareLink extends React.Component {
         linkEl.blur();
 
         //Temprorarily show checkmark
-        this.setState({ copied: true });
+        setCopied(true);
         setTimeout(() => {
-          this.setState({ copied: false });
+          setCopied(false);
         }, 1000);
       }
     }
   }
 
-  selectLink() {
-    const linkEl = this.linkInput;
+  function selectLink() {
+    const linkEl = linkInput;
     if (linkEl) {
       linkEl.setSelectionRange(0, linkEl.value.length);
     }
   }
 
-  clearSelection() {
-    const linkEl = this.linkInput;
+  function clearSelection() {
+    const linkEl = linkInput;
     if (linkEl) {
       linkEl.setSelectionRange(0, 0);
     }
   }
+
+  const labelElement = ((hasConnections && isOwned) || !isOwned) && (
+    <p className="asl__text">
+      Know someone who might also be interested in this atom? Consider sharing
+      the link below in social media.
+    </p>
+  );
+
+  const linkElement = showLink ? (
+    <div className="asl__link">
+      <div className="asl__link__copyfield">
+        <input
+          ref={ref => (linkInput = ref)}
+          className="asl__link__copyfield__input"
+          value={linkToPost}
+          readOnly
+          type="text"
+          onFocus={() => selectLink()}
+          onBlur={() => clearSelection()}
+        />
+        <button
+          className="red won-button--filled asl__link__copyfield__copy-button"
+          onClick={() => copyLink()}
+        >
+          <svg className="asl__link__copyfield__copy-button__icon">
+            {copied ? (
+              <use xlinkHref={ico16_checkmark} href={ico16_checkmark} />
+            ) : (
+              <use
+                xlinkHref={ico16_copy_to_clipboard}
+                href={ico16_copy_to_clipboard}
+              />
+            )}
+          </svg>
+        </button>
+      </div>
+    </div>
+  ) : (
+    <div className="asl__qrcode">
+      <img
+        className="asl__qrcode__code"
+        src={"data:image/svg+xml;utf8," + svgQrCodeToPost}
+      />
+    </div>
+  );
+
+  return (
+    <won-atom-share-link class={className ? className : ""}>
+      <div className="asl__content">
+        {labelElement}
+        <div className="asl__tabs">
+          <div
+            className={
+              "asl__tabs__tab clickable " +
+              (showLink ? " asl__tabs__tab--selected " : "")
+            }
+            onClick={() => setShowLink(true)}
+          >
+            Link
+          </div>
+          <div
+            className={
+              "asl__tabs__tab clickable " +
+              (!showLink ? " asl__tabs__tab--selected " : "")
+            }
+            onClick={() => setShowLink(false)}
+          >
+            QR-Code
+          </div>
+        </div>
+        {linkElement}
+      </div>
+    </won-atom-share-link>
+  );
 }
 WonAtomShareLink.propTypes = {
-  atomUri: PropTypes.string.isRequired,
+  atom: PropTypes.object.isRequired,
   className: PropTypes.string,
-  hasConnections: PropTypes.bool,
-  isOwned: PropTypes.bool,
-  linkToPost: PropTypes.string,
-  svgQrCodeToPost: PropTypes.string,
 };
-
-export default connect(mapStateToProps)(WonAtomShareLink);

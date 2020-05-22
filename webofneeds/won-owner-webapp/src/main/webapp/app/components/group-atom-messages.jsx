@@ -229,7 +229,7 @@ class GroupAtomMessages extends React.Component {
           </a>
         </div>
         <WonConnectionHeader connection={this.props.connection} />
-        <WonShareDropdown atomUri={this.props.targetAtomUri} />
+        <WonShareDropdown atom={this.props.targetAtom} />
         <WonConnectionContextDropdown connection={this.props.connection} />
       </div>
     );
@@ -255,7 +255,7 @@ class GroupAtomMessages extends React.Component {
       >
         {unreadIndicatorElement}
         {this.props.showAtomContentMessage && (
-          <WonAtomContentMessage atomUri={this.props.targetAtom} />
+          <WonAtomContentMessage atom={this.props.targetAtom} />
         )}
         {(this.props.isConnectionLoading ||
           this.props.isProcessingLoadingMessages) &&
