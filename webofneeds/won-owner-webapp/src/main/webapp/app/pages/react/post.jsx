@@ -69,7 +69,7 @@ class PagePost extends React.Component {
         {this.props.showSlideIns && <WonSlideIn />}
         <main className="postcontent">
           {!(this.props.atomLoading || this.props.atomFailedToLoad) &&
-            !!this.props.atom && <WonAtomInfo atomUri={this.props.atomUri} />}
+            !!this.props.atom && <WonAtomInfo atom={this.props.atom} />}
           {this.props.atomLoading && (
             <div className="pc__loading">
               <svg className="pc__loading__spinner hspinner">
