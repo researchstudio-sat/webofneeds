@@ -148,7 +148,7 @@ export default function WonConnectionHeader({ connection, toLink }) {
     );
   } else {
     const headerIconElement = isConnectionToGroup ? (
-      <WonGroupIcon connectionUri={connectionUri} />
+      <WonGroupIcon connection={connection} />
     ) : (
       <WonAtomIcon atom={targetAtom} />
     );
@@ -303,7 +303,7 @@ export default function WonConnectionHeader({ connection, toLink }) {
             <span className="ch__right__subtitle__type">
               {personaName}
               {groupChatLabel}
-              <WonConnectionState connectionUri={connectionUri} />
+              <WonConnectionState connection={connection} />
               {unreadCount}
               {messageOrState}
             </span>

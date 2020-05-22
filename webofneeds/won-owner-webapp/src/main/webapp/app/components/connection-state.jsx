@@ -8,9 +8,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { labels } from "../won-label-utils.js";
-import { get, getIn } from "../utils.js";
-import { connect } from "react-redux";
-import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import { get } from "../utils.js";
 
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import vocab from "../service/vocab.js";
@@ -21,68 +19,49 @@ import ico36_incoming from "~/images/won-icons/ico36_incoming.svg";
 import ico36_message from "~/images/won-icons/ico36_message.svg";
 import ico36_close_circle from "~/images/won-icons/ico36_close_circle.svg";
 
-const mapStateToProps = (state, ownProps) => {
-  const atom = generalSelectors.getOwnedAtomByConnectionUri(
-    state,
-    ownProps.connectionUri
-  );
-  const connection = getIn(atom, ["connections", ownProps.connectionUri]);
+export default function WonConnectionState({ connection }) {
+  const connectionState = get(connection, "state");
+  const unread = connectionUtils.isUnread(connection);
 
-  return {
-    connectionUri: ownProps.connectionUri,
-    connectionState: get(connection, "state"),
-    unread: connectionUtils.isUnread(connection),
-  };
-};
+  let icon;
 
-class WonConnectionState extends React.Component {
-  render() {
-    let icon;
-
-    switch (this.props.connectionState) {
-      case vocab.WON.Suggested:
-        icon = <use xlinkHref={ico36_match} href={ico36_match} />;
-        break;
-      case vocab.WON.RequestSent:
-        icon = <use xlinkHref={ico36_outgoing} href={ico36_outgoing} />;
-        break;
-      case vocab.WON.RequestReceived:
-        icon = <use xlinkHref={ico36_incoming} href={ico36_incoming} />;
-        break;
-      case vocab.WON.Connected:
-        icon = <use xlinkHref={ico36_message} href={ico36_message} />;
-        break;
-      case vocab.WON.Closed:
-      default:
-        icon = <use xlinkHref={ico36_close_circle} href={ico36_close_circle} />;
-        break;
-    }
-
-    return (
-      <won-connection-state>
-        <div
-          className="cs__state"
-          title={labels.connectionState[this.props.connectionState]}
-        >
-          {this.props.unread &&
-            this.props.connectionState === vocab.WON.Suggested && (
-              <svg
-                className={
-                  "cs__state__icon " + (this.props.unread ? " won-unread " : "")
-                }
-              >
-                {icon}
-              </svg>
-            )}
-        </div>
-      </won-connection-state>
-    );
+  switch (connectionState) {
+    case vocab.WON.Suggested:
+      icon = <use xlinkHref={ico36_match} href={ico36_match} />;
+      break;
+    case vocab.WON.RequestSent:
+      icon = <use xlinkHref={ico36_outgoing} href={ico36_outgoing} />;
+      break;
+    case vocab.WON.RequestReceived:
+      icon = <use xlinkHref={ico36_incoming} href={ico36_incoming} />;
+      break;
+    case vocab.WON.Connected:
+      icon = <use xlinkHref={ico36_message} href={ico36_message} />;
+      break;
+    case vocab.WON.Closed:
+    default:
+      icon = <use xlinkHref={ico36_close_circle} href={ico36_close_circle} />;
+      break;
   }
+
+  return (
+    <won-connection-state>
+      <div
+        className="cs__state"
+        title={labels.connectionState[connectionState]}
+      >
+        {unread &&
+          connectionState === vocab.WON.Suggested && (
+            <svg
+              className={"cs__state__icon " + (unread ? " won-unread " : "")}
+            >
+              {icon}
+            </svg>
+          )}
+      </div>
+    </won-connection-state>
+  );
 }
 WonConnectionState.propTypes = {
-  connectionUri: PropTypes.string.isRequired,
-  connectionState: PropTypes.string,
-  unread: PropTypes.bool,
+  connection: PropTypes.connection,
 };
-
-export default connect(mapStateToProps)(WonConnectionState);
