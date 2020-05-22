@@ -44,7 +44,7 @@ export default function WonAtomContentHolds({ atom }) {
     return (
       <WonAtomCard
         key={get(conn, "uri")}
-        atomUri={get(conn, "targetAtomUri")}
+        atom={get(storedAtoms, get(conn, "targetAtomUri"))}
         currentLocation={currentLocation}
         showSuggestions={isOwned}
         showHolder={false}

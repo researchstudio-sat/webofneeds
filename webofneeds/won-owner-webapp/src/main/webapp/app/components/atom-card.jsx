@@ -15,14 +15,13 @@ import { useSelector } from "react-redux";
 import "~/style/_atom-card.scss";
 
 export default function WonAtomCard({
-  atomUri,
+  atom,
   showHolder,
   showSuggestions,
   currentLocation,
 }) {
-  const atom = useSelector(state => getIn(state, ["atoms", atomUri]));
   const processState = useSelector(state => get(state, "process"));
-
+  const atomUri = get(atom, "uri");
   const isSkeleton =
     !(
       processUtils.isAtomLoaded(processState, atomUri) &&
@@ -77,7 +76,7 @@ export default function WonAtomCard({
   return <won-atom-card>{cardContent}</won-atom-card>;
 }
 WonAtomCard.propTypes = {
-  atomUri: PropTypes.string.isRequired,
+  atom: PropTypes.object,
   showHolder: PropTypes.bool,
   showSuggestions: PropTypes.bool,
   currentLocation: PropTypes.object,

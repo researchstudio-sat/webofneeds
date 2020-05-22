@@ -25,7 +25,7 @@ export default function WonAtomCardGrid({
       return (
         <WonAtomCard
           key={get(atom, "uri")}
-          atomUri={get(atom, "uri")}
+          atom={atom}
           showHolder={showHolder}
           showSuggestions={showSuggestions}
           currentLocation={currentLocation}

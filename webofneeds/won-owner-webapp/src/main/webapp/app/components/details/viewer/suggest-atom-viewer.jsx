@@ -137,7 +137,7 @@ class WonSuggestAtomViewer extends React.Component {
         <div className="suggestatomv__content">
           <div className="suggestatomv__content__post">
             <WonAtomCard
-              atomUri={this.props.content}
+              atom={this.props.suggestedPost}
               currentLocation={this.props.currentLocation}
               showHolder={true}
               showSuggestions={false}
