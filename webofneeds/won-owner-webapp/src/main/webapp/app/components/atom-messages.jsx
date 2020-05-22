@@ -391,6 +391,7 @@ class AtomMessages extends React.Component {
           <WonConnectionHeader connection={this.props.connection} />
           <WonShareDropdown atomUri={this.props.targetAtomUri} />
           <WonConnectionContextDropdown
+            connection={this.props.connection}
             showPetriNetDataField={this.showPetriNetDataField.bind(this)}
             showAgreementDataField={this.showAgreementDataField.bind(this)}
           />
@@ -475,6 +476,7 @@ class AtomMessages extends React.Component {
             Showing Agreement Data
           </div>
           <WonConnectionContextDropdown
+            connection={this.props.connection}
             showPetriNetDataField={this.showPetriNetDataField.bind(this)}
             showAgreementDataField={this.showAgreementDataField.bind(this)}
           />
@@ -621,6 +623,7 @@ class AtomMessages extends React.Component {
             Showing PetriNet Data
           </div>
           <WonConnectionContextDropdown
+            connection={this.props.connection}
             showPetriNetDataField={this.showPetriNetDataField.bind(this)}
             showAgreementDataField={this.showAgreementDataField.bind(this)}
           />

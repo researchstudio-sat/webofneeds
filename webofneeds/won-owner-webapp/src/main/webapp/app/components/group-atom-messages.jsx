@@ -230,7 +230,7 @@ class GroupAtomMessages extends React.Component {
         </div>
         <WonConnectionHeader connection={this.props.connection} />
         <WonShareDropdown atomUri={this.props.targetAtomUri} />
-        <WonConnectionContextDropdown />
+        <WonConnectionContextDropdown connection={this.props.connection} />
       </div>
     );
 
