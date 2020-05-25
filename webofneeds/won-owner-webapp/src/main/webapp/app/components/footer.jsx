@@ -1,150 +1,114 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { connect } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
-import { get } from "../utils.js";
+// import { get } from "../utils.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
-import * as generalSelectors from "../redux/selectors/general-selectors.js";
+// import * as generalSelectors from "../redux/selectors/general-selectors.js";
 
 import "~/style/_footer.scss";
 import { Link } from "react-router-dom";
 
-const mapStateToProps = (state, ownProps) => {
-  const theme = generalSelectors.getTheme(state);
-  return {
-    className: ownProps.className,
-    themeName: get(theme, "name"),
-    appTitle: get(theme, "title"),
-    shouldShowRdf: viewSelectors.showRdf(state),
-    debugMode: viewSelectors.isDebugModeEnabled(state),
-  };
-};
+export default function WonFooter({ className }) {
+  const dispatch = useDispatch();
+  // const theme = useSelector(generalSelectors.getTheme);
+  // const themeName = get(theme, "name");
+  // const appTitle = get(theme, "title");
+  const shouldShowRdf = useSelector(viewSelectors.showRdf);
+  const debugMode = useSelector(viewSelectors.isDebugModeEnabled);
 
-const mapDispatchToProps = dispatch => {
-  return {
-    toastPush: toastImm => {
-      dispatch(actionCreators.toasts__push(toastImm));
-    },
-    toggleRdf: () => {
-      dispatch(actionCreators.view__toggleRdf());
-    },
-    toggleDebugMode: () => {
-      dispatch(actionCreators.view__toggleDebugMode());
-    },
-  };
-};
+  function getDebugModeLabel() {
+    return debugMode ? "Turn Off Debugmode" : "Turn On Debugmode";
+  }
 
-class WonFooter extends React.Component {
-  render() {
-    return (
-      <won-footer class={this.props.className ? this.props.className : ""}>
-        <div className="footer">
-          {/*<!-- TODO: find or create logos that are stylable -->
-        <!--<img src="skin/{{this.props.themeName}}/images/logo.svg" class="footer__logo">
+  return (
+    <won-footer class={className ? className : ""}>
+      <div className="footer">
+        {/*<!-- TODO: find or create logos that are stylable -->
+        <!--<img src="skin/{{themeName}}/images/logo.svg" class="footer__logo">
         <div class="footer__appTitle">
-            {{ this.props.appTitle }}
+            {{ appTitle }}
         </div>
         <div class="footer__tagLine">Web of Needs</div>-->*/}
-          <div className="footer__linksdesktop hide-in-responsive">
-            <Link className="footer__linksdesktop__link" to="/about">
-              About
-            </Link>
-            <span className="footer__linksdesktop__divider">|</span>
-            <Link
-              className="footer__linksdesktop__link"
-              to="/about?aboutSection=aboutPrivacyPolicy"
-            >
-              Privacy
-            </Link>
-            <span className="footer__linksdesktop__divider">|</span>
-            <Link
-              className="footer__linksdesktop__link"
-              to="/about?aboutSection=aboutFaq"
-            >
-              FAQ
-            </Link>
-            <span className="footer__linksdesktop__divider">|</span>
-            <Link
-              className="footer__linksdesktop__link"
-              to="/about?aboutSection=aboutTermsOfService"
-            >
-              Terms Of Service
-            </Link>
-            <span className="footer__linksdesktop__divider">|</span>
-            <span
-              className="footer__linksdesktop__link"
-              onClick={() => this.props.toggleDebugMode()}
-            >
-              {this.getDebugModeLabel()}
-            </span>
-            <span className="footer__linksdesktop__divider">|</span>
-            <span
-              className="footer__linksdesktop__link"
-              onClick={() => this.props.toggleRdf()}
-            >
-              {this.props.shouldShowRdf
-                ? "Hide raw RDF data"
-                : "Show raw RDF data"}
-            </span>
-          </div>
-          <div className="footer__linksmobile show-in-responsive">
-            <Link className="footer__linksmobile__link" to="/about">
-              About
-            </Link>
-            <Link
-              className="footer__linksmobile__link"
-              to="/about?aboutSection=aboutPrivacyPolicy"
-            >
-              Privacy
-            </Link>
-            <Link
-              className="footer__linksmobile__link"
-              to="/about?aboutSection=aboutFaq"
-            >
-              FAQ
-            </Link>
-            <Link
-              className="footer__linksmobile__link"
-              to="/about?aboutSection=aboutTermsOfService"
-            >
-              Terms Of Service
-            </Link>
-            <span
-              className="footer__linksmobile__link"
-              onClick={() => this.props.toggleDebugMode()}
-            >
-              {this.getDebugModeLabel()}
-            </span>
-            <span
-              className="footer__linksmobile__link"
-              onClick={() => this.props.toggleRdf()}
-            >
-              {this.props.shouldShowRdf
-                ? "Hide raw RDF data"
-                : "Show raw RDF data"}
-            </span>
-          </div>
+        <div className="footer__linksdesktop hide-in-responsive">
+          <Link className="footer__linksdesktop__link" to="/about">
+            About
+          </Link>
+          <span className="footer__linksdesktop__divider">|</span>
+          <Link
+            className="footer__linksdesktop__link"
+            to="/about?aboutSection=aboutPrivacyPolicy"
+          >
+            Privacy
+          </Link>
+          <span className="footer__linksdesktop__divider">|</span>
+          <Link
+            className="footer__linksdesktop__link"
+            to="/about?aboutSection=aboutFaq"
+          >
+            FAQ
+          </Link>
+          <span className="footer__linksdesktop__divider">|</span>
+          <Link
+            className="footer__linksdesktop__link"
+            to="/about?aboutSection=aboutTermsOfService"
+          >
+            Terms Of Service
+          </Link>
+          <span className="footer__linksdesktop__divider">|</span>
+          <span
+            className="footer__linksdesktop__link"
+            onClick={() => dispatch(actionCreators.view__toggleDebugMode())}
+          >
+            {getDebugModeLabel()}
+          </span>
+          <span className="footer__linksdesktop__divider">|</span>
+          <span
+            className="footer__linksdesktop__link"
+            onClick={() => dispatch(actionCreators.view__toggleRdf())}
+          >
+            {shouldShowRdf ? "Hide raw RDF data" : "Show raw RDF data"}
+          </span>
         </div>
-      </won-footer>
-    );
-  }
-
-  getDebugModeLabel() {
-    return this.props.debugMode ? "Turn Off Debugmode" : "Turn On Debugmode";
-  }
+        <div className="footer__linksmobile show-in-responsive">
+          <Link className="footer__linksmobile__link" to="/about">
+            About
+          </Link>
+          <Link
+            className="footer__linksmobile__link"
+            to="/about?aboutSection=aboutPrivacyPolicy"
+          >
+            Privacy
+          </Link>
+          <Link
+            className="footer__linksmobile__link"
+            to="/about?aboutSection=aboutFaq"
+          >
+            FAQ
+          </Link>
+          <Link
+            className="footer__linksmobile__link"
+            to="/about?aboutSection=aboutTermsOfService"
+          >
+            Terms Of Service
+          </Link>
+          <span
+            className="footer__linksmobile__link"
+            onClick={() => dispatch(actionCreators.view__toggleDebugMode())}
+          >
+            {getDebugModeLabel()}
+          </span>
+          <span
+            className="footer__linksmobile__link"
+            onClick={() => dispatch(actionCreators.view__toggleRdf())}
+          >
+            {shouldShowRdf ? "Hide raw RDF data" : "Show raw RDF data"}
+          </span>
+        </div>
+      </div>
+    </won-footer>
+  );
 }
 WonFooter.propTypes = {
   className: PropTypes.string,
-  themeName: PropTypes.string,
-  appTitle: PropTypes.string,
-  shouldShowRdf: PropTypes.bool,
-  debugMode: PropTypes.bool,
-  toastPush: PropTypes.func,
-  toggleRdf: PropTypes.func,
-  toggleDebugMode: PropTypes.func,
 };
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonFooter);
