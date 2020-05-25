@@ -47,8 +47,8 @@ export default function WonAccountMenu() {
         className="wam__header clickable"
         onClick={
           mainMenuVisible
-            ? dispatch(actionCreators.view__hideMainMenu())
-            : dispatch(actionCreators.view__showMainMenu())
+            ? () => dispatch(actionCreators.view__hideMainMenu())
+            : () => dispatch(actionCreators.view__showMainMenu())
         }
       >
         <span className="wam__header__caption hide-in-responsive">
