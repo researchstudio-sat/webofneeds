@@ -111,15 +111,14 @@ export function disconnectPersona(atomUri, personaUri) {
 export function reviewPersona(reviewableConnectionUri, review) {
   return (dispatch, getState) => {
     const state = getState();
-    const connection = generalSelectors.getOwnedConnectionByUri(
-      state,
-      reviewableConnectionUri
-    );
-
     const ownAtom = generalSelectors.getOwnedAtomByConnectionUri(
       state,
       reviewableConnectionUri
     );
+    const connection =
+      reviewableConnectionUri &&
+      getIn(ownAtom, ["connections", reviewableConnectionUri]);
+
     const foreignAtomUri = get(connection, "targetAtomUri");
     const foreignAtom = getIn(state, ["atoms", foreignAtomUri]);
 

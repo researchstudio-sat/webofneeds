@@ -436,13 +436,3 @@ export function getConnectionsToInjectMsgInto(atoms, targetSocketUri, msgUri) {
     .filter(conn => get(conn, "targetSocketUri") === targetSocketUri)
     .filter(conn => !get(conn, "messages").contains(msgUri));
 }
-
-/**
- * Get the connection for a given connectionUri
- * @param state to retrieve data from
- * @param connectionUri to find corresponding connection for
- */
-export function getOwnedConnectionByUri(state, connectionUri) {
-  let atom = getOwnedAtomByConnectionUri(state, connectionUri);
-  return getIn(atom, ["connections", connectionUri]);
-}

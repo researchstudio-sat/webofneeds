@@ -659,8 +659,7 @@ export function showLatestMessages(connectionUri, numberOfEvents) {
       generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri);
     const atomUri = get(atom, "uri");
     const connection =
-      connectionUri &&
-      generalSelectors.getOwnedConnectionByUri(state, connectionUri);
+      connectionUri && getIn(atom, ["connections", connectionUri]);
     const processState = generalSelectors.getProcessState(state);
     if (
       !connectionUri ||
@@ -692,8 +691,7 @@ export function loadLatestMessagesOfConnection({
     generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri);
   const atomUri = get(atom, "uri");
   const connection =
-    connectionUri &&
-    generalSelectors.getOwnedConnectionByUri(state, connectionUri);
+    connectionUri && getIn(atom, ["connections", connectionUri]);
   const processState = generalSelectors.getProcessState(state);
   if (
     !connectionUri ||

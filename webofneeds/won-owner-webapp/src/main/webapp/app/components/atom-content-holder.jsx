@@ -21,12 +21,10 @@ export default function WonAtomContentHolder({ holdsUri }) {
   const history = useHistory();
   const dispatch = useDispatch();
   const { connectionUri } = getQueryParams(history.location);
-  const connection = useSelector(state =>
-    generalSelectors.getOwnedConnectionByUri(state, connectionUri)
-  );
   const ownAtom = useSelector(state =>
     generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri)
   );
+  const connection = getIn(ownAtom, ["connections", connectionUri]);
 
   const ratingConnectionUri =
     get(connection, "targetAtomUri") == holdsUri && atomUtils.isHeld(ownAtom)
