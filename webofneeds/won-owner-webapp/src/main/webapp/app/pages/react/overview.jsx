@@ -1,10 +1,9 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { actionCreators } from "../../actions/actions.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
-import { get, getIn, sortByDate } from "../../utils.js";
+import { getIn, sortByDate } from "../../utils.js";
 import * as processSelectors from "../../redux/selectors/process-selectors.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as useCaseUtils from "../../usecase-utils.js";
@@ -21,13 +20,20 @@ import WonFooter from "../../components/footer";
 
 import "~/style/_overview.scss";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
-import { withRouter } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
-const mapStateToProps = (state, ownProps) => {
-  const debugModeEnabled = viewSelectors.isDebugModeEnabled(state);
+export default function PageOverview() {
+  const history = useHistory();
+  const dispatch = useDispatch();
+  const debugModeEnabled = useSelector(viewSelectors.isDebugModeEnabled);
+  const [open, setOpen] = useState([]);
 
-  const whatsNewAtoms = generalSelectors
-    .getWhatsNewAtoms(state)
+  const whatsNewAtomsUnfiltered = useSelector(
+    generalSelectors.getWhatsNewAtoms
+  );
+
+  const accountState = useSelector(generalSelectors.getAccountState);
+  const whatsNewAtoms = whatsNewAtomsUnfiltered
     .filter(metaAtom => atomUtils.isActive(metaAtom))
     .filter(metaAtom => debugModeEnabled || !atomUtils.isSearchAtom(metaAtom))
     .filter(
@@ -38,7 +44,7 @@ const mapStateToProps = (state, ownProps) => {
     )
     .filter(
       (metaAtom, metaAtomUri) =>
-        !generalSelectors.isAtomOwned(state, metaAtomUri)
+        !accountUtils.isAtomOwned(accountState, metaAtomUri)
     );
 
   const whatsNewUseCaseIdentifierArray = whatsNewAtoms
@@ -48,302 +54,234 @@ const mapStateToProps = (state, ownProps) => {
     .toArray();
 
   const sortedVisibleAtoms = sortByDate(whatsNewAtoms, "creationDate");
-  const sortedVisibleAtomUriArray = sortedVisibleAtoms && [
-    ...sortedVisibleAtoms.flatMap(visibleAtom => get(visibleAtom, "uri")),
-  ];
-  const lastAtomUrisUpdateDate = getIn(state, [
-    "owner",
-    "lastWhatsNewUpdateTime",
-  ]);
+  const lastAtomUrisUpdateDate = useSelector(state =>
+    getIn(state, ["owner", "lastWhatsNewUpdateTime"])
+  );
 
-  const isOwnerAtomUrisLoading = processSelectors.isProcessingWhatsNew(state);
+  const isOwnerAtomUrisLoading = useSelector(
+    processSelectors.isProcessingWhatsNew
+  );
   const isOwnerAtomUrisToLoad =
     !lastAtomUrisUpdateDate && !isOwnerAtomUrisLoading;
 
-  const accountState = generalSelectors.getAccountState(state);
+  const isLoggedIn = accountUtils.isLoggedIn(accountState);
+  const currentLocation = useSelector(generalSelectors.getCurrentLocation);
+  const globalLastUpdateTime = useSelector(
+    generalSelectors.selectLastUpdateTime
+  );
+  const friendlyLastAtomUrisUpdateTimestamp =
+    lastAtomUrisUpdateDate &&
+    wonLabelUtils.relativeTime(globalLastUpdateTime, lastAtomUrisUpdateDate);
+  const sortedVisibleAtomsSize = sortedVisibleAtoms
+    ? sortedVisibleAtoms.length
+    : 0;
+  const hasVisibleAtoms = sortedVisibleAtomsSize > 0;
+  const showSlideIns = useSelector(
+    state =>
+      viewSelectors.hasSlideIns(state, history) &&
+      viewSelectors.isSlideInsVisible(state)
+  );
+  const showModalDialog = useSelector(viewSelectors.showModalDialog);
 
-  return {
-    whatsNewUseCaseIdentifierArray: whatsNewUseCaseIdentifierArray,
-    whatsNewAtoms: whatsNewAtoms,
-    isLoggedIn: accountUtils.isLoggedIn(accountState),
-    currentLocation: generalSelectors.getCurrentLocation(state),
-    lastAtomUrisUpdateDate,
-    friendlyLastAtomUrisUpdateTimestamp:
-      lastAtomUrisUpdateDate &&
-      wonLabelUtils.relativeTime(
-        generalSelectors.selectLastUpdateTime(state),
-        lastAtomUrisUpdateDate
-      ),
-    sortedVisibleAtomUriArray,
-    hasVisibleAtomUris:
-      sortedVisibleAtomUriArray && sortedVisibleAtomUriArray.length > 0,
-    sortedVisibleAtomUriSize: sortedVisibleAtomUriArray
-      ? sortedVisibleAtomUriArray.length
-      : 0,
-    isOwnerAtomUrisLoading,
-    isOwnerAtomUrisToLoad,
-    showSlideIns:
-      viewSelectors.hasSlideIns(state, ownProps.history) &&
-      viewSelectors.isSlideInsVisible(state),
-    showModalDialog: viewSelectors.showModalDialog(state),
-  };
-};
+  useEffect(() => {
+    if (isOwnerAtomUrisToLoad) {
+      dispatch(actionCreators.atoms__fetchWhatsNew());
+    }
+  });
 
-const mapDispatchToProps = dispatch => {
-  return {
-    fetchWhatsNew: date => {
-      dispatch(actionCreators.atoms__fetchWhatsNew(date));
-    },
-  };
-};
-
-class PageOverview extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      open: [],
-    };
-    this.reload = this.reload.bind(this);
+  function hasOtherAtoms() {
+    return !!whatsNewAtoms.find(atom => !atomUtils.hasMatchedUseCase(atom));
   }
-
-  render() {
-    return (
-      <section className={!this.props.isLoggedIn ? "won-signed-out" : ""}>
-        {this.props.showModalDialog && <WonModalDialog />}
-        <WonTopnav pageTitle="What's New" />
-        {this.props.isLoggedIn && <WonMenu />}
-        <WonToasts />
-        {this.props.showSlideIns && <WonSlideIn />}
-        <main className="owneroverview">
-          <div className="owneroverview__header">
-            <div className="owneroverview__header__title">
-              {"What's new? "}
-              {!this.props.isOwnerAtomUrisLoading &&
-                this.props.hasVisibleAtomUris &&
-                !this.props.whatsNewUseCaseIdentifierArray && (
-                  <span className="owneroverview__header__title__count">
-                    {"(" + this.props.sortedVisibleAtomUriSize + ")"}
-                  </span>
-                )}
-            </div>
-            <div className="owneroverview__header__updated">
-              {this.props.isOwnerAtomUrisLoading ? (
-                <div className="owneroverview__header__updated__loading hide-in-responsive">
-                  Loading...
-                </div>
-              ) : (
-                <div className="owneroverview__header__updated__time hide-in-responsive">
-                  {"Updated: " + this.props.friendlyLastAtomUrisUpdateTimestamp}
-                </div>
-              )}
-              <button
-                className="owneroverview__header__updated__reload won-button--filled red"
-                onClick={this.reload}
-                disabled={this.props.isOwnerAtomUrisLoading}
-              >
-                Reload
-              </button>
-            </div>
-          </div>
-          {this.props.hasVisibleAtomUris ? (
-            <div className="owneroverview__usecases">
-              {this.props.whatsNewUseCaseIdentifierArray.map(
-                (ucIdentifier, index) => (
-                  <div
-                    className="owneroverview__usecases__usecase"
-                    key={ucIdentifier + "-" + index}
-                  >
-                    <div
-                      className="owneroverview__usecases__usecase__header clickable"
-                      onClick={() => this.toggleUseCase(ucIdentifier)}
-                    >
-                      {useCaseUtils.getUseCaseIcon(ucIdentifier) && (
-                        <svg className="owneroverview__usecases__usecase__header__icon">
-                          <use
-                            xlinkHref={useCaseUtils.getUseCaseIcon(
-                              ucIdentifier
-                            )}
-                            href={useCaseUtils.getUseCaseIcon(ucIdentifier)}
-                          />
-                        </svg>
-                      )}
-                      <div className="owneroverview__usecases__usecase__header__title">
-                        {useCaseUtils.getUseCaseLabel(ucIdentifier)}
-                        <span className="owneroverview__usecases__usecase__header__title__count">
-                          {"(" + this.getAtomsSizeByUseCase(ucIdentifier) + ")"}
-                        </span>
-                      </div>
-                      <svg
-                        className={
-                          "owneroverview__usecases__usecase__header__carret " +
-                          (this.isUseCaseExpanded(ucIdentifier)
-                            ? " owneroverview__usecases__usecase__header__carret--expanded "
-                            : " owneroverview__usecases__usecase__header__carret--collapsed ")
-                        }
-                      >
-                        <use
-                          xlinkHref={ico16_arrow_down}
-                          href={ico16_arrow_down}
-                        />
-                      </svg>
-                    </div>
-                    {this.isUseCaseExpanded(ucIdentifier) && (
-                      <div className="owneroverview__usecases__usecase__atoms">
-                        <WonAtomCardGrid
-                          atoms={this.getSortedVisibleAtomsByUseCase(
-                            ucIdentifier
-                          )}
-                          currentLocation={this.props.currentLocation}
-                          showSuggestions={false}
-                          showHolder={true}
-                          showCreate={false}
-                        />
-                      </div>
-                    )}
-                  </div>
-                )
-              )}
-              {this.hasOtherAtoms() && (
-                <div className="owneroverview__usecases__usecase">
-                  {this.props.whatsNewUseCaseIdentifierArray && (
-                    <div
-                      className="owneroverview__usecases__usecase__header"
-                      onClick={() => this.toggleUseCase(undefined)}
-                    >
-                      <div className="owneroverview__usecases__usecase__header__title">
-                        Other
-                        <span className="owneroverview__usecases__usecase__header__title__count">
-                          {"(" + this.getOtherAtomsSize() + ")"}
-                        </span>
-                      </div>
-                      <svg
-                        className={
-                          "owneroverview__usecases__usecase__header__carret " +
-                          (this.isUseCaseExpanded(undefined)
-                            ? " owneroverview__usecases__usecase__header__carret--expanded "
-                            : " owneroverview__usecases__usecase__header__carret--collapsed ")
-                        }
-                      >
-                        <use
-                          xlinkHref={ico16_arrow_down}
-                          href={ico16_arrow_down}
-                        />
-                      </svg>
-                    </div>
-                  )}
-
-                  {this.isUseCaseExpanded(undefined) && (
-                    <div className="owneroverview__usecases__usecase__atoms">
-                      <WonAtomCardGrid
-                        atoms={this.getSortedVisibleOtherAtoms()}
-                        currentLocation={this.props.currentLocation}
-                        showSuggestions={false}
-                        showHolder={true}
-                        showCreate={false}
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="owneroverview__noresults">
-              <span className="owneroverview__noresults__label">
-                Nothing new found.
-              </span>
-            </div>
-          )}
-        </main>
-        <WonFooter />
-      </section>
-    );
-  }
-
-  hasOtherAtoms() {
-    return !!this.props.whatsNewAtoms.find(
-      atom => !atomUtils.hasMatchedUseCase(atom)
-    );
-  }
-  getOtherAtomsSize() {
-    const useCaseAtoms = this.props.whatsNewAtoms.filter(
+  function getOtherAtomsSize() {
+    const useCaseAtoms = whatsNewAtoms.filter(
       atom => !atomUtils.hasMatchedUseCase(atom)
     );
     return useCaseAtoms ? useCaseAtoms.size : 0;
   }
 
-  getAtomsSizeByUseCase(ucIdentifier) {
-    const useCaseAtoms = this.props.whatsNewAtoms.filter(
+  function getAtomsSizeByUseCase(ucIdentifier) {
+    const useCaseAtoms = whatsNewAtoms.filter(
       atom => atomUtils.getMatchedUseCaseIdentifier(atom) === ucIdentifier
     );
     return useCaseAtoms ? useCaseAtoms.size : 0;
   }
 
-  getSortedVisibleAtomsByUseCase(ucIdentifier) {
-    const useCaseAtoms = this.props.whatsNewAtoms.filter(
+  function getSortedVisibleAtomsByUseCase(ucIdentifier) {
+    const useCaseAtoms = whatsNewAtoms.filter(
       atom => atomUtils.getMatchedUseCaseIdentifier(atom) === ucIdentifier
     );
     return sortByDate(useCaseAtoms, "creationDate") || [];
   }
 
-  getSortedVisibleOtherAtoms() {
-    const useCaseAtoms = this.props.whatsNewAtoms.filter(
+  function getSortedVisibleOtherAtoms() {
+    const useCaseAtoms = whatsNewAtoms.filter(
       atom => !atomUtils.hasMatchedUseCase(atom)
     );
     return sortByDate(useCaseAtoms, "creationDate") || [];
   }
 
-  isUseCaseExpanded(ucIdentifier) {
-    return this.state.open.includes(ucIdentifier);
+  function isUseCaseExpanded(ucIdentifier) {
+    return open.includes(ucIdentifier);
   }
 
-  toggleUseCase(ucIdentifier) {
-    if (this.isUseCaseExpanded(ucIdentifier)) {
-      this.setState({
-        open: this.state.open.filter(element => ucIdentifier !== element),
-      });
+  function toggleUseCase(ucIdentifier) {
+    if (isUseCaseExpanded(ucIdentifier)) {
+      setOpen(open.filter(element => ucIdentifier !== element));
     } else {
-      const _open = this.state.open;
+      const _open = open;
       _open.push(ucIdentifier);
-      this.setState({ open: _open });
+      setOpen(_open);
     }
   }
 
-  componentDidUpdate() {
-    if (this.props.isOwnerAtomUrisToLoad) {
-      this.props.fetchWhatsNew();
-    }
-  }
-
-  reload() {
-    if (!this.props.isOwnerAtomUrisLoading) {
+  function reload() {
+    if (!isOwnerAtomUrisLoading) {
       const modifiedAfterDate =
-        (this.props.lastAtomUrisUpdateDate &&
-          new Date(this.props.lastAtomUrisUpdateDate)) ||
+        (lastAtomUrisUpdateDate && new Date(lastAtomUrisUpdateDate)) ||
         new Date(Date.now() - 30 /*Days before*/ * 86400000);
-      this.props.fetchWhatsNew(modifiedAfterDate);
+      dispatch(actionCreators.atoms__fetchWhatsNew(modifiedAfterDate));
     }
   }
-}
-PageOverview.propTypes = {
-  whatsNewUseCaseIdentifierArray: PropTypes.arrayOf(PropTypes.string),
-  whatsNewAtoms: PropTypes.object,
-  isLoggedIn: PropTypes.bool,
-  currentLocation: PropTypes.object,
-  lastAtomUrisUpdateDate: PropTypes.number,
-  friendlyLastAtomUrisUpdateTimestamp: PropTypes.string,
-  sortedVisibleAtomUriArray: PropTypes.arrayOf(PropTypes.string),
-  hasVisibleAtomUris: PropTypes.bool,
-  sortedVisibleAtomUriSize: PropTypes.number,
-  isOwnerAtomUrisLoading: PropTypes.bool,
-  isOwnerAtomUrisToLoad: PropTypes.bool,
-  showSlideIns: PropTypes.bool,
-  showModalDialog: PropTypes.bool,
-  fetchWhatsNew: PropTypes.func,
-};
 
-export default withRouter(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(PageOverview)
-);
+  return (
+    <section className={!isLoggedIn ? "won-signed-out" : ""}>
+      {showModalDialog && <WonModalDialog />}
+      <WonTopnav pageTitle="What's New" />
+      {isLoggedIn && <WonMenu />}
+      <WonToasts />
+      {showSlideIns && <WonSlideIn />}
+      <main className="owneroverview">
+        <div className="owneroverview__header">
+          <div className="owneroverview__header__title">
+            {"What's new? "}
+            {!isOwnerAtomUrisLoading &&
+              hasVisibleAtoms &&
+              !whatsNewUseCaseIdentifierArray && (
+                <span className="owneroverview__header__title__count">
+                  {"(" + sortedVisibleAtomsSize + ")"}
+                </span>
+              )}
+          </div>
+          <div className="owneroverview__header__updated">
+            {isOwnerAtomUrisLoading ? (
+              <div className="owneroverview__header__updated__loading hide-in-responsive">
+                Loading...
+              </div>
+            ) : (
+              <div className="owneroverview__header__updated__time hide-in-responsive">
+                {"Updated: " + friendlyLastAtomUrisUpdateTimestamp}
+              </div>
+            )}
+            <button
+              className="owneroverview__header__updated__reload won-button--filled red"
+              onClick={reload}
+              disabled={isOwnerAtomUrisLoading}
+            >
+              Reload
+            </button>
+          </div>
+        </div>
+        {hasVisibleAtoms ? (
+          <div className="owneroverview__usecases">
+            {whatsNewUseCaseIdentifierArray.map((ucIdentifier, index) => (
+              <div
+                className="owneroverview__usecases__usecase"
+                key={ucIdentifier + "-" + index}
+              >
+                <div
+                  className="owneroverview__usecases__usecase__header clickable"
+                  onClick={() => toggleUseCase(ucIdentifier)}
+                >
+                  {useCaseUtils.getUseCaseIcon(ucIdentifier) && (
+                    <svg className="owneroverview__usecases__usecase__header__icon">
+                      <use
+                        xlinkHref={useCaseUtils.getUseCaseIcon(ucIdentifier)}
+                        href={useCaseUtils.getUseCaseIcon(ucIdentifier)}
+                      />
+                    </svg>
+                  )}
+                  <div className="owneroverview__usecases__usecase__header__title">
+                    {useCaseUtils.getUseCaseLabel(ucIdentifier)}
+                    <span className="owneroverview__usecases__usecase__header__title__count">
+                      {"(" + getAtomsSizeByUseCase(ucIdentifier) + ")"}
+                    </span>
+                  </div>
+                  <svg
+                    className={
+                      "owneroverview__usecases__usecase__header__carret " +
+                      (isUseCaseExpanded(ucIdentifier)
+                        ? " owneroverview__usecases__usecase__header__carret--expanded "
+                        : " owneroverview__usecases__usecase__header__carret--collapsed ")
+                    }
+                  >
+                    <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
+                  </svg>
+                </div>
+                {isUseCaseExpanded(ucIdentifier) && (
+                  <div className="owneroverview__usecases__usecase__atoms">
+                    <WonAtomCardGrid
+                      atoms={getSortedVisibleAtomsByUseCase(ucIdentifier)}
+                      currentLocation={currentLocation}
+                      showSuggestions={false}
+                      showHolder={true}
+                      showCreate={false}
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
+            {hasOtherAtoms() && (
+              <div className="owneroverview__usecases__usecase">
+                {whatsNewUseCaseIdentifierArray && (
+                  <div
+                    className="owneroverview__usecases__usecase__header"
+                    onClick={() => toggleUseCase(undefined)}
+                  >
+                    <div className="owneroverview__usecases__usecase__header__title">
+                      Other
+                      <span className="owneroverview__usecases__usecase__header__title__count">
+                        {"(" + getOtherAtomsSize() + ")"}
+                      </span>
+                    </div>
+                    <svg
+                      className={
+                        "owneroverview__usecases__usecase__header__carret " +
+                        (isUseCaseExpanded(undefined)
+                          ? " owneroverview__usecases__usecase__header__carret--expanded "
+                          : " owneroverview__usecases__usecase__header__carret--collapsed ")
+                      }
+                    >
+                      <use
+                        xlinkHref={ico16_arrow_down}
+                        href={ico16_arrow_down}
+                      />
+                    </svg>
+                  </div>
+                )}
+
+                {isUseCaseExpanded(undefined) && (
+                  <div className="owneroverview__usecases__usecase__atoms">
+                    <WonAtomCardGrid
+                      atoms={getSortedVisibleOtherAtoms()}
+                      currentLocation={currentLocation}
+                      showSuggestions={false}
+                      showHolder={true}
+                      showCreate={false}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="owneroverview__noresults">
+            <span className="owneroverview__noresults__label">
+              Nothing new found.
+            </span>
+          </div>
+        )}
+      </main>
+      <WonFooter />
+    </section>
+  );
+}
