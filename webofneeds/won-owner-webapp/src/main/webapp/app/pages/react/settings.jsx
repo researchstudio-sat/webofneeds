@@ -2,7 +2,6 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
-import { get } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import WonModalDialog from "../../components/modal-dialog.jsx";
@@ -15,9 +14,10 @@ import WonFooter from "../../components/footer.jsx";
 import WonSettingsWrapper from "../../components/settings-wrapper";
 
 import "~/style/_signup.scss";
+import * as generalSelectors from "../../redux/selectors/general-selectors";
 
 const mapStateToProps = (state, ownProps) => {
-  const accountState = get(state, "account");
+  const accountState = generalSelectors.getAccountState(state);
 
   return {
     isLoggedIn: accountUtils.isLoggedIn(accountState),

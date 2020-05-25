@@ -2,12 +2,12 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
-import { get } from "../utils";
+import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as accountUtils from "../redux/utils/account-utils";
 import { Link, withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
-  const accountState = get(state, "account");
+  const accountState = generalSelectors.getAccountState(state);
 
   return {
     className: ownProps.className,

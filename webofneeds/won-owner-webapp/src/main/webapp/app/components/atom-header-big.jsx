@@ -29,7 +29,7 @@ export default function WonAtomHeaderBig({ atom }) {
   const responseToAtom = useSelector(
     state => responseToUri && getIn(state, ["atoms", responseToUri])
   );
-  const accountState = useSelector(state => get(state, "account"));
+  const accountState = useSelector(generalSelectors.getAccountState);
   const ownedAtomsWithBuddySocket = useSelector(state =>
     generalSelectors.getOwnedAtomsWithBuddySocket(state)
   );

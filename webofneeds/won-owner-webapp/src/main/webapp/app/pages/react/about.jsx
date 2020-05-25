@@ -4,6 +4,7 @@ import { ownerBaseUrl } from "~/config/default.js";
 import { get, getIn, toAbsoluteURL, getQueryParams } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
+import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import WonFooter from "../../components/footer.jsx";
 import WonAccordion from "../../components/accordion.jsx";
 import WonHowTo from "../../components/howto.jsx";
@@ -167,7 +168,7 @@ export default function PageAbout() {
   const themeName = get(theme, "name");
 
   const isLoggedIn = useSelector(state =>
-    accountUtils.isLoggedIn(get(state, "account"))
+    accountUtils.isLoggedIn(generalSelectors.getAccountState(state))
   );
   const tosTemplateHtml = get(theme, "tosTemplate");
   const imprintTemplateHtml = get(theme, "imprintTemplate");

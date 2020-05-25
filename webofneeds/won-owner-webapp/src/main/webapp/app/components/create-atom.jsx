@@ -120,16 +120,15 @@ const mapStateToProps = (state, ownProps) => {
     useCaseObject = useCaseUtils.getUseCase(useCase);
   }
 
-  const isHolderOwned = accountUtils.isAtomOwned(
-    get(state, "account"),
-    holderUri
-  );
+  const accountState = generalSelectors.getAccountState(state);
+
+  const isHolderOwned = accountUtils.isAtomOwned(accountState, holderUri);
   const holderAtom = isHolderOwned && getIn(state, ["atoms", holderUri]);
   const isHolderAtomValid = holderAtom && atomUtils.hasHolderSocket(holderAtom);
 
   return {
     defaultNodeUri: getIn(state, ["config", "defaultNodeUri"]),
-    loggedIn: accountUtils.isLoggedIn(get(state, "account")),
+    loggedIn: accountUtils.isLoggedIn(accountState),
     holderUri,
     isHolderAtomValid,
     connectToAtomUri,

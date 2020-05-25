@@ -27,7 +27,7 @@ export default function WonAtomContentSocket({
   suggestPicker,
 }) {
   const dispatch = useDispatch();
-  const accountState = useSelector(state => get(state, "account"));
+  const accountState = useSelector(generalSelectors.getAccountState);
   const isAtomOwned = accountUtils.isAtomOwned(accountState, get(atom, "uri"));
 
   const [showRequestReceived, toggleRequestReceived] = useState(false);

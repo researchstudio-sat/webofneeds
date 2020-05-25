@@ -1,12 +1,14 @@
 /**
  * Created by quasarchimaere on 21.01.2019.
  */
-import { get, getIn } from "../../utils.js";
+import { getIn, get } from "../../utils.js";
 import * as processUtils from "../utils/process-utils.js";
-
 import { createSelector } from "reselect";
 
-export const getProcessState = state => get(state, "process");
+const getProcessState = createSelector(
+  state => get(state, "process"),
+  state => state
+);
 
 /**
  * Check if anything in the state sub-map of process is currently marked as loading

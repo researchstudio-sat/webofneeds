@@ -53,7 +53,7 @@ export default function WonConnectionContextDropdown({
 
     linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
   }
-  const process = useSelector(state => get(state, "process"));
+  const process = useSelector(generalSelectors.getProcessState);
   const adminEmail = useSelector(state =>
     getIn(state, ["config", "theme", "adminEmail"])
   );

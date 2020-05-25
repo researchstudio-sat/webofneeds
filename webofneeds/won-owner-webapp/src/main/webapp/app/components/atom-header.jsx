@@ -6,8 +6,7 @@ import { Link } from "react-router-dom";
 import { get, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { relativeTime } from "../won-label-utils.js";
-import { selectLastUpdateTime } from "../redux/selectors/general-selectors.js";
-
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 
@@ -39,7 +38,7 @@ export default function WonAtomHeader({
   );
   const personaName = get(persona, "humanReadable");
 
-  const processState = useSelector(state => get(state, "process"));
+  const processState = useSelector(generalSelectors.getProcessState);
 
   const atomTypeLabel = atom && atomUtils.generateTypeLabel(atom);
   const atomLoading =
@@ -49,7 +48,9 @@ export default function WonAtomHeader({
     atom && processUtils.hasAtomFailedToLoad(processState, atomUri);
   const isGroupChatEnabled = atomUtils.hasGroupSocket(atom);
   const isChatEnabled = atomUtils.hasChatSocket(atom);
-  const globalUpdateTimestamp = useSelector(selectLastUpdateTime);
+  const globalUpdateTimestamp = useSelector(
+    generalSelectors.selectLastUpdateTime
+  );
   const friendlyTimestamp =
     !hideTimestamp &&
     atom &&

@@ -6,6 +6,7 @@ import ReactMarkdown from "react-markdown";
 import { parseRestErrorMessage } from "../won-utils.js";
 import { get, getIn } from "../utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import won from "../won-es6";
 
 import "~/style/_won-markdown.scss";
@@ -13,7 +14,7 @@ import WonLabelledHr from "./labelled-hr";
 import { Link } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
-  const accountState = get(state, "account");
+  const accountState = generalSelectors.getAccountState(state);
   const loginError = accountUtils.getLoginError(accountState);
   const isNotVerified =
     get(loginError, "code") === won.RESPONSECODE.USER_NOT_VERIFIED;

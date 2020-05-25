@@ -7,7 +7,6 @@ import { get, getIn, getQueryParams, generateLink } from "../utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
-import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import { Elm } from "../../elm/RatingView.elm";
 
 import WonAtomIcon from "./atom-icon.jsx";
@@ -23,7 +22,7 @@ export default function WonAtomContentHolder({ holdsUri }) {
   const dispatch = useDispatch();
   const { connectionUri } = getQueryParams(history.location);
   const connection = useSelector(state =>
-    connectionSelectors.getOwnedConnectionByUri(state, connectionUri)
+    generalSelectors.getOwnedConnectionByUri(state, connectionUri)
   );
   const ownAtom = useSelector(state =>
     generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri)
@@ -53,7 +52,7 @@ export default function WonAtomContentHolder({ holdsUri }) {
   const holderHasBuddySocket = atomUtils.hasBuddySocket(holderAtom);
   const holderBuddies = holderHasBuddySocket && get(holderAtom, "buddies");
 
-  const process = useSelector(state => get(state, "process"));
+  const process = useSelector(generalSelectors.getProcessState);
   const postIsOwned = useSelector(state =>
     generalSelectors.isAtomOwned(state, holdsUri)
   );

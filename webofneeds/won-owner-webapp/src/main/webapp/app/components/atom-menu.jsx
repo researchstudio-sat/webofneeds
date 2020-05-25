@@ -34,8 +34,8 @@ export default function WonAtomMenu({ atom, defaultTab }) {
   const holderAggregateRating =
     holderHasReviewSocket && getIn(holder, ["rating", "aggregateRating"]);
 
-  const viewState = useSelector(state => get(state, "view"));
-  const process = useSelector(state => get(state, "process"));
+  const viewState = useSelector(generalSelectors.getViewState);
+  const process = useSelector(generalSelectors.getProcessState);
 
   const isHoldable = atomUtils.hasHoldableSocket(atom);
   const holderAggregateRatingString =

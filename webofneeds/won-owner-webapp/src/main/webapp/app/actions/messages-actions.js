@@ -243,7 +243,7 @@ export function processConnectionMessage(wonMessage) {
 
       let sentEventPromise;
       if (isSentEvent) {
-        const senderAtom = get(state, ["atoms", senderAtomUri]);
+        const senderAtom = getIn(state, ["atoms", senderAtomUri]);
         const senderConnection = atomUtils.getConnectionBySocketUris(
           senderAtom,
           senderSocketUri,
@@ -264,7 +264,7 @@ export function processConnectionMessage(wonMessage) {
 
       let receivedEventPromise;
       if (isReceivedEvent) {
-        const targetAtom = get(state, ["atoms", targetAtomUri]);
+        const targetAtom = getIn(state, ["atoms", targetAtomUri]);
         const targetConnection = atomUtils.getConnectionBySocketUris(
           targetAtom,
           targetSocketUri,

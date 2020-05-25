@@ -53,11 +53,11 @@ export default function PageInventory() {
   const sortedOwnedActivePersonas =
     sortByDate(ownedActivePersonas, "modifiedDate") || [];
 
-  const viewState = useSelector(state => get(state, "view"));
+  const viewState = useSelector(generalSelectors.getViewState);
 
   const theme = useSelector(state => getIn(state, ["config", "theme"]));
-  const accountState = useSelector(state => get(state, "account"));
-  const process = useSelector(state => get(state, "process"));
+  const accountState = useSelector(generalSelectors.getAccountState);
+  const process = useSelector(generalSelectors.getProcessState);
 
   const isInitialLoadInProgress = processUtils.isProcessingInitialLoad(process);
   const isLoggedIn = accountUtils.isLoggedIn(accountState);

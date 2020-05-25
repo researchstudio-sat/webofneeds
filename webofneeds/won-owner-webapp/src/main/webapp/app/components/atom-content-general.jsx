@@ -3,7 +3,7 @@
  */
 import React from "react";
 import PropTypes from "prop-types";
-import { selectLastUpdateTime } from "../redux/selectors/general-selectors";
+import * as generalSelectors from "../redux/selectors/general-selectors";
 import { get } from "../utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import { relativeTime } from "../won-label-utils.js";
@@ -13,7 +13,7 @@ import { useSelector } from "react-redux";
 import "~/style/_atom-content-general.scss";
 
 export default function WonAtomContentGeneral({ atom }) {
-  const viewState = useSelector(state => get(state, "view"));
+  const viewState = useSelector(generalSelectors.getViewState);
 
   const creationDate = get(atom, "creationDate");
   const modifiedDate = get(atom, "modifiedDate");
@@ -23,7 +23,9 @@ export default function WonAtomContentGeneral({ atom }) {
   const shortFlagLabels = atom && atomUtils.generateShortFlagLabels(atom);
   const fullSocketLabels = atom && atomUtils.generateFullSocketLabels(atom);
   const shortSocketLabels = atom && atomUtils.generateShortSocketLabels(atom);
-  const globalLastUpdateTime = useSelector(selectLastUpdateTime);
+  const globalLastUpdateTime = useSelector(
+    generalSelectors.selectLastUpdateTime
+  );
   const friendlyCreationDate =
     creationDate && relativeTime(globalLastUpdateTime, creationDate);
   const friendlyModifiedDate =

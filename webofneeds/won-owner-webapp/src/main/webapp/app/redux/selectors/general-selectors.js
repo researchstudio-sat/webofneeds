@@ -8,6 +8,7 @@ import { getIn, get } from "../../utils.js";
 import * as atomUtils from "../utils/atom-utils.js";
 import * as connectionUtils from "../utils/connection-utils.js";
 import * as accountUtils from "../utils/account-utils.js";
+import * as processUtils from "../utils/process-utils.js";
 import * as viewUtils from "../utils/view-utils.js";
 import Color from "color";
 import Immutable from "immutable";
@@ -15,7 +16,18 @@ import vocab from "../../service/vocab";
 
 export const selectLastUpdateTime = state => get(state, "lastUpdateTime");
 
-export const getAccountState = state => get(state, "account");
+export const getAccountState = createSelector(
+  state => get(state, "account"),
+  state => state
+);
+export const getProcessState = createSelector(
+  state => get(state, "process"),
+  state => state
+);
+export const getViewState = createSelector(
+  state => get(state, "view"),
+  state => state
+);
 
 export const getAtoms = createSelector(
   state => state,
@@ -219,8 +231,8 @@ export function getOwnedAtomByConnectionUri(state, connectionUri) {
   const atoms = connectionUri && getOwnedAtoms(state); //we only check own atoms as these are the only ones who have connections stored
   return (
     atoms &&
-    (getIn(atoms, connectionUri.split("/c")[0]) ||
-      atoms.find(atom => atom.getIn(["connections", connectionUri])))
+    (get(atoms, connectionUri.split("/c")[0]) ||
+      atoms.find(atom => getIn(atom, ["connections", connectionUri])))
   );
 }
 
@@ -319,12 +331,12 @@ export function isAtomEditable(state, atomUri) {
 }
 
 export const isLocationAccessDenied = createSelector(
-  state => get(state, "view"),
+  getViewState,
   viewState => viewState && viewUtils.isLocationAccessDenied(viewState)
 );
 
 export const getCurrentLocation = createSelector(
-  state => get(state, "view"),
+  getViewState,
   viewState => viewState && viewUtils.getCurrentLocation(viewState)
 );
 
@@ -353,3 +365,67 @@ export const getTargetSocketType = (allAtoms, connection) => {
     getIn(allAtoms, [targetAtomUri, "content", "sockets", targetSocketUri])
   );
 };
+
+/**
+ * Get all connections stored within your own atoms as a map
+ * @returns Immutable.Map with all connections
+ */
+export const getOwnedConnections = createSelector(
+  getOwnedAtoms,
+  ownedAtoms =>
+    ownedAtoms && ownedAtoms.flatMap(atom => get(atom, "connections"))
+);
+
+/**
+ * Get all the connectionUris storid within the state
+ */
+export const getOwnedConnectionUris = createSelector(
+  getOwnedConnections,
+  ownedConnections => ownedConnections && ownedConnections.keySeq().toSet()
+);
+
+export const getConnectionsToCrawl = createSelector(
+  getProcessState,
+  getAllConnectedChatAndGroupConnections,
+  (process, connections) =>
+    connections
+      ? connections
+          .filter(
+            conn => !get(conn, "messages") || get(conn, "messages").size === 0
+            // the check below (if connectMessage was present) was replaced by if any messages are available (if any are there this connection is not to be fetched anymore)
+            // !!conn
+            //   .get("messages")
+            //   .find(msg => msg.get("messageType") === vocab.WONMSG.connectMessage)
+          )
+          .filter(conn => {
+            const connUri = get(conn, "uri");
+
+            return (
+              !processUtils.isConnectionLoading(process, connUri) &&
+              !processUtils.isConnectionLoadingMessages(process, connUri) &&
+              !processUtils.hasConnectionFailedToLoad(process, connUri) &&
+              processUtils.hasMessagesToLoad(process, connUri)
+            );
+          })
+      : Immutable.Map()
+);
+
+export function getConnectionsToInjectMsgInto(atoms, targetSocketUri, msgUri) {
+  const allConnections =
+    atoms && atoms.flatMap(atom => atom.get("connections"));
+
+  return allConnections
+    .filter(conn => connectionUtils.isConnected(conn))
+    .filter(conn => get(conn, "targetSocketUri") === targetSocketUri)
+    .filter(conn => !get(conn, "messages").contains(msgUri));
+}
+
+/**
+ * Get the connection for a given connectionUri
+ * @param state to retrieve data from
+ * @param connectionUri to find corresponding connection for
+ */
+export function getOwnedConnectionByUri(state, connectionUri) {
+  let atom = getOwnedAtomByConnectionUri(state, connectionUri);
+  return getIn(atom, ["connections", connectionUri]);
+}

@@ -19,7 +19,7 @@ export default function WonAtomInfo({ atom, className, defaultTab }) {
     generalSelectors.isAtomOwned(state, atomUri)
   );
 
-  const viewState = useSelector(state => get(state, "view"));
+  const viewState = useSelector(generalSelectors.getViewState);
   const visibleTab = viewUtils.getVisibleTabByAtomUri(viewState, atomUri);
 
   const atomLoading = useSelector(

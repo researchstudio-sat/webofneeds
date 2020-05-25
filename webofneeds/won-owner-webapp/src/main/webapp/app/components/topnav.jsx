@@ -6,7 +6,6 @@ import { get, getIn, getPathname } from "../utils.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import { isLoading } from "../redux/selectors/process-selectors.js";
-import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import WonAccountMenu from "./account-menu.jsx";
 
@@ -20,7 +19,7 @@ import { Link, withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const currentPath = getPathname(ownProps.location);
-  const accountState = get(state, "account");
+  const accountState = generalSelectors.getAccountState(state);
 
   return {
     pageTitle: ownProps.pageTitle,
@@ -33,7 +32,7 @@ const mapStateToProps = (state, ownProps) => {
     loggedIn: accountUtils.isLoggedIn(accountState),
     isSignUpView: currentPath === "/signup",
     showLoadingIndicator: isLoading(state),
-    connectionsToCrawl: connectionSelectors.getConnectionsToCrawl(state),
+    connectionsToCrawl: generalSelectors.getConnectionsToCrawl(state),
     hasUnreads:
       generalSelectors.hasUnreadSuggestedConnections(state) ||
       generalSelectors.hasUnreadBuddyConnections(state, true, false) ||

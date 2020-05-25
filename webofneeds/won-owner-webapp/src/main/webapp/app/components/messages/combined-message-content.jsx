@@ -5,9 +5,11 @@ import React from "react";
 import { useSelector } from "react-redux";
 
 import PropTypes from "prop-types";
-import { getAtoms } from "../../redux/selectors/general-selectors.js";
+import {
+  getAtoms,
+  getOwnedConnections,
+} from "../../redux/selectors/general-selectors.js";
 import { get, getIn, generateLink } from "../../utils.js";
-import { getOwnedConnections } from "../../redux/selectors/connection-selectors.js";
 import { labels } from "../../won-label-utils.js";
 import vocab from "../../service/vocab.js";
 import WonMessageContent from "./message-content.jsx";

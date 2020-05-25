@@ -60,7 +60,7 @@ const mapStateToProps = (state, ownProps) => {
   const isOwnerAtomUrisToLoad =
     !lastAtomUrisUpdateDate && !isOwnerAtomUrisLoading;
 
-  const accountState = get(state, "account");
+  const accountState = generalSelectors.getAccountState(state);
 
   return {
     whatsNewUseCaseIdentifierArray: whatsNewUseCaseIdentifierArray,

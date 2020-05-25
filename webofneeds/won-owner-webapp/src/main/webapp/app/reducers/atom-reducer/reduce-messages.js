@@ -3,7 +3,6 @@ import { markUriAsRead, isUriRead } from "../../won-localstorage.js";
 import { markConnectionAsRead } from "./reduce-connections.js";
 import { addAtomStub } from "./reduce-atoms.js";
 import vocab from "../../service/vocab.js";
-import * as connectionSelectors from "../../redux/selectors/connection-selectors.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import { get, getIn } from "../../utils.js";
@@ -297,7 +296,7 @@ export function addMessage(
         }
       }
 
-      const connections = connectionSelectors.getConnectionsToInjectMsgInto(
+      const connections = generalSelectors.getConnectionsToInjectMsgInto(
         state,
         targetSocketUri,
         getIn(parsedMessage, ["data", "uri"])

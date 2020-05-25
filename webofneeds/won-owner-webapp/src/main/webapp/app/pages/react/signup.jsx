@@ -1,9 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { get } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
+import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import WonModalDialog from "../../components/modal-dialog";
 import WonTopnav from "../../components/topnav";
 import WonMenu from "../../components/menu";
@@ -18,7 +18,7 @@ import { actionCreators } from "../../actions/actions";
 import { Link, withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
-  const accountState = get(state, "account");
+  const accountState = generalSelectors.getAccountState(state);
   return {
     isLoggedIn: accountUtils.isLoggedIn(accountState),
     registerError: accountUtils.getRegisterError(accountState),

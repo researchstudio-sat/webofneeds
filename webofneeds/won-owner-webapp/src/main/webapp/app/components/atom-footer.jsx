@@ -31,11 +31,9 @@ export default function WonAtomFooter({ atom, className }) {
   const history = useHistory();
   const atomUri = get(atom, "uri");
 
-  const ownedAtoms = useSelector(state =>
-    generalSelectors.getOwnedAtoms(state)
-  );
+  const ownedAtoms = useSelector(generalSelectors.getOwnedAtoms);
 
-  const accountState = useSelector(state => get(state, "account"));
+  const accountState = useSelector(generalSelectors.getAccountState);
 
   const isOwned = useSelector(state =>
     generalSelectors.isAtomOwned(state, atomUri)

@@ -14,6 +14,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { applyMiddleware, createStore } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
+import * as generalSelectors from "./redux/selectors/general-selectors.js";
 import {
   HashRouter,
   Switch,
@@ -45,7 +46,7 @@ import thunk from "redux-thunk";
 import { piwikMiddleware } from "./piwik.js";
 import { runMessagingAgent } from "./messaging-agent";
 import Immutable from "immutable";
-import { getQueryParams, get } from "./utils.js";
+import { getQueryParams } from "./utils.js";
 import * as accountUtils from "./redux/utils/account-utils.js";
 import * as processUtils from "./redux/utils/process-utils.js";
 import { runPushAgent } from "./push-agent";
@@ -99,8 +100,8 @@ store.dispatch(actionCreators.tick());
 function AppRoutes() {
   const dispatch = useDispatch();
   const location = useLocation();
-  const accountState = useSelector(state => get(state, "account"));
-  const processState = useSelector(state => get(state, "process"));
+  const accountState = useSelector(generalSelectors.getAccountState);
+  const processState = useSelector(generalSelectors.getProcessState);
 
   const isLoggedIn = accountUtils.isLoggedIn(accountState);
   const hasLoginError = !!accountUtils.getLoginError(accountState);

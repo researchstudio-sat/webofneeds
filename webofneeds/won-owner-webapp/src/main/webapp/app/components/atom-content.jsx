@@ -63,8 +63,8 @@ export default function WonAtomContent({ atom, defaultTab }) {
   const hasContent = hasVisibleDetails(content);
   const hasSeeksBranch = hasVisibleDetails(seeks);
 
-  const viewState = useSelector(state => get(state, "view"));
-  const process = useSelector(state => get(state, "process"));
+  const viewState = useSelector(generalSelectors.getViewState);
+  const process = useSelector(generalSelectors.getProcessState);
 
   const isHeld = atomUtils.isHeld(atom);
   const hasHoldableSocket = atomUtils.hasHoldableSocket(atom);

@@ -6,6 +6,7 @@ import { get, getIn } from "../utils.js";
 
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 
@@ -44,7 +45,7 @@ export default function WonAtomIcon({ atom, className, onClick }) {
     ? atomUtils.getBackground(holder)
     : undefined;
 
-  const process = useSelector(state => get(state, "process"));
+  const process = useSelector(generalSelectors.getProcessState);
   const atomInactive = atomUtils.isInactive(atom);
   const atomFailedToLoad =
     atom && processUtils.hasAtomFailedToLoad(process, get(atom, "uri"));

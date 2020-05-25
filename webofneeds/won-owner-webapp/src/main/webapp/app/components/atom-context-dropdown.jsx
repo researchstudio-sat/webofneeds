@@ -47,7 +47,7 @@ export default function WonAtomContextDropdown({ atom, className }) {
     linkToAtom = toAbsoluteURL(ownerBaseUrl).toString() + path;
   }
 
-  const process = useSelector(state => get(state, "process"));
+  const process = useSelector(generalSelectors.getProcessState);
 
   const adminEmail = useSelector(state =>
     getIn(state, ["config", "theme", "adminEmail"])

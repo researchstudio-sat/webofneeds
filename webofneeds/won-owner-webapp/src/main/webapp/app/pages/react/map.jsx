@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { actionCreators } from "../../actions/actions.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
-import { get, getIn } from "../../utils.js";
+import { getIn } from "../../utils.js";
 import * as processUtils from "../../redux/utils/process-utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as wonLabelUtils from "../../won-label-utils.js";
@@ -85,7 +85,7 @@ const mapStateToProps = (state, ownProps) => {
     "lastWhatsAroundUpdateTime",
   ]);
 
-  const process = get(state, "process");
+  const process = generalSelectors.getProcessState(state);
   const isOwnerAtomUrisLoading = processUtils.isProcessingWhatsAround(process);
   const isOwnerAtomUrisToLoad =
     !lastAtomUrisUpdateDate && !isOwnerAtomUrisLoading;
@@ -97,7 +97,7 @@ const mapStateToProps = (state, ownProps) => {
       locations.push(atomLocation);
     });
 
-  const accountState = get(state, "account");
+  const accountState = generalSelectors.getAccountState(state);
 
   return {
     isLoggedIn: accountUtils.isLoggedIn(accountState),

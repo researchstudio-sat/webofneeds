@@ -49,7 +49,7 @@ export default function PageConnections() {
     generalSelectors.hasChatConnections(state)
   );
   const isLoggedIn = useSelector(state =>
-    accountUtils.isLoggedIn(get(state, "account"))
+    accountUtils.isLoggedIn(generalSelectors.getAccountState(state))
   );
   const showModalDialog = useSelector(state =>
     viewSelectors.showModalDialog(state)

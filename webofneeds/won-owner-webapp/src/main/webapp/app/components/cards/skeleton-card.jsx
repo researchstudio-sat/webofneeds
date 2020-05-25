@@ -9,12 +9,13 @@ import { connect } from "react-redux";
 
 import "~/style/_skeleton-card.scss";
 import * as processUtils from "../../redux/utils/process-utils.js";
+import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import WonAtomConnectionsIndicator from "../atom-connections-indicator.jsx";
 import PropTypes from "prop-types";
 
 const mapStateToProps = (state, ownProps) => {
   const atom = getIn(state, ["atoms", ownProps.atomUri]);
-  const process = get(state, "process");
+  const process = generalSelectors.getProcessState(state);
 
   const atomInCreation = get(atom, "isBeingCreated");
   const atomLoaded =

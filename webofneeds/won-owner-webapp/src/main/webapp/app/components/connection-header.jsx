@@ -27,7 +27,6 @@ import "~/style/_connection-header.scss";
 import "~/style/_connection-indicators.scss";
 
 import ico36_incoming from "~/images/won-icons/ico36_incoming.svg";
-import { selectLastUpdateTime } from "../redux/selectors/general-selectors";
 
 export default function WonConnectionHeader({ connection, toLink }) {
   const connectionUri = get(connection, "uri");
@@ -46,7 +45,7 @@ export default function WonConnectionHeader({ connection, toLink }) {
     getIn(state, ["atoms", atomUtils.getHeldByUri(targetAtom), "humanReadble"])
   );
 
-  const processState = useSelector(state => get(state, "process"));
+  const processState = useSelector(generalSelectors.getProcessState);
 
   const targetAtomLoading = processUtils.isAtomLoading(
     processState,
@@ -54,7 +53,10 @@ export default function WonConnectionHeader({ connection, toLink }) {
   );
 
   const isTargetAtomOwned = useSelector(state =>
-    accountUtils.isAtomOwned(get(state, "account"), targetAtomUri)
+    accountUtils.isAtomOwned(
+      generalSelectors.getAccountState(state),
+      targetAtomUri
+    )
   );
 
   const groupConnections =
@@ -76,7 +78,9 @@ export default function WonConnectionHeader({ connection, toLink }) {
 
   const isDirectResponseFromRemote = atomUtils.isDirectResponseAtom(targetAtom);
 
-  const globalLastUpdateTime = useSelector(selectLastUpdateTime);
+  const globalLastUpdateTime = useSelector(
+    generalSelectors.selectLastUpdateTime
+  );
   const friendlyTimestamp =
     connection &&
     relativeTime(globalLastUpdateTime, get(connection, "lastUpdateDate"));

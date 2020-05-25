@@ -74,7 +74,7 @@ const mapStateToProps = (state, ownProps) => {
     excludedText: ownProps.excludedText,
     notAllowedSocketText: ownProps.notAllowedSocketText,
     onUpdate: ownProps.onUpdate,
-    processState: get(state, ["process"]),
+    processState: get(state, "process"),
     allSuggestableAtoms,
     allForbiddenAtoms,
     allowedSockets: ownProps.allowedSockets,

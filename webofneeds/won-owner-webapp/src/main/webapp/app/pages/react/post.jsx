@@ -17,6 +17,7 @@ import "~/style/_post.scss";
 import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg";
 import { useHistory } from "react-router-dom";
+import * as generalSelectors from "../../redux/selectors/general-selectors";
 
 export default function PagePost() {
   const history = useHistory();
@@ -25,8 +26,8 @@ export default function PagePost() {
   const atomUri = postUri;
   const atom = useSelector(state => getIn(state, ["atoms", atomUri]));
 
-  const processState = useSelector(state => get(state, "process"));
-  const accountState = useSelector(state => get(state, "account"));
+  const processState = useSelector(generalSelectors.getProcessState);
+  const accountState = useSelector(generalSelectors.getAccountState);
 
   const isLoggedIn = accountUtils.isLoggedIn(accountState);
   const atomTitle = get(atom, "humanReadable");

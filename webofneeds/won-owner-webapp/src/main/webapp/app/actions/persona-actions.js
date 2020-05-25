@@ -2,7 +2,6 @@ import { generateIdString, get, getIn } from "../utils";
 import vocab from "../service/vocab.js";
 import { actionTypes } from "./actions";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
-import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import {
   buildCloseMessage,
   buildConnectMessage,
@@ -112,7 +111,7 @@ export function disconnectPersona(atomUri, personaUri) {
 export function reviewPersona(reviewableConnectionUri, review) {
   return (dispatch, getState) => {
     const state = getState();
-    const connection = connectionSelectors.getOwnedConnectionByUri(
+    const connection = generalSelectors.getOwnedConnectionByUri(
       state,
       reviewableConnectionUri
     );

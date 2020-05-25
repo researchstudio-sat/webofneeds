@@ -9,7 +9,6 @@ import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as ownerApi from "../api/owner-api.js";
 import * as stateStore from "../redux/state-store.js";
-import { getOwnedConnectionByUri } from "../redux/selectors/connection-selectors.js";
 
 import { get, getIn } from "../utils.js";
 
@@ -660,8 +659,9 @@ export function showLatestMessages(connectionUri, numberOfEvents) {
       generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri);
     const atomUri = get(atom, "uri");
     const connection =
-      connectionUri && getOwnedConnectionByUri(state, connectionUri);
-    const processState = get(state, "process");
+      connectionUri &&
+      generalSelectors.getOwnedConnectionByUri(state, connectionUri);
+    const processState = generalSelectors.getProcessState(state);
     if (
       !connectionUri ||
       !connection ||
@@ -692,8 +692,9 @@ export function loadLatestMessagesOfConnection({
     generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri);
   const atomUri = get(atom, "uri");
   const connection =
-    connectionUri && getOwnedConnectionByUri(state, connectionUri);
-  const processState = get(state, "process");
+    connectionUri &&
+    generalSelectors.getOwnedConnectionByUri(state, connectionUri);
+  const processState = generalSelectors.getProcessState(state);
   if (
     !connectionUri ||
     !connection ||
@@ -732,7 +733,7 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
     const atomUri = get(atom, "uri");
     const connection = getIn(atom, ["connections", connectionUri]);
     const connectionMessages = get(connection, "messages");
-    const processState = get(state, "process");
+    const processState = generalSelectors.getProcessState(state);
     if (
       !connection ||
       processUtils.isConnectionLoading(processState, connectionUri) ||

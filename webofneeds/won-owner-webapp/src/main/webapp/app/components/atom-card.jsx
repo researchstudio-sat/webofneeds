@@ -5,6 +5,7 @@ import React from "react";
 import { get, getIn } from "../utils.js";
 
 import * as processUtils from "../redux/utils/process-utils.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import WonOtherCard from "./cards/other-card.jsx";
 import WonSkeletonCard from "./cards/skeleton-card.jsx";
 import WonPersonaCard from "./cards/persona-card.jsx";
@@ -20,7 +21,7 @@ export default function WonAtomCard({
   showSuggestions,
   currentLocation,
 }) {
-  const processState = useSelector(state => get(state, "process"));
+  const processState = useSelector(generalSelectors.getProcessState);
   const atomUri = get(atom, "uri");
   const isSkeleton =
     !(

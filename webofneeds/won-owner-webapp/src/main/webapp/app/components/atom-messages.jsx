@@ -6,7 +6,6 @@ import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as viewSelectors from "../redux/selectors/view-selectors";
 import * as messageUtils from "../redux/utils/message-utils";
 import { rdfTextfieldHelpText } from "../won-label-utils.js";
-import { hasMessagesToLoad } from "../redux/selectors/connection-selectors";
 import { get, getIn, generateLink } from "../utils";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
@@ -68,8 +67,11 @@ export default function WonAtomMessages({
       .filter(msg => !get(msg, "forwardMessage"))
       .filter(msg => !messageUtils.isAtomHintMessage(msg))
       .filter(msg => !messageUtils.isSocketHintMessage(msg));
-  const hasConnectionMessagesToLoad = useSelector(state =>
-    hasMessagesToLoad(state, connectionUri)
+
+  const processState = useSelector(generalSelectors.getProcessState);
+  const hasConnectionMessagesToLoad = processUtils.hasMessagesToLoad(
+    processState,
+    connectionUri
   );
 
   const agreementData = get(connection, "agreementData");
@@ -114,8 +116,6 @@ export default function WonAtomMessages({
     );
 
   const multiSelectType = get(connection, "multiSelectType");
-
-  const processState = useSelector(state => get(state, "process"));
 
   const unreadMessageCount = unreadMessages && unreadMessages.size;
   const isProcessingLoadingMessages =

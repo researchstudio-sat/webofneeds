@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as messageUtils from "../redux/utils/message-utils";
 import { rdfTextfieldHelpText } from "../won-label-utils.js";
-import { hasMessagesToLoad } from "../redux/selectors/connection-selectors";
 import { get, getIn, generateLink } from "../utils";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
@@ -60,8 +59,11 @@ export default function WonGroupAtomMessages({
       .filter(msg => !getIn(msg, ["references", "forwards"])) //FILTER OUT ALL FORWARD MESSAGE ENVELOPES JUST IN CASE
       .filter(msg => !messageUtils.isAtomHintMessage(msg)) //FILTER OUT ALL HINT MESSAGES
       .filter(msg => !messageUtils.isSocketHintMessage(msg));
-  const hasConnectionMessagesToLoad = useSelector(state =>
-    hasMessagesToLoad(state, connectionUri)
+
+  const processState = useSelector(generalSelectors.getProcessState);
+  const hasConnectionMessagesToLoad = processUtils.hasMessagesToLoad(
+    processState,
+    connectionUri
   );
 
   const sortedMessages = chatMessages
@@ -79,8 +81,6 @@ export default function WonGroupAtomMessages({
   const unreadMessages =
     chatMessages &&
     chatMessages.filter(msg => messageUtils.isMessageUnread(msg));
-
-  const processState = useSelector(state => get(state, "process"));
 
   const isConnected = connectionUtils.isConnected(connection);
   const unreadMessageCount = unreadMessages && unreadMessages.size;

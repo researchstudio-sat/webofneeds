@@ -2,8 +2,9 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
-import { get, getIn } from "../utils.js";
+import { getIn } from "../utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import WonLoggedInMenu from "./logged-in-menu.jsx";
 import WonLoginForm from "./login-form.jsx";
 
@@ -13,7 +14,7 @@ import ico36_person from "~/images/won-icons/ico36_person.svg";
 import ico36_person_anon from "~/images/won-icons/ico36_person_anon.svg";
 
 const mapStateToProps = state => {
-  const accountState = get(state, "account");
+  const accountState = generalSelectors.getAccountState(state);
 
   return {
     loggedIn: accountUtils.isLoggedIn(accountState),

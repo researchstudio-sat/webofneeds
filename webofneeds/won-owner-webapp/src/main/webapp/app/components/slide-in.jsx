@@ -15,6 +15,7 @@ import { ownerBaseUrl } from "~/config/default.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as processSelectors from "../redux/selectors/process-selectors.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 
 import "~/style/_slidein.scss";
 import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.svg";
@@ -27,7 +28,7 @@ const mapStateToProps = (state, ownProps) => {
   const { token } = getQueryParams(ownProps.location);
   const verificationToken = token;
 
-  const accountState = get(state, "account");
+  const accountState = generalSelectors.getAccountState(state);
 
   const privateId = accountUtils.getPrivateId(accountState);
   const path = "#!/inventory" + `?privateId=${privateId}`;

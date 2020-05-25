@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { get, getQueryParams } from "../../utils.js";
+import { getQueryParams } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import WonModalDialog from "../../components/modal-dialog.jsx";
@@ -16,6 +16,7 @@ import WonUseCasePicker from "../../components/usecase-picker.jsx";
 
 import "~/style/_create.scss";
 import "~/style/_responsiveness-utils.scss";
+import * as generalSelectors from "../../redux/selectors/general-selectors";
 
 export default function PageCreate() {
   const history = useHistory();
@@ -23,7 +24,7 @@ export default function PageCreate() {
     history.location
   );
 
-  const accountState = useSelector(state => get(state, "account"));
+  const accountState = useSelector(generalSelectors.getAccountState);
   const isLoggedIn = accountUtils.isLoggedIn(accountState);
   const showModalDialog = useSelector(viewSelectors.showModalDialog);
   const showSlideIns = useSelector(

@@ -3,13 +3,11 @@
  */
 import { createSelector } from "reselect";
 
-import { get, getIn } from "../../utils.js";
+import { getIn } from "../../utils.js";
 import * as viewUtils from "../utils/view-utils.js";
 import * as accountUtils from "../utils/account-utils.js";
-import { getAccountState } from "./general-selectors.js";
+import { getAccountState, getViewState } from "./general-selectors.js";
 import { getQueryParams } from "../../utils";
-
-export const getViewState = state => get(state, "view");
 
 /**
  * Check if showSlideIns is true
@@ -50,7 +48,7 @@ export const showAnonymousSlideInEmailInput = createSelector(
 );
 
 export function showSlideInAnonymousSuccess(state) {
-  const isAnonymous = accountUtils.isAnonymous(get(state, "account"));
+  const isAnonymous = accountUtils.isAnonymous(getAccountState(state));
 
   return (
     !showSlideInConnectionLost(state) &&
@@ -60,7 +58,7 @@ export function showSlideInAnonymousSuccess(state) {
 }
 
 export function showSlideInAnonymous(state) {
-  const isAnonymous = accountUtils.isAnonymous(get(state, "account"));
+  const isAnonymous = accountUtils.isAnonymous(getAccountState(state));
 
   return (
     !showSlideInConnectionLost(state) &&
@@ -72,14 +70,14 @@ export function showSlideInAnonymous(state) {
 
 export function showSlideInDisclaimer(state) {
   const isDisclaimerAccepted = accountUtils.isDisclaimerAccepted(
-    get(state, "account")
+    getAccountState(state)
   );
 
   return !showSlideInConnectionLost(state) && !isDisclaimerAccepted;
 }
 
 export function showSlideInTermsOfService(state) {
-  const accountState = get(state, "account");
+  const accountState = getAccountState(state);
   const isLoggedIn = accountUtils.isLoggedIn(accountState);
   const isTermsOfServiceAccepted = accountUtils.isTermsOfServiceAccepted(
     accountState
