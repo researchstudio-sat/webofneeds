@@ -1,8 +1,7 @@
 import React from "react";
-import PropTypes from "prop-types";
 import { actionCreators } from "../actions/actions.js";
-import { connect } from "react-redux";
-import { get, getIn } from "../utils.js";
+import { useSelector, useDispatch } from "react-redux";
+import { get } from "../utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 
 import "~/style/_responsiveness-utils.scss";
@@ -16,129 +15,110 @@ import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg"
 import vocab from "../service/vocab.js";
 import ReactMarkdown from "react-markdown";
 
-const mapStateToProps = state => {
-  const theme = generalSelectors.getTheme(state);
-  return {
-    adminEmail: get(theme, "adminEmail"),
-    toastsArray: getIn(state, ["toasts"])
-      ? getIn(state, ["toasts"]).toArray()
-      : [],
-  };
-};
+export default function WonToasts() {
+  const dispatch = useDispatch();
+  const theme = useSelector(generalSelectors.getTheme);
 
-const mapDispatchToState = dispatch => {
-  return {
-    toastDelete: toast => {
-      dispatch(actionCreators.toasts__delete(toast));
-    },
-  };
-};
+  const adminEmail = get(theme, "adminEmail");
+  const toasts = useSelector(state => get(state, "toasts"));
+  const toastsArray = toasts ? toasts.toArray() : [];
 
-class WonToasts extends React.Component {
-  render() {
-    return (
-      <won-toasts>
-        <div className="topnav__toasts">
-          {this.props.toastsArray.map((toast, index) => {
-            switch (get(toast, "type")) {
-              case vocab.WON.warnToast:
-                return (
-                  <div className="topnav__toasts__element warn" key={index}>
-                    <svg className="topnav__toasts__element__icon">
-                      <use
-                        xlinkHref={ico16_indicator_warning}
-                        href={ico16_indicator_warning}
-                      />
-                    </svg>
+  return (
+    <won-toasts>
+      <div className="topnav__toasts">
+        {toastsArray.map((toast, index) => {
+          switch (get(toast, "type")) {
+            case vocab.WON.warnToast:
+              return (
+                <div className="topnav__toasts__element warn" key={index}>
+                  <svg className="topnav__toasts__element__icon">
+                    <use
+                      xlinkHref={ico16_indicator_warning}
+                      href={ico16_indicator_warning}
+                    />
+                  </svg>
 
-                    <div className="topnav__toasts__element__text">
-                      <ReactMarkdown
-                        className="markdown"
-                        source={get(toast, "msg")}
-                      />
-                    </div>
-
-                    <svg
-                      className="topnav__toasts__element__close clickable"
-                      onClick={() => this.props.toastDelete(toast)}
-                    >
-                      <use xlinkHref={ico27_close} href={ico27_close} />
-                    </svg>
+                  <div className="topnav__toasts__element__text">
+                    <ReactMarkdown
+                      className="markdown"
+                      source={get(toast, "msg")}
+                    />
                   </div>
-                );
 
-              case vocab.WON.infoToast:
-                return (
-                  <div className="topnav__toasts__element info" key={index}>
-                    <svg className="topnav__toasts__element__icon">
-                      <use
-                        xlinkHref={ico16_indicator_info}
-                        href={ico16_indicator_info}
-                      />
-                    </svg>
+                  <svg
+                    className="topnav__toasts__element__close clickable"
+                    onClick={() =>
+                      dispatch(actionCreators.toasts__delete(toast))
+                    }
+                  >
+                    <use xlinkHref={ico27_close} href={ico27_close} />
+                  </svg>
+                </div>
+              );
 
-                    <div className="topnav__toasts__element__text">
-                      <ReactMarkdown
-                        className="markdown"
-                        source={get(toast, "msg")}
-                      />
-                    </div>
+            case vocab.WON.infoToast:
+              return (
+                <div className="topnav__toasts__element info" key={index}>
+                  <svg className="topnav__toasts__element__icon">
+                    <use
+                      xlinkHref={ico16_indicator_info}
+                      href={ico16_indicator_info}
+                    />
+                  </svg>
 
-                    <svg
-                      className="topnav__toasts__element__close clickable"
-                      onClick={() => this.props.toastDelete(toast)}
-                    >
-                      <use xlinkHref={ico27_close} href={ico27_close} />
-                    </svg>
+                  <div className="topnav__toasts__element__text">
+                    <ReactMarkdown
+                      className="markdown"
+                      source={get(toast, "msg")}
+                    />
                   </div>
-                );
 
-              case vocab.WON.errorToast:
-              default:
-                return (
-                  <div className="topnav__toasts__element error" key={index}>
-                    <svg className="topnav__toasts__element__icon">
-                      <use
-                        xlinkHref={ico16_indicator_error}
-                        href={ico16_indicator_error}
-                      />
-                    </svg>
+                  <svg
+                    className="topnav__toasts__element__close clickable"
+                    onClick={() =>
+                      dispatch(actionCreators.toasts__delete(toast))
+                    }
+                  >
+                    <use xlinkHref={ico27_close} href={ico27_close} />
+                  </svg>
+                </div>
+              );
 
-                    <div className="topnav__toasts__element__text">
-                      <ReactMarkdown
-                        className="markdown"
-                        source={get(toast, "msg")}
-                      />
-                      <p>
-                        If the problem persists please contact
-                        <a href={"mailto:" + this.props.adminEmail}>
-                          {this.props.adminEmail}
-                        </a>
-                      </p>
-                    </div>
+            case vocab.WON.errorToast:
+            default:
+              return (
+                <div className="topnav__toasts__element error" key={index}>
+                  <svg className="topnav__toasts__element__icon">
+                    <use
+                      xlinkHref={ico16_indicator_error}
+                      href={ico16_indicator_error}
+                    />
+                  </svg>
 
-                    <svg
-                      className="topnav__toasts__element__close clickable"
-                      onClick={() => this.props.toastDelete(toast)}
-                    >
-                      <use xlinkHref={ico27_close} href={ico27_close} />
-                    </svg>
+                  <div className="topnav__toasts__element__text">
+                    <ReactMarkdown
+                      className="markdown"
+                      source={get(toast, "msg")}
+                    />
+                    <p>
+                      If the problem persists please contact
+                      <a href={"mailto:" + adminEmail}>{adminEmail}</a>
+                    </p>
                   </div>
-                );
-            }
-          })}
-        </div>
-      </won-toasts>
-    );
-  }
+
+                  <svg
+                    className="topnav__toasts__element__close clickable"
+                    onClick={() =>
+                      dispatch(actionCreators.toasts__delete(toast))
+                    }
+                  >
+                    <use xlinkHref={ico27_close} href={ico27_close} />
+                  </svg>
+                </div>
+              );
+          }
+        })}
+      </div>
+    </won-toasts>
+  );
 }
-WonToasts.propTypes = {
-  adminEmail: PropTypes.string,
-  toastsArray: PropTypes.arrayOf(PropTypes.object),
-  toastDelete: PropTypes.func,
-};
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToState
-)(WonToasts);

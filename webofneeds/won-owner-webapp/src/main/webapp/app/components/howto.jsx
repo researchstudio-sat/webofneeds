@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import Immutable from "immutable";
-import { connect } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import { get } from "../utils.js";
@@ -16,7 +16,7 @@ import ico36_message from "~/images/won-icons/ico36_message.svg";
 import ico36_location_current from "~/images/won-icons/ico36_location_current.svg";
 import ico36_backarrow from "~/images/won-icons/ico36_backarrow.svg";
 import ico36_uc_question from "~/images/won-icons/ico36_uc_question.svg";
-import { Link, withRouter } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 const howItWorksSteps = [
   {
@@ -48,195 +48,34 @@ const howItWorksSteps = [
   },
 ];
 
-const mapStateToProps = (state, ownProps) => {
-  const theme = generalSelectors.getTheme(state);
-  return {
-    className: ownProps.className,
-    appTitle: get(theme, "title"),
-    isLocationAccessDenied: generalSelectors.isLocationAccessDenied(state),
-  };
-};
+export default function WonHowTo({ className }) {
+  const history = useHistory();
+  const dispatch = useDispatch();
+  const theme = useSelector(generalSelectors.getTheme);
+  const appTitle = get(theme, "title");
+  const isLocationAccessDenied = useSelector(
+    generalSelectors.isLocationAccessDenied
+  );
+  const [selectedHowItWorksStep, setSelectedHowItWorksStep] = useState(0);
 
-const mapDispatchToProps = dispatch => {
-  return {
-    locationAccessDenied: () => {
-      dispatch(actionCreators.view__locationAccessDenied());
-    },
-    updateCurrentLocation: locImm => {
-      dispatch(actionCreators.view__updateCurrentLocation(locImm));
-    },
-  };
-};
-
-class WonHowTo extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedHowItWorksStep: 0,
-    };
-
-    this.viewWhatsAround = this.viewWhatsAround.bind(this);
-    this.viewWhatsNew = this.viewWhatsNew.bind(this);
-  }
-
-  render() {
-    return (
-      <won-how-to class={this.props.className ? this.props.className : ""}>
-        <h1 className="howto__title">How it works</h1>
-        <h3 className="howto__subtitle">
-          {"in " + howItWorksSteps.length + " Steps"}
-        </h3>
-        <div className="howto__steps">
-          <div
-            className="howto__steps__process"
-            style={{ "--howToColCount": howItWorksSteps.length }}
-          >
-            {howItWorksSteps.map((item, index) => (
-              <svg
-                key={index}
-                className={
-                  "howto__steps__process__icon " +
-                  (index == this.state.selectedHowItWorksStep
-                    ? " howto__steps__process__icon--selected "
-                    : "")
-                }
-                onClick={() => this.setSelectedHowItWorksStep(index)}
-              >
-                <use
-                  xlinkHref={this.getSvgIconFromItem(item)}
-                  href={this.getSvgIconFromItem(item)}
-                />
-              </svg>
-            ))}
-            {howItWorksSteps.map((item, index) => (
-              <div
-                key={index}
-                className={
-                  "howto__steps__process__stepcount " +
-                  (index == this.state.selectedHowItWorksStep
-                    ? " howto__steps__process__stepcount--selected "
-                    : "")
-                }
-                onClick={() => this.setSelectedHowItWorksStep(index)}
-              >
-                {index + 1}
-              </div>
-            ))}
-            <div className="howto__steps__process__stepline" />
-          </div>
-          <svg
-            className={
-              "howto__steps__button howto__steps__button--prev " +
-              (this.state.selectedHowItWorksStep <= 0
-                ? " howto__steps__button--invisible "
-                : "")
-            }
-            onClick={() =>
-              this.setSelectedHowItWorksStep(
-                this.state.selectedHowItWorksStep - 1
-              )
-            }
-          >
-            <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
-          </svg>
-          <div className="howto__steps__detail">
-            <div className="howto__detail__title">
-              {howItWorksSteps[this.state.selectedHowItWorksStep].title}
-            </div>
-            <div className="howto__steps__detail__text">
-              {howItWorksSteps[this.state.selectedHowItWorksStep].text}
-            </div>
-          </div>
-          <svg
-            className={
-              "howto__steps__button howto__steps__button--next " +
-              (this.state.selectedHowItWorksStep >= howItWorksSteps.length - 1
-                ? " howto__steps__button--invisible "
-                : "")
-            }
-            onClick={() =>
-              this.setSelectedHowItWorksStep(
-                this.state.selectedHowItWorksStep + 1
-              )
-            }
-          >
-            <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
-          </svg>
-        </div>
-        <h2 className="howto__title">Ready to start?</h2>
-        <h3 className="howto__subtitle">
-          {"Post your atom or offer and let " +
-            this.props.appTitle +
-            " do the rest"}
-        </h3>
-        <div className="howto__createx">
-          <button
-            className="won-button--filled red howto__createx__button"
-            onClick={this.viewWhatsAround}
-          >
-            <svg className="won-button-icon">
-              <use
-                xlinkHref={ico36_location_current}
-                href={ico36_location_current}
-              />
-            </svg>
-            <span>{"What's in your Area?"}</span>
-          </button>
-          <button
-            className="won-button--filled red howto__createx__button"
-            onClick={this.viewWhatsNew}
-          >
-            <span>{"What's new?"}</span>
-          </button>
-          <WonLabelledHr
-            className="labelledHr howto__createx__labelledhr"
-            label="Or"
-          />
-          <Link
-            to="/create?useCase=persona"
-            className="won-button--filled red howto__createx__spanbutton"
-          >
-            <span>Create your Persona!</span>
-          </Link>
-          <WonLabelledHr
-            className="labelledHr howto__createx__labelledhr"
-            label="Or"
-          />
-          <Link
-            to="/create"
-            className="won-button--filled red howto__createx__spanbutton"
-          >
-            <span>Post something now!</span>
-          </Link>
-        </div>
-      </won-how-to>
-    );
-  }
-
-  setSelectedHowItWorksStep(index) {
-    this.setState({
-      selectedHowItWorksStep: index,
-    });
-  }
-
-  getSvgIconFromItem(item) {
+  function getSvgIconFromItem(item) {
     return item.svgSrc ? item.svgSrc : ico36_uc_question;
   }
 
-  viewWhatsAround() {
-    this.viewWhatsX(() => {
-      this.props.history.push("/map");
+  function viewWhatsAround() {
+    viewWhatsX(() => {
+      history.push("/map");
     });
   }
 
-  viewWhatsNew() {
-    this.viewWhatsX(() => {
-      this.props.history.push("/overview");
+  function viewWhatsNew() {
+    viewWhatsX(() => {
+      history.push("/overview");
     });
   }
 
-  viewWhatsX(callback) {
-    if (this.props.isLocationAccessDenied) {
+  function viewWhatsX(callback) {
+    if (isLocationAccessDenied) {
       callback();
     } else if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -244,8 +83,10 @@ class WonHowTo extends React.Component {
           const lat = currentLocation.coords.latitude;
           const lng = currentLocation.coords.longitude;
 
-          this.props.updateCurrentLocation(
-            Immutable.fromJS({ location: { lat, lng } })
+          dispatch(
+            actionCreators.view__updateCurrentLocation(
+              Immutable.fromJS({ location: { lat, lng } })
+            )
           );
           callback();
         },
@@ -257,7 +98,7 @@ class WonHowTo extends React.Component {
             ", continuing map initialization without currentLocation. fullerror:",
             error
           );
-          this.props.locationAccessDenied();
+          dispatch(actionCreators.view__locationAccessDenied());
           callback();
         },
         {
@@ -268,23 +109,133 @@ class WonHowTo extends React.Component {
       );
     } else {
       console.error("location could not be retrieved");
-      this.props.locationAccessDenied();
+      dispatch(actionCreators.view__locationAccessDenied());
       callback();
     }
   }
+
+  return (
+    <won-how-to class={className ? className : ""}>
+      <h1 className="howto__title">How it works</h1>
+      <h3 className="howto__subtitle">
+        {"in " + howItWorksSteps.length + " Steps"}
+      </h3>
+      <div className="howto__steps">
+        <div
+          className="howto__steps__process"
+          style={{ "--howToColCount": howItWorksSteps.length }}
+        >
+          {howItWorksSteps.map((item, index) => (
+            <svg
+              key={index}
+              className={
+                "howto__steps__process__icon " +
+                (index === selectedHowItWorksStep
+                  ? " howto__steps__process__icon--selected "
+                  : "")
+              }
+              onClick={() => setSelectedHowItWorksStep(index)}
+            >
+              <use
+                xlinkHref={getSvgIconFromItem(item)}
+                href={getSvgIconFromItem(item)}
+              />
+            </svg>
+          ))}
+          {howItWorksSteps.map((item, index) => (
+            <div
+              key={index}
+              className={
+                "howto__steps__process__stepcount " +
+                (index === selectedHowItWorksStep
+                  ? " howto__steps__process__stepcount--selected "
+                  : "")
+              }
+              onClick={() => setSelectedHowItWorksStep(index)}
+            >
+              {index + 1}
+            </div>
+          ))}
+          <div className="howto__steps__process__stepline" />
+        </div>
+        <svg
+          className={
+            "howto__steps__button howto__steps__button--prev " +
+            (selectedHowItWorksStep <= 0
+              ? " howto__steps__button--invisible "
+              : "")
+          }
+          onClick={() => setSelectedHowItWorksStep(selectedHowItWorksStep - 1)}
+        >
+          <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
+        </svg>
+        <div className="howto__steps__detail">
+          <div className="howto__detail__title">
+            {howItWorksSteps[selectedHowItWorksStep].title}
+          </div>
+          <div className="howto__steps__detail__text">
+            {howItWorksSteps[selectedHowItWorksStep].text}
+          </div>
+        </div>
+        <svg
+          className={
+            "howto__steps__button howto__steps__button--next " +
+            (selectedHowItWorksStep >= howItWorksSteps.length - 1
+              ? " howto__steps__button--invisible "
+              : "")
+          }
+          onClick={() => setSelectedHowItWorksStep(selectedHowItWorksStep + 1)}
+        >
+          <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
+        </svg>
+      </div>
+      <h2 className="howto__title">Ready to start?</h2>
+      <h3 className="howto__subtitle">
+        {"Post your atom or offer and let " + appTitle + " do the rest"}
+      </h3>
+      <div className="howto__createx">
+        <button
+          className="won-button--filled red howto__createx__button"
+          onClick={viewWhatsAround}
+        >
+          <svg className="won-button-icon">
+            <use
+              xlinkHref={ico36_location_current}
+              href={ico36_location_current}
+            />
+          </svg>
+          <span>{"What's in your Area?"}</span>
+        </button>
+        <button
+          className="won-button--filled red howto__createx__button"
+          onClick={viewWhatsNew}
+        >
+          <span>{"What's new?"}</span>
+        </button>
+        <WonLabelledHr
+          className="labelledHr howto__createx__labelledhr"
+          label="Or"
+        />
+        <Link
+          to="/create?useCase=persona"
+          className="won-button--filled red howto__createx__spanbutton"
+        >
+          <span>Create your Persona!</span>
+        </Link>
+        <WonLabelledHr
+          className="labelledHr howto__createx__labelledhr"
+          label="Or"
+        />
+        <Link
+          to="/create"
+          className="won-button--filled red howto__createx__spanbutton"
+        >
+          <span>Post something now!</span>
+        </Link>
+      </div>
+    </won-how-to>
+  );
 }
 WonHowTo.propTypes = {
   className: PropTypes.string,
-  appTitle: PropTypes.string,
-  isLocationAccessDenied: PropTypes.bool,
-  updateCurrentLocation: PropTypes.func,
-  locationAccessDenied: PropTypes.func,
-  history: PropTypes.object,
 };
-
-export default withRouter(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(WonHowTo)
-);
