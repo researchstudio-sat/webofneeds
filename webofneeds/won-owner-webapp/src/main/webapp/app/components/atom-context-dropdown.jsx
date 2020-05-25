@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { actionCreators } from "../actions/actions.js";
 import { useSelector, useDispatch } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors";
-import { generateLink, get, getIn, toAbsoluteURL } from "../utils";
+import { generateLink, get, toAbsoluteURL } from "../utils";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils";
 import { ownerBaseUrl } from "~/config/default.js";
@@ -49,9 +49,8 @@ export default function WonAtomContextDropdown({ atom, className }) {
 
   const process = useSelector(generalSelectors.getProcessState);
 
-  const adminEmail = useSelector(state =>
-    getIn(state, ["config", "theme", "adminEmail"])
-  );
+  const theme = useSelector(generalSelectors.getTheme);
+  const adminEmail = get(theme, "adminEmail");
   const isOwnAtom = useSelector(state =>
     generalSelectors.isAtomOwned(state, atomUri)
   );

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { ownerBaseUrl } from "~/config/default.js";
-import { get, getIn, toAbsoluteURL, getQueryParams } from "../../utils.js";
+import { get, toAbsoluteURL, getQueryParams } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
@@ -164,7 +164,7 @@ export default function PageAbout() {
   const [moreInfo, setMoreInfo] = useState(false);
   const { aboutSection } = getQueryParams(history.location);
 
-  const theme = useSelector(state => getIn(state, ["config", "theme"]));
+  const theme = useSelector(generalSelectors.getTheme);
   const themeName = get(theme, "name");
 
   const isLoggedIn = useSelector(state =>

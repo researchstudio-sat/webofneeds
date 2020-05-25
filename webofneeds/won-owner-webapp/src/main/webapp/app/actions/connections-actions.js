@@ -312,7 +312,7 @@ function connectReactionAtom(
     const state = getState();
     const connectToAtom = getIn(state, ["atoms", connectToAtomUri]);
 
-    const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
+    const nodeUri = generalSelectors.getDefaultNodeUri(state);
 
     // create new atom
     const { message, atomUri } = await buildCreateMessage(atomDraft, nodeUri);
@@ -459,7 +459,7 @@ function connectAdHoc(
         ],
       },
     };
-    const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
+    const nodeUri = generalSelectors.getDefaultNodeUri(state);
 
     // build create message for new atom
     const { message, atomUri } = await buildCreateMessage(adHocDraft, nodeUri);

@@ -16,6 +16,7 @@ import {
   buildCreateMessage,
   buildEditMessage,
 } from "../won-message-utils.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as stateStore from "../redux/state-store.js";
@@ -283,7 +284,7 @@ export function create(draft, personaUri, nodeUri) {
     const state = getState();
 
     if (!nodeUri) {
-      nodeUri = getIn(state, ["config", "defaultNodeUri"]);
+      nodeUri = generalSelectors.getDefaultNodeUri(state);
     }
 
     return ensureLoggedIn(dispatch, getState).then(async () => {

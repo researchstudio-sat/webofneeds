@@ -20,6 +20,7 @@ import { Link, withRouter } from "react-router-dom";
 const mapStateToProps = (state, ownProps) => {
   const currentPath = getPathname(ownProps.location);
   const accountState = generalSelectors.getAccountState(state);
+  const theme = generalSelectors.getTheme(state);
 
   return {
     pageTitle: ownProps.pageTitle,
@@ -27,8 +28,8 @@ const mapStateToProps = (state, ownProps) => {
     isSlideInsVisible: viewSelectors.isSlideInsVisible(state),
     mainMenuVisible: getIn(state, ["view", "showMainMenu"]),
     isMenuVisible: viewSelectors.isMenuVisible(state),
-    themeName: getIn(state, ["config", "theme", "name"]),
-    appTitle: getIn(state, ["config", "theme", "title"]),
+    themeName: get(theme, "name"),
+    appTitle: get(theme, "title"),
     loggedIn: accountUtils.isLoggedIn(accountState),
     isSignUpView: currentPath === "/signup",
     showLoadingIndicator: isLoading(state),

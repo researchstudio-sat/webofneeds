@@ -34,6 +34,23 @@ export const getAtoms = createSelector(
   state => get(state, "atoms")
 );
 
+export const getConfigState = createSelector(
+  state => state,
+  state => get(state, "config")
+);
+
+export const getTheme = createSelector(getConfigState, configState =>
+  get(configState, "theme")
+);
+
+export const getVisibleUseCasesByConfig = createSelector(getTheme, theme =>
+  get(theme, "visibleUseCases")
+);
+
+export const getDefaultNodeUri = createSelector(getConfigState, configState =>
+  get(configState, "defaultNodeUri")
+);
+
 export const getOwnedAtomUris = createSelector(getAccountState, account =>
   get(account, "ownedAtomUris")
 );

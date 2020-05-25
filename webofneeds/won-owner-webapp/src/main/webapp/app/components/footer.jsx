@@ -2,17 +2,19 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
-import { getIn } from "../utils.js";
+import { get } from "../utils.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 
 import "~/style/_footer.scss";
 import { Link } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
+  const theme = generalSelectors.getTheme(state);
   return {
     className: ownProps.className,
-    themeName: getIn(state, ["config", "theme", "name"]),
-    appTitle: getIn(state, ["config", "theme", "title"]),
+    themeName: get(theme, "name"),
+    appTitle: get(theme, "title"),
     shouldShowRdf: viewSelectors.showRdf(state),
     debugMode: viewSelectors.isDebugModeEnabled(state),
   };

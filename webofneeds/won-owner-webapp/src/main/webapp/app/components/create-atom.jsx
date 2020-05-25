@@ -127,7 +127,7 @@ const mapStateToProps = (state, ownProps) => {
   const isHolderAtomValid = holderAtom && atomUtils.hasHolderSocket(holderAtom);
 
   return {
-    defaultNodeUri: getIn(state, ["config", "defaultNodeUri"]),
+    defaultNodeUri: generalSelectors.getDefaultNodeUri(state),
     loggedIn: accountUtils.isLoggedIn(accountState),
     holderUri,
     isHolderAtomValid,

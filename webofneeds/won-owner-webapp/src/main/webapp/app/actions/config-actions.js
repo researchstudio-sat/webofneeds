@@ -1,4 +1,5 @@
 import { getIn, get, clone } from "../utils.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as ownerApi from "../api/owner-api.js";
 import { actionTypes } from "./actions";
 
@@ -11,7 +12,7 @@ import loadCSS from "loadcss";
  */
 export function configInit() {
   return (dispatch, getState) => {
-    const defaultTheme = getIn(getState(), ["config", "theme"]);
+    const defaultTheme = generalSelectors.getTheme(getState());
     const defaultThemeName = get(defaultTheme, "name");
     Promise.all([
       ownerApi.getDefaultNodeUri(),
@@ -30,13 +31,14 @@ export function configInit() {
 
 export function update(patch) {
   return (dispatch, getState) => {
-    const currentTheme = getIn(getState(), ["config", "theme", "name"]);
-    const newTheme = getIn(patch, ["theme", "name"]);
-    if (currentTheme && newTheme && currentTheme != newTheme) {
+    const currentTheme = generalSelectors.getTheme(getState());
+    const currentThemeName = get(currentTheme, "name");
+    const newThemeName = getIn(patch, ["theme", "name"]);
+    if (currentThemeName && newThemeName && currentThemeName != newThemeName) {
       // theme has changed (or was initialized), load the updated theme config first
 
       //TODO fetch config. also do that in init!. note that this can fail if an invalid theme has been set.
-      loadSkinConfig(newTheme).then(themeConfig => {
+      loadSkinConfig(newThemeName).then(themeConfig => {
         const patch_ = clone(patch);
         Object.assign(patch_.theme, themeConfig);
         dispatch({

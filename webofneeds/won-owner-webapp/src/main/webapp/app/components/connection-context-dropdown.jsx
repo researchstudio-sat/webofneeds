@@ -54,9 +54,8 @@ export default function WonConnectionContextDropdown({
     linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
   }
   const process = useSelector(generalSelectors.getProcessState);
-  const adminEmail = useSelector(state =>
-    getIn(state, ["config", "theme", "adminEmail"])
-  );
+  const theme = useSelector(generalSelectors.getTheme);
+  const adminEmail = get(theme, "adminEmail");
   const isConnectionToGroup =
     atomUtils.getGroupSocket(targetAtom) === get(connection, "targetSocketUri");
   const showAgreementData = get(connection, "showAgreementData");

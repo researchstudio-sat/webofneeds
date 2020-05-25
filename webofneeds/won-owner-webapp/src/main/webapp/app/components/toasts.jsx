@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { actionCreators } from "../actions/actions.js";
 import { connect } from "react-redux";
 import { get, getIn } from "../utils.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 
 import "~/style/_responsiveness-utils.scss";
 import "~/style/_toasts.scss";
@@ -16,8 +17,9 @@ import vocab from "../service/vocab.js";
 import ReactMarkdown from "react-markdown";
 
 const mapStateToProps = state => {
+  const theme = generalSelectors.getTheme(state);
   return {
-    adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
+    adminEmail: get(theme, "adminEmail"),
     toastsArray: getIn(state, ["toasts"])
       ? getIn(state, ["toasts"]).toArray()
       : [],

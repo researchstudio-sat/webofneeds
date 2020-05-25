@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { getIn, generateLink } from "../utils.js";
+import { generateLink } from "../utils.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import { connect } from "react-redux";
 import WonTitlePicker from "./details/picker/title-picker.jsx";
 import * as useCaseUtils from "../usecase-utils.js";
@@ -9,11 +10,9 @@ import "~/style/_usecase-picker.scss";
 import { Link, withRouter } from "react-router-dom";
 
 const mapStateToProps = state => {
-  const visibleUseCasesByConfig = getIn(state, [
-    "config",
-    "theme",
-    "visibleUseCases",
-  ]);
+  const visibleUseCasesByConfig = generalSelectors.getVisibleUseCasesByConfig(
+    state
+  );
 
   const showGroupsThreshold = 1;
   const customUseCase = useCaseUtils.getCustomUseCase();

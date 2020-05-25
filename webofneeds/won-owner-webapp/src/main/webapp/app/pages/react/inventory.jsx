@@ -2,7 +2,7 @@ import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { actionCreators } from "../../actions/actions.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
-import { get, getIn, sortByDate } from "../../utils.js";
+import { get, sortByDate } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import * as processUtils from "../../redux/utils/process-utils.js";
@@ -55,7 +55,7 @@ export default function PageInventory() {
 
   const viewState = useSelector(generalSelectors.getViewState);
 
-  const theme = useSelector(state => getIn(state, ["config", "theme"]));
+  const theme = useSelector(generalSelectors.getTheme);
   const accountState = useSelector(generalSelectors.getAccountState);
   const process = useSelector(generalSelectors.getProcessState);
 

@@ -4,7 +4,7 @@ import Immutable from "immutable";
 import { connect } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
-import { getIn } from "../utils.js";
+import { get } from "../utils.js";
 
 import WonLabelledHr from "./labelled-hr.jsx";
 
@@ -49,9 +49,10 @@ const howItWorksSteps = [
 ];
 
 const mapStateToProps = (state, ownProps) => {
+  const theme = generalSelectors.getTheme(state);
   return {
     className: ownProps.className,
-    appTitle: getIn(state, ["config", "theme", "title"]),
+    appTitle: get(theme, "title"),
     isLocationAccessDenied: generalSelectors.isLocationAccessDenied(state),
   };
 };

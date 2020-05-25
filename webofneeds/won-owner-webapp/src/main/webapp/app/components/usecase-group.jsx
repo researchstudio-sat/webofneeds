@@ -2,17 +2,16 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import * as useCaseUtils from "../usecase-utils.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 
 import "~/style/_usecase-group.scss";
-import { getIn, getQueryParams, generateLink } from "../utils";
+import { getQueryParams, generateLink } from "../utils";
 import { Link, withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
-  const visibleUseCasesByConfig = getIn(state, [
-    "config",
-    "theme",
-    "visibleUseCases",
-  ]);
+  const visibleUseCasesByConfig = generalSelectors.getVisibleUseCasesByConfig(
+    state
+  );
 
   const { useCaseGroup } = getQueryParams(ownProps.location);
   return {
