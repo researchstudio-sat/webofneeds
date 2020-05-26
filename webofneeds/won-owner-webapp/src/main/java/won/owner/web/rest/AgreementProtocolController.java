@@ -1,10 +1,13 @@
 package won.owner.web.rest;
 
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.Set;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +28,7 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 public class AgreementProtocolController {
     @Autowired
     private LinkedDataSource linkedDataSourceOnBehalfOfAtom;
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public void setLinkedDataSource(LinkedDataSource linkedDataSource) {
         this.linkedDataSourceOnBehalfOfAtom = linkedDataSource;
@@ -34,6 +38,15 @@ public class AgreementProtocolController {
     public ResponseEntity<AgreementProtocolUris> getHighlevelProtocolUris(URI connectionUri) {
         return new ResponseEntity<AgreementProtocolUris>(
                         getAgreementProtocolState(connectionUri).getAgreementProtocolUris(), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/getAgreementProtocolDataset", method = RequestMethod.GET, produces = {
+                    "application/ld+json",
+                    "application/trig", "application/n-quads" })
+    public ResponseEntity<Dataset> getAgreementProtocolDataset(URI connectionUri) {
+        Dataset agreementProtocolDataset = getAgreementProtocolState(connectionUri)
+                        .getAgreementProtocolDataset();
+        return new ResponseEntity<Dataset>(agreementProtocolDataset, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/getMessageEffects", method = RequestMethod.GET)
