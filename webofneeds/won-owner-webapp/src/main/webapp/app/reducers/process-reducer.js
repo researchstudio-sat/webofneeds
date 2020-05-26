@@ -418,12 +418,33 @@ export default function(processState = initialState, action = {}) {
       });
     }
 
+    case actionTypes.connections.updateAgreementDataset: {
+      const agreementDataset = action.payload.agreementDataset;
+      const connUri = action.payload.connectionUri;
+
+      if (!connUri || !agreementDataset) {
+        return processState;
+      }
+      return updateConnectionProcess(processState, connUri, {
+        agreementDataset: { loading: false, loaded: true },
+      });
+    }
+
     case actionTypes.connections.setLoadingAgreementData: {
       const connUri = action.payload.connectionUri;
       const loadingAgreementData = action.payload.loadingAgreementData;
 
       return updateConnectionProcess(processState, connUri, {
         agreementData: { loading: loadingAgreementData },
+      });
+    }
+
+    case actionTypes.connections.setLoadingAgreementDataset: {
+      const connUri = action.payload.connectionUri;
+      const loadingAgreementDataset = action.payload.loadingAgreementDataset;
+
+      return updateConnectionProcess(processState, connUri, {
+        agreementDataset: { loading: loadingAgreementDataset },
       });
     }
 

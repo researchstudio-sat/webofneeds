@@ -276,12 +276,28 @@ export function updateAgreementStateData(state, connectionUri, agreementData) {
     );
     return state;
   }
+}
 
+export function updateAgreementStateDataset(
+  state,
+  connectionUri,
+  agreementDataset
+) {
+  const atom = getAtomByConnectionUri(state, connectionUri);
+
+  if (!atom || !agreementDataset) {
+    console.warn(
+      "No atom found for connection(",
+      connectionUri,
+      ") or no agreementData set in params -> return unaltered state"
+    );
+    return state;
+  }
   const atomUri = atom.get("uri");
 
   return state.setIn(
-    [atomUri, "connections", connectionUri, "agreementData"],
-    agreementData
+    [atomUri, "connections", connectionUri, "agreementDataset"],
+    agreementDataset
   );
 }
 

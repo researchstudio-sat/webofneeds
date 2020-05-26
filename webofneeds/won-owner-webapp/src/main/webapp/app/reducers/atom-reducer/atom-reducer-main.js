@@ -42,6 +42,7 @@ import {
   setShowPetriNetData,
   storeConnectionsData,
   updateAgreementStateData,
+  updateAgreementStateDataset,
   updatePetriNetStateData,
 } from "./reduce-connections.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
@@ -238,6 +239,7 @@ export default function(allAtomsInState = initialState, action = {}) {
           unread: false,
           socketUri: senderSocketUri,
           targetSocketUri: targetSocketUri,
+          agreementDataset: undefined,
           agreementData: {
             agreementUris: Immutable.Set(),
             pendingProposalUris: Immutable.Set(),
@@ -605,6 +607,12 @@ export default function(allAtomsInState = initialState, action = {}) {
         allAtomsInState,
         action.payload.connectionUri,
         action.payload.agreementData
+      );
+    case actionTypes.connections.updateAgreementDataset:
+      return updateAgreementStateDataset(
+        allAtomsInState,
+        action.payload.connectionUri,
+        action.payload.agreementDataset
       );
     case actionTypes.connections.showPetriNetData:
       return setShowPetriNetData(
