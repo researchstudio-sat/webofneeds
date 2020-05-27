@@ -26,7 +26,7 @@ export default function WonAtomContextDropdown({ atom, className }) {
 
   useEffect(() => {
     function handleClick(e) {
-      if (!thisNode.contains(e.target) && contextMenuOpen) {
+      if (thisNode && !thisNode.contains(e.target) && contextMenuOpen) {
         setContextMenuOpen(false);
 
         return;

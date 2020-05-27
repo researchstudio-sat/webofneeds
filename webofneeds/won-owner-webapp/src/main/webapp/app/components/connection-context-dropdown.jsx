@@ -27,7 +27,7 @@ export default function WonConnectionContextDropdown({
 
   useEffect(() => {
     function handleClick(e) {
-      if (!thisNode.contains(e.target) && contextMenuOpen) {
+      if (thisNode && !thisNode.contains(e.target) && contextMenuOpen) {
         setContextMenuOpen(false);
 
         return;

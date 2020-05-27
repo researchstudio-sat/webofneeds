@@ -11,7 +11,7 @@ export default function WonShareDropdown({ atom, className }) {
   let thisNode;
   useEffect(() => {
     function handleClick(e) {
-      if (!thisNode.contains(e.target) && contextMenuOpen) {
+      if (thisNode && !thisNode.contains(e.target) && contextMenuOpen) {
         setContextMenuOpen(false);
 
         return;
