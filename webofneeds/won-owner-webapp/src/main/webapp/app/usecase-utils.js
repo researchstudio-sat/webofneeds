@@ -496,10 +496,10 @@ export function getVisibleUseCaseGroups(threshold, visibleUseCasesArray) {
 
 export function isHoldable(useCase) {
   return (
-    useCase &&
-    useCase.draft &&
-    useCase.draft.content &&
-    useCase.draft.content.sockets &&
+    !!useCase &&
+    !!useCase.draft &&
+    !!useCase.draft.content &&
+    !!useCase.draft.content.sockets &&
     values(useCase.draft.content.sockets).includes(
       vocab.HOLD.HoldableSocketCompacted
     )
@@ -527,4 +527,74 @@ function isInVisibleUseCaseArray(useCase, visibleUseCasesArray) {
     );
     return isUseCaseConfigured;
   }
+}
+
+// returns true if the part in isOrSeeks, has all the mandatory details of the useCaseBranchDetails
+export function mandatoryDetailsSet(isOrSeeks, useCaseBranchDetails) {
+  if (!useCaseBranchDetails) {
+    return true;
+  }
+
+  for (const key in useCaseBranchDetails) {
+    if (useCaseBranchDetails[key].mandatory) {
+      const detailSaved = isOrSeeks && isOrSeeks[key];
+      if (!detailSaved) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+// returns true if the branch has any content present
+function isBranchContentPresent(isOrSeeks, includeType = false) {
+  if (isOrSeeks) {
+    const details = Object.keys(isOrSeeks);
+    for (let d of details) {
+      if (isOrSeeks[d] && (includeType || d !== "type")) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+export function isValidDraft(draftObject, useCase) {
+  const draftContent = get(draftObject, "content");
+  const seeksBranch = get(draftObject, "seeks");
+
+  if (draftContent || seeksBranch) {
+    const mandatoryContentDetailsSet = mandatoryDetailsSet(
+      draftContent,
+      useCase.details
+    );
+    const mandatorySeeksDetailsSet = mandatoryDetailsSet(
+      seeksBranch,
+      useCase.seeksDetails
+    );
+    if (mandatoryContentDetailsSet && mandatorySeeksDetailsSet) {
+      const hasContent = isBranchContentPresent(draftContent);
+      const hasSeeksContent = isBranchContentPresent(seeksBranch);
+
+      return hasContent || hasSeeksContent;
+    }
+  }
+  return false;
+}
+
+/**
+ * Removes empty branches from the draft, and adds the proper useCase to the draft
+ */
+export function getSanitizedDraftObject(draftObject, useCase) {
+  const _draftObject = draftObject;
+  _draftObject.useCase = get(useCase, "identifier");
+
+  if (!isBranchContentPresent(_draftObject.content, true)) {
+    delete _draftObject.content;
+  }
+  if (!isBranchContentPresent(_draftObject.seeks, true)) {
+    delete _draftObject.seeks;
+  }
+
+  return _draftObject;
 }

@@ -25,7 +25,7 @@ export default function WonAccountMenu() {
   let thisNode;
   useEffect(() => {
     function handleClick(e) {
-      if (!thisNode.contains(e.target) && mainMenuVisible) {
+      if (thisNode && !thisNode.contains(e.target) && mainMenuVisible) {
         dispatch(actionCreators.view__hideMainMenu());
 
         return;

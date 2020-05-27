@@ -140,12 +140,14 @@ import * as jsonldUtils from "./jsonld-utils";
             return connectionContainerFramed[vocab.RDFS.member].map(
               parseJsonLdConnection
             );
-          } else {
+          } else if (connectionContainerFramed[vocab.RDFS.member]) {
             return [
               parseJsonLdConnection(
                 connectionContainerFramed[vocab.RDFS.member]
               ),
             ];
+          } else {
+            return [];
           }
         } else {
           return [];

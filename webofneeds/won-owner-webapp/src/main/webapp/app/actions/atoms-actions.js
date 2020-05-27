@@ -259,23 +259,23 @@ export function deleteAtom(atomUri) {
 
 export function edit(draft, oldAtom, callback) {
   return (dispatch, getState) => {
-    return ensureLoggedIn(dispatch, getState).then(async () => {
-      const { message, atomUri } = await buildEditMessage(draft, oldAtom);
-
-      ownerApi.sendMessage(message).then(jsonResp => {
-        dispatch({
-          type: actionTypes.atoms.edit,
-          payload: {
-            eventUri: jsonResp.messageUri,
-            message: jsonResp.message,
-            atomUri: atomUri,
-            atom: draft,
-            oldAtom,
-          },
+    return ensureLoggedIn(dispatch, getState)
+      .then(() => buildEditMessage(draft, oldAtom))
+      .then(({ message, atomUri }) => {
+        ownerApi.sendMessage(message).then(jsonResp => {
+          dispatch({
+            type: actionTypes.atoms.edit,
+            payload: {
+              eventUri: jsonResp.messageUri,
+              message: jsonResp.message,
+              atomUri: atomUri,
+              atom: draft,
+              oldAtom,
+            },
+          });
+          callback();
         });
-        callback();
       });
-    });
   };
 }
 
@@ -287,41 +287,46 @@ export function create(draft, personaUri, nodeUri) {
       nodeUri = generalSelectors.getDefaultNodeUri(state);
     }
 
-    return ensureLoggedIn(dispatch, getState).then(async () => {
-      const { message, atomUri } = await buildCreateMessage(draft, nodeUri);
+    return ensureLoggedIn(dispatch, getState)
+      .then(() => buildCreateMessage(draft, nodeUri))
+      .then(({ message, atomUri }) => {
+        ownerApi
+          .sendMessage(message)
+          .then(jsonResp => {
+            dispatch({
+              type: actionTypes.atoms.create,
+              payload: {
+                eventUri: jsonResp.messageUri,
+                message: jsonResp.message,
+                atomUri: atomUri,
+                atom: draft,
+              },
+            });
+          })
+          .then(() => {
+            const persona = getIn(state, ["atoms", personaUri]);
+            if (persona) {
+              const senderSocketUri = atomUtils.getSocketUri(
+                persona,
+                vocab.HOLD.HolderSocketCompacted
+              );
+              const targetSocketUri = `${atomUri}#holdableSocket`;
 
-      ownerApi
-        .sendMessage(message)
-        .then(jsonResp => {
-          dispatch({
-            type: actionTypes.atoms.create,
-            payload: {
-              eventUri: jsonResp.messageUri,
-              message: jsonResp.message,
-              atomUri: atomUri,
-              atom: draft,
-            },
+              return ownerApi
+                .serverSideConnect(
+                  senderSocketUri,
+                  targetSocketUri,
+                  false,
+                  true
+                )
+                .then(async response => {
+                  if (!response.ok) {
+                    const errorMsg = await response.text();
+                    throw new Error(`Could not connect identity: ${errorMsg}`);
+                  }
+                });
+            }
           });
-        })
-        .then(() => {
-          const persona = getIn(state, ["atoms", personaUri]);
-          if (persona) {
-            const senderSocketUri = atomUtils.getSocketUri(
-              persona,
-              vocab.HOLD.HolderSocketCompacted
-            );
-            const targetSocketUri = `${atomUri}#holdableSocket`;
-
-            return ownerApi
-              .serverSideConnect(senderSocketUri, targetSocketUri, false, true)
-              .then(async response => {
-                if (!response.ok) {
-                  const errorMsg = await response.text();
-                  throw new Error(`Could not connect identity: ${errorMsg}`);
-                }
-              });
-          }
-        });
-    });
+      });
   };
 }

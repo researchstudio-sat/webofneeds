@@ -116,7 +116,7 @@ export default function WonMenu() {
   let thisNode;
   useEffect(() => {
     function handleClick(e) {
-      if (!thisNode.contains(e.target) && isMenuVisible) {
+      if (thisNode && !thisNode.contains(e.target) && isMenuVisible) {
         // TODO: Fix me.
         // Handler is closing menu before actual MenuAction is toggled
         // dispatch(actionCreators.view__hideMenu());

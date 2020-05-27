@@ -125,13 +125,11 @@ export default function PageOverview() {
   }
 
   function toggleUseCase(ucIdentifier) {
-    if (isUseCaseExpanded(ucIdentifier)) {
-      setOpen(open.filter(element => ucIdentifier !== element));
-    } else {
-      const _open = open;
-      _open.push(ucIdentifier);
-      setOpen(_open);
-    }
+    setOpen(
+      isUseCaseExpanded(ucIdentifier)
+        ? open.filter(element => ucIdentifier !== element)
+        : open.concat(ucIdentifier)
+    );
   }
 
   function reload() {

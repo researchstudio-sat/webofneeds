@@ -144,7 +144,12 @@ export default function PageInventory() {
               />
             </div>
             {hasOwnedInactiveAtomUris && (
-              <div className="ownerinventory__header">
+              <div
+                className="ownerinventory__header clickable"
+                onClick={() =>
+                  dispatch(actionCreators.view__toggleClosedAtoms())
+                }
+              >
                 <div className="ownerinventory__header__title">
                   Archived
                   <span className="ownerinventory__header__title__count">
@@ -157,9 +162,6 @@ export default function PageInventory() {
                     (showClosedAtoms
                       ? "ownerinventory__header__carret--expanded"
                       : "ownerinventory__header__carret--collapsed")
-                  }
-                  onClick={() =>
-                    dispatch(actionCreators.view__toggleClosedAtoms())
                   }
                 >
                   <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
