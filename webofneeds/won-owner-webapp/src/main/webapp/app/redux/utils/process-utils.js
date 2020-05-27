@@ -268,6 +268,19 @@ export function isConnectionAgreementDataLoading(process, connUri) {
 }
 
 /**
+ * Return true if the agreement-Dataset for the given connUri is currently loading
+ * @param process
+ * @param connUri
+ * @returns {*}
+ */
+export function isConnectionAgreementDatasetLoading(process, connUri) {
+  return (
+    connUri &&
+    getIn(process, ["connections", connUri, "agreementDataset", "loading"])
+  );
+}
+
+/**
  * Return true if the agreement-Data for the given connUri has been loaded
  * @param process
  * @param connUri

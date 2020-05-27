@@ -5,27 +5,8 @@ import React from "react";
 import PropTypes from "prop-types";
 import { get } from "../utils.js";
 
-//import { useDispatch } from "react-redux";
-
 export default function WonConnectionAgreementDetails({ connection }) {
-  ///const dispatch = useDispatch();
-
   const agreementData = get(connection, "agreementData");
-
-  /**
-   * agreementData: {
-        agreementUris: Immutable.Set(),
-        pendingProposalUris: Immutable.Set(),
-        pendingCancellationProposalUris: Immutable.Set(),
-        cancellationPendingAgreementUris: Immutable.Set(),
-        acceptedCancellationProposalUris: Immutable.Set(),
-        cancelledAgreementUris: Immutable.Set(),
-        rejectedMessageUris: Immutable.Set(),
-        retractedMessageUris: Immutable.Set(),
-        proposedMessageUris: Immutable.Set(),
-        claimedMessageUris: Immutable.Set(),
-      },
-   */
   const agreementUris = get(agreementData, "agreementUris");
   const proposalUris = get(agreementData, "pendingProposalUris");
   const claimUris = get(agreementData, "claimedMessageUris");

@@ -276,6 +276,12 @@ export function updateAgreementStateData(state, connectionUri, agreementData) {
     );
     return state;
   }
+  const atomUri = atom.get("uri");
+
+  return state.setIn(
+    [atomUri, "connections", connectionUri, "agreementData"],
+    agreementData
+  );
 }
 
 export function updateAgreementStateDataset(
