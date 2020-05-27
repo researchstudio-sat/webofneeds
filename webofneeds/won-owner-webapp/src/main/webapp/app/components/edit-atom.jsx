@@ -66,7 +66,7 @@ export default function WonEditAtom({ fromAtom }) {
   }
 
   function updateDraft(updatedDraft, branch) {
-    const _draftObject = draftObject;
+    const _draftObject = JSON.parse(JSON.stringify(draftObject));
     _draftObject[branch] = updatedDraft;
 
     setDraftObject(_draftObject);
