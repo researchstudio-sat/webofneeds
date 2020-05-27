@@ -1,11 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { connect } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
 import ReactMarkdown from "react-markdown";
 import { parseRestErrorMessage } from "../won-utils.js";
-import { get, getIn } from "../utils.js";
+import { get } from "../utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
+import * as processUtils from "../redux/utils/process-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import won from "../won-es6";
 
@@ -13,32 +14,26 @@ import "~/style/_won-markdown.scss";
 import WonLabelledHr from "./labelled-hr";
 import { Link } from "react-router-dom";
 
-const mapStateToProps = (state, ownProps) => {
-  const accountState = generalSelectors.getAccountState(state);
+export default function WonLoginForm({ className }) {
+  const dispatch = useDispatch();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+
+  const accountState = useSelector(generalSelectors.getAccountState);
+  const processState = useSelector(generalSelectors.getProcessState);
   const loginError = accountUtils.getLoginError(accountState);
   const isNotVerified =
     get(loginError, "code") === won.RESPONSECODE.USER_NOT_VERIFIED;
+  const processingResendVerificationEmail = processUtils.isProcessingResendVerificationEmail(
+    processState
+  );
 
-  return {
-    className: ownProps.className,
-    loginError,
-    processingResendVerificationEmail: getIn(state, [
-      "process",
-      "processingResendVerificationEmail",
-    ]),
-    isNotVerified,
-  };
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    accountResendVerificationEmail: email => {
-      dispatch(actionCreators.account__resendVerificationEmail(email));
-    },
-    hideMainMenu: () => {
-      dispatch(actionCreators.view__hideMainMenu());
-    },
-    login: (email, password, rememberMe) => {
+  function formKeyUp(event) {
+    if (loginError) {
+      dispatch(actionCreators.view__clearLoginError());
+    }
+    if (event.keyCode == 13) {
       dispatch(
         actionCreators.account__login({
           email: email,
@@ -46,155 +41,90 @@ const mapDispatchToProps = dispatch => {
           rememberMe: rememberMe,
         })
       );
-    },
-    clearLoginError: () => {
-      dispatch(actionCreators.view__clearLoginError());
-    },
-  };
-};
-
-class WonLoginForm extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      email: "",
-      password: "",
-      rememberMe: false,
-    };
-
-    this.closeMenu = this.closeMenu.bind(this);
-    this.formKeyUp = this.formKeyUp.bind(this);
-    this.changeEmail = this.changeEmail.bind(this);
-    this.changePassword = this.changePassword.bind(this);
-    this.changeRememberMe = this.changeRememberMe.bind(this);
+    }
   }
 
-  render() {
-    return (
-      <won-login-form class={this.props.className ? this.props.className : ""}>
-        <form
-          onSubmit={e => {
-            e.preventDefault();
-            this.props.login(
-              this.state.email,
-              this.state.password,
-              this.state.rememberMe
-            );
-          }}
-          id="loginForm"
-          className="loginForm"
+  return (
+    <won-login-form class={className ? className : ""}>
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          dispatch(
+            actionCreators.account__login({
+              email: email,
+              password: password,
+              rememberMe: rememberMe,
+            })
+          );
+        }}
+        id="loginForm"
+        className="loginForm"
+      >
+        <input
+          id="loginEmail"
+          placeholder="Email address"
+          value={email}
+          type="email"
+          required
+          autoFocus
+          onKeyUp={formKeyUp}
+          onChange={event => setEmail(event.target.value)}
+        />
+        {!!loginError && (
+          <ReactMarkdown
+            className="wl__errormsg markdown"
+            source={parseRestErrorMessage(loginError)}
+          />
+        )}
+        {isNotVerified &&
+          (!processingResendVerificationEmail ? (
+            <a
+              className="wl__errormsg__resend"
+              onClick={() =>
+                dispatch(actionCreators.account__resendVerificationEmail(email))
+              }
+            >
+              {"(Click to Resend Verification Email)"}
+            </a>
+          ) : (
+            <a className="wl__errormsg__resend">{"(Resending...)"}</a>
+          ))}
+        <input
+          id="loginPassword"
+          placeholder="Password"
+          value={password}
+          type="password"
+          required
+          onKeyUp={formKeyUp}
+          onChange={event => setPassword(event.target.value)}
+        />
+        <button
+          className="won-button--filled lighterblue"
+          disabled={password === "" || email === ""}
         >
-          <input
-            id="loginEmail"
-            placeholder="Email address"
-            value={this.state.email}
-            type="email"
-            required
-            autoFocus
-            onKeyUp={this.formKeyUp}
-            onChange={this.changeEmail}
-          />
-          {!!this.props.loginError && (
-            <ReactMarkdown
-              className="wl__errormsg markdown"
-              source={parseRestErrorMessage(this.props.loginError)}
-            />
-          )}
-          {this.props.isNotVerified &&
-            (!this.props.processingResendVerificationEmail ? (
-              <a
-                className="wl__errormsg__resend"
-                onClick={() =>
-                  this.props.accountResendVerificationEmail(this.state.email)
-                }
-              >
-                {"(Click to Resend Verification Email)"}
-              </a>
-            ) : (
-              <a className="wl__errormsg__resend">{"(Resending...)"}</a>
-            ))}
-          <input
-            id="loginPassword"
-            placeholder="Password"
-            value={this.state.password}
-            type="password"
-            required
-            onKeyUp={this.formKeyUp}
-            onChange={this.changePassword}
-          />
-          <button
-            className="won-button--filled lighterblue"
-            disabled={this.state.password === "" || this.state.email === ""}
-          >
-            Sign In
-          </button>
-          <input
-            id="remember-me"
-            value={this.state.rememberMe}
-            onChange={this.changeRememberMe}
-            type="checkbox"
-          />
-          {" Remember me"}
-        </form>
-        <WonLabelledHr label="Or" />
-        <div className="wl__register">
-          <Link
-            className="won-button--filled red"
-            onClick={this.closeMenu}
-            to="/signup"
-          >
-            Sign up
-          </Link>
-        </div>
-      </won-login-form>
-    );
-  }
-
-  closeMenu() {
-    this.props.hideMainMenu();
-  }
-
-  formKeyUp(event) {
-    if (this.props.loginError) {
-      this.props.clearLoginError();
-    }
-    if (event.keyCode == 13) {
-      this.props.login(
-        this.state.email,
-        this.state.password,
-        this.state.rememberMe
-      );
-    }
-  }
-
-  changePassword(event) {
-    this.setState({
-      password: event.target.value,
-    });
-  }
-  changeRememberMe(event) {
-    this.setState({
-      rememberMe: event.target.checked,
-    });
-  }
-  changeEmail(event) {
-    this.setState({
-      email: event.target.value,
-    });
-  }
+          Sign In
+        </button>
+        <input
+          id="remember-me"
+          value={rememberMe}
+          onChange={event => setRememberMe(event.target.checked)}
+          type="checkbox"
+        />
+        {" Remember me"}
+      </form>
+      <WonLabelledHr label="Or" />
+      <div className="wl__register">
+        <Link
+          className="won-button--filled red"
+          onClick={() => dispatch(actionCreators.view__hideMainMenu())}
+          to="/signup"
+        >
+          Sign up
+        </Link>
+      </div>
+    </won-login-form>
+  );
 }
 WonLoginForm.propTypes = {
   className: PropTypes.string,
-  loginError: PropTypes.string,
-  processingResendVerificationEmail: PropTypes.bool,
-  isNotVerified: PropTypes.bool,
-  accountResendVerificationEmail: PropTypes.func,
-  hideMainMenu: PropTypes.func,
-  login: PropTypes.func,
-  clearLoginError: PropTypes.func,
 };
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonLoginForm);

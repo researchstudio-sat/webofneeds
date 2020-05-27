@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import WonLabelledHr from "./labelled-hr.jsx";
 
@@ -6,73 +6,70 @@ import "~/style/_flexgrid.scss";
 import ico16_arrow_up from "~/images/won-icons/ico16_arrow_up.svg";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 
-export default class WonFlexGrid extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedIdx: undefined,
-    };
+export default function WonFlexGrid({ items, className }) {
+  const [selectedIdx, setSelectedIdx] = useState(undefined);
+
+  function openElement(index) {
+    setSelectedIdx(selectedIdx ? undefined : index);
   }
 
-  render() {
-    return (
-      <won-flex-grid class={this.props.className ? this.props.className : ""}>
-        {this.props.items.map((item, index) => (
+  return (
+    <won-flex-grid class={className ? className : ""}>
+      {items.map((item, index) => {
+        const detail = item.detail;
+        const imageSrc = item.imageSrc;
+        const svgSrc = item.svgSrc;
+        const text = item.text;
+        const text2 = item.text2;
+        const separatorText = item.separatorText;
+
+        return (
           <div className="flexgrid__item" key={index}>
             <div
               className={
-                "fgi__block " + (item.detail !== undefined ? " clickable " : "")
+                "fgi__block " + (detail !== undefined ? " clickable " : "")
               }
-              onClick={() => this.openElement(index)}
+              onClick={() => openElement(index)}
             >
-              {item.imageSrc !== undefined && (
-                <img className="fgi__image" src={item.imageSrc} />
-              )}
-              {item.svgSrc !== undefined && (
+              {imageSrc && <img className="fgi__image" src={imageSrc} />}
+              {svgSrc && (
                 <svg className="fgi__image">
-                  <use href={item.svgSrc} />
+                  <use href={svgSrc} />
                 </svg>
               )}
-              {item.text2 === undefined &&
-                item.separatorText === undefined && (
-                  <span className="fgi__text">{item.text}</span>
-                )}
-              {item.text2 !== undefined &&
-                item.separatorText !== undefined && (
+              {!text2 &&
+                !separatorText && <span className="fgi__text">{text}</span>}
+              {text2 &&
+                separatorText && (
                   <span className="fgi__text">
-                    {item.text}
-                    <WonLabelledHr label={item.separatorText} />
-                    {item.text2}
+                    {text}
+                    <WonLabelledHr label={separatorText} />
+                    {text2}
                   </span>
                 )}
-              {item.detail !== undefined &&
-                index === this.state.selectedIdx && (
+              {detail ? (
+                index === selectedIdx ? (
                   <svg className="fgi__arrow">
                     <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
                   </svg>
-                )}
-              {item.detail !== undefined &&
-                index !== this.state.selectedIdx && (
+                ) : (
                   <svg className="fgi__arrow">
                     <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
                   </svg>
-                )}
+                )
+              ) : (
+                undefined
+              )}
             </div>
-            {item.detail !== undefined &&
-              index === this.state.selectedIdx && (
-                <span className="fgi__additionaltext">{item.detail}</span>
+            {detail &&
+              index === selectedIdx && (
+                <span className="fgi__additionaltext">{detail}</span>
               )}
           </div>
-        ))}
-      </won-flex-grid>
-    );
-  }
-
-  openElement(index) {
-    this.setState({
-      selectedIdx: index === this.state.selectedIdx ? undefined : index,
-    });
-  }
+        );
+      })}
+    </won-flex-grid>
+  );
 }
 WonFlexGrid.propTypes = {
   items: PropTypes.arrayOf(PropTypes.object).isRequired,
