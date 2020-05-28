@@ -47,71 +47,87 @@ export const showAnonymousSlideInEmailInput = createSelector(
   viewState => viewUtils.showAnonymousSlideInEmailInput(viewState)
 );
 
-export function showSlideInAnonymousSuccess(state) {
-  const isAnonymous = accountUtils.isAnonymous(getAccountState(state));
+export const showSlideInConnectionLost = createSelector(
+  state => getIn(state, ["messages", "lostConnection"]),
+  lostConnection => lostConnection
+);
 
-  return (
-    !showSlideInConnectionLost(state) &&
-    isAnonymous &&
-    (isAnonymousLinkSent(state) || isAnonymousLinkCopied(state))
+export const showSlideInAnonymousSuccess = createSelector(
+  getAccountState,
+  showSlideInConnectionLost,
+  isAnonymousLinkSent,
+  isAnonymousLinkCopied,
+  (
+    accountState,
+    isShowSlideInConnectionLost,
+    _isAnonymousLinkSent,
+    _isAnonymousLinkCopied
+  ) =>
+    !isShowSlideInConnectionLost &&
+    accountUtils.isAnonymous(accountState) &&
+    (_isAnonymousLinkSent || _isAnonymousLinkCopied)
+);
+
+export const showSlideInAnonymous = createSelector(
+  getAccountState,
+  showSlideInConnectionLost,
+  isAnonymousLinkSent,
+  isAnonymousLinkCopied,
+  (
+    accountState,
+    isShowSlideInConnectionLost,
+    _isAnonymousLinkSent,
+    _isAnonymousLinkCopied
+  ) =>
+    !isShowSlideInConnectionLost &&
+    accountUtils.isAnonymous(accountState) &&
+    !_isAnonymousLinkSent &&
+    !_isAnonymousLinkCopied
+);
+
+export const showSlideInDisclaimer = createSelector(
+  getAccountState,
+  showSlideInConnectionLost,
+  (accountState, isShowSlideInConnectionLost) =>
+    !isShowSlideInConnectionLost &&
+    !accountUtils.isDisclaimerAccepted(accountState)
+);
+
+export const showSlideInTermsOfService = createSelector(
+  getAccountState,
+  showSlideInConnectionLost,
+  (accountState, isShowSlideInConnectionLost) =>
+    accountUtils.isLoggedIn(accountState) &&
+    !isShowSlideInConnectionLost &&
+    !accountUtils.isTermsOfServiceAccepted(accountState)
+);
+
+export const showSlideInEmailVerification = history =>
+  createSelector(
+    getAccountState,
+    showSlideInConnectionLost,
+    (accountState, isShowSlideInConnectionLost) => {
+      const { token } = getQueryParams(history.location);
+
+      return !!(
+        !isShowSlideInConnectionLost &&
+        (token ||
+          (accountUtils.isLoggedIn(accountState) &&
+            !accountUtils.isEmailVerified(accountState) &&
+            !accountUtils.isAnonymous(accountState)))
+      );
+    }
   );
-}
 
-export function showSlideInAnonymous(state) {
-  const isAnonymous = accountUtils.isAnonymous(getAccountState(state));
-
-  return (
-    !showSlideInConnectionLost(state) &&
-    isAnonymous &&
-    !isAnonymousLinkSent(state) &&
-    !isAnonymousLinkCopied(state)
-  );
-}
-
-export function showSlideInDisclaimer(state) {
-  const isDisclaimerAccepted = accountUtils.isDisclaimerAccepted(
-    getAccountState(state)
-  );
-
-  return !showSlideInConnectionLost(state) && !isDisclaimerAccepted;
-}
-
-export function showSlideInTermsOfService(state) {
-  const accountState = getAccountState(state);
-  const isLoggedIn = accountUtils.isLoggedIn(accountState);
-  const isTermsOfServiceAccepted = accountUtils.isTermsOfServiceAccepted(
-    accountState
-  );
-
-  return (
-    isLoggedIn && !showSlideInConnectionLost(state) && !isTermsOfServiceAccepted
-  );
-}
-
-export function showSlideInEmailVerification(state, history) {
-  const { token } = getQueryParams(history.location);
-  const accountState = getAccountState(state);
-  const isLoggedIn = accountUtils.isLoggedIn(accountState);
-  const isAnonymous = accountUtils.isAnonymous(accountState);
-  const isEmailVerified = accountUtils.isEmailVerified(accountState);
-
-  return !!(
-    !showSlideInConnectionLost(state) &&
-    (token || (isLoggedIn && !isEmailVerified && !isAnonymous))
-  );
-}
-
-export function showSlideInConnectionLost(state) {
-  return getIn(state, ["messages", "lostConnection"]);
-}
-
-export function hasSlideIns(state, history) {
-  return !!(
+export const hasSlideIns = history => state =>
+  !!(
     showSlideInAnonymous(state) ||
     showSlideInAnonymousSuccess(state) ||
     showSlideInDisclaimer(state) ||
     showSlideInTermsOfService(state) ||
-    showSlideInEmailVerification(state, history) ||
+    showSlideInEmailVerification(history)(state) ||
     showSlideInConnectionLost(state)
   );
-}
+
+export const showSlideIns = history => state =>
+  isSlideInsVisible(state) && hasSlideIns(history)(state);
