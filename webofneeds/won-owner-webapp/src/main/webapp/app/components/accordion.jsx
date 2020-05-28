@@ -4,7 +4,6 @@ import ReactMarkdown from "react-markdown";
 
 import "~/style/_accordion.scss";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
-import ico16_arrow_up from "~/images/won-icons/ico16_arrow_up.svg";
 
 export default function WonAccordion({ items, className }) {
   const [selectedIdx, setSelectedIdx] = useState(undefined);
@@ -22,21 +21,22 @@ export default function WonAccordion({ items, className }) {
           onClick={() => openElement(index)}
         >
           <div className="header clickable">{item.title}</div>
-          {index !== selectedIdx ? (
-            <svg className="arrow clickable">
-              <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-            </svg>
-          ) : (
-            <React.Fragment>
-              <svg className="arrow clickable">
-                <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
-              </svg>
-              <ReactMarkdown
-                className="detail markdown"
-                source={item.detail}
-                linkTarget="_blank"
-              />
-            </React.Fragment>
+          <svg
+            className={
+              "arrow clickable" +
+              (index !== selectedIdx
+                ? " arrow--collapsed "
+                : " arrow--expanded ")
+            }
+          >
+            <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
+          </svg>
+          {index === selectedIdx && (
+            <ReactMarkdown
+              className="detail markdown"
+              source={item.detail}
+              linkTarget="_blank"
+            />
           )}
         </div>
       ))}

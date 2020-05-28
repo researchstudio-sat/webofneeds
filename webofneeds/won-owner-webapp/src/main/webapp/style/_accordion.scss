@@ -26,6 +26,15 @@ won-accordion {
       width: 1rem;
       height: 1rem;
 
+      &--expanded {
+        transform: rotate(-180deg);
+        transition: all linear 0.2s;
+      }
+
+      &--collapsed {
+        transition: all linear 0.2s;
+      }
+
       &.clickable {
         --local-primary: #{$won-primary-color};
       }

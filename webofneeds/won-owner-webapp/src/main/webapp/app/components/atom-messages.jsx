@@ -31,6 +31,7 @@ import { actionCreators } from "../actions/actions.js";
 import * as ownerApi from "../api/owner-api.js";
 import Immutable from "immutable";
 import { useHistory } from "react-router-dom";
+import { getOwnedConnections } from "../redux/selectors/general-selectors";
 
 export default function WonAtomMessages({
   connection,
@@ -59,6 +60,8 @@ export default function WonAtomMessages({
   const senderAtomUri = get(senderAtom, "uri");
   const targetAtomUri = get(connection, "targetAtomUri");
   const targetAtom = useSelector(generalSelectors.getAtom(targetAtomUri));
+  const allAtoms = useSelector(generalSelectors.getAtoms);
+  const ownedConnections = useSelector(getOwnedConnections);
 
   const messages = get(connection, "messages");
   const chatMessages =
@@ -624,6 +627,11 @@ export default function WonAtomMessages({
               key={get(msg, "uri") + "-" + index}
               message={msg}
               connection={connection}
+              senderAtom={senderAtom}
+              targetAtom={targetAtom}
+              allAtoms={allAtoms}
+              ownedConnections={ownedConnections}
+              shouldShowRdf={shouldShowRdf}
               onClick={
                 multiSelectType
                   ? () => selectMessage(get(msg, "uri"))
@@ -687,6 +695,11 @@ export default function WonAtomMessages({
             key={get(msg, "uri") + "-" + index}
             message={msg}
             connection={connection}
+            senderAtom={senderAtom}
+            targetAtom={targetAtom}
+            allAtoms={allAtoms}
+            ownedConnections={ownedConnections}
+            shouldShowRdf={shouldShowRdf}
             onClick={
               multiSelectType ? () => selectMessage(get(msg, "uri")) : undefined
             }
@@ -702,6 +715,11 @@ export default function WonAtomMessages({
             key={get(msg, "uri") + "-" + index}
             message={msg}
             connection={connection}
+            senderAtom={senderAtom}
+            targetAtom={targetAtom}
+            allAtoms={allAtoms}
+            ownedConnections={ownedConnections}
+            shouldShowRdf={shouldShowRdf}
             onClick={
               multiSelectType ? () => selectMessage(get(msg, "uri")) : undefined
             }
@@ -717,6 +735,11 @@ export default function WonAtomMessages({
             key={get(msg, "uri") + "-" + index}
             message={msg}
             connection={connection}
+            senderAtom={senderAtom}
+            targetAtom={targetAtom}
+            allAtoms={allAtoms}
+            ownedConnections={ownedConnections}
+            shouldShowRdf={shouldShowRdf}
             onClick={
               multiSelectType ? () => selectMessage(get(msg, "uri")) : undefined
             }

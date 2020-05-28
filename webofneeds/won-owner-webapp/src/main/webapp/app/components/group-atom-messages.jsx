@@ -25,6 +25,7 @@ import WonConnectionMessage from "./messages/connection-message.jsx";
 import { actionCreators } from "../actions/actions.js";
 import * as viewSelectors from "../redux/selectors/view-selectors";
 import { useHistory } from "react-router-dom";
+import { getOwnedConnections } from "../redux/selectors/general-selectors";
 
 export default function WonGroupAtomMessages({
   connection,
@@ -44,6 +45,8 @@ export default function WonGroupAtomMessages({
   const [snapBottom, setSnapBottom] = useState(true);
 
   const connectionUri = get(connection, "uri");
+  const allAtoms = useSelector(generalSelectors.getAtoms);
+  const ownedConnections = useSelector(getOwnedConnections);
   const senderAtom = useSelector(
     generalSelectors.getOwnedAtomByConnectionUri(connectionUri)
   );
@@ -323,6 +326,12 @@ export default function WonGroupAtomMessages({
             key={get(msg, "uri") + "-" + index}
             message={msg}
             connection={connection}
+            senderAtom={senderAtom}
+            targetAtom={targetAtom}
+            allAtoms={allAtoms}
+            ownedConnections={ownedConnections}
+            originatorAtom={get(allAtoms, get(msg, "originatorUri"))}
+            shouldShowRdf={shouldShowRdf}
             groupChatMessage={true}
           />
         );

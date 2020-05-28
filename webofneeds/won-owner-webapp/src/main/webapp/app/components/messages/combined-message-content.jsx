@@ -2,13 +2,8 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import { useSelector } from "react-redux";
 
 import PropTypes from "prop-types";
-import {
-  getAtoms,
-  getOwnedConnections,
-} from "../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import { get, getIn, generateLink } from "../../utils.js";
 import { labels } from "../../won-label-utils.js";
@@ -23,6 +18,10 @@ import { useHistory } from "react-router-dom";
 export default function WonCombinedMessageContent({
   message,
   connection,
+  allAtoms,
+  ownedConnections,
+  senderAtom,
+  originatorAtom,
   groupChatMessage,
   className,
   onClick,
@@ -36,9 +35,7 @@ export default function WonCombinedMessageContent({
   const referencesProposes = get(references, "proposes");
   const referencesClaims = get(references, "claims");
 
-  const allConnections = useSelector(getOwnedConnections);
-  const allAtoms = useSelector(getAtoms);
-
+  const originatorUri = get(message, "originatorUri");
   /*Extract persona name from message:
 
    either within the atom of the originatorUri-atom (in group-chat-messages)
@@ -47,9 +44,7 @@ export default function WonCombinedMessageContent({
    */
   const relevantAtomUri =
     !get(message, "outgoingMessage") &&
-    (groupChatMessage
-      ? get(message, "originatorUri")
-      : get(connection, "targetAtomUri"));
+    (groupChatMessage ? originatorUri : get(connection, "targetAtomUri"));
   const heldByAtomUri = atomUtils.getHeldByUri(get(allAtoms, relevantAtomUri));
 
   const relevantPersonaUri = heldByAtomUri;
@@ -64,8 +59,7 @@ export default function WonCombinedMessageContent({
   const hasProposes = referencesProposes && referencesProposes.size > 0;
   const agreementData = get(connection, "agreementData");
   const isInjectIntoMessage = injectInto && injectInto.size > 0; //contains the targetConnectionUris
-  const originatorUri = get(message, "originatorUri");
-  const originatorAtom = originatorUri && get(allAtoms, originatorUri);
+
   const injectIntoArray = injectInto && Array.from(injectInto.toSet());
   const isConnectionMessage = messageType === vocab.WONMSG.connectionMessage;
 
@@ -127,14 +121,14 @@ export default function WonCombinedMessageContent({
 
   function isInjectIntoConnectionPresent(connectionUri) {
     //TODO: THIS MIGHT BE A CONNECTION THAT WE DONT EVEN OWN, SO WE NEED TO BE MORE SMART ABOUT IT
-    let connection = get(allConnections, connectionUri);
+    let connection = get(ownedConnections, connectionUri);
 
     if (connection) {
       return true;
     } else {
       return (
-        allConnections &&
-        !!allConnections.find(
+        ownedConnections &&
+        !!ownedConnections.find(
           conn => get(conn, "targetConnectionUri") === connectionUri
         )
       );
@@ -143,14 +137,14 @@ export default function WonCombinedMessageContent({
 
   function getInjectIntoAtom(connectionUri) {
     //TODO: THIS MIGHT BE A CONNECTION THAT WE DONT EVEN OWN, SO WE NEED TO BE MORE SMART ABOUT IT
-    let connection = get(allConnections, connectionUri);
+    let connection = get(ownedConnections, connectionUri);
 
     if (connection) {
       return get(allAtoms, get(connection, "targetAtomUri"));
     } else {
       connection =
-        allConnections &&
-        allConnections.find(
+        ownedConnections &&
+        ownedConnections.find(
           conn => get(conn, "targetConnectionUri") === connectionUri
         );
 
@@ -248,7 +242,14 @@ export default function WonCombinedMessageContent({
   }
 
   const referencedMessageElements = hasReferences ? (
-    <WonReferencedMessageContent message={message} connection={connection} />
+    <WonReferencedMessageContent
+      message={message}
+      connection={connection}
+      allAtoms={allAtoms}
+      senderAtom={senderAtom}
+      originatorAtom={originatorAtom}
+      ownedConnections={ownedConnections}
+    />
   ) : (
     undefined
   );
@@ -282,6 +283,10 @@ export default function WonCombinedMessageContent({
 WonCombinedMessageContent.propTypes = {
   message: PropTypes.object,
   connection: PropTypes.object.isRequired,
+  originatorAtom: PropTypes.object,
+  senderAtom: PropTypes.object,
+  allAtoms: PropTypes.object.isRequired,
+  ownedConnections: PropTypes.object.isRequired,
   groupChatMessage: PropTypes.bool,
   className: PropTypes.string,
   onClick: PropTypes.func,

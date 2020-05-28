@@ -5,8 +5,7 @@ import * as messageUtils from "../../redux/utils/message-utils.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import { get, getIn, generateLink } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
-import { useDispatch, useSelector } from "react-redux";
-import * as generalSelectors from "../../redux/selectors/general-selectors.js";
+import { useDispatch } from "react-redux";
 import { ownerBaseUrl } from "~/config/default.js";
 
 import WonLabelledHr from "../labelled-hr.jsx";
@@ -20,36 +19,33 @@ import "~/style/_connection-message.scss";
 import "~/style/_rdflink.scss";
 import rdf_logo_2 from "~/images/won-icons/rdf_logo_2.svg";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
-import ico16_arrow_up from "~/images/won-icons/ico16_arrow_up.svg";
-import * as viewSelectors from "../../redux/selectors/view-selectors";
 import { useHistory } from "react-router-dom";
 
 const MESSAGE_READ_TIMEOUT = 1500;
 
 export default function WonConnectionMessage({
   message,
+  senderAtom,
+  targetAtom,
+  originatorAtom,
+  allAtoms,
+  ownedConnections,
   connection,
   onClick,
   groupChatMessage,
+  shouldShowRdf,
 }) {
   const dispatch = useDispatch();
   const history = useHistory();
-  const ownedAtom = useSelector(
-    generalSelectors.getOwnedAtomByConnectionUri(get(connection, "uri"))
-  );
   const messageUri = get(message, "uri");
   const connectionUri = get(connection, "uri");
-  const theirAtom = useSelector(
-    generalSelectors.getAtom(get(connection, "targetAtomUri"))
-  );
-  const shouldShowRdf = useSelector(viewSelectors.showRdf);
 
   let rdfLinkURL;
-  if (shouldShowRdf && ownerBaseUrl && ownedAtom && message) {
+  if (shouldShowRdf && ownerBaseUrl && senderAtom && message) {
     rdfLinkURL = urljoin(
       ownerBaseUrl,
       "/rest/linked-data/",
-      `?requester=${encodeURIComponent(get(ownedAtom, "uri"))}`,
+      `?requester=${encodeURIComponent(get(senderAtom, "uri"))}`,
       `&uri=${encodeURIComponent(get(message, "uri"))}`,
       get(message, "outgoingMessage") ? "&deep=true" : ""
     );
@@ -73,15 +69,7 @@ export default function WonConnectionMessage({
 
   const injectInto = get(message, "injectInto");
 
-  const messageSenderUri = get(message, "senderUri");
   const originatorUri = get(message, "originatorUri");
-
-  const messageSenderAtom = useSelector(
-    state => messageSenderUri && get(state, messageSenderUri)
-  );
-  const originatorAtom = useSelector(
-    state => originatorUri && get(state, originatorUri)
-  );
 
   const isConnectionMessage = messageUtils.isConnectionMessage(message);
   const isChangeNotificationMessage = messageUtils.isChangeNotificationMessage(
@@ -220,7 +208,7 @@ export default function WonConnectionMessage({
         actionCreators.messages__viewState__markAsCollapsed({
           messageUri: get(message, "uri"),
           connectionUri: connectionUri,
-          atomUri: get(ownedAtom, "uri"),
+          atomUri: get(senderAtom, "uri"),
           isCollapsed: expand,
         })
       );
@@ -261,7 +249,7 @@ export default function WonConnectionMessage({
       actionCreators.messages__viewState__markShowActions({
         messageUri: get(message, "uri"),
         connectionUri: connectionUri,
-        atomUri: get(ownedAtom, "uri"),
+        atomUri: get(senderAtom, "uri"),
         showActions: !showActions,
       })
     );
@@ -274,7 +262,7 @@ export default function WonConnectionMessage({
           actionCreators.messages__markAsRead({
             messageUri: messageUri,
             connectionUri: connectionUri,
-            atomUri: get(ownedAtom, "uri"),
+            atomUri: get(senderAtom, "uri"),
             read: true,
           })
         );
@@ -312,15 +300,15 @@ export default function WonConnectionMessage({
     if (!isSent && !(groupChatMessage && originatorUri)) {
       messageIcon.push(
         <WonAtomIcon
-          key="theirAtomUri"
-          atom={theirAtom}
+          key="targetAtomUri"
+          atom={targetAtom}
           onClick={
             !onClick
               ? () => {
                   history.push(
                     generateLink(
                       history.location,
-                      { postUri: get(theirAtom, "uri") },
+                      { postUri: get(targetAtom, "uri") },
                       "/post"
                     )
                   );
@@ -353,12 +341,6 @@ export default function WonConnectionMessage({
       );
     }
 
-    if (isFromSystem) {
-      messageIcon.push(
-        <WonAtomIcon key="messageSenderUri" atom={messageSenderAtom} />
-      );
-    }
-
     let messageCenterContentElement;
     if (isCollapsed) {
       messageCenterContentElement = (
@@ -385,21 +367,26 @@ export default function WonConnectionMessage({
           <WonCombinedMessageContent
             message={message}
             connection={connection}
+            senderAtom={senderAtom}
+            originatorAtom={originatorAtom}
+            allAtoms={allAtoms}
+            ownedConnections={ownedConnections}
             groupChatMessage={groupChatMessage}
           />
           {!groupChatMessage &&
           (isProposable || isClaimable) &&
           !multiSelectType ? (
             <div
-              className="won-cm__center__bubble__carret clickable"
+              className={
+                "won-cm__center__bubble__carret clickable " +
+                (showActions
+                  ? " won-cm__center__bubble__carret--expanded "
+                  : " won-cm__center__bubble__carret--collapsed ")
+              }
               onClick={() => toggleActions()}
             >
               <svg>
-                {showActions ? (
-                  <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
-                ) : (
-                  <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-                )}
+                <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
               </svg>
             </div>
           ) : (
@@ -458,6 +445,12 @@ export default function WonConnectionMessage({
 WonConnectionMessage.propTypes = {
   message: PropTypes.object.isRequired,
   connection: PropTypes.object.isRequired,
+  senderAtom: PropTypes.object.isRequired,
+  targetAtom: PropTypes.object.isRequired,
+  allAtoms: PropTypes.object,
+  ownedConnections: PropTypes.object,
+  originatorAtom: PropTypes.object,
   onClick: PropTypes.func,
   groupChatMessage: PropTypes.bool,
+  shouldShowRdf: PropTypes.bool,
 };

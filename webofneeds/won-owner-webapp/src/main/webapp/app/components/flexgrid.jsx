@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import WonLabelledHr from "./labelled-hr.jsx";
 
 import "~/style/_flexgrid.scss";
-import ico16_arrow_up from "~/images/won-icons/ico16_arrow_up.svg";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 
 export default function WonFlexGrid({ items, className }) {
@@ -48,15 +47,16 @@ export default function WonFlexGrid({ items, className }) {
                   </span>
                 )}
               {detail ? (
-                index === selectedIdx ? (
-                  <svg className="fgi__arrow">
-                    <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
-                  </svg>
-                ) : (
-                  <svg className="fgi__arrow">
-                    <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-                  </svg>
-                )
+                <svg
+                  className={
+                    "fgi__arrow " +
+                    (index === selectedIdx
+                      ? " fgi__arrow--exanded "
+                      : " fgi__arrow--collapsed ")
+                  }
+                >
+                  <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
+                </svg>
               ) : (
                 undefined
               )}

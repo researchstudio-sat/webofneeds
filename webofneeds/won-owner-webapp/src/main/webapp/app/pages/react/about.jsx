@@ -16,7 +16,6 @@ import WonSlideIn from "../../components/slide-in.jsx";
 import WonFlexGrid from "../../components/flexgrid.jsx";
 
 import "~/style/_about.scss";
-import ico16_arrow_up from "~/images/won-icons/ico16_arrow_up.svg";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 import { useHistory } from "react-router-dom";
 
@@ -210,14 +209,15 @@ export default function PageAbout() {
                 Read more
               </span>
               <svg
-                className="about__welcome__description__arrow clickable"
+                className={
+                  "about__welcome__description__arrow clickable " +
+                  (moreInfo
+                    ? " about__welcome__description__arrow--expanded "
+                    : " about__welcome__description__arrow--collapsed ")
+                }
                 onClick={toggleMoreInfo}
               >
-                {moreInfo ? (
-                  <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
-                ) : (
-                  <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-                )}
+                <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
               </svg>
 
               {moreInfo && (

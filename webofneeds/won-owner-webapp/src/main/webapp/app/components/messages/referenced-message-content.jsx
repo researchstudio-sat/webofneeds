@@ -3,7 +3,7 @@
  */
 import React from "react";
 import { actionCreators } from "../../actions/actions.js";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import PropTypes from "prop-types";
 import { get, getIn } from "../../utils.js";
@@ -12,16 +12,17 @@ import won from "../../won-es6";
 import WonCombinedMessageContent from "./combined-message-content.jsx";
 
 import "~/style/_referenced-message-content.scss";
-import ico16_arrow_up from "~/images/won-icons/ico16_arrow_up.svg";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
-import * as generalSelectors from "../../redux/selectors/general-selectors";
 
-export default function WonReferencedMessageContent({ message, connection }) {
+export default function WonReferencedMessageContent({
+  message,
+  connection,
+  senderAtom,
+  allAtoms,
+  ownedConnections,
+  originatorAtom,
+}) {
   const dispatch = useDispatch();
-  const ownedAtom = useSelector(
-    generalSelectors.getOwnedAtomByConnectionUri(get(connection, "uri"))
-  );
-
   const expandedReferences = getIn(message, [
     "viewState",
     "expandedReferences",
@@ -37,7 +38,7 @@ export default function WonReferencedMessageContent({ message, connection }) {
   const acceptUris = get(references, "accepts");
   const forwardUris = get(references, "forwards");
   const claimUris = get(references, "claims");
-  const ownedAtomUri = get(ownedAtom, "uri");
+  const senderAtomUri = get(senderAtom, "uri");
   const multiSelectType = get(connection, "multiSelectType");
 
   function toggleReferenceExpansion(reference) {
@@ -48,7 +49,7 @@ export default function WonReferencedMessageContent({ message, connection }) {
         actionCreators.messages__viewState__markExpandReference({
           messageUri: get(message, "uri"),
           connectionUri: get(connection, "uri"),
-          atomUri: ownedAtomUri,
+          atomUri: senderAtomUri,
           isExpanded: !currentExpansionState,
           reference: reference,
         })
@@ -72,7 +73,7 @@ export default function WonReferencedMessageContent({ message, connection }) {
     let onClick;
     if (!referencedMessage) {
       onClick = () =>
-        ownerApi.getMessage(ownedAtomUri, msgUri).then(response => {
+        ownerApi.getMessage(senderAtomUri, msgUri).then(response => {
           won.wonMessageFromJsonLd(response, msgUri).then(msg => {
             //If message isnt in the state we add it
             dispatch(actionCreators.messages__processAgreementMessage(msg));
@@ -85,6 +86,10 @@ export default function WonReferencedMessageContent({ message, connection }) {
         key={msgUri}
         message={referencedMessage}
         connection={connection}
+        senderAtom={senderAtom}
+        originatorAtom={originatorAtom}
+        allAtoms={allAtoms}
+        ownedConnections={ownedConnections}
         className={messageClass}
         onClick={onClick}
       />
@@ -117,13 +122,16 @@ export default function WonReferencedMessageContent({ message, connection }) {
                 messagesArraySize +
                 (messagesArraySize == 1 ? " Message" : " Messages")}
             </div>
-            <div className="refmsgcontent__fragment__header__carret">
+            <div
+              className={
+                "refmsgcontent__fragment__header__carret " +
+                (isExpanded
+                  ? " refmsgcontent__fragment__header__carret--expanded "
+                  : " refmsgcontent__fragment__header__carret--collapsed ")
+              }
+            >
               <svg>
-                {isExpanded ? (
-                  <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
-                ) : (
-                  <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-                )}
+                <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
               </svg>
             </div>
           </div>
@@ -174,6 +182,10 @@ export default function WonReferencedMessageContent({ message, connection }) {
 }
 
 WonReferencedMessageContent.propTypes = {
-  message: PropTypes.object,
-  connection: PropTypes.object,
+  message: PropTypes.object.isRequired,
+  connection: PropTypes.object.isRequired,
+  senderAtom: PropTypes.object.isRequired,
+  allAtoms: PropTypes.object.isRequired,
+  ownedConnections: PropTypes.object.isRequired,
+  originatorAtom: PropTypes.object,
 };
