@@ -17,10 +17,10 @@ export default function WonConnectionsOverview() {
   const history = useHistory();
   const [searchText, setSearchText] = useState({ value: "" });
 
-  const storedAtoms = useSelector(state => generalSelectors.getAtoms(state));
+  const storedAtoms = useSelector(generalSelectors.getAtoms);
 
   let allChatConnections = filterConnectionsBySearchValue(
-    useSelector(state => generalSelectors.getAllChatConnections(state)),
+    useSelector(generalSelectors.getAllChatConnections),
     storedAtoms,
     searchText,
     true

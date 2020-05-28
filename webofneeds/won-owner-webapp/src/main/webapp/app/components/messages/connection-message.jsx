@@ -43,7 +43,7 @@ export default function WonConnectionMessage({
   const theirAtom = useSelector(state =>
     getIn(state, ["atoms", get(connection, "targetAtomUri")])
   );
-  const shouldShowRdf = useSelector(state => viewSelectors.showRdf(state));
+  const shouldShowRdf = useSelector(viewSelectors.showRdf);
 
   let rdfLinkURL;
   if (shouldShowRdf && ownerBaseUrl && ownedAtom && message) {

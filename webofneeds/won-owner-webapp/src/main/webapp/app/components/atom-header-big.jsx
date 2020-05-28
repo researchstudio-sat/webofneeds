@@ -30,8 +30,8 @@ export default function WonAtomHeaderBig({ atom }) {
     state => responseToUri && getIn(state, ["atoms", responseToUri])
   );
   const accountState = useSelector(generalSelectors.getAccountState);
-  const ownedAtomsWithBuddySocket = useSelector(state =>
-    generalSelectors.getOwnedAtomsWithBuddySocket(state)
+  const ownedAtomsWithBuddySocket = useSelector(
+    generalSelectors.getOwnedAtomsWithBuddySocket
   );
   const hasOwnedAtomsWithBuddySocket =
     ownedAtomsWithBuddySocket &&

@@ -22,8 +22,8 @@ export default function WonAddBuddy({ atom, className }) {
   const dispatch = useDispatch();
   const [contextMenuOpen, setContextMenuOpen] = useState(false);
   let thisNode;
-  const ownedAtomsWithBuddySocket = useSelector(state =>
-    generalSelectors.getOwnedAtomsWithBuddySocket(state)
+  const ownedAtomsWithBuddySocket = useSelector(
+    generalSelectors.getOwnedAtomsWithBuddySocket
   );
 
   const ownedBuddyOptions =

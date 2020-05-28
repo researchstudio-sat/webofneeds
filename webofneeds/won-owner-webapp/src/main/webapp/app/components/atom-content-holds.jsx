@@ -25,13 +25,11 @@ export default function WonAtomContentHolds({ atom }) {
   const isOwned = useSelector(state =>
     generalSelectors.isAtomOwned(state, atomUri)
   );
-  const currentLocation = useSelector(state =>
-    generalSelectors.getCurrentLocation(state)
-  );
+  const currentLocation = useSelector(generalSelectors.getCurrentLocation);
 
   const [searchText, setSearchText] = useState({ value: "" });
 
-  const storedAtoms = useSelector(state => generalSelectors.getAtoms(state));
+  const storedAtoms = useSelector(generalSelectors.getAtoms);
 
   const connections = filterConnectionsBySearchValue(
     atomUtils.getConnectedConnections(atom, vocab.HOLD.HolderSocketCompacted),

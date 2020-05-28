@@ -45,15 +45,11 @@ export default function PageConnections() {
     selectedConnection &&
     atomUtils.getGroupSocket(selectedTargetAtom) ===
       get(selectedConnection, "targetSocketUri");
-  const hasChatConnections = useSelector(state =>
-    generalSelectors.hasChatConnections(state)
-  );
+  const hasChatConnections = useSelector(generalSelectors.hasChatConnections);
   const isLoggedIn = useSelector(state =>
     accountUtils.isLoggedIn(generalSelectors.getAccountState(state))
   );
-  const showModalDialog = useSelector(state =>
-    viewSelectors.showModalDialog(state)
-  );
+  const showModalDialog = useSelector(viewSelectors.showModalDialog);
   const showSlideIns = useSelector(
     state =>
       viewSelectors.hasSlideIns(state, history) &&

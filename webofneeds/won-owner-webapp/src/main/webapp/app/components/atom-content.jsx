@@ -79,9 +79,7 @@ export default function WonAtomContent({ atom, defaultTab }) {
     atomUri,
     defaultTab
   );
-  const personas = useSelector(state =>
-    generalSelectors.getOwnedCondensedPersonaList(state)
-  );
+  const personas = useSelector(generalSelectors.getOwnedCondensedPersonaList);
 
   function tryReload() {
     if (atomUri && atomFailedToLoad) {

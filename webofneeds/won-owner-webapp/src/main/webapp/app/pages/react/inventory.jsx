@@ -80,9 +80,7 @@ export default function PageInventory() {
       viewSelectors.hasSlideIns(state, history) &&
       viewSelectors.isSlideInsVisible(state)
   );
-  const showModalDialog = useSelector(state =>
-    viewSelectors.showModalDialog(state)
-  );
+  const showModalDialog = useSelector(viewSelectors.showModalDialog);
   const showClosedAtoms = viewUtils.showClosedAtoms(viewState);
 
   let additionalLogosElement;

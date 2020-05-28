@@ -15,7 +15,7 @@ import "~/style/_group-icon.scss";
 import PropTypes from "prop-types";
 
 export default function WonGroupIcon({ connection }) {
-  const allAtoms = useSelector(state => generalSelectors.getAtoms(state));
+  const allAtoms = useSelector(generalSelectors.getAtoms);
 
   const targetAtom = get(allAtoms, get(connection, "targetAtomUri"));
   const groupMembers = get(targetAtom, "groupMembers");

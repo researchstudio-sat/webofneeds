@@ -37,7 +37,7 @@ export default function WonAtomContentSocket({
   const [showSuggestAtomExpanded, toggleSuggestAtomExpanded] = useState(false);
   const [searchText, setSearchText] = useState({ value: "" });
 
-  const storedAtoms = useSelector(state => generalSelectors.getAtoms(state));
+  const storedAtoms = useSelector(generalSelectors.getAtoms);
 
   const allAtomConnections = atomUtils.getConnections(atom, socketType);
 
