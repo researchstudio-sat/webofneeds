@@ -232,7 +232,7 @@ export default function PageOverview() {
               <div className="owneroverview__usecases__usecase">
                 {whatsNewUseCaseIdentifierArray && (
                   <div
-                    className="owneroverview__usecases__usecase__header"
+                    className="owneroverview__usecases__usecase__header clickable"
                     onClick={() => toggleUseCase(undefined)}
                   >
                     <div className="owneroverview__usecases__usecase__header__title">
