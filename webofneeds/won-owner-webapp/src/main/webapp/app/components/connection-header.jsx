@@ -32,8 +32,8 @@ export default function WonConnectionHeader({ connection, toLink }) {
   const connectionUri = get(connection, "uri");
   const history = useHistory();
   const dispatch = useDispatch();
-  const senderAtom = useSelector(state =>
-    generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri)
+  const senderAtom = useSelector(
+    generalSelectors.getOwnedAtomByConnectionUri(connectionUri)
   );
 
   const targetAtomUri = get(connection, "targetAtomUri");

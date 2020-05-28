@@ -51,17 +51,13 @@ export default function WonAtomContextDropdown({ atom, className }) {
 
   const theme = useSelector(generalSelectors.getTheme);
   const adminEmail = get(theme, "adminEmail");
-  const isOwnAtom = useSelector(state =>
-    generalSelectors.isAtomOwned(state, atomUri)
-  );
+  const isOwnAtom = useSelector(generalSelectors.isAtomOwned(atomUri));
   const isActive = atomUtils.isActive(atom);
   const isInactive = atomUtils.isInactive(atom);
-  const isUsableAsTemplate = useSelector(state =>
-    generalSelectors.isAtomUsableAsTemplate(state, atomUri)
+  const isUsableAsTemplate = useSelector(
+    generalSelectors.isAtomUsableAsTemplate(atomUri)
   );
-  const isEditable = useSelector(state =>
-    generalSelectors.isAtomEditable(state, atomUri)
-  );
+  const isEditable = useSelector(generalSelectors.isAtomEditable(atomUri));
   const atomLoading =
     !atom || processUtils.isAtomLoading(process, get(atom, "uri"));
   const atomFailedToLoad =

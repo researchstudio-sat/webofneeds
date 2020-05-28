@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { getQueryParams, getIn } from "../../utils.js";
+import { getQueryParams } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as processUtils from "../../redux/utils/process-utils.js";
@@ -37,15 +37,11 @@ export default function PageCreate() {
     holderUri,
   } = getQueryParams(history.location);
   const processState = useSelector(generalSelectors.getProcessState);
-  const fromAtom = useSelector(state => getIn(state, ["atoms", fromAtomUri]));
+  const fromAtom = useSelector(generalSelectors.getAtom(fromAtomUri));
   const accountState = useSelector(generalSelectors.getAccountState);
   const isLoggedIn = accountUtils.isLoggedIn(accountState);
   const showModalDialog = useSelector(viewSelectors.showModalDialog);
-  const showSlideIns = useSelector(
-    state =>
-      viewSelectors.hasSlideIns(state, history) &&
-      viewSelectors.isSlideInsVisible(state)
-  );
+  const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
 
   const isFromAtomLoading = fromAtomUri
     ? processUtils.isAtomLoading(processState, fromAtomUri)

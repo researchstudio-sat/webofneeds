@@ -52,10 +52,9 @@ export default function WonEditAtom({ fromAtom }) {
     accountState,
     get(fromAtom, "uri")
   );
-  const isFromAtomEditable = useSelector(
-    state =>
-      loggedIn && generalSelectors.isAtomEditable(state, get(fromAtom, "uri"))
-  );
+  const isFromAtomEditable =
+    useSelector(generalSelectors.isAtomEditable(get(fromAtom, "uri"))) &&
+    loggedIn;
 
   function updateDraftSeeks(updatedDraftJson) {
     updateDraft(updatedDraftJson.draft, "seeks");

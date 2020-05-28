@@ -235,15 +235,14 @@ export function processConnectionMessage(wonMessage) {
         targetSocketUri
       );
 
-      const isSentEvent = generalSelectors.isAtomOwned(state, senderAtomUri);
-      const isReceivedEvent = generalSelectors.isAtomOwned(
-        state,
-        targetAtomUri
+      const isSentEvent = generalSelectors.isAtomOwned(senderAtomUri)(state);
+      const isReceivedEvent = generalSelectors.isAtomOwned(targetAtomUri)(
+        state
       );
 
       let sentEventPromise;
       if (isSentEvent) {
-        const senderAtom = getIn(state, ["atoms", senderAtomUri]);
+        const senderAtom = generalSelectors.getAtom(senderAtomUri)(state);
         const senderConnection = atomUtils.getConnectionBySocketUris(
           senderAtom,
           senderSocketUri,
@@ -264,7 +263,7 @@ export function processConnectionMessage(wonMessage) {
 
       let receivedEventPromise;
       if (isReceivedEvent) {
-        const targetAtom = getIn(state, ["atoms", targetAtomUri]);
+        const targetAtom = generalSelectors.getAtom(targetAtomUri)(state);
         const targetConnection = atomUtils.getConnectionBySocketUris(
           targetAtom,
           targetSocketUri,
@@ -496,7 +495,7 @@ export function connectSuccessOwn(wonMessage) {
       wonMessage.getSenderSocket()
     );
 
-    const atom = getIn(state, ["atoms", atomUri]);
+    const atom = generalSelectors.getAtom(atomUri)(state);
 
     const connection = getIn(atom, [
       "connections",
@@ -537,7 +536,7 @@ export function connectSuccessRemote(wonMessage) {
       wonMessage.getTargetSocket()
     );
 
-    const atom = getIn(state, ["atoms", atomUri]);
+    const atom = generalSelectors.getAtom(atomUri)(state);
     const targetSocketUri = wonMessage.getTargetSocket();
     const senderSocketUri = wonMessage.getSenderSocket();
 
@@ -593,12 +592,11 @@ export function processConnectMessage(wonMessage) {
       senderSocketUri
     );
 
-    const senderAtom = getIn(state, ["atoms", senderAtomUri]);
-    const recipientAtom = getIn(state, ["atoms", recipientAtomUri]);
-    const isOwnSenderAtom = generalSelectors.isAtomOwned(state, senderAtomUri);
-    const isOwnRecipientAtom = generalSelectors.isAtomOwned(
-      state,
-      recipientAtomUri
+    const senderAtom = generalSelectors.getAtom(senderAtomUri)(state);
+    const recipientAtom = generalSelectors.getAtom(recipientAtomUri)(state);
+    const isOwnSenderAtom = generalSelectors.isAtomOwned(senderAtomUri)(state);
+    const isOwnRecipientAtom = generalSelectors.isAtomOwned(recipientAtomUri)(
+      state
     );
 
     const receiverConnectionUri = get(
@@ -806,8 +804,8 @@ export function processSocketHintMessage(wonMessage) {
       targetSocketUri
     );
 
-    const targetAtom = getIn(state, ["atoms", targetAtomUri]);
-    const isOwnTargetAtom = generalSelectors.isAtomOwned(state, targetAtomUri);
+    const targetAtom = generalSelectors.getAtom(targetAtomUri)(state);
+    const isOwnTargetAtom = generalSelectors.isAtomOwned(targetAtomUri)(state);
 
     if (!targetAtom) {
       console.debug(

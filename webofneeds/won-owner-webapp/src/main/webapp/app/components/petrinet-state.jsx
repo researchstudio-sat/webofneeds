@@ -21,9 +21,7 @@ export default function WonPetrinetState({ processUri, className }) {
 
   const { connectionUri } = getQueryParams(history.location); //TODO: create selector that returns the correct connectionUri without looking up the open one
   const atom = useSelector(
-    state =>
-      connectionUri &&
-      generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri)
+    generalSelectors.getOwnedAtomByConnectionUri(connectionUri)
   );
   const connection = getIn(atom, ["connections", connectionUri]);
 

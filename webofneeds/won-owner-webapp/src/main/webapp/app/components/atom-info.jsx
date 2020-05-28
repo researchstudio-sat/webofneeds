@@ -8,23 +8,21 @@ import WonAtomFooter from "./atom-footer.jsx";
 import WonAtomContent from "./atom-content.jsx";
 import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as atomUtils from "../redux/utils/atom-utils";
+import * as processUtils from "../redux/utils/process-utils";
 import * as viewUtils from "../redux/utils/view-utils";
-import * as processSelectors from "../redux/selectors/process-selectors";
 
 import "~/style/_atom-info.scss";
 
 export default function WonAtomInfo({ atom, className, defaultTab }) {
   const atomUri = get(atom, "uri");
-  const isOwned = useSelector(state =>
-    generalSelectors.isAtomOwned(state, atomUri)
-  );
+  const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
 
   const viewState = useSelector(generalSelectors.getViewState);
   const visibleTab = viewUtils.getVisibleTabByAtomUri(viewState, atomUri);
 
-  const atomLoading = useSelector(
-    state => !atom || processSelectors.isAtomLoading(state, atomUri)
-  );
+  const processState = useSelector(generalSelectors.getProcessState);
+  const atomLoading =
+    !atom || processUtils.isAtomLoading(processState, atomUri);
 
   const showFooter =
     !atomLoading &&

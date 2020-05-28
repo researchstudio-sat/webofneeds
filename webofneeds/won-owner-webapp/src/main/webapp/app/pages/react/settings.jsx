@@ -20,11 +20,7 @@ export default function PageSettings() {
   const accountState = useSelector(generalSelectors.getAccountState);
   const isLoggedIn = accountUtils.isLoggedIn(accountState);
   const showModalDialog = useSelector(viewSelectors.showModalDialog);
-  const showSlideIns = useSelector(
-    state =>
-      viewSelectors.hasSlideIns(state, history) &&
-      viewSelectors.isSlideInsVisible(state)
-  );
+  const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
 
   return (
     <section className={!isLoggedIn ? "won-signed-out" : ""}>

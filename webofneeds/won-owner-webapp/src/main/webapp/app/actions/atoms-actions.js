@@ -21,7 +21,7 @@ import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as stateStore from "../redux/state-store.js";
 import * as ownerApi from "../api/owner-api.js";
-import { get, getIn } from "../utils.js";
+import { get } from "../utils.js";
 import { ensureLoggedIn } from "./account-actions.js";
 
 export function fetchUnloadedAtom(atomUri) {
@@ -103,8 +103,8 @@ export function connectSocketTypes(
 ) {
   return (dispatch, getState) => {
     const state = getState();
-    const senderAtom = getIn(state, ["atoms", senderAtomUri]);
-    const targetAtom = getIn(state, ["atoms", targetAtomUri]);
+    const senderAtom = generalSelectors.getAtom(senderAtomUri)(state);
+    const targetAtom = generalSelectors.getAtom(targetAtomUri)(state);
 
     const senderSocketUri = atomUtils.getSocketUri(
       senderAtom,
@@ -304,7 +304,7 @@ export function create(draft, personaUri, nodeUri) {
             });
           })
           .then(() => {
-            const persona = getIn(state, ["atoms", personaUri]);
+            const persona = generalSelectors.getAtom(personaUri)(state);
             if (persona) {
               const senderSocketUri = atomUtils.getSocketUri(
                 persona,

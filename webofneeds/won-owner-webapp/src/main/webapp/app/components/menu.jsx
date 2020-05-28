@@ -13,9 +13,7 @@ import { NavLink, useHistory } from "react-router-dom";
 export default function WonMenu() {
   const dispatch = useDispatch();
   const history = useHistory();
-  const hasSlideIns = useSelector(state =>
-    viewSelectors.hasSlideIns(state, history)
-  );
+  const hasSlideIns = useSelector(viewSelectors.hasSlideIns(history));
   const isMenuVisible = useSelector(viewSelectors.isMenuVisible);
   const isSlideInsVisible = useSelector(viewSelectors.isSlideInsVisible);
   const isLocationAccessDenied = useSelector(
@@ -25,8 +23,8 @@ export default function WonMenu() {
   const hasUnreadSuggestedConnections = useSelector(
     generalSelectors.hasUnreadSuggestedConnections
   );
-  const hasUnreadBuddyConnections = useSelector(state =>
-    generalSelectors.hasUnreadBuddyConnections(state, true, false)
+  const hasUnreadBuddyConnections = useSelector(
+    generalSelectors.hasUnreadBuddyConnections(true, false)
   );
   const hasUnreadChatConnections = useSelector(
     generalSelectors.hasUnreadChatConnections

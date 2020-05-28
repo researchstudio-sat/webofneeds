@@ -35,9 +35,7 @@ export default function WonAtomFooter({ atom, className }) {
 
   const accountState = useSelector(generalSelectors.getAccountState);
 
-  const isOwned = useSelector(state =>
-    generalSelectors.isAtomOwned(state, atomUri)
-  );
+  const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
 
   const reactionUseCases = atomUtils.getReactionUseCases(atom);
   const enabledUseCases = atomUtils.getEnabledUseCases(atom);

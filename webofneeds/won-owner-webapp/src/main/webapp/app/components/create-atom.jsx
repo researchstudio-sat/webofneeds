@@ -4,7 +4,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import PropTypes from "prop-types";
-import { get, getIn } from "../utils.js";
+import { get } from "../utils.js";
 
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -43,7 +43,7 @@ export default function WonCreateAtom({
   const isHolderAtomValid = useSelector(
     state =>
       accountUtils.isAtomOwned(accountState, holderUri) &&
-      atomUtils.hasHolderSocket(getIn(state, ["atoms", holderUri]))
+      atomUtils.hasHolderSocket(generalSelectors.getAtom(holderUri)(state))
   );
 
   let useCase;
@@ -93,8 +93,8 @@ export default function WonCreateAtom({
   const defaultNodeUri = useSelector(generalSelectors.getDefaultNodeUri);
   const loggedIn = accountUtils.isLoggedIn(accountState);
 
-  const isFromAtomUsableAsTemplate = useSelector(state =>
-    generalSelectors.isAtomUsableAsTemplate(state, get(fromAtom, "uri"))
+  const isFromAtomUsableAsTemplate = useSelector(
+    generalSelectors.isAtomUsableAsTemplate(get(fromAtom, "uri"))
   );
   const personas = useSelector(
     generalSelectors.getOwnedCondensedPersonaList

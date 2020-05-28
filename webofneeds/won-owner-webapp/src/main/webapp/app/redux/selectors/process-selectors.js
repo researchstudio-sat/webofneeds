@@ -1,7 +1,7 @@
 /**
  * Created by quasarchimaere on 21.01.2019.
  */
-import { getIn, get } from "../../utils.js";
+import { get } from "../../utils.js";
 import * as processUtils from "../utils/process-utils.js";
 import { createSelector } from "reselect";
 
@@ -62,17 +62,7 @@ export const isProcessingSendAnonymousLinkEmail = createSelector(
   process => processUtils.isProcessingSendAnonymousLinkEmail(process)
 );
 
-export function isAtomLoading(state, atomUri) {
-  return processUtils.isAtomLoading(getProcessState(state), atomUri);
-}
-
-export function isAtomToLoad(state, atomUri) {
-  return (
-    !getIn(state, ["atoms", atomUri]) ||
-    processUtils.isAtomToLoad(getProcessState(state), atomUri)
+export const isAtomLoading = atomUri =>
+  createSelector(getProcessState, processState =>
+    processUtils.isAtomLoading(processState, atomUri)
   );
-}
-
-export function hasAtomFailedToLoad(state, atomUri) {
-  return processUtils.hasAtomFailedToLoad(getProcessState(state), atomUri);
-}

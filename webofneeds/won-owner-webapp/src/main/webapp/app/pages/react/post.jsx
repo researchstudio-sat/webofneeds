@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { actionCreators } from "../../actions/actions.js";
-import { get, getIn, getQueryParams } from "../../utils.js";
+import { get, getQueryParams } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import * as processUtils from "../../redux/utils/process-utils.js";
@@ -24,18 +24,14 @@ export default function PagePost() {
   const dispatch = useDispatch();
   const { postUri } = getQueryParams(history.location);
   const atomUri = postUri;
-  const atom = useSelector(state => getIn(state, ["atoms", atomUri]));
+  const atom = useSelector(generalSelectors.getAtom(atomUri));
 
   const processState = useSelector(generalSelectors.getProcessState);
   const accountState = useSelector(generalSelectors.getAccountState);
 
   const isLoggedIn = accountUtils.isLoggedIn(accountState);
   const atomTitle = get(atom, "humanReadable");
-  const showSlideIns = useSelector(
-    state =>
-      viewSelectors.hasSlideIns(state, history) &&
-      viewSelectors.isSlideInsVisible(state)
-  );
+  const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
   const showModalDialog = useSelector(viewSelectors.showModalDialog);
   const atomLoading =
     !atom || processUtils.isAtomLoading(processState, atomUri);

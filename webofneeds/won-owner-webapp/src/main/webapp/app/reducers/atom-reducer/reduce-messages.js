@@ -296,7 +296,21 @@ export function addMessage(
         }
       }
 
-      const connections = generalSelectors.getConnectionsToInjectMsgInto(
+      const getConnectionsToInjectMsgInto = (
+        atomState,
+        targetSocketUri,
+        msgUri
+      ) => {
+        const allConnections =
+          atomState && atomState.flatMap(atom => atom.get("connections"));
+
+        return allConnections
+          .filter(conn => connectionUtils.isConnected(conn))
+          .filter(conn => get(conn, "targetSocketUri") === targetSocketUri)
+          .filter(conn => !get(conn, "messages").contains(msgUri));
+      };
+
+      const connections = getConnectionsToInjectMsgInto(
         state,
         targetSocketUri,
         getIn(parsedMessage, ["data", "uri"])

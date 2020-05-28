@@ -21,8 +21,8 @@ export default function WonAtomContentHolder({ holdsUri }) {
   const history = useHistory();
   const dispatch = useDispatch();
   const { connectionUri } = getQueryParams(history.location);
-  const ownAtom = useSelector(state =>
-    generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri)
+  const ownAtom = useSelector(
+    generalSelectors.getOwnedAtomByConnectionUri(connectionUri)
   );
   const connection = getIn(ownAtom, ["connections", connectionUri]);
 
@@ -31,12 +31,10 @@ export default function WonAtomContentHolder({ holdsUri }) {
       ? connectionUri
       : null;
 
-  const heldAtom = useSelector(
-    state => holdsUri && getIn(state, ["atoms", holdsUri])
-  );
+  const heldAtom = useSelector(generalSelectors.getAtom(holdsUri));
   const holderUri = atomUtils.getHeldByUri(heldAtom);
   const holderAtom = useSelector(
-    state => (heldAtom ? getIn(state, ["atoms", holderUri]) : undefined)
+    state => (heldAtom ? generalSelectors.getAtom(holderUri)(state) : undefined)
   );
 
   const holderHasHolderSocket = atomUtils.hasHolderSocket(holderAtom);
@@ -49,9 +47,7 @@ export default function WonAtomContentHolder({ holdsUri }) {
   const holderHasBuddySocket = atomUtils.hasBuddySocket(holderAtom);
 
   const process = useSelector(generalSelectors.getProcessState);
-  const postIsOwned = useSelector(state =>
-    generalSelectors.isAtomOwned(state, holdsUri)
-  );
+  const postIsOwned = useSelector(generalSelectors.isAtomOwned(holdsUri));
   const holderLoading =
     !holderAtom || processUtils.isAtomLoading(process, holderUri);
 

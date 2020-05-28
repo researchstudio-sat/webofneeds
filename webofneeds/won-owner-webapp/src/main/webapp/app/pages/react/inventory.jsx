@@ -29,20 +29,16 @@ export default function PageInventory() {
   const history = useHistory();
   const dispatch = useDispatch();
   const ownedActivePersonas = useSelector(state =>
-    generalSelectors
-      .getOwnedPersonas(state)
-      .filter(atom => atomUtils.isActive(atom))
+    generalSelectors.getOwnedPersonas(state).filter(atomUtils.isActive)
   );
   const ownedUnassignedActivePosts = useSelector(state =>
     generalSelectors
       .getOwnedPosts(state)
-      .filter(atom => atomUtils.isActive(atom))
+      .filter(atomUtils.isActive)
       .filter(atom => !atomUtils.isHeld(atom))
   );
   const ownedInactiveAtoms = useSelector(state =>
-    generalSelectors
-      .getOwnedAtoms(state)
-      .filter(atom => atomUtils.isInactive(atom))
+    generalSelectors.getOwnedAtoms(state).filter(atomUtils.isInactive)
   );
 
   const sortedOwnedUnassignedActivePosts =
@@ -75,11 +71,7 @@ export default function PageInventory() {
   const unassignedAtomSize = sortedOwnedUnassignedActivePosts.length;
   const inactiveAtomUriSize = sortedOwnedInactiveAtoms.length;
 
-  const showSlideIns = useSelector(
-    state =>
-      viewSelectors.hasSlideIns(state, history) &&
-      viewSelectors.isSlideInsVisible(state)
-  );
+  const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
   const showModalDialog = useSelector(viewSelectors.showModalDialog);
   const showClosedAtoms = viewUtils.showClosedAtoms(viewState);
 

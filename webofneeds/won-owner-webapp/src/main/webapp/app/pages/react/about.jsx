@@ -175,11 +175,7 @@ export default function PageAbout() {
   const privacyPolicyTemplateHtml = get(theme, "privacyPolicyTemplate");
   const peopleGrid = getPeopleGrid({ themeName });
   const showModalDialog = useSelector(viewSelectors.showModalDialog);
-  const showSlideIns = useSelector(
-    state =>
-      viewSelectors.hasSlideIns(state, history) &&
-      viewSelectors.isSlideInsVisible(state)
-  );
+  const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
 
   function toggleMoreInfo() {
     setMoreInfo(!moreInfo);

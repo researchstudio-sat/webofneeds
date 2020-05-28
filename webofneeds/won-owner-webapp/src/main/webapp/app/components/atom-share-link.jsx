@@ -26,9 +26,7 @@ export default function WonAtomShareLink({ atom, className }) {
   const hasConnections = get(atom, "connections")
     ? get(atom, "connections").size > 0
     : false;
-  const isOwned = useSelector(state =>
-    generalSelectors.isAtomOwned(state, atomUri)
-  );
+  const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
 
   let linkInput;
 

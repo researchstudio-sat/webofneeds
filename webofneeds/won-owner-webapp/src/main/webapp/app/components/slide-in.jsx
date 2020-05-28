@@ -79,8 +79,8 @@ export default function WonSlideIn() {
   const showTermsOfService = useSelector(
     viewSelectors.showSlideInTermsOfService
   );
-  const showEmailVerification = useSelector(state =>
-    viewSelectors.showSlideInEmailVerification(state, history)
+  const showEmailVerification = useSelector(
+    viewSelectors.showSlideInEmailVerification(history)
   );
   const showConnectionLost = useSelector(
     viewSelectors.showSlideInConnectionLost

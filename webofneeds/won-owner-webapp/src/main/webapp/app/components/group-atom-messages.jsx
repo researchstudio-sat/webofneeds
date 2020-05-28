@@ -44,14 +44,12 @@ export default function WonGroupAtomMessages({
   const [snapBottom, setSnapBottom] = useState(true);
 
   const connectionUri = get(connection, "uri");
-  const senderAtom = useSelector(state =>
-    generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri)
+  const senderAtom = useSelector(
+    generalSelectors.getOwnedAtomByConnectionUri(connectionUri)
   );
   const senderAtomUri = get(senderAtom, "uri");
   const targetAtomUri = get(connection, "targetAtomUri");
-  const targetAtom = useSelector(state =>
-    getIn(state, ["atoms", targetAtomUri])
-  );
+  const targetAtom = useSelector(generalSelectors.getAtom(targetAtomUri));
   const allChatMessages = get(connection, "messages");
   const chatMessages =
     allChatMessages &&

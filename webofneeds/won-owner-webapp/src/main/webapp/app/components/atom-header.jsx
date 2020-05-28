@@ -28,14 +28,10 @@ export default function WonAtomHeader({
   const isDirectResponse = atomUtils.isDirectResponseAtom(atom);
   const responseToUri =
     isDirectResponse && getIn(atom, ["content", "responseToUri"]);
-  const responseToAtom = useSelector(
-    state => responseToUri && getIn(state, ["atoms", responseToUri])
-  );
+  const responseToAtom = useSelector(generalSelectors.getAtom(responseToUri));
 
   const personaUri = atomUtils.getHeldByUri(atom);
-  const persona = useSelector(
-    state => personaUri && getIn(state, ["atoms", personaUri])
-  );
+  const persona = useSelector(generalSelectors.getAtom(personaUri));
   const personaName = get(persona, "humanReadable");
 
   const processState = useSelector(generalSelectors.getProcessState);

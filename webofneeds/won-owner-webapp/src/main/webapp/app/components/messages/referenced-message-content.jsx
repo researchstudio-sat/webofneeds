@@ -6,7 +6,6 @@ import { actionCreators } from "../../actions/actions.js";
 import { useDispatch, useSelector } from "react-redux";
 
 import PropTypes from "prop-types";
-import { getOwnedAtomByConnectionUri } from "../../redux/selectors/general-selectors.js";
 import { get, getIn } from "../../utils.js";
 import * as ownerApi from "../../api/owner-api";
 import won from "../../won-es6";
@@ -15,11 +14,12 @@ import WonCombinedMessageContent from "./combined-message-content.jsx";
 import "~/style/_referenced-message-content.scss";
 import ico16_arrow_up from "~/images/won-icons/ico16_arrow_up.svg";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
+import * as generalSelectors from "../../redux/selectors/general-selectors";
 
 export default function WonReferencedMessageContent({ message, connection }) {
   const dispatch = useDispatch();
-  const ownedAtom = useSelector(state =>
-    getOwnedAtomByConnectionUri(state, get(connection, "uri"))
+  const ownedAtom = useSelector(
+    generalSelectors.getOwnedAtomByConnectionUri(get(connection, "uri"))
   );
 
   const expandedReferences = getIn(message, [

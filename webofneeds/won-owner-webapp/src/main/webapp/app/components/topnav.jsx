@@ -23,9 +23,7 @@ export default function WonTopnav({ pageTitle }) {
   const currentPath = getPathname(history.location);
   const accountState = useSelector(generalSelectors.getAccountState);
   const theme = useSelector(generalSelectors.getTheme);
-  const hasSlideIns = useSelector(state =>
-    viewSelectors.hasSlideIns(state, history)
-  );
+  const hasSlideIns = useSelector(viewSelectors.hasSlideIns(history));
   const isSlideInsVisible = useSelector(viewSelectors.isSlideInsVisible);
   const mainMenuVisible = useSelector(state =>
     getIn(state, ["view", "showMainMenu"])
@@ -42,7 +40,7 @@ export default function WonTopnav({ pageTitle }) {
   const hasUnreads = useSelector(
     state =>
       generalSelectors.hasUnreadSuggestedConnections(state) ||
-      generalSelectors.hasUnreadBuddyConnections(state, true, false) ||
+      generalSelectors.hasUnreadBuddyConnections(true, false)(state) ||
       generalSelectors.hasUnreadChatConnections(state)
   );
 

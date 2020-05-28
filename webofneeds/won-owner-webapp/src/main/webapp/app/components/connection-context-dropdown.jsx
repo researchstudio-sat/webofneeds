@@ -43,9 +43,7 @@ export default function WonConnectionContextDropdown({
 
   const connectionUri = get(connection, "uri");
   const targetAtomUri = getIn(connection, ["targetAtomUri"]);
-  const targetAtom = useSelector(state =>
-    getIn(state, ["atoms", targetAtomUri])
-  );
+  const targetAtom = useSelector(generalSelectors.getAtom(targetAtomUri));
 
   let linkToPost;
   if (ownerBaseUrl && targetAtomUri) {
@@ -65,11 +63,11 @@ export default function WonConnectionContextDropdown({
   const isSentRequest = connectionUtils.isRequestSent(connection);
   const isReceivedRequest = connectionUtils.isRequestReceived(connection);
   const isSuggested = connectionUtils.isSuggested(connection);
-  const isTargetAtomUsableAsTemplate = useSelector(state =>
-    generalSelectors.isAtomUsableAsTemplate(state, targetAtomUri)
+  const isTargetAtomUsableAsTemplate = useSelector(
+    generalSelectors.isAtomUsableAsTemplate(targetAtomUri)
   );
-  const isTargetAtomEditable = useSelector(state =>
-    generalSelectors.isAtomEditable(state, targetAtomUri)
+  const isTargetAtomEditable = useSelector(
+    generalSelectors.isAtomEditable(targetAtomUri)
   );
   const connectionLoading =
     !connection || processUtils.isConnectionLoading(process, connectionUri);

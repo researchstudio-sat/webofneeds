@@ -37,11 +37,7 @@ export default function PageSignUp() {
   const registerError = accountUtils.getRegisterError(accountState);
   const isAnonymous = accountUtils.isAnonymous(accountState);
   const showModalDialog = useSelector(viewSelectors.showModalDialog);
-  const showSlideIns = useSelector(
-    state =>
-      viewSelectors.hasSlideIns(state, history) &&
-      viewSelectors.isSlideInsVisible(state)
-  );
+  const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
 
   function transfer() {
     dispatch(

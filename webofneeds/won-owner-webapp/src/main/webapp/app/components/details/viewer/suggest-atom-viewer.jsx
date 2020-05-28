@@ -5,7 +5,7 @@ import WonAtomCard from "../../atom-card.jsx";
 import { useSelector, useDispatch } from "react-redux";
 import * as generalSelectors from "../../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../../redux/utils/atom-utils.js";
-import { get, getIn, getQueryParams, generateLink } from "../../../utils.js";
+import { get, getQueryParams, generateLink } from "../../../utils.js";
 import { actionCreators } from "../../../actions/actions.js";
 
 import "~/style/_suggest-atom-viewer.scss";
@@ -17,10 +17,10 @@ export default function WonSuggestAtomViewer({ content, detail, className }) {
   const history = useHistory();
 
   const { connectionUri } = getQueryParams(history.location);
-  const openedOwnPost = useSelector(state =>
-    generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri)
+  const openedOwnPost = useSelector(
+    generalSelectors.getOwnedAtomByConnectionUri(connectionUri)
   );
-  const suggestedAtom = useSelector(state => getIn(state, ["atoms", content]));
+  const suggestedAtom = useSelector(generalSelectors.getAtom(content));
   const suggestedAtomUri = get(suggestedAtom, "uri");
 
   const connectionsOfOpenedOwnPost = get(openedOwnPost, "connections");
@@ -41,8 +41,8 @@ export default function WonSuggestAtomViewer({ content, detail, className }) {
   const failedToLoad = processUtils.hasAtomFailedToLoad(processState, content);
 
   const fetchedSuggestion = !isLoading && !toLoad && !failedToLoad;
-  const isSuggestedOwned = useSelector(state =>
-    generalSelectors.isAtomOwned(state, suggestedAtomUri)
+  const isSuggestedOwned = useSelector(
+    generalSelectors.isAtomOwned(suggestedAtomUri)
   );
 
   const hasChatSocket = atomUtils.hasChatSocket(suggestedAtom);

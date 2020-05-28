@@ -3,7 +3,7 @@
  */
 import React, { useState } from "react";
 import VisibilitySensor from "react-visibility-sensor";
-import { get, getIn } from "../../utils.js";
+import { get } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -20,7 +20,7 @@ export default function WonSkeletonCard({
 }) {
   const dispatch = useDispatch();
   const [localFetchInitiated, setLocalFetchInitiated] = useState(false);
-  const atom = useSelector(state => getIn(state, ["atoms", atomUri]));
+  const atom = useSelector(generalSelectors.getAtom(atomUri));
   const process = useSelector(generalSelectors.getProcessState);
 
   const atomInCreation = get(atom, "isBeingCreated");

@@ -2,7 +2,7 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import { get, getIn } from "../utils.js";
+import { get } from "../utils.js";
 
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils";
@@ -27,9 +27,7 @@ export default function WonAtomIcon({ atom, className, onClick }) {
 
   // Icons/Images of the AtomHolder
   const holderUri = atomUtils.getHeldByUri(atom);
-  const holder = useSelector(
-    state => holderUri && getIn(state, ["atoms", holderUri])
-  );
+  const holder = useSelector(generalSelectors.getAtom(holderUri));
   const holderImage = atomUtils.getDefaultPersonaImage(holder);
   const holderIdenticonSvg = atomUtils.getIdenticonSvg(holder);
   const isHolderPersona = atomUtils.isPersona(holder);

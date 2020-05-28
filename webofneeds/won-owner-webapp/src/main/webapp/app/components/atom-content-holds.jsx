@@ -22,9 +22,7 @@ import vocab from "../service/vocab";
 
 export default function WonAtomContentHolds({ atom }) {
   const atomUri = get(atom, "uri");
-  const isOwned = useSelector(state =>
-    generalSelectors.isAtomOwned(state, atomUri)
-  );
+  const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
   const currentLocation = useSelector(generalSelectors.getCurrentLocation);
 
   const [searchText, setSearchText] = useState({ value: "" });

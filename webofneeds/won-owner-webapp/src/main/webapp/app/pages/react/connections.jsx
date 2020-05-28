@@ -28,17 +28,15 @@ export default function PageConnections() {
   const selectedConnectionUri = connectionUri;
 
   const atom = useSelector(
-    state =>
-      selectedConnectionUri &&
-      generalSelectors.getOwnedAtomByConnectionUri(state, selectedConnectionUri)
+    generalSelectors.getOwnedAtomByConnectionUri(selectedConnectionUri)
   );
 
   const selectedConnection = getIn(atom, [
     "connections",
     selectedConnectionUri,
   ]);
-  const selectedTargetAtom = useSelector(state =>
-    getIn(state, ["atoms", get(selectedConnection, "targetAtomUri")])
+  const selectedTargetAtom = useSelector(
+    generalSelectors.getAtom(get(selectedConnection, "targetAtomUri"))
   );
 
   const isSelectedConnectionGroupChat =
@@ -50,11 +48,7 @@ export default function PageConnections() {
     accountUtils.isLoggedIn(generalSelectors.getAccountState(state))
   );
   const showModalDialog = useSelector(viewSelectors.showModalDialog);
-  const showSlideIns = useSelector(
-    state =>
-      viewSelectors.hasSlideIns(state, history) &&
-      viewSelectors.isSlideInsVisible(state)
-  );
+  const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
 
   let contentElements;
   if (selectedConnection && postUri) {

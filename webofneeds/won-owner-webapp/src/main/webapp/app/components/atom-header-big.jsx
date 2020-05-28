@@ -19,16 +19,12 @@ import * as generalSelectors from "../redux/selectors/general-selectors";
 export default function WonAtomHeaderBig({ atom }) {
   const atomUri = get(atom, "uri");
   const personaUri = atomUtils.getHeldByUri(atom);
-  const persona = useSelector(
-    state => personaUri && getIn(state, ["atoms", personaUri])
-  );
+  const persona = useSelector(generalSelectors.getAtom(personaUri));
   const personaName = get(persona, "humanReadable");
   const isDirectResponse = atomUtils.isDirectResponseAtom(atom);
   const responseToUri =
     isDirectResponse && getIn(atom, ["content", "responseToUri"]);
-  const responseToAtom = useSelector(
-    state => responseToUri && getIn(state, ["atoms", responseToUri])
-  );
+  const responseToAtom = useSelector(generalSelectors.getAtom(responseToUri));
   const accountState = useSelector(generalSelectors.getAccountState);
   const ownedAtomsWithBuddySocket = useSelector(
     generalSelectors.getOwnedAtomsWithBuddySocket

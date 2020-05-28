@@ -6,7 +6,7 @@ import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import { get, getIn, generateLink } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { useDispatch, useSelector } from "react-redux";
-import { getOwnedAtomByConnectionUri } from "../../redux/selectors/general-selectors.js";
+import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import { ownerBaseUrl } from "~/config/default.js";
 
 import WonLabelledHr from "../labelled-hr.jsx";
@@ -35,13 +35,12 @@ export default function WonConnectionMessage({
   const dispatch = useDispatch();
   const history = useHistory();
   const ownedAtom = useSelector(
-    state =>
-      connection && getOwnedAtomByConnectionUri(state, get(connection, "uri"))
+    generalSelectors.getOwnedAtomByConnectionUri(get(connection, "uri"))
   );
   const messageUri = get(message, "uri");
   const connectionUri = get(connection, "uri");
-  const theirAtom = useSelector(state =>
-    getIn(state, ["atoms", get(connection, "targetAtomUri")])
+  const theirAtom = useSelector(
+    generalSelectors.getAtom(get(connection, "targetAtomUri"))
   );
   const shouldShowRdf = useSelector(viewSelectors.showRdf);
 

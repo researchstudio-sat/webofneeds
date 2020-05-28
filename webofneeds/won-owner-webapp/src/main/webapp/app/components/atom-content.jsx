@@ -36,9 +36,7 @@ export default function WonAtomContent({ atom, defaultTab }) {
   const atomUri = get(atom, "uri");
   const { connectionUri } = getQueryParams(history.location);
   const openConnectionUri = connectionUri;
-  const isOwned = useSelector(state =>
-    generalSelectors.isAtomOwned(state, atomUri)
-  );
+  const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
   const isActive = atomUtils.isActive(atom);
   const content = get(atom, "content");
 

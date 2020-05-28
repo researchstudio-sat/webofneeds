@@ -76,11 +76,7 @@ export default function PageOverview() {
     ? sortedVisibleAtoms.length
     : 0;
   const hasVisibleAtoms = sortedVisibleAtomsSize > 0;
-  const showSlideIns = useSelector(
-    state =>
-      viewSelectors.hasSlideIns(state, history) &&
-      viewSelectors.isSlideInsVisible(state)
-  );
+  const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
   const showModalDialog = useSelector(viewSelectors.showModalDialog);
 
   useEffect(() => {
