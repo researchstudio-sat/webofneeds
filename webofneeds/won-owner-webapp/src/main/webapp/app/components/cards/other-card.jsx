@@ -38,8 +38,7 @@ export default function WonOtherCard({
   const holderUri = atomUtils.getHeldByUri(atom);
   const holder = useSelector(state => getIn(state, ["atoms", holderUri]));
   const holderName = get(holder, "humanReadable");
-  const holderHolds = holder && get(holder, "holds");
-  const holderVerified = holderHolds && holderHolds.includes(atomUri);
+  const holderVerified = atomUtils.isHolderVerified(atom, holder);
   const isHolderPersona = atomUtils.isPersona(holder);
   const personaIdenticonSvg = atomUtils.getIdenticonSvg(holder);
   const personaImage = atomUtils.getDefaultPersonaImage(holder);

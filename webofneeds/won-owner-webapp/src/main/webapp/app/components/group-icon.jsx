@@ -9,6 +9,7 @@ import React from "react";
 import { get } from "../utils.js";
 import { useSelector } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
 import WonAtomIcon from "./atom-icon.jsx";
 
 import "~/style/_group-icon.scss";
@@ -18,10 +19,10 @@ export default function WonGroupIcon({ connection }) {
   const allAtoms = useSelector(generalSelectors.getAtoms);
 
   const targetAtom = get(allAtoms, get(connection, "targetAtomUri"));
-  const groupMembers = get(targetAtom, "groupMembers");
+  const groupMembers = atomUtils.getGroupMemberUris(targetAtom);
 
   const groupMembersArray = groupMembers ? groupMembers.toArray() : [];
-  const groupMembersSize = groupMembers ? groupMembers.size : 0;
+  const groupMembersSize = groupMembersArray.length;
 
   const groupMemberElements = groupMembersArray.map((groupMemberUri, index) => {
     if (groupMembersSize <= 4 || index < 3) {

@@ -1,4 +1,3 @@
-import vocab from "../../service/vocab.js";
 import { parseConnection } from "./parse-connection.js";
 import { markUriAsRead } from "../../won-localstorage.js";
 
@@ -32,61 +31,7 @@ function addConnectionFull(atomState, connection) {
     const atom = get(atomState, atomUri);
 
     if (atom) {
-      const targetAtomUri = getIn(parsedConnection, ["data", "targetAtomUri"]);
       const connectionUri = getIn(parsedConnection, ["data", "uri"]);
-
-      const socketUri = getIn(parsedConnection, ["data", "socketUri"]);
-      const socketType = getIn(atom, ["content", "sockets", socketUri]);
-
-      if (
-        socketType === vocab.HOLD.HolderSocketCompacted &&
-        connectionUtils.isConnected(get(parsedConnection, "data"))
-      ) {
-        const holdsUri = targetAtomUri;
-
-        if (holdsUri) {
-          atomState = atomState.updateIn([atomUri, "holds"], holds =>
-            holds.add(holdsUri)
-          );
-        }
-      } else if (
-        socketType === vocab.HOLD.HoldableSocketCompacted &&
-        connectionUtils.isConnected(get(parsedConnection, "data"))
-      ) {
-        //holdableSocket Connection from atom to persona -> need to add heldBy targetAtomUri to the atom
-        const heldByUri = targetAtomUri;
-
-        if (heldByUri) {
-          atomState = atomState.setIn([atomUri, "heldBy"], heldByUri);
-        }
-      }
-
-      const targetAtom = get(atomState, targetAtomUri);
-
-      if (targetAtom) {
-        const targetSocketUri = getIn(parsedConnection, [
-          "data",
-          "targetSocketUri",
-        ]);
-        const realTargetSocket = getIn(targetAtom, [
-          "content",
-          "sockets",
-          targetSocketUri,
-        ]);
-
-        if (
-          connectionUtils.isConnected(get(parsedConnection, "data")) &&
-          socketType === vocab.BUDDY.BuddySocketCompacted &&
-          realTargetSocket === vocab.BUDDY.BuddySocketCompacted
-        ) {
-          atomState = atomState.updateIn([atomUri, "buddies"], buddies =>
-            buddies.add(targetAtomUri)
-          );
-          atomState = atomState.updateIn([targetAtomUri, "buddies"], buddies =>
-            buddies.add(atomUri)
-          );
-        }
-      }
 
       if (connectionUtils.isUnread(get(parsedConnection, "data"))) {
         //If there is a new message for the connection we will set the connection to newConnection
@@ -189,33 +134,7 @@ export function changeConnectionState(allAtoms, connectionUri, newState) {
     return allAtoms;
   }
 
-  const atomUri = atom.get("uri");
-
-  const targetAtomUri = getIn(atom, [
-    "connections",
-    connectionUri,
-    "targetAtomUri",
-  ]);
-  const socketUri = getIn(atom, ["connections", connectionUri, "socketUri"]);
-  const socketType = getIn(atom, ["content", "sockets", socketUri]);
-
-  if (socketType === vocab.HOLD.HolderSocketCompacted) {
-    if (newState === vocab.WON.Closed) {
-      allAtoms = allAtoms.updateIn([atomUri, "holds"], holds =>
-        holds.delete(targetAtomUri)
-      );
-    } else if (newState === vocab.WON.Connected) {
-      allAtoms = allAtoms.updateIn([atomUri, "holds"], holds =>
-        holds.add(targetAtomUri)
-      );
-    }
-  } else if (socketType === vocab.HOLD.HoldableSocketCompacted) {
-    if (newState === vocab.WON.Closed) {
-      allAtoms = allAtoms.deleteIn([atomUri, "heldBy"]);
-    } else if (newState === vocab.WON.Connected) {
-      allAtoms = allAtoms.setIn([atomUri, "heldBy"], targetAtomUri);
-    }
-  }
+  const atomUri = get(atom, "uri");
 
   return allAtoms
     .setIn([atomUri, "connections", connectionUri, "state"], newState)

@@ -546,40 +546,6 @@ export default function(processState = initialState, action = {}) {
                 loaded: true,
               }
             );
-
-            const heldAtomUris = get(parsedAtom, "holds");
-            heldAtomUris.map(heldAtomUri => {
-              if (
-                !processUtils.isAtomProcessExisting(processState, heldAtomUri)
-              ) {
-                processState = updateAtomProcess(processState, heldAtomUri, {
-                  toLoad: true,
-                });
-              }
-            });
-
-            const groupMemberUris = get(parsedAtom, "groupMembers");
-            groupMemberUris.map(groupMemberUri => {
-              if (
-                !processUtils.isAtomProcessExisting(
-                  processState,
-                  groupMemberUri
-                )
-              ) {
-                processState = updateAtomProcess(processState, groupMemberUri, {
-                  toLoad: true,
-                });
-              }
-            });
-
-            const buddyUris = get(parsedAtom, "buddies");
-            buddyUris.map(buddyUri => {
-              if (!processUtils.isAtomProcessExisting(processState, buddyUri)) {
-                processState = updateAtomProcess(processState, buddyUri, {
-                  toLoad: true,
-                });
-              }
-            });
           }
         });
       return processState;

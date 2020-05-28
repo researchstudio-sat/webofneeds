@@ -9,6 +9,7 @@ import {
   getAtoms,
   getOwnedConnections,
 } from "../../redux/selectors/general-selectors.js";
+import * as atomUtils from "../../redux/utils/atom-utils.js";
 import { get, getIn, generateLink } from "../../utils.js";
 import { labels } from "../../won-label-utils.js";
 import vocab from "../../service/vocab.js";
@@ -49,8 +50,9 @@ export default function WonCombinedMessageContent({
     (groupChatMessage
       ? get(message, "originatorUri")
       : get(connection, "targetAtomUri"));
-  const relevantPersonaUri =
-    relevantAtomUri && getIn(allAtoms, [relevantAtomUri, "heldBy"]);
+  const heldByAtomUri = atomUtils.getHeldByUri(get(allAtoms, relevantAtomUri));
+
+  const relevantPersonaUri = heldByAtomUri;
   const personaName = relevantPersonaUri
     ? getIn(allAtoms, [relevantPersonaUri, "content", "personaName"])
     : undefined;

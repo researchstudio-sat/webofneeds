@@ -10,7 +10,6 @@ import {
 } from "../../utils.js";
 import shajs from "sha.js";
 import Identicon from "identicon.js";
-import * as jsonLdUtils from "../../service/jsonld-utils.js";
 
 export function parseAtom(jsonldAtom) {
   const jsonldAtomImm = Immutable.fromJS(jsonldAtom);
@@ -23,33 +22,7 @@ export function parseAtom(jsonldAtom) {
       identiconSvg: generateIdenticon(jsonldAtomImm),
       nodeUri: jsonldAtomImm.getIn([vocab.WON.wonNodeCompacted, "@id"]),
       state: extractState(jsonldAtomImm),
-      heldBy: jsonLdUtils.parseFrom(
-        jsonldAtomImm,
-        [vocab.HOLD.heldByCompacted],
-        "xsd:ID"
-      ),
-      holds: Immutable.Set(
-        jsonLdUtils.parseListFrom(
-          jsonldAtomImm,
-          [vocab.HOLD.holdsCompacted],
-          "xsd:ID"
-        )
-      ),
-      buddies: Immutable.Set(
-        jsonLdUtils.parseListFrom(
-          jsonldAtomImm,
-          [vocab.BUDDY.buddyCompacted],
-          "xsd:ID"
-        )
-      ),
       rating: extractRating(jsonldAtomImm),
-      groupMembers: Immutable.Set(
-        jsonLdUtils.parseListFrom(
-          jsonldAtomImm,
-          ["group:groupMember"],
-          "xsd:ID"
-        )
-      ),
       content: generateContent(jsonldAtomImm, detailsToParse),
       seeks: generateContent(jsonldAtomImm.get("match:seeks"), detailsToParse),
       creationDate: extractCreationDate(jsonldAtomImm),
@@ -195,11 +168,7 @@ export function parseMetaAtom(metaAtom) {
       identiconSvg: undefined,
       nodeUri: undefined,
       state: extractStateFromMeta(get(metaAtomImm, "state")),
-      heldBy: get(metaAtomImm, "heldBy"),
-      holds: Immutable.Set(get(metaAtomImm, "holds")),
-      buddies: Immutable.Set(),
       rating: undefined,
-      groupMembers: Immutable.Set(),
       content: {
         type: extractTypes(get(metaAtomImm, "types")),
         sockets: extractSockets(get(metaAtomImm, "socketTypeUriMap")),

@@ -63,5 +63,5 @@ export default function WonConnectionState({ connection }) {
   );
 }
 WonConnectionState.propTypes = {
-  connection: PropTypes.connection,
+  connection: PropTypes.object,
 };

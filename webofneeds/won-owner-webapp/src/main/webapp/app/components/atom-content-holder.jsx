@@ -40,15 +40,13 @@ export default function WonAtomContentHolder({ holdsUri }) {
   );
 
   const holderHasHolderSocket = atomUtils.hasHolderSocket(holderAtom);
-  const holderHolds = holderHasHolderSocket && get(holderAtom, "holds");
-  const holderVerified = holderHolds && holderHolds.includes(holdsUri);
+  const holderVerified = atomUtils.isHolderVerified(heldAtom, holderAtom);
 
   const holderHasReviewSocket = atomUtils.hasReviewSocket(holderAtom);
   const aggregateRating =
     holderHasReviewSocket && getIn(holderAtom, ["rating", "aggregateRating"]);
 
   const holderHasBuddySocket = atomUtils.hasBuddySocket(holderAtom);
-  const holderBuddies = holderHasBuddySocket && get(holderAtom, "buddies");
 
   const process = useSelector(generalSelectors.getProcessState);
   const postIsOwned = useSelector(state =>
@@ -56,11 +54,25 @@ export default function WonAtomContentHolder({ holdsUri }) {
   );
   const holderLoading =
     !holderAtom || processUtils.isAtomLoading(process, holderUri);
+
+  const buddyConnections =
+    holderHasBuddySocket &&
+    atomUtils.getConnectedConnections(
+      holderAtom,
+      vocab.BUDDY.BuddySocketCompacted
+    );
+  const holderConnections =
+    holderHasHolderSocket &&
+    atomUtils.getConnectedConnections(
+      holderAtom,
+      vocab.HOLD.HolderSocketCompacted
+    );
+
   const holderName = getIn(holderAtom, ["content", "personaName"]);
   const holderDescription = getIn(holderAtom, ["content", "description"]);
   const holderWebsite = getIn(holderAtom, ["content", "website"]);
-  const holderHoldsSize = holderHolds ? holderHolds.size : 0;
-  const holderBuddySize = holderBuddies ? holderBuddies.size : 0;
+  const holderHoldsSize = holderConnections ? holderConnections.size : 0;
+  const holderBuddySize = buddyConnections ? buddyConnections.size : 0;
   const reviewCount =
     holderHasReviewSocket && getIn(holderAtom, ["rating", "reviewCount"]);
   const aggregateRatingString = aggregateRating && aggregateRating.toFixed(1);
