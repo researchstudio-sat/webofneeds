@@ -799,7 +799,9 @@ export default function WonAtomMessages({
           )}
 
         {proposalMessages}
-        <WonConnectionAgreementDetails connection={connection} />
+        {shouldShowRdf && (
+          <WonConnectionAgreementDetails connection={connection} />
+        )}
         {rdfLinkToConnection}
       </div>
     );
