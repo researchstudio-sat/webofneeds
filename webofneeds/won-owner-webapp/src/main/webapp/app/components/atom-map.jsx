@@ -34,7 +34,6 @@ export default function WonAtomMap({
   currentLocation,
   disableControls,
 }) {
-  // TODO Impl Center and zoom to all markers (work with bounds: <Map ref="map" bounds={bounds} className="atom-map__mapmount" boundsOptions={{padding: [50, 50]}} zoom={zoom}>)
   // TODO Impl MarkerClusters see -> https://yuzhva.github.io/react-leaflet-markercluster/
   const zoom = 13;
   if (locations && locations.length > 0) {
@@ -42,16 +41,19 @@ export default function WonAtomMap({
       get(currentLocation, "lat"),
       get(currentLocation, "lng"),
     ];
-    const firstLocationTupel = locations[0] && [
-      get(locations[0], "lat"),
-      get(locations[0], "lng"),
-    ];
+
+    const bounds = [];
+
+    if (currentLocationTupel) {
+      bounds.push(currentLocationTupel);
+    }
 
     const locationMarkers = locations.map((location, index) => {
       const lat = get(location, "lat");
       const lng = get(location, "lng");
       if (lat != undefined && lng != undefined) {
         const locationTupel = [lat, lng];
+        bounds.push(locationTupel);
         //We should use key here, but i do not know if we can find a unique key from the provided properties :-/
         return (
           <Marker
@@ -78,16 +80,13 @@ export default function WonAtomMap({
             if (isVisible) {
               return (
                 <Map
-                  center={
-                    currentLocationTupel
-                      ? currentLocationTupel
-                      : firstLocationTupel
-                  }
                   className="atom-map__mapmount"
                   zoom={zoom}
                   zoomControl={!disableControls}
                   dragging={!L.Browser.mobile}
                   tap={!L.Browser.mobile}
+                  boundsOptions={{ padding: [10, 10] }}
+                  bounds={bounds}
                 >
                   <TileLayer
                     attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
