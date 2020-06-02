@@ -384,11 +384,7 @@ export default function WonAtomFooter({ atom, className }) {
           history.push("/connections");
 
           dispatch(
-            actionCreators.connections__connectAdHoc(
-              targetSocketUri,
-              message,
-              personaUri
-            )
+            actionCreators.connections__connectAdHoc(targetSocketUri, message)
           );
         }
       }
@@ -403,8 +399,7 @@ export default function WonAtomFooter({ atom, className }) {
               dispatch(
                 actionCreators.connections__connectAdHoc(
                   targetSocketUri,
-                  message,
-                  personaUri
+                  message
                 )
               );
             },

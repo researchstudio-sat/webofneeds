@@ -431,18 +431,12 @@ function connectReactionAtom(
   });
 }
 
-export function connectionsConnectAdHoc(targetSocketUri, message, personaUri) {
+export function connectionsConnectAdHoc(targetSocketUri, connectMessage) {
   return (dispatch, getState) =>
-    connectAdHoc(targetSocketUri, message, personaUri, dispatch, getState); // moved to separate function to make transpilation work properly
+    connectAdHoc(targetSocketUri, connectMessage, dispatch, getState); // moved to separate function to make transpilation work properly
 }
 
-function connectAdHoc(
-  targetSocketUri,
-  message,
-  personaUri,
-  dispatch,
-  getState
-) {
+function connectAdHoc(targetSocketUri, connectMessage, dispatch, getState) {
   ensureLoggedIn(dispatch, getState).then(async () => {
     const theirAtomUri = generalSelectors.getAtomUriBySocketUri(
       targetSocketUri
@@ -478,35 +472,13 @@ function connectAdHoc(
           },
         });
       })
-      .then(async () => {
-        // add persona
-        if (personaUri) {
-          const persona = generalSelectors.getAtom(personaUri)(state);
-          const senderSocketUri = atomUtils.getSocketUri(
-            persona,
-            vocab.HOLD.HolderSocketCompacted
-          );
-          const targetSocketUri = `${atomUri}#holdableSocket`;
-
-          const response = await ownerApi.serverSideConnect(
-            senderSocketUri,
-            targetSocketUri,
-            false,
-            true
-          );
-          if (!response.ok) {
-            const errorMsg = await response.text();
-            throw new Error(`Could not connect identity: ${errorMsg}`);
-          }
-        }
-      })
       .then(() => {
         // set default socketUri
         let senderSocketUri = `${atomUri}#chatSocket`;
 
         // establish connection
         const cnctMsg = buildConnectMessage({
-          connectMessage: message,
+          connectMessage: connectMessage,
           socketUri: senderSocketUri,
           targetSocketUri: targetSocketUri,
         });
