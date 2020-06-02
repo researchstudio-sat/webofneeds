@@ -6,37 +6,23 @@ import PropTypes from "prop-types";
 import { get } from "../utils.js";
 
 export default function WonConnectionAgreementDetails({ connection }) {
-  const agreementData = get(connection, "agreementData");
-  const agreementUris = get(agreementData, "agreementUris");
-  const proposalUris = get(agreementData, "pendingProposalUris");
-  const claimUris = get(agreementData, "claimedMessageUris");
-  const proposeToCancelUris = get(
-    agreementData,
-    "cancellationPendingAgreementUris"
-  );
+  const agreementDataset = get(connection, "agreementDataset");
 
-  const agreementElementa =
-    agreementUris &&
-    agreementUris.map((agreementUri, index) => {
-      return <div key={agreementUri + index}>Agreement: {agreementUri}</div>;
-    });
-  const proposalElments =
-    proposalUris &&
-    proposalUris.map((proposalUri, index) => {
-      return <div key={proposalUri + index}>Proposal: {proposalUris}</div>;
-    });
-  const claimElements =
-    claimUris &&
-    claimUris.map((claimUri, index) => {
-      return <div key={claimUri + index}>Claim: {claimUri}</div>;
-    });
-
-  const proposeToCancelElements =
-    proposeToCancelUris &&
-    proposeToCancelUris.map((proposeToCancelUri, index) => {
+  const agreementQuads =
+    agreementDataset &&
+    agreementDataset.map((quad, index) => {
       return (
-        <div key={proposeToCancelUri + index}>
-          ProposeToCancel: {proposeToCancelUri}
+        <div key={quad.subject.value + index}>
+          &lt;
+          {quad.subject.value}
+          &gt; &lt;
+          {quad.predicate.value}
+          &gt; &lt;
+          {quad.object.value}
+          &gt; &lt;
+          {quad.graph.value}
+          &gt;
+          <hr />
         </div>
       );
     });
@@ -44,11 +30,8 @@ export default function WonConnectionAgreementDetails({ connection }) {
   return (
     <won-connection-agreement-details>
       <div>
-        TEST
-        {agreementElementa}
-        {proposalElments}
-        {claimElements}
-        {proposeToCancelElements}
+        <div className="pm__content__agreement__title">Agreements</div>
+        {agreementQuads}
       </div>
     </won-connection-agreement-details>
   );
