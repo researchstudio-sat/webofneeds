@@ -313,14 +313,17 @@ export default function WonAtomFooter({ atom, className }) {
             const personaConnection = personaConnections.first();
             const personaConnectionUri = get(personaConnection, "uri");
 
+            const senderSocketUri = get(personaConnection, "socketUri");
+            const targetSocketUri = get(personaConnection, "targetSocketUri");
+
             if (
               connectionUtils.isSuggested(personaConnection) ||
               connectionUtils.isClosed(personaConnection)
             ) {
               dispatch(
                 actionCreators.atoms__connectSockets(
-                  get(personaConnection, "socketUri"),
-                  get(personaConnection, "targetSocketUri"),
+                  senderSocketUri,
+                  targetSocketUri,
                   message
                 )
               );
@@ -339,8 +342,6 @@ export default function WonAtomFooter({ atom, className }) {
               );
               */
             } else if (connectionUtils.isRequestReceived(personaConnection)) {
-              const senderSocketUri = get(personaConnection, "socketUri");
-              const targetSocketUri = get(personaConnection, "targetSocketUri");
               dispatch(
                 actionCreators.atoms__connectSockets(
                   senderSocketUri,
@@ -349,19 +350,22 @@ export default function WonAtomFooter({ atom, className }) {
                 )
               );
             } else if (connectionUtils.isConnected(personaConnection)) {
-              const senderSocketUri = get(personaConnection, "socketUri");
-              const targetSocketUri = get(personaConnection, "targetSocketUri");
-              dispatch(
-                actionCreators.connections__sendChatMessage(
-                  message,
-                  undefined,
-                  undefined,
-                  senderSocketUri,
-                  targetSocketUri,
-                  personaConnectionUri,
-                  false
-                )
-              );
+              if (message) {
+                dispatch(
+                  actionCreators.connections__sendChatMessage(
+                    message,
+                    undefined,
+                    undefined,
+                    senderSocketUri,
+                    targetSocketUri,
+                    personaConnectionUri,
+                    false
+                  )
+                );
+              } /*else {
+                // Just go to the conneciton without sending an empty message
+              }
+              */
             }
 
             history.push(
