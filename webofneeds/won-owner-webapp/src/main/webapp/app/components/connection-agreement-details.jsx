@@ -1,27 +1,36 @@
 /**
- * Created by quasarchimaere on 30.07.2019.
+ * Created by ms on 27.05.2020.
  */
 import React from "react";
 import PropTypes from "prop-types";
 import { get } from "../utils.js";
+import * as N3 from "n3";
 
 export default function WonConnectionAgreementDetails({ connection }) {
   const agreementDataset = get(connection, "agreementDataset");
 
-  const agreementQuads =
-    agreementDataset &&
-    agreementDataset.map((quad, index) => {
+  let agreementParsedQuads = [];
+  agreementDataset.forEach(quad => {
+    const agreementWriter = new N3.Writer({
+      format: "application/trig",
+      prefixes: {
+        con: "https://w3id.org/won/content#",
+      },
+    });
+    agreementWriter.addQuad(quad);
+    agreementWriter.end((error, result) => {
+      console.log(result);
+      agreementParsedQuads.push(result);
+    });
+  });
+
+  const agreementQuadsElement =
+    agreementParsedQuads &&
+    agreementParsedQuads.map((quad, index) => {
       return (
-        <div key={quad.subject.value + index}>
-          &lt;
-          {quad.subject.value}
-          &gt; &lt;
-          {quad.predicate.value}
-          &gt; &lt;
-          {quad.object.value}
-          &gt; &lt;
-          {quad.graph.value}
-          &gt; .<hr />
+        <div key={quad + index}>
+          {quad}
+          <hr />
         </div>
       );
     });
@@ -30,7 +39,7 @@ export default function WonConnectionAgreementDetails({ connection }) {
     <won-connection-agreement-details>
       <div>
         <div className="pm__content__agreement__title">Agreements</div>
-        {agreementQuads}
+        {agreementQuadsElement}
       </div>
     </won-connection-agreement-details>
   );
