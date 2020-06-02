@@ -78,6 +78,7 @@ export default function WonAtomMessages({
   );
 
   const agreementData = get(connection, "agreementData");
+  const agreementDataset = get(connection, "agreementDataset");
   const petriNetData = get(connection, "petriNetData");
 
   //TODO: calculate this based on the uris in the agreementData and not based on every possible message
@@ -142,6 +143,12 @@ export default function WonAtomMessages({
   const agreementDataLoaded =
     agreementData &&
     processUtils.isConnectionAgreementDataLoaded(processState, connectionUri);
+  const agreementDatasetLoaded =
+    agreementDataset &&
+    processUtils.isConnectionAgreementDatasetLoaded(
+      processState,
+      connectionUri
+    );
   const petriNetDataLoaded =
     petriNetData &&
     processUtils.isConnectionPetriNetDataLoaded(processState, connectionUri);
@@ -422,7 +429,8 @@ export default function WonAtomMessages({
       forceFetch ||
       (connectionUtils.isConnected(connection) &&
         !connectionUtils.isUsingTemporaryUri(connection) &&
-        !isProcessingLoadingAgreementDataset)
+        !isProcessingLoadingAgreementDataset &&
+        !agreementDatasetLoaded)
     ) {
       try {
         dispatch(
