@@ -315,7 +315,7 @@ function connectReactionAtom(
     const nodeUri = generalSelectors.getDefaultNodeUri(state);
 
     // create new atom
-    const { message, atomUri } = await buildCreateMessage(atomDraft, nodeUri);
+    const { message, atomUri } = buildCreateMessage(atomDraft, nodeUri);
 
     // create the new atom
     ownerApi
@@ -456,7 +456,7 @@ function connectAdHoc(targetSocketUri, connectMessage, dispatch, getState) {
     const nodeUri = generalSelectors.getDefaultNodeUri(state);
 
     // build create message for new atom
-    const { message, atomUri } = await buildCreateMessage(adHocDraft, nodeUri);
+    const { message, atomUri } = buildCreateMessage(adHocDraft, nodeUri);
 
     // create the new atom
     ownerApi
