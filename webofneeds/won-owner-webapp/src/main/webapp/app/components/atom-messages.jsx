@@ -26,7 +26,7 @@ import WonLabelledHr from "./labelled-hr.jsx";
 import WonPetrinetState from "./petrinet-state.jsx";
 import WonAtomContentMessage from "./messages/atom-content-message.jsx";
 import WonConnectionMessage from "./messages/connection-message.jsx";
-// import WonConnectionAgreementDetails from "./connection-agreement-details.jsx";
+import WonConnectionAgreementDetails from "./connection-agreement-details.jsx";
 import { actionCreators } from "../actions/actions.js";
 import * as ownerApi from "../api/owner-api.js";
 import Immutable from "immutable";
@@ -48,7 +48,7 @@ export default function WonAtomMessages({
 
     ensureMessagesAreLoaded();
     ensureAgreementDataIsLoaded();
-    // ensureAgreementDatasetIsLoaded();
+    ensureAgreementDatasetIsLoaded();
     ensurePetriNetDataIsLoaded();
   });
   const [snapBottom, setSnapBottom] = useState(true);
@@ -130,12 +130,12 @@ export default function WonAtomMessages({
   const isProcessingLoadingPetriNetData =
     connection &&
     processUtils.isConnectionPetriNetDataLoading(processState, connectionUri);
-  // const isProcessingLoadingAgreementDataset =
-  //   connection &&
-  //   processUtils.isConnectionAgreementDatasetLoading(
-  //     processState,
-  //     connectionUri
-  //   );
+  const isProcessingLoadingAgreementDataset =
+    connection &&
+    processUtils.isConnectionAgreementDatasetLoading(
+      processState,
+      connectionUri
+    );
   const showAgreementData = get(connection, "showAgreementData");
   const showPetriNetData = get(connection, "showPetriNetData");
   const petriNetDataArray = petriNetData ? petriNetData.toArray() : [];
@@ -417,40 +417,40 @@ export default function WonAtomMessages({
     }
   }
 
-  // async function ensureAgreementDatasetIsLoaded(forceFetch = false) {
-  //   if (
-  //     forceFetch ||
-  //     (connectionUtils.isConnected(connection) &&
-  //       !connectionUtils.isUsingTemporaryUri(connection) &&
-  //       !isProcessingLoadingAgreementDataset)
-  //   ) {
-  //     try {
-  //       dispatch(
-  //         actionCreators.connections__setLoadingAgreementDataset({
-  //           connectionUri: connectionUri,
-  //           loadingAgreementDataset: true,
-  //         })
-  //       );
-  //       const response = await ownerApi.getAgreementProtocolDataset(
-  //         connectionUri
-  //       );
-  //       dispatch(
-  //         actionCreators.connections__updateAgreementDataset({
-  //           connectionUri: connectionUri,
-  //           agreementDataset: response,
-  //         })
-  //       );
-  //     } catch (error) {
-  //       console.error("Error:", error);
-  //       dispatch(
-  //         actionCreators.connections__setLoadingAgreementDataset({
-  //           connectionUri: connectionUri,
-  //           loadingAgreementDataset: false,
-  //         })
-  //       );
-  //     }
-  //   }
-  // }
+  async function ensureAgreementDatasetIsLoaded(forceFetch = false) {
+    if (
+      forceFetch ||
+      (connectionUtils.isConnected(connection) &&
+        !connectionUtils.isUsingTemporaryUri(connection) &&
+        !isProcessingLoadingAgreementDataset)
+    ) {
+      try {
+        dispatch(
+          actionCreators.connections__setLoadingAgreementDataset({
+            connectionUri: connectionUri,
+            loadingAgreementDataset: true,
+          })
+        );
+        const response = await ownerApi.getAgreementProtocolDataset(
+          connectionUri
+        );
+        dispatch(
+          actionCreators.connections__updateAgreementDataset({
+            connectionUri: connectionUri,
+            agreementDataset: response,
+          })
+        );
+      } catch (error) {
+        console.error("Error:", error);
+        dispatch(
+          actionCreators.connections__setLoadingAgreementDataset({
+            connectionUri: connectionUri,
+            loadingAgreementDataset: false,
+          })
+        );
+      }
+    }
+  }
 
   function ensureAgreementDataIsLoaded(forceFetch = false) {
     if (
@@ -642,8 +642,6 @@ export default function WonAtomMessages({
         })}
 
         {rdfLinkToConnection}
-
-        {/*<WonConnectionAgreementDetails connection={connection} />*/}
       </div>
     );
   } else if (showAgreementData) {
@@ -793,7 +791,7 @@ export default function WonAtomMessages({
           )}
 
         {proposalMessages}
-
+        <WonConnectionAgreementDetails connection={connection} />
         {rdfLinkToConnection}
       </div>
     );

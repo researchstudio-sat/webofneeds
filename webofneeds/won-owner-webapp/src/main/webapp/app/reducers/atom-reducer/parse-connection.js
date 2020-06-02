@@ -16,6 +16,7 @@ export function parseConnection(jsonldConnection) {
       messages: Immutable.Map(),
       socketUri: get(jsonldConnectionImm, "socket"),
       targetSocketUri: get(jsonldConnectionImm, "targetSocket"),
+      agreementDataset: undefined,
       agreementData: {
         agreementUris: Immutable.Set(),
         pendingProposalUris: Immutable.Set(),

@@ -44,6 +44,10 @@ export const emptyConnectionProcess = Immutable.fromJS({
     dirty: false,
     loaded: false,
   },
+  agreementDataset: {
+    loading: false,
+    loaded: false,
+  },
   agreementData: {
     loading: false,
     loaded: false,

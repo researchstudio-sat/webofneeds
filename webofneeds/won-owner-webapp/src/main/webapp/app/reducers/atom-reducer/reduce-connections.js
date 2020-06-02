@@ -214,7 +214,7 @@ export function updateAgreementStateDataset(
     console.warn(
       "No atom found for connection(",
       connectionUri,
-      ") or no agreementData set in params -> return unaltered state"
+      ") or no agreementDataset in params -> return unaltered state"
     );
     return state;
   }
