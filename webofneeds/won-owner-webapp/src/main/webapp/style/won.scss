@@ -270,18 +270,6 @@ svg {
 //TODO the :hover isn't usable on touch displays (require alternate path to get to the help text) - dog-ears + peel-slide?
 //TODO enable keyboard selection. add aria-information
 
-.wonCurrentLocationMarkerIcon > .marker {
-  width: 15px;
-  height: 15px;
-  background-color: $won-primary-color;
-  border-radius: 100%;
-}
-
-.wonLocationMarkerIcon > .marker__icon {
-  @include fixed-square($contentInfoHeaderIconSize);
-  --local-primary: #{$won-primary-color};
-}
-
 //QUICK FIX for broken elm back button
 main.settings won-svg-icon {
   @include fixed-square($postIconSize);

@@ -10,6 +10,9 @@ import { get } from "../utils.js";
 import PropTypes from "prop-types";
 
 import "leaflet/dist/leaflet.css";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import markerIconRetina from "leaflet/dist/images/marker-icon-2x.png";
 import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 
 const currentLocationIcon = L.divIcon({
@@ -17,10 +20,12 @@ const currentLocationIcon = L.divIcon({
   html: "<div class='marker'></div>",
 });
 
-const locationIcon = L.divIcon({
-  className: "wonLocationMarkerIcon",
-  html:
-    "<svg class='marker__icon'><use xlink:href='#ico36_detail_location' href='#ico36_detail_location' /></svg>",
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIconRetina,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
 });
 
 export default function WonAtomMap({
@@ -52,7 +57,6 @@ export default function WonAtomMap({
           <Marker
             key={locationTupel.toString() + "/" + index}
             position={locationTupel}
-            icon={locationIcon}
           />
         );
       }
@@ -82,6 +86,8 @@ export default function WonAtomMap({
                   className="atom-map__mapmount"
                   zoom={zoom}
                   zoomControl={!disableControls}
+                  dragging={!L.Browser.mobile}
+                  tap={!L.Browser.mobile}
                 >
                   <TileLayer
                     attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
