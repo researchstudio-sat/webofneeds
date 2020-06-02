@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import PropTypes from "prop-types";
 import WonAtomCard from "../../atom-card.jsx";
@@ -20,8 +20,8 @@ export default function WonSuggestAtomViewer({ content, detail, className }) {
   const openedOwnPost = useSelector(
     generalSelectors.getOwnedAtomByConnectionUri(connectionUri)
   );
-  const suggestedAtom = useSelector(generalSelectors.getAtom(content));
-  const suggestedAtomUri = get(suggestedAtom, "uri");
+  const suggestedAtomUri = content;
+  const suggestedAtom = useSelector(generalSelectors.getAtom(suggestedAtomUri));
 
   const connectionsOfOpenedOwnPost = get(openedOwnPost, "connections");
   const connectionsBetweenPosts =
@@ -36,9 +36,12 @@ export default function WonSuggestAtomViewer({ content, detail, className }) {
 
   const processState = useSelector(generalSelectors.getProcessState);
 
-  const isLoading = processUtils.isAtomLoading(processState, content);
-  const toLoad = processUtils.isAtomToLoad(processState, content);
-  const failedToLoad = processUtils.hasAtomFailedToLoad(processState, content);
+  const isLoading = processUtils.isAtomLoading(processState, suggestedAtomUri);
+  const toLoad = processUtils.isAtomToLoad(processState, suggestedAtomUri);
+  const failedToLoad = processUtils.hasAtomFailedToLoad(
+    processState,
+    suggestedAtomUri
+  );
 
   const fetchedSuggestion = !isLoading && !toLoad && !failedToLoad;
   const isSuggestedOwned = useSelector(
@@ -79,6 +82,12 @@ export default function WonSuggestAtomViewer({ content, detail, className }) {
   const establishedConnectionUri =
     hasConnectionBetweenPosts && get(connectionsBetweenPosts.first(), "uri");
 
+  useEffect(() => {
+    if (suggestedAtomUri && ((toLoad && !isLoading) || !suggestedAtom)) {
+      dispatch(actionCreators.atoms__fetchUnloadedAtom(suggestedAtomUri));
+    }
+  });
+
   function getInfoText() {
     if (isLoading) {
       return "Loading Atom...";
@@ -108,8 +117,8 @@ export default function WonSuggestAtomViewer({ content, detail, className }) {
   }
 
   function reloadSuggestion() {
-    if (content && failedToLoad) {
-      dispatch(actionCreators.atoms__fetchUnloadedAtom(content));
+    if (suggestedAtomUri && failedToLoad) {
+      dispatch(actionCreators.atoms__fetchUnloadedAtom(suggestedAtomUri));
     }
   }
 
@@ -161,65 +170,69 @@ export default function WonSuggestAtomViewer({ content, detail, className }) {
         {label}
       </div>
       <div className="suggestatomv__content">
-        <div className="suggestatomv__content__post">
-          <WonAtomCard
-            atom={suggestedAtom}
-            currentLocation={currentLocation}
-            showHolder={true}
-            showSuggestions={false}
-          />
-          {showActions ? (
-            <div className="suggestatomv__content__post__actions">
-              {failedToLoad ? (
-                <button
-                  className="suggestatomv__content__post__actions__button won-button--outlined thin red"
-                  onClick={reloadSuggestion.bind(this)}
-                >
-                  Reload
-                </button>
-              ) : (
-                undefined
-              )}
-              {showConnectAction ? (
-                <button
-                  className="suggestatomv__content__post__actions__button won-button--outlined thin red"
-                  onClick={connectWithPost.bind(this)}
-                >
-                  Connect
-                </button>
-              ) : (
-                undefined
-              )}
-              {showJoinAction ? (
-                <button
-                  className="suggestatomv__content__post__actions__button won-button--outlined thin red"
-                  onClick={connectWithPost.bind(this)}
-                >
-                  Join
-                </button>
-              ) : (
-                undefined
-              )}
-              {hasConnectionBetweenPosts ? (
-                <Link
-                  className="suggestatomv__content__post__actions__button won-button--outlined thin red"
-                  to={location =>
-                    generateLink(location, {
-                      connectionUri: establishedConnectionUri,
-                    })
-                  }
-                >
-                  View Chat
-                </Link>
-              ) : (
-                undefined
-              )}
-            </div>
-          ) : (
-            undefined
-          )}
+        <div className="suggestatomv__content__element">
+          <div className="suggestatomv__content__element__post">
+            <WonAtomCard
+              atom={suggestedAtom}
+              currentLocation={currentLocation}
+              showHolder={true}
+              showSuggestions={false}
+            />
+            {showActions ? (
+              <div className="suggestatomv__content__element__post__actions">
+                {failedToLoad ? (
+                  <button
+                    className="suggestatomv__content__element__post__actions__button won-button--outlined thin red"
+                    onClick={reloadSuggestion.bind(this)}
+                  >
+                    Reload
+                  </button>
+                ) : (
+                  undefined
+                )}
+                {showConnectAction ? (
+                  <button
+                    className="suggestatomv__content__element__post__actions__button won-button--outlined thin red"
+                    onClick={connectWithPost.bind(this)}
+                  >
+                    Connect
+                  </button>
+                ) : (
+                  undefined
+                )}
+                {showJoinAction ? (
+                  <button
+                    className="suggestatomv__content__element__post__actions__button won-button--outlined thin red"
+                    onClick={connectWithPost.bind(this)}
+                  >
+                    Join
+                  </button>
+                ) : (
+                  undefined
+                )}
+                {hasConnectionBetweenPosts ? (
+                  <Link
+                    className="suggestatomv__content__element__post__actions__button won-button--outlined thin red"
+                    to={location =>
+                      generateLink(location, {
+                        connectionUri: establishedConnectionUri,
+                      })
+                    }
+                  >
+                    View Chat
+                  </Link>
+                ) : (
+                  undefined
+                )}
+              </div>
+            ) : (
+              undefined
+            )}
+          </div>
+          <div className="suggestatomv__content__element__info">
+            {getInfoText()}
+          </div>
         </div>
-        <div className="suggestatomv__content__info">{getInfoText()}</div>
       </div>
     </won-suggest-atom-viewer>
   );

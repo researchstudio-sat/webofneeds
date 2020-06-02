@@ -6,28 +6,34 @@ won-suggest-atom-viewer {
   @include won-detail-viewer("suggestatomv");
 
   .suggestatomv__content {
-    & .suggestatomv__content__post {
-      border: $thinGrayBorder;
-      background: $won-light-gray;
+    display: grid;
+    grid-gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
 
-      &__actions {
-        border-top: $thinGrayBorder;
-        display: grid;
-        grid-auto-flow: column;
-        grid-gap: 0.5rem;
-        padding: 0.5rem;
+    > .suggestatomv__content__element {
+      .suggestatomv__content__element__post {
+        border: $thinGrayBorder;
+        background: $won-light-gray;
 
-        &__button.won-button--outlined.red.thin {
-          font-size: $smallFontSize;
+        &__actions {
+          border-top: $thinGrayBorder;
+          display: grid;
+          grid-auto-flow: column;
+          grid-gap: 0.5rem;
           padding: 0.5rem;
+
+          &__button.won-button--outlined.red.thin {
+            font-size: $smallFontSize;
+            padding: 0.5rem;
+          }
         }
       }
-    }
-    & .suggestatomv__content__info {
-      color: $won-skeleton-color;
-      font-size: $smallFontSize;
-      padding-top: 0.5rem;
-      text-align: center;
+      .suggestatomv__content__element__info {
+        color: $won-skeleton-color;
+        font-size: $smallFontSize;
+        padding-top: 0.5rem;
+        text-align: center;
+      }
     }
   }
 }

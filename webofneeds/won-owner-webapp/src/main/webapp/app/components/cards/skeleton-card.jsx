@@ -119,7 +119,7 @@ export default function WonSkeletonCard({
   );
 }
 WonSkeletonCard.propTypes = {
-  atomUri: PropTypes.string.isRequired,
+  atomUri: PropTypes.string,
   showHolder: PropTypes.bool,
   showSuggestions: PropTypes.bool,
 };
