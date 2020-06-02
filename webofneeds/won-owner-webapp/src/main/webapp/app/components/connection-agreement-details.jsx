@@ -21,8 +21,7 @@ export default function WonConnectionAgreementDetails({ connection }) {
           {quad.object.value}
           &gt; &lt;
           {quad.graph.value}
-          &gt;
-          <hr />
+          &gt; .<hr />
         </div>
       );
     });
