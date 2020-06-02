@@ -1,11 +1,10 @@
-import React from "react";
-import PropTypes from "prop-types";
+import React, { useState, useEffect, useRef } from "react";
 import Immutable from "immutable";
-import { connect } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { actionCreators } from "../../actions/actions.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
-import { getIn } from "../../utils.js";
+import { getIn, get } from "../../utils.js";
 import * as processUtils from "../../redux/utils/process-utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as wonLabelUtils from "../../won-label-utils.js";
@@ -33,59 +32,71 @@ import ico36_detail_location from "~/images/won-icons/ico36_detail_location.svg"
 import ico36_location_current from "~/images/won-icons/ico36_location_current.svg";
 import ico16_indicator_location from "~/images/won-icons/ico16_indicator_location.svg";
 import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg";
-import { withRouter } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
-const mapStateToProps = (state, ownProps) => {
-  const isLocationAccessDenied = generalSelectors.isLocationAccessDenied(state);
-  const currentLocation = generalSelectors.getCurrentLocation(state);
+export default function PageMap() {
+  const dispatch = useDispatch();
+  const history = useHistory();
 
-  const lastWhatsAroundLocation = getIn(state, [
-    "owner",
-    "lastWhatsAroundLocation",
-  ]);
-  const whatsAroundMaxDistance = getIn(state, [
-    "owner",
-    "lastWhatsAroundMaxDistance",
-  ]);
+  const isLocationAccessDenied = useSelector(
+    generalSelectors.isLocationAccessDenied
+  );
+  const currentLocation = useSelector(generalSelectors.getCurrentLocation);
 
-  const debugModeEnabled = viewSelectors.isDebugModeEnabled(state);
+  const [state, setState] = useState({
+    searchText: "",
+    searchResults: [],
+    lastWhatsAroundLocationName: "",
+  });
+  const [showLocationInput, setShowLocationInput] = useState(false);
 
-  const whatsAroundMetaAtoms = generalSelectors
-    .getWhatsAroundAtoms(state)
-    .filter(metaAtom => atomUtils.isActive(metaAtom))
-    .filter(metaAtom => debugModeEnabled || !atomUtils.isSearchAtom(metaAtom))
-    .filter(
-      metaAtom => debugModeEnabled || !atomUtils.isDirectResponseAtom(metaAtom)
-    )
-    .filter(
-      metaAtom => debugModeEnabled || !atomUtils.isInvisibleAtom(metaAtom)
-    )
-    .filter(
-      (metaAtom, metaAtomUri) =>
-        !generalSelectors.isAtomOwned(state, metaAtomUri)
-    )
-    .filter(metaAtom => atomUtils.hasLocation(metaAtom))
-    .filter(metaAtom => {
-      const distanceFrom = atomUtils.getDistanceFrom(
-        metaAtom,
-        lastWhatsAroundLocation
-      );
-      if (distanceFrom) {
-        return distanceFrom <= whatsAroundMaxDistance;
-      }
-      return false;
-    });
+  const lastWhatsAroundLocation = useSelector(state =>
+    getIn(state, ["owner", "lastWhatsAroundLocation"])
+  );
+
+  const previousLastWhatsAroundLocation = usePrevious(lastWhatsAroundLocation);
+  const whatsAroundMaxDistance = useSelector(state =>
+    getIn(state, ["owner", "lastWhatsAroundMaxDistance"])
+  );
+
+  const debugModeEnabled = useSelector(viewSelectors.isDebugModeEnabled);
+
+  const accountState = useSelector(generalSelectors.getAccountState);
+  const whatsAroundMetaAtoms = useSelector(state =>
+    generalSelectors
+      .getWhatsAroundAtoms(state)
+      .filter(metaAtom => atomUtils.isActive(metaAtom))
+      .filter(metaAtom => debugModeEnabled || !atomUtils.isSearchAtom(metaAtom))
+      .filter(
+        metaAtom =>
+          debugModeEnabled || !atomUtils.isDirectResponseAtom(metaAtom)
+      )
+      .filter(
+        metaAtom => debugModeEnabled || !atomUtils.isInvisibleAtom(metaAtom)
+      )
+      .filter(metaAtom => !accountUtils.isAtomOwned(metaAtom))
+      .filter(metaAtom => atomUtils.hasLocation(metaAtom))
+      .filter(metaAtom => {
+        const distanceFrom = atomUtils.getDistanceFrom(
+          metaAtom,
+          lastWhatsAroundLocation
+        );
+        if (distanceFrom) {
+          return distanceFrom <= whatsAroundMaxDistance;
+        }
+        return false;
+      })
+  );
 
   const sortedVisibleAtoms = atomUtils.sortByDistanceFrom(
     whatsAroundMetaAtoms,
     lastWhatsAroundLocation
   );
-  const lastAtomUrisUpdateDate = getIn(state, [
-    "owner",
-    "lastWhatsAroundUpdateTime",
-  ]);
+  const lastAtomUrisUpdateDate = useSelector(state =>
+    getIn(state, ["owner", "lastWhatsAroundUpdateTime"])
+  );
 
-  const process = generalSelectors.getProcessState(state);
+  const process = useSelector(generalSelectors.getProcessState);
   const isOwnerAtomUrisLoading = processUtils.isProcessingWhatsAround(process);
   const isOwnerAtomUrisToLoad =
     !lastAtomUrisUpdateDate && !isOwnerAtomUrisLoading;
@@ -97,442 +108,86 @@ const mapStateToProps = (state, ownProps) => {
       locations.push(atomLocation);
     });
 
-  const accountState = generalSelectors.getAccountState(state);
+  const isLoggedIn = accountUtils.isLoggedIn(accountState);
+  const globalLastUpdateDate = useSelector(
+    generalSelectors.selectLastUpdateTime
+  );
+  const friendlyLastAtomUrisUpdateTimestamp =
+    lastAtomUrisUpdateDate &&
+    wonLabelUtils.relativeTime(globalLastUpdateDate, lastAtomUrisUpdateDate);
 
-  return {
-    isLoggedIn: accountUtils.isLoggedIn(accountState),
-    currentLocation,
-    isLocationAccessDenied,
-    lastWhatsAroundLocation,
-    locations,
-    lastAtomUrisUpdateDate,
-    friendlyLastAtomUrisUpdateTimestamp:
-      lastAtomUrisUpdateDate &&
-      wonLabelUtils.relativeTime(
-        generalSelectors.selectLastUpdateTime(state),
-        lastAtomUrisUpdateDate
-      ),
-    sortedVisibleAtoms,
-    hasVisibleAtoms: sortedVisibleAtoms.length > 0,
-    sortedVisibleAtomsSize: sortedVisibleAtoms.length,
-    isOwnerAtomUrisLoading,
-    isOwnerAtomUrisToLoad,
-    showSlideIns:
-      viewSelectors.hasSlideIns(state, ownProps.history) &&
-      viewSelectors.isSlideInsVisible(state),
-    showModalDialog: viewSelectors.showModalDialog(state),
-  };
-};
+  const hasVisibleAtoms = sortedVisibleAtoms.length > 0;
+  const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
+  const showModalDialog = useSelector(viewSelectors.showModalDialog);
 
-const mapDispatchToProps = dispatch => {
-  return {
-    fetchWhatsAround: (date, latlng, distance) => {
-      dispatch(actionCreators.atoms__fetchWhatsAround(date, latlng, distance));
-    },
-    locationAccessDenied: () => {
-      dispatch(actionCreators.view__locationAccessDenied());
-    },
-    updateCurrentLocation: locImm => {
-      dispatch(actionCreators.view__updateCurrentLocation(locImm));
-    },
-  };
-};
+  const startSearch = _.debounce(value => {
+    searchNominatim(value).then(searchResults => {
+      const parsedResults = scrubSearchResults(searchResults, value);
 
-class PageMap extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      showLocationInput: false,
-      searchText: "",
-      searchResults: [],
-      lastWhatsAroundLocationName: "",
-    };
-
-    this.reload = this.reload.bind(this);
-    this.selectCurrentLocation = this.selectCurrentLocation.bind(this);
-    this.updateWhatsAroundSuggestions = this.updateWhatsAroundSuggestions.bind(
-      this
-    );
-    this.fetchCurrentLocationAndReload = this.fetchCurrentLocationAndReload.bind(
-      this
-    );
-
-    this.startSearch = _.debounce(value => {
-      searchNominatim(value).then(searchResults => {
-        const parsedResults = scrubSearchResults(searchResults, value);
-
-        this.setState({
-          searchResults: parsedResults || [],
-          lastWhatsAroundLocationName: value,
-        });
+      setState({
+        ...state,
+        searchResults: parsedResults || [],
+        lastWhatsAroundLocationName: value,
       });
-    }, 700);
-  }
+    });
+  }, 700);
 
-  render() {
-    return (
-      <section className={!this.props.isLoggedIn ? "won-signed-out" : ""}>
-        {this.props.showModalDialog && <WonModalDialog />}
-        <WonTopnav pageTitle="What's around" />
-        {this.props.isLoggedIn && <WonMenu />}
-        <WonToasts />
-        {this.props.showSlideIns && <WonSlideIn />}
-        <main className="ownermap">
-          {(this.props.isLocationAccessDenied ||
-            this.props.lastWhatsAroundLocation) && (
-            <div className="ownermap__header">
-              <span className="ownermap__header__label">
-                {"What's around:"}
-              </span>
-              {!this.state.showLocationInput && (
-                <div
-                  className="ownermap__header__location"
-                  onClick={() => this.setState({ showLocationInput: true })}
-                >
-                  <svg className="ownermap__header__location__icon">
-                    <use
-                      xlinkHref={ico36_detail_location}
-                      href={ico36_detail_location}
-                    />
-                  </svg>
-                  <span className="ownermap__header__location__label">
-                    {this.state.lastWhatsAroundLocationName}
-                  </span>
-                </div>
-              )}
-              {(this.state.showLocationInput ||
-                (this.props.isLocationAccessDenied &&
-                  !this.props.lastWhatsAroundLocation)) && (
-                <div className="ownermap__header__input">
-                  <svg
-                    className="ownermap__header__input__icon"
-                    onClick={() => this.setState({ showLocationInput: false })}
-                  >
-                    <use
-                      xlinkHref={ico36_detail_location}
-                      href={ico36_detail_location}
-                    />
-                  </svg>
-                  <WonTitlePicker
-                    onUpdate={this.updateWhatsAroundSuggestions}
-                    initialValue={this.state.searchText}
-                    detail={{ placeholder: "Search around location" }}
-                  />
-                </div>
-              )}
-
-              <div className="ownermap__header__updated">
-                {!this.state.showLocationInput &&
-                  (this.props.isOwnerAtomUrisLoading ? (
-                    <div className="ownermap__header__updated__loading hide-in-responsive">
-                      Loading...
-                    </div>
-                  ) : (
-                    <div className="ownermap__header__updated__time hide-in-responsive">
-                      {"Updated: " +
-                        this.props.friendlyLastAtomUrisUpdateTimestamp}
-                    </div>
-                  ))}
-
-                {this.state.showLocationInput ? (
-                  <div
-                    className="ownermap__header__updated__cancel won-button--filled red"
-                    onClick={() => this.setState({ showLocationInput: false })}
-                    disabled={this.props.isOwnerAtomUrisLoading}
-                  >
-                    Cancel
-                  </div>
-                ) : (
-                  <div
-                    className="ownermap__header__updated__reload won-button--filled red"
-                    onClick={this.reload}
-                    disabled={this.props.isOwnerAtomUrisLoading}
-                  >
-                    Reload
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-          {(!this.props.isOwnerAtomUrisToLoad ||
-            this.props.isLocationAccessDenied) && (
-            <div
-              className={
-                "ownermap__searchresults " +
-                (this.state.showLocationInput ||
-                (this.props.isLocationAccessDenied &&
-                  !this.props.lastWhatsAroundLocation)
-                  ? "ownermap__searchresults--visible"
-                  : "")
-              }
-            >
-              {!this.props.isLocationAccessDenied && (
-                <div
-                  className="ownermap__searchresults__result"
-                  onClick={this.selectCurrentLocation}
-                >
-                  <svg className="ownermap__searchresults__result__icon">
-                    <use
-                      xlinkHref={ico36_location_current}
-                      href={ico36_location_current}
-                    />
-                  </svg>
-                  <div className="ownermap__searchresults__result__label">
-                    Current Location
-                  </div>
-                </div>
-              )}
-              {this.state.searchResults.map((result, index) => (
-                <div
-                  className="ownermap__searchresults__result"
-                  onClick={() => this.selectLocation(result)}
-                  key={result.name + "-" + index}
-                >
-                  <svg className="ownermap__searchresults__result__icon">
-                    <use
-                      xlinkHref={ico16_indicator_location}
-                      href={ico16_indicator_location}
-                    />
-                  </svg>
-                  <div className="ownermap__searchresults__result__label">
-                    {result.name}
-                  </div>
-                </div>
-              ))}
-
-              {this.props.isLocationAccessDenied &&
-                !this.props.lastWhatsAroundLocation &&
-                !this.props.hasVisibleAtoms &&
-                !(this.state.searchResults.length > 0) && (
-                  <div className="ownermap__searchresults__deniedlocation">
-                    <svg className="ownermap__searchresults__deniedlocation__icon">
-                      <use
-                        xlinkHref={ico16_indicator_error}
-                        href={ico16_indicator_error}
-                      />
-                    </svg>
-                    <div className="ownermap__searchresults__deniedlocation__label">
-                      {
-                        "You prohibit us from retrieving your location, so we won't be able to show what's around you. If you want to change that, grant access to the location in your browser and reload the page, or type any location in the input-field above."
-                      }
-                    </div>
-                  </div>
-                )}
-            </div>
-          )}
-          {!this.props.currentLocation &&
-            !this.props.isLocationAccessDenied &&
-            !this.props.lastWhatsAroundLocation && (
-              <div className="ownermap__nolocation">
-                <svg className="ownermap__nolocation__icon">
-                  <use
-                    xlinkHref={ico36_detail_location}
-                    href={ico36_detail_location}
-                  />
-                </svg>
-                <div className="ownermap__nolocation__label">
-                  {"You did not grant location access yet. "}
-                  <span className="show-in-responsive">Tap</span>
-                  <span className="hide-in-responsive">Click</span>
-                  {
-                    " the button below and accept the location access to see what is going on around you."
-                  }
-                </div>
-                <div
-                  className="ownermap__nolocation__button won-button--filled red"
-                  onClick={this.fetchCurrentLocationAndReload}
-                >
-                  {"See What's Around"}
-                </div>
-              </div>
-            )}
-
-          {!this.props.isOwnerAtomUrisToLoad &&
-          !!this.props.lastWhatsAroundLocation ? (
-            <WonAtomMap
-              className={
-                "ownermap__map hide-in-responsive won-atom-map " +
-                (!(
-                  this.state.showLocationInput ||
-                  (this.props.isLocationAccessDenied &&
-                    !this.props.lastWhatsAroundLocation)
-                )
-                  ? " ownermap__map--visible "
-                  : "")
-              }
-              locations={this.props.locations}
-              currentLocation={this.props.lastWhatsAroundLocation}
-            />
-          ) : (
-            undefined
-          )}
-          {this.props.lastWhatsAroundLocation &&
-            (this.props.hasVisibleAtoms ? (
-              <div className="ownermap__content">
-                <WonAtomCardGrid
-                  atoms={this.props.sortedVisibleAtoms}
-                  currentLocation={this.props.lastWhatsAroundLocation}
-                  showHolder={true}
-                  showSuggestions={false}
-                  showCreate={false}
-                />
-              </div>
-            ) : (
-              <div className="ownermap__noresults">
-                <span className="ownermap__noresults__label">
-                  Nothing around this location, you can try another location by
-                  clicking on the location in the header.
-                </span>
-              </div>
-            ))}
-        </main>
-        <WonFooter />
-      </section>
-    );
-  }
-
-  componentDidUpdate(prevProps) {
-    if (
-      this.props.lastWhatsAroundLocation &&
-      this.props.lastWhatsAroundLocation !== prevProps.lastWhatsAroundLocation
-    ) {
-      reverseSearchNominatim(
-        this.props.lastWhatsAroundLocation.get("lat"),
-        this.props.lastWhatsAroundLocation.get("lng"),
-        13
-      ).then(searchResult => {
-        const displayName = searchResult.display_name;
-
-        this.setState({
-          searchText: displayName,
-          lastWhatsAroundLocationName: displayName,
-        });
-      });
-    }
-
-    if (this.props.isOwnerAtomUrisToLoad && this.props.currentLocation) {
-      const latlng = {
-        lat: this.props.currentLocation.get("lat"),
-        lng: this.props.currentLocation.get("lng"),
-      };
-      this.props.fetchWhatsAround(undefined, latlng, 5000);
-    }
-  }
-
-  updateWhatsAroundSuggestions({ value }) {
+  function updateWhatsAroundSuggestions({ value }) {
     const whatsAroundInputValue = value && value.trim();
-    this.setState({ searchText: value }, () => {
-      if (!!whatsAroundInputValue && whatsAroundInputValue.length > 0) {
-        this.startSearch(value);
-      } else {
-        this.resetWhatsAroundInput();
-      }
-    });
+    setState({ ...state, searchText: value });
+    if (!!whatsAroundInputValue && whatsAroundInputValue.length > 0) {
+      startSearch(value);
+    } else {
+      resetWhatsAroundInput();
+    }
   }
 
-  resetWhatsAroundInput() {
-    this.setState({
+  function resetWhatsAroundInput() {
+    setState({
+      ...state,
       searchText: "",
       searchResults: [],
     });
   }
 
-  reload() {
-    if (
-      !this.props.isOwnerAtomUrisLoading &&
-      this.props.lastWhatsAroundLocation
-    ) {
+  function reload() {
+    if (!isOwnerAtomUrisLoading && lastWhatsAroundLocation) {
       const latlng = {
-        lat: this.props.lastWhatsAroundLocation.get("lat"),
-        lng: this.props.lastWhatsAroundLocation.get("lng"),
+        lat: get(lastWhatsAroundLocation, "lat"),
+        lng: get(lastWhatsAroundLocation, "lng"),
       };
-      if (this.props.lastAtomUrisUpdateDate) {
-        this.props.fetchWhatsAround(
-          new Date(this.props.lastAtomUrisUpdateDate),
+      dispatch(
+        actionCreators.atoms__fetchWhatsAround(
+          lastAtomUrisUpdateDate ? new Date(lastAtomUrisUpdateDate) : undefined,
           latlng,
           5000
-        );
-      } else {
-        this.props.fetchWhatsAround(undefined, latlng, 5000);
-      }
-    }
-  }
-
-  selectCurrentLocation() {
-    if (!this.props.isLocationAccessDenied) {
-      this.setState(
-        {
-          showLocationInput: false,
-        },
-        () => {
-          if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(
-              currentLocation => {
-                const lat = currentLocation.coords.latitude;
-                const lng = currentLocation.coords.longitude;
-                this.props.updateCurrentLocation(
-                  Immutable.fromJS({ location: { lat, lng } })
-                );
-
-                if (this.props.lastAtomUrisUpdateDate) {
-                  this.props.fetchWhatsAround(
-                    new Date(this.props.lastAtomUrisUpdateDate),
-                    { lat, lng },
-                    5000
-                  );
-                } else {
-                  this.props.fetchWhatsAround(undefined, { lat, lng }, 5000);
-                }
-              },
-              error => {
-                //error handler
-                console.error(
-                  "Could not retrieve geolocation due to error: ",
-                  error.code,
-                  ", continuing map initialization without currentLocation. fullerror:",
-                  error
-                );
-                if (error.code == 1) {
-                  console.error("User Denied access");
-                }
-                this.props.locationAccessDenied();
-              },
-              {
-                //options
-                enableHighAccuracy: true,
-                maximumAge: 30 * 60 * 1000, //use if cache is not older than 30min
-              }
-            );
-          } else {
-            console.error("location could not be retrieved");
-
-            this.props.locationAccessDenied();
-          }
-        }
+        )
       );
     }
   }
 
-  fetchCurrentLocationAndReload() {
-    if (!this.props.currentLocation && !this.props.isOwnerAtomUrisLoading) {
+  function selectCurrentLocation() {
+    if (!isLocationAccessDenied) {
+      setShowLocationInput(false);
       if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(
           currentLocation => {
             const lat = currentLocation.coords.latitude;
             const lng = currentLocation.coords.longitude;
-            this.props.updateCurrentLocation(
-              Immutable.fromJS({ location: { lat, lng } })
+            dispatch(
+              actionCreators.view__updateCurrentLocation(
+                Immutable.fromJS({ location: { lat, lng } })
+              )
             );
-
-            if (this.props.lastAtomUrisUpdateDate) {
-              this.props.fetchWhatsAround(
-                new Date(this.props.lastAtomUrisUpdateDate),
+            dispatch(
+              actionCreators.atoms__fetchWhatsAround(
+                lastAtomUrisUpdateDate
+                  ? new Date(lastAtomUrisUpdateDate)
+                  : undefined,
                 { lat, lng },
                 5000
-              );
-            } else {
-              this.props.fetchWhatsAround(undefined, { lat, lng }, 5000);
-            }
+              )
+            );
           },
           error => {
             //error handler
@@ -545,7 +200,7 @@ class PageMap extends React.Component {
             if (error.code == 1) {
               console.error("User Denied access");
             }
-            this.props.locationAccessDenied();
+            dispatch(actionCreators.view__locationAccessDenied());
           },
           {
             //options
@@ -555,43 +210,318 @@ class PageMap extends React.Component {
         );
       } else {
         console.error("location could not be retrieved");
-        this.props.locationAccessDenied();
+        dispatch(actionCreators.view__locationAccessDenied());
       }
     }
   }
 
-  selectLocation(location) {
-    this.setState(
-      {
-        showLocationInput: false,
-      },
-      () => this.props.fetchWhatsAround(undefined, location, 5000)
-    );
+  function fetchCurrentLocationAndReload() {
+    if (!currentLocation && !isOwnerAtomUrisLoading) {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          currentLocation => {
+            const lat = currentLocation.coords.latitude;
+            const lng = currentLocation.coords.longitude;
+            dispatch(
+              actionCreators.view__updateCurrentLocation(
+                Immutable.fromJS({ location: { lat, lng } })
+              )
+            );
+            dispatch(
+              actionCreators.atoms__fetchWhatsAround(
+                lastAtomUrisUpdateDate
+                  ? new Date(lastAtomUrisUpdateDate)
+                  : undefined,
+                { lat, lng },
+                5000
+              )
+            );
+          },
+          error => {
+            //error handler
+            console.error(
+              "Could not retrieve geolocation due to error: ",
+              error.code,
+              ", continuing map initialization without currentLocation. fullerror:",
+              error
+            );
+            if (error.code == 1) {
+              console.error("User Denied access");
+            }
+            dispatch(actionCreators.view__locationAccessDenied());
+          },
+          {
+            //options
+            enableHighAccuracy: true,
+            maximumAge: 30 * 60 * 1000, //use if cache is not older than 30min
+          }
+        );
+      } else {
+        console.error("location could not be retrieved");
+        dispatch(actionCreators.view__locationAccessDenied());
+      }
+    }
   }
-}
-PageMap.propTypes = {
-  isLoggedIn: PropTypes.bool,
-  currentLocation: PropTypes.object,
-  isLocationAccessDenied: PropTypes.bool,
-  lastWhatsAroundLocation: PropTypes.object,
-  locations: PropTypes.arrayOf(PropTypes.object),
-  lastAtomUrisUpdateDate: PropTypes.number,
-  friendlyLastAtomUrisUpdateTimestamp: PropTypes.string,
-  sortedVisibleAtoms: PropTypes.arrayOf(PropTypes.object),
-  hasVisibleAtoms: PropTypes.bool,
-  sortedVisibleAtomsSize: PropTypes.number,
-  isOwnerAtomUrisLoading: PropTypes.bool,
-  isOwnerAtomUrisToLoad: PropTypes.bool,
-  showSlideIns: PropTypes.bool,
-  showModalDialog: PropTypes.bool,
-  fetchWhatsAround: PropTypes.func,
-  locationAccessDenied: PropTypes.func,
-  updateCurrentLocation: PropTypes.func,
-};
 
-export default withRouter(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(PageMap)
-);
+  function selectLocation(location) {
+    setShowLocationInput(false);
+    dispatch(actionCreators.atoms__fetchWhatsAround(undefined, location, 5000));
+  }
+
+  function usePrevious(value) {
+    // The ref object is a generic container whose current property is mutable ...
+    // ... and can hold any value, similar to an instance property on a class
+    const ref = useRef();
+
+    // Store current value in ref
+    useEffect(
+      () => {
+        ref.current = value;
+      },
+      [value]
+    ); // Only re-run if value changes
+
+    // Return previous value (happens before update in useEffect above)
+    return ref.current;
+  }
+
+  useEffect(() => {
+    if (
+      lastWhatsAroundLocation &&
+      lastWhatsAroundLocation !== previousLastWhatsAroundLocation
+    ) {
+      reverseSearchNominatim(
+        get(lastWhatsAroundLocation, "lat"),
+        get(lastWhatsAroundLocation, "lng"),
+        13
+      ).then(searchResult => {
+        const displayName = searchResult.display_name;
+
+        setState({
+          ...state,
+          searchText: displayName,
+          lastWhatsAroundLocationName: displayName,
+        });
+      });
+    }
+
+    if (isOwnerAtomUrisToLoad && currentLocation) {
+      const latlng = {
+        lat: get(currentLocation, "lat"),
+        lng: get(currentLocation, "lng"),
+      };
+      dispatch(actionCreators.atoms__fetchWhatsAround(undefined, latlng, 5000));
+    }
+  });
+
+  return (
+    <section className={!isLoggedIn ? "won-signed-out" : ""}>
+      {showModalDialog && <WonModalDialog />}
+      <WonTopnav pageTitle="What's around" />
+      {isLoggedIn && <WonMenu />}
+      <WonToasts />
+      {showSlideIns && <WonSlideIn />}
+      <main className="ownermap">
+        {(isLocationAccessDenied || lastWhatsAroundLocation) && (
+          <div className="ownermap__header">
+            <span className="ownermap__header__label">{"What's around:"}</span>
+            {!showLocationInput && (
+              <div
+                className="ownermap__header__location"
+                onClick={() => setShowLocationInput(true)}
+              >
+                <svg className="ownermap__header__location__icon">
+                  <use
+                    xlinkHref={ico36_detail_location}
+                    href={ico36_detail_location}
+                  />
+                </svg>
+                <span className="ownermap__header__location__label">
+                  {state.lastWhatsAroundLocationName}
+                </span>
+              </div>
+            )}
+            {(showLocationInput ||
+              (isLocationAccessDenied && !lastWhatsAroundLocation)) && (
+              <div className="ownermap__header__input">
+                <svg
+                  className="ownermap__header__input__icon"
+                  onClick={() => setShowLocationInput(false)}
+                >
+                  <use
+                    xlinkHref={ico36_detail_location}
+                    href={ico36_detail_location}
+                  />
+                </svg>
+                <WonTitlePicker
+                  onUpdate={updateWhatsAroundSuggestions}
+                  initialValue={state.searchText}
+                  detail={{ placeholder: "Search around location" }}
+                />
+              </div>
+            )}
+
+            <div className="ownermap__header__updated">
+              {!showLocationInput &&
+                (isOwnerAtomUrisLoading ? (
+                  <div className="ownermap__header__updated__loading">
+                    Loading...
+                  </div>
+                ) : (
+                  <div className="ownermap__header__updated__time">
+                    {"Updated: " + friendlyLastAtomUrisUpdateTimestamp}
+                  </div>
+                ))}
+
+              {showLocationInput ? (
+                <div
+                  className="ownermap__header__updated__cancel won-button--filled red"
+                  onClick={() => setShowLocationInput(false)}
+                  disabled={isOwnerAtomUrisLoading}
+                >
+                  Cancel
+                </div>
+              ) : (
+                <div
+                  className="ownermap__header__updated__reload won-button--filled red"
+                  onClick={reload}
+                  disabled={isOwnerAtomUrisLoading}
+                >
+                  Reload
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        {(!isOwnerAtomUrisToLoad || isLocationAccessDenied) && (
+          <div
+            className={
+              "ownermap__searchresults " +
+              (showLocationInput ||
+              (isLocationAccessDenied && !lastWhatsAroundLocation)
+                ? "ownermap__searchresults--visible"
+                : "")
+            }
+          >
+            {!isLocationAccessDenied && (
+              <div
+                className="ownermap__searchresults__result"
+                onClick={selectCurrentLocation}
+              >
+                <svg className="ownermap__searchresults__result__icon">
+                  <use
+                    xlinkHref={ico36_location_current}
+                    href={ico36_location_current}
+                  />
+                </svg>
+                <div className="ownermap__searchresults__result__label">
+                  Current Location
+                </div>
+              </div>
+            )}
+            {state.searchResults.map((result, index) => (
+              <div
+                className="ownermap__searchresults__result"
+                onClick={() => selectLocation(result)}
+                key={result.name + "-" + index}
+              >
+                <svg className="ownermap__searchresults__result__icon">
+                  <use
+                    xlinkHref={ico16_indicator_location}
+                    href={ico16_indicator_location}
+                  />
+                </svg>
+                <div className="ownermap__searchresults__result__label">
+                  {result.name}
+                </div>
+              </div>
+            ))}
+
+            {isLocationAccessDenied &&
+              !lastWhatsAroundLocation &&
+              !hasVisibleAtoms &&
+              !(state.searchResults.length > 0) && (
+                <div className="ownermap__searchresults__deniedlocation">
+                  <svg className="ownermap__searchresults__deniedlocation__icon">
+                    <use
+                      xlinkHref={ico16_indicator_error}
+                      href={ico16_indicator_error}
+                    />
+                  </svg>
+                  <div className="ownermap__searchresults__deniedlocation__label">
+                    {
+                      "You prohibit us from retrieving your location, so we won't be able to show what's around you. If you want to change that, grant access to the location in your browser and reload the page, or type any location in the input-field above."
+                    }
+                  </div>
+                </div>
+              )}
+          </div>
+        )}
+        {!currentLocation &&
+          !isLocationAccessDenied &&
+          !lastWhatsAroundLocation && (
+            <div className="ownermap__nolocation">
+              <svg className="ownermap__nolocation__icon">
+                <use
+                  xlinkHref={ico36_detail_location}
+                  href={ico36_detail_location}
+                />
+              </svg>
+              <div className="ownermap__nolocation__label">
+                {"You did not grant location access yet. "}
+                <span className="show-in-responsive">Tap</span>
+                <span className="hide-in-responsive">Click</span>
+                {
+                  " the button below and accept the location access to see what is going on around you."
+                }
+              </div>
+              <div
+                className="ownermap__nolocation__button won-button--filled red"
+                onClick={fetchCurrentLocationAndReload}
+              >
+                {"See What's Around"}
+              </div>
+            </div>
+          )}
+
+        {!isOwnerAtomUrisToLoad && !!lastWhatsAroundLocation ? (
+          <WonAtomMap
+            className={
+              "ownermap__map won-atom-map " +
+              (!(
+                showLocationInput ||
+                (isLocationAccessDenied && !lastWhatsAroundLocation)
+              )
+                ? " ownermap__map--visible "
+                : "")
+            }
+            locations={locations}
+            currentLocation={lastWhatsAroundLocation}
+          />
+        ) : (
+          undefined
+        )}
+        {lastWhatsAroundLocation &&
+          (hasVisibleAtoms ? (
+            <div className="ownermap__content">
+              <WonAtomCardGrid
+                atoms={sortedVisibleAtoms}
+                currentLocation={lastWhatsAroundLocation}
+                showHolder={true}
+                showSuggestions={false}
+                showCreate={false}
+              />
+            </div>
+          ) : (
+            <div className="ownermap__noresults">
+              <span className="ownermap__noresults__label">
+                Nothing around this location, you can try another location by
+                clicking on the location in the header.
+              </span>
+            </div>
+          ))}
+      </main>
+      <WonFooter />
+    </section>
+  );
+}
