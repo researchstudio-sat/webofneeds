@@ -211,30 +211,23 @@ export default function WonGroupAtomMessages({
   }
 
   function ensureMessagesAreLoaded() {
+    // make sure latest messages are loaded
     const INITIAL_MESSAGECOUNT = 10;
     if (
-      connection &&
-      !isConnectionLoading &&
-      !isProcessingLoadingMessages &&
       get(connection, "messages").size < INITIAL_MESSAGECOUNT &&
+      !connectionUtils.isUsingTemporaryUri(connection) &&
       hasConnectionMessagesToLoad
     ) {
-      dispatch(
-        actionCreators.connections__showLatestMessages(
-          connectionUri,
-          INITIAL_MESSAGECOUNT
-        )
-      );
+      loadPreviousMessages(INITIAL_MESSAGECOUNT);
     }
   }
 
-  function loadPreviousMessages() {
-    const MORE_MESSAGECOUNT = 5;
+  function loadPreviousMessages(messagesToLoadCount = 5) {
     if (connection && !isConnectionLoading && !isProcessingLoadingMessages) {
       dispatch(
         actionCreators.connections__showMoreMessages(
           connectionUri,
-          MORE_MESSAGECOUNT
+          messagesToLoadCount
         )
       );
     }
