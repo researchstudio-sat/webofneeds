@@ -62,7 +62,7 @@ export function fetchDataForOwnedAtoms(
 
 export function fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch) {
   return won
-    .getConnectionWithEventUris(connUri, { requesterWebId: atomUri })
+    .getConnection(connUri, { requesterWebId: atomUri })
     .then(connection => {
       dispatch({
         type: actionTypes.connections.storeActive,
@@ -105,14 +105,10 @@ export function fetchActiveConnectionAndDispatchBySocketUris(
   dispatch
 ) {
   return won
-    .getConnectionWithEventUrisBySocket(senderSocketUri, targetSocketUri, {
+    .getConnectionBySocket(senderSocketUri, targetSocketUri, {
       requesterWebId: atomUri,
     })
     .then(conn => {
-      console.debug(
-        "fetchActiveConnectionAndDispatchBySocketUris - conn: ",
-        conn
-      );
       dispatch({
         type: actionTypes.connections.storeActive,
         payload: Immutable.fromJS({ connections: { [conn.uri]: conn } }),
@@ -353,14 +349,6 @@ export function fetchMessages(
         } else {
           lookupMap["failed"][message.msgUri] = undefined;
         }
-      });
-
-      dispatch({
-        type: actionTypes.connections.messageUrisInLoading,
-        payload: Immutable.fromJS({
-          connectionUri: connectionUri,
-          uris: loadingArray,
-        }),
       });
 
       return { nextPage: nextPage, messages: lookupMap };

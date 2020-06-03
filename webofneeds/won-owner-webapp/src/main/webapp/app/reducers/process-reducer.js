@@ -52,8 +52,6 @@ export const emptyConnectionProcess = Immutable.fromJS({
 });
 
 export const emptyMessagesProcess = Immutable.fromJS({
-  loading: false,
-  toLoad: false,
   failedToLoad: false,
 });
 
@@ -306,24 +304,6 @@ export default function(processState = initialState, action = {}) {
       });
     }
 
-    case actionTypes.connections.messageUrisInLoading: {
-      const connUri = get(action.payload, "connectionUri");
-      const messageUris = get(action.payload, "uris");
-
-      if (messageUris) {
-        messageUris.map(messageUri => {
-          processState = updateMessageProcess(
-            processState,
-            connUri,
-            messageUri,
-            { toLoad: false, loading: true }
-          );
-        });
-      }
-
-      return processState;
-    }
-
     case actionTypes.connections.fetchMessagesSuccess: {
       const connUri = get(action.payload, "connectionUri");
       const nextPage = get(action.payload, "nextPage");
@@ -336,14 +316,25 @@ export default function(processState = initialState, action = {}) {
           nextPage: nextPage,
         });
 
-        loadedMessages.map((message, messageUri) => {
-          processState = updateMessageProcess(
-            processState,
-            connUri,
-            messageUri,
-            { toLoad: false, loading: false, failedToLoad: false }
-          );
-        });
+        const connectionMessageProcess = getIn(processState, [
+          "connections",
+          connUri,
+          "messages",
+        ]);
+
+        if (connectionMessageProcess && connectionMessageProcess.size > 0) {
+          loadedMessages.map((message, messageUri) => {
+            //Only set failedToLoad to false if the messageProcess existed (only happens if the message failed once)
+            if (get(connectionMessageProcess, messageUri)) {
+              processState = updateMessageProcess(
+                processState,
+                connUri,
+                messageUri,
+                { failedToLoad: false }
+              );
+            }
+          });
+        }
       }
 
       return processState;
@@ -366,7 +357,7 @@ export default function(processState = initialState, action = {}) {
             processState,
             connUri,
             messageUri,
-            { toLoad: false, loading: false, failedToLoad: true }
+            { failedToLoad: true }
           );
         });
       }
@@ -524,16 +515,6 @@ export default function(processState = initialState, action = {}) {
               toLoad: true,
             });
           }
-          const eventsOfConnection = get(conn, "hasEvents");
-          eventsOfConnection &&
-            eventsOfConnection.map(eventUri => {
-              processState = updateMessageProcess(
-                processState,
-                connUri,
-                eventUri,
-                { toLoad: true }
-              );
-            });
         });
 
       return processState;

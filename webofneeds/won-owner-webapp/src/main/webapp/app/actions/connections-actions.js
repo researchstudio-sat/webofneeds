@@ -579,7 +579,7 @@ export function connectionsRate(connectionUri, rating) {
     ]);
 
     won
-      .getConnectionWithEventUris(connectionUri, {
+      .getConnection(connectionUri, {
         requesterWebId: get(ownedAtom, "uri"),
       })
       .then(connection => {

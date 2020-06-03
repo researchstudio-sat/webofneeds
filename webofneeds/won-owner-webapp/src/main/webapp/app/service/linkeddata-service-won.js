@@ -23,7 +23,6 @@ import * as ownerApi from "../api/owner-api.js";
 import jsonld from "jsonld/dist/jsonld.js";
 import won from "./won.js";
 import vocab from "./vocab.js";
-import * as jsonldUtils from "./jsonld-utils";
 
 (function() {
   /**
@@ -155,7 +154,25 @@ import * as jsonldUtils from "./jsonld-utils";
       });
   };
 
-  function getConnection(connectionUri, fetchParams) {
+  /**
+   * @param connectionUri
+   * @param fetchParams: optional paramters
+   *        * requesterWebId: the WebID used to access the ressource (used
+   *            by the owner-server to pick the right key-pair)
+   *        * queryParams: GET-params as documented for ownerApi.js `queryString`
+   *        * pagingSize: if specified the server will return the first
+   *            page (unless e.g. `queryParams.p=2` is specified when
+   *            it will return the second page of size N)
+   * @return {*} the connections predicates
+   */
+  won.getConnection = function(connectionUri, fetchParams) {
+    if (!is("String", connectionUri)) {
+      throw new Error(
+        "Tried to request connection infos for sthg that isn't an uri: " +
+          connectionUri
+      );
+    }
+
     return (
       won
         //add the eventUris
@@ -200,53 +217,6 @@ import * as jsonldUtils from "./jsonld-utils";
           throw e;
         })
     );
-  }
-
-  /**
-   * @param connectionUri
-   * @param fetchParams: optional paramters
-   *        * requesterWebId: the WebID used to access the ressource (used
-   *            by the owner-server to pick the right key-pair)
-   *        * queryParams: GET-params as documented for ownerApi.js `queryString`
-   *        * pagingSize: if specified the server will return the first
-   *            page (unless e.g. `queryParams.p=2` is specified when
-   *            it will return the second page of size N)
-   * @return {*} the connections predicates along with the uris of associated events
-   */
-  won.getConnectionWithEventUris = function(connectionUri, fetchParams) {
-    if (!is("String", connectionUri)) {
-      throw new Error(
-        "Tried to request connection infos for sthg that isn't an uri: " +
-          connectionUri
-      );
-    }
-    return getConnection(connectionUri, fetchParams)
-      .then(connection =>
-        Promise.all([
-          Promise.resolve(connection),
-          won.getJsonLdNode(connection.messageContainer, fetchParams),
-        ])
-      )
-      .then(([connection, messageContainer]) => {
-        const messages = jsonldUtils.getProperty(
-          messageContainer,
-          vocab.RDFS.memberCompacted
-        );
-
-        /*
-           * if there's only a single rdfs:member in the event
-           * container, getJsonLdNode will not return an array, so we
-           * need to make sure it's one from here on out.
-           */
-        if (!messages) {
-          connection.hasEvents = [];
-        } else if (is("Array", messages)) {
-          connection.hasEvents = messages.map(message => message["@id"]);
-        } else {
-          connection.hasEvents = [messages["@id"]];
-        }
-        return connection;
-      });
   };
 
   /**
@@ -275,13 +245,15 @@ import * as jsonldUtils from "./jsonld-utils";
 
     const connectionContainerPromise = connectionContainerUri
       ? ownerApi.getJsonLdDataset(connectionContainerUri, fetchParams, true)
-      : getConnection(connectionUri).then(connection =>
-          ownerApi.getJsonLdDataset(
-            connection.messageContainer,
-            fetchParams,
-            true
-          )
-        );
+      : won
+          .getConnection(connectionUri)
+          .then(connection =>
+            ownerApi.getJsonLdDataset(
+              connection.messageContainer,
+              fetchParams,
+              true
+            )
+          );
 
     return connectionContainerPromise
       .then(responseObject =>
@@ -395,9 +367,9 @@ import * as jsonldUtils from "./jsonld-utils";
    *        * pagingSize: if specified the server will return the first
    *            page (unless e.g. `queryParams.p=2` is specified when
    *            it will return the second page of size N)
-   * @return {*} the connections predicates along with the uris of associated events
+   * @return {*} the connections predicates
    */
-  won.getConnectionWithEventUrisBySocket = function(
+  won.getConnectionBySocket = function(
     senderSocketUri,
     targetSocketUri,
     fetchParams
@@ -436,7 +408,7 @@ import * as jsonldUtils from "./jsonld-utils";
         //add the eventUris
         .then(jsonResp => jsonResp && jsonResp["@id"])
         .then(connUri =>
-          won.getConnectionWithEventUris(connUri, {
+          won.getConnection(connUri, {
             requesterWebId: fetchParams.requesterWebId,
           })
         )
