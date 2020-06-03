@@ -897,7 +897,7 @@ export default function WonAtomMessages({
           <ChatTextfield
             className="pm__footer__chattextfield"
             connection={connection}
-            placeholder={shouldShowRdf ? "Enter TTL..." : "Your message..."}
+            placeholder={shouldShowRdf ? "Enter RDF..." : "Your message..."}
             submitButtonLabel={shouldShowRdf ? "Send RDF" : "Send"}
             helpText={shouldShowRdf ? rdfTextfieldHelpText : ""}
             allowEmptySubmit={false}

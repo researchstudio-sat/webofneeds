@@ -135,7 +135,7 @@ export function connectionsChatMessage(
   senderSocketUri,
   targetSocketUri,
   connectionUri,
-  isTTL = false
+  isRDF = false
 ) {
   return (dispatch, getState) => {
     const senderAtomUri = generalSelectors.getAtomUriBySocketUri(
@@ -240,7 +240,7 @@ export function connectionsChatMessage(
       referencedContentUris: referencedContentUris,
       socketUri: senderSocketUri,
       targetSocketUri: targetSocketUri,
-      isTTL,
+      isRDF,
     })
       .then(message => ownerApi.sendMessage(message))
       .then(jsonResp =>

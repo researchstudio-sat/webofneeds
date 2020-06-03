@@ -145,7 +145,7 @@ export default function WonGroupAtomMessages({
     chatMessage,
     additionalContent,
     referencedContent,
-    isTTL = false
+    isRDF = false
   ) {
     dispatch(actionCreators.view__hideAddMessageContent());
 
@@ -162,7 +162,7 @@ export default function WonGroupAtomMessages({
           senderSocketUri,
           targetSocketUri,
           connectionUri,
-          isTTL
+          isRDF
         )
       );
     }
@@ -346,7 +346,7 @@ export default function WonGroupAtomMessages({
         <ChatTextfield
           className="gpm__footer__chattextfield"
           connection={connection}
-          placeholder={shouldShowRdf ? "Enter TTL..." : "Your message..."}
+          placeholder={shouldShowRdf ? "Enter RDF..." : "Your message..."}
           submitButtonLabel={shouldShowRdf ? "Send RDF" : "Send"}
           helpText={shouldShowRdf ? rdfTextfieldHelpText : ""}
           allowEmptySubmit={false}

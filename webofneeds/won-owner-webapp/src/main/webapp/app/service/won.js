@@ -29,7 +29,7 @@ import vocab from "./vocab.js";
 import jsonld from "jsonld/dist/jsonld.js";
 import * as jsonldUtils from "./jsonld-utils.js";
 
-import N3 from "n3";
+import * as N3 from "n3";
 
 window.N34dbg = N3;
 
@@ -508,10 +508,8 @@ window.wonMessageFromJsonLd4dbg = won.wonMessageFromJsonLd;
  *   (https://github.com/RubenVerborgh/N3.js#writing) for more details.
  */
 won.n3Write = async function(quads, writerArgs) {
-  //const { namedNode, literal, defaultGraph, quad } = N3.DataFactory;
   const writer = new N3.Writer(writerArgs);
   return new Promise((resolve, reject) => {
-    //quads.forEach(t => writer.addQuad(t))
     writer.addQuads(quads);
     writer.end((error, result) => {
       if (error) reject(error);
@@ -528,49 +526,34 @@ won.n3Write = async function(quads, writerArgs) {
  *   parser stricter about what it accepts. See the parser-documentation
  *   (https://github.com/RubenVerborgh/N3.js#parsing) for more details.
  */
-won.n3Parse = async function(rdf, parserArgs) {
-  const parser = parserArgs ? new N3.Parser(parserArgs) : new N3.Parser();
-  return new Promise((resolve, reject) => {
-    let quads = [];
-    parser.parse(rdf, (error, quad, prefixes) => {
-      if (error) {
-        reject(error);
-      } else if (quad) {
-        quads.push(quad);
-      } else {
-        // all quads collected
-        resolve({
-          quads,
-          prefixes,
-        });
-      }
-    });
-  });
+won.n3Parse = function(rdf, parserArgs) {
+  const rdfParser = parserArgs ? new N3.Parser(parserArgs) : new N3.Parser();
+  return rdfParser.parse(rdf);
 };
 
 /**
  *
- * @param {string} ttl
+ * @param {string} rdf
  * @param {boolean} prependWonPrefixes
  */
-won.ttlToJsonLd = function(ttl) {
+won.rdfToJsonLd = function(rdf) {
+  const parsedQuads = won.n3Parse(rdf);
   return won
-    .n3Parse(ttl)
-    .then(({ quads }) => won.n3Write(quads, { format: "application/n-quads" }))
+    .n3Write(parsedQuads, { format: "application/n-quads" })
     .then(quadString =>
       jsonld.fromRDF(quadString, { format: "application/n-quads" })
     )
     .catch(e => {
       e.message =
         "error while parsing the following turtle:\n\n" +
-        ttl +
+        rdf +
         "\n\n----\n\n" +
         e.message;
       throw e;
     });
 };
 
-window.ttlToJsonLd4dbg = won.ttlToJsonLd;
+window.rdfToJsonLd4dbg = won.rdfToJsonLd;
 
 /**
  * Like the JSONLD-Helper, an object that wraps a won message and
