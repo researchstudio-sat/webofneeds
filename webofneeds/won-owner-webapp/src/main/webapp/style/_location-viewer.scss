@@ -13,6 +13,15 @@ won-location-viewer {
 
       &__carret {
         @include fixed-square(1rem);
+
+        &--expanded {
+          transform: rotate(-180deg);
+          transition: all linear 0.2s;
+        }
+
+        &--collapsed {
+          transition: all linear 0.2s;
+        }
       }
     }
 

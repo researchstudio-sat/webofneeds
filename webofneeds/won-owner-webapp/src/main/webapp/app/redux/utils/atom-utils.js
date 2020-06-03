@@ -513,20 +513,32 @@ export function getDefaultSocketUri(atomImm) {
 }
 
 export function getHeldByUri(atomImm) {
-  return hasHoldableSocket(atomImm) ? get(atomImm, "heldBy") : undefined;
+  const heldAtomHoldableConnections =
+    hasHoldableSocket(atomImm) &&
+    getConnectedConnections(atomImm, vocab.HOLD.HoldableSocketCompacted);
+  if (heldAtomHoldableConnections && heldAtomHoldableConnections.size === 1) {
+    return get(heldAtomHoldableConnections.first(), "targetAtomUri");
+  } else {
+    return undefined;
+  }
 }
 
 export function isHeld(atomImm) {
   return !!getHeldByUri(atomImm);
 }
 
-export function getHeldAtomUris(atomImm) {
-  return hasHolderSocket(atomImm) && get(atomImm, "holds");
-}
-
-export function hasHeldAtoms(atomImm) {
-  const heldAtomUris = getHeldAtomUris(atomImm);
-  return !!heldAtomUris && heldAtomUris.size > 0;
+export function getGroupMemberUris(atomImm) {
+  const groupMemberConnections = getConnectedConnections(
+    atomImm,
+    vocab.GROUP.GroupSocketCompacted
+  );
+  return (
+    groupMemberConnections &&
+    groupMemberConnections
+      .map(conn => conn.get("targetAtomUri"))
+      .filter(targetAtomUri => !!targetAtomUri)
+      .toSet()
+  );
 }
 
 export function getDefaultSocketWithKeyReset(atomImm) {
@@ -682,4 +694,30 @@ export function hasUnreadNonClosedNonSuggestedChatConnections(atom) {
   return getAllNonClosedNonSuggestedChatConnections(atom).find(conn =>
     connectionUtils.isUnread(conn)
   );
+}
+
+/**
+ * This function checks if the holder of the heldAtom is actually "verified" -> meaning a connected holdable <-> holder connection exists from the heldAtom to the holderAtom
+ * and a connected holder <-> holdable connection exists from the holderAtom to the heldAtom
+ * @param heldAtom
+ * @param holderAtom
+ * @returns {*|boolean}
+ */
+export function isHolderVerified(heldAtom, holderAtom) {
+  const heldByUri = getHeldByUri(heldAtom);
+
+  if (holderAtom && heldByUri === get(holderAtom, "uri")) {
+    const holderAtomHolderConnections = getConnectedConnections(
+      holderAtom,
+      vocab.HOLD.HolderSocketCompacted
+    );
+
+    const connections = holderAtomHolderConnections.filter(
+      conn => get(conn, "targetAtomUri") === get(heldAtom, "uri")
+    );
+
+    return connections && connections.size === 1;
+  }
+
+  return false;
 }

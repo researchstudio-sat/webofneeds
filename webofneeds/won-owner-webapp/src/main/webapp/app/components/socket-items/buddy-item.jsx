@@ -19,7 +19,12 @@ import ico32_buddy_deny from "~/images/won-icons/ico32_buddy_deny.svg";
 import ico32_buddy_waiting from "~/images/won-icons/ico32_buddy_waiting.svg";
 import ico36_message from "~/images/won-icons/ico36_message.svg";
 
-export default function WonBuddyItem({ connection, atom, isOwned }) {
+export default function WonBuddyItem({
+  connection,
+  atom,
+  isOwned,
+  targetAtom,
+}) {
   const atomUri = get(atom, "uri");
 
   const hasBuddySocket = atomUtils.hasBuddySocket(atom);
@@ -217,11 +222,11 @@ export default function WonBuddyItem({ connection, atom, isOwned }) {
     return (
       <div className="si ">
         <WonAtomContextSwipeableView
-          atomUri={get(connection, "targetAtomUri")}
+          atom={targetAtom}
           toLink={generateLink(
             history.location,
             {
-              postUri: get(connection, "targetAtomUri"),
+              postUri: get(targetAtom, "uri"),
             },
             "/post"
           )}
@@ -327,11 +332,11 @@ export default function WonBuddyItem({ connection, atom, isOwned }) {
           <WonAtomContextSwipeableView
             className={headerClassName}
             actionButtons={actionButtons}
-            atomUri={get(connection, "targetAtomUri")}
+            atom={targetAtom}
             toLink={generateLink(
               history.location,
               {
-                postUri: get(connection, "targetAtomUri"),
+                postUri: get(targetAtom, "uri"),
               },
               "/post"
             )}
@@ -345,4 +350,5 @@ WonBuddyItem.propTypes = {
   connection: PropTypes.object.isRequired,
   atom: PropTypes.object.isRequired,
   isOwned: PropTypes.bool.isRequired,
+  targetAtom: PropTypes.object.isRequired,
 };

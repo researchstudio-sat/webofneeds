@@ -18,7 +18,12 @@ import PropTypes from "prop-types";
 import { useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
-export default function WonParticipantItem({ connection, atom, isOwned }) {
+export default function WonParticipantItem({
+  connection,
+  atom,
+  isOwned,
+  targetAtom,
+}) {
   const history = useHistory();
   const dispatch = useDispatch();
   const atomUri = get(atom, "uri");
@@ -258,7 +263,7 @@ export default function WonParticipantItem({ connection, atom, isOwned }) {
             <WonAtomContextSwipeableView
               className={headerClassName}
               actionButtons={actionButtons}
-              atomUri={get(connection, "targetAtomUri")}
+              atom={targetAtom}
               toLink={generateLink(
                 history.location,
                 {
@@ -275,7 +280,7 @@ export default function WonParticipantItem({ connection, atom, isOwned }) {
     return (
       <div className="si">
         <WonAtomContextSwipeableView
-          atomUri={get(connection, "targetAtomUri")}
+          atom={targetAtom}
           toLink={generateLink(
             history.location,
             {
@@ -292,4 +297,5 @@ WonParticipantItem.propTypes = {
   connection: PropTypes.object.isRequired,
   atom: PropTypes.object.isRequired,
   isOwned: PropTypes.bool.isRequired,
+  targetAtom: PropTypes.object.isRequired,
 };

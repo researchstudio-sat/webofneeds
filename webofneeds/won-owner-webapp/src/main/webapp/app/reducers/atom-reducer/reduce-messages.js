@@ -3,7 +3,6 @@ import { markUriAsRead, isUriRead } from "../../won-localstorage.js";
 import { markConnectionAsRead } from "./reduce-connections.js";
 import { addAtomStub } from "./reduce-atoms.js";
 import vocab from "../../service/vocab.js";
-import * as connectionSelectors from "../../redux/selectors/connection-selectors.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import { get, getIn } from "../../utils.js";
@@ -297,7 +296,21 @@ export function addMessage(
         }
       }
 
-      const connections = connectionSelectors.getConnectionsToInjectMsgInto(
+      const getConnectionsToInjectMsgInto = (
+        atomState,
+        targetSocketUri,
+        msgUri
+      ) => {
+        const allConnections =
+          atomState && atomState.flatMap(atom => atom.get("connections"));
+
+        return allConnections
+          .filter(conn => connectionUtils.isConnected(conn))
+          .filter(conn => get(conn, "targetSocketUri") === targetSocketUri)
+          .filter(conn => !get(conn, "messages").contains(msgUri));
+      };
+
+      const connections = getConnectionsToInjectMsgInto(
         state,
         targetSocketUri,
         getIn(parsedMessage, ["data", "uri"])
@@ -1335,24 +1348,12 @@ export function updateMessageStatus(state, messageUri, connectionUri, atomUri) {
   const hasCollapsedMessageState =
     isProposed || isClaimed || isAgreed || isRejected || isRetracted;
 
-  state = markMessageAsCollapsed(
+  return markMessageAsCollapsed(
     state,
     messageUri,
     connectionUri,
     atomUri,
     hasCollapsedMessageState
-  );
-
-  return state.setIn(
-    [
-      atomUri,
-      "connections",
-      connectionUri,
-      "messages",
-      messageUri,
-      "isMessageStatusUpToDate",
-    ],
-    true
   );
 }
 

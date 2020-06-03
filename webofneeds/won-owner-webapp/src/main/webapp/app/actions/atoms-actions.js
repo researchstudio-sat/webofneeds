@@ -16,11 +16,12 @@ import {
   buildCreateMessage,
   buildEditMessage,
 } from "../won-message-utils.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as stateStore from "../redux/state-store.js";
 import * as ownerApi from "../api/owner-api.js";
-import { get, getIn } from "../utils.js";
+import { get } from "../utils.js";
 import { ensureLoggedIn } from "./account-actions.js";
 
 export function fetchUnloadedAtom(atomUri) {
@@ -102,8 +103,8 @@ export function connectSocketTypes(
 ) {
   return (dispatch, getState) => {
     const state = getState();
-    const senderAtom = getIn(state, ["atoms", senderAtomUri]);
-    const targetAtom = getIn(state, ["atoms", targetAtomUri]);
+    const senderAtom = generalSelectors.getAtom(senderAtomUri)(state);
+    const targetAtom = generalSelectors.getAtom(targetAtomUri)(state);
 
     const senderSocketUri = atomUtils.getSocketUri(
       senderAtom,
@@ -258,10 +259,9 @@ export function deleteAtom(atomUri) {
 
 export function edit(draft, oldAtom, callback) {
   return (dispatch, getState) => {
-    return ensureLoggedIn(dispatch, getState).then(async () => {
-      const { message, atomUri } = await buildEditMessage(draft, oldAtom);
-
-      ownerApi.sendMessage(message).then(jsonResp => {
+    return ensureLoggedIn(dispatch, getState).then(() => {
+      const { message, atomUri } = buildEditMessage(draft, oldAtom);
+      return ownerApi.sendMessage(message).then(jsonResp => {
         dispatch({
           type: actionTypes.atoms.edit,
           payload: {
@@ -283,13 +283,13 @@ export function create(draft, personaUri, nodeUri) {
     const state = getState();
 
     if (!nodeUri) {
-      nodeUri = getIn(state, ["config", "defaultNodeUri"]);
+      nodeUri = generalSelectors.getDefaultNodeUri(state);
     }
 
-    return ensureLoggedIn(dispatch, getState).then(async () => {
-      const { message, atomUri } = await buildCreateMessage(draft, nodeUri);
+    return ensureLoggedIn(dispatch, getState).then(() => {
+      const { message, atomUri } = buildCreateMessage(draft, nodeUri);
 
-      ownerApi
+      return ownerApi
         .sendMessage(message)
         .then(jsonResp => {
           dispatch({
@@ -303,7 +303,7 @@ export function create(draft, personaUri, nodeUri) {
           });
         })
         .then(() => {
-          const persona = getIn(state, ["atoms", personaUri]);
+          const persona = generalSelectors.getAtom(personaUri)(state);
           if (persona) {
             const senderSocketUri = atomUtils.getSocketUri(
               persona,

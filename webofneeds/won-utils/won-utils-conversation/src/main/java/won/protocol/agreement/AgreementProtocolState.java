@@ -109,6 +109,10 @@ public class AgreementProtocolState {
         return uris;
     }
 
+    public Dataset getAgreementProtocolDataset() {
+        return AgreementProtocolState.of(this.conversation).getAgreements();
+    }
+
     public Dataset getConversationDataset() {
         return this.conversation;
     }

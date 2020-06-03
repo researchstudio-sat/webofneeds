@@ -204,26 +204,12 @@ import { Generator } from "sparqljs";
     if (args.content) {
       contentGraph = addContent(contentGraph, args.content);
     }
-    const graph = [
-      contentGraph,
-      //, <if _hasModalities> {... (see directly below) } </if>
-      seeksContentNode,
-      ...(args.content && args.content.arbitraryJsonLd
-        ? args.content.arbitraryJsonLd
-        : []),
-      ...(args.seeks && args.seeks.arbitraryJsonLd
-        ? args.seeks.arbitraryJsonLd
-        : []),
-    ];
+    const graph = [contentGraph, seeksContentNode];
 
     return {
       "@graph": graph,
       "@context": {
         ...won.defaultContext, // needed for the arbitrary rdf
-        //TODO probably an alias instead of an type declaration as it's intended here
-        "won:currency": "xsd:string",
-        "won:lowerPriceLimit": "xsd:float",
-        "won:upperPriceLimit": "xsd:float",
       },
     };
   };

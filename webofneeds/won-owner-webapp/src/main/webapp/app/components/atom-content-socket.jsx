@@ -27,7 +27,7 @@ export default function WonAtomContentSocket({
   suggestPicker,
 }) {
   const dispatch = useDispatch();
-  const accountState = useSelector(state => get(state, "account"));
+  const accountState = useSelector(generalSelectors.getAccountState);
   const isAtomOwned = accountUtils.isAtomOwned(accountState, get(atom, "uri"));
 
   const [showRequestReceived, toggleRequestReceived] = useState(false);
@@ -37,7 +37,7 @@ export default function WonAtomContentSocket({
   const [showSuggestAtomExpanded, toggleSuggestAtomExpanded] = useState(false);
   const [searchText, setSearchText] = useState({ value: "" });
 
-  const storedAtoms = useSelector(state => generalSelectors.getAtoms(state));
+  const storedAtoms = useSelector(generalSelectors.getAtoms);
 
   const allAtomConnections = atomUtils.getConnections(atom, socketType);
 
@@ -79,7 +79,12 @@ export default function WonAtomContentSocket({
 
     return connectionsArray.map((conn, index) => (
       <React.Fragment key={get(conn, "uri") + "-" + index}>
-        <ItemComponent connection={conn} atom={atom} isOwned={isAtomOwned} />
+        <ItemComponent
+          connection={conn}
+          atom={atom}
+          targetAtom={get(storedAtoms, get(conn, "targetAtomUri"))}
+          isOwned={isAtomOwned}
+        />
       </React.Fragment>
     ));
   }

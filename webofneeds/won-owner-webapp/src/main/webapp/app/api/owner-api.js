@@ -1,8 +1,13 @@
 import urljoin from "url-join";
 import { ownerBaseUrl } from "~/config/default.js";
 import * as wonUtils from "../won-utils.js";
-import { generateQueryParamsString } from "../utils.js";
+import {
+  generateQueryParamsString,
+  parseHeaderLinks,
+  getLinkAndParams,
+} from "../utils.js";
 import vocab from "../service/vocab.js";
+import * as N3 from "n3";
 // import { bestfetch } from "bestfetch";
 
 /**
@@ -401,7 +406,7 @@ export function getAllActiveMetaPersonas() {
   );
 }
 
-export function getJsonLdDataset(uri, params = {}) {
+export function getJsonLdDataset(uri, params = {}, includeLinkHeader = false) {
   /**
    * This function is used to generate the query-strings.
    * Should anything about the way the API is accessed changed,
@@ -425,6 +430,7 @@ export function getJsonLdDataset(uri, params = {}) {
    *         * "timeof",
    *         * "deep"
    *         * "state"
+   * @param includeLinkHeader if set to true, the response will be a json object of the json response and a link to the next page (if not present, the link will be undefined)
    * @returns {string}
    */
   /**
@@ -472,9 +478,9 @@ export function getJsonLdDataset(uri, params = {}) {
         if (
           (response.status >= 200 && response.status < 300) ||
           response.status === 304
-        )
+        ) {
           return response;
-        else {
+        } else {
           let error = new Error(
             `${response.status} - ${
               response.statusText
@@ -486,7 +492,27 @@ export function getJsonLdDataset(uri, params = {}) {
         }
       })
       //.then(dataset => dataset.data);
-      .then(dataset => dataset.json())
+      .then(response => {
+        if (includeLinkHeader) {
+          const linkHeaderString =
+            response.headers && response.headers.get("Link");
+          const linkHeaders = parseHeaderLinks(linkHeaderString);
+
+          const nextPageLinkObject =
+            linkHeaders &&
+            linkHeaders.next &&
+            getLinkAndParams(linkHeaders.next);
+          return Promise.all([
+            response.json(),
+            Promise.resolve(nextPageLinkObject),
+          ]).then(([jsonLdData, nextPage]) => ({
+            jsonLdData: jsonLdData,
+            nextPage: nextPage,
+          }));
+        } else {
+          return response.json();
+        }
+      })
   );
 }
 
@@ -615,6 +641,40 @@ export function getAgreementProtocolUris(connectionUri) {
   })
     .then(checkHttpStatus)
     .then(response => response.json());
+}
+
+export async function getAgreementProtocolDataset(connectionUri) {
+  const url = urljoin(
+    ownerBaseUrl,
+    "/rest/agreement/getAgreementProtocolDataset",
+    `?connectionUri=${connectionUri}`
+  );
+
+  let response = await fetch(url, {
+    method: "get",
+    headers: {
+      Accept: "application/trig",
+      "Content-Type": "application/trig",
+    },
+    credentials: "include",
+  });
+  response = await checkHttpStatus(response);
+  response = await response.text();
+  const writer = new N3.Writer({ format: "application/trig" });
+  const trigParser = new N3.Parser({ format: "application/trig" });
+  const data = await trigParser.parse(response, (error, quad, prefixes) => {
+    if (quad) {
+      console.log(quad);
+      writer.addQuad(quad);
+    } else {
+      console.log("# That's all, folks", prefixes, error ? error : "");
+      writer.end((error, result) => {
+        console.log(result, error ? error : "");
+        return result;
+      });
+    }
+  });
+  return data ? data : "";
 }
 
 export function getPetriNetUris(connectionUri) {

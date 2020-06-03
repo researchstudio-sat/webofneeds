@@ -7,52 +7,61 @@ import {
 } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
-import { connect } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 import PropTypes from "prop-types";
 
 import "~/style/_petrinet-state.scss";
 import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
-import { withRouter } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
-const mapStateToProps = (state, ownProps) => {
-  const { connectionUri } = getQueryParams(ownProps.location); //TODO: create selector that returns the correct connectionUri without looking up the open one
-  const atom =
-    connectionUri &&
-    generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri);
-  const connection = atom && atom.getIn(["connections", connectionUri]);
+export default function WonPetrinetState({ processUri, className }) {
+  const history = useHistory();
+  const dispatch = useDispatch();
+
+  const { connectionUri } = getQueryParams(history.location); //TODO: create selector that returns the correct connectionUri without looking up the open one
+  const atom = useSelector(
+    generalSelectors.getOwnedAtomByConnectionUri(connectionUri)
+  );
+  const connection = getIn(atom, ["connections", connectionUri]);
 
   const petriNetData = get(connection, "petriNetData");
 
-  const process = ownProps.processUri && get(petriNetData, ownProps.processUri);
+  const process = processUri && get(petriNetData, processUri);
 
-  const petriNetDataLoading =
-    connection &&
-    getIn(state, [
-      "process",
-      "connections",
-      connectionUri,
-      "petriNetData",
-      "loading",
-    ]);
-  const petriNetDataLoaded =
-    petriNetData &&
-    getIn(state, [
-      "process",
-      "connections",
-      connectionUri,
-      "petriNetData",
-      "loaded",
-    ]);
-  const petriNetDataDirty =
-    petriNetData &&
-    getIn(state, [
-      "process",
-      "connections",
-      connectionUri,
-      "petriNetData",
-      "dirty",
-    ]);
+  const petriNetDataLoading = useSelector(
+    state =>
+      connection &&
+      getIn(state, [
+        "process",
+        "connections",
+        connectionUri,
+        "petriNetData",
+        "loading",
+      ])
+  );
+  const petriNetDataLoaded = useSelector(
+    state =>
+      petriNetData &&
+      getIn(state, [
+        "process",
+        "connections",
+        connectionUri,
+        "petriNetData",
+        "loaded",
+      ])
+  );
+  const petriNetDataDirty = useSelector(
+    state =>
+      petriNetData &&
+      getIn(state, [
+        "process",
+        "connections",
+        connectionUri,
+        "petriNetData",
+        "dirty",
+      ])
+  );
   const markedPlaces = get(process, "markedPlaces");
   const enabledTransitions = get(process, "enabledTransitions");
 
@@ -61,33 +70,25 @@ const mapStateToProps = (state, ownProps) => {
     ? enabledTransitions.size
     : 0;
 
-  return {
-    className: ownProps.className,
-    processUri: ownProps.processUri,
-    connection: connection,
-    connectionUri: connectionUri,
-    multiSelectType: get(connection, "multiSelectType"),
-    petriNetData: petriNetData,
-    process: process,
-    hasEnabledTransitions: enabledTransitionsSize > 0,
-    hasMarkedPlaces: markedPlacesSize > 0,
-    enabledTransitionsArray: enabledTransitions && enabledTransitions.toArray(),
-    markedPlacesArray: markedPlaces && markedPlaces.toArray(),
-    petriNetDataDirty: petriNetDataDirty,
-    petriNetDataLoading: petriNetDataLoading,
-    petriNetDataLoaded: petriNetDataLoaded,
-  };
-};
+  const multiSelectType = get(connection, "multiSelectType");
+  const hasEnabledTransitions = enabledTransitionsSize > 0;
+  const hasMarkedPlaces = markedPlacesSize > 0;
+  const enabledTransitionsArray =
+    enabledTransitions && enabledTransitions.toArray();
+  const markedPlacesArray = markedPlaces && markedPlaces.toArray();
 
-const mapDispatchToProps = dispatch => {
-  return {
-    sendChatMessageClaimOnSuccess: (
-      processUri,
-      transitionUri,
-      senderSocketUri,
-      targetSocketUri,
-      connectionUri
-    ) => {
+  function sendClaim(transitionUri) {
+    if (transitionUri && processUri && connectionUri) {
+      console.debug(
+        "send transition 'claim' ",
+        transitionUri,
+        " for processUri: ",
+        processUri
+      );
+
+      const senderSocketUri = get(connection, "socketUri");
+      const targetSocketUri = get(connection, "targetSocketUri");
+
       dispatch(
         actionCreators.connections__sendChatMessageClaimOnSuccess(
           undefined,
@@ -100,160 +101,105 @@ const mapDispatchToProps = dispatch => {
           connectionUri
         )
       );
-    },
-  };
-};
+    }
+  }
 
-class WonPetrinetState extends React.Component {
-  render() {
-    const petrinetStateLoadingElement = this.props.petriNetDataLoaded &&
-      (this.props.petriNetDataLoading || this.props.petriNetDataDirty) && (
-        <div className="ps__loading">
-          <svg className="ps__loading__spinner">
-            <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
-          </svg>
-          <div className="ps__loading__label">
-            The PetriNet-State, is currently being calculated
-          </div>
+  const petrinetStateLoadingElement = petriNetDataLoaded &&
+    (petriNetDataLoading || petriNetDataDirty) && (
+      <div className="ps__loading">
+        <svg className="ps__loading__spinner">
+          <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
+        </svg>
+        <div className="ps__loading__label">
+          The PetriNet-State, is currently being calculated
         </div>
-      );
+      </div>
+    );
 
-    const petrinetInactiveElement = !this.props.process &&
-      !this.props.petriNetDataLoading &&
-      this.props.petriNetDataLoaded && (
-        <div className="ps__inactive">This PetriNet, is not active (yet).</div>
-      );
+  const petrinetInactiveElement = !process &&
+    !petriNetDataLoading &&
+    petriNetDataLoaded && (
+      <div className="ps__inactive">This PetriNet, is not active (yet).</div>
+    );
 
-    let petrinetActiveElement;
+  let petrinetActiveElement;
 
-    if (
-      this.props.process &&
-      (this.props.petriNetDataLoaded || !this.props.petriNetDataLoading)
-    ) {
-      let markedPlacesElement;
+  if (process && (petriNetDataLoaded || !petriNetDataLoading)) {
+    let markedPlacesElement;
 
-      if (this.props.hasMarkedPlaces) {
-        markedPlacesElement = this.props.markedPlacesArray.map(
-          (markedPlace, index) => {
-            return (
-              <div
-                className="ps__active__markedPlace"
-                key={index + "-" + markedPlace}
-              >
-                {generateSimpleTransitionLabel(markedPlace)}
-              </div>
-            );
-          }
-        );
-      } else {
-        markedPlacesElement = (
-          <div className="ps__active__noMarkedPlace">
-            No Marked Places in PetriNet
+    if (hasMarkedPlaces) {
+      markedPlacesElement = markedPlacesArray.map((markedPlace, index) => {
+        return (
+          <div
+            className="ps__active__markedPlace"
+            key={index + "-" + markedPlace}
+          >
+            {generateSimpleTransitionLabel(markedPlace)}
           </div>
         );
-      }
-
-      let enabledTransitionsElement;
-
-      if (this.props.hasEnabledTransitions) {
-        enabledTransitionsElement = this.props.enabledTransitionsArray.map(
-          (enabledTransition, index) => {
-            return (
-              <div
-                className="ps__active__enabledTransition"
-                key={index + "-" + enabledTransition}
-              >
-                <div className="ps__active__enabledTransition__label">
-                  {generateSimpleTransitionLabel(enabledTransition)}
-                </div>
-                {/*The button is labelled 'send' at the moment because we jsut send the transition but not claim it right away*/}
-                <button
-                  className="ps__active__enabledTransition__button won-button--filled thin red"
-                  disabled={
-                    this.props.multiSelectType || this.props.petriNetDataDirty
-                  }
-                  onClick={() => {
-                    this.sendClaim(enabledTransition);
-                  }}
-                >
-                  Claim
-                </button>
-              </div>
-            );
-          }
-        );
-      } else {
-        enabledTransitionsElement = (
-          <div className="ps__active__noEnabledTransition">
-            No Enabled Transitions in PetriNet
-          </div>
-        );
-      }
-
-      petrinetActiveElement = (
-        <div className="ps__active">
-          <div className="ps__active__header">Marked Places</div>
-          {markedPlacesElement}
-          <div className="ps__active__header">Enabled Transitions</div>
-          {enabledTransitionsElement}
+      });
+    } else {
+      markedPlacesElement = (
+        <div className="ps__active__noMarkedPlace">
+          No Marked Places in PetriNet
         </div>
       );
     }
 
-    return (
-      <won-petrinet-state
-        class={this.props.className ? this.props.className : ""}
-      >
-        {petrinetActiveElement}
-        {petrinetInactiveElement}
-        {petrinetStateLoadingElement}
-      </won-petrinet-state>
+    let enabledTransitionsElement;
+
+    if (hasEnabledTransitions) {
+      enabledTransitionsElement = enabledTransitionsArray.map(
+        (enabledTransition, index) => {
+          return (
+            <div
+              className="ps__active__enabledTransition"
+              key={index + "-" + enabledTransition}
+            >
+              <div className="ps__active__enabledTransition__label">
+                {generateSimpleTransitionLabel(enabledTransition)}
+              </div>
+              {/*The button is labelled 'send' at the moment because we jsut send the transition but not claim it right away*/}
+              <button
+                className="ps__active__enabledTransition__button won-button--filled thin red"
+                disabled={multiSelectType || petriNetDataDirty}
+                onClick={() => {
+                  sendClaim(enabledTransition);
+                }}
+              >
+                Claim
+              </button>
+            </div>
+          );
+        }
+      );
+    } else {
+      enabledTransitionsElement = (
+        <div className="ps__active__noEnabledTransition">
+          No Enabled Transitions in PetriNet
+        </div>
+      );
+    }
+
+    petrinetActiveElement = (
+      <div className="ps__active">
+        <div className="ps__active__header">Marked Places</div>
+        {markedPlacesElement}
+        <div className="ps__active__header">Enabled Transitions</div>
+        {enabledTransitionsElement}
+      </div>
     );
   }
 
-  sendClaim(transitionUri) {
-    if (transitionUri && this.props.processUri && this.props.connectionUri) {
-      console.debug(
-        "send transition 'claim' ",
-        transitionUri,
-        " for processUri: ",
-        this.props.processUri
-      );
-
-      const senderSocketUri = get(this.props.connection, "socketUri");
-      const targetSocketUri = get(this.props.connection, "targetSocketUri");
-
-      this.props.sendChatMessageClaimOnSuccess(
-        this.props.processUri,
-        transitionUri,
-        senderSocketUri,
-        targetSocketUri,
-        this.props.connectionUri
-      );
-    }
-  }
+  return (
+    <won-petrinet-state class={className ? className : ""}>
+      {petrinetActiveElement}
+      {petrinetInactiveElement}
+      {petrinetStateLoadingElement}
+    </won-petrinet-state>
+  );
 }
 WonPetrinetState.propTypes = {
   processUri: PropTypes.string.isRequired,
   className: PropTypes.string,
-  connection: PropTypes.object,
-  connectionUri: PropTypes.string,
-  multiSelectType: PropTypes.string,
-  petriNetData: PropTypes.object,
-  process: PropTypes.object,
-  hasEnabledTransitions: PropTypes.bool,
-  hasMarkedPlaces: PropTypes.bool,
-  enabledTransitionsArray: PropTypes.array,
-  markedPlacesArray: PropTypes.array,
-  petriNetDataDirty: PropTypes.bool,
-  petriNetDataLoading: PropTypes.bool,
-  petriNetDataLoaded: PropTypes.bool,
-  sendChatMessageClaimOnSuccess: PropTypes.func,
 };
-
-export default withRouter(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(WonPetrinetState)
-);

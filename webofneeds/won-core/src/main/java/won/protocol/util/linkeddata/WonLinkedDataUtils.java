@@ -410,25 +410,7 @@ public class WonLinkedDataUtils {
         pmap.setNsPrefix("msg", WONMSG.getURI());
         propertyPaths.add(PathParser.parse("won:messageContainer", pmap));
         propertyPaths.add(PathParser.parse("won:messageContainer/rdfs:member", pmap));
-        propertyPaths.add(PathParser.parse("won:messageContainer/rdfs:member/msg:correspondingRemoteMessage", pmap));
         propertyPaths.add(PathParser.parse("won:messageContainer/rdfs:member/msg:previousMessage", pmap));
-        propertyPaths.add(PathParser.parse("won:sourceAtom", pmap));
-        propertyPaths.add(PathParser.parse("won:sourceAtom/won:messageContainer", pmap));
-        propertyPaths.add(PathParser.parse("won:sourceAtom/won:messageContainer/rdfs:member", pmap));
-        propertyPaths.add(
-                        PathParser.parse("won:sourceAtom/won:messageContainer/rdfs:member/msg:previousMessage", pmap));
-        propertyPaths.add(PathParser.parse("won:targetAtom", pmap));
-        propertyPaths.add(PathParser.parse("won:targetAtom/won:messageContainer", pmap));
-        propertyPaths.add(PathParser.parse("won:targetAtom/won:messageContainer/rdfs:member", pmap));
-        propertyPaths.add(
-                        PathParser.parse("won:targetAtom/won:messageContainer/rdfs:member/msg:previousMessage", pmap));
-        propertyPaths.add(PathParser.parse("won:targetConnection", pmap));
-        propertyPaths.add(PathParser.parse("won:targetConnection/won:messageContainer", pmap));
-        propertyPaths.add(PathParser.parse("won:targetConnection/won:messageContainer/rdfs:member", pmap));
-        propertyPaths.add(PathParser.parse(
-                        "won:targetConnection/won:messageContainer/rdfs:member/msg:correspondingRemoteMessage", pmap));
-        propertyPaths.add(PathParser.parse("won:targetConnection/won:messageContainer/rdfs:member/msg:previousMessage",
-                        pmap));
         URI requesterWebId = WonLinkedDataUtils.getAtomURIforConnectionURI(connectionURI, linkedDataSource);
         return linkedDataSource.getDataForResourceWithPropertyPath(connectionURI, requesterWebId, propertyPaths,
                         maxRequests, depth);

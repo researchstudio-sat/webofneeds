@@ -2,6 +2,15 @@ import { deepFreeze, isValidNumber } from "./utils.js";
 import Immutable from "immutable";
 import vocab from "./service/vocab.js";
 
+export const rdfTextfieldHelpText =
+  "Expects valid turtle. " +
+  `<${vocab.WONMSG.uriPlaceholder.event}> will ` +
+  "be replaced by the uri generated for this message. " +
+  "Use it, so your TTL can be found when parsing the messages. " +
+  "See `won.defaultTurtlePrefixes` " +
+  "for prefixes that will be added automatically. E.g." +
+  `\`<${vocab.WONMSG.uriPlaceholder.event}> con:text "hello world!". \``;
+
 export const labels = deepFreeze({
   connectionState: {
     [vocab.WON.Suggested]: "Conversation suggested.",

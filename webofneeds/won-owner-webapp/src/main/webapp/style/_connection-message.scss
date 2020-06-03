@@ -116,9 +116,9 @@ won-connection-message {
       }
     }
   }
-  &.won-is-proposed:not(.won-is-collapsed),
-  &.won-is-claimed:not(.won-is-collapsed),
-  &.won-is-agreed:not(.won-is-collapsed) {
+  &.won-is-proposed:not(.won-is-collapsed):not(.won-is-collapsible),
+  &.won-is-claimed:not(.won-is-collapsed):not(.won-is-collapsible),
+  &.won-is-agreed:not(.won-is-collapsed):not(.won-is-collapsible) {
     opacity: 0.5;
     border: $thinGrayBorder;
   }
@@ -160,7 +160,17 @@ won-connection-message {
 
       &__carret {
         padding: 0.5rem;
-        svg {
+
+        &--expanded > svg {
+          transform: rotate(-180deg);
+          transition: all linear 0.2s;
+        }
+
+        &--collapsed > svg {
+          transition: all linear 0.2s;
+        }
+
+        > svg {
           @include fixed-square(1rem); // visually center icon on line
         }
       }

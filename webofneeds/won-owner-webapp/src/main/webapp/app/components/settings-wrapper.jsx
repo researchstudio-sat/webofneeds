@@ -5,10 +5,10 @@ import React from "react";
 import ElmComponent from "react-elm-components";
 import { ReactReduxContext } from "react-redux";
 import * as accountUtils from "../redux/utils/account-utils.js";
-import { get, getIn } from "../utils";
+import { get } from "../utils";
 import { Elm } from "../../elm/Settings.elm";
 
-import { currentSkin } from "../redux/selectors/general-selectors.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 
 class WonSettingsWrapper extends React.Component {
   componentWillUnmount() {
@@ -22,7 +22,7 @@ class WonSettingsWrapper extends React.Component {
       <ElmComponent
         src={Elm.Settings}
         flags={{
-          skin: currentSkin(),
+          skin: generalSelectors.currentSkin(),
           flags: { width: window.innerWidth, height: window.innerHeight },
         }}
         ports={this.setupPorts.bind(this)}
@@ -57,11 +57,11 @@ class WonSettingsWrapper extends React.Component {
     const selectSkinFromState = () => {
       skinPseudoComponent();
       return {
-        skin: getIn(getState(), ["config", "theme"]),
+        skin: generalSelectors.getTheme(getState()),
       };
     };
     const skinPseudoComponent = () => {
-      ports.skin.send(currentSkin());
+      ports.skin.send(generalSelectors.currentSkin());
     };
     const disconnectSkinPort = subscribe(selectSkinFromState);
 

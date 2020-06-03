@@ -2,7 +2,6 @@ import { generateIdString, get, getIn } from "../utils";
 import vocab from "../service/vocab.js";
 import { actionTypes } from "./actions";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
-import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import {
   buildCloseMessage,
   buildConnectMessage,
@@ -78,8 +77,8 @@ export function connectPersona(atomUri, personaUri) {
 export function disconnectPersona(atomUri, personaUri) {
   return (dispatch, getState) => {
     const state = getState();
-    const persona = getIn(state, ["atoms", personaUri]);
-    const atom = getIn(state, ["atoms", atomUri]);
+    const persona = generalSelectors.getAtom(personaUri)(state);
+    const atom = generalSelectors.getAtom(atomUri)(state);
 
     const connection = get(persona, "connections").find(conn => {
       const socketUri = get(conn, "targetSocketUri");
@@ -112,21 +111,19 @@ export function disconnectPersona(atomUri, personaUri) {
 export function reviewPersona(reviewableConnectionUri, review) {
   return (dispatch, getState) => {
     const state = getState();
-    const connection = connectionSelectors.getOwnedConnectionByUri(
-      state,
-      reviewableConnectionUri
-    );
-
     const ownAtom = generalSelectors.getOwnedAtomByConnectionUri(
-      state,
       reviewableConnectionUri
-    );
+    )(state);
+    const connection =
+      reviewableConnectionUri &&
+      getIn(ownAtom, ["connections", reviewableConnectionUri]);
+
     const foreignAtomUri = get(connection, "targetAtomUri");
-    const foreignAtom = getIn(state, ["atoms", foreignAtomUri]);
+    const foreignAtom = generalSelectors.getAtom(foreignAtomUri)(state);
 
     const getPersona = atom => {
       const personaUri = atomUtils.getHeldByUri(atom);
-      const persona = getIn(state, ["atoms", personaUri]);
+      const persona = generalSelectors.getAtom(personaUri)(state);
 
       return persona;
     };

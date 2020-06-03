@@ -4,7 +4,7 @@
 import Immutable from "immutable";
 import { details, abstractDetails } from "../detail-definitions.js";
 
-import { is, isValidNumber } from "../../app/utils.js";
+import { is, isValidNumber, get } from "../../app/utils.js";
 import won from "../../app/won-es6.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import ico36_detail_floorsize from "../../images/won-icons/ico36_detail_floorsize.svg";
@@ -162,8 +162,8 @@ export const realEstateNumberOfRoomsRangeDetail = {
 
     if (minNumberOfRooms || maxNumberOfRooms) {
       return Immutable.fromJS({
-        min: minNumberOfRooms,
-        max: maxNumberOfRooms,
+        min: get(minNumberOfRooms, "@value"),
+        max: get(maxNumberOfRooms, "@value"),
       });
     } else {
       return undefined;
@@ -238,8 +238,8 @@ export const realEstateFloorSizeRangeDetail = {
 
     if (minFloorSize || maxFloorSize) {
       return Immutable.fromJS({
-        min: minFloorSize && minFloorSize + "m²",
-        max: maxFloorSize && maxFloorSize + "m²",
+        min: get(minFloorSize, "@value"),
+        max: get(maxFloorSize, "@value"),
       });
     } else {
       return undefined;

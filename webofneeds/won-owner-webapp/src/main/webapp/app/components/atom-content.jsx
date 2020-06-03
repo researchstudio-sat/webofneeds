@@ -36,9 +36,7 @@ export default function WonAtomContent({ atom, defaultTab }) {
   const atomUri = get(atom, "uri");
   const { connectionUri } = getQueryParams(history.location);
   const openConnectionUri = connectionUri;
-  const isOwned = useSelector(state =>
-    generalSelectors.isAtomOwned(state, atomUri)
-  );
+  const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
   const isActive = atomUtils.isActive(atom);
   const content = get(atom, "content");
 
@@ -63,8 +61,8 @@ export default function WonAtomContent({ atom, defaultTab }) {
   const hasContent = hasVisibleDetails(content);
   const hasSeeksBranch = hasVisibleDetails(seeks);
 
-  const viewState = useSelector(state => get(state, "view"));
-  const process = useSelector(state => get(state, "process"));
+  const viewState = useSelector(generalSelectors.getViewState);
+  const process = useSelector(generalSelectors.getProcessState);
 
   const isHeld = atomUtils.isHeld(atom);
   const hasHoldableSocket = atomUtils.hasHoldableSocket(atom);
@@ -79,9 +77,7 @@ export default function WonAtomContent({ atom, defaultTab }) {
     atomUri,
     defaultTab
   );
-  const personas = useSelector(state =>
-    generalSelectors.getOwnedCondensedPersonaList(state)
-  );
+  const personas = useSelector(generalSelectors.getOwnedCondensedPersonaList);
 
   function tryReload() {
     if (atomUri && atomFailedToLoad) {
@@ -149,17 +145,17 @@ export default function WonAtomContent({ atom, defaultTab }) {
       case "DETAIL":
         visibleTabFragment = (
           <React.Fragment>
-            <WonAtomContentGeneral atomUri={atomUri} />
+            <WonAtomContentGeneral atom={atom} />
 
             {hasContent && (
-              <WonAtomContentDetails atomUri={atomUri} branch="content" />
+              <WonAtomContentDetails atom={atom} branch="content" />
             )}
             {hasContent &&
               hasSeeksBranch && (
                 <WonLabelledHr label="Search" className="cp__labelledhr" />
               )}
             {hasSeeksBranch && (
-              <WonAtomContentDetails atomUri={atomUri} branch="seeks" />
+              <WonAtomContentDetails atom={atom} branch="seeks" />
             )}
           </React.Fragment>
         );

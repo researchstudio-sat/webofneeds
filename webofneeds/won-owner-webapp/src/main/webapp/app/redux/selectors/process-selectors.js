@@ -1,12 +1,14 @@
 /**
  * Created by quasarchimaere on 21.01.2019.
  */
-import { get, getIn } from "../../utils.js";
+import { get } from "../../utils.js";
 import * as processUtils from "../utils/process-utils.js";
-
 import { createSelector } from "reselect";
 
-export const getProcessState = state => get(state, "process");
+const getProcessState = createSelector(
+  state => get(state, "process"),
+  state => state
+);
 
 /**
  * Check if anything in the state sub-map of process is currently marked as loading
@@ -28,8 +30,8 @@ export const isLoading = createSelector(
     processUtils.isProcessingResendVerificationEmail(process) ||
     processUtils.isProcessingSendAnonymousLinkEmail(process) ||
     processUtils.isAnyAtomLoading(process) ||
-    processUtils.isAnyConnectionLoading(process, true) ||
-    processUtils.isAnyMessageLoading(process)
+    processUtils.isAnyConnectionLoadingMessages(process) ||
+    processUtils.isAnyConnectionLoading(process, true)
 );
 
 export const isProcessingWhatsNew = createSelector(getProcessState, process =>
@@ -60,17 +62,7 @@ export const isProcessingSendAnonymousLinkEmail = createSelector(
   process => processUtils.isProcessingSendAnonymousLinkEmail(process)
 );
 
-export function isAtomLoading(state, atomUri) {
-  return processUtils.isAtomLoading(getProcessState(state), atomUri);
-}
-
-export function isAtomToLoad(state, atomUri) {
-  return (
-    !getIn(state, ["atoms", atomUri]) ||
-    processUtils.isAtomToLoad(getProcessState(state), atomUri)
+export const isAtomLoading = atomUri =>
+  createSelector(getProcessState, processState =>
+    processUtils.isAtomLoading(processState, atomUri)
   );
-}
-
-export function hasAtomFailedToLoad(state, atomUri) {
-  return processUtils.hasAtomFailedToLoad(getProcessState(state), atomUri);
-}

@@ -3,37 +3,32 @@
  */
 import React from "react";
 import { actionCreators } from "../../actions/actions.js";
-import { connect } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import PropTypes from "prop-types";
-import { getOwnedAtomByConnectionUri } from "../../redux/selectors/general-selectors.js";
 import { get, getIn } from "../../utils.js";
-import Immutable from "immutable";
 import * as ownerApi from "../../api/owner-api";
 import won from "../../won-es6";
 import WonCombinedMessageContent from "./combined-message-content.jsx";
 
 import "~/style/_referenced-message-content.scss";
-import ico16_arrow_up from "~/images/won-icons/ico16_arrow_up.svg";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 
-const mapStateToProps = (state, ownProps) => {
-  const ownedAtom =
-    ownProps.connectionUri &&
-    getOwnedAtomByConnectionUri(state, ownProps.connectionUri);
-  const connection = getIn(ownedAtom, ["connections", ownProps.connectionUri]);
-  const message =
-    connection && ownProps.messageUri
-      ? getIn(connection, ["messages", ownProps.messageUri])
-      : Immutable.Map();
-
+export default function WonReferencedMessageContent({
+  message,
+  connection,
+  senderAtom,
+  allAtoms,
+  ownedConnections,
+  originatorAtom,
+}) {
+  const dispatch = useDispatch();
   const expandedReferences = getIn(message, [
     "viewState",
     "expandedReferences",
   ]);
 
   const chatMessages = get(connection, "messages");
-
   const references = get(message, "references");
 
   const rejectUris = get(references, "rejects");
@@ -43,596 +38,154 @@ const mapStateToProps = (state, ownProps) => {
   const acceptUris = get(references, "accepts");
   const forwardUris = get(references, "forwards");
   const claimUris = get(references, "claims");
+  const senderAtomUri = get(senderAtom, "uri");
+  const multiSelectType = get(connection, "multiSelectType");
 
-  const acceptUrisSize = acceptUris ? acceptUris.size : 0;
-  const proposeUrisSize = proposeUris ? proposeUris.size : 0;
-  const proposeToCancelUrisSize = proposeToCancelUris
-    ? proposeToCancelUris.size
-    : 0;
-  const rejectUrisSize = rejectUris ? rejectUris.size : 0;
-  const retractUrisSize = retractUris ? retractUris.size : 0;
-  const forwardUrisSize = forwardUris ? forwardUris.size : 0;
-  const claimUrisSize = claimUris ? claimUris.size : 0;
+  function toggleReferenceExpansion(reference) {
+    if (message && !multiSelectType) {
+      const currentExpansionState = get(expandedReferences, reference);
 
-  return {
-    connectionUri: ownProps.connectionUri,
-    messageUri: ownProps.messageUri,
-    ownedAtomUri: get(ownedAtom, "uri"),
-    message,
-    chatMessages: chatMessages,
-    connection,
-    acceptUrisSize,
-    proposeUrisSize,
-    proposeToCancelUrisSize,
-    rejectUrisSize,
-    retractUrisSize,
-    forwardUrisSize,
-    claimUrisSize,
-    expandedReferences,
-    hasProposeUris: proposeUrisSize > 0,
-    hasAcceptUris: acceptUrisSize > 0,
-    hasProposeToCancelUris: proposeToCancelUrisSize > 0,
-    hasRetractUris: retractUrisSize > 0,
-    hasRejectUris: rejectUrisSize > 0,
-    hasForwardUris: forwardUrisSize > 0,
-    hasClaimUris: claimUrisSize > 0,
-    proposeUrisArray: proposeUris && Array.from(proposeUris.toSet()),
-    retractUrisArray: retractUris && Array.from(retractUris.toSet()),
-    rejectUrisArray: rejectUris && Array.from(rejectUris.toSet()),
-    forwardUrisArray: forwardUris && Array.from(forwardUris.toSet()),
-    proposeToCancelUrisArray:
-      proposeToCancelUris && Array.from(proposeToCancelUris.toSet()),
-    acceptUrisArray: acceptUris && Array.from(acceptUris.toSet()),
-    claimUrisArray: claimUris && Array.from(claimUris.toSet()),
-    hasContent: get(message, "hasContent"),
-    hasNotBeenLoaded: !message,
-    multiSelectType: get(connection, "multiSelectType"),
-  };
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    processAgreementMessage: msg => {
-      dispatch(actionCreators.messages__processAgreementMessage(msg));
-    },
-    messageMarkExpandReference: (
-      msgUri,
-      connUri,
-      atomUri,
-      expanded,
-      reference
-    ) => {
       dispatch(
         actionCreators.messages__viewState__markExpandReference({
-          messageUri: msgUri,
-          connectionUri: connUri,
-          atomUri: atomUri,
-          isExpanded: expanded,
+          messageUri: get(message, "uri"),
+          connectionUri: get(connection, "uri"),
+          atomUri: senderAtomUri,
+          isExpanded: !currentExpansionState,
           reference: reference,
         })
       );
-    },
-  };
-};
-
-class WonReferencedMessageContent extends React.Component {
-  render() {
-    let claimElements;
-    let acceptElements;
-    let forwardElements;
-    let proposeElements;
-    let retractElements;
-    let proposeToCancelElements;
-    let rejectElements;
-
-    if (this.props.hasClaimUris) {
-      let fragmentBody;
-
-      if (this.isReferenceExpanded("claims")) {
-        const messageElements =
-          this.props.claimUrisArray &&
-          this.props.claimUrisArray.map(msgUri => (
-            <WonCombinedMessageContent
-              key={msgUri}
-              messageUri={get(this.getReferencedMessage(msgUri), "uri")}
-              connectionUri={get(this.props.connection, "uri")}
-              className={
-                (this.getReferencedMessage(msgUri) &&
-                !get(this.getReferencedMessage(msgUri), "outgoingMessage")
-                  ? " won-cm--left "
-                  : "") +
-                (this.getReferencedMessage(msgUri) &&
-                get(this.getReferencedMessage(msgUri), "outgoingMessage")
-                  ? " won-cm--right "
-                  : "")
-              }
-              onClick={() => this.loadMessage(msgUri)}
-            />
-          ));
-
-        fragmentBody = (
-          <div className="refmsgcontent__fragment__body">{messageElements}</div>
-        );
-      }
-
-      claimElements = (
-        <div className="refmsgcontent__fragment">
-          <div
-            className={
-              "refmsgcontent__fragment__header " +
-              (!this.isReferenceExpanded("claims")
-                ? "refmsgcontent__fragment__header--collapsed"
-                : "")
-            }
-            onClick={() => this.toggleReferenceExpansion("claims")}
-          >
-            <div className="refmsgcontent__fragment__header__label">
-              Claiming{" "}
-              {this.props.claimUrisSize +
-                (this.props.claimUrisSize == 1 ? " Message" : " Messages")}
-            </div>
-            <div className="refmsgcontent__fragment__header__carret">
-              <svg>
-                {this.isReferenceExpanded("claims") ? (
-                  <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
-                ) : (
-                  <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-                )}
-              </svg>
-            </div>
-          </div>
-          {fragmentBody}
-        </div>
-      );
     }
-    if (this.props.hasAcceptUris) {
-      let fragmentBody;
+  }
 
-      if (this.isReferenceExpanded("accepts")) {
-        const messageElements =
-          this.props.acceptUrisArray &&
-          this.props.acceptUrisArray.map(msgUri => (
-            <WonCombinedMessageContent
-              key={msgUri}
-              messageUri={get(this.getReferencedMessage(msgUri), "uri")}
-              connectionUri={get(this.props.connection, "uri")}
-              className={
-                (this.getReferencedMessage(msgUri) &&
-                !get(this.getReferencedMessage(msgUri), "outgoingMessage")
-                  ? " won-cm--left "
-                  : "") +
-                (this.getReferencedMessage(msgUri) &&
-                get(this.getReferencedMessage(msgUri), "outgoingMessage")
-                  ? " won-cm--right "
-                  : "")
-              }
-              onClick={() => this.loadMessage(msgUri)}
-            />
-          ));
+  function generateCombinedMessageElement(msgUri, className) {
+    const referencedMessage = get(chatMessages, msgUri);
 
-        fragmentBody = (
-          <div className="refmsgcontent__fragment__body">{messageElements}</div>
-        );
+    let messageClass = className;
+
+    if (!className && referencedMessage) {
+      if (get(referencedMessage, "outgoingMessage")) {
+        messageClass = "won-cm--right";
+      } else {
+        messageClass = "won-cm--left";
       }
-
-      acceptElements = (
-        <div className="refmsgcontent__fragment">
-          <div
-            className={
-              "refmsgcontent__fragment__header " +
-              (!this.isReferenceExpanded("accepts")
-                ? "refmsgcontent__fragment__header--collapsed"
-                : "")
-            }
-            onClick={() => this.toggleReferenceExpansion("accepts")}
-          >
-            <div className="refmsgcontent__fragment__header__label">
-              Accepting{" "}
-              {this.props.acceptUrisSize +
-                (this.props.acceptUrisSize == 1 ? " Message" : " Messages")}
-            </div>
-            <div className="refmsgcontent__fragment__header__carret">
-              <svg>
-                {this.isReferenceExpanded("accepts") ? (
-                  <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
-                ) : (
-                  <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-                )}
-              </svg>
-            </div>
-          </div>
-          {fragmentBody}
-        </div>
-      );
     }
-    if (this.props.hasRetractUris) {
-      let fragmentBody;
 
-      if (this.isReferenceExpanded("retracts")) {
-        const messageElements =
-          this.props.retractUrisArray &&
-          this.props.retractUrisArray.map(msgUri => (
-            <WonCombinedMessageContent
-              key={msgUri}
-              messageUri={get(this.getReferencedMessage(msgUri), "uri")}
-              connectionUri={get(this.props.connection, "uri")}
-              className={
-                (this.getReferencedMessage(msgUri) &&
-                !get(this.getReferencedMessage(msgUri), "outgoingMessage")
-                  ? " won-cm--left "
-                  : "") +
-                (this.getReferencedMessage(msgUri) &&
-                get(this.getReferencedMessage(msgUri), "outgoingMessage")
-                  ? " won-cm--right "
-                  : "")
-              }
-              onClick={() => this.loadMessage(msgUri)}
-            />
-          ));
-
-        fragmentBody = (
-          <div className="refmsgcontent__fragment__body">{messageElements}</div>
-        );
-      }
-
-      retractElements = (
-        <div className="refmsgcontent__fragment">
-          <div
-            className={
-              "refmsgcontent__fragment__header " +
-              (!this.isReferenceExpanded("retracts")
-                ? "refmsgcontent__fragment__header--collapsed"
-                : "")
-            }
-            onClick={() => this.toggleReferenceExpansion("retracts")}
-          >
-            <div className="refmsgcontent__fragment__header__label">
-              Retracting{" "}
-              {this.props.retractUrisSize +
-                (this.props.retractUrisSize == 1 ? " Message" : " Messages")}
-            </div>
-            <div className="refmsgcontent__fragment__header__carret clickable">
-              <svg>
-                {this.isReferenceExpanded("retracts") ? (
-                  <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
-                ) : (
-                  <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-                )}
-              </svg>
-            </div>
-          </div>
-          {fragmentBody}
-        </div>
-      );
-    }
-    if (this.props.hasRejectUris) {
-      let fragmentBody;
-
-      if (this.isReferenceExpanded("rejects")) {
-        const messageElements =
-          this.props.rejectUrisArray &&
-          this.props.rejectUrisArray.map(msgUri => (
-            <WonCombinedMessageContent
-              key={msgUri}
-              messageUri={get(this.getReferencedMessage(msgUri), "uri")}
-              connectionUri={get(this.props.connection, "uri")}
-              className={
-                (this.getReferencedMessage(msgUri) &&
-                !get(this.getReferencedMessage(msgUri), "outgoingMessage")
-                  ? " won-cm--left "
-                  : "") +
-                (this.getReferencedMessage(msgUri) &&
-                get(this.getReferencedMessage(msgUri), "outgoingMessage")
-                  ? " won-cm--right "
-                  : "")
-              }
-              onClick={() => this.loadMessage(msgUri)}
-            />
-          ));
-
-        fragmentBody = (
-          <div className="refmsgcontent__fragment__body">{messageElements}</div>
-        );
-      }
-
-      rejectElements = (
-        <div className="refmsgcontent__fragment">
-          <div
-            className={
-              "refmsgcontent__fragment__header " +
-              (!this.isReferenceExpanded("rejects")
-                ? "refmsgcontent__fragment__header--collapsed"
-                : "")
-            }
-            onClick={() => this.toggleReferenceExpansion("rejects")}
-          >
-            <div className="refmsgcontent__fragment__header__label">
-              Rejecting{" "}
-              {this.props.rejectUrisSize +
-                (this.props.rejectUrisSize == 1 ? " Message" : " Messages")}
-            </div>
-            <div className="refmsgcontent__fragment__header__carret">
-              <svg>
-                {this.isReferenceExpanded("rejects") ? (
-                  <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
-                ) : (
-                  <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-                )}
-              </svg>
-            </div>
-          </div>
-          {fragmentBody}
-        </div>
-      );
-    }
-    if (this.props.hasProposeUris) {
-      let fragmentBody;
-
-      if (this.isReferenceExpanded("proposes")) {
-        const messageElements =
-          this.props.proposeUrisArray &&
-          this.props.proposeUrisArray.map(msgUri => (
-            <WonCombinedMessageContent
-              key={msgUri}
-              messageUri={get(this.getReferencedMessage(msgUri), "uri")}
-              connectionUri={get(this.props.connection, "uri")}
-              className={
-                (this.getReferencedMessage(msgUri) &&
-                !get(this.getReferencedMessage(msgUri), "outgoingMessage")
-                  ? " won-cm--left "
-                  : "") +
-                (this.getReferencedMessage(msgUri) &&
-                get(this.getReferencedMessage(msgUri), "outgoingMessage")
-                  ? " won-cm--right "
-                  : "")
-              }
-              onClick={() => this.loadMessage(msgUri)}
-            />
-          ));
-
-        fragmentBody = (
-          <div className="refmsgcontent__fragment__body">{messageElements}</div>
-        );
-      }
-
-      proposeElements = (
-        <div className="refmsgcontent__fragment">
-          <div
-            className={
-              "refmsgcontent__fragment__header " +
-              (!this.isReferenceExpanded("proposes")
-                ? "refmsgcontent__fragment__header--collapsed"
-                : "")
-            }
-            onClick={() => this.toggleReferenceExpansion("proposes")}
-          >
-            <div className="refmsgcontent__fragment__header__label">
-              Proposing{" "}
-              {this.props.proposeUrisSize +
-                (this.props.proposeUrisSize == 1 ? " Message" : " Messages")}
-            </div>
-            <div className="refmsgcontent__fragment__header__carret">
-              <svg>
-                {this.isReferenceExpanded("proposes") ? (
-                  <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
-                ) : (
-                  <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-                )}
-              </svg>
-            </div>
-          </div>
-          {fragmentBody}
-        </div>
-      );
-    }
-    if (this.props.hasProposeToCancelUris) {
-      let fragmentBody;
-
-      if (this.isReferenceExpanded("proposesToCancel")) {
-        const messageElements =
-          this.props.proposeToCancelUrisArray &&
-          this.props.proposeToCancelUrisArray.map(msgUri => (
-            <WonCombinedMessageContent
-              key={msgUri}
-              messageUri={get(this.getReferencedMessage(msgUri), "uri")}
-              connectionUri={get(this.props.connection, "uri")}
-              className={
-                (this.getReferencedMessage(msgUri) &&
-                !get(this.getReferencedMessage(msgUri), "outgoingMessage")
-                  ? " won-cm--left "
-                  : "") +
-                (this.getReferencedMessage(msgUri) &&
-                get(this.getReferencedMessage(msgUri), "outgoingMessage")
-                  ? " won-cm--right "
-                  : "")
-              }
-              onClick={() => this.loadMessage(msgUri)}
-            />
-          ));
-
-        fragmentBody = (
-          <div className="refmsgcontent__fragment__body">{messageElements}</div>
-        );
-      }
-
-      proposeToCancelElements = (
-        <div className="refmsgcontent__fragment">
-          <div
-            className={
-              "refmsgcontent__fragment__header " +
-              (!this.isReferenceExpanded("proposesToCancel")
-                ? "refmsgcontent__fragment__header--collapsed"
-                : "")
-            }
-            onClick={() => this.toggleReferenceExpansion("proposesToCancel")}
-          >
-            <div className="refmsgcontent__fragment__header__label">
-              Proposing to cancel{" "}
-              {this.props.proposeToCancelUrisSize +
-                (this.props.proposeToCancelUrisSize == 1
-                  ? " Message"
-                  : " Messages")}
-            </div>
-            <div className="refmsgcontent__fragment__header__carret">
-              <svg>
-                {this.isReferenceExpanded("proposesToCancel") ? (
-                  <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
-                ) : (
-                  <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-                )}
-              </svg>
-            </div>
-          </div>
-          {fragmentBody}
-        </div>
-      );
-    }
-    if (this.props.hasForwardUris) {
-      let fragmentBody;
-
-      if (this.isReferenceExpanded("forwards")) {
-        const messageElements =
-          this.props.forwardUrisArray &&
-          this.props.forwardUrisArray.map(msgUri => (
-            <WonCombinedMessageContent
-              key={msgUri}
-              messageUri={get(this.getReferencedMessage(msgUri), "uri")}
-              connectionUri={get(this.props.connection, "uri")}
-              className="won-cm--forward"
-              onClick={() => this.loadMessage(msgUri)}
-            />
-          ));
-
-        fragmentBody = (
-          <div className="refmsgcontent__fragment__body">{messageElements}</div>
-        );
-      }
-
-      forwardElements = (
-        <div className="refmsgcontent__fragment">
-          <div
-            className={
-              "refmsgcontent__fragment__header " +
-              (!this.isReferenceExpanded("forwards")
-                ? "refmsgcontent__fragment__header--collapsed"
-                : "")
-            }
-            onClick={() => this.toggleReferenceExpansion("forwards")}
-          >
-            <div className="refmsgcontent__fragment__header__label">
-              Forwarding{" "}
-              {this.props.forwardUrisSize +
-                (this.props.forwardUrisSize == 1 ? " Message" : " Messages")}
-            </div>
-            <div className="refmsgcontent__fragment__header__carret">
-              <svg>
-                {this.isReferenceExpanded("forwards") ? (
-                  <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
-                ) : (
-                  <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-                )}
-              </svg>
-            </div>
-          </div>
-          {fragmentBody}
-        </div>
-      );
+    let onClick;
+    if (!referencedMessage) {
+      onClick = () =>
+        ownerApi.getMessage(senderAtomUri, msgUri).then(response => {
+          won.wonMessageFromJsonLd(response, msgUri).then(msg => {
+            //If message isnt in the state we add it
+            dispatch(actionCreators.messages__processAgreementMessage(msg));
+          });
+        });
     }
 
     return (
-      <won-referenced-message-content
-        class={
-          this.props.hasContent || this.props.hasNotBeenLoaded
-            ? "won-has-non-ref-content"
-            : ""
-        }
-      >
-        {claimElements}
-        {proposeElements}
-        {retractElements}
-        {acceptElements}
-        {proposeToCancelElements}
-        {rejectElements}
-        {forwardElements}
-      </won-referenced-message-content>
+      <WonCombinedMessageContent
+        key={msgUri}
+        message={referencedMessage}
+        connection={connection}
+        senderAtom={senderAtom}
+        originatorAtom={originatorAtom}
+        allAtoms={allAtoms}
+        ownedConnections={ownedConnections}
+        className={messageClass}
+        onClick={onClick}
+      />
     );
   }
 
-  loadMessage(messageUri) {
-    if (!this.getReferencedMessage(messageUri)) {
-      this.addMessageToState(messageUri);
-    }
-  }
+  function generateMessageElementFragment(
+    label,
+    reference,
+    messageReferenceUris,
+    combinedMessageElementClassName
+  ) {
+    if (messageReferenceUris && messageReferenceUris.size > 0) {
+      const messageReferenceArray = Array.from(messageReferenceUris.toSet());
+      const isExpanded = get(expandedReferences, reference);
+      const messagesArraySize = messageReferenceArray.length;
 
-  addMessageToState(msgUri) {
-    const ownedAtomUri = this.props.ownedAtomUri;
-    return ownerApi.getMessage(ownedAtomUri, msgUri).then(response => {
-      won.wonMessageFromJsonLd(response, msgUri).then(msg => {
-        //If message isnt in the state we add it
-        this.props.processAgreementMessage(msg);
-      });
-    });
-  }
-  getReferencedMessage(messageUri) {
-    return get(this.props.chatMessages, messageUri);
-  }
-
-  toggleReferenceExpansion(reference) {
-    const currentExpansionState = get(this.props.expandedReferences, reference);
-
-    if (this.props.message && !this.props.multiSelectType) {
-      this.props.messageMarkExpandReference(
-        this.props.messageUri,
-        this.props.connectionUri,
-        this.props.ownedAtomUri,
-        !currentExpansionState,
-        reference
+      return (
+        <div className="refmsgcontent__fragment">
+          <div
+            className={
+              "refmsgcontent__fragment__header " +
+              (!isExpanded ? "refmsgcontent__fragment__header--collapsed" : "")
+            }
+            onClick={() => toggleReferenceExpansion(reference)}
+          >
+            <div className="refmsgcontent__fragment__header__label">
+              {label +
+                " " +
+                messagesArraySize +
+                (messagesArraySize == 1 ? " Message" : " Messages")}
+            </div>
+            <div
+              className={
+                "refmsgcontent__fragment__header__carret " +
+                (isExpanded
+                  ? " refmsgcontent__fragment__header__carret--expanded "
+                  : " refmsgcontent__fragment__header__carret--collapsed ")
+              }
+            >
+              <svg>
+                <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
+              </svg>
+            </div>
+          </div>
+          {isExpanded ? (
+            <div className="refmsgcontent__fragment__body">
+              {messageReferenceArray.map(msgUri =>
+                generateCombinedMessageElement(
+                  msgUri,
+                  combinedMessageElementClassName
+                    ? "won-cm--forward"
+                    : undefined
+                )
+              )}
+            </div>
+          ) : (
+            undefined
+          )}
+        </div>
       );
     }
+    return undefined;
   }
 
-  isReferenceExpanded(reference) {
-    return get(this.props.expandedReferences, reference);
-  }
+  return (
+    <won-referenced-message-content
+      class={
+        !message || get(message, "hasContent") ? "won-has-non-ref-content" : ""
+      }
+    >
+      {generateMessageElementFragment("Claiming", "claims", claimUris)}
+      {generateMessageElementFragment("Proposes", "proposes", proposeUris)}
+      {generateMessageElementFragment("Retracting", "retracts", retractUris)}
+      {generateMessageElementFragment("Accepts", "accepts", acceptUris)}
+      {generateMessageElementFragment(
+        "Proposing to cancel",
+        "proposesToCancel",
+        proposeToCancelUris
+      )}
+      {generateMessageElementFragment("Rejecting", "rejects", rejectUris)}
+      {generateMessageElementFragment(
+        "Forwarding",
+        "forwards",
+        forwardUris,
+        "won-cm--forward"
+      )}
+    </won-referenced-message-content>
+  );
 }
 
 WonReferencedMessageContent.propTypes = {
-  messageUri: PropTypes.string.isRequired,
-  connectionUri: PropTypes.string.isRequired,
-  ownedAtomUri: PropTypes.string,
-  message: PropTypes.object,
-  chatMessages: PropTypes.object,
-  connection: PropTypes.object,
-  acceptUrisSize: PropTypes.number,
-  proposeUrisSize: PropTypes.number,
-  proposeToCancelUrisSize: PropTypes.number,
-  rejectUrisSize: PropTypes.number,
-  retractUrisSize: PropTypes.number,
-  forwardUrisSize: PropTypes.number,
-  claimUrisSize: PropTypes.number,
-  multiSelectType: PropTypes.string,
-  expandedReferences: PropTypes.object,
-  hasProposeUris: PropTypes.bool,
-  hasAcceptUris: PropTypes.bool,
-  hasProposeToCancelUris: PropTypes.bool,
-  hasRetractUris: PropTypes.bool,
-  hasRejectUris: PropTypes.bool,
-  hasForwardUris: PropTypes.bool,
-  hasClaimUris: PropTypes.bool,
-  proposeUrisArray: PropTypes.arrayOf(PropTypes.string),
-  retractUrisArray: PropTypes.arrayOf(PropTypes.string),
-  rejectUrisArray: PropTypes.arrayOf(PropTypes.string),
-  forwardUrisArray: PropTypes.arrayOf(PropTypes.string),
-  proposeToCancelUrisArray: PropTypes.arrayOf(PropTypes.string),
-  acceptUrisArray: PropTypes.arrayOf(PropTypes.string),
-  claimUrisArray: PropTypes.arrayOf(PropTypes.string),
-  hasContent: PropTypes.bool,
-  hasNotBeenLoaded: PropTypes.bool,
-  messageMarkExpandReference: PropTypes.func,
-  processAgreementMessage: PropTypes.func,
+  message: PropTypes.object.isRequired,
+  connection: PropTypes.object.isRequired,
+  senderAtom: PropTypes.object.isRequired,
+  allAtoms: PropTypes.object.isRequired,
+  ownedConnections: PropTypes.object.isRequired,
+  originatorAtom: PropTypes.object,
 };
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WonReferencedMessageContent);

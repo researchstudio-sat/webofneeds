@@ -49,12 +49,10 @@ export default function ChatTextfield({
   const connectionUri = get(connection, "uri");
 
   const atom = useSelector(
-    state =>
-      connectionUri &&
-      generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri)
+    generalSelectors.getOwnedAtomByConnectionUri(connectionUri)
   );
-  const targetAtom = useSelector(state =>
-    getIn(state, ["atoms", get(connection, "targetAtomUri")])
+  const targetAtom = useSelector(
+    generalSelectors.getAtom(get(connection, "targetAtomUri"))
   );
 
   const messages = get(connection, "messages");

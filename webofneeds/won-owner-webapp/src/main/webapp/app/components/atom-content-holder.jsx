@@ -7,7 +7,6 @@ import { get, getIn, getQueryParams, generateLink } from "../utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
-import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
 import { Elm } from "../../elm/RatingView.elm";
 
 import WonAtomIcon from "./atom-icon.jsx";
@@ -22,48 +21,54 @@ export default function WonAtomContentHolder({ holdsUri }) {
   const history = useHistory();
   const dispatch = useDispatch();
   const { connectionUri } = getQueryParams(history.location);
-  const connection = useSelector(state =>
-    connectionSelectors.getOwnedConnectionByUri(state, connectionUri)
+  const ownAtom = useSelector(
+    generalSelectors.getOwnedAtomByConnectionUri(connectionUri)
   );
-  const ownAtom = useSelector(state =>
-    generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri)
-  );
+  const connection = getIn(ownAtom, ["connections", connectionUri]);
 
   const ratingConnectionUri =
     get(connection, "targetAtomUri") == holdsUri && atomUtils.isHeld(ownAtom)
       ? connectionUri
       : null;
 
-  const heldAtom = useSelector(
-    state => holdsUri && getIn(state, ["atoms", holdsUri])
-  );
+  const heldAtom = useSelector(generalSelectors.getAtom(holdsUri));
   const holderUri = atomUtils.getHeldByUri(heldAtom);
   const holderAtom = useSelector(
-    state => (heldAtom ? getIn(state, ["atoms", holderUri]) : undefined)
+    state => (heldAtom ? generalSelectors.getAtom(holderUri)(state) : undefined)
   );
 
   const holderHasHolderSocket = atomUtils.hasHolderSocket(holderAtom);
-  const holderHolds = holderHasHolderSocket && get(holderAtom, "holds");
-  const holderVerified = holderHolds && holderHolds.includes(holdsUri);
+  const holderVerified = atomUtils.isHolderVerified(heldAtom, holderAtom);
 
   const holderHasReviewSocket = atomUtils.hasReviewSocket(holderAtom);
   const aggregateRating =
     holderHasReviewSocket && getIn(holderAtom, ["rating", "aggregateRating"]);
 
   const holderHasBuddySocket = atomUtils.hasBuddySocket(holderAtom);
-  const holderBuddies = holderHasBuddySocket && get(holderAtom, "buddies");
 
-  const process = useSelector(state => get(state, "process"));
-  const postIsOwned = useSelector(state =>
-    generalSelectors.isAtomOwned(state, holdsUri)
-  );
+  const process = useSelector(generalSelectors.getProcessState);
+  const postIsOwned = useSelector(generalSelectors.isAtomOwned(holdsUri));
   const holderLoading =
     !holderAtom || processUtils.isAtomLoading(process, holderUri);
+
+  const buddyConnections =
+    holderHasBuddySocket &&
+    atomUtils.getConnectedConnections(
+      holderAtom,
+      vocab.BUDDY.BuddySocketCompacted
+    );
+  const holderConnections =
+    holderHasHolderSocket &&
+    atomUtils.getConnectedConnections(
+      holderAtom,
+      vocab.HOLD.HolderSocketCompacted
+    );
+
   const holderName = getIn(holderAtom, ["content", "personaName"]);
   const holderDescription = getIn(holderAtom, ["content", "description"]);
   const holderWebsite = getIn(holderAtom, ["content", "website"]);
-  const holderHoldsSize = holderHolds ? holderHolds.size : 0;
-  const holderBuddySize = holderBuddies ? holderBuddies.size : 0;
+  const holderHoldsSize = holderConnections ? holderConnections.size : 0;
+  const holderBuddySize = buddyConnections ? buddyConnections.size : 0;
   const reviewCount =
     holderHasReviewSocket && getIn(holderAtom, ["rating", "reviewCount"]);
   const aggregateRatingString = aggregateRating && aggregateRating.toFixed(1);
@@ -197,7 +202,7 @@ export default function WonAtomContentHolder({ holdsUri }) {
   return (
     <won-atom-content-holder>
       <div className="ac-holder__header">
-        {!holderLoading && <WonAtomIcon atomUri={holderUri} />}
+        {!holderLoading && <WonAtomIcon atom={holderAtom} />}
         {holderNameElement}
         {websiteFragment}
       </div>

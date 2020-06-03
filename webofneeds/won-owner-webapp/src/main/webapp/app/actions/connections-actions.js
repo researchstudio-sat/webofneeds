@@ -9,7 +9,6 @@ import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as ownerApi from "../api/owner-api.js";
 import * as stateStore from "../redux/state-store.js";
-import { getOwnedConnectionByUri } from "../redux/selectors/connection-selectors.js";
 
 import { get, getIn } from "../utils.js";
 
@@ -311,12 +310,12 @@ function connectReactionAtom(
 ) {
   ensureLoggedIn(dispatch, getState).then(async () => {
     const state = getState();
-    const connectToAtom = getIn(state, ["atoms", connectToAtomUri]);
+    const connectToAtom = generalSelectors.getAtom(connectToAtomUri)(state);
 
-    const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
+    const nodeUri = generalSelectors.getDefaultNodeUri(state);
 
     // create new atom
-    const { message, atomUri } = await buildCreateMessage(atomDraft, nodeUri);
+    const { message, atomUri } = buildCreateMessage(atomDraft, nodeUri);
 
     // create the new atom
     ownerApi
@@ -337,7 +336,7 @@ function connectReactionAtom(
       .then(() => {
         // add persona if present
         if (personaUri) {
-          const persona = getIn(state, ["atoms", personaUri]);
+          const persona = generalSelectors.getAtom(personaUri)(state);
           const senderSocketUri = atomUtils.getSocketUri(
             persona,
             vocab.HOLD.HolderSocketCompacted
@@ -371,7 +370,7 @@ function connectReactionAtom(
 
         const atomDraftSocketType = getSocketFromDraft(atomDraft);
 
-        if (generalSelectors.isAtomOwned(state, connectToAtomUri)) {
+        if (generalSelectors.isAtomOwned(connectToAtomUri)(state)) {
           const targetSocketUri = connectToSocketType
             ? atomUtils.getSocketUri(connectToAtom, connectToSocketType)
             : atomUtils.getDefaultSocketUri(connectToAtom);
@@ -432,18 +431,12 @@ function connectReactionAtom(
   });
 }
 
-export function connectionsConnectAdHoc(targetSocketUri, message, personaUri) {
+export function connectionsConnectAdHoc(targetSocketUri, connectMessage) {
   return (dispatch, getState) =>
-    connectAdHoc(targetSocketUri, message, personaUri, dispatch, getState); // moved to separate function to make transpilation work properly
+    connectAdHoc(targetSocketUri, connectMessage, dispatch, getState); // moved to separate function to make transpilation work properly
 }
 
-function connectAdHoc(
-  targetSocketUri,
-  message,
-  personaUri,
-  dispatch,
-  getState
-) {
+function connectAdHoc(targetSocketUri, connectMessage, dispatch, getState) {
   ensureLoggedIn(dispatch, getState).then(async () => {
     const theirAtomUri = generalSelectors.getAtomUriBySocketUri(
       targetSocketUri
@@ -460,10 +453,10 @@ function connectAdHoc(
         ],
       },
     };
-    const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
+    const nodeUri = generalSelectors.getDefaultNodeUri(state);
 
     // build create message for new atom
-    const { message, atomUri } = await buildCreateMessage(adHocDraft, nodeUri);
+    const { message, atomUri } = buildCreateMessage(adHocDraft, nodeUri);
 
     // create the new atom
     ownerApi
@@ -479,35 +472,13 @@ function connectAdHoc(
           },
         });
       })
-      .then(async () => {
-        // add persona
-        if (personaUri) {
-          const persona = getIn(state, ["atoms", personaUri]);
-          const senderSocketUri = atomUtils.getSocketUri(
-            persona,
-            vocab.HOLD.HolderSocketCompacted
-          );
-          const targetSocketUri = `${atomUri}#holdableSocket`;
-
-          const response = await ownerApi.serverSideConnect(
-            senderSocketUri,
-            targetSocketUri,
-            false,
-            true
-          );
-          if (!response.ok) {
-            const errorMsg = await response.text();
-            throw new Error(`Could not connect identity: ${errorMsg}`);
-          }
-        }
-      })
       .then(() => {
         // set default socketUri
         let senderSocketUri = `${atomUri}#chatSocket`;
 
         // establish connection
         const cnctMsg = buildConnectMessage({
-          connectMessage: message,
+          connectMessage: connectMessage,
           socketUri: senderSocketUri,
           targetSocketUri: targetSocketUri,
         });
@@ -600,7 +571,7 @@ export function connectionsRate(connectionUri, rating) {
       connectionUri,
       "targetAtomUri",
     ]);
-    const theirAtom = getIn(state, ["atoms", theirAtomUri]);
+    const theirAtom = generalSelectors.getAtom(theirAtomUri)(state);
     const theirConnectionUri = getIn(ownedAtom, [
       "connections",
       connectionUri,
@@ -608,7 +579,7 @@ export function connectionsRate(connectionUri, rating) {
     ]);
 
     won
-      .getConnectionWithEventUris(connectionUri, {
+      .getConnection(connectionUri, {
         requesterWebId: get(ownedAtom, "uri"),
       })
       .then(connection => {
@@ -657,11 +628,11 @@ export function showLatestMessages(connectionUri, numberOfEvents) {
     const state = getState();
     const atom =
       connectionUri &&
-      generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri);
+      generalSelectors.getOwnedAtomByConnectionUri(connectionUri)(state);
     const atomUri = get(atom, "uri");
     const connection =
-      connectionUri && getOwnedConnectionByUri(state, connectionUri);
-    const processState = get(state, "process");
+      connectionUri && getIn(atom, ["connections", connectionUri]);
+    const processState = generalSelectors.getProcessState(state);
     if (
       !connectionUri ||
       !connection ||
@@ -681,37 +652,6 @@ export function showLatestMessages(connectionUri, numberOfEvents) {
   };
 }
 
-export function loadLatestMessagesOfConnection({
-  connectionUri,
-  numberOfEvents,
-  state,
-  dispatch,
-}) {
-  const atom =
-    connectionUri &&
-    generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri);
-  const atomUri = get(atom, "uri");
-  const connection =
-    connectionUri && getOwnedConnectionByUri(state, connectionUri);
-  const processState = get(state, "process");
-  if (
-    !connectionUri ||
-    !connection ||
-    processUtils.isConnectionLoading(processState, connectionUri) ||
-    processUtils.isConnectionLoadingMessages(processState, connectionUri)
-  ) {
-    return Promise.resolve(); //only load if not already started and connection itself not loading
-  }
-
-  stateStore.fetchMessages(
-    dispatch,
-    state,
-    connectionUri,
-    atomUri,
-    numberOfEvents
-  );
-}
-
 /**
  * @param connectionUri
  * @param numberOfEvents
@@ -728,11 +668,10 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
     const state = getState();
     const atom =
       connectionUri &&
-      generalSelectors.getOwnedAtomByConnectionUri(state, connectionUri);
+      generalSelectors.getOwnedAtomByConnectionUri(connectionUri)(state);
     const atomUri = get(atom, "uri");
     const connection = getIn(atom, ["connections", connectionUri]);
-    const connectionMessages = get(connection, "messages");
-    const processState = get(state, "process");
+    const processState = generalSelectors.getProcessState(state);
     if (
       !connection ||
       processUtils.isConnectionLoading(processState, connectionUri) ||
@@ -740,13 +679,10 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
     ) {
       return; //only load if not already started and connection itself not loading
     }
-
-    // determine the oldest loaded event
-    const sortedConnectionMessages = connectionMessages
-      .valueSeq()
-      .sort((msg1, msg2) => get(msg1, "date") - get(msg2, "date"));
-
-    const oldestMessageUri = get(sortedConnectionMessages.first(), "uri");
+    const resumeAfterUri = processUtils.getResumeAfterUriForConnection(
+      processState,
+      connectionUri
+    );
 
     return stateStore.fetchMessages(
       dispatch,
@@ -754,7 +690,7 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
       connectionUri,
       atomUri,
       numberOfEvents,
-      oldestMessageUri
+      resumeAfterUri
     );
   };
 }

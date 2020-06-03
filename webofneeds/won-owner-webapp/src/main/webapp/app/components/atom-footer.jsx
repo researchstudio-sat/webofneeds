@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import Immutable from "immutable";
-import { connect } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { get, getIn, generateLink } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import WonAtomHeader from "./atom-header.jsx";
@@ -15,7 +15,7 @@ import * as wonLabelUtils from "../won-label-utils.js";
 import vocab from "../service/vocab.js";
 
 import "~/style/_atom-footer.scss";
-import { Link, withRouter } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 const FooterType = {
   INACTIVE: 1,
@@ -26,11 +26,16 @@ const FooterType = {
   UNKNOWN: 6,
 };
 
-const mapStateToProps = (state, ownProps) => {
-  const ownedAtoms = generalSelectors.getOwnedAtoms(state);
-  const atom = getIn(state, ["atoms", ownProps.atomUri]);
+export default function WonAtomFooter({ atom, className }) {
+  const dispatch = useDispatch();
+  const history = useHistory();
+  const atomUri = get(atom, "uri");
 
-  const isOwned = generalSelectors.isAtomOwned(state, ownProps.atomUri);
+  const ownedAtoms = useSelector(generalSelectors.getOwnedAtoms);
+
+  const accountState = useSelector(generalSelectors.getAccountState);
+
+  const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
 
   const reactionUseCases = atomUtils.getReactionUseCases(atom);
   const enabledUseCases = atomUtils.getEnabledUseCases(atom);
@@ -65,199 +70,21 @@ const mapStateToProps = (state, ownProps) => {
 
   const ownedChatSocketAtoms =
     ownedAtoms && ownedAtoms.filter(atom => atomUtils.hasChatSocket(atom));
+  const loggedIn = accountUtils.isLoggedIn(accountState);
+  const ownedReactionAtomsArray = ownedReactionAtoms
+    ? ownedReactionAtoms.toArray()
+    : [];
+  const addHolderUri =
+    atomUtils.hasEnabledUseCases(atom) && footerType === FooterType.ENABLED
+      ? atomUtils.getHeldByUri(atom)
+      : undefined;
 
-  return {
-    className: ownProps.className,
-    atomUri: ownProps.atomUri,
-    atom: atom,
-    loggedIn: accountUtils.isLoggedIn(get(state, "account")),
-    footerType,
-    useCasesArray,
-    isOwned: isOwned,
-
-    ownedReactionAtomsArray: ownedReactionAtoms
-      ? ownedReactionAtoms.toArray()
-      : [],
-    addHolderUri:
-      atomUtils.hasEnabledUseCases(atom) && footerType === FooterType.ENABLED
-        ? atomUtils.getHeldByUri(atom)
-        : undefined,
-    ownedChatSocketAtoms,
-  };
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    hideModalDialog: () => {
-      dispatch(actionCreators.view__hideModalDialog());
-    },
-    showModalDialog: payload => {
-      dispatch(actionCreators.view__showModalDialog(payload));
-    },
-    showTermsDialog: payload => {
-      dispatch(actionCreators.view__showTermsDialog(payload));
-    },
-    connectionsConnectAdHoc: (targetSocketUri, message, personaUri) => {
-      dispatch(
-        actionCreators.connections__connectAdHoc(
-          targetSocketUri,
-          message,
-          personaUri
-        )
-      );
-    },
-    connect: (
-      senderAtomUri,
-      targetAtomUri,
-      senderSocketType,
-      targetSocketType,
-      message
-    ) => {
-      dispatch(
-        actionCreators.atoms__connect(
-          senderAtomUri,
-          targetAtomUri,
-          senderSocketType,
-          targetSocketType,
-          message
-        )
-      );
-    },
-    sendChatMessage: (
-      trimmedMsg,
-      additionalContent,
-      referencedContent,
-      senderSocketUri,
-      targetSocketUri,
-      connectionUri,
-      isTTL
-    ) => {
-      dispatch(
-        actionCreators.connections__sendChatMessage(
-          trimmedMsg,
-          additionalContent,
-          referencedContent,
-          senderSocketUri,
-          targetSocketUri,
-          connectionUri,
-          isTTL
-        )
-      );
-    },
-    connectSockets: (senderSocketUri, targetSocketUri, message) => {
-      dispatch(
-        actionCreators.atoms__connectSockets(
-          senderSocketUri,
-          targetSocketUri,
-          message
-        )
-      );
-    },
-    connectSocketsServerSide: (senderSocketUri, targetSocketUri) => {
-      dispatch(
-        actionCreators.atoms__connectSocketsServerSide(
-          senderSocketUri,
-          targetSocketUri
-        )
-      );
-    },
-    atomReopen: atomUri => dispatch(actionCreators.atoms__reopen(atomUri)),
-  };
-};
-
-class AtomInfo extends React.Component {
-  render() {
-    let footerElement;
-
-    switch (this.props.footerType) {
-      case FooterType.INACTIVE:
-        footerElement = (
-          <div className="atom-footer__infolabel">
-            Atom is inactive, no requests allowed
-          </div>
-        );
-        break;
-      case FooterType.INACTIVE_OWNED:
-        footerElement = (
-          <React.Fragment>
-            <div className="atom-footer__infolabel">
-              This Atom is inactive. Others will not be able to interact with
-              it.
-            </div>
-            <button
-              className="won-publish-button red won-button--filled"
-              onClick={() => this.props.atomReopen(this.props.atomUri)}
-            >
-              Reopen
-            </button>
-          </React.Fragment>
-        );
-        break;
-      case FooterType.REACTION:
-        footerElement = this.props.useCasesArray.map((useCase, index) =>
-          this.getUseCaseTypeButton(useCase, index)
-        );
-        break;
-      case FooterType.ENABLED:
-        footerElement = this.props.useCasesArray.map((useCase, index) =>
-          this.getUseCaseTypeButton(useCase, index)
-        );
-        break;
-      case FooterType.ADHOC:
-        footerElement = (
-          <React.Fragment>
-            {!!atomUtils.getChatSocket(this.props.atom) && (
-              <ChatTextfield
-                placeholder="Message (optional)"
-                allowEmptySubmit={true}
-                showPersonas={true}
-                submitButtonLabel="Ask&#160;to&#160;Chat"
-                onSubmit={({ value, selectedPersona }) =>
-                  this.sendAdHocRequest(
-                    value,
-                    atomUtils.getChatSocket(this.props.atom),
-                    selectedPersona && selectedPersona.personaId
-                  )
-                }
-              />
-            )}
-            {!!atomUtils.getGroupSocket(this.props.atom) && (
-              <ChatTextfield
-                placeholder="Message (optional)"
-                allowEmptySubmit={true}
-                showPersonas={true}
-                submitButtonLabel="Join&#160;Group"
-                onSubmit={({ value, selectedPersona }) =>
-                  this.sendAdHocRequest(
-                    value,
-                    atomUtils.getGroupSocket(this.props.atom),
-                    selectedPersona && selectedPersona.personaId
-                  )
-                }
-              />
-            )}
-          </React.Fragment>
-        );
-        break;
-      case FooterType.UNKNOWN:
-      default:
-        footerElement = undefined;
-        break;
-    }
-
-    return (
-      <won-atom-footer class={this.props.className ? this.props.className : ""}>
-        {footerElement}
-      </won-atom-footer>
-    );
-  }
-
-  getUseCaseTypeButton(useCase, index) {
+  function getUseCaseTypeButton(useCase, index) {
     const ucIdentifier = get(useCase, "identifier");
     const ucSenderSocketType = get(useCase, "senderSocketType");
     const ucTargetSocketType = get(useCase, "targetSocketType");
 
-    const atomElements = this.props.ownedReactionAtomsArray
+    const atomElements = ownedReactionAtomsArray
       .filter(reactionAtom =>
         atomUtils.matchesDefinition(reactionAtom, useCase)
       )
@@ -268,12 +95,12 @@ class AtomInfo extends React.Component {
           ucSenderSocketType
         );
         const targetSocketUri = atomUtils.getSocketUri(
-          this.props.atom,
+          atom,
           ucTargetSocketType
         );
 
         const existingConnections = get(reactionAtom, "connections")
-          .filter(conn => get(conn, "targetAtomUri") === this.props.atomUri)
+          .filter(conn => get(conn, "targetAtomUri") === atomUri)
           .filter(conn =>
             connectionUtils.hasSocketUris(
               conn,
@@ -288,13 +115,13 @@ class AtomInfo extends React.Component {
         return (
           <WonAtomHeader
             key={get(reactionAtom, "uri") + "-" + index}
-            atomUri={get(reactionAtom, "uri")}
+            atom={reactionAtom}
             hideTimestamp={true}
             onClick={() =>
-              this.connectAtomSockets(
+              connectAtomSockets(
                 reactionAtom,
                 atomUtils.getSocketUri(reactionAtom, ucSenderSocketType),
-                atomUtils.getSocketUri(this.props.atom, ucTargetSocketType)
+                atomUtils.getSocketUri(atom, ucTargetSocketType)
               )
             }
           />
@@ -302,9 +129,9 @@ class AtomInfo extends React.Component {
       });
 
     const type =
-      this.props.footerType === FooterType.ENABLED
+      footerType === FooterType.ENABLED
         ? "enabled"
-        : this.props.footerType === FooterType.REACTION
+        : footerType === FooterType.REACTION
           ? "reaction"
           : undefined;
     let headerText =
@@ -329,7 +156,7 @@ class AtomInfo extends React.Component {
             <Link
               key={ucIdentifier + "-" + index}
               className="atom-footer__adhocbutton"
-              to={this.selectUseCaseRoute(
+              to={selectUseCaseRoute(
                 ucIdentifier,
                 ucSenderSocketType,
                 ucTargetSocketType
@@ -368,29 +195,33 @@ class AtomInfo extends React.Component {
     );
   }
 
-  selectUseCaseRoute(ucIdentifier, ucSenderSocketType, ucTargetSocketType) {
+  function selectUseCaseRoute(
+    ucIdentifier,
+    ucSenderSocketType,
+    ucTargetSocketType
+  ) {
     return generateLink(
-      this.props.history.location,
+      history.location,
       {
         useCase: ucIdentifier,
-        fromAtomUri: this.props.atomUri,
+        fromAtomUri: atomUri,
         senderSocketType: ucSenderSocketType,
         targetSocketType: ucTargetSocketType,
         mode: "CONNECT",
-        holderUri: this.props.addHolderUri,
+        holderUri: addHolderUri,
       },
       "/create"
     );
   }
 
-  connectAtomSockets(
+  function connectAtomSockets(
     senderAtom,
     senderSocketUri,
     targetSocketUri,
     message = ""
   ) {
-    const targetAtom = this.props.atom;
-    const footerType = this.props.footerType;
+    const targetAtom = atom;
+    const footerType = footerType;
     const dialogText = "Connect with this Atom?";
 
     const payload = {
@@ -401,18 +232,22 @@ class AtomInfo extends React.Component {
           caption: "Yes",
           callback: () => {
             if (footerType === FooterType.ENABLED) {
-              this.props.connectSocketsServerSide(
-                senderSocketUri,
-                targetSocketUri
+              dispatch(
+                actionCreators.atoms__connectSocketsServerSide(
+                  senderSocketUri,
+                  targetSocketUri
+                )
               );
             } else {
-              this.props.connectSockets(
-                senderSocketUri,
-                targetSocketUri,
-                message
+              dispatch(
+                actionCreators.atoms__connectSockets(
+                  senderSocketUri,
+                  targetSocketUri,
+                  message
+                )
               );
             }
-            this.props.hideModalDialog();
+            dispatch(actionCreators.view__hideModalDialog());
 
             const senderSocketType = atomUtils.getSocketType(
               senderAtom,
@@ -426,31 +261,31 @@ class AtomInfo extends React.Component {
               senderSocketType === vocab.CHAT.ChatSocketCompacted ||
               targetSocketType === vocab.CHAT.ChatSocketCompacted
             ) {
-              this.props.history.push("/connections");
+              history.push("/connections");
             }
           },
         },
         {
           caption: "No",
           callback: () => {
-            this.props.hideModalDialog();
+            dispatch(actionCreators.view__hideModalDialog());
           },
         },
       ],
     };
-    this.props.showModalDialog(payload);
+    dispatch(actionCreators.view__showModalDialog(payload));
   }
 
-  sendAdHocRequest(message, targetSocketUri, personaUri) {
-    const _atomUri = this.props.atomUri;
+  function sendAdHocRequest(message, targetSocketUri, personaUri) {
+    const _atomUri = atomUri;
 
-    if (this.props.loggedIn) {
+    if (loggedIn) {
       if (_atomUri) {
-        const personaAtom = get(this.props.ownedChatSocketAtoms, personaUri);
+        const personaAtom = get(ownedChatSocketAtoms, personaUri);
 
         if (personaAtom) {
           const targetSocketType =
-            targetSocketUri === atomUtils.getChatSocket(this.props.atom)
+            targetSocketUri === atomUtils.getChatSocket(atom)
               ? vocab.CHAT.ChatSocketCompacted
               : vocab.GROUP.GroupSocketCompacted;
 
@@ -464,64 +299,78 @@ class AtomInfo extends React.Component {
             );
 
           if (personaConnections.size == 0) {
-            this.props.connect(
-              personaUri,
-              _atomUri,
-              vocab.CHAT.ChatSocketCompacted,
-              targetSocketType,
-              message
-            );
-            this.props.history.push("/connections");
-          } else if (personaConnections.size == 1) {
-            const personaConnection = personaConnections.first();
-            const personaConnectionUri = get(personaConnection, "uri");
-
-            if (
-              connectionUtils.isSuggested(personaConnection) ||
-              connectionUtils.isClosed(personaConnection)
-            ) {
-              this.props.connectSockets(
-                get(personaConnection, "socketUri"),
-                get(personaConnection, "targetSocketUri"),
-                message
-              );
-            } else if (connectionUtils.isRequestSent(personaConnection)) {
-              // Just go to the connection without sending another request
-              /*
-              //Send another Request with a new message if there is a message present
-              this.props.connect(
+            dispatch(
+              actionCreators.atoms__connect(
                 personaUri,
                 _atomUri,
                 vocab.CHAT.ChatSocketCompacted,
                 targetSocketType,
                 message
+              )
+            );
+            history.push("/connections");
+          } else if (personaConnections.size == 1) {
+            const personaConnection = personaConnections.first();
+            const personaConnectionUri = get(personaConnection, "uri");
+
+            const senderSocketUri = get(personaConnection, "socketUri");
+            const targetSocketUri = get(personaConnection, "targetSocketUri");
+
+            if (
+              connectionUtils.isSuggested(personaConnection) ||
+              connectionUtils.isClosed(personaConnection)
+            ) {
+              dispatch(
+                actionCreators.atoms__connectSockets(
+                  senderSocketUri,
+                  targetSocketUri,
+                  message
+                )
+              );
+            } else if (connectionUtils.isRequestSent(personaConnection)) {
+              // Just go to the connection without sending another request
+              /*
+              //Send another Request with a new message if there is a message present
+              dispatch(
+                actionCreators.atoms__connect(
+                  personaUri,
+                  _atomUri,
+                  vocab.CHAT.ChatSocketCompacted,
+                  targetSocketType,
+                  message
+                )
               );
               */
             } else if (connectionUtils.isRequestReceived(personaConnection)) {
-              const senderSocketUri = get(personaConnection, "socketUri");
-              const targetSocketUri = get(personaConnection, "targetSocketUri");
-              this.props.connectSockets(
-                senderSocketUri,
-                targetSocketUri,
-                message
+              dispatch(
+                actionCreators.atoms__connectSockets(
+                  senderSocketUri,
+                  targetSocketUri,
+                  message
+                )
               );
             } else if (connectionUtils.isConnected(personaConnection)) {
-              const senderSocketUri = get(personaConnection, "socketUri");
-              const targetSocketUri = get(personaConnection, "targetSocketUri");
-              this.props.sendChatMessage(
-                message,
-                undefined,
-                undefined,
-                senderSocketUri,
-                targetSocketUri,
-                personaConnectionUri,
-                false
-              );
+              if (message) {
+                dispatch(
+                  actionCreators.connections__sendChatMessage(
+                    message,
+                    undefined,
+                    undefined,
+                    senderSocketUri,
+                    targetSocketUri,
+                    personaConnectionUri,
+                    false
+                  )
+                );
+              } /*else {
+                // Just go to the conneciton without sending an empty message
+              }
+              */
             }
 
-            this.props.history.push(
+            history.push(
               generateLink(
-                this.props.history.location,
+                history.location,
                 {
                   connectionUri: personaConnectionUri,
                 },
@@ -536,63 +385,121 @@ class AtomInfo extends React.Component {
             );
           }
         } else {
-          this.props.history.push("/connections");
+          history.push("/connections");
 
-          this.props.connectionsConnectAdHoc(
-            targetSocketUri,
-            message,
-            personaUri
+          dispatch(
+            actionCreators.connections__connectAdHoc(targetSocketUri, message)
           );
         }
       }
     } else {
-      this.props.showTermsDialog(
-        Immutable.fromJS({
-          acceptCallback: () => {
-            this.props.hideModalDialog();
-            this.props.history.push("/connections");
+      dispatch(
+        actionCreators.view__showTermsDialog(
+          Immutable.fromJS({
+            acceptCallback: () => {
+              dispatch(actionCreators.view__hideModalDialog());
+              history.push("/connections");
 
-            this.props.connectionsConnectAdHoc(
-              targetSocketUri,
-              message,
-              personaUri
-            );
-          },
-          cancelCallback: () => {
-            this.props.hideModalDialog();
-          },
-        })
+              dispatch(
+                actionCreators.connections__connectAdHoc(
+                  targetSocketUri,
+                  message
+                )
+              );
+            },
+            cancelCallback: () => {
+              dispatch(actionCreators.view__hideModalDialog());
+            },
+          })
+        )
       );
     }
   }
+
+  let footerElement;
+
+  switch (footerType) {
+    case FooterType.INACTIVE:
+      footerElement = (
+        <div className="atom-footer__infolabel">
+          Atom is inactive, no requests allowed
+        </div>
+      );
+      break;
+    case FooterType.INACTIVE_OWNED:
+      footerElement = (
+        <React.Fragment>
+          <div className="atom-footer__infolabel">
+            This Atom is inactive. Others will not be able to interact with it.
+          </div>
+          <button
+            className="won-publish-button red won-button--filled"
+            onClick={() => dispatch(actionCreators.atoms__reopen(atomUri))}
+          >
+            Reopen
+          </button>
+        </React.Fragment>
+      );
+      break;
+    case FooterType.REACTION:
+      footerElement = useCasesArray.map((useCase, index) =>
+        getUseCaseTypeButton(useCase, index)
+      );
+      break;
+    case FooterType.ENABLED:
+      footerElement = useCasesArray.map((useCase, index) =>
+        getUseCaseTypeButton(useCase, index)
+      );
+      break;
+    case FooterType.ADHOC:
+      footerElement = (
+        <React.Fragment>
+          {!!atomUtils.getChatSocket(atom) && (
+            <ChatTextfield
+              placeholder="Message (optional)"
+              allowEmptySubmit={true}
+              showPersonas={true}
+              submitButtonLabel="Ask&#160;to&#160;Chat"
+              onSubmit={({ value, selectedPersona }) =>
+                sendAdHocRequest(
+                  value,
+                  atomUtils.getChatSocket(atom),
+                  selectedPersona && selectedPersona.personaId
+                )
+              }
+            />
+          )}
+          {!!atomUtils.getGroupSocket(atom) && (
+            <ChatTextfield
+              placeholder="Message (optional)"
+              allowEmptySubmit={true}
+              showPersonas={true}
+              submitButtonLabel="Join&#160;Group"
+              onSubmit={({ value, selectedPersona }) =>
+                sendAdHocRequest(
+                  value,
+                  atomUtils.getGroupSocket(atom),
+                  selectedPersona && selectedPersona.personaId
+                )
+              }
+            />
+          )}
+        </React.Fragment>
+      );
+      break;
+    case FooterType.UNKNOWN:
+    default:
+      footerElement = undefined;
+      break;
+  }
+
+  return (
+    <won-atom-footer class={className ? className : ""}>
+      {footerElement}
+    </won-atom-footer>
+  );
 }
-
-AtomInfo.propTypes = {
-  atomUri: PropTypes.string,
+WonAtomFooter.propTypes = {
   atom: PropTypes.object,
-  loggedIn: PropTypes.bool,
-  isOwned: PropTypes.bool,
-  footerType: PropTypes.number,
-  useCasesArray: PropTypes.arrayOf(PropTypes.object),
-  ownedReactionAtomsArray: PropTypes.arrayOf(PropTypes.object),
-  addHolderUri: PropTypes.string,
   className: PropTypes.string,
-  hideModalDialog: PropTypes.func,
-  showModalDialog: PropTypes.func,
-  showTermsDialog: PropTypes.func,
-  connectionsConnectAdHoc: PropTypes.func,
-  ownedChatSocketAtoms: PropTypes.object,
-  connect: PropTypes.func,
-  connectSockets: PropTypes.func,
-  connectSocketsServerSide: PropTypes.func,
-  sendChatMessage: PropTypes.func,
-  atomReopen: PropTypes.func,
-  history: PropTypes.object,
 };
-
-export default withRouter(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(AtomInfo)
-);

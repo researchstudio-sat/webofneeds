@@ -4,7 +4,7 @@ import { actionTypes } from "../actions/actions.js";
 import * as atomUtils from "./utils/atom-utils.js";
 import * as processUtils from "./utils/process-utils.js";
 import { parseMetaAtom } from "../reducers/atom-reducer/parse-atom.js";
-import { get, is } from "../utils.js";
+import { get, getIn, is } from "../utils.js";
 import won from "../won-es6";
 import vocab from "../service/vocab.js";
 
@@ -62,7 +62,7 @@ export function fetchDataForOwnedAtoms(
 
 export function fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch) {
   return won
-    .getConnectionWithEventUris(connUri, { requesterWebId: atomUri })
+    .getConnection(connUri, { requesterWebId: atomUri })
     .then(connection => {
       dispatch({
         type: actionTypes.connections.storeActive,
@@ -105,14 +105,10 @@ export function fetchActiveConnectionAndDispatchBySocketUris(
   dispatch
 ) {
   return won
-    .getConnectionWithEventUrisBySocket(senderSocketUri, targetSocketUri, {
+    .getConnectionBySocket(senderSocketUri, targetSocketUri, {
       requesterWebId: atomUri,
     })
     .then(conn => {
-      console.debug(
-        "fetchActiveConnectionAndDispatchBySocketUris - conn: ",
-        conn
-      );
       dispatch({
         type: actionTypes.connections.storeActive,
         payload: Immutable.fromJS({ connections: { [conn.uri]: conn } }),
@@ -322,7 +318,7 @@ export function fetchMessages(
 ) {
   const fetchParams = {
     requesterWebId: atomUri,
-    pagingSize: numOfMsgs2pageSize(numberOfMessages),
+    pagingSize: numberOfMessages * 3, // `*3*` to compensate for the *roughly* 2 additional success messages per chat message
     deep: true,
     resumeafter: resumeAfter,
   };
@@ -331,9 +327,18 @@ export function fetchMessages(
     type: actionTypes.connections.fetchMessagesStart,
     payload: Immutable.fromJS({ connectionUri: connectionUri }),
   });
+
+  const connectionContainerUri = getIn(state, [
+    "atoms",
+    atomUri,
+    "connections",
+    connectionUri,
+    "messageContainerUri",
+  ]);
+
   return won
-    .getMessagesOfConnection(connectionUri, fetchParams)
-    .then(messages => {
+    .getMessagesOfConnection(connectionUri, connectionContainerUri, fetchParams)
+    .then(({ nextPage, messages }) => {
       const lookupMap = { success: {}, failed: {} };
       const loadingArray = [];
       messages.map(message => {
@@ -346,61 +351,51 @@ export function fetchMessages(
         }
       });
 
-      dispatch({
-        type: actionTypes.connections.messageUrisInLoading,
-        payload: Immutable.fromJS({
-          connectionUri: connectionUri,
-          uris: loadingArray,
-        }),
-      });
-
-      return lookupMap;
+      return { nextPage: nextPage, messages: lookupMap };
     })
-    .then(messages => storeMessages(dispatch, messages, connectionUri));
-}
+    .then(({ nextPage, messages }) => {
+      if (messages) {
+        const messagesImm = Immutable.fromJS(messages);
+        const successMessages = get(messagesImm, "success");
+        const failedMessages = get(messagesImm, "failed");
 
-/**
- * Helper function that stores dispatches the success and failed actions for a given set of messages
- * @param messages
- * @param connectionUri
- */
-function storeMessages(dispatch, messages, connectionUri) {
-  if (messages) {
-    const messagesImm = Immutable.fromJS(messages);
-    const successMessages = get(messagesImm, "success");
-    const failedMessages = get(messagesImm, "failed");
+        if (successMessages.size > 0) {
+          dispatch({
+            type: actionTypes.connections.fetchMessagesSuccess,
+            payload: Immutable.fromJS({
+              connectionUri: connectionUri,
+              events: successMessages,
+              nextPage: nextPage,
+            }),
+          });
+        }
 
-    if (successMessages.size > 0) {
-      dispatch({
-        type: actionTypes.connections.fetchMessagesSuccess,
-        payload: Immutable.fromJS({
-          connectionUri: connectionUri,
-          events: successMessages,
-        }),
-      });
-    }
+        if (failedMessages.size > 0) {
+          dispatch({
+            type: actionTypes.connections.fetchMessagesFailed,
+            payload: Immutable.fromJS({
+              connectionUri: connectionUri,
+              events: failedMessages,
+              nextPage: nextPage,
+            }),
+          });
+        }
 
-    if (failedMessages.size > 0) {
-      dispatch({
-        type: actionTypes.connections.fetchMessagesFailed,
-        payload: Immutable.fromJS({
-          connectionUri: connectionUri,
-          events: failedMessages,
-        }),
-      });
-    }
-
-    /*If neither succes nor failed has any elements we simply say that fetching Ended, that way
-    we can ensure that there is not going to be a lock on the connection because loadingMessages was complete but never
-    reset its status
-    */
-    if (successMessages.size == 0 && failedMessages.size == 0) {
-      dispatch({
-        type: actionTypes.connections.fetchMessagesEnd,
-        payload: Immutable.fromJS({ connectionUri: connectionUri }),
-      });
-    }
-  }
+        /*If neither succes nor failed has any elements we simply say that fetching Ended, that way
+        we can ensure that there is not going to be a lock on the connection because loadingMessages was complete but never
+        reset its status
+        */
+        if (successMessages.size == 0 && failedMessages.size == 0) {
+          dispatch({
+            type: actionTypes.connections.fetchMessagesEnd,
+            payload: Immutable.fromJS({
+              connectionUri: connectionUri,
+              nextPage: nextPage,
+            }),
+          });
+        }
+      }
+    });
 }
 
 export function fetchConnectionsOfAtomAndDispatch(atomUri, dispatch) {
@@ -572,9 +567,4 @@ function urisToLookupMap(
     });
     return lookupMap;
   });
-}
-
-function numOfMsgs2pageSize(numberOfMessages) {
-  // `*3*` to compensate for the *roughly* 2 additional success messages per chat message
-  return numberOfMessages * 3;
 }

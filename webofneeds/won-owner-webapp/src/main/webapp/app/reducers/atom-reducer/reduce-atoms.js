@@ -2,7 +2,6 @@ import { parseAtom, parseMetaAtom } from "./parse-atom.js";
 import Immutable from "immutable";
 import { get, getIn } from "../../utils.js";
 import vocab from "../../service/vocab.js";
-import * as atomUtils from "../../redux/utils/atom-utils.js";
 
 export function addAtom(atoms, jsonldAtom) {
   let newState;
@@ -17,27 +16,6 @@ export function addAtom(atoms, jsonldAtom) {
         "connections",
         get(existingAtom, "connections")
       );
-
-      const heldAtomUris = get(parsedAtom, "holds");
-      if (heldAtomUris.size > 0) {
-        heldAtomUris.map(atomUri => {
-          atoms = addAtomStub(atoms, atomUri);
-        });
-      }
-
-      const groupMemberUris = get(parsedAtom, "groupMembers");
-      if (groupMemberUris.size > 0) {
-        groupMemberUris.map(atomUri => {
-          atoms = addAtomStub(atoms, atomUri);
-        });
-      }
-
-      const buddyUris = get(parsedAtom, "buddies");
-      if (buddyUris.size > 0) {
-        buddyUris.map(atomUri => {
-          atoms = addAtomStub(atoms, atomUri);
-        });
-      }
     }
 
     return atoms.set(parsedAtomUri, parsedAtom);
@@ -51,35 +29,6 @@ export function addAtom(atoms, jsonldAtom) {
 
 export function deleteAtom(atoms, deletedAtomUri) {
   return atoms.delete(deletedAtomUri).map(atom => {
-    const removeHolder = atom => {
-      if (atomUtils.getHeldByUri(atom) === deletedAtomUri) {
-        return atom.delete("heldBy");
-      } else return atom;
-    };
-    const removeHeld = atom => {
-      return atom.updateIn(
-        ["holds"],
-        heldItems =>
-          heldItems && heldItems.filter(heldItem => heldItem != deletedAtomUri)
-      );
-    };
-
-    const removeGroupMembers = atom => {
-      return atom.updateIn(
-        ["groupMembers"],
-        heldItems =>
-          heldItems && heldItems.filter(heldItem => heldItem != deletedAtomUri)
-      );
-    };
-
-    const removeBuddies = atom => {
-      return atom.updateIn(
-        ["buddies"],
-        buddies =>
-          buddies && buddies.filter(heldItem => heldItem != deletedAtomUri)
-      );
-    };
-
     const removeConnections = atom => {
       return atom.updateIn(
         ["connections"],
@@ -91,9 +40,7 @@ export function deleteAtom(atoms, deletedAtomUri) {
       );
     };
 
-    return removeConnections(
-      removeHeld(removeHolder(removeGroupMembers(removeBuddies(atom))))
-    );
+    return removeConnections(atom);
   });
 }
 

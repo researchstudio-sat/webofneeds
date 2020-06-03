@@ -8,6 +8,7 @@ import { getIn, get } from "../../utils.js";
 import * as atomUtils from "../utils/atom-utils.js";
 import * as connectionUtils from "../utils/connection-utils.js";
 import * as accountUtils from "../utils/account-utils.js";
+import * as processUtils from "../utils/process-utils.js";
 import * as viewUtils from "../utils/view-utils.js";
 import Color from "color";
 import Immutable from "immutable";
@@ -15,16 +16,47 @@ import vocab from "../../service/vocab";
 
 export const selectLastUpdateTime = state => get(state, "lastUpdateTime");
 
-export const getAccountState = state => get(state, "account");
+export const getAccountState = createSelector(
+  state => get(state, "account"),
+  state => state
+);
+export const getProcessState = createSelector(
+  state => get(state, "process"),
+  state => state
+);
+export const getViewState = createSelector(
+  state => get(state, "view"),
+  state => state
+);
 
 export const getAtoms = createSelector(
   state => state,
   state => get(state, "atoms")
 );
 
+export const getConfigState = createSelector(
+  state => state,
+  state => get(state, "config")
+);
+
+export const getTheme = createSelector(getConfigState, configState =>
+  get(configState, "theme")
+);
+
+export const getVisibleUseCasesByConfig = createSelector(getTheme, theme =>
+  get(theme, "visibleUseCases")
+);
+
+export const getDefaultNodeUri = createSelector(getConfigState, configState =>
+  get(configState, "defaultNodeUri")
+);
+
 export const getOwnedAtomUris = createSelector(getAccountState, account =>
   get(account, "ownedAtomUris")
 );
+
+export const getAtom = atomUri =>
+  createSelector(getAtoms, atoms => get(atoms, atomUri));
 
 export const getOwnedAtoms = createSelector(
   getOwnedAtomUris,
@@ -122,30 +154,25 @@ export const hasUnreadSuggestedConnections = createSelector(
  * Determines if there are any buddy connections that are unread
  * (used for the inventory unread indicator)
  * @param state
- * @returns {boolean}
+ * @returns {function(state)}
  */
-export function hasUnreadBuddyConnections(
-  state,
-  excludeClosed = false,
-  excludeSuggested = false
-) {
-  const allOwnedAtoms = getOwnedAtoms(state);
-
-  return (
-    allOwnedAtoms &&
-    !!allOwnedAtoms
-      .filter(atom => atomUtils.isActive(atom))
-      .find(
-        atom =>
-          !!getBuddyConnectionsByAtomUri(
-            state,
-            get(atom, "uri"),
-            excludeClosed,
-            excludeSuggested
-          ).find(conn => connectionUtils.isUnread(conn))
-      )
+export const hasUnreadBuddyConnections = (excludeClosed, excludeSuggested) =>
+  createSelector(
+    state => state,
+    getOwnedAtoms,
+    (state, allOwnedAtoms) =>
+      allOwnedAtoms &&
+      !!allOwnedAtoms
+        .filter(atomUtils.isActive)
+        .find(
+          atom =>
+            !!getBuddyConnectionsByAtomUri(
+              get(atom, "uri"),
+              excludeClosed,
+              excludeSuggested
+            )(state).find(conn => connectionUtils.isUnread(conn))
+        )
   );
-}
 
 /**
  * Returns all buddyConnections of an atom
@@ -153,26 +180,25 @@ export function hasUnreadBuddyConnections(
  * @param atomUri
  * @param excludeClosed  -> exclude Closed connections
  * @param excludeSuggested -> exclude Suggested connections
- * @returns {*}
+ * @returns {function(state)}
  */
-export function getBuddyConnectionsByAtomUri(
-  state,
+const getBuddyConnectionsByAtomUri = (
   atomUri,
-  excludeClosed = false,
-  excludeSuggested = false
-) {
-  const atoms = getAtoms(state);
-  const connections = getIn(atoms, [atomUri, "connections"]);
+  excludeClosed,
+  excludeSuggested
+) =>
+  createSelector(getAtoms, atoms => {
+    const connections = getIn(atoms, [atomUri, "connections"]);
 
-  return connections
-    ? connections
-        .filter(conn => !(excludeClosed && connectionUtils.isClosed(conn)))
-        .filter(
-          conn => !(excludeSuggested && connectionUtils.isSuggested(conn))
-        )
-        .filter(conn => isBuddyConnection(atoms, conn))
-    : Immutable.Map();
-}
+    return connections
+      ? connections
+          .filter(conn => !(excludeClosed && connectionUtils.isClosed(conn)))
+          .filter(
+            conn => !(excludeSuggested && connectionUtils.isSuggested(conn))
+          )
+          .filter(conn => isBuddyConnection(atoms, conn))
+      : Immutable.Map();
+  });
 
 /**
  * Returns true if both sockets are BuddySockets
@@ -215,14 +241,15 @@ export const selectIsConnected = state =>
  * @param state to retrieve data from
  * @param connectionUri to find corresponding atom for
  */
-export function getOwnedAtomByConnectionUri(state, connectionUri) {
-  const atoms = connectionUri && getOwnedAtoms(state); //we only check own atoms as these are the only ones who have connections stored
-  return (
-    atoms &&
-    (getIn(atoms, connectionUri.split("/c")[0]) ||
-      atoms.find(atom => atom.getIn(["connections", connectionUri])))
+export const getOwnedAtomByConnectionUri = connectionUri =>
+  createSelector(
+    getOwnedAtoms,
+    atoms =>
+      connectionUri &&
+      atoms &&
+      (get(atoms, connectionUri.split("/c")[0]) ||
+        atoms.find(atom => getIn(atom, ["connections", connectionUri])))
   );
-}
 
 export const getOwnedPersonas = createSelector(
   getOwnedAtoms,
@@ -279,52 +306,47 @@ export function currentSkin() {
 }
 /**
  * Returns true if the atom is owned by the user who is currently logged in
- * @param state FULL redux state, no substates allowed
  * @param atomUri
+ * @return function(state)
  */
-export function isAtomOwned(state, atomUri) {
-  if (atomUri) {
-    const accountState = getAccountState(state);
-    return accountUtils.isAtomOwned(accountState, atomUri);
-  }
-  return false;
-}
+export const isAtomOwned = atomUri =>
+  createSelector(getAccountState, accountState =>
+    accountUtils.isAtomOwned(accountState, atomUri)
+  );
 
 /**
  * This checks if the given atomUri is allowed to be used as a template,
  * it is only allowed if the atom exists is NOT owned, and if it has a matchedUseCase
  * @param atomUri
- * @returns {*|boolean}
+ * @returns {func(state) -> returns bool}
  */
-export function isAtomUsableAsTemplate(state, atomUri) {
-  const atom = getIn(state, ["atoms", atomUri]);
-
-  return (
-    !!atom && !isAtomOwned(state, atomUri) && atomUtils.hasMatchedUseCase(atom)
+export const isAtomUsableAsTemplate = atomUri =>
+  createSelector(
+    getAtom(atomUri),
+    isAtomOwned(atomUri),
+    (atom, isOwned) => !!atom && !isOwned && atomUtils.hasMatchedUseCase(atom)
   );
-}
 
 /**
  * This checks if the given atomUri is allowed to be edited,
  * it is only allowed if the atom exists, and if it IS owned and has a matchedUseCase
  * @param atom
- * @returns {*|boolean}
+ * @returns {func(state) -> returns bool}
  */
-export function isAtomEditable(state, atomUri) {
-  const atom = getIn(state, ["atoms", atomUri]);
-
-  return (
-    !!atom && isAtomOwned(state, atomUri) && atomUtils.hasMatchedUseCase(atom)
+export const isAtomEditable = atomUri =>
+  createSelector(
+    getAtom(atomUri),
+    isAtomOwned(atomUri),
+    (atom, isOwned) => !!atom && isOwned && atomUtils.hasMatchedUseCase(atom)
   );
-}
 
 export const isLocationAccessDenied = createSelector(
-  state => get(state, "view"),
+  getViewState,
   viewState => viewState && viewUtils.isLocationAccessDenied(viewState)
 );
 
 export const getCurrentLocation = createSelector(
-  state => get(state, "view"),
+  getViewState,
   viewState => viewState && viewUtils.getCurrentLocation(viewState)
 );
 
@@ -353,3 +375,47 @@ export const getTargetSocketType = (allAtoms, connection) => {
     getIn(allAtoms, [targetAtomUri, "content", "sockets", targetSocketUri])
   );
 };
+
+/**
+ * Get all connections stored within your own atoms as a map
+ * @returns Immutable.Map with all connections
+ */
+export const getOwnedConnections = createSelector(
+  getOwnedAtoms,
+  ownedAtoms =>
+    ownedAtoms && ownedAtoms.flatMap(atom => get(atom, "connections"))
+);
+
+/**
+ * Get all the connectionUris storid within the state
+ */
+export const getOwnedConnectionUris = createSelector(
+  getOwnedConnections,
+  ownedConnections => ownedConnections && ownedConnections.keySeq().toSet()
+);
+
+export const getConnectionsToCrawl = createSelector(
+  getProcessState,
+  getAllConnectedChatAndGroupConnections,
+  (process, connections) =>
+    connections
+      ? connections
+          .filter(
+            conn => !get(conn, "messages") || get(conn, "messages").size === 0
+            // the check below (if connectMessage was present) was replaced by if any messages are available (if any are there this connection is not to be fetched anymore)
+            // !!conn
+            //   .get("messages")
+            //   .find(msg => msg.get("messageType") === vocab.WONMSG.connectMessage)
+          )
+          .filter(conn => {
+            const connUri = get(conn, "uri");
+
+            return (
+              !processUtils.isConnectionLoading(process, connUri) &&
+              !processUtils.isConnectionLoadingMessages(process, connUri) &&
+              !processUtils.hasConnectionFailedToLoad(process, connUri) &&
+              processUtils.hasMessagesToLoad(process, connUri)
+            );
+          })
+      : Immutable.Map()
+);

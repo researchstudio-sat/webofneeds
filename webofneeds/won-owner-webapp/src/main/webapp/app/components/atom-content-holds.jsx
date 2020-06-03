@@ -22,16 +22,12 @@ import vocab from "../service/vocab";
 
 export default function WonAtomContentHolds({ atom }) {
   const atomUri = get(atom, "uri");
-  const isOwned = useSelector(state =>
-    generalSelectors.isAtomOwned(state, atomUri)
-  );
-  const currentLocation = useSelector(state =>
-    generalSelectors.getCurrentLocation(state)
-  );
+  const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
+  const currentLocation = useSelector(generalSelectors.getCurrentLocation);
 
   const [searchText, setSearchText] = useState({ value: "" });
 
-  const storedAtoms = useSelector(state => generalSelectors.getAtoms(state));
+  const storedAtoms = useSelector(generalSelectors.getAtoms);
 
   const connections = filterConnectionsBySearchValue(
     atomUtils.getConnectedConnections(atom, vocab.HOLD.HolderSocketCompacted),
@@ -44,7 +40,7 @@ export default function WonAtomContentHolds({ atom }) {
     return (
       <WonAtomCard
         key={get(conn, "uri")}
-        atomUri={get(conn, "targetAtomUri")}
+        atom={get(storedAtoms, get(conn, "targetAtomUri"))}
         currentLocation={currentLocation}
         showSuggestions={isOwned}
         showHolder={false}

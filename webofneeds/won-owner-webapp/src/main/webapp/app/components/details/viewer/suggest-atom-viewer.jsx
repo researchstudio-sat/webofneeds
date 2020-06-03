@@ -1,185 +1,221 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import PropTypes from "prop-types";
 import WonAtomCard from "../../atom-card.jsx";
-import { connect } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import * as generalSelectors from "../../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../../redux/utils/atom-utils.js";
-import { get, getIn, getQueryParams, generateLink } from "../../../utils.js";
+import { get, getQueryParams, generateLink } from "../../../utils.js";
 import { actionCreators } from "../../../actions/actions.js";
 
 import "~/style/_suggest-atom-viewer.scss";
-import * as processSelectors from "../../../redux/selectors/process-selectors";
-import { withRouter, Link } from "react-router-dom";
+import * as processUtils from "../../../redux/utils/process-utils.js";
+import { useHistory, Link } from "react-router-dom";
 
-const mapStateToProps = (state, ownProps) => {
-  const { connectionUri } = getQueryParams(ownProps.location);
-  const openedConnectionUri = connectionUri;
-  const openedOwnPost =
-    openedConnectionUri &&
-    generalSelectors.getOwnedAtomByConnectionUri(state, openedConnectionUri);
-  const connection = getIn(openedOwnPost, ["connections", openedConnectionUri]);
+export default function WonSuggestAtomViewer({ content, detail, className }) {
+  const dispatch = useDispatch();
+  const history = useHistory();
 
-  const suggestedPost = getIn(state, ["atoms", ownProps.content]);
-  const suggestedPostUri = get(suggestedPost, "uri");
+  const { connectionUri } = getQueryParams(history.location);
+  const openedOwnPost = useSelector(
+    generalSelectors.getOwnedAtomByConnectionUri(connectionUri)
+  );
+  const suggestedAtomUri = content;
+  const suggestedAtom = useSelector(generalSelectors.getAtom(suggestedAtomUri));
 
   const connectionsOfOpenedOwnPost = get(openedOwnPost, "connections");
   const connectionsBetweenPosts =
-    suggestedPostUri &&
+    suggestedAtomUri &&
     connectionsOfOpenedOwnPost &&
     connectionsOfOpenedOwnPost.filter(
-      conn => conn.get("targetAtomUri") === suggestedPostUri
+      conn => get(conn, "targetAtomUri") === suggestedAtomUri
     );
 
   const hasConnectionBetweenPosts =
     connectionsBetweenPosts && connectionsBetweenPosts.size > 0;
 
-  const isLoading = processSelectors.isAtomLoading(state, ownProps.content);
-  const toLoad = processSelectors.isAtomToLoad(state, ownProps.content);
+  const processState = useSelector(generalSelectors.getProcessState);
 
-  const failedToLoad = processSelectors.hasAtomFailedToLoad(
-    state,
-    ownProps.content
+  const isLoading = processUtils.isAtomLoading(processState, suggestedAtomUri);
+  const toLoad = processUtils.isAtomToLoad(processState, suggestedAtomUri);
+  const failedToLoad = processUtils.hasAtomFailedToLoad(
+    processState,
+    suggestedAtomUri
   );
 
   const fetchedSuggestion = !isLoading && !toLoad && !failedToLoad;
-  const isSuggestedOwned = generalSelectors.isAtomOwned(
-    state,
-    suggestedPostUri
+  const isSuggestedOwned = useSelector(
+    generalSelectors.isAtomOwned(suggestedAtomUri)
   );
 
+  const hasChatSocket = atomUtils.hasChatSocket(suggestedAtom);
+  const hasGroupSocket = atomUtils.hasGroupSocket(suggestedAtom);
+  const chatSocketUri = atomUtils.getChatSocket(suggestedAtom);
+  const groupSocketUri = atomUtils.getGroupSocket(suggestedAtom);
+  const ownChatSocketUri = atomUtils.getChatSocket(openedOwnPost);
+
   const showConnectAction =
-    suggestedPost &&
+    suggestedAtom &&
     fetchedSuggestion &&
-    atomUtils.isActive(suggestedPost) &&
-    !atomUtils.hasGroupSocket(suggestedPost) &&
-    atomUtils.hasChatSocket(suggestedPost) &&
+    atomUtils.isActive(suggestedAtom) &&
+    !hasGroupSocket &&
+    hasChatSocket &&
     !hasConnectionBetweenPosts &&
     !isSuggestedOwned &&
     openedOwnPost;
   const showJoinAction =
-    suggestedPost &&
+    suggestedAtom &&
     fetchedSuggestion &&
-    atomUtils.isActive(suggestedPost) &&
-    atomUtils.hasGroupSocket(suggestedPost) &&
-    !atomUtils.hasChatSocket(suggestedPost) &&
+    atomUtils.isActive(suggestedAtom) &&
+    hasGroupSocket &&
+    !hasChatSocket &&
     !hasConnectionBetweenPosts &&
     !isSuggestedOwned &&
     openedOwnPost;
 
-  return {
-    content: ownProps.content,
-    detail: ownProps.detail,
-    suggestedPost,
-    openedOwnPost,
-    hasChatSocket: atomUtils.hasChatSocket(suggestedPost),
-    hasGroupSocket: atomUtils.hasGroupSocket(suggestedPost),
-    chatSocketUri: atomUtils.getChatSocket(suggestedPost),
-    groupSocketUri: atomUtils.getGroupSocket(suggestedPost),
-    ownChatSocketUri: atomUtils.getChatSocket(openedOwnPost),
-    ownGroupSocketUri: atomUtils.getGroupSocket(openedOwnPost),
-    isSuggestedOwned,
-    showActions:
-      failedToLoad ||
-      showConnectAction ||
-      showJoinAction ||
-      hasConnectionBetweenPosts,
-    showConnectAction,
-    showJoinAction,
-    isLoading,
-    toLoad,
-    failedToLoad,
-    currentLocation: generalSelectors.getCurrentLocation(state),
-    multiSelectType: connection && connection.get("multiSelectType"),
-    hasConnectionBetweenPosts,
-    establishedConnectionUri:
-      hasConnectionBetweenPosts && get(connectionsBetweenPosts.first(), "uri"),
-  };
-};
+  const showActions =
+    failedToLoad ||
+    showConnectAction ||
+    showJoinAction ||
+    hasConnectionBetweenPosts;
+  const currentLocation = useSelector(generalSelectors.getCurrentLocation);
+  const establishedConnectionUri =
+    hasConnectionBetweenPosts && get(connectionsBetweenPosts.first(), "uri");
 
-const mapDispatchToProps = dispatch => {
-  return {
-    fetchAtom: uri => {
-      dispatch(actionCreators.atoms__fetchUnloadedAtom(uri));
-    },
-    connectSockets: (senderSocketUri, targetSocketUri, message) => {
+  useEffect(() => {
+    if (suggestedAtomUri && ((toLoad && !isLoading) || !suggestedAtom)) {
+      dispatch(actionCreators.atoms__fetchUnloadedAtom(suggestedAtomUri));
+    }
+  });
+
+  function getInfoText() {
+    if (isLoading) {
+      return "Loading Atom...";
+    } else if (toLoad) {
+      return "Atom marked toLoad";
+    } else if (failedToLoad) {
+      return "Failed to load Atom";
+    } else if (atomUtils.isInactive(suggestedAtom)) {
+      return "This Atom is inactive";
+    }
+
+    if (atomUtils.isPersona(suggestedAtom)) {
+      return isSuggestedOwned
+        ? "This is one of your Personas"
+        : "This is someone elses Persona";
+    } else if (hasConnectionBetweenPosts) {
+      return "Already established a Connection with this Atom";
+    } else if (isSuggestedOwned) {
+      return "This is one of your own Atoms";
+    } else if (hasChatSocket && !hasGroupSocket) {
+      return "Click 'Connect' to connect with this Atom";
+    } else if (!hasChatSocket && hasGroupSocket) {
+      return "Click 'Join' to connect with this Group";
+    }
+
+    return "Click on the Icon to view Details";
+  }
+
+  function reloadSuggestion() {
+    if (suggestedAtomUri && failedToLoad) {
+      dispatch(actionCreators.atoms__fetchUnloadedAtom(suggestedAtomUri));
+    }
+  }
+
+  function connectWithPost() {
+    const openedOwnPostUri = get(openedOwnPost, "uri");
+
+    if (openedOwnPostUri && suggestedAtomUri) {
+      let targetSocketUri;
+
+      if (groupSocketUri) {
+        targetSocketUri = groupSocketUri;
+      } else if (chatSocketUri) {
+        targetSocketUri = chatSocketUri;
+      }
+
+      let senderSocketUri;
+      if (ownChatSocketUri) {
+        senderSocketUri = ownChatSocketUri;
+      }
+
       dispatch(
         actionCreators.atoms__connectSockets(
           senderSocketUri,
           targetSocketUri,
-          message
+          "Hey a Friend told me about you, let's chat!"
         )
       );
-    },
-  };
-};
+    } else {
+      console.warn(
+        "No Connect, either openedOwnPost(Uri) or suggestedAtom(Uri) not present"
+      );
+    }
+  }
 
-class WonSuggestAtomViewer extends React.Component {
-  render() {
-    const icon = this.props.detail.icon && (
-      <svg className="suggestatomv__header__icon">
-        <use xlinkHref={this.props.detail.icon} href={this.props.detail.icon} />
-      </svg>
-    );
+  const icon = detail.icon && (
+    <svg className="suggestatomv__header__icon">
+      <use xlinkHref={detail.icon} href={detail.icon} />
+    </svg>
+  );
 
-    const label = this.props.detail.icon && (
-      <span className="suggestatomv__header__label">
-        {this.props.detail.label}
-      </span>
-    );
+  const label = detail.icon && (
+    <span className="suggestatomv__header__label">{detail.label}</span>
+  );
 
-    return (
-      <won-suggest-atom-viewer class={this.props.className}>
-        <div className="suggestatomv__header">
-          {icon}
-          {label}
-        </div>
-        <div className="suggestatomv__content">
-          <div className="suggestatomv__content__post">
+  return (
+    <won-suggest-atom-viewer class={className}>
+      <div className="suggestatomv__header">
+        {icon}
+        {label}
+      </div>
+      <div className="suggestatomv__content">
+        <div className="suggestatomv__content__element">
+          <div className="suggestatomv__content__element__post">
             <WonAtomCard
-              atomUri={this.props.content}
-              currentLocation={this.props.currentLocation}
+              atom={suggestedAtom}
+              currentLocation={currentLocation}
               showHolder={true}
               showSuggestions={false}
             />
-            {this.props.showActions ? (
-              <div className="suggestatomv__content__post__actions">
-                {this.props.failedToLoad ? (
+            {showActions ? (
+              <div className="suggestatomv__content__element__post__actions">
+                {failedToLoad ? (
                   <button
-                    className="suggestatomv__content__post__actions__button won-button--outlined thin red"
-                    onClick={this.reloadSuggestion.bind(this)}
+                    className="suggestatomv__content__element__post__actions__button won-button--outlined thin red"
+                    onClick={reloadSuggestion.bind(this)}
                   >
                     Reload
                   </button>
                 ) : (
                   undefined
                 )}
-                {this.props.showConnectAction ? (
+                {showConnectAction ? (
                   <button
-                    className="suggestatomv__content__post__actions__button won-button--outlined thin red"
-                    onClick={this.connectWithPost.bind(this)}
+                    className="suggestatomv__content__element__post__actions__button won-button--outlined thin red"
+                    onClick={connectWithPost.bind(this)}
                   >
                     Connect
                   </button>
                 ) : (
                   undefined
                 )}
-                {this.props.showJoinAction ? (
+                {showJoinAction ? (
                   <button
-                    className="suggestatomv__content__post__actions__button won-button--outlined thin red"
-                    onClick={this.connectWithPost.bind(this)}
+                    className="suggestatomv__content__element__post__actions__button won-button--outlined thin red"
+                    onClick={connectWithPost.bind(this)}
                   >
                     Join
                   </button>
                 ) : (
                   undefined
                 )}
-                {this.props.hasConnectionBetweenPosts ? (
+                {hasConnectionBetweenPosts ? (
                   <Link
-                    className="suggestatomv__content__post__actions__button won-button--outlined thin red"
+                    className="suggestatomv__content__element__post__actions__button won-button--outlined thin red"
                     to={location =>
                       generateLink(location, {
-                        connectionUri: this.props.establishedConnectionUri,
+                        connectionUri: establishedConnectionUri,
                       })
                     }
                   >
@@ -193,110 +229,16 @@ class WonSuggestAtomViewer extends React.Component {
               undefined
             )}
           </div>
-          <div className="suggestatomv__content__info">
-            {this.getInfoText()}
+          <div className="suggestatomv__content__element__info">
+            {getInfoText()}
           </div>
         </div>
-      </won-suggest-atom-viewer>
-    );
-  }
-
-  getInfoText() {
-    if (this.props.isLoading) {
-      return "Loading Atom...";
-    } else if (this.props.toLoad) {
-      return "Atom marked toLoad";
-    } else if (this.props.failedToLoad) {
-      return "Failed to load Atom";
-    } else if (atomUtils.isInactive(this.props.suggestedPost)) {
-      return "This Atom is inactive";
-    }
-
-    if (atomUtils.isPersona(this.props.suggestedPost)) {
-      return this.props.isSuggestedOwned
-        ? "This is one of your Personas"
-        : "This is someone elses Persona";
-    } else if (this.props.hasConnectionBetweenPosts) {
-      return "Already established a Connection with this Atom";
-    } else if (this.props.isSuggestedOwned) {
-      return "This is one of your own Atoms";
-    } else if (this.props.hasChatSocket && !this.props.hasGroupSocket) {
-      return "Click 'Connect' to connect with this Atom";
-    } else if (!this.props.hasChatSocket && this.props.hasGroupSocket) {
-      return "Click 'Join' to connect with this Group";
-    }
-
-    return "Click on the Icon to view Details";
-  }
-
-  reloadSuggestion() {
-    if (this.props.content && this.props.failedToLoad) {
-      this.props.fetchAtom(this.props.content);
-    }
-  }
-
-  connectWithPost() {
-    const openedOwnPostUri =
-      this.props.openedOwnPost && this.props.openedOwnPost.get("uri");
-    const suggestedPostUri =
-      this.props.suggestedPost && this.props.suggestedPost.get("uri");
-
-    if (openedOwnPostUri && suggestedPostUri) {
-      let targetSocketUri;
-
-      if (this.props.groupSocketUri) {
-        targetSocketUri = this.props.groupSocketUri;
-      } else if (this.props.chatSocketUri) {
-        targetSocketUri = this.props.chatSocketUri;
-      }
-
-      let senderSocketUri;
-      if (this.props.ownChatSocketUri) {
-        senderSocketUri = this.props.ownChatSocketUri;
-      }
-
-      this.props.connectSockets(
-        senderSocketUri,
-        targetSocketUri,
-        "Hey a Friend told me about you, let's chat!"
-      );
-    } else {
-      console.warn(
-        "No Connect, either openedOwnPost(Uri) or suggestedPost(Uri) not present"
-      );
-    }
-  }
+      </div>
+    </won-suggest-atom-viewer>
+  );
 }
 WonSuggestAtomViewer.propTypes = {
+  content: PropTypes.string, //atomUri in this case
   detail: PropTypes.object,
-  content: PropTypes.string,
   className: PropTypes.string,
-  fetchAtom: PropTypes.func,
-  connectSockets: PropTypes.func,
-  suggestedPost: PropTypes.object,
-  openedOwnPost: PropTypes.object,
-  hasChatSocket: PropTypes.bool,
-  hasGroupSocket: PropTypes.bool,
-  groupSocketUri: PropTypes.string,
-  chatSocketUri: PropTypes.string,
-  ownGroupSocketUri: PropTypes.string,
-  ownChatSocketUri: PropTypes.string,
-  isSuggestedOwned: PropTypes.bool,
-  showActions: PropTypes.bool,
-  showConnectAction: PropTypes.bool,
-  showJoinAction: PropTypes.bool,
-  isLoading: PropTypes.bool,
-  toLoad: PropTypes.bool,
-  failedToLoad: PropTypes.bool,
-  currentLocation: PropTypes.object,
-  multiSelectType: PropTypes.string,
-  hasConnectionBetweenPosts: PropTypes.bool,
-  establishedConnectionUri: PropTypes.string,
 };
-
-export default withRouter(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(WonSuggestAtomViewer)
-);

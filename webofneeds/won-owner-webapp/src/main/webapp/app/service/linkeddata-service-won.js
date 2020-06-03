@@ -23,7 +23,6 @@ import * as ownerApi from "../api/owner-api.js";
 import jsonld from "jsonld/dist/jsonld.js";
 import won from "./won.js";
 import vocab from "./vocab.js";
-import * as jsonldUtils from "./jsonld-utils";
 
 (function() {
   /**
@@ -140,12 +139,14 @@ import * as jsonldUtils from "./jsonld-utils";
             return connectionContainerFramed[vocab.RDFS.member].map(
               parseJsonLdConnection
             );
-          } else {
+          } else if (connectionContainerFramed[vocab.RDFS.member]) {
             return [
               parseJsonLdConnection(
                 connectionContainerFramed[vocab.RDFS.member]
               ),
             ];
+          } else {
+            return [];
           }
         } else {
           return [];
@@ -153,7 +154,25 @@ import * as jsonldUtils from "./jsonld-utils";
       });
   };
 
-  function getConnection(connectionUri, fetchParams) {
+  /**
+   * @param connectionUri
+   * @param fetchParams: optional paramters
+   *        * requesterWebId: the WebID used to access the ressource (used
+   *            by the owner-server to pick the right key-pair)
+   *        * queryParams: GET-params as documented for ownerApi.js `queryString`
+   *        * pagingSize: if specified the server will return the first
+   *            page (unless e.g. `queryParams.p=2` is specified when
+   *            it will return the second page of size N)
+   * @return {*} the connections predicates
+   */
+  won.getConnection = function(connectionUri, fetchParams) {
+    if (!is("String", connectionUri)) {
+      throw new Error(
+        "Tried to request connection infos for sthg that isn't an uri: " +
+          connectionUri
+      );
+    }
+
     return (
       won
         //add the eventUris
@@ -198,57 +217,11 @@ import * as jsonldUtils from "./jsonld-utils";
           throw e;
         })
     );
-  }
-
-  /**
-   * @param connectionUri
-   * @param fetchParams: optional paramters
-   *        * requesterWebId: the WebID used to access the ressource (used
-   *            by the owner-server to pick the right key-pair)
-   *        * queryParams: GET-params as documented for ownerApi.js `queryString`
-   *        * pagingSize: if specified the server will return the first
-   *            page (unless e.g. `queryParams.p=2` is specified when
-   *            it will return the second page of size N)
-   * @return {*} the connections predicates along with the uris of associated events
-   */
-  won.getConnectionWithEventUris = function(connectionUri, fetchParams) {
-    if (!is("String", connectionUri)) {
-      throw new Error(
-        "Tried to request connection infos for sthg that isn't an uri: " +
-          connectionUri
-      );
-    }
-    return getConnection(connectionUri, fetchParams)
-      .then(connection =>
-        Promise.all([
-          Promise.resolve(connection),
-          won.getJsonLdNode(connection.messageContainer, fetchParams),
-        ])
-      )
-      .then(([connection, messageContainer]) => {
-        const messages = jsonldUtils.getProperty(
-          messageContainer,
-          vocab.RDFS.memberCompacted
-        );
-
-        /*
-           * if there's only a single rdfs:member in the event
-           * container, getJsonLdNode will not return an array, so we
-           * need to make sure it's one from here on out.
-           */
-        if (!messages) {
-          connection.hasEvents = [];
-        } else if (is("Array", messages)) {
-          connection.hasEvents = messages.map(message => message["@id"]);
-        } else {
-          connection.hasEvents = [messages["@id"]];
-        }
-        return connection;
-      });
   };
 
   /**
    * @param connectionUri
+   * @param connectionContainerUri, if this parameter is present we do not fetch the connection at all, we fetch the containerUri directly
    * @param fetchParams: optional paramters
    *        * requesterWebId: the WebID used to access the ressource (used
    *            by the owner-server to pick the right key-pair)
@@ -256,9 +229,13 @@ import * as jsonldUtils from "./jsonld-utils";
    *        * pagingSize: if specified the server will return the first
    *            page (unless e.g. `queryParams.p=2` is specified when
    *            it will return the second page of size N)
-   * @return {*} the connections predicates along with the fetched messages
+   * @return {nextPage: nextPageLink Object, messages: arrayOfMessages}
    */
-  won.getMessagesOfConnection = function(connectionUri, fetchParams) {
+  won.getMessagesOfConnection = function(
+    connectionUri,
+    connectionContainerUri,
+    fetchParams
+  ) {
     if (!is("String", connectionUri)) {
       throw new Error(
         "Tried to request connection infos for sthg that isn't an uri: " +
@@ -266,51 +243,68 @@ import * as jsonldUtils from "./jsonld-utils";
       );
     }
 
-    return getConnection(connectionUri)
-      .then(connection =>
-        ownerApi.getJsonLdDataset(connection.messageContainer, fetchParams)
-      )
-      .then(jsonLdData => jsonld.expand(jsonLdData))
-      .then(jsonLdData => {
-        const messages = {};
-
-        jsonLdData &&
-          jsonLdData
-            .filter(graph => graph["@id"].indexOf("wm:/") === 0)
-            .forEach(graph => {
-              const msgUri = graph["@id"].split("#")[0];
-              const singleMessage = messages[msgUri];
-
-              if (singleMessage) {
-                singleMessage["@graph"].push(graph);
-              } else {
-                messages[msgUri] = { "@graph": [graph] };
-              }
-            });
-
-        const promiseArray = [];
-        for (const msgUri in messages) {
-          const msg = messages[msgUri];
-          promiseArray.push(
-            won
-              .wonMessageFromJsonLd(msg, msgUri)
-              .then(wonMessage => ({
-                msgUri: msgUri,
-                wonMessage: wonMessage,
-              }))
-              .catch(error => {
-                console.error(
-                  "Could not parse msg to wonMessage: ",
-                  msg,
-                  "error: ",
-                  error
-                );
-                return { msgUri: msgUri, wonMessage: undefined };
-              })
+    const connectionContainerPromise = connectionContainerUri
+      ? ownerApi.getJsonLdDataset(connectionContainerUri, fetchParams, true)
+      : won
+          .getConnection(connectionUri)
+          .then(connection =>
+            ownerApi.getJsonLdDataset(
+              connection.messageContainer,
+              fetchParams,
+              true
+            )
           );
-        }
-        return Promise.all(promiseArray);
-      });
+
+    return connectionContainerPromise
+      .then(responseObject =>
+        jsonld.expand(responseObject.jsonLdData).then(jsonLdData => {
+          const messages = {};
+
+          jsonLdData &&
+            jsonLdData
+              .filter(graph => graph["@id"].indexOf("wm:/") === 0)
+              .forEach(graph => {
+                const msgUri = graph["@id"].split("#")[0];
+                const singleMessage = messages[msgUri];
+
+                if (singleMessage) {
+                  singleMessage["@graph"].push(graph);
+                } else {
+                  messages[msgUri] = { "@graph": [graph] };
+                }
+              });
+
+          const promiseArray = [];
+          for (const msgUri in messages) {
+            const msg = messages[msgUri];
+            promiseArray.push(
+              won
+                .wonMessageFromJsonLd(msg, msgUri)
+                .then(wonMessage => ({
+                  msgUri: msgUri,
+                  wonMessage: wonMessage,
+                }))
+                .catch(error => {
+                  console.error(
+                    "Could not parse msg to wonMessage: ",
+                    msg,
+                    "error: ",
+                    error
+                  );
+                  return { msgUri: msgUri, wonMessage: undefined };
+                })
+            );
+          }
+          return Promise.all([
+            Promise.resolve(responseObject.nextPage),
+            Promise.all(promiseArray),
+          ]);
+        })
+      )
+      .then(([nextPage, messages]) => ({
+        nextPage: nextPage,
+        messages: messages,
+      }));
   };
 
   /**
@@ -373,9 +367,9 @@ import * as jsonldUtils from "./jsonld-utils";
    *        * pagingSize: if specified the server will return the first
    *            page (unless e.g. `queryParams.p=2` is specified when
    *            it will return the second page of size N)
-   * @return {*} the connections predicates along with the uris of associated events
+   * @return {*} the connections predicates
    */
-  won.getConnectionWithEventUrisBySocket = function(
+  won.getConnectionBySocket = function(
     senderSocketUri,
     targetSocketUri,
     fetchParams
@@ -414,7 +408,7 @@ import * as jsonldUtils from "./jsonld-utils";
         //add the eventUris
         .then(jsonResp => jsonResp && jsonResp["@id"])
         .then(connUri =>
-          won.getConnectionWithEventUris(connUri, {
+          won.getConnection(connUri, {
             requesterWebId: fetchParams.requesterWebId,
           })
         )

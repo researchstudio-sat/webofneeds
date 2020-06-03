@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 import PropTypes from "prop-types";
 import { actionCreators } from "../actions/actions.js";
-import { connect } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors";
-import { generateLink, get, getIn, toAbsoluteURL } from "../utils";
+import { generateLink, get, toAbsoluteURL } from "../utils";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils";
 import { ownerBaseUrl } from "~/config/default.js";
@@ -14,10 +14,31 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 
 import "~/style/_context-dropdown.scss";
 import ico16_contextmenu from "~/images/won-icons/ico16_contextmenu.svg";
-import { withRouter } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
-const mapStateToProps = (state, ownProps) => {
-  const atom = ownProps.atomUri && getIn(state, ["atoms", ownProps.atomUri]);
+export default function WonAtomContextDropdown({ atom, className }) {
+  const dispatch = useDispatch();
+  const history = useHistory();
+  const atomUri = get(atom, "uri");
+  const [contextMenuOpen, setContextMenuOpen] = useState(false);
+
+  let thisNode;
+
+  useEffect(() => {
+    function handleClick(e) {
+      if (thisNode && !thisNode.contains(e.target) && contextMenuOpen) {
+        setContextMenuOpen(false);
+
+        return;
+      }
+    }
+
+    document.addEventListener("mousedown", handleClick, false);
+
+    return function cleanup() {
+      document.removeEventListener("mousedown", handleClick, false);
+    };
+  });
 
   let linkToAtom;
   if (ownerBaseUrl && atom) {
@@ -26,219 +47,33 @@ const mapStateToProps = (state, ownProps) => {
     linkToAtom = toAbsoluteURL(ownerBaseUrl).toString() + path;
   }
 
-  const process = get(state, "process");
+  const process = useSelector(generalSelectors.getProcessState);
 
-  return {
-    atomUri: ownProps.atomUri,
-    className: ownProps.className,
-    adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
-    isOwnAtom: generalSelectors.isAtomOwned(state, ownProps.atomUri),
-    isActive: atomUtils.isActive(atom),
-    isInactive: atomUtils.isInactive(atom),
-    isUsableAsTemplate: generalSelectors.isAtomUsableAsTemplate(
-      state,
-      ownProps.atomUri
-    ),
-    isEditable: generalSelectors.isAtomEditable(state, ownProps.atomUri),
-    atom,
-    atomLoading: !atom || processUtils.isAtomLoading(process, get(atom, "uri")),
-    atomFailedToLoad:
-      atom && processUtils.hasAtomFailedToLoad(process, get(atom, "uri")),
-    linkToAtom,
-  };
-};
+  const theme = useSelector(generalSelectors.getTheme);
+  const adminEmail = get(theme, "adminEmail");
+  const isOwnAtom = useSelector(generalSelectors.isAtomOwned(atomUri));
+  const isActive = atomUtils.isActive(atom);
+  const isInactive = atomUtils.isInactive(atom);
+  const isUsableAsTemplate = useSelector(
+    generalSelectors.isAtomUsableAsTemplate(atomUri)
+  );
+  const isEditable = useSelector(generalSelectors.isAtomEditable(atomUri));
+  const atomLoading =
+    !atom || processUtils.isAtomLoading(process, get(atom, "uri"));
+  const atomFailedToLoad =
+    atom && processUtils.hasAtomFailedToLoad(process, get(atom, "uri"));
 
-const mapDispatchToProps = dispatch => {
-  return {
-    atomReOpen: atomUri => {
-      dispatch(actionCreators.atoms__reopen(atomUri));
-    },
-    atomClose: atomUri => {
-      dispatch(actionCreators.atoms__close(atomUri));
-    },
-    atomDelete: atomUri => {
-      dispatch(actionCreators.atoms__delete(atomUri));
-    },
-    hideModalDialog: () => {
-      dispatch(actionCreators.view__hideModalDialog());
-    },
-    showModalDialog: payload => {
-      dispatch(actionCreators.view__showModalDialog(payload));
-    },
-  };
-};
-
-class WonAtomContextDropdown extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      contextMenuOpen: false,
-    };
-    this.handleClick = this.handleClick.bind(this);
-  }
-
-  render() {
-    const iconElement =
-      this.props.atomLoading || this.props.atomFailedToLoad ? (
-        <svg className="cdd__icon__small">
-          <use xlinkHref={ico16_contextmenu} href={ico16_contextmenu} />
-        </svg>
-      ) : (
-        <svg
-          className="cdd__icon__small clickable"
-          onClick={() => this.setState({ contextMenuOpen: true })}
-        >
-          <use xlinkHref={ico16_contextmenu} href={ico16_contextmenu} />
-        </svg>
-      );
-
-    let dropdownElement;
-
-    if (this.state.contextMenuOpen) {
-      const buttons = [];
-
-      buttons.push(
-        <button
-          key="export"
-          className="won-button--outlined thin red"
-          onClick={() => this.exportPdf()}
-        >
-          Export as PDF
-        </button>
-      );
-      this.props.isUsableAsTemplate &&
-        buttons.push(
-          <button
-            key="duplicate"
-            className="won-button--outlined thin red"
-            onClick={() =>
-              this.props.history.push(
-                generateLink(
-                  this.props.history.location,
-                  {
-                    fromAtomUri: this.props.atomUri,
-                    mode: "DUPLICATE",
-                  },
-                  "/create"
-                )
-              )
-            }
-          >
-            Post this too!
-          </button>
-        );
-      this.props.isEditable &&
-        buttons.push(
-          <button
-            key="edit"
-            className="won-button--outlined thin red"
-            onClick={() =>
-              this.props.history.push(
-                generateLink(
-                  this.props.history.location,
-                  {
-                    fromAtomUri: this.props.atomUri,
-                    mode: "EDIT",
-                  },
-                  "/create"
-                )
-              )
-            }
-          >
-            Edit
-          </button>
-        );
-      this.props.adminEmail &&
-        buttons.push(
-          <a
-            key="report"
-            className="won-button--outlined thin red"
-            href={
-              "mailto:" +
-              this.props.adminEmail +
-              "?" +
-              this.generateReportAtomMailParams()
-            }
-          >
-            Report
-          </a>
-        );
-      this.props.isOwnAtom &&
-        this.props.isInactive &&
-        buttons.push(
-          <button
-            key="reopen"
-            className="won-button--filled red"
-            onClick={() => this.reOpenAtom()}
-          >
-            Reopen
-          </button>
-        );
-      this.props.isOwnAtom &&
-        this.props.isInactive &&
-        buttons.push(
-          <button
-            key="delete"
-            className="won-button--filled red"
-            onClick={() => this.deleteAtom()}
-          >
-            Delete
-          </button>
-        );
-      this.props.isOwnAtom &&
-        this.props.isActive &&
-        buttons.push(
-          <button
-            key="close"
-            className="won-button--filled red"
-            onClick={() => this.closeAtom()}
-          >
-            Remove
-          </button>
-        );
-
-      dropdownElement = (
-        <div className="cdd__contextmenu">
-          <div
-            className="cdd__contextmenu__content"
-            onClick={() => this.setState({ contextMenuOpen: false })}
-          >
-            <div className="topline">
-              <svg className="cdd__icon__small__contextmenu clickable">
-                <use xlinkHref={ico16_contextmenu} href={ico16_contextmenu} />
-              </svg>
-            </div>
-            {/* Buttons when connection is available -->*/}
-            {buttons}
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <won-atom-context-dropdown
-        class={this.props.className ? this.props.className : ""}
-        ref={node => (this.node = node)}
-      >
-        {iconElement}
-        {dropdownElement}
-      </won-atom-context-dropdown>
-    );
-  }
-
-  generateReportAtomMailParams() {
+  function generateReportAtomMailParams() {
     //todo
-    const subject = `[Report Atom] - ${this.props.atomUri}`;
-    const body = `Link to Atom: ${this.linkToAtom}%0D%0AReason:%0D%0A`; //hint: %0D%0A adds a linebreak
+    const subject = `[Report Atom] - ${atomUri}`;
+    const body = `Link to Atom: ${linkToAtom}%0D%0AReason:%0D%0A`; //hint: %0D%0A adds a linebreak
 
     return `subject=${subject}&body=${body}`;
   }
 
-  exportPdf() {
-    if (!this.props.atom) return;
-    const docDefinition = wonUtils.createDocumentDefinitionFromPost(
-      this.props.atom
-    );
+  function exportPdf() {
+    if (!atom) return;
+    const docDefinition = wonUtils.createDocumentDefinitionFromPost(atom);
 
     if (docDefinition) {
       pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -246,14 +81,14 @@ class WonAtomContextDropdown extends React.Component {
     }
   }
 
-  reOpenAtom() {
-    if (this.props.isOwnAtom) {
-      this.props.atomReOpen(this.props.atomUri);
+  function reOpenAtom() {
+    if (isOwnAtom) {
+      dispatch(actionCreators.atoms__reopen(atomUri));
     }
   }
 
-  deleteAtom() {
-    if (this.props.isOwnAtom) {
+  function deleteAtom() {
+    if (isOwnAtom) {
       const payload = {
         caption: "Attention!",
         text: "Deleting the Atom is irreversible, do you want to proceed?",
@@ -261,25 +96,25 @@ class WonAtomContextDropdown extends React.Component {
           {
             caption: "Yes",
             callback: () => {
-              this.props.atomDelete(this.props.atomUri);
-              this.props.hideModalDialog();
-              this.props.history.push("/inventory");
+              dispatch(actionCreators.atoms__delete(atomUri));
+              dispatch(actionCreators.view__hideModalDialog());
+              history.push("/inventory");
             },
           },
           {
             caption: "No",
             callback: () => {
-              this.props.hideModalDialog();
+              dispatch(actionCreators.view__hideModalDialog());
             },
           },
         ],
       };
-      this.props.showModalDialog(payload);
+      dispatch(actionCreators.view__showModalDialog(payload));
     }
   }
 
-  closeAtom() {
-    if (this.props.isOwnAtom) {
+  function closeAtom() {
+    if (isOwnAtom) {
       const payload = {
         caption: "Attention!",
         text:
@@ -288,67 +123,171 @@ class WonAtomContextDropdown extends React.Component {
           {
             caption: "Delete",
             callback: () => {
-              this.deleteAtom();
+              deleteAtom();
             },
           },
           {
             caption: "Archive",
             callback: () => {
-              this.props.atomClose(this.props.atomUri);
-              this.props.hideModalDialog();
+              dispatch(actionCreators.atoms__close(atomUri));
+              dispatch(actionCreators.view__hideModalDialog());
             },
           },
           {
             caption: "Cancel",
             callback: () => {
-              this.props.hideModalDialog();
+              dispatch(actionCreators.view__hideModalDialog());
             },
           },
         ],
       };
-      this.props.showModalDialog(payload);
+      dispatch(actionCreators.view__showModalDialog(payload));
     }
   }
 
-  componentWillMount() {
-    document.addEventListener("mousedown", this.handleClick, false);
-  }
-  componentWillUnmount() {
-    document.removeEventListener("mousedown", this.handleClick, false);
+  const iconElement =
+    atomLoading || atomFailedToLoad ? (
+      <svg className="cdd__icon__small">
+        <use xlinkHref={ico16_contextmenu} href={ico16_contextmenu} />
+      </svg>
+    ) : (
+      <svg
+        className="cdd__icon__small clickable"
+        onClick={() => setContextMenuOpen(true)}
+      >
+        <use xlinkHref={ico16_contextmenu} href={ico16_contextmenu} />
+      </svg>
+    );
+
+  let dropdownElement;
+
+  if (contextMenuOpen) {
+    const buttons = [];
+
+    buttons.push(
+      <button
+        key="export"
+        className="won-button--outlined thin red"
+        onClick={() => exportPdf()}
+      >
+        Export as PDF
+      </button>
+    );
+    isUsableAsTemplate &&
+      buttons.push(
+        <button
+          key="duplicate"
+          className="won-button--outlined thin red"
+          onClick={() =>
+            history.push(
+              generateLink(
+                history.location,
+                {
+                  fromAtomUri: atomUri,
+                  mode: "DUPLICATE",
+                },
+                "/create"
+              )
+            )
+          }
+        >
+          Post this too!
+        </button>
+      );
+    isEditable &&
+      buttons.push(
+        <button
+          key="edit"
+          className="won-button--outlined thin red"
+          onClick={() =>
+            history.push(
+              generateLink(
+                history.location,
+                {
+                  fromAtomUri: atomUri,
+                  mode: "EDIT",
+                },
+                "/create"
+              )
+            )
+          }
+        >
+          Edit
+        </button>
+      );
+    adminEmail &&
+      buttons.push(
+        <a
+          key="report"
+          className="won-button--outlined thin red"
+          href={"mailto:" + adminEmail + "?" + generateReportAtomMailParams()}
+        >
+          Report
+        </a>
+      );
+    isOwnAtom &&
+      isInactive &&
+      buttons.push(
+        <button
+          key="reopen"
+          className="won-button--filled red"
+          onClick={() => reOpenAtom()}
+        >
+          Reopen
+        </button>
+      );
+    isOwnAtom &&
+      isInactive &&
+      buttons.push(
+        <button
+          key="delete"
+          className="won-button--filled red"
+          onClick={() => deleteAtom()}
+        >
+          Delete
+        </button>
+      );
+    isOwnAtom &&
+      isActive &&
+      buttons.push(
+        <button
+          key="close"
+          className="won-button--filled red"
+          onClick={() => closeAtom()}
+        >
+          Remove
+        </button>
+      );
+
+    dropdownElement = (
+      <div className="cdd__contextmenu">
+        <div
+          className="cdd__contextmenu__content"
+          onClick={() => setContextMenuOpen(false)}
+        >
+          <div className="topline">
+            <svg className="cdd__icon__small__contextmenu clickable">
+              <use xlinkHref={ico16_contextmenu} href={ico16_contextmenu} />
+            </svg>
+          </div>
+          {/* Buttons when connection is available -->*/}
+          {buttons}
+        </div>
+      </div>
+    );
   }
 
-  handleClick(e) {
-    if (!this.node.contains(e.target) && this.state.contextMenuOpen) {
-      this.setState({ contextMenuOpen: false });
-
-      return;
-    }
-  }
+  return (
+    <won-atom-context-dropdown
+      class={className ? className : ""}
+      ref={node => (thisNode = node)}
+    >
+      {iconElement}
+      {dropdownElement}
+    </won-atom-context-dropdown>
+  );
 }
 WonAtomContextDropdown.propTypes = {
-  atomUri: PropTypes.string.isRequired,
+  atom: PropTypes.object.isRequired,
   className: PropTypes.string,
-  adminEmail: PropTypes.string,
-  isOwnAtom: PropTypes.bool,
-  isActive: PropTypes.bool,
-  isInactive: PropTypes.bool,
-  isUsableAsTemplate: PropTypes.bool,
-  isEditable: PropTypes.bool,
-  atom: PropTypes.object,
-  atomLoading: PropTypes.bool,
-  atomFailedToLoad: PropTypes.bool,
-  linkToAtom: PropTypes.string,
-  atomReOpen: PropTypes.func,
-  atomClose: PropTypes.func,
-  atomDelete: PropTypes.func,
-  hideModalDialog: PropTypes.func,
-  showModalDialog: PropTypes.func,
-  history: PropTypes.object,
 };
-
-export default withRouter(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(WonAtomContextDropdown)
-);

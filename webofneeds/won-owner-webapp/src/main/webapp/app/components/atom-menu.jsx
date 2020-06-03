@@ -21,21 +21,19 @@ import { getSocketTypeArray } from "../redux/utils/atom-utils";
 export default function WonAtomMenu({ atom, defaultTab }) {
   const atomUri = get(atom, "uri");
   const dispatch = useDispatch();
-  const isOwned = useSelector(state =>
-    generalSelectors.isAtomOwned(state, atomUri)
-  );
+  const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
 
   const reviewCount = getIn(atom, ["rating", "reviewCount"]) || 0;
 
   const heldByUri = atomUtils.getHeldByUri(atom);
   const isHeld = atomUtils.isHeld(atom);
-  const holder = useSelector(state => getIn(state, ["atoms", heldByUri]));
+  const holder = useSelector(generalSelectors.getAtom(heldByUri));
   const holderHasReviewSocket = atomUtils.hasReviewSocket(holder);
   const holderAggregateRating =
     holderHasReviewSocket && getIn(holder, ["rating", "aggregateRating"]);
 
-  const viewState = useSelector(state => get(state, "view"));
-  const process = useSelector(state => get(state, "process"));
+  const viewState = useSelector(generalSelectors.getViewState);
+  const process = useSelector(generalSelectors.getProcessState);
 
   const isHoldable = atomUtils.hasHoldableSocket(atom);
   const holderAggregateRatingString =

@@ -2,7 +2,6 @@ import React from "react";
 
 import "~/style/_location-viewer.scss";
 import ico_filter_map from "~/images/won-icons/ico-filter_map.svg";
-import ico16_arrow_up from "~/images/won-icons/ico16_arrow_up.svg";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 import { get } from "../../../utils.js";
 import WonAtomMap from "../../atom-map.jsx";
@@ -42,12 +41,15 @@ export default class WonLocationViewer extends React.Component {
         <svg className="lv__content__text__carret">
           <use xlinkHref={ico_filter_map} href={ico_filter_map} />
         </svg>
-        <svg className="lv__content__text__carret">
-          {this.state.locationExpanded ? (
-            <use xlinkHref={ico16_arrow_up} href={ico16_arrow_up} />
-          ) : (
-            <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-          )}
+        <svg
+          className={
+            "lv__content__text__carret " +
+            (this.state.locationExpanded
+              ? " lv__content__text__carret--expanded "
+              : " lv__content__text__carret--collapsed ")
+          }
+        >
+          <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
         </svg>
       </div>
     ) : (

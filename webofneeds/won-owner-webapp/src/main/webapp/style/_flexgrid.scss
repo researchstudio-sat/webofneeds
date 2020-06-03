@@ -44,6 +44,15 @@ won-flex-grid {
       width: 1rem;
       height: 4rem;
       --local-primary: #{$won-primary-color};
+
+      &--expanded {
+        transform: rotate(-180deg);
+        transition: all linear 0.2s;
+      }
+
+      &--collapsed {
+        transition: all linear 0.2s;
+      }
     }
 
     .fgi__additionaltext {

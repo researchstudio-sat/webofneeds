@@ -198,6 +198,16 @@ export function isConnectionLoading(process, connUri, includeSubData = false) {
   return getIn(process, ["connections", connUri, "loading"]);
 }
 
+export function getResumeAfterUriForConnection(process, connUri) {
+  return getIn(process, [
+    "connections",
+    connUri,
+    "nextPage",
+    "params",
+    "resumeafter",
+  ]);
+}
+
 /**
  * Return true if given atomUri has failedToLoad
  * @param process (full process from state)
@@ -209,9 +219,7 @@ export function hasConnectionFailedToLoad(process, connUri) {
 }
 
 export function hasMessagesToLoad(process, connUri) {
-  const messages =
-    connUri && getIn(process, ["connections", connUri, "messages"]);
-  return !!(messages && messages.find(msg => get(msg, "toLoad")));
+  return !!getIn(process, ["connections", connUri, "nextPage"]);
 }
 
 /**
@@ -268,6 +276,19 @@ export function isConnectionAgreementDataLoading(process, connUri) {
 }
 
 /**
+ * Return true if the agreement-Dataset for the given connUri is currently loading
+ * @param process
+ * @param connUri
+ * @returns {*}
+ */
+export function isConnectionAgreementDatasetLoading(process, connUri) {
+  return (
+    connUri &&
+    getIn(process, ["connections", connUri, "agreementDataset", "loading"])
+  );
+}
+
+/**
  * Return true if the agreement-Data for the given connUri has been loaded
  * @param process
  * @param connUri
@@ -285,42 +306,14 @@ export function isConnectionLoadingMessages(process, connUri) {
 }
 
 /**
- * Return true if the msgUri is currently loading
+ * Return true if there is any connUri that is currently loading messages
  * @param process
  * @param msgUri
  * @param connUri (default=undefined, if present just lookup the msgUri within the connUri, otherwise crawl every connection)
  * @returns {*}
  */
-export function isMessageLoading(process, msgUri, connUri = undefined) {
-  if (connUri) {
-    return (
-      msgUri &&
-      getIn(process, ["connections", connUri, "messages", msgUri, "loading"])
-    );
-  }
-
-  return !!get(process, "connections")
-    .flatMap(conn => conn.get("messages"))
-    .find(msgProcess => msgProcess.get("loading"));
-}
-
-/**
- * Return true if the any msgUri is currently loading, if connUri is present just check messages within this connUri-process
- * @param process
- * @param msgUri
- * @param connUri (default=undefined, if present just lookup the msgUri within the connUri, otherwise crawl every connection)
- * @returns {*}
- */
-export function isAnyMessageLoading(process, connUri = undefined) {
-  if (connUri) {
-    const msgProcess = getIn(process, ["connections", connUri, "messages"]);
-
-    return !!msgProcess.find((msgProcess, msgUri) =>
-      isMessageLoading(process, msgUri, connUri)
-    );
-  }
-
+export function isAnyConnectionLoadingMessages(process) {
   return !!get(process, "connections").find((connProcess, connUri) =>
-    isAnyMessageLoading(process, connUri)
+    isConnectionLoadingMessages(process, connUri)
   );
 }

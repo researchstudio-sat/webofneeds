@@ -878,11 +878,11 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
             if (sortOrders.hasNext()) {
                 Sort.Order sortOrder = sortOrders.next();
                 if (sortOrder.getDirection() == Sort.Direction.ASC) {
-                    resumeBefore = events.get(0).getMessageURI();
-                    resumeAfter = events.get(events.size() - 1).getMessageURI();
-                } else {
-                    resumeBefore = events.get(events.size() - 1).getMessageURI();
                     resumeAfter = events.get(0).getMessageURI();
+                    resumeBefore = events.get(events.size() - 1).getMessageURI();
+                } else {
+                    resumeAfter = events.get(events.size() - 1).getMessageURI();
+                    resumeBefore = events.get(0).getMessageURI();
                 }
             }
         }

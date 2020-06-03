@@ -28,46 +28,42 @@ export default function PageConnections() {
   const selectedConnectionUri = connectionUri;
 
   const atom = useSelector(
-    state =>
-      selectedConnectionUri &&
-      generalSelectors.getOwnedAtomByConnectionUri(state, selectedConnectionUri)
+    generalSelectors.getOwnedAtomByConnectionUri(selectedConnectionUri)
   );
 
   const selectedConnection = getIn(atom, [
     "connections",
     selectedConnectionUri,
   ]);
-  const selectedTargetAtom = useSelector(state =>
-    getIn(state, ["atoms", get(selectedConnection, "targetAtomUri")])
+  const selectedTargetAtom = useSelector(
+    generalSelectors.getAtom(get(selectedConnection, "targetAtomUri"))
   );
 
   const isSelectedConnectionGroupChat =
     selectedConnection &&
     atomUtils.getGroupSocket(selectedTargetAtom) ===
       get(selectedConnection, "targetSocketUri");
-  const hasChatConnections = useSelector(state =>
-    generalSelectors.hasChatConnections(state)
-  );
+  const hasChatConnections = useSelector(generalSelectors.hasChatConnections);
   const isLoggedIn = useSelector(state =>
-    accountUtils.isLoggedIn(get(state, "account"))
+    accountUtils.isLoggedIn(generalSelectors.getAccountState(state))
   );
-  const showModalDialog = useSelector(state =>
-    viewSelectors.showModalDialog(state)
-  );
-  const showSlideIns = useSelector(
-    state =>
-      viewSelectors.hasSlideIns(state, history) &&
-      viewSelectors.isSlideInsVisible(state)
-  );
+  const showModalDialog = useSelector(viewSelectors.showModalDialog);
+  const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
 
   let contentElements;
   if (selectedConnection && postUri) {
     contentElements = (
       <main className="overview__justconnection">
         {isSelectedConnectionGroupChat ? (
-          <WonGroupAtomMessages />
+          <WonGroupAtomMessages
+            connection={selectedConnection}
+            backToChats={!postUri}
+          />
         ) : (
-          <WonAtomMessages />
+          <WonAtomMessages
+            connection={selectedConnection}
+            backToChats={!postUri}
+          />
         )}
       </main>
     );
@@ -84,9 +80,15 @@ export default function PageConnections() {
         {selectedConnection ? (
           <main className="overview__right">
             {isSelectedConnectionGroupChat ? (
-              <WonGroupAtomMessages />
+              <WonGroupAtomMessages
+                connection={selectedConnection}
+                backToChats={!postUri}
+              />
             ) : (
-              <WonAtomMessages />
+              <WonAtomMessages
+                connection={selectedConnection}
+                backToChats={!postUri}
+              />
             )}
           </main>
         ) : (

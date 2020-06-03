@@ -10,9 +10,8 @@ import * as wonUtils from "../won-utils.js";
 import * as ownerApi from "../api/owner-api.js";
 import { setDisclaimerAccepted } from "../won-localstorage.js";
 
-import { get } from "../utils.js";
-import * as connectionSelectors from "../redux/selectors/connection-selectors.js";
-import { loadLatestMessagesOfConnection } from "./connections-actions.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import { showLatestMessages } from "./connections-actions.js";
 
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -24,7 +23,7 @@ import { getPathname, getQueryParams } from "../utils";
  */
 export async function ensureLoggedIn(dispatch, getState) {
   const state = getState();
-  if (accountUtils.isLoggedIn(get(state, "account"))) {
+  if (accountUtils.isLoggedIn(generalSelectors.getAccountState(state))) {
     return;
   }
 
@@ -55,10 +54,11 @@ export function accountLogin(credentials) {
 
     const { email } = wonUtils.parseCredentials(credentials);
 
-    const accountState = get(state, "account");
+    const accountState = generalSelectors.getAccountState(state);
+    const processState = generalSelectors.getProcessState(state);
     const isLoggedIn = accountUtils.isLoggedIn(accountState);
     const processingLoginForEmail =
-      processUtils.isProcessingLoginForEmail(get(state, "process")) ||
+      processUtils.isProcessingLoginForEmail(processState) ||
       _loginInProcessFor;
 
     if (processingLoginForEmail) {
@@ -70,10 +70,7 @@ export function accountLogin(credentials) {
       return;
     }
 
-    if (
-      isLoggedIn &&
-      !processUtils.isProcessingInitialLoad(get(state, "process"))
-    ) {
+    if (isLoggedIn && !processUtils.isProcessingInitialLoad(processState)) {
       const loggedInEmail = accountUtils.getEmail(accountState);
 
       if (credentials.email === loggedInEmail) {
@@ -149,7 +146,9 @@ export function accountLogout(history) {
     const state = getState();
 
     if (
-      processUtils.isProcessingLogout(get(state, "process")) ||
+      processUtils.isProcessingLogout(
+        generalSelectors.getProcessState(state)
+      ) ||
       _logoutInProcess
     ) {
       console.debug("Logout in process. Aborting redundant attempt.");
@@ -327,17 +326,16 @@ export function reconnect() {
       const state = getState();
 
       /* 
+       * //TODO: THIS IS REALLY REALLY BAD IN MY OPINION WE SHOULD NOT DO THIS
        * -- loading latest messages for all connections (we might have missed some during the dc) --
        */
-      const connectionUris = connectionSelectors.getOwnedConnectionUris(state);
+      const connectionUris = generalSelectors.getOwnedConnectionUris(state);
       await Promise.all(
         connectionUris.map(connectionUri =>
-          loadLatestMessagesOfConnection({
+          showLatestMessages(
             connectionUri,
-            numberOfEvents: 10, //TODO magic number :|
-            state,
-            dispatch,
-          })
+            10 //TODO magic number :|
+          )(state, dispatch)
         )
       );
     } catch (e) {

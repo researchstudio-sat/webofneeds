@@ -27,7 +27,7 @@ export default function AtomContentChats({ atom }) {
   const [showClosed, toggleClosed] = useState(false);
   const [searchText, setSearchText] = useState({ value: "" });
 
-  const storedAtoms = useSelector(state => generalSelectors.getAtoms(state));
+  const storedAtoms = useSelector(generalSelectors.getAtoms);
 
   const chatConnections = filterConnectionsBySearchValue(
     get(atom, "connections").filter(

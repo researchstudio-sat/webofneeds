@@ -14,7 +14,12 @@ import ico36_outgoing from "~/images/won-icons/ico36_outgoing.svg";
 
 import "~/style/_socket-item.scss";
 
-export default function WonGenericItem({ connection, atom, isOwned }) {
+export default function WonGenericItem({
+  connection,
+  atom,
+  isOwned,
+  targetAtom,
+}) {
   const dispatch = useDispatch();
 
   let actionButtons;
@@ -266,7 +271,7 @@ export default function WonGenericItem({ connection, atom, isOwned }) {
         <WonAtomContextSwipeableView
           className={headerClassName}
           actionButtons={actionButtons}
-          atomUri={get(connection, "targetAtomUri")}
+          atom={targetAtom}
           toLink={generateLink(
             history.location,
             {
@@ -283,4 +288,5 @@ WonGenericItem.propTypes = {
   connection: PropTypes.object.isRequired,
   atom: PropTypes.object.isRequired,
   isOwned: PropTypes.bool.isRequired,
+  targetAtom: PropTypes.object.isRequired,
 };

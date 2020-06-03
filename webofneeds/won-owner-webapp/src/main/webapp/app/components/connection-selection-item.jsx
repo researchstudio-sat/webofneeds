@@ -17,6 +17,7 @@ import ico36_outgoing from "~/images/won-icons/ico36_outgoing.svg";
 
 import "~/style/_connection-selection-item-line.scss";
 import vocab from "../service/vocab";
+import * as generalSelectors from "../redux/selectors/general-selectors";
 
 export default function WonConnectionSelectionItem({
   senderAtom,
@@ -29,7 +30,7 @@ export default function WonConnectionSelectionItem({
 
   const senderAtomUri = get(connection, "uri").split("/c")[0];
   const targetAtomUri = get(connection, "targetAtomUri");
-  const processState = useSelector(state => get(state, "process"));
+  const processState = useSelector(generalSelectors.getProcessState);
 
   const [showActions, setShowActions] = useState(false);
 
@@ -269,7 +270,7 @@ export default function WonConnectionSelectionItem({
             false
           )}
         >
-          <WonAtomIcon atomUri={get(senderAtom, "uri")} />
+          <WonAtomIcon atom={senderAtom} />
         </Link>
       ) : (
         <div />

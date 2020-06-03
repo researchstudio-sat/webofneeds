@@ -8,9 +8,9 @@ import PropTypes from "prop-types";
 
 import WonAtomMap from "../atom-map.jsx";
 import WonAtomConnectionsIndicator from "../atom-connections-indicator.jsx";
+import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import { relativeTime } from "../../won-label-utils.js";
-import { selectLastUpdateTime } from "../../redux/selectors/general-selectors.js";
 
 import "~/style/_other-card.scss";
 import { Link } from "react-router-dom";
@@ -30,16 +30,13 @@ export default function WonOtherCard({
   const isDirectResponse = atomUtils.isDirectResponseAtom(atom);
   const responseToUri =
     isDirectResponse && getIn(atom, ["content", "responseToUri"]);
-  const responseToAtom = useSelector(state =>
-    getIn(state, ["atoms", responseToUri])
-  );
+  const responseToAtom = useSelector(generalSelectors.getAtom(responseToUri));
   const atomImage = atomUtils.getDefaultImage(atom);
   const atomLocation = atomUtils.getLocation(atom);
   const holderUri = atomUtils.getHeldByUri(atom);
-  const holder = useSelector(state => getIn(state, ["atoms", holderUri]));
+  const holder = useSelector(generalSelectors.getAtom(holderUri));
   const holderName = get(holder, "humanReadable");
-  const holderHolds = holder && get(holder, "holds");
-  const holderVerified = holderHolds && holderHolds.includes(atomUri);
+  const holderVerified = atomUtils.isHolderVerified(atom, holder);
   const isHolderPersona = atomUtils.isPersona(holder);
   const personaIdenticonSvg = atomUtils.getIdenticonSvg(holder);
   const personaImage = atomUtils.getDefaultPersonaImage(holder);
@@ -56,7 +53,9 @@ export default function WonOtherCard({
   const atomHasHoldableSocket = atomUtils.hasHoldableSocket(atom);
   const isGroupChatEnabled = atomUtils.hasGroupSocket(atom);
   const isChatEnabled = atomUtils.hasChatSocket(atom);
-  const globalLastUpdateTime = useSelector(selectLastUpdateTime);
+  const globalLastUpdateTime = useSelector(
+    generalSelectors.selectLastUpdateTime
+  );
   const friendlyTimestamp =
     atom && relativeTime(globalLastUpdateTime, get(atom, "lastUpdateDate"));
   const showPersonaImage = isHolderPersona && !!personaImage;

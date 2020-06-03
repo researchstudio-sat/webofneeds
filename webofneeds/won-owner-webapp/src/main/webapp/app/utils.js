@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 /**
  * Created by ksinger on 01.09.2015.
  */
@@ -14,6 +16,29 @@ export function dispatchEvent(elem, eventName, eventData) {
 
 export function getPathname(location) {
   return location && location.pathname;
+}
+
+export function parseHeaderLinks(linkHeaderString) {
+  return (
+    linkHeaderString &&
+    _.chain(linkHeaderString)
+      .split(",")
+      .map(link => {
+        return {
+          ref: link
+            .split(";")[1]
+            .replace(/rel="(.*)"/, "$1")
+            .trim(),
+          url: link
+            .split(";")[0]
+            .replace(/<(.*)>/, "$1")
+            .trim(),
+        };
+      })
+      .keyBy("ref")
+      .mapValues("url")
+      .value()
+  );
 }
 
 /*
@@ -33,8 +58,16 @@ Currently Used/possible Parameters:
   }
 */
 export function getQueryParams(location) {
-  let pairs = location.search.slice(1).split("&");
+  return getParamsObject(location.search.slice(1));
+}
 
+/**
+ * generates a json object out of the paramsString of a url (everything after the ?)
+ * @param paramsString
+ * @returns {any}
+ */
+function getParamsObject(paramsString) {
+  let pairs = paramsString.split("&");
   let result = {};
   pairs.forEach(function(pair) {
     pair = pair.split("=");
@@ -42,6 +75,30 @@ export function getQueryParams(location) {
   });
 
   return JSON.parse(JSON.stringify(result));
+}
+
+/**
+ * parses a json object out of a url, that puts the url/query params within a json object
+ * @param url
+ * @returns {{params: {}, url: (*|string)}|{params: any, url: (*|string)}|undefined}
+ */
+export function getLinkAndParams(url) {
+  const array = url && url.split("?");
+
+  if (array) {
+    if (array.length == 1) {
+      return {
+        url: array[0],
+        params: {},
+      };
+    } else if (array.length == 2) {
+      return {
+        url: array[0],
+        params: getParamsObject(array[1]),
+      };
+    }
+  }
+  return undefined;
 }
 
 /**

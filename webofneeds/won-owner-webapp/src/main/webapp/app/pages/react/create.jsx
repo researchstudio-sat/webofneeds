@@ -1,10 +1,12 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import { withRouter } from "react-router-dom";
-import { get, getQueryParams } from "../../utils.js";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
+import { getQueryParams } from "../../utils.js";
+import { actionCreators } from "../../actions/actions.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
+import * as processUtils from "../../redux/utils/process-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
+import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import WonModalDialog from "../../components/modal-dialog.jsx";
 import WonTopnav from "../../components/topnav.jsx";
 import WonMenu from "../../components/menu.jsx";
@@ -12,65 +14,172 @@ import WonToasts from "../../components/toasts.jsx";
 import WonSlideIn from "../../components/slide-in.jsx";
 import WonFooter from "../../components/footer.jsx";
 import WonCreateAtom from "../../components/create-atom.jsx";
+import WonEditAtom from "../../components/edit-atom.jsx";
 import WonUseCaseGroup from "../../components/usecase-group.jsx";
 import WonUseCasePicker from "../../components/usecase-picker.jsx";
 
 import "~/style/_create.scss";
 import "~/style/_responsiveness-utils.scss";
 
-const mapStateToProps = (state, ownProps) => {
-  const accountState = get(state, "account");
+import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
+import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg";
 
-  return {
-    isLoggedIn: accountUtils.isLoggedIn(accountState),
-    showModalDialog: viewSelectors.showModalDialog(state),
-    showSlideIns:
-      viewSelectors.hasSlideIns(state, ownProps.history) &&
-      viewSelectors.isSlideInsVisible(state),
-  };
-};
+export default function PageCreate() {
+  const history = useHistory();
+  const dispatch = useDispatch();
+  const {
+    useCase,
+    useCaseGroup,
+    fromAtomUri,
+    mode,
+    senderSocketType,
+    targetSocketType,
+    holderUri,
+  } = getQueryParams(history.location);
+  const processState = useSelector(generalSelectors.getProcessState);
+  const fromAtom = useSelector(generalSelectors.getAtom(fromAtomUri));
+  const accountState = useSelector(generalSelectors.getAccountState);
+  const isLoggedIn = accountUtils.isLoggedIn(accountState);
+  const showModalDialog = useSelector(viewSelectors.showModalDialog);
+  const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
 
-function PageCreate(props) {
-  let { useCase, useCaseGroup, fromAtomUri, mode } = getQueryParams(
-    props.location
-  );
+  const isFromAtomLoading = fromAtomUri
+    ? processUtils.isAtomLoading(processState, fromAtomUri)
+    : false;
+  const isFromAtomToLoad = fromAtomUri
+    ? processUtils.isAtomToLoad(processState, fromAtomUri)
+    : false;
+  const hasFromAtomFailedToLoad = fromAtomUri
+    ? processUtils.hasAtomFailedToLoad(processState, fromAtomUri)
+    : false;
+
+  useEffect(() => {
+    if (
+      fromAtomUri &&
+      (!fromAtom ||
+        (isFromAtomToLoad && !isFromAtomLoading && !hasFromAtomFailedToLoad))
+    ) {
+      dispatch(actionCreators.atoms__fetchUnloadedAtom(fromAtomUri));
+    }
+  });
+
   let contentElement;
-
-  let showCreateFromPost = !!(fromAtomUri && mode);
   let showUseCaseGroup = !useCase && !!useCaseGroup;
 
-  let showCreatePost = showCreateFromPost || !!useCase;
+  let showCreatePostFromAtom = !!fromAtomUri && !!mode;
+  let showCreatePostFromUseCase = !showCreatePostFromAtom && !!useCase;
 
-  let showUseCasePicker = !(showUseCaseGroup || showCreatePost);
+  let showUseCasePicker = !(
+    showUseCaseGroup ||
+    showCreatePostFromAtom ||
+    showCreatePostFromUseCase
+  );
 
-  if (showCreatePost) {
-    contentElement = <WonCreateAtom />;
-  } else if (showUseCaseGroup) {
+  if (showUseCaseGroup) {
     contentElement = <WonUseCaseGroup />;
   } else if (showUseCasePicker) {
     contentElement = <WonUseCasePicker />;
+  } else if (showCreatePostFromAtom) {
+    if (
+      fromAtom &&
+      !isFromAtomToLoad &&
+      !isFromAtomLoading &&
+      !hasFromAtomFailedToLoad
+    ) {
+      switch (mode) {
+        case "EDIT": {
+          contentElement = <WonEditAtom fromAtom={fromAtom} />;
+          break;
+        }
+
+        case "CONNECT": {
+          contentElement = (
+            <WonCreateAtom
+              useCaseIdentifier={useCase}
+              connect={true}
+              fromAtom={fromAtom}
+              senderSocketType={senderSocketType}
+              targetSocketType={targetSocketType}
+              holderUri={holderUri}
+            />
+          );
+          break;
+        }
+
+        case "DUPLICATE": {
+          contentElement = (
+            <WonCreateAtom
+              useCaseIdentifier={useCase}
+              fromAtom={fromAtom}
+              duplicate={true}
+              holderUri={holderUri}
+            />
+          );
+          break;
+        }
+
+        default: {
+          console.error("Returning empty div, mode is not valid: ", mode);
+          contentElement = <div />;
+          break;
+        }
+      }
+    } else {
+      contentElement = (
+        <won-create-atom>
+          <div className="cp__content">
+            {hasFromAtomFailedToLoad ? (
+              <div className="cp__content__failed">
+                <svg className="cp__content__failed__icon">
+                  <use
+                    xlinkHref={ico16_indicator_error}
+                    href={ico16_indicator_error}
+                  />
+                </svg>
+                <span className="cp__content__failed__label">
+                  Failed To Load - Post might have been deleted
+                </span>
+                <div className="cp__content__failed__actions">
+                  <button
+                    className="cp__content__failed__actions__button red won-button--outlined thin"
+                    onClick={() =>
+                      dispatch(
+                        actionCreators.atoms__fetchUnloadedAtom(fromAtomUri)
+                      )
+                    }
+                  >
+                    Try Reload
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="cp__content__loading">
+                <svg className="cp__content__loading__spinner hspinner">
+                  <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
+                </svg>
+                <span className="cp__content__loading__label">Loading...</span>
+              </div>
+            )}
+          </div>
+        </won-create-atom>
+      );
+    }
+  } else if (showCreatePostFromUseCase) {
+    contentElement = (
+      <WonCreateAtom useCaseIdentifier={useCase} holderUri={holderUri} />
+    );
   }
 
   return (
-    <section className={!props.isLoggedIn ? "won-signed-out" : ""}>
-      {props.showModalDialog && <WonModalDialog />}
+    <section className={!isLoggedIn ? "won-signed-out" : ""}>
+      {showModalDialog && <WonModalDialog />}
       <WonTopnav pageTitle="Create" />
-      {props.isLoggedIn && <WonMenu />}
+      {isLoggedIn && <WonMenu />}
       <WonToasts />
-      {props.showSlideIns && <WonSlideIn />}
+      {showSlideIns && <WonSlideIn />}
       {/* RIGHT SIDE */}
       <main className="ownercreate">{contentElement}</main>
       <WonFooter />
     </section>
   );
 }
-
-PageCreate.propTypes = {
-  location: PropTypes.object,
-  isLoggedIn: PropTypes.bool,
-  showModalDialog: PropTypes.bool,
-  showSlideIns: PropTypes.bool,
-  history: PropTypes.object,
-};
-
-export default withRouter(connect(mapStateToProps)(PageCreate));

@@ -37,6 +37,7 @@ export const emptyConnectionProcess = Immutable.fromJS({
   toLoad: false,
   loading: false,
   loadingMessages: false,
+  nextPage: undefined,
   failedToLoad: false,
   petriNetData: {
     loading: false,
@@ -51,8 +52,6 @@ export const emptyConnectionProcess = Immutable.fromJS({
 });
 
 export const emptyMessagesProcess = Immutable.fromJS({
-  loading: false,
-  toLoad: false,
   failedToLoad: false,
 });
 
@@ -296,49 +295,46 @@ export default function(processState = initialState, action = {}) {
 
     case actionTypes.connections.fetchMessagesEnd: {
       const connUri = get(action.payload, "connectionUri");
+      const nextPage = get(action.payload, "nextPage");
 
       return updateConnectionProcess(processState, connUri, {
         loadingMessages: false,
         failedToLoad: false,
+        nextPage: nextPage,
       });
-    }
-
-    case actionTypes.connections.messageUrisInLoading: {
-      const connUri = get(action.payload, "connectionUri");
-      const messageUris = get(action.payload, "uris");
-
-      if (messageUris) {
-        messageUris.map(messageUri => {
-          processState = updateMessageProcess(
-            processState,
-            connUri,
-            messageUri,
-            { toLoad: false, loading: true }
-          );
-        });
-      }
-
-      return processState;
     }
 
     case actionTypes.connections.fetchMessagesSuccess: {
       const connUri = get(action.payload, "connectionUri");
+      const nextPage = get(action.payload, "nextPage");
 
       const loadedMessages = get(action.payload, "events");
       if (loadedMessages) {
         processState = updateConnectionProcess(processState, connUri, {
           loadingMessages: false,
           failedToLoad: false,
+          nextPage: nextPage,
         });
 
-        loadedMessages.map((message, messageUri) => {
-          processState = updateMessageProcess(
-            processState,
-            connUri,
-            messageUri,
-            { toLoad: false, loading: false, failedToLoad: false }
-          );
-        });
+        const connectionMessageProcess = getIn(processState, [
+          "connections",
+          connUri,
+          "messages",
+        ]);
+
+        if (connectionMessageProcess && connectionMessageProcess.size > 0) {
+          loadedMessages.map((message, messageUri) => {
+            //Only set failedToLoad to false if the messageProcess existed (only happens if the message failed once)
+            if (get(connectionMessageProcess, messageUri)) {
+              processState = updateMessageProcess(
+                processState,
+                connUri,
+                messageUri,
+                { failedToLoad: false }
+              );
+            }
+          });
+        }
       }
 
       return processState;
@@ -346,12 +342,14 @@ export default function(processState = initialState, action = {}) {
 
     case actionTypes.connections.fetchMessagesFailed: {
       const connUri = get(action.payload, "connectionUri");
-      const failedMessages = get(action.payload, "events");
+      const nextPage = get(action.payload, "nextPage");
 
+      const failedMessages = get(action.payload, "events");
       if (failedMessages) {
         processState = updateConnectionProcess(processState, connUri, {
           loadingMessages: false,
           failedToLoad: true,
+          nextPage: nextPage,
         });
 
         failedMessages.map((message, messageUri) => {
@@ -359,7 +357,7 @@ export default function(processState = initialState, action = {}) {
             processState,
             connUri,
             messageUri,
-            { toLoad: false, loading: false, failedToLoad: true }
+            { failedToLoad: true }
           );
         });
       }
@@ -418,12 +416,33 @@ export default function(processState = initialState, action = {}) {
       });
     }
 
+    case actionTypes.connections.updateAgreementDataset: {
+      const agreementDataset = action.payload.agreementDataset;
+      const connUri = action.payload.connectionUri;
+
+      if (!connUri || !agreementDataset) {
+        return processState;
+      }
+      return updateConnectionProcess(processState, connUri, {
+        agreementDataset: { loading: false, loaded: true },
+      });
+    }
+
     case actionTypes.connections.setLoadingAgreementData: {
       const connUri = action.payload.connectionUri;
       const loadingAgreementData = action.payload.loadingAgreementData;
 
       return updateConnectionProcess(processState, connUri, {
         agreementData: { loading: loadingAgreementData },
+      });
+    }
+
+    case actionTypes.connections.setLoadingAgreementDataset: {
+      const connUri = action.payload.connectionUri;
+      const loadingAgreementDataset = action.payload.loadingAgreementDataset;
+
+      return updateConnectionProcess(processState, connUri, {
+        agreementDataset: { loading: loadingAgreementDataset },
       });
     }
 
@@ -472,6 +491,10 @@ export default function(processState = initialState, action = {}) {
           processState = updateConnectionProcess(processState, connUri, {
             toLoad: false,
             loading: false,
+            nextPage: {
+              url: get(conn, "messageContainer"),
+              params: {},
+            },
           });
 
           const targetAtomUri = get(conn, "targetAtom");
@@ -492,16 +515,6 @@ export default function(processState = initialState, action = {}) {
               toLoad: true,
             });
           }
-          const eventsOfConnection = get(conn, "hasEvents");
-          eventsOfConnection &&
-            eventsOfConnection.map(eventUri => {
-              processState = updateMessageProcess(
-                processState,
-                connUri,
-                eventUri,
-                { toLoad: true }
-              );
-            });
         });
 
       return processState;
@@ -525,40 +538,6 @@ export default function(processState = initialState, action = {}) {
                 loaded: true,
               }
             );
-
-            const heldAtomUris = get(parsedAtom, "holds");
-            heldAtomUris.map(heldAtomUri => {
-              if (
-                !processUtils.isAtomProcessExisting(processState, heldAtomUri)
-              ) {
-                processState = updateAtomProcess(processState, heldAtomUri, {
-                  toLoad: true,
-                });
-              }
-            });
-
-            const groupMemberUris = get(parsedAtom, "groupMembers");
-            groupMemberUris.map(groupMemberUri => {
-              if (
-                !processUtils.isAtomProcessExisting(
-                  processState,
-                  groupMemberUri
-                )
-              ) {
-                processState = updateAtomProcess(processState, groupMemberUri, {
-                  toLoad: true,
-                });
-              }
-            });
-
-            const buddyUris = get(parsedAtom, "buddies");
-            buddyUris.map(buddyUri => {
-              if (!processUtils.isAtomProcessExisting(processState, buddyUri)) {
-                processState = updateAtomProcess(processState, buddyUri, {
-                  toLoad: true,
-                });
-              }
-            });
           }
         });
       return processState;

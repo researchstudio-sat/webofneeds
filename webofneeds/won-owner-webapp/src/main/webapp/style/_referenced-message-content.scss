@@ -39,6 +39,15 @@ won-referenced-message-content {
       }
 
       &__carret {
+        &--expanded > svg {
+          transform: rotate(-180deg);
+          transition: all linear 0.2s;
+        }
+
+        &--collapsed > svg {
+          transition: all linear 0.2s;
+        }
+
         svg {
           @include fixed-square(1rem); // visually center icon on line
         }

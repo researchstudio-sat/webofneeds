@@ -74,7 +74,7 @@ const mapStateToProps = (state, ownProps) => {
     excludedText: ownProps.excludedText,
     notAllowedSocketText: ownProps.notAllowedSocketText,
     onUpdate: ownProps.onUpdate,
-    processState: get(state, ["process"]),
+    processState: get(state, "process"),
     allSuggestableAtoms,
     allForbiddenAtoms,
     allowedSockets: ownProps.allowedSockets,
@@ -187,7 +187,7 @@ class WonSuggestAtomPicker extends React.Component {
               (this.isSelected(atom) ? "won--selected" : "")
             }
           >
-            <WonAtomHeader atomUri={get(atom, "uri")} />
+            <WonAtomHeader atom={atom} />
           </div>
         );
       });

@@ -315,38 +315,17 @@ export function buildChatMessage({
   );
 }
 
-export async function buildEditMessage(editedAtomData, oldAtom) {
+export function buildEditMessage(editedAtomData, oldAtom) {
   const atomUriToEdit = oldAtom && oldAtom.get("uri");
 
-  //if type  create -> use atomBuilder as well
-  const prepareContentNodeData = async editedAtomData => ({
-    // Adds all fields from atomDataIsOrSeeks:
-    // title, description, tags, location,...
-    ...editedAtomData,
-
-    publishedContentUri: atomUriToEdit, //mandatory
-    arbitraryJsonLd: editedAtomData.ttl
-      ? await won.ttlToJsonLd(editedAtomData.ttl)
-      : [],
-  });
-
-  let contentRdf = won.buildAtomRdf({
-    content: editedAtomData.content
-      ? await prepareContentNodeData(editedAtomData.content)
-      : undefined,
-    seeks: editedAtomData.seeks
-      ? await prepareContentNodeData(editedAtomData.seeks)
-      : undefined,
-    useCase: editedAtomData.useCase ? editedAtomData.useCase : undefined, //only needed for atom building
-    // FIXME: find a better way to include atom details that are not part of is or seeks
-    socket: editedAtomData.socket,
-  });
-
-  const msgJson = won.buildMessageRdf(contentRdf, {
-    msgType: vocab.WONMSG.replaceMessage, //mandatory
-    publishedContentUri: atomUriToEdit, //mandatory
-    msgUri: vocab.WONMSG.uriPlaceholder.event,
-  });
+  const msgJson = won.buildMessageRdf(
+    buildContentRdf(editedAtomData, atomUriToEdit),
+    {
+      msgType: vocab.WONMSG.replaceMessage, //mandatory
+      publishedContentUri: atomUriToEdit, //mandatory
+      msgUri: vocab.WONMSG.uriPlaceholder.event,
+    }
+  );
   //add the @base definition to the @context so we can use #fragments in the atom structure
   msgJson["@context"]["@base"] = atomUriToEdit;
 
@@ -373,7 +352,7 @@ export async function buildEditMessage(editedAtomData, oldAtom) {
  *    atomUri: string
  * }}
  */
-export async function buildCreateMessage(atomData, wonNodeUri) {
+export function buildCreateMessage(atomData, wonNodeUri) {
   //Check for is and seeks
   /*
     if(!atomData.type || !atomData.title)
@@ -382,38 +361,42 @@ export async function buildCreateMessage(atomData, wonNodeUri) {
 
   const publishedContentUri = wonNodeUri + "/atom/" + wonUtils.getRandomWonId();
 
-  //if type  create -> use atomBuilder as well
-  const prepareContentNodeData = async atomData => ({
-    // Adds all fields from atomDataIsOrSeeks:
-    // title, description, tags, location,...
-    ...atomData,
-
-    publishedContentUri: publishedContentUri, //mandatory
-    arbitraryJsonLd: atomData.ttl ? await won.ttlToJsonLd(atomData.ttl) : [],
-  });
-
-  let contentRdf = won.buildAtomRdf({
-    content: atomData.content
-      ? await prepareContentNodeData(atomData.content)
-      : undefined,
-    seeks: atomData.seeks
-      ? await prepareContentNodeData(atomData.seeks)
-      : undefined,
-    useCase: atomData.useCase ? atomData.useCase : undefined, //only needed for atom building
-    // FIXME: find a better way to include atom details that are not part of is or seeks
-    socket: atomData.socket,
-  });
-
-  const msgJson = won.buildMessageRdf(contentRdf, {
-    atom: publishedContentUri, //mandatory
-    msgType: vocab.WONMSG.createMessage, //mandatory
-    publishedContentUri: publishedContentUri, //mandatory
-    msgUri: vocab.WONMSG.uriPlaceholder.event,
-  });
+  const msgJson = won.buildMessageRdf(
+    buildContentRdf(atomData, publishedContentUri),
+    {
+      atom: publishedContentUri, //mandatory
+      msgType: vocab.WONMSG.createMessage, //mandatory
+      publishedContentUri: publishedContentUri, //mandatory
+      msgUri: vocab.WONMSG.uriPlaceholder.event,
+    }
+  );
   //add the @base definition to the @context so we can use #fragments in the atom structure
   msgJson["@context"]["@base"] = publishedContentUri;
   return {
     message: msgJson,
     atomUri: publishedContentUri,
   };
+}
+
+function buildContentRdf(atomData, publishedContentUri) {
+  //if type  create -> use atomBuilder as well
+  const prepareContentNodeData = atomData => ({
+    // Adds all fields from atomDataIsOrSeeks:
+    // title, description, tags, location,...
+    ...atomData,
+
+    publishedContentUri: publishedContentUri, //mandatory
+  });
+
+  let contentRdf = won.buildAtomRdf({
+    content: atomData.content
+      ? prepareContentNodeData(atomData.content)
+      : undefined,
+    seeks: atomData.seeks ? prepareContentNodeData(atomData.seeks) : undefined,
+    useCase: atomData.useCase ? atomData.useCase : undefined, //only needed for atom building
+    // FIXME: find a better way to include atom details that are not part of is or seeks
+    socket: atomData.socket,
+  });
+
+  return contentRdf;
 }
