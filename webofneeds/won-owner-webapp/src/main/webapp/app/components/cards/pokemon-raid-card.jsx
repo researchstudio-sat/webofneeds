@@ -252,12 +252,15 @@ export default function PokemonRaidCard({
       : undefined;
 
   const cardIcon = (
-    <div
+    <Link
       className={
         "card__icon clickable " +
         (isInactive ? " inactive " : "") +
         (showMap ? "card__icon--map" : "") +
         (pokemonImageUrl ? "card__icon--pkm" : "")
+      }
+      to={location =>
+        generateLink(location, { postUri: atomUri, tab: "DETAIL" }, "/post")
       }
       style={style}
     >
@@ -294,7 +297,7 @@ export default function PokemonRaidCard({
       ) : (
         undefined
       )}
-    </div>
+    </Link>
   );
 
   const cardMain = (
