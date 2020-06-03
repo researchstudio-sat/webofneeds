@@ -652,37 +652,6 @@ export function showLatestMessages(connectionUri, numberOfEvents) {
   };
 }
 
-export function loadLatestMessagesOfConnection({
-  connectionUri,
-  numberOfEvents,
-  state,
-  dispatch,
-}) {
-  const atom =
-    connectionUri &&
-    generalSelectors.getOwnedAtomByConnectionUri(connectionUri)(state);
-  const atomUri = get(atom, "uri");
-  const connection =
-    connectionUri && getIn(atom, ["connections", connectionUri]);
-  const processState = generalSelectors.getProcessState(state);
-  if (
-    !connectionUri ||
-    !connection ||
-    processUtils.isConnectionLoading(processState, connectionUri) ||
-    processUtils.isConnectionLoadingMessages(processState, connectionUri)
-  ) {
-    return Promise.resolve(); //only load if not already started and connection itself not loading
-  }
-
-  stateStore.fetchMessages(
-    dispatch,
-    state,
-    connectionUri,
-    atomUri,
-    numberOfEvents
-  );
-}
-
 /**
  * @param connectionUri
  * @param numberOfEvents
@@ -702,7 +671,6 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
       generalSelectors.getOwnedAtomByConnectionUri(connectionUri)(state);
     const atomUri = get(atom, "uri");
     const connection = getIn(atom, ["connections", connectionUri]);
-    const connectionMessages = get(connection, "messages");
     const processState = generalSelectors.getProcessState(state);
     if (
       !connection ||
@@ -711,13 +679,10 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
     ) {
       return; //only load if not already started and connection itself not loading
     }
-
-    // determine the oldest loaded event
-    const sortedConnectionMessages = connectionMessages
-      .valueSeq()
-      .sort((msg1, msg2) => get(msg1, "date") - get(msg2, "date"));
-
-    const oldestMessageUri = get(sortedConnectionMessages.first(), "uri");
+    const resumeAfterUri = processUtils.getResumeAfterUriForConnection(
+      processState,
+      connectionUri
+    );
 
     return stateStore.fetchMessages(
       dispatch,
@@ -725,7 +690,7 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
       connectionUri,
       atomUri,
       numberOfEvents,
-      oldestMessageUri
+      resumeAfterUri
     );
   };
 }

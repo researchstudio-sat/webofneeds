@@ -198,6 +198,16 @@ export function isConnectionLoading(process, connUri, includeSubData = false) {
   return getIn(process, ["connections", connUri, "loading"]);
 }
 
+export function getResumeAfterUriForConnection(process, connUri) {
+  return getIn(process, [
+    "connections",
+    connUri,
+    "nextPage",
+    "params",
+    "resumeafter",
+  ]);
+}
+
 /**
  * Return true if given atomUri has failedToLoad
  * @param process (full process from state)
@@ -209,9 +219,7 @@ export function hasConnectionFailedToLoad(process, connUri) {
 }
 
 export function hasMessagesToLoad(process, connUri) {
-  const messages =
-    connUri && getIn(process, ["connections", connUri, "messages"]);
-  return !!(messages && messages.find(msg => get(msg, "toLoad")));
+  return !!getIn(process, ["connections", connUri, "nextPage"]);
 }
 
 /**

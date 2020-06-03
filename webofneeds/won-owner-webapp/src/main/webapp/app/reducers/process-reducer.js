@@ -37,6 +37,7 @@ export const emptyConnectionProcess = Immutable.fromJS({
   toLoad: false,
   loading: false,
   loadingMessages: false,
+  nextPage: undefined,
   failedToLoad: false,
   petriNetData: {
     loading: false,
@@ -296,10 +297,12 @@ export default function(processState = initialState, action = {}) {
 
     case actionTypes.connections.fetchMessagesEnd: {
       const connUri = get(action.payload, "connectionUri");
+      const nextPage = get(action.payload, "nextPage");
 
       return updateConnectionProcess(processState, connUri, {
         loadingMessages: false,
         failedToLoad: false,
+        nextPage: nextPage,
       });
     }
 
@@ -323,12 +326,14 @@ export default function(processState = initialState, action = {}) {
 
     case actionTypes.connections.fetchMessagesSuccess: {
       const connUri = get(action.payload, "connectionUri");
+      const nextPage = get(action.payload, "nextPage");
 
       const loadedMessages = get(action.payload, "events");
       if (loadedMessages) {
         processState = updateConnectionProcess(processState, connUri, {
           loadingMessages: false,
           failedToLoad: false,
+          nextPage: nextPage,
         });
 
         loadedMessages.map((message, messageUri) => {
@@ -346,12 +351,14 @@ export default function(processState = initialState, action = {}) {
 
     case actionTypes.connections.fetchMessagesFailed: {
       const connUri = get(action.payload, "connectionUri");
-      const failedMessages = get(action.payload, "events");
+      const nextPage = get(action.payload, "nextPage");
 
+      const failedMessages = get(action.payload, "events");
       if (failedMessages) {
         processState = updateConnectionProcess(processState, connUri, {
           loadingMessages: false,
           failedToLoad: true,
+          nextPage: nextPage,
         });
 
         failedMessages.map((message, messageUri) => {
@@ -493,6 +500,10 @@ export default function(processState = initialState, action = {}) {
           processState = updateConnectionProcess(processState, connUri, {
             toLoad: false,
             loading: false,
+            nextPage: {
+              url: get(conn, "messageContainer"),
+              params: {},
+            },
           });
 
           const targetAtomUri = get(conn, "targetAtom");

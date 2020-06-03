@@ -1,7 +1,11 @@
 import urljoin from "url-join";
 import { ownerBaseUrl } from "~/config/default.js";
 import * as wonUtils from "../won-utils.js";
-import { generateQueryParamsString } from "../utils.js";
+import {
+  generateQueryParamsString,
+  parseHeaderLinks,
+  getLinkAndParams,
+} from "../utils.js";
 import vocab from "../service/vocab.js";
 import * as N3 from "n3";
 // import { bestfetch } from "bestfetch";
@@ -402,7 +406,7 @@ export function getAllActiveMetaPersonas() {
   );
 }
 
-export function getJsonLdDataset(uri, params = {}) {
+export function getJsonLdDataset(uri, params = {}, includeLinkHeader = false) {
   /**
    * This function is used to generate the query-strings.
    * Should anything about the way the API is accessed changed,
@@ -426,6 +430,7 @@ export function getJsonLdDataset(uri, params = {}) {
    *         * "timeof",
    *         * "deep"
    *         * "state"
+   * @param includeLinkHeader if set to true, the response will be a json object of the json response and a link to the next page (if not present, the link will be undefined)
    * @returns {string}
    */
   /**
@@ -473,9 +478,9 @@ export function getJsonLdDataset(uri, params = {}) {
         if (
           (response.status >= 200 && response.status < 300) ||
           response.status === 304
-        )
+        ) {
           return response;
-        else {
+        } else {
           let error = new Error(
             `${response.status} - ${
               response.statusText
@@ -487,7 +492,27 @@ export function getJsonLdDataset(uri, params = {}) {
         }
       })
       //.then(dataset => dataset.data);
-      .then(dataset => dataset.json())
+      .then(response => {
+        if (includeLinkHeader) {
+          const linkHeaderString =
+            response.headers && response.headers.get("Link");
+          const linkHeaders = parseHeaderLinks(linkHeaderString);
+
+          const nextPageLinkObject =
+            linkHeaders &&
+            linkHeaders.next &&
+            getLinkAndParams(linkHeaders.next);
+          return Promise.all([
+            response.json(),
+            Promise.resolve(nextPageLinkObject),
+          ]).then(([jsonLdData, nextPage]) => ({
+            jsonLdData: jsonLdData,
+            nextPage: nextPage,
+          }));
+        } else {
+          return response.json();
+        }
+      })
   );
 }
 

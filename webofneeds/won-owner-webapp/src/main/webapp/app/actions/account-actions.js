@@ -11,7 +11,7 @@ import * as ownerApi from "../api/owner-api.js";
 import { setDisclaimerAccepted } from "../won-localstorage.js";
 
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
-import { loadLatestMessagesOfConnection } from "./connections-actions.js";
+import { showLatestMessages } from "./connections-actions.js";
 
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -326,17 +326,16 @@ export function reconnect() {
       const state = getState();
 
       /* 
+       * //TODO: THIS IS REALLY REALLY BAD IN MY OPINION WE SHOULD NOT DO THIS
        * -- loading latest messages for all connections (we might have missed some during the dc) --
        */
       const connectionUris = generalSelectors.getOwnedConnectionUris(state);
       await Promise.all(
         connectionUris.map(connectionUri =>
-          loadLatestMessagesOfConnection({
+          showLatestMessages(
             connectionUri,
-            numberOfEvents: 10, //TODO magic number :|
-            state,
-            dispatch,
-          })
+            10 //TODO magic number :|
+          )(state, dispatch)
         )
       );
     } catch (e) {

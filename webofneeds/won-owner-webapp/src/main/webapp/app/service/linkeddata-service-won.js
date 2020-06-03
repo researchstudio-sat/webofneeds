@@ -251,6 +251,7 @@ import * as jsonldUtils from "./jsonld-utils";
 
   /**
    * @param connectionUri
+   * @param connectionContainerUri, if this parameter is present we do not fetch the connection at all, we fetch the containerUri directly
    * @param fetchParams: optional paramters
    *        * requesterWebId: the WebID used to access the ressource (used
    *            by the owner-server to pick the right key-pair)
@@ -258,9 +259,13 @@ import * as jsonldUtils from "./jsonld-utils";
    *        * pagingSize: if specified the server will return the first
    *            page (unless e.g. `queryParams.p=2` is specified when
    *            it will return the second page of size N)
-   * @return {*} the connections predicates along with the fetched messages
+   * @return {nextPage: nextPageLink Object, messages: arrayOfMessages}
    */
-  won.getMessagesOfConnection = function(connectionUri, fetchParams) {
+  won.getMessagesOfConnection = function(
+    connectionUri,
+    connectionContainerUri,
+    fetchParams
+  ) {
     if (!is("String", connectionUri)) {
       throw new Error(
         "Tried to request connection infos for sthg that isn't an uri: " +
@@ -268,51 +273,66 @@ import * as jsonldUtils from "./jsonld-utils";
       );
     }
 
-    return getConnection(connectionUri)
-      .then(connection =>
-        ownerApi.getJsonLdDataset(connection.messageContainer, fetchParams)
+    const connectionContainerPromise = connectionContainerUri
+      ? ownerApi.getJsonLdDataset(connectionContainerUri, fetchParams, true)
+      : getConnection(connectionUri).then(connection =>
+          ownerApi.getJsonLdDataset(
+            connection.messageContainer,
+            fetchParams,
+            true
+          )
+        );
+
+    return connectionContainerPromise
+      .then(responseObject =>
+        jsonld.expand(responseObject.jsonLdData).then(jsonLdData => {
+          const messages = {};
+
+          jsonLdData &&
+            jsonLdData
+              .filter(graph => graph["@id"].indexOf("wm:/") === 0)
+              .forEach(graph => {
+                const msgUri = graph["@id"].split("#")[0];
+                const singleMessage = messages[msgUri];
+
+                if (singleMessage) {
+                  singleMessage["@graph"].push(graph);
+                } else {
+                  messages[msgUri] = { "@graph": [graph] };
+                }
+              });
+
+          const promiseArray = [];
+          for (const msgUri in messages) {
+            const msg = messages[msgUri];
+            promiseArray.push(
+              won
+                .wonMessageFromJsonLd(msg, msgUri)
+                .then(wonMessage => ({
+                  msgUri: msgUri,
+                  wonMessage: wonMessage,
+                }))
+                .catch(error => {
+                  console.error(
+                    "Could not parse msg to wonMessage: ",
+                    msg,
+                    "error: ",
+                    error
+                  );
+                  return { msgUri: msgUri, wonMessage: undefined };
+                })
+            );
+          }
+          return Promise.all([
+            Promise.resolve(responseObject.nextPage),
+            Promise.all(promiseArray),
+          ]);
+        })
       )
-      .then(jsonLdData => jsonld.expand(jsonLdData))
-      .then(jsonLdData => {
-        const messages = {};
-
-        jsonLdData &&
-          jsonLdData
-            .filter(graph => graph["@id"].indexOf("wm:/") === 0)
-            .forEach(graph => {
-              const msgUri = graph["@id"].split("#")[0];
-              const singleMessage = messages[msgUri];
-
-              if (singleMessage) {
-                singleMessage["@graph"].push(graph);
-              } else {
-                messages[msgUri] = { "@graph": [graph] };
-              }
-            });
-
-        const promiseArray = [];
-        for (const msgUri in messages) {
-          const msg = messages[msgUri];
-          promiseArray.push(
-            won
-              .wonMessageFromJsonLd(msg, msgUri)
-              .then(wonMessage => ({
-                msgUri: msgUri,
-                wonMessage: wonMessage,
-              }))
-              .catch(error => {
-                console.error(
-                  "Could not parse msg to wonMessage: ",
-                  msg,
-                  "error: ",
-                  error
-                );
-                return { msgUri: msgUri, wonMessage: undefined };
-              })
-          );
-        }
-        return Promise.all(promiseArray);
-      });
+      .then(([nextPage, messages]) => ({
+        nextPage: nextPage,
+        messages: messages,
+      }));
   };
 
   /**
