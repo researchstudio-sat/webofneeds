@@ -543,7 +543,7 @@ export default function WonAtomMessages({
       <div className="pm__content__unreadindicator">
         <div
           className="pm__content__unreadindicator__content won-button--filled red"
-          onClick={goToUnreadMessages.bind(this)}
+          onClick={goToUnreadMessages}
         >
           {unreadMessageCount} unread Messages
         </div>
@@ -583,18 +583,14 @@ export default function WonAtomMessages({
         <WonShareDropdown atom={targetAtom} />
         <WonConnectionContextDropdown
           connection={connection}
-          showPetriNetDataField={showPetriNetDataField.bind(this)}
-          showAgreementDataField={showAgreementDataField.bind(this)}
+          showPetriNetDataField={showPetriNetDataField}
+          showAgreementDataField={showAgreementDataField}
         />
       </div>
     );
 
     contentElement = (
-      <div
-        className="pm__content"
-        ref={chatContainerRef}
-        onScroll={onScroll.bind(this)}
-      >
+      <div className="pm__content" ref={chatContainerRef} onScroll={onScroll}>
         {unreadIndicatorElement}
         {showAtomContentMessage && <WonAtomContentMessage atom={targetAtom} />}
         {(isConnectionLoading || isProcessingLoadingMessages) &&
@@ -606,7 +602,7 @@ export default function WonAtomMessages({
           hasConnectionMessagesToLoad && (
             <button
               className="pm__content__loadbutton won-button--outlined thin red"
-              onClick={loadPreviousMessages.bind(this)}
+              onClick={() => loadPreviousMessages}
             >
               Load previous messages
             </button>
@@ -672,8 +668,8 @@ export default function WonAtomMessages({
         </div>
         <WonConnectionContextDropdown
           connection={connection}
-          showPetriNetDataField={showPetriNetDataField.bind(this)}
-          showAgreementDataField={showAgreementDataField.bind(this)}
+          showPetriNetDataField={showPetriNetDataField}
+          showAgreementDataField={showAgreementDataField}
         />
       </div>
     );
@@ -823,8 +819,8 @@ export default function WonAtomMessages({
         </div>
         <WonConnectionContextDropdown
           connection={connection}
-          showPetriNetDataField={showPetriNetDataField.bind(this)}
-          showAgreementDataField={showAgreementDataField.bind(this)}
+          showPetriNetDataField={showPetriNetDataField}
+          showAgreementDataField={showAgreementDataField}
         />
       </div>
     );

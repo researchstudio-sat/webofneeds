@@ -254,7 +254,7 @@ export default function WonGroupAtomMessages({
       <div className="gpm__content__unreadindicator">
         <div
           className="gpm__content__unreadindicator__content won-button--filled red"
-          onClick={goToUnreadMessages.bind(this)}
+          onClick={goToUnreadMessages}
         >
           {unreadMessageCount} unread Messages
         </div>
@@ -292,11 +292,7 @@ export default function WonGroupAtomMessages({
   );
 
   const contentElement = (
-    <div
-      className="gpm__content"
-      ref={chatContainerRef}
-      onScroll={onScroll.bind(this)}
-    >
+    <div className="gpm__content" ref={chatContainerRef} onScroll={onScroll}>
       {unreadIndicatorElement}
       {showAtomContentMessage && <WonAtomContentMessage atom={targetAtom} />}
       {(isConnectionLoading || isProcessingLoadingMessages) &&
@@ -307,7 +303,7 @@ export default function WonGroupAtomMessages({
         hasConnectionMessagesToLoad && (
           <button
             className="gpm__content__loadbutton won-button--outlined thin red"
-            onClick={loadPreviousMessages.bind(this)}
+            onClick={() => loadPreviousMessages()}
           >
             Load previous messages
           </button>
