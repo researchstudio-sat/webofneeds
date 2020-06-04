@@ -492,7 +492,7 @@ export function getSocketsWithKeysReset(atomImm) {
 }
 
 export function getSocketUri(atomImm, socketType) {
-  const sockets = getSockets(atomImm);
+  const sockets = socketType && getSockets(atomImm);
 
   return (
     sockets &&
@@ -505,11 +505,6 @@ export function getSocketUri(atomImm, socketType) {
 
 export function getSocketType(atomImm, socketUri) {
   return getIn(atomImm, ["content", "sockets", socketUri]);
-}
-
-export function getDefaultSocketUri(atomImm) {
-  const defaultSocket = getIn(atomImm, ["content", "defaultSocket"]);
-  return defaultSocket && defaultSocket.keySeq().first();
 }
 
 export function getHeldByUri(atomImm) {
@@ -541,29 +536,11 @@ export function getGroupMemberUris(atomImm) {
   );
 }
 
-export function getDefaultSocketWithKeyReset(atomImm) {
-  const defaultSocket = getIn(atomImm, ["content", "defaultSocket"]);
-
-  if (defaultSocket) {
-    return getSocketKeysReset(defaultSocket);
-  }
-  return undefined;
-}
-
 export function getSeeksSocketsWithKeysReset(atomImm) {
   const sockets = getIn(atomImm, ["seeks", "sockets"]);
 
   if (sockets) {
     return getSocketKeysReset(sockets);
-  }
-  return undefined;
-}
-
-export function getSeeksDefaultSocketWithKeyReset(atomImm) {
-  const defaultSocket = getIn(atomImm, ["seeks", "defaultSocket"]);
-
-  if (defaultSocket) {
-    return getSocketKeysReset(defaultSocket);
   }
   return undefined;
 }

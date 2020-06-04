@@ -21,7 +21,6 @@ const emptyDraftImm = Immutable.fromJS({
       "#chatSocket": vocab.CHAT.ChatSocketCompacted,
       "#holdableSocket": vocab.HOLD.HoldableSocketCompacted,
     },
-    defaultSocket: { "#chatSocket": vocab.CHAT.ChatSocketCompacted },
   },
   seeks: {},
 });
@@ -29,7 +28,7 @@ const emptyDraftImm = Immutable.fromJS({
 /**
  * This is used so we can inject preset values for certain UseCases, be aware that it does not merge the content completely.
  *
- * Sockets and defaultSocket will be overwritten if set in the useCase itself FIXME: Figure out a better way to handle or communicate
+ * Sockets will be overwritten if set in the useCase itself FIXME: Figure out a better way to handle or communicate
  * this
  * @param contentToMerge
  * @returns {any|*}
@@ -38,18 +37,11 @@ export function mergeInEmptyDraft(contentToMerge) {
   if (!contentToMerge) return emptyDraftImm.toJS();
   const contentToMergeImm = Immutable.fromJS(contentToMerge);
   const mergeSockets = contentToMergeImm.getIn(["content", "sockets"]);
-  const mergeDefaultSocket = contentToMergeImm.getIn([
-    "content",
-    "defaultSocket",
-  ]);
 
   let mergedDraftImm = emptyDraftImm;
 
   if (mergeSockets && mergeSockets.size > 0) {
     mergedDraftImm = mergedDraftImm.removeIn(["content", "sockets"]);
-  }
-  if (mergeDefaultSocket && mergeDefaultSocket.size > 0) {
-    mergedDraftImm = mergedDraftImm.removeIn(["content", "defaultSocket"]);
   }
 
   mergedDraftImm = mergedDraftImm.mergeDeep(contentToMergeImm);
@@ -84,7 +76,6 @@ export const details = {
   flags: basicDetails.flags,
   eventObjectAboutUris: basicDetails.eventObjectAboutUris,
   sockets: basicDetails.sockets,
-  defaultSocket: basicDetails.defaultSocket,
   type: basicDetails.type,
   pokemonGymInfo: pokemonDetails.pokemonGymInfo,
   pokemonRaid: pokemonDetails.pokemonRaid,

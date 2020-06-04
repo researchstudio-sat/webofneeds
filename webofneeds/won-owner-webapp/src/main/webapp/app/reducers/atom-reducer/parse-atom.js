@@ -461,7 +461,7 @@ function generateHumanReadableArray(presentDetails, detailsToParse) {
   let humanReadableArray = [];
   if (presentDetails && detailsToParse) {
     for (const key in presentDetails) {
-      if (!(key === "sockets" || key === "type" || key === "defaultSocket")) {
+      if (!(key === "sockets" || key === "type")) {
         const detailToParse = detailsToParse[key];
         if (detailToParse) {
           const detailValue = presentDetails[key];

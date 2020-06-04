@@ -51,9 +51,7 @@ export default function WonAtomContent({ atom, defaultTab }) {
       contentBranchImm &&
       contentBranchImm.find(
         (detailValue, detailKey) =>
-          detailKey != "type" &&
-          detailKey != "sockets" &&
-          detailKey != "defaultSocket"
+          detailKey != "type" && detailKey != "sockets"
       )
     );
   };

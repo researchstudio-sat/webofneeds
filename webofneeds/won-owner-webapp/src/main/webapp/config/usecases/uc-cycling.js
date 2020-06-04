@@ -24,7 +24,6 @@ export const cyclingPlan = {
           "#groupSocket": vocab.GROUP.GroupSocketCompacted,
           "#holdableSocket": vocab.HOLD.HoldableSocketCompacted,
         },
-        defaultSocket: { "#groupSocket": vocab.GROUP.GroupSocketCompacted },
       },
       seeks: {},
     }),

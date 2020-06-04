@@ -363,17 +363,15 @@ function connectReactionAtom(
               }
             }
           }
-
-          const defaultSocket = draftContent["defaultSocket"];
-          return defaultSocket && Object.keys(defaultSocket)[0];
         };
 
         const atomDraftSocketType = getSocketFromDraft(atomDraft);
 
         if (generalSelectors.isAtomOwned(connectToAtomUri)(state)) {
-          const targetSocketUri = connectToSocketType
-            ? atomUtils.getSocketUri(connectToAtom, connectToSocketType)
-            : atomUtils.getDefaultSocketUri(connectToAtom);
+          const targetSocketUri = atomUtils.getSocketUri(
+            connectToAtom,
+            connectToSocketType
+          );
 
           if (atomDraftSocketType && targetSocketUri) {
             const senderSocketUri = `${atomUri}${atomDraftSocketType}`;
@@ -393,39 +391,46 @@ function connectReactionAtom(
           }
         } else {
           const senderSocketUri = `${atomUri}${atomDraftSocketType}`;
-          const targetSocketUri = connectToSocketType
-            ? atomUtils.getSocketUri(connectToAtom, connectToSocketType)
-            : atomUtils.getDefaultSocketUri(connectToAtom);
-
-          // establish connection
-          const cnctMsg = buildConnectMessage({
-            connectMessage: "",
-            socketUri: senderSocketUri,
-            targetSocketUri: targetSocketUri,
-          });
-
-          ownerApi.sendMessage(cnctMsg).then(jsonResp =>
-            // connect action to be dispatched when the
-            // ad hoc atom has been created:
-
-            won
-              .wonMessageFromJsonLd(
-                jsonResp.message,
-                vocab.WONMSG.uriPlaceholder.event
-              )
-              .then(wonMessage =>
-                dispatch({
-                  type: actionTypes.atoms.connectSockets,
-                  payload: {
-                    eventUri: jsonResp.messageUri,
-                    message: jsonResp.message,
-                    optimisticEvent: wonMessage,
-                    senderSocketUri: senderSocketUri,
-                    targetSocketUri: targetSocketUri,
-                  },
-                })
-              )
+          const targetSocketUri = atomUtils.getSocketUri(
+            connectToAtom,
+            connectToSocketType
           );
+
+          if (senderSocketUri && targetSocketUri) {
+            // establish connection
+            const cnctMsg = buildConnectMessage({
+              connectMessage: "",
+              socketUri: senderSocketUri,
+              targetSocketUri: targetSocketUri,
+            });
+
+            ownerApi.sendMessage(cnctMsg).then(jsonResp =>
+              // connect action to be dispatched when the
+              // ad hoc atom has been created:
+
+              won
+                .wonMessageFromJsonLd(
+                  jsonResp.message,
+                  vocab.WONMSG.uriPlaceholder.event
+                )
+                .then(wonMessage =>
+                  dispatch({
+                    type: actionTypes.atoms.connectSockets,
+                    payload: {
+                      eventUri: jsonResp.messageUri,
+                      message: jsonResp.message,
+                      optimisticEvent: wonMessage,
+                      senderSocketUri: senderSocketUri,
+                      targetSocketUri: targetSocketUri,
+                    },
+                  })
+                )
+            );
+          } else {
+            throw new Error(
+              `Could not connect owned atoms did not find necessary sockets`
+            );
+          }
         }
       });
   });

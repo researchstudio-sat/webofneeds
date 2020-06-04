@@ -439,67 +439,6 @@ export const sockets = {
   },
 };
 
-export const defaultSocket = {
-  ...sockets,
-  identifier: "defaultSocket",
-  label: "Default Socket",
-  icon: ico36_detail_title, //TODO: CORRECT ICON
-  viewerComponent: undefined, //this is so we do not display this with a detail-viewer,
-  component: undefined,
-  multiSelect: false,
-  parseToRDF: function({ value }) {
-    //TODO: PARSE TO RDF ONLY WHEN VALUE IS ONE OF THE POSSIBLE ONES
-    if (value) {
-      let sockets = [];
-      Immutable.fromJS(value).map((socket, key) => {
-        sockets.push({ "@id": key, "won:socketDefinition": { "@id": socket } });
-      });
-
-      if (sockets.length == 1) {
-        return {
-          "won:defaultSocket": sockets,
-        };
-      }
-    }
-
-    return undefined;
-  },
-  parseFromRDF: function(jsonLDImm) {
-    const wonHasDefaultSocket = get(jsonLDImm, "won:defaultSocket");
-    let defaultSocket = Immutable.Map();
-
-    if (wonHasDefaultSocket && !Immutable.List.isList(wonHasDefaultSocket)) {
-      const defaultSocketId = get(wonHasDefaultSocket, "@id");
-
-      const wonHasSockets = get(jsonLDImm, "won:socket");
-
-      if (wonHasSockets) {
-        if (Immutable.List.isList(wonHasSockets)) {
-          const foundDefaultSocket = wonHasSockets.find(
-            socket => get(socket, "@id") === defaultSocketId
-          );
-          return defaultSocket.set(
-            defaultSocketId,
-            getIn(foundDefaultSocket, ["won:socketDefinition", "@id"])
-          );
-        } else if (get(wonHasSockets, "@id") === defaultSocketId) {
-          return defaultSocket.set(
-            defaultSocketId,
-            getIn(wonHasSockets, ["won:socketDefinition", "@id"])
-          );
-        }
-      }
-    }
-    return undefined;
-  },
-  generateHumanReadable: function({ value, includeLabel }) {
-    //TODO: Implement this so that the label shows instead of the value
-    if (value) {
-      return includeLabel ? this.label + ": " + value : value;
-    }
-  },
-};
-
 /*
   Use this detail with the s:PlanAction type -> if you use this detail make sure you add the s:PlanAction type to the corresponding branch (content or seeks)
 */

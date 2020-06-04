@@ -27,7 +27,6 @@ export const otherGroup = {
               "#groupSocket": vocab.GROUP.GroupSocketCompacted,
               "#holdableSocket": vocab.HOLD.HoldableSocketCompacted,
             },
-            defaultSocket: { "#groupSocket": vocab.GROUP.GroupSocketCompacted },
           },
         }),
       },

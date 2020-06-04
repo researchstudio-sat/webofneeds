@@ -56,11 +56,7 @@ export default function WonCreateAtom({
     const fromAtomContent = get(fromAtom, "content");
     const fromAtomSeeks = get(fromAtom, "seeks");
     const socketsReset = atomUtils.getSocketsWithKeysReset(fromAtom);
-    const defaultSocketReset = atomUtils.getDefaultSocketWithKeyReset(fromAtom);
     const seeksSocketsReset = atomUtils.getSeeksSocketsWithKeysReset(fromAtom);
-    const seeksDefaultSocketReset = atomUtils.getSeeksDefaultSocketWithKeyReset(
-      fromAtom
-    );
 
     if (fromAtomContent) {
       useCase.draft.content = fromAtomContent.toJS();
@@ -72,15 +68,9 @@ export default function WonCreateAtom({
     if (socketsReset) {
       useCase.draft.content.sockets = socketsReset.toJS();
     }
-    if (defaultSocketReset) {
-      useCase.draft.content.defaultSocket = defaultSocketReset.toJS();
-    }
 
     if (seeksSocketsReset) {
       useCase.draft.seeks.sockets = seeksSocketsReset.toJS();
-    }
-    if (seeksDefaultSocketReset) {
-      useCase.draft.seeks.defaultSocket = seeksDefaultSocketReset.toJS();
     }
   } else {
     useCase = useCaseUtils.getUseCase(useCaseIdentifier);
