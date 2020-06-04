@@ -602,7 +602,7 @@ export default function WonAtomMessages({
           hasConnectionMessagesToLoad && (
             <button
               className="pm__content__loadbutton won-button--outlined thin red"
-              onClick={() => loadPreviousMessages}
+              onClick={() => loadPreviousMessages()}
             >
               Load previous messages
             </button>
