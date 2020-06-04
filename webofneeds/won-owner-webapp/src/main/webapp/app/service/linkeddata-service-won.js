@@ -100,9 +100,18 @@ import vocab from "./vocab.js";
     return Promise.resolve();
   };
 
-  won.getConnectionUrisWithStateByAtomUri = (atomUri, requesterWebId) => {
+  /**
+   * Fetches all MetaConnections of the given atomUri
+   * @param atomUri
+   * @param connectedOnly -> if set to true, only connections with the state "Connected" will be returned
+   * @returns {Promise<never>}
+   */
+  won.getConnectionUrisWithStateByAtomUri = (
+    atomUri,
+    connectedOnly = false
+  ) => {
     return won
-      .getJsonLdNode(atomUri, requesterWebId)
+      .getJsonLdNode(atomUri)
       .then(jsonLdAtom => jsonld.expand(jsonLdAtom))
       .then(jsonLdAtom => {
         const jsonLdContentGraph = jsonLdAtom[0];
@@ -110,7 +119,10 @@ import vocab from "./vocab.js";
         return jsonLdContentGraph[vocab.WON.connections][0]["@id"];
       })
       .then(connectionContainerUri =>
-        won.getJsonLdNode(connectionContainerUri, { state: "Connected" })
+        won.getJsonLdNode(
+          connectionContainerUri,
+          connectedOnly ? { state: "Connected" } : undefined
+        )
       )
       .then(
         connectionContainer =>
