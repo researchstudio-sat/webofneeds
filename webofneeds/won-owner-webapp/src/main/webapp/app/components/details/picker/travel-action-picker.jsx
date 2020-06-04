@@ -14,13 +14,18 @@ import L from "leaflet";
 import _ from "lodash";
 
 import "leaflet/dist/leaflet.css";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import markerIconRetina from "leaflet/dist/images/marker-icon-2x.png";
 import ico16_indicator_location from "~/images/won-icons/ico16_indicator_location.svg";
 import ico36_location_current from "~/images/won-icons/ico36_location_current.svg";
 
-const locationIcon = L.divIcon({
-  className: "wonLocationMarkerIcon",
-  html:
-    "<svg class='marker__icon'><use xlink:href='#ico36_detail_location' href='#ico36_detail_location' /></svg>",
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIconRetina,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
 });
 
 //TODO: SELECT BOTH LOCATIONS BY CLICKING ON THE MAP
@@ -183,7 +188,6 @@ export default class WonTravelActionPicker extends React.Component {
         <Marker
           key={"fromLoc-" + selectedFromLocationCoordinates}
           position={selectedFromLocationCoordinates}
-          icon={locationIcon}
         />
       );
     }
@@ -192,7 +196,6 @@ export default class WonTravelActionPicker extends React.Component {
         <Marker
           key={"toLoc-" + selectedToLocationCoordinates}
           position={selectedToLocationCoordinates}
-          icon={locationIcon}
         />
       );
     }
