@@ -214,9 +214,9 @@ export default function WonGroupAtomMessages({
     // make sure latest messages are loaded
     const INITIAL_MESSAGECOUNT = 10;
     if (
-      get(connection, "messages").size < INITIAL_MESSAGECOUNT &&
+      hasConnectionMessagesToLoad &&
       !connectionUtils.isUsingTemporaryUri(connection) &&
-      hasConnectionMessagesToLoad
+      get(connection, "messages").size < INITIAL_MESSAGECOUNT
     ) {
       loadPreviousMessages(INITIAL_MESSAGECOUNT);
     }
