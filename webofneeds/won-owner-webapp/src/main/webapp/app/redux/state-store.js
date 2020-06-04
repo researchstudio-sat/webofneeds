@@ -400,7 +400,7 @@ export function fetchMessages(
 
 export function fetchConnectionsOfAtomAndDispatch(atomUri, dispatch) {
   return won
-    .getConnectionUrisWithStateByAtomUri(atomUri, atomUri)
+    .getConnectionUrisWithStateByAtomUri(atomUri)
     .then(connectionsWithStateAndSocket => {
       dispatch({
         type: actionTypes.connections.storeMetaConnections,
@@ -436,7 +436,7 @@ export function fetchConnectionsOfAtomAndDispatch(atomUri, dispatch) {
 
 export function fetchConnectionsOfNonOwnedAtomAndDispatch(atomUri, dispatch) {
   return won
-    .getConnectionUrisWithStateByAtomUri(atomUri, atomUri)
+    .getConnectionUrisWithStateByAtomUri(atomUri, true)
     .then(connectionsWithStateAndSocket => {
       const connectedConnections = connectionsWithStateAndSocket.filter(
         conn => conn.connectionState === vocab.WON.Connected
