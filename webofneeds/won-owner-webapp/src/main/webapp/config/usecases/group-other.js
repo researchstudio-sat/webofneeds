@@ -1,6 +1,8 @@
 import vocab from "../../app/service/vocab.js";
 
 import { complain } from "./uc-complain.js";
+import { organization } from "./uc-organization.js";
+import { newsarticle } from "./uc-newsarticle.js";
 import { handleComplaint } from "./uc-handle-complaint.js";
 import { customUseCase } from "./uc-custom.js";
 import { contactPaymentBot } from "./uc-contact-payment-bot.js";
@@ -17,6 +19,8 @@ export const otherGroup = {
     complain: complain,
     handleComplaint: handleComplaint,
     customUseCase: customUseCase,
+    organization: organization,
+    newsarticle: newsarticle,
     groupChat: {
       identifier: "groupChat",
       label: "New Groupchat Post",
