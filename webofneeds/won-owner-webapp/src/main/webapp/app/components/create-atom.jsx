@@ -129,7 +129,7 @@ export default function WonCreateAtom({
             history
           )
         );
-        history.push("/connections");
+        history.push("/connections"); //TODO: PUSH TO PAGE DEPENDING ON CONNECTED SOCKETTYPES/ATOM
       };
     } else {
       executeFunction = () => {
