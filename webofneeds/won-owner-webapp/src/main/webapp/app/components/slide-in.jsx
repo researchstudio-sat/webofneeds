@@ -45,7 +45,9 @@ export default function WonSlideIn() {
   const emailVerificationError = accountUtils.getEmailVerificationError(
     accountState
   );
-  const connectionHasBeenLost = getIn(state, ["messages", "lostConnection"]);
+  const connectionHasBeenLost = useSelector(state =>
+    getIn(state, ["messages", "lostConnection"])
+  );
   const showAnonymousSlideInEmailInput = useSelector(
     viewSelectors.showAnonymousSlideInEmailInput
   );
