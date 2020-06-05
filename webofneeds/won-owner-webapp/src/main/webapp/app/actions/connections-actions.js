@@ -352,21 +352,6 @@ function connectReactionAtom(
             });
         }
 
-        const getSocketFromDraft = atomDraft => {
-          const draftContent = atomDraft["content"];
-          const draftSockets = draftContent["sockets"];
-
-          if (draftSockets && atomDraftSocketType) {
-            for (let socketKey in draftSockets) {
-              if (draftSockets[socketKey] === atomDraftSocketType) {
-                return socketKey;
-              }
-            }
-          }
-        };
-
-        const atomDraftSocketType = getSocketFromDraft(atomDraft);
-
         if (generalSelectors.isAtomOwned(connectToAtomUri)(state)) {
           const targetSocketUri = atomUtils.getSocketUri(
             connectToAtom,
