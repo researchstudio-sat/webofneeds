@@ -7,6 +7,7 @@ import * as connectionUtils from "../../redux/utils/connection-utils";
 import WonAtomContextSwipeableView from "../atom-context-swipeable-view";
 import { actionCreators } from "../../actions/actions";
 import { useDispatch } from "react-redux";
+import { useHistory } from "react-router-dom";
 
 import ico16_checkmark from "~/images/won-icons/ico16_checkmark.svg";
 import ico36_close from "~/images/won-icons/ico36_close.svg";
@@ -21,6 +22,7 @@ export default function WonGenericItem({
   targetAtom,
 }) {
   const dispatch = useDispatch();
+  const history = useHistory();
 
   let actionButtons;
   let headerClassName;
