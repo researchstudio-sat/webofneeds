@@ -19,6 +19,7 @@ import { actionCreators } from "../actions/actions";
 import Immutable from "immutable";
 
 export default function WonAtomConnectionsIndicator({ atom }) {
+  //TODO: REWORK THE WHOLE THING BASED ON CONNECTIONS between generic-sockets
   const atomUri = get(atom, "uri");
   const dispatch = useDispatch();
   const history = useHistory();
@@ -26,10 +27,7 @@ export default function WonAtomConnectionsIndicator({ atom }) {
   const unreadRequests = requests.filter(conn =>
     connectionUtils.isUnread(conn)
   );
-
-  const hasUnreadChatConnections = atomUtils.hasUnreadNonClosedNonSuggestedChatConnections(
-    atom
-  );
+  const hasUnreadRequest = unreadRequests && unreadRequests.size > 0;
 
   const suggestedConnections = atomUtils.getSuggestedConnections(atom);
 
@@ -81,7 +79,7 @@ export default function WonAtomConnectionsIndicator({ atom }) {
     );
   }
 
-  if (hasUnreadChatConnections) {
+  if (hasUnreadRequest) {
     return (
       <Link
         className={
