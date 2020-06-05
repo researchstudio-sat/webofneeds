@@ -44,8 +44,7 @@ export const organization = {
     {
       identifier: "newsarticle",
       senderSocketType: vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted,
-      targetSocketType:
-        vocab.WXSCHEMA.AssociatedArticleSocketCompactedCompacted,
+      targetSocketType: vocab.WXSCHEMA.AssociatedArticleSocketCompacted,
     },
   ],
   details: {

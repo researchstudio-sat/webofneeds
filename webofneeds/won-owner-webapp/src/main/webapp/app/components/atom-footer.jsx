@@ -221,7 +221,6 @@ export default function WonAtomFooter({ atom, className }) {
     message = ""
   ) {
     const targetAtom = atom;
-    const footerType = footerType;
     const dialogText = "Connect with this Atom?";
 
     const payload = {

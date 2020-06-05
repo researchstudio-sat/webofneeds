@@ -352,15 +352,30 @@ function connectReactionAtom(
             });
         }
 
-        if (generalSelectors.isAtomOwned(connectToAtomUri)(state)) {
-          const targetSocketUri = atomUtils.getSocketUri(
-            connectToAtom,
-            connectToSocketType
-          );
+        const getSocketStringFromDraft = atomDraft => {
+          const draftContent = atomDraft["content"];
+          const draftSockets = draftContent["sockets"];
 
-          if (atomDraftSocketType && targetSocketUri) {
-            const senderSocketUri = `${atomUri}${atomDraftSocketType}`;
+          if (draftSockets && atomDraftSocketType) {
+            for (let socketKey in draftSockets) {
+              if (draftSockets[socketKey] === atomDraftSocketType) {
+                return socketKey;
+              }
+            }
+          }
+        };
 
+        const atomDraftSocketTypeString = getSocketStringFromDraft(atomDraft);
+
+        const targetSocketUri = atomUtils.getSocketUri(
+          connectToAtom,
+          connectToSocketType
+        );
+        const senderSocketUri =
+          atomDraftSocketTypeString && `${atomUri}${atomDraftSocketTypeString}`;
+
+        if (senderSocketUri && targetSocketUri) {
+          if (generalSelectors.isAtomOwned(connectToAtomUri)(state)) {
             ownerApi
               .serverSideConnect(targetSocketUri, senderSocketUri, false, true)
               .then(async response => {
@@ -370,18 +385,6 @@ function connectReactionAtom(
                 }
               });
           } else {
-            throw new Error(
-              `Could not connect owned atoms did not find necessary sockets`
-            );
-          }
-        } else {
-          const senderSocketUri = `${atomUri}${atomDraftSocketType}`;
-          const targetSocketUri = atomUtils.getSocketUri(
-            connectToAtom,
-            connectToSocketType
-          );
-
-          if (senderSocketUri && targetSocketUri) {
             // establish connection
             const cnctMsg = buildConnectMessage({
               connectMessage: "",
@@ -411,11 +414,11 @@ function connectReactionAtom(
                   })
                 )
             );
-          } else {
-            throw new Error(
-              `Could not connect owned atoms did not find necessary sockets`
-            );
           }
+        } else {
+          throw new Error(
+            `Could not connect owned atoms did not find necessary sockets`
+          );
         }
       });
   });

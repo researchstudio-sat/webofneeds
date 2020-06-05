@@ -586,6 +586,18 @@ function getSocketKeysReset(socketsImm) {
         return "#reviewSocket";
       case vocab.BUDDY.BuddySocketCompacted:
         return "#buddySocket";
+      case vocab.WXSCHEMA.WorksForInverseSocketCompacted:
+        return "#worksForInverseSocket";
+      case vocab.WXSCHEMA.MemberSocketCompacted:
+        return "#memberSocket";
+      case vocab.WXSCHEMA.AssociatedArticleSocketCompacted:
+        return "#associatedArticleSocket";
+      case vocab.WXSCHEMA.WorksForSocketCompacted:
+        return "#worksForSocket";
+      case vocab.WXSCHEMA.MemberOfSocketCompacted:
+        return "#memberOfSocket";
+      case vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted:
+        return "#associatedArticleInverseSocket";
       default:
         console.warn("Trying to reset an unknown socket: ", value);
         return "#unknownSocket";
