@@ -310,6 +310,45 @@ vocab.BUDDY.BuddySocket = vocab.BUDDY.baseUri + "BuddySocket";
 vocab.BUDDY.BuddySocketCompacted = vocab.BUDDY.prefix + ":BuddySocket";
 vocab.BUDDY.buddyCompacted = vocab.BUDDY.prefix + ":buddy";
 
+vocab.WXSCHEMA = {};
+vocab.WXSCHEMA.baseUri = "https://w3id.org/won/ext/schema#";
+vocab.WXSCHEMA.prefix = "wx-schema";
+
+vocab.WXSCHEMA.MemberOfSocket = vocab.WXSCHEMA.baseUri + "MemberOfSocket";
+vocab.WXSCHEMA.MemberOfSocketCompacted =
+  vocab.WXSCHEMA.prefix + ":MemberOfSocket";
+
+vocab.WXSCHEMA.MemberSocket = vocab.WXSCHEMA.baseUri + "MemberSocket";
+vocab.WXSCHEMA.MemberSocketCompacted = vocab.WXSCHEMA.prefix + ":MemberSocket";
+
+vocab.WXSCHEMA.AttendeeSocket = vocab.WXSCHEMA.baseUri + "AttendeeSocket";
+vocab.WXSCHEMA.AttendeeSocketCompacted =
+  vocab.WXSCHEMA.prefix + "::AttendeeSocket";
+
+vocab.WXSCHEMA.AttendeeInverseSocket =
+  vocab.WXSCHEMA.baseUri + "AttendeeInverseSocket";
+vocab.WXSCHEMA.AttendeeInverseSocketCompacted =
+  vocab.WXSCHEMA.prefix + "::AttendeeInverseSocket";
+
+vocab.WXSCHEMA.WorksForSocket = vocab.WXSCHEMA.baseUri + "WorksForSocket";
+vocab.WXSCHEMA.WorksForSocketCompacted =
+  vocab.WXSCHEMA.prefix + ":WorksForSocket";
+
+vocab.WXSCHEMA.WorksForInverseSocket =
+  vocab.WXSCHEMA.baseUri + "WorksForInverseSocket";
+vocab.WXSCHEMA.WorksForInverseSocketCompacted =
+  vocab.WXSCHEMA.prefix + ":WorksForInverseSocket";
+
+vocab.WXSCHEMA.AssociatedArticleSocket =
+  vocab.WXSCHEMA.baseUri + "AssociatedArticleSocket";
+vocab.WXSCHEMA.AssociatedArticleSocketCompacted =
+  vocab.WXSCHEMA.prefix + ":AssociatedArticleSocket";
+
+vocab.WXSCHEMA.AssociatedArticleInverseSocket =
+  vocab.WXSCHEMA.baseUri + "AssociatedArticleInverseSocket";
+vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted =
+  vocab.WXSCHEMA.prefix + ":AssociatedArticleInverseSocket";
+
 // UTILS
 vocab.WONMSG.uriPlaceholder = Object.freeze({
   event: "wm:/SELF",

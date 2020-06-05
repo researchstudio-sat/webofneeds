@@ -147,6 +147,8 @@ export function parseMetaAtom(metaAtom) {
         .replace(vocab.HOLD.baseUri, vocab.HOLD.prefix + ":")
         .replace(vocab.REVIEW.baseUri, vocab.REVIEW.prefix + ":")
         .replace(vocab.BUDDY.baseUri, vocab.BUDDY.prefix + ":")
+        .replace(vocab.BOT.baseUri, vocab.BOT.prefix + ":")
+        .replace(vocab.WXSCHEMA.baseUri, vocab.WXSCHEMA.prefix + ":")
     );
 
   const extractStateFromMeta = state => {

@@ -47,6 +47,12 @@ export const labels = deepFreeze({
     [vocab.HOLD.HolderSocketCompacted]: "Posts",
     [vocab.REVIEW.ReviewSocketCompacted]: "Reviews",
     [vocab.BUDDY.BuddySocketCompacted]: "Buddies",
+    [vocab.WXSCHEMA.AssociatedArticleSocketCompacted]: "Articles",
+    [vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted]: "Published in",
+    [vocab.WXSCHEMA.MemberSocketCompacted]: "Members",
+    [vocab.WXSCHEMA.MemberOfSocketCompacted]: "Member Of",
+    [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: "Employees",
+    [vocab.WXSCHEMA.WorksForSocketCompacted]: "Works For",
   },
 });
 
