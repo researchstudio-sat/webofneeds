@@ -21,6 +21,17 @@ export const persona = {
       seeks: {},
     }),
   },
+  reactions: {
+    [vocab.WXSCHEMA.WorksForSocketCompacted]: {
+      [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: ["organization"],
+    },
+    [vocab.WXSCHEMA.MemberOfSocketCompacted]: {
+      [vocab.WXSCHEMA.MemberSocketCompacted]: ["organization"],
+    },
+    [vocab.BUDDY.BuddySocketCompacted]: {
+      [vocab.BUDDY.BuddySocketCompacted]: ["persona"],
+    },
+  },
   reactionUseCases: [
     {
       identifier: "organization",

@@ -23,6 +23,17 @@ export const organization = {
       },
     }),
   },
+  reactions: {
+    [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: {
+      [vocab.WXSCHEMA.WorksForSocketCompacted]: ["persona"],
+    },
+    [vocab.WXSCHEMA.MemberSocketCompacted]: {
+      [vocab.WXSCHEMA.MemberOfSocketCompacted]: ["persona"],
+    },
+    [vocab.WXSCHEMA.AssociatedArticleSocketCompacted]: {
+      [vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted]: ["newsarticle"],
+    },
+  },
   reactionUseCases: [
     {
       identifier: "persona",

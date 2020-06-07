@@ -19,6 +19,11 @@ export const newsarticle = {
       seeks: {},
     }),
   },
+  reactions: {
+    [vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted]: {
+      [vocab.WXSCHEMA.AssociatedArticleSocketCompacted]: ["organization"],
+    },
+  },
   reactionUseCases: [
     {
       identifier: "organization",
