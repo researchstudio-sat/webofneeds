@@ -7,6 +7,7 @@ import Immutable from "immutable";
 import PropTypes from "prop-types";
 import { useSelector, useDispatch } from "react-redux";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
+import ico36_plus from "~/images/won-icons/ico36_plus.svg";
 import { get, sortByDate, filterConnectionsBySearchValue } from "../utils.js";
 
 import * as atomUtils from "../redux/utils/atom-utils";
@@ -40,6 +41,8 @@ export default function WonAtomContentSocket({
   const storedAtoms = useSelector(generalSelectors.getAtoms);
 
   const allAtomConnections = atomUtils.getConnections(atom, socketType);
+
+  const reactions = atomUtils.getReactions(atom, socketType);
 
   let excludedFromRequestUris = [get(atom, "uri")];
 
@@ -89,6 +92,34 @@ export default function WonAtomContentSocket({
     ));
   }
 
+  function generateAddItem() {
+    if (reactions) {
+      const onClick = () => {
+        //TODO: SHOW UI-ELEMENTS AFTER CLICK
+        console.debug(
+          "Clicked Add Reactions: ",
+          JSON.stringify(reactions.toJS())
+        );
+      };
+
+      //TODO: DO NOT ALLOW REACTIONS ON INACTIVE ATOMS
+      //TODO: LABEL BASED ON OWNERSHIP
+      //TODO: SHOW OPTIONS FOR ALL POSSIBLE USECASES (SIMILAR TO THE ATOM-FOOTER
+      //TODO: SHOW CREATE NEW OPTION FOR ALL POSSIBLE USECASES
+
+      return (
+        <div className="socketadd clickable" onClick={onClick}>
+          <svg className="socketadd__icon" title="Create a new post">
+            <use xlinkHref={ico36_plus} href={ico36_plus} />
+          </svg>
+          <span className="socketadd__label">Add</span>
+        </div>
+      );
+    } else {
+      return undefined;
+    }
+  }
+
   return (
     <won-atom-content-socket>
       <div className="acs__search">
@@ -98,10 +129,11 @@ export default function WonAtomContentSocket({
           detail={{ placeholder: "Filter Connections" }}
         />
       </div>
-      {activeConnections.size > 0 ? (
+      {activeConnections.size > 0 || reactions ? (
         <div className="acs__segment">
           <div className="acs__segment__content">
             {generateConnectionItems(activeConnections)}
+            {generateAddItem()}
           </div>
         </div>
       ) : (
