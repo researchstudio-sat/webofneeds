@@ -34,6 +34,7 @@ export function parseAtom(jsonldAtom) {
         icon: undefined,
         enabledUseCases: undefined,
         reactionUseCases: undefined,
+        reactions: undefined,
       },
       background: generateBackground(get(jsonldAtomImm, "@id")),
       unread: false,
@@ -61,6 +62,12 @@ export function parseAtom(jsonldAtom) {
           matchingUseCase.enabledUseCases
             ? Immutable.fromJS(matchingUseCase.enabledUseCases)
             : Immutable.List()
+        )
+        .setIn(
+          ["matchedUseCase", "reactions"],
+          matchingUseCase.reactions
+            ? Immutable.fromJS(matchingUseCase.reactions)
+            : Immutable.Map()
         )
         .setIn(
           ["matchedUseCase", "reactionUseCases"],
@@ -226,6 +233,12 @@ export function parseMetaAtom(metaAtom) {
             matchingUseCase.enabledUseCases
               ? Immutable.fromJS(matchingUseCase.enabledUseCases)
               : Immutable.List()
+          )
+          .setIn(
+            ["matchedUseCase", "reactions"],
+            matchingUseCase.reactions
+              ? Immutable.fromJS(matchingUseCase.reactions)
+              : Immutable.Map()
           )
           .setIn(
             ["matchedUseCase", "reactionUseCases"],

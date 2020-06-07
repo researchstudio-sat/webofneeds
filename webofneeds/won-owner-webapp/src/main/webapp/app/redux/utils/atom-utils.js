@@ -65,6 +65,10 @@ export function getReactionUseCases(atom) {
   return getIn(atom, ["matchedUseCase", "reactionUseCases"]);
 }
 
+export function getReactions(atom, socketType) {
+  return getIn(atom, ["matchedUseCase", "reactions", socketType]);
+}
+
 export function hasReactionUseCases(atom) {
   const reactionUseCases = getReactionUseCases(atom);
   return !!reactionUseCases && reactionUseCases.size > 0;
