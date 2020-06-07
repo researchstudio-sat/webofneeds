@@ -48,19 +48,6 @@ export default function WonAtomConnectionsIndicator({ atom }) {
 
   const hasNoUnreadConnections = !requestsCount > 0 && !hasUnreadChats;
 
-  function getRoute() {
-    const connUri = hasUnreadChats
-      ? get(unreadChats.first(), "uri")
-      : get(unreadRequests.first(), "uri");
-
-    return generateLink(
-      history.location,
-      { postUri: atomUri, connectionUri: connUri },
-      "/connections",
-      false
-    );
-  }
-
   function showAtomSuggestions() {
     dispatch(
       actionCreators.atoms__selectTab(
@@ -86,7 +73,19 @@ export default function WonAtomConnectionsIndicator({ atom }) {
           "won-atom-connections-indicator " +
           (hasNoUnreadConnections ? "won-no-connections" : "")
         }
-        to={getRoute()}
+        to={location => {
+          console.debug("Called Link in atom-connections-indicator");
+          const connUri = hasUnreadChats
+            ? get(unreadChats.first(), "uri")
+            : get(unreadRequests.first(), "uri");
+
+          return generateLink(
+            location,
+            { postUri: atomUri, connectionUri: connUri },
+            "/connections",
+            false
+          );
+        }}
       >
         <svg
           className={
