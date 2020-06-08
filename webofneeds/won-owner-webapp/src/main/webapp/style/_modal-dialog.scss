@@ -43,8 +43,8 @@
       &__footer {
         grid-area: modal_footer;
         display: grid;
-        grid-auto-flow: column;
-        grid-column-gap: 0.5rem;
+        grid-gap: 0.5rem;
+        grid-auto-flow: row;
       }
     }
   }
@@ -94,8 +94,14 @@
       &__footer {
         grid-area: modal_footer;
         display: grid;
-        grid-auto-flow: column;
-        grid-column-gap: 0.5rem;
+        grid-gap: 0.5rem;
+
+        &--column {
+          grid-auto-flow: column;
+        }
+        &--row {
+          grid-auto-flow: row;
+        }
       }
     }
   }
