@@ -28,6 +28,11 @@ export const cyclingPlan = {
       seeks: {},
     }),
   },
+  reactions: {
+    [vocab.GROUP.GroupSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: ["cyclingInterest"],
+    },
+  },
   reactionUseCases: [
     {
       identifier: "cyclingInterest",
@@ -110,6 +115,11 @@ export const cyclingInterest = {
         eventObjectAboutUris: "http://dbpedia.org/resource/Cycling",
       },
     }),
+  },
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.GROUP.GroupSocketCompacted]: ["cyclingPlan"],
+    },
   },
   enabledUseCases: [
     {

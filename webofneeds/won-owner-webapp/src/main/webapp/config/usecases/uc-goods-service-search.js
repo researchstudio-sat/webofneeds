@@ -29,6 +29,11 @@ export const goodsServiceSearch = {
       },
     }),
   },
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: ["serviceOffer", "goodsOffer"],
+    },
+  },
   reactionUseCases: [
     {
       identifier: "serviceOffer",

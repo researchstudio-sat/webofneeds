@@ -19,6 +19,11 @@ export const goodsTransportOffer = {
       },
     }),
   },
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: ["goodsTransportSearch"],
+    },
+  },
   enabledUseCases: undefined,
   reactionUseCases: [
     {

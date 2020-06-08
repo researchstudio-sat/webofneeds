@@ -22,6 +22,11 @@ export const consortiumOffer = {
       },
     }),
   },
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: ["consortiumSearch"],
+    },
+  },
   reactionUseCases: [
     {
       identifier: "consortiumSearch",

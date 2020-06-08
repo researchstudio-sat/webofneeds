@@ -26,6 +26,11 @@ export const rideShareOffer = {
       },
     }),
   },
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: ["personalTransportSearch"],
+    },
+  },
   enabledUseCases: undefined,
   reactionUseCases: [
     {

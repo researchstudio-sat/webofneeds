@@ -22,6 +22,11 @@ export const personalTransportSearch = {
       },
     }),
   },
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: ["taxiOffer", "rideShareOffer"],
+    },
+  },
   enabledUseCases: undefined,
   reactionUseCases: [
     {

@@ -28,6 +28,11 @@ export const lunchPlan = {
       seeks: {},
     }),
   },
+  reactions: {
+    [vocab.GROUP.GroupSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: ["lunchInterest"],
+    },
+  },
   reactionUseCases: [
     {
       identifier: "lunchInterest",
@@ -110,6 +115,11 @@ export const lunchInterest = {
         eventObjectAboutUris: "http://dbpedia.org/resource/Lunch",
       },
     }),
+  },
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.GROUP.GroupSocketCompacted]: ["lunchPlan"],
+    },
   },
   enabledUseCases: [
     {

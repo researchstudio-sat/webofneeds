@@ -39,6 +39,11 @@ export const rentRealEstateSearch = {
       },
     }),
   },
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: ["rentRealEstateOffer"],
+    },
+  },
   reactionUseCases: [
     {
       identifier: "rentRealEstateOffer",

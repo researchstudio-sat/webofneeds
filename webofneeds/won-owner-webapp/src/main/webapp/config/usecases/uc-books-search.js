@@ -20,6 +20,11 @@ export const booksSearch = {
       },
     }),
   },
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: ["booksOffer"],
+    },
+  },
   reactionUseCases: [
     {
       identifier: "booksOffer",

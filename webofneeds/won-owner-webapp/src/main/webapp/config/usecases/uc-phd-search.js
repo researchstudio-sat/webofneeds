@@ -25,6 +25,11 @@ export const phdSearch = {
       },
     }),
   },
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: ["phdOffer"],
+    },
+  },
   reactionUseCases: [
     {
       identifier: "phdOffer",

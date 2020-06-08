@@ -22,6 +22,11 @@ export const postdocOffer = {
       },
     }),
   },
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: ["postdocSearch"],
+    },
+  },
   reactionUseCases: [
     {
       identifier: "postdocSearch",

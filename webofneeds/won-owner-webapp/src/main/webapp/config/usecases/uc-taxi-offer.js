@@ -19,6 +19,11 @@ export const taxiOffer = {
       content: { title: "Taxi", type: ["s:TaxiService"] },
     }),
   },
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: ["personalTransportSearch"],
+    },
+  },
   enabledUseCases: undefined,
   reactionUseCases: [
     {

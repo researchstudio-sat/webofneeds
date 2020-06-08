@@ -36,6 +36,11 @@ export const rehearsalRoomSearch = {
       },
     }),
   },
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: ["rehearsalRoomOffer"],
+    },
+  },
   reactionUseCases: [
     {
       identifier: "rehearsalRoomOffer",

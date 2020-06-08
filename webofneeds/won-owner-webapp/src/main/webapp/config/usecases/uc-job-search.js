@@ -35,6 +35,11 @@ export const jobSearch = {
       },
     }),
   },
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: ["jobOffer"],
+    },
+  },
   reactionUseCases: [
     {
       identifier: "jobOffer",

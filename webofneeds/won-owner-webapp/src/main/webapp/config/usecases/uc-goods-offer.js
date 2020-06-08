@@ -20,6 +20,11 @@ export const goodsOffer = {
       },
     }),
   },
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: ["goodsServiceSearch"],
+    },
+  },
   reactionUseCases: [
     {
       identifier: "goodsServiceSearch",

@@ -24,6 +24,11 @@ export const complain = {
       },
     }),
   },
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: ["handleComplaint"],
+    },
+  },
   reactionUseCases: [
     {
       identifier: "handleComplaint",

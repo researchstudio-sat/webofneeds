@@ -22,6 +22,11 @@ export const pokemonGoRaid = {
       seeks: {},
     }),
   },
+  reactions: {
+    [vocab.GROUP.GroupSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: ["pokemonInterest"],
+    },
+  },
   reactionUseCases: [
     {
       identifier: "pokemonInterest",
@@ -52,6 +57,11 @@ export const pokemonInterest = {
         eventObjectAboutUris: "http://dbpedia.org/resource/Pokemon_Go",
       },
     }),
+  },
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.GROUP.GroupSocketCompacted]: ["pokemonGoRaid"],
+    },
   },
   enabledUseCases: [
     {
