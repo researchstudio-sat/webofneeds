@@ -54,10 +54,41 @@ export const labels = deepFreeze({
     [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: "Employees",
     [vocab.WXSCHEMA.WorksForSocketCompacted]: "Works For",
   },
+  socketItem: {
+    [vocab.GROUP.GroupSocketCompacted]: "Group Member",
+    [vocab.CHAT.ChatSocketCompacted]: "Chat",
+    [vocab.HOLD.HoldableSocketCompacted]: "Holder",
+    [vocab.HOLD.HolderSocketCompacted]: "Post",
+    [vocab.REVIEW.ReviewSocketCompacted]: "Review",
+    [vocab.BUDDY.BuddySocketCompacted]: "Buddy",
+    [vocab.WXSCHEMA.AssociatedArticleSocketCompacted]: "Publisher",
+    [vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted]: "Article",
+    [vocab.WXSCHEMA.MemberSocketCompacted]: "Membership",
+    [vocab.WXSCHEMA.MemberOfSocketCompacted]: "Member",
+    [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: "Employer",
+    [vocab.WXSCHEMA.WorksForSocketCompacted]: "Employee",
+  },
 });
 
 export function getSocketTabLabel(socketType) {
   return labels.socketTabs[socketType] || socketType;
+}
+
+export function getSocketItemLabels(socketTypes) {
+  if (!socketTypes) {
+    return undefined;
+  }
+
+  const socketTypeLabels = [];
+  for (const socketType of socketTypes) {
+    socketTypeLabels.push(labels.socketItem[socketType] || socketType);
+  }
+
+  return socketTypeLabels.join("/");
+}
+
+export function getSocketItemLabel(socketType) {
+  return labels.socketItem[socketType] || socketType;
 }
 
 /**
@@ -89,26 +120,6 @@ export const reactionLabels = Immutable.fromJS({
     [vocab.GROUP.GroupSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: "Invite to Group Chat",
       [vocab.GROUP.GroupSocketCompacted]: "Invite to Group Chat",
-    },
-  },
-  suggestions: {
-    [vocab.CHAT.ChatSocketCompacted]: {
-      [vocab.CHAT.ChatSocketCompacted]: "Chat Suggestions",
-      [vocab.GROUP.GroupSocketCompacted]: "Group Chat Suggestions",
-    },
-    [vocab.GROUP.GroupSocketCompacted]: {
-      [vocab.CHAT.ChatSocketCompacted]: "Suggestions for your Group Chat",
-      [vocab.GROUP.GroupSocketCompacted]:
-        "Group Chat Suggestions for your Group Chat",
-    },
-    [vocab.BUDDY.BuddySocketCompacted]: {
-      [vocab.BUDDY.BuddySocketCompacted]: "Buddy Suggestions",
-    },
-    [vocab.HOLD.HolderSocketCompacted]: {
-      [vocab.HOLD.HoldableSocketCompacted]: "Holdable Suggestions",
-    },
-    [vocab.HOLD.HoldableSocketCompacted]: {
-      [vocab.HOLD.HolderSocketCompacted]: "Holder Suggestions",
     },
   },
 });

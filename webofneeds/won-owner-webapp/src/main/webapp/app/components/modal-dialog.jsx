@@ -61,8 +61,8 @@ export default function WonModalDialog() {
           className={
             "md__dialog__footer " +
             (modalDialogButtons.length > 2
-              ? " md__dialog__footer--column"
-              : " md__dialog__footer--row")
+              ? " md__dialog__footer--row"
+              : " md__dialog__footer--column")
           }
         >
           {modalDialogButtons.map((button, index) => (

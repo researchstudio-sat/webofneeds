@@ -14,6 +14,7 @@ import * as useCaseUtils from "../usecase-utils.js";
 import * as wonLabelUtils from "../won-label-utils.js";
 import vocab from "../service/vocab.js";
 
+import ico36_plus from "~/images/won-icons/ico36_plus.svg";
 import "~/style/_atom-footer.scss";
 import { Link, useHistory } from "react-router-dom";
 
@@ -172,7 +173,7 @@ export default function WonAtomFooter({ atom, className }) {
                   </svg>
                 ) : (
                   <svg className="atom-footer__adhocbutton__icon__svg">
-                    <use xlinkHref="ico36_plus" href="ico36_plus" />
+                    <use xlinkHref={ico36_plus} href={ico36_plus} />
                   </svg>
                 )}
               </div>

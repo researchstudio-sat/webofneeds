@@ -2,13 +2,20 @@ import React from "react";
 import PropTypes from "prop-types";
 import { useDispatch } from "react-redux";
 import ico36_close from "~/images/won-icons/ico36_close.svg";
+import ico36_plus from "~/images/won-icons/ico36_plus.svg";
+
 import { sortBy, get } from "../utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as wonLabelUtils from "../won-label-utils.js";
+import * as useCaseUtils from "../usecase-utils.js";
+
 import WonAtomHeader from "./atom-header.jsx";
 import "~/style/_socket-add-atom.scss";
 import { actionCreators } from "../actions/actions.js";
+
+import { Link } from "react-router-dom";
+import { generateLink } from "../utils";
 
 export default function WonSocketAddAtom({
   addToAtom,
@@ -23,9 +30,13 @@ export default function WonSocketAddAtom({
   const addToAtomSocketUri = atomUtils.getSocketUri(addToAtom, addToSocketType);
   const isAddToAtomOwned = accountUtils.isAtomOwned(accountState, addToAtomUri);
 
-  //TODO: ADD CREATE NEW ATOM ELEMENT
+  //If the addToAtom is Owned, we preselect the holderUri (if present) to be used as the holder of the new atom to establish a connection with
+  const addHolderUri = isAddToAtomOwned
+    ? atomUtils.getHeldByUri(addToAtom)
+    : undefined;
 
   const sortedPossibleAtoms = storedAtoms
+    .filter(atom => atomUtils.isActive(atom))
     .filter(
       //If atom is owned then every atom that is currently stored can be added, if it is not owned we limit the options to owned atoms only
       (atom, atomUri) =>
@@ -59,6 +70,18 @@ export default function WonSocketAddAtom({
         )
     );
 
+  const createAtomReactionsArray = [];
+
+  reactions &&
+    reactions.map((useCaseIdentifierList, socketType) =>
+      useCaseIdentifierList.map(ucIdentifier =>
+        createAtomReactionsArray.push({
+          ucIdentifier: ucIdentifier,
+          socketType: socketType,
+        })
+      )
+    );
+
   const sortedPossibleAtomsArray =
     sortedPossibleAtoms &&
     sortBy(sortedPossibleAtoms, elem =>
@@ -71,8 +94,6 @@ export default function WonSocketAddAtom({
       accountState,
       selectedAtomUri
     );
-
-    console.debug("Selected Atom: ", selectedAtom.toJS());
 
     const connectFunctions = [];
 
@@ -105,9 +126,7 @@ export default function WonSocketAddAtom({
         if (includesSelectedUseCase && selectedAtomSocketUri) {
           if (isAddToAtomOwned && isSelectedAtomOwned) {
             connectFunctions.push({
-              label: `With ${wonLabelUtils.getSocketTabLabel(
-                socketType
-              )}-Socket`,
+              label: `As ${wonLabelUtils.getSocketTabLabel(socketType)}`,
               func: actionCreators.atoms__connectSocketsServerSide(
                 addToAtomSocketUri,
                 selectedAtomSocketUri
@@ -115,9 +134,7 @@ export default function WonSocketAddAtom({
             });
           } else if (isAddToAtomOwned && !isSelectedAtomOwned) {
             connectFunctions.push({
-              label: `With ${wonLabelUtils.getSocketTabLabel(
-                socketType
-              )}-Socket`,
+              label: `As ${wonLabelUtils.getSocketItemLabel(socketType)}`,
               func: actionCreators.atoms__connectSockets(
                 addToAtomSocketUri,
                 selectedAtomSocketUri
@@ -125,9 +142,7 @@ export default function WonSocketAddAtom({
             });
           } else if (!isAddToAtomOwned && isSelectedAtomOwned) {
             connectFunctions.push({
-              label: `With '${wonLabelUtils.getSocketTabLabel(
-                socketType
-              )}'-Socket`,
+              label: `As ${wonLabelUtils.getSocketItemLabel(socketType)}`,
               func: actionCreators.atoms__connectSockets(
                 selectedAtomSocketUri,
                 addToAtomSocketUri
@@ -197,9 +212,9 @@ export default function WonSocketAddAtom({
           <use xlinkHref={ico36_close} href={ico36_close} />
         </svg>
         <div className="wsaa__header__label">
-          {"Pick atom to add to the <" +
-            addToSocketType +
-            "> Socket TODO: BETTER LABEL"}
+          {`Pick an Atom below to add to the ${wonLabelUtils.getSocketTabLabel(
+            addToSocketType
+          )}`}
         </div>
       </div>
       <div className="wsaa__content">
@@ -212,6 +227,57 @@ export default function WonSocketAddAtom({
               onClick={() => selectAtom(atom)}
             />
           ))}
+        {createAtomReactionsArray.map(({ ucIdentifier, socketType }, index) => (
+          <Link
+            key={ucIdentifier + "-" + index}
+            className="wsaa__content__create"
+            to={location =>
+              generateLink(
+                location,
+                {
+                  useCase: ucIdentifier,
+                  fromAtomUri: addToAtomUri,
+                  senderSocketType: socketType,
+                  targetSocketType: addToSocketType,
+                  mode: "CONNECT",
+                  holderUri: addHolderUri,
+                },
+                "/create"
+              )
+            }
+          >
+            <div className="wsaa__content__create__icon">
+              {useCaseUtils.getUseCaseIcon(ucIdentifier) ? (
+                <svg className="wsaa__content__create__icon__svg">
+                  <use
+                    xlinkHref={useCaseUtils.getUseCaseIcon(ucIdentifier)}
+                    href={useCaseUtils.getUseCaseIcon(ucIdentifier)}
+                  />
+                </svg>
+              ) : (
+                <svg className="wsaa__content__create__icon__svg">
+                  <use xlinkHref={ico36_plus} href={ico36_plus} />
+                </svg>
+              )}
+            </div>
+            <div className="wsaa__content__create__right">
+              <div className="wsaa__content__create__right__topline">
+                <div className="wsaa__content__create__right__topline__notitle">
+                  {isAddToAtomOwned
+                    ? `Add New ${wonLabelUtils.getSocketItemLabel(socketType)}`
+                    : `Connect New ${wonLabelUtils.getSocketItemLabel(
+                        socketType
+                      )}`}
+                </div>
+              </div>
+              <div className="wsaa__content__create__right__subtitle">
+                <span className="wsaa__content__create__right__subtitle__type">
+                  <span>{useCaseUtils.getUseCaseLabel(ucIdentifier)}</span>
+                </span>
+              </div>
+            </div>
+          </Link>
+        ))}
       </div>
     </won-socket-add-atom>
   );

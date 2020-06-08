@@ -15,9 +15,10 @@ import {
   filterAtomsBySearchValue,
 } from "../utils.js";
 
-import * as atomUtils from "../redux/utils/atom-utils";
-import * as accountUtils from "../redux/utils/account-utils";
-import * as connectionUtils from "../redux/utils/connection-utils";
+import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
+import * as wonLabelUtils from "../won-label-utils.js";
 import WonTitlePicker from "./details/picker/title-picker.jsx";
 import WonSocketAddAtom from "./socket-add-atom.jsx";
 
@@ -125,25 +126,21 @@ export default function WonAtomContentSocket({
   function generateAddItem() {
     if (reactions) {
       const onClick = () => {
-        //TODO: SHOW UI-ELEMENTS AFTER CLICK
-        console.debug(
-          "Clicked Add Reactions: ",
-          JSON.stringify(reactions.toJS())
-        );
-        toggleAddPicker(!showAddPicker); //TODO: SHOULD NOT BE A TOGGLE IN MY OPINION
+        toggleAddPicker(!showAddPicker);
       };
-
-      //TODO: DO NOT ALLOW REACTIONS ON INACTIVE ATOMS
-      //TODO: LABEL BASED ON OWNERSHIP
-      //TODO: SHOW OPTIONS FOR ALL POSSIBLE USECASES (SIMILAR TO THE ATOM-FOOTER
-      //TODO: SHOW CREATE NEW OPTION FOR ALL POSSIBLE USECASES
 
       return (
         <div className="socketadd clickable" onClick={onClick}>
           <svg className="socketadd__icon" title="Create a new post">
             <use xlinkHref={ico36_plus} href={ico36_plus} />
           </svg>
-          <span className="socketadd__label">Add</span>
+          <span className="socketadd__label">
+            {isAtomOwned
+              ? `Add ${wonLabelUtils.getSocketItemLabels(reactions.keys())}`
+              : `Connect ${wonLabelUtils.getSocketItemLabels(
+                  reactions.keys()
+                )}`}
+          </span>
         </div>
       );
     } else {
