@@ -8,7 +8,12 @@ import PropTypes from "prop-types";
 import { useSelector, useDispatch } from "react-redux";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 import ico36_plus from "~/images/won-icons/ico36_plus.svg";
-import { get, sortByDate, filterConnectionsBySearchValue } from "../utils.js";
+import {
+  get,
+  sortByDate,
+  filterConnectionsBySearchValue,
+  filterAtomsBySearchValue,
+} from "../utils.js";
 
 import * as atomUtils from "../redux/utils/atom-utils";
 import * as accountUtils from "../redux/utils/account-utils";
@@ -41,6 +46,8 @@ export default function WonAtomContentSocket({
   const [showAddPicker, toggleAddPicker] = useState(false);
 
   const storedAtoms = useSelector(generalSelectors.getAtoms);
+
+  const filteredStoredAtoms = filterAtomsBySearchValue(storedAtoms, searchText);
 
   const allAtomConnections = atomUtils.getConnections(atom, socketType);
 
@@ -260,7 +267,7 @@ export default function WonAtomContentSocket({
       {showAddPicker ? (
         <WonSocketAddAtom
           addToAtom={atom}
-          storedAtoms={storedAtoms}
+          storedAtoms={filteredStoredAtoms}
           addToSocketType={socketType}
           reactions={reactions}
           accountState={accountState}

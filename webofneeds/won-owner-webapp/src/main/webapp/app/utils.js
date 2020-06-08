@@ -419,6 +419,26 @@ export function filterConnectionsBySearchValue(
 }
 
 /**
+ * Filters given Map of atoms by occurence of a given searchText Object { value: searchString }
+ * check only looks into the humanReadable of the atom(s)
+ * @param allAtomsImm atoms to filter in the state
+ * @param value searchValue
+ * @returns {*}
+ */
+export function filterAtomsBySearchValue(allAtomsImm, { value }) {
+  const tempSearchText = value.trim();
+
+  if (allAtomsImm && tempSearchText.length > 0) {
+    const regExp = new RegExp(tempSearchText, "i");
+
+    return allAtomsImm.filter(
+      atom => (get(atom, "humanReadable") || "").search(regExp) !== -1
+    );
+  }
+  return allAtomsImm;
+}
+
+/**
  * Sorts the elements by Selector (default order is ascending)
  * @param elementsImm elements from state that need to be returned as a sorted array
  * @param selector selector for the date that will be used to sort the elements (default is "lastUpdateDate")
