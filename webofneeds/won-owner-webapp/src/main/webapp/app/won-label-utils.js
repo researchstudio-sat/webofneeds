@@ -56,6 +56,10 @@ export const labels = deepFreeze({
   },
 });
 
+export function getSocketTabLabel(socketType) {
+  return labels.socketTabs[socketType] || socketType;
+}
+
 /**
  * Usage: reactionLabels.[enabled|reaction].[senderSocketType].[targetSocketType]
  *

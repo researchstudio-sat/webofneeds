@@ -98,7 +98,7 @@ export default function WonAtomMenu({ atom, defaultTab }) {
 
   // Add generic Tabs based on available Sockets
   socketTypeArray.map((socketType, index) => {
-    let label = wonLabelUtils.labels.socketTabs[socketType] || socketType;
+    let label = wonLabelUtils.getSocketTabLabel(socketType);
     let countLabel;
 
     const selected = visibleTab === socketType;
