@@ -154,7 +154,11 @@ export default function WonAtomContentSocket({
         <WonTitlePicker
           onUpdate={setSearchText}
           initialValue={searchText.value}
-          detail={{ placeholder: "Filter Connections" }}
+          detail={{
+            placeholder: `Filter ${wonLabelUtils.getSocketItemsLabel(
+              socketType
+            )}`,
+          }}
         />
       </div>
       {!showAddPicker ? (
@@ -170,8 +174,10 @@ export default function WonAtomContentSocket({
             <div className="acs__segment__content">
               <div className="acs__empty">
                 {searchText.value.trim().length > 0
-                  ? "No Results"
-                  : "No Connections"}
+                  ? `No ${wonLabelUtils.getSocketItemsLabel(
+                      socketType
+                    )} found for '${searchText.value.trim()}'`
+                  : `No ${wonLabelUtils.getSocketItemsLabel(socketType)}`}
               </div>
             </div>
           </div>

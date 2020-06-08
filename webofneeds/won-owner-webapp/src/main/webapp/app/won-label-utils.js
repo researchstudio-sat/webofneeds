@@ -68,6 +68,20 @@ export const labels = deepFreeze({
     [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: "Employer",
     [vocab.WXSCHEMA.WorksForSocketCompacted]: "Employee",
   },
+  socketItems: {
+    [vocab.GROUP.GroupSocketCompacted]: "Group Members",
+    [vocab.CHAT.ChatSocketCompacted]: "Chats",
+    [vocab.HOLD.HoldableSocketCompacted]: "Holders",
+    [vocab.HOLD.HolderSocketCompacted]: "Posts",
+    [vocab.REVIEW.ReviewSocketCompacted]: "Reviews",
+    [vocab.BUDDY.BuddySocketCompacted]: "Buddies",
+    [vocab.WXSCHEMA.AssociatedArticleSocketCompacted]: "Articles",
+    [vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted]: "Publishers",
+    [vocab.WXSCHEMA.MemberSocketCompacted]: "Memberships",
+    [vocab.WXSCHEMA.MemberOfSocketCompacted]: "Members",
+    [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: "Employees",
+    [vocab.WXSCHEMA.WorksForSocketCompacted]: "Employers",
+  },
 });
 
 export function getSocketTabLabel(socketType) {
@@ -89,6 +103,10 @@ export function getSocketItemLabels(socketTypes) {
 
 export function getSocketItemLabel(socketType) {
   return labels.socketItem[socketType] || socketType;
+}
+
+export function getSocketItemsLabel(socketType) {
+  return labels.socketItems[socketType] || socketType;
 }
 
 /**
