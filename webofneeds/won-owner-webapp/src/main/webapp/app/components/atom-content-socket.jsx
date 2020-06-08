@@ -16,6 +16,7 @@ import * as connectionUtils from "../redux/utils/connection-utils";
 import WonTitlePicker from "./details/picker/title-picker.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
 import WonSuggestAtomPicker from "./details/picker/suggest-atom-picker.jsx";
+import WonSocketAddAtom from "./socket-add-atom.jsx";
 
 import "~/style/_atom-content-socket.scss";
 import * as generalSelectors from "../redux/selectors/general-selectors";
@@ -37,6 +38,7 @@ export default function WonAtomContentSocket({
   const [showClosed, toggleClosed] = useState(false);
   const [showSuggestAtomExpanded, toggleSuggestAtomExpanded] = useState(false);
   const [searchText, setSearchText] = useState({ value: "" });
+  const [showAddPicker, toggleAddPicker] = useState(false);
 
   const storedAtoms = useSelector(generalSelectors.getAtoms);
 
@@ -92,6 +94,33 @@ export default function WonAtomContentSocket({
     ));
   }
 
+  function generateHeaderItem(label, size, toggleFunction, isExpanded) {
+    return (
+      <div
+        className="acs__segment__header clickable"
+        onClick={() => toggleFunction(!isExpanded)}
+      >
+        <div className="acs__segment__header__title">
+          {label}
+          <span className="acs__segment__header__title__count">
+            {"(" + size + ")"}
+          </span>
+        </div>
+        <div className="acs__segment__header__carret" />
+        <svg
+          className={
+            "acs__segment__header__carret " +
+            (isExpanded
+              ? " acs__segment__header__carret--expanded "
+              : " acs__segment__header__carret--collapsed ")
+          }
+        >
+          <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
+        </svg>
+      </div>
+    );
+  }
+
   function generateAddItem() {
     if (reactions) {
       const onClick = () => {
@@ -100,6 +129,7 @@ export default function WonAtomContentSocket({
           "Clicked Add Reactions: ",
           JSON.stringify(reactions.toJS())
         );
+        toggleAddPicker(!showAddPicker); //TODO: SHOULD NOT BE A TOGGLE IN MY OPINION
       };
 
       //TODO: DO NOT ALLOW REACTIONS ON INACTIVE ATOMS
@@ -129,48 +159,36 @@ export default function WonAtomContentSocket({
           detail={{ placeholder: "Filter Connections" }}
         />
       </div>
-      {activeConnections.size > 0 || reactions ? (
-        <div className="acs__segment">
-          <div className="acs__segment__content">
-            {generateConnectionItems(activeConnections)}
-            {generateAddItem()}
+      {!showAddPicker ? (
+        activeConnections.size > 0 || reactions ? (
+          <div className="acs__segment">
+            <div className="acs__segment__content">
+              {generateConnectionItems(activeConnections)}
+              {generateAddItem()}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="acs__segment">
+            <div className="acs__segment__content">
+              <div className="acs__empty">
+                {searchText.value.trim().length > 0
+                  ? "No Results"
+                  : "No Connections"}
+              </div>
+            </div>
+          </div>
+        )
       ) : (
-        <div className="acs__segment">
-          <div className="acs__segment__content">
-            <div className="acs__empty">
-              {searchText.value.trim().length > 0
-                ? "No Results"
-                : "No Connections"}
-            </div>
-          </div>
-        </div>
+        undefined
       )}
-      {requestReceivedConnections.size > 0 ? (
+      {!showAddPicker && requestReceivedConnections.size > 0 ? (
         <div className="acs__segment">
-          <div
-            className="acs__segment__header clickable"
-            onClick={() => toggleRequestReceived(!showRequestReceived)}
-          >
-            <div className="acs__segment__header__title">
-              Incoming Requests
-              <span className="acs__segment__header__title__count">
-                {"(" + requestReceivedConnections.size + ")"}
-              </span>
-            </div>
-            <div className="acs__segment__header__carret" />
-            <svg
-              className={
-                "acs__segment__header__carret " +
-                (showRequestReceived
-                  ? " acs__segment__header__carret--expanded "
-                  : " acs__segment__header__carret--collapsed ")
-              }
-            >
-              <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-            </svg>
-          </div>
+          {generateHeaderItem(
+            "Incoming Requests",
+            requestReceivedConnections.size,
+            toggleRequestReceived,
+            showRequestReceived
+          )}
           {showRequestReceived ? (
             <div className="acs__segment__content">
               {generateConnectionItems(requestReceivedConnections)}
@@ -182,30 +200,14 @@ export default function WonAtomContentSocket({
       ) : (
         undefined
       )}
-      {requestSentConnections.size > 0 ? (
+      {!showAddPicker && requestSentConnections.size > 0 ? (
         <div className="acs__segment">
-          <div
-            className="acs__segment__header clickable"
-            onClick={() => toggleRequestSent(!showRequestSent)}
-          >
-            <div className="acs__segment__header__title">
-              Sent Requests
-              <span className="acs__segment__header__title__count">
-                {"(" + requestSentConnections.size + ")"}
-              </span>
-            </div>
-            <div className="acs__segment__header__carret" />
-            <svg
-              className={
-                "acs__segment__header__carret " +
-                (showRequestSent
-                  ? " acs__segment__header__carret--expanded "
-                  : " acs__segment__header__carret--collapsed ")
-              }
-            >
-              <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-            </svg>
-          </div>
+          {generateHeaderItem(
+            "Sent Requests",
+            requestSentConnections.size,
+            toggleRequestSent,
+            showRequestSent
+          )}
           {showRequestSent ? (
             <div className="acs__segment__content">
               {generateConnectionItems(requestSentConnections)}
@@ -217,30 +219,14 @@ export default function WonAtomContentSocket({
       ) : (
         undefined
       )}
-      {suggestedConnections.size > 0 ? (
+      {!showAddPicker && suggestedConnections.size > 0 ? (
         <div className="acs__segment">
-          <div
-            className="acs__segment__header clickable"
-            onClick={() => toggleSuggestions(!showSuggestions)}
-          >
-            <div className="acs__segment__header__title">
-              Suggestions
-              <span className="acs__segment__header__title__count">
-                {"(" + suggestedConnections.size + ")"}
-              </span>
-            </div>
-            <div className="acs__segment__header__carret" />
-            <svg
-              className={
-                "acs__segment__header__carret " +
-                (showSuggestions
-                  ? " acs__segment__header__carret--expanded "
-                  : " acs__segment__header__carret--collapsed ")
-              }
-            >
-              <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-            </svg>
-          </div>
+          {generateHeaderItem(
+            "Suggestions",
+            suggestedConnections.size,
+            toggleSuggestions,
+            showSuggestions
+          )}
           {showSuggestions ? (
             <div className="acs__segment__content">
               {generateConnectionItems(suggestedConnections)}
@@ -252,30 +238,14 @@ export default function WonAtomContentSocket({
       ) : (
         undefined
       )}
-      {closedConnections.size > 0 ? (
+      {!showAddPicker && closedConnections.size > 0 ? (
         <div className="acs__segment">
-          <div
-            className="acs__segment__header clickable"
-            onClick={() => toggleClosed(!showClosed)}
-          >
-            <div className="acs__segment__header__title">
-              Closed
-              <span className="acs__segment__header__title__count">
-                {"(" + closedConnections.size + ")"}
-              </span>
-            </div>
-            <div className="acs__segment__header__carret" />
-            <svg
-              className={
-                "acs__segment__header__carret " +
-                (showClosed
-                  ? " acs__segment__header__carret--expanded "
-                  : " acs__segment__header__carret--collapsed ")
-              }
-            >
-              <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-            </svg>
-          </div>
+          {generateHeaderItem(
+            "Closed",
+            closedConnections.size,
+            toggleClosed,
+            showClosed
+          )}
           {showClosed ? (
             <div className="acs__segment__content">
               {generateConnectionItems(closedConnections)}
@@ -284,6 +254,18 @@ export default function WonAtomContentSocket({
             undefined
           )}
         </div>
+      ) : (
+        undefined
+      )}
+      {showAddPicker ? (
+        <WonSocketAddAtom
+          addToAtom={atom}
+          storedAtoms={storedAtoms}
+          addToSocketType={socketType}
+          reactions={reactions}
+          accountState={accountState}
+          onClose={() => toggleAddPicker(!showAddPicker)}
+        />
       ) : (
         undefined
       )}

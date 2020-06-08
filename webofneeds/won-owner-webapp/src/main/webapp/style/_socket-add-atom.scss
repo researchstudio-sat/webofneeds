@@ -1,0 +1,28 @@
+@import "won-config";
+@import "sizing-utils";
+
+won-socket-add-atom {
+  //TODO: Style
+  .wsaa__header {
+    display: grid;
+    grid-template-areas: "icon main";
+    grid-template-columns: min-content 1fr;
+    padding: 0.5rem;
+    grid-gap: 0.5rem;
+    align-items: center;
+    box-sizing: border-box;
+    border-bottom: $thinGrayBorder;
+
+    &__label {
+    }
+
+    &__icon {
+      @include fixed-square($postIconSize);
+      cursor: pointer;
+
+      &:hover {
+        --local-primary: #{$won-primary-color};
+      }
+    }
+  }
+}
