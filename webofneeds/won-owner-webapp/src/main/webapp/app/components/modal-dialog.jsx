@@ -60,7 +60,7 @@ export default function WonModalDialog() {
         <div
           className={
             "md__dialog__footer " +
-            (modalDialogButtons.length > 2
+            (modalDialogButtons.size > 2
               ? " md__dialog__footer--row"
               : " md__dialog__footer--column")
           }
