@@ -5,7 +5,7 @@
 import React, { useState } from "react";
 import Immutable from "immutable";
 import PropTypes from "prop-types";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 import ico36_plus from "~/images/won-icons/ico36_plus.svg";
 import {
@@ -19,21 +19,16 @@ import * as atomUtils from "../redux/utils/atom-utils";
 import * as accountUtils from "../redux/utils/account-utils";
 import * as connectionUtils from "../redux/utils/connection-utils";
 import WonTitlePicker from "./details/picker/title-picker.jsx";
-import WonLabelledHr from "./labelled-hr.jsx";
-import WonSuggestAtomPicker from "./details/picker/suggest-atom-picker.jsx";
 import WonSocketAddAtom from "./socket-add-atom.jsx";
 
 import "~/style/_atom-content-socket.scss";
 import * as generalSelectors from "../redux/selectors/general-selectors";
-import { actionCreators } from "../actions/actions";
 
 export default function WonAtomContentSocket({
   atom,
   socketType,
   ItemComponent,
-  suggestPicker,
 }) {
-  const dispatch = useDispatch();
   const accountState = useSelector(generalSelectors.getAccountState);
   const isAtomOwned = accountUtils.isAtomOwned(accountState, get(atom, "uri"));
 
@@ -41,7 +36,6 @@ export default function WonAtomContentSocket({
   const [showRequestSent, toggleRequestSent] = useState(false);
   const [showSuggestions, toggleSuggestions] = useState(false);
   const [showClosed, toggleClosed] = useState(false);
-  const [showSuggestAtomExpanded, toggleSuggestAtomExpanded] = useState(false);
   const [searchText, setSearchText] = useState({ value: "" });
   const [showAddPicker, toggleAddPicker] = useState(false);
 
@@ -273,84 +267,6 @@ export default function WonAtomContentSocket({
           accountState={accountState}
           onClose={() => toggleAddPicker(!showAddPicker)}
         />
-      ) : (
-        undefined
-      )}
-      {isAtomOwned && suggestPicker ? (
-        <React.Fragment>
-          <WonLabelledHr
-            label={suggestPicker.label}
-            arrow={showSuggestAtomExpanded ? "up" : "down"}
-            onClick={() => toggleSuggestAtomExpanded(!showSuggestAtomExpanded)}
-          />
-          {showSuggestAtomExpanded ? (
-            <WonSuggestAtomPicker
-              initialValue={undefined}
-              onUpdate={({ value }) => {
-                const targetAtomUri = value;
-                if (!isAtomOwned) {
-                  return;
-                }
-
-                const targetAtom = get(storedAtoms, targetAtomUri);
-
-                const senderSocketUri = atomUtils.getSocketUri(
-                  atom,
-                  socketType
-                );
-
-                let targetSocketUri;
-                for (const allowedSocket of suggestPicker.allowedSockets) {
-                  //Use the first found socketUri of the allowedSockets (in order) to be used as the targetSocket for the connect
-                  targetSocketUri = atomUtils.getSocketUri(
-                    targetAtom,
-                    allowedSocket
-                  );
-                  if (targetSocketUri) break;
-                }
-
-                if (!targetSocketUri) {
-                  return;
-                }
-
-                const payload = {
-                  caption: suggestPicker.modalCaption || "Connection",
-                  text: suggestPicker.modalText || "Send Request?",
-                  buttons: [
-                    {
-                      caption: "Yes",
-                      callback: () => {
-                        dispatch(
-                          actionCreators.atoms__connectSockets(
-                            senderSocketUri,
-                            targetSocketUri,
-                            ""
-                          )
-                        );
-                        dispatch(actionCreators.view__hideModalDialog());
-                      },
-                    },
-                    {
-                      caption: "No",
-                      callback: () => {
-                        dispatch(actionCreators.view__hideModalDialog());
-                      },
-                    },
-                  ],
-                };
-                dispatch(actionCreators.view__showModalDialog(payload));
-              }}
-              detail={{ placeholder: suggestPicker.placeholder }}
-              excludedUris={excludedFromRequestUris}
-              allowedSockets={suggestPicker.allowedSockets}
-              excludedText={suggestPicker.excludedText}
-              notAllowedSocketText={suggestPicker.notAllowedSocketText}
-              noSuggestionsText={suggestPicker.noSuggestionsText}
-            />
-          ) : (
-            undefined
-          )}
-        </React.Fragment>
       ) : (
         undefined
       )}

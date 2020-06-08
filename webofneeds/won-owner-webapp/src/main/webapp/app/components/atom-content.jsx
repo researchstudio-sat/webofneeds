@@ -181,21 +181,6 @@ export default function WonAtomContent({ atom, defaultTab }) {
             atom={atom}
             socketType={visibleTab}
             ItemComponent={WonParticipantItem}
-            suggestPicker={{
-              allowedSockets: [
-                vocab.CHAT.ChatSocketCompacted,
-                vocab.GROUP.GroupSocketCompacted,
-              ],
-              excludedText:
-                "Invitation does not work for atoms that are already part of the Group, or the group itself",
-              notAllowdSocketText:
-                "Invitation does not work on atoms without Group or Chat Socket",
-              noSuggestionsText: "No Participants available to invite",
-              placeholder: "Insert AtomUri to invite",
-              label: "Invite",
-              modalText: "Invite as Participant?",
-              modalCaption: "Group",
-            }}
           />
         );
         break;
@@ -206,18 +191,6 @@ export default function WonAtomContent({ atom, defaultTab }) {
             atom={atom}
             socketType={visibleTab}
             ItemComponent={WonBuddyItem}
-            suggestPicker={{
-              allowedSockets: [vocab.BUDDY.BuddySocketCompacted],
-              excludedText:
-                "Requesting yourself or someone who is already your Buddy is not allowed",
-              notAllowdSocketText:
-                "Request does not work on atoms without the Buddy Socket",
-              noSuggestionsText: "No known Personas available",
-              placeholder: "Insert AtomUri to invite",
-              label: "Invite",
-              modalText: "Request as Buddy?",
-              modalCaption: "Buddy",
-            }}
           />
         );
         break;

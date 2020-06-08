@@ -81,9 +81,7 @@ export default function WonAtomHeaderBig({ atom }) {
     </span>
   );
 
-  const buddyActionElement = showAddBuddyElement && (
-    <WonAddBuddy atomUri={atomUri} />
-  );
+  const buddyActionElement = showAddBuddyElement && <WonAddBuddy atom={atom} />;
 
   return (
     <won-atom-header-big>
