@@ -25,4 +25,24 @@ won-socket-add-atom {
       }
     }
   }
+
+  .wsaa__content {
+    display: grid;
+    grid-gap: 1rem;
+    padding-top: 0.5rem;
+
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+
+    > a.won-atom-header,
+    > won-atom-header {
+      padding: 0.5rem;
+      border: $thinGrayBorder;
+      background-color: $won-light-gray;
+
+      &:hover {
+        background: $won-lighter-gray;
+        cursor: pointer;
+      }
+    }
+  }
 }

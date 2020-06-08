@@ -6,6 +6,7 @@ import { sortBy, get } from "../utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as wonLabelUtils from "../won-label-utils.js";
+import WonAtomHeader from "./atom-header.jsx";
 import "~/style/_socket-add-atom.scss";
 import { actionCreators } from "../actions/actions.js";
 
@@ -201,19 +202,15 @@ export default function WonSocketAddAtom({
             "> Socket TODO: BETTER LABEL"}
         </div>
       </div>
-      <div>
+      <div className="wsaa__content">
         {sortedPossibleAtomsArray &&
           sortedPossibleAtomsArray.map((atom, index) => (
-            <div
-              className="clickable"
+            <WonAtomHeader
               key={get(atom, "uri") + "-" + index}
+              atom={atom}
+              hideTimestamp={true}
               onClick={() => selectAtom(atom)}
-            >
-              {get(atom, "uri") +
-                "-" +
-                get(atom, "humanReadable") +
-                " -- TODO: BETTER VIEW"}
-            </div>
+            />
           ))}
       </div>
     </won-socket-add-atom>
