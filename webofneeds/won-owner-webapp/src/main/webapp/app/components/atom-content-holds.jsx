@@ -62,7 +62,7 @@ export default function WonAtomContentHolds({ atom }) {
         undefined
       )}
       {atomCards}
-      {isOwned ? (
+      {isOwned && atomUtils.isActive(atom) ? (
         <Link
           className="ach__createatom"
           to={location =>

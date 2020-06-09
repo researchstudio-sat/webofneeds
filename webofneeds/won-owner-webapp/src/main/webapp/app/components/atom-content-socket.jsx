@@ -153,7 +153,7 @@ export default function WonAtomContentSocket({
   }
 
   function generateAddItem() {
-    if (reactions) {
+    if (reactions && atomUtils.isActive(atom)) {
       const onClick = () => {
         toggleAddPicker(!showAddPicker);
       };
