@@ -17,22 +17,35 @@ import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 
 import "~/style/_atom-content-chats.scss";
 import * as generalSelectors from "../redux/selectors/general-selectors";
+import * as accountUtils from "../redux/utils/account-utils";
 
 export default function AtomContentChats({ atom }) {
-  //const dispatch = useDispatch();
   const history = useHistory();
   const chatSocketUri = atomUtils.getChatSocket(atom);
+
+  const accountState = useSelector(generalSelectors.getAccountState);
+  const isAtomOwned = accountUtils.isAtomOwned(accountState, get(atom, "uri"));
 
   const [showSuggestions, toggleSuggestions] = useState(false);
   const [showClosed, toggleClosed] = useState(false);
   const [searchText, setSearchText] = useState({ value: "" });
 
   const storedAtoms = useSelector(generalSelectors.getAtoms);
+  const ownedConnectionsToSocketUri = useSelector(
+    state =>
+      !isAtomOwned &&
+      generalSelectors.getAllOwnedConnectionsWithTargetSocketUri(chatSocketUri)(
+        state
+      )
+  );
 
+  // If the atom is not owned, we will show Our ChatConnections to this atom instead
   const chatConnections = filterConnectionsBySearchValue(
-    get(atom, "connections").filter(
-      conn => get(conn, "socketUri") === chatSocketUri
-    ),
+    isAtomOwned
+      ? get(atom, "connections").filter(
+          conn => get(conn, "socketUri") === chatSocketUri
+        )
+      : ownedConnectionsToSocketUri,
     storedAtoms,
     searchText
   );
@@ -53,6 +66,7 @@ export default function AtomContentChats({ atom }) {
 
     return connectionsArray.map((conn, index) => {
       const connUri = get(conn, "uri");
+
       return (
         <div className="acc__item" key={connUri + "-" + index}>
           <WonConnectionSelectionItem
@@ -66,10 +80,38 @@ export default function AtomContentChats({ atom }) {
               "/connections",
               false
             )}
+            flip={!isAtomOwned}
           />
         </div>
       );
     });
+  }
+
+  function generateHeaderItem(label, size, toggleFunction, isExpanded) {
+    return (
+      <div
+        className="acc__segment__header clickable"
+        onClick={() => toggleFunction(!isExpanded)}
+      >
+        <div className="acc__segment__header__title">
+          {label}
+          <span className="acc__segment__header__title__count">
+            {"(" + size + ")"}
+          </span>
+        </div>
+        <div className="acc__segment__header__carret" />
+        <svg
+          className={
+            "acc__segment__header__carret " +
+            (isExpanded
+              ? " acc__segment__header__carret--expanded "
+              : " acc__segment__header__carret--collapsed ")
+          }
+        >
+          <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
+        </svg>
+      </div>
+    );
   }
 
   return (
@@ -98,28 +140,12 @@ export default function AtomContentChats({ atom }) {
       )}
       {suggestedChatConnections.size > 0 ? (
         <div className="acc__segment">
-          <div
-            className="acc__segment__header clickable"
-            onClick={() => toggleSuggestions(!showSuggestions)}
-          >
-            <div className="acc__segment__header__title">
-              Suggestions
-              <span className="acc__segment__header__title__count">
-                {"(" + suggestedChatConnections.size + ")"}
-              </span>
-            </div>
-            <div className="acc__segment__header__carret" />
-            <svg
-              className={
-                "acc__segment__header__carret " +
-                (showSuggestions
-                  ? " acc__segment__header__carret--expanded "
-                  : " acc__segment__header__carret--collapsed ")
-              }
-            >
-              <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-            </svg>
-          </div>
+          {generateHeaderItem(
+            "Suggestions",
+            suggestedChatConnections.size,
+            toggleSuggestions,
+            showSuggestions
+          )}
           {showSuggestions ? (
             <div className="acc__segment__content">
               {generateConnectionItems(suggestedChatConnections)}
@@ -133,28 +159,12 @@ export default function AtomContentChats({ atom }) {
       )}
       {closedChatConnections.size > 0 ? (
         <div className="acc__segment">
-          <div
-            className="acc__segment__header clickable"
-            onClick={() => toggleClosed(!showClosed)}
-          >
-            <div className="acc__segment__header__title">
-              Closed
-              <span className="acc__segment__header__title__count">
-                {"(" + closedChatConnections.size + ")"}
-              </span>
-            </div>
-            <div className="acc__segment__header__carret" />
-            <svg
-              className={
-                "acc__segment__header__carret " +
-                (showClosed
-                  ? " acc__segment__header__carret--expanded "
-                  : " acc__segment__header__carret--collapsed ")
-              }
-            >
-              <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-            </svg>
-          </div>
+          {generateHeaderItem(
+            "Closed",
+            closedChatConnections.size,
+            toggleClosed,
+            showClosed
+          )}
           {showClosed ? (
             <div className="acc__segment__content">
               {generateConnectionItems(closedChatConnections)}

@@ -42,21 +42,36 @@ export default function WonAtomContentSocket({
 
   const storedAtoms = useSelector(generalSelectors.getAtoms);
 
+  const socketUri = atomUtils.getSocketUri(atom, socketType);
+  const ownedConnectionsToSocketUri = useSelector(
+    state =>
+      !isAtomOwned
+        ? generalSelectors.getAllOwnedConnectionsWithTargetSocketUri(socketUri)(
+            state
+          )
+        : Immutable.Map()
+  );
+
   const filteredStoredAtoms = filterAtomsBySearchValue(storedAtoms, searchText);
 
-  const allAtomConnections = atomUtils.getConnections(atom, socketType);
+  const connectionsOfAtom = isAtomOwned
+    ? atomUtils.getConnections(atom, socketType)
+    : atomUtils
+        .getConnections(atom, socketType)
+        .filter(conn => {
+          //Filters out all connections that have a "counterpart" connection stored in another atom we own
+          const targetSocketUri = get(conn, "targetSocketUri");
+          return !ownedConnectionsToSocketUri.find(
+            ownedConnection =>
+              get(ownedConnection, "socketUri") === targetSocketUri
+          );
+        })
+        .merge(ownedConnectionsToSocketUri);
 
   const reactions = atomUtils.getReactions(atom, socketType);
 
-  let excludedFromRequestUris = [get(atom, "uri")];
-
-  allAtomConnections &&
-    allAtomConnections.map(conn =>
-      excludedFromRequestUris.push(get(conn, "targetAtomUri"))
-    );
-
   const connections = filterConnectionsBySearchValue(
-    allAtomConnections,
+    connectionsOfAtom,
     storedAtoms,
     searchText
   );
@@ -66,41 +81,51 @@ export default function WonAtomContentSocket({
     connectionUtils.isConnected(conn)
   );
 
-  const requestSentConnections = isAtomOwned
-    ? connections.filter(conn => connectionUtils.isRequestSent(conn))
-    : Immutable.Map();
+  const requestSentConnections = connections.filter(conn =>
+    connectionUtils.isRequestSent(conn)
+  );
 
-  const requestReceivedConnections = isAtomOwned
-    ? connections.filter(conn => connectionUtils.isRequestReceived(conn))
-    : Immutable.Map();
+  const requestReceivedConnections = connections.filter(conn =>
+    connectionUtils.isRequestReceived(conn)
+  );
 
-  const suggestedConnections = isAtomOwned
-    ? connections.filter(conn => connectionUtils.isSuggested(conn))
-    : Immutable.Map();
-  const closedConnections = isAtomOwned
-    ? connections.filter(conn => connectionUtils.isClosed(conn))
-    : Immutable.Map();
+  const suggestedConnections = connections.filter(conn =>
+    connectionUtils.isSuggested(conn)
+  );
+
+  const closedConnections = connections.filter(conn =>
+    connectionUtils.isClosed(conn)
+  );
 
   function generateConnectionItems(connections) {
     const connectionsArray = sortByDate(connections) || [];
 
-    return connectionsArray.map((conn, index) => (
-      <React.Fragment key={get(conn, "uri") + "-" + index}>
-        <ItemComponent
-          connection={conn}
-          atom={atom}
-          targetAtom={get(storedAtoms, get(conn, "targetAtomUri"))}
-          isOwned={isAtomOwned}
-        />
-      </React.Fragment>
-    ));
+    return connectionsArray.map((conn, index) => {
+      const flip = get(conn, "targetSocketUri") === socketUri;
+
+      return (
+        <React.Fragment key={get(conn, "uri") + "-" + index}>
+          <ItemComponent
+            connection={conn}
+            atom={
+              flip ? get(storedAtoms, get(conn, "uri").split("/c")[0]) : atom
+            }
+            targetAtom={get(storedAtoms, get(conn, "targetAtomUri"))}
+            isOwned={isAtomOwned}
+            flip={get(conn, "targetSocketUri") === socketUri}
+          />
+        </React.Fragment>
+      );
+    });
   }
 
   function generateHeaderItem(label, size, toggleFunction, isExpanded) {
     return (
       <div
-        className="acs__segment__header clickable"
-        onClick={() => toggleFunction(!isExpanded)}
+        className={
+          "acs__segment__header " + (toggleFunction ? " clickable " : "")
+        }
+        onClick={toggleFunction ? () => toggleFunction(!isExpanded) : undefined}
       >
         <div className="acs__segment__header__title">
           {label}
@@ -109,16 +134,20 @@ export default function WonAtomContentSocket({
           </span>
         </div>
         <div className="acs__segment__header__carret" />
-        <svg
-          className={
-            "acs__segment__header__carret " +
-            (isExpanded
-              ? " acs__segment__header__carret--expanded "
-              : " acs__segment__header__carret--collapsed ")
-          }
-        >
-          <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-        </svg>
+        {toggleFunction ? (
+          <svg
+            className={
+              "acs__segment__header__carret " +
+              (isExpanded
+                ? " acs__segment__header__carret--expanded "
+                : " acs__segment__header__carret--collapsed ")
+            }
+          >
+            <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
+          </svg>
+        ) : (
+          undefined
+        )}
       </div>
     );
   }
@@ -207,7 +236,7 @@ export default function WonAtomContentSocket({
       {!showAddPicker && requestSentConnections.size > 0 ? (
         <div className="acs__segment">
           {generateHeaderItem(
-            "Sent Requests",
+            isAtomOwned ? "Sent Requests" : "Pending Requests",
             requestSentConnections.size,
             toggleRequestSent,
             showRequestSent
@@ -226,7 +255,7 @@ export default function WonAtomContentSocket({
       {!showAddPicker && suggestedConnections.size > 0 ? (
         <div className="acs__segment">
           {generateHeaderItem(
-            "Suggestions",
+            isAtomOwned ? "Suggestions" : "Suggested in",
             suggestedConnections.size,
             toggleSuggestions,
             showSuggestions
