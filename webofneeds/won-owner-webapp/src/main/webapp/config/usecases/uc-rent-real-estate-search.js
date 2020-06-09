@@ -44,13 +44,6 @@ export const rentRealEstateSearch = {
       [vocab.CHAT.ChatSocketCompacted]: ["rentRealEstateOffer"],
     },
   },
-  reactionUseCases: [
-    {
-      identifier: "rentRealEstateOffer",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
   details: undefined,
   seeksDetails: {
     location: { ...details.location },

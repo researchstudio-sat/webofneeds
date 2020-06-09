@@ -24,20 +24,6 @@ export const newsarticle = {
       [vocab.WXSCHEMA.AssociatedArticleSocketCompacted]: ["organization"],
     },
   },
-  reactionUseCases: [
-    {
-      identifier: "organization",
-      senderSocketType: vocab.WXSCHEMA.AssociatedArticleSocketCompacted,
-      targetSocketType: vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted,
-    },
-  ],
-  enabledUseCases: [
-    {
-      identifier: "organization",
-      senderSocketType: vocab.WXSCHEMA.AssociatedArticleSocketCompacted,
-      targetSocketType: vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted,
-    },
-  ],
   details: {
     title: { ...details.title, mandatory: true },
     description: { ...details.description, mandatory: true },

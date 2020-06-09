@@ -34,18 +34,6 @@ export const goodsServiceSearch = {
       [vocab.CHAT.ChatSocketCompacted]: ["serviceOffer", "goodsOffer"],
     },
   },
-  reactionUseCases: [
-    {
-      identifier: "serviceOffer",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-    {
-      identifier: "goodsOffer",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
   seeksDetails: {
     title: { ...details.title },
     tags: {

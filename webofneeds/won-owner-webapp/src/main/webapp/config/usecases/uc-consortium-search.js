@@ -27,13 +27,6 @@ export const consortiumSearch = {
       [vocab.CHAT.ChatSocketCompacted]: ["consortiumOffer"],
     },
   },
-  reactionUseCases: [
-    {
-      identifier: "consortiumOffer",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
   details: {
     title: { ...details.title },
     description: { ...details.description },

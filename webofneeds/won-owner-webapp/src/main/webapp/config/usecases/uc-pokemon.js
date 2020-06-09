@@ -27,13 +27,6 @@ export const pokemonGoRaid = {
       [vocab.CHAT.ChatSocketCompacted]: ["pokemonInterest"],
     },
   },
-  reactionUseCases: [
-    {
-      identifier: "pokemonInterest",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.GROUP.GroupSocketCompacted,
-    },
-  ],
   details: {
     pokemonRaid: { ...details.pokemonRaid, mandatory: true },
     location: { ...details.location, mandatory: true },
@@ -63,20 +56,6 @@ export const pokemonInterest = {
       [vocab.GROUP.GroupSocketCompacted]: ["pokemonGoRaid"],
     },
   },
-  enabledUseCases: [
-    {
-      identifier: "pokemonGoRaid",
-      senderSocketType: vocab.GROUP.GroupSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
-  reactionUseCases: [
-    {
-      identifier: "pokemonGoRaid",
-      senderSocketType: vocab.GROUP.GroupSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
   details: {
     title: { ...details.title },
   },

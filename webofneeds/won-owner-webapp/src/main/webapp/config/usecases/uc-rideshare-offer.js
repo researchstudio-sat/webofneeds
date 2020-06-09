@@ -31,14 +31,6 @@ export const rideShareOffer = {
       [vocab.CHAT.ChatSocketCompacted]: ["personalTransportSearch"],
     },
   },
-  enabledUseCases: undefined,
-  reactionUseCases: [
-    {
-      identifier: "personalTransportSearch",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
   details: {
     title: { ...details.title },
     description: { ...details.description },

@@ -34,30 +34,6 @@ export const organization = {
       [vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted]: ["newsarticle"],
     },
   },
-  reactionUseCases: [
-    {
-      identifier: "persona",
-      senderSocketType: vocab.WXSCHEMA.WorksForSocketCompacted,
-      targetSocketType: vocab.WXSCHEMA.WorksForInverseSocketCompacted,
-    },
-    {
-      identifier: "persona",
-      senderSocketType: vocab.WXSCHEMA.MemberOfSocketCompacted,
-      targetSocketType: vocab.WXSCHEMA.MemberSocketCompacted,
-    },
-    {
-      identifier: "newsarticle",
-      senderSocketType: vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted,
-      targetSocketType: vocab.WXSCHEMA.AssociatedArticleSocketCompacted,
-    },
-  ],
-  enabledUseCases: [
-    {
-      identifier: "newsarticle",
-      senderSocketType: vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted,
-      targetSocketType: vocab.WXSCHEMA.AssociatedArticleSocketCompacted,
-    },
-  ],
   details: {
     title: { ...details.title },
     description: { ...details.description },

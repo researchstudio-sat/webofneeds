@@ -25,13 +25,6 @@ export const goodsOffer = {
       [vocab.CHAT.ChatSocketCompacted]: ["goodsServiceSearch"],
     },
   },
-  reactionUseCases: [
-    {
-      identifier: "goodsServiceSearch",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
   details: {
     title: { ...details.title, mandatory: true },
     description: { ...details.description },

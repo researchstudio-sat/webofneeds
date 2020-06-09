@@ -1,5 +1,4 @@
 import { deepFreeze, isValidNumber } from "./utils.js";
-import Immutable from "immutable";
 import vocab from "./service/vocab.js";
 
 export const rdfTextfieldHelpText =
@@ -108,39 +107,6 @@ export function getSocketItemLabel(socketType) {
 export function getSocketItemsLabel(socketType) {
   return labels.socketItems[socketType] || socketType;
 }
-
-/**
- * Usage: reactionLabels.[enabled|reaction].[senderSocketType].[targetSocketType]
- *
- * use enabled for enabled use-cases, and reaction for reaction usecases
- */
-export const reactionLabels = Immutable.fromJS({
-  enabled: {
-    [vocab.CHAT.ChatSocketCompacted]: {
-      [vocab.GROUP.GroupSocketCompacted]: "Join the Group Chat",
-    },
-    [vocab.GROUP.GroupSocketCompacted]: {
-      [vocab.CHAT.ChatSocketCompacted]: "Add to Group Chat",
-      [vocab.GROUP.GroupSocketCompacted]: "Add to Group Chat",
-    },
-    [vocab.HOLD.HolderSocketCompacted]: {
-      [vocab.HOLD.HoldableSocketCompacted]: "Add this Holder",
-    },
-    [vocab.HOLD.HoldableSocketCompacted]: {
-      [vocab.HOLD.HolderSocketCompacted]: "Add to Holder",
-    },
-  },
-  reaction: {
-    [vocab.CHAT.ChatSocketCompacted]: {
-      [vocab.CHAT.ChatSocketCompacted]: "Request to Chat",
-      [vocab.GROUP.GroupSocketCompacted]: "Request to Join the Group Chat",
-    },
-    [vocab.GROUP.GroupSocketCompacted]: {
-      [vocab.CHAT.ChatSocketCompacted]: "Invite to Group Chat",
-      [vocab.GROUP.GroupSocketCompacted]: "Invite to Group Chat",
-    },
-  },
-});
 
 /**
  * Both input parameters can be anything that `Date(...)` can

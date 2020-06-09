@@ -32,30 +32,6 @@ export const persona = {
       [vocab.BUDDY.BuddySocketCompacted]: ["persona"],
     },
   },
-  reactionUseCases: [
-    {
-      identifier: "organization",
-      senderSocketType: vocab.WXSCHEMA.WorksForInverseSocketCompacted,
-      targetSocketType: vocab.WXSCHEMA.WorksForSocketCompacted,
-    },
-    {
-      identifier: "organization",
-      senderSocketType: vocab.WXSCHEMA.MemberSocketCompacted,
-      targetSocketType: vocab.WXSCHEMA.MemberOfSocketCompacted,
-    },
-  ],
-  enabledUseCases: [
-    {
-      identifier: "organization",
-      senderSocketType: vocab.WXSCHEMA.WorksForInverseSocketCompacted,
-      targetSocketType: vocab.WXSCHEMA.WorksForSocketCompacted,
-    },
-    {
-      identifier: "organization",
-      senderSocketType: vocab.WXSCHEMA.MemberSocketCompacted,
-      targetSocketType: vocab.WXSCHEMA.MemberOfSocketCompacted,
-    },
-  ],
   details: {
     personaName: { ...details.personaName, mandatory: true },
     description: { ...details.description },

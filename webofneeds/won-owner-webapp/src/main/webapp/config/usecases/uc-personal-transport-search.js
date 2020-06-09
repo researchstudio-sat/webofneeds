@@ -27,19 +27,6 @@ export const personalTransportSearch = {
       [vocab.CHAT.ChatSocketCompacted]: ["taxiOffer", "rideShareOffer"],
     },
   },
-  enabledUseCases: undefined,
-  reactionUseCases: [
-    {
-      identifier: "taxiOffer",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-    {
-      identifier: "rideShareOffer",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
   // TODO: amount of people? other details?
   details: {
     title: { ...details.title },

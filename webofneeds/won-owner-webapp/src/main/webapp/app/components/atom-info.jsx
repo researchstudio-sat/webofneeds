@@ -22,8 +22,6 @@ export default function WonAtomInfo({ atom, className, defaultTab }) {
   const showFooter =
     !atomLoading &&
     (atomUtils.isInactive(atom) ||
-      (isOwned && atomUtils.hasEnabledUseCases(atom)) ||
-      (!isOwned && atomUtils.hasReactionUseCases(atom)) ||
       (!isOwned &&
         (atomUtils.hasGroupSocket(atom) || atomUtils.hasChatSocket(atom))));
 

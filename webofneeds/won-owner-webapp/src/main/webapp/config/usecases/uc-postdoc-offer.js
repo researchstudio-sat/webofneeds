@@ -27,13 +27,6 @@ export const postdocOffer = {
       [vocab.CHAT.ChatSocketCompacted]: ["postdocSearch"],
     },
   },
-  reactionUseCases: [
-    {
-      identifier: "postdocSearch",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
   details: {
     title: { ...details.title },
     description: { ...details.description },

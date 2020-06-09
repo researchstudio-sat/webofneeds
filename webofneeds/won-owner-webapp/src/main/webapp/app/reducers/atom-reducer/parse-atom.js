@@ -32,8 +32,6 @@ export function parseAtom(jsonldAtom) {
       matchedUseCase: {
         identifier: undefined,
         icon: undefined,
-        enabledUseCases: undefined,
-        reactionUseCases: undefined,
         reactions: undefined,
       },
       background: generateBackground(get(jsonldAtomImm, "@id")),
@@ -58,22 +56,10 @@ export function parseAtom(jsonldAtom) {
         .setIn(["matchedUseCase", "identifier"], matchingUseCase.identifier)
         .setIn(["matchedUseCase", "icon"], matchingUseCase.icon)
         .setIn(
-          ["matchedUseCase", "enabledUseCases"],
-          matchingUseCase.enabledUseCases
-            ? Immutable.fromJS(matchingUseCase.enabledUseCases)
-            : Immutable.List()
-        )
-        .setIn(
           ["matchedUseCase", "reactions"],
           matchingUseCase.reactions
             ? Immutable.fromJS(matchingUseCase.reactions)
             : Immutable.Map()
-        )
-        .setIn(
-          ["matchedUseCase", "reactionUseCases"],
-          matchingUseCase.reactionUseCases
-            ? Immutable.fromJS(matchingUseCase.reactionUseCases)
-            : Immutable.List()
         );
     }
 
@@ -207,8 +193,7 @@ export function parseMetaAtom(metaAtom) {
       matchedUseCase: {
         identifier: undefined,
         icon: undefined,
-        enabledUseCases: undefined,
-        reactionUseCases: undefined,
+        reactions: undefined,
       },
       background: generateBackground(get(metaAtomImm, "uri")),
       unread: false,
@@ -229,22 +214,10 @@ export function parseMetaAtom(metaAtom) {
           .setIn(["matchedUseCase", "identifier"], matchingUseCase.identifier)
           .setIn(["matchedUseCase", "icon"], matchingUseCase.icon)
           .setIn(
-            ["matchedUseCase", "enabledUseCases"],
-            matchingUseCase.enabledUseCases
-              ? Immutable.fromJS(matchingUseCase.enabledUseCases)
-              : Immutable.List()
-          )
-          .setIn(
             ["matchedUseCase", "reactions"],
             matchingUseCase.reactions
               ? Immutable.fromJS(matchingUseCase.reactions)
               : Immutable.Map()
-          )
-          .setIn(
-            ["matchedUseCase", "reactionUseCases"],
-            matchingUseCase.reactionUseCases
-              ? Immutable.fromJS(matchingUseCase.reactionUseCases)
-              : Immutable.List()
           );
       }
 

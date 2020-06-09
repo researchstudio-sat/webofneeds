@@ -61,26 +61,8 @@ export function getMatchedUseCaseIdentifier(atom) {
   return getIn(atom, ["matchedUseCase", "identifier"]);
 }
 
-export function getReactionUseCases(atom) {
-  return getIn(atom, ["matchedUseCase", "reactionUseCases"]);
-}
-
 export function getReactions(atom, socketType) {
   return getIn(atom, ["matchedUseCase", "reactions", socketType]);
-}
-
-export function hasReactionUseCases(atom) {
-  const reactionUseCases = getReactionUseCases(atom);
-  return !!reactionUseCases && reactionUseCases.size > 0;
-}
-
-export function getEnabledUseCases(atom) {
-  return getIn(atom, ["matchedUseCase", "enabledUseCases"]);
-}
-
-export function hasEnabledUseCases(atom) {
-  const enabledUseCases = getEnabledUseCases(atom);
-  return !!enabledUseCases && enabledUseCases.size > 0;
 }
 
 export function hasMatchedUseCase(atom) {

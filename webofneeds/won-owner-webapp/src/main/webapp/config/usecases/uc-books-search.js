@@ -25,13 +25,6 @@ export const booksSearch = {
       [vocab.CHAT.ChatSocketCompacted]: ["booksOffer"],
     },
   },
-  reactionUseCases: [
-    {
-      identifier: "booksOffer",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
   seeksDetails: {
     title: { ...details.title, mandatory: true },
     author: { ...details.author },

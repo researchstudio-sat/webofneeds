@@ -40,13 +40,6 @@ export const jobSearch = {
       [vocab.CHAT.ChatSocketCompacted]: ["jobOffer"],
     },
   },
-  reactionUseCases: [
-    {
-      identifier: "jobOffer",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
   details: {
     title: { ...details.title },
     description: { ...details.description },

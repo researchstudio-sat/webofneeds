@@ -71,7 +71,7 @@ const useCaseGroups = {
   other: otherGroup,
 };
 
-// add useCases here that should not be visible in the grouped useCases (will be hidden and only accessible through reaction and enabledUseCases
+// add useCases here that should not be visible in the grouped useCases (will be hidden and only accessible through reactions
 export const hiddenUseCases = {
   pokemonGoRaid: pokemonGoRaid,
   lunchPlan: lunchPlan,

@@ -41,13 +41,6 @@ export const rehearsalRoomOffer = {
       [vocab.CHAT.ChatSocketCompacted]: ["rehearsalRoomSearch"],
     },
   },
-  reactionUseCases: [
-    {
-      identifier: "rehearsalRoomSearch",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
   details: {
     title: { ...details.title },
     description: { ...details.description },

@@ -29,13 +29,6 @@ export const handleComplaint = {
       [vocab.CHAT.ChatSocketCompacted]: ["complain"],
     },
   },
-  reactionUseCases: [
-    {
-      identifier: "complain",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
   details: {
     title: { ...details.title },
     description: { ...details.description },

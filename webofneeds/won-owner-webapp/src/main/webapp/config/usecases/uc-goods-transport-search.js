@@ -31,14 +31,6 @@ export const goodsTransportSearch = {
       [vocab.CHAT.ChatSocketCompacted]: ["goodsTransportOffer"],
     },
   },
-  enabledUseCases: undefined,
-  reactionUseCases: [
-    {
-      identifier: "goodsTransportOffer",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
   details: {
     title: { ...details.title },
     content: {

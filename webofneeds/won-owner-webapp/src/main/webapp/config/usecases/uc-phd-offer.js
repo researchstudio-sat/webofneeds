@@ -27,13 +27,6 @@ export const phdOffer = {
       [vocab.CHAT.ChatSocketCompacted]: ["phdSearch"],
     },
   },
-  reactionUseCases: [
-    {
-      identifier: "phdSearch",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
   details: {
     title: { ...details.title },
     description: { ...details.description },

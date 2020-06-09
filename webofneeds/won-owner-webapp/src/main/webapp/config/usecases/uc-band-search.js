@@ -37,13 +37,6 @@ export const bandSearch = {
       [vocab.CHAT.ChatSocketCompacted]: ["musicianSearch"],
     },
   },
-  reactionUseCases: [
-    {
-      identifier: "musicianSearch",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
   details: {
     title: { ...details.title },
     description: { ...details.description },

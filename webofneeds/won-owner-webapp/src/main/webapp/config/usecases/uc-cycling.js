@@ -33,13 +33,6 @@ export const cyclingPlan = {
       [vocab.CHAT.ChatSocketCompacted]: ["cyclingInterest"],
     },
   },
-  reactionUseCases: [
-    {
-      identifier: "cyclingInterest",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.GROUP.GroupSocketCompacted,
-    },
-  ],
   details: {
     title: { ...details.title },
     description: { ...details.description },
@@ -121,20 +114,6 @@ export const cyclingInterest = {
       [vocab.GROUP.GroupSocketCompacted]: ["cyclingPlan"],
     },
   },
-  enabledUseCases: [
-    {
-      identifier: "cyclingPlan",
-      senderSocketType: vocab.GROUP.GroupSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
-  reactionUseCases: [
-    {
-      identifier: "cyclingPlan",
-      senderSocketType: vocab.GROUP.GroupSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
   details: {
     title: { ...details.title },
     description: { ...details.description },

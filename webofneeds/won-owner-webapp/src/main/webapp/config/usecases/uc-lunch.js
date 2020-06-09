@@ -33,13 +33,6 @@ export const lunchPlan = {
       [vocab.CHAT.ChatSocketCompacted]: ["lunchInterest"],
     },
   },
-  reactionUseCases: [
-    {
-      identifier: "lunchInterest",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.GROUP.GroupSocketCompacted,
-    },
-  ],
   details: {
     title: { ...details.title },
     description: { ...details.description },
@@ -121,20 +114,6 @@ export const lunchInterest = {
       [vocab.GROUP.GroupSocketCompacted]: ["lunchPlan"],
     },
   },
-  enabledUseCases: [
-    {
-      identifier: "lunchPlan",
-      senderSocketType: vocab.GROUP.GroupSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
-  reactionUseCases: [
-    {
-      identifier: "lunchPlan",
-      senderSocketType: vocab.GROUP.GroupSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
   details: {
     title: { ...details.title },
     description: { ...details.description },
