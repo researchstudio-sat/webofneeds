@@ -44,11 +44,7 @@ export default function WonAtomMenu({ atom, defaultTab }) {
   const atomFailedToLoad =
     atom && processUtils.hasAtomFailedToLoad(process, atomUri);
   const shouldShowRdf = viewUtils.showRdf(viewState);
-  const socketTypeArray = isOwned
-    ? getSocketTypeArray(atom)
-    : getSocketTypeArray(atom).filter(
-        socketType => socketType !== vocab.CHAT.ChatSocketCompacted
-      ); //filter the chat Socket so we do not display it as a menu item for non owned atoms
+  const socketTypeArray = getSocketTypeArray(atom);
 
   const visibleTab = viewUtils.getVisibleTabByAtomUri(
     viewState,
