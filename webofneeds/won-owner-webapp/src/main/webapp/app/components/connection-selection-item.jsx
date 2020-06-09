@@ -23,6 +23,7 @@ export default function WonConnectionSelectionItem({
   senderAtom,
   connection,
   toLink,
+  flip,
 }) {
   const history = useHistory();
   const dispatch = useDispatch();
@@ -275,7 +276,11 @@ export default function WonConnectionSelectionItem({
       ) : (
         <div />
       )}
-      <WonConnectionHeader connection={connection} toLink={toLink} />
+      <WonConnectionHeader
+        connection={connection}
+        toLink={toLink}
+        flip={flip}
+      />
       {closeButton}
     </div>
   );
@@ -317,4 +322,5 @@ WonConnectionSelectionItem.propTypes = {
   senderAtom: PropTypes.object,
   connection: PropTypes.object.isRequired,
   toLink: PropTypes.string,
+  flip: PropTypes.bool,
 };

@@ -24,12 +24,15 @@ export default function WonBuddyItem({
   atom,
   isOwned,
   targetAtom,
+  flip,
 }) {
   const atomUri = get(atom, "uri");
 
   const hasBuddySocket = atomUtils.hasBuddySocket(atom);
+  const addActionButtons = isOwned || flip;
   const chatConnections =
-    isOwned && atomUtils.getConnections(atom, vocab.CHAT.ChatSocketCompacted);
+    addActionButtons &&
+    atomUtils.getConnections(atom, vocab.CHAT.ChatSocketCompacted);
 
   const hasChatConnections = chatConnections && chatConnections.size > 0;
   const chatConnectionsArray = chatConnections && chatConnections.toArray();
@@ -76,7 +79,7 @@ export default function WonBuddyItem({
   }
 
   function requestBuddy(targetAtomUri, message = "") {
-    if (!isOwned || !hasBuddySocket) {
+    if (!addActionButtons || !hasBuddySocket) {
       console.warn("Trying to request a non-owned or non buddySocket atom");
       return;
     }
@@ -218,15 +221,15 @@ export default function WonBuddyItem({
     }
   }
 
-  if (!isOwned) {
+  if (!addActionButtons) {
     return (
       <div className="si ">
         <WonAtomContextSwipeableView
-          atom={targetAtom}
+          atom={flip ? atom : targetAtom}
           toLink={generateLink(
             history.location,
             {
-              postUri: get(targetAtom, "uri"),
+              postUri: flip ? get(atom, "uri") : get(targetAtom, "uri"),
             },
             "/post"
           )}
@@ -294,12 +297,16 @@ export default function WonBuddyItem({
       //TODO: Check chat socket connection
       actionButtons = (
         <div className="si__actions">
-          <svg
-            className="si__actions__icon primary won-icon"
-            onClick={() => sendChatMessage(connection)}
-          >
-            <use xlinkHref={ico36_message} href={ico36_message} />
-          </svg>
+          {!flip ? (
+            <svg
+              className="si__actions__icon primary won-icon"
+              onClick={() => sendChatMessage(connection)}
+            >
+              <use xlinkHref={ico36_message} href={ico36_message} />
+            </svg>
+          ) : (
+            undefined
+          )}
           <svg
             className="si__actions__icon secondary won-icon"
             onClick={() => closeConnection(connection)}
@@ -332,11 +339,11 @@ export default function WonBuddyItem({
           <WonAtomContextSwipeableView
             className={headerClassName}
             actionButtons={actionButtons}
-            atom={targetAtom}
+            atom={flip ? atom : targetAtom}
             toLink={generateLink(
               history.location,
               {
-                postUri: get(targetAtom, "uri"),
+                postUri: flip ? get(atom, "uri") : get(targetAtom, "uri"),
               },
               "/post"
             )}
@@ -351,4 +358,5 @@ WonBuddyItem.propTypes = {
   atom: PropTypes.object.isRequired,
   isOwned: PropTypes.bool.isRequired,
   targetAtom: PropTypes.object.isRequired,
+  flip: PropTypes.bool,
 };

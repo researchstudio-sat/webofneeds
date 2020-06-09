@@ -20,10 +20,12 @@ export default function WonGenericItem({
   atom,
   isOwned,
   targetAtom,
+  flip,
 }) {
   const dispatch = useDispatch();
   const history = useHistory();
 
+  const addActionButtons = isOwned || flip;
   let actionButtons;
   let headerClassName;
 
@@ -162,7 +164,7 @@ export default function WonGenericItem({
   switch (get(connection, "state")) {
     case vocab.WON.RequestReceived:
       headerClassName = "status--received";
-      actionButtons = isOwned ? (
+      actionButtons = addActionButtons ? (
         <div className="si__actions">
           <svg
             className="si__actions__icon request won-icon"
@@ -184,7 +186,7 @@ export default function WonGenericItem({
 
     case vocab.WON.RequestSent:
       headerClassName = "status--sent";
-      actionButtons = isOwned ? (
+      actionButtons = addActionButtons ? (
         <div className="si__actions">
           <svg className="si__actions__icon disabled won-icon" disabled={true}>
             <use xlinkHref={ico36_outgoing} href={ico36_outgoing} />
@@ -202,7 +204,7 @@ export default function WonGenericItem({
       break;
 
     case vocab.WON.Connected:
-      actionButtons = isOwned ? (
+      actionButtons = addActionButtons ? (
         <div className="si__actions">
           <svg
             className="si__actions__icon secondary won-icon"
@@ -218,7 +220,7 @@ export default function WonGenericItem({
 
     case vocab.WON.Closed:
       headerClassName = "status--closed";
-      actionButtons = isOwned ? (
+      actionButtons = addActionButtons ? (
         <div className="si__actions">Connection has been closed</div>
       ) : (
         undefined
@@ -227,7 +229,7 @@ export default function WonGenericItem({
 
     case vocab.WON.Suggested:
       headerClassName = "status--suggested";
-      actionButtons = isOwned ? (
+      actionButtons = addActionButtons ? (
         <div className="si__actions">
           <svg
             className="si__actions__icon request won-icon"
@@ -248,7 +250,7 @@ export default function WonGenericItem({
       break;
 
     default:
-      actionButtons = isOwned ? (
+      actionButtons = addActionButtons ? (
         <div className="si__actions">Unknown State</div>
       ) : (
         undefined
@@ -273,11 +275,13 @@ export default function WonGenericItem({
         <WonAtomContextSwipeableView
           className={headerClassName}
           actionButtons={actionButtons}
-          atom={targetAtom}
+          atom={flip ? atom : targetAtom}
           toLink={generateLink(
             history.location,
             {
-              postUri: get(connection, "targetAtomUri"),
+              postUri: flip
+                ? get(atom, "uri")
+                : get(connection, "targetAtomUri"),
             },
             "/post"
           )}
@@ -291,4 +295,5 @@ WonGenericItem.propTypes = {
   atom: PropTypes.object.isRequired,
   isOwned: PropTypes.bool.isRequired,
   targetAtom: PropTypes.object.isRequired,
+  flip: PropTypes.bool,
 };

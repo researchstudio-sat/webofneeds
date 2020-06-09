@@ -28,18 +28,31 @@ import "~/style/_connection-indicators.scss";
 
 import ico36_incoming from "~/images/won-icons/ico36_incoming.svg";
 
-export default function WonConnectionHeader({ connection, toLink }) {
+export default function WonConnectionHeader({ connection, toLink, flip }) {
   const connectionUri = get(connection, "uri");
   const history = useHistory();
   const dispatch = useDispatch();
-  const senderAtom = useSelector(
-    generalSelectors.getOwnedAtomByConnectionUri(connectionUri)
+
+  const senderAtomUri = flip
+    ? get(connection, "targetAtomUri")
+    : connectionUri.split("/c")[0];
+  const targetAtomUri = flip
+    ? connectionUri.split("/c")[0]
+    : get(connection, "targetAtomUri");
+
+  const senderAtom = useSelector(state =>
+    getIn(state, ["atoms", senderAtomUri])
+  );
+  const targetAtom = useSelector(state =>
+    getIn(state, ["atoms", targetAtomUri])
   );
 
-  const targetAtomUri = get(connection, "targetAtomUri");
-  const targetAtom = useSelector(state =>
-    get(generalSelectors.getAtoms(state), targetAtomUri)
-  );
+  const isDirectResponseFromRemote = atomUtils.isDirectResponseAtom(targetAtom);
+
+  const responseToUri =
+    isDirectResponseFromRemote &&
+    getIn(targetAtom, ["content", "responseToUri"]);
+  const responseToAtom = useSelector(generalSelectors.getAtom(responseToUri));
 
   const targetHolderName = useSelector(state =>
     getIn(state, ["atoms", atomUtils.getHeldByUri(targetAtom), "humanReadble"])
@@ -75,8 +88,6 @@ export default function WonConnectionHeader({ connection, toLink }) {
 
   const isConnectionToGroup =
     atomUtils.getGroupSocket(targetAtom) === get(connection, "targetSocketUri");
-
-  const isDirectResponseFromRemote = atomUtils.isDirectResponseAtom(targetAtom);
 
   const globalLastUpdateTime = useSelector(
     generalSelectors.selectLastUpdateTime
@@ -236,7 +247,9 @@ export default function WonConnectionHeader({ connection, toLink }) {
       } else {
         headerRightToplineContent = (
           <div className="ch__right__topline__notitle" title="Direct Response">
-            Direct Response
+            {responseToAtom
+              ? "Re: " + get(responseToAtom, "humanReadable")
+              : get(targetAtom, "humandReadable")}
           </div>
         );
       }
@@ -355,4 +368,5 @@ export default function WonConnectionHeader({ connection, toLink }) {
 WonConnectionHeader.propTypes = {
   connection: PropTypes.object.isRequired,
   toLink: PropTypes.string,
+  flip: PropTypes.bool,
 };

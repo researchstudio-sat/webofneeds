@@ -23,10 +23,12 @@ export default function WonParticipantItem({
   atom,
   isOwned,
   targetAtom,
+  flip,
 }) {
   const history = useHistory();
   const dispatch = useDispatch();
   const atomUri = get(atom, "uri");
+  const addActionButtons = isOwned || flip;
 
   function closeConnection(conn, dialogText = "Remove Participant?") {
     if (!conn) {
@@ -159,7 +161,7 @@ export default function WonParticipantItem({
     }
   }
 
-  if (isOwned) {
+  if (addActionButtons) {
     if (!connectionUtils.isClosed(connection)) {
       let actionButtons;
       let headerClassName;
@@ -263,11 +265,11 @@ export default function WonParticipantItem({
             <WonAtomContextSwipeableView
               className={headerClassName}
               actionButtons={actionButtons}
-              atom={targetAtom}
+              atom={flip ? atom : targetAtom}
               toLink={generateLink(
                 history.location,
                 {
-                  postUri: get(connection, "targetAtomUri"),
+                  postUri: flip ? get(atom, "uri") : get(targetAtom, "uri"),
                 },
                 "/post"
               )}
@@ -280,11 +282,11 @@ export default function WonParticipantItem({
     return (
       <div className="si">
         <WonAtomContextSwipeableView
-          atom={targetAtom}
+          atom={flip ? atom : targetAtom}
           toLink={generateLink(
             history.location,
             {
-              postUri: get(connection, "targetAtomUri"),
+              postUri: flip ? get(atom, "uri") : get(targetAtom, "uri"),
             },
             "/post"
           )}
