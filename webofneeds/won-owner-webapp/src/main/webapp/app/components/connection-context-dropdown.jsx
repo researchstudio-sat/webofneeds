@@ -151,6 +151,7 @@ export default function WonConnectionContextDropdown({
                 history.location,
                 {
                   postUri: targetAtomUri,
+                  connectionUri: undefined,
                 },
                 "/post"
               )
