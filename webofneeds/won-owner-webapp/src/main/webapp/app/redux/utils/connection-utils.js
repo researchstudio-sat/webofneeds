@@ -35,17 +35,22 @@ export function isUnread(connection) {
 
 export function hasSocketUris(connection, socketUri, targetSocketUri) {
   return (
-    !!socketUri &&
-    !!targetSocketUri &&
-    !!connection &&
-    get(connection, "socketUri") === socketUri &&
-    get(connection, "targetSocketUri") === targetSocketUri
+    hasSocketUri(connection, socketUri) &&
+    hasTargetSocketUri(connection, targetSocketUri)
   );
 }
 
 export function hasSocketUri(connection, socketUri) {
   return (
     !!connection && !!socketUri && get(connection, "socketUri") === socketUri
+  );
+}
+
+export function hasTargetSocketUri(connection, socketUri) {
+  return (
+    !!connection &&
+    !!socketUri &&
+    get(connection, "targetSocketUri") === socketUri
   );
 }
 

@@ -106,6 +106,18 @@ export const getOwnedPosts = createSelector(
     )
 );
 
+export const getAllOwnedConnectionsWithTargetSocketUri = targetSocketUri =>
+  createSelector(
+    getOwnedAtoms,
+    allOwnedAtoms =>
+      allOwnedAtoms &&
+      allOwnedAtoms
+        .filter(atom => atomUtils.isActive(atom))
+        .flatMap(atom =>
+          atomUtils.getAllConnectionsWithTargetSocketUri(atom, targetSocketUri)
+        )
+  );
+
 export const getAllChatConnections = createSelector(
   getOwnedAtoms,
   allOwnedAtoms =>

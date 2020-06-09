@@ -668,6 +668,14 @@ export function getAllNonClosedNonSuggestedChatConnections(atomImm) {
     : Immutable.Map();
 }
 
+export function getAllConnectionsWithTargetSocketUri(atomImm, targetSocketUri) {
+  return atomImm
+    ? get(atomImm, "connections").filter(conn =>
+        connectionUtils.hasTargetSocketUri(conn, targetSocketUri)
+      )
+    : Immutable.Map();
+}
+
 export function getAllConnectedChatAndGroupConnections(atomImm) {
   const groupSocketUri = getGroupSocket(atomImm);
   const chatSocketUri = getChatSocket(atomImm);
