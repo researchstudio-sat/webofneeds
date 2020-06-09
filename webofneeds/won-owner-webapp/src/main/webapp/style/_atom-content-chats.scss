@@ -68,6 +68,42 @@ won-atom-content-chats {
         border-top: $thinGrayBorder;
       }
 
+      & > .socketadd {
+        background: $won-light-gray;
+        padding: 0.5rem;
+        cursor: pointer;
+        display: grid;
+        grid-template-areas: "icon main";
+        grid-template-columns: min-content 1fr;
+        grid-gap: 0.5rem;
+        align-items: center;
+        box-sizing: border-box;
+        min-width: 0;
+
+        &:hover {
+          .socketadd__label {
+            color: $won-primary-color;
+          }
+
+          .socketadd__icon {
+            --local-primary: #{$won-primary-color};
+          }
+        }
+
+        .socketadd__label {
+          color: $won-line-gray;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+
+        .socketadd__icon {
+          @include fixed-square($postIconSize);
+          --local-primary: #{$won-line-gray};
+        }
+      }
+
+      & > .socketadd,
       .acc__item {
         border-right: $thinGrayBorder;
         border-left: $thinGrayBorder;
