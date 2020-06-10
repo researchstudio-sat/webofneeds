@@ -49,9 +49,10 @@ export default function WonCombinedMessageContent({
       ? originatorUri
       : get(connection, "targetAtomUri");
     const relevantAtom = get(allAtoms, relevantAtomUri);
-    const relevantPersona = atomUtils.isPersona(relevantAtom)
-      ? relevantAtom
-      : get(allAtoms, atomUtils.getHeldByUri(relevantAtom));
+    const relevantPersona =
+      atomUtils.isPersona(relevantAtom) || atomUtils.isServiceAtom(relevantAtom)
+        ? relevantAtom
+        : get(allAtoms, atomUtils.getHeldByUri(relevantAtom));
 
     personaName = relevantPersona
       ? get(relevantPersona, "humanReadable")

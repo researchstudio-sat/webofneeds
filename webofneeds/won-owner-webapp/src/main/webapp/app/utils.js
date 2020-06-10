@@ -2529,6 +2529,3 @@ const adjectives = [
   "Yummy",
   "Zany",
 ];
-
-window.generateIdString4dbg = generateIdString;
-window.generateFakePersonaName4dbg = generateFakePersonaName;

@@ -23,7 +23,7 @@ export default function WonAtomIcon({ atom, className, onClick, flipIcons }) {
   let mainIconAtom;
   let subIconAtom;
 
-  if (atomUtils.isPersona(atom)) {
+  if (atomUtils.isPersona(atom) || atomUtils.isServiceAtom(atom)) {
     mainIconAtom = atom;
     subIconAtom = undefined;
   } else {

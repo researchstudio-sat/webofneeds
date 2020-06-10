@@ -422,7 +422,7 @@ export default function WonSocketAddAtom({
 WonSocketAddAtom.propTypes = {
   addToAtom: PropTypes.object.isRequired,
   addToSocketType: PropTypes.string.isRequired,
-  reactions: PropTypes.object.isRequired,
+  reactions: PropTypes.object,
   storedAtoms: PropTypes.object.isRequired,
   accountState: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
