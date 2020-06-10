@@ -192,6 +192,7 @@ export default function WonAtomContent({ atom, defaultTab }) {
             atom={atom}
             socketType={visibleTab}
             ItemComponent={WonBuddyItem}
+            refuseOwned={isOwned}
           />
         );
         break;
@@ -212,7 +213,11 @@ export default function WonAtomContent({ atom, defaultTab }) {
 
       case vocab.CHAT.ChatSocketCompacted:
         visibleTabFragment = (
-          <WonAtomContentChats atom={atom} allowAdHoc={!isOwned} />
+          <WonAtomContentChats
+            atom={atom}
+            allowAdHoc={!isOwned}
+            refuseOwned={isOwned}
+          />
         );
         break;
 

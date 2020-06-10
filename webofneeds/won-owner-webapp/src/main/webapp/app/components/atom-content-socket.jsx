@@ -30,6 +30,7 @@ export default function WonAtomContentSocket({
   socketType,
   ItemComponent,
   allowAdHoc,
+  refuseOwned,
 }) {
   const accountState = useSelector(generalSelectors.getAccountState);
   const isAtomOwned = accountUtils.isAtomOwned(accountState, get(atom, "uri"));
@@ -303,6 +304,7 @@ export default function WonAtomContentSocket({
           storedAtoms={filteredStoredAtoms}
           addToSocketType={socketType}
           allowAdHoc={allowAdHoc}
+          refuseOwned={refuseOwned}
           reactions={reactions}
           accountState={accountState}
           onClose={() => toggleAddPicker(!showAddPicker)}
@@ -319,4 +321,5 @@ WonAtomContentSocket.propTypes = {
   socketType: PropTypes.string.isRequired,
   ItemComponent: PropTypes.func.isRequired,
   allowAdHoc: PropTypes.bool,
+  refuseOwned: PropTypes.bool,
 };
