@@ -282,8 +282,7 @@ export function connectionsConnectReactionAtom(
   atomDraft,
   persona,
   connectToSocketType,
-  atomDraftSocketType,
-  history
+  atomDraftSocketType
 ) {
   return (dispatch, getState) =>
     connectReactionAtom(
@@ -292,7 +291,6 @@ export function connectionsConnectReactionAtom(
       persona,
       connectToSocketType,
       atomDraftSocketType,
-      history,
       dispatch,
       getState
     ); // moved to separate function to make transpilation work properly
@@ -304,7 +302,6 @@ function connectReactionAtom(
   personaUri,
   connectToSocketType,
   atomDraftSocketType,
-  history,
   dispatch,
   getState
 ) {
@@ -330,8 +327,6 @@ function connectReactionAtom(
             atom: atomDraft,
           },
         });
-
-        history.push("/connections");
       })
       .then(() => {
         // add persona if present

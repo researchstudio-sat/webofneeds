@@ -1,21 +1,27 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { actionCreators } from "../actions/actions.js";
 import { useDispatch } from "react-redux";
-import ico36_close from "~/images/won-icons/ico36_close.svg";
-import ico36_plus from "~/images/won-icons/ico36_plus.svg";
+import { Link, useHistory } from "react-router-dom";
 
-import { sortBy, get } from "../utils.js";
+import { sortBy, get, generateLink } from "../utils.js";
+import vocab from "../service/vocab.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as wonLabelUtils from "../won-label-utils.js";
 import * as useCaseUtils from "../usecase-utils.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
 
+import WonLabelledHr from "./labelled-hr.jsx";
+import ChatTextfield from "./chat-textfield.jsx";
 import WonAtomHeader from "./atom-header.jsx";
-import "~/style/_socket-add-atom.scss";
-import { actionCreators } from "../actions/actions.js";
 
-import { Link } from "react-router-dom";
-import { generateLink } from "../utils";
+import ico36_close from "~/images/won-icons/ico36_close.svg";
+import ico36_plus from "~/images/won-icons/ico36_plus.svg";
+
+import "~/style/_socket-add-atom.scss";
+
+import Immutable from "immutable";
 
 export default function WonSocketAddAtom({
   addToAtom,
@@ -24,8 +30,10 @@ export default function WonSocketAddAtom({
   reactions,
   accountState,
   onClose,
+  allowAdHoc,
 }) {
   const dispatch = useDispatch();
+  const history = useHistory();
   const addToAtomUri = get(addToAtom, "uri");
   const addToAtomSocketUri = atomUtils.getSocketUri(addToAtom, addToSocketType);
   const isAddToAtomOwned = accountUtils.isAtomOwned(accountState, addToAtomUri);
@@ -205,6 +213,111 @@ export default function WonSocketAddAtom({
     }
   }
 
+  function sendAdHocRequest(message, targetSocketUri, personaUri) {
+    if (accountUtils.isLoggedIn(accountState)) {
+      if (addToAtomUri) {
+        const personaAtom = get(storedAtoms, personaUri);
+
+        if (personaAtom) {
+          // if the personaAtom already contains a chatSocket we will just use the persona as the Atom that connects
+          const senderSocketUri = atomUtils.getChatSocket(personaAtom);
+          const personaConnection = atomUtils.getConnectionBySocketUris(
+            personaAtom,
+            senderSocketUri,
+            targetSocketUri
+          );
+
+          if (!personaConnection) {
+            dispatch(
+              actionCreators.atoms__connectSockets(
+                senderSocketUri,
+                targetSocketUri,
+                message
+              )
+            );
+            history.push("/connections");
+          } else if (personaConnection) {
+            const personaConnectionUri = get(personaConnection, "uri");
+
+            if (
+              connectionUtils.isSuggested(personaConnection) ||
+              connectionUtils.isClosed(personaConnection)
+            ) {
+              dispatch(
+                actionCreators.atoms__connectSockets(
+                  senderSocketUri,
+                  targetSocketUri,
+                  message
+                )
+              );
+            } else if (connectionUtils.isRequestReceived(personaConnection)) {
+              dispatch(
+                actionCreators.atoms__connectSockets(
+                  senderSocketUri,
+                  targetSocketUri,
+                  message
+                )
+              );
+            } else if (
+              connectionUtils.isConnected(personaConnection) &&
+              message
+            ) {
+              dispatch(
+                actionCreators.connections__sendChatMessage(
+                  message,
+                  undefined,
+                  undefined,
+                  senderSocketUri,
+                  targetSocketUri,
+                  personaConnectionUri,
+                  false
+                )
+              );
+            }
+            // For status RequestSent and Connected(without a message) we simply view the go to the connection
+
+            history.push(
+              generateLink(
+                history.location,
+                {
+                  connectionUri: personaConnectionUri,
+                },
+                "/connections"
+              )
+            );
+          }
+        } else {
+          history.push("/connections");
+
+          dispatch(
+            actionCreators.connections__connectAdHoc(targetSocketUri, message)
+          );
+        }
+      }
+    } else {
+      dispatch(
+        actionCreators.view__showTermsDialog(
+          Immutable.fromJS({
+            acceptCallback: () => {
+              dispatch(actionCreators.view__hideModalDialog());
+              history.push("/connections");
+
+              dispatch(
+                actionCreators.connections__connectAdHoc(
+                  targetSocketUri,
+                  message
+                )
+              );
+            },
+            cancelCallback: () => {
+              dispatch(actionCreators.view__hideModalDialog());
+            },
+          })
+        )
+      );
+    }
+  }
+
   return (
     <won-socket-add-atom>
       <div className="wsaa__header">
@@ -279,6 +392,30 @@ export default function WonSocketAddAtom({
           </Link>
         ))}
       </div>
+      {allowAdHoc ? (
+        <React.Fragment>
+          <WonLabelledHr label="Or" />
+          <ChatTextfield
+            placeholder="Message (optional)"
+            allowEmptySubmit={true}
+            showPersonas={true}
+            submitButtonLabel={
+              addToSocketType === vocab.CHAT.ChatSocketCompacted
+                ? "Ask to Chat"
+                : "Join Group"
+            }
+            onSubmit={({ value, selectedPersona }) =>
+              sendAdHocRequest(
+                value,
+                atomUtils.getSocketUri(addToAtom, addToSocketType),
+                selectedPersona && selectedPersona.personaId
+              )
+            }
+          />
+        </React.Fragment>
+      ) : (
+        undefined
+      )}
     </won-socket-add-atom>
   );
 }
@@ -289,4 +426,5 @@ WonSocketAddAtom.propTypes = {
   storedAtoms: PropTypes.object.isRequired,
   accountState: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
+  allowAdHoc: PropTypes.bool,
 };

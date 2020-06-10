@@ -181,6 +181,7 @@ export default function WonAtomContent({ atom, defaultTab }) {
             atom={atom}
             socketType={visibleTab}
             ItemComponent={WonParticipantItem}
+            allowAdHoc={true}
           />
         );
         break;
@@ -210,7 +211,9 @@ export default function WonAtomContent({ atom, defaultTab }) {
         break;
 
       case vocab.CHAT.ChatSocketCompacted:
-        visibleTabFragment = <WonAtomContentChats atom={atom} />;
+        visibleTabFragment = (
+          <WonAtomContentChats atom={atom} allowAdHoc={true} />
+        );
         break;
 
       case "RDF":

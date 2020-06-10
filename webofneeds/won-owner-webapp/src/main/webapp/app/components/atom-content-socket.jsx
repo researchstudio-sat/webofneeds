@@ -29,6 +29,7 @@ export default function WonAtomContentSocket({
   atom,
   socketType,
   ItemComponent,
+  allowAdHoc,
 }) {
   const accountState = useSelector(generalSelectors.getAccountState);
   const isAtomOwned = accountUtils.isAtomOwned(accountState, get(atom, "uri"));
@@ -153,7 +154,7 @@ export default function WonAtomContentSocket({
   }
 
   function generateAddItem() {
-    if (reactions && atomUtils.isActive(atom)) {
+    if (atomUtils.isActive(atom) && (reactions || allowAdHoc)) {
       const onClick = () => {
         toggleAddPicker(!showAddPicker);
       };
@@ -295,6 +296,7 @@ export default function WonAtomContentSocket({
           addToAtom={atom}
           storedAtoms={filteredStoredAtoms}
           addToSocketType={socketType}
+          allowAdHoc={allowAdHoc}
           reactions={reactions}
           accountState={accountState}
           onClose={() => toggleAddPicker(!showAddPicker)}
@@ -310,5 +312,5 @@ WonAtomContentSocket.propTypes = {
   atom: PropTypes.object.isRequired,
   socketType: PropTypes.string.isRequired,
   ItemComponent: PropTypes.func.isRequired,
-  suggestPicker: PropTypes.object,
+  allowAdHoc: PropTypes.bool,
 };

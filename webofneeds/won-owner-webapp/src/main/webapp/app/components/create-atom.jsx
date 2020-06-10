@@ -22,6 +22,7 @@ import ElmReact from "./elm-react.jsx";
 import { Elm } from "../../elm/PublishButton.elm";
 import { actionCreators } from "../actions/actions";
 import { useHistory } from "react-router-dom";
+import vocab from "../service/vocab";
 
 export default function WonCreateAtom({
   fromAtom,
@@ -125,11 +126,14 @@ export default function WonCreateAtom({
             tempDraft,
             personaId,
             targetSocketType,
-            senderSocketType,
-            history
+            senderSocketType
           )
         );
-        history.push("/connections"); //TODO: PUSH TO PAGE DEPENDING ON CONNECTED SOCKETTYPES/ATOM
+        if (senderSocketType === vocab.CHAT.ChatSocketCompacted) {
+          history.push("/connections"); //TODO: PUSH TO PAGE DEPENDING ON CONNECTED SOCKETTYPES/ATOM
+        } else {
+          history.goBack();
+        }
       };
     } else {
       executeFunction = () => {

@@ -25,7 +25,7 @@ import ico36_plus from "~/images/won-icons/ico36_plus.svg";
 
 import "~/style/_atom-content-chats.scss";
 
-export default function AtomContentChats({ atom }) {
+export default function AtomContentChats({ atom, allowAdHoc }) {
   const history = useHistory();
   const chatSocketUri = atomUtils.getChatSocket(atom);
 
@@ -129,7 +129,7 @@ export default function AtomContentChats({ atom }) {
   }
 
   function generateAddItem() {
-    if (reactions && atomUtils.isActive(atom)) {
+    if (atomUtils.isActive(atom) && (reactions || allowAdHoc)) {
       const onClick = () => {
         toggleAddPicker(!showAddPicker);
       };
@@ -231,6 +231,7 @@ export default function AtomContentChats({ atom }) {
           addToAtom={atom}
           storedAtoms={filteredStoredAtoms}
           addToSocketType={vocab.CHAT.ChatSocketCompacted}
+          allowAdHoc={allowAdHoc}
           reactions={reactions}
           accountState={accountState}
           onClose={() => toggleAddPicker(!showAddPicker)}
@@ -244,4 +245,5 @@ export default function AtomContentChats({ atom }) {
 
 AtomContentChats.propTypes = {
   atom: PropTypes.object.isRequired,
+  allowAdHoc: PropTypes.bool,
 };
