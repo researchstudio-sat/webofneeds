@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { getHeldByUri } from "./redux/utils/atom-utils.js";
 
 /**
  * Created by ksinger on 01.09.2015.
@@ -386,13 +387,15 @@ export function sortByDate(
  * @param allAtomsImm all stored Atoms in the state
  * @param value searchValue
  * @param includeSenderAtom if true, also searches in senderAtom
+ * @param includePersonas if true, also searches the attached Personas or the fakePersonaName within the atom
  * @returns {*}
  */
 export function filterConnectionsBySearchValue(
   connectionsImm,
   allAtomsImm,
   { value },
-  includeSenderAtom = false
+  includeSenderAtom = false,
+  includePersonas = false
 ) {
   const tempSearchText = value.trim();
 
@@ -403,16 +406,51 @@ export function filterConnectionsBySearchValue(
       const targetAtom = get(allAtomsImm, get(conn, "targetAtomUri"));
       const targetAtomTitle = get(targetAtom, "humanReadable") || "";
 
+      let found = false;
+
+      found = targetAtomTitle.search(regExp) !== -1;
+      if (found) {
+        return true;
+      }
+
+      if (includePersonas) {
+        const targetPersona = get(allAtomsImm, getHeldByUri(targetAtom));
+        const targetPersonaTitle =
+          get(targetPersona, "humanReadable") ||
+          get(targetAtom, "fakePersonaName") ||
+          "";
+
+        found = targetPersonaTitle.search(regExp) !== -1;
+
+        if (found) {
+          return true;
+        }
+      }
+
       if (includeSenderAtom) {
         const senderAtom = get(allAtomsImm, get(conn, "uri").split("/c")[0]);
         const senderAtomTitle = get(senderAtom, "humanReadable") || "";
 
-        return (
-          targetAtomTitle.search(regExp) !== -1 ||
-          senderAtomTitle.search(regExp) !== -1
-        );
+        found = senderAtomTitle.search(regExp) !== -1;
+        if (found) {
+          return true;
+        }
+
+        if (includePersonas) {
+          const senderPersona = get(allAtomsImm, getHeldByUri(senderAtom));
+          const senderPersonaTitle =
+            get(senderPersona, "humanReadable") ||
+            get(senderAtom, "fakePersonaName") ||
+            "";
+
+          found = senderPersonaTitle.search(regExp) !== -1;
+          if (found) {
+            return true;
+          }
+        }
       }
-      return targetAtomTitle.search(regExp) !== -1;
+
+      return false;
     });
   }
   return connectionsImm;

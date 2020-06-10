@@ -23,6 +23,7 @@ export default function WonConnectionsOverview() {
     useSelector(generalSelectors.getAllChatConnections),
     storedAtoms,
     searchText,
+    true,
     true
   );
 

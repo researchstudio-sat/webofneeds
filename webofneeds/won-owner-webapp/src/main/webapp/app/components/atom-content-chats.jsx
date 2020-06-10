@@ -61,7 +61,9 @@ export default function AtomContentChats({ atom, allowAdHoc, refuseOwned }) {
         )
       : ownedConnectionsToSocketUri,
     storedAtoms,
-    searchText
+    searchText,
+    false,
+    true
   );
 
   const activeChatConnections = chatConnections.filter(
