@@ -690,6 +690,8 @@ export function generateFakePersonaName(atomUri) {
     for (const char of atomUri.split("")) {
       hash = char.charCodeAt(0) + ((hash << 5) - hash);
     }
+
+    hash = hash < 0 ? hash * -1 : hash;
   }
 
   return (
@@ -2527,3 +2529,6 @@ const adjectives = [
   "Yummy",
   "Zany",
 ];
+
+window.generateIdString4dbg = generateIdString;
+window.generateFakePersonaName4dbg = generateFakePersonaName;
