@@ -192,7 +192,7 @@ export default function WonAtomContentSocket({
         />
       </div>
       {!showAddPicker ? (
-        activeConnections.size > 0 || reactions ? (
+        activeConnections.size > 0 || reactions || allowAdHoc ? (
           <div className="acs__segment">
             <div className="acs__segment__content">
               {generateConnectionItems(activeConnections)}

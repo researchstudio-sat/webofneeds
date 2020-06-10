@@ -163,7 +163,7 @@ export default function AtomContentChats({ atom, allowAdHoc }) {
         />
       </div>
       {!showAddPicker ? (
-        activeChatConnections.size > 0 || reactions ? (
+        activeChatConnections.size > 0 || reactions || allowAdHoc ? (
           <div className="acc__segment">
             <div className="acc__segment__content borderTop">
               {generateConnectionItems(activeChatConnections)}
