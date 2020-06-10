@@ -33,7 +33,7 @@ export default function WonAddBuddy({ atom, className }) {
       .filter(buddyAtom => get(buddyAtom, "uri") !== get(atom, "uri"));
 
   const immediateConnectBuddy =
-    ownedBuddyOptions.size == 1 ? ownedBuddyOptions.first() : undefined;
+    ownedBuddyOptions.size === 1 ? ownedBuddyOptions.first() : undefined;
   const ownedAtomsWithBuddySocketArray =
     ownedBuddyOptions && ownedBuddyOptions.toArray();
   const targetBuddySocketUri = atomUtils.getSocketUri(
@@ -95,11 +95,7 @@ export default function WonAddBuddy({ atom, className }) {
     dispatch(actionCreators.view__showModalDialog(payload));
   }
 
-  function connectBuddy(
-    selectedAtomUri,
-    existingBuddyConnection,
-    message = ""
-  ) {
+  function connectBuddy(selectedAtom, existingBuddyConnection, message = "") {
     const dialogText = connectionUtils.isRequestReceived(
       existingBuddyConnection
     )
@@ -115,30 +111,17 @@ export default function WonAddBuddy({ atom, className }) {
         {
           caption: "Yes",
           callback: () => {
-            if (connectionUtils.isRequestReceived(existingBuddyConnection)) {
-              const senderSocketUri = get(existingBuddyConnection, "socketUri");
-              const targetSocketUri = get(
-                existingBuddyConnection,
-                "targetSocketUri"
-              );
-              dispatch(
-                actionCreators.atoms__connectSockets(
-                  senderSocketUri,
-                  targetSocketUri,
-                  message
-                )
-              );
-            } else {
-              dispatch(
-                actionCreators.atoms__connect(
-                  selectedAtomUri,
-                  get(atom, "uri"),
-                  vocab.BUDDY.BuddySocketCompacted,
-                  vocab.BUDDY.BuddySocketCompacted,
-                  message
-                )
-              );
-            }
+            const senderSocketUri = atomUtils.getSocketUri(
+              selectedAtom,
+              vocab.BUDDY.BuddySocketCompacted
+            );
+            dispatch(
+              actionCreators.atoms__connectSockets(
+                senderSocketUri,
+                targetBuddySocketUri,
+                message
+              )
+            );
             dispatch(actionCreators.view__hideModalDialog());
           },
         },
@@ -164,8 +147,8 @@ export default function WonAddBuddy({ atom, className }) {
 
   let buddySelectionElement =
     ownedAtomsWithBuddySocketArray &&
-    ownedAtomsWithBuddySocketArray.map(atom => {
-      const existingBuddyConnection = get(atom, "connections").find(
+    ownedAtomsWithBuddySocketArray.map(buddyAtom => {
+      const existingBuddyConnection = get(buddyAtom, "connections").find(
         conn => get(conn, "targetSocketUri") === targetBuddySocketUri
       );
 
@@ -192,14 +175,14 @@ export default function WonAddBuddy({ atom, className }) {
         connectionStateClass = "received";
         connectionStateIcon = ico32_buddy_accept;
         onClickAction = () => {
-          connectBuddy(get(atom, "uri"), existingBuddyConnection);
+          connectBuddy(buddyAtom, existingBuddyConnection);
         };
       } else {
         // also includes suggested (BuddySocket)Connections
         connectionStateClass = "requestable";
         connectionStateIcon = ico32_buddy_add;
         onClickAction = () => {
-          connectBuddy(get(atom, "uri"), existingBuddyConnection);
+          connectBuddy(buddyAtom, existingBuddyConnection);
         };
       }
 
@@ -209,10 +192,10 @@ export default function WonAddBuddy({ atom, className }) {
             "add-buddy__addbuddymenu__content__selection__buddy " +
             connectionStateClass
           }
-          key={get(atom, "uri")}
+          key={get(buddyAtom, "uri")}
           onClick={onClickAction}
         >
-          <WonAtomHeader atom={atom} hideTimestamp={true} />
+          <WonAtomHeader atom={buddyAtom} hideTimestamp={true} />
           <svg className="add-buddy__addbuddymenu__content__selection__buddy__status">
             <use xlinkHref={connectionStateIcon} href={connectionStateIcon} />
           </svg>
@@ -279,10 +262,7 @@ export default function WonAddBuddy({ atom, className }) {
       connectionStateIcon = ico32_buddy_accept;
       connectionStateLabel = "Accept Buddy Request";
       onClickAction = () => {
-        connectBuddy(
-          get(immediateConnectBuddy, "uri"),
-          existingBuddyConnection
-        );
+        connectBuddy(immediateConnectBuddy, existingBuddyConnection);
       };
     } else {
       // also includes suggested (BuddySocket)Connections
@@ -290,10 +270,7 @@ export default function WonAddBuddy({ atom, className }) {
       connectionStateIcon = ico32_buddy_add;
       connectionStateLabel = "Add as Buddy";
       onClickAction = () => {
-        connectBuddy(
-          get(immediateConnectBuddy, "uri"),
-          existingBuddyConnection
-        );
+        connectBuddy(immediateConnectBuddy, existingBuddyConnection);
       };
     }
 

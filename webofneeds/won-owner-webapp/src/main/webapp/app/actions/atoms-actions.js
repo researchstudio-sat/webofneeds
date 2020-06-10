@@ -94,67 +94,6 @@ export function connectSockets(
   };
 }
 
-export function connectSocketTypes(
-  senderAtomUri,
-  targetAtomUri,
-  senderSocketType,
-  targetSocketType,
-  connectMessage
-) {
-  return (dispatch, getState) => {
-    const state = getState();
-    const senderAtom = generalSelectors.getAtom(senderAtomUri)(state);
-    const targetAtom = generalSelectors.getAtom(targetAtomUri)(state);
-
-    const senderSocketUri = atomUtils.getSocketUri(
-      senderAtom,
-      senderSocketType
-    );
-    const targetSocketUri = atomUtils.getSocketUri(
-      targetAtom,
-      targetSocketType
-    );
-
-    if (!senderSocketUri) {
-      throw new Error(
-        `Atom ${get(senderAtom, "uri")} does not have a ${senderSocketType}`
-      );
-    }
-
-    if (!targetSocketUri) {
-      throw new Error(
-        `Atom ${get(targetAtom, "uri")} does not have a ${targetSocketType}`
-      );
-    }
-
-    const cnctMsg = buildConnectMessage({
-      connectMessage: connectMessage,
-      socketUri: senderSocketUri,
-      targetSocketUri: targetSocketUri,
-    });
-
-    return ownerApi.sendMessage(cnctMsg).then(jsonResp =>
-      won
-        .wonMessageFromJsonLd(
-          jsonResp.message,
-          vocab.WONMSG.uriPlaceholder.event
-        )
-        .then(wonMessage =>
-          dispatch({
-            type: actionTypes.atoms.connectSockets,
-            payload: {
-              eventUri: jsonResp.messageUri,
-              message: jsonResp.message,
-              optimisticEvent: wonMessage,
-              senderSocketUri: senderSocketUri,
-              targetSocketUri: targetSocketUri,
-            },
-          })
-        )
-    );
-  };
-}
-
 export function close(atomUri) {
   return (dispatch, getState) => {
     buildCloseAtomMessage(atomUri)

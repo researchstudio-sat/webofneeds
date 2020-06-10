@@ -30,12 +30,6 @@ export default function WonBuddyItem({
 
   const hasBuddySocket = atomUtils.hasBuddySocket(atom);
   const addActionButtons = isOwned || flip;
-  const chatConnections =
-    addActionButtons &&
-    atomUtils.getConnections(atom, vocab.CHAT.ChatSocketCompacted);
-
-  const hasChatConnections = chatConnections && chatConnections.size > 0;
-  const chatConnectionsArray = chatConnections && chatConnections.toArray();
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -53,32 +47,24 @@ export default function WonBuddyItem({
     }
   }
 
-  function openRequest(conn, message = "") {
-    if (!conn) {
-      return;
-    }
-
-    if (connectionUtils.isUnread(conn)) {
+  function openRequest() {
+    if (connectionUtils.isUnread(connection)) {
       dispatch(
         actionCreators.connections__markAsRead({
-          connectionUri: get(conn, "uri"),
+          connectionUri: get(connection, "uri"),
           atomUri: atomUri,
         })
       );
     }
 
-    const senderSocketUri = get(conn, "socketUri");
-    const targetSocketUri = get(conn, "targetSocketUri");
+    const senderSocketUri = get(connection, "socketUri");
+    const targetSocketUri = get(connection, "targetSocketUri");
     dispatch(
-      actionCreators.atoms__connectSockets(
-        senderSocketUri,
-        targetSocketUri,
-        message
-      )
+      actionCreators.atoms__connectSockets(senderSocketUri, targetSocketUri)
     );
   }
 
-  function requestBuddy(targetAtomUri, message = "") {
+  function requestBuddy() {
     if (!addActionButtons || !hasBuddySocket) {
       console.warn("Trying to request a non-owned or non buddySocket atom");
       return;
@@ -91,13 +77,13 @@ export default function WonBuddyItem({
         {
           caption: "Yes",
           callback: () => {
+            const senderSocketUri = get(connection, "socketUri");
+            const targetSocketUri = get(connection, "targetSocketUri");
+
             dispatch(
-              actionCreators.atoms__connect(
-                atomUri,
-                targetAtomUri,
-                vocab.CHAT.ChatSocketCompacted,
-                vocab.CHAT.ChatSocketCompacted,
-                message
+              actionCreators.atoms__connectSockets(
+                senderSocketUri,
+                targetSocketUri
               )
             );
             dispatch(actionCreators.view__hideModalDialog());
@@ -114,11 +100,7 @@ export default function WonBuddyItem({
     dispatch(actionCreators.view__showModalDialog(payload));
   }
 
-  function closeConnection(conn, dialogText = "Remove Buddy?") {
-    if (!conn) {
-      return;
-    }
-
+  function closeConnection(dialogText = "Remove Buddy?") {
     const payload = {
       caption: "Persona",
       text: dialogText,
@@ -126,16 +108,16 @@ export default function WonBuddyItem({
         {
           caption: "Yes",
           callback: () => {
-            if (connectionUtils.isUnread(conn)) {
+            if (connectionUtils.isUnread(connection)) {
               dispatch(
                 actionCreators.connections__markAsRead({
-                  connectionUri: get(conn, "uri"),
+                  connectionUri: get(connection, "uri"),
                   atomUri: atomUri,
                 })
               );
             }
 
-            dispatch(actionCreators.connections__close(get(conn, "uri")));
+            dispatch(actionCreators.connections__close(get(connection, "uri")));
             dispatch(actionCreators.view__hideModalDialog());
           },
         },
@@ -150,73 +132,42 @@ export default function WonBuddyItem({
     dispatch(actionCreators.view__showModalDialog(payload));
   }
 
-  function sendChatMessage(connection) {
-    if (chatConnectionsArray && hasChatConnections) {
-      //Check if connection is already an existing chatConnection
-      const targetAtomUri = get(connection, "targetAtomUri");
-      //const targetSocketUri = get(connection, "socketUri");
-      const chatConnections = chatConnectionsArray.filter(
-        conn => get(conn, "targetAtomUri") === targetAtomUri
-      );
-      //.filter(conn => get(conn, "socketUri") === targetSocketUri);
+  function sendChatMessage() {
+    const senderSocketUri = atomUtils.getSocketUri(
+      atom,
+      vocab.CHAT.ChatSocketCompacted
+    );
+    const targetSocketUri = atomUtils.getSocketUri(
+      targetAtom,
+      vocab.CHAT.ChatSocketCompacted
+    );
 
-      if (chatConnections.length == 0) {
-        //No chatConnection between buddies exists => connect
-        dispatch(
-          actionCreators.atoms__connect(
-            atomUri,
-            get(connection, "targetAtomUri"),
-            vocab.CHAT.ChatSocketCompacted,
-            vocab.CHAT.ChatSocketCompacted
-          )
-        );
-        history.push("/connections");
-      } else if (chatConnections.length == 1) {
-        const chatConnection = chatConnections[0];
-        const chatConnectionUri = get(chatConnection, "uri");
+    const chatConnection = atomUtils.getConnectionBySocketUris(
+      atom,
+      vocab.CHAT.ChatSocketCompacted,
+      vocab.CHAT.ChatSocketCompacted
+    );
 
-        if (
-          connectionUtils.isSuggested(chatConnection) ||
-          connectionUtils.isClosed(chatConnection)
-        ) {
-          dispatch(
-            actionCreators.atoms__connect(
-              atomUri,
-              get(connection, "targetAtomUri"),
-              vocab.CHAT.ChatSocketCompacted,
-              vocab.CHAT.ChatSocketCompacted
-            )
-          );
-        } else if (
-          connectionUtils.isConnected(chatConnection) ||
-          connectionUtils.isRequestSent(chatConnection) ||
-          connectionUtils.isRequestReceived(chatConnection)
-        ) {
-          history.push(
-            generateLink(
-              history.location,
-              { postUri: atomUri, connectionUri: chatConnectionUri },
-              "/connections"
-            )
-          );
-        }
-      } else {
-        console.error(
-          "more than one connection stored between two atoms that use the same exact sockets",
-          atom,
-          atomUtils.getChatSocket(atom)
-        );
-      }
-    } else {
-      //No chatConnection between buddies exists => connect
+    if (
+      !chatConnection ||
+      connectionUtils.isSuggested(chatConnection) ||
+      connectionUtils.isClosed(chatConnection) ||
+      connectionUtils.isRequestReceived(chatConnection)
+    ) {
       dispatch(
-        actionCreators.atoms__connect(
-          atomUri,
-          get(connection, "targetAtomUri"),
-          vocab.CHAT.ChatSocketCompacted,
-          vocab.CHAT.ChatSocketCompacted
+        actionCreators.atoms__connectSockets(senderSocketUri, targetSocketUri)
+      );
+    }
+
+    if (chatConnection) {
+      history.push(
+        generateLink(
+          history.location,
+          { postUri: atomUri, connectionUri: get(chatConnection, "uri") },
+          "/connections"
         )
       );
+    } else {
       history.push("/connections");
     }
   }
@@ -246,13 +197,13 @@ export default function WonBuddyItem({
         <div className="si__actions">
           <svg
             className="si__actions__icon request won-icon"
-            onClick={() => openRequest(connection)}
+            onClick={openRequest}
           >
             <use xlinkHref={ico32_buddy_accept} href={ico32_buddy_accept} />
           </svg>
           <svg
             className="si__actions__icon primary won-icon"
-            onClick={() => closeConnection(connection, "Reject Buddy Request?")}
+            onClick={() => closeConnection("Reject Buddy Request?")}
           >
             <use xlinkHref={ico32_buddy_deny} href={ico32_buddy_deny} />
           </svg>
@@ -264,15 +215,13 @@ export default function WonBuddyItem({
         <div className="si__actions">
           <svg
             className="si__actions__icon request won-icon"
-            onClick={() => requestBuddy(connection)}
+            onClick={requestBuddy}
           >
             <use xlinkHref={ico32_buddy_accept} href={ico32_buddy_accept} />
           </svg>
           <svg
             className="si__actions__icon primary won-icon"
-            onClick={() =>
-              closeConnection(connection, "Reject Buddy Suggestion?")
-            }
+            onClick={() => closeConnection("Reject Buddy Suggestion?")}
           >
             <use xlinkHref={ico32_buddy_deny} href={ico32_buddy_deny} />
           </svg>
@@ -282,25 +231,24 @@ export default function WonBuddyItem({
       headerClassName = "status--sent";
       actionButtons = (
         <div className="si__actions">
-          <svg className="si__actions__icon disabled won-icon" disabled={true}>
+          <svg className="si__actions__icon disabled won-icon">
             <use xlinkHref={ico32_buddy_waiting} href={ico32_buddy_waiting} />
           </svg>
           <svg
             className="si__actions__icon secondary won-icon"
-            onClick={() => closeConnection(connection, "Cancel Buddy Request?")}
+            onClick={() => closeConnection("Cancel Buddy Request?")}
           >
             <use xlinkHref={ico32_buddy_deny} href={ico32_buddy_deny} />
           </svg>
         </div>
       );
     } else if (connectionUtils.isConnected(connection)) {
-      //TODO: Check chat socket connection
       actionButtons = (
         <div className="si__actions">
-          {!flip ? (
+          {!flip && atomUtils.hasChatSocket(targetAtom) ? (
             <svg
               className="si__actions__icon primary won-icon"
-              onClick={() => sendChatMessage(connection)}
+              onClick={sendChatMessage}
             >
               <use xlinkHref={ico36_message} href={ico36_message} />
             </svg>
