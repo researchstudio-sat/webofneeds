@@ -56,8 +56,8 @@ export const labels = deepFreeze({
   socketItem: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Member",
     [vocab.CHAT.ChatSocketCompacted]: "Chat",
-    [vocab.HOLD.HoldableSocketCompacted]: "Holder",
-    [vocab.HOLD.HolderSocketCompacted]: "Post",
+    [vocab.HOLD.HoldableSocketCompacted]: "Post",
+    [vocab.HOLD.HolderSocketCompacted]: "Holder",
     [vocab.REVIEW.ReviewSocketCompacted]: "Review",
     [vocab.BUDDY.BuddySocketCompacted]: "Buddy",
     [vocab.WXSCHEMA.AssociatedArticleSocketCompacted]: "Publisher",

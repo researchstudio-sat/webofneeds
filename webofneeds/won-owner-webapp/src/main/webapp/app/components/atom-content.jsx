@@ -212,7 +212,7 @@ export default function WonAtomContent({ atom, defaultTab }) {
 
       case vocab.CHAT.ChatSocketCompacted:
         visibleTabFragment = (
-          <WonAtomContentChats atom={atom} allowAdHoc={true} />
+          <WonAtomContentChats atom={atom} allowAdHoc={!isOwned} />
         );
         break;
 

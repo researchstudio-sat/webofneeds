@@ -23,6 +23,17 @@ import "~/style/_socket-add-atom.scss";
 
 import Immutable from "immutable";
 
+/**
+ * Component that lets you pick certain Atoms (or create New "matching" atoms) that are connected with the `addToAtom`
+ * @param addToAtom - atom to connect to
+ * @param addToSocketType - socketType of the atom to connect to
+ * @param storedAtoms - pool of atoms (usually all stored atoms within the redux state)
+ * @param reactions - useCase reactions: json object see uc-persona.js as an example
+ * @param accountState - accountState redux store -> to determine ownership of the storedAtoms, and login status
+ * @param onClose - function that is executed when the close Button is clicked
+ * @param allowAdHoc - if true then the adHoc Connect textfield will be visible, connecting DirectResponse Atoms or Personas with the addToAtom
+ * @returns {*}
+ */
 export default function WonSocketAddAtom({
   addToAtom,
   addToSocketType,
