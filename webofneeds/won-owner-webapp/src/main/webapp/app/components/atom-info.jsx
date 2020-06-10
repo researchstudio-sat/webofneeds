@@ -14,16 +14,11 @@ import "~/style/_atom-info.scss";
 
 export default function WonAtomInfo({ atom, className, defaultTab }) {
   const atomUri = get(atom, "uri");
-  const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
   const processState = useSelector(generalSelectors.getProcessState);
   const atomLoading =
     !atom || processUtils.isAtomLoading(processState, atomUri);
 
-  const showFooter =
-    !atomLoading &&
-    (atomUtils.isInactive(atom) ||
-      (!isOwned &&
-        (atomUtils.hasGroupSocket(atom) || atomUtils.hasChatSocket(atom))));
+  const showFooter = !atomLoading && atomUtils.isInactive(atom);
 
   return (
     <won-atom-info
