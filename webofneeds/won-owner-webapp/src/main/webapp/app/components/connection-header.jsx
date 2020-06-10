@@ -231,8 +231,8 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
           );
         } else {
           headerRightToplineContent = (
-            <div className="ch__right__topline__notitle" title="no title">
-              no title
+            <div className="ch__right__topline__notitle" title="No Title">
+              No Title
             </div>
           );
         }

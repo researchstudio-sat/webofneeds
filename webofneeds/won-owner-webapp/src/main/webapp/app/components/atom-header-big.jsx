@@ -65,10 +65,10 @@ export default function WonAtomHeaderBig({ atom }) {
     titleElement = <h1 className="ahb__title">{generateTitle()}</h1>;
   } else if (isDirectResponse) {
     titleElement = (
-      <h1 className="ahb__title ahb__title--notitle">RE: no title</h1>
+      <h1 className="ahb__title ahb__title--notitle">Re: No Title</h1>
     );
   } else {
-    titleElement = <h1 className="ahb__title ahb__title--notitle">no title</h1>;
+    titleElement = <h1 className="ahb__title ahb__title--notitle">No Title</h1>;
   }
 
   const personaNameElement = personaName && (

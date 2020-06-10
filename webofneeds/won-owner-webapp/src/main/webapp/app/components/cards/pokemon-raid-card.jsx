@@ -121,11 +121,11 @@ export default function PokemonRaidCard({
         );
       } else {
         if (isDirectResponse) {
-          return <div className="card__main__topline__notitle">no title</div>;
-        } else {
           return (
-            <div className="card__main__topline__notitle">Re: no title</div>
+            <div className="card__main__topline__notitle">Re: No Title</div>
           );
+        } else {
+          return <div className="card__main__topline__notitle">No Title</div>;
         }
       }
     };

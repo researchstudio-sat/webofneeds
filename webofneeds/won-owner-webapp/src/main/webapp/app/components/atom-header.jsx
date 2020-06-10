@@ -151,8 +151,8 @@ export default function WonAtomHeader({
             {hasTitle()
               ? generateTitle()
               : isDirectResponse
-                ? "RE: no title"
-                : "no title"}
+                ? "Re: No Title"
+                : "No Title"}
           </div>
         </div>
         <div className="ph__right__subtitle">
