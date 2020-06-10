@@ -5,12 +5,7 @@ import React from "react";
 
 import PropTypes from "prop-types";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
-import {
-  get,
-  getIn,
-  generateLink,
-  generateFakePersonaName,
-} from "../../utils.js";
+import { get, getIn, generateLink } from "../../utils.js";
 import { labels } from "../../won-label-utils.js";
 import vocab from "../../service/vocab.js";
 import WonMessageContent from "./message-content.jsx";
@@ -60,7 +55,7 @@ export default function WonCombinedMessageContent({
 
     personaName = relevantPersona
       ? get(relevantPersona, "humanReadable")
-      : generateFakePersonaName(relevantAtomUri);
+      : get(relevantAtom, "fakePersonaName");
   }
 
   const multiSelectType = get(connection, "multiSelectType");

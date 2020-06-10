@@ -5,6 +5,7 @@ import * as atomUtils from "../../redux/utils/atom-utils.js";
 import {
   generateHexColor,
   generateRgbColorArray,
+  generateFakePersonaName,
   get,
   getIn,
 } from "../../utils.js";
@@ -29,6 +30,7 @@ export function parseAtom(jsonldAtom) {
       lastUpdateDate: extractCreationDate(jsonldAtomImm), //Used for sorting/updates (e.g. if connection comes in etc...)
       modifiedDate: extractLastModifiedDate(jsonldAtomImm), //Used as a flag if the atom itself has changed (e.g. atom edit)
       humanReadable: undefined, //can only be determined after we generated The Content
+      fakePersonaName: generateFakePersonaName(jsonldAtomImm.get("@id")),
       matchedUseCase: {
         identifier: undefined,
         icon: undefined,
@@ -190,6 +192,7 @@ export function parseMetaAtom(metaAtom) {
         get(metaAtomImm, "creationDate") &&
         new Date(get(metaAtomImm, "creationDate")),
       humanReadable: undefined,
+      fakePersonaName: generateFakePersonaName(get(metaAtomImm, "uri")),
       matchedUseCase: {
         identifier: undefined,
         icon: undefined,
