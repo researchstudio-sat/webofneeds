@@ -166,10 +166,16 @@ export default function WonAtomContentSocket({
           </svg>
           <span className="socketadd__label">
             {isAtomOwned
-              ? `Add ${wonLabelUtils.getSocketItemLabels(reactions.keys())}`
-              : `Connect ${wonLabelUtils.getSocketItemLabels(
-                  reactions.keys()
-                )}`}
+              ? `Add ${
+                  reactions
+                    ? wonLabelUtils.getSocketItemLabels(reactions.keys())
+                    : "Atom"
+                }`
+              : `Connect ${
+                  reactions
+                    ? wonLabelUtils.getSocketItemLabels(reactions.keys())
+                    : "Atom"
+                }`}
           </span>
         </div>
       );

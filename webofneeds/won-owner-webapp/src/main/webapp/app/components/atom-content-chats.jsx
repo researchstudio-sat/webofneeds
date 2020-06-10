@@ -141,10 +141,16 @@ export default function AtomContentChats({ atom, allowAdHoc }) {
           </svg>
           <span className="socketadd__label">
             {isAtomOwned
-              ? `Add ${wonLabelUtils.getSocketItemLabels(reactions.keys())}`
-              : `Connect ${wonLabelUtils.getSocketItemLabels(
-                  reactions.keys()
-                )}`}
+              ? `Add ${
+                  reactions
+                    ? wonLabelUtils.getSocketItemLabels(reactions.keys())
+                    : "Chat"
+                }`
+              : `Connect ${
+                  reactions
+                    ? wonLabelUtils.getSocketItemLabels(reactions.keys())
+                    : "Chat"
+                }`}
           </span>
         </div>
       );

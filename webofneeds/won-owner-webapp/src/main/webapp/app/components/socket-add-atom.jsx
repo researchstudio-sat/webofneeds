@@ -394,7 +394,7 @@ export default function WonSocketAddAtom({
       </div>
       {allowAdHoc ? (
         <React.Fragment>
-          <WonLabelledHr label="Or" />
+          {reactions ? <WonLabelledHr label="Or" /> : undefined}
           <ChatTextfield
             placeholder="Message (optional)"
             allowEmptySubmit={true}
