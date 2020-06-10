@@ -160,11 +160,23 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
   } else {
     const headerIcon = toLink ? (
       <Link className="ch__icon" to={toLink}>
-        <WonAtomIcon atom={targetAtom} />
+        <WonAtomIcon
+          atom={targetAtom}
+          flipIcons={
+            atomUtils.getGroupSocket(targetAtom) !==
+            get(connection, "targetSocketUri")
+          }
+        />
       </Link>
     ) : (
       <div className="ch__icon">
-        <WonAtomIcon atom={targetAtom} />
+        <WonAtomIcon
+          atom={targetAtom}
+          flipIcons={
+            atomUtils.getGroupSocket(targetAtom) !==
+            get(connection, "targetSocketUri")
+          }
+        />
       </div>
     );
 
