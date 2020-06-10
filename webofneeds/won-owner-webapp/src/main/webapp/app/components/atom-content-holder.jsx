@@ -64,7 +64,7 @@ export default function WonAtomContentHolder({ holdsUri }) {
       vocab.HOLD.HolderSocketCompacted
     );
 
-  const holderName = getIn(holderAtom, ["content", "personaName"]);
+  const holderName = get(holderAtom, "humanReadable");
   const holderDescription = getIn(holderAtom, ["content", "description"]);
   const holderWebsite = getIn(holderAtom, ["content", "website"]);
   const holderHoldsSize = holderConnections ? holderConnections.size : 0;

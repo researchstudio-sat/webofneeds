@@ -289,7 +289,7 @@ export const getOwnedCondensedPersonaList = createSelector(
       ownedPersonas
         .filter(persona => atomUtils.isActive(persona))
         .map(persona => ({
-          displayName: getIn(persona, ["content", "personaName"]),
+          displayName: get(persona, "humanReadable"),
           website: getIn(persona, ["content", "website"]),
           aboutMe: getIn(persona, ["content", "description"]),
           url: get(persona, "uri"),

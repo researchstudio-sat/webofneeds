@@ -1,3 +1,8 @@
+import {
+  uniqueNamesGenerator,
+  adjectives,
+  animals,
+} from "unique-names-generator";
 import _ from "lodash";
 
 /**
@@ -683,13 +688,16 @@ export function compareArrayBuffers(left, right) {
   return true;
 }
 
-/*export function shouldUpdate(name, oldState, newState) {
-  let shouldUpdate = false;
-  const oldStateImm = Immutable.fromJS(oldState);
-  const newStateImm = Immutable.fromJS(newState);
-
-  shouldUpdate = !newStateImm.equals(oldStateImm);
-
-  console.debug(name, " shouldComponentUpdate: ", shouldUpdate);
-  return shouldUpdate;
-}*/
+export function generateFakePersonaName(atomUri) {
+  //TODO: IMPLEMENT FAKE NAME GENERATOR WITH SEED
+  console.debug("adjectives: ", adjectives);
+  console.debug("animals: ", animals);
+  return (
+    atomUri &&
+    uniqueNamesGenerator({
+      dictionaries: [adjectives, animals],
+      separator: " ",
+      length: 2,
+    })
+  );
+}

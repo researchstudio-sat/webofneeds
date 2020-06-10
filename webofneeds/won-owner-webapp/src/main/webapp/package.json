@@ -48,6 +48,7 @@
     "sparqljs": "^2.1.0",
     "style": "0.0.3",
     "undo.js": "^0.2.0",
+    "unique-names-generator": "^4.2.0",
     "url-join": "^4.0.0",
     "whatwg-fetch": "^0.10.1"
   },

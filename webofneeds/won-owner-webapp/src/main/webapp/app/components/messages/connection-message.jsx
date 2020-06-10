@@ -302,6 +302,7 @@ export default function WonConnectionMessage({
         <WonAtomIcon
           key="targetAtomUri"
           atom={targetAtom}
+          flipIcons={true}
           onClick={
             !onClick
               ? () => {
@@ -324,6 +325,7 @@ export default function WonConnectionMessage({
         <WonAtomIcon
           key="originatorUri"
           atom={originatorAtom}
+          flipIcons={true}
           onClick={
             !onClick
               ? () => {
