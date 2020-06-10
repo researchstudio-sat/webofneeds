@@ -4,7 +4,6 @@
 import React from "react";
 import { Link, useHistory } from "react-router-dom";
 import WonAtomIcon from "./atom-icon.jsx";
-import WonGroupIcon from "./group-icon.jsx";
 import WonConnectionState from "./connection-state.jsx";
 import PropTypes from "prop-types";
 import VisibilitySensor from "react-visibility-sensor";
@@ -86,9 +85,6 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
     groupConnections.find(con => connectionUtils.isUnread(con))
   );
 
-  const isConnectionToGroup =
-    atomUtils.getGroupSocket(targetAtom) === get(connection, "targetSocketUri");
-
   const globalLastUpdateTime = useSelector(
     generalSelectors.selectLastUpdateTime
   );
@@ -162,18 +158,14 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
       </won-connection-header>
     );
   } else {
-    const headerIconElement = isConnectionToGroup ? (
-      <WonGroupIcon connection={connection} />
-    ) : (
-      <WonAtomIcon atom={targetAtom} />
-    );
-
     const headerIcon = toLink ? (
       <Link className="ch__icon" to={toLink}>
-        {headerIconElement}
+        <WonAtomIcon atom={targetAtom} />
       </Link>
     ) : (
-      <div className="ch__icon">{headerIconElement}</div>
+      <div className="ch__icon">
+        <WonAtomIcon atom={targetAtom} />
+      </div>
     );
 
     let headerRightContent;

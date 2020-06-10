@@ -508,20 +508,6 @@ export function isHeld(atomImm) {
   return !!getHeldByUri(atomImm);
 }
 
-export function getGroupMemberUris(atomImm) {
-  const groupMemberConnections = getConnectedConnections(
-    atomImm,
-    vocab.GROUP.GroupSocketCompacted
-  );
-  return (
-    groupMemberConnections &&
-    groupMemberConnections
-      .map(conn => conn.get("targetAtomUri"))
-      .filter(targetAtomUri => !!targetAtomUri)
-      .toSet()
-  );
-}
-
 export function getSeeksSocketsWithKeysReset(atomImm) {
   const sockets = getIn(atomImm, ["seeks", "sockets"]);
 
