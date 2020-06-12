@@ -18,7 +18,7 @@ export default function WonAtomContextSwipeableView({
 }) {
   const [show, setShow] = useState(false);
 
-  const headerElement = children;
+  const headerElement = <div className="headerElement">{children}</div>;
 
   let buttons = actionButtons;
 

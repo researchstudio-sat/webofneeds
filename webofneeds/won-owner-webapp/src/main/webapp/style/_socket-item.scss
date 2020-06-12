@@ -6,8 +6,7 @@
   border: $thinGrayBorder;
   background: $won-light-gray;
 
-  a.won-atom-header,
-  won-atom-header {
+  div.headerElement {
     padding: 0.5rem;
 
     &.status--sent {

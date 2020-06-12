@@ -10,8 +10,6 @@ won-atom-context-layout {
   //grid-column-gap: 0.5rem;
   min-width: 0;
 
-  @include square-image($postIconSize);
-
   .cl__main {
     grid-area: main;
   }
@@ -27,8 +25,7 @@ won-atom-context-layout {
   }
 
   &.status--sent {
-    a.won-atom-header,
-    won-atom-header {
+    div.headerElement {
       opacity: 0.25;
     }
 
@@ -50,8 +47,7 @@ won-atom-context-layout {
 
   &.status--suggested,
   &.status--received {
-    a.won-atom-header,
-    won-atom-header {
+    div.headerElement {
       @include animateOpacityHeartBeat();
     }
 

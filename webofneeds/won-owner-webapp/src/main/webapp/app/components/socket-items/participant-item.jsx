@@ -17,7 +17,7 @@ import VisibilitySensor from "react-visibility-sensor";
 import PropTypes from "prop-types";
 import { useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import WonAtomHeader from "../atom-header";
+import WonConnectionHeader from "../connection-header";
 
 export default function WonParticipantItem({
   connection,
@@ -287,8 +287,8 @@ export default function WonParticipantItem({
           className={headerClassName}
           actionButtons={actionButtons}
         >
-          <WonAtomHeader
-            atom={flip ? atom : targetAtom}
+          <WonConnectionHeader
+            connection={connection}
             toLink={generateLink(
               history.location,
               {
@@ -296,6 +296,7 @@ export default function WonParticipantItem({
               },
               "/post"
             )}
+            flip={flip}
           />
         </WonAtomContextSwipeableView>
       </div>
