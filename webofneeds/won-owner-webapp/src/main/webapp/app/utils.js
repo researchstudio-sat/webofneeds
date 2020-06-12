@@ -724,16 +724,23 @@ export function compareArrayBuffers(left, right) {
 export function generateFakePersonaName(atomUri) {
   let hash = 0;
 
-  if (atomUri) {
-    for (const char of atomUri.split("")) {
-      hash = char.charCodeAt(0) + ((hash << 5) - hash);
-    }
+  const hashFunc = text => {
+    if (text) {
+      for (const char of text.split("")) {
+        hash = char.charCodeAt(0) + ((hash << 5) - hash);
+      }
 
-    hash = hash < 0 ? hash * -1 : hash;
-  }
+      return hash < 0 ? hash * -1 : hash;
+    }
+  };
+
+  const animalHash = hashFunc("animal" + atomUri);
+  const adjectiveHash = hashFunc("adj" + atomUri);
 
   return (
-    adjectives[hash % adjectives.length] + " " + animals[hash % animals.length]
+    adjectives[adjectiveHash % adjectives.length] +
+    " " +
+    animals[animalHash % animals.length]
   );
 }
 
