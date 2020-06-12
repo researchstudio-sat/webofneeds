@@ -11,10 +11,11 @@ import "~/style/_atom-footer.scss";
 const FooterType = {
   INACTIVE: 1,
   INACTIVE_OWNED: 2,
-  UNKNOWN: 3,
+  CONNECTION: 3,
+  UNKNOWN: 4,
 };
 
-export default function WonAtomFooter({ atom, className }) {
+export default function WonAtomFooter({ atom, ownedConnection, className }) {
   const dispatch = useDispatch();
   const atomUri = get(atom, "uri");
 
@@ -24,6 +25,8 @@ export default function WonAtomFooter({ atom, className }) {
 
   if (atomUtils.isInactive(atom)) {
     footerType = isOwned ? FooterType.INACTIVE_OWNED : FooterType.INACTIVE;
+  } else {
+    footerType = ownedConnection ? FooterType.CONNECTION : FooterType.UNKNOWN;
   }
 
   let footerElement;
@@ -51,6 +54,8 @@ export default function WonAtomFooter({ atom, className }) {
         </React.Fragment>
       );
       break;
+    //TODO: IMPL VIEW
+    case FooterType.CONNECTION:
     case FooterType.UNKNOWN:
     default:
       footerElement = undefined;
@@ -65,5 +70,6 @@ export default function WonAtomFooter({ atom, className }) {
 }
 WonAtomFooter.propTypes = {
   atom: PropTypes.object,
+  ownedConnection: PropTypes.object,
   className: PropTypes.string,
 };

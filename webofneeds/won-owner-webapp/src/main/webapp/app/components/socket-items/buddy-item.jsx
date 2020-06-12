@@ -310,6 +310,7 @@ export default function WonBuddyItem({
               history.location,
               {
                 postUri: flip ? get(atom, "uri") : get(targetAtom, "uri"),
+                connectionUri: get(connection, "uri"),
               },
               "/post"
             )}

@@ -58,6 +58,9 @@ export const getOwnedAtomUris = createSelector(getAccountState, account =>
 export const getAtom = atomUri =>
   createSelector(getAtoms, atoms => get(atoms, atomUri));
 
+export const getOwnedConnection = connectionUri =>
+  createSelector(getOwnedConnections, conns => get(conns, connectionUri));
+
 export const getOwnedAtoms = createSelector(
   getOwnedAtomUris,
   getAtoms,
@@ -117,6 +120,13 @@ export const getAllOwnedConnectionsWithTargetSocketUri = targetSocketUri =>
           atomUtils.getAllConnectionsWithTargetSocketUri(atom, targetSocketUri)
         )
   );
+
+export const getOwnedAllConnections = createSelector(
+  getOwnedAtoms,
+  allOwnedAtoms =>
+    allOwnedAtoms &&
+    allOwnedAtoms.flatMap(atom => atomUtils.getConnections(atom))
+);
 
 export const getAllChatConnections = createSelector(
   getOwnedAtoms,

@@ -293,6 +293,7 @@ export default function WonParticipantItem({
               history.location,
               {
                 postUri: flip ? get(atom, "uri") : get(targetAtom, "uri"),
+                connectionUri: get(connection, "uri"),
               },
               "/post"
             )}

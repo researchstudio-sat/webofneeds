@@ -12,13 +12,19 @@ import * as processUtils from "../redux/utils/process-utils";
 
 import "~/style/_atom-info.scss";
 
-export default function WonAtomInfo({ atom, className, defaultTab }) {
+export default function WonAtomInfo({
+  atom,
+  ownedConnection,
+  className,
+  defaultTab,
+}) {
   const atomUri = get(atom, "uri");
   const processState = useSelector(generalSelectors.getProcessState);
   const atomLoading =
     !atom || processUtils.isAtomLoading(processState, atomUri);
 
-  const showFooter = !atomLoading && atomUtils.isInactive(atom);
+  const showFooter =
+    !atomLoading && (atomUtils.isInactive(atom) || ownedConnection);
 
   return (
     <won-atom-info
@@ -29,7 +35,11 @@ export default function WonAtomInfo({ atom, className, defaultTab }) {
       <WonAtomHeaderBig atom={atom} />
       <WonAtomMenu atom={atom} defaultTab={defaultTab} />
       <WonAtomContent atom={atom} defaultTab={defaultTab} />
-      {showFooter ? <WonAtomFooter atom={atom} /> : undefined}
+      {showFooter ? (
+        <WonAtomFooter atom={atom} ownedConnection={ownedConnection} />
+      ) : (
+        undefined
+      )}
     </won-atom-info>
   );
 }
@@ -37,4 +47,5 @@ WonAtomInfo.propTypes = {
   atom: PropTypes.object,
   defaultTab: PropTypes.string,
   className: PropTypes.string,
+  ownedConnection: PropTypes.object,
 };

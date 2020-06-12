@@ -22,9 +22,12 @@ import * as generalSelectors from "../../redux/selectors/general-selectors";
 export default function PagePost() {
   const history = useHistory();
   const dispatch = useDispatch();
-  const { postUri } = getQueryParams(history.location);
+  const { postUri, connectionUri } = getQueryParams(history.location);
   const atomUri = postUri;
   const atom = useSelector(generalSelectors.getAtom(atomUri));
+  const ownedConnection = useSelector(
+    generalSelectors.getOwnedConnection(connectionUri)
+  );
 
   const processState = useSelector(generalSelectors.getProcessState);
   const accountState = useSelector(generalSelectors.getAccountState);
@@ -82,7 +85,9 @@ export default function PagePost() {
       {showSlideIns && <WonSlideIn />}
       <main className="postcontent">
         {!(atomLoading || atomFailedToLoad) &&
-          !!atom && <WonAtomInfo atom={atom} />}
+          !!atom && (
+            <WonAtomInfo atom={atom} ownedConnection={ownedConnection} />
+          )}
         {atomLoading && (
           <div className="pc__loading">
             <svg className="pc__loading__spinner hspinner">

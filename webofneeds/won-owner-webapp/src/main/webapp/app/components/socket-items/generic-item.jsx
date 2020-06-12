@@ -285,6 +285,7 @@ export default function WonGenericItem({
                 postUri: flip
                   ? get(atom, "uri")
                   : get(connection, "targetAtomUri"),
+                connectionUri: get(connection, "uri"),
               },
               "/post"
             )}

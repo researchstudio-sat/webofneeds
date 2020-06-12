@@ -83,6 +83,8 @@ export default function AtomContentChats({ atom, allowAdHoc, refuseOwned }) {
     return connectionsArray.map((conn, index) => {
       const connUri = get(conn, "uri");
 
+      const linkToChat = connectionUtils.isConnected(conn);
+
       return (
         <div className="acc__item" key={connUri + "-" + index}>
           <WonConnectionSelectionItem
@@ -93,7 +95,7 @@ export default function AtomContentChats({ atom, allowAdHoc, refuseOwned }) {
                 postUri: get(atom, "uri"),
                 connectionUri: connUri,
               },
-              "/connections",
+              linkToChat ? "/connections" : "/post",
               false
             )}
             flip={!isAtomOwned}
