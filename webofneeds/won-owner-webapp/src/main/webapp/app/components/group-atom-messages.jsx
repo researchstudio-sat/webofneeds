@@ -108,7 +108,7 @@ export default function WonGroupAtomMessages({
     processUtils.isAtomLoading(processState, targetAtomUri) ||
     isConnectionLoading;
 
-  const showAtomContentMessage = !!(targetAtomUri && !isConnected);
+  const showAtomContentMessage = !!(targetAtomUri && isSuggested);
 
   function goToUnreadMessages() {
     snapToBottom();

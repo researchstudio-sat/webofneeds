@@ -171,7 +171,7 @@ export default function WonAtomMessages({
 
   const showAtomContentMessage = !!(
     showChatData &&
-    !connectionUtils.isConnected(connection) &&
+    connectionUtils.isSuggested(connection) &&
     !multiSelectType &&
     targetAtomUri
   );
