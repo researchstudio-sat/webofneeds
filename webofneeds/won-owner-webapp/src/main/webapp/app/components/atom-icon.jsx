@@ -88,7 +88,18 @@ export default function WonAtomIcon({ atom, className, onClick, flipIcons }) {
             src={"data:image/svg+xml;base64," + identiconSvg}
           />
         ) : (
-          undefined
+          <div
+            className="holderIcon holderUseCaseIcon holderIcon--isPersona"
+            style={{
+              backgroundColor: generateHexColor(
+                new shajs.sha512().update(atomUri).digest("hex")
+              ),
+            }}
+          >
+            <svg className="si__serviceatomicon">
+              <use xlinkHref={ico36_person_anon} href={ico36_person_anon} />
+            </svg>
+          </div>
         );
       }
     }
