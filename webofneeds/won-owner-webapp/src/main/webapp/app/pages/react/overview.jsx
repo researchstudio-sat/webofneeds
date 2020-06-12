@@ -216,7 +216,7 @@ export default function PageOverview() {
                     <WonAtomCardGrid
                       atoms={getSortedVisibleAtomsByUseCase(ucIdentifier)}
                       currentLocation={currentLocation}
-                      showSuggestions={false}
+                      showIndicators={false}
                       showHolder={true}
                       showCreate={false}
                     />
@@ -258,7 +258,7 @@ export default function PageOverview() {
                     <WonAtomCardGrid
                       atoms={getSortedVisibleOtherAtoms()}
                       currentLocation={currentLocation}
-                      showSuggestions={false}
+                      showIndicators={false}
                       showHolder={true}
                       showCreate={false}
                     />

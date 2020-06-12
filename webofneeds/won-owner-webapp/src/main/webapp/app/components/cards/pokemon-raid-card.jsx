@@ -18,7 +18,7 @@ import "~/style/_pokemon-raid-card.scss";
 
 export default function PokemonRaidCard({
   atom,
-  showSuggestions,
+  showIndicators,
   showHolder,
   currentLocation,
 }) {
@@ -339,7 +339,7 @@ export default function PokemonRaidCard({
       undefined
     );
 
-  const cardSuggestionIndicators = showSuggestions ? (
+  const cardSuggestionIndicators = showIndicators ? (
     <div className="card__indicators">
       <WonAtomConnectionsIndicator atom={atom} />
     </div>
@@ -360,6 +360,6 @@ export default function PokemonRaidCard({
 PokemonRaidCard.propTypes = {
   atom: PropTypes.object.isRequired,
   showHolder: PropTypes.bool,
-  showSuggestions: PropTypes.bool,
+  showIndicators: PropTypes.bool,
   currentLocation: PropTypes.object,
 };

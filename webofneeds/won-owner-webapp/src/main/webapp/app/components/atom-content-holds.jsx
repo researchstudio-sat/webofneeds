@@ -42,7 +42,7 @@ export default function WonAtomContentHolds({ atom }) {
         key={get(conn, "uri")}
         atom={get(storedAtoms, get(conn, "targetAtomUri"))}
         currentLocation={currentLocation}
-        showSuggestions={isOwned}
+        showIndicators={isOwned}
         showHolder={false}
       />
     );

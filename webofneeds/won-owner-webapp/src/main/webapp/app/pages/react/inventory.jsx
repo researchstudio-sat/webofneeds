@@ -127,7 +127,7 @@ export default function PageInventory() {
               <WonAtomCardGrid
                 atoms={sortedOwnedUnassignedActivePosts}
                 currentLocation={currentLocation}
-                showSuggestions={true}
+                showIndicators={true}
                 showHolder={true}
                 showCreate={true}
                 showCreatePersona={true}
@@ -164,7 +164,7 @@ export default function PageInventory() {
                   <WonAtomCardGrid
                     atoms={sortedOwnedInactiveAtoms}
                     currentLocation={currentLocation}
-                    showSuggestions={false}
+                    showIndicators={false}
                     showHolder={false}
                     showCreate={false}
                   />

@@ -17,7 +17,7 @@ import { Link } from "react-router-dom";
 
 export default function WonOtherCard({
   atom,
-  showSuggestions,
+  showIndicators,
   showHolder,
   currentLocation,
 }) {
@@ -339,7 +339,7 @@ export default function WonOtherCard({
       undefined
     );
 
-  const cardConnectionIndicators = showSuggestions ? (
+  const cardConnectionIndicators = showIndicators ? (
     <div className="card__indicators">
       <WonAtomConnectionsIndicator atom={atom} />
     </div>
@@ -360,6 +360,6 @@ export default function WonOtherCard({
 WonOtherCard.propTypes = {
   atom: PropTypes.object.isRequired,
   showHolder: PropTypes.bool,
-  showSuggestions: PropTypes.bool,
+  showIndicators: PropTypes.bool,
   currentLocation: PropTypes.object,
 };

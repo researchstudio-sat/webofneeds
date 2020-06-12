@@ -508,7 +508,7 @@ export default function PageMap() {
                 atoms={sortedVisibleAtoms}
                 currentLocation={lastWhatsAroundLocation}
                 showHolder={true}
-                showSuggestions={false}
+                showIndicators={false}
                 showCreate={false}
               />
             </div>
