@@ -265,6 +265,7 @@ export default function WonConnectionSelectionItem({
             history.location,
             {
               postUri: get(senderAtom, "uri"),
+              connectionUri: undefined,
               tab: "DETAIL",
             },
             "/post",

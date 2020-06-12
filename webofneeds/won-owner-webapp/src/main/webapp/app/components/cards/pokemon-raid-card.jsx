@@ -232,7 +232,11 @@ export default function PokemonRaidCard({
         (pokemonImageUrl ? "card__icon--pkm" : "")
       }
       to={location =>
-        generateLink(location, { postUri: atomUri, tab: "DETAIL" }, "/post")
+        generateLink(
+          location,
+          { postUri: atomUri, tab: "DETAIL", connectionUri: undefined },
+          "/post"
+        )
       }
       style={style}
     >
@@ -279,7 +283,11 @@ export default function PokemonRaidCard({
         (!showDefaultIcon ? "card__main--showIcon" : "")
       }
       to={location =>
-        generateLink(location, { postUri: atomUri, tab: "DETAIL" }, "/post")
+        generateLink(
+          location,
+          { postUri: atomUri, connectionUri: undefined, tab: "DETAIL" },
+          "/post"
+        )
       }
     >
       {createCardMainIcon()}
@@ -293,7 +301,11 @@ export default function PokemonRaidCard({
       <Link
         className="card__persona clickable"
         to={location =>
-          generateLink(location, { postUri: holderUri, tab: "DETAIL" }, "/post")
+          generateLink(
+            location,
+            { postUri: holderUri, connectionUri: undefined, tab: "DETAIL" },
+            "/post"
+          )
         }
       >
         {createHolderInfoIcon()}

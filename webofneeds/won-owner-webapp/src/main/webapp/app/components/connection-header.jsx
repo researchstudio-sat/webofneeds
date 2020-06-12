@@ -109,7 +109,11 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
       )
     );
     history.push(
-      generateLink(history.location, { postUri: targetAtomUri }, "/post")
+      generateLink(
+        history.location,
+        { connectionUri: undefined, postUri: targetAtomUri },
+        "/post"
+      )
     );
   }
 

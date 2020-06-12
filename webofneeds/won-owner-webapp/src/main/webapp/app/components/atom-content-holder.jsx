@@ -113,6 +113,7 @@ export default function WonAtomContentHolder({ holdsUri }) {
         history.location,
         {
           postUri: holderUri,
+          connectionUri: undefined,
         },
         "/post"
       )
@@ -133,6 +134,7 @@ export default function WonAtomContentHolder({ holdsUri }) {
         history.location,
         {
           postUri: holderUri,
+          connectionUri: undefined,
         },
         "/post"
       )
@@ -153,6 +155,7 @@ export default function WonAtomContentHolder({ holdsUri }) {
         history.location,
         {
           postUri: holderUri,
+          connectionUri: undefined,
         },
         "/post"
       )

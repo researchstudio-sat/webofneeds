@@ -48,7 +48,11 @@ export default function WonPersonaCard({ atom }) {
       to={location =>
         generateLink(
           location,
-          { postUri: get(atom, "uri"), tab: "DETAIL" },
+          {
+            postUri: get(atom, "uri"),
+            tab: "DETAIL",
+            connectionUri: undefined,
+          },
           "/post"
         )
       }

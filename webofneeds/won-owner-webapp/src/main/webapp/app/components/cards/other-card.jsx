@@ -223,7 +223,11 @@ export default function WonOtherCard({
         (showMap ? "card__icon--map" : "")
       }
       to={location =>
-        generateLink(location, { postUri: atomUri, tab: "DETAIL" }, "/post")
+        generateLink(
+          location,
+          { postUri: atomUri, tab: "DETAIL", connectionUri: undefined },
+          "/post"
+        )
       }
       style={style}
     >
@@ -279,7 +283,11 @@ export default function WonOtherCard({
         (!showDefaultIcon ? "card__main--showIcon" : "")
       }
       to={location =>
-        generateLink(location, { postUri: atomUri, tab: "DETAIL" }, "/post")
+        generateLink(
+          location,
+          { postUri: atomUri, tab: "DETAIL", connectionUri: undefined },
+          "/post"
+        )
       }
     >
       {createCardMainIcon()}
@@ -293,7 +301,11 @@ export default function WonOtherCard({
       <Link
         className="card__persona clickable"
         to={location =>
-          generateLink(location, { postUri: holderUri, tab: "DETAIL" }, "/post")
+          generateLink(
+            location,
+            { postUri: holderUri, tab: "DETAIL", connectionUri: undefined },
+            "/post"
+          )
         }
       >
         {createHolderInfoIcon()}

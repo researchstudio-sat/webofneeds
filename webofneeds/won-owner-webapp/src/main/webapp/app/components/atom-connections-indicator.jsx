@@ -59,7 +59,7 @@ export default function WonAtomConnectionsIndicator({ atom }) {
     history.push(
       generateLink(
         history.location,
-        { postUri: atomUri, tab: socketType },
+        { postUri: atomUri, tab: socketType, connectionUri: undefined },
         "/post"
       )
     );
