@@ -23,7 +23,7 @@ export default function WonAtomIcon({ atom, className, onClick, flipIcons }) {
   let mainIconAtom;
   let subIconAtom;
 
-  if (atomUtils.isPersona(atom) || atomUtils.isServiceAtom(atom)) {
+  if (atomUtils.hasHolderSocket(atom)) {
     mainIconAtom = atom;
     subIconAtom = undefined;
   } else {
@@ -188,7 +188,9 @@ export default function WonAtomIcon({ atom, className, onClick, flipIcons }) {
       onClick={onClick}
     >
       {generateAtomIcon(mainIconAtom)}
-      {generateSubIcon(subIconAtom)}
+      {atomUtils.hasHolderSocket(atom)
+        ? generateSubIcon(subIconAtom)
+        : undefined}
     </won-atom-icon>
   );
 }

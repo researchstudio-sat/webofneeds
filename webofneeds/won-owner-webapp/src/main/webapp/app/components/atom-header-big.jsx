@@ -20,8 +20,9 @@ export default function WonAtomHeaderBig({ atom }) {
   const atomUri = get(atom, "uri");
   const personaUri = atomUtils.getHeldByUri(atom);
   const persona = useSelector(generalSelectors.getAtom(personaUri));
-  const personaName =
-    get(persona, "humanReadable") || get(atom, "fakePersonaName");
+  const personaName = atomUtils.hasHolderSocket(atom)
+    ? undefined
+    : get(persona, "humanReadable") || get(atom, "fakePersonaName");
   const accountState = useSelector(generalSelectors.getAccountState);
   const ownedAtomsWithBuddySocket = useSelector(
     generalSelectors.getOwnedAtomsWithBuddySocket
