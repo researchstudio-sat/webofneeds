@@ -7,10 +7,13 @@ import vocab from "../service/vocab.js";
 
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as processUtils from "../redux/utils/process-utils.js";
+import * as wonUtils from "../won-utils.js";
+import * as useCaseUtils from "../usecase-utils.js";
 import * as ownerApi from "../api/owner-api.js";
 import * as stateStore from "../redux/state-store.js";
 
-import { get, getIn } from "../utils.js";
+import { get, getIn, generateFakePersonaName } from "../utils.js";
 
 import { ensureLoggedIn } from "./account-actions";
 
@@ -23,8 +26,6 @@ import {
   buildRateMessage,
   buildConnectMessage,
 } from "../won-message-utils.js";
-
-import * as processUtils from "../redux/utils/process-utils.js";
 
 export function connectionsChatMessageClaimOnSuccess(
   chatMessage,
@@ -431,16 +432,12 @@ function connectAdHoc(targetSocketUri, connectMessage, dispatch, getState) {
     );
 
     const state = getState();
-    const adHocDraft = {
-      content: {
-        responseToUri: theirAtomUri,
-        flags: [
-          "con:DirectResponse",
-          "match:NoHintForCounterpart",
-          "match:NoHintForMe",
-        ],
-      },
-    };
+    const adHocDraft = useCaseUtils.getUseCase("persona").draft;
+    adHocDraft.content.personaName = generateFakePersonaName(
+      wonUtils.getRandomWonId()
+    );
+    adHocDraft.content.description = "Automatically generated Persona";
+
     const nodeUri = generalSelectors.getDefaultNodeUri(state);
 
     // build create message for new atom
