@@ -13,142 +13,166 @@ import "~/style/_atom-connections-indicator.scss";
 import ico36_message from "~/images/won-icons/ico36_message.svg";
 import ico36_incoming from "~/images/won-icons/ico36_incoming.svg";
 import ico36_match from "~/images/won-icons/ico36_match.svg";
-import { Link, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import vocab from "../service/vocab";
 import { actionCreators } from "../actions/actions";
 import Immutable from "immutable";
 
 export default function WonAtomConnectionsIndicator({ atom }) {
-  //TODO: REWORK THE WHOLE THING BASED ON CONNECTIONS between generic-sockets
-  const atomUri = get(atom, "uri");
   const dispatch = useDispatch();
   const history = useHistory();
-  const requests = atomUtils.getRequestReceivedConnections(atom);
-  const unreadRequests = requests.filter(conn =>
+
+  const receivedRequests = atomUtils.getRequestReceivedConnections(atom);
+  const receivedRequestsUnread = receivedRequests.filter(conn =>
     connectionUtils.isUnread(conn)
   );
-  const hasUnreadRequest = unreadRequests && unreadRequests.size > 0;
 
-  const suggestedConnections = atomUtils.getSuggestedConnections(atom);
+  const connected = atomUtils.getConnectedConnections(
+    atom,
+    vocab.CHAT.ChatSocketCompacted
+  );
+  const connectedUnread = connected.filter(conn =>
+    connectionUtils.isUnread(conn)
+  );
 
-  const suggestionsCount = suggestedConnections ? suggestedConnections.size : 0;
-  const unreadSuggestions =
-    suggestedConnections &&
-    suggestedConnections.filter(conn => conn.get("unread"));
-  const unreadSuggestionsCount = unreadSuggestions ? unreadSuggestions.size : 0;
+  const suggested = atomUtils.getSuggestedConnections(atom);
+  const suggestedUnread = suggested.filter(conn =>
+    connectionUtils.isUnread(conn)
+  );
 
-  const unreadChats = atomUtils
-    .getConnectedConnections(atom)
-    .filter(conn => connectionUtils.isUnread(conn));
-  const hasUnreadChats = !!unreadChats && unreadChats.size > 0;
+  function linkToConnectionSocketTab(connection) {
+    const socketType = atomUtils.getSocketType(
+      atom,
+      get(connection, "socketUri")
+    );
 
-  const requestsCount = requests ? requests.size : 0;
-  const unreadRequestsCount = unreadRequests ? unreadRequests.size : 0;
-  // TODO: unread msgs count?
+    const atomUri = get(atom, "uri");
 
-  const hasNoUnreadConnections = !requestsCount > 0 && !hasUnreadChats;
-
-  function showAtomSuggestions() {
     dispatch(
       actionCreators.atoms__selectTab(
         Immutable.fromJS({
           atomUri: atomUri,
-          selectTab: vocab.CHAT.ChatSocketCompacted,
+          selectTab: socketType,
         })
-      ) //TODO: The suggestions indicator should link to the latest type of connection (since the atomTab SUGGESTIONS is not available any longer)
+      )
     );
     history.push(
       generateLink(
         history.location,
-        { postUri: atomUri, tab: vocab.CHAT.ChatSocketCompacted },
+        { postUri: atomUri, tab: socketType },
         "/post"
       )
     );
   }
 
-  if (hasUnreadRequest) {
-    return (
-      <Link
-        className={
-          "won-atom-connections-indicator " +
-          (hasNoUnreadConnections ? "won-no-connections" : "")
-        }
-        to={location => {
-          console.debug("Called Link in atom-connections-indicator");
-          const connUri = hasUnreadChats
-            ? get(unreadChats.first(), "uri")
-            : get(unreadRequests.first(), "uri");
+  function linkToRequests(connection) {
+    if (
+      atomUtils.getSocketType(atom, get(connection, "socketUri")) ===
+      vocab.CHAT.ChatSocketCompacted
+    ) {
+      linkToChat(connection);
+    } else {
+      linkToConnectionSocketTab(connection);
+    }
+  }
 
-          return generateLink(
-            location,
-            { postUri: atomUri, connectionUri: connUri },
-            "/connections",
-            false
-          );
-        }}
+  function linkToChat(connection) {
+    history.push(
+      generateLink(
+        history.location,
+        {
+          postUri: get(atom, "uri"),
+          connectionUri: get(connection, "uri"),
+        },
+        "/connections",
+        false
+      )
+    );
+  }
+
+  const generateIconElement = (icon, unreads = true) => (
+    <svg
+      className={
+        "asi__icon " + (unreads ? "asi__icon--unreads" : "asi__icon--reads")
+      }
+    >
+      <use xlinkHref={icon} href={icon} />
+    </svg>
+  );
+
+  const generateSubTitleElement = (label, connections, connectionsUnread) => (
+    <div className="asi__right__subtitle">
+      <div className="asi__right__subtitle__label">
+        {connections && connectionsUnread ? (
+          <React.Fragment>
+            <span>{connections.size + " " + label}</span>
+            {connectionsUnread.size > 0 ? (
+              <span>{", " + connectionsUnread.size + " new"}</span>
+            ) : (
+              undefined
+            )}
+          </React.Fragment>
+        ) : (
+          <span>{label}</span>
+        )}
+      </div>
+    </div>
+  );
+
+  if (connectedUnread.size > 0) {
+    return (
+      <won-atom-connections-indicator
+        onClick={() => linkToChat(connectedUnread.first())}
       >
-        <svg
-          className={
-            "asi__icon " +
-            (hasUnreadChats || unreadRequestsCount > 0
-              ? "asi__icon--unreads"
-              : "asi__icon--reads")
-          }
-        >
-          <use
-            xlinkHref={hasUnreadChats ? ico36_message : ico36_incoming}
-            href={hasUnreadChats ? ico36_message : ico36_incoming}
-          />
-        </svg>
+        {generateIconElement(ico36_message)}
+        <div className="asi__right">
+          <div className="asi__right__topline">
+            <div className="asi__right__topline__title">Unread Messages</div>
+          </div>
+          {generateSubTitleElement("You have unread Chat Messages")}
+        </div>
+      </won-atom-connections-indicator>
+    );
+  } else if (receivedRequests.size > 0 && suggestedUnread.size === 0) {
+    return (
+      <won-atom-connections-indicator
+        onClick={() =>
+          linkToRequests(
+            receivedRequestsUnread.first() || receivedRequests.first()
+          )
+        }
+      >
+        {generateIconElement(ico36_incoming, receivedRequestsUnread.size > 0)}
         <div className="asi__right">
           <div className="asi__right__topline">
             <div className="asi__right__topline__title">
-              {hasUnreadChats ? "Unread Messages" : "Connection Requests"}
+              {"Connection Requests"}
             </div>
           </div>
-          <div className="asi__right__subtitle">
-            <div className="asi__right__subtitle__label">
-              <span>
-                {hasUnreadChats
-                  ? "You have unread Chat Messages"
-                  : requestsCount + " Requests"}
-              </span>
-              {!hasUnreadChats && unreadRequestsCount > 0 ? (
-                <span>{", " + unreadRequestsCount + " new"}</span>
-              ) : null}
-            </div>
-          </div>
+          {generateSubTitleElement(
+            "Requests",
+            receivedRequests,
+            receivedRequestsUnread
+          )}
         </div>
-      </Link>
+      </won-atom-connections-indicator>
     );
   } else {
     return (
       <won-atom-connections-indicator
-        class={!suggestionsCount > 0 ? "won-no-connections" : ""}
-        onClick={showAtomSuggestions}
+        class={suggested.size === 0 ? "won-no-connections" : ""}
+        onClick={() =>
+          linkToConnectionSocketTab(
+            suggestedUnread.first() || suggested.first()
+          )
+        }
       >
-        <svg
-          className={
-            "asi__icon " +
-            (unreadSuggestionsCount > 0
-              ? "asi__icon--unreads"
-              : "asi__icon--reads")
-          }
-        >
-          <use xlinkHref={ico36_match} href={ico36_match} />
-        </svg>
+        {generateIconElement(ico36_match, suggestedUnread.size > 0)}
         <div className="asi__right">
           <div className="asi__right__topline">
             <div className="asi__right__topline__title">Suggestions</div>
           </div>
-          <div className="asi__right__subtitle">
-            <div className="asi__right__subtitle__label">
-              <span>{suggestionsCount + " Suggestions"}</span>
-              {unreadSuggestionsCount > 0 ? (
-                <span>{", " + unreadSuggestionsCount + " new"}</span>
-              ) : null}
-            </div>
-          </div>
+          {generateSubTitleElement("Suggestions", suggested, suggestedUnread)}
         </div>
       </won-atom-connections-indicator>
     );

@@ -297,57 +297,41 @@ export function getGroupSocket(atom) {
 }
 
 export function hasSuggestedConnections(atom) {
-  return (
-    get(atom, "connections") &&
-    !!get(atom, "connections").find(conn => connectionUtils.isSuggested(conn))
+  return !!getConnections(atom).find(conn => connectionUtils.isSuggested(conn));
+}
+
+export function getSuggestedConnections(atom, socketType) {
+  return getConnections(atom, socketType).filter(conn =>
+    connectionUtils.isSuggested(conn)
   );
 }
 
-export function getSuggestedConnections(atom) {
-  return get(atom, "connections")
-    ? get(atom, "connections").filter(conn => connectionUtils.isSuggested(conn))
-    : Immutable.Map();
-}
-
-export function getRequestReceivedConnections(atom) {
-  return get(atom, "connections")
-    ? get(atom, "connections").filter(conn =>
-        connectionUtils.isRequestReceived(conn)
-      )
-    : Immutable.Map();
+export function getRequestReceivedConnections(atom, socketType) {
+  return getConnections(atom, socketType).filter(conn =>
+    connectionUtils.isRequestReceived(conn)
+  );
 }
 
 export function hasUnreadSuggestedConnections(atom) {
-  return (
-    get(atom, "connections") &&
-    !!get(atom, "connections").find(
-      conn =>
-        connectionUtils.isSuggested(conn) && connectionUtils.isUnread(conn)
-    )
+  return !!getConnections(atom).find(
+    conn => connectionUtils.isSuggested(conn) && connectionUtils.isUnread(conn)
   );
 }
 
 export function getConnectionBySocketUris(atom, socketUri, targetSocketUri) {
-  const connections = get(atom, "connections");
-  return (
-    connections &&
-    connections.find(
-      conn =>
-        get(conn, "socketUri") === socketUri &&
-        get(conn, "targetSocketUri") === targetSocketUri
-    )
+  return getConnections(atom).find(
+    conn =>
+      get(conn, "socketUri") === socketUri &&
+      get(conn, "targetSocketUri") === targetSocketUri
   );
 }
 
 // to be used on personas
 export function hasUnreadBuddyRequests(atom) {
-  return (
-    get(atom, "connections") &&
-    !!get(atom, "connections").find(
-      conn =>
-        connectionUtils.isRequestReceived(conn) ||
-        connectionUtils.isRequestSent(conn)
-    )
+  return !!getConnections(atom).find(
+    conn =>
+      connectionUtils.isRequestReceived(conn) ||
+      connectionUtils.isRequestSent(conn)
   );
 }
 
@@ -617,52 +601,38 @@ export function getConnections(atomImm, socketType) {
  * @param socketType compactedSocketType Uri (senderSocket)
  */
 export function getConnectedConnections(atomImm, socketType) {
-  const connections = getConnections(atomImm, socketType);
-
-  return (
-    connections && connections.filter(conn => connectionUtils.isConnected(conn))
+  return getConnections(atomImm, socketType).filter(conn =>
+    connectionUtils.isConnected(conn)
   );
 }
 
 export function getAllNonClosedNonSuggestedChatConnections(atomImm) {
   const chatSocketUri = getChatSocket(atomImm);
 
-  return atomImm
-    ? get(atomImm, "connections").filter(
-        conn =>
-          connectionUtils.hasSocketUri(conn, chatSocketUri) &&
-          !(connectionUtils.isClosed(conn) || connectionUtils.isSuggested(conn))
-      )
-    : Immutable.Map();
+  return getConnections(atomImm).filter(
+    conn =>
+      connectionUtils.hasSocketUri(conn, chatSocketUri) &&
+      !(connectionUtils.isClosed(conn) || connectionUtils.isSuggested(conn))
+  );
 }
 
 export function getAllConnectionsWithTargetSocketUri(atomImm, targetSocketUri) {
-  return atomImm
-    ? get(atomImm, "connections").filter(conn =>
-        connectionUtils.hasTargetSocketUri(conn, targetSocketUri)
-      )
-    : Immutable.Map();
+  return getConnections(atomImm).filter(conn =>
+    connectionUtils.hasTargetSocketUri(conn, targetSocketUri)
+  );
 }
 
 export function getAllConnectedChatAndGroupConnections(atomImm) {
   const groupSocketUri = getGroupSocket(atomImm);
   const chatSocketUri = getChatSocket(atomImm);
 
-  return atomImm
-    ? get(atomImm, "connections")
-        .filter(conn => connectionUtils.isConnected(conn))
-        .filter(
-          conn =>
-            connectionUtils.hasSocketUri(conn, chatSocketUri) ||
-            connectionUtils.hasSocketUri(conn, groupSocketUri)
-        )
-    : Immutable.Map();
-}
-
-export function hasUnreadNonClosedNonSuggestedChatConnections(atom) {
-  return getAllNonClosedNonSuggestedChatConnections(atom).find(conn =>
-    connectionUtils.isUnread(conn)
-  );
+  return getConnections(atomImm)
+    .filter(conn => connectionUtils.isConnected(conn))
+    .filter(
+      conn =>
+        connectionUtils.hasSocketUri(conn, chatSocketUri) ||
+        connectionUtils.hasSocketUri(conn, groupSocketUri)
+    );
 }
 
 /**
