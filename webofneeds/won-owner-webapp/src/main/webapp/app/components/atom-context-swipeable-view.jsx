@@ -5,25 +5,20 @@ import React, { useState } from "react";
 import SwipeableViews from "react-swipeable-views";
 import "~/style/_atom-context-layout.scss";
 
-import WonAtomHeader from "./atom-header.jsx";
 import PropTypes from "prop-types";
 
 import ico16_contextmenu from "~/images/won-icons/ico16_contextmenu.svg";
 import ico32_buddy_add from "~/images/won-icons/ico32_buddy_add.svg";
 
 export default function WonAtomContextSwipeableView({
-  atom,
   actionButtons,
   className,
-  toLink,
   enableMouseEvents,
-  hideTimestamp,
+  children,
 }) {
   const [show, setShow] = useState(false);
 
-  const headerElement = (
-    <WonAtomHeader atom={atom} hideTimestamp={hideTimestamp} toLink={toLink} />
-  );
+  const headerElement = children;
 
   let buttons = actionButtons;
 
@@ -72,10 +67,8 @@ export default function WonAtomContextSwipeableView({
   }
 }
 WonAtomContextSwipeableView.propTypes = {
-  atom: PropTypes.object,
   className: PropTypes.string,
   actionButtons: PropTypes.any,
-  toLink: PropTypes.string,
   enableMouseEvents: PropTypes.bool,
-  hideTimestamp: PropTypes.bool,
+  children: PropTypes.any.isRequired,
 };

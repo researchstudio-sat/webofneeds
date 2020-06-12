@@ -18,6 +18,7 @@ import ico32_buddy_accept from "~/images/won-icons/ico32_buddy_accept.svg";
 import ico32_buddy_deny from "~/images/won-icons/ico32_buddy_deny.svg";
 import ico32_buddy_waiting from "~/images/won-icons/ico32_buddy_waiting.svg";
 import ico36_message from "~/images/won-icons/ico36_message.svg";
+import WonAtomHeader from "../atom-header";
 
 export default function WonBuddyItem({
   connection,
@@ -26,13 +27,13 @@ export default function WonBuddyItem({
   targetAtom,
   flip,
 }) {
-  const atomUri = get(atom, "uri");
+  const dispatch = useDispatch();
+  const history = useHistory();
 
   const hasBuddySocket = atomUtils.hasBuddySocket(atom);
   const addActionButtons = isOwned || flip;
-
-  const dispatch = useDispatch();
-  const history = useHistory();
+  let actionButtons;
+  let headerClassName;
 
   function markAsRead(conn) {
     if (connectionUtils.isUnread(conn)) {
@@ -40,7 +41,7 @@ export default function WonBuddyItem({
         dispatch(
           actionCreators.connections__markAsRead({
             connectionUri: get(conn, "uri"),
-            atomUri: atomUri,
+            atomUri: get(atom, "uri"),
           })
         );
       }, 1500);
@@ -52,7 +53,7 @@ export default function WonBuddyItem({
       dispatch(
         actionCreators.connections__markAsRead({
           connectionUri: get(connection, "uri"),
-          atomUri: atomUri,
+          atomUri: get(atom, "uri"),
         })
       );
     }
@@ -112,7 +113,7 @@ export default function WonBuddyItem({
               dispatch(
                 actionCreators.connections__markAsRead({
                   connectionUri: get(connection, "uri"),
-                  atomUri: atomUri,
+                  atomUri: get(atom, "uri"),
                 })
               );
             }
@@ -163,7 +164,10 @@ export default function WonBuddyItem({
       history.push(
         generateLink(
           history.location,
-          { postUri: atomUri, connectionUri: get(chatConnection, "uri") },
+          {
+            postUri: get(atom, "uri"),
+            connectionUri: get(chatConnection, "uri"),
+          },
           "/connections"
         )
       );
@@ -172,28 +176,10 @@ export default function WonBuddyItem({
     }
   }
 
-  if (!addActionButtons) {
-    return (
-      <div className="si ">
-        <WonAtomContextSwipeableView
-          atom={flip ? atom : targetAtom}
-          toLink={generateLink(
-            history.location,
-            {
-              postUri: flip ? get(atom, "uri") : get(targetAtom, "uri"),
-            },
-            "/post"
-          )}
-        />
-      </div>
-    );
-  } else {
-    let actionButtons;
-    let headerClassName;
-
-    if (connectionUtils.isRequestReceived(connection)) {
+  switch (get(connection, "state")) {
+    case vocab.WON.RequestReceived: {
       headerClassName = "status--received";
-      actionButtons = (
+      actionButtons = addActionButtons ? (
         <div className="si__actions">
           <svg
             className="si__actions__icon request won-icon"
@@ -208,10 +194,15 @@ export default function WonBuddyItem({
             <use xlinkHref={ico32_buddy_deny} href={ico32_buddy_deny} />
           </svg>
         </div>
+      ) : (
+        undefined
       );
-    } else if (connectionUtils.isSuggested(connection)) {
+      break;
+    }
+
+    case vocab.WON.Suggested: {
       headerClassName = "status--suggested";
-      actionButtons = (
+      actionButtons = addActionButtons ? (
         <div className="si__actions">
           <svg
             className="si__actions__icon request won-icon"
@@ -226,10 +217,14 @@ export default function WonBuddyItem({
             <use xlinkHref={ico32_buddy_deny} href={ico32_buddy_deny} />
           </svg>
         </div>
+      ) : (
+        undefined
       );
-    } else if (connectionUtils.isRequestSent(connection)) {
+      break;
+    }
+    case vocab.WON.RequestSent: {
       headerClassName = "status--sent";
-      actionButtons = (
+      actionButtons = addActionButtons ? (
         <div className="si__actions">
           <svg className="si__actions__icon disabled won-icon">
             <use xlinkHref={ico32_buddy_waiting} href={ico32_buddy_waiting} />
@@ -241,9 +236,13 @@ export default function WonBuddyItem({
             <use xlinkHref={ico32_buddy_deny} href={ico32_buddy_deny} />
           </svg>
         </div>
+      ) : (
+        undefined
       );
-    } else if (connectionUtils.isConnected(connection)) {
-      actionButtons = (
+      break;
+    }
+    case vocab.WON.Connected: {
+      actionButtons = addActionButtons ? (
         <div className="si__actions">
           {!flip && atomUtils.hasChatSocket(targetAtom) ? (
             <svg
@@ -262,31 +261,50 @@ export default function WonBuddyItem({
             <use xlinkHref={ico32_buddy_deny} href={ico32_buddy_deny} />
           </svg>
         </div>
+      ) : (
+        undefined
       );
-    } else if (connectionUtils.isClosed(connection)) {
-      headerClassName = "status--closed";
-      actionButtons = <div className="si__actions">Buddy has been removed</div>;
-    } else {
-      actionButtons = <div className="si__actions">Unknown State</div>;
+      break;
     }
 
-    return (
-      <VisibilitySensor
-        onChange={isVisible => {
-          isVisible &&
-            connectionUtils.isUnread(connection) &&
-            markAsRead(connection);
-        }}
-        intervalDelay={2000}
+    case vocab.WON.Closed: {
+      headerClassName = "status--closed";
+      actionButtons = addActionButtons ? (
+        <div className="si__actions">Buddy has been removed</div>
+      ) : (
+        undefined
+      );
+      break;
+    }
+    default: {
+      actionButtons = addActionButtons ? (
+        <div className="si__actions">Unknown State</div>
+      ) : (
+        undefined
+      );
+      break;
+    }
+  }
+
+  return (
+    <VisibilitySensor
+      onChange={isVisible => {
+        isVisible &&
+          connectionUtils.isUnread(connection) &&
+          markAsRead(connection);
+      }}
+      intervalDelay={2000}
+    >
+      <div
+        className={
+          "si " + (connectionUtils.isUnread(connection) ? " won-unread " : "")
+        }
       >
-        <div
-          className={
-            "si " + (connectionUtils.isUnread(connection) ? " won-unread " : "")
-          }
+        <WonAtomContextSwipeableView
+          className={headerClassName}
+          actionButtons={actionButtons}
         >
-          <WonAtomContextSwipeableView
-            className={headerClassName}
-            actionButtons={actionButtons}
+          <WonAtomHeader
             atom={flip ? atom : targetAtom}
             toLink={generateLink(
               history.location,
@@ -296,10 +314,10 @@ export default function WonBuddyItem({
               "/post"
             )}
           />
-        </div>
-      </VisibilitySensor>
-    );
-  }
+        </WonAtomContextSwipeableView>
+      </div>
+    </VisibilitySensor>
+  );
 }
 WonBuddyItem.propTypes = {
   connection: PropTypes.object.isRequired,

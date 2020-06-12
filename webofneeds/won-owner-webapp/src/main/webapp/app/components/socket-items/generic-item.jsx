@@ -14,6 +14,7 @@ import ico36_close from "~/images/won-icons/ico36_close.svg";
 import ico36_outgoing from "~/images/won-icons/ico36_outgoing.svg";
 
 import "~/style/_socket-item.scss";
+import WonAtomHeader from "../atom-header";
 
 export default function WonGenericItem({
   connection,
@@ -275,17 +276,20 @@ export default function WonGenericItem({
         <WonAtomContextSwipeableView
           className={headerClassName}
           actionButtons={actionButtons}
-          atom={flip ? atom : targetAtom}
-          toLink={generateLink(
-            history.location,
-            {
-              postUri: flip
-                ? get(atom, "uri")
-                : get(connection, "targetAtomUri"),
-            },
-            "/post"
-          )}
-        />
+        >
+          <WonAtomHeader
+            atom={flip ? atom : targetAtom}
+            toLink={generateLink(
+              history.location,
+              {
+                postUri: flip
+                  ? get(atom, "uri")
+                  : get(connection, "targetAtomUri"),
+              },
+              "/post"
+            )}
+          />
+        </WonAtomContextSwipeableView>
       </div>
     </VisibilitySensor>
   );
