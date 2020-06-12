@@ -31,7 +31,7 @@ import Immutable from "immutable";
  * @param reactions - useCase reactions: json object see uc-persona.js as an example
  * @param accountState - accountState redux store -> to determine ownership of the storedAtoms, and login status
  * @param onClose - function that is executed when the close Button is clicked
- * @param allowAdHoc - if true then the adHoc Connect textfield will be visible, connecting DirectResponse Atoms or Personas with the addToAtom
+ * @param allowAdHoc - if true then the adHoc Connect textfield will be visible, connecting Generated Persona or Personas with the addToAtom
  * @param refuseOwned - if true then remove all Owned Atoms (incl. the create Option) as options to connect with (only makes sense if the addToAtom is Owned itself)
  * @returns {*}
  */

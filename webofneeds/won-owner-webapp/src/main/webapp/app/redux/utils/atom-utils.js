@@ -211,20 +211,6 @@ export function getDefaultPersonaImage(atom) {
 }
 
 /**
- * Determines if a given atom is a DirectResponse-Atom
- * @param atom
- * @returns {*|boolean}
- */
-export function isDirectResponseAtom(atom) {
-  return (
-    getIn(atom, ["content", "flags"]) &&
-    getIn(atom, ["content", "flags"]).contains(
-      vocab.WONCON.DirectResponseCompacted
-    )
-  );
-}
-
-/**
  * Determines if a given atom is Invisible (contains the no hint for counterpart flag)
  * @param atom
  * @returns {*|boolean}
@@ -380,7 +366,7 @@ export function generateFullSocketLabels(atomImm) {
 }
 
 /**
- * Retrieves the Label of the used useCase as an atomType, if no usecase is specified we check if atom is a searchAtom or DirectResponseAtom
+ * Retrieves the Label of the used useCase as an atomType, if no usecase is specified we check if atom is a searchAtom
  * @param {*} atomImm the atom as saved in the state
  */
 export function generateTypeLabel(atomImm) {
@@ -393,8 +379,6 @@ export function generateTypeLabel(atomImm) {
   } else {
     if (isSearchAtom(atomImm)) {
       return "Search";
-    } else if (isDirectResponseAtom(atomImm)) {
-      return "Direct Response";
     }
 
     return "";

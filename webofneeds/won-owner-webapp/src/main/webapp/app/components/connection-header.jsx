@@ -46,13 +46,6 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
     getIn(state, ["atoms", targetAtomUri])
   );
 
-  const isDirectResponseFromRemote = atomUtils.isDirectResponseAtom(targetAtom);
-
-  const responseToUri =
-    isDirectResponseFromRemote &&
-    getIn(targetAtom, ["content", "responseToUri"]);
-  const responseToAtom = useSelector(generalSelectors.getAtom(responseToUri));
-
   const targetHolderName = useSelector(state =>
     getIn(state, ["atoms", atomUtils.getHeldByUri(targetAtom), "humanReadble"])
   );
@@ -230,33 +223,17 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
         latestMessage && getHumanReadableStringFromMessage(latestMessage);
       const latestMessageUnread = messageUtils.isMessageUnread(latestMessage);
 
-      let headerRightToplineContent;
-      if (!isDirectResponseFromRemote) {
-        if (get(targetAtom, "humanReadable")) {
-          headerRightToplineContent = (
-            <div
-              className="ch__right__topline__title"
-              title={get(targetAtom, "humanReadable")}
-            >
-              {get(targetAtom, "humanReadable")}
-            </div>
-          );
-        } else {
-          headerRightToplineContent = (
-            <div className="ch__right__topline__notitle" title="No Title">
-              No Title
-            </div>
-          );
-        }
-      } else {
-        headerRightToplineContent = (
-          <div className="ch__right__topline__notitle" title="Direct Response">
-            {responseToAtom
-              ? "Re: " + get(responseToAtom, "humanReadable")
-              : get(targetAtom, "humandReadable")}
-          </div>
-        );
-      }
+      const title = get(targetAtom, "humanReadable");
+
+      const headerRightToplineContent = title ? (
+        <div className="ch__right__topline__title" title={title}>
+          {title}
+        </div>
+      ) : (
+        <div className="ch__right__topline__notitle" title="No Title">
+          No Title
+        </div>
+      );
 
       const personaName =
         targetHolderName && !atomUtils.hasGroupSocket(targetAtom) ? (

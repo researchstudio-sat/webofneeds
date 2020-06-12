@@ -37,9 +37,6 @@ export default function PageOverview() {
     .filter(metaAtom => atomUtils.isActive(metaAtom))
     .filter(metaAtom => debugModeEnabled || !atomUtils.isSearchAtom(metaAtom))
     .filter(
-      metaAtom => debugModeEnabled || !atomUtils.isDirectResponseAtom(metaAtom)
-    )
-    .filter(
       metaAtom => debugModeEnabled || !atomUtils.isInvisibleAtom(metaAtom)
     )
     .filter(

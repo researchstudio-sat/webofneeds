@@ -100,8 +100,6 @@ vocab.WONCON.binaryRatingBad = vocab.WONCON.baseUri + "Bad";
 vocab.WONCON.feedback = vocab.WONCON.baseUri + "feedback";
 vocab.WONCON.binaryRating = vocab.WONCON.baseUri + "binaryRating";
 vocab.WONCON.feedbackTarget = vocab.WON.baseUri + "feedbackTarget";
-vocab.WONCON.DirectResponse = vocab.WON.baseUri + "DirectResponse";
-vocab.WONCON.DirectResponseCompacted = vocab.WONCON.prefix + ":DirectResponse";
 
 vocab.WONMATCH = {};
 vocab.WONMATCH.baseUri = "https://w3id.org/won/matching#";

@@ -282,7 +282,6 @@ export const flags = {
   options: [
     { value: "match:NoHintForMe", label: "Silent" },
     { value: "match:NoHintForCounterpart", label: "Invisible" },
-    { value: "con:DirectResponse", label: "DirectResponse" },
     { value: "match:UsedForTesting", label: "UsedForTesting" },
   ],
   parseToRDF: function({ value }) {

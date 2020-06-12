@@ -28,10 +28,6 @@ export default function PokemonRaidCard({
   const identiconSvg = !useCaseIcon
     ? atomUtils.getIdenticonSvg(atom)
     : undefined;
-  const isDirectResponse = atomUtils.isDirectResponseAtom(atom);
-  const responseToUri =
-    isDirectResponse && getIn(atom, ["content", "responseToUri"]);
-  const responseToAtom = useSelector(generalSelectors.getAtom(responseToUri));
   const atomLocation = atomUtils.getLocation(atom);
   const holderUri = atomUtils.getHeldByUri(atom);
   const holder = useSelector(generalSelectors.getAtom(holderUri));
@@ -96,41 +92,17 @@ export default function PokemonRaidCard({
   }
 
   function createCardMainTopline() {
-    const hasTitle = () => {
-      if (isDirectResponse && responseToAtom) {
-        return !!get(responseToAtom, "humanReadable");
-      } else {
-        return !!get(atom, "humanReadable");
-      }
-    };
+    const title = get(atom, "humanReadable");
 
-    const generateTitleString = () => {
-      if (isDirectResponse && responseToAtom) {
-        return "Re: " + get(responseToAtom, "humanReadable");
-      } else {
-        return get(atom, "humanReadable");
-      }
-    };
-
-    const generateCardTitle = () => {
-      if (hasTitle()) {
-        return (
-          <div className="card__main__topline__title">
-            {generateTitleString()}
-          </div>
-        );
-      } else {
-        if (isDirectResponse) {
-          return (
-            <div className="card__main__topline__notitle">Re: No Title</div>
-          );
-        } else {
-          return <div className="card__main__topline__notitle">No Title</div>;
-        }
-      }
-    };
-
-    return <div className="card__main__topline">{generateCardTitle()}</div>;
+    return (
+      <div className="card__main__topline">
+        {title ? (
+          <div className="card__main__topline__title">{title}</div>
+        ) : (
+          <div className="card__main__topline__notitle">No Title</div>
+        )}
+      </div>
+    );
   }
 
   function createCardMainIcon() {
