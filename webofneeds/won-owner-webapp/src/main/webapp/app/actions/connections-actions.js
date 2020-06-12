@@ -464,32 +464,45 @@ function connectAdHoc(targetSocketUri, connectMessage, dispatch, getState) {
         // set default socketUri
         let senderSocketUri = `${atomUri}#chatSocket`;
 
-        // establish connection
-        const cnctMsg = buildConnectMessage({
-          connectMessage: connectMessage,
-          socketUri: senderSocketUri,
-          targetSocketUri: targetSocketUri,
-        });
+        if (generalSelectors.isAtomOwned(theirAtomUri)(state)) {
+          ownerApi
+            .serverSideConnect(senderSocketUri, targetSocketUri, true, false)
+            .then(async response => {
+              if (!response.ok) {
+                const errorMsg = await response.text();
+                throw new Error(
+                  `Could not connect sockets(${senderSocketUri}<->${targetSocketUri}): ${errorMsg}`
+                );
+              }
+            });
+        } else {
+          // establish connection
+          const cnctMsg = buildConnectMessage({
+            connectMessage: connectMessage,
+            socketUri: senderSocketUri,
+            targetSocketUri: targetSocketUri,
+          });
 
-        ownerApi.sendMessage(cnctMsg).then(jsonResp =>
-          won
-            .wonMessageFromJsonLd(
-              jsonResp.message,
-              vocab.WONMSG.uriPlaceholder.event
-            )
-            .then(wonMessage =>
-              dispatch({
-                type: actionTypes.atoms.connectSockets,
-                payload: {
-                  eventUri: jsonResp.messageUri,
-                  message: jsonResp.message,
-                  optimisticEvent: wonMessage,
-                  senderSocketUri: senderSocketUri,
-                  targetSocketUri: targetSocketUri,
-                },
-              })
-            )
-        );
+          ownerApi.sendMessage(cnctMsg).then(jsonResp =>
+            won
+              .wonMessageFromJsonLd(
+                jsonResp.message,
+                vocab.WONMSG.uriPlaceholder.event
+              )
+              .then(wonMessage =>
+                dispatch({
+                  type: actionTypes.atoms.connectSockets,
+                  payload: {
+                    eventUri: jsonResp.messageUri,
+                    message: jsonResp.message,
+                    optimisticEvent: wonMessage,
+                    senderSocketUri: senderSocketUri,
+                    targetSocketUri: targetSocketUri,
+                  },
+                })
+              )
+          );
+        }
       });
   });
 }

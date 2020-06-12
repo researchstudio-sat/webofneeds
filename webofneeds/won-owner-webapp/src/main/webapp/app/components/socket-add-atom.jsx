@@ -255,15 +255,19 @@ export default function WonSocketAddAtom({
             targetSocketUri
           );
 
-          if (!personaConnection) {
-            dispatch(
-              actionCreators.atoms__connectSockets(
+          let connectFunction = isAddToAtomOwned
+            ? actionCreators.atoms__connectSocketsServerSide(
+                senderSocketUri,
+                targetSocketUri
+              )
+            : actionCreators.atoms__connectSockets(
                 senderSocketUri,
                 targetSocketUri,
                 message
-              )
-            );
-            history.push("/connections");
+              );
+
+          if (!personaConnection) {
+            dispatch(connectFunction);
           } else if (personaConnection) {
             const personaConnectionUri = get(personaConnection, "uri");
 
@@ -271,13 +275,7 @@ export default function WonSocketAddAtom({
               connectionUtils.isSuggested(personaConnection) ||
               connectionUtils.isClosed(personaConnection)
             ) {
-              dispatch(
-                actionCreators.atoms__connectSockets(
-                  senderSocketUri,
-                  targetSocketUri,
-                  message
-                )
-              );
+              dispatch(connectFunction);
             } else if (connectionUtils.isRequestReceived(personaConnection)) {
               dispatch(
                 actionCreators.atoms__connectSockets(
