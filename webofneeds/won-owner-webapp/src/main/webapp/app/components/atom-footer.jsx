@@ -45,17 +45,35 @@ export default function WonAtomFooter({ atom, ownedConnection, className }) {
           <div className="atom-footer__infolabel">
             This Atom is inactive. Others will not be able to interact with it.
           </div>
-          <button
-            className="won-publish-button red won-button--filled"
-            onClick={() => dispatch(actionCreators.atoms__reopen(atomUri))}
-          >
-            Reopen
-          </button>
+          <div className="atom-footer__buttons">
+            <button
+              className="won-publish-button red won-button--filled"
+              onClick={() => dispatch(actionCreators.atoms__reopen(atomUri))}
+            >
+              Reopen
+            </button>
+          </div>
         </React.Fragment>
       );
       break;
-    //TODO: IMPL VIEW
     case FooterType.CONNECTION:
+      //TODO: IMPL VIEW
+      footerElement = (
+        <React.Fragment>
+          <div className="atom-footer__infolabel">
+            TODO: INFOLABEL BASED ON CONNECTION IN URL
+          </div>
+          <div className="atom-footer__buttons">
+            <button className="won-publish-button red won-button--outlined">
+              TODO: LABEL
+            </button>
+            <button className="won-publish-button red won-button--filled">
+              TODO: LABEL
+            </button>
+          </div>
+        </React.Fragment>
+      );
+      break;
     case FooterType.UNKNOWN:
     default:
       footerElement = undefined;

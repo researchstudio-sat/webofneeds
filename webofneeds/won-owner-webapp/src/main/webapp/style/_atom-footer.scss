@@ -3,7 +3,24 @@
 @import "animate";
 
 won-atom-footer {
+  display: grid;
+  grid-gap: 0.5rem;
+  align-items: center;
+
   .atom-footer__infolabel {
-    text-align: center;
+    text-align: left;
+  }
+
+  .atom-footer__buttons {
+    display: grid;
+    grid-gap: 0.5rem;
+    grid-auto-flow: column;
+  }
+
+  @media (min-width: $maxContentWidth) {
+    grid-auto-flow: column;
+  }
+  @media (max-width: $maxContentWidth) {
+    grid-auto-flow: row;
   }
 }
