@@ -30,7 +30,7 @@ export default function WonGenericSocketActions({
     }
 
     const payload = {
-      caption: "Connect",
+      caption: "Connection",
       text: dialogText,
       buttons: [
         {
@@ -97,7 +97,7 @@ export default function WonGenericSocketActions({
     }
 
     const payload = {
-      caption: "Connect",
+      caption: "Connection",
       text: "Do you want to send a Request?",
       buttons: [
         {

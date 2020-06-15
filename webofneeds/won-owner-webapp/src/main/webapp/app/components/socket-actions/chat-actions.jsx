@@ -27,7 +27,7 @@ export default function WonChatSocketActions({ connection, goBackOnAction }) {
     }
 
     const payload = {
-      caption: "Connect",
+      caption: "Chat",
       text: dialogText,
       buttons: [
         {
@@ -94,7 +94,7 @@ export default function WonChatSocketActions({ connection, goBackOnAction }) {
     }
 
     const payload = {
-      caption: "Connect",
+      caption: "Chat",
       text: "Do you want to send a Request?",
       buttons: [
         {

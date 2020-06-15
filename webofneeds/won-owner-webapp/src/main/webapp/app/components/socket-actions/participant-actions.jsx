@@ -31,7 +31,7 @@ export default function WonParticipantSocketActions({
     }
 
     const payload = {
-      caption: "Connect",
+      caption: "Participant",
       text: dialogText,
       buttons: [
         {
@@ -98,7 +98,7 @@ export default function WonParticipantSocketActions({
     }
 
     const payload = {
-      caption: "Connect",
+      caption: "Participant",
       text: "Do you want to send a Request?",
       buttons: [
         {

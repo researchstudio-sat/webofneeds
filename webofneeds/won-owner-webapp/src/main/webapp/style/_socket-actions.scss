@@ -10,27 +10,9 @@ won-socket-actions {
   height: 100%;
   box-sizing: border-box;
 
-  .si__actions__button.won-button--filled.red,
-  .si__actions__button.won-button--outlined.red.thin {
+  > .won-button--filled,
+  > .won-button--outlined {
     cursor: pointer;
-    font-size: $smallFontSize;
     padding: 0.5rem;
-
-    > .label {
-    }
-
-    > .icon {
-      @include fixed-square($postIconSize);
-    }
-  }
-
-  .si__actions__icon.won-icon.primary,
-  .si__actions__icon.won-icon.secondary,
-  .si__actions__icon.won-icon.disabled,
-  .si__actions__icon.won-icon.request {
-    cursor: pointer;
-    display: flex;
-    align-self: center;
-    margin: auto;
   }
 }

@@ -50,7 +50,7 @@ export default function WonBuddySocketActions({ connection, goBackOnAction }) {
 
   function requestBuddy() {
     const payload = {
-      caption: "Persona",
+      caption: "Buddy",
       text: "Send Buddy Request?",
       buttons: [
         {
@@ -96,7 +96,7 @@ export default function WonBuddySocketActions({ connection, goBackOnAction }) {
 
   function closeConnection(dialogText = "Remove Buddy?") {
     const payload = {
-      caption: "Persona",
+      caption: "Buddy",
       text: dialogText,
       buttons: [
         {
