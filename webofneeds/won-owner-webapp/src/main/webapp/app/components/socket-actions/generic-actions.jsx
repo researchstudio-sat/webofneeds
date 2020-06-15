@@ -1,5 +1,6 @@
 import React from "react";
 import { useDispatch } from "react-redux";
+import { useHistory } from "react-router-dom";
 import { actionCreators } from "../../actions/actions";
 import PropTypes from "prop-types";
 import { get } from "../../utils";
@@ -11,8 +12,12 @@ import ico16_checkmark from "~/images/won-icons/ico16_checkmark.svg";
 import ico36_close from "~/images/won-icons/ico36_close.svg";
 import ico36_outgoing from "~/images/won-icons/ico36_outgoing.svg";
 
-export default function WonGenericSocketActions({ connection }) {
+export default function WonGenericSocketActions({
+  connection,
+  goBackOnAction,
+}) {
   const dispatch = useDispatch();
+  const history = useHistory();
   const connectionState = get(connection, "state");
   const connectionUri = get(connection, "uri");
 
@@ -43,6 +48,9 @@ export default function WonGenericSocketActions({ connection }) {
 
             dispatch(actionCreators.connections__close(connUri));
             dispatch(actionCreators.view__hideModalDialog());
+            if (goBackOnAction) {
+              history.goBack();
+            }
           },
         },
         {
@@ -78,6 +86,9 @@ export default function WonGenericSocketActions({ connection }) {
         message
       )
     );
+    if (goBackOnAction) {
+      history.goBack();
+    }
   }
 
   function sendRequest(conn, message = "") {
@@ -119,6 +130,9 @@ export default function WonGenericSocketActions({ connection }) {
               )
             );
             dispatch(actionCreators.view__hideModalDialog());
+            if (goBackOnAction) {
+              history.goBack();
+            }
           },
         },
         {
@@ -132,72 +146,81 @@ export default function WonGenericSocketActions({ connection }) {
     dispatch(actionCreators.view__showModalDialog(payload));
   }
 
+  const closeButtonElement = (label, dialogText) => (
+    <button
+      className="won-button--outlined red"
+      onClick={() => closeConnection(connection, dialogText)}
+    >
+      <svg className="won-button-icon">
+        <use xlinkHref={ico36_close} href={ico36_close} />
+      </svg>
+      <span className="won-button-label">{label}</span>
+    </button>
+  );
+
   switch (connectionState) {
     case vocab.WON.RequestReceived:
       return (
         <won-socket-actions>
-          <svg
-            className="si__actions__icon request won-icon"
+          {closeButtonElement("Reject", "Reject Request?")}
+          <button
+            className="won-button--filled red"
             onClick={() => openRequest(connection)}
           >
-            <use xlinkHref={ico16_checkmark} href={ico16_checkmark} />
-          </svg>
-          <svg
-            className="si__actions__icon primary won-icon"
-            onClick={() => closeConnection(connection, "Reject Request?")}
-          >
-            <use xlinkHref={ico36_close} href={ico36_close} />
-          </svg>
+            <svg className="won-button-icon">
+              <use xlinkHref={ico16_checkmark} href={ico16_checkmark} />
+            </svg>
+            <span className="won-button-label">Accept</span>
+          </button>
         </won-socket-actions>
       );
 
     case vocab.WON.RequestSent:
       return (
         <won-socket-actions>
-          <svg className="si__actions__icon disabled won-icon" disabled={true}>
-            <use xlinkHref={ico36_outgoing} href={ico36_outgoing} />
-          </svg>
-          <svg
-            className="si__actions__icon secondary won-icon"
-            onClick={() => closeConnection(connection, "Cancel Request?")}
-          >
-            <use xlinkHref={ico36_close} href={ico36_close} />
-          </svg>
+          {closeButtonElement("Cancel", "Cancel Request?")}
+          <button className="won-button--filled red" disabled={true}>
+            <svg className="won-button-icon">
+              <use xlinkHref={ico36_outgoing} href={ico36_outgoing} />
+            </svg>
+            <span className="won-button-label">Pending...</span>
+          </button>
         </won-socket-actions>
       );
 
     case vocab.WON.Connected:
       return (
-        <won-socket-actions>
-          <svg
-            className="si__actions__icon secondary won-icon"
-            onClick={() => closeConnection(connection)}
-          >
-            <use xlinkHref={ico36_close} href={ico36_close} />
-          </svg>
-        </won-socket-actions>
+        <won-socket-actions>{closeButtonElement("Remove")}</won-socket-actions>
       );
 
     case vocab.WON.Closed:
       return (
-        <won-socket-actions>Connection has been closed</won-socket-actions>
+        <won-socket-actions>
+          <button
+            className="won-button--filled red"
+            onClick={() => sendRequest(connection)}
+          >
+            <svg className="won-button-icon">
+              <use xlinkHref={ico16_checkmark} href={ico16_checkmark} />
+            </svg>
+            <span className="won-button-label">Reopen</span>
+          </button>
+        </won-socket-actions>
       );
 
     case vocab.WON.Suggested:
       return (
         <won-socket-actions>
-          <svg
-            className="si__actions__icon request won-icon"
+          {closeButtonElement("Remove", "Remove Suggestion?")}
+          <button
+            className="won-button--filled red"
             onClick={() => sendRequest(connection)}
           >
-            <use xlinkHref={ico16_checkmark} href={ico16_checkmark} />
-          </svg>
-          <svg
-            className="si__actions__icon primary won-icon"
-            onClick={() => closeConnection(connection, "Remove Suggestion?")}
-          >
-            <use xlinkHref={ico36_close} href={ico36_close} />
-          </svg>
+            <svg className="won-button-icon">
+              <use xlinkHref={ico16_checkmark} href={ico16_checkmark} />
+            </svg>
+            <span className="won-button-label">Request</span>
+          </button>
         </won-socket-actions>
       );
 
@@ -207,4 +230,5 @@ export default function WonGenericSocketActions({ connection }) {
 }
 WonGenericSocketActions.propTypes = {
   connection: PropTypes.object.isRequired,
+  goBackOnAction: PropTypes.bool,
 };

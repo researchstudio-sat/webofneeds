@@ -47,9 +47,6 @@ export default function WonGenericItem({
       headerClassName = "status--sent";
       break;
 
-    case vocab.WON.Connected:
-      break;
-
     case vocab.WON.Closed:
       headerClassName = "status--closed";
       break;

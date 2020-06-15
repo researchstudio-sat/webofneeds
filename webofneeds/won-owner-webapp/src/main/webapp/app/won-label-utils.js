@@ -108,6 +108,41 @@ export function getSocketItemsLabel(socketType) {
   return labels.socketItems[socketType] || socketType;
 }
 
+export function getSocketActionInfo(
+  senderSocketType,
+  targetSocketType,
+  connectionState
+) {
+  //TODO: BETTER LABELS
+  let infoLabel = "";
+
+  switch (connectionState) {
+    case vocab.WON.Connected:
+      infoLabel = " already added to ";
+      break;
+    case vocab.WON.RequestSent:
+      infoLabel = " requested to join ";
+      break;
+    case vocab.WON.RequestReceived:
+      infoLabel = " requests to join ";
+      break;
+    case vocab.WON.Closed:
+      infoLabel = " was removed from ";
+      break;
+    case vocab.WON.Suggested:
+      infoLabel = " suggested as ";
+      break;
+    default:
+      infoLabel = " <-- ";
+      break;
+  }
+  return (
+    getSocketItemLabel(targetSocketType) +
+    infoLabel +
+    getSocketItemsLabel(senderSocketType)
+  );
+}
+
 /**
  * Both input parameters can be anything that `Date(...)` can
  * parse (incl. other `Date`s, xsd-strings,...)

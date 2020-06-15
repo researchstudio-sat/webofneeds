@@ -20,6 +20,7 @@ won-atom-footer {
 
   @media (min-width: $maxContentWidth) {
     grid-auto-flow: column;
+    grid-template-columns: 1fr min-content;
   }
   @media (max-width: $maxContentWidth) {
     grid-auto-flow: row;
