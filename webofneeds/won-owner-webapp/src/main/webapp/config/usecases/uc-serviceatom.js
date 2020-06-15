@@ -19,6 +19,11 @@ export const serviceAtom = {
       seeks: {},
     }),
   },
+  reactions: {
+    [vocab.HOLD.HolderSocketCompacted]: {
+      [vocab.HOLD.HoldableSocketCompacted]: ["*"],
+    },
+  },
   details: {
     personaName: { ...details.personaName, mandatory: true },
     description: { ...details.description },

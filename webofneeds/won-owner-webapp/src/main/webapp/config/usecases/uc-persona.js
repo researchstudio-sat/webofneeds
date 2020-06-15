@@ -31,6 +31,9 @@ export const persona = {
     [vocab.BUDDY.BuddySocketCompacted]: {
       [vocab.BUDDY.BuddySocketCompacted]: ["persona"],
     },
+    [vocab.HOLD.HolderSocketCompacted]: {
+      [vocab.HOLD.HoldableSocketCompacted]: ["*"],
+    },
   },
   details: {
     personaName: { ...details.personaName, mandatory: true },
