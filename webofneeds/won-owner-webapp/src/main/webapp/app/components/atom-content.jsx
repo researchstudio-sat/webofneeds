@@ -10,12 +10,12 @@ import * as processUtils from "../redux/utils/process-utils.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
 import vocab from "../service/vocab.js";
 
-import WonAtomContentHolds from "./atom-content-holds.jsx";
-import WonAtomContentChats from "./atom-content-chats.jsx";
-import WonAtomContentSocket from "./atom-content-socket.jsx";
-import WonAtomContentGeneral from "./atom-content-general.jsx";
-import WonAtomContentHolder from "./atom-content-holder.jsx";
-import WonAtomContentDetails from "./atom-content-details.jsx";
+import WonAtomContentHolds from "./atom-content/atom-content-holds.jsx";
+import WonAtomContentChats from "./atom-content/atom-content-chats.jsx";
+import WonAtomContentSocket from "./atom-content/atom-content-socket.jsx";
+import WonAtomContentGeneral from "./atom-content/atom-content-general.jsx";
+import WonAtomContentHolder from "./atom-content/atom-content-holder.jsx";
+import WonAtomContentDetails from "./atom-content/atom-content-details.jsx";
 import WonBuddyItem from "./socket-items/buddy-item.jsx";
 import WonParticipantItem from "./socket-items/participant-item.jsx";
 import WonGenericItem from "./socket-items/generic-item.jsx";

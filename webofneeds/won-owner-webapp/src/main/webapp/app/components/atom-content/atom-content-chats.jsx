@@ -2,23 +2,23 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import { useHistory } from "react-router-dom";
-import vocab from "../service/vocab.js";
+import vocab from "../../service/vocab.js";
 import {
   get,
   generateLink,
   sortByDate,
   filterConnectionsBySearchValue,
   filterAtomsBySearchValue,
-} from "../utils.js";
-import * as atomUtils from "../redux/utils/atom-utils.js";
-import * as connectionUtils from "../redux/utils/connection-utils.js";
-import * as generalSelectors from "../redux/selectors/general-selectors.js";
-import * as accountUtils from "../redux/utils/account-utils.js";
-import * as wonLabelUtils from "../won-label-utils.js";
+} from "../../utils.js";
+import * as atomUtils from "../../redux/utils/atom-utils.js";
+import * as connectionUtils from "../../redux/utils/connection-utils.js";
+import * as generalSelectors from "../../redux/selectors/general-selectors.js";
+import * as accountUtils from "../../redux/utils/account-utils.js";
+import * as wonLabelUtils from "../../won-label-utils.js";
 
-import WonConnectionSelectionItem from "./connection-selection-item.jsx";
-import WonTitlePicker from "./details/picker/title-picker.jsx";
-import WonSocketAddAtom from "./socket-add-atom.jsx";
+import WonConnectionSelectionItem from "../connection-selection-item.jsx";
+import WonTitlePicker from "../details/picker/title-picker.jsx";
+import WonSocketAddAtom from "../socket-add-atom.jsx";
 
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 import ico36_plus from "~/images/won-icons/ico36_plus.svg";

@@ -1,21 +1,21 @@
 import React from "react";
 import PropTypes from "prop-types";
 import Immutable from "immutable";
-import { actionCreators } from "../actions/actions.js";
+import { actionCreators } from "../../actions/actions.js";
 import { useSelector, useDispatch } from "react-redux";
-import { get, getIn, getQueryParams, generateLink } from "../utils.js";
-import * as generalSelectors from "../redux/selectors/general-selectors.js";
-import * as atomUtils from "../redux/utils/atom-utils.js";
-import * as processUtils from "../redux/utils/process-utils.js";
-import { Elm } from "../../elm/RatingView.elm";
+import { get, getIn, getQueryParams, generateLink } from "../../utils.js";
+import * as generalSelectors from "../../redux/selectors/general-selectors.js";
+import * as atomUtils from "../../redux/utils/atom-utils.js";
+import * as processUtils from "../../redux/utils/process-utils.js";
+import { Elm } from "../../../elm/RatingView.elm";
 
-import WonAtomIcon from "./atom-icon.jsx";
-import WonDescriptionViewer from "./details/viewer/description-viewer.jsx";
-import { details } from "../../config/detail-definitions.js";
+import WonAtomIcon from "../atom-icon.jsx";
+import WonDescriptionViewer from "../details/viewer/description-viewer.jsx";
+import { details } from "../../../config/detail-definitions.js";
 import "~/style/_atom-content-holder.scss";
-import ElmReact from "./elm-react";
+import ElmReact from "../elm-react";
 import { useHistory } from "react-router-dom";
-import vocab from "../service/vocab.js";
+import vocab from "../../service/vocab.js";
 
 export default function WonAtomContentHolder({ holdsUri }) {
   const history = useHistory();

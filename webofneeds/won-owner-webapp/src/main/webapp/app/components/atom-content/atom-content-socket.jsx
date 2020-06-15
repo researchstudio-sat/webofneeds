@@ -13,17 +13,17 @@ import {
   sortByDate,
   filterConnectionsBySearchValue,
   filterAtomsBySearchValue,
-} from "../utils.js";
+} from "../../utils.js";
 
-import * as atomUtils from "../redux/utils/atom-utils.js";
-import * as accountUtils from "../redux/utils/account-utils.js";
-import * as connectionUtils from "../redux/utils/connection-utils.js";
-import * as wonLabelUtils from "../won-label-utils.js";
-import WonTitlePicker from "./details/picker/title-picker.jsx";
-import WonSocketAddAtom from "./socket-add-atom.jsx";
+import * as atomUtils from "../../redux/utils/atom-utils.js";
+import * as accountUtils from "../../redux/utils/account-utils.js";
+import * as connectionUtils from "../../redux/utils/connection-utils.js";
+import * as wonLabelUtils from "../../won-label-utils.js";
+import WonTitlePicker from "../details/picker/title-picker.jsx";
+import WonSocketAddAtom from "../socket-add-atom.jsx";
 
 import "~/style/_atom-content-socket.scss";
-import * as generalSelectors from "../redux/selectors/general-selectors";
+import * as generalSelectors from "../../redux/selectors/general-selectors";
 
 export default function WonAtomContentSocket({
   atom,

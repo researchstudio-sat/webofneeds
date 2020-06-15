@@ -1,6 +1,6 @@
 import React from "react";
-import { get } from "../utils.js";
-import * as usecaseUtils from "../usecase-utils.js";
+import { get } from "../../utils.js";
+import * as usecaseUtils from "../../usecase-utils.js";
 
 import "~/style/_atom-content-details.scss";
 import PropTypes from "prop-types";
