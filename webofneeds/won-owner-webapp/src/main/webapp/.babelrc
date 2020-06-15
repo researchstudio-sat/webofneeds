@@ -1,17 +1,17 @@
 {
   "presets": [
     [
-      "env",
+      "@babel/preset-env",
       {
         "targets": {
           "browsers": ["last 2 versions"]
         }
       }
-    ]
+    ],
+    "@babel/preset-react"
   ],
   "plugins": [
-    "transform-react-jsx",
-    "transform-object-rest-spread",
-    "transform-custom-element-classes"
+    "@babel/plugin-transform-react-jsx",
+    ["@babel/plugin-proposal-decorators", { "legacy": true }]
   ]
 }
