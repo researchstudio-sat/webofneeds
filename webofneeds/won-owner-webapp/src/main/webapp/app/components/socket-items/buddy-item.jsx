@@ -10,10 +10,10 @@ import * as atomUtils from "../../redux/utils/atom-utils";
 import * as connectionUtils from "../../redux/utils/connection-utils";
 import vocab from "../../service/vocab.js";
 import WonAtomContextSwipeableView from "../atom-context-swipeable-view";
-import "~/style/_socket-item.scss";
 import VisibilitySensor from "react-visibility-sensor";
 import PropTypes from "prop-types";
 
+import "~/style/_socket-item.scss";
 import ico32_buddy_accept from "~/images/won-icons/ico32_buddy_accept.svg";
 import ico32_buddy_deny from "~/images/won-icons/ico32_buddy_deny.svg";
 import ico32_buddy_waiting from "~/images/won-icons/ico32_buddy_waiting.svg";

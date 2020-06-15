@@ -7,6 +7,7 @@ import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 
 import "~/style/_atom-footer.scss";
+import WonGenericSocketActions from "./socket-actions/generic-actions";
 
 const FooterType = {
   INACTIVE: 1,
@@ -61,16 +62,10 @@ export default function WonAtomFooter({ atom, ownedConnection, className }) {
       footerElement = (
         <React.Fragment>
           <div className="atom-footer__infolabel">
-            TODO: INFOLABEL BASED ON CONNECTION IN URL
+            TODO: INFOLABEL BASED ON CONNECTION IN URL AND PUT THE CORRECT
+            SOCKETACTIONS COMPONENT INTO THIS
           </div>
-          <div className="atom-footer__buttons">
-            <button className="won-publish-button red won-button--outlined">
-              TODO: LABEL
-            </button>
-            <button className="won-publish-button red won-button--filled">
-              TODO: LABEL
-            </button>
-          </div>
+          <WonGenericSocketActions connection={ownedConnection} />
         </React.Fragment>
       );
       break;

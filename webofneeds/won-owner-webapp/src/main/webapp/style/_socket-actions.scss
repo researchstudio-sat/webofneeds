@@ -1,0 +1,30 @@
+@import "won-config";
+@import "sizing-utils";
+@import "animate";
+
+won-socket-actions {
+  display: grid;
+  grid-auto-flow: column;
+  grid-gap: 0.5rem;
+  padding: 0.5rem;
+  height: 100%;
+  box-sizing: border-box;
+
+  .si__actions__button.won-button--filled.red,
+  .si__actions__button.won-button--outlined.red.thin {
+    cursor: pointer;
+    font-size: $smallFontSize;
+    padding: 0.5rem;
+  }
+
+  .si__actions__icon.won-icon.primary,
+  .si__actions__icon.won-icon.secondary,
+  .si__actions__icon.won-icon.disabled,
+  .si__actions__icon.won-icon.request {
+    cursor: pointer;
+    display: flex;
+    align-self: center;
+    margin: auto;
+    @include fixed-square($postIconSize);
+  }
+}
