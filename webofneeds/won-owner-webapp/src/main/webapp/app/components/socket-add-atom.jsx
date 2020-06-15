@@ -44,6 +44,7 @@ export default function WonSocketAddAtom({
   onClose,
   allowAdHoc,
   refuseOwned,
+  refuseNonOwned,
 }) {
   const dispatch = useDispatch();
   const history = useHistory();
@@ -74,6 +75,7 @@ export default function WonSocketAddAtom({
       const isOwned = accountUtils.isAtomOwned(accountState, atomUri);
 
       return (
+        (!refuseNonOwned || isOwned) && //Filters all non owned Atoms if refuseNonOwned is true
         (!refuseOwned || !isOwned) && //Filters all owned Atoms if refusedOwned is true
         (isAddToAtomOwned || isOwned) && //Filters all non-owned Atoms if isAddToAtomOwned is false
         atomUri !== addToAtomUri //Filters the addToAtomUri from the list
@@ -459,4 +461,5 @@ WonSocketAddAtom.propTypes = {
   onClose: PropTypes.func.isRequired,
   allowAdHoc: PropTypes.bool,
   refuseOwned: PropTypes.bool,
+  refuseNonOwned: PropTypes.bool,
 };
