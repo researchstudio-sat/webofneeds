@@ -29,7 +29,6 @@ export default function WonConnectionSelectionItem({
   const dispatch = useDispatch();
   const openConnectionUri = getQueryParams(history.location).connectionUri;
 
-  const senderAtomUri = get(connection, "uri").split("/c")[0];
   const targetAtomUri = get(connection, "targetAtomUri");
   const processState = useSelector(generalSelectors.getProcessState);
 
@@ -73,7 +72,6 @@ export default function WonConnectionSelectionItem({
               dispatch(
                 actionCreators.connections__markAsRead({
                   connectionUri: connectionUri,
-                  atomUri: senderAtomUri,
                 })
               );
             }
@@ -104,7 +102,6 @@ export default function WonConnectionSelectionItem({
       dispatch(
         actionCreators.connections__markAsRead({
           connectionUri: connectionUri,
-          atomUri: senderAtomUri,
         })
       );
     }
@@ -140,7 +137,6 @@ export default function WonConnectionSelectionItem({
               dispatch(
                 actionCreators.connections__markAsRead({
                   connectionUri: connectionUri,
-                  atomUri: senderAtomUri,
                 })
               );
             }

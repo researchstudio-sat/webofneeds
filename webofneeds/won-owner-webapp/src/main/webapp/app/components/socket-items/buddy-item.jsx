@@ -41,7 +41,6 @@ export default function WonBuddyItem({
         dispatch(
           actionCreators.connections__markAsRead({
             connectionUri: get(conn, "uri"),
-            atomUri: get(atom, "uri"),
           })
         );
       }, 1500);
@@ -53,7 +52,6 @@ export default function WonBuddyItem({
       dispatch(
         actionCreators.connections__markAsRead({
           connectionUri: get(connection, "uri"),
-          atomUri: get(atom, "uri"),
         })
       );
     }
@@ -113,7 +111,6 @@ export default function WonBuddyItem({
               dispatch(
                 actionCreators.connections__markAsRead({
                   connectionUri: get(connection, "uri"),
-                  atomUri: get(atom, "uri"),
                 })
               );
             }

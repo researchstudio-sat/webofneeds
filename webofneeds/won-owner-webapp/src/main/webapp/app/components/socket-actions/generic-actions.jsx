@@ -15,7 +15,6 @@ export default function WonGenericSocketActions({ connection }) {
   const dispatch = useDispatch();
   const connectionState = get(connection, "state");
   const connectionUri = get(connection, "uri");
-  const atomUri = connectionUri && connectionUri.split("/c")[0];
 
   function closeConnection(
     conn,
@@ -38,7 +37,6 @@ export default function WonGenericSocketActions({ connection }) {
               dispatch(
                 actionCreators.connections__markAsRead({
                   connectionUri: connectionUri,
-                  atomUri: atomUri,
                 })
               );
             }
@@ -67,7 +65,6 @@ export default function WonGenericSocketActions({ connection }) {
       dispatch(
         actionCreators.connections__markAsRead({
           connectionUri: connectionUri,
-          atomUri: atomUri,
         })
       );
     }
@@ -103,7 +100,6 @@ export default function WonGenericSocketActions({ connection }) {
               dispatch(
                 actionCreators.connections__markAsRead({
                   connectionUri: connectionUri,
-                  atomUri: atomUri,
                 })
               );
             }

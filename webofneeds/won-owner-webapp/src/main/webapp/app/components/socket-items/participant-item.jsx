@@ -51,7 +51,6 @@ export default function WonParticipantItem({
               dispatch(
                 actionCreators.connections__markAsRead({
                   connectionUri: connUri,
-                  atomUri: get(atom, "uri"),
                 })
               );
             }
@@ -82,7 +81,6 @@ export default function WonParticipantItem({
       dispatch(
         actionCreators.connections__markAsRead({
           connectionUri: connUri,
-          atomUri: get(atom, "uri"),
         })
       );
     }
@@ -118,7 +116,6 @@ export default function WonParticipantItem({
               dispatch(
                 actionCreators.connections__markAsRead({
                   connectionUri: connUri,
-                  atomUri: get(atom, "uri"),
                 })
               );
             }
@@ -157,7 +154,6 @@ export default function WonParticipantItem({
         dispatch(
           actionCreators.connections__markAsRead({
             connectionUri: get(conn, "uri"),
-            atomUri: get(atom, "uri"),
           })
         );
       }, 1500);

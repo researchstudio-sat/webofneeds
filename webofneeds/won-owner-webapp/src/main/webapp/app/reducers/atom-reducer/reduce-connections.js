@@ -58,9 +58,9 @@ function addConnectionFull(atomState, connection) {
   return atomState;
 }
 
-export function markConnectionAsRead(state, connectionUri, atomUri) {
-  const atom = get(state, atomUri);
-  const connection = getIn(atom, ["connections", connectionUri]);
+export function markConnectionAsRead(state, connectionUri) {
+  const atomUri = connectionUri && connectionUri.split("/c")[0];
+  const connection = getIn(state, [atomUri, "connections", connectionUri]);
 
   markUriAsRead(connectionUri);
 

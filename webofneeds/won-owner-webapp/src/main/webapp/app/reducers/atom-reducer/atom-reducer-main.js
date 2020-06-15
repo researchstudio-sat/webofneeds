@@ -588,8 +588,7 @@ export default function(allAtomsInState = initialState, action = {}) {
     case actionTypes.connections.markAsRead:
       return markConnectionAsRead(
         allAtomsInState,
-        action.payload.connectionUri,
-        action.payload.atomUri
+        action.payload.connectionUri
       );
     case actionTypes.connections.rate:
       return markConnectionAsRated(
