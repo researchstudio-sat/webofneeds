@@ -23,7 +23,7 @@ export default function WonAtomInfo({
   const atomLoading =
     !atom || processUtils.isAtomLoading(processState, atomUri);
 
-  const showFooter =
+  const showActions =
     !atomLoading && (atomUtils.isInactive(atom) || ownedConnection);
 
   return (
@@ -33,13 +33,13 @@ export default function WonAtomInfo({
       }
     >
       <WonAtomHeaderBig atom={atom} />
-      <WonAtomMenu atom={atom} defaultTab={defaultTab} />
-      <WonAtomContent atom={atom} defaultTab={defaultTab} />
-      {showFooter ? (
+      {showActions ? (
         <WonAtomActions atom={atom} ownedConnection={ownedConnection} />
       ) : (
         undefined
       )}
+      <WonAtomMenu atom={atom} defaultTab={defaultTab} />
+      <WonAtomContent atom={atom} defaultTab={defaultTab} />
     </won-atom-info>
   );
 }

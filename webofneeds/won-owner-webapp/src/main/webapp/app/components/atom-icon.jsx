@@ -188,9 +188,9 @@ export default function WonAtomIcon({ atom, className, onClick, flipIcons }) {
       onClick={onClick}
     >
       {generateAtomIcon(mainIconAtom)}
-      {atomUtils.hasHolderSocket(atom)
-        ? undefined
-        : generateSubIcon(subIconAtom)}
+      {atomUtils.hasHoldableSocket(atom)
+        ? generateSubIcon(subIconAtom)
+        : undefined}
     </won-atom-icon>
   );
 }
