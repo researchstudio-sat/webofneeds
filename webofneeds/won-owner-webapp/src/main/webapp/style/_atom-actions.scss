@@ -2,17 +2,17 @@
 @import "sizing-utils";
 @import "animate";
 
-won-atom-footer {
+won-atom-actions {
   display: grid;
   grid-gap: 0.5rem;
   align-items: center;
 
-  .atom-footer__infolabel {
+  .atom-actions__infolabel {
     text-align: left;
   }
 
   won-socket-actions,
-  .atom-footer__buttons {
+  .atom-actions__buttons {
     display: grid;
     grid-gap: 0.5rem;
     grid-auto-flow: column;

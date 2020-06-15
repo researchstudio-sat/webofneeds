@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { get } from "../utils.js";
 import WonAtomHeaderBig from "./atom-header-big.jsx";
 import WonAtomMenu from "./atom-menu.jsx";
-import WonAtomFooter from "./atom-footer.jsx";
+import WonAtomActions from "./atom-actions.jsx";
 import WonAtomContent from "./atom-content.jsx";
 import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as atomUtils from "../redux/utils/atom-utils";
@@ -36,7 +36,7 @@ export default function WonAtomInfo({
       <WonAtomMenu atom={atom} defaultTab={defaultTab} />
       <WonAtomContent atom={atom} defaultTab={defaultTab} />
       {showFooter ? (
-        <WonAtomFooter atom={atom} ownedConnection={ownedConnection} />
+        <WonAtomActions atom={atom} ownedConnection={ownedConnection} />
       ) : (
         undefined
       )}

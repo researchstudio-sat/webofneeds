@@ -8,7 +8,7 @@ import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as wonLabelUtils from "../won-label-utils.js";
 
-import "~/style/_atom-footer.scss";
+import "~/style/_atom-actions.scss";
 import WonGenericSocketActions from "./socket-actions/generic-actions";
 import WonParticipantSocketActions from "./socket-actions/participant-actions";
 import WonBuddySocketActions from "./socket-actions/buddy-actions";
@@ -20,7 +20,7 @@ const FooterType = {
   UNKNOWN: 4,
 };
 
-export default function WonAtomFooter({ atom, ownedConnection, className }) {
+export default function WonAtomActions({ atom, ownedConnection, className }) {
   const dispatch = useDispatch();
   const atomUri = get(atom, "uri");
 
@@ -61,7 +61,7 @@ export default function WonAtomFooter({ atom, ownedConnection, className }) {
   switch (footerType) {
     case FooterType.INACTIVE:
       footerElement = (
-        <div className="atom-footer__infolabel">
+        <div className="atom-actions__infolabel">
           Atom is inactive, no requests allowed
         </div>
       );
@@ -69,10 +69,10 @@ export default function WonAtomFooter({ atom, ownedConnection, className }) {
     case FooterType.INACTIVE_OWNED:
       footerElement = (
         <React.Fragment>
-          <div className="atom-footer__infolabel">
+          <div className="atom-actions__infolabel">
             This Atom is inactive. Others will not be able to interact with it.
           </div>
-          <div className="atom-footer__buttons">
+          <div className="atom-actions__buttons">
             <button
               className="won-publish-button red won-button--filled"
               onClick={() => dispatch(actionCreators.atoms__reopen(atomUri))}
@@ -101,7 +101,7 @@ export default function WonAtomFooter({ atom, ownedConnection, className }) {
 
         footerElement = (
           <React.Fragment>
-            <div className="atom-footer__infolabel">
+            <div className="atom-actions__infolabel">
               {wonLabelUtils.getSocketActionInfo(
                 senderSocketType,
                 targetSocketType,
@@ -120,12 +120,12 @@ export default function WonAtomFooter({ atom, ownedConnection, className }) {
   }
 
   return (
-    <won-atom-footer class={className ? className : ""}>
+    <won-atom-actions class={className ? className : ""}>
       {footerElement}
-    </won-atom-footer>
+    </won-atom-actions>
   );
 }
-WonAtomFooter.propTypes = {
+WonAtomActions.propTypes = {
   atom: PropTypes.object,
   ownedConnection: PropTypes.object,
   className: PropTypes.string,
