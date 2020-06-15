@@ -56,33 +56,15 @@ won-connection-selection-item {
         padding-right: 0.5rem;
       }
     }
-    &__actions {
+    won-socket-actions {
       display: grid;
       grid-auto-flow: column;
       grid-gap: 0.5rem;
-      height: 100%;
-      &__button.won-button--filled.red,
-      &__button.won-button--outlined.red.thin {
-        cursor: pointer;
-        font-size: $smallFontSize;
-        padding: 0.5rem;
-      }
-      &__icon.won-icon.primary,
-      &__icon.won-icon.secondary,
-      &__icon.won-icon.disabled,
-      &__icon.won-icon.request {
-        cursor: pointer;
-        display: flex;
-        align-self: center;
-        margin: auto;
-        @include fixed-square($postIconSize);
-      }
     }
   }
   .csi__trigger {
     grid-area: trigger;
     padding: 0.5rem;
-
     --local-primary: #{$won-secondary-color};
     @include fixed-square($postIconSizeMobile);
   }
