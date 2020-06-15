@@ -46,36 +46,23 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
     getIn(state, ["atoms", targetAtomUri])
   );
 
-  const targetHolderName = useSelector(state =>
-    getIn(state, ["atoms", atomUtils.getHeldByUri(targetAtom), "humanReadble"])
+  const targetHolderName = useSelector(
+    state =>
+      atomUtils.hasHoldableSocket(targetAtom) &&
+      (getIn(state, [
+        "atoms",
+        atomUtils.getHeldByUri(targetAtom),
+        "humanReadable",
+      ]) ||
+        get(targetAtom, "fakePersonaName"))
   );
 
   const processState = useSelector(generalSelectors.getProcessState);
+  const accountState = useSelector(generalSelectors.getAccountState);
 
-  const targetAtomLoading = processUtils.isAtomLoading(
-    processState,
-    get(targetAtom, "uri")
-  );
-
-  const isTargetAtomOwned = useSelector(state =>
-    accountUtils.isAtomOwned(
-      generalSelectors.getAccountState(state),
-      targetAtomUri
-    )
-  );
-
-  const groupConnections =
-    isTargetAtomOwned &&
-    get(targetAtom, "connections")
-      .filter(
-        con => atomUtils.getGroupSocket(targetAtom) === get(con, "socketUri")
-      )
-      .filter(con => connectionUtils.isRequestReceived(con));
-
-  const hasGroupRequests = groupConnections && groupConnections.size > 0;
-  const hasNewGroupRequests = !!(
-    hasGroupRequests &&
-    groupConnections.find(con => connectionUtils.isUnread(con))
+  const isTargetAtomOwned = accountUtils.isAtomOwned(
+    accountState,
+    targetAtomUri
   );
 
   const globalLastUpdateTime = useSelector(
@@ -87,10 +74,10 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
   const connectionOrAtomsLoading =
     !connection ||
     !targetAtom ||
-    processUtils.isAtomToLoad(processState, targetAtomUri) ||
     !senderAtom ||
+    processUtils.isAtomToLoad(processState, targetAtomUri) ||
     processUtils.isAtomLoading(processState, get(senderAtom, "uri")) ||
-    targetAtomLoading ||
+    processUtils.isAtomLoading(processState, get(targetAtom, "uri")) ||
     processUtils.isConnectionLoading(processState, get(connection, "uri"));
 
   function onChange(isVisible) {
@@ -122,7 +109,7 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
       targetAtomUri &&
       (!targetAtom ||
         (processUtils.isAtomToLoad(processState, get(targetAtom, "uri")) &&
-          !targetAtomLoading))
+          !processUtils.isAtomLoading(processState, get(targetAtom, "uri"))))
     ) {
       dispatch(actionCreators.atoms__fetchUnloadedAtom(targetAtomUri));
     }
@@ -239,19 +226,16 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
         </div>
       );
 
-      const personaName =
-        targetHolderName && !atomUtils.hasGroupSocket(targetAtom) ? (
-          <span className="ch__right__subtitle__type__persona">
-            {targetHolderName}
-          </span>
-        ) : (
-          undefined
-        );
-
-      const groupChatLabel = atomUtils.hasGroupSocket(targetAtom) ? (
+      const groupChatLabelOrPersonaName = atomUtils.hasGroupSocket(
+        targetAtom
+      ) ? (
         <span className="ch__right__subtitle__type__groupchat">
           {"Group Chat" +
             (atomUtils.hasChatSocket(targetAtom) ? " enabled" : "")}
+        </span>
+      ) : targetHolderName ? (
+        <span className="ch__right__subtitle__type__persona">
+          {targetHolderName}
         </span>
       ) : (
         undefined
@@ -303,8 +287,7 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
 
           <div className="ch__right__subtitle">
             <span className="ch__right__subtitle__type">
-              {personaName}
-              {groupChatLabel}
+              {groupChatLabelOrPersonaName}
               <WonConnectionState connection={connection} />
               {unreadCount}
               {messageOrState}
@@ -314,26 +297,38 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
         </React.Fragment>
       );
     }
-    let incomingRequestsIcon =
-      isTargetAtomOwned && hasGroupRequests ? (
-        <div className="ch__indicator">
-          <won-connection-indicators>
-            <svg
-              className={
-                "indicators__item " +
-                (!hasNewGroupRequests ? " indicators__item--reads " : "") +
-                (hasNewGroupRequests ? " indicators__item--unreads " : "")
-              }
-              //TODO
-              onClick={() => selectMembersTab()}
-            >
-              <use xlinkHref={ico36_incoming} href={ico36_incoming} />
-            </svg>
-          </won-connection-indicators>
-        </div>
-      ) : (
-        undefined
-      );
+
+    let incomingRequestsIcon;
+
+    if (isTargetAtomOwned) {
+      const groupConnectionRequests = atomUtils
+        .getConnections(targetAtom, vocab.GROUP.GroupSocketCompacted)
+        .filter(con => connectionUtils.isRequestReceived(con));
+
+      if (groupConnectionRequests && groupConnectionRequests.size > 0) {
+        const hasNewGroupRequests = !!groupConnectionRequests.find(con =>
+          connectionUtils.isUnread(con)
+        );
+
+        incomingRequestsIcon = (
+          <div className="ch__indicator">
+            <won-connection-indicators>
+              <svg
+                className={
+                  "indicators__item " +
+                  (hasNewGroupRequests
+                    ? " indicators__item--unreads "
+                    : " indicators__item--reads ")
+                }
+                onClick={selectMembersTab}
+              >
+                <use xlinkHref={ico36_incoming} href={ico36_incoming} />
+              </svg>
+            </won-connection-indicators>
+          </div>
+        );
+      }
+    }
 
     return (
       <won-connection-header class={toLink ? "clickable" : ""}>
