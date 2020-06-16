@@ -569,9 +569,9 @@ export function getConnections(atomImm, socketType) {
           connectionUtils.hasSocketUri(conn, socketUri)
         )
       : Immutable.Map();
-  } else {
-    return connections || Immutable.Map();
   }
+
+  return socketType || !connections ? Immutable.Map() : connections;
 }
 
 /**
