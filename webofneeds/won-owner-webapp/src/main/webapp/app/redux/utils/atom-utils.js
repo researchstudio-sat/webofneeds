@@ -434,11 +434,6 @@ export function getSockets(atomImm) {
   return getIn(atomImm, ["content", "sockets"]);
 }
 
-export function getSocketTypeArray(atomImm) {
-  const sockets = getSockets(atomImm);
-  return sockets ? sockets.valueSeq().toArray() : [];
-}
-
 export function getSocketsWithKeysReset(atomImm) {
   const sockets = getSockets(atomImm);
 

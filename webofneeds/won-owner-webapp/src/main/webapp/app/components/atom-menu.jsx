@@ -16,7 +16,6 @@ import vocab from "../service/vocab.js";
 import Immutable from "immutable";
 
 import "~/style/_atom-menu.scss";
-import { getSocketTypeArray } from "../redux/utils/atom-utils";
 
 export default function WonAtomMenu({
   atom,
@@ -48,7 +47,6 @@ export default function WonAtomMenu({
   const atomFailedToLoad =
     atom && processUtils.hasAtomFailedToLoad(process, atomUri);
   const shouldShowRdf = viewUtils.showRdf(viewState);
-  const socketTypeArray = getSocketTypeArray(atom);
 
   const visibleTab = viewUtils.getVisibleTabByAtomUri(
     viewState,
@@ -97,7 +95,7 @@ export default function WonAtomMenu({
   );
 
   // Add generic Tabs based on available Sockets
-  socketTypeArray.map((socketType, index) => {
+  relevantConnectionsMap.map((socketTypeConnections, socketType) => {
     let label = wonLabelUtils.getSocketTabLabel(socketType);
     let countLabel;
 
@@ -129,7 +127,7 @@ export default function WonAtomMenu({
 
       case vocab.CHAT.ChatSocketCompacted: {
         const socketUri = atomUtils.getSocketUri(atom, socketType);
-        const activeConnections = get(relevantConnectionsMap, socketType)
+        const activeConnections = socketTypeConnections
           .filter(
             conn =>
               // We filter out every chat connection that is not owned, otherwise the count would show non owned chatconnections of non owned atoms
@@ -147,10 +145,9 @@ export default function WonAtomMenu({
         break;
       }
       default: {
-        const activeConnections = get(
-          relevantConnectionsMap,
-          socketType
-        ).filter(conn => !connectionUtils.isClosed(conn));
+        const activeConnections = socketTypeConnections.filter(
+          conn => !connectionUtils.isClosed(conn)
+        );
 
         inactive = !activeConnections || activeConnections.size === 0;
         countLabel =
@@ -167,7 +164,7 @@ export default function WonAtomMenu({
     if (label) {
       buttons.push(
         <div
-          key={socketType + "-" + index}
+          key={socketType}
           className={generateAtomItemCssClasses(selected, inactive, unread)}
           onClick={() =>
             dispatch(

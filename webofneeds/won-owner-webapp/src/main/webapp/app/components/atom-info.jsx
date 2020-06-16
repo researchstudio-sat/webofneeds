@@ -26,7 +26,7 @@ export default function WonAtomInfo({
   const showActions =
     !atomLoading && (atomUtils.isInactive(atom) || ownedConnection);
 
-  const relevantConnectionsOfAtom = useSelector(
+  const relevantConnectionsMap = useSelector(
     generalSelectors.getConnectionsOfAtomWithOwnedTargetConnections(atomUri)
   );
 
@@ -45,12 +45,12 @@ export default function WonAtomInfo({
       <WonAtomMenu
         atom={atom}
         defaultTab={defaultTab}
-        relevantConnectionsMap={relevantConnectionsOfAtom}
+        relevantConnectionsMap={relevantConnectionsMap}
       />
       <WonAtomContent
         atom={atom}
         defaultTab={defaultTab}
-        relevantConnectionsMap={relevantConnectionsOfAtom}
+        relevantConnectionsMap={relevantConnectionsMap}
       />
     </won-atom-info>
   );

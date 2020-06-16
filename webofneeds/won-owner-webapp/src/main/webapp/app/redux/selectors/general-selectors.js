@@ -128,19 +128,17 @@ export const getConnectionsOfAtomWithOwnedTargetConnections = atomUri =>
         get(atom, "uri")
       );
 
-      if (isAtomOwned) {
-        return atomUtils.getConnections(atom);
-      } else {
-        let relevantConnections = Immutable.Map();
-
-        const socketConnectionMap = atomUtils
-          .getSockets(atom)
-          .flip()
-          .map((_socketUri, _socketType) => {
+      return atomUtils
+        .getSockets(atom)
+        .flip()
+        .map((_socketUri, _socketType) => {
+          if (isAtomOwned) {
+            return atomUtils.getConnections(atom, _socketType);
+          } else {
             const ownedConnectionsToSocketUri = getAllOwnedConnectionsWithTargetSocketUri(
               _socketUri
             )(state);
-            const relevantConnectionsForSocketUri = atomUtils
+            return atomUtils
               .getConnections(atom, _socketType)
               .filter(conn => {
                 //Filters out all connections that have a "counterpart" connection stored in another atom we own
@@ -151,17 +149,8 @@ export const getConnectionsOfAtomWithOwnedTargetConnections = atomUri =>
                 );
               })
               .merge(ownedConnectionsToSocketUri);
-
-            relevantConnections = relevantConnections.merge(
-              relevantConnectionsForSocketUri
-            );
-            return relevantConnectionsForSocketUri;
-          });
-
-        console.debug("socketConnectionMap: ", socketConnectionMap);
-
-        return relevantConnections;
-      }
+          }
+        });
     }
   );
 

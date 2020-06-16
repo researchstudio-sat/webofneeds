@@ -187,7 +187,10 @@ export default function WonAtomContent({
             socketType={visibleTab}
             ItemComponent={WonParticipantItem}
             allowAdHoc={true}
-            relevantConnections={get(relevantConnectionsMap, visibleTab)}
+            relevantConnections={get(
+              relevantConnectionsMap,
+              vocab.GROUP.GroupSocketCompacted
+            )}
           />
         );
         break;
@@ -200,7 +203,10 @@ export default function WonAtomContent({
             socketType={visibleTab}
             ItemComponent={WonBuddyItem}
             refuseOwned={isOwned}
-            relevantConnections={get(relevantConnectionsMap, visibleTab)}
+            relevantConnections={get(
+              relevantConnectionsMap,
+              vocab.BUDDY.BuddySocketCompacted
+            )}
           />
         );
         break;
@@ -221,8 +227,14 @@ export default function WonAtomContent({
         break;
 
       case vocab.CHAT.ChatSocketCompacted: {
-        const socketUri = atomUtils.getSocketUri(atom, visibleTab);
-        const connections = get(relevantConnectionsMap, visibleTab).filter(
+        const socketUri = atomUtils.getSocketUri(
+          atom,
+          vocab.CHAT.ChatSocketCompacted
+        );
+        const relevantConnections = get(
+          relevantConnectionsMap,
+          vocab.CHAT.ChatSocketCompacted
+        ).filter(
           conn =>
             // We filter out every chat connection that is not owned, otherwise the count would show non owned chatconnections of non owned atoms
             isOwned || connectionUtils.hasTargetSocketUri(conn, socketUri)
@@ -232,7 +244,7 @@ export default function WonAtomContent({
             atom={atom}
             allowAdHoc={!isOwned}
             refuseOwned={isOwned}
-            relevantConnections={connections}
+            relevantConnections={relevantConnections}
           />
         );
         break;
