@@ -274,12 +274,7 @@ export default function WonConnectionMessage({
 
   if (isChangeNotificationMessage) {
     messageContentElement = (
-      <VisibilitySensor
-        onChange={isVisible => {
-          isVisible && isUnread && markAsRead();
-        }}
-        intervalDelay={2000}
-      >
+      <VisibilitySensor onChange={onChange} intervalDelay={2000}>
         <WonLabelledHr
           className="won-cm__modified"
           label="Post has been modified"
@@ -288,12 +283,7 @@ export default function WonConnectionMessage({
     );
   } else {
     if (isUnread) {
-      <VisibilitySensor
-        onChange={isVisible => {
-          isVisible && isUnread && markAsRead();
-        }}
-        intervalDelay={2000}
-      />;
+      <VisibilitySensor onChange={onChange} intervalDelay={2000} />;
     }
     const messageIcon = [];
 
@@ -417,12 +407,7 @@ export default function WonConnectionMessage({
     messageContentElement = (
       <React.Fragment>
         {messageIcon}
-        <VisibilitySensor
-          onChange={isVisible => {
-            isVisible && isUnread && markAsRead();
-          }}
-          intervalDelay={2000}
-        >
+        <VisibilitySensor onChange={onChange} intervalDelay={2000}>
           <div className={generateCenterCssClasses()}>
             <div className={generateCenterBubbleCssClasses()}>
               {messageCenterContentElement}
@@ -441,6 +426,14 @@ export default function WonConnectionMessage({
         </VisibilitySensor>
       </React.Fragment>
     );
+  }
+
+  function onChange(isVisible) {
+    if (isVisible) {
+      if (isUnread) {
+        markAsRead();
+      }
+    }
   }
 
   return (
