@@ -25,10 +25,13 @@ import ico36_plus from "~/images/won-icons/ico36_plus.svg";
 
 import "~/style/_atom-content-chats.scss";
 
-export default function AtomContentChats({ atom, allowAdHoc, refuseOwned }) {
+export default function AtomContentChats({
+  atom,
+  allowAdHoc,
+  refuseOwned,
+  relevantConnections,
+}) {
   const history = useHistory();
-  const chatSocketUri = atomUtils.getChatSocket(atom);
-
   const accountState = useSelector(generalSelectors.getAccountState);
   const isAtomOwned = accountUtils.isAtomOwned(accountState, get(atom, "uri"));
 
@@ -38,14 +41,6 @@ export default function AtomContentChats({ atom, allowAdHoc, refuseOwned }) {
   const [showAddPicker, toggleAddPicker] = useState(false);
 
   const storedAtoms = useSelector(generalSelectors.getAtoms);
-  const ownedConnectionsToSocketUri = useSelector(
-    state =>
-      !isAtomOwned &&
-      generalSelectors.getAllOwnedConnectionsWithTargetSocketUri(chatSocketUri)(
-        state
-      )
-  );
-
   const filteredStoredAtoms = filterAtomsBySearchValue(storedAtoms, searchText);
 
   const reactions = atomUtils.getReactions(
@@ -55,11 +50,7 @@ export default function AtomContentChats({ atom, allowAdHoc, refuseOwned }) {
 
   // If the atom is not owned, we will show Our ChatConnections to this atom instead
   const chatConnections = filterConnectionsBySearchValue(
-    isAtomOwned
-      ? get(atom, "connections").filter(
-          conn => get(conn, "socketUri") === chatSocketUri
-        )
-      : ownedConnectionsToSocketUri,
+    relevantConnections,
     storedAtoms,
     searchText,
     false,
@@ -254,6 +245,7 @@ export default function AtomContentChats({ atom, allowAdHoc, refuseOwned }) {
 
 AtomContentChats.propTypes = {
   atom: PropTypes.object.isRequired,
+  relevantConnections: PropTypes.object.isRequired,
   allowAdHoc: PropTypes.bool,
   refuseOwned: PropTypes.bool,
 };

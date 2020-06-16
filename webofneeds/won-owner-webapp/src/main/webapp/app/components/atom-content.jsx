@@ -29,8 +29,13 @@ import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg"
 import rdf_logo_1 from "~/images/won-icons/rdf_logo_1.svg";
 import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 import { useHistory } from "react-router-dom";
+import * as connectionUtils from "../redux/utils/connection-utils";
 
-export default function WonAtomContent({ atom, defaultTab }) {
+export default function WonAtomContent({
+  atom,
+  defaultTab,
+  relevantConnectionsMap,
+}) {
   const history = useHistory();
   const dispatch = useDispatch();
   const atomUri = get(atom, "uri");
@@ -175,27 +180,31 @@ export default function WonAtomContent({ atom, defaultTab }) {
         }
         break;
 
-      case vocab.GROUP.GroupSocketCompacted:
+      case vocab.GROUP.GroupSocketCompacted: {
         visibleTabFragment = (
           <WonAtomContentSocket
             atom={atom}
             socketType={visibleTab}
             ItemComponent={WonParticipantItem}
             allowAdHoc={true}
+            relevantConnections={get(relevantConnectionsMap, visibleTab)}
           />
         );
         break;
+      }
 
-      case vocab.BUDDY.BuddySocketCompacted:
+      case vocab.BUDDY.BuddySocketCompacted: {
         visibleTabFragment = (
           <WonAtomContentSocket
             atom={atom}
             socketType={visibleTab}
             ItemComponent={WonBuddyItem}
             refuseOwned={isOwned}
+            relevantConnections={get(relevantConnectionsMap, visibleTab)}
           />
         );
         break;
+      }
 
       case vocab.REVIEW.ReviewSocketCompacted:
         visibleTabFragment = (
@@ -211,15 +220,23 @@ export default function WonAtomContent({ atom, defaultTab }) {
         visibleTabFragment = <WonAtomContentHolds atom={atom} />;
         break;
 
-      case vocab.CHAT.ChatSocketCompacted:
+      case vocab.CHAT.ChatSocketCompacted: {
+        const socketUri = atomUtils.getSocketUri(atom, visibleTab);
+        const connections = get(relevantConnectionsMap, visibleTab).filter(
+          conn =>
+            // We filter out every chat connection that is not owned, otherwise the count would show non owned chatconnections of non owned atoms
+            isOwned || connectionUtils.hasTargetSocketUri(conn, socketUri)
+        );
         visibleTabFragment = (
           <WonAtomContentChats
             atom={atom}
             allowAdHoc={!isOwned}
             refuseOwned={isOwned}
+            relevantConnections={connections}
           />
         );
         break;
+      }
 
       case "RDF":
         visibleTabFragment = (
@@ -252,15 +269,17 @@ export default function WonAtomContent({ atom, defaultTab }) {
         );
         break;
 
-      default:
+      default: {
         visibleTabFragment = (
           <WonAtomContentSocket
             atom={atom}
             socketType={visibleTab}
             ItemComponent={WonGenericItem}
+            relevantConnections={get(relevantConnectionsMap, visibleTab)}
           />
         );
         break;
+      }
     }
 
     return (
@@ -275,5 +294,6 @@ export default function WonAtomContent({ atom, defaultTab }) {
 }
 WonAtomContent.propTypes = {
   atom: PropTypes.object.isRequired,
+  relevantConnectionsMap: PropTypes.object.isRequired,
   defaultTab: PropTypes.string,
 };

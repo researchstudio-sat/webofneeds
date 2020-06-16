@@ -3,7 +3,6 @@
  */
 
 import React, { useState } from "react";
-import Immutable from "immutable";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
@@ -31,6 +30,7 @@ export default function WonAtomContentSocket({
   ItemComponent,
   allowAdHoc,
   refuseOwned,
+  relevantConnections,
 }) {
   const accountState = useSelector(generalSelectors.getAccountState);
   const isAtomOwned = accountUtils.isAtomOwned(accountState, get(atom, "uri"));
@@ -45,35 +45,12 @@ export default function WonAtomContentSocket({
   const storedAtoms = useSelector(generalSelectors.getAtoms);
 
   const socketUri = atomUtils.getSocketUri(atom, socketType);
-  const ownedConnectionsToSocketUri = useSelector(
-    state =>
-      !isAtomOwned
-        ? generalSelectors.getAllOwnedConnectionsWithTargetSocketUri(socketUri)(
-            state
-          )
-        : Immutable.Map()
-  );
-
   const filteredStoredAtoms = filterAtomsBySearchValue(storedAtoms, searchText);
-
-  const connectionsOfAtom = isAtomOwned
-    ? atomUtils.getConnections(atom, socketType)
-    : atomUtils
-        .getConnections(atom, socketType)
-        .filter(conn => {
-          //Filters out all connections that have a "counterpart" connection stored in another atom we own
-          const targetSocketUri = get(conn, "targetSocketUri");
-          return !ownedConnectionsToSocketUri.find(
-            ownedConnection =>
-              get(ownedConnection, "socketUri") === targetSocketUri
-          );
-        })
-        .merge(ownedConnectionsToSocketUri);
 
   const reactions = atomUtils.getReactions(atom, socketType);
 
   const connections = filterConnectionsBySearchValue(
-    connectionsOfAtom,
+    relevantConnections,
     storedAtoms,
     searchText
   );
@@ -318,6 +295,7 @@ export default function WonAtomContentSocket({
 
 WonAtomContentSocket.propTypes = {
   atom: PropTypes.object.isRequired,
+  relevantConnections: PropTypes.object.isRequired,
   socketType: PropTypes.string.isRequired,
   ItemComponent: PropTypes.func.isRequired,
   allowAdHoc: PropTypes.bool,

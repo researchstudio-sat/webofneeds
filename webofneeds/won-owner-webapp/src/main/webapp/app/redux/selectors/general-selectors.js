@@ -109,6 +109,62 @@ export const getOwnedPosts = createSelector(
     )
 );
 
+/**
+ * Returns all connections of the Atom if the atom is owned,
+ * if the atom is not owned, we take all the connections of the non owned atom, filter out all the connections
+ * that exists from our own atoms to the atom, and merge the owned connections into the connections Map that is
+ * returned
+ * @param atomUri
+ * @returns A Map of Maps {[socketType]: Map<ConnUri>: [connections]}
+ */
+export const getConnectionsOfAtomWithOwnedTargetConnections = atomUri =>
+  createSelector(
+    state => state,
+    getAccountState,
+    getAtom(atomUri),
+    (state, accountState, atom) => {
+      const isAtomOwned = accountUtils.isAtomOwned(
+        accountState,
+        get(atom, "uri")
+      );
+
+      if (isAtomOwned) {
+        return atomUtils.getConnections(atom);
+      } else {
+        let relevantConnections = Immutable.Map();
+
+        const socketConnectionMap = atomUtils
+          .getSockets(atom)
+          .flip()
+          .map((_socketUri, _socketType) => {
+            const ownedConnectionsToSocketUri = getAllOwnedConnectionsWithTargetSocketUri(
+              _socketUri
+            )(state);
+            const relevantConnectionsForSocketUri = atomUtils
+              .getConnections(atom, _socketType)
+              .filter(conn => {
+                //Filters out all connections that have a "counterpart" connection stored in another atom we own
+                const targetSocketUri = get(conn, "targetSocketUri");
+                return !ownedConnectionsToSocketUri.find(
+                  ownedConnection =>
+                    get(ownedConnection, "socketUri") === targetSocketUri
+                );
+              })
+              .merge(ownedConnectionsToSocketUri);
+
+            relevantConnections = relevantConnections.merge(
+              relevantConnectionsForSocketUri
+            );
+            return relevantConnectionsForSocketUri;
+          });
+
+        console.debug("socketConnectionMap: ", socketConnectionMap);
+
+        return relevantConnections;
+      }
+    }
+  );
+
 export const getAllOwnedConnectionsWithTargetSocketUri = targetSocketUri =>
   createSelector(
     getOwnedAtoms,

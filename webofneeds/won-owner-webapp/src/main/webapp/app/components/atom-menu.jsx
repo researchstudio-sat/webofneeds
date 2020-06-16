@@ -18,7 +18,11 @@ import Immutable from "immutable";
 import "~/style/_atom-menu.scss";
 import { getSocketTypeArray } from "../redux/utils/atom-utils";
 
-export default function WonAtomMenu({ atom, defaultTab }) {
+export default function WonAtomMenu({
+  atom,
+  defaultTab,
+  relevantConnectionsMap,
+}) {
   const atomUri = get(atom, "uri");
   const dispatch = useDispatch();
   const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
@@ -123,10 +127,30 @@ export default function WonAtomMenu({ atom, defaultTab }) {
         countLabel = hasReviews && "(" + reviewCount + ")";
         break;
 
+      case vocab.CHAT.ChatSocketCompacted: {
+        const socketUri = atomUtils.getSocketUri(atom, socketType);
+        const activeConnections = get(relevantConnectionsMap, socketType)
+          .filter(
+            conn =>
+              // We filter out every chat connection that is not owned, otherwise the count would show non owned chatconnections of non owned atoms
+              isOwned || connectionUtils.hasTargetSocketUri(conn, socketUri)
+          )
+          .filter(conn => !connectionUtils.isClosed(conn));
+        inactive = !activeConnections || activeConnections.size === 0;
+        countLabel =
+          activeConnections && activeConnections.size > 0
+            ? "(" + activeConnections.size + ")"
+            : undefined;
+        unread =
+          activeConnections &&
+          !!activeConnections.find(conn => connectionUtils.isUnread(conn));
+        break;
+      }
       default: {
-        const activeConnections = isOwned
-          ? atomUtils.getNonClosedConnections(atom, socketType)
-          : atomUtils.getConnectedConnections(atom, socketType);
+        const activeConnections = get(
+          relevantConnectionsMap,
+          socketType
+        ).filter(conn => !connectionUtils.isClosed(conn));
 
         inactive = !activeConnections || activeConnections.size === 0;
         countLabel =
@@ -189,5 +213,6 @@ export default function WonAtomMenu({ atom, defaultTab }) {
 
 WonAtomMenu.propTypes = {
   atom: PropTypes.object.isRequired,
+  relevantConnectionsMap: PropTypes.object.isRequired,
   defaultTab: PropTypes.string,
 };
