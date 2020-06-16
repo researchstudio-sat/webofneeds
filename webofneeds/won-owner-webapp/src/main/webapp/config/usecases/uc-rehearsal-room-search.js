@@ -38,7 +38,10 @@ export const rehearsalRoomSearch = {
   },
   reactions: {
     [vocab.CHAT.ChatSocketCompacted]: {
-      [vocab.CHAT.ChatSocketCompacted]: ["rehearsalRoomOffer"],
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["rehearsalRoomOffer"],
+        refuseOwned: true,
+      },
     },
   },
   details: undefined,

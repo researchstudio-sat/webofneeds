@@ -24,7 +24,10 @@ export const consortiumOffer = {
   },
   reactions: {
     [vocab.CHAT.ChatSocketCompacted]: {
-      [vocab.CHAT.ChatSocketCompacted]: ["consortiumSearch"],
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["consortiumSearch"],
+        refuseOwned: true,
+      },
     },
   },
   details: {

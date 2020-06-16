@@ -21,7 +21,10 @@ export const serviceAtom = {
   },
   reactions: {
     [vocab.HOLD.HolderSocketCompacted]: {
-      [vocab.HOLD.HoldableSocketCompacted]: ["*"],
+      [vocab.HOLD.HoldableSocketCompacted]: {
+        useCaseIdentifiers: ["*"],
+        refuseNonOwned: true,
+      },
     },
   },
   details: {

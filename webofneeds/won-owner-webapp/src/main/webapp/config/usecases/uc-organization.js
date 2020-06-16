@@ -25,13 +25,19 @@ export const organization = {
   },
   reactions: {
     [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: {
-      [vocab.WXSCHEMA.WorksForSocketCompacted]: ["persona"],
+      [vocab.WXSCHEMA.WorksForSocketCompacted]: {
+        useCaseIdentifiers: ["persona"],
+      },
     },
     [vocab.WXSCHEMA.MemberSocketCompacted]: {
-      [vocab.WXSCHEMA.MemberOfSocketCompacted]: ["persona"],
+      [vocab.WXSCHEMA.MemberOfSocketCompacted]: {
+        useCaseIdentifiers: ["persona"],
+      },
     },
     [vocab.WXSCHEMA.AssociatedArticleSocketCompacted]: {
-      [vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted]: ["newsarticle"],
+      [vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted]: {
+        useCaseIdentifiers: ["newsarticle"],
+      },
     },
   },
   details: {

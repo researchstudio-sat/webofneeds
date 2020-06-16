@@ -41,7 +41,10 @@ export const rentRealEstateSearch = {
   },
   reactions: {
     [vocab.CHAT.ChatSocketCompacted]: {
-      [vocab.CHAT.ChatSocketCompacted]: ["rentRealEstateOffer"],
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["rentRealEstateOffer"],
+        refuseOwned: true,
+      },
     },
   },
   details: undefined,

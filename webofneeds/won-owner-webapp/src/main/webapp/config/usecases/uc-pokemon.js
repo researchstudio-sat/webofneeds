@@ -24,7 +24,12 @@ export const pokemonGoRaid = {
   },
   reactions: {
     [vocab.GROUP.GroupSocketCompacted]: {
-      [vocab.CHAT.ChatSocketCompacted]: ["pokemonInterest"],
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["pokemonInterest"],
+      },
+      [vocab.GROUP.GroupSocketCompacted]: {
+        useCaseIdentifiers: ["pokemonGoRaid"],
+      },
     },
   },
   details: {
@@ -53,7 +58,9 @@ export const pokemonInterest = {
   },
   reactions: {
     [vocab.CHAT.ChatSocketCompacted]: {
-      [vocab.GROUP.GroupSocketCompacted]: ["pokemonGoRaid"],
+      [vocab.GROUP.GroupSocketCompacted]: {
+        useCaseIdentifiers: ["pokemonGoRaid"],
+      },
     },
   },
   details: {

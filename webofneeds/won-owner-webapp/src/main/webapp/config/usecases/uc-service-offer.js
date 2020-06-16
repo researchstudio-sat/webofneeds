@@ -19,7 +19,10 @@ export const serviceOffer = {
   },
   reactions: {
     [vocab.CHAT.ChatSocketCompacted]: {
-      [vocab.CHAT.ChatSocketCompacted]: ["goodsServiceSearch"],
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["goodsServiceSearch"],
+        refuseOwned: true,
+      },
     },
   },
   details: {

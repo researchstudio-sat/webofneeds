@@ -34,7 +34,10 @@ export const bandSearch = {
   },
   reactions: {
     [vocab.CHAT.ChatSocketCompacted]: {
-      [vocab.CHAT.ChatSocketCompacted]: ["musicianSearch"],
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["musicianSearch"],
+        refuseOwned: true,
+      },
     },
   },
   details: {

@@ -30,7 +30,12 @@ export const cyclingPlan = {
   },
   reactions: {
     [vocab.GROUP.GroupSocketCompacted]: {
-      [vocab.CHAT.ChatSocketCompacted]: ["cyclingInterest"],
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["cyclingInterest"],
+      },
+      [vocab.GROUP.GroupSocketCompacted]: {
+        useCaseIdentifiers: ["cyclingPlan"],
+      },
     },
   },
   details: {
@@ -111,7 +116,9 @@ export const cyclingInterest = {
   },
   reactions: {
     [vocab.CHAT.ChatSocketCompacted]: {
-      [vocab.GROUP.GroupSocketCompacted]: ["cyclingPlan"],
+      [vocab.GROUP.GroupSocketCompacted]: {
+        useCaseIdentifiers: ["cyclingPlan"],
+      },
     },
   },
   details: {

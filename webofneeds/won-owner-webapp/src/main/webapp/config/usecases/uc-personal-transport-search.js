@@ -24,7 +24,10 @@ export const personalTransportSearch = {
   },
   reactions: {
     [vocab.CHAT.ChatSocketCompacted]: {
-      [vocab.CHAT.ChatSocketCompacted]: ["taxiOffer", "rideShareOffer"],
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["taxiOffer", "rideShareOffer"],
+        refuseOwned: true,
+      },
     },
   },
   // TODO: amount of people? other details?

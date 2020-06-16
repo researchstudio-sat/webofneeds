@@ -22,7 +22,10 @@ export const goodsOffer = {
   },
   reactions: {
     [vocab.CHAT.ChatSocketCompacted]: {
-      [vocab.CHAT.ChatSocketCompacted]: ["goodsServiceSearch"],
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["goodsServiceSearch"],
+        refuseOwned: true,
+      },
     },
   },
   details: {

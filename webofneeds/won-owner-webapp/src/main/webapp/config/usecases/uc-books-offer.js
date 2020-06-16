@@ -22,7 +22,10 @@ export const booksOffer = {
   },
   reactions: {
     [vocab.CHAT.ChatSocketCompacted]: {
-      [vocab.CHAT.ChatSocketCompacted]: ["booksSearch"],
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["booksSearch"],
+        refuseOwned: true,
+      },
     },
   },
   details: {

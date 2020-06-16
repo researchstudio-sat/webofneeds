@@ -78,15 +78,14 @@ export default function WonSocketAddAtom({
       return (
         reactions &&
         !!reactions.find((reaction, socketType) => {
-          const allowedUseCaseList =
-            get(reaction, "useCaseIdentifiers") || reaction; //TODO: FIX AND REFACTOR ONCE THE REACTIONS HAVE BEEN ALTERED
+          const allowedUseCaseList = get(reaction, "useCaseIdentifiers");
 
           const refuseOwned = get(reaction, "refuseOwned");
           const refuseNonOwned = get(reaction, "refuseNonOwned");
 
           return (
-            !(refuseOwned && isOwned) &&
-            !(refuseNonOwned && !isOwned) &&
+            (!isAddToAtomOwned || !(refuseOwned && isOwned)) &&
+            (isAddToAtomOwned || !(refuseNonOwned && !isOwned)) &&
             atomUtils.hasSocket(atom, socketType) &&
             allowedUseCaseList &&
             !!allowedUseCaseList.find(
@@ -117,8 +116,7 @@ export default function WonSocketAddAtom({
     reactions
       .filter(reaction => !get(reaction, "refuseOwned"))
       .map((reaction, socketType) => {
-        const allowedUseCaseList =
-          get(reaction, "useCaseIdentifiers") || reaction; //TODO: FIX AND REFACTOR ONCE THE REACTIONS HAVE BEEN ALTERED
+        const allowedUseCaseList = get(reaction, "useCaseIdentifiers");
 
         return allowedUseCaseList
           .filter(ucIdentifier => ucIdentifier !== "*") //TODO: REMOVE THIS ONCE WE KNOW HOW TO HANDLE WILDCARD USECASES
@@ -147,15 +145,14 @@ export default function WonSocketAddAtom({
 
     reactions &&
       reactions.map((reaction, socketType) => {
-        const allowedUseCaseList =
-          get(reaction, "useCaseIdentifiers") || reaction; //TODO: FIX AND REFACTOR ONCE THE REACTIONS HAVE BEEN ALTERED
+        const allowedUseCaseList = get(reaction, "useCaseIdentifiers");
 
         const refuseOwned = get(reaction, "refuseOwned");
         const refuseNonOwned = get(reaction, "refuseNonOwned");
 
         const includesSelectedUseCase =
-          !(refuseOwned && isSelectedAtomOwned) &&
-          !(refuseNonOwned && !isSelectedAtomOwned) &&
+          (!isAddToAtomOwned || !(refuseOwned && isSelectedAtomOwned)) &&
+          (isAddToAtomOwned || !(refuseNonOwned && !isSelectedAtomOwned)) &&
           allowedUseCaseList &&
           !!allowedUseCaseList.find(
             ucIdentifier =>

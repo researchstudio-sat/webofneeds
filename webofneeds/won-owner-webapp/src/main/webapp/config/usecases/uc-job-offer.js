@@ -35,7 +35,10 @@ export const jobOffer = {
   },
   reactions: {
     [vocab.CHAT.ChatSocketCompacted]: {
-      [vocab.CHAT.ChatSocketCompacted]: ["jobSearch"],
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["jobSearch"],
+        refuseOwned: true,
+      },
     },
   },
   details: {

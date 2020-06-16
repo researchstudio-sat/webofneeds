@@ -30,7 +30,10 @@ export const lunchPlan = {
   },
   reactions: {
     [vocab.GROUP.GroupSocketCompacted]: {
-      [vocab.CHAT.ChatSocketCompacted]: ["lunchInterest"],
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["lunchInterest"],
+      },
+      [vocab.GROUP.GroupSocketCompacted]: { useCaseIdentifiers: ["lunchPlan"] },
     },
   },
   details: {
@@ -111,7 +114,7 @@ export const lunchInterest = {
   },
   reactions: {
     [vocab.CHAT.ChatSocketCompacted]: {
-      [vocab.GROUP.GroupSocketCompacted]: ["lunchPlan"],
+      [vocab.GROUP.GroupSocketCompacted]: { useCaseIdentifiers: ["lunchPlan"] },
     },
   },
   details: {

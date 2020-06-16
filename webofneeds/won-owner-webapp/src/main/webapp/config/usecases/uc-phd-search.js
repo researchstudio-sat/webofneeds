@@ -27,7 +27,10 @@ export const phdSearch = {
   },
   reactions: {
     [vocab.CHAT.ChatSocketCompacted]: {
-      [vocab.CHAT.ChatSocketCompacted]: ["phdOffer"],
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["phdOffer"],
+        refuseOwned: true,
+      },
     },
   },
   details: {
