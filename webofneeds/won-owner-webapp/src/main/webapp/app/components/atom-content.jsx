@@ -274,13 +274,17 @@ export default function WonAtomContent({
         break;
 
       default: {
-        visibleTabFragment = (
+        const relevantConnections = get(relevantConnectionsMap, visibleTab);
+
+        visibleTabFragment = relevantConnections ? (
           <WonAtomContentSocket
             atom={atom}
             socketType={visibleTab}
             ItemComponent={WonGenericItem}
-            relevantConnections={get(relevantConnectionsMap, visibleTab)}
+            relevantConnections={relevantConnections}
           />
+        ) : (
+          undefined
         );
         break;
       }

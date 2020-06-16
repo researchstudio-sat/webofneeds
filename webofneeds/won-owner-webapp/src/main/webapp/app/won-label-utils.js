@@ -110,7 +110,7 @@ export function getSocketItemsLabel(socketType) {
 
 export function getSocketActionInfo(
   senderSocketType,
-  targetSocketType,
+  targetAtomTypeLabel,
   connectionState
 ) {
   //TODO: BETTER LABELS
@@ -137,7 +137,7 @@ export function getSocketActionInfo(
       break;
   }
   return (
-    getSocketItemLabel(targetSocketType) +
+    (targetAtomTypeLabel.length > 0 ? targetAtomTypeLabel : "Atom") +
     infoLabel +
     getSocketItemsLabel(senderSocketType)
   );

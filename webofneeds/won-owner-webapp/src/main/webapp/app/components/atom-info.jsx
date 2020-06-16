@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import { get } from "../utils.js";
@@ -22,6 +22,13 @@ export default function WonAtomInfo({
   const processState = useSelector(generalSelectors.getProcessState);
 
   const [visibleTab, setVisibleTab] = useState(initialTab);
+
+  useEffect(
+    () => {
+      setVisibleTab(initialTab);
+    },
+    [atomUri, initialTab]
+  );
 
   const atomLoading =
     !atom || processUtils.isAtomLoading(processState, atomUri);

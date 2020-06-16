@@ -14,7 +14,7 @@ import WonParticipantSocketActions from "./socket-actions/participant-actions";
 import WonBuddySocketActions from "./socket-actions/buddy-actions";
 import WonChatSocketActions from "./socket-actions/chat-actions";
 
-const FooterType = {
+const ActionType = {
   INACTIVE: 1,
   INACTIVE_OWNED: 2,
   CONNECTION: 3,
@@ -27,12 +27,12 @@ export default function WonAtomActions({ atom, ownedConnection, className }) {
 
   const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
 
-  let footerType = FooterType.UNKNOWN;
+  let actionType = ActionType.UNKNOWN;
 
   if (atomUtils.isInactive(atom)) {
-    footerType = isOwned ? FooterType.INACTIVE_OWNED : FooterType.INACTIVE;
+    actionType = isOwned ? ActionType.INACTIVE_OWNED : ActionType.INACTIVE;
   } else {
-    footerType = ownedConnection ? FooterType.CONNECTION : FooterType.UNKNOWN;
+    actionType = ownedConnection ? ActionType.CONNECTION : ActionType.UNKNOWN;
   }
 
   const targetAtom = useSelector(
@@ -48,27 +48,18 @@ export default function WonAtomActions({ atom, ownedConnection, className }) {
       )
   );
 
-  const targetSocketType = atomUtils.getSocketType(
-    targetAtom,
-    get(ownedConnection, "targetSocketUri")
-  );
-  const senderSocketType = atomUtils.getSocketType(
-    senderAtom,
-    get(ownedConnection, "socketUri")
-  );
+  let actionElement;
 
-  let footerElement;
-
-  switch (footerType) {
-    case FooterType.INACTIVE:
-      footerElement = (
+  switch (actionType) {
+    case ActionType.INACTIVE:
+      actionElement = (
         <div className="atom-actions__infolabel">
           Atom is inactive, no requests allowed
         </div>
       );
       break;
-    case FooterType.INACTIVE_OWNED:
-      footerElement = (
+    case ActionType.INACTIVE_OWNED:
+      actionElement = (
         <React.Fragment>
           <div className="atom-actions__infolabel">
             This Atom is inactive. Others will not be able to interact with it.
@@ -84,48 +75,57 @@ export default function WonAtomActions({ atom, ownedConnection, className }) {
         </React.Fragment>
       );
       break;
-    case FooterType.CONNECTION:
+    case ActionType.CONNECTION:
       {
-        let ActionElement;
+        const senderSocketType = atomUtils.getSocketType(
+          senderAtom,
+          get(ownedConnection, "socketUri")
+        );
+        const targetAtomTypeLabel = atomUtils.generateTypeLabel(targetAtom);
+
+        let ActionComponent;
 
         switch (senderSocketType) {
           case vocab.GROUP.GroupSocketCompacted:
-            ActionElement = WonParticipantSocketActions;
+            ActionComponent = WonParticipantSocketActions;
             break;
           case vocab.BUDDY.BuddySocketCompacted:
-            ActionElement = WonBuddySocketActions;
+            ActionComponent = WonBuddySocketActions;
             break;
           case vocab.CHAT.ChatSocketCompacted:
-            ActionElement = WonChatSocketActions;
+            ActionComponent = WonChatSocketActions;
             break;
           default:
-            ActionElement = WonGenericSocketActions;
+            ActionComponent = WonGenericSocketActions;
             break;
         }
 
-        footerElement = (
+        actionElement = (
           <React.Fragment>
             <div className="atom-actions__infolabel">
               {wonLabelUtils.getSocketActionInfo(
                 senderSocketType,
-                targetSocketType,
+                targetAtomTypeLabel,
                 get(ownedConnection, "state")
               )}
             </div>
-            <ActionElement connection={ownedConnection} goBackOnAction={true} />
+            <ActionComponent
+              connection={ownedConnection}
+              goBackOnAction={true}
+            />
           </React.Fragment>
         );
       }
       break;
-    case FooterType.UNKNOWN:
+    case ActionType.UNKNOWN:
     default:
-      footerElement = undefined;
+      actionElement = undefined;
       break;
   }
 
   return (
     <won-atom-actions class={className ? className : ""}>
-      {footerElement}
+      {actionElement}
     </won-atom-actions>
   );
 }
