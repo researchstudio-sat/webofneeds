@@ -12,6 +12,7 @@ import "~/style/_atom-actions.scss";
 import WonGenericSocketActions from "./socket-actions/generic-actions";
 import WonParticipantSocketActions from "./socket-actions/participant-actions";
 import WonBuddySocketActions from "./socket-actions/buddy-actions";
+import WonChatSocketActions from "./socket-actions/chat-actions";
 
 const FooterType = {
   INACTIVE: 1,
@@ -93,6 +94,9 @@ export default function WonAtomActions({ atom, ownedConnection, className }) {
             break;
           case vocab.BUDDY.BuddySocketCompacted:
             ActionElement = WonBuddySocketActions;
+            break;
+          case vocab.CHAT.ChatSocketCompacted:
+            ActionElement = WonChatSocketActions;
             break;
           default:
             ActionElement = WonGenericSocketActions;
