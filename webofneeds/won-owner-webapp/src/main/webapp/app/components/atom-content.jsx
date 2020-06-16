@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import Immutable from "immutable";
 import { actionCreators } from "../actions/actions.js";
 import { useSelector, useDispatch } from "react-redux";
 import { get, getQueryParams } from "../utils.js";
@@ -136,6 +137,9 @@ export default function WonAtomContent({
     );
 
     let visibleTabFragment;
+    const relevantConnections =
+      get(relevantConnectionsMap, visibleTab) || Immutable.Map();
+
     switch (visibleTab) {
       case "DETAIL":
         visibleTabFragment = (
@@ -179,10 +183,7 @@ export default function WonAtomContent({
             socketType={visibleTab}
             ItemComponent={WonParticipantItem}
             allowAdHoc={true}
-            relevantConnections={get(
-              relevantConnectionsMap,
-              vocab.GROUP.GroupSocketCompacted
-            )}
+            relevantConnections={relevantConnections}
           />
         );
         break;
@@ -195,10 +196,7 @@ export default function WonAtomContent({
             socketType={visibleTab}
             ItemComponent={WonBuddyItem}
             refuseOwned={isOwned}
-            relevantConnections={get(
-              relevantConnectionsMap,
-              vocab.BUDDY.BuddySocketCompacted
-            )}
+            relevantConnections={relevantConnections}
           />
         );
         break;
@@ -223,20 +221,16 @@ export default function WonAtomContent({
           atom,
           vocab.CHAT.ChatSocketCompacted
         );
-        const relevantConnections = get(
-          relevantConnectionsMap,
-          vocab.CHAT.ChatSocketCompacted
-        ).filter(
-          conn =>
-            // We filter out every chat connection that is not owned, otherwise the count would show non owned chatconnections of non owned atoms
-            isOwned || connectionUtils.hasTargetSocketUri(conn, socketUri)
-        );
         visibleTabFragment = (
           <WonAtomContentChats
             atom={atom}
             allowAdHoc={!isOwned}
-            refuseOwned={isOwned}
-            relevantConnections={relevantConnections}
+            refuseOwned={false} // Used to be refuse Owned true, but then we couldnt add GroupChats anymore --> TODO Figure out a way to allow owned differently
+            // We filter out every chat connection that is not owned, otherwise the count would show non owned chatconnections of non owned atoms
+            relevantConnections={relevantConnections.filter(
+              conn =>
+                isOwned || connectionUtils.hasTargetSocketUri(conn, socketUri)
+            )}
           />
         );
         break;
@@ -274,17 +268,13 @@ export default function WonAtomContent({
         break;
 
       default: {
-        const relevantConnections = get(relevantConnectionsMap, visibleTab);
-
-        visibleTabFragment = relevantConnections ? (
+        visibleTabFragment = (
           <WonAtomContentSocket
             atom={atom}
             socketType={visibleTab}
             ItemComponent={WonGenericItem}
             relevantConnections={relevantConnections}
           />
-        ) : (
-          undefined
         );
         break;
       }

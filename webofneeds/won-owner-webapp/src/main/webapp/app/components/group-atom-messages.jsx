@@ -40,6 +40,20 @@ export default function WonGroupAtomMessages({
     }
 
     ensureMessagesAreLoaded();
+
+    //TODO: FILTER MESSAGE URIS IN A WAY THAT WE GET A SET OF ORIGINATORURIS AND SENDERURIS WHICH WE WILL CHECK AND FETCH IF THEY ARE NOT PRESENT
+    /*if (groupChatMessage && processState && isReceived) {
+      if (
+        originatorUri &&
+        !processUtils.hasAtomFailedToLoad(originatorUri) &&
+        (!originatorAtom ||
+          ((get(originatorAtom, "uriStub") ||
+            processUtils.isAtomToLoad(originatorUri)) &&
+            !processUtils.isAtomLoading(originatorUri)))
+      ) {
+        dispatch(actionCreators.atoms__fetchUnloadedAtom(originatorUri));
+      }
+    }*/
   });
   const [snapBottom, setSnapBottom] = useState(true);
 
