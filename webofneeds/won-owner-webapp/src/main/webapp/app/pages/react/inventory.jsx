@@ -108,7 +108,7 @@ export default function PageInventory() {
                     key={get(persona, "uri") + "-" + index}
                     className="ownerinventory__personas__persona"
                     atom={persona}
-                    defaultTab={vocab.HOLD.HolderSocketCompacted}
+                    initialTab={vocab.HOLD.HolderSocketCompacted}
                   />
                 ))}
               </div>

@@ -234,7 +234,7 @@ export default function PokemonRaidCard({
       to={location =>
         generateLink(
           location,
-          { postUri: atomUri, tab: "DETAIL", connectionUri: undefined },
+          { postUri: atomUri, connectionUri: undefined, tab: undefined },
           "/post"
         )
       }
@@ -285,7 +285,7 @@ export default function PokemonRaidCard({
       to={location =>
         generateLink(
           location,
-          { postUri: atomUri, connectionUri: undefined, tab: "DETAIL" },
+          { postUri: atomUri, connectionUri: undefined, tab: undefined },
           "/post"
         )
       }
@@ -303,7 +303,7 @@ export default function PokemonRaidCard({
         to={location =>
           generateLink(
             location,
-            { postUri: holderUri, connectionUri: undefined, tab: "DETAIL" },
+            { postUri: holderUri, connectionUri: undefined, tab: undefined },
             "/post"
           )
         }

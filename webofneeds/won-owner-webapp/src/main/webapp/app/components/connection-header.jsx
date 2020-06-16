@@ -18,7 +18,6 @@ import * as messageUtils from "../redux/utils/message-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import vocab from "../service/vocab.js";
-import Immutable from "immutable";
 
 import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
 
@@ -87,18 +86,14 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
   }
 
   function selectMembersTab() {
-    dispatch(
-      actionCreators.atoms__selectTab(
-        Immutable.fromJS({
-          atomUri: targetAtomUri,
-          selectTab: vocab.GROUP.GroupSocketCompacted,
-        })
-      )
-    );
     history.push(
       generateLink(
         history.location,
-        { connectionUri: undefined, postUri: targetAtomUri },
+        {
+          connectionUri: undefined,
+          tab: vocab.GROUP.GroupSocketCompacted,
+          postUri: targetAtomUri,
+        },
         "/post"
       )
     );

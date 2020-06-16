@@ -4,7 +4,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import PropTypes from "prop-types";
-import { get } from "../utils.js";
+import { get, generateLink } from "../utils.js";
 
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -22,7 +22,6 @@ import ElmReact from "./elm-react.jsx";
 import { Elm } from "../../elm/PublishButton.elm";
 import { actionCreators } from "../actions/actions";
 import { useHistory } from "react-router-dom";
-import vocab from "../service/vocab";
 
 export default function WonCreateAtom({
   fromAtom,
@@ -120,27 +119,38 @@ export default function WonCreateAtom({
 
     if (connect) {
       executeFunction = () => {
+        const fromAtomUri = get(fromAtom, "uri");
+
         dispatch(
           actionCreators.connections__connectReactionAtom(
-            get(fromAtom, "uri"),
+            fromAtomUri,
             tempDraft,
             personaId,
             targetSocketType,
             senderSocketType
           )
         );
-        if (senderSocketType === vocab.CHAT.ChatSocketCompacted) {
-          history.push("/connections"); //TODO: PUSH TO PAGE DEPENDING ON CONNECTED SOCKETTYPES/ATOM
-        } else {
-          history.goBack();
-        }
+
+        history.replace(
+          generateLink(
+            history.location,
+            {
+              postUri: fromAtomUri,
+              connectionUri: undefined,
+              tab: targetSocketType,
+            },
+            "/post"
+          )
+        );
       };
     } else {
       executeFunction = () => {
         dispatch(
           actionCreators.atoms__create(tempDraft, personaId, defaultNodeUri)
         );
-        history.push("/inventory");
+        history.replace(
+          generateLink(history.location, {}, "/inventory", false)
+        );
       };
     }
 

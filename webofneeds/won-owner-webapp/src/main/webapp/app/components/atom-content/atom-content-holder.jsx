@@ -1,6 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import Immutable from "immutable";
 import { actionCreators } from "../../actions/actions.js";
 import { useSelector, useDispatch } from "react-redux";
 import { get, getIn, getQueryParams, generateLink } from "../../utils.js";
@@ -100,19 +99,12 @@ export default function WonAtomContentHolder({ holdsUri }) {
   }
 
   function viewPersonaPosts() {
-    dispatch(
-      actionCreators.atoms__selectTab(
-        Immutable.fromJS({
-          atomUri: holderUri,
-          selectTab: vocab.HOLD.HolderSocketCompacted,
-        })
-      )
-    );
     history.push(
       generateLink(
         history.location,
         {
           postUri: holderUri,
+          tab: vocab.HOLD.HolderSocketCompacted,
           connectionUri: undefined,
         },
         "/post"
@@ -121,19 +113,12 @@ export default function WonAtomContentHolder({ holdsUri }) {
   }
 
   function viewPersonaBuddies() {
-    dispatch(
-      actionCreators.atoms__selectTab(
-        Immutable.fromJS({
-          atomUri: holderUri,
-          selectTab: vocab.BUDDY.BuddySocketCompacted,
-        })
-      )
-    );
     history.push(
       generateLink(
         history.location,
         {
           postUri: holderUri,
+          tab: vocab.BUDDY.BuddySocketCompacted,
           connectionUri: undefined,
         },
         "/post"
@@ -142,19 +127,12 @@ export default function WonAtomContentHolder({ holdsUri }) {
   }
 
   function viewPersonaReviews() {
-    dispatch(
-      actionCreators.atoms__selectTab(
-        Immutable.fromJS({
-          atomUri: holderUri,
-          selectTab: vocab.REVIEW.ReviewSocketCompacted,
-        })
-      )
-    );
     history.push(
       generateLink(
         history.location,
         {
           postUri: holderUri,
+          tab: vocab.REVIEW.ReviewSocketCompacted,
           connectionUri: undefined,
         },
         "/post"

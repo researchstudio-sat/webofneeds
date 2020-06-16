@@ -22,7 +22,7 @@ import * as generalSelectors from "../../redux/selectors/general-selectors";
 export default function PagePost() {
   const history = useHistory();
   const dispatch = useDispatch();
-  const { postUri, connectionUri } = getQueryParams(history.location);
+  const { postUri, connectionUri, tab } = getQueryParams(history.location);
   const atomUri = postUri;
   const atom = useSelector(generalSelectors.getAtom(atomUri));
   const ownedConnection = useSelector(
@@ -108,7 +108,11 @@ export default function PagePost() {
     );
   } else if (atom) {
     atomContentElement = (
-      <WonAtomInfo atom={atom} ownedConnection={ownedConnection} />
+      <WonAtomInfo
+        atom={atom}
+        ownedConnection={ownedConnection}
+        initialTab={tab}
+      />
     );
   }
 

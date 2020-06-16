@@ -50,7 +50,7 @@ export default function WonPersonaCard({ atom }) {
           location,
           {
             postUri: get(atom, "uri"),
-            tab: "DETAIL",
+            tab: undefined,
             connectionUri: undefined,
           },
           "/post"

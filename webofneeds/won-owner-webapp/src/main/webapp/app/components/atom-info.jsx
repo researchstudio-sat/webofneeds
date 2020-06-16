@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import { get } from "../utils.js";
@@ -16,10 +16,13 @@ export default function WonAtomInfo({
   atom,
   ownedConnection,
   className,
-  defaultTab,
+  initialTab = "DETAIL",
 }) {
   const atomUri = get(atom, "uri");
   const processState = useSelector(generalSelectors.getProcessState);
+
+  const [visibleTab, setVisibleTab] = useState(initialTab);
+
   const atomLoading =
     !atom || processUtils.isAtomLoading(processState, atomUri);
 
@@ -44,12 +47,13 @@ export default function WonAtomInfo({
       )}
       <WonAtomMenu
         atom={atom}
-        defaultTab={defaultTab}
+        visibleTab={visibleTab}
+        setVisibleTab={setVisibleTab}
         relevantConnectionsMap={relevantConnectionsMap}
       />
       <WonAtomContent
         atom={atom}
-        defaultTab={defaultTab}
+        visibleTab={visibleTab}
         relevantConnectionsMap={relevantConnectionsMap}
       />
     </won-atom-info>
@@ -57,7 +61,7 @@ export default function WonAtomInfo({
 }
 WonAtomInfo.propTypes = {
   atom: PropTypes.object,
-  defaultTab: PropTypes.string,
   className: PropTypes.string,
   ownedConnection: PropTypes.object,
+  initialTab: PropTypes.string,
 };

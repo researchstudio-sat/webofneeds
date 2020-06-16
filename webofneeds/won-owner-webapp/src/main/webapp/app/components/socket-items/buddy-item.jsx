@@ -94,6 +94,7 @@ export default function WonBuddyItem({
               {
                 postUri: flip ? get(atom, "uri") : get(targetAtom, "uri"),
                 connectionUri: get(connection, "uri"),
+                tab: undefined,
               },
               "/post"
             )}

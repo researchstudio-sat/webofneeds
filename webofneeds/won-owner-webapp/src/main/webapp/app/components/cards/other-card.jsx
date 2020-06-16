@@ -225,7 +225,7 @@ export default function WonOtherCard({
       to={location =>
         generateLink(
           location,
-          { postUri: atomUri, tab: "DETAIL", connectionUri: undefined },
+          { postUri: atomUri, tab: undefined, connectionUri: undefined },
           "/post"
         )
       }
@@ -285,7 +285,7 @@ export default function WonOtherCard({
       to={location =>
         generateLink(
           location,
-          { postUri: atomUri, tab: "DETAIL", connectionUri: undefined },
+          { postUri: atomUri, tab: undefined, connectionUri: undefined },
           "/post"
         )
       }
@@ -303,7 +303,7 @@ export default function WonOtherCard({
         to={location =>
           generateLink(
             location,
-            { postUri: holderUri, tab: "DETAIL", connectionUri: undefined },
+            { postUri: holderUri, tab: undefined, connectionUri: undefined },
             "/post"
           )
         }

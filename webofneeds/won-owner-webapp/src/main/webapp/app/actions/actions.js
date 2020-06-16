@@ -153,7 +153,6 @@ const actionHierarchy = {
 
     storeUriFailed: INJ_DEFAULT,
     removeDeleted: INJ_DEFAULT,
-    selectTab: INJ_DEFAULT,
   },
   personas: {
     review: reviewPersona,

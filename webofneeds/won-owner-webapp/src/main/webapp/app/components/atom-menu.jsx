@@ -2,9 +2,8 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import { actionCreators } from "../actions/actions.js";
 import { get, getIn } from "../utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
@@ -13,17 +12,16 @@ import * as processUtils from "../redux/utils/process-utils.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
 import * as wonLabelUtils from "../won-label-utils.js";
 import vocab from "../service/vocab.js";
-import Immutable from "immutable";
 
 import "~/style/_atom-menu.scss";
 
 export default function WonAtomMenu({
   atom,
-  defaultTab,
+  visibleTab,
+  setVisibleTab,
   relevantConnectionsMap,
 }) {
   const atomUri = get(atom, "uri");
-  const dispatch = useDispatch();
   const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
 
   const reviewCount = getIn(atom, ["rating", "reviewCount"]) || 0;
@@ -47,12 +45,6 @@ export default function WonAtomMenu({
   const atomFailedToLoad =
     atom && processUtils.hasAtomFailedToLoad(process, atomUri);
   const shouldShowRdf = viewUtils.showRdf(viewState);
-
-  const visibleTab = viewUtils.getVisibleTabByAtomUri(
-    viewState,
-    atomUri,
-    defaultTab
-  );
 
   function generateParentCssClasses() {
     const cssClassNames = [];
@@ -82,13 +74,7 @@ export default function WonAtomMenu({
     <div
       key="detail"
       className={generateAtomItemCssClasses(visibleTab === "DETAIL")}
-      onClick={() =>
-        dispatch(
-          actionCreators.atoms__selectTab(
-            Immutable.fromJS({ atomUri: atomUri, selectTab: "DETAIL" })
-          )
-        )
-      }
+      onClick={() => setVisibleTab("DETAIL")}
     >
       <span className="atom-menu__item__label">Detail</span>
     </div>
@@ -166,13 +152,7 @@ export default function WonAtomMenu({
         <div
           key={socketType}
           className={generateAtomItemCssClasses(selected, inactive, unread)}
-          onClick={() =>
-            dispatch(
-              actionCreators.atoms__selectTab(
-                Immutable.fromJS({ atomUri: atomUri, selectTab: socketType })
-              )
-            )
-          }
+          onClick={() => setVisibleTab(socketType)}
         >
           <span className="atom-menu__item__unread" />
           <span className="atom-menu__item__label">{label}</span>
@@ -191,13 +171,7 @@ export default function WonAtomMenu({
       <div
         key="rdf"
         className={generateAtomItemCssClasses(visibleTab === "RDF")}
-        onClick={() =>
-          dispatch(
-            actionCreators.atoms__selectTab(
-              Immutable.fromJS({ atomUri: atomUri, selectTab: "RDF" })
-            )
-          )
-        }
+        onClick={() => setVisibleTab("RDF")}
       >
         <span className="atom-menu__item__label">RDF</span>
       </div>
@@ -211,5 +185,6 @@ export default function WonAtomMenu({
 WonAtomMenu.propTypes = {
   atom: PropTypes.object.isRequired,
   relevantConnectionsMap: PropTypes.object.isRequired,
-  defaultTab: PropTypes.string,
+  visibleTab: PropTypes.string.isRequired,
+  setVisibleTab: PropTypes.func.isRequired,
 };

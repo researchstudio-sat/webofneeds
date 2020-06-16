@@ -98,7 +98,7 @@ export default function WonConnectionSelectionItem({
             {
               postUri: get(senderAtom, "uri"),
               connectionUri: undefined,
-              tab: "DETAIL",
+              tab: undefined,
             },
             "/post",
             false

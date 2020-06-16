@@ -7,7 +7,6 @@ import { get, getQueryParams } from "../utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
-import * as viewUtils from "../redux/utils/view-utils.js";
 import vocab from "../service/vocab.js";
 
 import WonAtomContentHolds from "./atom-content/atom-content-holds.jsx";
@@ -33,7 +32,7 @@ import * as connectionUtils from "../redux/utils/connection-utils";
 
 export default function WonAtomContent({
   atom,
-  defaultTab,
+  visibleTab,
   relevantConnectionsMap,
 }) {
   const history = useHistory();
@@ -63,8 +62,6 @@ export default function WonAtomContent({
 
   const hasContent = hasVisibleDetails(content);
   const hasSeeksBranch = hasVisibleDetails(seeks);
-
-  const viewState = useSelector(generalSelectors.getViewState);
   const process = useSelector(generalSelectors.getProcessState);
 
   const isHeld = atomUtils.isHeld(atom);
@@ -75,11 +72,6 @@ export default function WonAtomContent({
   const atomProcessingUpdate =
     atom && processUtils.isAtomProcessingUpdate(process, atomUri);
 
-  const visibleTab = viewUtils.getVisibleTabByAtomUri(
-    viewState,
-    atomUri,
-    defaultTab
-  );
   const personas = useSelector(generalSelectors.getOwnedCondensedPersonaList);
 
   function tryReload() {
@@ -307,5 +299,5 @@ export default function WonAtomContent({
 WonAtomContent.propTypes = {
   atom: PropTypes.object.isRequired,
   relevantConnectionsMap: PropTypes.object.isRequired,
-  defaultTab: PropTypes.string,
+  visibleTab: PropTypes.string.isRequired,
 };

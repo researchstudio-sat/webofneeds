@@ -311,6 +311,7 @@ export default function WonConnectionMessage({
                       history.location,
                       {
                         postUri: get(targetAtom, "uri"),
+                        tab: undefined,
                         connectionUri: undefined,
                       },
                       "/post"
@@ -335,7 +336,11 @@ export default function WonConnectionMessage({
                   history.push(
                     generateLink(
                       history.location,
-                      { postUri: originatorUri, connectionUri: undefined },
+                      {
+                        postUri: originatorUri,
+                        connectionUri: undefined,
+                        tab: undefined,
+                      },
                       "/post"
                     )
                   );

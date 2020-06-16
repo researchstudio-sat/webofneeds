@@ -93,6 +93,7 @@ export default function WonGenericItem({
                   ? get(atom, "uri")
                   : get(connection, "targetAtomUri"),
                 connectionUri: get(connection, "uri"),
+                tab: undefined,
               },
               "/post"
             )}

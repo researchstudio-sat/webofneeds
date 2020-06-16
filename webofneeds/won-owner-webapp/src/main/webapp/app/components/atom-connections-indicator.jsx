@@ -2,7 +2,6 @@
  * Created by sigpie on 21.09.2019.
  */
 import React from "react";
-import { useDispatch } from "react-redux";
 import PropTypes from "prop-types";
 import { get, generateLink } from "../utils.js";
 
@@ -15,11 +14,8 @@ import ico36_incoming from "~/images/won-icons/ico36_incoming.svg";
 import ico36_match from "~/images/won-icons/ico36_match.svg";
 import { useHistory } from "react-router-dom";
 import vocab from "../service/vocab";
-import { actionCreators } from "../actions/actions";
-import Immutable from "immutable";
 
 export default function WonAtomConnectionsIndicator({ atom }) {
-  const dispatch = useDispatch();
   const history = useHistory();
 
   const receivedRequests = atomUtils.getRequestReceivedConnections(atom);
@@ -48,14 +44,6 @@ export default function WonAtomConnectionsIndicator({ atom }) {
 
     const atomUri = get(atom, "uri");
 
-    dispatch(
-      actionCreators.atoms__selectTab(
-        Immutable.fromJS({
-          atomUri: atomUri,
-          selectTab: socketType,
-        })
-      )
-    );
     history.push(
       generateLink(
         history.location,

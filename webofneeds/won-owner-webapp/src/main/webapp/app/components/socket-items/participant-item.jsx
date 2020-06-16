@@ -96,6 +96,7 @@ export default function WonParticipantItem({
               {
                 postUri: flip ? get(atom, "uri") : get(targetAtom, "uri"),
                 connectionUri: get(connection, "uri"),
+                tab: undefined,
               },
               "/post"
             )}
