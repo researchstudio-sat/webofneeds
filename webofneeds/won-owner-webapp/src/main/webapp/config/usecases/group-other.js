@@ -10,6 +10,7 @@ import { contactPaymentBot } from "./uc-contact-payment-bot.js";
 import { details, mergeInEmptyDraft } from "../detail-definitions.js";
 
 import ico36_plus from "../../images/won-icons/ico36_plus.svg";
+import ico36_uc_custom from "../../images/won-icons/ico36_uc_custom.svg";
 
 export const otherGroup = {
   identifier: "othergroup",
@@ -23,16 +24,28 @@ export const otherGroup = {
     newsarticle: newsarticle,
     groupChat: {
       identifier: "groupChat",
-      label: "New Groupchat Post",
+      label: "Custom GroupChat",
+      icon: ico36_uc_custom,
       draft: {
         ...mergeInEmptyDraft({
           content: {
+            type: [vocab.WON.GenericGroupChatCompacted],
             sockets: {
               "#groupSocket": vocab.GROUP.GroupSocketCompacted,
               "#holdableSocket": vocab.HOLD.HoldableSocketCompacted,
             },
           },
         }),
+      },
+      reactions: {
+        [vocab.GROUP.GroupSocketCompacted]: {
+          [vocab.CHAT.ChatSocketCompacted]: {
+            useCaseIdentifiers: ["persona"],
+          },
+          [vocab.GROUP.GroupSocketCompacted]: {
+            useCaseIdentifiers: ["*"],
+          },
+        },
       },
       details: details,
       seeksDetails: details,

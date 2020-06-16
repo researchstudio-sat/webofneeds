@@ -4,7 +4,7 @@ import ico36_uc_custom from "../../images/won-icons/ico36_uc_custom.svg";
 
 export const customUseCase = {
   identifier: "customUseCase",
-  label: "New custom post",
+  label: "Custom Post",
   icon: ico36_uc_custom,
   doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: { ...mergeInEmptyDraft() },

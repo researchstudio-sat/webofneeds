@@ -23,16 +23,35 @@ export const persona = {
   },
   reactions: {
     [vocab.WXSCHEMA.WorksForSocketCompacted]: {
-      [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: ["organization"],
+      [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: {
+        useCaseIdentifiers: ["organization"],
+      },
     },
     [vocab.WXSCHEMA.MemberOfSocketCompacted]: {
-      [vocab.WXSCHEMA.MemberSocketCompacted]: ["organization"],
+      [vocab.WXSCHEMA.MemberSocketCompacted]: {
+        useCaseIdentifiers: ["organization"],
+      },
     },
     [vocab.BUDDY.BuddySocketCompacted]: {
-      [vocab.BUDDY.BuddySocketCompacted]: ["persona"],
+      [vocab.BUDDY.BuddySocketCompacted]: {
+        useCaseIdentifiers: ["persona"],
+        refuseOwned: true,
+      },
     },
     [vocab.HOLD.HolderSocketCompacted]: {
-      [vocab.HOLD.HoldableSocketCompacted]: ["*"],
+      [vocab.HOLD.HoldableSocketCompacted]: {
+        useCaseIdentifiers: ["*"],
+        refuseNonOwned: true,
+      },
+    },
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["persona"],
+        refuseOwned: true,
+      },
+      [vocab.GROUP.GroupSocketCompacted]: {
+        useCaseIdentifiers: ["*"],
+      },
     },
   },
   details: {

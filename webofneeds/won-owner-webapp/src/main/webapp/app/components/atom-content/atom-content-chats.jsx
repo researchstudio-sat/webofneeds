@@ -28,7 +28,6 @@ import "~/style/_atom-content-chats.scss";
 export default function AtomContentChats({
   atom,
   allowAdHoc,
-  refuseOwned,
   relevantConnections,
 }) {
   const history = useHistory();
@@ -231,7 +230,6 @@ export default function AtomContentChats({
           storedAtoms={filteredStoredAtoms}
           addToSocketType={vocab.CHAT.ChatSocketCompacted}
           allowAdHoc={allowAdHoc}
-          refuseOwned={refuseOwned}
           reactions={reactions}
           accountState={accountState}
           onClose={() => toggleAddPicker(!showAddPicker)}
@@ -247,5 +245,4 @@ AtomContentChats.propTypes = {
   atom: PropTypes.object.isRequired,
   relevantConnections: PropTypes.object.isRequired,
   allowAdHoc: PropTypes.bool,
-  refuseOwned: PropTypes.bool,
 };

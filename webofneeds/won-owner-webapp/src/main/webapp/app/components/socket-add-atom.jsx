@@ -32,7 +32,6 @@ import Immutable from "immutable";
  * @param accountState - accountState redux store -> to determine ownership of the storedAtoms, and login status
  * @param onClose - function that is executed when the close Button is clicked
  * @param allowAdHoc - if true then the adHoc Connect textfield will be visible, connecting Generated Persona or Personas with the addToAtom
- * @param refuseOwned - if true then remove all Owned Atoms (incl. the create Option) as options to connect with (only makes sense if the addToAtom is Owned itself)
  * @returns {*}
  */
 export default function WonSocketAddAtom({
@@ -43,8 +42,6 @@ export default function WonSocketAddAtom({
   accountState,
   onClose,
   allowAdHoc,
-  refuseOwned,
-  refuseNonOwned,
 }) {
   const dispatch = useDispatch();
   const history = useHistory();
@@ -52,7 +49,7 @@ export default function WonSocketAddAtom({
   const addToAtomSocketUri = atomUtils.getSocketUri(addToAtom, addToSocketType);
   const isAddToAtomOwned = accountUtils.isAtomOwned(accountState, addToAtomUri);
 
-  if (!isAddToAtomOwned && refuseOwned) {
+  if (!isAddToAtomOwned) {
     console.error(
       "Atom: ",
       addToAtom,
@@ -67,25 +64,29 @@ export default function WonSocketAddAtom({
 
   const sortedPossibleAtoms = storedAtoms
     .filter(atom => atomUtils.isActive(atom))
-    .filter(
-      (atom, atomUri) =>
-        refuseOwned ? !accountUtils.isAtomOwned(accountState, atomUri) : true
-    )
     .filter((atom, atomUri) => {
       const isOwned = accountUtils.isAtomOwned(accountState, atomUri);
 
       return (
-        (!refuseNonOwned || isOwned) && //Filters all non owned Atoms if refuseNonOwned is true
-        (!refuseOwned || !isOwned) && //Filters all owned Atoms if refusedOwned is true
         (isAddToAtomOwned || isOwned) && //Filters all non-owned Atoms if isAddToAtomOwned is false
         atomUri !== addToAtomUri //Filters the addToAtomUri from the list
       );
     })
-    .filter(
-      atom =>
+    .filter((atom, atomUri) => {
+      const isOwned = accountUtils.isAtomOwned(accountState, atomUri);
+
+      return (
         reactions &&
-        !!reactions.find(
-          (allowedUseCaseList, socketType) =>
+        !!reactions.find((reaction, socketType) => {
+          const allowedUseCaseList =
+            get(reaction, "useCaseIdentifiers") || reaction; //TODO: FIX AND REFACTOR ONCE THE REACTIONS HAVE BEEN ALTERED
+
+          const refuseOwned = get(reaction, "refuseOwned");
+          const refuseNonOwned = get(reaction, "refuseNonOwned");
+
+          return (
+            !(refuseOwned && isOwned) &&
+            !(refuseNonOwned && !isOwned) &&
             atomUtils.hasSocket(atom, socketType) &&
             allowedUseCaseList &&
             !!allowedUseCaseList.find(
@@ -105,20 +106,29 @@ export default function WonSocketAddAtom({
                       addToAtomSocketUri
                     ))
             )
-        )
-    );
+          );
+        })
+      );
+    });
 
   const createAtomReactionsArray = [];
 
   reactions &&
-    reactions.map((useCaseIdentifierList, socketType) =>
-      useCaseIdentifierList.map(ucIdentifier =>
-        createAtomReactionsArray.push({
-          ucIdentifier: ucIdentifier,
-          socketType: socketType,
-        })
-      )
-    );
+    reactions
+      .filter(reaction => !get(reaction, "refuseOwned"))
+      .map((reaction, socketType) => {
+        const allowedUseCaseList =
+          get(reaction, "useCaseIdentifiers") || reaction; //TODO: FIX AND REFACTOR ONCE THE REACTIONS HAVE BEEN ALTERED
+
+        return allowedUseCaseList
+          .filter(ucIdentifier => ucIdentifier !== "*") //TODO: REMOVE THIS ONCE WE KNOW HOW TO HANDLE WILDCARD USECASES
+          .map(ucIdentifier =>
+            createAtomReactionsArray.push({
+              ucIdentifier: ucIdentifier,
+              socketType: socketType,
+            })
+          );
+      });
 
   const sortedPossibleAtomsArray =
     sortedPossibleAtoms &&
@@ -136,8 +146,16 @@ export default function WonSocketAddAtom({
     const connectFunctions = [];
 
     reactions &&
-      reactions.map((allowedUseCaseList, socketType) => {
+      reactions.map((reaction, socketType) => {
+        const allowedUseCaseList =
+          get(reaction, "useCaseIdentifiers") || reaction; //TODO: FIX AND REFACTOR ONCE THE REACTIONS HAVE BEEN ALTERED
+
+        const refuseOwned = get(reaction, "refuseOwned");
+        const refuseNonOwned = get(reaction, "refuseNonOwned");
+
         const includesSelectedUseCase =
+          !(refuseOwned && isSelectedAtomOwned) &&
+          !(refuseNonOwned && !isSelectedAtomOwned) &&
           allowedUseCaseList &&
           !!allowedUseCaseList.find(
             ucIdentifier =>
@@ -363,64 +381,59 @@ export default function WonSocketAddAtom({
               onClick={() => selectAtom(atom)}
             />
           ))}
-        {!refuseOwned &&
-          createAtomReactionsArray.map(
-            ({ ucIdentifier, socketType }, index) => (
-              <Link
-                key={ucIdentifier + "-" + index}
-                className="wsaa__content__create"
-                to={location =>
-                  generateLink(
-                    location,
-                    {
-                      useCase: ucIdentifier,
-                      fromAtomUri: addToAtomUri,
-                      senderSocketType: socketType,
-                      targetSocketType: addToSocketType,
-                      mode: "CONNECT",
-                      holderUri: addHolderUri,
-                    },
-                    "/create"
-                  )
-                }
-              >
-                <div className="wsaa__content__create__icon">
-                  {useCaseUtils.getUseCaseIcon(ucIdentifier) ? (
-                    <svg className="wsaa__content__create__icon__svg">
-                      <use
-                        xlinkHref={useCaseUtils.getUseCaseIcon(ucIdentifier)}
-                        href={useCaseUtils.getUseCaseIcon(ucIdentifier)}
-                      />
-                    </svg>
-                  ) : (
-                    <svg className="wsaa__content__create__icon__svg">
-                      <use xlinkHref={ico36_plus} href={ico36_plus} />
-                    </svg>
-                  )}
+        {createAtomReactionsArray.map(({ ucIdentifier, socketType }, index) => (
+          <Link
+            key={ucIdentifier + "-" + index}
+            className="wsaa__content__create"
+            to={location =>
+              generateLink(
+                location,
+                {
+                  useCase: ucIdentifier,
+                  fromAtomUri: addToAtomUri,
+                  senderSocketType: socketType,
+                  targetSocketType: addToSocketType,
+                  mode: "CONNECT",
+                  holderUri: addHolderUri,
+                },
+                "/create"
+              )
+            }
+          >
+            <div className="wsaa__content__create__icon">
+              {useCaseUtils.getUseCaseIcon(ucIdentifier) ? (
+                <svg className="wsaa__content__create__icon__svg">
+                  <use
+                    xlinkHref={useCaseUtils.getUseCaseIcon(ucIdentifier)}
+                    href={useCaseUtils.getUseCaseIcon(ucIdentifier)}
+                  />
+                </svg>
+              ) : (
+                <svg className="wsaa__content__create__icon__svg">
+                  <use xlinkHref={ico36_plus} href={ico36_plus} />
+                </svg>
+              )}
+            </div>
+            <div className="wsaa__content__create__right">
+              <div className="wsaa__content__create__right__topline">
+                <div className="wsaa__content__create__right__topline__notitle">
+                  {isAddToAtomOwned
+                    ? `Add New ${wonLabelUtils.getSocketItemLabel(socketType)}`
+                    : `Connect New ${wonLabelUtils.getSocketItemLabel(
+                        socketType
+                      )}`}
                 </div>
-                <div className="wsaa__content__create__right">
-                  <div className="wsaa__content__create__right__topline">
-                    <div className="wsaa__content__create__right__topline__notitle">
-                      {isAddToAtomOwned
-                        ? `Add New ${wonLabelUtils.getSocketItemLabel(
-                            socketType
-                          )}`
-                        : `Connect New ${wonLabelUtils.getSocketItemLabel(
-                            socketType
-                          )}`}
-                    </div>
-                  </div>
-                  <div className="wsaa__content__create__right__subtitle">
-                    <span className="wsaa__content__create__right__subtitle__type">
-                      <span>{useCaseUtils.getUseCaseLabel(ucIdentifier)}</span>
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            )
-          )}
+              </div>
+              <div className="wsaa__content__create__right__subtitle">
+                <span className="wsaa__content__create__right__subtitle__type">
+                  <span>{useCaseUtils.getUseCaseLabel(ucIdentifier)}</span>
+                </span>
+              </div>
+            </div>
+          </Link>
+        ))}
       </div>
-      {!refuseOwned && allowAdHoc ? (
+      {allowAdHoc ? (
         <React.Fragment>
           {reactions ? <WonLabelledHr label="Or" /> : undefined}
           <ChatTextfield
@@ -455,6 +468,4 @@ WonSocketAddAtom.propTypes = {
   accountState: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
   allowAdHoc: PropTypes.bool,
-  refuseOwned: PropTypes.bool,
-  refuseNonOwned: PropTypes.bool,
 };

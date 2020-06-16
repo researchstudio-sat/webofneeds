@@ -75,6 +75,8 @@ vocab.WON.messageContainerCompacted = vocab.WON.prefix + ":messageContainer";
 
 vocab.WON.Persona = vocab.WON.baseUri + "Persona";
 vocab.WON.PersonaCompacted = vocab.WON.prefix + ":Persona";
+vocab.WON.GenericGroupChat = vocab.WON.baseUri + "GenericGroupChat";
+vocab.WON.GenericGroupChatCompacted = vocab.WON.prefix + ":GenericGroupChat";
 
 vocab.WON.matchScore = vocab.WON.baseUri + "matchScore";
 vocab.WON.matchScoreCompacted = vocab.WON.prefix + ":matchScore";

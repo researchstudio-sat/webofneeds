@@ -195,7 +195,6 @@ export default function WonAtomContent({
             atom={atom}
             socketType={visibleTab}
             ItemComponent={WonBuddyItem}
-            refuseOwned={isOwned}
             relevantConnections={relevantConnections}
           />
         );
@@ -225,7 +224,6 @@ export default function WonAtomContent({
           <WonAtomContentChats
             atom={atom}
             allowAdHoc={!isOwned}
-            refuseOwned={false} // Used to be refuse Owned true, but then we couldnt add GroupChats anymore --> TODO Figure out a way to allow owned differently
             // We filter out every chat connection that is not owned, otherwise the count would show non owned chatconnections of non owned atoms
             relevantConnections={relevantConnections.filter(
               conn =>
