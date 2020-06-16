@@ -1,0 +1,12 @@
+@import "won-config";
+
+won-connection-agreement-details {
+  .cad__quad {
+    white-space: pre-wrap;
+    font-size: $smallFontSize;
+
+    &__subject {
+      text-decoration-color: red;
+    }
+  }
+}

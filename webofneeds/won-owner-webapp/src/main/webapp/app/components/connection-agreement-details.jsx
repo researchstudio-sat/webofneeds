@@ -1,49 +1,66 @@
 /**
  * Created by ms on 27.05.2020.
  */
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { usePrevious } from "../cstm-react-utils.js";
 import PropTypes from "prop-types";
+import won from "../service/won";
 import { get } from "../utils.js";
-import * as N3 from "n3";
+import { parseRDFJSQuadToFactoryQuad } from "../service/rdf-utils";
+import * as Graphy from "graphy";
+
+import "../../style/_connection-agreement-details.scss";
 
 export default function WonConnectionAgreementDetails({ connection }) {
-  const agreementDataset = get(connection, "agreementDataset");
+  const lastAgreementDataset = get(connection, "agreementDataset");
+  const previousAgreementDataset =
+    lastAgreementDataset &&
+    usePrevious(lastAgreementDataset, useRef, useEffect);
+  const [graphyParsedData, setGraphyParsedData] = useState([]);
+  const [graphyElement, setGraphyElement] = useState("");
 
-  let agreementParsedQuads = [];
-  agreementDataset.forEach(quad => {
-    const agreementWriter = new N3.Writer({
-      format: "application/trig",
-      prefixes: {
-        con: "https://w3id.org/won/content#",
-      },
-    });
-    agreementWriter.addQuad(quad);
-    agreementWriter.end((error, result) => {
-      console.log(result);
-      agreementParsedQuads.push(result);
-    });
+  // Graphy solution
+
+  const trigScribe = Graphy["content.trig.scribe"];
+  let dsScriber = trigScribe({
+    prefixes: {
+      ...won.minimalContext,
+    },
   });
 
-  const agreementQuadsElement =
-    agreementParsedQuads &&
-    agreementParsedQuads.map((quad, index) => {
-      return (
-        <div key={quad + index}>
-          {quad}
-          <hr />
-        </div>
-      );
+  dsScriber.on("data", sTrig => {
+    if (!graphyParsedData.includes(sTrig + "")) {
+      graphyParsedData.push(sTrig + "");
+      setGraphyParsedData(graphyParsedData);
+      generateGraphyElement(graphyParsedData);
+      console.log(sTrig + "");
+    }
+  });
+
+  function generateGraphyElement(dataArray) {
+    let parsedElement = "";
+    dataArray.forEach(element => (parsedElement += element));
+    setGraphyElement(parsedElement);
+  }
+
+  if (
+    lastAgreementDataset &&
+    lastAgreementDataset !== previousAgreementDataset
+  ) {
+    lastAgreementDataset.forEach(quad => {
+      dsScriber.write(parseRDFJSQuadToFactoryQuad(quad));
     });
+    dsScriber.end();
+  }
 
   return (
     <won-connection-agreement-details>
-      <div>
-        <div className="pm__content__agreement__title">Agreements</div>
-        {agreementQuadsElement}
-      </div>
+      <div className="pm__content__agreement__title">Agreements</div>
+      <div className="cad__quad">{graphyElement}</div>
     </won-connection-agreement-details>
   );
 }
+
 WonConnectionAgreementDetails.propTypes = {
   connection: PropTypes.object.isRequired,
 };
