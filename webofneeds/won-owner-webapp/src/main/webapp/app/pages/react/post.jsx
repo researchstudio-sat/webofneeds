@@ -76,6 +76,42 @@ export default function PagePost() {
     }
   });
 
+  let atomContentElement;
+
+  if (atomLoading) {
+    atomContentElement = (
+      <div className="pc__loading">
+        <svg className="pc__loading__spinner hspinner">
+          <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
+        </svg>
+        <span className="pc__loading__label">Loading...</span>
+      </div>
+    );
+  } else if (atomFailedToLoad) {
+    atomContentElement = (
+      <div className="pc__failed">
+        <svg className="pc__failed__icon">
+          <use xlinkHref={ico16_indicator_error} href={ico16_indicator_error} />
+        </svg>
+        <span className="pc__failed__label">
+          Failed To Load - Atom might have been deleted
+        </span>
+        <div className="pc__failed__actions">
+          <button
+            className="pc__failed__actions__button red won-button--outlined thin"
+            onClick={tryReload}
+          >
+            Try Reload
+          </button>
+        </div>
+      </div>
+    );
+  } else if (atom) {
+    atomContentElement = (
+      <WonAtomInfo atom={atom} ownedConnection={ownedConnection} />
+    );
+  }
+
   return (
     <section className={!isLoggedIn ? "won-signed-out" : ""}>
       {showModalDialog && <WonModalDialog />}
@@ -83,41 +119,7 @@ export default function PagePost() {
       {isLoggedIn && <WonMenu />}
       <WonToasts />
       {showSlideIns && <WonSlideIn />}
-      <main className="postcontent">
-        {!(atomLoading || atomFailedToLoad) &&
-          !!atom && (
-            <WonAtomInfo atom={atom} ownedConnection={ownedConnection} />
-          )}
-        {atomLoading && (
-          <div className="pc__loading">
-            <svg className="pc__loading__spinner hspinner">
-              <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
-            </svg>
-            <span className="pc__loading__label">Loading...</span>
-          </div>
-        )}
-        {atomFailedToLoad && (
-          <div className="pc__failed">
-            <svg className="pc__failed__icon">
-              <use
-                xlinkHref={ico16_indicator_error}
-                href={ico16_indicator_error}
-              />
-            </svg>
-            <span className="pc__failed__label">
-              Failed To Load - Atom might have been deleted
-            </span>
-            <div className="pc__failed__actions">
-              <button
-                className="pc__failed__actions__button red won-button--outlined thin"
-                onClick={tryReload}
-              >
-                Try Reload
-              </button>
-            </div>
-          </div>
-        )}
-      </main>
+      <main className="atomcontent">{atomContentElement}</main>
       <WonFooter />
     </section>
   );
