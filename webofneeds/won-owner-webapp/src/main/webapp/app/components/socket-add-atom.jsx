@@ -165,7 +165,7 @@ export default function WonSocketAddAtom({
           if (isAddToAtomOwned && isSelectedAtomOwned) {
             connectFunctions.push({
               label: `As ${wonLabelUtils.getSocketTabLabel(socketType)}`,
-              func: actionCreators.atoms__connectSocketsServerSide(
+              func: actionCreators.atoms__connectSockets(
                 addToAtomSocketUri,
                 selectedAtomSocketUri
               ),
@@ -257,16 +257,11 @@ export default function WonSocketAddAtom({
             targetSocketUri
           );
 
-          let connectFunction = isAddToAtomOwned
-            ? actionCreators.atoms__connectSocketsServerSide(
-                senderSocketUri,
-                targetSocketUri
-              )
-            : actionCreators.atoms__connectSockets(
-                senderSocketUri,
-                targetSocketUri,
-                message
-              );
+          let connectFunction = actionCreators.atoms__connectSockets(
+            senderSocketUri,
+            targetSocketUri,
+            message
+          );
 
           if (!personaConnection) {
             dispatch(connectFunction);

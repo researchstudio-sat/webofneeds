@@ -135,7 +135,6 @@ const actionHierarchy = {
     closedBySystem: atomActions.closedBySystem,
     failed: INJ_DEFAULT,
     connectSockets: atomActions.connectSockets,
-    connectSocketsServerSide: atomActions.connectSocketsServerSide,
     fetchUnloadedAtom: atomActions.fetchUnloadedAtom,
 
     fetchMetaAtoms: INJ_DEFAULT,
