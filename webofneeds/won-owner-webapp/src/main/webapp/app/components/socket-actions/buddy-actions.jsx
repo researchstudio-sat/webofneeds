@@ -20,7 +20,7 @@ export default function WonBuddySocketActions({ connection, goBackOnAction }) {
   const dispatch = useDispatch();
   const history = useHistory();
   const connectionState = get(connection, "state");
-  const connectionUri = connectionUri;
+  const connectionUri = get(connection, "uri");
 
   const senderAtom = useSelector(
     generalSelectors.getAtom(connectionUri.split("/c")[0])
