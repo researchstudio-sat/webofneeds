@@ -52,7 +52,6 @@ export default function PokemonRaidCard({
     details.pokemonRaid.findPokemonById(pokemonId, pokemonForm);
   const pokemonImageUrl = pokemon && pokemon.imageUrl;
   const isInactive = atomUtils.isInactive(atom);
-  const holderWebsite = getIn(holder, ["content", "website"]);
   const atomTypeLabel = atomUtils.generateTypeLabel(atom);
   const atomHasHoldableSocket = atomUtils.hasHoldableSocket(atom);
   const isGroupChatEnabled = atomUtils.hasGroupSocket(atom);
@@ -139,23 +138,6 @@ export default function PokemonRaidCard({
     }
   }
 
-  function createPersonaWebsite() {
-    if (holderWebsite) {
-      return (
-        <React.Fragment>
-          <div className="card__persona__websitelabel">Website:</div>,
-          <a
-            className="card__persona__websitelink"
-            target="_blank"
-            rel="noopener noreferrer"
-            href={holderWebsite}
-          >
-            {holderWebsite}
-          </a>
-        </React.Fragment>
-      );
-    }
-  }
   function createVerificationLabel() {
     if (holderVerified) {
       return (
@@ -317,7 +299,6 @@ export default function PokemonRaidCard({
         ) : (
           undefined
         )}
-        {createPersonaWebsite()}
       </Link>
     ) : (
       undefined

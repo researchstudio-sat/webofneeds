@@ -3,7 +3,7 @@
  */
 import React from "react";
 import { useSelector } from "react-redux";
-import { get, getIn, generateLink } from "../../utils.js";
+import { get, generateLink } from "../../utils.js";
 import PropTypes from "prop-types";
 
 import WonAtomMap from "../atom-map.jsx";
@@ -44,7 +44,6 @@ export default function WonOtherCard({
     ? atomUtils.getBackground(holder)
     : undefined;
   const isInactive = atomUtils.isInactive(atom);
-  const holderWebsite = getIn(holder, ["content", "website"]);
   const atomTypeLabel = atomUtils.generateTypeLabel(atom);
   const atomHasHoldableSocket = atomUtils.hasHoldableSocket(atom);
   const isGroupChatEnabled = atomUtils.hasGroupSocket(atom);
@@ -131,23 +130,6 @@ export default function WonOtherCard({
     }
   }
 
-  function createPersonaWebsite() {
-    if (holderWebsite) {
-      return (
-        <React.Fragment>
-          <div className="card__persona__websitelabel">Website:</div>,
-          <a
-            className="card__persona__websitelink"
-            target="_blank"
-            rel="noopener noreferrer"
-            href={holderWebsite}
-          >
-            {holderWebsite}
-          </a>
-        </React.Fragment>
-      );
-    }
-  }
   function createVerificationLabel() {
     if (holderVerified) {
       return (
@@ -317,7 +299,6 @@ export default function WonOtherCard({
         ) : (
           undefined
         )}
-        {createPersonaWebsite()}
       </Link>
     ) : (
       undefined
