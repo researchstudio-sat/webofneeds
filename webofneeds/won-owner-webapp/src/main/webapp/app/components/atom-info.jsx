@@ -46,7 +46,6 @@ export default function WonAtomInfo({
   );
 
   const reactions = atomUtils.getReactions(atom);
-  console.debug("reactions: ", reactions);
 
   function generateReactionElements() {
     const isAtomOwned = accountUtils.isAtomOwned(accountState, atomUri);
@@ -97,7 +96,10 @@ export default function WonAtomInfo({
         showAddPicker={showAddPicker}
         setVisibleTab={setVisibleTab}
       />
-      {visibleTab === "DETAIL" && atomUtils.isActive(atom) && reactions ? (
+      {visibleTab === "DETAIL" &&
+      atomUtils.isActive(atom) &&
+      reactions &&
+      reactions.size > 0 ? (
         <won-atom-reactions>{generateReactionElements()}</won-atom-reactions>
       ) : (
         undefined
