@@ -507,6 +507,7 @@ export function sortByDistanceFrom(atomsImm, location, order = "ASC") {
 }
 
 function getSocketKeysReset(socketsImm) {
+  //TODO: Needs to be generic somehow, otherwise every socket that is added would not be able to be reset correctly
   return socketsImm.mapKeys((key, value) => {
     switch (value) {
       case vocab.CHAT.ChatSocketCompacted:
