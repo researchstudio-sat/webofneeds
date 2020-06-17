@@ -86,7 +86,7 @@ export default function WonAtomMenu({
     let countLabel;
 
     const selected = visibleTab === socketType;
-    let inactive = false;
+    let inactive = false; //TODO: Implement inactive based on connectionsCount and possibleReactions to socket
     let unread = false;
 
     switch (socketType) {
@@ -107,7 +107,6 @@ export default function WonAtomMenu({
         break;
 
       case vocab.REVIEW.ReviewSocketCompacted:
-        inactive = !hasReviews;
         countLabel = hasReviews && "(" + reviewCount + ")";
         break;
 
@@ -120,7 +119,6 @@ export default function WonAtomMenu({
               isOwned || connectionUtils.hasTargetSocketUri(conn, socketUri)
           )
           .filter(conn => !connectionUtils.isClosed(conn));
-        inactive = !activeConnections || activeConnections.size === 0;
         countLabel =
           activeConnections && activeConnections.size > 0
             ? "(" + activeConnections.size + ")"
@@ -135,7 +133,6 @@ export default function WonAtomMenu({
           conn => !connectionUtils.isClosed(conn)
         );
 
-        inactive = !activeConnections || activeConnections.size === 0;
         countLabel =
           activeConnections && activeConnections.size > 0
             ? "(" + activeConnections.size + ")"
