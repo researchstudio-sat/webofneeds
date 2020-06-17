@@ -417,10 +417,6 @@ export const getCurrentLocation = createSelector(
   viewState => viewState && viewUtils.getCurrentLocation(viewState)
 );
 
-export function getAtomUriBySocketUri(socketUri) {
-  return socketUri && socketUri.split("#")[0];
-}
-
 export const getSenderSocketType = (allAtoms, connection) => {
   const connectionUri = get(connection, "uri");
   const senderSocketUri = get(connection, "socketUri");

@@ -4,7 +4,12 @@
 import { actionTypes } from "../../actions/actions.js";
 import Immutable from "immutable";
 import vocab from "../../service/vocab.js";
-import { get, getIn, msStringToDate } from "../../utils.js";
+import {
+  get,
+  getIn,
+  msStringToDate,
+  extractAtomUriBySocketUri,
+} from "../../utils.js";
 import {
   addAtom,
   addAtomInCreation,
@@ -47,7 +52,6 @@ import {
 } from "./reduce-connections.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
-import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 
 const initialState = Immutable.fromJS({});
 
@@ -200,12 +204,8 @@ export default function(allAtomsInState = initialState, action = {}) {
       const senderSocketUri = action.payload.senderSocketUri;
       const targetSocketUri = action.payload.targetSocketUri;
 
-      const senderAtomUri = generalSelectors.getAtomUriBySocketUri(
-        senderSocketUri
-      );
-      const targetAtomUri = generalSelectors.getAtomUriBySocketUri(
-        targetSocketUri
-      );
+      const senderAtomUri = extractAtomUriBySocketUri(senderSocketUri);
+      const targetAtomUri = extractAtomUriBySocketUri(targetSocketUri);
       const senderAtom = get(allAtomsInState, senderAtomUri);
       const affectedConnection =
         senderAtom &&
@@ -425,11 +425,11 @@ export default function(allAtomsInState = initialState, action = {}) {
 
       const targetAtom = get(
         allAtomsInState,
-        generalSelectors.getAtomUriBySocketUri(targetSocketUri)
+        extractAtomUriBySocketUri(targetSocketUri)
       );
       const senderAtom = get(
         allAtomsInState,
-        generalSelectors.getAtomUriBySocketUri(senderSocketUri)
+        extractAtomUriBySocketUri(senderSocketUri)
       );
 
       const senderConnection = atomUtils.getConnectionBySocketUris(
@@ -671,7 +671,7 @@ export default function(allAtomsInState = initialState, action = {}) {
       const wonMessage = get(action, "payload");
       const senderSocketUri = wonMessage.getSenderSocket();
       const messageUri = wonMessage.getIsResponseTo();
-      const atomUri = generalSelectors.getAtomUriBySocketUri(senderSocketUri);
+      const atomUri = extractAtomUriBySocketUri(senderSocketUri);
 
       const atom = get(allAtomsInState, atomUri);
       const affectedConnection =
@@ -714,9 +714,7 @@ export default function(allAtomsInState = initialState, action = {}) {
     case actionTypes.messages.chatMessage.failure: {
       const wonMessage = getIn(action, ["payload"]);
       const messageUri = wonMessage.getIsResponseTo();
-      const atomUri = generalSelectors.getAtomUriBySocketUri(
-        wonMessage.getTargetSocket()
-      );
+      const atomUri = extractAtomUriBySocketUri(wonMessage.getTargetSocket());
       const connectionUri = wonMessage.getConnection(); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
       const path = [
@@ -742,7 +740,7 @@ export default function(allAtomsInState = initialState, action = {}) {
       const targetSocketUri = wonMessage.getTargetSocket();
       const senderSocketUri = wonMessage.getSenderSocket();
       const messageUri = wonMessage.getIsResponseTo();
-      const atomUri = generalSelectors.getAtomUriBySocketUri(targetSocketUri);
+      const atomUri = extractAtomUriBySocketUri(targetSocketUri);
 
       const atom = get(allAtomsInState, atomUri);
       const affectedConnection = atomUtils.getConnectionBySocketUris(

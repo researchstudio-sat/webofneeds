@@ -13,7 +13,12 @@ import * as useCaseUtils from "../usecase-utils.js";
 import * as ownerApi from "../api/owner-api.js";
 import * as stateStore from "../redux/state-store.js";
 
-import { get, getIn, generateFakePersonaName } from "../utils.js";
+import {
+  get,
+  getIn,
+  generateFakePersonaName,
+  extractAtomUriBySocketUri,
+} from "../utils.js";
 
 import { ensureLoggedIn } from "./account-actions";
 
@@ -35,9 +40,7 @@ export function connectionsChatMessageClaimOnSuccess(
   connectionUri
 ) {
   return dispatch => {
-    const ownedAtomUri = generalSelectors.getAtomUriBySocketUri(
-      senderSocketUri
-    );
+    const ownedAtomUri = extractAtomUriBySocketUri(senderSocketUri);
 
     let referencedContentUris = undefined;
     let messageUriToClaim = undefined;
@@ -139,9 +142,7 @@ export function connectionsChatMessage(
   isTTL = false
 ) {
   return (dispatch, getState) => {
-    const senderAtomUri = generalSelectors.getAtomUriBySocketUri(
-      senderSocketUri
-    );
+    const senderAtomUri = extractAtomUriBySocketUri(senderSocketUri);
     const ownedAtom = getIn(getState(), ["atoms", senderAtomUri]);
 
     let referencedContentUris = undefined;
@@ -427,9 +428,7 @@ export function connectionsConnectAdHoc(targetSocketUri, connectMessage) {
 
 function connectAdHoc(targetSocketUri, connectMessage, dispatch, getState) {
   ensureLoggedIn(dispatch, getState).then(async () => {
-    const theirAtomUri = generalSelectors.getAtomUriBySocketUri(
-      targetSocketUri
-    );
+    const theirAtomUri = extractAtomUriBySocketUri(targetSocketUri);
 
     const state = getState();
     const adHocDraft = useCaseUtils.getUseCase("persona").draft;

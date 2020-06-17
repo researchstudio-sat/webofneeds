@@ -3,9 +3,8 @@ import { markUriAsRead, isUriRead } from "../../won-localstorage.js";
 import { markConnectionAsRead } from "./reduce-connections.js";
 import { addAtomStub } from "./reduce-atoms.js";
 import vocab from "../../service/vocab.js";
-import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
-import { get, getIn } from "../../utils.js";
+import { get, getIn, extractAtomUriBySocketUri } from "../../utils.js";
 import Immutable from "immutable";
 import {
   getSenderSocketType,
@@ -30,10 +29,10 @@ export function addMessage(
       const senderSocketUri = wonMessage.getSenderSocket();
       const targetSocketUri = wonMessage.getTargetSocket();
 
-      const senderAtomUri = generalSelectors.getAtomUriBySocketUri(
+      const senderAtomUri = extractAtomUriBySocketUri(
         wonMessage.getSenderSocket()
       );
-      const targetAtomUri = generalSelectors.getAtomUriBySocketUri(
+      const targetAtomUri = extractAtomUriBySocketUri(
         wonMessage.getTargetSocket()
       );
       const senderAtom = get(allAtomsInState, senderAtomUri);

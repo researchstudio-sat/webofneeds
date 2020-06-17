@@ -731,6 +731,10 @@ export function extractAtomUriFromConnectionUri(connectionUri) {
   );
 }
 
+export function extractAtomUriBySocketUri(socketUri) {
+  return socketUri && socketUri.substring(0, socketUri.lastIndexOf("#"));
+}
+
 export function generateFakePersonaName(atomUri) {
   let hash = 0;
 
