@@ -35,13 +35,14 @@ export const jobSearch = {
       },
     }),
   },
-  reactionUseCases: [
-    {
-      identifier: "jobOffer",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["jobOffer"],
+        refuseOwned: true,
+      },
     },
-  ],
+  },
   details: {
     title: { ...details.title },
     description: { ...details.description },

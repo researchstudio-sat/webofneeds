@@ -14,7 +14,7 @@ import { Link } from "react-router-dom";
 export default function WonAtomCardGrid({
   atoms,
   showHolder,
-  showSuggestions,
+  showIndicators,
   showCreate,
   showCreatePersona,
   currentLocation,
@@ -27,7 +27,7 @@ export default function WonAtomCardGrid({
           key={get(atom, "uri")}
           atom={atom}
           showHolder={showHolder}
-          showSuggestions={showSuggestions}
+          showIndicators={showIndicators}
           currentLocation={currentLocation}
         />
       );
@@ -66,7 +66,7 @@ export default function WonAtomCardGrid({
 WonAtomCardGrid.propTypes = {
   atoms: PropTypes.arrayOf(PropTypes.object).isRequired,
   showHolder: PropTypes.bool,
-  showSuggestions: PropTypes.bool,
+  showIndicators: PropTypes.bool,
   showCreate: PropTypes.bool,
   showCreatePersona: PropTypes.bool,
   currentLocation: PropTypes.object,

@@ -18,7 +18,7 @@ import "~/style/_pokemon-raid-card.scss";
 
 export default function PokemonRaidCard({
   atom,
-  showSuggestions,
+  showIndicators,
   showHolder,
   currentLocation,
 }) {
@@ -28,10 +28,6 @@ export default function PokemonRaidCard({
   const identiconSvg = !useCaseIcon
     ? atomUtils.getIdenticonSvg(atom)
     : undefined;
-  const isDirectResponse = atomUtils.isDirectResponseAtom(atom);
-  const responseToUri =
-    isDirectResponse && getIn(atom, ["content", "responseToUri"]);
-  const responseToAtom = useSelector(generalSelectors.getAtom(responseToUri));
   const atomLocation = atomUtils.getLocation(atom);
   const holderUri = atomUtils.getHeldByUri(atom);
   const holder = useSelector(generalSelectors.getAtom(holderUri));
@@ -56,7 +52,6 @@ export default function PokemonRaidCard({
     details.pokemonRaid.findPokemonById(pokemonId, pokemonForm);
   const pokemonImageUrl = pokemon && pokemon.imageUrl;
   const isInactive = atomUtils.isInactive(atom);
-  const holderWebsite = getIn(holder, ["content", "website"]);
   const atomTypeLabel = atomUtils.generateTypeLabel(atom);
   const atomHasHoldableSocket = atomUtils.hasHoldableSocket(atom);
   const isGroupChatEnabled = atomUtils.hasGroupSocket(atom);
@@ -96,41 +91,17 @@ export default function PokemonRaidCard({
   }
 
   function createCardMainTopline() {
-    const hasTitle = () => {
-      if (isDirectResponse && responseToAtom) {
-        return !!get(responseToAtom, "humanReadable");
-      } else {
-        return !!get(atom, "humanReadable");
-      }
-    };
+    const title = get(atom, "humanReadable");
 
-    const generateTitleString = () => {
-      if (isDirectResponse && responseToAtom) {
-        return "Re: " + get(responseToAtom, "humanReadable");
-      } else {
-        return get(atom, "humanReadable");
-      }
-    };
-
-    const generateCardTitle = () => {
-      if (hasTitle()) {
-        return (
-          <div className="card__main__topline__title">
-            {generateTitleString()}
-          </div>
-        );
-      } else {
-        if (isDirectResponse) {
-          return <div className="card__main__topline__notitle">no title</div>;
-        } else {
-          return (
-            <div className="card__main__topline__notitle">Re: no title</div>
-          );
-        }
-      }
-    };
-
-    return <div className="card__main__topline">{generateCardTitle()}</div>;
+    return (
+      <div className="card__main__topline">
+        {title ? (
+          <div className="card__main__topline__title">{title}</div>
+        ) : (
+          <div className="card__main__topline__notitle">No Title</div>
+        )}
+      </div>
+    );
   }
 
   function createCardMainIcon() {
@@ -167,23 +138,6 @@ export default function PokemonRaidCard({
     }
   }
 
-  function createPersonaWebsite() {
-    if (holderWebsite) {
-      return (
-        <React.Fragment>
-          <div className="card__persona__websitelabel">Website:</div>,
-          <a
-            className="card__persona__websitelink"
-            target="_blank"
-            rel="noopener noreferrer"
-            href={holderWebsite}
-          >
-            {holderWebsite}
-          </a>
-        </React.Fragment>
-      );
-    }
-  }
   function createVerificationLabel() {
     if (holderVerified) {
       return (
@@ -260,7 +214,11 @@ export default function PokemonRaidCard({
         (pokemonImageUrl ? "card__icon--pkm" : "")
       }
       to={location =>
-        generateLink(location, { postUri: atomUri, tab: "DETAIL" }, "/post")
+        generateLink(
+          location,
+          { postUri: atomUri, connectionUri: undefined, tab: undefined },
+          "/post"
+        )
       }
       style={style}
     >
@@ -307,7 +265,11 @@ export default function PokemonRaidCard({
         (!showDefaultIcon ? "card__main--showIcon" : "")
       }
       to={location =>
-        generateLink(location, { postUri: atomUri, tab: "DETAIL" }, "/post")
+        generateLink(
+          location,
+          { postUri: atomUri, connectionUri: undefined, tab: undefined },
+          "/post"
+        )
       }
     >
       {createCardMainIcon()}
@@ -321,7 +283,11 @@ export default function PokemonRaidCard({
       <Link
         className="card__persona clickable"
         to={location =>
-          generateLink(location, { postUri: holderUri, tab: "DETAIL" }, "/post")
+          generateLink(
+            location,
+            { postUri: holderUri, connectionUri: undefined, tab: undefined },
+            "/post"
+          )
         }
       >
         {createHolderInfoIcon()}
@@ -333,13 +299,12 @@ export default function PokemonRaidCard({
         ) : (
           undefined
         )}
-        {createPersonaWebsite()}
       </Link>
     ) : (
       undefined
     );
 
-  const cardSuggestionIndicators = showSuggestions ? (
+  const cardSuggestionIndicators = showIndicators ? (
     <div className="card__indicators">
       <WonAtomConnectionsIndicator atom={atom} />
     </div>
@@ -360,6 +325,6 @@ export default function PokemonRaidCard({
 PokemonRaidCard.propTypes = {
   atom: PropTypes.object.isRequired,
   showHolder: PropTypes.bool,
-  showSuggestions: PropTypes.bool,
+  showIndicators: PropTypes.bool,
   currentLocation: PropTypes.object,
 };

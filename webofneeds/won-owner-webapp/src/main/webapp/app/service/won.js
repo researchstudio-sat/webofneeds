@@ -237,6 +237,7 @@ won.minimalContext = {
   match: vocab.WONMATCH.baseUri,
   demo: vocab.DEMO.baseUri,
   "wx-bot": vocab.BOT.baseUri,
+  "wx-schema": vocab.WXSCHEMA.baseUri,
   hold: vocab.HOLD.baseUri,
   chat: vocab.CHAT.baseUri,
   group: vocab.GROUP.baseUri,

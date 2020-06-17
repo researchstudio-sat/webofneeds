@@ -25,13 +25,14 @@ export const phdSearch = {
       },
     }),
   },
-  reactionUseCases: [
-    {
-      identifier: "phdOffer",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["phdOffer"],
+        refuseOwned: true,
+      },
     },
-  ],
+  },
   details: {
     title: { ...details.title },
     description: { ...details.description },

@@ -3,7 +3,7 @@
  */
 import React from "react";
 import { Link } from "react-router-dom";
-import { get, getIn } from "../utils.js";
+import { get } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { relativeTime } from "../won-label-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
@@ -25,10 +25,6 @@ export default function WonAtomHeader({
 }) {
   const dispatch = useDispatch();
   const atomUri = get(atom, "uri");
-  const isDirectResponse = atomUtils.isDirectResponseAtom(atom);
-  const responseToUri =
-    isDirectResponse && getIn(atom, ["content", "responseToUri"]);
-  const responseToAtom = useSelector(generalSelectors.getAtom(responseToUri));
 
   const personaUri = atomUtils.getHeldByUri(atom);
   const persona = useSelector(generalSelectors.getAtom(personaUri));
@@ -52,25 +48,11 @@ export default function WonAtomHeader({
     atom &&
     relativeTime(globalUpdateTimestamp, get(atom, "lastUpdateDate"));
 
+  const title = get(atom, "humanReadable");
+
   function ensureAtomIsLoaded() {
     if (atomUri && (!atom || (atomToLoad && !atomLoading))) {
       dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
-    }
-  }
-
-  function hasTitle() {
-    if (isDirectResponse && responseToAtom) {
-      return !!get(responseToAtom, "humanReadable");
-    } else {
-      return !!get(atom, "humanReadable");
-    }
-  }
-
-  function generateTitle() {
-    if (isDirectResponse && responseToAtom) {
-      return "Re: " + get(responseToAtom, "humanReadable");
-    } else {
-      return get(atom, "humanReadable");
     }
   }
 
@@ -148,11 +130,7 @@ export default function WonAtomHeader({
       <div className="ph__right">
         <div className="ph__right__topline">
           <div className="ph__right__topline__title">
-            {hasTitle()
-              ? generateTitle()
-              : isDirectResponse
-                ? "RE: no title"
-                : "no title"}
+            {title ? title : "No Title"}
           </div>
         </div>
         <div className="ph__right__subtitle">

@@ -1,7 +1,10 @@
 import Immutable from "immutable";
-import { isValidNumber, msStringToDate } from "../../utils.js";
+import {
+  isValidNumber,
+  msStringToDate,
+  extractAtomUriBySocketUri,
+} from "../../utils.js";
 import * as useCaseUtils from "../../usecase-utils.js";
-import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 
 /*
   "alreadyProcessed" flag sets the sentOwn/Remote flags to true
@@ -33,7 +36,7 @@ export function parseMessage(
       uri: wonMessage.getMessageUri(),
       forwardMessage: forwardMessage,
       originatorUri: forwardMessage
-        ? generalSelectors.getAtomUriBySocketUri(wonMessage.getSenderSocket())
+        ? extractAtomUriBySocketUri(wonMessage.getSenderSocket())
         : undefined,
       content: {
         text: wonMessage.getTextMessage(),
@@ -61,9 +64,7 @@ export function parseMessage(
         !wonMessage.isFromOwner() &&
         !wonMessage.getSenderAtom() &&
         wonMessage.getSenderNode(),
-      senderUri: generalSelectors.getAtomUriBySocketUri(
-        wonMessage.getSenderSocket()
-      ),
+      senderUri: extractAtomUriBySocketUri(wonMessage.getSenderSocket()),
       messageType: wonMessage.getMessageType(),
       viewState: {
         isSelected: false,

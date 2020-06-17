@@ -5,6 +5,7 @@ import * as atomUtils from "../../redux/utils/atom-utils.js";
 import {
   generateHexColor,
   generateRgbColorArray,
+  generateFakePersonaName,
   get,
   getIn,
 } from "../../utils.js";
@@ -29,11 +30,11 @@ export function parseAtom(jsonldAtom) {
       lastUpdateDate: extractCreationDate(jsonldAtomImm), //Used for sorting/updates (e.g. if connection comes in etc...)
       modifiedDate: extractLastModifiedDate(jsonldAtomImm), //Used as a flag if the atom itself has changed (e.g. atom edit)
       humanReadable: undefined, //can only be determined after we generated The Content
+      fakePersonaName: generateFakePersonaName(jsonldAtomImm.get("@id")),
       matchedUseCase: {
         identifier: undefined,
         icon: undefined,
-        enabledUseCases: undefined,
-        reactionUseCases: undefined,
+        reactions: undefined,
       },
       background: generateBackground(get(jsonldAtomImm, "@id")),
       unread: false,
@@ -57,16 +58,10 @@ export function parseAtom(jsonldAtom) {
         .setIn(["matchedUseCase", "identifier"], matchingUseCase.identifier)
         .setIn(["matchedUseCase", "icon"], matchingUseCase.icon)
         .setIn(
-          ["matchedUseCase", "enabledUseCases"],
-          matchingUseCase.enabledUseCases
-            ? Immutable.fromJS(matchingUseCase.enabledUseCases)
-            : Immutable.List()
-        )
-        .setIn(
-          ["matchedUseCase", "reactionUseCases"],
-          matchingUseCase.reactionUseCases
-            ? Immutable.fromJS(matchingUseCase.reactionUseCases)
-            : Immutable.List()
+          ["matchedUseCase", "reactions"],
+          matchingUseCase.reactions
+            ? Immutable.fromJS(matchingUseCase.reactions)
+            : Immutable.Map()
         );
     }
 
@@ -147,6 +142,8 @@ export function parseMetaAtom(metaAtom) {
         .replace(vocab.HOLD.baseUri, vocab.HOLD.prefix + ":")
         .replace(vocab.REVIEW.baseUri, vocab.REVIEW.prefix + ":")
         .replace(vocab.BUDDY.baseUri, vocab.BUDDY.prefix + ":")
+        .replace(vocab.BOT.baseUri, vocab.BOT.prefix + ":")
+        .replace(vocab.WXSCHEMA.baseUri, vocab.WXSCHEMA.prefix + ":")
     );
 
   const extractStateFromMeta = state => {
@@ -195,11 +192,11 @@ export function parseMetaAtom(metaAtom) {
         get(metaAtomImm, "creationDate") &&
         new Date(get(metaAtomImm, "creationDate")),
       humanReadable: undefined,
+      fakePersonaName: generateFakePersonaName(get(metaAtomImm, "uri")),
       matchedUseCase: {
         identifier: undefined,
         icon: undefined,
-        enabledUseCases: undefined,
-        reactionUseCases: undefined,
+        reactions: undefined,
       },
       background: generateBackground(get(metaAtomImm, "uri")),
       unread: false,
@@ -220,16 +217,10 @@ export function parseMetaAtom(metaAtom) {
           .setIn(["matchedUseCase", "identifier"], matchingUseCase.identifier)
           .setIn(["matchedUseCase", "icon"], matchingUseCase.icon)
           .setIn(
-            ["matchedUseCase", "enabledUseCases"],
-            matchingUseCase.enabledUseCases
-              ? Immutable.fromJS(matchingUseCase.enabledUseCases)
-              : Immutable.List()
-          )
-          .setIn(
-            ["matchedUseCase", "reactionUseCases"],
-            matchingUseCase.reactionUseCases
-              ? Immutable.fromJS(matchingUseCase.reactionUseCases)
-              : Immutable.List()
+            ["matchedUseCase", "reactions"],
+            matchingUseCase.reactions
+              ? Immutable.fromJS(matchingUseCase.reactions)
+              : Immutable.Map()
           );
       }
 
@@ -461,7 +452,7 @@ function generateHumanReadableArray(presentDetails, detailsToParse) {
   let humanReadableArray = [];
   if (presentDetails && detailsToParse) {
     for (const key in presentDetails) {
-      if (!(key === "sockets" || key === "type" || key === "defaultSocket")) {
+      if (!(key === "sockets" || key === "type")) {
         const detailToParse = detailsToParse[key];
         if (detailToParse) {
           const detailValue = presentDetails[key];

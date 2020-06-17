@@ -37,9 +37,6 @@ export default function PageOverview() {
     .filter(metaAtom => atomUtils.isActive(metaAtom))
     .filter(metaAtom => debugModeEnabled || !atomUtils.isSearchAtom(metaAtom))
     .filter(
-      metaAtom => debugModeEnabled || !atomUtils.isDirectResponseAtom(metaAtom)
-    )
-    .filter(
       metaAtom => debugModeEnabled || !atomUtils.isInvisibleAtom(metaAtom)
     )
     .filter(
@@ -216,7 +213,7 @@ export default function PageOverview() {
                     <WonAtomCardGrid
                       atoms={getSortedVisibleAtomsByUseCase(ucIdentifier)}
                       currentLocation={currentLocation}
-                      showSuggestions={false}
+                      showIndicators={false}
                       showHolder={true}
                       showCreate={false}
                     />
@@ -258,7 +255,7 @@ export default function PageOverview() {
                     <WonAtomCardGrid
                       atoms={getSortedVisibleOtherAtoms()}
                       currentLocation={currentLocation}
-                      showSuggestions={false}
+                      showIndicators={false}
                       showHolder={true}
                       showCreate={false}
                     />

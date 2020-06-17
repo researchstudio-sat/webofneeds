@@ -7,6 +7,7 @@ import {
   sortByDate,
   generateLink,
   filterConnectionsBySearchValue,
+  extractAtomUriFromConnectionUri,
 } from "../utils.js";
 import WonConnectionSelectionItem from "./connection-selection-item.jsx";
 import WonTitlePicker from "./details/picker/title-picker.jsx";
@@ -23,6 +24,7 @@ export default function WonConnectionsOverview() {
     useSelector(generalSelectors.getAllChatConnections),
     storedAtoms,
     searchText,
+    true,
     true
   );
 
@@ -32,7 +34,7 @@ export default function WonConnectionsOverview() {
     connections &&
     connections.map(conn => {
       const connUri = get(conn, "uri");
-      const atomUri = connUri.split("/c")[0];
+      const atomUri = extractAtomUriFromConnectionUri(connUri);
       return (
         <div className="co__item" key={connUri}>
           <WonConnectionSelectionItem

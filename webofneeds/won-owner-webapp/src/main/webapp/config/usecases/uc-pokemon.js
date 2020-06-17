@@ -18,18 +18,20 @@ export const pokemonGoRaid = {
           "#groupSocket": vocab.GROUP.GroupSocketCompacted,
           "#holdableSocket": vocab.HOLD.HoldableSocketCompacted,
         },
-        defaultSocket: { "#groupSocket": vocab.GROUP.GroupSocketCompacted },
       },
       seeks: {},
     }),
   },
-  reactionUseCases: [
-    {
-      identifier: "pokemonInterest",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.GROUP.GroupSocketCompacted,
+  reactions: {
+    [vocab.GROUP.GroupSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["pokemonInterest"],
+      },
+      [vocab.GROUP.GroupSocketCompacted]: {
+        useCaseIdentifiers: ["pokemonGoRaid"],
+      },
     },
-  ],
+  },
   details: {
     pokemonRaid: { ...details.pokemonRaid, mandatory: true },
     location: { ...details.location, mandatory: true },
@@ -54,20 +56,13 @@ export const pokemonInterest = {
       },
     }),
   },
-  enabledUseCases: [
-    {
-      identifier: "pokemonGoRaid",
-      senderSocketType: vocab.GROUP.GroupSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.GROUP.GroupSocketCompacted]: {
+        useCaseIdentifiers: ["pokemonGoRaid"],
+      },
     },
-  ],
-  reactionUseCases: [
-    {
-      identifier: "pokemonGoRaid",
-      senderSocketType: vocab.GROUP.GroupSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
+  },
   details: {
     title: { ...details.title },
   },

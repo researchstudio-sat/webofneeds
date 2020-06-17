@@ -4,7 +4,7 @@
 
 import { createSelector } from "reselect";
 
-import { getIn, get } from "../../utils.js";
+import { getIn, get, extractAtomUriFromConnectionUri } from "../../utils.js";
 import * as atomUtils from "../utils/atom-utils.js";
 import * as connectionUtils from "../utils/connection-utils.js";
 import * as accountUtils from "../utils/account-utils.js";
@@ -58,6 +58,9 @@ export const getOwnedAtomUris = createSelector(getAccountState, account =>
 export const getAtom = atomUri =>
   createSelector(getAtoms, atoms => get(atoms, atomUri));
 
+export const getOwnedConnection = connectionUri =>
+  createSelector(getOwnedConnections, conns => get(conns, connectionUri));
+
 export const getOwnedAtoms = createSelector(
   getOwnedAtomUris,
   getAtoms,
@@ -104,6 +107,70 @@ export const getOwnedPosts = createSelector(
         !getIn(ownedAtom, ["content", "type"]) ||
         (atomUtils.isAtom(ownedAtom) && !atomUtils.isPersona(ownedAtom))
     )
+);
+
+/**
+ * Returns all connections of the Atom if the atom is owned,
+ * if the atom is not owned, we take all the connections of the non owned atom, filter out all the connections
+ * that exists from our own atoms to the atom, and merge the owned connections into the connections Map that is
+ * returned
+ * @param atomUri
+ * @returns A Map of Maps {[socketType]: Map<ConnUri>: [connections]}
+ */
+export const getConnectionsOfAtomWithOwnedTargetConnections = atomUri =>
+  createSelector(
+    state => state,
+    getAccountState,
+    getAtom(atomUri),
+    (state, accountState, atom) => {
+      const isAtomOwned = accountUtils.isAtomOwned(
+        accountState,
+        get(atom, "uri")
+      );
+
+      return atomUtils
+        .getSockets(atom)
+        .flip()
+        .map((_socketUri, _socketType) => {
+          if (isAtomOwned) {
+            return atomUtils.getConnections(atom, _socketType);
+          } else {
+            const ownedConnectionsToSocketUri = getAllOwnedConnectionsWithTargetSocketUri(
+              _socketUri
+            )(state);
+            return atomUtils
+              .getConnections(atom, _socketType)
+              .filter(conn => {
+                //Filters out all connections that have a "counterpart" connection stored in another atom we own
+                const targetSocketUri = get(conn, "targetSocketUri");
+                return !ownedConnectionsToSocketUri.find(
+                  ownedConnection =>
+                    get(ownedConnection, "socketUri") === targetSocketUri
+                );
+              })
+              .merge(ownedConnectionsToSocketUri);
+          }
+        });
+    }
+  );
+
+export const getAllOwnedConnectionsWithTargetSocketUri = targetSocketUri =>
+  createSelector(
+    getOwnedAtoms,
+    allOwnedAtoms =>
+      allOwnedAtoms &&
+      allOwnedAtoms
+        .filter(atom => atomUtils.isActive(atom))
+        .flatMap(atom =>
+          atomUtils.getAllConnectionsWithTargetSocketUri(atom, targetSocketUri)
+        )
+  );
+
+export const getOwnedAllConnections = createSelector(
+  getOwnedAtoms,
+  allOwnedAtoms =>
+    allOwnedAtoms &&
+    allOwnedAtoms.flatMap(atom => atomUtils.getConnections(atom))
 );
 
 export const getAllChatConnections = createSelector(
@@ -247,7 +314,7 @@ export const getOwnedAtomByConnectionUri = connectionUri =>
     atoms =>
       connectionUri &&
       atoms &&
-      (get(atoms, connectionUri.split("/c")[0]) ||
+      (get(atoms, extractAtomUriFromConnectionUri(connectionUri)) ||
         atoms.find(atom => getIn(atom, ["connections", connectionUri])))
   );
 
@@ -277,7 +344,7 @@ export const getOwnedCondensedPersonaList = createSelector(
       ownedPersonas
         .filter(persona => atomUtils.isActive(persona))
         .map(persona => ({
-          displayName: getIn(persona, ["content", "personaName"]),
+          displayName: get(persona, "humanReadable"),
           website: getIn(persona, ["content", "website"]),
           aboutMe: getIn(persona, ["content", "description"]),
           url: get(persona, "uri"),
@@ -350,17 +417,13 @@ export const getCurrentLocation = createSelector(
   viewState => viewState && viewUtils.getCurrentLocation(viewState)
 );
 
-export function getAtomUriBySocketUri(socketUri) {
-  return socketUri && socketUri.split("#")[0];
-}
-
 export const getSenderSocketType = (allAtoms, connection) => {
   const connectionUri = get(connection, "uri");
   const senderSocketUri = get(connection, "socketUri");
   const senderAtom =
     connectionUri &&
     allAtoms &&
-    (getIn(allAtoms, connectionUri.split("/c")[0]) ||
+    (getIn(allAtoms, extractAtomUriFromConnectionUri(connectionUri)) ||
       allAtoms.find(atom => getIn(atom, ["connections", connectionUri])));
 
   return senderAtom && atomUtils.getSocketType(senderAtom, senderSocketUri);

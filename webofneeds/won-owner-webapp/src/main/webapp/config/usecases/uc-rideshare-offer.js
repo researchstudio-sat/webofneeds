@@ -26,14 +26,14 @@ export const rideShareOffer = {
       },
     }),
   },
-  enabledUseCases: undefined,
-  reactionUseCases: [
-    {
-      identifier: "personalTransportSearch",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["personalTransportSearch"],
+        refuseOwned: true,
+      },
     },
-  ],
+  },
   details: {
     title: { ...details.title },
     description: { ...details.description },

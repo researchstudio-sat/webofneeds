@@ -1,0 +1,19 @@
+@import "won-config";
+@import "sizing-utils";
+@import "animate";
+
+won-socket-actions {
+  display: grid;
+  grid-auto-flow: column;
+  grid-gap: 0.5rem;
+  padding: 0.5rem;
+  height: 100%;
+  box-sizing: border-box;
+  background: $won-secondary-color;
+
+  > .won-button--filled,
+  > .won-button--outlined {
+    cursor: pointer;
+    padding: 0.5rem;
+  }
+}

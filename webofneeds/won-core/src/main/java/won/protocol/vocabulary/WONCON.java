@@ -18,7 +18,6 @@ public class WONCON {
     public static final Property petriNet = m.createProperty(BASE_URI + "petriNet");
     public static final Property tag = m.createProperty(BASE_URI + "tag");
     public static final Property text = m.createProperty(BASE_URI + "text");
-    public static final Resource DirectResponse = m.createProperty(BASE_URI + "DirectResponse");
     public static final Resource ServiceBot = m.createProperty(BASE_URI + "ServiceBot");
     public static final Property feedbackEvent = m.createProperty(BASE_URI, "feedbackEvent");
     public static final Property feedback = m.createProperty(BASE_URI, "feedback");

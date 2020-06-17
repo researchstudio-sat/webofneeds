@@ -24,18 +24,20 @@ export const cyclingPlan = {
           "#groupSocket": vocab.GROUP.GroupSocketCompacted,
           "#holdableSocket": vocab.HOLD.HoldableSocketCompacted,
         },
-        defaultSocket: { "#groupSocket": vocab.GROUP.GroupSocketCompacted },
       },
       seeks: {},
     }),
   },
-  reactionUseCases: [
-    {
-      identifier: "cyclingInterest",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.GROUP.GroupSocketCompacted,
+  reactions: {
+    [vocab.GROUP.GroupSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["cyclingInterest"],
+      },
+      [vocab.GROUP.GroupSocketCompacted]: {
+        useCaseIdentifiers: ["cyclingPlan"],
+      },
     },
-  ],
+  },
   details: {
     title: { ...details.title },
     description: { ...details.description },
@@ -112,20 +114,13 @@ export const cyclingInterest = {
       },
     }),
   },
-  enabledUseCases: [
-    {
-      identifier: "cyclingPlan",
-      senderSocketType: vocab.GROUP.GroupSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.GROUP.GroupSocketCompacted]: {
+        useCaseIdentifiers: ["cyclingPlan"],
+      },
     },
-  ],
-  reactionUseCases: [
-    {
-      identifier: "cyclingPlan",
-      senderSocketType: vocab.GROUP.GroupSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
+  },
   details: {
     title: { ...details.title },
     description: { ...details.description },

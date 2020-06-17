@@ -24,18 +24,18 @@ export const lunchPlan = {
           "#groupSocket": vocab.GROUP.GroupSocketCompacted,
           "#holdableSocket": vocab.HOLD.HoldableSocketCompacted,
         },
-        defaultSocket: { "#groupSocket": vocab.GROUP.GroupSocketCompacted },
       },
       seeks: {},
     }),
   },
-  reactionUseCases: [
-    {
-      identifier: "lunchInterest",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.GROUP.GroupSocketCompacted,
+  reactions: {
+    [vocab.GROUP.GroupSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["lunchInterest"],
+      },
+      [vocab.GROUP.GroupSocketCompacted]: { useCaseIdentifiers: ["lunchPlan"] },
     },
-  ],
+  },
   details: {
     title: { ...details.title },
     description: { ...details.description },
@@ -112,20 +112,11 @@ export const lunchInterest = {
       },
     }),
   },
-  enabledUseCases: [
-    {
-      identifier: "lunchPlan",
-      senderSocketType: vocab.GROUP.GroupSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.GROUP.GroupSocketCompacted]: { useCaseIdentifiers: ["lunchPlan"] },
     },
-  ],
-  reactionUseCases: [
-    {
-      identifier: "lunchPlan",
-      senderSocketType: vocab.GROUP.GroupSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
+  },
   details: {
     title: { ...details.title },
     description: { ...details.description },

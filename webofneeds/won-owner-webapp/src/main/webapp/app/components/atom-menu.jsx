@@ -2,9 +2,8 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import { actionCreators } from "../actions/actions.js";
 import { get, getIn } from "../utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
@@ -13,14 +12,16 @@ import * as processUtils from "../redux/utils/process-utils.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
 import * as wonLabelUtils from "../won-label-utils.js";
 import vocab from "../service/vocab.js";
-import Immutable from "immutable";
 
 import "~/style/_atom-menu.scss";
-import { getSocketTypeArray } from "../redux/utils/atom-utils";
 
-export default function WonAtomMenu({ atom, defaultTab }) {
+export default function WonAtomMenu({
+  atom,
+  visibleTab,
+  setVisibleTab,
+  relevantConnectionsMap,
+}) {
   const atomUri = get(atom, "uri");
-  const dispatch = useDispatch();
   const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
 
   const reviewCount = getIn(atom, ["rating", "reviewCount"]) || 0;
@@ -44,17 +45,6 @@ export default function WonAtomMenu({ atom, defaultTab }) {
   const atomFailedToLoad =
     atom && processUtils.hasAtomFailedToLoad(process, atomUri);
   const shouldShowRdf = viewUtils.showRdf(viewState);
-  const socketTypeArray = isOwned
-    ? getSocketTypeArray(atom)
-    : getSocketTypeArray(atom).filter(
-        socketType => socketType !== vocab.CHAT.ChatSocketCompacted
-      ); //filter the chat Socket so we do not display it as a menu item for non owned atoms
-
-  const visibleTab = viewUtils.getVisibleTabByAtomUri(
-    viewState,
-    atomUri,
-    defaultTab
-  );
 
   function generateParentCssClasses() {
     const cssClassNames = [];
@@ -84,21 +74,15 @@ export default function WonAtomMenu({ atom, defaultTab }) {
     <div
       key="detail"
       className={generateAtomItemCssClasses(visibleTab === "DETAIL")}
-      onClick={() =>
-        dispatch(
-          actionCreators.atoms__selectTab(
-            Immutable.fromJS({ atomUri: atomUri, selectTab: "DETAIL" })
-          )
-        )
-      }
+      onClick={() => setVisibleTab("DETAIL")}
     >
       <span className="atom-menu__item__label">Detail</span>
     </div>
   );
 
   // Add generic Tabs based on available Sockets
-  socketTypeArray.map((socketType, index) => {
-    let label = wonLabelUtils.labels.socketTabs[socketType] || socketType;
+  relevantConnectionsMap.map((socketTypeConnections, socketType) => {
+    let label = wonLabelUtils.getSocketTabLabel(socketType);
     let countLabel;
 
     const selected = visibleTab === socketType;
@@ -127,10 +111,29 @@ export default function WonAtomMenu({ atom, defaultTab }) {
         countLabel = hasReviews && "(" + reviewCount + ")";
         break;
 
+      case vocab.CHAT.ChatSocketCompacted: {
+        const socketUri = atomUtils.getSocketUri(atom, socketType);
+        const activeConnections = socketTypeConnections
+          .filter(
+            conn =>
+              // We filter out every chat connection that is not owned, otherwise the count would show non owned chatconnections of non owned atoms
+              isOwned || connectionUtils.hasTargetSocketUri(conn, socketUri)
+          )
+          .filter(conn => !connectionUtils.isClosed(conn));
+        inactive = !activeConnections || activeConnections.size === 0;
+        countLabel =
+          activeConnections && activeConnections.size > 0
+            ? "(" + activeConnections.size + ")"
+            : undefined;
+        unread =
+          activeConnections &&
+          !!activeConnections.find(conn => connectionUtils.isUnread(conn));
+        break;
+      }
       default: {
-        const activeConnections = isOwned
-          ? atomUtils.getNonClosedConnections(atom, socketType)
-          : atomUtils.getConnectedConnections(atom, socketType);
+        const activeConnections = socketTypeConnections.filter(
+          conn => !connectionUtils.isClosed(conn)
+        );
 
         inactive = !activeConnections || activeConnections.size === 0;
         countLabel =
@@ -147,15 +150,9 @@ export default function WonAtomMenu({ atom, defaultTab }) {
     if (label) {
       buttons.push(
         <div
-          key={socketType + "-" + index}
+          key={socketType}
           className={generateAtomItemCssClasses(selected, inactive, unread)}
-          onClick={() =>
-            dispatch(
-              actionCreators.atoms__selectTab(
-                Immutable.fromJS({ atomUri: atomUri, selectTab: socketType })
-              )
-            )
-          }
+          onClick={() => setVisibleTab(socketType)}
         >
           <span className="atom-menu__item__unread" />
           <span className="atom-menu__item__label">{label}</span>
@@ -174,13 +171,7 @@ export default function WonAtomMenu({ atom, defaultTab }) {
       <div
         key="rdf"
         className={generateAtomItemCssClasses(visibleTab === "RDF")}
-        onClick={() =>
-          dispatch(
-            actionCreators.atoms__selectTab(
-              Immutable.fromJS({ atomUri: atomUri, selectTab: "RDF" })
-            )
-          )
-        }
+        onClick={() => setVisibleTab("RDF")}
       >
         <span className="atom-menu__item__label">RDF</span>
       </div>
@@ -193,5 +184,7 @@ export default function WonAtomMenu({ atom, defaultTab }) {
 
 WonAtomMenu.propTypes = {
   atom: PropTypes.object.isRequired,
-  defaultTab: PropTypes.string,
+  relevantConnectionsMap: PropTypes.object.isRequired,
+  visibleTab: PropTypes.string.isRequired,
+  setVisibleTab: PropTypes.func.isRequired,
 };

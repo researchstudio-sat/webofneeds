@@ -57,11 +57,18 @@ export default function WonModalDialog() {
             </div>
           </React.Fragment>
         )}
-        <div className="md__dialog__footer">
+        <div
+          className={
+            "md__dialog__footer " +
+            (modalDialogButtons.size > 2
+              ? " md__dialog__footer--row"
+              : " md__dialog__footer--column")
+          }
+        >
           {modalDialogButtons.map((button, index) => (
             <button
               key={get(button, "caption") + "-" + index}
-              className="won-button--filled lighterblue"
+              className={"won-button--filled lighterblue"}
               onClick={get(button, "callback")}
             >
               <span>{get(button, "caption")}</span>

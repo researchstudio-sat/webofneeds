@@ -134,9 +134,7 @@ const actionHierarchy = {
     delete: atomActions.deleteAtom,
     closedBySystem: atomActions.closedBySystem,
     failed: INJ_DEFAULT,
-    connect: atomActions.connectSocketTypes,
     connectSockets: atomActions.connectSockets,
-    connectSocketsServerSide: atomActions.connectSocketsServerSide,
     fetchUnloadedAtom: atomActions.fetchUnloadedAtom,
 
     fetchMetaAtoms: INJ_DEFAULT,
@@ -154,7 +152,6 @@ const actionHierarchy = {
 
     storeUriFailed: INJ_DEFAULT,
     removeDeleted: INJ_DEFAULT,
-    selectTab: INJ_DEFAULT,
   },
   personas: {
     review: reviewPersona,

@@ -24,13 +24,14 @@ export const handleComplaint = {
       },
     }),
   },
-  reactionUseCases: [
-    {
-      identifier: "complain",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["complain"],
+        refuseOwned: true,
+      },
     },
-  ],
+  },
   details: {
     title: { ...details.title },
     description: { ...details.description },

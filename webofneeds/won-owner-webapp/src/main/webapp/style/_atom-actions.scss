@@ -1,0 +1,28 @@
+@import "won-config";
+@import "sizing-utils";
+@import "animate";
+
+won-atom-actions {
+  display: grid;
+  grid-gap: 0.5rem;
+  align-items: center;
+
+  .atom-actions__infolabel {
+    text-align: left;
+  }
+
+  won-socket-actions,
+  .atom-actions__buttons {
+    display: grid;
+    grid-gap: 0.5rem;
+    grid-auto-flow: column;
+  }
+
+  @media (min-width: $maxContentWidth) {
+    grid-auto-flow: column;
+    grid-template-columns: 1fr min-content;
+  }
+  @media (max-width: $maxContentWidth) {
+    grid-auto-flow: row;
+  }
+}

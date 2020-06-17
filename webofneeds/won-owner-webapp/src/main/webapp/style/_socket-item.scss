@@ -6,8 +6,7 @@
   border: $thinGrayBorder;
   background: $won-light-gray;
 
-  a.won-atom-header,
-  won-atom-header {
+  div.headerElement {
     padding: 0.5rem;
 
     &.status--sent {
@@ -27,32 +26,5 @@
   &.won-unread {
     border-color: $won-unread-attention;
     /*box-shadow: 0px 0px 5px 5px var(--won-primary-color);*/
-  }
-
-  &__actions {
-    display: grid;
-    grid-auto-flow: column;
-    grid-gap: 0.5rem;
-    padding: 0.5rem;
-    height: 100%;
-    box-sizing: border-box;
-
-    &__button.won-button--filled.red,
-    &__button.won-button--outlined.red.thin {
-      cursor: pointer;
-      font-size: $smallFontSize;
-      padding: 0.5rem;
-    }
-
-    &__icon.won-icon.primary,
-    &__icon.won-icon.secondary,
-    &__icon.won-icon.disabled,
-    &__icon.won-icon.request {
-      cursor: pointer;
-      display: flex;
-      align-self: center;
-      margin: auto;
-      @include fixed-square($postIconSize);
-    }
   }
 }

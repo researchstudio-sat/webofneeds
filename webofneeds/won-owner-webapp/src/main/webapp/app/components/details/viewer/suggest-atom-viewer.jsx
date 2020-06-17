@@ -176,7 +176,7 @@ export default function WonSuggestAtomViewer({ content, detail, className }) {
               atom={suggestedAtom}
               currentLocation={currentLocation}
               showHolder={true}
-              showSuggestions={false}
+              showIndicators={false}
             />
             {showActions ? (
               <div className="suggestatomv__content__element__post__actions">

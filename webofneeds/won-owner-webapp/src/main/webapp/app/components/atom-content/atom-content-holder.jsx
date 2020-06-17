@@ -1,21 +1,20 @@
 import React from "react";
 import PropTypes from "prop-types";
-import Immutable from "immutable";
-import { actionCreators } from "../actions/actions.js";
+import { actionCreators } from "../../actions/actions.js";
 import { useSelector, useDispatch } from "react-redux";
-import { get, getIn, getQueryParams, generateLink } from "../utils.js";
-import * as generalSelectors from "../redux/selectors/general-selectors.js";
-import * as atomUtils from "../redux/utils/atom-utils.js";
-import * as processUtils from "../redux/utils/process-utils.js";
-import { Elm } from "../../elm/RatingView.elm";
+import { get, getIn, getQueryParams, generateLink } from "../../utils.js";
+import * as generalSelectors from "../../redux/selectors/general-selectors.js";
+import * as atomUtils from "../../redux/utils/atom-utils.js";
+import * as processUtils from "../../redux/utils/process-utils.js";
+import { Elm } from "../../../elm/RatingView.elm";
 
-import WonAtomIcon from "./atom-icon.jsx";
-import WonDescriptionViewer from "./details/viewer/description-viewer.jsx";
-import { details } from "../../config/detail-definitions.js";
+import WonAtomIcon from "../atom-icon.jsx";
+import WonDescriptionViewer from "../details/viewer/description-viewer.jsx";
+import { details } from "../../../config/detail-definitions.js";
 import "~/style/_atom-content-holder.scss";
-import ElmReact from "./elm-react";
+import ElmReact from "../elm-react";
 import { useHistory } from "react-router-dom";
-import vocab from "../service/vocab.js";
+import vocab from "../../service/vocab.js";
 
 export default function WonAtomContentHolder({ holdsUri }) {
   const history = useHistory();
@@ -64,7 +63,7 @@ export default function WonAtomContentHolder({ holdsUri }) {
       vocab.HOLD.HolderSocketCompacted
     );
 
-  const holderName = getIn(holderAtom, ["content", "personaName"]);
+  const holderName = get(holderAtom, "humanReadable");
   const holderDescription = getIn(holderAtom, ["content", "description"]);
   const holderWebsite = getIn(holderAtom, ["content", "website"]);
   const holderHoldsSize = holderConnections ? holderConnections.size : 0;
@@ -100,19 +99,13 @@ export default function WonAtomContentHolder({ holdsUri }) {
   }
 
   function viewPersonaPosts() {
-    dispatch(
-      actionCreators.atoms__selectTab(
-        Immutable.fromJS({
-          atomUri: holderUri,
-          selectTab: vocab.HOLD.HolderSocketCompacted,
-        })
-      )
-    );
     history.push(
       generateLink(
         history.location,
         {
           postUri: holderUri,
+          tab: vocab.HOLD.HolderSocketCompacted,
+          connectionUri: undefined,
         },
         "/post"
       )
@@ -120,19 +113,13 @@ export default function WonAtomContentHolder({ holdsUri }) {
   }
 
   function viewPersonaBuddies() {
-    dispatch(
-      actionCreators.atoms__selectTab(
-        Immutable.fromJS({
-          atomUri: holderUri,
-          selectTab: vocab.BUDDY.BuddySocketCompacted,
-        })
-      )
-    );
     history.push(
       generateLink(
         history.location,
         {
           postUri: holderUri,
+          tab: vocab.BUDDY.BuddySocketCompacted,
+          connectionUri: undefined,
         },
         "/post"
       )
@@ -140,19 +127,13 @@ export default function WonAtomContentHolder({ holdsUri }) {
   }
 
   function viewPersonaReviews() {
-    dispatch(
-      actionCreators.atoms__selectTab(
-        Immutable.fromJS({
-          atomUri: holderUri,
-          selectTab: vocab.REVIEW.ReviewSocketCompacted,
-        })
-      )
-    );
     history.push(
       generateLink(
         history.location,
         {
           postUri: holderUri,
+          tab: vocab.REVIEW.ReviewSocketCompacted,
+          connectionUri: undefined,
         },
         "/post"
       )

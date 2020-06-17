@@ -3,8 +3,7 @@
 @import "fonts";
 @import "flex-layout";
 
-won-atom-connections-indicator,
-a.won-atom-connections-indicator {
+won-atom-connections-indicator {
   display: grid;
   grid-template-columns: min-content 1fr;
   align-items: center;

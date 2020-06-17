@@ -16,7 +16,7 @@ import PropTypes from "prop-types";
 export default function WonSkeletonCard({
   atomUri,
   showHolder,
-  showSuggestions,
+  showIndicators,
 }) {
   const dispatch = useDispatch();
   const [localFetchInitiated, setLocalFetchInitiated] = useState(false);
@@ -97,7 +97,7 @@ export default function WonSkeletonCard({
   const cardPersona =
     showHolder && !atomLoaded ? <div className="card__nopersona" /> : undefined;
 
-  const cardSuggestions = showSuggestions ? (
+  const cardIndicators = showIndicators ? (
     <WonAtomConnectionsIndicator />
   ) : (
     undefined
@@ -114,12 +114,12 @@ export default function WonSkeletonCard({
       {cardMainFailed}
       {cardMain}
       {cardPersona}
-      {cardSuggestions}
+      {cardIndicators}
     </won-skeleton-card>
   );
 }
 WonSkeletonCard.propTypes = {
   atomUri: PropTypes.string,
   showHolder: PropTypes.bool,
-  showSuggestions: PropTypes.bool,
+  showIndicators: PropTypes.bool,
 };

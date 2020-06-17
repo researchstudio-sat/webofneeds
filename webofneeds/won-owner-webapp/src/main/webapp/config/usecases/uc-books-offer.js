@@ -20,13 +20,14 @@ export const booksOffer = {
       },
     }),
   },
-  reactionUseCases: [
-    {
-      identifier: "booksSearch",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["booksSearch"],
+        refuseOwned: true,
+      },
     },
-  ],
+  },
   details: {
     title: { ...details.title, mandatory: true },
     author: { ...details.author },

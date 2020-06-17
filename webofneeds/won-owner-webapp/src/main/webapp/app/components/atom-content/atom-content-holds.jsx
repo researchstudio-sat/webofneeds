@@ -7,18 +7,18 @@ import {
   generateLink,
   filterConnectionsBySearchValue,
   sortByDate,
-} from "../utils.js";
+} from "../../utils.js";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import * as atomUtils from "../redux/utils/atom-utils.js";
-import * as generalSelectors from "../redux/selectors/general-selectors.js";
-import WonAtomCard from "./atom-card.jsx";
-import WonTitlePicker from "./details/picker/title-picker.jsx";
+import * as atomUtils from "../../redux/utils/atom-utils.js";
+import * as generalSelectors from "../../redux/selectors/general-selectors.js";
+import WonHeldItem from "../socket-items/held-item.jsx";
+import WonTitlePicker from "../details/picker/title-picker.jsx";
 
 import "~/style/_atom-content-holds.scss";
 import ico36_plus from "~/images/won-icons/ico36_plus.svg";
 import PropTypes from "prop-types";
-import vocab from "../service/vocab";
+import vocab from "../../service/vocab";
 
 export default function WonAtomContentHolds({ atom }) {
   const atomUri = get(atom, "uri");
@@ -38,12 +38,13 @@ export default function WonAtomContentHolds({ atom }) {
 
   const atomCards = connectionsArray.map(conn => {
     return (
-      <WonAtomCard
+      <WonHeldItem
         key={get(conn, "uri")}
-        atom={get(storedAtoms, get(conn, "targetAtomUri"))}
+        atom={atom}
+        connection={conn}
+        targetAtom={get(storedAtoms, get(conn, "targetAtomUri"))}
+        isOwned={isOwned}
         currentLocation={currentLocation}
-        showSuggestions={isOwned}
-        showHolder={false}
       />
     );
   });
@@ -62,7 +63,7 @@ export default function WonAtomContentHolds({ atom }) {
         undefined
       )}
       {atomCards}
-      {isOwned ? (
+      {isOwned && atomUtils.isActive(atom) ? (
         <Link
           className="ach__createatom"
           to={location =>

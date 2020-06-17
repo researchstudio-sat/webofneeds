@@ -29,18 +29,14 @@ export const goodsServiceSearch = {
       },
     }),
   },
-  reactionUseCases: [
-    {
-      identifier: "serviceOffer",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["serviceOffer", "goodsOffer"],
+        refuseOwned: true,
+      },
     },
-    {
-      identifier: "goodsOffer",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
+  },
   seeksDetails: {
     title: { ...details.title },
     tags: {

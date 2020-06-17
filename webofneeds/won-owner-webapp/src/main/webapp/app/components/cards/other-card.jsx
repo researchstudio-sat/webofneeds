@@ -3,7 +3,7 @@
  */
 import React from "react";
 import { useSelector } from "react-redux";
-import { get, getIn, generateLink } from "../../utils.js";
+import { get, generateLink } from "../../utils.js";
 import PropTypes from "prop-types";
 
 import WonAtomMap from "../atom-map.jsx";
@@ -17,7 +17,7 @@ import { Link } from "react-router-dom";
 
 export default function WonOtherCard({
   atom,
-  showSuggestions,
+  showIndicators,
   showHolder,
   currentLocation,
 }) {
@@ -27,10 +27,6 @@ export default function WonOtherCard({
   const identiconSvg = !useCaseIcon
     ? atomUtils.getIdenticonSvg(atom)
     : undefined;
-  const isDirectResponse = atomUtils.isDirectResponseAtom(atom);
-  const responseToUri =
-    isDirectResponse && getIn(atom, ["content", "responseToUri"]);
-  const responseToAtom = useSelector(generalSelectors.getAtom(responseToUri));
   const atomImage = atomUtils.getDefaultImage(atom);
   const atomLocation = atomUtils.getLocation(atom);
   const holderUri = atomUtils.getHeldByUri(atom);
@@ -48,7 +44,6 @@ export default function WonOtherCard({
     ? atomUtils.getBackground(holder)
     : undefined;
   const isInactive = atomUtils.isInactive(atom);
-  const holderWebsite = getIn(holder, ["content", "website"]);
   const atomTypeLabel = atomUtils.generateTypeLabel(atom);
   const atomHasHoldableSocket = atomUtils.hasHoldableSocket(atom);
   const isGroupChatEnabled = atomUtils.hasGroupSocket(atom);
@@ -88,41 +83,17 @@ export default function WonOtherCard({
   }
 
   function createCardMainTopline() {
-    const hasTitle = () => {
-      if (isDirectResponse && responseToAtom) {
-        return !!get(responseToAtom, "humanReadable");
-      } else {
-        return !!get(atom, "humanReadable");
-      }
-    };
+    const title = get(atom, "humanReadable");
 
-    const generateTitleString = () => {
-      if (isDirectResponse && responseToAtom) {
-        return "Re: " + get(responseToAtom, "humanReadable");
-      } else {
-        return get(atom, "humanReadable");
-      }
-    };
-
-    const generateCardTitle = () => {
-      if (hasTitle()) {
-        return (
-          <div className="card__main__topline__title">
-            {generateTitleString()}
-          </div>
-        );
-      } else {
-        if (isDirectResponse) {
-          return <div className="card__main__topline__notitle">no title</div>;
-        } else {
-          return (
-            <div className="card__main__topline__notitle">Re: no title</div>
-          );
-        }
-      }
-    };
-
-    return <div className="card__main__topline">{generateCardTitle()}</div>;
+    return (
+      <div className="card__main__topline">
+        {title ? (
+          <div className="card__main__topline__title">{title}</div>
+        ) : (
+          <div className="card__main__topline__notitle">No Title</div>
+        )}
+      </div>
+    );
   }
 
   function createCardMainIcon() {
@@ -159,23 +130,6 @@ export default function WonOtherCard({
     }
   }
 
-  function createPersonaWebsite() {
-    if (holderWebsite) {
-      return (
-        <React.Fragment>
-          <div className="card__persona__websitelabel">Website:</div>,
-          <a
-            className="card__persona__websitelink"
-            target="_blank"
-            rel="noopener noreferrer"
-            href={holderWebsite}
-          >
-            {holderWebsite}
-          </a>
-        </React.Fragment>
-      );
-    }
-  }
   function createVerificationLabel() {
     if (holderVerified) {
       return (
@@ -251,7 +205,11 @@ export default function WonOtherCard({
         (showMap ? "card__icon--map" : "")
       }
       to={location =>
-        generateLink(location, { postUri: atomUri, tab: "DETAIL" }, "/post")
+        generateLink(
+          location,
+          { postUri: atomUri, tab: undefined, connectionUri: undefined },
+          "/post"
+        )
       }
       style={style}
     >
@@ -307,7 +265,11 @@ export default function WonOtherCard({
         (!showDefaultIcon ? "card__main--showIcon" : "")
       }
       to={location =>
-        generateLink(location, { postUri: atomUri, tab: "DETAIL" }, "/post")
+        generateLink(
+          location,
+          { postUri: atomUri, tab: undefined, connectionUri: undefined },
+          "/post"
+        )
       }
     >
       {createCardMainIcon()}
@@ -321,7 +283,11 @@ export default function WonOtherCard({
       <Link
         className="card__persona clickable"
         to={location =>
-          generateLink(location, { postUri: holderUri, tab: "DETAIL" }, "/post")
+          generateLink(
+            location,
+            { postUri: holderUri, tab: undefined, connectionUri: undefined },
+            "/post"
+          )
         }
       >
         {createHolderInfoIcon()}
@@ -333,13 +299,12 @@ export default function WonOtherCard({
         ) : (
           undefined
         )}
-        {createPersonaWebsite()}
       </Link>
     ) : (
       undefined
     );
 
-  const cardConnectionIndicators = showSuggestions ? (
+  const cardConnectionIndicators = showIndicators ? (
     <div className="card__indicators">
       <WonAtomConnectionsIndicator atom={atom} />
     </div>
@@ -360,6 +325,6 @@ export default function WonOtherCard({
 WonOtherCard.propTypes = {
   atom: PropTypes.object.isRequired,
   showHolder: PropTypes.bool,
-  showSuggestions: PropTypes.bool,
+  showIndicators: PropTypes.bool,
   currentLocation: PropTypes.object,
 };

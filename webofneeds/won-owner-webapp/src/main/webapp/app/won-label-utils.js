@@ -1,5 +1,4 @@
 import { deepFreeze, isValidNumber } from "./utils.js";
-import Immutable from "immutable";
 import vocab from "./service/vocab.js";
 
 export const rdfTextfieldHelpText =
@@ -47,61 +46,102 @@ export const labels = deepFreeze({
     [vocab.HOLD.HolderSocketCompacted]: "Posts",
     [vocab.REVIEW.ReviewSocketCompacted]: "Reviews",
     [vocab.BUDDY.BuddySocketCompacted]: "Buddies",
+    [vocab.WXSCHEMA.AssociatedArticleSocketCompacted]: "Articles",
+    [vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted]: "Published in",
+    [vocab.WXSCHEMA.MemberSocketCompacted]: "Members",
+    [vocab.WXSCHEMA.MemberOfSocketCompacted]: "Member Of",
+    [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: "Employees",
+    [vocab.WXSCHEMA.WorksForSocketCompacted]: "Works For",
+  },
+  socketItem: {
+    [vocab.GROUP.GroupSocketCompacted]: "Group Member",
+    [vocab.CHAT.ChatSocketCompacted]: "Chat",
+    [vocab.HOLD.HoldableSocketCompacted]: "Post",
+    [vocab.HOLD.HolderSocketCompacted]: "Holder",
+    [vocab.REVIEW.ReviewSocketCompacted]: "Review",
+    [vocab.BUDDY.BuddySocketCompacted]: "Buddy",
+    [vocab.WXSCHEMA.AssociatedArticleSocketCompacted]: "Publisher",
+    [vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted]: "Article",
+    [vocab.WXSCHEMA.MemberSocketCompacted]: "Membership",
+    [vocab.WXSCHEMA.MemberOfSocketCompacted]: "Member",
+    [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: "Employer",
+    [vocab.WXSCHEMA.WorksForSocketCompacted]: "Employee",
+  },
+  socketItems: {
+    [vocab.GROUP.GroupSocketCompacted]: "Group Members",
+    [vocab.CHAT.ChatSocketCompacted]: "Chats",
+    [vocab.HOLD.HoldableSocketCompacted]: "Holders",
+    [vocab.HOLD.HolderSocketCompacted]: "Posts",
+    [vocab.REVIEW.ReviewSocketCompacted]: "Reviews",
+    [vocab.BUDDY.BuddySocketCompacted]: "Buddies",
+    [vocab.WXSCHEMA.AssociatedArticleSocketCompacted]: "Articles",
+    [vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted]: "Publishers",
+    [vocab.WXSCHEMA.MemberSocketCompacted]: "Members",
+    [vocab.WXSCHEMA.MemberOfSocketCompacted]: "Memberships",
+    [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: "Employees",
+    [vocab.WXSCHEMA.WorksForSocketCompacted]: "Employers",
   },
 });
 
-/**
- * Usage: reactionLabels.[enabled|reaction].[senderSocketType].[targetSocketType]
- *
- * use enabled for enabled use-cases, and reaction for reaction usecases
- */
-export const reactionLabels = Immutable.fromJS({
-  enabled: {
-    [vocab.CHAT.ChatSocketCompacted]: {
-      [vocab.GROUP.GroupSocketCompacted]: "Join the Group Chat",
-    },
-    [vocab.GROUP.GroupSocketCompacted]: {
-      [vocab.CHAT.ChatSocketCompacted]: "Add to Group Chat",
-      [vocab.GROUP.GroupSocketCompacted]: "Add to Group Chat",
-    },
-    [vocab.HOLD.HolderSocketCompacted]: {
-      [vocab.HOLD.HoldableSocketCompacted]: "Add this Holder",
-    },
-    [vocab.HOLD.HoldableSocketCompacted]: {
-      [vocab.HOLD.HolderSocketCompacted]: "Add to Holder",
-    },
-  },
-  reaction: {
-    [vocab.CHAT.ChatSocketCompacted]: {
-      [vocab.CHAT.ChatSocketCompacted]: "Request to Chat",
-      [vocab.GROUP.GroupSocketCompacted]: "Request to Join the Group Chat",
-    },
-    [vocab.GROUP.GroupSocketCompacted]: {
-      [vocab.CHAT.ChatSocketCompacted]: "Invite to Group Chat",
-      [vocab.GROUP.GroupSocketCompacted]: "Invite to Group Chat",
-    },
-  },
-  suggestions: {
-    [vocab.CHAT.ChatSocketCompacted]: {
-      [vocab.CHAT.ChatSocketCompacted]: "Chat Suggestions",
-      [vocab.GROUP.GroupSocketCompacted]: "Group Chat Suggestions",
-    },
-    [vocab.GROUP.GroupSocketCompacted]: {
-      [vocab.CHAT.ChatSocketCompacted]: "Suggestions for your Group Chat",
-      [vocab.GROUP.GroupSocketCompacted]:
-        "Group Chat Suggestions for your Group Chat",
-    },
-    [vocab.BUDDY.BuddySocketCompacted]: {
-      [vocab.BUDDY.BuddySocketCompacted]: "Buddy Suggestions",
-    },
-    [vocab.HOLD.HolderSocketCompacted]: {
-      [vocab.HOLD.HoldableSocketCompacted]: "Holdable Suggestions",
-    },
-    [vocab.HOLD.HoldableSocketCompacted]: {
-      [vocab.HOLD.HolderSocketCompacted]: "Holder Suggestions",
-    },
-  },
-});
+export function getSocketTabLabel(socketType) {
+  return labels.socketTabs[socketType] || socketType;
+}
+
+export function getSocketItemLabels(socketTypes) {
+  if (!socketTypes) {
+    return undefined;
+  }
+
+  const socketTypeLabels = [];
+  for (const socketType of socketTypes) {
+    socketTypeLabels.push(labels.socketItem[socketType] || socketType);
+  }
+
+  return socketTypeLabels.join("/");
+}
+
+export function getSocketItemLabel(socketType) {
+  return labels.socketItem[socketType] || socketType;
+}
+
+export function getSocketItemsLabel(socketType) {
+  return labels.socketItems[socketType] || socketType;
+}
+
+export function getSocketActionInfo(
+  senderSocketType,
+  targetAtomTypeLabel,
+  connectionState
+) {
+  //TODO: BETTER LABELS
+  let infoLabel = "";
+
+  switch (connectionState) {
+    case vocab.WON.Connected:
+      infoLabel = " already added to ";
+      break;
+    case vocab.WON.RequestSent:
+      infoLabel = " requested to join ";
+      break;
+    case vocab.WON.RequestReceived:
+      infoLabel = " requests to join ";
+      break;
+    case vocab.WON.Closed:
+      infoLabel = " was removed from ";
+      break;
+    case vocab.WON.Suggested:
+      infoLabel = " suggested as ";
+      break;
+    default:
+      infoLabel = " <-- ";
+      break;
+  }
+  return (
+    (targetAtomTypeLabel.length > 0 ? targetAtomTypeLabel : "Atom") +
+    infoLabel +
+    getSocketItemsLabel(senderSocketType)
+  );
+}
 
 /**
  * Both input parameters can be anything that `Date(...)` can

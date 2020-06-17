@@ -8,10 +8,6 @@
     position: relative;
     height: $size;
 
-    &.won-is-persona .image {
-      border-radius: 100%;
-    }
-
     &.inactive {
       -webkit-filter: grayscale(100%);
       filter: grayscale(100%);
@@ -22,6 +18,10 @@
     }
 
     & .image {
+      &--isPersona {
+        border-radius: 100%;
+      }
+
       display: flex;
       align-items: center;
       justify-content: center;
@@ -46,13 +46,16 @@
 
     & .holderIcon {
       background: white;
-      border-radius: 100%;
       position: absolute;
       @include fixed-square($size/2);
       right: $size/7 * -1;
       bottom: $size/7 * -1;
       z-index: 2;
       object-fit: cover;
+
+      &--isPersona {
+        border-radius: 100%;
+      }
 
       &.holderUseCaseIcon {
         background: unset;

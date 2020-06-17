@@ -17,7 +17,7 @@
 /**
  * Created by fkleedorfer on 05.09.2014.
  */
-import { is, getIn } from "../utils.js";
+import { is, getIn, extractAtomUriBySocketUri } from "../utils.js";
 
 import * as ownerApi from "../api/owner-api.js";
 import jsonld from "jsonld/dist/jsonld.js";
@@ -349,7 +349,10 @@ import vocab from "./vocab.js";
     fetchParams.targetSocket = targetSocketUri;
 
     return ownerApi
-      .getJsonLdDataset(senderSocketUri.split("#")[0] + "/c", fetchParams)
+      .getJsonLdDataset(
+        extractAtomUriBySocketUri(senderSocketUri) + "/c",
+        fetchParams
+      )
       .then(jsonLdData => {
         console.debug(
           "Result when retrieving connection for socket(",
@@ -400,7 +403,10 @@ import vocab from "./vocab.js";
 
     return (
       ownerApi
-        .getJsonLdDataset(senderSocketUri.split("#")[0] + "/c", fetchParams)
+        .getJsonLdDataset(
+          extractAtomUriBySocketUri(senderSocketUri) + "/c",
+          fetchParams
+        )
         .then(jsonLdData => {
           console.debug(
             "Result when retrieving connection for socket(",

@@ -18,7 +18,7 @@ import "~/style/_atom-card.scss";
 export default function WonAtomCard({
   atom,
   showHolder,
-  showSuggestions,
+  showIndicators,
   currentLocation,
 }) {
   const processState = useSelector(generalSelectors.getProcessState);
@@ -41,7 +41,7 @@ export default function WonAtomCard({
     cardContent = (
       <WonSkeletonCard
         atomUri={atomUri}
-        showSuggestions={showSuggestions}
+        showIndicators={showIndicators}
         showHolder={showHolder}
       />
     );
@@ -55,7 +55,7 @@ export default function WonAtomCard({
         cardContent = (
           <PokemonRaidCard
             atom={atom}
-            showSuggestions={showSuggestions}
+            showIndicators={showIndicators}
             showHolder={showHolder}
             currentLocation={currentLocation}
           />
@@ -65,7 +65,7 @@ export default function WonAtomCard({
         cardContent = (
           <WonOtherCard
             atom={atom}
-            showSuggestions={showSuggestions}
+            showIndicators={showIndicators}
             showHolder={showHolder}
             currentLocation={currentLocation}
           />
@@ -79,6 +79,6 @@ export default function WonAtomCard({
 WonAtomCard.propTypes = {
   atom: PropTypes.object,
   showHolder: PropTypes.bool,
-  showSuggestions: PropTypes.bool,
+  showIndicators: PropTypes.bool,
   currentLocation: PropTypes.object,
 };

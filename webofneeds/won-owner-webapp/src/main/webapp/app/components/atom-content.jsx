@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import Immutable from "immutable";
 import { actionCreators } from "../actions/actions.js";
 import { useSelector, useDispatch } from "react-redux";
 import { get, getQueryParams } from "../utils.js";
@@ -7,15 +8,14 @@ import { get, getQueryParams } from "../utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
-import * as viewUtils from "../redux/utils/view-utils.js";
 import vocab from "../service/vocab.js";
 
-import WonAtomContentHolds from "./atom-content-holds.jsx";
-import WonAtomContentChats from "./atom-content-chats.jsx";
-import WonAtomContentSocket from "./atom-content-socket.jsx";
-import WonAtomContentGeneral from "./atom-content-general.jsx";
-import WonAtomContentHolder from "./atom-content-holder.jsx";
-import WonAtomContentDetails from "./atom-content-details.jsx";
+import WonAtomContentHolds from "./atom-content/atom-content-holds.jsx";
+import WonAtomContentChats from "./atom-content/atom-content-chats.jsx";
+import WonAtomContentSocket from "./atom-content/atom-content-socket.jsx";
+import WonAtomContentGeneral from "./atom-content/atom-content-general.jsx";
+import WonAtomContentHolder from "./atom-content/atom-content-holder.jsx";
+import WonAtomContentDetails from "./atom-content/atom-content-details.jsx";
 import WonBuddyItem from "./socket-items/buddy-item.jsx";
 import WonParticipantItem from "./socket-items/participant-item.jsx";
 import WonGenericItem from "./socket-items/generic-item.jsx";
@@ -29,8 +29,13 @@ import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg"
 import rdf_logo_1 from "~/images/won-icons/rdf_logo_1.svg";
 import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 import { useHistory } from "react-router-dom";
+import * as connectionUtils from "../redux/utils/connection-utils";
 
-export default function WonAtomContent({ atom, defaultTab }) {
+export default function WonAtomContent({
+  atom,
+  visibleTab,
+  relevantConnectionsMap,
+}) {
   const history = useHistory();
   const dispatch = useDispatch();
   const atomUri = get(atom, "uri");
@@ -51,17 +56,13 @@ export default function WonAtomContent({ atom, defaultTab }) {
       contentBranchImm &&
       contentBranchImm.find(
         (detailValue, detailKey) =>
-          detailKey != "type" &&
-          detailKey != "sockets" &&
-          detailKey != "defaultSocket"
+          detailKey != "type" && detailKey != "sockets"
       )
     );
   };
 
   const hasContent = hasVisibleDetails(content);
   const hasSeeksBranch = hasVisibleDetails(seeks);
-
-  const viewState = useSelector(generalSelectors.getViewState);
   const process = useSelector(generalSelectors.getProcessState);
 
   const isHeld = atomUtils.isHeld(atom);
@@ -72,11 +73,6 @@ export default function WonAtomContent({ atom, defaultTab }) {
   const atomProcessingUpdate =
     atom && processUtils.isAtomProcessingUpdate(process, atomUri);
 
-  const visibleTab = viewUtils.getVisibleTabByAtomUri(
-    viewState,
-    atomUri,
-    defaultTab
-  );
   const personas = useSelector(generalSelectors.getOwnedCondensedPersonaList);
 
   function tryReload() {
@@ -141,6 +137,9 @@ export default function WonAtomContent({ atom, defaultTab }) {
     );
 
     let visibleTabFragment;
+    const relevantConnections =
+      get(relevantConnectionsMap, visibleTab) || Immutable.Map();
+
     switch (visibleTab) {
       case "DETAIL":
         visibleTabFragment = (
@@ -177,52 +176,30 @@ export default function WonAtomContent({ atom, defaultTab }) {
         }
         break;
 
-      case vocab.GROUP.GroupSocketCompacted:
+      case vocab.GROUP.GroupSocketCompacted: {
         visibleTabFragment = (
           <WonAtomContentSocket
             atom={atom}
             socketType={visibleTab}
             ItemComponent={WonParticipantItem}
-            suggestPicker={{
-              allowedSockets: [
-                vocab.CHAT.ChatSocketCompacted,
-                vocab.GROUP.GroupSocketCompacted,
-              ],
-              excludedText:
-                "Invitation does not work for atoms that are already part of the Group, or the group itself",
-              notAllowdSocketText:
-                "Invitation does not work on atoms without Group or Chat Socket",
-              noSuggestionsText: "No Participants available to invite",
-              placeholder: "Insert AtomUri to invite",
-              label: "Invite",
-              modalText: "Invite as Participant?",
-              modalCaption: "Group",
-            }}
+            allowAdHoc={true}
+            relevantConnections={relevantConnections}
           />
         );
         break;
+      }
 
-      case vocab.BUDDY.BuddySocketCompacted:
+      case vocab.BUDDY.BuddySocketCompacted: {
         visibleTabFragment = (
           <WonAtomContentSocket
             atom={atom}
             socketType={visibleTab}
             ItemComponent={WonBuddyItem}
-            suggestPicker={{
-              allowedSockets: [vocab.BUDDY.BuddySocketCompacted],
-              excludedText:
-                "Requesting yourself or someone who is already your Buddy is not allowed",
-              notAllowdSocketText:
-                "Request does not work on atoms without the Buddy Socket",
-              noSuggestionsText: "No known Personas available",
-              placeholder: "Insert AtomUri to invite",
-              label: "Invite",
-              modalText: "Request as Buddy?",
-              modalCaption: "Buddy",
-            }}
+            relevantConnections={relevantConnections}
           />
         );
         break;
+      }
 
       case vocab.REVIEW.ReviewSocketCompacted:
         visibleTabFragment = (
@@ -238,9 +215,24 @@ export default function WonAtomContent({ atom, defaultTab }) {
         visibleTabFragment = <WonAtomContentHolds atom={atom} />;
         break;
 
-      case vocab.CHAT.ChatSocketCompacted:
-        visibleTabFragment = <WonAtomContentChats atom={atom} />;
+      case vocab.CHAT.ChatSocketCompacted: {
+        const socketUri = atomUtils.getSocketUri(
+          atom,
+          vocab.CHAT.ChatSocketCompacted
+        );
+        visibleTabFragment = (
+          <WonAtomContentChats
+            atom={atom}
+            allowAdHoc={!isOwned}
+            // We filter out every chat connection that is not owned, otherwise the count would show non owned chatconnections of non owned atoms
+            relevantConnections={relevantConnections.filter(
+              conn =>
+                isOwned || connectionUtils.hasTargetSocketUri(conn, socketUri)
+            )}
+          />
+        );
         break;
+      }
 
       case "RDF":
         visibleTabFragment = (
@@ -273,15 +265,17 @@ export default function WonAtomContent({ atom, defaultTab }) {
         );
         break;
 
-      default:
+      default: {
         visibleTabFragment = (
           <WonAtomContentSocket
             atom={atom}
             socketType={visibleTab}
             ItemComponent={WonGenericItem}
+            relevantConnections={relevantConnections}
           />
         );
         break;
+      }
     }
 
     return (
@@ -296,5 +290,6 @@ export default function WonAtomContent({ atom, defaultTab }) {
 }
 WonAtomContent.propTypes = {
   atom: PropTypes.object.isRequired,
-  defaultTab: PropTypes.string,
+  relevantConnectionsMap: PropTypes.object.isRequired,
+  visibleTab: PropTypes.string.isRequired,
 };

@@ -22,19 +22,14 @@ export const personalTransportSearch = {
       },
     }),
   },
-  enabledUseCases: undefined,
-  reactionUseCases: [
-    {
-      identifier: "taxiOffer",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["taxiOffer", "rideShareOffer"],
+        refuseOwned: true,
+      },
     },
-    {
-      identifier: "rideShareOffer",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
-    },
-  ],
+  },
   // TODO: amount of people? other details?
   details: {
     title: { ...details.title },

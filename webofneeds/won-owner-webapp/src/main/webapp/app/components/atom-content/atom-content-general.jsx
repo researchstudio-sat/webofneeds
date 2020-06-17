@@ -3,11 +3,11 @@
  */
 import React from "react";
 import PropTypes from "prop-types";
-import * as generalSelectors from "../redux/selectors/general-selectors";
-import { get } from "../utils.js";
-import * as atomUtils from "../redux/utils/atom-utils.js";
-import { relativeTime } from "../won-label-utils.js";
-import * as viewUtils from "../redux/utils/view-utils.js";
+import * as generalSelectors from "../../redux/selectors/general-selectors";
+import { get } from "../../utils.js";
+import * as atomUtils from "../../redux/utils/atom-utils.js";
+import { relativeTime } from "../../won-label-utils.js";
+import * as viewUtils from "../../redux/utils/view-utils.js";
 import { useSelector } from "react-redux";
 
 import "~/style/_atom-content-general.scss";

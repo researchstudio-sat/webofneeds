@@ -18,10 +18,11 @@ import {
 } from "../won-message-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as stateStore from "../redux/state-store.js";
 import * as ownerApi from "../api/owner-api.js";
-import { get } from "../utils.js";
+import { get, extractAtomUriBySocketUri } from "../utils.js";
 import { ensureLoggedIn } from "./account-actions.js";
 
 export function fetchUnloadedAtom(atomUri) {
@@ -29,35 +30,12 @@ export function fetchUnloadedAtom(atomUri) {
     stateStore.fetchAtomAndDispatch(atomUri, dispatch, getState);
 }
 
-export function connectSocketsServerSide(senderSocketUri, targetSocketUri) {
-  return () => {
-    if (!senderSocketUri) {
-      throw new Error("SenderSocketUri not present");
-    }
-
-    if (!targetSocketUri) {
-      throw new Error("TargetSocketUri not present");
-    }
-
-    return ownerApi
-      .serverSideConnect(senderSocketUri, targetSocketUri)
-      .then(async response => {
-        if (!response.ok) {
-          const errorMsg = await response.text();
-          throw new Error(
-            `Could not connect sockets(${senderSocketUri}<->${targetSocketUri}): ${errorMsg}`
-          );
-        }
-      });
-  };
-}
-
 export function connectSockets(
   senderSocketUri,
   targetSocketUri,
   connectMessage
 ) {
-  return dispatch => {
+  return (dispatch, getState) => {
     if (!senderSocketUri) {
       throw new Error("SenderSocketUri not present");
     }
@@ -66,92 +44,62 @@ export function connectSockets(
       throw new Error("TargetSocketUri not present");
     }
 
-    const cnctMsg = buildConnectMessage({
-      connectMessage: connectMessage,
-      socketUri: senderSocketUri,
-      targetSocketUri: targetSocketUri,
-    });
+    const accountState = generalSelectors.getAccountState(getState());
+    if (
+      accountUtils.isAtomOwned(
+        accountState,
+        extractAtomUriBySocketUri(senderSocketUri)
+      ) &&
+      accountUtils.isAtomOwned(
+        accountState,
+        extractAtomUriBySocketUri(targetSocketUri)
+      )
+    ) {
+      if (!senderSocketUri) {
+        throw new Error("SenderSocketUri not present");
+      }
 
-    return ownerApi.sendMessage(cnctMsg).then(jsonResp =>
-      won
-        .wonMessageFromJsonLd(
-          jsonResp.message,
-          vocab.WONMSG.uriPlaceholder.event
-        )
-        .then(wonMessage =>
-          dispatch({
-            type: actionTypes.atoms.connectSockets,
-            payload: {
-              eventUri: jsonResp.messageUri,
-              message: jsonResp.message,
-              optimisticEvent: wonMessage,
-              senderSocketUri: senderSocketUri,
-              targetSocketUri: targetSocketUri,
-            },
-          })
-        )
-    );
-  };
-}
+      if (!targetSocketUri) {
+        throw new Error("TargetSocketUri not present");
+      }
 
-export function connectSocketTypes(
-  senderAtomUri,
-  targetAtomUri,
-  senderSocketType,
-  targetSocketType,
-  connectMessage
-) {
-  return (dispatch, getState) => {
-    const state = getState();
-    const senderAtom = generalSelectors.getAtom(senderAtomUri)(state);
-    const targetAtom = generalSelectors.getAtom(targetAtomUri)(state);
+      return ownerApi
+        .serverSideConnect(senderSocketUri, targetSocketUri)
+        .then(async response => {
+          if (!response.ok) {
+            const errorMsg = await response.text();
+            throw new Error(
+              `Could not connect sockets(${senderSocketUri}<->${targetSocketUri}): ${errorMsg}`
+            );
+          }
+        });
+    } else {
+      const cnctMsg = buildConnectMessage({
+        connectMessage: connectMessage,
+        socketUri: senderSocketUri,
+        targetSocketUri: targetSocketUri,
+      });
 
-    const senderSocketUri = atomUtils.getSocketUri(
-      senderAtom,
-      senderSocketType
-    );
-    const targetSocketUri = atomUtils.getSocketUri(
-      targetAtom,
-      targetSocketType
-    );
-
-    if (!senderSocketUri) {
-      throw new Error(
-        `Atom ${get(senderAtom, "uri")} does not have a ${senderSocketType}`
+      return ownerApi.sendMessage(cnctMsg).then(jsonResp =>
+        won
+          .wonMessageFromJsonLd(
+            jsonResp.message,
+            vocab.WONMSG.uriPlaceholder.event
+          )
+          .then(wonMessage =>
+            dispatch({
+              type: actionTypes.atoms.connectSockets,
+              payload: {
+                eventUri: jsonResp.messageUri,
+                message: jsonResp.message,
+                optimisticEvent: wonMessage,
+                senderSocketUri: senderSocketUri,
+                targetSocketUri: targetSocketUri,
+              },
+            })
+          )
       );
     }
-
-    if (!targetSocketUri) {
-      throw new Error(
-        `Atom ${get(targetAtom, "uri")} does not have a ${targetSocketType}`
-      );
-    }
-
-    const cnctMsg = buildConnectMessage({
-      connectMessage: connectMessage,
-      socketUri: senderSocketUri,
-      targetSocketUri: targetSocketUri,
-    });
-
-    return ownerApi.sendMessage(cnctMsg).then(jsonResp =>
-      won
-        .wonMessageFromJsonLd(
-          jsonResp.message,
-          vocab.WONMSG.uriPlaceholder.event
-        )
-        .then(wonMessage =>
-          dispatch({
-            type: actionTypes.atoms.connectSockets,
-            payload: {
-              eventUri: jsonResp.messageUri,
-              message: jsonResp.message,
-              optimisticEvent: wonMessage,
-              senderSocketUri: senderSocketUri,
-              targetSocketUri: targetSocketUri,
-            },
-          })
-        )
-    );
   };
 }
 

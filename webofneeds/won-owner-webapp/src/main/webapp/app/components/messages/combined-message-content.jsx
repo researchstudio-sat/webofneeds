@@ -42,15 +42,22 @@ export default function WonCombinedMessageContent({
    or
    within the targetAtomUri-atom of the connection (for 1:1 chats)
    */
-  const relevantAtomUri =
-    !get(message, "outgoingMessage") &&
-    (groupChatMessage ? originatorUri : get(connection, "targetAtomUri"));
-  const heldByAtomUri = atomUtils.getHeldByUri(get(allAtoms, relevantAtomUri));
+  let personaName = undefined;
 
-  const relevantPersonaUri = heldByAtomUri;
-  const personaName = relevantPersonaUri
-    ? getIn(allAtoms, [relevantPersonaUri, "content", "personaName"])
-    : undefined;
+  if (!get(message, "outgoingMessage")) {
+    const relevantAtomUri = groupChatMessage
+      ? originatorUri
+      : get(connection, "targetAtomUri");
+    const relevantAtom = get(allAtoms, relevantAtomUri);
+    const relevantPersona =
+      atomUtils.isPersona(relevantAtom) || atomUtils.isServiceAtom(relevantAtom)
+        ? relevantAtom
+        : get(allAtoms, atomUtils.getHeldByUri(relevantAtom));
+
+    personaName = relevantPersona
+      ? get(relevantPersona, "humanReadable")
+      : get(relevantAtom, "fakePersonaName");
+  }
 
   const multiSelectType = get(connection, "multiSelectType");
   const hasContent = get(message, "hasContent");

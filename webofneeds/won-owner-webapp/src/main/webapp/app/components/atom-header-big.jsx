@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 import "~/style/_atom-header-big.scss";
 import * as atomUtils from "../redux/utils/atom-utils";
 import * as accountUtils from "../redux/utils/account-utils";
-import { get, getIn } from "../utils.js";
+import { get } from "../utils.js";
 
 import WonAtomContextDropdown from "../components/atom-context-dropdown.jsx";
 import WonAtomIcon from "../components/atom-icon.jsx";
@@ -20,11 +20,10 @@ export default function WonAtomHeaderBig({ atom }) {
   const atomUri = get(atom, "uri");
   const personaUri = atomUtils.getHeldByUri(atom);
   const persona = useSelector(generalSelectors.getAtom(personaUri));
-  const personaName = get(persona, "humanReadable");
-  const isDirectResponse = atomUtils.isDirectResponseAtom(atom);
-  const responseToUri =
-    isDirectResponse && getIn(atom, ["content", "responseToUri"]);
-  const responseToAtom = useSelector(generalSelectors.getAtom(responseToUri));
+  const personaName =
+    atomUtils.hasHoldableSocket(atom) && !atomUtils.hasGroupSocket(atom)
+      ? get(persona, "humanReadable") || get(atom, "fakePersonaName")
+      : undefined;
   const accountState = useSelector(generalSelectors.getAccountState);
   const ownedAtomsWithBuddySocket = useSelector(
     generalSelectors.getOwnedAtomsWithBuddySocket
@@ -43,33 +42,13 @@ export default function WonAtomHeaderBig({ atom }) {
     !accountUtils.isAtomOwned(accountState, atomUri);
   const atomTypeLabel = atom && atomUtils.generateTypeLabel(atom);
 
-  function generateTitle() {
-    if (isDirectResponse && responseToAtom) {
-      return "Re: " + get(responseToAtom, "humanReadable");
-    } else {
-      return get(atom, "humanReadable");
-    }
-  }
+  const title = get(atom, "humanReadable");
 
-  function hasTitle() {
-    if (isDirectResponse && responseToAtom) {
-      return !!get(responseToAtom, "humanReadable");
-    } else {
-      return !!get(atom, "humanReadable");
-    }
-  }
-
-  let titleElement;
-
-  if (hasTitle()) {
-    titleElement = <h1 className="ahb__title">{generateTitle()}</h1>;
-  } else if (isDirectResponse) {
-    titleElement = (
-      <h1 className="ahb__title ahb__title--notitle">RE: no title</h1>
-    );
-  } else {
-    titleElement = <h1 className="ahb__title ahb__title--notitle">no title</h1>;
-  }
+  const titleElement = title ? (
+    <h1 className="ahb__title">{title}</h1>
+  ) : (
+    <h1 className="ahb__title ahb__title--notitle">No Title</h1>
+  );
 
   const personaNameElement = personaName && (
     <span className="ahb__titles__persona">{personaName}</span>
@@ -81,9 +60,7 @@ export default function WonAtomHeaderBig({ atom }) {
     </span>
   );
 
-  const buddyActionElement = showAddBuddyElement && (
-    <WonAddBuddy atomUri={atomUri} />
-  );
+  const buddyActionElement = showAddBuddyElement && <WonAddBuddy atom={atom} />;
 
   return (
     <won-atom-header-big>

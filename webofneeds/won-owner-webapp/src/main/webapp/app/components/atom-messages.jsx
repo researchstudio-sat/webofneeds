@@ -24,7 +24,6 @@ import WonConnectionContextDropdown from "./connection-context-dropdown.jsx";
 import ChatTextfield from "./chat-textfield.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
 import WonPetrinetState from "./petrinet-state.jsx";
-import WonAtomContentMessage from "./messages/atom-content-message.jsx";
 import WonConnectionMessage from "./messages/connection-message.jsx";
 // import WonConnectionAgreementDetails from "./connection-agreement-details.jsx";
 import { actionCreators } from "../actions/actions.js";
@@ -168,13 +167,6 @@ export default function WonAtomMessages({
     processUtils.isAtomLoading(processState, senderAtomUri) ||
     processUtils.isAtomLoading(processState, targetAtomUri) ||
     isConnectionLoading;
-
-  const showAtomContentMessage = !!(
-    showChatData &&
-    !connectionUtils.isConnected(connection) &&
-    !multiSelectType &&
-    targetAtomUri
-  );
 
   function showAgreementDataField() {
     dispatch(
@@ -592,7 +584,6 @@ export default function WonAtomMessages({
     contentElement = (
       <div className="pm__content" ref={chatContainerRef} onScroll={onScroll}>
         {unreadIndicatorElement}
-        {showAtomContentMessage && <WonAtomContentMessage atom={targetAtom} />}
         {(isConnectionLoading || isProcessingLoadingMessages) &&
           loadSpinnerElement}
         {!connectionUtils.isSuggested(connection) &&

@@ -1,37 +1,44 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import { get } from "../utils.js";
 import WonAtomHeaderBig from "./atom-header-big.jsx";
 import WonAtomMenu from "./atom-menu.jsx";
-import WonAtomFooter from "./atom-footer.jsx";
+import WonAtomActions from "./atom-actions.jsx";
 import WonAtomContent from "./atom-content.jsx";
 import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as atomUtils from "../redux/utils/atom-utils";
 import * as processUtils from "../redux/utils/process-utils";
-import * as viewUtils from "../redux/utils/view-utils";
 
 import "~/style/_atom-info.scss";
 
-export default function WonAtomInfo({ atom, className, defaultTab }) {
+export default function WonAtomInfo({
+  atom,
+  ownedConnection,
+  className,
+  initialTab = "DETAIL",
+}) {
   const atomUri = get(atom, "uri");
-  const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
-
-  const viewState = useSelector(generalSelectors.getViewState);
-  const visibleTab = viewUtils.getVisibleTabByAtomUri(viewState, atomUri);
-
   const processState = useSelector(generalSelectors.getProcessState);
+
+  const [visibleTab, setVisibleTab] = useState(initialTab);
+
+  useEffect(
+    () => {
+      setVisibleTab(initialTab);
+    },
+    [atomUri, initialTab]
+  );
+
   const atomLoading =
     !atom || processUtils.isAtomLoading(processState, atomUri);
 
-  const showFooter =
-    !atomLoading &&
-    visibleTab === "DETAIL" &&
-    (atomUtils.isInactive(atom) ||
-      (isOwned && atomUtils.hasEnabledUseCases(atom)) ||
-      (!isOwned && atomUtils.hasReactionUseCases(atom)) ||
-      (!isOwned &&
-        (atomUtils.hasGroupSocket(atom) || atomUtils.hasChatSocket(atom))));
+  const showActions =
+    !atomLoading && (atomUtils.isInactive(atom) || ownedConnection);
+
+  const relevantConnectionsMap = useSelector(
+    generalSelectors.getConnectionsOfAtomWithOwnedTargetConnections(atomUri)
+  );
 
   return (
     <won-atom-info
@@ -40,14 +47,28 @@ export default function WonAtomInfo({ atom, className, defaultTab }) {
       }
     >
       <WonAtomHeaderBig atom={atom} />
-      <WonAtomMenu atom={atom} defaultTab={defaultTab} />
-      <WonAtomContent atom={atom} defaultTab={defaultTab} />
-      {showFooter ? <WonAtomFooter atom={atom} /> : undefined}
+      {showActions ? (
+        <WonAtomActions atom={atom} ownedConnection={ownedConnection} />
+      ) : (
+        undefined
+      )}
+      <WonAtomMenu
+        atom={atom}
+        visibleTab={visibleTab}
+        setVisibleTab={setVisibleTab}
+        relevantConnectionsMap={relevantConnectionsMap}
+      />
+      <WonAtomContent
+        atom={atom}
+        visibleTab={visibleTab}
+        relevantConnectionsMap={relevantConnectionsMap}
+      />
     </won-atom-info>
   );
 }
 WonAtomInfo.propTypes = {
   atom: PropTypes.object,
-  defaultTab: PropTypes.string,
   className: PropTypes.string,
+  ownedConnection: PropTypes.object,
+  initialTab: PropTypes.string,
 };

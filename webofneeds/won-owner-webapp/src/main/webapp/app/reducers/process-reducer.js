@@ -3,10 +3,9 @@
  */
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
-import { get, getIn } from "../utils.js";
+import { get, getIn, extractAtomUriBySocketUri } from "../utils.js";
 import { parseAtom } from "./atom-reducer/parse-atom.js";
 import * as processUtils from "../redux/utils/process-utils.js";
-import * as generalSelectors from "../redux/selectors/general-selectors.js";
 
 const initialState = Immutable.fromJS({
   processingInitialLoad: true,
@@ -591,10 +590,10 @@ export default function(processState = initialState, action = {}) {
  */
 export function addMessageAtomsToLoad(processState, wonMessage) {
   if (!wonMessage.isResponse()) {
-    const senderAtomUri = generalSelectors.getAtomUriBySocketUri(
+    const senderAtomUri = extractAtomUriBySocketUri(
       wonMessage.getSenderSocket()
     );
-    const targetAtomUri = generalSelectors.getAtomUriBySocketUri(
+    const targetAtomUri = extractAtomUriBySocketUri(
       wonMessage.getTargetSocket()
     );
 

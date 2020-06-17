@@ -184,14 +184,6 @@ import { Generator } from "sparqljs";
             },
           ]
         : undefined,
-      "won:defaultSocket": !(args.content && args.content.defaultSocket)
-        ? [
-            {
-              "@id": "#chatSocket",
-              "won:socketDefinition": { "@id": vocab.CHAT.ChatSocketCompacted },
-            },
-          ]
-        : undefined,
       "match:flag": won.debugmode
         ? [{ "@id": "match:UsedForTesting" }]
         : undefined, //TODO: refactor this and use a won:flags-Detail in the content instead

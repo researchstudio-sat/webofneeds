@@ -18,18 +18,12 @@ const initialState = Immutable.fromJS({
   anonymousSlideIn: {
     visible: false,
     showEmailInput: false,
-
     linkSent: false,
     linkCopied: false,
   },
   showSlideIns: true,
-  atoms: new Immutable.Map(),
   locationAccessDenied: false,
   currentLocation: undefined,
-});
-
-const initialAtomState = Immutable.fromJS({
-  visibleTab: "DETAIL",
 });
 
 export default function(viewState = initialState, action = {}) {
@@ -171,18 +165,6 @@ export default function(viewState = initialState, action = {}) {
       return viewState
         .setIn(["anonymousSlideIn", "linkCopied"], true)
         .setIn(["anonymousSlideIn", "linkSent"], false);
-
-    case actionTypes.atoms.selectTab: {
-      const atomUri = action.payload.get("atomUri");
-      const selectTab = action.payload.get("selectTab");
-
-      const atomState = viewState.getIn(["atoms", atomUri]) || initialAtomState;
-
-      return viewState.setIn(
-        ["atoms", atomUri],
-        atomState.set("visibleTab", selectTab)
-      );
-    }
 
     default:
       return viewState;

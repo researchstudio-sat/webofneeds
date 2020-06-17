@@ -39,13 +39,14 @@ export const rentRealEstateSearch = {
       },
     }),
   },
-  reactionUseCases: [
-    {
-      identifier: "rentRealEstateOffer",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["rentRealEstateOffer"],
+        refuseOwned: true,
+      },
     },
-  ],
+  },
   details: undefined,
   seeksDetails: {
     location: { ...details.location },

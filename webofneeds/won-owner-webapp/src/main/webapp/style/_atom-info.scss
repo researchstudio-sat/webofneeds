@@ -4,8 +4,11 @@
 
 won-atom-info {
   display: grid;
-  grid-template-areas: "header" "menu" "main" "footer";
-  grid-template-rows: min-content min-content minmax($minimalGridRows, 1fr) min-content;
+  grid-template-areas: "header" "actions" "menu" "main";
+  grid-template-rows: min-content min-content min-content minmax(
+      $minimalGridRows,
+      1fr
+    );
   box-sizing: border-box;
 
   > won-atom-header-big {
@@ -23,12 +26,13 @@ won-atom-info {
     display: grid;
   }
 
-  > won-atom-footer {
-    grid-area: footer;
+  > won-atom-actions {
+    grid-area: actions;
     display: grid;
     grid-gap: 0.5rem;
     padding: 0.5rem;
     box-sizing: border-box;
-    border-top: $thinGrayBorder;
+    background: $won-secondary-color;
+    color: white;
   }
 }

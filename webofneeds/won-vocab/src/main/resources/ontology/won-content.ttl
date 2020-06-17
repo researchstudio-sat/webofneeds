@@ -100,14 +100,6 @@ bd:lat-lon rdf:type rdfs:Datatype .
                 rdfs:label "feedbackFor" .
 
 
-###  https://w3id.org/won/content#inResponseTo
-:inResponseTo rdf:type owl:ObjectProperty ;
-              rdfs:domain :DirectResponse ;
-              rdfs:range won:Atom ;
-              rdfs:comment "An Atom that was created in order to directly respond to another links to that Atom with this property."@en ;
-              rdfs:label "inResponseTo" .
-
-
 ###  https://w3id.org/won/content#northWestCorner
 :northWestCorner rdf:type owl:ObjectProperty ;
                  rdfs:domain :BoundingBox ;
@@ -253,13 +245,6 @@ bd:lat-lon rdf:type owl:Class .
 :BoundingBox rdf:type owl:Class ;
              rdfs:comment "The bounding box around a location, used for calculating the map viewport when displaying it."@en ;
              rdfs:label "BoundingBox" .
-
-
-###  https://w3id.org/won/content#DirectResponse
-:DirectResponse rdf:type owl:Class ;
-                rdfs:subClassOf won:Atom ;
-                rdfs:comment "An Atom of this class indicates that it was created for directly responding to another Atom."@en ;
-                rdfs:label "DirectResponse" .
 
 
 ###  https://w3id.org/won/content#Feedback

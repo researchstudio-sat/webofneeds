@@ -20,13 +20,14 @@ export const goodsOffer = {
       },
     }),
   },
-  reactionUseCases: [
-    {
-      identifier: "goodsServiceSearch",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["goodsServiceSearch"],
+        refuseOwned: true,
+      },
     },
-  ],
+  },
   details: {
     title: { ...details.title, mandatory: true },
     description: { ...details.description },

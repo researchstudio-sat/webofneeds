@@ -20,7 +20,6 @@ import WonShareDropdown from "./share-dropdown.jsx";
 import WonConnectionContextDropdown from "./connection-context-dropdown.jsx";
 import ChatTextfield from "./chat-textfield.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
-import WonAtomContentMessage from "./messages/atom-content-message.jsx";
 import WonConnectionMessage from "./messages/connection-message.jsx";
 import { actionCreators } from "../actions/actions.js";
 import * as viewSelectors from "../redux/selectors/view-selectors";
@@ -41,6 +40,20 @@ export default function WonGroupAtomMessages({
     }
 
     ensureMessagesAreLoaded();
+
+    //TODO: FILTER MESSAGE URIS IN A WAY THAT WE GET A SET OF ORIGINATORURIS AND SENDERURIS WHICH WE WILL CHECK AND FETCH IF THEY ARE NOT PRESENT
+    /*if (groupChatMessage && processState && isReceived) {
+      if (
+        originatorUri &&
+        !processUtils.hasAtomFailedToLoad(originatorUri) &&
+        (!originatorAtom ||
+          ((get(originatorAtom, "uriStub") ||
+            processUtils.isAtomToLoad(originatorUri)) &&
+            !processUtils.isAtomLoading(originatorUri)))
+      ) {
+        dispatch(actionCreators.atoms__fetchUnloadedAtom(originatorUri));
+      }
+    }*/
   });
   const [snapBottom, setSnapBottom] = useState(true);
 
@@ -107,8 +120,6 @@ export default function WonGroupAtomMessages({
     processUtils.isAtomLoading(processState, senderAtomUri) ||
     processUtils.isAtomLoading(processState, targetAtomUri) ||
     isConnectionLoading;
-
-  const showAtomContentMessage = !!(targetAtomUri && !isConnected);
 
   function goToUnreadMessages() {
     snapToBottom();
@@ -294,7 +305,6 @@ export default function WonGroupAtomMessages({
   const contentElement = (
     <div className="gpm__content" ref={chatContainerRef} onScroll={onScroll}>
       {unreadIndicatorElement}
-      {showAtomContentMessage && <WonAtomContentMessage atom={targetAtom} />}
       {(isConnectionLoading || isProcessingLoadingMessages) &&
         loadSpinnerElement}
       {!isSuggested &&

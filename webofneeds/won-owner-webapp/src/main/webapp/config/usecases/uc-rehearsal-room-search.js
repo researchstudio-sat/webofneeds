@@ -36,13 +36,14 @@ export const rehearsalRoomSearch = {
       },
     }),
   },
-  reactionUseCases: [
-    {
-      identifier: "rehearsalRoomOffer",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["rehearsalRoomOffer"],
+        refuseOwned: true,
+      },
     },
-  ],
+  },
   details: undefined,
   seeksDetails: {
     location: { ...details.location },

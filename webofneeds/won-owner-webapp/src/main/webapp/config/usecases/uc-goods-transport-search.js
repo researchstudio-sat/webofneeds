@@ -26,14 +26,14 @@ export const goodsTransportSearch = {
       },
     }),
   },
-  enabledUseCases: undefined,
-  reactionUseCases: [
-    {
-      identifier: "goodsTransportOffer",
-      senderSocketType: vocab.CHAT.ChatSocketCompacted,
-      targetSocketType: vocab.CHAT.ChatSocketCompacted,
+  reactions: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["goodsTransportOffer"],
+        refuseOwned: true,
+      },
     },
-  ],
+  },
   details: {
     title: { ...details.title },
     content: {

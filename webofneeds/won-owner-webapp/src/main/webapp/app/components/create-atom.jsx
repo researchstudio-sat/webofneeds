@@ -4,7 +4,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import PropTypes from "prop-types";
-import { get } from "../utils.js";
+import { get, generateLink } from "../utils.js";
 
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -56,11 +56,7 @@ export default function WonCreateAtom({
     const fromAtomContent = get(fromAtom, "content");
     const fromAtomSeeks = get(fromAtom, "seeks");
     const socketsReset = atomUtils.getSocketsWithKeysReset(fromAtom);
-    const defaultSocketReset = atomUtils.getDefaultSocketWithKeyReset(fromAtom);
     const seeksSocketsReset = atomUtils.getSeeksSocketsWithKeysReset(fromAtom);
-    const seeksDefaultSocketReset = atomUtils.getSeeksDefaultSocketWithKeyReset(
-      fromAtom
-    );
 
     if (fromAtomContent) {
       useCase.draft.content = fromAtomContent.toJS();
@@ -72,15 +68,9 @@ export default function WonCreateAtom({
     if (socketsReset) {
       useCase.draft.content.sockets = socketsReset.toJS();
     }
-    if (defaultSocketReset) {
-      useCase.draft.content.defaultSocket = defaultSocketReset.toJS();
-    }
 
     if (seeksSocketsReset) {
       useCase.draft.seeks.sockets = seeksSocketsReset.toJS();
-    }
-    if (seeksDefaultSocketReset) {
-      useCase.draft.seeks.defaultSocket = seeksDefaultSocketReset.toJS();
     }
   } else {
     useCase = useCaseUtils.getUseCase(useCaseIdentifier);
@@ -129,24 +119,38 @@ export default function WonCreateAtom({
 
     if (connect) {
       executeFunction = () => {
+        const fromAtomUri = get(fromAtom, "uri");
+
         dispatch(
           actionCreators.connections__connectReactionAtom(
-            get(fromAtom, "uri"),
+            fromAtomUri,
             tempDraft,
             personaId,
             targetSocketType,
-            senderSocketType,
-            history
+            senderSocketType
           )
         );
-        history.push("/connections");
+
+        history.replace(
+          generateLink(
+            history.location,
+            {
+              postUri: fromAtomUri,
+              connectionUri: undefined,
+              tab: targetSocketType,
+            },
+            "/post"
+          )
+        );
       };
     } else {
       executeFunction = () => {
         dispatch(
           actionCreators.atoms__create(tempDraft, personaId, defaultNodeUri)
         );
-        history.push("/inventory");
+        history.replace(
+          generateLink(history.location, {}, "/inventory", false)
+        );
       };
     }
 

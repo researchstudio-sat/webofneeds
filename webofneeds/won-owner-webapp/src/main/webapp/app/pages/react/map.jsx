@@ -68,10 +68,6 @@ export default function PageMap() {
       .filter(metaAtom => atomUtils.isActive(metaAtom))
       .filter(metaAtom => debugModeEnabled || !atomUtils.isSearchAtom(metaAtom))
       .filter(
-        metaAtom =>
-          debugModeEnabled || !atomUtils.isDirectResponseAtom(metaAtom)
-      )
-      .filter(
         metaAtom => debugModeEnabled || !atomUtils.isInvisibleAtom(metaAtom)
       )
       .filter(metaAtom => !accountUtils.isAtomOwned(metaAtom))
@@ -508,7 +504,7 @@ export default function PageMap() {
                 atoms={sortedVisibleAtoms}
                 currentLocation={lastWhatsAroundLocation}
                 showHolder={true}
-                showSuggestions={false}
+                showIndicators={false}
                 showCreate={false}
               />
             </div>

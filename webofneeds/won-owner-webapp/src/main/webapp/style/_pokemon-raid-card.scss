@@ -116,10 +116,8 @@ pokemon-raid-card {
     margin-top: 0.5rem;
 
     display: grid;
-    grid-template-areas:
-      "card__persona__icon card__persona__name card__persona__name"
-      "card__persona__icon card__persona__websitelabel card__persona__websitelink";
-    grid-template-columns: var(--persona-height) max-content 1fr;
+    grid-template-areas: "card__persona__icon card__persona__name";
+    grid-template-columns: var(--persona-height) 1fr;
     grid-column-gap: 0.5rem;
     padding-top: 0.5rem;
     border-top: $thinGrayBorder;
@@ -132,6 +130,7 @@ pokemon-raid-card {
       background: white;
 
       &.holderUseCaseIcon {
+        border-radius: 0;
         background: unset;
         padding: 0.2rem;
         box-sizing: border-box;
@@ -169,15 +168,6 @@ pokemon-raid-card {
           color: $won-unread-attention;
         }
       }
-    }
-
-    .card__persona__websitelabel {
-      font-size: $smallFontSize;
-      grid-area: card__persona__websitelabel;
-    }
-    .card__persona__websitelink {
-      font-size: $smallFontSize;
-      grid-area: card__persona__websitelink;
     }
   }
 
