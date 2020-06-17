@@ -22,7 +22,7 @@ import * as accountUtils from "../redux/utils/account-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as stateStore from "../redux/state-store.js";
 import * as ownerApi from "../api/owner-api.js";
-import { get, extractAtomUriBySocketUri } from "../utils.js";
+import { get, extractAtomUriBySocketUri, delay } from "../utils.js";
 import { ensureLoggedIn } from "./account-actions.js";
 
 export function fetchUnloadedAtom(atomUri) {
@@ -80,25 +80,28 @@ export function connectSockets(
         targetSocketUri: targetSocketUri,
       });
 
-      return ownerApi.sendMessage(cnctMsg).then(jsonResp =>
-        won
-          .wonMessageFromJsonLd(
-            jsonResp.message,
-            vocab.WONMSG.uriPlaceholder.event
-          )
-          .then(wonMessage =>
-            dispatch({
-              type: actionTypes.atoms.connectSockets,
-              payload: {
-                eventUri: jsonResp.messageUri,
-                message: jsonResp.message,
-                optimisticEvent: wonMessage,
-                senderSocketUri: senderSocketUri,
-                targetSocketUri: targetSocketUri,
-              },
-            })
-          )
-      );
+      //TODO: DELAY WORKAROUND TO FIX CONNECT ISSUES
+      return delay(2000)
+        .then(() => ownerApi.sendMessage(cnctMsg))
+        .then(jsonResp =>
+          won
+            .wonMessageFromJsonLd(
+              jsonResp.message,
+              vocab.WONMSG.uriPlaceholder.event
+            )
+            .then(wonMessage =>
+              dispatch({
+                type: actionTypes.atoms.connectSockets,
+                payload: {
+                  eventUri: jsonResp.messageUri,
+                  message: jsonResp.message,
+                  optimisticEvent: wonMessage,
+                  senderSocketUri: senderSocketUri,
+                  targetSocketUri: targetSocketUri,
+                },
+              })
+            )
+        );
     }
   };
 }

@@ -1,4 +1,4 @@
-import { generateIdString, get, getIn } from "../utils";
+import { generateIdString, get, getIn, delay } from "../utils";
 import vocab from "../service/vocab.js";
 import { actionTypes } from "./actions";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
@@ -38,22 +38,28 @@ function connectReview(dispatch, ownPersona, foreignPersona, connectMessage) {
     targetSocketUri: targetSocketUri,
   });
 
-  return ownerApi.sendMessage(cnctMsg).then(jsonResp =>
-    won
-      .wonMessageFromJsonLd(jsonResp.message, vocab.WONMSG.uriPlaceholder.event)
-      .then(wonMessage =>
-        dispatch({
-          type: actionTypes.atoms.connectSockets,
-          payload: {
-            eventUri: jsonResp.messageUri,
-            message: jsonResp.message,
-            optimisticEvent: wonMessage,
-            senderSocketUri: senderSocketUri,
-            targetSocketUri: targetSocketUri,
-          },
-        })
-      )
-  );
+  //TODO: DELAY WORKAROUND TO FIX CONNECT ISSUES
+  return delay(2000)
+    .then(() => ownerApi.sendMessage(cnctMsg))
+    .then(jsonResp =>
+      won
+        .wonMessageFromJsonLd(
+          jsonResp.message,
+          vocab.WONMSG.uriPlaceholder.event
+        )
+        .then(wonMessage =>
+          dispatch({
+            type: actionTypes.atoms.connectSockets,
+            payload: {
+              eventUri: jsonResp.messageUri,
+              message: jsonResp.message,
+              optimisticEvent: wonMessage,
+              senderSocketUri: senderSocketUri,
+              targetSocketUri: targetSocketUri,
+            },
+          })
+        )
+    );
 }
 
 export function connectPersona(atomUri, personaUri) {

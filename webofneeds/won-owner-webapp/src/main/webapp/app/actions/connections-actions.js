@@ -4,7 +4,6 @@
 
 import won from "../won-es6.js";
 import vocab from "../service/vocab.js";
-
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -18,6 +17,7 @@ import {
   getIn,
   generateFakePersonaName,
   extractAtomUriBySocketUri,
+  delay,
 } from "../utils.js";
 
 import { ensureLoggedIn } from "./account-actions";
@@ -388,29 +388,31 @@ function connectReactionAtom(
               socketUri: senderSocketUri,
               targetSocketUri: targetSocketUri,
             });
+            //TODO: DELAY WORKAROUND TO FIX CONNECT ISSUES
+            delay(2000)
+              .then(() => ownerApi.sendMessage(cnctMsg))
+              .then(jsonResp =>
+                // connect action to be dispatched when the
+                // ad hoc atom has been created:
 
-            ownerApi.sendMessage(cnctMsg).then(jsonResp =>
-              // connect action to be dispatched when the
-              // ad hoc atom has been created:
-
-              won
-                .wonMessageFromJsonLd(
-                  jsonResp.message,
-                  vocab.WONMSG.uriPlaceholder.event
-                )
-                .then(wonMessage =>
-                  dispatch({
-                    type: actionTypes.atoms.connectSockets,
-                    payload: {
-                      eventUri: jsonResp.messageUri,
-                      message: jsonResp.message,
-                      optimisticEvent: wonMessage,
-                      senderSocketUri: senderSocketUri,
-                      targetSocketUri: targetSocketUri,
-                    },
-                  })
-                )
-            );
+                won
+                  .wonMessageFromJsonLd(
+                    jsonResp.message,
+                    vocab.WONMSG.uriPlaceholder.event
+                  )
+                  .then(wonMessage =>
+                    dispatch({
+                      type: actionTypes.atoms.connectSockets,
+                      payload: {
+                        eventUri: jsonResp.messageUri,
+                        message: jsonResp.message,
+                        optimisticEvent: wonMessage,
+                        senderSocketUri: senderSocketUri,
+                        targetSocketUri: targetSocketUri,
+                      },
+                    })
+                  )
+              );
           }
         } else {
           throw new Error(
@@ -479,25 +481,28 @@ function connectAdHoc(targetSocketUri, connectMessage, dispatch, getState) {
             targetSocketUri: targetSocketUri,
           });
 
-          ownerApi.sendMessage(cnctMsg).then(jsonResp =>
-            won
-              .wonMessageFromJsonLd(
-                jsonResp.message,
-                vocab.WONMSG.uriPlaceholder.event
-              )
-              .then(wonMessage =>
-                dispatch({
-                  type: actionTypes.atoms.connectSockets,
-                  payload: {
-                    eventUri: jsonResp.messageUri,
-                    message: jsonResp.message,
-                    optimisticEvent: wonMessage,
-                    senderSocketUri: senderSocketUri,
-                    targetSocketUri: targetSocketUri,
-                  },
-                })
-              )
-          );
+          //TODO: DELAY WORKAROUND TO FIX CONNECT ISSUES
+          delay(2000)
+            .then(() => ownerApi.sendMessage(cnctMsg))
+            .then(jsonResp =>
+              won
+                .wonMessageFromJsonLd(
+                  jsonResp.message,
+                  vocab.WONMSG.uriPlaceholder.event
+                )
+                .then(wonMessage =>
+                  dispatch({
+                    type: actionTypes.atoms.connectSockets,
+                    payload: {
+                      eventUri: jsonResp.messageUri,
+                      message: jsonResp.message,
+                      optimisticEvent: wonMessage,
+                      senderSocketUri: senderSocketUri,
+                      targetSocketUri: targetSocketUri,
+                    },
+                  })
+                )
+            );
         }
       });
   });
