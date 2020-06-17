@@ -19,6 +19,7 @@ export default function WonAtomMenu({
   atom,
   visibleTab,
   setVisibleTab,
+  toggleAddPicker,
   relevantConnectionsMap,
 }) {
   const atomUri = get(atom, "uri");
@@ -74,7 +75,10 @@ export default function WonAtomMenu({
     <div
       key="detail"
       className={generateAtomItemCssClasses(visibleTab === "DETAIL")}
-      onClick={() => setVisibleTab("DETAIL")}
+      onClick={() => {
+        setVisibleTab("DETAIL");
+        toggleAddPicker(false);
+      }}
     >
       <span className="atom-menu__item__label">Detail</span>
     </div>
@@ -149,7 +153,10 @@ export default function WonAtomMenu({
         <div
           key={socketType}
           className={generateAtomItemCssClasses(selected, inactive, unread)}
-          onClick={() => setVisibleTab(socketType)}
+          onClick={() => {
+            setVisibleTab(socketType);
+            toggleAddPicker(false);
+          }}
         >
           <span className="atom-menu__item__unread" />
           <span className="atom-menu__item__label">{label}</span>
@@ -168,7 +175,10 @@ export default function WonAtomMenu({
       <div
         key="rdf"
         className={generateAtomItemCssClasses(visibleTab === "RDF")}
-        onClick={() => setVisibleTab("RDF")}
+        onClick={() => {
+          setVisibleTab("RDF");
+          toggleAddPicker(false);
+        }}
       >
         <span className="atom-menu__item__label">RDF</span>
       </div>
@@ -184,4 +194,5 @@ WonAtomMenu.propTypes = {
   relevantConnectionsMap: PropTypes.object.isRequired,
   visibleTab: PropTypes.string.isRequired,
   setVisibleTab: PropTypes.func.isRequired,
+  toggleAddPicker: PropTypes.func.isRequired,
 };

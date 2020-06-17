@@ -35,6 +35,8 @@ export default function WonAtomContent({
   atom,
   visibleTab,
   relevantConnectionsMap,
+  showAddPicker,
+  toggleAddPicker,
 }) {
   const history = useHistory();
   const dispatch = useDispatch();
@@ -184,6 +186,8 @@ export default function WonAtomContent({
             ItemComponent={WonParticipantItem}
             allowAdHoc={true}
             relevantConnections={relevantConnections}
+            showAddPicker={showAddPicker}
+            toggleAddPicker={toggleAddPicker}
           />
         );
         break;
@@ -196,6 +200,8 @@ export default function WonAtomContent({
             socketType={visibleTab}
             ItemComponent={WonBuddyItem}
             relevantConnections={relevantConnections}
+            showAddPicker={showAddPicker}
+            toggleAddPicker={toggleAddPicker}
           />
         );
         break;
@@ -224,6 +230,8 @@ export default function WonAtomContent({
           <WonAtomContentChats
             atom={atom}
             allowAdHoc={!isOwned}
+            showAddPicker={showAddPicker}
+            toggleAddPicker={toggleAddPicker}
             // We filter out every chat connection that is not owned, otherwise the count would show non owned chatconnections of non owned atoms
             relevantConnections={relevantConnections.filter(
               conn =>
@@ -272,6 +280,8 @@ export default function WonAtomContent({
             socketType={visibleTab}
             ItemComponent={WonGenericItem}
             relevantConnections={relevantConnections}
+            showAddPicker={showAddPicker}
+            toggleAddPicker={toggleAddPicker}
           />
         );
         break;
@@ -292,4 +302,6 @@ WonAtomContent.propTypes = {
   atom: PropTypes.object.isRequired,
   relevantConnectionsMap: PropTypes.object.isRequired,
   visibleTab: PropTypes.string.isRequired,
+  showAddPicker: PropTypes.bool.isRequired,
+  toggleAddPicker: PropTypes.func.isRequired,
 };

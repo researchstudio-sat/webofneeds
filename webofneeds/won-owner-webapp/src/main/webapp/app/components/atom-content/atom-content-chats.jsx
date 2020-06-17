@@ -19,9 +19,9 @@ import * as wonLabelUtils from "../../won-label-utils.js";
 import WonConnectionSelectionItem from "../connection-selection-item.jsx";
 import WonTitlePicker from "../details/picker/title-picker.jsx";
 import WonSocketAddAtom from "../socket-add-atom.jsx";
+import WonSocketAddButton from "../socket-add-button.jsx";
 
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
-import ico36_plus from "~/images/won-icons/ico36_plus.svg";
 
 import "~/style/_atom-content-chats.scss";
 
@@ -29,6 +29,8 @@ export default function AtomContentChats({
   atom,
   allowAdHoc,
   relevantConnections,
+  showAddPicker,
+  toggleAddPicker,
 }) {
   const history = useHistory();
   const accountState = useSelector(generalSelectors.getAccountState);
@@ -37,7 +39,6 @@ export default function AtomContentChats({
   const [showSuggestions, toggleSuggestions] = useState(false);
   const [showClosed, toggleClosed] = useState(false);
   const [searchText, setSearchText] = useState({ value: "" });
-  const [showAddPicker, toggleAddPicker] = useState(false);
 
   const storedAtoms = useSelector(generalSelectors.getAtoms);
   const filteredStoredAtoms = filterAtomsBySearchValue(storedAtoms, searchText);
@@ -120,37 +121,6 @@ export default function AtomContentChats({
     );
   }
 
-  function generateAddItem() {
-    if (atomUtils.isActive(atom) && (reactions || allowAdHoc)) {
-      const onClick = () => {
-        toggleAddPicker(!showAddPicker);
-      };
-
-      return (
-        <div className="socketadd clickable" onClick={onClick}>
-          <svg className="socketadd__icon" title="Create a new post">
-            <use xlinkHref={ico36_plus} href={ico36_plus} />
-          </svg>
-          <span className="socketadd__label">
-            {isAtomOwned
-              ? `Add ${
-                  reactions
-                    ? wonLabelUtils.getSocketItemLabels(reactions.keys())
-                    : "Chat"
-                }`
-              : `Connect ${
-                  reactions
-                    ? wonLabelUtils.getSocketItemLabels(reactions.keys())
-                    : "Chat"
-                }`}
-          </span>
-        </div>
-      );
-    } else {
-      return undefined;
-    }
-  }
-
   return (
     <won-atom-content-chats>
       <div className="acc__search">
@@ -165,7 +135,16 @@ export default function AtomContentChats({
           <div className="acc__segment">
             <div className="acc__segment__content borderTop">
               {generateConnectionItems(activeChatConnections)}
-              {generateAddItem()}
+              {atomUtils.isActive(atom) && (reactions || allowAdHoc) ? (
+                <WonSocketAddButton
+                  senderReactions={reactions}
+                  isAtomOwned={isAtomOwned}
+                  onClick={() => toggleAddPicker(!showAddPicker)}
+                  targetSocketType={vocab.CHAT.ChatSocketCompacted}
+                />
+              ) : (
+                undefined
+              )}
             </div>
           </div>
         ) : (
@@ -245,4 +224,6 @@ AtomContentChats.propTypes = {
   atom: PropTypes.object.isRequired,
   relevantConnections: PropTypes.object.isRequired,
   allowAdHoc: PropTypes.bool,
+  showAddPicker: PropTypes.bool.isRequired,
+  toggleAddPicker: PropTypes.func.isRequired,
 };

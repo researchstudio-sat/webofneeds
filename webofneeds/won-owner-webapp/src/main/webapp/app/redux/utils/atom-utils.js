@@ -61,8 +61,15 @@ export function getMatchedUseCaseIdentifier(atom) {
   return getIn(atom, ["matchedUseCase", "identifier"]);
 }
 
+/**
+ * returns the stored reactions for the specific atom (if socketType is undefined return all reactions)
+ * @param atom
+ * @param socketType
+ * @returns {*}
+ */
 export function getReactions(atom, socketType) {
-  return getIn(atom, ["matchedUseCase", "reactions", socketType]);
+  const reactions = getIn(atom, ["matchedUseCase", "reactions"]);
+  return socketType ? get(reactions, socketType) : reactions;
 }
 
 export function hasMatchedUseCase(atom) {

@@ -4,28 +4,23 @@
 
 won-atom-info {
   display: grid;
-  grid-template-areas: "header" "actions" "menu" "main";
-  grid-template-rows: min-content min-content min-content minmax(
-      $minimalGridRows,
-      1fr
-    );
+  grid-template-areas: "header" "actions" "menu" "main" "reactions";
+  grid-template-rows:
+    min-content min-content min-content minmax($minimalGridRows, 1fr)
+    min-content;
   box-sizing: border-box;
-
   > won-atom-header-big {
     grid-area: header;
   }
-
   > won-atom-menu {
     grid-area: menu;
   }
-
   > won-atom-content {
     padding: 0.5rem;
     box-sizing: border-box;
     grid-area: main;
     display: grid;
   }
-
   > won-atom-actions {
     grid-area: actions;
     display: grid;
@@ -34,5 +29,19 @@ won-atom-info {
     box-sizing: border-box;
     background: $won-secondary-color;
     color: white;
+  }
+  > won-atom-reactions {
+    grid-area: reactions;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    padding: 0.5rem;
+    border-top: $thinGrayBorder;
+    grid-gap: 1rem;
+    & > won-socket-add-button {
+      border: $thinGrayBorder;
+      &:hover {
+        border-color: $won-primary-color;
+      }
+    }
   }
 }

@@ -6,7 +6,6 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
-import ico36_plus from "~/images/won-icons/ico36_plus.svg";
 import {
   get,
   sortByDate,
@@ -21,6 +20,7 @@ import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import * as wonLabelUtils from "../../won-label-utils.js";
 import WonTitlePicker from "../details/picker/title-picker.jsx";
 import WonSocketAddAtom from "../socket-add-atom.jsx";
+import WonSocketAddButton from "../socket-add-button.jsx";
 
 import "~/style/_atom-content-socket.scss";
 import * as generalSelectors from "../../redux/selectors/general-selectors";
@@ -31,6 +31,8 @@ export default function WonAtomContentSocket({
   ItemComponent,
   allowAdHoc,
   relevantConnections,
+  showAddPicker,
+  toggleAddPicker,
 }) {
   const accountState = useSelector(generalSelectors.getAccountState);
   const isAtomOwned = accountUtils.isAtomOwned(accountState, get(atom, "uri"));
@@ -40,7 +42,6 @@ export default function WonAtomContentSocket({
   const [showSuggestions, toggleSuggestions] = useState(false);
   const [showClosed, toggleClosed] = useState(false);
   const [searchText, setSearchText] = useState({ value: "" });
-  const [showAddPicker, toggleAddPicker] = useState(false);
 
   const storedAtoms = useSelector(generalSelectors.getAtoms);
 
@@ -136,37 +137,6 @@ export default function WonAtomContentSocket({
     );
   }
 
-  function generateAddItem() {
-    if (atomUtils.isActive(atom) && (reactions || allowAdHoc)) {
-      const onClick = () => {
-        toggleAddPicker(!showAddPicker);
-      };
-
-      return (
-        <div className="socketadd clickable" onClick={onClick}>
-          <svg className="socketadd__icon" title="Create a new post">
-            <use xlinkHref={ico36_plus} href={ico36_plus} />
-          </svg>
-          <span className="socketadd__label">
-            {isAtomOwned
-              ? `Add ${
-                  reactions
-                    ? wonLabelUtils.getSocketItemLabels(reactions.keys())
-                    : "Atom"
-                }`
-              : `Connect ${
-                  reactions
-                    ? wonLabelUtils.getSocketItemLabels(reactions.keys())
-                    : "Atom"
-                }`}
-          </span>
-        </div>
-      );
-    } else {
-      return undefined;
-    }
-  }
-
   return (
     <won-atom-content-socket>
       <div className="acs__search">
@@ -185,7 +155,16 @@ export default function WonAtomContentSocket({
           <div className="acs__segment">
             <div className="acs__segment__content">
               {generateConnectionItems(activeConnections)}
-              {generateAddItem()}
+              {atomUtils.isActive(atom) && (reactions || allowAdHoc) ? (
+                <WonSocketAddButton
+                  senderReactions={reactions}
+                  isAtomOwned={isAtomOwned}
+                  onClick={() => toggleAddPicker(!showAddPicker)}
+                  targetSocketType={socketType}
+                />
+              ) : (
+                undefined
+              )}
             </div>
           </div>
         ) : (
@@ -303,4 +282,6 @@ WonAtomContentSocket.propTypes = {
   socketType: PropTypes.string.isRequired,
   ItemComponent: PropTypes.func.isRequired,
   allowAdHoc: PropTypes.bool,
+  showAddPicker: PropTypes.bool.isRequired,
+  toggleAddPicker: PropTypes.func.isRequired,
 };
