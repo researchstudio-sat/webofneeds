@@ -114,7 +114,7 @@ export default function WonSocketAddAtom({
 
   reactions &&
     reactions
-      .filter(reaction => !get(reaction, "refuseOwned"))
+      .filter(reaction => !isAddToAtomOwned || !get(reaction, "refuseOwned"))
       .map((reaction, socketType) => {
         const allowedUseCaseList = get(reaction, "useCaseIdentifiers");
 
