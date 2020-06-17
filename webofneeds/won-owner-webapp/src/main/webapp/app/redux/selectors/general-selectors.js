@@ -4,7 +4,7 @@
 
 import { createSelector } from "reselect";
 
-import { getIn, get } from "../../utils.js";
+import { getIn, get, extractAtomUriFromConnectionUri } from "../../utils.js";
 import * as atomUtils from "../utils/atom-utils.js";
 import * as connectionUtils from "../utils/connection-utils.js";
 import * as accountUtils from "../utils/account-utils.js";
@@ -314,7 +314,7 @@ export const getOwnedAtomByConnectionUri = connectionUri =>
     atoms =>
       connectionUri &&
       atoms &&
-      (get(atoms, connectionUri.split("/c")[0]) ||
+      (get(atoms, extractAtomUriFromConnectionUri(connectionUri)) ||
         atoms.find(atom => getIn(atom, ["connections", connectionUri])))
   );
 
@@ -427,7 +427,7 @@ export const getSenderSocketType = (allAtoms, connection) => {
   const senderAtom =
     connectionUri &&
     allAtoms &&
-    (getIn(allAtoms, connectionUri.split("/c")[0]) ||
+    (getIn(allAtoms, extractAtomUriFromConnectionUri(connectionUri)) ||
       allAtoms.find(atom => getIn(atom, ["connections", connectionUri])));
 
   return senderAtom && atomUtils.getSocketType(senderAtom, senderSocketUri);

@@ -428,7 +428,10 @@ export function filterConnectionsBySearchValue(
       }
 
       if (includeSenderAtom) {
-        const senderAtom = get(allAtomsImm, get(conn, "uri").split("/c")[0]);
+        const senderAtom = get(
+          allAtomsImm,
+          extractAtomUriFromConnectionUri(get(conn, "uri"))
+        );
         const senderAtomTitle = get(senderAtom, "humanReadable") || "";
 
         found = senderAtomTitle.search(regExp) !== -1;
@@ -719,6 +722,13 @@ export function compareArrayBuffers(left, right) {
   }
 
   return true;
+}
+
+export function extractAtomUriFromConnectionUri(connectionUri) {
+  return (
+    connectionUri &&
+    connectionUri.substring(0, connectionUri.lastIndexOf("/c/"))
+  );
 }
 
 export function generateFakePersonaName(atomUri) {

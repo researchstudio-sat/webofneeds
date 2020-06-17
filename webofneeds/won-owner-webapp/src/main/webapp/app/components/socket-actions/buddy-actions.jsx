@@ -3,7 +3,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { actionCreators } from "../../actions/actions";
 import PropTypes from "prop-types";
-import { generateLink, get } from "../../utils";
+import {
+  extractAtomUriFromConnectionUri,
+  generateLink,
+  get,
+} from "../../utils";
 import vocab from "../../service/vocab";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as connectionUtils from "../../redux/utils/connection-utils";
@@ -23,7 +27,7 @@ export default function WonBuddySocketActions({ connection, goBackOnAction }) {
   const connectionUri = get(connection, "uri");
 
   const senderAtom = useSelector(
-    generalSelectors.getAtom(connectionUri.split("/c")[0])
+    generalSelectors.getAtom(extractAtomUriFromConnectionUri(connectionUri))
   );
   const targetAtom = useSelector(
     generalSelectors.getAtom(get(connection, "targetAtomUri"))

@@ -12,6 +12,7 @@ import {
   sortByDate,
   filterConnectionsBySearchValue,
   filterAtomsBySearchValue,
+  extractAtomUriFromConnectionUri,
 } from "../../utils.js";
 
 import * as atomUtils from "../../redux/utils/atom-utils.js";
@@ -86,7 +87,12 @@ export default function WonAtomContentSocket({
           <ItemComponent
             connection={conn}
             atom={
-              flip ? get(storedAtoms, get(conn, "uri").split("/c")[0]) : atom
+              flip
+                ? get(
+                    storedAtoms,
+                    extractAtomUriFromConnectionUri(get(conn, "uri"))
+                  )
+                : atom
             }
             targetAtom={get(storedAtoms, get(conn, "targetAtomUri"))}
             isOwned={isAtomOwned}

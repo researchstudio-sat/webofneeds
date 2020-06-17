@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { useSelector, useDispatch } from "react-redux";
-import { get } from "../utils.js";
+import { get, extractAtomUriFromConnectionUri } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import vocab from "../service/vocab";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
@@ -43,9 +43,9 @@ export default function WonAtomActions({ atom, ownedConnection, className }) {
   const senderAtom = useSelector(
     state =>
       ownedConnection &&
-      generalSelectors.getAtom(get(ownedConnection, "uri").split("/c")[0])(
-        state
-      )
+      generalSelectors.getAtom(
+        extractAtomUriFromConnectionUri(get(ownedConnection, "uri"))
+      )(state)
   );
 
   let actionElement;

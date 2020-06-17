@@ -2,7 +2,7 @@ import { parseConnection } from "./parse-connection.js";
 import { markUriAsRead } from "../../won-localstorage.js";
 
 import { markAtomAsRead } from "./reduce-atoms.js";
-import { getIn, get } from "../../utils.js";
+import { getIn, get, extractAtomUriFromConnectionUri } from "../../utils.js";
 import * as connectionUtils from "../../redux/utils/connection-utils";
 import { addAtomStub } from "./reduce-atoms";
 
@@ -59,7 +59,7 @@ function addConnectionFull(atomState, connection) {
 }
 
 export function markConnectionAsRead(state, connectionUri) {
-  const atomUri = connectionUri && connectionUri.split("/c")[0];
+  const atomUri = extractAtomUriFromConnectionUri(connectionUri);
   const connection = getIn(state, [atomUri, "connections", connectionUri]);
 
   markUriAsRead(connectionUri);

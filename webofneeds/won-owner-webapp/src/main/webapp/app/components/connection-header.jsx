@@ -7,7 +7,12 @@ import WonAtomIcon from "./atom-icon.jsx";
 import WonConnectionState from "./connection-state.jsx";
 import PropTypes from "prop-types";
 import VisibilitySensor from "react-visibility-sensor";
-import { get, getIn, generateLink } from "../utils.js";
+import {
+  get,
+  getIn,
+  generateLink,
+  extractAtomUriFromConnectionUri,
+} from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { useSelector, useDispatch } from "react-redux";
 import { labels, relativeTime } from "../won-label-utils.js";
@@ -33,9 +38,9 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
 
   const senderAtomUri = flip
     ? get(connection, "targetAtomUri")
-    : connectionUri.split("/c")[0];
+    : extractAtomUriFromConnectionUri(connectionUri);
   const targetAtomUri = flip
-    ? connectionUri.split("/c")[0]
+    ? extractAtomUriFromConnectionUri(connectionUri)
     : get(connection, "targetAtomUri");
 
   const senderAtom = useSelector(state =>
