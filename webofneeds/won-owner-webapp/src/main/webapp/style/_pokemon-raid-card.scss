@@ -132,6 +132,7 @@ pokemon-raid-card {
       background: white;
 
       &.holderUseCaseIcon {
+        border-radius: 0;
         background: unset;
         padding: 0.2rem;
         box-sizing: border-box;
