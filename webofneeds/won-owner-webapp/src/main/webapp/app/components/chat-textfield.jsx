@@ -106,29 +106,10 @@ export default function ChatTextfield({
   const showAddMessageContent = useSelector(state =>
     getIn(state, ["view", "showAddMessageContent"])
   );
-  const SelectedDetailComponent = get(selectedDetail, "component");
+
   const personas = useSelector(state =>
     generalSelectors.getOwnedCondensedPersonaList(state).toJS()
   );
-
-  function getMultiSelectActionLabel() {
-    if (multiSelectType) {
-      switch (multiSelectType) {
-        case "rejects":
-          return "Reject selected";
-        case "retracts":
-          return "Retract selected";
-        case "proposes":
-          return "Propose selected";
-        case "accepts":
-          return "Accept selected";
-        case "proposesToCancel":
-          return "Propose To Cancel selected";
-        default:
-          return "illegal state";
-      }
-    }
-  }
 
   function updateDetail(name, value, closeOnDelete = false) {
     const _additionalContent = state.additionalContent;
@@ -452,6 +433,14 @@ export default function ChatTextfield({
         </div>
       );
     } else if (selectedDetail && !multiSelectType) {
+      //we need to call toJS because otherwise non functional PickerComponents are invalid
+      const selectedDetailJS = selectedDetail.toJS();
+
+      const selectedDetailIcon = get(selectedDetail, "icon");
+      const selectedDetailLabel = get(selectedDetail, "label");
+      const selectedDetailIdentifier = get(selectedDetail, "identifier");
+      const SelectedDetailComponent = selectedDetailJS.component;
+
       detailsElement = (
         <div className="cts__details__input">
           <div className="cts__details__input__header">
@@ -464,24 +453,21 @@ export default function ChatTextfield({
               <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
             </svg>
             <svg className="cts__details__input__header__icon">
-              <use
-                xlinkHref={get(selectedDetail, "icon")}
-                href={get(selectedDetail, "icon")}
-              />
+              <use xlinkHref={selectedDetailIcon} href={selectedDetailIcon} />
             </svg>
             <div className="cts__details__input__header__label">
-              {get(selectedDetail, "label")}
+              {selectedDetailLabel}
             </div>
           </div>
           {SelectedDetailComponent && (
             <SelectedDetailComponent
               className="cts__details__input__content"
               onUpdate={({ value }) =>
-                updateDetail(get(selectedDetail, "identifier"), value)
+                updateDetail(selectedDetailIdentifier, value)
               }
               initialValue={get(
                 state.additionalContent,
-                get(selectedDetail, "identifier")
+                selectedDetailIdentifier
               )}
               detail={selectedDetail.toJS()}
             />
@@ -489,6 +475,23 @@ export default function ChatTextfield({
         </div>
       );
     } else if (!selectedDetail && multiSelectType) {
+      const getMultiSelectActionLabel = () => {
+        switch (multiSelectType) {
+          case "rejects":
+            return "Reject selected";
+          case "retracts":
+            return "Retract selected";
+          case "proposes":
+            return "Propose selected";
+          case "accepts":
+            return "Accept selected";
+          case "proposesToCancel":
+            return "Propose To Cancel selected";
+          default:
+            return "illegal state";
+        }
+      };
+
       detailsElement = (
         <div className="cts__details__input">
           <div className="cts__details__input__header">
