@@ -28,23 +28,13 @@ export default function WonEditAtom({ fromAtom }) {
   );
   const accountState = useSelector(generalSelectors.getAccountState);
 
-  const useCase = useCaseUtils.getUseCase(
-    atomUtils.getMatchedUseCaseIdentifier(fromAtom) || "customUseCase"
+  const useCaseImm = useCaseUtils.getUseCaseImmMergedWithAtom(
+    atomUtils.getMatchedUseCaseIdentifier(fromAtom) || "customUseCase",
+    fromAtom
   );
 
-  const fromAtomContent = get(fromAtom, "content");
-  const fromAtomSeeks = get(fromAtom, "seeks");
-
-  if (fromAtomContent) {
-    useCase.draft.content = fromAtomContent.toJS();
-  }
-  if (fromAtomSeeks) {
-    useCase.draft.seeks = fromAtomSeeks.toJS();
-  }
-
-  const [draftObject, setDraftObject] = useState(
-    JSON.parse(JSON.stringify(useCase.draft))
-  );
+  const useCase = useCaseImm.toJS();
+  const [draftObject, setDraftObject] = useState(useCase.draft);
 
   const loggedIn = accountUtils.isLoggedIn(accountState);
 

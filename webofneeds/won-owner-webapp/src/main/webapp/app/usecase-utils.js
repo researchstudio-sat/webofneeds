@@ -325,6 +325,50 @@ export function getUseCase(useCaseString) {
   return undefined;
 }
 
+/**
+ * Returns the Immutable useCase definition for the given useCaseIdentifier, merged with the content and seeks
+ * of the given atomToMergeImm -> if there are sockets in the useCase that are not present in the atomToMerge, they
+ * will be added
+ * @param useCaseIdentifier
+ * @param atomToMergeImm
+ * @returns {any} Immutable useCase Object (used for edit-atom functionality)
+ */
+export function getUseCaseImmMergedWithAtom(useCaseIdentifier, atomToMergeImm) {
+  let useCaseImm = get(useCasesImm, useCaseIdentifier);
+
+  if (useCaseImm) {
+    const atomToMergeContent = get(atomToMergeImm, "content");
+    if (atomToMergeContent) {
+      const contentSockets =
+        getIn(useCaseImm, ["draft", "content", "sockets"]) || Immutable.Map();
+      const atomToMergeContentSockets =
+        get(atomToMergeContent, "sockets") || Immutable.Map();
+
+      const mergedSockets = contentSockets
+        .flip()
+        .merge(atomToMergeContentSockets.flip())
+        .map(
+          socketUri =>
+            socketUri.startsWith("#")
+              ? get(atomToMergeImm, "uri") + socketUri
+              : socketUri
+        )
+        .flip();
+
+      useCaseImm = useCaseImm.setIn(
+        ["draft", "content"],
+        atomToMergeContent.set("sockets", mergedSockets)
+      );
+    }
+
+    const atomToMergeSeeks = get(atomToMergeImm, "seeks");
+    if (atomToMergeSeeks) {
+      useCaseImm = useCaseImm.setIn(["draft", "seeks"], atomToMergeSeeks);
+    }
+  }
+  return useCaseImm;
+}
+
 export function getUseCaseGroupByIdentifier(groupIdentifier) {
   const foundUseCaseGroup =
     groupIdentifier &&

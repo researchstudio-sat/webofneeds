@@ -515,37 +515,7 @@ export function sortByDistanceFrom(atomsImm, location, order = "ASC") {
 
 function getSocketKeysReset(socketsImm) {
   //TODO: Needs to be generic somehow, otherwise every socket that is added would not be able to be reset correctly
-  return socketsImm.mapKeys((key, value) => {
-    switch (value) {
-      case vocab.CHAT.ChatSocketCompacted:
-        return "#chatSocket";
-      case vocab.GROUP.GroupSocketCompacted:
-        return "#groupSocket";
-      case vocab.HOLD.HolderSocketCompacted:
-        return "#holderSocket";
-      case vocab.HOLD.HoldableSocketCompacted:
-        return "#holdableSocket";
-      case vocab.REVIEW.ReviewSocketCompacted:
-        return "#reviewSocket";
-      case vocab.BUDDY.BuddySocketCompacted:
-        return "#buddySocket";
-      case vocab.WXSCHEMA.WorksForInverseSocketCompacted:
-        return "#worksForInverseSocket";
-      case vocab.WXSCHEMA.MemberSocketCompacted:
-        return "#memberSocket";
-      case vocab.WXSCHEMA.AssociatedArticleSocketCompacted:
-        return "#associatedArticleSocket";
-      case vocab.WXSCHEMA.WorksForSocketCompacted:
-        return "#worksForSocket";
-      case vocab.WXSCHEMA.MemberOfSocketCompacted:
-        return "#memberOfSocket";
-      case vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted:
-        return "#associatedArticleInverseSocket";
-      default:
-        console.warn("Trying to reset an unknown socket: ", value);
-        return "#unknownSocket";
-    }
-  });
+  return socketsImm.mapKeys(key => key.substr(key.lastIndexOf("#")));
 }
 
 /**
