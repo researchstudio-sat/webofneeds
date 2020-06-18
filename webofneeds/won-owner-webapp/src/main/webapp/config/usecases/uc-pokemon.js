@@ -25,7 +25,7 @@ export const pokemonGoRaid = {
   reactions: {
     [vocab.GROUP.GroupSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["pokemonInterest"],
+        useCaseIdentifiers: ["pokemonInterest", "persona"],
       },
       [vocab.GROUP.GroupSocketCompacted]: {
         useCaseIdentifiers: ["pokemonGoRaid"],

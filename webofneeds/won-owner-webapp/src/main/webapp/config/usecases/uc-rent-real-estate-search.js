@@ -42,7 +42,7 @@ export const rentRealEstateSearch = {
   reactions: {
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["rentRealEstateOffer"],
+        useCaseIdentifiers: ["rentRealEstateOffer", "persona"],
         refuseOwned: true,
       },
     },

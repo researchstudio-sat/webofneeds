@@ -1,35 +1,36 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import { generateLink } from "../utils.js";
-import * as generalSelectors from "../redux/selectors/general-selectors.js";
-import { useSelector } from "react-redux";
 import WonTitlePicker from "./details/picker/title-picker.jsx";
 import * as useCaseUtils from "../usecase-utils.js";
 
 import "~/style/_usecase-picker.scss";
 import { Link } from "react-router-dom";
 
-export default function WonUseCasePicker() {
+export default function WonUseCasePicker({
+  visibleUseCasesByConfig,
+  filterBySocketType,
+}) {
   const [state, setState] = useState({
     searchText: "",
     searchResults: [],
   });
 
-  const visibleUseCasesByConfig = useSelector(
-    generalSelectors.getVisibleUseCasesByConfig
-  );
   const showGroupsThreshold = 1;
   const customUseCase = useCaseUtils.getCustomUseCase();
   const visibleUseCaseGroups =
     visibleUseCasesByConfig &&
     useCaseUtils.getVisibleUseCaseGroups(
       showGroupsThreshold,
-      visibleUseCasesByConfig
+      visibleUseCasesByConfig,
+      filterBySocketType
     );
   const ungroupedUseCases =
     visibleUseCasesByConfig &&
     useCaseUtils.getUnGroupedUseCases(
       showGroupsThreshold,
-      visibleUseCasesByConfig
+      visibleUseCasesByConfig,
+      filterBySocketType
     );
 
   function startFromRoute(location, selectedUseCase) {
@@ -37,9 +38,7 @@ export default function WonUseCasePicker() {
       selectedUseCase && selectedUseCase.identifier;
 
     if (selectedUseCaseIdentifier) {
-      return `${location.pathname}?useCase=${encodeURIComponent(
-        selectedUseCaseIdentifier
-      )}`;
+      return generateLink(location, { useCase: selectedUseCaseIdentifier });
     } else {
       console.warn("No identifier found for given usecase, ", selectedUseCase);
     }
@@ -65,7 +64,8 @@ export default function WonUseCasePicker() {
     if (value && value.trim().length > 1) {
       searchResults = useCaseUtils.filterUseCasesBySearchQuery(
         value,
-        visibleUseCasesByConfig
+        visibleUseCasesByConfig,
+        filterBySocketType
       );
 
       if (searchResults) {
@@ -204,3 +204,7 @@ export default function WonUseCasePicker() {
     </won-usecase-picker>
   );
 }
+WonUseCasePicker.propTypes = {
+  visibleUseCasesByConfig: PropTypes.object.isRequired,
+  filterBySocketType: PropTypes.string,
+};

@@ -31,7 +31,7 @@ export const cyclingPlan = {
   reactions: {
     [vocab.GROUP.GroupSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["cyclingInterest"],
+        useCaseIdentifiers: ["cyclingInterest", "persona"],
       },
       [vocab.GROUP.GroupSocketCompacted]: {
         useCaseIdentifiers: ["cyclingPlan"],

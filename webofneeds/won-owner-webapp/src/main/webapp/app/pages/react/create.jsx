@@ -43,6 +43,10 @@ export default function PageCreate() {
   const showModalDialog = useSelector(viewSelectors.showModalDialog);
   const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
 
+  const visibleUseCasesByConfig = useSelector(
+    generalSelectors.getVisibleUseCasesByConfig
+  );
+
   const isFromAtomLoading = fromAtomUri
     ? processUtils.isAtomLoading(processState, fromAtomUri)
     : false;
@@ -76,9 +80,19 @@ export default function PageCreate() {
   );
 
   if (showUseCaseGroup) {
-    contentElement = <WonUseCaseGroup />;
+    contentElement = (
+      <WonUseCaseGroup
+        visibleUseCasesByConfig={visibleUseCasesByConfig}
+        filterBySocketType={senderSocketType}
+      />
+    );
   } else if (showUseCasePicker) {
-    contentElement = <WonUseCasePicker />;
+    contentElement = (
+      <WonUseCasePicker
+        visibleUseCasesByConfig={visibleUseCasesByConfig}
+        filterBySocketType={senderSocketType}
+      />
+    );
   } else if (showCreatePostFromAtom) {
     if (
       fromAtom &&

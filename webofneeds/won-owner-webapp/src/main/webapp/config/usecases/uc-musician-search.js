@@ -35,7 +35,7 @@ export const musicianSearch = {
   reactions: {
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["bandSearch"],
+        useCaseIdentifiers: ["bandSearch", "persona"],
         refuseOwned: true,
       },
     },

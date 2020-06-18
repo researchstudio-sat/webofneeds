@@ -32,7 +32,7 @@ export const goodsServiceSearch = {
   reactions: {
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["serviceOffer", "goodsOffer"],
+        useCaseIdentifiers: ["serviceOffer", "goodsOffer", "persona"],
         refuseOwned: true,
       },
     },

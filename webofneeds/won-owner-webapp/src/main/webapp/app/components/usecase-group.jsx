@@ -1,18 +1,16 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import PropTypes from "prop-types";
 import * as useCaseUtils from "../usecase-utils.js";
-import * as generalSelectors from "../redux/selectors/general-selectors.js";
 
 import "~/style/_usecase-group.scss";
 import { getQueryParams, generateLink } from "../utils";
 import { Link, useHistory } from "react-router-dom";
 
-export default function WonUseCaseGroup() {
+export default function WonUseCaseGroup({
+  visibleUseCasesByConfig,
+  filterBySocketType,
+}) {
   const history = useHistory();
-  const visibleUseCasesByConfig = useSelector(
-    generalSelectors.getVisibleUseCasesByConfig
-  );
-
   const { useCaseGroup } = getQueryParams(history.location);
 
   const visibleUseCaseGroup =
@@ -58,7 +56,8 @@ export default function WonUseCaseGroup() {
                 (subItem, index) =>
                   useCaseUtils.isDisplayableItem(
                     subItem,
-                    visibleUseCasesByConfig
+                    visibleUseCasesByConfig,
+                    filterBySocketType
                   ) ? (
                     <Link
                       key={subItem.identifier + "-" + index}
@@ -90,3 +89,7 @@ export default function WonUseCaseGroup() {
     </won-usecase-group>
   );
 }
+WonUseCaseGroup.propTypes = {
+  visibleUseCasesByConfig: PropTypes.object.isRequired,
+  filterBySocketType: PropTypes.string,
+};
