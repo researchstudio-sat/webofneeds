@@ -29,7 +29,7 @@ export const goodsTransportSearch = {
   reactions: {
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["goodsTransportOffer"],
+        useCaseIdentifiers: ["goodsTransportOffer", "persona"],
         refuseOwned: true,
       },
     },

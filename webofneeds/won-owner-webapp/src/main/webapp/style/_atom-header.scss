@@ -5,6 +5,7 @@
 
 a.won-atom-header,
 won-atom-header {
+  &.won-to-load,
   &.won-is-loading {
     @include animateOpacityHeartBeat();
     pointer-events: none;

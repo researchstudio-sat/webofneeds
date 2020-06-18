@@ -69,6 +69,11 @@ export default function WonConnectionContextDropdown({
   const isTargetAtomEditable = useSelector(
     generalSelectors.isAtomEditable(targetAtomUri)
   );
+
+  const targetAtomUseCaseIdentifier = atomUtils.getMatchedUseCaseIdentifier(
+    targetAtom
+  );
+
   const connectionLoading =
     !connection || processUtils.isConnectionLoading(process, connectionUri);
 
@@ -198,9 +203,11 @@ export default function WonConnectionContextDropdown({
               location,
               {
                 fromAtomUri: targetAtomUri,
+                useCase: targetAtomUseCaseIdentifier,
                 mode: "DUPLICATE",
               },
-              "/create"
+              "/create",
+              false
             )
           }
         >
@@ -217,9 +224,11 @@ export default function WonConnectionContextDropdown({
               location,
               {
                 fromAtomUri: targetAtomUri,
+                useCase: targetAtomUseCaseIdentifier,
                 mode: "EDIT",
               },
-              "/create"
+              "/create",
+              false
             )
           }
         >

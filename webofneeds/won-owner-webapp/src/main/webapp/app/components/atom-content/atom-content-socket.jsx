@@ -29,7 +29,6 @@ export default function WonAtomContentSocket({
   atom,
   socketType,
   ItemComponent,
-  allowAdHoc,
   relevantConnections,
   showAddPicker,
   toggleAddPicker,
@@ -151,11 +150,11 @@ export default function WonAtomContentSocket({
         />
       </div>
       {!showAddPicker ? (
-        activeConnections.size > 0 || reactions || allowAdHoc ? (
+        activeConnections.size > 0 || reactions ? (
           <div className="acs__segment">
             <div className="acs__segment__content">
               {generateConnectionItems(activeConnections)}
-              {atomUtils.isActive(atom) && (reactions || allowAdHoc) ? (
+              {atomUtils.isActive(atom) && reactions ? (
                 <WonSocketAddButton
                   senderReactions={reactions}
                   isAtomOwned={isAtomOwned}
@@ -264,7 +263,6 @@ export default function WonAtomContentSocket({
           addToAtom={atom}
           storedAtoms={filteredStoredAtoms}
           addToSocketType={socketType}
-          allowAdHoc={allowAdHoc}
           reactions={reactions}
           accountState={accountState}
           onClose={() => toggleAddPicker(!showAddPicker)}
@@ -281,7 +279,6 @@ WonAtomContentSocket.propTypes = {
   relevantConnections: PropTypes.object.isRequired,
   socketType: PropTypes.string.isRequired,
   ItemComponent: PropTypes.func.isRequired,
-  allowAdHoc: PropTypes.bool,
   showAddPicker: PropTypes.bool.isRequired,
   toggleAddPicker: PropTypes.func.isRequired,
 };

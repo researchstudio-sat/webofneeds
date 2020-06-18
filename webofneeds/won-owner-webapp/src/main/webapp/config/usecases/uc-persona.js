@@ -34,7 +34,7 @@ export const persona = {
     },
     [vocab.BUDDY.BuddySocketCompacted]: {
       [vocab.BUDDY.BuddySocketCompacted]: {
-        useCaseIdentifiers: ["persona"],
+        useCaseIdentifiers: ["persona", "persona"],
         refuseOwned: true,
       },
     },
@@ -46,7 +46,7 @@ export const persona = {
     },
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["persona"],
+        useCaseIdentifiers: ["persona", "persona"],
         refuseOwned: true,
       },
       [vocab.GROUP.GroupSocketCompacted]: {

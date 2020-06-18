@@ -255,15 +255,26 @@ function initializeAllMessageDetails() {
  * @param visibleUseCasesArray => array of useCaseIdentifier that are visible
  * @returns {*}
  */
-export function getUnGroupedUseCases(threshold = 0, visibleUseCasesArray) {
+export function getUnGroupedUseCases(
+  threshold = 0,
+  visibleUseCasesArray,
+  filterBySocketType
+) {
   let ungroupedUseCasesImm = useCasesImm;
 
   useCaseGroupsImm
     .filter(
       useCaseGroup =>
-        isDisplayableUseCaseGroupImm(useCaseGroup, visibleUseCasesArray) &&
-        countDisplayableItemsInGroupImm(useCaseGroup, visibleUseCasesArray) >
-          threshold
+        isDisplayableUseCaseGroupImm(
+          useCaseGroup,
+          visibleUseCasesArray,
+          filterBySocketType
+        ) &&
+        countDisplayableItemsInGroupImm(
+          useCaseGroup,
+          visibleUseCasesArray,
+          filterBySocketType
+        ) > threshold
     )
     .map(useCaseGroup => {
       // don't show usecases in groups as single use cases
@@ -281,7 +292,13 @@ export function getUnGroupedUseCases(threshold = 0, visibleUseCasesArray) {
   return (
     ungroupedUseCasesImm &&
     ungroupedUseCasesImm
-      .filter(useCase => isDisplayableUseCaseImm(useCase, visibleUseCasesArray))
+      .filter(useCase =>
+        isDisplayableUseCaseImm(
+          useCase,
+          visibleUseCasesArray,
+          filterBySocketType
+        )
+      )
       .toJS()
   );
 }
@@ -323,23 +340,61 @@ export function getUseCaseGroupByIdentifier(groupIdentifier) {
  * @param visibleUseCasesArray => array of useCaseIdentifier that are visible
  * @returns {*}
  */
-export function isDisplayableUseCase(useCase, visibleUseCasesArray) {
+export function isDisplayableUseCase(
+  useCase,
+  visibleUseCasesArray,
+  filterBySocketType
+) {
+  if (filterBySocketType) {
+    const sockets = getIn(useCase, ["draft", "content", "sockets"]);
+
+    if (sockets) {
+      let foundSocket = false;
+      for (const key in sockets) {
+        if (sockets[key] === filterBySocketType) {
+          foundSocket = true;
+          break;
+        }
+      }
+      if (!foundSocket) {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
   return (
     useCase &&
     isInVisibleUseCaseArray(useCase, visibleUseCasesArray) &&
     useCase.identifier &&
-    !useCase.hidden &&
+    (filterBySocketType || !useCase.hidden) &&
     (useCase.label || useCase.icon) &&
     !useCase.subItems
   );
 }
 
-function isDisplayableUseCaseImm(useCaseImm, visibleUseCasesArray) {
+function isDisplayableUseCaseImm(
+  useCaseImm,
+  visibleUseCasesArray,
+  filterBySocketType
+) {
+  if (filterBySocketType) {
+    const socketsImm = getIn(useCaseImm, ["draft", "content", "sockets"]);
+
+    if (
+      !socketsImm ||
+      !socketsImm.find(socketType => socketType === filterBySocketType)
+    ) {
+      return false;
+    }
+  }
+
   return (
     useCaseImm &&
     get(useCaseImm, "identifier") &&
     isInVisibleUseCaseArray(useCaseImm, visibleUseCasesArray) &&
-    !get(useCaseImm, "hidden") &&
+    (filterBySocketType || !get(useCaseImm, "hidden")) &&
     (get(useCaseImm, "label") || get(useCaseImm, "icon")) &&
     !get(useCaseImm, "subItems")
   );
@@ -351,17 +406,33 @@ function isDisplayableUseCaseImm(useCaseImm, visibleUseCasesArray) {
  * @param visibleUseCasesArray => array of useCaseIdentifier that are visible
  * @returns {*}
  */
-export function isDisplayableItem(item, visibleUseCasesArray) {
+export function isDisplayableItem(
+  item,
+  visibleUseCasesArray,
+  filterBySocketType
+) {
   return (
-    isDisplayableUseCase(item, visibleUseCasesArray) ||
-    isDisplayableUseCaseGroup(item, visibleUseCasesArray)
+    isDisplayableUseCase(item, visibleUseCasesArray, filterBySocketType) ||
+    isDisplayableUseCaseGroup(item, visibleUseCasesArray, filterBySocketType)
   );
 }
 
-function isDisplayableItemImm(itemImm, visibleUseCasesArray) {
+function isDisplayableItemImm(
+  itemImm,
+  visibleUseCasesArray,
+  filterBySocketType
+) {
   return (
-    isDisplayableUseCaseImm(itemImm, visibleUseCasesArray) ||
-    isDisplayableUseCaseGroupImm(itemImm, visibleUseCasesArray)
+    isDisplayableUseCaseImm(
+      itemImm,
+      visibleUseCasesArray,
+      filterBySocketType
+    ) ||
+    isDisplayableUseCaseGroupImm(
+      itemImm,
+      visibleUseCasesArray,
+      filterBySocketType
+    )
   );
 }
 
@@ -372,7 +443,11 @@ function isDisplayableItemImm(itemImm, visibleUseCasesArray) {
  * @param visibleUseCasesArray => array of useCaseIdentifier that are visible
  * @returns {*}
  */
-export function isDisplayableUseCaseGroup(useCaseGroup, visibleUseCasesArray) {
+export function isDisplayableUseCaseGroup(
+  useCaseGroup,
+  visibleUseCasesArray,
+  filterBySocketType
+) {
   const useCaseGroupValid =
     useCaseGroup &&
     (useCaseGroup.label || useCaseGroup.icon) &&
@@ -380,7 +455,13 @@ export function isDisplayableUseCaseGroup(useCaseGroup, visibleUseCasesArray) {
 
   if (useCaseGroupValid) {
     for (const key in useCaseGroup.subItems) {
-      if (isDisplayableItem(useCaseGroup.subItems[key], visibleUseCasesArray)) {
+      if (
+        isDisplayableItem(
+          useCaseGroup.subItems[key],
+          visibleUseCasesArray,
+          filterBySocketType
+        )
+      ) {
         return true;
       }
     }
@@ -388,7 +469,11 @@ export function isDisplayableUseCaseGroup(useCaseGroup, visibleUseCasesArray) {
   return false;
 }
 
-function isDisplayableUseCaseGroupImm(useCaseGroupImm, visibleUseCasesArray) {
+function isDisplayableUseCaseGroupImm(
+  useCaseGroupImm,
+  visibleUseCasesArray,
+  filterBySocketType
+) {
   const useCaseGroupValid =
     useCaseGroupImm &&
     (get(useCaseGroupImm, "label") || get(useCaseGroupImm, "icon")) &&
@@ -399,7 +484,7 @@ function isDisplayableUseCaseGroupImm(useCaseGroupImm, visibleUseCasesArray) {
     return !!(
       subItems &&
       subItems.find(subItem =>
-        isDisplayableItemImm(subItem, visibleUseCasesArray)
+        isDisplayableItemImm(subItem, visibleUseCasesArray, filterBySocketType)
       )
     );
   }
@@ -414,13 +499,14 @@ function isDisplayableUseCaseGroupImm(useCaseGroupImm, visibleUseCasesArray) {
  */
 function countDisplayableItemsInGroupImm(
   useCaseGroupImm,
-  visibleUseCasesArray
+  visibleUseCasesArray,
+  filterBySocketType
 ) {
   const subItems = get(useCaseGroupImm, "subItems");
 
   const size = subItems
     ? subItems.filter(subItem =>
-        isDisplayableItemImm(subItem, visibleUseCasesArray)
+        isDisplayableItemImm(subItem, visibleUseCasesArray, filterBySocketType)
       ).size
     : 0;
 
@@ -436,12 +522,21 @@ export function isUseCaseGroup(element) {
   return element.subItems;
 }
 
-export function filterUseCasesBySearchQuery(queryString, visibleUseCasesArray) {
+export function filterUseCasesBySearchQuery(
+  queryString,
+  visibleUseCasesArray,
+  filterBySocketType
+) {
   const resultSet =
     useCasesImm &&
     useCasesImm
       .filter(useCase =>
-        searchFunctionImm(useCase, queryString, visibleUseCasesArray)
+        searchFunctionImm(
+          useCase,
+          queryString,
+          visibleUseCasesArray,
+          filterBySocketType
+        )
       )
       .toSet();
 
@@ -452,9 +547,20 @@ export function filterUseCasesBySearchQuery(queryString, visibleUseCasesArray) {
   return Array.from(resultSet.toJS());
 }
 
-function searchFunctionImm(useCaseImm, searchString, visibleUseCasesArray) {
+function searchFunctionImm(
+  useCaseImm,
+  searchString,
+  visibleUseCasesArray,
+  filterBySocketType
+) {
   // don't treat use cases that can't be displayed as results
-  if (!isDisplayableUseCaseImm(useCaseImm, visibleUseCasesArray)) {
+  if (
+    !isDisplayableUseCaseImm(
+      useCaseImm,
+      visibleUseCasesArray,
+      filterBySocketType
+    )
+  ) {
     return false;
   }
   // check for searchString in use case label and draft
@@ -481,14 +587,25 @@ function hasSubElements(obj) {
   return obj && obj !== {} && Object.keys(obj).length > 0;
 }
 
-export function getVisibleUseCaseGroups(threshold, visibleUseCasesArray) {
+export function getVisibleUseCaseGroups(
+  threshold,
+  visibleUseCasesArray,
+  filterBySocketType
+) {
   const visibleUseCaseGroups =
     useCaseGroupsImm &&
     useCaseGroupsImm.filter(
       useCaseGroup =>
-        isDisplayableUseCaseGroupImm(useCaseGroup, visibleUseCasesArray) &&
-        countDisplayableItemsInGroupImm(useCaseGroup, visibleUseCasesArray) >
-          threshold
+        isDisplayableUseCaseGroupImm(
+          useCaseGroup,
+          visibleUseCasesArray,
+          filterBySocketType
+        ) &&
+        countDisplayableItemsInGroupImm(
+          useCaseGroup,
+          visibleUseCasesArray,
+          filterBySocketType
+        ) > threshold
     );
 
   return visibleUseCaseGroups && visibleUseCaseGroups.toJS();

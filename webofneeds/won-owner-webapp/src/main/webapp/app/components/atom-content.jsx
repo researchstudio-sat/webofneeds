@@ -184,7 +184,6 @@ export default function WonAtomContent({
             atom={atom}
             socketType={visibleTab}
             ItemComponent={WonParticipantItem}
-            allowAdHoc={true}
             relevantConnections={relevantConnections}
             showAddPicker={showAddPicker}
             toggleAddPicker={toggleAddPicker}
@@ -229,10 +228,11 @@ export default function WonAtomContent({
         visibleTabFragment = (
           <WonAtomContentChats
             atom={atom}
-            allowAdHoc={!isOwned}
             showAddPicker={showAddPicker}
             toggleAddPicker={toggleAddPicker}
             // We filter out every chat connection that is not owned, otherwise the count would show non owned chatconnections of non owned atoms
+            // TODO: If isOwned is false, then we need to remove all the Group to Chat connections from the relevantConnections, otherwise we will
+            // otherwise we allow the groupChat owner to send a direct message from the group to one single member
             relevantConnections={relevantConnections.filter(
               conn =>
                 isOwned || connectionUtils.hasTargetSocketUri(conn, socketUri)

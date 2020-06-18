@@ -27,7 +27,6 @@ import "~/style/_atom-content-chats.scss";
 
 export default function AtomContentChats({
   atom,
-  allowAdHoc,
   relevantConnections,
   showAddPicker,
   toggleAddPicker,
@@ -131,11 +130,11 @@ export default function AtomContentChats({
         />
       </div>
       {!showAddPicker ? (
-        activeChatConnections.size > 0 || reactions || allowAdHoc ? (
+        activeChatConnections.size > 0 || reactions ? (
           <div className="acc__segment">
             <div className="acc__segment__content borderTop">
               {generateConnectionItems(activeChatConnections)}
-              {atomUtils.isActive(atom) && (reactions || allowAdHoc) ? (
+              {atomUtils.isActive(atom) && reactions ? (
                 <WonSocketAddButton
                   senderReactions={reactions}
                   isAtomOwned={isAtomOwned}
@@ -208,7 +207,6 @@ export default function AtomContentChats({
           addToAtom={atom}
           storedAtoms={filteredStoredAtoms}
           addToSocketType={vocab.CHAT.ChatSocketCompacted}
-          allowAdHoc={allowAdHoc}
           reactions={reactions}
           accountState={accountState}
           onClose={() => toggleAddPicker(!showAddPicker)}
@@ -223,7 +221,6 @@ export default function AtomContentChats({
 AtomContentChats.propTypes = {
   atom: PropTypes.object.isRequired,
   relevantConnections: PropTypes.object.isRequired,
-  allowAdHoc: PropTypes.bool,
   showAddPicker: PropTypes.bool.isRequired,
   toggleAddPicker: PropTypes.func.isRequired,
 };

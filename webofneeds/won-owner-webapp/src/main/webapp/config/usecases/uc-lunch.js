@@ -31,7 +31,7 @@ export const lunchPlan = {
   reactions: {
     [vocab.GROUP.GroupSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["lunchInterest"],
+        useCaseIdentifiers: ["lunchInterest", "persona"],
       },
       [vocab.GROUP.GroupSocketCompacted]: { useCaseIdentifiers: ["lunchPlan"] },
     },

@@ -31,7 +31,6 @@ import Immutable from "immutable";
  * @param reactions - useCase reactions: json object see uc-persona.js as an example
  * @param accountState - accountState redux store -> to determine ownership of the storedAtoms, and login status
  * @param onClose - function that is executed when the close Button is clicked
- * @param allowAdHoc - if true then the adHoc Connect textfield will be visible, connecting Generated Persona or Personas with the addToAtom
  * @returns {*}
  */
 export default function WonSocketAddAtom({
@@ -41,7 +40,6 @@ export default function WonSocketAddAtom({
   reactions,
   accountState,
   onClose,
-  allowAdHoc,
 }) {
   const dispatch = useDispatch();
   const history = useHistory();
@@ -49,13 +47,13 @@ export default function WonSocketAddAtom({
   const addToAtomSocketUri = atomUtils.getSocketUri(addToAtom, addToSocketType);
   const isAddToAtomOwned = accountUtils.isAtomOwned(accountState, addToAtomUri);
 
-  if (!isAddToAtomOwned) {
-    console.error(
-      "Atom: ",
-      addToAtom,
-      " is not owned, yet the component refuses to allow Owned Atoms to connect -> you are gonna have a bad time :-("
-    );
-  }
+  const allowAdHoc = !!reactions.find(
+    (reaction, socketType) =>
+      socketType === vocab.CHAT.ChatSocketCompacted &&
+      (get(reaction, "useCaseIdentifiers", "*") ||
+        (get(reaction, "useCaseIdentifiers", "persona") &&
+          !(isAddToAtomOwned && get(reaction, "refuseOwned"))))
+  );
 
   //If the addToAtom is Owned, we preselect the holderUri (if present) to be used as the holder of the new atom to establish a connection with
   const addHolderUri = isAddToAtomOwned
@@ -118,21 +116,20 @@ export default function WonSocketAddAtom({
       .map((reaction, socketType) => {
         const allowedUseCaseList = get(reaction, "useCaseIdentifiers");
 
-        return allowedUseCaseList
-          .filter(ucIdentifier => ucIdentifier !== "*") //TODO: REMOVE THIS ONCE WE KNOW HOW TO HANDLE WILDCARD USECASES
-          .map(ucIdentifier =>
-            createAtomReactionsArray.push({
-              ucIdentifier: ucIdentifier,
-              socketType: socketType,
-            })
-          );
+        return allowedUseCaseList.map(ucIdentifier =>
+          createAtomReactionsArray.push({
+            ucIdentifier: ucIdentifier,
+            socketType: socketType,
+          })
+        );
       });
 
   const sortedPossibleAtomsArray =
     sortedPossibleAtoms &&
-    sortBy(sortedPossibleAtoms, elem =>
-      (get(elem, "humanReadable") || "").toLowerCase()
-    );
+    sortBy(sortedPossibleAtoms, elem => {
+      const humanReadable = get(elem, "humanReadable");
+      return humanReadable ? humanReadable.toLowerCase() : undefined;
+    });
 
   function selectAtom(selectedAtom) {
     const selectedAtomUri = get(selectedAtom, "uri");
@@ -386,7 +383,7 @@ export default function WonSocketAddAtom({
               generateLink(
                 location,
                 {
-                  useCase: ucIdentifier,
+                  useCase: ucIdentifier !== "*" ? ucIdentifier : undefined,
                   fromAtomUri: addToAtomUri,
                   senderSocketType: socketType,
                   targetSocketType: addToSocketType,
@@ -440,7 +437,9 @@ export default function WonSocketAddAtom({
             submitButtonLabel={
               addToSocketType === vocab.CHAT.ChatSocketCompacted
                 ? "Ask to Chat"
-                : "Join Group"
+                : isAddToAtomOwned
+                  ? "Join"
+                  : "Ask to Join"
             }
             onSubmit={({ value, selectedPersona }) =>
               sendAdHocRequest(
@@ -464,5 +463,4 @@ WonSocketAddAtom.propTypes = {
   storedAtoms: PropTypes.object.isRequired,
   accountState: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
-  allowAdHoc: PropTypes.bool,
 };

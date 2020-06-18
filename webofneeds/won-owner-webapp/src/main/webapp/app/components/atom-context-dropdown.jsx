@@ -58,6 +58,9 @@ export default function WonAtomContextDropdown({ atom, className }) {
     generalSelectors.isAtomUsableAsTemplate(atomUri)
   );
   const isEditable = useSelector(generalSelectors.isAtomEditable(atomUri));
+
+  const useCaseIdentifier = atomUtils.getMatchedUseCaseIdentifier(atom);
+
   const atomLoading =
     !atom || processUtils.isAtomLoading(process, get(atom, "uri"));
   const atomFailedToLoad =
@@ -184,9 +187,11 @@ export default function WonAtomContextDropdown({ atom, className }) {
                 history.location,
                 {
                   fromAtomUri: atomUri,
+                  useCase: useCaseIdentifier,
                   mode: "DUPLICATE",
                 },
-                "/create"
+                "/create",
+                false
               )
             )
           }
@@ -205,9 +210,11 @@ export default function WonAtomContextDropdown({ atom, className }) {
                 history.location,
                 {
                   fromAtomUri: atomUri,
+                  useCase: useCaseIdentifier,
                   mode: "EDIT",
                 },
-                "/create"
+                "/create",
+                false
               )
             )
           }

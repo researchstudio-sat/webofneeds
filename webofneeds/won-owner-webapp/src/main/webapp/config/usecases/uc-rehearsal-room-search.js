@@ -39,7 +39,7 @@ export const rehearsalRoomSearch = {
   reactions: {
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["rehearsalRoomOffer"],
+        useCaseIdentifiers: ["rehearsalRoomOffer", "persona"],
         refuseOwned: true,
       },
     },

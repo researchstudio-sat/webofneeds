@@ -22,7 +22,7 @@ export const taxiOffer = {
   reactions: {
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["personalTransportSearch"],
+        useCaseIdentifiers: ["personalTransportSearch", "persona"],
         refuseOwned: true,
       },
     },

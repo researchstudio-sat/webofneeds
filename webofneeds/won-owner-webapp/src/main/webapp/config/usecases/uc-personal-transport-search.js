@@ -25,7 +25,7 @@ export const personalTransportSearch = {
   reactions: {
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["taxiOffer", "rideShareOffer"],
+        useCaseIdentifiers: ["taxiOffer", "rideShareOffer", "persona"],
         refuseOwned: true,
       },
     },

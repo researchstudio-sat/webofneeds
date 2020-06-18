@@ -27,7 +27,7 @@ export const complain = {
   reactions: {
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["handleComplaint"],
+        useCaseIdentifiers: ["handleComplaint", "persona"],
         refuseOwned: true,
       },
     },

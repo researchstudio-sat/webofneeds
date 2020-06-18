@@ -29,7 +29,7 @@ export const rideShareOffer = {
   reactions: {
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["personalTransportSearch"],
+        useCaseIdentifiers: ["personalTransportSearch", "persona"],
         refuseOwned: true,
       },
     },

@@ -28,7 +28,7 @@ export const postdocSearch = {
   reactions: {
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["postdocOffer"],
+        useCaseIdentifiers: ["postdocOffer", "persona"],
         refuseOwned: true,
       },
     },

@@ -23,7 +23,7 @@ export const booksSearch = {
   reactions: {
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["booksOffer"],
+        useCaseIdentifiers: ["booksOffer", "persona"],
         refuseOwned: true,
       },
     },

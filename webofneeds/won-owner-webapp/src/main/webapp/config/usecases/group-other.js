@@ -40,7 +40,7 @@ export const otherGroup = {
       reactions: {
         [vocab.GROUP.GroupSocketCompacted]: {
           [vocab.CHAT.ChatSocketCompacted]: {
-            useCaseIdentifiers: ["persona"],
+            useCaseIdentifiers: ["*"],
           },
           [vocab.GROUP.GroupSocketCompacted]: {
             useCaseIdentifiers: ["*"],

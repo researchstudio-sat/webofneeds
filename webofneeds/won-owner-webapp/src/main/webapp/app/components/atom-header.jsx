@@ -65,7 +65,7 @@ export default function WonAtomHeader({
   let atomHeaderContent;
   let atomHeaderIcon;
 
-  if (atomLoading) {
+  if (atomLoading || atomToLoad) {
     //Loading View
 
     atomHeaderIcon = <div className="ph__icon__skeleton" />;
@@ -181,7 +181,7 @@ export default function WonAtomHeader({
     </Link>
   ) : (
     <won-atom-header
-      className={
+      class={
         (atomLoading ? " won-is-loading " : "") +
         (atomToLoad ? " won-to-load " : "") +
         (onClick ? " clickable " : "") +

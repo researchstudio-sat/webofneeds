@@ -43,6 +43,10 @@ export default function PageCreate() {
   const showModalDialog = useSelector(viewSelectors.showModalDialog);
   const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
 
+  const visibleUseCasesByConfig = useSelector(
+    generalSelectors.getVisibleUseCasesByConfig
+  );
+
   const isFromAtomLoading = fromAtomUri
     ? processUtils.isAtomLoading(processState, fromAtomUri)
     : false;
@@ -66,7 +70,7 @@ export default function PageCreate() {
   let contentElement;
   let showUseCaseGroup = !useCase && !!useCaseGroup;
 
-  let showCreatePostFromAtom = !!fromAtomUri && !!mode;
+  let showCreatePostFromAtom = !!fromAtomUri && !!mode && !!useCase;
   let showCreatePostFromUseCase = !showCreatePostFromAtom && !!useCase;
 
   let showUseCasePicker = !(
@@ -76,9 +80,19 @@ export default function PageCreate() {
   );
 
   if (showUseCaseGroup) {
-    contentElement = <WonUseCaseGroup />;
+    contentElement = (
+      <WonUseCaseGroup
+        visibleUseCasesByConfig={visibleUseCasesByConfig}
+        filterBySocketType={senderSocketType}
+      />
+    );
   } else if (showUseCasePicker) {
-    contentElement = <WonUseCasePicker />;
+    contentElement = (
+      <WonUseCasePicker
+        visibleUseCasesByConfig={visibleUseCasesByConfig}
+        filterBySocketType={senderSocketType}
+      />
+    );
   } else if (showCreatePostFromAtom) {
     if (
       fromAtom &&
