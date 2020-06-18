@@ -118,14 +118,12 @@ export default function WonSocketAddAtom({
       .map((reaction, socketType) => {
         const allowedUseCaseList = get(reaction, "useCaseIdentifiers");
 
-        return allowedUseCaseList
-          .filter(ucIdentifier => ucIdentifier !== "*") //TODO: REMOVE THIS ONCE WE KNOW HOW TO HANDLE WILDCARD USECASES
-          .map(ucIdentifier =>
-            createAtomReactionsArray.push({
-              ucIdentifier: ucIdentifier,
-              socketType: socketType,
-            })
-          );
+        return allowedUseCaseList.map(ucIdentifier =>
+          createAtomReactionsArray.push({
+            ucIdentifier: ucIdentifier,
+            socketType: socketType,
+          })
+        );
       });
 
   const sortedPossibleAtomsArray =
@@ -386,7 +384,7 @@ export default function WonSocketAddAtom({
               generateLink(
                 location,
                 {
-                  useCase: ucIdentifier,
+                  useCase: ucIdentifier !== "*" ? ucIdentifier : undefined,
                   fromAtomUri: addToAtomUri,
                   senderSocketType: socketType,
                   targetSocketType: addToSocketType,

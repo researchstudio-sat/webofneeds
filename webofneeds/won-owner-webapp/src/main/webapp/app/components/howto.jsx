@@ -4,7 +4,7 @@ import Immutable from "immutable";
 import { useDispatch, useSelector } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
-import { get } from "../utils.js";
+import { get, generateLink } from "../utils.js";
 
 import WonLabelledHr from "./labelled-hr.jsx";
 
@@ -217,7 +217,9 @@ export default function WonHowTo({ className }) {
           label="Or"
         />
         <Link
-          to="/create?useCase=persona"
+          to={location =>
+            generateLink(location, { useCase: "persona" }, "/create", "false")
+          }
           className="won-button--filled red howto__createx__spanbutton"
         >
           <span>Create your Persona!</span>
@@ -227,7 +229,7 @@ export default function WonHowTo({ className }) {
           label="Or"
         />
         <Link
-          to="/create"
+          to={location => generateLink(location, {}, "/create", "false")}
           className="won-button--filled red howto__createx__spanbutton"
         >
           <span>Post something now!</span>

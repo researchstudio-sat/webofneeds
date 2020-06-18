@@ -4,7 +4,7 @@
 
 import React from "react";
 import WonAtomCard from "./atom-card.jsx";
-import { get } from "../utils.js";
+import { get, generateLink } from "../utils.js";
 import PropTypes from "prop-types";
 
 import ico32_buddy_add from "~/images/won-icons/ico32_buddy_add.svg";
@@ -34,7 +34,10 @@ export default function WonAtomCardGrid({
     });
 
   const createAtom = showCreate ? (
-    <Link className="won-create-card" to="/create">
+    <Link
+      className="won-create-card"
+      to={location => generateLink(location, {}, "/create", false)}
+    >
       <svg className="createcard__icon" title="Create a new post">
         <use xlinkHref={ico36_plus} href={ico36_plus} />
       </svg>
@@ -45,7 +48,19 @@ export default function WonAtomCardGrid({
   );
 
   const createPersonaAtom = showCreatePersona ? (
-    <Link className="won-create-card" to="/create?useCase=persona">
+    <Link
+      className="won-create-card"
+      to={location =>
+        generateLink(
+          location,
+          {
+            useCase: "persona",
+          },
+          "/create",
+          false
+        )
+      }
+    >
       <svg className="createcard__icon" title="Create a new post">
         <use xlinkHref={ico32_buddy_add} href={ico32_buddy_add} />
       </svg>

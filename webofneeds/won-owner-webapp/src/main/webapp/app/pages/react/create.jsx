@@ -66,7 +66,7 @@ export default function PageCreate() {
   let contentElement;
   let showUseCaseGroup = !useCase && !!useCaseGroup;
 
-  let showCreatePostFromAtom = !!fromAtomUri && !!mode;
+  let showCreatePostFromAtom = !!fromAtomUri && !!mode && !!useCase;
   let showCreatePostFromUseCase = !showCreatePostFromAtom && !!useCase;
 
   let showUseCasePicker = !(
