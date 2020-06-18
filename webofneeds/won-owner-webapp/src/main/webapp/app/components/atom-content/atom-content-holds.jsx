@@ -67,7 +67,17 @@ export default function WonAtomContentHolds({ atom }) {
         <Link
           className="ach__createatom"
           to={location =>
-            generateLink(location, { holderUri: atomUri }, "/create", false)
+            generateLink(
+              location,
+              {
+                senderSocketType: vocab.HOLD.HoldableSocketCompacted,
+                targetSocketType: vocab.HOLD.HolderSocketCompacted,
+                fromAtomUri: atomUri,
+                mode: "CONNECT",
+              },
+              "/create",
+              false
+            )
           }
         >
           <svg className="ach__createatom__icon" title="Create a new post">

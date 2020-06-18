@@ -275,6 +275,16 @@ vocab.HOLD.HolderSocketCompacted = vocab.HOLD.prefix + ":HolderSocket";
 vocab.HOLD.heldByCompacted = vocab.HOLD.prefix + ":heldBy";
 vocab.HOLD.holdsCompacted = vocab.HOLD.prefix + ":holds";
 
+/* This constant is limiting the connected connections
+ to a holdableSocket to one, if a socket is not listed
+ in this object, the capacity is not limited
+
+ socketCapacity could be retrieved from the socketDefinition
+ e.g. see won-ext-hold.ttl and won-ext-core.ttl -> won:socketCapacity */
+vocab.socketCapacity = {
+  [vocab.HOLD.HoldableSocketCompacted]: 1,
+};
+
 vocab.BOT = {};
 vocab.BOT.baseUri = "https://w3id.org/won/ext/bot#";
 vocab.BOT.prefix = "wx-bot";
