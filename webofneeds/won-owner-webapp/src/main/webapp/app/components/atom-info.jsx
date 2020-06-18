@@ -52,18 +52,19 @@ export default function WonAtomInfo({
     const reactionElements = [];
     reactions &&
       reactions.map((senderSocketReactions, targetSocketType) => {
-        reactionElements.push(
-          <WonSocketAddButton
-            senderReactions={senderSocketReactions}
-            targetSocketType={targetSocketType}
-            isAtomOwned={isAtomOwned}
-            key={targetSocketType}
-            onClick={() => {
-              setVisibleTab(targetSocketType);
-              toggleAddPicker(true);
-            }}
-          />
-        );
+        atomUtils.hasSocket(atom, targetSocketType) &&
+          reactionElements.push(
+            <WonSocketAddButton
+              senderReactions={senderSocketReactions}
+              targetSocketType={targetSocketType}
+              isAtomOwned={isAtomOwned}
+              key={targetSocketType}
+              onClick={() => {
+                setVisibleTab(targetSocketType);
+                toggleAddPicker(true);
+              }}
+            />
+          );
       });
 
     return reactionElements;
