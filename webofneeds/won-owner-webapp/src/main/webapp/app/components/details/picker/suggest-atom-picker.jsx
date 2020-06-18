@@ -64,9 +64,10 @@ const mapStateToProps = (state, ownProps) => {
   const suggestedAtom = get(allSuggestableAtoms, suggestedAtomUri);
   const sortedActiveAtomsArray =
     allSuggestableAtoms &&
-    sortBy(allSuggestableAtoms, elem =>
-      (elem.get("humanReadable") || "").toLowerCase()
-    );
+    sortBy(allSuggestableAtoms, elem => {
+      const humanReadable = get(elem, "humanReadable");
+      return humanReadable ? humanReadable.toLowerCase() : undefined;
+    });
 
   return {
     initialValue: ownProps.initialValue,

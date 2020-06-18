@@ -126,9 +126,10 @@ export default function WonSocketAddAtom({
 
   const sortedPossibleAtomsArray =
     sortedPossibleAtoms &&
-    sortBy(sortedPossibleAtoms, elem =>
-      (get(elem, "humanReadable") || "").toLowerCase()
-    );
+    sortBy(sortedPossibleAtoms, elem => {
+      const humanReadable = get(elem, "humanReadable");
+      return humanReadable ? humanReadable.toLowerCase() : undefined;
+    });
 
   function selectAtom(selectedAtom) {
     const selectedAtomUri = get(selectedAtom, "uri");
