@@ -1,83 +1,64 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 import PropTypes from "prop-types";
-import WonTitlePicker from "./title-picker.jsx";
+import WonDescriptionPicker from "./description-picker.jsx";
 
 import "~/style/_reviewpicker.scss";
 
-export default class WonReviewPicker extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      text: props.initialValue && props.initialValue.text,
-      rating:
-        (props.initialValue && props.initialValue.rating) ||
-        this.getDefaultRating(),
-    };
-  }
+export default function WonReviewPicker({ initialValue, detail, onUpdate }) {
+  const [state, setState] = useState({
+    text: initialValue && initialValue.text,
+    rating: (initialValue && initialValue.rating) || getDefaultRating(),
+  });
 
-  render() {
-    return (
-      <won-review-picker>
-        <div className="reviewp__input">
-          <select
-            className="reviewp__input__rating"
-            onChange={this.updateRating.bind(this)}
-            value={this.state.rating}
-            disabled={
-              !this.props.detail.rating || this.props.detail.rating.length <= 1
-            }
-          >
-            {this.props.detail.rating &&
-              this.props.detail.rating.map((r, index) => (
-                <option key={r.value + "-" + index} value={r.value}>
-                  {r.label}
-                </option>
-              ))}
-          </select>
-          <WonTitlePicker
-            onUpdate={this.updateText.bind(this)}
-            initialValue={
-              this.props.initialValue && this.props.initialValue.text
-            }
-            detail={{ placeholder: this.props.detail.placeholder }}
-          />
-        </div>
-      </won-review-picker>
-    );
-  }
+  useEffect(
+    () => {
+      if (state.rating) {
+        onUpdate({
+          value: state,
+        });
+      } else {
+        onUpdate({ value: undefined });
+      }
+    },
+    [state]
+  );
 
-  getDefaultRating() {
+  function getDefaultRating() {
     let defaultRating;
 
-    this.props.detail &&
-      this.props.detail.rating.forEach(rating => {
+    detail &&
+      detail.rating.forEach(rating => {
         if (rating.default) defaultRating = rating.value;
       });
 
     return defaultRating;
   }
 
-  updateText({ value }) {
-    this.setState({ text: value }, this.update.bind(this));
-  }
-
-  updateRating(event) {
-    const rating = event.target.value;
-    console.debug("Rating: ", rating);
-
-    this.setState({ rating: rating }, this.update.bind(this));
-  }
-
-  update() {
-    if (this.state.rating) {
-      this.props.onUpdate({
-        value: this.state,
-      });
-    } else {
-      this.props.onUpdate({ value: undefined });
-    }
-  }
+  return (
+    <won-review-picker>
+      <div className="reviewp__input">
+        <select
+          className="reviewp__input__rating"
+          onChange={event => setState({ ...state, rating: event.target.value })}
+          value={state.rating}
+          disabled={!detail.rating || detail.rating.length <= 1}
+        >
+          {detail.rating &&
+            detail.rating.map((r, index) => (
+              <option key={r.value + "-" + index} value={r.value}>
+                {r.label}
+              </option>
+            ))}
+        </select>
+        <WonDescriptionPicker
+          onUpdate={({ value }) => setState({ ...state, text: value })}
+          initialValue={initialValue && initialValue.text}
+          detail={{ placeholder: detail.placeholder }}
+        />
+      </div>
+    </won-review-picker>
+  );
 }
 WonReviewPicker.propTypes = {
   initialValue: PropTypes.object,
