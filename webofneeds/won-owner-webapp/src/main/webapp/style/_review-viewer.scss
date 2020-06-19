@@ -1,5 +1,16 @@
 @import "detail-viewer-mixin";
+@import "won-config";
 
 won-review-viewer {
   @include won-detail-viewer("reviewv");
+
+  .reviewv__content {
+    > .reviewv__content__rating {
+      font-size: $mediumFontSize;
+      font-weight: bold;
+    }
+    > won-description-viewer {
+      padding-top: 0.5rem;
+    }
+  }
 }
