@@ -222,12 +222,14 @@ export default function WonAtomContent({
             atom={atom}
             socketType={visibleTab}
             ItemComponent={WonHeldItem}
+            //Holdercontent should only display connected items
             relevantConnections={relevantConnections.filter(conn =>
               connectionUtils.isConnected(conn)
             )}
             showAddPicker={showAddPicker}
             toggleAddPicker={toggleAddPicker}
             addButtonClassName="won-socket-add-button--big"
+            segmentContentClassName="acs__segment__content--fourcols"
           />
         );
         break;

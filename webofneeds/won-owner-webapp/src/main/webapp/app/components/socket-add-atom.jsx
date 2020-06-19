@@ -82,10 +82,13 @@ export default function WonSocketAddAtom({
           const refuseNonOwned = get(reaction, "refuseNonOwned");
 
           return (
+            allowedUseCaseList &&
             (!isAddToAtomOwned || !(refuseOwned && isOwned)) &&
             (isAddToAtomOwned || !(refuseNonOwned && !isOwned)) &&
             atomUtils.hasSocket(atom, socketType) &&
-            allowedUseCaseList &&
+            (!vocab.socketCapacity[socketType] ||
+              atomUtils.getConnectedConnections(atom, socketType).size <
+                vocab.socketCapacity[socketType]) &&
             !!allowedUseCaseList.find(
               ucIdentifier =>
                 (ucIdentifier === "*" ||
@@ -148,9 +151,12 @@ export default function WonSocketAddAtom({
         const refuseNonOwned = get(reaction, "refuseNonOwned");
 
         const includesSelectedUseCase =
+          allowedUseCaseList &&
           (!isAddToAtomOwned || !(refuseOwned && isSelectedAtomOwned)) &&
           (isAddToAtomOwned || !(refuseNonOwned && !isSelectedAtomOwned)) &&
-          allowedUseCaseList &&
+          (!vocab.socketCapacity[socketType] ||
+            atomUtils.getConnectedConnections(selectedAtom, socketType).size <
+              vocab.socketCapacity[socketType]) &&
           !!allowedUseCaseList.find(
             ucIdentifier =>
               (ucIdentifier === "*" ||
