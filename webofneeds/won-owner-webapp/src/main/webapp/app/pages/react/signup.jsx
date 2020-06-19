@@ -239,6 +239,8 @@ export default function PageSignUp() {
                 <Link
                   className="clickable"
                   to="/about?aboutSection=aboutTermsOfService"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   Terms Of Service
                 </Link>
