@@ -13,16 +13,6 @@ won-socket-add-button {
   box-sizing: border-box;
   min-width: 0;
 
-  &:hover {
-    .socketadd__label {
-      color: $won-primary-color;
-    }
-
-    .socketadd__icon {
-      --local-primary: #{$won-primary-color};
-    }
-  }
-
   .socketadd__label {
     color: $won-line-gray;
     text-overflow: ellipsis;
@@ -33,5 +23,33 @@ won-socket-add-button {
   .socketadd__icon {
     @include fixed-square($postIconSize);
     --local-primary: #{$won-line-gray};
+  }
+
+  &:hover {
+    .socketadd__label {
+      color: $won-primary-color;
+    }
+
+    .socketadd__icon {
+      --local-primary: #{$won-primary-color};
+    }
+  }
+
+  &.won-socket-add-button--big {
+    grid-template-areas: "icon" "main";
+    grid-template-columns: 1fr;
+    justify-content: center;
+    align-content: center;
+    justify-items: center;
+
+    .socketadd__label {
+      font-size: $mediumFontSize;
+      text-align: center;
+      white-space: normal;
+    }
+
+    .socketadd__icon {
+      @include fixed-square($hugeiconSize);
+    }
   }
 }

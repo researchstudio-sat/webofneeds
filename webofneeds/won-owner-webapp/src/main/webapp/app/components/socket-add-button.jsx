@@ -11,6 +11,7 @@ export default function WonSocketAddButton({
   /*targetSocketType,*/
   isAtomOwned,
   onClick,
+  className,
 }) {
   function generateReactionLabel() {
     return isAtomOwned
@@ -27,7 +28,10 @@ export default function WonSocketAddButton({
   }
 
   return (
-    <won-socket-add-button class="clickable" onClick={onClick}>
+    <won-socket-add-button
+      class={"clickable " + (className ? ` ${className} ` : "")}
+      onClick={onClick}
+    >
       <svg className="socketadd__icon" title="Create a new post">
         <use xlinkHref={ico36_plus} href={ico36_plus} />
       </svg>
@@ -41,4 +45,5 @@ WonSocketAddButton.propTypes = {
   targetSocketType: PropTypes.string,
   isAtomOwned: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
+  className: PropTypes.string,
 };

@@ -32,6 +32,7 @@ export default function WonAtomContentSocket({
   relevantConnections,
   showAddPicker,
   toggleAddPicker,
+  addButtonClassName,
 }) {
   const accountState = useSelector(generalSelectors.getAccountState);
   const isAtomOwned = accountUtils.isAtomOwned(accountState, get(atom, "uri"));
@@ -160,6 +161,7 @@ export default function WonAtomContentSocket({
                   isAtomOwned={isAtomOwned}
                   onClick={() => toggleAddPicker(!showAddPicker)}
                   targetSocketType={socketType}
+                  className={addButtonClassName}
                 />
               ) : (
                 undefined
@@ -281,4 +283,5 @@ WonAtomContentSocket.propTypes = {
   ItemComponent: PropTypes.func.isRequired,
   showAddPicker: PropTypes.bool.isRequired,
   toggleAddPicker: PropTypes.func.isRequired,
+  addButtonClassName: PropTypes.string,
 };
