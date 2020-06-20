@@ -22,6 +22,7 @@ import ElmReact from "./elm-react.jsx";
 import { Elm } from "../../elm/PublishButton.elm";
 import { actionCreators } from "../actions/actions";
 import { useHistory } from "react-router-dom";
+import vocab from "../service/vocab";
 
 export default function WonCreateAtom({
   fromAtom,
@@ -238,9 +239,18 @@ export default function WonCreateAtom({
               buttonEnabled:
                 !connectionHasBeenLost &&
                 useCaseUtils.isValidDraft(draftObject, useCase),
-              showPersonas: useCaseUtils.isHoldable(useCase) && loggedIn,
+              showPersonas:
+                useCaseUtils.isHoldable(useCase) &&
+                loggedIn &&
+                senderSocketType !== vocab.HOLD.HoldableSocketCompacted &&
+                targetSocketType !== vocab.HOLD.HolderSocketCompacted,
               personas: personas,
-              presetHolderUri: isHolderAtomValid ? holderUri : undefined,
+              presetHolderUri:
+                isHolderAtomValid &&
+                senderSocketType !== vocab.HOLD.HoldableSocketCompacted &&
+                targetSocketType !== vocab.HOLD.HolderSocketCompacted
+                  ? holderUri
+                  : undefined,
             }}
             onPublish={publish}
           />

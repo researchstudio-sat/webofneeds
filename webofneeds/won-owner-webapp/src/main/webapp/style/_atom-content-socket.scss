@@ -71,6 +71,10 @@ won-atom-content-socket {
 
       grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
 
+      &--fourcols {
+        grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+      }
+
       & > won-socket-add-button {
         border: $thinGrayBorder;
 

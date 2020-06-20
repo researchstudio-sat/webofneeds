@@ -10,7 +10,6 @@ import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import vocab from "../service/vocab.js";
 
-import WonAtomContentHolds from "./atom-content/atom-content-holds.jsx";
 import WonAtomContentChats from "./atom-content/atom-content-chats.jsx";
 import WonAtomContentSocket from "./atom-content/atom-content-socket.jsx";
 import WonAtomContentGeneral from "./atom-content/atom-content-general.jsx";
@@ -18,6 +17,7 @@ import WonAtomContentHolder from "./atom-content/atom-content-holder.jsx";
 import WonAtomContentDetails from "./atom-content/atom-content-details.jsx";
 import WonBuddyItem from "./socket-items/buddy-item.jsx";
 import WonParticipantItem from "./socket-items/participant-item.jsx";
+import WonHeldItem from "./socket-items/held-item.jsx";
 import WonGenericItem from "./socket-items/generic-item.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
 import ElmReact from "./elm-react.jsx";
@@ -217,7 +217,21 @@ export default function WonAtomContent({
         break;
 
       case vocab.HOLD.HolderSocketCompacted:
-        visibleTabFragment = <WonAtomContentHolds atom={atom} />;
+        visibleTabFragment = (
+          <WonAtomContentSocket
+            atom={atom}
+            socketType={visibleTab}
+            ItemComponent={WonHeldItem}
+            //Holdercontent should only display connected items
+            relevantConnections={relevantConnections.filter(conn =>
+              connectionUtils.isConnected(conn)
+            )}
+            showAddPicker={showAddPicker}
+            toggleAddPicker={toggleAddPicker}
+            addButtonClassName="won-socket-add-button--big"
+            segmentContentClassName="acs__segment__content--fourcols"
+          />
+        );
         break;
 
       case vocab.CHAT.ChatSocketCompacted: {

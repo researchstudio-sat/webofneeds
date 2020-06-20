@@ -144,8 +144,8 @@ export default function WonBuddySocketActions({ connection, goBackOnAction }) {
 
     const chatConnection = atomUtils.getConnectionBySocketUris(
       senderAtom,
-      vocab.CHAT.ChatSocketCompacted,
-      vocab.CHAT.ChatSocketCompacted
+      senderSocketUri,
+      targetSocketUri
     );
 
     if (

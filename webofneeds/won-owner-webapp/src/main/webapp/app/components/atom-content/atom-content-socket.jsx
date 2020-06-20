@@ -32,6 +32,8 @@ export default function WonAtomContentSocket({
   relevantConnections,
   showAddPicker,
   toggleAddPicker,
+  addButtonClassName,
+  segmentContentClassName,
 }) {
   const accountState = useSelector(generalSelectors.getAccountState);
   const isAtomOwned = accountUtils.isAtomOwned(accountState, get(atom, "uri"));
@@ -152,7 +154,10 @@ export default function WonAtomContentSocket({
       {!showAddPicker ? (
         activeConnections.size > 0 || reactions ? (
           <div className="acs__segment">
-            <div className="acs__segment__content">
+            <div
+              className={`acs__segment__content ${segmentContentClassName ||
+                ""}`}
+            >
               {generateConnectionItems(activeConnections)}
               {atomUtils.isActive(atom) && reactions ? (
                 <WonSocketAddButton
@@ -160,6 +165,7 @@ export default function WonAtomContentSocket({
                   isAtomOwned={isAtomOwned}
                   onClick={() => toggleAddPicker(!showAddPicker)}
                   targetSocketType={socketType}
+                  className={addButtonClassName}
                 />
               ) : (
                 undefined
@@ -168,7 +174,10 @@ export default function WonAtomContentSocket({
           </div>
         ) : (
           <div className="acs__segment">
-            <div className="acs__segment__content">
+            <div
+              className={`acs__segment__content ${segmentContentClassName ||
+                ""}`}
+            >
               <div className="acs__empty">
                 {searchText.value.trim().length > 0
                   ? `No ${wonLabelUtils.getSocketItemsLabel(
@@ -191,7 +200,10 @@ export default function WonAtomContentSocket({
             showRequestReceived
           )}
           {showRequestReceived ? (
-            <div className="acs__segment__content">
+            <div
+              className={`acs__segment__content ${segmentContentClassName ||
+                ""}`}
+            >
               {generateConnectionItems(requestReceivedConnections)}
             </div>
           ) : (
@@ -210,7 +222,10 @@ export default function WonAtomContentSocket({
             showRequestSent
           )}
           {showRequestSent ? (
-            <div className="acs__segment__content">
+            <div
+              className={`acs__segment__content ${segmentContentClassName ||
+                ""}`}
+            >
               {generateConnectionItems(requestSentConnections)}
             </div>
           ) : (
@@ -229,7 +244,10 @@ export default function WonAtomContentSocket({
             showSuggestions
           )}
           {showSuggestions ? (
-            <div className="acs__segment__content">
+            <div
+              className={`acs__segment__content ${segmentContentClassName ||
+                ""}`}
+            >
               {generateConnectionItems(suggestedConnections)}
             </div>
           ) : (
@@ -248,7 +266,10 @@ export default function WonAtomContentSocket({
             showClosed
           )}
           {showClosed ? (
-            <div className="acs__segment__content">
+            <div
+              className={`acs__segment__content ${segmentContentClassName ||
+                ""}`}
+            >
               {generateConnectionItems(closedConnections)}
             </div>
           ) : (
@@ -281,4 +302,6 @@ WonAtomContentSocket.propTypes = {
   ItemComponent: PropTypes.func.isRequired,
   showAddPicker: PropTypes.bool.isRequired,
   toggleAddPicker: PropTypes.func.isRequired,
+  addButtonClassName: PropTypes.string,
+  segmentContentClassName: PropTypes.string,
 };

@@ -46,7 +46,7 @@ export const persona = {
     },
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["persona", "persona"],
+        useCaseIdentifiers: ["persona"],
         refuseOwned: true,
       },
       [vocab.GROUP.GroupSocketCompacted]: {

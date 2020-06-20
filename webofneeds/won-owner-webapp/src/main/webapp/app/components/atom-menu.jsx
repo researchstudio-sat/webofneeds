@@ -132,6 +132,23 @@ export default function WonAtomMenu({
           !!activeConnections.find(conn => connectionUtils.isUnread(conn));
         break;
       }
+
+      case vocab.HOLD.HolderSocketCompacted: {
+        //Holdertab should always just display the amount of connected items
+        const activeConnections = socketTypeConnections.filter(conn =>
+          connectionUtils.isConnected(conn)
+        );
+
+        countLabel =
+          activeConnections && activeConnections.size > 0
+            ? "(" + activeConnections.size + ")"
+            : undefined;
+        unread =
+          activeConnections &&
+          !!activeConnections.find(conn => connectionUtils.isUnread(conn));
+        break;
+      }
+
       default: {
         const activeConnections = socketTypeConnections.filter(
           conn => !connectionUtils.isClosed(conn)

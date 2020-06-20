@@ -7,6 +7,7 @@ won-review-picker {
     position: relative;
     display: grid;
     grid-template-columns: 1fr auto;
+    grid-row-gap: 0.5rem;
 
     .reviewp__input__rating {
       grid-column: 1 / span 2;

@@ -16,7 +16,9 @@ export const review = {
   viewerComponent: WonReviewViewer,
   placeholder: "Review Text (optional)",
   rating: [
-    { value: undefined, label: "Select a Rating", default: true },
+    //Value needs to be empty string for react to clear localState (https://github.com/facebook/react/issues/4085)
+    //which isn't a problem since the bool value of an empty string is false (in js)
+    { value: "", label: "Select a Rating", default: true },
     { value: 1, label: "1 Star" },
     { value: 2, label: "2 Stars" },
     { value: 3, label: "3 Stars" },

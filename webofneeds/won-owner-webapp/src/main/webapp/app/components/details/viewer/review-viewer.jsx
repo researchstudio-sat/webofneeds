@@ -1,35 +1,51 @@
 import React from "react";
+import WonDescriptionViewer from "./description-viewer.jsx";
+import { get } from "../../../utils.js";
 
 import "~/style/_review-viewer.scss";
 import PropTypes from "prop-types";
 
-export default class WonReviewViewer extends React.Component {
-  render() {
-    const icon = this.props.detail.icon && (
-      <svg className="reviewv__header__icon">
-        <use xlinkHref={this.props.detail.icon} href={this.props.detail.icon} />
-      </svg>
-    );
+export default function WonReviewViewer({ detail, content, className }) {
+  const reviewRating = get(content, "rating");
+  const reviewText = get(content, "text");
 
-    const label = this.props.detail.icon && (
-      <span className="reviewv__header__label">{this.props.detail.label}</span>
-    );
+  const icon = detail.icon && (
+    <svg className="reviewv__header__icon">
+      <use xlinkHref={detail.icon} href={detail.icon} />
+    </svg>
+  );
 
-    return (
-      <won-review-viewer class={this.props.className}>
-        <div className="reviewv__header">
-          {icon}
-          {label}
-        </div>
-        <div className="reviewv__content">
-          {this.props.detail.generateHumanReadable({
-            value: this.props.content.toJS(),
-            includeLabel: false,
-          })}
-        </div>
-      </won-review-viewer>
-    );
+  const label = detail.icon && (
+    <span className="reviewv__header__label">{detail.label}</span>
+  );
+
+  function getRatingLabel() {
+    let ratingLabel;
+    detail.rating &&
+      detail.rating.forEach(rating => {
+        if (rating.value === reviewRating) {
+          ratingLabel = rating.label;
+        }
+      });
+    return ratingLabel || reviewRating;
   }
+
+  return (
+    <won-review-viewer class={className}>
+      <div className="reviewv__header">
+        {icon}
+        {label}
+      </div>
+      <div className="reviewv__content">
+        <div className="reviewv__content__rating">{getRatingLabel()}</div>
+        {reviewText ? (
+          <WonDescriptionViewer content={reviewText} detail={{}} />
+        ) : (
+          undefined
+        )}
+      </div>
+    </won-review-viewer>
+  );
 }
 WonReviewViewer.propTypes = {
   detail: PropTypes.object,
