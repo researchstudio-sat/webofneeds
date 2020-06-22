@@ -1,4 +1,8 @@
-import { details, mergeInEmptyDraft } from "../detail-definitions.js";
+import {
+  details,
+  mergeInEmptyDraft,
+  defaultReactions,
+} from "../detail-definitions.js";
 import {
   vicinityScoreSubQuery,
   sparqlQuery,
@@ -29,6 +33,7 @@ export const lunchPlan = {
     }),
   },
   reactions: {
+    ...defaultReactions,
     [vocab.GROUP.GroupSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
         useCaseIdentifiers: ["lunchInterest", "persona"],
@@ -113,6 +118,7 @@ export const lunchInterest = {
     }),
   },
   reactions: {
+    ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.GROUP.GroupSocketCompacted]: { useCaseIdentifiers: ["lunchPlan"] },
     },

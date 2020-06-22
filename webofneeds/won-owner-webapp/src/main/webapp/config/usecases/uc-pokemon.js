@@ -1,4 +1,8 @@
-import { details, mergeInEmptyDraft } from "../detail-definitions.js";
+import {
+  details,
+  mergeInEmptyDraft,
+  defaultReactions,
+} from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import ico36_pokemon_raid from "../../images/won-icons/ico36_pokemon-raid.svg";
@@ -23,6 +27,7 @@ export const pokemonGoRaid = {
     }),
   },
   reactions: {
+    ...defaultReactions,
     [vocab.GROUP.GroupSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
         useCaseIdentifiers: ["pokemonInterest", "persona"],
@@ -57,6 +62,7 @@ export const pokemonInterest = {
     }),
   },
   reactions: {
+    ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.GROUP.GroupSocketCompacted]: {
         useCaseIdentifiers: ["pokemonGoRaid"],

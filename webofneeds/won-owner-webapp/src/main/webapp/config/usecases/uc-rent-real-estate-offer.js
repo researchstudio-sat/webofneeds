@@ -1,7 +1,11 @@
 /**
  * Created by fsuda on 18.09.2018.
  */
-import { details, mergeInEmptyDraft } from "../detail-definitions.js";
+import {
+  details,
+  mergeInEmptyDraft,
+  defaultReactions,
+} from "../detail-definitions.js";
 import {
   realEstateRentDetail,
   realEstateFloorSizeDetail,
@@ -40,6 +44,7 @@ export const rentRealEstateOffer = {
     }),
   },
   reactions: {
+    ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
         useCaseIdentifiers: ["rentRealEstateSearch", "persona"],

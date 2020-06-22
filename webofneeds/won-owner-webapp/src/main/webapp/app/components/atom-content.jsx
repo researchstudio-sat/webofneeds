@@ -193,7 +193,6 @@ export default function WonAtomContent({
               filteredReactions &&
               filteredReactions.size > 0 && (
                 <WonAtomContentReactions
-                  atom={atom}
                   reactions={filteredReactions}
                   isOwned={isOwned}
                   setVisibleTab={setVisibleTab}
@@ -353,7 +352,6 @@ WonAtomContent.propTypes = {
 };
 
 function WonAtomContentReactions({
-  atom,
   reactions,
   isOwned,
   setVisibleTab,
@@ -362,19 +360,18 @@ function WonAtomContentReactions({
   const generateReactionElements = () => {
     const reactionElements = [];
     reactions.map((senderSocketReactions, targetSocketType) => {
-      atomUtils.hasSocket(atom, targetSocketType) &&
-        reactionElements.push(
-          <WonSocketAddButton
-            senderReactions={senderSocketReactions}
-            targetSocketType={targetSocketType}
-            isAtomOwned={isOwned}
-            key={targetSocketType}
-            onClick={() => {
-              setVisibleTab(targetSocketType);
-              toggleAddPicker(true);
-            }}
-          />
-        );
+      reactionElements.push(
+        <WonSocketAddButton
+          senderReactions={senderSocketReactions}
+          targetSocketType={targetSocketType}
+          isAtomOwned={isOwned}
+          key={targetSocketType}
+          onClick={() => {
+            setVisibleTab(targetSocketType);
+            toggleAddPicker(true);
+          }}
+        />
+      );
     });
 
     return reactionElements;
@@ -387,7 +384,6 @@ function WonAtomContentReactions({
   );
 }
 WonAtomContentReactions.propTypes = {
-  atom: PropTypes.object.isRequired,
   reactions: PropTypes.object.isRequired,
   isOwned: PropTypes.bool,
   setVisibleTab: PropTypes.func.isRequired,

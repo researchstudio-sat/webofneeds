@@ -1,7 +1,11 @@
 /**
  * Created by fsuda on 18.09.2018.
  */
-import { details, mergeInEmptyDraft } from "../detail-definitions.js";
+import {
+  details,
+  mergeInEmptyDraft,
+  defaultReactions,
+} from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
 import ico36_uc_wtf from "../../images/won-icons/ico36_uc_wtf.svg";
 
@@ -24,6 +28,7 @@ export const organization = {
     }),
   },
   reactions: {
+    ...defaultReactions,
     [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: {
       [vocab.WXSCHEMA.WorksForSocketCompacted]: {
         useCaseIdentifiers: ["persona"],

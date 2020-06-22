@@ -1,4 +1,8 @@
-import { details, mergeInEmptyDraft } from "../detail-definitions.js";
+import {
+  details,
+  mergeInEmptyDraft,
+  defaultReactions,
+} from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
 import ico36_robot from "../../images/won-icons/ico36_robot.svg";
 
@@ -20,6 +24,7 @@ export const serviceAtom = {
     }),
   },
   reactions: {
+    ...defaultReactions,
     [vocab.HOLD.HolderSocketCompacted]: {
       [vocab.HOLD.HoldableSocketCompacted]: {
         useCaseIdentifiers: ["*"],

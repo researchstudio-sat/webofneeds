@@ -2,6 +2,7 @@ import {
   details,
   abstractDetails,
   mergeInEmptyDraft,
+  defaultReactions,
 } from "../detail-definitions.js";
 import { sparqlQuery } from "../../app/sparql-builder-utils.js";
 import won from "../../app/service/won.js";
@@ -27,6 +28,7 @@ export const goodsTransportSearch = {
     }),
   },
   reactions: {
+    ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
         useCaseIdentifiers: ["goodsTransportOffer", "persona"],

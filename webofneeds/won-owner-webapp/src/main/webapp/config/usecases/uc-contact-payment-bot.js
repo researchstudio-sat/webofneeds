@@ -1,4 +1,4 @@
-import { mergeInEmptyDraft } from "../detail-definitions.js";
+import { mergeInEmptyDraft, defaultReactions } from "../detail-definitions.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import { sparqlQuery } from "../../app/sparql-builder-utils.js";
 import won from "../../app/service/won.js";
@@ -24,6 +24,9 @@ export const contactPaymentBot = {
         type: ["con:ServiceBot"],
       },
     }),
+  },
+  reactions: {
+    ...defaultReactions,
   },
   generateQuery: (draft, resultName) => {
     if (draft) {

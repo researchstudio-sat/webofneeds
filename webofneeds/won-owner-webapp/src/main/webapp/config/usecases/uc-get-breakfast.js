@@ -1,7 +1,11 @@
 /**
  * Created by fsuda on 18.09.2018.
  */
-import { details, mergeInEmptyDraft } from "../detail-definitions.js";
+import {
+  details,
+  mergeInEmptyDraft,
+  defaultReactions,
+} from "../detail-definitions.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import { interestsDetail } from "../details/person.js";
 import ico36_uc_breakfast from "../../images/won-icons/ico36_uc_breakfast.svg";
@@ -21,6 +25,9 @@ export const getBreakfast = {
       },
       seeks: { title: "breakfast" },
     }),
+  },
+  reactions: {
+    ...defaultReactions,
   },
   details: {
     title: { ...details.title },

@@ -1,4 +1,8 @@
-import { details, mergeInEmptyDraft } from "../detail-definitions.js";
+import {
+  details,
+  mergeInEmptyDraft,
+  defaultReactions,
+} from "../detail-definitions.js";
 import { interestsDetail, skillsDetail } from "../details/person.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import {
@@ -36,6 +40,7 @@ export const jobSearch = {
     }),
   },
   reactions: {
+    ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
         useCaseIdentifiers: ["jobOffer", "persona"],

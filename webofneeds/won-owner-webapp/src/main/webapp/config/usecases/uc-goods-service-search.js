@@ -2,7 +2,11 @@
  * Created by kweinberger on 06.12.2018.
  */
 
-import { details, mergeInEmptyDraft } from "../detail-definitions.js";
+import {
+  details,
+  mergeInEmptyDraft,
+  defaultReactions,
+} from "../detail-definitions.js";
 import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
 import { getIn, is } from "../../app/utils.js";
@@ -30,6 +34,7 @@ export const goodsServiceSearch = {
     }),
   },
   reactions: {
+    ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
         useCaseIdentifiers: ["serviceOffer", "goodsOffer", "persona"],
