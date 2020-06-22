@@ -21,21 +21,23 @@ export default function WonConnectionAgreementDetails({ connection }) {
 
   // Graphy solution
 
-  const trigScribe = Graphy["content.trig.scribe"];
-  let dsScriber = trigScribe({
-    prefixes: {
-      ...won.minimalContext,
-    },
-  });
+  const trigWrite = Graphy["content.trig.write"];
+  let trigWriter = trigWrite();
 
-  dsScriber.on("data", sTrig => {
-    if (!graphyParsedData.includes(sTrig + "")) {
+  trigWriter
+    .on("data", sTrig => {
+      /*if (!graphyParsedData.includes(sTrig + "")) {
       graphyParsedData.push(sTrig + "");
       setGraphyParsedData(graphyParsedData);
       generateGraphyElement(graphyParsedData);
-      console.log(sTrig + "");
-    }
-  });
+      console.log(sTrig + "");*/
+      graphyParsedData.push(sTrig + "");
+    })
+    .on("finish", () => {
+      console.log("done!");
+      setGraphyParsedData(graphyParsedData);
+      generateGraphyElement(graphyParsedData);
+    });
 
   function generateGraphyElement(dataArray) {
     let parsedElement = "";
@@ -47,10 +49,26 @@ export default function WonConnectionAgreementDetails({ connection }) {
     lastAgreementDataset &&
     lastAgreementDataset !== previousAgreementDataset
   ) {
-    lastAgreementDataset.forEach(quad => {
-      dsScriber.write(parseRDFJSQuadToFactoryQuad(quad));
+    trigWriter.write({
+      type: "prefixes",
+      value: {
+        ...won.minimalContext,
+      },
+      tokens: {
+        graph: true, // output `GRAPH` tokens in TriG format
+      },
     });
-    dsScriber.end();
+    const parsedQuadArray = [];
+    lastAgreementDataset.forEach(quad => {
+      parsedQuadArray.push(parseRDFJSQuadToFactoryQuad(quad));
+    });
+    if (parsedQuadArray.length > 0) {
+      trigWriter.write({
+        type: "array",
+        value: parsedQuadArray,
+      });
+    }
+    trigWriter.end();
   }
 
   return (
