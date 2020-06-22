@@ -6,10 +6,8 @@ import WonAtomHeaderBig from "./atom-header-big.jsx";
 import WonAtomMenu from "./atom-menu.jsx";
 import WonAtomActions from "./atom-actions.jsx";
 import WonAtomContent from "./atom-content.jsx";
-import WonSocketAddButton from "./socket-add-button.jsx";
 import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as atomUtils from "../redux/utils/atom-utils";
-import * as accountUtils from "../redux/utils/account-utils";
 import * as processUtils from "../redux/utils/process-utils";
 
 import "~/style/_atom-info.scss";
@@ -22,7 +20,6 @@ export default function WonAtomInfo({
 }) {
   const atomUri = get(atom, "uri");
   const processState = useSelector(generalSelectors.getProcessState);
-  const accountState = useSelector(generalSelectors.getAccountState);
 
   const [visibleTab, setVisibleTab] = useState(initialTab);
   const [showAddPicker, toggleAddPicker] = useState(false);
@@ -44,31 +41,6 @@ export default function WonAtomInfo({
   const relevantConnectionsMap = useSelector(
     generalSelectors.getConnectionsOfAtomWithOwnedTargetConnections(atomUri)
   );
-
-  const reactions = atomUtils.getReactions(atom);
-
-  function generateReactionElements() {
-    const isAtomOwned = accountUtils.isAtomOwned(accountState, atomUri);
-    const reactionElements = [];
-    reactions &&
-      reactions.map((senderSocketReactions, targetSocketType) => {
-        atomUtils.hasSocket(atom, targetSocketType) &&
-          reactionElements.push(
-            <WonSocketAddButton
-              senderReactions={senderSocketReactions}
-              targetSocketType={targetSocketType}
-              isAtomOwned={isAtomOwned}
-              key={targetSocketType}
-              onClick={() => {
-                setVisibleTab(targetSocketType);
-                toggleAddPicker(true);
-              }}
-            />
-          );
-      });
-
-    return reactionElements;
-  }
 
   return (
     <won-atom-info
@@ -97,14 +69,6 @@ export default function WonAtomInfo({
         showAddPicker={showAddPicker}
         setVisibleTab={setVisibleTab}
       />
-      {visibleTab === "DETAIL" &&
-      atomUtils.isActive(atom) &&
-      reactions &&
-      reactions.size > 0 ? (
-        <won-atom-reactions>{generateReactionElements()}</won-atom-reactions>
-      ) : (
-        undefined
-      )}
     </won-atom-info>
   );
 }

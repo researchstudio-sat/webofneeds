@@ -6,6 +6,7 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
+import vocab from "../../service/vocab.js";
 import {
   get,
   sortByDate,
@@ -34,6 +35,7 @@ export default function WonAtomContentSocket({
   toggleAddPicker,
   addButtonClassName,
   segmentContentClassName,
+  setVisibleTab,
 }) {
   const accountState = useSelector(generalSelectors.getAccountState);
   const isAtomOwned = accountUtils.isAtomOwned(accountState, get(atom, "uri"));
@@ -286,7 +288,12 @@ export default function WonAtomContentSocket({
           addToSocketType={socketType}
           reactions={reactions}
           accountState={accountState}
-          onClose={() => toggleAddPicker(!showAddPicker)}
+          onClose={() => {
+            if (vocab.socketCapacity[socketType] === 1) {
+              setVisibleTab("DETAIL");
+            }
+            toggleAddPicker(!showAddPicker);
+          }}
         />
       ) : (
         undefined
@@ -304,4 +311,5 @@ WonAtomContentSocket.propTypes = {
   toggleAddPicker: PropTypes.func.isRequired,
   addButtonClassName: PropTypes.string,
   segmentContentClassName: PropTypes.string,
+  setVisibleTab: PropTypes.func.isRequired,
 };

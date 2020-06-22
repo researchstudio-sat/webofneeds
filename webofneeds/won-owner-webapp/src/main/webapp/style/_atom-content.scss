@@ -40,6 +40,39 @@ won-atom-content {
         font-weight: 300;
       }
     }
+
+    won-atom-content-single-connect-sockets,
+    won-atom-content-reactions {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+      grid-gap: 1rem;
+      padding: 0.5rem 0;
+
+      won-socket-add-button {
+        border: $thinGrayBorder;
+        &:hover {
+          border-color: $won-primary-color;
+        }
+      }
+    }
+
+    won-atom-content-single-connect-sockets {
+      & > .scs__item {
+        > .scs__item__label {
+          padding-bottom: 0.25rem;
+        }
+        > .scs__item__content {
+          &:hover {
+            border-color: $won-primary-color;
+          }
+        }
+      }
+    }
+
+    won-atom-content-reactions {
+      border-top: $thinGrayBorder;
+      padding-bottom: 0;
+    }
   }
 
   .atom-failedtoload {
