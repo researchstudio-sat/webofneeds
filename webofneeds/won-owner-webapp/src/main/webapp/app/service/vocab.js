@@ -285,6 +285,11 @@ vocab.socketCapacity = {
   [vocab.HOLD.HoldableSocketCompacted]: 1,
 };
 
+/* This constant is to prevent connections to non owned atoms for specific sockets */
+vocab.refuseAddToNonOwned = {
+  [vocab.HOLD.HoldableSocketCompacted]: true,
+};
+
 vocab.BOT = {};
 vocab.BOT.baseUri = "https://w3id.org/won/ext/bot#";
 vocab.BOT.prefix = "wx-bot";

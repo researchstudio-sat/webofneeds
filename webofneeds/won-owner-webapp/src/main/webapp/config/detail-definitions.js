@@ -26,9 +26,15 @@ const emptyDraftImm = Immutable.fromJS({
 });
 
 export const defaultReactions = {
+  [vocab.BUDDY.BuddySocketCompacted]: {
+    [vocab.BUDDY.BuddySocketCompacted]: {
+      useCaseIdentifiers: ["persona"],
+      refuseOwned: true,
+    },
+  },
   [vocab.CHAT.ChatSocketCompacted]: {
     [vocab.CHAT.ChatSocketCompacted]: {
-      useCaseIdentifier: ["*"],
+      useCaseIdentifiers: ["*"],
       refuseOwned: true,
     },
   },

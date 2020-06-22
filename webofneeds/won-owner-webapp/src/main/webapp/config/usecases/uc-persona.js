@@ -37,12 +37,6 @@ export const persona = {
         useCaseIdentifiers: ["organization"],
       },
     },
-    [vocab.BUDDY.BuddySocketCompacted]: {
-      [vocab.BUDDY.BuddySocketCompacted]: {
-        useCaseIdentifiers: ["persona", "persona"],
-        refuseOwned: true,
-      },
-    },
     [vocab.HOLD.HolderSocketCompacted]: {
       [vocab.HOLD.HoldableSocketCompacted]: {
         useCaseIdentifiers: ["*"],

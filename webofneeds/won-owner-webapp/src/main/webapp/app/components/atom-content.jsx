@@ -357,9 +357,9 @@ function WonAtomContentReactions({
   setVisibleTab,
   toggleAddPicker,
 }) {
-  const generateReactionElements = () => {
-    const reactionElements = [];
-    reactions.map((senderSocketReactions, targetSocketType) => {
+  const reactionElements = [];
+  reactions.map((senderSocketReactions, targetSocketType) => {
+    (isOwned || !vocab.refuseAddToNonOwned[targetSocketType]) &&
       reactionElements.push(
         <WonSocketAddButton
           senderReactions={senderSocketReactions}
@@ -372,15 +372,12 @@ function WonAtomContentReactions({
           }}
         />
       );
-    });
+  });
 
-    return reactionElements;
-  };
-
-  return (
-    <won-atom-content-reactions>
-      {generateReactionElements()}
-    </won-atom-content-reactions>
+  return reactionElements.length > 0 ? (
+    <won-atom-content-reactions>{reactionElements}</won-atom-content-reactions>
+  ) : (
+    <div />
   );
 }
 WonAtomContentReactions.propTypes = {
@@ -399,77 +396,77 @@ function WonAtomContentSingleConnectSockets({
   storedAtoms,
   relevantSingleConnectConnectionsMap,
 }) {
-  const generateSingleConnectSocketElements = () => {
-    const reactionElements = [];
-    relevantSingleConnectConnectionsMap &&
-      relevantSingleConnectConnectionsMap.map(
-        (connections, targetSocketType) => {
-          const connectedConnections = connections.filter(
-            connectionUtils.isConnected
-          );
-
-          const socketUri = atomUtils.getSocketUri(atom, targetSocketType);
-          const contentElements = [];
-
-          if (connectedConnections.size > 0) {
-            connectedConnections.map(conn => {
-              switch (targetSocketType) {
-                //If you want specific socket-items for a specific targetSocketType please include the items here
-                default:
-                  contentElements.push(
-                    <WonGenericItem
-                      key={get(conn, "uri")}
-                      connection={conn}
-                      atom={
-                        isOwned
-                          ? get(
-                              storedAtoms,
-                              extractAtomUriFromConnectionUri(get(conn, "uri"))
-                            )
-                          : atom
-                      }
-                      targetAtom={get(storedAtoms, get(conn, "targetAtomUri"))}
-                      isOwned={isOwned}
-                      flip={get(conn, "targetSocketUri") === socketUri}
-                    />
-                  );
-                  break;
-              }
-            });
-          } else {
-            const senderSocketReactions = get(reactions, targetSocketType);
-
-            contentElements.push(
-              <WonSocketAddButton
-                senderReactions={senderSocketReactions}
-                targetSocketType={targetSocketType}
-                isAtomOwned={isOwned}
-                key={targetSocketType}
-                onClick={() => {
-                  setVisibleTab(targetSocketType);
-                  toggleAddPicker(true);
-                }}
-              />
-            );
-          }
-          reactionElements.push(
-            <div className="scs__item" key={targetSocketType}>
-              <div className="scs__item__label">
-                {wonLabelUtils.getSocketTabLabel(targetSocketType)}
-              </div>
-              <div className="scs__item__content">{contentElements}</div>
-            </div>
-          );
-        }
+  const reactionElements = [];
+  relevantSingleConnectConnectionsMap &&
+    relevantSingleConnectConnectionsMap.map((connections, targetSocketType) => {
+      const connectedConnections = connections.filter(
+        connectionUtils.isConnected
       );
 
-    return reactionElements;
-  };
+      const socketUri = atomUtils.getSocketUri(atom, targetSocketType);
+      const contentElements = [];
 
-  return (
+      //TODO: Handle requestSents and requestReceived connections for singleConnectSocketActions
+
+      if (connectedConnections.size > 0) {
+        connectedConnections.map(conn => {
+          switch (targetSocketType) {
+            //If you want specific socket-items for a specific targetSocketType please include the items here
+            default:
+              contentElements.push(
+                <WonGenericItem
+                  key={get(conn, "uri")}
+                  connection={conn}
+                  atom={
+                    isOwned
+                      ? get(
+                          storedAtoms,
+                          extractAtomUriFromConnectionUri(get(conn, "uri"))
+                        )
+                      : atom
+                  }
+                  targetAtom={get(storedAtoms, get(conn, "targetAtomUri"))}
+                  isOwned={isOwned}
+                  flip={get(conn, "targetSocketUri") === socketUri}
+                />
+              );
+              break;
+          }
+        });
+      } else {
+        const senderSocketReactions = get(reactions, targetSocketType);
+
+        (isOwned || !vocab.refuseAddToNonOwned[targetSocketType]) &&
+          contentElements.push(
+            <WonSocketAddButton
+              senderReactions={senderSocketReactions}
+              targetSocketType={targetSocketType}
+              isAtomOwned={isOwned}
+              key={targetSocketType}
+              onClick={() => {
+                setVisibleTab(targetSocketType);
+                toggleAddPicker(true);
+              }}
+            />
+          );
+      }
+      contentElements.length > 0 &&
+        reactionElements.push(
+          <div className="scs__item" key={targetSocketType}>
+            <div className="scs__item__label">
+              {wonLabelUtils.getSocketTabLabel(targetSocketType)}
+            </div>
+            <div className="scs__item__content">{contentElements}</div>
+          </div>
+        );
+    });
+
+  return reactionElements.length > 0 ? (
     <won-atom-content-single-connect-sockets>
-      {generateSingleConnectSocketElements()}
+      {reactionElements}
     </won-atom-content-single-connect-sockets>
+  ) : (
+    <div />
   );
 }
 WonAtomContentSingleConnectSockets.propTypes = {

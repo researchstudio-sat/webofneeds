@@ -161,7 +161,9 @@ export default function WonAtomContentSocket({
                 ""}`}
             >
               {generateConnectionItems(activeConnections)}
-              {atomUtils.isActive(atom) && reactions ? (
+              {atomUtils.isActive(atom) &&
+              reactions &&
+              (isAtomOwned || !vocab.refuseAddToNonOwned[socketType]) ? (
                 <WonSocketAddButton
                   senderReactions={reactions}
                   isAtomOwned={isAtomOwned}
