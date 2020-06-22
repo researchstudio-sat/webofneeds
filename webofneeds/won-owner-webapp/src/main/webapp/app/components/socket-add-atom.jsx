@@ -94,17 +94,18 @@ export default function WonSocketAddAtom({
                 (ucIdentifier === "*" ||
                   atomUtils.getMatchedUseCaseIdentifier(atom) ===
                     ucIdentifier) &&
-                (isAddToAtomOwned
-                  ? !atomUtils.getConnectionBySocketUris(
-                      addToAtom,
-                      addToAtomSocketUri,
-                      atomUtils.getSocketUri(atom, socketType)
-                    )
-                  : !atomUtils.getConnectionBySocketUris(
-                      atom,
-                      atomUtils.getSocketUri(atom, socketType),
-                      addToAtomSocketUri
-                    ))
+                (vocab.socketCapacity[addToSocketType] === 1 ||
+                  (isAddToAtomOwned
+                    ? !atomUtils.getConnectionBySocketUris(
+                        addToAtom,
+                        addToAtomSocketUri,
+                        atomUtils.getSocketUri(atom, socketType)
+                      )
+                    : !atomUtils.getConnectionBySocketUris(
+                        atom,
+                        atomUtils.getSocketUri(atom, socketType),
+                        addToAtomSocketUri
+                      )))
             )
           );
         })
@@ -162,17 +163,18 @@ export default function WonSocketAddAtom({
               (ucIdentifier === "*" ||
                 atomUtils.getMatchedUseCaseIdentifier(selectedAtom) ===
                   ucIdentifier) &&
-              (isAddToAtomOwned
-                ? !atomUtils.getConnectionBySocketUris(
-                    addToAtom,
-                    addToAtomSocketUri,
-                    atomUtils.getSocketUri(selectedAtom, socketType)
-                  )
-                : !atomUtils.getConnectionBySocketUris(
-                    selectedAtom,
-                    atomUtils.getSocketUri(selectedAtom, socketType),
-                    addToAtomSocketUri
-                  ))
+              (vocab.socketCapacity[addToSocketType] === 1 ||
+                (isAddToAtomOwned
+                  ? !atomUtils.getConnectionBySocketUris(
+                      addToAtom,
+                      addToAtomSocketUri,
+                      atomUtils.getSocketUri(selectedAtom, socketType)
+                    )
+                  : !atomUtils.getConnectionBySocketUris(
+                      selectedAtom,
+                      atomUtils.getSocketUri(selectedAtom, socketType),
+                      addToAtomSocketUri
+                    )))
           );
         const selectedAtomSocketUri = atomUtils.getSocketUri(
           selectedAtom,
