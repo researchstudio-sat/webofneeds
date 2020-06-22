@@ -40,7 +40,6 @@ export default function WonAtomHeaderBig({ atom }) {
     atomUtils.hasBuddySocket(atom) &&
     hasOwnedAtomsWithBuddySocket &&
     !accountUtils.isAtomOwned(accountState, atomUri);
-  const atomTypeLabel = atom && atomUtils.generateTypeLabel(atom);
 
   const title = get(atom, "humanReadable");
 
@@ -71,7 +70,6 @@ export default function WonAtomHeaderBig({ atom }) {
             {titleElement}
             {personaNameElement}
             {groupChatElement}
-            <div className="ahb__titles__type">{atomTypeLabel}</div>
           </hgroup>
         </div>
         {buddyActionElement}
