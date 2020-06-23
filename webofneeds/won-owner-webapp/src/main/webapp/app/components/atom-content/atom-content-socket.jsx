@@ -163,7 +163,10 @@ export default function WonAtomContentSocket({
               {generateConnectionItems(activeConnections)}
               {atomUtils.isActive(atom) &&
               reactions &&
-              (isAtomOwned || !vocab.refuseAddToNonOwned[socketType]) ? (
+              ((isAtomOwned || !vocab.refuseAddToNonOwned[socketType]) &&
+                (!vocab.socketCapacity[socketType] ||
+                  relevantConnections.filter(connectionUtils.isConnected).size <
+                    vocab.socketCapacity[socketType])) ? (
                 <WonSocketAddButton
                   senderReactions={reactions}
                   isAtomOwned={isAtomOwned}

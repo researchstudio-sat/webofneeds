@@ -23,6 +23,8 @@ export const organization = {
           "#memberSocket": vocab.WXSCHEMA.MemberSocketCompacted,
           "#associatedArticleSocket":
             vocab.WXSCHEMA.AssociatedArticleSocketCompacted,
+          "#parentOrgSocket": vocab.WXSCHEMA.ParentOrganizationSocketCompacted,
+          "#subOrgSocket": vocab.WXSCHEMA.SubOrganizationSocketCompacted,
         },
       },
     }),
@@ -42,6 +44,16 @@ export const organization = {
     [vocab.WXSCHEMA.AssociatedArticleSocketCompacted]: {
       [vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted]: {
         useCaseIdentifiers: ["newsarticle"],
+      },
+    },
+    [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: {
+      [vocab.WXSCHEMA.SubOrganizationSocketCompacted]: {
+        useCaseIdentifiers: ["organization"],
+      },
+    },
+    [vocab.WXSCHEMA.SubOrganizationSocketCompacted]: {
+      [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: {
+        useCaseIdentifiers: ["organization"],
       },
     },
   },

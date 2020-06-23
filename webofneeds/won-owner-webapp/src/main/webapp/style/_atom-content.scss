@@ -62,6 +62,12 @@ won-atom-content {
           padding-bottom: 0.25rem;
         }
         > .scs__item__content {
+          > won-atom-connections-indicator {
+            border: $thinGrayBorder;
+            background: $won-light-gray;
+            padding: 0.5rem;
+          }
+
           &:hover {
             border-color: $won-primary-color;
           }

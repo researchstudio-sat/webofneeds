@@ -52,6 +52,8 @@ const labels = deepFreeze({
     [vocab.WXSCHEMA.MemberOfSocketCompacted]: "Member Of",
     [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: "Employees",
     [vocab.WXSCHEMA.WorksForSocketCompacted]: "Works For",
+    [vocab.WXSCHEMA.SubOrganizationSocketCompacted]: "Sub Organizations",
+    [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: "Parent Organization",
   },
   socketItem: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Member",
@@ -66,6 +68,8 @@ const labels = deepFreeze({
     [vocab.WXSCHEMA.MemberOfSocketCompacted]: "Member",
     [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: "Employer",
     [vocab.WXSCHEMA.WorksForSocketCompacted]: "Employee",
+    [vocab.WXSCHEMA.SubOrganizationSocketCompacted]: "Parent Organization",
+    [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: "Sub Organization",
   },
   socketItems: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Members",
@@ -80,6 +84,8 @@ const labels = deepFreeze({
     [vocab.WXSCHEMA.MemberOfSocketCompacted]: "Memberships",
     [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: "Employees",
     [vocab.WXSCHEMA.WorksForSocketCompacted]: "Employers",
+    [vocab.WXSCHEMA.SubOrganizationSocketCompacted]: "Sub Organizations",
+    [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: "Parent Organizations",
   },
 });
 

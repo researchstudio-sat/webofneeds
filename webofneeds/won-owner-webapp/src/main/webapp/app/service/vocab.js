@@ -275,21 +275,6 @@ vocab.HOLD.HolderSocketCompacted = vocab.HOLD.prefix + ":HolderSocket";
 vocab.HOLD.heldByCompacted = vocab.HOLD.prefix + ":heldBy";
 vocab.HOLD.holdsCompacted = vocab.HOLD.prefix + ":holds";
 
-/* This constant is limiting the connected connections
- to a holdableSocket to one, if a socket is not listed
- in this object, the capacity is not limited
-
- socketCapacity could be retrieved from the socketDefinition
- e.g. see won-ext-hold.ttl and won-ext-core.ttl -> won:socketCapacity */
-vocab.socketCapacity = {
-  [vocab.HOLD.HoldableSocketCompacted]: 1,
-};
-
-/* This constant is to prevent connections to non owned atoms for specific sockets */
-vocab.refuseAddToNonOwned = {
-  [vocab.HOLD.HoldableSocketCompacted]: true,
-};
-
 vocab.BOT = {};
 vocab.BOT.baseUri = "https://w3id.org/won/ext/bot#";
 vocab.BOT.prefix = "wx-bot";
@@ -364,6 +349,16 @@ vocab.WXSCHEMA.AssociatedArticleInverseSocket =
 vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted =
   vocab.WXSCHEMA.prefix + ":AssociatedArticleInverseSocket";
 
+vocab.WXSCHEMA.SubOrganizationSocket =
+  vocab.WXSCHEMA.baseUri + "SubOrganizationSocket";
+vocab.WXSCHEMA.SubOrganizationSocketCompacted =
+  vocab.WXSCHEMA.prefix + ":SubOrganizationSocket";
+
+vocab.WXSCHEMA.ParentOrganizationSocket =
+  vocab.WXSCHEMA.baseUri + "ParentOrganizationSocket";
+vocab.WXSCHEMA.ParentOrganizationSocketCompacted =
+  vocab.WXSCHEMA.prefix + ":ParentOrganizationSocket";
+
 // UTILS
 vocab.WONMSG.uriPlaceholder = Object.freeze({
   event: "wm:/SELF",
@@ -372,5 +367,21 @@ vocab.WONMSG.uriPlaceholder = Object.freeze({
 vocab.WON.contentNodeBlankUri = Object.freeze({
   seeks: "_:seeksAtomContent",
 });
+
+/* This constant is limiting the connected connections
+ to a holdableSocket to one, if a socket is not listed
+ in this object, the capacity is not limited
+
+ socketCapacity could be retrieved from the socketDefinition
+ e.g. see won-ext-hold.ttl and won-ext-core.ttl -> won:socketCapacity */
+vocab.socketCapacity = {
+  [vocab.HOLD.HoldableSocketCompacted]: 1,
+  [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: 1,
+};
+
+/* This constant is to prevent connections to non owned atoms for specific sockets */
+vocab.refuseAddToNonOwned = {
+  [vocab.HOLD.HoldableSocketCompacted]: true,
+};
 
 export default vocab;

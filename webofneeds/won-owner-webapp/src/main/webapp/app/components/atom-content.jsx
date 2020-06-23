@@ -123,9 +123,9 @@ export default function WonAtomContent({
     let visibleTabFragment;
     const relevantConnections =
       get(
-        relevantConnectionsMap.filter(
+        relevantConnectionsMap /*.filter(
           connectionUtils.filterSingleConnectedSocketCapacityFilter
-        ),
+        )*/,
         visibleTab
       ) || Immutable.Map();
 
