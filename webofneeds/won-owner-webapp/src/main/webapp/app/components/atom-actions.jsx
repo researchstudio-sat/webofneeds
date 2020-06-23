@@ -10,6 +10,7 @@ import * as wonLabelUtils from "../won-label-utils.js";
 
 import "~/style/_atom-actions.scss";
 import WonGenericSocketActions from "./socket-actions/generic-actions";
+import WonAtomHeader from "./atom-header.jsx";
 import WonParticipantSocketActions from "./socket-actions/participant-actions";
 import WonBuddySocketActions from "./socket-actions/buddy-actions";
 import WonChatSocketActions from "./socket-actions/chat-actions";
@@ -24,6 +25,7 @@ const ActionType = {
 export default function WonAtomActions({ atom, ownedConnection, className }) {
   const dispatch = useDispatch();
   const atomUri = get(atom, "uri");
+  const atomType = atomUtils.generateTypeLabel(atom);
 
   const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
 
@@ -81,9 +83,14 @@ export default function WonAtomActions({ atom, ownedConnection, className }) {
           senderAtom,
           get(ownedConnection, "socketUri")
         );
-        const targetAtomTypeLabel = atomUtils.generateTypeLabel(targetAtom);
+        const targetSocketType = atomUtils.getSocketType(
+          targetAtom,
+          get(ownedConnection, "targetSocketUri")
+        );
 
         let ActionComponent;
+
+        //TODO: Display correct SocketItem based on socketType instead of WonAtomHeader
 
         switch (senderSocketType) {
           case vocab.GROUP.GroupSocketCompacted:
@@ -100,15 +107,22 @@ export default function WonAtomActions({ atom, ownedConnection, className }) {
             break;
         }
 
+        const isTargetAtomDisplayed = get(senderAtom, "uri") === atomUri;
+        const toSocketType = isTargetAtomDisplayed
+          ? targetSocketType
+          : senderSocketType;
         actionElement = (
           <React.Fragment>
             <div className="atom-actions__infolabel">
-              {wonLabelUtils.getSocketActionInfo(
-                senderSocketType,
-                targetAtomTypeLabel,
+              {wonLabelUtils.getSocketActionInfoLabel(
+                atomType,
+                toSocketType,
                 get(ownedConnection, "state")
               )}
             </div>
+            <WonAtomHeader
+              atom={isTargetAtomDisplayed ? targetAtom : senderAtom}
+            />
             <ActionComponent
               connection={ownedConnection}
               goBackOnAction={true}

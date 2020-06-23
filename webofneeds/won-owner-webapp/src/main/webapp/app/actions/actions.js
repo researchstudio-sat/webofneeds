@@ -152,6 +152,7 @@ const actionHierarchy = {
 
     storeUriFailed: INJ_DEFAULT,
     removeDeleted: INJ_DEFAULT,
+    markAsLoaded: INJ_DEFAULT,
   },
   personas: {
     review: reviewPersona,

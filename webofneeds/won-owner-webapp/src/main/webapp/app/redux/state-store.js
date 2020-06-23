@@ -156,6 +156,12 @@ export function fetchAtomAndDispatch(
 
   if (!update && processUtils.isAtomLoaded(processState, atomUri)) {
     console.debug("Omit Fetch of Atom<", atomUri, ">, it is already loaded...");
+    if (processUtils.isAtomToLoad(processState, atomUri)) {
+      dispatch({
+        type: actionTypes.atoms.markAsLoaded,
+        payload: Immutable.fromJS({ uri: atomUri }),
+      });
+    }
     return Promise.resolve();
   } else if (processUtils.isAtomLoading(processState, atomUri)) {
     console.debug(
@@ -186,6 +192,12 @@ export function fetchAtomAndDispatch(
             personaUri,
             "> attached to Atom, it is already loaded"
           );
+          if (processUtils.isAtomToLoad(processState, personaUri)) {
+            dispatch({
+              type: actionTypes.atoms.markAsLoaded,
+              payload: Immutable.fromJS({ uri: personaUri }),
+            });
+          }
           return atom;
         } else if (processUtils.isAtomLoading(processState, personaUri)) {
           console.debug(
@@ -470,6 +482,12 @@ function fetchOwnedAtomAndDispatch(
 
   if (!forceFetch && processUtils.isAtomLoaded(processState, atomUri)) {
     console.debug("Omit Fetch of Atom<", atomUri, ">, it is already loaded...");
+    if (processUtils.isAtomToLoad(processState, atomUri)) {
+      dispatch({
+        type: actionTypes.atoms.markAsLoaded,
+        payload: Immutable.fromJS({ uri: atomUri }),
+      });
+    }
     return Promise.resolve();
   } else if (!forceFetch && processUtils.isAtomLoading(processState, atomUri)) {
     console.debug(

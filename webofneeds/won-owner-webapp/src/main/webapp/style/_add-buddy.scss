@@ -50,7 +50,7 @@ won-add-buddy {
     position: relative;
     height: 0;
     z-index: 1000;
-    top: calc((#{$postIconSizeMobile} + #{$thinBorderWidth} + 0.5rem) * -1);
+    top: calc((#{$thinBorderWidth} + 0.5rem) * -1);
     right: $thinBorderWidth;
 
     .add-buddy__addbuddymenu__content {

@@ -3,63 +3,169 @@
 @import "sizing-utils";
 @import "square-image";
 
-.atom-header-big {
+won-atom-header-big {
+  display: grid;
   background-color: $won-light-gray;
   border-top: none;
   border-bottom: $thinBorderWidth solid $won-line-gray;
 
-  @include max-content-width($maxContentWidth, $minContentPadding, "ahb");
+  &.won-atom-header-big--actions-expanded {
+    border-color: $won-secondary-color;
+  }
 
-  > .ahb__inner {
+  grid-template-areas:
+    "icon title . buddy share context"
+    "icon title . . . ."
+    "icon info actiontoggle actiontoggle actiontoggle actiontoggle";
+  grid-template-columns: min-content 1fr min-content min-content min-content min-content;
+
+  @media (max-width: $responsivenessBreakPoint) {
+    padding: 0.5rem 0.5rem 0 0.5rem;
+    grid-row-gap: 0.1rem;
+    @include square-image($postIconSize, 0 0.5rem 0.5rem 0);
+    grid-template-areas:
+      "icon title share context"
+      "icon info buddy context"
+      "actiontoggle actiontoggle actiontoggle actiontoggle";
+    grid-template-columns: min-content 1fr min-content min-content;
+  }
+  @media (min-width: $responsivenessBreakPoint) {
+    padding: 1rem 1rem 0 1rem;
+    grid-row-gap: 0.5rem;
+    @include square-image(4.7rem, 0 1rem 1rem 0);
+    grid-template-areas:
+      "icon title . buddy share context"
+      "icon title . . . ."
+      "icon info actiontoggle actiontoggle actiontoggle actiontoggle";
+    grid-template-columns: min-content 1fr min-content min-content min-content min-content;
+  }
+
+  > won-atom-icon {
+    grid-area: icon;
+    align-self: center;
+  }
+
+  > won-add-buddy {
+    grid-area: buddy;
     display: flex;
-    flex-direction: row;
-    align-content: center;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 1rem;
+    justify-self: end;
+    margin-right: 1rem;
+  }
+
+  > won-toggle-actions {
+    grid-area: actiontoggle;
+    align-self: end;
+    justify-self: end;
+    white-space: nowrap;
+
+    > .won-toggle-actions__button {
+      display: grid;
+      grid-auto-flow: column;
+      grid-gap: 0.5rem;
+      /* justify-content: center; */
+      align-items: center;
+      position: relative;
+      cursor: pointer;
+      border: $thinGrayBorder;
+      border-bottom: none;
+      border-top-left-radius: 0.25rem;
+      border-top-right-radius: 0.25rem;
+      padding: 0.5rem;
+
+      > .won-toggle-actions__button__infoicon {
+        @include square-image($iconSize);
+      }
+
+      > .won-toggle-actions__button__carret {
+        @include fixed-square(1rem);
+      }
+
+      &.won-toggle-actions__button--collapsed {
+        --local-primary: #{$won-secondary-color};
+        color: $won-secondary-color;
+        background: $won-light-gray;
+
+        > .won-toggle-actions__button__carret {
+          transition: all linear 0.2s;
+        }
+      }
+
+      &.won-toggle-actions__button--expanded {
+        --local-primary: #{$won-secondary-text-color};
+        border-color: $won-secondary-color;
+        color: $won-secondary-text-color;
+        background: $won-secondary-color;
+
+        > .won-toggle-actions__button__carret {
+          transform: rotate(-180deg);
+          transition: all linear 0.2s;
+        }
+      }
+
+      &:hover {
+        --local-primary: #{$won-secondary-text-color};
+        border-color: $won-secondary-color;
+        color: $won-secondary-text-color;
+        background: $won-secondary-color;
+      }
+
+      &:hover,
+      &:focus {
+        outline: 0;
+      }
+    }
+  }
+
+  > won-share-dropdown {
+    grid-area: share;
+    margin-right: 1rem;
+  }
+
+  > won-atom-context-dropdown {
+    grid-area: context;
+  }
+
+  > .ahb__title {
+    grid-area: title;
+
+    font-size: $mediumFontSize;
+    font-weight: 300;
+    text-overflow: ellipsis;
+    overflow: hidden;
 
     @media (max-width: $responsivenessBreakPoint) {
-      @include square-image($postIconSize, 0 0.5rem 0 0);
+      font-size: $normalFontSize;
     }
-    @media (min-width: $responsivenessBreakPoint) {
-      @include square-image(4.7rem, 0 1rem 0 0);
+  }
+
+  > .ahb__info {
+    grid-area: info;
+    align-self: end;
+    margin-right: 0.5rem;
+    margin-bottom: 1rem;
+
+    @media (max-width: $responsivenessBreakPoint) {
+      margin-bottom: 0.5rem;
     }
 
-    .ahb__title {
-      font-size: $mediumFontSize;
-      font-weight: 300;
-      padding: 0.1rem;
+    > .ahb__info__groupchat,
+    > .ahb__info__persona {
+      border-radius: 0.19rem;
+      padding: 0 0.25rem;
+      margin-right: 0.25rem;
 
       @media (max-width: $responsivenessBreakPoint) {
-        font-size: $normalFontSize;
+        font-size: $smallFontSize;
       }
     }
 
-    .ahb__titles__persona {
-      border-radius: 0.19rem;
+    > .ahb__info__persona {
       background: $won-secondary-color-lighter;
       color: $won-secondary-text-color;
-      padding: 0 0.25rem;
-      display: inline-block;
     }
 
-    .ahb__titles__groupchat {
-      border-radius: 0.19rem;
+    > .ahb__info__groupchat {
       background: $won-line-gray;
-      margin: 0.1rem;
-      padding: 0 0.25rem;
-      display: inline-block;
     }
-  }
-
-  > won-add-buddy,
-  > won-atom-context-dropdown,
-  > won-share-dropdown {
-    margin-top: 1rem;
-    margin-right: 0.5rem;
-  }
-
-  > won-share-dropdown {
-    margin-right: 1rem;
   }
 }

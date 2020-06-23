@@ -130,39 +130,37 @@ export function getSocketItemsLabel(socketType) {
   return labels.socketItems[socketType] || socketType;
 }
 
-export function getSocketActionInfo(
-  senderSocketType,
-  targetAtomTypeLabel,
+export function getSocketActionInfoLabel(
+  atomType,
+  socketType,
   connectionState
 ) {
-  //TODO: BETTER LABELS
+  //TODO: IMPL BETTER
   let infoLabel = "";
+  const atomTypeLabel = atomType.length > 0 ? atomType : "Atom";
 
   switch (connectionState) {
     case vocab.WON.Connected:
-      infoLabel = " already added to ";
+      infoLabel = "already added to";
       break;
     case vocab.WON.RequestSent:
-      infoLabel = " requested to join ";
+      infoLabel = "requested to join";
       break;
     case vocab.WON.RequestReceived:
-      infoLabel = " requests to join ";
+      infoLabel = "requests to join";
       break;
     case vocab.WON.Closed:
-      infoLabel = " was removed from ";
+      infoLabel = ` was removed from `;
       break;
     case vocab.WON.Suggested:
-      infoLabel = " suggested as ";
+      infoLabel = ` suggested as `;
       break;
     default:
-      infoLabel = " <-- ";
+      infoLabel = " <--> ";
       break;
   }
-  return (
-    (targetAtomTypeLabel.length > 0 ? targetAtomTypeLabel : "Atom") +
-    infoLabel +
-    getSocketItemsLabel(senderSocketType)
-  );
+
+  return `${atomTypeLabel} ${infoLabel} ${getSocketItemsLabel(socketType)} of`;
 }
 
 /**
