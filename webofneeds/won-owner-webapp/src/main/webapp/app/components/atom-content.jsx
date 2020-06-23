@@ -20,6 +20,7 @@ import WonAtomContentChats from "./atom-content/atom-content-chats.jsx";
 import WonAtomContentSocket from "./atom-content/atom-content-socket.jsx";
 import WonAtomContentGeneral from "./atom-content/atom-content-general.jsx";
 import WonSocketAddButton from "./socket-add-button.jsx";
+import WonAtomConnectionsIndicator from "./atom-connections-indicator.jsx";
 import WonAtomContentDetails from "./atom-content/atom-content-details.jsx";
 import WonBuddyItem from "./socket-items/buddy-item.jsx";
 import WonParticipantItem from "./socket-items/participant-item.jsx";
@@ -402,14 +403,22 @@ function WonAtomContentSingleConnectSockets({
       const connectedConnections = connections.filter(
         connectionUtils.isConnected
       );
+      const requestSentConnections = connections.filter(
+        connectionUtils.isRequestSent
+      );
 
       const socketUri = atomUtils.getSocketUri(atom, targetSocketType);
       const contentElements = [];
 
-      //TODO: Handle requestSents and requestReceived connections for singleConnectSocketActions
-
+      let displayConnections;
       if (connectedConnections.size > 0) {
-        connectedConnections.map(conn => {
+        displayConnections = connectedConnections;
+      } else if (requestSentConnections.size > 0) {
+        displayConnections = requestSentConnections;
+      }
+
+      if (displayConnections) {
+        displayConnections.map(conn => {
           switch (targetSocketType) {
             //If you want specific socket-items for a specific targetSocketType please include the items here
             default:
@@ -436,19 +445,37 @@ function WonAtomContentSingleConnectSockets({
       } else {
         const senderSocketReactions = get(reactions, targetSocketType);
 
-        (isOwned || !vocab.refuseAddToNonOwned[targetSocketType]) &&
+        if (
+          isOwned &&
+          atomUtils
+            .getConnections(atom, targetSocketType)
+            .find(
+              conn =>
+                connectionUtils.isRequestReceived(conn) ||
+                connectionUtils.isSuggested(conn)
+            )
+        ) {
           contentElements.push(
-            <WonSocketAddButton
-              senderReactions={senderSocketReactions}
-              targetSocketType={targetSocketType}
-              isAtomOwned={isOwned}
-              key={targetSocketType}
-              onClick={() => {
-                setVisibleTab(targetSocketType);
-                toggleAddPicker(true);
-              }}
+            <WonAtomConnectionsIndicator
+              atom={atom}
+              socketType={targetSocketType}
             />
           );
+        } else {
+          (isOwned || !vocab.refuseAddToNonOwned[targetSocketType]) &&
+            contentElements.push(
+              <WonSocketAddButton
+                senderReactions={senderSocketReactions}
+                targetSocketType={targetSocketType}
+                isAtomOwned={isOwned}
+                key={targetSocketType}
+                onClick={() => {
+                  setVisibleTab(targetSocketType);
+                  toggleAddPicker(true);
+                }}
+              />
+            );
+        }
       }
       contentElements.length > 0 &&
         reactionElements.push(

@@ -3,6 +3,7 @@
  */
 import React from "react";
 import PropTypes from "prop-types";
+import Immutable from "immutable";
 import { get, generateLink } from "../utils.js";
 
 import * as atomUtils from "../redux/utils/atom-utils.js";
@@ -15,23 +16,33 @@ import ico36_match from "~/images/won-icons/ico36_match.svg";
 import { useHistory } from "react-router-dom";
 import vocab from "../service/vocab";
 
-export default function WonAtomConnectionsIndicator({ atom }) {
+/**
+ * Displays connection State indicators with link to the corresponding connection
+ * @param atom
+ * @param socketType - if present limit indicator only to a certain socketType, if the socketType is not empty or not ChatSocket ignore Connected ChatMessages
+ * @returns {*}
+ * @constructor
+ */
+export default function WonAtomConnectionsIndicator({ atom, socketType }) {
   const history = useHistory();
 
-  const receivedRequests = atomUtils.getRequestReceivedConnections(atom);
+  const receivedRequests = atomUtils.getRequestReceivedConnections(
+    atom,
+    socketType
+  );
   const receivedRequestsUnread = receivedRequests.filter(conn =>
     connectionUtils.isUnread(conn)
   );
 
-  const connected = atomUtils.getConnectedConnections(
-    atom,
-    vocab.CHAT.ChatSocketCompacted
-  );
+  const connected =
+    !socketType || socketType === vocab.CHAT.ChatSocketCompacted
+      ? atomUtils.getConnectedConnections(atom, vocab.CHAT.ChatSocketCompacted)
+      : Immutable.Map();
   const connectedUnread = connected.filter(conn =>
     connectionUtils.isUnread(conn)
   );
 
-  const suggested = atomUtils.getSuggestedConnections(atom);
+  const suggested = atomUtils.getSuggestedConnections(atom, socketType);
   const suggestedUnread = suggested.filter(conn =>
     connectionUtils.isUnread(conn)
   );
@@ -166,4 +177,7 @@ export default function WonAtomConnectionsIndicator({ atom }) {
     );
   }
 }
-WonAtomConnectionsIndicator.propTypes = { atom: PropTypes.object };
+WonAtomConnectionsIndicator.propTypes = {
+  atom: PropTypes.object,
+  socketType: PropTypes.string,
+};
