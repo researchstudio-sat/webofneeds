@@ -108,6 +108,7 @@ won:derivesAtomProperty rdf:type owl:AnnotationProperty .
 	won:derivesAtomProperty schema:parentOrganization ;
 	rdfs:label "ParentOrganizationSocket" ;
 	rdfs:comment "An Atom `A` that specifies a Socket with this SocketDefinition derives triple `A schema:parentOrganization B` when a Connection with an Atom B is established. Automatically generated from the [parentOrganization](http://schema.org/parentOrganization) Property of the http://schema.org vocabulary." ;
+	won:socketCapacity 1 ;
 	won:compatibleSocketDefinition :SubOrganizationSocket .
 
 :AlbumReleaseSocket a won:SocketDefinition ;
