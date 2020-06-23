@@ -15,7 +15,8 @@ import {
 } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { useSelector, useDispatch } from "react-redux";
-import { labels, relativeTime } from "../won-label-utils.js";
+import { relativeTime } from "../won-label-utils.js";
+import * as wonLabelUtils from "../won-label-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
@@ -274,7 +275,7 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
       } else {
         messageOrState = !unreadMessageCount ? (
           <span className="ch__right__subtitle__type__state">
-            {labels.connectionState[get(connection, "state")]}
+            {wonLabelUtils.getConnectionStateLabel(get(connection, "state"))}
           </span>
         ) : (
           undefined

@@ -4,7 +4,7 @@
 
 import vocab from "../../service/vocab.js";
 import { get, getIn } from "../../utils.js";
-import { labels } from "../../won-label-utils.js";
+import * as wonLabelUtils from "../../won-label-utils.js";
 import * as connectionUtils from "./connection-utils.js";
 import * as useCaseUtils from "../../usecase-utils.js";
 import Immutable from "immutable";
@@ -356,10 +356,10 @@ export function generateFullFlagLabels(atomImm) {
   const flagsArray =
     flags &&
     flags
-      .toArray()
       // use nicer socket labels if available
       // TODO: remove this to match RDF state?
-      .map(flag => (labels.flags[flag] ? labels.flags[flag] : flag));
+      .map(wonLabelUtils.getFlagLabel)
+      .toArray();
   return flagsArray;
 }
 
@@ -371,12 +371,10 @@ export function generateFullSocketLabels(atomImm) {
   const socketsArray =
     sockets &&
     sockets
-      .toArray()
       // use nicer socket labels if available
       // TODO: remove this to match RDF state?
-      .map(
-        socket => (labels.sockets[socket] ? labels.sockets[socket] : socket)
-      );
+      .map(wonLabelUtils.getSocketLabel)
+      .toArray();
   return socketsArray;
 }
 
@@ -408,16 +406,11 @@ export function generateShortSocketLabels(atomImm) {
   const socketsArray =
     sockets &&
     sockets
-      .toArray()
       // rename sockets
       // TODO: check if this can be used anywhere or whether it should be Group Chat Enabled
-      .map(socket => {
-        if (socket === vocab.GROUP.GroupSocketCompacted) {
-          return labels.sockets[socket] ? labels.sockets[socket] : socket;
-        }
-        return "";
-      })
-      .filter(socket => socket.length > 0);
+      .filter(socket => socket === vocab.GROUP.GroupSocketCompacted)
+      .map(wonLabelUtils.getSocketLabel)
+      .toArray();
   return socketsArray;
 }
 
@@ -429,19 +422,16 @@ export function generateShortFlagLabels(atomImm) {
   const flagsArray =
     flags &&
     flags
-      .toArray()
+
       // rename flags
       // TODO: flags should have explanatory hovertext
-      .map(flag => {
-        if (flag === vocab.WONMATCH.NoHintForCounterpartCompacted) {
-          return labels.flags[flag] ? labels.flags[flag] : flag;
-        }
-        if (flag === vocab.WONMATCH.NoHintForMeCompacted) {
-          return labels.flags[flag] ? labels.flags[flag] : flag;
-        }
-        return "";
-      })
-      .filter(flag => flag.length > 0);
+      .filter(
+        flag =>
+          flag === vocab.WONMATCH.NoHintForCounterpartCompacted ||
+          flag === vocab.WONMATCH.NoHintForMeCompacted
+      )
+      .map(wonLabelUtils.getFlagLabel)
+      .toArray();
   return flagsArray;
 }
 

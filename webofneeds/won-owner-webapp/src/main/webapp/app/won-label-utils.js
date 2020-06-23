@@ -10,7 +10,7 @@ export const rdfTextfieldHelpText =
   "for prefixes that will be added automatically. E.g." +
   `\`<${vocab.WONMSG.uriPlaceholder.event}> con:text "hello world!". \``;
 
-export const labels = deepFreeze({
+const labels = deepFreeze({
   connectionState: {
     [vocab.WON.Suggested]: "Conversation suggested.",
     [vocab.WON.RequestSent]: "Conversation requested by you.",
@@ -82,6 +82,22 @@ export const labels = deepFreeze({
     [vocab.WXSCHEMA.WorksForSocketCompacted]: "Employers",
   },
 });
+
+export function getConnectionStateLabel(connectionState) {
+  return labels.connectionState[connectionState] || connectionState;
+}
+
+export function getMessageTypeLabel(messageType) {
+  return labels.messageType[messageType] || messageType;
+}
+
+export function getFlagLabel(flag) {
+  return labels.flags[flag] || flag;
+}
+
+export function getSocketLabel(socket) {
+  return labels.sockets[socket] || socket;
+}
 
 export function getSocketTabLabel(socketType) {
   return labels.socketTabs[socketType] || socketType;
