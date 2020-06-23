@@ -18,9 +18,15 @@ won-atom-actions {
     grid-auto-flow: column;
   }
 
+  > won-atom-header {
+    background: $won-light-gray;
+    border: $thinGrayBorder;
+    padding: 0.5rem;
+  }
+
   @media (min-width: $maxContentWidth) {
     grid-auto-flow: column;
-    grid-template-columns: 1fr min-content;
+    grid-template-columns: 1fr minmax(16rem, 1fr) min-content;
   }
   @media (max-width: $maxContentWidth) {
     grid-auto-flow: row;

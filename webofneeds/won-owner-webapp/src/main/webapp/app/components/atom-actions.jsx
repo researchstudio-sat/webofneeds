@@ -10,6 +10,7 @@ import * as wonLabelUtils from "../won-label-utils.js";
 
 import "~/style/_atom-actions.scss";
 import WonGenericSocketActions from "./socket-actions/generic-actions";
+import WonAtomHeader from "./atom-header.jsx";
 import WonParticipantSocketActions from "./socket-actions/participant-actions";
 import WonBuddySocketActions from "./socket-actions/buddy-actions";
 import WonChatSocketActions from "./socket-actions/chat-actions";
@@ -89,6 +90,8 @@ export default function WonAtomActions({ atom, ownedConnection, className }) {
 
         let ActionComponent;
 
+        //TODO: Display correct SocketItem based on socketType instead of WonAtomHeader
+
         switch (senderSocketType) {
           case vocab.GROUP.GroupSocketCompacted:
             ActionComponent = WonParticipantSocketActions;
@@ -117,6 +120,9 @@ export default function WonAtomActions({ atom, ownedConnection, className }) {
                 get(ownedConnection, "state")
               )}
             </div>
+            <WonAtomHeader
+              atom={isTargetAtomDisplayed ? targetAtom : senderAtom}
+            />
             <ActionComponent
               connection={ownedConnection}
               goBackOnAction={true}
