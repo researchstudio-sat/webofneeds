@@ -23,11 +23,21 @@ won-atom-header-big {
     padding: 0.5rem 0.5rem 0 0.5rem;
     grid-row-gap: 0.1rem;
     @include square-image($postIconSize, 0 0.5rem 0.5rem 0);
+    grid-template-areas:
+      "icon title share context"
+      "icon info buddy context"
+      "actiontoggle actiontoggle actiontoggle actiontoggle";
+    grid-template-columns: min-content 1fr min-content min-content;
   }
   @media (min-width: $responsivenessBreakPoint) {
     padding: 1rem 1rem 0 1rem;
     grid-row-gap: 0.5rem;
     @include square-image(4.7rem, 0 1rem 1rem 0);
+    grid-template-areas:
+      "icon title . buddy share context"
+      "icon title . . . ."
+      "icon info actiontoggle actiontoggle actiontoggle actiontoggle";
+    grid-template-columns: min-content 1fr min-content min-content min-content min-content;
   }
 
   > won-atom-icon {
