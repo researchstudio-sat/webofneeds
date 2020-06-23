@@ -9,6 +9,7 @@ import WonAtomContent from "./atom-content.jsx";
 import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as atomUtils from "../redux/utils/atom-utils";
 import * as processUtils from "../redux/utils/process-utils";
+import * as connectionUtils from "../redux/utils/connection-utils";
 
 import "~/style/_atom-info.scss";
 
@@ -19,10 +20,20 @@ export default function WonAtomInfo({
   initialTab = "DETAIL",
 }) {
   const atomUri = get(atom, "uri");
+  const connectionUri = get(ownedConnection, "uri");
   const processState = useSelector(generalSelectors.getProcessState);
+
+  const atomLoading =
+    !atom || processUtils.isAtomLoading(processState, atomUri);
 
   const [visibleTab, setVisibleTab] = useState(initialTab);
   const [showAddPicker, toggleAddPicker] = useState(false);
+  const [showActions, toggleActions] = useState(
+    !atomLoading &&
+      !!ownedConnection &&
+      (atomUtils.isInactive(atom) ||
+        (ownedConnection && !connectionUtils.isConnected(ownedConnection)))
+  );
 
   useEffect(
     () => {
@@ -31,12 +42,17 @@ export default function WonAtomInfo({
     },
     [atomUri, initialTab]
   );
-
-  const atomLoading =
-    !atom || processUtils.isAtomLoading(processState, atomUri);
-
-  const showActions =
-    !atomLoading && (atomUtils.isInactive(atom) || ownedConnection);
+  useEffect(
+    () => {
+      toggleActions(
+        !atomLoading &&
+          (atomUtils.isInactive(atom) ||
+            (!!ownedConnection &&
+              !connectionUtils.isConnected(ownedConnection)))
+      );
+    },
+    [atomUri, connectionUri, atomLoading]
+  );
 
   const relevantConnectionsMap = useSelector(
     generalSelectors.getConnectionsOfAtomWithOwnedTargetConnections(atomUri)
@@ -48,7 +64,12 @@ export default function WonAtomInfo({
         (className ? className : "") + (atomLoading ? " won-is-loading " : "")
       }
     >
-      <WonAtomHeaderBig atom={atom} />
+      <WonAtomHeaderBig
+        atom={atom}
+        ownedConnection={ownedConnection}
+        showActions={showActions}
+        toggleActions={toggleActions}
+      />
       {showActions ? (
         <WonAtomActions atom={atom} ownedConnection={ownedConnection} />
       ) : (

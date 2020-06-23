@@ -24,6 +24,7 @@ const ActionType = {
 export default function WonAtomActions({ atom, ownedConnection, className }) {
   const dispatch = useDispatch();
   const atomUri = get(atom, "uri");
+  const atomType = atomUtils.generateTypeLabel(atom);
 
   const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
 
@@ -81,7 +82,10 @@ export default function WonAtomActions({ atom, ownedConnection, className }) {
           senderAtom,
           get(ownedConnection, "socketUri")
         );
-        const targetAtomTypeLabel = atomUtils.generateTypeLabel(targetAtom);
+        const targetSocketType = atomUtils.getSocketType(
+          targetAtom,
+          get(ownedConnection, "targetSocketUri")
+        );
 
         let ActionComponent;
 
@@ -100,12 +104,16 @@ export default function WonAtomActions({ atom, ownedConnection, className }) {
             break;
         }
 
+        const isTargetAtomDisplayed = get(senderAtom, "uri") === atomUri;
+        const toSocketType = isTargetAtomDisplayed
+          ? targetSocketType
+          : senderSocketType;
         actionElement = (
           <React.Fragment>
             <div className="atom-actions__infolabel">
-              {wonLabelUtils.getSocketActionInfo(
-                senderSocketType,
-                targetAtomTypeLabel,
+              {wonLabelUtils.getSocketActionInfoLabel(
+                atomType,
+                toSocketType,
                 get(ownedConnection, "state")
               )}
             </div>

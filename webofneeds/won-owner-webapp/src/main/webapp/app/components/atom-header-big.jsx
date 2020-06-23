@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 
 import "~/style/_atom-header-big.scss";
 import * as atomUtils from "../redux/utils/atom-utils";
+import * as wonLabelUtils from "../won-label-utils.js";
 import * as accountUtils from "../redux/utils/account-utils";
 import { get } from "../utils.js";
 
@@ -16,10 +17,20 @@ import WonShareDropdown from "../components/share-dropdown.jsx";
 import WonAddBuddy from "../components/add-buddy.jsx";
 import * as generalSelectors from "../redux/selectors/general-selectors";
 
-export default function WonAtomHeaderBig({ atom }) {
+import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
+import { extractAtomUriFromConnectionUri } from "../utils";
+
+export default function WonAtomHeaderBig({
+  atom,
+  ownedConnection,
+  showActions,
+  toggleActions,
+}) {
   const atomUri = get(atom, "uri");
+  const atomType = atomUtils.generateTypeLabel(atom);
   const personaUri = atomUtils.getHeldByUri(atom);
-  const persona = useSelector(generalSelectors.getAtom(personaUri));
+  const storedAtoms = useSelector(generalSelectors.getAtoms);
+  const persona = get(storedAtoms, personaUri);
   const personaName =
     atomUtils.hasHoldableSocket(atom) && !atomUtils.hasGroupSocket(atom)
       ? get(persona, "humanReadable") || get(atom, "fakePersonaName")
@@ -50,35 +61,126 @@ export default function WonAtomHeaderBig({ atom }) {
   );
 
   const personaNameElement = personaName && (
-    <span className="ahb__titles__persona">{personaName}</span>
+    <span className="ahb__info__persona">{personaName}</span>
   );
 
   const groupChatElement = isGroupChatEnabled && (
-    <span className="ahb__titles__groupchat">
+    <span className="ahb__info__groupchat">
       {"Group Chat" + (isChatEnabled ? " enabled" : "")}
     </span>
   );
 
   const buddyActionElement = showAddBuddyElement && <WonAddBuddy atom={atom} />;
 
+  const generateAtomActionButton = () => {
+    const isInactive = atomUtils.isInactive(atom);
+    if (ownedConnection || isInactive) {
+      const connectionState = get(ownedConnection, "state");
+      const targetAtom = get(
+        storedAtoms,
+        get(ownedConnection, "targetAtomUri")
+      );
+      const senderAtom = get(
+        storedAtoms,
+        extractAtomUriFromConnectionUri(get(ownedConnection, "uri"))
+      );
+
+      const targetSocketType = atomUtils.getSocketType(
+        targetAtom,
+        get(ownedConnection, "targetSocketUri")
+      );
+      const senderSocketType = atomUtils.getSocketType(
+        senderAtom,
+        get(ownedConnection, "socketUri")
+      );
+
+      const isTargetAtomDisplayed = get(senderAtom, "uri") === atomUri;
+
+      const generateAtomIcon = () => {
+        let icon;
+        if (ownedConnection && !isInactive) {
+          icon = (
+            <WonAtomIcon
+              atom={isTargetAtomDisplayed ? targetAtom : senderAtom}
+            />
+          );
+        }
+
+        return (
+          icon && (
+            <div className="won-toggle-actions__button__infoicon">{icon}</div>
+          )
+        );
+      };
+
+      const generateButtonLabel = () => {
+        if (isInactive) {
+          return (
+            <span className="won-toggle-actions__button__label">
+              Atom Inactive
+            </span>
+          );
+        }
+
+        const toSocketType = isTargetAtomDisplayed
+          ? targetSocketType
+          : senderSocketType;
+
+        return (
+          <span className="won-toggle-actions__button__label">
+            {wonLabelUtils.getSocketActionInfoLabel(
+              atomType,
+              toSocketType,
+              connectionState
+            )}
+          </span>
+        );
+      };
+
+      return (
+        <won-toggle-actions>
+          <button
+            onClick={() => toggleActions(!showActions)}
+            className={
+              "won-toggle-actions__button " +
+              (showActions
+                ? " won-toggle-actions__button--expanded "
+                : " won-toggle-actions__button--collapsed ")
+            }
+          >
+            {generateButtonLabel()}
+            {generateAtomIcon()}
+            <svg className="won-toggle-actions__button__carret">
+              <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
+            </svg>
+          </button>
+        </won-toggle-actions>
+      );
+    }
+  };
+
   return (
-    <won-atom-header-big>
-      <nav className="atom-header-big">
-        <div className="ahb__inner">
-          <WonAtomIcon atom={atom} />
-          <hgroup>
-            {titleElement}
-            {personaNameElement}
-            {groupChatElement}
-          </hgroup>
+    <won-atom-header-big
+      class={showActions ? "won-atom-header-big--actions-expanded" : ""}
+    >
+      <WonAtomIcon atom={atom} />
+      {titleElement}
+      {(groupChatElement || personaNameElement) && (
+        <div className="ahb__info">
+          {groupChatElement}
+          {personaNameElement}
         </div>
-        {buddyActionElement}
-        <WonShareDropdown atom={atom} />
-        <WonAtomContextDropdown atom={atom} />
-      </nav>
+      )}
+      {buddyActionElement}
+      {generateAtomActionButton()}
+      <WonShareDropdown atom={atom} />
+      <WonAtomContextDropdown atom={atom} />
     </won-atom-header-big>
   );
 }
 WonAtomHeaderBig.propTypes = {
   atom: PropTypes.object,
+  ownedConnection: PropTypes.object,
+  showActions: PropTypes.bool.isRequired,
+  toggleActions: PropTypes.func.isRequired,
 };
