@@ -542,6 +542,17 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
+    case actionTypes.atoms.markAsLoaded: {
+      let atomUri = get(action.payload, "uri");
+
+      return updateAtomProcess(processState, atomUri, {
+        toLoad: false,
+        failedToLoad: false,
+        loading: false,
+        loaded: true,
+      });
+    }
+
     case actionTypes.atoms.storeOwnedMetaAtoms: {
       const metaAtoms = get(action.payload, "metaAtoms");
 
