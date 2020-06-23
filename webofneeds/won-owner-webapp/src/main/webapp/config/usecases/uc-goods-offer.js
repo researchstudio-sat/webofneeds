@@ -2,7 +2,11 @@
  * Created by kweinberger on 06.12.2018.
  */
 
-import { details, mergeInEmptyDraft } from "../detail-definitions.js";
+import {
+  details,
+  mergeInEmptyDraft,
+  defaultReactions,
+} from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
 import ico36_plus from "../../images/won-icons/ico36_plus.svg";
 
@@ -21,6 +25,7 @@ export const goodsOffer = {
     }),
   },
   reactions: {
+    ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
         useCaseIdentifiers: ["goodsServiceSearch", "persona"],

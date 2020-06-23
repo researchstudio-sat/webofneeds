@@ -7,7 +7,11 @@ import { handleComplaint } from "./uc-handle-complaint.js";
 import { customUseCase } from "./uc-custom.js";
 import { contactPaymentBot } from "./uc-contact-payment-bot.js";
 
-import { details, mergeInEmptyDraft } from "../detail-definitions.js";
+import {
+  details,
+  mergeInEmptyDraft,
+  defaultReactions,
+} from "../detail-definitions.js";
 
 import ico36_plus from "../../images/won-icons/ico36_plus.svg";
 import ico36_uc_custom from "../../images/won-icons/ico36_uc_custom.svg";
@@ -38,6 +42,7 @@ export const otherGroup = {
         }),
       },
       reactions: {
+        ...defaultReactions,
         [vocab.GROUP.GroupSocketCompacted]: {
           [vocab.CHAT.ChatSocketCompacted]: {
             useCaseIdentifiers: ["*"],

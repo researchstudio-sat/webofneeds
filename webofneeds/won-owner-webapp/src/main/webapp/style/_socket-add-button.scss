@@ -26,6 +26,7 @@ won-socket-add-button {
   }
 
   &:hover {
+    cursor: pointer;
     .socketadd__label {
       color: $won-primary-color;
     }

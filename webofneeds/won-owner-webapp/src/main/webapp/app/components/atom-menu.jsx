@@ -27,19 +27,8 @@ export default function WonAtomMenu({
 
   const reviewCount = getIn(atom, ["rating", "reviewCount"]) || 0;
 
-  const heldByUri = atomUtils.getHeldByUri(atom);
-  const isHeld = atomUtils.isHeld(atom);
-  const holder = useSelector(generalSelectors.getAtom(heldByUri));
-  const holderHasReviewSocket = atomUtils.hasReviewSocket(holder);
-  const holderAggregateRating =
-    holderHasReviewSocket && getIn(holder, ["rating", "aggregateRating"]);
-
   const viewState = useSelector(generalSelectors.getViewState);
   const process = useSelector(generalSelectors.getProcessState);
-
-  const isHoldable = atomUtils.hasHoldableSocket(atom);
-  const holderAggregateRatingString =
-    holderAggregateRating && holderAggregateRating.toFixed(1);
 
   const hasReviews = reviewCount > 0;
   const atomLoading = !atom || processUtils.isAtomLoading(process, atomUri);
@@ -85,107 +74,93 @@ export default function WonAtomMenu({
   );
 
   // Add generic Tabs based on available Sockets
-  relevantConnectionsMap.map((socketTypeConnections, socketType) => {
-    let label = wonLabelUtils.getSocketTabLabel(socketType);
-    let countLabel;
+  relevantConnectionsMap
+    .filter(connectionUtils.filterSingleConnectedSocketCapacityFilter)
+    .map((socketTypeConnections, socketType) => {
+      let label = wonLabelUtils.getSocketTabLabel(socketType);
+      let countLabel;
 
-    const selected = visibleTab === socketType;
-    let inactive = false; //TODO: Implement inactive based on connectionsCount and possibleReactions to socket
-    let unread = false;
+      const selected = visibleTab === socketType;
+      let inactive = false; //TODO: Implement inactive based on connectionsCount and possibleReactions to socket
+      let unread = false;
 
-    switch (socketType) {
-      case vocab.HOLD.HoldableSocketCompacted:
-        if (isHeld) {
+      switch (socketType) {
+        case vocab.REVIEW.ReviewSocketCompacted:
+          countLabel = hasReviews && "(" + reviewCount + ")";
+          break;
+
+        case vocab.CHAT.ChatSocketCompacted: {
+          const socketUri = atomUtils.getSocketUri(atom, socketType);
+          const activeConnections = socketTypeConnections
+            .filter(
+              conn =>
+                // We filter out every chat connection that is not owned, otherwise the count would show non owned chatconnections of non owned atoms
+                isOwned || connectionUtils.hasTargetSocketUri(conn, socketUri)
+            )
+            .filter(conn => !connectionUtils.isClosed(conn));
           countLabel =
-            holderAggregateRatingString &&
-            "(★ " + holderAggregateRatingString + ")";
-        } else if (isHoldable && isOwned) {
-          countLabel =
-            holderAggregateRatingString &&
-            "(★ " + holderAggregateRatingString + ")";
-          label = "+ " + label;
-        } else {
-          // if there is currently no holder in a non-owned atom we set the label to undefined to remove the tab from being displayed
-          label = undefined;
+            activeConnections && activeConnections.size > 0
+              ? "(" + activeConnections.size + ")"
+              : undefined;
+          unread =
+            activeConnections &&
+            !!activeConnections.find(conn => connectionUtils.isUnread(conn));
+          break;
         }
-        break;
 
-      case vocab.REVIEW.ReviewSocketCompacted:
-        countLabel = hasReviews && "(" + reviewCount + ")";
-        break;
+        case vocab.HOLD.HolderSocketCompacted: {
+          //Holdertab should always just display the amount of connected items
+          const activeConnections = socketTypeConnections.filter(conn =>
+            connectionUtils.isConnected(conn)
+          );
 
-      case vocab.CHAT.ChatSocketCompacted: {
-        const socketUri = atomUtils.getSocketUri(atom, socketType);
-        const activeConnections = socketTypeConnections
-          .filter(
-            conn =>
-              // We filter out every chat connection that is not owned, otherwise the count would show non owned chatconnections of non owned atoms
-              isOwned || connectionUtils.hasTargetSocketUri(conn, socketUri)
-          )
-          .filter(conn => !connectionUtils.isClosed(conn));
-        countLabel =
-          activeConnections && activeConnections.size > 0
-            ? "(" + activeConnections.size + ")"
-            : undefined;
-        unread =
-          activeConnections &&
-          !!activeConnections.find(conn => connectionUtils.isUnread(conn));
-        break;
+          countLabel =
+            activeConnections && activeConnections.size > 0
+              ? "(" + activeConnections.size + ")"
+              : undefined;
+          unread =
+            activeConnections &&
+            !!activeConnections.find(conn => connectionUtils.isUnread(conn));
+          break;
+        }
+
+        default: {
+          const activeConnections = socketTypeConnections.filter(
+            conn => !connectionUtils.isClosed(conn)
+          );
+
+          countLabel =
+            activeConnections && activeConnections.size > 0
+              ? "(" + activeConnections.size + ")"
+              : undefined;
+          unread =
+            activeConnections &&
+            !!activeConnections.find(conn => connectionUtils.isUnread(conn));
+          break;
+        }
       }
 
-      case vocab.HOLD.HolderSocketCompacted: {
-        //Holdertab should always just display the amount of connected items
-        const activeConnections = socketTypeConnections.filter(conn =>
-          connectionUtils.isConnected(conn)
+      if (label) {
+        buttons.push(
+          <div
+            key={socketType}
+            className={generateAtomItemCssClasses(selected, inactive, unread)}
+            onClick={() => {
+              setVisibleTab(socketType);
+              toggleAddPicker(false);
+            }}
+          >
+            <span className="atom-menu__item__unread" />
+            <span className="atom-menu__item__label">{label}</span>
+            {countLabel ? (
+              <span className="atom-menu__item__count">{countLabel}</span>
+            ) : (
+              undefined
+            )}
+          </div>
         );
-
-        countLabel =
-          activeConnections && activeConnections.size > 0
-            ? "(" + activeConnections.size + ")"
-            : undefined;
-        unread =
-          activeConnections &&
-          !!activeConnections.find(conn => connectionUtils.isUnread(conn));
-        break;
       }
-
-      default: {
-        const activeConnections = socketTypeConnections.filter(
-          conn => !connectionUtils.isClosed(conn)
-        );
-
-        countLabel =
-          activeConnections && activeConnections.size > 0
-            ? "(" + activeConnections.size + ")"
-            : undefined;
-        unread =
-          activeConnections &&
-          !!activeConnections.find(conn => connectionUtils.isUnread(conn));
-        break;
-      }
-    }
-
-    if (label) {
-      buttons.push(
-        <div
-          key={socketType}
-          className={generateAtomItemCssClasses(selected, inactive, unread)}
-          onClick={() => {
-            setVisibleTab(socketType);
-            toggleAddPicker(false);
-          }}
-        >
-          <span className="atom-menu__item__unread" />
-          <span className="atom-menu__item__label">{label}</span>
-          {countLabel ? (
-            <span className="atom-menu__item__count">{countLabel}</span>
-          ) : (
-            undefined
-          )}
-        </div>
-      );
-    }
-  });
+    });
 
   shouldShowRdf &&
     buttons.push(

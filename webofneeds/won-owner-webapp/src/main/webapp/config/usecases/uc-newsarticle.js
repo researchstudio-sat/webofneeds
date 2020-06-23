@@ -1,4 +1,8 @@
-import { details, mergeInEmptyDraft } from "../detail-definitions.js";
+import {
+  details,
+  mergeInEmptyDraft,
+  defaultReactions,
+} from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
 import ico36_uc_wtf from "../../images/won-icons/ico36_uc_wtf.svg";
 
@@ -20,6 +24,7 @@ export const newsarticle = {
     }),
   },
   reactions: {
+    ...defaultReactions,
     [vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted]: {
       [vocab.WXSCHEMA.AssociatedArticleSocketCompacted]: {
         useCaseIdentifiers: ["organization"],

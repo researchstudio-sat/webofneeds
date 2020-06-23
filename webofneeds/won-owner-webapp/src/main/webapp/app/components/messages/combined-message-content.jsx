@@ -5,8 +5,8 @@ import React from "react";
 
 import PropTypes from "prop-types";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
+import * as wonLabelUtils from "../../won-label-utils.js";
 import { get, getIn, generateLink } from "../../utils.js";
-import { labels } from "../../won-label-utils.js";
 import vocab from "../../service/vocab.js";
 import WonMessageContent from "./message-content.jsx";
 import WonAtomIcon from "../atom-icon.jsx";
@@ -174,11 +174,11 @@ export default function WonCombinedMessageContent({
   let messageHeaderOriginatorElement;
   let messageHeaderInjectInElement;
   if (!isConnectionMessage) {
-    const headerLabel = labels.messageType[messageType] || messageType;
-
     messageHeaderElement = !hasNotBeenLoaded ? (
       <div className="msg__header">
-        <div className="msg__header__type">{headerLabel}</div>
+        <div className="msg__header__type">
+          {wonLabelUtils.getMessageTypeLabel(messageType)}
+        </div>
       </div>
     ) : (
       undefined

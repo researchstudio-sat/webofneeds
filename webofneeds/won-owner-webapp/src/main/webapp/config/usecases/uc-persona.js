@@ -1,4 +1,8 @@
-import { details, mergeInEmptyDraft } from "../detail-definitions.js";
+import {
+  details,
+  mergeInEmptyDraft,
+  defaultReactions,
+} from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
 
 export const persona = {
@@ -22,6 +26,7 @@ export const persona = {
     }),
   },
   reactions: {
+    ...defaultReactions,
     [vocab.WXSCHEMA.WorksForSocketCompacted]: {
       [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: {
         useCaseIdentifiers: ["organization"],
@@ -30,12 +35,6 @@ export const persona = {
     [vocab.WXSCHEMA.MemberOfSocketCompacted]: {
       [vocab.WXSCHEMA.MemberSocketCompacted]: {
         useCaseIdentifiers: ["organization"],
-      },
-    },
-    [vocab.BUDDY.BuddySocketCompacted]: {
-      [vocab.BUDDY.BuddySocketCompacted]: {
-        useCaseIdentifiers: ["persona", "persona"],
-        refuseOwned: true,
       },
     },
     [vocab.HOLD.HolderSocketCompacted]: {

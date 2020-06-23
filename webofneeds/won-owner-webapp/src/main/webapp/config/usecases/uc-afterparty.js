@@ -1,7 +1,11 @@
 /**
  * Created by fsuda on 18.09.2018.
  */
-import { details, mergeInEmptyDraft } from "../detail-definitions.js";
+import {
+  details,
+  mergeInEmptyDraft,
+  defaultReactions,
+} from "../detail-definitions.js";
 import { interestsDetail } from "../details/person.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import ico36_uc_drinks from "../../images/won-icons/ico36_uc_drinks.svg";
@@ -20,6 +24,9 @@ export const afterparty = {
         searchString: "afterparty",
       },
     }),
+  },
+  reactions: {
+    ...defaultReactions,
   },
   details: {
     title: { ...details.title },

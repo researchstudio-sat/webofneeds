@@ -7,7 +7,7 @@
  */
 import React from "react";
 import PropTypes from "prop-types";
-import { labels } from "../won-label-utils.js";
+import * as wonLabelUtils from "../won-label-utils.js";
 import { get } from "../utils.js";
 
 import * as connectionUtils from "../redux/utils/connection-utils.js";
@@ -48,7 +48,7 @@ export default function WonConnectionState({ connection }) {
     <won-connection-state>
       <div
         className="cs__state"
-        title={labels.connectionState[connectionState]}
+        title={wonLabelUtils.getConnectionStateLabel(connectionState)}
       >
         {unread &&
           connectionState === vocab.WON.Suggested && (

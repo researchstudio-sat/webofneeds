@@ -1,7 +1,11 @@
 /**
  * Created by fsuda on 18.09.2018.
  */
-import { details, mergeInEmptyDraft } from "../detail-definitions.js";
+import {
+  details,
+  mergeInEmptyDraft,
+  defaultReactions,
+} from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
 import ico36_uc_wtf from "../../images/won-icons/ico36_uc_wtf.svg";
 
@@ -19,11 +23,14 @@ export const organization = {
           "#memberSocket": vocab.WXSCHEMA.MemberSocketCompacted,
           "#associatedArticleSocket":
             vocab.WXSCHEMA.AssociatedArticleSocketCompacted,
+          "#parentOrgSocket": vocab.WXSCHEMA.ParentOrganizationSocketCompacted,
+          "#subOrgSocket": vocab.WXSCHEMA.SubOrganizationSocketCompacted,
         },
       },
     }),
   },
   reactions: {
+    ...defaultReactions,
     [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: {
       [vocab.WXSCHEMA.WorksForSocketCompacted]: {
         useCaseIdentifiers: ["persona"],
@@ -37,6 +44,16 @@ export const organization = {
     [vocab.WXSCHEMA.AssociatedArticleSocketCompacted]: {
       [vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted]: {
         useCaseIdentifiers: ["newsarticle"],
+      },
+    },
+    [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: {
+      [vocab.WXSCHEMA.SubOrganizationSocketCompacted]: {
+        useCaseIdentifiers: ["organization"],
+      },
+    },
+    [vocab.WXSCHEMA.SubOrganizationSocketCompacted]: {
+      [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: {
+        useCaseIdentifiers: ["organization"],
       },
     },
   },

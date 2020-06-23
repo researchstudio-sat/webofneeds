@@ -15,31 +15,30 @@ import { showLatestMessages } from "./connections-actions.js";
 
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
-import { getPathname, getQueryParams } from "../utils";
+import { getPathname, getQueryParams, delay } from "../utils";
 
 /**
  * Makes sure user is either logged in
  * or creates a private-ID account as fallback.
  */
-export async function ensureLoggedIn(dispatch, getState) {
+export const ensureLoggedIn = (dispatch, getState) => {
   const state = getState();
   if (accountUtils.isLoggedIn(generalSelectors.getAccountState(state))) {
-    return;
-  }
+    return Promise.resolve();
+  } else {
+    const privateId = wonUtils.generatePrivateId();
 
-  const privateId = wonUtils.generatePrivateId();
-  try {
-    await accountRegister({ privateId })(dispatch, getState).then(
-      () => new Promise(resolve => setTimeout(resolve, 1500))
-    );
-  } catch (err) {
-    console.error(
-      `Creating temporary account (${privateId}) has failed due to `,
-      err
-    );
-    dispatch(actionCreators.account__registerFailed({ privateId }));
+    return accountRegister({ privateId })(dispatch, getState)
+      .then(() => delay(2000))
+      .catch(err => {
+        console.error(
+          `Creating temporary account (${privateId}) has failed due to `,
+          err
+        );
+        dispatch(actionCreators.account__registerFailed({ privateId }));
+      });
   }
-}
+};
 
 let _loginInProcessFor;
 /**
@@ -316,21 +315,21 @@ export function accountSendAnonymousLinkEmail(email, privateId) {
   };
 }
 
-export function reconnect() {
-  return async (dispatch, getState) => {
-    dispatch({ type: actionTypes.reconnect.start });
-    try {
-      await ownerApi.checkLoginStatus();
+export const reconnect = () => (dispatch, getState) => {
+  dispatch({ type: actionTypes.reconnect.start });
+  return ownerApi
+    .checkLoginStatus()
+    .then(() => {
       dispatch({ type: actionTypes.reconnect.success });
 
       const state = getState();
 
-      /* 
+      /*
        * //TODO: THIS IS REALLY REALLY BAD IN MY OPINION WE SHOULD NOT DO THIS
        * -- loading latest messages for all connections (we might have missed some during the dc) --
        */
       const connectionUris = generalSelectors.getOwnedConnectionUris(state);
-      await Promise.all(
+      return Promise.all(
         connectionUris.map(connectionUri =>
           showLatestMessages(
             connectionUri,
@@ -338,7 +337,8 @@ export function reconnect() {
           )(state, dispatch)
         )
       );
-    } catch (e) {
+    })
+    .catch(e => {
       if (e.status >= 400 && e.status < 500) {
         //FIXME: this seems weird and unintentional to me, the actionTypes.account.reset closes the main menu (see view-reducer.js) and the dispatch after opens it again, is this wanted that way?
         dispatch({ type: actionTypes.account.reset });
@@ -347,6 +347,5 @@ export function reconnect() {
         dispatch(actionCreators.lostConnection());
       }
       console.warn(e);
-    }
-  };
-}
+    });
+};

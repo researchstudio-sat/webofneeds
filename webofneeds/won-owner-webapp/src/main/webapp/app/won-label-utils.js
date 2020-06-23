@@ -10,7 +10,7 @@ export const rdfTextfieldHelpText =
   "for prefixes that will be added automatically. E.g." +
   `\`<${vocab.WONMSG.uriPlaceholder.event}> con:text "hello world!". \``;
 
-export const labels = deepFreeze({
+const labels = deepFreeze({
   connectionState: {
     [vocab.WON.Suggested]: "Conversation suggested.",
     [vocab.WON.RequestSent]: "Conversation requested by you.",
@@ -52,6 +52,8 @@ export const labels = deepFreeze({
     [vocab.WXSCHEMA.MemberOfSocketCompacted]: "Member Of",
     [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: "Employees",
     [vocab.WXSCHEMA.WorksForSocketCompacted]: "Works For",
+    [vocab.WXSCHEMA.SubOrganizationSocketCompacted]: "Sub Organizations",
+    [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: "Parent Organization",
   },
   socketItem: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Member",
@@ -66,6 +68,8 @@ export const labels = deepFreeze({
     [vocab.WXSCHEMA.MemberOfSocketCompacted]: "Member",
     [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: "Employer",
     [vocab.WXSCHEMA.WorksForSocketCompacted]: "Employee",
+    [vocab.WXSCHEMA.SubOrganizationSocketCompacted]: "Parent Organization",
+    [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: "Sub Organization",
   },
   socketItems: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Members",
@@ -80,8 +84,26 @@ export const labels = deepFreeze({
     [vocab.WXSCHEMA.MemberOfSocketCompacted]: "Memberships",
     [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: "Employees",
     [vocab.WXSCHEMA.WorksForSocketCompacted]: "Employers",
+    [vocab.WXSCHEMA.SubOrganizationSocketCompacted]: "Sub Organizations",
+    [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: "Parent Organizations",
   },
 });
+
+export function getConnectionStateLabel(connectionState) {
+  return labels.connectionState[connectionState] || connectionState;
+}
+
+export function getMessageTypeLabel(messageType) {
+  return labels.messageType[messageType] || messageType;
+}
+
+export function getFlagLabel(flag) {
+  return labels.flags[flag] || flag;
+}
+
+export function getSocketLabel(socket) {
+  return labels.sockets[socket] || socket;
+}
 
 export function getSocketTabLabel(socketType) {
   return labels.socketTabs[socketType] || socketType;

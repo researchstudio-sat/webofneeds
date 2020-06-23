@@ -25,6 +25,27 @@ const emptyDraftImm = Immutable.fromJS({
   seeks: {},
 });
 
+export const defaultReactions = {
+  [vocab.BUDDY.BuddySocketCompacted]: {
+    [vocab.BUDDY.BuddySocketCompacted]: {
+      useCaseIdentifiers: ["persona"],
+      refuseOwned: true,
+    },
+  },
+  [vocab.CHAT.ChatSocketCompacted]: {
+    [vocab.CHAT.ChatSocketCompacted]: {
+      useCaseIdentifiers: ["*"],
+      refuseOwned: true,
+    },
+  },
+  [vocab.HOLD.HoldableSocketCompacted]: {
+    [vocab.HOLD.HolderSocketCompacted]: {
+      useCaseIdentifiers: ["persona"],
+      refuseNonOwned: true,
+    },
+  },
+};
+
 /**
  * This is used so we can inject preset values for certain UseCases, be aware that it does not merge the content completely.
  *
