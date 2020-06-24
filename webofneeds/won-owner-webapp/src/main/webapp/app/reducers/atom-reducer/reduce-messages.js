@@ -227,6 +227,16 @@ export function addMessage(
                 );
               });
               hadReferences = true;
+              state = state.setIn(
+                [
+                  "process",
+                  "connections",
+                  targetConnectionUri,
+                  "agreementDataset",
+                  "loaded",
+                ],
+                false
+              );
             }
             if (references.get("rejects")) {
               const rejectedMessageUris = references.get("rejects");

@@ -440,6 +440,12 @@ export default function WonAtomMessages({
             loadingAgreementDataset: false,
           })
         );
+        dispatch(
+          actionCreators.connections__setLoadedAgreementDataset({
+            connectionUri: connectionUri,
+            loadedAgreementDataset: false,
+          })
+        );
       }
     }
   }

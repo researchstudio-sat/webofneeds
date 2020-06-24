@@ -449,6 +449,15 @@ export default function(processState = initialState, action = {}) {
       });
     }
 
+    case actionTypes.connections.setLoadedAgreementDataset: {
+      const connUri = action.payload.connectionUri;
+      const loadedAgreementDataset = action.payload.loadedAgreementDataset;
+
+      return updateConnectionProcess(processState, connUri, {
+        agreementDataset: { loaded: loadedAgreementDataset },
+      });
+    }
+
     case actionTypes.connections.storeMetaConnections: {
       const connections = get(action.payload, "connections");
 
