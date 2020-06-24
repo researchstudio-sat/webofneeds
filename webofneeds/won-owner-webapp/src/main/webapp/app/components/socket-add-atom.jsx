@@ -192,7 +192,10 @@ export default function WonSocketAddAtom({
             });
           } else if (isAddToAtomOwned && !isSelectedAtomOwned) {
             connectFunctions.push({
-              label: `As ${wonLabelUtils.getSocketItemLabel(socketType)}`,
+              label: `As ${wonLabelUtils.getSocketItemLabel(
+                addToSocketType,
+                socketType
+              )}`,
               func: actionCreators.atoms__connectSockets(
                 addToAtomSocketUri,
                 selectedAtomSocketUri
@@ -200,7 +203,10 @@ export default function WonSocketAddAtom({
             });
           } else if (!isAddToAtomOwned && isSelectedAtomOwned) {
             connectFunctions.push({
-              label: `As ${wonLabelUtils.getSocketItemLabel(socketType)}`,
+              label: `As ${wonLabelUtils.getSocketItemLabel(
+                addToSocketType,
+                socketType
+              )}`,
               func: actionCreators.atoms__connectSockets(
                 selectedAtomSocketUri,
                 addToAtomSocketUri
@@ -420,15 +426,23 @@ export default function WonSocketAddAtom({
               <div className="wsaa__content__create__right__topline">
                 <div className="wsaa__content__create__right__topline__notitle">
                   {isAddToAtomOwned
-                    ? `Add New ${wonLabelUtils.getSocketItemLabel(socketType)}`
+                    ? `Add New ${wonLabelUtils.getSocketItemLabel(
+                        addToSocketType,
+                        socketType
+                      )}`
                     : `Connect New ${wonLabelUtils.getSocketItemLabel(
+                        addToSocketType,
                         socketType
                       )}`}
                 </div>
               </div>
               <div className="wsaa__content__create__right__subtitle">
                 <span className="wsaa__content__create__right__subtitle__type">
-                  <span>{useCaseUtils.getUseCaseLabel(ucIdentifier)}</span>
+                  <span>
+                    {ucIdentifier !== "*"
+                      ? useCaseUtils.getUseCaseLabel(ucIdentifier)
+                      : "Pick a UseCase"}
+                  </span>
                 </span>
               </div>
             </div>

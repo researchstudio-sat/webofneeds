@@ -109,21 +109,35 @@ export function getSocketTabLabel(socketType) {
   return labels.socketTabs[socketType] || socketType;
 }
 
-export function getSocketItemLabels(socketTypes) {
+export function getSocketItemLabels(targetSocketType, socketTypes) {
   if (!socketTypes) {
     return undefined;
   }
 
   const socketTypeLabels = [];
   for (const socketType of socketTypes) {
-    socketTypeLabels.push(labels.socketItem[socketType] || socketType);
+    socketTypeLabels.push(getSocketItemLabel(targetSocketType, socketType));
   }
 
   return socketTypeLabels.join("/");
 }
 
-export function getSocketItemLabel(socketType) {
-  return labels.socketItem[socketType] || socketType;
+export function getSocketItemLabel(targetSocketType, socketType) {
+  if (
+    (targetSocketType === vocab.CHAT.ChatSocketCompacted ||
+      targetSocketType === vocab.GROUP.GroupSocketCompacted) &&
+    socketType === vocab.GROUP.GroupSocketCompacted
+  ) {
+    return "Group";
+  } else if (
+    targetSocketType === vocab.GROUP.GroupSocketCompacted &&
+    (socketType === vocab.CHAT.ChatSocketCompacted ||
+      socketType === vocab.GROUP.GroupSocketCompacted)
+  ) {
+    return "Group Member";
+  } else {
+    return labels.socketItem[socketType] || socketType;
+  }
 }
 
 export function getSocketItemsLabel(socketType) {
@@ -131,13 +145,12 @@ export function getSocketItemsLabel(socketType) {
 }
 
 export function getSocketActionInfoLabel(
-  atomType,
   socketType,
-  connectionState
+  connectionState,
+  atomType
 ) {
   //TODO: IMPL BETTER
   let infoLabel = "";
-  const atomTypeLabel = atomType.length > 0 ? atomType : "Atom";
 
   switch (connectionState) {
     case vocab.WON.Connected:
@@ -160,7 +173,14 @@ export function getSocketActionInfoLabel(
       break;
   }
 
-  return `${atomTypeLabel} ${infoLabel} ${getSocketItemsLabel(socketType)} of`;
+  if (atomType && atomType.length > 0) {
+    const atomTypeLabel = atomType;
+    return `${atomTypeLabel} ${infoLabel} ${getSocketItemsLabel(
+      socketType
+    )} of`;
+  } else {
+    return `${infoLabel} ${getSocketItemsLabel(socketType)} of`;
+  }
 }
 
 /**

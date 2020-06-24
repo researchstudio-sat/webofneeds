@@ -27,7 +27,6 @@ export default function WonAtomHeaderBig({
   toggleActions,
 }) {
   const atomUri = get(atom, "uri");
-  const atomType = atomUtils.generateTypeLabel(atom);
   const personaUri = atomUtils.getHeldByUri(atom);
   const storedAtoms = useSelector(generalSelectors.getAtoms);
   const persona = get(storedAtoms, personaUri);
@@ -96,20 +95,13 @@ export default function WonAtomHeaderBig({
 
       const isTargetAtomDisplayed = get(senderAtom, "uri") === atomUri;
 
-      const generateAtomIcon = () => {
-        let icon;
-        if (ownedConnection && !isInactive) {
-          icon = (
-            <WonAtomIcon
-              atom={isTargetAtomDisplayed ? targetAtom : senderAtom}
-            />
-          );
-        }
-
-        return (
-          icon && (
-            <div className="won-toggle-actions__button__infoicon">{icon}</div>
-          )
+      const generateAtomIcon = displayAtom => {
+        return ownedConnection && !isInactive ? (
+          <div className="won-toggle-actions__button__infoicon">
+            <WonAtomIcon atom={displayAtom} />
+          </div>
+        ) : (
+          undefined
         );
       };
 
@@ -129,7 +121,6 @@ export default function WonAtomHeaderBig({
         return (
           <span className="won-toggle-actions__button__label">
             {wonLabelUtils.getSocketActionInfoLabel(
-              atomType,
               toSocketType,
               connectionState
             )}
@@ -148,8 +139,9 @@ export default function WonAtomHeaderBig({
                 : " won-toggle-actions__button--collapsed ")
             }
           >
+            {generateAtomIcon(isTargetAtomDisplayed ? senderAtom : targetAtom)}
             {generateButtonLabel()}
-            {generateAtomIcon()}
+            {generateAtomIcon(isTargetAtomDisplayed ? targetAtom : senderAtom)}
             <svg className="won-toggle-actions__button__carret">
               <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
             </svg>

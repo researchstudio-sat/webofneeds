@@ -382,7 +382,7 @@ export function generateFullSocketLabels(atomImm) {
  * Retrieves the Label of the used useCase as an atomType, if no usecase is specified we check if atom is a searchAtom
  * @param {*} atomImm the atom as saved in the state
  */
-export function generateTypeLabel(atomImm) {
+export function generateTypeLabel(atomImm, defaultType) {
   const useCaseLabel = useCaseUtils.getUseCaseLabel(
     getMatchedUseCaseIdentifier(atomImm)
   );
@@ -394,7 +394,7 @@ export function generateTypeLabel(atomImm) {
       return "Search";
     }
 
-    return "";
+    return defaultType ? defaultType : "";
   }
 }
 
