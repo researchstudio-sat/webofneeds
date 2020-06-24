@@ -1,0 +1,21 @@
+<h2 id="overv" class="list">Web of Needs Value Flows Extension: Overview <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
+<span class="markdown">
+This ontology has the following classes and properties.</span>
+<h4>Named Individuals</h4><ul class="hlist">
+   <li>
+      <a href="#CustodianInverseSocket"
+         title="https://w3id.org/won/ext/valueflows#CustodianInverseSocket">PrimaryAccountableInverseSocket</a>
+   </li>
+   <li>
+      <a href="#PrimaryAccountableInverseSocket"
+         title="https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket">PrimaryAccountableInverseSocket</a>
+   </li>
+   <li>
+      <a href="#CustodianSocket"
+         title="https://w3id.org/won/ext/valueflows#CustodianSocket">PrimaryAccountableSocket</a>
+   </li>
+   <li>
+      <a href="#PrimaryAccountableSocket"
+         title="https://w3id.org/won/ext/valueflows#PrimaryAccountableSocket">PrimaryAccountableSocket</a>
+   </li>
+</ul>

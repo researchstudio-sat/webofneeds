@@ -1,0 +1,157 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="https://w3id.org/won/ext/valueflows#"
+     xml:base="https://w3id.org/won/ext/valueflows"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:core="https://w3id.org/won/core#"
+     xmlns:prov="http://www.w3.org/ns/prov#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:vaem="http://www.linkedmodel.org/schema/vaem#"
+     xmlns:vann="http://purl.org/vocab/vann/"
+     xmlns:terms="http://purl.org/dc/terms/">
+    <owl:Ontology rdf:about="https://w3id.org/won/ext/valueflows">
+        <owl:versionIRI rdf:resource="https://w3id.org/won/ext/valueflows/1.0"/>
+        <owl:imports rdf:resource="https://w3id.org/won/core"/>
+        <dc:abstract xml:lang="en">This ontology contains a pair of Socket definitions automatically generated for each object property in https://valueflo.ws/. These sockets allow Atoms to connect to each other and thereby establish the respective relationship.</dc:abstract>
+        <dc:creator>Florian Kleedorfer</dc:creator>
+        <dc:creator>Maximilian Stolze</dc:creator>
+        <dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2020-06-24</dc:date>
+        <dc:title>Web of Needs Value Flows Extension</dc:title>
+        <terms:license rdf:resource="https://creativecommons.org/licenses/by/4.0/"/>
+        <vann:preferredNamespacePrefix>wx-valueflows</vann:preferredNamespacePrefix>
+        <prov:wasDerivedFrom rdf:resource="https://w3id.org/valueflows"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    
+
+
+    <!-- http://www.w3.org/ns/prov#wasDerivedFrom -->
+
+
+    <owl:AnnotationProperty rdf:about="http://www.w3.org/ns/prov#wasDerivedFrom"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    
+
+
+    <!-- https://w3id.org/valueflows#primaryAccountable -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/valueflows#primaryAccountable"/>
+    
+
+
+    <!-- https://w3id.org/won/ext/valueflows#CustodianInverseSocket -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/valueflows#CustodianInverseSocket">
+        <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
+        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/valueflows#CustodianSocket"/>
+        <core:derivesInverseAtomProperty rdf:resource="https://w3id.org/won/ext/valueflows#custodian"/>
+        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
+        <rdfs:comment xml:lang="en">A Persona Atom uses a Socket with this configuration to connect to Atoms of which it is the custodian.</rdfs:comment>
+        <rdfs:label>PrimaryAccountableInverseSocket</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- https://w3id.org/won/ext/valueflows#CustodianSocket -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/valueflows#CustodianSocket">
+        <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
+        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/valueflows#CustodianInverseSocket"/>
+        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/valueflows#custodian"/>
+        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
+        <core:socketCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</core:socketCapacity>
+        <rdfs:comment xml:lang="en">An Atom uses a Socket with this configuration to connect to the Persona Atom that is its custodian.</rdfs:comment>
+        <rdfs:label>PrimaryAccountableSocket</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket">
+        <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
+        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/valueflows#PrimaryAccountableSocket"/>
+        <core:derivesInverseAtomProperty rdf:resource="https://w3id.org/valueflows#primaryAccountable"/>
+        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
+        <rdfs:comment xml:lang="en">A Persona Atom uses a Socket with this configuration to connect to Atoms of which it is the primary accountable.</rdfs:comment>
+        <rdfs:label>PrimaryAccountableInverseSocket</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- https://w3id.org/won/ext/valueflows#PrimaryAccountableSocket -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/valueflows#PrimaryAccountableSocket">
+        <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
+        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket"/>
+        <core:derivesAtomProperty rdf:resource="https://w3id.org/valueflows#primaryAccountable"/>
+        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
+        <core:socketCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</core:socketCapacity>
+        <rdfs:comment xml:lang="en">An Atom uses a Socket with this configuration to connect to the Persona Atom that is its primary accountable.</rdfs:comment>
+        <rdfs:label>PrimaryAccountableSocket</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- https://w3id.org/won/ext/valueflows#custodian -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/valueflows#custodian"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="https://w3id.org/won/ext/valueflows#CustodianInverseSocket"/>
+            <rdf:Description rdf:about="https://w3id.org/won/ext/valueflows#CustodianSocket"/>
+            <rdf:Description rdf:about="https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket"/>
+            <rdf:Description rdf:about="https://w3id.org/won/ext/valueflows#PrimaryAccountableSocket"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 5.1.14) https://github.com/owlcs/owlapi/ -->
+
+
