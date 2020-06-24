@@ -9,7 +9,6 @@
     "color": "^3.1.2",
     "geopoint": "^1.0.1",
     "glob-to-regexp": "^0.4.0",
-    "graphy": "^4.2.1",
     "identicon.js": "^2.3.3",
     "immutable": "^3.8.2",
     "jsonld": "^3.1.1",
@@ -53,11 +52,11 @@
     "whatwg-fetch": "^0.10.1"
   },
   "scripts": {
-    "build": "cross-env WON_OWNER_BASE_URL=/owner parcel build index.html --public-url=/owner -d generated",
+    "build": "cross-env WON_OWNER_BASE_URL=/owner parcel build index.html --public-url=/owner -d generated --log-level 3",
     "serve": "parcel ENABLE_NOTIFICATIONS=true index.html",
     "postinstall": "npm rebuild && patch-package",
     "precommit": "lint-staged",
-    "watch": "cross-env ENABLE_NOTIFICATIONS=true WON_OWNER_BASE_URL=/owner parcel watch index.html --public-url=/owner -d generated --no-hmr",
+    "watch": "cross-env ENABLE_NOTIFICATIONS=true WON_OWNER_BASE_URL=/owner parcel watch index.html --public-url=/owner -d generated --no-hmr --log-level 3",
     "clean": "rimraf ./generated ./.cache",
     "test": "jest --coverage || true",
     "test:watch": "npm run test -- --watch"
@@ -66,6 +65,7 @@
     "@babel/core": "^7.10.2",
     "@babel/plugin-proposal-decorators": "^7.10.1",
     "@babel/plugin-transform-react-jsx": "^7.10.1",
+    "@babel/plugin-transform-runtime": "^7.10.3",
     "@babel/preset-env": "^7.10.2",
     "@babel/preset-react": "^7.10.1",
     "acorn": "^6.4.1",
@@ -110,6 +110,5 @@
     "moduleNameMapper": {
       "^.+.(css|styl|less|sass|scss|svg|png|jpg|ttf|woff|woff2)$": "jest-transform-stub"
     }
-
   }
 }
