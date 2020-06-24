@@ -660,21 +660,9 @@ export async function getAgreementProtocolDataset(connectionUri) {
   });
   response = await checkHttpStatus(response);
   response = await response.text();
-  const writer = new N3.Writer({ format: "application/trig" });
   const trigParser = new N3.Parser({ format: "application/trig" });
-  const data = await trigParser.parse(response, (error, quad, prefixes) => {
-    if (quad) {
-      console.log(quad);
-      writer.addQuad(quad);
-    } else {
-      console.log("# That's all, folks", prefixes, error ? error : "");
-      writer.end((error, result) => {
-        console.log(result, error ? error : "");
-        return result;
-      });
-    }
-  });
-  return data ? data : "";
+
+  return trigParser.parse(response);
 }
 
 export function getPetriNetUris(connectionUri) {

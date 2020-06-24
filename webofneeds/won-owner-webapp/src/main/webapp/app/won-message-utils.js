@@ -179,12 +179,12 @@ export function buildChatMessage({
   chatMessage,
   additionalContent,
   referencedContentUris, //this is a map of corresponding uris to be e.g. proposes or retracted...
-  isTTL,
+  isRDF,
   socketUri,
   targetSocketUri,
 }) {
-  let jsonldGraphPayloadP = isTTL
-    ? won.ttlToJsonLd(won.defaultTurtlePrefixes + "\n" + chatMessage)
+  let jsonldGraphPayloadP = isRDF
+    ? won.rdfToJsonLd(won.defaultTurtlePrefixes + "\n" + chatMessage)
     : Promise.resolve();
 
   const envelopeDataP = won.validateEnvelopeDataForConnection(
@@ -209,10 +209,10 @@ export function buildChatMessage({
         .targetSocket(targetSocketUri)
         .timestamp(new Date().getTime().toString());
 
-      if (isTTL && graphPayload) {
+      if (isRDF && graphPayload) {
         wonMessageBuilder.mergeIntoContentGraph(graphPayload);
       } else if (
-        !isTTL &&
+        !isRDF &&
         (chatMessage || additionalContent || referencedContentUris)
       ) {
         //add the chatMessage as normal text message

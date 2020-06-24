@@ -371,6 +371,12 @@ function processMessageEffectsAndMessage(
                   },
                 });
               });
+              dispatch(
+                actionCreators.connections__setLoadedAgreementDataset({
+                  connectionUri: connectionUri,
+                  loadedAgreementDataset: false,
+                })
+              );
             }
             break;
           case "CLAIMS":

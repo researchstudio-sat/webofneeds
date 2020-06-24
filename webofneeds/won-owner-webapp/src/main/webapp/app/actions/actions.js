@@ -97,6 +97,7 @@ const actionHierarchy = {
     markAsRead: INJ_DEFAULT,
     setLoadingAgreementData: INJ_DEFAULT,
     setLoadingAgreementDataset: INJ_DEFAULT,
+    setLoadedAgreementDataset: INJ_DEFAULT,
     setLoadingPetriNetData: INJ_DEFAULT,
     showAgreementData: INJ_DEFAULT,
     showPetriNetData: INJ_DEFAULT,

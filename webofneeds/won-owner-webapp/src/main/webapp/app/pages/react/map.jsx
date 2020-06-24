@@ -5,6 +5,7 @@ import { actionCreators } from "../../actions/actions.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import { getIn, get } from "../../utils.js";
+import { usePrevious } from "../../cstm-react-utils.js";
 import * as processUtils from "../../redux/utils/process-utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as wonLabelUtils from "../../won-label-utils.js";
@@ -54,7 +55,11 @@ export default function PageMap() {
     getIn(state, ["owner", "lastWhatsAroundLocation"])
   );
 
-  const previousLastWhatsAroundLocation = usePrevious(lastWhatsAroundLocation);
+  const previousLastWhatsAroundLocation = usePrevious(
+    lastWhatsAroundLocation,
+    useRef,
+    useEffect
+  );
   const whatsAroundMaxDistance = useSelector(state =>
     getIn(state, ["owner", "lastWhatsAroundMaxDistance"])
   );
@@ -262,23 +267,6 @@ export default function PageMap() {
   function selectLocation(location) {
     setShowLocationInput(false);
     dispatch(actionCreators.atoms__fetchWhatsAround(undefined, location, 5000));
-  }
-
-  function usePrevious(value) {
-    // The ref object is a generic container whose current property is mutable ...
-    // ... and can hold any value, similar to an instance property on a class
-    const ref = useRef();
-
-    // Store current value in ref
-    useEffect(
-      () => {
-        ref.current = value;
-      },
-      [value]
-    ); // Only re-run if value changes
-
-    // Return previous value (happens before update in useEffect above)
-    return ref.current;
   }
 
   useEffect(() => {

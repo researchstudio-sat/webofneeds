@@ -1,58 +1,47 @@
 /**
- * Created by quasarchimaere on 30.07.2019.
+ * Created by ms on 27.05.2020.
  */
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
+import * as N3 from "n3";
+import { usePrevious } from "../cstm-react-utils.js";
 import PropTypes from "prop-types";
+import won from "../service/won";
 import { get } from "../utils.js";
 
+import "../../style/_connection-agreement-details.scss";
+
 export default function WonConnectionAgreementDetails({ connection }) {
-  const agreementData = get(connection, "agreementData");
-  const agreementUris = get(agreementData, "agreementUris");
-  const proposalUris = get(agreementData, "pendingProposalUris");
-  const claimUris = get(agreementData, "claimedMessageUris");
-  const proposeToCancelUris = get(
-    agreementData,
-    "cancellationPendingAgreementUris"
-  );
+  const lastAgreementDataset = get(connection, "agreementDataset");
+  const previousAgreementDataset =
+    lastAgreementDataset &&
+    usePrevious(lastAgreementDataset, useRef, useEffect);
+  const [parsedData, setParsedData] = useState("");
 
-  const agreementElementa =
-    agreementUris &&
-    agreementUris.map((agreementUri, index) => {
-      return <div key={agreementUri + index}>Agreement: {agreementUri}</div>;
-    });
-  const proposalElments =
-    proposalUris &&
-    proposalUris.map((proposalUri, index) => {
-      return <div key={proposalUri + index}>Proposal: {proposalUris}</div>;
-    });
-  const claimElements =
-    claimUris &&
-    claimUris.map((claimUri, index) => {
-      return <div key={claimUri + index}>Claim: {claimUri}</div>;
-    });
+  const writer = new N3.Writer({
+    format: "application/trig",
+    prefixes: won.minimalContext,
+  });
 
-  const proposeToCancelElements =
-    proposeToCancelUris &&
-    proposeToCancelUris.map((proposeToCancelUri, index) => {
-      return (
-        <div key={proposeToCancelUri + index}>
-          ProposeToCancel: {proposeToCancelUri}
-        </div>
-      );
+  if (
+    lastAgreementDataset &&
+    lastAgreementDataset != previousAgreementDataset
+  ) {
+    writer.addQuads(lastAgreementDataset);
+    writer.end((error, result) => {
+      if (parsedData !== result) {
+        setParsedData(result);
+      }
     });
+  }
 
   return (
     <won-connection-agreement-details>
-      <div>
-        TEST
-        {agreementElementa}
-        {proposalElments}
-        {claimElements}
-        {proposeToCancelElements}
-      </div>
+      <div className="pm__content__agreement__title">Agreements</div>
+      <div className="cad__quad">{parsedData}</div>
     </won-connection-agreement-details>
   );
 }
+
 WonConnectionAgreementDetails.propTypes = {
   connection: PropTypes.object.isRequired,
 };

@@ -43,6 +43,10 @@ export const emptyConnectionProcess = Immutable.fromJS({
     dirty: false,
     loaded: false,
   },
+  agreementDataset: {
+    loading: false,
+    loaded: false,
+  },
   agreementData: {
     loading: false,
     loaded: false,
@@ -442,6 +446,15 @@ export default function(processState = initialState, action = {}) {
 
       return updateConnectionProcess(processState, connUri, {
         agreementDataset: { loading: loadingAgreementDataset },
+      });
+    }
+
+    case actionTypes.connections.setLoadedAgreementDataset: {
+      const connUri = action.payload.connectionUri;
+      const loadedAgreementDataset = action.payload.loadedAgreementDataset;
+
+      return updateConnectionProcess(processState, connUri, {
+        agreementDataset: { loaded: loadedAgreementDataset },
       });
     }
 
