@@ -89,7 +89,7 @@ export default function WonBuddySocketActions({ connection, goBackOnAction }) {
   const closeButtonElement = (label, dialogText) => (
     <button
       className="won-button--outlined white"
-      onClick={() => closeConnection(connection, dialogText)}
+      onClick={() => closeConnection(dialogText)}
     >
       <svg className="won-button-icon">
         <use xlinkHref={ico32_buddy_deny} href={ico32_buddy_deny} />

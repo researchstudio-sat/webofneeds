@@ -15,7 +15,7 @@ import PropTypes from "prop-types";
 import { useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import WonConnectionHeader from "../connection-header";
-import WonBuddySocketActions from "../socket-actions/buddy-actions";
+import WonParticipantSocketActions from "../socket-actions/participant-actions";
 
 export default function WonParticipantItem({
   connection,
@@ -83,7 +83,7 @@ export default function WonParticipantItem({
           className={headerClassName}
           actionButtons={
             addActionButtons ? (
-              <WonBuddySocketActions connection={connection} />
+              <WonParticipantSocketActions connection={connection} />
             ) : (
               undefined
             )
