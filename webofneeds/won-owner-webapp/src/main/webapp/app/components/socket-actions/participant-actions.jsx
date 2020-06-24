@@ -23,10 +23,9 @@ export default function WonParticipantSocketActions({
   const connectionUri = get(connection, "uri");
 
   function closeConnection(
-    conn,
     dialogText = "Do you want to remove the Connection?"
   ) {
-    if (!conn) {
+    if (!connection) {
       return;
     }
 
@@ -37,9 +36,7 @@ export default function WonParticipantSocketActions({
         {
           caption: "Yes",
           callback: () => {
-            const connUri = get(conn, "uri");
-
-            if (connectionUtils.isUnread(conn)) {
+            if (connectionUtils.isUnread(connection)) {
               dispatch(
                 actionCreators.connections__markAsRead({
                   connectionUri: connectionUri,
@@ -47,7 +44,7 @@ export default function WonParticipantSocketActions({
               );
             }
 
-            dispatch(actionCreators.connections__close(connUri));
+            dispatch(actionCreators.connections__close(connectionUri));
             dispatch(actionCreators.view__hideModalDialog());
             if (goBackOnAction) {
               history.goBack();
@@ -65,12 +62,12 @@ export default function WonParticipantSocketActions({
     dispatch(actionCreators.view__showModalDialog(payload));
   }
 
-  function openRequest(conn, message = "") {
-    if (!conn) {
+  function openRequest(message = "") {
+    if (!connection) {
       return;
     }
 
-    if (connectionUtils.isUnread(conn)) {
+    if (connectionUtils.isUnread(connection)) {
       dispatch(
         actionCreators.connections__markAsRead({
           connectionUri: connectionUri,
@@ -78,8 +75,8 @@ export default function WonParticipantSocketActions({
       );
     }
 
-    const senderSocketUri = get(conn, "socketUri");
-    const targetSocketUri = get(conn, "targetSocketUri");
+    const senderSocketUri = get(connection, "socketUri");
+    const targetSocketUri = get(connection, "targetSocketUri");
     dispatch(
       actionCreators.atoms__connectSockets(
         senderSocketUri,
@@ -92,8 +89,8 @@ export default function WonParticipantSocketActions({
     }
   }
 
-  function sendRequest(conn, message = "") {
-    if (!conn) {
+  function sendRequest(message = "") {
+    if (!connection) {
       return;
     }
 
@@ -104,11 +101,10 @@ export default function WonParticipantSocketActions({
         {
           caption: "Yes",
           callback: () => {
-            const connUri = get(conn, "uri");
-            const senderSocketUri = get(conn, "socketUri");
-            const targetSocketUri = get(conn, "targetSocketUri");
+            const senderSocketUri = get(connection, "socketUri");
+            const targetSocketUri = get(connection, "targetSocketUri");
 
-            if (connectionUtils.isUnread(conn)) {
+            if (connectionUtils.isUnread(connection)) {
               dispatch(
                 actionCreators.connections__markAsRead({
                   connectionUri: connectionUri,
@@ -118,7 +114,7 @@ export default function WonParticipantSocketActions({
 
             dispatch(
               actionCreators.connections__rate(
-                connUri,
+                connectionUri,
                 vocab.WONCON.binaryRatingGood
               )
             );
@@ -150,7 +146,7 @@ export default function WonParticipantSocketActions({
   const closeButtonElement = (label, dialogText) => (
     <button
       className="won-button--outlined white"
-      onClick={() => closeConnection(connection, dialogText)}
+      onClick={() => closeConnection(dialogText)}
     >
       <svg className="won-button-icon">
         <use xlinkHref={ico32_buddy_deny} href={ico32_buddy_deny} />
@@ -166,7 +162,7 @@ export default function WonParticipantSocketActions({
           {closeButtonElement("Reject", "Reject Participant Request?")}
           <button
             className="won-button--filled red"
-            onClick={() => openRequest(connection)}
+            onClick={() => openRequest()}
           >
             <svg className="won-button-icon">
               <use xlinkHref={ico32_buddy_accept} href={ico32_buddy_accept} />
@@ -201,7 +197,7 @@ export default function WonParticipantSocketActions({
         <won-socket-actions>
           <button
             className="won-button--filled red"
-            onClick={() => sendRequest(connection)}
+            onClick={() => sendRequest()}
           >
             <svg className="won-button-icon">
               <use xlinkHref={ico32_buddy_add} href={ico32_buddy_add} />
@@ -217,7 +213,7 @@ export default function WonParticipantSocketActions({
           {closeButtonElement("Remove", "Remove Participant Suggestion?")}
           <button
             className="won-button--filled red"
-            onClick={() => sendRequest(connection)}
+            onClick={() => sendRequest()}
           >
             <svg className="won-button-icon">
               <use xlinkHref={ico32_buddy_add} href={ico32_buddy_add} />

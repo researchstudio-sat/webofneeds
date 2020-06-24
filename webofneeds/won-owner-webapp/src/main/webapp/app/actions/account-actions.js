@@ -11,7 +11,6 @@ import * as ownerApi from "../api/owner-api.js";
 import { setDisclaimerAccepted } from "../won-localstorage.js";
 
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
-import { showLatestMessages } from "./connections-actions.js";
 
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
@@ -322,21 +321,7 @@ export const reconnect = () => (dispatch, getState) => {
     .then(() => {
       dispatch({ type: actionTypes.reconnect.success });
 
-      const state = getState();
-
-      /*
-       * //TODO: THIS IS REALLY REALLY BAD IN MY OPINION WE SHOULD NOT DO THIS
-       * -- loading latest messages for all connections (we might have missed some during the dc) --
-       */
-      const connectionUris = generalSelectors.getOwnedConnectionUris(state);
-      return Promise.all(
-        connectionUris.map(connectionUri =>
-          showLatestMessages(
-            connectionUri,
-            10 //TODO magic number :|
-          )(state, dispatch)
-        )
-      );
+      return stateStore.fetchOwnedData(dispatch, getState);
     })
     .catch(e => {
       if (e.status >= 400 && e.status < 500) {

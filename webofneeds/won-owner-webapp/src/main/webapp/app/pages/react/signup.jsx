@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
@@ -22,22 +22,33 @@ export default function PageSignUp() {
   const history = useHistory();
   const dispatch = useDispatch();
 
+  const accountState = useSelector(generalSelectors.getAccountState);
+  const privateId = accountUtils.getPrivateId(accountState);
+  const isLoggedIn = accountUtils.isLoggedIn(accountState);
+  const registerError = accountUtils.getRegisterError(accountState);
+  const isAnonymous = accountUtils.isAnonymous(accountState);
+  const showModalDialog = useSelector(viewSelectors.showModalDialog);
+  const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
+
   const [state, setState] = useState({
     email: "",
     validEmail: false,
+    privateId: privateId,
     password: "",
     passwordAgain: "",
     rememberMe: false,
     acceptToS: false,
   });
 
-  const accountState = useSelector(generalSelectors.getAccountState);
-
-  const isLoggedIn = accountUtils.isLoggedIn(accountState);
-  const registerError = accountUtils.getRegisterError(accountState);
-  const isAnonymous = accountUtils.isAnonymous(accountState);
-  const showModalDialog = useSelector(viewSelectors.showModalDialog);
-  const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
+  useEffect(
+    () => {
+      setState({
+        ...state,
+        privateId: privateId,
+      });
+    },
+    [privateId]
+  );
 
   function transfer() {
     dispatch(
