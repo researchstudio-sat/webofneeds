@@ -66,7 +66,6 @@ export default function PageMap() {
     generalSelectors
       .getWhatsAroundAtoms(state)
       .filter(metaAtom => atomUtils.isActive(metaAtom))
-      .filter(metaAtom => debugModeEnabled || !atomUtils.isSearchAtom(metaAtom))
       .filter(
         metaAtom => debugModeEnabled || !atomUtils.isInvisibleAtom(metaAtom)
       )

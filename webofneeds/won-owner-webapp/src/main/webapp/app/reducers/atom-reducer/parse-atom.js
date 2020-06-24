@@ -15,28 +15,29 @@ import Identicon from "identicon.js";
 export function parseAtom(jsonldAtom) {
   const jsonldAtomImm = Immutable.fromJS(jsonldAtom);
 
-  if (jsonldAtomImm && jsonldAtomImm.get("@id")) {
+  const atomUri = get(jsonldAtomImm, "@id");
+  if (atomUri) {
     const detailsToParse = useCaseUtils.getAllDetails();
 
     let parsedAtom = {
-      uri: jsonldAtomImm.get("@id"),
-      identiconSvg: generateIdenticon(jsonldAtomImm),
-      nodeUri: jsonldAtomImm.getIn([vocab.WON.wonNodeCompacted, "@id"]),
+      uri: atomUri,
+      identiconSvg: generateIdenticon(atomUri),
+      nodeUri: getIn(jsonldAtomImm, [vocab.WON.wonNodeCompacted, "@id"]),
       state: extractState(jsonldAtomImm),
       rating: extractRating(jsonldAtomImm),
       content: generateContent(jsonldAtomImm, detailsToParse),
-      seeks: generateContent(jsonldAtomImm.get("match:seeks"), detailsToParse),
+      seeks: generateContent(get(jsonldAtomImm, "match:seeks"), detailsToParse),
       creationDate: extractCreationDate(jsonldAtomImm),
       lastUpdateDate: extractCreationDate(jsonldAtomImm), //Used for sorting/updates (e.g. if connection comes in etc...)
       modifiedDate: extractLastModifiedDate(jsonldAtomImm), //Used as a flag if the atom itself has changed (e.g. atom edit)
       humanReadable: undefined, //can only be determined after we generated The Content
-      fakePersonaName: generateFakePersonaName(jsonldAtomImm.get("@id")),
+      fakePersonaName: generateFakePersonaName(atomUri),
       matchedUseCase: {
         identifier: undefined,
         icon: undefined,
         reactions: undefined,
       },
-      background: generateBackground(get(jsonldAtomImm, "@id")),
+      background: generateBackground(atomUri),
       unread: false,
       isBeingCreated: false,
       connections: Immutable.Map(),
@@ -268,15 +269,13 @@ function extractState(atomJsonLd) {
   // we use to check for active
   // state and everything else
   // will be inactive
-  return atomJsonLd.getIn([vocab.WON.atomStateCompacted, "@id"]) ===
+  return getIn(atomJsonLd, [vocab.WON.atomStateCompacted, "@id"]) ===
     vocab.WON.ActiveCompacted
     ? vocab.WON.ActiveCompacted
     : vocab.WON.InactiveCompacted;
 }
 
-function generateIdenticon(atomJsonLd) {
-  const atomUri = atomJsonLd.get("@id");
-
+function generateIdenticon(atomUri) {
   if (!atomUri) {
     return;
   }
@@ -305,8 +304,8 @@ function generateBackground(atomUri) {
 
 function extractCreationDate(atomJsonLd) {
   const creationDate =
-    atomJsonLd.get("dct:created") ||
-    atomJsonLd.get("http://purl.org/dc/terms/created");
+    get(atomJsonLd, "dct:created") ||
+    get(atomJsonLd, "http://purl.org/dc/terms/created");
   if (creationDate) {
     return new Date(get(creationDate, "@value"));
   }
@@ -315,8 +314,8 @@ function extractCreationDate(atomJsonLd) {
 
 function extractLastModifiedDate(atomJsonLd) {
   const lastModifiedDate =
-    atomJsonLd.get("dct:modified") ||
-    atomJsonLd.get("http://purl.org/dc/terms/modified");
+    get(atomJsonLd, "dct:modified") ||
+    get(atomJsonLd, "http://purl.org/dc/terms/modified");
   if (lastModifiedDate) {
     return new Date(get(lastModifiedDate, "@value"));
   }
@@ -324,16 +323,16 @@ function extractLastModifiedDate(atomJsonLd) {
 }
 
 function extractRating(atomJsonLd) {
-  const reviews = atomJsonLd.get("review:reviews");
-  const reviewedConnection = atomJsonLd.get("review:reviewedConnection");
+  const reviews = get(atomJsonLd, "review:reviews");
+  const reviewedConnection = get(atomJsonLd, "review:reviewedConnection");
 
   const rating = {
     aggregateRating:
-      atomJsonLd.get("s:aggregateRating") &&
-      parseFloat(atomJsonLd.get("s:aggregateRating")),
+      get(atomJsonLd, "s:aggregateRating") &&
+      parseFloat(get(atomJsonLd, "s:aggregateRating")),
     reviewCount:
-      atomJsonLd.get("s:reviewCount") &&
-      parseInt(atomJsonLd.get("s:reviewCount")),
+      get(atomJsonLd, "s:reviewCount") &&
+      parseInt(get(atomJsonLd, "s:reviewCount")),
     reviews: reviews
       ? Immutable.List.isList(reviews)
         ? reviews
@@ -357,17 +356,11 @@ function getHumanReadableStringFromAtom(atomImm, detailsToParse) {
     const atomContent = get(atomImm, "content");
     const seeksBranch = get(atomImm, "seeks");
 
-    const title = atomContent && atomContent.get("title");
-    const seeksTitle = seeksBranch && seeksBranch.get("title");
+    const title = get(atomContent, "title");
+    const seeksTitle = get(seeksBranch, "title");
 
     if (atomUtils.isServiceAtom(atomImm) || atomUtils.isPersona(atomImm)) {
       return getIn(atomImm, ["content", "personaName"]);
-    } else if (atomUtils.isSearchAtom(atomImm)) {
-      const searchString = getIn(atomImm, ["content", "searchString"]);
-
-      if (searchString) {
-        return "Search: " + searchString;
-      }
     }
 
     if (getIn(atomImm, ["matchedUseCase", "identifier"]) === "pokemonGoRaid") {
