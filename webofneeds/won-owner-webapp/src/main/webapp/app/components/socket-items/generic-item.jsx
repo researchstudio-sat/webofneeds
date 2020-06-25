@@ -89,9 +89,7 @@ export default function WonGenericItem({
             toLink={generateLink(
               history.location,
               {
-                postUri: flip
-                  ? get(atom, "uri")
-                  : get(connection, "targetAtomUri"),
+                postUri: flip ? get(atom, "uri") : get(targetAtom, "uri"),
                 connectionUri: get(connection, "uri"),
                 tab: undefined,
               },

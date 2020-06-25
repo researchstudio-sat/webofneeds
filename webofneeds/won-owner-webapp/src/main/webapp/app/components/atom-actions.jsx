@@ -14,6 +14,7 @@ import WonAtomHeader from "./atom-header.jsx";
 import WonParticipantSocketActions from "./socket-actions/participant-actions";
 import WonBuddySocketActions from "./socket-actions/buddy-actions";
 import WonChatSocketActions from "./socket-actions/chat-actions";
+import WonAtomIcon from "./atom-icon";
 
 const ActionType = {
   INACTIVE: 1,
@@ -22,10 +23,14 @@ const ActionType = {
   UNKNOWN: 4,
 };
 
-export default function WonAtomActions({ atom, ownedConnection, className }) {
+export default function WonAtomActions({
+  atom,
+  ownedConnection,
+  storedAtoms,
+  className,
+}) {
   const dispatch = useDispatch();
   const atomUri = get(atom, "uri");
-  const atomType = atomUtils.generateTypeLabel(atom, "Atom");
 
   const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
 
@@ -36,19 +41,6 @@ export default function WonAtomActions({ atom, ownedConnection, className }) {
   } else {
     actionType = ownedConnection ? ActionType.CONNECTION : ActionType.UNKNOWN;
   }
-
-  const targetAtom = useSelector(
-    state =>
-      ownedConnection &&
-      generalSelectors.getAtom(get(ownedConnection, "targetAtomUri"))(state)
-  );
-  const senderAtom = useSelector(
-    state =>
-      ownedConnection &&
-      generalSelectors.getAtom(
-        extractAtomUriFromConnectionUri(get(ownedConnection, "uri"))
-      )(state)
-  );
 
   let actionElement;
 
@@ -79,14 +71,21 @@ export default function WonAtomActions({ atom, ownedConnection, className }) {
       break;
     case ActionType.CONNECTION:
       {
+        const targetAtom = get(
+          storedAtoms,
+          get(ownedConnection, "targetAtomUri")
+        );
+        const senderAtom = get(
+          storedAtoms,
+          extractAtomUriFromConnectionUri(get(ownedConnection, "uri"))
+        );
+
         const senderSocketType = atomUtils.getSocketType(
           senderAtom,
           get(ownedConnection, "socketUri")
         );
-        const targetSocketType = atomUtils.getSocketType(
-          targetAtom,
-          get(ownedConnection, "targetSocketUri")
-        );
+
+        const isViewOfTargetAtom = get(targetAtom, "uri") === atomUri;
 
         let ActionComponent;
 
@@ -107,22 +106,37 @@ export default function WonAtomActions({ atom, ownedConnection, className }) {
             break;
         }
 
-        const isTargetAtomDisplayed = get(senderAtom, "uri") === atomUri;
-        const toSocketType = isTargetAtomDisplayed
-          ? targetSocketType
-          : senderSocketType;
         actionElement = (
           <React.Fragment>
-            <div className="atom-actions__infolabel">
-              {wonLabelUtils.getSocketActionInfoLabel(
-                toSocketType,
-                get(ownedConnection, "state"),
-                atomType
-              )}
+            <div
+              className={
+                "atom-actions__info " +
+                (isViewOfTargetAtom
+                  ? " atom-actions__info--targetVisible "
+                  : " atom-actions__info--senderVisible ")
+              }
+            >
+              <div className="atom-actions__info__target">
+                {isViewOfTargetAtom ? (
+                  <WonAtomIcon atom={targetAtom} />
+                ) : (
+                  <WonAtomHeader atom={targetAtom} />
+                )}
+              </div>
+              <div className="atom-actions__info__label">
+                {wonLabelUtils.getSocketActionInfoLabel(
+                  senderSocketType,
+                  get(ownedConnection, "state")
+                )}
+              </div>
+              <div className="atom-actions__info__sender">
+                {isViewOfTargetAtom ? (
+                  <WonAtomHeader atom={senderAtom} />
+                ) : (
+                  <WonAtomIcon atom={senderAtom} />
+                )}
+              </div>
             </div>
-            <WonAtomHeader
-              atom={isTargetAtomDisplayed ? targetAtom : senderAtom}
-            />
             <ActionComponent
               connection={ownedConnection}
               goBackOnAction={true}
@@ -146,5 +160,6 @@ export default function WonAtomActions({ atom, ownedConnection, className }) {
 WonAtomActions.propTypes = {
   atom: PropTypes.object,
   ownedConnection: PropTypes.object,
+  storedAtoms: PropTypes.object.isRequired,
   className: PropTypes.string,
 };

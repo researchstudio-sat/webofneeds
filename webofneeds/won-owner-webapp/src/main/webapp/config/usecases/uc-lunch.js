@@ -103,7 +103,7 @@ export const lunchPlan = {
 
 export const lunchInterest = {
   identifier: "lunchInterest",
-  label: "Add Lunch Interest",
+  label: "Interest in Lunch",
   icon: ico36_uc_meal_half,
   draft: {
     ...mergeInEmptyDraft({

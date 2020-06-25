@@ -144,12 +144,7 @@ export function getSocketItemsLabel(socketType) {
   return labels.socketItems[socketType] || socketType;
 }
 
-export function getSocketActionInfoLabel(
-  socketType,
-  connectionState,
-  atomType
-) {
-  //TODO: IMPL BETTER
+export function getSocketActionInfoLabel(socketType, connectionState) {
   let infoLabel = "";
 
   switch (connectionState) {
@@ -157,7 +152,7 @@ export function getSocketActionInfoLabel(
       infoLabel = "already added to";
       break;
     case vocab.WON.RequestSent:
-      infoLabel = "requested to join";
+      infoLabel = "was requested to join";
       break;
     case vocab.WON.RequestReceived:
       infoLabel = "requests to join";
@@ -173,14 +168,7 @@ export function getSocketActionInfoLabel(
       break;
   }
 
-  if (atomType && atomType.length > 0) {
-    const atomTypeLabel = atomType;
-    return `${atomTypeLabel} ${infoLabel} ${getSocketItemsLabel(
-      socketType
-    )} of`;
-  } else {
-    return `${infoLabel} ${getSocketItemsLabel(socketType)} of`;
-  }
+  return `${infoLabel} ${getSocketItemsLabel(socketType)} of`;
 }
 
 /**

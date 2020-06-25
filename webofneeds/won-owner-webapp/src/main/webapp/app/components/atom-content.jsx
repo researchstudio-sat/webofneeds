@@ -40,6 +40,7 @@ export default function WonAtomContent({
   visibleTab,
   setVisibleTab,
   relevantConnectionsMap,
+  storedAtoms,
   showAddPicker,
   toggleAddPicker,
 }) {
@@ -48,8 +49,6 @@ export default function WonAtomContent({
   const atomUri = get(atom, "uri");
   const { connectionUri } = getQueryParams(history.location);
   const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
-
-  const storedAtoms = useSelector(generalSelectors.getAtoms);
 
   const process = useSelector(generalSelectors.getProcessState);
 

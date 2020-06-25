@@ -22,6 +22,7 @@ export default function WonAtomInfo({
   const atomUri = get(atom, "uri");
   const connectionUri = get(ownedConnection, "uri");
   const processState = useSelector(generalSelectors.getProcessState);
+  const storedAtoms = useSelector(generalSelectors.getAtoms);
 
   const atomLoading =
     !atom || processUtils.isAtomLoading(processState, atomUri);
@@ -71,7 +72,11 @@ export default function WonAtomInfo({
         toggleActions={toggleActions}
       />
       {showActions ? (
-        <WonAtomActions atom={atom} ownedConnection={ownedConnection} />
+        <WonAtomActions
+          atom={atom}
+          ownedConnection={ownedConnection}
+          storedAtoms={storedAtoms}
+        />
       ) : (
         undefined
       )}
@@ -89,6 +94,7 @@ export default function WonAtomInfo({
         toggleAddPicker={toggleAddPicker}
         showAddPicker={showAddPicker}
         setVisibleTab={setVisibleTab}
+        storedAtoms={storedAtoms}
       />
     </won-atom-info>
   );
