@@ -27,7 +27,6 @@ export default function WonAtomHeaderBig({
   toggleActions,
 }) {
   const atomUri = get(atom, "uri");
-  const atomType = atomUtils.generateTypeLabel(atom);
   const personaUri = atomUtils.getHeldByUri(atom);
   const storedAtoms = useSelector(generalSelectors.getAtoms);
   const persona = get(storedAtoms, personaUri);
@@ -85,57 +84,14 @@ export default function WonAtomHeaderBig({
         extractAtomUriFromConnectionUri(get(ownedConnection, "uri"))
       );
 
-      const targetSocketType = atomUtils.getSocketType(
-        targetAtom,
-        get(ownedConnection, "targetSocketUri")
-      );
       const senderSocketType = atomUtils.getSocketType(
         senderAtom,
         get(ownedConnection, "socketUri")
       );
-
-      const isTargetAtomDisplayed = get(senderAtom, "uri") === atomUri;
-
-      const generateAtomIcon = () => {
-        let icon;
-        if (ownedConnection && !isInactive) {
-          icon = (
-            <WonAtomIcon
-              atom={isTargetAtomDisplayed ? targetAtom : senderAtom}
-            />
-          );
-        }
-
-        return (
-          icon && (
-            <div className="won-toggle-actions__button__infoicon">{icon}</div>
-          )
-        );
-      };
-
-      const generateButtonLabel = () => {
-        if (isInactive) {
-          return (
-            <span className="won-toggle-actions__button__label">
-              Atom Inactive
-            </span>
-          );
-        }
-
-        const toSocketType = isTargetAtomDisplayed
-          ? targetSocketType
-          : senderSocketType;
-
-        return (
-          <span className="won-toggle-actions__button__label">
-            {wonLabelUtils.getSocketActionInfoLabel(
-              atomType,
-              toSocketType,
-              connectionState
-            )}
-          </span>
-        );
-      };
+      const targetSocketType = atomUtils.getSocketType(
+        targetAtom,
+        get(ownedConnection, "targetSocketUri")
+      );
 
       return (
         <won-toggle-actions>
@@ -148,8 +104,27 @@ export default function WonAtomHeaderBig({
                 : " won-toggle-actions__button--collapsed ")
             }
           >
-            {generateButtonLabel()}
-            {generateAtomIcon()}
+            {isInactive ? (
+              <span className="won-toggle-actions__button__label">
+                Atom Inactive
+              </span>
+            ) : (
+              <React.Fragment>
+                <div className="won-toggle-actions__button__infoicon">
+                  <WonAtomIcon atom={targetAtom} />
+                </div>
+                <span className="won-toggle-actions__button__label">
+                  {wonLabelUtils.getSocketActionInfoLabel(
+                    senderSocketType,
+                    connectionState,
+                    targetSocketType
+                  )}
+                </span>
+                <div className="won-toggle-actions__button__infoicon">
+                  <WonAtomIcon atom={senderAtom} />
+                </div>
+              </React.Fragment>
+            )}
             <svg className="won-toggle-actions__button__carret">
               <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
             </svg>

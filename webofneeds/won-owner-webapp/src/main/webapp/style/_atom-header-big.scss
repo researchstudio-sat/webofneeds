@@ -132,10 +132,6 @@ won-atom-header-big {
     font-weight: 300;
     text-overflow: ellipsis;
     overflow: hidden;
-
-    @media (max-width: $responsivenessBreakPoint) {
-      font-size: $normalFontSize;
-    }
   }
 
   > .ahb__info {

@@ -24,8 +24,6 @@ won-atom-info {
   }
   > won-atom-actions {
     grid-area: actions;
-    display: grid;
-    grid-gap: 0.5rem;
     padding: 0.5rem;
     box-sizing: border-box;
     background: $won-secondary-color;

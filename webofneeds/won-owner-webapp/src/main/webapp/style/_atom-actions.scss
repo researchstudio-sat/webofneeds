@@ -1,14 +1,67 @@
 @import "won-config";
 @import "sizing-utils";
 @import "animate";
+@import "square-image";
 
 won-atom-actions {
   display: grid;
-  grid-gap: 0.5rem;
   align-items: center;
 
-  .atom-actions__infolabel {
-    text-align: left;
+  .atom-actions__info {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-areas: "target label sender";
+    grid-template-columns: min-content max-content 1fr;
+    align-items: center;
+    padding: 0.5rem;
+    grid-gap: 0.5rem;
+
+    @media (max-width: $responsivenessBreakPointLarge) {
+      &--targetVisible {
+        grid-template-areas: "target label" "sender sender";
+        grid-template-columns: min-content 1fr;
+      }
+
+      &--senderVisible {
+        grid-template-areas: "target target" "label sender";
+        grid-template-columns: min-content 1fr;
+      }
+    }
+
+    .atom-actions__info__target {
+      grid-area: target;
+    }
+
+    .atom-actions__info__label {
+      grid-area: label;
+      text-align: left;
+    }
+
+    .atom-actions__info__sender {
+      grid-area: sender;
+    }
+
+    .atom-actions__info__target,
+    .atom-actions__info__sender {
+      @include square-image($postIconSize);
+
+      > won-atom-icon {
+        @media (max-width: $responsivenessBreakPointLarge) {
+          padding-left: 0.5rem;
+        }
+      }
+
+      > won-atom-header {
+        background: $won-light-gray;
+        border: $thinGrayBorder;
+        padding: 0.5rem;
+
+        @media (min-width: $responsivenessBreakPointLarge) {
+          min-width: 16rem;
+          max-width: 20rem;
+        }
+      }
+    }
   }
 
   won-socket-actions,
@@ -18,17 +71,12 @@ won-atom-actions {
     grid-auto-flow: column;
   }
 
-  > won-atom-header {
-    background: $won-light-gray;
-    border: $thinGrayBorder;
-    padding: 0.5rem;
+  @media (min-width: $responsivenessBreakPointLarge) {
+    grid-auto-flow: column;
+    grid-template-columns: 1fr min-content;
   }
 
-  @media (min-width: $maxContentWidth) {
-    grid-auto-flow: column;
-    grid-template-columns: 1fr minmax(16rem, 1fr) min-content;
-  }
-  @media (max-width: $maxContentWidth) {
+  @media (max-width: $responsivenessBreakPointLarge) {
     grid-auto-flow: row;
   }
 }

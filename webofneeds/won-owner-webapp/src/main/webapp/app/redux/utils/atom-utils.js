@@ -337,18 +337,6 @@ export function hasUnreadBuddyRequests(atom) {
 }
 
 /**
- * Determines if a given atom is a Search-Atom (see draft in create-search.js)
- * @param atom
- * @returns {*|boolean}
- */
-export function isSearchAtom(atom) {
-  return (
-    getIn(atom, ["content", "type"]) &&
-    getIn(atom, ["content", "type"]).has("demo:PureSearch")
-  );
-}
-
-/**
  * Generates an array that contains all atom flags, using a human readable label if available.
  */
 export function generateFullFlagLabels(atomImm) {
@@ -382,20 +370,15 @@ export function generateFullSocketLabels(atomImm) {
  * Retrieves the Label of the used useCase as an atomType, if no usecase is specified we check if atom is a searchAtom
  * @param {*} atomImm the atom as saved in the state
  */
-export function generateTypeLabel(atomImm) {
+export function generateTypeLabel(atomImm, defaultType) {
   const useCaseLabel = useCaseUtils.getUseCaseLabel(
     getMatchedUseCaseIdentifier(atomImm)
   );
 
   if (useCaseLabel) {
     return useCaseLabel;
-  } else {
-    if (isSearchAtom(atomImm)) {
-      return "Search";
-    }
-
-    return "";
   }
+  return defaultType ? defaultType : "";
 }
 
 /**

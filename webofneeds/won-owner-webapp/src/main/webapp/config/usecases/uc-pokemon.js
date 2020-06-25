@@ -48,7 +48,7 @@ export const pokemonGoRaid = {
 
 export const pokemonInterest = {
   identifier: "pokemonInterest",
-  label: "Add Interest in Pokémon Go",
+  label: "Interest in Pokémon Go",
   icon: ico36_pokeball, //TODO: Better Icon
   draft: {
     ...mergeInEmptyDraft({

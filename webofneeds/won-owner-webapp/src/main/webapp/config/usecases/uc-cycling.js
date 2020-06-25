@@ -105,7 +105,7 @@ export const cyclingPlan = {
 
 export const cyclingInterest = {
   identifier: "cyclingInterest",
-  label: "Add Cycling Interest",
+  label: "Interest in Cycling",
   icon: ico36_uc_cycling_cropped,
   draft: {
     ...mergeInEmptyDraft({

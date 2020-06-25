@@ -8,7 +8,7 @@ import ico36_plus from "~/images/won-icons/ico36_plus.svg";
 
 export default function WonSocketAddButton({
   senderReactions,
-  /*targetSocketType,*/
+  targetSocketType,
   isAtomOwned,
   onClick,
   className,
@@ -17,13 +17,19 @@ export default function WonSocketAddButton({
     return isAtomOwned
       ? `Add ${
           senderReactions
-            ? wonLabelUtils.getSocketItemLabels(senderReactions.keys())
-            : "Chat"
+            ? wonLabelUtils.getSocketItemLabels(
+                targetSocketType,
+                senderReactions.keys()
+              )
+            : "Atom"
         }`
       : `Connect ${
           senderReactions
-            ? wonLabelUtils.getSocketItemLabels(senderReactions.keys())
-            : "Chat"
+            ? wonLabelUtils.getSocketItemLabels(
+                targetSocketType,
+                senderReactions.keys()
+              )
+            : "Atom"
         }`;
   }
 

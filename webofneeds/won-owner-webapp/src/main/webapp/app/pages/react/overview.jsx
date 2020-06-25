@@ -35,7 +35,6 @@ export default function PageOverview() {
   const accountState = useSelector(generalSelectors.getAccountState);
   const whatsNewAtoms = whatsNewAtomsUnfiltered
     .filter(metaAtom => atomUtils.isActive(metaAtom))
-    .filter(metaAtom => debugModeEnabled || !atomUtils.isSearchAtom(metaAtom))
     .filter(
       metaAtom => debugModeEnabled || !atomUtils.isInvisibleAtom(metaAtom)
     )

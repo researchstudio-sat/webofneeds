@@ -109,21 +109,35 @@ export function getSocketTabLabel(socketType) {
   return labels.socketTabs[socketType] || socketType;
 }
 
-export function getSocketItemLabels(socketTypes) {
+export function getSocketItemLabels(targetSocketType, socketTypes) {
   if (!socketTypes) {
     return undefined;
   }
 
   const socketTypeLabels = [];
   for (const socketType of socketTypes) {
-    socketTypeLabels.push(labels.socketItem[socketType] || socketType);
+    socketTypeLabels.push(getSocketItemLabel(targetSocketType, socketType));
   }
 
   return socketTypeLabels.join("/");
 }
 
-export function getSocketItemLabel(socketType) {
-  return labels.socketItem[socketType] || socketType;
+export function getSocketItemLabel(targetSocketType, socketType) {
+  if (
+    (targetSocketType === vocab.CHAT.ChatSocketCompacted ||
+      targetSocketType === vocab.GROUP.GroupSocketCompacted) &&
+    socketType === vocab.GROUP.GroupSocketCompacted
+  ) {
+    return "Group";
+  } else if (
+    targetSocketType === vocab.GROUP.GroupSocketCompacted &&
+    (socketType === vocab.CHAT.ChatSocketCompacted ||
+      socketType === vocab.GROUP.GroupSocketCompacted)
+  ) {
+    return "Group Member";
+  } else {
+    return labels.socketItem[socketType] || socketType;
+  }
 }
 
 export function getSocketItemsLabel(socketType) {
@@ -131,36 +145,34 @@ export function getSocketItemsLabel(socketType) {
 }
 
 export function getSocketActionInfoLabel(
-  atomType,
   socketType,
-  connectionState
+  connectionState,
+  targetSocketType
 ) {
-  //TODO: IMPL BETTER
   let infoLabel = "";
-  const atomTypeLabel = atomType.length > 0 ? atomType : "Atom";
 
   switch (connectionState) {
     case vocab.WON.Connected:
-      infoLabel = "already added to";
+      infoLabel = `${getSocketItemLabel(socketType, targetSocketType)} of`;
       break;
     case vocab.WON.RequestSent:
-      infoLabel = "requested to join";
+      infoLabel = `was requested to join ${getSocketItemsLabel(socketType)} of`;
       break;
     case vocab.WON.RequestReceived:
-      infoLabel = "requests to join";
+      infoLabel = `requests to join ${getSocketItemsLabel(socketType)} of`;
       break;
     case vocab.WON.Closed:
-      infoLabel = ` was removed from `;
+      infoLabel = `was removed from ${getSocketItemsLabel(socketType)} of`;
       break;
     case vocab.WON.Suggested:
-      infoLabel = ` suggested as `;
+      infoLabel = `suggested for ${getSocketItemsLabel(socketType)} of`;
       break;
     default:
       infoLabel = " <--> ";
       break;
   }
 
-  return `${atomTypeLabel} ${infoLabel} ${getSocketItemsLabel(socketType)} of`;
+  return infoLabel;
 }
 
 /**

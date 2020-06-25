@@ -100,7 +100,7 @@ export default function WonAtomContentSocket({
             }
             targetAtom={get(storedAtoms, get(conn, "targetAtomUri"))}
             isOwned={isAtomOwned}
-            flip={get(conn, "targetSocketUri") === socketUri}
+            flip={flip}
           />
         </React.Fragment>
       );
