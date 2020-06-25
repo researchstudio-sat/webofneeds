@@ -156,16 +156,16 @@ export function getSocketActionInfoLabel(
       infoLabel = `${getSocketItemLabel(socketType, targetSocketType)} of`;
       break;
     case vocab.WON.RequestSent:
-      infoLabel = `was requested to join ${getSocketItemsLabel(socketType)}`;
+      infoLabel = `was requested to join ${getSocketItemsLabel(socketType)} of`;
       break;
     case vocab.WON.RequestReceived:
-      infoLabel = `requests to join ${getSocketItemsLabel(socketType)}`;
+      infoLabel = `requests to join ${getSocketItemsLabel(socketType)} of`;
       break;
     case vocab.WON.Closed:
-      infoLabel = `was removed from ${getSocketItemsLabel(socketType)}`;
+      infoLabel = `was removed from ${getSocketItemsLabel(socketType)} of`;
       break;
     case vocab.WON.Suggested:
-      infoLabel = `suggested for ${getSocketItemsLabel(socketType)}`;
+      infoLabel = `suggested for ${getSocketItemsLabel(socketType)} of`;
       break;
     default:
       infoLabel = " <--> ";
