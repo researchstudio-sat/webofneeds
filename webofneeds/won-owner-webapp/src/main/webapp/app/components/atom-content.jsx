@@ -234,16 +234,6 @@ export default function WonAtomContent({
         break;
       }
 
-      case vocab.REVIEW.ReviewSocketCompacted:
-        visibleTabFragment = (
-          <div className="atom-content__reviews">
-            <div className="atom-content__reviews__empty">
-              No Reviews to display.
-            </div>
-          </div>
-        );
-        break;
-
       case vocab.HOLD.HolderSocketCompacted:
         visibleTabFragment = (
           <WonAtomContentSocket

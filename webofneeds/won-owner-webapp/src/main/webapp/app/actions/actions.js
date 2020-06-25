@@ -62,11 +62,6 @@ import {
   fetchWhatsNew,
   pageLoadAction,
 } from "./load-action.js";
-import {
-  disconnectPersona,
-  connectPersona,
-  reviewPersona,
-} from "./persona-actions.js";
 import { deepFreeze } from "../utils.js";
 import won from "../won-es6";
 
@@ -156,10 +151,6 @@ const actionHierarchy = {
     markAsLoaded: INJ_DEFAULT,
   },
   personas: {
-    review: reviewPersona,
-    connect: connectPersona,
-    disconnect: disconnectPersona,
-
     fetchPersonas: fetchPersonas,
 
     store: INJ_DEFAULT,

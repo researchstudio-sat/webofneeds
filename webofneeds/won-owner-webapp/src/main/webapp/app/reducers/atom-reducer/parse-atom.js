@@ -24,7 +24,6 @@ export function parseAtom(jsonldAtom) {
       identiconSvg: generateIdenticon(atomUri),
       nodeUri: getIn(jsonldAtomImm, [vocab.WON.wonNodeCompacted, "@id"]),
       state: extractState(jsonldAtomImm),
-      rating: extractRating(jsonldAtomImm),
       content: generateContent(jsonldAtomImm, detailsToParse),
       seeks: generateContent(get(jsonldAtomImm, "match:seeks"), detailsToParse),
       creationDate: extractCreationDate(jsonldAtomImm),
@@ -141,7 +140,6 @@ export function parseMetaAtom(metaAtom) {
         .replace(vocab.CHAT.baseUri, vocab.CHAT.prefix + ":")
         .replace(vocab.GROUP.baseUri, vocab.GROUP.prefix + ":")
         .replace(vocab.HOLD.baseUri, vocab.HOLD.prefix + ":")
-        .replace(vocab.REVIEW.baseUri, vocab.REVIEW.prefix + ":")
         .replace(vocab.BUDDY.baseUri, vocab.BUDDY.prefix + ":")
         .replace(vocab.BOT.baseUri, vocab.BOT.prefix + ":")
         .replace(vocab.WXSCHEMA.baseUri, vocab.WXSCHEMA.prefix + ":")
@@ -320,35 +318,6 @@ function extractLastModifiedDate(atomJsonLd) {
     return new Date(get(lastModifiedDate, "@value"));
   }
   return undefined;
-}
-
-function extractRating(atomJsonLd) {
-  const reviews = get(atomJsonLd, "review:reviews");
-  const reviewedConnection = get(atomJsonLd, "review:reviewedConnection");
-
-  const rating = {
-    aggregateRating:
-      get(atomJsonLd, "s:aggregateRating") &&
-      parseFloat(get(atomJsonLd, "s:aggregateRating")),
-    reviewCount:
-      get(atomJsonLd, "s:reviewCount") &&
-      parseInt(get(atomJsonLd, "s:reviewCount")),
-    reviews: reviews
-      ? Immutable.List.isList(reviews)
-        ? reviews
-        : Immutable.List.of(reviews)
-      : undefined,
-    reviewedConnection: reviewedConnection
-      ? Immutable.List.isList(reviewedConnection)
-        ? reviewedConnection
-        : Immutable.List.of(reviewedConnection)
-      : undefined,
-  };
-  if (rating.aggregateRating && rating.reviewCount) {
-    return rating;
-  } else {
-    return undefined;
-  }
 }
 
 function getHumanReadableStringFromAtom(atomImm, detailsToParse) {

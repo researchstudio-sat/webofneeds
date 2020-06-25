@@ -18,11 +18,11 @@ export const reviewRating = {
     //Value needs to be empty string for react to clear localState (https://github.com/facebook/react/issues/4085)
     //which isn't a problem since the bool value of an empty string is false (in js)
     { value: "", label: "Select a Rating", default: true },
-    { value: 1, label: "1 Star" },
-    { value: 2, label: "2 Stars" },
-    { value: 3, label: "3 Stars" },
-    { value: 4, label: "4 Stars" },
-    { value: 5, label: "5 Stars" },
+    { value: 1, label: "⭐" },
+    { value: 2, label: "⭐⭐" },
+    { value: 3, label: "⭐⭐⭐" },
+    { value: 4, label: "⭐⭐⭐⭐" },
+    { value: 5, label: "⭐⭐⭐⭐⭐" },
   ],
   messageEnabled: false,
   parseToRDF: function({ value, identifier, contentUri }) {

@@ -4,7 +4,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import { get, getIn } from "../utils.js";
+import { get } from "../utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
@@ -25,12 +25,9 @@ export default function WonAtomMenu({
   const atomUri = get(atom, "uri");
   const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
 
-  const reviewCount = getIn(atom, ["rating", "reviewCount"]) || 0;
-
   const viewState = useSelector(generalSelectors.getViewState);
   const process = useSelector(generalSelectors.getProcessState);
 
-  const hasReviews = reviewCount > 0;
   const atomLoading = !atom || processUtils.isAtomLoading(process, atomUri);
   const atomFailedToLoad =
     atom && processUtils.hasAtomFailedToLoad(process, atomUri);
@@ -85,10 +82,6 @@ export default function WonAtomMenu({
       let unread = false;
 
       switch (socketType) {
-        case vocab.REVIEW.ReviewSocketCompacted:
-          countLabel = hasReviews && "(" + reviewCount + ")";
-          break;
-
         case vocab.CHAT.ChatSocketCompacted: {
           const socketUri = atomUtils.getSocketUri(atom, socketType);
           const activeConnections = socketTypeConnections
