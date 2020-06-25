@@ -37,6 +37,7 @@ export const otherGroup = {
             sockets: {
               "#groupSocket": vocab.GROUP.GroupSocketCompacted,
               "#holdableSocket": vocab.HOLD.HoldableSocketCompacted,
+              "#sReviewSocket": vocab.WXSCHEMA.ReviewSocketCompacted,
             },
           },
         }),

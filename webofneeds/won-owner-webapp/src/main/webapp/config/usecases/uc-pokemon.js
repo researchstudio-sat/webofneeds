@@ -21,6 +21,7 @@ export const pokemonGoRaid = {
         sockets: {
           "#groupSocket": vocab.GROUP.GroupSocketCompacted,
           "#holdableSocket": vocab.HOLD.HoldableSocketCompacted,
+          "#sReviewSocket": vocab.WXSCHEMA.ReviewSocketCompacted,
         },
       },
       seeks: {},

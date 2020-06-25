@@ -2165,12 +2165,14 @@ won:derivesAtomProperty rdf:type owl:AnnotationProperty .
 
 :ReviewSocket a won:SocketDefinition ;
 	won:derivesAtomProperty schema:review ;
+	won:autoOpen "true"^^xsd:boolean ;
 	rdfs:label "ReviewSocket" ;
 	rdfs:comment "An Atom `A` that specifies a Socket with this SocketDefinition derives triple `A schema:review B` when a Connection with an Atom B is established. Automatically generated from the [review](http://schema.org/review) Property of the http://schema.org vocabulary." ;
 	won:compatibleSocketDefinition :ReviewInverseSocket .
 
 :ReviewInverseSocket a won:SocketDefinition ;
 	won:derivesInverseAtomProperty schema:review ;
+	won:socketCapacity 1 ;
 	rdfs:label "ReviewInverseSocket" ;
 	rdfs:comment "An Atom `A` that specifies a Socket with this SocketDefinition derives triple `B schema:review A` when a Connection with an Atom B is established. Automatically generated from the [review](http://schema.org/review) Property of the http://schema.org vocabulary." ;
 	won:compatibleSocketDefinition :ReviewSocket .
