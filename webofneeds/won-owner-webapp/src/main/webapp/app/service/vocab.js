@@ -297,12 +297,6 @@ vocab.GROUP.prefix = "group";
 vocab.GROUP.GroupSocket = vocab.GROUP.baseUri + "GroupSocket";
 vocab.GROUP.GroupSocketCompacted = vocab.GROUP.prefix + ":GroupSocket";
 
-vocab.REVIEW = {};
-vocab.REVIEW.baseUri = "https://w3id.org/won/ext/review#";
-vocab.REVIEW.prefix = "review";
-vocab.REVIEW.ReviewSocket = vocab.REVIEW.baseUri + "ReviewSocket";
-vocab.REVIEW.ReviewSocketCompacted = vocab.REVIEW.prefix + ":ReviewSocket";
-
 vocab.BUDDY = {};
 vocab.BUDDY.baseUri = "https://w3id.org/won/ext/buddy#";
 vocab.BUDDY.prefix = "buddy";

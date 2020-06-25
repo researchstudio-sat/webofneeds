@@ -1,10 +1,8 @@
 module Persona exposing
     ( Persona
-    , connect
     , decoder
     , icon
     , inlineView
-    , review
     )
 
 import Html exposing (Attribute, Html)
@@ -85,40 +83,3 @@ decoder =
         |> DP.required "displayName" Decode.string
         |> DP.required "timestamp" Decode.datetime
         |> checkDecoder (Decode.field "saved" <| compareCheck True Decode.bool)
-
-
-
----- ACTIONS ----
-
-
-connect :
-    { persona : Persona
-    , atomUrl : String
-    }
-    -> Action
-connect { persona, atomUrl } =
-    Widget.customAction
-        "personas__connect"
-        [ Encode.string atomUrl
-        , Encode.string persona.uri
-        ]
-
-
-review :
-    { connection : String
-    , review : Review
-    }
-    -> Action
-review data =
-    let
-        encodedReview =
-            Encode.object
-                [ ( "value", Encode.int data.review.value )
-                , ( "message", Encode.string data.review.message )
-                ]
-    in
-    Widget.customAction
-        "personas__review"
-        [ Encode.string data.connection
-        , encodedReview
-        ]
