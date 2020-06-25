@@ -88,6 +88,10 @@ export default function WonAtomHeaderBig({
         senderAtom,
         get(ownedConnection, "socketUri")
       );
+      const targetSocketType = atomUtils.getSocketType(
+        targetAtom,
+        get(ownedConnection, "targetSocketUri")
+      );
 
       return (
         <won-toggle-actions>
@@ -112,7 +116,8 @@ export default function WonAtomHeaderBig({
                 <span className="won-toggle-actions__button__label">
                   {wonLabelUtils.getSocketActionInfoLabel(
                     senderSocketType,
-                    connectionState
+                    connectionState,
+                    targetSocketType
                   )}
                 </span>
                 <div className="won-toggle-actions__button__infoicon">

@@ -84,6 +84,10 @@ export default function WonAtomActions({
           senderAtom,
           get(ownedConnection, "socketUri")
         );
+        const targetSocketType = atomUtils.getSocketType(
+          targetAtom,
+          get(ownedConnection, "targetSocketUri")
+        );
 
         const isViewOfTargetAtom = get(targetAtom, "uri") === atomUri;
 
@@ -126,7 +130,8 @@ export default function WonAtomActions({
               <div className="atom-actions__info__label">
                 {wonLabelUtils.getSocketActionInfoLabel(
                   senderSocketType,
-                  get(ownedConnection, "state")
+                  get(ownedConnection, "state"),
+                  targetSocketType
                 )}
               </div>
               <div className="atom-actions__info__sender">

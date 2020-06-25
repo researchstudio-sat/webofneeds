@@ -144,31 +144,35 @@ export function getSocketItemsLabel(socketType) {
   return labels.socketItems[socketType] || socketType;
 }
 
-export function getSocketActionInfoLabel(socketType, connectionState) {
+export function getSocketActionInfoLabel(
+  socketType,
+  connectionState,
+  targetSocketType
+) {
   let infoLabel = "";
 
   switch (connectionState) {
     case vocab.WON.Connected:
-      infoLabel = "already added to";
+      infoLabel = `${getSocketItemLabel(socketType, targetSocketType)} of`;
       break;
     case vocab.WON.RequestSent:
-      infoLabel = "was requested to join";
+      infoLabel = `was requested to join ${getSocketItemsLabel(socketType)}`;
       break;
     case vocab.WON.RequestReceived:
-      infoLabel = "requests to join";
+      infoLabel = `requests to join ${getSocketItemsLabel(socketType)}`;
       break;
     case vocab.WON.Closed:
-      infoLabel = ` was removed from `;
+      infoLabel = `was removed from ${getSocketItemsLabel(socketType)}`;
       break;
     case vocab.WON.Suggested:
-      infoLabel = ` suggested as `;
+      infoLabel = `suggested for ${getSocketItemsLabel(socketType)}`;
       break;
     default:
       infoLabel = " <--> ";
       break;
   }
 
-  return `${infoLabel} ${getSocketItemsLabel(socketType)} of`;
+  return infoLabel;
 }
 
 /**
