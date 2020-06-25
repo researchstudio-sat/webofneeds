@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 import { get } from "../utils.js";
 import WonAtomHeaderBig from "./atom-header-big.jsx";
 import WonAtomMenu from "./atom-menu.jsx";
@@ -12,6 +13,7 @@ import * as processUtils from "../redux/utils/process-utils";
 import * as connectionUtils from "../redux/utils/connection-utils";
 
 import "~/style/_atom-info.scss";
+import { generateLink } from "../utils";
 
 export default function WonAtomInfo({
   atom,
@@ -19,6 +21,7 @@ export default function WonAtomInfo({
   className,
   initialTab = "DETAIL",
 }) {
+  const history = useHistory();
   const atomUri = get(atom, "uri");
   const connectionUri = get(ownedConnection, "uri");
   const processState = useSelector(generalSelectors.getProcessState);
@@ -59,6 +62,16 @@ export default function WonAtomInfo({
     generalSelectors.getConnectionsOfAtomWithOwnedTargetConnections(atomUri)
   );
 
+  /*FIXME: This is a quick(ish) workaround that adds the tabname
+    to the route for all pages but /inventory -> that way navigating
+    from a specific atom within a socket, will not result in
+    browserBack showing the detail page but the tab that was previously selected */
+  const changeTab =
+    history.location.pathname !== "/inventory"
+      ? tabName =>
+          history.replace(generateLink(history.location, { tab: tabName }))
+      : setVisibleTab;
+
   return (
     <won-atom-info
       class={
@@ -83,7 +96,7 @@ export default function WonAtomInfo({
       <WonAtomMenu
         atom={atom}
         visibleTab={visibleTab}
-        setVisibleTab={setVisibleTab}
+        setVisibleTab={changeTab}
         toggleAddPicker={toggleAddPicker}
         relevantConnectionsMap={relevantConnectionsMap}
       />
@@ -93,7 +106,7 @@ export default function WonAtomInfo({
         relevantConnectionsMap={relevantConnectionsMap}
         toggleAddPicker={toggleAddPicker}
         showAddPicker={showAddPicker}
-        setVisibleTab={setVisibleTab}
+        setVisibleTab={changeTab}
         storedAtoms={storedAtoms}
       />
     </won-atom-info>
