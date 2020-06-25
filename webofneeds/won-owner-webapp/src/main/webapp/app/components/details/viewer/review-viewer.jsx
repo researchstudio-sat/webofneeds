@@ -1,5 +1,4 @@
 import React from "react";
-import WonDescriptionViewer from "./description-viewer.jsx";
 import { get } from "../../../utils.js";
 
 import "~/style/_review-viewer.scss";
@@ -7,7 +6,6 @@ import PropTypes from "prop-types";
 
 export default function WonReviewViewer({ detail, content, className }) {
   const reviewRating = get(content, "rating");
-  const reviewText = get(content, "text");
 
   const icon = detail.icon && (
     <svg className="reviewv__header__icon">
@@ -38,11 +36,6 @@ export default function WonReviewViewer({ detail, content, className }) {
       </div>
       <div className="reviewv__content">
         <div className="reviewv__content__rating">{getRatingLabel()}</div>
-        {reviewText ? (
-          <WonDescriptionViewer content={reviewText} detail={{}} />
-        ) : (
-          undefined
-        )}
       </div>
     </won-review-viewer>
   );

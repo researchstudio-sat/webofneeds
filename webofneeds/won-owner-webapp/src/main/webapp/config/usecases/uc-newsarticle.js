@@ -18,6 +18,7 @@ export const newsarticle = {
           "#holdableSocket": vocab.HOLD.HoldableSocketCompacted,
           "#associatedArticleInverseSocket":
             vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted,
+          "#sReviewSocket": vocab.WXSCHEMA.ReviewSocketCompacted,
         },
       },
       seeks: {},

@@ -20,12 +20,19 @@ const emptyDraftImm = Immutable.fromJS({
     sockets: {
       "#chatSocket": vocab.CHAT.ChatSocketCompacted,
       "#holdableSocket": vocab.HOLD.HoldableSocketCompacted,
+      "#sReviewSocket": vocab.WXSCHEMA.ReviewSocketCompacted,
     },
   },
   seeks: {},
 });
 
 export const defaultReactions = {
+  [vocab.WXSCHEMA.ReviewSocketCompacted]: {
+    [vocab.WXSCHEMA.ReviewInverseSocketCompacted]: {
+      useCaseIdentifiers: ["review"],
+      refuseNonOwned: true,
+    },
+  },
   [vocab.BUDDY.BuddySocketCompacted]: {
     [vocab.BUDDY.BuddySocketCompacted]: {
       useCaseIdentifiers: ["persona"],
@@ -91,7 +98,7 @@ export const details = {
 
   pricerange: priceDetails.pricerange,
   price: priceDetails.price,
-  review: reviewDetails.review,
+  reviewRating: reviewDetails.reviewRating,
   responseToUri: basicDetails.responseToUri,
   website: basicDetails.website,
   flags: basicDetails.flags,

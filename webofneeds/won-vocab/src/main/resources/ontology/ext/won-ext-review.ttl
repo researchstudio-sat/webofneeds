@@ -75,7 +75,7 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
 
 ###  https://w3id.org/won/ext/review#ReviewSocket
 :ReviewSocket rdf:type owl:NamedIndividual ,
-                       won:SocketDefinition ;
+                       won:SocketDefinition ;:reviews
               won:compatibleSocketDefinition :ReviewSocket ;
               won:derivesAtomProperty :reviews ;
               won:autoOpen "true"^^xsd:boolean ;

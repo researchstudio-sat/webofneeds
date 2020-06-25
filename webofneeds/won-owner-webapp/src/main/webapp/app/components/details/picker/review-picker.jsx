@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
 
 import PropTypes from "prop-types";
-import WonDescriptionPicker from "./description-picker.jsx";
 
 import "~/style/_reviewpicker.scss";
 
 export default function WonReviewPicker({ initialValue, detail, onUpdate }) {
   const [state, setState] = useState({
-    text: initialValue && initialValue.text,
     rating: (initialValue && initialValue.rating) || getDefaultRating(),
   });
 
@@ -51,11 +49,6 @@ export default function WonReviewPicker({ initialValue, detail, onUpdate }) {
               </option>
             ))}
         </select>
-        <WonDescriptionPicker
-          onUpdate={({ value }) => setState({ ...state, text: value })}
-          initialValue={initialValue && initialValue.text}
-          detail={{ placeholder: detail.placeholder }}
-        />
       </div>
     </won-review-picker>
   );
