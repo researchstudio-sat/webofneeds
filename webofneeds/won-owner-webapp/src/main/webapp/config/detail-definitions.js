@@ -108,6 +108,7 @@ export const details = {
   pokemonGymInfo: pokemonDetails.pokemonGymInfo,
   pokemonRaid: pokemonDetails.pokemonRaid,
   isbn: extendedDetails.isbn,
+  classifiedAs: extendedDetails.classifiedAs,
   author: extendedDetails.author,
 };
 

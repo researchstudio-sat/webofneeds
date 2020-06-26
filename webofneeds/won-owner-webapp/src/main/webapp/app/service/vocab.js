@@ -361,6 +361,9 @@ vocab.WXSCHEMA.ReviewInverseSocket =
 vocab.WXSCHEMA.ReviewInverseSocketCompacted =
   vocab.WXSCHEMA.prefix + ":ReviewInverseSocket";
 
+vocab.VALUEFLOWS = {};
+vocab.VALUEFLOWS.baseUri = "https://w3id.org/valueflows#";
+vocab.VALUEFLOWS.prefix = "vf";
 // UTILS
 vocab.WONMSG.uriPlaceholder = Object.freeze({
   event: "wm:/SELF",
