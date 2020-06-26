@@ -1,0 +1,5 @@
+@import "detail-viewer-mixin";
+
+wikidata-viewer {
+  @include won-detail-viewer("wikidatav");
+}
