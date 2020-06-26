@@ -209,6 +209,7 @@ Copy the SSL connector statement given below to `<TOMCAT_FOLDER>/conf/server.xml
         certificateKeystoreFile="/home/username/WoNKeystore/t-keystore.jks"
         certificateKeystorePassword="changeit"/>
    </SSLHostConfig>
+   <UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" /> 
  </Connector>
 ```
 
