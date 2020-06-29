@@ -190,7 +190,8 @@ public class PersistenceTest {
         Mockito.when(socketLookup.isCompatible(targetSocket, senderSocket)).thenReturn(true);
         Mockito.when(socketLookup.getCapacityOfType(any(URI.class))).thenReturn(Optional.of(10));
         Mockito.when(socketLookup.isCompatibleSocketTypes(any(URI.class), any(URI.class))).thenReturn(true);
-        Mockito.when(socketLookup.getSocketConfig(any(URI.class))).thenReturn(Optional.of(getChatSocketDefForDerivation()));
+        Mockito.when(socketLookup.getSocketConfig(any(URI.class)))
+                        .thenReturn(Optional.of(getChatSocketDefForDerivation()));
         WonMessage connectMessage = prepareFromOwner(WonMessageBuilder
                         .connect()
                         .sockets().sender(senderSocket).recipient(targetSocket)
@@ -262,7 +263,8 @@ public class PersistenceTest {
         Mockito.when(socketLookup.isCompatible(targetSocket, senderSocket)).thenReturn(true);
         Mockito.when(socketLookup.getCapacityOfType(any(URI.class))).thenReturn(Optional.of(10));
         Mockito.when(socketLookup.isCompatibleSocketTypes(any(URI.class), any(URI.class))).thenReturn(true);
-        Mockito.when(socketLookup.getSocketConfig(any(URI.class))).thenReturn(Optional.of(getChatSocketDefForDerivation()));
+        Mockito.when(socketLookup.getSocketConfig(any(URI.class)))
+                        .thenReturn(Optional.of(getChatSocketDefForDerivation()));
         WonMessage connectMessage = prepareFromOwner(WonMessageBuilder
                         .connect()
                         .sockets().sender(senderSocket).recipient(targetSocket)
@@ -303,35 +305,43 @@ public class PersistenceTest {
 
     private SocketDefinition getChatSocketDefForDerivation() {
         return new SocketDefinition() {
-            @Override public URI getSocketURI() {
+            @Override
+            public URI getSocketURI() {
                 throw new UnsupportedOperationException("not implemented");
             }
 
-            @Override public Optional<URI> getSocketDefinitionURI() {
+            @Override
+            public Optional<URI> getSocketDefinitionURI() {
                 throw new UnsupportedOperationException("not implemented");
             }
 
-            @Override public Set<URI> getDerivationProperties() {
+            @Override
+            public Set<URI> getDerivationProperties() {
                 return Collections.emptySet();
             }
 
-            @Override public Set<URI> getInverseDerivationProperties() {
+            @Override
+            public Set<URI> getInverseDerivationProperties() {
                 return Collections.emptySet();
             }
 
-            @Override public boolean isCompatibleWith(SocketDefinition other) {
+            @Override
+            public boolean isCompatibleWith(SocketDefinition other) {
                 throw new UnsupportedOperationException("not implemented");
             }
 
-            @Override public boolean isAutoOpen() {
+            @Override
+            public boolean isAutoOpen() {
                 throw new UnsupportedOperationException("not implemented");
             }
 
-            @Override public Optional<Integer> getCapacity() {
+            @Override
+            public Optional<Integer> getCapacity() {
                 throw new UnsupportedOperationException("not implemented");
             }
 
-            @Override public Set<URI> getInconsistentProperties() {
+            @Override
+            public Set<URI> getInconsistentProperties() {
                 throw new UnsupportedOperationException("not implemented");
             }
         };
