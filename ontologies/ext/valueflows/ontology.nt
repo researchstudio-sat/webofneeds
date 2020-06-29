@@ -41,7 +41,7 @@
 <https://w3id.org/won/ext/valueflows#custodian> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/ext/valueflows#CustodianInverseSocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
 <https://w3id.org/won/ext/valueflows#CustodianInverseSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "A Persona Atom uses a Socket with this configuration to connect to Atoms of which it is the custodian."@en .
-<https://w3id.org/won/ext/valueflows#CustodianInverseSocket> <http://www.w3.org/2000/01/rdf-schema#label> "PrimaryAccountableInverseSocket" .
+<https://w3id.org/won/ext/valueflows#CustodianInverseSocket> <http://www.w3.org/2000/01/rdf-schema#label> "CustodianInverseSocket" .
 # 
 # https://w3id.org/won/ext/valueflows#CustodianSocket
 <https://w3id.org/won/ext/valueflows#CustodianSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
@@ -51,7 +51,7 @@
 <https://w3id.org/won/ext/valueflows#CustodianSocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
 <https://w3id.org/won/ext/valueflows#CustodianSocket> <https://w3id.org/won/core#socketCapacity> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 <https://w3id.org/won/ext/valueflows#CustodianSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "An Atom uses a Socket with this configuration to connect to the Persona Atom that is its custodian."@en .
-<https://w3id.org/won/ext/valueflows#CustodianSocket> <http://www.w3.org/2000/01/rdf-schema#label> "PrimaryAccountableSocket" .
+<https://w3id.org/won/ext/valueflows#CustodianSocket> <http://www.w3.org/2000/01/rdf-schema#label> "CustodianSocket" .
 # 
 # https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket
 <https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .

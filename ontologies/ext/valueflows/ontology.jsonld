@@ -60,7 +60,7 @@
     "@value" : "A Persona Atom uses a Socket with this configuration to connect to Atoms of which it is the custodian."
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "PrimaryAccountableInverseSocket"
+    "@value" : "CustodianInverseSocket"
   } ],
   "https://w3id.org/won/core#autoOpen" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
@@ -80,7 +80,7 @@
     "@value" : "An Atom uses a Socket with this configuration to connect to the Persona Atom that is its custodian."
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "PrimaryAccountableSocket"
+    "@value" : "CustodianSocket"
   } ],
   "https://w3id.org/won/core#autoOpen" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#boolean",

@@ -41,7 +41,7 @@
                         <https://w3id.org/won/core#derivesInverseAtomProperty> :custodian ;
                         <https://w3id.org/won/core#autoOpen> "false"^^xsd:boolean ;
                         rdfs:comment "A Persona Atom uses a Socket with this configuration to connect to Atoms of which it is the custodian."@en ;
-                        rdfs:label "PrimaryAccountableInverseSocket" .
+                        rdfs:label "CustodianInverseSocket" .
 
 
 ###  https://w3id.org/won/ext/valueflows#CustodianSocket
@@ -52,7 +52,7 @@
                  <https://w3id.org/won/core#autoOpen> "false"^^xsd:boolean ;
                  <https://w3id.org/won/core#socketCapacity> 1 ;
                  rdfs:comment "An Atom uses a Socket with this configuration to connect to the Persona Atom that is its custodian."@en ;
-                 rdfs:label "PrimaryAccountableSocket" .
+                 rdfs:label "CustodianSocket" .
 
 
 ###  https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket
