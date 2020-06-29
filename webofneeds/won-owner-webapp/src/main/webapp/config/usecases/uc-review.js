@@ -4,19 +4,19 @@ import {
   defaultReactions,
 } from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
-import ico36_robot from "../../images/won-icons/ico36_robot.svg";
 
-export const serviceAtom = {
-  identifier: "serviceAtom",
-  label: "Bot",
-  icon: ico36_robot,
+export const review = {
+  identifier: "review",
+  label: "Review",
+  icon: undefined, //No Icon For Persona UseCase (uses identicon)
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: [vocab.BOT.ServiceAtomCompacted],
+        type: ["s:Review"],
         sockets: {
           "#chatSocket": vocab.CHAT.ChatSocketCompacted,
-          "#holderSocket": vocab.HOLD.HolderSocketCompacted,
+          "#sReviewInverseSocket": vocab.WXSCHEMA.ReviewInverseSocketCompacted,
+          "#holdableSocket": vocab.HOLD.HoldableSocketCompacted,
           "#sReviewSocket": vocab.WXSCHEMA.ReviewSocketCompacted,
         },
       },
@@ -25,18 +25,18 @@ export const serviceAtom = {
   },
   reactions: {
     ...defaultReactions,
-    [vocab.HOLD.HolderSocketCompacted]: {
-      [vocab.HOLD.HoldableSocketCompacted]: {
+    [vocab.WXSCHEMA.ReviewInverseSocketCompacted]: {
+      [vocab.WXSCHEMA.ReviewSocketCompacted]: {
         useCaseIdentifiers: ["*"],
-        refuseNonOwned: true,
+        refuseOwned: true,
       },
     },
   },
   details: {
-    personaName: { ...details.personaName, mandatory: true },
+    title: { ...details.title },
+    reviewRating: { ...details.reviewRating, mandatory: true },
     description: { ...details.description },
-    website: { ...details.website },
-    termsOfService: { ...details.termsOfService },
+    images: { ...details.images },
   },
   seeksDetails: {},
 };

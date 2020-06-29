@@ -381,10 +381,6 @@ export const sockets = {
       value: { "#holdableSocket": vocab.HOLD.HoldableSocketCompacted },
       label: "HoldableSocket",
     },
-    {
-      value: { "#reviewSocket": vocab.REVIEW.ReviewSocketCompacted },
-      label: "ReviewSocket",
-    },
   ],
   parseToRDF: function({ value }) {
     //TODO: PARSE TO RDF ONLY WHEN VALUE IS CONTAINING ONLY POSSIBLE ONES

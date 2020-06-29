@@ -276,10 +276,6 @@ export function hasHolderSocket(atom) {
   return hasSocket(atom, vocab.HOLD.HolderSocketCompacted);
 }
 
-export function hasReviewSocket(atom) {
-  return hasSocket(atom, vocab.REVIEW.ReviewSocketCompacted);
-}
-
 export function hasBuddySocket(atom) {
   return hasSocket(atom, vocab.BUDDY.BuddySocketCompacted);
 }

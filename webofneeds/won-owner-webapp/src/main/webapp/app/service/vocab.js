@@ -297,12 +297,6 @@ vocab.GROUP.prefix = "group";
 vocab.GROUP.GroupSocket = vocab.GROUP.baseUri + "GroupSocket";
 vocab.GROUP.GroupSocketCompacted = vocab.GROUP.prefix + ":GroupSocket";
 
-vocab.REVIEW = {};
-vocab.REVIEW.baseUri = "https://w3id.org/won/ext/review#";
-vocab.REVIEW.prefix = "review";
-vocab.REVIEW.ReviewSocket = vocab.REVIEW.baseUri + "ReviewSocket";
-vocab.REVIEW.ReviewSocketCompacted = vocab.REVIEW.prefix + ":ReviewSocket";
-
 vocab.BUDDY = {};
 vocab.BUDDY.baseUri = "https://w3id.org/won/ext/buddy#";
 vocab.BUDDY.prefix = "buddy";
@@ -359,6 +353,14 @@ vocab.WXSCHEMA.ParentOrganizationSocket =
 vocab.WXSCHEMA.ParentOrganizationSocketCompacted =
   vocab.WXSCHEMA.prefix + ":ParentOrganizationSocket";
 
+vocab.WXSCHEMA.ReviewSocket = vocab.WXSCHEMA.baseUri + "ReviewSocket";
+vocab.WXSCHEMA.ReviewSocketCompacted = vocab.WXSCHEMA.prefix + ":ReviewSocket";
+
+vocab.WXSCHEMA.ReviewInverseSocket =
+  vocab.WXSCHEMA.baseUri + "ReviewInverseSocket";
+vocab.WXSCHEMA.ReviewInverseSocketCompacted =
+  vocab.WXSCHEMA.prefix + ":ReviewInverseSocket";
+
 // UTILS
 vocab.WONMSG.uriPlaceholder = Object.freeze({
   event: "wm:/SELF",
@@ -377,6 +379,7 @@ vocab.WON.contentNodeBlankUri = Object.freeze({
 vocab.socketCapacity = {
   [vocab.HOLD.HoldableSocketCompacted]: 1,
   [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: 1,
+  [vocab.WXSCHEMA.ReviewInverseSocketCompacted]: 1,
 };
 
 /* This constant is to prevent connections to non owned atoms for specific sockets */

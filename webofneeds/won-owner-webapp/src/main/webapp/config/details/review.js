@@ -8,88 +8,65 @@ import WonReviewPicker from "../../app/components/details/picker/review-picker.j
 import ico36_detail_title from "../../images/won-icons/ico36_detail_title.svg";
 
 /*Detail based on https://schema.org/Review*/
-export const review = {
-  identifier: "review",
-  label: "Review",
+export const reviewRating = {
+  identifier: "reviewRating",
+  label: "Rating",
   icon: ico36_detail_title /*TODO: REVIEW/RATING ICON*/,
   component: WonReviewPicker,
   viewerComponent: WonReviewViewer,
-  placeholder: "Review Text (optional)",
   rating: [
     //Value needs to be empty string for react to clear localState (https://github.com/facebook/react/issues/4085)
     //which isn't a problem since the bool value of an empty string is false (in js)
     { value: "", label: "Select a Rating", default: true },
-    { value: 1, label: "1 Star" },
-    { value: 2, label: "2 Stars" },
-    { value: 3, label: "3 Stars" },
-    { value: 4, label: "4 Stars" },
-    { value: 5, label: "5 Stars" },
+    { value: 1, label: "⭐" },
+    { value: 2, label: "⭐⭐" },
+    { value: 3, label: "⭐⭐⭐" },
+    { value: 4, label: "⭐⭐⭐⭐" },
+    { value: 5, label: "⭐⭐⭐⭐⭐" },
   ],
-  messageEnabled: true,
+  messageEnabled: false,
   parseToRDF: function({ value, identifier, contentUri }) {
     if (!value || !value.rating) {
-      return { "s:review": undefined };
+      return { "s:reviewRating": undefined };
     }
 
     const randomString = generateIdString(10);
 
     return {
-      "s:review": {
-        "@type": "s:Review",
+      /*"s:about":
+          "TODO: here should be the identityUri that the review refers to", //TODO: use identity uri*/
+      /*"s:author":
+          "TODO:  here should be the identityUri of the review-author", //TODO: use identity uri*/
+      "s:reviewRating": {
+        "@type": "s:Rating",
         "@id":
           contentUri && identifier
             ? contentUri + "#" + identifier + "-" + randomString
             : undefined,
-        "s:about":
-          "TODO: here should be the identityUri that the review refers to", //TODO: use identity uri
-        "s:author":
-          "TODO:  here should be the identityUri of the review-author", //TODO: use identity uri
-        "s:reviewRating": {
-          "@type": "s:Rating",
-          "@id":
-            contentUri && identifier
-              ? contentUri +
-                "#" +
-                identifier +
-                "-" +
-                randomString +
-                "-" +
-                generateIdString(10)
-              : undefined,
-          "s:bestRating": { "@value": 5, "@type": "xsd:int" }, //not necessary but possible
-          "s:ratingValue": { "@value": value.rating, "@type": "xsd:int" },
-          "s:worstRating": { "@value": 1, "@type": "xsd:int" }, //not necessary but possible
-        },
-        "s:description": value.text,
+        "s:bestRating": { "@value": 5, "@type": "xsd:int" }, //not necessary but possible
+        "s:ratingValue": { "@value": value.rating, "@type": "xsd:int" },
+        "s:worstRating": { "@value": 1, "@type": "xsd:int" }, //not necessary but possible
       },
     };
   },
   parseFromRDF: function(jsonLDImm) {
-    const text = jsonLdUtils.parseFrom(
-      jsonLDImm,
-      ["s:review", "s:description"],
-      "xsd:string"
-    );
-
     const rating = jsonLdUtils.parseFrom(
       jsonLDImm,
-      ["s:review", "s:reviewRating", "s:ratingValue"],
+      ["s:reviewRating", "s:ratingValue"],
       "xsd:int"
     );
 
-    //TODO: EXTRACT AUTHOR AND ABOUT URI
+    //TODO: EXTRACT AUTHOR AND ABOUT URI BEST/WORST Rating
 
     if (!rating) {
       return undefined;
     } else {
-      return { text: text, rating: rating };
+      return { rating: rating };
     }
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value) {
-      //TODO: EXTRACT AUTHOR AND ABOUT URI
-      const text = value.text;
-
+      //TODO: EXTRACT AUTHOR AND ABOUT URI BEST/WORST Rating
       let ratingLabel = undefined;
 
       this.rating &&
@@ -100,10 +77,7 @@ export const review = {
         });
       ratingLabel = ratingLabel || value.rating;
 
-      return (
-        (includeLabel ? this.label + ": " + ratingLabel : ratingLabel) +
-        (text ? " - " + text : "")
-      );
+      return includeLabel ? this.label + ": " + ratingLabel : ratingLabel;
     }
     return undefined;
   },

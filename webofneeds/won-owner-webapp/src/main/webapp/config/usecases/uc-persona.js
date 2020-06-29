@@ -15,11 +15,11 @@ export const persona = {
         type: [vocab.WON.PersonaCompacted],
         sockets: {
           "#chatSocket": vocab.CHAT.ChatSocketCompacted,
-          "#reviewSocket": vocab.REVIEW.ReviewSocketCompacted,
           "#holderSocket": vocab.HOLD.HolderSocketCompacted,
           "#buddySocket": vocab.BUDDY.BuddySocketCompacted,
           "#worksForSocket": vocab.WXSCHEMA.WorksForSocketCompacted,
           "#memberOfSocket": vocab.WXSCHEMA.MemberOfSocketCompacted,
+          "#sReviewSocket": vocab.WXSCHEMA.ReviewSocketCompacted,
         },
       },
       seeks: {},

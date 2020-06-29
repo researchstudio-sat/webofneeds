@@ -5,10 +5,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 import won.bot.vocabulary.WXBOT;
 import won.protocol.util.DefaultAtomModelWrapper;
-import won.protocol.vocabulary.SCHEMA;
-import won.protocol.vocabulary.WXCHAT;
-import won.protocol.vocabulary.WXHOLD;
-import won.protocol.vocabulary.WXREVIEW;
+import won.protocol.vocabulary.*;
 
 import java.net.URI;
 import java.util.Objects;
@@ -30,7 +27,7 @@ public class ServiceAtomModelWrapper extends DefaultAtomModelWrapper {
         atom.addProperty(RDF.type, WXBOT.ServiceAtom);
         this.addSocket("#HolderSocket", WXHOLD.HolderSocketString);
         this.addSocket("#ChatSocket", WXCHAT.ChatSocketString);
-        this.addSocket("#ReviewSocket", WXREVIEW.ReviewSocketString);
+        this.addSocket("#sReviewSocket", WXSCHEMA.ReviewSocketString);
         this.setDefaultSocket("#ChatSocket");
         if (Objects.nonNull(serviceAtomContent.getName())) {
             this.setName(serviceAtomContent.getName());

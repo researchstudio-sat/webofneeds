@@ -14,7 +14,6 @@ const minimalContext = {
   hold: vocab.HOLD.baseUri,
   chat: vocab.CHAT.baseUri,
   group: vocab.GROUP.baseUri,
-  review: vocab.REVIEW.baseUri,
   buddy: vocab.BUDDY.baseUri,
   rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
   agr: vocab.AGR.baseUri,
