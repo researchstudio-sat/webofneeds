@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import won.node.service.nodeconfig.URIService;
 import won.protocol.exception.IllegalAtomContentException;
 import won.protocol.exception.IllegalAtomURIException;
@@ -72,6 +71,8 @@ public class AtomService {
     MessageEventRepository messageEventRepository;
     @Autowired
     MessageService messageService;
+    @Autowired
+    DataDerivationService dataDerivationService;
     @Autowired
     URIService uriService;
     @Autowired
@@ -208,6 +209,7 @@ public class AtomService {
         atom = atomRepository.save(atom);
         connectionContainerRepository.save(connectionContainer);
         socketEntities.forEach(socket -> socketRepository.save(socket));
+        dataDerivationService.deriveDataIfNecessary(atom);
         return atom;
     }
 
@@ -270,6 +272,7 @@ public class AtomService {
         datasetHolder.setDataset(atomContent);
         atom.setDatatsetHolder(datasetHolder);
         atom.setAttachmentDatasetHolders(attachments);
+        dataDerivationService.deriveDataIfNecessary(atom);
         return atomRepository.save(atom);
     }
 
@@ -466,6 +469,7 @@ public class AtomService {
         Atom atom = getAtomRequired(atomURI);
         logger.debug("atom State: " + atom.getState());
         atom.setState(AtomState.ACTIVE);
+        dataDerivationService.deriveDataIfNecessary(atom);
         atomRepository.save(atom);
         logger.debug("atom State: " + atom.getState());
     }
@@ -487,6 +491,7 @@ public class AtomService {
         Optional<Atom> atom = getAtomForUpdate(atomURI);
         logger.debug("atom State: " + atom.get().getState());
         atom.get().setState(AtomState.INACTIVE);
+        dataDerivationService.deriveDataIfNecessary(atom.get());
         atomRepository.save(atom.get());
         logger.debug("atom State: " + atom.get().getState());
     }

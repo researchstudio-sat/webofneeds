@@ -106,5 +106,6 @@
 
     <!-- Defines where repositories are placed -->
     <jpa:repositories base-package="won.protocol.repository" />
+    <context:component-scan base-package="won.node.service.persistence" />
 
 </beans>
