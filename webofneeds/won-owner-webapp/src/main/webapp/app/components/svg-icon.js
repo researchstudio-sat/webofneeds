@@ -1,6 +1,7 @@
 import "@webcomponents/custom-elements";
 
-import icons from "../../images/won-icons/*.svg";
+// import icons from "../../images/won-icons/*.svg"; //FIXME: WEBPACK IMPORT
+import icons from "../../images/won-icons/ico36_detail_description.svg";
 
 class SvgIcon extends HTMLElement {
   static get observedAttributes() {

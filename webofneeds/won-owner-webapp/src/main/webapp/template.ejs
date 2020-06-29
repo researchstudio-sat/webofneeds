@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width">
+  <link rel="icon" type="image/png" href="skin/current/images/logo.png">
+  <title>Web of Needs</title>
+</head>
+<body>
+    <section ui-view id="root" class="ng-scope"></section>
+    <% if (htmlWebpackPlugin.files.sprites) { %>
+      <div style="display:none">
+        <% for (var spriteFileName in htmlWebpackPlugin.files.sprites) { %>
+            <%= htmlWebpackPlugin.files.sprites[spriteFileName] %>
+        <% } %>
+      </div>
+    <% } %>
+</body>
+</html>
