@@ -423,12 +423,14 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
         String newEtag = data.getEtag();
         // load the model from storage
         Model model = connectionModelMapper.toModel(connection);
-        Model additionalData = connection.getDatasetHolder() == null ? null
-                        : connection.getDatasetHolder().getDataset().getDefaultModel();
-        setNsPrefixes(model);
-        if (additionalData != null) {
-            model.add(additionalData);
+        Dataset connectionDataset = connection.getDatasetHolder() == null ? null
+                        : connection.getDatasetHolder().getDataset();
+        if (connectionDataset == null) {
+            connectionDataset = DatasetFactory.createGeneral();
+        } else {
+            connectionDataset = RdfUtils.cloneDataset(connectionDataset);
         }
+        setNsPrefixes(model);
         // model.setNsPrefix("", connection.getConnectionURI().toString());
         // create connection member
         Resource connectionResource = model.getResource(connection.getConnectionURI().toString());
@@ -444,8 +446,8 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
                 addAdditionalData(model, datasetHolder.getDataset().getDefaultModel(), connectionResource);
             }
         }
-        Dataset connectionDataset = addBaseUriAndDefaultPrefixes(
-                        newDatasetWithNamedModel(createDataGraphUriFromResource(connectionResource), model));
+        connectionDataset.addNamedModel(createDataGraphUriFromResource(connectionResource), model);
+        connectionDataset = addBaseUriAndDefaultPrefixes(connectionDataset);
         return new DataWithEtag<>(connectionDataset, newEtag, etag);
     }
 

@@ -6,9 +6,7 @@ import static org.mockito.Matchers.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Date;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -30,6 +28,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import won.node.service.linkeddata.lookup.SocketLookupFromLinkedData;
+import won.node.service.persistence.DataDerivationService;
 import won.node.service.nodeconfig.URIService;
 import won.node.service.persistence.AtomService;
 import won.node.service.persistence.ConnectionService;
@@ -39,10 +38,7 @@ import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.impl.KeyForNewAtomAddingProcessor;
 import won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor;
 import won.protocol.message.processor.impl.WonMessageSignerVerifier;
-import won.protocol.model.Atom;
-import won.protocol.model.AtomMessageContainer;
-import won.protocol.model.AtomState;
-import won.protocol.model.Connection;
+import won.protocol.model.*;
 import won.protocol.repository.AtomMessageContainerRepository;
 import won.protocol.repository.AtomRepository;
 import won.protocol.repository.MessageEventRepository;
@@ -63,6 +59,8 @@ public class PersistenceTest {
      */
     @Autowired
     AtomRepository atomRepository;
+    @Autowired
+    DataDerivationService dataDerivationService;
     @Autowired
     AtomMessageContainerRepository atomMessageContainerRepository;
     @Autowired
@@ -192,6 +190,7 @@ public class PersistenceTest {
         Mockito.when(socketLookup.isCompatible(targetSocket, senderSocket)).thenReturn(true);
         Mockito.when(socketLookup.getCapacityOfType(any(URI.class))).thenReturn(Optional.of(10));
         Mockito.when(socketLookup.isCompatibleSocketTypes(any(URI.class), any(URI.class))).thenReturn(true);
+        Mockito.when(socketLookup.getSocketConfig(any(URI.class))).thenReturn(Optional.of(getChatSocketDefForDerivation()));
         WonMessage connectMessage = prepareFromOwner(WonMessageBuilder
                         .connect()
                         .sockets().sender(senderSocket).recipient(targetSocket)
@@ -263,6 +262,7 @@ public class PersistenceTest {
         Mockito.when(socketLookup.isCompatible(targetSocket, senderSocket)).thenReturn(true);
         Mockito.when(socketLookup.getCapacityOfType(any(URI.class))).thenReturn(Optional.of(10));
         Mockito.when(socketLookup.isCompatibleSocketTypes(any(URI.class), any(URI.class))).thenReturn(true);
+        Mockito.when(socketLookup.getSocketConfig(any(URI.class))).thenReturn(Optional.of(getChatSocketDefForDerivation()));
         WonMessage connectMessage = prepareFromOwner(WonMessageBuilder
                         .connect()
                         .sockets().sender(senderSocket).recipient(targetSocket)
@@ -299,6 +299,42 @@ public class PersistenceTest {
         assertEquals(2, messageEventRepository.findByParentURI(con.getConnectionURI()).size());
         Set<URI> messages2 = messageEventRepository.findByParentURI(remoteCon.getConnectionURI()).stream()
                         .map(mic -> mic.getMessageURI()).collect(Collectors.toSet());
+    }
+
+    private SocketDefinition getChatSocketDefForDerivation() {
+        return new SocketDefinition() {
+            @Override public URI getSocketURI() {
+                throw new UnsupportedOperationException("not implemented");
+            }
+
+            @Override public Optional<URI> getSocketDefinitionURI() {
+                throw new UnsupportedOperationException("not implemented");
+            }
+
+            @Override public Set<URI> getDerivationProperties() {
+                return Collections.emptySet();
+            }
+
+            @Override public Set<URI> getInverseDerivationProperties() {
+                return Collections.emptySet();
+            }
+
+            @Override public boolean isCompatibleWith(SocketDefinition other) {
+                throw new UnsupportedOperationException("not implemented");
+            }
+
+            @Override public boolean isAutoOpen() {
+                throw new UnsupportedOperationException("not implemented");
+            }
+
+            @Override public Optional<Integer> getCapacity() {
+                throw new UnsupportedOperationException("not implemented");
+            }
+
+            @Override public Set<URI> getInconsistentProperties() {
+                throw new UnsupportedOperationException("not implemented");
+            }
+        };
     }
 
     private Dataset createTestDataset(String resourceName) throws IOException {

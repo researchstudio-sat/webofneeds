@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.exception.IllegalMessageForAtomStateException;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
@@ -75,6 +74,8 @@ public class ConnectionService {
     DatasetHolderRepository datasetHolderRepository;
     @Autowired
     MessageEventRepository messageEventRepository;
+    @Autowired
+    DataDerivationService dataDerivationService;
     @Autowired
     EntityManager entityManager;
 
@@ -174,6 +175,7 @@ public class ConnectionService {
             logger.debug("connect from owner: set connection {} state to: {}", con.get().getConnectionURI(),
                             con.get().getState());
         }
+        dataDerivationService.deriveDataIfNecessary(con.get());
         return connectionRepository.save(con.get());
     }
 
@@ -251,6 +253,7 @@ public class ConnectionService {
         if (logger.isDebugEnabled()) {
             logger.debug("connect from node: set connection {} state to: {}", con.getConnectionURI(), con.getState());
         }
+        dataDerivationService.deriveDataIfNecessary(con);
         return connectionRepository.save(con);
     }
 
@@ -310,7 +313,6 @@ public class ConnectionService {
     /**
      * Creates a new Connection object.
      *
-     * @param connectionURI
      * @param atomURI
      * @param otherAtomURI
      * @param socketURI
@@ -441,6 +443,7 @@ public class ConnectionService {
         // set new state and save in the db
         con.changeStateTo(nextState);
         // save in the db
+        dataDerivationService.deriveDataIfNecessary(con);
         return connectionRepository.save(con);
     }
 
