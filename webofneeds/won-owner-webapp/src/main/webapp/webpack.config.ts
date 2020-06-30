@@ -22,8 +22,15 @@ function config(env, argv): Configuration {
     entry: "./app/app.js",
     mode: mode,
     optimization: {
+      moduleIds: "hashed",
       splitChunks: {
-        chunks: "all",
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: "vendors",
+            chunks: "all",
+          },
+        },
       },
       minimizer: [
         new UglifyJsPlugin({
@@ -36,7 +43,6 @@ function config(env, argv): Configuration {
     output: {
       path: path.resolve(__dirname, "dist"),
       filename: "[name].[contenthash].js",
-      chunkFilename: "[name].[contenthash].js",
     },
     resolve: {
       alias: {
@@ -181,6 +187,8 @@ function config(env, argv): Configuration {
         directories: [
           path.join(__dirname, "app"),
           path.join(__dirname, "style"),
+          path.join(__dirname, "images"),
+          path.join(__dirname, "fonts"),
         ],
         // Root directory (optional)
         root: __dirname,
