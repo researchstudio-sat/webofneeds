@@ -5,6 +5,7 @@ import * as UglifyJsPlugin from "uglifyjs-webpack-plugin";
 import * as OptimizeCSSAssetsPlugin from "optimize-css-assets-webpack-plugin";
 import * as SpriteLoaderPlugin from "svg-sprite-loader/plugin";
 import * as CopyWebpackPlugin from "copy-webpack-plugin";
+// import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 import * as WatchTimePlugin from "webpack-watch-time-plugin";
 import * as UnusedWebpackPlugin from "unused-webpack-plugin";
 import * as DartSass from "dart-sass";
@@ -21,6 +22,9 @@ function config(env, argv): Configuration {
     entry: "./app/app.js",
     mode: mode,
     optimization: {
+      splitChunks: {
+        chunks: "all",
+      },
       minimizer: [
         new UglifyJsPlugin({
           parallel: true,
@@ -32,6 +36,7 @@ function config(env, argv): Configuration {
     output: {
       path: path.resolve(__dirname, "dist"),
       filename: "[name].[contenthash].js",
+      chunkFilename: "[name].[contenthash].js",
     },
     resolve: {
       alias: {
@@ -137,6 +142,7 @@ function config(env, argv): Configuration {
       ],
     },
     plugins: [
+      // new BundleAnalyzerPlugin(),
       new HtmlWebpackPlugin({
         template: path.resolve(__dirname, "template.ejs"),
       }),
@@ -153,6 +159,14 @@ function config(env, argv): Configuration {
           {
             from: "skin",
             to: "skin",
+          },
+          {
+            from: "assets",
+            to: "assets",
+          },
+          {
+            from: "WEB-INF",
+            to: "WEB-INF",
           },
         ],
       }),
@@ -174,6 +188,7 @@ function config(env, argv): Configuration {
       new EnvironmentPlugin({
         NODE_ENV: "development",
         WON_DEPLOY_NODE_ENV: "default",
+        WON_OWNER_BASE_URL: "/owner",
       }),
     ],
     devtool: "source-map",

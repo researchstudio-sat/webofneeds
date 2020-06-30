@@ -17,7 +17,6 @@
     "lodash": "^4.17.15",
     "min-dash": "^3.5.2",
     "n3": "^1.4.0",
-    "parcel-bundler": "^1.12.4",
     "pdfmake": "^0.1.65",
     "prop-types": "^15.7.2",
     "qr-image": "^3.2.0",
@@ -52,11 +51,11 @@
     "whatwg-fetch": "^0.10.1"
   },
   "scripts": {
-    "build": "webpack",
+    "build": "cross-env WON_OWNER_BASE_URL=/owner NODE_ENV=production && webpack",
     "postinstall": "npm rebuild && patch-package",
     "precommit": "lint-staged",
-    "watch": "webpack --watch",
-    "clean": "rimraf ./dist ./.cache",
+    "watch": "cross-env WON_OWNER_BASE_URL=/owner NODE_ENV=production && webpack --watch",
+    "clean": "rimraf ./dist",
     "test": "jest --coverage || true",
     "test:watch": "npm run test -- --watch"
   },
@@ -73,6 +72,7 @@
     "@types/optimize-css-assets-webpack-plugin": "^5.0.1",
     "@types/uglifyjs-webpack-plugin": "^1.1.0",
     "@types/webpack": "^4.41.18",
+    "@types/webpack-bundle-analyzer": "^3.8.0",
     "acorn": "^6.4.1",
     "autoprefixer": "^9.8.4",
     "babel-eslint": "^8.2.6",
@@ -110,9 +110,6 @@
     "mini-css-extract-plugin": "^0.9.0",
     "node-elm-compiler": "^5.0.4",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
-    "parcel-plugin-eslint": "^1.0.7",
-    "parcel-plugin-static-files-copy": "^2.4.3",
-    "parcel-plugin-svg-sprite": "^1.4.1",
     "patch-package": "^6.2.2",
     "postcss-loader": "^3.0.0",
     "prettier": "1.14.0",
@@ -130,6 +127,7 @@
     "uglifyjs-webpack-plugin": "^2.2.0",
     "unused-webpack-plugin": "^2.4.0",
     "webpack": "^4.43.0",
+    "webpack-bundle-analyzer": "^3.8.0",
     "webpack-cli": "^3.3.12",
     "webpack-livereload-plugin": "^2.3.0",
     "webpack-watch-time-plugin": "^0.3.0"

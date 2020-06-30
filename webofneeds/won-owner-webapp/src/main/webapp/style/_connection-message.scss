@@ -28,7 +28,7 @@ won-connection-message {
     padding-left: 3rem;
     cursor: pointer;
 
-    background-image: url("../assets/cb.svg");
+    background-image: url("assets/cb.svg");
     background-position: 0 0.5rem;
     background-repeat: no-repeat;
     background-size: 2.5rem;
@@ -39,7 +39,7 @@ won-connection-message {
   }
 
   &.won-is-multiSelect.won-is-selected {
-    background-image: url("../assets/cb-selected.svg");
+    background-image: url("assets/cb-selected.svg");
   }
 
   &.won-unread {
