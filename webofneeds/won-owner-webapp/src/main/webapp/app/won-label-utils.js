@@ -38,6 +38,11 @@ const labels = deepFreeze({
     [vocab.HOLD.HolderSocketCompacted]: "Holder",
     [vocab.WXSCHEMA.ReviewSocketCompacted]: "Review enabled",
     [vocab.BUDDY.BuddySocketCompacted]: "Buddy",
+    [vocab.VALUEFLOWS.PrimaryAccountableSocketCompacted]: "Primary Accountable",
+    [vocab.VALUEFLOWS.PrimaryAccountableInverseSocketCompacted]:
+      "Primary Inverse Accountable",
+    [vocab.VALUEFLOWS.CustodianSocketCompacted]: "Custodian",
+    [vocab.VALUEFLOWS.CustodianInverseSocketCompacted]: "Custodian Inverse",
   },
   socketTabs: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Members",
@@ -55,6 +60,11 @@ const labels = deepFreeze({
     [vocab.WXSCHEMA.WorksForSocketCompacted]: "Works For",
     [vocab.WXSCHEMA.SubOrganizationSocketCompacted]: "Sub Organizations",
     [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: "Parent Organization",
+    [vocab.VALUEFLOWS.PrimaryAccountableSocketCompacted]: "Primary Accountable",
+    [vocab.VALUEFLOWS.PrimaryAccountableInverseSocketCompacted]:
+      "Primary Inverse Accountable",
+    [vocab.VALUEFLOWS.CustodianSocketCompacted]: "Custodian",
+    [vocab.VALUEFLOWS.CustodianInverseSocketCompacted]: "Custodian Inverse",
   },
   socketItem: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Member",

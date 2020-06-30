@@ -266,6 +266,7 @@ won.defaultContext = {
   cert: "http://www.w3.org/ns/auth/cert#",
   s: "http://schema.org/",
   sh: "http://www.w3.org/ns/shacl#",
+  om2: "http://www.ontology-of-units-of-measure.org/resource/om-2/",
   foaf: "http://xmlns.com/foaf/0.1/",
   "msg:messageType": {
     "@id": vocab.WONMSG.messageType,

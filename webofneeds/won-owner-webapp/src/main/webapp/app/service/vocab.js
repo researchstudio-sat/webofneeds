@@ -364,6 +364,22 @@ vocab.WXSCHEMA.ReviewInverseSocketCompacted =
 vocab.VALUEFLOWS = {};
 vocab.VALUEFLOWS.baseUri = "https://w3id.org/valueflows#";
 vocab.VALUEFLOWS.prefix = "vf";
+vocab.VALUEFLOWS.PrimaryAccountableSocket =
+  vocab.VALUEFLOWS.baseUri + "PrimaryAccountableSocket";
+vocab.VALUEFLOWS.PrimaryAccountableSocketCompacted =
+  vocab.VALUEFLOWS.prefix + ":PrimaryAccountableSocket";
+vocab.VALUEFLOWS.PrimaryAccountableIverseSocket =
+  vocab.VALUEFLOWS.baseUri + "PrimaryAccountableInverseSocket";
+vocab.VALUEFLOWS.PrimaryAccountableInverseSocketCompacted =
+  vocab.VALUEFLOWS.prefix + ":PrimaryAccountableInverseSocket";
+vocab.VALUEFLOWS.CustodianSocket = vocab.VALUEFLOWS.baseUri + "CustodianSocket";
+vocab.VALUEFLOWS.CustodianSocketCompacted =
+  vocab.VALUEFLOWS.prefix + ":CustodianSocket";
+vocab.VALUEFLOWS.CustodianInverseSocket =
+  vocab.VALUEFLOWS.baseUri + "CustodianInverseSocket";
+vocab.VALUEFLOWS.CustodianInverseSocketCompacted =
+  vocab.VALUEFLOWS.prefix + ":CustodianInverseSocket";
+
 // UTILS
 vocab.WONMSG.uriPlaceholder = Object.freeze({
   event: "wm:/SELF",
