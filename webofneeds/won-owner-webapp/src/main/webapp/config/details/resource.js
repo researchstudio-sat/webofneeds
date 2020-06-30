@@ -37,7 +37,10 @@ export const accountingQuantity = {
   messageEnabled: false,
   component: WonAmountPicker,
   viewerComponent: WonAmountViewer,
-  unit: [{ value: "om2:kilogram", label: "kg", default: true }],
+  unit: [
+    { value: "om:kilogram", label: "kg", default: true },
+    { value: "om:litre", label: "L", default: true },
+  ],
 
   parseToRDF: function({ value }) {
     if (
@@ -105,7 +108,10 @@ export const onhandQuantity = {
   messageEnabled: false,
   component: WonAmountPicker,
   viewerComponent: WonAmountViewer,
-  unit: [{ value: "om2:kilogram", label: "kg", default: true }],
+  unit: [
+    { value: "om:kilogram", label: "kg", default: true },
+    { value: "om:litre", label: "L", default: true },
+  ],
 
   parseToRDF: function({ value }) {
     if (

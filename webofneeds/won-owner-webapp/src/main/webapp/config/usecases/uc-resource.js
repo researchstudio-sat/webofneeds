@@ -19,11 +19,8 @@ export const resource = {
       content: {
         type: ["vf:EconomicResource"],
         sockets: {
-          "#PrimaryAccountableSocket":
-            vocab.VALUEFLOWS.PrimaryAccountableSocketCompacted,
           "#PrimaryAccountableInverseSocket":
             vocab.VALUEFLOWS.PrimaryAccountableInverseSocketCompacted,
-          "#CustodianSocket": vocab.VALUEFLOWS.CustodianSocketCompacted,
           "#CustodianInverseSocket":
             vocab.VALUEFLOWS.CustodianInverseSocketCompacted,
         },
