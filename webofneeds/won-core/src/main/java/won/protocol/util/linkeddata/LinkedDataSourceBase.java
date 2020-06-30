@@ -116,8 +116,10 @@ public class LinkedDataSourceBase implements LinkedDataSource {
                 logger.debug("fetched resource {}:", resource);
                 RDFDataMgr.write(System.out, dataset, Lang.TRIG);
             }
+        } catch (LinkedDataFetchingException e) {
+            throw e;
         } catch (Exception e) {
-            logger.debug(String.format("Couldn't fetch resource %s", resource), e);
+            logger.info(String.format("Couldn't fetch resource %s", resource), e);
         }
         return dataset;
     }
@@ -136,6 +138,8 @@ public class LinkedDataSourceBase implements LinkedDataSource {
                 logger.debug("fetched resource {} with requesterWebId {}:", resource, requesterWebID);
                 RDFDataMgr.write(System.out, dataset, Lang.TRIG);
             }
+        } catch (LinkedDataFetchingException e) {
+            throw e;
         } catch (Exception e) {
             logger.debug(String.format("Couldn't fetch resource %s", resource), e);
         }

@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.WonMessageProcessor;
@@ -39,7 +39,13 @@ public class EagerlyCachePopulatingMessageProcessor implements WonMessageProcess
             List<URI> previous = WonRdfUtils.MessageUtils.getPreviousMessageUrisIncludingRemote(message);
             addIfNotNull(toLoad, previous);
             parallelRequestsThreadpool.submit(() -> toLoad.parallelStream()
-                            .forEach(uri -> linkedDataSourceOnBehalfOfAtom.getDataForResource(uri, requester)));
+                            .forEach(uri -> {
+                                try {
+                                    linkedDataSourceOnBehalfOfAtom.getDataForResource(uri, requester);
+                                } catch (Exception e) {
+                                    logger.debug("Error fetching {}, omitting", uri, e);
+                                }
+                            }));
         }
         return message;
     }
