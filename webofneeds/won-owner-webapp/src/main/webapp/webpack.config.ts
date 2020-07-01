@@ -25,10 +25,19 @@ function config(env, argv): Configuration {
       moduleIds: "hashed",
       splitChunks: {
         cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
+          vendor_pdfmake: {
+            test: /[\\/]node_modules[\\/](pdfmake)[\\/]/,
+            name: "vendor_pdfmake",
+            chunks: "async",
+          },
+          vendors: {
+            test: /[\\/]node_modules[\\/](?!pdfmake)(.[a-zA-Z0-9.\-_]+)[\\/]/,
             name: "vendors",
             chunks: "all",
+          },
+          pdfExport: {
+            name: "pdfExport",
+            chunks: "async",
           },
         },
       },

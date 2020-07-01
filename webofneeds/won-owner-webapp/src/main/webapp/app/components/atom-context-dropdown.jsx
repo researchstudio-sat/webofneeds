@@ -9,8 +9,6 @@ import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils";
 import { ownerBaseUrl } from "~/config/default.js";
 import * as wonUtils from "../won-utils.js";
-import pdfMake from "pdfmake/build/pdfmake.min";
-import pdfFonts from "pdfmake/build/vfs_fonts";
 
 import "~/style/_context-dropdown.scss";
 import ico16_contextmenu from "~/images/won-icons/ico16_contextmenu.svg";
@@ -79,8 +77,11 @@ export default function WonAtomContextDropdown({ atom, className }) {
     const docDefinition = wonUtils.createDocumentDefinitionFromPost(atom);
 
     if (docDefinition) {
-      pdfMake.vfs = pdfFonts.pdfMake.vfs;
-      pdfMake.createPdf(docDefinition).download();
+      import(/* webpackChunkName: "pdfExport" */ "../pdfExport").then(
+        module => {
+          module.exportPdf(docDefinition);
+        }
+      );
     }
   }
 
