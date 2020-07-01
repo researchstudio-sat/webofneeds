@@ -41,7 +41,9 @@ export const title = {
     if (cfDataset) {
       //TODO: Fix for language fetching once CF PR is closed and dep is updated https://github.com/zazuko/clownface/pull/41
       const cfTitles = cfDataset.out(schema.title);
-      return cfTitles && cfTitles.values;
+      if (cfTitles && cfTitles.values && cfTitles.values.length > 0) {
+        return cfTitles.values;
+      }
     }
   },
   parseFromRDF: function(jsonLDImm) {
@@ -79,7 +81,9 @@ export const personaName = {
     if (cfDataset) {
       //TODO: Fix for language fetching once CF PR is closed and dep is updated https://github.com/zazuko/clownface/pull/41
       const cfNames = cfDataset.out(schema.name);
-      return cfNames && cfNames.values;
+      if (cfNames && cfNames.values && cfNames.values.length > 0) {
+        return cfNames.values;
+      }
     }
   },
   parseFromRDF: function(jsonLDImm) {
@@ -203,7 +207,13 @@ export const description = {
     if (cfDataset) {
       //TODO: Fix for language fetching once CF PR is closed and dep is updated https://github.com/zazuko/clownface/pull/41
       const cfDescription = cfDataset.out(schema.description);
-      return cfDescription && cfDescription.values;
+      if (
+        cfDescription &&
+        cfDescription.values &&
+        cfDescription.values.length > 0
+      ) {
+        return cfDescription.values;
+      }
     }
   },
   parseFromRDF: function(jsonLDImm) {
