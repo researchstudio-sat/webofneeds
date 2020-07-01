@@ -1,0 +1,47 @@
+@import "won-config";
+@import "textfield";
+@import "sizing-utils";
+
+wikidata-picker {
+  .wikidatap__input {
+    position: relative;
+    display: grid;
+
+    .wikidatap__input__results {
+      display: grid;
+      grid-auto-flow: row;
+      border: $thinGrayBorder;
+      border-bottom: 0;
+
+      &__result {
+        padding: 1rem 0.5rem;
+        border-bottom: $thinGrayBorder;
+        border-top: 0;
+        cursor: pointer;
+        background: white;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: $won-line-gray;
+
+        &__label {
+          white-space: nowrap;
+          color: $won-primary-text-color;
+        }
+
+        &__concepturi {
+          margin-left: 0.5rem;
+          color: $won-line-gray;
+          font-style: italic;
+        }
+
+        &:hover {
+          color: $won-primary-color;
+
+          &__concepturi {
+            color: $won-primary-color;
+          }
+        }
+      }
+    }
+  }
+}

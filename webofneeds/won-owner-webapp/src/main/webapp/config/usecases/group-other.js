@@ -6,6 +6,7 @@ import { newsarticle } from "./uc-newsarticle.js";
 import { handleComplaint } from "./uc-handle-complaint.js";
 import { customUseCase } from "./uc-custom.js";
 import { contactPaymentBot } from "./uc-contact-payment-bot.js";
+import { resource } from "./uc-resource.js";
 
 import {
   details,
@@ -21,6 +22,7 @@ export const otherGroup = {
   label: "More...",
   icon: ico36_plus,
   subItems: {
+    resource: resource,
     complain: complain,
     handleComplaint: handleComplaint,
     customUseCase: customUseCase,

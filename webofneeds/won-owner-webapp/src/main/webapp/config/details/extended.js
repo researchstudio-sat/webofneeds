@@ -1,5 +1,7 @@
 import WonTitlePicker from "../../app/components/details/picker/title-picker";
 import WonTitleViewer from "../../app/components/details/viewer/title-viewer";
+import WikiDataPicker from "../../app/components/details/picker/wikidata-picker";
+import WikiDataViewer from "../../app/components/details/viewer/wikidata-viewer";
 import * as jsonLdUtils from "../../app/service/jsonld-utils";
 import ico36_detail_title from "../../images/won-icons/ico36_detail_title.svg";
 import ico36_detail_person from "../../images/won-icons/ico36_detail_person.svg";
@@ -54,6 +56,36 @@ export const author = {
     );
   },
   generateHumanReadable: function({ value, includeLabel }) {
+    if (value) {
+      return includeLabel ? this.label + ": " + value : value;
+    }
+    return undefined;
+  },
+};
+
+export const classifiedAs = {
+  identifier: "classifiedAs",
+  label: "Classified As", //TODO: Better Label
+  icon: ico36_detail_title, //TODO: Better Icon
+  messageDetail: false,
+  placeholder: "Type to find what you look for...", //TODO: Better Placeholder
+  component: WikiDataPicker,
+  viewerComponent: WikiDataViewer,
+  parseToRDF: function({ value }) {
+    if (value) {
+      return {
+        "vf:classifiedAs": {
+          "@id": value,
+        },
+      };
+    }
+    return undefined;
+  },
+  parseFromRDF: function(jsonLDImm) {
+    return jsonLdUtils.parseFrom(jsonLDImm, ["vf:classifiedAs"], "xsd:ID");
+  },
+  generateHumanReadable: function({ value, includeLabel }) {
+    //TODO: Implement
     if (value) {
       return includeLabel ? this.label + ": " + value : value;
     }

@@ -361,6 +361,31 @@ vocab.WXSCHEMA.ReviewInverseSocket =
 vocab.WXSCHEMA.ReviewInverseSocketCompacted =
   vocab.WXSCHEMA.prefix + ":ReviewInverseSocket";
 
+
+vocab.VALUEFLOWS = {};
+vocab.VALUEFLOWS.baseUri = "https://w3id.org/valueflows#";
+vocab.VALUEFLOWS.prefix = "vf";
+
+vocab.WXVALUEFLOWS = {};
+vocab.WXVALUEFLOWS.baseUri = "https://w3id.org/won/ext/valueflows#";
+vocab.WXVALUEFLOWS.prefix = "wx-valueflows";
+vocab.WXVALUEFLOWS.PrimaryAccountableSocket =
+  vocab.WXVALUEFLOWS.baseUri + "PrimaryAccountableSocket";
+vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted =
+  vocab.WXVALUEFLOWS.prefix + ":PrimaryAccountableSocket";
+vocab.WXVALUEFLOWS.PrimaryAccountableIverseSocket =
+  vocab.WXVALUEFLOWS.baseUri + "PrimaryAccountableInverseSocket";
+vocab.WXVALUEFLOWS.PrimaryAccountableInverseSocketCompacted =
+  vocab.WXVALUEFLOWS.prefix + ":PrimaryAccountableInverseSocket";
+vocab.WXVALUEFLOWS.CustodianSocket =
+  vocab.WXVALUEFLOWS.baseUri + "CustodianSocket";
+vocab.WXVALUEFLOWS.CustodianSocketCompacted =
+  vocab.WXVALUEFLOWS.prefix + ":CustodianSocket";
+vocab.WXVALUEFLOWS.CustodianInverseSocket =
+  vocab.WXVALUEFLOWS.baseUri + "CustodianInverseSocket";
+vocab.WXVALUEFLOWS.CustodianInverseSocketCompacted =
+  vocab.WXVALUEFLOWS.prefix + ":CustodianInverseSocket";
+
 // UTILS
 vocab.WONMSG.uriPlaceholder = Object.freeze({
   event: "wm:/SELF",
@@ -380,6 +405,8 @@ vocab.socketCapacity = {
   [vocab.HOLD.HoldableSocketCompacted]: 1,
   [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: 1,
   [vocab.WXSCHEMA.ReviewInverseSocketCompacted]: 1,
+  [vocab.WXVALUEFLOWS.PrimaryAccountableInverseSocketCompacted]: 1,
+  [vocab.WXVALUEFLOWS.CustodianInverseSocketCompacted]: 1,
 };
 
 /* This constant is to prevent connections to non owned atoms for specific sockets */

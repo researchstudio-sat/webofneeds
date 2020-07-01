@@ -248,14 +248,16 @@ won.minimalContext = {
   gr: "http://purl.org/goodrelations/v1#",
   wf: vocab.WORKFLOW.baseUri,
   rdfg: "http://www.w3.org/2004/03/trix/rdfg-1/",
+  vf: vocab.VALUEFLOWS.baseUri,
+  "wx-valueflows": vocab.WXVALUEFLOWS.baseUri,
 };
 won.minimalTurtlePrefixes = context2ttlPrefixes(won.minimalContext);
 
 won.defaultContext = {
   ...won.minimalContext,
+  [vocab.RDFS.prefix]: vocab.RDFS.baseUri,
   webID: "http://www.example.com/webids/",
   dc: "http://purl.org/dc/elements/1.1/",
-  rdfs: vocab.RDFS.baseUri,
   geo: "http://www.w3.org/2003/01/geo/wgs84_pos#",
   xsd: "http://www.w3.org/2001/XMLSchema#",
   gr: "http://purl.org/goodrelations/v1#",
@@ -265,6 +267,7 @@ won.defaultContext = {
   cert: "http://www.w3.org/ns/auth/cert#",
   s: "http://schema.org/",
   sh: "http://www.w3.org/ns/shacl#",
+  om: "http://www.ontology-of-units-of-measure.org/resource/om-2/",
   foaf: "http://xmlns.com/foaf/0.1/",
   "msg:messageType": {
     "@id": vocab.WONMSG.messageType,
