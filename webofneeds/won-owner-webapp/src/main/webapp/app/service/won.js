@@ -249,7 +249,7 @@ won.minimalContext = {
   wf: vocab.WORKFLOW.baseUri,
   rdfg: "http://www.w3.org/2004/03/trix/rdfg-1/",
   vf: vocab.VALUEFLOWS.baseUri,
-  wx-valueflows: vocab.WXVALUEFLOWS.baseUri,
+  "wx-valueflows": vocab.WXVALUEFLOWS.baseUri,
 };
 won.minimalTurtlePrefixes = context2ttlPrefixes(won.minimalContext);
 
