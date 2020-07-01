@@ -47,7 +47,7 @@ echo "(re)generating documentation for ontologies"
 echo "   ontologies folder:  ${ontology_root}"
 echo "   output folder    :  ${output_base}"
 
-onts=(core message agreement modification content matching)
+onts=(core message agreement modification content matching workflow)
 ext_onts=(buddy chat group hold review schema demo pogo bot valueflows)
 
 rewrite_base="https://researchstudio-sat.github.io/webofneeds/ontologies"
