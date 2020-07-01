@@ -63,14 +63,15 @@ export default function WonAtomInfo({
   );
 
   /*FIXME: This is a quick(ish) workaround that adds the tabname
-    to the route for all pages but /inventory -> that way navigating
+    to the route for all pages but /inventory & / -> that way navigating
     from a specific atom within a socket, will not result in
     browserBack showing the detail page but the tab that was previously selected */
   const changeTab =
-    history.location.pathname !== "/inventory"
-      ? tabName =>
-          history.replace(generateLink(history.location, { tab: tabName }))
-      : setVisibleTab;
+    history.location.pathname === "/inventory" &&
+    history.location.pathname === "/"
+      ? setVisibleTab
+      : tabName =>
+          history.replace(generateLink(history.location, { tab: tabName }));
 
   return (
     <won-atom-info
