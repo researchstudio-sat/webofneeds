@@ -73,6 +73,7 @@ public class WON {
     public static final Property goal = m.createProperty(BASE_URI, "goal");
     public static final Property shapesGraph = m.createProperty(BASE_URI, "shapesGraph");
     public static final Property dataGraph = m.createProperty(BASE_URI, "dataGraph");
+    public static final Property derivedForConnectionState = m.createProperty(BASE_URI + "derivedForConnectionState");
     // Resource individuals
     public static final Resource ATOM_STATE_ACTIVE = m.createResource(AtomState.ACTIVE.getURI().toString());
     public static final Resource ATOM_STATE_INACTIVE = m.createResource(AtomState.INACTIVE.getURI().toString());

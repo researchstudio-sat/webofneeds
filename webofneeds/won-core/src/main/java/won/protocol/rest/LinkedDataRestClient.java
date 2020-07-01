@@ -121,16 +121,16 @@ public abstract class LinkedDataRestClient {
                 return new DatasetResponseWithStatusCodeAndHeaders(dataset, 200, headers);
             }
             if (e instanceof HttpClientErrorException) {
-                throw new LinkedDataFetchingException(resourceURI, MessageFormat.format(
+                throw new LinkedDataFetchingException(MessageFormat.format(
                                 "Caught a HttpClientErrorException exception, for {0}. Underlying error message is: {1}, response Body: {2}",
                                 resourceURI, e.getMessage(), ((HttpClientErrorException) e).getResponseBodyAsString()),
-                                e);
+                                e, resourceURI, ((HttpClientErrorException) e).getRawStatusCode());
             }
             if (e instanceof HttpServerErrorException) {
-                throw new LinkedDataFetchingException(resourceURI, MessageFormat.format(
+                throw new LinkedDataFetchingException(MessageFormat.format(
                                 "Caught a HttpServerErrorException exception, for {0}. Underlying error message is: {1}, response Body: {2}",
                                 resourceURI, e.getMessage(), ((HttpServerErrorException) e).getResponseBodyAsString()),
-                                e);
+                                e, resourceURI, ((HttpServerErrorException) e).getRawStatusCode());
             }
             throw new LinkedDataFetchingException(resourceURI,
                             MessageFormat.format("Caught a clientHandler exception, "

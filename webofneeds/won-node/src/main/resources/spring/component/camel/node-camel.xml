@@ -112,8 +112,6 @@
 	<bean name="socketTypeSlip" class="won.node.camel.processor.general.SocketTypeSlipComputer"/>
 	<!-- extraction of connection state for data derivation -->
 	<bean name="connectionStateChangeBuilder" class="won.node.camel.processor.general.ConnectionStateChangeBuilderCamelProcessor" />
-	<!--  data derivation processor -->
-	<bean name="dataDeriver" class="won.node.camel.processor.general.SocketDerivationProcessor" />
 	<!--  delete message processor -->
 	<bean name="atomDeleter" class="won.node.camel.processor.general.DeleteAtomMessageProcessor" />
 	<!--  merges the message datasets found the message and original message headers -->

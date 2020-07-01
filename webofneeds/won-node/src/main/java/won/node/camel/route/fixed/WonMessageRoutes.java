@@ -104,8 +104,6 @@ public class WonMessageRoutes extends RouteBuilder {
                         .to("bean:connectionStateChangeBuilder")
                         // call the default implementation, which may alter the message.
                         .routingSlip(method("fixedMessageProcessorSlip"))
-                        // depending on connection state change, make/delete derivations
-                        .to("bean:dataDeriver")
                         .choice()
                         /**/.when(shouldCallSocketImplForMessage)
                         /**//**/.to("bean:socketTypeExtractor")
@@ -207,8 +205,6 @@ public class WonMessageRoutes extends RouteBuilder {
                         .to("bean:connectionStateChangeBuilder")
                         // call the default implementation, which may alter the message.
                         .routingSlip(method("fixedMessageProcessorSlip"))
-                        // depending on connection state change, make/delete derivations
-                        .to("bean:dataDeriver")
                         .to("bean:socketTypeExtractor")
                         .choice()
                         /**/.when(shouldCallSocketImplForMessage)

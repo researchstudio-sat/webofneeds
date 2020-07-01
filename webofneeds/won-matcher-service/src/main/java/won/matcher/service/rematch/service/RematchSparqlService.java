@@ -32,6 +32,7 @@ import won.matcher.service.common.event.BulkAtomEvent;
 import won.matcher.service.common.event.Cause;
 import won.matcher.service.common.service.sparql.SparqlService;
 import won.matcher.service.crawler.config.CrawlConfig;
+import won.protocol.rest.LinkedDataFetchingException;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
@@ -96,6 +97,28 @@ public class RematchSparqlService extends SparqlService {
                                             })
                                             .ifPresent(request -> executeUpdate(request));
                         });
+    }
+
+    private void deleteRematchEntry(String atomUri) {
+        StringBuilder builder = new StringBuilder();
+        // in case of a new push from the WoN node, remove the reference
+        // date for this atom - it will be added by the subsequent insert
+        builder.append(" DELETE {  \n");
+        builder.append("  graph won:rematchMetadata {  \n");
+        builder.append("    ?atomUri ?p ?o ; \n");
+        builder.append("  } \n");
+        builder.append(" } \n");
+        builder.append(" WHERE {  \n");
+        builder.append("  graph won:rematchMetadata {  \n");
+        builder.append("    ?atomUri ?p ?o . \n");
+        builder.append("  } \n");
+        builder.append(" }; \n");
+        ParameterizedSparqlString pss = new ParameterizedSparqlString();
+        pss.setCommandText(builder.toString());
+        pss.setNsPrefix("won", "https://w3id.org/won/core#");
+        pss.setIri("atomUri", atomUri);
+        long now = System.currentTimeMillis();
+        this.executeUpdateQuery(pss.toString());
     }
 
     private Optional<String> createMatchAttemptUpdate(AtomEvent msg) {
@@ -205,17 +228,24 @@ public class RematchSparqlService extends SparqlService {
             while (results.hasNext()) {
                 QuerySolution qs = results.nextSolution();
                 String atomUri = qs.get("atomUri").asResource().getURI();
-                Dataset ds = linkedDataSource.getDataForResource(URI.create(atomUri));
-                if (AtomModelWrapper.isAAtom(ds)) {
-                    StringWriter sw = new StringWriter();
-                    RDFDataMgr.write(sw, ds, RDFFormat.TRIG.getLang());
-                    AtomEvent atomEvent = new AtomEvent(atomUri, null, AtomEvent.TYPE.ACTIVE,
-                                    System.currentTimeMillis(), sw.toString(), RDFFormat.TRIG.getLang(),
-                                    Cause.SCHEDULED_FOR_REMATCH);
-                    bulkAtomEvent.addAtomEvent(atomEvent);
-                    if (bulkAtomEvent.getAtomEvents().size() >= MAX_ATOMS_PER_REMATCH_BULK) {
-                        bulkAtomEvent = new BulkAtomEvent();
-                        bulks.add(bulkAtomEvent);
+                try {
+                    Dataset ds = linkedDataSource.getDataForResource(URI.create(atomUri));
+                    if (AtomModelWrapper.isAAtom(ds)) {
+                        StringWriter sw = new StringWriter();
+                        RDFDataMgr.write(sw, ds, RDFFormat.TRIG.getLang());
+                        AtomEvent atomEvent = new AtomEvent(atomUri, null, AtomEvent.TYPE.ACTIVE,
+                                        System.currentTimeMillis(), sw.toString(), RDFFormat.TRIG.getLang(),
+                                        Cause.SCHEDULED_FOR_REMATCH);
+                        bulkAtomEvent.addAtomEvent(atomEvent);
+                        if (bulkAtomEvent.getAtomEvents().size() >= MAX_ATOMS_PER_REMATCH_BULK) {
+                            bulkAtomEvent = new BulkAtomEvent();
+                            bulks.add(bulkAtomEvent);
+                        }
+                    }
+                } catch (LinkedDataFetchingException e) {
+                    if (e.getStatusCode().isPresent() && e.getStatusCode().get().equals(410)) {
+                        // atom was deleted. Remove it from index
+                        deleteRematchEntry(atomUri);
                     }
                 }
             }

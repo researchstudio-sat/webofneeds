@@ -65,7 +65,7 @@ import won.cryptography.service.RandomNumberService;
 import won.node.camel.service.WonCamelHelper;
 import won.node.service.linkeddata.generate.LinkedDataService;
 import won.node.service.linkeddata.lookup.SocketLookupFromLinkedData;
-import won.node.service.nodebehaviour.DataDerivationService;
+import won.node.service.persistence.DataDerivationService;
 import won.node.service.nodeconfig.URIService;
 import won.node.service.persistence.AtomService;
 import won.node.service.persistence.ConnectionService;

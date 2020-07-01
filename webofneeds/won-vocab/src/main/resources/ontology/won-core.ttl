@@ -12,7 +12,7 @@
 
 <https://w3id.org/won/core> rdf:type owl:Ontology ;
                              owl:versionIRI <https://w3id.org/won/core/1.0> ;
-                             dc:abstract """The Web of Needs is a decentralized linked data application infrastructure for mediating cooperation in the broadest sense. 
+                             dc:abstract """The Web of Needs is a decentralized linked data application infrastructure for mediating cooperation in the broadest sense.
 
 Based on append-only message logs, users (or other agents) publish and manage objects (*Atoms*). The main goal of publishing Atoms is to express interest in cooperation, for example by specifying something that is needed or being offered. However, Atoms can contain arbitrary data and thus be used to build general linked data knowledge graphs.
 
@@ -266,6 +266,13 @@ xsd:duration rdf:type rdfs:Datatype .
          rdfs:comment "Links an Atom or Connection to their WoN node."@en ;
          rdfs:label "wonNode" .
 
+
+###  https://w3id.org/won/core#derivedForConnectionState
+:derivedForConnectionState rdf:type owl:ObjectProperty ;
+                           rdfs:domain :DerivedDataGraph ;
+                           rdfs:range :ConnectionState ;
+                           rdfs:comment "links a derived data graph to the connection state in which it was derived." ;
+                           rdfs:label "derivedForConnectionState" .
 
 #################################################################
 #    Data properties
@@ -525,6 +532,11 @@ The container supports LDP paging as described here: https://github.com/research
              rdfs:isDefinedBy <https://w3id.org/won/core> ;
              rdfs:label "WonProtocol" .
 
+###  https://w3id.org/won/core#DerivedDataGraph
+:DerivedDataGraph rdf:type owl:Class ;
+                  rdfs:label "DerivedDataGraph" ;
+                  rdfs:isDefinedBy <https://w3id.org/won/core> ;
+                  rdfs:comment "Graph of derived data." .
 
 #################################################################
 #    Individuals
