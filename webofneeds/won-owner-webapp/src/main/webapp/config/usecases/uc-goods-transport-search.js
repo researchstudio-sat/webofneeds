@@ -50,6 +50,7 @@ export const goodsTransportSearch = {
           return { "@type": "s:Product", "s:name": value };
         }
       },
+      parseFromCF: undefined, //TODO: needs to be set to undefined until we implement a specific parseFromCF for this detail
       parseFromRDF: function(jsonLDImm) {
         const content = jsonLdUtils.parseFrom(
           jsonLDImm,
