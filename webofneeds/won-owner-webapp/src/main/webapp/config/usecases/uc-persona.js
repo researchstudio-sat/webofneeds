@@ -20,6 +20,9 @@ export const persona = {
           "#worksForSocket": vocab.WXSCHEMA.WorksForSocketCompacted,
           "#memberOfSocket": vocab.WXSCHEMA.MemberOfSocketCompacted,
           "#sReviewSocket": vocab.WXSCHEMA.ReviewSocketCompacted,
+          "#PrimaryAccountableSocket":
+            vocab.VALUEFLOWS.PrimaryAccountableSocketCompacted,
+          "#CustodianSocket": vocab.VALUEFLOWS.CustodianSocketCompacted,
         },
       },
       seeks: {},
@@ -27,6 +30,16 @@ export const persona = {
   },
   reactions: {
     ...defaultReactions,
+    [vocab.VALUEFLOWS.PrimaryAccountableSocketCompacted]: {
+      [vocab.VALUEFLOWS.PrimaryAccountableInverseSocketCompacted]: {
+        useCaseIdentifiers: ["resource"],
+      },
+    },
+    [vocab.VALUEFLOWS.CustodianSocketCompacted]: {
+      [vocab.VALUEFLOWS.CustodianInverseSocketCompacted]: {
+        useCaseIdentifiers: ["resource"],
+      },
+    },
     [vocab.WXSCHEMA.WorksForSocketCompacted]: {
       [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: {
         useCaseIdentifiers: ["organization"],

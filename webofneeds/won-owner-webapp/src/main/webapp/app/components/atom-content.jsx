@@ -219,6 +219,21 @@ export default function WonAtomContent({
         break;
       }
 
+      case vocab.VALUEFLOWS.PrimaryAccountableSocketCompacted: {
+        visibleTabFragment = (
+          <WonAtomContentSocket
+            atom={atom}
+            socketType={visibleTab}
+            ItemComponent={WonBuddyItem}
+            relevantConnections={relevantConnections}
+            showAddPicker={showAddPicker}
+            toggleAddPicker={toggleAddPicker}
+            setVisibleTab={setVisibleTab}
+          />
+        );
+        break;
+      }
+
       case vocab.BUDDY.BuddySocketCompacted: {
         visibleTabFragment = (
           <WonAtomContentSocket

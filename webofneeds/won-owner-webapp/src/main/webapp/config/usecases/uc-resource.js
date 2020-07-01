@@ -32,8 +32,12 @@ export const resource = {
     ...defaultReactions,
     [vocab.VALUEFLOWS.PrimaryAccountableInverseSocketCompacted]: {
       [vocab.VALUEFLOWS.PrimaryAccountableSocketCompacted]: {
-        useCaseIdentifiers: ["*"],
-        refuseOwned: true,
+        useCaseIdentifiers: ["persona"],
+      },
+    },
+    [vocab.VALUEFLOWS.CustodianInverseSocketCompacted]: {
+      [vocab.VALUEFLOWS.CustodianSocketCompacted]: {
+        useCaseIdentifiers: ["persona"],
       },
     },
   },
