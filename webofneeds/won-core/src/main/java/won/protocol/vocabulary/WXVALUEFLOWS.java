@@ -11,7 +11,8 @@ public class WXVALUEFLOWS {
     public static final String PrimaryAccountableSocketString = BASE_URI + "PrimaryAccountableSocket";
     public static final Resource PrimaryAccountableSocket = m.createResource(PrimaryAccountableSocketString);
     public static final String PrimaryAccountableInverseSocketString = BASE_URI + "PrimaryAccountableIverseSocket";
-    public static final Resource PrimaryAccountableIverseSocket = m.createResource(PrimaryAccountableInverseSocketString);
+    public static final Resource PrimaryAccountableIverseSocket = m
+                    .createResource(PrimaryAccountableInverseSocketString);
     public static final String CustodianSocketSocketString = BASE_URI + "CustodianSocket";
     public static final Resource CustodianSocket = m.createResource(CustodianSocketSocketString);
     public static final String CustodianInverseSocketSocketString = BASE_URI + "CustodianInverseSocket";
