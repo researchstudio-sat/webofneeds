@@ -16,10 +16,8 @@ export const name = {
     return value ? { "vf:name": value } : undefined;
   },
   parseFromRDF: function(jsonLDImm) {
-    const dcTitle = jsonLdUtils.parseFrom(jsonLDImm, ["vf:name"], "xsd:string");
-    return (
-      dcTitle || jsonLdUtils.parseFrom(jsonLDImm, ["vf:name"], "xsd:string")
-    );
+    const vfName = jsonLdUtils.parseFrom(jsonLDImm, ["vf:name"], "xsd:string");
+    return vfName ? vfName : undefined;
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value) {
@@ -171,21 +169,25 @@ export const onhandQuantity = {
   },
 };
 
-/**
- * WIP
- */
-export const currentLocation = {
-  ...details.location,
-  identifier: "currentLocation",
-  parseToRDF: function({ value, contentUri }) {
-    return {
-      "vf:currentLocation": details.location.parseToRDF(value, contentUri),
-    };
+export const classifiedAs = {
+  ...details.classifiedAs,
+  identifier: "classifiedAs",
+  label: "Classified As",
+  parseToRDF: function({ value }) {
+    return value ? { "vf:classifiedAs": value } : undefined;
   },
   parseFromRDF: function(jsonLDImm) {
-    const location = jsonLdUtils.parseFrom(jsonLDImm, ["vf:currentLocation"]);
-    const jsonldLocation =
-      jsonLDImm && (location.get("s:location") || location.get("won:location"));
-    return jsonLdUtils.parseSPlace(jsonldLocation);
+    const classifiedAs = jsonLdUtils.parseFrom(
+      jsonLDImm,
+      ["vf:classifiedAs"],
+      "xsd:string"
+    );
+    return classifiedAs ? classifiedAs : undefined;
+  },
+  generateHumanReadable: function({ value, includeLabel }) {
+    if (value) {
+      return includeLabel ? this.label + ": " + value : value;
+    }
+    return undefined;
   },
 };

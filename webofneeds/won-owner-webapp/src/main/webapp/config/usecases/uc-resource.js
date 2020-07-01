@@ -20,9 +20,9 @@ export const resource = {
         type: ["vf:EconomicResource"],
         sockets: {
           "#PrimaryAccountableInverseSocket":
-            vocab.VALUEFLOWS.PrimaryAccountableInverseSocketCompacted,
+            vocab.WXVALUEFLOWS.PrimaryAccountableInverseSocketCompacted,
           "#CustodianInverseSocket":
-            vocab.VALUEFLOWS.CustodianInverseSocketCompacted,
+            vocab.WXVALUEFLOWS.CustodianInverseSocketCompacted,
         },
       },
       seeks: {},
@@ -30,13 +30,13 @@ export const resource = {
   },
   reactions: {
     ...defaultReactions,
-    [vocab.VALUEFLOWS.PrimaryAccountableInverseSocketCompacted]: {
-      [vocab.VALUEFLOWS.PrimaryAccountableSocketCompacted]: {
+    [vocab.WXVALUEFLOWS.PrimaryAccountableInverseSocketCompacted]: {
+      [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]: {
         useCaseIdentifiers: ["persona"],
       },
     },
-    [vocab.VALUEFLOWS.CustodianInverseSocketCompacted]: {
-      [vocab.VALUEFLOWS.CustodianSocketCompacted]: {
+    [vocab.WXVALUEFLOWS.CustodianInverseSocketCompacted]: {
+      [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: {
         useCaseIdentifiers: ["persona"],
       },
     },
@@ -47,7 +47,7 @@ export const resource = {
     accountingQuantity: { ...accountingQuantity },
     onhandQuantity: { ...onhandQuantity },
     location: { ...details.location, mandatory: false },
-    //currentLocation: { ...currentLocation },
+    classifiedAs: { ...details.classifiedAs },
   },
   seeksDetails: {},
 };

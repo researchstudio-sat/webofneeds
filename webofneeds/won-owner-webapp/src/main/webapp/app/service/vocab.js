@@ -364,21 +364,26 @@ vocab.WXSCHEMA.ReviewInverseSocketCompacted =
 vocab.VALUEFLOWS = {};
 vocab.VALUEFLOWS.baseUri = "https://w3id.org/valueflows#";
 vocab.VALUEFLOWS.prefix = "vf";
-vocab.VALUEFLOWS.PrimaryAccountableSocket =
-  vocab.VALUEFLOWS.baseUri + "PrimaryAccountableSocket";
-vocab.VALUEFLOWS.PrimaryAccountableSocketCompacted =
-  vocab.VALUEFLOWS.prefix + ":PrimaryAccountableSocket";
-vocab.VALUEFLOWS.PrimaryAccountableIverseSocket =
-  vocab.VALUEFLOWS.baseUri + "PrimaryAccountableInverseSocket";
-vocab.VALUEFLOWS.PrimaryAccountableInverseSocketCompacted =
-  vocab.VALUEFLOWS.prefix + ":PrimaryAccountableInverseSocket";
-vocab.VALUEFLOWS.CustodianSocket = vocab.VALUEFLOWS.baseUri + "CustodianSocket";
-vocab.VALUEFLOWS.CustodianSocketCompacted =
-  vocab.VALUEFLOWS.prefix + ":CustodianSocket";
-vocab.VALUEFLOWS.CustodianInverseSocket =
-  vocab.VALUEFLOWS.baseUri + "CustodianInverseSocket";
-vocab.VALUEFLOWS.CustodianInverseSocketCompacted =
-  vocab.VALUEFLOWS.prefix + ":CustodianInverseSocket";
+
+vocab.WXVALUEFLOWS = {};
+vocab.WXVALUEFLOWS.baseUri = "https://w3id.org/won/ext/valueflows#";
+vocab.WXVALUEFLOWS.prefix = "wx-valueflows";
+vocab.WXVALUEFLOWS.PrimaryAccountableSocket =
+  vocab.WXVALUEFLOWS.baseUri + "PrimaryAccountableSocket";
+vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted =
+  vocab.WXVALUEFLOWS.prefix + ":PrimaryAccountableSocket";
+vocab.WXVALUEFLOWS.PrimaryAccountableIverseSocket =
+  vocab.WXVALUEFLOWS.baseUri + "PrimaryAccountableInverseSocket";
+vocab.WXVALUEFLOWS.PrimaryAccountableInverseSocketCompacted =
+  vocab.WXVALUEFLOWS.prefix + ":PrimaryAccountableInverseSocket";
+vocab.WXVALUEFLOWS.CustodianSocket =
+  vocab.WXVALUEFLOWS.baseUri + "CustodianSocket";
+vocab.WXVALUEFLOWS.CustodianSocketCompacted =
+  vocab.WXVALUEFLOWS.prefix + ":CustodianSocket";
+vocab.WXVALUEFLOWS.CustodianInverseSocket =
+  vocab.WXVALUEFLOWS.baseUri + "CustodianInverseSocket";
+vocab.WXVALUEFLOWS.CustodianInverseSocketCompacted =
+  vocab.WXVALUEFLOWS.prefix + ":CustodianInverseSocket";
 
 // UTILS
 vocab.WONMSG.uriPlaceholder = Object.freeze({
@@ -399,6 +404,8 @@ vocab.socketCapacity = {
   [vocab.HOLD.HoldableSocketCompacted]: 1,
   [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: 1,
   [vocab.WXSCHEMA.ReviewInverseSocketCompacted]: 1,
+  [vocab.WXVALUEFLOWS.PrimaryAccountableInverseSocketCompacted]: 1,
+  [vocab.WXVALUEFLOWS.CustodianInverseSocketCompacted]: 1,
 };
 
 /* This constant is to prevent connections to non owned atoms for specific sockets */
