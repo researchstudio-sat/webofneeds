@@ -7,6 +7,7 @@ import {
   name,
   accountingQuantity,
   onhandQuantity,
+  effortQuantity,
 } from "../details/resource.js";
 import vocab from "../../app/service/vocab.js";
 
@@ -46,6 +47,7 @@ export const resource = {
     name: { ...name },
     accountingQuantity: { ...accountingQuantity },
     onhandQuantity: { ...onhandQuantity },
+    effortQuantity: { ...effortQuantity },
     location: { ...details.location, mandatory: false },
     classifiedAs: { ...details.classifiedAs },
   },

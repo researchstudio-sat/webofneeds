@@ -52,8 +52,8 @@ export const accountingQuantity = {
     } else {
       return {
         "vf:accountingQuantity": {
-          "om2:hasUnit": { "@id": value.unit },
-          "om2:hasNumericalValue": value.amount,
+          "om:hasUnit": { "@id": value.unit },
+          "om:hasNumericalValue": value.amount,
         },
       };
     }
@@ -61,12 +61,12 @@ export const accountingQuantity = {
   parseFromRDF: function(jsonLDImm) {
     const amount = jsonLdUtils.parseFrom(
       jsonLDImm,
-      ["vf:accountingQuantity", "om2:hasNumericalValue"],
+      ["vf:accountingQuantity", "om:hasNumericalValue"],
       "xsd:float"
     );
     const unit = jsonLdUtils.parseFrom(
       jsonLDImm,
-      ["vf:accountingQuantity", "om2:hasUnit"],
+      ["vf:accountingQuantity", "om:hasUnit"],
       "xsd:id"
     );
 
@@ -123,8 +123,8 @@ export const onhandQuantity = {
     } else {
       return {
         "vf:onhandQuantity": {
-          "om2:hasUnit": { "@id": value.unit },
-          "om2:hasNumericalValue": value.amount,
+          "om:hasUnit": { "@id": value.unit },
+          "om:hasNumericalValue": value.amount,
         },
       };
     }
@@ -132,12 +132,80 @@ export const onhandQuantity = {
   parseFromRDF: function(jsonLDImm) {
     const amount = jsonLdUtils.parseFrom(
       jsonLDImm,
-      ["vf:onhandQuantity", "om2:hasNumericalValue"],
+      ["vf:onhandQuantity", "om:hasNumericalValue"],
       "xsd:float"
     );
     const unit = jsonLdUtils.parseFrom(
       jsonLDImm,
-      ["vf:onhandQuantity", "om2:hasUnit"],
+      ["vf:onhandQuantity", "om:hasUnit"],
+      "xsd:id"
+    );
+
+    if (amount === undefined && !unit) {
+      return undefined;
+    } else {
+      return {
+        amount: amount,
+        unit: unit,
+      };
+    }
+  },
+  generateHumanReadable: function({ value, includeLabel }) {
+    if (value) {
+      const amount = value.amount;
+      let unitLabel = undefined;
+
+      this.unit &&
+        this.unit.forEach(unit => {
+          if (unit.value === value.unit) {
+            unitLabel = unit.label;
+          }
+        });
+      unitLabel = unitLabel || value.unit;
+
+      return (includeLabel ? this.label + ": " + amount : amount) + unitLabel;
+    }
+    return undefined;
+  },
+};
+
+export const effortQuantity = {
+  identifier: "effortQuantity",
+  icon: ico36_detail_floorsize,
+  label: "Effort quantity",
+  placeholder: "1",
+  messageEnabled: false,
+  component: WonAmountPicker,
+  viewerComponent: WonAmountViewer,
+  unit: [{ value: "om:hour", label: "h", default: true }],
+
+  parseToRDF: function({ value }) {
+    if (
+      !value ||
+      value.amount === undefined ||
+      value.amount < 0 ||
+      !value.unit ||
+      !isValidNumber(value.amount)
+    ) {
+      return { "vf:effortQuantity": undefined };
+    } else {
+      return {
+        "vf:effortQuantity": {
+          "om:hasUnit": { "@id": value.unit },
+          "om:hasNumericalValue": value.amount,
+        },
+      };
+    }
+  },
+  parseFromRDF: function(jsonLDImm) {
+    const amount = jsonLdUtils.parseFrom(
+      jsonLDImm,
+      ["vf:effortQuantity", "om:hasNumericalValue"],
+      "xsd:float"
+    );
+    const unit = jsonLdUtils.parseFrom(
+      jsonLDImm,
+      ["vf:effortQuantity", "om:hasUnit"],
       "xsd:id"
     );
 
