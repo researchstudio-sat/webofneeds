@@ -1,10 +1,22 @@
 import "@webcomponents/custom-elements";
 
-import icons from "../../images/won-icons/*.svg";
+import ico16_arrow_down from "../../images/won-icons/ico16_arrow_down.svg";
+import ico16_arrow_up from "../../images/won-icons/ico16_arrow_up.svg";
+import ico36_plus from "../../images/won-icons/ico36_plus.svg";
 
 class SvgIcon extends HTMLElement {
   static get observedAttributes() {
     return ["icon", "color"];
+  }
+
+  getIcon(iconName) {
+    if (iconName === "ico16_arrow_down") {
+      return ico16_arrow_down;
+    } else if (iconName === "ico16_arrow_up") {
+      return ico16_arrow_up;
+    } else {
+      return ico36_plus;
+    }
   }
 
   connectedCallback() {
@@ -20,9 +32,9 @@ class SvgIcon extends HTMLElement {
     useElement.setAttributeNS(
       "http://www.w3.org/1999/xlink",
       "xlink:href",
-      icons[this.getAttribute("icon")]
+      this.getIcon(this.getAttribute("icon"))
     );
-    useElement.setAttribute("href", icons[this.getAttribute("icon")]);
+    useElement.setAttribute("href", this.getIcon(this.getAttribute("icon")));
     svgElement.appendChild(useElement);
     this.appendChild(svgElement);
   }
@@ -35,9 +47,9 @@ class SvgIcon extends HTMLElement {
           link.setAttributeNS(
             "http://www.w3.org/1999/xlink",
             "xlink:href",
-            icons[newValue]
+            this.getIcon(newValue)
           );
-          link.setAttribute("href", icons[newValue]);
+          link.setAttribute("href", this.getIcon(newValue));
         }
         break;
       }
