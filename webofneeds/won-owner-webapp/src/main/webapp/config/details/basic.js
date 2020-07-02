@@ -242,6 +242,17 @@ export const termsOfService = {
   placeholder: "Enter Description...",
   component: WonDescriptionPicker,
   viewerComponent: WonDescriptionViewer,
+  parseFromCF: function(cfDataset) {
+    if (cfDataset) {
+      //TODO: Fix for language fetching once CF PR is closed and dep is updated https://github.com/zazuko/clownface/pull/41
+      const cfToS = cfDataset.out(
+        namedNode("http://schema.org/termsOfService")
+      );
+      if (cfToS && cfToS.values && cfToS.values.length > 0) {
+        return cfToS.values;
+      }
+    }
+  },
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
     return {
