@@ -83,8 +83,9 @@ export default function WonSocketAddAtom({
 
           return (
             allowedUseCaseList &&
-            (!isAddToAtomOwned || !(refuseOwned && isOwned)) &&
-            (isAddToAtomOwned || !(refuseNonOwned && !isOwned)) &&
+            (isOwned
+              ? !refuseOwned || !isAddToAtomOwned
+              : !refuseNonOwned && isAddToAtomOwned) &&
             atomUtils.hasSocket(atom, socketType) &&
             (!vocab.socketCapacity[socketType] ||
               atomUtils.getConnectedConnections(atom, socketType).size <
@@ -153,8 +154,9 @@ export default function WonSocketAddAtom({
 
         const includesSelectedUseCase =
           allowedUseCaseList &&
-          (!isAddToAtomOwned || !(refuseOwned && isSelectedAtomOwned)) &&
-          (isAddToAtomOwned || !(refuseNonOwned && !isSelectedAtomOwned)) &&
+          (isSelectedAtomOwned
+            ? !refuseOwned || !isAddToAtomOwned
+            : !refuseNonOwned && isAddToAtomOwned) &&
           (!vocab.socketCapacity[socketType] ||
             atomUtils.getConnectedConnections(selectedAtom, socketType).size <
               vocab.socketCapacity[socketType]) &&
