@@ -1,5 +1,35 @@
 @import "detail-viewer-mixin";
+@import "sizing-utils";
 
 wikidata-viewer {
   @include won-detail-viewer("wikidatav");
+
+  .wikidatav__content__data {
+    &__additionalData {
+      &__header {
+        display: grid;
+        grid-template-columns: 1fr min-content;
+        grid-gap: 0.5rem;
+        border-bottom: $thinGrayBorder;
+
+        align-items: center;
+
+        &__title {
+        }
+
+        &__carret {
+          @include fixed-square(1rem);
+
+          &--expanded {
+            transform: rotate(-180deg);
+            transition: all linear 0.2s;
+          }
+
+          &--collapsed {
+            transition: all linear 0.2s;
+          }
+        }
+      }
+    }
+  }
 }

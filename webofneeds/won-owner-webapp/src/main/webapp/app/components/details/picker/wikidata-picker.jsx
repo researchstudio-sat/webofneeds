@@ -5,6 +5,7 @@ import "~/style/_wikidatapicker.scss";
 import PropTypes from "prop-types";
 import _ from "lodash";
 import WonTitlePicker from "./title-picker";
+import WikiDataViewer from "~/app/components/details/viewer/wikidata-viewer";
 
 export default function WikiDataPicker({
   initialValue,
@@ -13,6 +14,9 @@ export default function WikiDataPicker({
   onUpdate,
 }) {
   const [searchText, setSearchText] = useState(
+    initialValue === undefined ? "" : initialValue
+  );
+  const [wikiDataUri, setWikiDataUri] = useState(
     initialValue === undefined ? "" : initialValue
   );
   const [searchResults, setSearchResults] = useState([]);
@@ -46,6 +50,11 @@ export default function WikiDataPicker({
     [searchText]
   );
 
+  function selectWikiDataUri(conceptUri) {
+    onUpdate({ value: conceptUri });
+    setWikiDataUri(conceptUri);
+  }
+
   return (
     <wikidata-picker class={className ? className : ""}>
       <div className="wikidatap__input">
@@ -60,7 +69,7 @@ export default function WikiDataPicker({
             <div
               className="wikidatap__input__results__result"
               key={index}
-              onClick={() => onUpdate({ value: result.concepturi })}
+              onClick={() => selectWikiDataUri(result.concepturi)}
             >
               <span className="wikidatap__input__results__result__label">
                 {result.label}
@@ -71,6 +80,13 @@ export default function WikiDataPicker({
             </div>
           ))}
         </div>
+        {wikiDataUri && (
+          <WikiDataViewer
+            className="wikidatap__selected"
+            content={wikiDataUri}
+            detail={{}}
+          />
+        )}
       </div>
     </wikidata-picker>
   );

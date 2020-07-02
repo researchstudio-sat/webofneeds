@@ -1,19 +1,29 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import rdfFetch from "@rdfjs/fetch";
 import cf from "clownface";
 
 import PropTypes from "prop-types";
 import Immutable from "immutable";
 import * as useCaseUtils from "../../../usecase-utils";
+import * as generalSelectors from "../../../redux/selectors/general-selectors.js";
 import { get } from "../../../utils";
 
 import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 import rdf_logo_1 from "~/images/won-icons/rdf_logo_1.svg";
 import "~/style/_wikidata-viewer.scss";
 import "~/style/_rdflink.scss";
+import { actionCreators } from "~/app/actions/actions";
+import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 
 export default function WikiDataViewer({ content, detail, className }) {
-  const [wikiDataContent, setWikiDataContent] = useState(undefined);
+  const dispatch = useDispatch();
+  const entityUri = content && content.replace(/\/$/, "");
+  const wikiDataContent = useSelector(
+    generalSelectors.getExternalData(entityUri)
+  );
+
+  const [showAdditionalData, toggleAdditionalData] = useState(false);
   const detailsToParse = useCaseUtils.getAllDetails();
   const allDetailsImm = useCaseUtils.getAllDetailsImm();
 
@@ -49,10 +59,9 @@ export default function WikiDataViewer({ content, detail, className }) {
 
   useEffect(
     () => {
-      if (content) {
-        const entityUri = content.replace(/\/$/, "");
+      if (entityUri && !wikiDataContent) {
         const entityId = entityUri.substr(entityUri.lastIndexOf("/") + 1);
-        const specialDataUrl = `https://www.wikidata.org/wiki/Special:EntityData/${entityId}.jsonld`;
+        const specialDataUrl = `https://www.wikidata.org/wiki/Special:EntityData/${entityId}.ttl`;
 
         rdfFetch(specialDataUrl)
           .then(response => response.dataset())
@@ -63,37 +72,48 @@ export default function WikiDataViewer({ content, detail, className }) {
 
             return generateContentFromCF(cfEntity, detailsToParse);
           })
-          .then(parsedContent =>
-            setWikiDataContent(Immutable.fromJS(parsedContent))
-          );
+          .then(parsedContent => {
+            dispatch(
+              actionCreators.externalData__store(
+                Immutable.fromJS({ [entityUri]: parsedContent })
+              )
+            );
+          });
       }
     },
-    [content]
+    [entityUri]
   );
 
-  const contentDetailsMap =
+  const additionalContentDetailsMap =
     wikiDataContent &&
-    wikiDataContent.map((contentDetail, contentDetailKey) => {
-      const detailDefinitionImm = get(allDetailsImm, contentDetailKey);
-      if (detailDefinitionImm) {
-        const detailDefinition = detailDefinitionImm.toJS();
-        const ReactViewerComponent =
-          detailDefinition && detailDefinition.viewerComponent;
+    wikiDataContent
+      .filter(
+        (_, contentDetailKey) =>
+          contentDetailKey !== "imageUrl" &&
+          contentDetailKey !== "personaName" &&
+          contentDetailKey !== "title"
+      )
+      .map((contentDetail, contentDetailKey) => {
+        const detailDefinitionImm = get(allDetailsImm, contentDetailKey);
+        if (detailDefinitionImm) {
+          const detailDefinition = detailDefinitionImm.toJS();
+          const ReactViewerComponent =
+            detailDefinition && detailDefinition.viewerComponent;
 
-        if (ReactViewerComponent) {
-          return (
-            <div key={contentDetailKey} className="pis__component">
-              <ReactViewerComponent
-                detail={detailDefinition}
-                content={contentDetail}
-              />
-            </div>
-          );
+          if (ReactViewerComponent) {
+            return (
+              <div key={contentDetailKey} className="pis__component">
+                <ReactViewerComponent
+                  detail={detailDefinition}
+                  content={contentDetail}
+                />
+              </div>
+            );
+          }
         }
-      }
 
-      return undefined;
-    });
+        return undefined;
+      });
 
   return (
     <wikidata-viewer class={className}>
@@ -102,9 +122,44 @@ export default function WikiDataViewer({ content, detail, className }) {
         {label}
       </div>
       <div className="wikidatav__content">
-        {contentDetailsMap ? (
-          <div className="wikidatav__content__data">
-            {contentDetailsMap.toArray()}
+        {additionalContentDetailsMap ? (
+          <div className="wikidatav__content__data__additionalData">
+            <div
+              className="wikidatav__content__data__additionalData__header clickable"
+              onClick={() => toggleAdditionalData(!showAdditionalData)}
+            >
+              <div className="wikidatav__content__data__additionalData__header__title">
+                Additional Data
+              </div>
+              <svg
+                className={
+                  "wikidatav__content__data__additionalData__header__carret " +
+                  (showAdditionalData
+                    ? " wikidatav__content__data__additionalData__header__carret--expanded "
+                    : " wikidatav__content__data__additionalData__header__carret--collapsed ")
+                }
+              >
+                <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
+              </svg>
+            </div>
+            {showAdditionalData && (
+              <React.Fragment>
+                <div className="wikidatav__content__data__additionalData__content">
+                  {additionalContentDetailsMap.toArray()}
+                </div>
+                <a
+                  className="wikidatav__content__data__additionalData__content__link rdflink clickable"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={content}
+                >
+                  <svg className="rdflink__small">
+                    <use xlinkHref={rdf_logo_1} href={rdf_logo_1} />
+                  </svg>
+                  <span className="rdflink__label">WikiData Link</span>
+                </a>
+              </React.Fragment>
+            )}
           </div>
         ) : (
           <div className="wikidatav__content__loading">
@@ -116,17 +171,6 @@ export default function WikiDataViewer({ content, detail, className }) {
             </span>
           </div>
         )}
-        <a
-          className="wikidatav__content__link rdflink clickable"
-          target="_blank"
-          rel="noopener noreferrer"
-          href={content}
-        >
-          <svg className="rdflink__small">
-            <use xlinkHref={rdf_logo_1} href={rdf_logo_1} />
-          </svg>
-          <span className="rdflink__label">WikiData Link</span>
-        </a>
       </div>
     </wikidata-viewer>
   );
