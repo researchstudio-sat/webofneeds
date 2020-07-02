@@ -42,7 +42,7 @@ ssh root@satvm02 chmod 777 $base_folder/solr/wontest/data
 
 # copy the hackathon skin to the custom skin folder that get used by this instance
 ssh root@satvm02 mkdir -p $base_folder/custom_owner_skin
-scp -r $WORKSPACE/webofneeds/won-owner-webapp/src/main/webapp/static/skin/hackathon/* root@satvm02:$base_folder/custom_owner_skin/
+scp -r $WORKSPACE/webofneeds/won-owner-webapp/src/main/webapp/skin/hackathon/* root@satvm02:$base_folder/custom_owner_skin/
 
 # copy the openssl.conf file to the server where the certificates are generated
 # the conf file is needed to specify alternative server names, see conf file in won-docker/image/gencert/openssl.conf

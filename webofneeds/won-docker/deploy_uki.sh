@@ -50,8 +50,8 @@ echo changed permissions for directory $base_folder/solr/solr/wontest/data to 77
 # copy the uki skin to the custom skin folder that get used by this instance
 ssh won@satvm06 mkdir -p $base_folder/custom_owner_skin
 echo made directory $base_folder/custom_owner_skin
-scp -r $WORKSPACE/webofneeds/won-owner-webapp/src/main/webapp/static/skin/uki/* won@satvm06:$base_folder/custom_owner_skin/
-echo copied $WORKSPACE/webofneeds/won-owner-webapp/src/main/webapp/static/skin/uki/* to won@satvm06:$base_folder/custom_owner_skin/
+scp -r $WORKSPACE/webofneeds/won-owner-webapp/src/main/webapp/skin/uki/* won@satvm06:$base_folder/custom_owner_skin/
+echo copied $WORKSPACE/webofneeds/won-owner-webapp/src/main/webapp/skin/uki/* to won@satvm06:$base_folder/custom_owner_skin/
 
 echo build the docker containers
 docker --tlsverify -H satvm06.researchstudio.at:2376 pull webofneeds/bigdata

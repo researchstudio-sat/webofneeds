@@ -32,7 +32,7 @@ scp $WORKSPACE/webofneeds/won-docker/image/nginx/nginx.conf won@satvm01:$live_ba
 
 # copy the spoco skin to the custom skin folder that get used by this instance
 ssh root@satvm02 mkdir -p $base_folder/custom_owner_skin
-scp -r $WORKSPACE/webofneeds/won-owner-webapp/src/main/webapp/static/skin/spoco/* root@satvm02:$base_folder/custom_owner_skin/
+scp -r $WORKSPACE/webofneeds/won-owner-webapp/src/main/webapp/skin/spoco/* root@satvm02:$base_folder/custom_owner_skin/
 
 # copy the openssl.conf file to the server where the certificates are generated
 # the conf file is needed to specify alternative server names, see conf file in won-docker/image/gencert/openssl.conf
