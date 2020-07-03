@@ -5,6 +5,7 @@ import "~/style/_wikidatapicker.scss";
 import PropTypes from "prop-types";
 import _ from "lodash";
 import WonTitlePicker from "./title-picker";
+import WikiDataViewer from "~/app/components/details/viewer/wikidata-viewer";
 
 export default function WikiDataPicker({
   initialValue,
@@ -15,6 +16,10 @@ export default function WikiDataPicker({
   const [searchText, setSearchText] = useState(
     initialValue === undefined ? "" : initialValue
   );
+  const [wikiDataUri, setWikiDataUri] = useState(
+    initialValue === undefined ? "" : initialValue
+  );
+  const [showSearchResults, toggleShowSearchResults] = useState(!initialValue);
   const [searchResults, setSearchResults] = useState([]);
 
   const startSearch = _.debounce(value => {
@@ -42,9 +47,16 @@ export default function WikiDataPicker({
       } else {
         resetClassifiedAsSearchInput();
       }
+      toggleShowSearchResults(true);
     },
     [searchText]
   );
+
+  function selectWikiDataUri(conceptUri) {
+    onUpdate({ value: conceptUri });
+    toggleShowSearchResults(!conceptUri);
+    setWikiDataUri(conceptUri);
+  }
 
   return (
     <wikidata-picker class={className ? className : ""}>
@@ -55,22 +67,44 @@ export default function WikiDataPicker({
           detail={{ placeholder: detail && detail.placeholder }}
         />
 
-        <div className="wikidatap__input__results">
-          {searchResults.map((result, index) => (
-            <div
-              className="wikidatap__input__results__result"
-              key={index}
-              onClick={() => onUpdate({ value: result.concepturi })}
-            >
-              <span className="wikidatap__input__results__result__label">
-                {result.label}
+        {showSearchResults && (
+          <div className="wikidatap__input__results">
+            {searchResults.map((result, index) => (
+              <div
+                className="wikidatap__input__results__result"
+                key={index}
+                onClick={() => selectWikiDataUri(result.concepturi)}
+              >
+                <span className="wikidatap__input__results__result__label">
+                  {result.label}
+                </span>
+                <span className="wikidatap__input__results__result__concepturi">
+                  {result.concepturi}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+        {wikiDataUri && (
+          <div className="wikidatap__input__selected">
+            <div className="wikidatap__input__selected__header">
+              <span className="wikidatap__input__selected__header__title">
+                Selected
               </span>
-              <span className="wikidatap__input__results__result__concepturi">
-                {result.concepturi}
-              </span>
+              <button
+                className="wikidatap__input__selected__header__clearButton won-button--filled red"
+                onClick={() => selectWikiDataUri()}
+              >
+                Clear
+              </button>
             </div>
-          ))}
-        </div>
+            <WikiDataViewer
+              className="wikidatap__input__selected__content"
+              content={wikiDataUri}
+              detail={{}}
+            />
+          </div>
+        )}
       </div>
     </wikidata-picker>
   );

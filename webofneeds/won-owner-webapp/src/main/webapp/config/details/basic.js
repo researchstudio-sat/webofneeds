@@ -1,12 +1,15 @@
 import { get, getIn, is } from "../../app/utils.js";
 import { select } from "../details/abstract.js";
 import Immutable from "immutable";
+import { schema } from "@tpluscode/rdf-ns-builders";
+import { namedNode } from "@rdfjs/data-model";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 
 import WonTitleViewer from "../../app/components/details/viewer/title-viewer.jsx";
 import WonDescriptionViewer from "../../app/components/details/viewer/description-viewer.jsx";
 import WonTagsViewer from "../../app/components/details/viewer/tags-viewer.jsx";
 import WonSuggestAtomViewer from "../../app/components/details/viewer/suggest-atom-viewer.jsx";
+import WonImageUrlViewer from "../../app/components/details/viewer/imageurl-viewer.jsx";
 
 import WonTitlePicker from "../../app/components/details/picker/title-picker.jsx";
 import WonDescriptionPicker from "../../app/components/details/picker/description-picker.jsx";
@@ -18,6 +21,7 @@ import ico36_detail_title from "../../images/won-icons/ico36_detail_title.svg";
 import ico36_search from "../../images/won-icons/ico36_search.svg";
 import ico36_detail_description from "../../images/won-icons/ico36_detail_description.svg";
 import ico36_detail_tags from "../../images/won-icons/ico36_detail_tags.svg";
+import ico36_detail_media from "../../images/won-icons/ico36_detail_media.svg";
 
 export const title = {
   identifier: "title",
@@ -32,6 +36,15 @@ export const title = {
       "dc:title": val,
       "s:title": val,
     };
+  },
+  parseFromCF: function(cfDataset) {
+    if (cfDataset) {
+      //TODO: Fix for language fetching once CF PR is closed and dep is updated https://github.com/zazuko/clownface/pull/41
+      const cfTitles = cfDataset.out(schema.title);
+      if (cfTitles && cfTitles.values && cfTitles.values.length > 0) {
+        return cfTitles.values[0];
+      }
+    }
   },
   parseFromRDF: function(jsonLDImm) {
     const dcTitle = jsonLdUtils.parseFrom(
@@ -63,6 +76,15 @@ export const personaName = {
     return {
       "s:name": val,
     };
+  },
+  parseFromCF: function(cfDataset) {
+    if (cfDataset) {
+      //TODO: Fix for language fetching once CF PR is closed and dep is updated https://github.com/zazuko/clownface/pull/41
+      const cfNames = cfDataset.out(schema.name);
+      if (cfNames && cfNames.values && cfNames.values.length > 0) {
+        return cfNames.values[0];
+      }
+    }
   },
   parseFromRDF: function(jsonLDImm) {
     return jsonLdUtils.parseFrom(jsonLDImm, ["s:name"], "xsd:string");
@@ -128,6 +150,45 @@ export const searchString = {
   },
 };
 
+export const imageUrl = {
+  identifier: "imageUrl",
+  label: "Image",
+  icon: ico36_detail_media,
+  placeholder: "Add image url...",
+  component: WonTitlePicker,
+  viewerComponent: WonImageUrlViewer,
+  parseFromCF: function(cfDataset) {
+    if (cfDataset) {
+      const cfImageUrl = cfDataset.out(
+        namedNode("http://www.wikidata.org/prop/direct/P18")
+      );
+      return cfImageUrl && cfImageUrl.value;
+    }
+  },
+  parseToRDF: function({ value }) {
+    const val = value ? value : undefined;
+    // Image
+    if (value) {
+      return {
+        "http://www.wikidata.org/prop/direct/P18": { "@id": val },
+      };
+    }
+  },
+  parseFromRDF: function(jsonLDImm) {
+    return jsonLdUtils.parseFrom(
+      jsonLDImm,
+      ["http://www.wikidata.org/prop/direct/P18"],
+      "xsd:ID"
+    );
+  },
+  generateHumanReadable: function({ value, includeLabel }) {
+    if (value) {
+      return includeLabel ? this.label + ": " + value : value;
+    }
+    return undefined;
+  },
+};
+
 export const description = {
   identifier: "description",
   label: "Description",
@@ -142,16 +203,29 @@ export const description = {
       "s:description": val,
     };
   },
+  parseFromCF: function(cfDataset) {
+    if (cfDataset) {
+      //TODO: Fix for language fetching once CF PR is closed and dep is updated https://github.com/zazuko/clownface/pull/41
+      const cfDescription = cfDataset.out(schema.description);
+      if (
+        cfDescription &&
+        cfDescription.values &&
+        cfDescription.values.length > 0
+      ) {
+        return cfDescription.values[0];
+      }
+    }
+  },
   parseFromRDF: function(jsonLDImm) {
-    const dcDescription = jsonLdUtils.parseFrom(
-      jsonLDImm,
-      ["dc:description"],
-      "xsd:string"
-    );
-    return (
-      dcDescription ||
-      jsonLdUtils.parseFrom(jsonLDImm, ["s:description"], "xsd:string")
-    );
+    const description = get(jsonLDImm, "s:description");
+    if (Immutable.List.isList(description)) {
+      return get(
+        description.filter(d => get(d, "@language") === "en").first(),
+        "@value"
+      );
+    } else {
+      return jsonLdUtils.parseFrom(jsonLDImm, ["s:description"], "xsd:string");
+    }
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value) {
@@ -168,6 +242,17 @@ export const termsOfService = {
   placeholder: "Enter Description...",
   component: WonDescriptionPicker,
   viewerComponent: WonDescriptionViewer,
+  parseFromCF: function(cfDataset) {
+    if (cfDataset) {
+      //TODO: Fix for language fetching once CF PR is closed and dep is updated https://github.com/zazuko/clownface/pull/41
+      const cfToS = cfDataset.out(
+        namedNode("http://schema.org/termsOfService")
+      );
+      if (cfToS && cfToS.values && cfToS.values.length > 0) {
+        return cfToS.values[0];
+      }
+    }
+  },
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
     return {

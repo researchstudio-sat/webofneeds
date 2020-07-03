@@ -1,0 +1,9 @@
+@import "detail-viewer-mixin";
+
+won-imageurl-viewer {
+  @include won-detail-viewer("imageurlv");
+
+  .imageurlv__content__image {
+    max-width: 100%;
+  }
+}

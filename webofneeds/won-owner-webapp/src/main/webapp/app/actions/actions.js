@@ -150,6 +150,9 @@ const actionHierarchy = {
     removeDeleted: INJ_DEFAULT,
     markAsLoaded: INJ_DEFAULT,
   },
+  externalData: {
+    store: INJ_DEFAULT,
+  },
   personas: {
     fetchPersonas: fetchPersonas,
 

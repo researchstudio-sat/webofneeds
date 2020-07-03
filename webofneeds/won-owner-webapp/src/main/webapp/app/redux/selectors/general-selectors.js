@@ -29,6 +29,11 @@ export const getViewState = createSelector(
   state => state
 );
 
+export const getExternalDataState = createSelector(
+  state => get(state, "externalData"),
+  state => state
+);
+
 export const getAtoms = createSelector(
   state => state,
   state => get(state, "atoms")
@@ -57,6 +62,11 @@ export const getOwnedAtomUris = createSelector(getAccountState, account =>
 
 export const getAtom = atomUri =>
   createSelector(getAtoms, atoms => get(atoms, atomUri));
+
+export const getExternalData = externalDataUri =>
+  createSelector(getExternalDataState, externalData =>
+    get(externalData, externalDataUri)
+  );
 
 export const getOwnedConnection = connectionUri =>
   createSelector(getOwnedConnections, conns => get(conns, connectionUri));

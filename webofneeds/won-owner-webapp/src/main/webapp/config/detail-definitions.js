@@ -109,6 +109,7 @@ export const details = {
   pokemonRaid: pokemonDetails.pokemonRaid,
   isbn: extendedDetails.isbn,
   classifiedAs: extendedDetails.classifiedAs,
+  imageUrl: basicDetails.imageUrl,
   author: extendedDetails.author,
 };
 

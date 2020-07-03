@@ -1,5 +1,99 @@
 @import "detail-viewer-mixin";
+@import "sizing-utils";
 
 wikidata-viewer {
   @include won-detail-viewer("wikidatav");
+
+  .wikidatav__content {
+    &__loading {
+      display: grid;
+      grid-auto-flow: column;
+      justify-content: left;
+      grid-gap: 0.5rem;
+      align-items: center;
+    }
+    &__data {
+      display: grid;
+      grid-template-columns: min-content 1fr;
+      grid-template-rows: min-content;
+      background: $won-lighter-gray;
+      border: $thinGrayBorder;
+      border-radius: 0.19rem;
+
+      &__title {
+        padding: 0.5rem;
+        font-weight: bold;
+      }
+      &__image {
+        @media (max-width: $responsivenessBreakPoint) {
+          height: 3rem;
+          max-height: 3rem;
+
+          > img {
+            height: 3rem;
+            max-height: 3rem;
+          }
+        }
+        @media (min-width: $responsivenessBreakPoint) {
+          height: 5rem;
+          max-height: 5rem;
+
+          > img {
+            height: 5rem;
+            max-height: 5rem;
+          }
+        }
+
+        > img {
+          border-top-left-radius: 0.19rem;
+          border-bottom-left-radius: 0.19rem;
+          object-fit: cover;
+        }
+      }
+    }
+    &__additionalData {
+      padding-top: 0.5rem;
+      &__header {
+        display: grid;
+        grid-template-columns: min-content 1fr;
+        grid-gap: 0.5rem;
+
+        &:hover {
+          --local-primary: #{$won-primary-color};
+          color: $won-primary-color;
+        }
+
+        &--expanded {
+          border-bottom: $thinGrayBorder;
+
+          > .wikidatav__content__additionalData__header__carret {
+            transform: rotate(-180deg);
+            transition: all linear 0.2s;
+          }
+        }
+
+        &--collapsed {
+          > .wikidatav__content__additionalData__header__carret {
+            transition: all linear 0.2s;
+          }
+        }
+
+        align-items: center;
+
+        &__title {
+        }
+
+        &__carret {
+          @include fixed-square(1rem);
+        }
+      }
+
+      &__content {
+        > .wikidatav__content__additionalData__content__link,
+        > .wikidatav__content__additionalData__content__detail {
+          padding-top: 0.5rem;
+        }
+      }
+    }
+  }
 }

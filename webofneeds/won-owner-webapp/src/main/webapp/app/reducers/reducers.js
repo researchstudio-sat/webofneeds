@@ -6,6 +6,7 @@ import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
 import { messagesReducer } from "./message-reducers.js";
 import reduceReducers from "reduce-reducers";
+import externalDataReducer from "./external-data-reducer.js";
 import atomReducer from "./atom-reducer/atom-reducer-main.js";
 import accountReducer from "./account-reducer.js";
 import toastReducer from "./toast-reducer.js";
@@ -39,6 +40,7 @@ const reducers = {
 
   account: accountReducer,
   atoms: atomReducer,
+  externalData: externalDataReducer,
   messages: messagesReducer,
   toasts: toastReducer,
   view: viewReducer,

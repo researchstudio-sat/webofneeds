@@ -3,9 +3,12 @@
   "version": "0.2.0",
   "dependencies": {
     "@depack/render": "^1.5.0",
+    "@rdfjs/fetch": "^2.1.0",
+    "@tpluscode/rdf-ns-builders": "^0.3.6",
     "@webcomponents/custom-elements": "^1.4.1",
     "api": "0.0.1",
     "bestfetch": "^4.0.0",
+    "clownface": "^0.12.4",
     "color": "^3.1.2",
     "geopoint": "^1.0.1",
     "glob-to-regexp": "^0.4.0",
