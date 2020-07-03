@@ -67,7 +67,7 @@ export default function WonAtomInfo({
     from a specific atom within a socket, will not result in
     browserBack showing the detail page but the tab that was previously selected */
   const changeTab =
-    history.location.pathname === "/inventory" &&
+    history.location.pathname === "/inventory" ||
     history.location.pathname === "/"
       ? setVisibleTab
       : tabName =>
