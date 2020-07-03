@@ -23,7 +23,7 @@ export const cyclingPlan = {
       content: {
         type: ["s:PlanAction"],
         title: "Let's go for a bike ride!",
-        eventObjectAboutUris: "http://dbpedia.org/resource/Cycling",
+        eventObjectAboutUris: "http://www.wikidata.org/entity/Q53121",
         sockets: {
           "#groupSocket": vocab.GROUP.GroupSocketCompacted,
           "#holdableSocket": vocab.HOLD.HoldableSocketCompacted,
@@ -90,7 +90,7 @@ export const cyclingPlan = {
         `${resultName} match:seeks ?seeks .`,
         `?seeks rdf:type s:PlanAction.`,
         `?seeks s:object ?planObject.`,
-        `?planObject s:about <http://dbpedia.org/resource/Cycling>.`,
+        `?planObject s:about <http://www.wikidata.org/entity/Q53121>.`,
         `?thisAtom hold:heldBy/buddy:buddy/hold:holds ${resultName}.`,
         `BIND( (
           COALESCE(?location_geoScore, 0) 
@@ -116,7 +116,7 @@ export const cyclingInterest = {
       },
       seeks: {
         type: ["s:PlanAction"],
-        eventObjectAboutUris: "http://dbpedia.org/resource/Cycling",
+        eventObjectAboutUris: "http://www.wikidata.org/entity/Q53121",
       },
     }),
   },
@@ -175,7 +175,7 @@ export const cyclingInterest = {
         `${resultName} rdf:type s:PlanAction.`,
         `${resultName} s:object ?planObject.`,
         `${resultName} hold:heldBy ?holder.`,
-        `?planObject s:about <http://dbpedia.org/resource/Cycling>.`,
+        `?planObject s:about <http://www.wikidata.org/entity/Q53121>.`,
         `?thisAtom hold:heldBy/buddy:buddy/hold:holds ${resultName}.`,
         // calculate average of scores; can be weighed if necessary
         `BIND( (

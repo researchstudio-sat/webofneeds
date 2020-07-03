@@ -23,7 +23,7 @@ export const lunchPlan = {
       content: {
         type: ["s:PlanAction"],
         title: "Let's go get lunch!",
-        eventObjectAboutUris: "http://dbpedia.org/resource/Lunch",
+        eventObjectAboutUris: "http://www.wikidata.org/entity/Q12896105",
         sockets: {
           "#groupSocket": vocab.GROUP.GroupSocketCompacted,
           "#holdableSocket": vocab.HOLD.HoldableSocketCompacted,
@@ -88,7 +88,7 @@ export const lunchPlan = {
         `${resultName} match:seeks ?seeks .`,
         `?seeks rdf:type s:PlanAction.`,
         `?seeks s:object ?planObject.`,
-        `?planObject s:about <http://dbpedia.org/resource/Lunch>.`,
+        `?planObject s:about <http://www.wikidata.org/entity/Q12896105>.`,
         `?thisAtom hold:heldBy/buddy:buddy/hold:holds ${resultName}.`,
         `BIND( ( 
           COALESCE(?location_geoScore, 0) 
@@ -114,7 +114,7 @@ export const lunchInterest = {
       },
       seeks: {
         type: ["s:PlanAction"],
-        eventObjectAboutUris: "http://dbpedia.org/resource/Lunch",
+        eventObjectAboutUris: "http://www.wikidata.org/entity/Q12896105",
       },
     }),
   },
@@ -169,7 +169,7 @@ export const lunchInterest = {
         `${resultName} rdf:type won:Atom.`,
         `${resultName} rdf:type s:PlanAction.`,
         `${resultName} s:object ?planObject.`,
-        `?planObject s:about <http://dbpedia.org/resource/Lunch>.`,
+        `?planObject s:about <http://www.wikidata.org/entity/Q12896105>.`,
         `?thisAtom hold:heldBy/buddy:buddy/hold:holds ${resultName}.`,
         // calculate average of scores; can be weighed if necessary
         `BIND( (

@@ -26,7 +26,7 @@ export const rideShareOffer = {
     ...mergeInEmptyDraft({
       content: {
         title: "Share a Ride",
-        type: ["http://dbpedia.org/resource/Ridesharing"],
+        type: ["http://www.wikidata.org/entity/Q16804155"],
       },
     }),
   },
