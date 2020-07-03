@@ -84,13 +84,40 @@ export default function WikiDataViewer({ content, detail, className }) {
     [entityUri]
   );
 
+  const title = get(wikiDataContent, "title");
+  const personaName = get(wikiDataContent, "personaName");
+  const imageUrl = get(wikiDataContent, "imageUrl");
+
+  const dataElement = (
+    <div className="wikidatav__content__data">
+      {imageUrl ? (
+        <a
+          className="wikidatav__content__data__image clickable"
+          href={imageUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img src={imageUrl} />
+        </a>
+      ) : (
+        <div />
+      )}
+      {(title || personaName) && (
+        <div className="wikidatav__content__data__title">
+          {title || personaName}
+        </div>
+      )}
+    </div>
+  );
+
   const additionalContentDetailsMap =
     wikiDataContent &&
     wikiDataContent
       .filter(
         (_, contentDetailKey) =>
           contentDetailKey !== "imageUrl" &&
-          contentDetailKey !== "personaName" &&
+          //if there was a title, we add the personaName to the additional Details so we do not lose information
+          (title || contentDetailKey !== "personaName") &&
           contentDetailKey !== "title"
       )
       .map((contentDetail, contentDetailKey) => {
@@ -117,26 +144,6 @@ export default function WikiDataViewer({ content, detail, className }) {
 
         return undefined;
       });
-
-  const title =
-    get(wikiDataContent, "title") || get(wikiDataContent, "personaName");
-  const imageUrl = get(wikiDataContent, "imageUrl");
-
-  const dataElement = (
-    <div className="wikidatav__content__data">
-      {imageUrl && (
-        <a
-          className="wikidatav__content__data__image clickable"
-          href={imageUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src={imageUrl} />
-        </a>
-      )}
-      {title && <div className="wikidatav__content__data__title">{title}</div>}
-    </div>
-  );
 
   return (
     <wikidata-viewer class={className}>

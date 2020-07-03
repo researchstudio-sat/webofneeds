@@ -5,6 +5,13 @@ wikidata-viewer {
   @include won-detail-viewer("wikidatav");
 
   .wikidatav__content {
+    &__loading {
+      display: grid;
+      grid-auto-flow: column;
+      justify-content: left;
+      grid-gap: 0.5rem;
+      align-items: center;
+    }
     &__data {
       display: grid;
       grid-template-columns: min-content 1fr;
@@ -18,12 +25,23 @@ wikidata-viewer {
         font-weight: bold;
       }
       &__image {
-        height: 5rem;
-        max-height: 5rem;
-
         @media (max-width: $responsivenessBreakPoint) {
           height: 3rem;
           max-height: 3rem;
+
+          > img {
+            height: 3rem;
+            max-height: 3rem;
+          }
+        }
+        @media (min-width: $responsivenessBreakPoint) {
+          height: 5rem;
+          max-height: 5rem;
+
+          > img {
+            height: 5rem;
+            max-height: 5rem;
+          }
         }
 
         > img {

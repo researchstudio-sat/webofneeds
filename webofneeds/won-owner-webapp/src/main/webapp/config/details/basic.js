@@ -42,7 +42,7 @@ export const title = {
       //TODO: Fix for language fetching once CF PR is closed and dep is updated https://github.com/zazuko/clownface/pull/41
       const cfTitles = cfDataset.out(schema.title);
       if (cfTitles && cfTitles.values && cfTitles.values.length > 0) {
-        return cfTitles.values;
+        return cfTitles.values[0];
       }
     }
   },
@@ -82,7 +82,7 @@ export const personaName = {
       //TODO: Fix for language fetching once CF PR is closed and dep is updated https://github.com/zazuko/clownface/pull/41
       const cfNames = cfDataset.out(schema.name);
       if (cfNames && cfNames.values && cfNames.values.length > 0) {
-        return cfNames.values;
+        return cfNames.values[0];
       }
     }
   },
@@ -212,7 +212,7 @@ export const description = {
         cfDescription.values &&
         cfDescription.values.length > 0
       ) {
-        return cfDescription.values;
+        return cfDescription.values[0];
       }
     }
   },
@@ -249,7 +249,7 @@ export const termsOfService = {
         namedNode("http://schema.org/termsOfService")
       );
       if (cfToS && cfToS.values && cfToS.values.length > 0) {
-        return cfToS.values;
+        return cfToS.values[0];
       }
     }
   },
