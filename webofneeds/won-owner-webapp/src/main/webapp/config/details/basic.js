@@ -22,6 +22,8 @@ import ico36_search from "../../images/won-icons/ico36_search.svg";
 import ico36_detail_description from "../../images/won-icons/ico36_detail_description.svg";
 import ico36_detail_tags from "../../images/won-icons/ico36_detail_tags.svg";
 import ico36_detail_media from "../../images/won-icons/ico36_detail_media.svg";
+import WikiDataViewer from "~/app/components/details/viewer/wikidata-viewer";
+import WikiDataPicker from "~/app/components/details/picker/wikidata-picker";
 
 export const title = {
   identifier: "title",
@@ -547,6 +549,8 @@ export const eventObjectAboutUris = {
       };
     }
   },
+  component: WikiDataPicker,
+  viewerComponent: WikiDataViewer,
   parseFromRDF: function(jsonLDImm) {
     const types = get(jsonLDImm, "@type");
     if (

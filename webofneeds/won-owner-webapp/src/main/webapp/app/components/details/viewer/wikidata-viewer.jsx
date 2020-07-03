@@ -18,7 +18,11 @@ import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 
 export default function WikiDataViewer({ content, detail, className }) {
   const dispatch = useDispatch();
-  const entityUri = content && content.replace(/\/$/, "");
+  //FIXME: Workaround for multiple dataUris in state
+  const entityUri =
+    content && Immutable.List.isList(content)
+      ? content.first().replace(/\/$/, "")
+      : content.replace(/\/$/, "");
   const wikiDataContent = useSelector(
     generalSelectors.getExternalData(entityUri)
   );
