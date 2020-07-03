@@ -7,6 +7,27 @@ wikidata-picker {
     position: relative;
     display: grid;
 
+    .wikidatap__input__selected {
+      padding-top: 1rem;
+
+      &__header {
+        display: grid;
+        grid-template-columns: 1fr min-content;
+        grid-gap: 0.5rem;
+        align-items: end;
+        &__title {
+          font-weight: bold;
+        }
+        &__clearButton {
+          padding: 0.5rem 1rem;
+        }
+      }
+
+      &__content {
+        padding-left: 0;
+      }
+    }
+
     .wikidatap__input__results {
       display: grid;
       grid-auto-flow: row;
