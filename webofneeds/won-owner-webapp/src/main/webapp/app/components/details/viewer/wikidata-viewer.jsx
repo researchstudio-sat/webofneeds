@@ -102,7 +102,10 @@ export default function WikiDataViewer({ content, detail, className }) {
 
           if (ReactViewerComponent) {
             return (
-              <div key={contentDetailKey} className="pis__component">
+              <div
+                key={contentDetailKey}
+                className="wikidatav__content__additionalData__content__detail"
+              >
                 <ReactViewerComponent
                   detail={detailDefinition}
                   content={contentDetail}
@@ -115,6 +118,26 @@ export default function WikiDataViewer({ content, detail, className }) {
         return undefined;
       });
 
+  const title =
+    get(wikiDataContent, "title") || get(wikiDataContent, "personaName");
+  const imageUrl = get(wikiDataContent, "imageUrl");
+
+  const dataElement = (
+    <div className="wikidatav__content__data">
+      {imageUrl && (
+        <a
+          className="wikidatav__content__data__image clickable"
+          href={imageUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img src={imageUrl} />
+        </a>
+      )}
+      {title && <div className="wikidatav__content__data__title">{title}</div>}
+    </div>
+  );
+
   return (
     <wikidata-viewer class={className}>
       <div className="wikidatav__header">
@@ -122,45 +145,48 @@ export default function WikiDataViewer({ content, detail, className }) {
         {label}
       </div>
       <div className="wikidatav__content">
-        {additionalContentDetailsMap ? (
-          <div className="wikidatav__content__data__additionalData">
-            <div
-              className="wikidatav__content__data__additionalData__header clickable"
-              onClick={() => toggleAdditionalData(!showAdditionalData)}
-            >
-              <div className="wikidatav__content__data__additionalData__header__title">
-                Additional Data
-              </div>
-              <svg
-                className={
-                  "wikidatav__content__data__additionalData__header__carret " +
-                  (showAdditionalData
-                    ? " wikidatav__content__data__additionalData__header__carret--expanded "
-                    : " wikidatav__content__data__additionalData__header__carret--collapsed ")
-                }
-              >
-                <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-              </svg>
-            </div>
-            {showAdditionalData && (
-              <React.Fragment>
-                <div className="wikidatav__content__data__additionalData__content">
-                  {additionalContentDetailsMap.toArray()}
-                </div>
-                <a
-                  className="wikidatav__content__data__additionalData__content__link rdflink clickable"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href={content}
+        {wikiDataContent ? (
+          <React.Fragment>
+            {dataElement}
+            {additionalContentDetailsMap && (
+              <div className="wikidatav__content__additionalData">
+                <div
+                  className={
+                    "wikidatav__content__additionalData__header clickable " +
+                    (showAdditionalData
+                      ? " wikidatav__content__additionalData__header--expanded "
+                      : " wikidatav__content__additionalData__header--collapsed ")
+                  }
+                  onClick={() => toggleAdditionalData(!showAdditionalData)}
                 >
-                  <svg className="rdflink__small">
-                    <use xlinkHref={rdf_logo_1} href={rdf_logo_1} />
+                  <svg className="wikidatav__content__additionalData__header__carret">
+                    <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
                   </svg>
-                  <span className="rdflink__label">WikiData Link</span>
-                </a>
-              </React.Fragment>
+                  <div className="wikidatav__content__additionalData__header__title">
+                    Additional Data
+                  </div>
+                </div>
+                {showAdditionalData && (
+                  <React.Fragment>
+                    <div className="wikidatav__content__additionalData__content">
+                      {additionalContentDetailsMap.toArray()}
+                    </div>
+                    <a
+                      className="wikidatav__content__additionalData__content__link rdflink clickable"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={content}
+                    >
+                      <svg className="rdflink__small">
+                        <use xlinkHref={rdf_logo_1} href={rdf_logo_1} />
+                      </svg>
+                      <span className="rdflink__label">WikiData Link</span>
+                    </a>
+                  </React.Fragment>
+                )}
+              </div>
             )}
-          </div>
+          </React.Fragment>
         ) : (
           <div className="wikidatav__content__loading">
             <svg className="wikidatav__content__loading__spinner hspinner">
