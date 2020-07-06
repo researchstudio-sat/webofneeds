@@ -47,7 +47,7 @@ export const rentRealEstateSearch = {
     ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["rentRealEstateOffer", "persona"],
+        useCaseIdentifiers: ["rentRealEstateOffer"],
         refuseOwned: true,
       },
     },

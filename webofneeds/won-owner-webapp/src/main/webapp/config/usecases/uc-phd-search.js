@@ -33,7 +33,7 @@ export const phdSearch = {
     ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["phdOffer", "persona"],
+        useCaseIdentifiers: ["phdOffer"],
         refuseOwned: true,
       },
     },

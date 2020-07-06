@@ -33,7 +33,7 @@ export const postdocSearch = {
     ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["postdocOffer", "persona"],
+        useCaseIdentifiers: ["postdocOffer"],
         refuseOwned: true,
       },
     },

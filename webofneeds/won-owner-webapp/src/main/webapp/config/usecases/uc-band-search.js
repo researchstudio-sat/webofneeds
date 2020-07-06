@@ -40,7 +40,7 @@ export const bandSearch = {
     ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["musicianSearch", "persona"],
+        useCaseIdentifiers: ["musicianSearch"],
         refuseOwned: true,
       },
     },

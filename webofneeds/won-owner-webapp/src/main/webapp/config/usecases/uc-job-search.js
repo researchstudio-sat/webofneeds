@@ -43,7 +43,7 @@ export const jobSearch = {
     ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["jobOffer", "persona"],
+        useCaseIdentifiers: ["jobOffer"],
         refuseOwned: true,
       },
     },
