@@ -87,9 +87,7 @@ export const cyclingPlan = {
       subQueries: subQueries,
       where: [
         `${resultName} rdf:type demo:Interest.`,
-        `${resultName} match:seeks ?seeks .`,
-        `?seeks rdf:type s:PlanAction.`,
-        `?seeks s:object ?planObject.`,
+        `${resultName} s:object ?planObject.`,
         `?planObject s:about <http://www.wikidata.org/entity/Q53121>.`,
         `?thisAtom hold:heldBy/buddy:buddy/hold:holds ${resultName}.`,
         `BIND( (
@@ -112,12 +110,10 @@ export const cyclingInterest = {
     ...mergeInEmptyDraft({
       content: {
         type: ["demo:Interest"],
+        eventObjectAboutUris: "http://www.wikidata.org/entity/Q53121",
         title: "I am interested in cycling!",
       },
-      seeks: {
-        type: ["s:PlanAction"],
-        eventObjectAboutUris: "http://www.wikidata.org/entity/Q53121",
-      },
+      seeks: {},
     }),
   },
   reactions: {

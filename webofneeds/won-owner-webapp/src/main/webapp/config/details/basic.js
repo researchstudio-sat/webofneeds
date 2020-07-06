@@ -554,8 +554,9 @@ export const eventObjectAboutUris = {
   parseFromRDF: function(jsonLDImm) {
     const types = get(jsonLDImm, "@type");
     if (
-      (Immutable.List.isList(types) && types.includes("s:PlanAction")) ||
-      types === "s:PlanAction"
+      (Immutable.List.isList(types) &&
+        (types.includes("s:PlanAction") || types.includes("demo:Interest"))) ||
+      (types === "s:PlanAction" || types === "demo:Interest")
     ) {
       const planObjs = get(jsonLDImm, "s:object");
       let plns = [];

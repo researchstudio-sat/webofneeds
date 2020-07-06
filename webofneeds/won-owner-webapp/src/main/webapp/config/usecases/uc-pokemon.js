@@ -55,11 +55,9 @@ export const pokemonInterest = {
     ...mergeInEmptyDraft({
       content: {
         type: ["demo:Interest"],
-      },
-      seeks: {
-        type: ["s:PlanAction"],
         eventObjectAboutUris: "http://www.wikidata.org/entity/Q20966579",
       },
+      seeks: {},
     }),
   },
   reactions: {

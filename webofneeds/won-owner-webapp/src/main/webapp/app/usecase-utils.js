@@ -112,7 +112,8 @@ export function findUseCaseByAtom(atomImm) {
     if (
       matchingUseCases.size > 1 &&
       contentTypes &&
-      contentTypes.includes("s:PlanAction")
+      (contentTypes.includes("s:PlanAction") ||
+        contentTypes.includes("demo:Interest"))
     ) {
       const eventObjectMatchingUseCases = matchingUseCases.filter(useCase => {
         const draftEventObject = getIn(useCase, [

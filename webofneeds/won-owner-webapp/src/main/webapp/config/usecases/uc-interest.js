@@ -86,9 +86,7 @@ export const genericPlan = {
       subQueries: subQueries,
       where: [
         `${resultName} rdf:type demo:Interest.`,
-        `${resultName} match:seeks ?seeks .`,
-        `?seeks rdf:type s:PlanAction.`,
-        `?seeks s:object ?planObject.`,
+        `${resultName} s:object ?planObject.`,
         `?planObject s:about <http://www.wikidata.org/entity/Q12896105>.`,
         `?thisAtom hold:heldBy/buddy:buddy/hold:holds ${resultName}.`,
         `BIND( ( 
@@ -112,9 +110,7 @@ export const genericInterest = {
       content: {
         type: ["demo:Interest"],
       },
-      seeks: {
-        type: ["s:PlanAction"],
-      },
+      seeks: {},
     }),
   },
   reactions: {
@@ -128,17 +124,16 @@ export const genericInterest = {
   details: {
     title: { ...details.title },
     description: { ...details.description },
+    eventObjectAboutUris: {
+      ...details.eventObjectAboutUris,
+      mandatory: true,
+    },
     location: {
       ...details.location,
       mandatory: true,
     },
   },
-  seeksDetails: {
-    eventObjectAboutUris: {
-      ...details.eventObjectAboutUris,
-      mandatory: true,
-    },
-  },
+  seeksDetails: {},
   //TODO: Fix Query,
   /*generateQuery: (draft, resultName) => {
     const vicinityScoreSQ = vicinityScoreSubQuery({
