@@ -11,6 +11,97 @@ import {
 // import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
 import ico36_uc_question from "~/images/won-icons/ico36_uc_question.svg";
+import * as jsonLdUtils from "~/app/service/jsonld-utils";
+
+export const genericPlan = {
+  identifier: "genericPlan",
+  label: "Plan",
+  icon: ico36_uc_question,
+  doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
+  draft: {
+    ...mergeInEmptyDraft({
+      content: {
+        type: ["s:PlanAction"],
+        sockets: {
+          "#groupSocket": vocab.GROUP.GroupSocketCompacted,
+          "#holdableSocket": vocab.HOLD.HoldableSocketCompacted,
+          "#sReviewSocket": vocab.WXSCHEMA.ReviewSocketCompacted,
+        },
+      },
+      seeks: {},
+    }),
+  },
+  reactions: {
+    ...defaultReactions,
+    [vocab.GROUP.GroupSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["genericInterest", "persona"],
+      },
+      [vocab.GROUP.GroupSocketCompacted]: {
+        useCaseIdentifiers: ["genericPlan"],
+      },
+    },
+  },
+  details: {
+    title: { ...details.title },
+    eventObjectAboutUris: { ...details.eventObjectAboutUris, mandatory: true },
+    description: { ...details.description },
+    location: { ...details.location, mandatory: true },
+    fromDatetime: { ...details.fromDatetime },
+  },
+  seeksDetails: {},
+
+  /*generateQuery: (draft, resultName) => {
+    const vicinityScoreSQ = vicinityScoreSubQuery({
+      resultName: resultName,
+      bindScoreAs: "?location_geoScore",
+      pathToGeoCoords: "s:location/s:geo",
+      prefixesInPath: {
+        s: won.defaultContext["s"],
+        won: won.defaultContext["won"],
+        con: won.defaultContext["con"],
+      },
+      geoCoordinates: getIn(draft, ["content", "location"]),
+    });
+
+    const subQueries = [vicinityScoreSQ]
+      .filter(sq => sq) // filter out non-existing details (the SQs should be `undefined` for them)
+      .map(sq => ({
+        query: sq,
+        optional: true, // so counterparts without that detail don't get filtered out (just assigned a score of 0 via `coalesce`)
+      }));
+
+    const query = sparqlQuery({
+      prefixes: {
+        won: won.defaultContext["won"],
+        rdf: won.defaultContext["rdf"],
+        buddy: won.defaultContext["buddy"],
+        hold: won.defaultContext["hold"],
+        s: won.defaultContext["s"],
+        match: won.defaultContext["match"],
+        demo: won.defaultContext["demo"],
+      },
+      distinct: true,
+      variables: [resultName, "?score"],
+      subQueries: subQueries,
+      where: [
+        `${resultName} rdf:type demo:Interest.`,
+        `${resultName} match:seeks ?seeks .`,
+        `?seeks rdf:type s:PlanAction.`,
+        `?seeks s:object ?planObject.`,
+        `?planObject s:about <http://www.wikidata.org/entity/Q12896105>.`,
+        `?thisAtom hold:heldBy/buddy:buddy/hold:holds ${resultName}.`,
+        `BIND( ( 
+          COALESCE(?location_geoScore, 0) 
+        ) / 5  as ?score)`,
+        // `FILTER(?score > 0)`, // not necessary atm to filter; there are parts of -postings we can't match yet (e.g. NLP on description). also content's sparse anyway.
+      ],
+      orderBy: [{ order: "DESC", variable: "?score" }],
+    });
+
+    return query;
+  },*/
+};
 
 export const genericInterest = {
   identifier: "genericInterest",
