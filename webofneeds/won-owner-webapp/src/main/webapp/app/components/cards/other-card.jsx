@@ -8,6 +8,7 @@ import PropTypes from "prop-types";
 
 import WonAtomMap from "../atom-map.jsx";
 import WonAtomConnectionsIndicator from "../atom-connections-indicator.jsx";
+import WonHolderSnippet from "./snippets/holder-snippet.jsx";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import { relativeTime } from "../../won-label-utils.js";
@@ -31,18 +32,6 @@ export default function WonOtherCard({
   const atomLocation = atomUtils.getLocation(atom);
   const holderUri = atomUtils.getHeldByUri(atom);
   const holder = useSelector(generalSelectors.getAtom(holderUri));
-  const holderName = get(holder, "humanReadable");
-  const holderVerified = atomUtils.isHolderVerified(atom, holder);
-  const isHolderPersona = atomUtils.isPersona(holder);
-  const personaIdenticonSvg = atomUtils.getIdenticonSvg(holder);
-  const personaImage = atomUtils.getDefaultPersonaImage(holder);
-  const showHolderIcon = !isHolderPersona;
-  const holderUseCaseIcon = !isHolderPersona
-    ? atomUtils.getMatchedUseCaseIcon(holder)
-    : undefined;
-  const holderUseCaseIconBackground = !isHolderPersona
-    ? atomUtils.getBackground(holder)
-    : undefined;
   const isInactive = atomUtils.isInactive(atom);
   const atomTypeLabel = atomUtils.generateTypeLabel(atom);
   const atomHasHoldableSocket = atomUtils.hasHoldableSocket(atom);
@@ -53,9 +42,7 @@ export default function WonOtherCard({
   );
   const friendlyTimestamp =
     atom && relativeTime(globalLastUpdateTime, get(atom, "lastUpdateDate"));
-  const showPersonaImage = isHolderPersona && !!personaImage;
-  const showPersonaIdenticon =
-    isHolderPersona && !personaImage && !!personaIdenticonSvg;
+
   const showMap = false; //!atomImage && atomLocation; //if no image is present but a location is, we display a map instead
   const showDefaultIcon = !atomImage; //&& !atomLocation; //if no image and no location are present we display the defaultIcon in the card__icon area, instead of next to the title
 
@@ -126,66 +113,6 @@ export default function WonOtherCard({
             undefined
           )}
         </div>
-      );
-    }
-  }
-
-  function createVerificationLabel() {
-    if (holderVerified) {
-      return (
-        <span
-          className="card__persona__name__verification card__persona__name__verification--verified"
-          title="The Persona-Relation of this Post is verified by the Persona"
-        >
-          Verified
-        </span>
-      );
-    } else {
-      return (
-        <span
-          className="card__persona__name__verification card__persona__name__verification--unverified"
-          title="The Persona-Relation of this Post is NOT verified by the Persona"
-        >
-          Unverified!
-        </span>
-      );
-    }
-  }
-
-  function createHolderInfoIcon() {
-    if (showHolderIcon) {
-      const style = {
-        backgroundColor: holderUseCaseIconBackground,
-      };
-
-      return (
-        <div style={style} className="card__persona__icon holderUseCaseIcon">
-          <svg className="si__serviceatomicon">
-            <use xlinkHref={holderUseCaseIcon} href={holderUseCaseIcon} />
-          </svg>
-        </div>
-      );
-    } else if (showPersonaIdenticon) {
-      return (
-        <img
-          className="card__persona__icon"
-          alt="Auto-generated title image for persona that holds the atom"
-          src={"data:image/svg+xml;base64," + personaIdenticonSvg}
-        />
-      );
-    }
-    if (showPersonaImage) {
-      return (
-        <img
-          className="card__persona__icon"
-          alt={get(personaImage, "name")}
-          src={
-            "data:" +
-            get(personaImage, "encodingFormat") +
-            ";base64," +
-            get(personaImage, "encoding")
-          }
-        />
       );
     }
   }
@@ -278,32 +205,6 @@ export default function WonOtherCard({
     </Link>
   );
 
-  const cardPersonaInfo =
-    showHolder && holder && atomHasHoldableSocket ? (
-      <Link
-        className="card__persona clickable"
-        to={location =>
-          generateLink(
-            location,
-            { postUri: holderUri, tab: undefined, connectionUri: undefined },
-            "/post"
-          )
-        }
-      >
-        {createHolderInfoIcon()}
-        {holderName ? (
-          <div className="card__persona__name">
-            <span className="card__persona__name__label">{holderName}</span>
-            {createVerificationLabel()}
-          </div>
-        ) : (
-          undefined
-        )}
-      </Link>
-    ) : (
-      undefined
-    );
-
   const cardConnectionIndicators = showIndicators ? (
     <div className="card__indicators">
       <WonAtomConnectionsIndicator atom={atom} />
@@ -316,7 +217,11 @@ export default function WonOtherCard({
     <won-other-card>
       {cardIcon}
       {cardMain}
-      {cardPersonaInfo}
+      {showHolder &&
+        holder &&
+        atomHasHoldableSocket && (
+          <WonHolderSnippet holder={holder} heldAtom={atom} />
+        )}
       {cardConnectionIndicators}
     </won-other-card>
   );
