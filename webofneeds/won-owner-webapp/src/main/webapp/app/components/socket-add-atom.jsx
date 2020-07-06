@@ -53,9 +53,12 @@ export default function WonSocketAddAtom({
         !(isAddToAtomOwned && get(reaction, "refuseOwned"))
     ),
     "useCaseIdentifiers"
-  ).filter(ucIdentifier => ucIdentifier !== "persona" || ucIdentifier !== "*");
+  );
   const allowAdHoc =
-    !!adHocUseCaseIdentifiers && adHocUseCaseIdentifiers.size === 1;
+    !!adHocUseCaseIdentifiers &&
+    adHocUseCaseIdentifiers.filter(
+      ucIdentifier => ucIdentifier !== "persona" && ucIdentifier !== "*"
+    ).size === 1;
 
   //If the addToAtom is Owned, we preselect the holderUri (if present) to be used as the holder of the new atom to establish a connection with
   const addHolderUri = isAddToAtomOwned
