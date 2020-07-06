@@ -113,6 +113,8 @@ export function parseMetaAtom(metaAtom) {
           .replace(vocab.DEMO.baseUri, vocab.DEMO.prefix + ":")
           .replace(vocab.BOT.baseUri, vocab.BOT.prefix + ":")
           .replace(vocab.WONMATCH.baseUri, vocab.WONMATCH.prefix + ":")
+          .replace(vocab.VALUEFLOWS.baseUri, vocab.VALUEFLOWS.prefix + ":")
+          .replace(vocab.WXVALUEFLOWS.baseUri, vocab.WXVALUEFLOWS.prefix + ":")
           .replace("http://schema.org/", "s:")
       )
     );
@@ -143,6 +145,7 @@ export function parseMetaAtom(metaAtom) {
         .replace(vocab.BUDDY.baseUri, vocab.BUDDY.prefix + ":")
         .replace(vocab.BOT.baseUri, vocab.BOT.prefix + ":")
         .replace(vocab.WXSCHEMA.baseUri, vocab.WXSCHEMA.prefix + ":")
+        .replace(vocab.WXVALUEFLOWS.baseUri, vocab.WXVALUEFLOWS.prefix + ":")
     );
 
   const extractStateFromMeta = state => {
