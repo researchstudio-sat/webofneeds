@@ -10,7 +10,6 @@ import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as wonLabelUtils from "../won-label-utils.js";
 import * as useCaseUtils from "../usecase-utils.js";
-import * as connectionUtils from "../redux/utils/connection-utils.js";
 
 import WonLabelledHr from "./labelled-hr.jsx";
 import ChatTextfield from "./chat-textfield.jsx";
@@ -47,13 +46,16 @@ export default function WonSocketAddAtom({
   const addToAtomSocketUri = atomUtils.getSocketUri(addToAtom, addToSocketType);
   const isAddToAtomOwned = accountUtils.isAtomOwned(accountState, addToAtomUri);
 
-  const allowAdHoc = !!reactions.find(
-    (reaction, socketType) =>
-      socketType === vocab.CHAT.ChatSocketCompacted &&
-      (get(reaction, "useCaseIdentifiers", "*") ||
-        (get(reaction, "useCaseIdentifiers", "persona") &&
-          !(isAddToAtomOwned && get(reaction, "refuseOwned"))))
+  const adHocUseCaseIdentifiers = get(
+    reactions.find(
+      (reaction, socketType) =>
+        socketType === vocab.CHAT.ChatSocketCompacted &&
+        !(isAddToAtomOwned && get(reaction, "refuseOwned"))
+    ),
+    "useCaseIdentifiers"
   );
+  const allowAdHoc =
+    !!adHocUseCaseIdentifiers && adHocUseCaseIdentifiers.size === 1;
 
   //If the addToAtom is Owned, we preselect the holderUri (if present) to be used as the holder of the new atom to establish a connection with
   const addHolderUri = isAddToAtomOwned
@@ -271,79 +273,25 @@ export default function WonSocketAddAtom({
     }
   }
 
-  function sendAdHocRequest(message, targetSocketUri, personaUri) {
+  function sendAdHocRequest(
+    message,
+    targetSocketUri,
+    personaUri,
+    adHocUseCaseIdentifier
+  ) {
     if (accountUtils.isLoggedIn(accountState)) {
       if (addToAtomUri) {
-        const personaAtom = get(storedAtoms, personaUri);
+        history.push("/connections");
 
-        if (personaAtom) {
-          // if the personaAtom already contains a chatSocket we will just use the persona as the Atom that connects
-          const senderSocketUri = atomUtils.getChatSocket(personaAtom);
-          const personaConnection = atomUtils.getConnectionBySocketUris(
-            personaAtom,
-            senderSocketUri,
-            targetSocketUri
-          );
-
-          let connectFunction = actionCreators.atoms__connectSockets(
-            senderSocketUri,
+        dispatch(
+          actionCreators.connections__connectAdHoc(
             targetSocketUri,
-            message
-          );
-
-          if (!personaConnection) {
-            dispatch(connectFunction);
-          } else if (personaConnection) {
-            const personaConnectionUri = get(personaConnection, "uri");
-
-            if (
-              connectionUtils.isSuggested(personaConnection) ||
-              connectionUtils.isClosed(personaConnection)
-            ) {
-              dispatch(connectFunction);
-            } else if (connectionUtils.isRequestReceived(personaConnection)) {
-              dispatch(
-                actionCreators.atoms__connectSockets(
-                  senderSocketUri,
-                  targetSocketUri,
-                  message
-                )
-              );
-            } else if (
-              connectionUtils.isConnected(personaConnection) &&
-              message
-            ) {
-              dispatch(
-                actionCreators.connections__sendChatMessage(
-                  message,
-                  undefined,
-                  undefined,
-                  senderSocketUri,
-                  targetSocketUri,
-                  personaConnectionUri,
-                  false
-                )
-              );
-            }
-            // For status RequestSent and Connected(without a message) we simply view the go to the connection
-
-            history.push(
-              generateLink(
-                history.location,
-                {
-                  connectionUri: personaConnectionUri,
-                },
-                "/connections"
-              )
-            );
-          }
-        } else {
-          history.push("/connections");
-
-          dispatch(
-            actionCreators.connections__connectAdHoc(targetSocketUri, message)
-          );
-        }
+            message,
+            adHocUseCaseIdentifier,
+            addToAtom,
+            personaUri
+          )
+        );
       }
     } else {
       dispatch(
@@ -356,7 +304,9 @@ export default function WonSocketAddAtom({
               dispatch(
                 actionCreators.connections__connectAdHoc(
                   targetSocketUri,
-                  message
+                  message,
+                  adHocUseCaseIdentifier,
+                  addToAtom
                 )
               );
             },
@@ -469,7 +419,8 @@ export default function WonSocketAddAtom({
               sendAdHocRequest(
                 value,
                 atomUtils.getSocketUri(addToAtom, addToSocketType),
-                selectedPersona && selectedPersona.personaId
+                selectedPersona && selectedPersona.personaId,
+                adHocUseCaseIdentifiers.first()
               )
             }
           />

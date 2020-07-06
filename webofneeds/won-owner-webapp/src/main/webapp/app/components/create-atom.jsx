@@ -23,6 +23,7 @@ import { Elm } from "../../elm/PublishButton.elm";
 import { actionCreators } from "../actions/actions";
 import { useHistory } from "react-router-dom";
 import vocab from "../service/vocab";
+import { getIn } from "../utils";
 
 export default function WonCreateAtom({
   fromAtom,
@@ -75,6 +76,36 @@ export default function WonCreateAtom({
     }
   } else {
     useCase = useCaseUtils.getUseCase(useCaseIdentifier);
+  }
+
+  if (connect && fromAtom) {
+    // For some special create cases we move some content of the fromAtom to the createAtomDraft
+
+    const contentTypes =
+      getIn(fromAtom, ["content", "type"]) &&
+      getIn(fromAtom, ["content", "type"])
+        .toSet()
+        .remove(vocab.WON.AtomCompacted);
+
+    const useCaseContentTypes = getIn(useCase, ["draft", "content", "type"]);
+    const useCaseContentTypesImm =
+      useCaseContentTypes && Immutable.fromJS(useCaseContentTypes).toSet();
+
+    if (
+      useCaseContentTypes &&
+      (useCaseContentTypesImm.includes("s:PlanAction") ||
+        useCaseContentTypesImm.includes("demo:Interest")) &&
+      (contentTypes.includes("s:PlanAction") ||
+        contentTypes.includes("demo:Interest"))
+    ) {
+      const eventObjectAboutUris = getIn(fromAtom, [
+        "content",
+        "eventObjectAboutUris",
+      ]);
+      if (eventObjectAboutUris) {
+        useCase.draft.content.eventObjectAboutUris = eventObjectAboutUris.toArray();
+      }
+    }
   }
 
   const [draftObject, setDraftObject] = useState(

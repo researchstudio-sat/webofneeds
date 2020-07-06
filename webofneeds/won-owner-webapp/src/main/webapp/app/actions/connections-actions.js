@@ -7,18 +7,11 @@ import vocab from "../service/vocab.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
-import * as wonUtils from "../won-utils.js";
 import * as useCaseUtils from "../usecase-utils.js";
 import * as ownerApi from "../api/owner-api.js";
 import * as stateStore from "../redux/state-store.js";
 
-import {
-  get,
-  getIn,
-  generateFakePersonaName,
-  extractAtomUriBySocketUri,
-  delay,
-} from "../utils.js";
+import { get, getIn, extractAtomUriBySocketUri, delay } from "../utils.js";
 
 import { ensureLoggedIn } from "./account-actions";
 
@@ -423,22 +416,61 @@ function connectReactionAtom(
   });
 }
 
-export function connectionsConnectAdHoc(targetSocketUri, connectMessage) {
+export function connectionsConnectAdHoc(
+  targetSocketUri,
+  connectMessage,
+  adHocUseCaseIdentifier,
+  targetAtom,
+  personaUriForAdHocAtom
+) {
   return (dispatch, getState) =>
-    connectAdHoc(targetSocketUri, connectMessage, dispatch, getState); // moved to separate function to make transpilation work properly
+    connectAdHoc(
+      targetSocketUri,
+      connectMessage,
+      adHocUseCaseIdentifier,
+      targetAtom,
+      personaUriForAdHocAtom,
+      dispatch,
+      getState
+    ); // moved to separate function to make transpilation work properly
 }
 
-function connectAdHoc(targetSocketUri, connectMessage, dispatch, getState) {
+function connectAdHoc(
+  targetSocketUri,
+  connectMessage,
+  adHocUseCaseIdentifier,
+  targetAtom,
+  personaUriForAdHocAtom,
+  dispatch,
+  getState
+) {
   ensureLoggedIn(dispatch, getState).then(async () => {
     const theirAtomUri = extractAtomUriBySocketUri(targetSocketUri);
 
     const state = getState();
-    const adHocDraft = useCaseUtils.getUseCase("persona").draft;
-    adHocDraft.content.personaName = generateFakePersonaName(
-      wonUtils.getRandomWonId()
-    );
-    adHocDraft.content.description = "Automatically generated Persona";
+    const adHocDraft = useCaseUtils.getUseCase(adHocUseCaseIdentifier).draft;
 
+    if (targetAtom) {
+      // For some special create cases we move some content of the fromAtom to the createAtomDraft
+      const contentTypes =
+        getIn(targetAtom, ["content", "type"]) &&
+        getIn(targetAtom, ["content", "type"])
+          .toSet()
+          .remove(vocab.WON.AtomCompacted);
+
+      if (
+        contentTypes.includes("s:PlanAction") ||
+        contentTypes.includes("demo:Interest")
+      ) {
+        const eventObjectAboutUris = getIn(targetAtom, [
+          "content",
+          "eventObjectAboutUris",
+        ]);
+        if (eventObjectAboutUris) {
+          adHocDraft.content.eventObjectAboutUris = eventObjectAboutUris.toArray();
+        }
+      }
+    }
     const nodeUri = generalSelectors.getDefaultNodeUri(state);
 
     // build create message for new atom
@@ -457,6 +489,25 @@ function connectAdHoc(targetSocketUri, connectMessage, dispatch, getState) {
             atom: adHocDraft,
           },
         });
+      })
+      .then(() => {
+        const persona = generalSelectors.getAtom(personaUriForAdHocAtom)(state);
+        if (persona) {
+          const senderSocketUri = atomUtils.getSocketUri(
+            persona,
+            vocab.HOLD.HolderSocketCompacted
+          );
+          const targetSocketUri = `${atomUri}#holdableSocket`;
+
+          return ownerApi
+            .serverSideConnect(senderSocketUri, targetSocketUri, false, true)
+            .then(async response => {
+              if (!response.ok) {
+                const errorMsg = await response.text();
+                throw new Error(`Could not connect identity: ${errorMsg}`);
+              }
+            });
+        }
       })
       .then(() => {
         // set default socketUri
