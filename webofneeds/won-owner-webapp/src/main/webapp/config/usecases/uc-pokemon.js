@@ -17,7 +17,7 @@ export const pokemonGoRaid = {
     ...mergeInEmptyDraft({
       content: {
         type: ["s:PlanAction"],
-        eventObjectAboutUris: "http://dbpedia.org/resource/Pokemon_Go",
+        eventObjectAboutUris: "http://www.wikidata.org/entity/Q20966579",
         sockets: {
           "#groupSocket": vocab.GROUP.GroupSocketCompacted,
           "#holdableSocket": vocab.HOLD.HoldableSocketCompacted,
@@ -31,7 +31,7 @@ export const pokemonGoRaid = {
     ...defaultReactions,
     [vocab.GROUP.GroupSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["pokemonInterest", "persona"],
+        useCaseIdentifiers: ["pokemonInterest"],
       },
       [vocab.GROUP.GroupSocketCompacted]: {
         useCaseIdentifiers: ["pokemonGoRaid"],
@@ -55,11 +55,9 @@ export const pokemonInterest = {
     ...mergeInEmptyDraft({
       content: {
         type: ["demo:Interest"],
+        eventObjectAboutUris: "http://www.wikidata.org/entity/Q20966579",
       },
-      seeks: {
-        type: ["s:PlanAction"],
-        eventObjectAboutUris: "http://dbpedia.org/resource/Pokemon_Go",
-      },
+      seeks: {},
     }),
   },
   reactions: {

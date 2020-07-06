@@ -26,7 +26,7 @@ export const rideShareOffer = {
     ...mergeInEmptyDraft({
       content: {
         title: "Share a Ride",
-        type: ["http://dbpedia.org/resource/Ridesharing"],
+        type: ["http://www.wikidata.org/entity/Q16804155"],
       },
     }),
   },
@@ -34,7 +34,7 @@ export const rideShareOffer = {
     ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["personalTransportSearch", "persona"],
+        useCaseIdentifiers: ["personalTransportSearch"],
         refuseOwned: true,
       },
     },

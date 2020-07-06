@@ -23,7 +23,7 @@ export const goodsTransportSearch = {
     ...mergeInEmptyDraft({
       content: {
         title: "Want to send something",
-        type: ["http://dbpedia.org/resource/Cargo"],
+        type: ["http://www.wikidata.org/entity/Q319224"],
       },
     }),
   },
@@ -31,7 +31,7 @@ export const goodsTransportSearch = {
     ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["goodsTransportOffer", "persona"],
+        useCaseIdentifiers: ["goodsTransportOffer"],
         refuseOwned: true,
       },
     },
@@ -301,7 +301,7 @@ export const goodsTransportSearch = {
         },
         operations: [
           `${resultName} a won:Atom.`,
-          `${resultName} a <http://dbpedia.org/resource/Transport>. `,
+          `${resultName} a <http://www.wikidata.org/entity/Q7590>. `,
           `${resultName} (won:location|s:location) ?location.`,
           "?location s:geo ?location_geo.",
           "?location_geo s:latitude ?location_lat;",
@@ -335,7 +335,7 @@ export const goodsTransportSearch = {
         },
         operations: [
           `${resultName} a won:Atom.`,
-          `${resultName} a <http://dbpedia.org/resource/Transport>.`,
+          `${resultName} a <http://www.wikidata.org/entity/Q7590>.`,
           `${resultName} (won:location|s:location) ?location.`,
           "?location s:geo ?location_geo.",
           "?location_geo s:latitude ?location_lat;",
@@ -361,7 +361,7 @@ export const goodsTransportSearch = {
         },
         operations: [
           `${resultName} a won:Atom.`,
-          `${resultName} a <http://dbpedia.org/resource/Transport>.`,
+          `${resultName} a <http://www.wikidata.org/entity/Q7590>.`,
           `${resultName} (won:location|s:location) ?location.`,
           "?location s:geo ?location_geo.",
           "?location_geo s:latitude ?location_lat;",
@@ -384,7 +384,7 @@ export const goodsTransportSearch = {
         },
         operations: [
           `${resultName} a won:Atom.`,
-          `${resultName} a <http://dbpedia.org/resource/Transport>. `,
+          `${resultName} a <http://www.wikidata.org/entity/Q7590>. `,
         ],
       };
     }

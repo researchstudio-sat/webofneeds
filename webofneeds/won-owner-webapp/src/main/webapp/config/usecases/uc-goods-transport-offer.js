@@ -19,7 +19,7 @@ export const goodsTransportOffer = {
     ...mergeInEmptyDraft({
       content: {
         title: "Transportation offer",
-        type: ["http://dbpedia.org/resource/Transport"],
+        type: ["http://www.wikidata.org/entity/Q7590"],
       },
     }),
   },
@@ -27,7 +27,7 @@ export const goodsTransportOffer = {
     ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["goodsTransportSearch", "persona"],
+        useCaseIdentifiers: ["goodsTransportSearch"],
         refuseOwned: true,
       },
     },
@@ -57,7 +57,7 @@ export const goodsTransportOffer = {
         },
         operations: [
           `${resultName} a won:Atom.`,
-          `${resultName} a <http://dbpedia.org/resource/Cargo>.`,
+          `${resultName} a <http://www.wikidata.org/entity/Q319224>.`,
           `${resultName} match:seeks ?seeks.`,
           "?seeks con:travelAction/s:fromLocation ?fromLocation.",
           "?seeks con:travelAction/s:toLocation ?toLocation.",
@@ -94,7 +94,7 @@ export const goodsTransportOffer = {
         },
         operations: [
           `${resultName} a won:Atom.`,
-          `${resultName} a <http://dbpedia.org/resource/Cargo>.`,
+          `${resultName} a <http://www.wikidata.org/entity/Q319224>.`,
         ],
       };
     }

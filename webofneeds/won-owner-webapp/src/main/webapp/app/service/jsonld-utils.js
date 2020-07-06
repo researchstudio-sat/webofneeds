@@ -413,6 +413,9 @@ function parseJsonldLeaf(val, type) {
     case "xsd:ID": {
       const id = get(val, "@id");
       if (!id) {
+        const value = get(val, "@value");
+        if (value) return value;
+
         throwErr(`Could not parse \`${val}\` to an id.`);
       }
       return id;

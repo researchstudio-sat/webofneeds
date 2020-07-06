@@ -23,7 +23,7 @@ export const cyclingPlan = {
       content: {
         type: ["s:PlanAction"],
         title: "Let's go for a bike ride!",
-        eventObjectAboutUris: "http://dbpedia.org/resource/Cycling",
+        eventObjectAboutUris: "http://www.wikidata.org/entity/Q53121",
         sockets: {
           "#groupSocket": vocab.GROUP.GroupSocketCompacted,
           "#holdableSocket": vocab.HOLD.HoldableSocketCompacted,
@@ -37,7 +37,7 @@ export const cyclingPlan = {
     ...defaultReactions,
     [vocab.GROUP.GroupSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["cyclingInterest", "persona"],
+        useCaseIdentifiers: ["cyclingInterest"],
       },
       [vocab.GROUP.GroupSocketCompacted]: {
         useCaseIdentifiers: ["cyclingPlan"],
@@ -87,10 +87,8 @@ export const cyclingPlan = {
       subQueries: subQueries,
       where: [
         `${resultName} rdf:type demo:Interest.`,
-        `${resultName} match:seeks ?seeks .`,
-        `?seeks rdf:type s:PlanAction.`,
-        `?seeks s:object ?planObject.`,
-        `?planObject s:about <http://dbpedia.org/resource/Cycling>.`,
+        `${resultName} s:object ?planObject.`,
+        `?planObject s:about <http://www.wikidata.org/entity/Q53121>.`,
         `?thisAtom hold:heldBy/buddy:buddy/hold:holds ${resultName}.`,
         `BIND( (
           COALESCE(?location_geoScore, 0) 
@@ -112,12 +110,10 @@ export const cyclingInterest = {
     ...mergeInEmptyDraft({
       content: {
         type: ["demo:Interest"],
+        eventObjectAboutUris: "http://www.wikidata.org/entity/Q53121",
         title: "I am interested in cycling!",
       },
-      seeks: {
-        type: ["s:PlanAction"],
-        eventObjectAboutUris: "http://dbpedia.org/resource/Cycling",
-      },
+      seeks: {},
     }),
   },
   reactions: {
@@ -175,7 +171,7 @@ export const cyclingInterest = {
         `${resultName} rdf:type s:PlanAction.`,
         `${resultName} s:object ?planObject.`,
         `${resultName} hold:heldBy ?holder.`,
-        `?planObject s:about <http://dbpedia.org/resource/Cycling>.`,
+        `?planObject s:about <http://www.wikidata.org/entity/Q53121>.`,
         `?thisAtom hold:heldBy/buddy:buddy/hold:holds ${resultName}.`,
         // calculate average of scores; can be weighed if necessary
         `BIND( (

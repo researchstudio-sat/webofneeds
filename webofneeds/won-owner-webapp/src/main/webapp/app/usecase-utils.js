@@ -112,9 +112,10 @@ export function findUseCaseByAtom(atomImm) {
     if (
       matchingUseCases.size > 1 &&
       contentTypes &&
-      contentTypes.includes("s:PlanAction")
+      (contentTypes.includes("s:PlanAction") ||
+        contentTypes.includes("demo:Interest"))
     ) {
-      matchingUseCases = matchingUseCases.filter(useCase => {
+      const eventObjectMatchingUseCases = matchingUseCases.filter(useCase => {
         const draftEventObject = getIn(useCase, [
           "draft",
           "content",
@@ -133,6 +134,16 @@ export function findUseCaseByAtom(atomImm) {
         }
         return atomEventObject && atomEventObject.includes(draftEventObject);
       });
+
+      //If there is no matching eventObject UseCase we just take the generic one
+      if (eventObjectMatchingUseCases.size !== 0) {
+        matchingUseCases = eventObjectMatchingUseCases;
+      } else {
+        matchingUseCases = matchingUseCases.filter(
+          useCase =>
+            !getIn(useCase, ["draft", "content", "eventObjectAboutUris"])
+        );
+      }
     }
 
     if (matchingUseCases.size > 1) {
@@ -147,7 +158,7 @@ export function findUseCaseByAtom(atomImm) {
       seeksTypes &&
       seeksTypes.includes("s:PlanAction")
     ) {
-      matchingUseCases = matchingUseCases.filter(useCase => {
+      const eventObjectMatchingUseCases = matchingUseCases.filter(useCase => {
         const draftEventObject = getIn(useCase, [
           "draft",
           "seeks",
@@ -168,6 +179,15 @@ export function findUseCaseByAtom(atomImm) {
         }
         return atomEventObject && atomEventObject.includes(draftEventObject);
       });
+
+      //If there is no matching eventObject UseCase we just take the generic one
+      if (eventObjectMatchingUseCases.size !== 0) {
+        matchingUseCases = eventObjectMatchingUseCases;
+      } else {
+        matchingUseCases = matchingUseCases.filter(
+          useCase => !getIn(useCase, ["draft", "seeks", "eventObjectAboutUris"])
+        );
+      }
     }
 
     if (matchingUseCases.size > 1) {

@@ -3,27 +3,25 @@ import {
   mergeInEmptyDraft,
   defaultReactions,
 } from "../detail-definitions.js";
-import {
-  vicinityScoreSubQuery,
-  sparqlQuery,
-} from "../../app/sparql-builder-utils.js";
-import { getIn } from "../../app/utils.js";
-import won from "../../app/service/won.js";
+// import {
+//   vicinityScoreSubQuery,
+//   sparqlQuery,
+// } from "../../app/sparql-builder-utils.js";
+// import { getIn } from "../../app/utils.js";
+// import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
-import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
-import ico36_uc_meal_half from "../../images/won-icons/ico36_uc_meal-half.svg";
+import ico36_uc_question from "~/images/won-icons/ico36_uc_question.svg";
+import * as jsonLdUtils from "~/app/service/jsonld-utils";
 
-export const lunchPlan = {
-  identifier: "lunchPlan",
-  label: "Plan Lunch!",
-  icon: ico36_uc_meal_half,
+export const genericPlan = {
+  identifier: "genericPlan",
+  label: "Plan",
+  icon: ico36_uc_question,
   doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {
         type: ["s:PlanAction"],
-        title: "Let's go get lunch!",
-        eventObjectAboutUris: "http://www.wikidata.org/entity/Q12896105",
         sockets: {
           "#groupSocket": vocab.GROUP.GroupSocketCompacted,
           "#holdableSocket": vocab.HOLD.HoldableSocketCompacted,
@@ -37,20 +35,23 @@ export const lunchPlan = {
     ...defaultReactions,
     [vocab.GROUP.GroupSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["lunchInterest"],
+        useCaseIdentifiers: ["genericInterest"],
       },
-      [vocab.GROUP.GroupSocketCompacted]: { useCaseIdentifiers: ["lunchPlan"] },
+      [vocab.GROUP.GroupSocketCompacted]: {
+        useCaseIdentifiers: ["genericPlan"],
+      },
     },
   },
   details: {
     title: { ...details.title },
+    eventObjectAboutUris: { ...details.eventObjectAboutUris, mandatory: true },
     description: { ...details.description },
     location: { ...details.location, mandatory: true },
     fromDatetime: { ...details.fromDatetime },
   },
   seeksDetails: {},
 
-  generateQuery: (draft, resultName) => {
+  /*generateQuery: (draft, resultName) => {
     const vicinityScoreSQ = vicinityScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?location_geoScore",
@@ -97,19 +98,17 @@ export const lunchPlan = {
     });
 
     return query;
-  },
+  },*/
 };
 
-export const lunchInterest = {
-  identifier: "lunchInterest",
-  label: "Interest in Lunch",
-  icon: ico36_uc_meal_half,
+export const genericInterest = {
+  identifier: "genericInterest",
+  label: "Interest",
+  icon: ico36_uc_question, //TODO: Find generic interest Icon
   draft: {
     ...mergeInEmptyDraft({
       content: {
         type: ["demo:Interest"],
-        eventObjectAboutUris: "http://www.wikidata.org/entity/Q12896105",
-        title: "I am interested in meeting up for lunch!",
       },
       seeks: {},
     }),
@@ -117,20 +116,26 @@ export const lunchInterest = {
   reactions: {
     ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
-      [vocab.GROUP.GroupSocketCompacted]: { useCaseIdentifiers: ["lunchPlan"] },
+      [vocab.GROUP.GroupSocketCompacted]: {
+        useCaseIdentifiers: ["genericPlan"],
+      },
     },
   },
   details: {
     title: { ...details.title },
     description: { ...details.description },
+    eventObjectAboutUris: {
+      ...details.eventObjectAboutUris,
+      mandatory: true,
+    },
     location: {
       ...details.location,
       mandatory: true,
     },
   },
   seeksDetails: {},
-
-  generateQuery: (draft, resultName) => {
+  //TODO: Fix Query,
+  /*generateQuery: (draft, resultName) => {
     const vicinityScoreSQ = vicinityScoreSubQuery({
       resultName: resultName,
       bindScoreAs: "?location_geoScore",
@@ -177,5 +182,5 @@ export const lunchInterest = {
     });
 
     return query;
-  },
+  },*/
 };

@@ -44,7 +44,7 @@ export const rehearsalRoomOffer = {
     ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["rehearsalRoomSearch", "persona"],
+        useCaseIdentifiers: ["rehearsalRoomSearch"],
         refuseOwned: true,
       },
     },

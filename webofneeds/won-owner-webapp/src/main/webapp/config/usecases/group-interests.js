@@ -1,5 +1,6 @@
 import { cyclingInterest } from "./uc-cycling.js";
 import { lunchInterest } from "./uc-lunch.js";
+import { genericInterest } from "./uc-interest.js";
 import { pokemonInterest } from "./uc-pokemon.js";
 
 import ico36_detail_interests from "../../images/won-icons/ico36_detail_interests.svg";
@@ -12,5 +13,6 @@ export const interestsGroup = {
     lunchInterest: lunchInterest,
     cyclingInterest: cyclingInterest,
     pokemonInterest: pokemonInterest,
+    genericInterest: genericInterest,
   },
 };

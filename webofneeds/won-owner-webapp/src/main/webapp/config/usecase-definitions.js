@@ -10,6 +10,7 @@ import { personalMobilityGroup } from "./usecases/group-personal-mobility";
 import { interestsGroup } from "./usecases/group-interests";
 // import { customUseCase } from "./usecases/uc-custom.js";
 
+import { genericPlan } from "./usecases/uc-interest.js";
 import { lunchPlan } from "./usecases/uc-lunch.js";
 import { cyclingPlan } from "./usecases/uc-cycling.js";
 import { pokemonGoRaid } from "./usecases/uc-pokemon.js";
@@ -75,6 +76,7 @@ const useCaseGroups = {
 // add useCases here that should not be visible in the grouped useCases (will be hidden and only accessible through reactions
 export const hiddenUseCases = {
   pokemonGoRaid: pokemonGoRaid,
+  genericPlan: genericPlan,
   lunchPlan: lunchPlan,
   cyclingPlan: cyclingPlan,
   persona: persona,

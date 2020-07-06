@@ -63,11 +63,6 @@ export const getOwnedAtomUris = createSelector(getAccountState, account =>
 export const getAtom = atomUri =>
   createSelector(getAtoms, atoms => get(atoms, atomUri));
 
-export const getExternalData = externalDataUri =>
-  createSelector(getExternalDataState, externalData =>
-    get(externalData, externalDataUri)
-  );
-
 export const getOwnedConnection = connectionUri =>
   createSelector(getOwnedConnections, conns => get(conns, connectionUri));
 

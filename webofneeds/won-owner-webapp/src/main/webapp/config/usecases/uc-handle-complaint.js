@@ -32,7 +32,7 @@ export const handleComplaint = {
     ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["complain", "persona"],
+        useCaseIdentifiers: ["complain"],
         refuseOwned: true,
       },
     },

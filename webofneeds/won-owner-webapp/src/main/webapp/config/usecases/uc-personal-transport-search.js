@@ -30,7 +30,7 @@ export const personalTransportSearch = {
     ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["taxiOffer", "rideShareOffer", "persona"],
+        useCaseIdentifiers: ["taxiOffer", "rideShareOffer"],
         refuseOwned: true,
       },
     },
@@ -74,7 +74,7 @@ export const personalTransportSearch = {
             ${resultName} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> won:Atom.
             {
               { 
-                ${resultName} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/resource/Ridesharing>.
+                ${resultName} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.wikidata.org/entity/Q16804155>.
                 OPTIONAL { 
                   ${resultName} (con:travelAction/s:fromLocation) ?fromLocation.
                   ?fromLocation s:geo ?fromLocation_geo.
@@ -152,7 +152,7 @@ export const personalTransportSearch = {
           `${resultName} a won:Atom.
           {
             {
-              ${resultName} a <http://dbpedia.org/resource/Ridesharing> ;
+              ${resultName} a <http://www.wikidata.org/entity/Q16804155> ;
                             (con:travelAction/s:fromLocation) ?location.
             } 
             union 
@@ -188,7 +188,7 @@ export const personalTransportSearch = {
           `${resultName} a won:Atom.
           {
             {
-              ${resultName} a <http://dbpedia.org/resource/Ridesharing> ;
+              ${resultName} a <http://www.wikidata.org/entity/Q16804155> ;
                             (con:travelAction/s:toLocation) ?location.
             } 
             union 
@@ -219,7 +219,7 @@ export const personalTransportSearch = {
         },
         operations: [
           `${resultName} a won:Atom.`,
-          `{{${resultName} a <http://dbpedia.org/resource/Ridesharing>} union {${resultName} a s:TaxiService}}`,
+          `{{${resultName} a <http://www.wikidata.org/entity/Q16804155>} union {${resultName} a s:TaxiService}}`,
         ],
       };
     }
