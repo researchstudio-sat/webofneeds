@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Immutable from "immutable";
 
 import { get } from "../../../utils.js";
 import "~/style/_wikidatapicker.scss";
@@ -13,13 +14,13 @@ export default function WikiDataPicker({
   className,
   onUpdate,
 }) {
-  const [searchText, setSearchText] = useState(
-    initialValue === undefined ? "" : initialValue
+  const [searchText, setSearchText] = useState("");
+  const [wikiDataUris, setWikiDataUris] = useState(
+    initialValue === undefined ? Immutable.Set() : Immutable.Set(initialValue)
   );
-  const [wikiDataUri, setWikiDataUri] = useState(
-    initialValue === undefined ? "" : initialValue
+  const [showSearchResults, toggleShowSearchResults] = useState(
+    searchText && searchText.length > 0
   );
-  const [showSearchResults, toggleShowSearchResults] = useState(!initialValue);
   const [searchResults, setSearchResults] = useState([]);
 
   const startSearch = _.debounce(value => {
@@ -53,9 +54,17 @@ export default function WikiDataPicker({
   );
 
   function selectWikiDataUri(conceptUri) {
-    onUpdate({ value: conceptUri });
-    toggleShowSearchResults(!conceptUri);
-    setWikiDataUri(conceptUri);
+    const newWikiDataUris = wikiDataUris.add(conceptUri);
+    onUpdate({ value: newWikiDataUris.toArray() });
+    setWikiDataUris(newWikiDataUris);
+    setSearchText("");
+    toggleShowSearchResults(false);
+  }
+
+  function removeWikiDataUri(conceptUri) {
+    const newWikiDataUris = wikiDataUris.remove(conceptUri);
+    onUpdate({ value: newWikiDataUris.toArray() });
+    setWikiDataUris(newWikiDataUris);
   }
 
   return (
@@ -85,26 +94,27 @@ export default function WikiDataPicker({
             ))}
           </div>
         )}
-        {wikiDataUri && (
-          <div className="wikidatap__input__selected">
-            <div className="wikidatap__input__selected__header">
-              <span className="wikidatap__input__selected__header__title">
-                Selected
-              </span>
-              <button
-                className="wikidatap__input__selected__header__clearButton won-button--filled red"
-                onClick={() => selectWikiDataUri()}
-              >
-                Clear
-              </button>
+        {wikiDataUris &&
+          wikiDataUris.map(wikiDataUri => (
+            <div className="wikidatap__input__selected" key={wikiDataUri}>
+              <div className="wikidatap__input__selected__header">
+                <span className="wikidatap__input__selected__header__title">
+                  Selected
+                </span>
+                <button
+                  className="wikidatap__input__selected__header__clearButton won-button--filled red"
+                  onClick={() => removeWikiDataUri(wikiDataUri)}
+                >
+                  Remove
+                </button>
+              </div>
+              <WikiDataViewer
+                className="wikidatap__input__selected__content"
+                content={Immutable.fromJS([wikiDataUri])}
+                detail={{}}
+              />
             </div>
-            <WikiDataViewer
-              className="wikidatap__input__selected__content"
-              content={wikiDataUri}
-              detail={{}}
-            />
-          </div>
-        )}
+          ))}
       </div>
     </wikidata-picker>
   );
@@ -112,7 +122,10 @@ export default function WikiDataPicker({
 
 WikiDataPicker.propTypes = {
   className: PropTypes.string,
-  initialValue: PropTypes.string,
+  initialValue: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.string),
+    PropTypes.object,
+  ]),
   detail: PropTypes.object,
   onUpdate: PropTypes.func.isRequired,
 };

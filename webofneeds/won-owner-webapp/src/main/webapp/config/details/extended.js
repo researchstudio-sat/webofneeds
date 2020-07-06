@@ -5,6 +5,7 @@ import WikiDataViewer from "../../app/components/details/viewer/wikidata-viewer"
 import * as jsonLdUtils from "../../app/service/jsonld-utils";
 import ico36_detail_title from "../../images/won-icons/ico36_detail_title.svg";
 import ico36_detail_person from "../../images/won-icons/ico36_detail_person.svg";
+import { is } from "~/app/utils";
 
 export const isbn = {
   identifier: "isbn",
@@ -72,17 +73,27 @@ export const classifiedAs = {
   component: WikiDataPicker,
   viewerComponent: WikiDataViewer,
   parseToRDF: function({ value }) {
-    if (value) {
+    if (!value) {
+      return;
+    } else if (is("Array", value)) {
+      const classifiedAsObjects = value.map(item => {
+        return {
+          "@type": "xsd:ID",
+          "@value": item,
+        };
+      });
+      return { "vf:classifiedAs": classifiedAsObjects };
+    } else {
       return {
         "vf:classifiedAs": {
-          "@id": value,
+          "@type": "xsd:ID",
+          "@value": value,
         },
       };
     }
-    return undefined;
   },
   parseFromRDF: function(jsonLDImm) {
-    return jsonLdUtils.parseFrom(jsonLDImm, ["vf:classifiedAs"], "xsd:ID");
+    return jsonLdUtils.parseListFrom(jsonLDImm, ["vf:classifiedAs"], "xsd:ID");
   },
   generateHumanReadable: function({ value, includeLabel }) {
     //TODO: Implement

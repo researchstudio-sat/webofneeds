@@ -18,14 +18,9 @@ import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 
 export default function WikiDataViewer({ content, detail, className }) {
   const dispatch = useDispatch();
-  //FIXME: Workaround for multiple dataUris in state
-  const entityUri =
-    content && Immutable.List.isList(content)
-      ? content.first().replace(/\/$/, "")
-      : content.replace(/\/$/, "");
-  const wikiDataContent = useSelector(
-    generalSelectors.getExternalData(entityUri)
-  );
+  const entityUris = content && content.map(uri => uri.replace(/\/$/, ""));
+
+  const externalDataState = useSelector(generalSelectors.getExternalDataState);
 
   const [showAdditionalData, toggleAdditionalData] = useState(false);
   const detailsToParse = useCaseUtils.getAllDetails();
@@ -63,99 +58,99 @@ export default function WikiDataViewer({ content, detail, className }) {
 
   useEffect(
     () => {
-      if (entityUri && !wikiDataContent) {
-        const entityId = entityUri.substr(entityUri.lastIndexOf("/") + 1);
-        const specialDataUrl = `https://www.wikidata.org/wiki/Special:EntityData/${entityId}.ttl`;
+      entityUris.map(entityUri => {
+        if (entityUri && !externalDataState.get(entityUri)) {
+          const entityId = entityUri.substr(entityUri.lastIndexOf("/") + 1);
+          const specialDataUrl = `https://www.wikidata.org/wiki/Special:EntityData/${entityId}.ttl`;
 
-        rdfFetch(specialDataUrl)
-          .then(response => response.dataset())
-          .then(dataset => {
-            const cfData = cf({ dataset });
+          rdfFetch(specialDataUrl)
+            .then(response => response.dataset())
+            .then(dataset => {
+              const cfData = cf({ dataset });
 
-            const cfEntity = cfData.namedNode(entityUri);
+              const cfEntity = cfData.namedNode(entityUri);
 
-            return generateContentFromCF(cfEntity, detailsToParse);
-          })
-          .then(parsedContent => {
-            dispatch(
-              actionCreators.externalData__store(
-                Immutable.fromJS({ [entityUri]: parsedContent })
-              )
-            );
-          });
-      }
-    },
-    [entityUri]
-  );
-
-  const title = get(wikiDataContent, "title");
-  const personaName = get(wikiDataContent, "personaName");
-  const imageUrl = get(wikiDataContent, "imageUrl");
-
-  const dataElement = (
-    <div className="wikidatav__content__data">
-      {imageUrl ? (
-        <a
-          className="wikidatav__content__data__image clickable"
-          href={imageUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src={imageUrl} />
-        </a>
-      ) : (
-        <div />
-      )}
-      {(title || personaName) && (
-        <div className="wikidatav__content__data__title">
-          {title || personaName}
-        </div>
-      )}
-    </div>
-  );
-
-  const additionalContentDetailsMap =
-    wikiDataContent &&
-    wikiDataContent
-      .filter(
-        (_, contentDetailKey) =>
-          contentDetailKey !== "imageUrl" &&
-          //if there was a title, we add the personaName to the additional Details so we do not lose information
-          (title || contentDetailKey !== "personaName") &&
-          contentDetailKey !== "title"
-      )
-      .map((contentDetail, contentDetailKey) => {
-        const detailDefinitionImm = get(allDetailsImm, contentDetailKey);
-        if (detailDefinitionImm) {
-          const detailDefinition = detailDefinitionImm.toJS();
-          const ReactViewerComponent =
-            detailDefinition && detailDefinition.viewerComponent;
-
-          if (ReactViewerComponent) {
-            return (
-              <div
-                key={contentDetailKey}
-                className="wikidatav__content__additionalData__content__detail"
-              >
-                <ReactViewerComponent
-                  detail={detailDefinition}
-                  content={contentDetail}
-                />
-              </div>
-            );
-          }
+              return generateContentFromCF(cfEntity, detailsToParse);
+            })
+            .then(parsedContent => {
+              dispatch(
+                actionCreators.externalData__store(
+                  Immutable.fromJS({ [entityUri]: parsedContent })
+                )
+              );
+            });
         }
-
-        return undefined;
       });
+    },
+    [entityUris]
+  );
 
-  return (
-    <wikidata-viewer class={className}>
-      <div className="wikidatav__header">
-        {icon}
-        {label}
+  const generateWikiDataContentElement = entityUri => {
+    const wikiDataContent = get(externalDataState, entityUri);
+
+    const title = get(wikiDataContent, "title");
+    const personaName = get(wikiDataContent, "personaName");
+    const imageUrl = get(wikiDataContent, "imageUrl");
+
+    const dataElement = (
+      <div className="wikidatav__content__data">
+        {imageUrl ? (
+          <a
+            className="wikidatav__content__data__image clickable"
+            href={imageUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img src={imageUrl} />
+          </a>
+        ) : (
+          <div />
+        )}
+        {(title || personaName) && (
+          <div className="wikidatav__content__data__title">
+            {title || personaName}
+          </div>
+        )}
       </div>
-      <div className="wikidatav__content">
+    );
+
+    const additionalContentDetailsMap =
+      wikiDataContent &&
+      wikiDataContent
+        .filter(
+          (_, contentDetailKey) =>
+            contentDetailKey !== "imageUrl" &&
+            //if there was a title, we add the personaName to the additional Details so we do not lose information
+            (title || contentDetailKey !== "personaName") &&
+            contentDetailKey !== "title"
+        )
+        .map((contentDetail, contentDetailKey) => {
+          const detailDefinitionImm = get(allDetailsImm, contentDetailKey);
+          if (detailDefinitionImm) {
+            const detailDefinition = detailDefinitionImm.toJS();
+            const ReactViewerComponent =
+              detailDefinition && detailDefinition.viewerComponent;
+
+            if (ReactViewerComponent) {
+              return (
+                <div
+                  key={contentDetailKey}
+                  className="wikidatav__content__additionalData__content__detail"
+                >
+                  <ReactViewerComponent
+                    detail={detailDefinition}
+                    content={contentDetail}
+                  />
+                </div>
+              );
+            }
+          }
+
+          return undefined;
+        });
+
+    return (
+      <div className="wikidatav__content" key={entityUri}>
         {wikiDataContent ? (
           <React.Fragment>
             {dataElement}
@@ -209,11 +204,21 @@ export default function WikiDataViewer({ content, detail, className }) {
           </div>
         )}
       </div>
+    );
+  };
+
+  return (
+    <wikidata-viewer class={className}>
+      <div className="wikidatav__header">
+        {icon}
+        {label}
+      </div>
+      {entityUris && entityUris.map(generateWikiDataContentElement)}
     </wikidata-viewer>
   );
 }
 WikiDataViewer.propTypes = {
   detail: PropTypes.object,
-  content: PropTypes.string,
+  content: PropTypes.object,
   className: PropTypes.string,
 };
