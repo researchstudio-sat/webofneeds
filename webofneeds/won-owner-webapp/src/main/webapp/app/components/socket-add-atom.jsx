@@ -53,7 +53,7 @@ export default function WonSocketAddAtom({
         !(isAddToAtomOwned && get(reaction, "refuseOwned"))
     ),
     "useCaseIdentifiers"
-  ).filter(ucIdentifier => ucIdentifier !== "persona");
+  ).filter(ucIdentifier => ucIdentifier !== "persona" || ucIdentifier !== "*");
   const allowAdHoc =
     !!adHocUseCaseIdentifiers && adHocUseCaseIdentifiers.size === 1;
 
