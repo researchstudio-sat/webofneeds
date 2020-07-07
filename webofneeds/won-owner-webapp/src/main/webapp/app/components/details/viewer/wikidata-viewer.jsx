@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import rdfFetch from "@rdfjs/fetch";
-import cf from "clownface";
 
 import PropTypes from "prop-types";
-import Immutable from "immutable";
 import * as useCaseUtils from "../../../usecase-utils";
+import * as processUtils from "../../../redux/utils/process-utils.js";
 import * as generalSelectors from "../../../redux/selectors/general-selectors.js";
 import { get } from "../../../utils";
 
@@ -19,11 +17,10 @@ import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 export default function WikiDataViewer({ content, detail, className }) {
   const dispatch = useDispatch();
   const entityUris = content && content.map(uri => uri.replace(/\/$/, ""));
-
   const externalDataState = useSelector(generalSelectors.getExternalDataState);
+  const processState = useSelector(generalSelectors.getProcessState);
 
   const [showAdditionalData, toggleAdditionalData] = useState(false);
-  const detailsToParse = useCaseUtils.getAllDetails();
   const allDetailsImm = useCaseUtils.getAllDetailsImm();
 
   const icon = detail.icon && (
@@ -36,49 +33,15 @@ export default function WikiDataViewer({ content, detail, className }) {
     <span className="wikidatav__header__label">{detail.label}</span>
   );
 
-  function generateContentFromCF(cfEntityData, detailsToParse) {
-    let content = {};
-    if (cfEntityData && detailsToParse) {
-      for (const detailKey in detailsToParse) {
-        const detailToParse = detailsToParse[detailKey];
-        const detailIdentifier = detailToParse && detailToParse.identifier;
-        const detailValue =
-          detailToParse &&
-          detailToParse.parseFromCF &&
-          detailToParse.parseFromCF(cfEntityData);
-
-        if (detailIdentifier && detailValue) {
-          content[detailIdentifier] = detailValue;
-        }
-      }
-    }
-
-    return content;
-  }
-
   useEffect(
     () => {
       entityUris.map(entityUri => {
-        if (entityUri && !externalDataState.get(entityUri)) {
-          const entityId = entityUri.substr(entityUri.lastIndexOf("/") + 1);
-          const specialDataUrl = `https://www.wikidata.org/wiki/Special:EntityData/${entityId}.ttl`;
-
-          rdfFetch(specialDataUrl)
-            .then(response => response.dataset())
-            .then(dataset => {
-              const cfData = cf({ dataset });
-
-              const cfEntity = cfData.namedNode(entityUri);
-
-              return generateContentFromCF(cfEntity, detailsToParse);
-            })
-            .then(parsedContent => {
-              dispatch(
-                actionCreators.externalData__store(
-                  Immutable.fromJS({ [entityUri]: parsedContent })
-                )
-              );
-            });
+        if (
+          entityUri &&
+          !processUtils.isExternalDataLoading(processState, entityUri) &&
+          !get(externalDataState, entityUri)
+        ) {
+          dispatch(actionCreators.externalData__fetchWikiData(entityUri));
         }
       });
     },
@@ -181,7 +144,7 @@ export default function WikiDataViewer({ content, detail, className }) {
                       className="wikidatav__content__additionalData__content__link rdflink clickable"
                       target="_blank"
                       rel="noopener noreferrer"
-                      href={content}
+                      href={entityUri}
                     >
                       <svg className="rdflink__small">
                         <use xlinkHref={rdf_logo_1} href={rdf_logo_1} />

@@ -20,8 +20,14 @@ const initialState = Immutable.fromJS({
   processingWhatsNew: false,
   processingWhatsAround: false,
   processingMetaAtoms: false,
+  externalData: Immutable.Map(),
   atoms: Immutable.Map(),
   connections: Immutable.Map(),
+});
+
+export const emptyExternalDataProcess = Immutable.fromJS({
+  loading: false,
+  failedToLoad: false,
 });
 
 export const emptyAtomProcess = Immutable.fromJS({
@@ -57,6 +63,25 @@ export const emptyConnectionProcess = Immutable.fromJS({
 export const emptyMessagesProcess = Immutable.fromJS({
   failedToLoad: false,
 });
+
+function updateExternalDataProcess(processState, externalDataUri, payload) {
+  if (!externalDataUri) {
+    return processState;
+  }
+
+  const oldExternalDataProcess = getIn(processState, [
+    "externalData",
+    externalDataUri,
+  ]);
+  const payloadImm = Immutable.fromJS(payload);
+
+  return processState.setIn(
+    ["externalData", externalDataUri],
+    oldExternalDataProcess
+      ? oldExternalDataProcess.mergeDeep(payloadImm)
+      : emptyExternalDataProcess.mergeDeep(payloadImm)
+  );
+}
 
 function updateAtomProcess(processState, atomUri, payload) {
   if (!atomUri) {
@@ -532,6 +557,20 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
+    case actionTypes.externalData.store: {
+      const data = get(action, "payload");
+
+      data &&
+        data.mapKeys(uri => {
+          processState = updateExternalDataProcess(processState, uri, {
+            failedToLoad: false,
+            loading: false,
+          });
+        });
+
+      return processState;
+    }
+
     case actionTypes.atoms.store:
     case actionTypes.personas.store: {
       let atoms = get(action.payload, "atoms");
@@ -588,6 +627,22 @@ export default function(processState = initialState, action = {}) {
           toLoad: false,
           loading: true,
         });
+      }
+      return processState;
+    }
+
+    case actionTypes.externalData.storeUriInLoading: {
+      const externalDataUri = get(action.payload, "uri");
+
+      if (externalDataUri) {
+        processState = updateExternalDataProcess(
+          processState,
+          externalDataUri,
+          {
+            loading: true,
+            failedToLoad: false,
+          }
+        );
       }
       return processState;
     }

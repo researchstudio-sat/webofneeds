@@ -7,6 +7,7 @@ import PropTypes from "prop-types";
 import _ from "lodash";
 import WonTitlePicker from "./title-picker";
 import WikiDataViewer from "~/app/components/details/viewer/wikidata-viewer";
+import { searchWikiData } from "~/app/api/wikidata-api";
 
 export default function WikiDataPicker({
   initialValue,
@@ -24,13 +25,9 @@ export default function WikiDataPicker({
   const [searchResults, setSearchResults] = useState([]);
 
   const startSearch = _.debounce(value => {
-    const url = `https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${encodeURIComponent(
-      value
-    )}&format=json&language=en&limit=20&origin=*`;
-
-    fetch(url)
-      .then(resp => resp.json())
-      .then(results => setSearchResults(get(results, "search") || []));
+    searchWikiData(value).then(results =>
+      setSearchResults(get(results, "search") || [])
+    );
   }, 700);
 
   function resetClassifiedAsSearchInput() {

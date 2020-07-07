@@ -84,27 +84,6 @@ pokemon-raid-card {
       }
     }
   }
-
-  // Defines the height of the (no)persona-div, so that they no-persona is the same height as attached personas
-  --persona-height: 2.5rem;
-
-  .card__nopersona {
-    grid-area: card__persona;
-    margin-top: 0.5rem;
-    display: grid;
-    grid-column-gap: 0.5rem;
-    padding-top: 0.5rem;
-    border-top: $thinGrayBorder;
-    justify-items: center;
-    align-items: center;
-    height: var(--persona-height);
-
-    &__label {
-      font-size: $smallFontSize;
-      color: $won-line-gray;
-    }
-  }
-
   .card__indicators {
     grid-area: card__indicators;
     margin-top: 0.5rem;
@@ -112,63 +91,6 @@ pokemon-raid-card {
 
   .card__persona {
     grid-area: card__persona;
-
-    margin-top: 0.5rem;
-
-    display: grid;
-    grid-template-areas: "card__persona__icon card__persona__name";
-    grid-template-columns: var(--persona-height) 1fr;
-    grid-column-gap: 0.5rem;
-    padding-top: 0.5rem;
-    border-top: $thinGrayBorder;
-
-    &__icon {
-      grid-area: card__persona__icon;
-
-      border-radius: 100%;
-      @include fixed-square(var(--persona-height));
-      background: white;
-
-      &.holderUseCaseIcon {
-        border-radius: 0;
-        background: unset;
-        padding: 0.2rem;
-        box-sizing: border-box;
-
-        & .si__serviceatomicon {
-          display: flex;
-          --local-primary: #{$won-secondary-text-color};
-          height: 100%;
-          width: 100%;
-        }
-      }
-    }
-
-    &__name {
-      color: $won-primary-text-color;
-      grid-area: card__persona__name;
-      display: flex;
-      align-items: center;
-
-      &__label {
-        font-size: $normalFontSize;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      &__verification {
-        font-size: $smallFontSize;
-        margin-left: 0.25rem;
-
-        &--verified {
-          color: $won-line-gray;
-        }
-        &--unverified {
-          color: $won-unread-attention;
-        }
-      }
-    }
   }
 
   .card__main {

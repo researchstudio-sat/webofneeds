@@ -141,6 +141,10 @@ export function isAtomLoaded(process, atomUri) {
   return atomUri && getIn(process, ["atoms", atomUri, "loaded"]);
 }
 
+export function isExternalDataLoading(process, uri) {
+  return uri && getIn(process, ["externalData", uri, "loading"]);
+}
+
 export function isAtomProcessExisting(process, atomUri) {
   return atomUri && !!getIn(process, ["atoms", atomUri]);
 }
