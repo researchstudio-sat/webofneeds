@@ -23,7 +23,6 @@ export const cyclingPlan = {
     ...mergeInEmptyDraft({
       content: {
         type: ["s:PlanAction"],
-        title: "Let's go for a bike ride!",
         eventObjectAboutUris: "http://www.wikidata.org/entity/Q53121",
         sockets: {
           "#groupSocket": vocab.GROUP.GroupSocketCompacted,
@@ -112,7 +111,6 @@ export const cyclingInterest = {
       content: {
         type: ["demo:Interest"],
         eventObjectAboutUris: "http://www.wikidata.org/entity/Q53121",
-        title: "I am interested in cycling!",
       },
       seeks: {},
     }),

@@ -19,7 +19,6 @@ export const getBreakfast = {
     ...mergeInEmptyDraft({
       content: {
         type: ["demo:Breakfast"],
-        title: "I'm up for breakfast! Any plans?",
         tags: ["breakfast"],
         searchString: "breakfast",
       },

@@ -20,7 +20,7 @@ export const taxiOffer = {
   doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
-      content: { title: "Taxi", type: ["s:TaxiService"] },
+      content: { type: ["s:TaxiService"] },
     }),
   },
   reactions: {

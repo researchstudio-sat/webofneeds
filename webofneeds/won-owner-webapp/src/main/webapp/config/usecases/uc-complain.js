@@ -20,7 +20,6 @@ export const complain = {
     ...mergeInEmptyDraft({
       content: {
         type: ["demo:Complaint"],
-        title: "WTF?",
         tags: ["wtf"],
       },
       seeks: {

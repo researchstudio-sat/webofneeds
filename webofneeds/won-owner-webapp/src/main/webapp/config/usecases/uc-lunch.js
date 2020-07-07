@@ -23,7 +23,6 @@ export const lunchPlan = {
     ...mergeInEmptyDraft({
       content: {
         type: ["s:PlanAction"],
-        title: "Let's go get lunch!",
         eventObjectAboutUris: "http://www.wikidata.org/entity/Q12896105",
         sockets: {
           "#groupSocket": vocab.GROUP.GroupSocketCompacted,
@@ -110,7 +109,6 @@ export const lunchInterest = {
       content: {
         type: ["demo:Interest"],
         eventObjectAboutUris: "http://www.wikidata.org/entity/Q12896105",
-        title: "I am interested in meeting up for lunch!",
       },
       seeks: {},
     }),

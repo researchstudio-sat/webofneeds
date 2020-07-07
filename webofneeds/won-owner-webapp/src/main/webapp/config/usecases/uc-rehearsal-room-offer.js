@@ -33,7 +33,6 @@ export const rehearsalRoomOffer = {
     ...mergeInEmptyDraft({
       content: {
         type: ["demo:RehearsalRoomRentOffer"],
-        title: "Offer Rehearsal Room!",
       },
       seeks: {
         type: ["demo:RehearsalRoomRentDemand"],
