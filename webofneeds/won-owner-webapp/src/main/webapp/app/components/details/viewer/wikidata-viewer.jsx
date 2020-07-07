@@ -144,7 +144,7 @@ export default function WikiDataViewer({ content, detail, className }) {
                       className="wikidatav__content__additionalData__content__link rdflink clickable"
                       target="_blank"
                       rel="noopener noreferrer"
-                      href={content}
+                      href={entityUri}
                     >
                       <svg className="rdflink__small">
                         <use xlinkHref={rdf_logo_1} href={rdf_logo_1} />
