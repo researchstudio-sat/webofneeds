@@ -692,7 +692,8 @@ export function getUseCaseLabel(identifier) {
 }
 
 export function getUseCaseIcon(identifier) {
-  return getIn(useCasesImm, [identifier, "icon"]);
+  const iconImm = getIn(useCasesImm, [identifier, "icon"]);
+  return iconImm && iconImm.toJS();
 }
 
 function isInVisibleUseCaseArray(useCase, visibleUseCasesArray) {
