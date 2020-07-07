@@ -526,7 +526,7 @@ export const sockets = {
 */
 export const eventObjectAboutUris = {
   identifier: "eventObjectAboutUris",
-  label: "Event",
+  label: "Topic",
   icon: ico36_detail_title,
   placeholder: "What? (Short title shown in lists)",
   parseToRDF: function({ value }) {
