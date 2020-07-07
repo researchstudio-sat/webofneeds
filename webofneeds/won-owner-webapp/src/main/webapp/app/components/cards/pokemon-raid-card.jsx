@@ -45,6 +45,7 @@ export default function PokemonRaidCard({
   const atomHasHoldableSocket = atomUtils.hasHoldableSocket(atom);
   const isGroupChatEnabled = atomUtils.hasGroupSocket(atom);
   const isChatEnabled = atomUtils.hasChatSocket(atom);
+  const externalDataState = useSelector(generalSelectors.getExternalDataState);
   const globalLastUpdateTime = useSelector(
     generalSelectors.selectLastUpdateTime
   );
@@ -77,7 +78,7 @@ export default function PokemonRaidCard({
   }
 
   function createCardMainTopline() {
-    const title = get(atom, "humanReadable");
+    const title = atomUtils.getTitle(atom, externalDataState);
 
     return (
       <div className="card__main__topline">

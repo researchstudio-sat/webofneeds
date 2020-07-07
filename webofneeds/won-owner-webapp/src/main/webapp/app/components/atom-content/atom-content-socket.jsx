@@ -47,16 +47,22 @@ export default function WonAtomContentSocket({
   const [searchText, setSearchText] = useState({ value: "" });
 
   const storedAtoms = useSelector(generalSelectors.getAtoms);
+  const externalDataState = useSelector(generalSelectors.getExternalDataState);
 
   const socketUri = atomUtils.getSocketUri(atom, socketType);
-  const filteredStoredAtoms = filterAtomsBySearchValue(storedAtoms, searchText);
+  const filteredStoredAtoms = filterAtomsBySearchValue(
+    storedAtoms,
+    searchText,
+    externalDataState
+  );
 
   const reactions = atomUtils.getReactions(atom, socketType);
 
   const connections = filterConnectionsBySearchValue(
     relevantConnections,
     storedAtoms,
-    searchText
+    searchText,
+    externalDataState
   );
 
   // If an atom is owned we display all connStates, if the atom is not owned we only display connected states

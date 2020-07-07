@@ -49,13 +49,9 @@ export default function WonInterestCard({
         .filter(data => !!data)
     : Immutable.Map();
 
-  const wikiDataHumanReadable = [];
   const wikiDataImageUrls = [];
   externalDataMap.map(data => {
     const wikiDataImageUrl = get(data, "imageUrl");
-    const wikiDataName = get(data, "personaName");
-    const wikiDataTitle = get(data, "title");
-    wikiDataHumanReadable.push(wikiDataName || wikiDataTitle);
     wikiDataImageUrl && wikiDataImageUrls.push(wikiDataImageUrl);
   });
 
@@ -77,16 +73,12 @@ export default function WonInterestCard({
   }
 
   function createCardMainTopline() {
-    const humanReadable = get(atom, "humanReadable");
+    const title = atomUtils.getTitle(atom, externalDataState);
 
     return (
       <div className="card__main__topline">
-        {wikiDataHumanReadable.length > 0 ? (
-          <div className="card__main__topline__title">
-            {wikiDataHumanReadable.join(", ")}
-          </div>
-        ) : humanReadable ? (
-          <div className="card__main__topline__title">{humanReadable}</div>
+        {title ? (
+          <div className="card__main__topline__title">{title}</div>
         ) : (
           <div className="card__main__topline__notitle">No Title</div>
         )}

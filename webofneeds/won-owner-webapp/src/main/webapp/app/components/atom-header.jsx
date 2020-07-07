@@ -27,8 +27,9 @@ export default function WonAtomHeader({
   const atomUri = get(atom, "uri");
 
   const personaUri = atomUtils.getHeldByUri(atom);
+  const externalDataState = useSelector(generalSelectors.getExternalDataState);
   const persona = useSelector(generalSelectors.getAtom(personaUri));
-  const personaName = get(persona, "humanReadable");
+  const personaName = atomUtils.getTitle(persona, externalDataState);
 
   const processState = useSelector(generalSelectors.getProcessState);
 
@@ -48,7 +49,7 @@ export default function WonAtomHeader({
     atom &&
     relativeTime(globalUpdateTimestamp, get(atom, "lastUpdateDate"));
 
-  const title = get(atom, "humanReadable");
+  const title = atomUtils.getTitle(atom, externalDataState);
 
   function ensureAtomIsLoaded() {
     if (atomUri && (!atom || (atomToLoad && !atomLoading))) {

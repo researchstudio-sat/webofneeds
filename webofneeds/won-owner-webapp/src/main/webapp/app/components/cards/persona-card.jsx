@@ -8,12 +8,15 @@ import * as atomUtils from "../../redux/utils/atom-utils.js";
 
 import "~/style/_persona-card.scss";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import * as generalSelectors from "~/app/redux/selectors/general-selectors";
 
 export default function WonPersonaCard({ atom }) {
   const identiconSvg = atomUtils.getIdenticonSvg(atom);
   const atomImage = atomUtils.getDefaultPersonaImage(atom);
   const isInactive = atomUtils.isInactive(atom);
-  const personaName = get(atom, "humanReadable");
+  const externalDataState = useSelector(generalSelectors.getExternalDataState);
+  const personaName = atomUtils.getTitle(atom, externalDataState);
   const showDefaultIcon = !atomImage;
 
   const personaIdenticon =

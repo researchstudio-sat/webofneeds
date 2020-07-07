@@ -32,12 +32,14 @@ export default function WonAtomHeaderBig({
   const persona = get(storedAtoms, personaUri);
   const personaName =
     atomUtils.hasHoldableSocket(atom) && !atomUtils.hasGroupSocket(atom)
-      ? get(persona, "humanReadable") || get(atom, "fakePersonaName")
+      ? atomUtils.getTitle(persona, externalDataState) ||
+        get(atom, "fakePersonaName")
       : undefined;
   const accountState = useSelector(generalSelectors.getAccountState);
   const ownedAtomsWithBuddySocket = useSelector(
     generalSelectors.getOwnedAtomsWithBuddySocket
   );
+  const externalDataState = useSelector(generalSelectors.getExternalDataState);
   const hasOwnedAtomsWithBuddySocket =
     ownedAtomsWithBuddySocket &&
     ownedAtomsWithBuddySocket
@@ -51,7 +53,7 @@ export default function WonAtomHeaderBig({
     hasOwnedAtomsWithBuddySocket &&
     !accountUtils.isAtomOwned(accountState, atomUri);
 
-  const title = get(atom, "humanReadable");
+  const title = atomUtils.getTitle(atom, externalDataState);
 
   const titleElement = title ? (
     <h1 className="ahb__title">{title}</h1>

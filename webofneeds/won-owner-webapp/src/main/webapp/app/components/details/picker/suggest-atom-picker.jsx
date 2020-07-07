@@ -8,6 +8,7 @@ import Immutable from "immutable";
 import PropTypes from "prop-types";
 
 import { get, getIn, sortBy } from "../../../utils.js";
+import * as atomUtils from "../../../redux/utils/atom-utils.js";
 import * as generalSelectors from "../../../redux/selectors/general-selectors.js";
 import WonAtomHeader from "../../atom-header.jsx";
 import WonLabelledHr from "../../labelled-hr.jsx";
@@ -18,6 +19,7 @@ import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 import ico36_close from "~/images/won-icons/ico36_close.svg";
 
 const mapStateToProps = (state, ownProps) => {
+  const externalDataState = generalSelectors.getExternalDataState(state);
   const hasAtLeastOneAllowedSocket = (atom, allowedSockets) => {
     if (allowedSockets) {
       const allowedSocketsImm = Immutable.fromJS(allowedSockets);
@@ -65,8 +67,8 @@ const mapStateToProps = (state, ownProps) => {
   const sortedActiveAtomsArray =
     allSuggestableAtoms &&
     sortBy(allSuggestableAtoms, elem => {
-      const humanReadable = get(elem, "humanReadable");
-      return humanReadable ? humanReadable.toLowerCase() : undefined;
+      const title = atomUtils.getTitle(elem, externalDataState);
+      return title ? title.toLowerCase() : undefined;
     });
 
   return {

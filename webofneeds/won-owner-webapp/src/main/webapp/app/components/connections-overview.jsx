@@ -19,11 +19,13 @@ export default function WonConnectionsOverview() {
   const [searchText, setSearchText] = useState({ value: "" });
 
   const storedAtoms = useSelector(generalSelectors.getAtoms);
+  const externalDataState = useSelector(generalSelectors.getExternalDataState);
 
   let allChatConnections = filterConnectionsBySearchValue(
     useSelector(generalSelectors.getAllChatConnections),
     storedAtoms,
     searchText,
+    externalDataState,
     true,
     true
   );

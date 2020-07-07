@@ -53,6 +53,37 @@ export function matchesDefinition(atom, useCaseDefinition) {
   );
 }
 
+/**
+ * Generates the Title Based on the Human Readable but use externalDataState if available
+ * @param atom
+ * @param externalDataState
+ * @returns {any}
+ */
+export function getTitle(atom, externalDataState, separator = ", ") {
+  const eventObjectAboutUris = getIn(atom, ["content", "eventObjectAboutUris"]);
+
+  const externalDataMap =
+    eventObjectAboutUris &&
+    eventObjectAboutUris
+      .map(uri => get(externalDataState, uri))
+      .filter(data => !!data);
+
+  const wikiDataHumanReadable = [];
+
+  externalDataMap &&
+    externalDataMap.map(data => {
+      const wikiDataName = get(data, "personaName");
+      const wikiDataTitle = get(data, "title");
+      if (wikiDataName || wikiDataTitle) {
+        wikiDataHumanReadable.push(wikiDataName || wikiDataTitle);
+      }
+    });
+
+  return wikiDataHumanReadable.length > 0
+    ? wikiDataHumanReadable.join(separator)
+    : get(atom, "humanReadable");
+}
+
 export function getBackground(atom) {
   return get(atom, "background");
 }

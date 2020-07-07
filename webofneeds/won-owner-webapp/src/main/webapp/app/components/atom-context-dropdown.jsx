@@ -46,6 +46,7 @@ export default function WonAtomContextDropdown({ atom, className }) {
   }
 
   const process = useSelector(generalSelectors.getProcessState);
+  const externalDataState = useSelector(generalSelectors.getExternalDataState);
 
   const theme = useSelector(generalSelectors.getTheme);
   const adminEmail = get(theme, "adminEmail");
@@ -74,7 +75,10 @@ export default function WonAtomContextDropdown({ atom, className }) {
 
   function exportPdf() {
     if (!atom) return;
-    const docDefinition = wonUtils.createDocumentDefinitionFromPost(atom);
+    const docDefinition = wonUtils.createDocumentDefinitionFromPost(
+      atom,
+      externalDataState
+    );
 
     if (docDefinition) {
       import(/* webpackChunkName: "pdfExport" */ "../pdfExport").then(

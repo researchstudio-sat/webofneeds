@@ -174,7 +174,10 @@ export function closedBySystem(event) {
       type: actionTypes.atoms.closedBySystem,
       payload: {
         atomUri: event.getAtom(),
-        humanReadable: get(atom, "humanReadable"),
+        humanReadable: atomUtils.getTitle(
+          atom,
+          generalSelectors.getExternalDataState(getState())
+        ),
         message: event.getTextMessage(),
       },
     });
