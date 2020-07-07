@@ -7,6 +7,10 @@ import { parseMetaAtom } from "../reducers/atom-reducer/parse-atom.js";
 import { get, getIn, is } from "../utils.js";
 import won from "../won-es6";
 import vocab from "../service/vocab.js";
+import { fetchWikiData } from "~/app/api/wikidata-api";
+import cf from "clownface";
+import { actionCreators } from "../actions/actions";
+import * as useCaseUtils from "~/app/usecase-utils";
 
 export function fetchOwnedData(dispatch, getState) {
   return ownerApi
@@ -586,3 +590,58 @@ function urisToLookupMap(
     return lookupMap;
   });
 }
+
+export const storeWikiData = (uri, dispatch, getState) => {
+  const processState = get(getState(), "process");
+
+  if (processUtils.isExternalDataLoading(processState, uri)) {
+    console.debug(
+      "Omit Fetch of WikiData<",
+      uri,
+      ">, it is currently loading..."
+    );
+    return Promise.resolve();
+  }
+  console.debug("Proceed Fetch of WikiData<", uri, ">");
+
+  dispatch({
+    type: actionTypes.externalData.storeUriInLoading,
+    payload: Immutable.fromJS({ uri: uri }),
+  });
+
+  return fetchWikiData(uri)
+    .then(dataset => {
+      const cfData = cf({ dataset });
+      const detailsToParse = useCaseUtils.getAllDetails();
+      const cfEntity = cfData.namedNode(uri);
+
+      const generateContentFromCF = (cfEntityData, detailsToParse) => {
+        let content = {};
+        if (cfEntityData && detailsToParse) {
+          for (const detailKey in detailsToParse) {
+            const detailToParse = detailsToParse[detailKey];
+            const detailIdentifier = detailToParse && detailToParse.identifier;
+            const detailValue =
+              detailToParse &&
+              detailToParse.parseFromCF &&
+              detailToParse.parseFromCF(cfEntityData);
+
+            if (detailIdentifier && detailValue) {
+              content[detailIdentifier] = detailValue;
+            }
+          }
+        }
+
+        return content;
+      };
+
+      return generateContentFromCF(cfEntity, detailsToParse);
+    })
+    .then(parsedContent => {
+      dispatch(
+        actionCreators.externalData__store(
+          Immutable.fromJS({ [uri]: parsedContent })
+        )
+      );
+    });
+};

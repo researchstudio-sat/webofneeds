@@ -64,6 +64,7 @@ import {
 } from "./load-action.js";
 import { deepFreeze } from "../utils.js";
 import won from "../won-es6";
+import * as stateStore from "~/app/redux/state-store";
 
 /**
  * all values equal to this string will be replaced by action-creators that simply
@@ -151,6 +152,9 @@ const actionHierarchy = {
     markAsLoaded: INJ_DEFAULT,
   },
   externalData: {
+    fetchWikiData: uri => (dispatch, getState) =>
+      stateStore.storeWikiData(uri, dispatch, getState),
+    storeUriInLoading: INJ_DEFAULT,
     store: INJ_DEFAULT,
   },
   personas: {
