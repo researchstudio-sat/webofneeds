@@ -1,11 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { actionCreators } from "../actions/actions.js";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
 
 import { sortBy, get, generateLink } from "../utils.js";
 import vocab from "../service/vocab.js";
+import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as wonLabelUtils from "../won-label-utils.js";
@@ -45,6 +46,7 @@ export default function WonSocketAddAtom({
   const addToAtomUri = get(addToAtom, "uri");
   const addToAtomSocketUri = atomUtils.getSocketUri(addToAtom, addToSocketType);
   const isAddToAtomOwned = accountUtils.isAtomOwned(accountState, addToAtomUri);
+  const externalDataState = useSelector(generalSelectors.getExternalDataState);
 
   const adHocUseCaseIdentifiers = get(
     reactions.find(
@@ -137,7 +139,7 @@ export default function WonSocketAddAtom({
   const sortedPossibleAtomsArray =
     sortedPossibleAtoms &&
     sortBy(sortedPossibleAtoms, elem => {
-      const humanReadable = get(elem, "humanReadable");
+      const humanReadable = atomUtils.getTitle(elem, externalDataState);
       return humanReadable ? humanReadable.toLowerCase() : undefined;
     });
 
@@ -252,13 +254,13 @@ export default function WonSocketAddAtom({
       const payload = {
         caption: wonLabelUtils.getSocketTabLabel(addToSocketType),
         text: isAddToAtomOwned
-          ? `Add '${get(
+          ? `Add '${atomUtils.getTitle(
               selectedAtom,
-              "humanReadable"
+              externalDataState
             )}' to ${wonLabelUtils.getSocketTabLabel(addToSocketType)}`
-          : `Request '${get(
+          : `Request '${atomUtils.getTitle(
               selectedAtom,
-              "humanReadable"
+              externalDataState
             )}' to be added in ${wonLabelUtils.getSocketTabLabel(
               addToSocketType
             )}`,

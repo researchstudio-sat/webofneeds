@@ -10,13 +10,14 @@ import {
 // import { getIn } from "../../app/utils.js";
 // import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
+import ico36_detail_datetime from "~/images/won-icons/ico36_detail_datetime.svg";
 import ico36_uc_question from "~/images/won-icons/ico36_uc_question.svg";
 import * as jsonLdUtils from "~/app/service/jsonld-utils";
 
 export const genericPlan = {
   identifier: "genericPlan",
   label: "Plan",
-  icon: ico36_uc_question,
+  icon: ico36_detail_datetime,
   doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({

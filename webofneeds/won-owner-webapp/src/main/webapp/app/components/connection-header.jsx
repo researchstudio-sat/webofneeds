@@ -51,19 +51,20 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
     getIn(state, ["atoms", targetAtomUri])
   );
 
-  const targetHolderName = useSelector(
-    state =>
-      atomUtils.hasHoldableSocket(targetAtom) &&
-      (getIn(state, [
-        "atoms",
-        atomUtils.getHeldByUri(targetAtom),
-        "humanReadable",
-      ]) ||
-        get(targetAtom, "fakePersonaName"))
-  );
-
   const processState = useSelector(generalSelectors.getProcessState);
   const accountState = useSelector(generalSelectors.getAccountState);
+  const externalDataState = useSelector(generalSelectors.getExternalDataState);
+
+  const targetHolderName = useSelector(state => {
+    if (atomUtils.hasHoldableSocket(targetAtom)) {
+      const holder = generalSelectors.getAtom(
+        atomUtils.getHeldByUri(targetAtom)
+      )(state);
+      const title = atomUtils.getTitle(holder, externalDataState);
+
+      return title || get(targetAtom, "fakePersonaName");
+    }
+  });
 
   const isTargetAtomOwned = accountUtils.isAtomOwned(
     accountState,
@@ -215,7 +216,7 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
         latestMessage && getHumanReadableStringFromMessage(latestMessage);
       const latestMessageUnread = messageUtils.isMessageUnread(latestMessage);
 
-      const title = get(targetAtom, "humanReadable");
+      const title = atomUtils.getTitle(targetAtom, externalDataState);
 
       const headerRightToplineContent = title ? (
         <div className="ch__right__topline__title" title={title}>

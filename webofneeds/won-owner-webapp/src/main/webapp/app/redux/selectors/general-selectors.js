@@ -343,13 +343,14 @@ export const getOwnedAtomsWithBuddySocket = createSelector(
  */
 export const getOwnedCondensedPersonaList = createSelector(
   getOwnedPersonas,
-  ownedPersonas => {
+  getExternalDataState,
+  (ownedPersonas, externalDataState) => {
     return (
       ownedPersonas &&
       ownedPersonas
         .filter(persona => atomUtils.isActive(persona))
         .map(persona => ({
-          displayName: get(persona, "humanReadable"),
+          displayName: atomUtils.getTitle(persona, externalDataState),
           website: getIn(persona, ["content", "website"]),
           aboutMe: getIn(persona, ["content", "description"]),
           url: get(persona, "uri"),

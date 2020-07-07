@@ -21,7 +21,6 @@ export const personalTransportSearch = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        title: "Need a lift",
         type: ["demo:PersonalTransportSearch"],
       },
     }),

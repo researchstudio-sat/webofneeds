@@ -5,7 +5,6 @@ import { organization } from "./uc-organization.js";
 import { newsarticle } from "./uc-newsarticle.js";
 import { handleComplaint } from "./uc-handle-complaint.js";
 import { customUseCase } from "./uc-custom.js";
-import { contactPaymentBot } from "./uc-contact-payment-bot.js";
 import { resource } from "./uc-resource.js";
 
 import {
@@ -58,6 +57,5 @@ export const otherGroup = {
       details: details,
       seeksDetails: details,
     },
-    contactPaymentBot: contactPaymentBot,
   },
 };

@@ -781,7 +781,10 @@ export function atomMessageReceived(wonMessage) {
       type: actionTypes.messages.atomMessageReceived,
       payload: {
         atomUri: targetAtomUri,
-        humanReadable: atom.get("humanReadable"),
+        humanReadable: atomUtils.getTitle(
+          atom,
+          generalSelectors.getExternalDataState(getState())
+        ),
         message: wonMessage.getTextMessage(),
       },
     });

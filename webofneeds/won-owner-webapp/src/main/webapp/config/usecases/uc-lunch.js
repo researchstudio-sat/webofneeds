@@ -11,18 +11,18 @@ import { getIn } from "../../app/utils.js";
 import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
+import ico36_detail_datetime from "../../images/won-icons/ico36_detail_datetime.svg";
 import ico36_uc_meal_half from "../../images/won-icons/ico36_uc_meal-half.svg";
 
 export const lunchPlan = {
   identifier: "lunchPlan",
   label: "Plan Lunch!",
-  icon: ico36_uc_meal_half,
+  icon: ico36_detail_datetime,
   doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {
         type: ["s:PlanAction"],
-        title: "Let's go get lunch!",
         eventObjectAboutUris: "http://www.wikidata.org/entity/Q12896105",
         sockets: {
           "#groupSocket": vocab.GROUP.GroupSocketCompacted,
@@ -109,7 +109,6 @@ export const lunchInterest = {
       content: {
         type: ["demo:Interest"],
         eventObjectAboutUris: "http://www.wikidata.org/entity/Q12896105",
-        title: "I am interested in meeting up for lunch!",
       },
       seeks: {},
     }),

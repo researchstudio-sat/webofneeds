@@ -4,6 +4,7 @@
 import React from "react";
 
 import PropTypes from "prop-types";
+import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import * as wonLabelUtils from "../../won-label-utils.js";
 import { get, getIn, generateLink } from "../../utils.js";
@@ -14,6 +15,7 @@ import WonReferencedMessageContent from "./referenced-message-content.jsx";
 
 import "~/style/_combined-message-content.scss";
 import { useHistory } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export default function WonCombinedMessageContent({
   message,
@@ -34,6 +36,7 @@ export default function WonCombinedMessageContent({
   const references = get(message, "references");
   const referencesProposes = get(references, "proposes");
   const referencesClaims = get(references, "claims");
+  const externalDataState = useSelector(generalSelectors.getExternalDataState);
 
   const originatorUri = get(message, "originatorUri");
   /*Extract persona name from message:
@@ -55,7 +58,7 @@ export default function WonCombinedMessageContent({
         : get(allAtoms, atomUtils.getHeldByUri(relevantAtom));
 
     personaName = relevantPersona
-      ? get(relevantPersona, "humanReadable")
+      ? atomUtils.getTitle(relevantPersona, externalDataState)
       : get(relevantAtom, "fakePersonaName");
   }
 

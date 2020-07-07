@@ -9,6 +9,7 @@ import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import WonOtherCard from "./cards/other-card.jsx";
 import WonSkeletonCard from "./cards/skeleton-card.jsx";
 import WonPersonaCard from "./cards/persona-card.jsx";
+import WonInterestCard from "./cards/interest-card.jsx";
 import PokemonRaidCard from "./cards/pokemon-raid-card.jsx";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
@@ -58,6 +59,18 @@ export default function WonAtomCard({
             showIndicators={showIndicators}
             showHolder={showHolder}
             currentLocation={currentLocation}
+          />
+        );
+        break;
+      case "lunchInterest":
+      case "cyclingInterest":
+      case "pokemonInterest":
+      case "genericInterest":
+        cardContent = (
+          <WonInterestCard
+            atom={atom}
+            showIndicators={showIndicators}
+            showHolder={showHolder}
           />
         );
         break;

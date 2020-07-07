@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { getHeldByUri } from "./redux/utils/atom-utils.js";
+import { getHeldByUri, getTitle } from "./redux/utils/atom-utils.js";
 import fakeNames from "./fakeNames.json";
 
 /**
@@ -387,6 +387,7 @@ export function sortByDate(
  * @param connectionsImm connections map to apply filter on
  * @param allAtomsImm all stored Atoms in the state
  * @param value searchValue
+ * @param externalDataState title might be composed by externalData
  * @param includeSenderAtom if true, also searches in senderAtom
  * @param includePersonas if true, also searches the attached Personas or the fakePersonaName within the atom
  * @returns {*}
@@ -395,6 +396,7 @@ export function filterConnectionsBySearchValue(
   connectionsImm,
   allAtomsImm,
   { value },
+  externalDataState,
   includeSenderAtom = false,
   includePersonas = false
 ) {
@@ -405,7 +407,7 @@ export function filterConnectionsBySearchValue(
 
     return connectionsImm.filter(conn => {
       const targetAtom = get(allAtomsImm, get(conn, "targetAtomUri"));
-      const targetAtomTitle = get(targetAtom, "humanReadable") || "";
+      const targetAtomTitle = getTitle(targetAtom, externalDataState) || "";
 
       let found = false;
 
@@ -417,7 +419,7 @@ export function filterConnectionsBySearchValue(
       if (includePersonas) {
         const targetPersona = get(allAtomsImm, getHeldByUri(targetAtom));
         const targetPersonaTitle =
-          get(targetPersona, "humanReadable") ||
+          getTitle(targetPersona, externalDataState) ||
           get(targetAtom, "fakePersonaName") ||
           "";
 
@@ -433,7 +435,7 @@ export function filterConnectionsBySearchValue(
           allAtomsImm,
           extractAtomUriFromConnectionUri(get(conn, "uri"))
         );
-        const senderAtomTitle = get(senderAtom, "humanReadable") || "";
+        const senderAtomTitle = getTitle(senderAtom, externalDataState) || "";
 
         found = senderAtomTitle.search(regExp) !== -1;
         if (found) {
@@ -443,7 +445,7 @@ export function filterConnectionsBySearchValue(
         if (includePersonas) {
           const senderPersona = get(allAtomsImm, getHeldByUri(senderAtom));
           const senderPersonaTitle =
-            get(senderPersona, "humanReadable") ||
+            getTitle(senderPersona, externalDataState) ||
             get(senderAtom, "fakePersonaName") ||
             "";
 
@@ -465,16 +467,21 @@ export function filterConnectionsBySearchValue(
  * check only looks into the humanReadable of the atom(s)
  * @param allAtomsImm atoms to filter in the state
  * @param value searchValue
+ * @param externalDataState title might be composed by externalData
  * @returns {*}
  */
-export function filterAtomsBySearchValue(allAtomsImm, { value }) {
+export function filterAtomsBySearchValue(
+  allAtomsImm,
+  { value },
+  externalDataState
+) {
   const tempSearchText = value.trim();
 
   if (allAtomsImm && tempSearchText.length > 0) {
     const regExp = new RegExp(tempSearchText, "i");
 
     return allAtomsImm.filter(
-      atom => (get(atom, "humanReadable") || "").search(regExp) !== -1
+      atom => (getTitle(atom, externalDataState) || "").search(regExp) !== -1
     );
   }
   return allAtomsImm;

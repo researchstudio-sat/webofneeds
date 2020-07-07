@@ -19,7 +19,6 @@ export const getToKnow = {
     ...mergeInEmptyDraft({
       content: {
         type: ["demo:Meetup"],
-        title: "I'm up for meeting new people!",
         tags: ["meetup"],
         searchString: "meetup",
       },

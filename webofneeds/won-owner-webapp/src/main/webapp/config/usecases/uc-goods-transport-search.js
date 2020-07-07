@@ -22,7 +22,6 @@ export const goodsTransportSearch = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        title: "Want to send something",
         type: ["http://www.wikidata.org/entity/Q319224"],
       },
     }),

@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { actionCreators } from "../../actions/actions.js";
-import { get, getQueryParams } from "../../utils.js";
+import { getQueryParams } from "../../utils.js";
+import * as atomUtils from "../../redux/utils/atom-utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import * as processUtils from "../../redux/utils/process-utils.js";
@@ -31,9 +32,10 @@ export default function PagePost() {
 
   const processState = useSelector(generalSelectors.getProcessState);
   const accountState = useSelector(generalSelectors.getAccountState);
+  const externalDataState = useSelector(generalSelectors.getExternalDataState);
 
   const isLoggedIn = accountUtils.isLoggedIn(accountState);
-  const atomTitle = get(atom, "humanReadable");
+  const atomTitle = atomUtils.getTitle(atom, externalDataState);
   const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
   const showModalDialog = useSelector(viewSelectors.showModalDialog);
   const atomLoading =

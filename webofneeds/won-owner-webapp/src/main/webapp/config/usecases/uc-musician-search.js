@@ -28,7 +28,6 @@ export const musicianSearch = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        title: "Looking for a Musician!",
         type: ["s:MusicGroup"],
       },
       seeks: {

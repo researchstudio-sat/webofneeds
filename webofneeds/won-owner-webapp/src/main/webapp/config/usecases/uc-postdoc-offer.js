@@ -20,7 +20,6 @@ export const postdocOffer = {
     ...mergeInEmptyDraft({
       content: {
         type: ["demo:PostDocPosition"],
-        title: "I'm offering a PostDoc position!",
         tags: ["offer-postdoc"],
         searchString: "search-postdoc",
       },

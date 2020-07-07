@@ -3,20 +3,25 @@
  */
 import React from "react";
 import { useSelector } from "react-redux";
-import { get, generateLink } from "../../utils.js";
+import { get, getIn, generateLink } from "../../utils.js";
 import PropTypes from "prop-types";
+import Immutable from "immutable";
 
-import WonAtomMap from "../atom-map.jsx";
 import WonAtomConnectionsIndicator from "../atom-connections-indicator.jsx";
 import WonHolderSnippet from "./snippets/holder-snippet.jsx";
+import WonAtomMap from "../atom-map.jsx";
+import SwipeableViews from "react-swipeable-views";
+import { autoPlay } from "react-swipeable-views-utils";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import { relativeTime } from "../../won-label-utils.js";
 
-import "~/style/_other-card.scss";
+import "~/style/_interest-card.scss";
 import { Link } from "react-router-dom";
 
-export default function WonOtherCard({
+const AutoPlaySwipeableViews = autoPlay(SwipeableViews);
+
+export default function WonInterestCard({
   atom,
   showIndicators,
   showHolder,
@@ -28,41 +33,38 @@ export default function WonOtherCard({
   const identiconSvg = !useCaseIcon
     ? atomUtils.getIdenticonSvg(atom)
     : undefined;
-  const atomImage = atomUtils.getDefaultImage(atom);
+
   const atomLocation = atomUtils.getLocation(atom);
   const holderUri = atomUtils.getHeldByUri(atom);
   const holder = useSelector(generalSelectors.getAtom(holderUri));
   const isInactive = atomUtils.isInactive(atom);
   const atomTypeLabel = atomUtils.generateTypeLabel(atom);
   const atomHasHoldableSocket = atomUtils.hasHoldableSocket(atom);
-  const isGroupChatEnabled = atomUtils.hasGroupSocket(atom);
-  const isChatEnabled = atomUtils.hasChatSocket(atom);
   const externalDataState = useSelector(generalSelectors.getExternalDataState);
+  const eventObjectAboutUris = getIn(atom, ["content", "eventObjectAboutUris"]);
+
+  const externalDataMap = eventObjectAboutUris
+    ? eventObjectAboutUris
+        .map(uri => get(externalDataState, uri))
+        .filter(data => !!data)
+    : Immutable.Map();
+
+  const wikiDataImageUrls = [];
+  externalDataMap.map(data => {
+    const wikiDataImageUrl = get(data, "imageUrl");
+    wikiDataImageUrl && wikiDataImageUrls.push(wikiDataImageUrl);
+  });
+
   const globalLastUpdateTime = useSelector(
     generalSelectors.selectLastUpdateTime
   );
   const friendlyTimestamp =
     atom && relativeTime(globalLastUpdateTime, get(atom, "lastUpdateDate"));
 
-  const showMap = false; //!atomImage && atomLocation; //if no image is present but a location is, we display a map instead
-  const showDefaultIcon = !atomImage; //&& !atomLocation; //if no image and no location are present we display the defaultIcon in the card__icon area, instead of next to the title
-
   function createCardMainSubtitle() {
-    const createGroupChatLabel = () => {
-      if (isGroupChatEnabled) {
-        return (
-          <span className="card__main__subtitle__type__groupchat">
-            {"Group Chat" + (isChatEnabled ? " enabled" : "")}
-          </span>
-        );
-      }
-      return undefined;
-    };
-
     return (
       <div className="card__main__subtitle">
         <span className="card__main__subtitle__type">
-          {createGroupChatLabel()}
           <span>{atomTypeLabel}</span>
         </span>
         <div className="card__main__subtitle__date">{friendlyTimestamp}</div>
@@ -85,52 +87,40 @@ export default function WonOtherCard({
   }
 
   function createCardMainIcon() {
-    if (!showDefaultIcon) {
-      const style =
-        !atomImage && iconBackground
-          ? {
-              backgroundColor: iconBackground,
-            }
-          : undefined;
-
-      return (
-        <div className="card__main__icon" style={style}>
-          {useCaseIcon ? (
-            <div className="card__main__icon__usecaseimage">
-              <svg>
-                <use xlinkHref={useCaseIcon} href={useCaseIcon} />
-              </svg>
-            </div>
-          ) : (
-            undefined
-          )}
-          {identiconSvg ? (
-            <img
-              className="card__main__icon__identicon"
-              alt="Auto-generated title image"
-              src={"data:image/svg+xml;base64," + identiconSvg}
-            />
-          ) : (
-            undefined
-          )}
-        </div>
-      );
-    }
-  }
-
-  const style =
-    showDefaultIcon && iconBackground
+    const style = iconBackground
       ? {
           backgroundColor: iconBackground,
         }
       : undefined;
 
+    return (
+      <div className="card__main__icon" style={style}>
+        {useCaseIcon ? (
+          <div className="card__main__icon__usecaseimage">
+            <svg>
+              <use xlinkHref={useCaseIcon} href={useCaseIcon} />
+            </svg>
+          </div>
+        ) : (
+          undefined
+        )}
+        {identiconSvg ? (
+          <img
+            className="card__main__icon__identicon"
+            alt="Auto-generated title image"
+            src={"data:image/svg+xml;base64," + identiconSvg}
+          />
+        ) : (
+          undefined
+        )}
+      </div>
+    );
+  }
+
   const cardIcon = (
     <Link
       className={
-        "card__icon " +
-        (isInactive ? " inactive " : "") +
-        (showMap ? "card__icon--map" : "")
+        "card__icon card__icon--map " + (isInactive ? " inactive " : "")
       }
       to={location =>
         generateLink(
@@ -139,59 +129,26 @@ export default function WonOtherCard({
           "/post"
         )
       }
-      style={style}
     >
-      {showDefaultIcon && useCaseIcon ? (
-        <div className="identicon usecaseimage">
-          <svg>
-            <use xlinkHref={useCaseIcon} href={useCaseIcon} />
-          </svg>
-        </div>
-      ) : (
-        undefined
-      )}
-      {showDefaultIcon && identiconSvg ? (
-        <img
-          className="identicon"
-          alt="Auto-generated title image"
-          src={"data:image/svg+xml;base64," + identiconSvg}
-        />
-      ) : (
-        undefined
-      )}
-      {atomImage ? (
-        <img
-          className="image"
-          alt={get(atomImage, "name")}
-          src={
-            "data:" +
-            get(atomImage, "encodingFormat") +
-            ";base64," +
-            get(atomImage, "encoding")
-          }
-        />
-      ) : (
-        undefined
-      )}
-      {showMap ? (
-        <WonAtomMap
-          className="location"
-          locations={[atomLocation]}
-          currentLocation={currentLocation}
-          disableControls={true}
-        />
-      ) : (
-        undefined
-      )}
+      <AutoPlaySwipeableViews>
+        {wikiDataImageUrls.map((url, index) => (
+          <img key={url + "-" + index} className="image" src={url} />
+        ))}
+        {atomLocation && (
+          <WonAtomMap
+            className="location"
+            locations={[atomLocation]}
+            currentLocation={currentLocation}
+            disableControls={true}
+          />
+        )}
+      </AutoPlaySwipeableViews>
     </Link>
   );
 
   const cardMain = (
     <Link
-      className={
-        "card__main clickable " +
-        (!showDefaultIcon ? "card__main--showIcon" : "")
-      }
+      className="card__main clickable card__main--showIcon"
       to={location =>
         generateLink(
           location,
@@ -215,7 +172,7 @@ export default function WonOtherCard({
   );
 
   return (
-    <won-other-card>
+    <won-interest-card>
       {cardIcon}
       {cardMain}
       {showHolder &&
@@ -224,11 +181,11 @@ export default function WonOtherCard({
           <WonHolderSnippet holder={holder} heldAtom={atom} />
         )}
       {cardConnectionIndicators}
-    </won-other-card>
+    </won-interest-card>
   );
 }
 
-WonOtherCard.propTypes = {
+WonInterestCard.propTypes = {
   atom: PropTypes.object.isRequired,
   showHolder: PropTypes.bool,
   showIndicators: PropTypes.bool,

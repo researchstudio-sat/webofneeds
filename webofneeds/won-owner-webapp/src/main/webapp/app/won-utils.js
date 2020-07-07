@@ -9,6 +9,7 @@ import qr from "qr-image";
 
 import Immutable from "immutable";
 import * as useCaseUtils from "./usecase-utils.js";
+import { getTitle } from "./redux/utils/atom-utils.js";
 
 import won from "./won-es6.js";
 
@@ -74,10 +75,10 @@ function getRandomString(
   ).join("");
 }
 
-export function createDocumentDefinitionFromPost(post) {
+export function createDocumentDefinitionFromPost(post, externalDataState) {
   if (!post) return;
 
-  let title = { text: post.get("humanReadable"), style: "title" };
+  let title = { text: getTitle(post, externalDataState), style: "title" };
   let contentHeader = { text: "Description", style: "branchHeader" };
   let seeksHeader = { text: "Looking For", style: "branchHeader" };
 

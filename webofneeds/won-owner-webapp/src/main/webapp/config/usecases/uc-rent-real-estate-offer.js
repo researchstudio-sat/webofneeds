@@ -34,7 +34,6 @@ export const rentRealEstateOffer = {
     ...mergeInEmptyDraft({
       content: {
         type: ["demo:RealEstateRentOffer"],
-        title: "For Rent",
         tags: ["RentOutRealEstate"],
       },
       seeks: {

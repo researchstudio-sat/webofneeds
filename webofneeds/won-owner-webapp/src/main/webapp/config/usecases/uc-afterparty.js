@@ -19,7 +19,6 @@ export const afterparty = {
     ...mergeInEmptyDraft({
       content: {
         type: ["demo:AfterParty"],
-        title: "I'm up for partying! Any plans?",
         tags: ["afterparty"],
         searchString: "afterparty",
       },

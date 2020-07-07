@@ -40,7 +40,12 @@ export default function AtomContentChats({
   const [searchText, setSearchText] = useState({ value: "" });
 
   const storedAtoms = useSelector(generalSelectors.getAtoms);
-  const filteredStoredAtoms = filterAtomsBySearchValue(storedAtoms, searchText);
+  const externalDataState = useSelector(generalSelectors.getExternalDataState);
+  const filteredStoredAtoms = filterAtomsBySearchValue(
+    storedAtoms,
+    searchText,
+    externalDataState
+  );
 
   const reactions = atomUtils.getReactions(
     atom,
@@ -52,6 +57,7 @@ export default function AtomContentChats({
     relevantConnections,
     storedAtoms,
     searchText,
+    externalDataState,
     false,
     true
   );

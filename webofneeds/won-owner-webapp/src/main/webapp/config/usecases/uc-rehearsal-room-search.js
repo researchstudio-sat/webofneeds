@@ -32,7 +32,6 @@ export const rehearsalRoomSearch = {
     ...mergeInEmptyDraft({
       content: {
         type: ["demo:RehearsalRoomRentDemand"],
-        title: "Looking for Rehearsal Room!",
         searchString: "Rehearsal Room",
       },
       seeks: {

@@ -2,12 +2,15 @@ import React from "react";
 import PropTypes from "prop-types";
 import { generateLink, get } from "~/app/utils";
 import { Link } from "react-router-dom";
+import * as generalSelectors from "~/app/redux/selectors/general-selectors";
 import * as atomUtils from "~/app/redux/utils/atom-utils";
 
 import "~/style/_holder-snippet.scss";
+import { useSelector } from "react-redux";
 
 export default function WonHolderSnippet({ holder, heldAtom }) {
-  const holderName = get(holder, "humanReadable");
+  const externalDataState = useSelector(generalSelectors.getExternalDataState);
+  const holderName = atomUtils.getTitle(holder, externalDataState);
 
   function createHolderInfoIcon() {
     const isHolderPersona = atomUtils.isPersona(holder);

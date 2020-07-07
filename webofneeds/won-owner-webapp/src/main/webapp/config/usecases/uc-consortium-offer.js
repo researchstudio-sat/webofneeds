@@ -20,7 +20,6 @@ export const consortiumOffer = {
     ...mergeInEmptyDraft({
       content: {
         type: ["demo:ConsortiumOffer"],
-        title: "Offering a slot in a project consortium",
         tags: ["offer-consortium"],
         searchString: "search-consortium",
       },
