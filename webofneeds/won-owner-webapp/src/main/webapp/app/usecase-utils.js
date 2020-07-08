@@ -5,7 +5,6 @@
 import * as useCaseDefinitions from "../config/usecase-definitions.js";
 import { messageDetails } from "../config/detail-definitions.js";
 import { get, getIn } from "./utils.js";
-import { values } from "min-dash";
 import vocab from "./service/vocab.js";
 
 import Immutable from "immutable";
@@ -676,15 +675,16 @@ export function getVisibleUseCaseGroups(
 }
 
 export function isHoldable(useCase) {
-  return (
-    !!useCase &&
-    !!useCase.draft &&
-    !!useCase.draft.content &&
-    !!useCase.draft.content.sockets &&
-    values(useCase.draft.content.sockets).includes(
-      vocab.HOLD.HoldableSocketCompacted
-    )
-  );
+  const useCaseSockets = getIn(useCase, ["draft", "content", "sockets"]);
+
+  if (useCaseSockets) {
+    for (const key in useCaseSockets) {
+      if (useCaseSockets[key] === vocab.HOLD.HoldableSocketCompacted) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 export function getUseCaseLabel(identifier) {
