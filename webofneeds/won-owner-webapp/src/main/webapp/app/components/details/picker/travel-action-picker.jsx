@@ -11,7 +11,7 @@ import {
 } from "../../../api/nominatim-api.js";
 import L from "leaflet";
 
-import _ from "lodash";
+import _debounce from "lodash/debounce";
 
 import "leaflet/dist/leaflet.css";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
@@ -55,7 +55,7 @@ export default class WonTravelActionPicker extends React.Component {
     this.doneTypingTo = this.doneTypingTo.bind(this);
     this.update = this.update.bind(this);
 
-    this.startSearchFrom = _.debounce(value => {
+    this.startSearchFrom = _debounce(value => {
       searchNominatim(value).then(fromSearchResults => {
         const parsedResults = scrubSearchResults(fromSearchResults, value);
 
@@ -66,7 +66,7 @@ export default class WonTravelActionPicker extends React.Component {
       });
     }, 700);
 
-    this.startSearchTo = _.debounce(value => {
+    this.startSearchTo = _debounce(value => {
       searchNominatim(value).then(toSearchResults => {
         const parsedResults = scrubSearchResults(toSearchResults, value);
 

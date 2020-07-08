@@ -39,6 +39,12 @@ function config(env, argv): Configuration {
             name: "pdfExport",
             chunks: "async",
           },
+          styles: {
+            name: "styles",
+            test: /\.s?css$/,
+            chunks: "all",
+            enforce: true,
+          },
         },
       },
       minimizer: [
@@ -157,7 +163,7 @@ function config(env, argv): Configuration {
       ],
     },
     plugins: [
-      // new BundleAnalyzerPlugin(),
+      //new BundleAnalyzerPlugin(),
       new HtmlWebpackPlugin({
         template: path.resolve(__dirname, "template.ejs"),
       }),
@@ -210,6 +216,9 @@ function config(env, argv): Configuration {
     ],
     devtool: "source-map",
     stats: {
+      performance: true,
+      modulesSort: "size",
+      colors: true,
       children: false,
     },
   };

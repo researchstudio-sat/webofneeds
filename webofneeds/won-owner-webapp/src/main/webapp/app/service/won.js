@@ -26,7 +26,7 @@ import {
   setDisclaimerAccepted,
 } from "../won-localstorage.js";
 import vocab from "./vocab.js";
-import jsonld from "jsonld/dist/jsonld.js";
+import jsonld from "jsonld/dist/jsonld.min.js";
 import * as jsonldUtils from "./jsonld-utils.js";
 
 import * as N3 from "n3";

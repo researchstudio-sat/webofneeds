@@ -26,7 +26,7 @@ import WonAtomCardGrid from "../../components/atom-card-grid.jsx";
 import WonFooter from "../../components/footer.jsx";
 import WonTitlePicker from "../../components/details/picker/title-picker.jsx";
 
-import _ from "lodash";
+import _debounce from "lodash/debounce";
 
 import "~/style/_map.scss";
 import ico36_detail_location from "~/images/won-icons/ico36_detail_location.svg";
@@ -120,7 +120,7 @@ export default function PageMap() {
   const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
   const showModalDialog = useSelector(viewSelectors.showModalDialog);
 
-  const startSearch = _.debounce(value => {
+  const startSearch = _debounce(value => {
     searchNominatim(value).then(searchResults => {
       const parsedResults = scrubSearchResults(searchResults, value);
 

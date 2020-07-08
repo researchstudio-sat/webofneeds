@@ -128,11 +128,13 @@ export default function WonTopnav({ pageTitle }) {
             src={"skin/" + themeName + "/images/logo.svg"}
             className="topnav__logo__image hide-in-responsive"
             onClick={goDefault}
+            alt="logo"
           />
           <img
             src={"skin/" + themeName + "/images/logo.svg"}
             className="topnav__logo__image show-in-responsive"
             onClick={menuAction}
+            alt="logo"
           />
           {hasUnreads &&
             !isMenuVisible && (
