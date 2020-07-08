@@ -11,7 +11,7 @@ import {
 } from "../../../api/nominatim-api.js";
 import L from "leaflet";
 
-import _ from "lodash";
+import _debounce from "lodash/debounce";
 
 import "leaflet/dist/leaflet.css";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
@@ -47,7 +47,7 @@ export default class WonLocationPicker extends React.Component {
     this.setAlternativeName = this.setAlternativeName.bind(this);
     this.update = this.update.bind(this);
 
-    this.startSearch = _.debounce(value => {
+    this.startSearch = _debounce(value => {
       this.setState({
         searchState: "RUNNING",
       });

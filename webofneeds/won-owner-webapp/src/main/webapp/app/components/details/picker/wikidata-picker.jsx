@@ -4,7 +4,7 @@ import Immutable from "immutable";
 import { get } from "../../../utils.js";
 import "~/style/_wikidatapicker.scss";
 import PropTypes from "prop-types";
-import _ from "lodash";
+import _debounce from "lodash/debounce";
 import WonTitlePicker from "./title-picker";
 import WikiDataViewer from "~/app/components/details/viewer/wikidata-viewer";
 import { searchWikiData } from "~/app/api/wikidata-api";
@@ -24,7 +24,7 @@ export default function WikiDataPicker({
   );
   const [searchResults, setSearchResults] = useState([]);
 
-  const startSearch = _.debounce(value => {
+  const startSearch = _debounce(value => {
     searchWikiData(value).then(results =>
       setSearchResults(get(results, "search") || [])
     );

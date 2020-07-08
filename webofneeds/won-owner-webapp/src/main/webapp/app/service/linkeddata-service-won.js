@@ -20,7 +20,7 @@
 import { is, getIn, extractAtomUriBySocketUri } from "../utils.js";
 
 import * as ownerApi from "../api/owner-api.js";
-import jsonld from "jsonld/dist/jsonld.js";
+import jsonld from "jsonld/dist/jsonld.min.js";
 import won from "./won.js";
 import vocab from "./vocab.js";
 

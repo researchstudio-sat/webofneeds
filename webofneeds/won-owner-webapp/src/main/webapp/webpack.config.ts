@@ -1,7 +1,7 @@
 import * as path from "path";
 import { Configuration, EnvironmentPlugin } from "webpack";
 import * as MiniCssExtractPlugin from "mini-css-extract-plugin";
-import * as UglifyJsPlugin from "uglifyjs-webpack-plugin";
+import * as TerserPlugin from "terser-webpack-plugin";
 import * as OptimizeCSSAssetsPlugin from "optimize-css-assets-webpack-plugin";
 import * as SpriteLoaderPlugin from "svg-sprite-loader/plugin";
 import * as CopyWebpackPlugin from "copy-webpack-plugin";
@@ -41,11 +41,9 @@ function config(env, argv): Configuration {
           },
         },
       },
+      minimize: true,
       minimizer: [
-        new UglifyJsPlugin({
-          parallel: true,
-          sourceMap: true,
-        }),
+        new TerserPlugin({ sourceMap: true}),
         new OptimizeCSSAssetsPlugin(),
       ],
     },
@@ -57,40 +55,22 @@ function config(env, argv): Configuration {
       alias: {
         "~": path.resolve(__dirname),
       },
-      extensions: [".jsx", ".js"],
+      extensions: [".jsx", ".js", ".scss"],
     },
     module: {
       rules: [
         {
           test: /\.jsx?$/,
           exclude: [/node_modules/],
-          use: [
-            {
-              loader: "babel-loader",
-            },
-            {
-              loader: "eslint-loader",
-            },
-          ],
+          loader: ["babel-loader", "eslint-loader"],
         },
         {
           test: /\.s?css$/,
-          use: [
-            () => {
-              if (mode == "development") {
-                return {
-                  loader: "style-loader",
-                };
-              } else {
-                return MiniCssExtractPlugin.loader;
-              }
-            },
+          loader: [
+            MiniCssExtractPlugin.loader,
             {
               loader: "css-loader",
-              options: {
-                sourceMap: true,
-                import: false,
-              },
+              options: { sourceMap: true, import: false },
             },
             {
               loader: "postcss-loader",
@@ -157,7 +137,7 @@ function config(env, argv): Configuration {
       ],
     },
     plugins: [
-      // new BundleAnalyzerPlugin(),
+      //new BundleAnalyzerPlugin(),
       new HtmlWebpackPlugin({
         template: path.resolve(__dirname, "template.ejs"),
       }),
@@ -210,6 +190,9 @@ function config(env, argv): Configuration {
     ],
     devtool: "source-map",
     stats: {
+      performance: true,
+      modulesSort: "size",
+      colors: true,
       children: false,
     },
   };
