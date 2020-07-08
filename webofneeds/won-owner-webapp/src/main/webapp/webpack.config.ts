@@ -39,12 +39,6 @@ function config(env, argv): Configuration {
             name: "pdfExport",
             chunks: "async",
           },
-          styles: {
-            name: "styles",
-            test: /\.s?css$/,
-            chunks: "all",
-            enforce: true,
-          },
         },
       },
       minimizer: [
@@ -63,40 +57,22 @@ function config(env, argv): Configuration {
       alias: {
         "~": path.resolve(__dirname),
       },
-      extensions: [".jsx", ".js"],
+      extensions: [".jsx", ".js", ".scss"],
     },
     module: {
       rules: [
         {
           test: /\.jsx?$/,
           exclude: [/node_modules/],
-          use: [
-            {
-              loader: "babel-loader",
-            },
-            {
-              loader: "eslint-loader",
-            },
-          ],
+          loader: ["babel-loader", "eslint-loader"],
         },
         {
           test: /\.s?css$/,
-          use: [
-            () => {
-              if (mode == "development") {
-                return {
-                  loader: "style-loader",
-                };
-              } else {
-                return MiniCssExtractPlugin.loader;
-              }
-            },
+          loader: [
+            MiniCssExtractPlugin.loader,
             {
               loader: "css-loader",
-              options: {
-                sourceMap: true,
-                import: false,
-              },
+              options: { sourceMap: true, import: false },
             },
             {
               loader: "postcss-loader",
