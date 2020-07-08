@@ -1,7 +1,7 @@
 import * as path from "path";
 import { Configuration, EnvironmentPlugin } from "webpack";
 import * as MiniCssExtractPlugin from "mini-css-extract-plugin";
-import * as UglifyJsPlugin from "uglifyjs-webpack-plugin";
+import * as TerserPlugin from "terser-webpack-plugin";
 import * as OptimizeCSSAssetsPlugin from "optimize-css-assets-webpack-plugin";
 import * as SpriteLoaderPlugin from "svg-sprite-loader/plugin";
 import * as CopyWebpackPlugin from "copy-webpack-plugin";
@@ -41,11 +41,9 @@ function config(env, argv): Configuration {
           },
         },
       },
+      minimize: true,
       minimizer: [
-        new UglifyJsPlugin({
-          parallel: true,
-          sourceMap: true,
-        }),
+        new TerserPlugin({ sourceMap: true}),
         new OptimizeCSSAssetsPlugin(),
       ],
     },
