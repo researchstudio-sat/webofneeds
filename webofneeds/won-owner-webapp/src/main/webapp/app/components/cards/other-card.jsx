@@ -6,8 +6,8 @@ import { useSelector } from "react-redux";
 import { get, generateLink } from "../../utils.js";
 import PropTypes from "prop-types";
 
-import WonAtomMap from "../atom-map.jsx";
 import WonAtomConnectionsIndicator from "../atom-connections-indicator.jsx";
+import WonContentSnippet from "~/app/components/cards/snippets/content-snippet";
 import WonHolderSnippet from "./snippets/holder-snippet.jsx";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
@@ -23,16 +23,8 @@ export default function WonOtherCard({
   currentLocation,
 }) {
   const atomUri = get(atom, "uri");
-  const useCaseIcon = atomUtils.getMatchedUseCaseIcon(atom);
-  const iconBackground = atomUtils.getBackground(atom);
-  const identiconSvg = !useCaseIcon
-    ? atomUtils.getIdenticonSvg(atom)
-    : undefined;
-  const atomImage = atomUtils.getDefaultImage(atom);
-  const atomLocation = atomUtils.getLocation(atom);
   const holderUri = atomUtils.getHeldByUri(atom);
   const holder = useSelector(generalSelectors.getAtom(holderUri));
-  const isInactive = atomUtils.isInactive(atom);
   const atomTypeLabel = atomUtils.generateTypeLabel(atom);
   const atomHasHoldableSocket = atomUtils.hasHoldableSocket(atom);
   const isGroupChatEnabled = atomUtils.hasGroupSocket(atom);
@@ -43,9 +35,6 @@ export default function WonOtherCard({
   );
   const friendlyTimestamp =
     atom && relativeTime(globalLastUpdateTime, get(atom, "lastUpdateDate"));
-
-  const showMap = false; //!atomImage && atomLocation; //if no image is present but a location is, we display a map instead
-  const showDefaultIcon = !atomImage; //&& !atomLocation; //if no image and no location are present we display the defaultIcon in the card__icon area, instead of next to the title
 
   function createCardMainSubtitle() {
     const createGroupChatLabel = () => {
@@ -83,114 +72,49 @@ export default function WonOtherCard({
       </div>
     );
   }
-
+  //FIXME currently we always show the icon, we just need to implement a way where we only show it when we have swipeable-content (see content-snippet, maybe with local state)
+  const showsContent = true;
   function createCardMainIcon() {
-    if (!showDefaultIcon) {
-      const style =
-        !atomImage && iconBackground
-          ? {
-              backgroundColor: iconBackground,
-            }
-          : undefined;
+    if (showsContent) {
+      const useCaseIcon = atomUtils.getMatchedUseCaseIcon(atom);
+      const identiconSvg = !useCaseIcon
+        ? atomUtils.getIdenticonSvg(atom)
+        : undefined;
 
-      return (
-        <div className="card__main__icon" style={style}>
-          {useCaseIcon ? (
-            <div className="card__main__icon__usecaseimage">
-              <svg>
-                <use xlinkHref={useCaseIcon} href={useCaseIcon} />
-              </svg>
-            </div>
-          ) : (
-            undefined
-          )}
-          {identiconSvg ? (
-            <img
-              className="card__main__icon__identicon"
-              alt="Auto-generated title image"
-              src={"data:image/svg+xml;base64," + identiconSvg}
-            />
-          ) : (
-            undefined
-          )}
-        </div>
-      );
-    }
-  }
+      const iconBackground = atomUtils.getBackground(atom);
+      const style = iconBackground
+        ? {
+            backgroundColor: iconBackground,
+          }
+        : undefined;
 
-  const style =
-    showDefaultIcon && iconBackground
-      ? {
-          backgroundColor: iconBackground,
-        }
-      : undefined;
-
-  const cardIcon = (
-    <Link
-      className={
-        "card__icon " +
-        (isInactive ? " inactive " : "") +
-        (showMap ? "card__icon--map" : "")
-      }
-      to={location =>
-        generateLink(
-          location,
-          { postUri: atomUri, tab: undefined, connectionUri: undefined },
-          "/post"
-        )
-      }
-      style={style}
-    >
-      {showDefaultIcon && useCaseIcon ? (
-        <div className="identicon usecaseimage">
+      const icon = useCaseIcon ? (
+        <div className="card__main__icon__usecaseimage">
           <svg>
             <use xlinkHref={useCaseIcon} href={useCaseIcon} />
           </svg>
         </div>
       ) : (
-        undefined
-      )}
-      {showDefaultIcon && identiconSvg ? (
         <img
-          className="identicon"
+          className="card__main__icon__identicon"
           alt="Auto-generated title image"
           src={"data:image/svg+xml;base64," + identiconSvg}
         />
-      ) : (
-        undefined
-      )}
-      {atomImage ? (
-        <img
-          className="image"
-          alt={get(atomImage, "name")}
-          src={
-            "data:" +
-            get(atomImage, "encodingFormat") +
-            ";base64," +
-            get(atomImage, "encoding")
-          }
-        />
-      ) : (
-        undefined
-      )}
-      {showMap ? (
-        <WonAtomMap
-          className="location"
-          locations={[atomLocation]}
-          currentLocation={currentLocation}
-          disableControls={true}
-        />
-      ) : (
-        undefined
-      )}
-    </Link>
-  );
+      );
+
+      return (
+        <div className="card__main__icon" style={style}>
+          {icon}
+        </div>
+      );
+    }
+    return undefined;
+  }
 
   const cardMain = (
     <Link
       className={
-        "card__main clickable " +
-        (!showDefaultIcon ? "card__main--showIcon" : "")
+        "card__main clickable " + (showsContent ? "card__main--showIcon" : "")
       }
       to={location =>
         generateLink(
@@ -216,7 +140,7 @@ export default function WonOtherCard({
 
   return (
     <won-other-card>
-      {cardIcon}
+      <WonContentSnippet atom={atom} currentLocation={currentLocation} />
       {cardMain}
       {showHolder &&
         holder &&
