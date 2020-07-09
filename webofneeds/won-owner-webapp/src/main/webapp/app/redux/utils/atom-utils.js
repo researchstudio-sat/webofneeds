@@ -131,9 +131,7 @@ export function hasMatchedUseCase(atom) {
 }
 
 export function hasImages(atom) {
-  return (
-    !!getIn(atom, ["content", "images"]) || !!getIn(atom, ["seeks", "images"])
-  );
+  return !!getImages(atom) || !!getSeeksImages(atom);
 }
 
 export function hasLocation(atom) {
@@ -217,6 +215,18 @@ export function getDistanceFrom(atom, location) {
   return calculateDistance(atomLocation, location);
 }
 
+export function getImages(atom) {
+  return getIn(atom, ["content", "images"]);
+}
+
+export function getImageUrl(atom) {
+  return getIn(atom, ["content", "imageUrl"]);
+}
+
+export function getSeeksImages(atom) {
+  return getIn(atom, ["seeks", "images"]);
+}
+
 /**
  * Returns the "Default" Image (currently the content branch is checked before seeks) of an atom
  * if the atom does not have any images we return undefined
@@ -224,7 +234,7 @@ export function getDistanceFrom(atom, location) {
  */
 export function getDefaultImage(atom) {
   if (hasImages(atom)) {
-    const contentImages = getIn(atom, ["content", "images"]);
+    const contentImages = getImages(atom);
 
     if (contentImages) {
       const defaultImage = contentImages.find(image => get(image, "default"));
@@ -234,7 +244,7 @@ export function getDefaultImage(atom) {
       }
     }
 
-    const seeksImages = getIn(atom, ["seeks", "images"]);
+    const seeksImages = getSeeksImages(atom);
 
     if (seeksImages) {
       const defaultImage = seeksImages.find(image => get(image, "default"));
