@@ -60,24 +60,39 @@ export function matchesDefinition(atom, useCaseDefinition) {
  * @returns {any}
  */
 export function getTitle(atom, externalDataState, separator = ", ") {
-  const eventObjectAboutUris = getIn(atom, ["content", "eventObjectAboutUris"]);
+  const title = getIn(atom, ["content", "title"]);
+  if (title) {
+    return title;
+  }
 
-  const externalDataMap =
-    eventObjectAboutUris &&
-    eventObjectAboutUris
-      .map(uri => get(externalDataState, uri))
-      .filter(data => !!data);
+  const personaName = getIn(atom, ["content", "personaName"]);
+
+  if (personaName) {
+    return personaName;
+  }
+
+  const eventObjectAboutUris = getIn(atom, ["content", "eventObjectAboutUris"]);
+  const classifiedAs = getIn(atom, ["content", "classifiedAs"]);
 
   const wikiDataHumanReadable = [];
 
-  externalDataMap &&
-    externalDataMap.map(data => {
-      const wikiDataName = get(data, "personaName");
-      const wikiDataTitle = get(data, "title");
-      if (wikiDataName || wikiDataTitle) {
-        wikiDataHumanReadable.push(wikiDataName || wikiDataTitle);
-      }
-    });
+  const generateHumanReadable = uris => {
+    const externalDataMap =
+      uris &&
+      uris.map(uri => get(externalDataState, uri)).filter(data => !!data);
+
+    externalDataMap &&
+      externalDataMap.map(data => {
+        const wikiDataName = get(data, "personaName");
+        const wikiDataTitle = get(data, "title");
+        if (wikiDataName || wikiDataTitle) {
+          wikiDataHumanReadable.push(wikiDataName || wikiDataTitle);
+        }
+      });
+  };
+
+  generateHumanReadable(eventObjectAboutUris);
+  generateHumanReadable(classifiedAs);
 
   return wikiDataHumanReadable.length > 0
     ? wikiDataHumanReadable.join(separator)
