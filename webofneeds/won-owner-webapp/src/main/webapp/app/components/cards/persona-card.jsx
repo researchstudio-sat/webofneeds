@@ -60,7 +60,11 @@ export default function WonPersonaCard({ atom }) {
         )
       }
     >
-      <div className={"card__icon clickable " + (isInactive ? "inactive" : "")}>
+      <div
+        className={
+          "card__detailinfo clickable " + (isInactive ? "inactive" : "")
+        }
+      >
         {personaIdenticon}
         {personaImage}
       </div>

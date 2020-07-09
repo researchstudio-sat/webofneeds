@@ -5,13 +5,13 @@
 a.won-persona-card {
   grid-area: card;
   display: grid;
-  grid-template-areas: "card__main" "card__icon";
+  grid-template-areas: "card__main" "card__detailinfo";
   grid-template-rows: max-content 1fr;
   padding: 0.5rem;
   color: black;
 
-  .card__icon {
-    grid-area: card__icon;
+  .card__detailinfo {
+    grid-area: card__detailinfo;
     display: grid;
     margin-top: 0.5rem;
     user-select: none;

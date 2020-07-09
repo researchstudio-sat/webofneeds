@@ -219,16 +219,19 @@ export default function WonAtomContent({
         break;
       }
 
+      case vocab.WXVALUEFLOWS.CustodianSocketCompacted:
       case vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted: {
         visibleTabFragment = (
           <WonAtomContentSocket
             atom={atom}
             socketType={visibleTab}
-            ItemComponent={WonBuddyItem}
+            ItemComponent={WonHeldItem}
             relevantConnections={relevantConnections}
             showAddPicker={showAddPicker}
             toggleAddPicker={toggleAddPicker}
             setVisibleTab={setVisibleTab}
+            addButtonClassName="won-socket-add-button--big"
+            segmentContentClassName="acs__segment__content--fourcols"
           />
         );
         break;

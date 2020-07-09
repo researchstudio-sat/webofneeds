@@ -1,4 +1,4 @@
-import _chain from "lodash/chain";
+import _ from "lodash";
 import { getHeldByUri, getTitle } from "./redux/utils/atom-utils.js";
 import fakeNames from "./fakeNames.json";
 
@@ -23,7 +23,7 @@ export function getPathname(location) {
 export function parseHeaderLinks(linkHeaderString) {
   return (
     linkHeaderString &&
-    _chain(linkHeaderString)
+    _.chain(linkHeaderString)
       .split(",")
       .map(link => {
         return {

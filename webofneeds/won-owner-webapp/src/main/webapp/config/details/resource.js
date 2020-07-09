@@ -236,26 +236,3 @@ export const effortQuantity = {
     return undefined;
   },
 };
-
-export const classifiedAs = {
-  ...details.classifiedAs,
-  identifier: "classifiedAs",
-  label: "Classified As",
-  parseToRDF: function({ value }) {
-    return value ? { "vf:classifiedAs": value } : undefined;
-  },
-  parseFromRDF: function(jsonLDImm) {
-    const classifiedAs = jsonLdUtils.parseFrom(
-      jsonLDImm,
-      ["vf:classifiedAs"],
-      "xsd:string"
-    );
-    return classifiedAs ? classifiedAs : undefined;
-  },
-  generateHumanReadable: function({ value, includeLabel }) {
-    if (value) {
-      return includeLabel ? this.label + ": " + value : value;
-    }
-    return undefined;
-  },
-};

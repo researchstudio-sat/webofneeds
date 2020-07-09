@@ -59,7 +59,7 @@ export default function WonSkeletonCard({
       delayedCall={true}
       offset={{ top: -300, bottom: -300 }}
     >
-      <div className="card__icon__skeleton" />
+      <div className="card__detailinfo__skeleton" />
     </VisibilitySensor>
   ) : (
     undefined
@@ -95,7 +95,7 @@ export default function WonSkeletonCard({
     );
 
   const cardPersona =
-    showHolder && !atomLoaded ? <div className="card__nopersona" /> : undefined;
+    showHolder && !atomLoaded ? <div className="card__noholder" /> : undefined;
 
   const cardIndicators = showIndicators ? (
     <WonAtomConnectionsIndicator />
