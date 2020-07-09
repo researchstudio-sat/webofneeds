@@ -1,4 +1,5 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import { generateLink, get } from "~/app/utils";
 import { Link } from "react-router-dom";
@@ -6,7 +7,6 @@ import * as generalSelectors from "~/app/redux/selectors/general-selectors";
 import * as atomUtils from "~/app/redux/utils/atom-utils";
 
 import "~/style/_holder-snippet.scss";
-import { useSelector } from "react-redux";
 
 export default function WonHolderSnippet({ holder, heldAtom }) {
   const externalDataState = useSelector(generalSelectors.getExternalDataState);

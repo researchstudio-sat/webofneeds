@@ -1,44 +1,27 @@
 import React from "react";
 import PropTypes from "prop-types";
 import Immutable from "immutable";
-import { useSelector } from "react-redux";
 import { generateLink, get, getIn } from "~/app/utils";
 import { Link } from "react-router-dom";
 import * as atomUtils from "~/app/redux/utils/atom-utils";
 import WonAtomMap from "~/app/components/atom-map";
 import SwipeableViews from "react-swipeable-views";
 import { autoPlay } from "react-swipeable-views-utils";
-
-const AutoPlaySwipeableViews = autoPlay(SwipeableViews);
+import { details } from "~/config/detail-definitions";
 
 import "~/style/_content-snippet.scss";
 
-import * as generalSelectors from "~/app/redux/selectors/general-selectors";
-import { details } from "~/config/detail-definitions";
+const AutoPlaySwipeableViews = autoPlay(SwipeableViews);
 
-export default function WonContentSnippet({ atom, currentLocation }) {
-  const atomUri = get(atom, "uri");
-  const isInactive = atomUtils.isInactive(atom);
-  const iconBackground = atomUtils.getBackground(atom);
-  const useCaseIcon = atomUtils.getMatchedUseCaseIcon(atom);
-  const identiconSvg = !useCaseIcon
-    ? atomUtils.getIdenticonSvg(atom)
-    : undefined;
-  const atomLocation = atomUtils.getLocation(atom);
+export function generateSwipeableContent(
+  atom,
+  externalDataState,
+  currentLocation
+) {
+  const swipeableContent = [];
+
   const eventObjectAboutUris = getIn(atom, ["content", "eventObjectAboutUris"]);
   const classifiedAs = getIn(atom, ["content", "classifiedAs"]);
-  const externalDataState = useSelector(generalSelectors.getExternalDataState);
-
-  const pokemonId = getIn(atom, ["content", "pokemonRaid", "id"]);
-  const pokemonForm = getIn(atom, ["content", "pokemonRaid", "form"]);
-  const pokemon =
-    pokemonId &&
-    details.pokemonRaid &&
-    details.pokemonRaid.findPokemonById &&
-    details.pokemonRaid.findPokemonById(pokemonId, pokemonForm);
-
-  const pokemonImageUrl = pokemon && pokemon.imageUrl;
-
   const externalDataMap = eventObjectAboutUris
     ? eventObjectAboutUris
         .map(uri => get(externalDataState, uri))
@@ -65,54 +48,20 @@ export default function WonContentSnippet({ atom, currentLocation }) {
 
   generateWikiDataImages(eventObjectAboutUris);
   generateWikiDataImages(classifiedAs);
-
-  const style = iconBackground
-    ? {
-        backgroundColor: iconBackground,
-      }
-    : undefined;
-  const swipeableContent = [];
   wikiDataImageUrls.map((url, index) =>
     swipeableContent.push(
       <img key={url + "-" + index} className="image" src={url} />
     )
   );
 
-  const contentImages = atomUtils.getImages(atom);
-  const seeksImages = atomUtils.getSeeksImages(atom);
-
-  contentImages &&
-    contentImages.map(image => {
-      swipeableContent.push(
-        <img
-          className="image"
-          alt={get(image, "name")}
-          src={
-            "data:" +
-            get(image, "encodingFormat") +
-            ";base64," +
-            get(image, "encoding")
-          }
-        />
-      );
-    });
-
-  seeksImages &&
-    seeksImages.map(image => {
-      swipeableContent.push(
-        <img
-          className="image"
-          alt={get(image, "name")}
-          src={
-            "data:" +
-            get(image, "encodingFormat") +
-            ";base64," +
-            get(image, "encoding")
-          }
-        />
-      );
-    });
-
+  const pokemonId = getIn(atom, ["content", "pokemonRaid", "id"]);
+  const pokemonForm = getIn(atom, ["content", "pokemonRaid", "form"]);
+  const pokemon =
+    pokemonId &&
+    details.pokemonRaid &&
+    details.pokemonRaid.findPokemonById &&
+    details.pokemonRaid.findPokemonById(pokemonId, pokemonForm);
+  const pokemonImageUrl = pokemon && pokemon.imageUrl;
   pokemonImageUrl &&
     swipeableContent.push(
       <img
@@ -134,6 +83,41 @@ export default function WonContentSnippet({ atom, currentLocation }) {
       />
     );
 
+  const contentImages = atomUtils.getImages(atom);
+  contentImages &&
+    contentImages.map(image => {
+      swipeableContent.push(
+        <img
+          className="image"
+          alt={get(image, "name")}
+          src={
+            "data:" +
+            get(image, "encodingFormat") +
+            ";base64," +
+            get(image, "encoding")
+          }
+        />
+      );
+    });
+
+  const seeksImages = atomUtils.getSeeksImages(atom);
+  seeksImages &&
+    seeksImages.map(image => {
+      swipeableContent.push(
+        <img
+          className="image"
+          alt={get(image, "name")}
+          src={
+            "data:" +
+            get(image, "encodingFormat") +
+            ";base64," +
+            get(image, "encoding")
+          }
+        />
+      );
+    });
+
+  const atomLocation = atomUtils.getLocation(atom);
   atomLocation &&
     swipeableContent.push(
       <WonAtomMap
@@ -144,6 +128,24 @@ export default function WonContentSnippet({ atom, currentLocation }) {
         disableControls={true}
       />
     );
+
+  return swipeableContent;
+}
+
+export default function WonContentSnippet({ atom, swipeableContent }) {
+  const atomUri = get(atom, "uri");
+  const isInactive = atomUtils.isInactive(atom);
+  const iconBackground = atomUtils.getBackground(atom);
+  const useCaseIcon = atomUtils.getMatchedUseCaseIcon(atom);
+  const identiconSvg = !useCaseIcon
+    ? atomUtils.getIdenticonSvg(atom)
+    : undefined;
+
+  const style = iconBackground
+    ? {
+        backgroundColor: iconBackground,
+      }
+    : undefined;
 
   let iconContent;
   if (swipeableContent.length === 0) {
@@ -190,5 +192,5 @@ export default function WonContentSnippet({ atom, currentLocation }) {
 }
 WonContentSnippet.propTypes = {
   atom: PropTypes.object.isRequired,
-  currentLocation: PropTypes.object,
+  swipeableContent: PropTypes.array.isRequired,
 };
