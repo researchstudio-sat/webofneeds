@@ -48,7 +48,7 @@ export const resource = {
     accountingQuantity: { ...accountingQuantity },
     onhandQuantity: { ...onhandQuantity },
     effortQuantity: { ...effortQuantity },
-    location: { ...details.location, mandatory: false },
+    location: { ...details.location },
     classifiedAs: { ...details.classifiedAs },
   },
   seeksDetails: {},
