@@ -171,9 +171,9 @@ export default function WonContentSnippet({ atom, currentLocation }) {
   return (
     <Link
       className={
-        "card__icon " +
+        "card__detailinfo " +
         (isInactive ? " inactive " : "") +
-        (swipeableContent.length > 0 ? " card__icon--map " : "")
+        (swipeableContent.length > 0 ? " card__detailinfo--map " : "")
       }
       to={location =>
         generateLink(

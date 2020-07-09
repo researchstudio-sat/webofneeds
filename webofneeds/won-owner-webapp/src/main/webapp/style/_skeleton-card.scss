@@ -4,7 +4,7 @@
 
 won-skeleton-card {
   display: grid;
-  grid-template-areas: "card__icon" "card__main" "card__persona" "card__indicators";
+  grid-template-areas: "card__detailinfo" "card__main" "card__holder" "card__indicators";
   grid-template-rows: max-content 1fr min-content min-content;
   background: $won-light-gray;
   padding: 0.5rem;
@@ -31,7 +31,7 @@ won-skeleton-card {
       background-color: $won-skeleton-color;
     }
   }
-  .card__icon__skeleton {
+  .card__detailinfo__skeleton {
     height: 10rem;
     background-color: $won-skeleton-color;
     margin-bottom: 0.5rem;
@@ -40,8 +40,8 @@ won-skeleton-card {
   // Defines the height of the (no)persona-div, so that they no-persona is the same height as attached personas
   --persona-height: 2.5rem;
 
-  .card__nopersona {
-    grid-area: card__persona;
+  .card__noholder {
+    grid-area: card__holder;
     margin-top: 0.5rem;
     display: grid;
     grid-column-gap: 0.5rem;

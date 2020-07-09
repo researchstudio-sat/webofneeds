@@ -2,20 +2,20 @@
 @import "sizing-utils";
 @import "animate";
 
-.card__persona {
+.card__holder {
   // Defines the height of the (no)persona-div, so that they no-persona is the same height as attached personas
   --persona-height: 2.5rem;
   margin-top: 0.5rem;
 
   display: grid;
-  grid-template-areas: "card__persona__icon card__persona__name";
+  grid-template-areas: "card__holder__icon card__holder__name";
   grid-template-columns: var(--persona-height) 1fr;
   grid-column-gap: 0.5rem;
   padding-top: 0.5rem;
   border-top: $thinGrayBorder;
 
   &__icon {
-    grid-area: card__persona__icon;
+    grid-area: card__holder__icon;
 
     border-radius: 100%;
     @include fixed-square(var(--persona-height));
@@ -38,7 +38,7 @@
 
   &__name {
     color: $won-primary-text-color;
-    grid-area: card__persona__name;
+    grid-area: card__holder__name;
     display: flex;
     align-items: center;
 

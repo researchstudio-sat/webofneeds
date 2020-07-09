@@ -5,18 +5,18 @@
 won-interest-card {
   grid-area: card;
   display: grid;
-  grid-template-areas: "card__icon" "card__main" "card__persona" "card__indicators";
+  grid-template-areas: "card__detailinfo" "card__main" "card__holder" "card__indicators";
   grid-template-rows: max-content 1fr min-content min-content;
   padding: 0.5rem;
   color: black;
   background: $won-light-gray;
 
-  .card__icon {
-    grid-area: card__icon;
+  .card__detailinfo {
+    grid-area: card__detailinfo;
   }
 
-  .card__persona {
-    grid-area: card__persona;
+  .card__holder {
+    grid-area: card__holder;
   }
 
   .card__indicators {

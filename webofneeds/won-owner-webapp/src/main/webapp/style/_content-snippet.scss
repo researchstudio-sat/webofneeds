@@ -2,14 +2,14 @@
 @import "sizing-utils";
 @import "animate";
 
-.card__icon {
-  &:not(.card__icon--map) {
+.card__detailinfo {
+  &:not(.card__detailinfo--map) {
     display: grid;
     justify-content: center;
     align-items: center;
   }
 
-  &.card__icon--map {
+  &.card__detailinfo--map {
     display: block;
     width: 100%;
   }
