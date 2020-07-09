@@ -1,6 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import Immutable from "immutable";
 import { generateLink, get, getIn } from "~/app/utils";
 import { Link } from "react-router-dom";
 import * as atomUtils from "~/app/redux/utils/atom-utils";
@@ -20,47 +19,36 @@ export function generateSwipeableContent(
 ) {
   const swipeableContent = [];
 
-  const eventObjectAboutUris = getIn(atom, ["content", "eventObjectAboutUris"]);
-  const classifiedAs = getIn(atom, ["content", "classifiedAs"]);
-  const externalDataMap = eventObjectAboutUris
-    ? eventObjectAboutUris
-        .map(uri => get(externalDataState, uri))
-        .filter(data => !!data)
-    : Immutable.Map();
-
-  const wikiDataImageUrls = [];
-  externalDataMap.map(data => {
-    const wikiDataImageUrl = get(data, "imageUrl");
-    wikiDataImageUrl && wikiDataImageUrls.push(wikiDataImageUrl);
-  });
-
+  // Add WikiData Images from eventObjectAboutUris and classifiedAs
   const generateWikiDataImages = uris => {
     const externalDataMap =
       uris &&
       uris.map(uri => get(externalDataState, uri)).filter(data => !!data);
 
     externalDataMap &&
-      externalDataMap.map(data => {
+      externalDataMap.map((data, key) => {
         const wikiDataImageUrl = get(data, "imageUrl");
-        wikiDataImageUrl && wikiDataImageUrls.push(wikiDataImageUrl);
+        wikiDataImageUrl &&
+          swipeableContent.push(
+            <img
+              key={key + "-" + wikiDataImageUrl}
+              className="image"
+              src={wikiDataImageUrl}
+            />
+          );
       });
   };
+  generateWikiDataImages(getIn(atom, ["content", "eventObjectAboutUris"]));
+  generateWikiDataImages(getIn(atom, ["content", "classifiedAs"]));
 
-  generateWikiDataImages(eventObjectAboutUris);
-  generateWikiDataImages(classifiedAs);
-  wikiDataImageUrls.map((url, index) =>
-    swipeableContent.push(
-      <img key={url + "-" + index} className="image" src={url} />
-    )
-  );
-
-  const pokemonId = getIn(atom, ["content", "pokemonRaid", "id"]);
-  const pokemonForm = getIn(atom, ["content", "pokemonRaid", "form"]);
+  // Add Pokemon Image if pokemonRaid detail is set
+  const pokemonRaid = getIn(atom, ["content", "pokemonRaid"]);
+  const pokemonId = get(pokemonRaid, "id");
   const pokemon =
     pokemonId &&
     details.pokemonRaid &&
     details.pokemonRaid.findPokemonById &&
-    details.pokemonRaid.findPokemonById(pokemonId, pokemonForm);
+    details.pokemonRaid.findPokemonById(pokemonId, get(pokemonRaid, "form"));
   const pokemonImageUrl = pokemon && pokemon.imageUrl;
   pokemonImageUrl &&
     swipeableContent.push(
@@ -72,6 +60,7 @@ export function generateSwipeableContent(
       />
     );
 
+  // Add Image from ImageUrl if ImageUrl is in content
   const atomImageUrl = atomUtils.getImageUrl(atom);
   atomImageUrl &&
     swipeableContent.push(
@@ -83,6 +72,7 @@ export function generateSwipeableContent(
       />
     );
 
+  // Add Images if Images are present in content
   const contentImages = atomUtils.getImages(atom);
   contentImages &&
     contentImages.map(image => {
@@ -100,6 +90,7 @@ export function generateSwipeableContent(
       );
     });
 
+  // Add Images if Images are present in seeks
   const seeksImages = atomUtils.getSeeksImages(atom);
   seeksImages &&
     seeksImages.map(image => {
@@ -117,6 +108,7 @@ export function generateSwipeableContent(
       );
     });
 
+  // Add Map if location is present
   const atomLocation = atomUtils.getLocation(atom);
   atomLocation &&
     swipeableContent.push(
