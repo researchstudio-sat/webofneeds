@@ -31,38 +31,58 @@ public class UserAtomService {
         URI atomUri = getOwnedAtomURI(wonMessage);
         Long userId = user != null ? user.getId() : null;
         WonMessage focalMessage = wonMessage.getFocalMessage();
-        if (focalMessage.getMessageType() == WonMessageType.SUCCESS_RESPONSE) {
-            switch (focalMessage.getRespondingToMessageType()) {
-                case CREATE_ATOM:
+        switch (focalMessage.getMessageType()) {
+            case SUCCESS_RESPONSE:
+                switch (focalMessage.getRespondingToMessageType()) {
+                    // note: we do not react to successful creation here - we optimistically assumed
+                    // it was going to work
+                    // (see below)
+                    case DEACTIVATE:
+                        try {
+                            deactivateAtomUri(focalMessage);
+                        } catch (Exception e) {
+                            logger.warn("could not deactivate atom " + atomUri + " of user " + userId, e);
+                        }
+                        break;
+                    case ACTIVATE:
+                        try {
+                            activateAtomUri(focalMessage);
+                        } catch (Exception e) {
+                            logger.warn("could not activate atom " + atomUri + " of user " + userId, e);
+                        }
+                        break;
+                    case DELETE:
+                        try {
+                            deleteUserAtom(focalMessage, user);
+                        } catch (Exception e) {
+                            logger.warn("could not delete atom " + atomUri + " of user " + userId, e);
+                        }
+                    default:
+                        // do nothing
+                }
+            case FAILURE_RESPONSE:
+                if (focalMessage.getRespondingToMessageType() == WonMessageType.CREATE_ATOM) {
                     try {
-                        saveAtomUriWithUser(focalMessage, user);
-                    } catch (Exception e) {
-                        logger.warn("could not associate atom " + atomUri + " with user " + userId, e);
-                    }
-                    break;
-                case DEACTIVATE:
-                    try {
-                        deactivateAtomUri(focalMessage);
+                        // create failed - remove association
+                        removeUserAtomBecauseOfFailedCreation(focalMessage, user);
                     } catch (Exception e) {
                         logger.warn("could not deactivate atom " + atomUri + " of user " + userId, e);
                     }
-                    break;
-                case ACTIVATE:
-                    try {
-                        activateAtomUri(focalMessage);
-                    } catch (Exception e) {
-                        logger.warn("could not activate atom " + atomUri + " of user " + userId, e);
-                    }
-                    break;
-                case DELETE:
-                    try {
-                        deleteUserAtom(focalMessage, user);
-                    } catch (Exception e) {
-                        logger.warn("could not delete atom " + atomUri + " of user " + userId, e);
-                    }
-                default:
-                    // do nothing
-            }
+                }
+                break;
+            case CREATE_ATOM:
+                try {
+                    // optimistically add atom to user's atoms. If creation fails, we'll be notified
+                    // (see above)
+                    saveAtomUriWithUser(focalMessage, user);
+                } catch (Exception e) {
+                    logger.warn("could not associate atom " + atomUri + " with user " + userId, e);
+                }
+                break;
+            default:
+                // do nothing
+        }
+        if (focalMessage.getMessageType() == WonMessageType.SUCCESS_RESPONSE) {
         }
     }
 
@@ -126,6 +146,20 @@ public class UserAtomService {
             } else {
                 throw new IllegalStateException("atom not in state deleted");
             }
+        }
+    }
+
+    private void removeUserAtomBecauseOfFailedCreation(final WonMessage wonMessage, User user) {
+        URI atomUri = getOwnedAtomURI(wonMessage);
+        // Get the atom from owner application db
+        UserAtom userAtom = userAtomRepository.findByAtomUri(atomUri);
+        if (userAtom != null) {
+            user = userRepository.findOne(user.getId());
+            // Delete atom in users atom list and save changes
+            user.getUserAtoms().remove(userAtom);
+            user = userRepository.save(user);
+            // Delete atom in atom repository
+            userAtomRepository.delete(userAtom);
         }
     }
 }
