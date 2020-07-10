@@ -61,12 +61,10 @@ const labels = deepFreeze({
     [vocab.WXSCHEMA.WorksForSocketCompacted]: "Works For",
     [vocab.WXSCHEMA.SubOrganizationSocketCompacted]: "Sub Organizations",
     [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: "Parent Organization",
-    [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]:
-      "Primary Accountable",
-    [vocab.WXVALUEFLOWS.PrimaryAccountableInverseSocketCompacted]:
-      "Primary Inverse Accountable",
-    [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: "Custodian",
-    [vocab.WXVALUEFLOWS.CustodianInverseSocketCompacted]: "Custodian Inverse",
+    [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]: "Owns",
+    [vocab.WXVALUEFLOWS.PrimaryAccountableInverseSocketCompacted]: "Owned By",
+    [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: "Controls",
+    [vocab.WXVALUEFLOWS.CustodianInverseSocketCompacted]: "Controlled by",
   },
   socketItem: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Member",
@@ -84,12 +82,11 @@ const labels = deepFreeze({
     [vocab.WXSCHEMA.SubOrganizationSocketCompacted]: "Parent Organization",
     [vocab.WXSCHEMA.ReviewInverseSocketCompacted]: "Review",
     [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: "Sub Organization",
-    [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]:
-      "Primary Accountable",
+    [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]: "Owner",
     [vocab.WXVALUEFLOWS.PrimaryAccountableInverseSocketCompacted]:
-      "Primary Inverse Accountable",
-    [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: "Custodian",
-    [vocab.WXVALUEFLOWS.CustodianInverseSocketCompacted]: "Custodian Inverse",
+      "Owned Thing",
+    [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: "Controlled by",
+    [vocab.WXVALUEFLOWS.CustodianInverseSocketCompacted]: "Controlled Thing",
   },
   socketItems: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Members",
@@ -106,12 +103,10 @@ const labels = deepFreeze({
     [vocab.WXSCHEMA.WorksForSocketCompacted]: "Employers",
     [vocab.WXSCHEMA.SubOrganizationSocketCompacted]: "Sub Organizations",
     [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: "Parent Organizations",
-    [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]:
-      "Primary Accountables",
-    [vocab.WXVALUEFLOWS.PrimaryAccountableInverseSocketCompacted]:
-      "Primary Inverse Accountables",
-    [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: "Custodians",
-    [vocab.WXVALUEFLOWS.CustodianInverseSocketCompacted]: "Custodians Inverse",
+    [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]: "Owned Things",
+    [vocab.WXVALUEFLOWS.PrimaryAccountableInverseSocketCompacted]: "Owners",
+    [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: "Controlled Things",
+    [vocab.WXVALUEFLOWS.CustodianInverseSocketCompacted]: "Controllers",
   },
 });
 
