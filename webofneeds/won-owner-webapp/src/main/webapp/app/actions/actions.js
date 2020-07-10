@@ -159,12 +159,6 @@ const actionHierarchy = {
   },
   personas: {
     fetchPersonas: fetchPersonas,
-
-    store: INJ_DEFAULT,
-    storeUriInLoading: INJ_DEFAULT,
-
-    storeUriFailed: INJ_DEFAULT,
-    removeDeleted: INJ_DEFAULT,
   },
   /**
    * Server triggered interactions (aka received messages)

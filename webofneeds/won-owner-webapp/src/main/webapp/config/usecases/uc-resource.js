@@ -7,14 +7,14 @@ import {
   name,
   accountingQuantity,
   onhandQuantity,
-  effortQuantity,
 } from "../details/resource.js";
 import vocab from "../../app/service/vocab.js";
+import ico36_uc_transport_demand from "~/images/won-icons/ico36_uc_transport_demand.svg";
 
 export const resource = {
   identifier: "resource",
-  label: "EconomicResource",
-  icon: undefined, //No Icon For Persona UseCase (uses identicon)
+  label: "Thing",
+  icon: ico36_uc_transport_demand,
   draft: {
     ...mergeInEmptyDraft({
       content: {
@@ -47,9 +47,9 @@ export const resource = {
     name: { ...name },
     accountingQuantity: { ...accountingQuantity },
     onhandQuantity: { ...onhandQuantity },
-    effortQuantity: { ...effortQuantity },
     location: { ...details.location },
     classifiedAs: { ...details.classifiedAs },
+    images: { ...details.images },
   },
   seeksDetails: {},
 };

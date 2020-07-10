@@ -37,7 +37,8 @@ export const accountingQuantity = {
   viewerComponent: WonAmountViewer,
   unit: [
     { value: "om:kilogram", label: "kg", default: true },
-    { value: "om:litre", label: "L", default: true },
+    { value: "om:litre", label: "l", default: true },
+    { value: "om:one", label: "piece(s)", default: true },
   ],
 
   parseToRDF: function({ value }) {
@@ -108,7 +109,8 @@ export const onhandQuantity = {
   viewerComponent: WonAmountViewer,
   unit: [
     { value: "om:kilogram", label: "kg", default: true },
-    { value: "om:litre", label: "L", default: true },
+    { value: "om:litre", label: "l", default: true },
+    { value: "om:one", label: "piece(s)", default: true },
   ],
 
   parseToRDF: function({ value }) {

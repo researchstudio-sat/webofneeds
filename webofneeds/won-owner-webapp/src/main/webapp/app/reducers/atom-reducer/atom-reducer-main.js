@@ -75,13 +75,11 @@ export default function(allAtomsInState = initialState, action = {}) {
       return addMetaAtomStubs(allAtomsInState, action.payload.get("metaAtoms"));
     }
 
-    case actionTypes.personas.storeUriInLoading:
     case actionTypes.atoms.storeUriInLoading: {
       return addAtomStub(allAtomsInState, action.payload.get("uri"));
     }
 
-    case actionTypes.atoms.store:
-    case actionTypes.personas.store: {
+    case actionTypes.atoms.store: {
       let atoms = action.payload.get("atoms");
       atoms = atoms ? atoms : Immutable.Set();
 
@@ -119,7 +117,6 @@ export default function(allAtomsInState = initialState, action = {}) {
       );
 
     case actionTypes.atoms.removeDeleted:
-    case actionTypes.personas.removeDeleted:
     case actionTypes.atoms.delete:
       return deleteAtom(allAtomsInState, action.payload.get("uri"));
 

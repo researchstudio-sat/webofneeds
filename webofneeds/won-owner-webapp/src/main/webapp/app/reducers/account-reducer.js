@@ -50,7 +50,6 @@ export default function(userData = initialState, action = {}) {
     }
 
     case actionTypes.atoms.removeDeleted:
-    case actionTypes.personas.removeDeleted:
     case actionTypes.atoms.delete: {
       const atomUri = action.payload.get("uri");
 

@@ -11,7 +11,7 @@ import {
 // import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
 import ico36_detail_datetime from "~/images/won-icons/ico36_detail_datetime.svg";
-import ico36_uc_question from "~/images/won-icons/ico36_uc_question.svg";
+import ico36_detail_interests from "~/images/won-icons/ico36_detail_interests.svg";
 import * as jsonLdUtils from "~/app/service/jsonld-utils";
 
 export const genericPlan = {
@@ -105,7 +105,7 @@ export const genericPlan = {
 export const genericInterest = {
   identifier: "genericInterest",
   label: "Interest",
-  icon: ico36_uc_question, //TODO: Find generic interest Icon
+  icon: ico36_detail_interests,
   draft: {
     ...mergeInEmptyDraft({
       content: {
@@ -131,7 +131,6 @@ export const genericInterest = {
     },
     location: {
       ...details.location,
-      mandatory: true,
     },
   },
   seeksDetails: {},

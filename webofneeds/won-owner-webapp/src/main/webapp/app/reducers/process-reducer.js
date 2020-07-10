@@ -294,8 +294,7 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.account.sendAnonymousLinkEmailSuccess:
       return processState.set("processingSendAnonymousLinkEmail", false);
 
-    case actionTypes.atoms.storeUriFailed:
-    case actionTypes.personas.storeUriFailed: {
+    case actionTypes.atoms.storeUriFailed: {
       return updateAtomProcess(processState, get(action.payload, "uri"), {
         toLoad: false,
         loaded: false,
@@ -571,8 +570,7 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
-    case actionTypes.atoms.store:
-    case actionTypes.personas.store: {
+    case actionTypes.atoms.store: {
       let atoms = get(action.payload, "atoms");
 
       atoms &&
@@ -618,7 +616,6 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
-    case actionTypes.personas.storeUriInLoading:
     case actionTypes.atoms.storeUriInLoading: {
       const atomUri = get(action.payload, "uri");
 
@@ -652,8 +649,7 @@ export default function(processState = initialState, action = {}) {
       return addMessageAtomsToLoad(processState, action.payload);
 
     case actionTypes.atoms.delete:
-    case actionTypes.atoms.removeDeleted:
-    case actionTypes.personas.removeDeleted: {
+    case actionTypes.atoms.removeDeleted: {
       const atomUri = get(action.payload, "uri");
       return processState.deleteIn(["atoms", atomUri]);
     }
