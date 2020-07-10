@@ -57,9 +57,11 @@ public class UserAtomService {
                         } catch (Exception e) {
                             logger.warn("could not delete atom " + atomUri + " of user " + userId, e);
                         }
+                        break;
                     default:
                         // do nothing
                 }
+                break;
             case FAILURE_RESPONSE:
                 if (focalMessage.getRespondingToMessageType() == WonMessageType.CREATE_ATOM) {
                     try {
@@ -81,8 +83,6 @@ public class UserAtomService {
                 break;
             default:
                 // do nothing
-        }
-        if (focalMessage.getMessageType() == WonMessageType.SUCCESS_RESPONSE) {
         }
     }
 

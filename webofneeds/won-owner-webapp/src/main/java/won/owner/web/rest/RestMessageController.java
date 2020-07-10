@@ -99,6 +99,7 @@ public class RestMessageController {
         if (user != null && atomURI != null) {
             webSocketSessionService.getWebSocketSessions(user).forEach(
                             session -> webSocketSessionService.addMapping(atomURI, session));
+            this.userAtomService.updateUserAtomAssociation(msg, user);
         }
         // send it in a separate thread (so we can return our result immediately)
         try {
