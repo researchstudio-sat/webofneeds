@@ -97,7 +97,6 @@ const reducers = {
       }
 
       case actionTypes.atoms.removeDeleted:
-      case actionTypes.personas.removeDeleted:
       case actionTypes.atoms.delete: {
         const atomUri = action.payload.get("uri");
         const whatsAroundUris = owner.get("whatsAroundUris");
