@@ -201,6 +201,9 @@ public class WonWebSocketHandler extends TextWebSocketHandler
             // anyway, we have to bind the URI to the session, otherwise we can't handle
             // incoming server->client messages
             atomUri = wonMessage.getSenderAtomURI();
+            if (user != null && atomUri != null) {
+                this.userAtomService.updateUserAtomAssociation(wonMessage, user);
+            }
             logger.debug("binding session to atom URI {}", atomUri);
             this.webSocketSessionService.addMapping(atomUri, session);
         } catch (Exception e) {
