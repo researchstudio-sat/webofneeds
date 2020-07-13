@@ -71,14 +71,21 @@ export default function WonAtomHeader({
 
     atomHeaderIcon = <div className="ph__icon__skeleton" />;
     atomHeaderContent = (
-      <div className="ph__right">
-        <div className="ph__right__topline">
-          <div className="ph__right__topline__title" />
+      <VisibilitySensor
+        onChange={onChange}
+        intervalDelay={200}
+        partialVisibility={true}
+        offset={{ top: -300, bottom: -300 }}
+      >
+        <div className="ph__right">
+          <div className="ph__right__topline">
+            <div className="ph__right__topline__title" />
+          </div>
+          <div className="ph__right__subtitle">
+            <span className="ph__right__subtitle__type" />
+          </div>
         </div>
-        <div className="ph__right__subtitle">
-          <span className="ph__right__subtitle__type" />
-        </div>
-      </div>
+      </VisibilitySensor>
     );
   } else if (get(atom, "isBeingCreated")) {
     //In Creation View
@@ -171,14 +178,7 @@ export default function WonAtomHeader({
       to={toLink}
     >
       {atomHeaderIcon}
-      <VisibilitySensor
-        onChange={onChange}
-        intervalDelay={200}
-        partialVisibility={true}
-        offset={{ top: -300, bottom: -300 }}
-      >
-        {atomHeaderContent}
-      </VisibilitySensor>
+      {atomHeaderContent}
     </Link>
   ) : (
     <won-atom-header
@@ -191,14 +191,7 @@ export default function WonAtomHeader({
       onClick={onClick}
     >
       {atomHeaderIcon}
-      <VisibilitySensor
-        onChange={onChange}
-        intervalDelay={200}
-        partialVisibility={true}
-        offset={{ top: -300, bottom: -300 }}
-      >
-        {atomHeaderContent}
-      </VisibilitySensor>
+      {atomHeaderContent}
     </won-atom-header>
   );
 }

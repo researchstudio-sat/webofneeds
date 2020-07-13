@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { actionCreators } from "~/app/actions/actions";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { get, generateLink } from "../utils.js";
 import WonAtomHeaderBig from "./atom-header-big.jsx";
@@ -14,28 +13,21 @@ import * as processUtils from "../redux/utils/process-utils";
 import * as connectionUtils from "../redux/utils/connection-utils";
 
 import "~/style/_atom-info.scss";
-import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
-import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg";
 
 export default function WonAtomInfo({
+  atomUri,
   atom,
   ownedConnection,
   className,
   initialTab = "DETAIL",
 }) {
   const history = useHistory();
-  const dispatch = useDispatch();
-  const atomUri = get(atom, "uri");
   const connectionUri = get(ownedConnection, "uri");
   const processState = useSelector(generalSelectors.getProcessState);
   const storedAtoms = useSelector(generalSelectors.getAtoms);
   //TODO: IMPLEMENT VISIBILITY SENSOR TO FETCH ONLY WHEN IN VIEW
   const atomLoading =
     !atom || processUtils.isAtomLoading(processState, atomUri);
-  const atomFailedToLoad =
-    atom && processUtils.hasAtomFailedToLoad(processState, atomUri);
-  const atomToLoad = !atom || processUtils.isAtomToLoad(processState, atomUri);
-  const initialLoad = processUtils.isProcessingInitialLoad(processState);
 
   const [visibleTab, setVisibleTab] = useState(initialTab);
   const [showAddPicker, toggleAddPicker] = useState(false);
@@ -62,12 +54,8 @@ export default function WonAtomInfo({
             (!!ownedConnection &&
               !connectionUtils.isConnected(ownedConnection)))
       );
-
-      if (atomUri && !initialLoad && ((atomToLoad && !atomLoading) || !atom)) {
-        dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
-      }
     },
-    [atomUri, connectionUri, atomLoading, initialLoad]
+    [atomUri, connectionUri, atomLoading]
   );
 
   const relevantConnectionsMap = useSelector(
@@ -85,81 +73,45 @@ export default function WonAtomInfo({
       : tabName =>
           history.replace(generateLink(history.location, { tab: tabName }));
 
-  function tryReload() {
-    if (atomUri && atomFailedToLoad) {
-      dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
-    }
-  }
-
-  if (atomFailedToLoad) {
-    return (
-      <won-atom-info
-        class={(className ? className : "") + " won-failed-to-load "}
-      >
-        <svg className="ai__failed__icon">
-          <use xlinkHref={ico16_indicator_error} href={ico16_indicator_error} />
-        </svg>
-        <span className="ai__failed__label">
-          Failed To Load - Atom might have been deleted
-        </span>
-        <div className="ai__failed__actions">
-          <button
-            className="ai__failed__actions__button red won-button--outlined thin"
-            onClick={tryReload}
-          >
-            Try Reload
-          </button>
-        </div>
-      </won-atom-info>
-    );
-  } else if (atomLoading || atomToLoad || !atom) {
-    return (
-      <won-atom-info class={(className ? className : "") + " won-is-loading "}>
-        <svg className="ai__loading__spinner hspinner">
-          <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
-        </svg>
-        <span className="ai__loading__label">Loading...</span>
-      </won-atom-info>
-    );
-  } else {
-    return (
-      <won-atom-info class={className ? className : ""}>
-        <WonAtomHeaderBig
+  return (
+    <won-atom-info class={className ? className : ""}>
+      <WonAtomHeaderBig
+        atomUri={atomUri}
+        atom={atom}
+        ownedConnection={ownedConnection}
+        showActions={showActions}
+        toggleActions={toggleActions}
+      />
+      {showActions ? (
+        <WonAtomActions
           atom={atom}
           ownedConnection={ownedConnection}
-          showActions={showActions}
-          toggleActions={toggleActions}
-        />
-        {showActions ? (
-          <WonAtomActions
-            atom={atom}
-            ownedConnection={ownedConnection}
-            storedAtoms={storedAtoms}
-          />
-        ) : (
-          undefined
-        )}
-        <WonAtomMenu
-          atom={atom}
-          visibleTab={visibleTab}
-          setVisibleTab={changeTab}
-          toggleAddPicker={toggleAddPicker}
-          relevantConnectionsMap={relevantConnectionsMap}
-        />
-        <WonAtomContent
-          atom={atom}
-          visibleTab={visibleTab}
-          relevantConnectionsMap={relevantConnectionsMap}
-          toggleAddPicker={toggleAddPicker}
-          showAddPicker={showAddPicker}
-          setVisibleTab={changeTab}
           storedAtoms={storedAtoms}
         />
-      </won-atom-info>
-    );
-  }
+      ) : (
+        undefined
+      )}
+      <WonAtomMenu
+        atom={atom}
+        visibleTab={visibleTab}
+        setVisibleTab={changeTab}
+        toggleAddPicker={toggleAddPicker}
+        relevantConnectionsMap={relevantConnectionsMap}
+      />
+      <WonAtomContent
+        atom={atom}
+        visibleTab={visibleTab}
+        relevantConnectionsMap={relevantConnectionsMap}
+        toggleAddPicker={toggleAddPicker}
+        showAddPicker={showAddPicker}
+        setVisibleTab={changeTab}
+        storedAtoms={storedAtoms}
+      />
+    </won-atom-info>
+  );
 }
 WonAtomInfo.propTypes = {
+  atomUri: PropTypes.string.isRequired,
   atom: PropTypes.object,
   className: PropTypes.string,
   ownedConnection: PropTypes.object,
