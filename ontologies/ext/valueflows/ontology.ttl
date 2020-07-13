@@ -57,11 +57,7 @@
              <https://w3id.org/won/core#autoOpen> "false"^^xsd:boolean ;
              <https://w3id.org/won/core#socketCapacity> 1 ;
              rdfs:comment "An Activity Atom uses a Socket with this configuration to connect to a Presona Atom for a resource."@en ;
-             rdfs:label "ActivitySocket" .
-
-
-###  https://w3id.org/won/ext/valueflows#CustodianInverseSocket
-:CustodianInverseSocket rdf:type owl:NamedIndividual .
+             rdfs:label "ActorSocket" .
 
 
 ###  https://w3id.org/won/ext/valueflows#CustodianOfSocket
@@ -77,16 +73,12 @@
 ###  https://w3id.org/won/ext/valueflows#CustodianSocket
 :CustodianSocket rdf:type owl:NamedIndividual ,
                           <https://w3id.org/won/core#SocketDefinition> ;
-                 <https://w3id.org/won/core#compatibleSocketDefinition> :CustodianInverseSocket ;
+                 <https://w3id.org/won/core#compatibleSocketDefinition> :CustodianOfSocket ;
                  <https://w3id.org/won/core#derivesAtomProperty> :custodian ;
                  <https://w3id.org/won/core#autoOpen> "false"^^xsd:boolean ;
                  <https://w3id.org/won/core#socketCapacity> 1 ;
                  rdfs:comment "An Atom uses a Socket with this configuration to connect to the Persona Atom that is its custodian."@en ;
                  rdfs:label "CustodianSocket" .
-
-
-###  https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket
-:PrimaryAccountableInverseSocket rdf:type owl:NamedIndividual .
 
 
 ###  https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket
@@ -102,7 +94,7 @@
 ###  https://w3id.org/won/ext/valueflows#PrimaryAccountableSocket
 :PrimaryAccountableSocket rdf:type owl:NamedIndividual ,
                                    <https://w3id.org/won/core#SocketDefinition> ;
-                          <https://w3id.org/won/core#compatibleSocketDefinition> :PrimaryAccountableInverseSocket ;
+                          <https://w3id.org/won/core#compatibleSocketDefinition> :PrimaryAccountableOfSocket ;
                           <https://w3id.org/won/core#derivesAtomProperty> <https://w3id.org/valueflows#primaryAccountable> ;
                           <https://w3id.org/won/core#autoOpen> "false"^^xsd:boolean ;
                           <https://w3id.org/won/core#socketCapacity> 1 ;
@@ -118,7 +110,7 @@
                         <https://w3id.org/won/core#autoOpen> "false"^^xsd:boolean ;
                         <https://w3id.org/won/core#socketCapacity> 1 ;
                         rdfs:comment "A Resource Atom uses a Socket with this configuration to connect to an Activity Atom for a resource."@en ;
-                        rdfs:label "ActivitySocket" .
+                        rdfs:label "ResourceActivitySocket" .
 
 
 ###  https://w3id.org/won/ext/valueflows#ResourceSocket
@@ -128,7 +120,7 @@
                 <https://w3id.org/won/core#derivesInverseAtomProperty> <https://w3id.org/valueflows#EconomicResource> ;
                 <https://w3id.org/won/core#autoOpen> "false"^^xsd:boolean ;
                 rdfs:comment "An Activity Atom uses a Socket with this configuration to connect to its corresponding Resource Atom."@en ;
-                rdfs:label "ActivityInverseSocket" .
+                rdfs:label "ResourceSocket" .
 
 
 ###  https://w3id.org/won/ext/valueflows#actor

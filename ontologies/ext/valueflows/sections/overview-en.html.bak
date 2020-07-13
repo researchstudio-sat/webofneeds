@@ -3,19 +3,11 @@
 This ontology has the following classes and properties.</span>
 <h4>Named Individuals</h4><ul class="hlist">
    <li>
-      <a href="#ResourceSocket"
-         title="https://w3id.org/won/ext/valueflows#ResourceSocket">ActivityInverseSocket</a>
-   </li>
-   <li>
-      <a href="#ActorSocket" title="https://w3id.org/won/ext/valueflows#ActorSocket">ActivitySocket</a>
-   </li>
-   <li>
-      <a href="#ResourceActivitySocket"
-         title="https://w3id.org/won/ext/valueflows#ResourceActivitySocket">ActivitySocket</a>
-   </li>
-   <li>
       <a href="#ActorActivitySocket"
          title="https://w3id.org/won/ext/valueflows#ActorActivitySocket">ActorActivitySocket</a>
+   </li>
+   <li>
+      <a href="#ActorSocket" title="https://w3id.org/won/ext/valueflows#ActorSocket">ActorSocket</a>
    </li>
    <li>
       <a href="#CustodianOfSocket"
@@ -32,5 +24,13 @@ This ontology has the following classes and properties.</span>
    <li>
       <a href="#PrimaryAccountableSocket"
          title="https://w3id.org/won/ext/valueflows#PrimaryAccountableSocket">PrimaryAccountableSocket</a>
+   </li>
+   <li>
+      <a href="#ResourceActivitySocket"
+         title="https://w3id.org/won/ext/valueflows#ResourceActivitySocket">ResourceActivitySocket</a>
+   </li>
+   <li>
+      <a href="#ResourceSocket"
+         title="https://w3id.org/won/ext/valueflows#ResourceSocket">ResourceSocket</a>
    </li>
 </ul>

@@ -95,7 +95,7 @@
     "@value" : "An Activity Atom uses a Socket with this configuration to connect to a Presona Atom for a resource."
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "ActivitySocket"
+    "@value" : "ActorSocket"
   } ],
   "https://w3id.org/won/core#autoOpen" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
@@ -111,9 +111,6 @@
     "@type" : "http://www.w3.org/2001/XMLSchema#integer",
     "@value" : "1"
   } ]
-}, {
-  "@id" : "https://w3id.org/won/ext/valueflows#CustodianInverseSocket",
-  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual" ]
 }, {
   "@id" : "https://w3id.org/won/ext/valueflows#CustodianOfSocket",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/core#SocketDefinition" ],
@@ -149,7 +146,7 @@
     "@value" : "false"
   } ],
   "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
-    "@id" : "https://w3id.org/won/ext/valueflows#CustodianInverseSocket"
+    "@id" : "https://w3id.org/won/ext/valueflows#CustodianOfSocket"
   } ],
   "https://w3id.org/won/core#derivesAtomProperty" : [ {
     "@id" : "https://w3id.org/won/ext/valueflows#custodian"
@@ -158,9 +155,6 @@
     "@type" : "http://www.w3.org/2001/XMLSchema#integer",
     "@value" : "1"
   } ]
-}, {
-  "@id" : "https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket",
-  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual" ]
 }, {
   "@id" : "https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/core#SocketDefinition" ],
@@ -196,7 +190,7 @@
     "@value" : "false"
   } ],
   "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
-    "@id" : "https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket"
+    "@id" : "https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket"
   } ],
   "https://w3id.org/won/core#derivesAtomProperty" : [ {
     "@id" : "https://w3id.org/valueflows#primaryAccountable"
@@ -213,7 +207,7 @@
     "@value" : "A Resource Atom uses a Socket with this configuration to connect to an Activity Atom for a resource."
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "ActivitySocket"
+    "@value" : "ResourceActivitySocket"
   } ],
   "https://w3id.org/won/core#autoOpen" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
@@ -237,7 +231,7 @@
     "@value" : "An Activity Atom uses a Socket with this configuration to connect to its corresponding Resource Atom."
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "ActivityInverseSocket"
+    "@value" : "ResourceSocket"
   } ],
   "https://w3id.org/won/core#autoOpen" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
