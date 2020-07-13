@@ -66,7 +66,7 @@
     "id" : "9",
     "type" : "owl:Class"
   }, {
-    "id" : "15",
+    "id" : "13",
     "type" : "owl:Class"
   }, {
     "id" : "31",
@@ -78,14 +78,11 @@
     "id" : "28",
     "type" : "owl:Class"
   }, {
-    "id" : "13",
+    "id" : "16",
     "type" : "owl:Thing"
   }, {
-    "id" : "25",
+    "id" : "22",
     "type" : "rdfs:Datatype"
-  }, {
-    "id" : "45",
-    "type" : "owl:Class"
   }, {
     "id" : "5",
     "type" : "rdfs:Datatype"
@@ -129,7 +126,7 @@
     "id" : "61",
     "type" : "owl:unionOf"
   }, {
-    "id" : "44",
+    "id" : "45",
     "type" : "owl:unionOf"
   }, {
     "id" : "37",
@@ -138,7 +135,7 @@
     "id" : "30",
     "type" : "owl:Class"
   }, {
-    "id" : "60",
+    "id" : "59",
     "type" : "rdfs:Datatype"
   }, {
     "id" : "63",
@@ -159,10 +156,10 @@
     "id" : "72",
     "type" : "owl:unionOf"
   }, {
-    "id" : "22",
+    "id" : "24",
     "type" : "owl:Class"
   }, {
-    "id" : "23",
+    "id" : "25",
     "type" : "owl:Class"
   }, {
     "id" : "2",
@@ -174,7 +171,7 @@
     "id" : "20",
     "type" : "owl:Class"
   }, {
-    "id" : "16",
+    "id" : "14",
     "type" : "owl:Class"
   } ],
   "classAttribute" : [ {
@@ -329,24 +326,64 @@
         "undefined" : "PrimaryAccountableSocket"
       }
     }, {
-      "iri" : "https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket",
+      "iri" : "https://w3id.org/won/ext/valueflows#ResourceActivitySocket",
       "baseIri" : "https://w3id.org/won/ext/valueflows",
       "comment" : {
-        "en" : "A Persona Atom uses a Socket with this configuration to connect to Atoms of which it is the primary accountable."
+        "en" : "A Resource Atom uses a Socket with this configuration to connect to an Activity Atom for a resource."
       },
       "labels" : {
-        "IRI-based" : "PrimaryAccountableInverseSocket",
-        "undefined" : "PrimaryAccountableInverseSocket"
+        "IRI-based" : "ResourceActivitySocket",
+        "undefined" : "ActivitySocket"
       }
     }, {
-      "iri" : "https://w3id.org/won/ext/valueflows#CustodianInverseSocket",
+      "iri" : "https://w3id.org/won/ext/valueflows#ActorSocket",
+      "baseIri" : "https://w3id.org/won/ext/valueflows",
+      "comment" : {
+        "en" : "An Activity Atom uses a Socket with this configuration to connect to a Presona Atom for a resource."
+      },
+      "labels" : {
+        "IRI-based" : "ActorSocket",
+        "undefined" : "ActivitySocket"
+      }
+    }, {
+      "iri" : "https://w3id.org/won/ext/valueflows#CustodianOfSocket",
       "baseIri" : "https://w3id.org/won/ext/valueflows",
       "comment" : {
         "en" : "A Persona Atom uses a Socket with this configuration to connect to Atoms of which it is the custodian."
       },
       "labels" : {
-        "IRI-based" : "CustodianInverseSocket",
-        "undefined" : "CustodianInverseSocket"
+        "IRI-based" : "CustodianOfSocket",
+        "undefined" : "CustodianOfSocket"
+      }
+    }, {
+      "iri" : "https://w3id.org/won/ext/valueflows#ResourceSocket",
+      "baseIri" : "https://w3id.org/won/ext/valueflows",
+      "comment" : {
+        "en" : "An Activity Atom uses a Socket with this configuration to connect to its corresponding Resource Atom."
+      },
+      "labels" : {
+        "IRI-based" : "ResourceSocket",
+        "undefined" : "ActivityInverseSocket"
+      }
+    }, {
+      "iri" : "https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket",
+      "baseIri" : "https://w3id.org/won/ext/valueflows",
+      "comment" : {
+        "en" : "A Persona Atom uses a Socket with this configuration to connect to Atoms of which it is the primary accountable."
+      },
+      "labels" : {
+        "IRI-based" : "PrimaryAccountableOfSocket",
+        "undefined" : "PrimaryAccountableOfSocket"
+      }
+    }, {
+      "iri" : "https://w3id.org/won/ext/valueflows#ActorActivitySocket",
+      "baseIri" : "https://w3id.org/won/ext/valueflows",
+      "comment" : {
+        "en" : "A Persona Atom uses a Socket with this configuration to connect to an Activity Atom for a resource."
+      },
+      "labels" : {
+        "IRI-based" : "ActorActivitySocket",
+        "undefined" : "ActorActivitySocket"
       }
     }, {
       "iri" : "https://w3id.org/won/ext/valueflows#CustodianSocket",
@@ -363,7 +400,7 @@
       "en" : "A Socket's definition."
     },
     "attributes" : [ "external" ],
-    "id" : "15"
+    "id" : "13"
   }, {
     "iri" : "http://www.w3.org/2001/XMLSchema#integer",
     "baseIri" : "http://www.w3.org/2001/XMLSchema",
@@ -403,38 +440,17 @@
   }, {
     "iri" : "http://www.w3.org/2002/07/owl#Thing",
     "baseIri" : "http://owl2vowl.de",
-    "id" : "13",
+    "id" : "16",
     "label" : {
       "undefined" : "Thing"
     }
   }, {
     "iri" : "http://www.w3.org/2001/XMLSchema#integer",
     "baseIri" : "http://www.w3.org/2001/XMLSchema",
-    "id" : "25",
+    "id" : "22",
     "label" : {
       "IRI-based" : "integer"
     }
-  }, {
-    "iri" : "https://w3id.org/won/core#previousConnectionState",
-    "baseIri" : "https://w3id.org/won/core",
-    "instances" : 0,
-    "annotations" : {
-      "isDefinedBy" : [ {
-        "identifier" : "isDefinedBy",
-        "language" : "undefined",
-        "value" : "https://w3id.org/won/core",
-        "type" : "iri"
-      } ]
-    },
-    "label" : {
-      "IRI-based" : "previousConnectionState",
-      "undefined" : "previousConnectionState"
-    },
-    "comment" : {
-      "en" : "Indicates the state in which the Connection was before the current one."
-    },
-    "attributes" : [ "external" ],
-    "id" : "45"
   }, {
     "iri" : "http://www.w3.org/2001/XMLSchema#string",
     "baseIri" : "http://www.w3.org/2001/XMLSchema",
@@ -564,13 +580,13 @@
   }, {
     "instances" : 0,
     "union" : [ "35", "7" ],
-    "attributes" : [ "union", "anonymous" ],
+    "attributes" : [ "anonymous", "union" ],
     "id" : "61"
   }, {
     "instances" : 0,
     "union" : [ "35", "7" ],
-    "attributes" : [ "union", "anonymous" ],
-    "id" : "44"
+    "attributes" : [ "anonymous", "union" ],
+    "id" : "45"
   }, {
     "iri" : "http://www.w3.org/2001/XMLSchema#string",
     "baseIri" : "http://www.w3.org/2001/XMLSchema",
@@ -595,7 +611,7 @@
   }, {
     "iri" : "http://www.w3.org/2001/XMLSchema#string",
     "baseIri" : "http://www.w3.org/2001/XMLSchema",
-    "id" : "60",
+    "id" : "59",
     "label" : {
       "IRI-based" : "string"
     }
@@ -651,7 +667,7 @@
   }, {
     "instances" : 0,
     "union" : [ "35", "7" ],
-    "attributes" : [ "union", "anonymous" ],
+    "attributes" : [ "anonymous", "union" ],
     "id" : "72"
   }, {
     "iri" : "https://w3id.org/won/core#Node",
@@ -665,7 +681,7 @@
       "en" : "A server storing Atoms and the data associated with them."
     },
     "attributes" : [ "external" ],
-    "id" : "22"
+    "id" : "24"
   }, {
     "iri" : "https://w3id.org/won/core#WonProtocol",
     "baseIri" : "https://w3id.org/won/core",
@@ -687,7 +703,7 @@
       "en" : "Superclass for Web of Needs protocol implementations."
     },
     "attributes" : [ "external" ],
-    "id" : "23"
+    "id" : "25"
   }, {
     "iri" : "https://w3id.org/won/core#WonOverActiveMq",
     "baseIri" : "https://w3id.org/won/core",
@@ -709,7 +725,7 @@
     },
     "attributes" : [ "external" ],
     "id" : "2",
-    "superClasses" : [ "23" ]
+    "superClasses" : [ "25" ]
   }, {
     "iri" : "https://w3id.org/won/core#AtomState",
     "baseIri" : "https://w3id.org/won/core",
@@ -794,7 +810,7 @@
       "IRI-based" : "Property"
     },
     "attributes" : [ "external" ],
-    "id" : "16"
+    "id" : "14"
   } ],
   "property" : [ {
     "id" : "1",
@@ -812,7 +828,7 @@
     "id" : "12",
     "type" : "owl:objectProperty"
   }, {
-    "id" : "14",
+    "id" : "15",
     "type" : "owl:objectProperty"
   }, {
     "id" : "17",
@@ -822,10 +838,10 @@
     "type" : "rdfs:SubClassOf"
   }, {
     "id" : "21",
-    "type" : "owl:objectProperty"
-  }, {
-    "id" : "24",
     "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "23",
+    "type" : "owl:objectProperty"
   }, {
     "id" : "26",
     "type" : "rdfs:SubClassOf"
@@ -857,6 +873,9 @@
     "id" : "43",
     "type" : "owl:objectProperty"
   }, {
+    "id" : "44",
+    "type" : "owl:objectProperty"
+  }, {
     "id" : "49",
     "type" : "owl:datatypeProperty"
   }, {
@@ -872,7 +891,7 @@
     "id" : "58",
     "type" : "owl:datatypeProperty"
   }, {
-    "id" : "59",
+    "id" : "60",
     "type" : "owl:datatypeProperty"
   }, {
     "id" : "62",
@@ -938,7 +957,7 @@
     "comment" : {
       "en" : "The activeMQ topic to subscribe to to be informed when an atom is deleted."
     },
-    "attributes" : [ "external", "datatype" ],
+    "attributes" : [ "datatype", "external" ],
     "id" : "1"
   }, {
     "iri" : "https://w3id.org/won/core#ownerQueue",
@@ -952,7 +971,7 @@
     "comment" : {
       "en" : "The activeMQ queue to be used by owners to send messages to the node."
     },
-    "attributes" : [ "external", "datatype" ],
+    "attributes" : [ "datatype", "external" ],
     "id" : "4"
   }, {
     "iri" : "https://w3id.org/won/core#atomState",
@@ -974,7 +993,7 @@
     "comment" : {
       "en" : "Defines the Atom object's state."
     },
-    "attributes" : [ "external", "object", "functional" ],
+    "attributes" : [ "object", "external", "functional" ],
     "id" : "6"
   }, {
     "iri" : "https://w3id.org/won/core#brokerUri",
@@ -988,12 +1007,26 @@
     "comment" : {
       "en" : "The URI of the activeMQ broker"
     },
-    "attributes" : [ "external", "datatype" ],
+    "attributes" : [ "datatype", "external" ],
     "id" : "10"
+  }, {
+    "iri" : "https://w3id.org/won/core#derivesInverseAtomProperty",
+    "baseIri" : "https://w3id.org/won/core",
+    "range" : "14",
+    "label" : {
+      "IRI-based" : "derivesInverseAtomProperty",
+      "undefined" : "derivesInverseAtomProperty"
+    },
+    "domain" : "13",
+    "comment" : {
+      "en" : "Defines a property to be 'derived' when the connection is established. The property will be used to derive a triple '[targetAtom] [property] [sourceAtom]'."
+    },
+    "attributes" : [ "object", "external" ],
+    "id" : "12"
   }, {
     "iri" : "https://w3id.org/won/core#contentGraph",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "13",
+    "range" : "16",
     "label" : {
       "IRI-based" : "contentGraph",
       "undefined" : "contentGraph"
@@ -1002,45 +1035,45 @@
     "comment" : {
       "en" : "Links an Atom to an RDF graph holding some of its RDF content."
     },
-    "attributes" : [ "external", "object" ],
-    "id" : "12"
-  }, {
-    "iri" : "https://w3id.org/won/core#derivesInverseAtomProperty",
-    "baseIri" : "https://w3id.org/won/core",
-    "range" : "16",
-    "label" : {
-      "IRI-based" : "derivesInverseAtomProperty",
-      "undefined" : "derivesInverseAtomProperty"
-    },
-    "domain" : "15",
-    "comment" : {
-      "en" : "Defines a property to be 'derived' when the connection is established. The property will be used to derive a triple '[targetAtom] [property] [sourceAtom]'."
-    },
-    "attributes" : [ "external", "object" ],
-    "id" : "14"
+    "attributes" : [ "object", "external" ],
+    "id" : "15"
   }, {
     "iri" : "https://w3id.org/won/core#derivesAtomProperty",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "16",
+    "range" : "14",
     "label" : {
       "IRI-based" : "derivesAtomProperty",
       "undefined" : "derivesAtomProperty"
     },
-    "domain" : "15",
+    "domain" : "13",
     "comment" : {
       "en" : "Defines a property to be 'derived' when the connection is established. The property will be used to derive a triple '[sourceAtom] [property] [targetAtom]'."
     },
-    "attributes" : [ "external", "object" ],
+    "attributes" : [ "object", "external" ],
     "id" : "17"
   }, {
     "range" : "20",
     "domain" : "19",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "18"
+  }, {
+    "iri" : "https://w3id.org/won/core#suggestedCount",
+    "baseIri" : "https://w3id.org/won/core",
+    "range" : "22",
+    "label" : {
+      "IRI-based" : "suggestedCount",
+      "undefined" : "suggestedCount"
+    },
+    "domain" : "19",
+    "comment" : {
+      "en" : "The number of connections in the container that are in state SUGGESTED."
+    },
+    "attributes" : [ "datatype", "external" ],
+    "id" : "21"
   }, {
     "iri" : "https://w3id.org/won/core#supportsWonProtocolImpl",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "23",
+    "range" : "25",
     "annotations" : {
       "isDefinedBy" : [ {
         "identifier" : "isDefinedBy",
@@ -1053,40 +1086,26 @@
       "IRI-based" : "supportsWonProtocolImpl",
       "undefined" : "supportsWonProtocolImpl"
     },
-    "domain" : "22",
+    "domain" : "24",
     "comment" : {
       "en" : "Connects an WoN Node object with a description of a WON protocol it supports."
     },
-    "attributes" : [ "external", "object" ],
-    "id" : "21"
+    "attributes" : [ "object", "external" ],
+    "id" : "23"
   }, {
-    "iri" : "https://w3id.org/won/core#suggestedCount",
-    "baseIri" : "https://w3id.org/won/core",
     "range" : "25",
-    "label" : {
-      "IRI-based" : "suggestedCount",
-      "undefined" : "suggestedCount"
-    },
-    "domain" : "19",
-    "comment" : {
-      "en" : "The number of connections in the container that are in state SUGGESTED."
-    },
-    "attributes" : [ "external", "datatype" ],
-    "id" : "24"
-  }, {
-    "range" : "23",
     "domain" : "2",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "26"
   }, {
     "range" : "20",
     "domain" : "28",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "27"
   }, {
     "range" : "20",
     "domain" : "30",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "29"
   }, {
     "iri" : "https://w3id.org/won/core#socketCapacity",
@@ -1096,11 +1115,11 @@
       "IRI-based" : "socketCapacity",
       "undefined" : "socketCapacity"
     },
-    "domain" : "15",
+    "domain" : "13",
     "comment" : {
       "en" : "Defines the maximum number of established connections supported by the socket."
     },
-    "attributes" : [ "external", "datatype" ],
+    "attributes" : [ "datatype", "external" ],
     "id" : "33"
   }, {
     "iri" : "https://w3id.org/won/core#targetConnection",
@@ -1122,7 +1141,7 @@
     "comment" : {
       "en" : "Links a Connection object to its remote counterpart."
     },
-    "attributes" : [ "inverse functional", "external", "object", "functional", "symmetric" ],
+    "attributes" : [ "object", "external", "inverse functional", "functional", "symmetric" ],
     "id" : "34"
   }, {
     "iri" : "https://w3id.org/won/core#atomActivatedTopic",
@@ -1136,7 +1155,7 @@
     "comment" : {
       "en" : "The activeMQ topic to subscribe to to be informed when an atom is activated."
     },
-    "attributes" : [ "external", "datatype" ],
+    "attributes" : [ "datatype", "external" ],
     "id" : "36"
   }, {
     "iri" : "https://w3id.org/won/core#requestReceivedCount",
@@ -1150,7 +1169,7 @@
     "comment" : {
       "en" : "The number of connections in the container that are in state REQUEST_RECEIVED."
     },
-    "attributes" : [ "external", "datatype" ],
+    "attributes" : [ "datatype", "external" ],
     "id" : "38"
   }, {
     "iri" : "https://w3id.org/won/core#targetAtom",
@@ -1172,7 +1191,7 @@
     "comment" : {
       "en" : "links a Connection to its remote Atom. The remote Atom is the one holding the  targetConnection."
     },
-    "attributes" : [ "external", "object" ],
+    "attributes" : [ "object", "external" ],
     "id" : "40"
   }, {
     "iri" : "https://w3id.org/won/core#uriPrefixSpecification",
@@ -1182,26 +1201,48 @@
       "IRI-based" : "uriPrefixSpecification",
       "undefined" : "uriPrefixSpecification"
     },
-    "domain" : "22",
+    "domain" : "24",
     "comment" : {
       "en" : "Specification of URI prefixes used by this WoN node."
     },
-    "attributes" : [ "external", "object" ],
+    "attributes" : [ "object", "external" ],
     "id" : "41"
+  }, {
+    "iri" : "https://w3id.org/won/core#previousConnectionState",
+    "baseIri" : "https://w3id.org/won/core",
+    "range" : "43",
+    "annotations" : {
+      "isDefinedBy" : [ {
+        "identifier" : "isDefinedBy",
+        "language" : "undefined",
+        "value" : "https://w3id.org/won/core",
+        "type" : "iri"
+      } ]
+    },
+    "label" : {
+      "IRI-based" : "previousConnectionState",
+      "undefined" : "previousConnectionState"
+    },
+    "domain" : "35",
+    "comment" : {
+      "en" : "Indicates the state in which the Connection was before the current one."
+    },
+    "attributes" : [ "object", "external", "functional" ],
+    "id" : "43"
   }, {
     "iri" : "https://w3id.org/won/core#wonNode",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "22",
+    "range" : "24",
     "label" : {
       "IRI-based" : "wonNode",
       "undefined" : "wonNode"
     },
-    "domain" : "44",
+    "domain" : "45",
     "comment" : {
       "en" : "Links an Atom or Connection to their WoN node."
     },
-    "attributes" : [ "external", "object" ],
-    "id" : "43"
+    "attributes" : [ "object", "external" ],
+    "id" : "44"
   }, {
     "iri" : "https://w3id.org/won/core#atomModifiedTopic",
     "baseIri" : "https://w3id.org/won/core",
@@ -1214,12 +1255,12 @@
     "comment" : {
       "en" : "The activeMQ topic to subscribe to to be informed when an atom is modified."
     },
-    "attributes" : [ "external", "datatype" ],
+    "attributes" : [ "datatype", "external" ],
     "id" : "49"
   }, {
     "iri" : "https://w3id.org/won/core#socketDefinition",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "15",
+    "range" : "13",
     "label" : {
       "IRI-based" : "socketDefinition",
       "undefined" : "socketDefinition"
@@ -1228,7 +1269,7 @@
     "comment" : {
       "en" : "Links the socket to its definition. A socket must have exactly one definition."
     },
-    "attributes" : [ "external", "object" ],
+    "attributes" : [ "object", "external" ],
     "id" : "53"
   }, {
     "iri" : "https://w3id.org/won/core#targetSocket",
@@ -1250,7 +1291,7 @@
     "comment" : {
       "en" : "Indicates that a remote atom or remote connection supports the specified socket (=behavior) or specifies the remote socket to connect with."
     },
-    "attributes" : [ "external", "object" ],
+    "attributes" : [ "object", "external" ],
     "id" : "56"
   }, {
     "iri" : "https://w3id.org/won/core#connectionUriPrefix",
@@ -1264,8 +1305,22 @@
     "comment" : {
       "en" : "Specifies the prefix a connection must have on the node this specification applies to."
     },
-    "attributes" : [ "external", "datatype" ],
+    "attributes" : [ "datatype", "external" ],
     "id" : "57"
+  }, {
+    "iri" : "https://w3id.org/won/core#atomCreatedTopic",
+    "baseIri" : "https://w3id.org/won/core",
+    "range" : "59",
+    "label" : {
+      "IRI-based" : "atomCreatedTopic",
+      "undefined" : "atomCreatedTopic"
+    },
+    "domain" : "2",
+    "comment" : {
+      "en" : "The activeMQ topic to subscribe to to be informed when an atom is created."
+    },
+    "attributes" : [ "datatype", "external" ],
+    "id" : "58"
   }, {
     "iri" : "https://w3id.org/won/core#closedCount",
     "baseIri" : "https://w3id.org/won/core",
@@ -1278,22 +1333,8 @@
     "comment" : {
       "en" : "The number of connections in the container that are in state CLOSED."
     },
-    "attributes" : [ "external", "datatype" ],
-    "id" : "58"
-  }, {
-    "iri" : "https://w3id.org/won/core#atomCreatedTopic",
-    "baseIri" : "https://w3id.org/won/core",
-    "range" : "60",
-    "label" : {
-      "IRI-based" : "atomCreatedTopic",
-      "undefined" : "atomCreatedTopic"
-    },
-    "domain" : "2",
-    "comment" : {
-      "en" : "The activeMQ topic to subscribe to to be informed when an atom is created."
-    },
-    "attributes" : [ "external", "datatype" ],
-    "id" : "59"
+    "attributes" : [ "datatype", "external" ],
+    "id" : "60"
   }, {
     "iri" : "https://w3id.org/won/core#autoOpen",
     "baseIri" : "https://w3id.org/won/core",
@@ -1302,11 +1343,11 @@
       "IRI-based" : "autoOpen",
       "undefined" : "autoOpen"
     },
-    "domain" : "15",
+    "domain" : "13",
     "comment" : {
       "en" : "Indicates that any incoming CONNECT/OPEN message will be answered with OPEN unless the facet configuration forbids it."
     },
-    "attributes" : [ "external", "datatype" ],
+    "attributes" : [ "datatype", "external" ],
     "id" : "62"
   }, {
     "iri" : "https://w3id.org/won/core#socket",
@@ -1328,7 +1369,7 @@
     "comment" : {
       "en" : "Indicates that an atom or connection supports the specified socket (=behavior)."
     },
-    "attributes" : [ "external", "object" ],
+    "attributes" : [ "object", "external" ],
     "id" : "64"
   }, {
     "iri" : "https://w3id.org/won/core#requestSentCount",
@@ -1342,7 +1383,7 @@
     "comment" : {
       "en" : "The number of connections in the container that are in state REQUEST_RECEIVED."
     },
-    "attributes" : [ "external", "datatype" ],
+    "attributes" : [ "datatype", "external" ],
     "id" : "66"
   }, {
     "iri" : "https://w3id.org/won/core#sourceAtom",
@@ -1356,7 +1397,7 @@
     "comment" : {
       "en" : "Links a Connection to the Atom it belongs to (the source of this Connection)"
     },
-    "attributes" : [ "external", "object" ],
+    "attributes" : [ "object", "external" ],
     "id" : "67"
   }, {
     "iri" : "https://w3id.org/won/core#atomUriPrefix",
@@ -1370,27 +1411,13 @@
     "comment" : {
       "en" : "Specifies the prefix an atom must have on the node this specification applies to. This specification allows clients to generate new valid new Atom URIs."
     },
-    "attributes" : [ "external", "datatype" ],
+    "attributes" : [ "datatype", "external" ],
     "id" : "68"
   }, {
     "range" : "28",
     "domain" : "19",
-    "attributes" : [ "anonymous", "object" ],
+    "attributes" : [ "object", "anonymous" ],
     "id" : "69"
-  }, {
-    "iri" : "https://w3id.org/won/core#atomList",
-    "baseIri" : "https://w3id.org/won/core",
-    "range" : "30",
-    "label" : {
-      "IRI-based" : "atomList",
-      "undefined" : "atomList"
-    },
-    "domain" : "22",
-    "comment" : {
-      "undefined" : "The Node's atoms, in a LDP-pageable container."
-    },
-    "attributes" : [ "external", "object" ],
-    "id" : "70"
   }, {
     "iri" : "https://w3id.org/won/core#defaultSocket",
     "baseIri" : "https://w3id.org/won/core",
@@ -1411,7 +1438,21 @@
     "comment" : {
       "en" : "Indicates the socket to connect to by default."
     },
-    "attributes" : [ "external", "object" ],
+    "attributes" : [ "object", "external" ],
+    "id" : "70"
+  }, {
+    "iri" : "https://w3id.org/won/core#atomList",
+    "baseIri" : "https://w3id.org/won/core",
+    "range" : "30",
+    "label" : {
+      "IRI-based" : "atomList",
+      "undefined" : "atomList"
+    },
+    "domain" : "24",
+    "comment" : {
+      "undefined" : "The Node's atoms, in a LDP-pageable container."
+    },
+    "attributes" : [ "object", "external" ],
     "id" : "71"
   }, {
     "iri" : "https://w3id.org/won/core#connectionState",
@@ -1433,7 +1474,7 @@
     "comment" : {
       "en" : "Indicates the state in which the Connection object is."
     },
-    "attributes" : [ "external", "object", "functional" ],
+    "attributes" : [ "object", "external", "functional" ],
     "id" : "73"
   }, {
     "iri" : "https://w3id.org/won/core#matcherQueue",
@@ -1447,7 +1488,7 @@
     "comment" : {
       "en" : "The activeMQ queue to be used by matchers to send messages to the node."
     },
-    "attributes" : [ "external", "datatype" ],
+    "attributes" : [ "datatype", "external" ],
     "id" : "74"
   }, {
     "iri" : "https://w3id.org/won/core#connectedCount",
@@ -1461,7 +1502,7 @@
     "comment" : {
       "en" : "The number of connections in the container that are in state CONNECTED."
     },
-    "attributes" : [ "external", "datatype" ],
+    "attributes" : [ "datatype", "external" ],
     "id" : "75"
   }, {
     "iri" : "https://w3id.org/won/core#atomDeactivatedTopic",
@@ -1475,7 +1516,7 @@
     "comment" : {
       "en" : "The activeMQ topic to subscribe to to be informed when an atom is deactivated."
     },
-    "attributes" : [ "external", "datatype" ],
+    "attributes" : [ "datatype", "external" ],
     "id" : "76"
   }, {
     "iri" : "https://w3id.org/won/core#connections",
@@ -1497,7 +1538,7 @@
     "comment" : {
       "en" : "Links the Atom object to its connections."
     },
-    "attributes" : [ "external", "object" ],
+    "attributes" : [ "object", "external" ],
     "id" : "77"
   }, {
     "iri" : "https://w3id.org/won/core#messageUriPrefix",
@@ -1511,21 +1552,21 @@
     "comment" : {
       "en" : "Specifies the prefix a message must have on the node to which this specification applies. This specification allows clients to convert between a message URI (prefix 'wm:/') and a dereferencable https URI."
     },
-    "attributes" : [ "external", "datatype" ],
+    "attributes" : [ "datatype", "external" ],
     "id" : "78"
   }, {
     "iri" : "https://w3id.org/won/core#compatibleSocketDefinition",
     "baseIri" : "https://w3id.org/won/core",
-    "range" : "15",
+    "range" : "13",
     "label" : {
       "IRI-based" : "compatibleSocketDefinition",
       "undefined" : "compatibleSocketDefinition"
     },
-    "domain" : "15",
+    "domain" : "13",
     "comment" : {
       "en" : "Identifies another SocketDefinition that is compatible with this one. Connections with other kinds of sockets will not be allowed unless they are explicitly annotated."
     },
-    "attributes" : [ "external", "object" ],
+    "attributes" : [ "object", "external" ],
     "id" : "79"
   }, {
     "iri" : "https://w3id.org/won/core#messageContainer",
@@ -1547,7 +1588,7 @@
     "comment" : {
       "en" : "Links the Connection object to a container containing connection events (messages)."
     },
-    "attributes" : [ "external", "object", "functional" ],
+    "attributes" : [ "object", "external", "functional" ],
     "id" : "80"
   }, {
     "iri" : "https://w3id.org/won/core#nodeQueue",
@@ -1561,7 +1602,7 @@
     "comment" : {
       "en" : "The activeMQ queue to be used by other nodes to send messages to the node."
     },
-    "attributes" : [ "external", "datatype" ],
+    "attributes" : [ "datatype", "external" ],
     "id" : "81"
   } ]
 }

@@ -3,18 +3,29 @@
   "@type" : [ "http://www.w3.org/2002/07/owl#AllDifferent" ],
   "http://www.w3.org/2002/07/owl#distinctMembers" : [ {
     "@list" : [ {
-      "@id" : "https://w3id.org/won/ext/valueflows#CustodianInverseSocket"
+      "@id" : "https://w3id.org/won/ext/valueflows#ActorActivitySocket"
+    }, {
+      "@id" : "https://w3id.org/won/ext/valueflows#ActorSocket"
+    }, {
+      "@id" : "https://w3id.org/won/ext/valueflows#CustodianOfSocket"
     }, {
       "@id" : "https://w3id.org/won/ext/valueflows#CustodianSocket"
     }, {
-      "@id" : "https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket"
+      "@id" : "https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket"
     }, {
       "@id" : "https://w3id.org/won/ext/valueflows#PrimaryAccountableSocket"
+    }, {
+      "@id" : "https://w3id.org/won/ext/valueflows#ResourceActivitySocket"
+    }, {
+      "@id" : "https://w3id.org/won/ext/valueflows#ResourceSocket"
     } ]
   } ]
 }, {
   "@id" : "http://www.w3.org/ns/prov#wasDerivedFrom",
   "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "https://w3id.org/valueflows#EconomicResource",
+  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual" ]
 }, {
   "@id" : "https://w3id.org/valueflows#primaryAccountable",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual" ]
@@ -53,14 +64,65 @@
     "@id" : "https://w3id.org/valueflows"
   } ]
 }, {
+  "@id" : "https://w3id.org/won/ext/valueflows#ActorActivitySocket",
+  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/core#SocketDefinition" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "A Persona Atom uses a Socket with this configuration to connect to an Activity Atom for a resource."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "ActorActivitySocket"
+  } ],
+  "https://w3id.org/won/core#autoOpen" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
+    "@value" : "false"
+  } ],
+  "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
+    "@id" : "https://w3id.org/won/ext/valueflows#ActorSocket"
+  } ],
+  "https://w3id.org/won/core#derivesAtomProperty" : [ {
+    "@id" : "https://w3id.org/won/ext/valueflows#actor"
+  } ],
+  "https://w3id.org/won/core#socketCapacity" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/ext/valueflows#ActorSocket",
+  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/core#SocketDefinition" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "An Activity Atom uses a Socket with this configuration to connect to a Presona Atom for a resource."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "ActivitySocket"
+  } ],
+  "https://w3id.org/won/core#autoOpen" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
+    "@value" : "false"
+  } ],
+  "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
+    "@id" : "https://w3id.org/won/ext/valueflows#ActorActivitySocket"
+  } ],
+  "https://w3id.org/won/core#derivesAtomProperty" : [ {
+    "@id" : "https://w3id.org/won/ext/valueflows#actor"
+  } ],
+  "https://w3id.org/won/core#socketCapacity" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ]
+}, {
   "@id" : "https://w3id.org/won/ext/valueflows#CustodianInverseSocket",
+  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual" ]
+}, {
+  "@id" : "https://w3id.org/won/ext/valueflows#CustodianOfSocket",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/core#SocketDefinition" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
     "@language" : "en",
     "@value" : "A Persona Atom uses a Socket with this configuration to connect to Atoms of which it is the custodian."
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "CustodianInverseSocket"
+    "@value" : "CustodianOfSocket"
   } ],
   "https://w3id.org/won/core#autoOpen" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
@@ -98,13 +160,16 @@
   } ]
 }, {
   "@id" : "https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket",
+  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual" ]
+}, {
+  "@id" : "https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/core#SocketDefinition" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
     "@language" : "en",
     "@value" : "A Persona Atom uses a Socket with this configuration to connect to Atoms of which it is the primary accountable."
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "PrimaryAccountableInverseSocket"
+    "@value" : "PrimaryAccountableOfSocket"
   } ],
   "https://w3id.org/won/core#autoOpen" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
@@ -140,6 +205,53 @@
     "@type" : "http://www.w3.org/2001/XMLSchema#integer",
     "@value" : "1"
   } ]
+}, {
+  "@id" : "https://w3id.org/won/ext/valueflows#ResourceActivitySocket",
+  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/core#SocketDefinition" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "A Resource Atom uses a Socket with this configuration to connect to an Activity Atom for a resource."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "ActivitySocket"
+  } ],
+  "https://w3id.org/won/core#autoOpen" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
+    "@value" : "false"
+  } ],
+  "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
+    "@id" : "https://w3id.org/won/ext/valueflows#ResourceSocket"
+  } ],
+  "https://w3id.org/won/core#derivesAtomProperty" : [ {
+    "@id" : "https://w3id.org/valueflows#EconomicResource"
+  } ],
+  "https://w3id.org/won/core#socketCapacity" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/ext/valueflows#ResourceSocket",
+  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/core#SocketDefinition" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "An Activity Atom uses a Socket with this configuration to connect to its corresponding Resource Atom."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "ActivityInverseSocket"
+  } ],
+  "https://w3id.org/won/core#autoOpen" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
+    "@value" : "false"
+  } ],
+  "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
+    "@id" : "https://w3id.org/won/ext/valueflows#ResourceActivitySocket"
+  } ],
+  "https://w3id.org/won/core#derivesInverseAtomProperty" : [ {
+    "@id" : "https://w3id.org/valueflows#EconomicResource"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/ext/valueflows#actor",
+  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual" ]
 }, {
   "@id" : "https://w3id.org/won/ext/valueflows#custodian",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual" ]

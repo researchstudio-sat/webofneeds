@@ -4,29 +4,112 @@ This section provides details for each class and property defined by Web of Need
    <h3 id="namedindividuals" class="list">Named Individuals</h3>
    <ul class="hlist">
       <li>
-         <a href="#CustodianInverseSocket"
-            title="https://w3id.org/won/ext/valueflows#CustodianInverseSocket">CustodianInverseSocket</a>
+         <a href="#ResourceSocket"
+            title="https://w3id.org/won/ext/valueflows#ResourceSocket">ActivityInverseSocket</a>
+      </li>
+      <li>
+         <a href="#ActorSocket" title="https://w3id.org/won/ext/valueflows#ActorSocket">ActivitySocket</a>
+      </li>
+      <li>
+         <a href="#ResourceActivitySocket"
+            title="https://w3id.org/won/ext/valueflows#ResourceActivitySocket">ActivitySocket</a>
+      </li>
+      <li>
+         <a href="#ActorActivitySocket"
+            title="https://w3id.org/won/ext/valueflows#ActorActivitySocket">ActorActivitySocket</a>
+      </li>
+      <li>
+         <a href="#CustodianOfSocket"
+            title="https://w3id.org/won/ext/valueflows#CustodianOfSocket">CustodianOfSocket</a>
       </li>
       <li>
          <a href="#CustodianSocket"
             title="https://w3id.org/won/ext/valueflows#CustodianSocket">CustodianSocket</a>
       </li>
       <li>
-         <a href="#PrimaryAccountableInverseSocket"
-            title="https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket">PrimaryAccountableInverseSocket</a>
+         <a href="#PrimaryAccountableOfSocket"
+            title="https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket">PrimaryAccountableOfSocket</a>
       </li>
       <li>
          <a href="#PrimaryAccountableSocket"
             title="https://w3id.org/won/ext/valueflows#PrimaryAccountableSocket">PrimaryAccountableSocket</a>
       </li>
    </ul>
-   <div class="entity" id="CustodianInverseSocket">
-      <h3>CustodianInverseSocket<sup class="type-ni" title="named individual">ni</sup>
+   <div class="entity" id="ResourceSocket">
+      <h3>ActivityInverseSocket<sup class="type-ni" title="named individual">ni</sup>
          <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
          </span>
       </h3>
       <p>
-         <strong>IRI:</strong> https://w3id.org/won/ext/valueflows#CustodianInverseSocket</p>
+         <strong>IRI:</strong> https://w3id.org/won/ext/valueflows#ResourceSocket</p>
+      <div class="comment">
+         <span class="markdown">An Activity Atom uses a Socket with this configuration to connect to its corresponding Resource Atom.</span>
+      </div>
+      <dl class="description">
+         <dt>belongs to</dt>
+         <dd>
+            <span class="dotted" title="https://w3id.org/won/core#SocketDefinition">socket definition</span>
+         </dd>
+      </dl>
+   </div>
+   <div class="entity" id="ActorSocket">
+      <h3>ActivitySocket<sup class="type-ni" title="named individual">ni</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/ext/valueflows#ActorSocket</p>
+      <div class="comment">
+         <span class="markdown">An Activity Atom uses a Socket with this configuration to connect to a Presona Atom for a resource.</span>
+      </div>
+      <dl class="description">
+         <dt>belongs to</dt>
+         <dd>
+            <span class="dotted" title="https://w3id.org/won/core#SocketDefinition">socket definition</span>
+         </dd>
+      </dl>
+   </div>
+   <div class="entity" id="ResourceActivitySocket">
+      <h3>ActivitySocket<sup class="type-ni" title="named individual">ni</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/ext/valueflows#ResourceActivitySocket</p>
+      <div class="comment">
+         <span class="markdown">A Resource Atom uses a Socket with this configuration to connect to an Activity Atom for a resource.</span>
+      </div>
+      <dl class="description">
+         <dt>belongs to</dt>
+         <dd>
+            <span class="dotted" title="https://w3id.org/won/core#SocketDefinition">socket definition</span>
+         </dd>
+      </dl>
+   </div>
+   <div class="entity" id="ActorActivitySocket">
+      <h3>ActorActivitySocket<sup class="type-ni" title="named individual">ni</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/ext/valueflows#ActorActivitySocket</p>
+      <div class="comment">
+         <span class="markdown">A Persona Atom uses a Socket with this configuration to connect to an Activity Atom for a resource.</span>
+      </div>
+      <dl class="description">
+         <dt>belongs to</dt>
+         <dd>
+            <span class="dotted" title="https://w3id.org/won/core#SocketDefinition">socket definition</span>
+         </dd>
+      </dl>
+   </div>
+   <div class="entity" id="CustodianOfSocket">
+      <h3>CustodianOfSocket<sup class="type-ni" title="named individual">ni</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/ext/valueflows#CustodianOfSocket</p>
       <div class="comment">
          <span class="markdown">A Persona Atom uses a Socket with this configuration to connect to Atoms of which it is the custodian.</span>
       </div>
@@ -54,13 +137,13 @@ This section provides details for each class and property defined by Web of Need
          </dd>
       </dl>
    </div>
-   <div class="entity" id="PrimaryAccountableInverseSocket">
-      <h3>PrimaryAccountableInverseSocket<sup class="type-ni" title="named individual">ni</sup>
+   <div class="entity" id="PrimaryAccountableOfSocket">
+      <h3>PrimaryAccountableOfSocket<sup class="type-ni" title="named individual">ni</sup>
          <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
          </span>
       </h3>
       <p>
-         <strong>IRI:</strong> https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket</p>
+         <strong>IRI:</strong> https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket</p>
       <div class="comment">
          <span class="markdown">A Persona Atom uses a Socket with this configuration to connect to Atoms of which it is the primary accountable.</span>
       </div>

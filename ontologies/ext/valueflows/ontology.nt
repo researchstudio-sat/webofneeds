@@ -30,18 +30,45 @@
 # #################################################################
 # 
 # 
+# https://w3id.org/valueflows#EconomicResource
+<https://w3id.org/valueflows#EconomicResource> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+# 
 # https://w3id.org/valueflows#primaryAccountable
 <https://w3id.org/valueflows#primaryAccountable> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 # 
+# https://w3id.org/won/ext/valueflows#ActorActivitySocket
+<https://w3id.org/won/ext/valueflows#ActorActivitySocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/valueflows#ActorActivitySocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#SocketDefinition> .
+<https://w3id.org/won/ext/valueflows#ActorActivitySocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/valueflows#ActorSocket> .
+<https://w3id.org/won/ext/valueflows#ActorActivitySocket> <https://w3id.org/won/core#derivesAtomProperty> <https://w3id.org/won/ext/valueflows#actor> .
+<https://w3id.org/won/ext/valueflows#actor> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/valueflows#ActorActivitySocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<https://w3id.org/won/ext/valueflows#ActorActivitySocket> <https://w3id.org/won/core#socketCapacity> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://w3id.org/won/ext/valueflows#ActorActivitySocket> <http://www.w3.org/2000/01/rdf-schema#comment> "A Persona Atom uses a Socket with this configuration to connect to an Activity Atom for a resource."@en .
+<https://w3id.org/won/ext/valueflows#ActorActivitySocket> <http://www.w3.org/2000/01/rdf-schema#label> "ActorActivitySocket" .
+# 
+# https://w3id.org/won/ext/valueflows#ActorSocket
+<https://w3id.org/won/ext/valueflows#ActorSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/valueflows#ActorSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#SocketDefinition> .
+<https://w3id.org/won/ext/valueflows#ActorSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/valueflows#ActorActivitySocket> .
+<https://w3id.org/won/ext/valueflows#ActorSocket> <https://w3id.org/won/core#derivesAtomProperty> <https://w3id.org/won/ext/valueflows#actor> .
+<https://w3id.org/won/ext/valueflows#ActorSocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<https://w3id.org/won/ext/valueflows#ActorSocket> <https://w3id.org/won/core#socketCapacity> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://w3id.org/won/ext/valueflows#ActorSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "An Activity Atom uses a Socket with this configuration to connect to a Presona Atom for a resource."@en .
+<https://w3id.org/won/ext/valueflows#ActorSocket> <http://www.w3.org/2000/01/rdf-schema#label> "ActivitySocket" .
+# 
 # https://w3id.org/won/ext/valueflows#CustodianInverseSocket
 <https://w3id.org/won/ext/valueflows#CustodianInverseSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
-<https://w3id.org/won/ext/valueflows#CustodianInverseSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#SocketDefinition> .
-<https://w3id.org/won/ext/valueflows#CustodianInverseSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/valueflows#CustodianSocket> .
-<https://w3id.org/won/ext/valueflows#CustodianInverseSocket> <https://w3id.org/won/core#derivesInverseAtomProperty> <https://w3id.org/won/ext/valueflows#custodian> .
+# 
+# https://w3id.org/won/ext/valueflows#CustodianOfSocket
+<https://w3id.org/won/ext/valueflows#CustodianOfSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/valueflows#CustodianOfSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#SocketDefinition> .
+<https://w3id.org/won/ext/valueflows#CustodianOfSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/valueflows#CustodianSocket> .
+<https://w3id.org/won/ext/valueflows#CustodianOfSocket> <https://w3id.org/won/core#derivesInverseAtomProperty> <https://w3id.org/won/ext/valueflows#custodian> .
 <https://w3id.org/won/ext/valueflows#custodian> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
-<https://w3id.org/won/ext/valueflows#CustodianInverseSocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/ext/valueflows#CustodianInverseSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "A Persona Atom uses a Socket with this configuration to connect to Atoms of which it is the custodian."@en .
-<https://w3id.org/won/ext/valueflows#CustodianInverseSocket> <http://www.w3.org/2000/01/rdf-schema#label> "CustodianInverseSocket" .
+<https://w3id.org/won/ext/valueflows#CustodianOfSocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<https://w3id.org/won/ext/valueflows#CustodianOfSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "A Persona Atom uses a Socket with this configuration to connect to Atoms of which it is the custodian."@en .
+<https://w3id.org/won/ext/valueflows#CustodianOfSocket> <http://www.w3.org/2000/01/rdf-schema#label> "CustodianOfSocket" .
 # 
 # https://w3id.org/won/ext/valueflows#CustodianSocket
 <https://w3id.org/won/ext/valueflows#CustodianSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
@@ -55,12 +82,15 @@
 # 
 # https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket
 <https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
-<https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#SocketDefinition> .
-<https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/valueflows#PrimaryAccountableSocket> .
-<https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket> <https://w3id.org/won/core#derivesInverseAtomProperty> <https://w3id.org/valueflows#primaryAccountable> .
-<https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "A Persona Atom uses a Socket with this configuration to connect to Atoms of which it is the primary accountable."@en .
-<https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket> <http://www.w3.org/2000/01/rdf-schema#label> "PrimaryAccountableInverseSocket" .
+# 
+# https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket
+<https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#SocketDefinition> .
+<https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/valueflows#PrimaryAccountableSocket> .
+<https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket> <https://w3id.org/won/core#derivesInverseAtomProperty> <https://w3id.org/valueflows#primaryAccountable> .
+<https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "A Persona Atom uses a Socket with this configuration to connect to Atoms of which it is the primary accountable."@en .
+<https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket> <http://www.w3.org/2000/01/rdf-schema#label> "PrimaryAccountableOfSocket" .
 # 
 # https://w3id.org/won/ext/valueflows#PrimaryAccountableSocket
 <https://w3id.org/won/ext/valueflows#PrimaryAccountableSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
@@ -71,6 +101,27 @@
 <https://w3id.org/won/ext/valueflows#PrimaryAccountableSocket> <https://w3id.org/won/core#socketCapacity> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 <https://w3id.org/won/ext/valueflows#PrimaryAccountableSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "An Atom uses a Socket with this configuration to connect to the Persona Atom that is its primary accountable."@en .
 <https://w3id.org/won/ext/valueflows#PrimaryAccountableSocket> <http://www.w3.org/2000/01/rdf-schema#label> "PrimaryAccountableSocket" .
+# 
+# https://w3id.org/won/ext/valueflows#ResourceActivitySocket
+<https://w3id.org/won/ext/valueflows#ResourceActivitySocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/valueflows#ResourceActivitySocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#SocketDefinition> .
+<https://w3id.org/won/ext/valueflows#ResourceActivitySocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/valueflows#ResourceSocket> .
+<https://w3id.org/won/ext/valueflows#ResourceActivitySocket> <https://w3id.org/won/core#derivesAtomProperty> <https://w3id.org/valueflows#EconomicResource> .
+<https://w3id.org/won/ext/valueflows#ResourceActivitySocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<https://w3id.org/won/ext/valueflows#ResourceActivitySocket> <https://w3id.org/won/core#socketCapacity> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://w3id.org/won/ext/valueflows#ResourceActivitySocket> <http://www.w3.org/2000/01/rdf-schema#comment> "A Resource Atom uses a Socket with this configuration to connect to an Activity Atom for a resource."@en .
+<https://w3id.org/won/ext/valueflows#ResourceActivitySocket> <http://www.w3.org/2000/01/rdf-schema#label> "ActivitySocket" .
+# 
+# https://w3id.org/won/ext/valueflows#ResourceSocket
+<https://w3id.org/won/ext/valueflows#ResourceSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/valueflows#ResourceSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#SocketDefinition> .
+<https://w3id.org/won/ext/valueflows#ResourceSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/valueflows#ResourceActivitySocket> .
+<https://w3id.org/won/ext/valueflows#ResourceSocket> <https://w3id.org/won/core#derivesInverseAtomProperty> <https://w3id.org/valueflows#EconomicResource> .
+<https://w3id.org/won/ext/valueflows#ResourceSocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<https://w3id.org/won/ext/valueflows#ResourceSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "An Activity Atom uses a Socket with this configuration to connect to its corresponding Resource Atom."@en .
+<https://w3id.org/won/ext/valueflows#ResourceSocket> <http://www.w3.org/2000/01/rdf-schema#label> "ActivityInverseSocket" .
+# 
+# https://w3id.org/won/ext/valueflows#actor
 # 
 # https://w3id.org/won/ext/valueflows#custodian
 # 
@@ -84,18 +135,30 @@
 # 
 # 
 _:genid1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AllDifferent> .
-_:genid1 <http://www.w3.org/2002/07/owl#distinctMembers> _:genid5 .
+_:genid1 <http://www.w3.org/2002/07/owl#distinctMembers> _:genid9 .
+_:genid9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#ActorActivitySocket> .
+_:genid9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid8 .
+_:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#ActorSocket> .
+_:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid7 .
+_:genid7 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid7 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#CustodianOfSocket> .
+_:genid7 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid6 .
+_:genid6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#CustodianSocket> .
+_:genid6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid5 .
 _:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
-_:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#CustodianInverseSocket> .
+_:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket> .
 _:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid4 .
 _:genid4 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
-_:genid4 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#CustodianSocket> .
+_:genid4 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#PrimaryAccountableSocket> .
 _:genid4 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid3 .
 _:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
-_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket> .
+_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#ResourceActivitySocket> .
 _:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid2 .
 _:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
-_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#PrimaryAccountableSocket> .
+_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#ResourceSocket> .
 _:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
 # 
 # Generated by the OWL API (version 5.1.14) https://github.com/owlcs/owlapi/
