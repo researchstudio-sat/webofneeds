@@ -1,6 +1,7 @@
 import * as ownerApi from "../api/owner-api.js";
 import Immutable from "immutable";
 import { actionTypes } from "../actions/actions.js";
+import * as generalSelectors from "./selectors/general-selectors.js";
 import * as atomUtils from "./utils/atom-utils.js";
 import * as processUtils from "./utils/process-utils.js";
 import { parseMetaAtom } from "../reducers/atom-reducer/parse-atom.js";
@@ -12,56 +13,22 @@ import cf from "clownface";
 import { actionCreators } from "../actions/actions";
 import * as useCaseUtils from "~/app/usecase-utils";
 
-export function fetchOwnedData(dispatch, getState) {
-  return ownerApi
-    .getOwnedMetaAtoms()
-    .then(metaAtoms => {
-      const atomsImm = Immutable.fromJS(metaAtoms);
-      dispatch({
-        type: actionTypes.atoms.storeOwnedMetaAtoms,
-        payload: Immutable.fromJS({
-          metaAtoms: atomsImm ? atomsImm : Immutable.Map(),
-        }),
-      });
+export function fetchOwnedMetaData(dispatch) {
+  return ownerApi.getOwnedMetaAtoms().then(metaAtoms => {
+    const atomsImm = Immutable.fromJS(metaAtoms);
+    dispatch({
+      type: actionTypes.atoms.storeOwnedMetaAtoms,
+      payload: Immutable.fromJS({
+        metaAtoms: atomsImm ? atomsImm : Immutable.Map(),
+      }),
+    });
 
-      const activeAtomsImm =
-        atomsImm &&
-        atomsImm.filter(metaAtom =>
-          atomUtils.isActive(parseMetaAtom(metaAtom))
-        );
+    const activeAtomsImm =
+      atomsImm &&
+      atomsImm.filter(metaAtom => atomUtils.isActive(parseMetaAtom(metaAtom)));
 
-      return [...activeAtomsImm.keys()];
-    })
-    .then(activeAtomUris =>
-      fetchDataForOwnedAtoms(activeAtomUris, dispatch, getState)
-    );
-}
-
-/**
- * fetches Data incl. connections for given array of atomUris
- * @param ownedAtomUris atomUris to be fetched
- * @param dispatch redux dispatcher
- * @param getState redux state
- * @param forceFetch bool if true, then fetch will be executed even if atom is already in the state (useful on edit)
- * @returns {Promise<void>|*}
- */
-export function fetchDataForOwnedAtoms(
-  ownedAtomUris,
-  dispatch,
-  getState,
-  forceFetch = false
-) {
-  if (!is("Array", ownedAtomUris) || ownedAtomUris.length === 0) {
-    return Promise.resolve();
-  }
-
-  return urisToLookupMap(ownedAtomUris, uri =>
-    fetchOwnedAtomAndDispatch(uri, dispatch, getState, forceFetch)
-  ).then(() =>
-    urisToLookupMap(ownedAtomUris, atomUri =>
-      fetchConnectionsOfAtomAndDispatch(atomUri, dispatch)
-    )
-  );
+    return [...activeAtomsImm.keys()];
+  });
 }
 
 export function fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch) {
@@ -156,7 +123,8 @@ export function fetchAtomAndDispatch(
   getState,
   update = false
 ) {
-  const processState = get(getState(), "process");
+  const state = getState();
+  const processState = generalSelectors.getProcessState(state);
 
   if (!update && processUtils.isAtomLoaded(processState, atomUri)) {
     console.debug("Omit Fetch of Atom<", atomUri, ">, it is already loaded...");
@@ -172,6 +140,13 @@ export function fetchAtomAndDispatch(
       "Omit Fetch of Atom<",
       atomUri,
       ">, it is currently loading..."
+    );
+    return Promise.resolve();
+  } else if (processUtils.isProcessingInitialLoad(processState)) {
+    console.debug(
+      "Omit Fetch of Atom<",
+      atomUri,
+      ">, initial Load still in progress..."
     );
     return Promise.resolve();
   }
@@ -193,7 +168,11 @@ export function fetchAtomAndDispatch(
     })
     .then(atom => {
       //Fetch All MetaConnections Of NonOwnedAtomAndDispatch //TODO: ENHANCE LOADING PROCESS BY LOADING CONNECTIONS ONLY ON POST VIEW
-      fetchConnectionsOfNonOwnedAtomAndDispatch(atomUri, dispatch);
+      if (generalSelectors.isAtomOwned(atomUri)(state)) {
+        fetchConnectionsOfAtomAndDispatch(atomUri, dispatch);
+      } else {
+        fetchConnectionsOfNonOwnedAtomAndDispatch(atomUri, dispatch);
+      }
       return atom;
     })
     .catch(() => {
@@ -405,68 +384,6 @@ export function fetchConnectionsOfNonOwnedAtomAndDispatch(atomUri, dispatch) {
 }
 
 /**
- * fetches Data for atomUri
- * @param atomUri uri to be fetched
- * @param dispatch redux dispatcher
- * @param getState redux state
- * @param forceFetch bool if true, then fetch will be executed even if atom is already in the state (useful on edit)
- * @returns {Promise<void>|*}
- */
-function fetchOwnedAtomAndDispatch(
-  atomUri,
-  dispatch,
-  getState,
-  forceFetch = false
-) {
-  const processState = get(getState(), "process");
-
-  if (!forceFetch && processUtils.isAtomLoaded(processState, atomUri)) {
-    console.debug("Omit Fetch of Atom<", atomUri, ">, it is already loaded...");
-    if (processUtils.isAtomToLoad(processState, atomUri)) {
-      dispatch({
-        type: actionTypes.atoms.markAsLoaded,
-        payload: Immutable.fromJS({ uri: atomUri }),
-      });
-    }
-    return Promise.resolve();
-  } else if (!forceFetch && processUtils.isAtomLoading(processState, atomUri)) {
-    console.debug(
-      "Omit Fetch of Atom<",
-      atomUri,
-      ">, it is currently loading..."
-    );
-    return Promise.resolve();
-  }
-  console.debug("Proceed Fetch of Atom<", atomUri, ">");
-
-  dispatch({
-    type: actionTypes.atoms.storeUriInLoading,
-    payload: Immutable.fromJS({ uri: atomUri }),
-  });
-
-  return won
-    .getAtom(atomUri)
-    .then(atom => {
-      dispatch({
-        type: actionTypes.atoms.store,
-        payload: Immutable.fromJS({ atoms: { [atomUri]: atom } }),
-      });
-      return atom;
-    })
-    .catch(err => {
-      const errResponse = err && err.response;
-      const isDeleted = !!(errResponse && errResponse.status == 410);
-
-      dispatch({
-        type: isDeleted
-          ? actionTypes.atoms.removeDeleted
-          : actionTypes.atoms.storeUriFailed,
-        payload: Immutable.fromJS({ uri: atomUri }),
-      });
-    });
-}
-
-/**
  * Takes a single uri or an array of uris, performs the lookup function on each
  * of them seperately, collects the results and builds an map/object
  * with the uris as keys and the results as values.
@@ -528,7 +445,7 @@ function urisToLookupMap(
 }
 
 export const storeWikiData = (uri, dispatch, getState) => {
-  const processState = get(getState(), "process");
+  const processState = generalSelectors.getProcessState(getState());
 
   if (processUtils.isExternalDataLoading(processState, uri)) {
     console.debug(

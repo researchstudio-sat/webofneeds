@@ -52,7 +52,7 @@ export function failedCloseAtom(event) {
     const atomUri = event.getAtom();
 
     stateStore
-      .fetchDataForOwnedAtoms([atomUri], dispatch, getState)
+      .fetchAtomAndDispatch(atomUri, dispatch, getState)
       .then(() => dispatch({ type: actionTypes.messages.closeAtom.failed }));
   };
 }
@@ -62,7 +62,7 @@ export function failedReopenAtom(event) {
     const atomUri = event.getAtom();
 
     stateStore
-      .fetchDataForOwnedAtoms([atomUri], dispatch, getState)
+      .fetchAtomAndDispatch(atomUri, dispatch, getState)
       .then(() => dispatch({ type: actionTypes.messages.reopenAtom.failed }));
   };
 }
@@ -157,7 +157,7 @@ export function successfulEdit(event) {
       );
     } else {
       stateStore
-        .fetchDataForOwnedAtoms([atomURI], dispatch, getState, true)
+        .fetchAtomAndDispatch(atomURI, dispatch, getState, true)
         .then(() => {
           dispatch(
             actionCreators.atoms__editSuccessful({

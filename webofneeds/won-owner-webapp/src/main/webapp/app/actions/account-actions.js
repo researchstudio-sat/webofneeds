@@ -102,7 +102,7 @@ export function accountLogin(credentials) {
         })
       )
       .then(() => dispatch({ type: actionTypes.upgradeHttpSession }))
-      .then(() => stateStore.fetchOwnedData(dispatch, getState))
+      .then(() => stateStore.fetchOwnedMetaData(dispatch, getState))
       .then(() => dispatch({ type: actionTypes.account.loginFinished }))
       .catch(error =>
         error.response.json().then(loginError => {
@@ -321,7 +321,7 @@ export const reconnect = () => (dispatch, getState) => {
     .then(() => {
       dispatch({ type: actionTypes.reconnect.success });
 
-      return stateStore.fetchOwnedData(dispatch, getState);
+      return stateStore.fetchOwnedMetaData(dispatch, getState);
     })
     .catch(e => {
       if (e.status >= 400 && e.status < 500) {
