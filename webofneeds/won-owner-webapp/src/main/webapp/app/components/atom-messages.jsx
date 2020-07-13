@@ -6,7 +6,12 @@ import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as viewSelectors from "../redux/selectors/view-selectors";
 import * as messageUtils from "../redux/utils/message-utils";
 import { rdfTextfieldHelpText } from "../won-label-utils.js";
-import { get, getIn, generateLink } from "../utils";
+import {
+  get,
+  getIn,
+  generateLink,
+  extractAtomUriFromConnectionUri,
+} from "../utils";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import won from "../won-es6.js";
@@ -309,7 +314,7 @@ export default function WonAtomMessages({
         message
       )
     );
-    history.push(
+    history.replace(
       generateLink(history.location, {
         connectionUri: connectionUri,
       })
@@ -327,13 +332,25 @@ export default function WonAtomMessages({
     }
     dispatch(actionCreators.connections__close(connectionUri));
     if (backToChats) {
-      history.push(
-        generateLink(history.location, {
-          connectionUri: undefined,
-        })
+      history.replace(
+        generateLink(
+          history.location,
+          {
+            connectionUri: undefined,
+          },
+          "/connections",
+          false
+        )
       );
     } else {
-      history.goBack();
+      history.replace(
+        generateLink(
+          history.location,
+          { postUri: extractAtomUriFromConnectionUri(connectionUri) },
+          "/post",
+          false
+        )
+      );
     }
   }
 
@@ -572,7 +589,26 @@ export default function WonAtomMessages({
         <a
           className="pm__header__back__button clickable"
           onClick={
-            backToChats ? () => history.push("/connections") : history.goBack
+            backToChats
+              ? () =>
+                  history.replace(
+                    generateLink(
+                      history.location,
+                      {
+                        connectionUri: undefined,
+                      },
+                      "/connections",
+                      false
+                    )
+                  )
+              : history.replace(
+                  generateLink(
+                    history.location,
+                    { postUri: extractAtomUriFromConnectionUri(connectionUri) },
+                    "/post",
+                    false
+                  )
+                )
           }
         >
           <svg className="pm__header__back__button__icon">

@@ -25,6 +25,8 @@ import ico36_detail_media from "../../images/won-icons/ico36_detail_media.svg";
 import WikiDataViewer from "~/app/components/details/viewer/wikidata-viewer";
 import WikiDataPicker from "~/app/components/details/picker/wikidata-picker";
 
+const CF_LANGUAGE = ["en", "de", "*"];
+
 export const title = {
   identifier: "title",
   label: "Title",
@@ -41,8 +43,7 @@ export const title = {
   },
   parseFromCF: function(cfDataset) {
     if (cfDataset) {
-      //TODO: Fix for language fetching once CF PR is closed and dep is updated https://github.com/zazuko/clownface/pull/41
-      const cfTitles = cfDataset.out(schema.title);
+      const cfTitles = cfDataset.out(schema.title, { language: CF_LANGUAGE });
       if (cfTitles && cfTitles.values && cfTitles.values.length > 0) {
         return cfTitles.values[0];
       }
@@ -81,8 +82,7 @@ export const personaName = {
   },
   parseFromCF: function(cfDataset) {
     if (cfDataset) {
-      //TODO: Fix for language fetching once CF PR is closed and dep is updated https://github.com/zazuko/clownface/pull/41
-      const cfNames = cfDataset.out(schema.name);
+      const cfNames = cfDataset.out(schema.name, { language: CF_LANGUAGE });
       if (cfNames && cfNames.values && cfNames.values.length > 0) {
         return cfNames.values[0];
       }
@@ -207,8 +207,9 @@ export const description = {
   },
   parseFromCF: function(cfDataset) {
     if (cfDataset) {
-      //TODO: Fix for language fetching once CF PR is closed and dep is updated https://github.com/zazuko/clownface/pull/41
-      const cfDescription = cfDataset.out(schema.description);
+      const cfDescription = cfDataset.out(schema.description, {
+        language: CF_LANGUAGE,
+      });
       if (
         cfDescription &&
         cfDescription.values &&
@@ -246,9 +247,9 @@ export const termsOfService = {
   viewerComponent: WonDescriptionViewer,
   parseFromCF: function(cfDataset) {
     if (cfDataset) {
-      //TODO: Fix for language fetching once CF PR is closed and dep is updated https://github.com/zazuko/clownface/pull/41
       const cfToS = cfDataset.out(
-        namedNode("http://schema.org/termsOfService")
+        namedNode("http://schema.org/termsOfService"),
+        { language: CF_LANGUAGE }
       );
       if (cfToS && cfToS.values && cfToS.values.length > 0) {
         return cfToS.values[0];
