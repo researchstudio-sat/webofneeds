@@ -18,8 +18,9 @@ import * as generalSelectors from "../../redux/selectors/general-selectors";
 
 export default function PagePost() {
   const history = useHistory();
-  const { postUri, connectionUri, tab } = getQueryParams(history.location);
-  const atomUri = postUri;
+  const { postUri: atomUri, connectionUri, tab } = getQueryParams(
+    history.location
+  );
   const atom = useSelector(generalSelectors.getAtom(atomUri));
   const ownedConnection = useSelector(
     generalSelectors.getOwnedConnection(connectionUri)
