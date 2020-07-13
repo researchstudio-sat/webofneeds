@@ -156,9 +156,11 @@ export default function WonAtomContent({
         );
 
         // Filter out singleConnectSocketReactions
-        const filteredReactions = reactions.filter(
-          connectionUtils.filterSingleConnectedSocketCapacityFilter
-        );
+        const filteredReactions =
+          reactions &&
+          reactions.filter(
+            connectionUtils.filterSingleConnectedSocketCapacityFilter
+          );
 
         visibleTabFragment = (
           <React.Fragment>
