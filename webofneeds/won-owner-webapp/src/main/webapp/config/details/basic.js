@@ -45,7 +45,6 @@ export const title = {
     if (cfDataset) {
       const cfTitles = cfDataset.out(schema.title, { language: CF_LANGUAGE });
       if (cfTitles && cfTitles.values && cfTitles.values.length > 0) {
-        console.debug("cfTitles: ", cfTitles.values);
         return cfTitles.values[0];
       }
     }
@@ -85,7 +84,6 @@ export const personaName = {
     if (cfDataset) {
       const cfNames = cfDataset.out(schema.name, { language: CF_LANGUAGE });
       if (cfNames && cfNames.values && cfNames.values.length > 0) {
-        console.debug("cfNames: ", cfNames.values);
         return cfNames.values[0];
       }
     }
@@ -217,7 +215,6 @@ export const description = {
         cfDescription.values &&
         cfDescription.values.length > 0
       ) {
-        console.debug("cfDescription: ", cfDescription.values);
         return cfDescription.values[0];
       }
     }
@@ -255,7 +252,6 @@ export const termsOfService = {
         { language: CF_LANGUAGE }
       );
       if (cfToS && cfToS.values && cfToS.values.length > 0) {
-        console.debug("cfToS: ", cfToS.values);
         return cfToS.values[0];
       }
     }
