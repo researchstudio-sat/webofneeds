@@ -43,7 +43,6 @@ export default function PageConnections() {
   const atomUri =
     get(atom, "uri") || extractAtomUriFromConnectionUri(selectedConnectionUri);
   const atomLoading = processUtils.isAtomLoading(processState, atomUri);
-  const initialLoad = processUtils.isProcessingInitialLoad(processState);
 
   const selectedConnection = getIn(atom, [
     "connections",
@@ -55,7 +54,7 @@ export default function PageConnections() {
 
   useEffect(
     () => {
-      if (atomUri && !initialLoad && (!atomLoading || !atom)) {
+      if (atomUri && (!atomLoading || !atom)) {
         console.debug(
           "Fetching unloaded atom:",
           atomUri,
@@ -64,15 +63,8 @@ export default function PageConnections() {
         );
         dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
       }
-    },
-    [selectedConnectionUri, atom, atomLoading, initialLoad]
-  );
 
-  const ownedAtoms = useSelector(generalSelectors.getOwnedAtoms);
-
-  useEffect(
-    () => {
-      if (!atomUriInRoute && !initialLoad && ownedAtoms) {
+      if (!atomUriInRoute && ownedAtoms) {
         const unloadedAtoms = ownedAtoms.filter(
           (_, atomUri) =>
             processUtils.isAtomToLoad(processState, atomUri) &&
@@ -87,8 +79,10 @@ export default function PageConnections() {
         }
       }
     },
-    [selectedConnectionUri, atom, atomLoading, initialLoad, ownedAtoms]
+    [selectedConnectionUri, atom, atomLoading, ownedAtoms]
   );
+
+  const ownedAtoms = useSelector(generalSelectors.getOwnedAtoms);
 
   const isSelectedConnectionGroupChat =
     selectedConnection &&

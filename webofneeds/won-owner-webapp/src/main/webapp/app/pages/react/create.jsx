@@ -57,8 +57,6 @@ export default function PageCreate() {
     ? processUtils.hasAtomFailedToLoad(processState, fromAtomUri)
     : false;
 
-  const initialLoad = processUtils.isProcessingInitialLoad(processState);
-
   useEffect(
     () => {
       if (
@@ -69,14 +67,7 @@ export default function PageCreate() {
         dispatch(actionCreators.atoms__fetchUnloadedAtom(fromAtomUri));
       }
     },
-    [
-      initialLoad,
-      fromAtom,
-      isFromAtomLoading,
-      isFromAtomToLoad,
-      hasFromAtomFailedToLoad,
-      initialLoad,
-    ]
+    [fromAtom, isFromAtomLoading, isFromAtomToLoad, hasFromAtomFailedToLoad]
   );
 
   let contentElement;

@@ -119,11 +119,10 @@ export default function WonCreateAtom({
     generalSelectors.isAtomUsableAsTemplate(get(fromAtom, "uri"))
   );
 
-  const initialLoad = processUtils.isProcessingInitialLoad(processState);
   const ownedPersonas = useSelector(generalSelectors.getOwnedPersonas);
   useEffect(
     () => {
-      if (!initialLoad && ownedPersonas) {
+      if (ownedPersonas) {
         const unloadedPersonas = ownedPersonas.filter(
           (_, atomUri) =>
             processUtils.isAtomToLoad(processState, atomUri) &&
@@ -137,7 +136,7 @@ export default function WonCreateAtom({
         }
       }
     },
-    [initialLoad, ownedPersonas]
+    [ownedPersonas]
   );
 
   const personas = useSelector(

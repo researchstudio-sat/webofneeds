@@ -113,11 +113,10 @@ export default function ChatTextfield({
   );
 
   const processState = useSelector(generalSelectors.getProcessState);
-  const initialLoad = processUtils.isProcessingInitialLoad(processState);
   const ownedPersonas = useSelector(generalSelectors.getOwnedPersonas);
   useEffect(
     () => {
-      if (showPersonas && !initialLoad && ownedPersonas) {
+      if (showPersonas && ownedPersonas) {
         const unloadedPersonas = ownedPersonas.filter(
           (_, atomUri) =>
             processUtils.isAtomToLoad(processState, atomUri) &&
@@ -131,7 +130,7 @@ export default function ChatTextfield({
         }
       }
     },
-    [initialLoad, showPersonas, ownedPersonas]
+    [showPersonas, ownedPersonas]
   );
 
   function updateDetail(name, value, closeOnDelete = false) {
