@@ -71,7 +71,7 @@ export const accountingQuantity = {
       "xsd:id"
     );
 
-    if (amount === undefined && !unit) {
+    if (amount === undefined || !unit) {
       return undefined;
     } else {
       return {
@@ -143,7 +143,7 @@ export const onhandQuantity = {
       "xsd:id"
     );
 
-    if (amount === undefined && !unit) {
+    if (amount === undefined || !unit) {
       return undefined;
     } else {
       return {
@@ -211,7 +211,7 @@ export const effortQuantity = {
       "xsd:id"
     );
 
-    if (amount === undefined && !unit) {
+    if (amount === undefined || !unit) {
       return undefined;
     } else {
       return {
