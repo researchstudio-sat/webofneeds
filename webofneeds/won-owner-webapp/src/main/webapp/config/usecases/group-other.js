@@ -6,7 +6,7 @@ import { newsarticle } from "./uc-newsarticle.js";
 import { handleComplaint } from "./uc-handle-complaint.js";
 import { customUseCase } from "./uc-custom.js";
 import { resource } from "./uc-resource.js";
-
+import { activity } from "./uc-activity.js/index.js";
 import {
   details,
   mergeInEmptyDraft,
@@ -22,6 +22,7 @@ export const otherGroup = {
   icon: ico36_plus,
   subItems: {
     resource: resource,
+    action: activity,
     complain: complain,
     handleComplaint: handleComplaint,
     customUseCase: customUseCase,

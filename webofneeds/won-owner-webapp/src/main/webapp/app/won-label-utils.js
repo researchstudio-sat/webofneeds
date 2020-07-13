@@ -38,12 +38,12 @@ const labels = deepFreeze({
     [vocab.HOLD.HolderSocketCompacted]: "Holder",
     [vocab.WXSCHEMA.ReviewSocketCompacted]: "Review enabled",
     [vocab.BUDDY.BuddySocketCompacted]: "Buddy",
-    [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]:
+    [vocab.WXVALUEFLOWS.PrimaryAccountableOfSocketCompacted]:
       "Primary Accountable",
-    [vocab.WXVALUEFLOWS.PrimaryAccountableInverseSocketCompacted]:
-      "Primary Inverse Accountable",
-    [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: "Custodian",
-    [vocab.WXVALUEFLOWS.CustodianInverseSocketCompacted]: "Custodian Inverse",
+    [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]:
+      "Primary Of Accountable",
+    [vocab.WXVALUEFLOWS.CustodianSocketOfCompacted]: "Custodian",
+    [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: "Custodian Of",
   },
   socketTabs: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Members",
@@ -61,10 +61,14 @@ const labels = deepFreeze({
     [vocab.WXSCHEMA.WorksForSocketCompacted]: "Works For",
     [vocab.WXSCHEMA.SubOrganizationSocketCompacted]: "Sub Organizations",
     [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: "Parent Organization",
-    [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]: "Owns",
-    [vocab.WXVALUEFLOWS.PrimaryAccountableInverseSocketCompacted]: "Owned By",
-    [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: "Controls",
-    [vocab.WXVALUEFLOWS.CustodianInverseSocketCompacted]: "Controlled by",
+    [vocab.WXVALUEFLOWS.PrimaryAccountableOfSocketCompacted]: "Owns",
+    [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]: "Owned By",
+    [vocab.WXVALUEFLOWS.CustodianSocketOfCompacted]: "Controls",
+    [vocab.WXVALUEFLOWS.CustodianOfSocketCompacted]: "Controlled by",
+    [vocab.WXVALUEFLOWS.ResourceSocketCompacted]: "Affected Resource",
+    [vocab.WXVALUEFLOWS.ResourceActivitySocketCompacted]: "Activity",
+    [vocab.WXVALUEFLOWS.ActorActivitySocket]: "Actor",
+    [vocab.WXVALUEFLOWS.ActorActivitySocketCompacted]: "Activity",
   },
   socketItem: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Member",
@@ -82,11 +86,10 @@ const labels = deepFreeze({
     [vocab.WXSCHEMA.SubOrganizationSocketCompacted]: "Parent Organization",
     [vocab.WXSCHEMA.ReviewInverseSocketCompacted]: "Review",
     [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: "Sub Organization",
-    [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]: "Owner",
-    [vocab.WXVALUEFLOWS.PrimaryAccountableInverseSocketCompacted]:
-      "Owned Thing",
-    [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: "Controlled by",
-    [vocab.WXVALUEFLOWS.CustodianInverseSocketCompacted]: "Controlled Thing",
+    [vocab.WXVALUEFLOWS.PrimaryAccountableOfSocketCompacted]: "Owner",
+    [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]: "Owned Thing",
+    [vocab.WXVALUEFLOWS.CustodianSocketOfCompacted]: "Controlled by",
+    [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: "Controlled Thing",
   },
   socketItems: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Members",
@@ -103,10 +106,10 @@ const labels = deepFreeze({
     [vocab.WXSCHEMA.WorksForSocketCompacted]: "Employers",
     [vocab.WXSCHEMA.SubOrganizationSocketCompacted]: "Sub Organizations",
     [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: "Parent Organizations",
-    [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]: "Owned Things",
-    [vocab.WXVALUEFLOWS.PrimaryAccountableInverseSocketCompacted]: "Owners",
-    [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: "Controlled Things",
-    [vocab.WXVALUEFLOWS.CustodianInverseSocketCompacted]: "Controllers",
+    [vocab.WXVALUEFLOWS.PrimaryAccountableOfSocketCompacted]: "Owned Things",
+    [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]: "Owners",
+    [vocab.WXVALUEFLOWS.CustodianSocketOfCompacted]: "Controlled Things",
+    [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: "Controllers",
   },
 });
 

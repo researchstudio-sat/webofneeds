@@ -42,7 +42,7 @@
 ###  https://w3id.org/won/ext/valueflows#PrimaryAccountableSocket
 :PrimaryAccountableSocket rdf:type owl:NamedIndividual ,
                          won:SocketDefinition ;
-                won:compatibleSocketDefinition :PrimaryAccountableInverseSocket ;
+                won:compatibleSocketDefinition :PrimaryAccountableOfSocket ;
                 won:derivesAtomProperty vf:primaryAccountable ;
                 won:autoOpen "false"^^xsd:boolean ;
                 won:socketCapacity 1 ;
@@ -50,34 +50,74 @@
                 rdfs:label "PrimaryAccountableSocket" .
 
 
-###  https://w3id.org/won/ext/valueflows#PrimaryAccountableInverseSocket
-:PrimaryAccountableInverseSocket rdf:type owl:NamedIndividual ,
+###  https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket
+:PrimaryAccountableOfSocket rdf:type owl:NamedIndividual ,
                        won:SocketDefinition ;
               won:compatibleSocketDefinition :PrimaryAccountableSocket ;
-              won:derivesInverseAtomProperty vf:primaryAccountable;
+              won:derivesInverseAtomProperty vf:primaryAccountable ;
               won:autoOpen "false"^^xsd:boolean ;
               rdfs:comment "A Persona Atom uses a Socket with this configuration to connect to Atoms of which it is the primary accountable."@en ;
-              rdfs:label "PrimaryAccountableInverseSocket" .
+              rdfs:label "PrimaryAccountableOfSocket" .
 
 
 ###  https://w3id.org/won/ext/valueflows#CustodianSocket
 :CustodianSocket rdf:type owl:NamedIndividual ,
                          won:SocketDefinition ;
-                won:compatibleSocketDefinition :CustodianInverseSocket ;
+                won:compatibleSocketDefinition :CustodianOfSocket ;
                 won:derivesAtomProperty :custodian ;
                 won:autoOpen "false"^^xsd:boolean ;
                 won:socketCapacity 1 ;
                 rdfs:comment "An Atom uses a Socket with this configuration to connect to the Persona Atom that is its custodian."@en ;
                 rdfs:label "CustodianSocket" .
 
-###  https://w3id.org/won/ext/valueflows#CustodianInverseSocket
-:CustodianInverseSocket rdf:type owl:NamedIndividual ,
+###  https://w3id.org/won/ext/valueflows#CustodianOfSocket
+:CustodianOfSocket rdf:type owl:NamedIndividual ,
                        won:SocketDefinition ;
               won:compatibleSocketDefinition :CustodianSocket ;
-              won:derivesInverseAtomProperty :custodian;
+              won:derivesInverseAtomProperty :custodian ;
               won:autoOpen "false"^^xsd:boolean ;
               rdfs:comment "A Persona Atom uses a Socket with this configuration to connect to Atoms of which it is the custodian."@en ;
-              rdfs:label "CustodianInverseSocket" .
+              rdfs:label "CustodianOfSocket" .
+
+
+###  https://w3id.org/won/ext/valueflows#ResourceSocket
+:ResourceSocket rdf:type owl:NamedIndividual ,
+                                 won:SocketDefinition ;
+                        won:compatibleSocketDefinition :ResourceActivitySocket ;
+                        won:derivesInverseAtomProperty vf:EconomicResource ;
+                        won:autoOpen "false"^^xsd:boolean ;
+                        rdfs:comment "An Activity Atom uses a Socket with this configuration to connect to its corresponding Resource Atom."@en ;
+                        rdfs:label "ResourceSocket" .
+
+###  https://w3id.org/won/ext/valueflows#ResourceActivitySocket
+:ResourceActivitySocket rdf:type owl:NamedIndividual ,
+                                 won:SocketDefinition ;
+                        won:compatibleSocketDefinition :ResourceSocket ;
+                        won:derivesAtomProperty vf:EconomicResource ;
+                        won:autoOpen "false"^^xsd:boolean ;
+                        won:socketCapacity 1 ;
+                        rdfs:comment "A Resource Atom uses a Socket with this configuration to connect to an Activity Atom for a resource."@en ;
+                        rdfs:label "ResourceActivitySocket" .
+
+###  https://w3id.org/won/ext/valueflows#ActorSocket
+:ActorSocket rdf:type owl:NamedIndividual ,
+                         won:SocketDefinition ;
+                won:compatibleSocketDefinition :ActorActivitySocket ;
+                won:derivesAtomProperty :actor ;
+                won:autoOpen "false"^^xsd:boolean ;
+                won:socketCapacity 1 ;
+                rdfs:comment "An Activity Atom uses a Socket with this configuration to connect to a Presona Atom for a resource."@en ;
+                rdfs:label "ActorSocket" .
+
+###  https://w3id.org/won/ext/valueflows#ActorActivitySocket
+:ActorActivitySocket rdf:type owl:NamedIndividual ,
+                                 won:SocketDefinition ;
+                        won:compatibleSocketDefinition :ActorSocket ;
+                        won:derivesAtomProperty :actor ;
+                        won:autoOpen "false"^^xsd:boolean ;
+                        won:socketCapacity 1 ;
+                        rdfs:comment "A Persona Atom uses a Socket with this configuration to connect to an Activity Atom for a resource."@en ;
+                        rdfs:label "ActorActivitySocket" .
 
 #################################################################
 #    Annotations
@@ -90,9 +130,13 @@
 
 [ rdf:type owl:AllDifferent ;
   owl:distinctMembers ( :PrimaryAccountableSocket
-                        :PrimaryAccountableInverseSocket
+                        :PrimaryAccountableOfSocket
                         :CustodianSocket
-                        :CustodianInverseSocket
+                        :CustodianOfSocket
+                        :ResourceSocket
+                        :ResourceActivitySocket
+                        :ActorSocket
+                        :ActorActivitySocket
                       )
 ] .
 
