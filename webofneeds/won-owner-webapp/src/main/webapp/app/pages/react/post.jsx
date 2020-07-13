@@ -44,6 +44,7 @@ export default function PagePost() {
       <main className="atomcontent">
         <WonAtomInfo
           atom={atom}
+          atomUri={atomUri}
           ownedConnection={ownedConnection}
           initialTab={tab}
         />
