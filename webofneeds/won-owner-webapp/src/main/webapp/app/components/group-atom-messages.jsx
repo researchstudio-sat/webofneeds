@@ -317,14 +317,17 @@ export default function WonGroupAtomMessages({
                       false
                     )
                   )
-              : history.replace(
-                  generateLink(
-                    history.location,
-                    { postUri: extractAtomUriFromConnectionUri(connectionUri) },
-                    "/post",
-                    false
+              : () =>
+                  history.replace(
+                    generateLink(
+                      history.location,
+                      {
+                        postUri: extractAtomUriFromConnectionUri(connectionUri),
+                      },
+                      "/post",
+                      false
+                    )
                   )
-                )
           }
         >
           <svg className="gpm__header__back__button__icon">
