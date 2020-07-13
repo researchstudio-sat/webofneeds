@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
 import { get, getIn } from "../utils.js";
@@ -25,6 +25,7 @@ import ico36_plus_circle from "~/images/won-icons/ico36_plus_circle.svg";
 import ico36_added_circle from "~/images/won-icons/ico36_added_circle.svg";
 import ico36_close_circle from "~/images/won-icons/ico36_close_circle.svg";
 import * as atomUtils from "../redux/utils/atom-utils";
+import * as processUtils from "~/app/redux/utils/process-utils";
 
 export default function ChatTextfield({
   connection,
@@ -109,6 +110,27 @@ export default function ChatTextfield({
 
   const personas = useSelector(state =>
     generalSelectors.getOwnedCondensedPersonaList(state).toJS()
+  );
+
+  const processState = useSelector(generalSelectors.getProcessState);
+  const ownedPersonas = useSelector(generalSelectors.getOwnedPersonas);
+  useEffect(
+    () => {
+      if (showPersonas && ownedPersonas) {
+        const unloadedPersonas = ownedPersonas.filter(
+          (_, atomUri) =>
+            processUtils.isAtomToLoad(processState, atomUri) &&
+            !processUtils.isAtomLoading(processState, atomUri)
+        );
+        if (unloadedPersonas.size > 0) {
+          console.debug("Fetching unloaded personas...");
+          unloadedPersonas.map((atom, atomUri) => {
+            dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
+          });
+        }
+      }
+    },
+    [showPersonas, ownedPersonas]
   );
 
   function updateDetail(name, value, closeOnDelete = false) {

@@ -1,7 +1,7 @@
 /**
  * Created by quasarchimaere on 30.07.2019.
  */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import PropTypes from "prop-types";
 import { get, generateLink } from "../utils.js";
@@ -118,6 +118,27 @@ export default function WonCreateAtom({
   const isFromAtomUsableAsTemplate = useSelector(
     generalSelectors.isAtomUsableAsTemplate(get(fromAtom, "uri"))
   );
+
+  const ownedPersonas = useSelector(generalSelectors.getOwnedPersonas);
+  useEffect(
+    () => {
+      if (ownedPersonas) {
+        const unloadedPersonas = ownedPersonas.filter(
+          (_, atomUri) =>
+            processUtils.isAtomToLoad(processState, atomUri) &&
+            !processUtils.isAtomLoading(processState, atomUri)
+        );
+        if (unloadedPersonas.size > 0) {
+          console.debug("Fetching unloaded personas...");
+          unloadedPersonas.map((atom, atomUri) => {
+            dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
+          });
+        }
+      }
+    },
+    [ownedPersonas]
+  );
+
   const personas = useSelector(
     generalSelectors.getOwnedCondensedPersonaList
   ).toJS();

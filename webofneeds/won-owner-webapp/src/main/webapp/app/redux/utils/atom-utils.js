@@ -471,7 +471,7 @@ export function generateShortFlagLabels(atomImm) {
 }
 
 export function getSockets(atomImm) {
-  return getIn(atomImm, ["content", "sockets"]);
+  return getIn(atomImm, ["content", "sockets"]) || Immutable.Map();
 }
 
 export function getSocketsWithKeysReset(atomImm) {

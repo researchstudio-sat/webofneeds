@@ -25,7 +25,7 @@ export const pageLoadAction = () => (dispatch, getState) => {
 function loadingWhileSignedIn(dispatch, getState) {
   // reset websocket to make sure it's using the logged-in session
   dispatch(actionCreators.reconnect__start());
-  return stateStore.fetchOwnedData(dispatch, getState);
+  return stateStore.fetchOwnedMetaData(dispatch, getState);
 }
 
 export const fetchWhatsNew = createdAfterDate => (dispatch, getState) => {

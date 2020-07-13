@@ -2,6 +2,7 @@
 @import "flex-layout";
 @import "sizing-utils";
 @import "square-image";
+@import "animate";
 
 won-atom-header-big {
   display: grid;
@@ -38,6 +39,42 @@ won-atom-header-big {
       "icon title . . . ."
       "icon info actiontoggle actiontoggle actiontoggle actiontoggle";
     grid-template-columns: min-content 1fr min-content min-content min-content min-content;
+  }
+
+  &.won-failed-to-load,
+  &.won-to-load,
+  &.won-is-loading {
+    pointer-events: none;
+
+    .ahb__info {
+      height: $normalFontSize;
+      width: 5rem;
+      background-color: $won-skeleton-color;
+    }
+
+    .ahb__title {
+      height: $mediumFontSize;
+      width: 7rem;
+      background-color: $won-skeleton-color;
+    }
+
+    .ahb__icon__skeleton {
+      grid-area: icon;
+      background-color: $won-skeleton-color;
+      @media (min-width: $responsivenessBreakPoint) {
+        @include fixed-square(4.7rem);
+        margin: 0 1rem 1rem 0;
+      }
+      @media (max-width: $responsivenessBreakPoint) {
+        @include fixed-square($postIconSize);
+        margin: 0 0.5rem 0.5rem 0;
+      }
+    }
+  }
+
+  &.won-to-load,
+  &.won-is-loading {
+    @include animateOpacityHeartBeat();
   }
 
   > won-atom-icon {

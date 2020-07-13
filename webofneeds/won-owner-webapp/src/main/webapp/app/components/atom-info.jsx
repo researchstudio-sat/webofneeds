@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { get } from "../utils.js";
+import { get, generateLink } from "../utils.js";
 import WonAtomHeaderBig from "./atom-header-big.jsx";
 import WonAtomMenu from "./atom-menu.jsx";
 import WonAtomActions from "./atom-actions.jsx";
@@ -13,20 +13,19 @@ import * as processUtils from "../redux/utils/process-utils";
 import * as connectionUtils from "../redux/utils/connection-utils";
 
 import "~/style/_atom-info.scss";
-import { generateLink } from "../utils";
 
 export default function WonAtomInfo({
+  atomUri,
   atom,
   ownedConnection,
   className,
   initialTab = "DETAIL",
 }) {
   const history = useHistory();
-  const atomUri = get(atom, "uri");
   const connectionUri = get(ownedConnection, "uri");
   const processState = useSelector(generalSelectors.getProcessState);
   const storedAtoms = useSelector(generalSelectors.getAtoms);
-
+  //TODO: IMPLEMENT VISIBILITY SENSOR TO FETCH ONLY WHEN IN VIEW
   const atomLoading =
     !atom || processUtils.isAtomLoading(processState, atomUri);
 
@@ -46,6 +45,7 @@ export default function WonAtomInfo({
     },
     [atomUri, initialTab]
   );
+
   useEffect(
     () => {
       toggleActions(
@@ -74,12 +74,9 @@ export default function WonAtomInfo({
           history.replace(generateLink(history.location, { tab: tabName }));
 
   return (
-    <won-atom-info
-      class={
-        (className ? className : "") + (atomLoading ? " won-is-loading " : "")
-      }
-    >
+    <won-atom-info class={className ? className : ""}>
       <WonAtomHeaderBig
+        atomUri={atomUri}
         atom={atom}
         ownedConnection={ownedConnection}
         showActions={showActions}
@@ -114,6 +111,7 @@ export default function WonAtomInfo({
   );
 }
 WonAtomInfo.propTypes = {
+  atomUri: PropTypes.string.isRequired,
   atom: PropTypes.object,
   className: PropTypes.string,
   ownedConnection: PropTypes.object,

@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 public class WonOwnerMailSender {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String OWNER_TARGET_ATOM_LINK = "/#!/post?postUri=";
-    private static final String OWNER_CONNECTION_LINK = "/#!/connections?connectionUri=%s";
+    private static final String OWNER_CONNECTION_LINK = "/#!/connections?postUri=%s&connectionUri=%s";
     private static final String OWNER_LOCAL_ATOM_LINK = "/#!/post?postUri=";
     private static final String OWNER_VERIFICATION_LINK = "/#!/inventory?token=";
     private static final String OWNER_ANONYMOUS_LINK = "/#!/inventory?privateId=";
@@ -136,8 +136,8 @@ public class WonOwnerMailSender {
             velocityContext.put("linkLocalAtom", linkLocalAtom);
             velocityContext.put("localAtomTitle", localAtomTitle);
         }
-        if (localConnection != null) {
-            String linkConnection = ownerAppLink + String.format(OWNER_CONNECTION_LINK, localConnection);
+        if (localConnection != null && localAtom != null) {
+            String linkConnection = ownerAppLink + String.format(OWNER_CONNECTION_LINK, localAtom, localConnection);
             velocityContext.put("linkConnection", linkConnection);
         }
         if (textMsg != null) {

@@ -57,15 +57,18 @@ export default function PageCreate() {
     ? processUtils.hasAtomFailedToLoad(processState, fromAtomUri)
     : false;
 
-  useEffect(() => {
-    if (
-      fromAtomUri &&
-      (!fromAtom ||
-        (isFromAtomToLoad && !isFromAtomLoading && !hasFromAtomFailedToLoad))
-    ) {
-      dispatch(actionCreators.atoms__fetchUnloadedAtom(fromAtomUri));
-    }
-  });
+  useEffect(
+    () => {
+      if (
+        fromAtomUri &&
+        (!fromAtom ||
+          (isFromAtomToLoad && !isFromAtomLoading && !hasFromAtomFailedToLoad))
+      ) {
+        dispatch(actionCreators.atoms__fetchUnloadedAtom(fromAtomUri));
+      }
+    },
+    [fromAtom, isFromAtomLoading, isFromAtomToLoad, hasFromAtomFailedToLoad]
+  );
 
   let contentElement;
   let showUseCaseGroup = !useCase && !!useCaseGroup;

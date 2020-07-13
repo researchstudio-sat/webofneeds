@@ -78,7 +78,7 @@ async function openNotifiedPage(event) {
       ? `${self.registration.scope}#!/post?postUri=${atomUri}` // when deeplink works, change this to `/connections?connectionUri=${connectionUri}` see https://github.com/researchstudio-sat/webofneeds/issues/2985
       : `${
           self.registration.scope
-        }#!/connections?connectionUri=${connectionUri}`;
+        }#!/connections?postUri=${atomUri}&connectionUri=${connectionUri}`;
   console.log(targetUri);
 
   if (urlWindows.length > 0) {
