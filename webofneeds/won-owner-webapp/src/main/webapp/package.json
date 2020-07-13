@@ -8,7 +8,7 @@
     "@webcomponents/custom-elements": "^1.4.1",
     "api": "0.0.1",
     "bestfetch": "^4.0.0",
-    "clownface": "^0.12.4",
+    "clownface": "^1.0.0",
     "color": "^3.1.2",
     "geopoint": "^1.0.1",
     "identicon.js": "^2.3.3",
