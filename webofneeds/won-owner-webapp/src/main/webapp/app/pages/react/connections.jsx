@@ -1,9 +1,18 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useHistory } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { actionCreators } from "~/app/actions/actions";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
-import { get, getIn, getQueryParams } from "../../utils.js";
+import {
+  get,
+  getIn,
+  getQueryParams,
+  extractAtomUriFromConnectionUri,
+} from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
+import * as atomUtils from "../../redux/utils/atom-utils";
+import * as processUtils from "../../redux/utils/process-utils.js";
 import WonModalDialog from "../../components/modal-dialog.jsx";
 import WonTopnav from "../../components/topnav.jsx";
 import WonMenu from "../../components/menu.jsx";
@@ -17,19 +26,24 @@ import WonConnectionsOverview from "../../components/connections-overview.jsx";
 import "~/style/_connections.scss";
 import "~/style/_responsiveness-utils.scss";
 import ico36_message from "~/images/won-icons/ico36_message.svg";
-import { useHistory } from "react-router-dom";
-import * as atomUtils from "../../redux/utils/atom-utils";
 
 export default function PageConnections() {
   const history = useHistory();
+  const dispatch = useDispatch();
 
-  const { connectionUri, postUri } = getQueryParams(history.location);
+  const {
+    connectionUri: selectedConnectionUri,
+    postUri: atomUriInRoute,
+  } = getQueryParams(history.location);
 
-  const selectedConnectionUri = connectionUri;
-
+  const processState = useSelector(generalSelectors.getProcessState);
   const atom = useSelector(
     generalSelectors.getOwnedAtomByConnectionUri(selectedConnectionUri)
   );
+  const atomUri =
+    get(atom, "uri") || extractAtomUriFromConnectionUri(selectedConnectionUri);
+  const atomLoading = processUtils.isAtomLoading(processState, atomUri);
+  const initialLoad = processUtils.isProcessingInitialLoad(processState);
 
   const selectedConnection = getIn(atom, [
     "connections",
@@ -37,6 +51,15 @@ export default function PageConnections() {
   ]);
   const selectedTargetAtom = useSelector(
     generalSelectors.getAtom(get(selectedConnection, "targetAtomUri"))
+  );
+
+  useEffect(
+    () => {
+      if (atomUri && !initialLoad && (!atomLoading || !atom)) {
+        dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
+      }
+    },
+    [selectedConnectionUri, atom, atomLoading, initialLoad]
   );
 
   const isSelectedConnectionGroupChat =
@@ -51,18 +74,18 @@ export default function PageConnections() {
   const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
 
   let contentElements;
-  if (selectedConnection && postUri) {
+  if (selectedConnection && atomUriInRoute) {
     contentElements = (
       <main className="overview__justconnection">
         {isSelectedConnectionGroupChat ? (
           <WonGroupAtomMessages
             connection={selectedConnection}
-            backToChats={!postUri}
+            backToChats={!atomUriInRoute}
           />
         ) : (
           <WonAtomMessages
             connection={selectedConnection}
-            backToChats={!postUri}
+            backToChats={!atomUriInRoute}
           />
         )}
       </main>
@@ -82,12 +105,12 @@ export default function PageConnections() {
             {isSelectedConnectionGroupChat ? (
               <WonGroupAtomMessages
                 connection={selectedConnection}
-                backToChats={!postUri}
+                backToChats={!atomUriInRoute}
               />
             ) : (
               <WonAtomMessages
                 connection={selectedConnection}
-                backToChats={!postUri}
+                backToChats={!atomUriInRoute}
               />
             )}
           </main>
@@ -130,7 +153,7 @@ export default function PageConnections() {
     <section className={!isLoggedIn ? "won-signed-out" : ""}>
       {showModalDialog && <WonModalDialog />}
       <WonTopnav pageTitle="Chats" />
-      {isLoggedIn && !postUri && <WonMenu />}
+      {isLoggedIn && !atomUriInRoute && <WonMenu />}
       <WonToasts />
       {showSlideIns && <WonSlideIn />}
 

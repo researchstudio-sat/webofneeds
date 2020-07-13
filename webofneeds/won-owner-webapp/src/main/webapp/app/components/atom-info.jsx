@@ -35,6 +35,7 @@ export default function WonAtomInfo({
   const atomFailedToLoad =
     atom && processUtils.hasAtomFailedToLoad(processState, atomUri);
   const atomToLoad = !atom || processUtils.isAtomToLoad(processState, atomUri);
+  const initialLoad = processUtils.isProcessingInitialLoad(processState);
 
   const [visibleTab, setVisibleTab] = useState(initialTab);
   const [showAddPicker, toggleAddPicker] = useState(false);
@@ -62,11 +63,11 @@ export default function WonAtomInfo({
               !connectionUtils.isConnected(ownedConnection)))
       );
 
-      if (atomUri && ((atomToLoad && !atomLoading) || !atom)) {
+      if (atomUri && !initialLoad && ((atomToLoad && !atomLoading) || !atom)) {
         dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
       }
     },
-    [atomUri, connectionUri, atomLoading]
+    [atomUri, connectionUri, atomLoading, initialLoad]
   );
 
   const relevantConnectionsMap = useSelector(
