@@ -56,10 +56,38 @@ export default function PageConnections() {
   useEffect(
     () => {
       if (atomUri && !initialLoad && (!atomLoading || !atom)) {
+        console.debug(
+          "Fetching unloaded atom:",
+          atomUri,
+          " for connection: ",
+          selectedConnectionUri
+        );
         dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
       }
     },
     [selectedConnectionUri, atom, atomLoading, initialLoad]
+  );
+
+  const ownedAtoms = useSelector(generalSelectors.getOwnedAtoms);
+
+  useEffect(
+    () => {
+      if (!atomUriInRoute && !initialLoad && ownedAtoms) {
+        const unloadedAtoms = ownedAtoms.filter(
+          (_, atomUri) =>
+            processUtils.isAtomToLoad(processState, atomUri) &&
+            !processUtils.isAtomLoading(processState, atomUri)
+        );
+
+        if (unloadedAtoms.size > 0) {
+          console.debug("Fetching unloaded atoms...");
+          unloadedAtoms.map((atom, atomUri) => {
+            dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
+          });
+        }
+      }
+    },
+    [selectedConnectionUri, atom, atomLoading, initialLoad, ownedAtoms]
   );
 
   const isSelectedConnectionGroupChat =
@@ -135,6 +163,8 @@ export default function PageConnections() {
       </React.Fragment>
     );
   } else {
+    // TODO: FETCH ALL ATOMS TO DETERMINE IF NO CHATS ARE ACTUALLY TRUE
+
     contentElements = (
       <main className="overview__nochats">
         <div className="overview__nochats__empty">
