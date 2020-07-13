@@ -5,7 +5,6 @@ import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import { get, sortByDate } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
-import * as processUtils from "../../redux/utils/process-utils.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import * as viewUtils from "../../redux/utils/view-utils.js";
 import WonModalDialog from "../../components/modal-dialog.jsx";
@@ -18,7 +17,6 @@ import WonFooter from "../../components/footer.jsx";
 import WonHowTo from "../../components/howto.jsx";
 import WonAtomCardGrid from "../../components/atom-card-grid.jsx";
 
-import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 
 import "~/style/_inventory.scss";
@@ -53,9 +51,7 @@ export default function PageInventory() {
 
   const theme = useSelector(generalSelectors.getTheme);
   const accountState = useSelector(generalSelectors.getAccountState);
-  const process = useSelector(generalSelectors.getProcessState);
 
-  const isInitialLoadInProgress = processUtils.isProcessingInitialLoad(process);
   const isLoggedIn = accountUtils.isLoggedIn(accountState);
   const welcomeTemplateHtml = get(theme, "welcomeTemplate");
   const additionalLogos =
@@ -92,86 +88,76 @@ export default function PageInventory() {
       {showSlideIns && <WonSlideIn />}
 
       {isLoggedIn ? (
-        isInitialLoadInProgress ? (
-          <main className="ownerloading">
-            <svg className="ownerloading__spinner hspinner">
-              <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
-            </svg>
-            <span className="ownerloading__label">Gathering your Atoms...</span>
-          </main>
-        ) : (
-          <main className="ownerinventory">
-            {hasOwnedActivePersonas && (
-              <div className="ownerinventory__personas">
-                {sortedOwnedActivePersonas.map((persona, index) => (
-                  <WonAtomInfo
-                    key={get(persona, "uri") + "-" + index}
-                    className="ownerinventory__personas__persona"
-                    atom={persona}
-                    initialTab={vocab.HOLD.HolderSocketCompacted}
-                  />
-                ))}
-              </div>
-            )}
-            <div className="ownerinventory__header">
+        <main className="ownerinventory">
+          {hasOwnedActivePersonas && (
+            <div className="ownerinventory__personas">
+              {sortedOwnedActivePersonas.map((persona, index) => (
+                <WonAtomInfo
+                  key={get(persona, "uri") + "-" + index}
+                  className="ownerinventory__personas__persona"
+                  atomUri={get(persona, "uri")}
+                  atom={persona}
+                  initialTab={vocab.HOLD.HolderSocketCompacted}
+                />
+              ))}
+            </div>
+          )}
+          <div className="ownerinventory__header">
+            <div className="ownerinventory__header__title">
+              Unassigned
+              {hasOwnedUnassignedAtomUris && (
+                <span className="ownerinventory__header__title__count">
+                  {"(" + unassignedAtomSize + ")"}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="ownerinventory__content">
+            <WonAtomCardGrid
+              atoms={sortedOwnedUnassignedActivePosts}
+              currentLocation={currentLocation}
+              showIndicators={true}
+              showHolder={true}
+              showCreate={true}
+              showCreatePersona={true}
+            />
+          </div>
+          {hasOwnedInactiveAtomUris && (
+            <div
+              className="ownerinventory__header clickable"
+              onClick={() => dispatch(actionCreators.view__toggleClosedAtoms())}
+            >
               <div className="ownerinventory__header__title">
-                Unassigned
-                {hasOwnedUnassignedAtomUris && (
-                  <span className="ownerinventory__header__title__count">
-                    {"(" + unassignedAtomSize + ")"}
-                  </span>
-                )}
+                Archived
+                <span className="ownerinventory__header__title__count">
+                  {"(" + inactiveAtomUriSize + ")"}
+                </span>
               </div>
-            </div>
-            <div className="ownerinventory__content">
-              <WonAtomCardGrid
-                atoms={sortedOwnedUnassignedActivePosts}
-                currentLocation={currentLocation}
-                showIndicators={true}
-                showHolder={true}
-                showCreate={true}
-                showCreatePersona={true}
-              />
-            </div>
-            {hasOwnedInactiveAtomUris && (
-              <div
-                className="ownerinventory__header clickable"
-                onClick={() =>
-                  dispatch(actionCreators.view__toggleClosedAtoms())
+              <svg
+                className={
+                  "ownerinventory__header__carret " +
+                  (showClosedAtoms
+                    ? "ownerinventory__header__carret--expanded"
+                    : "ownerinventory__header__carret--collapsed")
                 }
               >
-                <div className="ownerinventory__header__title">
-                  Archived
-                  <span className="ownerinventory__header__title__count">
-                    {"(" + inactiveAtomUriSize + ")"}
-                  </span>
-                </div>
-                <svg
-                  className={
-                    "ownerinventory__header__carret " +
-                    (showClosedAtoms
-                      ? "ownerinventory__header__carret--expanded"
-                      : "ownerinventory__header__carret--collapsed")
-                  }
-                >
-                  <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-                </svg>
+                <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
+              </svg>
+            </div>
+          )}
+          {showClosedAtoms &&
+            hasOwnedInactiveAtomUris && (
+              <div className="ownerinventory__content">
+                <WonAtomCardGrid
+                  atoms={sortedOwnedInactiveAtoms}
+                  currentLocation={currentLocation}
+                  showIndicators={false}
+                  showHolder={false}
+                  showCreate={false}
+                />
               </div>
             )}
-            {showClosedAtoms &&
-              hasOwnedInactiveAtomUris && (
-                <div className="ownerinventory__content">
-                  <WonAtomCardGrid
-                    atoms={sortedOwnedInactiveAtoms}
-                    currentLocation={currentLocation}
-                    showIndicators={false}
-                    showHolder={false}
-                    showCreate={false}
-                  />
-                </div>
-              )}
-          </main>
-        )
+        </main>
       ) : (
         <main className="ownerwelcome">
           <div
