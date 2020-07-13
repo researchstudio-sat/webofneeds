@@ -317,7 +317,7 @@ export default function WonGroupAtomMessages({
                       false
                     )
                   )
-              : history.replace(
+              : () => history.replace(
                   generateLink(
                     history.location,
                     { postUri: extractAtomUriFromConnectionUri(connectionUri) },
