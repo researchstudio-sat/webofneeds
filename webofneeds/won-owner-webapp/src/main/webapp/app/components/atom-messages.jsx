@@ -588,7 +588,7 @@ export default function WonAtomMessages({
       <React.Fragment>
         <a
           className="pm__header__back__button clickable"
-          onClick={
+          onClick={() =>
             backToChats
               ? () =>
                   history.replace(
