@@ -12,6 +12,7 @@ import "../style/won.scss";
 
 import React from "react";
 import ReactDOM from "react-dom";
+import PropTypes from "prop-types";
 import { applyMiddleware, createStore } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
 import * as generalSelectors from "./redux/selectors/general-selectors.js";
@@ -50,6 +51,7 @@ import { getQueryParams } from "./utils.js";
 import * as accountUtils from "./redux/utils/account-utils.js";
 import * as processUtils from "./redux/utils/process-utils.js";
 import { runPushAgent } from "./push-agent";
+import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 
 window.won = won;
 
@@ -97,11 +99,10 @@ store.dispatch(actionCreators.initialPageLoad());
 //app.run(["$ngRedux", $ngRedux => $ngRedux.dispatch(actionCreators.tick())]);
 store.dispatch(actionCreators.tick());
 
-function AppRoutes() {
+function AppRoutes({ processState }) {
   const dispatch = useDispatch();
   const location = useLocation();
   const accountState = useSelector(generalSelectors.getAccountState);
-  const processState = useSelector(generalSelectors.getProcessState);
 
   const isLoggedIn = accountUtils.isLoggedIn(accountState);
   const hasLoginError = !!accountUtils.getLoginError(accountState);
@@ -166,12 +167,32 @@ function AppRoutes() {
     </Switch>
   );
 }
+AppRoutes.propTypes = { processState: PropTypes.object.isRequired };
+
+function App() {
+  const processState = useSelector(generalSelectors.getProcessState);
+
+  if (processUtils.isProcessingInitialLoad(processState)) {
+    return (
+      <main className="ownerloading">
+        <svg className="ownerloading__spinner hspinner">
+          <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
+        </svg>
+        <span className="ownerloading__label">Gathering your Atoms...</span>
+      </main>
+    );
+  } else {
+    return (
+      <HashRouter hashType="hashbang">
+        <AppRoutes processState={processState} />
+      </HashRouter>
+    );
+  }
+}
 
 ReactDOM.render(
   <Provider store={store}>
-    <HashRouter hashType="hashbang">
-      <AppRoutes />
-    </HashRouter>
+    <App />
   </Provider>,
   document.getElementById("root")
 );
