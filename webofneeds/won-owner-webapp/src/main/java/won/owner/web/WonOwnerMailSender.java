@@ -4,8 +4,6 @@ import org.apache.jena.query.Dataset;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.app.event.EventCartridge;
-import org.apache.velocity.app.event.implement.EscapeHtmlReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,9 +113,6 @@ public class WonOwnerMailSender {
                     String textMsg) {
         String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
         VelocityContext velocityContext = new VelocityContext();
-        EventCartridge ec = new EventCartridge();
-        ec.addEventHandler(new EscapeHtmlReference());
-        ec.attachToContext(velocityContext);
         if (targetAtom != null) {
             Dataset atomDataset = linkedDataSource.getDataForResource(URI.create(targetAtom));
             DefaultAtomModelWrapper targetAtomWrapper = new DefaultAtomModelWrapper(atomDataset);
@@ -152,9 +147,6 @@ public class WonOwnerMailSender {
     private VelocityContext createVerificationContext(EmailVerificationToken verificationToken) {
         String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
         VelocityContext velocityContext = new VelocityContext();
-        EventCartridge ec = new EventCartridge();
-        ec.addEventHandler(new EscapeHtmlReference());
-        ec.attachToContext(velocityContext);
         String verificationLinkUrl = ownerAppLink + OWNER_VERIFICATION_LINK + verificationToken.getToken();
         velocityContext.put("verificationLinkUrl", verificationLinkUrl);
         velocityContext.put("expirationDate", verificationToken.getExpiryDate());
@@ -166,9 +158,6 @@ public class WonOwnerMailSender {
     private VelocityContext createServiceNameOnlyContext() {
         String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
         VelocityContext velocityContext = new VelocityContext();
-        EventCartridge ec = new EventCartridge();
-        ec.addEventHandler(new EscapeHtmlReference());
-        ec.attachToContext(velocityContext);
         velocityContext.put("serviceName", this.ownerWebappUri);
         return velocityContext;
     }
@@ -176,9 +165,6 @@ public class WonOwnerMailSender {
     private VelocityContext createRecoveryKeyContext(String recoveryKey) {
         String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
         VelocityContext velocityContext = new VelocityContext();
-        EventCartridge ec = new EventCartridge();
-        ec.addEventHandler(new EscapeHtmlReference());
-        ec.attachToContext(velocityContext);
         velocityContext.put("recoveryKey", recoveryKey);
         velocityContext.put("serviceName", this.ownerWebappUri);
         return velocityContext;
@@ -187,9 +173,6 @@ public class WonOwnerMailSender {
     private VelocityContext createAnonymousLinkContext(String privateId) {
         String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
         VelocityContext velocityContext = new VelocityContext();
-        EventCartridge ec = new EventCartridge();
-        ec.addEventHandler(new EscapeHtmlReference());
-        ec.attachToContext(velocityContext);
         String anonymousLinkUrl = ownerAppLink + OWNER_ANONYMOUS_LINK + privateId;
         velocityContext.put("anonymousLinkUrl", anonymousLinkUrl);
         velocityContext.put("serviceName", this.ownerWebappUri);
@@ -199,9 +182,6 @@ public class WonOwnerMailSender {
     private VelocityContext createMultipleHintsContext(Map<String, Long> hintCountPerAtom) {
         String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
         VelocityContext velocityContext = new VelocityContext();
-        EventCartridge ec = new EventCartridge();
-        ec.addEventHandler(new EscapeHtmlReference());
-        ec.attachToContext(velocityContext);
         velocityContext.put("hintCount", hintCountPerAtom);
         velocityContext.put("serviceName", this.ownerWebappUri);
         velocityContext.put("atoms", hintCountPerAtom.keySet());
