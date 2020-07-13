@@ -588,7 +588,7 @@ export default function WonAtomMessages({
       <React.Fragment>
         <a
           className="pm__header__back__button clickable"
-          onClick={() =>
+          onClick={
             backToChats
               ? () =>
                   history.replace(
@@ -601,7 +601,7 @@ export default function WonAtomMessages({
                       false
                     )
                   )
-              : history.replace(
+              : () => history.replace(
                   generateLink(
                     history.location,
                     { postUri: extractAtomUriFromConnectionUri(connectionUri) },
