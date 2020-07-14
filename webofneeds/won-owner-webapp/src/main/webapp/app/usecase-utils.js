@@ -350,9 +350,14 @@ export function getUseCase(useCaseString) {
  * will be added
  * @param useCaseIdentifier
  * @param atomToMergeImm
+ * @param dropUndefinedSockets if set to true drop existing Sockets that are not in the UseCaseDefinition
  * @returns {any} Immutable useCase Object (used for edit-atom functionality)
  */
-export function getUseCaseImmMergedWithAtom(useCaseIdentifier, atomToMergeImm) {
+export function getUseCaseImmMergedWithAtom(
+  useCaseIdentifier,
+  atomToMergeImm,
+  dropUndefinedSockets = false
+) {
   let useCaseImm = get(useCasesImm, useCaseIdentifier);
 
   if (useCaseImm) {
@@ -363,20 +368,26 @@ export function getUseCaseImmMergedWithAtom(useCaseIdentifier, atomToMergeImm) {
       const atomToMergeContentSockets =
         get(atomToMergeContent, "sockets") || Immutable.Map();
 
-      const mergedSockets = contentSockets
-        .flip()
+      const flippedContentSockets = contentSockets.flip();
+
+      let flippedMergedSockets = flippedContentSockets
         .merge(atomToMergeContentSockets.flip())
         .map(
           socketUri =>
             socketUri.startsWith("#")
               ? get(atomToMergeImm, "uri") + socketUri
               : socketUri
-        )
-        .flip();
+        );
+
+      if (dropUndefinedSockets) {
+        flippedMergedSockets = flippedMergedSockets.filter(
+          (socketUri, socketType) => get(flippedContentSockets, socketType)
+        );
+      }
 
       useCaseImm = useCaseImm.setIn(
         ["draft", "content"],
-        atomToMergeContent.set("sockets", mergedSockets)
+        atomToMergeContent.set("sockets", flippedMergedSockets.flip())
       );
     }
 
