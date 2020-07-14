@@ -220,9 +220,10 @@ export default function WonAtomContent({
         );
         break;
       }
-
-      case vocab.WXVALUEFLOWS.CustodianSocketCompacted:
-      case vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted: {
+      case vocab.WXVALUEFLOWS.ResourceActivitySocketCompacted:
+      case vocab.WXVALUEFLOWS.ActorActivitySocketCompacted:
+      case vocab.WXVALUEFLOWS.CustodianOfSocketCompacted:
+      case vocab.WXVALUEFLOWS.PrimaryAccountableOfSocketCompacted: {
         visibleTabFragment = (
           <WonAtomContentSocket
             atom={atom}

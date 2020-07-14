@@ -20,9 +20,11 @@ export const persona = {
           "#worksForSocket": vocab.WXSCHEMA.WorksForSocketCompacted,
           "#memberOfSocket": vocab.WXSCHEMA.MemberOfSocketCompacted,
           "#sReviewSocket": vocab.WXSCHEMA.ReviewSocketCompacted,
-          "#PrimaryAccountableSocket":
-            vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted,
-          "#CustodianSocket": vocab.WXVALUEFLOWS.CustodianSocketCompacted,
+          "#PrimaryAccountableOfSocket":
+            vocab.WXVALUEFLOWS.PrimaryAccountableOfSocketCompacted,
+          "#CustodianOfSocket": vocab.WXVALUEFLOWS.CustodianOfSocketCompacted,
+          "#ActorActivitySocket":
+            vocab.WXVALUEFLOWS.ActorActivitySocketCompacted,
         },
       },
       seeks: {},
@@ -30,14 +32,24 @@ export const persona = {
   },
   reactions: {
     ...defaultReactions,
-    [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]: {
-      [vocab.WXVALUEFLOWS.PrimaryAccountableInverseSocketCompacted]: {
+    [vocab.WXVALUEFLOWS.ActorActivitySocketCompacted]: {
+      [vocab.WXVALUEFLOWS.ActorSocketCompacted]: {
+        useCaseIdentifiers: ["activity"],
+      },
+    },
+    [vocab.WXVALUEFLOWS.PrimaryAccountableOfSocketCompacted]: {
+      [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]: {
         useCaseIdentifiers: ["resource"],
       },
     },
-    [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: {
-      [vocab.WXVALUEFLOWS.CustodianInverseSocketCompacted]: {
+    [vocab.WXVALUEFLOWS.CustodianOfSocketCompacted]: {
+      [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: {
         useCaseIdentifiers: ["resource"],
+      },
+    },
+    [vocab.WXVALUEFLOWS.ResourceActivitySocketCompacted]: {
+      [vocab.WXVALUEFLOWS.ActorSocket]: {
+        useCaseIdentifiers: ["action"],
       },
     },
     [vocab.WXSCHEMA.WorksForSocketCompacted]: {
