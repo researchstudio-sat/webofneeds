@@ -74,28 +74,39 @@ won-connection-message {
   &.won-cm--left {
     justify-content: flex-start;
 
+    > .won-cm__center {
+      padding-left: 0.25rem;
+
+      > .won-cm__center__bubble {
+        background: white;
+      }
+    }
     & .won-cm__center__bubble {
       @include speech-bubble-left(
-        $won-light-gray,
-        $won-line-gray,
-        $speechBubbleTailSize / 2,
-        $thinBorderWidth,
-        0.8rem
+                      white,
+                      $won-line-gray,
+                      $speechBubbleTailSize / 2,
+                      $thinBorderWidth,
+                      0.8rem
       );
 
       &.references {
         @include speech-bubble-left(
-          $won-light-gray,
-          $thinDarkBorder,
-          $speechBubbleTailSize/2,
-          $thinBorderWidth,
-          0.8rem
+                        white,
+                        $thinDarkBorder,
+                        $speechBubbleTailSize/2,
+                        $thinBorderWidth,
+                        0.8rem
         );
       }
     }
   }
   &.won-cm--right {
     justify-content: flex-end;
+
+    > .won-cm__center {
+      padding-right: 0.25rem;
+    }
     & .won-cm__center__bubble {
       @include speech-bubble-right(
         $won-light-gray,

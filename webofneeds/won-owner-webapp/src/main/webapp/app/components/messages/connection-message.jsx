@@ -288,30 +288,30 @@ export default function WonConnectionMessage({
     const messageIcon = [];
 
     if (!isSent && !(groupChatMessage && originatorUri)) {
-      messageIcon.push(
-        <WonAtomIcon
-          key="targetAtomUri"
-          atom={targetAtom}
-          flipIcons={true}
-          onClick={
-            !onClick
-              ? () => {
-                  history.push(
-                    generateLink(
-                      history.location,
-                      {
-                        postUri: get(targetAtom, "uri"),
-                        tab: undefined,
-                        connectionUri: undefined,
-                      },
-                      "/post"
-                    )
-                  );
-                }
-              : undefined
-          }
-        />
-      );
+      // messageIcon.push(
+      //   <WonAtomIcon
+      //     key="targetAtomUri"
+      //     atom={targetAtom}
+      //     flipIcons={true}
+      //     onClick={
+      //       !onClick
+      //         ? () => {
+      //             history.push(
+      //               generateLink(
+      //                 history.location,
+      //                 {
+      //                   postUri: get(targetAtom, "uri"),
+      //                   tab: undefined,
+      //                   connectionUri: undefined,
+      //                 },
+      //                 "/post"
+      //               )
+      //             );
+      //           }
+      //         : undefined
+      //     }
+      //   />
+      // );
     }
 
     if (isReceived && groupChatMessage && originatorUri) {

@@ -63,7 +63,7 @@ won-atom-messages {
   .pm__content {
     grid-area: main;
     padding: 0.5rem 0.5rem 0.5rem 0;
-    background: white;
+    background: $won-lighter-gray;
     border: $thinGrayBorder;
     overflow: auto;
     scroll-behavior: smooth;
@@ -107,10 +107,6 @@ won-atom-messages {
       margin-left: 0.5rem;
       text-align: center;
       box-sizing: border-box;
-    }
-    &.won-petrinet-content,
-    &.won-agreement-content {
-      background: $won-lighter-gray;
     }
     &__petrinet__loadingtext,
     &__agreement__loadingtext {

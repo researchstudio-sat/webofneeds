@@ -63,7 +63,7 @@ won-group-atom-messages {
   .gpm__content {
     grid-area: main;
     padding: 0.5rem 0.5rem 0.5rem 0;
-    background: white;
+    background: $won-lighter-gray;
     border: $thinGrayBorder;
     overflow: auto;
     flex-grow: 1;
