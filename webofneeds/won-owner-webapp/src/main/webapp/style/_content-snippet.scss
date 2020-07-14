@@ -50,6 +50,12 @@
     object-fit: cover;
     width: 100%;
     background: white;
+
+    &.pkmimg {
+      object-fit: contain;
+      padding: 1.5rem;
+      box-sizing: border-box;
+    }
   }
 
   & won-atom-map.location {
