@@ -7,13 +7,13 @@ import vocab from "../../app/service/vocab.js";
 import ico36_uc_transport_demand from "~/images/won-icons/ico36_uc_transport_demand.svg";
 
 export const activity = {
-  identifier: "action",
-  label: "Action",
+  identifier: "activity",
+  label: "Activity",
   icon: ico36_uc_transport_demand,
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["wx-valueflows:Action"],
+        type: ["wx-valueflows:Activity"],
         sockets: {
           "#ResourceSocket": vocab.WXVALUEFLOWS.ResourceSocketCompacted,
           "#ActorSocket": vocab.WXVALUEFLOWS.ActorSocketCompacted,

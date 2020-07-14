@@ -389,9 +389,9 @@ vocab.WXVALUEFLOWS.ResourceSocket =
 vocab.WXVALUEFLOWS.ResourceSocketCompacted =
   vocab.WXVALUEFLOWS.prefix + ":ResourceSocket";
 vocab.WXVALUEFLOWS.ResourceActivitySocket =
-  vocab.WXVALUEFLOWS.baseUri + ":ResourceSocket";
+  vocab.WXVALUEFLOWS.baseUri + ":ResourceActivitySocket";
 vocab.WXVALUEFLOWS.ResourceActivitySocketCompacted =
-  vocab.WXVALUEFLOWS.prefix + ":ResourceSocket";
+  vocab.WXVALUEFLOWS.prefix + ":ResourceActivitySocket";
 vocab.WXVALUEFLOWS.ActorSocket = vocab.WXVALUEFLOWS.baseUri + ":ActorSocket";
 vocab.WXVALUEFLOWS.ActorSocketCompacted =
   vocab.WXVALUEFLOWS.prefix + ":ActorSocket";
@@ -419,8 +419,9 @@ vocab.socketCapacity = {
   [vocab.HOLD.HoldableSocketCompacted]: 1,
   [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: 1,
   [vocab.WXSCHEMA.ReviewInverseSocketCompacted]: 1,
-  [vocab.WXVALUEFLOWS.PrimaryAccountableOfSocketCompacted]: 1,
-  [vocab.WXVALUEFLOWS.CustodianOfSocketCompacted]: 1,
+  [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]: 1,
+  [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: 1,
+  [vocab.WXVALUEFLOWS.ActorSocketCompacted]: 1,
 };
 
 /* This constant is to prevent connections to non owned atoms for specific sockets */

@@ -32,6 +32,11 @@ export const persona = {
   },
   reactions: {
     ...defaultReactions,
+    [vocab.WXVALUEFLOWS.ActorActivitySocketCompacted]: {
+      [vocab.WXVALUEFLOWS.ActorSocketCompacted]: {
+        useCaseIdentifiers: ["activity"],
+      },
+    },
     [vocab.WXVALUEFLOWS.PrimaryAccountableOfSocketCompacted]: {
       [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]: {
         useCaseIdentifiers: ["resource"],

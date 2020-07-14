@@ -42,6 +42,11 @@ export const resource = {
         useCaseIdentifiers: ["persona"],
       },
     },
+    [vocab.WXVALUEFLOWS.ResourceActivitySocketCompacted]: {
+      [vocab.WXVALUEFLOWS.ResourceSocketCompacted]: {
+        useCaseIdentifiers: ["activity"],
+      },
+    },
   },
   details: {
     title: { ...details.title },
