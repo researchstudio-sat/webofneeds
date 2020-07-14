@@ -48,6 +48,7 @@ const labels = deepFreeze({
     [vocab.WXVALUEFLOWS.ResourceActivitySocketCompacted]: "Activities",
     [vocab.WXVALUEFLOWS.ActorSocketCompacted]: "Actor",
     [vocab.WXVALUEFLOWS.ActorActivitySocketCompacted]: "Activities",
+    [vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted]: "Partner Activities",
   },
   socketTabs: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Members",
@@ -73,6 +74,7 @@ const labels = deepFreeze({
     [vocab.WXVALUEFLOWS.ResourceActivitySocketCompacted]: "Activities",
     [vocab.WXVALUEFLOWS.ActorSocketCompacted]: "Actor",
     [vocab.WXVALUEFLOWS.ActorActivitySocketCompacted]: "Activities",
+    [vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted]: "Connections",
   },
   socketItem: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Member",
@@ -98,6 +100,7 @@ const labels = deepFreeze({
     [vocab.WXVALUEFLOWS.ResourceActivitySocketCompacted]: "Affected Resource",
     [vocab.WXVALUEFLOWS.ActorSocketCompacted]: "Activity",
     [vocab.WXVALUEFLOWS.ActorActivitySocketCompacted]: "Actor",
+    [vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted]: "Connection",
   },
   socketItems: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Members",
@@ -122,6 +125,7 @@ const labels = deepFreeze({
     [vocab.WXVALUEFLOWS.ResourceActivitySocketCompacted]: "Affected Resources",
     [vocab.WXVALUEFLOWS.ActorSocketCompacted]: "Activities",
     [vocab.WXVALUEFLOWS.ActorActivitySocketCompacted]: "Actors",
+    [vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted]: "Connections",
   },
 });
 

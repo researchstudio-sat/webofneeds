@@ -84,7 +84,7 @@
 :ResourceSocket rdf:type owl:NamedIndividual ,
                                  won:SocketDefinition ;
                         won:compatibleSocketDefinition :ResourceActivitySocket ;
-                        won:derivesInverseAtomProperty vf:EconomicResource ;
+                        won:derivesAtomProperty vf:EconomicResource ;
                         won:autoOpen "false"^^xsd:boolean ;
                         rdfs:comment "An Activity Atom uses a Socket with this configuration to connect to its corresponding Resource Atom."@en ;
                         rdfs:label "ResourceSocket" .
@@ -93,7 +93,7 @@
 :ResourceActivitySocket rdf:type owl:NamedIndividual ,
                                  won:SocketDefinition ;
                         won:compatibleSocketDefinition :ResourceSocket ;
-                        won:derivesAtomProperty vf:EconomicResource ;
+                        won:derivesInverseAtomProperty vf:EconomicResource ;
                         won:autoOpen "false"^^xsd:boolean ;
                         won:socketCapacity 1 ;
                         rdfs:comment "A Resource Atom uses a Socket with this configuration to connect to an Activity Atom for a resource."@en ;
@@ -113,11 +113,21 @@
 :ActorActivitySocket rdf:type owl:NamedIndividual ,
                                  won:SocketDefinition ;
                         won:compatibleSocketDefinition :ActorSocket ;
-                        won:derivesAtomProperty :actor ;
+                        won:derivesInverseAtomProperty :actor ;
                         won:autoOpen "false"^^xsd:boolean ;
                         won:socketCapacity 1 ;
                         rdfs:comment "A Persona Atom uses a Socket with this configuration to connect to an Activity Atom for a resource."@en ;
                         rdfs:label "ActorActivitySocket" .
+
+###  https://w3id.org/won/ext/valueflows#PartnerActivitySocket
+:PartnerActivitySocket rdf:type owl:NamedIndividual ,
+                              won:SocketDefinition ;
+                     won:compatibleSocketDefinition :PartnerActivitySocket ;
+                     won:derivesAtomProperty :partnerActivity ;
+                     won:autoOpen "false"^^xsd:boolean ;
+                     won:socketCapacity 1 ;
+                     rdfs:comment "An Activity Atom uses a Socket with this configuration to connect to an Activity Atom."@en ;
+                     rdfs:label "PartnerActivitySocket" .
 
 #################################################################
 #    Annotations
@@ -137,6 +147,7 @@
                         :ResourceActivitySocket
                         :ActorSocket
                         :ActorActivitySocket
+                        :PartnerActivitySocket
                       )
 ] .
 

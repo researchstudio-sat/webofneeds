@@ -17,6 +17,7 @@ export const activity = {
         sockets: {
           "#ResourceSocket": vocab.WXVALUEFLOWS.ResourceSocketCompacted,
           "#ActorSocket": vocab.WXVALUEFLOWS.ActorSocketCompacted,
+          "#PartnerActivity": vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted,
         },
       },
       seeks: {},
@@ -32,6 +33,11 @@ export const activity = {
     [vocab.WXVALUEFLOWS.ActorSocketCompacted]: {
       [vocab.WXVALUEFLOWS.ActorActivitySocketCompacted]: {
         useCaseIdentifiers: ["persona"],
+      },
+    },
+    [vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted]: {
+      [vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted]: {
+        useCaseIdentifiers: ["activity"],
       },
     },
   },

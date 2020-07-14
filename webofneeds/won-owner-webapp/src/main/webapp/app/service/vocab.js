@@ -399,6 +399,10 @@ vocab.WXVALUEFLOWS.ActorActivitySocket =
   vocab.WXVALUEFLOWS.baseUri + ":ActorActivitySocket";
 vocab.WXVALUEFLOWS.ActorActivitySocketCompacted =
   vocab.WXVALUEFLOWS.prefix + ":ActorActivitySocket";
+vocab.WXVALUEFLOWS.PartnerActivitySocket =
+  vocab.WXVALUEFLOWS.baseUri + ":PartnerActivitySocket";
+vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted =
+  vocab.WXVALUEFLOWS.prefix + ":PartnerActivitySocket";
 
 // UTILS
 vocab.WONMSG.uriPlaceholder = Object.freeze({
