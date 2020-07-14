@@ -30,7 +30,8 @@ export default function WonEditAtom({ fromAtom }) {
 
   const useCaseImm = useCaseUtils.getUseCaseImmMergedWithAtom(
     atomUtils.getMatchedUseCaseIdentifier(fromAtom) || "customUseCase",
-    fromAtom
+    fromAtom,
+    true
   );
 
   const useCase = useCaseImm.toJS();
