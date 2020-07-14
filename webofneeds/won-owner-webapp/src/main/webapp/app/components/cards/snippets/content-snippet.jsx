@@ -54,7 +54,7 @@ export function generateSwipeableContent(
     swipeableContent.push(
       <img
         key={"pkm"}
-        className="image"
+        className="image pkmimg"
         alt={pokemonImageUrl}
         src={pokemonImageUrl}
       />

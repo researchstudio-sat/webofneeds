@@ -7,23 +7,23 @@ import {
   defaultReactions,
 } from "../detail-definitions.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
-import ico36_uc_drinks from "../../images/won-icons/ico36_uc_drinks.svg";
+import ico36_uc_breakfast from "../../images/won-icons/ico36_uc_breakfast.svg";
 import ico36_detail_datetime from "~/images/won-icons/ico36_detail_datetime.svg";
 import vocab from "~/app/service/vocab";
 import { sparqlQuery, vicinityScoreSubQuery } from "~/app/sparql-builder-utils";
 import won from "~/app/service/won";
 import { getIn } from "~/app/utils";
 
-export const afterpartyPlan = {
-  identifier: "afterpartyPlan",
-  label: "Plan Party!",
+export const breakfastPlan = {
+  identifier: "breakfastPlan",
+  label: "Plan Breakfast!",
   icon: ico36_detail_datetime,
   doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {
         type: ["s:PlanAction"],
-        eventObjectAboutUris: "http://www.wikidata.org/entity/Q200538",
+        eventObjectAboutUris: "http://www.wikidata.org/entity/Q80973",
         sockets: {
           "#groupSocket": vocab.GROUP.GroupSocketCompacted,
           "#holdableSocket": vocab.HOLD.HoldableSocketCompacted,
@@ -37,10 +37,10 @@ export const afterpartyPlan = {
     ...defaultReactions,
     [vocab.GROUP.GroupSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["afterpartyInterest"],
+        useCaseIdentifiers: ["breakfastInterest"],
       },
       [vocab.GROUP.GroupSocketCompacted]: {
-        useCaseIdentifiers: ["afterpartyPlan"],
+        useCaseIdentifiers: ["breakfastPlan"],
       },
     },
   },
@@ -88,7 +88,7 @@ export const afterpartyPlan = {
       where: [
         `${resultName} rdf:type demo:Interest.`,
         `${resultName} s:object ?planObject.`,
-        `?planObject s:about <http://www.wikidata.org/entity/Q200538>.`,
+        `?planObject s:about <http://www.wikidata.org/entity/Q80973>.`,
         `?thisAtom hold:heldBy/buddy:buddy/hold:holds ${resultName}.`,
         `BIND( ( 
           COALESCE(?location_geoScore, 0) 
@@ -102,15 +102,15 @@ export const afterpartyPlan = {
   },
 };
 
-export const afterpartyInterest = {
-  identifier: "afterpartyInterest",
-  label: "Partying",
-  icon: ico36_uc_drinks,
+export const breakfastInterest = {
+  identifier: "breakfastInterest",
+  label: "Interest in Lunch",
+  icon: ico36_uc_breakfast,
   draft: {
     ...mergeInEmptyDraft({
       content: {
         type: ["demo:Interest"],
-        eventObjectAboutUris: "http://www.wikidata.org/entity/Q200538",
+        eventObjectAboutUris: "http://www.wikidata.org/entity/Q80973",
       },
       seeks: {},
     }),
@@ -119,7 +119,7 @@ export const afterpartyInterest = {
     ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.GROUP.GroupSocketCompacted]: {
-        useCaseIdentifiers: ["afterpartyPlan"],
+        useCaseIdentifiers: ["breakfastPlan"],
       },
     },
   },
@@ -168,7 +168,7 @@ export const afterpartyInterest = {
         `${resultName} rdf:type won:Atom.`,
         `${resultName} rdf:type s:PlanAction.`,
         `${resultName} s:object ?planObject.`,
-        `?planObject s:about <http://www.wikidata.org/entity/Q200538>.`,
+        `?planObject s:about <http://www.wikidata.org/entity/Q80973>.`,
         `?thisAtom hold:heldBy/buddy:buddy/hold:holds ${resultName}.`,
         // calculate average of scores; can be weighed if necessary
         `BIND( (

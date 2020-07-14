@@ -295,3 +295,11 @@ main.ownerloading {
     text-align: center;
   }
 }
+
+// Current Location Marker
+.wonCurrentLocationMarkerIcon > .marker {
+  width: 15px;
+  height: 15px;
+  background-color: $won-primary-color;
+  border-radius: 100%;
+}

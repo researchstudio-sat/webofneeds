@@ -1,5 +1,9 @@
 import Immutable from "immutable";
-import { isValidDate, toLocalISODateString } from "../../app/utils.js";
+import {
+  isValidDate,
+  parseDatetimeStrictly,
+  toLocalISODateString,
+} from "../../app/utils.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import PokemonGymViewer from "../../app/components/details/viewer/pokemon-gym-viewer.jsx";
 import PokemonRaidbossViewer from "../../app/components/details/viewer/pokemon-raidboss-viewer.jsx";
@@ -105,6 +109,9 @@ export const pokemonRaid = {
   },
   parseToRDF: function({ value }) {
     if (this.isValid(value)) {
+      const hatchesDate = parseDatetimeStrictly(value.hatches);
+      const expiresDate = parseDatetimeStrictly(value.expires);
+
       if (value.hatched) {
         return {
           "won:raid": {
@@ -114,7 +121,7 @@ export const pokemonRaid = {
               ? { "@value": value.form, "@type": "xsd:string" }
               : undefined,
             "s:validThrough": {
-              "@value": toLocalISODateString(value.expires),
+              "@value": toLocalISODateString(expiresDate),
               "@type": "xsd:dateTime",
             },
           },
@@ -124,11 +131,11 @@ export const pokemonRaid = {
           "won:raid": {
             "won:level": { "@value": value.level, "@type": "xsd:long" },
             "s:validFrom": {
-              "@value": toLocalISODateString(value.hatches),
+              "@value": toLocalISODateString(hatchesDate),
               "@type": "xsd:dateTime",
             },
             "s:validThrough": {
-              "@value": toLocalISODateString(value.expires),
+              "@value": toLocalISODateString(expiresDate),
               "@type": "xsd:dateTime",
             },
           },
