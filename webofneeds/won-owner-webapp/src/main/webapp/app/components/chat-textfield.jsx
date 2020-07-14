@@ -301,29 +301,31 @@ export default function ChatTextfield({
       allMessageDetailsImm.size > 0 &&
       allMessageDetailsImm.toArray().map(detail => {
         if (get(detail, "component")) {
+          const detailIconImm = get(detail, "icon");
+          const detailLabelImm = get(detail, "label");
+          const detailIdentifierImm = get(detail, "identifier");
+          const detailIcon = detailIconImm && detailIconImm.toJS();
+
           return (
             <div
-              key={get(detail, "identifier")}
+              key={detailIdentifierImm}
               className="cts__details__grid__detail"
               onClick={() =>
                 dispatch(
                   actionCreators.view__selectAddMessageContent({
-                    selectedDetail: get(detail, "identifier"),
+                    selectedDetail: detailIdentifierImm,
                   })
                 )
               }
             >
-              {get(detail, "icon") && (
+              {detailIcon && (
                 <svg className="cts__details__grid__detail__icon">
-                  <use
-                    xlinkHref={get(detail, "icon")}
-                    href={get(detail, "icon")}
-                  />
+                  <use xlinkHref={detailIcon} href={detailIcon} />
                 </svg>
               )}
-              {get(detail, "label") && (
+              {detailLabelImm && (
                 <div className="cts__details__grid__detail__label">
-                  {get(detail, "label")}
+                  {detailLabelImm}
                 </div>
               )}
             </div>
