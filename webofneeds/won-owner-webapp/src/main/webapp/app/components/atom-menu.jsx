@@ -73,6 +73,19 @@ export default function WonAtomMenu({
   // Add generic Tabs based on available Sockets
   relevantConnectionsMap
     .filter(connectionUtils.filterSingleConnectedSocketCapacityFilter)
+    .toOrderedMap()
+    .sortBy((socketTypeConnections, socketType) => {
+      switch (socketType) {
+        case vocab.HOLD.HolderSocketCompacted:
+          return "1";
+        case vocab.CHAT.ChatSocketCompacted:
+          return "2";
+        case vocab.GROUP.GroupSocketCompacted:
+          return "3";
+        default:
+          return wonLabelUtils.getSocketTabLabel(socketType);
+      }
+    })
     .map((socketTypeConnections, socketType) => {
       let label = wonLabelUtils.getSocketTabLabel(socketType);
       let countLabel;
