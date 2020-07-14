@@ -42,7 +42,7 @@ const labels = deepFreeze({
       "Primary Accountable",
     [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]:
       "Primary Of Accountable",
-    [vocab.WXVALUEFLOWS.CustodianSocketOfCompacted]: "Custodian",
+    [vocab.WXVALUEFLOWS.CustodianOfSocketCompacted]: "Custodian",
     [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: "Custodian Of",
     [vocab.WXVALUEFLOWS.ResourceSocketCompacted]: "Affected Resources",
     [vocab.WXVALUEFLOWS.ResourceActivitySocketCompacted]: "Activities",
