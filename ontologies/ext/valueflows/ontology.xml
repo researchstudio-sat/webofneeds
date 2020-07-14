@@ -78,7 +78,7 @@
     <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/valueflows#ActorActivitySocket">
         <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
         <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/valueflows#ActorSocket"/>
-        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/valueflows#actor"/>
+        <core:derivesInverseAtomProperty rdf:resource="https://w3id.org/won/ext/valueflows#actor"/>
         <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
         <core:socketCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</core:socketCapacity>
         <rdfs:comment xml:lang="en">A Persona Atom uses a Socket with this configuration to connect to an Activity Atom for a resource.</rdfs:comment>
@@ -131,6 +131,21 @@
     
 
 
+    <!-- https://w3id.org/won/ext/valueflows#PartnerActivitySocket -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/valueflows#PartnerActivitySocket">
+        <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
+        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/valueflows#PartnerActivitySocket"/>
+        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/valueflows#partnerActivity"/>
+        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
+        <core:socketCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</core:socketCapacity>
+        <rdfs:comment xml:lang="en">An Activity Atom uses a Socket with this configuration to connect to an Activity Atom.</rdfs:comment>
+        <rdfs:label>PartnerActivitySocket</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
     <!-- https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket -->
 
 
@@ -166,7 +181,7 @@
     <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/valueflows#ResourceActivitySocket">
         <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
         <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/valueflows#ResourceSocket"/>
-        <core:derivesAtomProperty rdf:resource="https://w3id.org/valueflows#EconomicResource"/>
+        <core:derivesInverseAtomProperty rdf:resource="https://w3id.org/valueflows#EconomicResource"/>
         <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
         <core:socketCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</core:socketCapacity>
         <rdfs:comment xml:lang="en">A Resource Atom uses a Socket with this configuration to connect to an Activity Atom for a resource.</rdfs:comment>
@@ -181,7 +196,7 @@
     <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/valueflows#ResourceSocket">
         <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
         <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/valueflows#ResourceActivitySocket"/>
-        <core:derivesInverseAtomProperty rdf:resource="https://w3id.org/valueflows#EconomicResource"/>
+        <core:derivesAtomProperty rdf:resource="https://w3id.org/valueflows#EconomicResource"/>
         <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
         <rdfs:comment xml:lang="en">An Activity Atom uses a Socket with this configuration to connect to its corresponding Resource Atom.</rdfs:comment>
         <rdfs:label>ResourceSocket</rdfs:label>
@@ -203,6 +218,13 @@
     
 
 
+    <!-- https://w3id.org/won/ext/valueflows#partnerActivity -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/valueflows#partnerActivity"/>
+    
+
+
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
@@ -219,6 +241,7 @@
             <rdf:Description rdf:about="https://w3id.org/won/ext/valueflows#ActorSocket"/>
             <rdf:Description rdf:about="https://w3id.org/won/ext/valueflows#CustodianOfSocket"/>
             <rdf:Description rdf:about="https://w3id.org/won/ext/valueflows#CustodianSocket"/>
+            <rdf:Description rdf:about="https://w3id.org/won/ext/valueflows#PartnerActivitySocket"/>
             <rdf:Description rdf:about="https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket"/>
             <rdf:Description rdf:about="https://w3id.org/won/ext/valueflows#PrimaryAccountableSocket"/>
             <rdf:Description rdf:about="https://w3id.org/won/ext/valueflows#ResourceActivitySocket"/>

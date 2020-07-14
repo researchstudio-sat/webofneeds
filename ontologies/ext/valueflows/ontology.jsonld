@@ -11,6 +11,8 @@
     }, {
       "@id" : "https://w3id.org/won/ext/valueflows#CustodianSocket"
     }, {
+      "@id" : "https://w3id.org/won/ext/valueflows#PartnerActivitySocket"
+    }, {
       "@id" : "https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket"
     }, {
       "@id" : "https://w3id.org/won/ext/valueflows#PrimaryAccountableSocket"
@@ -80,7 +82,7 @@
   "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
     "@id" : "https://w3id.org/won/ext/valueflows#ActorSocket"
   } ],
-  "https://w3id.org/won/core#derivesAtomProperty" : [ {
+  "https://w3id.org/won/core#derivesInverseAtomProperty" : [ {
     "@id" : "https://w3id.org/won/ext/valueflows#actor"
   } ],
   "https://w3id.org/won/core#socketCapacity" : [ {
@@ -156,6 +158,30 @@
     "@value" : "1"
   } ]
 }, {
+  "@id" : "https://w3id.org/won/ext/valueflows#PartnerActivitySocket",
+  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/core#SocketDefinition" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "An Activity Atom uses a Socket with this configuration to connect to an Activity Atom."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "PartnerActivitySocket"
+  } ],
+  "https://w3id.org/won/core#autoOpen" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
+    "@value" : "false"
+  } ],
+  "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
+    "@id" : "https://w3id.org/won/ext/valueflows#PartnerActivitySocket"
+  } ],
+  "https://w3id.org/won/core#derivesAtomProperty" : [ {
+    "@id" : "https://w3id.org/won/ext/valueflows#partnerActivity"
+  } ],
+  "https://w3id.org/won/core#socketCapacity" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ]
+}, {
   "@id" : "https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/core#SocketDefinition" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
@@ -216,7 +242,7 @@
   "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
     "@id" : "https://w3id.org/won/ext/valueflows#ResourceSocket"
   } ],
-  "https://w3id.org/won/core#derivesAtomProperty" : [ {
+  "https://w3id.org/won/core#derivesInverseAtomProperty" : [ {
     "@id" : "https://w3id.org/valueflows#EconomicResource"
   } ],
   "https://w3id.org/won/core#socketCapacity" : [ {
@@ -240,7 +266,7 @@
   "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
     "@id" : "https://w3id.org/won/ext/valueflows#ResourceActivitySocket"
   } ],
-  "https://w3id.org/won/core#derivesInverseAtomProperty" : [ {
+  "https://w3id.org/won/core#derivesAtomProperty" : [ {
     "@id" : "https://w3id.org/valueflows#EconomicResource"
   } ]
 }, {
@@ -248,5 +274,8 @@
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual" ]
 }, {
   "@id" : "https://w3id.org/won/ext/valueflows#custodian",
+  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual" ]
+}, {
+  "@id" : "https://w3id.org/won/ext/valueflows#partnerActivity",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual" ]
 } ]
