@@ -7,13 +7,9 @@ import { realEstateGroup } from "./usecases/group-real-estate";
 import { transportGroup } from "./usecases/group-transport";
 import { otherGroup } from "./usecases/group-other";
 import { personalMobilityGroup } from "./usecases/group-personal-mobility";
-import { interestsGroup } from "./usecases/group-interests";
+import { interestsGroup, plansGroup } from "./usecases/group-interests";
 // import { customUseCase } from "./usecases/uc-custom.js";
 
-import { genericPlan } from "./usecases/uc-interest.js";
-import { lunchPlan } from "./usecases/uc-lunch.js";
-import { cyclingPlan } from "./usecases/uc-cycling.js";
-import { pokemonGoRaid } from "./usecases/uc-pokemon.js";
 import { persona } from "./usecases/uc-persona.js";
 import { serviceAtom } from "./usecases/uc-serviceatom.js";
 import { review } from "./usecases/uc-review.js";
@@ -62,6 +58,7 @@ import { review } from "./usecases/uc-review.js";
 
 const useCaseGroups = {
   interestsGroup: interestsGroup,
+  plansGroup: plansGroup,
   social: socialGroup,
   classifieds: classifiedsGroup,
   work: workGroup,
@@ -75,10 +72,6 @@ const useCaseGroups = {
 
 // add useCases here that should not be visible in the grouped useCases (will be hidden and only accessible through reactions
 export const hiddenUseCases = {
-  pokemonGoRaid: pokemonGoRaid,
-  genericPlan: genericPlan,
-  lunchPlan: lunchPlan,
-  cyclingPlan: cyclingPlan,
   persona: persona,
   serviceAtom: serviceAtom,
   review: review,

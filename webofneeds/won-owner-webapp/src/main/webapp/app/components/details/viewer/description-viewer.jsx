@@ -22,7 +22,7 @@ export default function WonDescriptionViewer({ detail, content, className }) {
         {label}
       </div>
       <ReactMarkdown
-        className="markdown"
+        className="dv__content markdown"
         source={content}
         linkTarget="_blank"
       />
