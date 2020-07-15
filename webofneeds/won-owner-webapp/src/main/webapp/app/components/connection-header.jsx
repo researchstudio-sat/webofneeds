@@ -9,7 +9,6 @@ import PropTypes from "prop-types";
 import VisibilitySensor from "react-visibility-sensor";
 import {
   get,
-  getIn,
   generateLink,
   extractAtomUriFromConnectionUri,
 } from "../utils.js";
@@ -44,27 +43,22 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
     ? extractAtomUriFromConnectionUri(connectionUri)
     : get(connection, "targetAtomUri");
 
-  const senderAtom = useSelector(state =>
-    getIn(state, ["atoms", senderAtomUri])
-  );
-  const targetAtom = useSelector(state =>
-    getIn(state, ["atoms", targetAtomUri])
-  );
+  const senderAtom = useSelector(generalSelectors.getAtom(senderAtomUri));
+  const targetAtom = useSelector(generalSelectors.getAtom(targetAtomUri));
 
   const processState = useSelector(generalSelectors.getProcessState);
   const accountState = useSelector(generalSelectors.getAccountState);
   const externalDataState = useSelector(generalSelectors.getExternalDataState);
 
-  const targetHolderName = useSelector(state => {
-    if (atomUtils.hasHoldableSocket(targetAtom)) {
-      const holder = generalSelectors.getAtom(
-        atomUtils.getHeldByUri(targetAtom)
-      )(state);
-      const title = atomUtils.getTitle(holder, externalDataState);
+  const targetHolderUri = atomUtils.getHeldByUri(targetAtom);
+  const targetHolderAtom = useSelector(
+    generalSelectors.getAtom(targetHolderUri)
+  );
 
-      return title || get(targetAtom, "fakePersonaName");
-    }
-  });
+  const targetHolderName = atomUtils.hasHoldableSocket(targetAtom)
+    ? atomUtils.getTitle(targetHolderAtom, externalDataState) ||
+      get(targetAtom, "fakePersonaName")
+    : undefined;
 
   const isTargetAtomOwned = accountUtils.isAtomOwned(
     accountState,
@@ -77,20 +71,25 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
   const friendlyTimestamp =
     connection &&
     relativeTime(globalLastUpdateTime, get(connection, "lastUpdateDate"));
+
+  const isTargetAtomFetchNecessary = processUtils.isAtomFetchNecessary(
+    processState,
+    targetAtomUri,
+    targetAtom
+  );
+  const isTargetHolderFetchNecessary = processUtils.isAtomFetchNecessary(
+    processState,
+    targetHolderUri,
+    targetHolderAtom
+  );
+
   const connectionOrAtomsLoading =
     !connection ||
-    !targetAtom ||
+    isTargetAtomFetchNecessary ||
+    isTargetHolderFetchNecessary ||
     !senderAtom ||
-    processUtils.isAtomToLoad(processState, targetAtomUri) ||
     processUtils.isAtomLoading(processState, get(senderAtom, "uri")) ||
-    processUtils.isAtomLoading(processState, get(targetAtom, "uri")) ||
     processUtils.isConnectionLoading(processState, get(connection, "uri"));
-
-  function onChange(isVisible) {
-    if (isVisible) {
-      ensureAtomIsLoaded();
-    }
-  }
 
   function selectMembersTab() {
     history.push(
@@ -106,24 +105,32 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
     );
   }
 
-  function ensureAtomIsLoaded() {
-    if (
-      targetAtomUri &&
-      (!targetAtom ||
-        (processUtils.isAtomToLoad(processState, get(targetAtom, "uri")) &&
-          !processUtils.isAtomLoading(processState, get(targetAtom, "uri"))))
-    ) {
+  function ensureTargetAtomIsFetched() {
+    if (isTargetAtomFetchNecessary) {
+      console.debug("fetch targetAtomUri, ", targetAtomUri);
       dispatch(actionCreators.atoms__fetchUnloadedAtom(targetAtomUri));
     }
   }
 
+  function ensureTargetHolderIsFetched() {
+    if (isTargetHolderFetchNecessary) {
+      console.debug("fetch targetHolderUri, ", targetHolderUri);
+      dispatch(actionCreators.atoms__fetchUnloadedAtom(targetHolderUri));
+    }
+  }
+
   if (connectionOrAtomsLoading) {
+    const onChange = isVisible => {
+      if (isVisible) {
+        ensureTargetAtomIsFetched();
+        ensureTargetHolderIsFetched();
+      }
+    };
+
     return (
       <won-connection-header class="won-is-loading">
         <VisibilitySensor
-          onChange={isVisible => {
-            onChange(isVisible);
-          }}
+          onChange={onChange}
           intervalDelay={200}
           partialVisibility={true}
           offset={{ top: -300, bottom: -300 }}
@@ -236,7 +243,7 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
             (atomUtils.hasChatSocket(targetAtom) ? " enabled" : "")}
         </span>
       ) : targetHolderName ? (
-        <span className="ch__right__subtitle__type__persona">
+        <span className="ch__right__subtitle__type__holder">
           {targetHolderName}
         </span>
       ) : (
