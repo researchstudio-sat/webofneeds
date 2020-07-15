@@ -24,11 +24,11 @@ won-atom-messages {
       display: grid;
 
       &:hover {
-        filter: brightness(85%);
+        filter: brightness(125%);
       }
 
       &__button__icon {
-        --local-primary: #{$won-primary-color};
+        --local-primary: #{$won-secondary-color};
         @include fixed-square($backIconSize);
       }
     }
