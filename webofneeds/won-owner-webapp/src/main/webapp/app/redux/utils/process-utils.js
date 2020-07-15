@@ -335,6 +335,21 @@ export function isAnyConnectionLoadingMessages(process) {
   );
 }
 
+export function isExternalDataFetchNecessary(
+  process,
+  externalDataUri,
+  externalDataEntry
+) {
+  if (externalDataUri) {
+    if (!externalDataEntry) {
+      return true;
+    } else {
+      return isExternalDataLoading(process, externalDataUri);
+    }
+  }
+  return false;
+}
+
 export function isAtomFetchNecessary(process, atomUri, atom) {
   if (atomUri) {
     if (!atom) {

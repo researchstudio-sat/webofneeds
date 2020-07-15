@@ -37,9 +37,11 @@ export default function WikiDataViewer({ content, detail, className }) {
     () => {
       entityUris.map(entityUri => {
         if (
-          entityUri &&
-          !processUtils.isExternalDataLoading(processState, entityUri) &&
-          !get(externalDataState, entityUri)
+          processUtils.isExternalDataFetchNecessary(
+            processState,
+            entityUri,
+            get(externalDataState, entityUri)
+          )
         ) {
           dispatch(actionCreators.externalData__fetchWikiData(entityUri));
         }
