@@ -14,7 +14,7 @@ won-socket-add-button {
   min-width: 0;
 
   .socketadd__label {
-    color: $won-line-gray;
+    color: $won-secondary-color;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
@@ -22,17 +22,18 @@ won-socket-add-button {
 
   .socketadd__icon {
     @include fixed-square($postIconSize);
-    --local-primary: #{$won-line-gray};
+    --local-primary: #{$won-secondary-color};
   }
 
   &:hover {
+    background: $won-secondary-color;
     cursor: pointer;
     .socketadd__label {
-      color: $won-primary-color;
+      color: $won-light-gray;
     }
 
     .socketadd__icon {
-      --local-primary: #{$won-primary-color};
+      --local-primary: #{$won-light-gray};
     }
   }
 

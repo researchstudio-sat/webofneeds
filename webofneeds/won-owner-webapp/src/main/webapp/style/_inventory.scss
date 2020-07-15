@@ -156,26 +156,27 @@ main.ownerinventory {
       box-sizing: border-box;
 
       &:hover {
-        border-color: $won-primary-color;
+        border-color: $won-secondary-color;
+        background: $won-secondary-color;
 
         .createcard__label {
-          color: $won-primary-color;
+          color: $won-light-gray;
         }
 
         .createcard__icon {
-          --local-primary: #{$won-primary-color};
+          --local-primary: #{$won-light-gray};
         }
       }
 
       > .createcard__label {
         font-size: $mediumFontSize;
         text-align: center;
-        color: $won-line-gray;
+        color: $won-secondary-color;
       }
 
       > .createcard__icon {
         @include fixed-square($hugeiconSize);
-        --local-primary: #{$won-line-gray};
+        --local-primary: #{$won-secondary-color};
       }
     }
   }
