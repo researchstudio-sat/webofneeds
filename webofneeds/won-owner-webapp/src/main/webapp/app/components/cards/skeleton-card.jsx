@@ -47,9 +47,7 @@ export default function WonSkeletonCard({
 
   const cardIconSkeleton = isAtomFetchNecessary ? (
     <VisibilitySensor
-      onChange={isVisible => {
-        onChange(isVisible);
-      }}
+      onChange={onChange}
       intervalDelay={200}
       partialVisibility={true}
       delayedCall={true}

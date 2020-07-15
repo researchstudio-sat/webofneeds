@@ -19,6 +19,7 @@ import "~/style/_pokemon-raid-card.scss";
 
 export default function PokemonRaidCard({
   atom,
+  processState,
   showIndicators,
   showHolder,
   currentLocation,
@@ -51,9 +52,14 @@ export default function PokemonRaidCard({
         showIcon={swipeableContent && swipeableContent.length > 0}
       />
       {showHolder &&
-        holder &&
+        holderUri &&
         atomHasHoldableSocket && (
-          <WonHolderSnippet holder={holder} heldAtom={atom} />
+          <WonHolderSnippet
+            holderUri={holderUri}
+            holder={holder}
+            heldAtom={atom}
+            processState={processState}
+          />
         )}
       {cardConnectionIndicators}
     </pokemon-raid-card>
@@ -62,6 +68,7 @@ export default function PokemonRaidCard({
 
 PokemonRaidCard.propTypes = {
   atom: PropTypes.object.isRequired,
+  processState: PropTypes.object.isRequired,
   showHolder: PropTypes.bool,
   showIndicators: PropTypes.bool,
   currentLocation: PropTypes.object,

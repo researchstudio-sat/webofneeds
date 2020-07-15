@@ -18,7 +18,7 @@ export default function WonHeldItem({
   currentLocation,
 }) {
   const dispatch = useDispatch();
-
+  //TODO: ADD ACTIONS
   function markAsRead(conn) {
     if (connectionUtils.isUnread(conn)) {
       setTimeout(() => {
@@ -30,6 +30,9 @@ export default function WonHeldItem({
       }, 1500);
     }
   }
+
+  const visibleAtom = flip ? atom : targetAtom;
+  const visibleAtomUri = get(visibleAtom, "uri");
 
   return (
     <VisibilitySensor
@@ -47,7 +50,8 @@ export default function WonHeldItem({
         }
       >
         <WonAtomCard
-          atom={flip ? atom : targetAtom}
+          atomUri={visibleAtomUri}
+          atom={visibleAtom}
           showIndicators={isOwned}
           showHolder={false}
           currentLocation={currentLocation}

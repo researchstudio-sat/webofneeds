@@ -1,16 +1,44 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import { generateLink, get } from "~/app/utils";
 import { Link } from "react-router-dom";
 import * as generalSelectors from "~/app/redux/selectors/general-selectors";
 import * as atomUtils from "~/app/redux/utils/atom-utils";
+import * as processUtils from "~/app/redux/utils/process-utils";
 
 import "~/style/_holder-snippet.scss";
+import { actionCreators } from "~/app/actions/actions";
+import VisibilitySensor from "react-visibility-sensor";
 
-export default function WonHolderSnippet({ holder, heldAtom }) {
+export default function WonHolderSnippet({
+  holderUri,
+  holder,
+  heldAtom,
+  processState,
+}) {
+  const dispatch = useDispatch();
   const externalDataState = useSelector(generalSelectors.getExternalDataState);
   const holderName = atomUtils.getTitle(holder, externalDataState);
+
+  const isHolderFetchNecessary = processUtils.isAtomFetchNecessary(
+    processState,
+    holderUri,
+    holder
+  );
+
+  function ensureHolderIsFetched() {
+    if (isHolderFetchNecessary) {
+      console.debug("fetch holderUri, ", holderUri);
+      dispatch(actionCreators.atoms__fetchUnloadedAtom(holderUri));
+    }
+  }
+
+  function onChange(isVisible) {
+    if (isVisible) {
+      ensureHolderIsFetched();
+    }
+  }
 
   function createHolderInfoIcon() {
     const isHolderPersona = atomUtils.isPersona(holder);
@@ -66,7 +94,7 @@ export default function WonHolderSnippet({ holder, heldAtom }) {
     }
   }
 
-  return (
+  const holderSnippetContent = (
     <Link
       className="card__holder clickable"
       to={location =>
@@ -106,8 +134,24 @@ export default function WonHolderSnippet({ holder, heldAtom }) {
       )}
     </Link>
   );
+
+  return isHolderFetchNecessary ? (
+    <VisibilitySensor
+      onChange={onChange}
+      intervalDelay={200}
+      partialVisibility={true}
+      delayedCall={true}
+      offset={{ top: -300, bottom: -300 }}
+    >
+      {holderSnippetContent}
+    </VisibilitySensor>
+  ) : (
+    holderSnippetContent
+  );
 }
 WonHolderSnippet.propTypes = {
-  holder: PropTypes.object.isRequired,
+  holderUri: PropTypes.string.isRequired,
+  holder: PropTypes.object,
+  processState: PropTypes.object.isRequired,
   heldAtom: PropTypes.object.isRequired,
 };
