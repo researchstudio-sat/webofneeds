@@ -26,7 +26,7 @@ const MESSAGE_READ_TIMEOUT = 1500;
 export default function WonConnectionMessage({
   message,
   senderAtom,
-  targetAtom,
+  // targetAtom,
   originatorAtom,
   allAtoms,
   ownedConnections,
@@ -287,32 +287,32 @@ export default function WonConnectionMessage({
     }
     const messageIcon = [];
 
-    if (!isSent && !(groupChatMessage && originatorUri)) {
-      // messageIcon.push(
-      //   <WonAtomIcon
-      //     key="targetAtomUri"
-      //     atom={targetAtom}
-      //     flipIcons={true}
-      //     onClick={
-      //       !onClick
-      //         ? () => {
-      //             history.push(
-      //               generateLink(
-      //                 history.location,
-      //                 {
-      //                   postUri: get(targetAtom, "uri"),
-      //                   tab: undefined,
-      //                   connectionUri: undefined,
-      //                 },
-      //                 "/post"
-      //               )
-      //             );
-      //           }
-      //         : undefined
-      //     }
-      //   />
-      // );
-    }
+    // if (!isSent && !(groupChatMessage && originatorUri)) {
+    //   messageIcon.push(
+    //     <WonAtomIcon
+    //       key="targetAtomUri"
+    //       atom={targetAtom}
+    //       flipIcons={true}
+    //       onClick={
+    //         !onClick
+    //           ? () => {
+    //               history.push(
+    //                 generateLink(
+    //                   history.location,
+    //                   {
+    //                     postUri: get(targetAtom, "uri"),
+    //                     tab: undefined,
+    //                     connectionUri: undefined,
+    //                   },
+    //                   "/post"
+    //                 )
+    //               );
+    //             }
+    //           : undefined
+    //       }
+    //     />
+    //   );
+    // }
 
     if (isReceived && groupChatMessage && originatorUri) {
       messageIcon.push(
@@ -449,7 +449,7 @@ WonConnectionMessage.propTypes = {
   message: PropTypes.object.isRequired,
   connection: PropTypes.object.isRequired,
   senderAtom: PropTypes.object.isRequired,
-  targetAtom: PropTypes.object.isRequired,
+  // targetAtom: PropTypes.object.isRequired,
   allAtoms: PropTypes.object,
   ownedConnections: PropTypes.object,
   originatorAtom: PropTypes.object,
