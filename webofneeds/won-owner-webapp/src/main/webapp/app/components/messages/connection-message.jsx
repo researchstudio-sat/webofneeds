@@ -117,9 +117,9 @@ export default function WonConnectionMessage({
   const isFromSystem = get(message, "systemMessage");
   const hasReferences = get(message, "hasReferences");
 
-  const originatorPersonaUri =
+  const originatorHolderUri =
     groupChatMessage && atomUtils.getHeldByUri(originatorAtom);
-  const originatorPersona = get(allAtoms, originatorPersonaUri);
+  const originatorHolder = get(allAtoms, originatorHolderUri);
 
   const isOriginatorAtomFetchNecessary =
     isReceived &&
@@ -135,8 +135,8 @@ export default function WonConnectionMessage({
     groupChatMessage &&
     processUtils.isAtomFetchNecessary(
       processState,
-      originatorPersonaUri,
-      originatorPersona
+      originatorHolderUri,
+      originatorHolder
     );
 
   function ensureOriginatorIsFetched() {
@@ -147,8 +147,8 @@ export default function WonConnectionMessage({
   }
   function ensureOriginatorHolderIsFetched() {
     if (isOriginatorHolderFetchNecessary) {
-      console.debug("fetch originatorPersonaUri, ", originatorPersonaUri);
-      dispatch(actionCreators.atoms__fetchUnloadedAtom(originatorPersonaUri));
+      console.debug("fetch originatorHolderUri, ", originatorHolderUri);
+      dispatch(actionCreators.atoms__fetchUnloadedAtom(originatorHolderUri));
     }
   }
 
