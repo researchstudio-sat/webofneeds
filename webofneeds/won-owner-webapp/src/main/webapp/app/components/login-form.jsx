@@ -99,7 +99,7 @@ export default function WonLoginForm({ className }) {
           onChange={event => setPassword(event.target.value)}
         />
         <button
-          className="won-button--filled lighterblue"
+          className="won-button--filled secondary"
           disabled={password === "" || email === ""}
         >
           Sign In
@@ -115,7 +115,7 @@ export default function WonLoginForm({ className }) {
       <WonLabelledHr label="Or" />
       <div className="wl__register">
         <Link
-          className="won-button--filled red"
+          className="won-button--filled secondary"
           onClick={() => dispatch(actionCreators.view__hideMainMenu())}
           to="/signup"
         >

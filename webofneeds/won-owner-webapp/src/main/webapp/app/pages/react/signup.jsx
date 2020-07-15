@@ -260,7 +260,7 @@ export default function PageSignUp() {
           </div>
           {isAnonymous && (
             <button
-              className="won-button--filled red"
+              className="won-button--filled secondary"
               disabled={!isValid()}
               onClick={transfer}
             >
@@ -269,7 +269,7 @@ export default function PageSignUp() {
           )}
           {isAnonymous && <WonLabelledHr label="or" className="labelledHr" />}
           <button
-            className="won-button--filled red"
+            className="won-button--filled secondary"
             disabled={!isValid()}
             onClick={register}
           >

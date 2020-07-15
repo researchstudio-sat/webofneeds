@@ -15,6 +15,7 @@
     color: white;
     background: lightgrey;
     cursor: default;
+    filter: brightness(100%);
   }
 
   .won-button-icon {
@@ -106,6 +107,9 @@
   &.red {
     @include outline-button-color($won-primary-color);
   }
+  &.secondary {
+    @include outline-button-color($won-secondary-color);
+  }
   &.darkgray {
     @include outline-button-color($won-dark-gray);
   }
@@ -139,6 +143,9 @@
   /*Button color definitions*/
   &.red {
     @include flat-button-color(white, $won-primary-color);
+  }
+  &.secondary {
+    @include flat-button-color(white, $won-secondary-color);
   }
   &.darkgray {
     @include flat-button-color(white, $won-dark-gray);

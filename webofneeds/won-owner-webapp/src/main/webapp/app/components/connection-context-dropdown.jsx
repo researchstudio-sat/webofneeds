@@ -149,7 +149,7 @@ export default function WonConnectionContextDropdown({
       buttons.push(
         <button
           key="details"
-          className="won-button--outlined thin red"
+          className="won-button--outlined thin secondary"
           onClick={() =>
             history.push(
               generateLink(
@@ -174,7 +174,7 @@ export default function WonConnectionContextDropdown({
       buttons.push(
         <button
           key="agrdata"
-          className="won-button--outlined thin red"
+          className="won-button--outlined thin secondary"
           onClick={() => showAgreementDataField()}
         >
           Show Agreement Data
@@ -187,7 +187,7 @@ export default function WonConnectionContextDropdown({
       buttons.push(
         <button
           key="petrinetdata"
-          className="won-button--outlined thin red"
+          className="won-button--outlined thin secondary"
           onClick={() => showPetriNetDataField()}
         >
           Show PetriNet Data
@@ -197,7 +197,7 @@ export default function WonConnectionContextDropdown({
       buttons.push(
         <Link
           key="duplicate"
-          className="won-button--outlined thin red"
+          className="won-button--outlined thin secondary"
           to={location =>
             generateLink(
               location,
@@ -218,7 +218,7 @@ export default function WonConnectionContextDropdown({
       buttons.push(
         <Link
           key="edit"
-          className="won-button--outlined thin red"
+          className="won-button--outlined thin secondary"
           to={location =>
             generateLink(
               location,
@@ -239,7 +239,7 @@ export default function WonConnectionContextDropdown({
       buttons.push(
         <a
           key="report"
-          className="won-button--outlined thin red"
+          className="won-button--outlined thin secondary"
           href={"mailto:" + adminEmail + "?" + generateReportPostMailParams()}
         >
           Report
@@ -248,7 +248,7 @@ export default function WonConnectionContextDropdown({
     buttons.push(
       <button
         key="close"
-        className="won-button--filled red"
+        className="won-button--filled secondary"
         onClick={() => closeConnection()}
         disabled={isClosed}
       >

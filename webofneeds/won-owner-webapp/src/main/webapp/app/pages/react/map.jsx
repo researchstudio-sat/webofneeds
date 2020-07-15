@@ -358,7 +358,7 @@ export default function PageMap() {
 
               {showLocationInput ? (
                 <div
-                  className="ownermap__header__updated__cancel won-button--filled red"
+                  className="ownermap__header__updated__cancel won-button--filled secondary"
                   onClick={() => setShowLocationInput(false)}
                   disabled={isOwnerAtomUrisLoading}
                 >
@@ -366,7 +366,7 @@ export default function PageMap() {
                 </div>
               ) : (
                 <div
-                  className="ownermap__header__updated__reload won-button--filled red"
+                  className="ownermap__header__updated__reload won-button--filled secondary"
                   onClick={reload}
                   disabled={isOwnerAtomUrisLoading}
                 >
@@ -459,7 +459,7 @@ export default function PageMap() {
                 }
               </div>
               <div
-                className="ownermap__nolocation__button won-button--filled red"
+                className="ownermap__nolocation__button won-button--filled secondary"
                 onClick={fetchCurrentLocationAndReload}
               >
                 {"See What's Around"}

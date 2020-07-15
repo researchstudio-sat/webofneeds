@@ -60,7 +60,7 @@ export default function WonAtomActions({
           </div>
           <div className="atom-actions__buttons">
             <button
-              className="won-publish-button red won-button--filled"
+              className="won-publish-button secondary won-button--filled"
               onClick={() => dispatch(actionCreators.atoms__reopen(atomUri))}
             >
               Reopen

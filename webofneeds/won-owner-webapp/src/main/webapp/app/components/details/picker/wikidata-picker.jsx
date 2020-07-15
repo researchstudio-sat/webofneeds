@@ -99,7 +99,7 @@ export default function WikiDataPicker({
                   Selected
                 </span>
                 <button
-                  className="wikidatap__input__selected__header__clearButton won-button--filled red"
+                  className="wikidatap__input__selected__header__clearButton won-button--filled secondary"
                   onClick={() => removeWikiDataUri(wikiDataUri)}
                 >
                   Remove

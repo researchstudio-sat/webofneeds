@@ -157,7 +157,7 @@ export default function WonChatSocketActions({ connection, goBackOnAction }) {
         <won-socket-actions>
           {closeButtonElement("Reject", "Reject Request?")}
           <button
-            className="won-button--filled red"
+            className="won-button--filled secondary"
             onClick={() => openRequest()}
           >
             <svg className="won-button-icon">
@@ -172,7 +172,7 @@ export default function WonChatSocketActions({ connection, goBackOnAction }) {
       return (
         <won-socket-actions>
           {closeButtonElement("Cancel", "Cancel Request?")}
-          <button className="won-button--filled red" disabled={true}>
+          <button className="won-button--filled secondary" disabled={true}>
             <svg className="won-button-icon">
               <use xlinkHref={ico36_outgoing} href={ico36_outgoing} />
             </svg>
@@ -192,7 +192,7 @@ export default function WonChatSocketActions({ connection, goBackOnAction }) {
       return (
         <won-socket-actions>
           <button
-            className="won-button--filled red"
+            className="won-button--filled secondary"
             onClick={() => sendRequest()}
           >
             <svg className="won-button-icon">
@@ -208,7 +208,7 @@ export default function WonChatSocketActions({ connection, goBackOnAction }) {
         <won-socket-actions>
           {closeButtonElement("Remove", "Remove Suggestion?")}
           <button
-            className="won-button--filled red"
+            className="won-button--filled secondary"
             onClick={() => sendRequest()}
           >
             <svg className="won-button-icon">

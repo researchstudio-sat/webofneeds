@@ -32,7 +32,7 @@ export default function WonLoggedInMenu({ className }) {
       <hr className="show-in-responsive" />
       {isAnonymous && (
         <Link
-          className="won-button--outlined thin red wlim__button--signup"
+          className="won-button--outlined thin secondary wlim__button--signup"
           onClick={closeMenu}
           to="/signup"
         >
@@ -40,7 +40,7 @@ export default function WonLoggedInMenu({ className }) {
         </Link>
       )}
       <Link
-        className="won-button--outlined thin red"
+        className="won-button--outlined thin secondary"
         onClick={closeMenu}
         to="/settings"
       >
@@ -48,7 +48,7 @@ export default function WonLoggedInMenu({ className }) {
       </Link>
       <hr />
       <button
-        className="won-button--filled lighterblue"
+        className="won-button--filled secondary"
         style={{ width: "100%" }}
         onClick={logout}
       >

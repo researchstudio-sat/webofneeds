@@ -161,7 +161,7 @@ export default function PageCreate() {
                 </span>
                 <div className="cp__content__failed__actions">
                   <button
-                    className="cp__content__failed__actions__button red won-button--outlined thin"
+                    className="cp__content__failed__actions__button secondary won-button--outlined thin"
                     onClick={() =>
                       dispatch(
                         actionCreators.atoms__fetchUnloadedAtom(fromAtomUri)
