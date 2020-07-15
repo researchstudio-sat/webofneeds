@@ -26,10 +26,10 @@ export default function WonAtomHeader({
   const dispatch = useDispatch();
   const atomUri = get(atom, "uri");
 
-  const personaUri = atomUtils.getHeldByUri(atom);
+  const holderUri = atomUtils.getHeldByUri(atom);
   const externalDataState = useSelector(generalSelectors.getExternalDataState);
-  const persona = useSelector(generalSelectors.getAtom(personaUri));
-  const personaName = atomUtils.getTitle(persona, externalDataState);
+  const holderAtom = useSelector(generalSelectors.getAtom(holderUri));
+  const holderName = atomUtils.getTitle(holderAtom, externalDataState);
 
   const processState = useSelector(generalSelectors.getProcessState);
 
@@ -51,25 +51,45 @@ export default function WonAtomHeader({
 
   const title = atomUtils.getTitle(atom, externalDataState);
 
-  function ensureAtomIsLoaded() {
-    if (atomUri && (!atom || (atomToLoad && !atomLoading))) {
+  function ensureAtomIsFetched() {
+    if (isAtomFetchNecessary) {
+      console.debug("fetch atomUri, ", atomUri);
       dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
+    }
+  }
+
+  function ensureHolderIsFetched() {
+    if (isHolderFetchNecessary) {
+      console.debug("fetch holderUri, ", holderUri);
+      dispatch(actionCreators.atoms__fetchUnloadedAtom(holderUri));
     }
   }
 
   function onChange(isVisible) {
     if (isVisible) {
-      ensureAtomIsLoaded();
+      ensureAtomIsFetched();
+      ensureHolderIsFetched();
     }
   }
 
   let atomHeaderContent;
   let atomHeaderIcon;
 
-  if (atomLoading || atomToLoad) {
+  const isAtomFetchNecessary = processUtils.isAtomFetchNecessary(
+    processState,
+    atomUri,
+    atom
+  );
+  const isHolderFetchNecessary = processUtils.isAtomFetchNecessary(
+    processState,
+    holderUri,
+    holderAtom
+  );
+
+  if (isAtomFetchNecessary || isHolderFetchNecessary) {
     //Loading View
 
-    atomHeaderIcon = <div className="ph__icon__skeleton" />;
+    atomHeaderIcon = <div className="ah__icon__skeleton" />;
     atomHeaderContent = (
       <VisibilitySensor
         onChange={onChange}
@@ -77,12 +97,12 @@ export default function WonAtomHeader({
         partialVisibility={true}
         offset={{ top: -300, bottom: -300 }}
       >
-        <div className="ph__right">
-          <div className="ph__right__topline">
-            <div className="ph__right__topline__title" />
+        <div className="ah__right">
+          <div className="ah__right__topline">
+            <div className="ah__right__topline__title" />
           </div>
-          <div className="ph__right__subtitle">
-            <span className="ph__right__subtitle__type" />
+          <div className="ah__right__subtitle">
+            <span className="ah__right__subtitle__type" />
           </div>
         </div>
       </VisibilitySensor>
@@ -91,27 +111,27 @@ export default function WonAtomHeader({
     //In Creation View
     atomHeaderIcon = <WonAtomIcon atom={atom} />;
     atomHeaderContent = (
-      <div className="ph__right">
-        <div className="ph__right__topline">
-          <div className="ph__right__topline__notitle">Creating...</div>
+      <div className="ah__right">
+        <div className="ah__right__topline">
+          <div className="ah__right__topline__notitle">Creating...</div>
         </div>
-        <div className="ph__right__subtitle">
-          <span className="ph__right__subtitle__type">
-            {personaName ? (
-              <span className="ph__right__subtitle__type__persona">
-                {personaName}
+        <div className="ah__right__subtitle">
+          <span className="ah__right__subtitle__type">
+            {holderName ? (
+              <span className="ah__right__subtitle__type__holder">
+                {holderName}
               </span>
             ) : (
               undefined
             )}
             {isGroupChatEnabled ? (
-              <span className="ph__right__subtitle__type__groupchat">
+              <span className="ah__right__subtitle__type__groupchat">
                 {isChatEnabled ? "Group Chat enabled" : "Group Chat"}
               </span>
             ) : (
               undefined
             )}
-            <span className="ph__right__subtitle__type">{atomTypeLabel}</span>
+            <span className="ah__right__subtitle__type">{atomTypeLabel}</span>
           </span>
         </div>
       </div>
@@ -120,12 +140,12 @@ export default function WonAtomHeader({
     //FailedToLoad View
     atomHeaderIcon = <WonAtomIcon atom={atom} />;
     atomHeaderContent = (
-      <div className="ph__right">
-        <div className="ph__right__topline">
-          <div className="ph__right__topline__notitle">Atom Loading failed</div>
+      <div className="ah__right">
+        <div className="ah__right__topline">
+          <div className="ah__right__topline__notitle">Atom Loading failed</div>
         </div>
-        <div className="ph__right__subtitle">
-          <span className="ph__right__subtitle__type">
+        <div className="ah__right__subtitle">
+          <span className="ah__right__subtitle__type">
             Atom might have been deleted.
           </span>
         </div>
@@ -135,23 +155,23 @@ export default function WonAtomHeader({
     //Normal View
     atomHeaderIcon = <WonAtomIcon atom={atom} />;
     atomHeaderContent = (
-      <div className="ph__right">
-        <div className="ph__right__topline">
-          <div className="ph__right__topline__title">
+      <div className="ah__right">
+        <div className="ah__right__topline">
+          <div className="ah__right__topline__title">
             {title ? title : "No Title"}
           </div>
         </div>
-        <div className="ph__right__subtitle">
-          <span className="ph__right__subtitle__type">
-            {personaName ? (
-              <span className="ph__right__subtitle__type__persona">
-                {personaName}
+        <div className="ah__right__subtitle">
+          <span className="ah__right__subtitle__type">
+            {holderName ? (
+              <span className="ah__right__subtitle__type__holder">
+                {holderName}
               </span>
             ) : (
               undefined
             )}
             {isGroupChatEnabled ? (
-              <span className="ph__right__subtitle__type__groupchat">
+              <span className="ah__right__subtitle__type__groupchat">
                 {isChatEnabled ? "Group Chat enabled" : "Group Chat"}
               </span>
             ) : (
@@ -160,7 +180,7 @@ export default function WonAtomHeader({
             <span>{atomTypeLabel}</span>
           </span>
           {!hideTimestamp && (
-            <div className="ph__right__subtitle__date">{friendlyTimestamp}</div>
+            <div className="ah__right__subtitle__date">{friendlyTimestamp}</div>
           )}
         </div>
       </div>
@@ -184,7 +204,9 @@ export default function WonAtomHeader({
     <won-atom-header
       class={
         (atomLoading ? " won-is-loading " : "") +
-        (atomToLoad ? " won-to-load " : "") +
+        (isAtomFetchNecessary || isHolderFetchNecessary
+          ? " won-to-load "
+          : "") +
         (onClick ? " clickable " : "") +
         (className ? " " + className + " " : "")
       }

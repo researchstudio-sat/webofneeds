@@ -202,7 +202,7 @@ export default function WonAtomHeaderBig({
         : undefined;
 
     const holderNameElement = holderName && (
-      <span className="ahb__info__persona">{holderName}</span>
+      <span className="ahb__info__holder">{holderName}</span>
     );
 
     const isGroupChatEnabled = atomUtils.hasGroupSocket(atom);
