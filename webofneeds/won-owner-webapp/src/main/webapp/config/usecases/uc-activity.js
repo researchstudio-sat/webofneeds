@@ -38,6 +38,7 @@ export const activity = {
     [vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted]: {
       [vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted]: {
         useCaseIdentifiers: ["activity"],
+        refuseOwned: true,
       },
     },
   },
