@@ -371,7 +371,7 @@ export default function WonAtomMessages({
 
   function ensureMessagesAreLoaded() {
     // make sure latest messages are loaded
-    const INITIAL_MESSAGECOUNT = 25;
+    const INITIAL_MESSAGECOUNT = 15;
     if (
       hasConnectionMessagesToLoad &&
       !connectionUtils.isUsingTemporaryUri(connection) &&
@@ -532,7 +532,7 @@ export default function WonAtomMessages({
         });
     }
   }
-  function loadPreviousMessages(messagesToLoadCount = 15) {
+  function loadPreviousMessages(messagesToLoadCount = 10) {
     if (connection && !isConnectionLoading && !isProcessingLoadingMessages) {
       dispatch(
         actionCreators.connections__showMoreMessages(
