@@ -340,11 +340,11 @@ export function isAtomFetchNecessary(process, atomUri, atom) {
     if (!atom) {
       return true;
     } else {
-      const atomToLoad = isAtomToLoad(process, atomUri);
-      const atomFailedToLoad = hasAtomFailedToLoad(process, atomUri);
-      const atomLoading = isAtomLoading(process, atomUri);
-
-      return atomToLoad && !atomLoading && !atomFailedToLoad;
+      return (
+        isAtomToLoad(process, atomUri) &&
+        !isAtomLoading(process, atomUri) &&
+        !hasAtomFailedToLoad(process, atomUri)
+      );
     }
   }
   return false;
