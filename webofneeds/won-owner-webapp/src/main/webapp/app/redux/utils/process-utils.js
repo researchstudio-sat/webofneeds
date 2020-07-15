@@ -334,3 +334,18 @@ export function isAnyConnectionLoadingMessages(process) {
     isConnectionLoadingMessages(process, connUri)
   );
 }
+
+export function isAtomFetchNecessary(process, atomUri, atom) {
+  if (atomUri) {
+    if (!atom) {
+      return true;
+    } else {
+      const atomToLoad = isAtomToLoad(process, atomUri);
+      const atomFailedToLoad = hasAtomFailedToLoad(process, atomUri);
+      const atomLoading = isAtomLoading(process, atomUri);
+
+      return atomToLoad && !atomLoading && !atomFailedToLoad;
+    }
+  }
+  return false;
+}

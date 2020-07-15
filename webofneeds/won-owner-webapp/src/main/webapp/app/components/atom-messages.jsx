@@ -660,6 +660,7 @@ export default function WonAtomMessages({
               connection={connection}
               senderAtom={senderAtom}
               targetAtom={targetAtom}
+              processState={processState}
               allAtoms={allAtoms}
               ownedConnections={ownedConnections}
               shouldShowRdf={shouldShowRdf}
@@ -726,6 +727,7 @@ export default function WonAtomMessages({
             connection={connection}
             senderAtom={senderAtom}
             targetAtom={targetAtom}
+            processState={processState}
             allAtoms={allAtoms}
             ownedConnections={ownedConnections}
             shouldShowRdf={shouldShowRdf}
@@ -746,6 +748,7 @@ export default function WonAtomMessages({
             connection={connection}
             senderAtom={senderAtom}
             targetAtom={targetAtom}
+            processState={processState}
             allAtoms={allAtoms}
             ownedConnections={ownedConnections}
             shouldShowRdf={shouldShowRdf}
@@ -766,6 +769,7 @@ export default function WonAtomMessages({
             connection={connection}
             senderAtom={senderAtom}
             targetAtom={targetAtom}
+            processState={processState}
             allAtoms={allAtoms}
             ownedConnections={ownedConnections}
             shouldShowRdf={shouldShowRdf}

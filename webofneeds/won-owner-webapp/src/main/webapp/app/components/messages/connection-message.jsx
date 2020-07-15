@@ -1,8 +1,10 @@
 import React from "react";
 import urljoin from "url-join";
 import PropTypes from "prop-types";
+import * as atomUtils from "../../redux/utils/atom-utils.js";
 import * as messageUtils from "../../redux/utils/message-utils.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
+import * as processUtils from "../../redux/utils/process-utils.js";
 import { get, getIn, generateLink } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { useDispatch } from "react-redux";
@@ -28,6 +30,7 @@ export default function WonConnectionMessage({
   senderAtom,
   // targetAtom,
   originatorAtom,
+  processState,
   allAtoms,
   ownedConnections,
   connection,
@@ -113,6 +116,41 @@ export default function WonConnectionMessage({
   const isInjectIntoMessage = injectInto && injectInto.size > 0;
   const isFromSystem = get(message, "systemMessage");
   const hasReferences = get(message, "hasReferences");
+
+  const originatorPersonaUri =
+    groupChatMessage && atomUtils.getHeldByUri(originatorAtom);
+  const originatorPersona = get(allAtoms, originatorPersonaUri);
+
+  const isOriginatorAtomFetchNecessary =
+    isReceived &&
+    groupChatMessage &&
+    processUtils.isAtomFetchNecessary(
+      processState,
+      originatorUri,
+      originatorAtom
+    );
+
+  const isOriginatorHolderFetchNecessary =
+    isReceived &&
+    groupChatMessage &&
+    processUtils.isAtomFetchNecessary(
+      processState,
+      originatorPersonaUri,
+      originatorPersona
+    );
+
+  function ensureOriginatorIsFetched() {
+    if (isOriginatorAtomFetchNecessary) {
+      console.debug("fetch originatorUri, ", originatorUri);
+      dispatch(actionCreators.atoms__fetchUnloadedAtom(originatorUri));
+    }
+  }
+  function ensureOriginatorHolderIsFetched() {
+    if (isOriginatorHolderFetchNecessary) {
+      console.debug("fetch originatorPersonaUri, ", originatorPersonaUri);
+      dispatch(actionCreators.atoms__fetchUnloadedAtom(originatorPersonaUri));
+    }
+  }
 
   function generateParentCssClasses() {
     const cssClassNames = [];
@@ -272,19 +310,29 @@ export default function WonConnectionMessage({
 
   let messageContentElement;
 
+  function shouldWrapVisibilitySensor() {
+    return (
+      isUnread ||
+      isOriginatorAtomFetchNecessary ||
+      isOriginatorHolderFetchNecessary
+    );
+  }
+
   if (isChangeNotificationMessage) {
-    messageContentElement = (
-      <VisibilitySensor onChange={onChange} intervalDelay={2000}>
-        <WonLabelledHr
-          className="won-cm__modified"
-          label="Post has been modified"
-        />
+    const innerMessageContentElement = (
+      <WonLabelledHr
+        className="won-cm__modified"
+        label="Post has been modified"
+      />
+    );
+    messageContentElement = shouldWrapVisibilitySensor() ? (
+      <VisibilitySensor onChange={onChange} intervalDelay={200}>
+        {innerMessageContentElement}
       </VisibilitySensor>
+    ) : (
+      innerMessageContentElement
     );
   } else {
-    if (isUnread) {
-      <VisibilitySensor onChange={onChange} intervalDelay={2000} />;
-    }
     const messageIcon = [];
 
     // if (!isSent && !(groupChatMessage && originatorUri)) {
@@ -404,26 +452,34 @@ export default function WonConnectionMessage({
       );
     }
 
+    const innerMessageContentElement = (
+      <div className={generateCenterCssClasses()}>
+        <div className={generateCenterBubbleCssClasses()}>
+          {messageCenterContentElement}
+        </div>
+        <WonConnectionMessageStatus message={message} />
+        {rdfLinkURL ? (
+          <a target="_blank" rel="noopener noreferrer" href={rdfLinkURL}>
+            <svg className="rdflink__small clickable">
+              <use xlinkHref={rdf_logo_2} href={rdf_logo_2} />
+            </svg>
+          </a>
+        ) : (
+          undefined
+        )}
+      </div>
+    );
+
     messageContentElement = (
       <React.Fragment>
         {messageIcon}
-        <VisibilitySensor onChange={onChange} intervalDelay={2000}>
-          <div className={generateCenterCssClasses()}>
-            <div className={generateCenterBubbleCssClasses()}>
-              {messageCenterContentElement}
-            </div>
-            <WonConnectionMessageStatus message={message} />
-            {rdfLinkURL ? (
-              <a target="_blank" rel="noopener noreferrer" href={rdfLinkURL}>
-                <svg className="rdflink__small clickable">
-                  <use xlinkHref={rdf_logo_2} href={rdf_logo_2} />
-                </svg>
-              </a>
-            ) : (
-              undefined
-            )}
-          </div>
-        </VisibilitySensor>
+        {shouldWrapVisibilitySensor() ? (
+          <VisibilitySensor onChange={onChange} intervalDelay={200}>
+            {innerMessageContentElement}
+          </VisibilitySensor>
+        ) : (
+          innerMessageContentElement
+        )}
       </React.Fragment>
     );
   }
@@ -433,6 +489,8 @@ export default function WonConnectionMessage({
       if (isUnread) {
         markAsRead();
       }
+      ensureOriginatorIsFetched();
+      ensureOriginatorHolderIsFetched();
     }
   }
 
@@ -450,6 +508,7 @@ WonConnectionMessage.propTypes = {
   connection: PropTypes.object.isRequired,
   senderAtom: PropTypes.object.isRequired,
   // targetAtom: PropTypes.object.isRequired,
+  processState: PropTypes.object.isRequired,
   allAtoms: PropTypes.object,
   ownedConnections: PropTypes.object,
   originatorAtom: PropTypes.object,
