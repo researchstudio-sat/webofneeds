@@ -25,14 +25,9 @@ export default function WonAtomCard({
   const processState = useSelector(generalSelectors.getProcessState);
   const atomUri = get(atom, "uri");
   const isSkeleton =
-    !(
-      processUtils.isAtomLoaded(processState, atomUri) &&
-      !get(atom, "isBeingCreated")
-    ) ||
     get(atom, "isBeingCreated") ||
     processUtils.hasAtomFailedToLoad(processState, atomUri) ||
-    processUtils.isAtomLoading(processState, atomUri) ||
-    processUtils.isAtomToLoad(processState, atomUri);
+    processUtils.isAtomFetchNecessary(processState, atomUri, atom);
 
   const matchedUseCase = getIn(atom, ["matchedUseCase", "identifier"]);
 
@@ -41,7 +36,9 @@ export default function WonAtomCard({
   if (isSkeleton) {
     cardContent = (
       <WonSkeletonCard
+        atom={atom}
         atomUri={atomUri}
+        processState={processState}
         showIndicators={showIndicators}
         showHolder={showHolder}
       />

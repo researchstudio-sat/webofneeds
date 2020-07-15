@@ -1,55 +1,51 @@
 /**
  * Created by quasarchimaere on 30.07.2019.
  */
-import React, { useState } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 import VisibilitySensor from "react-visibility-sensor";
+import WonAtomConnectionsIndicator from "../atom-connections-indicator.jsx";
+import * as processUtils from "../../redux/utils/process-utils.js";
 import { get } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import "~/style/_skeleton-card.scss";
-import * as processUtils from "../../redux/utils/process-utils.js";
-import * as generalSelectors from "../../redux/selectors/general-selectors.js";
-import WonAtomConnectionsIndicator from "../atom-connections-indicator.jsx";
-import PropTypes from "prop-types";
 
 export default function WonSkeletonCard({
   atomUri,
+  processState,
+  atom,
   showHolder,
   showIndicators,
 }) {
   const dispatch = useDispatch();
-  const [localFetchInitiated, setLocalFetchInitiated] = useState(false);
-  const atom = useSelector(generalSelectors.getAtom(atomUri));
-  const process = useSelector(generalSelectors.getProcessState);
 
   const atomInCreation = get(atom, "isBeingCreated");
-  const atomLoaded =
-    processUtils.isAtomLoaded(process, atomUri) && !atomInCreation;
-  const atomLoading = processUtils.isAtomLoading(process, atomUri);
-  const atomFailedToLoad = processUtils.hasAtomFailedToLoad(process, atomUri);
-  const atomToLoad = processUtils.isAtomToLoad(process, atomUri) || !atom;
+  const atomFailedToLoad = processUtils.hasAtomFailedToLoad(
+    processState,
+    atomUri
+  );
+  const atomToLoad = processUtils.isAtomToLoad(processState, atomUri) || !atom;
 
-  function ensureAtomIsLoaded() {
-    if (
-      atomUri &&
-      !atomLoaded &&
-      !atomLoading &&
-      !atomInCreation &&
-      atomToLoad
-    ) {
+  const isAtomFetchNecessary =
+    !atomInCreation &&
+    processUtils.isAtomFetchNecessary(processState, atomUri, atom);
+
+  function ensureAtomIsFetched() {
+    if (isAtomFetchNecessary) {
+      console.debug("fetch atomUri, ", atomUri);
       dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
     }
   }
 
   function onChange(isVisible) {
-    if (isVisible && !localFetchInitiated) {
-      ensureAtomIsLoaded();
-      setLocalFetchInitiated(true);
+    if (isVisible) {
+      ensureAtomIsFetched();
     }
   }
 
-  const cardIconSkeleton = !atomLoaded ? (
+  const cardIconSkeleton = isAtomFetchNecessary ? (
     <VisibilitySensor
       onChange={isVisible => {
         onChange(isVisible);
@@ -62,10 +58,10 @@ export default function WonSkeletonCard({
       <div className="card__detailinfo__skeleton" />
     </VisibilitySensor>
   ) : (
-    undefined
+    <div className="card__detailinfo__skeleton" />
   );
 
-  const cardMainFailed = atomFailedToLoad ? (
+  const cardMain = atomFailedToLoad ? (
     <div className="card__main">
       <div className="card__main__topline">
         <div className="card__main__topline__notitle">Atom Loading failed</div>
@@ -77,25 +73,21 @@ export default function WonSkeletonCard({
       </div>
     </div>
   ) : (
-    undefined
+    <div className="card__main">
+      <div className="card__main__topline">
+        <div className="card__main__topline__title" />
+      </div>
+      <div className="card__main__subtitle">
+        <span className="card__main__subtitle__type" />
+      </div>
+    </div>
   );
 
-  const cardMain =
-    atomLoading || atomToLoad || atomInCreation ? (
-      <div className="card__main">
-        <div className="card__main__topline">
-          <div className="card__main__topline__title" />
-        </div>
-        <div className="card__main__subtitle">
-          <span className="card__main__subtitle__type" />
-        </div>
-      </div>
-    ) : (
-      undefined
-    );
-
-  const cardPersona =
-    showHolder && !atomLoaded ? <div className="card__noholder" /> : undefined;
+  const cardPersona = showHolder ? (
+    <div className="card__noholder" />
+  ) : (
+    undefined
+  );
 
   const cardIndicators = showIndicators ? (
     <WonAtomConnectionsIndicator />
@@ -106,12 +98,11 @@ export default function WonSkeletonCard({
   return (
     <won-skeleton-card
       class={
-        (atomLoading || atomInCreation ? " won-is-loading " : "") +
+        (isAtomFetchNecessary || atomInCreation ? " won-is-loading " : "") +
         (atomToLoad ? "won-is-toload" : "")
       }
     >
       {cardIconSkeleton}
-      {cardMainFailed}
       {cardMain}
       {cardPersona}
       {cardIndicators}
@@ -119,7 +110,9 @@ export default function WonSkeletonCard({
   );
 }
 WonSkeletonCard.propTypes = {
-  atomUri: PropTypes.string,
+  atomUri: PropTypes.string.isRequired,
+  processState: PropTypes.object.isRequired,
+  atom: PropTypes.object,
   showHolder: PropTypes.bool,
   showIndicators: PropTypes.bool,
 };
