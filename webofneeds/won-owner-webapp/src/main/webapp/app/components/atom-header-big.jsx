@@ -10,6 +10,7 @@ import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as atomUtils from "../redux/utils/atom-utils";
 import * as wonLabelUtils from "../won-label-utils.js";
 import * as accountUtils from "../redux/utils/account-utils";
+import * as processUtils from "../redux/utils/process-utils";
 import { get, extractAtomUriFromConnectionUri } from "../utils.js";
 
 import WonAtomContextDropdown from "../components/atom-context-dropdown.jsx";
@@ -19,7 +20,7 @@ import WonAddBuddy from "../components/add-buddy.jsx";
 
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 import "~/style/_atom-header-big.scss";
-import * as processUtils from "~/app/redux/utils/process-utils";
+
 import VisibilitySensor from "react-visibility-sensor";
 
 export default function WonAtomHeaderBig({
@@ -33,39 +34,52 @@ export default function WonAtomHeaderBig({
   const storedAtoms = useSelector(generalSelectors.getAtoms);
   const accountState = useSelector(generalSelectors.getAccountState);
   const processState = useSelector(generalSelectors.getProcessState);
+  const externalDataState = useSelector(generalSelectors.getExternalDataState);
   const ownedAtomsWithBuddySocket = useSelector(
     generalSelectors.getOwnedAtomsWithBuddySocket
   );
   const atomLoading =
     !atom || processUtils.isAtomLoading(processState, atomUri);
-  const atomToLoad = !atom || processUtils.isAtomToLoad(processState, atomUri);
   const atomFailedToLoad =
     atom && processUtils.hasAtomFailedToLoad(processState, atomUri);
-  const externalDataState = useSelector(generalSelectors.getExternalDataState);
+
+  const holderUri = atomUtils.getHeldByUri(atom);
+  const holderAtom = get(storedAtoms, holderUri);
 
   let contentElement;
 
-  if (atomLoading || atomToLoad || !atom) {
+  const isAtomFetchNecessary = processUtils.isAtomFetchNecessary(
+    processState,
+    atomUri,
+    atom
+  );
+  const isHolderFetchNecessary = processUtils.isAtomFetchNecessary(
+    processState,
+    holderUri,
+    holderAtom
+  );
+
+  if (isAtomFetchNecessary || isHolderFetchNecessary) {
     const onChange = isVisible => {
-      console.debug("is visible...", isVisible);
       if (isVisible) {
-        ensureAtomIsLoaded();
+        ensureAtomIsFetched();
+        ensureHolderIsFetched();
       }
     };
 
-    const ensureAtomIsLoaded = () => {
-      console.debug("ensureAtomIsLoaded...");
-      if (atomUri && (!atom || (atomToLoad && !atomLoading))) {
+    const ensureAtomIsFetched = () => {
+      if (processUtils.isAtomFetchNecessary(processState, atomUri, atom)) {
         console.debug("fetch atomUri, ", atomUri);
         dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
-      } else {
-        console.debug(
-          "fetch omitted atomUri, ",
-          atomUri,
-          atomToLoad,
-          atomLoading,
-          atom
-        );
+      }
+    };
+
+    const ensureHolderIsFetched = () => {
+      if (
+        processUtils.isAtomFetchNecessary(processState, holderUri, holderAtom)
+      ) {
+        console.debug("fetch holderUri, ", holderUri);
+        dispatch(actionCreators.atoms__fetchUnloadedAtom(holderUri));
       }
     };
 
@@ -181,16 +195,14 @@ export default function WonAtomHeaderBig({
       <h1 className="ahb__title ahb__title--notitle">No Title</h1>
     );
 
-    const personaUri = atomUtils.getHeldByUri(atom);
-    const persona = get(storedAtoms, personaUri);
-    const personaName =
+    const holderName =
       atomUtils.hasHoldableSocket(atom) && !atomUtils.hasGroupSocket(atom)
-        ? atomUtils.getTitle(persona, externalDataState) ||
+        ? atomUtils.getTitle(holderAtom, externalDataState) ||
           get(atom, "fakePersonaName")
         : undefined;
 
-    const personaNameElement = personaName && (
-      <span className="ahb__info__persona">{personaName}</span>
+    const holderNameElement = holderName && (
+      <span className="ahb__info__holder">{holderName}</span>
     );
 
     const isGroupChatEnabled = atomUtils.hasGroupSocket(atom);
@@ -206,10 +218,10 @@ export default function WonAtomHeaderBig({
       <React.Fragment>
         <WonAtomIcon atom={atom} />
         {titleElement}
-        {(groupChatElement || personaNameElement) && (
+        {(groupChatElement || holderNameElement) && (
           <div className="ahb__info">
             {groupChatElement}
-            {personaNameElement}
+            {holderNameElement}
           </div>
         )}
         {buddyActionElement}
@@ -228,7 +240,9 @@ export default function WonAtomHeaderBig({
           : "" +
             (atomFailedToLoad ? " won-failed-to-load " : "") +
             (atomLoading ? " won-is-loading " : "") +
-            (atomToLoad ? " won-to-load " : "")
+            (isHolderFetchNecessary || isAtomFetchNecessary
+              ? " won-to-load "
+              : "")
       }
     >
       {contentElement}

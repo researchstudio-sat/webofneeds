@@ -15,7 +15,7 @@ import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import vocab from "../service/vocab.js";
 
-import "~/style/_group-atom-messages.scss";
+import "~/style/_atom-messages.scss";
 import "~/style/_rdflink.scss";
 import rdf_logo_1 from "~/images/won-icons/rdf_logo_1.svg";
 import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
@@ -45,20 +45,6 @@ export default function WonGroupAtomMessages({
     }
 
     ensureMessagesAreLoaded();
-
-    //TODO: FILTER MESSAGE URIS IN A WAY THAT WE GET A SET OF ORIGINATORURIS AND SENDERURIS WHICH WE WILL CHECK AND FETCH IF THEY ARE NOT PRESENT
-    /*if (groupChatMessage && processState && isReceived) {
-      if (
-        originatorUri &&
-        !processUtils.hasAtomFailedToLoad(originatorUri) &&
-        (!originatorAtom ||
-          ((get(originatorAtom, "uriStub") ||
-            processUtils.isAtomToLoad(originatorUri)) &&
-            !processUtils.isAtomLoading(originatorUri)))
-      ) {
-        dispatch(actionCreators.atoms__fetchUnloadedAtom(originatorUri));
-      }
-    }*/
   });
   const [snapBottom, setSnapBottom] = useState(true);
 
@@ -134,7 +120,6 @@ export default function WonGroupAtomMessages({
     if (!snapBottom) {
       setSnapBottom(true);
     }
-    scrollToBottom();
   }
 
   function unsnapFromBottom() {
@@ -240,7 +225,7 @@ export default function WonGroupAtomMessages({
 
   function ensureMessagesAreLoaded() {
     // make sure latest messages are loaded
-    const INITIAL_MESSAGECOUNT = 10;
+    const INITIAL_MESSAGECOUNT = 15;
     if (
       hasConnectionMessagesToLoad &&
       !connectionUtils.isUsingTemporaryUri(connection) &&
@@ -250,7 +235,7 @@ export default function WonGroupAtomMessages({
     }
   }
 
-  function loadPreviousMessages(messagesToLoadCount = 5) {
+  function loadPreviousMessages(messagesToLoadCount = 10) {
     if (connection && !isConnectionLoading && !isProcessingLoadingMessages) {
       dispatch(
         actionCreators.connections__showMoreMessages(
@@ -279,9 +264,9 @@ export default function WonGroupAtomMessages({
 
   const unreadIndicatorElement =
     unreadMessageCount && !snapBottom ? (
-      <div className="gpm__content__unreadindicator">
+      <div className="am__content__unreadindicator">
         <div
-          className="gpm__content__unreadindicator__content won-button--filled red"
+          className="am__content__unreadindicator__content won-button--filled red"
           onClick={goToUnreadMessages}
         >
           {unreadMessageCount} unread Messages
@@ -292,7 +277,7 @@ export default function WonGroupAtomMessages({
     );
 
   const loadSpinnerElement = (
-    <div className="gpm__content__loadspinner">
+    <div className="am__content__loadspinner">
       <svg className="hspinner">
         <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
       </svg>
@@ -300,10 +285,10 @@ export default function WonGroupAtomMessages({
   );
 
   const headerElement = (
-    <div className="gpm__header">
-      <div className="gpm__header__back">
+    <div className="am__header">
+      <div className="am__header__back">
         <a
-          className="gpm__header__back__button clickable"
+          className="am__header__back__button clickable"
           onClick={
             backToChats
               ? () =>
@@ -330,7 +315,7 @@ export default function WonGroupAtomMessages({
                   )
           }
         >
-          <svg className="gpm__header__back__button__icon">
+          <svg className="am__header__back__button__icon">
             <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
           </svg>
         </a>
@@ -342,7 +327,7 @@ export default function WonGroupAtomMessages({
   );
 
   const contentElement = (
-    <div className="gpm__content" ref={chatContainerRef} onScroll={onScroll}>
+    <div className="am__content" ref={chatContainerRef} onScroll={onScroll}>
       {unreadIndicatorElement}
       {(isConnectionLoading || isProcessingLoadingMessages) &&
         loadSpinnerElement}
@@ -351,7 +336,7 @@ export default function WonGroupAtomMessages({
         !isProcessingLoadingMessages &&
         hasConnectionMessagesToLoad && (
           <button
-            className="gpm__content__loadbutton won-button--outlined thin red"
+            className="am__content__loadbutton won-button--outlined thin red"
             onClick={() => loadPreviousMessages()}
           >
             Load previous messages
@@ -366,6 +351,7 @@ export default function WonGroupAtomMessages({
             connection={connection}
             senderAtom={senderAtom}
             targetAtom={targetAtom}
+            processState={processState}
             allAtoms={allAtoms}
             ownedConnections={ownedConnections}
             originatorAtom={get(allAtoms, get(msg, "originatorUri"))}
@@ -380,9 +366,9 @@ export default function WonGroupAtomMessages({
 
   if (isConnected) {
     footerElement = (
-      <div className="gpm__footer">
+      <div className="am__footer">
         <ChatTextfield
-          className="gpm__footer__chattextfield"
+          className="am__footer__chattextfield"
           connection={connection}
           placeholder={shouldShowRdf ? "Enter RDF..." : "Your message..."}
           submitButtonLabel={shouldShowRdf ? "Send RDF" : "Send"}
@@ -398,15 +384,15 @@ export default function WonGroupAtomMessages({
     );
   } else if (isSentRequest) {
     footerElement = (
-      <div className="gpm__footer">
+      <div className="am__footer">
         Waiting for the Group Administrator to accept your request.
       </div>
     );
   } else if (isReceivedRequest) {
     footerElement = (
-      <div className="gpm__footer">
+      <div className="am__footer">
         <ChatTextfield
-          className="gpm__footer__chattextfield"
+          className="am__footer__chattextfield"
           connection={connection}
           placeholder="Message (optional)"
           submitButtonLabel="Accept&#160;Invite"
@@ -424,9 +410,9 @@ export default function WonGroupAtomMessages({
             );
           }}
         />
-        <WonLabelledHr className="gpm__footer__labelledhr" label="Or" />
+        <WonLabelledHr className="am__footer__labelledhr" label="Or" />
         <button
-          className="gpm__footer__button won-button--filled black"
+          className="am__footer__button won-button--filled black"
           onClick={() => closeConnection()}
         >
           Decline
@@ -435,9 +421,9 @@ export default function WonGroupAtomMessages({
     );
   } else if (isSuggested) {
     footerElement = (
-      <div className="gpm__footer">
+      <div className="am__footer">
         <ChatTextfield
-          className="gpm__footer__chattextfield"
+          className="am__footer__chattextfield"
           connection={connection}
           placeholder="Message (optional)"
           submitButtonLabel="Ask&#160;to&#160;Join"
@@ -446,9 +432,9 @@ export default function WonGroupAtomMessages({
           showPersonas={!connection}
           onSubmit={({ value }) => sendRequest(value)}
         />
-        <WonLabelledHr className="gpm__footer__labelledhr" label="Or" />
+        <WonLabelledHr className="am__footer__labelledhr" label="Or" />
         <button
-          className="gpm__footer__button won-button--filled black"
+          className="am__footer__button won-button--filled black"
           onClick={() => closeConnection(true)}
         >
           Bad match - remove!
@@ -458,7 +444,7 @@ export default function WonGroupAtomMessages({
   }
 
   return (
-    <won-group-atom-messages
+    <won-atom-messages
       class={
         (className || "") + (connectionOrAtomsLoading ? " won-is-loading " : "")
       }
@@ -466,7 +452,7 @@ export default function WonGroupAtomMessages({
       {headerElement}
       {contentElement}
       {footerElement}
-    </won-group-atom-messages>
+    </won-atom-messages>
   );
 }
 WonGroupAtomMessages.propTypes = {

@@ -10,19 +10,19 @@ won-atom-header {
     @include animateOpacityHeartBeat();
     pointer-events: none;
 
-    .ph__icon__skeleton {
+    .ah__icon__skeleton {
       grid-area: icon;
       @include fixed-square($postIconSize);
       background-color: $won-skeleton-color;
     }
 
-    .ph__right__subtitle__type {
+    .ah__right__subtitle__type {
       height: $smallFontSize;
       width: 5rem;
       background-color: $won-skeleton-color;
     }
 
-    .ph__right__topline__title {
+    .ah__right__topline__title {
       height: $normalFontSize;
       width: 7rem;
       background-color: $won-skeleton-color;
@@ -44,7 +44,7 @@ won-atom-header {
     grid-area: icon;
   }
 
-  .ph__right {
+  .ah__right {
     grid-area: main;
     display: grid;
     grid-template-areas: "topline" "subtitle";
@@ -81,7 +81,7 @@ won-atom-header {
         overflow: hidden;
         white-space: nowrap;
 
-        &__persona {
+        &__holder {
           border-radius: 0.19rem;
           background: $won-secondary-color-lighter;
           color: $won-secondary-text-color;

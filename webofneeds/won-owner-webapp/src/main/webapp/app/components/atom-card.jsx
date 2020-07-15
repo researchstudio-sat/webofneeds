@@ -17,22 +17,17 @@ import { useSelector } from "react-redux";
 import "~/style/_atom-card.scss";
 
 export default function WonAtomCard({
+  atomUri,
   atom,
   showHolder,
   showIndicators,
   currentLocation,
 }) {
   const processState = useSelector(generalSelectors.getProcessState);
-  const atomUri = get(atom, "uri");
   const isSkeleton =
-    !(
-      processUtils.isAtomLoaded(processState, atomUri) &&
-      !get(atom, "isBeingCreated")
-    ) ||
     get(atom, "isBeingCreated") ||
     processUtils.hasAtomFailedToLoad(processState, atomUri) ||
-    processUtils.isAtomLoading(processState, atomUri) ||
-    processUtils.isAtomToLoad(processState, atomUri);
+    processUtils.isAtomFetchNecessary(processState, atomUri, atom);
 
   const matchedUseCase = getIn(atom, ["matchedUseCase", "identifier"]);
 
@@ -41,7 +36,9 @@ export default function WonAtomCard({
   if (isSkeleton) {
     cardContent = (
       <WonSkeletonCard
+        atom={atom}
         atomUri={atomUri}
+        processState={processState}
         showIndicators={showIndicators}
         showHolder={showHolder}
       />
@@ -56,6 +53,7 @@ export default function WonAtomCard({
         cardContent = (
           <PokemonRaidCard
             atom={atom}
+            processState={processState}
             showIndicators={showIndicators}
             showHolder={showHolder}
             currentLocation={currentLocation}
@@ -69,6 +67,7 @@ export default function WonAtomCard({
         cardContent = (
           <WonInterestCard
             atom={atom}
+            processState={processState}
             showIndicators={showIndicators}
             showHolder={showHolder}
           />
@@ -78,6 +77,7 @@ export default function WonAtomCard({
         cardContent = (
           <WonOtherCard
             atom={atom}
+            processState={processState}
             showIndicators={showIndicators}
             showHolder={showHolder}
             currentLocation={currentLocation}
@@ -90,6 +90,7 @@ export default function WonAtomCard({
   return <won-atom-card>{cardContent}</won-atom-card>;
 }
 WonAtomCard.propTypes = {
+  atomUri: PropTypes.string.isRequired,
   atom: PropTypes.object,
   showHolder: PropTypes.bool,
   showIndicators: PropTypes.bool,

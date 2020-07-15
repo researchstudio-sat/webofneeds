@@ -86,16 +86,11 @@ export default function WonEditAtom({ fromAtom }) {
 
     const createContentFragment = useCase.details &&
       Object.keys(useCase.details).length > 0 && (
-        <React.Fragment>
-          <div className="cp__content__branchheader">
-            Your offer or self description
-          </div>
-          <WonCreateIsSeeks
-            detailList={useCase.details}
-            initialDraft={useCase.draft.content}
-            onUpdate={updateDraftContent}
-          />
-        </React.Fragment>
+        <WonCreateIsSeeks
+          detailList={useCase.details}
+          initialDraft={useCase.draft.content}
+          onUpdate={updateDraftContent}
+        />
       );
 
     const createSeeksFragment = useCase.seeksDetails &&

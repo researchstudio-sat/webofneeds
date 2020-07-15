@@ -334,3 +334,33 @@ export function isAnyConnectionLoadingMessages(process) {
     isConnectionLoadingMessages(process, connUri)
   );
 }
+
+export function isExternalDataFetchNecessary(
+  process,
+  externalDataUri,
+  externalDataEntry
+) {
+  if (externalDataUri) {
+    if (!externalDataEntry) {
+      return true;
+    } else {
+      return isExternalDataLoading(process, externalDataUri);
+    }
+  }
+  return false;
+}
+
+export function isAtomFetchNecessary(process, atomUri, atom) {
+  if (atomUri) {
+    if (!atom) {
+      return true;
+    } else {
+      return (
+        isAtomToLoad(process, atomUri) &&
+        !isAtomLoading(process, atomUri) &&
+        !hasAtomFailedToLoad(process, atomUri)
+      );
+    }
+  }
+  return false;
+}

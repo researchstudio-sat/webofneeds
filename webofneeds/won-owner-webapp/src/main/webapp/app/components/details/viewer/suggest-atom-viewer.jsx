@@ -1,25 +1,26 @@
-import React, { useEffect } from "react";
+import React from "react";
 
 import PropTypes from "prop-types";
 import WonAtomCard from "../../atom-card.jsx";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import * as generalSelectors from "../../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../../redux/utils/atom-utils.js";
-import { actionCreators } from "../../../actions/actions.js";
 
 import "~/style/_suggest-atom-viewer.scss";
 import * as processUtils from "../../../redux/utils/process-utils.js";
 
 export default function WonSuggestAtomViewer({ content, detail, className }) {
-  const dispatch = useDispatch();
-
   const suggestedAtomUri = content;
   const suggestedAtom = useSelector(generalSelectors.getAtom(suggestedAtomUri));
 
   const processState = useSelector(generalSelectors.getProcessState);
 
-  const isLoading = processUtils.isAtomLoading(processState, suggestedAtomUri);
-  const toLoad = processUtils.isAtomToLoad(processState, suggestedAtomUri);
+  const isSuggestAtomFetchNecessary = processUtils.isAtomFetchNecessary(
+    processState,
+    suggestedAtomUri,
+    suggestedAtom
+  );
+
   const failedToLoad = processUtils.hasAtomFailedToLoad(
     processState,
     suggestedAtomUri
@@ -27,14 +28,8 @@ export default function WonSuggestAtomViewer({ content, detail, className }) {
 
   const currentLocation = useSelector(generalSelectors.getCurrentLocation);
 
-  useEffect(() => {
-    if (suggestedAtomUri && ((toLoad && !isLoading) || !suggestedAtom)) {
-      dispatch(actionCreators.atoms__fetchUnloadedAtom(suggestedAtomUri));
-    }
-  });
-
   function getInfoText() {
-    if (isLoading || toLoad) {
+    if (isSuggestAtomFetchNecessary) {
       return "Loading Atom...";
     } else if (failedToLoad) {
       return "Failed to load Atom";
@@ -65,6 +60,7 @@ export default function WonSuggestAtomViewer({ content, detail, className }) {
         <div className="suggestatomv__content__element">
           <div className="suggestatomv__content__element__post">
             <WonAtomCard
+              atomUri={suggestedAtomUri}
               atom={suggestedAtom}
               currentLocation={currentLocation}
               showHolder={true}

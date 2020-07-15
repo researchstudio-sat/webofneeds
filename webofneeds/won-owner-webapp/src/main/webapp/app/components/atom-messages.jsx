@@ -371,7 +371,7 @@ export default function WonAtomMessages({
 
   function ensureMessagesAreLoaded() {
     // make sure latest messages are loaded
-    const INITIAL_MESSAGECOUNT = 10;
+    const INITIAL_MESSAGECOUNT = 15;
     if (
       hasConnectionMessagesToLoad &&
       !connectionUtils.isUsingTemporaryUri(connection) &&
@@ -532,7 +532,7 @@ export default function WonAtomMessages({
         });
     }
   }
-  function loadPreviousMessages(messagesToLoadCount = 5) {
+  function loadPreviousMessages(messagesToLoadCount = 10) {
     if (connection && !isConnectionLoading && !isProcessingLoadingMessages) {
       dispatch(
         actionCreators.connections__showMoreMessages(
@@ -563,9 +563,9 @@ export default function WonAtomMessages({
 
   const unreadIndicatorElement =
     unreadMessageCount && !snapBottom ? (
-      <div className="pm__content__unreadindicator">
+      <div className="am__content__unreadindicator">
         <div
-          className="pm__content__unreadindicator__content won-button--filled red"
+          className="am__content__unreadindicator__content won-button--filled red"
           onClick={goToUnreadMessages}
         >
           {unreadMessageCount} unread Messages
@@ -576,7 +576,7 @@ export default function WonAtomMessages({
     );
 
   const loadSpinnerElement = (
-    <div className="pm__content__loadspinner">
+    <div className="am__content__loadspinner">
       <svg className="hspinner">
         <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
       </svg>
@@ -587,7 +587,7 @@ export default function WonAtomMessages({
     const backButtonElement = (
       <React.Fragment>
         <a
-          className="pm__header__back__button clickable"
+          className="am__header__back__button clickable"
           onClick={
             backToChats
               ? () =>
@@ -614,7 +614,7 @@ export default function WonAtomMessages({
                   )
           }
         >
-          <svg className="pm__header__back__button__icon">
+          <svg className="am__header__back__button__icon">
             <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
           </svg>
         </a>
@@ -622,8 +622,8 @@ export default function WonAtomMessages({
     );
 
     headerElement = (
-      <div className="pm__header">
-        <div className="pm__header__back">{backButtonElement}</div>
+      <div className="am__header">
+        <div className="am__header__back">{backButtonElement}</div>
         <WonConnectionHeader connection={connection} />
         <WonShareDropdown atom={targetAtom} />
         <WonConnectionContextDropdown
@@ -635,7 +635,7 @@ export default function WonAtomMessages({
     );
 
     contentElement = (
-      <div className="pm__content" ref={chatContainerRef} onScroll={onScroll}>
+      <div className="am__content" ref={chatContainerRef} onScroll={onScroll}>
         {unreadIndicatorElement}
         {(isConnectionLoading || isProcessingLoadingMessages) &&
           loadSpinnerElement}
@@ -645,7 +645,7 @@ export default function WonAtomMessages({
           !isProcessingLoadingMessages &&
           hasConnectionMessagesToLoad && (
             <button
-              className="pm__content__loadbutton won-button--outlined thin red"
+              className="am__content__loadbutton won-button--outlined thin red"
               onClick={() => loadPreviousMessages()}
             >
               Load previous messages
@@ -660,6 +660,7 @@ export default function WonAtomMessages({
               connection={connection}
               senderAtom={senderAtom}
               targetAtom={targetAtom}
+              processState={processState}
               allAtoms={allAtoms}
               ownedConnections={ownedConnections}
               shouldShowRdf={shouldShowRdf}
@@ -677,10 +678,10 @@ export default function WonAtomMessages({
     );
   } else if (showAgreementData) {
     headerElement = (
-      <div className="pm__header">
-        <div className="pm__header__back">
+      <div className="am__header">
+        <div className="am__header__back">
           <a
-            className="pm__header__back__button clickable"
+            className="am__header__back__button clickable"
             onClick={() =>
               dispatch(
                 actionCreators.connections__showAgreementData({
@@ -690,13 +691,13 @@ export default function WonAtomMessages({
               )
             }
           >
-            <svg className="pm__header__back__button__icon clickable">
+            <svg className="am__header__back__button__icon clickable">
               <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
             </svg>
           </a>
         </div>
         <div
-          className="pm__header__title clickable"
+          className="am__header__title clickable"
           onClick={() =>
             dispatch(
               actionCreators.connections__showAgreementData({
@@ -726,6 +727,7 @@ export default function WonAtomMessages({
             connection={connection}
             senderAtom={senderAtom}
             targetAtom={targetAtom}
+            processState={processState}
             allAtoms={allAtoms}
             ownedConnections={ownedConnections}
             shouldShowRdf={shouldShowRdf}
@@ -746,6 +748,7 @@ export default function WonAtomMessages({
             connection={connection}
             senderAtom={senderAtom}
             targetAtom={targetAtom}
+            processState={processState}
             allAtoms={allAtoms}
             ownedConnections={ownedConnections}
             shouldShowRdf={shouldShowRdf}
@@ -766,6 +769,7 @@ export default function WonAtomMessages({
             connection={connection}
             senderAtom={senderAtom}
             targetAtom={targetAtom}
+            processState={processState}
             allAtoms={allAtoms}
             ownedConnections={ownedConnections}
             shouldShowRdf={shouldShowRdf}
@@ -777,14 +781,14 @@ export default function WonAtomMessages({
       });
 
     contentElement = (
-      <div className="pm__content won-agreement-content" ref={chatContainerRef}>
+      <div className="am__content won-agreement-content" ref={chatContainerRef}>
         {unreadIndicatorElement}
         {(isConnectionLoading ||
           isProcessingLoadingMessages ||
           (showAgreementData && isProcessingLoadingAgreementData)) &&
           loadSpinnerElement}
         {isProcessingLoadingAgreementData && (
-          <div className="pm__content__agreement__loadingtext">
+          <div className="am__content__agreement__loadingtext">
             Calculating Agreement Status
           </div>
         )}
@@ -795,21 +799,21 @@ export default function WonAtomMessages({
           proposalMessageArray.length > 0
         ) &&
           !isProcessingLoadingAgreementData && (
-            <div className="pm__content__agreement__emptytext">
+            <div className="am__content__agreement__emptytext">
               No Agreements within this Conversation
             </div>
           )}
 
         {agreementMessageArray.length > 0 &&
           !isProcessingLoadingAgreementData && (
-            <div className="pm__content__agreement__title">Agreements</div>
+            <div className="am__content__agreement__title">Agreements</div>
           )}
 
         {agreementMessages}
 
         {cancellationPendingMessageArray.length > 0 &&
           !isProcessingLoadingAgreementData && (
-            <div className="pm__content__agreement__title">
+            <div className="am__content__agreement__title">
               Agreements with Pending Cancellation
             </div>
           )}
@@ -818,7 +822,7 @@ export default function WonAtomMessages({
 
         {proposalMessageArray.length > 0 &&
           !isProcessingLoadingAgreementData && (
-            <div className="pm__content__agreement__title">Open Proposals</div>
+            <div className="am__content__agreement__title">Open Proposals</div>
           )}
 
         {proposalMessages}
@@ -830,10 +834,10 @@ export default function WonAtomMessages({
     );
   } else if (showPetriNetData) {
     headerElement = (
-      <div className="pm__header">
-        <div className="pm__header__back">
+      <div className="am__header">
+        <div className="am__header__back">
           <a
-            className="pm__header__back__button clickable"
+            className="am__header__back__button clickable"
             onClick={() =>
               dispatch(
                 actionCreators.connections__showPetriNetData({
@@ -843,13 +847,13 @@ export default function WonAtomMessages({
               )
             }
           >
-            <svg className="pm__header__back__button__icon clickable">
+            <svg className="am__header__back__button__icon clickable">
               <use xlinkHref={ico36_backarrow} href={ico36_backarrow} />
             </svg>
           </a>
         </div>
         <div
-          className="pm__header__title clickable"
+          className="am__header__title clickable"
           onClick={() =>
             dispatch(
               actionCreators.connections__showPetriNetData({
@@ -875,14 +879,14 @@ export default function WonAtomMessages({
         if (get(process, "processURI")) {
           return (
             <div
-              className="pm__content__petrinet__process"
+              className="am__content__petrinet__process"
               key={get(process, "processURI") + "-" + index}
             >
-              <div className="pm__content__petrinet__process__header">
+              <div className="am__content__petrinet__process__header">
                 ProcessURI: {get(process, "processURI")}
               </div>
               <WonPetrinetState
-                className="pm__content__petrinet__process__content"
+                className="am__content__petrinet__process__content"
                 processUri={get(process, "processURI")}
               />
             </div>
@@ -891,7 +895,7 @@ export default function WonAtomMessages({
       });
 
     contentElement = (
-      <div className="pm__content won-petrinet-content" ref={chatContainerRef}>
+      <div className="am__content won-petrinet-content" ref={chatContainerRef}>
         {unreadIndicatorElement}
         {(isConnectionLoading ||
           isProcessingLoadingMessages ||
@@ -899,11 +903,11 @@ export default function WonAtomMessages({
           loadSpinnerElement}
         {!hasPetriNetData &&
           (isProcessingLoadingPetriNetData ? (
-            <div className="pm__content__petrinet__loadingtext">
+            <div className="am__content__petrinet__loadingtext">
               Calculating PetriNet Status
             </div>
           ) : (
-            <div className="pm__content__petrinet__emptytext">
+            <div className="am__content__petrinet__emptytext">
               No PetriNet Data within this Conversation
             </div>
           ))}
@@ -916,9 +920,9 @@ export default function WonAtomMessages({
   if (!showPetriNetData) {
     if (connectionUtils.isConnected(connection)) {
       footerElement = (
-        <div className="pm__footer">
+        <div className="am__footer">
           <ChatTextfield
-            className="pm__footer__chattextfield"
+            className="am__footer__chattextfield"
             connection={connection}
             placeholder={shouldShowRdf ? "Enter RDF..." : "Your message..."}
             submitButtonLabel={shouldShowRdf ? "Send RDF" : "Send"}
@@ -935,15 +939,15 @@ export default function WonAtomMessages({
     } else if (!multiSelectType) {
       if (connectionUtils.isRequestSent(connection)) {
         footerElement = (
-          <div className="pm__footer">
+          <div className="am__footer">
             Waiting for them to accept your chat request.
           </div>
         );
       } else if (connectionUtils.isRequestReceived(connection)) {
         footerElement = (
-          <div className="pm__footer">
+          <div className="am__footer">
             <ChatTextfield
-              className="pm__footer__chattextfield"
+              className="am__footer__chattextfield"
               connection={connection}
               placeholder="Message (optional)"
               submitButtonLabel="Accept&#160;Chat"
@@ -961,9 +965,9 @@ export default function WonAtomMessages({
                 );
               }}
             />
-            <WonLabelledHr className="pm__footer__labelledhr" label="Or" />
+            <WonLabelledHr className="am__footer__labelledhr" label="Or" />
             <button
-              className="pm__footer__button won-button--filled black"
+              className="am__footer__button won-button--filled black"
               onClick={() => closeConnection()}
             >
               Decline
@@ -972,9 +976,9 @@ export default function WonAtomMessages({
         );
       } else if (connectionUtils.isSuggested(connection)) {
         footerElement = (
-          <div className="pm__footer">
+          <div className="am__footer">
             <ChatTextfield
-              className="pm__footer__chattextfield"
+              className="am__footer__chattextfield"
               connection={connection}
               placeholder="Message (optional)"
               submitButtonLabel="Ask&#160;to&#160;Chat"
@@ -983,9 +987,9 @@ export default function WonAtomMessages({
               showPersonas={!connection}
               onSubmit={({ value }) => sendRequest(value)}
             />
-            <WonLabelledHr className="pm__footer__labelledhr" label="Or" />
+            <WonLabelledHr className="am__footer__labelledhr" label="Or" />
             <button
-              className="pm__footer__button won-button--filled black"
+              className="am__footer__button won-button--filled black"
               onClick={() => closeConnection(true)}
             >
               Bad match - remove!

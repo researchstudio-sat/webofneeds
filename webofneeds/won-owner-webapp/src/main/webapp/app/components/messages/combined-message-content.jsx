@@ -194,7 +194,7 @@ export default function WonCombinedMessageContent({
             <div className="msg__header__type">{getAgreementHeaderLabel()}</div>
           </div>
         );
-      } else if (personaName) {
+      } else if (personaName && groupChatMessage) {
         messageHeaderElement = (
           <div className="msg__header">
             <div className="msg__header__type">{personaName}</div>

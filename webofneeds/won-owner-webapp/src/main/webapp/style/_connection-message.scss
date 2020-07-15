@@ -6,7 +6,7 @@
 won-connection-message {
   grid-template-columns: min-content minmax(min-content, max-content);
   box-sizing: border-box;
-  padding: 0.5rem 0 0.5rem 0.5rem;
+  padding: 0.5rem 0 0.5rem 1rem;
   @include square-image($postIconSize, 0 0.5rem 0 0);
   display: grid;
   grid-template-areas: "icon content";
@@ -44,7 +44,7 @@ won-connection-message {
 
   &.won-unread {
     border-left: 0.25rem solid $won-unread-attention;
-    padding-left: 0.25rem;
+    padding-left: 0.75rem;
   }
 
   &.won-is-collapsed {
@@ -74,9 +74,24 @@ won-connection-message {
   &.won-cm--left {
     justify-content: flex-start;
 
+    > .won-cm__center {
+      padding-left: 0.25rem;
+
+      > .won-cm__center__bubble {
+        background: $won-lighter-gray;
+
+        @include speech-bubble-left(
+          $won-lighter-gray,
+          $won-line-gray,
+          $speechBubbleTailSize / 2,
+          $thinBorderWidth,
+          0.8rem
+        );
+      }
+    }
     & .won-cm__center__bubble {
       @include speech-bubble-left(
-        $won-light-gray,
+        white,
         $won-line-gray,
         $speechBubbleTailSize / 2,
         $thinBorderWidth,
@@ -85,7 +100,7 @@ won-connection-message {
 
       &.references {
         @include speech-bubble-left(
-          $won-light-gray,
+          white,
           $thinDarkBorder,
           $speechBubbleTailSize/2,
           $thinBorderWidth,
@@ -96,9 +111,25 @@ won-connection-message {
   }
   &.won-cm--right {
     justify-content: flex-end;
+
+    > .won-cm__center {
+      padding-right: 0.25rem;
+
+      > .won-cm__center__bubble {
+        background: white;
+
+        @include speech-bubble-right(
+          white,
+          $won-line-gray,
+          $speechBubbleTailSize/2,
+          $thinBorderWidth,
+          0.8rem
+        );
+      }
+    }
     & .won-cm__center__bubble {
       @include speech-bubble-right(
-        $won-light-gray,
+        $won-lighter-gray,
         $won-line-gray,
         $speechBubbleTailSize/2,
         $thinBorderWidth,

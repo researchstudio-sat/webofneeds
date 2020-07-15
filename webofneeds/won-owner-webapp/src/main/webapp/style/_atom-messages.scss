@@ -6,11 +6,9 @@ won-atom-messages {
   display: grid;
   grid-template-areas: "header" "main" "footer";
   grid-template-rows: min-content minmax($minimalGridRows, 1fr) min-content;
-  grid-row-gap: $gridRowGap;
   box-sizing: border-box;
-  padding: $gridRowGap;
 
-  .pm__header {
+  .am__header {
     display: grid;
     grid-template-columns: auto 1fr auto auto;
     grid-template-areas: "header_back header_title header_share header_context";
@@ -19,6 +17,7 @@ won-atom-messages {
     text-align: left;
     min-width: 0;
     align-items: center;
+    padding: $defaultPadding;
 
     &__back {
       grid-area: header_back;
@@ -48,11 +47,13 @@ won-atom-messages {
     }
   }
 
-  .pm__footer {
+  .am__footer {
     grid-area: footer;
+    border-top: $thinGrayBorder;
+    background: $won-light-gray;
 
     &__chattextfield {
-      padding: 0.5rem 0;
+      padding: $defaultPadding;
     }
 
     &__button {
@@ -60,14 +61,23 @@ won-atom-messages {
     }
   }
 
-  .pm__content {
+  .am__content {
     grid-area: main;
     padding: 0.5rem 0.5rem 0.5rem 0;
-    background: white;
-    border: $thinGrayBorder;
+    border-top: $thinGrayBorder;
     overflow: auto;
     scroll-behavior: smooth;
     flex-grow: 1;
+
+    &__loadbutton, /* just so the button and spinner won't make the chatmessages "jump"*/
+    &__loadspinner {
+      width: calc(100% - 0.5rem);
+      height: 3rem;
+      padding: 0.66em 2em;
+      margin-left: 0.5rem;
+      text-align: center;
+      box-sizing: border-box;
+    }
 
     &__unreadindicator {
       height: 3rem;
@@ -99,19 +109,6 @@ won-atom-messages {
         white-space: nowrap;
       }
     }
-    &__loadbutton, /* just so the button and spinner won't make the chatmessages "jump"*/
-    &__loadspinner {
-      width: calc(100% - 0.5rem);
-      height: 3rem;
-      padding: 0.66em 2em;
-      margin-left: 0.5rem;
-      text-align: center;
-      box-sizing: border-box;
-    }
-    &.won-petrinet-content,
-    &.won-agreement-content {
-      background: $won-lighter-gray;
-    }
     &__petrinet__loadingtext,
     &__agreement__loadingtext {
       padding-left: 0.5rem;
@@ -128,7 +125,7 @@ won-atom-messages {
       font-size: $normalFontSize;
       color: $won-subtitle-gray;
     }
-    won-petrinet-state.pm__content__petrinet__process__content {
+    won-petrinet-state.am__content__petrinet__process__content {
       display: grid;
       grid-gap: 0.5rem;
       padding: 0.5rem;

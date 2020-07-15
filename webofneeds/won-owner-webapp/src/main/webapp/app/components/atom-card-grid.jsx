@@ -19,12 +19,14 @@ export default function WonAtomCardGrid({
   showCreatePersona,
   currentLocation,
 }) {
+  //TODO: REFACTOR THIS COMPONENT TO RETRIEVE A atomsImm Map instead of an array
   const atomCards =
     atoms &&
     atoms.map(atom => {
       return (
         <WonAtomCard
           key={get(atom, "uri")}
+          atomUri={get(atom, "uri")}
           atom={atom}
           showHolder={showHolder}
           showIndicators={showIndicators}
