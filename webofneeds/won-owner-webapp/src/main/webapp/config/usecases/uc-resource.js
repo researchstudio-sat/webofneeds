@@ -49,7 +49,6 @@ export const resource = {
     },
   },
   details: {
-    title: { ...details.title },
     name: { ...name },
     accountingQuantity: { ...accountingQuantity },
     onhandQuantity: { ...onhandQuantity },
