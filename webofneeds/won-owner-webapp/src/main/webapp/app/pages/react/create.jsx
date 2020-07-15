@@ -57,17 +57,20 @@ export default function PageCreate() {
     ? processUtils.hasAtomFailedToLoad(processState, fromAtomUri)
     : false;
 
+  const isFromAtomFetchNecessary = processUtils.isAtomFetchNecessary(
+    processState,
+    fromAtomUri,
+    fromAtom
+  );
+
   useEffect(
     () => {
-      if (
-        fromAtomUri &&
-        (!fromAtom ||
-          (isFromAtomToLoad && !isFromAtomLoading && !hasFromAtomFailedToLoad))
-      ) {
+      if (isFromAtomFetchNecessary) {
+        console.debug("fetch fromAtomUri, ", fromAtomUri);
         dispatch(actionCreators.atoms__fetchUnloadedAtom(fromAtomUri));
       }
     },
-    [fromAtom, isFromAtomLoading, isFromAtomToLoad, hasFromAtomFailedToLoad]
+    [fromAtomUri, fromAtom, isFromAtomFetchNecessary]
   );
 
   let contentElement;

@@ -117,15 +117,13 @@ export default function ChatTextfield({
   useEffect(
     () => {
       if (showPersonas && ownedPersonas) {
-        const unloadedPersonas = ownedPersonas.filter(
-          (_, atomUri) =>
-            processUtils.isAtomToLoad(processState, atomUri) &&
-            !processUtils.isAtomLoading(processState, atomUri)
+        const unloadedPersonas = ownedPersonas.filter((persona, personaUri) =>
+          processUtils.isAtomFetchNecessary(processState, personaUri, persona)
         );
         if (unloadedPersonas.size > 0) {
-          console.debug("Fetching unloaded personas...");
-          unloadedPersonas.map((atom, atomUri) => {
-            dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
+          unloadedPersonas.mapKeys(personaUri => {
+            console.debug("fetch personaUri, ", personaUri);
+            dispatch(actionCreators.atoms__fetchUnloadedAtom(personaUri));
           });
         }
       }

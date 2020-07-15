@@ -42,7 +42,11 @@ export default function PageConnections() {
   );
   const atomUri =
     get(atom, "uri") || extractAtomUriFromConnectionUri(selectedConnectionUri);
-  const atomLoading = processUtils.isAtomLoading(processState, atomUri);
+  const isAtomFetchNecessary = processUtils.isAtomFetchNecessary(
+    processState,
+    atomUri,
+    atom
+  );
 
   const selectedConnection = getIn(atom, [
     "connections",
@@ -54,32 +58,31 @@ export default function PageConnections() {
 
   useEffect(
     () => {
-      if (atomUri && (!atomLoading || !atom)) {
-        console.debug(
-          "Fetching unloaded atom:",
-          atomUri,
-          " for connection: ",
-          selectedConnectionUri
-        );
+      if (isAtomFetchNecessary) {
+        console.debug("fetch atomUri, ", atomUri);
         dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
       }
 
       if (!atomUriInRoute && ownedAtoms) {
-        const unloadedAtoms = ownedAtoms.filter(
-          (_, atomUri) =>
-            processUtils.isAtomToLoad(processState, atomUri) &&
-            !processUtils.isAtomLoading(processState, atomUri)
+        const unloadedAtoms = ownedAtoms.filter((atom, atomUri) =>
+          processUtils.isAtomFetchNecessary(processState, atomUri, atom)
         );
 
         if (unloadedAtoms.size > 0) {
-          console.debug("Fetching unloaded atoms...");
-          unloadedAtoms.map((atom, atomUri) => {
+          unloadedAtoms.mapKeys(atomUri => {
+            console.debug("fetch atomUri, ", atomUri);
             dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
           });
         }
       }
     },
-    [selectedConnectionUri, atom, atomLoading, ownedAtoms]
+    [
+      selectedConnectionUri,
+      atom,
+      ownedAtoms,
+      isAtomFetchNecessary,
+      atomUriInRoute,
+    ]
   );
 
   const ownedAtoms = useSelector(generalSelectors.getOwnedAtoms);
