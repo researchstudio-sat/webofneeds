@@ -9,7 +9,7 @@
     border-bottom-color: $won-primary-color;
   }
 
-  &:not(.menu__tab--selected):hover {
+  &:hover {
     border-bottom-color: $won-primary-color-light;
     color: $won-primary-color-light;
   }
@@ -26,7 +26,7 @@
     border-left-color: $won-primary-color;
   }
 
-  &:not(.menu__tab--selected):hover {
+  &:hover {
     border-left-color: $won-primary-color-light;
     color: $won-primary-color-light;
   }
@@ -120,9 +120,6 @@
   }
 
   &.menu__tab--selected {
-    cursor: default;
-    pointer-events: none;
-
     &:not(.menu__tab--inactive) {
       color: $won-primary-color;
     }
