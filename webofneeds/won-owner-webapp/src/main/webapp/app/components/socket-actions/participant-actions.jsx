@@ -161,7 +161,7 @@ export default function WonParticipantSocketActions({
         <won-socket-actions>
           {closeButtonElement("Reject", "Reject Participant Request?")}
           <button
-            className="won-button--filled secondary"
+            className="won-button--filled primary"
             onClick={() => openRequest()}
           >
             <svg className="won-button-icon">
@@ -176,7 +176,7 @@ export default function WonParticipantSocketActions({
       return (
         <won-socket-actions>
           {closeButtonElement("Cancel", "Cancel Participant Request?")}
-          <button className="won-button--filled secondary" disabled={true}>
+          <button className="won-button--filled primary" disabled={true}>
             <svg className="won-button-icon">
               <use xlinkHref={ico32_buddy_waiting} href={ico32_buddy_waiting} />
             </svg>
@@ -196,7 +196,7 @@ export default function WonParticipantSocketActions({
       return (
         <won-socket-actions>
           <button
-            className="won-button--filled secondary"
+            className="won-button--filled primary"
             onClick={() => sendRequest()}
           >
             <svg className="won-button-icon">
@@ -212,7 +212,7 @@ export default function WonParticipantSocketActions({
         <won-socket-actions>
           {closeButtonElement("Remove", "Remove Participant Suggestion?")}
           <button
-            className="won-button--filled secondary"
+            className="won-button--filled primary"
             onClick={() => sendRequest()}
           >
             <svg className="won-button-icon">

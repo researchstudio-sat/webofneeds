@@ -26,15 +26,8 @@ won-socket-add-button {
   }
 
   &:hover {
-    background: $won-secondary-color;
+    background: rgba(white, 0.5);
     cursor: pointer;
-    .socketadd__label {
-      color: $won-light-gray;
-    }
-
-    .socketadd__icon {
-      --local-primary: #{$won-light-gray};
-    }
   }
 
   &.won-socket-add-button--big {

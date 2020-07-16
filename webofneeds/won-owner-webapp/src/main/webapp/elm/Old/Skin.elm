@@ -19,6 +19,7 @@ import Json.Decode as Decode exposing (Decoder)
 
 type alias Skin =
     { primaryColor : Color
+    , secondaryColor : Color
     , lightGray : Color
     , lineGray : Color
     , subtitleGray : Color
@@ -38,6 +39,7 @@ white =
 default : Skin
 default =
     { primaryColor = rgb255 240 70 70
+    , secondaryColor = rgb255 0 50 90
     , lightGray = rgb255 240 242 244
     , lineGray = rgb255 203 210 209
     , subtitleGray = rgb255 128 128 128
@@ -89,8 +91,9 @@ colorDecoder =
 
 decoder : Decoder Skin
 decoder =
-    Decode.map4 Skin
+    Decode.map5 Skin
         (Decode.field "primaryColor" colorDecoder)
+        (Decode.field "secondaryColor" colorDecoder)
         (Decode.field "lightGray" colorDecoder)
         (Decode.field "lineGray" colorDecoder)
         (Decode.field "subtitleGray" colorDecoder)
@@ -119,6 +122,7 @@ type Msg msg
 
 type alias SkinFlags =
     { primaryColor : Rgb
+    , secondaryColor : Rgb
     , lightGray : Rgb
     , lineGray : Rgb
     , subtitleGray : Rgb
@@ -132,6 +136,7 @@ fromFlags flags =
             fromRgb255 { red = r, green = g, blue = b, alpha = 1 }
     in
     { primaryColor = frgb flags.primaryColor
+    , secondaryColor = frgb flags.secondaryColor
     , lightGray = frgb flags.lightGray
     , lineGray = frgb flags.lineGray
     , subtitleGray = frgb flags.subtitleGray

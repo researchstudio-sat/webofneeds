@@ -163,9 +163,9 @@ chat-textfield {
     border-bottom-right-radius: 0;
     border-top-right-radius: 0;
     padding: 0.66rem;
-    --local-primary: #{$won-primary-text-color};
+    --local-primary: #{$won-secondary-color};
     &:hover:not(:disabled) {
-      background: $won-primary-color;
+      background: $won-secondary-color;
       --local-primary: #{$won-secondary-text-color};
     }
     &:disabled {

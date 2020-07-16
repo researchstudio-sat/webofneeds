@@ -51,9 +51,18 @@ won-atom-messages {
     grid-area: footer;
     border-top: $thinGrayBorder;
     background: $won-light-gray;
+    padding: $defaultPadding;
 
     &__chattextfield {
-      padding: $defaultPadding;
+    }
+
+    > won-labelled-hr {
+      .wlh__label {
+        .wlh__label__text {
+          background: $won-light-gray;
+          white-space: nowrap;
+        }
+      }
     }
 
     &__button {

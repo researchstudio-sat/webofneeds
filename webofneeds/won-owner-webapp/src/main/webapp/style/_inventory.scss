@@ -157,15 +157,7 @@ main.ownerinventory {
 
       &:hover {
         border-color: $won-secondary-color;
-        background: $won-secondary-color;
-
-        .createcard__label {
-          color: $won-light-gray;
-        }
-
-        .createcard__icon {
-          --local-primary: #{$won-light-gray};
-        }
+        background: rgba(white, 0.5);
       }
 
       > .createcard__label {

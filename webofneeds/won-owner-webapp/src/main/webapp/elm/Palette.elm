@@ -8,7 +8,7 @@ wonButton : List (Attribute msg) -> List (Html msg) -> Html msg
 wonButton attrs children =
     button
         (attrs
-            ++ [ HA.class "red"
+            ++ [ HA.class "secondary"
                , HA.class "won-button--filled"
                ]
         )

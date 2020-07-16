@@ -10,15 +10,14 @@ won-share-dropdown {
     padding-right: 0.25rem;
   }
 
-  &:hover {
-    filter: brightness(125%);
-  }
-
   .topline {
     height: 2rem;
   }
 
   .sdd__icon__small__sharemenu {
+    &:hover {
+      filter: brightness(125%);
+    }
     --local-primary: black;
     @include fixed-square($postIconSizeMobile);
     //padding-left: 0.5rem;

@@ -13,7 +13,7 @@ import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as connectionUtils from "../../redux/utils/connection-utils";
 
 import "~/style/_socket-actions.scss";
-import ico36_message from "~/images/won-icons/ico36_message.svg";
+import ico32_message_nocircle from "~/images/won-icons/ico32_message_nocircle.svg";
 import ico32_buddy_add from "~/images/won-icons/ico32_buddy_add.svg";
 import ico32_buddy_deny from "~/images/won-icons/ico32_buddy_deny.svg";
 import ico32_buddy_accept from "~/images/won-icons/ico32_buddy_accept.svg";
@@ -182,10 +182,7 @@ export default function WonBuddySocketActions({ connection, goBackOnAction }) {
       return (
         <won-socket-actions>
           {closeButtonElement("Reject", "Reject Buddy Request?")}
-          <button
-            className="won-button--filled secondary"
-            onClick={openRequest}
-          >
+          <button className="won-button--filled primary" onClick={openRequest}>
             <svg className="won-button-icon">
               <use xlinkHref={ico32_buddy_accept} href={ico32_buddy_accept} />
             </svg>
@@ -198,7 +195,7 @@ export default function WonBuddySocketActions({ connection, goBackOnAction }) {
       return (
         <won-socket-actions>
           {closeButtonElement("Cancel", "Cancel Buddy Request?")}
-          <button className="won-button--filled secondary" disabled={true}>
+          <button className="won-button--filled primary" disabled={true}>
             <svg className="won-button-icon">
               <use xlinkHref={ico32_buddy_waiting} href={ico32_buddy_waiting} />
             </svg>
@@ -213,11 +210,14 @@ export default function WonBuddySocketActions({ connection, goBackOnAction }) {
           {closeButtonElement("Remove", "Remove Buddy?")}
           {atomUtils.hasChatSocket(targetAtom) ? (
             <button
-              className="won-button--filled secondary"
+              className="won-button--filled primary"
               onClick={sendChatMessage}
             >
               <svg className="won-button-icon">
-                <use xlinkHref={ico36_message} href={ico36_message} />
+                <use
+                  xlinkHref={ico32_message_nocircle}
+                  href={ico32_message_nocircle}
+                />
               </svg>
               <span className="won-button-label">Message</span>
             </button>
@@ -230,10 +230,7 @@ export default function WonBuddySocketActions({ connection, goBackOnAction }) {
     case vocab.WON.Closed:
       return (
         <won-socket-actions>
-          <button
-            className="won-button--filled secondary"
-            onClick={requestBuddy}
-          >
+          <button className="won-button--filled primary" onClick={requestBuddy}>
             <svg className="won-button-icon">
               <use xlinkHref={ico32_buddy_add} href={ico32_buddy_add} />
             </svg>
@@ -246,10 +243,7 @@ export default function WonBuddySocketActions({ connection, goBackOnAction }) {
       return (
         <won-socket-actions>
           {closeButtonElement("Remove", "Remove Suggestion?")}
-          <button
-            className="won-button--filled secondary"
-            onClick={requestBuddy}
-          >
+          <button className="won-button--filled primary" onClick={requestBuddy}>
             <svg className="won-button-icon">
               <use xlinkHref={ico32_buddy_add} href={ico32_buddy_add} />
             </svg>
