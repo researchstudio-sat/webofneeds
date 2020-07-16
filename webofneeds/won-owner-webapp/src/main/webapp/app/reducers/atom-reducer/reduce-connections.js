@@ -116,8 +116,9 @@ export function markConnectionAsRated(state, connectionUri) {
  *            to find corresponding atom for
  */
 export function getAtomByConnectionUri(allAtomsInState, connectionUri) {
-  return allAtomsInState.find(atom =>
-    getIn(atom, ["connections", connectionUri])
+  return (
+    get(allAtomsInState, extractAtomUriFromConnectionUri(connectionUri)) ||
+    allAtomsInState.find(atom => getIn(atom, ["connections", connectionUri]))
   );
 }
 
