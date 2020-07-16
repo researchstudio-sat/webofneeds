@@ -310,6 +310,17 @@ function processMessageEffectsAndMessage(
     return Promise.resolve();
   }
 
+  //AgreementDataset
+  if (wonMessage.getAcceptsMessageUris()) {
+    dispatch({
+      type: actionTypes.connections.setLoadedAgreementDataset,
+      payload: {
+        connectionUri: connectionUri,
+        loadedAgreementDataset: false,
+      },
+    });
+  }
+
   dispatch({
     type: actionTypes.connections.setLoadingPetriNetData,
     payload: {

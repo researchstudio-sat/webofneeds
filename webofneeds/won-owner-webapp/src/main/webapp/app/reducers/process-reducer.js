@@ -6,7 +6,6 @@ import Immutable from "immutable";
 import { get, getIn, extractAtomUriBySocketUri } from "../utils.js";
 import { parseAtom } from "./atom-reducer/parse-atom.js";
 import * as processUtils from "../redux/utils/process-utils.js";
-import { parseMessage } from "./atom-reducer/parse-message.js";
 
 const initialState = Immutable.fromJS({
   processingInitialLoad: true,
@@ -351,17 +350,7 @@ export default function(processState = initialState, action = {}) {
         ]);
 
         if (connectionMessageProcess && connectionMessageProcess.size > 0) {
-          let resetAgreementDataSet = false;
           loadedMessages.map((message, messageUri) => {
-            const parsedMessage =
-              !resetAgreementDataSet && parseMessage(message);
-
-            if (getIn(parsedMessage, ["data", "references", "accepts"])) {
-              resetAgreementDataSet = true;
-              processState = updateConnectionProcess(processState, connUri, {
-                agreementDataset: { loaded: false },
-              });
-            }
             //Only set failedToLoad to false if the messageProcess existed (only happens if the message failed once)
             if (get(connectionMessageProcess, messageUri)) {
               processState = updateMessageProcess(
