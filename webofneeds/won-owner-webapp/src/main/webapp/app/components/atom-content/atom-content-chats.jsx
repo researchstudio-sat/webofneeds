@@ -139,7 +139,6 @@ export default function AtomContentChats({
         activeChatConnections.size > 0 || reactions ? (
           <div className="acc__segment">
             <div className="acc__segment__content borderTop">
-              {generateConnectionItems(activeChatConnections)}
               {atomUtils.isActive(atom) && reactions ? (
                 <WonSocketAddButton
                   senderReactions={reactions}
@@ -150,6 +149,7 @@ export default function AtomContentChats({
               ) : (
                 undefined
               )}
+              {generateConnectionItems(activeChatConnections)}
             </div>
           </div>
         ) : (

@@ -166,7 +166,6 @@ export default function WonAtomContentSocket({
               className={`acs__segment__content ${segmentContentClassName ||
                 ""}`}
             >
-              {generateConnectionItems(activeConnections)}
               {atomUtils.isActive(atom) &&
               reactions &&
               ((isAtomOwned || !vocab.refuseAddToNonOwned[socketType]) &&
@@ -183,6 +182,7 @@ export default function WonAtomContentSocket({
               ) : (
                 undefined
               )}
+              {generateConnectionItems(activeConnections)}
             </div>
           </div>
         ) : (
