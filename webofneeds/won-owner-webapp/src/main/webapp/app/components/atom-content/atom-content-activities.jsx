@@ -23,7 +23,7 @@ import WonSocketAddButton from "../socket-add-button.jsx";
 
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 
-import "~/style/_atom-content-chats.scss";
+import "~/style/_atom-content-activities.scss";
 
 export default function AtomContentActivities({
   atom,
