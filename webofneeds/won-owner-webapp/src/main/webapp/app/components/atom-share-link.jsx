@@ -87,7 +87,7 @@ export default function WonAtomShareLink({ atom, className }) {
           onBlur={() => clearSelection()}
         />
         <button
-          className="red won-button--filled asl__link__copyfield__copy-button"
+          className="secondary won-button--filled asl__link__copyfield__copy-button"
           onClick={() => copyLink()}
         >
           <svg className="asl__link__copyfield__copy-button__icon">
