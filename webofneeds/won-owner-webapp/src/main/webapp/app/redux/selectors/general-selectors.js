@@ -430,7 +430,7 @@ export const getSenderSocketType = (allAtoms, connection) => {
   const senderAtom =
     connectionUri &&
     allAtoms &&
-    (getIn(allAtoms, extractAtomUriFromConnectionUri(connectionUri)) ||
+    (get(allAtoms, extractAtomUriFromConnectionUri(connectionUri)) ||
       allAtoms.find(atom => getIn(atom, ["connections", connectionUri])));
 
   return senderAtom && atomUtils.getSocketType(senderAtom, senderSocketUri);
