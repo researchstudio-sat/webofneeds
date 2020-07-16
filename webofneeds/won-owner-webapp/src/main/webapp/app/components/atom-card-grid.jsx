@@ -74,9 +74,9 @@ export default function WonAtomCardGrid({
 
   return (
     <React.Fragment>
-      {atomCards}
       {createAtom}
       {createPersonaAtom}
+      {atomCards}
     </React.Fragment>
   );
 }
