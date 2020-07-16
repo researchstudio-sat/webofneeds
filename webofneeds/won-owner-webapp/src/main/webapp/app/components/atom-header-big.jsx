@@ -26,6 +26,7 @@ import VisibilitySensor from "react-visibility-sensor";
 export default function WonAtomHeaderBig({
   atomUri,
   atom,
+  ownedConnectionUri,
   ownedConnection,
   showActions,
   toggleActions,
@@ -59,27 +60,100 @@ export default function WonAtomHeaderBig({
     holderAtom
   );
 
-  if (isAtomFetchNecessary || isHolderFetchNecessary) {
+  const senderAtomUri = extractAtomUriFromConnectionUri(ownedConnectionUri);
+  const senderAtom = get(storedAtoms, senderAtomUri);
+  const isSenderAtomFetchNecessary =
+    senderAtomUri !== atomUri &&
+    senderAtomUri !== holderUri &&
+    processUtils.isAtomFetchNecessary(processState, senderAtomUri, senderAtom);
+
+  const senderHolderUri = atomUtils.getHeldByUri(senderAtom);
+  const connectionHolder = get(storedAtoms, senderHolderUri);
+  const isSenderHolderFetchNecessary =
+    senderHolderUri !== atomUri &&
+    senderHolderUri !== holderUri &&
+    processUtils.isAtomFetchNecessary(
+      processState,
+      senderHolderUri,
+      connectionHolder
+    );
+
+  const targetAtomUri = get(ownedConnection, "targetAtomUri");
+  const targetAtom = get(storedAtoms, targetAtomUri);
+  const isTargetAtomFetchNecessary =
+    targetAtomUri !== atomUri &&
+    targetAtomUri !== holderUri &&
+    processUtils.isAtomFetchNecessary(processState, targetAtomUri, targetAtom);
+
+  const targetHolderUri = atomUtils.getHeldByUri(targetAtom);
+  const targetHolder = get(storedAtoms, targetHolderUri);
+  const isTargetHolderFetchNecessary =
+    targetHolderUri !== atomUri &&
+    targetHolderUri !== holderUri &&
+    processUtils.isAtomFetchNecessary(
+      processState,
+      targetHolderUri,
+      targetHolder
+    );
+
+  if (
+    isAtomFetchNecessary ||
+    isHolderFetchNecessary ||
+    isSenderAtomFetchNecessary ||
+    isSenderHolderFetchNecessary ||
+    isTargetAtomFetchNecessary ||
+    isTargetHolderFetchNecessary
+  ) {
     const onChange = isVisible => {
       if (isVisible) {
         ensureAtomIsFetched();
         ensureHolderIsFetched();
+        ensureSenderAtomIsFetched();
+        ensureSenderHolderIsFetched();
+        ensureTargetAtomIsFetched();
+        ensureTargetHolderIsFetched();
       }
     };
 
     const ensureAtomIsFetched = () => {
-      if (processUtils.isAtomFetchNecessary(processState, atomUri, atom)) {
+      if (isAtomFetchNecessary) {
         console.debug("fetch atomUri, ", atomUri);
         dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
       }
     };
 
     const ensureHolderIsFetched = () => {
-      if (
-        processUtils.isAtomFetchNecessary(processState, holderUri, holderAtom)
-      ) {
+      if (isHolderFetchNecessary) {
         console.debug("fetch holderUri, ", holderUri);
         dispatch(actionCreators.atoms__fetchUnloadedAtom(holderUri));
+      }
+    };
+
+    const ensureSenderAtomIsFetched = () => {
+      if (isSenderAtomFetchNecessary) {
+        console.debug("fetch senderAtomUri, ", senderAtomUri);
+        dispatch(actionCreators.atoms__fetchUnloadedAtom(senderAtomUri));
+      }
+    };
+
+    const ensureSenderHolderIsFetched = () => {
+      if (isSenderHolderFetchNecessary) {
+        console.debug("fetch senderHolderUri, ", senderHolderUri);
+        dispatch(actionCreators.atoms__fetchUnloadedAtom(senderHolderUri));
+      }
+    };
+
+    const ensureTargetAtomIsFetched = () => {
+      if (isTargetAtomFetchNecessary) {
+        console.debug("fetch targetAtomUri, ", targetAtomUri);
+        dispatch(actionCreators.atoms__fetchUnloadedAtom(targetAtomUri));
+      }
+    };
+
+    const ensureTargetHolderIsFetched = () => {
+      if (isTargetHolderFetchNecessary) {
+        console.debug("fetch targetHolderUri, ", targetHolderUri);
+        dispatch(actionCreators.atoms__fetchUnloadedAtom(targetHolderUri));
       }
     };
 
@@ -124,15 +198,6 @@ export default function WonAtomHeaderBig({
       const isInactive = atomUtils.isInactive(atom);
       if (ownedConnection || isInactive) {
         const connectionState = get(ownedConnection, "state");
-        const targetAtom = get(
-          storedAtoms,
-          get(ownedConnection, "targetAtomUri")
-        );
-        const senderAtom = get(
-          storedAtoms,
-          extractAtomUriFromConnectionUri(get(ownedConnection, "uri"))
-        );
-
         const senderSocketType = atomUtils.getSocketType(
           senderAtom,
           get(ownedConnection, "socketUri")
@@ -252,6 +317,7 @@ export default function WonAtomHeaderBig({
 WonAtomHeaderBig.propTypes = {
   atomUri: PropTypes.string.isRequired,
   atom: PropTypes.object,
+  ownedConnectionUri: PropTypes.string,
   ownedConnection: PropTypes.object,
   showActions: PropTypes.bool.isRequired,
   toggleActions: PropTypes.func.isRequired,

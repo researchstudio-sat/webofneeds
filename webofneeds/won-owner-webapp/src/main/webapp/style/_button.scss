@@ -5,9 +5,9 @@
   background: $bg_color;
   outline-color: $color;
 
-  &:active,
-  &:hover {
-    filter: brightness(85%);
+  &:active:not(:disabled),
+  &:hover:not(:disabled) {
+    filter: brightness(125%);
   }
   &:disabled {
     /*Default disabled colors, can be changed or extracted will be used
@@ -15,6 +15,7 @@
     color: white;
     background: lightgrey;
     cursor: default;
+    filter: brightness(100%);
   }
 
   .won-button-icon {
@@ -32,8 +33,8 @@
     //outline: 0; // supress blue outline in chrome
   }
 
-  &:active,
-  &:hover {
+  &:active:not(:disabled),
+  &:hover:not(:disabled) {
     // background: rgba(255, 255, 255, 0.15);
     background: rgba(white, 0.5);
   }
@@ -103,8 +104,12 @@
   &.white {
     @include outline-button-color(white);
   }
+  &.primary,
   &.red {
     @include outline-button-color($won-primary-color);
+  }
+  &.secondary {
+    @include outline-button-color($won-secondary-color);
   }
   &.darkgray {
     @include outline-button-color($won-dark-gray);
@@ -137,8 +142,12 @@
   @include won-button--filled;
 
   /*Button color definitions*/
+  &.primary,
   &.red {
     @include flat-button-color(white, $won-primary-color);
+  }
+  &.secondary {
+    @include flat-button-color(white, $won-secondary-color);
   }
   &.darkgray {
     @include flat-button-color(white, $won-dark-gray);

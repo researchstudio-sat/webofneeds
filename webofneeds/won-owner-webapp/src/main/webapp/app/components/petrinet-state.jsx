@@ -161,7 +161,7 @@ export default function WonPetrinetState({ processUri, className }) {
               </div>
               {/*The button is labelled 'send' at the moment because we jsut send the transition but not claim it right away*/}
               <button
-                className="ps__active__enabledTransition__button won-button--filled thin red"
+                className="ps__active__enabledTransition__button won-button--filled thin secondary"
                 disabled={multiSelectType || petriNetDataDirty}
                 onClick={() => {
                   sendClaim(enabledTransition);

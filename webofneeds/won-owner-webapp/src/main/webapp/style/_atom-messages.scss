@@ -24,11 +24,11 @@ won-atom-messages {
       display: grid;
 
       &:hover {
-        filter: brightness(85%);
+        filter: brightness(125%);
       }
 
       &__button__icon {
-        --local-primary: #{$won-primary-color};
+        --local-primary: #{$won-secondary-color};
         @include fixed-square($backIconSize);
       }
     }
@@ -51,9 +51,18 @@ won-atom-messages {
     grid-area: footer;
     border-top: $thinGrayBorder;
     background: $won-light-gray;
+    padding: $defaultPadding;
 
     &__chattextfield {
-      padding: $defaultPadding;
+    }
+
+    > won-labelled-hr {
+      .wlh__label {
+        .wlh__label__text {
+          background: $won-light-gray;
+          white-space: nowrap;
+        }
+      }
     }
 
     &__button {

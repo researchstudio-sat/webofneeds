@@ -163,7 +163,7 @@ export default function PageOverview() {
               </div>
             )}
             <button
-              className="owneroverview__header__updated__reload won-button--filled red"
+              className="owneroverview__header__updated__reload won-button--filled secondary"
               onClick={reload}
               disabled={isOwnerAtomUrisLoading}
             >

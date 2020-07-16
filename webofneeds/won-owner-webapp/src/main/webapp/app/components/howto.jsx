@@ -195,7 +195,7 @@ export default function WonHowTo({ className }) {
       </h3>
       <div className="howto__createx">
         <button
-          className="won-button--filled red howto__createx__button"
+          className="won-button--filled secondary howto__createx__button"
           onClick={viewWhatsAround}
         >
           <svg className="won-button-icon">
@@ -207,7 +207,7 @@ export default function WonHowTo({ className }) {
           <span>{"What's in your Area?"}</span>
         </button>
         <button
-          className="won-button--filled red howto__createx__button"
+          className="won-button--filled secondary howto__createx__button"
           onClick={viewWhatsNew}
         >
           <span>{"What's new?"}</span>
@@ -220,7 +220,7 @@ export default function WonHowTo({ className }) {
           to={location =>
             generateLink(location, { useCase: "persona" }, "/create", "false")
           }
-          className="won-button--filled red howto__createx__spanbutton"
+          className="won-button--filled secondary howto__createx__spanbutton"
         >
           <span>Create your Persona!</span>
         </Link>
@@ -230,7 +230,7 @@ export default function WonHowTo({ className }) {
         />
         <Link
           to={location => generateLink(location, {}, "/create", "false")}
-          className="won-button--filled red howto__createx__spanbutton"
+          className="won-button--filled secondary howto__createx__spanbutton"
         >
           <span>Post something now!</span>
         </Link>

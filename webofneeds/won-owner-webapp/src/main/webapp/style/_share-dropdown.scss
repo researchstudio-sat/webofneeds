@@ -15,6 +15,9 @@ won-share-dropdown {
   }
 
   .sdd__icon__small__sharemenu {
+    &:hover {
+      filter: brightness(125%);
+    }
     --local-primary: black;
     @include fixed-square($postIconSizeMobile);
     //padding-left: 0.5rem;

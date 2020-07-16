@@ -175,7 +175,7 @@ export default function WonAtomContextDropdown({ atom, className }) {
     buttons.push(
       <button
         key="export"
-        className="won-button--outlined thin red"
+        className="won-button--outlined thin secondary"
         onClick={() => exportPdf()}
       >
         Export as PDF
@@ -185,7 +185,7 @@ export default function WonAtomContextDropdown({ atom, className }) {
       buttons.push(
         <button
           key="duplicate"
-          className="won-button--outlined thin red"
+          className="won-button--outlined thin secondary"
           onClick={() =>
             history.push(
               generateLink(
@@ -208,7 +208,7 @@ export default function WonAtomContextDropdown({ atom, className }) {
       buttons.push(
         <button
           key="edit"
-          className="won-button--outlined thin red"
+          className="won-button--outlined thin secondary"
           onClick={() =>
             history.push(
               generateLink(
@@ -231,7 +231,7 @@ export default function WonAtomContextDropdown({ atom, className }) {
       buttons.push(
         <a
           key="report"
-          className="won-button--outlined thin red"
+          className="won-button--outlined thin secondary"
           href={"mailto:" + adminEmail + "?" + generateReportAtomMailParams()}
         >
           Report
@@ -242,7 +242,7 @@ export default function WonAtomContextDropdown({ atom, className }) {
       buttons.push(
         <button
           key="reopen"
-          className="won-button--filled red"
+          className="won-button--filled secondary"
           onClick={() => reOpenAtom()}
         >
           Reopen
@@ -253,7 +253,7 @@ export default function WonAtomContextDropdown({ atom, className }) {
       buttons.push(
         <button
           key="delete"
-          className="won-button--filled red"
+          className="won-button--filled secondary"
           onClick={() => deleteAtom()}
         >
           Delete
@@ -264,7 +264,7 @@ export default function WonAtomContextDropdown({ atom, className }) {
       buttons.push(
         <button
           key="close"
-          className="won-button--filled red"
+          className="won-button--filled secondary"
           onClick={() => closeAtom()}
         >
           Remove

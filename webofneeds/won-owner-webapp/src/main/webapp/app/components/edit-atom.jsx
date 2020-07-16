@@ -121,7 +121,7 @@ export default function WonEditAtom({ fromAtom }) {
           {isFromAtomEditable ? (
             <div className="cp__footer__edit">
               <button
-                className="cp__footer__edit__save won-button--filled red"
+                className="cp__footer__edit__save won-button--filled secondary"
                 onClick={save}
                 disabled={
                   connectionHasBeenLost ||
@@ -131,7 +131,7 @@ export default function WonEditAtom({ fromAtom }) {
                 Save
               </button>
               <button
-                className="cp__footer__edit__cancel won-button--outlined thin red"
+                className="cp__footer__edit__cancel won-button--outlined thin secondary"
                 onClick={history.goBack}
               >
                 Cancel

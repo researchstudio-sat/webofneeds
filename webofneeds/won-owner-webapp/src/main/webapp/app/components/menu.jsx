@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
 
@@ -10,7 +11,7 @@ import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import Immutable from "immutable";
 import { NavLink, useHistory } from "react-router-dom";
 
-export default function WonMenu() {
+export default function WonMenu({ className }) {
   const dispatch = useDispatch();
   const history = useHistory();
   const hasSlideIns = useSelector(viewSelectors.hasSlideIns(history));
@@ -41,7 +42,7 @@ export default function WonMenu() {
 
   function generateRootClasses() {
     const classes = [];
-
+    className && classes.push(className);
     hasSlideIns && classes.push("won-has-slideins");
     isMenuVisible && classes.push("won-menu--show-mobile");
 
@@ -216,3 +217,6 @@ export default function WonMenu() {
     </won-menu>
   );
 }
+WonMenu.propTypes = {
+  className: PropTypes.string,
+};

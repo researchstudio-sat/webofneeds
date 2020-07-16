@@ -98,7 +98,7 @@ export default function WonAtomContent({
           </span>
           <div className="atom-failedtoload__actions">
             <button
-              className="atom-failedtoload__actions__button red won-button--outlined thin"
+              className="atom-failedtoload__actions__button secondary won-button--outlined thin"
               onClick={() => tryReload()}
             >
               Try Reload

@@ -68,7 +68,7 @@ export default function WonModalDialog() {
           {modalDialogButtons.map((button, index) => (
             <button
               key={get(button, "caption") + "-" + index}
-              className={"won-button--filled lighterblue"}
+              className={"won-button--filled secondary"}
               onClick={get(button, "callback")}
             >
               <span>{get(button, "caption")}</span>

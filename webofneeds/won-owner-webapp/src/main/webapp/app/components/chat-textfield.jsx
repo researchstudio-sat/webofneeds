@@ -399,14 +399,14 @@ export default function ChatTextfield({
               {showAgreementData ? (
                 <React.Fragment>
                   <button
-                    className="cts__details__grid__action won-button--filled red"
+                    className="cts__details__grid__action won-button--filled secondary"
                     onClick={() => activateMultiSelect("accepts")}
                     disabled={!hasAcceptableMessages}
                   >
                     Accept Proposal(s)
                   </button>
                   <button
-                    className="cts__details__grid__action won-button--filled red"
+                    className="cts__details__grid__action won-button--filled secondary"
                     onClick={() => activateMultiSelect("rejects")}
                     disabled={!hasRejectableMessages}
                   >
@@ -416,14 +416,14 @@ export default function ChatTextfield({
               ) : (
                 <React.Fragment>
                   <button
-                    className="cts__details__grid__action won-button--filled red"
+                    className="cts__details__grid__action won-button--filled secondary"
                     onClick={() => activateMultiSelect("proposes")}
                     disabled={!hasProposableMessages}
                   >
                     Make Proposal
                   </button>
                   <button
-                    className="cts__details__grid__action won-button--filled red"
+                    className="cts__details__grid__action won-button--filled secondary"
                     onClick={() => activateMultiSelect("claims")}
                     disabled={!hasClaimableMessages}
                   >
@@ -433,14 +433,14 @@ export default function ChatTextfield({
               )}
 
               <button
-                className="cts__details__grid__action won-button--filled red"
+                className="cts__details__grid__action won-button--filled secondary"
                 onClick={() => activateMultiSelect("proposesToCancel")}
                 disabled={!hasCancelableMessages}
               >
                 Cancel Agreement(s)
               </button>
               <button
-                className="cts__details__grid__action won-button--filled red"
+                className="cts__details__grid__action won-button--filled secondary"
                 onClick={() => activateMultiSelect("retracts")}
                 disabled={!hasRetractableMessages}
               >

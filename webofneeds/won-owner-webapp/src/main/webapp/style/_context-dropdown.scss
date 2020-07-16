@@ -12,6 +12,9 @@ won-connection-context-dropdown {
       --local-primary: #{$won-skeleton-color};
     }
     &.clickable {
+      :hover {
+        filter: brightness(125%);
+      }
       --local-primary: #{$won-secondary-color};
     }
   }

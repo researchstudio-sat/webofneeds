@@ -19,7 +19,7 @@ export default class WonDatetimePicker extends React.Component {
         class={this.props.className ? this.props.className : ""}
       >
         <button
-          className="datetimep__button won-button--filled red"
+          className="datetimep__button won-button--filled secondary"
           onClick={this.currentDatetime.bind(this)}
         >
           Now

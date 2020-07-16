@@ -27,7 +27,7 @@ mainButton skin attr { label, onPress } =
     case onPress of
         Just handler ->
             Input.button
-                ([ Background.color skin.primaryColor
+                ([ Background.color skin.secondaryColor
                  , Border.rounded 3
                  , paddingEach
                     { top = 10
@@ -45,7 +45,7 @@ mainButton skin attr { label, onPress } =
 
         Nothing ->
             Input.button
-                ([ Background.color (Skin.setAlpha 0.5 skin.primaryColor)
+                ([ Background.color (Skin.setAlpha 0.5 skin.secondaryColor)
                  , Border.rounded 3
                  , paddingEach
                     { top = 10
@@ -67,7 +67,7 @@ outlinedButton skin { label, onPress } =
     case onPress of
         Just handler ->
             Input.button
-                [ Border.color skin.primaryColor
+                [ Border.color skin.secondaryColor
                 , Border.rounded 3
                 , paddingEach
                     { top = 10
@@ -75,7 +75,7 @@ outlinedButton skin { label, onPress } =
                     , left = 15
                     , right = 15
                     }
-                , Font.color skin.primaryColor
+                , Font.color skin.secondaryColor
                 , Border.width 1
                 ]
                 { onPress = Just handler
@@ -84,7 +84,7 @@ outlinedButton skin { label, onPress } =
 
         Nothing ->
             Input.button
-                [ Border.color (Skin.setAlpha 0.5 skin.primaryColor)
+                [ Border.color (Skin.setAlpha 0.5 skin.secondaryColor)
                 , Border.rounded 3
                 , paddingEach
                     { top = 10
@@ -92,7 +92,7 @@ outlinedButton skin { label, onPress } =
                     , left = 15
                     , right = 15
                     }
-                , Font.color (Skin.setAlpha 0.5 skin.primaryColor)
+                , Font.color (Skin.setAlpha 0.5 skin.secondaryColor)
                 ]
                 { onPress = Nothing
                 , label = Element.map never label

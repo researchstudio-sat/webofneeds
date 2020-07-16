@@ -129,7 +129,7 @@ won-how-to {
     &__button {
       margin-top: 1rem;
       cursor: pointer;
-      --local-primary: #{$won-primary-color};
+      --local-primary: #{$won-secondary-color};
       @include fixed-square(2.5rem);
 
       &--invisible {

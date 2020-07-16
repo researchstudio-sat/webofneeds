@@ -219,7 +219,7 @@ view skin model =
                                         , label =
                                             Elements.svgIcon
                                                 []
-                                                { color = skin.primaryColor
+                                                { color = skin.secondaryColor
                                                 , name = "ico36_backarrow"
                                                 }
                                         }
@@ -257,7 +257,7 @@ navigation deviceClass skin route =
                             && deviceClass
                             == Desktop
                     then
-                        ( skin.primaryColor, Skin.white )
+                        ( skin.secondaryColor, Skin.white )
 
                     else
                         ( Skin.setAlpha 0 Skin.white, Skin.black )

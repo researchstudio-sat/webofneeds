@@ -40,7 +40,7 @@ export default function WonConnectionSelectionItem({
 
   const closeButton = targetAtomFailedToLoad ? (
     <button
-      className="csi__closebutton red won-button--outlined thin"
+      className="csi__closebutton secondary won-button--outlined thin"
       onClick={() => closeConnection()}
     >
       Close

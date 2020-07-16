@@ -200,7 +200,7 @@ export default function WonTopnav({ pageTitle }) {
           !mainMenuVisible && (
             <Link
               to="/signup"
-              className="topnav__signupbtn won-button--filled red hide-in-responsive"
+              className="topnav__signupbtn won-button--filled secondary hide-in-responsive"
             >
               Sign up
             </Link>

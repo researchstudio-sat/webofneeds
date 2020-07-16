@@ -565,7 +565,7 @@ export default function WonAtomMessages({
     unreadMessageCount && !snapBottom ? (
       <div className="am__content__unreadindicator">
         <div
-          className="am__content__unreadindicator__content won-button--filled red"
+          className="am__content__unreadindicator__content won-button--filled primary"
           onClick={goToUnreadMessages}
         >
           {unreadMessageCount} unread Messages
@@ -645,7 +645,7 @@ export default function WonAtomMessages({
           !isProcessingLoadingMessages &&
           hasConnectionMessagesToLoad && (
             <button
-              className="am__content__loadbutton won-button--outlined thin red"
+              className="am__content__loadbutton won-button--outlined thin secondary"
               onClick={() => loadPreviousMessages()}
             >
               Load previous messages

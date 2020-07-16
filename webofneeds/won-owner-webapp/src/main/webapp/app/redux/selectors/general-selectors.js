@@ -372,6 +372,7 @@ export function currentSkin() {
   };
   return {
     primaryColor: getColor("--won-primary-color"),
+    secondaryColor: getColor("--won-secondary-color"),
     lightGray: getColor("--won-light-gray"),
     lineGray: getColor("--won-line-gray"),
     subtitleGray: getColor("--won-subtitle-gray"),
