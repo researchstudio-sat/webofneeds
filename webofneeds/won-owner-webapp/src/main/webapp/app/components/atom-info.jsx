@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { get, generateLink } from "../utils.js";
+import { generateLink } from "../utils.js";
 import WonAtomHeaderBig from "./atom-header-big.jsx";
 import WonAtomMenu from "./atom-menu.jsx";
 import WonAtomActions from "./atom-actions.jsx";
@@ -17,12 +17,12 @@ import "~/style/_atom-info.scss";
 export default function WonAtomInfo({
   atomUri,
   atom,
+  ownedConnectionUri,
   ownedConnection,
   className,
   initialTab = "DETAIL",
 }) {
   const history = useHistory();
-  const connectionUri = get(ownedConnection, "uri");
   const processState = useSelector(generalSelectors.getProcessState);
   const storedAtoms = useSelector(generalSelectors.getAtoms);
   //TODO: IMPLEMENT VISIBILITY SENSOR TO FETCH ONLY WHEN IN VIEW
@@ -55,7 +55,7 @@ export default function WonAtomInfo({
               !connectionUtils.isConnected(ownedConnection)))
       );
     },
-    [atomUri, connectionUri, atomLoading]
+    [atomUri, ownedConnectionUri, atomLoading]
   );
 
   const relevantConnectionsMap = useSelector(
@@ -78,6 +78,7 @@ export default function WonAtomInfo({
       <WonAtomHeaderBig
         atomUri={atomUri}
         atom={atom}
+        ownedConnectionUri={ownedConnectionUri}
         ownedConnection={ownedConnection}
         showActions={showActions}
         toggleActions={toggleActions}
@@ -114,6 +115,7 @@ WonAtomInfo.propTypes = {
   atomUri: PropTypes.string.isRequired,
   atom: PropTypes.object,
   className: PropTypes.string,
+  ownedConnectionUri: PropTypes.string,
   ownedConnection: PropTypes.object,
   initialTab: PropTypes.string,
 };

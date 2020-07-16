@@ -45,6 +45,7 @@ export default function PagePost() {
         <WonAtomInfo
           atom={atom}
           atomUri={atomUri}
+          ownedConnectionUri={connectionUri}
           ownedConnection={ownedConnection}
           initialTab={tab}
         />
