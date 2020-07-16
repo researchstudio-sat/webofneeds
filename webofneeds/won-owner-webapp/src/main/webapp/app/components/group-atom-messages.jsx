@@ -320,7 +320,18 @@ export default function WonGroupAtomMessages({
           </svg>
         </a>
       </div>
-      <WonConnectionHeader connection={connection} />
+      <WonConnectionHeader
+        connection={connection}
+        toLink={generateLink(
+          history.location,
+          {
+            postUri: get(connection, "targetAtomUri"),
+            connectionUri: get(connection, "uri"),
+            tab: undefined,
+          },
+          "/post"
+        )}
+      />
       <WonShareDropdown atom={targetAtom} />
       <WonConnectionContextDropdown connection={connection} />
     </div>

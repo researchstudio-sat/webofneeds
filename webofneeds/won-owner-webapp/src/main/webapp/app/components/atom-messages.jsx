@@ -624,7 +624,18 @@ export default function WonAtomMessages({
     headerElement = (
       <div className="am__header">
         <div className="am__header__back">{backButtonElement}</div>
-        <WonConnectionHeader connection={connection} />
+        <WonConnectionHeader
+          connection={connection}
+          toLink={generateLink(
+            history.location,
+            {
+              postUri: get(connection, "targetAtomUri"),
+              connectionUri: get(connection, "uri"),
+              tab: undefined,
+            },
+            "/post"
+          )}
+        />
         <WonShareDropdown atom={targetAtom} />
         <WonConnectionContextDropdown
           connection={connection}
