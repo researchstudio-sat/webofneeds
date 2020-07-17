@@ -17,6 +17,7 @@ export default function WonPublishButton({
   ownedPersonas,
   presetHolderUri,
   onPublish,
+  extendedLabel,
 }) {
   const [selectedHolderUri, setSelectedHolderUri] = useState(presetHolderUri);
   const [showHolderPicker, toggleHolderPicker] = useState(false);
@@ -38,11 +39,9 @@ export default function WonPublishButton({
 
   const publishLabel = () => {
     if (holderPickerEnabled) {
+      const holderAtom = get(ownedPersonas, selectedHolderUri);
       const icon = selectedHolderUri ? (
-        <WonAtomIcon
-          className="submit-button__icon"
-          atom={get(ownedPersonas, selectedHolderUri)}
-        />
+        <WonAtomIcon className="submit-button__icon" atom={holderAtom} />
       ) : (
         <svg className="submit-button__icon anon">
           <use href={ico36_person_anon} xlinkHref={ico36_person_anon} />
@@ -53,6 +52,13 @@ export default function WonPublishButton({
         <React.Fragment>
           <span className="submit-button__label">{`${label} as`}</span>
           {icon}
+          {extendedLabel ? (
+            <span className="submit-button__label hide-in-responsive">
+              {holderAtom ? atomUtils.getTitle(holderAtom) : "Anonymous"}
+            </span>
+          ) : (
+            undefined
+          )}
         </React.Fragment>
       );
     }
@@ -99,13 +105,14 @@ export default function WonPublishButton({
   };
 
   return (
-    <won-publish-button class="won-publish-button">
+    <won-publish-button>
       <div
         className={
           "submit-button " +
           (!buttonEnabled
             ? " submit-button--disabled "
-            : " submit-button--enabled ")
+            : " submit-button--enabled ") +
+          (holderPickerEnabled ? " submit-button--holderpicker " : "")
         }
         onClick={() =>
           buttonEnabled && onPublish({ personaId: selectedHolderUri })
@@ -141,4 +148,5 @@ WonPublishButton.propTypes = {
   ownedPersonas: PropTypes.object,
   presetHolderUri: PropTypes.string,
   label: PropTypes.string,
+  extendedLabel: PropTypes.bool,
 };

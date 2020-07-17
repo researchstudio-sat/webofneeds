@@ -2,13 +2,11 @@
 @import "sizing-utils";
 @import "square-image";
 
-won-publish-button,
-.won-publish-button {
+won-publish-button {
   position: relative;
   --buttonBackground: #{$won-secondary-color};
   --buttonTextColor: #{$won-secondary-text-color};
 
-  border-radius: 0.19rem;
   text-overflow: ellipsis;
   display: grid;
   grid-template-areas: "wpb_submit wpb_holder";
@@ -20,6 +18,12 @@ won-publish-button,
     text-align: center;
     align-items: center;
     justify-content: center;
+    border-radius: 0.19rem;
+
+    &--holderpicker {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
 
     color: var(--buttonTextColor);
 
@@ -104,6 +108,8 @@ won-publish-button,
     cursor: pointer;
     padding: 0.66rem;
     background: var(--buttonBackground);
+    border-top-right-radius: 0.19rem;
+    border-bottom-right-radius: 0.19rem;
     border-left: $boldBorderWidth solid var(--buttonTextColor);
     --local-primary: var(--buttonTextColor);
 

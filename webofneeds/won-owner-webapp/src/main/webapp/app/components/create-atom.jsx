@@ -285,6 +285,7 @@ export default function WonCreateAtom({
               targetSocketType !== vocab.HOLD.HolderSocketCompacted
             }
             ownedPersonas={ownedPersonas}
+            extendedLabel={true}
             presetHolderUri={
               isHolderAtomValid &&
               senderSocketType !== vocab.HOLD.HoldableSocketCompacted &&

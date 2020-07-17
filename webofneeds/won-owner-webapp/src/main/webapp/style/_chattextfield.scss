@@ -199,11 +199,13 @@ chat-textfield {
     > div {
       height: 100%;
     }
-    .won-publish-button {
+    > won-publish-button {
       width: auto;
       height: 100%;
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
+      .submit-button {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
     }
   }
   .cts__additionalcontent {
