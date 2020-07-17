@@ -64,14 +64,14 @@ public class ToOwnerSender extends AbstractCamelProcessor {
         logger.debug("number of registered owner applications: {}",
                         ownerApps == null ? 0 : ownerApps.size());
         List<String> queueNames = ownerApps.stream()
-                        .map(app -> getQueueName(app))
+                        .flatMap(app -> app.getQueueNames().stream())
                         .filter(queue -> ownerManagementService.existsCamelEndpointForOwnerApplicationQueue(queue))
                         .collect(Collectors.toList());
         if (queueNames.isEmpty()) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Cannot send message to ownerApplication with Id(s){}: no queues registered",
-                                ownerApps.stream().map(OwnerApplication::getOwnerApplicationId)
-                                                .reduce("", String::concat));
+                                Arrays.toString(ownerApps.stream().map(OwnerApplication::getOwnerApplicationId)
+                                                .collect(Collectors.toList()).toArray()));
             }
         } else {
             if (logger.isDebugEnabled()) {
@@ -84,11 +84,6 @@ public class ToOwnerSender extends AbstractCamelProcessor {
             messagingService.send(exchangeToOwners, "direct:sendToOwnerApplications");
         }
         removeMessageToSend(exchange);
-    }
-
-    private String getQueueName(OwnerApplication ownerapp) {
-        logger.debug("ownerApplicationID: {}", ownerapp.getOwnerApplicationId());
-        return ownerManagementService.getEndpointForMessage("wonMessage", ownerapp.getOwnerApplicationId());
     }
 
     /**
@@ -112,7 +107,8 @@ public class ToOwnerSender extends AbstractCamelProcessor {
             if (logger.isDebugEnabled()) {
                 logger.debug("Atom to send the message {} to: {}", msg.getMessageURI(), atom.get().getAtomURI());
                 logger.debug("Found these ownerapplicationids for message {} : {}", msg.getMessageURI(),
-                                ownerApplications);
+                                Arrays.toString(ownerApplications.stream().map(OwnerApplication::getOwnerApplicationId)
+                                                .collect(Collectors.toList()).toArray()));
             }
         }
         // if no owner application ids are authorized, we use the fallback specified (if

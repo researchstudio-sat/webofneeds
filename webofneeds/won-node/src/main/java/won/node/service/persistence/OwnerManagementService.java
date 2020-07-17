@@ -50,7 +50,6 @@ public class OwnerManagementService implements ApplicationManagementService {
 
     private synchronized void addCamelEndpointsForOwnerApplication(OwnerApplication ownerApplication) {
         List<String> componentNames = camelContext.getComponentNames();
-        logger.debug("camel components: " + Arrays.toString(componentNames.toArray()));
         Component activemqComponent = (Component) camelContext.getComponent("activemq");
         for (String queueName : ownerApplication.getQueueNames()) {
             Endpoint existingQueueEndpoint = camelContext.hasEndpoint(queueName);
@@ -74,20 +73,6 @@ public class OwnerManagementService implements ApplicationManagementService {
     }
 
     public boolean existsCamelEndpointForOwnerApplicationQueue(String queueName) {
-        return (camelContext.getEndpoint(queueName) != null);
-    }
-
-    public String getEndpointForMessage(String methodName, String ownerApplicationID) {
-        OwnerApplication ownerApplication = ownerApplicationRepository.findOneByOwnerApplicationId(ownerApplicationID)
-                        .get();
-        List<String> queueNames = ownerApplication.getQueueNames();
-        String endpoint = "";
-        for (int i = 0; i < queueNames.size(); i++) {
-            endpoint = queueNames.get(i);
-            if (queueNames.get(i).contains(methodName)) {
-                break;
-            }
-        }
-        return endpoint;
+        return (camelContext.hasEndpoint(queueName) != null);
     }
 }
