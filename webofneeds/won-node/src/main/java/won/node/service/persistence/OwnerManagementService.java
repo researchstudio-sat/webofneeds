@@ -73,6 +73,6 @@ public class OwnerManagementService implements ApplicationManagementService {
     }
 
     public boolean existsCamelEndpointForOwnerApplicationQueue(String queueName) {
-        return (camelContext.getEndpoint(queueName) != null);
+        return (camelContext.hasEndpoint(queueName) != null);
     }
 }
