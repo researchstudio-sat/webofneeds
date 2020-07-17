@@ -2,13 +2,16 @@ package won.node.service.persistence;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
+import org.apache.camel.CamelContext;
+import org.apache.camel.Component;
+import org.apache.camel.Endpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import won.protocol.model.OwnerApplication;
 import won.protocol.repository.OwnerApplicationRepository;
 import won.protocol.service.ApplicationManagementService;
@@ -16,36 +19,62 @@ import won.protocol.service.ApplicationManagementService;
 /**
  * User: sbyim Date: 11.11.13
  */
-@Component
+@org.springframework.stereotype.Component
 public class OwnerManagementService implements ApplicationManagementService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     private OwnerApplicationRepository ownerApplicationRepository;
+    @Autowired
+    private CamelContext camelContext;
 
     @Override
     public String registerOwnerApplication(String ownerApplicationId) {
         logger.debug("ownerApplicationId: " + ownerApplicationId.toString());
-        if (!ownerApplicationRepository.findOneByOwnerApplicationId(ownerApplicationId).isPresent()) {
+        Optional<OwnerApplication> ownerApplication = ownerApplicationRepository
+                        .findOneByOwnerApplicationId(ownerApplicationId);
+        if (!ownerApplication.isPresent()) {
             logger.info("Registering owner application for the first time with id: {}", ownerApplicationId);
-            OwnerApplication ownerApplication = new OwnerApplication();
-            ownerApplication.setOwnerApplicationId(ownerApplicationId.toString());
-            ownerApplication = ownerApplicationRepository.save(ownerApplication);
-            List<String> queueNames = generateQueueNamesForOwnerApplication(ownerApplication);
-            ownerApplication.setQueueNames(queueNames);
-            ownerApplication = ownerApplicationRepository.save(ownerApplication);
-            return ownerApplicationId;
+            OwnerApplication newOwnerApplication = new OwnerApplication();
+            newOwnerApplication.setOwnerApplicationId(ownerApplicationId.toString());
+            newOwnerApplication = ownerApplicationRepository.save(newOwnerApplication);
+            List<String> queueNames = generateQueueNamesForOwnerApplication(newOwnerApplication);
+            newOwnerApplication.setQueueNames(queueNames);
+            newOwnerApplication = ownerApplicationRepository.save(newOwnerApplication);
+            ownerApplication = Optional.of(newOwnerApplication);
         } else {
             logger.info("Registering already known owner application with id: {}", ownerApplicationId);
-            return ownerApplicationId;
+        }
+        addCamelEndpointsForOwnerApplication(ownerApplication.get());
+        return ownerApplicationId;
+    }
+
+    private synchronized void addCamelEndpointsForOwnerApplication(OwnerApplication ownerApplication) {
+        List<String> componentNames = camelContext.getComponentNames();
+        logger.debug("camel components: " + Arrays.toString(componentNames.toArray()));
+        Component activemqComponent = (Component) camelContext.getComponent("activemq");
+        for (String queueName : ownerApplication.getQueueNames()) {
+            Endpoint existingQueueEndpoint = camelContext.hasEndpoint(queueName);
+            if (existingQueueEndpoint != null) {
+                logger.debug("endpoint '{}' already present in camel context", queueName);
+            } else {
+                try {
+                    Endpoint newQueueEndpoint = activemqComponent.createEndpoint(queueName);
+                    camelContext.addEndpoint(queueName, newQueueEndpoint);
+                } catch (Exception e) {
+                    logger.warn("Could not register camel endpoint for activeMQ queue {}", queueName, e);
+                }
+            }
         }
     }
 
     public List<String> generateQueueNamesForOwnerApplication(OwnerApplication ownerApplication) {
-        logger.debug(ownerApplication.getOwnerApplicationId());
         List<String> queueNames = new ArrayList<>();
         queueNames.add("activemq" + ":queue:OwnerProtocol.Out." + ownerApplication.getOwnerApplicationId());
-        ownerApplication.setQueueNames(queueNames);
-        return ownerApplication.getQueueNames();
+        return queueNames;
+    }
+
+    public boolean existsCamelEndpointForOwnerApplicationQueue(String queueName) {
+        return (camelContext.getEndpoint(queueName) != null);
     }
 
     public String getEndpointForMessage(String methodName, String ownerApplicationID) {
