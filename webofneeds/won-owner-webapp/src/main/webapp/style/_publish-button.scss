@@ -1,103 +1,130 @@
 @import "won-config";
 @import "sizing-utils";
+@import "square-image";
 
+won-publish-button,
 .won-publish-button {
-  width: 100%;
-  height: 100%;
+  position: relative;
+  --buttonBackground: #{$won-secondary-color};
+  --buttonTextColor: #{$won-secondary-text-color};
 
-  &.won-button-row {
+  border-radius: 0.19rem;
+  text-overflow: ellipsis;
+  display: grid;
+  grid-template-areas: "wpb_submit wpb_holder";
+  grid-template-columns: 1fr min-content;
+
+  .submit-button {
+    grid-area: wpb_submit;
     display: flex;
-    position: relative;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
 
-    align-items: stretch;
+    color: var(--buttonTextColor);
 
-    button.left {
-      border-bottom-right-radius: 0;
-      border-top-right-radius: 0;
-    }
-
-    button.right {
-      border-bottom-left-radius: 0;
-      border-top-left-radius: 0;
-    }
-
-    .submit-button {
-      flex-grow: 1;
-      white-space: normal;
-    }
-
-    .won-dropdown-button {
-      margin-left: 0.1em;
-      padding-left: 1ch;
-      padding-right: 1ch;
-      flex-shrink: 1;
-      won-svg-icon {
-        @include fixed-square($iconSize * 0.8);
-
-        & > svg {
-          @include fixed-square($iconSize * 0.8);
-        }
+    @include square-image(1.75rem);
+    .submit-button__icon {
+      &.anon {
+        --local-primary: var(--buttonTextColor);
       }
+      padding: 0.25rem;
+      @include fixed-square(1.75rem);
     }
-  }
+    .submit-button__label {
+      padding: 0.66rem 0.25rem;
+      white-space: nowrap;
+    }
 
-  &.down .won-persona-list {
-    top: calc(100% + 0.25em);
-  }
+    &:not(:disabled):hover {
+      filter: brightness(125%);
+    }
 
-  &.up .won-persona-list {
-    bottom: calc(100% + 0.25em);
-  }
-
-  .won-persona-list {
-    $line-size: $postIconSize * 0.7;
-    z-index: 2;
-    max-height: 25em;
-    overflow: auto;
-
-    font-size: 0.8rem;
-    box-sizing: border-box;
-    position: absolute;
-    min-width: 100%;
-    right: 0;
-    left: 0;
-    display: grid;
-    background: white;
-    border: $won-line-gray 1px solid;
-    border-radius: 0.19rem;
-
-    .won-persona-list-entry {
-      display: grid;
-      height: $line-size;
-      padding: 0.5rem;
-      grid-template-columns: min-content 1fr;
-      grid-column-gap: 1ch;
-      user-select: none;
+    &--enabled {
+      background: var(--buttonBackground);
       cursor: pointer;
+    }
+    &--disabled {
+      background: $won-disabled-color;
+      cursor: default;
+      pointer-events: none;
+    }
+  }
 
-      .won-persona-name {
-        align-self: center;
-        font-size: 1.2em;
+  .holder-picker {
+    height: 0;
+    position: absolute;
+    top: -10rem;
+    width: 100%;
+
+    &__content {
+      background: white;
+      border: 0.0625rem solid var(--won-line-gray);
+      border-bottom: 0;
+
+      display: grid;
+      grid-gap: 0.5rem;
+      padding: 0.5rem;
+
+      max-height: 10rem;
+      overflow-y: auto;
+      box-sizing: border-box;
+
+      > *:hover {
+        background: $won-lighter-gray;
       }
 
-      &:hover {
-        background-color: $won-light-gray;
-      }
+      &__anon {
+        display: grid;
+        grid-template-areas: "anon_icon anon_label";
+        grid-template-columns: min-content 1fr;
+        grid-column-gap: 0.5rem;
+        cursor: pointer;
 
-      .won-persona-icon {
-        border-radius: 100%;
-        overflow: hidden;
-        @include fixed-square($line-size);
-        display: block;
-      }
+        --local-primary: #{$won-secondary-color};
 
-      &.empty {
-        grid-template-columns: 1fr max-content 1fr;
-        .won-persona-name {
-          grid-column: 2;
-          font-style: italic;
-          color: $won-line-gray;
+        &__label {
+          color: $won-secondary-color;
+          grid-area: anon_label;
         }
+
+        &__icon {
+          grid-area: anon_icon;
+          @include fixed-square($postIconSize);
+        }
+      }
+    }
+  }
+
+  .holder-indicator {
+    grid-area: wpb_holder;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0.66rem;
+    background: var(--buttonBackground);
+    border-left: $boldBorderWidth solid var(--buttonTextColor);
+    --local-primary: var(--buttonTextColor);
+
+    &:not(:disabled):hover {
+      filter: brightness(125%);
+    }
+
+    &__carret {
+      @include fixed-square(1.25rem);
+    }
+
+    &--expanded {
+      .holder-indicator__carret {
+        transition: all linear 0.2s;
+      }
+    }
+
+    &--collapsed {
+      .holder-indicator__carret {
+        transform: rotate(-180deg);
+        transition: all linear 0.2s;
       }
     }
   }

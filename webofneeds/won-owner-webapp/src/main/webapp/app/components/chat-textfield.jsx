@@ -3,12 +3,10 @@ import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
 import { get, getIn } from "../utils.js";
 
-import ElmReact from "./elm-react.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
+import WonPublishButton from "./publish-button.jsx";
 import TextareaAutosize from "react-autosize-textarea";
 import { actionCreators } from "../actions/actions.js";
-
-import { Elm } from "../../elm/PublishButton.elm";
 
 import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
@@ -106,10 +104,6 @@ export default function ChatTextfield({
   );
   const showAddMessageContent = useSelector(state =>
     getIn(state, ["view", "showAddMessageContent"])
-  );
-
-  const personas = useSelector(state =>
-    generalSelectors.getOwnedCondensedPersonaList(state).toJS()
   );
 
   const processState = useSelector(generalSelectors.getProcessState);
@@ -748,15 +742,12 @@ export default function ChatTextfield({
         value={state.message}
       />
       <div className="cts__submitbutton">
-        <ElmReact
-          src={Elm.PublishButton}
-          flags={{
-            buttonEnabled: valid(),
-            showPersonas: !!showPersonas,
-            personas: personas,
-            label: submitButtonLabel,
-          }}
-          onPublish={submit.bind(this)}
+        <WonPublishButton
+          showPersonas={!!showPersonas}
+          ownedPersonas={ownedPersonas}
+          onPublish={submit}
+          buttonEnabled={valid()}
+          label={submitButtonLabel}
         />
       </div>
 

@@ -335,34 +335,6 @@ export const getOwnedAtomsWithBuddySocket = createSelector(
 );
 
 /**
- * Returns all owned Personas as a List, condenses the information of the persona so that only some attributes are included.
- * This Function is currently used for persona lists/views based on elm (as they are not based on our general atom-structure)
- * @param state
- * @returns {Iterable<K, {website: *, saved: boolean, displayName: *, url: *, aboutMe: *, timestamp: string | * | number | void}>}
- */
-export const getOwnedCondensedPersonaList = createSelector(
-  getOwnedPersonas,
-  getExternalDataState,
-  (ownedPersonas, externalDataState) => {
-    return (
-      ownedPersonas &&
-      ownedPersonas
-        .filter(persona => atomUtils.isActive(persona))
-        .map(persona => ({
-          displayName: atomUtils.getTitle(persona, externalDataState),
-          website: getIn(persona, ["content", "website"]),
-          aboutMe: getIn(persona, ["content", "description"]),
-          url: get(persona, "uri"),
-          saved: !get(persona, "isBeingCreated"),
-          timestamp: get(persona, "creationDate").toISOString(),
-        }))
-        .filter(persona => !!persona.displayName)
-        .toList()
-    );
-  }
-);
-
-/**
  * Returns true if the atom is owned by the user who is currently logged in
  * @param atomUri
  * @return function(state)

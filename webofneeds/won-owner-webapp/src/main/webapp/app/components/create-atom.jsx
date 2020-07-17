@@ -18,12 +18,11 @@ import "~/style/_responsiveness-utils.scss";
 import Immutable from "immutable";
 import WonCreateIsSeeks from "./create-isseeks.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
-import ElmReact from "./elm-react.jsx";
-import { Elm } from "../../elm/PublishButton.elm";
 import { actionCreators } from "../actions/actions";
 import { useHistory } from "react-router-dom";
 import vocab from "../service/vocab";
 import { getIn } from "../utils";
+import WonPublishButton from "~/app/components/publish-button";
 
 export default function WonCreateAtom({
   fromAtom,
@@ -136,10 +135,6 @@ export default function WonCreateAtom({
     },
     [ownedPersonas]
   );
-
-  const personas = useSelector(
-    generalSelectors.getOwnedCondensedPersonaList
-  ).toJS();
 
   function updateDraftSeeks(updatedDraftJson) {
     updateDraft(updatedDraftJson.draft, "seeks");
@@ -277,27 +272,26 @@ export default function WonCreateAtom({
         </div>
         <div className="cp__footer">
           <WonLabelledHr label="done?" className="cp__footer__labelledhr" />
-
-          <ElmReact
-            src={Elm.PublishButton}
-            flags={{
-              buttonEnabled:
-                !connectionHasBeenLost &&
-                useCaseUtils.isValidDraft(draftObject, useCase),
-              showPersonas:
-                useCaseUtils.isHoldable(useCase) &&
-                loggedIn &&
-                senderSocketType !== vocab.HOLD.HoldableSocketCompacted &&
-                targetSocketType !== vocab.HOLD.HolderSocketCompacted,
-              personas: personas,
-              presetHolderUri:
-                isHolderAtomValid &&
-                senderSocketType !== vocab.HOLD.HoldableSocketCompacted &&
-                targetSocketType !== vocab.HOLD.HolderSocketCompacted
-                  ? holderUri
-                  : undefined,
-            }}
+          <WonPublishButton
             onPublish={publish}
+            buttonEnabled={
+              !connectionHasBeenLost &&
+              useCaseUtils.isValidDraft(draftObject, useCase)
+            }
+            showPersonas={
+              useCaseUtils.isHoldable(useCase) &&
+              loggedIn &&
+              senderSocketType !== vocab.HOLD.HoldableSocketCompacted &&
+              targetSocketType !== vocab.HOLD.HolderSocketCompacted
+            }
+            ownedPersonas={ownedPersonas}
+            presetHolderUri={
+              isHolderAtomValid &&
+              senderSocketType !== vocab.HOLD.HoldableSocketCompacted &&
+              targetSocketType !== vocab.HOLD.HolderSocketCompacted
+                ? holderUri
+                : undefined
+            }
           />
 
           {duplicate &&

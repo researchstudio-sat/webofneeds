@@ -201,14 +201,9 @@ chat-textfield {
     }
     .won-publish-button {
       width: auto;
+      height: 100%;
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
-      .submit-button {
-        flex-shrink: 1;
-        line-height: 1em;
-        border-radius: 0;
-        padding: 0 0.5em;
-      }
     }
   }
   .cts__additionalcontent {
