@@ -127,6 +127,7 @@ body {
       }
     }
 
+    > aside.settings__left,
     > aside.overview__left {
       grid-area: list;
       z-index: 2;
@@ -155,6 +156,7 @@ body {
     }
 
     > main.overview__justconnection,
+    > main.settings__right,
     > main.overview__right {
       grid-area: content;
 
@@ -171,6 +173,7 @@ body {
         background: white;
       }
 
+      > won-settings-content,
       > won-group-atom-messages,
       > won-atom-messages {
         height: calc(100vh - var(--headerHeight) - var(--menuHeight));
@@ -192,13 +195,6 @@ body {
       grid-area: list;
       @media (min-width: $responsivenessBreakPoint) {
         grid-column: 1 / -1;
-      }
-    }
-
-    > main.settings {
-      grid-area: list;
-      @media (min-width: $responsivenessBreakPoint) {
-        grid-column: 2 / 4;
       }
     }
 

@@ -21,10 +21,17 @@ main.signup {
       grid-row-gap: 0.5rem;
 
       &__errormsg {
-        font-size: $smallFontSize;
-        margin-top: 1rem;
-        margin-bottom: 1rem;
-        color: $won-primary-color;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: max-content;
+        align-items: center;
+        grid-gap: 0.25rem;
+        margin-bottom: 0.5rem;
+
+        &__label {
+          font-size: $smallFontSize;
+          color: $won-primary-color;
+        }
 
         &__icon {
           @include fixed-square(1em);

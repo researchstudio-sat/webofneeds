@@ -10,7 +10,6 @@ import * as connectionUtils from "../utils/connection-utils.js";
 import * as accountUtils from "../utils/account-utils.js";
 import * as processUtils from "../utils/process-utils.js";
 import * as viewUtils from "../utils/view-utils.js";
-import Color from "color";
 import Immutable from "immutable";
 import vocab from "../../service/vocab";
 
@@ -363,21 +362,6 @@ export const getOwnedCondensedPersonaList = createSelector(
   }
 );
 
-//TODO: move this method to a place that makes more sense, its not really a selector function
-export function currentSkin() {
-  const style = getComputedStyle(document.body);
-  const getColor = name => {
-    const color = Color(style.getPropertyValue(name).trim());
-    return color.rgb().object();
-  };
-  return {
-    primaryColor: getColor("--won-primary-color"),
-    secondaryColor: getColor("--won-secondary-color"),
-    lightGray: getColor("--won-light-gray"),
-    lineGray: getColor("--won-line-gray"),
-    subtitleGray: getColor("--won-subtitle-gray"),
-  };
-}
 /**
  * Returns true if the atom is owned by the user who is currently logged in
  * @param atomUri
