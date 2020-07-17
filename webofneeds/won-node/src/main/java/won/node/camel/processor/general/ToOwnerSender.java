@@ -63,15 +63,26 @@ public class ToOwnerSender extends AbstractCamelProcessor {
         // String methodName =headers.get("methodName").toString();
         logger.debug("number of registered owner applications: {}",
                         ownerApps == null ? 0 : ownerApps.size());
-        List<String> queueNames = ownerApps.stream().map(app -> getQueueName(app)).collect(Collectors.toList());
-        if (logger.isDebugEnabled()) {
-            logger.debug("sending message to owner(s) {}: {}", Arrays.toString(queueNames.toArray()),
-                            msg.toStringForDebug(true));
+        List<String> queueNames = ownerApps.stream()
+                        .map(app -> getQueueName(app))
+                        .filter(queue -> ownerManagementService.existsCamelEndpointForOwnerApplicationQueue(queue))
+                        .collect(Collectors.toList());
+        if (queueNames.isEmpty()) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Cannot send message to ownerApplication with Id(s){}: no queues registered",
+                                ownerApps.stream().map(OwnerApplication::getOwnerApplicationId)
+                                                .reduce("", String::concat));
+            }
+        } else {
+            if (logger.isDebugEnabled()) {
+                logger.debug("sending message to owner(s) {}: {}", Arrays.toString(queueNames.toArray()),
+                                msg.toStringForDebug(true));
+            }
+            Exchange exchangeToOwners = new DefaultExchange(camelContext);
+            putMessageIntoBody(exchangeToOwners, msg);
+            exchangeToOwners.getIn().setHeader(WonCamelConstants.OWNER_APPLICATION_IDS_HEADER, queueNames);
+            messagingService.send(exchangeToOwners, "direct:sendToOwnerApplications");
         }
-        Exchange exchangeToOwners = new DefaultExchange(camelContext);
-        putMessageIntoBody(exchangeToOwners, msg);
-        exchangeToOwners.getIn().setHeader(WonCamelConstants.OWNER_APPLICATION_IDS_HEADER, queueNames);
-        messagingService.send(exchangeToOwners, "direct:sendToOwnerApplications");
         removeMessageToSend(exchange);
     }
 
