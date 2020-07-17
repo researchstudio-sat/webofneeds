@@ -1,0 +1,102 @@
+@import "won-config";
+@import "sizing-utils";
+@import "fonts";
+@import "flex-layout";
+
+aside.settings__left {
+  border-right: $thinGrayBorder;
+  @media (max-width: $responsivenessBreakPoint) {
+    grid-column: 1 / -1;
+  }
+
+  > .settings__left__item {
+    padding: 1rem;
+    font-size: $normalFontSize;
+    color: $won-secondary-color;
+    cursor: pointer;
+
+    &--selected {
+      cursor: default;
+      pointer-events: none;
+      background: $won-secondary-color;
+      color: $won-secondary-text-color;
+    }
+
+    &__label {
+    }
+  }
+}
+
+main.settings__right {
+  > won-settings-content {
+    display: grid;
+    grid-template-areas:
+      "wsc_header"
+      "wsc_content";
+    grid-template-rows: min-content 1fr;
+
+    > .wsc__header {
+      grid-area: wsc_header;
+      font-size: $mediumFontSize;
+      border-bottom: $thinGrayBorder;
+      padding: 0.5rem;
+    }
+
+    > .wsc__content {
+      grid-area: wsc_content;
+      display: grid;
+      grid-gap: 0.5rem;
+      grid-auto-rows: min-content;
+      padding: 0.5rem;
+
+      > .wsc__content__infomsg {
+        &--primary {
+          padding: 1rem;
+          color: $won-secondary-text-color;
+          background: $won-primary-color;
+        }
+        &--secondary {
+          padding: 1rem;
+          color: $won-secondary-text-color;
+          background: $won-secondary-color;
+        }
+      }
+
+      > .wsc__content__exportform {
+        display: grid;
+        grid-gap: 0.5rem;
+
+        @media (min-width: $responsivenessBreakPoint) {
+          grid-template-columns: 1fr min-content;
+        }
+        @media (max-width: $responsivenessBreakPoint) {
+          grid-template-rows: min-content min-content;
+        }
+      }
+
+      > .wsc__content__passwordform {
+        display: grid;
+        grid-gap: 0.5rem;
+
+        .wsc__content__passwordform__errormsg {
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: max-content;
+          align-items: center;
+          grid-gap: 0.25rem;
+          margin-bottom: 0.5rem;
+
+          &__label {
+            font-size: $smallFontSize;
+            color: $won-primary-color;
+          }
+
+          &__icon {
+            @include fixed-square(1em);
+            --local-primary: #{$won-primary-color};
+          }
+        }
+      }
+    }
+  }
+}

@@ -86,6 +86,7 @@ export default function WonGenericItem({
         >
           <WonAtomHeader
             atom={flip ? atom : targetAtom}
+            hideTimestamp={true}
             toLink={generateLink(
               history.location,
               {

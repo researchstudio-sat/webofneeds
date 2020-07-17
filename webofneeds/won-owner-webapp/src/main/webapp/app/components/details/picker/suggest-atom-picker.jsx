@@ -190,7 +190,7 @@ class WonSuggestAtomPicker extends React.Component {
               (this.isSelected(atom) ? "won--selected" : "")
             }
           >
-            <WonAtomHeader atom={atom} />
+            <WonAtomHeader atom={atom} hideTimestamp={true} />
           </div>
         );
       });

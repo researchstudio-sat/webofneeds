@@ -124,7 +124,7 @@ export default function WonAtomActions({
                 {isViewOfTargetAtom ? (
                   <WonAtomIcon atom={targetAtom} />
                 ) : (
-                  <WonAtomHeader atom={targetAtom} />
+                  <WonAtomHeader atom={targetAtom} hideTimestamp={true} />
                 )}
               </div>
               <div className="atom-actions__info__label">
@@ -136,7 +136,7 @@ export default function WonAtomActions({
               </div>
               <div className="atom-actions__info__sender">
                 {isViewOfTargetAtom ? (
-                  <WonAtomHeader atom={senderAtom} />
+                  <WonAtomHeader atom={senderAtom} hideTimestamp={true} />
                 ) : (
                   <WonAtomIcon atom={senderAtom} />
                 )}

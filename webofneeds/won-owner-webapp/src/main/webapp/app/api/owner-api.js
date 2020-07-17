@@ -77,6 +77,21 @@ export function logout() {
   return fetch(url, httpOptions).then(checkHttpStatus);
 }
 
+export function exportAccount(dataEncryptionPassword) {
+  const url = urljoin(
+    ownerBaseUrl,
+    `/rest/users/exportAccount?keyStorePassword=${dataEncryptionPassword}`
+  );
+  const httpOptions = {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  };
+  return fetch(url, httpOptions).then(checkHttpStatus);
+}
 /**
  * Checks whether the user has a logged-in session.
  * Returns a promise with the user-object if successful

@@ -167,7 +167,9 @@ export default function PageSignUp() {
                       href={ico16_indicator_warning}
                     />
                   </svg>
-                  Not a valid E-Mail address
+                  <span className="signup__content__form__errormsg__label">
+                    Not a valid E-Mail address
+                  </span>
                 </div>
               )}
             {registerError && (
@@ -178,7 +180,9 @@ export default function PageSignUp() {
                     href={ico16_indicator_warning}
                   />
                 </svg>
-                {registerError}
+                <span className="signup__content__form__errormsg__label">
+                  {registerError}
+                </span>
               </div>
             )}
 
@@ -200,9 +204,7 @@ export default function PageSignUp() {
                       href={ico16_indicator_warning}
                     />
                   </svg>
-                  {"Password too short, must be at least " +
-                    MINPW_LENGTH +
-                    " Characters"}
+                  <span className="signup__content__form__errormsg__label">{`Password too short, must be at least ${MINPW_LENGTH} Characters`}</span>
                 </div>
               )}
 
@@ -224,7 +226,9 @@ export default function PageSignUp() {
                       href={ico16_indicator_warning}
                     />
                   </svg>
-                  Password is not equal
+                  <span className="signup__content__form__errormsg__label">
+                    Password is not equal
+                  </span>
                 </div>
               )}
 

@@ -10,7 +10,6 @@ import * as connectionUtils from "../utils/connection-utils.js";
 import * as accountUtils from "../utils/account-utils.js";
 import * as processUtils from "../utils/process-utils.js";
 import * as viewUtils from "../utils/view-utils.js";
-import Color from "color";
 import Immutable from "immutable";
 import vocab from "../../service/vocab";
 
@@ -335,49 +334,6 @@ export const getOwnedAtomsWithBuddySocket = createSelector(
     ownedAtoms && ownedAtoms.filter(atom => atomUtils.hasBuddySocket(atom))
 );
 
-/**
- * Returns all owned Personas as a List, condenses the information of the persona so that only some attributes are included.
- * This Function is currently used for persona lists/views based on elm (as they are not based on our general atom-structure)
- * @param state
- * @returns {Iterable<K, {website: *, saved: boolean, displayName: *, url: *, aboutMe: *, timestamp: string | * | number | void}>}
- */
-export const getOwnedCondensedPersonaList = createSelector(
-  getOwnedPersonas,
-  getExternalDataState,
-  (ownedPersonas, externalDataState) => {
-    return (
-      ownedPersonas &&
-      ownedPersonas
-        .filter(persona => atomUtils.isActive(persona))
-        .map(persona => ({
-          displayName: atomUtils.getTitle(persona, externalDataState),
-          website: getIn(persona, ["content", "website"]),
-          aboutMe: getIn(persona, ["content", "description"]),
-          url: get(persona, "uri"),
-          saved: !get(persona, "isBeingCreated"),
-          timestamp: get(persona, "creationDate").toISOString(),
-        }))
-        .filter(persona => !!persona.displayName)
-        .toList()
-    );
-  }
-);
-
-//TODO: move this method to a place that makes more sense, its not really a selector function
-export function currentSkin() {
-  const style = getComputedStyle(document.body);
-  const getColor = name => {
-    const color = Color(style.getPropertyValue(name).trim());
-    return color.rgb().object();
-  };
-  return {
-    primaryColor: getColor("--won-primary-color"),
-    secondaryColor: getColor("--won-secondary-color"),
-    lightGray: getColor("--won-light-gray"),
-    lineGray: getColor("--won-line-gray"),
-    subtitleGray: getColor("--won-subtitle-gray"),
-  };
-}
 /**
  * Returns true if the atom is owned by the user who is currently logged in
  * @param atomUri
