@@ -2,7 +2,6 @@ package won.node.service.persistence;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +11,7 @@ import org.apache.camel.Endpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import won.protocol.model.OwnerApplication;
 import won.protocol.repository.OwnerApplicationRepository;
 import won.protocol.service.ApplicationManagementService;
@@ -52,6 +52,7 @@ public class OwnerManagementService implements ApplicationManagementService {
         List<String> componentNames = camelContext.getComponentNames();
         Component activemqComponent = (Component) camelContext.getComponent("activemq");
         for (String queueName : ownerApplication.getQueueNames()) {
+            queueName = sanitizeQueueNameForOwnerApplication(ownerApplication, queueName);
             Endpoint existingQueueEndpoint = camelContext.hasEndpoint(queueName);
             if (existingQueueEndpoint != null) {
                 logger.debug("endpoint '{}' already present in camel context", queueName);
@@ -59,6 +60,7 @@ public class OwnerManagementService implements ApplicationManagementService {
                 try {
                     Endpoint newQueueEndpoint = activemqComponent.createEndpoint(queueName);
                     camelContext.addEndpoint(queueName, newQueueEndpoint);
+                    logger.debug("added camel endpoint '{}'", queueName);
                 } catch (Exception e) {
                     logger.warn("Could not register camel endpoint for activeMQ queue {}", queueName, e);
                 }
@@ -68,10 +70,35 @@ public class OwnerManagementService implements ApplicationManagementService {
 
     public List<String> generateQueueNamesForOwnerApplication(OwnerApplication ownerApplication) {
         List<String> queueNames = new ArrayList<>();
-        queueNames.add("activemq" + ":queue:OwnerProtocol.Out." + ownerApplication.getOwnerApplicationId());
+        queueNames.add("activemq:queue:OwnerProtocol.Out." + ownerApplication.getOwnerApplicationId());
         return queueNames;
     }
 
+    /**
+     * Checks if the given queue name is exactly equal to the ownerApplicationId,
+     * and returns the String "activemq:queue:OwnerProtocol.Out." + queueName,
+     * otherwise, just returns the queue name
+     * 
+     * @return the sanitized queue name
+     */
+    public String sanitizeQueueNameForOwnerApplication(OwnerApplication ownerApplication, String queueName) {
+        String ownerApplicationId = ownerApplication.getOwnerApplicationId();
+        if (ownerApplicationId != null && ownerApplicationId.trim().equals(queueName.trim())) {
+            String newQueueName = "activemq:queue:OwnerProtocol.Out." + ownerApplicationId;
+            if (logger.isDebugEnabled()) {
+                logger.debug("automatically converting ownerApplicationId {} to queue name {}", ownerApplicationId,
+                                newQueueName);
+            }
+            return newQueueName;
+        }
+        return queueName;
+    }
+
+    /**
+     * @param ownerAppliation
+     * @param queueName
+     * @return
+     */
     public boolean existsCamelEndpointForOwnerApplicationQueue(String queueName) {
         return (camelContext.hasEndpoint(queueName) != null);
     }
