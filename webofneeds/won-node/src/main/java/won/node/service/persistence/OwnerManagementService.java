@@ -60,6 +60,7 @@ public class OwnerManagementService implements ApplicationManagementService {
                 try {
                     Endpoint newQueueEndpoint = activemqComponent.createEndpoint(queueName);
                     camelContext.addEndpoint(queueName, newQueueEndpoint);
+                    logger.debug("added camel endpoint '{}'", queueName);
                 } catch (Exception e) {
                     logger.warn("Could not register camel endpoint for activeMQ queue {}", queueName, e);
                 }
