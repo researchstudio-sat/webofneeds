@@ -64,8 +64,13 @@ public class ToOwnerSender extends AbstractCamelProcessor {
         logger.debug("number of registered owner applications: {}",
                         ownerApps == null ? 0 : ownerApps.size());
         List<String> queueNames = ownerApps.stream()
-                        .flatMap(app -> app.getQueueNames().stream())
-                        .filter(queue -> ownerManagementService.existsCamelEndpointForOwnerApplicationQueue(queue))
+                        .flatMap(app -> {
+                            return app.getQueueNames().stream()
+                                            .map(queue -> ownerManagementService
+                                                            .sanitizeQueueNameForOwnerApplication(app, queue))
+                                            .filter(queue -> ownerManagementService
+                                                            .existsCamelEndpointForOwnerApplicationQueue(queue));
+                        })
                         .collect(Collectors.toList());
         if (queueNames.isEmpty()) {
             if (logger.isDebugEnabled()) {
