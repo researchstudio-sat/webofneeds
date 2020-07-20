@@ -89,7 +89,7 @@ public class ToOwnerSender extends AbstractCamelProcessor {
             putMessageIntoBody(exchangeToOwners, msg);
             exchangeToOwners.getIn().setHeader(
                             WonCamelConstants.OWNER_APPLICATION_IDS_HEADER,
-                            queueNames.stream());
+                            queueNames);
             exchangeToOwners.getIn().setHeader("JMSExpiration", System.currentTimeMillis() + 20000);
             messagingService.send(exchangeToOwners, "direct:sendToOwnerApplications");
         }
