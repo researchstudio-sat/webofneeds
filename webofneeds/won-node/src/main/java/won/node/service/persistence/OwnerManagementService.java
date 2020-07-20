@@ -53,7 +53,7 @@ public class OwnerManagementService implements ApplicationManagementService {
         Component activemqComponent = (Component) camelContext.getComponent("activemq");
         for (String queueName : ownerApplication.getQueueNames()) {
             queueName = sanitizeQueueNameForOwnerApplication(ownerApplication, queueName);
-            queueName = addActiveMQComponentParametersToQueueName(queueName)
+            queueName = addActiveMQComponentParametersToQueueName(queueName);
             Endpoint existingQueueEndpoint = camelContext.hasEndpoint(queueName);
             if (existingQueueEndpoint != null) {
                 logger.debug("endpoint '{}' already present in camel context", queueName);
