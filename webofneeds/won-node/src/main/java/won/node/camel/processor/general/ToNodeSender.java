@@ -62,7 +62,7 @@ public class ToNodeSender implements Processor {
             putMessage(newExchangeFromExternal, msg);
             putDirection(newExchangeFromExternal, WonMessageDirection.FROM_EXTERNAL);
             putMessageType(newExchangeFromExternal, msg.getMessageType());
-            messagingService.send(newExchangeFromExternal, "seda:msgFromExternal?timeToLive=20000");
+            messagingService.send(newExchangeFromExternal, "seda:msgFromExternal");
             removeMessageToSend(exchange);
             return;
         }
