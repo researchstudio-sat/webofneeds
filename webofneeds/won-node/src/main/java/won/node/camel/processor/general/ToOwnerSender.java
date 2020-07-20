@@ -68,6 +68,8 @@ public class ToOwnerSender extends AbstractCamelProcessor {
                             return app.getQueueNames().stream()
                                             .map(queue -> ownerManagementService
                                                             .sanitizeQueueNameForOwnerApplication(app, queue))
+                                            .map(queue -> ownerManagementService
+                                                            .addActiveMQComponentParametersToQueueName(queue))
                                             .filter(queue -> ownerManagementService
                                                             .existsCamelEndpointForOwnerApplicationQueue(queue));
                         })
@@ -85,7 +87,10 @@ public class ToOwnerSender extends AbstractCamelProcessor {
             }
             Exchange exchangeToOwners = new DefaultExchange(camelContext);
             putMessageIntoBody(exchangeToOwners, msg);
-            exchangeToOwners.getIn().setHeader(WonCamelConstants.OWNER_APPLICATION_IDS_HEADER, queueNames);
+            exchangeToOwners.getIn().setHeader(
+                            WonCamelConstants.OWNER_APPLICATION_IDS_HEADER,
+                            queueNames);
+            exchangeToOwners.getIn().setHeader("JMSExpiration", System.currentTimeMillis() + 20000);
             messagingService.send(exchangeToOwners, "direct:sendToOwnerApplications");
         }
         removeMessageToSend(exchange);
