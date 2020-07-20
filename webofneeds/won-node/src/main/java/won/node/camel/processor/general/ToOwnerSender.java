@@ -85,7 +85,9 @@ public class ToOwnerSender extends AbstractCamelProcessor {
             }
             Exchange exchangeToOwners = new DefaultExchange(camelContext);
             putMessageIntoBody(exchangeToOwners, msg);
-            exchangeToOwners.getIn().setHeader(WonCamelConstants.OWNER_APPLICATION_IDS_HEADER, queueNames);
+            exchangeToOwners.getIn().setHeader(
+                            WonCamelConstants.OWNER_APPLICATION_IDS_HEADER,
+                            queueNames.stream().map(s -> s + "?timeToLive=20000").collect(Collectors.toList()));
             messagingService.send(exchangeToOwners, "direct:sendToOwnerApplications");
         }
         removeMessageToSend(exchange);
