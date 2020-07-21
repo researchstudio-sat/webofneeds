@@ -290,7 +290,7 @@ export function addMessage(
 
           state = state.setIn(
             [targetAtomUri, "connections", targetConnectionUri, "messages"],
-            messages
+            messages.toOrderedMap().sortBy(sortByMessageTimeStamp)
           );
         }
       }
@@ -1369,4 +1369,15 @@ function isChatToGroupConnection(allAtoms, connection) {
     getTargetSocketType(allAtoms, connection) ===
       vocab.GROUP.GroupSocketCompacted
   );
+}
+
+/**
+ * Default message Sorting -> so we can already store a sorted map of messages in the atom
+ * @param message
+ * @returns {any}
+ */
+function sortByMessageTimeStamp(message) {
+  const messageDate = get(message, "date");
+
+  return messageDate && messageDate.getTime();
 }

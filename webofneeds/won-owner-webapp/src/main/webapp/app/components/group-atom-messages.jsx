@@ -71,17 +71,7 @@ export default function WonGroupAtomMessages({
     connectionUri
   );
 
-  const sortedMessages = chatMessages
-    ? chatMessages.toArray().sort(function(a, b) {
-        const aDate = get(a, "date");
-        const bDate = get(b, "date");
-
-        const aTime = aDate && aDate.getTime();
-        const bTime = bDate && bDate.getTime();
-
-        return aTime - bTime;
-      })
-    : [];
+  const sortedMessages = chatMessages ? chatMessages.toArray() : [];
 
   const unreadMessages =
     chatMessages &&
