@@ -6,7 +6,7 @@ import { goodsTransportOffer } from "./uc-goods-transport-offer.js";
 import ico36_uc_transport_offer from "../../images/won-icons/ico36_uc_transport_offer.svg";
 
 export const transportGroup = {
-  identifier: "transportgroup",
+  identifier: "transportGroup",
   label: "Transport",
   icon: ico36_uc_transport_offer,
   subItems: {

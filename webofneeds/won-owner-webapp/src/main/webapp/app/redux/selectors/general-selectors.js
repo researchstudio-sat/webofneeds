@@ -187,6 +187,12 @@ export const getAllChatConnections = createSelector(
       .flatMap(atom =>
         atomUtils.getAllNonClosedNonSuggestedChatConnections(atom)
       )
+      .toOrderedMap()
+      .sortBy(conn => {
+        const lastUpdateDate = get(conn, "lastUpdateDate");
+        return lastUpdateDate && lastUpdateDate.getTime();
+      })
+      .reverse()
 );
 
 export const getAllConnectedChatAndGroupConnections = createSelector(
@@ -199,11 +205,6 @@ export const getAllConnectedChatAndGroupConnections = createSelector(
         atom => atomUtils.hasChatSocket(atom) || atomUtils.hasGroupSocket(atom)
       )
       .flatMap(atom => atomUtils.getAllConnectedChatAndGroupConnections(atom))
-);
-
-export const hasChatConnections = createSelector(
-  getAllChatConnections,
-  chatConnections => chatConnections && chatConnections.size > 0
 );
 
 /**
@@ -292,9 +293,8 @@ export const hasUnreadChatConnections = createSelector(
     chatConnections &&
     !!chatConnections.find(
       conn =>
-        !(
-          connectionUtils.isClosed(conn) || connectionUtils.isSuggested(conn)
-        ) && connectionUtils.isUnread(conn)
+        connectionUtils.isUnread(conn) &&
+        !(connectionUtils.isClosed(conn) || connectionUtils.isSuggested(conn))
     )
 );
 

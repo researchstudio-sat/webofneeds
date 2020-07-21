@@ -15,7 +15,6 @@ import {
 import { actionCreators } from "../actions/actions.js";
 import { useSelector, useDispatch } from "react-redux";
 import { relativeTime } from "../won-label-utils.js";
-import * as wonLabelUtils from "../won-label-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
@@ -24,14 +23,28 @@ import * as processUtils from "../redux/utils/process-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import vocab from "../service/vocab.js";
 
-import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
-
 import "~/style/_connection-header.scss";
 import "~/style/_connection-indicators.scss";
 
 import ico36_incoming from "~/images/won-icons/ico36_incoming.svg";
 
-export default function WonConnectionHeader({ connection, toLink, flip }) {
+/**
+ * React Component that shows the Connection Header
+ * @param connection connection to show Header for
+ * @param toLink link to go to on click
+ * @param flip reverses the displayed atom of the connection
+ * @param hideTimestamp hides Timestamp
+ * @param hideMessageIndicator hides MessageIndicator (either text of latestMessage, or unread count)
+ * @returns {*}
+ * @constructor
+ */
+export default function WonConnectionHeader({
+  connection,
+  toLink,
+  flip,
+  hideTimestamp,
+  hideMessageIndicator,
+}) {
   const connectionUri = get(connection, "uri");
   const history = useHistory();
   const dispatch = useDispatch();
@@ -55,22 +68,9 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
     generalSelectors.getAtom(targetHolderUri)
   );
 
-  const targetHolderName = atomUtils.hasHoldableSocket(targetAtom)
-    ? atomUtils.getTitle(targetHolderAtom, externalDataState) ||
-      get(targetAtom, "fakePersonaName")
-    : undefined;
-
-  const isTargetAtomOwned = accountUtils.isAtomOwned(
-    accountState,
-    targetAtomUri
-  );
-
   const globalLastUpdateTime = useSelector(
     generalSelectors.selectLastUpdateTime
   );
-  const friendlyTimestamp =
-    connection &&
-    relativeTime(globalLastUpdateTime, get(connection, "lastUpdateDate"));
 
   const isTargetAtomFetchNecessary = processUtils.isAtomFetchNecessary(
     processState,
@@ -186,105 +186,90 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
           </div>
           <div className="ch__right__subtitle">
             <span className="ch__right__subtitle__type">
-              <span className="ch__right__subtitle__type__state">
-                Atom might have been deleted, you might want to close this
-                connection.
-              </span>
+              Atom might have been deleted, you might want to close this
+              connection.
             </span>
           </div>
         </React.Fragment>
       );
     } else {
-      const allMessages = get(connection, "messages");
-      const unreadMessages =
-        allMessages &&
-        allMessages.filter(msg => messageUtils.isMessageUnread(msg));
-
-      const unreadMessageCount =
-        unreadMessages && unreadMessages.size > 0
-          ? unreadMessages.size
-          : undefined;
-
-      const sortedMessages = allMessages && allMessages.toArray();
-      if (sortedMessages) {
-        sortedMessages.sort(function(a, b) {
-          const aDate = get(a, "date");
-          const bDate = get(b, "date");
-
-          const aTime = aDate && aDate.getTime();
-          const bTime = bDate && bDate.getTime();
-
-          return bTime - aTime;
-        });
-      }
-
-      const latestMessage = sortedMessages && sortedMessages[0];
-      const latestMessageHumanReadableString =
-        latestMessage && getHumanReadableStringFromMessage(latestMessage);
-      const latestMessageUnread = messageUtils.isMessageUnread(latestMessage);
-
       const title = atomUtils.getTitle(targetAtom, externalDataState);
 
-      const headerRightToplineContent = title ? (
-        <div className="ch__right__topline__title" title={title}>
-          {title}
-        </div>
-      ) : (
-        <div className="ch__right__topline__notitle" title="No Title">
-          No Title
-        </div>
-      );
+      let subtitleElement;
+      if (!hideMessageIndicator) {
+        const allMessages = get(connection, "messages");
+        const unreadMessages =
+          allMessages &&
+          allMessages.filter(msg => messageUtils.isMessageUnread(msg));
 
-      const groupChatLabelOrPersonaName = atomUtils.hasGroupSocket(
-        targetAtom
-      ) ? (
-        <span className="ch__right__subtitle__type__groupchat">
-          {"Group Chat" +
-            (atomUtils.hasChatSocket(targetAtom) ? " enabled" : "")}
-        </span>
-      ) : targetHolderName ? (
-        <span className="ch__right__subtitle__type__holder">
-          {targetHolderName}
-        </span>
-      ) : (
-        undefined
-      );
+        const unreadMessageCount =
+          unreadMessages && unreadMessages.size > 0
+            ? unreadMessages.size
+            : undefined;
 
-      let unreadCount;
+        if (unreadMessageCount > 1) {
+          subtitleElement = (
+            <span className="ch__right__subtitle__type__unreadcount">
+              {`${unreadMessageCount} unread Messages`}
+            </span>
+          );
+        } else {
+          const latestMessage = allMessages && allMessages.last();
 
-      if (unreadMessageCount > 1) {
-        unreadCount = (
-          <span className="ch__right__subtitle__type__unreadcount">
-            {unreadMessageCount + " unread Messages"}
-          </span>
-        );
-      } else if (unreadMessageCount == 1 && !latestMessageHumanReadableString) {
-        unreadCount = (
-          <span className="ch__right__subtitle__type__unreadcount">
-            1 unread Message
-          </span>
-        );
+          if (latestMessage) {
+            subtitleElement = (
+              <span
+                className={
+                  "ch__right__subtitle__type__message " +
+                  (messageUtils.isMessageUnread(latestMessage)
+                    ? "won-unread"
+                    : "")
+                }
+              >
+                {messageUtils.getHumanReadableString(latestMessage)}
+              </span>
+            );
+          } else if (unreadMessageCount === 1) {
+            subtitleElement = (
+              <span className="ch__right__subtitle__type__unreadcount">
+                1 unread Message
+              </span>
+            );
+          }
+        }
       }
 
-      let messageOrState;
-      if (latestMessageHumanReadableString) {
-        messageOrState = !(unreadMessageCount > 1) ? (
-          <span
-            className={
-              "ch__right__subtitle__type__message " +
-              (latestMessageUnread ? "won-unread" : "")
-            }
-          >
-            {latestMessageHumanReadableString}
+      let groupChatLabelOrPersonaName;
+      if (atomUtils.hasGroupSocket(targetAtom)) {
+        groupChatLabelOrPersonaName = (
+          <span className="ch__right__subtitle__type__groupchat">
+            {`Group Chat ${
+              atomUtils.hasChatSocket(targetAtom) ? "enabled" : ""
+            }`}
           </span>
-        ) : (
-          undefined
         );
       } else {
-        messageOrState = !unreadMessageCount ? (
-          <span className="ch__right__subtitle__type__state">
-            {wonLabelUtils.getConnectionStateLabel(get(connection, "state"))}
-          </span>
+        const targetHolderName = atomUtils.hasHoldableSocket(targetAtom)
+          ? atomUtils.getTitle(targetHolderAtom, externalDataState) ||
+            get(targetAtom, "fakePersonaName")
+          : undefined;
+
+        if (targetHolderName) {
+          groupChatLabelOrPersonaName = (
+            <span className="ch__right__subtitle__type__holder">
+              {targetHolderName}
+            </span>
+          );
+        }
+      }
+
+      let timeStampElement;
+      if (!hideTimestamp) {
+        const friendlyTimestamp =
+          connection &&
+          relativeTime(globalLastUpdateTime, get(connection, "lastUpdateDate"));
+        timeStampElement = friendlyTimestamp ? (
+          <div className="ch__right__subtitle__date">{friendlyTimestamp}</div>
         ) : (
           undefined
         );
@@ -292,16 +277,25 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
 
       headerRightContent = (
         <React.Fragment>
-          <div className="ch__right__topline">{headerRightToplineContent}</div>
+          <div className="ch__right__topline">
+            {title ? (
+              <div className="ch__right__topline__title" title={title}>
+                {title}
+              </div>
+            ) : (
+              <div className="ch__right__topline__notitle" title="No Title">
+                No Title
+              </div>
+            )}
+          </div>
 
           <div className="ch__right__subtitle">
             <span className="ch__right__subtitle__type">
               {groupChatLabelOrPersonaName}
               <WonConnectionState connection={connection} />
-              {unreadCount}
-              {messageOrState}
+              {subtitleElement}
             </span>
-            <div className="ch__right__subtitle__date">{friendlyTimestamp}</div>
+            {timeStampElement}
           </div>
         </React.Fragment>
       );
@@ -309,10 +303,14 @@ export default function WonConnectionHeader({ connection, toLink, flip }) {
 
     let incomingRequestsIcon;
 
-    if (isTargetAtomOwned) {
-      const groupConnectionRequests = atomUtils
-        .getConnections(targetAtom, vocab.GROUP.GroupSocketCompacted)
-        .filter(con => connectionUtils.isRequestReceived(con));
+    if (
+      atomUtils.hasGroupSocket(targetAtom) &&
+      accountUtils.isAtomOwned(accountState, targetAtomUri)
+    ) {
+      const groupConnectionRequests = atomUtils.getRequestReceivedConnections(
+        targetAtom,
+        vocab.GROUP.GroupSocketCompacted
+      );
 
       if (groupConnectionRequests && groupConnectionRequests.size > 0) {
         const hasNewGroupRequests = !!groupConnectionRequests.find(con =>
@@ -358,4 +356,6 @@ WonConnectionHeader.propTypes = {
   connection: PropTypes.object.isRequired,
   toLink: PropTypes.string,
   flip: PropTypes.bool,
+  hideTimestamp: PropTypes.bool,
+  hideMessageIndicator: PropTypes.bool,
 };

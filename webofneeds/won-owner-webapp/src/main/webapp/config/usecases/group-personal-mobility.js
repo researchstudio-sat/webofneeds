@@ -5,7 +5,7 @@ import { personalTransportSearch } from "./uc-personal-transport-search.js";
 import ico36_uc_route_demand from "../../images/won-icons/ico36_uc_route_demand.svg";
 
 export const personalMobilityGroup = {
-  identifier: "mobilitygroup",
+  identifier: "personalMobilityGroup",
   label: "Mobility",
   icon: ico36_uc_route_demand,
   subItems: {

@@ -13,8 +13,8 @@ import WonMenu from "../../components/menu.jsx";
 import WonToasts from "../../components/toasts.jsx";
 import WonSlideIn from "../../components/slide-in.jsx";
 import WonFooter from "../../components/footer.jsx";
-import WonCreateAtom from "../../components/create-atom.jsx";
-import WonEditAtom from "../../components/edit-atom.jsx";
+import WonCreateAtom from "../../components/atom-editor/create-atom.jsx";
+import WonEditAtom from "../../components/atom-editor/edit-atom.jsx";
 import WonUseCaseGroup from "../../components/usecase-group.jsx";
 import WonUseCasePicker from "../../components/usecase-picker.jsx";
 

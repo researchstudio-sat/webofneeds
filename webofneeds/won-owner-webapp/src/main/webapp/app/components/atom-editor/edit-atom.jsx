@@ -2,22 +2,22 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import PropTypes from "prop-types";
-import { get } from "../utils.js";
+import { get, getIn } from "../../utils.js";
 
-import * as generalSelectors from "../redux/selectors/general-selectors.js";
-import * as atomUtils from "../redux/utils/atom-utils.js";
-import * as useCaseUtils from "../usecase-utils.js";
-import * as accountUtils from "../redux/utils/account-utils.js";
+import * as generalSelectors from "../../redux/selectors/general-selectors.js";
+import * as atomUtils from "../../redux/utils/atom-utils.js";
+import * as useCaseUtils from "../../usecase-utils.js";
+import * as accountUtils from "../../redux/utils/account-utils.js";
+
+import WonBranchDetailInput from "./branch-detail-input.jsx";
+import WonLabelledHr from "../labelled-hr.jsx";
+import { actionCreators } from "../../actions/actions";
 
 import "~/style/_create-atom.scss";
 import "~/style/_responsiveness-utils.scss";
-
-import WonCreateIsSeeks from "./create-isseeks.jsx";
-import WonLabelledHr from "./labelled-hr.jsx";
-import { actionCreators } from "../actions/actions";
-import { useHistory } from "react-router-dom";
 
 export default function WonEditAtom({ fromAtom }) {
   const history = useHistory();
@@ -34,8 +34,9 @@ export default function WonEditAtom({ fromAtom }) {
     true
   );
 
-  const useCase = useCaseImm.toJS();
-  const [draftObject, setDraftObject] = useState(useCase.draft);
+  const [draftObjectImm, setDraftObjectImm] = useState(
+    get(useCaseImm, "draft")
+  );
 
   const loggedIn = accountUtils.isLoggedIn(accountState);
 
@@ -47,26 +48,24 @@ export default function WonEditAtom({ fromAtom }) {
     useSelector(generalSelectors.isAtomEditable(get(fromAtom, "uri"))) &&
     loggedIn;
 
-  function updateDraftSeeks(updatedDraftJson) {
-    updateDraft(updatedDraftJson.draft, "seeks");
+  function updateDraftSeeksImm(updatedDraftBranchImm) {
+    updateDraftImm(updatedDraftBranchImm, "seeks");
+  }
+  function updateDraftContentImm(updatedDraftBranchImm) {
+    updateDraftImm(updatedDraftBranchImm, "content");
   }
 
-  function updateDraftContent(updatedDraftJson) {
-    updateDraft(updatedDraftJson.draft, "content");
-  }
-
-  function updateDraft(updatedDraft, branch) {
-    const _draftObject = JSON.parse(JSON.stringify(draftObject));
-    _draftObject[branch] = updatedDraft;
-
-    setDraftObject(_draftObject);
+  function updateDraftImm(updatedDraftImm, branch) {
+    setDraftObjectImm(draftObjectImm.set(branch, updatedDraftImm));
   }
 
   function save() {
     if (loggedIn && isFromAtomOwned) {
       dispatch(
         actionCreators.atoms__edit(
-          useCaseUtils.getSanitizedDraftObject(draftObject, useCase),
+          useCaseUtils
+            .getSanitizedDraftObjectImm(draftObjectImm, useCaseImm)
+            .toJS(),
           fromAtom,
           history.goBack
         )
@@ -74,33 +73,41 @@ export default function WonEditAtom({ fromAtom }) {
     }
   }
 
-  if (useCase) {
-    const headerIconElement = useCase.icon && (
-      <svg className="cp__header__icon" title={useCase.label}>
-        <use xlinkHref={useCase.icon} href={useCase.icon} />
+  if (useCaseImm) {
+    const useCaseLabel = get(useCaseImm, "label");
+    const useCaseIcon = get(useCaseImm, "icon");
+    const useCaseIconJS = useCaseIcon && useCaseIcon.toJS();
+
+    const headerIconElement = useCaseIconJS && (
+      <svg className="cp__header__icon" title={useCaseLabel}>
+        <use xlinkHref={useCaseIconJS} href={useCaseIconJS} />
       </svg>
     );
     let headerTitleElement = (
       <span className="cp__header__title">Edit Atom</span>
     );
 
-    const createContentFragment = useCase.details &&
-      Object.keys(useCase.details).length > 0 && (
-        <WonCreateIsSeeks
-          detailList={useCase.details}
-          initialDraft={useCase.draft.content}
-          onUpdate={updateDraftContent}
+    const contentDetailsImm = get(useCaseImm, "details");
+
+    const createContentFragment = contentDetailsImm &&
+      contentDetailsImm.size > 0 && (
+        <WonBranchDetailInput
+          detailListImm={contentDetailsImm}
+          initialDraftImm={getIn(useCaseImm, ["draft", "content"])}
+          onUpdateImm={updateDraftContentImm}
         />
       );
 
-    const createSeeksFragment = useCase.seeksDetails &&
-      Object.keys(useCase.seeksDetails).length > 0 && (
+    const seeksDetailsImm = get(useCaseImm, "seeksDetails");
+
+    const createSeeksFragment = seeksDetailsImm &&
+      seeksDetailsImm.size > 0 && (
         <React.Fragment>
           <div className="cp__content__branchheader">Looking For</div>
-          <WonCreateIsSeeks
-            detailList={useCase.seeksDetails}
-            initialDraft={useCase.draft.seeks}
-            onUpdate={updateDraftSeeks}
+          <WonBranchDetailInput
+            detailListImm={seeksDetailsImm}
+            initialDraftImm={getIn(useCaseImm, ["draft", "seeks"])}
+            onUpdateImm={updateDraftSeeksImm}
           />
         </React.Fragment>
       );
@@ -125,7 +132,7 @@ export default function WonEditAtom({ fromAtom }) {
                 onClick={save}
                 disabled={
                   connectionHasBeenLost ||
-                  !useCaseUtils.isValidDraft(draftObject, useCase)
+                  !useCaseUtils.isValidDraftImm(draftObjectImm, useCaseImm)
                 }
               >
                 Save

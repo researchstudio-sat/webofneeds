@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import * as useCaseUtils from "../usecase-utils.js";
 
 import "~/style/_usecase-group.scss";
-import { getQueryParams, generateLink } from "../utils";
+import { getQueryParams, generateLink, get } from "../utils";
 import { Link, useHistory } from "react-router-dom";
 
 export default function WonUseCaseGroup({
@@ -13,73 +13,80 @@ export default function WonUseCaseGroup({
   const history = useHistory();
   const { useCaseGroup } = getQueryParams(history.location);
 
-  const visibleUseCaseGroup =
+  const visibleUseCaseGroupImm =
     visibleUseCasesByConfig &&
-    useCaseUtils.getUseCaseGroupByIdentifier(useCaseGroup);
+    useCaseUtils.getUseCaseGroupByIdentifierImm(useCaseGroup);
 
-  function startFromRoute(location, subItem) {
-    const subItemIdentifier = subItem && subItem.identifier;
+  const ucgLabel = get(visibleUseCaseGroupImm, "label");
+  const ucgIcon = get(visibleUseCaseGroupImm, "icon");
+  const ucgIconJS = ucgIcon && ucgIcon.toJS();
 
-    if (subItemIdentifier) {
-      if (useCaseUtils.isUseCaseGroup(subItem)) {
-        return generateLink(location, { useCaseGroup: subItemIdentifier });
-      } else {
-        return generateLink(location, { useCase: subItemIdentifier });
-      }
-    } else {
-      console.warn("No identifier found for given usecase, ", subItem);
+  const generateSubItems = () => {
+    const subItemElements = [];
+    const ucgSubItems = get(visibleUseCaseGroupImm, "subItems");
+
+    if (ucgSubItems) {
+      const startFromRoute = (location, subItem) => {
+        const subItemIdentifier = get(subItem, "identifier");
+
+        if (subItemIdentifier) {
+          return generateLink(
+            location,
+            useCaseUtils.isUseCaseGroup()
+              ? { useCaseGroup: subItemIdentifier }
+              : { useCase: subItemIdentifier }
+          );
+        } else {
+          console.warn("No identifier found for given usecase, ", subItem);
+        }
+      };
+
+      ucgSubItems.map((subItem, subItemIdentifier) => {
+        const subItemLabel = get(subItem, "label");
+        const subItemIcon = get(subItem, "icon");
+        const subItemIconJS = subItemIcon && subItemIcon.toJS();
+
+        if (
+          useCaseUtils.isDisplayableItemImm(
+            subItem,
+            visibleUseCasesByConfig,
+            filterBySocketType
+          )
+        ) {
+          subItemElements.push(
+            <Link
+              key={subItemIdentifier}
+              className="ucg__main__usecase clickable"
+              to={location => startFromRoute(location, subItem)}
+            >
+              {!!subItemIconJS && (
+                <svg className="ucg__main__usecase__icon">
+                  <use xlinkHref={subItemIconJS} href={subItemIconJS} />
+                </svg>
+              )}
+              {!!subItemLabel && (
+                <div className="ucg__main__usecase__label">{subItemLabel}</div>
+              )}
+            </Link>
+          );
+        }
+      });
     }
-  }
-
+    return subItemElements;
+  };
   return (
     <won-usecase-group>
-      {visibleUseCaseGroup ? (
+      {visibleUseCaseGroupImm ? (
         <React.Fragment>
           <div className="ucg__header">
-            {visibleUseCaseGroup.icon && (
+            {ucgIconJS && (
               <svg className="ucg__header__icon">
-                <use
-                  xlinkHref={visibleUseCaseGroup.icon}
-                  href={visibleUseCaseGroup.icon}
-                />
+                <use xlinkHref={ucgIconJS} href={ucgIconJS} />
               </svg>
             )}
-            {visibleUseCaseGroup.label && (
-              <div className="ucg__header__title">
-                {visibleUseCaseGroup.label}
-              </div>
-            )}
+            {ucgLabel && <div className="ucg__header__title">{ucgLabel}</div>}
           </div>
-          <div className="ucg__main">
-            {!!visibleUseCaseGroup.subItems &&
-              Object.values(visibleUseCaseGroup.subItems).map(
-                (subItem, index) =>
-                  useCaseUtils.isDisplayableItem(
-                    subItem,
-                    visibleUseCasesByConfig,
-                    filterBySocketType
-                  ) ? (
-                    <Link
-                      key={subItem.identifier + "-" + index}
-                      className="ucg__main__usecase clickable"
-                      to={location => startFromRoute(location, subItem)}
-                    >
-                      {!!subItem.icon && (
-                        <svg className="ucg__main__usecase__icon">
-                          <use xlinkHref={subItem.icon} href={subItem.icon} />
-                        </svg>
-                      )}
-                      {!!subItem.label && (
-                        <div className="ucg__main__usecase__label">
-                          {subItem.label}
-                        </div>
-                      )}
-                    </Link>
-                  ) : (
-                    undefined
-                  )
-              )}
-          </div>
+          <div className="ucg__main">{generateSubItems()}</div>
         </React.Fragment>
       ) : (
         <div className="ucg__header">

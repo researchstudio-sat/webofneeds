@@ -2,12 +2,12 @@
 @import "animate";
 @import "sizing-utils";
 
-won-create-isseeks {
+won-branch-detail-input {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
 
-  .cis__detail__items {
+  .bdi__detail__items {
     display: grid;
     grid-auto-flow: row;
 
@@ -26,10 +26,10 @@ won-create-isseeks {
       &:hover {
         background: $won-light-gray;
 
-        .cis__detail__items__item__header__label {
+        .bdi__detail__items__item__header__label {
           color: $won-primary-color;
         }
-        .cis__circleicon {
+        .bdi__circleicon {
           --local-primary: #{$won-primary-color};
         }
       }
@@ -77,15 +77,15 @@ won-create-isseeks {
         color: black;
         --local-primary: black; // for the svg-icons
 
-        .cis__circleicon {
+        .bdi__circleicon {
           @include fixed-height(2rem);
           @include fixed-width(2rem);
         }
 
-        .cis__mandatory {
+        .bdi__mandatory {
           --local-primary: #{$won-primary-color};
 
-          .cis__mandatory__icon {
+          .bdi__mandatory__icon {
             @include fixed-height(1rem);
             @include fixed-width(1rem);
           }

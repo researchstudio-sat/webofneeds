@@ -8,7 +8,6 @@ import WonPublishButton from "./publish-button.jsx";
 import TextareaAutosize from "react-autosize-textarea";
 import { actionCreators } from "../actions/actions.js";
 
-import { getHumanReadableStringFromMessage } from "../reducers/atom-reducer/parse-message.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as messageUtils from "../redux/utils/message-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
@@ -337,8 +336,7 @@ export default function ChatTextfield({
               className="cts__details__input__refcontent__message"
             >
               <div className="cts__details__input__refcontent__message__label">
-                {getHumanReadableStringFromMessage(msg) ||
-                  "«Message does not have text»"}
+                {messageUtils.getHumanReadableString(msg)}
               </div>
               <svg
                 className="cts__details__input__refcontent__message__discard clickable"

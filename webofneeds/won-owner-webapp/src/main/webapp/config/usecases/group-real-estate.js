@@ -5,7 +5,7 @@ import { rehearsalRoomSearch } from "./uc-rehearsal-room-search.js";
 import ico36_uc_realestate from "../../images/won-icons/ico36_uc_realestate.svg";
 
 export const realEstateGroup = {
-  identifier: "realestategroup",
+  identifier: "realEstateGroup",
   label: "Homes",
   icon: ico36_uc_realestate,
   subItems: {

@@ -12,11 +12,11 @@ export const rdfTextfieldHelpText =
 
 const labels = deepFreeze({
   connectionState: {
-    [vocab.WON.Suggested]: "Conversation suggested.",
-    [vocab.WON.RequestSent]: "Conversation requested by you.",
-    [vocab.WON.RequestReceived]: "Conversation requested.",
-    [vocab.WON.Connected]: "Conversation open.",
-    [vocab.WON.Closed]: "Conversation closed.",
+    [vocab.WON.Suggested]: "Suggested",
+    [vocab.WON.RequestSent]: "Requested by you",
+    [vocab.WON.RequestReceived]: "Requested",
+    [vocab.WON.Connected]: "Open",
+    [vocab.WON.Closed]: "Closed",
   },
   messageType: {
     [vocab.WONMSG.connectMessage]: "Connect Message",

@@ -368,3 +368,7 @@ export function isChangeNotificationMessage(msg) {
 export function isParsable(msg) {
   return get(msg, "isParsable");
 }
+
+export function getHumanReadableString(msg) {
+  return getIn(msg, ["content", "text"]) || "«Message does not have text»";
+}

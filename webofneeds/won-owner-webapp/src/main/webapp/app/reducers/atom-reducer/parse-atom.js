@@ -70,6 +70,37 @@ export function parseAtom(jsonldAtom) {
       getHumanReadableStringFromAtom(parsedAtomImm, detailsToParse)
     );
 
+    //Sort content details
+    const atomContent = get(parsedAtomImm, "content");
+    const atomSeeksContent = get(parsedAtomImm, "seeks");
+
+    const sortContentDetailsImm = (_, contentIdentifier) => {
+      if (
+        contentIdentifier === "title" ||
+        contentIdentifier === "personaName"
+      ) {
+        return "1";
+      }
+      if (contentIdentifier === "description") {
+        return "2";
+      }
+
+      return get(detailsToParse[contentIdentifier], "label");
+    };
+
+    if (atomContent) {
+      parsedAtomImm = parsedAtomImm.set(
+        "content",
+        atomContent.toOrderedMap().sortBy(sortContentDetailsImm)
+      );
+    }
+    if (atomSeeksContent) {
+      parsedAtomImm = parsedAtomImm.set(
+        "seeks",
+        atomSeeksContent.toOrderedMap().sortBy(sortContentDetailsImm)
+      );
+    }
+
     return parsedAtomImm;
   } else {
     console.error(

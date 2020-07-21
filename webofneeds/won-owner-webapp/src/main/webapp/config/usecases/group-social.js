@@ -5,7 +5,7 @@ import { handleComplaint } from "./uc-handle-complaint";
 import ico36_uc_find_people from "../../images/won-icons/ico36_uc_find_people.svg";
 
 export const socialGroup = {
-  identifier: "socialgroup",
+  identifier: "socialGroup",
   label: "Social",
   icon: ico36_uc_find_people,
   subItems: {

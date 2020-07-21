@@ -7,7 +7,7 @@ import { rehearsalRoomSearch } from "./uc-rehearsal-room-search.js";
 import ico36_detail_instrument from "../../images/won-icons/ico36_detail_instrument.svg";
 
 export const artistGroup = {
-  identifier: "artistgroup",
+  identifier: "artistGroup",
   label: "Music",
   icon: ico36_detail_instrument,
   subItems: {
