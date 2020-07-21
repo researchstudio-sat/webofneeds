@@ -319,6 +319,8 @@ export default function WonGroupAtomMessages({
           },
           "/post"
         )}
+        hideTimestamp={true}
+        hideMessageIndicator={true}
       />
       <WonShareDropdown atom={targetAtom} />
       <WonConnectionContextDropdown connection={connection} />

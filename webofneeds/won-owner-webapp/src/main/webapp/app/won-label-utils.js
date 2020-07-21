@@ -11,13 +11,6 @@ export const rdfTextfieldHelpText =
   `\`<${vocab.WONMSG.uriPlaceholder.event}> con:text "hello world!". \``;
 
 const labels = deepFreeze({
-  connectionState: {
-    [vocab.WON.Suggested]: "Conversation suggested.",
-    [vocab.WON.RequestSent]: "Conversation requested by you.",
-    [vocab.WON.RequestReceived]: "Conversation requested.",
-    [vocab.WON.Connected]: "Conversation open.",
-    [vocab.WON.Closed]: "Conversation closed.",
-  },
   messageType: {
     [vocab.WONMSG.connectMessage]: "Connect Message",
     [vocab.WONMSG.closeMessage]: "Close Message",
@@ -124,10 +117,6 @@ const labels = deepFreeze({
     [vocab.WXVALUEFLOWS.ActorActivitySocketCompacted]: "Actors",
   },
 });
-
-export function getConnectionStateLabel(connectionState) {
-  return labels.connectionState[connectionState] || connectionState;
-}
 
 export function getMessageTypeLabel(messageType) {
   return labels.messageType[messageType] || messageType;

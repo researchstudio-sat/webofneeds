@@ -143,11 +143,6 @@ function hasReferences(refContent) {
   return false;
 }
 
-export function getHumanReadableStringFromMessage(message) {
-  const text = message && message.getIn(["content", "text"]);
-  return text;
-}
-
 /**
  * Tries to extract all the detailsToParse from the given contentJsonLd
  * uses the parseFromRdf function defined in the detail to extract the content

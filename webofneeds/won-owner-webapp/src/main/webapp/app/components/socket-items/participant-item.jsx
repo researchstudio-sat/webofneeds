@@ -101,6 +101,8 @@ export default function WonParticipantItem({
               "/post"
             )}
             flip={flip}
+            hideTimestamp={true}
+            hideMessageIndicator={true}
           />
         </WonAtomContextSwipeableView>
       </div>

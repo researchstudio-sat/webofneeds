@@ -623,6 +623,8 @@ export default function WonAtomMessages({
             },
             "/post"
           )}
+          hideTimestamp={true}
+          hideMessageIndicator={true}
         />
         <WonShareDropdown atom={targetAtom} />
         <WonConnectionContextDropdown
