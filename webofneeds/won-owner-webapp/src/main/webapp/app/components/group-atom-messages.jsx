@@ -71,8 +71,6 @@ export default function WonGroupAtomMessages({
     connectionUri
   );
 
-  const sortedMessages = chatMessages ? chatMessages.toArray() : [];
-
   const unreadMessages =
     chatMessages &&
     chatMessages.filter(msg => messageUtils.isMessageUnread(msg));
@@ -327,27 +325,14 @@ export default function WonGroupAtomMessages({
     </div>
   );
 
-  const contentElement = (
-    <div className="am__content" ref={chatContainerRef} onScroll={onScroll}>
-      {unreadIndicatorElement}
-      {(isConnectionLoading || isProcessingLoadingMessages) &&
-        loadSpinnerElement}
-      {!isSuggested &&
-        !isConnectionLoading &&
-        !isProcessingLoadingMessages &&
-        hasConnectionMessagesToLoad && (
-          <button
-            className="am__content__loadbutton won-button--outlined thin secondary"
-            onClick={() => loadPreviousMessages()}
-          >
-            Load previous messages
-          </button>
-        )}
+  const generateMessageElements = () => {
+    const messageElements = [];
 
-      {sortedMessages.map((msg, index) => {
-        return (
+    if (chatMessages) {
+      chatMessages.map((msg, messageUri) => {
+        messageElements.push(
           <WonConnectionMessage
-            key={get(msg, "uri") + "-" + index}
+            key={messageUri}
             message={msg}
             connection={connection}
             senderAtom={senderAtom}
@@ -360,10 +345,10 @@ export default function WonGroupAtomMessages({
             groupChatMessage={true}
           />
         );
-      })}
-      {rdfLinkToConnection}
-    </div>
-  );
+      });
+    }
+    return messageElements;
+  };
 
   if (isConnected) {
     footerElement = (
@@ -451,7 +436,25 @@ export default function WonGroupAtomMessages({
       }
     >
       {headerElement}
-      {contentElement}
+      <div className="am__content" ref={chatContainerRef} onScroll={onScroll}>
+        {unreadIndicatorElement}
+        {(isConnectionLoading || isProcessingLoadingMessages) &&
+          loadSpinnerElement}
+        {!isSuggested &&
+          !isConnectionLoading &&
+          !isProcessingLoadingMessages &&
+          hasConnectionMessagesToLoad && (
+            <button
+              className="am__content__loadbutton won-button--outlined thin secondary"
+              onClick={() => loadPreviousMessages()}
+            >
+              Load previous messages
+            </button>
+          )}
+        {generateMessageElements()}
+        {rdfLinkToConnection}
+      </div>
+
       {footerElement}
     </won-atom-messages>
   );

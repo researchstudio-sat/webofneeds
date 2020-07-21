@@ -100,8 +100,6 @@ export default function WonAtomMessages({
     messages.filter(msg => messageUtils.isMessageProposal(connection, msg));
   //TODO Refactor End
 
-  let sortedMessages = chatMessages ? chatMessages.toArray() : [];
-
   const unreadMessages =
     chatMessages &&
     chatMessages.filter(msg => messageUtils.isMessageUnread(msg));
@@ -635,6 +633,34 @@ export default function WonAtomMessages({
       </div>
     );
 
+    const generateMessageElements = () => {
+      const messageElements = [];
+
+      if (chatMessages) {
+        chatMessages.map((msg, messageUri) => {
+          messageElements.push(
+            <WonConnectionMessage
+              key={messageUri}
+              message={msg}
+              connection={connection}
+              senderAtom={senderAtom}
+              targetAtom={targetAtom}
+              processState={processState}
+              allAtoms={allAtoms}
+              ownedConnections={ownedConnections}
+              shouldShowRdf={shouldShowRdf}
+              onClick={
+                multiSelectType
+                  ? () => selectMessage(get(msg, "uri"))
+                  : undefined
+              }
+            />
+          );
+        });
+      }
+      return messageElements;
+    };
+
     contentElement = (
       <div className="am__content" ref={chatContainerRef} onScroll={onScroll}>
         {unreadIndicatorElement}
@@ -653,27 +679,7 @@ export default function WonAtomMessages({
             </button>
           )}
 
-        {sortedMessages.map((msg, index) => {
-          return (
-            <WonConnectionMessage
-              key={get(msg, "uri") + "-" + index}
-              message={msg}
-              connection={connection}
-              senderAtom={senderAtom}
-              targetAtom={targetAtom}
-              processState={processState}
-              allAtoms={allAtoms}
-              ownedConnections={ownedConnections}
-              shouldShowRdf={shouldShowRdf}
-              onClick={
-                multiSelectType
-                  ? () => selectMessage(get(msg, "uri"))
-                  : undefined
-              }
-            />
-          );
-        })}
-
+        {generateMessageElements()}
         {rdfLinkToConnection}
       </div>
     );
