@@ -9,7 +9,48 @@ import vocab from "./service/vocab.js";
 
 import Immutable from "immutable";
 
-const useCasesImm = Immutable.fromJS(useCaseDefinitions.getAllUseCases());
+/**
+ * Sorting function for details, list details alphabetically, but show title or personaName first, and description second
+ * then all mandatory details (alphabetically) and then the rest
+ * @param detail
+ * @param detailIdentifier
+ * @returns {string|any}
+ */
+const sortDetailsImm = (detail, detailIdentifier) => {
+  if (detailIdentifier === "title" || detailIdentifier === "personaName") {
+    return "1";
+  }
+  if (detailIdentifier === "description") {
+    return "2";
+  }
+
+  const detailLabel = get(detail, "label");
+  if (get(detail, "mandatory")) {
+    return `3${detailLabel}`;
+  }
+  return detailLabel;
+};
+
+const useCasesImm = Immutable.fromJS(useCaseDefinitions.getAllUseCases()).map(
+  useCase => {
+    const contentDetails = get(useCase, "details");
+    const seeksDetails = get(useCase, "seeksDetails");
+
+    if (contentDetails) {
+      useCase = useCase.set(
+        "details",
+        contentDetails.toOrderedMap().sortBy(sortDetailsImm)
+      );
+    }
+    if (seeksDetails) {
+      useCase = useCase.set(
+        "seeksDetails",
+        seeksDetails.toOrderedMap().sortBy(sortDetailsImm)
+      );
+    }
+    return useCase;
+  }
+);
 const useCaseGroupsImm = Immutable.fromJS(
   useCaseDefinitions.getAllUseCaseGroups()
 );
@@ -342,6 +383,15 @@ export function getUseCase(useCaseString) {
     return foundUseCase && foundUseCase.toJS();
   }
   return undefined;
+}
+
+/**
+ * Returns a copy of the useCase with the given useCaseString as an identifier
+ * @param useCaseString
+ * @returns {*}
+ */
+export function getUseCaseImm(useCaseString) {
+  return get(useCasesImm, useCaseString);
 }
 
 /**
@@ -685,15 +735,13 @@ export function getVisibleUseCaseGroups(
   return visibleUseCaseGroups && visibleUseCaseGroups.toJS();
 }
 
-export function isHoldable(useCase) {
-  const useCaseSockets = getIn(useCase, ["draft", "content", "sockets"]);
+export function isHoldable(useCaseImm) {
+  const useCaseSockets = getIn(useCaseImm, ["draft", "content", "sockets"]);
 
   if (useCaseSockets) {
-    for (const key in useCaseSockets) {
-      if (useCaseSockets[key] === vocab.HOLD.HoldableSocketCompacted) {
-        return true;
-      }
-    }
+    return !!useCaseSockets.find(
+      socketType => socketType === vocab.HOLD.HoldableSocketCompacted
+    );
   }
   return false;
 }
@@ -723,51 +771,47 @@ function isInVisibleUseCaseArray(useCase, visibleUseCasesArray) {
 }
 
 // returns true if the part in isOrSeeks, has all the mandatory details of the useCaseBranchDetails
-export function mandatoryDetailsSet(isOrSeeks, useCaseBranchDetails) {
-  if (!useCaseBranchDetails) {
+function mandatoryDetailsSetImm(branchImm, useCaseBranchDetailsImm) {
+  if (!useCaseBranchDetailsImm) {
     return true;
   }
 
-  for (const key in useCaseBranchDetails) {
-    if (useCaseBranchDetails[key].mandatory) {
-      const detailSaved = isOrSeeks && isOrSeeks[key];
-      if (!detailSaved) {
-        return false;
-      }
-    }
-  }
-  return true;
+  const unsetMandatoryDetails = useCaseBranchDetailsImm
+    .filter(detail => get(detail, "mandatory"))
+    .filter((detail, detailIdentifier) => !get(branchImm, detailIdentifier));
+
+  return unsetMandatoryDetails.size === 0;
 }
 
 // returns true if the branch has any content present
-function isBranchContentPresent(isOrSeeks, includeType = false) {
-  if (isOrSeeks) {
-    const details = Object.keys(isOrSeeks);
-    for (let d of details) {
-      if (isOrSeeks[d] && (includeType || d !== "type")) {
-        return true;
-      }
-    }
+function isBranchContentPresentImm(isOrSeeksImm, includeType = false) {
+  if (isOrSeeksImm) {
+    return (
+      isOrSeeksImm.filter(
+        (detail, detailIdentifier) =>
+          !!detail && (includeType || detailIdentifier !== "type")
+      ).size > 0
+    );
   }
   return false;
 }
 
-export function isValidDraft(draftObject, useCase) {
-  const draftContent = get(draftObject, "content");
-  const seeksBranch = get(draftObject, "seeks");
+export function isValidDraftImm(draftObjectImm, useCaseImm) {
+  const draftContentImm = get(draftObjectImm, "content");
+  const seeksBranchImm = get(draftObjectImm, "seeks");
 
-  if (draftContent || seeksBranch) {
-    const mandatoryContentDetailsSet = mandatoryDetailsSet(
-      draftContent,
-      useCase.details
+  if (draftContentImm || seeksBranchImm) {
+    const mandatoryContentDetailsSet = mandatoryDetailsSetImm(
+      draftContentImm,
+      get(useCaseImm, "details")
     );
-    const mandatorySeeksDetailsSet = mandatoryDetailsSet(
-      seeksBranch,
-      useCase.seeksDetails
+    const mandatorySeeksDetailsSet = mandatoryDetailsSetImm(
+      seeksBranchImm,
+      get(useCaseImm, "seeksDetails")
     );
     if (mandatoryContentDetailsSet && mandatorySeeksDetailsSet) {
-      const hasContent = isBranchContentPresent(draftContent);
-      const hasSeeksContent = isBranchContentPresent(seeksBranch);
+      const hasContent = isBranchContentPresentImm(draftContentImm);
+      const hasSeeksContent = isBranchContentPresentImm(seeksBranchImm);
 
       return hasContent || hasSeeksContent;
     }
@@ -778,16 +822,15 @@ export function isValidDraft(draftObject, useCase) {
 /**
  * Removes empty branches from the draft, and adds the proper useCase to the draft
  */
-export function getSanitizedDraftObject(draftObject, useCase) {
-  const _draftObject = draftObject;
-  _draftObject.useCase = get(useCase, "identifier");
+export function getSanitizedDraftObjectImm(draftObjectImm, useCaseImm) {
+  draftObjectImm = draftObjectImm.set("useCase", get(useCaseImm, "identifier"));
 
-  if (!isBranchContentPresent(_draftObject.content, true)) {
-    delete _draftObject.content;
+  if (!isBranchContentPresentImm(get(draftObjectImm, "content"), true)) {
+    draftObjectImm = draftObjectImm.set("content", undefined);
   }
-  if (!isBranchContentPresent(_draftObject.seeks, true)) {
-    delete _draftObject.seeks;
+  if (!isBranchContentPresentImm(get(draftObjectImm, "seeks"), true)) {
+    draftObjectImm = draftObjectImm.set("seeks", undefined);
   }
 
-  return _draftObject;
+  return draftObjectImm;
 }
