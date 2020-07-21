@@ -91,7 +91,10 @@ export default function PageConnections() {
     selectedConnection &&
     atomUtils.getGroupSocket(selectedTargetAtom) ===
       get(selectedConnection, "targetSocketUri");
-  const hasChatConnections = useSelector(generalSelectors.hasChatConnections);
+  const allChatConnections = useSelector(
+    generalSelectors.getAllChatConnections
+  );
+  const storedAtoms = useSelector(generalSelectors.getAtoms);
   const isLoggedIn = useSelector(state =>
     accountUtils.isLoggedIn(generalSelectors.getAccountState(state))
   );
@@ -115,7 +118,7 @@ export default function PageConnections() {
         )}
       </main>
     );
-  } else if (hasChatConnections) {
+  } else if (allChatConnections && allChatConnections.size > 0) {
     contentElements = (
       <React.Fragment>
         <aside
@@ -123,7 +126,10 @@ export default function PageConnections() {
             "overview__left " + (selectedConnection ? "hide-in-responsive" : "")
           }
         >
-          <WonConnectionsOverview />
+          <WonConnectionsOverview
+            chatConnections={allChatConnections}
+            storedAtoms={storedAtoms}
+          />
         </aside>
         {selectedConnection ? (
           <main className="overview__right">

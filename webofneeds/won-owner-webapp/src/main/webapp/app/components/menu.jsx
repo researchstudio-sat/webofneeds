@@ -20,7 +20,6 @@ export default function WonMenu({ className }) {
   const isLocationAccessDenied = useSelector(
     generalSelectors.isLocationAccessDenied
   );
-  const hasChatConnections = useSelector(generalSelectors.hasChatConnections);
   const hasUnreadSuggestedConnections = useSelector(
     generalSelectors.hasUnreadSuggestedConnections
   );
@@ -146,10 +145,7 @@ export default function WonMenu({ className }) {
           <span className="menu__tab__label">Inventory</span>
         </NavLink>
         <NavLink
-          className={generateTabClasses(
-            !hasChatConnections,
-            hasUnreadChatConnections
-          )}
+          className={generateTabClasses(false, hasUnreadChatConnections)}
           activeClassName="menu__tab--selected"
           onClick={hideMenuIfVisible}
           to="/connections"
