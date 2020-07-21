@@ -462,13 +462,13 @@ export function getUseCaseImmMergedWithAtom(
   return useCaseImm;
 }
 
-export function getUseCaseGroupByIdentifier(groupIdentifier) {
-  const foundUseCaseGroup =
+export function getUseCaseGroupByIdentifierImm(groupIdentifier) {
+  return (
     groupIdentifier &&
     useCaseGroupsImm.find(
       useCaseGroup => get(useCaseGroup, "identifier") === groupIdentifier
-    );
-  return foundUseCaseGroup && foundUseCaseGroup.toJS();
+    )
+  );
 }
 
 /**
@@ -656,7 +656,7 @@ function countDisplayableItemsInGroupImm(
  * @returns {*}
  */
 export function isUseCaseGroup(element) {
-  return element.subItems;
+  return !!get(element, "subItems");
 }
 
 export function filterUseCasesBySearchQueryImm(
