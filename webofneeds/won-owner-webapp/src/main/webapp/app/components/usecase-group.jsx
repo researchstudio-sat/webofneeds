@@ -46,12 +46,14 @@ export default function WonUseCaseGroup({
         const subItemIcon = get(subItem, "icon");
         const subItemIconJS = subItemIcon && subItemIcon.toJS();
 
-        subItemElements.push(
-          useCaseUtils.isDisplayableItem(
+        if (
+          useCaseUtils.isDisplayableItemImm(
             subItem,
             visibleUseCasesByConfig,
             filterBySocketType
-          ) ? (
+          )
+        ) {
+          subItemElements.push(
             <Link
               key={subItemIdentifier}
               className="ucg__main__usecase clickable"
@@ -66,12 +68,11 @@ export default function WonUseCaseGroup({
                 <div className="ucg__main__usecase__label">{subItemLabel}</div>
               )}
             </Link>
-          ) : (
-            undefined
-          )
-        );
+          );
+        }
       });
     }
+    return subItemElements;
   };
   return (
     <won-usecase-group>

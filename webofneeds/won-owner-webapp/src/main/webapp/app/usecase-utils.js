@@ -543,18 +543,7 @@ function isDisplayableUseCaseImm(
  * @param visibleUseCasesArray => array of useCaseIdentifier that are visible
  * @returns {*}
  */
-export function isDisplayableItem(
-  item,
-  visibleUseCasesArray,
-  filterBySocketType
-) {
-  return (
-    isDisplayableUseCase(item, visibleUseCasesArray, filterBySocketType) ||
-    isDisplayableUseCaseGroup(item, visibleUseCasesArray, filterBySocketType)
-  );
-}
-
-function isDisplayableItemImm(
+export function isDisplayableItemImm(
   itemImm,
   visibleUseCasesArray,
   filterBySocketType
@@ -571,39 +560,6 @@ function isDisplayableItemImm(
       filterBySocketType
     )
   );
-}
-
-/**
- * return if the given useCaseGroup is displayable or not
- * needs to have at least one displayable UseCase
- * @param useCase
- * @param visibleUseCasesArray => array of useCaseIdentifier that are visible
- * @returns {*}
- */
-export function isDisplayableUseCaseGroup(
-  useCaseGroup,
-  visibleUseCasesArray,
-  filterBySocketType
-) {
-  const useCaseGroupValid =
-    useCaseGroup &&
-    (useCaseGroup.label || useCaseGroup.icon) &&
-    useCaseGroup.subItems;
-
-  if (useCaseGroupValid) {
-    for (const key in useCaseGroup.subItems) {
-      if (
-        isDisplayableItem(
-          useCaseGroup.subItems[key],
-          visibleUseCasesArray,
-          filterBySocketType
-        )
-      ) {
-        return true;
-      }
-    }
-  }
-  return false;
 }
 
 function isDisplayableUseCaseGroupImm(
