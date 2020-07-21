@@ -13,7 +13,7 @@ TODO: create use case icons
 */
 
 export const classifiedsGroup = {
-  identifier: "classifiedsgroup",
+  identifier: "classifiedsGroup",
   label: "Buy & Sell",
   icon: ico36_detail_price,
   subItems: {

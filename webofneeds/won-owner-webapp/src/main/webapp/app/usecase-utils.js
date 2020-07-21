@@ -31,8 +31,12 @@ const sortDetailsImm = (detail, detailIdentifier) => {
   return detailLabel;
 };
 
-const useCasesImm = Immutable.fromJS(useCaseDefinitions.getAllUseCases()).map(
-  useCase => {
+const sortByItemLabel = item => get(item, "label");
+
+const useCasesImm = Immutable.fromJS(useCaseDefinitions.getAllUseCases())
+  .toOrderedMap()
+  .sortBy(sortByItemLabel)
+  .map(useCase => {
     const contentDetails = get(useCase, "details");
     const seeksDetails = get(useCase, "seeksDetails");
 
@@ -49,11 +53,26 @@ const useCasesImm = Immutable.fromJS(useCaseDefinitions.getAllUseCases()).map(
       );
     }
     return useCase;
-  }
-);
+  });
 const useCaseGroupsImm = Immutable.fromJS(
   useCaseDefinitions.getAllUseCaseGroups()
-);
+)
+  .map(useCaseGroup => {
+    const subItems = get(useCaseGroup, "subItems");
+    if (subItems) {
+      return useCaseGroup.set(
+        "subItems",
+        subItems.toOrderedMap().sortBy(sortByItemLabel)
+      );
+    } else {
+      return useCaseGroup;
+    }
+  })
+  .toOrderedMap()
+  .sortBy(
+    (useCaseGroup, useCaseGroupIdentifier) =>
+      useCaseGroupIdentifier === "otherGroup" ? "_" : get(useCaseGroup, "label")
+  );
 const allDetails = initializeAllDetails();
 const allDetailsImm = Immutable.fromJS(allDetails);
 const allMessageDetailsImm = Immutable.fromJS(initializeAllMessageDetails());
@@ -315,7 +334,7 @@ function initializeAllMessageDetails() {
  * @param visibleUseCasesArray => array of useCaseIdentifier that are visible
  * @returns {*}
  */
-export function getUnGroupedUseCases(
+export function getUnGroupedUseCasesImm(
   threshold = 0,
   visibleUseCasesArray,
   filterBySocketType
@@ -351,15 +370,9 @@ export function getUnGroupedUseCases(
 
   return (
     ungroupedUseCasesImm &&
-    ungroupedUseCasesImm
-      .filter(useCase =>
-        isDisplayableUseCaseImm(
-          useCase,
-          visibleUseCasesArray,
-          filterBySocketType
-        )
-      )
-      .toJS()
+    ungroupedUseCasesImm.filter(useCase =>
+      isDisplayableUseCaseImm(useCase, visibleUseCasesArray, filterBySocketType)
+    )
   );
 }
 
@@ -368,8 +381,8 @@ export function getUnGroupedUseCases(
  * @param useCaseString
  * @returns {*}
  */
-export function getCustomUseCase() {
-  return getUseCase("customUseCase");
+export function getCustomUseCaseImm() {
+  return getUseCaseImm("customUseCase");
 }
 
 /**
@@ -646,29 +659,22 @@ export function isUseCaseGroup(element) {
   return element.subItems;
 }
 
-export function filterUseCasesBySearchQuery(
+export function filterUseCasesBySearchQueryImm(
   queryString,
   visibleUseCasesArray,
   filterBySocketType
 ) {
-  const resultSet =
+  return (
     useCasesImm &&
-    useCasesImm
-      .filter(useCase =>
-        searchFunctionImm(
-          useCase,
-          queryString,
-          visibleUseCasesArray,
-          filterBySocketType
-        )
+    useCasesImm.filter(useCase =>
+      searchFunctionImm(
+        useCase,
+        queryString,
+        visibleUseCasesArray,
+        filterBySocketType
       )
-      .toSet();
-
-  if (!resultSet || resultSet.size === 0) {
-    return undefined;
-  }
-
-  return Array.from(resultSet.toJS());
+    )
+  );
 }
 
 function searchFunctionImm(
@@ -711,12 +717,12 @@ function hasSubElements(obj) {
   return obj && obj !== {} && Object.keys(obj).length > 0;
 }
 
-export function getVisibleUseCaseGroups(
+export function getVisibleUseCaseGroupsImm(
   threshold,
   visibleUseCasesArray,
   filterBySocketType
 ) {
-  const visibleUseCaseGroups =
+  return (
     useCaseGroupsImm &&
     useCaseGroupsImm.filter(
       useCaseGroup =>
@@ -730,9 +736,8 @@ export function getVisibleUseCaseGroups(
           visibleUseCasesArray,
           filterBySocketType
         ) > threshold
-    );
-
-  return visibleUseCaseGroups && visibleUseCaseGroups.toJS();
+    )
+  );
 }
 
 export function isHoldable(useCaseImm) {

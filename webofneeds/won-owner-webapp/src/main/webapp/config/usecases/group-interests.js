@@ -10,7 +10,7 @@ import ico36_detail_interests from "../../images/won-icons/ico36_detail_interest
 import ico36_detail_datetime from "~/images/won-icons/ico36_detail_datetime.svg";
 
 export const interestsGroup = {
-  identifier: "interestsgroup",
+  identifier: "interestsGroup",
   label: "Interests",
   icon: ico36_detail_interests,
   subItems: {

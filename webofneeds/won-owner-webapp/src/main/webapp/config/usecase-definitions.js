@@ -59,15 +59,15 @@ import { review } from "./usecases/uc-review.js";
 const useCaseGroups = {
   interestsGroup: interestsGroup,
   plansGroup: plansGroup,
-  social: socialGroup,
-  classifieds: classifiedsGroup,
-  work: workGroup,
-  academic: academicGroup,
-  artists: artistGroup,
-  realEstate: realEstateGroup,
-  transport: transportGroup,
-  personalMobility: personalMobilityGroup,
-  other: otherGroup,
+  socialGroup: socialGroup,
+  classifiedsGroup: classifiedsGroup,
+  workGroup: workGroup,
+  academicGroup: academicGroup,
+  artistGroup: artistGroup,
+  realEstateGroup: realEstateGroup,
+  transportGroup: transportGroup,
+  personalMobilityGroup: personalMobilityGroup,
+  otherGroup: otherGroup,
 };
 
 // add useCases here that should not be visible in the grouped useCases (will be hidden and only accessible through reactions

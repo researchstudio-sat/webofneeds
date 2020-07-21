@@ -17,7 +17,7 @@ import ico36_plus from "../../images/won-icons/ico36_plus.svg";
 import ico36_uc_custom from "../../images/won-icons/ico36_uc_custom.svg";
 
 export const otherGroup = {
-  identifier: "othergroup",
+  identifier: "otherGroup",
   label: "More...",
   icon: ico36_plus,
   subItems: {
