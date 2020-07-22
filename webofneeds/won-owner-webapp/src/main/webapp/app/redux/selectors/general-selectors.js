@@ -426,22 +426,13 @@ export const getConnectionsToCrawl = createSelector(
   (process, connections) =>
     connections
       ? connections
+          .filter(conn => connectionUtils.getMessagesSize(conn) === 0)
           .filter(
-            conn => !get(conn, "messages") || get(conn, "messages").size === 0
-            // the check below (if connectMessage was present) was replaced by if any messages are available (if any are there this connection is not to be fetched anymore)
-            // !!conn
-            //   .get("messages")
-            //   .find(msg => msg.get("messageType") === vocab.WONMSG.connectMessage)
-          )
-          .filter(conn => {
-            const connUri = get(conn, "uri");
-
-            return (
+            (conn, connUri) =>
               !processUtils.isConnectionLoading(process, connUri) &&
               !processUtils.isConnectionLoadingMessages(process, connUri) &&
               !processUtils.hasConnectionFailedToLoad(process, connUri) &&
               processUtils.hasMessagesToLoad(process, connUri)
-            );
-          })
+          )
       : Immutable.Map()
 );

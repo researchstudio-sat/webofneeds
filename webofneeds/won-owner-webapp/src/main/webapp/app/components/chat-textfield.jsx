@@ -53,7 +53,7 @@ export default function ChatTextfield({
     generalSelectors.getAtom(get(connection, "targetAtomUri"))
   );
 
-  const messages = get(connection, "messages");
+  const messages = connectionUtils.getMessages(connection);
 
   const selectedMessages =
     messages && messages.filter(msg => messageUtils.isMessageSelected(msg));

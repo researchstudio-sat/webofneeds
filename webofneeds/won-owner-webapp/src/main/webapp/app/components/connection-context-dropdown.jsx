@@ -155,7 +155,7 @@ export default function WonConnectionContextDropdown({
               generateLink(
                 history.location,
                 {
-                  postUri: targetAtomUri,
+                  postUri: targetAtomUri, //TODO: ENHANCE LOADING PROCESS BY LOADING CONNECTIONS ONLY ON POST VIEW
                   tab: undefined,
                   connectionUri: undefined,
                 },

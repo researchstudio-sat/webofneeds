@@ -54,6 +54,21 @@ export function hasTargetSocketUri(connection, socketUri) {
   );
 }
 
+export function getMessages(connection) {
+  return get(connection, "messages");
+}
+
+export function getMessagesSize(connection) {
+  const messages = getMessages(connection);
+
+  return messages ? messages.size : 0;
+}
+
+export function getMessage(connection, msgUri) {
+  const messages = getMessages(connection);
+
+  return get(messages, msgUri);
+}
 /**
  * Creates a label of the participants and suggestions/requests/invites of a given set of groupChatConnections
  * @param groupChatConnections

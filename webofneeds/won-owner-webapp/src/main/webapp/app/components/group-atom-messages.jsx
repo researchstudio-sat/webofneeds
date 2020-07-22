@@ -57,7 +57,7 @@ export default function WonGroupAtomMessages({
   const senderAtomUri = get(senderAtom, "uri");
   const targetAtomUri = get(connection, "targetAtomUri");
   const targetAtom = useSelector(generalSelectors.getAtom(targetAtomUri));
-  const allChatMessages = get(connection, "messages");
+  const allChatMessages = connectionUtils.getMessages(connection);
   const chatMessages =
     allChatMessages &&
     allChatMessages
@@ -217,7 +217,7 @@ export default function WonGroupAtomMessages({
     if (
       hasConnectionMessagesToLoad &&
       !connectionUtils.isUsingTemporaryUri(connection) &&
-      get(connection, "messages").size < INITIAL_MESSAGECOUNT
+      connectionUtils.getMessagesSize(connection) < INITIAL_MESSAGECOUNT
     ) {
       loadPreviousMessages(INITIAL_MESSAGECOUNT);
     }

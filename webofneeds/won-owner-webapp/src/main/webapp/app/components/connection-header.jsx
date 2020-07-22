@@ -197,7 +197,7 @@ export default function WonConnectionHeader({
 
       let subtitleElement;
       if (!hideMessageIndicator) {
-        const allMessages = get(connection, "messages");
+        const allMessages = connectionUtils.getMessages(connection);
         const unreadMessages =
           allMessages &&
           allMessages.filter(msg => messageUtils.isMessageUnread(msg));

@@ -5,6 +5,7 @@ import { actionCreators } from "../actions/actions.js";
 import { get, getIn, getPathname } from "../utils.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as processSelectors from "../redux/selectors/process-selectors.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import WonAccountMenu from "./account-menu.jsx";
@@ -54,33 +55,16 @@ export default function WonTopnav({ pageTitle }) {
         " Size: ",
         connectionsToCrawl.size
       );
-      connectionsToCrawl.map(conn => {
-        const messages = get(conn, "messages");
-        const messageCount = messages ? messages.size : 0;
-
-        if (messageCount === 0) {
+      connectionsToCrawl
+        .filter(conn => connectionUtils.getMessagesSize(conn) === 0)
+        .map(conn => {
           dispatch(
             actionCreators.connections__showLatestMessages(
               get(conn, "uri"),
               MESSAGECOUNT
             )
           );
-        } /* else {
-          // WORKAROUND FOR SLOW LOAD: Remove loading of more Messages until a read one appears will be excluded
-          const receivedMessages = messages.filter(
-            msg => !get(msg, "outgoingMessage")
-          );
-          const receivedMessagesReadPresent = receivedMessages.find(
-            msg => !get(msg, "unread")
-          );
-
-          if (!receivedMessagesReadPresent) {
-            dispatch(
-              actionCreators.connections__showMoreMessages(get(conn, "uri"), MESSAGECOUNT)
-            );
-          }
-        } */
-      });
+        });
     }
   });
 

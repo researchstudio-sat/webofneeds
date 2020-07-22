@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 
 import PropTypes from "prop-types";
 import { get, getIn } from "../../utils.js";
+import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import * as ownerApi from "../../api/owner-api";
 import won from "../../won-es6";
 import WonCombinedMessageContent from "./combined-message-content.jsx";
@@ -28,7 +29,6 @@ export default function WonReferencedMessageContent({
     "expandedReferences",
   ]);
 
-  const chatMessages = get(connection, "messages");
   const references = get(message, "references");
 
   const rejectUris = get(references, "rejects");
@@ -58,7 +58,7 @@ export default function WonReferencedMessageContent({
   }
 
   function generateCombinedMessageElement(msgUri, className) {
-    const referencedMessage = get(chatMessages, msgUri);
+    const referencedMessage = connectionUtils.getMessage(connection, msgUri);
 
     let messageClass = className;
 
