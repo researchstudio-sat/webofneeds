@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import { get, toAbsoluteURL } from "../utils.js";
 import { ownerBaseUrl } from "~/config/default.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as wonUtils from "../won-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 
@@ -23,9 +24,8 @@ export default function WonAtomShareLink({ atom, className }) {
   }
   let svgQrCodeToPost = wonUtils.generateSvgQrCode(linkToPost);
 
-  const hasConnections = get(atom, "connections")
-    ? get(atom, "connections").size > 0
-    : false;
+  const connections = atomUtils.getConnections(atom);
+  const hasConnections = !!connections && connections.size > 0;
   const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
 
   let linkInput;

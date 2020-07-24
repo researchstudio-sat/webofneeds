@@ -55,9 +55,9 @@ export default function WonConnectionMessage({
   }
   const isSent = get(message, "outgoingMessage");
   const isReceived = !get(message, "outgoingMessage");
-  const isFailedToSend = get(message, "failedToSend");
-  const isReceivedByOwn = get(message, "isReceivedByOwn");
-  const isReceivedByRemote = get(message, "isReceivedByRemote");
+  const isFailedToSend = messageUtils.hasFailedToSend(message);
+  const isReceivedByOwn = messageUtils.isReceivedByOwn(message);
+  const isReceivedByRemote = messageUtils.isReceivedByRemote(message);
 
   // determines if the sent message is not received by any of the servers yet but not failed either
   const isPending =

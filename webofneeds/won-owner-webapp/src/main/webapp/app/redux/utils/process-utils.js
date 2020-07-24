@@ -266,6 +266,12 @@ export function isConnectionPetriNetDataLoaded(process, connUri) {
   );
 }
 
+export function isConnectionPetriNetDataDirty(process, connUri) {
+  return (
+    connUri && getIn(process, ["connections", connUri, "petriNetData", "dirty"])
+  );
+}
+
 /**
  * Return true if the agreement-Data for the given connUri is currently loading
  * @param process

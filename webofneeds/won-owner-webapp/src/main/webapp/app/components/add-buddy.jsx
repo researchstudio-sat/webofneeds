@@ -148,9 +148,9 @@ export default function WonAddBuddy({ atom, className }) {
   let buddySelectionElement =
     ownedAtomsWithBuddySocketArray &&
     ownedAtomsWithBuddySocketArray.map(buddyAtom => {
-      const existingBuddyConnection = get(buddyAtom, "connections").find(
-        conn => get(conn, "targetSocketUri") === targetBuddySocketUri
-      );
+      const existingBuddyConnection = atomUtils
+        .getConnections(buddyAtom, vocab.BUDDY.BuddySocketCompacted)
+        .find(conn => get(conn, "targetSocketUri") === targetBuddySocketUri);
 
       let connectionStateClass;
       let onClickAction = undefined;
@@ -229,10 +229,9 @@ export default function WonAddBuddy({ atom, className }) {
   let actionButton;
 
   if (immediateConnectBuddy) {
-    const existingBuddyConnection = get(
-      immediateConnectBuddy,
-      "connections"
-    ).find(conn => get(conn, "targetSocketUri") === targetBuddySocketUri);
+    const existingBuddyConnection = atomUtils
+      .getConnections(immediateConnectBuddy, vocab.BUDDY.BuddySocketCompacted)
+      .find(conn => get(conn, "targetSocketUri") === targetBuddySocketUri);
 
     let connectionStateClass;
     let onClickAction = undefined;

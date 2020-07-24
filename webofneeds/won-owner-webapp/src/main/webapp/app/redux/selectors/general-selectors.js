@@ -43,6 +43,16 @@ export const getConfigState = createSelector(
   state => get(state, "config")
 );
 
+export const getMessagesState = createSelector(
+  state => state,
+  state => get(state, "messages")
+);
+
+export const isWaitingForAnswer = msgUri =>
+  createSelector(getMessagesState, messagesState =>
+    getIn(messagesState, ["waitingForAnswer", msgUri])
+  );
+
 export const getTheme = createSelector(getConfigState, configState =>
   get(configState, "theme")
 );
@@ -260,7 +270,8 @@ const getBuddyConnectionsByAtomUri = (
   excludeSuggested
 ) =>
   createSelector(getAtoms, atoms => {
-    const connections = getIn(atoms, [atomUri, "connections"]);
+    const atom = get(atoms, atomUri);
+    const connections = atomUtils.getConnections(atom);
 
     return connections
       ? connections
@@ -303,9 +314,11 @@ export const getActiveAtoms = createSelector(
   allAtoms => allAtoms && allAtoms.filter(atom => atomUtils.isActive(atom))
 );
 
-export const selectIsConnected = state =>
-  !state.getIn(["messages", "reconnecting"]) &&
-  !state.getIn(["messages", "lostConnection"]);
+export const selectIsConnected = createSelector(
+  getMessagesState,
+  messagesState =>
+    !get(messagesState, "reconnecting") && !get(messagesState, "lostConnection")
+);
 
 /**
  * Get the atom for a given connectionUri
@@ -319,7 +332,17 @@ export const getOwnedAtomByConnectionUri = connectionUri =>
       connectionUri &&
       atoms &&
       (get(atoms, extractAtomUriFromConnectionUri(connectionUri)) ||
-        atoms.find(atom => getIn(atom, ["connections", connectionUri])))
+        atoms.find(atom => atomUtils.getConnection(atom, connectionUri)))
+  );
+
+export const getAtomByConnectionUri = connectionUri =>
+  createSelector(
+    getAtoms,
+    atoms =>
+      connectionUri &&
+      atoms &&
+      (get(atoms, extractAtomUriFromConnectionUri(connectionUri)) ||
+        atoms.find(atom => atomUtils.getConnection(atom, connectionUri)))
   );
 
 export const getOwnedPersonas = createSelector(
@@ -387,7 +410,7 @@ export const getSenderSocketType = (allAtoms, connection) => {
     connectionUri &&
     allAtoms &&
     (get(allAtoms, extractAtomUriFromConnectionUri(connectionUri)) ||
-      allAtoms.find(atom => getIn(atom, ["connections", connectionUri])));
+      allAtoms.find(atom => atomUtils.getConnection(atom, connectionUri)));
 
   return senderAtom && atomUtils.getSocketType(senderAtom, senderSocketUri);
 };
@@ -409,7 +432,7 @@ export const getTargetSocketType = (allAtoms, connection) => {
 export const getOwnedConnections = createSelector(
   getOwnedAtoms,
   ownedAtoms =>
-    ownedAtoms && ownedAtoms.flatMap(atom => get(atom, "connections"))
+    ownedAtoms && ownedAtoms.flatMap(atom => atomUtils.getConnections(atom))
 );
 
 /**

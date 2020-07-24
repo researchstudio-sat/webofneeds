@@ -1,6 +1,7 @@
 import { parseAtom, parseMetaAtom } from "./parse-atom.js";
 import Immutable from "immutable";
 import { get, getIn } from "../../utils.js";
+import * as atomUtils from "../../redux/utils/atom-utils.js";
 import vocab from "../../service/vocab.js";
 
 export function addAtom(allAtomsInState, jsonldAtom) {
@@ -13,7 +14,7 @@ export function addAtom(allAtomsInState, jsonldAtom) {
     if (existingAtom) {
       parsedAtom = parsedAtom.set(
         "connections",
-        get(existingAtom, "connections")
+        atomUtils.getConnections(existingAtom)
       );
     }
 
@@ -27,8 +28,8 @@ export function addAtom(allAtomsInState, jsonldAtom) {
 export function deleteAtom(allAtomsInState, deletedAtomUri) {
   return allAtomsInState.delete(deletedAtomUri).map(atom => {
     const removeConnections = atom => {
-      return atom.updateIn(
-        ["connections"],
+      return atom.update(
+        "connections",
         connections =>
           connections &&
           connections.filter(

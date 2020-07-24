@@ -5,6 +5,18 @@
 import vocab from "../../service/vocab.js";
 import { get, getIn } from "../../utils.js";
 
+export function isReceivedByOwn(msg) {
+  return !!msg && get(msg, "isReceivedByOwn");
+}
+
+export function isReceivedByRemote(msg) {
+  return !!msg && get(msg, "isReceivedByRemote");
+}
+
+export function hasFailedToSend(msg) {
+  return !!msg && get(msg, "failedToSend");
+}
+
 /**
  * Determines if a given message can be Proposed
  * @param con

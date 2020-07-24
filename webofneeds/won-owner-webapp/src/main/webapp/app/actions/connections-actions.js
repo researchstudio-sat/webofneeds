@@ -561,20 +561,13 @@ function connectAdHoc(
 
 export function connectionsClose(connectionUri) {
   return (dispatch, getState) => {
-    const ownedAtom = get(getState(), "atoms").find(atom =>
-      getIn(atom, ["connections", connectionUri])
+    const ownedAtom = generalSelectors.getAtomByConnectionUri(connectionUri)(
+      getState()
     );
 
-    const socketUri = getIn(ownedAtom, [
-      "connections",
-      connectionUri,
-      "socketUri",
-    ]);
-    const targetSocketUri = getIn(ownedAtom, [
-      "connections",
-      connectionUri,
-      "targetSocketUri",
-    ]);
+    const connection = atomUtils.getConnection(ownedAtom, connectionUri);
+    const socketUri = get(connection, "socketUri");
+    const targetSocketUri = get(connection, "targetSocketUri");
 
     buildCloseMessage(socketUri, targetSocketUri)
       .then(message => ownerApi.sendMessage(message))
@@ -614,22 +607,14 @@ export function connectionsRate(connectionUri, rating) {
   return (dispatch, getState) => {
     const state = getState();
 
-    const ownedAtom = get(state, "atoms").find(atom =>
-      getIn(atom, ["connections", connectionUri])
+    const ownedAtom = generalSelectors.getAtomByConnectionUri(connectionUri)(
+      state
     );
-    const theirAtomUri = getIn(state, [
-      "atoms",
-      get(ownedAtom, "uri"),
-      "connections",
-      connectionUri,
-      "targetAtomUri",
-    ]);
+    const connection = atomUtils.getConnection(ownedAtom, connectionUri);
+
+    const theirAtomUri = get(connection, "targetAtomUri");
+    const theirConnectionUri = get(connection, "targetConnectionUri");
     const theirAtom = generalSelectors.getAtom(theirAtomUri)(state);
-    const theirConnectionUri = getIn(ownedAtom, [
-      "connections",
-      connectionUri,
-      "targetConnectionUri",
-    ]);
 
     won
       .getConnection(connectionUri, {
@@ -683,8 +668,7 @@ export function showLatestMessages(connectionUri, numberOfEvents) {
       connectionUri &&
       generalSelectors.getOwnedAtomByConnectionUri(connectionUri)(state);
     const atomUri = get(atom, "uri");
-    const connection =
-      connectionUri && getIn(atom, ["connections", connectionUri]);
+    const connection = atomUtils.getConnection(atom, connectionUri);
     const processState = generalSelectors.getProcessState(state);
     if (
       !connectionUri ||
@@ -723,7 +707,7 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
       connectionUri &&
       generalSelectors.getOwnedAtomByConnectionUri(connectionUri)(state);
     const atomUri = get(atom, "uri");
-    const connection = getIn(atom, ["connections", connectionUri]);
+    const connection = atomUtils.getConnection(atom, connectionUri);
     const processState = generalSelectors.getProcessState(state);
     if (
       !connection ||

@@ -331,17 +331,19 @@ export function setMultiSelectType(
   ]);
 
   if (!multiSelectType) {
-    messages = messages
-      .map(msg => {
-        msg = getIn(msg, ["viewState", "isSelected"])
-          ? msg.setIn(["viewState", "isSelected"], false)
-          : msg;
-        return msg;
-      })
-      .toOrderedMap()
-      .sortBy(sortByMessageTimeStamp);
     allAtomsInState = allAtomsInState
-      .setIn([atomUri, "connections", connectionUri, "messages"], messages)
+      .setIn(
+        [atomUri, "connections", connectionUri, "messages"],
+        messages
+          .map(msg => {
+            msg = getIn(msg, ["viewState", "isSelected"])
+              ? msg.setIn(["viewState", "isSelected"], false)
+              : msg;
+            return msg;
+          })
+          .toOrderedMap()
+          .sortBy(sortByMessageTimeStamp)
+      )
       .setIn(
         [atomUri, "connections", connectionUri, "multiSelectType"],
         undefined

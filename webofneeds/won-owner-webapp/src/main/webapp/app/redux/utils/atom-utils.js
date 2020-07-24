@@ -564,6 +564,10 @@ export function getNonClosedConnections(atomImm, socketType) {
   );
 }
 
+export function getConnection(atomImm, connectionUri) {
+  return getIn(atomImm, ["connections", connectionUri]);
+}
+
 /**
  * Return all connections of the given atom
  * @param atomImm immutable atom that stores connections

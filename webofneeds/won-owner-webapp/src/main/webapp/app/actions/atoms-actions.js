@@ -17,7 +17,6 @@ import {
   buildEditMessage,
 } from "../won-message-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
-import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as stateStore from "../redux/state-store.js";
@@ -115,14 +114,12 @@ export function close(atomUri) {
           })
         );
 
+        const atom = generalSelectors.getAtom(atomUri)(getState());
+
         //Close all the open connections of the atom
-        getState()
-          .getIn(["atoms", atomUri, "connections"])
-          .map(conn => {
-            if (connectionUtils.isConnected(conn)) {
-              dispatch(actionCreators.connections__close(get(conn, "uri")));
-            }
-          });
+        atomUtils.getConnectedConnections(atom).map(conn => {
+          dispatch(actionCreators.connections__close(get(conn, "uri")));
+        });
       })
       .then(() =>
         // assume close went through successfully, update GUI

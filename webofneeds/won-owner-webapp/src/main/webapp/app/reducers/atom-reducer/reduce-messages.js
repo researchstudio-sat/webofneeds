@@ -11,6 +11,7 @@ import {
   getSenderSocketType,
   getTargetSocketType,
 } from "../../redux/selectors/general-selectors";
+import { extractAtomUriFromConnectionUri } from "../../utils";
 
 export function addMessage(
   allAtomsInState,
@@ -69,11 +70,6 @@ export function addMessage(
 
           const existingMessage = get(messages, parsedMessageUri);
 
-          const isReceivedByOwn = !!get(existingMessage, "isReceivedByOwn");
-          const isReceivedByRemote = !!get(
-            existingMessage,
-            "isReceivedByRemote"
-          );
           if (existingMessage) {
             parsedMessage = parsedMessage.setIn(
               ["data", "messageStatus"],
@@ -84,17 +80,24 @@ export function addMessage(
               get(existingMessage, "viewState")
             );
           }
+
+          const isReceivedByOwn = messageUtils.isReceivedByOwn(existingMessage);
+          const isReceivedByRemote = messageUtils.isReceivedByRemote(
+            existingMessage
+          );
+
           if (!alreadyProcessed && (isReceivedByOwn || isReceivedByRemote)) {
             parsedMessage = parsedMessage
               .setIn(["data", "isReceivedByOwn"], isReceivedByOwn)
               .setIn(["data", "isReceivedByRemote"], isReceivedByRemote);
           }
 
-          messages = messages.set(parsedMessageUri, get(parsedMessage, "data"));
-
           allAtomsInState = allAtomsInState.setIn(
             [senderAtomUri, "connections", senderConnectionUri, "messages"],
             messages
+              .set(parsedMessageUri, get(parsedMessage, "data"))
+              .toOrderedMap()
+              .sortBy(sortByMessageTimeStamp)
           );
         }
       }
@@ -254,20 +257,16 @@ export function addMessage(
             //re-get messages after state changes from references
             if (hadReferences) {
               parsedMessage = parsedMessage.setIn(["data", "unread"], false);
-              messages = getIn(allAtomsInState, [
-                targetAtomUri,
-                "connections",
-                targetConnectionUri,
-                "messages",
-              ]);
+              messages = connectionUtils.getMessages(targetConnection);
             }
 
             const existingMessage = get(messages, parsedMessageUri);
 
-            const isReceivedByOwn = !!get(existingMessage, "isReceivedByOwn");
-            const isReceivedByRemote = !!get(
-              existingMessage,
-              "isReceivedByRemote"
+            const isReceivedByOwn = messageUtils.isReceivedByOwn(
+              existingMessage
+            );
+            const isReceivedByRemote = messageUtils.isReceivedByRemote(
+              existingMessage
             );
 
             if (!alreadyProcessed && (isReceivedByOwn || isReceivedByRemote)) {
@@ -290,17 +289,20 @@ export function addMessage(
       }
 
       const getConnectionsToInjectMsgInto = (
-        atomState,
+        allAtomsInState,
         targetSocketUri,
         msgUri
       ) => {
         const allConnections =
-          atomState && atomState.flatMap(atom => get(atom, "connections"));
+          allAtomsInState &&
+          allAtomsInState.flatMap(atom => get(atom, "connections"));
 
         return allConnections
           .filter(conn => connectionUtils.isConnected(conn))
-          .filter(conn => get(conn, "targetSocketUri") === targetSocketUri)
-          .filter(conn => !get(conn, "messages").contains(msgUri));
+          .filter(conn =>
+            connectionUtils.hasTargetSocketUri(conn, targetSocketUri)
+          )
+          .filter(conn => !connectionUtils.getMessage(conn, msgUri));
       };
 
       const connections = getConnectionsToInjectMsgInto(
@@ -309,22 +311,21 @@ export function addMessage(
         parsedMessageUri
       );
       if (connections && connections.size > 0) {
-        connections.map((conn, connUri) => {
-          let forwardMessage = parseMessage(wonMessage, alreadyProcessed, true);
-          if (forwardMessage) {
-            if (eventUriOverride) {
-              // In Some cases (like if we send a message) we need to override the messageUri in the wonMessage with the correct one
-              forwardMessage = forwardMessage.setIn(
-                ["data", "uri"],
-                eventUriOverride
-              );
-            }
-            const forwardMessageUri = getIn(forwardMessage, ["data", "uri"]);
+        const forwardMessage = parseMessage(wonMessage, alreadyProcessed, true);
+        let forwardMessageData = get(forwardMessage, "data");
+        if (eventUriOverride) {
+          // In Some cases (like if we send a message) we need to override the messageUri in the wonMessage with the correct one
+          forwardMessageData = forwardMessageData.set("uri", eventUriOverride);
+        }
+        const forwardMessageUri = get(forwardMessageData, "uri");
 
+        forwardMessageData &&
+          connections.map((conn, connUri) => {
             const atomUri = get(
-              allAtomsInState.find(
-                atom => !!getIn(atom, ["connections", connUri])
-              ),
+              get(allAtomsInState, extractAtomUriFromConnectionUri(connUri)) ||
+                allAtomsInState.find(
+                  atom => !!getIn(atom, ["connections", connUri])
+                ),
               "uri"
             );
 
@@ -340,26 +341,24 @@ export function addMessage(
                 //ignore messages for nonexistant connections
                 const existingMessage = get(messages, forwardMessageUri);
 
-                const isReceivedByOwn = !!get(
-                  existingMessage,
-                  "isReceivedByOwn"
+                const isReceivedByOwn = messageUtils.isReceivedByOwn(
+                  existingMessage
                 );
-                const isReceivedByRemote = !!get(
-                  existingMessage,
-                  "isReceivedByRemote"
+                const isReceivedByRemote = messageUtils.isReceivedByRemote(
+                  existingMessage
                 );
 
                 if (
                   !alreadyProcessed &&
                   (isReceivedByOwn || isReceivedByRemote)
                 ) {
-                  forwardMessage = forwardMessage
-                    .setIn(["data", "isReceivedByOwn"], isReceivedByOwn)
-                    .setIn(["data", "isReceivedByRemote"], isReceivedByRemote);
+                  forwardMessageData = forwardMessageData
+                    .set("isReceivedByOwn", isReceivedByOwn)
+                    .set("isReceivedByRemote", isReceivedByRemote);
                 }
 
-                forwardMessage = forwardMessage.setIn(
-                  ["data", "unread"],
+                forwardMessageData = forwardMessageData.set(
+                  "unread",
                   !wonMessage.isAtomHintMessage() &&
                     !wonMessage.isSocketHintMessage() &&
                     !isUriRead(forwardMessageUri)
@@ -368,14 +367,13 @@ export function addMessage(
                 allAtomsInState = allAtomsInState.setIn(
                   [atomUri, "connections", connUri, "messages"],
                   messages
-                    .set(forwardMessageUri, get(forwardMessage, "data"))
+                    .set(forwardMessageUri, forwardMessageData)
                     .toOrderedMap()
                     .sortBy(sortByMessageTimeStamp)
                 );
               }
             }
-          }
-        });
+          });
       }
     }
   }
@@ -424,16 +422,14 @@ export function markMessageAsSelected(
   }
 
   return allAtomsInState.setIn(
-    [
-      atomUri,
-      "connections",
-      connectionUri,
-      "messages",
+    [atomUri, "connections", connectionUri, "messages"],
+    messages.set(
       messageUri,
-      "viewState",
-      "isSelected",
-    ],
-    isSelected
+      message
+        .setIn(["viewState", "isSelected"], isSelected)
+        .toOrderedMap()
+        .sortBy(sortByMessageTimeStamp)
+    )
   );
 }
 
@@ -481,18 +477,15 @@ export function markMessageAsCollapsed(
       false
     );
   }
-
   return allAtomsInState.setIn(
-    [
-      atomUri,
-      "connections",
-      connectionUri,
-      "messages",
-      messageUri,
-      "viewState",
-      "isCollapsed",
-    ],
-    isCollapsed
+    [atomUri, "connections", connectionUri, "messages"],
+    messages
+      .setIn(
+        messageUri,
+        message.setIn(["viewState", "isCollapsed"], isCollapsed)
+      )
+      .toOrderedMap()
+      .sortBy(sortByMessageTimeStamp)
   );
 }
 
@@ -560,6 +553,7 @@ export function markMessageExpandAllReferences(
           expandedReferences.map(() => isExpanded)
         )
       )
+      .toOrderedMap()
       .sortBy(sortByMessageTimeStamp)
   );
 }
@@ -601,17 +595,17 @@ export function markMessageExpandReferences(
   }
 
   return allAtomsInState.setIn(
-    [
-      atomUri,
-      "connections",
-      connectionUri,
-      "messages",
-      messageUri,
-      "viewState",
-      "expandedReferences",
-      reference,
-    ],
-    isExpanded
+    [atomUri, "connections", connectionUri, "messages"],
+    messages
+      .set(
+        messageUri,
+        message.setIn(
+          ["viewState", "expandedReferences", reference],
+          isExpanded
+        )
+      )
+      .toOrderedMap()
+      .sortBy(sortByMessageTimeStamp)
   );
 }
 
@@ -679,13 +673,11 @@ export function markMessageAsRead(
     return allAtomsInState;
   }
 
-  messages = messages
-    .set(messageUri, message.set("unread", !read))
-    .sortBy(sortByMessageTimeStamp);
-
   allAtomsInState = allAtomsInState.setIn(
     [atomUri, "connections", connectionUri, "messages"],
     messages
+      .set(messageUri, message.set("unread", !read))
+      .sortBy(sortByMessageTimeStamp)
   );
 
   if (!messages.find(msg => get(msg, "unread"))) {

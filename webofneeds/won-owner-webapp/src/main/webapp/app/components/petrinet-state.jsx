@@ -2,9 +2,10 @@ import React from "react";
 import {
   generateSimpleTransitionLabel,
   get,
-  getIn,
   getQueryParams,
 } from "../utils.js";
+import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as processUtils from "../redux/utils/process-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import { useSelector, useDispatch } from "react-redux";
@@ -23,45 +24,27 @@ export default function WonPetrinetState({ processUri, className }) {
   const atom = useSelector(
     generalSelectors.getOwnedAtomByConnectionUri(connectionUri)
   );
-  const connection = getIn(atom, ["connections", connectionUri]);
+  const processState = useSelector(generalSelectors.getProcessState);
+  const connection = atomUtils.getConnection(atom, connectionUri);
 
   const petriNetData = get(connection, "petriNetData");
 
   const process = processUri && get(petriNetData, processUri);
 
-  const petriNetDataLoading = useSelector(
-    state =>
-      connection &&
-      getIn(state, [
-        "process",
-        "connections",
-        connectionUri,
-        "petriNetData",
-        "loading",
-      ])
+  const petriNetDataLoading = processUtils.isConnectionPetriNetDataLoading(
+    processState,
+    connectionUri
   );
-  const petriNetDataLoaded = useSelector(
-    state =>
-      petriNetData &&
-      getIn(state, [
-        "process",
-        "connections",
-        connectionUri,
-        "petriNetData",
-        "loaded",
-      ])
+
+  const petriNetDataLoaded = processUtils.isConnectionPetriNetDataLoaded(
+    processState,
+    connectionUri
   );
-  const petriNetDataDirty = useSelector(
-    state =>
-      petriNetData &&
-      getIn(state, [
-        "process",
-        "connections",
-        connectionUri,
-        "petriNetData",
-        "dirty",
-      ])
+  const petriNetDataDirty = processUtils.isConnectionPetriNetDataDirty(
+    processState,
+    connectionUri
   );
+
   const markedPlaces = get(process, "markedPlaces");
   const enabledTransitions = get(process, "enabledTransitions");
 

@@ -22,11 +22,9 @@ export function successfulCloseAtom(event) {
     //TODO MAYBE DELETE THIS FUNCTION, I THINK IT SERVES NO PURPOSE
     //TODO maybe refactor these response message handling
     if (
-      getState().getIn([
-        "messages",
-        "waitingForAnswer",
-        event.getIsRemoteResponseTo(),
-      ])
+      generalSelectors.isWaitingForAnswer(event.getIsRemoteResponseTo())(
+        getState()
+      )
     ) {
       //dispatch(actionCreators.connections__denied(event));
     }
@@ -37,11 +35,9 @@ export function successfulReopenAtom(event) {
     //TODO MAYBE DELETE THIS FUNCTION, I THINK IT SERVES NO PURPOSE
     //TODO maybe refactor these response message handling
     if (
-      getState().getIn([
-        "messages",
-        "waitingForAnswer",
-        event.getIsRemoteResponseTo(),
-      ])
+      generalSelectors.isWaitingForAnswer(event.getIsRemoteResponseTo())(
+        getState()
+      )
     ) {
       //dispatch(actionCreators.connections__denied(event));
     }
@@ -93,18 +89,14 @@ export function successfulCloseConnection(event) {
     const state = getState();
     //TODO maybe refactor these response message handling
     if (
-      state.getIn(["messages", "waitingForAnswer", event.getIsResponseTo()])
+      generalSelectors.isWaitingForAnswer(event.getIsRemoteResponseTo())(state)
     ) {
       dispatch({
         type: actionTypes.messages.close.success,
         payload: event,
       });
     } else if (
-      state.getIn([
-        "messages",
-        "waitingForAnswer",
-        event.getIsRemoteResponseTo(),
-      ])
+      generalSelectors.isWaitingForAnswer(event.getIsRemoteResponseTo())(state)
     ) {
       dispatch({
         type: actionTypes.messages.close.success,
@@ -508,10 +500,10 @@ export function connectSuccessOwn(wonMessage) {
 
     const atom = generalSelectors.getAtom(atomUri)(state);
 
-    const connection = getIn(atom, [
-      "connections",
-      "connectionFrom:" + wonMessage.getIsResponseTo(),
-    ]);
+    const connection = atomUtils.getConnection(
+      atom,
+      "connectionFrom:" + wonMessage.getIsResponseTo()
+    );
 
     if (connection) {
       let connUriPromise;
@@ -555,10 +547,10 @@ export function connectSuccessRemote(wonMessage) {
         targetSocketUri,
         senderSocketUri
       ) ||
-      getIn(atom, [
-        "connections",
-        "connectionFrom:" + wonMessage.getIsResponseTo(),
-      ]);
+      atomUtils.getConnection(
+        atom,
+        "connectionFrom:" + wonMessage.getIsResponseTo()
+      );
 
     if (connection) {
       let connUriPromise;

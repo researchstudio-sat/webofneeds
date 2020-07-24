@@ -5,7 +5,7 @@ import * as generalSelectors from "./selectors/general-selectors.js";
 import * as atomUtils from "./utils/atom-utils.js";
 import * as processUtils from "./utils/process-utils.js";
 import { parseMetaAtom } from "../reducers/atom-reducer/parse-atom.js";
-import { get, getIn, is } from "../utils.js";
+import { get, is } from "../utils.js";
 import won from "../won-es6";
 import vocab from "../service/vocab.js";
 import { fetchWikiData } from "~/app/api/wikidata-api";
@@ -259,13 +259,11 @@ export function fetchMessages(
     payload: Immutable.fromJS({ connectionUri: connectionUri }),
   });
 
-  const connectionContainerUri = getIn(state, [
-    "atoms",
-    atomUri,
-    "connections",
-    connectionUri,
-    "messageContainerUri",
-  ]);
+  const atom = generalSelectors.getAtomByConnectionUri(connectionUri)(state);
+  const connectionContainerUri = get(
+    atomUtils.getConnection(atom, connectionUri),
+    "messageContainerUri"
+  );
 
   return won
     .getMessagesOfConnection(connectionUri, connectionContainerUri, fetchParams)
