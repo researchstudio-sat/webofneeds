@@ -6,12 +6,19 @@ import won from "../won-es6.js";
 import vocab from "../service/vocab.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as useCaseUtils from "../usecase-utils.js";
 import * as ownerApi from "../api/owner-api.js";
 import * as stateStore from "../redux/state-store.js";
 
-import { get, getIn, extractAtomUriBySocketUri, delay } from "../utils.js";
+import {
+  get,
+  getIn,
+  getUri,
+  extractAtomUriBySocketUri,
+  delay,
+} from "../utils.js";
 
 import { ensureLoggedIn } from "./account-actions";
 
@@ -145,7 +152,7 @@ export function connectionsChatMessage(
         let contentUris = [];
 
         referencedMessages.map(msg => {
-          const correctUri = get(msg, "uri");
+          const correctUri = getUri(msg);
           if (correctUri)
             contentUris.push({
               "@id": correctUri,
@@ -156,9 +163,9 @@ export function connectionsChatMessage(
               dispatch({
                 type: actionTypes.connections.agreementData.markAsRetracted,
                 payload: {
-                  messageUri: get(msg, "uri"),
+                  messageUri: getUri(msg),
                   connectionUri: connectionUri,
-                  atomUri: get(ownedAtom, "uri"),
+                  atomUri: getUri(ownedAtom),
                   retracted: true,
                 },
               });
@@ -167,9 +174,9 @@ export function connectionsChatMessage(
               dispatch({
                 type: actionTypes.connections.agreementData.markAsRejected,
                 payload: {
-                  messageUri: get(msg, "uri"),
+                  messageUri: getUri(msg),
                   connectionUri: connectionUri,
-                  atomUri: get(ownedAtom, "uri"),
+                  atomUri: getUri(ownedAtom),
                   rejected: true,
                 },
               });
@@ -180,9 +187,9 @@ export function connectionsChatMessage(
                   actionTypes.connections.agreementData
                     .markAsCancellationPending,
                 payload: {
-                  messageUri: get(msg, "uri"),
+                  messageUri: getUri(msg),
                   connectionUri: connectionUri,
-                  atomUri: get(ownedAtom, "uri"),
+                  atomUri: getUri(ownedAtom),
                   cancellationPending: true,
                 },
               });
@@ -191,9 +198,9 @@ export function connectionsChatMessage(
               dispatch({
                 type: actionTypes.connections.agreementData.markAsAccepted,
                 payload: {
-                  messageUri: get(msg, "uri"),
+                  messageUri: getUri(msg),
                   connectionUri: connectionUri,
-                  atomUri: get(ownedAtom, "uri"),
+                  atomUri: getUri(ownedAtom),
                   accepted: true,
                 },
               });
@@ -202,9 +209,9 @@ export function connectionsChatMessage(
               dispatch({
                 type: actionTypes.connections.agreementData.markAsClaimed,
                 payload: {
-                  messageUri: get(msg, "uri"),
+                  messageUri: getUri(msg),
                   connectionUri: connectionUri,
-                  atomUri: get(ownedAtom, "uri"),
+                  atomUri: getUri(ownedAtom),
                   claimed: true,
                 },
               });
@@ -213,9 +220,9 @@ export function connectionsChatMessage(
               dispatch({
                 type: actionTypes.connections.agreementData.markAsProposed,
                 payload: {
-                  messageUri: get(msg, "uri"),
+                  messageUri: getUri(msg),
                   connectionUri: connectionUri,
-                  atomUri: get(ownedAtom, "uri"),
+                  atomUri: getUri(ownedAtom),
                   proposed: true,
                 },
               });
@@ -561,20 +568,13 @@ function connectAdHoc(
 
 export function connectionsClose(connectionUri) {
   return (dispatch, getState) => {
-    const ownedAtom = get(getState(), "atoms").find(atom =>
-      getIn(atom, ["connections", connectionUri])
+    const ownedAtom = generalSelectors.getAtomByConnectionUri(connectionUri)(
+      getState()
     );
 
-    const socketUri = getIn(ownedAtom, [
-      "connections",
-      connectionUri,
-      "socketUri",
-    ]);
-    const targetSocketUri = getIn(ownedAtom, [
-      "connections",
-      connectionUri,
-      "targetSocketUri",
-    ]);
+    const connection = atomUtils.getConnection(ownedAtom, connectionUri);
+    const socketUri = connectionUtils.getSocketUri(connection);
+    const targetSocketUri = connectionUtils.getTargetSocketUri(connection);
 
     buildCloseMessage(socketUri, targetSocketUri)
       .then(message => ownerApi.sendMessage(message))
@@ -614,26 +614,18 @@ export function connectionsRate(connectionUri, rating) {
   return (dispatch, getState) => {
     const state = getState();
 
-    const ownedAtom = get(state, "atoms").find(atom =>
-      getIn(atom, ["connections", connectionUri])
+    const ownedAtom = generalSelectors.getAtomByConnectionUri(connectionUri)(
+      state
     );
-    const theirAtomUri = getIn(state, [
-      "atoms",
-      get(ownedAtom, "uri"),
-      "connections",
-      connectionUri,
-      "targetAtomUri",
-    ]);
+    const connection = atomUtils.getConnection(ownedAtom, connectionUri);
+
+    const theirAtomUri = connectionUtils.getTargetAtomUri(connection);
+    const theirConnectionUri = get(connection, "targetConnectionUri");
     const theirAtom = generalSelectors.getAtom(theirAtomUri)(state);
-    const theirConnectionUri = getIn(ownedAtom, [
-      "connections",
-      connectionUri,
-      "targetConnectionUri",
-    ]);
 
     won
       .getConnection(connectionUri, {
-        requesterWebId: get(ownedAtom, "uri"),
+        requesterWebId: getUri(ownedAtom),
       })
       .then(connection => {
         let msgToRateFor = {
@@ -642,7 +634,7 @@ export function connectionsRate(connectionUri, rating) {
 
         return buildRateMessage(
           msgToRateFor,
-          get(ownedAtom, "uri"),
+          getUri(ownedAtom),
           theirAtomUri,
           get(ownedAtom, "nodeUri"),
           get(theirAtom, "nodeUri"),
@@ -682,9 +674,8 @@ export function showLatestMessages(connectionUri, numberOfEvents) {
     const atom =
       connectionUri &&
       generalSelectors.getOwnedAtomByConnectionUri(connectionUri)(state);
-    const atomUri = get(atom, "uri");
-    const connection =
-      connectionUri && getIn(atom, ["connections", connectionUri]);
+    const atomUri = getUri(atom);
+    const connection = atomUtils.getConnection(atom, connectionUri);
     const processState = generalSelectors.getProcessState(state);
     if (
       !connectionUri ||
@@ -722,8 +713,8 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
     const atom =
       connectionUri &&
       generalSelectors.getOwnedAtomByConnectionUri(connectionUri)(state);
-    const atomUri = get(atom, "uri");
-    const connection = getIn(atom, ["connections", connectionUri]);
+    const atomUri = getUri(atom);
+    const connection = atomUtils.getConnection(atom, connectionUri);
     const processState = generalSelectors.getProcessState(state);
     if (
       !connection ||

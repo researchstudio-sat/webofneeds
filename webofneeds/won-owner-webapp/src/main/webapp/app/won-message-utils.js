@@ -5,6 +5,7 @@
 import won from "./won-es6.js";
 import vocab from "./service/vocab.js";
 
+import { getUri } from "./utils.js";
 import * as wonUtils from "./won-utils.js";
 import * as useCaseUtils from "./usecase-utils.js";
 
@@ -316,7 +317,7 @@ export function buildChatMessage({
 }
 
 export function buildEditMessage(editedAtomData, oldAtom) {
-  const atomUriToEdit = oldAtom && oldAtom.get("uri");
+  const atomUriToEdit = getUri(oldAtom);
 
   const msgJson = won.buildMessageRdf(
     buildContentRdf(editedAtomData, atomUriToEdit),

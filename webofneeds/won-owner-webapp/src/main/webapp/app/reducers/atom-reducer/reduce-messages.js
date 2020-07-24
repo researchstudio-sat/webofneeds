@@ -4,7 +4,14 @@ import { markConnectionAsRead } from "./reduce-connections.js";
 import { addAtomStub } from "./reduce-atoms.js";
 import vocab from "../../service/vocab.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
-import { get, getIn, extractAtomUriBySocketUri } from "../../utils.js";
+import * as messageUtils from "../../redux/utils/message-utils.js";
+import {
+  get,
+  getIn,
+  getUri,
+  extractAtomUriBySocketUri,
+  extractAtomUriFromConnectionUri,
+} from "../../utils.js";
 import Immutable from "immutable";
 import {
   getSenderSocketType,
@@ -12,7 +19,7 @@ import {
 } from "../../redux/selectors/general-selectors";
 
 export function addMessage(
-  state,
+  allAtomsInState,
   wonMessage,
   alreadyProcessed = false,
   eventUriOverride = undefined
@@ -25,7 +32,7 @@ export function addMessage(
         // In Some cases (like if we send a message) we need to override the messageUri in the wonMessage with the correct one
         parsedMessage = parsedMessage.setIn(["data", "uri"], eventUriOverride);
       }
-      const allAtomsInState = state;
+      const parsedMessageUri = getIn(parsedMessage, ["data", "uri"]);
       const senderSocketUri = wonMessage.getSenderSocket();
       const targetSocketUri = wonMessage.getTargetSocket();
 
@@ -49,74 +56,65 @@ export function addMessage(
           connectionUtils.hasSocketUris(conn, targetSocketUri, senderSocketUri)
         );
 
-      if (targetAtomUri && !state.has(targetAtomUri)) {
+      if (targetAtomUri && !allAtomsInState.has(targetAtomUri)) {
         console.debug("Target Atom is not in the state yet, we need to add it");
-        state = addAtomStub(state, targetAtomUri);
+        allAtomsInState = addAtomStub(allAtomsInState, targetAtomUri);
       }
-      if (senderAtomUri && !state.has(senderAtomUri)) {
+      if (senderAtomUri && !allAtomsInState.has(senderAtomUri)) {
         console.debug("Sender Atom is not in the state yet, we need to add it");
-        state = addAtomStub(state, senderAtomUri);
+        allAtomsInState = addAtomStub(allAtomsInState, senderAtomUri);
       }
 
       if (senderConnection) {
-        const senderConnectionUri = get(senderConnection, "uri");
+        const senderConnectionUri = getUri(senderConnection);
         parsedMessage = parsedMessage.setIn(["data", "outgoingMessage"], true);
 
-        let messages = state.getIn([
-          senderAtomUri,
-          "connections",
-          senderConnectionUri,
-          "messages",
-        ]);
+        let messages = connectionUtils.getMessages(senderConnection);
         if (messages) {
           //ignore messages for nonexistant connections
 
-          const existingMessage = messages.get(
-            parsedMessage.getIn(["data", "uri"])
-          );
+          const existingMessage = get(messages, parsedMessageUri);
 
-          const isReceivedByOwn = !!get(existingMessage, "isReceivedByOwn");
-          const isReceivedByRemote = !!get(
-            existingMessage,
-            "isReceivedByRemote"
-          );
           if (existingMessage) {
             parsedMessage = parsedMessage.setIn(
               ["data", "messageStatus"],
-              existingMessage.get("messageStatus")
+              get(existingMessage, "messageStatus")
             );
             parsedMessage = parsedMessage.setIn(
               ["data", "viewState"],
-              existingMessage.get("viewState")
+              get(existingMessage, "viewState")
             );
           }
+
+          const isReceivedByOwn = messageUtils.isReceivedByOwn(existingMessage);
+          const isReceivedByRemote = messageUtils.isReceivedByRemote(
+            existingMessage
+          );
+
           if (!alreadyProcessed && (isReceivedByOwn || isReceivedByRemote)) {
             parsedMessage = parsedMessage
               .setIn(["data", "isReceivedByOwn"], isReceivedByOwn)
               .setIn(["data", "isReceivedByRemote"], isReceivedByRemote);
           }
 
-          messages = messages.set(
-            parsedMessage.getIn(["data", "uri"]),
-            parsedMessage.get("data")
-          );
-
-          state = state.setIn(
+          allAtomsInState = allAtomsInState.setIn(
             [senderAtomUri, "connections", senderConnectionUri, "messages"],
-            messages
+            messageUtils.sortMessages(
+              messages.set(parsedMessageUri, get(parsedMessage, "data"))
+            )
           );
         }
       }
 
       if (targetConnection) {
-        const targetConnectionUri = get(targetConnection, "uri");
+        const targetConnectionUri = getUri(targetConnection);
         parsedMessage = parsedMessage
           .setIn(["data", "outgoingMessage"], false)
           .setIn(
             ["data", "unread"],
             !wonMessage.isAtomHintMessage() &&
               !wonMessage.isSocketHintMessage() &&
-              !isUriRead(getIn(parsedMessage, ["data", "uri"]))
+              !isUriRead(parsedMessageUri)
           )
           .setIn(["data", "isReceivedByOwn"], true)
           .setIn(["data", "isReceivedByRemote"], true);
@@ -124,37 +122,37 @@ export function addMessage(
         if (
           getIn(parsedMessage, ["data", "unread"]) &&
           !isChatToGroupConnection(
-            state,
-            getIn(state, [targetAtomUri, "connections", targetConnectionUri])
-          )
-        ) {
-          //If there is a new message for the connection we will set the connection to newConnection
-          state = state.setIn(
-            [targetAtomUri, "lastUpdateDate"],
-            parsedMessage.getIn(["data", "date"])
-          );
-          state = state.setIn([targetAtomUri, "unread"], true);
-          state = state.setIn(
-            [
+            allAtomsInState,
+            getIn(allAtomsInState, [
               targetAtomUri,
               "connections",
               targetConnectionUri,
-              "lastUpdateDate",
-            ],
-            parsedMessage.getIn(["data", "date"])
-          );
-          state = state.setIn(
-            [targetAtomUri, "connections", targetConnectionUri, "unread"],
-            true
-          );
+            ])
+          )
+        ) {
+          //If there is a new message for the connection we will set the connection to newConnection
+          allAtomsInState = allAtomsInState
+            .setIn(
+              [targetAtomUri, "lastUpdateDate"],
+              getIn(parsedMessage, ["data", "date"])
+            )
+            .setIn([targetAtomUri, "unread"], true)
+            .setIn(
+              [
+                targetAtomUri,
+                "connections",
+                targetConnectionUri,
+                "lastUpdateDate",
+              ],
+              getIn(parsedMessage, ["data", "date"])
+            )
+            .setIn(
+              [targetAtomUri, "connections", targetConnectionUri, "unread"],
+              true
+            );
         }
 
-        let messages = state.getIn([
-          targetAtomUri,
-          "connections",
-          targetConnectionUri,
-          "messages",
-        ]);
+        let messages = connectionUtils.getMessages(targetConnection);
         if (messages) {
           //ignore messages for nonexistant connections
 
@@ -165,20 +163,24 @@ export function addMessage(
             */
           if (
             !isChatToGroupConnection(
-              state,
-              getIn(state, [targetAtomUri, "connections", targetConnectionUri])
+              allAtomsInState,
+              getIn(allAtomsInState, [
+                targetAtomUri,
+                "connections",
+                targetConnectionUri,
+              ])
             )
           ) {
             /**
              * if this message has any higher level protocol references, we need to update the state of the referenced messages as well
              */
-            const references = parsedMessage.getIn(["data", "references"]);
+            const references = getIn(parsedMessage, ["data", "references"]);
             let hadReferences = false;
-            if (references.get("claims")) {
-              const claimedMessageUris = references.get("claims");
+            if (get(references, "claims")) {
+              const claimedMessageUris = get(references, "claims");
               claimedMessageUris.forEach(messageUri => {
-                state = markMessageAsClaimed(
-                  state,
+                allAtomsInState = markMessageAsClaimed(
+                  allAtomsInState,
                   messageUri,
                   targetConnectionUri,
                   targetAtomUri,
@@ -187,11 +189,11 @@ export function addMessage(
               });
               hadReferences = true;
             }
-            if (references.get("proposes")) {
-              const proposedMessageUris = references.get("proposes");
+            if (get(references, "proposes")) {
+              const proposedMessageUris = get(references, "proposes");
               proposedMessageUris.forEach(messageUri => {
-                state = markMessageAsProposed(
-                  state,
+                allAtomsInState = markMessageAsProposed(
+                  allAtomsInState,
                   messageUri,
                   targetConnectionUri,
                   targetAtomUri,
@@ -200,13 +202,14 @@ export function addMessage(
               });
               hadReferences = true;
             }
-            if (references.get("proposesToCancel")) {
-              const proposesToCancelMessageUris = references.get(
+            if (get(references, "proposesToCancel")) {
+              const proposesToCancelMessageUris = get(
+                references,
                 "proposesToCancel"
               );
               proposesToCancelMessageUris.forEach(messageUri => {
-                state = markMessageAsCancellationPending(
-                  state,
+                allAtomsInState = markMessageAsCancellationPending(
+                  allAtomsInState,
                   messageUri,
                   targetConnectionUri,
                   targetAtomUri,
@@ -215,11 +218,11 @@ export function addMessage(
               });
               hadReferences = true;
             }
-            if (references.get("accepts")) {
-              const acceptedMessageUris = references.get("accepts");
+            if (get(references, "accepts")) {
+              const acceptedMessageUris = get(references, "accepts");
               acceptedMessageUris.forEach(messageUri => {
-                state = markMessageAsAccepted(
-                  state,
+                allAtomsInState = markMessageAsAccepted(
+                  allAtomsInState,
                   messageUri,
                   targetConnectionUri,
                   targetAtomUri,
@@ -228,11 +231,11 @@ export function addMessage(
               });
               hadReferences = true;
             }
-            if (references.get("rejects")) {
-              const rejectedMessageUris = references.get("rejects");
+            if (get(references, "rejects")) {
+              const rejectedMessageUris = get(references, "rejects");
               rejectedMessageUris.forEach(messageUri => {
-                state = markMessageAsRejected(
-                  state,
+                allAtomsInState = markMessageAsRejected(
+                  allAtomsInState,
                   messageUri,
                   targetConnectionUri,
                   targetAtomUri,
@@ -241,11 +244,11 @@ export function addMessage(
               });
               hadReferences = true;
             }
-            if (references.get("retracts")) {
-              const retractedMessageUris = references.get("retracts");
+            if (get(references, "retracts")) {
+              const retractedMessageUris = get(references, "retracts");
               retractedMessageUris.forEach(messageUri => {
-                state = markMessageAsRetracted(
-                  state,
+                allAtomsInState = markMessageAsRetracted(
+                  allAtomsInState,
                   messageUri,
                   targetConnectionUri,
                   targetAtomUri,
@@ -258,22 +261,16 @@ export function addMessage(
             //re-get messages after state changes from references
             if (hadReferences) {
               parsedMessage = parsedMessage.setIn(["data", "unread"], false);
-              messages = state.getIn([
-                targetAtomUri,
-                "connections",
-                targetConnectionUri,
-                "messages",
-              ]);
+              messages = connectionUtils.getMessages(targetConnection);
             }
 
-            const existingMessage = messages.get(
-              parsedMessage.getIn(["data", "uri"])
-            );
+            const existingMessage = get(messages, parsedMessageUri);
 
-            const isReceivedByOwn = !!get(existingMessage, "isReceivedByOwn");
-            const isReceivedByRemote = !!get(
-              existingMessage,
-              "isReceivedByRemote"
+            const isReceivedByOwn = messageUtils.isReceivedByOwn(
+              existingMessage
+            );
+            const isReceivedByRemote = messageUtils.isReceivedByRemote(
+              existingMessage
             );
 
             if (!alreadyProcessed && (isReceivedByOwn || isReceivedByRemote)) {
@@ -283,116 +280,107 @@ export function addMessage(
             }
 
             messages = messages.set(
-              parsedMessage.getIn(["data", "uri"]),
-              parsedMessage.get("data")
+              parsedMessageUri,
+              get(parsedMessage, "data")
             );
           }
 
-          state = state.setIn(
+          allAtomsInState = allAtomsInState.setIn(
             [targetAtomUri, "connections", targetConnectionUri, "messages"],
-            messages.toOrderedMap().sortBy(sortByMessageTimeStamp)
+            messageUtils.sortMessages(messages)
           );
         }
       }
 
       const getConnectionsToInjectMsgInto = (
-        atomState,
+        allAtomsInState,
         targetSocketUri,
         msgUri
       ) => {
         const allConnections =
-          atomState && atomState.flatMap(atom => atom.get("connections"));
+          allAtomsInState &&
+          allAtomsInState.flatMap(atom => get(atom, "connections"));
 
         return allConnections
           .filter(conn => connectionUtils.isConnected(conn))
-          .filter(conn => get(conn, "targetSocketUri") === targetSocketUri)
-          .filter(conn => !get(conn, "messages").contains(msgUri));
+          .filter(conn =>
+            connectionUtils.hasTargetSocketUri(conn, targetSocketUri)
+          )
+          .filter(conn => !connectionUtils.getMessage(conn, msgUri));
       };
 
       const connections = getConnectionsToInjectMsgInto(
-        state,
+        allAtomsInState,
         targetSocketUri,
-        getIn(parsedMessage, ["data", "uri"])
+        parsedMessageUri
       );
       if (connections && connections.size > 0) {
-        connections.map(conn => {
-          let forwardMessage = parseMessage(wonMessage, alreadyProcessed, true);
-          if (forwardMessage) {
-            if (eventUriOverride) {
-              // In Some cases (like if we send a message) we need to override the messageUri in the wonMessage with the correct one
-              forwardMessage = forwardMessage.setIn(
-                ["data", "uri"],
-                eventUriOverride
-              );
-            }
+        const forwardMessage = parseMessage(wonMessage, alreadyProcessed, true);
+        let forwardMessageData = get(forwardMessage, "data");
+        if (eventUriOverride) {
+          // In Some cases (like if we send a message) we need to override the messageUri in the wonMessage with the correct one
+          forwardMessageData = forwardMessageData.set("uri", eventUriOverride);
+        }
+        const forwardMessageUri = getUri(forwardMessageData);
 
-            const connUri = get(conn, "uri");
+        forwardMessageData &&
+          connections.map((conn, connUri) => {
             const atomUri = get(
-              state.find(atom => !!getIn(atom, ["connections", connUri])),
+              get(allAtomsInState, extractAtomUriFromConnectionUri(connUri)) ||
+                allAtomsInState.find(
+                  atom => !!getIn(atom, ["connections", connUri])
+                ),
               "uri"
             );
 
             if (
               isChatToGroupConnection(
-                state,
-                getIn(state, [atomUri, "connections", connUri])
+                allAtomsInState,
+                getIn(allAtomsInState, [atomUri, "connections", connUri])
               ) &&
-              senderSocketUri !== get(conn, "socketUri")
+              !connectionUtils.hasSocketUri(conn, senderSocketUri)
             ) {
-              let messages = state.getIn([
-                atomUri,
-                "connections",
-                connUri,
-                "messages",
-              ]);
+              let messages = connectionUtils.getMessages(conn);
               if (messages) {
                 //ignore messages for nonexistant connections
-                const existingMessage = messages.get(
-                  forwardMessage.getIn(["data", "uri"])
-                );
+                const existingMessage = get(messages, forwardMessageUri);
 
-                const isReceivedByOwn = !!get(
-                  existingMessage,
-                  "isReceivedByOwn"
+                const isReceivedByOwn = messageUtils.isReceivedByOwn(
+                  existingMessage
                 );
-                const isReceivedByRemote = !!get(
-                  existingMessage,
-                  "isReceivedByRemote"
+                const isReceivedByRemote = messageUtils.isReceivedByRemote(
+                  existingMessage
                 );
 
                 if (
                   !alreadyProcessed &&
                   (isReceivedByOwn || isReceivedByRemote)
                 ) {
-                  forwardMessage = forwardMessage
-                    .setIn(["data", "isReceivedByOwn"], isReceivedByOwn)
-                    .setIn(["data", "isReceivedByRemote"], isReceivedByRemote);
+                  forwardMessageData = forwardMessageData
+                    .set("isReceivedByOwn", isReceivedByOwn)
+                    .set("isReceivedByRemote", isReceivedByRemote);
                 }
 
-                forwardMessage = forwardMessage.setIn(
-                  ["data", "unread"],
+                forwardMessageData = forwardMessageData.set(
+                  "unread",
                   !wonMessage.isAtomHintMessage() &&
                     !wonMessage.isSocketHintMessage() &&
-                    !isUriRead(getIn(parsedMessage, ["data", "uri"]))
+                    !isUriRead(forwardMessageUri)
                 );
 
-                messages = messages.set(
-                  forwardMessage.getIn(["data", "uri"]),
-                  forwardMessage.get("data")
-                );
-
-                state = state.setIn(
+                allAtomsInState = allAtomsInState.setIn(
                   [atomUri, "connections", connUri, "messages"],
-                  messages
+                  messageUtils.sortMessages(
+                    messages.set(forwardMessageUri, forwardMessageData)
+                  )
                 );
               }
             }
-          }
-        });
+          });
       }
     }
   }
-  return state;
+  return allAtomsInState;
 }
 
 /*
@@ -400,25 +388,26 @@ export function addMessage(
  because we will add all the messages with the "alreadyProcessed" flag, which indicates that we do not care about the
  sent status anymore and assume that it has been successfully sent to each server (incl. the remote)
  */
-export function addExistingMessages(state, wonMessages) {
+export function addExistingMessages(allAtomsInState, wonMessages) {
   if (wonMessages && wonMessages.size > 0) {
     wonMessages.map(wonMessage => {
-      state = addMessage(state, wonMessage, true);
+      allAtomsInState = addMessage(allAtomsInState, wonMessage, true);
     });
   }
-  return state;
+  return allAtomsInState;
 }
 
 export function markMessageAsSelected(
-  state,
+  allAtomsInState,
   messageUri,
   connectionUri,
   atomUri,
   isSelected
 ) {
-  const atom = state.get(atomUri);
-  const connection = atom && atom.getIn(["connections", connectionUri]);
-  const message = connection && connection.getIn(["messages", messageUri]);
+  const atom = get(allAtomsInState, atomUri);
+  const connection = getIn(atom, ["connections", connectionUri]);
+  let messages = connectionUtils.getMessages(connection);
+  const message = get(messages, messageUri);
 
   markUriAsRead(messageUri);
 
@@ -432,33 +421,31 @@ export function markMessageAsSelected(
       connectionUri,
       ">"
     );
-    return state;
+    return allAtomsInState;
   }
 
-  return state.setIn(
-    [
-      atomUri,
-      "connections",
-      connectionUri,
-      "messages",
-      messageUri,
-      "viewState",
-      "isSelected",
-    ],
-    isSelected
+  return allAtomsInState.setIn(
+    [atomUri, "connections", connectionUri, "messages"],
+    messageUtils.sortMessages(
+      messages.set(
+        messageUri,
+        message.setIn(["viewState", "isSelected"], isSelected)
+      )
+    )
   );
 }
 
 export function markMessageAsCollapsed(
-  state,
+  allAtomsInState,
   messageUri,
   connectionUri,
   atomUri,
   isCollapsed
 ) {
-  const atom = state.get(atomUri);
-  const connection = atom && atom.getIn(["connections", connectionUri]);
-  const message = connection && connection.getIn(["messages", messageUri]);
+  const atom = get(allAtomsInState, atomUri);
+  const connection = getIn(atom, ["connections", connectionUri]);
+  let messages = connectionUtils.getMessages(connection);
+  const message = get(messages, messageUri);
 
   markUriAsRead(messageUri);
 
@@ -472,44 +459,40 @@ export function markMessageAsCollapsed(
       connectionUri,
       ">"
     );
-    return state;
+    return allAtomsInState;
   }
 
   if (isCollapsed) {
-    state = markMessageShowActions(
-      state,
+    allAtomsInState = markMessageShowActions(
+      allAtomsInState,
       messageUri,
       connectionUri,
       atomUri,
       false
     );
 
-    state = markMessageExpandAllReferences(
-      state,
+    allAtomsInState = markMessageExpandAllReferences(
+      allAtomsInState,
       messageUri,
       connectionUri,
       atomUri,
       false
     );
   }
-
-  return state.setIn(
-    [
-      atomUri,
-      "connections",
-      connectionUri,
-      "messages",
-      messageUri,
-      "viewState",
-      "isCollapsed",
-    ],
-    isCollapsed
+  return allAtomsInState.setIn(
+    [atomUri, "connections", connectionUri, "messages"],
+    messageUtils.sortMessages(
+      messages.setIn(
+        messageUri,
+        message.setIn(["viewState", "isCollapsed"], isCollapsed)
+      )
+    )
   );
 }
 
 /**
  * Collapses/Expands all available references within the viewState of a message based on the isExpanded value
- * @param state
+ * @param allAtomsInState
  * @param messageUri
  * @param connectionUri
  * @param atomUri
@@ -518,15 +501,17 @@ export function markMessageAsCollapsed(
  * @returns {*}
  */
 export function markMessageExpandAllReferences(
-  state,
+  allAtomsInState,
   messageUri,
   connectionUri,
   atomUri,
   isExpanded
 ) {
-  const atom = state.get(atomUri);
-  const connection = atom && atom.getIn(["connections", connectionUri]);
-  const message = connection && connection.getIn(["messages", messageUri]);
+  const atom = get(allAtomsInState, atomUri);
+  const connection = getIn(atom, ["connections", connectionUri]);
+
+  let messages = connectionUtils.getMessages(connection);
+  const message = get(messages, messageUri);
 
   if (!message) {
     console.error(
@@ -538,15 +523,10 @@ export function markMessageExpandAllReferences(
       connectionUri,
       ">"
     );
-    return state;
+    return allAtomsInState;
   }
 
-  const expandedReferences = state.getIn([
-    atomUri,
-    "connections",
-    connectionUri,
-    "messages",
-    messageUri,
+  const expandedReferences = getIn(message, [
     "viewState",
     "expandedReferences",
   ]);
@@ -561,26 +541,26 @@ export function markMessageExpandAllReferences(
       connectionUri,
       ">"
     );
-    return state;
+    return allAtomsInState;
   }
 
-  return state.setIn(
-    [
-      atomUri,
-      "connections",
-      connectionUri,
-      "messages",
-      messageUri,
-      "viewState",
-      "expandedReferences",
-    ],
-    expandedReferences.map(() => isExpanded)
+  return allAtomsInState.setIn(
+    [atomUri, "connections", connectionUri, "messages"],
+    messageUtils.sortMessages(
+      messages.set(
+        messageUri,
+        message.setIn(
+          ["viewState", "expandedReferences"],
+          expandedReferences.map(() => isExpanded)
+        )
+      )
+    )
   );
 }
 
 /**
  * Collapses/Expands the given reference within the viewState of a message based on the isExpanded value
- * @param state
+ * @param allAtomsInState
  * @param messageUri
  * @param connectionUri
  * @param atomUri
@@ -589,16 +569,17 @@ export function markMessageExpandAllReferences(
  * @returns {*}
  */
 export function markMessageExpandReferences(
-  state,
+  allAtomsInState,
   messageUri,
   connectionUri,
   atomUri,
   isExpanded,
   reference
 ) {
-  const atom = state.get(atomUri);
-  const connection = atom && atom.getIn(["connections", connectionUri]);
-  const message = connection && connection.getIn(["messages", messageUri]);
+  const atom = get(allAtomsInState, atomUri);
+  const connection = getIn(atom, ["connections", connectionUri]);
+  let messages = connectionUtils.getMessages(connection);
+  const message = get(messages, messageUri);
 
   if (!message) {
     console.error(
@@ -610,34 +591,35 @@ export function markMessageExpandReferences(
       connectionUri,
       ">"
     );
-    return state;
+    return allAtomsInState;
   }
 
-  return state.setIn(
-    [
-      atomUri,
-      "connections",
-      connectionUri,
-      "messages",
-      messageUri,
-      "viewState",
-      "expandedReferences",
-      reference,
-    ],
-    isExpanded
+  return allAtomsInState.setIn(
+    [atomUri, "connections", connectionUri, "messages"],
+    messageUtils.sortMessages(
+      messages.set(
+        messageUri,
+        message.setIn(
+          ["viewState", "expandedReferences", reference],
+          isExpanded
+        )
+      )
+    )
   );
 }
 
 export function markMessageShowActions(
-  state,
+  allAtomsInState,
   messageUri,
   connectionUri,
   atomUri,
   showActions
 ) {
-  const atom = state.get(atomUri);
-  const connection = atom && atom.getIn(["connections", connectionUri]);
-  const message = connection && connection.getIn(["messages", messageUri]);
+  const atom = get(allAtomsInState, atomUri);
+  const connection = getIn(atom, ["connections", connectionUri]);
+
+  let messages = connectionUtils.getMessages(connection);
+  const message = get(messages, messageUri);
 
   markUriAsRead(messageUri);
 
@@ -651,33 +633,33 @@ export function markMessageShowActions(
       connectionUri,
       ">"
     );
-    return state;
+    return allAtomsInState;
   }
 
-  return state.setIn(
-    [
-      atomUri,
-      "connections",
-      connectionUri,
-      "messages",
-      messageUri,
-      "viewState",
-      "showActions",
-    ],
-    showActions
+  return allAtomsInState.setIn(
+    [atomUri, "connections", connectionUri, "messages"],
+    messageUtils.sortMessages(
+      messages.set(
+        messageUri,
+        message.setIn(["viewState", "showActions"], showActions)
+      )
+    )
   );
 }
 
 export function markMessageAsRead(
-  state,
+  allAtomsInState,
   messageUri,
   connectionUri,
   atomUri,
   read = true
 ) {
-  const atom = state.get(atomUri);
-  const connection = atom && atom.getIn(["connections", connectionUri]);
-  const message = connection && connection.getIn(["messages", messageUri]);
+  const atom = get(allAtomsInState, atomUri);
+  const connection = getIn(atom, ["connections", connectionUri]);
+
+  let messages = connectionUtils.getMessages(connection);
+  const message = get(messages, messageUri);
+
   markUriAsRead(messageUri);
 
   if (!message) {
@@ -690,26 +672,25 @@ export function markMessageAsRead(
       connectionUri,
       ">"
     );
-    return state;
+    return allAtomsInState;
   }
 
-  state = state.setIn(
-    [atomUri, "connections", connectionUri, "messages", messageUri, "unread"],
-    !read
+  allAtomsInState = allAtomsInState.setIn(
+    [atomUri, "connections", connectionUri, "messages"],
+    messageUtils.sortMessages(
+      messages.set(messageUri, message.set("unread", !read))
+    )
   );
 
-  if (
-    state
-      .getIn([atomUri, "connections", connectionUri, "messages"])
-      .filter(msg => msg.get("unread")).size == 0
-  ) {
-    state = markConnectionAsRead(state, connectionUri, atomUri);
+  if (!messages.find(msg => messageUtils.isMessageUnread(msg))) {
+    allAtomsInState = markConnectionAsRead(
+      allAtomsInState,
+      connectionUri,
+      atomUri
+    );
   }
 
-  return state.setIn(
-    [atomUri, "connections", connectionUri, "messages", messageUri, "unread"],
-    !read
-  );
+  return allAtomsInState;
 }
 
 /**
@@ -718,7 +699,7 @@ export function markMessageAsRead(
  * Additionally calls markMessageAsCancellationPending to the referencedMessages with the parameter false
  * Additionally calls markMessageAsProposed to the referencedMessages with the parameter false
  * Additionally calls markMessageAsClaimed to the referencedMessages with the parameter false
- * @param state
+ * @param allAtomsInState
  * @param messageUri
  * @param connectionUri
  * @param atomUri
@@ -726,16 +707,16 @@ export function markMessageAsRead(
  * @returns {*}
  */
 export function markMessageAsRejected(
-  state,
+  allAtomsInState,
   messageUri,
   connectionUri,
   atomUri,
   rejected
 ) {
-  let atom = state.get(atomUri);
-  let connection = atom && atom.getIn(["connections", connectionUri]);
-  let messages = connection && connection.get("messages");
-  let message = messages && messages.get(messageUri);
+  let atom = get(allAtomsInState, atomUri);
+  let connection = getIn(atom, ["connections", connectionUri]);
+  let messages = connectionUtils.getMessages(connection);
+  let message = get(messages, messageUri);
 
   if (!message) {
     console.error(
@@ -747,17 +728,16 @@ export function markMessageAsRejected(
       connectionUri,
       ">"
     );
-    return state;
+    return allAtomsInState;
   }
-  const proposedToCancelReferences = message.getIn([
-    "references",
-    "proposesToCancel",
-  ]);
+  const proposedToCancelReferences = messageUtils.getProposesToCancelReferences(
+    message
+  );
 
   if (proposedToCancelReferences) {
     proposedToCancelReferences.forEach(proposedToCancelRef => {
-      state = markMessageAsCancellationPending(
-        state,
+      allAtomsInState = markMessageAsCancellationPending(
+        allAtomsInState,
         proposedToCancelRef,
         connectionUri,
         atomUri,
@@ -766,12 +746,12 @@ export function markMessageAsRejected(
     });
   }
 
-  const proposesReferences = message.getIn(["references", "proposes"]);
+  const proposesReferences = messageUtils.getProposesReferences(message);
 
   if (proposesReferences) {
     proposesReferences.forEach(proposesRef => {
-      state = markMessageAsProposed(
-        state,
+      allAtomsInState = markMessageAsProposed(
+        allAtomsInState,
         proposesRef,
         connectionUri,
         atomUri,
@@ -780,12 +760,12 @@ export function markMessageAsRejected(
     });
   }
 
-  const claimsReferences = message.getIn(["references", "claims"]);
+  const claimsReferences = messageUtils.getClaimsReferences(message);
 
   if (claimsReferences) {
     claimsReferences.forEach(claimsRef => {
-      state = markMessageAsClaimed(
-        state,
+      allAtomsInState = markMessageAsClaimed(
+        allAtomsInState,
         claimsRef,
         connectionUri,
         atomUri,
@@ -794,20 +774,28 @@ export function markMessageAsRejected(
     });
   }
 
-  state = markMessageAsRead(state, messageUri, connectionUri, atomUri, false);
+  allAtomsInState = markMessageAsRead(
+    allAtomsInState,
+    messageUri,
+    connectionUri,
+    atomUri,
+    false
+  );
 
-  state = markMessageAsCollapsed(
-    state,
+  allAtomsInState = markMessageAsCollapsed(
+    allAtomsInState,
     messageUri,
     connectionUri,
     atomUri,
     rejected
   );
 
-  const rejectedMessageUris =
-    connection && connection.getIn(["agreementData", "rejectedMessageUris"]);
+  const rejectedMessageUris = getIn(connection, [
+    "agreementData",
+    "rejectedMessageUris",
+  ]);
 
-  return state.setIn(
+  return allAtomsInState.setIn(
     [
       atomUri,
       "connections",
@@ -830,7 +818,7 @@ export function markMessageAsRejected(
  * Additionally calls markMessageAsCancellationPending to the referencedMessages with the parameter false
  * Additionally calls markMessageAsProposed to the referencedMessages with the parameter false
  * Additionally calls markMessageAsClaimed to the referencedMessages with the parameter false
- * @param state
+ * @param allAtomsInState
  * @param messageUri
  * @param connectionUri
  * @param atomUri
@@ -838,16 +826,16 @@ export function markMessageAsRejected(
  * @returns {*}
  */
 export function markMessageAsRetracted(
-  state,
+  allAtomsInState,
   messageUri,
   connectionUri,
   atomUri,
   retracted
 ) {
-  let atom = state.get(atomUri);
-  let connection = atom && atom.getIn(["connections", connectionUri]);
-  let messages = connection && connection.get("messages");
-  let message = messages && messages.get(messageUri);
+  let atom = get(allAtomsInState, atomUri);
+  let connection = getIn(atom, ["connections", connectionUri]);
+  let messages = connectionUtils.getMessages(connection);
+  let message = get(messages, messageUri);
 
   if (!message) {
     console.error(
@@ -859,17 +847,16 @@ export function markMessageAsRetracted(
       connectionUri,
       ">"
     );
-    return state;
+    return allAtomsInState;
   }
-  const proposedToCancelReferences = message.getIn([
-    "references",
-    "proposesToCancel",
-  ]);
+  const proposedToCancelReferences = messageUtils.getProposesToCancelReferences(
+    message
+  );
 
   if (proposedToCancelReferences) {
     proposedToCancelReferences.forEach(proposedToCancelRef => {
-      state = markMessageAsCancellationPending(
-        state,
+      allAtomsInState = markMessageAsCancellationPending(
+        allAtomsInState,
         proposedToCancelRef,
         connectionUri,
         atomUri,
@@ -878,12 +865,12 @@ export function markMessageAsRetracted(
     });
   }
 
-  const proposesReferences = message.getIn(["references", "proposes"]);
+  const proposesReferences = messageUtils.getProposesReferences(message);
 
   if (proposesReferences) {
     proposesReferences.forEach(proposesRef => {
-      state = markMessageAsProposed(
-        state,
+      allAtomsInState = markMessageAsProposed(
+        allAtomsInState,
         proposesRef,
         connectionUri,
         atomUri,
@@ -892,12 +879,12 @@ export function markMessageAsRetracted(
     });
   }
 
-  const claimsReferences = message.getIn(["references", "claims"]);
+  const claimsReferences = messageUtils.getClaimsReferences(message);
 
   if (claimsReferences) {
     claimsReferences.forEach(claimsRef => {
-      state = markMessageAsClaimed(
-        state,
+      allAtomsInState = markMessageAsClaimed(
+        allAtomsInState,
         claimsRef,
         connectionUri,
         atomUri,
@@ -906,20 +893,28 @@ export function markMessageAsRetracted(
     });
   }
 
-  state = markMessageAsRead(state, messageUri, connectionUri, atomUri, false);
+  allAtomsInState = markMessageAsRead(
+    allAtomsInState,
+    messageUri,
+    connectionUri,
+    atomUri,
+    false
+  );
 
-  state = markMessageAsCollapsed(
-    state,
+  allAtomsInState = markMessageAsCollapsed(
+    allAtomsInState,
     messageUri,
     connectionUri,
     atomUri,
     retracted
   );
 
-  const retractedMessageUris =
-    connection && connection.getIn(["agreementData", "retractedMessageUris"]);
+  const retractedMessageUris = getIn(connection, [
+    "agreementData",
+    "retractedMessageUris",
+  ]);
 
-  return state.setIn(
+  return allAtomsInState.setIn(
     [
       atomUri,
       "connections",
@@ -939,7 +934,7 @@ export function markMessageAsRetracted(
 /**
  * Sets the given messageUri messageStatus->isClaimed to the given parameter (claimed).
  * Additionally calls markMessageAsCollapsed to the given parameter (claimed) as well
- * @param state
+ * @param allAtomsInState
  * @param messageUri
  * @param connectionUri
  * @param atomUri
@@ -947,14 +942,14 @@ export function markMessageAsRetracted(
  * @returns {*}
  */
 export function markMessageAsClaimed(
-  state,
+  allAtomsInState,
   messageUri,
   connectionUri,
   atomUri,
   claimed
 ) {
-  let atom = state.get(atomUri);
-  let connection = atom && atom.getIn(["connections", connectionUri]);
+  let atom = get(allAtomsInState, atomUri);
+  let connection = getIn(atom, ["connections", connectionUri]);
 
   if (!connection) {
     console.error(
@@ -964,23 +959,31 @@ export function markMessageAsClaimed(
       atomUri,
       ">"
     );
-    return state;
+    return allAtomsInState;
   }
 
-  state = markMessageAsCollapsed(
-    state,
+  allAtomsInState = markMessageAsCollapsed(
+    allAtomsInState,
     messageUri,
     connectionUri,
     atomUri,
     claimed
   );
 
-  state = markMessageAsRead(state, messageUri, connectionUri, atomUri, false);
+  allAtomsInState = markMessageAsRead(
+    allAtomsInState,
+    messageUri,
+    connectionUri,
+    atomUri,
+    false
+  );
 
-  const claimedMessageUris =
-    connection && connection.getIn(["agreementData", "claimedMessageUris"]);
+  const claimedMessageUris = getIn(connection, [
+    "agreementData",
+    "claimedMessageUris",
+  ]);
 
-  return state.setIn(
+  return allAtomsInState.setIn(
     [
       atomUri,
       "connections",
@@ -1000,7 +1003,7 @@ export function markMessageAsClaimed(
 /**
  * Sets the given messageUri messageStatus->isAgreed to the given parameter (isAgreedOn).
  * Additionally calls markMessageAsCollapsed to the given parameter (isAgreedOn) as well
- * @param state
+ * @param allAtomsInState
  * @param messageUri
  * @param connectionUri
  * @param atomUri
@@ -1008,14 +1011,14 @@ export function markMessageAsClaimed(
  * @returns {*}
  */
 export function markMessageAsAgreed(
-  state,
+  allAtomsInState,
   messageUri,
   connectionUri,
   atomUri,
   isAgreedOn
 ) {
-  let atom = state.get(atomUri);
-  let connection = atom && atom.getIn(["connections", connectionUri]);
+  let atom = get(allAtomsInState, atomUri);
+  let connection = getIn(atom, ["connections", connectionUri]);
 
   if (!connection) {
     console.error(
@@ -1025,23 +1028,31 @@ export function markMessageAsAgreed(
       atomUri,
       ">"
     );
-    return state;
+    return allAtomsInState;
   }
 
-  state = markMessageAsRead(state, messageUri, connectionUri, atomUri, false);
+  allAtomsInState = markMessageAsRead(
+    allAtomsInState,
+    messageUri,
+    connectionUri,
+    atomUri,
+    false
+  );
 
-  state = markMessageAsCollapsed(
-    state,
+  allAtomsInState = markMessageAsCollapsed(
+    allAtomsInState,
     messageUri,
     connectionUri,
     atomUri,
     isAgreedOn
   );
 
-  const agreedMessageUris =
-    connection && connection.getIn(["agreementData", "agreedMessageUris"]);
+  const agreedMessageUris = getIn(connection, [
+    "agreementData",
+    "agreedMessageUris",
+  ]);
 
-  return state.setIn(
+  return allAtomsInState.setIn(
     [
       atomUri,
       "connections",
@@ -1061,7 +1072,7 @@ export function markMessageAsAgreed(
 /**
  * Sets the given messageUri messageStatus->isProposed to the given parameter (proposed).
  * Additionally calls markMessageAsCollapsed to the given parameter (proposed) as well
- * @param state
+ * @param allAtomsInState
  * @param messageUri
  * @param connectionUri
  * @param atomUri
@@ -1069,14 +1080,14 @@ export function markMessageAsAgreed(
  * @returns {*}
  */
 export function markMessageAsProposed(
-  state,
+  allAtomsInState,
   messageUri,
   connectionUri,
   atomUri,
   proposed
 ) {
-  let atom = state.get(atomUri);
-  let connection = atom && atom.getIn(["connections", connectionUri]);
+  let atom = get(allAtomsInState, atomUri);
+  let connection = getIn(atom, ["connections", connectionUri]);
 
   if (!connection) {
     console.error(
@@ -1086,13 +1097,19 @@ export function markMessageAsProposed(
       atomUri,
       ">"
     );
-    return state;
+    return allAtomsInState;
   }
 
-  state = markMessageAsRead(state, messageUri, connectionUri, atomUri, false);
+  allAtomsInState = markMessageAsRead(
+    allAtomsInState,
+    messageUri,
+    connectionUri,
+    atomUri,
+    false
+  );
 
-  state = markMessageAsCollapsed(
-    state,
+  allAtomsInState = markMessageAsCollapsed(
+    allAtomsInState,
     messageUri,
     connectionUri,
     atomUri,
@@ -1100,10 +1117,12 @@ export function markMessageAsProposed(
   );
 
   //if !proposed remove from set because message was retracted/rejected
-  const proposedMessageUris =
-    connection && connection.getIn(["agreementData", "proposedMessageUris"]);
+  const proposedMessageUris = getIn(connection, [
+    "agreementData",
+    "proposedMessageUris",
+  ]);
 
-  return state.setIn(
+  return allAtomsInState.setIn(
     [
       atomUri,
       "connections",
@@ -1121,16 +1140,16 @@ export function markMessageAsProposed(
 }
 
 export function markMessageAsAccepted(
-  state,
+  allAtomsInState,
   messageUri,
   connectionUri,
   atomUri,
   accepted
 ) {
-  let atom = state.get(atomUri);
-  let connection = atom && atom.getIn(["connections", connectionUri]);
-  let messages = connection && connection.get("messages");
-  let message = messages && messages.get(messageUri);
+  let atom = get(allAtomsInState, atomUri);
+  let connection = getIn(atom, ["connections", connectionUri]);
+  let messages = connectionUtils.getMessages(connection);
+  let message = get(messages, messageUri);
 
   if (!message) {
     console.error(
@@ -1142,17 +1161,17 @@ export function markMessageAsAccepted(
       connectionUri,
       ">"
     );
-    return state;
+    return allAtomsInState;
   }
-  const proposedToCancelReferences = message.getIn([
-    "references",
-    "proposesToCancel",
-  ]);
+
+  const proposedToCancelReferences = messageUtils.getProposesToCancelReferences(
+    message
+  );
 
   if (proposedToCancelReferences) {
     proposedToCancelReferences.forEach(proposedToCancelRef => {
-      state = markMessageAsCancelled(
-        state,
+      allAtomsInState = markMessageAsCancelled(
+        allAtomsInState,
         proposedToCancelRef,
         connectionUri,
         atomUri,
@@ -1163,8 +1182,8 @@ export function markMessageAsAccepted(
 
   // remove from cancelled and cancellationPending sets because of not pending anymore
   if (accepted) {
-    state = markMessageAsCancellationPending(
-      state,
+    allAtomsInState = markMessageAsCancellationPending(
+      allAtomsInState,
       messageUri,
       connectionUri,
       atomUri,
@@ -1172,12 +1191,17 @@ export function markMessageAsAccepted(
     );
   }
 
-  state = markMessageAsRead(state, messageUri, connectionUri, atomUri, false);
+  allAtomsInState = markMessageAsRead(
+    allAtomsInState,
+    messageUri,
+    connectionUri,
+    atomUri,
+    false
+  );
 
-  const agreementUris =
-    connection && connection.getIn(["agreementData", "agreementUris"]);
+  const agreementUris = getIn(connection, ["agreementData", "agreementUris"]);
 
-  return state.setIn(
+  return allAtomsInState.setIn(
     [atomUri, "connections", connectionUri, "agreementData", "agreementUris"],
     (agreementUris && agreementUris.add(messageUri)) ||
       Immutable.Set(messageUri)
@@ -1185,14 +1209,14 @@ export function markMessageAsAccepted(
 }
 
 export function markMessageAsCancelled(
-  state,
+  allAtomsInState,
   messageUri,
   connectionUri,
   atomUri,
   cancelled
 ) {
-  let atom = state.get(atomUri);
-  let connection = atom && atom.getIn(["connections", connectionUri]);
+  let atom = get(allAtomsInState, atomUri);
+  let connection = getIn(atom, ["connections", connectionUri]);
 
   if (!connection) {
     console.error(
@@ -1202,25 +1226,25 @@ export function markMessageAsCancelled(
       atomUri,
       ">"
     );
-    return state;
+    return allAtomsInState;
   }
 
   //if cancelled remove from accepted/agreementUris and cancellationPending sets
   if (cancelled) {
-    const agreementUris =
-      connection && connection.getIn(["agreementData", "agreementUris"]);
+    const agreementUris = getIn(connection, ["agreementData", "agreementUris"]);
 
-    state = state.setIn(
+    allAtomsInState = allAtomsInState.setIn(
       [atomUri, "connections", connectionUri, "agreementData", "agreementUris"],
       (agreementUris && agreementUris.filter(uri => uri != messageUri)) ||
         Immutable.Set()
     );
 
-    const cancellationPendingAgreementUris =
-      connection &&
-      connection.getIn(["agreementData", "cancellationPendingAgreementUris"]);
+    const cancellationPendingAgreementUris = getIn(connection, [
+      "agreementData",
+      "cancellationPendingAgreementUris",
+    ]);
 
-    state = state.setIn(
+    allAtomsInState = allAtomsInState.setIn(
       [
         atomUri,
         "connections",
@@ -1234,11 +1258,19 @@ export function markMessageAsCancelled(
     );
   }
 
-  state = markMessageAsRead(state, messageUri, connectionUri, atomUri, false);
+  allAtomsInState = markMessageAsRead(
+    allAtomsInState,
+    messageUri,
+    connectionUri,
+    atomUri,
+    false
+  );
 
-  const cancelledAgreementUris =
-    connection && connection.getIn(["agreementData", "cancelledAgreementUris"]);
-  return state.setIn(
+  const cancelledAgreementUris = getIn(connection, [
+    "agreementData",
+    "cancelledAgreementUris",
+  ]);
+  return allAtomsInState.setIn(
     [
       atomUri,
       "connections",
@@ -1256,14 +1288,14 @@ export function markMessageAsCancelled(
 }
 
 export function markMessageAsCancellationPending(
-  state,
+  allAtomsInState,
   messageUri,
   connectionUri,
   atomUri,
   cancellationPending
 ) {
-  let atom = state.get(atomUri);
-  let connection = atom && atom.getIn(["connections", connectionUri]);
+  let atom = get(allAtomsInState, atomUri);
+  let connection = getIn(atom, ["connections", connectionUri]);
 
   if (!connection) {
     console.error(
@@ -1273,17 +1305,24 @@ export function markMessageAsCancellationPending(
       atomUri,
       ">"
     );
-    return state;
+    return allAtomsInState;
   }
 
-  state = markMessageAsRead(state, messageUri, connectionUri, atomUri, false);
+  allAtomsInState = markMessageAsRead(
+    allAtomsInState,
+    messageUri,
+    connectionUri,
+    atomUri,
+    false
+  );
 
-  const cancellationPendingUris =
-    connection &&
-    connection.getIn(["agreementData", "cancellationPendingAgreementUris"]);
+  const cancellationPendingUris = getIn(connection, [
+    "agreementData",
+    "cancellationPendingAgreementUris",
+  ]);
 
   // if !cancellationPending remove from set because message was retracted/rejected
-  return state.setIn(
+  return allAtomsInState.setIn(
     [
       atomUri,
       "connections",
@@ -1304,17 +1343,23 @@ export function markMessageAsCancellationPending(
 /**
  * Sets the given messageUri messageStatus to the given parameter (messageStatus).
  * Additionally calls markMessageAsCollapsed to the bool-exp from messageStatus data => (isProposed || isClaimed ||isRejected || isRetracted)
- * @param state
+ * @param allAtomsInState
  * @param messageUri
  * @param connectionUri
  * @param atomUri
  * @returns {*}
  *
  */
-export function updateMessageStatus(state, messageUri, connectionUri, atomUri) {
-  let atom = state.get(atomUri);
-  let connection = atom && atom.getIn(["connections", connectionUri]);
-  let message = connection && connection.getIn(["messages", messageUri]);
+export function updateMessageStatus(
+  allAtomsInState,
+  messageUri,
+  connectionUri,
+  atomUri
+) {
+  let atom = get(allAtomsInState, atomUri);
+  let connection = getIn(atom, ["connections", connectionUri]);
+  let messages = connectionUtils.getMessages(connection);
+  let message = get(messages, messageUri);
 
   if (!message) {
     console.error(
@@ -1326,29 +1371,32 @@ export function updateMessageStatus(state, messageUri, connectionUri, atomUri) {
       connectionUri,
       ">"
     );
-    return state;
+    return allAtomsInState;
   }
 
   //Check if there is any "positive" messageStatus, we assume that we do not want to display this message "fully"
-  const agreementData = connection && connection.get("agreementData");
+  const agreementData = get(connection, "agreementData");
 
-  const isProposed =
-    agreementData && !!agreementData.getIn(["proposedMessageUris", messageUri]);
-  const isClaimed =
-    agreementData && !!agreementData.getIn(["claimedMessageUris", messageUri]);
-  const isAgreed =
-    agreementData && !!agreementData.getIn(["agreedMessageUris", messageUri]);
-  const isRejected =
-    agreementData && !!agreementData.getIn(["rejectedMessageUris", messageUri]);
-  const isRetracted =
-    agreementData &&
-    !!agreementData.getIn(["retractedMessageUris", messageUri]);
+  const isProposed = !!getIn(agreementData, [
+    "proposedMessageUris",
+    messageUri,
+  ]);
+  const isClaimed = !!getIn(agreementData, ["claimedMessageUris", messageUri]);
+  const isAgreed = !!getIn(agreementData, ["agreedMessageUris", messageUri]);
+  const isRejected = !!getIn(agreementData, [
+    "rejectedMessageUris",
+    messageUri,
+  ]);
+  const isRetracted = !!getIn(agreementData, [
+    "retractedMessageUris",
+    messageUri,
+  ]);
 
   const hasCollapsedMessageState =
     isProposed || isClaimed || isAgreed || isRejected || isRetracted;
 
   return markMessageAsCollapsed(
-    state,
+    allAtomsInState,
     messageUri,
     connectionUri,
     atomUri,
@@ -1358,26 +1406,15 @@ export function updateMessageStatus(state, messageUri, connectionUri, atomUri) {
 
 /**
  * Returns true if socket is a ChatSocket and targetSocket is a GroupSocket
- * @param allAtoms all atoms of the state
+ * @param allAtoms all atoms of the allAtomsInState
  * @param connection to check sockettypes of
  * @returns {boolean}
  */
-function isChatToGroupConnection(allAtoms, connection) {
+function isChatToGroupConnection(allAtomsInState, connection) {
   return (
-    getSenderSocketType(allAtoms, connection) ===
+    getSenderSocketType(allAtomsInState, connection) ===
       vocab.CHAT.ChatSocketCompacted &&
-    getTargetSocketType(allAtoms, connection) ===
+    getTargetSocketType(allAtomsInState, connection) ===
       vocab.GROUP.GroupSocketCompacted
   );
-}
-
-/**
- * Default message Sorting -> so we can already store a sorted map of messages in the atom
- * @param message
- * @returns {any}
- */
-function sortByMessageTimeStamp(message) {
-  const messageDate = get(message, "date");
-
-  return messageDate && messageDate.getTime();
 }

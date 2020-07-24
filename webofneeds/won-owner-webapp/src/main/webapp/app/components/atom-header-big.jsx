@@ -10,8 +10,9 @@ import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as atomUtils from "../redux/utils/atom-utils";
 import * as wonLabelUtils from "../won-label-utils.js";
 import * as accountUtils from "../redux/utils/account-utils";
+import * as connectionUtils from "~/app/redux/utils/connection-utils";
 import * as processUtils from "../redux/utils/process-utils";
-import { get, extractAtomUriFromConnectionUri } from "../utils.js";
+import { get, getUri, extractAtomUriFromConnectionUri } from "../utils.js";
 
 import WonAtomContextDropdown from "../components/atom-context-dropdown.jsx";
 import WonAtomIcon from "../components/atom-icon.jsx";
@@ -78,7 +79,7 @@ export default function WonAtomHeaderBig({
       connectionHolder
     );
 
-  const targetAtomUri = get(ownedConnection, "targetAtomUri");
+  const targetAtomUri = connectionUtils.getTargetAtomUri(ownedConnection);
   const targetAtom = get(storedAtoms, targetAtomUri);
   const isTargetAtomFetchNecessary =
     targetAtomUri !== atomUri &&
@@ -187,7 +188,7 @@ export default function WonAtomHeaderBig({
       ownedAtomsWithBuddySocket &&
       ownedAtomsWithBuddySocket
         .filter(atom => atomUtils.isActive(atom))
-        .filter(atom => get(atom, "uri") !== atomUri).size > 0;
+        .filter(atom => getUri(atom) !== atomUri).size > 0;
 
     const showAddBuddyElement =
       atomUtils.hasBuddySocket(atom) &&
@@ -197,14 +198,14 @@ export default function WonAtomHeaderBig({
     const generateAtomActionButton = () => {
       const isInactive = atomUtils.isInactive(atom);
       if (ownedConnection || isInactive) {
-        const connectionState = get(ownedConnection, "state");
+        const connectionState = connectionUtils.getState(ownedConnection);
         const senderSocketType = atomUtils.getSocketType(
           senderAtom,
-          get(ownedConnection, "socketUri")
+          connectionUtils.getSocketUri(ownedConnection)
         );
         const targetSocketType = atomUtils.getSocketType(
           targetAtom,
-          get(ownedConnection, "targetSocketUri")
+          connectionUtils.getTargetSocketUri(ownedConnection)
         );
 
         return (

@@ -7,7 +7,7 @@ import * as messageUtils from "../redux/utils/message-utils";
 import { rdfTextfieldHelpText } from "../won-label-utils.js";
 import {
   get,
-  getIn,
+  getUri,
   generateLink,
   extractAtomUriFromConnectionUri,
 } from "../utils";
@@ -48,20 +48,20 @@ export default function WonGroupAtomMessages({
   });
   const [snapBottom, setSnapBottom] = useState(true);
 
-  const connectionUri = get(connection, "uri");
+  const connectionUri = getUri(connection);
   const allAtoms = useSelector(generalSelectors.getAtoms);
   const ownedConnections = useSelector(getOwnedConnections);
   const senderAtom = useSelector(
     generalSelectors.getOwnedAtomByConnectionUri(connectionUri)
   );
-  const senderAtomUri = get(senderAtom, "uri");
-  const targetAtomUri = get(connection, "targetAtomUri");
+  const senderAtomUri = getUri(senderAtom);
+  const targetAtomUri = connectionUtils.getTargetAtomUri(connection);
   const targetAtom = useSelector(generalSelectors.getAtom(targetAtomUri));
-  const allChatMessages = get(connection, "messages");
+  const allChatMessages = connectionUtils.getMessages(connection);
   const chatMessages =
     allChatMessages &&
     allChatMessages
-      .filter(msg => !getIn(msg, ["references", "forwards"])) //FILTER OUT ALL FORWARD MESSAGE ENVELOPES JUST IN CASE
+      .filter(msg => !messageUtils.hasForwardsReferences(msg)) //FILTER OUT ALL FORWARD MESSAGE ENVELOPES JUST IN CASE
       .filter(msg => !messageUtils.isAtomHintMessage(msg)) //FILTER OUT ALL HINT MESSAGES
       .filter(msg => !messageUtils.isSocketHintMessage(msg));
 
@@ -140,8 +140,8 @@ export default function WonGroupAtomMessages({
 
     const trimmedMsg = chatMessage.trim();
     if (trimmedMsg || additionalContent || referencedContent) {
-      const senderSocketUri = get(connection, "socketUri");
-      const targetSocketUri = get(connection, "targetSocketUri");
+      const senderSocketUri = connectionUtils.getSocketUri(connection);
+      const targetSocketUri = connectionUtils.getTargetSocketUri(connection);
 
       dispatch(
         actionCreators.connections__sendChatMessage(
@@ -166,8 +166,8 @@ export default function WonGroupAtomMessages({
     );
     dispatch(
       actionCreators.atoms__connectSockets(
-        get(connection, "socketUri"),
-        get(connection, "targetSocketUri"),
+        connectionUtils.getSocketUri(connection),
+        connectionUtils.getTargetSocketUri(connection),
         message
       )
     );
@@ -217,7 +217,7 @@ export default function WonGroupAtomMessages({
     if (
       hasConnectionMessagesToLoad &&
       !connectionUtils.isUsingTemporaryUri(connection) &&
-      get(connection, "messages").size < INITIAL_MESSAGECOUNT
+      connectionUtils.getMessagesSize(connection) < INITIAL_MESSAGECOUNT
     ) {
       loadPreviousMessages(INITIAL_MESSAGECOUNT);
     }
@@ -313,8 +313,8 @@ export default function WonGroupAtomMessages({
         toLink={generateLink(
           history.location,
           {
-            postUri: get(connection, "targetAtomUri"),
-            connectionUri: get(connection, "uri"),
+            postUri: connectionUtils.getTargetAtomUri(connection),
+            connectionUri: getUri(connection),
             tab: undefined,
           },
           "/post"
@@ -387,8 +387,10 @@ export default function WonGroupAtomMessages({
           allowEmptySubmit={true}
           allowDetails={false}
           onSubmit={({ value }) => {
-            const senderSocketUri = get(connection, "socketUri");
-            const targetSocketUri = get(connection, "targetSocketUri");
+            const senderSocketUri = connectionUtils.getSocketUri(connection);
+            const targetSocketUri = connectionUtils.getTargetSocketUri(
+              connection
+            );
             dispatch(
               actionCreators.atoms__connectSockets(
                 senderSocketUri,

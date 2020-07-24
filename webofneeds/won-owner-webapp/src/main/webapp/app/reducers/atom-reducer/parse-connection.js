@@ -1,6 +1,6 @@
 import Immutable from "immutable";
 import vocab from "../../service/vocab.js";
-import { get } from "../../utils.js";
+import { get, getUri } from "../../utils.js";
 import { isUriRead } from "../../won-localstorage.js";
 
 export function parseConnection(jsonldConnection) {
@@ -9,7 +9,7 @@ export function parseConnection(jsonldConnection) {
   let parsedConnection = {
     belongsToUri: get(jsonldConnectionImm, "sourceAtom"),
     data: {
-      uri: get(jsonldConnectionImm, "uri"),
+      uri: getUri(jsonldConnectionImm),
       state: get(jsonldConnectionImm, "connectionState"),
       previousState: get(jsonldConnectionImm, "previousConnectionState"),
       messageContainerUri: get(jsonldConnectionImm, "messageContainer"),

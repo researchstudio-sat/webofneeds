@@ -4,29 +4,46 @@
 
 import vocab from "../../service/vocab.js";
 import { get } from "../../utils.js";
+import * as messageUtils from "./message-utils.js";
+
+export function getState(connection) {
+  return get(connection, "state");
+}
+
+export function getTargetAtomUri(connection) {
+  return get(connection, "targetAtomUri");
+}
+
+export function getSocketUri(connection) {
+  return get(connection, "socketUri");
+}
+
+export function getTargetSocketUri(connection) {
+  return get(connection, "targetSocketUri");
+}
 
 export function isUsingTemporaryUri(connection) {
   return !!get(connection, "usingTemporaryUri");
 }
 
 export function isRequestSent(connection) {
-  return get(connection, "state") === vocab.WON.RequestSent;
+  return getState(connection) === vocab.WON.RequestSent;
 }
 
 export function isRequestReceived(connection) {
-  return get(connection, "state") === vocab.WON.RequestReceived;
+  return getState(connection) === vocab.WON.RequestReceived;
 }
 
 export function isSuggested(connection) {
-  return get(connection, "state") === vocab.WON.Suggested;
+  return getState(connection) === vocab.WON.Suggested;
 }
 
 export function isConnected(connection) {
-  return get(connection, "state") === vocab.WON.Connected;
+  return getState(connection) === vocab.WON.Connected;
 }
 
 export function isClosed(connection) {
-  return get(connection, "state") === vocab.WON.Closed;
+  return getState(connection) === vocab.WON.Closed;
 }
 
 export function isUnread(connection) {
@@ -41,19 +58,30 @@ export function hasSocketUris(connection, socketUri, targetSocketUri) {
 }
 
 export function hasSocketUri(connection, socketUri) {
-  return (
-    !!connection && !!socketUri && get(connection, "socketUri") === socketUri
-  );
+  return !!connection && !!socketUri && getSocketUri(connection) === socketUri;
 }
 
 export function hasTargetSocketUri(connection, socketUri) {
   return (
-    !!connection &&
-    !!socketUri &&
-    get(connection, "targetSocketUri") === socketUri
+    !!connection && !!socketUri && getTargetSocketUri(connection) === socketUri
   );
 }
 
+export function getMessages(connection) {
+  return get(connection, "messages");
+}
+
+export function getMessagesSize(connection) {
+  const messages = getMessages(connection);
+
+  return messages ? messages.size : 0;
+}
+
+export function getMessage(connection, msgUri) {
+  const messages = getMessages(connection);
+
+  return get(messages, msgUri);
+}
 /**
  * Creates a label of the participants and suggestions/requests/invites of a given set of groupChatConnections
  * @param groupChatConnections
@@ -138,3 +166,14 @@ export const filterSingleConnectedSocketCapacityFilter = (_, socketType) =>
  */
 export const filterNonSingleConnectedSocketCapacityFilter = (_, socketType) =>
   vocab.socketCapacity[socketType] === 1;
+
+/**
+ * (re)sorts the messages stored in the connection
+ * @param conn
+ * @returns {connection object with sorted messages)
+ */
+export function sortMessages(conn) {
+  const messages = getMessages(conn);
+
+  return conn.set(messageUtils.sortMessages(messages));
+}

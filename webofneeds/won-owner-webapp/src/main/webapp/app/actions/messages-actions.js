@@ -4,7 +4,7 @@
 
 import won from "../won-es6.js";
 import { actionTypes, actionCreators } from "./actions.js";
-import { getIn } from "../utils.js";
+import { getIn, getUri, get, extractAtomUriBySocketUri } from "../utils.js";
 
 import Immutable from "immutable";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
@@ -14,7 +14,6 @@ import * as stateStore from "../redux/state-store.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as ownerApi from "../api/owner-api.js";
-import { extractAtomUriBySocketUri, get } from "../utils";
 import * as processUtils from "../redux/utils/process-utils";
 
 export function successfulCloseAtom(event) {
@@ -22,11 +21,9 @@ export function successfulCloseAtom(event) {
     //TODO MAYBE DELETE THIS FUNCTION, I THINK IT SERVES NO PURPOSE
     //TODO maybe refactor these response message handling
     if (
-      getState().getIn([
-        "messages",
-        "waitingForAnswer",
-        event.getIsRemoteResponseTo(),
-      ])
+      generalSelectors.isWaitingForAnswer(event.getIsRemoteResponseTo())(
+        getState()
+      )
     ) {
       //dispatch(actionCreators.connections__denied(event));
     }
@@ -37,11 +34,9 @@ export function successfulReopenAtom(event) {
     //TODO MAYBE DELETE THIS FUNCTION, I THINK IT SERVES NO PURPOSE
     //TODO maybe refactor these response message handling
     if (
-      getState().getIn([
-        "messages",
-        "waitingForAnswer",
-        event.getIsRemoteResponseTo(),
-      ])
+      generalSelectors.isWaitingForAnswer(event.getIsRemoteResponseTo())(
+        getState()
+      )
     ) {
       //dispatch(actionCreators.connections__denied(event));
     }
@@ -93,18 +88,14 @@ export function successfulCloseConnection(event) {
     const state = getState();
     //TODO maybe refactor these response message handling
     if (
-      state.getIn(["messages", "waitingForAnswer", event.getIsResponseTo()])
+      generalSelectors.isWaitingForAnswer(event.getIsRemoteResponseTo())(state)
     ) {
       dispatch({
         type: actionTypes.messages.close.success,
         payload: event,
       });
     } else if (
-      state.getIn([
-        "messages",
-        "waitingForAnswer",
-        event.getIsRemoteResponseTo(),
-      ])
+      generalSelectors.isWaitingForAnswer(event.getIsRemoteResponseTo())(state)
     ) {
       dispatch({
         type: actionTypes.messages.close.success,
@@ -245,7 +236,7 @@ export function processConnectionMessage(wonMessage) {
           targetSocketUri
         );
 
-        const senderConnectionUri = get(senderConnection, "uri");
+        const senderConnectionUri = getUri(senderConnection);
 
         sentEventPromise = processMessageEffectsAndMessage(
           wonMessage,
@@ -266,7 +257,7 @@ export function processConnectionMessage(wonMessage) {
           senderSocketUri
         );
 
-        const targetConnectionUri = get(targetConnection, "uri");
+        const targetConnectionUri = getUri(targetConnection);
 
         receivedEventPromise = processMessageEffectsAndMessage(
           wonMessage,
@@ -508,22 +499,22 @@ export function connectSuccessOwn(wonMessage) {
 
     const atom = generalSelectors.getAtom(atomUri)(state);
 
-    const connection = getIn(atom, [
-      "connections",
-      "connectionFrom:" + wonMessage.getIsResponseTo(),
-    ]);
+    const connection = atomUtils.getConnection(
+      atom,
+      "connectionFrom:" + wonMessage.getIsResponseTo()
+    );
 
     if (connection) {
       let connUriPromise;
 
       if (connectionUtils.isUsingTemporaryUri(connection)) {
         connUriPromise = stateStore.fetchConnectionUriBySocketUris(
-          get(connection, "socketUri"),
-          get(connection, "targetSocketUri"),
+          connectionUtils.getSocketUri(connection),
+          connectionUtils.getTargetSocketUri(connection),
           atomUri
         );
       } else {
-        connUriPromise = Promise.resolve(get(connection, "uri"));
+        connUriPromise = Promise.resolve(getUri(connection));
       }
 
       connUriPromise.then(connUri => {
@@ -555,10 +546,10 @@ export function connectSuccessRemote(wonMessage) {
         targetSocketUri,
         senderSocketUri
       ) ||
-      getIn(atom, [
-        "connections",
-        "connectionFrom:" + wonMessage.getIsResponseTo(),
-      ]);
+      atomUtils.getConnection(
+        atom,
+        "connectionFrom:" + wonMessage.getIsResponseTo()
+      );
 
     if (connection) {
       let connUriPromise;
@@ -570,7 +561,7 @@ export function connectSuccessRemote(wonMessage) {
           atomUri
         );
       } else {
-        connUriPromise = Promise.resolve(get(connection, "uri"));
+        connUriPromise = Promise.resolve(getUri(connection));
       }
 
       connUriPromise.then(connUri => {
@@ -604,21 +595,19 @@ export function processConnectMessage(wonMessage) {
       state
     );
 
-    const receiverConnectionUri = get(
+    const receiverConnectionUri = getUri(
       atomUtils.getConnectionBySocketUris(
         recipientAtom,
         targetSocketUri,
         senderSocketUri
-      ),
-      "uri"
+      )
     );
-    const senderConnectionUri = get(
+    const senderConnectionUri = getUri(
       atomUtils.getConnectionBySocketUris(
         senderAtom,
         senderSocketUri,
         targetSocketUri
-      ),
-      "uri"
+      )
     );
 
     let senderAtomP;
@@ -717,7 +706,7 @@ export function processConnectMessage(wonMessage) {
               dispatch({
                 type: actionTypes.messages.connectMessageReceived,
                 payload: {
-                  updatedConnectionUri: get(newReceiverConnection, "uri"),
+                  updatedConnectionUri: getUri(newReceiverConnection),
                   ownedAtomUri: recipientAtomUri,
                   message: wonMessage,
                 },
@@ -742,7 +731,7 @@ export function processConnectMessage(wonMessage) {
               dispatch({
                 type: actionTypes.messages.connectMessageSent,
                 payload: {
-                  updatedConnectionUri: get(newSenderConnection, "uri"),
+                  updatedConnectionUri: getUri(newSenderConnection),
                   senderAtomUri: senderAtomUri,
                   event: wonMessage,
                 },
@@ -825,7 +814,7 @@ export function processSocketHintMessage(wonMessage) {
       targetSocketUri,
       senderSocketUri
     );
-    const targetConnectionUri = get(targetConnection, "uri");
+    const targetConnectionUri = getUri(targetConnection);
 
     if (!targetConnectionUri && isOwnTargetAtom) {
       return stateStore

@@ -3,7 +3,7 @@
  */
 
 import vocab from "../../service/vocab.js";
-import { get, getIn } from "../../utils.js";
+import { get, getIn, getUri } from "../../utils.js";
 import * as wonLabelUtils from "../../won-label-utils.js";
 import * as connectionUtils from "./connection-utils.js";
 import * as useCaseUtils from "../../usecase-utils.js";
@@ -15,7 +15,11 @@ import Immutable from "immutable";
  * @returns {*|boolean}
  */
 export function isActive(atom) {
-  return get(atom, "state") === vocab.WON.ActiveCompacted;
+  return getState(atom) === vocab.WON.ActiveCompacted;
+}
+
+export function getState(atom) {
+  return get(atom, "state");
 }
 
 /**
@@ -24,7 +28,7 @@ export function isActive(atom) {
  * @returns {*|boolean}
  */
 export function isInactive(atom) {
-  return get(atom, "state") === vocab.WON.InactiveCompacted;
+  return getState(atom) === vocab.WON.InactiveCompacted;
 }
 
 export function getIdenticonSvg(atom) {
@@ -374,8 +378,8 @@ export function hasUnreadSuggestedConnections(atom) {
 export function getConnectionBySocketUris(atom, socketUri, targetSocketUri) {
   return getConnections(atom).find(
     conn =>
-      get(conn, "socketUri") === socketUri &&
-      get(conn, "targetSocketUri") === targetSocketUri
+      connectionUtils.hasSocketUri(conn, socketUri) &&
+      connectionUtils.hasTargetSocketUri(conn, targetSocketUri)
   );
 }
 
@@ -501,7 +505,9 @@ export function getHeldByUri(atomImm) {
     hasHoldableSocket(atomImm) &&
     getConnectedConnections(atomImm, vocab.HOLD.HoldableSocketCompacted);
   if (heldAtomHoldableConnections && heldAtomHoldableConnections.size === 1) {
-    return get(heldAtomHoldableConnections.first(), "targetAtomUri");
+    return connectionUtils.getTargetAtomUri(
+      heldAtomHoldableConnections.first()
+    );
   } else {
     return undefined;
   }
@@ -562,6 +568,10 @@ export function getNonClosedConnections(atomImm, socketType) {
   return (
     connections && connections.filter(conn => !connectionUtils.isClosed(conn))
   );
+}
+
+export function getConnection(atomImm, connectionUri) {
+  return getIn(atomImm, ["connections", connectionUri]);
 }
 
 /**
@@ -635,14 +645,14 @@ export function getAllConnectedChatAndGroupConnections(atomImm) {
 export function isHolderVerified(heldAtom, holderAtom) {
   const heldByUri = getHeldByUri(heldAtom);
 
-  if (holderAtom && heldByUri === get(holderAtom, "uri")) {
+  if (holderAtom && heldByUri === getUri(holderAtom)) {
     const holderAtomHolderConnections = getConnectedConnections(
       holderAtom,
       vocab.HOLD.HolderSocketCompacted
     );
 
     const connections = holderAtomHolderConnections.filter(
-      conn => get(conn, "targetAtomUri") === get(heldAtom, "uri")
+      conn => connectionUtils.getTargetAtomUri(conn) === getUri(heldAtom)
     );
 
     return connections && connections.size === 1;

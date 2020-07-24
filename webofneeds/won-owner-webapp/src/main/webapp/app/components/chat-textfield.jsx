@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
-import { get, getIn } from "../utils.js";
+import { get, getIn, getUri } from "../utils.js";
 
 import WonLabelledHr from "./labelled-hr.jsx";
 import WonPublishButton from "./publish-button.jsx";
@@ -44,16 +44,16 @@ export default function ChatTextfield({
     referencedContent: new Map(),
   });
 
-  const connectionUri = get(connection, "uri");
+  const connectionUri = getUri(connection);
 
   const atom = useSelector(
     generalSelectors.getOwnedAtomByConnectionUri(connectionUri)
   );
   const targetAtom = useSelector(
-    generalSelectors.getAtom(get(connection, "targetAtomUri"))
+    generalSelectors.getAtom(connectionUtils.getTargetAtomUri(connection))
   );
 
-  const messages = get(connection, "messages");
+  const messages = connectionUtils.getMessages(connection);
 
   const selectedMessages =
     messages && messages.filter(msg => messageUtils.isMessageSelected(msg));
@@ -95,8 +95,10 @@ export default function ChatTextfield({
 
   const multiSelectType = get(connection, "multiSelectType");
   const showAgreementData = get(connection, "showAgreementData");
-  const isChatToGroupConnection =
-    atomUtils.getGroupSocket(targetAtom) === get(connection, "targetSocketUri");
+  const isChatToGroupConnection = connectionUtils.hasTargetSocketUri(
+    connection,
+    atomUtils.getGroupSocket(targetAtom)
+  );
   const isConnected = connectionUtils.isConnected(connection);
   const connectionHasBeenLost = !useSelector(
     generalSelectors.selectIsConnected
@@ -157,9 +159,9 @@ export default function ChatTextfield({
       referencedContent.forEach(msg => {
         dispatch(
           actionCreators.messages__viewState__markAsSelected({
-            messageUri: get(msg, "uri"),
+            messageUri: getUri(msg),
             connectionUri: connectionUri,
-            atomUri: get(atom, "uri"),
+            atomUri: getUri(atom),
             isSelected: true,
           })
         );
@@ -343,9 +345,9 @@ export default function ChatTextfield({
                 onClick={() =>
                   dispatch(
                     actionCreators.messages__viewState__markAsSelected({
-                      messageUri: get(msg, "uri"),
+                      messageUri: getUri(msg),
                       connectionUri: connectionUri,
-                      atomUri: get(atom, "uri"),
+                      atomUri: getUri(atom),
                       isSelected: false,
                     })
                   )

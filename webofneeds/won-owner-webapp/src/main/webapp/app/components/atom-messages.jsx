@@ -9,6 +9,7 @@ import { rdfTextfieldHelpText } from "../won-label-utils.js";
 import {
   get,
   getIn,
+  getUri,
   generateLink,
   extractAtomUriFromConnectionUri,
 } from "../utils";
@@ -57,17 +58,17 @@ export default function WonAtomMessages({
   });
   const [snapBottom, setSnapBottom] = useState(true);
 
-  const connectionUri = get(connection, "uri");
+  const connectionUri = getUri(connection);
   const senderAtom = useSelector(
     generalSelectors.getOwnedAtomByConnectionUri(connectionUri)
   );
-  const senderAtomUri = get(senderAtom, "uri");
-  const targetAtomUri = get(connection, "targetAtomUri");
+  const senderAtomUri = getUri(senderAtom);
+  const targetAtomUri = connectionUtils.getTargetAtomUri(connection);
   const targetAtom = useSelector(generalSelectors.getAtom(targetAtomUri));
   const allAtoms = useSelector(generalSelectors.getAtoms);
   const ownedConnections = useSelector(getOwnedConnections);
 
-  const messages = get(connection, "messages");
+  const messages = connectionUtils.getMessages(connection);
   const chatMessages =
     messages &&
     messages
@@ -259,8 +260,8 @@ export default function WonAtomMessages({
 
     const trimmedMsg = chatMessage.trim();
     if (trimmedMsg || additionalContent || referencedContent) {
-      const senderSocketUri = get(connection, "socketUri");
-      const targetSocketUri = get(connection, "targetSocketUri");
+      const senderSocketUri = connectionUtils.getSocketUri(connection);
+      const targetSocketUri = connectionUtils.getTargetSocketUri(connection);
 
       dispatch(
         actionCreators.connections__sendChatMessage(
@@ -297,8 +298,8 @@ export default function WonAtomMessages({
 
     dispatch(
       actionCreators.atoms__connectSockets(
-        get(connection, "socketUri"),
-        get(connection, "targetSocketUri"),
+        connectionUtils.getSocketUri(connection),
+        connectionUtils.getTargetSocketUri(connection),
         message
       )
     );
@@ -343,7 +344,7 @@ export default function WonAtomMessages({
   }
 
   function selectMessage(msgUri) {
-    const msg = getIn(connection, ["messages", msgUri]);
+    const msg = connectionUtils.getMessage(connection, msgUri);
 
     if (msg) {
       dispatch(
@@ -363,7 +364,7 @@ export default function WonAtomMessages({
     if (
       hasConnectionMessagesToLoad &&
       !connectionUtils.isUsingTemporaryUri(connection) &&
-      get(connection, "messages").size < INITIAL_MESSAGECOUNT
+      connectionUtils.getMessagesSize(connection) < INITIAL_MESSAGECOUNT
     ) {
       loadPreviousMessages(INITIAL_MESSAGECOUNT);
     }
@@ -617,8 +618,8 @@ export default function WonAtomMessages({
           toLink={generateLink(
             history.location,
             {
-              postUri: get(connection, "targetAtomUri"),
-              connectionUri: get(connection, "uri"),
+              postUri: connectionUtils.getTargetAtomUri(connection),
+              connectionUri: getUri(connection),
               tab: undefined,
             },
             "/post"
@@ -652,9 +653,7 @@ export default function WonAtomMessages({
               ownedConnections={ownedConnections}
               shouldShowRdf={shouldShowRdf}
               onClick={
-                multiSelectType
-                  ? () => selectMessage(get(msg, "uri"))
-                  : undefined
+                multiSelectType ? () => selectMessage(getUri(msg)) : undefined
               }
             />
           );
@@ -731,7 +730,7 @@ export default function WonAtomMessages({
       agreementMessageArray.map((msg, index) => {
         return (
           <WonConnectionMessage
-            key={get(msg, "uri") + "-" + index}
+            key={getUri(msg) + "-" + index}
             message={msg}
             connection={connection}
             senderAtom={senderAtom}
@@ -741,7 +740,7 @@ export default function WonAtomMessages({
             ownedConnections={ownedConnections}
             shouldShowRdf={shouldShowRdf}
             onClick={
-              multiSelectType ? () => selectMessage(get(msg, "uri")) : undefined
+              multiSelectType ? () => selectMessage(getUri(msg)) : undefined
             }
           />
         );
@@ -752,7 +751,7 @@ export default function WonAtomMessages({
       cancellationPendingMessageArray.map((msg, index) => {
         return (
           <WonConnectionMessage
-            key={get(msg, "uri") + "-" + index}
+            key={getUri(msg) + "-" + index}
             message={msg}
             connection={connection}
             senderAtom={senderAtom}
@@ -762,7 +761,7 @@ export default function WonAtomMessages({
             ownedConnections={ownedConnections}
             shouldShowRdf={shouldShowRdf}
             onClick={
-              multiSelectType ? () => selectMessage(get(msg, "uri")) : undefined
+              multiSelectType ? () => selectMessage(getUri(msg)) : undefined
             }
           />
         );
@@ -773,7 +772,7 @@ export default function WonAtomMessages({
       proposalMessageArray.map((msg, index) => {
         return (
           <WonConnectionMessage
-            key={get(msg, "uri") + "-" + index}
+            key={getUri(msg) + "-" + index}
             message={msg}
             connection={connection}
             senderAtom={senderAtom}
@@ -783,7 +782,7 @@ export default function WonAtomMessages({
             ownedConnections={ownedConnections}
             shouldShowRdf={shouldShowRdf}
             onClick={
-              multiSelectType ? () => selectMessage(get(msg, "uri")) : undefined
+              multiSelectType ? () => selectMessage(getUri(msg)) : undefined
             }
           />
         );
@@ -963,8 +962,12 @@ export default function WonAtomMessages({
               allowEmptySubmit={true}
               allowDetails={false}
               onSubmit={({ value }) => {
-                const senderSocketUri = get(connection, "socketUri");
-                const targetSocketUri = get(connection, "targetSocketUri");
+                const senderSocketUri = connectionUtils.getSocketUri(
+                  connection
+                );
+                const targetSocketUri = connectionUtils.getTargetSocketUri(
+                  connection
+                );
                 dispatch(
                   actionCreators.atoms__connectSockets(
                     senderSocketUri,

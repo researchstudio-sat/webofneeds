@@ -4,14 +4,14 @@ import { useSelector, useDispatch } from "react-redux";
 import { actionCreators } from "~/app/actions/actions";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import {
-  get,
-  getIn,
+  getUri,
   getQueryParams,
   extractAtomUriFromConnectionUri,
 } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils";
+import * as connectionUtils from "../../redux/utils/connection-utils";
 import * as processUtils from "../../redux/utils/process-utils.js";
 import WonModalDialog from "../../components/modal-dialog.jsx";
 import WonTopnav from "../../components/topnav.jsx";
@@ -41,19 +41,21 @@ export default function PageConnections() {
     generalSelectors.getOwnedAtomByConnectionUri(selectedConnectionUri)
   );
   const atomUri =
-    get(atom, "uri") || extractAtomUriFromConnectionUri(selectedConnectionUri);
+    getUri(atom) || extractAtomUriFromConnectionUri(selectedConnectionUri);
   const isAtomFetchNecessary = processUtils.isAtomFetchNecessary(
     processState,
     atomUri,
     atom
   );
 
-  const selectedConnection = getIn(atom, [
-    "connections",
-    selectedConnectionUri,
-  ]);
+  const selectedConnection = atomUtils.getConnection(
+    atom,
+    selectedConnectionUri
+  );
   const selectedTargetAtom = useSelector(
-    generalSelectors.getAtom(get(selectedConnection, "targetAtomUri"))
+    generalSelectors.getAtom(
+      connectionUtils.getTargetAtomUri(selectedConnection)
+    )
   );
 
   useEffect(
@@ -89,8 +91,10 @@ export default function PageConnections() {
 
   const isSelectedConnectionGroupChat =
     selectedConnection &&
-    atomUtils.getGroupSocket(selectedTargetAtom) ===
-      get(selectedConnection, "targetSocketUri");
+    connectionUtils.hasTargetSocketUri(
+      selectedConnection,
+      atomUtils.getGroupSocket(selectedTargetAtom)
+    );
   const allChatConnections = useSelector(
     generalSelectors.getAllChatConnections
   );

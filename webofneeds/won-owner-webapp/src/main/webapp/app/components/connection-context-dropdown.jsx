@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { actionCreators } from "../actions/actions.js";
 import { useDispatch, useSelector } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors";
-import { get, getIn, toAbsoluteURL, generateLink } from "../utils";
+import { get, getUri, toAbsoluteURL, generateLink } from "../utils";
 import * as connectionUtils from "../redux/utils/connection-utils";
 import * as processUtils from "../redux/utils/process-utils";
 import { ownerBaseUrl } from "~/config/default.js";
@@ -41,8 +41,8 @@ export default function WonConnectionContextDropdown({
     };
   });
 
-  const connectionUri = get(connection, "uri");
-  const targetAtomUri = getIn(connection, ["targetAtomUri"]);
+  const connectionUri = getUri(connection);
+  const targetAtomUri = connectionUtils.getTargetAtomUri(connection);
   const targetAtom = useSelector(generalSelectors.getAtom(targetAtomUri));
 
   let linkToPost;
@@ -54,8 +54,10 @@ export default function WonConnectionContextDropdown({
   const process = useSelector(generalSelectors.getProcessState);
   const theme = useSelector(generalSelectors.getTheme);
   const adminEmail = get(theme, "adminEmail");
-  const isConnectionToGroup =
-    atomUtils.getGroupSocket(targetAtom) === get(connection, "targetSocketUri");
+  const isConnectionToGroup = connectionUtils.hasTargetSocketUri(
+    connection,
+    atomUtils.getGroupSocket(targetAtom)
+  );
   const showAgreementData = get(connection, "showAgreementData");
   const showPetriNetData = get(connection, "showPetriNetData");
   const isClosed = connectionUtils.isClosed(connection);
@@ -155,7 +157,7 @@ export default function WonConnectionContextDropdown({
               generateLink(
                 history.location,
                 {
-                  postUri: targetAtomUri,
+                  postUri: targetAtomUri, //TODO: ENHANCE LOADING PROCESS BY LOADING CONNECTIONS ONLY ON POST VIEW
                   tab: undefined,
                   connectionUri: undefined,
                 },

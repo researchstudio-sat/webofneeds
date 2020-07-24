@@ -7,7 +7,7 @@ import { connect } from "react-redux";
 import Immutable from "immutable";
 import PropTypes from "prop-types";
 
-import { get, getIn, sortBy } from "../../../utils.js";
+import { get, getIn, getUri, sortBy } from "../../../utils.js";
 import * as atomUtils from "../../../redux/utils/atom-utils.js";
 import * as generalSelectors from "../../../redux/selectors/general-selectors.js";
 import WonAtomHeader from "../../atom-header.jsx";
@@ -37,7 +37,7 @@ const mapStateToProps = (state, ownProps) => {
     if (excludedUris) {
       const excludedUrisImm = Immutable.fromJS(excludedUris);
 
-      return excludedUrisImm.contains(get(atom, "uri"));
+      return excludedUrisImm.contains(getUri(atom));
     }
     return false;
   };
@@ -183,7 +183,7 @@ class WonSuggestAtomPicker extends React.Component {
       const suggestionItems = this.props.sortedActiveAtomsArray.map(atom => {
         return (
           <div
-            key={get(atom, "uri")}
+            key={getUri(atom)}
             onClick={() => this.selectAtom(atom)}
             className={
               "sap__posts__post clickable " +
@@ -270,7 +270,7 @@ class WonSuggestAtomPicker extends React.Component {
     return (
       atom &&
       this.props.suggestedAtom &&
-      get(atom, "uri") === get(this.props.suggestedAtom, "uri")
+      getUri(atom) === getUri(this.props.suggestedAtom)
     );
   }
 
@@ -340,7 +340,7 @@ class WonSuggestAtomPicker extends React.Component {
 
   selectAtom(atom) {
     console.debug("suggest-atom-picker: ", "selectAtom(", atom, ")");
-    const atomUri = get(atom, "uri");
+    const atomUri = getUri(atom);
 
     if (atomUri) {
       this.update(atomUri);

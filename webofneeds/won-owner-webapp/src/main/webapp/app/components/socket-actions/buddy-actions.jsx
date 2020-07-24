@@ -6,7 +6,7 @@ import PropTypes from "prop-types";
 import {
   extractAtomUriFromConnectionUri,
   generateLink,
-  get,
+  getUri,
 } from "../../utils";
 import vocab from "../../service/vocab";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
@@ -23,14 +23,14 @@ import * as atomUtils from "../../redux/utils/atom-utils";
 export default function WonBuddySocketActions({ connection, goBackOnAction }) {
   const dispatch = useDispatch();
   const history = useHistory();
-  const connectionState = get(connection, "state");
-  const connectionUri = get(connection, "uri");
+  const connectionState = connectionUtils.getState(connection);
+  const connectionUri = getUri(connection);
 
   const senderAtom = useSelector(
     generalSelectors.getAtom(extractAtomUriFromConnectionUri(connectionUri))
   );
   const targetAtom = useSelector(
-    generalSelectors.getAtom(get(connection, "targetAtomUri"))
+    generalSelectors.getAtom(connectionUtils.getTargetAtomUri(connection))
   );
 
   function openRequest() {
@@ -42,8 +42,8 @@ export default function WonBuddySocketActions({ connection, goBackOnAction }) {
       );
     }
 
-    const senderSocketUri = get(connection, "socketUri");
-    const targetSocketUri = get(connection, "targetSocketUri");
+    const senderSocketUri = connectionUtils.getSocketUri(connection);
+    const targetSocketUri = connectionUtils.getTargetSocketUri(connection);
     dispatch(
       actionCreators.atoms__connectSockets(senderSocketUri, targetSocketUri)
     );
@@ -60,8 +60,10 @@ export default function WonBuddySocketActions({ connection, goBackOnAction }) {
         {
           caption: "Yes",
           callback: () => {
-            const senderSocketUri = get(connection, "socketUri");
-            const targetSocketUri = get(connection, "targetSocketUri");
+            const senderSocketUri = connectionUtils.getSocketUri(connection);
+            const targetSocketUri = connectionUtils.getTargetSocketUri(
+              connection
+            );
 
             dispatch(
               actionCreators.atoms__connectSockets(
@@ -163,8 +165,8 @@ export default function WonBuddySocketActions({ connection, goBackOnAction }) {
       ? generateLink(
           history.location,
           {
-            postUri: get(senderAtom, "uri"),
-            connectionUri: get(chatConnection, "uri"),
+            postUri: getUri(senderAtom),
+            connectionUri: getUri(chatConnection),
           },
           "/connections"
         )

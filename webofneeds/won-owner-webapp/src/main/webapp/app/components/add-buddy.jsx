@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import vocab from "../service/vocab.js";
 import { useSelector, useDispatch } from "react-redux";
-import { get } from "../utils.js";
+import { getUri } from "../utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
@@ -30,7 +30,7 @@ export default function WonAddBuddy({ atom, className }) {
     ownedAtomsWithBuddySocket &&
     ownedAtomsWithBuddySocket
       .filter(buddyAtom => atomUtils.isActive(buddyAtom))
-      .filter(buddyAtom => get(buddyAtom, "uri") !== get(atom, "uri"));
+      .filter(buddyAtom => getUri(buddyAtom) !== getUri(atom));
 
   const immediateConnectBuddy =
     ownedBuddyOptions.size === 1 ? ownedBuddyOptions.first() : undefined;
@@ -66,7 +66,7 @@ export default function WonAddBuddy({ atom, className }) {
       return;
     }
 
-    const existingBuddyConnectionUri = get(existingBuddyConnection, "uri");
+    const existingBuddyConnectionUri = getUri(existingBuddyConnection);
 
     const payload = {
       caption: "Buddy",
@@ -102,7 +102,7 @@ export default function WonAddBuddy({ atom, className }) {
       ? "Accept Buddy Request?"
       : "Send Buddy Request?";
 
-    const existingBuddyConnectionUri = get(existingBuddyConnection, "uri");
+    const existingBuddyConnectionUri = getUri(existingBuddyConnection);
 
     const payload = {
       caption: "Buddy",
@@ -148,9 +148,11 @@ export default function WonAddBuddy({ atom, className }) {
   let buddySelectionElement =
     ownedAtomsWithBuddySocketArray &&
     ownedAtomsWithBuddySocketArray.map(buddyAtom => {
-      const existingBuddyConnection = get(buddyAtom, "connections").find(
-        conn => get(conn, "targetSocketUri") === targetBuddySocketUri
-      );
+      const existingBuddyConnection = atomUtils
+        .getConnections(buddyAtom, vocab.BUDDY.BuddySocketCompacted)
+        .find(conn =>
+          connectionUtils.hasTargetSocketUri(conn, targetBuddySocketUri)
+        );
 
       let connectionStateClass;
       let onClickAction = undefined;
@@ -192,7 +194,7 @@ export default function WonAddBuddy({ atom, className }) {
             "add-buddy__addbuddymenu__content__selection__buddy " +
             connectionStateClass
           }
-          key={get(buddyAtom, "uri")}
+          key={getUri(buddyAtom)}
           onClick={onClickAction}
         >
           <WonAtomHeader atom={buddyAtom} hideTimestamp={true} />
@@ -229,10 +231,11 @@ export default function WonAddBuddy({ atom, className }) {
   let actionButton;
 
   if (immediateConnectBuddy) {
-    const existingBuddyConnection = get(
-      immediateConnectBuddy,
-      "connections"
-    ).find(conn => get(conn, "targetSocketUri") === targetBuddySocketUri);
+    const existingBuddyConnection = atomUtils
+      .getConnections(immediateConnectBuddy, vocab.BUDDY.BuddySocketCompacted)
+      .find(conn =>
+        connectionUtils.hasTargetSocketUri(conn, targetBuddySocketUri)
+      );
 
     let connectionStateClass;
     let onClickAction = undefined;

@@ -7,6 +7,7 @@ import { relativeTime } from "../../won-label-utils.js";
 import { get } from "../../utils.js";
 import { useSelector } from "react-redux";
 import { selectLastUpdateTime } from "../../redux/selectors/general-selectors.js";
+import * as messageUtils from "../../redux/utils/message-utils.js";
 
 import "~/style/_connection-message-status.scss";
 import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.svg";
@@ -16,9 +17,9 @@ export default function WonConnectionMessageStatus({ message }) {
   const lastUpdateTime = useSelector(selectLastUpdateTime);
 
   const isOutgoingMessage = get(message, "outgoingMessage");
-  const isFailedToSend = get(message, "failedToSend");
-  const isReceivedByOwn = get(message, "isReceivedByOwn");
-  const isReceivedByRemote = get(message, "isReceivedByRemote");
+  const isFailedToSend = messageUtils.hasFailedToSend(message);
+  const isReceivedByOwn = messageUtils.isReceivedByOwn(message);
+  const isReceivedByRemote = messageUtils.isReceivedByRemote(message);
 
   let statusIcons;
 

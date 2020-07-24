@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { generateLink, get, getIn } from "~/app/utils";
+import { generateLink, get, getIn, getUri } from "~/app/utils";
 import { Link } from "react-router-dom";
 import * as atomUtils from "~/app/redux/utils/atom-utils";
 import WonAtomMap from "~/app/components/atom-map";
@@ -125,7 +125,7 @@ export function generateSwipeableContent(
 }
 
 export default function WonContentSnippet({ atom, swipeableContent }) {
-  const atomUri = get(atom, "uri");
+  const atomUri = getUri(atom);
   const isInactive = atomUtils.isInactive(atom);
   const iconBackground = atomUtils.getBackground(atom);
   const useCaseIcon = atomUtils.getMatchedUseCaseIcon(atom);

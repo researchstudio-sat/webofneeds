@@ -3,7 +3,19 @@
  */
 
 import vocab from "../../service/vocab.js";
-import { get, getIn } from "../../utils.js";
+import { get, getIn, getUri } from "../../utils.js";
+
+export function isReceivedByOwn(msg) {
+  return !!msg && get(msg, "isReceivedByOwn");
+}
+
+export function isReceivedByRemote(msg) {
+  return !!msg && get(msg, "isReceivedByRemote");
+}
+
+export function hasFailedToSend(msg) {
+  return !!msg && get(msg, "failedToSend");
+}
 
 /**
  * Determines if a given message can be Proposed
@@ -139,14 +151,41 @@ export function isMessageRejectable(con, msg) {
   );
 }
 
+export function getReferences(msg) {
+  return get(msg, "references");
+}
+
+export function getForwardsReferences(msg) {
+  const references = getReferences(msg);
+
+  return get(references, "forwards");
+}
+
+export function hasForwardsReferences(msg) {
+  const forwards = getForwardsReferences(msg);
+  return forwards && forwards.size > 0;
+}
+
+export function getProposesReferences(msg) {
+  const references = getReferences(msg);
+
+  return get(references, "proposes");
+}
+
 /**
  * Determines if a given message has proposes references
  * @param msg
  * @returns {*|boolean}
  */
 export function hasProposesReferences(msg) {
-  const references = get(msg, "references");
-  return get(references, "proposes") && get(references, "proposes").size > 0;
+  const proposes = getProposesReferences(msg);
+  return proposes && proposes.size > 0;
+}
+
+export function getClaimsReferences(msg) {
+  const references = getReferences(msg);
+
+  return get(references, "claims");
 }
 
 /**
@@ -155,21 +194,23 @@ export function hasProposesReferences(msg) {
  * @returns {*|boolean}
  */
 export function hasClaimsReferences(msg) {
-  const references = get(msg, "references");
-  return get(references, "claims") && get(references, "claims").size > 0;
+  const claims = getClaimsReferences(msg);
+  return claims && claims.size > 0;
 }
 
+export function getProposesToCancelReferences(msg) {
+  const references = getReferences(msg);
+
+  return get(references, "proposesToCancel");
+}
 /**
  * Determines if a given message has proposesToCancel references
  * @param msg
  * @returns {*|boolean}
  */
 export function hasProposesToCancelReferences(msg) {
-  const references = get(msg, "references");
-  return (
-    get(references, "proposesToCancel") &&
-    get(references, "proposesToCancel").size > 0
-  );
+  const proposesToCancel = getProposesToCancelReferences(msg);
+  return proposesToCancel && proposesToCancel.size > 0;
 }
 
 /**
@@ -181,7 +222,7 @@ export function hasProposesToCancelReferences(msg) {
 export function isMessageProposed(con, msg) {
   const agreementData = get(con, "agreementData");
   const proposedMessageUris = get(agreementData, "proposedMessageUris");
-  return proposedMessageUris && proposedMessageUris.has(get(msg, "uri"));
+  return proposedMessageUris && proposedMessageUris.has(getUri(msg));
 }
 
 /**
@@ -193,7 +234,7 @@ export function isMessageProposed(con, msg) {
 export function isMessageClaimed(con, msg) {
   const agreementData = get(con, "agreementData");
   const claimedMessageUris = get(agreementData, "claimedMessageUris");
-  return claimedMessageUris && claimedMessageUris.has(get(msg, "uri"));
+  return claimedMessageUris && claimedMessageUris.has(getUri(msg));
 }
 
 /**
@@ -205,7 +246,7 @@ export function isMessageClaimed(con, msg) {
 export function isMessageRejected(con, msg) {
   const agreementData = get(con, "agreementData");
   const rejectedMessageUris = get(agreementData, "rejectedMessageUris");
-  return rejectedMessageUris && rejectedMessageUris.has(get(msg, "uri"));
+  return rejectedMessageUris && rejectedMessageUris.has(getUri(msg));
 }
 
 /**
@@ -224,9 +265,9 @@ export function isMessageAccepted(con, msg) {
   );
 
   return (
-    (acceptedMessageUris && acceptedMessageUris.has(get(msg, "uri"))) ||
+    (acceptedMessageUris && acceptedMessageUris.has(getUri(msg))) ||
     (acceptedCancellationProposalUris &&
-      acceptedCancellationProposalUris.has(get(msg, "uri")))
+      acceptedCancellationProposalUris.has(getUri(msg)))
   );
 }
 
@@ -239,7 +280,7 @@ export function isMessageAccepted(con, msg) {
 export function isMessageAgreedOn(con, msg) {
   const agreementData = get(con, "agreementData");
   const agreedMessageUris = get(agreementData, "agreedMessageUris");
-  return agreedMessageUris && agreedMessageUris.has(get(msg, "uri"));
+  return agreedMessageUris && agreedMessageUris.has(getUri(msg));
 }
 
 /**
@@ -251,7 +292,7 @@ export function isMessageAgreedOn(con, msg) {
 export function isMessageRetracted(con, msg) {
   const agreementData = get(con, "agreementData");
   const retractedMessageUris = get(agreementData, "retractedMessageUris");
-  return retractedMessageUris && retractedMessageUris.has(get(msg, "uri"));
+  return retractedMessageUris && retractedMessageUris.has(getUri(msg));
 }
 
 /**
@@ -263,7 +304,7 @@ export function isMessageRetracted(con, msg) {
 export function isMessageCancelled(con, msg) {
   const agreementData = get(con, "agreementData");
   const cancelledMessageUris = get(agreementData, "cancelledAgreementUris");
-  return cancelledMessageUris && cancelledMessageUris.has(get(msg, "uri"));
+  return cancelledMessageUris && cancelledMessageUris.has(getUri(msg));
 }
 
 /**
@@ -278,9 +319,7 @@ export function isMessageCancellationPending(con, msg) {
     agreementData,
     "cancellationPendingAgreementUris"
   );
-  return (
-    cancellationPendingUris && cancellationPendingUris.has(get(msg, "uri"))
-  );
+  return cancellationPendingUris && cancellationPendingUris.has(getUri(msg));
 }
 
 /**
@@ -371,4 +410,26 @@ export function isParsable(msg) {
 
 export function getHumanReadableString(msg) {
   return getIn(msg, ["content", "text"]) || "«Message does not have text»";
+}
+
+/**
+ * (re)sorts the messages within the given messagesMap
+ * @param messagesMap
+ * @returns {sorted messagesMap)
+ */
+export function sortMessages(messagesMap) {
+  return messagesMap.toOrderedMap().sortBy(sortByMessageTimeStamp);
+}
+
+/**
+ * Default message Sorting -> so we can already store a sorted map of messages in the atom
+ * @param message
+ * @returns {any}
+ */
+export function sortByMessageTimeStamp(message) {
+  const messageDate = get(message, "date");
+  if (!messageDate) {
+    console.warn("messageDate for message is undefinded: ", message);
+  }
+  return messageDate && messageDate.getTime();
 }

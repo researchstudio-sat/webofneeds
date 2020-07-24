@@ -17,12 +17,11 @@ import {
   buildEditMessage,
 } from "../won-message-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
-import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as stateStore from "../redux/state-store.js";
 import * as ownerApi from "../api/owner-api.js";
-import { get, extractAtomUriBySocketUri } from "../utils.js";
+import { getUri, extractAtomUriBySocketUri } from "../utils.js";
 import { ensureLoggedIn } from "./account-actions.js";
 
 export function fetchUnloadedAtom(atomUri) {
@@ -115,14 +114,12 @@ export function close(atomUri) {
           })
         );
 
+        const atom = generalSelectors.getAtom(atomUri)(getState());
+
         //Close all the open connections of the atom
-        getState()
-          .getIn(["atoms", atomUri, "connections"])
-          .map(conn => {
-            if (connectionUtils.isConnected(conn)) {
-              dispatch(actionCreators.connections__close(get(conn, "uri")));
-            }
-          });
+        atomUtils.getConnectedConnections(atom).map(conn => {
+          dispatch(actionCreators.connections__close(getUri(conn)));
+        });
       })
       .then(() =>
         // assume close went through successfully, update GUI

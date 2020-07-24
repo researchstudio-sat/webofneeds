@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { generateLink, get } from "../../utils";
+import { generateLink, getUri } from "../../utils";
 import vocab from "../../service/vocab";
 import VisibilitySensor from "react-visibility-sensor";
 import * as connectionUtils from "../../redux/utils/connection-utils";
@@ -31,14 +31,14 @@ export default function WonGenericItem({
       setTimeout(() => {
         dispatch(
           actionCreators.connections__markAsRead({
-            connectionUri: get(conn, "uri"),
+            connectionUri: getUri(conn),
           })
         );
       }, 1500);
     }
   }
 
-  switch (get(connection, "state")) {
+  switch (connectionUtils.getState(connection)) {
     case vocab.WON.RequestReceived:
       headerClassName = "status--received";
       break;
@@ -61,7 +61,7 @@ export default function WonGenericItem({
 
   return (
     <VisibilitySensor
-      key={get(connection, "uri")}
+      key={getUri(connection)}
       onChange={isVisible => {
         isVisible &&
           connectionUtils.isUnread(connection) &&
@@ -90,8 +90,8 @@ export default function WonGenericItem({
             toLink={generateLink(
               history.location,
               {
-                postUri: flip ? get(atom, "uri") : get(targetAtom, "uri"),
-                connectionUri: get(connection, "uri"),
+                postUri: flip ? getUri(atom) : getUri(targetAtom),
+                connectionUri: getUri(connection),
                 tab: undefined,
               },
               "/post"

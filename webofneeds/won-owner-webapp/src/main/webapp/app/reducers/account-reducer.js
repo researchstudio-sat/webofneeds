@@ -2,6 +2,7 @@
  * Created by ksinger on 10.05.2016.
  */
 import { actionTypes } from "../actions/actions.js";
+import { getUri } from "../utils.js";
 import Immutable from "immutable";
 
 import { isDisclaimerAccepted } from "../won-localstorage.js";
@@ -51,7 +52,7 @@ export default function(userData = initialState, action = {}) {
 
     case actionTypes.atoms.removeDeleted:
     case actionTypes.atoms.delete: {
-      const atomUri = action.payload.get("uri");
+      const atomUri = getUri(action.payload);
 
       const ownedAtomUris = userData.get("ownedAtomUris");
       return userData.set("ownedAtomUris", ownedAtomUris.remove(atomUri));

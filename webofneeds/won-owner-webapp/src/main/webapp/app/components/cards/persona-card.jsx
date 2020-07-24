@@ -3,7 +3,7 @@
  */
 import React from "react";
 import PropTypes from "prop-types";
-import { get, generateLink } from "../../utils.js";
+import { get, generateLink, getUri } from "../../utils.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 
 import "~/style/_persona-card.scss";
@@ -52,7 +52,7 @@ export default function WonPersonaCard({ atom }) {
         generateLink(
           location,
           {
-            postUri: get(atom, "uri"),
+            postUri: getUri(atom),
             tab: undefined,
             connectionUri: undefined,
           },

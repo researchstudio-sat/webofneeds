@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { useHistory } from "react-router-dom";
 import vocab from "../../service/vocab.js";
 import {
-  get,
+  getUri,
   generateLink,
   sortByDate,
   filterConnectionsBySearchValue,
@@ -33,7 +33,7 @@ export default function AtomContentChats({
 }) {
   const history = useHistory();
   const accountState = useSelector(generalSelectors.getAccountState);
-  const isAtomOwned = accountUtils.isAtomOwned(accountState, get(atom, "uri"));
+  const isAtomOwned = accountUtils.isAtomOwned(accountState, getUri(atom));
 
   const [showSuggestions, toggleSuggestions] = useState(false);
   const [showClosed, toggleClosed] = useState(false);
@@ -77,7 +77,7 @@ export default function AtomContentChats({
     const connectionsArray = sortByDate(connections) || [];
 
     return connectionsArray.map((conn, index) => {
-      const connUri = get(conn, "uri");
+      const connUri = getUri(conn);
 
       return (
         <div className="acc__item" key={connUri + "-" + index}>
@@ -86,7 +86,7 @@ export default function AtomContentChats({
             toLink={generateLink(
               history.location,
               {
-                postUri: get(atom, "uri"),
+                postUri: getUri(atom),
                 connectionUri: connUri,
               },
               "/connections",

@@ -7,6 +7,7 @@ import vocab from "../../service/vocab.js";
 import {
   get,
   getIn,
+  getUri,
   msStringToDate,
   extractAtomUriBySocketUri,
 } from "../../utils.js";
@@ -76,7 +77,7 @@ export default function(allAtomsInState = initialState, action = {}) {
     }
 
     case actionTypes.atoms.storeUriInLoading: {
-      return addAtomStub(allAtomsInState, action.payload.get("uri"));
+      return addAtomStub(allAtomsInState, getUri(action.payload));
     }
 
     case actionTypes.atoms.store: {
@@ -118,7 +119,7 @@ export default function(allAtomsInState = initialState, action = {}) {
 
     case actionTypes.atoms.removeDeleted:
     case actionTypes.atoms.delete:
-      return deleteAtom(allAtomsInState, action.payload.get("uri"));
+      return deleteAtom(allAtomsInState, getUri(action.payload));
 
     case actionTypes.atoms.edit: {
       console.debug(
@@ -206,14 +207,20 @@ export default function(allAtomsInState = initialState, action = {}) {
       const senderAtom = get(allAtomsInState, senderAtomUri);
       const affectedConnection =
         senderAtom &&
-        get(senderAtom, "connections").find(conn =>
-          connectionUtils.hasSocketUris(conn, senderSocketUri, targetSocketUri)
-        );
+        atomUtils
+          .getConnections(senderAtom)
+          .find(conn =>
+            connectionUtils.hasSocketUris(
+              conn,
+              senderSocketUri,
+              targetSocketUri
+            )
+          );
 
       if (affectedConnection) {
         const cnctStateUpdated = changeConnectionStateByFun(
           allAtomsInState,
-          get(affectedConnection, "uri"),
+          getUri(affectedConnection),
           state => {
             if (!state) return vocab.WON.RequestSent; //fallback if no state present
             if (state === vocab.WON.Connected) return vocab.WON.Connected; //stay in connected if it was already the case
@@ -316,13 +323,13 @@ export default function(allAtomsInState = initialState, action = {}) {
 
       const tmpConnUri = "connectionFrom:" + messageUri;
       const tmpAtom = getAtomByConnectionUri(allAtomsInState, tmpConnUri);
-      const tmpConnection = getIn(tmpAtom, ["connections", tmpConnUri]);
+      const tmpConnection = atomUtils.getConnection(tmpAtom, tmpConnUri);
 
       if (tmpConnection) {
         // connection was established from scratch without having a
         // connection uri. now that we have the uri, we can store it
         // (see connectAdHoc)
-        const atomUri = tmpAtom.get("uri");
+        const atomUri = getUri(tmpAtom);
         const properConnection = tmpConnection
           .delete("usingTemporaryUri")
           .set("uri", connUri);
@@ -330,11 +337,29 @@ export default function(allAtomsInState = initialState, action = {}) {
         allAtomsInState = allAtomsInState
           .deleteIn([atomUri, "connections", tmpConnUri])
           .mergeDeepIn([atomUri, "connections", connUri], properConnection);
-        const path = [atomUri, "connections", connUri, "messages", messageUri];
-        if (getIn(allAtomsInState, path)) {
-          allAtomsInState = allAtomsInState
-            .setIn([...path, "isReceivedByOwn"], true)
-            .setIn([...path, "isReceivedByRemote"], true);
+
+        const connection = atomUtils.getConnection(
+          get(allAtomsInState, atomUri),
+          connUri
+        );
+        const messages = connectionUtils.getMessages(connection);
+        const message = connectionUtils.getMessage(connection, messageUri);
+
+        if (message) {
+          allAtomsInState = allAtomsInState.setIn(
+            [atomUri, "connections", connUri],
+            connectionUtils.sortMessages(
+              connection.set(
+                "messages",
+                messages.set(
+                  messageUri,
+                  message
+                    .set("isReceivedByOwn", true)
+                    .set("isReceivedByRemote", true)
+                )
+              )
+            )
+          );
         }
       } else {
         const atomByConnectionUri = getAtomByConnectionUri(
@@ -343,18 +368,28 @@ export default function(allAtomsInState = initialState, action = {}) {
         );
 
         if (atomByConnectionUri) {
-          const path = [
-            get(atomByConnectionUri, "uri"),
-            "connections",
-            connUri,
-            "messages",
-            messageUri,
-          ];
+          const connection = atomUtils.getConnection(
+            atomByConnectionUri,
+            connUri
+          );
+          const messages = connectionUtils.getMessages(connection);
+          const message = connectionUtils.getMessage(connection, messageUri);
 
-          if (getIn(allAtomsInState, path)) {
-            allAtomsInState = allAtomsInState
-              .setIn([...path, "isReceivedByOwn"], true)
-              .setIn([...path, "isReceivedByRemote"], true);
+          if (message) {
+            allAtomsInState = allAtomsInState.setIn(
+              [getUri(atomByConnectionUri), "connections", connUri],
+              connectionUtils.sortMessages(
+                connection.set(
+                  "messages",
+                  messages.set(
+                    messageUri,
+                    message
+                      .set("isReceivedByOwn", true)
+                      .set("isReceivedByRemote", true)
+                  )
+                )
+              )
+            );
           }
         }
       }
@@ -369,13 +404,13 @@ export default function(allAtomsInState = initialState, action = {}) {
 
       const tmpConnUri = "connectionFrom:" + messageUri;
       const tmpAtom = getAtomByConnectionUri(allAtomsInState, tmpConnUri);
-      const tmpConnection = getIn(tmpAtom, ["connections", tmpConnUri]);
+      const tmpConnection = atomUtils.getConnection(tmpAtom, tmpConnUri);
 
       if (tmpConnection) {
         // connection was established from scratch without having a
         // connection uri. now that we have the uri, we can store it
         // (see connectAdHoc)
-        const atomUri = tmpAtom.get("uri");
+        const atomUri = getUri(tmpAtom);
         const properConnection = tmpConnection
           .delete("usingTemporaryUri")
           .set("uri", connUri);
@@ -383,11 +418,23 @@ export default function(allAtomsInState = initialState, action = {}) {
         allAtomsInState = allAtomsInState
           .deleteIn([atomUri, "connections", tmpConnUri])
           .mergeDeepIn([atomUri, "connections", connUri], properConnection);
-        const path = [atomUri, "connections", connUri, "messages", messageUri];
-        if (getIn(allAtomsInState, path)) {
+
+        const connection = atomUtils.getConnection(
+          get(allAtomsInState, atomUri),
+          connUri
+        );
+        const messages = connectionUtils.getMessages(connection);
+        const message = connectionUtils.getMessage(connection, messageUri);
+
+        if (message) {
           allAtomsInState = allAtomsInState.setIn(
-            [...path, "isReceivedByOwn"],
-            true
+            [atomUri, "connections", connUri],
+            connectionUtils.sortMessages(
+              connection.set(
+                "messages",
+                messages.set(messageUri, message.set("isReceivedByOwn", true))
+              )
+            )
           );
         }
       } else {
@@ -397,18 +444,22 @@ export default function(allAtomsInState = initialState, action = {}) {
         );
 
         if (atomByConnectionUri) {
-          const path = [
-            get(atomByConnectionUri, "uri"),
-            "connections",
-            connUri,
-            "messages",
-            messageUri,
-          ];
+          const connection = atomUtils.getConnection(
+            atomByConnectionUri,
+            connUri
+          );
+          const messages = connectionUtils.getMessages(connection);
+          const message = connectionUtils.getMessage(connection, messageUri);
 
-          if (getIn(allAtomsInState, path)) {
+          if (message) {
             allAtomsInState = allAtomsInState.setIn(
-              [...path, "isReceivedByOwn"],
-              true
+              [getUri(atomByConnectionUri), "connections", connUri],
+              connectionUtils.sortMessages(
+                connection.set(
+                  "messages",
+                  messages.set(messageUri, message.set("isReceivedByOwn", true))
+                )
+              )
             );
           }
         }
@@ -443,14 +494,14 @@ export default function(allAtomsInState = initialState, action = {}) {
       if (senderConnection) {
         allAtomsInState = changeConnectionState(
           allAtomsInState,
-          get(senderConnection, "uri"),
+          getUri(senderConnection),
           vocab.WON.Closed
         );
       }
       if (targetConnection) {
         allAtomsInState = changeConnectionState(
           allAtomsInState,
-          get(targetConnection, "uri"),
+          getUri(targetConnection),
           vocab.WON.Closed
         );
       }
@@ -673,11 +724,10 @@ export default function(allAtomsInState = initialState, action = {}) {
       const atom = get(allAtomsInState, atomUri);
       const affectedConnection =
         atom &&
-        get(atom, "connections")
-          .filter(conn => get(conn, "socketUri") === senderSocketUri)
-          .filter(conn =>
-            get(conn, "messages").find(msg => get(msg, "uri") === messageUri)
-          )
+        atomUtils
+          .getConnections(atom)
+          .filter(conn => connectionUtils.hasSocketUri(conn, senderSocketUri))
+          .filter(conn => !!connectionUtils.getMessage(conn, messageUri))
           .first();
 
       if (!affectedConnection) {
@@ -685,26 +735,37 @@ export default function(allAtomsInState = initialState, action = {}) {
         return allAtomsInState;
       }
 
-      const connectionUri = get(affectedConnection, "uri");
+      const connectionUri = getUri(affectedConnection);
 
       // we want to use the response date to update the original message
       // date
       // in order to use server timestamps everywhere
       const responseDateOnServer = msStringToDate(wonMessage.getTimestamp());
       // make sure we have an event with that uri:
-      const path = [
-        atomUri,
-        "connections",
-        connectionUri,
-        "messages",
-        messageUri,
-      ];
 
-      if (getIn(allAtomsInState, path)) {
-        allAtomsInState = allAtomsInState
-          .setIn([...path, "date"], responseDateOnServer)
-          .setIn([...path, "isReceivedByOwn"], true);
+      const messages = connectionUtils.getMessages(affectedConnection);
+      const message = connectionUtils.getMessage(
+        affectedConnection,
+        messageUri
+      );
+
+      if (message) {
+        allAtomsInState = allAtomsInState.setIn(
+          [atomUri, "connections", connectionUri],
+          connectionUtils.sortMessages(
+            affectedConnection.set(
+              "messages",
+              messages.set(
+                messageUri,
+                message
+                  .set("isReceivedByOwn", true)
+                  .set("date", responseDateOnServer)
+              )
+            )
+          )
+        );
       }
+
       return allAtomsInState;
     }
 
@@ -714,18 +775,20 @@ export default function(allAtomsInState = initialState, action = {}) {
       const atomUri = extractAtomUriBySocketUri(wonMessage.getTargetSocket());
       const connectionUri = wonMessage.getConnection(); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      const path = [
-        atomUri,
-        "connections",
-        connectionUri,
-        "messages",
-        messageUri,
-      ];
+      const atom = get(allAtomsInState, atomUri);
+      const connection = atomUtils.getConnection(atom, connectionUri);
+      const messages = connectionUtils.getMessages(connection);
+      const message = connectionUtils.getMessage(connection, messageUri);
 
-      if (getIn(allAtomsInState, path)) {
+      if (message) {
         allAtomsInState = allAtomsInState.setIn(
-          [...path, "failedToSend"],
-          true
+          [atomUri, "connections", connectionUri],
+          connectionUtils.sortMessages(
+            connection.set(
+              "messages",
+              messages.set(messageUri, message.set("failedToSend", true))
+            )
+          )
         );
       }
 
@@ -751,20 +814,31 @@ export default function(allAtomsInState = initialState, action = {}) {
         return allAtomsInState;
       }
 
-      const connectionUri = get(affectedConnection, "uri");
+      const connectionUri = getUri(affectedConnection);
 
-      const path = [
-        atomUri,
-        "connections",
-        connectionUri,
-        "messages",
-        messageUri,
-      ];
-      if (getIn(allAtomsInState, path)) {
-        allAtomsInState = allAtomsInState
-          .setIn([...path, "isReceivedByRemote"], true)
-          .setIn([...path, "isReceivedByOwn"], true);
+      const messages = connectionUtils.getMessages(affectedConnection);
+      const message = connectionUtils.getMessage(
+        affectedConnection,
+        messageUri
+      );
+
+      if (message) {
+        allAtomsInState = allAtomsInState.setIn(
+          [atomUri, "connections", connectionUri],
+          connectionUtils.sortMessages(
+            affectedConnection.set(
+              "messages",
+              messages.set(
+                messageUri,
+                message
+                  .set("isReceivedByRemote", true)
+                  .set("isReceivedByOwn", true)
+              )
+            )
+          )
+        );
       }
+
       return allAtomsInState;
     }
 

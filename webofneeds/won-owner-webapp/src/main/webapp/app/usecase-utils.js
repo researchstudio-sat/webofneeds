@@ -4,7 +4,7 @@
 
 import * as useCaseDefinitions from "../config/usecase-definitions.js";
 import { messageDetails } from "../config/detail-definitions.js";
-import { get, getIn } from "./utils.js";
+import { get, getIn, getUri } from "./utils.js";
 import vocab from "./service/vocab.js";
 
 import Immutable from "immutable";
@@ -438,7 +438,7 @@ export function getUseCaseImmMergedWithAtom(
         .map(
           socketUri =>
             socketUri.startsWith("#")
-              ? get(atomToMergeImm, "uri") + socketUri
+              ? getUri(atomToMergeImm) + socketUri
               : socketUri
         );
 

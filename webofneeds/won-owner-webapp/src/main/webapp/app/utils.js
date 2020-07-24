@@ -1,5 +1,6 @@
 import _ from "lodash";
 import { getHeldByUri, getTitle } from "./redux/utils/atom-utils.js";
+import { getTargetAtomUri } from "./redux/utils/connection-utils.js";
 import fakeNames from "./fakeNames.json";
 
 /**
@@ -301,6 +302,16 @@ export function get(obj, property) {
 }
 
 /**
+ * Shorthand for get(obj, "uri")
+ * it's a normal or an immutable-js object.
+ * @param obj
+ * @param property
+ */
+export function getUri(obj) {
+  return get(obj, "uri");
+}
+
+/**
  * Tries to look up a property-path on a nested object-structure.
  * Where `obj.x.y` would throw an error if `x` wasn't defined
  * `get(obj, ['x','y'])` would return undefined.
@@ -406,7 +417,7 @@ export function filterConnectionsBySearchValue(
     const regExp = new RegExp(tempSearchText, "i");
 
     return connectionsImm.filter(conn => {
-      const targetAtom = get(allAtomsImm, get(conn, "targetAtomUri"));
+      const targetAtom = get(allAtomsImm, getTargetAtomUri(conn));
       const targetAtomTitle = getTitle(targetAtom, externalDataState) || "";
 
       let found = false;
@@ -433,7 +444,7 @@ export function filterConnectionsBySearchValue(
       if (includeSenderAtom) {
         const senderAtom = get(
           allAtomsImm,
-          extractAtomUriFromConnectionUri(get(conn, "uri"))
+          extractAtomUriFromConnectionUri(getUri(conn))
         );
         const senderAtomTitle = getTitle(senderAtom, externalDataState) || "";
 

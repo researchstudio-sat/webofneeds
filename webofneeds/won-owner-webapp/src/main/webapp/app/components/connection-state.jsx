@@ -8,7 +8,6 @@
 import React from "react";
 import PropTypes from "prop-types";
 import * as wonLabelUtils from "../won-label-utils.js";
-import { get } from "../utils.js";
 
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import vocab from "../service/vocab.js";
@@ -20,7 +19,7 @@ import ico36_message from "~/images/won-icons/ico36_message.svg";
 import ico36_close_circle from "~/images/won-icons/ico36_close_circle.svg";
 
 export default function WonConnectionState({ connection }) {
-  const connectionState = get(connection, "state");
+  const connectionState = connectionUtils.getState(connection);
   const unread = connectionUtils.isUnread(connection);
 
   let icon;

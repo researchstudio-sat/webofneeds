@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { actionCreators } from "../../actions/actions";
 import PropTypes from "prop-types";
-import { get } from "../../utils";
+import { getUri } from "../../utils";
 import vocab from "../../service/vocab";
 import * as connectionUtils from "../../redux/utils/connection-utils";
 
@@ -15,8 +15,8 @@ import ico36_outgoing from "~/images/won-icons/ico36_outgoing.svg";
 export default function WonChatSocketActions({ connection, goBackOnAction }) {
   const dispatch = useDispatch();
   const history = useHistory();
-  const connectionState = get(connection, "state");
-  const connectionUri = get(connection, "uri");
+  const connectionState = connectionUtils.getState(connection);
+  const connectionUri = getUri(connection);
 
   function closeConnection(
     dialogText = "Do you want to remove the Connection?"
@@ -71,8 +71,8 @@ export default function WonChatSocketActions({ connection, goBackOnAction }) {
       );
     }
 
-    const senderSocketUri = get(connection, "socketUri");
-    const targetSocketUri = get(connection, "targetSocketUri");
+    const senderSocketUri = connectionUtils.getSocketUri(connection);
+    const targetSocketUri = connectionUtils.getTargetSocketUri(connection);
     dispatch(
       actionCreators.atoms__connectSockets(
         senderSocketUri,
@@ -97,8 +97,10 @@ export default function WonChatSocketActions({ connection, goBackOnAction }) {
         {
           caption: "Yes",
           callback: () => {
-            const senderSocketUri = get(connection, "socketUri");
-            const targetSocketUri = get(connection, "targetSocketUri");
+            const senderSocketUri = connectionUtils.getSocketUri(connection);
+            const targetSocketUri = connectionUtils.getTargetSocketUri(
+              connection
+            );
 
             if (connectionUtils.isUnread(connection)) {
               dispatch(

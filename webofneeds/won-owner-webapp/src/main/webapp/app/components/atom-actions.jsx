@@ -1,11 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { useSelector, useDispatch } from "react-redux";
-import { get, extractAtomUriFromConnectionUri } from "../utils.js";
+import { get, getUri, extractAtomUriFromConnectionUri } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import vocab from "../service/vocab";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as wonLabelUtils from "../won-label-utils.js";
 
 import "~/style/_atom-actions.scss";
@@ -30,7 +31,7 @@ export default function WonAtomActions({
   className,
 }) {
   const dispatch = useDispatch();
-  const atomUri = get(atom, "uri");
+  const atomUri = getUri(atom);
 
   const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
 
@@ -73,23 +74,23 @@ export default function WonAtomActions({
       {
         const targetAtom = get(
           storedAtoms,
-          get(ownedConnection, "targetAtomUri")
+          connectionUtils.getTargetAtomUri(ownedConnection)
         );
         const senderAtom = get(
           storedAtoms,
-          extractAtomUriFromConnectionUri(get(ownedConnection, "uri"))
+          extractAtomUriFromConnectionUri(getUri(ownedConnection))
         );
 
         const senderSocketType = atomUtils.getSocketType(
           senderAtom,
-          get(ownedConnection, "socketUri")
+          connectionUtils.getSocketUri(ownedConnection)
         );
         const targetSocketType = atomUtils.getSocketType(
           targetAtom,
-          get(ownedConnection, "targetSocketUri")
+          connectionUtils.getTargetSocketUri(ownedConnection)
         );
 
-        const isViewOfTargetAtom = get(targetAtom, "uri") === atomUri;
+        const isViewOfTargetAtom = getUri(targetAtom) === atomUri;
 
         let ActionComponent;
 
@@ -130,7 +131,7 @@ export default function WonAtomActions({
               <div className="atom-actions__info__label">
                 {wonLabelUtils.getSocketActionInfoLabel(
                   senderSocketType,
-                  get(ownedConnection, "state"),
+                  connectionUtils.getState(ownedConnection),
                   targetSocketType
                 )}
               </div>

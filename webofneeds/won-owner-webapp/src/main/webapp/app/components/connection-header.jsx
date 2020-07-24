@@ -9,6 +9,7 @@ import PropTypes from "prop-types";
 import VisibilitySensor from "react-visibility-sensor";
 import {
   get,
+  getUri,
   generateLink,
   extractAtomUriFromConnectionUri,
 } from "../utils.js";
@@ -45,16 +46,16 @@ export default function WonConnectionHeader({
   hideTimestamp,
   hideMessageIndicator,
 }) {
-  const connectionUri = get(connection, "uri");
+  const connectionUri = getUri(connection);
   const history = useHistory();
   const dispatch = useDispatch();
 
   const senderAtomUri = flip
-    ? get(connection, "targetAtomUri")
+    ? connectionUtils.getTargetAtomUri(connection)
     : extractAtomUriFromConnectionUri(connectionUri);
   const targetAtomUri = flip
     ? extractAtomUriFromConnectionUri(connectionUri)
-    : get(connection, "targetAtomUri");
+    : connectionUtils.getTargetAtomUri(connection);
 
   const senderAtom = useSelector(generalSelectors.getAtom(senderAtomUri));
   const targetAtom = useSelector(generalSelectors.getAtom(targetAtomUri));
@@ -88,8 +89,8 @@ export default function WonConnectionHeader({
     isTargetAtomFetchNecessary ||
     isTargetHolderFetchNecessary ||
     !senderAtom ||
-    processUtils.isAtomLoading(processState, get(senderAtom, "uri")) ||
-    processUtils.isConnectionLoading(processState, get(connection, "uri"));
+    processUtils.isAtomLoading(processState, getUri(senderAtom)) ||
+    processUtils.isConnectionLoading(processState, getUri(connection));
 
   function selectMembersTab() {
     history.push(
@@ -156,8 +157,10 @@ export default function WonConnectionHeader({
         <WonAtomIcon
           atom={targetAtom}
           flipIcons={
-            atomUtils.getGroupSocket(targetAtom) !==
-            get(connection, "targetSocketUri")
+            !connectionUtils.hasTargetSocketUri(
+              connection,
+              atomUtils.getGroupSocket(targetAtom)
+            )
           }
         />
       </Link>
@@ -166,17 +169,17 @@ export default function WonConnectionHeader({
         <WonAtomIcon
           atom={targetAtom}
           flipIcons={
-            atomUtils.getGroupSocket(targetAtom) !==
-            get(connection, "targetSocketUri")
+            !connectionUtils.hasTargetSocketUri(
+              connection,
+              atomUtils.getGroupSocket(targetAtom)
+            )
           }
         />
       </div>
     );
 
     let headerRightContent;
-    if (
-      processUtils.hasAtomFailedToLoad(processState, get(targetAtom, "uri"))
-    ) {
+    if (processUtils.hasAtomFailedToLoad(processState, getUri(targetAtom))) {
       headerRightContent = (
         <React.Fragment>
           <div className="ch__right__topline">
@@ -197,7 +200,7 @@ export default function WonConnectionHeader({
 
       let subtitleElement;
       if (!hideMessageIndicator) {
-        const allMessages = get(connection, "messages");
+        const allMessages = connectionUtils.getMessages(connection);
         const unreadMessages =
           allMessages &&
           allMessages.filter(msg => messageUtils.isMessageUnread(msg));

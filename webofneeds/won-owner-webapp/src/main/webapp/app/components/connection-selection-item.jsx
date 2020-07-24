@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useHistory, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { get, generateLink, getQueryParams } from "../utils.js";
+import { getUri, generateLink, getQueryParams } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
@@ -26,12 +26,12 @@ export default function WonConnectionSelectionItem({
   const dispatch = useDispatch();
   const openConnectionUri = getQueryParams(history.location).connectionUri;
 
-  const targetAtomUri = get(connection, "targetAtomUri");
+  const targetAtomUri = connectionUtils.getTargetAtomUri(connection);
   const processState = useSelector(generalSelectors.getProcessState);
 
   const [showActions, setShowActions] = useState(false);
 
-  const connectionUri = get(connection, "uri");
+  const connectionUri = getUri(connection);
   const targetAtomFailedToLoad = processUtils.hasAtomFailedToLoad(
     processState,
     targetAtomUri
@@ -96,7 +96,7 @@ export default function WonConnectionSelectionItem({
           to={generateLink(
             history.location,
             {
-              postUri: get(senderAtom, "uri"),
+              postUri: getUri(senderAtom),
               connectionUri: undefined,
               tab: undefined,
             },

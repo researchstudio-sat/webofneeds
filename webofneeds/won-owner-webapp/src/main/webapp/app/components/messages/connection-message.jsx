@@ -5,7 +5,7 @@ import * as atomUtils from "../../redux/utils/atom-utils.js";
 import * as messageUtils from "../../redux/utils/message-utils.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import * as processUtils from "../../redux/utils/process-utils.js";
-import { get, getIn, generateLink } from "../../utils.js";
+import { get, getUri, getIn, generateLink } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { useDispatch } from "react-redux";
 import { ownerBaseUrl } from "~/config/default.js";
@@ -40,24 +40,24 @@ export default function WonConnectionMessage({
 }) {
   const dispatch = useDispatch();
   const history = useHistory();
-  const messageUri = get(message, "uri");
-  const connectionUri = get(connection, "uri");
+  const messageUri = getUri(message);
+  const connectionUri = getUri(connection);
 
   let rdfLinkURL;
   if (shouldShowRdf && ownerBaseUrl && senderAtom && message) {
     rdfLinkURL = urljoin(
       ownerBaseUrl,
       "/rest/linked-data/",
-      `?requester=${encodeURIComponent(get(senderAtom, "uri"))}`,
-      `&uri=${encodeURIComponent(get(message, "uri"))}`,
+      `?requester=${encodeURIComponent(getUri(senderAtom))}`,
+      `&uri=${encodeURIComponent(getUri(message))}`,
       get(message, "outgoingMessage") ? "&deep=true" : ""
     );
   }
   const isSent = get(message, "outgoingMessage");
   const isReceived = !get(message, "outgoingMessage");
-  const isFailedToSend = get(message, "failedToSend");
-  const isReceivedByOwn = get(message, "isReceivedByOwn");
-  const isReceivedByRemote = get(message, "isReceivedByRemote");
+  const isFailedToSend = messageUtils.hasFailedToSend(message);
+  const isReceivedByOwn = messageUtils.isReceivedByOwn(message);
+  const isReceivedByRemote = messageUtils.isReceivedByRemote(message);
 
   // determines if the sent message is not received by any of the servers yet but not failed either
   const isPending =
@@ -244,9 +244,9 @@ export default function WonConnectionMessage({
     if (message && !multiSelectType) {
       dispatch(
         actionCreators.messages__viewState__markAsCollapsed({
-          messageUri: get(message, "uri"),
+          messageUri: getUri(message),
           connectionUri: connectionUri,
-          atomUri: get(senderAtom, "uri"),
+          atomUri: getUri(senderAtom),
           isCollapsed: expand,
         })
       );
@@ -285,9 +285,9 @@ export default function WonConnectionMessage({
   function toggleActions() {
     dispatch(
       actionCreators.messages__viewState__markShowActions({
-        messageUri: get(message, "uri"),
+        messageUri: getUri(message),
         connectionUri: connectionUri,
-        atomUri: get(senderAtom, "uri"),
+        atomUri: getUri(senderAtom),
         showActions: !showActions,
       })
     );
@@ -300,7 +300,7 @@ export default function WonConnectionMessage({
           actionCreators.messages__markAsRead({
             messageUri: messageUri,
             connectionUri: connectionUri,
-            atomUri: get(senderAtom, "uri"),
+            atomUri: getUri(senderAtom),
             read: true,
           })
         );
@@ -348,7 +348,7 @@ export default function WonConnectionMessage({
     //                 generateLink(
     //                   history.location,
     //                   {
-    //                     postUri: get(targetAtom, "uri"),
+    //                     postUri: getUri(targetAtom),
     //                     tab: undefined,
     //                     connectionUri: undefined,
     //                   },

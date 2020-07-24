@@ -130,19 +130,19 @@ export default function WonSlideIn() {
             Lost connection &ndash; make sure your internet-connection is
             working, then click &ldquo;reconnect&rdquo;.
           </span>
-          {connectionHasBeenLost &&
-            !reconnecting && (
-              <button
-                onClick={() => dispatch(actionCreators.reconnect__start())}
-                className="si__button"
-              >
-                Reconnect
-              </button>
-            )}
-          {reconnecting && (
+          {reconnecting ? (
             <svg className="hspinner">
               <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
             </svg>
+          ) : connectionHasBeenLost ? (
+            <button
+              onClick={() => dispatch(actionCreators.reconnect__start())}
+              className="si__button"
+            >
+              Reconnect
+            </button>
+          ) : (
+            undefined
           )}
         </div>
       )}

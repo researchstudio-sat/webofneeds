@@ -4,7 +4,12 @@
 
 import { createSelector } from "reselect";
 
-import { getIn, get, extractAtomUriFromConnectionUri } from "../../utils.js";
+import {
+  getIn,
+  get,
+  getUri,
+  extractAtomUriFromConnectionUri,
+} from "../../utils.js";
 import * as atomUtils from "../utils/atom-utils.js";
 import * as connectionUtils from "../utils/connection-utils.js";
 import * as accountUtils from "../utils/account-utils.js";
@@ -42,6 +47,16 @@ export const getConfigState = createSelector(
   state => state,
   state => get(state, "config")
 );
+
+export const getMessagesState = createSelector(
+  state => state,
+  state => get(state, "messages")
+);
+
+export const isWaitingForAnswer = msgUri =>
+  createSelector(getMessagesState, messagesState =>
+    getIn(messagesState, ["waitingForAnswer", msgUri])
+  );
 
 export const getTheme = createSelector(getConfigState, configState =>
   get(configState, "theme")
@@ -127,10 +142,7 @@ export const getConnectionsOfAtomWithOwnedTargetConnections = atomUri =>
     getAccountState,
     getAtom(atomUri),
     (state, accountState, atom) => {
-      const isAtomOwned = accountUtils.isAtomOwned(
-        accountState,
-        get(atom, "uri")
-      );
+      const isAtomOwned = accountUtils.isAtomOwned(accountState, getUri(atom));
 
       return atomUtils
         .getSockets(atom)
@@ -146,10 +158,11 @@ export const getConnectionsOfAtomWithOwnedTargetConnections = atomUri =>
               .getConnections(atom, _socketType)
               .filter(conn => {
                 //Filters out all connections that have a "counterpart" connection stored in another atom we own
-                const targetSocketUri = get(conn, "targetSocketUri");
-                return !ownedConnectionsToSocketUri.find(
-                  ownedConnection =>
-                    get(ownedConnection, "socketUri") === targetSocketUri
+                const targetSocketUri = connectionUtils.getTargetSocketUri(
+                  conn
+                );
+                return !ownedConnectionsToSocketUri.find(ownedConnection =>
+                  connectionUtils.hasSocketUri(ownedConnection, targetSocketUri)
                 );
               })
               .merge(ownedConnectionsToSocketUri);
@@ -239,7 +252,7 @@ export const hasUnreadBuddyConnections = (excludeClosed, excludeSuggested) =>
         .find(
           atom =>
             !!getBuddyConnectionsByAtomUri(
-              get(atom, "uri"),
+              getUri(atom),
               excludeClosed,
               excludeSuggested
             )(state).find(conn => connectionUtils.isUnread(conn))
@@ -260,7 +273,8 @@ const getBuddyConnectionsByAtomUri = (
   excludeSuggested
 ) =>
   createSelector(getAtoms, atoms => {
-    const connections = getIn(atoms, [atomUri, "connections"]);
+    const atom = get(atoms, atomUri);
+    const connections = atomUtils.getConnections(atom);
 
     return connections
       ? connections
@@ -303,9 +317,11 @@ export const getActiveAtoms = createSelector(
   allAtoms => allAtoms && allAtoms.filter(atom => atomUtils.isActive(atom))
 );
 
-export const selectIsConnected = state =>
-  !state.getIn(["messages", "reconnecting"]) &&
-  !state.getIn(["messages", "lostConnection"]);
+export const selectIsConnected = createSelector(
+  getMessagesState,
+  messagesState =>
+    !get(messagesState, "reconnecting") && !get(messagesState, "lostConnection")
+);
 
 /**
  * Get the atom for a given connectionUri
@@ -319,7 +335,17 @@ export const getOwnedAtomByConnectionUri = connectionUri =>
       connectionUri &&
       atoms &&
       (get(atoms, extractAtomUriFromConnectionUri(connectionUri)) ||
-        atoms.find(atom => getIn(atom, ["connections", connectionUri])))
+        atoms.find(atom => atomUtils.getConnection(atom, connectionUri)))
+  );
+
+export const getAtomByConnectionUri = connectionUri =>
+  createSelector(
+    getAtoms,
+    atoms =>
+      connectionUri &&
+      atoms &&
+      (get(atoms, extractAtomUriFromConnectionUri(connectionUri)) ||
+        atoms.find(atom => atomUtils.getConnection(atom, connectionUri)))
   );
 
 export const getOwnedPersonas = createSelector(
@@ -381,20 +407,20 @@ export const getCurrentLocation = createSelector(
 );
 
 export const getSenderSocketType = (allAtoms, connection) => {
-  const connectionUri = get(connection, "uri");
-  const senderSocketUri = get(connection, "socketUri");
+  const connectionUri = getUri(connection);
+  const senderSocketUri = connectionUtils.getSocketUri(connection);
   const senderAtom =
     connectionUri &&
     allAtoms &&
     (get(allAtoms, extractAtomUriFromConnectionUri(connectionUri)) ||
-      allAtoms.find(atom => getIn(atom, ["connections", connectionUri])));
+      allAtoms.find(atom => atomUtils.getConnection(atom, connectionUri)));
 
   return senderAtom && atomUtils.getSocketType(senderAtom, senderSocketUri);
 };
 
 export const getTargetSocketType = (allAtoms, connection) => {
-  const targetAtomUri = get(connection, "targetAtomUri");
-  const targetSocketUri = get(connection, "targetSocketUri");
+  const targetAtomUri = connectionUtils.getTargetAtomUri(connection);
+  const targetSocketUri = connectionUtils.getTargetSocketUri(connection);
 
   return (
     targetSocketUri &&
@@ -409,7 +435,7 @@ export const getTargetSocketType = (allAtoms, connection) => {
 export const getOwnedConnections = createSelector(
   getOwnedAtoms,
   ownedAtoms =>
-    ownedAtoms && ownedAtoms.flatMap(atom => get(atom, "connections"))
+    ownedAtoms && ownedAtoms.flatMap(atom => atomUtils.getConnections(atom))
 );
 
 /**
@@ -426,22 +452,13 @@ export const getConnectionsToCrawl = createSelector(
   (process, connections) =>
     connections
       ? connections
+          .filter(conn => connectionUtils.getMessagesSize(conn) === 0)
           .filter(
-            conn => !get(conn, "messages") || get(conn, "messages").size === 0
-            // the check below (if connectMessage was present) was replaced by if any messages are available (if any are there this connection is not to be fetched anymore)
-            // !!conn
-            //   .get("messages")
-            //   .find(msg => msg.get("messageType") === vocab.WONMSG.connectMessage)
-          )
-          .filter(conn => {
-            const connUri = get(conn, "uri");
-
-            return (
+            (conn, connUri) =>
               !processUtils.isConnectionLoading(process, connUri) &&
               !processUtils.isConnectionLoadingMessages(process, connUri) &&
               !processUtils.hasConnectionFailedToLoad(process, connUri) &&
               processUtils.hasMessagesToLoad(process, connUri)
-            );
-          })
+          )
       : Immutable.Map()
 );

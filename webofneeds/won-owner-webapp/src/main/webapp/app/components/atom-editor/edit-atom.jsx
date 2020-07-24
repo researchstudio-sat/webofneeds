@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import PropTypes from "prop-types";
-import { get, getIn } from "../../utils.js";
+import { get, getIn, getUri } from "../../utils.js";
 
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
@@ -42,11 +42,10 @@ export default function WonEditAtom({ fromAtom }) {
 
   const isFromAtomOwned = accountUtils.isAtomOwned(
     accountState,
-    get(fromAtom, "uri")
+    getUri(fromAtom)
   );
   const isFromAtomEditable =
-    useSelector(generalSelectors.isAtomEditable(get(fromAtom, "uri"))) &&
-    loggedIn;
+    useSelector(generalSelectors.isAtomEditable(getUri(fromAtom))) && loggedIn;
 
   function updateDraftSeeksImm(updatedDraftBranchImm) {
     updateDraftImm(updatedDraftBranchImm, "seeks");

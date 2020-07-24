@@ -2,7 +2,7 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import { get } from "../utils.js";
+import { get, getUri } from "../utils.js";
 
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils";
@@ -15,7 +15,7 @@ import ico36_person_anon from "~/images/won-icons/ico36_person_anon.svg";
 import shajs from "sha.js";
 
 export default function WonAtomIcon({ atom, className, onClick, flipIcons }) {
-  const atomUri = get(atom, "uri");
+  const atomUri = getUri(atom);
   const holder = useSelector(
     generalSelectors.getAtom(atomUtils.getHeldByUri(atom))
   );
@@ -179,7 +179,7 @@ export default function WonAtomIcon({ atom, className, onClick, flipIcons }) {
       class={
         (className ? className : "") +
         " " +
-        (processUtils.hasAtomFailedToLoad(processState, get(atom, "uri"))
+        (processUtils.hasAtomFailedToLoad(processState, getUri(atom))
           ? " won-failed-to-load "
           : "") +
         (atomUtils.isInactive(atom) ? " inactive " : "") +

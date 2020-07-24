@@ -4,7 +4,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import { get } from "../utils.js";
+import { getUri } from "../utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
@@ -22,7 +22,7 @@ export default function WonAtomMenu({
   toggleAddPicker,
   relevantConnectionsMap,
 }) {
-  const atomUri = get(atom, "uri");
+  const atomUri = getUri(atom);
   const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
 
   const viewState = useSelector(generalSelectors.getViewState);

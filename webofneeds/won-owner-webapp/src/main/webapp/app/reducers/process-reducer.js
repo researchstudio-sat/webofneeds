@@ -3,7 +3,7 @@
  */
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
-import { get, getIn, extractAtomUriBySocketUri } from "../utils.js";
+import { get, getIn, getUri, extractAtomUriBySocketUri } from "../utils.js";
 import { parseAtom } from "./atom-reducer/parse-atom.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 
@@ -295,7 +295,7 @@ export default function(processState = initialState, action = {}) {
       return processState.set("processingSendAnonymousLinkEmail", false);
 
     case actionTypes.atoms.storeUriFailed: {
-      return updateAtomProcess(processState, get(action.payload, "uri"), {
+      return updateAtomProcess(processState, getUri(action.payload), {
         toLoad: false,
         loaded: false,
         failedToLoad: true,
@@ -487,13 +487,9 @@ export default function(processState = initialState, action = {}) {
 
       connections &&
         connections.map(conn => {
-          processState = updateConnectionProcess(
-            processState,
-            get(conn, "uri"),
-            {
-              toLoad: true,
-            }
-          );
+          processState = updateConnectionProcess(processState, getUri(conn), {
+            toLoad: true,
+          });
           const targetAtomUri = get(conn, "targetAtom");
           if (
             !processUtils.isAtomProcessExisting(processState, targetAtomUri)
@@ -577,23 +573,19 @@ export default function(processState = initialState, action = {}) {
         atoms.map(atom => {
           const parsedAtom = parseAtom(atom);
           if (parsedAtom) {
-            processState = updateAtomProcess(
-              processState,
-              get(parsedAtom, "uri"),
-              {
-                toLoad: false,
-                failedToLoad: false,
-                loading: false,
-                loaded: true,
-              }
-            );
+            processState = updateAtomProcess(processState, getUri(parsedAtom), {
+              toLoad: false,
+              failedToLoad: false,
+              loading: false,
+              loaded: true,
+            });
           }
         });
       return processState;
     }
 
     case actionTypes.atoms.markAsLoaded: {
-      let atomUri = get(action.payload, "uri");
+      let atomUri = getUri(action.payload);
 
       return updateAtomProcess(processState, atomUri, {
         toLoad: false,
@@ -617,7 +609,7 @@ export default function(processState = initialState, action = {}) {
     }
 
     case actionTypes.atoms.storeUriInLoading: {
-      const atomUri = get(action.payload, "uri");
+      const atomUri = getUri(action.payload);
 
       if (atomUri) {
         processState = updateAtomProcess(processState, atomUri, {
@@ -629,7 +621,7 @@ export default function(processState = initialState, action = {}) {
     }
 
     case actionTypes.externalData.storeUriInLoading: {
-      const externalDataUri = get(action.payload, "uri");
+      const externalDataUri = getUri(action.payload);
 
       if (externalDataUri) {
         processState = updateExternalDataProcess(
@@ -650,7 +642,7 @@ export default function(processState = initialState, action = {}) {
 
     case actionTypes.atoms.delete:
     case actionTypes.atoms.removeDeleted: {
-      const atomUri = get(action.payload, "uri");
+      const atomUri = getUri(action.payload);
       return processState.deleteIn(["atoms", atomUri]);
     }
 
