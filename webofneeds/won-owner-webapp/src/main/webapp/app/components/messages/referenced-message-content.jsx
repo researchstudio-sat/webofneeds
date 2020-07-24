@@ -8,6 +8,7 @@ import { useDispatch } from "react-redux";
 import PropTypes from "prop-types";
 import { get, getIn } from "../../utils.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
+import * as messageUtils from "../../redux/utils/message-utils.js";
 import * as ownerApi from "../../api/owner-api";
 import won from "../../won-es6";
 import WonCombinedMessageContent from "./combined-message-content.jsx";
@@ -29,15 +30,7 @@ export default function WonReferencedMessageContent({
     "expandedReferences",
   ]);
 
-  const references = get(message, "references");
-
-  const rejectUris = get(references, "rejects");
-  const retractUris = get(references, "retracts");
-  const proposeUris = get(references, "proposes");
-  const proposeToCancelUris = get(references, "proposesToCancel");
-  const acceptUris = get(references, "accepts");
-  const forwardUris = get(references, "forwards");
-  const claimUris = get(references, "claims");
+  const references = messageUtils.getReferences(message);
   const senderAtomUri = get(senderAtom, "uri");
   const multiSelectType = get(connection, "multiSelectType");
 
@@ -99,9 +92,9 @@ export default function WonReferencedMessageContent({
   function generateMessageElementFragment(
     label,
     reference,
-    messageReferenceUris,
     combinedMessageElementClassName
   ) {
+    const messageReferenceUris = get(references, reference);
     if (messageReferenceUris && messageReferenceUris.size > 0) {
       const messageReferenceArray = Array.from(messageReferenceUris.toSet());
       const isExpanded = get(expandedReferences, reference);
@@ -161,20 +154,18 @@ export default function WonReferencedMessageContent({
         !message || get(message, "hasContent") ? "won-has-non-ref-content" : ""
       }
     >
-      {generateMessageElementFragment("Claiming", "claims", claimUris)}
-      {generateMessageElementFragment("Proposes", "proposes", proposeUris)}
-      {generateMessageElementFragment("Retracting", "retracts", retractUris)}
-      {generateMessageElementFragment("Accepts", "accepts", acceptUris)}
+      {generateMessageElementFragment("Claiming", "claims")}
+      {generateMessageElementFragment("Proposes", "proposes")}
+      {generateMessageElementFragment("Retracting", "retracts")}
+      {generateMessageElementFragment("Accepts", "accepts")}
       {generateMessageElementFragment(
         "Proposing to cancel",
-        "proposesToCancel",
-        proposeToCancelUris
+        "proposesToCancel"
       )}
-      {generateMessageElementFragment("Rejecting", "rejects", rejectUris)}
+      {generateMessageElementFragment("Rejecting", "rejects")}
       {generateMessageElementFragment(
         "Forwarding",
         "forwards",
-        forwardUris,
         "won-cm--forward"
       )}
     </won-referenced-message-content>

@@ -139,14 +139,41 @@ export function isMessageRejectable(con, msg) {
   );
 }
 
+export function getReferences(msg) {
+  return get(msg, "references");
+}
+
+export function getForwardsReferences(msg) {
+  const references = getReferences(msg);
+
+  return get(references, "forwards");
+}
+
+export function hasForwardsReferences(msg) {
+  const forwards = getForwardsReferences(msg);
+  return forwards && forwards.size > 0;
+}
+
+export function getProposesReferences(msg) {
+  const references = getReferences(msg);
+
+  return get(references, "proposes");
+}
+
 /**
  * Determines if a given message has proposes references
  * @param msg
  * @returns {*|boolean}
  */
 export function hasProposesReferences(msg) {
-  const references = get(msg, "references");
-  return get(references, "proposes") && get(references, "proposes").size > 0;
+  const proposes = getProposesReferences(msg);
+  return proposes && proposes.size > 0;
+}
+
+export function getClaimsReferences(msg) {
+  const references = getReferences(msg);
+
+  return get(references, "claims");
 }
 
 /**
@@ -155,21 +182,23 @@ export function hasProposesReferences(msg) {
  * @returns {*|boolean}
  */
 export function hasClaimsReferences(msg) {
-  const references = get(msg, "references");
-  return get(references, "claims") && get(references, "claims").size > 0;
+  const claims = getClaimsReferences(msg);
+  return claims && claims.size > 0;
 }
 
+export function getProposesToCancelReferences(msg) {
+  const references = getReferences(msg);
+
+  return get(references, "proposesToCancel");
+}
 /**
  * Determines if a given message has proposesToCancel references
  * @param msg
  * @returns {*|boolean}
  */
 export function hasProposesToCancelReferences(msg) {
-  const references = get(msg, "references");
-  return (
-    get(references, "proposesToCancel") &&
-    get(references, "proposesToCancel").size > 0
-  );
+  const proposesToCancel = getProposesToCancelReferences(msg);
+  return proposesToCancel && proposesToCancel.size > 0;
 }
 
 /**

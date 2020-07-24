@@ -5,12 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as messageUtils from "../redux/utils/message-utils";
 import { rdfTextfieldHelpText } from "../won-label-utils.js";
-import {
-  get,
-  getIn,
-  generateLink,
-  extractAtomUriFromConnectionUri,
-} from "../utils";
+import { get, generateLink, extractAtomUriFromConnectionUri } from "../utils";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import vocab from "../service/vocab.js";
@@ -61,7 +56,7 @@ export default function WonGroupAtomMessages({
   const chatMessages =
     allChatMessages &&
     allChatMessages
-      .filter(msg => !getIn(msg, ["references", "forwards"])) //FILTER OUT ALL FORWARD MESSAGE ENVELOPES JUST IN CASE
+      .filter(msg => !messageUtils.hasForwardsReferences(msg)) //FILTER OUT ALL FORWARD MESSAGE ENVELOPES JUST IN CASE
       .filter(msg => !messageUtils.isAtomHintMessage(msg)) //FILTER OUT ALL HINT MESSAGES
       .filter(msg => !messageUtils.isSocketHintMessage(msg));
 

@@ -67,7 +67,7 @@ export default function WonAtomMessages({
   const allAtoms = useSelector(generalSelectors.getAtoms);
   const ownedConnections = useSelector(getOwnedConnections);
 
-  const messages = get(connection, "messages");
+  const messages = connectionUtils.getMessages(connection);
   const chatMessages =
     messages &&
     messages
@@ -343,7 +343,7 @@ export default function WonAtomMessages({
   }
 
   function selectMessage(msgUri) {
-    const msg = getIn(connection, ["messages", msgUri]);
+    const msg = connectionUtils.getMessage(connection, msgUri);
 
     if (msg) {
       dispatch(
@@ -363,7 +363,7 @@ export default function WonAtomMessages({
     if (
       hasConnectionMessagesToLoad &&
       !connectionUtils.isUsingTemporaryUri(connection) &&
-      get(connection, "messages").size < INITIAL_MESSAGECOUNT
+      connectionUtils.getMessagesSize(connection) < INITIAL_MESSAGECOUNT
     ) {
       loadPreviousMessages(INITIAL_MESSAGECOUNT);
     }

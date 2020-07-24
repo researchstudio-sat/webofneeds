@@ -6,6 +6,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
+import * as messageUtils from "../../redux/utils/message-utils.js";
 import * as wonLabelUtils from "../../won-label-utils.js";
 import { get, getIn, generateLink } from "../../utils.js";
 import vocab from "../../service/vocab.js";
@@ -33,9 +34,8 @@ export default function WonCombinedMessageContent({
   const injectInto = get(message, "injectInto");
 
   const hasReferences = get(message, "hasReferences");
-  const references = get(message, "references");
-  const referencesProposes = get(references, "proposes");
-  const referencesClaims = get(references, "claims");
+  const referencesProposes = messageUtils.getProposesReferences(message);
+  const referencesClaims = messageUtils.getClaimsReferences(message);
   const externalDataState = useSelector(generalSelectors.getExternalDataState);
 
   const originatorUri = get(message, "originatorUri");

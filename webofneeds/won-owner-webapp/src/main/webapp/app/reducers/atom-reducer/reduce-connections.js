@@ -2,17 +2,18 @@ import { parseConnection } from "./parse-connection.js";
 import { markUriAsRead } from "../../won-localstorage.js";
 
 import { markAtomAsRead } from "./reduce-atoms.js";
+import { sortByMessageTimeStamp } from "./reduce-messages.js";
 import { getIn, get, extractAtomUriFromConnectionUri } from "../../utils.js";
 import * as connectionUtils from "../../redux/utils/connection-utils";
 import { addAtomStub } from "./reduce-atoms";
 
-export function storeConnectionsData(state, connectionsToStore) {
+export function storeConnectionsData(allAtomsInState, connectionsToStore) {
   if (connectionsToStore && connectionsToStore.size > 0) {
     connectionsToStore.forEach(connection => {
-      state = addConnectionFull(state, connection);
+      allAtomsInState = addConnectionFull(allAtomsInState, connection);
     });
   }
-  return state;
+  return allAtomsInState;
 }
 
 /**
@@ -58,9 +59,13 @@ function addConnectionFull(atomState, connection) {
   return atomState;
 }
 
-export function markConnectionAsRead(state, connectionUri) {
+export function markConnectionAsRead(allAtomsInState, connectionUri) {
   const atomUri = extractAtomUriFromConnectionUri(connectionUri);
-  const connection = getIn(state, [atomUri, "connections", connectionUri]);
+  const connection = getIn(allAtomsInState, [
+    atomUri,
+    "connections",
+    connectionUri,
+  ]);
 
   markUriAsRead(connectionUri);
 
@@ -72,22 +77,28 @@ export function markConnectionAsRead(state, connectionUri) {
       atomUri,
       ">"
     );
-    return state;
+    return allAtomsInState;
   }
 
-  state = state.setIn([atomUri, "connections", connectionUri, "unread"], false);
+  allAtomsInState = allAtomsInState.setIn(
+    [atomUri, "connections", connectionUri, "unread"],
+    false
+  );
 
   if (
-    getIn(state, [atomUri, "connections"]).find(conn => !get(conn, "unread"))
+    getIn(allAtomsInState, [atomUri, "connections"]).find(
+      conn => !get(conn, "unread")
+    )
   ) {
-    state = markAtomAsRead(state, atomUri);
+    allAtomsInState = markAtomAsRead(allAtomsInState, atomUri);
   }
 
-  return state;
+  return allAtomsInState;
 }
 
-export function markConnectionAsRated(state, connectionUri) {
-  let atom = connectionUri && getAtomByConnectionUri(state, connectionUri);
+export function markConnectionAsRated(allAtomsInState, connectionUri) {
+  let atom =
+    connectionUri && getAtomByConnectionUri(allAtomsInState, connectionUri);
   let connection = getIn(atom, ["connections", connectionUri]);
 
   if (!connection) {
@@ -98,10 +109,10 @@ export function markConnectionAsRated(state, connectionUri) {
       get(atom, "uri"),
       ">"
     );
-    return state;
+    return allAtomsInState;
   }
 
-  return state.setIn(
+  return allAtomsInState.setIn(
     [get(atom, "uri"), "connections", connectionUri, "isRated"],
     true
   );
@@ -110,7 +121,7 @@ export function markConnectionAsRated(state, connectionUri) {
 /**
  * Get the atom for a given connectionUri
  *
- * @param state
+ * @param allAtomsInState
  *            to retrieve data from
  * @param connectionUri
  *            to find corresponding atom for
@@ -122,8 +133,12 @@ export function getAtomByConnectionUri(allAtomsInState, connectionUri) {
   );
 }
 
-export function changeConnectionState(allAtoms, connectionUri, newState) {
-  const atom = getAtomByConnectionUri(allAtoms, connectionUri);
+export function changeConnectionState(
+  allAtomsInState,
+  connectionUri,
+  newState
+) {
+  const atom = getAtomByConnectionUri(allAtomsInState, connectionUri);
 
   if (!atom) {
     console.warn(
@@ -131,18 +146,22 @@ export function changeConnectionState(allAtoms, connectionUri, newState) {
       connectionUri,
       ") -> return unaltered state"
     );
-    return allAtoms;
+    return allAtomsInState;
   }
 
   const atomUri = get(atom, "uri");
 
-  return allAtoms
+  return allAtomsInState
     .setIn([atomUri, "connections", connectionUri, "state"], newState)
     .setIn([atomUri, "connections", connectionUri, "unread"], true);
 }
 
-export function changeConnectionStateByFun(state, connectionUri, fun) {
-  const atom = getAtomByConnectionUri(state, connectionUri);
+export function changeConnectionStateByFun(
+  allAtomsInState,
+  connectionUri,
+  fun
+) {
+  const atom = getAtomByConnectionUri(allAtomsInState, connectionUri);
 
   if (!atom) {
     console.warn(
@@ -150,22 +169,30 @@ export function changeConnectionStateByFun(state, connectionUri, fun) {
       connectionUri,
       ") -> return unaltered state"
     );
-    return state;
+    return allAtomsInState;
   }
 
   const atomUri = get(atom, "uri");
-  const connectionState = getIn(state, [
+  const connectionState = getIn(allAtomsInState, [
     atomUri,
     "connections",
     connectionUri,
     "state",
   ]);
 
-  return changeConnectionState(state, connectionUri, fun(connectionState));
+  return changeConnectionState(
+    allAtomsInState,
+    connectionUri,
+    fun(connectionState)
+  );
 }
 
-export function updatePetriNetStateData(state, connectionUri, petriNetData) {
-  const atom = getAtomByConnectionUri(state, connectionUri);
+export function updatePetriNetStateData(
+  allAtomsInState,
+  connectionUri,
+  petriNetData
+) {
+  const atom = getAtomByConnectionUri(allAtomsInState, connectionUri);
 
   if (!atom || !petriNetData) {
     console.warn(
@@ -173,19 +200,23 @@ export function updatePetriNetStateData(state, connectionUri, petriNetData) {
       connectionUri,
       ") or no petriNetData set in params -> return unaltered state"
     );
-    return state;
+    return allAtomsInState;
   }
 
   const atomUri = get(atom, "uri");
 
-  return state.setIn(
+  return allAtomsInState.setIn(
     [atomUri, "connections", connectionUri, "petriNetData"],
     petriNetData
   );
 }
 
-export function updateAgreementStateData(state, connectionUri, agreementData) {
-  const atom = getAtomByConnectionUri(state, connectionUri);
+export function updateAgreementStateData(
+  allAtomsInState,
+  connectionUri,
+  agreementData
+) {
+  const atom = getAtomByConnectionUri(allAtomsInState, connectionUri);
 
   if (!atom || !agreementData) {
     console.warn(
@@ -193,22 +224,22 @@ export function updateAgreementStateData(state, connectionUri, agreementData) {
       connectionUri,
       ") or no agreementData set in params -> return unaltered state"
     );
-    return state;
+    return allAtomsInState;
   }
   const atomUri = get(atom, "uri");
 
-  return state.setIn(
+  return allAtomsInState.setIn(
     [atomUri, "connections", connectionUri, "agreementData"],
     agreementData
   );
 }
 
 export function updateAgreementStateDataset(
-  state,
+  allAtomsInState,
   connectionUri,
   agreementDataset
 ) {
-  const atom = getAtomByConnectionUri(state, connectionUri);
+  const atom = getAtomByConnectionUri(allAtomsInState, connectionUri);
 
   if (!atom || !agreementDataset) {
     console.warn(
@@ -216,18 +247,22 @@ export function updateAgreementStateDataset(
       connectionUri,
       ") or no agreementDataset in params -> return unaltered state"
     );
-    return state;
+    return allAtomsInState;
   }
   const atomUri = get(atom, "uri");
 
-  return state.setIn(
+  return allAtomsInState.setIn(
     [atomUri, "connections", connectionUri, "agreementDataset"],
     agreementDataset
   );
 }
 
-export function setShowAgreementData(state, connectionUri, showAgreementData) {
-  const atom = getAtomByConnectionUri(state, connectionUri);
+export function setShowAgreementData(
+  allAtomsInState,
+  connectionUri,
+  showAgreementData
+) {
+  const atom = getAtomByConnectionUri(allAtomsInState, connectionUri);
 
   if (!atom) {
     console.warn(
@@ -235,19 +270,23 @@ export function setShowAgreementData(state, connectionUri, showAgreementData) {
       connectionUri,
       ") -> return unaltered state"
     );
-    return state;
+    return allAtomsInState;
   }
 
   const atomUri = get(atom, "uri");
 
-  return state.setIn(
+  return allAtomsInState.setIn(
     [atomUri, "connections", connectionUri, "showAgreementData"],
     showAgreementData
   );
 }
 
-export function setShowPetriNetData(state, connectionUri, showPetriNetData) {
-  const atom = getAtomByConnectionUri(state, connectionUri);
+export function setShowPetriNetData(
+  allAtomsInState,
+  connectionUri,
+  showPetriNetData
+) {
+  const atom = getAtomByConnectionUri(allAtomsInState, connectionUri);
 
   if (!atom) {
     console.warn(
@@ -255,23 +294,23 @@ export function setShowPetriNetData(state, connectionUri, showPetriNetData) {
       connectionUri,
       ") -> return unaltered state"
     );
-    return state;
+    return allAtomsInState;
   }
 
   const atomUri = get(atom, "uri");
 
-  return state.setIn(
+  return allAtomsInState.setIn(
     [atomUri, "connections", connectionUri, "showPetriNetData"],
     showPetriNetData
   );
 }
 
 export function setMultiSelectType(
-  state,
+  allAtomsInState,
   connectionUri,
   multiSelectType = undefined
 ) {
-  const atom = getAtomByConnectionUri(state, connectionUri);
+  const atom = getAtomByConnectionUri(allAtomsInState, connectionUri);
 
   if (!atom) {
     console.warn(
@@ -279,12 +318,12 @@ export function setMultiSelectType(
       connectionUri,
       ") -> return unaltered state"
     );
-    return state;
+    return allAtomsInState;
   }
 
   const atomUri = get(atom, "uri");
 
-  let messages = getIn(state, [
+  let messages = getIn(allAtomsInState, [
     atomUri,
     "connections",
     connectionUri,
@@ -292,38 +331,38 @@ export function setMultiSelectType(
   ]);
 
   if (!multiSelectType) {
-    messages = messages.map(msg => {
-      msg = getIn(msg, ["viewState", "isSelected"])
-        ? msg.setIn(["viewState", "isSelected"], false)
-        : msg;
-      return msg;
-    });
-    state = state.setIn(
-      [atomUri, "connections", connectionUri, "messages"],
-      messages
-    );
-    state = state.setIn(
-      [atomUri, "connections", connectionUri, "multiSelectType"],
-      undefined
-    );
+    messages = messages
+      .map(msg => {
+        msg = getIn(msg, ["viewState", "isSelected"])
+          ? msg.setIn(["viewState", "isSelected"], false)
+          : msg;
+        return msg;
+      })
+      .toOrderedMap()
+      .sortBy(sortByMessageTimeStamp);
+    allAtomsInState = allAtomsInState
+      .setIn([atomUri, "connections", connectionUri, "messages"], messages)
+      .setIn(
+        [atomUri, "connections", connectionUri, "multiSelectType"],
+        undefined
+      );
   } else {
-    state = state.setIn(
+    allAtomsInState = allAtomsInState.setIn(
       [atomUri, "connections", connectionUri, "multiSelectType"],
       multiSelectType
     );
   }
 
-  return state;
+  return allAtomsInState;
 }
 
-export function addMetaConnections(state, atomUri, connections) {
-  let newState = state;
+export function addMetaConnections(allAtomsInState, atomUri, connections) {
   atomUri &&
     connections &&
     connections.forEach(conn => {
-      newState = addMetaConnection(newState, atomUri, conn);
+      allAtomsInState = addMetaConnection(allAtomsInState, atomUri, conn);
     });
-  return newState;
+  return allAtomsInState;
 }
 
 function addMetaConnection(atomState, atomUri, conn) {
