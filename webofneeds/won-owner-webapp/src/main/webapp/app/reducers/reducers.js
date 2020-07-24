@@ -122,68 +122,10 @@ export default reduceReducers(
      * store/model. e.g.: an reducers object `{ drafts: function(state = [], action){...} }`
      * would result in a store like `{ drafts: [...] }`
      */
-  combineReducersStable(Immutable.Map(reducers)),
-
-  /*--------------------- <cross-cutting-reducer> -------------------
-     *
-     * combineReducers above parcels out the state to individual
-     * reducers that deal with their slice on their own. Sadly not
-     * all updates can work like this. Occasionally there's cross-cutting
-     * concerns between parts of the state. These can be addressed in
-     * this reducer.
-     *
-     * **How to use me:**
-     *
-     * * Try not to create new branches of the state here (this is
-     *   what combineReducers is for)
-     * * Make sure the actual methods updating a respective part
-     *   of the state are in the js-file responsible for that part
-     *   of the state. This is to ensure that all write-accesses
-     *   to the data can be discerned from that one file.
-     *
-     * @dependent state: https://github.com/rackt/redux/issues/749
-     *
-     * also, if you need to resolve the data-dependency just for
-     * a component, you can use [memoized selectors]
-     * (http://rackt.org/redux/docs/recipes/ComputingDerivedData.html)
-     */
-  (state, action) => {
-    switch (action.type) {
-      /**
-       * Add all actions that load connections
-       * and their events. The reducer here makes
-       * sure that no connections between two atoms
-       * that both are owned by the user, remain
-       * in the state.
-       */
-      case actionTypes.connections.storeActive:
-      case actionTypes.account.loginFinished:
-      case actionTypes.initialLoadFinished:
-        return deleteChatConnectionsBetweenOwnedAtoms(state);
-
-      default:
-        return state;
-    }
-  }
-  //-------------------- </cross-cutting-reducer> -------------------
+  combineReducersStable(Immutable.Map(reducers))
 );
 
 window.Immutable4dbg = Immutable;
-
-function deleteChatConnectionsBetweenOwnedAtoms(state) {
-  let atoms = state.get("atoms");
-
-  if (atoms) {
-    atoms = atoms.map(function(atom) {
-      let connections = atom.get("connections");
-
-      return atom.set("connections", connections);
-    });
-    return state.set("atoms", atoms);
-  }
-
-  return state;
-}
 
 /**
  * Reducers are functions of type (state, action) => state.
