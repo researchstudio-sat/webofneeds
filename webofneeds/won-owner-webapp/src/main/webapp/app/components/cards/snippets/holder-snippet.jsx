@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import { generateLink, get } from "~/app/utils";
+import { generateLink, get, getUri } from "~/app/utils";
 import { Link } from "react-router-dom";
 import * as generalSelectors from "~/app/redux/selectors/general-selectors";
 import * as atomUtils from "~/app/redux/utils/atom-utils";
@@ -101,7 +101,7 @@ export default function WonHolderSnippet({
         generateLink(
           location,
           {
-            postUri: get(holder, "uri"),
+            postUri: getUri(holder),
             tab: undefined,
             connectionUri: undefined,
           },

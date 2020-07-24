@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { actionCreators } from "../actions/actions.js";
 import { useSelector, useDispatch } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors";
-import { generateLink, get, toAbsoluteURL } from "../utils";
+import { generateLink, get, getUri, toAbsoluteURL } from "../utils";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils";
 import { ownerBaseUrl } from "~/config/default.js";
@@ -17,7 +17,7 @@ import { useHistory } from "react-router-dom";
 export default function WonAtomContextDropdown({ atom, className }) {
   const dispatch = useDispatch();
   const history = useHistory();
-  const atomUri = get(atom, "uri");
+  const atomUri = getUri(atom);
   const [contextMenuOpen, setContextMenuOpen] = useState(false);
 
   let thisNode;
@@ -40,7 +40,7 @@ export default function WonAtomContextDropdown({ atom, className }) {
 
   let linkToAtom;
   if (ownerBaseUrl && atom) {
-    const path = "#!/post" + `?postUri=${encodeURI(get(atom, "uri"))}`;
+    const path = "#!/post" + `?postUri=${encodeURI(getUri(atom))}`;
 
     linkToAtom = toAbsoluteURL(ownerBaseUrl).toString() + path;
   }
@@ -61,9 +61,9 @@ export default function WonAtomContextDropdown({ atom, className }) {
   const useCaseIdentifier = atomUtils.getMatchedUseCaseIdentifier(atom);
 
   const atomLoading =
-    !atom || processUtils.isAtomLoading(process, get(atom, "uri"));
+    !atom || processUtils.isAtomLoading(process, getUri(atom));
   const atomFailedToLoad =
-    atom && processUtils.hasAtomFailedToLoad(process, get(atom, "uri"));
+    atom && processUtils.hasAtomFailedToLoad(process, getUri(atom));
 
   function generateReportAtomMailParams() {
     //todo

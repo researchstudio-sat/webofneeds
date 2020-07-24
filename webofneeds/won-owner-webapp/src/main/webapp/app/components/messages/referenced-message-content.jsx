@@ -6,7 +6,7 @@ import { actionCreators } from "../../actions/actions.js";
 import { useDispatch } from "react-redux";
 
 import PropTypes from "prop-types";
-import { get, getIn } from "../../utils.js";
+import { get, getIn, getUri } from "../../utils.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import * as messageUtils from "../../redux/utils/message-utils.js";
 import * as ownerApi from "../../api/owner-api";
@@ -31,7 +31,7 @@ export default function WonReferencedMessageContent({
   ]);
 
   const references = messageUtils.getReferences(message);
-  const senderAtomUri = get(senderAtom, "uri");
+  const senderAtomUri = getUri(senderAtom);
   const multiSelectType = get(connection, "multiSelectType");
 
   function toggleReferenceExpansion(reference) {
@@ -40,8 +40,8 @@ export default function WonReferencedMessageContent({
 
       dispatch(
         actionCreators.messages__viewState__markExpandReference({
-          messageUri: get(message, "uri"),
-          connectionUri: get(connection, "uri"),
+          messageUri: getUri(message),
+          connectionUri: getUri(connection),
           atomUri: senderAtomUri,
           isExpanded: !currentExpansionState,
           reference: reference,

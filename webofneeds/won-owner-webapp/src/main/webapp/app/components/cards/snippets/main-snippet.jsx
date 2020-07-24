@@ -2,7 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
-import { generateLink, get } from "~/app/utils";
+import { generateLink, get, getUri } from "~/app/utils";
 import * as atomUtils from "~/app/redux/utils/atom-utils";
 import * as generalSelectors from "~/app/redux/selectors/general-selectors";
 import { relativeTime } from "~/app/won-label-utils";
@@ -10,7 +10,7 @@ import { relativeTime } from "~/app/won-label-utils";
 import "~/style/_main-snippet.scss";
 
 export default function WonMainSnippet({ atom, showIcon, externalDataState }) {
-  const atomUri = get(atom, "uri");
+  const atomUri = getUri(atom);
 
   const isGroupChatEnabled = atomUtils.hasGroupSocket(atom);
   const isChatEnabled = atomUtils.hasChatSocket(atom);

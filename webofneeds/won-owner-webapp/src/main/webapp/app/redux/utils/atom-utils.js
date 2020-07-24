@@ -3,7 +3,7 @@
  */
 
 import vocab from "../../service/vocab.js";
-import { get, getIn } from "../../utils.js";
+import { get, getIn, getUri } from "../../utils.js";
 import * as wonLabelUtils from "../../won-label-utils.js";
 import * as connectionUtils from "./connection-utils.js";
 import * as useCaseUtils from "../../usecase-utils.js";
@@ -641,14 +641,14 @@ export function getAllConnectedChatAndGroupConnections(atomImm) {
 export function isHolderVerified(heldAtom, holderAtom) {
   const heldByUri = getHeldByUri(heldAtom);
 
-  if (holderAtom && heldByUri === get(holderAtom, "uri")) {
+  if (holderAtom && heldByUri === getUri(holderAtom)) {
     const holderAtomHolderConnections = getConnectedConnections(
       holderAtom,
       vocab.HOLD.HolderSocketCompacted
     );
 
     const connections = holderAtomHolderConnections.filter(
-      conn => connectionUtils.getTargetAtomUri(conn) === get(heldAtom, "uri")
+      conn => connectionUtils.getTargetAtomUri(conn) === getUri(heldAtom)
     );
 
     return connections && connections.size === 1;

@@ -9,6 +9,7 @@ import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 import vocab from "../../service/vocab.js";
 import {
   get,
+  getUri,
   sortByDate,
   filterConnectionsBySearchValue,
   filterAtomsBySearchValue,
@@ -38,7 +39,7 @@ export default function WonAtomContentSocket({
   setVisibleTab,
 }) {
   const accountState = useSelector(generalSelectors.getAccountState);
-  const isAtomOwned = accountUtils.isAtomOwned(accountState, get(atom, "uri"));
+  const isAtomOwned = accountUtils.isAtomOwned(accountState, getUri(atom));
 
   const [showRequestReceived, toggleRequestReceived] = useState(false);
   const [showRequestSent, toggleRequestSent] = useState(false);
@@ -93,14 +94,14 @@ export default function WonAtomContentSocket({
       const flip = get(conn, "targetSocketUri") === socketUri;
 
       return (
-        <React.Fragment key={get(conn, "uri") + "-" + index}>
+        <React.Fragment key={getUri(conn) + "-" + index}>
           <ItemComponent
             connection={conn}
             atom={
               flip
                 ? get(
                     storedAtoms,
-                    extractAtomUriFromConnectionUri(get(conn, "uri"))
+                    extractAtomUriFromConnectionUri(getUri(conn))
                   )
                 : atom
             }

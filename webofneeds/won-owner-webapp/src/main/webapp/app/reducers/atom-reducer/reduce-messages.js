@@ -5,13 +5,18 @@ import { addAtomStub } from "./reduce-atoms.js";
 import vocab from "../../service/vocab.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import * as messageUtils from "../../redux/utils/message-utils.js";
-import { get, getIn, extractAtomUriBySocketUri } from "../../utils.js";
+import {
+  get,
+  getIn,
+  getUri,
+  extractAtomUriBySocketUri,
+  extractAtomUriFromConnectionUri,
+} from "../../utils.js";
 import Immutable from "immutable";
 import {
   getSenderSocketType,
   getTargetSocketType,
 } from "../../redux/selectors/general-selectors";
-import { extractAtomUriFromConnectionUri } from "../../utils";
 
 export function addMessage(
   allAtomsInState,
@@ -61,7 +66,7 @@ export function addMessage(
       }
 
       if (senderConnection) {
-        const senderConnectionUri = get(senderConnection, "uri");
+        const senderConnectionUri = getUri(senderConnection);
         parsedMessage = parsedMessage.setIn(["data", "outgoingMessage"], true);
 
         let messages = connectionUtils.getMessages(senderConnection);
@@ -103,7 +108,7 @@ export function addMessage(
       }
 
       if (targetConnection) {
-        const targetConnectionUri = get(targetConnection, "uri");
+        const targetConnectionUri = getUri(targetConnection);
         parsedMessage = parsedMessage
           .setIn(["data", "outgoingMessage"], false)
           .setIn(
@@ -317,7 +322,7 @@ export function addMessage(
           // In Some cases (like if we send a message) we need to override the messageUri in the wonMessage with the correct one
           forwardMessageData = forwardMessageData.set("uri", eventUriOverride);
         }
-        const forwardMessageUri = get(forwardMessageData, "uri");
+        const forwardMessageUri = getUri(forwardMessageData);
 
         forwardMessageData &&
           connections.map((conn, connUri) => {

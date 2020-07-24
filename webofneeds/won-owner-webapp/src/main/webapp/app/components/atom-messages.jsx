@@ -9,6 +9,7 @@ import { rdfTextfieldHelpText } from "../won-label-utils.js";
 import {
   get,
   getIn,
+  getUri,
   generateLink,
   extractAtomUriFromConnectionUri,
 } from "../utils";
@@ -57,11 +58,11 @@ export default function WonAtomMessages({
   });
   const [snapBottom, setSnapBottom] = useState(true);
 
-  const connectionUri = get(connection, "uri");
+  const connectionUri = getUri(connection);
   const senderAtom = useSelector(
     generalSelectors.getOwnedAtomByConnectionUri(connectionUri)
   );
-  const senderAtomUri = get(senderAtom, "uri");
+  const senderAtomUri = getUri(senderAtom);
   const targetAtomUri = connectionUtils.getTargetAtomUri(connection);
   const targetAtom = useSelector(generalSelectors.getAtom(targetAtomUri));
   const allAtoms = useSelector(generalSelectors.getAtoms);
@@ -618,7 +619,7 @@ export default function WonAtomMessages({
             history.location,
             {
               postUri: connectionUtils.getTargetAtomUri(connection),
-              connectionUri: get(connection, "uri"),
+              connectionUri: getUri(connection),
               tab: undefined,
             },
             "/post"
@@ -652,9 +653,7 @@ export default function WonAtomMessages({
               ownedConnections={ownedConnections}
               shouldShowRdf={shouldShowRdf}
               onClick={
-                multiSelectType
-                  ? () => selectMessage(get(msg, "uri"))
-                  : undefined
+                multiSelectType ? () => selectMessage(getUri(msg)) : undefined
               }
             />
           );
@@ -731,7 +730,7 @@ export default function WonAtomMessages({
       agreementMessageArray.map((msg, index) => {
         return (
           <WonConnectionMessage
-            key={get(msg, "uri") + "-" + index}
+            key={getUri(msg) + "-" + index}
             message={msg}
             connection={connection}
             senderAtom={senderAtom}
@@ -741,7 +740,7 @@ export default function WonAtomMessages({
             ownedConnections={ownedConnections}
             shouldShowRdf={shouldShowRdf}
             onClick={
-              multiSelectType ? () => selectMessage(get(msg, "uri")) : undefined
+              multiSelectType ? () => selectMessage(getUri(msg)) : undefined
             }
           />
         );
@@ -752,7 +751,7 @@ export default function WonAtomMessages({
       cancellationPendingMessageArray.map((msg, index) => {
         return (
           <WonConnectionMessage
-            key={get(msg, "uri") + "-" + index}
+            key={getUri(msg) + "-" + index}
             message={msg}
             connection={connection}
             senderAtom={senderAtom}
@@ -762,7 +761,7 @@ export default function WonAtomMessages({
             ownedConnections={ownedConnections}
             shouldShowRdf={shouldShowRdf}
             onClick={
-              multiSelectType ? () => selectMessage(get(msg, "uri")) : undefined
+              multiSelectType ? () => selectMessage(getUri(msg)) : undefined
             }
           />
         );
@@ -773,7 +772,7 @@ export default function WonAtomMessages({
       proposalMessageArray.map((msg, index) => {
         return (
           <WonConnectionMessage
-            key={get(msg, "uri") + "-" + index}
+            key={getUri(msg) + "-" + index}
             message={msg}
             connection={connection}
             senderAtom={senderAtom}
@@ -783,7 +782,7 @@ export default function WonAtomMessages({
             ownedConnections={ownedConnections}
             shouldShowRdf={shouldShowRdf}
             onClick={
-              multiSelectType ? () => selectMessage(get(msg, "uri")) : undefined
+              multiSelectType ? () => selectMessage(getUri(msg)) : undefined
             }
           />
         );

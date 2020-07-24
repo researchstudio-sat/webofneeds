@@ -21,7 +21,7 @@ import * as accountUtils from "../redux/utils/account-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as stateStore from "../redux/state-store.js";
 import * as ownerApi from "../api/owner-api.js";
-import { get, extractAtomUriBySocketUri } from "../utils.js";
+import { getUri, extractAtomUriBySocketUri } from "../utils.js";
 import { ensureLoggedIn } from "./account-actions.js";
 
 export function fetchUnloadedAtom(atomUri) {
@@ -118,7 +118,7 @@ export function close(atomUri) {
 
         //Close all the open connections of the atom
         atomUtils.getConnectedConnections(atom).map(conn => {
-          dispatch(actionCreators.connections__close(get(conn, "uri")));
+          dispatch(actionCreators.connections__close(getUri(conn)));
         });
       })
       .then(() =>

@@ -1,13 +1,13 @@
 import { parseAtom, parseMetaAtom } from "./parse-atom.js";
 import Immutable from "immutable";
-import { get, getIn } from "../../utils.js";
+import { get, getIn, getUri } from "../../utils.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import vocab from "../../service/vocab.js";
 
 export function addAtom(allAtomsInState, jsonldAtom) {
   let parsedAtom = parseAtom(jsonldAtom);
-  const parsedAtomUri = get(parsedAtom, "uri");
+  const parsedAtomUri = getUri(parsedAtom);
 
   if (parsedAtomUri) {
     let existingAtom = get(allAtomsInState, parsedAtomUri);
@@ -92,7 +92,7 @@ export function addMetaAtomStubs(allAtomsInState, metaAtoms) {
 function addMetaAtomStub(allAtomsInState, metaAtom) {
   const parsedMetaAtom = parseMetaAtom(metaAtom);
 
-  const parsedAtomUri = get(parsedMetaAtom, "uri");
+  const parsedAtomUri = getUri(parsedMetaAtom);
 
   if (
     parsedAtomUri &&

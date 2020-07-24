@@ -4,7 +4,7 @@ import { actionCreators } from "../actions/actions.js";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
 
-import { sortBy, get, generateLink } from "../utils.js";
+import { sortBy, get, getUri, generateLink } from "../utils.js";
 import vocab from "../service/vocab.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
@@ -43,7 +43,7 @@ export default function WonSocketAddAtom({
 }) {
   const dispatch = useDispatch();
   const history = useHistory();
-  const addToAtomUri = get(addToAtom, "uri");
+  const addToAtomUri = getUri(addToAtom);
   const addToAtomSocketUri = atomUtils.getSocketUri(addToAtom, addToSocketType);
   const isAddToAtomOwned = accountUtils.isAtomOwned(accountState, addToAtomUri);
   const externalDataState = useSelector(generalSelectors.getExternalDataState);
@@ -144,7 +144,7 @@ export default function WonSocketAddAtom({
     });
 
   function selectAtom(selectedAtom) {
-    const selectedAtomUri = get(selectedAtom, "uri");
+    const selectedAtomUri = getUri(selectedAtom);
     const isSelectedAtomOwned = accountUtils.isAtomOwned(
       accountState,
       selectedAtomUri
@@ -340,7 +340,7 @@ export default function WonSocketAddAtom({
         {sortedPossibleAtomsArray &&
           sortedPossibleAtomsArray.map((atom, index) => (
             <WonAtomHeader
-              key={get(atom, "uri") + "-" + index}
+              key={getUri(atom) + "-" + index}
               atom={atom}
               hideTimestamp={true}
               onClick={() => selectAtom(atom)}

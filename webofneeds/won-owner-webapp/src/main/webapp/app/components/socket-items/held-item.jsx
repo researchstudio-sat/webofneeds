@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { get } from "../../utils";
+import { getUri } from "../../utils";
 import VisibilitySensor from "react-visibility-sensor";
 import * as connectionUtils from "../../redux/utils/connection-utils";
 import { actionCreators } from "../../actions/actions";
@@ -24,7 +24,7 @@ export default function WonHeldItem({
       setTimeout(() => {
         dispatch(
           actionCreators.connections__markAsRead({
-            connectionUri: get(conn, "uri"),
+            connectionUri: getUri(conn),
           })
         );
       }, 1500);
@@ -32,11 +32,11 @@ export default function WonHeldItem({
   }
 
   const visibleAtom = flip ? atom : targetAtom;
-  const visibleAtomUri = get(visibleAtom, "uri");
+  const visibleAtomUri = getUri(visibleAtom);
 
   return (
     <VisibilitySensor
-      key={get(connection, "uri")}
+      key={getUri(connection)}
       onChange={isVisible => {
         isVisible &&
           connectionUtils.isUnread(connection) &&

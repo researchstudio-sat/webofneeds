@@ -5,6 +5,7 @@ import { actionCreators } from "~/app/actions/actions";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import {
   get,
+  getUri,
   getQueryParams,
   extractAtomUriFromConnectionUri,
 } from "../../utils.js";
@@ -41,7 +42,7 @@ export default function PageConnections() {
     generalSelectors.getOwnedAtomByConnectionUri(selectedConnectionUri)
   );
   const atomUri =
-    get(atom, "uri") || extractAtomUriFromConnectionUri(selectedConnectionUri);
+    getUri(atom) || extractAtomUriFromConnectionUri(selectedConnectionUri);
   const isAtomFetchNecessary = processUtils.isAtomFetchNecessary(
     processState,
     atomUri,

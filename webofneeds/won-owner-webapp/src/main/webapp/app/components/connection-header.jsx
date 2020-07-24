@@ -9,6 +9,7 @@ import PropTypes from "prop-types";
 import VisibilitySensor from "react-visibility-sensor";
 import {
   get,
+  getUri,
   generateLink,
   extractAtomUriFromConnectionUri,
 } from "../utils.js";
@@ -45,7 +46,7 @@ export default function WonConnectionHeader({
   hideTimestamp,
   hideMessageIndicator,
 }) {
-  const connectionUri = get(connection, "uri");
+  const connectionUri = getUri(connection);
   const history = useHistory();
   const dispatch = useDispatch();
 
@@ -88,8 +89,8 @@ export default function WonConnectionHeader({
     isTargetAtomFetchNecessary ||
     isTargetHolderFetchNecessary ||
     !senderAtom ||
-    processUtils.isAtomLoading(processState, get(senderAtom, "uri")) ||
-    processUtils.isConnectionLoading(processState, get(connection, "uri"));
+    processUtils.isAtomLoading(processState, getUri(senderAtom)) ||
+    processUtils.isConnectionLoading(processState, getUri(connection));
 
   function selectMembersTab() {
     history.push(
@@ -174,9 +175,7 @@ export default function WonConnectionHeader({
     );
 
     let headerRightContent;
-    if (
-      processUtils.hasAtomFailedToLoad(processState, get(targetAtom, "uri"))
-    ) {
+    if (processUtils.hasAtomFailedToLoad(processState, getUri(targetAtom))) {
       headerRightContent = (
         <React.Fragment>
           <div className="ch__right__topline">

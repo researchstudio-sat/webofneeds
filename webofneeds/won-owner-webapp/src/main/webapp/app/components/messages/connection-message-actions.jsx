@@ -1,7 +1,7 @@
 import React from "react";
 import Immutable from "immutable";
 import PropTypes from "prop-types";
-import { get } from "../../utils.js";
+import { get, getUri } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { useDispatch } from "react-redux";
 
@@ -36,10 +36,10 @@ export default function WonConnectionMessageActions({ message, connection }) {
       actionCreators.connections__sendChatMessage(
         undefined,
         undefined,
-        new Map().set(type, Immutable.Map().set(get(message, "uri"), message)),
+        new Map().set(type, Immutable.Map().set(getUri(message), message)),
         senderSocketUri,
         targetSocketUri,
-        get(connection, "uri"),
+        getUri(connection),
         false
       )
     );

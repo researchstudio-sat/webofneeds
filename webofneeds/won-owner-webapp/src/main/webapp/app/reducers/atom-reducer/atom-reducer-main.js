@@ -7,6 +7,7 @@ import vocab from "../../service/vocab.js";
 import {
   get,
   getIn,
+  getUri,
   msStringToDate,
   extractAtomUriBySocketUri,
 } from "../../utils.js";
@@ -77,7 +78,7 @@ export default function(allAtomsInState = initialState, action = {}) {
     }
 
     case actionTypes.atoms.storeUriInLoading: {
-      return addAtomStub(allAtomsInState, action.payload.get("uri"));
+      return addAtomStub(allAtomsInState, getUri(action.payload));
     }
 
     case actionTypes.atoms.store: {
@@ -119,7 +120,7 @@ export default function(allAtomsInState = initialState, action = {}) {
 
     case actionTypes.atoms.removeDeleted:
     case actionTypes.atoms.delete:
-      return deleteAtom(allAtomsInState, action.payload.get("uri"));
+      return deleteAtom(allAtomsInState, getUri(action.payload));
 
     case actionTypes.atoms.edit: {
       console.debug(
@@ -220,7 +221,7 @@ export default function(allAtomsInState = initialState, action = {}) {
       if (affectedConnection) {
         const cnctStateUpdated = changeConnectionStateByFun(
           allAtomsInState,
-          get(affectedConnection, "uri"),
+          getUri(affectedConnection),
           state => {
             if (!state) return vocab.WON.RequestSent; //fallback if no state present
             if (state === vocab.WON.Connected) return vocab.WON.Connected; //stay in connected if it was already the case
@@ -329,7 +330,7 @@ export default function(allAtomsInState = initialState, action = {}) {
         // connection was established from scratch without having a
         // connection uri. now that we have the uri, we can store it
         // (see connectAdHoc)
-        const atomUri = tmpAtom.get("uri");
+        const atomUri = getUri(tmpAtom);
         const properConnection = tmpConnection
           .delete("usingTemporaryUri")
           .set("uri", connUri);
@@ -378,7 +379,7 @@ export default function(allAtomsInState = initialState, action = {}) {
 
           if (message) {
             allAtomsInState = allAtomsInState.setIn(
-              [get(atomByConnectionUri, "uri"), "connections", connUri],
+              [getUri(atomByConnectionUri), "connections", connUri],
               connection.set(
                 "messages",
                 messages
@@ -412,7 +413,7 @@ export default function(allAtomsInState = initialState, action = {}) {
         // connection was established from scratch without having a
         // connection uri. now that we have the uri, we can store it
         // (see connectAdHoc)
-        const atomUri = tmpAtom.get("uri");
+        const atomUri = getUri(tmpAtom);
         const properConnection = tmpConnection
           .delete("usingTemporaryUri")
           .set("uri", connUri);
@@ -456,7 +457,7 @@ export default function(allAtomsInState = initialState, action = {}) {
 
           if (message) {
             allAtomsInState = allAtomsInState.setIn(
-              [get(atomByConnectionUri, "uri"), "connections", connUri],
+              [getUri(atomByConnectionUri), "connections", connUri],
               connection.set(
                 "messages",
                 messages
@@ -498,14 +499,14 @@ export default function(allAtomsInState = initialState, action = {}) {
       if (senderConnection) {
         allAtomsInState = changeConnectionState(
           allAtomsInState,
-          get(senderConnection, "uri"),
+          getUri(senderConnection),
           vocab.WON.Closed
         );
       }
       if (targetConnection) {
         allAtomsInState = changeConnectionState(
           allAtomsInState,
-          get(targetConnection, "uri"),
+          getUri(targetConnection),
           vocab.WON.Closed
         );
       }
@@ -739,7 +740,7 @@ export default function(allAtomsInState = initialState, action = {}) {
         return allAtomsInState;
       }
 
-      const connectionUri = get(affectedConnection, "uri");
+      const connectionUri = getUri(affectedConnection);
 
       // we want to use the response date to update the original message
       // date
@@ -820,7 +821,7 @@ export default function(allAtomsInState = initialState, action = {}) {
         return allAtomsInState;
       }
 
-      const connectionUri = get(affectedConnection, "uri");
+      const connectionUri = getUri(affectedConnection);
 
       const messages = connectionUtils.getMessages(affectedConnection);
       const message = connectionUtils.getMessage(

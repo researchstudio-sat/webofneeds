@@ -2,7 +2,7 @@ import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { actionCreators } from "../../actions/actions.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
-import { get, sortByDate } from "../../utils.js";
+import { get, getUri, sortByDate } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
@@ -93,9 +93,9 @@ export default function PageInventory() {
             <div className="ownerinventory__personas">
               {sortedOwnedActivePersonas.map((persona, index) => (
                 <WonAtomInfo
-                  key={get(persona, "uri") + "-" + index}
+                  key={getUri(persona) + "-" + index}
                   className="ownerinventory__personas__persona"
-                  atomUri={get(persona, "uri")}
+                  atomUri={getUri(persona)}
                   atom={persona}
                   initialTab={vocab.HOLD.HolderSocketCompacted}
                 />

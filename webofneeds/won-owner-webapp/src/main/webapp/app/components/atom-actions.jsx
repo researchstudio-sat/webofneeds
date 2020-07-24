@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { useSelector, useDispatch } from "react-redux";
-import { get, extractAtomUriFromConnectionUri } from "../utils.js";
+import { get, getUri, extractAtomUriFromConnectionUri } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import vocab from "../service/vocab";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
@@ -31,7 +31,7 @@ export default function WonAtomActions({
   className,
 }) {
   const dispatch = useDispatch();
-  const atomUri = get(atom, "uri");
+  const atomUri = getUri(atom);
 
   const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
 
@@ -78,7 +78,7 @@ export default function WonAtomActions({
         );
         const senderAtom = get(
           storedAtoms,
-          extractAtomUriFromConnectionUri(get(ownedConnection, "uri"))
+          extractAtomUriFromConnectionUri(getUri(ownedConnection))
         );
 
         const senderSocketType = atomUtils.getSocketType(
@@ -90,7 +90,7 @@ export default function WonAtomActions({
           get(ownedConnection, "targetSocketUri")
         );
 
-        const isViewOfTargetAtom = get(targetAtom, "uri") === atomUri;
+        const isViewOfTargetAtom = getUri(targetAtom) === atomUri;
 
         let ActionComponent;
 

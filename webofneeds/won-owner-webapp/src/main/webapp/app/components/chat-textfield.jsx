@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
-import { get, getIn } from "../utils.js";
+import { get, getIn, getUri } from "../utils.js";
 
 import WonLabelledHr from "./labelled-hr.jsx";
 import WonPublishButton from "./publish-button.jsx";
@@ -44,7 +44,7 @@ export default function ChatTextfield({
     referencedContent: new Map(),
   });
 
-  const connectionUri = get(connection, "uri");
+  const connectionUri = getUri(connection);
 
   const atom = useSelector(
     generalSelectors.getOwnedAtomByConnectionUri(connectionUri)
@@ -157,9 +157,9 @@ export default function ChatTextfield({
       referencedContent.forEach(msg => {
         dispatch(
           actionCreators.messages__viewState__markAsSelected({
-            messageUri: get(msg, "uri"),
+            messageUri: getUri(msg),
             connectionUri: connectionUri,
-            atomUri: get(atom, "uri"),
+            atomUri: getUri(atom),
             isSelected: true,
           })
         );
@@ -343,9 +343,9 @@ export default function ChatTextfield({
                 onClick={() =>
                   dispatch(
                     actionCreators.messages__viewState__markAsSelected({
-                      messageUri: get(msg, "uri"),
+                      messageUri: getUri(msg),
                       connectionUri: connectionUri,
-                      atomUri: get(atom, "uri"),
+                      atomUri: getUri(atom),
                       isSelected: false,
                     })
                   )

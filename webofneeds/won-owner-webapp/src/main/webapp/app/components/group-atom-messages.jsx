@@ -5,7 +5,12 @@ import { useDispatch, useSelector } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as messageUtils from "../redux/utils/message-utils";
 import { rdfTextfieldHelpText } from "../won-label-utils.js";
-import { get, generateLink, extractAtomUriFromConnectionUri } from "../utils";
+import {
+  get,
+  getUri,
+  generateLink,
+  extractAtomUriFromConnectionUri,
+} from "../utils";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import vocab from "../service/vocab.js";
@@ -43,13 +48,13 @@ export default function WonGroupAtomMessages({
   });
   const [snapBottom, setSnapBottom] = useState(true);
 
-  const connectionUri = get(connection, "uri");
+  const connectionUri = getUri(connection);
   const allAtoms = useSelector(generalSelectors.getAtoms);
   const ownedConnections = useSelector(getOwnedConnections);
   const senderAtom = useSelector(
     generalSelectors.getOwnedAtomByConnectionUri(connectionUri)
   );
-  const senderAtomUri = get(senderAtom, "uri");
+  const senderAtomUri = getUri(senderAtom);
   const targetAtomUri = connectionUtils.getTargetAtomUri(connection);
   const targetAtom = useSelector(generalSelectors.getAtom(targetAtomUri));
   const allChatMessages = connectionUtils.getMessages(connection);
@@ -309,7 +314,7 @@ export default function WonGroupAtomMessages({
           history.location,
           {
             postUri: connectionUtils.getTargetAtomUri(connection),
-            connectionUri: get(connection, "uri"),
+            connectionUri: getUri(connection),
             tab: undefined,
           },
           "/post"

@@ -7,6 +7,7 @@ import {
   extractAtomUriFromConnectionUri,
   generateLink,
   get,
+  getUri,
 } from "../../utils";
 import vocab from "../../service/vocab";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
@@ -24,7 +25,7 @@ export default function WonBuddySocketActions({ connection, goBackOnAction }) {
   const dispatch = useDispatch();
   const history = useHistory();
   const connectionState = get(connection, "state");
-  const connectionUri = get(connection, "uri");
+  const connectionUri = getUri(connection);
 
   const senderAtom = useSelector(
     generalSelectors.getAtom(extractAtomUriFromConnectionUri(connectionUri))
@@ -163,8 +164,8 @@ export default function WonBuddySocketActions({ connection, goBackOnAction }) {
       ? generateLink(
           history.location,
           {
-            postUri: get(senderAtom, "uri"),
-            connectionUri: get(chatConnection, "uri"),
+            postUri: getUri(senderAtom),
+            connectionUri: getUri(chatConnection),
           },
           "/connections"
         )

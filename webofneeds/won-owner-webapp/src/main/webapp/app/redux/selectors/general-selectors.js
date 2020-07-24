@@ -4,7 +4,12 @@
 
 import { createSelector } from "reselect";
 
-import { getIn, get, extractAtomUriFromConnectionUri } from "../../utils.js";
+import {
+  getIn,
+  get,
+  getUri,
+  extractAtomUriFromConnectionUri,
+} from "../../utils.js";
 import * as atomUtils from "../utils/atom-utils.js";
 import * as connectionUtils from "../utils/connection-utils.js";
 import * as accountUtils from "../utils/account-utils.js";
@@ -137,10 +142,7 @@ export const getConnectionsOfAtomWithOwnedTargetConnections = atomUri =>
     getAccountState,
     getAtom(atomUri),
     (state, accountState, atom) => {
-      const isAtomOwned = accountUtils.isAtomOwned(
-        accountState,
-        get(atom, "uri")
-      );
+      const isAtomOwned = accountUtils.isAtomOwned(accountState, getUri(atom));
 
       return atomUtils
         .getSockets(atom)
@@ -249,7 +251,7 @@ export const hasUnreadBuddyConnections = (excludeClosed, excludeSuggested) =>
         .find(
           atom =>
             !!getBuddyConnectionsByAtomUri(
-              get(atom, "uri"),
+              getUri(atom),
               excludeClosed,
               excludeSuggested
             )(state).find(conn => connectionUtils.isUnread(conn))
@@ -404,7 +406,7 @@ export const getCurrentLocation = createSelector(
 );
 
 export const getSenderSocketType = (allAtoms, connection) => {
-  const connectionUri = get(connection, "uri");
+  const connectionUri = getUri(connection);
   const senderSocketUri = get(connection, "socketUri");
   const senderAtom =
     connectionUri &&

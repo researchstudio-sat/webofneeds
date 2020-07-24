@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
-import { get, getIn, getPathname } from "../utils.js";
+import { get, getUri, getIn, getPathname } from "../utils.js";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
@@ -60,7 +60,7 @@ export default function WonTopnav({ pageTitle }) {
         .map(conn => {
           dispatch(
             actionCreators.connections__showLatestMessages(
-              get(conn, "uri"),
+              getUri(conn),
               MESSAGECOUNT
             )
           );

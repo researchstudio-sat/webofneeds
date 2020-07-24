@@ -2,7 +2,7 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import { get, generateLink } from "../../utils.js";
+import { get, getUri, generateLink } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
@@ -34,7 +34,7 @@ export default function WonBuddyItem({
       setTimeout(() => {
         dispatch(
           actionCreators.connections__markAsRead({
-            connectionUri: get(conn, "uri"),
+            connectionUri: getUri(conn),
           })
         );
       }, 1500);
@@ -93,8 +93,8 @@ export default function WonBuddyItem({
             toLink={generateLink(
               history.location,
               {
-                postUri: flip ? get(atom, "uri") : get(targetAtom, "uri"),
-                connectionUri: get(connection, "uri"),
+                postUri: flip ? getUri(atom) : getUri(targetAtom),
+                connectionUri: getUri(connection),
                 tab: undefined,
               },
               "/post"

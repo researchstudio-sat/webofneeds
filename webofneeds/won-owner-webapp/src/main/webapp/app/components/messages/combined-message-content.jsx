@@ -9,7 +9,7 @@ import * as atomUtils from "../../redux/utils/atom-utils.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import * as messageUtils from "../../redux/utils/message-utils.js";
 import * as wonLabelUtils from "../../won-label-utils.js";
-import { get, getIn, generateLink } from "../../utils.js";
+import { get, getUri, getIn, generateLink } from "../../utils.js";
 import vocab from "../../service/vocab.js";
 import WonMessageContent from "./message-content.jsx";
 import WonAtomIcon from "../atom-icon.jsx";
@@ -75,7 +75,7 @@ export default function WonCombinedMessageContent({
   const isConnectionMessage = messageType === vocab.WONMSG.connectionMessage;
 
   function getAgreementHeaderLabel() {
-    const messageUri = get(message, "uri");
+    const messageUri = getUri(message);
     //TODO: integrate agreed message cases
     if (hasClaims && hasProposes) {
       if (agreementData) {

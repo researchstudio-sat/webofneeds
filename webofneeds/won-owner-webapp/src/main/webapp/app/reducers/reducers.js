@@ -4,6 +4,7 @@
 
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
+import { getUri } from "../utils.js";
 import { messagesReducer } from "./message-reducers.js";
 import reduceReducers from "reduce-reducers";
 import externalDataReducer from "./external-data-reducer.js";
@@ -98,7 +99,7 @@ const reducers = {
 
       case actionTypes.atoms.removeDeleted:
       case actionTypes.atoms.delete: {
-        const atomUri = action.payload.get("uri");
+        const atomUri = getUri(action.payload);
         const whatsAroundUris = owner.get("whatsAroundUris");
         const whatsNewUris = owner.get("whatsNewUris");
 

@@ -8,6 +8,7 @@ import {
   generateFakePersonaName,
   get,
   getIn,
+  getUri,
 } from "../../utils.js";
 import shajs from "sha.js";
 import Identicon from "identicon.js";
@@ -194,7 +195,7 @@ export function parseMetaAtom(metaAtom) {
 
   if (metaAtomImm) {
     let parsedMetaAtom = {
-      uri: get(metaAtomImm, "uri"),
+      uri: getUri(metaAtomImm),
       identiconSvg: undefined,
       nodeUri: undefined,
       state: extractStateFromMeta(get(metaAtomImm, "state")),
@@ -225,13 +226,13 @@ export function parseMetaAtom(metaAtom) {
         get(metaAtomImm, "creationDate") &&
         new Date(get(metaAtomImm, "creationDate")),
       humanReadable: undefined,
-      fakePersonaName: generateFakePersonaName(get(metaAtomImm, "uri")),
+      fakePersonaName: generateFakePersonaName(getUri(metaAtomImm)),
       matchedUseCase: {
         identifier: undefined,
         icon: undefined,
         reactions: undefined,
       },
-      background: generateBackground(get(metaAtomImm, "uri")),
+      background: generateBackground(getUri(metaAtomImm)),
       unread: false,
       isBeingCreated: false,
       connections: Immutable.Map(),

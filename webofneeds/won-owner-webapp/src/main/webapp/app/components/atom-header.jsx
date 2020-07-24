@@ -3,7 +3,7 @@
  */
 import React from "react";
 import { Link } from "react-router-dom";
-import { get } from "../utils.js";
+import { get, getUri } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { relativeTime } from "../won-label-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
@@ -24,7 +24,7 @@ export default function WonAtomHeader({
   className,
 }) {
   const dispatch = useDispatch();
-  const atomUri = get(atom, "uri");
+  const atomUri = getUri(atom);
 
   const holderUri = atomUtils.getHeldByUri(atom);
   const externalDataState = useSelector(generalSelectors.getExternalDataState);

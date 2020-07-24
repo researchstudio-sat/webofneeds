@@ -4,7 +4,7 @@
 
 import React from "react";
 import WonAtomCard from "./atom-card.jsx";
-import { get, generateLink } from "../utils.js";
+import { getUri, generateLink } from "../utils.js";
 import PropTypes from "prop-types";
 
 import ico32_buddy_add from "~/images/won-icons/ico32_buddy_add.svg";
@@ -25,8 +25,8 @@ export default function WonAtomCardGrid({
     atoms.map(atom => {
       return (
         <WonAtomCard
-          key={get(atom, "uri")}
-          atomUri={get(atom, "uri")}
+          key={getUri(atom)}
+          atomUri={getUri(atom)}
           atom={atom}
           showHolder={showHolder}
           showIndicators={showIndicators}

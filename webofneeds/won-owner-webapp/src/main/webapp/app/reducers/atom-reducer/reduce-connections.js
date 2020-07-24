@@ -3,7 +3,12 @@ import { markUriAsRead } from "../../won-localstorage.js";
 
 import { markAtomAsRead } from "./reduce-atoms.js";
 import { sortByMessageTimeStamp } from "./reduce-messages.js";
-import { getIn, get, extractAtomUriFromConnectionUri } from "../../utils.js";
+import {
+  getIn,
+  get,
+  getUri,
+  extractAtomUriFromConnectionUri,
+} from "../../utils.js";
 import * as connectionUtils from "../../redux/utils/connection-utils";
 import { addAtomStub } from "./reduce-atoms";
 
@@ -32,20 +37,21 @@ function addConnectionFull(atomState, connection) {
     const atom = get(atomState, atomUri);
 
     if (atom) {
-      const connectionUri = getIn(parsedConnection, ["data", "uri"]);
+      const parsedConnectionData = get(parsedConnection, "data");
+      const connectionUri = getUri(parsedConnectionData);
 
-      if (connectionUtils.isUnread(get(parsedConnection, "data"))) {
+      if (connectionUtils.isUnread(parsedConnectionData)) {
         //If there is a new message for the connection we will set the connection to newConnection
         atomState = atomState.setIn(
           [atomUri, "lastUpdateDate"],
-          getIn(parsedConnection, ["data", "lastUpdateDate"])
+          get(parsedConnectionData, "lastUpdateDate")
         );
         atomState = atomState.setIn([atomUri, "unread"], true);
       }
 
       return atomState.mergeDeepIn(
         [atomUri, "connections", connectionUri],
-        get(parsedConnection, "data")
+        parsedConnectionData
       );
     } else {
       console.error(
@@ -106,14 +112,14 @@ export function markConnectionAsRated(allAtomsInState, connectionUri) {
       "No connection with connectionUri: <",
       connectionUri,
       "> found within atomUri: <",
-      get(atom, "uri"),
+      getUri(atom),
       ">"
     );
     return allAtomsInState;
   }
 
   return allAtomsInState.setIn(
-    [get(atom, "uri"), "connections", connectionUri, "isRated"],
+    [getUri(atom), "connections", connectionUri, "isRated"],
     true
   );
 }
@@ -149,7 +155,7 @@ export function changeConnectionState(
     return allAtomsInState;
   }
 
-  const atomUri = get(atom, "uri");
+  const atomUri = getUri(atom);
 
   return allAtomsInState
     .setIn([atomUri, "connections", connectionUri, "state"], newState)
@@ -172,7 +178,7 @@ export function changeConnectionStateByFun(
     return allAtomsInState;
   }
 
-  const atomUri = get(atom, "uri");
+  const atomUri = getUri(atom);
   const connectionState = getIn(allAtomsInState, [
     atomUri,
     "connections",
@@ -203,7 +209,7 @@ export function updatePetriNetStateData(
     return allAtomsInState;
   }
 
-  const atomUri = get(atom, "uri");
+  const atomUri = getUri(atom);
 
   return allAtomsInState.setIn(
     [atomUri, "connections", connectionUri, "petriNetData"],
@@ -226,7 +232,7 @@ export function updateAgreementStateData(
     );
     return allAtomsInState;
   }
-  const atomUri = get(atom, "uri");
+  const atomUri = getUri(atom);
 
   return allAtomsInState.setIn(
     [atomUri, "connections", connectionUri, "agreementData"],
@@ -249,7 +255,7 @@ export function updateAgreementStateDataset(
     );
     return allAtomsInState;
   }
-  const atomUri = get(atom, "uri");
+  const atomUri = getUri(atom);
 
   return allAtomsInState.setIn(
     [atomUri, "connections", connectionUri, "agreementDataset"],
@@ -273,7 +279,7 @@ export function setShowAgreementData(
     return allAtomsInState;
   }
 
-  const atomUri = get(atom, "uri");
+  const atomUri = getUri(atom);
 
   return allAtomsInState.setIn(
     [atomUri, "connections", connectionUri, "showAgreementData"],
@@ -297,7 +303,7 @@ export function setShowPetriNetData(
     return allAtomsInState;
   }
 
-  const atomUri = get(atom, "uri");
+  const atomUri = getUri(atom);
 
   return allAtomsInState.setIn(
     [atomUri, "connections", connectionUri, "showPetriNetData"],
@@ -321,7 +327,7 @@ export function setMultiSelectType(
     return allAtomsInState;
   }
 
-  const atomUri = get(atom, "uri");
+  const atomUri = getUri(atom);
 
   let messages = getIn(allAtomsInState, [
     atomUri,
@@ -377,13 +383,14 @@ function addMetaConnection(atomState, atomUri, conn) {
   const parsedMetaConnection = parseConnection(conn);
 
   if (!!storedAtom && !storedConnection && parsedMetaConnection) {
-    const connectionUri = getIn(parsedMetaConnection, ["data", "uri"]);
+    const parsedMetaConnectionData = get(parsedMetaConnection, "data");
+    const connectionUri = getUri(parsedMetaConnectionData);
 
-    if (connectionUtils.isUnread(get(parsedMetaConnection, "data"))) {
+    if (connectionUtils.isUnread(parsedMetaConnectionData)) {
       //If there is a new message for the connection we will set the connection to newConnection
       atomState = atomState.setIn(
         [atomUri, "lastUpdateDate"],
-        getIn(parsedMetaConnection, ["data", "lastUpdateDate"])
+        get(parsedMetaConnectionData, "lastUpdateDate")
       );
       atomState = atomState.setIn([atomUri, "unread"], true);
     }
@@ -393,7 +400,7 @@ function addMetaConnection(atomState, atomUri, conn) {
 
     return atomState.mergeDeepIn(
       [atomUri, "connections", connectionUri],
-      get(parsedMetaConnection, "data")
+      parsedMetaConnectionData
     );
   }
 

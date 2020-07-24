@@ -2,7 +2,7 @@
  * Created by ksinger on 11.08.2016.
  */
 
-import { generateIdString, toAbsoluteURL } from "./utils.js";
+import { generateIdString, toAbsoluteURL, getUri } from "./utils.js";
 
 import { ownerBaseUrl } from "~/config/default.js";
 import qr from "qr-image";
@@ -134,7 +134,7 @@ export function createDocumentDefinitionFromPost(post, externalDataState) {
   }
 
   if (ownerBaseUrl && post) {
-    const path = "#!/post" + `?postUri=${encodeURI(post.get("uri"))}`;
+    const path = "#!/post" + `?postUri=${encodeURI(getUri(post))}`;
     const linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
 
     if (linkToPost) {

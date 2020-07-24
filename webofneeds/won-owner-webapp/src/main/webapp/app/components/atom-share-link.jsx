@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
-import { get, toAbsoluteURL } from "../utils.js";
+import { getUri, toAbsoluteURL } from "../utils.js";
 import { ownerBaseUrl } from "~/config/default.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as wonUtils from "../won-utils.js";
@@ -15,7 +15,7 @@ import ico16_checkmark from "~/images/won-icons/ico16_checkmark.svg";
 export default function WonAtomShareLink({ atom, className }) {
   const [showLink, setShowLink] = useState(true);
   const [copied, setCopied] = useState(false);
-  const atomUri = get(atom, "uri");
+  const atomUri = getUri(atom);
   let linkToPost;
   if (ownerBaseUrl && atom) {
     const path = "#!/post" + `?postUri=${encodeURI(atomUri)}`;

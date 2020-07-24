@@ -5,6 +5,7 @@ import { actionCreators } from "../actions/actions.js";
 import { useSelector, useDispatch } from "react-redux";
 import {
   get,
+  getUri,
   getQueryParams,
   extractAtomUriFromConnectionUri,
 } from "../utils.js";
@@ -46,7 +47,7 @@ export default function WonAtomContent({
 }) {
   const history = useHistory();
   const dispatch = useDispatch();
-  const atomUri = get(atom, "uri");
+  const atomUri = getUri(atom);
   const { connectionUri } = getQueryParams(history.location);
   const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
 
@@ -434,13 +435,13 @@ function WonAtomContentSingleConnectSockets({
             default:
               contentElements.push(
                 <WonGenericItem
-                  key={get(conn, "uri")}
+                  key={getUri(conn)}
                   connection={conn}
                   atom={
                     isOwned
                       ? get(
                           storedAtoms,
-                          extractAtomUriFromConnectionUri(get(conn, "uri"))
+                          extractAtomUriFromConnectionUri(getUri(conn))
                         )
                       : atom
                   }

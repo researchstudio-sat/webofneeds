@@ -4,7 +4,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import Immutable from "immutable";
-import { get, generateLink } from "../utils.js";
+import { get, getUri, generateLink } from "../utils.js";
 
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
@@ -53,7 +53,7 @@ export default function WonAtomConnectionsIndicator({ atom, socketType }) {
       get(connection, "socketUri")
     );
 
-    const atomUri = get(atom, "uri");
+    const atomUri = getUri(atom);
 
     history.push(
       generateLink(
@@ -80,8 +80,8 @@ export default function WonAtomConnectionsIndicator({ atom, socketType }) {
       generateLink(
         history.location,
         {
-          postUri: get(atom, "uri"),
-          connectionUri: get(connection, "uri"),
+          postUri: getUri(atom),
+          connectionUri: getUri(connection),
         },
         "/connections",
         false

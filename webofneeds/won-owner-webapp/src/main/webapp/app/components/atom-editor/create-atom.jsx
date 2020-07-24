@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import PropTypes from "prop-types";
-import { get, getIn, generateLink } from "../../utils.js";
+import { get, getIn, getUri, generateLink } from "../../utils.js";
 import vocab from "../../service/vocab";
 
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
@@ -125,7 +125,7 @@ export default function WonCreateAtom({
   const loggedIn = accountUtils.isLoggedIn(accountState);
 
   const isFromAtomUsableAsTemplate = useSelector(
-    generalSelectors.isAtomUsableAsTemplate(get(fromAtom, "uri"))
+    generalSelectors.isAtomUsableAsTemplate(getUri(fromAtom))
   );
 
   const ownedPersonas = useSelector(generalSelectors.getOwnedPersonas);
@@ -174,7 +174,7 @@ export default function WonCreateAtom({
 
     if (connect) {
       executeFunction = () => {
-        const fromAtomUri = get(fromAtom, "uri");
+        const fromAtomUri = getUri(fromAtom);
 
         dispatch(
           actionCreators.connections__connectReactionAtom(
