@@ -573,8 +573,8 @@ export function connectionsClose(connectionUri) {
     );
 
     const connection = atomUtils.getConnection(ownedAtom, connectionUri);
-    const socketUri = get(connection, "socketUri");
-    const targetSocketUri = get(connection, "targetSocketUri");
+    const socketUri = connectionUtils.getSocketUri(connection);
+    const targetSocketUri = connectionUtils.getTargetSocketUri(connection);
 
     buildCloseMessage(socketUri, targetSocketUri)
       .then(message => ownerApi.sendMessage(message))

@@ -75,8 +75,8 @@ export default function WonParticipantSocketActions({
       );
     }
 
-    const senderSocketUri = get(connection, "socketUri");
-    const targetSocketUri = get(connection, "targetSocketUri");
+    const senderSocketUri = connectionUtils.getSocketUri(connection);
+    const targetSocketUri = connectionUtils.getTargetSocketUri(connection);
     dispatch(
       actionCreators.atoms__connectSockets(
         senderSocketUri,
@@ -101,8 +101,10 @@ export default function WonParticipantSocketActions({
         {
           caption: "Yes",
           callback: () => {
-            const senderSocketUri = get(connection, "socketUri");
-            const targetSocketUri = get(connection, "targetSocketUri");
+            const senderSocketUri = connectionUtils.getSocketUri(connection);
+            const targetSocketUri = connectionUtils.getTargetSocketUri(
+              connection
+            );
 
             if (connectionUtils.isUnread(connection)) {
               dispatch(

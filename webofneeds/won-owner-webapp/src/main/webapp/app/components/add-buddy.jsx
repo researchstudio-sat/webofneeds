@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import vocab from "../service/vocab.js";
 import { useSelector, useDispatch } from "react-redux";
-import { get, getUri } from "../utils.js";
+import { getUri } from "../utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
@@ -150,7 +150,9 @@ export default function WonAddBuddy({ atom, className }) {
     ownedAtomsWithBuddySocketArray.map(buddyAtom => {
       const existingBuddyConnection = atomUtils
         .getConnections(buddyAtom, vocab.BUDDY.BuddySocketCompacted)
-        .find(conn => get(conn, "targetSocketUri") === targetBuddySocketUri);
+        .find(conn =>
+          connectionUtils.hasTargetSocketUri(conn, targetBuddySocketUri)
+        );
 
       let connectionStateClass;
       let onClickAction = undefined;
@@ -231,7 +233,9 @@ export default function WonAddBuddy({ atom, className }) {
   if (immediateConnectBuddy) {
     const existingBuddyConnection = atomUtils
       .getConnections(immediateConnectBuddy, vocab.BUDDY.BuddySocketCompacted)
-      .find(conn => get(conn, "targetSocketUri") === targetBuddySocketUri);
+      .find(conn =>
+        connectionUtils.hasTargetSocketUri(conn, targetBuddySocketUri)
+      );
 
     let connectionStateClass;
     let onClickAction = undefined;

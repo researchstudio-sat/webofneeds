@@ -731,7 +731,7 @@ export default function(allAtomsInState = initialState, action = {}) {
         atom &&
         atomUtils
           .getConnections(atom)
-          .filter(conn => get(conn, "socketUri") === senderSocketUri)
+          .filter(conn => connectionUtils.hasSocketUri(conn, senderSocketUri))
           .filter(conn => !!connectionUtils.getMessage(conn, messageUri))
           .first();
 

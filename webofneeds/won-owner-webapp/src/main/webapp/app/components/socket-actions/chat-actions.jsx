@@ -71,8 +71,8 @@ export default function WonChatSocketActions({ connection, goBackOnAction }) {
       );
     }
 
-    const senderSocketUri = get(connection, "socketUri");
-    const targetSocketUri = get(connection, "targetSocketUri");
+    const senderSocketUri = connectionUtils.getSocketUri(connection);
+    const targetSocketUri = connectionUtils.getTargetSocketUri(connection);
     dispatch(
       actionCreators.atoms__connectSockets(
         senderSocketUri,
@@ -97,8 +97,10 @@ export default function WonChatSocketActions({ connection, goBackOnAction }) {
         {
           caption: "Yes",
           callback: () => {
-            const senderSocketUri = get(connection, "socketUri");
-            const targetSocketUri = get(connection, "targetSocketUri");
+            const senderSocketUri = connectionUtils.getSocketUri(connection);
+            const targetSocketUri = connectionUtils.getTargetSocketUri(
+              connection
+            );
 
             if (connectionUtils.isUnread(connection)) {
               dispatch(

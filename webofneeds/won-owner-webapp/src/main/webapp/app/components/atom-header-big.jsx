@@ -201,11 +201,11 @@ export default function WonAtomHeaderBig({
         const connectionState = get(ownedConnection, "state");
         const senderSocketType = atomUtils.getSocketType(
           senderAtom,
-          get(ownedConnection, "socketUri")
+          connectionUtils.getSocketUri(ownedConnection)
         );
         const targetSocketType = atomUtils.getSocketType(
           targetAtom,
-          get(ownedConnection, "targetSocketUri")
+          connectionUtils.getTargetSocketUri(ownedConnection)
         );
 
         return (

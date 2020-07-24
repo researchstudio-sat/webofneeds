@@ -43,8 +43,8 @@ export default function WonBuddySocketActions({ connection, goBackOnAction }) {
       );
     }
 
-    const senderSocketUri = get(connection, "socketUri");
-    const targetSocketUri = get(connection, "targetSocketUri");
+    const senderSocketUri = connectionUtils.getSocketUri(connection);
+    const targetSocketUri = connectionUtils.getTargetSocketUri(connection);
     dispatch(
       actionCreators.atoms__connectSockets(senderSocketUri, targetSocketUri)
     );
@@ -61,8 +61,10 @@ export default function WonBuddySocketActions({ connection, goBackOnAction }) {
         {
           caption: "Yes",
           callback: () => {
-            const senderSocketUri = get(connection, "socketUri");
-            const targetSocketUri = get(connection, "targetSocketUri");
+            const senderSocketUri = connectionUtils.getSocketUri(connection);
+            const targetSocketUri = connectionUtils.getTargetSocketUri(
+              connection
+            );
 
             dispatch(
               actionCreators.atoms__connectSockets(

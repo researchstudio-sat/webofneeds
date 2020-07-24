@@ -95,8 +95,10 @@ export default function ChatTextfield({
 
   const multiSelectType = get(connection, "multiSelectType");
   const showAgreementData = get(connection, "showAgreementData");
-  const isChatToGroupConnection =
-    atomUtils.getGroupSocket(targetAtom) === get(connection, "targetSocketUri");
+  const isChatToGroupConnection = connectionUtils.hasTargetSocketUri(
+    connection,
+    atomUtils.getGroupSocket(targetAtom)
+  );
   const isConnected = connectionUtils.isConnected(connection);
   const connectionHasBeenLost = !useSelector(
     generalSelectors.selectIsConnected

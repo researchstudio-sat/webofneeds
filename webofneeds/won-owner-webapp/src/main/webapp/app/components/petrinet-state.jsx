@@ -15,6 +15,7 @@ import PropTypes from "prop-types";
 import "~/style/_petrinet-state.scss";
 import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 import { useHistory } from "react-router-dom";
+import * as connectionUtils from "~/app/redux/utils/connection-utils";
 
 export default function WonPetrinetState({ processUri, className }) {
   const history = useHistory();
@@ -69,8 +70,8 @@ export default function WonPetrinetState({ processUri, className }) {
         processUri
       );
 
-      const senderSocketUri = get(connection, "socketUri");
-      const targetSocketUri = get(connection, "targetSocketUri");
+      const senderSocketUri = connectionUtils.getSocketUri(connection);
+      const targetSocketUri = connectionUtils.getTargetSocketUri(connection);
 
       dispatch(
         actionCreators.connections__sendChatMessageClaimOnSuccess(

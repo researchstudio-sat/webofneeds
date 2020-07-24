@@ -83,11 +83,11 @@ export default function WonAtomActions({
 
         const senderSocketType = atomUtils.getSocketType(
           senderAtom,
-          get(ownedConnection, "socketUri")
+          connectionUtils.getSocketUri(ownedConnection)
         );
         const targetSocketType = atomUtils.getSocketType(
           targetAtom,
-          get(ownedConnection, "targetSocketUri")
+          connectionUtils.getTargetSocketUri(ownedConnection)
         );
 
         const isViewOfTargetAtom = getUri(targetAtom) === atomUri;

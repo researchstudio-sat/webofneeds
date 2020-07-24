@@ -91,7 +91,7 @@ export default function WonAtomContentSocket({
     const connectionsArray = sortByDate(connections) || [];
 
     return connectionsArray.map((conn, index) => {
-      const flip = get(conn, "targetSocketUri") === socketUri;
+      const flip = connectionUtils.hasTargetSocketUri(conn, socketUri);
 
       return (
         <React.Fragment key={getUri(conn) + "-" + index}>

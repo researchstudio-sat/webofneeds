@@ -4,7 +4,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { actionCreators } from "~/app/actions/actions";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import {
-  get,
   getUri,
   getQueryParams,
   extractAtomUriFromConnectionUri,
@@ -92,8 +91,10 @@ export default function PageConnections() {
 
   const isSelectedConnectionGroupChat =
     selectedConnection &&
-    atomUtils.getGroupSocket(selectedTargetAtom) ===
-      get(selectedConnection, "targetSocketUri");
+    connectionUtils.hasTargetSocketUri(
+      selectedConnection,
+      atomUtils.getGroupSocket(selectedTargetAtom)
+    );
   const allChatConnections = useSelector(
     generalSelectors.getAllChatConnections
   );

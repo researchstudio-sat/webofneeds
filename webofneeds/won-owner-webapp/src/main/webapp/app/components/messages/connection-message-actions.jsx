@@ -29,8 +29,8 @@ export default function WonConnectionMessageActions({ message, connection }) {
   const isAcceptable = messageUtils.isMessageAcceptable(connection, message);
 
   function sendActionMessage(type) {
-    const senderSocketUri = get(connection, "socketUri");
-    const targetSocketUri = get(connection, "targetSocketUri");
+    const senderSocketUri = connectionUtils.getSocketUri(connection);
+    const targetSocketUri = connectionUtils.getTargetSocketUri(connection);
 
     dispatch(
       actionCreators.connections__sendChatMessage(

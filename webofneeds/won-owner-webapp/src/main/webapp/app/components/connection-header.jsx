@@ -157,8 +157,10 @@ export default function WonConnectionHeader({
         <WonAtomIcon
           atom={targetAtom}
           flipIcons={
-            atomUtils.getGroupSocket(targetAtom) !==
-            get(connection, "targetSocketUri")
+            !connectionUtils.hasTargetSocketUri(
+              connection,
+              atomUtils.getGroupSocket(targetAtom)
+            )
           }
         />
       </Link>
@@ -167,8 +169,10 @@ export default function WonConnectionHeader({
         <WonAtomIcon
           atom={targetAtom}
           flipIcons={
-            atomUtils.getGroupSocket(targetAtom) !==
-            get(connection, "targetSocketUri")
+            !connectionUtils.hasTargetSocketUri(
+              connection,
+              atomUtils.getGroupSocket(targetAtom)
+            )
           }
         />
       </div>

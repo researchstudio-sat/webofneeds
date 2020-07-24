@@ -260,8 +260,8 @@ export default function WonAtomMessages({
 
     const trimmedMsg = chatMessage.trim();
     if (trimmedMsg || additionalContent || referencedContent) {
-      const senderSocketUri = get(connection, "socketUri");
-      const targetSocketUri = get(connection, "targetSocketUri");
+      const senderSocketUri = connectionUtils.getSocketUri(connection);
+      const targetSocketUri = connectionUtils.getTargetSocketUri(connection);
 
       dispatch(
         actionCreators.connections__sendChatMessage(
@@ -298,8 +298,8 @@ export default function WonAtomMessages({
 
     dispatch(
       actionCreators.atoms__connectSockets(
-        get(connection, "socketUri"),
-        get(connection, "targetSocketUri"),
+        connectionUtils.getSocketUri(connection),
+        connectionUtils.getTargetSocketUri(connection),
         message
       )
     );
@@ -962,8 +962,12 @@ export default function WonAtomMessages({
               allowEmptySubmit={true}
               allowDetails={false}
               onSubmit={({ value }) => {
-                const senderSocketUri = get(connection, "socketUri");
-                const targetSocketUri = get(connection, "targetSocketUri");
+                const senderSocketUri = connectionUtils.getSocketUri(
+                  connection
+                );
+                const targetSocketUri = connectionUtils.getTargetSocketUri(
+                  connection
+                );
                 dispatch(
                   actionCreators.atoms__connectSockets(
                     senderSocketUri,

@@ -339,7 +339,7 @@ export function addMessage(
                 allAtomsInState,
                 getIn(allAtomsInState, [atomUri, "connections", connUri])
               ) &&
-              senderSocketUri !== get(conn, "socketUri")
+              !connectionUtils.hasSocketUri(conn, senderSocketUri)
             ) {
               let messages = connectionUtils.getMessages(conn);
               if (messages) {

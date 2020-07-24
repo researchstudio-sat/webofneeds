@@ -4,7 +4,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import Immutable from "immutable";
-import { get, getUri, generateLink } from "../utils.js";
+import { getUri, generateLink } from "../utils.js";
 
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
@@ -50,7 +50,7 @@ export default function WonAtomConnectionsIndicator({ atom, socketType }) {
   function linkToConnectionSocketTab(connection) {
     const socketType = atomUtils.getSocketType(
       atom,
-      get(connection, "socketUri")
+      connectionUtils.getSocketUri(connection)
     );
 
     const atomUri = getUri(atom);
@@ -66,8 +66,10 @@ export default function WonAtomConnectionsIndicator({ atom, socketType }) {
 
   function linkToRequests(connection) {
     if (
-      atomUtils.getSocketType(atom, get(connection, "socketUri")) ===
-      vocab.CHAT.ChatSocketCompacted
+      atomUtils.getSocketType(
+        atom,
+        connectionUtils.getSocketUri(connection)
+      ) === vocab.CHAT.ChatSocketCompacted
     ) {
       linkToChat(connection);
     } else {

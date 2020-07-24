@@ -54,8 +54,10 @@ export default function WonConnectionContextDropdown({
   const process = useSelector(generalSelectors.getProcessState);
   const theme = useSelector(generalSelectors.getTheme);
   const adminEmail = get(theme, "adminEmail");
-  const isConnectionToGroup =
-    atomUtils.getGroupSocket(targetAtom) === get(connection, "targetSocketUri");
+  const isConnectionToGroup = connectionUtils.hasTargetSocketUri(
+    connection,
+    atomUtils.getGroupSocket(targetAtom)
+  );
   const showAgreementData = get(connection, "showAgreementData");
   const showPetriNetData = get(connection, "showPetriNetData");
   const isClosed = connectionUtils.isClosed(connection);

@@ -9,6 +9,14 @@ export function getTargetAtomUri(connection) {
   return get(connection, "targetAtomUri");
 }
 
+export function getSocketUri(connection) {
+  return get(connection, "socketUri");
+}
+
+export function getTargetSocketUri(connection) {
+  return get(connection, "targetSocketUri");
+}
+
 export function isUsingTemporaryUri(connection) {
   return !!get(connection, "usingTemporaryUri");
 }
@@ -45,16 +53,12 @@ export function hasSocketUris(connection, socketUri, targetSocketUri) {
 }
 
 export function hasSocketUri(connection, socketUri) {
-  return (
-    !!connection && !!socketUri && get(connection, "socketUri") === socketUri
-  );
+  return !!connection && !!socketUri && getSocketUri(connection) === socketUri;
 }
 
 export function hasTargetSocketUri(connection, socketUri) {
   return (
-    !!connection &&
-    !!socketUri &&
-    get(connection, "targetSocketUri") === socketUri
+    !!connection && !!socketUri && getTargetSocketUri(connection) === socketUri
   );
 }
 

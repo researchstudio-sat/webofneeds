@@ -158,10 +158,11 @@ export const getConnectionsOfAtomWithOwnedTargetConnections = atomUri =>
               .getConnections(atom, _socketType)
               .filter(conn => {
                 //Filters out all connections that have a "counterpart" connection stored in another atom we own
-                const targetSocketUri = get(conn, "targetSocketUri");
-                return !ownedConnectionsToSocketUri.find(
-                  ownedConnection =>
-                    get(ownedConnection, "socketUri") === targetSocketUri
+                const targetSocketUri = connectionUtils.getTargetSocketUri(
+                  conn
+                );
+                return !ownedConnectionsToSocketUri.find(ownedConnection =>
+                  connectionUtils.hasSocketUri(ownedConnection, targetSocketUri)
                 );
               })
               .merge(ownedConnectionsToSocketUri);
@@ -407,7 +408,7 @@ export const getCurrentLocation = createSelector(
 
 export const getSenderSocketType = (allAtoms, connection) => {
   const connectionUri = getUri(connection);
-  const senderSocketUri = get(connection, "socketUri");
+  const senderSocketUri = connectionUtils.getSocketUri(connection);
   const senderAtom =
     connectionUri &&
     allAtoms &&
@@ -419,7 +420,7 @@ export const getSenderSocketType = (allAtoms, connection) => {
 
 export const getTargetSocketType = (allAtoms, connection) => {
   const targetAtomUri = connectionUtils.getTargetAtomUri(connection);
-  const targetSocketUri = get(connection, "targetSocketUri");
+  const targetSocketUri = connectionUtils.getTargetSocketUri(connection);
 
   return (
     targetSocketUri &&

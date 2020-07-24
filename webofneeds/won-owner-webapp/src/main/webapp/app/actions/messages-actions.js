@@ -509,8 +509,8 @@ export function connectSuccessOwn(wonMessage) {
 
       if (connectionUtils.isUsingTemporaryUri(connection)) {
         connUriPromise = stateStore.fetchConnectionUriBySocketUris(
-          get(connection, "socketUri"),
-          get(connection, "targetSocketUri"),
+          connectionUtils.getSocketUri(connection),
+          connectionUtils.getTargetSocketUri(connection),
           atomUri
         );
       } else {

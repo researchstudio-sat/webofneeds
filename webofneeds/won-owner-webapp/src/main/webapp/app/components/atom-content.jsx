@@ -450,7 +450,7 @@ function WonAtomContentSingleConnectSockets({
                     connectionUtils.getTargetAtomUri(conn)
                   )}
                   isOwned={isOwned}
-                  flip={get(conn, "targetSocketUri") === socketUri}
+                  flip={connectionUtils.hasTargetSocketUri(conn, socketUri)}
                 />
               );
               break;

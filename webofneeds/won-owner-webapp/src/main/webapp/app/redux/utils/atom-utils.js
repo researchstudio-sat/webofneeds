@@ -374,8 +374,8 @@ export function hasUnreadSuggestedConnections(atom) {
 export function getConnectionBySocketUris(atom, socketUri, targetSocketUri) {
   return getConnections(atom).find(
     conn =>
-      get(conn, "socketUri") === socketUri &&
-      get(conn, "targetSocketUri") === targetSocketUri
+      connectionUtils.hasSocketUri(conn, socketUri) &&
+      connectionUtils.hasTargetSocketUri(conn, targetSocketUri)
   );
 }
 
