@@ -93,7 +93,7 @@ export function markConnectionAsRead(allAtomsInState, connectionUri) {
 
   if (
     getIn(allAtomsInState, [atomUri, "connections"]).find(
-      conn => !get(conn, "unread")
+      conn => !connectionUtils.isUnread(conn)
     )
   ) {
     allAtomsInState = markAtomAsRead(allAtomsInState, atomUri);

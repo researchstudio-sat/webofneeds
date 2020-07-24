@@ -685,7 +685,7 @@ export function markMessageAsRead(
       .sortBy(sortByMessageTimeStamp)
   );
 
-  if (!messages.find(msg => get(msg, "unread"))) {
+  if (!messages.find(msg => messageUtils.isMessageUnread(msg))) {
     allAtomsInState = markConnectionAsRead(
       allAtomsInState,
       connectionUri,
