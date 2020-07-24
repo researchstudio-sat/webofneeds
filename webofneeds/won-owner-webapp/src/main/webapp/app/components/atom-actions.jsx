@@ -131,7 +131,7 @@ export default function WonAtomActions({
               <div className="atom-actions__info__label">
                 {wonLabelUtils.getSocketActionInfoLabel(
                   senderSocketType,
-                  get(ownedConnection, "state"),
+                  connectionUtils.getState(ownedConnection),
                   targetSocketType
                 )}
               </div>

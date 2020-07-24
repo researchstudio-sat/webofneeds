@@ -15,7 +15,11 @@ import Immutable from "immutable";
  * @returns {*|boolean}
  */
 export function isActive(atom) {
-  return get(atom, "state") === vocab.WON.ActiveCompacted;
+  return getState(atom) === vocab.WON.ActiveCompacted;
+}
+
+export function getState(atom) {
+  return get(atom, "state");
 }
 
 /**
@@ -24,7 +28,7 @@ export function isActive(atom) {
  * @returns {*|boolean}
  */
 export function isInactive(atom) {
-  return get(atom, "state") === vocab.WON.InactiveCompacted;
+  return getState(atom) === vocab.WON.InactiveCompacted;
 }
 
 export function getIdenticonSvg(atom) {

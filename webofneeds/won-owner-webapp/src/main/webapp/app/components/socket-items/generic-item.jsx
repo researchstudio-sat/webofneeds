@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { generateLink, get, getUri } from "../../utils";
+import { generateLink, getUri } from "../../utils";
 import vocab from "../../service/vocab";
 import VisibilitySensor from "react-visibility-sensor";
 import * as connectionUtils from "../../redux/utils/connection-utils";
@@ -38,7 +38,7 @@ export default function WonGenericItem({
     }
   }
 
-  switch (get(connection, "state")) {
+  switch (connectionUtils.getState(connection)) {
     case vocab.WON.RequestReceived:
       headerClassName = "status--received";
       break;

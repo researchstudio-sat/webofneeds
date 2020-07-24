@@ -2,7 +2,7 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import { get, getUri, generateLink } from "../../utils.js";
+import { getUri, generateLink } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
@@ -41,7 +41,7 @@ export default function WonBuddyItem({
     }
   }
 
-  switch (get(connection, "state")) {
+  switch (connectionUtils.getState(connection)) {
     case vocab.WON.RequestReceived: {
       headerClassName = "status--received";
       break;

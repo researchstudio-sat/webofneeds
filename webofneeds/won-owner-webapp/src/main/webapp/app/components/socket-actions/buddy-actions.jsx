@@ -6,7 +6,6 @@ import PropTypes from "prop-types";
 import {
   extractAtomUriFromConnectionUri,
   generateLink,
-  get,
   getUri,
 } from "../../utils";
 import vocab from "../../service/vocab";
@@ -24,7 +23,7 @@ import * as atomUtils from "../../redux/utils/atom-utils";
 export default function WonBuddySocketActions({ connection, goBackOnAction }) {
   const dispatch = useDispatch();
   const history = useHistory();
-  const connectionState = get(connection, "state");
+  const connectionState = connectionUtils.getState(connection);
   const connectionUri = getUri(connection);
 
   const senderAtom = useSelector(

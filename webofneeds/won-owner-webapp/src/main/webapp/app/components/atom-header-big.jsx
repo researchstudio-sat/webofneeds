@@ -198,7 +198,7 @@ export default function WonAtomHeaderBig({
     const generateAtomActionButton = () => {
       const isInactive = atomUtils.isInactive(atom);
       if (ownedConnection || isInactive) {
-        const connectionState = get(ownedConnection, "state");
+        const connectionState = connectionUtils.getState(ownedConnection);
         const senderSocketType = atomUtils.getSocketType(
           senderAtom,
           connectionUtils.getSocketUri(ownedConnection)

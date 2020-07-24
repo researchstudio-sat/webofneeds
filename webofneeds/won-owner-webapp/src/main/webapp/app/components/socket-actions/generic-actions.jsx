@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { actionCreators } from "../../actions/actions";
 import PropTypes from "prop-types";
-import { get, getUri } from "../../utils";
+import { getUri } from "../../utils";
 import vocab from "../../service/vocab";
 import * as connectionUtils from "../../redux/utils/connection-utils";
 
@@ -18,7 +18,7 @@ export default function WonGenericSocketActions({
 }) {
   const dispatch = useDispatch();
   const history = useHistory();
-  const connectionState = get(connection, "state");
+  const connectionState = connectionUtils.getState(connection);
   const connectionUri = getUri(connection);
 
   function closeConnection(
