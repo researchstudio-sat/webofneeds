@@ -2,7 +2,6 @@ import { parseConnection } from "./parse-connection.js";
 import { markUriAsRead } from "../../won-localstorage.js";
 
 import { markAtomAsRead } from "./reduce-atoms.js";
-import { sortByMessageTimeStamp } from "./reduce-messages.js";
 import {
   getIn,
   get,
@@ -10,6 +9,7 @@ import {
   extractAtomUriFromConnectionUri,
 } from "../../utils.js";
 import * as connectionUtils from "../../redux/utils/connection-utils";
+import * as messageUtils from "../../redux/utils/message-utils";
 import { addAtomStub } from "./reduce-atoms";
 
 export function storeConnectionsData(allAtomsInState, connectionsToStore) {
@@ -340,15 +340,14 @@ export function setMultiSelectType(
     allAtomsInState = allAtomsInState
       .setIn(
         [atomUri, "connections", connectionUri, "messages"],
-        messages
-          .map(msg => {
+        messageUtils.sortMessages(
+          messages.map(msg => {
             msg = getIn(msg, ["viewState", "isSelected"])
               ? msg.setIn(["viewState", "isSelected"], false)
               : msg;
             return msg;
           })
-          .toOrderedMap()
-          .sortBy(sortByMessageTimeStamp)
+        )
       )
       .setIn(
         [atomUri, "connections", connectionUri, "multiSelectType"],

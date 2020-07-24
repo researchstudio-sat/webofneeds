@@ -53,7 +53,6 @@ import {
 } from "./reduce-connections.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
-import { sortByMessageTimeStamp } from "./reduce-messages";
 
 const initialState = Immutable.fromJS({});
 
@@ -349,17 +348,16 @@ export default function(allAtomsInState = initialState, action = {}) {
         if (message) {
           allAtomsInState = allAtomsInState.setIn(
             [atomUri, "connections", connUri],
-            connection.set(
-              "messages",
-              messages
-                .set(
+            connectionUtils.sortMessages(
+              connection.set(
+                "messages",
+                messages.set(
                   messageUri,
                   message
                     .set("isReceivedByOwn", true)
                     .set("isReceivedByRemote", true)
                 )
-                .toOrderedMap()
-                .sortBy(sortByMessageTimeStamp)
+              )
             )
           );
         }
@@ -380,17 +378,16 @@ export default function(allAtomsInState = initialState, action = {}) {
           if (message) {
             allAtomsInState = allAtomsInState.setIn(
               [getUri(atomByConnectionUri), "connections", connUri],
-              connection.set(
-                "messages",
-                messages
-                  .set(
+              connectionUtils.sortMessages(
+                connection.set(
+                  "messages",
+                  messages.set(
                     messageUri,
                     message
                       .set("isReceivedByOwn", true)
                       .set("isReceivedByRemote", true)
                   )
-                  .toOrderedMap()
-                  .sortBy(sortByMessageTimeStamp)
+                )
               )
             );
           }
@@ -432,12 +429,11 @@ export default function(allAtomsInState = initialState, action = {}) {
         if (message) {
           allAtomsInState = allAtomsInState.setIn(
             [atomUri, "connections", connUri],
-            connection.set(
-              "messages",
-              messages
-                .set(messageUri, message.set("isReceivedByOwn", true))
-                .toOrderedMap()
-                .sortBy(sortByMessageTimeStamp)
+            connectionUtils.sortMessages(
+              connection.set(
+                "messages",
+                messages.set(messageUri, message.set("isReceivedByOwn", true))
+              )
             )
           );
         }
@@ -458,12 +454,11 @@ export default function(allAtomsInState = initialState, action = {}) {
           if (message) {
             allAtomsInState = allAtomsInState.setIn(
               [getUri(atomByConnectionUri), "connections", connUri],
-              connection.set(
-                "messages",
-                messages
-                  .set(messageUri, message.set("isReceivedByOwn", true))
-                  .toOrderedMap()
-                  .sortBy(sortByMessageTimeStamp)
+              connectionUtils.sortMessages(
+                connection.set(
+                  "messages",
+                  messages.set(messageUri, message.set("isReceivedByOwn", true))
+                )
               )
             );
           }
@@ -757,17 +752,16 @@ export default function(allAtomsInState = initialState, action = {}) {
       if (message) {
         allAtomsInState = allAtomsInState.setIn(
           [atomUri, "connections", connectionUri],
-          affectedConnection.set(
-            "messages",
-            messages
-              .set(
+          connectionUtils.sortMessages(
+            affectedConnection.set(
+              "messages",
+              messages.set(
                 messageUri,
                 message
                   .set("isReceivedByOwn", true)
                   .set("date", responseDateOnServer)
               )
-              .toOrderedMap()
-              .sortBy(sortByMessageTimeStamp)
+            )
           )
         );
       }
@@ -789,12 +783,11 @@ export default function(allAtomsInState = initialState, action = {}) {
       if (message) {
         allAtomsInState = allAtomsInState.setIn(
           [atomUri, "connections", connectionUri],
-          connection.set(
-            "messages",
-            messages
-              .set(messageUri, message.set("failedToSend", true))
-              .toOrderedMap()
-              .sortBy(sortByMessageTimeStamp)
+          connectionUtils.sortMessages(
+            connection.set(
+              "messages",
+              messages.set(messageUri, message.set("failedToSend", true))
+            )
           )
         );
       }
@@ -832,17 +825,16 @@ export default function(allAtomsInState = initialState, action = {}) {
       if (message) {
         allAtomsInState = allAtomsInState.setIn(
           [atomUri, "connections", connectionUri],
-          affectedConnection.set(
-            "messages",
-            messages
-              .set(
+          connectionUtils.sortMessages(
+            affectedConnection.set(
+              "messages",
+              messages.set(
                 messageUri,
                 message
                   .set("isReceivedByRemote", true)
                   .set("isReceivedByOwn", true)
               )
-              .toOrderedMap()
-              .sortBy(sortByMessageTimeStamp)
+            )
           )
         );
       }

@@ -411,3 +411,25 @@ export function isParsable(msg) {
 export function getHumanReadableString(msg) {
   return getIn(msg, ["content", "text"]) || "«Message does not have text»";
 }
+
+/**
+ * (re)sorts the messages within the given messagesMap
+ * @param messagesMap
+ * @returns {sorted messagesMap)
+ */
+export function sortMessages(messagesMap) {
+  return messagesMap.toOrderedMap().sortBy(sortByMessageTimeStamp);
+}
+
+/**
+ * Default message Sorting -> so we can already store a sorted map of messages in the atom
+ * @param message
+ * @returns {any}
+ */
+export function sortByMessageTimeStamp(message) {
+  const messageDate = get(message, "date");
+  if (!messageDate) {
+    console.warn("messageDate for message is undefinded: ", message);
+  }
+  return messageDate && messageDate.getTime();
+}

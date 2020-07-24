@@ -4,6 +4,7 @@
 
 import vocab from "../../service/vocab.js";
 import { get } from "../../utils.js";
+import * as messageUtils from "./message-utils.js";
 
 export function getState(connection) {
   return get(connection, "state");
@@ -165,3 +166,14 @@ export const filterSingleConnectedSocketCapacityFilter = (_, socketType) =>
  */
 export const filterNonSingleConnectedSocketCapacityFilter = (_, socketType) =>
   vocab.socketCapacity[socketType] === 1;
+
+/**
+ * (re)sorts the messages stored in the connection
+ * @param conn
+ * @returns {connection object with sorted messages)
+ */
+export function sortMessages(conn) {
+  const messages = getMessages(conn);
+
+  return conn.set(messageUtils.sortMessages(messages));
+}

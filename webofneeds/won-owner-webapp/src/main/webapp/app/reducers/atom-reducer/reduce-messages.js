@@ -99,10 +99,9 @@ export function addMessage(
 
           allAtomsInState = allAtomsInState.setIn(
             [senderAtomUri, "connections", senderConnectionUri, "messages"],
-            messages
-              .set(parsedMessageUri, get(parsedMessage, "data"))
-              .toOrderedMap()
-              .sortBy(sortByMessageTimeStamp)
+            messageUtils.sortMessages(
+              messages.set(parsedMessageUri, get(parsedMessage, "data"))
+            )
           );
         }
       }
@@ -288,7 +287,7 @@ export function addMessage(
 
           allAtomsInState = allAtomsInState.setIn(
             [targetAtomUri, "connections", targetConnectionUri, "messages"],
-            messages.toOrderedMap().sortBy(sortByMessageTimeStamp)
+            messageUtils.sortMessages(messages)
           );
         }
       }
@@ -371,10 +370,9 @@ export function addMessage(
 
                 allAtomsInState = allAtomsInState.setIn(
                   [atomUri, "connections", connUri, "messages"],
-                  messages
-                    .set(forwardMessageUri, forwardMessageData)
-                    .toOrderedMap()
-                    .sortBy(sortByMessageTimeStamp)
+                  messageUtils.sortMessages(
+                    messages.set(forwardMessageUri, forwardMessageData)
+                  )
                 );
               }
             }
@@ -428,12 +426,11 @@ export function markMessageAsSelected(
 
   return allAtomsInState.setIn(
     [atomUri, "connections", connectionUri, "messages"],
-    messages.set(
-      messageUri,
-      message
-        .setIn(["viewState", "isSelected"], isSelected)
-        .toOrderedMap()
-        .sortBy(sortByMessageTimeStamp)
+    messageUtils.sortMessages(
+      messages.set(
+        messageUri,
+        message.setIn(["viewState", "isSelected"], isSelected)
+      )
     )
   );
 }
@@ -484,13 +481,12 @@ export function markMessageAsCollapsed(
   }
   return allAtomsInState.setIn(
     [atomUri, "connections", connectionUri, "messages"],
-    messages
-      .setIn(
+    messageUtils.sortMessages(
+      messages.setIn(
         messageUri,
         message.setIn(["viewState", "isCollapsed"], isCollapsed)
       )
-      .toOrderedMap()
-      .sortBy(sortByMessageTimeStamp)
+    )
   );
 }
 
@@ -550,16 +546,15 @@ export function markMessageExpandAllReferences(
 
   return allAtomsInState.setIn(
     [atomUri, "connections", connectionUri, "messages"],
-    messages
-      .set(
+    messageUtils.sortMessages(
+      messages.set(
         messageUri,
         message.setIn(
           ["viewState", "expandedReferences"],
           expandedReferences.map(() => isExpanded)
         )
       )
-      .toOrderedMap()
-      .sortBy(sortByMessageTimeStamp)
+    )
   );
 }
 
@@ -601,16 +596,15 @@ export function markMessageExpandReferences(
 
   return allAtomsInState.setIn(
     [atomUri, "connections", connectionUri, "messages"],
-    messages
-      .set(
+    messageUtils.sortMessages(
+      messages.set(
         messageUri,
         message.setIn(
           ["viewState", "expandedReferences", reference],
           isExpanded
         )
       )
-      .toOrderedMap()
-      .sortBy(sortByMessageTimeStamp)
+    )
   );
 }
 
@@ -644,9 +638,12 @@ export function markMessageShowActions(
 
   return allAtomsInState.setIn(
     [atomUri, "connections", connectionUri, "messages"],
-    messages
-      .set(messageUri, message.setIn(["viewState", "showActions"], showActions))
-      .sortBy(sortByMessageTimeStamp)
+    messageUtils.sortMessages(
+      messages.set(
+        messageUri,
+        message.setIn(["viewState", "showActions"], showActions)
+      )
+    )
   );
 }
 
@@ -680,9 +677,9 @@ export function markMessageAsRead(
 
   allAtomsInState = allAtomsInState.setIn(
     [atomUri, "connections", connectionUri, "messages"],
-    messages
-      .set(messageUri, message.set("unread", !read))
-      .sortBy(sortByMessageTimeStamp)
+    messageUtils.sortMessages(
+      messages.set(messageUri, message.set("unread", !read))
+    )
   );
 
   if (!messages.find(msg => messageUtils.isMessageUnread(msg))) {
@@ -1420,17 +1417,4 @@ function isChatToGroupConnection(allAtomsInState, connection) {
     getTargetSocketType(allAtomsInState, connection) ===
       vocab.GROUP.GroupSocketCompacted
   );
-}
-
-/**
- * Default message Sorting -> so we can already store a sorted map of messages in the atom
- * @param message
- * @returns {any}
- */
-export function sortByMessageTimeStamp(message) {
-  const messageDate = get(message, "date");
-  if (!messageDate) {
-    console.warn("messageDate for message is undefinded: ", message);
-  }
-  return messageDate && messageDate.getTime();
 }
