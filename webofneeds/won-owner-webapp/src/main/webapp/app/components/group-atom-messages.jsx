@@ -50,7 +50,7 @@ export default function WonGroupAtomMessages({
     generalSelectors.getOwnedAtomByConnectionUri(connectionUri)
   );
   const senderAtomUri = get(senderAtom, "uri");
-  const targetAtomUri = get(connection, "targetAtomUri");
+  const targetAtomUri = connectionUtils.getTargetAtomUri(connection);
   const targetAtom = useSelector(generalSelectors.getAtom(targetAtomUri));
   const allChatMessages = connectionUtils.getMessages(connection);
   const chatMessages =
@@ -308,7 +308,7 @@ export default function WonGroupAtomMessages({
         toLink={generateLink(
           history.location,
           {
-            postUri: get(connection, "targetAtomUri"),
+            postUri: connectionUtils.getTargetAtomUri(connection),
             connectionUri: get(connection, "uri"),
             tab: undefined,
           },

@@ -10,6 +10,7 @@ import * as generalSelectors from "../redux/selectors/general-selectors";
 import * as atomUtils from "../redux/utils/atom-utils";
 import * as wonLabelUtils from "../won-label-utils.js";
 import * as accountUtils from "../redux/utils/account-utils";
+import * as connectionUtils from "~/app/redux/utils/connection-utils";
 import * as processUtils from "../redux/utils/process-utils";
 import { get, extractAtomUriFromConnectionUri } from "../utils.js";
 
@@ -78,7 +79,7 @@ export default function WonAtomHeaderBig({
       connectionHolder
     );
 
-  const targetAtomUri = get(ownedConnection, "targetAtomUri");
+  const targetAtomUri = connectionUtils.getTargetAtomUri(ownedConnection);
   const targetAtom = get(storedAtoms, targetAtomUri);
   const isTargetAtomFetchNecessary =
     targetAtomUri !== atomUri &&

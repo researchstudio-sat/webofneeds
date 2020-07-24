@@ -2,6 +2,7 @@ import { parseAtom, parseMetaAtom } from "./parse-atom.js";
 import Immutable from "immutable";
 import { get, getIn } from "../../utils.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
+import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import vocab from "../../service/vocab.js";
 
 export function addAtom(allAtomsInState, jsonldAtom) {
@@ -33,7 +34,7 @@ export function deleteAtom(allAtomsInState, deletedAtomUri) {
         connections =>
           connections &&
           connections.filter(
-            conn => get(conn, "targetAtomUri") !== deletedAtomUri
+            conn => connectionUtils.getTargetAtomUri(conn) !== deletedAtomUri
           )
       );
     };

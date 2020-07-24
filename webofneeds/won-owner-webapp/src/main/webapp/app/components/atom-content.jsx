@@ -444,7 +444,10 @@ function WonAtomContentSingleConnectSockets({
                         )
                       : atom
                   }
-                  targetAtom={get(storedAtoms, get(conn, "targetAtomUri"))}
+                  targetAtom={get(
+                    storedAtoms,
+                    connectionUtils.getTargetAtomUri(conn)
+                  )}
                   isOwned={isOwned}
                   flip={get(conn, "targetSocketUri") === socketUri}
                 />

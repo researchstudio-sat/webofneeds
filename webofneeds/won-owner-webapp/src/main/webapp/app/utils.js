@@ -1,5 +1,6 @@
 import _ from "lodash";
 import { getHeldByUri, getTitle } from "./redux/utils/atom-utils.js";
+import { getTargetAtomUri } from "./redux/utils/connection-utils.js";
 import fakeNames from "./fakeNames.json";
 
 /**
@@ -406,7 +407,7 @@ export function filterConnectionsBySearchValue(
     const regExp = new RegExp(tempSearchText, "i");
 
     return connectionsImm.filter(conn => {
-      const targetAtom = get(allAtomsImm, get(conn, "targetAtomUri"));
+      const targetAtom = get(allAtomsImm, getTargetAtomUri(conn));
       const targetAtomTitle = getTitle(targetAtom, externalDataState) || "";
 
       let found = false;

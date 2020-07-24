@@ -6,6 +6,7 @@ import won from "../won-es6.js";
 import vocab from "../service/vocab.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as useCaseUtils from "../usecase-utils.js";
 import * as ownerApi from "../api/owner-api.js";
@@ -612,7 +613,7 @@ export function connectionsRate(connectionUri, rating) {
     );
     const connection = atomUtils.getConnection(ownedAtom, connectionUri);
 
-    const theirAtomUri = get(connection, "targetAtomUri");
+    const theirAtomUri = connectionUtils.getTargetAtomUri(connection);
     const theirConnectionUri = get(connection, "targetConnectionUri");
     const theirAtom = generalSelectors.getAtom(theirAtomUri)(state);
 

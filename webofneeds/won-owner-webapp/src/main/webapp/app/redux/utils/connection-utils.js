@@ -5,6 +5,10 @@
 import vocab from "../../service/vocab.js";
 import { get } from "../../utils.js";
 
+export function getTargetAtomUri(connection) {
+  return get(connection, "targetAtomUri");
+}
+
 export function isUsingTemporaryUri(connection) {
   return !!get(connection, "usingTemporaryUri");
 }

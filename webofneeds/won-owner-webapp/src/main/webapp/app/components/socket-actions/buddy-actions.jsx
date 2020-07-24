@@ -30,7 +30,7 @@ export default function WonBuddySocketActions({ connection, goBackOnAction }) {
     generalSelectors.getAtom(extractAtomUriFromConnectionUri(connectionUri))
   );
   const targetAtom = useSelector(
-    generalSelectors.getAtom(get(connection, "targetAtomUri"))
+    generalSelectors.getAtom(connectionUtils.getTargetAtomUri(connection))
   );
 
   function openRequest() {

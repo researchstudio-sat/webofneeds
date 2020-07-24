@@ -104,7 +104,10 @@ export default function WonAtomContentSocket({
                   )
                 : atom
             }
-            targetAtom={get(storedAtoms, get(conn, "targetAtomUri"))}
+            targetAtom={get(
+              storedAtoms,
+              connectionUtils.getTargetAtomUri(conn)
+            )}
             isOwned={isAtomOwned}
             flip={flip}
           />

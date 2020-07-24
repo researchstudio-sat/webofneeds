@@ -6,6 +6,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
+import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import * as messageUtils from "../../redux/utils/message-utils.js";
 import * as wonLabelUtils from "../../won-label-utils.js";
 import { get, getIn, generateLink } from "../../utils.js";
@@ -50,7 +51,7 @@ export default function WonCombinedMessageContent({
   if (!get(message, "outgoingMessage")) {
     const relevantAtomUri = groupChatMessage
       ? originatorUri
-      : get(connection, "targetAtomUri");
+      : connectionUtils.getTargetAtomUri(connection);
     const relevantAtom = get(allAtoms, relevantAtomUri);
     const relevantPersona =
       atomUtils.isPersona(relevantAtom) || atomUtils.isServiceAtom(relevantAtom)
@@ -150,7 +151,7 @@ export default function WonCombinedMessageContent({
     let connection = get(ownedConnections, connectionUri);
 
     if (connection) {
-      return get(allAtoms, get(connection, "targetAtomUri"));
+      return get(allAtoms, connectionUtils.getTargetAtomUri(connection));
     } else {
       connection =
         ownedConnections &&
@@ -159,7 +160,7 @@ export default function WonCombinedMessageContent({
         );
 
       if (connection) {
-        return get(allAtoms, get(connection, "targetAtomUri"));
+        return get(allAtoms, connectionUtils.getTargetAtomUri(connection));
       }
     }
 

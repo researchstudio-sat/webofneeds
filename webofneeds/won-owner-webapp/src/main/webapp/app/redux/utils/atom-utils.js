@@ -501,7 +501,9 @@ export function getHeldByUri(atomImm) {
     hasHoldableSocket(atomImm) &&
     getConnectedConnections(atomImm, vocab.HOLD.HoldableSocketCompacted);
   if (heldAtomHoldableConnections && heldAtomHoldableConnections.size === 1) {
-    return get(heldAtomHoldableConnections.first(), "targetAtomUri");
+    return connectionUtils.getTargetAtomUri(
+      heldAtomHoldableConnections.first()
+    );
   } else {
     return undefined;
   }
@@ -646,7 +648,7 @@ export function isHolderVerified(heldAtom, holderAtom) {
     );
 
     const connections = holderAtomHolderConnections.filter(
-      conn => get(conn, "targetAtomUri") === get(heldAtom, "uri")
+      conn => connectionUtils.getTargetAtomUri(conn) === get(heldAtom, "uri")
     );
 
     return connections && connections.size === 1;

@@ -50,11 +50,11 @@ export default function WonConnectionHeader({
   const dispatch = useDispatch();
 
   const senderAtomUri = flip
-    ? get(connection, "targetAtomUri")
+    ? connectionUtils.getTargetAtomUri(connection)
     : extractAtomUriFromConnectionUri(connectionUri);
   const targetAtomUri = flip
     ? extractAtomUriFromConnectionUri(connectionUri)
-    : get(connection, "targetAtomUri");
+    : connectionUtils.getTargetAtomUri(connection);
 
   const senderAtom = useSelector(generalSelectors.getAtom(senderAtomUri));
   const targetAtom = useSelector(generalSelectors.getAtom(targetAtomUri));

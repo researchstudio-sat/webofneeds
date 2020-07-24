@@ -11,6 +11,7 @@ import {
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils";
+import * as connectionUtils from "../../redux/utils/connection-utils";
 import * as processUtils from "../../redux/utils/process-utils.js";
 import WonModalDialog from "../../components/modal-dialog.jsx";
 import WonTopnav from "../../components/topnav.jsx";
@@ -52,7 +53,9 @@ export default function PageConnections() {
     selectedConnectionUri
   );
   const selectedTargetAtom = useSelector(
-    generalSelectors.getAtom(get(selectedConnection, "targetAtomUri"))
+    generalSelectors.getAtom(
+      connectionUtils.getTargetAtomUri(selectedConnection)
+    )
   );
 
   useEffect(

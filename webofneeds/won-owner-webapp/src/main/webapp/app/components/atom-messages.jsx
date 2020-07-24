@@ -62,7 +62,7 @@ export default function WonAtomMessages({
     generalSelectors.getOwnedAtomByConnectionUri(connectionUri)
   );
   const senderAtomUri = get(senderAtom, "uri");
-  const targetAtomUri = get(connection, "targetAtomUri");
+  const targetAtomUri = connectionUtils.getTargetAtomUri(connection);
   const targetAtom = useSelector(generalSelectors.getAtom(targetAtomUri));
   const allAtoms = useSelector(generalSelectors.getAtoms);
   const ownedConnections = useSelector(getOwnedConnections);
@@ -617,7 +617,7 @@ export default function WonAtomMessages({
           toLink={generateLink(
             history.location,
             {
-              postUri: get(connection, "targetAtomUri"),
+              postUri: connectionUtils.getTargetAtomUri(connection),
               connectionUri: get(connection, "uri"),
               tab: undefined,
             },

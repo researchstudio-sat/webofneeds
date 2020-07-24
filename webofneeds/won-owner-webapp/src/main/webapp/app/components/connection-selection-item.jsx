@@ -26,7 +26,7 @@ export default function WonConnectionSelectionItem({
   const dispatch = useDispatch();
   const openConnectionUri = getQueryParams(history.location).connectionUri;
 
-  const targetAtomUri = get(connection, "targetAtomUri");
+  const targetAtomUri = connectionUtils.getTargetAtomUri(connection);
   const processState = useSelector(generalSelectors.getProcessState);
 
   const [showActions, setShowActions] = useState(false);

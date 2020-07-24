@@ -416,7 +416,7 @@ export const getSenderSocketType = (allAtoms, connection) => {
 };
 
 export const getTargetSocketType = (allAtoms, connection) => {
-  const targetAtomUri = get(connection, "targetAtomUri");
+  const targetAtomUri = connectionUtils.getTargetAtomUri(connection);
   const targetSocketUri = get(connection, "targetSocketUri");
 
   return (

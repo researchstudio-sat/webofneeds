@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { actionCreators } from "../actions/actions.js";
 import { useDispatch, useSelector } from "react-redux";
 import * as generalSelectors from "../redux/selectors/general-selectors";
-import { get, getIn, toAbsoluteURL, generateLink } from "../utils";
+import { get, toAbsoluteURL, generateLink } from "../utils";
 import * as connectionUtils from "../redux/utils/connection-utils";
 import * as processUtils from "../redux/utils/process-utils";
 import { ownerBaseUrl } from "~/config/default.js";
@@ -42,7 +42,7 @@ export default function WonConnectionContextDropdown({
   });
 
   const connectionUri = get(connection, "uri");
-  const targetAtomUri = getIn(connection, ["targetAtomUri"]);
+  const targetAtomUri = connectionUtils.getTargetAtomUri(connection);
   const targetAtom = useSelector(generalSelectors.getAtom(targetAtomUri));
 
   let linkToPost;

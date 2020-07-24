@@ -6,6 +6,7 @@ import { actionCreators } from "../actions/actions.js";
 import vocab from "../service/vocab";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as wonLabelUtils from "../won-label-utils.js";
 
 import "~/style/_atom-actions.scss";
@@ -73,7 +74,7 @@ export default function WonAtomActions({
       {
         const targetAtom = get(
           storedAtoms,
-          get(ownedConnection, "targetAtomUri")
+          connectionUtils.getTargetAtomUri(ownedConnection)
         );
         const senderAtom = get(
           storedAtoms,
