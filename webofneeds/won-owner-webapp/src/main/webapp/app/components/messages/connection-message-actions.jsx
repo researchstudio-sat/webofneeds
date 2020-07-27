@@ -11,8 +11,7 @@ import * as connectionUtils from "../../redux/utils/connection-utils.js";
 
 export default function WonConnectionMessageActions({ message, connection }) {
   const dispatch = useDispatch();
-  const multiSelectType = connectionUtils.getMultiSelectType(connection);
-  const isProposed = messageUtils.isMessageProposed(connection, message);
+  const multiSelectType = !!connectionUtils.getMultiSelectType(connection);
   const isCancellationPending = messageUtils.isMessageCancellationPending(
     connection,
     message
@@ -66,7 +65,9 @@ export default function WonConnectionMessageActions({ message, connection }) {
     <won-connection-message-actions>
       {isProposable
         ? generateButton(
-            isProposed ? "Propose (again)" : "Propose",
+            messageUtils.isMessageProposed(connection, message)
+              ? "Propose (again)"
+              : "Propose",
             "proposes",
             "black",
             multiSelectType
