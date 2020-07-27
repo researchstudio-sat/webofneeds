@@ -29,62 +29,6 @@ export default function WonReferencedMessageContent({
 
   const references = messageUtils.getReferences(message);
   const senderAtomUri = getUri(senderAtom);
-  const multiSelectType = connectionUtils.getMultiSelectType(connection);
-
-  function toggleReferenceExpansion(reference) {
-    if (message && !multiSelectType) {
-      const currentExpansionState = get(expandedReferences, reference);
-
-      dispatch(
-        actionCreators.messages__viewState__markExpandReference({
-          messageUri: getUri(message),
-          connectionUri: getUri(connection),
-          atomUri: senderAtomUri,
-          isExpanded: !currentExpansionState,
-          reference: reference,
-        })
-      );
-    }
-  }
-
-  function generateCombinedMessageElement(msgUri, className) {
-    const referencedMessage = connectionUtils.getMessage(connection, msgUri);
-
-    let messageClass = className;
-
-    if (!className && referencedMessage) {
-      if (get(referencedMessage, "outgoingMessage")) {
-        messageClass = "won-cm--right";
-      } else {
-        messageClass = "won-cm--left";
-      }
-    }
-
-    let onClick;
-    if (!referencedMessage) {
-      onClick = () =>
-        ownerApi.getMessage(senderAtomUri, msgUri).then(response => {
-          won.wonMessageFromJsonLd(response, msgUri).then(msg => {
-            //If message isnt in the state we add it
-            dispatch(actionCreators.messages__processAgreementMessage(msg));
-          });
-        });
-    }
-
-    return (
-      <WonCombinedMessageContent
-        key={msgUri}
-        message={referencedMessage}
-        connection={connection}
-        senderAtom={senderAtom}
-        originatorAtom={originatorAtom}
-        allAtoms={allAtoms}
-        ownedConnections={ownedConnections}
-        className={messageClass}
-        onClick={onClick}
-      />
-    );
-  }
 
   function generateMessageElementFragment(
     label,
@@ -93,9 +37,67 @@ export default function WonReferencedMessageContent({
   ) {
     const messageReferenceUris = get(references, reference);
     if (messageReferenceUris && messageReferenceUris.size > 0) {
+      const toggleReferenceExpansion = reference => {
+        if (message && !connectionUtils.getMultiSelectType(connection)) {
+          const currentExpansionState = get(expandedReferences, reference);
+
+          dispatch(
+            actionCreators.messages__viewState__markExpandReference({
+              messageUri: getUri(message),
+              connectionUri: getUri(connection),
+              atomUri: senderAtomUri,
+              isExpanded: !currentExpansionState,
+              reference: reference,
+            })
+          );
+        }
+      };
+
       const messageReferenceArray = Array.from(messageReferenceUris.toSet());
       const isExpanded = get(expandedReferences, reference);
       const messagesArraySize = messageReferenceArray.length;
+
+      const generateCombinedMessageElement = (msgUri, className) => {
+        const referencedMessage = connectionUtils.getMessage(
+          connection,
+          msgUri
+        );
+
+        let messageClass = className;
+
+        if (!className && referencedMessage) {
+          if (get(referencedMessage, "outgoingMessage")) {
+            messageClass = "won-cm--right";
+          } else {
+            messageClass = "won-cm--left";
+          }
+        }
+
+        let onClick;
+        if (!referencedMessage) {
+          onClick = () =>
+            ownerApi.getMessage(senderAtomUri, msgUri).then(response => {
+              won.wonMessageFromJsonLd(response, msgUri).then(msg => {
+                //If message isnt in the state we add it
+                dispatch(actionCreators.messages__processAgreementMessage(msg));
+              });
+            });
+        }
+
+        return (
+          <WonCombinedMessageContent
+            key={msgUri}
+            message={referencedMessage}
+            connection={connection}
+            senderAtom={senderAtom}
+            originatorAtom={originatorAtom}
+            allAtoms={allAtoms}
+            ownedConnections={ownedConnections}
+            className={messageClass}
+            onClick={onClick}
+          />
+        );
+      };
 
       return (
         <div className="refmsgcontent__fragment">

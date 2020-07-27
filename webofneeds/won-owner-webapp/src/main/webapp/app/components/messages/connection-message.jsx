@@ -5,7 +5,7 @@ import * as atomUtils from "../../redux/utils/atom-utils.js";
 import * as messageUtils from "../../redux/utils/message-utils.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import * as processUtils from "../../redux/utils/process-utils.js";
-import { get, getUri, getIn, generateLink } from "../../utils.js";
+import { get, getUri, generateLink } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { useDispatch } from "react-redux";
 import { ownerBaseUrl } from "~/config/default.js";
@@ -257,7 +257,7 @@ export default function WonConnectionMessage({
 
   function showMessageAlways() {
     if (message) {
-      return getIn(message, ["content", "text"])
+      return messageUtils.hasText(message)
         ? true
         : !hasReferences ||
             shouldShowRdf ||
