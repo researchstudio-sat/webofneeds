@@ -16,14 +16,13 @@ export default function WonConnectionMessageStatus({ message }) {
   const lastUpdateTime = useSelector(selectLastUpdateTime);
 
   const isOutgoingMessage = messageUtils.isOutgoingMessage(message);
-  const isFailedToSend = messageUtils.hasFailedToSend(message);
-  const isReceivedByOwn = messageUtils.isReceivedByOwn(message);
-  const isReceivedByRemote = messageUtils.isReceivedByRemote(message);
-
-  let statusIcons;
 
   if (isOutgoingMessage) {
+    const isFailedToSend = messageUtils.hasFailedToSend(message);
+
     let icons;
+    let label;
+
     if (isFailedToSend) {
       icons = (
         <svg
@@ -36,7 +35,11 @@ export default function WonConnectionMessageStatus({ message }) {
           />
         </svg>
       );
+      label = <div className="msgstatus__time--failure">Sending failed</div>;
     } else {
+      const isReceivedByOwn = messageUtils.isReceivedByOwn(message);
+      const isReceivedByRemote = messageUtils.isReceivedByRemote(message);
+
       icons = (
         <React.Fragment>
           <svg
@@ -56,50 +59,32 @@ export default function WonConnectionMessageStatus({ message }) {
           </svg>
         </React.Fragment>
       );
+
+      label =
+        isReceivedByRemote && isReceivedByOwn ? (
+          <div className="msgstatus__time">
+            {relativeTime(lastUpdateTime, messageUtils.getDate(message))}
+          </div>
+        ) : (
+          <div className="msgstatus__time--pending">Sending&nbsp;&hellip;</div>
+        );
     }
 
-    statusIcons = <div className="msgstatus__icons">{icons}</div>;
-  }
-
-  let timeStampLabel;
-  let failedLabel;
-  let sendingLabel;
-
-  if (
-    !isOutgoingMessage ||
-    (!isFailedToSend && (isReceivedByRemote && isReceivedByOwn))
-  ) {
-    timeStampLabel = (
-      <div className="msgstatus__time">
-        {relativeTime(lastUpdateTime, messageUtils.getDate(message))}
-      </div>
+    return (
+      <won-connection-message-status>
+        <div className="msgstatus__icons">{icons}</div>
+        {label}
+      </won-connection-message-status>
+    );
+  } else {
+    return (
+      <won-connection-message-status>
+        <div className="msgstatus__time">
+          {relativeTime(lastUpdateTime, messageUtils.getDate(message))}
+        </div>
+      </won-connection-message-status>
     );
   }
-
-  if (
-    isOutgoingMessage &&
-    !isFailedToSend &&
-    (!isReceivedByRemote || !isReceivedByOwn)
-  ) {
-    sendingLabel = (
-      <div className="msgstatus__time--pending">Sending&nbsp;&hellip;</div>
-    );
-  }
-
-  if (isOutgoingMessage && isFailedToSend) {
-    failedLabel = (
-      <div className="msgstatus__time--failure">Sending failed</div>
-    );
-  }
-
-  return (
-    <won-connection-message-status>
-      {statusIcons}
-      {timeStampLabel}
-      {sendingLabel}
-      {failedLabel}
-    </won-connection-message-status>
-  );
 }
 WonConnectionMessageStatus.propTypes = {
   message: PropTypes.object.isRequired,
