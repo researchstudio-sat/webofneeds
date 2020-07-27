@@ -180,6 +180,14 @@ export function getContent(msg) {
   return get(msg, "content");
 }
 
+export function hasText(msg) {
+  return !!getText(msg);
+}
+
+export function getText(msg) {
+  return get(getContent(msg), "text");
+}
+
 export function isSystemMessage(msg) {
   return get(msg, "systemMessage");
 }
