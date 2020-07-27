@@ -3,13 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { actionCreators } from "../../actions/actions.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
-import {
-  get,
-  getIn,
-  sortByDate,
-  generateLink,
-  getQueryParams,
-} from "../../utils.js";
+import { get, getIn, generateLink, getQueryParams } from "../../utils.js";
 import * as processSelectors from "../../redux/selectors/process-selectors.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as useCaseUtils from "../../usecase-utils.js";
@@ -103,6 +97,13 @@ export default function PageOverview() {
       useCase === OTHERIDENTIFIER
         ? get(whatsNewAtomsGroupedByUseCaseIdentifier, undefined)
         : get(whatsNewAtomsGroupedByUseCaseIdentifier, useCase);
+
+    const sortedVisibleAtoms =
+      visibleAtoms &&
+      visibleAtoms
+        .toOrderedMap()
+        .sortBy(atom => atomUtils.getLastUpdateDate(atom))
+        .reverse();
     const visibleAtomsSize = visibleAtoms ? visibleAtoms.size : 0;
 
     overviewContentElement = (
@@ -150,7 +151,7 @@ export default function PageOverview() {
             <div className="owneroverview__usecases__usecase">
               <div className="owneroverview__usecases__usecase__atoms">
                 <WonAtomCardGrid
-                  atoms={sortByDate(visibleAtoms)}
+                  atoms={sortedVisibleAtoms}
                   currentLocation={currentLocation}
                   showIndicators={false}
                   showHolder={true}

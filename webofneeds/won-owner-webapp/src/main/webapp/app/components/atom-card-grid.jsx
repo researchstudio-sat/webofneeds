@@ -4,7 +4,7 @@
 
 import React from "react";
 import WonAtomCard from "./atom-card.jsx";
-import { getUri, generateLink } from "../utils.js";
+import { generateLink } from "../utils.js";
 import PropTypes from "prop-types";
 
 import ico32_buddy_add from "~/images/won-icons/ico32_buddy_add.svg";
@@ -19,14 +19,14 @@ export default function WonAtomCardGrid({
   showCreatePersona,
   currentLocation,
 }) {
-  //TODO: REFACTOR THIS COMPONENT TO RETRIEVE A atomsImm Map instead of an array
-  const atomCards =
-    atoms &&
-    atoms.map(atom => {
-      return (
+  const atomCardElements = [];
+
+  atoms &&
+    atoms.map((atom, atomUri) => {
+      atomCardElements.push(
         <WonAtomCard
-          key={getUri(atom)}
-          atomUri={getUri(atom)}
+          key={atomUri}
+          atomUri={atomUri}
           atom={atom}
           showHolder={showHolder}
           showIndicators={showIndicators}
@@ -76,12 +76,12 @@ export default function WonAtomCardGrid({
     <React.Fragment>
       {createAtom}
       {createPersonaAtom}
-      {atomCards}
+      {atomCardElements}
     </React.Fragment>
   );
 }
 WonAtomCardGrid.propTypes = {
-  atoms: PropTypes.arrayOf(PropTypes.object).isRequired,
+  atoms: PropTypes.object,
   showHolder: PropTypes.bool,
   showIndicators: PropTypes.bool,
   showCreate: PropTypes.bool,

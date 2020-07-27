@@ -86,12 +86,10 @@ export default function PageMap() {
         }
         return false;
       })
+      .toOrderedMap()
+      .sortBy(metaAtom => atomUtils.getDistanceFrom(metaAtom, currentLocation))
   );
 
-  const sortedVisibleAtoms = atomUtils.sortByDistanceFrom(
-    whatsAroundMetaAtoms,
-    lastWhatsAroundLocation
-  );
   const lastAtomUrisUpdateDate = useSelector(state =>
     getIn(state, ["owner", "lastWhatsAroundUpdateTime"])
   );
@@ -116,7 +114,7 @@ export default function PageMap() {
     lastAtomUrisUpdateDate &&
     wonLabelUtils.relativeTime(globalLastUpdateDate, lastAtomUrisUpdateDate);
 
-  const hasVisibleAtoms = sortedVisibleAtoms.length > 0;
+  const hasVisibleAtoms = whatsAroundMetaAtoms && whatsAroundMetaAtoms.size > 0;
   const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
   const showModalDialog = useSelector(viewSelectors.showModalDialog);
 
@@ -488,7 +486,7 @@ export default function PageMap() {
           (hasVisibleAtoms ? (
             <div className="ownermap__content">
               <WonAtomCardGrid
-                atoms={sortedVisibleAtoms}
+                atoms={whatsAroundMetaAtoms}
                 currentLocation={lastWhatsAroundLocation}
                 showHolder={true}
                 showIndicators={false}

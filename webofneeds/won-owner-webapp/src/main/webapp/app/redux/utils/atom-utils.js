@@ -549,32 +549,6 @@ export function getSeeksSocketsWithKeysReset(atomImm) {
   return undefined;
 }
 
-/**
- * Sorts the elements by distance from given location (default order is ascending)
- * @param elementsImm elements from state that need to be returned as a sorted array
- * @param location given location to calculate the distance from
- * @param order if "DESC" then the order will be descending, everything else resorts to the default sort of ascending order
- * @returns {*} sorted Elements array
- */
-export function sortByDistanceFrom(atomsImm, location, order = "ASC") {
-  let sortedAtoms = atomsImm && atomsImm.toArray();
-
-  if (sortedAtoms) {
-    sortedAtoms.sort(function(a, b) {
-      const bDist = getDistanceFrom(b, location);
-      const aDist = getDistanceFrom(a, location);
-
-      if (order === "DESC") {
-        return bDist - aDist;
-      } else {
-        return aDist - bDist;
-      }
-    });
-  }
-
-  return sortedAtoms;
-}
-
 function getSocketKeysReset(socketsImm) {
   //TODO: Needs to be generic somehow, otherwise every socket that is added would not be able to be reset correctly
   return socketsImm.mapKeys(key => key.substr(key.lastIndexOf("#")));
