@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { generateLink, get, getIn, getUri } from "~/app/utils";
+import { generateLink, get, getUri } from "~/app/utils";
 import { Link } from "react-router-dom";
 import * as atomUtils from "~/app/redux/utils/atom-utils";
 import WonAtomMap from "~/app/components/atom-map";
@@ -38,11 +38,12 @@ export function generateSwipeableContent(
           );
       });
   };
-  generateWikiDataImages(getIn(atom, ["content", "eventObjectAboutUris"]));
-  generateWikiDataImages(getIn(atom, ["content", "classifiedAs"]));
+  const atomContent = atomUtils.getContent(atom);
+  generateWikiDataImages(get(atomContent, "eventObjectAboutUris"));
+  generateWikiDataImages(get(atomContent, "classifiedAs"));
 
   // Add Pokemon Image if pokemonRaid detail is set
-  const pokemonRaid = getIn(atom, ["content", "pokemonRaid"]);
+  const pokemonRaid = get(atomContent, "pokemonRaid");
   const pokemonId = get(pokemonRaid, "id");
   const pokemon =
     pokemonId &&

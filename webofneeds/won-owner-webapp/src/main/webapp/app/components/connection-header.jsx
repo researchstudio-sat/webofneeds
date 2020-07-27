@@ -270,7 +270,10 @@ export default function WonConnectionHeader({
       if (!hideTimestamp) {
         const friendlyTimestamp =
           connection &&
-          relativeTime(globalLastUpdateTime, get(connection, "lastUpdateDate"));
+          relativeTime(
+            globalLastUpdateTime,
+            connectionUtils.getLastUpdateDate(connection)
+          );
         timeStampElement = friendlyTimestamp ? (
           <div className="ch__right__subtitle__date">{friendlyTimestamp}</div>
         ) : (

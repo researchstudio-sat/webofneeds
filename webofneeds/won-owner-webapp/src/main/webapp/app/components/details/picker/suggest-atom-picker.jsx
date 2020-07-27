@@ -23,7 +23,7 @@ const mapStateToProps = (state, ownProps) => {
   const hasAtLeastOneAllowedSocket = (atom, allowedSockets) => {
     if (allowedSockets) {
       const allowedSocketsImm = Immutable.fromJS(allowedSockets);
-      const atomSocketsImm = getIn(atom, ["content", "sockets"]);
+      const atomSocketsImm = atomUtils.getSockets(atom);
 
       return (
         atomSocketsImm &&

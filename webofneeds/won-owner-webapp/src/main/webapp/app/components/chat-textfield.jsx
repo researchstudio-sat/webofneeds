@@ -93,8 +93,8 @@ export default function ChatTextfield({
     selectedDetailIdentifier &&
     get(allMessageDetailsImm, selectedDetailIdentifier);
 
-  const multiSelectType = get(connection, "multiSelectType");
-  const showAgreementData = get(connection, "showAgreementData");
+  const multiSelectType = connectionUtils.getMultiSelectType(connection);
+  const showAgreementData = connectionUtils.showAgreementData(connection);
   const isChatToGroupConnection = connectionUtils.hasTargetSocketUri(
     connection,
     atomUtils.getGroupSocket(targetAtom)

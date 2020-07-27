@@ -342,7 +342,7 @@ export default function WonGroupAtomMessages({
             processState={processState}
             allAtoms={allAtoms}
             ownedConnections={ownedConnections}
-            originatorAtom={get(allAtoms, get(msg, "originatorUri"))}
+            originatorAtom={get(allAtoms, messageUtils.getOriginatorUri(msg))}
             shouldShowRdf={shouldShowRdf}
             groupChatMessage={true}
           />

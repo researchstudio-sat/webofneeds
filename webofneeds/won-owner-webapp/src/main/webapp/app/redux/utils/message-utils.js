@@ -4,6 +4,7 @@
 
 import vocab from "../../service/vocab.js";
 import { get, getIn, getUri } from "../../utils.js";
+import { getAgreementData } from "./connection-utils.js";
 
 export function isReceivedByOwn(msg) {
   return !!msg && get(msg, "isReceivedByOwn");
@@ -26,10 +27,10 @@ export function hasFailedToSend(msg) {
 export function isMessageProposable(con, msg) {
   //TODO: should a message be proposable if it was already proposed? or even accepted? and what if the ref are only forwardedMessages?
   return (
-    get(msg, "hasContent") &&
-    get(msg, "messageType") !== vocab.WONMSG.connectMessage &&
-    get(msg, "messageType") !== vocab.WONMSG.changeNotificationMessage &&
-    !get(msg, "hasReferences") &&
+    hasContent(msg) &&
+    !isConnectMessage(msg) &&
+    !isChangeNotificationMessage(msg) &&
+    !hasReferences(msg) &&
     !isMessageRetracted(con, msg) &&
     !isMessageRejected(con, msg)
   );
@@ -44,10 +45,10 @@ export function isMessageProposable(con, msg) {
 export function isMessageClaimable(con, msg) {
   //TODO: should a message be claimable if it was already claimed or proposed or even accepted? what if the ref are only forwardedMessages?
   return (
-    get(msg, "hasContent") &&
-    get(msg, "messageType") !== vocab.WONMSG.connectMessage &&
-    get(msg, "messageType") !== vocab.WONMSG.changeNotificationMessage &&
-    !get(msg, "hasReferences") &&
+    hasContent(msg) &&
+    !isConnectMessage(msg) &&
+    !isChangeNotificationMessage(msg) &&
+    !hasReferences(msg) &&
     !isMessageRetracted(con, msg) &&
     !isMessageRejected(con, msg)
   );
@@ -61,7 +62,7 @@ export function isMessageClaimable(con, msg) {
  */
 export function isMessageAgreeable(con, msg) {
   return (
-    get(msg, "hasContent") &&
+    hasContent(msg) &&
     (hasClaimsReferences(con, msg) ||
       hasProposesReferences(con, msg) ||
       hasProposesToCancelReferences(con, msg)) &&
@@ -91,6 +92,14 @@ export function isMessageCancelable(con, msg) {
   );
 }
 
+export function isOutgoingMessage(msg) {
+  return get(msg, "outgoingMessage");
+}
+
+export function isIncomingMessage(msg) {
+  return !isOutgoingMessage(msg);
+}
+
 /**
  * Determines if a given message can be Accepted
  * @param con
@@ -102,7 +111,7 @@ export function isMessageAcceptable(con, msg) {
     (hasClaimsReferences(msg) ||
       hasProposesReferences(msg) ||
       hasProposesToCancelReferences(msg)) &&
-    !get(msg, "outgoingMessage") &&
+    isIncomingMessage(msg) &&
     !isMessageAccepted(con, msg) &&
     !isMessageAgreedOn(con, msg) &&
     !isMessageCancelled(con, msg) &&
@@ -120,7 +129,7 @@ export function isMessageAcceptable(con, msg) {
  */
 export function isMessageRetractable(con, msg) {
   return (
-    get(msg, "outgoingMessage") &&
+    isOutgoingMessage(msg) &&
     !isMessageAccepted(con, msg) &&
     !isMessageAgreedOn(con, msg) &&
     !isMessageCancelled(con, msg) &&
@@ -141,7 +150,7 @@ export function isMessageRejectable(con, msg) {
     (hasClaimsReferences(msg) ||
       hasProposesReferences(msg) ||
       hasProposesToCancelReferences(msg)) &&
-    !get(msg, "outgoingMessage") &&
+    isIncomingMessage(msg) &&
     !isMessageAccepted(con, msg) &&
     !isMessageAgreedOn(con, msg) &&
     !isMessageCancelled(con, msg) &&
@@ -149,6 +158,30 @@ export function isMessageRejectable(con, msg) {
     !isMessageRetracted(con, msg) &&
     !isMessageRejected(con, msg)
   );
+}
+
+export function getOriginatorUri(msg) {
+  return get(msg, "originatorUri");
+}
+
+export function getForwardMessage(msg) {
+  return get(msg, "forwardMessage");
+}
+
+export function hasReferences(msg) {
+  return get(msg, "hasReferences");
+}
+
+export function hasContent(msg) {
+  return get(msg, "hasContent");
+}
+
+export function getContent(msg) {
+  return get(msg, "content");
+}
+
+export function isSystemMessage(msg) {
+  return get(msg, "systemMessage");
 }
 
 export function getReferences(msg) {
@@ -220,7 +253,7 @@ export function hasProposesToCancelReferences(msg) {
  * @returns {*|boolean}
  */
 export function isMessageProposed(con, msg) {
-  const agreementData = get(con, "agreementData");
+  const agreementData = getAgreementData(con);
   const proposedMessageUris = get(agreementData, "proposedMessageUris");
   return proposedMessageUris && proposedMessageUris.has(getUri(msg));
 }
@@ -232,7 +265,7 @@ export function isMessageProposed(con, msg) {
  * @returns {*|boolean}
  */
 export function isMessageClaimed(con, msg) {
-  const agreementData = get(con, "agreementData");
+  const agreementData = getAgreementData(con);
   const claimedMessageUris = get(agreementData, "claimedMessageUris");
   return claimedMessageUris && claimedMessageUris.has(getUri(msg));
 }
@@ -244,7 +277,7 @@ export function isMessageClaimed(con, msg) {
  * @returns {*|boolean}
  */
 export function isMessageRejected(con, msg) {
-  const agreementData = get(con, "agreementData");
+  const agreementData = getAgreementData(con);
   const rejectedMessageUris = get(agreementData, "rejectedMessageUris");
   return rejectedMessageUris && rejectedMessageUris.has(getUri(msg));
 }
@@ -256,7 +289,7 @@ export function isMessageRejected(con, msg) {
  * @returns {*|boolean}
  */
 export function isMessageAccepted(con, msg) {
-  const agreementData = get(con, "agreementData");
+  const agreementData = getAgreementData(con);
   const acceptedMessageUris = get(agreementData, "agreementUris");
 
   const acceptedCancellationProposalUris = get(
@@ -278,7 +311,7 @@ export function isMessageAccepted(con, msg) {
  * @returns {*|boolean}
  */
 export function isMessageAgreedOn(con, msg) {
-  const agreementData = get(con, "agreementData");
+  const agreementData = getAgreementData(con);
   const agreedMessageUris = get(agreementData, "agreedMessageUris");
   return agreedMessageUris && agreedMessageUris.has(getUri(msg));
 }
@@ -290,7 +323,7 @@ export function isMessageAgreedOn(con, msg) {
  * @returns {*|boolean}
  */
 export function isMessageRetracted(con, msg) {
-  const agreementData = get(con, "agreementData");
+  const agreementData = getAgreementData(con);
   const retractedMessageUris = get(agreementData, "retractedMessageUris");
   return retractedMessageUris && retractedMessageUris.has(getUri(msg));
 }
@@ -302,7 +335,7 @@ export function isMessageRetracted(con, msg) {
  * @returns {*|boolean}
  */
 export function isMessageCancelled(con, msg) {
-  const agreementData = get(con, "agreementData");
+  const agreementData = getAgreementData(con);
   const cancelledMessageUris = get(agreementData, "cancelledAgreementUris");
   return cancelledMessageUris && cancelledMessageUris.has(getUri(msg));
 }
@@ -314,7 +347,7 @@ export function isMessageCancelled(con, msg) {
  * @returns {*|boolean}
  */
 export function isMessageCancellationPending(con, msg) {
-  const agreementData = get(con, "agreementData");
+  const agreementData = getAgreementData(con);
   const cancellationPendingUris = get(
     agreementData,
     "cancellationPendingAgreementUris"
@@ -331,6 +364,10 @@ export function isMessageUnread(msg) {
   return !!get(msg, "unread");
 }
 
+export function getInjectInto(msg) {
+  return get(msg, "injectInto");
+}
+
 /**
  * determines whether the given message is currently selected or not
  * @param msg
@@ -338,6 +375,18 @@ export function isMessageUnread(msg) {
  */
 export function isMessageSelected(msg) {
   return getIn(msg, ["viewState", "isSelected"]);
+}
+
+export function isCollapsed(msg) {
+  return getIn(msg, ["viewState", "isCollapsed"]);
+}
+
+export function getExpandedReferences(msg) {
+  return getIn(msg, ["viewState", "expandedReferences"]);
+}
+
+export function showActions(msg) {
+  return getIn(msg, ["viewState", "showActions"]);
 }
 
 /**
@@ -388,20 +437,28 @@ export function isMessageAgreement(con, msg) {
   return isMessageAccepted(con, msg) && !isMessageCancellationPending(con, msg);
 }
 
+export function getType(msg) {
+  return get(msg, "messageType");
+}
+
 export function isAtomHintMessage(msg) {
-  return get(msg, "messageType") === vocab.WONMSG.atomHintMessage;
+  return getType(msg) === vocab.WONMSG.atomHintMessage;
 }
 
 export function isSocketHintMessage(msg) {
-  return get(msg, "messageType") === vocab.WONMSG.socketHintMessage;
+  return getType(msg) === vocab.WONMSG.socketHintMessage;
 }
 
 export function isConnectionMessage(msg) {
-  return get(msg, "messageType") === vocab.WONMSG.connectionMessage;
+  return getType(msg) === vocab.WONMSG.connectionMessage;
+}
+
+export function isConnectMessage(msg) {
+  return getType(msg) === vocab.WONMSG.connectMessage;
 }
 
 export function isChangeNotificationMessage(msg) {
-  return get(msg, "messageType") === vocab.WONMSG.changeNotificationMessage;
+  return getType(msg) === vocab.WONMSG.changeNotificationMessage;
 }
 
 export function isParsable(msg) {
@@ -409,7 +466,8 @@ export function isParsable(msg) {
 }
 
 export function getHumanReadableString(msg) {
-  return getIn(msg, ["content", "text"]) || "«Message does not have text»";
+  const content = getContent(msg);
+  return get(content, "text") || "«Message does not have text»";
 }
 
 /**
@@ -421,15 +479,19 @@ export function sortMessages(messagesMap) {
   return messagesMap.toOrderedMap().sortBy(sortByMessageTimeStamp);
 }
 
+export function getDate(msg) {
+  return get(msg, "date");
+}
+
 /**
  * Default message Sorting -> so we can already store a sorted map of messages in the atom
- * @param message
+ * @param msg
  * @returns {any}
  */
-export function sortByMessageTimeStamp(message) {
-  const messageDate = get(message, "date");
+export function sortByMessageTimeStamp(msg) {
+  const messageDate = getDate(msg);
   if (!messageDate) {
-    console.warn("messageDate for message is undefinded: ", message);
+    console.warn("messageDate for message is undefinded: ", msg);
   }
   return messageDate && messageDate.getTime();
 }

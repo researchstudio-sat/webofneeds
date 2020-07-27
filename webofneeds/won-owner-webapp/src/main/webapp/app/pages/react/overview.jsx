@@ -44,7 +44,7 @@ export default function PageOverview() {
     );
 
   const whatsNewUseCaseIdentifierArray = whatsNewAtoms
-    .map(atom => getIn(atom, ["matchedUseCase", "identifier"]))
+    .map(atom => atomUtils.getMatchedUseCaseIdentifier(atom))
     .filter(identifier => !!identifier)
     .toSet()
     .toArray();

@@ -357,23 +357,23 @@ function extractLastModifiedDate(atomJsonLd) {
 
 function getHumanReadableStringFromAtom(atomImm, detailsToParse) {
   if (atomImm && detailsToParse) {
-    const atomContent = get(atomImm, "content");
-    const seeksBranch = get(atomImm, "seeks");
+    const atomContent = atomUtils.getContent(atomImm);
+    const seeksBranch = atomUtils.getSeeks(atomImm);
 
     const title = get(atomContent, "title");
     const seeksTitle = get(seeksBranch, "title");
 
     if (atomUtils.isServiceAtom(atomImm) || atomUtils.isPersona(atomImm)) {
-      return getIn(atomImm, ["content", "personaName"]);
+      return get(atomContent, "personaName");
     }
 
-    if (getIn(atomImm, ["matchedUseCase", "identifier"]) === "pokemonGoRaid") {
+    if (atomUtils.getMatchedUseCaseIdentifier(atomImm) === "pokemonGoRaid") {
       let raidReadable;
       let locationReadable;
       let gymReadable;
 
       const raidDetail = "pokemonRaid";
-      const raidValueImm = getIn(atomImm, ["content", raidDetail]);
+      const raidValueImm = get(atomContent, raidDetail);
       if (raidValueImm && detailsToParse[raidDetail]) {
         raidReadable = detailsToParse[raidDetail].generateHumanReadable({
           value: raidValueImm.toJS(),
@@ -382,7 +382,7 @@ function getHumanReadableStringFromAtom(atomImm, detailsToParse) {
       }
 
       const locationDetail = "location";
-      const locationValueImm = getIn(atomImm, ["content", locationDetail]);
+      const locationValueImm = get(atomContent, locationDetail);
       if (locationValueImm && detailsToParse[locationDetail]) {
         locationReadable = detailsToParse[locationDetail].generateHumanReadable(
           {
@@ -393,7 +393,7 @@ function getHumanReadableStringFromAtom(atomImm, detailsToParse) {
       }
 
       const gymDetail = "pokemonGymInfo";
-      const gymValueImm = getIn(atomImm, ["content", gymDetail]);
+      const gymValueImm = get(atomContent, gymDetail);
       if (gymValueImm && detailsToParse[gymDetail]) {
         gymReadable = detailsToParse[gymDetail].generateHumanReadable({
           value: gymValueImm.toJS(),

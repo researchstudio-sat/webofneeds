@@ -11,6 +11,7 @@ import {
 import * as connectionUtils from "../../redux/utils/connection-utils";
 import * as messageUtils from "../../redux/utils/message-utils";
 import { addAtomStub } from "./reduce-atoms";
+import * as atomUtils from "~/app/redux/utils/atom-utils";
 
 export function storeConnectionsData(allAtomsInState, connectionsToStore) {
   if (connectionsToStore && connectionsToStore.size > 0) {
@@ -105,7 +106,7 @@ export function markConnectionAsRead(allAtomsInState, connectionUri) {
 export function markConnectionAsRated(allAtomsInState, connectionUri) {
   let atom =
     connectionUri && getAtomByConnectionUri(allAtomsInState, connectionUri);
-  let connection = getIn(atom, ["connections", connectionUri]);
+  let connection = atomUtils.getConnection(atom, connectionUri);
 
   if (!connection) {
     console.error(
@@ -135,7 +136,7 @@ export function markConnectionAsRated(allAtomsInState, connectionUri) {
 export function getAtomByConnectionUri(allAtomsInState, connectionUri) {
   return (
     get(allAtomsInState, extractAtomUriFromConnectionUri(connectionUri)) ||
-    allAtomsInState.find(atom => getIn(atom, ["connections", connectionUri]))
+    allAtomsInState.find(atom => atomUtils.getConnection(atom, connectionUri))
   );
 }
 
@@ -342,7 +343,7 @@ export function setMultiSelectType(
         [atomUri, "connections", connectionUri, "messages"],
         messageUtils.sortMessages(
           messages.map(msg => {
-            msg = getIn(msg, ["viewState", "isSelected"])
+            msg = messageUtils.isMessageSelected(msg)
               ? msg.setIn(["viewState", "isSelected"], false)
               : msg;
             return msg;

@@ -31,15 +31,15 @@ export default function WonCombinedMessageContent({
   onClick,
 }) {
   const history = useHistory();
-  const messageType = get(message, "messageType");
-  const injectInto = get(message, "injectInto");
+  const messageType = messageUtils.getType(message);
+  const injectInto = messageUtils.getInjectInto(message);
 
-  const hasReferences = get(message, "hasReferences");
+  const hasReferences = messageUtils.hasReferences(message);
   const referencesProposes = messageUtils.getProposesReferences(message);
   const referencesClaims = messageUtils.getClaimsReferences(message);
   const externalDataState = useSelector(generalSelectors.getExternalDataState);
 
-  const originatorUri = get(message, "originatorUri");
+  const originatorUri = messageUtils.getOriginatorUri(message);
   /*Extract persona name from message:
 
    either within the atom of the originatorUri-atom (in group-chat-messages)
@@ -48,7 +48,7 @@ export default function WonCombinedMessageContent({
    */
   let personaName = undefined;
 
-  if (!get(message, "outgoingMessage")) {
+  if (messageUtils.isIncomingMessage(message)) {
     const relevantAtomUri = groupChatMessage
       ? originatorUri
       : connectionUtils.getTargetAtomUri(connection);
@@ -63,12 +63,12 @@ export default function WonCombinedMessageContent({
       : get(relevantAtom, "fakePersonaName");
   }
 
-  const multiSelectType = get(connection, "multiSelectType");
-  const hasContent = get(message, "hasContent");
+  const multiSelectType = connectionUtils.getMultiSelectType(connection);
+  const hasContent = messageUtils.hasContent(message);
   const hasNotBeenLoaded = !message;
   const hasClaims = referencesClaims && referencesClaims.size > 0;
   const hasProposes = referencesProposes && referencesProposes.size > 0;
-  const agreementData = get(connection, "agreementData");
+  const agreementData = connectionUtils.getAgreementData(connection);
   const isInjectIntoMessage = injectInto && injectInto.size > 0; //contains the targetConnectionUris
 
   const injectIntoArray = injectInto && Array.from(injectInto.toSet());
@@ -140,7 +140,7 @@ export default function WonCombinedMessageContent({
       return (
         ownedConnections &&
         !!ownedConnections.find(
-          conn => get(conn, "targetConnectionUri") === connectionUri
+          conn => connectionUtils.getTargetConnectionUri(conn) === connectionUri
         )
       );
     }
@@ -156,7 +156,7 @@ export default function WonCombinedMessageContent({
       connection =
         ownedConnections &&
         ownedConnections.find(
-          conn => get(conn, "targetConnectionUri") === connectionUri
+          conn => connectionUtils.getTargetConnectionUri(conn) === connectionUri
         );
 
       if (connection) {

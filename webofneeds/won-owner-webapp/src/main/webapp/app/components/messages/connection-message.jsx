@@ -44,17 +44,19 @@ export default function WonConnectionMessage({
   const connectionUri = getUri(connection);
 
   let rdfLinkURL;
+  const isSent = messageUtils.isOutgoingMessage(message);
+
   if (shouldShowRdf && ownerBaseUrl && senderAtom && message) {
     rdfLinkURL = urljoin(
       ownerBaseUrl,
       "/rest/linked-data/",
       `?requester=${encodeURIComponent(getUri(senderAtom))}`,
       `&uri=${encodeURIComponent(getUri(message))}`,
-      get(message, "outgoingMessage") ? "&deep=true" : ""
+      isSent ? "&deep=true" : ""
     );
   }
-  const isSent = get(message, "outgoingMessage");
-  const isReceived = !get(message, "outgoingMessage");
+
+  const isReceived = messageUtils.isIncomingMessage(message);
   const isFailedToSend = messageUtils.hasFailedToSend(message);
   const isReceivedByOwn = messageUtils.isReceivedByOwn(message);
   const isReceivedByRemote = messageUtils.isReceivedByRemote(message);
@@ -70,18 +72,18 @@ export default function WonConnectionMessage({
     (!(isReceivedByOwn && isReceivedByRemote) &&
       (isReceivedByOwn || isReceivedByRemote));
 
-  const injectInto = get(message, "injectInto");
+  const injectInto = messageUtils.getInjectInto(message);
 
-  const originatorUri = get(message, "originatorUri");
+  const originatorUri = messageUtils.getOriginatorUri(message);
 
   const isConnectionMessage = messageUtils.isConnectionMessage(message);
   const isChangeNotificationMessage = messageUtils.isChangeNotificationMessage(
     message
   );
-  const isSelected = getIn(message, ["viewState", "isSelected"]);
-  const isCollapsed = getIn(message, ["viewState", "isCollapsed"]);
-  const showActions = getIn(message, ["viewState", "showActions"]);
-  const multiSelectType = get(connection, "multiSelectType");
+  const isSelected = messageUtils.isMessageSelected(message);
+  const isCollapsed = messageUtils.isCollapsed(message);
+  const showActions = messageUtils.showActions(message);
+  const multiSelectType = connectionUtils.getMultiSelectType(connection);
   const isParsable = messageUtils.isParsable(message);
   const isClaimed = messageUtils.isMessageClaimed(connection, message);
   const isProposed = messageUtils.isMessageProposed(connection, message);
@@ -114,8 +116,8 @@ export default function WonConnectionMessage({
   const isAcceptable = messageUtils.isMessageAcceptable(connection, message);
   const isUnread = messageUtils.isMessageUnread(message);
   const isInjectIntoMessage = injectInto && injectInto.size > 0;
-  const isFromSystem = get(message, "systemMessage");
-  const hasReferences = get(message, "hasReferences");
+  const isFromSystem = messageUtils.isSystemMessage(message);
+  const hasReferences = messageUtils.hasReferences(message);
 
   const originatorHolderUri =
     groupChatMessage && atomUtils.getHeldByUri(originatorAtom);

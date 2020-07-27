@@ -6,7 +6,7 @@ import PropTypes from "prop-types";
 import VisibilitySensor from "react-visibility-sensor";
 import WonAtomConnectionsIndicator from "../atom-connections-indicator.jsx";
 import * as processUtils from "../../redux/utils/process-utils.js";
-import { get } from "../../utils.js";
+import * as atomUtils from "../../redux/utils/atom-utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { useDispatch } from "react-redux";
 
@@ -21,7 +21,7 @@ export default function WonSkeletonCard({
 }) {
   const dispatch = useDispatch();
 
-  const atomInCreation = get(atom, "isBeingCreated");
+  const atomInCreation = atomUtils.isBeingCreated(atom);
   const atomFailedToLoad = processUtils.hasAtomFailedToLoad(
     processState,
     atomUri

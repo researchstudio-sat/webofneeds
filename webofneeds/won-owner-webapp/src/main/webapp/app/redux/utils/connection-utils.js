@@ -14,6 +14,18 @@ export function getTargetAtomUri(connection) {
   return get(connection, "targetAtomUri");
 }
 
+export function getTargetConnectionUri(connection) {
+  return get(connection, "targetConnectionUri");
+}
+
+export function getLastUpdateDate(connection) {
+  return get(connection, "lastUpdateDate");
+}
+
+export function getMultiSelectType(connection) {
+  return get(connection, "multiSelectType");
+}
+
 export function getSocketUri(connection) {
   return get(connection, "socketUri");
 }
@@ -48,6 +60,26 @@ export function isClosed(connection) {
 
 export function isUnread(connection) {
   return !!get(connection, "unread");
+}
+
+export function getAgreementData(connection) {
+  return get(connection, "agreementData");
+}
+
+export function getAgreementDataset(connection) {
+  return get(connection, "agreementDataset");
+}
+
+export function getPetriNetData(connection) {
+  return get(connection, "petriNetData");
+}
+
+export function showPetriNetData(connection) {
+  return get(connection, "showPetriNetData");
+}
+
+export function showAgreementData(connection) {
+  return get(connection, "showAgreementData");
 }
 
 export function hasSocketUris(connection, socketUri, targetSocketUri) {

@@ -4,7 +4,6 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { relativeTime } from "../../won-label-utils.js";
-import { get } from "../../utils.js";
 import { useSelector } from "react-redux";
 import { selectLastUpdateTime } from "../../redux/selectors/general-selectors.js";
 import * as messageUtils from "../../redux/utils/message-utils.js";
@@ -16,7 +15,7 @@ import ico36_added_circle from "~/images/won-icons/ico36_added_circle.svg";
 export default function WonConnectionMessageStatus({ message }) {
   const lastUpdateTime = useSelector(selectLastUpdateTime);
 
-  const isOutgoingMessage = get(message, "outgoingMessage");
+  const isOutgoingMessage = messageUtils.isOutgoingMessage(message);
   const isFailedToSend = messageUtils.hasFailedToSend(message);
   const isReceivedByOwn = messageUtils.isReceivedByOwn(message);
   const isReceivedByRemote = messageUtils.isReceivedByRemote(message);
@@ -72,7 +71,7 @@ export default function WonConnectionMessageStatus({ message }) {
   ) {
     timeStampLabel = (
       <div className="msgstatus__time">
-        {relativeTime(lastUpdateTime, get(message, "date"))}
+        {relativeTime(lastUpdateTime, messageUtils.getDate(message))}
       </div>
     );
   }

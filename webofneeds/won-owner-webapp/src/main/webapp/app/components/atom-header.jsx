@@ -3,7 +3,7 @@
  */
 import React from "react";
 import { Link } from "react-router-dom";
-import { get, getUri } from "../utils.js";
+import { getUri } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { relativeTime } from "../won-label-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
@@ -47,7 +47,7 @@ export default function WonAtomHeader({
   const friendlyTimestamp =
     !hideTimestamp &&
     atom &&
-    relativeTime(globalUpdateTimestamp, get(atom, "lastUpdateDate"));
+    relativeTime(globalUpdateTimestamp, atomUtils.getLastUpdateDate(atom));
 
   const title = atomUtils.getTitle(atom, externalDataState);
 
@@ -107,7 +107,7 @@ export default function WonAtomHeader({
         </div>
       </VisibilitySensor>
     );
-  } else if (get(atom, "isBeingCreated")) {
+  } else if (atomUtils.isBeingCreated(atom)) {
     //In Creation View
     atomHeaderIcon = <WonAtomIcon atom={atom} />;
     atomHeaderContent = (

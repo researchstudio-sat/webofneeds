@@ -620,7 +620,9 @@ export function connectionsRate(connectionUri, rating) {
     const connection = atomUtils.getConnection(ownedAtom, connectionUri);
 
     const theirAtomUri = connectionUtils.getTargetAtomUri(connection);
-    const theirConnectionUri = get(connection, "targetConnectionUri");
+    const theirConnectionUri = connectionUtils.getTargetConnectionUri(
+      connection
+    );
     const theirAtom = generalSelectors.getAtom(theirAtomUri)(state);
 
     won

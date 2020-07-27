@@ -28,7 +28,7 @@ export default function WonPetrinetState({ processUri, className }) {
   const processState = useSelector(generalSelectors.getProcessState);
   const connection = atomUtils.getConnection(atom, connectionUri);
 
-  const petriNetData = get(connection, "petriNetData");
+  const petriNetData = connectionUtils.getPetriNetData(connection);
 
   const process = processUri && get(petriNetData, processUri);
 
@@ -54,7 +54,7 @@ export default function WonPetrinetState({ processUri, className }) {
     ? enabledTransitions.size
     : 0;
 
-  const multiSelectType = get(connection, "multiSelectType");
+  const multiSelectType = connectionUtils.getMultiSelectType(connection);
   const hasEnabledTransitions = enabledTransitionsSize > 0;
   const hasMarkedPlaces = markedPlacesSize > 0;
   const enabledTransitionsArray =

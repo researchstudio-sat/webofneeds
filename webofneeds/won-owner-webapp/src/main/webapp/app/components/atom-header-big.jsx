@@ -264,7 +264,7 @@ export default function WonAtomHeaderBig({
     const holderName =
       atomUtils.hasHoldableSocket(atom) && !atomUtils.hasGroupSocket(atom)
         ? atomUtils.getTitle(holderAtom, externalDataState) ||
-          get(atom, "fakePersonaName")
+          atomUtils.getFakePersonaName(atom)
         : undefined;
 
     const holderNameElement = holderName && (

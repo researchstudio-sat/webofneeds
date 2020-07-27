@@ -6,12 +6,12 @@ import * as N3 from "n3";
 import { usePrevious } from "../cstm-react-utils.js";
 import PropTypes from "prop-types";
 import won from "../service/won";
-import { get } from "../utils.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
 
 import "../../style/_connection-agreement-details.scss";
 
 export default function WonConnectionAgreementDetails({ connection }) {
-  const lastAgreementDataset = get(connection, "agreementDataset");
+  const lastAgreementDataset = connectionUtils.getAgreementDataset(connection);
   const previousAgreementDataset =
     lastAgreementDataset &&
     usePrevious(lastAgreementDataset, useRef, useEffect);

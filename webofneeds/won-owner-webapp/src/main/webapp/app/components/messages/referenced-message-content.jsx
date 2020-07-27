@@ -6,7 +6,7 @@ import { actionCreators } from "../../actions/actions.js";
 import { useDispatch } from "react-redux";
 
 import PropTypes from "prop-types";
-import { get, getIn, getUri } from "../../utils.js";
+import { get, getUri } from "../../utils.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import * as messageUtils from "../../redux/utils/message-utils.js";
 import * as ownerApi from "../../api/owner-api";
@@ -25,14 +25,11 @@ export default function WonReferencedMessageContent({
   originatorAtom,
 }) {
   const dispatch = useDispatch();
-  const expandedReferences = getIn(message, [
-    "viewState",
-    "expandedReferences",
-  ]);
+  const expandedReferences = messageUtils.getExpandedReferences(message);
 
   const references = messageUtils.getReferences(message);
   const senderAtomUri = getUri(senderAtom);
-  const multiSelectType = get(connection, "multiSelectType");
+  const multiSelectType = connectionUtils.getMultiSelectType(connection);
 
   function toggleReferenceExpansion(reference) {
     if (message && !multiSelectType) {
@@ -151,7 +148,9 @@ export default function WonReferencedMessageContent({
   return (
     <won-referenced-message-content
       class={
-        !message || get(message, "hasContent") ? "won-has-non-ref-content" : ""
+        !message || messageUtils.hasContent(message)
+          ? "won-has-non-ref-content"
+          : ""
       }
     >
       {generateMessageElementFragment("Claiming", "claims")}
