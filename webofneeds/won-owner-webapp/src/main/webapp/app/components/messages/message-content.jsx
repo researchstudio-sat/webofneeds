@@ -14,14 +14,14 @@ import "~/style/_won-markdown.scss";
 import vocab from "../../service/vocab.js";
 
 export default function WonMessageContent({ message }) {
-  const content = messageUtils.getContent(message);
-  const matchScore = get(content, "matchScore");
-  const text = get(content, "text");
-
-  const messageType = messageUtils.getType(message);
-  const matchScorePercentage = matchScore && matchScore * 100;
-
   if (message) {
+    const content = messageUtils.getContent(message);
+    const matchScore = get(content, "matchScore");
+    const text = get(content, "text");
+
+    const messageType = messageUtils.getType(message);
+    const matchScorePercentage = matchScore && matchScore * 100;
+
     const markdownText = text ? (
       <ReactMarkdown
         className="msg__text markdown"
@@ -31,7 +31,7 @@ export default function WonMessageContent({ message }) {
     ) : (
       undefined
     );
-    const matchScore = matchScore ? (
+    const matchScoreElement = matchScore ? (
       <div className="msg__matchScore">MatchScore: {matchScorePercentage}%</div>
     ) : (
       undefined
@@ -79,7 +79,7 @@ export default function WonMessageContent({ message }) {
       <won-message-content>
         {markdownText}
         {contentDetailsArray}
-        {matchScore}
+        {matchScoreElement}
         {noParsableContent}
       </won-message-content>
     );
