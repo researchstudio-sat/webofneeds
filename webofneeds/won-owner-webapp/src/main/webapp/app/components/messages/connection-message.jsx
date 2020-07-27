@@ -28,7 +28,6 @@ const MESSAGE_READ_TIMEOUT = 1500;
 export default function WonConnectionMessage({
   message,
   senderAtom,
-  // targetAtom,
   originatorAtom,
   processState,
   allAtoms,
@@ -43,48 +42,15 @@ export default function WonConnectionMessage({
   const messageUri = getUri(message);
   const connectionUri = getUri(connection);
 
-  let rdfLinkURL;
   const isSent = messageUtils.isOutgoingMessage(message);
-
-  if (shouldShowRdf && ownerBaseUrl && senderAtom && message) {
-    rdfLinkURL = urljoin(
-      ownerBaseUrl,
-      "/rest/linked-data/",
-      `?requester=${encodeURIComponent(getUri(senderAtom))}`,
-      `&uri=${encodeURIComponent(getUri(message))}`,
-      isSent ? "&deep=true" : ""
-    );
-  }
-
   const isReceived = messageUtils.isIncomingMessage(message);
-  const isFailedToSend = messageUtils.hasFailedToSend(message);
-  const isReceivedByOwn = messageUtils.isReceivedByOwn(message);
-  const isReceivedByRemote = messageUtils.isReceivedByRemote(message);
 
-  // determines if the sent message is not received by any of the servers yet but not failed either
-  const isPending =
-    isSent && !isFailedToSend && !isReceivedByOwn && !isReceivedByRemote;
-
-  // determines if the sent message is received by any of the servers yet but not failed either
-  const isPartiallyLoaded =
-    isSent &&
-    !isFailedToSend &&
-    (!(isReceivedByOwn && isReceivedByRemote) &&
-      (isReceivedByOwn || isReceivedByRemote));
-
-  const injectInto = messageUtils.getInjectInto(message);
-
-  const originatorUri = messageUtils.getOriginatorUri(message);
-
-  const isConnectionMessage = messageUtils.isConnectionMessage(message);
   const isChangeNotificationMessage = messageUtils.isChangeNotificationMessage(
     message
   );
-  const isSelected = messageUtils.isMessageSelected(message);
   const isCollapsed = messageUtils.isCollapsed(message);
   const showActions = messageUtils.showActions(message);
   const multiSelectType = connectionUtils.getMultiSelectType(connection);
-  const isParsable = messageUtils.isParsable(message);
   const isClaimed = messageUtils.isMessageClaimed(connection, message);
   const isProposed = messageUtils.isMessageProposed(connection, message);
   const isAccepted = messageUtils.isMessageAccepted(connection, message);
@@ -97,13 +63,13 @@ export default function WonConnectionMessage({
   );
   const isCancelled = messageUtils.isMessageCancelled(connection, message);
   const isCollapsible =
-    messageUtils.isMessageClaimed(connection, message) ||
-    messageUtils.isMessageProposed(connection, message) ||
-    messageUtils.isMessageAgreedOn(connection, message) ||
-    messageUtils.isMessageRejected(connection, message) ||
-    messageUtils.isMessageRetracted(connection, message) ||
-    messageUtils.isMessageCancellationPending(connection, message) ||
-    messageUtils.isMessageCancelled(connection, message);
+    isClaimed ||
+    isProposed ||
+    isAgreed ||
+    isRejected ||
+    isRetracted ||
+    isCancellationPending ||
+    isCancelled;
   const isProposable =
     connectionUtils.isConnected(connection) &&
     messageUtils.isMessageProposable(connection, message);
@@ -111,56 +77,39 @@ export default function WonConnectionMessage({
     connectionUtils.isConnected(connection) &&
     messageUtils.isMessageClaimable(connection, message);
   const isCancelable = messageUtils.isMessageCancelable(connection, message);
-  const isRetractable = messageUtils.isMessageRetractable(connection, message);
-  const isRejectable = messageUtils.isMessageRejectable(connection, message);
-  const isAcceptable = messageUtils.isMessageAcceptable(connection, message);
   const isUnread = messageUtils.isMessageUnread(message);
-  const isInjectIntoMessage = injectInto && injectInto.size > 0;
-  const isFromSystem = messageUtils.isSystemMessage(message);
+
   const hasReferences = messageUtils.hasReferences(message);
 
-  const originatorHolderUri =
-    groupChatMessage && atomUtils.getHeldByUri(originatorAtom);
-  const originatorHolder = get(allAtoms, originatorHolderUri);
-
-  const isOriginatorAtomFetchNecessary =
-    isReceived &&
-    groupChatMessage &&
-    processUtils.isAtomFetchNecessary(
-      processState,
-      originatorUri,
-      originatorAtom
-    );
-
-  const isOriginatorHolderFetchNecessary =
-    isReceived &&
-    groupChatMessage &&
-    processUtils.isAtomFetchNecessary(
-      processState,
-      originatorHolderUri,
-      originatorHolder
-    );
-
-  function ensureOriginatorIsFetched() {
-    if (isOriginatorAtomFetchNecessary) {
-      console.debug("fetch originatorUri, ", originatorUri);
-      dispatch(actionCreators.atoms__fetchUnloadedAtom(originatorUri));
-    }
-  }
-  function ensureOriginatorHolderIsFetched() {
-    if (isOriginatorHolderFetchNecessary) {
-      console.debug("fetch originatorHolderUri, ", originatorHolderUri);
-      dispatch(actionCreators.atoms__fetchUnloadedAtom(originatorHolderUri));
-    }
-  }
-
   function generateParentCssClasses() {
+    const isSelectable = () => {
+      //TODO: Not allowed for certain high-level protocol states
+      if (message && multiSelectType) {
+        switch (multiSelectType) {
+          case "rejects":
+            return messageUtils.isMessageRejectable(connection, message);
+          case "retracts":
+            return messageUtils.isMessageRetractable(connection, message);
+          case "proposesToCancel":
+            return isCancelable;
+          case "accepts":
+            return messageUtils.isMessageAcceptable(connection, message);
+          case "proposes":
+            return isProposable;
+          case "claims":
+            return isClaimable;
+        }
+      }
+      return false;
+    };
+
     const cssClassNames = [];
     isReceived && cssClassNames.push("won-cm--left");
     isSent && cssClassNames.push("won-cm--right");
     !!multiSelectType && cssClassNames.push("won-is-multiSelect");
     !isSelectable() && cssClassNames.push("won-not-selectable");
-    isSelected && cssClassNames.push("won-is-selected");
+    messageUtils.isMessageSelected(message) &&
+      cssClassNames.push("won-is-selected");
     isProposed && cssClassNames.push("won-is-proposed");
     isClaimed && cssClassNames.push("won-is-claimed");
     isRejected && cssClassNames.push("won-is-rejected");
@@ -178,338 +127,163 @@ export default function WonConnectionMessage({
     return cssClassNames.join(" ");
   }
 
-  function generateCenterCssClasses() {
-    const cssClassNames = ["won-cm__center"];
-
-    isConnectionMessage &&
-      !isParsable &&
-      cssClassNames.push("won-cm__center--nondisplayable");
-    isFromSystem && cssClassNames.push("won-cm__center--system");
-    isInjectIntoMessage && cssClassNames.push("won-cm__center--inject-into");
-
-    return cssClassNames.join(" ");
-  }
-
-  function generateCenterBubbleCssClasses() {
-    const cssClassNames = ["won-cm__center__bubble"];
-
-    hasReferences && cssClassNames.push("references");
-    isPending && cssClassNames.push("pending");
-    isPartiallyLoaded && cssClassNames.push("partiallyLoaded");
-    isSent && isFailedToSend && cssClassNames.push("failure");
-
-    return cssClassNames.join(" ");
-  }
-
-  function generateCollapsedLabel() {
-    if (message) {
-      let label;
-
-      if (isClaimed) label = "Message was claimed.";
-      else if (isProposed) label = "Message was proposed.";
-      else if (isAccepted) label = "Message was accepted.";
-      else if (isAgreed) label = "Message is part of an agreement";
-      else if (isRejected) label = "Message was rejected.";
-      else if (isRetracted) label = "Message was retracted.";
-      else if (isCancellationPending) label = "Cancellation pending.";
-      else if (isCancelled) label = "Cancelled.";
-      else label = "Message collapsed.";
-
-      return label + " Click to expand.";
-    }
-    return undefined;
-  }
-
-  function isSelectable() {
-    //TODO: Not allowed for certain high-level protocol states
-    if (message && multiSelectType) {
-      switch (multiSelectType) {
-        case "rejects":
-          return isRejectable;
-        case "retracts":
-          return isRetractable;
-        case "proposesToCancel":
-          return isCancelable;
-        case "accepts":
-          return isAcceptable;
-        case "proposes":
-          return isProposable;
-        case "claims":
-          return isClaimable;
-      }
-    }
-    return false;
-  }
-
-  function expandMessage(expand) {
-    //TODO: Not allowed for certain high-level protocol states
-    if (message && !multiSelectType) {
-      dispatch(
-        actionCreators.messages__viewState__markAsCollapsed({
-          messageUri: getUri(message),
-          connectionUri: connectionUri,
-          atomUri: getUri(senderAtom),
-          isCollapsed: expand,
-        })
-      );
-    }
-  }
-
   function showMessageAlways() {
-    if (message) {
-      return messageUtils.hasText(message)
-        ? true
-        : !hasReferences ||
-            shouldShowRdf ||
-            showActions ||
-            messageUtils.hasProposesReferences(message) ||
-            messageUtils.hasClaimsReferences(message) ||
-            messageUtils.hasProposesToCancelReferences(message);
-    }
-    return true;
-  }
-
-  //TODO: Not allowed for certain high-level protocol states
-  function showActionButtons() {
     return (
-      !groupChatMessage &&
-      !isRetracted &&
-      !isRejected &&
-      !(messageUtils.hasProposesToCancelReferences(message) && isAccepted) &&
-      (showActions ||
-        isCancelable ||
-        messageUtils.hasProposesReferences(message) ||
-        messageUtils.hasClaimsReferences(message) ||
-        messageUtils.hasProposesToCancelReferences(message))
+      !message ||
+      messageUtils.hasText(message) ||
+      !hasReferences ||
+      shouldShowRdf ||
+      showActions ||
+      messageUtils.hasProposesReferences(message) ||
+      messageUtils.hasClaimsReferences(message) ||
+      messageUtils.hasProposesToCancelReferences(message)
     );
   }
 
-  function toggleActions() {
-    dispatch(
-      actionCreators.messages__viewState__markShowActions({
-        messageUri: getUri(message),
-        connectionUri: connectionUri,
-        atomUri: getUri(senderAtom),
-        showActions: !showActions,
-      })
-    );
-  }
+  if (showMessageAlways()) {
+    const originatorUri = messageUtils.getOriginatorUri(message);
+    const originatorHolderUri =
+      groupChatMessage && atomUtils.getHeldByUri(originatorAtom);
+    const originatorHolder = get(allAtoms, originatorHolderUri);
 
-  function markAsRead() {
-    if (isUnread) {
-      setTimeout(() => {
-        dispatch(
-          actionCreators.messages__markAsRead({
-            messageUri: messageUri,
-            connectionUri: connectionUri,
-            atomUri: getUri(senderAtom),
-            read: true,
-          })
-        );
-      }, MESSAGE_READ_TIMEOUT);
-    }
-  }
+    const isOriginatorAtomFetchNecessary =
+      isReceived &&
+      groupChatMessage &&
+      processUtils.isAtomFetchNecessary(
+        processState,
+        originatorUri,
+        originatorAtom
+      );
 
-  let messageContentElement;
+    const isOriginatorHolderFetchNecessary =
+      isReceived &&
+      groupChatMessage &&
+      processUtils.isAtomFetchNecessary(
+        processState,
+        originatorHolderUri,
+        originatorHolder
+      );
 
-  function shouldWrapVisibilitySensor() {
-    return (
+    const ensureOriginatorIsFetched = () => {
+      if (isOriginatorAtomFetchNecessary) {
+        console.debug("fetch originatorUri, ", originatorUri);
+        dispatch(actionCreators.atoms__fetchUnloadedAtom(originatorUri));
+      }
+    };
+    const ensureOriginatorHolderIsFetched = () => {
+      if (isOriginatorHolderFetchNecessary) {
+        console.debug("fetch originatorHolderUri, ", originatorHolderUri);
+        dispatch(actionCreators.atoms__fetchUnloadedAtom(originatorHolderUri));
+      }
+    };
+
+    const wrapVisibilitySensor =
       isUnread ||
       isOriginatorAtomFetchNecessary ||
-      isOriginatorHolderFetchNecessary
-    );
-  }
+      isOriginatorHolderFetchNecessary;
 
-  if (isChangeNotificationMessage) {
-    const innerMessageContentElement = (
-      <WonLabelledHr
-        className="won-cm__modified"
-        label="Post has been modified"
-      />
-    );
-    messageContentElement = shouldWrapVisibilitySensor() ? (
-      <VisibilitySensor onChange={onChange} intervalDelay={200}>
-        {innerMessageContentElement}
-      </VisibilitySensor>
-    ) : (
-      innerMessageContentElement
+    const onChange = isVisible => {
+      if (isVisible) {
+        if (isUnread) {
+          setTimeout(() => {
+            dispatch(
+              actionCreators.messages__markAsRead({
+                messageUri: messageUri,
+                connectionUri: connectionUri,
+                atomUri: getUri(senderAtom),
+                read: true,
+              })
+            );
+          }, MESSAGE_READ_TIMEOUT);
+        }
+        ensureOriginatorIsFetched();
+        ensureOriginatorHolderIsFetched();
+      }
+    };
+
+    return (
+      <won-connection-message
+        class={generateParentCssClasses()}
+        onClick={onClick}
+      >
+        {isChangeNotificationMessage ? (
+          wrapVisibilitySensor ? (
+            <VisibilitySensor onChange={onChange} intervalDelay={200}>
+              <WonChangeNotificationMessage />
+            </VisibilitySensor>
+          ) : (
+            <WonChangeNotificationMessage />
+          )
+        ) : (
+          <React.Fragment>
+            {groupChatMessage && isReceived && originatorUri ? (
+              <WonAtomIcon
+                key={originatorUri}
+                atom={originatorAtom}
+                flipIcons={true}
+                onClick={
+                  !onClick
+                    ? () => {
+                        history.push(
+                          generateLink(
+                            history.location,
+                            {
+                              postUri: originatorUri,
+                              connectionUri: undefined,
+                              tab: undefined,
+                            },
+                            "/post"
+                          )
+                        );
+                      }
+                    : undefined
+                }
+              />
+            ) : (
+              undefined
+            )}
+            {wrapVisibilitySensor ? (
+              <VisibilitySensor onChange={onChange} intervalDelay={200}>
+                <WonMessageContentWrapper
+                  message={message}
+                  groupChatMessage={groupChatMessage}
+                  connection={connection}
+                  senderAtom={senderAtom}
+                  ownedConnections={ownedConnections}
+                  originatorAtom={originatorAtom}
+                  allAtoms={allAtoms}
+                  shouldShowRdf={shouldShowRdf}
+                />
+              </VisibilitySensor>
+            ) : (
+              <WonMessageContentWrapper
+                message={message}
+                groupChatMessage={groupChatMessage}
+                connection={connection}
+                senderAtom={senderAtom}
+                ownedConnections={ownedConnections}
+                originatorAtom={originatorAtom}
+                allAtoms={allAtoms}
+                shouldShowRdf={shouldShowRdf}
+              />
+            )}
+          </React.Fragment>
+        )}
+      </won-connection-message>
     );
   } else {
-    const messageIcon = [];
-
-    // if (!isSent && !(groupChatMessage && originatorUri)) {
-    //   messageIcon.push(
-    //     <WonAtomIcon
-    //       key="targetAtomUri"
-    //       atom={targetAtom}
-    //       flipIcons={true}
-    //       onClick={
-    //         !onClick
-    //           ? () => {
-    //               history.push(
-    //                 generateLink(
-    //                   history.location,
-    //                   {
-    //                     postUri: getUri(targetAtom),
-    //                     tab: undefined,
-    //                     connectionUri: undefined,
-    //                   },
-    //                   "/post"
-    //                 )
-    //               );
-    //             }
-    //           : undefined
-    //       }
-    //     />
-    //   );
-    // }
-
-    if (isReceived && groupChatMessage && originatorUri) {
-      messageIcon.push(
-        <WonAtomIcon
-          key="originatorUri"
-          atom={originatorAtom}
-          flipIcons={true}
-          onClick={
-            !onClick
-              ? () => {
-                  history.push(
-                    generateLink(
-                      history.location,
-                      {
-                        postUri: originatorUri,
-                        connectionUri: undefined,
-                        tab: undefined,
-                      },
-                      "/post"
-                    )
-                  );
-                }
-              : undefined
-          }
-        />
-      );
-    }
-
-    let messageCenterContentElement;
-    if (isCollapsed) {
-      messageCenterContentElement = (
-        <div
-          className="won-cm__center__bubble__collapsed clickable"
-          onClick={() => expandMessage(false)}
-        >
-          {generateCollapsedLabel()}
-        </div>
-      );
-    } else {
-      messageCenterContentElement = (
-        <React.Fragment>
-          {isCollapsible ? (
-            <div
-              className="won-cm__center__bubble__collapsed clickable"
-              onClick={() => expandMessage(true)}
-            >
-              Click to collapse again
-            </div>
-          ) : (
-            undefined
-          )}
-          <WonCombinedMessageContent
-            message={message}
-            connection={connection}
-            senderAtom={senderAtom}
-            originatorAtom={originatorAtom}
-            allAtoms={allAtoms}
-            ownedConnections={ownedConnections}
-            groupChatMessage={groupChatMessage}
-          />
-          {!groupChatMessage &&
-          (isProposable || isClaimable) &&
-          !multiSelectType ? (
-            <div
-              className={
-                "won-cm__center__bubble__carret clickable " +
-                (showActions
-                  ? " won-cm__center__bubble__carret--expanded "
-                  : " won-cm__center__bubble__carret--collapsed ")
-              }
-              onClick={() => toggleActions()}
-            >
-              <svg>
-                <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-              </svg>
-            </div>
-          ) : (
-            undefined
-          )}
-          {showActionButtons() ? (
-            <WonConnectionMessageActions
-              message={message}
-              connection={connection}
-            />
-          ) : (
-            undefined
-          )}
-        </React.Fragment>
-      );
-    }
-
-    const innerMessageContentElement = (
-      <div className={generateCenterCssClasses()}>
-        <div className={generateCenterBubbleCssClasses()}>
-          {messageCenterContentElement}
-        </div>
-        <WonConnectionMessageStatus message={message} />
-        {rdfLinkURL ? (
-          <a target="_blank" rel="noopener noreferrer" href={rdfLinkURL}>
-            <svg className="rdflink__small clickable">
-              <use xlinkHref={rdf_logo_2} href={rdf_logo_2} />
-            </svg>
-          </a>
-        ) : (
-          undefined
-        )}
-      </div>
-    );
-
-    messageContentElement = (
-      <React.Fragment>
-        {messageIcon}
-        {shouldWrapVisibilitySensor() ? (
-          <VisibilitySensor onChange={onChange} intervalDelay={200}>
-            {innerMessageContentElement}
-          </VisibilitySensor>
-        ) : (
-          innerMessageContentElement
-        )}
-      </React.Fragment>
+    return (
+      <won-connection-message
+        class={generateParentCssClasses()}
+        onClick={onClick}
+      />
     );
   }
-
-  function onChange(isVisible) {
-    if (isVisible) {
-      if (isUnread) {
-        markAsRead();
-      }
-      ensureOriginatorIsFetched();
-      ensureOriginatorHolderIsFetched();
-    }
-  }
-
-  return (
-    <won-connection-message
-      class={generateParentCssClasses()}
-      onClick={onClick}
-    >
-      {showMessageAlways() ? messageContentElement : undefined}
-    </won-connection-message>
-  );
 }
 WonConnectionMessage.propTypes = {
   message: PropTypes.object.isRequired,
   connection: PropTypes.object.isRequired,
   senderAtom: PropTypes.object.isRequired,
-  // targetAtom: PropTypes.object.isRequired,
   processState: PropTypes.object.isRequired,
   allAtoms: PropTypes.object,
   ownedConnections: PropTypes.object,
@@ -517,4 +291,307 @@ WonConnectionMessage.propTypes = {
   onClick: PropTypes.func,
   groupChatMessage: PropTypes.bool,
   shouldShowRdf: PropTypes.bool,
+};
+
+function WonChangeNotificationMessage() {
+  return (
+    <WonLabelledHr
+      className="won-cm__modified"
+      label="Post has been modified"
+    />
+  );
+}
+
+function WonMessageExpandedContent({
+  connection,
+  ownedConnections,
+  groupChatMessage,
+  message,
+  senderAtom,
+  originatorAtom,
+  allAtoms,
+  onClick,
+}) {
+  const dispatch = useDispatch();
+  const messageUri = getUri(message);
+  const connectionUri = getUri(connection);
+  const multiSelectType = connectionUtils.getMultiSelectType(connection);
+  const showActions = messageUtils.showActions(message);
+  //TODO: Not allowed for certain high-level protocol states
+
+  const isClaimed = messageUtils.isMessageClaimed(connection, message);
+  const isProposed = messageUtils.isMessageProposed(connection, message);
+  const isAccepted = messageUtils.isMessageAccepted(connection, message);
+  const isAgreed = messageUtils.isMessageAgreedOn(connection, message);
+  const isRejected = messageUtils.isMessageRejected(connection, message);
+  const isRetracted = messageUtils.isMessageRetracted(connection, message);
+  const isCancellationPending = messageUtils.isMessageCancellationPending(
+    connection,
+    message
+  );
+  const isCancelled = messageUtils.isMessageCancelled(connection, message);
+
+  const showActionButtons = () => {
+    return (
+      !groupChatMessage &&
+      !isRetracted &&
+      !isRejected &&
+      !(messageUtils.hasProposesToCancelReferences(message) && isAccepted) &&
+      (showActions ||
+        messageUtils.isMessageCancelable(connection, message) ||
+        messageUtils.hasProposesReferences(message) ||
+        messageUtils.hasClaimsReferences(message) ||
+        messageUtils.hasProposesToCancelReferences(message))
+    );
+  };
+
+  const isCollapsible =
+    isClaimed ||
+    isProposed ||
+    isAgreed ||
+    isRejected ||
+    isRetracted ||
+    isCancellationPending ||
+    isCancelled;
+
+  return (
+    <React.Fragment>
+      {isCollapsible ? (
+        <div
+          className="won-cm__center__bubble__collapsed clickable"
+          onClick={onClick}
+        >
+          Click to collapse again
+        </div>
+      ) : (
+        undefined
+      )}
+      <WonCombinedMessageContent
+        message={message}
+        connection={connection}
+        senderAtom={senderAtom}
+        originatorAtom={originatorAtom}
+        allAtoms={allAtoms}
+        ownedConnections={ownedConnections}
+        groupChatMessage={groupChatMessage}
+      />
+      {!groupChatMessage &&
+      (!multiSelectType &&
+        connectionUtils.isConnected(connection) &&
+        (messageUtils.isMessageProposable(connection, message) ||
+          messageUtils.isMessageClaimable(connection, message))) ? (
+        <div
+          className={
+            "won-cm__center__bubble__carret clickable " +
+            (showActions
+              ? " won-cm__center__bubble__carret--expanded "
+              : " won-cm__center__bubble__carret--collapsed ")
+          }
+          onClick={() =>
+            dispatch(
+              actionCreators.messages__viewState__markShowActions({
+                messageUri: messageUri,
+                connectionUri: connectionUri,
+                atomUri: getUri(senderAtom),
+                showActions: !showActions,
+              })
+            )
+          }
+        >
+          <svg>
+            <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
+          </svg>
+        </div>
+      ) : (
+        undefined
+      )}
+      {showActionButtons() ? (
+        <WonConnectionMessageActions
+          message={message}
+          connection={connection}
+        />
+      ) : (
+        undefined
+      )}
+    </React.Fragment>
+  );
+}
+WonMessageExpandedContent.propTypes = {
+  connection: PropTypes.object,
+  ownedConnections: PropTypes.object,
+  message: PropTypes.object,
+  groupChatMessage: PropTypes.bool,
+  onClick: PropTypes.func.isRequired,
+  allAtoms: PropTypes.object,
+  senderAtom: PropTypes.object,
+  originatorAtom: PropTypes.object,
+};
+
+function WonMessageContentWrapper({
+  message,
+  connection,
+  senderAtom,
+  originatorAtom,
+  allAtoms,
+  groupChatMessage,
+  ownedConnections,
+  shouldShowRdf,
+}) {
+  const dispatch = useDispatch();
+  const messageUri = getUri(message);
+  const connectionUri = getUri(connection);
+  const isSent = messageUtils.isOutgoingMessage(message);
+
+  const generateCenterBubbleCssClasses = () => {
+    const isFailedToSend = messageUtils.hasFailedToSend(message);
+    const isReceivedByOwn = messageUtils.isReceivedByOwn(message);
+    const isReceivedByRemote = messageUtils.isReceivedByRemote(message);
+    // determines if the sent message is not received by any of the servers yet but not failed either
+
+    const isPending =
+      isSent && !isFailedToSend && !isReceivedByOwn && !isReceivedByRemote;
+    // determines if the sent message is received by any of the servers yet but not failed either
+    const isPartiallyLoaded =
+      isSent &&
+      !isFailedToSend &&
+      (!(isReceivedByOwn && isReceivedByRemote) &&
+        (isReceivedByOwn || isReceivedByRemote));
+
+    const cssClassNames = ["won-cm__center__bubble"];
+
+    messageUtils.hasReferences(message) && cssClassNames.push("references");
+    isPending && cssClassNames.push("pending");
+    isPartiallyLoaded && cssClassNames.push("partiallyLoaded");
+    isSent && isFailedToSend && cssClassNames.push("failure");
+
+    return cssClassNames.join(" ");
+  };
+
+  const generateCenterCssClasses = () => {
+    const cssClassNames = ["won-cm__center"];
+
+    const injectInto = messageUtils.getInjectInto(message);
+    const isInjectIntoMessage = injectInto && injectInto.size > 0;
+
+    messageUtils.isConnectionMessage(message) &&
+      !messageUtils.isParsable(message) &&
+      cssClassNames.push("won-cm__center--nondisplayable");
+    messageUtils.isSystemMessage(message) &&
+      cssClassNames.push("won-cm__center--system");
+    isInjectIntoMessage && cssClassNames.push("won-cm__center--inject-into");
+
+    return cssClassNames.join(" ");
+  };
+
+  const expandMessage = expand => {
+    //TODO: Not allowed for certain high-level protocol states
+    if (message && !connectionUtils.getMultiSelectType(connection)) {
+      dispatch(
+        actionCreators.messages__viewState__markAsCollapsed({
+          messageUri: messageUri,
+          connectionUri: connectionUri,
+          atomUri: getUri(senderAtom),
+          isCollapsed: expand,
+        })
+      );
+    }
+  };
+
+  return (
+    <div className={generateCenterCssClasses()}>
+      <div className={generateCenterBubbleCssClasses()}>
+        {messageUtils.isCollapsed(message) ? (
+          <WonMessageCollapsedContent
+            message={message}
+            onClick={() => expandMessage(false)}
+          />
+        ) : (
+          <WonMessageExpandedContent
+            message={message}
+            connection={connection}
+            allAtoms={allAtoms}
+            senderAtom={senderAtom}
+            originatorAtom={originatorAtom}
+            ownedConnections={ownedConnections}
+            groupChatMessage={groupChatMessage}
+            onClick={() => expandMessage(true)}
+          />
+        )}
+      </div>
+      <WonConnectionMessageStatus message={message} />
+      {shouldShowRdf && ownerBaseUrl && senderAtom && message ? (
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href={urljoin(
+            ownerBaseUrl,
+            "/rest/linked-data/",
+            `?requester=${encodeURIComponent(getUri(senderAtom))}`,
+            `&uri=${encodeURIComponent(getUri(message))}`,
+            isSent ? "&deep=true" : ""
+          )}
+        >
+          <svg className="rdflink__small clickable">
+            <use xlinkHref={rdf_logo_2} href={rdf_logo_2} />
+          </svg>
+        </a>
+      ) : (
+        undefined
+      )}
+    </div>
+  );
+}
+
+WonMessageContentWrapper.propTypes = {
+  message: PropTypes.object,
+  connection: PropTypes.object,
+  senderAtom: PropTypes.object,
+  originatorAtom: PropTypes.object,
+  allAtoms: PropTypes.object,
+  groupChatMessage: PropTypes.bool,
+  ownedConnections: PropTypes.object,
+  shouldShowRdf: PropTypes.bool,
+};
+
+function WonMessageCollapsedContent({ connection, message, onClick }) {
+  let collapsedLabelText;
+
+  let label;
+
+  if (message) {
+    if (messageUtils.isMessageClaimed(connection, message))
+      label = "Message was claimed.";
+    else if (messageUtils.isMessageProposed(connection, message))
+      label = "Message was proposed.";
+    else if (messageUtils.isMessageAccepted(connection, message))
+      label = "Message was accepted.";
+    else if (messageUtils.isMessageAgreedOn(connection, message))
+      label = "Message is part of an agreement";
+    else if (messageUtils.isMessageRejected(connection, message))
+      label = "Message was rejected.";
+    else if (messageUtils.isMessageRetracted(connection, message))
+      label = "Message was retracted.";
+    else if (messageUtils.isMessageCancellationPending(connection, message))
+      label = "Cancellation pending.";
+    else if (messageUtils.isMessageCancelled(connection, message))
+      label = "Cancelled.";
+    else label = "Message collapsed.";
+
+    collapsedLabelText = label + " Click to expand.";
+  }
+
+  return (
+    <div
+      className="won-cm__center__bubble__collapsed clickable"
+      onClick={onClick}
+    >
+      {collapsedLabelText}
+    </div>
+  );
+}
+
+WonMessageCollapsedContent.propTypes = {
+  connection: PropTypes.object,
+  message: PropTypes.object,
+  onClick: PropTypes.func.isRequired,
 };

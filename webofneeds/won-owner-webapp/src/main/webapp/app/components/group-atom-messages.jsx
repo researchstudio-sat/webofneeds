@@ -338,7 +338,6 @@ export default function WonGroupAtomMessages({
             message={msg}
             connection={connection}
             senderAtom={senderAtom}
-            targetAtom={targetAtom}
             processState={processState}
             allAtoms={allAtoms}
             ownedConnections={ownedConnections}
