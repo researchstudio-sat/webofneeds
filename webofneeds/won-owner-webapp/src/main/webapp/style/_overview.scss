@@ -19,14 +19,29 @@ main.owneroverview {
     grid-gap: 0.5rem;
     border-bottom: $thinGrayBorder;
     padding: 0.5rem;
+
+    &--withIcon {
+      grid-template-columns: min-content 1fr min-content;
+    }
+
     @media (min-width: $maxContentWidth) {
       padding-right: 0;
     }
     align-items: center;
 
+    &__icon {
+      @include fixed-square($iconSize);
+      --local-primary: #{$won-primary-text-color};
+    }
+
     &__title {
       font-size: $mediumFontSize;
       font-weight: 300;
+
+      &__count {
+        display: inline-block;
+        margin-left: 0.25rem;
+      }
     }
 
     &__updated {
@@ -77,6 +92,7 @@ main.owneroverview {
         grid-template-areas: "ouch_icon ouch_title ouch_carret";
         border-bottom: $thinGrayBorder;
         padding: 0.5rem;
+        color: $won-primary-text-color;
         @media (min-width: $maxContentWidth) {
           padding-right: 0;
         }
@@ -110,14 +126,7 @@ main.owneroverview {
             --local-primary: #{$won-primary-color};
           }
 
-          &--expanded {
-            transform: rotate(-180deg);
-            transition: all linear 0.2s;
-          }
-
-          &--collapsed {
-            transition: all linear 0.2s;
-          }
+          transform: rotate(-90deg);
         }
       }
 
