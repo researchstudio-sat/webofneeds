@@ -39,49 +39,28 @@ export default function WonConnectionMessage({
 }) {
   const dispatch = useDispatch();
   const history = useHistory();
-  const messageUri = getUri(message);
-  const connectionUri = getUri(connection);
-
-  const isSent = messageUtils.isOutgoingMessage(message);
+  const isUnread = messageUtils.isMessageUnread(message);
   const isReceived = messageUtils.isIncomingMessage(message);
 
   const isChangeNotificationMessage = messageUtils.isChangeNotificationMessage(
     message
   );
-  const isCollapsed = messageUtils.isCollapsed(message);
-  const showActions = messageUtils.showActions(message);
-  const multiSelectType = connectionUtils.getMultiSelectType(connection);
-  const isClaimed = messageUtils.isMessageClaimed(connection, message);
-  const isProposed = messageUtils.isMessageProposed(connection, message);
-  const isAccepted = messageUtils.isMessageAccepted(connection, message);
-  const isAgreed = messageUtils.isMessageAgreedOn(connection, message);
-  const isRejected = messageUtils.isMessageRejected(connection, message);
-  const isRetracted = messageUtils.isMessageRetracted(connection, message);
-  const isCancellationPending = messageUtils.isMessageCancellationPending(
-    connection,
-    message
-  );
-  const isCancelled = messageUtils.isMessageCancelled(connection, message);
-  const isCollapsible =
-    isClaimed ||
-    isProposed ||
-    isAgreed ||
-    isRejected ||
-    isRetracted ||
-    isCancellationPending ||
-    isCancelled;
-  const isProposable =
-    connectionUtils.isConnected(connection) &&
-    messageUtils.isMessageProposable(connection, message);
-  const isClaimable =
-    connectionUtils.isConnected(connection) &&
-    messageUtils.isMessageClaimable(connection, message);
-  const isCancelable = messageUtils.isMessageCancelable(connection, message);
-  const isUnread = messageUtils.isMessageUnread(message);
 
-  const hasReferences = messageUtils.hasReferences(message);
+  const multiSelectType = connectionUtils.getMultiSelectType(connection);
 
   function generateParentCssClasses() {
+    const isCancelled = messageUtils.isMessageCancelled(connection, message);
+
+    const isClaimed = messageUtils.isMessageClaimed(connection, message);
+    const isProposed = messageUtils.isMessageProposed(connection, message);
+    const isAgreed = messageUtils.isMessageAgreedOn(connection, message);
+    const isRejected = messageUtils.isMessageRejected(connection, message);
+    const isRetracted = messageUtils.isMessageRetracted(connection, message);
+    const isCancellationPending = messageUtils.isMessageCancellationPending(
+      connection,
+      message
+    );
+
     const isSelectable = () => {
       //TODO: Not allowed for certain high-level protocol states
       if (message && multiSelectType) {
@@ -91,33 +70,50 @@ export default function WonConnectionMessage({
           case "retracts":
             return messageUtils.isMessageRetractable(connection, message);
           case "proposesToCancel":
-            return isCancelable;
+            return messageUtils.isMessageCancelable(connection, message);
           case "accepts":
             return messageUtils.isMessageAcceptable(connection, message);
           case "proposes":
-            return isProposable;
+            return (
+              connectionUtils.isConnected(connection) &&
+              messageUtils.isMessageProposable(connection, message)
+            );
           case "claims":
-            return isClaimable;
+            return (
+              connectionUtils.isConnected(connection) &&
+              messageUtils.isMessageClaimable(connection, message)
+            );
         }
       }
       return false;
     };
 
+    const isCollapsible =
+      isClaimed ||
+      isProposed ||
+      isAgreed ||
+      isRejected ||
+      isRetracted ||
+      isCancellationPending ||
+      isCancelled;
+
     const cssClassNames = [];
-    isReceived && cssClassNames.push("won-cm--left");
-    isSent && cssClassNames.push("won-cm--right");
-    !!multiSelectType && cssClassNames.push("won-is-multiSelect");
-    !isSelectable() && cssClassNames.push("won-not-selectable");
+    messageUtils.isMessageAccepted(connection, message) &&
+      cssClassNames.push("won-is-accepted");
+    messageUtils.isCollapsed(message) && cssClassNames.push("won-is-collapsed");
     messageUtils.isMessageSelected(message) &&
       cssClassNames.push("won-is-selected");
+    messageUtils.isOutgoingMessage(message) &&
+      cssClassNames.push("won-cm--right");
+    isReceived && cssClassNames.push("won-cm--left");
+    !!multiSelectType && cssClassNames.push("won-is-multiSelect");
+    !isSelectable() && cssClassNames.push("won-not-selectable");
     isProposed && cssClassNames.push("won-is-proposed");
     isClaimed && cssClassNames.push("won-is-claimed");
     isRejected && cssClassNames.push("won-is-rejected");
     isRetracted && cssClassNames.push("won-is-retracted");
-    isAccepted && cssClassNames.push("won-is-accepted");
     isAgreed && cssClassNames.push("won-is-agreed");
     isCancelled && cssClassNames.push("won-is-cancelled");
-    isCollapsed && cssClassNames.push("won-is-collapsed");
     isCollapsible && cssClassNames.push("won-is-collapsible");
     isChangeNotificationMessage &&
       cssClassNames.push("won-is-changeNotification");
@@ -131,9 +127,9 @@ export default function WonConnectionMessage({
     return (
       !message ||
       messageUtils.hasText(message) ||
-      !hasReferences ||
+      !messageUtils.hasReferences(message) ||
       shouldShowRdf ||
-      showActions ||
+      messageUtils.showActions(message) ||
       messageUtils.hasProposesReferences(message) ||
       messageUtils.hasClaimsReferences(message) ||
       messageUtils.hasProposesToCancelReferences(message)
@@ -188,8 +184,8 @@ export default function WonConnectionMessage({
           setTimeout(() => {
             dispatch(
               actionCreators.messages__markAsRead({
-                messageUri: messageUri,
-                connectionUri: connectionUri,
+                messageUri: getUri(message),
+                connectionUri: getUri(connection),
                 atomUri: getUri(senderAtom),
                 read: true,
               })
@@ -313,46 +309,33 @@ function WonMessageExpandedContent({
   onClick,
 }) {
   const dispatch = useDispatch();
-  const messageUri = getUri(message);
-  const connectionUri = getUri(connection);
-  const multiSelectType = connectionUtils.getMultiSelectType(connection);
   const showActions = messageUtils.showActions(message);
-  //TODO: Not allowed for certain high-level protocol states
 
-  const isClaimed = messageUtils.isMessageClaimed(connection, message);
-  const isProposed = messageUtils.isMessageProposed(connection, message);
-  const isAccepted = messageUtils.isMessageAccepted(connection, message);
-  const isAgreed = messageUtils.isMessageAgreedOn(connection, message);
   const isRejected = messageUtils.isMessageRejected(connection, message);
   const isRetracted = messageUtils.isMessageRetracted(connection, message);
-  const isCancellationPending = messageUtils.isMessageCancellationPending(
-    connection,
-    message
-  );
-  const isCancelled = messageUtils.isMessageCancelled(connection, message);
 
-  const showActionButtons = () => {
-    return (
-      !groupChatMessage &&
-      !isRetracted &&
-      !isRejected &&
-      !(messageUtils.hasProposesToCancelReferences(message) && isAccepted) &&
-      (showActions ||
-        messageUtils.isMessageCancelable(connection, message) ||
-        messageUtils.hasProposesReferences(message) ||
-        messageUtils.hasClaimsReferences(message) ||
-        messageUtils.hasProposesToCancelReferences(message))
-    );
-  };
+  const showActionButtons =
+    !groupChatMessage &&
+    !isRetracted &&
+    !isRejected &&
+    !(
+      messageUtils.hasProposesToCancelReferences(message) &&
+      messageUtils.isMessageAccepted(connection, message)
+    ) &&
+    (showActions ||
+      messageUtils.isMessageCancelable(connection, message) ||
+      messageUtils.hasProposesReferences(message) ||
+      messageUtils.hasClaimsReferences(message) ||
+      messageUtils.hasProposesToCancelReferences(message));
 
   const isCollapsible =
-    isClaimed ||
-    isProposed ||
-    isAgreed ||
+    messageUtils.isMessageClaimed(connection, message) ||
+    messageUtils.isMessageProposed(connection, message) ||
+    messageUtils.isMessageAgreedOn(connection, message) ||
     isRejected ||
     isRetracted ||
-    isCancellationPending ||
-    isCancelled;
+    messageUtils.isMessageCancellationPending(connection, message) ||
+    messageUtils.isMessageCancelled(connection, message);
 
   return (
     <React.Fragment>
@@ -376,7 +359,7 @@ function WonMessageExpandedContent({
         groupChatMessage={groupChatMessage}
       />
       {!groupChatMessage &&
-      (!multiSelectType &&
+      (!connectionUtils.getMultiSelectType(connection) &&
         connectionUtils.isConnected(connection) &&
         (messageUtils.isMessageProposable(connection, message) ||
           messageUtils.isMessageClaimable(connection, message))) ? (
@@ -390,8 +373,8 @@ function WonMessageExpandedContent({
           onClick={() =>
             dispatch(
               actionCreators.messages__viewState__markShowActions({
-                messageUri: messageUri,
-                connectionUri: connectionUri,
+                messageUri: getUri(message),
+                connectionUri: getUri(connection),
                 atomUri: getUri(senderAtom),
                 showActions: !showActions,
               })
@@ -405,7 +388,7 @@ function WonMessageExpandedContent({
       ) : (
         undefined
       )}
-      {showActionButtons() ? (
+      {showActionButtons ? (
         <WonConnectionMessageActions
           message={message}
           connection={connection}
@@ -438,8 +421,6 @@ function WonMessageContentWrapper({
   shouldShowRdf,
 }) {
   const dispatch = useDispatch();
-  const messageUri = getUri(message);
-  const connectionUri = getUri(connection);
   const isSent = messageUtils.isOutgoingMessage(message);
 
   const generateCenterBubbleCssClasses = () => {
@@ -488,8 +469,8 @@ function WonMessageContentWrapper({
     if (message && !connectionUtils.getMultiSelectType(connection)) {
       dispatch(
         actionCreators.messages__viewState__markAsCollapsed({
-          messageUri: messageUri,
-          connectionUri: connectionUri,
+          messageUri: getUri(message),
+          connectionUri: getUri(connection),
           atomUri: getUri(senderAtom),
           isCollapsed: expand,
         })
