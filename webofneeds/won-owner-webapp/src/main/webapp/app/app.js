@@ -38,6 +38,7 @@ import PageAbout from "./pages/react/about";
 import PageMap from "./pages/react/map";
 import PageCreate from "./pages/react/create";
 import PageConnections from "./pages/react/connections";
+import PageActivities from "./pages/react/activities";
 import PageOverview from "./pages/react/overview";
 import PagePost from "./pages/react/post";
 import PageSettings from "./pages/react/settings";
@@ -156,6 +157,9 @@ function AppRoutes({ processState }) {
       </Route>
       <Route path="/connections">
         <PageConnections />
+      </Route>
+      <Route path="/activities">
+        <PageActivities />
       </Route>
       <Route path="/overview">
         <PageOverview />

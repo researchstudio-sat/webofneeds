@@ -89,7 +89,7 @@ export default function AtomContentActivities({
                 postUri: get(atom, "uri"),
                 connectionUri: connUri,
               },
-              "/connections",
+              "/activities",
               false
             )}
             flip={!isAtomOwned}
