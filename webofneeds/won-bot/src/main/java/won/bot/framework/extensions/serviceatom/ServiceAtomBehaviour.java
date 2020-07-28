@@ -2,8 +2,10 @@ package won.bot.framework.extensions.serviceatom;
 
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
@@ -77,19 +79,22 @@ public class ServiceAtomBehaviour extends BotBehaviour {
                                     if (serviceBotDataSet == null) {
                                         logger.debug("BotServiceAtom can't be retrieved, creating a new one...");
                                         createServiceAtom();
-                                    } else if (!Objects.equals(
-                                                    new ServiceAtomModelWrapper(serviceBotDataSet)
-                                                                    .getServiceAtomContent(),
-                                                    serviceAtomContent)) {
-                                        logger.debug("BotServiceAtom is outdated, modifying the BotServiceAtom");
-                                        modifyServiceAtom();
                                     } else {
-                                        logger.info(
-                                                        "#####################################################################################");
-                                        logger.info("BotServiceAtom is still up to date, atom URI is {}",
-                                                        serviceAtomUri);
-                                        logger.info(
-                                                        "#####################################################################################");
+                                        ServiceAtomModelWrapper oldServiceAtomWrapper = new ServiceAtomModelWrapper(
+                                                        serviceBotDataSet);
+                                        if (!Objects.equals(
+                                                        oldServiceAtomWrapper.getServiceAtomContent(),
+                                                        serviceAtomContent)) {
+                                            logger.debug("BotServiceAtom is outdated, modifying the BotServiceAtom");
+                                            modifyServiceAtom(oldServiceAtomWrapper);
+                                        } else {
+                                            logger.info(
+                                                            "#####################################################################################");
+                                            logger.info("BotServiceAtom is still up to date, atom URI is {}",
+                                                            serviceAtomUri);
+                                            logger.info(
+                                                            "#####################################################################################");
+                                        }
                                     }
                                 }
                             }
@@ -132,9 +137,70 @@ public class ServiceAtomBehaviour extends BotBehaviour {
                                                 createAtomMessage.getMessageURI());
                             }
 
-                            private void modifyServiceAtom() {
-                                logger.info("BotServiceAtom modification currently not implemented");
-                                // TODO: Implement BotServiceAtom modification
+                            private void modifyServiceAtom(ServiceAtomModelWrapper oldServiceAtomModelWrapper) {
+                                final URI atomUri = URI.create(oldServiceAtomModelWrapper.getAtomUri());
+
+                                // Replace placeholder socketUris with existing socketUris
+                                // if socketType was present before modification
+                                Map<String, String> oldServiceAtomSocketsInverse = oldServiceAtomModelWrapper
+                                                .getServiceAtomContent().getSockets().entrySet().stream()
+                                                .collect(Collectors.toMap(socketEntry -> socketEntry.getValue(),
+                                                                socketEntry -> socketEntry.getKey()));
+                                serviceAtomContent.setSockets(serviceAtomContent
+                                                .getSockets()
+                                                .entrySet()
+                                                .stream()
+                                                .collect(Collectors.toMap(
+                                                                socketEntry -> oldServiceAtomSocketsInverse
+                                                                                .containsKey(
+                                                                                                socketEntry.getValue())
+                                                                                                                ? oldServiceAtomSocketsInverse
+                                                                                                                                .get(socketEntry
+                                                                                                                                                .getValue())
+                                                                                                                : socketEntry.getKey(),
+                                                                socketEntry -> socketEntry.getValue())));
+                                ServiceAtomModelWrapper serviceAtomModelWrapper = new ServiceAtomModelWrapper(
+                                                atomUri, serviceAtomContent);
+                                final URI wonNodeUri = URI.create(oldServiceAtomModelWrapper.getWonNodeUri());
+                                Dataset botServiceDataset = serviceAtomModelWrapper.copyDataset();
+                                logger.debug("creating BotServiceAtom on won node {} with content: {} ", wonNodeUri,
+                                                RdfUtils.toString(Prefixer.setPrefixes(botServiceDataset)));
+                                RdfUtils.replaceBaseURI(botServiceDataset, atomUri.toString(), true);
+                                ServiceAtomModelWrapper modifiedAtomModelWrapper = new ServiceAtomModelWrapper(
+                                                botServiceDataset);
+                                WonMessage modifyAtomMessage = WonMessageBuilder
+                                                .replace()
+                                                .atom(atomUri)
+                                                .content().dataset(modifiedAtomModelWrapper.copyDatasetWithoutSysinfo())
+                                                .build();
+                                modifyAtomMessage = ctx.getWonMessageSender().prepareMessage(modifyAtomMessage);
+                                ctx.getBotContextWrapper().rememberAtomUri(atomUri);
+                                EventBus bus = ctx.getEventBus();
+                                EventListener successCallback = event -> {
+                                    logger.info(
+                                                    "#####################################################################################");
+                                    logger.info("BotServiceAtom modification successful, atom URI is {}",
+                                                    atomUri);
+                                    logger.info(
+                                                    "#####################################################################################");
+                                    serviceAtomContext.setServiceAtomUri(atomUri);
+                                    bus.publish(new AtomCreatedEvent(atomUri, wonNodeUri, botServiceDataset,
+                                                    null));
+                                };
+                                EventListener failureCallback = event -> {
+                                    String textMessage = WonRdfUtils.MessageUtils
+                                                    .getTextMessage(((FailureResponseEvent) event).getFailureMessage());
+                                    logger.error("BotServiceAtom modification failed for atom URI {}, original message URI: {}",
+                                                    atomUri, textMessage);
+                                    ctx.getBotContextWrapper().removeAtomUri(atomUri);
+                                };
+                                EventBotActionUtils.makeAndSubscribeResponseListener(modifyAtomMessage, successCallback,
+                                                failureCallback, ctx);
+                                logger.debug("registered listeners for response to message URI {}",
+                                                modifyAtomMessage.getMessageURI());
+                                ctx.getWonMessageSender().sendMessage(modifyAtomMessage);
+                                logger.debug("BotServiceAtom creation message sent with message URI {}",
+                                                modifyAtomMessage.getMessageURI());
                             }
                         }));
         subscribeWithAutoCleanup(AtomCreatedEvent.class, new ActionOnEventListener(ctx, new BaseEventBotAction(ctx) {

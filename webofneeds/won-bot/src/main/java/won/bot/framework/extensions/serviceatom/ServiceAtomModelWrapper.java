@@ -8,11 +8,12 @@ import won.protocol.util.DefaultAtomModelWrapper;
 import won.protocol.vocabulary.*;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class ServiceAtomModelWrapper extends DefaultAtomModelWrapper {
-    // TODO: ADD MORE SERVICE BOT ATOM CONTENT MAKE SOCKETS CONFIGURABLE
-    private ServiceAtomContent serviceAtomContent;
+    private final ServiceAtomContent serviceAtomContent;
 
     public ServiceAtomModelWrapper(URI atomUri, ServiceAtomContent serviceAtomContent) {
         this(atomUri.toString(), serviceAtomContent);
@@ -25,18 +26,20 @@ public class ServiceAtomModelWrapper extends DefaultAtomModelWrapper {
         // SET RDF STRUCTURE
         Resource atom = this.getAtomModel().createResource(atomUri);
         atom.addProperty(RDF.type, WXBOT.ServiceAtom);
-        this.addSocket("#HolderSocket", WXHOLD.HolderSocketString);
-        this.addSocket("#ChatSocket", WXCHAT.ChatSocketString);
-        this.addSocket("#sReviewSocket", WXSCHEMA.ReviewSocketString);
-        this.setDefaultSocket("#ChatSocket");
+        if (Objects.nonNull(serviceAtomContent.getSockets())) {
+            serviceAtomContent.getSockets().forEach(this::addSocket);
+        }
         if (Objects.nonNull(serviceAtomContent.getName())) {
             this.setName(serviceAtomContent.getName());
         }
         if (Objects.nonNull(serviceAtomContent.getDescription())) {
-            this.setDescription(serviceAtomContent.getDescription());
+            atom.addProperty(SCHEMA.DESCRIPTION, serviceAtomContent.getDescription());
         }
         if (Objects.nonNull(serviceAtomContent.getTermsOfService())) {
             atom.addProperty(SCHEMA.TERMS_OF_SERVICE, serviceAtomContent.getTermsOfService());
+        }
+        if (Objects.nonNull(serviceAtomContent.getTags())) {
+            serviceAtomContent.getTags().forEach(tag -> atom.addProperty(WONCON.tag, tag));
         }
     }
 
@@ -45,6 +48,11 @@ public class ServiceAtomModelWrapper extends DefaultAtomModelWrapper {
         serviceAtomContent = new ServiceAtomContent(this.getSomeName());
         serviceAtomContent.setDescription(this.getSomeDescription());
         serviceAtomContent.setTermsOfService(getSomeContentPropertyStringValue(SCHEMA.TERMS_OF_SERVICE));
+        serviceAtomContent.setTags(this.getTags(this.getAtomContentNode()));
+        Map<String, String> sockets = new HashMap<>();
+        this.getSocketTypeUriMap().forEach(
+                        (socketUri, socketTypeUri) -> sockets.put(socketUri.toString(), socketTypeUri.toString()));
+        serviceAtomContent.setSockets(sockets);
     }
 
     public ServiceAtomContent getServiceAtomContent() {
