@@ -47,6 +47,10 @@ public class WON {
     public static final Property contentGraph = m.createProperty(BASE_URI, "contentGraph");
     public static final Property derivedGraph = m.createProperty(BASE_URI, "derivedGraph");
     public static final Property socket = m.createProperty(BASE_URI, "socket");
+    /**
+     * @deprecated Default Socket is not used anymore, will be removed soon
+     */
+    @Deprecated
     public static final Property defaultSocket = m.createProperty(BASE_URI, "defaultSocket");
     public static final Resource Socket = m.createResource(BASE_URI + "Socket");
     public static final Property compatibleSocketDefinition = m.createProperty(BASE_URI + "compatibleSocketDefinition");

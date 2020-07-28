@@ -962,6 +962,7 @@ public class WonRdfUtils {
          * @param model
          * @param subject
          * @param returnAnyIfNoDefaultFound
+         * @deprecated Default Socket is not used anymore, will be removed soon
          * @return
          */
         public static Optional<URI> getDefaultSocket(Model model, Resource subject, boolean returnAnyIfNoDefaultFound) {
@@ -992,7 +993,10 @@ public class WonRdfUtils {
          * 
          * @param model
          * @param socketURI
+         * @deprecated will be removed, use
+         * {@link SocketUtils#addSocket(Model, URI, URI)} instead
          */
+        @Deprecated
         public static void addSocket(final Model model, final URI socketURI, final URI socketTypeURI,
                         final boolean isDefaultSocket) {
             Resource baseRes = RdfUtils.getBaseResource(model);
@@ -1007,10 +1011,35 @@ public class WonRdfUtils {
             }
         }
 
+        /**
+         * Adds a triple to the model of the form {@literal <>} won:socket [socketURI].
+         *
+         * @param model
+         * @param socketURI
+         */
+        public static void addSocket(final Model model, final URI socketURI, final URI socketTypeURI) {
+            Resource baseRes = RdfUtils.getBaseResource(model);
+            Resource socket = model.createResource(socketURI.toString());
+            baseRes.addProperty(WON.socket, socket);
+            socket.addProperty(WON.socketDefinition, model.createResource(socketTypeURI.toString()));
+        }
+
+        /**
+         * @deprecated will be removed, use
+         * {@link SocketUtils#addSocket(Dataset, URI, URI)} instead
+         */
+        @Deprecated
         public static void addSocket(final Dataset dataset, final URI socketURI, final URI socketTypeURI,
                         final boolean isDefaultSocket) {
             visit(dataset, model -> {
                 addSocket(model, socketURI, socketTypeURI, isDefaultSocket);
+                return null;
+            });
+        }
+
+        public static void addSocket(final Dataset dataset, final URI socketURI, final URI socketTypeURI) {
+            visit(dataset, model -> {
+                addSocket(model, socketURI, socketTypeURI);
                 return null;
             });
         }

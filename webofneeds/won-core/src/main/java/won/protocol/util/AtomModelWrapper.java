@@ -473,6 +473,10 @@ public class AtomModelWrapper {
         socket.addProperty(WON.socketDefinition, socketType);
     }
 
+    /**
+     * @deprecated Default Socket is not used anymore, will be removed soon
+     */
+    @Deprecated
     public void setDefaultSocket(String socketUri) {
         if (socketUri.startsWith("#")) {
             socketUri = getAtomUri() + socketUri;
@@ -484,6 +488,10 @@ public class AtomModelWrapper {
         getAtomContentNode().addProperty(WON.defaultSocket, socket);
     }
 
+    /**
+     * @deprecated Default Socket is not used anymore, will be removed soon
+     */
+    @Deprecated
     public Optional<String> getDefaultSocket() {
         Statement stmt = getAtomContentNode().getProperty(WON.defaultSocket);
         if (stmt == null)
