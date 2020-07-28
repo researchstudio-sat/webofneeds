@@ -139,7 +139,6 @@ public class ServiceAtomBehaviour extends BotBehaviour {
 
                             private void modifyServiceAtom(ServiceAtomModelWrapper oldServiceAtomModelWrapper) {
                                 final URI atomUri = URI.create(oldServiceAtomModelWrapper.getAtomUri());
-
                                 // Replace placeholder socketUris with existing socketUris
                                 // if socketType was present before modification
                                 Map<String, String> oldServiceAtomSocketsInverse = oldServiceAtomModelWrapper
