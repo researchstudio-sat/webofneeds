@@ -3,33 +3,31 @@ import React from "react";
 import "~/style/_price-viewer.scss";
 import PropTypes from "prop-types";
 
-export default class WonPriceViewer extends React.Component {
-  render() {
-    const icon = this.props.detail.icon && (
-      <svg className="pricev__header__icon">
-        <use xlinkHref={this.props.detail.icon} href={this.props.detail.icon} />
-      </svg>
-    );
+export default function WonPriceViewer({ detail, content, className }) {
+  const icon = detail.icon && (
+    <svg className="pricev__header__icon">
+      <use xlinkHref={detail.icon} href={detail.icon} />
+    </svg>
+  );
 
-    const label = this.props.detail.icon && (
-      <span className="pricev__header__label">{this.props.detail.label}</span>
-    );
+  const label = detail.icon && (
+    <span className="pricev__header__label">{detail.label}</span>
+  );
 
-    return (
-      <won-price-viewer class={this.props.className}>
-        <div className="pricev__header">
-          {icon}
-          {label}
-        </div>
-        <div className="pricev__content">
-          {this.props.detail.generateHumanReadable({
-            value: this.props.content.toJS(),
-            includeLabel: false,
-          })}
-        </div>
-      </won-price-viewer>
-    );
-  }
+  return (
+    <won-price-viewer class={className}>
+      <div className="pricev__header">
+        {icon}
+        {label}
+      </div>
+      <div className="pricev__content">
+        {detail.generateHumanReadable({
+          value: content.toJS(),
+          includeLabel: false,
+        })}
+      </div>
+    </won-price-viewer>
+  );
 }
 WonPriceViewer.propTypes = {
   detail: PropTypes.object,
