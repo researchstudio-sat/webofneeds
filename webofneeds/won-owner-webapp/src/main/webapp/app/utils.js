@@ -363,36 +363,6 @@ export function zipWith(f, xs, ys) {
 }
 
 /**
- * Sorts the elements by Date (default order is descending)
- * @param elementsImm elements from state that need to be returned as a sorted array
- * @param selector selector for the date that will be used to sort the elements (default is "lastUpdateDate")
- * @param order if "ASC" then the order will be ascending, everything else resorts to the default sort of descending order
- * @returns {*} sorted Elements array
- */
-export function sortByDate(
-  elementsImm,
-  selector = "lastUpdateDate",
-  order = "DESC"
-) {
-  let sortedElements = elementsImm && elementsImm.toArray();
-
-  if (sortedElements) {
-    sortedElements.sort(function(a, b) {
-      const bDate = b.get(selector) && b.get(selector).getTime();
-      const aDate = a.get(selector) && a.get(selector).getTime();
-
-      if (order === "ASC") {
-        return aDate - bDate;
-      } else {
-        return bDate - aDate;
-      }
-    });
-  }
-
-  return sortedElements;
-}
-
-/**
  * Filters given Map of connections by occurence of a given searchText Object { value: searchString }
  * check only looks into the humanReadable of the atom(s)
  * @param connectionsImm connections map to apply filter on
