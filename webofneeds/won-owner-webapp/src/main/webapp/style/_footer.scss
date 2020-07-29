@@ -72,13 +72,14 @@ won-footer {
 
     .footer__linksmobile {
       grid-area: footerLinks;
-      display: flex;
+      display: grid;
       font-size: $smallFontSize;
-      align-items: center;
-      flex-direction: column;
+      justify-items: center;
+      grid-template-columns: 1fr 1fr;
 
       &__link:visited,
       &__link {
+        padding: 0.5rem;
         cursor: pointer;
         color: $won-subtitle-gray;
         text-decoration: none;
