@@ -2,7 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
-import { generateLink, get, getUri } from "~/app/utils";
+import { generateLink, getUri } from "~/app/utils";
 import * as atomUtils from "~/app/redux/utils/atom-utils";
 import * as generalSelectors from "~/app/redux/selectors/general-selectors";
 import { relativeTime } from "~/app/won-label-utils";
@@ -20,7 +20,8 @@ export default function WonMainSnippet({ atom, showIcon, externalDataState }) {
     generalSelectors.selectLastUpdateTime
   );
   const friendlyTimestamp =
-    atom && relativeTime(globalLastUpdateTime, get(atom, "lastUpdateDate"));
+    atom &&
+    relativeTime(globalLastUpdateTime, atomUtils.getLastUpdateDate(atom));
 
   function createCardMainSubtitle() {
     const createGroupChatLabel = () => {

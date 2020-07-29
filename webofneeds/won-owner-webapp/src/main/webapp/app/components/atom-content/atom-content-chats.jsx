@@ -6,7 +6,6 @@ import vocab from "../../service/vocab.js";
 import {
   getUri,
   generateLink,
-  sortByDate,
   filterConnectionsBySearchValue,
   filterAtomsBySearchValue,
 } from "../../utils.js";
@@ -74,29 +73,36 @@ export default function AtomContentChats({
   );
 
   function generateConnectionItems(connections) {
-    const connectionsArray = sortByDate(connections) || [];
+    const connectionElements = [];
+    connections &&
+      connections
+        .toOrderedMap()
+        .sortBy(conn => {
+          const lastUpdateDate = connectionUtils.getLastUpdateDate(conn);
+          return lastUpdateDate && lastUpdateDate.getTime();
+        })
+        .reverse()
+        .map((conn, connUri) => {
+          connectionElements.push(
+            <div className="acc__item" key={connUri}>
+              <WonConnectionSelectionItem
+                connection={conn}
+                toLink={generateLink(
+                  history.location,
+                  {
+                    postUri: getUri(atom),
+                    connectionUri: connUri,
+                  },
+                  "/connections",
+                  false
+                )}
+                flip={!isAtomOwned}
+              />
+            </div>
+          );
+        });
 
-    return connectionsArray.map((conn, index) => {
-      const connUri = getUri(conn);
-
-      return (
-        <div className="acc__item" key={connUri + "-" + index}>
-          <WonConnectionSelectionItem
-            connection={conn}
-            toLink={generateLink(
-              history.location,
-              {
-                postUri: getUri(atom),
-                connectionUri: connUri,
-              },
-              "/connections",
-              false
-            )}
-            flip={!isAtomOwned}
-          />
-        </div>
-      );
-    });
+    return connectionElements;
   }
 
   function generateHeaderItem(label, size, toggleFunction, isExpanded) {

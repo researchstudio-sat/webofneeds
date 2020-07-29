@@ -1,7 +1,7 @@
 import React from "react";
 import Immutable from "immutable";
 import PropTypes from "prop-types";
-import { get, getUri } from "../../utils.js";
+import { getUri } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { useDispatch } from "react-redux";
 
@@ -11,8 +11,7 @@ import * as connectionUtils from "../../redux/utils/connection-utils.js";
 
 export default function WonConnectionMessageActions({ message, connection }) {
   const dispatch = useDispatch();
-  const multiSelectType = get(connection, "multiSelectType");
-  const isProposed = messageUtils.isMessageProposed(connection, message);
+  const multiSelectType = !!connectionUtils.getMultiSelectType(connection);
   const isCancellationPending = messageUtils.isMessageCancellationPending(
     connection,
     message
@@ -66,7 +65,9 @@ export default function WonConnectionMessageActions({ message, connection }) {
     <won-connection-message-actions>
       {isProposable
         ? generateButton(
-            isProposed ? "Propose (again)" : "Propose",
+            messageUtils.isMessageProposed(connection, message)
+              ? "Propose (again)"
+              : "Propose",
             "proposes",
             "black",
             multiSelectType

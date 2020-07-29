@@ -131,9 +131,9 @@ export default function WonAtomContent({
 
     switch (visibleTab) {
       case "DETAIL": {
-        const content = get(atom, "content");
+        const content = atomUtils.getContent(atom);
         //TODO it will be possible to have more than one seeks
-        const seeks = get(atom, "seeks");
+        const seeks = atomUtils.getSeeks(atom);
 
         /**
          * This function checks if there is at least one detail present that is displayable

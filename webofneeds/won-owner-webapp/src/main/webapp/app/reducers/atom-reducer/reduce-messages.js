@@ -3,6 +3,7 @@ import { markUriAsRead, isUriRead } from "../../won-localstorage.js";
 import { markConnectionAsRead } from "./reduce-connections.js";
 import { addAtomStub } from "./reduce-atoms.js";
 import vocab from "../../service/vocab.js";
+import * as atomUtils from "../../redux/utils/atom-utils.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import * as messageUtils from "../../redux/utils/message-utils.js";
 import {
@@ -299,7 +300,7 @@ export function addMessage(
       ) => {
         const allConnections =
           allAtomsInState &&
-          allAtomsInState.flatMap(atom => get(atom, "connections"));
+          allAtomsInState.flatMap(atom => atomUtils.getConnections(atom));
 
         return allConnections
           .filter(conn => connectionUtils.isConnected(conn))
@@ -327,8 +328,8 @@ export function addMessage(
           connections.map((conn, connUri) => {
             const atomUri = get(
               get(allAtomsInState, extractAtomUriFromConnectionUri(connUri)) ||
-                allAtomsInState.find(
-                  atom => !!getIn(atom, ["connections", connUri])
+                allAtomsInState.find(atom =>
+                  atomUtils.getConnection(atom, connUri)
                 ),
               "uri"
             );
@@ -405,7 +406,7 @@ export function markMessageAsSelected(
   isSelected
 ) {
   const atom = get(allAtomsInState, atomUri);
-  const connection = getIn(atom, ["connections", connectionUri]);
+  const connection = atomUtils.getConnection(atom, connectionUri);
   let messages = connectionUtils.getMessages(connection);
   const message = get(messages, messageUri);
 
@@ -443,7 +444,7 @@ export function markMessageAsCollapsed(
   isCollapsed
 ) {
   const atom = get(allAtomsInState, atomUri);
-  const connection = getIn(atom, ["connections", connectionUri]);
+  const connection = atomUtils.getConnection(atom, connectionUri);
   let messages = connectionUtils.getMessages(connection);
   const message = get(messages, messageUri);
 
@@ -508,7 +509,7 @@ export function markMessageExpandAllReferences(
   isExpanded
 ) {
   const atom = get(allAtomsInState, atomUri);
-  const connection = getIn(atom, ["connections", connectionUri]);
+  const connection = atomUtils.getConnection(atom, connectionUri);
 
   let messages = connectionUtils.getMessages(connection);
   const message = get(messages, messageUri);
@@ -526,10 +527,7 @@ export function markMessageExpandAllReferences(
     return allAtomsInState;
   }
 
-  const expandedReferences = getIn(message, [
-    "viewState",
-    "expandedReferences",
-  ]);
+  const expandedReferences = messageUtils.getExpandedReferences(message);
 
   if (!expandedReferences) {
     console.error(
@@ -577,7 +575,7 @@ export function markMessageExpandReferences(
   reference
 ) {
   const atom = get(allAtomsInState, atomUri);
-  const connection = getIn(atom, ["connections", connectionUri]);
+  const connection = atomUtils.getConnection(atom, connectionUri);
   let messages = connectionUtils.getMessages(connection);
   const message = get(messages, messageUri);
 
@@ -616,7 +614,7 @@ export function markMessageShowActions(
   showActions
 ) {
   const atom = get(allAtomsInState, atomUri);
-  const connection = getIn(atom, ["connections", connectionUri]);
+  const connection = atomUtils.getConnection(atom, connectionUri);
 
   let messages = connectionUtils.getMessages(connection);
   const message = get(messages, messageUri);
@@ -655,7 +653,7 @@ export function markMessageAsRead(
   read = true
 ) {
   const atom = get(allAtomsInState, atomUri);
-  const connection = getIn(atom, ["connections", connectionUri]);
+  const connection = atomUtils.getConnection(atom, connectionUri);
 
   let messages = connectionUtils.getMessages(connection);
   const message = get(messages, messageUri);
@@ -714,7 +712,7 @@ export function markMessageAsRejected(
   rejected
 ) {
   let atom = get(allAtomsInState, atomUri);
-  let connection = getIn(atom, ["connections", connectionUri]);
+  let connection = atomUtils.getConnection(atom, connectionUri);
   let messages = connectionUtils.getMessages(connection);
   let message = get(messages, messageUri);
 
@@ -833,7 +831,7 @@ export function markMessageAsRetracted(
   retracted
 ) {
   let atom = get(allAtomsInState, atomUri);
-  let connection = getIn(atom, ["connections", connectionUri]);
+  let connection = atomUtils.getConnection(atom, connectionUri);
   let messages = connectionUtils.getMessages(connection);
   let message = get(messages, messageUri);
 
@@ -949,7 +947,7 @@ export function markMessageAsClaimed(
   claimed
 ) {
   let atom = get(allAtomsInState, atomUri);
-  let connection = getIn(atom, ["connections", connectionUri]);
+  let connection = atomUtils.getConnection(atom, connectionUri);
 
   if (!connection) {
     console.error(
@@ -1018,7 +1016,7 @@ export function markMessageAsAgreed(
   isAgreedOn
 ) {
   let atom = get(allAtomsInState, atomUri);
-  let connection = getIn(atom, ["connections", connectionUri]);
+  let connection = atomUtils.getConnection(atom, connectionUri);
 
   if (!connection) {
     console.error(
@@ -1087,7 +1085,7 @@ export function markMessageAsProposed(
   proposed
 ) {
   let atom = get(allAtomsInState, atomUri);
-  let connection = getIn(atom, ["connections", connectionUri]);
+  let connection = atomUtils.getConnection(atom, connectionUri);
 
   if (!connection) {
     console.error(
@@ -1147,7 +1145,7 @@ export function markMessageAsAccepted(
   accepted
 ) {
   let atom = get(allAtomsInState, atomUri);
-  let connection = getIn(atom, ["connections", connectionUri]);
+  let connection = atomUtils.getConnection(atom, connectionUri);
   let messages = connectionUtils.getMessages(connection);
   let message = get(messages, messageUri);
 
@@ -1216,7 +1214,7 @@ export function markMessageAsCancelled(
   cancelled
 ) {
   let atom = get(allAtomsInState, atomUri);
-  let connection = getIn(atom, ["connections", connectionUri]);
+  let connection = atomUtils.getConnection(atom, connectionUri);
 
   if (!connection) {
     console.error(
@@ -1295,7 +1293,7 @@ export function markMessageAsCancellationPending(
   cancellationPending
 ) {
   let atom = get(allAtomsInState, atomUri);
-  let connection = getIn(atom, ["connections", connectionUri]);
+  let connection = atomUtils.getConnection(atom, connectionUri);
 
   if (!connection) {
     console.error(
@@ -1357,7 +1355,7 @@ export function updateMessageStatus(
   atomUri
 ) {
   let atom = get(allAtomsInState, atomUri);
-  let connection = getIn(atom, ["connections", connectionUri]);
+  let connection = atomUtils.getConnection(atom, connectionUri);
   let messages = connectionUtils.getMessages(connection);
   let message = get(messages, messageUri);
 
@@ -1375,7 +1373,7 @@ export function updateMessageStatus(
   }
 
   //Check if there is any "positive" messageStatus, we assume that we do not want to display this message "fully"
-  const agreementData = get(connection, "agreementData");
+  const agreementData = connectionUtils.getAgreementData(connection);
 
   const isProposed = !!getIn(agreementData, [
     "proposedMessageUris",

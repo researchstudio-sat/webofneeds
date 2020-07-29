@@ -93,8 +93,8 @@ export default function ChatTextfield({
     selectedDetailIdentifier &&
     get(allMessageDetailsImm, selectedDetailIdentifier);
 
-  const multiSelectType = get(connection, "multiSelectType");
-  const showAgreementData = get(connection, "showAgreementData");
+  const multiSelectType = connectionUtils.getMultiSelectType(connection);
+  const showAgreementData = connectionUtils.showAgreementData(connection);
   const isChatToGroupConnection = connectionUtils.hasTargetSocketUri(
     connection,
     atomUtils.getGroupSocket(targetAtom)
@@ -659,6 +659,7 @@ export default function ChatTextfield({
       getAdditionalContentKeysArray().map((key, index) => {
         const usedDetailImm = get(allMessageDetailsImm, key);
         const usedDetail = usedDetailImm && usedDetailImm.toJS();
+        const usedDetailIcon = get(usedDetail, "icon");
 
         const humanReadableDetail =
           usedDetail &&
@@ -682,10 +683,7 @@ export default function ChatTextfield({
                 )
               }
             >
-              <use
-                xlinkHref={get(usedDetailImm, "icon")}
-                href={get(usedDetailImm, "icon")}
-              />
+              <use xlinkHref={usedDetailIcon} href={usedDetailIcon} />
             </svg>
             <span
               className="cts__additionalcontent__list__item__label clickable"

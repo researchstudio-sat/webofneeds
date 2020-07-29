@@ -8,7 +8,6 @@ import * as messageUtils from "../redux/utils/message-utils";
 import { rdfTextfieldHelpText } from "../won-label-utils.js";
 import {
   get,
-  getIn,
   getUri,
   generateLink,
   extractAtomUriFromConnectionUri,
@@ -72,7 +71,7 @@ export default function WonAtomMessages({
   const chatMessages =
     messages &&
     messages
-      .filter(msg => !get(msg, "forwardMessage"))
+      .filter(msg => !messageUtils.getForwardMessage(msg))
       .filter(msg => !messageUtils.isAtomHintMessage(msg))
       .filter(msg => !messageUtils.isSocketHintMessage(msg));
 
@@ -82,9 +81,9 @@ export default function WonAtomMessages({
     connectionUri
   );
 
-  const agreementData = get(connection, "agreementData");
-  const agreementDataset = get(connection, "agreementDataset");
-  const petriNetData = get(connection, "petriNetData");
+  const agreementData = connectionUtils.getAgreementData(connection);
+  const agreementDataset = connectionUtils.getAgreementDataset(connection);
+  const petriNetData = connectionUtils.getPetriNetData(connection);
 
   //TODO: calculate this based on the uris in the agreementData and not based on every possible message
   const agreementMessages =
@@ -108,11 +107,11 @@ export default function WonAtomMessages({
   const showChatData =
     connection &&
     !(
-      get(connection, "showAgreementData") ||
-      get(connection, "showPetriNetData")
+      connectionUtils.showAgreementData(connection) ||
+      connectionUtils.showPetriNetData(connection)
     );
 
-  const multiSelectType = get(connection, "multiSelectType");
+  const multiSelectType = connectionUtils.getMultiSelectType(connection);
 
   const unreadMessageCount = unreadMessages && unreadMessages.size;
   const isProcessingLoadingMessages =
@@ -130,8 +129,8 @@ export default function WonAtomMessages({
       processState,
       connectionUri
     );
-  const showAgreementData = get(connection, "showAgreementData");
-  const showPetriNetData = get(connection, "showPetriNetData");
+  const showAgreementData = connectionUtils.showAgreementData(connection);
+  const showPetriNetData = connectionUtils.showPetriNetData(connection);
   const petriNetDataArray = petriNetData ? petriNetData.toArray() : [];
   const agreementDataLoaded =
     agreementData &&
@@ -352,7 +351,7 @@ export default function WonAtomMessages({
           messageUri: msgUri,
           connectionUri: connectionUri,
           atomUri: senderAtomUri,
-          isSelected: !getIn(msg, ["viewState", "isSelected"]),
+          isSelected: !messageUtils.isMessageSelected(msg),
         })
       );
     }
@@ -647,7 +646,6 @@ export default function WonAtomMessages({
               message={msg}
               connection={connection}
               senderAtom={senderAtom}
-              targetAtom={targetAtom}
               processState={processState}
               allAtoms={allAtoms}
               ownedConnections={ownedConnections}
@@ -734,7 +732,6 @@ export default function WonAtomMessages({
             message={msg}
             connection={connection}
             senderAtom={senderAtom}
-            targetAtom={targetAtom}
             processState={processState}
             allAtoms={allAtoms}
             ownedConnections={ownedConnections}
@@ -755,7 +752,6 @@ export default function WonAtomMessages({
             message={msg}
             connection={connection}
             senderAtom={senderAtom}
-            targetAtom={targetAtom}
             processState={processState}
             allAtoms={allAtoms}
             ownedConnections={ownedConnections}
@@ -776,7 +772,6 @@ export default function WonAtomMessages({
             message={msg}
             connection={connection}
             senderAtom={senderAtom}
-            targetAtom={targetAtom}
             processState={processState}
             allAtoms={allAtoms}
             ownedConnections={ownedConnections}

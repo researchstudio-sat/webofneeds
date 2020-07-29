@@ -58,8 +58,8 @@ export default function WonConnectionContextDropdown({
     connection,
     atomUtils.getGroupSocket(targetAtom)
   );
-  const showAgreementData = get(connection, "showAgreementData");
-  const showPetriNetData = get(connection, "showPetriNetData");
+  const showAgreementData = connectionUtils.showAgreementData(connection);
+  const showPetriNetData = connectionUtils.showPetriNetData(connection);
   const isClosed = connectionUtils.isClosed(connection);
   const isConnected = connectionUtils.isConnected(connection);
   const isSentRequest = connectionUtils.isRequestSent(connection);

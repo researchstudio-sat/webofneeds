@@ -708,11 +708,11 @@ export function isHoldable(useCaseImm) {
 }
 
 export function getUseCaseLabel(identifier) {
-  return getIn(useCasesImm, [identifier, "label"]);
+  return identifier && getIn(useCasesImm, [identifier, "label"]);
 }
 
 export function getUseCaseIcon(identifier) {
-  const iconImm = getIn(useCasesImm, [identifier, "icon"]);
+  const iconImm = identifier && getIn(useCasesImm, [identifier, "icon"]);
   return iconImm && iconImm.toJS();
 }
 

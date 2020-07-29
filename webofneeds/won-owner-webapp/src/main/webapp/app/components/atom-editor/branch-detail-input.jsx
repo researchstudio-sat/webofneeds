@@ -49,7 +49,6 @@ export default function WonBranchDetailInput({
 
           const detailJS = detailImm.toJS();
           const DetailComponent = detailJS.component;
-          const generateHumanReadable = detailJS.generateHumanReadable;
 
           const detailValueJS =
             draftObjectJS && draftObjectJS[detailIdentifier];
@@ -94,7 +93,7 @@ export default function WonBranchDetailInput({
                 {hasDetailValue &&
                   !isDetailExpanded && (
                     <div className="bdi__detail__items__item__header__content">
-                      {generateHumanReadable({
+                      {detailJS.generateHumanReadable({
                         value: detailValueJS,
                         includeLabel: false,
                       })}

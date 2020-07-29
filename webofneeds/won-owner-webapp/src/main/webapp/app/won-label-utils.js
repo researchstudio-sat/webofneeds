@@ -10,6 +10,12 @@ export const rdfTextfieldHelpText =
   "for prefixes that will be added automatically. E.g." +
   `\`<${vocab.WONMSG.uriPlaceholder.event}> con:text "hello world!". \``;
 
+export const noParsableContentPlaceholder =
+  "«This message couldn't be displayed as it didn't contain," +
+  "any parsable content! " +
+  'Click on the "Show raw RDF data"-button in ' +
+  'the footer of the page to see the "raw" message-data.»';
+
 const labels = deepFreeze({
   connectionState: {
     [vocab.WON.Suggested]: "Suggested",

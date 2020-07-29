@@ -202,7 +202,7 @@ export const getAllChatConnections = createSelector(
       )
       .toOrderedMap()
       .sortBy(conn => {
-        const lastUpdateDate = get(conn, "lastUpdateDate");
+        const lastUpdateDate = connectionUtils.getLastUpdateDate(conn);
         return lastUpdateDate && lastUpdateDate.getTime();
       })
       .reverse()

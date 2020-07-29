@@ -4,7 +4,6 @@
 import React from "react";
 import PropTypes from "prop-types";
 import * as generalSelectors from "../../redux/selectors/general-selectors";
-import { get } from "../../utils.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import { relativeTime } from "../../won-label-utils.js";
 import * as viewUtils from "../../redux/utils/view-utils.js";
@@ -15,8 +14,8 @@ import "~/style/_atom-content-general.scss";
 export default function WonAtomContentGeneral({ atom }) {
   const viewState = useSelector(generalSelectors.getViewState);
 
-  const creationDate = get(atom, "creationDate");
-  const modifiedDate = get(atom, "modifiedDate");
+  const creationDate = atomUtils.getCreationDate(atom);
+  const modifiedDate = atomUtils.getModifiedDate(atom);
 
   const typeLabel = atom && atomUtils.generateTypeLabel(atom);
   const fullFlagLabels = atom && atomUtils.generateFullFlagLabels(atom);

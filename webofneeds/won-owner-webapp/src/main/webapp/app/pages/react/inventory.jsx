@@ -2,7 +2,7 @@ import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { actionCreators } from "../../actions/actions.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
-import { get, getUri, sortByDate } from "../../utils.js";
+import { get } from "../../utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
@@ -26,31 +26,40 @@ import vocab from "../../service/vocab.js";
 export default function PageInventory() {
   const history = useHistory();
   const dispatch = useDispatch();
+  const viewState = useSelector(generalSelectors.getViewState);
+  const theme = useSelector(generalSelectors.getTheme);
+  const accountState = useSelector(generalSelectors.getAccountState);
+
   const ownedActivePersonas = useSelector(state =>
-    generalSelectors.getOwnedPersonas(state).filter(atomUtils.isActive)
+    generalSelectors
+      .getOwnedPersonas(state)
+      .filter(atomUtils.isActive)
+      .toOrderedMap()
+      .sortBy(persona => atomUtils.getTitle(persona))
   );
   const ownedUnassignedActivePosts = useSelector(state =>
     generalSelectors
       .getOwnedPosts(state)
       .filter(atomUtils.isActive)
       .filter(atom => !atomUtils.isHeld(atom))
+      .toOrderedMap()
+      .sortBy(atom => {
+        const creationDate = atomUtils.getCreationDate(atom);
+        return creationDate && creationDate.getTime();
+      })
+      .reverse()
   );
   const ownedInactiveAtoms = useSelector(state =>
-    generalSelectors.getOwnedAtoms(state).filter(atomUtils.isInactive)
+    generalSelectors
+      .getOwnedAtoms(state)
+      .filter(atomUtils.isInactive)
+      .toOrderedMap()
+      .sortBy(atom => {
+        const creationDate = atomUtils.getCreationDate(atom);
+        return creationDate && creationDate.getTime();
+      })
+      .reverse()
   );
-
-  const sortedOwnedUnassignedActivePosts =
-    sortByDate(ownedUnassignedActivePosts, "creationDate") || [];
-
-  const sortedOwnedInactiveAtoms =
-    sortByDate(ownedInactiveAtoms, "creationDate") || [];
-  const sortedOwnedActivePersonas =
-    sortByDate(ownedActivePersonas, "modifiedDate") || [];
-
-  const viewState = useSelector(generalSelectors.getViewState);
-
-  const theme = useSelector(generalSelectors.getTheme);
-  const accountState = useSelector(generalSelectors.getAccountState);
 
   const isLoggedIn = accountUtils.isLoggedIn(accountState);
   const welcomeTemplateHtml = get(theme, "welcomeTemplate");
@@ -59,13 +68,13 @@ export default function PageInventory() {
       ? get(theme, "additionalLogos").toArray()
       : undefined;
   const currentLocation = useSelector(generalSelectors.getCurrentLocation);
-  const hasOwnedUnassignedAtomUris =
-    sortedOwnedUnassignedActivePosts.length > 0;
+  const unassignedAtomSize = ownedUnassignedActivePosts
+    ? ownedUnassignedActivePosts.size
+    : 0;
+  const hasOwnedUnassignedAtomUris = unassignedAtomSize > 0;
 
-  const hasOwnedInactiveAtomUris = sortedOwnedInactiveAtoms.length > 0;
-  const hasOwnedActivePersonas = sortedOwnedActivePersonas.length > 0;
-  const unassignedAtomSize = sortedOwnedUnassignedActivePosts.length;
-  const inactiveAtomUriSize = sortedOwnedInactiveAtoms.length;
+  const inactiveAtomUriSize = ownedInactiveAtoms ? ownedInactiveAtoms.size : 0;
+  const hasOwnedInactiveAtomUris = ownedInactiveAtoms > 0;
 
   const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
   const showModalDialog = useSelector(viewSelectors.showModalDialog);
@@ -79,6 +88,22 @@ export default function PageInventory() {
       </svg>
     ));
   }
+
+  const personaElements = [];
+
+  ownedActivePersonas &&
+    ownedActivePersonas.map((persona, personaUri) => {
+      personaElements.push(
+        <WonAtomInfo
+          key={personaUri}
+          className="ownerinventory__personas__persona"
+          atomUri={personaUri}
+          atom={persona}
+          initialTab={vocab.HOLD.HolderSocketCompacted}
+        />
+      );
+    });
+
   return (
     <section className={!isLoggedIn ? "won-signed-out" : ""}>
       {showModalDialog && <WonModalDialog />}
@@ -89,18 +114,8 @@ export default function PageInventory() {
 
       {isLoggedIn ? (
         <main className="ownerinventory">
-          {hasOwnedActivePersonas && (
-            <div className="ownerinventory__personas">
-              {sortedOwnedActivePersonas.map((persona, index) => (
-                <WonAtomInfo
-                  key={getUri(persona) + "-" + index}
-                  className="ownerinventory__personas__persona"
-                  atomUri={getUri(persona)}
-                  atom={persona}
-                  initialTab={vocab.HOLD.HolderSocketCompacted}
-                />
-              ))}
-            </div>
+          {personaElements.length > 0 && (
+            <div className="ownerinventory__personas">{personaElements}</div>
           )}
           <div className="ownerinventory__header">
             <div className="ownerinventory__header__title">
@@ -114,7 +129,7 @@ export default function PageInventory() {
           </div>
           <div className="ownerinventory__content">
             <WonAtomCardGrid
-              atoms={sortedOwnedUnassignedActivePosts}
+              atoms={ownedUnassignedActivePosts}
               currentLocation={currentLocation}
               showIndicators={true}
               showHolder={true}
@@ -149,7 +164,7 @@ export default function PageInventory() {
             hasOwnedInactiveAtomUris && (
               <div className="ownerinventory__content">
                 <WonAtomCardGrid
-                  atoms={sortedOwnedInactiveAtoms}
+                  atoms={ownedInactiveAtoms}
                   currentLocation={currentLocation}
                   showIndicators={false}
                   showHolder={false}

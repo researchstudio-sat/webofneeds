@@ -7,16 +7,6 @@ import fakeNames from "./fakeNames.json";
  * Created by ksinger on 01.09.2015.
  */
 
-export function dispatchEvent(elem, eventName, eventData) {
-  let event = undefined;
-  if (eventData) {
-    event = new CustomEvent(eventName, { detail: eventData });
-  } else {
-    event = new Event(eventName);
-  }
-  elem.dispatchEvent(event);
-}
-
 export function getPathname(location) {
   return location && location.pathname;
 }
@@ -347,52 +337,6 @@ export function getIn(obj, path) {
 }
 
 /**
- * zipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
- * e.g. zipWith((x,y)=>x-y, [8,9,3], [3,2]) // => [5,7]
- * @param f
- * @param xs
- * @param ys
- */
-export function zipWith(f, xs, ys) {
-  return Array.from(
-    {
-      length: Math.min(xs.length, ys.length),
-    },
-    (_, i) => f(xs[i], ys[i])
-  );
-}
-
-/**
- * Sorts the elements by Date (default order is descending)
- * @param elementsImm elements from state that need to be returned as a sorted array
- * @param selector selector for the date that will be used to sort the elements (default is "lastUpdateDate")
- * @param order if "ASC" then the order will be ascending, everything else resorts to the default sort of descending order
- * @returns {*} sorted Elements array
- */
-export function sortByDate(
-  elementsImm,
-  selector = "lastUpdateDate",
-  order = "DESC"
-) {
-  let sortedElements = elementsImm && elementsImm.toArray();
-
-  if (sortedElements) {
-    sortedElements.sort(function(a, b) {
-      const bDate = b.get(selector) && b.get(selector).getTime();
-      const aDate = a.get(selector) && a.get(selector).getTime();
-
-      if (order === "ASC") {
-        return aDate - bDate;
-      } else {
-        return bDate - aDate;
-      }
-    });
-  }
-
-  return sortedElements;
-}
-
-/**
  * Filters given Map of connections by occurence of a given searchText Object { value: searchString }
  * check only looks into the humanReadable of the atom(s)
  * @param connectionsImm connections map to apply filter on
@@ -496,36 +440,6 @@ export function filterAtomsBySearchValue(
     );
   }
   return allAtomsImm;
-}
-
-/**
- * Sorts the elements by Selector (default order is ascending)
- * @param elementsImm elements from state that need to be returned as a sorted array
- * @param selector selector for the date that will be used to sort the elements (default is "lastUpdateDate")
- * @param order if "ASC" then the order will be ascending, everything else resorts to the default sort of descending order
- * @returns {*} sorted Elements array
- */
-export function sortBy(elementsImm, selector = elem => elem, order = "ASC") {
-  let sortedElements = elementsImm && elementsImm.toArray();
-
-  if (sortedElements) {
-    sortedElements.sort(function(a, b) {
-      const bValue = b && selector(b);
-      const aValue = a && selector(a);
-
-      if (order === "ASC") {
-        if (aValue < bValue) return -1;
-        if (aValue > bValue) return 1;
-        return 0;
-      } else {
-        if (bValue < aValue) return -1;
-        if (bValue > aValue) return 1;
-        return 0;
-      }
-    });
-  }
-
-  return sortedElements;
 }
 
 export function generateHexColor(text) {

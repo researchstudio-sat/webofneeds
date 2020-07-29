@@ -5,6 +5,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import ReactMarkdown from "react-markdown";
 import { get } from "../../utils.js";
+import { noParsableContentPlaceholder } from "~/app/won-label-utils.js";
 import * as messageUtils from "../../redux/utils/message-utils.js";
 import * as usecaseUtils from "../../usecase-utils.js";
 
@@ -12,21 +13,15 @@ import "~/style/_message-content.scss";
 import "~/style/_won-markdown.scss";
 import vocab from "../../service/vocab.js";
 
-const noParsableContentPlaceholder =
-  "«This message couldn't be displayed as it didn't contain," +
-  "any parsable content! " +
-  'Click on the "Show raw RDF data"-button in ' +
-  'the footer of the page to see the "raw" message-data.»';
-
 export default function WonMessageContent({ message }) {
-  const content = get(message, "content");
-  const matchScore = get(content, "matchScore");
-  const text = get(content, "text");
-
-  const messageType = get(message, "messageType");
-  const matchScorePercentage = matchScore && matchScore * 100;
-
   if (message) {
+    const content = messageUtils.getContent(message);
+    const matchScore = get(content, "matchScore");
+    const text = get(content, "text");
+
+    const messageType = messageUtils.getType(message);
+    const matchScorePercentage = matchScore && matchScore * 100;
+
     const markdownText = text ? (
       <ReactMarkdown
         className="msg__text markdown"
@@ -36,7 +31,7 @@ export default function WonMessageContent({ message }) {
     ) : (
       undefined
     );
-    const matchScore = matchScore ? (
+    const matchScoreElement = matchScore ? (
       <div className="msg__matchScore">MatchScore: {matchScorePercentage}%</div>
     ) : (
       undefined
@@ -84,7 +79,7 @@ export default function WonMessageContent({ message }) {
       <won-message-content>
         {markdownText}
         {contentDetailsArray}
-        {matchScore}
+        {matchScoreElement}
         {noParsableContent}
       </won-message-content>
     );

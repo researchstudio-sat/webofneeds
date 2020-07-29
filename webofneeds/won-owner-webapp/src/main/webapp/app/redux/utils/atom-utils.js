@@ -22,6 +22,33 @@ export function getState(atom) {
   return get(atom, "state");
 }
 
+export function getFakePersonaName(atom) {
+  return get(atom, "fakePersonaName");
+}
+
+export function getLastUpdateDate(atom) {
+  return get(atom, "lastUpdateDate");
+}
+
+export function getCreationDate(atom) {
+  return get(atom, "creationDate");
+}
+
+export function getModifiedDate(atom) {
+  return get(atom, "modifiedDate");
+}
+
+export function isBeingCreated(atom) {
+  return get(atom, "isBeingCreated");
+}
+
+export function getContent(atom) {
+  return get(atom, "content");
+}
+
+export function getSeeks(atom) {
+  return get(atom, "seeks");
+}
 /**
  * Determines if a given atom is a Inactive
  * @param atom
@@ -64,19 +91,20 @@ export function matchesDefinition(atom, useCaseDefinition) {
  * @returns {any}
  */
 export function getTitle(atom, externalDataState, separator = ", ") {
-  const title = getIn(atom, ["content", "title"]);
+  const atomContent = getContent(atom);
+  const title = get(atomContent, "title");
   if (title) {
     return title;
   }
 
-  const personaName = getIn(atom, ["content", "personaName"]);
+  const personaName = get(atomContent, "personaName");
 
   if (personaName) {
     return personaName;
   }
 
-  const eventObjectAboutUris = getIn(atom, ["content", "eventObjectAboutUris"]);
-  const classifiedAs = getIn(atom, ["content", "classifiedAs"]);
+  const eventObjectAboutUris = get(atomContent, "eventObjectAboutUris");
+  const classifiedAs = get(atomContent, "classifiedAs");
 
   const wikiDataHumanReadable = [];
 
@@ -131,7 +159,7 @@ export function getReactions(atom, socketType) {
 }
 
 export function hasMatchedUseCase(atom) {
-  return !!getIn(atom, ["matchedUseCase", "identifier"]);
+  return !!getMatchedUseCaseIdentifier(atom);
 }
 
 export function hasImages(atom) {
@@ -139,12 +167,7 @@ export function hasImages(atom) {
 }
 
 export function hasLocation(atom) {
-  return (
-    !!getIn(atom, ["content", "jobLocation"]) ||
-    !!getIn(atom, ["content", "location"]) ||
-    !!getIn(atom, ["seeks", "jobLocation"]) ||
-    !!getIn(atom, ["seeks", "location"])
-  );
+  return !!getLocation(atom);
 }
 
 /**
@@ -155,15 +178,15 @@ export function hasLocation(atom) {
  * @returns {*}
  */
 export function getLocation(atom) {
-  if (hasLocation(atom)) {
-    return (
-      getIn(atom, ["content", "jobLocation"]) ||
-      getIn(atom, ["content", "location"]) ||
-      getIn(atom, ["seeks", "jobLocation"]) ||
-      getIn(atom, ["seeks", "location"])
-    );
-  }
-  return undefined;
+  const atomContent = getContent(atom);
+  const atomSeeks = getSeeks(atom);
+
+  return (
+    get(atomContent, "jobLocation") ||
+    get(atomContent, "location") ||
+    get(atomSeeks, "jobLocation") ||
+    get(atomSeeks, "location")
+  );
 }
 
 /**
@@ -220,15 +243,18 @@ export function getDistanceFrom(atom, location) {
 }
 
 export function getImages(atom) {
-  return getIn(atom, ["content", "images"]);
+  const atomContent = getContent(atom);
+  return get(atomContent, "images");
 }
 
 export function getImageUrl(atom) {
-  return getIn(atom, ["content", "imageUrl"]);
+  const atomContent = getContent(atom);
+  return get(atomContent, "imageUrl");
 }
 
 export function getSeeksImages(atom) {
-  return getIn(atom, ["seeks", "images"]);
+  const atomSeeks = getSeeks(atom);
+  return get(atomSeeks, "images");
 }
 
 /**
@@ -271,8 +297,8 @@ export function getDefaultImage(atom) {
  * @param atom
  */
 export function getDefaultPersonaImage(atom) {
-  if (hasImages(atom) && isPersona(atom)) {
-    const contentImages = getIn(atom, ["content", "images"]);
+  if (isPersona(atom) && hasImages(atom)) {
+    const contentImages = getImages(atom);
 
     if (contentImages) {
       const defaultImage = contentImages.find(image => get(image, "default"));
@@ -291,33 +317,30 @@ export function getDefaultPersonaImage(atom) {
  * @returns {*|boolean}
  */
 export function isInvisibleAtom(atom) {
-  return (
-    getIn(atom, ["content", "flags"]) &&
-    getIn(atom, ["content", "flags"]).contains(
-      vocab.WONMATCH.NoHintForCounterpartCompacted
-    )
-  );
+  const atomContent = getContent(atom);
+  const flags = get(atomContent, "flags");
+  return flags && flags.contains(vocab.WONMATCH.NoHintForCounterpartCompacted);
 }
 
 export function isPersona(atom) {
-  return (
-    getIn(atom, ["content", "type"]) &&
-    getIn(atom, ["content", "type"]).has(vocab.WON.PersonaCompacted)
-  );
+  const atomContent = getContent(atom);
+  const types = get(atomContent, "type");
+
+  return types && types.has(vocab.WON.PersonaCompacted);
 }
 
 export function isServiceAtom(atom) {
-  return (
-    getIn(atom, ["content", "type"]) &&
-    getIn(atom, ["content", "type"]).has(vocab.BOT.ServiceAtomCompacted)
-  );
+  const atomContent = getContent(atom);
+  const types = get(atomContent, "type");
+
+  return types && types.has(vocab.BOT.ServiceAtomCompacted);
 }
 
 export function isAtom(atom) {
-  return (
-    getIn(atom, ["content", "type"]) &&
-    getIn(atom, ["content", "type"]).has(vocab.WON.AtomCompacted)
-  );
+  const atomContent = getContent(atom);
+  const types = get(atomContent, "type");
+
+  return types && types.has(vocab.WON.AtomCompacted);
 }
 
 export function hasChatSocket(atom) {
@@ -524,32 +547,6 @@ export function getSeeksSocketsWithKeysReset(atomImm) {
     return getSocketKeysReset(sockets);
   }
   return undefined;
-}
-
-/**
- * Sorts the elements by distance from given location (default order is ascending)
- * @param elementsImm elements from state that need to be returned as a sorted array
- * @param location given location to calculate the distance from
- * @param order if "DESC" then the order will be descending, everything else resorts to the default sort of ascending order
- * @returns {*} sorted Elements array
- */
-export function sortByDistanceFrom(atomsImm, location, order = "ASC") {
-  let sortedAtoms = atomsImm && atomsImm.toArray();
-
-  if (sortedAtoms) {
-    sortedAtoms.sort(function(a, b) {
-      const bDist = getDistanceFrom(b, location);
-      const aDist = getDistanceFrom(a, location);
-
-      if (order === "DESC") {
-        return bDist - aDist;
-      } else {
-        return aDist - bDist;
-      }
-    });
-  }
-
-  return sortedAtoms;
 }
 
 function getSocketKeysReset(socketsImm) {

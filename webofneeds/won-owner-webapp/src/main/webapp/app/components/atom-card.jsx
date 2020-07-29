@@ -2,8 +2,8 @@
  * Created by quasarchimaere on 30.07.2019.
  */
 import React from "react";
-import { get, getIn } from "../utils.js";
 
+import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import WonOtherCard from "./cards/other-card.jsx";
@@ -25,11 +25,11 @@ export default function WonAtomCard({
 }) {
   const processState = useSelector(generalSelectors.getProcessState);
   const isSkeleton =
-    get(atom, "isBeingCreated") ||
+    atomUtils.isBeingCreated(atom) ||
     processUtils.hasAtomFailedToLoad(processState, atomUri) ||
     processUtils.isAtomFetchNecessary(processState, atomUri, atom);
 
-  const matchedUseCase = getIn(atom, ["matchedUseCase", "identifier"]);
+  const matchedUseCase = atomUtils.getMatchedUseCaseIdentifier(atom);
 
   let cardContent;
 

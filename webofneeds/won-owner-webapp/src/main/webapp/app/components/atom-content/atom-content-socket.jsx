@@ -10,7 +10,6 @@ import vocab from "../../service/vocab.js";
 import {
   get,
   getUri,
-  sortByDate,
   filterConnectionsBySearchValue,
   filterAtomsBySearchValue,
   extractAtomUriFromConnectionUri,
@@ -39,6 +38,7 @@ export default function WonAtomContentSocket({
   setVisibleTab,
 }) {
   const accountState = useSelector(generalSelectors.getAccountState);
+  const currentLocation = useSelector(generalSelectors.getCurrentLocation);
   const isAtomOwned = accountUtils.isAtomOwned(accountState, getUri(atom));
 
   const [showRequestReceived, toggleRequestReceived] = useState(false);
@@ -88,33 +88,39 @@ export default function WonAtomContentSocket({
   );
 
   function generateConnectionItems(connections) {
-    const connectionsArray = sortByDate(connections) || [];
+    const connectionElements = [];
 
-    return connectionsArray.map((conn, index) => {
-      const flip = connectionUtils.hasTargetSocketUri(conn, socketUri);
+    connections &&
+      connections
+        .toOrderedMap()
+        .sortBy(conn => {
+          const lastUpdateDate = connectionUtils.getLastUpdateDate(conn);
+          return lastUpdateDate && lastUpdateDate.getTime();
+        })
+        .reverse()
+        .map((conn, connUri) => {
+          const flip = connectionUtils.hasTargetSocketUri(conn, socketUri);
+          connectionElements.push(
+            <ItemComponent
+              key={connUri}
+              connection={conn}
+              currentLocation={currentLocation}
+              atom={
+                flip
+                  ? get(storedAtoms, extractAtomUriFromConnectionUri(connUri))
+                  : atom
+              }
+              targetAtom={get(
+                storedAtoms,
+                connectionUtils.getTargetAtomUri(conn)
+              )}
+              isOwned={isAtomOwned}
+              flip={flip}
+            />
+          );
+        });
 
-      return (
-        <React.Fragment key={getUri(conn) + "-" + index}>
-          <ItemComponent
-            connection={conn}
-            atom={
-              flip
-                ? get(
-                    storedAtoms,
-                    extractAtomUriFromConnectionUri(getUri(conn))
-                  )
-                : atom
-            }
-            targetAtom={get(
-              storedAtoms,
-              connectionUtils.getTargetAtomUri(conn)
-            )}
-            isOwned={isAtomOwned}
-            flip={flip}
-          />
-        </React.Fragment>
-      );
-    });
+    return connectionElements;
   }
 
   function generateHeaderItem(label, size, toggleFunction, isExpanded) {
