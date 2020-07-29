@@ -340,6 +340,10 @@ export function hasBuddySocket(atom) {
   return hasSocket(atom, vocab.BUDDY.BuddySocketCompacted);
 }
 
+export function hasPartnerActivitySocket(atom) {
+  return hasSocket(atom, vocab.VALUEFLOWS.PartnerActivitySocketCompacted);
+}
+
 export function hasSocket(atom, socket) {
   const sockets = getSockets(atom);
   return sockets && sockets.contains(socket);
@@ -347,6 +351,10 @@ export function hasSocket(atom, socket) {
 
 export function getChatSocket(atom) {
   return getSocketUri(atom, vocab.CHAT.ChatSocketCompacted);
+}
+
+export function getPartnerActivitySocket(atom) {
+  return getSocketUri(atom, vocab.VALUEFLOWS.PartnerActivitySocketCompacted);
 }
 
 export function getGroupSocket(atom) {
@@ -612,6 +620,16 @@ export function getAllNonClosedNonSuggestedChatConnections(atomImm) {
   return getConnections(atomImm).filter(
     conn =>
       connectionUtils.hasSocketUri(conn, chatSocketUri) &&
+      !(connectionUtils.isClosed(conn) || connectionUtils.isSuggested(conn))
+  );
+}
+
+export function getAllNonClosedNonSuggestedPartnerActivityConnections(atomImm) {
+  const partnerActivitySocketUri = getPartnerActivitySocket(atomImm);
+
+  return getConnections(atomImm).filter(
+    conn =>
+      connectionUtils.hasSocketUri(conn, partnerActivitySocketUri) &&
       !(connectionUtils.isClosed(conn) || connectionUtils.isSuggested(conn))
   );
 }
