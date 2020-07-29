@@ -4,7 +4,7 @@ import { actionCreators } from "../actions/actions.js";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
 
-import { sortBy, get, getUri, generateLink } from "../utils.js";
+import { get, getUri, generateLink } from "../utils.js";
 import vocab from "../service/vocab.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
@@ -118,30 +118,95 @@ export default function WonSocketAddAtom({
           );
         })
       );
+    })
+    .toOrderedMap()
+    .sortBy(atom => {
+      const humanReadable = atomUtils.getTitle(atom, externalDataState);
+      return humanReadable ? humanReadable.toLowerCase() : undefined;
     });
 
-  const createAtomReactionsArray = [];
+  const createAtomReactionsElements = [];
 
   reactions &&
     reactions
       .filter(reaction => !isAddToAtomOwned || !get(reaction, "refuseOwned"))
-      .map((reaction, socketType) => {
-        const allowedUseCaseList = get(reaction, "useCaseIdentifiers");
+      .map((reaction, socketType) =>
+        get(reaction, "useCaseIdentifiers").map(ucIdentifier =>
+          createAtomReactionsElements.push(
+            <Link
+              key={ucIdentifier + "-" + socketType}
+              className="wsaa__content__create"
+              to={location =>
+                generateLink(
+                  location,
+                  {
+                    useCase: ucIdentifier !== "*" ? ucIdentifier : undefined,
+                    fromAtomUri: addToAtomUri,
+                    senderSocketType: socketType,
+                    targetSocketType: addToSocketType,
+                    mode: "CONNECT",
+                    holderUri: addHolderUri,
+                  },
+                  "/create"
+                )
+              }
+            >
+              <div className="wsaa__content__create__icon">
+                {useCaseUtils.getUseCaseIcon(ucIdentifier) ? (
+                  <svg className="wsaa__content__create__icon__svg">
+                    <use
+                      xlinkHref={useCaseUtils.getUseCaseIcon(ucIdentifier)}
+                      href={useCaseUtils.getUseCaseIcon(ucIdentifier)}
+                    />
+                  </svg>
+                ) : (
+                  <svg className="wsaa__content__create__icon__svg">
+                    <use xlinkHref={ico36_plus} href={ico36_plus} />
+                  </svg>
+                )}
+              </div>
+              <div className="wsaa__content__create__right">
+                <div className="wsaa__content__create__right__topline">
+                  <div className="wsaa__content__create__right__topline__notitle">
+                    {isAddToAtomOwned
+                      ? `Add New ${wonLabelUtils.getSocketItemLabel(
+                          addToSocketType,
+                          socketType
+                        )}`
+                      : `Connect New ${wonLabelUtils.getSocketItemLabel(
+                          addToSocketType,
+                          socketType
+                        )}`}
+                  </div>
+                </div>
+                <div className="wsaa__content__create__right__subtitle">
+                  <span className="wsaa__content__create__right__subtitle__type">
+                    <span>
+                      {ucIdentifier !== "*"
+                        ? useCaseUtils.getUseCaseLabel(ucIdentifier)
+                        : "Pick a UseCase"}
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </Link>
+          )
+        )
+      );
 
-        return allowedUseCaseList.map(ucIdentifier =>
-          createAtomReactionsArray.push({
-            ucIdentifier: ucIdentifier,
-            socketType: socketType,
-          })
-        );
-      });
+  const sortedPossibleAtomsElements = [];
 
-  const sortedPossibleAtomsArray =
-    sortedPossibleAtoms &&
-    sortBy(sortedPossibleAtoms, elem => {
-      const humanReadable = atomUtils.getTitle(elem, externalDataState);
-      return humanReadable ? humanReadable.toLowerCase() : undefined;
-    });
+  sortedPossibleAtoms &&
+    sortedPossibleAtoms.map((atom, atomUri) =>
+      sortedPossibleAtomsElements.push(
+        <WonAtomHeader
+          key={atomUri}
+          atom={atom}
+          hideTimestamp={true}
+          onClick={() => selectAtom(atom)}
+        />
+      )
+    );
 
   function selectAtom(selectedAtom) {
     const selectedAtomUri = getUri(selectedAtom);
@@ -337,74 +402,8 @@ export default function WonSocketAddAtom({
         </div>
       </div>
       <div className="wsaa__content">
-        {sortedPossibleAtomsArray &&
-          sortedPossibleAtomsArray.map((atom, index) => (
-            <WonAtomHeader
-              key={getUri(atom) + "-" + index}
-              atom={atom}
-              hideTimestamp={true}
-              onClick={() => selectAtom(atom)}
-            />
-          ))}
-        {createAtomReactionsArray.map(({ ucIdentifier, socketType }, index) => (
-          <Link
-            key={ucIdentifier + "-" + index}
-            className="wsaa__content__create"
-            to={location =>
-              generateLink(
-                location,
-                {
-                  useCase: ucIdentifier !== "*" ? ucIdentifier : undefined,
-                  fromAtomUri: addToAtomUri,
-                  senderSocketType: socketType,
-                  targetSocketType: addToSocketType,
-                  mode: "CONNECT",
-                  holderUri: addHolderUri,
-                },
-                "/create"
-              )
-            }
-          >
-            <div className="wsaa__content__create__icon">
-              {useCaseUtils.getUseCaseIcon(ucIdentifier) ? (
-                <svg className="wsaa__content__create__icon__svg">
-                  <use
-                    xlinkHref={useCaseUtils.getUseCaseIcon(ucIdentifier)}
-                    href={useCaseUtils.getUseCaseIcon(ucIdentifier)}
-                  />
-                </svg>
-              ) : (
-                <svg className="wsaa__content__create__icon__svg">
-                  <use xlinkHref={ico36_plus} href={ico36_plus} />
-                </svg>
-              )}
-            </div>
-            <div className="wsaa__content__create__right">
-              <div className="wsaa__content__create__right__topline">
-                <div className="wsaa__content__create__right__topline__notitle">
-                  {isAddToAtomOwned
-                    ? `Add New ${wonLabelUtils.getSocketItemLabel(
-                        addToSocketType,
-                        socketType
-                      )}`
-                    : `Connect New ${wonLabelUtils.getSocketItemLabel(
-                        addToSocketType,
-                        socketType
-                      )}`}
-                </div>
-              </div>
-              <div className="wsaa__content__create__right__subtitle">
-                <span className="wsaa__content__create__right__subtitle__type">
-                  <span>
-                    {ucIdentifier !== "*"
-                      ? useCaseUtils.getUseCaseLabel(ucIdentifier)
-                      : "Pick a UseCase"}
-                  </span>
-                </span>
-              </div>
-            </div>
-          </Link>
-        ))}
+        {sortedPossibleAtomsElements}
+        {createAtomReactionsElements}
       </div>
       {allowAdHoc ? (
         <React.Fragment>

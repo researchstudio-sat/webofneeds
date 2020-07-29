@@ -7,7 +7,7 @@ import { connect } from "react-redux";
 import Immutable from "immutable";
 import PropTypes from "prop-types";
 
-import { get, getIn, getUri, sortBy } from "../../../utils.js";
+import { get, getIn, getUri } from "../../../utils.js";
 import * as atomUtils from "../../../redux/utils/atom-utils.js";
 import * as generalSelectors from "../../../redux/selectors/general-selectors.js";
 import WonAtomHeader from "../../atom-header.jsx";
@@ -45,13 +45,19 @@ const mapStateToProps = (state, ownProps) => {
   const suggestedAtomUri = ownProps.initialValue;
   const allActiveAtoms = generalSelectors.getActiveAtoms(state);
 
-  const allSuggestableAtoms =
+  const sortedSuggestableAtoms =
     allActiveAtoms &&
-    allActiveAtoms.filter(
-      atom =>
-        !isExcludedAtom(atom, ownProps.excludedUris) &&
-        hasAtLeastOneAllowedSocket(atom, ownProps.allowedSockets)
-    );
+    allActiveAtoms
+      .filter(
+        atom =>
+          !isExcludedAtom(atom, ownProps.excludedUris) &&
+          hasAtLeastOneAllowedSocket(atom, ownProps.allowedSockets)
+      )
+      .toOrderedMap()
+      .sortBy(atom => {
+        const title = atomUtils.getTitle(atom, externalDataState);
+        return title ? title.toLowerCase() : undefined;
+      });
 
   const allForbiddenAtoms =
     allActiveAtoms &&
@@ -63,14 +69,7 @@ const mapStateToProps = (state, ownProps) => {
         )
     );
 
-  const suggestedAtom = get(allSuggestableAtoms, suggestedAtomUri);
-  const sortedActiveAtomsArray =
-    allSuggestableAtoms &&
-    sortBy(allSuggestableAtoms, elem => {
-      const title = atomUtils.getTitle(elem, externalDataState);
-      return title ? title.toLowerCase() : undefined;
-    });
-
+  const suggestedAtom = get(sortedSuggestableAtoms, suggestedAtomUri);
   return {
     initialValue: ownProps.initialValue,
     detail: ownProps.detail,
@@ -78,12 +77,10 @@ const mapStateToProps = (state, ownProps) => {
     notAllowedSocketText: ownProps.notAllowedSocketText,
     onUpdate: ownProps.onUpdate,
     processState: get(state, "process"),
-    allSuggestableAtoms,
     allForbiddenAtoms,
     allowedSockets: ownProps.allowedSockets,
     excludedUris: ownProps.excludedUris,
-    suggestionsAvailable: allSuggestableAtoms && allSuggestableAtoms.size > 0,
-    sortedActiveAtomsArray,
+    sortedSuggestableAtoms,
     suggestedAtom,
     noSuggestionsLabel:
       ownProps.noSuggestionsText || "No Atoms available to suggest",
@@ -136,7 +133,7 @@ class WonSuggestAtomPicker extends React.Component {
       state.uriToFetch &&
       !uriToFetchLoading &&
       !uriToFetchFailedToLoad &&
-      get(props.allSuggestableAtoms, state.uriToFetch);
+      get(props.sortedSuggestableAtoms, state.uriToFetch);
     const uriToFetchFailed =
       state.uriToFetch &&
       !uriToFetchLoading &&
@@ -179,11 +176,16 @@ class WonSuggestAtomPicker extends React.Component {
   render() {
     let suggestions;
 
-    if (this.props.suggestionsAvailable) {
-      const suggestionItems = this.props.sortedActiveAtomsArray.map(atom => {
-        return (
+    if (
+      this.props.sortedSuggestableAtoms &&
+      this.props.sortedSuggestableAtoms.size > 0
+    ) {
+      const suggestionElements = [];
+
+      this.props.sortedSuggestableAtoms.map((atom, atomUri) =>
+        suggestionElements.push(
           <div
-            key={getUri(atom)}
+            key={atomUri}
             onClick={() => this.selectAtom(atom)}
             className={
               "sap__posts__post clickable " +
@@ -192,10 +194,9 @@ class WonSuggestAtomPicker extends React.Component {
           >
             <WonAtomHeader atom={atom} hideTimestamp={true} />
           </div>
-        );
-      });
-
-      suggestions = <div className="sap__posts">{suggestionItems}</div>;
+        )
+      );
+      suggestions = <div className="sap__posts">{suggestionElements}</div>;
     } else {
       suggestions = (
         <div className="sap__noposts">{this.props.noSuggestionsLabel}</div>
@@ -327,7 +328,7 @@ class WonSuggestAtomPicker extends React.Component {
       this.state.uriToFetch
     );
     if (
-      !getIn(this.props.allSuggestableAtoms, this.state.uriToFetch) &&
+      !getIn(this.props.sortedSuggestableAtoms, this.state.uriToFetch) &&
       !get(this.props.allForbiddenAtoms, this.state.uriToFetch)
     ) {
       this.setState({ fetching: true }, () =>
@@ -355,10 +356,8 @@ WonSuggestAtomPicker.propTypes = {
   notAllowedSocketText: PropTypes.string,
   noSuggestionsText: PropTypes.string,
   onUpdate: PropTypes.func.isRequired,
-  allSuggestableAtoms: PropTypes.object,
+  sortedSuggestableAtoms: PropTypes.object,
   allForbiddenAtoms: PropTypes.object,
-  suggestionsAvailable: PropTypes.bool,
-  sortedActiveAtomsArray: PropTypes.arrayOf(PropTypes.object),
   suggestedAtom: PropTypes.object,
   noSuggestionsLabel: PropTypes.string,
   fetchAtom: PropTypes.func,
