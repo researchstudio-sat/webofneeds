@@ -38,6 +38,7 @@ export default function WonAtomContentSocket({
   setVisibleTab,
 }) {
   const accountState = useSelector(generalSelectors.getAccountState);
+  const currentLocation = useSelector(generalSelectors.getCurrentLocation);
   const isAtomOwned = accountUtils.isAtomOwned(accountState, getUri(atom));
 
   const [showRequestReceived, toggleRequestReceived] = useState(false);
@@ -103,6 +104,7 @@ export default function WonAtomContentSocket({
             <ItemComponent
               key={connUri}
               connection={conn}
+              currentLocation={currentLocation}
               atom={
                 flip
                   ? get(storedAtoms, extractAtomUriFromConnectionUri(connUri))
