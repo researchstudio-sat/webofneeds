@@ -18,7 +18,7 @@ export const resource = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["vf:EconomicResource"],
+        type: [vocab.VALUEFLOWS.EconomicResourceCompacted],
         sockets: {
           "#PrimaryAccountableSocket":
             vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted,

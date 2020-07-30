@@ -13,7 +13,7 @@ export const activity = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["wx-valueflows:Activity"],
+        type: [vocab.WXVALUEFLOWS.ActivityCompacted],
         sockets: {
           "#ResourceSocket": vocab.WXVALUEFLOWS.ResourceSocketCompacted,
           "#ActorSocket": vocab.WXVALUEFLOWS.ActorSocketCompacted,

@@ -364,10 +364,16 @@ vocab.WXSCHEMA.ReviewInverseSocketCompacted =
 vocab.VALUEFLOWS = {};
 vocab.VALUEFLOWS.baseUri = "https://w3id.org/valueflows#";
 vocab.VALUEFLOWS.prefix = "vf";
+vocab.VALUEFLOWS.EconomicResource =
+  vocab.VALUEFLOWS.baseUri + "EconomicResource";
+vocab.VALUEFLOWS.EconomicResourceCompacted =
+  vocab.VALUEFLOWS.prefix + ":EconomicResource";
 
 vocab.WXVALUEFLOWS = {};
 vocab.WXVALUEFLOWS.baseUri = "https://w3id.org/won/ext/valueflows#";
-vocab.WXVALUEFLOWS.prefix = "wx-valueflows";
+vocab.WXVALUEFLOWS.prefix = "wx-vf";
+vocab.WXVALUEFLOWS.Activity = vocab.WXVALUEFLOWS.baseUri + "Activity";
+vocab.WXVALUEFLOWS.ActivityCompacted = vocab.WXVALUEFLOWS.prefix + ":Activity";
 vocab.WXVALUEFLOWS.PrimaryAccountableSocket =
   vocab.WXVALUEFLOWS.baseUri + "PrimaryAccountableSocket";
 vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted =
