@@ -91,9 +91,11 @@ export default function WonAtomIcon({ atom, className, onClick, flipIcons }) {
           <div
             className="holderIcon holderUseCaseIcon holderIcon--isPersona"
             style={{
-              backgroundColor: generateHexColor(
-                new shajs.sha512().update(atomUri).digest("hex")
-              ),
+              backgroundColor: atomUri
+                ? generateHexColor(
+                    new shajs.sha512().update(atomUri).digest("hex")
+                  )
+                : "black",
             }}
           >
             <svg className="si__serviceatomicon">
@@ -160,9 +162,11 @@ export default function WonAtomIcon({ atom, className, onClick, flipIcons }) {
           <div
             className="image usecaseimage image--isPersona"
             style={{
-              backgroundColor: generateHexColor(
-                new shajs.sha512().update(atomUri).digest("hex")
-              ),
+              backgroundColor: atomUri
+                ? generateHexColor(
+                    new shajs.sha512().update(atomUri).digest("hex")
+                  )
+                : "black",
             }}
           >
             <svg className="si__usecaseicon">
