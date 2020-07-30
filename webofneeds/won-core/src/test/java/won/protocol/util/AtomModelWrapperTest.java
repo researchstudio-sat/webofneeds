@@ -18,6 +18,7 @@ import org.junit.Test;
 import won.protocol.message.Utils;
 import won.protocol.model.AtomGraphType;
 import won.protocol.model.AtomState;
+import won.protocol.vocabulary.SCHEMA;
 import won.protocol.vocabulary.WONCON;
 import won.protocol.vocabulary.WONMATCH;
 
@@ -139,9 +140,9 @@ public class AtomModelWrapperTest {
         AtomModelWrapper atomModelWrapper = new AtomModelWrapper(ATOM_URI);
         Assert.assertNotNull(atomModelWrapper.copyAtomModel(AtomGraphType.ATOM));
         Assert.assertEquals(ATOM_URI, atomModelWrapper.getAtomUri());
-        atomModelWrapper.setContentPropertyStringValue(DC.description, "description");
+        atomModelWrapper.setContentPropertyStringValue(SCHEMA.DESCRIPTION, "description");
         atomModelWrapper.addPropertyStringValue(WONCON.tag, "tag");
-        Assert.assertEquals(1, atomModelWrapper.getContentPropertyStringValues(DC.description, null).size());
+        Assert.assertEquals(1, atomModelWrapper.getContentPropertyStringValues(SCHEMA.DESCRIPTION, null).size());
         Assert.assertEquals(1, atomModelWrapper.getContentPropertyStringValues(WONCON.tag, null).size());
         // add different content nodes now and check that they are there
         atomModelWrapper.createSeeksNode("https://seeks_uri1");
@@ -152,13 +153,13 @@ public class AtomModelWrapperTest {
         Assert.assertNotNull(atomModelWrapper.getAtomContentNode());
         Assert.assertEquals(2, atomModelWrapper.getSeeksNodes().size());
         // add content now and check if it can be queried correctly
-        atomModelWrapper.setContentPropertyStringValue(DC.description, "description");
-        atomModelWrapper.setSeeksPropertyStringValue(DC.description, "description1");
-        atomModelWrapper.addSeeksPropertyStringValue(DC.description, "description2");
+        atomModelWrapper.setContentPropertyStringValue(SCHEMA.DESCRIPTION, "description");
+        atomModelWrapper.setSeeksPropertyStringValue(SCHEMA.DESCRIPTION, "description1");
+        atomModelWrapper.addSeeksPropertyStringValue(SCHEMA.DESCRIPTION, "description2");
         atomModelWrapper.addPropertyStringValue(WONCON.tag, "tag1");
         atomModelWrapper.addSeeksPropertyStringValue(WONCON.tag, "tag2");
-        Assert.assertEquals(4, atomModelWrapper.getSeeksPropertyStringValues(DC.description, null).size());
-        Assert.assertEquals(5, atomModelWrapper.getAllContentPropertyStringValues(DC.description, null).size());
+        Assert.assertEquals(4, atomModelWrapper.getSeeksPropertyStringValues(SCHEMA.DESCRIPTION, null).size());
+        Assert.assertEquals(5, atomModelWrapper.getAllContentPropertyStringValues(SCHEMA.DESCRIPTION, null).size());
         Assert.assertEquals(4, atomModelWrapper.getAllContentPropertyStringValues(WONCON.tag, null).size());
         Assert.assertEquals(2, atomModelWrapper.getContentPropertyStringValues(WONCON.tag, null).size());
         Assert.assertEquals(2, atomModelWrapper.getSeeksPropertyStringValues(WONCON.tag, null).size());

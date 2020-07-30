@@ -35,7 +35,7 @@ public class ServiceAtomModelWrapper extends DefaultAtomModelWrapper {
             this.setName(serviceAtomContent.getName());
         }
         if (Objects.nonNull(serviceAtomContent.getDescription())) {
-            atom.addProperty(SCHEMA.DESCRIPTION, serviceAtomContent.getDescription());
+            this.setDescription(serviceAtomContent.getDescription());
         }
         if (Objects.nonNull(serviceAtomContent.getTermsOfService())) {
             atom.addProperty(SCHEMA.TERMS_OF_SERVICE, serviceAtomContent.getTermsOfService());
@@ -55,7 +55,7 @@ public class ServiceAtomModelWrapper extends DefaultAtomModelWrapper {
     public ServiceAtomModelWrapper(Dataset atomDataset) {
         super(atomDataset);
         serviceAtomContent = new ServiceAtomContent(this.getSomeName());
-        serviceAtomContent.setDescription(this.getSomeContentPropertyStringValue(SCHEMA.DESCRIPTION));
+        serviceAtomContent.setDescription(this.getSomeDescription());
         serviceAtomContent.setTermsOfService(getSomeContentPropertyStringValue(SCHEMA.TERMS_OF_SERVICE));
         serviceAtomContent.setTags(this.getTags(this.getAtomContentNode()));
         serviceAtomContent.setFlags(this.getAllFlags());
