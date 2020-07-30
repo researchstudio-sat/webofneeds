@@ -39,8 +39,8 @@ import won.bot.framework.eventbot.listener.impl.ActionOnceAfterNEventsListener;
 import won.bot.framework.eventbot.listener.impl.AutomaticMessageResponderListener;
 import won.bot.integrationtest.failsim.BaseEventListenerContextDecorator;
 import won.bot.integrationtest.failsim.DuplicateMessageSenderDecorator;
-import won.protocol.model.SocketType;
 import won.protocol.util.WonRdfUtils;
+import won.protocol.vocabulary.WXCHAT;
 
 /**
  *
@@ -57,7 +57,7 @@ public class DuplicateMessageSendingConversationBot extends IntegrationtestBot {
         // we're not expecting any failure messages in this test:
         bus.subscribe(FailureResponseEvent.class, new ActionOnEventListener(ctx, new BaseEventBotAction(ctx) {
             @Override
-            protected void doRun(Event event, EventListener executingListener) throws Exception {
+            protected void doRun(Event event, EventListener executingListener) {
                 FailureResponseEvent failureResponseEvent = (FailureResponseEvent) event;
                 bus.publish(new TestFailedEvent(DuplicateMessageSendingConversationBot.this, "Message failed: "
                                 + failureResponseEvent.getOriginalMessageURI() + ": "
@@ -71,8 +71,8 @@ public class DuplicateMessageSendingConversationBot extends IntegrationtestBot {
         // connect atoms
         bus.subscribe(AtomCreatedEvent.class, new ActionOnceAfterNEventsListener(ctx, "atomConnector", NO_OF_ATOMS * 2,
                         new ConnectFromListToListAction(ctx, getBotContextWrapper().getAtomCreateListName(),
-                                        getBotContextWrapper().getAtomCreateListName(), SocketType.ChatSocket.getURI(),
-                                        SocketType.ChatSocket.getURI(), MILLIS_BETWEEN_MESSAGES, "Hi!")));
+                                        getBotContextWrapper().getAtomCreateListName(), WXCHAT.ChatSocket.getUri(),
+                                        WXCHAT.ChatSocket.getUri(), MILLIS_BETWEEN_MESSAGES, "Hi!")));
         // add a listener that is informed of the connect/open events and that
         // auto-opens
         // subscribe it to:

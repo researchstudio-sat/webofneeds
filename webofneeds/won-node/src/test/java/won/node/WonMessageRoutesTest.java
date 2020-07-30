@@ -770,9 +770,9 @@ public abstract class WonMessageRoutesTest {
         Mockito.when(socketLookup.isCompatibleSocketTypes(any(URI.class), any(URI.class))).thenReturn(true);
         Mockito.when(socketLookup.getCapacityOfType(any(URI.class))).then(x -> Optional.of(10));
         Mockito.when(messageRoutingInfoServiceWithLookup.senderSocketType(any(WonMessage.class)))
-                        .thenReturn(Optional.of(URI.create(WXCHAT.ChatSocket.toString())));
+                        .thenReturn(Optional.of(WXCHAT.ChatSocket.getUri()));
         Mockito.when(messageRoutingInfoServiceWithLookup.recipientSocketType(any(WonMessage.class)))
-                        .thenReturn(Optional.of(URI.create(WXCHAT.ChatSocket.toString())));
+                        .thenReturn(Optional.of(WXCHAT.ChatSocket.getUri()));
         Mockito.when(messageRoutingInfoServiceWithLookup.senderNode(any(WonMessage.class)))
                         .thenReturn(Optional.of(URI_NODE_1));
         Mockito.when(messageRoutingInfoServiceWithLookup.recipientNode(any(WonMessage.class)))

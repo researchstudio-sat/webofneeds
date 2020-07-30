@@ -9,7 +9,10 @@ import won.protocol.vocabulary.WON;
 /**
  * Created with IntelliJ IDEA. User: gabriel Date: 12.09.13 Time: 18:11 To
  * change this template use File | Settings | File Templates.
+ *
+ * @deprecated use Uris instead
  */
+@Deprecated
 public enum SocketType {
     ChatSocket("wx-chat", "ChatSocket"), HolderSocket("wx-hold", "HolderSocket"),
     HoldableSocket("wx-hold", "HoldableSocket"),

@@ -6,8 +6,6 @@ import org.apache.jena.rdf.model.Resource;
 
 public class WXCHAT {
     public static final String BASE_URI = "https://w3id.org/won/ext/chat#";
-    public static final String DEFAULT_PREFIX = "chat";
-    private static Model m = ModelFactory.createDefaultModel();
-    public static final String ChatSocketString = BASE_URI + "ChatSocket";
-    public static final Resource ChatSocket = m.createResource(ChatSocketString);
+    public static final String DEFAULT_PREFIX = "wx-chat";
+    public static final ResourceWrapper ChatSocket = ResourceWrapper.create(BASE_URI + "ChatSocket");
 }

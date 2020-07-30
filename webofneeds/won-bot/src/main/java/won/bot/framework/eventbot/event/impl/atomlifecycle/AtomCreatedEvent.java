@@ -15,7 +15,6 @@ import java.net.URI;
 import org.apache.jena.query.Dataset;
 
 import won.bot.framework.eventbot.event.BaseAtomSpecificEvent;
-import won.protocol.model.SocketType;
 
 /**
  *
@@ -24,10 +23,10 @@ public class AtomCreatedEvent extends BaseAtomSpecificEvent {
     private final URI atomUriBeforeCreation;
     private final URI wonNodeUri;
     private final Dataset atomDataset;
-    private final SocketType socketType;
+    private final URI socketType;
 
     public AtomCreatedEvent(final URI atomURI, final URI wonNodeUri, final Dataset atomDataset,
-                    final SocketType socketType, final URI atomUriBeforeCreation) {
+                    final URI socketType, final URI atomUriBeforeCreation) {
         super(atomURI);
         this.wonNodeUri = wonNodeUri;
         this.atomDataset = atomDataset;
@@ -35,8 +34,7 @@ public class AtomCreatedEvent extends BaseAtomSpecificEvent {
         this.atomUriBeforeCreation = atomUriBeforeCreation;
     }
 
-    public AtomCreatedEvent(final URI atomURI, final URI wonNodeUri, final Dataset atomDataset,
-                    final SocketType socketType) {
+    public AtomCreatedEvent(final URI atomURI, final URI wonNodeUri, final Dataset atomDataset, final URI socketType) {
         this(atomURI, wonNodeUri, atomDataset, socketType, null);
     }
 
@@ -52,7 +50,7 @@ public class AtomCreatedEvent extends BaseAtomSpecificEvent {
         return atomUriBeforeCreation;
     }
 
-    public SocketType getSocketType() {
+    public URI getSocketType() {
         return socketType;
     }
 }
