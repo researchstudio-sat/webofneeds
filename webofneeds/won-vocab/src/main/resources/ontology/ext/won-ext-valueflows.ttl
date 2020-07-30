@@ -20,7 +20,7 @@
                                  dc:date "2020-06-24"^^xsd:date ;
                                  dc:title "Web of Needs Value Flows Extension" ;
                                  dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
-                                 vann:preferredNamespacePrefix "wx-valueflows" ;
+                                 vann:preferredNamespacePrefix "wx-vf" ;
                                  prov:wasDerivedFrom <https://w3id.org/valueflows> .
 
 #################################################################
@@ -129,6 +129,26 @@
                      rdfs:comment "An Activity Atom uses a Socket with this configuration to connect to an Activity Atom."@en ;
                      rdfs:label "PartnerActivitySocket" .
 
+###  https://w3id.org/won/ext/valueflows#SupportableSocket
+:SupportableSocket rdf:type owl:NamedIndividual ,
+                         won:SocketDefinition ;
+                won:compatibleSocketDefinition :SupporterSocket ;
+                won:derivesAtomProperty :supporter ;
+                won:autoOpen "false"^^xsd:boolean ;
+                won:socketCapacity 1 ;
+                rdfs:comment "A Resource uses a Socket with this configuration to connect to the VF-Helper Atom that is its supporter."@en ;
+                rdfs:label "SupportableSocket" .
+
+###  https://w3id.org/won/ext/valueflows#SupporterSocket
+:SupporterSocket rdf:type owl:NamedIndividual ,
+                       won:SocketDefinition ;
+              won:compatibleSocketDefinition :SupportableSocket ;
+              won:derivesInverseAtomProperty :supports ;
+              won:autoOpen "false"^^xsd:boolean ;
+              rdfs:comment "A VF-Helper Atom uses a Socket with this configuration to connect to Resources of which it is the supporter."@en ;
+              rdfs:label "SupporterSocket" .
+
+
 #################################################################
 #    Annotations
 #################################################################
@@ -148,6 +168,8 @@
                         :ActorSocket
                         :ActorActivitySocket
                         :PartnerActivitySocket
+                        :SupporterSocket
+                        :SupportableSocket
                       )
 ] .
 
