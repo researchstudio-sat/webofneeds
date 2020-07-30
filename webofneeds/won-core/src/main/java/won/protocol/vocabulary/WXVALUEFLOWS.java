@@ -6,15 +6,17 @@ import org.apache.jena.rdf.model.Resource;
 
 public class WXVALUEFLOWS {
     public static final String BASE_URI = "https://w3id.org/won/ext/valueflows#";
-    public static final String DEFAULT_PREFIX = "vf";
+    public static final String DEFAULT_PREFIX = "wx-vf";
     private static Model m = ModelFactory.createDefaultModel();
     public static final String PrimaryAccountableSocketString = BASE_URI + "PrimaryAccountableSocket";
     public static final Resource PrimaryAccountableSocket = m.createResource(PrimaryAccountableSocketString);
-    public static final String PrimaryAccountableInverseSocketString = BASE_URI + "PrimaryAccountableIverseSocket";
-    public static final Resource PrimaryAccountableIverseSocket = m
-                    .createResource(PrimaryAccountableInverseSocketString);
-    public static final String CustodianSocketSocketString = BASE_URI + "CustodianSocket";
-    public static final Resource CustodianSocket = m.createResource(CustodianSocketSocketString);
-    public static final String CustodianInverseSocketSocketString = BASE_URI + "CustodianInverseSocket";
-    public static final Resource CustodianInverseSocket = m.createResource(CustodianInverseSocketSocketString);
+    public static final String PrimaryAccountableOfSocketString = BASE_URI + "PrimaryAccountableOfSocket";
+    public static final Resource PrimaryAccountableOfSocket = m
+                    .createResource(PrimaryAccountableOfSocketString);
+    public static final String CustodianSocketString = BASE_URI + "CustodianSocket";
+    public static final Resource CustodianSocket = m.createResource(CustodianSocketString);
+    public static final String CustodianOfSocketString = BASE_URI + "CustodianOfSocket";
+    public static final Resource CustodianOfSocket = m.createResource(CustodianOfSocketString);
+    public static final String ActorActivitySocketString = BASE_URI + "ActorActivitySocket";
+    public static final Resource ActorActivitySocket = m.createResource(ActorActivitySocketString);
 }
