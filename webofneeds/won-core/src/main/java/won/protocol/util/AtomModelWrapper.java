@@ -427,8 +427,23 @@ public class AtomModelWrapper {
         return getAtomContentNode().hasProperty(WONMATCH.matchingContext, context);
     }
 
+    /**
+     * @deprecated use {@link AtomModelWrapper#setQuery(String)} instead, addQuery
+     * would not remove any existing ones and we currently support only one query
+     * per atom
+     * @param query
+     */
     public void addQuery(String query) {
         getAtomContentNode().addProperty(WONMATCH.sparqlQuery, query);
+    }
+
+    public void setQuery(String query) {
+        removeQuery();
+        getAtomContentNode().addProperty(WONMATCH.sparqlQuery, query);
+    }
+
+    public void removeQuery() {
+        getAtomContentNode().removeAll(WONMATCH.sparqlQuery);
     }
 
     public Optional<String> getQuery() {

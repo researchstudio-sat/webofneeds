@@ -21,6 +21,7 @@ import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.util.Prefixer;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonMessageUriHelper;
+import won.protocol.vocabulary.WONMSG;
 
 /**
  * User: ypanchenko Date: 03.04.2015
@@ -97,7 +98,7 @@ public class SignatureAddingWonMessageProcessor implements WonMessageProcessor {
     private WonMessage processWithKey(final WonMessage wonMessage, final String privateKeyUri,
                     final PrivateKey privateKey, final PublicKey publicKey) throws Exception {
         URI messageURI = wonMessage.getMessageURIRequired();
-        if (!Objects.equals(messageURI, WonMessageUriHelper.getSelfUri())) {
+        if (!Objects.equals(messageURI, WONMSG.MESSAGE_SELF)) {
             // we only sign a message if it still has the self message uri
             return wonMessage;
         }

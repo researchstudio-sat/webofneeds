@@ -199,25 +199,6 @@ public class DefaultAtomModelWrapper extends AtomModelWrapper {
         return eventObjectAboutUris;
     }
 
-    public URI getHeldBy() {
-        // TODO: IMPL
-        // Collection<RDFNode> rdfHeldBy = getContentPropertyObjects(WXHOLD.HELD_BY);
-        // return rdfHeldBy.stream().findFirst().map(rdfNode ->
-        // URI.create(rdfNode.asResource().getURI())).orElse(null);
-        return null;
-    }
-
-    public Collection<URI> getHolds() {
-        Collection<URI> holds = new LinkedList<>();
-        // TODO: IMPL
-        /*
-         * Collection<RDFNode> rdfHolds = getContentPropertyObjects(WXHOLD.HOLDS); for
-         * (RDFNode rdfNode : rdfHolds) {
-         * holds.add(URI.create(rdfNode.asResource().getURI())); }
-         */
-        return holds;
-    }
-
     public Collection<String> getAllTitles() {
         return getAllContentPropertyStringValues(DC.title, null);
     }

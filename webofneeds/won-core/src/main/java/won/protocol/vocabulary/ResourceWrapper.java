@@ -17,7 +17,7 @@ public final class ResourceWrapper {
     }
 
     private ResourceWrapper(Resource resource) {
-        this.resourceString = resource.toString();
+        this.resourceString = resource.getURI();
         this.resourceURI = URI.create(this.resourceString);
         this.resource = resource;
     }
@@ -40,15 +40,15 @@ public final class ResourceWrapper {
         return new ResourceWrapper(resourceURI);
     }
 
-    public String toString() {
+    public String asString() {
         return resourceString;
     }
 
-    public URI getUri() {
+    public URI asURI() {
         return resourceURI;
     }
 
-    public Resource getResource() {
+    public Resource asResource() {
         return resource;
     }
 }

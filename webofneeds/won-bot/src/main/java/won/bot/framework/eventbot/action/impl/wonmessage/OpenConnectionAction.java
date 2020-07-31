@@ -57,18 +57,7 @@ public class OpenConnectionAction extends BaseEventBotAction {
             // better to
             // use connection object instead
             AtomHintFromMatcherEvent hintEvent = (AtomHintFromMatcherEvent) event;
-            logger.debug("opening connection based on hint {}", event);
-            URI recipientAtom = hintEvent.getRecipientAtom();
-            LinkedDataSource lds = getEventListenerContext().getLinkedDataSource();
-            Optional<URI> recipientSocket = WonLinkedDataUtils.getDefaultSocket(hintEvent.getRecipientAtom(), false,
-                            lds);
-            Optional<URI> targetSocket = WonLinkedDataUtils.getDefaultSocket(hintEvent.getHintTargetAtom(), false, lds);
-            if (recipientSocket.isPresent() && targetSocket.isPresent()) {
-                getEventListenerContext().getWonMessageSender()
-                                .prepareAndSendMessage(createConnectWonMessage(hintEvent.getRecipientAtom(),
-                                                hintEvent.getHintTargetAtom(), recipientSocket.get(),
-                                                targetSocket.get()));
-            }
+            logger.debug("ignore opening connection based on atom hint {} not possible", hintEvent);
         } else if (event instanceof SocketHintFromMatcherEvent) {
             // TODO: the hint with a match object is not really suitable here. Would be
             // better to

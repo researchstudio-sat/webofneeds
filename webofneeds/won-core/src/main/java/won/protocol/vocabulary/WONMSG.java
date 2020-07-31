@@ -25,7 +25,7 @@ public class WONMSG {
      * signatures/contents: before verification, its permanent message URI is
      * replaced with this one.
      */
-    public static final String MESSAGE_SELF = "wm:/SELF";
+    public static final URI MESSAGE_SELF = URI.create("wm:/SELF");
     public static final String BASE_URI = "https://w3id.org/won/message#";
     public static final String DEFAULT_PREFIX = "msg";
     private static Model m = ModelFactory.createDefaultModel();

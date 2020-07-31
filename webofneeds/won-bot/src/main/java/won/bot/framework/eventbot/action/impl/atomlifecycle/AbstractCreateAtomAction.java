@@ -86,7 +86,7 @@ public abstract class AbstractCreateAtomAction extends BaseEventBotAction {
         if (sockets == null || sockets.length == 0) {
             // add the default socket if none is present.
             this.sockets = new ArrayList<>(1);
-            this.sockets.add(WXCHAT.ChatSocket.getUri());
+            this.sockets.add(WXCHAT.ChatSocket.asURI());
         } else {
             this.sockets = Arrays.asList(sockets);
         }

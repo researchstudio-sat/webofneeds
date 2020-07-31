@@ -94,6 +94,7 @@ import won.protocol.util.RdfUtils;
 import won.protocol.util.WonMessageUriHelper;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.pretty.Lang_WON;
+import won.protocol.vocabulary.WONMSG;
 import won.protocol.vocabulary.WXCHAT;
 import won.test.category.RequiresPosgresServer;
 
@@ -770,9 +771,9 @@ public abstract class WonMessageRoutesTest {
         Mockito.when(socketLookup.isCompatibleSocketTypes(any(URI.class), any(URI.class))).thenReturn(true);
         Mockito.when(socketLookup.getCapacityOfType(any(URI.class))).then(x -> Optional.of(10));
         Mockito.when(messageRoutingInfoServiceWithLookup.senderSocketType(any(WonMessage.class)))
-                        .thenReturn(Optional.of(WXCHAT.ChatSocket.getUri()));
+                        .thenReturn(Optional.of(WXCHAT.ChatSocket.asURI()));
         Mockito.when(messageRoutingInfoServiceWithLookup.recipientSocketType(any(WonMessage.class)))
-                        .thenReturn(Optional.of(WXCHAT.ChatSocket.getUri()));
+                        .thenReturn(Optional.of(WXCHAT.ChatSocket.asURI()));
         Mockito.when(messageRoutingInfoServiceWithLookup.senderNode(any(WonMessage.class)))
                         .thenReturn(Optional.of(URI_NODE_1));
         Mockito.when(messageRoutingInfoServiceWithLookup.recipientNode(any(WonMessage.class)))
@@ -853,7 +854,7 @@ public abstract class WonMessageRoutesTest {
     }
 
     protected void sendFromOwner(WonMessage msg, String ownerApplicationIdForResponse) {
-        if (Objects.equals(WonMessageUriHelper.getSelfUri(), msg.getMessageURIRequired())) {
+        if (Objects.equals(WONMSG.MESSAGE_SELF, msg.getMessageURIRequired())) {
             throw new IllegalArgumentException("message is not prepared, cannot send : " + msg.toShortStringForDebug());
         }
         logMessageRdf(makeMessageBox(" message OWNER => NODE"), msg);
@@ -864,7 +865,7 @@ public abstract class WonMessageRoutesTest {
     }
 
     protected void sendFromMatcher(WonMessage msg) {
-        if (Objects.equals(WonMessageUriHelper.getSelfUri(), msg.getMessageURIRequired())) {
+        if (Objects.equals(WONMSG.MESSAGE_SELF, msg.getMessageURIRequired())) {
             throw new IllegalArgumentException("message is not prepared, cannot send : " + msg.toShortStringForDebug());
         }
         logMessageRdf(makeMessageBox("message MATCHER => NODE"), msg);
@@ -873,7 +874,7 @@ public abstract class WonMessageRoutesTest {
     }
 
     protected void sendFromExternalOwner(WonMessage msg) {
-        if (Objects.equals(WonMessageUriHelper.getSelfUri(), msg.getMessageURIRequired())) {
+        if (Objects.equals(WONMSG.MESSAGE_SELF, msg.getMessageURIRequired())) {
             throw new IllegalArgumentException("message is not prepared, cannot send : " + msg.toShortStringForDebug());
         }
         logMessageRdf(makeMessageBox("message EXTERNAL => NODE"), msg);
@@ -882,7 +883,7 @@ public abstract class WonMessageRoutesTest {
     }
 
     protected void sendFromExternalSystem(WonMessage msg) {
-        if (Objects.equals(WonMessageUriHelper.getSelfUri(), msg.getMessageURIRequired())) {
+        if (Objects.equals(WONMSG.MESSAGE_SELF, msg.getMessageURIRequired())) {
             throw new IllegalArgumentException("message is not prepared, cannot send : " + msg.toShortStringForDebug());
         }
         logMessageRdf(makeMessageBox("message EXTERNAL => NODE"), msg);

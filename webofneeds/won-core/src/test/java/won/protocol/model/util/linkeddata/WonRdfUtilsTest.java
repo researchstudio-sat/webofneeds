@@ -49,7 +49,7 @@ public class WonRdfUtilsTest {
         Dataset atomDataset = loadTestDatasetFromClasspathResource("wonrdfutils/atom1.trig");
         URI atomURI = WonRdfUtils.AtomUtils.getAtomURI(atomDataset);
         Collection<URI> sockets = WonRdfUtils.SocketUtils.getSocketsOfType(atomDataset, atomURI,
-                        URI.create(WXCHAT.ChatSocketString));
+                        WXCHAT.ChatSocket.asURI());
         Assert.assertEquals(1, sockets.size());
         Assert.assertEquals(URI.create("https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#chatSocket"),
                         sockets.stream().findFirst().get());
@@ -60,7 +60,7 @@ public class WonRdfUtilsTest {
         Dataset atomDataset = loadTestDatasetFromClasspathResource("wonrdfutils/atom1.trig");
         URI atomURI = WonRdfUtils.AtomUtils.getAtomURI(atomDataset);
         Collection<URI> sockets = WonRdfUtils.SocketUtils.getSocketsOfType(atomDataset, atomURI,
-                        URI.create(WXGROUP.GroupSocketString));
+                        WXGROUP.GroupSocket.asURI());
         Assert.assertEquals(2, sockets.size());
         Assert.assertTrue(sockets.contains(
                         URI.create("https://192.168.124.49:8443/won/resource/atom/cbfgi37je6kr#groupSocket1")));

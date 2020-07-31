@@ -56,7 +56,7 @@ public class WonMessageSignerVerifier {
     public static SignatureVerificationState verify(Map<String, PublicKey> keys, WonMessage message) throws Exception {
         Dataset ds = message.getCompleteDataset();
         RdfUtils.renameResourceWithPrefix(ds, message.getMessageURIRequired().toString(),
-                        WonMessageUriHelper.getSelfUri().toString());
+                        WONMSG.MESSAGE_SELF.toString());
         WonVerifier verifier = new WonVerifier(WonMessage.of(ds));
         verifier.verify(keys);
         return verifier.getVerificationResult();
@@ -144,7 +144,7 @@ public class WonMessageSignerVerifier {
     private static void calculateMessageUriForContent(Dataset msgDataset) throws Exception {
         WonHasher hasher = new WonHasher();
         String hashId = hasher.calculateHashIdForDataset(msgDataset);
-        RdfUtils.renameResourceWithPrefix(msgDataset, WonMessageUriHelper.getSelfUri().toString(),
+        RdfUtils.renameResourceWithPrefix(msgDataset, WONMSG.MESSAGE_SELF.toString(),
                         WonMessageUriHelper.createMessageURIForId(hashId).toString());
     }
 

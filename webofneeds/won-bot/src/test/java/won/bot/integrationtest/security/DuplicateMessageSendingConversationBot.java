@@ -71,8 +71,8 @@ public class DuplicateMessageSendingConversationBot extends IntegrationtestBot {
         // connect atoms
         bus.subscribe(AtomCreatedEvent.class, new ActionOnceAfterNEventsListener(ctx, "atomConnector", NO_OF_ATOMS * 2,
                         new ConnectFromListToListAction(ctx, getBotContextWrapper().getAtomCreateListName(),
-                                        getBotContextWrapper().getAtomCreateListName(), WXCHAT.ChatSocket.getUri(),
-                                        WXCHAT.ChatSocket.getUri(), MILLIS_BETWEEN_MESSAGES, "Hi!")));
+                                        getBotContextWrapper().getAtomCreateListName(), WXCHAT.ChatSocket.asURI(),
+                                        WXCHAT.ChatSocket.asURI(), MILLIS_BETWEEN_MESSAGES, "Hi!")));
         // add a listener that is informed of the connect/open events and that
         // auto-opens
         // subscribe it to:

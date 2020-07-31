@@ -54,7 +54,7 @@ public class CreateAtomCommandEvent implements MessageCommandEvent {
         if (sockets != null && sockets.length > 0) {
             this.sockets = Arrays.asList(sockets);
         } else {
-            this.sockets = Collections.singletonList(WXCHAT.ChatSocket.getUri());
+            this.sockets = Collections.singletonList(WXCHAT.ChatSocket.asURI());
         }
         this.usedForTesting = usedForTesting;
         this.doNotMatch = doNotMatch;

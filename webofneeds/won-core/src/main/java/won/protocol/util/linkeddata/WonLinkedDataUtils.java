@@ -566,12 +566,6 @@ public class WonLinkedDataUtils {
         return RdfUtils.getNodeForPropertyPath(dataset, resourceURI, propertyPath);
     }
 
-    public static Optional<URI> getDefaultSocket(URI atomURI, boolean returnAnyIfNoDefaultFound,
-                    LinkedDataSource linkedDataSource) {
-        return WonRdfUtils.SocketUtils.getDefaultSocket(getDataForResource(atomURI, linkedDataSource), atomURI,
-                        returnAnyIfNoDefaultFound);
-    }
-
     public static Collection<URI> getSocketsOfType(URI atomURI, URI socketTypeURI, LinkedDataSource linkedDataSource) {
         return WonRdfUtils.SocketUtils.getSocketsOfType(getDataForResource(atomURI, linkedDataSource), atomURI,
                         socketTypeURI);
@@ -794,7 +788,7 @@ public class WonLinkedDataUtils {
      * Extracts the prev page link from a list of HTTP 'Link' headers returned by an
      * LDP container.
      * 
-     * @see https://www.w3.org/TR/ldp-paging/#ldpp-ex-paging-other-links
+     * @see {@link "https://www.w3.org/TR/ldp-paging/#ldpp-ex-paging-other-links"}
      * @param linkHeaders
      * @return
      */
@@ -818,7 +812,7 @@ public class WonLinkedDataUtils {
      * Extracts the next page link from a list of HTTP 'Link' headers returned by an
      * LDP container.
      * 
-     * @see https://www.w3.org/TR/ldp-paging/#ldpp-ex-paging-other-links
+     * @see {@link "https://www.w3.org/TR/ldp-paging/#ldpp-ex-paging-other-links"}
      * @param linkHeaders
      * @return
      */

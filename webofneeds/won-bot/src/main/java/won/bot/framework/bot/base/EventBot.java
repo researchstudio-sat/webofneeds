@@ -173,7 +173,7 @@ public abstract class EventBot extends ScheduledTriggerBot {
     public final void onNewAtomCreated(final URI atomUri, final URI wonNodeUri, final Dataset atomDataset)
                     throws Exception {
         if (getLifecyclePhase().isActive()) {
-            eventBus.publish(new AtomCreatedEvent(atomUri, wonNodeUri, atomDataset, WXCHAT.ChatSocket.getUri()));
+            eventBus.publish(new AtomCreatedEvent(atomUri, wonNodeUri, atomDataset, WXCHAT.ChatSocket.asURI()));
         } else {
             logger.info("not publishing event for call to onNewAtomCreated() as the bot is not in state {} but {}",
                             BotLifecyclePhase.ACTIVE, getLifecyclePhase());

@@ -147,7 +147,7 @@ public class WonMessageUtils {
         if (messageURI == null) {
             return false;
         }
-        if (Objects.equals(messageURI, WonMessageUriHelper.getSelfUri())) {
+        if (Objects.equals(messageURI, WONMSG.MESSAGE_SELF)) {
             return false;
         }
         return messageURI.toString().startsWith(WONMSG.MESSAGE_URI_PREFIX);

@@ -90,7 +90,7 @@ public class WonMessageTest {
         Dataset both = msg.getCompleteDataset();
         RdfUtils.addDatasetToDataset(both, response.getCompleteDataset());
         WonMessage msgAndResponse = WonMessage.of(both);
-        Assert.assertEquals("messageUri should be that of original message", WonMessageUriHelper.getSelfUri(),
+        Assert.assertEquals("messageUri should be that of original message", WONMSG.MESSAGE_SELF,
                         msgAndResponse.getMessageURI());
     }
 
@@ -118,7 +118,7 @@ public class WonMessageTest {
         RdfUtils.addDatasetToDataset(both, response2.getCompleteDataset());
         WonMessage msgAndResponse = WonMessage.of(both);
         Assert.assertEquals("messageUri should be that of original message",
-                        WonMessageUriHelper.getSelfUri(),
+                        WONMSG.MESSAGE_SELF,
                         msgAndResponse.getMessageURI());
     }
 }
