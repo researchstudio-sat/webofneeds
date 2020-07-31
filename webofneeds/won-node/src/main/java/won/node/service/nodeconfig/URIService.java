@@ -194,11 +194,11 @@ public class URIService implements InitializingBean {
         return URI.create(atomResourceURIPrefix + "/" + atomId + "/c/" + connectionId);
     }
 
-    public URI createConnectionsURIForAtom(URI atomURI) {
+    public URI createConnectionContainerURIForAtom(URI atomURI) {
         return URI.create(atomURI.toString() + "/c");
     }
 
-    public URI createMessagesURIForConnection(URI connURI) {
+    public URI createMessageContainerURIForConnection(URI connURI) {
         return URI.create(connURI.toString() + "/msg");
     }
 
