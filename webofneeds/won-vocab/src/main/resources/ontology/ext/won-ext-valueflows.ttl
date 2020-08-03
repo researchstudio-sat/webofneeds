@@ -95,7 +95,6 @@
                         won:compatibleSocketDefinition :ResourceSocket ;
                         won:derivesInverseAtomProperty vf:EconomicResource ;
                         won:autoOpen "false"^^xsd:boolean ;
-                        won:socketCapacity 1 ;
                         rdfs:comment "A Resource Atom uses a Socket with this configuration to connect to an Activity Atom for a resource."@en ;
                         rdfs:label "ResourceActivitySocket" .
 
@@ -115,7 +114,6 @@
                         won:compatibleSocketDefinition :ActorSocket ;
                         won:derivesInverseAtomProperty :actor ;
                         won:autoOpen "false"^^xsd:boolean ;
-                        won:socketCapacity 1 ;
                         rdfs:comment "A Persona Atom uses a Socket with this configuration to connect to an Activity Atom for a resource."@en ;
                         rdfs:label "ActorActivitySocket" .
 
@@ -125,7 +123,6 @@
                      won:compatibleSocketDefinition :PartnerActivitySocket ;
                      won:derivesAtomProperty :partnerActivity ;
                      won:autoOpen "false"^^xsd:boolean ;
-                     won:socketCapacity 1 ;
                      rdfs:comment "An Activity Atom uses a Socket with this configuration to connect to an Activity Atom."@en ;
                      rdfs:label "PartnerActivitySocket" .
 
@@ -143,7 +140,7 @@
 :SupporterSocket rdf:type owl:NamedIndividual ,
                        won:SocketDefinition ;
               won:compatibleSocketDefinition :SupportableSocket ;
-              won:derivesInverseAtomProperty :supports ;
+              won:derivesInverseAtomProperty :supporter ;
               won:autoOpen "false"^^xsd:boolean ;
               rdfs:comment "A VF-Helper Atom uses a Socket with this configuration to connect to Resources of which it is the supporter."@en ;
               rdfs:label "SupporterSocket" .
