@@ -25,6 +25,7 @@ export const resource = {
           "#CustodianSocket": vocab.WXVALUEFLOWS.CustodianSocketCompacted,
           "#ResourceActivitySocket":
             vocab.WXVALUEFLOWS.ResourceActivitySocketCompacted,
+          "#SupportableSocket": vocab.WXVALUEFLOWS.SupportableSocketCompacted,
         },
       },
       seeks: {},
