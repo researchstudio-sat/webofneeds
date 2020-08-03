@@ -440,6 +440,7 @@ vocab.socketCapacity = {
   [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]: 1,
   [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: 1,
   [vocab.WXVALUEFLOWS.ActorSocketCompacted]: 1,
+  [vocab.WXVALUEFLOWS.SupportableSocketCompacted]: 1,
 };
 
 /* This constant is to prevent connections to non owned atoms for specific sockets */
