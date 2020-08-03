@@ -17,7 +17,8 @@ export const activity = {
         sockets: {
           "#ResourceSocket": vocab.WXVALUEFLOWS.ResourceSocketCompacted,
           "#ActorSocket": vocab.WXVALUEFLOWS.ActorSocketCompacted,
-          "#PartnerActivity": vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted,
+          "#PartnerActivitySocket":
+            vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted,
         },
       },
       seeks: {},

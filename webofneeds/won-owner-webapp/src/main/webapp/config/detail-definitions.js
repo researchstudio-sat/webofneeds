@@ -9,6 +9,7 @@ import * as reviewDetails from "./details/review.js";
 import * as paymentDetails from "./details/payment.js";
 import * as pokemonDetails from "./details/pokemon.js";
 import * as extendedDetails from "./details/extended.js";
+import * as actions from "./details/action.js";
 
 import * as abstractDetails_ from "./details/abstract.js";
 import vocab from "../app/service/vocab.js";
@@ -119,4 +120,6 @@ export const messageDetails = {
   petriNetWorkflow: workflowDetails.petriNetWorkflow,
   petriNetTransition: workflowDetails.petriNetTransition,
   paypalPayment: paymentDetails.paypalPayment,
+
+  customAction: actions.customAction,
 };
