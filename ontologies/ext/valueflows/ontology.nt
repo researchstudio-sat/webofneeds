@@ -7,7 +7,7 @@
 <https://w3id.org/won/ext/valueflows> <http://purl.org/dc/elements/1.1/date> "2020-06-24"^^<http://www.w3.org/2001/XMLSchema#date> .
 <https://w3id.org/won/ext/valueflows> <http://purl.org/dc/elements/1.1/title> "Web of Needs Value Flows Extension" .
 <https://w3id.org/won/ext/valueflows> <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> .
-<https://w3id.org/won/ext/valueflows> <http://purl.org/vocab/vann/preferredNamespacePrefix> "wx-valueflows" .
+<https://w3id.org/won/ext/valueflows> <http://purl.org/vocab/vann/preferredNamespacePrefix> "wx-vf" .
 <https://w3id.org/won/ext/valueflows> <http://www.w3.org/ns/prov#wasDerivedFrom> <https://w3id.org/valueflows> .
 # 
 # 
@@ -43,7 +43,6 @@
 <https://w3id.org/won/ext/valueflows#ActorActivitySocket> <https://w3id.org/won/core#derivesInverseAtomProperty> <https://w3id.org/won/ext/valueflows#actor> .
 <https://w3id.org/won/ext/valueflows#actor> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/ext/valueflows#ActorActivitySocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/ext/valueflows#ActorActivitySocket> <https://w3id.org/won/core#socketCapacity> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 <https://w3id.org/won/ext/valueflows#ActorActivitySocket> <http://www.w3.org/2000/01/rdf-schema#comment> "A Persona Atom uses a Socket with this configuration to connect to an Activity Atom for a resource."@en .
 <https://w3id.org/won/ext/valueflows#ActorActivitySocket> <http://www.w3.org/2000/01/rdf-schema#label> "ActorActivitySocket" .
 # 
@@ -84,7 +83,6 @@
 <https://w3id.org/won/ext/valueflows#PartnerActivitySocket> <https://w3id.org/won/core#derivesAtomProperty> <https://w3id.org/won/ext/valueflows#partnerActivity> .
 <https://w3id.org/won/ext/valueflows#partnerActivity> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/ext/valueflows#PartnerActivitySocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/ext/valueflows#PartnerActivitySocket> <https://w3id.org/won/core#socketCapacity> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 <https://w3id.org/won/ext/valueflows#PartnerActivitySocket> <http://www.w3.org/2000/01/rdf-schema#comment> "An Activity Atom uses a Socket with this configuration to connect to an Activity Atom."@en .
 <https://w3id.org/won/ext/valueflows#PartnerActivitySocket> <http://www.w3.org/2000/01/rdf-schema#label> "PartnerActivitySocket" .
 # 
@@ -113,7 +111,6 @@
 <https://w3id.org/won/ext/valueflows#ResourceActivitySocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/valueflows#ResourceSocket> .
 <https://w3id.org/won/ext/valueflows#ResourceActivitySocket> <https://w3id.org/won/core#derivesInverseAtomProperty> <https://w3id.org/valueflows#EconomicResource> .
 <https://w3id.org/won/ext/valueflows#ResourceActivitySocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/ext/valueflows#ResourceActivitySocket> <https://w3id.org/won/core#socketCapacity> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 <https://w3id.org/won/ext/valueflows#ResourceActivitySocket> <http://www.w3.org/2000/01/rdf-schema#comment> "A Resource Atom uses a Socket with this configuration to connect to an Activity Atom for a resource."@en .
 <https://w3id.org/won/ext/valueflows#ResourceActivitySocket> <http://www.w3.org/2000/01/rdf-schema#label> "ResourceActivitySocket" .
 # 
@@ -126,11 +123,33 @@
 <https://w3id.org/won/ext/valueflows#ResourceSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "An Activity Atom uses a Socket with this configuration to connect to its corresponding Resource Atom."@en .
 <https://w3id.org/won/ext/valueflows#ResourceSocket> <http://www.w3.org/2000/01/rdf-schema#label> "ResourceSocket" .
 # 
+# https://w3id.org/won/ext/valueflows#SupportableSocket
+<https://w3id.org/won/ext/valueflows#SupportableSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/valueflows#SupportableSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#SocketDefinition> .
+<https://w3id.org/won/ext/valueflows#SupportableSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/valueflows#SupporterSocket> .
+<https://w3id.org/won/ext/valueflows#SupportableSocket> <https://w3id.org/won/core#derivesAtomProperty> <https://w3id.org/won/ext/valueflows#supporter> .
+<https://w3id.org/won/ext/valueflows#supporter> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/valueflows#SupportableSocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<https://w3id.org/won/ext/valueflows#SupportableSocket> <https://w3id.org/won/core#socketCapacity> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://w3id.org/won/ext/valueflows#SupportableSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "A Resource uses a Socket with this configuration to connect to the VF-Helper Atom that is its supporter."@en .
+<https://w3id.org/won/ext/valueflows#SupportableSocket> <http://www.w3.org/2000/01/rdf-schema#label> "SupportableSocket" .
+# 
+# https://w3id.org/won/ext/valueflows#SupporterSocket
+<https://w3id.org/won/ext/valueflows#SupporterSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/valueflows#SupporterSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#SocketDefinition> .
+<https://w3id.org/won/ext/valueflows#SupporterSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/valueflows#SupportableSocket> .
+<https://w3id.org/won/ext/valueflows#SupporterSocket> <https://w3id.org/won/core#derivesInverseAtomProperty> <https://w3id.org/won/ext/valueflows#supporter> .
+<https://w3id.org/won/ext/valueflows#SupporterSocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<https://w3id.org/won/ext/valueflows#SupporterSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "A VF-Helper Atom uses a Socket with this configuration to connect to Resources of which it is the supporter."@en .
+<https://w3id.org/won/ext/valueflows#SupporterSocket> <http://www.w3.org/2000/01/rdf-schema#label> "SupporterSocket" .
+# 
 # https://w3id.org/won/ext/valueflows#actor
 # 
 # https://w3id.org/won/ext/valueflows#custodian
 # 
 # https://w3id.org/won/ext/valueflows#partnerActivity
+# 
+# https://w3id.org/won/ext/valueflows#supporter
 # 
 # 
 # 
@@ -142,33 +161,39 @@
 # 
 # 
 _:genid1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AllDifferent> .
-_:genid1 <http://www.w3.org/2002/07/owl#distinctMembers> _:genid10 .
+_:genid1 <http://www.w3.org/2002/07/owl#distinctMembers> _:genid12 .
+_:genid12 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid12 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#ActorActivitySocket> .
+_:genid12 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid11 .
+_:genid11 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid11 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#ActorSocket> .
+_:genid11 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid10 .
 _:genid10 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
-_:genid10 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#ActorActivitySocket> .
+_:genid10 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#CustodianOfSocket> .
 _:genid10 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid9 .
 _:genid9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
-_:genid9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#ActorSocket> .
+_:genid9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#CustodianSocket> .
 _:genid9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid8 .
 _:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
-_:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#CustodianOfSocket> .
+_:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#PartnerActivitySocket> .
 _:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid7 .
 _:genid7 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
-_:genid7 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#CustodianSocket> .
+_:genid7 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket> .
 _:genid7 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid6 .
 _:genid6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
-_:genid6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#PartnerActivitySocket> .
+_:genid6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#PrimaryAccountableSocket> .
 _:genid6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid5 .
 _:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
-_:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket> .
+_:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#ResourceActivitySocket> .
 _:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid4 .
 _:genid4 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
-_:genid4 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#PrimaryAccountableSocket> .
+_:genid4 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#ResourceSocket> .
 _:genid4 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid3 .
 _:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
-_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#ResourceActivitySocket> .
+_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#SupportableSocket> .
 _:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid2 .
 _:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
-_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#ResourceSocket> .
+_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/valueflows#SupporterSocket> .
 _:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
 # 
 # Generated by the OWL API (version 5.1.14) https://github.com/owlcs/owlapi/

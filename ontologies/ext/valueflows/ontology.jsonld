@@ -20,6 +20,10 @@
       "@id" : "https://w3id.org/won/ext/valueflows#ResourceActivitySocket"
     }, {
       "@id" : "https://w3id.org/won/ext/valueflows#ResourceSocket"
+    }, {
+      "@id" : "https://w3id.org/won/ext/valueflows#SupportableSocket"
+    }, {
+      "@id" : "https://w3id.org/won/ext/valueflows#SupporterSocket"
     } ]
   } ]
 }, {
@@ -54,7 +58,7 @@
     "@id" : "https://creativecommons.org/licenses/by/4.0/"
   } ],
   "http://purl.org/vocab/vann/preferredNamespacePrefix" : [ {
-    "@value" : "wx-valueflows"
+    "@value" : "wx-vf"
   } ],
   "http://www.w3.org/2002/07/owl#imports" : [ {
     "@id" : "https://w3id.org/won/core"
@@ -84,10 +88,6 @@
   } ],
   "https://w3id.org/won/core#derivesInverseAtomProperty" : [ {
     "@id" : "https://w3id.org/won/ext/valueflows#actor"
-  } ],
-  "https://w3id.org/won/core#socketCapacity" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
-    "@value" : "1"
   } ]
 }, {
   "@id" : "https://w3id.org/won/ext/valueflows#ActorSocket",
@@ -176,10 +176,6 @@
   } ],
   "https://w3id.org/won/core#derivesAtomProperty" : [ {
     "@id" : "https://w3id.org/won/ext/valueflows#partnerActivity"
-  } ],
-  "https://w3id.org/won/core#socketCapacity" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
-    "@value" : "1"
   } ]
 }, {
   "@id" : "https://w3id.org/won/ext/valueflows#PrimaryAccountableOfSocket",
@@ -244,10 +240,6 @@
   } ],
   "https://w3id.org/won/core#derivesInverseAtomProperty" : [ {
     "@id" : "https://w3id.org/valueflows#EconomicResource"
-  } ],
-  "https://w3id.org/won/core#socketCapacity" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
-    "@value" : "1"
   } ]
 }, {
   "@id" : "https://w3id.org/won/ext/valueflows#ResourceSocket",
@@ -270,6 +262,50 @@
     "@id" : "https://w3id.org/valueflows#EconomicResource"
   } ]
 }, {
+  "@id" : "https://w3id.org/won/ext/valueflows#SupportableSocket",
+  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/core#SocketDefinition" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "A Resource uses a Socket with this configuration to connect to the VF-Helper Atom that is its supporter."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "SupportableSocket"
+  } ],
+  "https://w3id.org/won/core#autoOpen" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
+    "@value" : "false"
+  } ],
+  "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
+    "@id" : "https://w3id.org/won/ext/valueflows#SupporterSocket"
+  } ],
+  "https://w3id.org/won/core#derivesAtomProperty" : [ {
+    "@id" : "https://w3id.org/won/ext/valueflows#supporter"
+  } ],
+  "https://w3id.org/won/core#socketCapacity" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/ext/valueflows#SupporterSocket",
+  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/core#SocketDefinition" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "A VF-Helper Atom uses a Socket with this configuration to connect to Resources of which it is the supporter."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "SupporterSocket"
+  } ],
+  "https://w3id.org/won/core#autoOpen" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
+    "@value" : "false"
+  } ],
+  "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
+    "@id" : "https://w3id.org/won/ext/valueflows#SupportableSocket"
+  } ],
+  "https://w3id.org/won/core#derivesInverseAtomProperty" : [ {
+    "@id" : "https://w3id.org/won/ext/valueflows#supporter"
+  } ]
+}, {
   "@id" : "https://w3id.org/won/ext/valueflows#actor",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual" ]
 }, {
@@ -277,5 +313,8 @@
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual" ]
 }, {
   "@id" : "https://w3id.org/won/ext/valueflows#partnerActivity",
+  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual" ]
+}, {
+  "@id" : "https://w3id.org/won/ext/valueflows#supporter",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual" ]
 } ]

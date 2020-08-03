@@ -7,7 +7,7 @@ This is a place holder text for the introduction. The introduction should briefl
 <table>
 <caption> <a href="#ns"> Table 1</a>: Namespaces used in the document </caption>
 <tbody>
-<tr><td><b>wx-valueflows</b></td><td>&lt;https://w3id.org/won/ext/valueflows&gt;</td></tr>
+<tr><td><b>wx-vf</b></td><td>&lt;https://w3id.org/won/ext/valueflows&gt;</td></tr>
 <tr><td><b>ext</b></td><td>&lt;https://w3id.org/won/ext&gt;</td></tr>
 <tr><td><b>w3id-org</b></td><td>&lt;https://w3id.org&gt;</td></tr>
 <tr><td><b>vaem</b></td><td>&lt;http://www.linkedmodel.org/schema/vaem&gt;</td></tr>

@@ -21,7 +21,7 @@
         <dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2020-06-24</dc:date>
         <dc:title>Web of Needs Value Flows Extension</dc:title>
         <terms:license rdf:resource="https://creativecommons.org/licenses/by/4.0/"/>
-        <vann:preferredNamespacePrefix>wx-valueflows</vann:preferredNamespacePrefix>
+        <vann:preferredNamespacePrefix>wx-vf</vann:preferredNamespacePrefix>
         <prov:wasDerivedFrom rdf:resource="https://w3id.org/valueflows"/>
     </owl:Ontology>
     
@@ -80,7 +80,6 @@
         <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/valueflows#ActorSocket"/>
         <core:derivesInverseAtomProperty rdf:resource="https://w3id.org/won/ext/valueflows#actor"/>
         <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
-        <core:socketCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</core:socketCapacity>
         <rdfs:comment xml:lang="en">A Persona Atom uses a Socket with this configuration to connect to an Activity Atom for a resource.</rdfs:comment>
         <rdfs:label>ActorActivitySocket</rdfs:label>
     </owl:NamedIndividual>
@@ -139,7 +138,6 @@
         <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/valueflows#PartnerActivitySocket"/>
         <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/valueflows#partnerActivity"/>
         <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
-        <core:socketCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</core:socketCapacity>
         <rdfs:comment xml:lang="en">An Activity Atom uses a Socket with this configuration to connect to an Activity Atom.</rdfs:comment>
         <rdfs:label>PartnerActivitySocket</rdfs:label>
     </owl:NamedIndividual>
@@ -183,7 +181,6 @@
         <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/valueflows#ResourceSocket"/>
         <core:derivesInverseAtomProperty rdf:resource="https://w3id.org/valueflows#EconomicResource"/>
         <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
-        <core:socketCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</core:socketCapacity>
         <rdfs:comment xml:lang="en">A Resource Atom uses a Socket with this configuration to connect to an Activity Atom for a resource.</rdfs:comment>
         <rdfs:label>ResourceActivitySocket</rdfs:label>
     </owl:NamedIndividual>
@@ -200,6 +197,35 @@
         <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
         <rdfs:comment xml:lang="en">An Activity Atom uses a Socket with this configuration to connect to its corresponding Resource Atom.</rdfs:comment>
         <rdfs:label>ResourceSocket</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- https://w3id.org/won/ext/valueflows#SupportableSocket -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/valueflows#SupportableSocket">
+        <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
+        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/valueflows#SupporterSocket"/>
+        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/valueflows#supporter"/>
+        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
+        <core:socketCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</core:socketCapacity>
+        <rdfs:comment xml:lang="en">A Resource uses a Socket with this configuration to connect to the VF-Helper Atom that is its supporter.</rdfs:comment>
+        <rdfs:label>SupportableSocket</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- https://w3id.org/won/ext/valueflows#SupporterSocket -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/valueflows#SupporterSocket">
+        <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
+        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/valueflows#SupportableSocket"/>
+        <core:derivesInverseAtomProperty rdf:resource="https://w3id.org/won/ext/valueflows#supporter"/>
+        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
+        <rdfs:comment xml:lang="en">A VF-Helper Atom uses a Socket with this configuration to connect to Resources of which it is the supporter.</rdfs:comment>
+        <rdfs:label>SupporterSocket</rdfs:label>
     </owl:NamedIndividual>
     
 
@@ -225,6 +251,13 @@
     
 
 
+    <!-- https://w3id.org/won/ext/valueflows#supporter -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/valueflows#supporter"/>
+    
+
+
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
@@ -246,6 +279,8 @@
             <rdf:Description rdf:about="https://w3id.org/won/ext/valueflows#PrimaryAccountableSocket"/>
             <rdf:Description rdf:about="https://w3id.org/won/ext/valueflows#ResourceActivitySocket"/>
             <rdf:Description rdf:about="https://w3id.org/won/ext/valueflows#ResourceSocket"/>
+            <rdf:Description rdf:about="https://w3id.org/won/ext/valueflows#SupportableSocket"/>
+            <rdf:Description rdf:about="https://w3id.org/won/ext/valueflows#SupporterSocket"/>
         </owl:distinctMembers>
     </rdf:Description>
 </rdf:RDF>
