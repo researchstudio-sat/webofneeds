@@ -4,9 +4,8 @@ import PropTypes from "prop-types";
 import { useHistory } from "react-router-dom";
 import vocab from "../../service/vocab.js";
 import {
-  get,
+  getUri,
   generateLink,
-  sortByDate,
   filterConnectionsBySearchValue,
   filterAtomsBySearchValue,
 } from "../../utils.js";
@@ -33,7 +32,7 @@ export default function AtomContentActivities({
 }) {
   const history = useHistory();
   const accountState = useSelector(generalSelectors.getAccountState);
-  const isAtomOwned = accountUtils.isAtomOwned(accountState, get(atom, "uri"));
+  const isAtomOwned = accountUtils.isAtomOwned(accountState, getUri(atom));
 
   const [showSuggestions, toggleSuggestions] = useState(false);
   const [showClosed, toggleClosed] = useState(false);
@@ -74,29 +73,36 @@ export default function AtomContentActivities({
   );
 
   function generateConnectionItems(connections) {
-    const connectionsArray = sortByDate(connections) || [];
+    const connectionElements = [];
+    connections &&
+      connections
+        .toOrderedMap()
+        .sortBy(conn => {
+          const lastUpdateDate = connectionUtils.getLastUpdateDate(conn);
+          return lastUpdateDate && lastUpdateDate.getTime();
+        })
+        .reverse()
+        .map((conn, connUri) => {
+          connectionElements.push(
+            <div className="acc__item" key={connUri}>
+              <WonConnectionSelectionItem
+                connection={conn}
+                toLink={generateLink(
+                  history.location,
+                  {
+                    postUri: getUri(atom),
+                    connectionUri: connUri,
+                  },
+                  "/connections",
+                  false
+                )}
+                flip={!isAtomOwned}
+              />
+            </div>
+          );
+        });
 
-    return connectionsArray.map((conn, index) => {
-      const connUri = get(conn, "uri");
-
-      return (
-        <div className="acc__item" key={connUri + "-" + index}>
-          <WonConnectionSelectionItem
-            connection={conn}
-            toLink={generateLink(
-              history.location,
-              {
-                postUri: get(atom, "uri"),
-                connectionUri: connUri,
-              },
-              "/activities",
-              false
-            )}
-            flip={!isAtomOwned}
-          />
-        </div>
-      );
-    });
+    return connectionElements;
   }
 
   function generateHeaderItem(label, size, toggleFunction, isExpanded) {
