@@ -82,6 +82,7 @@ public class Prefixer {
         prefixMapping.setNsPrefix(WXBUDDY.DEFAULT_PREFIX, WXBUDDY.BASE_URI);
         prefixMapping.setNsPrefix(WXVALUEFLOWS.DEFAULT_PREFIX, WXVALUEFLOWS.BASE_URI);
         prefixMapping.setNsPrefix("vf", "https://w3id.org/valueflows#");
+        prefixMapping.setNsPrefix("om2","http://www.ontology-of-units-of-measure.org/resource/om-2/");
         prefixMapping.setNsPrefix("demo", "https://w3id.org/won/ext/demo#");
         prefixMapping.setNsPrefix("wx-bot", "https://w3id.org/won/ext/bot#");
         prefixMapping.setNsPrefix("wxs", "https://w3id.org/won/ext/schema#");

@@ -122,4 +122,5 @@ export const messageDetails = {
   paypalPayment: paymentDetails.paypalPayment,
 
   customAction: actions.customAction,
+  raiseAction: actions.raiseAction,
 };
