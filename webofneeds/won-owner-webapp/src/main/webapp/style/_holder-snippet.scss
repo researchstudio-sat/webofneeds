@@ -41,6 +41,7 @@
     grid-area: card__holder__name;
     display: flex;
     align-items: center;
+    overflow: hidden;
 
     &__label {
       font-size: $normalFontSize;

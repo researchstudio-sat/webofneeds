@@ -69,7 +69,7 @@ public class TaxiDemandAtomGenerator {
         if (Math.random() < (1.0 - probability)) {
             return resource;
         }
-        resource.addProperty(DC.description, "This is a sample offer that was automatically generated.");
+        resource.addProperty(SCHEMA.DESCRIPTION, "This is a sample offer that was automatically generated.");
         return resource;
     }
 

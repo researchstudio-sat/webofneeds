@@ -18,13 +18,14 @@ export const resource = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["vf:EconomicResource"],
+        type: [vocab.VALUEFLOWS.EconomicResourceCompacted],
         sockets: {
           "#PrimaryAccountableSocket":
             vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted,
           "#CustodianSocket": vocab.WXVALUEFLOWS.CustodianSocketCompacted,
           "#ResourceActivitySocket":
             vocab.WXVALUEFLOWS.ResourceActivitySocketCompacted,
+          "#SupportableSocket": vocab.WXVALUEFLOWS.SupportableSocketCompacted,
         },
       },
       seeks: {},
@@ -49,7 +50,6 @@ export const resource = {
     },
   },
   details: {
-    title: { ...details.title },
     name: { ...name },
     accountingQuantity: { ...accountingQuantity },
     onhandQuantity: { ...onhandQuantity },

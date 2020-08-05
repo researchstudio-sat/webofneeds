@@ -13,10 +13,12 @@ export const activity = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["wx-valueflows:Activity"],
+        type: [vocab.WXVALUEFLOWS.ActivityCompacted],
         sockets: {
           "#ResourceSocket": vocab.WXVALUEFLOWS.ResourceSocketCompacted,
           "#ActorSocket": vocab.WXVALUEFLOWS.ActorSocketCompacted,
+          "#PartnerActivitySocket":
+            vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted,
         },
       },
       seeks: {},
@@ -32,6 +34,12 @@ export const activity = {
     [vocab.WXVALUEFLOWS.ActorSocketCompacted]: {
       [vocab.WXVALUEFLOWS.ActorActivitySocketCompacted]: {
         useCaseIdentifiers: ["persona"],
+      },
+    },
+    [vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted]: {
+      [vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted]: {
+        useCaseIdentifiers: ["activity"],
+        refuseOwned: true,
       },
     },
   },

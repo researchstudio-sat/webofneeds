@@ -9,14 +9,12 @@ public class WXHOLD {
     public static final String BASE_URI = "https://w3id.org/won/ext/hold#";
     public static final String DEFAULT_PREFIX = "hold";
     private static Model m = ModelFactory.createDefaultModel();
-    public static final String HolderSocketString = BASE_URI + "HolderSocket";
-    public static final Resource HolderSocket = m.createResource(HolderSocketString);
-    public static final String HoldableSocketString = BASE_URI + "HoldableSocket";
-    public static final Resource HoldableSocket = m.createResource(HoldableSocketString);
     public static final String holdsString = BASE_URI + "holds";
     public static final Resource holds = m.createResource(holdsString);
     public static final String heldByString = BASE_URI + "heldBy";
     public static final Resource heldBy = m.createResource(heldByString);
-    public static final Property HELD_BY = m.createProperty(heldByString);
-    public static final Property HOLDS = m.createProperty(holdsString);
+    public static final String HolderSocketString = BASE_URI + "HolderSocket";
+    public static final ResourceWrapper HolderSocket = ResourceWrapper.create(HolderSocketString);
+    public static final String HoldableSocketString = BASE_URI + "HoldableSocket";
+    public static final ResourceWrapper HoldableSocket = ResourceWrapper.create(HoldableSocketString);
 }

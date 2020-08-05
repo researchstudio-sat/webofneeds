@@ -34,17 +34,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import won.protocol.util.pretty.ConversationDatasetWriterFactory;
 import won.protocol.util.pretty.Lang_WON;
-import won.protocol.vocabulary.CERT;
-import won.protocol.vocabulary.SCHEMA;
-import won.protocol.vocabulary.WON;
-import won.protocol.vocabulary.WONCON;
-import won.protocol.vocabulary.WONMATCH;
-import won.protocol.vocabulary.WONMSG;
-import won.protocol.vocabulary.WXBUDDY;
-import won.protocol.vocabulary.WXCHAT;
-import won.protocol.vocabulary.WXGROUP;
-import won.protocol.vocabulary.WXHOLD;
-import won.protocol.vocabulary.WXREVIEW;
+import won.protocol.vocabulary.*;
 
 /**
  * Tests if it is viable to set exactly those prefixes that are used in a a
@@ -90,6 +80,9 @@ public class Prefixer {
         prefixMapping.setNsPrefix(WXHOLD.DEFAULT_PREFIX, WXHOLD.BASE_URI);
         prefixMapping.setNsPrefix(WXREVIEW.DEFAULT_PREFIX, WXREVIEW.BASE_URI);
         prefixMapping.setNsPrefix(WXBUDDY.DEFAULT_PREFIX, WXBUDDY.BASE_URI);
+        prefixMapping.setNsPrefix(WXVALUEFLOWS.DEFAULT_PREFIX, WXVALUEFLOWS.BASE_URI);
+        prefixMapping.setNsPrefix("vf", "https://w3id.org/valueflows#");
+        prefixMapping.setNsPrefix("om2", "http://www.ontology-of-units-of-measure.org/resource/om-2/");
         prefixMapping.setNsPrefix("demo", "https://w3id.org/won/ext/demo#");
         prefixMapping.setNsPrefix("wx-bot", "https://w3id.org/won/ext/bot#");
         prefixMapping.setNsPrefix("wxs", "https://w3id.org/won/ext/schema#");

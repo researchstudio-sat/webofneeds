@@ -72,7 +72,7 @@ public class WonMessageBuilder {
     private Long timestamp;
 
     public WonMessageBuilder() {
-        this.messageURI = WonMessageUriHelper.getSelfUri();
+        this.messageURI = WONMSG.MESSAGE_SELF;
     }
 
     public static CloseBuilder close() {

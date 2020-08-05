@@ -14,7 +14,7 @@ import org.apache.jena.query.Dataset;
 import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.protocol.message.WonMessageType;
-import won.protocol.model.SocketType;
+import won.protocol.vocabulary.WXCHAT;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -54,7 +54,7 @@ public class CreateAtomCommandEvent implements MessageCommandEvent {
         if (sockets != null && sockets.length > 0) {
             this.sockets = Arrays.asList(sockets);
         } else {
-            this.sockets = Collections.singletonList(SocketType.ChatSocket.getURI());
+            this.sockets = Collections.singletonList(WXCHAT.ChatSocket.asURI());
         }
         this.usedForTesting = usedForTesting;
         this.doNotMatch = doNotMatch;

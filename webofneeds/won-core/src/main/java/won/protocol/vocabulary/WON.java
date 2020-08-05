@@ -26,6 +26,7 @@ public class WON {
     public static final String DEFAULT_PREFIX = "won";
     private static Model m = ModelFactory.createDefaultModel();
     public static final Resource Atom = m.createResource(BASE_URI + "Atom");
+    public static final Resource Persona = m.createResource(BASE_URI + "Persona");
     public static final Property wonNode = m.createProperty(BASE_URI, "wonNode");
     public static final Property defaultGraphSigningMethod = m.createProperty(BASE_URI, "defaultGraphSigningMethod");
     public static final Property nodeQueue = m.createProperty(BASE_URI, "nodeQueue");

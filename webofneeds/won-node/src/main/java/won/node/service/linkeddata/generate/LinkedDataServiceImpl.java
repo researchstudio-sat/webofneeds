@@ -54,6 +54,7 @@ import won.node.service.persistence.AtomInformationService;
 import won.protocol.exception.NoSuchAtomException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessageType;
+import won.protocol.message.WonMessageUtils;
 import won.protocol.model.Atom;
 import won.protocol.model.AtomModelMapper;
 import won.protocol.model.AtomState;
@@ -293,7 +294,7 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
                 // only add deep data if atom is active
                 Slice<URI> slice = atomInformationService.listConnectionURIs(atomUri, 1, deepLayerSize, null, null);
                 AtomInformationService.PagedResource<Dataset, URI> connectionsResource = toContainerPage(
-                                this.uriService.createConnectionsURIForAtom(atomUri).toString(), slice);
+                                this.uriService.createConnectionContainerURIForAtom(atomUri).toString(), slice);
                 addDeepConnectionData(connectionsResource.getContent(), slice.getContent());
                 RdfUtils.addDatasetToDataset(dataset, connectionsResource.getContent());
                 for (URI connectionUri : slice.getContent()) {
@@ -455,7 +456,9 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public Dataset listConnection(URI socketUri, URI targetSocketUri, boolean deep) throws NoSuchConnectionException {
         Optional<Connection> con = atomInformationService.getConnection(socketUri, targetSocketUri);
-        Dataset data = makeConnectionContainer(this.connectionResourceURIPrefix + "/", Arrays.asList(con.get()));
+        Dataset data = makeConnectionContainer(this.uriService
+                        .createConnectionContainerURIForAtom(WonMessageUtils.stripFragment(socketUri)).toString(),
+                        Arrays.asList(con.get()));
         if (deep) {
             addDeepConnectionData(data, Arrays.asList(con.get().getConnectionURI()));
         }
@@ -540,7 +543,7 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
                     throws NoSuchAtomException, NoSuchConnectionException {
         List<Connection> connections = new ArrayList<>(
                         atomInformationService.listConnections(atomURI, filterByConnectionState));
-        URI connectionsUri = this.uriService.createConnectionsURIForAtom(atomURI);
+        URI connectionsUri = this.uriService.createConnectionContainerURIForAtom(atomURI);
         AtomInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
                         connectionsUri.toString(), new SliceImpl<>(connections));
         if (deep) {
@@ -561,7 +564,7 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
                     throws NoSuchAtomException, NoSuchConnectionException {
         Slice<Connection> slice = atomInformationService.listConnections(atomURI, page, preferredSize, messageType,
                         timeSpot, filterByConnectionState);
-        URI connectionsUri = this.uriService.createConnectionsURIForAtom(atomURI);
+        URI connectionsUri = this.uriService.createConnectionContainerURIForAtom(atomURI);
         AtomInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
                         connectionsUri.toString(), slice);
         if (deep) {
@@ -582,7 +585,7 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
                     throws NoSuchAtomException, NoSuchConnectionException {
         Slice<Connection> slice = atomInformationService.listConnectionsBefore(atomURI, beforeEventURI, preferredSize,
                         messageType, timeSpot, filterByConnectionState);
-        URI connectionsUri = this.uriService.createConnectionsURIForAtom(atomURI);
+        URI connectionsUri = this.uriService.createConnectionContainerURIForAtom(atomURI);
         AtomInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
                         connectionsUri.toString(), slice);
         if (deep) {
@@ -603,7 +606,7 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
                     throws NoSuchAtomException, NoSuchConnectionException {
         Slice<Connection> slice = atomInformationService.listConnectionsAfter(atomURI, resumeConnURI, preferredSize,
                         messageType, timeSpot, filterByConnectionState);
-        URI connectionsUri = this.uriService.createConnectionsURIForAtom(atomURI);
+        URI connectionsUri = this.uriService.createConnectionContainerURIForAtom(atomURI);
         AtomInformationService.PagedResource<Dataset, Connection> connectionsContainerPage = toConnectionsContainerPage(
                         connectionsUri.toString(), slice);
         if (deep) {
@@ -681,7 +684,8 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
                     throws NoSuchConnectionException {
         Slice<MessageEvent> slice = atomInformationService.listConnectionEvents(connectionUri, pageNum,
                         preferedSize, msgType);
-        return eventsToContainerPage(this.uriService.createMessagesURIForConnection(connectionUri).toString(), slice,
+        return eventsToContainerPage(this.uriService.createMessageContainerURIForConnection(connectionUri).toString(),
+                        slice,
                         deep);
     }
 
@@ -692,7 +696,8 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
                     throws NoSuchConnectionException {
         Slice<MessageEvent> slice = atomInformationService.listConnectionEventsAfter(connectionUri, msgURI,
                         preferedSize, msgType);
-        return eventsToContainerPage(this.uriService.createMessagesURIForConnection(connectionUri).toString(), slice,
+        return eventsToContainerPage(this.uriService.createMessageContainerURIForConnection(connectionUri).toString(),
+                        slice,
                         deep);
     }
 
@@ -703,7 +708,8 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
                     throws NoSuchConnectionException {
         Slice<MessageEvent> slice = atomInformationService.listConnectionEventsBefore(connectionUri, msgURI,
                         preferedSize, msgType);
-        return eventsToContainerPage(this.uriService.createMessagesURIForConnection(connectionUri).toString(), slice,
+        return eventsToContainerPage(this.uriService.createMessageContainerURIForConnection(connectionUri).toString(),
+                        slice,
                         deep);
     }
 

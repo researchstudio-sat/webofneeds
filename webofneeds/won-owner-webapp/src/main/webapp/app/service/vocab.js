@@ -364,10 +364,16 @@ vocab.WXSCHEMA.ReviewInverseSocketCompacted =
 vocab.VALUEFLOWS = {};
 vocab.VALUEFLOWS.baseUri = "https://w3id.org/valueflows#";
 vocab.VALUEFLOWS.prefix = "vf";
+vocab.VALUEFLOWS.EconomicResource =
+  vocab.VALUEFLOWS.baseUri + "EconomicResource";
+vocab.VALUEFLOWS.EconomicResourceCompacted =
+  vocab.VALUEFLOWS.prefix + ":EconomicResource";
 
 vocab.WXVALUEFLOWS = {};
 vocab.WXVALUEFLOWS.baseUri = "https://w3id.org/won/ext/valueflows#";
-vocab.WXVALUEFLOWS.prefix = "wx-valueflows";
+vocab.WXVALUEFLOWS.prefix = "wx-vf";
+vocab.WXVALUEFLOWS.Activity = vocab.WXVALUEFLOWS.baseUri + "Activity";
+vocab.WXVALUEFLOWS.ActivityCompacted = vocab.WXVALUEFLOWS.prefix + ":Activity";
 vocab.WXVALUEFLOWS.PrimaryAccountableSocket =
   vocab.WXVALUEFLOWS.baseUri + "PrimaryAccountableSocket";
 vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted =
@@ -385,20 +391,32 @@ vocab.WXVALUEFLOWS.CustodianOfSocket =
 vocab.WXVALUEFLOWS.CustodianOfSocketCompacted =
   vocab.WXVALUEFLOWS.prefix + ":CustodianOfSocket";
 vocab.WXVALUEFLOWS.ResourceSocket =
-  vocab.WXVALUEFLOWS.baseUri + ":ResourceSocket";
+  vocab.WXVALUEFLOWS.baseUri + "ResourceSocket";
 vocab.WXVALUEFLOWS.ResourceSocketCompacted =
   vocab.WXVALUEFLOWS.prefix + ":ResourceSocket";
 vocab.WXVALUEFLOWS.ResourceActivitySocket =
-  vocab.WXVALUEFLOWS.baseUri + ":ResourceActivitySocket";
+  vocab.WXVALUEFLOWS.baseUri + "ResourceActivitySocket";
 vocab.WXVALUEFLOWS.ResourceActivitySocketCompacted =
   vocab.WXVALUEFLOWS.prefix + ":ResourceActivitySocket";
-vocab.WXVALUEFLOWS.ActorSocket = vocab.WXVALUEFLOWS.baseUri + ":ActorSocket";
+vocab.WXVALUEFLOWS.SupportableSocket =
+  vocab.WXVALUEFLOWS.baseUri + "SupporatbleSocket";
+vocab.WXVALUEFLOWS.SupportableSocketCompacted =
+  vocab.WXVALUEFLOWS.prefix + ":SupportableSocket";
+vocab.WXVALUEFLOWS.SupporterSocket =
+  vocab.WXVALUEFLOWS.baseUri + "SupporterSocket";
+vocab.WXVALUEFLOWS.SupporterSocketCompacted =
+  vocab.WXVALUEFLOWS.prefix + ":SupporterSocket";
+vocab.WXVALUEFLOWS.ActorSocket = vocab.WXVALUEFLOWS.baseUri + "ActorSocket";
 vocab.WXVALUEFLOWS.ActorSocketCompacted =
   vocab.WXVALUEFLOWS.prefix + ":ActorSocket";
 vocab.WXVALUEFLOWS.ActorActivitySocket =
-  vocab.WXVALUEFLOWS.baseUri + ":ActorActivitySocket";
+  vocab.WXVALUEFLOWS.baseUri + "ActorActivitySocket";
 vocab.WXVALUEFLOWS.ActorActivitySocketCompacted =
   vocab.WXVALUEFLOWS.prefix + ":ActorActivitySocket";
+vocab.WXVALUEFLOWS.PartnerActivitySocket =
+  vocab.WXVALUEFLOWS.baseUri + "PartnerActivitySocket";
+vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted =
+  vocab.WXVALUEFLOWS.prefix + ":PartnerActivitySocket";
 
 // UTILS
 vocab.WONMSG.uriPlaceholder = Object.freeze({
@@ -422,6 +440,7 @@ vocab.socketCapacity = {
   [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]: 1,
   [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: 1,
   [vocab.WXVALUEFLOWS.ActorSocketCompacted]: 1,
+  [vocab.WXVALUEFLOWS.SupportableSocketCompacted]: 1,
 };
 
 /* This constant is to prevent connections to non owned atoms for specific sockets */

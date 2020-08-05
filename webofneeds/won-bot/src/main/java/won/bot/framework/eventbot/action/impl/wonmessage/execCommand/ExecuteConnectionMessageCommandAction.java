@@ -20,6 +20,7 @@ import won.protocol.message.builder.ConnectionMessageBuilder;
 import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonMessageUriHelper;
+import won.protocol.vocabulary.WONMSG;
 
 /**
  * Action executing a ConnectionMessageCommandEvent, creating a connection
@@ -66,7 +67,7 @@ public class ExecuteConnectionMessageCommandAction
     protected WonMessage createWonMessage(ConnectionMessageCommandEvent messageCommandEvent)
                     throws WonMessageBuilderException {
         Model localMessageModel = RdfUtils.cloneModel(messageCommandEvent.getMessageModel());
-        RdfUtils.replaceBaseURI(localMessageModel, WonMessageUriHelper.getSelfUri().toString());
+        RdfUtils.replaceBaseURI(localMessageModel, WONMSG.MESSAGE_SELF.toString());
         ConnectionMessageBuilder wmb = WonMessageBuilder.connectionMessage()
                         .sockets()
                         /**/.sender(messageCommandEvent.getCon().getSocketURI())

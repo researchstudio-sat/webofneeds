@@ -23,10 +23,10 @@ import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
-import won.protocol.model.SocketType;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WONMATCH;
+import won.protocol.vocabulary.WXCHAT;
 
 /**
  * Base class for actions that create atoms.
@@ -86,7 +86,7 @@ public abstract class AbstractCreateAtomAction extends BaseEventBotAction {
         if (sockets == null || sockets.length == 0) {
             // add the default socket if none is present.
             this.sockets = new ArrayList<>(1);
-            this.sockets.add(SocketType.ChatSocket.getURI());
+            this.sockets.add(WXCHAT.ChatSocket.asURI());
         } else {
             this.sockets = Arrays.asList(sockets);
         }

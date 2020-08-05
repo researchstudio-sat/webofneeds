@@ -36,9 +36,9 @@ export const accountingQuantity = {
   component: WonAmountPicker,
   viewerComponent: WonAmountViewer,
   unit: [
-    { value: "om:kilogram", label: "kg", default: true },
-    { value: "om:litre", label: "l", default: true },
-    { value: "om:one", label: "piece(s)", default: true },
+    { value: "om2:kilogram", label: "kg", default: true },
+    { value: "om2:litre", label: "l", default: true },
+    { value: "om2:one", label: "piece(s)", default: true },
   ],
 
   parseToRDF: function({ value }) {
@@ -53,8 +53,8 @@ export const accountingQuantity = {
     } else {
       return {
         "vf:accountingQuantity": {
-          "om:hasUnit": { "@id": value.unit },
-          "om:hasNumericalValue": value.amount,
+          "om2:hasUnit": { "@id": value.unit },
+          "om2:hasNumericalValue": value.amount,
         },
       };
     }
@@ -62,12 +62,12 @@ export const accountingQuantity = {
   parseFromRDF: function(jsonLDImm) {
     const amount = jsonLdUtils.parseFrom(
       jsonLDImm,
-      ["vf:accountingQuantity", "om:hasNumericalValue"],
+      ["vf:accountingQuantity", "om2:hasNumericalValue"],
       "xsd:float"
     );
     const unit = jsonLdUtils.parseFrom(
       jsonLDImm,
-      ["vf:accountingQuantity", "om:hasUnit"],
+      ["vf:accountingQuantity", "om2:hasUnit"],
       "xsd:id"
     );
 
@@ -108,9 +108,9 @@ export const onhandQuantity = {
   component: WonAmountPicker,
   viewerComponent: WonAmountViewer,
   unit: [
-    { value: "om:kilogram", label: "kg", default: true },
-    { value: "om:litre", label: "l", default: true },
-    { value: "om:one", label: "piece(s)", default: true },
+    { value: "om2:kilogram", label: "kg", default: true },
+    { value: "om2:litre", label: "l", default: true },
+    { value: "om2:one", label: "piece(s)", default: true },
   ],
 
   parseToRDF: function({ value }) {
@@ -125,8 +125,8 @@ export const onhandQuantity = {
     } else {
       return {
         "vf:onhandQuantity": {
-          "om:hasUnit": { "@id": value.unit },
-          "om:hasNumericalValue": value.amount,
+          "om2:hasUnit": { "@id": value.unit },
+          "om2:hasNumericalValue": value.amount,
         },
       };
     }
@@ -134,12 +134,12 @@ export const onhandQuantity = {
   parseFromRDF: function(jsonLDImm) {
     const amount = jsonLdUtils.parseFrom(
       jsonLDImm,
-      ["vf:onhandQuantity", "om:hasNumericalValue"],
+      ["vf:onhandQuantity", "om2:hasNumericalValue"],
       "xsd:float"
     );
     const unit = jsonLdUtils.parseFrom(
       jsonLDImm,
-      ["vf:onhandQuantity", "om:hasUnit"],
+      ["vf:onhandQuantity", "om2:hasUnit"],
       "xsd:id"
     );
 
@@ -179,7 +179,7 @@ export const effortQuantity = {
   messageEnabled: false,
   component: WonAmountPicker,
   viewerComponent: WonAmountViewer,
-  unit: [{ value: "om:hour", label: "h", default: true }],
+  unit: [{ value: "om2:hour", label: "h", default: true }],
 
   parseToRDF: function({ value }) {
     if (
@@ -193,8 +193,8 @@ export const effortQuantity = {
     } else {
       return {
         "vf:effortQuantity": {
-          "om:hasUnit": { "@id": value.unit },
-          "om:hasNumericalValue": value.amount,
+          "om2:hasUnit": { "@id": value.unit },
+          "om2:hasNumericalValue": value.amount,
         },
       };
     }
@@ -202,12 +202,12 @@ export const effortQuantity = {
   parseFromRDF: function(jsonLDImm) {
     const amount = jsonLdUtils.parseFrom(
       jsonLDImm,
-      ["vf:effortQuantity", "om:hasNumericalValue"],
+      ["vf:effortQuantity", "om2:hasNumericalValue"],
       "xsd:float"
     );
     const unit = jsonLdUtils.parseFrom(
       jsonLDImm,
-      ["vf:effortQuantity", "om:hasUnit"],
+      ["vf:effortQuantity", "om2:hasUnit"],
       "xsd:id"
     );
 

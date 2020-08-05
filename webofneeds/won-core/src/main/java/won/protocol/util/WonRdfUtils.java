@@ -935,14 +935,6 @@ public class WonRdfUtils {
             return RdfUtils.visitFlattenedToList(atomDataset, m -> getSocketsOfType(m, atomURI, socketType));
         }
 
-        public static Optional<URI> getDefaultSocket(Model model, boolean returnAnyIfNoDefaultFound) {
-            return getDefaultSocket(model, RdfUtils.getBaseResource(model), returnAnyIfNoDefaultFound);
-        }
-
-        public static Optional<URI> getDefaultSocket(Model model, URI subject, boolean returnAnyIfNoDefaultFound) {
-            return getDefaultSocket(model, model.getResource(subject.toString()), returnAnyIfNoDefaultFound);
-        }
-
         public static Set<URI> getSocketsOfAtom(Dataset atomDataset, URI atomURI) {
             return getSocketsOfAtomAsStream(atomDataset, atomURI).collect(Collectors.toSet());
         }
@@ -951,41 +943,6 @@ public class WonRdfUtils {
             return RdfUtils.getObjectStreamOfProperty(atomDataset, atomURI, URI.create(WON.socket.getURI()),
                             node -> node.isURIResource() ? URI.create(node.asResource().getURI())
                                             : null);
-        }
-
-        /**
-         * Returns the default socket found in the model. If there is no default socket,
-         * the result is empty. unless returnAnyIfNoDefaultFound is true, in which case
-         * any socket may be returned. and there is no default socket, any socket may be
-         * returned
-         * 
-         * @param model
-         * @param subject
-         * @param returnAnyIfNoDefaultFound
-         * @deprecated Default Socket is not used anymore, will be removed soon
-         * @return
-         */
-        public static Optional<URI> getDefaultSocket(Model model, Resource subject, boolean returnAnyIfNoDefaultFound) {
-            RDFNode socket = subject.getPropertyResourceValue(WON.defaultSocket);
-            if (socket != null && socket.isURIResource()) {
-                return Optional.of(URI.create(socket.toString()));
-            }
-            if (returnAnyIfNoDefaultFound) {
-                StmtIterator stmtIterator = subject.listProperties(WON.socket);
-                while (stmtIterator.hasNext()) {
-                    socket = stmtIterator.next().getObject();
-                    if (socket.isResource() && socket.isURIResource()) {
-                        return Optional.of(URI.create(socket.toString()));
-                    }
-                }
-            }
-            return Optional.empty();
-        }
-
-        public static Optional<URI> getDefaultSocket(Dataset atomDataset, URI atomURI,
-                        boolean returnAnyIfNoDefaultFound) {
-            return Optional.ofNullable(RdfUtils.findFirst(atomDataset,
-                            m -> getDefaultSocket(m, atomURI, returnAnyIfNoDefaultFound).orElse(null)));
         }
 
         /**

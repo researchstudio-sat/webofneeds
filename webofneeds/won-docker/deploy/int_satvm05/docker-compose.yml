@@ -231,19 +231,12 @@ services:
       #      - "logging.config=/usr/src/bots/logback.xml"
       - "uri.prefix.owner=https://satvm05.researchstudio.at/debug_bot" # set this for the trust store alias
       - "won.node.uris=https://satvm05.researchstudio.at:8888/won/resource https://satvm05.researchstudio.at/won/resource"
-      - "botContext.impl=mongoBotContext"
-      - "botContext.mongodb.user=won"
-      - "botContext.mongodb.pass=$mongo_db_passwd"
-      - "botContext.mongodb.host=satvm05.researchstudio.at"
-      - "botContext.mongodb.port=27018"
-      - "botContext.mongodb.database=int_bot"
     volumes:
       - $base_folder/won-client-certs/debug_bot:/usr/src/bots/client-certs/
     #      - $base_folder/logback_debug_bot.xml:/usr/src/bots/logback.xml
     depends_on:
       - wonnode1
       - wonnode2
-      - mongodb
 
   hokify_bot:
     restart: always
@@ -259,17 +252,10 @@ services:
       - "hokifyjobbot.updateTime=70"
       - "hokifyjobbot.publishTime=10"
       - "hokifyjobbot.createAllInOne=false"
-      - "botContext.impl=mongoBotContext"
-      - "botContext.mongodb.user=won"
-      - "botContext.mongodb.pass=$mongo_db_passwd"
-      - "botContext.mongodb.host=satvm05.researchstudio.at"
-      - "botContext.mongodb.port=27018"
-      - "botContext.mongodb.database=int_bot"
     volumes:
       - $base_folder/won-client-certs/hokify_bot:/usr/src/bots/client-certs/
     #     - $base_folder/logback_debug_bot.xml:/usr/src/bots/logback.xml
     depends_on:
-      - mongodb
       - wonnode1
       - wonnode2
 
@@ -289,18 +275,10 @@ services:
       - "api.vienna.request=$RB_REQUEST_VIENNA"
       - "raidbot.fetchInterval=600" #fetch new raids every 600 seconds (10min)
       - "raidbot.sanitizeInterval=900" #sanitize existing raids every 900 seconds (15min)
-      - "botContext.impl=mongoBotContext"
-      - "botContext.mongodb.user=won"
-      - "botContext.mongodb.pass=$mongo_db_passwd"
-      - "botContext.mongodb.host=satvm05.researchstudio.at"
-      - "botContext.mongodb.port=27018"
-      - "botContext.mongodb.database=int_bot"
-      # - "raidbot.phaseOut=true" # set this if you do not want to create new atoms but just manage the existing ones
     volumes:
       - $base_folder/won-client-certs/raid_bot:/usr/src/bots/client-certs/
     #     - $base_folder/logback_debug_bot.xml:/usr/src/bots/logback.xml
     depends_on:
-      - mongodb
       - wonnode1
       - wonnode2
 

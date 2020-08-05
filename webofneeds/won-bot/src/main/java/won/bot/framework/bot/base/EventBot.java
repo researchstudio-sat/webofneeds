@@ -53,10 +53,10 @@ import won.protocol.message.WonMessageType;
 import won.protocol.message.sender.WonMessageSender;
 import won.protocol.message.sender.exception.WonMessageSenderException;
 import won.protocol.model.Connection;
-import won.protocol.model.SocketType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
+import won.protocol.vocabulary.WXCHAT;
 
 /**
  * Base class for bots that define their behaviour through event listeners. Once
@@ -173,7 +173,7 @@ public abstract class EventBot extends ScheduledTriggerBot {
     public final void onNewAtomCreated(final URI atomUri, final URI wonNodeUri, final Dataset atomDataset)
                     throws Exception {
         if (getLifecyclePhase().isActive()) {
-            eventBus.publish(new AtomCreatedEvent(atomUri, wonNodeUri, atomDataset, SocketType.ChatSocket));
+            eventBus.publish(new AtomCreatedEvent(atomUri, wonNodeUri, atomDataset, WXCHAT.ChatSocket.asURI()));
         } else {
             logger.info("not publishing event for call to onNewAtomCreated() as the bot is not in state {} but {}",
                             BotLifecyclePhase.ACTIVE, getLifecyclePhase());

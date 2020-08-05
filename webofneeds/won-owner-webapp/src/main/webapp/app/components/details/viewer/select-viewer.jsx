@@ -19,8 +19,8 @@ export default function WonSelectViewer({ content, detail, className }) {
 
   const options =
     detail.options &&
-    detail.options.map(option => {
-      <label className="selectv__input__inner">
+    detail.options.map(option => (
+      <label className="selectv__input__inner" key={option}>
         <input
           className="selectv__input__inner__select"
           type={detail && detail.multiSelect ? "checkbox" : "radio"}
@@ -29,8 +29,8 @@ export default function WonSelectViewer({ content, detail, className }) {
           checked={isChecked(option)}
         />
         {option.label}
-      </label>;
-    });
+      </label>
+    ));
 
   return (
     <won-select-viewer class={className}>

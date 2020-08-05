@@ -214,7 +214,7 @@ public class ServiceAtomBehaviour extends BotBehaviour {
                             logger.debug("Atom ({}) is known, must be one we created..., dataset: {}", createdAtomUri,
                                             RdfUtils.toString(Prefixer.setPrefixes(atomCreatedEvent.getAtomDataset())));
                             Optional<URI> createdAtomHoldableSocketUri = WonLinkedDataUtils
-                                            .getSocketsOfType(createdAtomUri, URI.create(WXHOLD.HoldableSocketString),
+                                            .getSocketsOfType(createdAtomUri, WXHOLD.HoldableSocket.asURI(),
                                                             ctx.getLinkedDataSource())
                                             .stream().findFirst();
                             if (createdAtomHoldableSocketUri.isPresent()) {
@@ -223,7 +223,7 @@ public class ServiceAtomBehaviour extends BotBehaviour {
                                                 createdAtomUri, botServiceAtomUri);
                                 Optional<URI> botServiceAtomHolderSocketUri = WonLinkedDataUtils
                                                 .getSocketsOfType(botServiceAtomUri,
-                                                                URI.create(WXHOLD.HolderSocketString),
+                                                                WXHOLD.HolderSocket.asURI(),
                                                                 ctx.getLinkedDataSource())
                                                 .stream().findFirst();
                                 logger.debug("Connecting atom ({}) - botServiceAtom ({})", createdAtomUri,
@@ -284,9 +284,9 @@ public class ServiceAtomBehaviour extends BotBehaviour {
                                                         ctx.getLinkedDataSource());
                                         if (senderSocketTypeUri.isPresent() && targetSocketTypeUri.isPresent()
                                                         && Objects.equals(senderSocketTypeUri.get(),
-                                                                        URI.create(WXHOLD.HoldableSocketString))
+                                                                        WXHOLD.HoldableSocket.asURI())
                                                         && Objects.equals(targetSocketTypeUri.get(),
-                                                                        URI.create(WXHOLD.HolderSocketString))) {
+                                                                        WXHOLD.HolderSocket.asURI())) {
                                             logger.debug("Accepting connect request from atom ({}) to serviceAtom ({})",
                                                             senderAtomUri, targetAtomUri);
                                             WonMessage openServiceAtomMessage = WonMessageBuilder.connect().sockets()

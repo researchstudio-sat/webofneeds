@@ -93,17 +93,17 @@ public class DefaultAtomModelWrapper extends AtomModelWrapper {
 
     public void setSeeksDescription(String description) {
         createSeeksNodeIfNonExist();
-        setSeeksPropertyStringValue(DC.description, description);
+        setSeeksPropertyStringValue(SCHEMA.DESCRIPTION, description);
     }
 
     public void setDescription(String description) {
         Resource atomNode = getAtomNode(AtomGraphType.ATOM);
-        atomNode.removeAll(DC.description);
-        atomNode.addLiteral(DC.description, description);
+        atomNode.removeAll(SCHEMA.DESCRIPTION);
+        atomNode.addLiteral(SCHEMA.DESCRIPTION, description);
     }
 
     public String getSomeDescription(String... preferredLanguages) {
-        return getSomeContentPropertyStringValue(DC.description, preferredLanguages);
+        return getSomeContentPropertyStringValue(SCHEMA.DESCRIPTION, preferredLanguages);
     }
 
     public String getSomeName(String... preferredLanguages) {
@@ -115,7 +115,7 @@ public class DefaultAtomModelWrapper extends AtomModelWrapper {
     }
 
     Collection<String> getDescriptions(Resource contentNode, String language) {
-        return getContentPropertyStringValues(contentNode, DC.description, language);
+        return getContentPropertyStringValues(contentNode, SCHEMA.DESCRIPTION, language);
     }
 
     public void addTag(String tag) {
@@ -197,25 +197,6 @@ public class DefaultAtomModelWrapper extends AtomModelWrapper {
             }
         }
         return eventObjectAboutUris;
-    }
-
-    public URI getHeldBy() {
-        // TODO: IMPL
-        // Collection<RDFNode> rdfHeldBy = getContentPropertyObjects(WXHOLD.HELD_BY);
-        // return rdfHeldBy.stream().findFirst().map(rdfNode ->
-        // URI.create(rdfNode.asResource().getURI())).orElse(null);
-        return null;
-    }
-
-    public Collection<URI> getHolds() {
-        Collection<URI> holds = new LinkedList<>();
-        // TODO: IMPL
-        /*
-         * Collection<RDFNode> rdfHolds = getContentPropertyObjects(WXHOLD.HOLDS); for
-         * (RDFNode rdfNode : rdfHolds) {
-         * holds.add(URI.create(rdfNode.asResource().getURI())); }
-         */
-        return holds;
     }
 
     public Collection<String> getAllTitles() {

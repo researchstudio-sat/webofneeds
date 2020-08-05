@@ -246,11 +246,10 @@ won.minimalContext = {
   [vocab.PAYMENT.prefix]: vocab.PAYMENT.baseUri,
   [vocab.WORKFLOW.prefix]: vocab.WORKFLOW.baseUri,
   [vocab.VALUEFLOWS.prefix]: vocab.VALUEFLOWS.baseUri,
+  [vocab.WXVALUEFLOWS.prefix]: vocab.WXVALUEFLOWS.baseUri,
   rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
   gr: "http://purl.org/goodrelations/v1#",
   rdfg: "http://www.w3.org/2004/03/trix/rdfg-1/",
-  vf: vocab.VALUEFLOWS.baseUri,
-  "wx-valueflows": vocab.WXVALUEFLOWS.baseUri,
 };
 won.minimalTurtlePrefixes = context2ttlPrefixes(won.minimalContext);
 
@@ -268,7 +267,7 @@ won.defaultContext = {
   cert: "http://www.w3.org/ns/auth/cert#",
   s: "http://schema.org/",
   sh: "http://www.w3.org/ns/shacl#",
-  om: "http://www.ontology-of-units-of-measure.org/resource/om-2/",
+  om2: "http://www.ontology-of-units-of-measure.org/resource/om-2/",
   foaf: "http://xmlns.com/foaf/0.1/",
   "msg:messageType": {
     "@id": vocab.WONMSG.messageType,

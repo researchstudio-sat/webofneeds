@@ -1,6 +1,8 @@
 package won.bot.framework.extensions.serviceatom;
 
 import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 import won.bot.vocabulary.WXBOT;
@@ -33,13 +35,20 @@ public class ServiceAtomModelWrapper extends DefaultAtomModelWrapper {
             this.setName(serviceAtomContent.getName());
         }
         if (Objects.nonNull(serviceAtomContent.getDescription())) {
-            atom.addProperty(SCHEMA.DESCRIPTION, serviceAtomContent.getDescription());
+            this.setDescription(serviceAtomContent.getDescription());
         }
         if (Objects.nonNull(serviceAtomContent.getTermsOfService())) {
             atom.addProperty(SCHEMA.TERMS_OF_SERVICE, serviceAtomContent.getTermsOfService());
         }
         if (Objects.nonNull(serviceAtomContent.getTags())) {
             serviceAtomContent.getTags().forEach(tag -> atom.addProperty(WONCON.tag, tag));
+        }
+        if (Objects.nonNull(serviceAtomContent.getFlags())) {
+            Model m = ModelFactory.createDefaultModel();
+            serviceAtomContent.getFlags().forEach(flag -> {
+                if (flag != null)
+                    atom.addProperty(WONMATCH.flag, m.createResource(flag.toString()));
+            });
         }
     }
 
@@ -49,6 +58,7 @@ public class ServiceAtomModelWrapper extends DefaultAtomModelWrapper {
         serviceAtomContent.setDescription(this.getSomeDescription());
         serviceAtomContent.setTermsOfService(getSomeContentPropertyStringValue(SCHEMA.TERMS_OF_SERVICE));
         serviceAtomContent.setTags(this.getTags(this.getAtomContentNode()));
+        serviceAtomContent.setFlags(this.getAllFlags());
         Map<String, String> sockets = new HashMap<>();
         this.getSocketTypeUriMap().forEach(
                         (socketUri, socketTypeUri) -> sockets.put(socketUri.toString(), socketTypeUri.toString()));

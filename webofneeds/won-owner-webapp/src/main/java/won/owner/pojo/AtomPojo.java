@@ -37,8 +37,6 @@ public class AtomPojo {
     private ZonedDateTime modifiedZonedDateTime;
     private String modifiedDate;
     private Collection<URI> flags;
-    private Collection<URI> holds;
-    private URI heldBy;
     private Collection<URI> eventObjectAboutUris;
     private Collection<URI> seeksEventObjectAboutUris;
     private Map<URI, URI> socketTypeUriMap;
@@ -64,8 +62,6 @@ public class AtomPojo {
         types = atom.getContentTypes();
         seeksTypes = atom.getSeeksTypes();
         state = atom.getAtomState();
-        heldBy = atom.getHeldBy();
-        holds = atom.getHolds(); // TODO: IMPL ME
         seeksEventObjectAboutUris = atom.getSeeksEventObjectAboutUris();
         eventObjectAboutUris = atom.getContentEventObjectAboutUris();
         socketTypeUriMap = atom.getSocketTypeUriMap();
@@ -162,22 +158,6 @@ public class AtomPojo {
 
     public void setModifiedZonedDateTime(ZonedDateTime modifiedZonedDateTime) {
         this.modifiedZonedDateTime = modifiedZonedDateTime;
-    }
-
-    public Collection<URI> getHolds() {
-        return holds;
-    }
-
-    public void setHolds(Collection<URI> holds) {
-        this.holds = holds;
-    }
-
-    public URI getHeldBy() {
-        return heldBy;
-    }
-
-    public void setHeldBy(URI heldBy) {
-        this.heldBy = heldBy;
     }
 
     public Collection<URI> getEventObjectAboutUris() {

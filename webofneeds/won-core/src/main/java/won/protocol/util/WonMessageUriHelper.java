@@ -89,9 +89,10 @@ public class WonMessageUriHelper {
      * Returns the URI reserved for a message being created or checked. The uri is
      * {@link won.protocol.vocabulary.WONMSG.MESSAGE_SELF}
      * 
+     * @deprecated use {@link WONMSG#MESSAGE_SELF} directly
      * @return
      */
     public static URI getSelfUri() {
-        return URI.create(WONMSG.MESSAGE_SELF);
+        return WONMSG.MESSAGE_SELF;
     }
 }

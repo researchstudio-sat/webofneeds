@@ -6,8 +6,6 @@ import java.util.Optional;
 import won.protocol.model.SocketDefinition;
 
 public interface SocketLookup {
-    Optional<URI> lookupDefaultSocket(URI atomURI);
-
     Optional<SocketDefinition> getSocketConfig(URI socketType);
 
     Optional<Integer> getCapacity(URI socket);

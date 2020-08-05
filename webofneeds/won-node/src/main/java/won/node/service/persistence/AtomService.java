@@ -164,16 +164,12 @@ public class AtomService {
         // rename the content graphs and signature graphs so they start with the atom
         // uri
         Collection<String> sockets = getSocketsAndCheck(atomModelWrapper, atomURI);
-        Optional<String> defaultSocket = getDefaultSocketAndCheck(atomModelWrapper, sockets);
         Set<Socket> socketEntities = sockets.stream().map(socketUri -> {
             Optional<String> socketType = getSocketTypeAndCheck(atomModelWrapper, socketUri);
             Socket f = new Socket();
             f.setAtomURI(atomURI);
             f.setSocketURI(URI.create(socketUri));
             f.setTypeURI(URI.create(socketType.get()));
-            if (defaultSocket.isPresent() && socketUri.equals(defaultSocket.get())) {
-                f.setDefaultSocket(true);
-            }
             return f;
         }).collect(Collectors.toSet());
         checkResourcesInAtomContent(atomModelWrapper);
@@ -223,7 +219,6 @@ public class AtomService {
         checkCanThisMessageCreateOrModifyThisAtom(wonMessage, atomURI);
         checkResourcesInAtomContent(atomModelWrapper);
         Collection<String> sockets = getSocketsAndCheck(atomModelWrapper, atomURI);
-        getDefaultSocketAndCheck(atomModelWrapper, sockets);
         final Atom atom = getAtomRequired(atomURI);
         URI messageURI = wonMessage.getMessageURI();
         // store the atom content
@@ -279,7 +274,6 @@ public class AtomService {
     private Set<Socket> determineNewSockets(URI atomURI, List<Socket> existingSockets,
                     AtomModelWrapper atomModelWrapper) {
         Collection<String> sockets = atomModelWrapper.getSocketUris();
-        Optional<String> defaultSocket = atomModelWrapper.getDefaultSocket();
         if (sockets.size() == 0)
             throw new IllegalAtomContentException("at least one property won:socket required ");
         // create new socket entities for the sockets not yet existing:
@@ -295,9 +289,6 @@ public class AtomService {
                             f.setAtomURI(atomURI);
                             f.setSocketURI(URI.create(socketUri));
                             f.setTypeURI(URI.create(socketType.get()));
-                            if (defaultSocket.isPresent() && socketUri.equals(defaultSocket.get())) {
-                                f.setDefaultSocket(true);
-                            }
                             return f;
                         }).collect(Collectors.toSet());
         return newSocketEntities;
@@ -313,19 +304,12 @@ public class AtomService {
     private Set<Socket> determineAndModifyChangedSockets(URI atomURI, List<Socket> existingSockets,
                     AtomModelWrapper atomModelWrapper) {
         Collection<String> sockets = atomModelWrapper.getSocketUris();
-        Optional<URI> defaultSocket = atomModelWrapper.getDefaultSocket().map(f -> URI.create(f));
         return existingSockets.stream().filter(socket -> {
             if (!sockets.contains(socket.getSocketURI().toString())) {
                 // socket is removed, not changed
                 return false;
             }
             boolean changed = false;
-            boolean isNowDefaultSocket = defaultSocket.isPresent() && defaultSocket.get().equals(socket.getSocketURI());
-            if (isNowDefaultSocket != socket.isDefaultSocket()) {
-                // socket's default socket property has changed
-                changed = true;
-                socket.setDefaultSocket(isNowDefaultSocket);
-            }
             Optional<URI> newSocketType = atomModelWrapper.getSocketType(socket.getSocketURI().toString())
                             .map(f -> URI.create(f));
             boolean typeChanged = newSocketType.isPresent() && !newSocketType.get().equals(socket.getTypeURI());
@@ -371,17 +355,6 @@ public class AtomService {
                             + ". Add a '[socket] won:socketDefinition [SocketDefinition]' triple!");
         }
         return socketType;
-    }
-
-    private Optional<String> getDefaultSocketAndCheck(final AtomModelWrapper atomModelWrapper,
-                    Collection<String> sockets) {
-        Optional<String> defaultSocket = atomModelWrapper.getDefaultSocket();
-        if (defaultSocket.isPresent() && !sockets.contains(defaultSocket.get())) {
-            throw new IllegalAtomContentException(
-                            "DefaultSocket must be one of the sockets defined in the atom. This one is not: "
-                                            + defaultSocket.get());
-        }
-        return defaultSocket;
     }
 
     private Collection<String> getSocketsAndCheck(final AtomModelWrapper atomModelWrapper, URI atomURI) {

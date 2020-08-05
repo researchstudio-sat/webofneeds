@@ -17,6 +17,7 @@ import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as wonLabelUtils from "../won-label-utils.js";
 import vocab from "../service/vocab.js";
 
+import WonAtomContentActivities from "./atom-content/atom-content-activities.jsx";
 import WonAtomContentChats from "./atom-content/atom-content-chats.jsx";
 import WonAtomContentSocket from "./atom-content/atom-content-socket.jsx";
 import WonAtomContentGeneral from "./atom-content/atom-content-general.jsx";
@@ -275,6 +276,27 @@ export default function WonAtomContent({
         );
         break;
 
+      case vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted: {
+        const socketUri = atomUtils.getSocketUri(
+          atom,
+          vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted
+        );
+        visibleTabFragment = (
+          <WonAtomContentActivities
+            atom={atom}
+            showAddPicker={showAddPicker}
+            toggleAddPicker={toggleAddPicker}
+            // We filter out every chat connection that is not owned, otherwise the count would show non owned chatconnections of non owned atoms
+            // TODO: If isOwned is false, then we need to remove all the Group to Chat connections from the relevantConnections, otherwise we will
+            // otherwise we allow the groupChat owner to send a direct message from the group to one single member
+            relevantConnections={relevantConnections.filter(
+              conn =>
+                isOwned || connectionUtils.hasTargetSocketUri(conn, socketUri)
+            )}
+          />
+        );
+        break;
+      }
       case vocab.CHAT.ChatSocketCompacted: {
         const socketUri = atomUtils.getSocketUri(
           atom,

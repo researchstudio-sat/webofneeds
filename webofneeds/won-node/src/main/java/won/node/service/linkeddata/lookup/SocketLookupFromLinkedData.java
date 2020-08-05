@@ -20,11 +20,6 @@ public class SocketLookupFromLinkedData implements SocketLookup {
     LinkedDataSource linkedDataSource;
 
     @Override
-    public Optional<URI> lookupDefaultSocket(URI atomURI) {
-        return WonLinkedDataUtils.getDefaultSocket(atomURI, true, linkedDataSource);
-    }
-
-    @Override
     public Optional<SocketDefinition> getSocketConfig(URI socket) {
         try {
             return WonLinkedDataUtils.getSocketDefinitionOfSocket(linkedDataSource, socket);

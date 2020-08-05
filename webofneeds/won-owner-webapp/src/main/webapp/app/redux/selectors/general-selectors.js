@@ -208,6 +208,24 @@ export const getAllChatConnections = createSelector(
       .reverse()
 );
 
+export const getAllPartnerActivityConnections = createSelector(
+  getOwnedAtoms,
+  allOwnedAtoms =>
+    allOwnedAtoms &&
+    allOwnedAtoms
+      .filter(atom => atomUtils.isActive(atom))
+      .filter(atom => atomUtils.hasPartnerActivitySocket(atom))
+      .flatMap(atom =>
+        atomUtils.getAllNonClosedNonSuggestedPartnerActivityConnections(atom)
+      )
+      .toOrderedMap()
+      .sortBy(conn => {
+        const lastUpdateDate = get(conn, "lastUpdateDate");
+        return lastUpdateDate && lastUpdateDate.getTime();
+      })
+      .reverse()
+);
+
 export const getAllConnectedChatAndGroupConnections = createSelector(
   getOwnedAtoms,
   allOwnedAtoms =>
