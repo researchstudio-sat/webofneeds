@@ -214,6 +214,19 @@ bd:lat-lon rdf:type rdfs:Datatype .
       rdfs:comment "The textual content of a Message."@en ;
       rdfs:label "text" .
 
+###  https://w3id.org/won/content#agreement
+:agreement rdf:type owl:DatatypeProperty ;
+      rdfs:domain msg:Message ;
+      rdfs:range xsd:base64Binary ;
+      rdfs:comment "The zipped, Base64 encoded TriG representation of the content of an WoN agreement."@en ;
+      rdfs:label "agreement" .
+
+###  https://w3id.org/won/content#agreementMessages
+:agreementMessages rdf:type owl:DatatypeProperty ;
+      rdfs:domain msg:Message ;
+      rdfs:range xsd:base64Binary ;
+      rdfs:comment "The zipped, Base64 encoded TriG representation of all messages belonging to a WoN agreement."@en ;
+      rdfs:label "agreementMessages" .
 
 #################################################################
 #    Classes
