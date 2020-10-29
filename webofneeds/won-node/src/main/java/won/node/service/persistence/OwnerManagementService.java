@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Component;
 import org.apache.camel.Endpoint;
@@ -51,15 +52,16 @@ public class OwnerManagementService implements ApplicationManagementService {
     private synchronized void addCamelEndpointsForOwnerApplication(OwnerApplication ownerApplication) {
         List<String> componentNames = camelContext.getComponentNames();
         Component activemqComponent = (Component) camelContext.getComponent("activemq");
+        ((ActiveMQComponent) activemqComponent).setPreserveMessageQos(true);
         for (String queueName : ownerApplication.getQueueNames()) {
             queueName = sanitizeQueueNameForOwnerApplication(ownerApplication, queueName);
-            queueName = addActiveMQComponentParametersToQueueName(queueName);
             Endpoint existingQueueEndpoint = camelContext.hasEndpoint(queueName);
             if (existingQueueEndpoint != null) {
                 logger.debug("endpoint '{}' already present in camel context", queueName);
             } else {
                 try {
                     Endpoint newQueueEndpoint = activemqComponent.createEndpoint(queueName);
+
                     camelContext.addEndpoint(queueName, newQueueEndpoint);
                     logger.debug("added camel endpoint '{}'", queueName);
                 } catch (Exception e) {
@@ -102,9 +104,5 @@ public class OwnerManagementService implements ApplicationManagementService {
      */
     public boolean existsCamelEndpointForOwnerApplicationQueue(String queueName) {
         return (camelContext.hasEndpoint(queueName) != null);
-    }
-
-    public String addActiveMQComponentParametersToQueueName(String queueName) {
-        return queueName + "?preserveMessageQos=true";
     }
 }
