@@ -25,7 +25,7 @@ public class WonJmsConfiguration extends JmsConfiguration {
         setDeliveryPersistent(false);
         setAcknowledgementModeName("DUPS_OK_ACKNOWLEDGE"); // make each consumer explicitly acknowledge each message
         setDisableReplyTo(true);
-        setExplicitQosEnabled(true); // required for the TTL to have an effect
+        setPreserveMessageQos(true);
         setTimeToLive(10);
         setTransacted(false);
         setAsyncConsumer(true); // this may improve performance for most cases, but it bites us in the

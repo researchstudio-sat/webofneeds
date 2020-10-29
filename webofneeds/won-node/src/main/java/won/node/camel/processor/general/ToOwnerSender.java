@@ -68,8 +68,6 @@ public class ToOwnerSender extends AbstractCamelProcessor {
                             return app.getQueueNames().stream()
                                             .map(queue -> ownerManagementService
                                                             .sanitizeQueueNameForOwnerApplication(app, queue))
-                                            .map(queue -> ownerManagementService
-                                                            .addActiveMQComponentParametersToQueueName(queue))
                                             .filter(queue -> ownerManagementService
                                                             .existsCamelEndpointForOwnerApplicationQueue(queue));
                         })
