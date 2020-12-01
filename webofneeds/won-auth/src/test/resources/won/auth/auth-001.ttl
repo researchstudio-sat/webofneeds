@@ -1,0 +1,14 @@
+@base <https://example.com/test/atom1> .
+@prefix ex:<https://example.com/test/> .
+@prefix auth:<https://w3id.org/won/auth#> .
+@prefix won:       <https://w3id.org/won/core#> .
+
+# grant any operation to ex:atom2, given it is active
+
+<#authorization1>
+    a auth:Authorization ;
+    auth:grantee [ auth:atom ex:atom2 ] ;
+    auth:grant [
+       auth:atomState won:Active ;
+       auth:operation auth:anyOperation
+    ] .

@@ -1,0 +1,28 @@
+@base             <https://example.com/test/atom1> .
+@prefix ex:       <https://example.com/test/> .
+@prefix auth:     <https://w3id.org/won/auth#> .
+@prefix won:      <https://w3id.org/won/core#> .
+@prefix wx-buddy: <https://w3id.org/won/ext/buddy#> .
+
+# request read on the buddy socket's connections (ie. list the connections)
+# grant read on sysinfo and connect/close+read to any buddy, but inherit:false disallows the request
+
+<#authorization>
+    a            auth:Authorization ;
+    auth:grantee [ auth:atom auth:anyAtom ] ;
+    auth:grant   [ auth:graph  [ auth:graphType auth:contentGraph, auth:sysinfoGraph ;
+                                 auth:operation auth:opRead ] ;
+                   auth:socket [ auth:socketType  wx-buddy:BuddySocket ;
+                                 auth:operation   auth:opConnectClose, auth:opRead ;
+                                 auth:connections [ auth:inherit false ] ] ] .
+
+
+<#request>
+    a                   auth:OperationRequest ;
+    auth:requestor      ex:atom2 ;
+    auth:reqAtom        ex:atom1 ;
+    auth:reqPosition    auth:positionConnections ;
+    auth:reqSocketType  wx-buddy:BuddySocket ;
+    auth:reqSocket      <#buddySocket> ;
+    auth:reqConnections <#buddySocket/c> ;
+    auth:operation      auth:opRead .

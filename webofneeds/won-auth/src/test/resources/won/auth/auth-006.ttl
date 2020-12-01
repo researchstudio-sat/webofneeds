@@ -1,0 +1,19 @@
+@base             <https://example.com/test/atom1> .
+@prefix auth:     <https://w3id.org/won/auth#> .
+@prefix msg:     <https://w3id.org/won/message#> .
+@prefix wx-buddy: <https://w3id.org/won/ext/buddy#> .
+@prefix wx-hold:  <https://w3id.org/won/ext/hold#> .
+
+# grant
+#   - read on everything
+#   - sending msg:ConnectionMessage messages on behalf of the atom
+#   - sending msg:Replacemessage messages that modify the graph #supportBotContent
+# to bearers of the token issued by the holder
+<#authorization7>
+    a           auth:Authorization ;
+    auth:bearer [ auth:scope  "my support bots" ;
+                  auth:issuer [ auth:socket [ auth:socketType wx-hold:HoldableSocket ;
+                                              auth:targetAtom [ ] ] ] ] ;
+    auth:grant  [ auth:operation auth:opRead, [ auth:messageOnBehalf msg:ConnectionMessage ] ;
+                  auth:graph     [ auth:graphIri  <#supportBotContent> ;
+                                   auth:operation [ auth:messageOnBehalf msg:ReplaceMessage ] ] ] .

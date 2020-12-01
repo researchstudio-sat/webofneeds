@@ -1,0 +1,13 @@
+@base             <https://example.com/test/atom1> .
+@prefix auth:     <https://w3id.org/won/auth#> .
+@prefix wx-buddy: <https://w3id.org/won/ext/buddy#> .
+
+# grant read on sysinfo and connect/close to any atom
+
+<#authorization2>
+    a            auth:Authorization ;
+    auth:grantee [ auth:atom auth:anyAtom ] ;
+    auth:grant   [ auth:graph  [ auth:graphType auth:contentGraph, auth:sysinfoGraph ;
+                                 auth:operation auth:opRead ] ;
+                   auth:socket [ auth:socketType wx-buddy:BuddySocket ;
+                                 auth:operation  auth:opConnectClose ; ] ] .

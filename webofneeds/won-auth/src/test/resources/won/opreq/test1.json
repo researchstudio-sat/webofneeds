@@ -1,0 +1,6 @@
+[{ "typ":"jwt",  "alg":"HS256" },
+{ "iss": "https://example.com/test/atom3",
+  "sub": "https://example.com/test/atom2",
+  "exp": "EXPIRY_TIME",
+  "iat": "ISSUED_AT",
+  "scope": "https://w3id.org/won/ext/buddy#BuddySocket"}]

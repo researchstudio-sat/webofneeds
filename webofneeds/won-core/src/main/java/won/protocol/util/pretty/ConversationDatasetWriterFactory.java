@@ -138,7 +138,7 @@ public class ConversationDatasetWriterFactory implements WriterDatasetRIOTFactor
                 if (dftGraph && !GDFT_BRACE) {
                     // Non-empty default graph, no braces.
                     // No indenting.
-                    writeGraphTTL(dsg, name);
+                    writeGraphTTL(dsg.getGraph(name));
                     return true;
                 }
                 // The graph will go in braces, whether non-empty default graph or a named
@@ -156,7 +156,7 @@ public class ConversationDatasetWriterFactory implements WriterDatasetRIOTFactor
                 else
                     out.print(" ");
                 out.incIndent(INDENT_GRAPH);
-                writeGraphTTL(dsg, name);
+                writeGraphTTL(dsg.getGraph(name));
                 out.decIndent(INDENT_GRAPH);
                 if (NL_END)
                     out.ensureStartOfLine();

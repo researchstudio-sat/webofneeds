@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>won-parent-pom</artifactId>
+        <relativePath>../won-parent-pom</relativePath>
+        <groupId>at.researchstudio.sat</groupId>
+        <version>0.10-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <name>Authorization</name>
+    <artifactId>won-auth</artifactId>
+    <properties>
+            <shacl2java.generate-sources.outputDir>${project.basedir}/target/generated-sources/shacl2java</shacl2java.generate-sources.outputDir>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>at.researchstudio.sat</groupId>
+            <artifactId>won-utils-shacl2java</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- LOGGING STUFF -->
+        <!-- TEST STUFF -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <!-- RDF STUFF -->
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-tdb</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-shacl</artifactId>
+        </dependency>
+        <!-- SPRING STUFF -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>shacl2java-generate-auth-classes</id>
+                        <!-- the phase should be 'generate-sources', and 'process-sources'
+                        for the next two plugins (right?), but that does not work.-->
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>won.shacl2java.Shacl2JavaSrcGenCommand</mainClass>
+                            <commandlineArgs>-p won.auth.model -o ${shacl2java.generate-sources.outputDir} ${project.basedir}/src/main/resources/shacl/won-auth-shapes.ttl -vc https://w3id.org/won/auth#TreeExpressionShape</commandlineArgs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-sources</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${shacl2java.generate-sources.outputDir}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>format-generated</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>format</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <configFile>eclipse/formatter.xml</configFile>
+                    <encoding>UTF-8</encoding>
+                    <lineEnding>LF</lineEnding>
+                    <directories>
+                        <directory>${shacl2java.generate-sources.outputDir}</directory>
+                    </directories>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>

@@ -1,0 +1,50 @@
+@base              <https://example.com/test/atom1> .
+@prefix auth:      <https://w3id.org/won/auth#> .
+@prefix msg:       <https://w3id.org/won/message#> .
+@prefix won:       <https://w3id.org/won/core#> .
+@prefix wx-buddy:  <https://w3id.org/won/ext/buddy#> .
+@prefix wx-hold:   <https://w3id.org/won/ext/hold#> .
+@prefix wx-schema: <https://w3id.org/won/ext/schema#> .
+
+# ACLs for an atom holding information about a private party I am organizing.
+
+# Allows bearers of a "buddyOfBuddy" token signed by the holder of the
+# party (my persona atom) to see the graph #invitationWithoutSpecifics
+# and to connect/communicate via the wx-schema:AttendeeSocket - which allows
+# me (as the owner of the party atom), to accept/deny their requests to attend
+
+<#authorization1Party>
+    a           auth:Authorization ;
+    auth:bearer [ auth:scope  "buddyOfBuddy" ;
+                  auth:issuer [ auth:socket [ auth:socketType wx-hold:HoldableSocket ;
+                                              auth:targetAtom [ ] ; ] ] ] ;
+    auth:grant  [ auth:graph  [ auth:graphType auth:sysinfoGraph ;
+                                auth:graphIri  <#invitationWithoutSpecifics> ;
+                                auth:operation auth:opRead ] ;
+                  auth:socket [ auth:socketType wx-schema:AttendeeSocket ;
+                                auth:operation  auth:opConnectClose, auth:opCommunicate ; ] ] .
+
+# All atoms connected on the wx-schema:AttendeeSocket get read access to
+# the content graph #timeDateAndLocation, containing all information needed to
+# attend. I can invite my buddies directly by requesting a connection with them
+# on the attendee socket.
+
+<#authorization2Party>
+    a            auth:Authorization ;
+    auth:grantee [ auth:socket [ auth:socketType wx-schema:AttendeeSocket ;
+                                 auth:connection [ auth:connectionState won:Connected, won:RequestSent ] ;
+        auth:targetAtom [] ;
+        ]
+    ] ;
+    auth:grant [
+         auth:graph [
+            auth:graphType auth:sysinfoGraph ;
+            auth:graphIri <#invitationWithoutSpecifics>, <#timeDateAndLocation> ;
+        auth:operation auth:opRead ] ; ] .
+
+
+# Any atom is allowed to get the authentication info
+
+<#Authorization3Party>
+    auth:grantee [ auth:atom auth:anyAtom ] ;
+    auth:grant   [ auth:graph [ auth:operation auth:opGetAuthInfo ; ] ] .

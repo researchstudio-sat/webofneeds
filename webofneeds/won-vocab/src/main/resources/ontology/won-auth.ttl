@@ -1,0 +1,17 @@
+@prefix : <https://w3id.org/won/auth#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won: <https://w3id.org/won/core#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <https://w3id.org/won/content> .
+
+<https://w3id.org/won/auth> rdf:type owl:Ontology ;
+                               owl:versionIRI <https://w3id.org/won/auth/1.0> ;
+                               owl:imports <https://w3id.org/won/core/1.0> ;
+                               <http://purl.org/dc/elements/1.1/abstract> "This ontology defines classes and properties used to express access control rules in WoN atoms."@en ;
+                               <http://purl.org/dc/elements/1.1/created> "2020-11-19"^^xsd:date ;
+                               <http://purl.org/dc/elements/1.1/title> "Web of Needs Authorization Ontology"@en ;
+                               <http://purl.org/dc/terms/license> "https://creativecommons.org/licenses/by/4.0/"^^xsd:string ;
+                               <http://purl.org/vocab/vann/preferredNamespacePrefix> "auth"^^xsd:string .

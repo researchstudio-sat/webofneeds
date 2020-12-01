@@ -1,0 +1,12 @@
+@prefix ex: <https://example.com/ns#> .
+ex:Bob a ex:Person ;
+       ex:address ex:BobsAddress .
+
+ex:BobsAddress
+    ex:postalCode "1234" .
+
+ex:Reto a ex:Person ;
+        ex:address ex:RetosAddress .
+
+ex:RetosAddress
+    ex:postalCode "5678" .

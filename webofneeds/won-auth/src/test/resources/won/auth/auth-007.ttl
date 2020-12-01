@@ -1,0 +1,19 @@
+<<@base             <https://example.com/test/atom1> .
+@prefix auth:     <https://w3id.org/won/auth#> .
+@prefix msg:      <https://w3id.org/won/message#> .
+@prefix wx-buddy: <https://w3id.org/won/ext/buddy#> .
+@prefix wx-hold:  <https://w3id.org/won/ext/hold#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+
+# grants
+#   - a "buddyOfBuddy" token
+# to atoms bearing a BuddySocket token issued by one of my buddies
+
+<#authorization1Persona>
+    a               auth:Authorization ;
+    auth:bearer     [ auth:scope  wx-buddy:BuddySocket ;
+                      auth:issuer [ auth:socket [ auth:socketType wx-buddy:BuddySocket ;
+                                                  auth:targetAtom [ ] ] ] ] ;
+    auth:grantToken [ auth:scope        "buddyOfBuddy" ;
+                      auth:expiresAfter 3600 ; ] .

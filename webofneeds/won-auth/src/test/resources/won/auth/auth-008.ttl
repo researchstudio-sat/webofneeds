@@ -1,0 +1,18 @@
+@base             <https://example.com/test/atom1> .
+@prefix auth:     <https://w3id.org/won/auth#> .
+@prefix msg:      <https://w3id.org/won/message#> .
+@prefix wx-buddy: <https://w3id.org/won/ext/buddy#> .
+@prefix wx-hold:  <https://w3id.org/won/ext/hold#> .
+
+# Allows the requestor of a "buddyOfBuddy" token to learn how they can
+# authenticate to obtain one (i.e. get a BuddySocket token from one of
+# my buddies )
+#
+# grants
+#   - authInfo for tokenRequest for token with scope 'buddyOfBuddy'
+# to anyone
+
+<#Authorization2Persona>
+    auth:grantee [ auth:atom auth:anyAtom ] ;
+    auth:grant   [ auth:tokenRequest [ auth:tokenScope "buddyOfBuddy" ;
+                                       auth:operation  auth:opGetAuthInfo ; ] ] .

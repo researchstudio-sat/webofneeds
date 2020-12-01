@@ -1,0 +1,23 @@
+@base         <https://example.com/test/atom1> .
+@prefix ex:   <https://example.com/test/> .
+@prefix auth: <https://w3id.org/won/auth#> .
+@prefix won:  <https://w3id.org/won/core#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+
+# request read on the whole atom, exact atom state match
+
+<#authorization>
+    a auth:Authorization ;
+    auth:grantee [ auth:atom ex:atom2 ] ;
+    auth:grant [
+                   auth:atomState won:Active ;
+                   auth:operation auth:anyOperation
+               ] .
+
+<#request>
+    a                      auth:OperationRequest ;
+    auth:requestor         ex:atom2 ;
+    auth:reqAtom           ex:atom1 ;
+    auth:reqAtomState      won:Active ;
+    auth:reqPosition       auth:positionRoot ;
+    auth:operation         auth:opRead .

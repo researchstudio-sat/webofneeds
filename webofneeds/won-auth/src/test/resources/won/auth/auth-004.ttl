@@ -1,0 +1,20 @@
+@base             <https://example.com/test/atom1> .
+@prefix auth:     <https://w3id.org/won/auth#> .
+@prefix wx-buddy: <https://w3id.org/won/ext/buddy#> .
+@prefix won: <https://w3id.org/won/core#> .
+
+# grant
+#   * read on content, sysinfo
+#   * list, msg-exchange and connect/close on buddy socket
+# to connected or invited buddies.
+
+<#authorization3>
+    a            auth:Authorization ;
+    auth:grantee [ auth:socket [ auth:socketType wx-buddy:BuddySocket ;
+                                 auth:connection [ auth:connectionState won:Connected, won:RequestSent ;
+                                                   auth:targetAtom      [ ] ] ] ] ;
+    auth:grant   [ auth:graph  [ auth:graphType auth:contentGraph, auth:sysinfoGraph ;
+                                 auth:operation auth:opRead ; ] ;
+                   auth:socket [ auth:socketType         wx-buddy:BuddySocket ;
+                                 auth:operation          auth:opRead, auth:opCommunicate, auth:opConnectClose ;
+                                 auth:connectionMessages [ auth:inherit false ] ] ] .
