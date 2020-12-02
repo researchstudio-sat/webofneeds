@@ -11,33 +11,33 @@ import java.util.stream.Collectors;
 import static won.auth.model.Individuals.ANY_OPERATION;
 
 class OperationRequestChecker implements TreeExpressionVisitor {
-
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    
     private Deque<Set<OperationExpression>> grantedOperations = new ArrayDeque<>();
 
     private static boolean isLowerThan(AsePosition lower, AsePosition higher) {
-        return lowerBy(lower, higher, new HashSet()) > -1 ;
+        return lowerBy(lower, higher, new HashSet()) > -1;
     }
 
     private static int lowerBy(AsePosition lower, AsePosition higher) {
         return lowerBy(lower, higher, new HashSet());
     }
+
     /**
      * Returns the level difference if <code>lower</code> is lower, otherwise -1;
+     * 
      * @param lower
      * @param higher
      * @param visited
      * @return
      */
     private static int lowerBy(AsePosition lower, AsePosition higher, Set visited) {
-        if (visited.contains(lower)){
+        if (visited.contains(lower)) {
             return -1;
         }
         visited.add(lower);
         AsePosition parent = lower.getParentPosition();
-        if (parent != null){
-            if (parent.equals(higher)){
+        if (parent != null) {
+            if (parent.equals(higher)) {
                 return visited.size();
             }
             return lowerBy(parent, higher, visited);
@@ -75,14 +75,12 @@ class OperationRequestChecker implements TreeExpressionVisitor {
         }
     }
 
-    // if the requested position is lower than the end of its branch in the ASE tree,
+    // if the requested position is lower than the end of its branch in the ASE
+    // tree,
     // the decision is made at that point.
     private DecisionAtHigherLevel decisionAtHigherLevel = new DecisionAtHigherLevel();
-
     private OperationRequest operationRequest;
-
     private Boolean finalDecision = null;
-
     private Set<OperationExpression> NOTHING_GRANTED = Collections.unmodifiableSet(new HashSet<>());
 
     public OperationRequestChecker(OperationRequest operationRequest) {
@@ -92,16 +90,17 @@ class OperationRequestChecker implements TreeExpressionVisitor {
     public Boolean getFinalDecision() {
         if (finalDecision != null) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Decision at requested level {} is {}", operationRequest.getReqPosition(), finalDecision ? "positive" : "negative");
+                logger.debug("Decision at requested level {} is {}", operationRequest.getReqPosition(),
+                                finalDecision ? "positive" : "negative");
             }
             return finalDecision;
         }
         if (decisionAtHigherLevel.hasDecision()) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Decision at requested level {} made at higher-than-requested level {} is {}",
-                        new Object[]{operationRequest.getReqPosition(),
-                                decisionAtHigherLevel.getPosition(),
-                                decisionAtHigherLevel.getDecision() ? "positive" : "negative"});
+                                new Object[] { operationRequest.getReqPosition(),
+                                                decisionAtHigherLevel.getPosition(),
+                                                decisionAtHigherLevel.getDecision() ? "positive" : "negative" });
             }
             return decisionAtHigherLevel.getDecision();
         }
@@ -120,31 +119,33 @@ class OperationRequestChecker implements TreeExpressionVisitor {
         if (granted.contains(ANY_OPERATION) || granted.contains(operation)) {
             return true;
         }
-        Set<MessageType> mto = operation.getMessageTosMessageOperation().stream().flatMap(mo -> mo.getMembers().stream()).collect(Collectors.toSet());
+        Set<MessageType> mto = operation.getMessageTosMessageOperation().stream()
+                        .flatMap(mo -> mo.getMembers().stream()).collect(Collectors.toSet());
         mto.addAll(operation.getMessageTosMessageType());
         Boolean firstResult = null;
         if (!mto.isEmpty()) {
             boolean result = granted.parallelStream()
-                    .anyMatch(go -> mto.stream()
-                            .allMatch(msgType ->
-                                    go.getMessageTosMessageType().contains(msgType)
-                                            || go.getMessageTosMessageOperation().stream()
-                                            .anyMatch(msgOp -> msgOp.getMembers().contains(msgType))));
+                            .anyMatch(go -> mto.stream()
+                                            .allMatch(msgType -> go.getMessageTosMessageType().contains(msgType)
+                                                            || go.getMessageTosMessageOperation().stream()
+                                                                            .anyMatch(msgOp -> msgOp.getMembers()
+                                                                                            .contains(msgType))));
             if (!result) {
                 return false;
             } else {
                 firstResult = true;
             }
         }
-        Set<MessageType> mob = operation.getMessageOnBehalfsMessageOperation().stream().flatMap(mo -> mo.getMembers().stream()).collect(Collectors.toSet());
+        Set<MessageType> mob = operation.getMessageOnBehalfsMessageOperation().stream()
+                        .flatMap(mo -> mo.getMembers().stream()).collect(Collectors.toSet());
         mob.addAll(operation.getMessageOnBehalfsMessageType());
         if (!mob.isEmpty()) {
             boolean result = granted.parallelStream()
-                    .anyMatch(go -> mob.stream()
-                            .allMatch(msgType ->
-                                    go.getMessageOnBehalfsMessageType().contains(msgType)
-                                            || go.getMessageOnBehalfsMessageOperation().stream()
-                                            .anyMatch(msgOp -> msgOp.getMembers().contains(msgType))));
+                            .anyMatch(go -> mob.stream()
+                                            .allMatch(msgType -> go.getMessageOnBehalfsMessageType().contains(msgType)
+                                                            || go.getMessageOnBehalfsMessageOperation().stream()
+                                                                            .anyMatch(msgOp -> msgOp.getMembers()
+                                                                                            .contains(msgType))));
             if (!result) {
                 return false;
             } else {
@@ -153,7 +154,7 @@ class OperationRequestChecker implements TreeExpressionVisitor {
                 }
             }
         }
-        if (firstResult != null){
+        if (firstResult != null) {
             return firstResult;
         }
         return false;
@@ -172,13 +173,12 @@ class OperationRequestChecker implements TreeExpressionVisitor {
                     boolean decisionAtCurrentPosition = isOperationGranted(operationRequest.getOperation());
                     if (logger.isDebugEnabled()) {
                         logger.debug("Recording decision at higher-than-requested position {}: {}",
-                                decisionPosition, decisionAtCurrentPosition);
+                                        decisionPosition, decisionAtCurrentPosition);
                     }
                     this.decisionAtHigherLevel.updateIfLower(decisionPosition, decisionAtCurrentPosition);
                 }
             }
         }
-
     }
 
     private void markBranchNothingGranted() {
@@ -213,7 +213,8 @@ class OperationRequestChecker implements TreeExpressionVisitor {
 
     @Override
     public void onBeforeRecursion(Object parent, Object child) {
-        //check if we are omitting ASEs. if so, check if they are the decision position and if so, decide.
+        // check if we are omitting ASEs. if so, check if they are the decision position
+        // and if so, decide.
         AsePosition childPosition = ((TreeExpression) child).getAsePosition();
         AsePosition candidate = childPosition.getParentPosition();
         while (!candidate.equals(((TreeExpression) parent).getAsePosition()) && !isFinalDecisionMade()) {
@@ -230,7 +231,6 @@ class OperationRequestChecker implements TreeExpressionVisitor {
         // now, the top element is the one we pushed onto it at this level
         grantedOperations.pop();
     }
-
 
     @Override
     public void visit(ConnectionMessagesExpression other) {

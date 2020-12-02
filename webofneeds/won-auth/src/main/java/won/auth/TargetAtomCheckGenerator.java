@@ -3,15 +3,18 @@ package won.auth;
 import won.auth.check.TargetAtomCheck;
 import won.auth.model.*;
 
+import java.net.URI;
 import java.util.*;
 
 class TargetAtomCheckGenerator implements TreeExpressionVisitor {
     private Deque<TreeExpression> pathFromRoot = new ArrayDeque<>();
-
     private Set<TargetAtomCheck> targetAtomChecks = new HashSet<>();
+    private URI atom;
+    private URI requestorAtom;
 
-
-    public TargetAtomCheckGenerator() {
+    public TargetAtomCheckGenerator(URI atom, URI requestorAtom) {
+        this.atom = atom;
+        this.requestorAtom = requestorAtom;
     }
 
     @Override
@@ -19,8 +22,8 @@ class TargetAtomCheckGenerator implements TreeExpressionVisitor {
         // pop the top off our stack if we just recursed into a
         // child for which we pushed an element onto it
         if (child instanceof ConnectionsExpression
-                || child instanceof ConnectionExpression
-                || child instanceof SocketExpression) {
+                        || child instanceof ConnectionExpression
+                        || child instanceof SocketExpression) {
             pathFromRoot.pop();
         }
     }
@@ -35,7 +38,8 @@ class TargetAtomCheckGenerator implements TreeExpressionVisitor {
     }
 
     public void collectTargetAtomCheck(TargetAtomContainer node) {
-        TargetAtomCheck check = TargetAtomCheck.of(Collections.unmodifiableCollection(pathFromRoot));
+        TargetAtomCheck check = TargetAtomCheck.of(atom, requestorAtom,
+                        Collections.unmodifiableCollection(pathFromRoot));
         this.targetAtomChecks.add(check);
     }
 
@@ -48,6 +52,4 @@ class TargetAtomCheckGenerator implements TreeExpressionVisitor {
     public void visit(SocketExpression other) {
         pathFromRoot.push(other);
     }
-
-
 }

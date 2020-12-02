@@ -326,7 +326,7 @@ auth:messageTypesExpressionShape
 
 auth:messageTypeShape
     a        sh:NodeShape ;
-    sh:close true ;
+    sh:closed true ;
     sh:in    ( msg:ActivateMessage
                msg:AtomHintMessage
                msg:AtomMessage

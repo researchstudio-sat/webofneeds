@@ -1,6 +1,7 @@
 package won.shacl2java;
 
 import io.github.classgraph.*;
+import org.apache.commons.collections4.SetUtils;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
@@ -18,9 +19,9 @@ import won.shacl2java.annotation.Individual;
 import won.shacl2java.annotation.Individuals;
 import won.shacl2java.annotation.PropertyPath;
 import won.shacl2java.annotation.ShapeNode;
-import won.shacl2java.sourcegen.DataNodesAndShapes;
-import won.shacl2java.sourcegen.DerivedInstantiationContext;
-import won.shacl2java.sourcegen.InstantiationContext;
+import won.shacl2java.instantiation.DataNodeAndShapes;
+import won.shacl2java.instantiation.DerivedInstantiationContext;
+import won.shacl2java.instantiation.InstantiationContext;
 import won.shacl2java.util.CollectionUtils;
 import won.shacl2java.util.NameUtils;
 import won.shacl2java.util.ShapeUtils;
@@ -33,22 +34,23 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static org.apache.commons.collections4.SetUtils.union;
 import static org.apache.jena.shacl.validation.VLib.focusNodes;
 import static org.apache.jena.shacl.validation.VLib.isFocusNode;
 import static won.shacl2java.util.NameUtils.adderNameForFieldNameInPlural;
 import static won.shacl2java.util.NameUtils.setterNameForField;
 
-public class Shacl2JavaEntityFactory {
+public class Shacl2JavaInstanceFactory {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private Shapes shapes;
     private String[] packagesToScan;
     private InstantiationContext baseInstantiationContext;
     private InstantiationContext dataInstantiationContext;
 
-    public Shacl2JavaEntityFactory(Shapes shapes, String... packagesToScan) {
+    public Shacl2JavaInstanceFactory(Shapes shapes, String... packagesToScan) {
         this.shapes = shapes;
         this.packagesToScan = packagesToScan;
-        this.baseInstantiationContext = new InstantiationContext(shapes.getGraph());
+        this.baseInstantiationContext = new InstantiationContext(shapes);
         scanPackages(baseInstantiationContext);
         instantiateAll(baseInstantiationContext);
     }
@@ -73,6 +75,41 @@ public class Shacl2JavaEntityFactory {
         this.dataInstantiationContext = dataContext;
     }
 
+    public Set<Object> getInstances(String uri) {
+        if (dataInstantiationContext == null) {
+            return Collections.emptySet();
+        }
+        return dataInstantiationContext.getInstances(uri);
+    }
+
+    public <T> Set<T> getInstancesOfType(Class<T> type) {
+        if (dataInstantiationContext == null) {
+            return Collections.emptySet();
+        }
+        return dataInstantiationContext.getEntitiesOfType(type);
+    }
+
+    public <T> Set<T> getInstancesOfType(String uri, Class<T> type) {
+        if (dataInstantiationContext == null) {
+            return Collections.emptySet();
+        }
+        return dataInstantiationContext.getEntitiesOfType(uri, type);
+    }
+
+    public Map<String, Set<Object>> getInstanceMap() {
+        if (dataInstantiationContext == null) {
+            return Collections.emptyMap();
+        }
+        return dataInstantiationContext.getInstanceMap();
+    }
+
+    public Collection<Object> getInstances() {
+        if (dataInstantiationContext == null) {
+            return Collections.emptySet();
+        }
+        return dataInstantiationContext.getInstances();
+    }
+
     private void scanPackages(InstantiationContext ctx) {
         try (ScanResult scanResult = new ClassGraph().enableAllInfo().acceptPackages(packagesToScan)
                         .scan()) {
@@ -83,7 +120,7 @@ public class Shacl2JavaEntityFactory {
                 AnnotationParameterValue nodes = paramVals.get("value");
                 String[] shapeNodes = (String[]) nodes.getValue();
                 for (int i = 0; i < shapeNodes.length; i++) {
-                    ctx.setClassForShape(shapeNodes[i], shapeClassInfo.loadClass());
+                    ctx.addClassForShape(shapeNodes[i], shapeClassInfo.loadClass());
                 }
             }
             ClassInfoList individualClassInfoList = scanResult.getClassesWithAnnotation(Individuals.class.getName());
@@ -115,7 +152,7 @@ public class Shacl2JavaEntityFactory {
                         } else {
                             continue;
                         }
-                        ctx.setInstanceForFocusNode(focusNode, instance);
+                        ctx.addInstanceForFocusNode(focusNode, instance);
                         ctx.setFocusNodeForInstance(instance, focusNode);
                         ctx.addShapeForFocusNode(focusNode, this.shapes.getShape(shapeNode));
                     } catch (Exception e) {
@@ -126,58 +163,63 @@ public class Shacl2JavaEntityFactory {
         }
     }
 
+    private Set<DataNodeAndShapes> deduplicate(Set<DataNodeAndShapes> sets) {
+        return sets.parallelStream().collect(Collectors.toMap(
+                        // calculate union of all shapes collected per value node
+                        dnas -> dnas.getDataNode(),
+                        dnas -> dnas.getShapeNodes(),
+                        (left, right) -> {
+                            Set<Node> merged = new HashSet<>();
+                            merged.addAll(left);
+                            merged.addAll(right);
+                            return merged;
+                        })) // transform back into DataNodeAndShapes objects
+                        .entrySet()
+                        .parallelStream()
+                        .map(entry -> new DataNodeAndShapes(entry.getKey(), entry.getValue()))
+                        .collect(Collectors.toSet());
+    }
+
     private void instantiateAll(InstantiationContext ctx) {
-        Set<DataNodesAndShapes> toInstantiate = null;
+        Set<DataNodeAndShapes> toInstantiate = null;
         while (toInstantiate == null || toInstantiate.size() > 0) {
             if (toInstantiate == null) {
-                toInstantiate = StreamSupport.stream(shapes.spliterator(), true).flatMap(shape -> {
-                    return instantiate(null, shape, false, ctx).stream();
-                }).collect(Collectors.toSet());
+                Set<Shape> shapeSet = new HashSet();
+                shapes.forEach(s -> shapeSet.add(s));
+                toInstantiate = shapeSet.parallelStream().map(shape -> {
+                    return instantiate(null, shape, false, ctx);
+                }).reduce(SetUtils::union).orElseGet(() -> Collections.emptySet());
+                toInstantiate = deduplicate(toInstantiate);
             } else {
-                toInstantiate = toInstantiate.parallelStream().flatMap(dataNodesAndShapes -> {
-                    if (dataNodesAndShapes.getShapeNodes().isEmpty()) {
-                        return dataNodesAndShapes.getDataNodes().stream()
-                                        .flatMap(focusNode -> StreamSupport.stream(shapes.spliterator(), true).flatMap(
-                                                        shape -> instantiate(focusNode, shape, false, ctx).stream()));
+                toInstantiate = toInstantiate.parallelStream().map(dataNodeAndShapes -> {
+                    if (dataNodeAndShapes.getShapeNodes().isEmpty()) {
+                        return StreamSupport
+                                        .stream(shapes.spliterator(), true)
+                                        .map(shape -> instantiate(dataNodeAndShapes.getDataNode(),
+                                                        shape, false, ctx))
+                                        .reduce(SetUtils::union).orElseGet(() -> Collections.emptySet());
                     } else {
-                        return dataNodesAndShapes.getShapeNodes().parallelStream()
-                                        .flatMap(shapeNode -> dataNodesAndShapes.getDataNodes().parallelStream()
-                                                        .flatMap(focusNode -> instantiate(focusNode,
-                                                                        shapes.getShape(shapeNode), true, ctx)
-                                                                                        .stream()));
+                        return dataNodeAndShapes
+                                        .getShapeNodes()
+                                        .parallelStream()
+                                        .map(shapeNode -> instantiate(dataNodeAndShapes.getDataNode(),
+                                                        shapes.getShape(shapeNode), true, ctx))
+                                        .reduce(SetUtils::union).orElseGet(() -> Collections.emptySet());
                     }
-                }).collect(Collectors.toSet());
+                }).reduce(SetUtils::union).orElseGet(() -> Collections.emptySet());
+                toInstantiate = deduplicate(toInstantiate);
             }
         }
         ctx.getMappedInstances().parallelStream().forEach(entry -> {
             Node node = entry.getKey();
-            Object instance = entry.getValue();
-            if (logger.isDebugEnabled()) {
-                logger.debug("wiring dependencies of instance {} ", node);
-            }
-            wireDependencies(instance, ctx);
+            Set<Object> instances = entry.getValue();
+            instances.parallelStream().forEach(instance -> {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("wiring dependencies of instance {} ", node);
+                }
+                wireDependencies(instance, ctx);
+            });
         });
-    }
-
-    public <T> Set<T> getEntitiesOfType(Class<T> type) {
-        if (dataInstantiationContext == null) {
-            return Collections.emptySet();
-        }
-        return dataInstantiationContext.getEntitiesOfType(type);
-    }
-
-    public Map<String, Object> getInstanceMap() {
-        if (dataInstantiationContext == null) {
-            return Collections.emptyMap();
-        }
-        return dataInstantiationContext.getInstanceMap();
-    }
-
-    public Collection<Object> getInstances() {
-        if (dataInstantiationContext == null) {
-            return Collections.emptySet();
-        }
-        return dataInstantiationContext.getInstances();
     }
 
     /**
@@ -189,7 +231,7 @@ public class Shacl2JavaEntityFactory {
      * @return the set of nodes reached during instantiation that have not been
      * instantiated yet
      */
-    public Set<DataNodesAndShapes> instantiate(Node node, Shape shape, boolean forceApplyShape,
+    public Set<DataNodeAndShapes> instantiate(Node node, Shape shape, boolean forceApplyShape,
                     InstantiationContext ctx) {
         if (shape.getShapeNode().isBlank()) {
             if (node == null) {
@@ -210,9 +252,11 @@ public class Shacl2JavaEntityFactory {
                     return Collections.emptySet();
                 }
             }
-            if (ctx.hasInstanceForFocusNode(node)) {
-                ctx.addShapeForFocusNode(node, shape);
+            if (ctx.hasInstanceForFocusNode(node) && !ctx.isNewShapeForFocusNode(node, shape)) {
                 return Collections.emptySet();
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("processing node {} with shape {}", node, shape);
             }
             focusNodes = Collections.singleton(node);
         } else {
@@ -222,100 +266,100 @@ public class Shacl2JavaEntityFactory {
             return Collections.emptySet();
         }
         String shapeURI = shape.getShapeNode().getURI();
-        Class<?> classForShape = ctx.getClassForShape(shapeURI);
-        if (classForShape == null) {
+        Set<Class<?>> classesForShape = ctx.getClassesForShape(shapeURI);
+        if (classesForShape == null) {
             throw new IllegalArgumentException(String.format("No class found to instantiate for shape %s",
                             shape.getShapeNode().getLocalName()));
         }
-        // our shape might reference other shapes via sh:node (maybe through other
-        // operators such as sh:or)
-        // * we remember them for wiring
-        // * we return them as dependencies to instantiate
-        Set<Shape> allRelevantShapes = ShapeUtils.getNodeShapes((NodeShape) shape, shapes);
-        allRelevantShapes.add(shape);
-        DataNodesAndShapes.SetBuilder resultBuilder = DataNodesAndShapes.setBuilder();
-        for (Node focusNode : focusNodes) {
-            try {
-                Object instance = null;
-                if (logger.isDebugEnabled()) {
-                    logger.debug("attempting to instantiate focus node {} with shape {}", focusNode,
-                                    shape.getShapeNode());
-                }
-                instance = instantiate(shape, shapeURI, focusNode, ctx);
-                if (instance == null) {
-                    // we failed to instantiate an enum constant for the focus node of what looked
-                    // like an enum shape.
-                    // maybe another shape works better
-                    continue;
-                }
-                ctx.setInstanceForFocusNode(focusNode, instance);
-                ctx.setFocusNodeForInstance(instance, focusNode);
-                ctx.setClassForInstance(instance, classForShape);
-                ctx.addShapesForFocusNode(focusNode, allRelevantShapes);
-            } catch (NoSuchMethodException e) {
-                throw new IllegalArgumentException(
-                                String.format("Cannot instantiate %s for shape %s",
-                                                classForShape.getName(), shape.getShapeNode().getLocalName())
-                                                + ": no parameterless constructor found",
-                                e);
-            } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-                throw new IllegalArgumentException(String.format("Cannot instantiate %s for shape %s - %s: %s",
-                                classForShape.getName(), shape.getShapeNode().getLocalName(),
-                                e.getClass().getSimpleName(),
-                                e.getMessage()), e);
-            }
-            if (logger.isDebugEnabled()) {
-                logger.debug("Collecting dependencies of focus node {}", focusNode);
-            }
+        Set ret = classesForShape.parallelStream().map(classForShape -> {
+            // our shape might reference other shapes via sh:node (maybe through other
+            // operators such as sh:or)
+            // * we remember them for wiring
+            // * we return them as dependencies to instantiate
+            Set<Shape> allRelevantShapes = ShapeUtils.getNodeShapes((NodeShape) shape, shapes);
             Map<Path, Set<PropertyShape>> propertyShapesPerPath = getPropertyShapesByPath(allRelevantShapes);
-            for (Path path : propertyShapesPerPath.keySet()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("\twiring properties for path {} ", path);
-                }
-                Set<Node> valueNodes = ShaclPaths.valueNodes(ctx.getData(), focusNode, path);
-                for (PropertyShape propertyShape : propertyShapesPerPath.get(path)) {
+            allRelevantShapes.add(shape);
+            return focusNodes.parallelStream().map(focusNode -> {
+                try {
+                    Object instance = null;
                     if (logger.isDebugEnabled()) {
-                        logger.debug("\t\tFound property shape {} ", propertyShape.getShapeNode());
+                        logger.debug("attempting to instantiate focus node {} with shape {}", focusNode,
+                                        shape.getShapeNode());
                     }
-                    if (!valueNodes.isEmpty()) {
-                        Set<Node> candidateNodeShapes = ShapeUtils.getShNodeShapes(propertyShape, shapes)
-                                        .stream()
-                                        .filter(s -> !s.getShapeNode().isBlank())
-                                        .map(Shape::getShapeNode)
-                                        .collect(Collectors.toSet());
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("\t\t\tAdding to dependencies: {} with candidate shapes {}",
-                                            Arrays.toString(valueNodes.toArray()),
-                                            Arrays.toString(candidateNodeShapes.toArray()));
-                        }
-                        resultBuilder.dataNodes(valueNodes);
-                        resultBuilder.shapeNodes(candidateNodeShapes);
-                        resultBuilder.newSet();
+                    instance = instantiate(shape, shapeURI, focusNode, classForShape, ctx);
+                    if (instance == null) {
+                        // we failed to instantiate an enum constant for the focus node of what looked
+                        // like an enum shape.
+                        // maybe another shape works better
+                        return Collections.emptySet();
                     }
+                    ctx.addInstanceForFocusNode(focusNode, instance);
+                    ctx.setFocusNodeForInstance(instance, focusNode);
+                    ctx.setClassForInstance(instance, classForShape);
+                    ctx.addShapesForFocusNode(focusNode, allRelevantShapes);
+                } catch (NoSuchMethodException e) {
+                    throw new IllegalArgumentException(
+                                    String.format("Cannot instantiate %s for shape %s",
+                                                    classForShape.getName(), shape.getShapeNode().getLocalName())
+                                                    + ": no parameterless constructor found",
+                                    e);
+                } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+                    throw new IllegalArgumentException(String.format("Cannot instantiate %s for shape %s - %s: %s",
+                                    classForShape.getName(), shape.getShapeNode().getLocalName(),
+                                    e.getClass().getSimpleName(),
+                                    e.getMessage()), e);
                 }
-            }
-        }
-        return resultBuilder.build();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Collecting dependencies of focus node {}", focusNode);
+                }
+                return propertyShapesPerPath
+                                .entrySet()
+                                .parallelStream()
+                                .map(pathToShapes -> {
+                                    Path path = pathToShapes.getKey();
+                                    Set<PropertyShape> propertyShapes = pathToShapes.getValue();
+                                    if (logger.isDebugEnabled()) {
+                                        logger.debug("\tcollecting new focus nodes via path {} ", path);
+                                    }
+                                    Set<Node> valueNodes = ShaclPaths.valueNodes(ctx.getData(), focusNode, path);
+                                    if (valueNodes.isEmpty()) {
+                                        return Collections.emptySet();
+                                    }
+                                    return valueNodes
+                                                    .parallelStream()
+                                                    .map(valueNode -> propertyShapes
+                                                                    .parallelStream()
+                                                                    .map(ctx::getNodeShapesForPropertyShape)
+                                                                    .map(nodeShapeNodes -> new DataNodeAndShapes(
+                                                                                    valueNode,
+                                                                                    nodeShapeNodes))
+                                                                    .collect(Collectors.toSet()))
+                                                    .reduce(SetUtils::union).orElse(Collections.emptySet());
+                                }).reduce(SetUtils::union).orElse(Collections.emptySet());
+            }).reduce(SetUtils::union).orElse(Collections.emptySet());
+        }).reduce(SetUtils::union).orElse(Collections.emptySet());
+        return ret;
     }
 
-    public Object instantiate(Shape shape, String shapeURI, Node focusNode, InstantiationContext ctx)
+    public Object instantiate(Shape shape, String shapeURI, Node focusNode, Class<?> classForShape,
+                    InstantiationContext ctx)
                     throws InstantiationException,
                     IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Object instance;
-        Class<Enum> type = (Class<Enum>) ctx.getClassForShape(shapeURI);
+        Class<Enum> type = (Class<Enum>) classForShape;
         if (type.isEnum()) {
             if (ShapeUtils.checkForEnumShape(shape).isEnumShape()) {
                 return instantiateEnum(focusNode, type);
             }
         }
-        return instance = instantiateClass(shapeURI, focusNode, ctx);
+        return instantiateClass(focusNode, classForShape);
     }
 
-    public Object instantiateClass(String shapeURI, Node focusNode, InstantiationContext ctx)
+    public Object instantiateClass(Node focusNode, Class<?> classForShape)
                     throws InstantiationException,
                     IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Object instance;
-        instance = ctx.getClassForShape(shapeURI).getConstructor().newInstance();
+        instance = classForShape.getDeclaredConstructor().newInstance();
         Method nodeSetter = instance.getClass().getMethod("set_node", Node.class);
         if (nodeSetter != null) {
             nodeSetter.invoke(instance, focusNode);
@@ -368,44 +412,51 @@ public class Shacl2JavaEntityFactory {
                         .flatMap(s -> s.getPropertyShapes().stream())
                         .map(PropertyShape::getPath)
                         .collect(Collectors.toSet());
-        for (Path path : pathsFromPropertyShapes) {
+        pathsFromPropertyShapes.parallelStream().forEach(path -> {
             Set<Node> valueNodes = ShaclPaths.valueNodes(ctx.getData(), focusNode, path);
             Set<Field> fieldsForPath = fieldsByPath.get(path);
             if (fieldsForPath != null && !fieldsForPath.isEmpty()) {
                 if (valueNodes.size() > 0) {
                     for (Node valueNode : valueNodes) {
-                        Object dependency = ctx.getInstanceForFocusNode(valueNode);
-                        if (dependency == null) {
+                        Set<Object> dependencyCandidates = ctx.getInstancesForFocusNode(valueNode);
+                        if (dependencyCandidates == null) {
                             // dependency could be a blank node, literal or IRI that is not explicitly
                             // covered by a shape
                             if (valueNode.isLiteral()) {
-                                dependency = valueNode.getLiteralDatatype()
-                                                .parse(valueNode.getLiteralLexicalForm());
+                                dependencyCandidates = Collections.singleton(valueNode.getLiteralDatatype()
+                                                .parse(valueNode.getLiteralLexicalForm()));
                             } else if (valueNode.isURI()) {
-                                dependency = URI.create(valueNode.getURI());
+                                dependencyCandidates = Collections.singleton(URI.create(valueNode.getURI()));
                             }
                         }
                         Field field = null;
                         try {
-                            field = selectFieldByType(fieldsForPath, instance, dependency);
-                            if (field == null) {
+                            Map<Field, Object> fieldsToDependencies = selectFieldByType(fieldsForPath, instance,
+                                            dependencyCandidates);
+                            if (fieldsToDependencies == null || fieldsToDependencies.size() == 0) {
                                 throw new IllegalArgumentException(
-                                                makeWiringErrorMessage(instance, focusNode, dependency, null, null)
+                                                makeWiringErrorMessage(instance, focusNode, dependencyCandidates, null,
+                                                                null)
                                                                 + ": unable to identify appropriate field to set");
                             }
-                            setDependency(instance, field.getName(), dependency);
-                            if (logger.isDebugEnabled()) {
-                                logger.debug("wired {} ",
-                                                makeWiringMessage(instance, focusNode, dependency, field));
+                            for (Map.Entry<Field, Object> fieldsToSet : fieldsToDependencies.entrySet()) {
+                                field = fieldsToSet.getKey();
+                                Object dependency = fieldsToSet.getValue();
+                                setDependency(instance, field.getName(), dependency);
+                                if (logger.isDebugEnabled()) {
+                                    logger.debug("wired {} ",
+                                                    makeWiringMessage(instance, focusNode, dependency, field));
+                                }
                             }
                         } catch (Throwable e) {
                             throw new IllegalArgumentException(
-                                            makeWiringErrorMessage(instance, focusNode, dependency, field, e), e);
+                                            makeWiringErrorMessage(instance, focusNode, dependencyCandidates, field, e),
+                                            e);
                         }
                     }
                 }
             }
-        }
+        });
     }
 
     private void extractPath(Map<Path, Set<Field>> fieldsByPath, Field field) {
@@ -433,7 +484,9 @@ public class Shacl2JavaEntityFactory {
             return;
         }
         Stream.of(individualUris)
-                        .map(individualUri -> ctx.getInstanceForFocusNode(NodeFactory.createURI(individualUri)))
+                        .flatMap(individualUri -> ctx.getInstancesForFocusNode(NodeFactory.createURI(individualUri))
+                                        .stream())
+                        .parallel()
                         .forEach(individualInstance -> setDependency(instance, field.getName(), individualInstance));
     }
 
@@ -455,23 +508,42 @@ public class Shacl2JavaEntityFactory {
         return String.format("((%s) %s).%s = %s", instClassStr, focusNodeStr, fieldStr, dependencyStr);
     }
 
-    private Field selectFieldByType(Set<Field> fields, Object instance, Object dependency)
+    private Map<Field, Object> selectFieldByType(Set<Field> fields, Object instance, Set<Object> dependencyCandidates)
                     throws NoSuchFieldException {
+        Map<Field, Object> mapped = new HashMap<>();
         for (Field field : fields) {
-            if (field.getType().isAssignableFrom(dependency.getClass())) {
-                return field;
-            }
-        }
-        for (Field field : fields) {
-            if (field.getType().isAssignableFrom(Set.class)) {
-                Type typeArg = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
-                if (typeArg instanceof Class && ((Class<?>) typeArg).isAssignableFrom(dependency.getClass())) {
-                    return field;
+            for (Object dependency : dependencyCandidates) {
+                if (field.getType().isAssignableFrom(dependency.getClass())) {
+                    mapped.put(field, dependency);
                 }
             }
         }
+        if (mapped.size() == dependencyCandidates.size()) {
+            return mapped;
+        }
+        for (Field field : fields) {
+            if (mapped.containsKey(field)) {
+                continue;
+            }
+            if (Set.class.isAssignableFrom(field.getType())) {
+                try {
+                    Type typeArg = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+                    for (Object dependency : dependencyCandidates) {
+                        if (typeArg instanceof Class && ((Class<?>) typeArg).isAssignableFrom(dependency.getClass())) {
+                            mapped.put(field, dependency);
+                        }
+                    }
+                } catch (ClassCastException e) {
+                    throw e;
+                }
+            }
+        }
+        if (!mapped.isEmpty()) {
+            return mapped;
+        }
         throw new IllegalStateException(String.format(
-                        "Could not find appropriate field for instance %s and dependency %s", instance, dependency));
+                        "Could not find appropriate field for instance %s and dependency candidates %s",
+                        instance, Arrays.toString(dependencyCandidates.toArray())));
     }
 
     private void setDependency(Object instance, String fieldName, Object dependency) {
@@ -524,7 +596,7 @@ public class Shacl2JavaEntityFactory {
 
     private static Map<Path, Set<PropertyShape>> getPropertyShapesByPath(Set<Shape> nodeShapes) {
         Map<Path, Set<PropertyShape>> propertyShapesPerPath = nodeShapes
-                        .stream()
+                        .parallelStream()
                         .flatMap(s -> s.getPropertyShapes().stream())
                         .collect(Collectors.toMap(
                                         s -> s.getPath(),

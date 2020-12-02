@@ -1,28 +1,45 @@
-@base             <https://example.com/test/atom1> .
-@prefix auth:     <https://w3id.org/won/auth#> .
-@prefix msg:      <https://w3id.org/won/message#> .
-@prefix wx-buddy: <https://w3id.org/won/ext/buddy#> .
-@prefix wx-hold:  <https://w3id.org/won/ext/hold#> .
-@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
-@prefix ex:       <https://example.com/test/> .
+@base         <https://example.com/test/atom1> .
+@prefix ex:   <https://example.com/test/> .
+@prefix auth: <https://w3id.org/won/auth#> .
+@prefix won:  <https://w3id.org/won/core#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix atom1:   <http://example.org/test/atom1#> .
+@prefix msg:  <https://w3id.org/won/message#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdfg: <http://www.w3.org/2004/04/trix/rdfg-1/> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
-# grants
-#   - a "buddyOfBuddy" token
-# to atoms bearing a BuddySocket token issued by one of my buddies
+# request read on the whole atom, exact atom state match
+# granted to any connected atom
+
+
+ex:atom1 a won:Atom ;
+         won:socket atom1:buddySocket ;
+         won:state won:Active ;
+         won:messageContainer atom1:msg .
+
+atom1:buddySocket a won:Socket ;
+    won:connections atom1:buddySocketConnections .
+
+atom1:buddySocketConnections rdfs:member atom1:bsConn1 .
+
+atom1:bsConn1 a won:Connection ;
+    won:targetAtom ex:atom2 ;
+    won:connectionState won:Connected .
+
 
 <#authorization>
-    a               auth:Authorization ;
-    auth:bearer     [ auth:scope  wx-buddy:BuddySocket ;
-                      auth:issuer [ auth:socket [ auth:socketType wx-buddy:BuddySocket ;
-                                                  auth:targetAtom [ ] ] ] ] ;
-    auth:grantToken [ auth:scope        "buddyOfBuddy" ;
-                      auth:expiresAfter 3600 ; ] .
+    a auth:Authorization ;
+    auth:grantee [ auth:targetAtom [ ] ] ;
+    auth:grant [
+                   auth:atomState won:Active ;
+                   auth:operation auth:anyOperation
+               ] .
 
 <#request>
-    a                   auth:OperationRequest ;
-    auth:requestor      ex:atom2 ;
-    auth:reqAtom        ex:atom1 ;
-    auth:reqPosition    auth:positionTokenRequest ;
-    auth:reqSocketType  wx-buddy:BuddySocket ;
-    auth:reqSocket      <#buddySocket> ;
-    auth:operation      [ auth:messageTo msg:ConnectMessage ] .
+    a                      auth:OperationRequest ;
+    auth:requestor         ex:atom2 ;
+    auth:reqAtom           ex:atom1 ;
+    auth:reqAtomState      won:Active ;
+    auth:reqPosition       auth:positionRoot ;
+    auth:operation         auth:opRead .

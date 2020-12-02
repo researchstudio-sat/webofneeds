@@ -1,7 +1,9 @@
-package won.shacl2java.sourcegen;
+package won.shacl2java.instantiation;
 
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.shacl.parser.PropertyShape;
 import org.apache.jena.shacl.parser.Shape;
 
 import java.util.Objects;
@@ -11,15 +13,16 @@ public class DerivedInstantiationContext extends InstantiationContext {
     private InstantiationContext parentContext;
 
     public DerivedInstantiationContext(Graph data, InstantiationContext parentContext) {
-        super(data);
+        super();
         Objects.requireNonNull(data);
         Objects.requireNonNull(parentContext);
+        this.data = data;
         this.parentContext = parentContext;
     }
 
     @Override
-    public Class<?> getClassForShape(String shapeUri) {
-        return parentContext.getClassForShape(shapeUri);
+    public Set<Class<?>> getClassesForShape(String shapeUri) {
+        return parentContext.getClassesForShape(shapeUri);
     }
 
     @Override
@@ -54,11 +57,11 @@ public class DerivedInstantiationContext extends InstantiationContext {
     }
 
     @Override
-    public Object getInstanceForFocusNode(Node focusNode) {
+    public Set<Object> getInstancesForFocusNode(Node focusNode) {
         if (super.hasInstanceForFocusNode(focusNode)) {
-            return super.getInstanceForFocusNode(focusNode);
+            return super.getInstancesForFocusNode(focusNode);
         }
-        return parentContext.getInstanceForFocusNode(focusNode);
+        return parentContext.getInstancesForFocusNode(focusNode);
     }
 
     @Override
@@ -77,5 +80,24 @@ public class DerivedInstantiationContext extends InstantiationContext {
     @Override
     public boolean hasShapesForFocusNode(Node node) {
         return super.hasShapesForFocusNode(node) || parentContext.hasShapesForFocusNode(node);
+    }
+
+    @Override
+    public boolean hasShapeForFocusNode(Node node, Shape shape) {
+        return super.hasShapeForFocusNode(node, shape) || parentContext.hasShapeForFocusNode(node, shape);
+    }
+
+    @Override
+    public Set<Object> getInstances(String uri) {
+        Node uriNode = NodeFactory.createURI(uri);
+        if (super.hasInstanceForFocusNode(uriNode)) {
+            return super.getInstances(uri);
+        }
+        return parentContext.getInstances(uri);
+    }
+
+    @Override
+    public Set<Node> getNodeShapesForPropertyShape(PropertyShape propertyShape) {
+        return parentContext.getNodeShapesForPropertyShape(propertyShape);
     }
 }

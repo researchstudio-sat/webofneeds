@@ -14,6 +14,7 @@
     <artifactId>won-auth</artifactId>
     <properties>
             <shacl2java.generate-sources.outputDir>${project.basedir}/target/generated-sources/shacl2java</shacl2java.generate-sources.outputDir>
+        <shacl2java.generate-test-sources.outputDir>${project.basedir}/target/generated-test-sources/shacl2java</shacl2java.generate-test-sources.outputDir>
     </properties>
 
     <dependencies>
@@ -83,6 +84,19 @@
                             <commandlineArgs>-p won.auth.model -o ${shacl2java.generate-sources.outputDir} ${project.basedir}/src/main/resources/shacl/won-auth-shapes.ttl -vc https://w3id.org/won/auth#TreeExpressionShape</commandlineArgs>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>shacl2java-generate-auth-test-classes</id>
+                        <!-- the phase should be 'generate-sources', and 'process-sources'
+                        for the next two plugins (right?), but that does not work.-->
+                        <phase>process-test-sources</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>won.shacl2java.Shacl2JavaSrcGenCommand</mainClass>
+                            <commandlineArgs>-p won.auth.test.model -o ${shacl2java.generate-test-sources.outputDir} ${project.basedir}/src/main/resources/shacl/won-test-atom-shapes.ttl </commandlineArgs>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -101,6 +115,18 @@
                             </sources>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>add-test-sources</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${shacl2java.generate-test-sources.outputDir}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -108,21 +134,36 @@
                 <artifactId>formatter-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>format-generated</id>
+                        <id>format-generated-sources</id>
                         <phase>generate-resources</phase>
                         <goals>
                             <goal>format</goal>
                         </goals>
+                        <configuration>
+                            <configFile>eclipse/formatter.xml</configFile>
+                            <encoding>UTF-8</encoding>
+                            <lineEnding>LF</lineEnding>
+                            <directories>
+                                <directory>${shacl2java.generate-sources.outputDir}</directory>
+                            </directories>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>format-generated-test-sources</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>format</goal>
+                        </goals>
+                        <configuration>
+                            <configFile>eclipse/formatter.xml</configFile>
+                            <encoding>UTF-8</encoding>
+                            <lineEnding>LF</lineEnding>
+                            <directories>
+                                <directory>${shacl2java.generate-test-sources.outputDir}</directory>
+                            </directories>
+                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <configFile>eclipse/formatter.xml</configFile>
-                    <encoding>UTF-8</encoding>
-                    <lineEnding>LF</lineEnding>
-                    <directories>
-                        <directory>${shacl2java.generate-sources.outputDir}</directory>
-                    </directories>
-                </configuration>
             </plugin>
 
         </plugins>

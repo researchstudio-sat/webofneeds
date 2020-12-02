@@ -95,19 +95,33 @@ public class SourceGeneratorTests {
     }
 
     @Test
+    public void test3() throws IOException {
+        Shapes shapes = loadShapes(testBaseFolder.createRelative("test3/shapes.ttl"));
+        String outputDir = getOutputDir().getAbsolutePath();
+        Shacl2JavaConfig config = Shacl2JavaConfig.builder()
+                        .packageName("test2")
+                        .classNameRegexReplace("(Property)?Shape$", "")
+                        .outputDir(outputDir).build();
+        SourceGenerator gen = new SourceGenerator();
+        List<TypeSpec> typeSpecs = gen.generateTypes(shapes, config);
+        SourceGenerator.writeClasses(typeSpecs, config);
+        logger.debug("wrote classes to {} ", outputDir);
+    }
+
+    @Test
     public void test1Generated_data001() throws IOException {
         Shapes shapes = loadShapes(testBaseFolder.createRelative("test1/shapes.ttl"));
         Shacl2JavaConfig config = Shacl2JavaConfig.builder()
                         .packageName("test1").build();
         Model data = loadData(testBaseFolder.createRelative("test1/data-001.ttl"));
-        Shacl2JavaEntityFactory factory = new Shacl2JavaEntityFactory(shapes, config.getPackageName());
+        Shacl2JavaInstanceFactory factory = new Shacl2JavaInstanceFactory(shapes, config.getPackageName());
         factory.load(data.getGraph());
-        Map<String, Object> entities = factory.getInstanceMap();
+        Map<String, Set<Object>> entities = factory.getInstanceMap();
         Assert.assertEquals(4, entities.size());
-        Object o = entities.get("https://example.com/ns#Bob");
+        Object o = entities.get("https://example.com/ns#Bob").stream().findFirst().get();
         Assert.assertEquals(Person.class, o.getClass());
         Person bob = (Person) o;
-        o = entities.get("https://example.com/ns#BobsAddress");
+        o = entities.get("https://example.com/ns#BobsAddress").stream().findFirst().get();
         Assert.assertEquals(Address.class, o.getClass());
         Assert.assertSame(o, bob.getAddresses().stream().findFirst().get());
         Assert.assertEquals("1234", bob.getAddresses().stream().findFirst().get().getPostalCode());
@@ -119,11 +133,11 @@ public class SourceGeneratorTests {
         Shacl2JavaConfig config = Shacl2JavaConfig.builder()
                         .packageName("test2").build();
         Model data = loadData(testBaseFolder.createRelative("test2/auth-001.ttl"));
-        Shacl2JavaEntityFactory factory = new Shacl2JavaEntityFactory(shapes, config.getPackageName());
+        Shacl2JavaInstanceFactory factory = new Shacl2JavaInstanceFactory(shapes, config.getPackageName());
         factory.load(data.getGraph());
-        Map<String, Object> entities = factory.getInstanceMap();
+        Map<String, Set<Object>> entities = factory.getInstanceMap();
         Assert.assertEquals(4, entities.size());
-        Object o = entities.get("https://example.com/test/atom1#authorization1");
+        Object o = entities.get("https://example.com/test/atom1#authorization1").stream().findFirst().get();
         Assert.assertEquals(Authorization.class, o.getClass());
         Authorization authShape = (Authorization) o;
         Assert.assertEquals(1, authShape.getGranteesAtomExpression().size());
@@ -144,11 +158,11 @@ public class SourceGeneratorTests {
         Shacl2JavaConfig config = Shacl2JavaConfig.builder()
                         .packageName("test2").build();
         Model data = loadData(testBaseFolder.createRelative("test2/auth-002.ttl"));
-        Shacl2JavaEntityFactory factory = new Shacl2JavaEntityFactory(shapes, config.getPackageName());
+        Shacl2JavaInstanceFactory factory = new Shacl2JavaInstanceFactory(shapes, config.getPackageName());
         factory.load(data.getGraph());
-        Map<String, Object> entities = factory.getInstanceMap();
-        Assert.assertEquals(10, entities.size());
-        Object o = entities.get("https://example.com/test/atom1#authorization5");
+        Map<String, Set<Object>> entities = factory.getInstanceMap();
+        Assert.assertEquals(12, entities.size());
+        Object o = entities.get("https://example.com/test/atom1#authorization5").stream().findFirst().get();
         Assert.assertEquals(Authorization.class, o.getClass());
         Authorization authShape = (Authorization) o;
         Assert.assertEquals(1, authShape.getGranteesAtomExpression().size());
@@ -160,11 +174,11 @@ public class SourceGeneratorTests {
         Shacl2JavaConfig config = Shacl2JavaConfig.builder()
                         .packageName("test2").build();
         Model data = loadData(testBaseFolder.createRelative("test2/auth-003.ttl"));
-        Shacl2JavaEntityFactory factory = new Shacl2JavaEntityFactory(shapes, config.getPackageName());
+        Shacl2JavaInstanceFactory factory = new Shacl2JavaInstanceFactory(shapes, config.getPackageName());
         factory.load(data.getGraph());
-        Map<String, Object> entities = factory.getInstanceMap();
+        Map<String, Set<Object>> entities = factory.getInstanceMap();
         Assert.assertEquals(8, entities.size());
-        Object o = entities.get("https://example.com/test/atom1#authorization2");
+        Object o = entities.get("https://example.com/test/atom1#authorization2").stream().findFirst().get();
         Assert.assertEquals(Authorization.class, o.getClass());
         Authorization authShape = (Authorization) o;
         Assert.assertEquals(1, authShape.getGranteesAtomExpression().size());

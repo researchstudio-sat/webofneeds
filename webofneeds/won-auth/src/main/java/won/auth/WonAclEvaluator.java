@@ -6,9 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.auth.check.TargetAtomCheck;
 import won.auth.check.TargetAtomCheckEvaluator;
-import won.auth.check.TokenValidator;
 import won.auth.model.*;
-import won.shacl2java.Shacl2JavaEntityFactory;
+import won.shacl2java.Shacl2JavaInstanceFactory;
 
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
@@ -17,40 +16,32 @@ import java.util.*;
 import static won.auth.model.PredefinedAtomExpression.ANY_ATOM;
 import static won.auth.model.PredefinedGranteeExpression.ANYONE;
 
-
 public class WonAclEvaluator {
-
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
     private TargetAtomCheckEvaluator targetAtomCheckEvaluator;
-    private TokenValidator tokenValidator;
-    private Shacl2JavaEntityFactory entityFactory;
+    private Shacl2JavaInstanceFactory entityFactory;
 
-    public WonAclEvaluator(TargetAtomCheckEvaluator targetAtomCheckEvaluator, Shapes shapes) {
+    public WonAclEvaluator(Shapes shapes, TargetAtomCheckEvaluator targetAtomCheckEvaluator) {
         this.targetAtomCheckEvaluator = targetAtomCheckEvaluator;
-        this.entityFactory = new Shacl2JavaEntityFactory(shapes, "won.auth.model");
+        this.entityFactory = new Shacl2JavaInstanceFactory(shapes, "won.auth.model");
     }
 
     public void loadData(Graph dataGraph) {
-        long start = System.currentTimeMillis();
         this.entityFactory.load(dataGraph);
-        if (logger.isDebugEnabled()){
-            logger.debug("loaded entity factory in {} ms", System.currentTimeMillis() - start);
-        }
     }
 
     public Set<Authorization> getAutorizations() {
         return this.entityFactory
-                .getEntitiesOfType(Authorization.class);
+                        .getInstancesOfType(Authorization.class);
     }
 
     public Set<OperationRequest> getOperationRequests() {
-        return this.entityFactory.getEntitiesOfType(OperationRequest.class);
+        return this.entityFactory.getInstancesOfType(OperationRequest.class);
     }
 
-    private static AclEvalResult accessControlDecision(boolean decision){
+    private static AclEvalResult accessControlDecision(boolean decision) {
         AclEvalResult acd = new AclEvalResult();
-        if (decision){
+        if (decision) {
             acd.setDecision(DecisionValue.ACCESS_GRANTED);
         } else {
             acd.setDecision(DecisionValue.ACCESS_DENIED);
@@ -61,13 +52,12 @@ public class WonAclEvaluator {
     public AclEvalResult decide(Authorization authorization, OperationRequest request) {
         long start = System.currentTimeMillis();
         try {
-            //determine if the requestor is in the set of grantees
+            // determine if the requestor is in the set of grantees
             if (!isRequestorAGrantee(authorization, request)) {
                 debug("requestor {} is not grantee", authorization, request, request.getRequestor());
                 return accessControlDecision(false);
             }
-
-            //determine if the operation is granted
+            // determine if the operation is granted
             if (isOperationGranted(authorization, request)) {
                 debug("operation is granted", authorization, request);
                 return accessControlDecision(true);
@@ -75,30 +65,27 @@ public class WonAclEvaluator {
             debug("operation is not granted", authorization, request);
             return accessControlDecision(false);
         } finally {
-            if (logger.isDebugEnabled()){
+            if (logger.isDebugEnabled()) {
                 debug("decision took {} ms", authorization, request, System.currentTimeMillis() - start);
             }
         }
     }
 
-
     private static boolean isOperationGranted(Authorization authorization, OperationRequest request) {
-
         for (AseRoot root : authorization.getGrants()) {
             OperationRequestChecker operationRequestChecker = new OperationRequestChecker(request);
             root.acceptRecursively(operationRequestChecker, false);
             boolean finalDecision = operationRequestChecker.getFinalDecision();
             debug("operation granted: {}", authorization, request, finalDecision);
-            if (finalDecision){
+            if (finalDecision) {
                 return true;
             }
         }
-
         return false;
     }
 
-    public boolean isRequestorAGrantee(Authorization authorization, OperationRequest request) {
-        //fast check: check for direct referenct
+    private boolean isRequestorAGrantee(Authorization authorization, OperationRequest request) {
+        // fast check: check for direct referenct
         if (ANYONE.equals(authorization.getGranteePredefinedGranteeExpression())) {
             return true;
         }
@@ -116,7 +103,7 @@ public class WonAclEvaluator {
         }
         debug("looking for grantee in atom structure expressions", authorization, request);
         for (AseRoot root : authorization.getGranteesAseRoot()) {
-            TargetAtomCheckGenerator v = new TargetAtomCheckGenerator();
+            TargetAtomCheckGenerator v = new TargetAtomCheckGenerator(request.getReqAtom(), requestor);
             root.acceptRecursively(v, false);
             for (TargetAtomCheck check : v.getTargetAtomChecks()) {
                 if (this.targetAtomCheckEvaluator.isAllowedTargetAtom(requestor, check)) {
@@ -128,7 +115,6 @@ public class WonAclEvaluator {
         return false;
     }
 
-
     private static void debug(String message, Authorization auth, OperationRequest request, Object... params) {
         if (logger.isDebugEnabled()) {
             Object[] logParams = new Object[params.length + 2];
@@ -138,7 +124,4 @@ public class WonAclEvaluator {
             logger.debug("AuthCheck: " + message + " ({} against {})", logParams);
         }
     }
-
-
-
 }

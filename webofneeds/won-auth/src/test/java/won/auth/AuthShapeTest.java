@@ -110,9 +110,9 @@ public class AuthShapeTest {
 
     public static Stream<Resource> getOperationRequests() throws IOException {
         Resource[] okFiles = ResourcePatternUtils.getResourcePatternResolver(loader)
-                .getResources("classpath:/won/opreq/ok/*.ttl");
+                        .getResources("classpath:/won/opreq/ok/*.ttl");
         Resource[] failFiles = ResourcePatternUtils.getResourcePatternResolver(loader)
-                .getResources("classpath:/won/opreq/ok/*.ttl");
-        return Stream.concat(Stream.of(okFiles),Stream.of(failFiles));
+                        .getResources("classpath:/won/opreq/ok/*.ttl");
+        return Stream.concat(Stream.of(okFiles), Stream.of(failFiles));
     }
 }

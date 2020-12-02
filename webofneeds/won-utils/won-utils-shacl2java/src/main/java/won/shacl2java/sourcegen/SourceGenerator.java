@@ -346,9 +346,11 @@ public class SourceGenerator {
                 String propertyName = NameUtils.propertyNameForPath(path);
                 logger.debug("generating property '{}' of {}", propertyName, NameUtils.nameForShape(relevantShape));
                 Set<PropertySpec> propertySpecs = propSpecsPerPath.get(path);
-                logger.debug("found property specs: \n{}",
-                                propertySpecs.stream().map(Object::toString)
-                                                .collect(Collectors.joining("\n", "\n", "\n")));
+                if (logger.isDebugEnabled()) {
+                    for (PropertySpec propertySpec : propertySpecs) {
+                        logger.debug("\tfound property spec: {}", propertySpec);
+                    }
+                }
                 boolean addTypeSuffix = propertySpecs.size() > 1;
                 for (PropertySpec propertySpec : propertySpecs) {
                     addFieldWithPropertySpec(propertyName, path, propertySpec, typeBuilder, fieldsPerPath, config,

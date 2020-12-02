@@ -7,7 +7,6 @@ import won.auth.check.TokenValidator;
 import java.net.URI;
 
 public class AcceptAll implements TargetAtomCheckEvaluator, TokenValidator {
-
     @Override
     public boolean isAllowedTargetAtom(URI atom, TargetAtomCheck check) {
         return true;
