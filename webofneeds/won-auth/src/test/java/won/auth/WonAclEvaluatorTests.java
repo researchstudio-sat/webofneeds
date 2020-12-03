@@ -1,5 +1,6 @@
 package won.auth;
 
+import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
@@ -22,16 +23,21 @@ import org.springframework.core.io.support.ResourcePatternUtils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
-import won.auth.model.AclEvalResult;
-import won.auth.model.Authorization;
-import won.auth.model.DecisionValue;
-import won.auth.model.OperationRequest;
+import won.auth.ModelBasedTargetAtomCheckEvaluator;
+import won.auth.WonAclEvaluator;
+import won.auth.model.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+
+import static org.apache.jena.vocabulary.VCARD4.Date;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class)
@@ -120,6 +126,26 @@ public class WonAclEvaluatorTests {
                         });
     }
 
+    @Test
+    public void testWonAcl_spec() throws IOException {
+        Shapes shapes = loadShapes(shapesDef);
+        Shapes atomDataShapes = loadShapes(atomDataShapesDef);
+        ModelBasedTargetAtomCheckEvaluator targetAtomChecker = new ModelBasedTargetAtomCheckEvaluator(atomDataShapes,
+                        "won.auth.test.model");
+        WonAclEvaluator evaluator = withDurationLog("initializing WonAclEvaluator",
+                        () -> new WonAclEvaluator(shapes, targetAtomChecker));
+        getSpecOperationRequests().forEach(
+                        testCaseResource -> {
+                            Graph graph = null;
+                            try {
+                                evaluateTestWithSpec(shapes, atomDataShapes, evaluator, targetAtomChecker,
+                                                testCaseResource);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        });
+    }
+
     private void evaluateTest(Shapes shapes, Shapes atomDataShapes,
                     WonAclEvaluator evaluator, ModelBasedTargetAtomCheckEvaluator targetAtomChecker, Resource resource,
                     DecisionValue accessDenied)
@@ -134,9 +160,27 @@ public class WonAclEvaluatorTests {
         withDurationLog("instantiating test atom entities",
                         () -> targetAtomChecker.loadData(graph));
         withDurationLog("instantiating auth/req entities",
-                        () ->   evaluator.loadData(graph));
+                        () -> evaluator.loadData(graph));
         withDurationLog("making auth decision",
                         () -> checkExpectedAuthDecision(evaluator, accessDenied, resource.getFilename()));
+    }
+
+    private void evaluateTestWithSpec(Shapes shapes, Shapes atomDataShapes,
+                    WonAclEvaluator evaluator, ModelBasedTargetAtomCheckEvaluator targetAtomChecker, Resource resource)
+                    throws IOException {
+        logger.debug("test case: {}", resource.getFilename());
+        Graph graph = withDurationLog("loading data graph ",
+                        () -> loadGraph(resource));
+        withDurationLog("validating with auth shapes",
+                        () -> validateTestData(shapes, graph, true, shapesDef.getFilename()));
+        withDurationLog("validating with atom test data shapes",
+                        () -> validateTestData(atomDataShapes, graph, false, atomDataShapesDef.getFilename()));
+        withDurationLog("instantiating test atom entities",
+                        () -> targetAtomChecker.loadData(graph));
+        withDurationLog("instantiating auth/req entities",
+                        () -> evaluator.loadData(graph));
+        withDurationLog("making auth decision",
+                        () -> checkSpecifiedAuthDecision(evaluator, resource.getFilename()));
     }
 
     private static void withDurationLog(String message, Runnable runnable) {
@@ -174,17 +218,83 @@ public class WonAclEvaluatorTests {
 
     private void checkExpectedAuthDecision(WonAclEvaluator loadedEvaluator, DecisionValue expected,
                     String testIdentifier) {
-        for (Authorization auth : loadedEvaluator.getAutorizations()) {
+        for (Authorization auth : loadedEvaluator.getAuthorizations()) {
             for (OperationRequest opReq : loadedEvaluator.getOperationRequests()) {
                 logger.debug("checking OpRequest {} against Authorization {} ", opReq.get_node(), auth.get_node());
                 String message = getWrongAuthDecisionMessage(testIdentifier, expected, auth, opReq);
                 AclEvalResult decision = null;
                 long start = System.currentTimeMillis();
-                for (int i = 0; i < 1; i++) {
-                    decision = loadedEvaluator.decide(auth, opReq);
-                }
+                decision = loadedEvaluator.decide(auth, opReq);
                 logDuration("making authorization decision", start);
                 Assert.assertEquals(message, expected, decision.getDecision());
+            }
+        }
+    }
+
+    private void checkSpecifiedAuthDecision(WonAclEvaluator loadedEvaluator, String testIdentifier) {
+        for (ExpectedAclEvalResult spec : loadedEvaluator.getInstanceFactory()
+                        .getInstancesOfType(ExpectedAclEvalResult.class)) {
+            logger.debug("using spec {} for testing...", spec);
+            OperationRequest opReq = spec.getRequestedOperation();
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(new Date());
+            cal.add(Calendar.MINUTE, 30);
+            opReq.getBearsTokens().forEach(token -> token.setTokenExp(new XSDDateTime(cal)));
+            for (Authorization auth : loadedEvaluator.getAuthorizations()) {
+                logger.debug("checking OpRequest {} against Authorization {} ", opReq.get_node(), auth.get_node());
+                DecisionValue expected = spec.getDecision();
+                String message = getWrongAuthDecisionMessage(testIdentifier, expected, auth, opReq);
+                AclEvalResult decision = null;
+                long start = System.currentTimeMillis();
+                decision = loadedEvaluator.decide(auth, opReq);
+                logDuration("making authorization decision", start);
+                Assert.assertEquals(message, expected, decision.getDecision());
+                if (!spec.getIssueTokens().isEmpty()) {
+                    for (AuthTokenTestSpec tokenSpec : spec.getIssueTokens()) {
+                        Assert.assertTrue("Issued token does not match any of the specified ones",
+                                        decision.getIssueTokens().stream().anyMatch(actualToken -> {
+                                            if (!tokenSpec.getTokenIss().equals(actualToken.getTokenIss())) {
+                                                return false;
+                                            }
+                                            if (!tokenSpec.getTokenSub().equals(actualToken.getTokenSub())) {
+                                                return false;
+                                            }
+                                            if (tokenSpec.getTokenScopeString() != null) {
+                                                if (!tokenSpec.getTokenScopeString()
+                                                                .equals(actualToken.getTokenScopeString())) {
+                                                    return false;
+                                                }
+                                            }
+                                            if (tokenSpec.getTokenScopeURI() != null) {
+                                                if (!tokenSpec.getTokenScopesUnion()
+                                                                .equals(actualToken.getTokenScopeURI())) {
+                                                    return false;
+                                                }
+                                            }
+                                            Instant expiry = actualToken.getTokenExp().asCalendar().toInstant();
+                                            Instant issuedAt = actualToken.getTokenExp().asCalendar().toInstant();
+                                            Instant now = Instant.now();
+                                            Duration validityPeriod = Duration.between(issuedAt, expiry);
+                                            Duration timeSinceCreation = Duration.between(issuedAt, now);
+                                            if (Duration.ofSeconds(1).compareTo(timeSinceCreation.abs()) > 0) {
+                                                return false;
+                                            }
+                                            if (tokenSpec.getExpiresAfterInteger() != null) {
+                                                if (Duration.ofSeconds(tokenSpec.getExpiresAfterInteger())
+                                                                .compareTo(validityPeriod) != 0) {
+                                                    return false;
+                                                }
+                                            }
+                                            if (tokenSpec.getExpiresAfterLong() != null) {
+                                                if (Duration.ofSeconds(tokenSpec.getExpiresAfterLong())
+                                                                .compareTo(validityPeriod) != 0) {
+                                                    return false;
+                                                }
+                                            }
+                                            return true;
+                                        }));
+                    }
+                }
             }
         }
     }
@@ -208,6 +318,12 @@ public class WonAclEvaluatorTests {
     public static Stream<Resource> getFailOperationRequests() throws IOException {
         Resource[] files = ResourcePatternUtils.getResourcePatternResolver(loader)
                         .getResources("classpath:/won/opreq/fail/opreq*.ttl");
+        return Stream.of(files);
+    }
+
+    public static Stream<Resource> getSpecOperationRequests() throws IOException {
+        Resource[] files = ResourcePatternUtils.getResourcePatternResolver(loader)
+                        .getResources("classpath:/won/opreq/spec/opreq*.ttl");
         return Stream.of(files);
     }
 }

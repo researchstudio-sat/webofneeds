@@ -1,0 +1,32 @@
+@base             <https://example.com/test/atom1> .
+@prefix ex:       <https://example.com/test/> .
+@prefix auth:     <https://w3id.org/won/auth#> .
+@prefix won:      <https://w3id.org/won/core#> .
+@prefix wx-buddy: <https://w3id.org/won/ext/buddy#> .
+@prefix wx-chat: <https://w3id.org/won/ext/chat#> .
+@prefix wx-hold: <https://w3id.org/won/ext/hold#> .
+
+# request to read a message in a chatSocket connection
+
+
+
+<#authorization>
+    a            auth:Authorization ;
+    auth:grantee [ auth:atom auth:anyAtom ] ;
+    auth:grant   [ auth:socket    [ auth:socketType wx-chat:ChatSocket;
+                                    auth:operation  auth:opRead ; ] ] .
+
+
+<#request>
+    a                   auth:OperationRequest ;
+    auth:requestor      ex:atom2 ;
+    auth:reqAtom        ex:atom1 ;
+    auth:reqPosition    auth:positionConnectionMessage ;
+    auth:reqSocketType  wx-chat:ChatSocket ;
+    auth:reqSocket      <#chatSocket> ;
+    auth:reqConnections <#chatSocket/c> ;
+    auth:reqConnection  <#chatSocket/c/conn123> ;
+    auth:reqConnectionState  won:Connected ;
+    auth:reqConnectionMessages <#chatSocket/c/conn123/msg> ;
+    auth:reqConnectionMessage <wm:/message1234> ;
+    auth:operation      auth:opRead .

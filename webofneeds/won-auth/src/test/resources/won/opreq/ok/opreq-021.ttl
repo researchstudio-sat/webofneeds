@@ -13,10 +13,14 @@
     a            auth:Authorization ;
     auth:grantee [ auth:atom auth:anyAtom ] ;
     auth:grant   [ auth:socket [ auth:socketType  wx-chat:ChatSocket ;
-                                 auth:connections [ auth:connection [ auth:operation          auth:opRead ;
+                                 auth:operation   auth:opRead ;
+#allow the read
+                                 auth:connections [ auth:connection [ auth:inherit            false ;
+# don't inherit
                                                                       auth:connectionMessages
                                                                                               [ auth:connectionMessage
-                                                                                                      [ ] ] ] ] ] ] .
+                                                                                                      [ auth:operation # allow specifically
+                                                                                                              auth:opRead ] ] ] ] ] ] .
 
 
 <#request>

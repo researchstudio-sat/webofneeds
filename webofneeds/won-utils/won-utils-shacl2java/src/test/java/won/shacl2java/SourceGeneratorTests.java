@@ -136,7 +136,7 @@ public class SourceGeneratorTests {
         Shacl2JavaInstanceFactory factory = new Shacl2JavaInstanceFactory(shapes, config.getPackageName());
         factory.load(data.getGraph());
         Map<String, Set<Object>> entities = factory.getInstanceMap();
-        Assert.assertEquals(4, entities.size());
+        Assert.assertEquals(5, entities.size());
         Object o = entities.get("https://example.com/test/atom1#authorization1").stream().findFirst().get();
         Assert.assertEquals(Authorization.class, o.getClass());
         Authorization authShape = (Authorization) o;
@@ -177,7 +177,7 @@ public class SourceGeneratorTests {
         Shacl2JavaInstanceFactory factory = new Shacl2JavaInstanceFactory(shapes, config.getPackageName());
         factory.load(data.getGraph());
         Map<String, Set<Object>> entities = factory.getInstanceMap();
-        Assert.assertEquals(8, entities.size());
+        Assert.assertEquals(10, entities.size());
         Object o = entities.get("https://example.com/test/atom1#authorization2").stream().findFirst().get();
         Assert.assertEquals(Authorization.class, o.getClass());
         Authorization authShape = (Authorization) o;

@@ -1,0 +1,94 @@
+@base             <https://example.com/test/atom1> .
+@prefix ex:       <https://example.com/test/> .
+@prefix auth:     <https://w3id.org/won/auth#> .
+@prefix won:      <https://w3id.org/won/core#> .
+@prefix wx-buddy: <https://w3id.org/won/ext/buddy#> .
+@prefix wx-hold:  <https://w3id.org/won/ext/hold#> .
+@prefix owl:      <http://www.w3.org/2002/07/owl#> .
+@prefix atom1:    <http://example.org/test/atom1#> .
+@prefix msg:      <https://w3id.org/won/message#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdfg:     <http://www.w3.org/2004/04/trix/rdfg-1/> .
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+
+ex:atom1
+    a                    won:Atom ;
+    won:socket           atom1:buddySocket, ex:exSocket ;
+    won:state            won:Active ;
+    won:messageContainer atom1:msg .
+
+atom1:buddySocket
+    a                    won:Socket ;
+    won:socketDefinition wx-buddy:BuddySocket ;
+    won:connections      atom1:buddySocketConnections .
+
+ex:exSocket
+    a                    won:Socket ;
+    won:socketDefinition ex:ExSocketDef ;
+    won:connections      atom1:exSocketConnections .
+
+
+atom1:buddySocketConnections
+    rdfs:member atom1:bsConn1, atom1:bsConn2 .
+
+atom1:exSocketConnections
+    rdfs:member atom1:exConn1 .
+
+atom1:bsConn1
+    a                   won:Connection ;
+    won:targetAtom      ex:atom2 ;
+    won:connectionState won:RequestSent .
+
+atom1:bsConn2
+    a                   won:Connection ;
+    won:targetAtom      ex:atom3 ;
+    won:connectionState won:RequestReceived .
+
+
+atom1:exConn1
+    a                   won:Connection ;
+    won:targetAtom      ex:atom4 ;
+    won:connectionState won:RequestSent .
+
+<#authorization>
+    a            auth:Authorization ;
+    auth:grantee [   auth:targetAtom [ ] ; #allows connected - but none here are
+                     auth:socket [ auth:socketIri  atom1:bsConn1 ;
+                                   auth:connections [ auth:connection [ auth:targetAtom      [ ] ;
+                                                                      auth:connectionState won:RequestReceived ] ] ] ;
+                     auth:socket [ auth:socketType wx-buddy:BuddySocket ;
+                                   auth:connections [ auth:connection [ auth:targetAtom      [ ] ;
+                                                                        auth:connectionState won:Connected ] ] ] ;
+# requires state won:Connected
+                   auth:socket [ auth:socketType ex:ExSocketDef ;
+                                 auth:targetAtom [ ] ;
+                                 auth:connections [auth:connectionState won:RequestSent ] ; # target atom is at socket level
+                               ]
+                 ] ;
+    auth:grant   [ auth:atomState won:Active ;
+                   auth:operation auth:anyOperation ] .
+
+<#request1>
+    a                 auth:OperationRequest ;
+    auth:requestor    ex:atom2 ;
+    auth:reqAtom      ex:atom1 ;
+    auth:reqAtomState won:Active ;
+    auth:reqPosition  auth:positionRoot ;
+    auth:operation    auth:opRead .
+
+<#request2>
+    a                 auth:OperationRequest ;
+    auth:requestor    ex:atom3 ;
+    auth:reqAtom      ex:atom1 ;
+    auth:reqAtomState won:Active ;
+    auth:reqPosition  auth:positionRoot ;
+    auth:operation    auth:opRead .
+
+<#request3>
+    a                 auth:OperationRequest ;
+    auth:requestor    ex:atom4 ;
+    auth:reqAtom      ex:atom1 ;
+    auth:reqAtomState won:Active ;
+    auth:reqPosition  auth:positionRoot ;
+    auth:operation    auth:opRead .

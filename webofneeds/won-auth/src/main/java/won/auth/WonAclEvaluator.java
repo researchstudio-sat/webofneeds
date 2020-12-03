@@ -11,32 +11,35 @@ import won.shacl2java.Shacl2JavaInstanceFactory;
 
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
+import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static won.auth.model.PredefinedAtomExpression.ANY_ATOM;
+import static won.auth.model.PredefinedAtomExpression.SELF;
 import static won.auth.model.PredefinedGranteeExpression.ANYONE;
 
 public class WonAclEvaluator {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private TargetAtomCheckEvaluator targetAtomCheckEvaluator;
-    private Shacl2JavaInstanceFactory entityFactory;
+    private Shacl2JavaInstanceFactory instanceFactory;
 
     public WonAclEvaluator(Shapes shapes, TargetAtomCheckEvaluator targetAtomCheckEvaluator) {
         this.targetAtomCheckEvaluator = targetAtomCheckEvaluator;
-        this.entityFactory = new Shacl2JavaInstanceFactory(shapes, "won.auth.model");
+        this.instanceFactory = new Shacl2JavaInstanceFactory(shapes, "won.auth.model");
     }
 
     public void loadData(Graph dataGraph) {
-        this.entityFactory.load(dataGraph);
+        this.instanceFactory.load(dataGraph);
     }
 
-    public Set<Authorization> getAutorizations() {
-        return this.entityFactory
+    public Set<Authorization> getAuthorizations() {
+        return this.instanceFactory
                         .getInstancesOfType(Authorization.class);
     }
 
     public Set<OperationRequest> getOperationRequests() {
-        return this.entityFactory.getInstancesOfType(OperationRequest.class);
+        return this.instanceFactory.getInstancesOfType(OperationRequest.class);
     }
 
     private static AclEvalResult accessControlDecision(boolean decision) {
@@ -55,6 +58,11 @@ public class WonAclEvaluator {
             // determine if the requestor is in the set of grantees
             if (!isRequestorAGrantee(authorization, request)) {
                 debug("requestor {} is not grantee", authorization, request, request.getRequestor());
+                if (isRequestorBearerOfAcceptedToken(authorization, request)) {
+                    debug("requestor {} has an accepted token", authorization, request, request.getRequestor());
+                    return accessControlDecision(true);
+                }
+                debug("requestor {} does not have an accepted token", authorization, request, request.getRequestor());
                 return accessControlDecision(false);
             }
             // determine if the operation is granted
@@ -103,16 +111,112 @@ public class WonAclEvaluator {
         }
         debug("looking for grantee in atom structure expressions", authorization, request);
         for (AseRoot root : authorization.getGranteesAseRoot()) {
-            TargetAtomCheckGenerator v = new TargetAtomCheckGenerator(request.getReqAtom(), requestor);
-            root.acceptRecursively(v, false);
-            for (TargetAtomCheck check : v.getTargetAtomChecks()) {
-                if (this.targetAtomCheckEvaluator.isAllowedTargetAtom(requestor, check)) {
-                    debug("requestor {} is grantee of Atom Structure Expression", authorization, request, requestor);
-                    return true;
-                }
+            URI baseAtom = request.getReqAtom();
+            if (isTargetAtom(requestor, baseAtom, root))
+                return true;
+        }
+        return false;
+    }
+
+    private boolean isTargetAtom(URI candidate, URI baseAtom, AseRoot aseRoot) {
+        TargetAtomCheckGenerator v = new TargetAtomCheckGenerator(baseAtom, candidate);
+        aseRoot.acceptRecursively(v, false);
+        for (TargetAtomCheck check : v.getTargetAtomChecks()) {
+            if (this.targetAtomCheckEvaluator.isRequestorAllowedTarget(check)) {
+                return true;
             }
         }
         return false;
+    }
+
+    private boolean isRequestorBearerOfAcceptedToken(Authorization authorization, OperationRequest request) {
+        Set<AuthToken> decoded = new HashSet<>();
+        decoded.addAll(request.getBearsTokens());
+        Set<String> encodedTokens = request.getBearsEncodedTokens();
+        decoded.addAll(decodeAuthTokens(encodedTokens));
+        decoded = decoded.stream()
+                        .filter(token -> isTokenValid(token))
+                        .collect(Collectors.toSet());
+        debug("valid tokens: {}", authorization, request, decoded.size());
+        for (TokenShape tokenShape : authorization.getBearers()) {
+            Set<AseRoot> aseRoots = tokenShape.getIssuersAseRoot();
+            Set<AtomExpression> atomExpressions = tokenShape.getIssuersAtomExpression();
+            Set<AuthToken> elegibleTokens = filterTokensByScope(decoded, tokenShape);
+            debug("tokens with correct scope: {}", authorization, request, elegibleTokens.size());
+            if (isIssuerAccepted(elegibleTokens, aseRoots, atomExpressions, request.getReqAtom())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Set<AuthToken> filterTokensByScope(Set<AuthToken> decoded, TokenShape tokenShape) {
+        Set<String> requiredScopeStrings = tokenShape.getScopesString();
+        Set<AuthToken> elegibleTokens = new HashSet<>();
+        if (!requiredScopeStrings.isEmpty()) {
+            Set<AuthToken> tokensWithcorrectScope = decoded.stream()
+                            .filter(token -> token.getTokenScopeString() != null
+                                            && requiredScopeStrings.contains(token.getTokenScopeString()))
+                            .collect(Collectors.toSet());
+            elegibleTokens.addAll(tokensWithcorrectScope);
+        }
+        Set<URI> requiredScopeIris = tokenShape.getScopesURI();
+        if (!requiredScopeIris.isEmpty()) {
+            Set<AuthToken> tokensWithcorrectScope = decoded.stream()
+                            .filter(token -> token.getTokenScopeURI() != null
+                                            && requiredScopeIris.contains(token.getTokenScopeURI()))
+                            .collect(Collectors.toSet());
+            elegibleTokens.addAll(tokensWithcorrectScope);
+        }
+        return elegibleTokens;
+    }
+
+    private boolean isIssuerAccepted(Set<AuthToken> elegibleTokens, Set<AseRoot> aseRoots,
+                    Set<AtomExpression> atomExpressions, URI baseAtom) {
+        return elegibleTokens.stream().anyMatch(token -> {
+            URI issuer = token.getTokenIss();
+            if (isIssuerInAtomExpressions(baseAtom, atomExpressions, issuer)) {
+                return true;
+            }
+            if (isIssuerATargetAtom(baseAtom, aseRoots, issuer)) {
+                return true;
+            }
+            return false;
+        });
+    }
+
+    private boolean isIssuerATargetAtom(URI baseAtom, Set<AseRoot> aseRoots, URI issuer) {
+        return aseRoots.stream().anyMatch(root -> isTargetAtom(issuer, baseAtom, root));
+    }
+
+    private boolean isIssuerInAtomExpressions(URI baseAtom, Set<AtomExpression> atomExpressions, URI issuer) {
+        return atomExpressions.stream().anyMatch(ae -> {
+            if (ANY_ATOM.equals(ae.getAtomPredefinedAtomExpression())) {
+                return true;
+            }
+            if (SELF.equals(ae.getAtomPredefinedAtomExpression())) {
+                return baseAtom.equals(issuer);
+            }
+            if (ae.getAtomsURI().contains(issuer)) {
+                return true;
+            }
+            return false;
+        });
+    }
+
+    private boolean isTokenValid(AuthToken token) {
+        return token.getTokenExp() != null
+                        && token.getTokenExp().asCalendar().toInstant().compareTo(Instant.now()) > 0
+                        && token.getTokenIss() != null
+                        && token.getTokenSub() != null
+                        && token.getTokenIat() != null;
+    }
+
+    private Collection<? extends AuthToken> decodeAuthTokens(Set<String> encodedTokens) {
+        if (encodedTokens.isEmpty()) {
+            return Collections.emptySet();
+        }
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     private static void debug(String message, Authorization auth, OperationRequest request, Object... params) {
@@ -123,5 +227,14 @@ public class WonAclEvaluator {
             System.arraycopy(params, 0, logParams, 0, params.length);
             logger.debug("AuthCheck: " + message + " ({} against {})", logParams);
         }
+    }
+
+    /**
+     * Access to the instance factory for tests.
+     * 
+     * @return
+     */
+    Shacl2JavaInstanceFactory getInstanceFactory() {
+        return instanceFactory;
     }
 }

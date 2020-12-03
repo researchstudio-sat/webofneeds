@@ -13,52 +13,42 @@ import won.shacl2java.Shacl2JavaInstanceFactory;
 
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ModelBasedTargetAtomCheckEvaluator implements TargetAtomCheckEvaluator {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    Shacl2JavaInstanceFactory entityFactory;
+    Shacl2JavaInstanceFactory instanceFactory;
 
     public ModelBasedTargetAtomCheckEvaluator(Shapes shapes, String packageName) {
-        this.entityFactory = new Shacl2JavaInstanceFactory(shapes, packageName);
+        this.instanceFactory = new Shacl2JavaInstanceFactory(shapes, packageName);
     }
 
     public void loadData(Graph data) {
-        this.entityFactory.load(data);
+        this.instanceFactory.load(data);
     }
 
     @Override
-    public boolean isAllowedTargetAtom(URI atomUri, TargetAtomCheck check) {
-        Atom atom = (Atom) entityFactory.getInstances(atomUri.toString());
-        if (atom == null) {
-            logger.debug("No data found for atom {} ", atomUri);
+    public boolean isRequestorAllowedTarget(TargetAtomCheck check) {
+        Optional<Atom> atomOpt = instanceFactory.getInstanceOfType(check.getAtom().toString(), Atom.class);
+        if (!atomOpt.isPresent()) {
+            logger.debug("No data found for atom {} ", check.getAtom());
             return false;
         }
-        Set<Socket> sockets = atom.getSockets();
-        if (!check.getAllowedSockets().isEmpty()) {
-            sockets = sockets
-                            .parallelStream()
-                            .filter(socket -> check.getAllowedSockets()
-                                            .parallelStream()
-                                            .map(Object::toString)
-                                            .anyMatch(s -> s.equals(socket.get_node().getURI())))
-                            .collect(Collectors.toSet());
-        }
-        if (!check.getAllowedSocketTypes().isEmpty()) {
-            sockets = sockets
-                            .parallelStream()
-                            .filter(socket -> check
-                                            .getAllowedSocketTypes()
-                                            .contains(socket.getSocketDefinition()))
-                            .collect(Collectors.toSet());
-        }
+        Set<Socket> sockets = atomOpt.get().getSockets();
+        sockets = sockets
+                        .parallelStream()
+                        .filter(socket -> check.isSocketAllowed(URI.create(socket.get_node().toString())))
+                        .collect(Collectors.toSet());
+        sockets = sockets
+                        .parallelStream()
+                        .filter(socket -> check.isSocketTypeAllowed(socket.getSocketDefinition()))
+                        .collect(Collectors.toSet());
         Set<Connection> connections = sockets
                         .stream()
                         .flatMap(s -> s.getConnections().getMembers().stream())
-                        .filter(c -> check
-                                        .getAllowedConnectionStates()
-                                        .contains(c.getConnectionState()))
+                        .filter(c -> check.isConnectionStateAllowed(c.getConnectionState()))
                         .collect(Collectors.toSet());
         return connections
                         .parallelStream()

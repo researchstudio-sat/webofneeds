@@ -13,10 +13,11 @@
     a            auth:Authorization ;
     auth:grantee [ auth:atom auth:anyAtom ] ;
     auth:grant   [ auth:socket [ auth:socketType  wx-chat:ChatSocket ;
-                                 auth:connections [ auth:connection [ auth:operation          auth:opRead ;
-                                                                      auth:connectionMessages
-                                                                                              [ auth:connectionMessage
-                                                                                                      [ ] ] ] ] ] ] .
+                                 auth:connections
+                                                  [ auth:connection
+                                                          [ auth:connectionMessages
+                                                                  [ auth:connectionMessage
+                                                                          [ auth:operation auth:opRead ] ] ] ] ] ] .
 
 
 <#request>

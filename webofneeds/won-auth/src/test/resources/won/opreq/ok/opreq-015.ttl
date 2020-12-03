@@ -12,7 +12,8 @@
 @prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
 # request read on the whole atom, exact atom state match
-# granted to any connected atom
+# granted to any atom connected on the buddysocket
+# requestor has correct state, targetAtomExpression is at exact place
 
 
 ex:atom1
@@ -32,12 +33,15 @@ atom1:buddySocketConnections
 atom1:bsConn1
     a                   won:Connection ;
     won:targetAtom      ex:atom2 ;
-    won:connectionState won:Connected .
+    won:connectionState won:RequestSent .
 
 
 <#authorization>
     a            auth:Authorization ;
-    auth:grantee [ auth:targetAtom [ ] ] ;
+    auth:grantee [ auth:socket [ auth:socketType  wx-buddy:BuddySocket ;
+                                 auth:connections [ auth:connection [ auth:targetAtom      [ ] ;
+                                                                      auth:connectionState won:RequestSent,
+                                                                                           won:RequestReceived ] ] ] ] ;
     auth:grant   [ auth:atomState won:Active ;
                    auth:operation auth:anyOperation ] .
 

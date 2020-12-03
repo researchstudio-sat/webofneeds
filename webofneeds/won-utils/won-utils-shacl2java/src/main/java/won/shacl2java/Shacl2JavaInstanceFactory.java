@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static org.apache.commons.collections4.SetUtils.union;
 import static org.apache.jena.shacl.validation.VLib.focusNodes;
 import static org.apache.jena.shacl.validation.VLib.isFocusNode;
 import static won.shacl2java.util.NameUtils.adderNameForFieldNameInPlural;
@@ -50,9 +49,10 @@ public class Shacl2JavaInstanceFactory {
     public Shacl2JavaInstanceFactory(Shapes shapes, String... packagesToScan) {
         this.shapes = shapes;
         this.packagesToScan = packagesToScan;
-        this.baseInstantiationContext = new InstantiationContext(shapes);
-        scanPackages(baseInstantiationContext);
-        instantiateAll(baseInstantiationContext);
+        InstantiationContext ctx = new InstantiationContext(shapes);
+        scanPackages(ctx);
+        instantiateAll(ctx);
+        this.baseInstantiationContext = ctx;
     }
 
     /**
@@ -86,14 +86,14 @@ public class Shacl2JavaInstanceFactory {
         if (dataInstantiationContext == null) {
             return Collections.emptySet();
         }
-        return dataInstantiationContext.getEntitiesOfType(type);
+        return dataInstantiationContext.getInstanceOfType(type);
     }
 
-    public <T> Set<T> getInstancesOfType(String uri, Class<T> type) {
+    public <T> Optional<T> getInstanceOfType(String uri, Class<T> type) {
         if (dataInstantiationContext == null) {
-            return Collections.emptySet();
+            return Optional.empty();
         }
-        return dataInstantiationContext.getEntitiesOfType(uri, type);
+        return dataInstantiationContext.getInstanceOfType(uri, type);
     }
 
     public Map<String, Set<Object>> getInstanceMap() {
@@ -185,7 +185,10 @@ public class Shacl2JavaInstanceFactory {
         while (toInstantiate == null || toInstantiate.size() > 0) {
             if (toInstantiate == null) {
                 Set<Shape> shapeSet = new HashSet();
-                shapes.forEach(s -> shapeSet.add(s));
+                Iterator<Shape> it = shapes.iteratorAll();
+                while (it.hasNext()) {
+                    shapeSet.add(it.next());
+                }
                 toInstantiate = shapeSet.parallelStream().map(shape -> {
                     return instantiate(null, shape, false, ctx);
                 }).reduce(SetUtils::union).orElseGet(() -> Collections.emptySet());
@@ -210,7 +213,7 @@ public class Shacl2JavaInstanceFactory {
                 toInstantiate = deduplicate(toInstantiate);
             }
         }
-        ctx.getMappedInstances().parallelStream().forEach(entry -> {
+        ctx.getInstancesByNode().parallelStream().forEach(entry -> {
             Node node = entry.getKey();
             Set<Object> instances = entry.getValue();
             instances.parallelStream().forEach(instance -> {
@@ -265,6 +268,7 @@ public class Shacl2JavaInstanceFactory {
         if (focusNodes.isEmpty()) {
             return Collections.emptySet();
         }
+        final Set<Node> finalFocusNodes = removeNodesInstantiatedInBaseContext(focusNodes);
         String shapeURI = shape.getShapeNode().getURI();
         Set<Class<?>> classesForShape = ctx.getClassesForShape(shapeURI);
         if (classesForShape == null) {
@@ -279,7 +283,7 @@ public class Shacl2JavaInstanceFactory {
             Set<Shape> allRelevantShapes = ShapeUtils.getNodeShapes((NodeShape) shape, shapes);
             Map<Path, Set<PropertyShape>> propertyShapesPerPath = getPropertyShapesByPath(allRelevantShapes);
             allRelevantShapes.add(shape);
-            return focusNodes.parallelStream().map(focusNode -> {
+            return finalFocusNodes.parallelStream().map(focusNode -> {
                 try {
                     Object instance = null;
                     if (logger.isDebugEnabled()) {
@@ -326,9 +330,9 @@ public class Shacl2JavaInstanceFactory {
                                         return Collections.emptySet();
                                     }
                                     return valueNodes
-                                                    .parallelStream()
+                                                    .stream()
                                                     .map(valueNode -> propertyShapes
-                                                                    .parallelStream()
+                                                                    .stream()
                                                                     .map(ctx::getNodeShapesForPropertyShape)
                                                                     .map(nodeShapeNodes -> new DataNodeAndShapes(
                                                                                     valueNode,
@@ -339,6 +343,23 @@ public class Shacl2JavaInstanceFactory {
             }).reduce(SetUtils::union).orElse(Collections.emptySet());
         }).reduce(SetUtils::union).orElse(Collections.emptySet());
         return ret;
+    }
+
+    public Set<Node> removeNodesInstantiatedInBaseContext(Collection<Node> focusNodes) {
+        return focusNodes.stream()
+                        .filter(Objects::nonNull)
+                        .filter(n -> {
+                            if (baseInstantiationContext != null
+                                            && baseInstantiationContext.hasInstanceForFocusNode(n)) {
+                                if (logger.isDebugEnabled()) {
+                                    logger.debug("Skipping instantiation of node {} as it is already an instance in the base context",
+                                                    n);
+                                }
+                                return false;
+                            } else {
+                                return true;
+                            }
+                        }).collect(Collectors.toSet());
     }
 
     public Object instantiate(Shape shape, String shapeURI, Node focusNode, Class<?> classForShape,

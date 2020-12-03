@@ -10,7 +10,6 @@ import won.shacl2java.util.ShapeUtils;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static won.shacl2java.util.CollectionUtils.addToMultivalueConcurrentHashMap;
@@ -40,39 +39,45 @@ public class InstantiationContext {
         return focusNodeToInstance.size();
     }
 
-    public <T> Set<T> getEntitiesOfType(Class<T> type) {
+    public <T> Set<T> getInstanceOfType(Class<T> type) {
         return this.focusNodeToInstance.values().stream()
-                        .filter(v -> v.getClass().isAssignableFrom(type))
+                        .flatMap(Collection::stream)
+                        .filter(v -> type.isAssignableFrom(v.getClass()))
                         .map(v -> type.cast(v))
                         .collect(Collectors.toSet());
     }
 
-    public <T> Set<T> getEntitiesOfType(String uri, Class<T> type) {
-        Set<Object> instances = this.focusNodeToInstance.get(uri);
+    public Set<Object> getInstances(String uri) {
+        return focusNodeToInstance.get(NodeFactory.createURI(uri));
+    }
+
+    public <T> Optional<T> getInstanceOfType(String uri, Class<T> type) {
+        Set<Object> instances = getInstances(uri);
         if (instances == null)
-            return Collections.emptySet();
+            return Optional.empty();
         return instances.stream()
                         .filter(v -> v.getClass().isAssignableFrom(type))
                         .map(v -> type.cast(v))
-                        .collect(Collectors.toSet());
+                        .findFirst(); // there cannot be more than one. If there
     }
 
     public Map<String, Set<Object>> getInstanceMap() {
-        return this.focusNodeToInstance
+        return Collections.unmodifiableMap(this.focusNodeToInstance
                         .entrySet()
                         .stream()
                         .collect(
                                         Collectors.toMap(
                                                         e -> e.getKey().toString(),
-                                                        e -> e.getValue()));
+                                                        e -> e.getValue())));
     }
 
-    public Set<Map.Entry<Node, Set<Object>>> getMappedInstances() {
+    public Set<Map.Entry<Node, Set<Object>>> getInstancesByNode() {
         return Collections.unmodifiableSet(focusNodeToInstance.entrySet());
     }
 
     public Collection<Object> getInstances() {
-        return Collections.unmodifiableCollection(focusNodeToInstance.values());
+        return Collections.unmodifiableCollection(
+                        focusNodeToInstance.values().stream().flatMap(Collection::stream).collect(Collectors.toSet()));
     }
 
     public Set<Class<?>> getClassesForShape(String shapeUri) {
@@ -183,10 +188,6 @@ public class InstantiationContext {
     public Graph getData() {
         return data;
     };
-
-    public Set<Object> getInstances(String uri) {
-        return focusNodeToInstance.get(NodeFactory.createURI(uri));
-    }
 
     public Set<Node> getNodeShapesForPropertyShape(PropertyShape propertyShape) {
         return propertyShapeToNodeShape.computeIfAbsent(propertyShape,

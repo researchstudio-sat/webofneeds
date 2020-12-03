@@ -5,14 +5,41 @@
 @prefix wx-buddy: <https://w3id.org/won/ext/buddy#> .
 @prefix wx-hold:  <https://w3id.org/won/ext/hold#> .
 @prefix owl:      <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
 @prefix atom1:    <http://example.org/test/atom1#> .
 @prefix msg:      <https://w3id.org/won/message#> .
 @prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix rdfg:     <http://www.w3.org/2004/04/trix/rdfg-1/> .
 @prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
-# request read on the whole atom, exact atom state match
-# granted to any connected atom
+ex:expectedResult
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessGranted ;
+    auth:requestedOperation <#request> .
+
+
+<#authorization>
+    a               auth:Authorization ;
+    auth:bearer     [ auth:scope  wx-buddy:BuddySocket ;
+                      auth:issuer [ auth:socket [ auth:socketType wx-buddy:BuddySocket ;
+                                                  auth:targetAtom [ ] ] ] ] ;
+    auth:grant [ auth:operation auth:opRead ] .
+
+<#request>
+    a                auth:OperationRequest ;
+    auth:operation   auth:opRead ;
+    auth:requestor   ex:atom2 ;
+    auth:reqAtom     ex:atom1 ;
+    auth:reqPosition auth:positionRoot ;
+    auth:bearsToken  ex:token1 .
+
+ex:token1
+    a               auth:AuthToken ;
+    auth:tokenScope wx-buddy:BuddySocket ;
+    auth:tokenIss   ex:atom3 ;
+    auth:tokenSub   ex:atom2 ;
+    auth:tokenIat   "2020-12-03T22:30:00"^^xsd:dateTime ;
+    auth:tokenExp   "2020-12-03T23:30:00"^^xsd:dateTime .
 
 
 ex:atom1
@@ -31,20 +58,5 @@ atom1:buddySocketConnections
 
 atom1:bsConn1
     a                   won:Connection ;
-    won:targetAtom      ex:atom2 ;
+    won:targetAtom      ex:atom3 ;
     won:connectionState won:Connected .
-
-
-<#authorization>
-    a            auth:Authorization ;
-    auth:grantee [ auth:targetAtom [ ] ] ;
-    auth:grant   [ auth:atomState won:Active ;
-                   auth:operation auth:anyOperation ] .
-
-<#request>
-    a                 auth:OperationRequest ;
-    auth:requestor    ex:atom2 ;
-    auth:reqAtom      ex:atom1 ;
-    auth:reqAtomState won:Active ;
-    auth:reqPosition  auth:positionRoot ;
-    auth:operation    auth:opRead .

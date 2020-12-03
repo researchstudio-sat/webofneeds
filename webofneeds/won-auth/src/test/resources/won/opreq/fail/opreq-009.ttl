@@ -2,17 +2,18 @@
 @prefix ex:       <https://example.com/test/> .
 @prefix auth:     <https://w3id.org/won/auth#> .
 @prefix won:      <https://w3id.org/won/core#> .
-@prefix wx-buddy: <https://w3id.org/won/ext/buddy#> .
-@prefix wx-hold:  <https://w3id.org/won/ext/hold#> .
 @prefix owl:      <http://www.w3.org/2002/07/owl#> .
 @prefix atom1:    <http://example.org/test/atom1#> .
+@prefix wx-buddy: <https://w3id.org/won/ext/buddy#> .
+@prefix wx-hold:  <https://w3id.org/won/ext/hold#> .
 @prefix msg:      <https://w3id.org/won/message#> .
 @prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix rdfg:     <http://www.w3.org/2004/04/trix/rdfg-1/> .
 @prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
 # request read on the whole atom, exact atom state match
-# granted to any connected atom
+# granted to any atom connected on the holdableSocket
+# requestor is connected on the wrong socket type
 
 
 ex:atom1
@@ -22,9 +23,8 @@ ex:atom1
     won:messageContainer atom1:msg .
 
 atom1:buddySocket
-    a                    won:Socket ;
-    won:socketDefinition wx-buddy:BuddySocket ;
-    won:connections      atom1:buddySocketConnections .
+    a               won:Socket ;
+    won:connections atom1:buddySocketConnections .
 
 atom1:buddySocketConnections
     rdfs:member atom1:bsConn1 .
@@ -37,7 +37,8 @@ atom1:bsConn1
 
 <#authorization>
     a            auth:Authorization ;
-    auth:grantee [ auth:targetAtom [ ] ] ;
+    auth:grantee [ auth:socket [ auth:socketType wx-hold:holdableSocket ;
+                                 auth:targetAtom [ ] ] ] ;
     auth:grant   [ auth:atomState won:Active ;
                    auth:operation auth:anyOperation ] .
 
