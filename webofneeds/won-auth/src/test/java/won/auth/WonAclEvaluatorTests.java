@@ -23,8 +23,6 @@ import org.springframework.core.io.support.ResourcePatternUtils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
-import won.auth.ModelBasedTargetAtomCheckEvaluator;
-import won.auth.WonAclEvaluator;
 import won.auth.model.*;
 
 import java.io.IOException;
@@ -34,10 +32,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static org.apache.jena.vocabulary.VCARD4.Date;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class)
@@ -221,7 +219,7 @@ public class WonAclEvaluatorTests {
         for (Authorization auth : loadedEvaluator.getAuthorizations()) {
             for (OperationRequest opReq : loadedEvaluator.getOperationRequests()) {
                 logger.debug("checking OpRequest {} against Authorization {} ", opReq.get_node(), auth.get_node());
-                String message = getWrongAuthDecisionMessage(testIdentifier, expected, auth, opReq);
+                String message = makeWrongAuthDecisionMessage(testIdentifier, expected, auth, opReq);
                 AclEvalResult decision = null;
                 long start = System.currentTimeMillis();
                 decision = loadedEvaluator.decide(auth, opReq);
@@ -243,7 +241,7 @@ public class WonAclEvaluatorTests {
             for (Authorization auth : loadedEvaluator.getAuthorizations()) {
                 logger.debug("checking OpRequest {} against Authorization {} ", opReq.get_node(), auth.get_node());
                 DecisionValue expected = spec.getDecision();
-                String message = getWrongAuthDecisionMessage(testIdentifier, expected, auth, opReq);
+                String message = makeWrongAuthDecisionMessage(testIdentifier, expected, auth, opReq);
                 AclEvalResult decision = null;
                 long start = System.currentTimeMillis();
                 decision = loadedEvaluator.decide(auth, opReq);
@@ -251,47 +249,9 @@ public class WonAclEvaluatorTests {
                 Assert.assertEquals(message, expected, decision.getDecision());
                 if (!spec.getIssueTokens().isEmpty()) {
                     for (AuthTokenTestSpec tokenSpec : spec.getIssueTokens()) {
-                        Assert.assertTrue("Issued token does not match any of the specified ones",
+                        Assert.assertTrue(makeWrongTokenMessage(tokenSpec, decision),
                                         decision.getIssueTokens().stream().anyMatch(actualToken -> {
-                                            if (!tokenSpec.getTokenIss().equals(actualToken.getTokenIss())) {
-                                                return false;
-                                            }
-                                            if (!tokenSpec.getTokenSub().equals(actualToken.getTokenSub())) {
-                                                return false;
-                                            }
-                                            if (tokenSpec.getTokenScopeString() != null) {
-                                                if (!tokenSpec.getTokenScopeString()
-                                                                .equals(actualToken.getTokenScopeString())) {
-                                                    return false;
-                                                }
-                                            }
-                                            if (tokenSpec.getTokenScopeURI() != null) {
-                                                if (!tokenSpec.getTokenScopesUnion()
-                                                                .equals(actualToken.getTokenScopeURI())) {
-                                                    return false;
-                                                }
-                                            }
-                                            Instant expiry = actualToken.getTokenExp().asCalendar().toInstant();
-                                            Instant issuedAt = actualToken.getTokenExp().asCalendar().toInstant();
-                                            Instant now = Instant.now();
-                                            Duration validityPeriod = Duration.between(issuedAt, expiry);
-                                            Duration timeSinceCreation = Duration.between(issuedAt, now);
-                                            if (Duration.ofSeconds(1).compareTo(timeSinceCreation.abs()) > 0) {
-                                                return false;
-                                            }
-                                            if (tokenSpec.getExpiresAfterInteger() != null) {
-                                                if (Duration.ofSeconds(tokenSpec.getExpiresAfterInteger())
-                                                                .compareTo(validityPeriod) != 0) {
-                                                    return false;
-                                                }
-                                            }
-                                            if (tokenSpec.getExpiresAfterLong() != null) {
-                                                if (Duration.ofSeconds(tokenSpec.getExpiresAfterLong())
-                                                                .compareTo(validityPeriod) != 0) {
-                                                    return false;
-                                                }
-                                            }
-                                            return true;
+                                            return matches(tokenSpec, actualToken);
                                         }));
                     }
                 }
@@ -299,7 +259,59 @@ public class WonAclEvaluatorTests {
         }
     }
 
-    private String getWrongAuthDecisionMessage(String testIdentifier, DecisionValue expected, Authorization auth,
+    private boolean matches(AuthTokenTestSpec tokenSpec, AuthToken actualToken) {
+        if (!tokenSpec.getTokenIss().equals(actualToken.getTokenIss())) {
+            return false;
+        }
+        if (!tokenSpec.getTokenSub().equals(actualToken.getTokenSub())) {
+            return false;
+        }
+        if (tokenSpec.getTokenScopeString() != null) {
+            if (!tokenSpec.getTokenScopeString()
+                            .equals(actualToken.getTokenScopeString())) {
+                return false;
+            }
+        }
+        if (tokenSpec.getTokenScopeURI() != null) {
+            if (!tokenSpec.getTokenScopesUnion()
+                            .equals(actualToken.getTokenScopeURI())) {
+                return false;
+            }
+        }
+        Instant expiry = actualToken.getTokenExp().asCalendar().toInstant();
+        Instant issuedAt = actualToken.getTokenIat().asCalendar().toInstant();
+        Instant now = Instant.now();
+        Duration validityPeriod = Duration.between(issuedAt, expiry);
+        Duration timeSinceCreation = Duration.between(issuedAt, now);
+        if (Duration.ofMinutes(5).compareTo(timeSinceCreation.abs()) > 0) {
+            //allow for (very) slow test runs or debugging sessisons
+            return false;
+        }
+        if (tokenSpec.getExpiresAfterInteger() != null) {
+            if (Duration.ofSeconds(tokenSpec.getExpiresAfterInteger())
+                            .compareTo(validityPeriod) != 0) {
+                return false;
+            }
+        }
+        if (tokenSpec.getExpiresAfterLong() != null) {
+            if (Duration.ofSeconds(tokenSpec.getExpiresAfterLong())
+                            .compareTo(validityPeriod) != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private String makeWrongTokenMessage(AuthTokenTestSpec spec, AclEvalResult decision) {
+        String expected = spec.toStringAllFields();
+        String actual = decision.getIssueTokens()
+                        .stream()
+                        .map(t -> t.toStringAllFields())
+                        .collect(Collectors.joining(",\n", "[\n", "\n]"));
+        return String.format("Expected token not issued. \nexpected: %s\nactual: %s\n", expected, actual);
+    }
+
+    private String makeWrongAuthDecisionMessage(String testIdentifier, DecisionValue expected, Authorization auth,
                     OperationRequest opReq) {
         testIdentifier = testIdentifier != null ? testIdentifier + ": " : "";
         testIdentifier = testIdentifier.replaceAll("(/[^/])[^/]+(?=/)", "$1"); // abbreviate path

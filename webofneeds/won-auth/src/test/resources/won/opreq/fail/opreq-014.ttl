@@ -53,16 +53,16 @@ atom1:exConn1
 
 <#authorization>
     a            auth:Authorization ;
-    auth:grantee [ auth:targetAtom [ ] ;
-#allows request2
+    auth:grantee [
+                 #allows request2
                    auth:socket     [ auth:socketIri   atom1:buddySocket ;
                                      auth:connections [ auth:connection [ auth:targetAtom      [ ] ;
                                                                           auth:connectionState
-                                                                                               won:RequestReceived ] ] ] ;
+                                                                                               won:RequestSent ] ] ] ;
 # allows request1
                    auth:socket     [ auth:socketType  ex:ExSocketDef ;
                                      auth:connections [ auth:targetAtom      [ ] ;
-                                                        auth:connectionState won:RequestSent ] ;
+                                                        auth:connectionState won:Closed ] ;
                                    ] ] ;
 # allows request3
 

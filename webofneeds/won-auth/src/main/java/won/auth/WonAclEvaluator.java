@@ -1,5 +1,6 @@
 package won.auth;
 
+import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.shacl.Shapes;
 import org.slf4j.Logger;
@@ -42,12 +43,37 @@ public class WonAclEvaluator {
         return this.instanceFactory.getInstancesOfType(OperationRequest.class);
     }
 
-    private static AclEvalResult accessControlDecision(boolean decision) {
+    private static AclEvalResult accessControlDecision(boolean decision, Authorization authorization,
+                    OperationRequest request) {
         AclEvalResult acd = new AclEvalResult();
-        if (decision) {
-            acd.setDecision(DecisionValue.ACCESS_GRANTED);
-        } else {
+        if (!decision) {
             acd.setDecision(DecisionValue.ACCESS_DENIED);
+            return acd;
+        }
+        acd.setDecision(DecisionValue.ACCESS_GRANTED);
+        for (TokenSpecification grantToken : authorization.getGrantTokens()) {
+            AuthToken token = new AuthToken();
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(new Date());
+            XSDDateTime iat = new XSDDateTime(cal);
+            if (grantToken.getExpiresAfterBigInteger() != null) {
+                cal.add(Calendar.SECOND, grantToken.getExpiresAfterBigInteger().intValueExact());
+            } else if (grantToken.getExpiresAfterLong() != null) {
+                cal.add(Calendar.SECOND, grantToken.getExpiresAfterLong().intValue());
+            } else if (grantToken.getExpiresAfterInteger() != null) {
+                cal.add(Calendar.SECOND, grantToken.getExpiresAfterInteger());
+            }
+            XSDDateTime exp = new XSDDateTime(cal);
+            token.setTokenExp(exp);
+            token.setTokenIat(iat);
+            token.setTokenIss(request.getReqAtom());
+            token.setTokenSub(request.getRequestor());
+            if (grantToken.getScopeURI() != null) {
+                token.setTokenScopeURI(grantToken.getScopeURI());
+            } else if (grantToken.getScopeString() != null) {
+                token.setTokenScopeString(grantToken.getScopeString());
+            }
+            acd.addIssueToken(token);
         }
         return acd;
     }
@@ -60,18 +86,18 @@ public class WonAclEvaluator {
                 debug("requestor {} is not grantee", authorization, request, request.getRequestor());
                 if (isRequestorBearerOfAcceptedToken(authorization, request)) {
                     debug("requestor {} has an accepted token", authorization, request, request.getRequestor());
-                    return accessControlDecision(true);
+                    return accessControlDecision(true, authorization, request);
                 }
                 debug("requestor {} does not have an accepted token", authorization, request, request.getRequestor());
-                return accessControlDecision(false);
+                return accessControlDecision(false, authorization, request);
             }
             // determine if the operation is granted
             if (isOperationGranted(authorization, request)) {
                 debug("operation is granted", authorization, request);
-                return accessControlDecision(true);
+                return accessControlDecision(true, authorization, request);
             }
             debug("operation is not granted", authorization, request);
-            return accessControlDecision(false);
+            return accessControlDecision(false, authorization, request);
         } finally {
             if (logger.isDebugEnabled()) {
                 debug("decision took {} ms", authorization, request, System.currentTimeMillis() - start);
