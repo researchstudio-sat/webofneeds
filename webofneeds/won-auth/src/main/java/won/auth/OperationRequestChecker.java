@@ -10,16 +10,12 @@ import java.util.stream.Collectors;
 
 import static won.auth.model.Individuals.ANY_OPERATION;
 
-class OperationRequestChecker implements TreeExpressionVisitor {
+class OperationRequestChecker extends DefaultTreeExpressionVisitor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private Deque<Set<OperationExpression>> grantedOperations = new ArrayDeque<>();
 
     private static boolean isLowerThan(AsePosition lower, AsePosition higher) {
         return lowerBy(lower, higher, new HashSet()) > -1;
-    }
-
-    private static int lowerBy(AsePosition lower, AsePosition higher) {
-        return lowerBy(lower, higher, new HashSet());
     }
 
     /**
@@ -212,7 +208,7 @@ class OperationRequestChecker implements TreeExpressionVisitor {
     }
 
     @Override
-    public void onBeforeRecursion(Object parent, Object child) {
+    protected void onBeforeRecursion(TreeExpression parent, TreeExpression child) {
         // check if we are omitting ASEs. if so, check if they are the decision position
         // and if so, decide.
         AsePosition childPosition = ((TreeExpression) child).getAsePosition();
@@ -223,7 +219,7 @@ class OperationRequestChecker implements TreeExpressionVisitor {
     }
 
     @Override
-    public void onAfterRecursion(Object parent, Object child) {
+    protected void onAfterRecursion(TreeExpression parent, TreeExpression child) {
         if (logger.isDebugEnabled()) {
             logger.debug("allowed ops in {}: {}", child, Arrays.asList(grantedOperations.peek().toArray()));
         }
@@ -233,7 +229,7 @@ class OperationRequestChecker implements TreeExpressionVisitor {
     }
 
     @Override
-    public void visit(ConnectionMessagesExpression other) {
+    protected void onBeginVisit(ConnectionMessagesExpression other) {
         inherit(other);
         if (isBranchMarkedNothingGranted() || isFinalDecisionMade()) {
             return;
@@ -246,7 +242,7 @@ class OperationRequestChecker implements TreeExpressionVisitor {
     }
 
     @Override
-    public void visit(GraphExpression other) {
+    protected void onBeginVisit(GraphExpression other) {
         inherit(other);
         if (isBranchMarkedNothingGranted() || isFinalDecisionMade()) {
             return;
@@ -266,7 +262,7 @@ class OperationRequestChecker implements TreeExpressionVisitor {
     }
 
     @Override
-    public void visit(ConnectionMessageExpression other) {
+    protected void onBeginVisit(ConnectionMessageExpression other) {
         inherit(other);
         if (isBranchMarkedNothingGranted() || isFinalDecisionMade()) {
             return;
@@ -276,7 +272,7 @@ class OperationRequestChecker implements TreeExpressionVisitor {
     }
 
     @Override
-    public void visit(AseRoot other) {
+    protected void onBeginVisit(AseRoot other) {
         inherit(other);
         if (isBranchMarkedNothingGranted() || isFinalDecisionMade()) {
             return;
@@ -291,7 +287,7 @@ class OperationRequestChecker implements TreeExpressionVisitor {
     }
 
     @Override
-    public void visit(AtomMessagesExpression other) {
+    protected void onBeginVisit(AtomMessagesExpression other) {
         inherit(other);
         if (isBranchMarkedNothingGranted() || isFinalDecisionMade()) {
             return;
@@ -301,7 +297,7 @@ class OperationRequestChecker implements TreeExpressionVisitor {
     }
 
     @Override
-    public void visit(TokenRequestExpression other) {
+    protected void onBeginVisit(TokenRequestExpression other) {
         inherit(other);
         if (isBranchMarkedNothingGranted() || isFinalDecisionMade()) {
             return;
@@ -311,7 +307,7 @@ class OperationRequestChecker implements TreeExpressionVisitor {
     }
 
     @Override
-    public void visit(AtomMessageExpression other) {
+    protected void onBeginVisit(AtomMessageExpression other) {
         inherit(other);
         if (isBranchMarkedNothingGranted() || isFinalDecisionMade()) {
             return;
@@ -321,7 +317,7 @@ class OperationRequestChecker implements TreeExpressionVisitor {
     }
 
     @Override
-    public void visit(ConnectionsExpression other) {
+    protected void onBeginVisit(ConnectionsExpression other) {
         inherit(other);
         if (isBranchMarkedNothingGranted() || isFinalDecisionMade()) {
             return;
@@ -336,7 +332,7 @@ class OperationRequestChecker implements TreeExpressionVisitor {
     }
 
     @Override
-    public void visit(SocketExpression other) {
+    protected void onBeginVisit(SocketExpression other) {
         inherit(other);
         if (isBranchMarkedNothingGranted() || isFinalDecisionMade()) {
             return;
@@ -356,7 +352,7 @@ class OperationRequestChecker implements TreeExpressionVisitor {
     }
 
     @Override
-    public void visit(ConnectionExpression other) {
+    protected void onBeginVisit(ConnectionExpression other) {
         inherit(other);
         if (isBranchMarkedNothingGranted() || isFinalDecisionMade()) {
             return;

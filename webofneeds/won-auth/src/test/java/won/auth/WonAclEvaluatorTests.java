@@ -283,8 +283,8 @@ public class WonAclEvaluatorTests {
         Instant now = Instant.now();
         Duration validityPeriod = Duration.between(issuedAt, expiry);
         Duration timeSinceCreation = Duration.between(issuedAt, now);
-        if (Duration.ofMinutes(5).compareTo(timeSinceCreation.abs()) > 0) {
-            //allow for (very) slow test runs or debugging sessisons
+        if (Duration.ofMinutes(5).compareTo(timeSinceCreation.abs()) < 0) {
+            // allow for (very) slow test runs or debugging sessisons
             return false;
         }
         if (tokenSpec.getExpiresAfterInteger() != null) {

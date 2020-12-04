@@ -1,13 +1,15 @@
 package won.auth;
 
+import org.apache.thrift.TException;
 import won.auth.check.TargetAtomCheck;
+import won.auth.model.DefaultTreeExpressionVisitor;
 import won.auth.model.*;
 
 import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
-class TargetAtomCheckGenerator implements TreeExpressionVisitor {
+class TargetAtomCheckGenerator extends DefaultTreeExpressionVisitor {
     private Deque<TargetAtomCheck> checks = new ArrayDeque<>();
     private Set<TargetAtomCheck> targetAtomChecks = new HashSet<>();
 
@@ -17,14 +19,14 @@ class TargetAtomCheckGenerator implements TreeExpressionVisitor {
     }
 
     @Override
-    public void onBeforeRecursion(Object parent, Object child) {
+    protected void onBeforeRecursion(TreeExpression host, TreeExpression child) {
         if (child instanceof TargetAtomContainer) {
             checks.push(checks.peek().clone());
         }
     }
 
     @Override
-    public void onAfterRecursion(Object parent, Object child) {
+    protected void onAfterRecursion(TreeExpression parent, TreeExpression child) {
         // pop the top off our stack if we just recursed into a
         // child for which we pushed an element onto it
         if (child instanceof TargetAtomContainer) {
@@ -54,14 +56,14 @@ class TargetAtomCheckGenerator implements TreeExpressionVisitor {
     }
 
     @Override
-    public void visit(ConnectionsExpression other) {
+    protected void onBeginVisit(ConnectionsExpression other) {
         TargetAtomCheck check = checks.peek();
         check.setAllowedConnectionStatesCS(other.getConnectionStates());
         processPossibleTargetAtom(other);
     }
 
     @Override
-    public void visit(SocketExpression other) {
+    protected void onBeginVisit(SocketExpression other) {
         TargetAtomCheck check = checks.peek();
         check.setAllowedSockets(other.getSocketIris());
         check.setAllowedSocketTypes(other.getSocketTypes());
@@ -69,12 +71,12 @@ class TargetAtomCheckGenerator implements TreeExpressionVisitor {
     }
 
     @Override
-    public void visit(AseRoot other) {
+    protected void onBeginVisit(AseRoot other) {
         processPossibleTargetAtom(other);
     }
 
     @Override
-    public void visit(ConnectionExpression other) {
+    protected void onBeginVisit(ConnectionExpression other) {
         TargetAtomCheck check = checks.peek();
         Set<URI> inherited = check.getAllowedConnectionStates();
         if (inherited.isEmpty()) {

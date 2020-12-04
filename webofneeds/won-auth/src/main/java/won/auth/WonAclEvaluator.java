@@ -108,7 +108,7 @@ public class WonAclEvaluator {
     private static boolean isOperationGranted(Authorization authorization, OperationRequest request) {
         for (AseRoot root : authorization.getGrants()) {
             OperationRequestChecker operationRequestChecker = new OperationRequestChecker(request);
-            root.acceptRecursively(operationRequestChecker, false);
+            root.accept(operationRequestChecker);
             boolean finalDecision = operationRequestChecker.getFinalDecision();
             debug("operation granted: {}", authorization, request, finalDecision);
             if (finalDecision) {
@@ -146,7 +146,7 @@ public class WonAclEvaluator {
 
     private boolean isTargetAtom(URI candidate, URI baseAtom, AseRoot aseRoot) {
         TargetAtomCheckGenerator v = new TargetAtomCheckGenerator(baseAtom, candidate);
-        aseRoot.acceptRecursively(v, false);
+        aseRoot.accept(v);
         for (TargetAtomCheck check : v.getTargetAtomChecks()) {
             if (this.targetAtomCheckEvaluator.isRequestorAllowedTarget(check)) {
                 return true;
