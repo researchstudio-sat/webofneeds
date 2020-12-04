@@ -26,7 +26,7 @@
 
     <logger name="won.auth.WonAclEvaluatorTests" level="debug" />
     <logger name="won.auth" level="debug" />
-    <logger name="won.shacl2java" level="debug" />
+    <logger name="won.shacl2java" level="warn" />
 
     <!-- available log-levels: DEBUG, INFO, WARN, ERROR -->
     <root level="info">

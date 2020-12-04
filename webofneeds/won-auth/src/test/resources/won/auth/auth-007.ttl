@@ -12,8 +12,8 @@
 
 <#authorization1Persona>
     a               auth:Authorization ;
-    auth:bearer     [ auth:scope  wx-buddy:BuddySocket ;
+    auth:bearer     [ auth:tokenScope  wx-buddy:BuddySocket ;
                       auth:issuer [ auth:socket [ auth:socketType wx-buddy:BuddySocket ;
                                                   auth:targetAtom [ ] ] ] ] ;
-    auth:grantToken [ auth:scope        "buddyOfBuddy" ;
+    auth:grantToken [ auth:tokenScope        "buddyOfBuddy" ;
                       auth:expiresAfter 3600 ; ] .

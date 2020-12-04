@@ -11,7 +11,7 @@
 # to bearers of the token issued by the holder
 <#authorization7>
     a           auth:Authorization ;
-    auth:bearer [ auth:scope  "my support bots" ;
+    auth:bearer [ auth:tokenScope  "my support bots" ;
                   auth:issuer [ auth:socket [ auth:socketType wx-hold:HoldableSocket ;
                                               auth:targetAtom [ ] ] ] ] ;
     auth:grant  [ auth:operation auth:opRead, [ auth:messageOnBehalf msg:ConnectionMessage ] ;

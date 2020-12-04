@@ -30,9 +30,7 @@ import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -232,30 +230,49 @@ public class WonAclEvaluatorTests {
     private void checkSpecifiedAuthDecision(WonAclEvaluator loadedEvaluator, String testIdentifier) {
         for (ExpectedAclEvalResult spec : loadedEvaluator.getInstanceFactory()
                         .getInstancesOfType(ExpectedAclEvalResult.class)) {
-            logger.debug("using spec {} for testing...", spec);
+            logger.debug("using spec {} for testing...", spec.toStringAllFields());
             OperationRequest opReq = spec.getRequestedOperation();
             Calendar cal = Calendar.getInstance();
             cal.setTime(new Date());
             cal.add(Calendar.MINUTE, 30);
             opReq.getBearsTokens().forEach(token -> token.setTokenExp(new XSDDateTime(cal)));
-            for (Authorization auth : loadedEvaluator.getAuthorizations()) {
+            boolean specFulfilled = false;
+            boolean specDecisionFulfilledAlready = false;
+
+            Authorization specFulfillingAuth = null;
+            Set<String> correctDecisionForAuths = new HashSet();
+            Set<String> wrongTokensIssuedForAuths = new HashSet<>();
+            AUTHS: for (Authorization auth : loadedEvaluator.getAuthorizations()) {
                 logger.debug("checking OpRequest {} against Authorization {} ", opReq.get_node(), auth.get_node());
                 DecisionValue expected = spec.getDecision();
-                String message = makeWrongAuthDecisionMessage(testIdentifier, expected, auth, opReq);
-                AclEvalResult decision = null;
                 long start = System.currentTimeMillis();
-                decision = loadedEvaluator.decide(auth, opReq);
+                AclEvalResult decision = loadedEvaluator.decide(auth, opReq);
                 logDuration("making authorization decision", start);
-                Assert.assertEquals(message, expected, decision.getDecision());
-                if (!spec.getIssueTokens().isEmpty()) {
-                    for (AuthTokenTestSpec tokenSpec : spec.getIssueTokens()) {
-                        Assert.assertTrue(makeWrongTokenMessage(tokenSpec, decision),
-                                        decision.getIssueTokens().stream().anyMatch(actualToken -> {
-                                            return matches(tokenSpec, actualToken);
-                                        }));
+                if (!expected.equals(decision.getDecision())){
+                    continue;
+                } else {
+                    correctDecisionForAuths.add(auth.get_node().toString());
+                    if (!spec.getIssueTokens().isEmpty()) {
+                        for (AuthTokenTestSpec tokenSpec : spec.getIssueTokens()) {
+                            if (!decision.getIssueTokens()
+                                    .stream()
+                                    .anyMatch(actualToken -> matches(tokenSpec, actualToken))) {
+                                wrongTokensIssuedForAuths.add(auth.get_node().toString());
+                                continue AUTHS;
+                            }
+                        }
                     }
                 }
+                specFulfilled = true;
+                specFulfillingAuth = auth;
+                break;
             }
+            String failMessage = String.format("OpRequest %s: decision should be %s. Auths with correct result: %s, of which produced wrong tokens: %s",
+                    opReq.get_node(), spec.getDecision(),
+                    Arrays.toString(correctDecisionForAuths.toArray()),
+                    Arrays.toString(wrongTokensIssuedForAuths.toArray())) ;
+            Assert.assertTrue(failMessage, specFulfilled);
+            logger.debug("test passed for spec {} with authorization {}", spec.toStringAllFields(), specFulfillingAuth.toStringAllFields());
         }
     }
 

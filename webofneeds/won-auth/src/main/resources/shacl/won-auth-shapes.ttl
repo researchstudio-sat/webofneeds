@@ -407,7 +407,7 @@ auth:tokenShapeShape
     sh:property        [ sh:path     [ sh:inversePath auth:bearer ] ;
                          sh:minCount 1 ;
                          sh:maxCount 1 ; ] ;
-    sh:property        [ sh:path     auth:scope ;
+    sh:property        [ sh:path     auth:tokenScope ;
                          sh:minCount 1 ;
                          sh:or       ( [ sh:nodeKind sh:Literal ;
                                          sh:datatype xsd:string ; ]
@@ -425,7 +425,7 @@ auth:tokenSpecificationShape
     sh:property        [ sh:path     [ sh:inversePath auth:grantToken ] ;
                          sh:minCount 1 ;
                          sh:maxCount 1 ] ;
-    sh:property        [ sh:path     auth:scope ;
+    sh:property        [ sh:path     auth:tokenScope ;
                          sh:minCount 1 ;
                          sh:maxCount 1 ;
                          sh:or       ( [ sh:nodeKind sh:IRI ]
@@ -833,7 +833,7 @@ auth:grantToken
 auth:issuer
     a owl:ObjectProperty .
 
-auth:scope
+auth:tokenScope
     a owl:DatatypeProperty .
 
 auth:inherit
@@ -856,7 +856,7 @@ auth:tokenExp
     a owl:DatatypeProperty .
 
 auth:tokenScope
-    a owl:DatatypeProperty .
+    a owl:ObjectProperty .
 
 
 auth:anyOperation

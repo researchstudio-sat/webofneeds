@@ -68,10 +68,10 @@ public class WonAclEvaluator {
             token.setTokenIat(iat);
             token.setTokenIss(request.getReqAtom());
             token.setTokenSub(request.getRequestor());
-            if (grantToken.getScopeURI() != null) {
-                token.setTokenScopeURI(grantToken.getScopeURI());
-            } else if (grantToken.getScopeString() != null) {
-                token.setTokenScopeString(grantToken.getScopeString());
+            if (grantToken.getTokenScopeURI() != null) {
+                token.setTokenScopeURI(grantToken.getTokenScopeURI());
+            } else if (grantToken.getTokenScopeString() != null) {
+                token.setTokenScopeString(grantToken.getTokenScopeString());
             }
             acd.addIssueToken(token);
         }
@@ -86,10 +86,10 @@ public class WonAclEvaluator {
                 debug("requestor {} is not grantee", authorization, request, request.getRequestor());
                 if (isRequestorBearerOfAcceptedToken(authorization, request)) {
                     debug("requestor {} has an accepted token", authorization, request, request.getRequestor());
-                    return accessControlDecision(true, authorization, request);
+                } else {
+                    debug("requestor {} does not have an accepted token", authorization, request, request.getRequestor());
+                    return accessControlDecision(false, authorization, request);
                 }
-                debug("requestor {} does not have an accepted token", authorization, request, request.getRequestor());
-                return accessControlDecision(false, authorization, request);
             }
             // determine if the operation is granted
             if (isOperationGranted(authorization, request)) {
@@ -177,7 +177,7 @@ public class WonAclEvaluator {
     }
 
     private Set<AuthToken> filterTokensByScope(Set<AuthToken> decoded, TokenShape tokenShape) {
-        Set<String> requiredScopeStrings = tokenShape.getScopesString();
+        Set<String> requiredScopeStrings = tokenShape.getTokenScopesString();
         Set<AuthToken> elegibleTokens = new HashSet<>();
         if (!requiredScopeStrings.isEmpty()) {
             Set<AuthToken> tokensWithcorrectScope = decoded.stream()
@@ -186,7 +186,7 @@ public class WonAclEvaluator {
                             .collect(Collectors.toSet());
             elegibleTokens.addAll(tokensWithcorrectScope);
         }
-        Set<URI> requiredScopeIris = tokenShape.getScopesURI();
+        Set<URI> requiredScopeIris = tokenShape.getTokenScopesURI();
         if (!requiredScopeIris.isEmpty()) {
             Set<AuthToken> tokensWithcorrectScope = decoded.stream()
                             .filter(token -> token.getTokenScopeURI() != null

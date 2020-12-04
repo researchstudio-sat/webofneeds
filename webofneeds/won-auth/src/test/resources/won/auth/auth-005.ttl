@@ -8,7 +8,7 @@
 
 <#authorization4>
     a           auth:Authorization ;
-    auth:bearer [ auth:scope  "my trusted associates" ;
+    auth:bearer [ auth:tokenScope  "my trusted associates" ;
                   auth:issuer [ auth:socket [ auth:socketType wx-hold:HoldableSocket ;
                                               auth:targetAtom [ ] ] ] ] ;
     auth:grant  [ auth:operation          auth:opRead ;

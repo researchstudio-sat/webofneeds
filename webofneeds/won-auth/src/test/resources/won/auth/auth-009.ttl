@@ -15,7 +15,7 @@
 
 <#authorization1Party>
     a           auth:Authorization ;
-    auth:bearer [ auth:scope  "buddyOfBuddy" ;
+    auth:bearer [ auth:tokenScope  "buddyOfBuddy" ;
                   auth:issuer [ auth:socket [ auth:socketType wx-hold:HoldableSocket ;
                                               auth:targetAtom [ ] ; ] ] ] ;
     auth:grant  [ auth:graph  [ auth:graphType auth:sysinfoGraph ;
