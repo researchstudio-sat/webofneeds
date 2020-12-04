@@ -272,7 +272,14 @@ public class Shacl2JavaInstanceFactory {
         String shapeURI = shape.getShapeNode().getURI();
         Set<Class<?>> classesForShape = ctx.getClassesForShape(shapeURI);
         if (classesForShape == null) {
-            throw new IllegalArgumentException(String.format("No class found to instantiate for shape %s",
+            if (logger.isDebugEnabled()) {
+                logger.debug("No class found to instantiate for shape {}.",
+                                shape.getShapeNode().getLocalName());
+                logger.debug("Instantiation context:");
+                logger.debug(ctx.getFormattedState());
+            }
+            throw new IllegalArgumentException(String.format(
+                            "No class found to instantiate for shape %s, more information is logged on loglevel debug",
                             shape.getShapeNode().getLocalName()));
         }
         Set ret = classesForShape.parallelStream().map(classForShape -> {

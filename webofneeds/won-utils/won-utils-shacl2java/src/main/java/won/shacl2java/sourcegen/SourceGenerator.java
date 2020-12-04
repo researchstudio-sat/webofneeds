@@ -50,6 +50,7 @@ public class SourceGenerator {
     private Map<URI, TypeSpec> interfacesForRdfTypes = new HashMap();
     private Map<URI, Set<String>> rdfTypeInterfaceImplNames = new HashMap();
     private Map<Node, ClassName> individualNodeToClassName = new HashMap<>();
+    private Map<String, Node> classNames = new HashMap<>();
 
     public SourceGenerator() {
     }
@@ -86,6 +87,7 @@ public class SourceGenerator {
         typeSpecs.addAll(StreamSupport
                         .stream(Spliterators.spliteratorUnknownSize(shapes.iteratorAll(), Spliterator.ORDERED), false)
                         .distinct()
+                        .filter(s -> s.isNodeShape())
                         .map(shape -> {
                             if (isAnonymousShape(shape)) {
                                 return null;
@@ -153,6 +155,7 @@ public class SourceGenerator {
 
     public TypeSpec generateClass(Shape shape, Shapes shapes, Shacl2JavaConfig config) {
         String name = NameUtils.classNameForShape(shape, config);
+        detectNameClash(shape, name);
         TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(name).addModifiers(PUBLIC);
         addInterfacesForRdfTypes(typeBuilder, shape, config);
         typeBuilder.addJavadoc(getJavadocGeneratedForShape(shape));
@@ -190,6 +193,18 @@ public class SourceGenerator {
         return typeSpec;
     }
 
+    public void detectNameClash(Shape shape, String name) {
+        if (classNames.containsKey(name)) {
+            Node conflictingShape = classNames.get(name);
+            if (!shape.getShapeNode().equals(conflictingShape)) {
+                throw new IllegalStateException(
+                                String.format("Name clash: %s is generated twice, once for shape %s, once for %s",
+                                                name, classNames.get(name), shape.getShapeNode()));
+            }
+        }
+        classNames.put(name, shape.getShapeNode());
+    }
+
     public void addInterfacesForRdfTypes(TypeSpec.Builder typeBuilder, Shape shape, Shacl2JavaConfig config) {
         if (!config.isInterfacesForRdfTypes()) {
             return;
@@ -202,10 +217,14 @@ public class SourceGenerator {
                         .filter(u -> !u.startsWith(SHACL.getURI()))
                         .map(u -> URI.create(u))
                         .forEach(u -> {
-                            TypeSpec iFace = interfacesForRdfTypes.computeIfAbsent(u, typeUri -> TypeSpec
-                                            .interfaceBuilder(classNameForShapeURI(typeUri, config))
-                                            .addModifiers(PUBLIC)
-                                            .build());
+                            TypeSpec iFace = interfacesForRdfTypes.computeIfAbsent(u, typeUri -> {
+                                String name = classNameForShapeURI(typeUri, config);
+                                detectNameClash(shape, name);
+                                return TypeSpec
+                                                .interfaceBuilder(name)
+                                                .addModifiers(PUBLIC)
+                                                .build();
+                            });
                             typeBuilder.addSuperinterface(ClassName.get(config.getPackageName(), iFace.name));
                             addToMultivalueMap(rdfTypeInterfaceImplNames, u, typeBuilder.build().name);
                         });
@@ -275,6 +294,7 @@ public class SourceGenerator {
 
     public TypeSpec generateEnum(Shacl2JavaConfig config, Shape shape, EnumShapeChecker enumShapeChecker) {
         ClassName name = NameUtils.javaPoetClassNameForShape(shape, config);
+        detectNameClash(shape, name.simpleName());
         TypeSpec.Builder typeBuilder = TypeSpec.enumBuilder(name).addModifiers(PUBLIC);
         typeBuilder.addJavadoc(getJavadocGeneratedForShape(shape));
         typeBuilder.addAnnotation(
@@ -414,22 +434,25 @@ public class SourceGenerator {
                         .addStatement("return getClass().getSimpleName()+\"{_node=\" + get_node() + \"}\"")
                         .addModifiers(PUBLIC)
                         .build();
-        String hashparams = typeBuilder.fieldSpecs.stream().map(m -> m.name).collect(Collectors.joining(","));
-        /**
-         * MethodSpec hashCode = MethodSpec.methodBuilder("hashCode")
-         * .addModifiers(PUBLIC) .returns(TypeName.INT)
-         * .addStatement(String.format("return $T.hash(%s)", hashparams),
-         * TypeName.get(Objects.class)) .build(); MethodSpec.Builder equalsBuilder =
-         * MethodSpec.methodBuilder("equals"); equalsBuilder.addModifiers(PUBLIC)
-         * .addParameter(TypeName.OBJECT, "o") .returns(TypeName.BOOLEAN)
-         * .addStatement("if (this == o) return true") .addStatement("if (o == null ||
-         * getClass() != o.getClass()) return false") .addStatement("$T obj = ($T) o",
-         * typeClass, typeClass); String allEquals = typeBuilder.fieldSpecs .stream()
-         * .map(fs -> String.format("Objects.equals(%s, obj.%s)", fs.name, fs.name))
-         * .collect(Collectors.joining(" && ")); equalsBuilder.addStatement("return " +
-         * allEquals); typeBuilder.addMethod(equalsBuilder.build());
-         * typeBuilder.addMethod(hashCode);
-         */
+        MethodSpec.Builder toStringAllFieldsBuilder = MethodSpec.methodBuilder("toStringAllFields");
+        toStringAllFieldsBuilder.addModifiers(PUBLIC)
+                        .returns(TypeName.get(String.class))
+                        .addStatement("$T sb = new $T()", StringBuilder.class, StringBuilder.class)
+                        .addStatement(" sb.append(getClass().getSimpleName()).append($S)", "{");
+        typeBuilder.fieldSpecs.stream()
+                        .forEach(fs -> toStringAllFieldsBuilder
+                                        .addStatement("sb.append($S).append($S)", fs.name, "=")
+                                        .beginControlFlow("if ($N != null) ", fs.name)
+                                        .addStatement("sb.append($N.toString())", fs.name)
+                                        .nextControlFlow("else")
+                                        .addStatement("sb.append($S)", "null")
+                                        .endControlFlow()
+                                        .addStatement("sb.append($S)", ", "));
+        toStringAllFieldsBuilder
+                        .addStatement("sb.delete(sb.length() - 2, sb.length())")
+                        .addStatement("sb.append($S)", "}")
+                        .addStatement("return sb.toString()");
+        typeBuilder.addMethod(toStringAllFieldsBuilder.build());
         MethodSpec hashCode = MethodSpec.methodBuilder("hashCode")
                         .addModifiers(PUBLIC)
                         .returns(TypeName.INT)

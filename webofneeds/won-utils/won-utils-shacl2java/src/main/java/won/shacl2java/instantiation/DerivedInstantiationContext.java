@@ -100,4 +100,15 @@ public class DerivedInstantiationContext extends InstantiationContext {
     public Set<Node> getNodeShapesForPropertyShape(PropertyShape propertyShape) {
         return parentContext.getNodeShapesForPropertyShape(propertyShape);
     }
+
+    @Override
+    public String getFormattedState() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.getFormattedState());
+        if (parentContext != null) {
+            sb.append("\nparent context:\n")
+                            .append(parentContext.getFormattedState());
+        }
+        return sb.toString();
+    }
 }

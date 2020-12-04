@@ -197,4 +197,28 @@ public class InstantiationContext {
                                         .map(Shape::getShapeNode)
                                         .collect(Collectors.toSet()));
     }
+
+    public String getFormattedState() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("InstantiationContext\n");
+        sb.append("Shape-class mapping:\n");
+        shapeClasses.entrySet().forEach(e -> sb.append("\t")
+                        .append(e.getKey())
+                        .append(" -> ")
+                        .append(e.getValue())
+                        .append("\n"));
+        sb.append("uri-instance mapping:\n");
+        focusNodeToInstance.entrySet().forEach(e -> sb.append("\t")
+                        .append(e.getKey())
+                        .append(" -> ")
+                        .append(e.getValue())
+                        .append("\n"));
+        sb.append("uri-shape mapping:\n");
+        focusNodeToShapes.entrySet().forEach(e -> sb.append("\t")
+                        .append(e.getKey())
+                        .append(" -> ")
+                        .append(e.getValue())
+                        .append("\n"));
+        return sb.toString();
+    }
 }
