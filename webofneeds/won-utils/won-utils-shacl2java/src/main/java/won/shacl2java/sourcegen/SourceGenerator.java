@@ -104,6 +104,8 @@ public class SourceGenerator {
                         .collect(Collectors.toList()));
         Map<URI, TypeSpec> visitorInterfaces = generateVisitors(config);
         typeSpecs.addAll(visitorInterfaces.values());
+        Map<URI, TypeSpec> defaultVisitorImpls = generateVisitorImpls(config);
+        typeSpecs.addAll(defaultVisitorImpls.values());
         typeSpecs = addVisitorAcceptMethods(typeSpecs, visitorInterfaces, config);
         Collection<TypeSpec> populatedInterfacesForRdfTypes = populateInterfacesForRdfTypes(interfacesForRdfTypes,
                         typeSpecs, config);
@@ -255,6 +257,7 @@ public class SourceGenerator {
                                         .map(methodSpec -> {
                                             MethodSpec.Builder b = MethodSpec.methodBuilder(methodSpec.name);
                                             b.returns(methodSpec.returnType);
+                                            b.addTypeVariables(methodSpec.typeVariables);
                                             methodSpec.parameters.forEach(p -> b.addParameter(p));
                                             if (!methodSpec.returnType.equals(ClassName.VOID)) {
                                                 b.addStatement("return null");
@@ -679,32 +682,111 @@ public class SourceGenerator {
         for (URI visitorClass : config.getVisitorClasses()) {
             // generate a visitor interface
             String visitorName = NameUtils.classNameForShapeURI(visitorClass, config) + config.getVisitorSuffix();
+            String hostInterfaceName = NameUtils.classNameForShapeURI(visitorClass, config);
+            ClassName hostInterfaceClassName = ClassName.get(config.getPackageName(), hostInterfaceName);
             TypeSpec.Builder ifBuilder = TypeSpec
                             .interfaceBuilder(visitorName)
                             .addModifiers(PUBLIC);
             if (visitorClassToTypeSpec.containsKey(visitorClass)) {
                 for (TypeSpec typeSpec : visitorClassToTypeSpec.get(visitorClass)) {
-                    logger.debug("proessing type {} as part of visitor class {}", typeSpec.name, visitorClass);
+                    logger.debug("proessing type {} as part of visitor class {} for generating interface",
+                                    typeSpec.name, visitorClass);
                     ifBuilder.addMethod(
                                     MethodSpec
                                                     .methodBuilder("visit")
-                                                    .addParameter(ClassName.get(config.getPackageName(), typeSpec.name),
-                                                                    "other")
                                                     .addModifiers(DEFAULT, PUBLIC)
+                                                    .addParameter(ClassName.get(config.getPackageName(), typeSpec.name),
+                                                                    "host")
                                                     .build());
                 }
-                ifBuilder.addMethod(MethodSpec.methodBuilder("onBeforeRecursion")
-                                .addModifiers(PUBLIC, DEFAULT)
-                                .addParameter(ParameterSpec.builder(ClassName.OBJECT, "parent").build())
-                                .addParameter(ParameterSpec.builder(ClassName.OBJECT, "child").build())
-                                .build());
-                ifBuilder.addMethod(MethodSpec.methodBuilder("onAfterRecursion")
-                                .addModifiers(PUBLIC, DEFAULT)
-                                .addParameter(ParameterSpec.builder(ClassName.OBJECT, "parent").build())
-                                .addParameter(ParameterSpec.builder(ClassName.OBJECT, "child").build())
-                                .build());
                 TypeSpec visitorInterface = ifBuilder.build();
                 newTypeSpecs.put(visitorClass, visitorInterface);
+            }
+        }
+        return newTypeSpecs;
+    }
+
+    private Map<URI, TypeSpec> generateVisitorImpls(Shacl2JavaConfig config) {
+        logger.debug("generating default implementations for visitor classes {}",
+                        visitorClassToTypeSpec.keySet().stream()
+                                        .map(URI::toString)
+                                        .collect(Collectors.joining(",", "[", "]")));
+        Map<URI, TypeSpec> newTypeSpecs = new HashMap<>();
+        for (URI visitorClass : config.getVisitorClasses()) {
+            String visitorName = NameUtils.classNameForShapeURI(visitorClass, config) + config.getVisitorSuffix();
+            String hostInterfaceName = NameUtils.classNameForShapeURI(visitorClass, config);
+            ClassName hostInterfaceClassName = ClassName.get(config.getPackageName(), hostInterfaceName);
+            if (visitorClassToTypeSpec.containsKey(visitorClass)) {
+                // generate default visitor implementation
+                String visitorImplName = "Default" + visitorName;
+                TypeSpec.Builder vImplBuilder = TypeSpec
+                                .classBuilder(visitorImplName)
+                                .addModifiers(PUBLIC);
+                vImplBuilder.addSuperinterface(ClassName.get(config.getPackageName(), visitorName));
+                vImplBuilder.addMethod(MethodSpec.methodBuilder("onBeforeRecursion")
+                                .addModifiers(PROTECTED)
+                                .addParameter(hostInterfaceClassName, "host")
+                                .addParameter(hostInterfaceClassName, "child")
+                                .build());
+                vImplBuilder.addMethod(MethodSpec.methodBuilder("onAfterRecursion")
+                                .addModifiers(PROTECTED)
+                                .addParameter(hostInterfaceClassName, "host")
+                                .addParameter(hostInterfaceClassName, "child")
+                                .build());
+                Set<String> visitedTypeNames = visitorClassToTypeSpec.get(visitorClass).stream().map(spec -> spec.name)
+                                .collect(Collectors.toSet());
+                for (TypeSpec typeSpec : visitorClassToTypeSpec.get(visitorClass)) {
+                    logger.debug("proessing type {} as part of visitor class {} for generating default implementation",
+                                    typeSpec.name, visitorClass);
+                    ClassName childClassName = ClassName.get(config.getPackageName(), typeSpec.name);
+                    vImplBuilder.addMethod(MethodSpec.methodBuilder("onBeginVisit")
+                                    .addModifiers(PROTECTED)
+                                    .addParameter(childClassName, "host")
+                                    .build());
+                    vImplBuilder.addMethod(MethodSpec.methodBuilder("onEndVisit")
+                                    .addModifiers(PROTECTED)
+                                    .addParameter(childClassName, "host")
+                                    .build());
+                    MethodSpec.Builder visitRecursivelyBuilder = MethodSpec.methodBuilder("visit")
+                                    .addModifiers(PUBLIC, FINAL)
+                                    .addParameter(childClassName, "host");
+                    visitRecursivelyBuilder.addStatement("onBeginVisit(host)");
+                    for (FieldSpec subElement : typeSpec.fieldSpecs) {
+                        // let's allow the visitor to visit the subelement, too.
+                        TypeName _subElTyp = subElement.type;
+                        TypeName rawSubElementType = null;
+                        if (subElement.type instanceof ParameterizedTypeName) {
+                            _subElTyp = ((ParameterizedTypeName) subElement.type).typeArguments.get(0);
+                            rawSubElementType = ((ParameterizedTypeName) subElement.type).rawType;
+                        }
+                        final TypeName subElementType = _subElTyp;
+                        if (visitedTypeNames.contains(((ClassName) subElementType).simpleName())) {
+                            if (subElement.type instanceof ParameterizedTypeName) {
+                                logger.debug("adding recursion for field {}", subElement.name);
+                                String getter = getterNameForField(subElement.name);
+                                if (rawSubElementType != null && rawSubElementType.equals(TypeName.get(Set.class))) {
+                                    visitRecursivelyBuilder
+                                                    .beginControlFlow("host.$N().forEach(child -> ", getter)
+                                                    .addStatement("onBeforeRecursion(host, child)")
+                                                    .addStatement("child.accept(this)")
+                                                    .addStatement("onAfterRecursion(host, child)")
+                                                    .endControlFlow(")");
+                                } else {
+                                    visitRecursivelyBuilder
+                                                    .addStatement("$N child = host.$N()", subElementType, getter)
+                                                    .beginControlFlow("if (child != null)")
+                                                    .addStatement("onBeforeRecursion(host, child)")
+                                                    .addStatement("child.accept(visitor, depthFirst)")
+                                                    .addStatement("onAfterRecursion(host, child)")
+                                                    .endControlFlow();
+                                }
+                            }
+                        }
+                    }
+                    visitRecursivelyBuilder.addStatement("onEndVisit(host)");
+                    vImplBuilder.addMethod(visitRecursivelyBuilder.build());
+                }
+                newTypeSpecs.put(visitorClass, vImplBuilder.build());
             }
         }
         return newTypeSpecs;
@@ -715,18 +797,18 @@ public class SourceGenerator {
         logger.debug("generating visitors for visitor classes {}", visitorClassToTypeSpec.keySet().stream()
                         .map(URI::toString)
                         .collect(Collectors.joining(",", "[", "]")));
-        Map<TypeSpec, Set<URI>> typeSpecToVisitorClasses = new HashMap();
+        Map<TypeSpec, Set<URI>> typeSpecToVisitedClasses = new HashMap();
         for (Map.Entry<URI, Set<TypeSpec>> entry : visitorClassToTypeSpec.entrySet()) {
             for (TypeSpec ts : entry.getValue()) {
-                addToMultivalueMap(typeSpecToVisitorClasses, ts, entry.getKey());
+                addToMultivalueMap(typeSpecToVisitedClasses, ts, entry.getKey());
             }
         }
         return typeSpecs.stream().map(typeSpec -> {
-            if (!typeSpecToVisitorClasses.containsKey(typeSpec)) {
+            if (!typeSpecToVisitedClasses.containsKey(typeSpec)) {
                 return typeSpec;
             }
             TypeSpec.Builder modifyingBuilder = typeSpec.toBuilder();
-            for (URI visitorClass : typeSpecToVisitorClasses.get(typeSpec)) {
+            for (URI visitorClass : typeSpecToVisitedClasses.get(typeSpec)) {
                 TypeSpec visitorInterface = visitorInterfaces.get(visitorClass);
                 addAcceptMethodsForVisitorInterface(typeSpec, modifyingBuilder, visitorInterface, config);
             }
@@ -740,59 +822,11 @@ public class SourceGenerator {
         // generate an accept/acceptRecursively method in our class
         logger.debug("adding accept(visitor) and acceptRecursively(visitor) methods to {}", typeSpec.name);
         MethodSpec accept = MethodSpec.methodBuilder("accept")
-                        .addParameter(visitorClassName, "visitor")
                         .addModifiers(PUBLIC)
+                        .addParameter(visitorClassName, "visitor")
                         .addStatement("$N.visit(this)", "visitor")
                         .build();
-        MethodSpec.Builder acceptRecursivelyBuilder = MethodSpec.methodBuilder("acceptRecursively")
-                        .addParameter(visitorClassName, "visitor")
-                        .addParameter(ClassName.BOOLEAN, "depthFirst")
-                        .addModifiers(PUBLIC)
-                        .beginControlFlow("if (!$N)", "depthFirst")
-                        .addStatement("$N.visit(this)", "visitor")
-                        .endControlFlow();
-        for (FieldSpec subElement : typeSpec.fieldSpecs) {
-            // let's allow the visitor to visit the subelement, too.
-            TypeName _subElTyp = subElement.type;
-            TypeName rawSubElementType = null;
-            if (subElement.type instanceof ParameterizedTypeName) {
-                _subElTyp = ((ParameterizedTypeName) subElement.type).typeArguments.get(0);
-                rawSubElementType = ((ParameterizedTypeName) subElement.type).rawType;
-            }
-            final TypeName subElementType = _subElTyp;
-            if (visitorInterface.methodSpecs
-                            .stream()
-                            .filter(m -> m.name.equals("visit"))
-                            .filter(m -> m.parameters.size() == 1)
-                            .anyMatch(m -> m.parameters.get(0).type.equals(subElementType))) {
-                if (subElement.type instanceof ParameterizedTypeName) {
-                    logger.debug("adding recursion for field {}", subElement.name);
-                    if (rawSubElementType != null && rawSubElementType.equals(TypeName.get(Set.class))) {
-                        acceptRecursivelyBuilder
-                                        .beginControlFlow("if ($N != null)", subElement.name)
-                                        .beginControlFlow("$N.forEach(child -> ", subElement.name)
-                                        .addStatement("visitor.onBeforeRecursion(this, child)")
-                                        .addStatement("child.acceptRecursively(visitor, depthFirst)")
-                                        .addStatement("visitor.onAfterRecursion(this, child)")
-                                        .endControlFlow(")")
-                                        .endControlFlow();
-                    } else {
-                        acceptRecursivelyBuilder
-                                        .beginControlFlow("if ($N != null)", subElement.name)
-                                        .addStatement("visitor.onBeforeRecursion(this, $N)", subElement.name)
-                                        .addStatement("$N.acceptRecursively(visitor, depthFirst)", subElement.name)
-                                        .addStatement("visitor.onAfterRecursion(this, $N)", subElement.name)
-                                        .endControlFlow();
-                    }
-                }
-            }
-        }
-        acceptRecursivelyBuilder.beginControlFlow("if ($N)", "depthFirst")
-                        .addStatement("$N.visit(this)", "visitor")
-                        .endControlFlow();
-        modifyingBuilder
-                        .addMethod(accept)
-                        .addMethod(acceptRecursivelyBuilder.build());
+        modifyingBuilder.addMethod(accept);
     }
 
     private static class PropertyHelper {
