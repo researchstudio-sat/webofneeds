@@ -43,6 +43,35 @@ public class WonAclEvaluator {
         return this.instanceFactory.getInstancesOfType(OperationRequest.class);
     }
 
+    public AclEvalResult decide(Authorization authorization, OperationRequest request) {
+        long start = System.currentTimeMillis();
+        AclEvalResult result = null;
+        try {
+            // determine if the requestor is in the set of grantees
+            if (!isRequestorAGrantee(authorization, request)) {
+                debug("requestor {} is not grantee", authorization, request, request.getRequestor());
+                if (isRequestorBearerOfAcceptedToken(authorization, request)) {
+                    debug("requestor {} has an accepted token", authorization, request, request.getRequestor());
+                } else {
+                    debug("requestor {} does not have an accepted token", authorization, request, request.getRequestor());
+                    return accessControlDecision(false, authorization, request);
+                }
+            }
+            // determine if the operation is granted
+            if (isOperationGranted(authorization, request)) {
+                debug("operation is granted", authorization, request);
+                return accessControlDecision(true, authorization, request);
+            }
+            debug("operation is not granted", authorization, request);
+            return accessControlDecision(false, authorization, request);
+        } finally {
+            if (logger.isDebugEnabled()) {
+                debug("decision took {} ms", authorization, request, System.currentTimeMillis() - start);
+            }
+        }
+    }
+
+
     private static AclEvalResult accessControlDecision(boolean decision, Authorization authorization,
                     OperationRequest request) {
         AclEvalResult acd = new AclEvalResult();
@@ -78,32 +107,6 @@ public class WonAclEvaluator {
         return acd;
     }
 
-    public AclEvalResult decide(Authorization authorization, OperationRequest request) {
-        long start = System.currentTimeMillis();
-        try {
-            // determine if the requestor is in the set of grantees
-            if (!isRequestorAGrantee(authorization, request)) {
-                debug("requestor {} is not grantee", authorization, request, request.getRequestor());
-                if (isRequestorBearerOfAcceptedToken(authorization, request)) {
-                    debug("requestor {} has an accepted token", authorization, request, request.getRequestor());
-                } else {
-                    debug("requestor {} does not have an accepted token", authorization, request, request.getRequestor());
-                    return accessControlDecision(false, authorization, request);
-                }
-            }
-            // determine if the operation is granted
-            if (isOperationGranted(authorization, request)) {
-                debug("operation is granted", authorization, request);
-                return accessControlDecision(true, authorization, request);
-            }
-            debug("operation is not granted", authorization, request);
-            return accessControlDecision(false, authorization, request);
-        } finally {
-            if (logger.isDebugEnabled()) {
-                debug("decision took {} ms", authorization, request, System.currentTimeMillis() - start);
-            }
-        }
-    }
 
     private static boolean isOperationGranted(Authorization authorization, OperationRequest request) {
         for (AseRoot root : authorization.getGrants()) {
@@ -148,6 +151,9 @@ public class WonAclEvaluator {
         TargetAtomCheckGenerator v = new TargetAtomCheckGenerator(baseAtom, candidate);
         aseRoot.accept(v);
         for (TargetAtomCheck check : v.getTargetAtomChecks()) {
+            if (logger.isDebugEnabled()){
+                logger.debug("Evaluating targetAtomCheck: {}", check);
+            }
             if (this.targetAtomCheckEvaluator.isRequestorAllowedTarget(check)) {
                 return true;
             }
@@ -164,13 +170,15 @@ public class WonAclEvaluator {
                         .filter(token -> isTokenValid(token))
                         .collect(Collectors.toSet());
         debug("valid tokens: {}", authorization, request, decoded.size());
-        for (TokenShape tokenShape : authorization.getBearers()) {
-            Set<AseRoot> aseRoots = tokenShape.getIssuersAseRoot();
-            Set<AtomExpression> atomExpressions = tokenShape.getIssuersAtomExpression();
-            Set<AuthToken> elegibleTokens = filterTokensByScope(decoded, tokenShape);
-            debug("tokens with correct scope: {}", authorization, request, elegibleTokens.size());
-            if (isIssuerAccepted(elegibleTokens, aseRoots, atomExpressions, request.getReqAtom())) {
-                return true;
+        if (decoded.size() > 0) {
+            for (TokenShape tokenShape : authorization.getBearers()) {
+                Set<AseRoot> aseRoots = tokenShape.getIssuersAseRoot();
+                Set<AtomExpression> atomExpressions = tokenShape.getIssuersAtomExpression();
+                Set<AuthToken> elegibleTokens = filterTokensByScope(decoded, tokenShape);
+                debug("tokens with correct scope: {}", authorization, request, elegibleTokens.size());
+                if (isIssuerAccepted(elegibleTokens, aseRoots, atomExpressions, request.getReqAtom())) {
+                    return true;
+                }
             }
         }
         return false;

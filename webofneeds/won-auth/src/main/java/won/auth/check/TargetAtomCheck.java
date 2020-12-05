@@ -8,20 +8,20 @@ import java.util.stream.Collectors;
 
 public class TargetAtomCheck {
     private URI atom;
-    private URI requestorAtom;
+    private URI requestedTarget;
     private Set<URI> allowedSockets;
     private Set<URI> allowedSocketTypes;
     private Set<URI> allowedConnectionStates;
 
-    public TargetAtomCheck(URI atom, URI requestorAtom) {
+    public TargetAtomCheck(URI atom, URI requestedTarget) {
         this.atom = atom;
-        this.requestorAtom = requestorAtom;
+        this.requestedTarget = requestedTarget;
     }
 
     public TargetAtomCheck clone() {
-        TargetAtomCheck clone = new TargetAtomCheck(atom, requestorAtom);
+        TargetAtomCheck clone = new TargetAtomCheck(atom, requestedTarget);
         clone.atom = atom;
-        clone.requestorAtom = requestorAtom;
+        clone.requestedTarget = requestedTarget;
         clone.allowedSockets = new HashSet<>(getAllowedSockets());
         clone.allowedSocketTypes = new HashSet<>(getAllowedSocketTypes());
         clone.allowedConnectionStates = new HashSet<>(getAllowedConnectionStates());
@@ -32,8 +32,8 @@ public class TargetAtomCheck {
         return atom;
     }
 
-    public URI getRequestorAtom() {
-        return requestorAtom;
+    public URI getRequestedTarget() {
+        return requestedTarget;
     }
 
     public Set<URI> getAllowedSockets() {
@@ -126,7 +126,7 @@ public class TargetAtomCheck {
             return false;
         TargetAtomCheck that = (TargetAtomCheck) o;
         return Objects.equals(atom, that.atom) &&
-                        Objects.equals(requestorAtom, that.requestorAtom) &&
+                        Objects.equals(requestedTarget, that.requestedTarget) &&
                         Objects.equals(allowedSockets, that.allowedSockets) &&
                         Objects.equals(allowedSocketTypes, that.allowedSocketTypes) &&
                         Objects.equals(allowedConnectionStates, that.allowedConnectionStates);
@@ -134,7 +134,7 @@ public class TargetAtomCheck {
 
     @Override
     public int hashCode() {
-        return Objects.hash(atom, requestorAtom, allowedSockets, allowedSocketTypes, allowedConnectionStates);
+        return Objects.hash(atom, requestedTarget, allowedSockets, allowedSocketTypes, allowedConnectionStates);
     }
 
     public void intersectAllowedConnectionStates(Set<URI> allowedConnectionStates) {
@@ -154,7 +154,7 @@ public class TargetAtomCheck {
     public String toString() {
         return "TargetAtomCheck{" +
                         "atom=" + atom +
-                        ", requestorAtom=" + requestorAtom +
+                        ", requestorAtom=" + requestedTarget +
                         ", allowedSockets=" + allowedSockets +
                         ", allowedSocketTypes=" + allowedSocketTypes +
                         ", allowedConnectionStates=" + allowedConnectionStates +

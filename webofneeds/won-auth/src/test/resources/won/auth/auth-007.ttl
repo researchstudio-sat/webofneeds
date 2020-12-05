@@ -1,4 +1,4 @@
-<<@base             <https://example.com/test/atom1> .
+@base             <https://example.com/test/atom1> .
 @prefix auth:     <https://w3id.org/won/auth#> .
 @prefix msg:      <https://w3id.org/won/message#> .
 @prefix wx-buddy: <https://w3id.org/won/ext/buddy#> .

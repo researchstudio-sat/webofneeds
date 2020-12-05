@@ -251,12 +251,18 @@ public class WonAclEvaluatorTests {
                 if (!expected.equals(decision.getDecision())){
                     continue;
                 } else {
+                    logger.debug("AclEvalResult decision fulfills spec: {}, checking tokens...", decision.getDecision() );
                     correctDecisionForAuths.add(auth.get_node().toString());
                     if (!spec.getIssueTokens().isEmpty()) {
+                        logger.debug("Spec requires {} tokens", spec.getIssueTokens().size() );
                         for (AuthTokenTestSpec tokenSpec : spec.getIssueTokens()) {
+                            logger.debug("AclEvalResult contains {} tokens", decision.getIssueTokens().size() );
                             if (!decision.getIssueTokens()
                                     .stream()
                                     .anyMatch(actualToken -> matches(tokenSpec, actualToken))) {
+                                logger.debug("None of the actual tokens {} matched the specified token {}",
+                                        decision.getIssueTokens().stream().map(AuthToken::toStringAllFields).collect(Collectors.joining(",","[","]")),
+                                        tokenSpec.toStringAllFields());
                                 wrongTokensIssuedForAuths.add(auth.get_node().toString());
                                 continue AUTHS;
                             }
@@ -290,7 +296,7 @@ public class WonAclEvaluatorTests {
             }
         }
         if (tokenSpec.getTokenScopeURI() != null) {
-            if (!tokenSpec.getTokenScopesUnion()
+            if (!tokenSpec.getTokenScopeURI()
                             .equals(actualToken.getTokenScopeURI())) {
                 return false;
             }

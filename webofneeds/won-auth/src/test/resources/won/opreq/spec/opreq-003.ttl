@@ -1,22 +1,20 @@
-@prefix auth:        <https://w3id.org/won/auth#> .
-@prefix msg:         <https://w3id.org/won/message#> .
-@prefix won:         <https://w3id.org/won/core#> .
-@prefix wx-buddy:    <https://w3id.org/won/ext/buddy#> .
-@prefix wx-hold:     <https://w3id.org/won/ext/hold#> .
-@prefix wx-schema:   <https://w3id.org/won/ext/schema#> .
-@prefix ex:          <https://example.com/test/> .
-@prefix owl:         <http://www.w3.org/2002/07/owl#> .
-@prefix xsd:         <http://www.w3.org/2001/XMLSchema#> .
-@prefix msg:         <https://w3id.org/won/message#> .
-@prefix rdfs:        <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix rdfg:        <http://www.w3.org/2004/04/trix/rdfg-1/> .
-@prefix rdf:         <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix party:       <http://example.org/test/party#> .
-@prefix shrek:       <http://example.org/test/shrek#> .
-@prefix donkey:      <http://example.org/test/donkey#> .
-@prefix dragon:      <http://example.org/test/dragon#> .
-@prefix magicmirror: <http://example.org/test/magicmirror#> .
-@prefix pinocchio: <http://example.org/test/pinocchio#> .
+@prefix auth:         <https://w3id.org/won/auth#> .
+@prefix won:          <https://w3id.org/won/core#> .
+@prefix wx-buddy:     <https://w3id.org/won/ext/buddy#> .
+@prefix wx-hold:      <https://w3id.org/won/ext/hold#> .
+@prefix wx-schema:    <https://w3id.org/won/ext/schema#> .
+@prefix msg:          <https://w3id.org/won/message#> .
+@prefix ex:           <https://example.com/test/> .
+@prefix owl:          <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix party:        <http://example.org/test/party#> .
+@prefix shrek:        <http://example.org/test/shrek#> .
+@prefix donkey:       <http://example.org/test/donkey#> .
+@prefix dragon:       <http://example.org/test/dragon#> .
+@prefix magicmirror:  <http://example.org/test/magicmirror#> .
+@prefix pinocchio:    <http://example.org/test/pinocchio#> .
+@prefix lordfarquaad: <http://example.org/test/lordfarquaad#> .
 
 # Shrek is organizing a rather secretive party. His friends can see an invitation without time/location details.
 # Friends of friends can see that, too. Guests who are personally invited can see the time/location details.
@@ -24,12 +22,12 @@
 
 # dragon cannot see the time/date info
 
-dragon:expectedResult3
+dragon:expectedResult1
     a                       auth:ExpectedAclEvalResult ;
     auth:decision           auth:accessDenied ;
-    auth:requestedOperation dragon:request3 .
+    auth:requestedOperation dragon:request1 .
 
-dragon:request3
+dragon:request1
     a                 auth:OperationRequest ;
     auth:operation    auth:opRead ;
     auth:requestor    ex:dragon ;
@@ -40,12 +38,12 @@ dragon:request3
 
 # dragon cannot see the invitiation info
 
-dragon:expectedResult4
+dragon:expectedResult2
     a                       auth:ExpectedAclEvalResult ;
     auth:decision           auth:accessDenied ;
-    auth:requestedOperation dragon:request4 .
+    auth:requestedOperation dragon:request2 .
 
-dragon:request4
+dragon:request2
     a                 auth:OperationRequest ;
     auth:operation    auth:opRead ;
     auth:requestor    ex:dragon ;
@@ -54,26 +52,45 @@ dragon:request4
     auth:reqGraph     party:invitationWithoutSpecifics ;
     auth:reqAtomState won:Active .
 
-# dragon gets a "buddyOfBuddy" token from shrek
+# dragon gets a wx-buddy:BuddySocket token from donkey
 
-dragon:expectedResult1
+dragon:expectedResult3
     a                       auth:ExpectedAclEvalResult ;
     auth:decision           auth:accessGranted ;
-    auth:requestedOperation dragon:request1 ;
+    auth:requestedOperation dragon:request3 ;
+    auth:issueToken         [ auth:tokenScope   wx-buddy:BuddySocket ;
+                              auth:tokenIss     ex:donkey ;
+                              auth:tokenSub     ex:dragon ;
+                              auth:expiresAfter 3600 ] .
+
+dragon:request3
+    a                 auth:OperationRequest ;
+    auth:operation    auth:opRequestToken ;
+    auth:requestor    ex:dragon ;
+    auth:reqAtom      ex:donkey ;
+    auth:reqPosition  auth:positionTokenRequest ;
+    auth:reqAtomState won:Active .
+
+# dragon gets a "buddyOfBuddy" token from shrek
+
+dragon:expectedResult4
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessGranted ;
+    auth:requestedOperation dragon:request4 ;
     auth:issueToken         [ auth:tokenScope   "buddyOfBuddy" ;
                               auth:tokenIss     ex:shrek ;
                               auth:tokenSub     ex:dragon ;
                               auth:expiresAfter 3600 ] .
 
-dragon:request1
+dragon:request4
     a                auth:OperationRequest ;
     auth:operation   auth:opRequestToken ;
     auth:requestor   ex:dragon ;
     auth:reqAtom     ex:shrek ;
     auth:reqPosition auth:positionTokenRequest ;
-    auth:bearsToken  dragon:donkeysBuddyToken1 .
+    auth:bearsToken  dragon:donkeysBuddyToken4 .
 
-dragon:donkeysBuddyToken1
+dragon:donkeysBuddyToken4
     a               auth:AuthToken ;
     auth:tokenScope wx-buddy:BuddySocket ;
     auth:tokenIss   ex:donkey ;
@@ -83,12 +100,12 @@ dragon:donkeysBuddyToken1
 
 # dragon can see the invitiation info with her token from shrek
 
-dragon:expectedResult2
+dragon:expectedResult5
     a                       auth:ExpectedAclEvalResult ;
     auth:decision           auth:accessGranted ;
-    auth:requestedOperation dragon:request2 .
+    auth:requestedOperation dragon:request5 .
 
-dragon:request2
+dragon:request5
     a                 auth:OperationRequest ;
     auth:operation    auth:opRead ;
     auth:requestor    ex:dragon ;
@@ -107,6 +124,43 @@ dragon:shreksBuddyOfBuddyToken
     auth:tokenIat   "2020-12-03T17:00:00"^^xsd:dateTime ;
     auth:tokenExp   "2020-12-03T18:00:00"^^xsd:dateTime .
 
+# dragon cannot time/date info with her token from shrek (she needs to request to attend and be granted)
+
+dragon:expectedResult6
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessDenied ;
+    auth:requestedOperation dragon:request6 .
+
+dragon:request6
+    a                 auth:OperationRequest ;
+    auth:operation    auth:opRead ;
+    auth:requestor    ex:dragon ;
+    auth:reqAtom      ex:party ;
+    auth:reqPosition  auth:positionAtomGraph ;
+    auth:bearsToken   dragon:shreksBuddyOfBuddyToken ;
+    auth:reqGraph     party:timeDateAndLocation ;
+    auth:reqAtomState won:Active ;
+.
+
+# dragon can ask to attend the party with her token from shrek .
+
+dragon:expectedResult7
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessGranted ;
+    auth:requestedOperation dragon:request7 .
+
+dragon:request7
+    a                  auth:OperationRequest ;
+    auth:operation     [ auth:messageTo msg:ConnectMessage ] ;
+    auth:requestor     ex:dragon ;
+    auth:reqAtom       ex:party ;
+    auth:reqAtomState  won:Active ;
+    auth:reqPosition   auth:positionSocket ;
+    auth:bearsToken    dragon:shreksBuddyOfBuddyToken ;
+    auth:reqSocket     party:attendeeSocket ;
+    auth:reqSocketType wx-schema:AttendeeSocket .
+
+
 # magicmirror can see the time/date/location info becauses he is invited
 
 magicmirror:expectedResult1
@@ -123,7 +177,25 @@ magicmirror:request1
     auth:reqGraph     party:timeDateAndLocation ;
     auth:reqAtomState won:Active .
 
-# magicmirror can see the time/date/location info becauses he is invited
+# magicmirror can see who is attending or invited because he is invited
+
+magicmirror:expectedResult2
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessGranted ;
+    auth:requestedOperation magicmirror:request2 .
+
+magicmirror:request2
+    a                  auth:OperationRequest ;
+    auth:operation     auth:opRead ;
+    auth:requestor     ex:magicmirror ;
+    auth:reqAtom       ex:party ;
+    auth:reqAtomState  won:Active ;
+    auth:reqPosition   auth:positionConnections ;
+    auth:reqSocket     party:attendeeSocket ;
+    auth:reqSocketType wx-schema:AttendeeSocket ;
+    auth:reqConnections party:attendeeSocketConnections .
+
+# pinocchio can see the time/date/location info becauses he is invited
 
 pinocchio:expectedResult1
     a                       auth:ExpectedAclEvalResult ;
@@ -167,17 +239,77 @@ donkey:buddyTokenFromShrek
 
 # lordfarquaad cannot not see any content
 
+lordfarquaad:expectedResult1
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessDenied ;
+    auth:requestedOperation lordfarquaad:request1 .
 
+lordfarquaad:request1
+    a                 auth:OperationRequest ;
+    auth:operation    auth:opRead ;
+    auth:requestor    ex:lordfarquaad ;
+    auth:reqAtom      ex:party ;
+    auth:reqPosition  auth:positionAtomGraph ;
+    auth:reqGraph     party:invitationWithoutSpecifics ;
+    auth:reqAtomState won:Active .
+
+lordfarquaad:expectedResult2
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessDenied ;
+    auth:requestedOperation lordfarquaad:request2 .
+
+lordfarquaad:request2
+    a                 auth:OperationRequest ;
+    auth:operation    auth:opRead ;
+    auth:requestor    ex:lordfarquaad ;
+    auth:reqAtom      ex:party ;
+    auth:reqPosition  auth:positionAtomGraph ;
+    auth:reqGraph     party:invitationWithoutSpecifics ;
+    auth:reqAtomState won:Active .
+
+# lordfarquaad cannot ask to attend the party.
+
+lordfarquaad:expectedResult3
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessDenied ;
+    auth:requestedOperation lordfarquaad:request3 .
+
+lordfarquaad:request3
+    a                  auth:OperationRequest ;
+    auth:operation     [ auth:messageTo msg:ConnectMessage ] ;
+    auth:requestor     ex:lordfarquaad ;
+    auth:reqAtom       ex:party ;
+    auth:reqAtomState  won:Active ;
+    auth:reqPosition   auth:positionSocket ;
+    auth:reqSocket     party:attendeeSocket ;
+    auth:reqSocketType wx-schema:AttendeeSocket .
+
+# lordfarquaad cannot see who is attending or invited
+
+lordfarquaad:expectedResult4
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessDenied ;
+    auth:requestedOperation lordfarquaad:request4 .
+
+lordfarquaad:request4
+    a                  auth:OperationRequest ;
+    auth:operation     auth:opRead ;
+    auth:requestor     ex:lordfarquaad ;
+    auth:reqAtom       ex:party ;
+    auth:reqAtomState  won:Active ;
+    auth:reqPosition   auth:positionConnections ;
+    auth:reqSocket     party:attendeeSocket ;
+    auth:reqSocketType wx-schema:AttendeeSocket ;
+    auth:reqConnections party:attendeeSocketConnections .
 
 ### ACLs
 
 # Grants a wx-buddy:BuddySocket token to buddies
 
-shrek:grantBuddyTokenAuth
+ex:grantBuddyTokenAuth
     a               auth:Authorization ;
     auth:grantee    [ auth:socket [ auth:socketType wx-buddy:BuddySocket ;
-                                    auth:connection [ auth:connectionState won:Connected ] ;
-                                    auth:targetAtom [ ] ; ] ] ;
+                                    auth:targetAtom [ ] ] ] ;
     auth:grant      [ auth:operation auth:opRequestToken ] ;
     auth:grantToken [ auth:tokenScope   wx-buddy:BuddySocket ;
                       auth:expiresAfter 3600 ] .
@@ -199,16 +331,16 @@ shrek:grantBuddyOfBuddyTokenAuth
 # and to connect/communicate via the wx-schema:AttendeeSocket - which allows
 # Shrek (as the owner of the party atom), to accept/deny their requests to attend
 
-party:buddyOfBuddyAuthorization
+party:unspecificInvitationAuthorization
     a           auth:Authorization ;
     auth:bearer [ auth:tokenScope "buddyOfBuddy", wx-buddy:BuddySocket ;
                   auth:issuer     [ auth:socket [ auth:socketType wx-hold:HoldableSocket ;
-                                                  auth:targetAtom [ ] ; ] ] ] ;
+                                                  auth:targetAtom [ ] ] ] ] ;
     auth:grant  [ auth:graph  [ auth:graphType auth:sysinfoGraph ;
                                 auth:graphIri  party:invitationWithoutSpecifics ;
                                 auth:operation auth:opRead ] ;
                   auth:socket [ auth:socketType wx-schema:AttendeeSocket ;
-                                auth:operation  auth:opConnectClose, auth:opCommunicate ; ] ] .
+                                auth:operation  auth:opConnectClose, auth:opCommunicate ] ] .
 
 # All atoms connected on the wx-schema:AttendeeSocket get read access to
 # the content graph #timeDateAndLocation, containing all information needed to
@@ -219,17 +351,19 @@ party:attendeeAuthorization
     a            auth:Authorization ;
     auth:grantee [ auth:socket [ auth:socketType wx-schema:AttendeeSocket ;
                                  auth:connection [ auth:targetAtom      [ ] ;
-                                                   auth:connectionState won:Connected, won:RequestSent ] ; ] ] ;
-    auth:grant   [ auth:graph [ auth:graphType auth:sysinfoGraph ;
-                                auth:graphIri  party:invitationWithoutSpecifics, party:timeDateAndLocation ;
-                                auth:operation auth:opRead ] ; ] .
+                                                   auth:connectionState won:Connected, won:RequestSent ] ] ] ;
+    auth:grant   [ auth:graph  [ auth:graphType auth:sysinfoGraph ;
+                                 auth:graphIri  party:invitationWithoutSpecifics, party:timeDateAndLocation ;
+                                 auth:operation auth:opRead ] ;
+                   auth:socket [ auth:socketType wx-schema:AttendeeSocket ;
+                                 auth:operation  auth:opConnectClose, auth:opCommunicate, auth:opRead ] ] .
 
 
 # Any atom is allowed to get the authentication info
 
 <#Authorization3Party>
     auth:grantee [ auth:atom auth:anyAtom ] ;
-    auth:grant   [ auth:graph [ auth:operation auth:opGetAuthInfo ; ] ] .
+    auth:grant   [ auth:graph [ auth:operation auth:opGetAuthInfo ] ] .
 
 ## shrek's buddy network (and connection to the party)
 
@@ -297,7 +431,7 @@ donkey:buddy2
     won:targetAtom      ex:dragon ;
     won:connectionState won:Connected .
 
-donkey:buddy2
+donkey:buddy3
     a                   won:Connection ;
     won:targetAtom      ex:lordfarquaad ;
     won:connectionState won:RequestReceived .
