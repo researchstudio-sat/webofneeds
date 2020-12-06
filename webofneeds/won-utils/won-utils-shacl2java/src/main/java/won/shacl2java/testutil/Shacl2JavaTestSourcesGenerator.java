@@ -22,6 +22,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class Shacl2JavaTestSourcesGenerator {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -61,7 +62,7 @@ public class Shacl2JavaTestSourcesGenerator {
                             .addVisitorClass(URI.create("https://w3id.org/won/auth#TreeExpressionShape"))
                             .outputDir(outputDirFile.getAbsolutePath()).build();
             SourceGenerator gen = new SourceGenerator();
-            List<TypeSpec> typeSpecs = gen.generateTypes(shapes, config);
+            Set<TypeSpec> typeSpecs = gen.generateTypes(shapes, config);
             SourceGenerator.writeClasses(typeSpecs, config);
             logger.debug("wrote classes to {} ", outputDirFile);
         }

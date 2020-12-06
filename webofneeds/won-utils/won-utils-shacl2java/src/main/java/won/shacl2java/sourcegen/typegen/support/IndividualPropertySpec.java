@@ -1,7 +1,6 @@
-package won.shacl2java.sourcegen;
+package won.shacl2java.sourcegen.typegen.support;
 
 import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.TypeName;
 import org.apache.jena.graph.Node;
 
 import java.util.Collection;

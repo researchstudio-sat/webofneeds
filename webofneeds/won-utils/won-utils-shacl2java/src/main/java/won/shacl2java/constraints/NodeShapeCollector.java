@@ -8,12 +8,9 @@ import org.apache.jena.shacl.engine.constraint.ShNot;
 import org.apache.jena.shacl.parser.Constraint;
 import org.apache.jena.shacl.parser.NodeShape;
 import org.apache.jena.shacl.parser.Shape;
-import won.shacl2java.sourcegen.PropertySpec;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Collects all node shapes that apply to the origin node shape (i.e., shapes

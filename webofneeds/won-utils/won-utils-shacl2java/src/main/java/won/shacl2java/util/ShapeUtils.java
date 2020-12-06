@@ -5,7 +5,7 @@ import org.apache.jena.shacl.Shapes;
 import org.apache.jena.shacl.parser.NodeShape;
 import org.apache.jena.shacl.parser.PropertyShape;
 import org.apache.jena.shacl.parser.Shape;
-import won.shacl2java.sourcegen.PropertySpec;
+import won.shacl2java.constraints.PropertySpec;
 import won.shacl2java.constraints.*;
 
 import java.util.Set;

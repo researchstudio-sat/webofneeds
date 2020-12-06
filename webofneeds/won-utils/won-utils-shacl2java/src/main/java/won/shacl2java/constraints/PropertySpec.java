@@ -1,4 +1,4 @@
-package won.shacl2java.sourcegen;
+package won.shacl2java.constraints;
 
 import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.graph.Node;

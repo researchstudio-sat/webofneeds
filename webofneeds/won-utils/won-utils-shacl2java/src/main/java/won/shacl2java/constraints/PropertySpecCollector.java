@@ -1,13 +1,11 @@
 package won.shacl2java.constraints;
 
-import org.apache.jena.graph.Node;
 import org.apache.jena.shacl.engine.constraint.*;
 import org.apache.jena.shacl.parser.Constraint;
 import org.apache.jena.shacl.parser.Shape;
 import org.apache.jena.shacl.vocabulary.SHACL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.shacl2java.sourcegen.PropertySpec;
 
 import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
