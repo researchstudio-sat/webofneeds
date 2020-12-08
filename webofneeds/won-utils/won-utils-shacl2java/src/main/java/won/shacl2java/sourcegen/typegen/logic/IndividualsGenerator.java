@@ -5,17 +5,22 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.TypeSpec;
 import org.apache.jena.graph.Node;
+import org.apache.jena.riot.system.ErrorHandler;
 import org.apache.jena.shacl.Shapes;
+import org.apache.jena.shacl.engine.ValidationContext;
+import org.apache.jena.shacl.validation.VLib;
 import won.shacl2java.Shacl2JavaConfig;
 import won.shacl2java.annotation.Individual;
 import won.shacl2java.annotation.Individuals;
 import won.shacl2java.annotation.ShapeNode;
 import won.shacl2java.sourcegen.typegen.mapping.IndividualClassNames;
-import won.shacl2java.sourcegen.typegen.mapping.ProducerConsumerMap;
+import won.shacl2java.sourcegen.typegen.support.ProducerConsumerMap;
 import won.shacl2java.sourcegen.typegen.TypesGenerator;
 import won.shacl2java.util.NameUtils;
+import won.shacl2java.validation.ResettableErrorHandler;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.StreamSupport;
 
 import static javax.lang.model.element.Modifier.*;
@@ -41,6 +46,8 @@ public class IndividualsGenerator implements TypesGenerator {
     }
 
     private TypeSpec generateIndividuals(Shapes shapes, Shacl2JavaConfig config) {
+        ResettableErrorHandler err = new ResettableErrorHandler();
+        ValidationContext vCtx = ValidationContext.create(shapes, shapes.getGraph(), err);
         TypeSpec.Builder individualsTypeBuilder = TypeSpec.classBuilder("Individuals")
                         .addModifiers(PUBLIC)
                         .addAnnotation(AnnotationSpec.builder(Individuals.class).build());
@@ -52,6 +59,11 @@ public class IndividualsGenerator implements TypesGenerator {
                             Collection<Node> focusNodes = focusNodes(shapes.getGraph(), shape);
                             for (Node focusNode : focusNodes) {
                                 if (focusNode.isBlank() || focusNode.isLiteral()) {
+                                    continue;
+                                }
+                                err.reset();
+                                VLib.validateShape(vCtx, shapes.getGraph(), shape, focusNode);
+                                if (err.isError() || err.isFatal()) {
                                     continue;
                                 }
                                 String name = NameUtils.enumConstantName(focusNode.getURI());

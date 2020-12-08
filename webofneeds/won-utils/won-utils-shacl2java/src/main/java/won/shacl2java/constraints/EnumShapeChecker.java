@@ -6,11 +6,13 @@ import org.apache.jena.shacl.engine.constraint.ClosedConstraint;
 import org.apache.jena.shacl.engine.constraint.DatatypeConstraint;
 import org.apache.jena.shacl.engine.constraint.InConstraint;
 import org.apache.jena.shacl.engine.constraint.NodeKindConstraint;
+import org.apache.jena.shacl.parser.ConstraintVisitor;
+import org.apache.jena.shacl.parser.ConstraintVisitorBase;
 import org.apache.jena.shacl.parser.Shape;
 
 import java.util.List;
 
-public class EnumShapeChecker implements ConstraintVisitor {
+public class EnumShapeChecker extends ConstraintVisitorBase {
     private List<Node> values;
     private RDFDatatype datatype;
     private Node nodeKind;

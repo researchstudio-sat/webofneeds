@@ -2,6 +2,7 @@ package won.shacl2java.sourcegen.typegen.mapping;
 
 import com.squareup.javapoet.TypeSpec;
 import won.shacl2java.sourcegen.typegen.UpdateableTypeSpecMapping;
+import won.shacl2java.sourcegen.typegen.support.ProducerConsumerMap;
 
 import java.net.URI;
 import java.util.Map;

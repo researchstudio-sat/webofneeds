@@ -5,9 +5,7 @@ import org.apache.jena.shacl.engine.constraint.ConstraintOp1;
 import org.apache.jena.shacl.engine.constraint.ConstraintOpN;
 import org.apache.jena.shacl.engine.constraint.ShNode;
 import org.apache.jena.shacl.engine.constraint.ShNot;
-import org.apache.jena.shacl.parser.Constraint;
-import org.apache.jena.shacl.parser.NodeShape;
-import org.apache.jena.shacl.parser.Shape;
+import org.apache.jena.shacl.parser.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -16,7 +14,7 @@ import java.util.Set;
  * Collects all node shapes that apply to the origin node shape (i.e., shapes
  * referenced via or/and/xor/xone/node(anon) etc.)
  */
-public class NodeShapeCollector implements ConstraintVisitor {
+public class NodeShapeCollector extends ConstraintVisitorBase {
     private Set<Node> shapeNodes = null;
     private boolean negated = false;
 
@@ -64,7 +62,7 @@ public class NodeShapeCollector implements ConstraintVisitor {
                 visitRecursively(subShape, visitor);
             });
         }
-        visitor.visit(constraint);
+        constraint.visit(visitor);
     }
 
     private boolean shouldRecurseInto(ShNode constraint) {

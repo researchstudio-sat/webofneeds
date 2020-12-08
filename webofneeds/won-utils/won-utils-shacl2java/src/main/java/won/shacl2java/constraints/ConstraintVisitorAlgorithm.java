@@ -4,6 +4,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.shacl.engine.constraint.ConstraintOp1;
 import org.apache.jena.shacl.engine.constraint.ConstraintOpN;
 import org.apache.jena.shacl.parser.Constraint;
+import org.apache.jena.shacl.parser.ConstraintVisitor;
 import org.apache.jena.shacl.parser.Shape;
 
 import java.util.HashSet;
@@ -45,7 +46,7 @@ public class ConstraintVisitorAlgorithm {
     private static void visitRecursively(Constraint constraint, ConstraintVisitor visitor, boolean depthFirst,
                     Set<Node> visited) {
         if (!depthFirst) {
-            visitor.visit(constraint);
+            constraint.visit(visitor);
         }
         if (constraint instanceof ConstraintOp1) {
             Shape other = ((ConstraintOp1) constraint).getOther();
@@ -61,13 +62,13 @@ public class ConstraintVisitorAlgorithm {
             });
         }
         if (depthFirst) {
-            visitor.visit(constraint);
+            constraint.visit(visitor);
         }
     }
 
     public static void visitShallow(Shape shape, ConstraintVisitor visitor) {
         for (Constraint constraint : shape.getConstraints()) {
-            visitor.visit(constraint);
+            constraint.visit(visitor);
         }
     }
 }

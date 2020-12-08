@@ -39,7 +39,7 @@ ex:expectedResult
     auth:operation   auth:opRequestToken ;
     auth:requestor   ex:atom2 ;
     auth:reqAtom     ex:atom1 ;
-    auth:reqPosition auth:positionTokenRequest ;
+    auth:reqPosition auth:positionRoot ;
     auth:bearsToken  ex:token1 .
 
 ex:token1

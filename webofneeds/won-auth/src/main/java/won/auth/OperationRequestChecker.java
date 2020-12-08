@@ -7,8 +7,10 @@ import won.auth.model.*;
 import java.lang.invoke.MethodHandles;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static won.auth.model.Individuals.ANY_OPERATION;
+import static won.auth.model.MessageWildcard.ANY_MESSAGE_TYPE;
 
 class OperationRequestChecker extends DefaultTreeExpressionVisitor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -20,7 +22,7 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
 
     /**
      * Returns the level difference if <code>lower</code> is lower, otherwise -1;
-     * 
+     *
      * @param lower
      * @param higher
      * @param visited
@@ -112,48 +114,8 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
 
     private boolean isOperationGranted(OperationExpression operation) {
         Set<OperationExpression> granted = grantedOperations.peek();
-        if (granted.contains(ANY_OPERATION) || granted.contains(operation)) {
-            return true;
-        }
-        Set<MessageType> mto = operation.getMessageTosMessageOperation().stream()
-                        .flatMap(mo -> mo.getMembers().stream()).collect(Collectors.toSet());
-        mto.addAll(operation.getMessageTosMessageType());
-        Boolean firstResult = null;
-        if (!mto.isEmpty()) {
-            boolean result = granted.parallelStream()
-                            .anyMatch(go -> mto.stream()
-                                            .allMatch(msgType -> go.getMessageTosMessageType().contains(msgType)
-                                                            || go.getMessageTosMessageOperation().stream()
-                                                                            .anyMatch(msgOp -> msgOp.getMembers()
-                                                                                            .contains(msgType))));
-            if (!result) {
-                return false;
-            } else {
-                firstResult = true;
-            }
-        }
-        Set<MessageType> mob = operation.getMessageOnBehalfsMessageOperation().stream()
-                        .flatMap(mo -> mo.getMembers().stream()).collect(Collectors.toSet());
-        mob.addAll(operation.getMessageOnBehalfsMessageType());
-        if (!mob.isEmpty()) {
-            boolean result = granted.parallelStream()
-                            .anyMatch(go -> mob.stream()
-                                            .allMatch(msgType -> go.getMessageOnBehalfsMessageType().contains(msgType)
-                                                            || go.getMessageOnBehalfsMessageOperation().stream()
-                                                                            .anyMatch(msgOp -> msgOp.getMembers()
-                                                                                            .contains(msgType))));
-            if (!result) {
-                return false;
-            } else {
-                if (firstResult == null || firstResult) {
-                    return true;
-                }
-            }
-        }
-        if (firstResult != null) {
-            return firstResult;
-        }
-        return false;
+        OperationGrantsRequested check = new OperationGrantsRequested(operation);
+        return granted.stream().anyMatch(grantedOperation -> grantedOperation.when(check));
     }
 
     private void decideForPosition(AsePosition decisionPosition) {
@@ -161,12 +123,15 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
         if (!isFinalDecisionMade()) {
             if (!isBranchMarkedNothingGranted()) {
                 if (requestedPos.equals(decisionPosition)) {
-                    finalDecision = isOperationGranted(operationRequest.getOperation());
+                    // TODO: implement sh:xone handling to get just one operation here
+                    finalDecision = isOperationGranted(
+                                    operationRequest.getOperationsUnion().stream().findFirst().get());
                     if (logger.isDebugEnabled()) {
                         logger.debug("Making final decision at position {}: {}", decisionPosition, finalDecision);
                     }
                 } else if (isLowerThan(requestedPos, decisionPosition)) {
-                    boolean decisionAtCurrentPosition = isOperationGranted(operationRequest.getOperation());
+                    boolean decisionAtCurrentPosition = isOperationGranted(
+                                    operationRequest.getOperationsUnion().stream().findFirst().get());
                     if (logger.isDebugEnabled()) {
                         logger.debug("Recording decision at higher-than-requested position {}: {}",
                                         decisionPosition, decisionAtCurrentPosition);
@@ -189,7 +154,7 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
     private void collectOperations(OperationContainer node) {
         Set<OperationExpression> granted = grantedOperations.peek();
         if (granted != NOTHING_GRANTED) {
-            granted.addAll(node.getOperations());
+            granted.addAll(node.getOperationsUnion());
         }
     }
 
@@ -297,16 +262,6 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
     }
 
     @Override
-    protected void onBeginVisit(TokenRequestExpression other) {
-        inherit(other);
-        if (isBranchMarkedNothingGranted() || isFinalDecisionMade()) {
-            return;
-        }
-        collectOperations(other);
-        decideForPosition(other.getAsePosition());
-    }
-
-    @Override
     protected void onBeginVisit(AtomMessageExpression other) {
         inherit(other);
         if (isBranchMarkedNothingGranted() || isFinalDecisionMade()) {
@@ -364,5 +319,124 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
         }
         collectOperations(other);
         decideForPosition(other.getAsePosition());
+    }
+
+    private static class FalseUnless implements OperationExpression.Cases<Boolean> {
+        @Override
+        public Boolean is(AuthInfoOperationExpression option) {
+            return false;
+        }
+
+        @Override
+        public Boolean is(TokenOperationExpression option) {
+            return false;
+        }
+
+        @Override
+        public Boolean is(SimpleOperationExpression option) {
+            return false;
+        }
+
+        @Override
+        public Boolean is(MessageOperationExpression option) {
+            return false;
+        }
+    }
+
+    private static class OperationGrantsRequested implements OperationExpression.Cases<Boolean> {
+        private OperationExpression requested;
+
+        public OperationGrantsRequested(OperationExpression requested) {
+            this.requested = requested;
+        }
+
+        @Override
+        public Boolean is(AuthInfoOperationExpression granted) {
+            return false;
+        }
+
+        @Override
+        public Boolean is(TokenOperationExpression granted) {
+            return false;
+        }
+
+        @Override
+        public Boolean is(SimpleOperationExpression granted) {
+            if (granted.equals(ANY_OPERATION)) {
+                return true;
+            }
+            return requested.when(new FalseUnless() {
+                @Override
+                public Boolean is(SimpleOperationExpression requestedOption) {
+                    return granted.get_node().equals(requestedOption.get_node());
+                }
+            });
+        }
+
+        @Override
+        public Boolean is(MessageOperationExpression granted) {
+            return requested.when(new FalseUnless() {
+                @Override
+                public Boolean is(MessageOperationExpression requestedOption) {
+                    if (ANY_MESSAGE_TYPE.equals(granted.getMessageTosMessageWildcard())
+                                    && !requestedOption.getMessageTosUnion().isEmpty()
+                                    && (requestedOption.getMessageOnBehalfsUnion().isEmpty()
+                                                    || ANY_MESSAGE_TYPE.equals(
+                                                                    granted.getMessageOnBehalfsMessageWildcard()))) {
+                        return true;
+                    }
+                    if (ANY_MESSAGE_TYPE.equals(granted.getMessageOnBehalfsMessageWildcard())
+                                    && !requestedOption.getMessageOnBehalfsUnion().isEmpty()
+                                    && (requestedOption.getMessageTosUnion().isEmpty()
+                                                    || ANY_MESSAGE_TYPE.equals(
+                                                                    granted.getMessageOnBehalfsMessageWildcard()))) {
+                        return true;
+                    }
+                    Set<MessageType> requestedTos = collectMessageTypes(requestedOption.getMessageTosUnion());
+                    if (!requestedTos.isEmpty()){
+                        Set<MessageType> grantedTos = collectMessageTypes(granted.getMessageTosUnion());
+                        if (grantedTos.containsAll(requestedTos)) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                    Set<MessageType> requestedOnBehalfs = collectMessageTypes(
+                                    requestedOption.getMessageOnBehalfsUnion());
+                    if (!requestedOnBehalfs.isEmpty()){
+                        Set<MessageType> grantedOnBehalfs = collectMessageTypes(granted.getMessageOnBehalfsUnion());
+                        if (grantedOnBehalfs.containsAll(requestedOnBehalfs)) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                    return false;
+                }
+            });
+        }
+    }
+
+    private static Set<MessageType> collectMessageTypes(Set<MessageTypeSpecification> msgTypeSpecs) {
+        return msgTypeSpecs.stream()
+                        .flatMap(s -> s.when(new MessageTypeSpecification.Cases<Stream<MessageType>>() {
+                            @Override
+                            public Stream<MessageType> is(MessageWildcard option) {
+                                return new HashSet<MessageType>().stream();
+                            }
+
+                            @Override
+                            public Stream<MessageType> is(MessageTypesExpression option) {
+                                return option.getMembers().stream();
+                            }
+
+                            @Override
+                            public Stream<MessageType> is(MessageType option) {
+                                Set<MessageType> ret = new HashSet<>();
+                                ret.add(option);
+                                return ret.stream();
+                            }
+                        }))
+                        .collect(Collectors.toSet());
     }
 }

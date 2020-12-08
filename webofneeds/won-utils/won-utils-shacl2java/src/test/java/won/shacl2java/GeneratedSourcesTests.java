@@ -104,10 +104,10 @@ public class GeneratedSourcesTests {
         Assert.assertNotNull(authShape.getGrants());
         AseRoot grant = (AseRoot) authShape.getGrants().stream().findAny().get();
         Assert.assertNotNull(grant.getAtomStates());
-        Assert.assertNotNull(grant.getOperations());
+        Assert.assertNotNull(grant.getOperationsUnion());
         Assert.assertEquals(AtomState.class, grant.getAtomStates().stream().findAny().get().getClass());
         Assert.assertEquals(OperationExpression.class,
-                        grant.getOperations().stream().findAny().get().getClass());
+                        grant.getOperationsUnion().stream().findAny().get().getClass());
     }
 
     @Test

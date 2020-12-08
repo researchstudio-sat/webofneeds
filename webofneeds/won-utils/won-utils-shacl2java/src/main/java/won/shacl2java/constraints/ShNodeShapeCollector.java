@@ -4,12 +4,14 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.shacl.engine.constraint.ShNode;
 import org.apache.jena.shacl.engine.constraint.ShNot;
 import org.apache.jena.shacl.parser.Constraint;
+import org.apache.jena.shacl.parser.ConstraintVisitor;
+import org.apache.jena.shacl.parser.ConstraintVisitorBase;
 import org.apache.jena.shacl.parser.Shape;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class ShNodeShapeCollector implements ConstraintVisitor {
+public class ShNodeShapeCollector extends ConstraintVisitorBase {
     private Set<Node> shapeNodes = null;
     private boolean negated = false;
 

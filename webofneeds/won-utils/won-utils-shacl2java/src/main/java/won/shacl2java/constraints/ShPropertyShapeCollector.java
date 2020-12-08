@@ -1,14 +1,12 @@
 package won.shacl2java.constraints;
 
 import org.apache.jena.shacl.engine.constraint.ConstraintOpN;
-import org.apache.jena.shacl.parser.Constraint;
-import org.apache.jena.shacl.parser.PropertyShape;
-import org.apache.jena.shacl.parser.Shape;
+import org.apache.jena.shacl.parser.*;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class ShPropertyShapeCollector implements ConstraintVisitor {
+public class ShPropertyShapeCollector extends ConstraintVisitorBase {
     private Set<PropertyShape> propertyShapes = new HashSet<>();
 
     public ShPropertyShapeCollector() {
@@ -37,6 +35,6 @@ public class ShPropertyShapeCollector implements ConstraintVisitor {
                 visitRecursively(subShape);
             });
         }
-        visit(constraint);
+        constraint.visit(this);
     }
 }

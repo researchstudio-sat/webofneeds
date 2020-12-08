@@ -1,0 +1,11 @@
+@prefix auth:<https://w3id.org/won/auth#> .
+@prefix msg:  <https://w3id.org/won/message#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+auth:opModifyOnBehalf
+    a                    auth:MessageOperation ;
+    auth:messageOnBehalf auth:msgTypesModify .
+
+auth:msgTypesModify
+    a           auth:MessageTypeSet ;
+    rdfs:member msg:ReplaceMessage, msg:DeactivateMessage, msg:ActivateMessage .

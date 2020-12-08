@@ -1,0 +1,11 @@
+@prefix auth:<https://w3id.org/won/auth#> .
+@prefix msg:  <https://w3id.org/won/message#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+auth:opHint
+    a              auth:MessageOperation ;
+    auth:messageTo auth:msgTypesHint .
+
+auth:msgTypesHint
+    a           auth:MessageTypeSet ;
+    rdfs:member msg:SocketHintMessage, msg:AtomHintMessage .

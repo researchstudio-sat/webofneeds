@@ -68,7 +68,7 @@ dragon:request3
     auth:operation    auth:opRequestToken ;
     auth:requestor    ex:dragon ;
     auth:reqAtom      ex:donkey ;
-    auth:reqPosition  auth:positionTokenRequest ;
+    auth:reqPosition  auth:positionRoot ;
     auth:reqAtomState won:Active .
 
 # dragon gets a "buddyOfBuddy" token from shrek
@@ -87,7 +87,7 @@ dragon:request4
     auth:operation   auth:opRequestToken ;
     auth:requestor   ex:dragon ;
     auth:reqAtom     ex:shrek ;
-    auth:reqPosition auth:positionTokenRequest ;
+    auth:reqPosition auth:positionRoot ;
     auth:bearsToken  dragon:donkeysBuddyToken4 .
 
 dragon:donkeysBuddyToken4
@@ -185,14 +185,14 @@ magicmirror:expectedResult2
     auth:requestedOperation magicmirror:request2 .
 
 magicmirror:request2
-    a                  auth:OperationRequest ;
-    auth:operation     auth:opRead ;
-    auth:requestor     ex:magicmirror ;
-    auth:reqAtom       ex:party ;
-    auth:reqAtomState  won:Active ;
-    auth:reqPosition   auth:positionConnections ;
-    auth:reqSocket     party:attendeeSocket ;
-    auth:reqSocketType wx-schema:AttendeeSocket ;
+    a                   auth:OperationRequest ;
+    auth:operation      auth:opRead ;
+    auth:requestor      ex:magicmirror ;
+    auth:reqAtom        ex:party ;
+    auth:reqAtomState   won:Active ;
+    auth:reqPosition    auth:positionConnections ;
+    auth:reqSocket      party:attendeeSocket ;
+    auth:reqSocketType  wx-schema:AttendeeSocket ;
     auth:reqConnections party:attendeeSocketConnections .
 
 # pinocchio can see the time/date/location info becauses he is invited
@@ -292,14 +292,14 @@ lordfarquaad:expectedResult4
     auth:requestedOperation lordfarquaad:request4 .
 
 lordfarquaad:request4
-    a                  auth:OperationRequest ;
-    auth:operation     auth:opRead ;
-    auth:requestor     ex:lordfarquaad ;
-    auth:reqAtom       ex:party ;
-    auth:reqAtomState  won:Active ;
-    auth:reqPosition   auth:positionConnections ;
-    auth:reqSocket     party:attendeeSocket ;
-    auth:reqSocketType wx-schema:AttendeeSocket ;
+    a                   auth:OperationRequest ;
+    auth:operation      auth:opRead ;
+    auth:requestor      ex:lordfarquaad ;
+    auth:reqAtom        ex:party ;
+    auth:reqAtomState   won:Active ;
+    auth:reqPosition    auth:positionConnections ;
+    auth:reqSocket      party:attendeeSocket ;
+    auth:reqSocketType  wx-schema:AttendeeSocket ;
     auth:reqConnections party:attendeeSocketConnections .
 
 ### ACLs
@@ -331,7 +331,7 @@ shrek:grantBuddyOfBuddyTokenAuth
 # and to connect/communicate via the wx-schema:AttendeeSocket - which allows
 # Shrek (as the owner of the party atom), to accept/deny their requests to attend
 
-party:unspecificInvitationAuthorization
+party:unspecificInvitationAuth
     a           auth:Authorization ;
     auth:bearer [ auth:tokenScope "buddyOfBuddy", wx-buddy:BuddySocket ;
                   auth:issuer     [ auth:socket [ auth:socketType wx-hold:HoldableSocket ;
@@ -347,7 +347,7 @@ party:unspecificInvitationAuthorization
 # attend. Shrek can invite people directly by requesting a connection with them
 # on the attendee socket.
 
-party:attendeeAuthorization
+party:attendeeAuth
     a            auth:Authorization ;
     auth:grantee [ auth:socket [ auth:socketType wx-schema:AttendeeSocket ;
                                  auth:connection [ auth:targetAtom      [ ] ;
@@ -360,10 +360,13 @@ party:attendeeAuthorization
 
 
 # Any atom is allowed to get the authentication info
+# for read on graphs and sending messages ot the attendee socket
 
-<#Authorization3Party>
-    auth:grantee [ auth:atom auth:anyAtom ] ;
-    auth:grant   [ auth:graph [ auth:operation auth:opGetAuthInfo ] ] .
+#party:authInfoAuth
+#    auth:grantee auth:anyone ;
+#    auth:grant   [ auth:graph  [ auth:provideAuthInfo [ auth:operation auth:Read ] ] ;
+#                   auth:socket [ auth:socketType      wx-schema:AttendeeSocket ;
+#                                 auth:provideAuthInfo [ auth:operation [ auth:messageTo auth:anyMessageType ] ] ] ] .
 
 ## shrek's buddy network (and connection to the party)
 

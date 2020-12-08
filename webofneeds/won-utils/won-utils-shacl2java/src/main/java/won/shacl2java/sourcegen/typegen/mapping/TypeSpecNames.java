@@ -1,14 +1,14 @@
 package won.shacl2java.sourcegen.typegen.mapping;
 
+import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import won.shacl2java.sourcegen.typegen.UpdateableTypeSpecMapping;
 import won.shacl2java.sourcegen.typegen.support.ProducerConsumerMap;
 
-import java.net.URI;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class VisitorInterfaceTypes extends ProducerConsumerMap<URI, TypeSpec> implements UpdateableTypeSpecMapping {
+public class TypeSpecNames extends ProducerConsumerMap<TypeName, TypeSpec> implements UpdateableTypeSpecMapping {
     @Override
     public void applyChanges(Map<TypeSpec, TypeSpec> changedTypes) {
         this.internalMap = internalMap.entrySet()

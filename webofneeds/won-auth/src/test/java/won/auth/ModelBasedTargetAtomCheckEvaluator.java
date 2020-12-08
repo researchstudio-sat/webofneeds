@@ -38,21 +38,21 @@ public class ModelBasedTargetAtomCheckEvaluator implements TargetAtomCheckEvalua
             return false;
         }
         Set<Socket> sockets = atomOpt.get().getSockets();
-        if (logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("candidate sockets, initially: {} ", Arrays.asList(sockets.toArray()));
         }
         sockets = sockets
                         .parallelStream()
                         .filter(socket -> check.isSocketAllowed(URI.create(socket.get_node().toString())))
                         .collect(Collectors.toSet());
-        if (logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("candidate sockets after filtering socket URIs: {} ", Arrays.asList(sockets.toArray()));
         }
         sockets = sockets
                         .parallelStream()
                         .filter(socket -> check.isSocketTypeAllowed(socket.getSocketDefinition()))
                         .collect(Collectors.toSet());
-        if (logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("candidate sockets after filtering socket types: {} ", Arrays.asList(sockets.toArray()));
         }
         Set<Connection> connections = sockets
@@ -60,8 +60,9 @@ public class ModelBasedTargetAtomCheckEvaluator implements TargetAtomCheckEvalua
                         .flatMap(s -> s.getConnections().getMembers().stream())
                         .filter(c -> check.isConnectionStateAllowed(c.getConnectionState()))
                         .collect(Collectors.toSet());
-        if (logger.isDebugEnabled()){
-            logger.debug("candidate connections after filtering by connection state: {} ", Arrays.asList(connections.toArray()));
+        if (logger.isDebugEnabled()) {
+            logger.debug("candidate connections after filtering by connection state: {} ",
+                            Arrays.asList(connections.toArray()));
         }
         boolean foundIt = connections
                         .parallelStream()
@@ -69,8 +70,9 @@ public class ModelBasedTargetAtomCheckEvaluator implements TargetAtomCheckEvalua
                                         .getTargetAtom()
                                         .get_node().toString()
                                         .equals(check.getRequestedTarget().toString()));
-        if (logger.isDebugEnabled()){
-            logger.debug("{} target atom {} in connections' targetAtoms", foundIt? "found":"did not find", check.getRequestedTarget());
+        if (logger.isDebugEnabled()) {
+            logger.debug("{} target atom {} in connections' targetAtoms", foundIt ? "found" : "did not find",
+                            check.getRequestedTarget());
         }
         return foundIt;
     }

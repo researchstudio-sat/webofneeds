@@ -1,9 +1,6 @@
-package won.shacl2java.sourcegen.typegen.mapping;
+package won.shacl2java.sourcegen.typegen.support;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 public class ProducerConsumerMap<K, V> {
@@ -46,6 +43,10 @@ public class ProducerConsumerMap<K, V> {
 
         public boolean containsValue(Object value) {
             return internalMap.containsValue(value);
+        }
+
+        public Map asMap() {
+            return Collections.unmodifiableMap(internalMap);
         }
     }
 

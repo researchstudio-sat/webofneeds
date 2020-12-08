@@ -23,10 +23,6 @@ auth:atomStatePropertyShape
     sh:path auth:atomState ;
     sh:node auth:atomStateShape .
 
-auth:tokenRequestPropertyShape
-    a       sh:PropertyShape ;
-    sh:path auth:tokenRequest ;
-    sh:node auth:tokenRequestExpressionShape .
 
 auth:graphPropertyShape
     a       sh:PropertyShape ;
@@ -71,7 +67,11 @@ auth:connectionMessagePropertyShape
 auth:operationPropertyShape
     a       sh:PropertyShape ;
     sh:path auth:operation ;
-    sh:node auth:operationExpressionShape .
+    sh:or   ( [ sh:node auth:simpleOperationExpressionShape ]
+              [ sh:node auth:messageOperationExpressionShape ]
+              [ sh:node auth:tokenOperationExpressionShape ]
+              [ sh:node auth:authInfoOperationExpressionShape ] ) .
+
 
 auth:targetAtomPropertyShape
     a           sh:PropertyShape ;
@@ -134,7 +134,6 @@ auth:aseRootShape
     auth:asePosition auth:positionRoot ;
     sh:nodeKind      sh:BlankNodeOrIRI ;
     sh:property      auth:atomStatePropertyShape ;
-    sh:property      auth:tokenRequestPropertyShape ;
     sh:property      auth:graphPropertyShape ;
     sh:property      auth:atomMessagesPropertyShape ;
     sh:property      auth:atomMessagePropertyShape ;
@@ -303,18 +302,6 @@ auth:connectionMessageExpressionShape
                                  sh:maxCount    1 ] ] ;
     sh:property      auth:operationPropertyShape .
 
-# Definition 16 (token request expression )
-
-auth:tokenRequestExpressionShape
-    a                sh:NodeShape, auth:TreeExpressionShape, auth:OperationContainerShape, auth:InheritingShape ;
-    sh:closed        true ;
-    auth:asePosition auth:positionTokenRequest ;
-    sh:property      auth:inheritPropertyShape ;
-    sh:property      [ sh:path [ sh:inversePath auth:tokenRequest ;
-                                 sh:minCount    1 ;
-                                 sh:maxCount    1 ] ] ;
-    sh:property      auth:operationPropertyShape .
-
 # Definition 17 (atom expression)
 
 auth:atomExpressionShape
@@ -323,12 +310,11 @@ auth:atomExpressionShape
     sh:ignoredProperties ( auth:atom ) ;
     sh:targetSubjectsOf  auth:atom ;
     sh:or                ( [ sh:property [ sh:path     auth:atom ;
-                                           sh:node     auth:predefinedAtomExpressionShape ;
-                                           sh:maxCount 1 ] ]
+                                           sh:node     auth:relativeAtomExpressionShape ] ]
                            [ sh:property [ sh:path     auth:atom ;
                                            sh:nodeKind sh:IRI ] ] ) .
 
-auth:predefinedAtomExpressionShape
+auth:relativeAtomExpressionShape
     a           sh:NodeShape ;
     sh:closed   true ;
     sh:nodeKind sh:IRI ;
@@ -337,43 +323,60 @@ auth:predefinedAtomExpressionShape
                   auth:anyAtom ) .
 # Definition 18 (operation expression)
 
-auth:operationExpressionShape
-    a                    sh:NodeShape ;
+
+auth:messageOperationExpressionShape
+    a                    sh:NodeShape, auth:OperationExpressionShape ;
     sh:closed            true ;
-    sh:targetClass       auth:Operation ;
-    sh:ignoredProperties ( rdf:type auth:messageOnBehalf auth:messageTo ) ;
+    sh:targetClass       auth:MessageOperation ;
+    sh:ignoredProperties ( rdf:type ) ;
     sh:property          [ sh:path auth:messageTo ;
-                           sh:or   ( [ sh:node auth:messageOperationShape ]
-                                     [ sh:node auth:messageTypeShape ] ) ] ;
+                           sh:or   ( [ sh:node auth:messageTypesExpressionShape ]
+                                     [ sh:node auth:messageTypeShape ]
+                                     [ sh:node auth:messageWildcardShape ] ) ] ;
     sh:property          [ sh:path auth:messageOnBehalf ;
-                           sh:or   ( [ sh:node auth:messageOperationShape ]
-                                     [ sh:node auth:messageTypeShape ] ) ] .
+                           sh:or   ( [ sh:node auth:messageTypesExpressionShape ]
+                                     [ sh:node auth:messageTypeShape ]
+                                     [ sh:node auth:messageWildcardShape ] ) ] .
+
+auth:tokenOperationExpressionShape
+    a                    sh:NodeShape, auth:OperationExpressionShape ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property          auth:tokenScopePropertyShape .
+
+auth:simpleOperationExpressionShape
+    a                    sh:NodeShape, auth:OperationExpressionShape ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:class             auth:SimpleOperation ;
+    sh:targetClass       auth:SimpleOperation .
 
 
-auth:messageOperationShape
-    a     sh:NodeShape ;
-    sh:or ( [ sh:node auth:messageTypesExpressionShape ]
-            [ sh:node auth:messageTypeShape ]
-            [ sh:node auth:predefinedMessageOperationShape ] ) .
+auth:messageWildcardShape
+    a           sh:NodeShape, auth:MessageTypeSpecificationShape ;
+    sh:closed   true ;
+    sh:nodeKind sh:IRI ;
+    sh:in       ( auth:anyMessageType ) .
 
-auth:predefinedMessageOperationShape
-    a           sh:NodeShape ;
-    sh:hasValue auth:anyMessageType .
-
+auth:authInfoOperationExpressionShape
+    a                    sh:NodeShape, auth:OperationExpressionShape ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property          auth:operationPropertyShape .
 
 # Definition 19 (message types expression)
 
 auth:messageTypesExpressionShape
-    a                    sh:NodeShape ;
+    a                    sh:NodeShape, auth:MessageTypeSpecificationShape ;
     sh:closed            true ;
-    sh:target            auth:msgTypesCommunicate, auth:msgTypesModify, auth:msgTypesConnectClose, auth:msgTypesHint ;
-    sh:ignoredProperties ( rdfs:comment ) ;
+    sh:targetClass       auth:MessageTypeSet ;
+    sh:ignoredProperties ( rdf:type ) ;
     sh:property          [ sh:path     rdfs:member ;
                            sh:minCount 1 ;
                            sh:node     auth:messageTypeShape ] .
 
 auth:messageTypeShape
-    a         sh:NodeShape ;
+    a         sh:NodeShape, auth:MessageTypeSpecificationShape ;
     sh:closed true ;
     sh:in     ( msg:ActivateMessage
                 msg:AtomHintMessage
@@ -447,7 +450,7 @@ auth:authorizationShape
                                            sh:node auth:aseRootShape ] ]
                            [ sh:property [ sh:path     auth:grantee ;
                                            sh:maxCount 1 ;
-                                           sh:node     auth:predefinedGranteeExpression ] ] ) ;
+                                           sh:node     auth:granteeWildcardShape ] ] ) ;
     sh:property          [ sh:path auth:bearer ;
                            sh:node auth:tokenShapeShape ; ] ;
     sh:property          [ sh:path auth:grant ;
@@ -461,7 +464,7 @@ auth:authorizationShape
                            [ sh:path     auth:grantToken ;
                              sh:minCount 1 ] ) .
 
-auth:predefinedGranteeExpression
+auth:granteeWildcardShape
     a           sh:NodeShape ;
     sh:closed   true ;
     sh:nodeKind sh:IRI ;
@@ -481,7 +484,7 @@ auth:authorizationRequestShape
                                            sh:node auth:aseRootShape ] ]
                            [ sh:property [ sh:path     auth:grantee ;
                                            sh:maxCount 1 ;
-                                           sh:node     auth:predefinedGranteeExpression ] ] ) ;
+                                           sh:node     auth:granteeWildcardShape ] ] ) ;
     sh:property          [ sh:path auth:bearer ;
                            sh:node auth:tokenShapeShape ; ] ;
     sh:property          [ sh:path auth:grant ;
@@ -526,7 +529,6 @@ auth:asePositionShape
                      auth:positionAtomGraph
                      auth:positionAtomMessage
                      auth:positionAtomMessages
-                     auth:positionTokenRequest
                      auth:positionSocket
                      auth:positionConnections
                      auth:positionConnection
@@ -549,7 +551,10 @@ auth:operationRequestShape
     sh:property          [ sh:path     auth:operation ;
                            sh:minCount 1 ;
                            sh:maxCount 1 ;
-                           sh:node     auth:operationExpressionShape ] ;
+                           sh:or       ( [ sh:node auth:simpleOperationExpressionShape ]
+                                         [ sh:node auth:messageOperationExpressionShape ]
+                                         [ sh:node auth:tokenOperationExpressionShape ]
+                                         [ sh:node auth:authInfoOperationExpressionShape ] ) ] ;
     sh:property          [ sh:path     auth:reqAtom ;
                            sh:nodeKind sh:IRI ;
                            sh:maxCount 1 ; ] ;
@@ -674,6 +679,17 @@ auth:AuthorizationRequest
 auth:Operation
     a owl:Class .
 
+auth:SimpleOperation
+    a               owl:Class ;
+    rdfs:subClassOf auth:Operation .
+
+auth:MessageOperation
+    a               owl:Class ;
+    rdfs:subClassOf auth:Operation .
+
+auth:MessageTypeSet
+    a owl:Class .
+
 auth:TokenShape
     a owl:Class .
 
@@ -756,9 +772,6 @@ auth:targetAtom
     a owl:ObjectProperty .
 
 auth:atomState
-    a owl:ObjectProperty .
-
-auth:tokenRequest
     a owl:ObjectProperty .
 
 auth:tokenScope
@@ -860,62 +873,67 @@ auth:tokenScope
 
 
 auth:anyOperation
-    a auth:Operation .
+    a auth:SimpleOperation .
 
 auth:opAutoConnect
-    a auth:Operation .
+    a auth:SimpleOperation .
 
 auth:opObserve
-    a auth:Operation .
+    a auth:SimpleOperation .
 
 auth:opRead
-    a auth:Operation .
+    a auth:SimpleOperation .
 
 auth:opHint
-    a auth:Operation .
+    a              auth:MessageOperation ;
+    auth:messageTo auth:msgTypesHint .
 
 auth:opGetAuthInfo
-    a auth:Operation .
+    a auth:SimpleOperation .
 
 auth:opRequestToken
-    a auth:Operation .
+    a auth:SimpleOperation .
 
 auth:opConnectClose
-    a              auth:Operation ;
+    a              auth:MessageOperation ;
     auth:messageTo auth:msgTypesConnectClose .
 
 auth:opCommunicate
-    a              auth:Operation ;
+    a              auth:MessageOperation ;
     auth:messageTo auth:msgTypesCommunicate .
 
 auth:opModifyOnBehalf
-    a                    auth:Operation ;
+    a                    auth:MessageOperation ;
     auth:messageOnBehalf auth:msgTypesModify .
 
 
 auth:opCommunicateOnBehalf
-    a                    auth:Operation ;
+    a                    auth:MessageOperation ;
     auth:messageOnBehalf auth:msgTypesCommunicate .
 
 auth:opConnectAndCommunicateOnBehalf
-    a                    auth:Operation ;
+    a                    auth:MessageOperation ;
     auth:messageOnBehalf auth:msgTypesConnectClose, auth:msgTypesCommunicate .
 
 auth:opConnectCloseOnBehalf
-    a                    auth:Operation ;
+    a                    auth:MessageOperation ;
     auth:messageOnBehalf auth:msgTypesConnectClose .
 
 
 auth:msgTypesConnectClose
+    a           auth:MessageTypeSet ;
     rdfs:member msg:ConnectMessage, msg:CloseMessage .
 
 auth:msgTypesCommunicate
+    a           auth:MessageTypeSet ;
     rdfs:member msg:ConnectionMessage, msg:ChangeNotificationMessage .
 
 auth:msgTypesHint
+    a           auth:MessageTypeSet ;
     rdfs:member msg:SocketHintMessage, msg:AtomHintMessage .
 
 auth:msgTypesModify
+    a           auth:MessageTypeSet ;
     rdfs:member msg:ReplaceMessage, msg:DeactivateMessage, msg:ActivateMessage .
 
 
@@ -931,10 +949,6 @@ auth:positionAtomMessage
     auth:parentPosition auth:positionAtomMessages .
 
 auth:positionAtomMessages
-    a                   owl:NamedIndividual, auth:AsePosition ;
-    auth:parentPosition auth:positionRoot .
-
-auth:positionTokenRequest
     a                   owl:NamedIndividual, auth:AsePosition ;
     auth:parentPosition auth:positionRoot .
 

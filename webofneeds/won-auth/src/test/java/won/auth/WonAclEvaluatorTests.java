@@ -238,7 +238,6 @@ public class WonAclEvaluatorTests {
             opReq.getBearsTokens().forEach(token -> token.setTokenExp(new XSDDateTime(cal)));
             boolean specFulfilled = false;
             boolean specDecisionFulfilledAlready = false;
-
             Authorization specFulfillingAuth = null;
             Set<String> correctDecisionForAuths = new HashSet();
             Set<String> wrongTokensIssuedForAuths = new HashSet<>();
@@ -248,21 +247,23 @@ public class WonAclEvaluatorTests {
                 long start = System.currentTimeMillis();
                 AclEvalResult decision = loadedEvaluator.decide(auth, opReq);
                 logDuration("making authorization decision", start);
-                if (!expected.equals(decision.getDecision())){
+                if (!expected.equals(decision.getDecision())) {
                     continue;
                 } else {
-                    logger.debug("AclEvalResult decision fulfills spec: {}, checking tokens...", decision.getDecision() );
+                    logger.debug("AclEvalResult decision fulfills spec: {}, checking tokens...",
+                                    decision.getDecision());
                     correctDecisionForAuths.add(auth.get_node().toString());
                     if (!spec.getIssueTokens().isEmpty()) {
-                        logger.debug("Spec requires {} tokens", spec.getIssueTokens().size() );
+                        logger.debug("Spec requires {} tokens", spec.getIssueTokens().size());
                         for (AuthTokenTestSpec tokenSpec : spec.getIssueTokens()) {
-                            logger.debug("AclEvalResult contains {} tokens", decision.getIssueTokens().size() );
+                            logger.debug("AclEvalResult contains {} tokens", decision.getIssueTokens().size());
                             if (!decision.getIssueTokens()
-                                    .stream()
-                                    .anyMatch(actualToken -> matches(tokenSpec, actualToken))) {
+                                            .stream()
+                                            .anyMatch(actualToken -> matches(tokenSpec, actualToken))) {
                                 logger.debug("None of the actual tokens {} matched the specified token {}",
-                                        decision.getIssueTokens().stream().map(AuthToken::toStringAllFields).collect(Collectors.joining(",","[","]")),
-                                        tokenSpec.toStringAllFields());
+                                                decision.getIssueTokens().stream().map(AuthToken::toStringAllFields)
+                                                                .collect(Collectors.joining(",", "[", "]")),
+                                                tokenSpec.toStringAllFields());
                                 wrongTokensIssuedForAuths.add(auth.get_node().toString());
                                 continue AUTHS;
                             }
@@ -273,12 +274,14 @@ public class WonAclEvaluatorTests {
                 specFulfillingAuth = auth;
                 break;
             }
-            String failMessage = String.format("OpRequest %s: decision should be %s. Auths with correct result: %s, of which produced wrong tokens: %s",
-                    opReq.get_node(), spec.getDecision(),
-                    Arrays.toString(correctDecisionForAuths.toArray()),
-                    Arrays.toString(wrongTokensIssuedForAuths.toArray())) ;
+            String failMessage = String.format(
+                            "OpRequest %s: decision should be %s. Auths with correct result: %s, of which produced wrong tokens: %s",
+                            opReq.get_node(), spec.getDecision(),
+                            Arrays.toString(correctDecisionForAuths.toArray()),
+                            Arrays.toString(wrongTokensIssuedForAuths.toArray()));
             Assert.assertTrue(failMessage, specFulfilled);
-            logger.debug("test passed for spec {} with authorization {}", spec.toStringAllFields(), specFulfillingAuth.toStringAllFields());
+            logger.debug("test passed for spec {} with authorization {}", spec.toStringAllFields(),
+                            specFulfillingAuth.toStringAllFields());
         }
     }
 

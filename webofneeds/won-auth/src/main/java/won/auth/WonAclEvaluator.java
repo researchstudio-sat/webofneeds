@@ -16,9 +16,9 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static won.auth.model.PredefinedAtomExpression.ANY_ATOM;
-import static won.auth.model.PredefinedAtomExpression.SELF;
-import static won.auth.model.PredefinedGranteeExpression.ANYONE;
+import static won.auth.model.GranteeWildcard.ANYONE;
+import static won.auth.model.RelativeAtomExpression.ANY_ATOM;
+import static won.auth.model.RelativeAtomExpression.SELF;
 
 public class WonAclEvaluator {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -53,7 +53,8 @@ public class WonAclEvaluator {
                 if (isRequestorBearerOfAcceptedToken(authorization, request)) {
                     debug("requestor {} has an accepted token", authorization, request, request.getRequestor());
                 } else {
-                    debug("requestor {} does not have an accepted token", authorization, request, request.getRequestor());
+                    debug("requestor {} does not have an accepted token", authorization, request,
+                                    request.getRequestor());
                     return accessControlDecision(false, authorization, request);
                 }
             }
@@ -70,7 +71,6 @@ public class WonAclEvaluator {
             }
         }
     }
-
 
     private static AclEvalResult accessControlDecision(boolean decision, Authorization authorization,
                     OperationRequest request) {
@@ -107,7 +107,6 @@ public class WonAclEvaluator {
         return acd;
     }
 
-
     private static boolean isOperationGranted(Authorization authorization, OperationRequest request) {
         for (AseRoot root : authorization.getGrants()) {
             OperationRequestChecker operationRequestChecker = new OperationRequestChecker(request);
@@ -123,14 +122,15 @@ public class WonAclEvaluator {
 
     private boolean isRequestorAGrantee(Authorization authorization, OperationRequest request) {
         // fast check: check for direct referenct
-        if (ANYONE.equals(authorization.getGranteePredefinedGranteeExpression())) {
+        if (ANYONE.equals(authorization.getGranteeGranteeWildcard())) {
+            debug("anyone is a grantee", authorization, request);
             return true;
         }
         URI requestor = request.getRequestor();
         for (AtomExpression grantee : authorization.getGranteesAtomExpression()) {
             debug("looking for grantee in atom expressions", authorization, request);
-            if (ANY_ATOM.equals(grantee.getAtomPredefinedAtomExpression())) {
-                debug("anyone is a grantee", authorization, request);
+            if (grantee.getAtomsRelativeAtomExpression().contains(ANY_ATOM)) {
+                debug("any atom is a grantee", authorization, request);
                 return true;
             }
             if (grantee.getAtomsURI().contains(requestor)) {
@@ -151,7 +151,7 @@ public class WonAclEvaluator {
         TargetAtomCheckGenerator v = new TargetAtomCheckGenerator(baseAtom, candidate);
         aseRoot.accept(v);
         for (TargetAtomCheck check : v.getTargetAtomChecks()) {
-            if (logger.isDebugEnabled()){
+            if (logger.isDebugEnabled()) {
                 logger.debug("Evaluating targetAtomCheck: {}", check);
             }
             if (this.targetAtomCheckEvaluator.isRequestorAllowedTarget(check)) {
@@ -225,10 +225,10 @@ public class WonAclEvaluator {
 
     private boolean isIssuerInAtomExpressions(URI baseAtom, Set<AtomExpression> atomExpressions, URI issuer) {
         return atomExpressions.stream().anyMatch(ae -> {
-            if (ANY_ATOM.equals(ae.getAtomPredefinedAtomExpression())) {
+            if (ae.getAtomsRelativeAtomExpression().contains(ANY_ATOM)) {
                 return true;
             }
-            if (SELF.equals(ae.getAtomPredefinedAtomExpression())) {
+            if (ae.getAtomsRelativeAtomExpression().contains(SELF)) {
                 return baseAtom.equals(issuer);
             }
             if (ae.getAtomsURI().contains(issuer)) {

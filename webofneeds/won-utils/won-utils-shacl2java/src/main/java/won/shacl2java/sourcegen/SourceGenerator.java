@@ -60,6 +60,8 @@ public class SourceGenerator {
         TypegenContext ctx = new TypegenContext();
         NameClashDetector nameClashDetector = new NameClashDetector();
         IndividualClassNames individualClassNames = new IndividualClassNames();
+        TypeSpecNames typeSpecNames = new TypeSpecNames();
+        ctx.manageMapping(typeSpecNames);
         ShapeTypeInterfaceTypes shapeTypeInterfaceTypes = new ShapeTypeInterfaceTypes();
         ctx.manageMapping(shapeTypeInterfaceTypes);
         ShapeTypeImplTypes shapeTypeImplTypes = new ShapeTypeImplTypes();
@@ -76,11 +78,18 @@ public class SourceGenerator {
                         shapes, config, nameClashDetector,
                         individualClassNames.consumer(),
                         shapeTypeSpecs.producer(),
-                        visitorClassTypeSpecs.producer());
+                        visitorClassTypeSpecs.producer(),
+                        typeSpecNames.producer());
+        MainTypesPostprocessor mainTypesPostprocessor = new MainTypesPostprocessor(
+                        shapes,
+                        config,
+                        shapeTypeSpecs.consumer(),
+                        individualClassNames.consumer(),
+                        typeSpecNames.consumer());
         ShapeTypeInterfaceGenerator interfaceGenerator = new ShapeTypeInterfaceGenerator(
                         shapes,
-                        shapeTypeInterfaceTypes.producer(),
-                        nameClashDetector, config);
+                        config, shapeTypeInterfaceTypes.producer(),
+                        nameClashDetector, typeSpecNames.producer());
         ShapeTypeInterfaceImplementer interfaceImplementer = new ShapeTypeInterfaceImplementer(
                         shapes,
                         config,
@@ -109,6 +118,7 @@ public class SourceGenerator {
         ctx.applyGenerator(mainTypesGenerator);
         ctx.applyGenerator(interfaceGenerator);
         ctx.applyPostpropcessor(interfaceImplementer);
+        ctx.applyPostpropcessor(mainTypesPostprocessor);
         ctx.applyPostpropcessor(interfacePopulator);
         ctx.applyGenerator(visitorInterfaceGenerator);
         ctx.applyPostpropcessor(visitorAcceptMethodAdder);

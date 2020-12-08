@@ -2,6 +2,8 @@ package won.shacl2java.constraints;
 
 import org.apache.jena.shacl.engine.constraint.*;
 import org.apache.jena.shacl.parser.Constraint;
+import org.apache.jena.shacl.parser.ConstraintVisitor;
+import org.apache.jena.shacl.parser.ConstraintVisitorBase;
 import org.apache.jena.shacl.parser.Shape;
 import org.apache.jena.shacl.vocabulary.SHACL;
 import org.slf4j.Logger;
@@ -17,7 +19,7 @@ import java.util.stream.Stream;
 
 import static won.shacl2java.constraints.ConstraintVisitorAlgorithm.visitDepthFirst;
 
-public class PropertySpecCollector implements ConstraintVisitor {
+public class PropertySpecCollector extends ConstraintVisitorBase {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private boolean negated = false;
     Stack<Set<PropertySpec>> stack = new Stack<>();
@@ -62,6 +64,7 @@ public class PropertySpecCollector implements ConstraintVisitor {
         for (int i = 0; i < shXone.getOthers().size(); i++) {
             specs.addAll(stack.pop());
         }
+        // specs = specs.stream().map(s -> s.setExclusive(true));
         stack.push(crossMerge(stack.pop(), specs));
     }
 
@@ -178,7 +181,7 @@ public class PropertySpecCollector implements ConstraintVisitor {
                 visitRecursively(subShape, visitor);
             });
         }
-        visitor.visit(constraint);
+        constraint.visit(visitor);
     }
 
     private boolean shouldRecurseInto(ShNode constraint) {

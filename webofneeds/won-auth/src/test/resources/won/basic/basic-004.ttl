@@ -1,0 +1,7 @@
+@prefix auth:<https://w3id.org/won/auth#> .
+@prefix msg:  <https://w3id.org/won/message#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+auth:customMessageOperation
+    a                    auth:MessageOperation ;
+    auth:messageOnBehalf msg:ConnectionMessage, msg:CloseMessage .
