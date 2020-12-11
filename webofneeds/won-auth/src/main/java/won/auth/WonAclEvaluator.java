@@ -16,6 +16,8 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static won.auth.model.DecisionValue.ACCESS_DENIED;
+import static won.auth.model.DecisionValue.ACCESS_GRANTED;
 import static won.auth.model.GranteeWildcard.ANYONE;
 import static won.auth.model.RelativeAtomExpression.ANY_ATOM;
 import static won.auth.model.RelativeAtomExpression.SELF;
@@ -44,69 +46,153 @@ public class WonAclEvaluator {
         return this.instanceFactory.getInstancesOfType(OperationRequest.class);
     }
 
-    public AclEvalResult decide(Authorization authorization, OperationRequest request) {
-        long start = System.currentTimeMillis();
-        AclEvalResult result = null;
-        try {
-            // determine if the requestor is in the set of grantees
-            if (!isRequestorAGrantee(authorization, request)) {
+    public AclEvalResult decide(Set<Authorization> authorizations, OperationRequest request) {
+        Set<Authorization> requestorIsGranteeOf = new HashSet<>();
+        boolean grantAuthInfo = canProvideAuthInfo(authorizations, request,
+                        requestorIsGranteeOf);
+        return authorizations.stream()
+                        .map(auth -> decide(auth, request, grantAuthInfo))
+                        .reduce((left, right) -> {
+                            AclEvalResult merged = new AclEvalResult();
+                            if (ACCESS_GRANTED.equals(left.getDecision())
+                                            || ACCESS_GRANTED.equals(right.getDecision())) {
+                                merged.setDecision(ACCESS_GRANTED);
+                            } else {
+                                merged.setDecision(ACCESS_DENIED);
+                            }
+                            HashSet<AuthToken> tokens = new HashSet<>();
+                            tokens.addAll(left.getIssueTokens());
+                            tokens.addAll(right.getIssueTokens());
+                            merged.setIssueTokens(tokens);
+                            if (ACCESS_DENIED.equals(merged.getDecision())) {
+                                Set<AuthInfo> authInfos = new HashSet<>();
+                                authInfos.addAll(left.getAuthInfos());
+                                authInfos.addAll(right.getAuthInfos());
+                                merged.setAuthInfos(authInfos);
+                            }
+                            return merged;
+                        }).get();
+    }
+
+    public boolean provideAuthInfo(Set<Authorization> authorizations,
+                    OperationRequest request) {
+        return canProvideAuthInfo(authorizations, request, Collections.emptySet());
+    }
+
+    private boolean canProvideAuthInfo(Set<Authorization> authorizations, OperationRequest request,
+                    Set<Authorization> requestorIsGranteeOf) {
+        return authorizations.stream()
+                        .filter(authorization -> !authorization.getProvideAuthInfos().isEmpty())
+                        .filter(authorization -> isRequestorAGrantee(authorization, request)
+                                        || isRequestorBearerOfAcceptedToken(authorization, request))
+                        .map(authorization -> {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("evaluating provideAuthInfo for {}", authorization);
+                            }
+                            requestorIsGranteeOf.add(authorization); // side effect!
+                            return authorization;
+                        })
+                        .anyMatch(authorization -> canProvideAuthInfo(authorization, request));
+    }
+
+    private static boolean canProvideAuthInfo(Authorization authorization, OperationRequest request) {
+        for (AseRoot root : authorization.getProvideAuthInfos()) {
+            OperationRequestChecker operationRequestChecker = new OperationRequestChecker(request);
+            root.accept(operationRequestChecker);
+            boolean finalDecision = operationRequestChecker.getFinalDecision();
+            debug("providing auth info : {}", authorization, request, finalDecision);
+            if (finalDecision) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public AclEvalResult decide(Authorization authorization, OperationRequest request,
+                    boolean provideAuthInfo) {
+        return decide(authorization, request, provideAuthInfo, Collections.emptySet());
+    }
+
+    private AclEvalResult decide(Authorization authorization, OperationRequest request,
+                    boolean provideAuthInfo, Set<Authorization> requestorIsGranteeOf) {
+        // determine if the requestor is in the set of grantees
+        boolean decisionSoFar = false;
+        if (requestorIsGranteeOf.contains(authorization)) {
+            decisionSoFar = true;
+        } else {
+            if (isRequestorAGrantee(authorization, request)) {
+                debug("requestor {} is grantee", authorization, request, request.getRequestor());
+                decisionSoFar = true;
+            } else {
                 debug("requestor {} is not grantee", authorization, request, request.getRequestor());
                 if (isRequestorBearerOfAcceptedToken(authorization, request)) {
                     debug("requestor {} has an accepted token", authorization, request, request.getRequestor());
+                    decisionSoFar = true;
                 } else {
                     debug("requestor {} does not have an accepted token", authorization, request,
                                     request.getRequestor());
-                    return accessControlDecision(false, authorization, request);
+                    decisionSoFar = false;
                 }
             }
+        }
+        AuthInfo authInfo = null;
+        if (decisionSoFar || provideAuthInfo) {
             // determine if the operation is granted
             if (isOperationGranted(authorization, request)) {
                 debug("operation is granted", authorization, request);
-                return accessControlDecision(true, authorization, request);
-            }
-            debug("operation is not granted", authorization, request);
-            return accessControlDecision(false, authorization, request);
-        } finally {
-            if (logger.isDebugEnabled()) {
-                debug("decision took {} ms", authorization, request, System.currentTimeMillis() - start);
+                if (provideAuthInfo) {
+                    authInfo = new AuthInfo();
+                    authInfo.setBearers(authorization.getBearers());
+                    authInfo.setGranteesAseRoot(authorization.getGranteesAseRoot());
+                    authInfo.setGranteeGranteeWildcard(authorization.getGranteeGranteeWildcard());
+                }
+            } else {
+                decisionSoFar = false;
             }
         }
+        debug("operation is not granted", authorization, request);
+        return accessControlDecision(decisionSoFar, authorization, request, authInfo);
     }
 
-    private static AclEvalResult accessControlDecision(boolean decision, Authorization authorization,
-                    OperationRequest request) {
+    private static AclEvalResult accessControlDecision(boolean accessGranted, Authorization authorization,
+                    OperationRequest request, AuthInfo authInfo) {
         AclEvalResult acd = new AclEvalResult();
-        if (!decision) {
+        if (!accessGranted) {
             acd.setDecision(DecisionValue.ACCESS_DENIED);
-            return acd;
+        } else {
+            acd.setDecision(ACCESS_GRANTED);
         }
-        acd.setDecision(DecisionValue.ACCESS_GRANTED);
-        for (TokenOperationExpression op : authorization.getGrants().stream()
-                        .flatMap(root -> root.getOperationsTokenOperationExpression().stream())
-                        .collect(Collectors.toSet())) {
-            TokenSpecification tokenSpec = op.getRequestToken();
-            AuthToken token = new AuthToken();
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(new Date());
-            XSDDateTime iat = new XSDDateTime(cal);
-            if (tokenSpec.getExpiresAfterBigInteger() != null) {
-                cal.add(Calendar.SECOND, tokenSpec.getExpiresAfterBigInteger().intValueExact());
-            } else if (tokenSpec.getExpiresAfterLong() != null) {
-                cal.add(Calendar.SECOND, tokenSpec.getExpiresAfterLong().intValue());
-            } else if (tokenSpec.getExpiresAfterInteger() != null) {
-                cal.add(Calendar.SECOND, tokenSpec.getExpiresAfterInteger());
+        if (!accessGranted && authInfo != null) {
+            acd.setAuthInfos(Collections.singleton(authInfo));
+        }
+        if (accessGranted) {
+            for (TokenOperationExpression op : authorization.getGrants().stream()
+                            .flatMap(root -> root.getOperationsTokenOperationExpression().stream())
+                            .collect(Collectors.toSet())) {
+                TokenSpecification tokenSpec = op.getRequestToken();
+                AuthToken token = new AuthToken();
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(new Date());
+                XSDDateTime iat = new XSDDateTime(cal);
+                if (tokenSpec.getExpiresAfterBigInteger() != null) {
+                    cal.add(Calendar.SECOND, tokenSpec.getExpiresAfterBigInteger().intValueExact());
+                } else if (tokenSpec.getExpiresAfterLong() != null) {
+                    cal.add(Calendar.SECOND, tokenSpec.getExpiresAfterLong().intValue());
+                } else if (tokenSpec.getExpiresAfterInteger() != null) {
+                    cal.add(Calendar.SECOND, tokenSpec.getExpiresAfterInteger());
+                }
+                XSDDateTime exp = new XSDDateTime(cal);
+                token.setTokenExp(exp);
+                token.setTokenIat(iat);
+                token.setTokenIss(request.getReqAtom());
+                token.setTokenSub(request.getRequestor());
+                if (tokenSpec.getTokenScopeURI() != null) {
+                    token.setTokenScopeURI(tokenSpec.getTokenScopeURI());
+                } else if (tokenSpec.getTokenScopeString() != null) {
+                    token.setTokenScopeString(tokenSpec.getTokenScopeString());
+                }
+                acd.addIssueToken(token);
             }
-            XSDDateTime exp = new XSDDateTime(cal);
-            token.setTokenExp(exp);
-            token.setTokenIat(iat);
-            token.setTokenIss(request.getReqAtom());
-            token.setTokenSub(request.getRequestor());
-            if (tokenSpec.getTokenScopeURI() != null) {
-                token.setTokenScopeURI(tokenSpec.getTokenScopeURI());
-            } else if (tokenSpec.getTokenScopeString() != null) {
-                token.setTokenScopeString(tokenSpec.getTokenScopeString());
-            }
-            acd.addIssueToken(token);
         }
         return acd;
     }
@@ -269,7 +355,7 @@ public class WonAclEvaluator {
 
     /**
      * Access to the instance factory for tests.
-     * 
+     *
      * @return
      */
     Shacl2JavaInstanceFactory getInstanceFactory() {

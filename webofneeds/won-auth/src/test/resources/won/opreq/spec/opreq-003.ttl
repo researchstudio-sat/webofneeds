@@ -316,13 +316,13 @@ ex:grantBuddyTokenAuth
 # Grants a "buddyOfBuddy" token to buddies of shrek's buddies
 
 shrek:grantBuddyOfBuddyTokenAuth
-    a               auth:Authorization ;
-    auth:bearer     [ auth:tokenScope wx-buddy:BuddySocket ;
-                      auth:issuer     [ auth:socket [ auth:socketType  wx-buddy:BuddySocket ;
-                                                      auth:connections [ auth:connectionState won:Connected ;
-                                                                         auth:targetAtom      [ ] ] ] ] ] ;
-    auth:grant      [ auth:operation [ auth:requestToken [ auth:tokenScope   "buddyOfBuddy" ;
-                      auth:expiresAfter 3600 ] ] ].
+    a           auth:Authorization ;
+    auth:bearer [ auth:tokenScope wx-buddy:BuddySocket ;
+                  auth:issuer     [ auth:socket [ auth:socketType  wx-buddy:BuddySocket ;
+                                                  auth:connections [ auth:connectionState won:Connected ;
+                                                                     auth:targetAtom      [ ] ] ] ] ] ;
+    auth:grant  [ auth:operation [ auth:requestToken [ auth:tokenScope   "buddyOfBuddy" ;
+                                                       auth:expiresAfter 3600 ] ] ] .
 
 # Allows direct buddies and bearers of a "buddyOfBuddy" token signed by the holder of the
 # party (Shrek's persona atom) to see the graph #invitationWithoutSpecifics
@@ -357,24 +357,31 @@ party:attendeeAuth
                                  auth:operation  auth:opConnectClose, auth:opCommunicate, auth:opRead ] ] .
 
 
-## Any atom is allowed to get the authentication info
-## for read on graphs and sending messages ot the attendee socket
-#
-#party:authInfoAuth
-#    auth:grantee auth:anyone ;
-#    auth:grant   [ auth:graph  [ auth:#AuthInfo [ auth:operation auth:Read ] ] ;
-#                   auth:socket [ auth:socketType      wx-schema:AttendeeSocket ;
-#                                 auth:provideAuthInfo [ auth:operation [ auth:messageTo auth:anyMessageType ] ] ] ] .
-#
-## Anyony can learn how to obtain a wx-buddy:BuddySocket token
-#
-#ex:buddySocketTokenInfoAuth
-#    auth:grantee auth:anyone ;
-#    auth:grant
-#                 [ auth:provideAuthInfo
-#                         [ auth:operation [ auth:requestToken [ auth:tokenScope wx-buddy:BuddySocket ] ] ] ] .
-#
-#
+# Any atom is allowed to get the authentication info
+# for read on graphs and sending messages ot the attendee socket
+
+party:authInfoAuth
+    a            auth:Authorization ;
+    auth:grantee         auth:anyone ;
+    auth:provideAuthInfo [ auth:operation auth:anyOperation ] .
+
+
+party:authInfoAuth
+    a            auth:Authorization ;
+    auth:grantee         auth:anyone ;
+    auth:provideAuthInfo [ auth:graph  [ auth:operation auth:Read ] ;
+                           auth:socket [ auth:socketType wx-schema:AttendeeSocket ;
+                                         auth:operation  [ auth:messageTo auth:anyMessageType ] ] ] .
+
+# Anyony can learn how to obtain a wx-buddy:BuddySocket token
+
+ex:buddySocketTokenInfoAuth
+    a            auth:Authorization ;
+    auth:grantee auth:anyone ;
+    auth:provideAuthInfo
+                 [ auth:operation [ auth:requestToken [ auth:tokenScope wx-buddy:BuddySocket ] ] ] .
+
+
 
 ## shrek's buddy network (and connection to the party)
 

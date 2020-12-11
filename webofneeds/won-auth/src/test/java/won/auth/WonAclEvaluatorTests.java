@@ -9,6 +9,7 @@ import org.apache.jena.shacl.ValidationReport;
 import org.apache.jena.shacl.lib.ShLib;
 import org.apache.jena.shacl.sys.ShaclSystem;
 import org.apache.jena.sparql.graph.GraphFactory;
+import org.hamcrest.core.AllOf;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -220,7 +221,7 @@ public class WonAclEvaluatorTests {
                 String message = makeWrongAuthDecisionMessage(testIdentifier, expected, auth, opReq);
                 AclEvalResult decision = null;
                 long start = System.currentTimeMillis();
-                decision = loadedEvaluator.decide(auth, opReq);
+                decision = loadedEvaluator.decide(Collections.singleton(auth), opReq);
                 logDuration("making authorization decision", start);
                 Assert.assertEquals(message, expected, decision.getDecision());
             }
@@ -236,54 +237,36 @@ public class WonAclEvaluatorTests {
             cal.setTime(new Date());
             cal.add(Calendar.MINUTE, 30);
             opReq.getBearsTokens().forEach(token -> token.setTokenExp(new XSDDateTime(cal)));
-            boolean specFulfilled = false;
-            boolean specDecisionFulfilledAlready = false;
             Authorization specFulfillingAuth = null;
             Set<String> correctDecisionForAuths = new HashSet();
             Set<String> wrongTokensIssuedForAuths = new HashSet<>();
-            AUTHS: for (Authorization auth : loadedEvaluator.getAuthorizations()) {
-                logger.debug("checking OpRequest {} against Authorization {} ", opReq.get_node(), auth.get_node());
-                DecisionValue expected = spec.getDecision();
-                long start = System.currentTimeMillis();
-                AclEvalResult decision = loadedEvaluator.decide(auth, opReq);
-                logDuration("making authorization decision", start);
-                if (!expected.equals(decision.getDecision())) {
-                    continue;
-                } else {
-                    logger.debug("AclEvalResult decision fulfills spec: {}, {}",
-                                    decision.getDecision(), spec.getIssueTokens().isEmpty() ? "no tokens to check" : "checking token(s)...");
-                    correctDecisionForAuths.add(auth.get_node().toString());
-                    if (!spec.getIssueTokens().isEmpty()) {
-                        logger.debug("Spec requires {} tokens", spec.getIssueTokens().size());
-                        for (AuthTokenTestSpec tokenSpec : spec.getIssueTokens()) {
-                            logger.debug("AclEvalResult contains {} tokens", decision.getIssueTokens().size());
-                            if (!decision.getIssueTokens()
-                                            .stream()
-                                            .anyMatch(actualToken -> matches(tokenSpec, actualToken))) {
-                                logger.debug("None of the actual tokens {} matched the specified token {}",
-                                                decision.getIssueTokens().stream().map(AuthToken::toStringAllFields)
-                                                                .collect(Collectors.joining(",", "[", "]")),
-                                                tokenSpec.toStringAllFields());
-                                wrongTokensIssuedForAuths.add(auth.get_node().toString());
-                                continue AUTHS;
-                            }
-                        }
+            long start = System.currentTimeMillis();
+            AclEvalResult result = loadedEvaluator.decide(loadedEvaluator.getAuthorizations(), opReq);
+            logDuration("making authorization decision", start);
+            logger.debug("checking OpRequest {} against Authorizations ", opReq.get_node());
+            DecisionValue expected = spec.getDecision();
+            Assert.assertEquals(String.format("%s: wrong ACL decision", testIdentifier), expected,
+                            result.getDecision());
+            if (!spec.getIssueTokens().isEmpty()) {
+                logger.debug("Spec requires {} tokens", spec.getIssueTokens().size());
+                for (AuthTokenTestSpec tokenSpec : spec.getIssueTokens()) {
+                    logger.debug("AclEvalResult contains {} tokens", result.getIssueTokens().size());
+                    if (!result.getIssueTokens()
+                                    .stream()
+                                    .anyMatch(actualToken -> matches(tokenSpec, actualToken))) {
+                        Assert.fail(String.format(
+                                        "%s, Spec %s: None of the actual tokens %s match the specified token %s",
+                                        testIdentifier,
+                                        spec.get_node(),
+                                        result.getIssueTokens().stream().map(AuthToken::toStringAllFields)
+                                                        .collect(Collectors.joining(",", "[", "]")),
+                                        tokenSpec.toStringAllFields()));
                     }
                 }
-                specFulfilled = true;
-                specFulfillingAuth = auth;
-                break;
             }
-            String failMessage = String.format(
-                            "%s: OpRequest %s: decision should be %s. Auths with correct result: %s, of which produced wrong tokens: %s",
-                            testIdentifier,
-                            opReq.get_node(), spec.getDecision(),
-                            Arrays.toString(correctDecisionForAuths.toArray()),
-                            Arrays.toString(wrongTokensIssuedForAuths.toArray()));
-            Assert.assertTrue(failMessage, specFulfilled);
-            logger.debug("test passed for spec {} with authorization {}", spec.toStringAllFields(),
-                            specFulfillingAuth.toStringAllFields());
+            logger.debug("authinfo : {}", Arrays.toString(result.getAuthInfos().stream().map(a -> a.toStringAllFields()).toArray()));
         }
+        logger.debug("test case {} passed", testIdentifier);
     }
 
     private boolean matches(AuthTokenTestSpec tokenSpec, AuthToken actualToken) {
