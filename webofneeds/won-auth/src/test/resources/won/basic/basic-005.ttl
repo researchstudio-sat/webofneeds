@@ -1,0 +1,11 @@
+@prefix auth: <https://w3id.org/won/auth#> .
+@prefix msg:  <https://w3id.org/won/message#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex:   <https://example.com/test/> .
+
+ex:request
+    a                auth:OperationRequest ;
+    auth:operation   [ auth:requestToken [ auth:tokenScope "buddyOfBuddy" ; ] ] ;
+    auth:requestor   ex:atom2 ;
+    auth:reqAtom     ex:atom1 ;
+    auth:reqPosition auth:positionRoot .

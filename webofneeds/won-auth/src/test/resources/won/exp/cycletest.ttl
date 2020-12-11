@@ -1,0 +1,13 @@
+@prefix ex:       <https://example.com/test/> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+
+ex:PersonShape
+    a sh:NodeShape;
+    sh:targetClass ex:Person ;
+    sh:property [ sh:path ex:mother ;
+                sh:node ex:PersonShape ] .
+
+ex:alice a ex:Person .
+
+ex:bob a ex:Person ;
+    ex:mother ex:alice .

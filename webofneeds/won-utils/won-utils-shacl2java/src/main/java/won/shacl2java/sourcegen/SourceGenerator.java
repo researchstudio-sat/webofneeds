@@ -62,6 +62,7 @@ public class SourceGenerator {
         IndividualClassNames individualClassNames = new IndividualClassNames();
         TypeSpecNames typeSpecNames = new TypeSpecNames();
         ctx.manageMapping(typeSpecNames);
+        ShapeTargetClasses shapeTargetClasses = new ShapeTargetClasses();
         ShapeTypeInterfaceTypes shapeTypeInterfaceTypes = new ShapeTypeInterfaceTypes();
         ctx.manageMapping(shapeTypeInterfaceTypes);
         ShapeTypeImplTypes shapeTypeImplTypes = new ShapeTypeImplTypes();
@@ -79,13 +80,15 @@ public class SourceGenerator {
                         individualClassNames.consumer(),
                         shapeTypeSpecs.producer(),
                         visitorClassTypeSpecs.producer(),
-                        typeSpecNames.producer());
+                        typeSpecNames.producer(),
+                        shapeTargetClasses.producer());
         MainTypesPostprocessor mainTypesPostprocessor = new MainTypesPostprocessor(
                         shapes,
                         config,
                         shapeTypeSpecs.consumer(),
                         individualClassNames.consumer(),
-                        typeSpecNames.consumer());
+                        typeSpecNames.consumer(),
+                        shapeTargetClasses.consumer());
         ShapeTypeInterfaceGenerator interfaceGenerator = new ShapeTypeInterfaceGenerator(
                         shapes,
                         config, shapeTypeInterfaceTypes.producer(),

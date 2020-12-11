@@ -69,9 +69,7 @@ auth:operationPropertyShape
     sh:path auth:operation ;
     sh:or   ( [ sh:node auth:simpleOperationExpressionShape ]
               [ sh:node auth:messageOperationExpressionShape ]
-              [ sh:node auth:tokenOperationExpressionShape ]
-              [ sh:node auth:authInfoOperationExpressionShape ] ) .
-
+              [ sh:node auth:tokenOperationExpressionShape ] ) .
 
 auth:targetAtomPropertyShape
     a           sh:PropertyShape ;
@@ -309,8 +307,8 @@ auth:atomExpressionShape
     sh:closed            true ;
     sh:ignoredProperties ( auth:atom ) ;
     sh:targetSubjectsOf  auth:atom ;
-    sh:or                ( [ sh:property [ sh:path     auth:atom ;
-                                           sh:node     auth:relativeAtomExpressionShape ] ]
+    sh:or                ( [ sh:property [ sh:path auth:atom ;
+                                           sh:node auth:relativeAtomExpressionShape ] ]
                            [ sh:property [ sh:path     auth:atom ;
                                            sh:nodeKind sh:IRI ] ] ) .
 
@@ -323,6 +321,7 @@ auth:relativeAtomExpressionShape
                   auth:anyAtom ) .
 # Definition 18 (operation expression)
 
+# TODO: Update definition of operation expression
 
 auth:messageOperationExpressionShape
     a                    sh:NodeShape, auth:OperationExpressionShape ;
@@ -338,11 +337,16 @@ auth:messageOperationExpressionShape
                                      [ sh:node auth:messageTypeShape ]
                                      [ sh:node auth:messageWildcardShape ] ) ] .
 
+# TODO: Add Definition for token operation expression
+
 auth:tokenOperationExpressionShape
     a                    sh:NodeShape, auth:OperationExpressionShape ;
     sh:closed            true ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property          auth:tokenScopePropertyShape .
+    sh:property          [ sh:path     auth:requestToken ;
+                           sh:minCount 1 ;
+                           sh:maxCount 1 ;
+                           sh:node     auth:tokenSpecificationShape ] .
 
 auth:simpleOperationExpressionShape
     a                    sh:NodeShape, auth:OperationExpressionShape ;
@@ -358,8 +362,10 @@ auth:messageWildcardShape
     sh:nodeKind sh:IRI ;
     sh:in       ( auth:anyMessageType ) .
 
-auth:authInfoOperationExpressionShape
-    a                    sh:NodeShape, auth:OperationExpressionShape ;
+# TODO: Add Definition for auth info expression
+
+auth:authInfoExpressionShape
+    a                    sh:NodeShape ;
     sh:closed            true ;
     sh:ignoredProperties ( rdf:type ) ;
     sh:property          auth:operationPropertyShape .
@@ -422,19 +428,10 @@ auth:tokenShapeShape
 # Definition 22 (token specification)
 
 auth:tokenSpecificationShape
-    a                  sh:NodeShape ;
-    sh:closed          true ;
-    sh:targetObjectsOf auth:grantToken ;
-    sh:property        [ sh:path     [ sh:inversePath auth:grantToken ] ;
-                         sh:minCount 1 ;
-                         sh:maxCount 1 ] ;
-    sh:property        [ sh:path     auth:tokenScope ;
-                         sh:minCount 1 ;
-                         sh:maxCount 1 ;
-                         sh:or       ( [ sh:nodeKind sh:IRI ]
-                                       [ sh:nodeKind sh:Literal ;
-                                         sh:datatype xsd:string ] ) ] ;
-    sh:property        auth:expiresAfterPropertyShape .
+    a           sh:NodeShape ;
+    sh:closed   true ;
+    sh:property auth:tokenScopePropertyShape ;
+    sh:property auth:expiresAfterPropertyShape .
 
 # Definition 23 (authorization)
 
@@ -455,8 +452,6 @@ auth:authorizationShape
                            sh:node auth:tokenShapeShape ; ] ;
     sh:property          [ sh:path auth:grant ;
                            sh:node auth:aseRootShape ] ;
-    sh:property          [ sh:path auth:grantToken ;
-                           sh:node auth:tokenSpecificationShape ] ;
     sh:property          [ sh:path     auth:requestedBy ;
                            sh:nodeKind sh:IRI ] ;
     sh:or                ( [ sh:path     auth:grant ;
@@ -489,8 +484,6 @@ auth:authorizationRequestShape
                            sh:node auth:tokenShapeShape ; ] ;
     sh:property          [ sh:path auth:grant ;
                            sh:node auth:aseRootShape ] ;
-    sh:property          [ sh:path auth:grantToken ;
-                           sh:node auth:tokenSpecificationShape ] ;
     sh:property          [ sh:path     auth:requestedBy ;
                            sh:nodeKind sh:IRI ] ;
     sh:or                ( [ sh:path     auth:grant ;
@@ -524,7 +517,7 @@ auth:asePositionShape
     sh:targetClass auth:AsePosition ;
     sh:property    [ sh:path     auth:parentPosition ;
                      sh:maxCount 1 ;
-                     sh:node     auth:asePositionShape ] ;
+                     sh:class     auth:AsePosition ] ;
     sh:in          ( auth:positionRoot
                      auth:positionAtomGraph
                      auth:positionAtomMessage
@@ -553,11 +546,12 @@ auth:operationRequestShape
                            sh:maxCount 1 ;
                            sh:or       ( [ sh:node auth:simpleOperationExpressionShape ]
                                          [ sh:node auth:messageOperationExpressionShape ]
-                                         [ sh:node auth:tokenOperationExpressionShape ]
-                                         [ sh:node auth:authInfoOperationExpressionShape ] ) ] ;
+                                         [ sh:node auth:tokenOperationExpressionShape ] ) ] ;
     sh:property          [ sh:path     auth:reqAtom ;
                            sh:nodeKind sh:IRI ;
                            sh:maxCount 1 ; ] ;
+    sh:property          [ sh:path auth:requestToken ;
+                           sh:node auth:tokenSpecificationShape ] ;
     sh:property          [ sh:path     auth:reqAtomMessages ;
                            sh:nodeKind sh:IRI ;
                            sh:maxCount 1 ; ] ;
@@ -604,6 +598,22 @@ auth:authTokenShape
     sh:property    auth:tokenScopePropertyShape ;
     sh:property    auth:tokenIatPropertyShape ;
     sh:property    auth:tokenExpPropertyShape .
+
+# communicates the auth info in the WWW-Authenticate header, stripped-down version of auth:authorizationShape, omitting
+# all grant/grantToken information. Moreover, explicit grants via atomExpressions are not communicated this way as this
+# might divulge delicate information.
+
+auth:authInfoShape
+    a              sh:NodeShape ;
+    sh:targetClass auth:AuthInfo ;
+    sh:property    [ sh:path auth:bearer ;
+                     sh:node auth:tokenShapeShape ] ;
+    sh:or          ( [ sh:property [ sh:path auth:grantee ;
+                                     sh:node auth:aseRootShape ] ]
+                     [ sh:property [ sh:path     auth:grantee ;
+                                     sh:maxCount 1 ;
+                                     sh:node     auth:granteeWildcardShape ] ] ) .
+
 
 auth:authTokenTestSpecShape
     a           sh:NodeShape ;
@@ -889,9 +899,6 @@ auth:opHint
     auth:messageTo auth:msgTypesHint .
 
 auth:opGetAuthInfo
-    a auth:SimpleOperation .
-
-auth:opRequestToken
     a auth:SimpleOperation .
 
 auth:opConnectClose

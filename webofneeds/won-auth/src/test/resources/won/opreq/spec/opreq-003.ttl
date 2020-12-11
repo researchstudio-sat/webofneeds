@@ -65,7 +65,7 @@ dragon:expectedResult3
 
 dragon:request3
     a                 auth:OperationRequest ;
-    auth:operation    auth:opRequestToken ;
+    auth:operation    [ auth:requestToken [ auth:tokenScope wx-buddy:BuddySocket ] ] ;
     auth:requestor    ex:dragon ;
     auth:reqAtom      ex:donkey ;
     auth:reqPosition  auth:positionRoot ;
@@ -84,7 +84,7 @@ dragon:expectedResult4
 
 dragon:request4
     a                auth:OperationRequest ;
-    auth:operation   auth:opRequestToken ;
+    auth:operation   [ auth:requestToken [ auth:tokenScope "buddyOfBuddy" ] ] ;
     auth:requestor   ex:dragon ;
     auth:reqAtom     ex:shrek ;
     auth:reqPosition auth:positionRoot ;
@@ -307,12 +307,11 @@ lordfarquaad:request4
 # Grants a wx-buddy:BuddySocket token to buddies
 
 ex:grantBuddyTokenAuth
-    a               auth:Authorization ;
-    auth:grantee    [ auth:socket [ auth:socketType wx-buddy:BuddySocket ;
-                                    auth:targetAtom [ ] ] ] ;
-    auth:grant      [ auth:operation auth:opRequestToken ] ;
-    auth:grantToken [ auth:tokenScope   wx-buddy:BuddySocket ;
-                      auth:expiresAfter 3600 ] .
+    a            auth:Authorization ;
+    auth:grantee [ auth:socket [ auth:socketType wx-buddy:BuddySocket ;
+                                 auth:targetAtom [ ] ] ] ;
+    auth:grant   [ auth:operation [ auth:requestToken [ auth:tokenScope   wx-buddy:BuddySocket ;
+                                                        auth:expiresAfter 3600 ] ] ] .
 
 # Grants a "buddyOfBuddy" token to buddies of shrek's buddies
 
@@ -322,9 +321,8 @@ shrek:grantBuddyOfBuddyTokenAuth
                       auth:issuer     [ auth:socket [ auth:socketType  wx-buddy:BuddySocket ;
                                                       auth:connections [ auth:connectionState won:Connected ;
                                                                          auth:targetAtom      [ ] ] ] ] ] ;
-    auth:grant      [ auth:operation auth:opRequestToken ] ;
-    auth:grantToken [ auth:tokenScope   "buddyOfBuddy" ;
-                      auth:expiresAfter 3600 ] .
+    auth:grant      [ auth:operation [ auth:requestToken [ auth:tokenScope   "buddyOfBuddy" ;
+                      auth:expiresAfter 3600 ] ] ].
 
 # Allows direct buddies and bearers of a "buddyOfBuddy" token signed by the holder of the
 # party (Shrek's persona atom) to see the graph #invitationWithoutSpecifics
@@ -359,14 +357,24 @@ party:attendeeAuth
                                  auth:operation  auth:opConnectClose, auth:opCommunicate, auth:opRead ] ] .
 
 
-# Any atom is allowed to get the authentication info
-# for read on graphs and sending messages ot the attendee socket
-
+## Any atom is allowed to get the authentication info
+## for read on graphs and sending messages ot the attendee socket
+#
 #party:authInfoAuth
 #    auth:grantee auth:anyone ;
-#    auth:grant   [ auth:graph  [ auth:provideAuthInfo [ auth:operation auth:Read ] ] ;
+#    auth:grant   [ auth:graph  [ auth:#AuthInfo [ auth:operation auth:Read ] ] ;
 #                   auth:socket [ auth:socketType      wx-schema:AttendeeSocket ;
 #                                 auth:provideAuthInfo [ auth:operation [ auth:messageTo auth:anyMessageType ] ] ] ] .
+#
+## Anyony can learn how to obtain a wx-buddy:BuddySocket token
+#
+#ex:buddySocketTokenInfoAuth
+#    auth:grantee auth:anyone ;
+#    auth:grant
+#                 [ auth:provideAuthInfo
+#                         [ auth:operation [ auth:requestToken [ auth:tokenScope wx-buddy:BuddySocket ] ] ] ] .
+#
+#
 
 ## shrek's buddy network (and connection to the party)
 

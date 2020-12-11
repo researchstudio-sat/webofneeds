@@ -12,6 +12,7 @@ import org.apache.jena.shacl.Shapes;
 import org.apache.jena.shacl.ValidationReport;
 import org.apache.jena.shacl.engine.ValidationContext;
 import org.apache.jena.shacl.lib.ShLib;
+import org.apache.jena.shacl.parser.Shape;
 import org.apache.jena.shacl.validation.VLib;
 import org.junit.Assert;
 import org.junit.Test;
@@ -102,9 +103,21 @@ public class AuthShapeTest {
                         NodeFactory.createURI(AUTH + "simpleOperationExpressionShape"), shapes, data, false);
     }
 
-    private void assertConformsTo(Node focusNode, Node shape, Shapes shapes, Graph data, boolean expected) {
+    @Test
+    public void testBasicShape_005() throws IOException {
+        Shapes shapes = loadShapes(shapesDef);
+        Graph data = loadData(loader.getResource("classpath:/won/basic/basic-005.ttl"));
+        assertConformsTo(NodeFactory.createURI("https://example.com/test/request"),
+                        NodeFactory.createURI(AUTH + "operationRequestShape"), shapes, data, true);
+    }
+
+    private void assertConformsTo(Node focusNode, Node shapeNode, Shapes shapes, Graph data, boolean expected) {
         ResettableErrorHandler handler = new ResettableErrorHandler();
-        boolean isFocusNode = VLib.isFocusNode(shapes.getShape(shape), focusNode, data);
+        Shape shape = shapes.getShape(shapeNode);
+        if (shape == null) {
+            throw new IllegalArgumentException("no such shape: " + shapeNode);
+        }
+        boolean isFocusNode = VLib.isFocusNode(shape, focusNode, data);
         if (expected && !isFocusNode) {
             Assert.fail(String.format("%s should be focus node of %s", focusNode, shape));
         }
@@ -113,7 +126,7 @@ public class AuthShapeTest {
         }
         if (isFocusNode) {
             ValidationContext vCtx = ValidationContext.create(shapes, shapes.getGraph(), handler);
-            VLib.validateShape(vCtx, data, shapes.getShape(shape), focusNode);
+            VLib.validateShape(vCtx, data, shapes.getShape(shapeNode), focusNode);
             if (vCtx.hasViolation()) {
                 ValidationReport report = vCtx.generateReport();
                 printNonconformingReport(report);
@@ -121,7 +134,7 @@ public class AuthShapeTest {
             }
             if (handler.isError() || handler.isFatal()) {
                 Assert.fail(String.format("Node %s %s to shape %s", focusNode,
-                                expected ? "does not conform" : "unexpectedly conforms", shape));
+                                expected ? "does not conform" : "unexpectedly conforms", shapeNode));
             }
         }
     }
@@ -136,6 +149,11 @@ public class AuthShapeTest {
         getOperationRequests().forEach(opReq -> {
             assertConformityOfAuthorizations(shapes, opReq);
         });
+    }
+
+    @Test
+    public void testCycles() throws IOException {
+        Shapes shapes = loadShapes(loader.getResource("classpath:/won/exp/cycletest.ttl"));
     }
 
     private void assertConformityOfAuthorizations(Shapes shapes, Resource authGraph) {

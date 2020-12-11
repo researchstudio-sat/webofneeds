@@ -4,9 +4,11 @@ import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.shacl.Shapes;
+import org.apache.jena.shacl.engine.ValidationContext;
 import org.apache.jena.shacl.parser.PropertyShape;
 import org.apache.jena.shacl.parser.Shape;
 import won.shacl2java.util.ShapeUtils;
+import won.shacl2java.validation.ResettableErrorHandler;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,7 +25,7 @@ public class InstantiationContext {
     private ConcurrentHashMap<Node, Set<Object>> focusNodeToInstance = new ConcurrentHashMap<>();
     private ConcurrentHashMap<PropertyShape, Set<Node>> propertyShapeToNodeShape = new ConcurrentHashMap<>();
     protected Graph data;
-    private Shapes shapes;
+    protected Shapes shapes;
 
     protected InstantiationContext() {
         this.data = null;
@@ -220,5 +222,9 @@ public class InstantiationContext {
                         .append(e.getValue())
                         .append("\n"));
         return sb.toString();
+    }
+
+    public ValidationContext newValidationContext() {
+        return ValidationContext.create(shapes, data);
     }
 }

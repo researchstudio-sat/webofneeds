@@ -250,8 +250,8 @@ public class WonAclEvaluatorTests {
                 if (!expected.equals(decision.getDecision())) {
                     continue;
                 } else {
-                    logger.debug("AclEvalResult decision fulfills spec: {}, checking tokens...",
-                                    decision.getDecision());
+                    logger.debug("AclEvalResult decision fulfills spec: {}, {}",
+                                    decision.getDecision(), spec.getIssueTokens().isEmpty() ? "no tokens to check" : "checking token(s)...");
                     correctDecisionForAuths.add(auth.get_node().toString());
                     if (!spec.getIssueTokens().isEmpty()) {
                         logger.debug("Spec requires {} tokens", spec.getIssueTokens().size());
@@ -275,7 +275,8 @@ public class WonAclEvaluatorTests {
                 break;
             }
             String failMessage = String.format(
-                            "OpRequest %s: decision should be %s. Auths with correct result: %s, of which produced wrong tokens: %s",
+                            "%s: OpRequest %s: decision should be %s. Auths with correct result: %s, of which produced wrong tokens: %s",
+                            testIdentifier,
                             opReq.get_node(), spec.getDecision(),
                             Arrays.toString(correctDecisionForAuths.toArray()),
                             Arrays.toString(wrongTokensIssuedForAuths.toArray()));

@@ -15,9 +15,9 @@
 
 <#authorization1Party>
     a           auth:Authorization ;
-    auth:bearer [ auth:tokenScope  "buddyOfBuddy" ;
-                  auth:issuer [ auth:socket [ auth:socketType wx-hold:HoldableSocket ;
-                                              auth:targetAtom [ ] ; ] ] ] ;
+    auth:bearer [ auth:tokenScope "buddyOfBuddy" ;
+                  auth:issuer     [ auth:socket [ auth:socketType wx-hold:HoldableSocket ;
+                                                  auth:targetAtom [ ] ; ] ] ] ;
     auth:grant  [ auth:graph  [ auth:graphType auth:sysinfoGraph ;
                                 auth:graphIri  <#invitationWithoutSpecifics> ;
                                 auth:operation auth:opRead ] ;
@@ -33,14 +33,10 @@
     a            auth:Authorization ;
     auth:grantee [ auth:socket [ auth:socketType wx-schema:AttendeeSocket ;
                                  auth:connection [ auth:connectionState won:Connected, won:RequestSent ] ;
-        auth:targetAtom [] ;
-        ]
-    ] ;
-    auth:grant [
-         auth:graph [
-            auth:graphType auth:sysinfoGraph ;
-            auth:graphIri <#invitationWithoutSpecifics>, <#timeDateAndLocation> ;
-        auth:operation auth:opRead ] ; ] .
+                                 auth:targetAtom [ ] ] ] ;
+    auth:grant   [ auth:graph [ auth:graphType auth:sysinfoGraph ;
+                                auth:graphIri  <#invitationWithoutSpecifics>, <#timeDateAndLocation> ;
+                                auth:operation auth:opRead ] ] .
 
 
 # Any atom is allowed to get the authentication info

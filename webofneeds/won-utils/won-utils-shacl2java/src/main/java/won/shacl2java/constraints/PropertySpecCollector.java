@@ -112,7 +112,8 @@ public class PropertySpecCollector extends ConstraintVisitorBase {
 
     @Override
     public void visit(ClassConstraint classConstraint) {
-        logger.warn("TODO: sh:class not handled for generating fields of java classes");
+        Set<PropertySpec> propertySpecs = stack.peek();
+        propertySpecs.forEach(p -> p.setShClass(classConstraint.getExpectedClass()));
     }
 
     @Override

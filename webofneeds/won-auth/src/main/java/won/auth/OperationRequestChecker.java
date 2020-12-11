@@ -5,10 +5,12 @@ import org.slf4j.LoggerFactory;
 import won.auth.model.*;
 
 import java.lang.invoke.MethodHandles;
+import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static won.auth.WonAclEvaluator.DEFAULT_TOKEN_EXPIRES_AFTER_SECONDS;
 import static won.auth.model.Individuals.ANY_OPERATION;
 import static won.auth.model.MessageWildcard.ANY_MESSAGE_TYPE;
 
@@ -323,11 +325,6 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
 
     private static class FalseUnless implements OperationExpression.Cases<Boolean> {
         @Override
-        public Boolean is(AuthInfoOperationExpression option) {
-            return false;
-        }
-
-        @Override
         public Boolean is(TokenOperationExpression option) {
             return false;
         }
@@ -351,13 +348,36 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
         }
 
         @Override
-        public Boolean is(AuthInfoOperationExpression granted) {
-            return false;
-        }
-
-        @Override
         public Boolean is(TokenOperationExpression granted) {
-            return false;
+            String grantedScope = granted.getRequestToken().getTokenScopeString();
+            URI grantedURI = granted.getRequestToken().getTokenScopeURI();
+            long grantedValidity = AuthUtils.getExpiresAfterSecondsLong(granted.getRequestToken())
+                            .orElse(DEFAULT_TOKEN_EXPIRES_AFTER_SECONDS);
+            return requested.when(new FalseUnless() {
+                @Override
+                public Boolean is(TokenOperationExpression option) {
+                    boolean scopeFits = false;
+                    if (grantedScope != null) {
+                        String reqScope = option.getRequestToken().getTokenScopeString();
+                        if (grantedScope.equals(reqScope)) {
+                            scopeFits = true;
+                        }
+                    }
+                    if (!scopeFits && grantedURI != null) {
+                        if (grantedURI.equals(option.getRequestToken().getTokenScopeURI())) {
+                            scopeFits = true;
+                        }
+                    }
+                    if (!scopeFits) {
+                        return false;
+                    }
+                    Optional<Long> requestedValidity = AuthUtils.getExpiresAfterSecondsLong(option.getRequestToken());
+                    if (requestedValidity.isPresent()) {
+                        return requestedValidity.get() <= grantedValidity;
+                    }
+                    return true;
+                }
+            });
         }
 
         @Override
@@ -393,7 +413,7 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
                         return true;
                     }
                     Set<MessageType> requestedTos = collectMessageTypes(requestedOption.getMessageTosUnion());
-                    if (!requestedTos.isEmpty()){
+                    if (!requestedTos.isEmpty()) {
                         Set<MessageType> grantedTos = collectMessageTypes(granted.getMessageTosUnion());
                         if (grantedTos.containsAll(requestedTos)) {
                             return true;
@@ -403,7 +423,7 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
                     }
                     Set<MessageType> requestedOnBehalfs = collectMessageTypes(
                                     requestedOption.getMessageOnBehalfsUnion());
-                    if (!requestedOnBehalfs.isEmpty()){
+                    if (!requestedOnBehalfs.isEmpty()) {
                         Set<MessageType> grantedOnBehalfs = collectMessageTypes(granted.getMessageOnBehalfsUnion());
                         if (grantedOnBehalfs.containsAll(requestedOnBehalfs)) {
                             return true;

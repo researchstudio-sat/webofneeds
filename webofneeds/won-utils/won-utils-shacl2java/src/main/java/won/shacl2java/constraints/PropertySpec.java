@@ -12,6 +12,7 @@ public class PropertySpec {
     private RDFDatatype shDatatype;
     private Node shNodeKind;
     private Shape shNodeShape;
+    private Node shClass;
     private boolean negated = false;
     private Set<Node> shInOrHasValue;
 
@@ -19,6 +20,7 @@ public class PropertySpec {
         PropertySpec clone = new PropertySpec();
         clone.setShNodeKind(shNodeKind);
         clone.setShNodeShape(shNodeShape);
+        clone.setShClass(shClass);
         clone.setShDatatype(shDatatype);
         clone.setShMaxCount(shMaxCount);
         clone.setShMinCount(shMinCount);
@@ -58,6 +60,7 @@ public class PropertySpec {
         copy.setShMaxCount(other.getShMaxCount());
         copy.setShMinCount(other.getShMinCount());
         copy.setShNodeKind(other.getShNodeKind());
+        copy.setShClass(other.getShClass());
         copy.setShNodeShape(other.getShNodeShape());
         return Optional.of(copy);
     }
@@ -134,7 +137,6 @@ public class PropertySpec {
 
     public void setShNodeKind(Node shNodeKind) {
         this.shNodeKind = ensureNotModifying(this.shNodeKind, shNodeKind);
-        ;
     }
 
     public boolean hasNamedNodeShape() {
@@ -147,7 +149,18 @@ public class PropertySpec {
 
     public void setShNodeShape(Shape shNodeShape) {
         this.shNodeShape = ensureNotModifying(this.shNodeShape, shNodeShape);
-        ;
+    }
+
+    public Node getShClass() {
+        return shClass;
+    }
+
+    public void setShClass(Node shClass) {
+        this.shClass = ensureNotModifying(this.shClass, shClass);
+    }
+
+    public boolean hasShClass() {
+        return this.shClass != null;
     }
 
     private <T> T ensureNotModifying(T instanceValue, T newValue) {
@@ -176,12 +189,14 @@ public class PropertySpec {
                         Objects.equals(shDatatype, that.shDatatype) &&
                         Objects.equals(shNodeKind, that.shNodeKind) &&
                         Objects.equals(shNodeShape, that.shNodeShape) &&
+                        Objects.equals(shClass, that.shClass) &&
                         Objects.equals(shInOrHasValue, that.shInOrHasValue);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(shMinCount, shMaxCount, shDatatype, shNodeKind, shNodeShape, negated, shInOrHasValue);
+        return Objects.hash(shMinCount, shMaxCount, shDatatype, shNodeKind, shNodeShape, shClass, negated,
+                        shInOrHasValue);
     }
 
     @Override
@@ -192,6 +207,7 @@ public class PropertySpec {
                         ", shDatatype=" + shDatatype +
                         ", shNodeKind=" + shNodeKind +
                         ", shNodeShape=" + shNodeShape +
+                        ", shClassShape=" + shClass +
                         ", negated=" + negated +
                         ", shInOrHasValue=" + shInOrHasValue +
                         '}';

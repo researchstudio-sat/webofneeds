@@ -2,30 +2,22 @@ package won.shacl2java.sourcegen.typegen.logic;
 
 import com.squareup.javapoet.*;
 import org.apache.jena.graph.Node;
-import org.apache.jena.graph.Node_Blank;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.riot.other.G;
 import org.apache.jena.shacl.Shapes;
-import org.apache.jena.shacl.parser.PropertyShape;
 import org.apache.jena.shacl.parser.Shape;
 import org.apache.jena.shacl.vocabulary.SHACL;
-import org.apache.jena.sparql.path.Path;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.shacl2java.Shacl2JavaConfig;
-import won.shacl2java.annotation.Individual;
-import won.shacl2java.annotation.PropertyPath;
 import won.shacl2java.annotation.ShapeNode;
 import won.shacl2java.constraints.EnumShapeChecker;
-import won.shacl2java.constraints.PropertySpec;
 import won.shacl2java.sourcegen.typegen.TypesGenerator;
-import won.shacl2java.sourcegen.typegen.mapping.IndividualClassNames;
-import won.shacl2java.sourcegen.typegen.mapping.ShapeTypeSpecs;
-import won.shacl2java.sourcegen.typegen.mapping.TypeSpecNames;
-import won.shacl2java.sourcegen.typegen.mapping.VisitorClassTypeSpecs;
-import won.shacl2java.sourcegen.typegen.support.*;
-import won.shacl2java.util.CollectionUtils;
+import won.shacl2java.sourcegen.typegen.mapping.*;
+import won.shacl2java.sourcegen.typegen.support.NameClashDetector;
+import won.shacl2java.sourcegen.typegen.support.ProducerConsumerMap;
 import won.shacl2java.util.NameUtils;
 import won.shacl2java.util.ShapeUtils;
 
@@ -37,9 +29,8 @@ import java.util.stream.StreamSupport;
 
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.PUBLIC;
-import static won.shacl2java.sourcegen.typegen.support.TypegenUtils.*;
-import static won.shacl2java.util.CollectionUtils.addToMultivalueMap;
-import static won.shacl2java.util.NameUtils.*;
+import static won.shacl2java.sourcegen.typegen.support.TypegenUtils.generateGetter;
+import static won.shacl2java.sourcegen.typegen.support.TypegenUtils.generateSetter;
 
 public class MainTypesGenerator implements TypesGenerator {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -50,12 +41,13 @@ public class MainTypesGenerator implements TypesGenerator {
     private ShapeTypeSpecs.Producer shapeTypeSpecs;
     private VisitorClassTypeSpecs.Producer visitorClassTypeSpecs;
     private TypeSpecNames.Producer typeSpecNames;
+    private ShapeTargetClasses.Producer shapeTargetClasses;
 
     public MainTypesGenerator(Shapes shapes, Shacl2JavaConfig config, NameClashDetector nameClashDetector,
                     IndividualClassNames.Consumer individualClassNames,
                     ShapeTypeSpecs.Producer shapeTypeSpecs,
                     VisitorClassTypeSpecs.Producer visitorClassTypeSpecs,
-                    TypeSpecNames.Producer typeSpecNames) {
+                    TypeSpecNames.Producer typeSpecNames, ShapeTargetClasses.Producer producer) {
         this.shapes = shapes;
         this.config = config;
         this.nameClashDetector = nameClashDetector;
@@ -63,6 +55,7 @@ public class MainTypesGenerator implements TypesGenerator {
         this.shapeTypeSpecs = shapeTypeSpecs;
         this.visitorClassTypeSpecs = visitorClassTypeSpecs;
         this.typeSpecNames = typeSpecNames;
+        this.shapeTargetClasses = producer;
     }
 
     @Override
@@ -130,6 +123,11 @@ public class MainTypesGenerator implements TypesGenerator {
                         .map(URI::create)
                         .filter(u -> config.getVisitorClasses().contains(u))
                         .forEach(visitorClassUri -> visitorClassTypeSpecs.add(visitorClassUri, typeSpec));
+        // remember if this shape uses sh:targetClass so we can map property shapes with
+        // sh:class to its java type
+        G.allSP(shapes.getGraph(), shape.getShapeNode(), SHACL.targetClass).forEach(targetClass -> {
+            shapeTargetClasses.put(targetClass, shape);
+        });
         return typeSpec;
     }
 

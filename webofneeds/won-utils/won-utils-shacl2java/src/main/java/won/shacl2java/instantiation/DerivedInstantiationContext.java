@@ -3,6 +3,7 @@ package won.shacl2java.instantiation;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.shacl.engine.ValidationContext;
 import org.apache.jena.shacl.parser.PropertyShape;
 import org.apache.jena.shacl.parser.Shape;
 
@@ -110,5 +111,10 @@ public class DerivedInstantiationContext extends InstantiationContext {
                             .append(parentContext.getFormattedState());
         }
         return sb.toString();
+    }
+
+    @Override
+    public ValidationContext newValidationContext() {
+        return ValidationContext.create(parentContext.shapes, this.data);
     }
 }

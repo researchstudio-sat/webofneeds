@@ -7,9 +7,11 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.shacl.Shapes;
 import org.apache.jena.shacl.engine.ShaclPaths;
+import org.apache.jena.shacl.engine.ValidationContext;
 import org.apache.jena.shacl.parser.NodeShape;
 import org.apache.jena.shacl.parser.PropertyShape;
 import org.apache.jena.shacl.parser.Shape;
+import org.apache.jena.shacl.validation.VLib;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
@@ -25,6 +27,7 @@ import won.shacl2java.instantiation.InstantiationContext;
 import won.shacl2java.util.CollectionUtils;
 import won.shacl2java.util.NameUtils;
 import won.shacl2java.util.ShapeUtils;
+import won.shacl2java.validation.ResettableErrorHandler;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.*;
@@ -45,6 +48,7 @@ public class Shacl2JavaInstanceFactory {
     private String[] packagesToScan;
     private InstantiationContext baseInstantiationContext;
     private InstantiationContext dataInstantiationContext;
+    private boolean instantiateViolatingNodes = false;
 
     public Shacl2JavaInstanceFactory(Shapes shapes, String... packagesToScan) {
         this.shapes = shapes;
@@ -66,13 +70,20 @@ public class Shacl2JavaInstanceFactory {
      * Instantiates everything found in data. Replaces any results from previous
      * calls to <code>load(Graph)</code>.
      * 
-     * @param data
+     * @param data the data to load
+     * @param instantiateViolatingNodes if <code>true</code>, instances are
+     * generated for nodes even if they violate one or more of their shapes.
      */
-    public void load(Graph data) {
+    public void load(Graph data, boolean instantiateViolatingNodes) {
         reset();
+        this.instantiateViolatingNodes = instantiateViolatingNodes;
         DerivedInstantiationContext dataContext = new DerivedInstantiationContext(data, baseInstantiationContext);
         instantiateAll(dataContext);
         this.dataInstantiationContext = dataContext;
+    }
+
+    public void load(Graph data) {
+        load(data, false);
     }
 
     public Set<Object> getInstances(String uri) {
@@ -268,7 +279,23 @@ public class Shacl2JavaInstanceFactory {
         if (focusNodes.isEmpty()) {
             return Collections.emptySet();
         }
-        final Set<Node> finalFocusNodes = removeNodesInstantiatedInBaseContext(focusNodes);
+        final Set<Node> finalFocusNodes = removeNodesInstantiatedInBaseContext(focusNodes)
+                        .stream().filter(fnode -> {
+                            if (instantiateViolatingNodes) {
+                                return true;
+                            }
+                            // check if focusnode conforms to shape
+                            ValidationContext vCtx = ctx.newValidationContext();
+                            VLib.validateShape(vCtx, ctx.getData(), shape, fnode);
+                            if (vCtx.hasViolation()) {
+                                if (logger.isDebugEnabled()) {
+                                    logger.debug("skipping node {} as it does not conform to shape {}", fnode,
+                                                    shape.getShapeNode());
+                                }
+                                return false;
+                            }
+                            return true;
+                        }).collect(Collectors.toSet());
         String shapeURI = shape.getShapeNode().getURI();
         Set<Class<?>> classesForShape = ctx.getClassesForShape(shapeURI);
         if (classesForShape == null) {
@@ -635,5 +662,9 @@ public class Shacl2JavaInstanceFactory {
                                             return union;
                                         }));
         return propertyShapesPerPath;
+    }
+
+    public int size() {
+        return dataInstantiationContext.size();
     }
 }

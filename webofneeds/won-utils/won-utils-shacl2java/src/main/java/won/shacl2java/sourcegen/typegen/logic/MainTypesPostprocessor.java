@@ -16,6 +16,7 @@ import won.shacl2java.annotation.Individual;
 import won.shacl2java.annotation.PropertyPath;
 import won.shacl2java.constraints.PropertySpec;
 import won.shacl2java.sourcegen.typegen.TypesPostprocessor;
+import won.shacl2java.sourcegen.typegen.mapping.ShapeTargetClasses;
 import won.shacl2java.sourcegen.typegen.mapping.TypeSpecNames;
 import won.shacl2java.sourcegen.typegen.support.ProducerConsumerMap;
 import won.shacl2java.sourcegen.typegen.mapping.ShapeTypeSpecs;
@@ -40,6 +41,7 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
     private ShapeTypeSpecs.Consumer shapeTypeSpecs;
     private ProducerConsumerMap.Consumer individualClassNames;
     private TypeSpecNames.Consumer typeSpecNames;
+    private ShapeTargetClasses.Consumer shapeTargetClasses;
     private Shapes shapes;
     private Shacl2JavaConfig config;
 
@@ -47,12 +49,14 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                     Shacl2JavaConfig config,
                     ShapeTypeSpecs.Consumer shapeTypeSpecs,
                     ProducerConsumerMap.Consumer individualClassNames,
-                    TypeSpecNames.Consumer typeSpecNames) {
+                    TypeSpecNames.Consumer typeSpecNames,
+                    ShapeTargetClasses.Consumer shapeTargetClasses) {
         this.shapeTypeSpecs = shapeTypeSpecs;
         this.individualClassNames = individualClassNames;
         this.typeSpecNames = typeSpecNames;
         this.shapes = shapes;
         this.config = config;
+        this.shapeTargetClasses = shapeTargetClasses;
     }
 
     @Override
@@ -109,7 +113,8 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                 }
                 boolean addTypeSuffix = propertySpecs.size() > 1;
                 for (PropertySpec propertySpec : propertySpecs) {
-                    addFieldWithPropertySpec(propertyName, path, propertySpec, typeBuilder, fieldsPerPath, config,
+                    addFieldWithPropertySpec(shapes, propertyName, path, propertySpec, typeBuilder, fieldsPerPath,
+                                    config,
                                     addTypeSuffix);
                 }
             }
@@ -220,11 +225,11 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                         .endControlFlow();
     }
 
-    private static void addFieldWithPropertySpec(String propertyName, Path path, PropertySpec propertySpec,
+    private void addFieldWithPropertySpec(Shapes shapes, String propertyName, Path path, PropertySpec propertySpec,
                     TypeSpec.Builder typeBuilder, Map<Path, Set<FieldSpec>> fieldsPerPath, Shacl2JavaConfig config,
                     boolean addTypeSuffix) {
         logger.debug("adding field {} for propertySpec: {}", propertyName, propertySpec);
-        PropertyHelper helper = new PropertyHelper(propertyName, propertySpec, config, addTypeSuffix);
+        PropertyHelper helper = new PropertyHelper(shapes, propertyName, propertySpec, config, addTypeSuffix);
         TypeName fieldType = helper.getTypeName();
         String fieldName = helper.getFieldName();
         FieldSpec field = FieldSpec.builder(fieldType,
@@ -336,7 +341,7 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
         typeBuilder.addMethod(toString);
     }
 
-    private static class PropertyHelper {
+    private class PropertyHelper {
         private TypeName typeName;
         private ClassName baseType;
         private String basePropertyName;
@@ -345,9 +350,12 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
         private String typeSuffix = "";
         private String propertyKindSuffix = "";
         private boolean addTypeIndicator = false;
+        private Shapes shapes;
 
-        public PropertyHelper(String basePropertyName, PropertySpec propertySpec, Shacl2JavaConfig config,
+        public PropertyHelper(Shapes shapes, String basePropertyName, PropertySpec propertySpec,
+                        Shacl2JavaConfig config,
                         boolean addTypeIndicator) {
+            this.shapes = shapes;
             this.basePropertyName = basePropertyName;
             this.propertySpec = propertySpec;
             this.config = config;
@@ -385,7 +393,16 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                 // in this case, reset any propertyKindSuffix we may have set
                 this.propertyKindSuffix = "";
                 type = NameUtils.javaPoetClassNameForShape(propertySpec.getShNodeShape(), config);
-            } else {
+            } else if (propertySpec.hasShClass()) {
+                Optional<Shape> shape = shapeTargetClasses.get(propertySpec.getShClass());
+                if (shape.isPresent()) {
+                    Optional<TypeSpec> typeSpec = shapeTypeSpecs.get(shape.get());
+                    if (typeSpec.isPresent()) {
+                        type = ClassName.get(config.getPackageName(), typeSpec.get().name);
+                    }
+                }
+            }
+            if (type == null) {
                 type = ClassName.get(candidateJavaType);
             }
             if (type == null) {

@@ -22,6 +22,7 @@ import static won.auth.model.RelativeAtomExpression.SELF;
 
 public class WonAclEvaluator {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    public static final long DEFAULT_TOKEN_EXPIRES_AFTER_SECONDS = 3600;
     private TargetAtomCheckEvaluator targetAtomCheckEvaluator;
     private Shacl2JavaInstanceFactory instanceFactory;
 
@@ -80,27 +81,30 @@ public class WonAclEvaluator {
             return acd;
         }
         acd.setDecision(DecisionValue.ACCESS_GRANTED);
-        for (TokenSpecification grantToken : authorization.getGrantTokens()) {
+        for (TokenOperationExpression op : authorization.getGrants().stream()
+                        .flatMap(root -> root.getOperationsTokenOperationExpression().stream())
+                        .collect(Collectors.toSet())) {
+            TokenSpecification tokenSpec = op.getRequestToken();
             AuthToken token = new AuthToken();
             Calendar cal = Calendar.getInstance();
             cal.setTime(new Date());
             XSDDateTime iat = new XSDDateTime(cal);
-            if (grantToken.getExpiresAfterBigInteger() != null) {
-                cal.add(Calendar.SECOND, grantToken.getExpiresAfterBigInteger().intValueExact());
-            } else if (grantToken.getExpiresAfterLong() != null) {
-                cal.add(Calendar.SECOND, grantToken.getExpiresAfterLong().intValue());
-            } else if (grantToken.getExpiresAfterInteger() != null) {
-                cal.add(Calendar.SECOND, grantToken.getExpiresAfterInteger());
+            if (tokenSpec.getExpiresAfterBigInteger() != null) {
+                cal.add(Calendar.SECOND, tokenSpec.getExpiresAfterBigInteger().intValueExact());
+            } else if (tokenSpec.getExpiresAfterLong() != null) {
+                cal.add(Calendar.SECOND, tokenSpec.getExpiresAfterLong().intValue());
+            } else if (tokenSpec.getExpiresAfterInteger() != null) {
+                cal.add(Calendar.SECOND, tokenSpec.getExpiresAfterInteger());
             }
             XSDDateTime exp = new XSDDateTime(cal);
             token.setTokenExp(exp);
             token.setTokenIat(iat);
             token.setTokenIss(request.getReqAtom());
             token.setTokenSub(request.getRequestor());
-            if (grantToken.getTokenScopeURI() != null) {
-                token.setTokenScopeURI(grantToken.getTokenScopeURI());
-            } else if (grantToken.getTokenScopeString() != null) {
-                token.setTokenScopeString(grantToken.getTokenScopeString());
+            if (tokenSpec.getTokenScopeURI() != null) {
+                token.setTokenScopeURI(tokenSpec.getTokenScopeURI());
+            } else if (tokenSpec.getTokenScopeString() != null) {
+                token.setTokenScopeString(tokenSpec.getTokenScopeString());
             }
             acd.addIssueToken(token);
         }

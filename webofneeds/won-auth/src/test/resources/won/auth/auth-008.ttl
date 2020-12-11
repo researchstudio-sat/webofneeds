@@ -3,6 +3,7 @@
 @prefix msg:      <https://w3id.org/won/message#> .
 @prefix wx-buddy: <https://w3id.org/won/ext/buddy#> .
 @prefix wx-hold:  <https://w3id.org/won/ext/hold#> .
+@prefix won:      <https://w3id.org/won/core#> .
 
 # Allows the requestor of a "buddyOfBuddy" token to learn how they can
 # authenticate to obtain one (i.e. get a BuddySocket token from one of
@@ -12,7 +13,12 @@
 #   - authInfo for tokenRequest for token with scope 'buddyOfBuddy'
 # to anyone
 
-<#Authorization2Persona>
-    auth:grantee [ auth:atom auth:anyAtom ] ;
-    auth:grant   [ auth:tokenRequest [ auth:tokenScope "buddyOfBuddy" ;
-                                       auth:operation  auth:opGetAuthInfo ; ] ] .
+<#grantBuddyOfBuddyTokenAuth>
+    a           auth:Authorization ;
+    auth:bearer [ auth:tokenScope wx-buddy:BuddySocket ;
+                  auth:issuer     [ auth:socket [ auth:socketType  wx-buddy:BuddySocket ;
+                                                  auth:connections [ auth:connectionState won:Connected ;
+                                                                     auth:targetAtom      [ ] ] ] ] ] ;
+    auth:grant  [ auth:operation [ auth:requestToken [ auth:tokenScope   "buddyOfBuddy" ;
+                                                       auth:expiresAfter 3600 ] ] ] .
+

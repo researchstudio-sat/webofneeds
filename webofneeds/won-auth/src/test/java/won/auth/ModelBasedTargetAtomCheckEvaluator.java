@@ -27,7 +27,7 @@ public class ModelBasedTargetAtomCheckEvaluator implements TargetAtomCheckEvalua
     }
 
     public void loadData(Graph data) {
-        this.instanceFactory.load(data);
+        this.instanceFactory.load(data, true);
     }
 
     @Override
