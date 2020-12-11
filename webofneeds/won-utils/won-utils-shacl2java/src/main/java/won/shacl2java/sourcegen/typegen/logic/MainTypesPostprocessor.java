@@ -334,6 +334,9 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                         .addStatement("if (this == o) return true")
                         .addStatement("if (o == null || getClass() != o.getClass()) return false")
                         .addStatement("$T obj = ($T) o", typeClass, typeClass)
+                        .beginControlFlow("if (_node == null)")
+                        .addStatement("return false")
+                        .endControlFlow()
                         .addStatement("return _node.equals(obj._node)")
                         .build();
         typeBuilder.addMethod(equals);
