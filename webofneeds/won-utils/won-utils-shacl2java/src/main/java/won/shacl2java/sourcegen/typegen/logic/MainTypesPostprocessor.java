@@ -26,6 +26,7 @@ import won.shacl2java.util.NameUtils;
 import won.shacl2java.util.ShapeUtils;
 
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -103,8 +104,12 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                                 return union;
                             }));
             for (Path path : propSpecsPerPath.keySet()) {
-                String propertyName = NameUtils.propertyNameForPath(path);
-                logger.debug("generating property '{}' of {}", propertyName, NameUtils.nameForShape(relevantShape));
+                Optional<String> propertyName = NameUtils.propertyNameForPath(path);
+                if (!propertyName.isPresent()) {
+                    continue;
+                }
+                logger.debug("generating property '{}' of {}", propertyName.get(),
+                                NameUtils.nameForShape(relevantShape));
                 Set<PropertySpec> propertySpecs = propSpecsPerPath.get(path);
                 if (logger.isDebugEnabled()) {
                     for (PropertySpec propertySpec : propertySpecs) {
@@ -113,7 +118,7 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                 }
                 boolean addTypeSuffix = propertySpecs.size() > 1;
                 for (PropertySpec propertySpec : propertySpecs) {
-                    addFieldWithPropertySpec(shapes, propertyName, path, propertySpec, typeBuilder, fieldsPerPath,
+                    addFieldWithPropertySpec(shapes, propertyName.get(), path, propertySpec, typeBuilder, fieldsPerPath,
                                     config,
                                     addTypeSuffix);
                 }
@@ -124,8 +129,10 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                     return;
                 }
                 Path path = pathToFields.getKey();
-                String fieldName = propertyNameForPath(path);
-                addUnionGetter(fieldName, path, typeBuilder, fieldSpecs, config);
+                Optional<String> fieldName = propertyNameForPath(path);
+                if (fieldName.isPresent()) {
+                    addUnionGetter(fieldName.get(), path, typeBuilder, fieldSpecs, config);
+                }
             });
         }
         relevantShapes
@@ -339,6 +346,78 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                         .endControlFlow()
                         .addStatement("return _node.equals(obj._node)")
                         .build();
+        MethodSpec.Builder deepEqualsBuilder = MethodSpec.methodBuilder("deepEquals")
+                        .addModifiers(PUBLIC)
+                        .addParameter(TypeName.OBJECT, "o")
+                        .addParameter(ClassName.get(ArrayDeque.class), "visited")
+                        .returns(TypeName.BOOLEAN)
+                        .addStatement("if (this == o) return true")
+                        .addStatement("if (o == null || getClass() != o.getClass()) return false")
+                        .beginControlFlow("if (visited.contains(this))")
+                        .addStatement("return true")
+                        .endControlFlow()
+                        .addStatement("visited.push(this)")
+                        .addStatement("$T obj = ($T) o", typeClass, typeClass)
+                        .addStatement("boolean sub = false");
+        for (FieldSpec subElement : typeBuilder.fieldSpecs) {
+            TypeName _subElTyp = subElement.type;
+            TypeName rawSubElementType = null;
+            if (subElement.type instanceof ParameterizedTypeName) {
+                _subElTyp = ((ParameterizedTypeName) subElement.type).typeArguments.get(0);
+                rawSubElementType = ((ParameterizedTypeName) subElement.type).rawType;
+            }
+            final TypeName subElementType = _subElTyp;
+            if (subElement.type instanceof ParameterizedTypeName) {
+                logger.debug("adding recursion for field {}", subElement.name);
+                String getter = getterNameForField(subElement.name);
+                if (rawSubElementType != null && rawSubElementType.equals(TypeName.get(Set.class))) {
+                    deepEqualsBuilder
+                                    .beginControlFlow("sub = this.$N().stream().allMatch(child -> ", getter)
+                                    .beginControlFlow("return obj.$N().stream().anyMatch( objChild -> ", getter)
+                                    .beginControlFlow("try ")
+                                    .addStatement("$T m = child.getClass().getMethod($S, $T.class, $T.class)",
+                                                    Method.class,
+                                                    "deepEquals",
+                                                    Object.class, ArrayDeque.class)
+                                    .addStatement("return (Boolean) m.invoke(child, objChild, visited)")
+                                    .nextControlFlow("catch ($T e)", NoSuchMethodException.class)
+                                    .addStatement("return child.equals(objChild)")
+                                    .nextControlFlow("catch (Exception e)")
+                                    .addStatement("throw new $T($S, e)", RuntimeException.class, "Cannot compare")
+                                    .endControlFlow()
+                                    .endControlFlow(")")
+                                    .endControlFlow(")")
+                                    .beginControlFlow("if (!sub)")
+                                    .addStatement("visited.pop()")
+                                    .addStatement("return false")
+                                    .endControlFlow();
+                } else {
+                    deepEqualsBuilder
+                                    .addStatement("$N child = this.$N()", subElementType, getter)
+                                    .beginControlFlow("if (child != null)")
+                                    .beginControlFlow("try ")
+                                    .addStatement("$T m = child.getClass().getMethod($S, $T.class, $T.class)",
+                                                    Method.class,
+                                                    "deepEquals",
+                                                    Object.class, ArrayDeque.class)
+                                    .addStatement("return (Boolean) m.invoke(child, objChild, visited)")
+                                    .nextControlFlow("catch ($T e)", NoSuchMethodException.class)
+                                    .addStatement("return child.equals(objChild)")
+                                    .nextControlFlow("catch (Exception e)")
+                                    .addStatement("throw new $T($S, e)", RuntimeException.class, "Cannot compare")
+                                    .endControlFlow()
+                                    .beginControlFlow("if (!sub)")
+                                    .addStatement("visited.pop()")
+                                    .addStatement("return false")
+                                    .endControlFlow()
+                                    .endControlFlow();
+                }
+            }
+        }
+        deepEqualsBuilder
+                        .addStatement("visited.pop()")
+                        .addStatement("return true");
+        typeBuilder.addMethod(deepEqualsBuilder.build());
         typeBuilder.addMethod(equals);
         typeBuilder.addMethod(hashCode);
         typeBuilder.addMethod(toString);

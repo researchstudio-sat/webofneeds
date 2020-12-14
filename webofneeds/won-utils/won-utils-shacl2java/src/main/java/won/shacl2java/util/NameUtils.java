@@ -12,6 +12,7 @@ import org.apache.jena.sparql.path.PathVisitorBase;
 import won.shacl2java.Shacl2JavaConfig;
 
 import java.net.URI;
+import java.util.Optional;
 import java.util.regex.Matcher;
 
 public class NameUtils {
@@ -79,12 +80,12 @@ public class NameUtils {
         return name;
     }
 
-    public static String propertyNameForPropertyShape(PropertyShape shape) {
+    public static Optional<String> propertyNameForPropertyShape(PropertyShape shape) {
         Path path = shape.getPath();
         return propertyNameForPath(path);
     }
 
-    public static String propertyNameForPath(Path path) {
+    public static Optional<String> propertyNameForPath(Path path) {
         StringBuilder propertyName = new StringBuilder();
         path.visit(new PathVisitorBase() {
             @Override
@@ -100,7 +101,11 @@ public class NameUtils {
                 }
             }
         });
-        return propertyName.toString();
+        String ret = propertyName.toString();
+        if (ret.length() == 0) {
+            return Optional.empty();
+        }
+        return Optional.of(ret);
     }
 
     public static String plural(String name) {

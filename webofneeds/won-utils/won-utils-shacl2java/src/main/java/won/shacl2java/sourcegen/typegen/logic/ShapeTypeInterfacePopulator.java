@@ -60,7 +60,11 @@ public class ShapeTypeInterfacePopulator implements TypesPostprocessor {
                                             b.addTypeVariables(methodSpec.typeVariables);
                                             methodSpec.parameters.forEach(p -> b.addParameter(p));
                                             if (!methodSpec.returnType.equals(ClassName.VOID)) {
-                                                b.addStatement("return null");
+                                                if (methodSpec.returnType.isPrimitive()) {
+                                                    b.addStatement("return ($T) null", methodSpec.returnType.box());
+                                                } else {
+                                                    b.addStatement("return null");
+                                                }
                                             }
                                             b.addModifiers(PUBLIC, DEFAULT);
                                             return b.build();

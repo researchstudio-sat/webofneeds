@@ -293,6 +293,11 @@ public class Shacl2JavaInstanceFactory {
                                                     shape.getShapeNode());
                                 }
                                 return false;
+                            } else {
+                                if (logger.isDebugEnabled()) {
+                                    logger.debug("accepting node {} as it conforms to shape {}", fnode,
+                                                    shape.getShapeNode());
+                                }
                             }
                             return true;
                         }).collect(Collectors.toSet());
