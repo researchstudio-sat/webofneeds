@@ -2,6 +2,7 @@ package won.auth;
 
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.compose.Union;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shacl.Shapes;
@@ -46,7 +47,7 @@ public class WonAclEvaluatorTests {
     }
 
     @Autowired
-    private static ResourceLoader loader;
+    private ResourceLoader loader;
     @Value("classpath:/shacl/won-auth-shapes.ttl")
     private Resource shapesDef;
     @Value("classpath:/shacl/won-test-atom-shapes.ttl")
@@ -133,10 +134,31 @@ public class WonAclEvaluatorTests {
                         () -> new WonAclEvaluator(shapes, targetAtomChecker));
         getSpecOperationRequests().forEach(
                         testCaseResource -> {
-                            Graph graph = null;
+                            Graph graph = loadGraph(testCaseResource);
                             try {
                                 evaluateTestWithSpec(shapes, atomDataShapes, evaluator, targetAtomChecker,
-                                                testCaseResource);
+                                                graph, testCaseResource);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        });
+    }
+
+    @Test
+    public void testWonAcl_domain_spec() throws IOException {
+        Shapes shapes = loadShapes(shapesDef);
+        Shapes atomDataShapes = loadShapes(atomDataShapesDef);
+        ModelBasedTargetAtomCheckEvaluator targetAtomChecker = new ModelBasedTargetAtomCheckEvaluator(atomDataShapes,
+                        "won.auth.test.model");
+        Graph domainBase = loadGraph(loader.getResource("classpath:/won/opreq/domain1/domain.ttl"));
+        WonAclEvaluator evaluator = withDurationLog("initializing WonAclEvaluator",
+                        () -> new WonAclEvaluator(shapes, targetAtomChecker));
+        getDomainSpecOperationRequests().forEach(
+                        testCaseResource -> {
+                            try {
+                                Graph testCase = loadGraph(testCaseResource);
+                                evaluateTestWithSpec(shapes, atomDataShapes, evaluator, targetAtomChecker,
+                                                new Union(domainBase, testCase), testCaseResource);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -157,25 +179,25 @@ public class WonAclEvaluatorTests {
         withDurationLog("instantiating test atom entities",
                         () -> targetAtomChecker.loadData(graph));
         withDurationLog("instantiating auth/req entities",
-                        () -> evaluator.loadData(graph));
+                        () -> evaluator.loadData(new Union(shapes.getGraph(), graph)));
         withDurationLog("making auth decision",
                         () -> checkExpectedAuthDecision(evaluator, accessDenied, resource.getFilename()));
     }
 
     private void evaluateTestWithSpec(Shapes shapes, Shapes atomDataShapes,
-                    WonAclEvaluator evaluator, ModelBasedTargetAtomCheckEvaluator targetAtomChecker, Resource resource)
+                    WonAclEvaluator evaluator, ModelBasedTargetAtomCheckEvaluator targetAtomChecker, Graph graph,
+                    Resource resource)
                     throws IOException {
-        logger.debug("test case: {}", resource.getFilename());
-        Graph graph = withDurationLog("loading data graph ",
-                        () -> loadGraph(resource));
         withDurationLog("validating with auth shapes",
-                        () -> validateTestData(shapes, graph, true, shapesDef.getFilename()));
+                        () -> validateTestData(shapes, graph, true,
+                                        resource.getFilename() + " validated against auth shapes"));
         withDurationLog("validating with atom test data shapes",
-                        () -> validateTestData(atomDataShapes, graph, false, atomDataShapesDef.getFilename()));
+                        () -> validateTestData(atomDataShapes, graph, false,
+                                        resource.getFilename() + " validated against atom test data shapes"));
         withDurationLog("instantiating test atom entities",
                         () -> targetAtomChecker.loadData(graph));
         withDurationLog("instantiating auth/req entities",
-                        () -> evaluator.loadData(graph));
+                        () -> evaluator.loadData(new Union(graph, shapes.getGraph())));
         withDurationLog("making auth decision",
                         () -> checkSpecifiedAuthDecision(evaluator, resource.getFilename()));
     }
@@ -198,14 +220,14 @@ public class WonAclEvaluatorTests {
     }
 
     public void validateTestData(Shapes shapes, Graph graph, boolean failTest, String shapesName) {
-        ValidationReport shaclReport = ShaclSystem.get().validate(shapes, graph);
+        ValidationReport shaclReport = ShaclSystem.get().validate(shapes, new Union(shapes.getGraph(), graph));
         if (failTest) {
             if (!shaclReport.conforms()) {
                 ShLib.printReport(shaclReport);
                 System.out.println();
                 RDFDataMgr.write(System.out, shaclReport.getModel(), Lang.TTL);
             }
-            Assert.assertTrue(shaclReport.conforms());
+            Assert.assertTrue(String.format("%s: test data invalid", shapesName), shaclReport.conforms());
         } else {
             if (!shaclReport.conforms()) {
                 logger.info("graph failed SHACL validation with {}", shapesName);
@@ -231,42 +253,153 @@ public class WonAclEvaluatorTests {
     private void checkSpecifiedAuthDecision(WonAclEvaluator loadedEvaluator, String testIdentifier) {
         for (ExpectedAclEvalResult spec : loadedEvaluator.getInstanceFactory()
                         .getInstancesOfType(ExpectedAclEvalResult.class)) {
-            logger.debug("using spec {} for testing...", spec.toStringAllFields());
+            logger.debug("{}: using spec {} for testing...", testIdentifier, spec.toStringAllFields());
             OperationRequest opReq = spec.getRequestedOperation();
             Calendar cal = Calendar.getInstance();
             cal.setTime(new Date());
             cal.add(Calendar.MINUTE, 30);
             opReq.getBearsTokens().forEach(token -> token.setTokenExp(new XSDDateTime(cal)));
-            Authorization specFulfillingAuth = null;
-            Set<String> correctDecisionForAuths = new HashSet();
-            Set<String> wrongTokensIssuedForAuths = new HashSet<>();
             long start = System.currentTimeMillis();
-            AclEvalResult result = loadedEvaluator.decide(loadedEvaluator.getAuthorizations(), opReq);
+            AclEvalResult actualResult = loadedEvaluator.decide(loadedEvaluator.getAuthorizations(), opReq);
             logDuration("making authorization decision", start);
             logger.debug("checking OpRequest {} against Authorizations ", opReq.get_node());
             DecisionValue expected = spec.getDecision();
             Assert.assertEquals(String.format("%s: wrong ACL decision", testIdentifier), expected,
-                            result.getDecision());
+                            actualResult.getDecision());
             if (!spec.getIssueTokens().isEmpty()) {
                 logger.debug("Spec requires {} tokens", spec.getIssueTokens().size());
                 for (AuthTokenTestSpec tokenSpec : spec.getIssueTokens()) {
-                    logger.debug("AclEvalResult contains {} tokens", result.getIssueTokens().size());
-                    if (!result.getIssueTokens()
+                    logger.debug("AclEvalResult contains {} tokens", actualResult.getIssueTokens().size());
+                    if (!actualResult.getIssueTokens()
                                     .stream()
                                     .anyMatch(actualToken -> matches(tokenSpec, actualToken))) {
                         Assert.fail(String.format(
                                         "%s, Spec %s: None of the actual tokens %s match the specified token %s",
                                         testIdentifier,
                                         spec.get_node(),
-                                        result.getIssueTokens().stream().map(AuthToken::toStringAllFields)
+                                        actualResult.getIssueTokens().stream().map(AuthToken::toStringAllFields)
                                                         .collect(Collectors.joining(",", "[", "]")),
                                         tokenSpec.toStringAllFields()));
                     }
                 }
+            } else if (!actualResult.getIssueTokens().isEmpty()) {
+                Assert.fail(String.format(
+                                "%s, Spec %s: Tokens granted but none specified",
+                                testIdentifier,
+                                spec.get_node()));
             }
-            logger.debug("authinfo : {}", Arrays.toString(result.getAuthInfos().stream().map(a -> a.toStringAllFields()).toArray()));
+            if (spec.getProvideAuthInfo() != null) {
+                AuthInfo expectedAuthInfo = spec.getProvideAuthInfo();
+                if (!matches(expectedAuthInfo, actualResult.getProvideAuthInfo())) {
+                    Assert.fail(String.format(
+                                    "%s, Spec %s: None of the actual auth infos %s match the specified authInfo %s",
+                                    testIdentifier, spec.get_node(),
+                                    actualResult.getProvideAuthInfo() != null
+                                                    ? actualResult.getProvideAuthInfo().toStringAllFields()
+                                                    : "null",
+                                    expectedAuthInfo.toStringAllFields()));
+                }
+            } else if (actualResult.getProvideAuthInfo() != null) {
+                Assert.fail(String.format(
+                                "%s, Spec %s: Auth info provided but none specified",
+                                testIdentifier,
+                                spec.get_node()));
+            }
+            logger.debug("authinfo : {}",
+                            actualResult.getProvideAuthInfo() != null
+                                            ? actualResult.getProvideAuthInfo().toStringAllFields()
+                                            : "null");
         }
         logger.debug("test case {} passed", testIdentifier);
+    }
+
+    private boolean matches(AuthInfo expectedAuthInfo, AuthInfo actualAuthInfo) {
+        if (expectedAuthInfo == null && actualAuthInfo != null
+                        || expectedAuthInfo != null && actualAuthInfo == null) {
+            return false;
+        }
+        if (expectedAuthInfo.getGranteeGranteeWildcard() != null) {
+            if (!expectedAuthInfo.getGranteeGranteeWildcard().equals(actualAuthInfo.getGranteeGranteeWildcard())) {
+                return false;
+            }
+        }
+        if (!expectedAuthInfo.getBearers().isEmpty()) {
+            if (!expectedAuthInfo
+                            .getBearers()
+                            .stream()
+                            .allMatch(expectedTokenSpec -> actualAuthInfo
+                                            .getBearers()
+                                            .stream()
+                                            .anyMatch(actualTokenSpec -> matches(expectedTokenSpec,
+                                                            actualTokenSpec)))) {
+                return false;
+            }
+        }
+        if (!expectedAuthInfo.getGranteesAseRoot().isEmpty()) {
+            if (!expectedAuthInfo
+                            .getGranteesAseRoot()
+                            .stream()
+                            .allMatch(expectedAseRoot -> actualAuthInfo
+                                            .getGranteesAseRoot()
+                                            .stream()
+                                            .anyMatch(actualAseRoot -> matches(expectedAseRoot, actualAseRoot)))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean matches(AseRoot expectedAseRoot, AseRoot actualAseRoot) {
+        return expectedAseRoot.deepEquals(actualAseRoot, new ArrayDeque());
+    }
+
+    private boolean matches(TokenShape expectedTokenSpec, TokenShape actualTokenSpec) {
+        if (!expectedTokenSpec.getIssuersAtomExpression().isEmpty()) {
+            if (!expectedTokenSpec
+                            .getIssuersAtomExpression()
+                            .stream()
+                            .allMatch(expectedAtomExpression -> actualTokenSpec
+                                            .getIssuersAtomExpression()
+                                            .stream()
+                                            .anyMatch(actualAtomExpression -> matches(expectedAtomExpression,
+                                                            actualAtomExpression)))) {
+                return false;
+            }
+        }
+        if (!expectedTokenSpec.getIssuersAseRoot().isEmpty()) {
+            if (!expectedTokenSpec
+                            .getIssuersAseRoot()
+                            .stream()
+                            .allMatch(expectedAseRoot -> actualTokenSpec
+                                            .getIssuersAseRoot()
+                                            .stream()
+                                            .anyMatch(actualAseRoot -> matches(expectedAseRoot, actualAseRoot)))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean matches(AtomExpression expectedAtomExpression, AtomExpression actualAtomExpression) {
+        if (!expectedAtomExpression.getAtomsRelativeAtomExpression().isEmpty()
+                        && !expectedAtomExpression
+                                        .getAtomsRelativeAtomExpression()
+                                        .stream()
+                                        .allMatch(expected -> actualAtomExpression
+                                                        .getAtomsRelativeAtomExpression()
+                                                        .stream()
+                                                        .anyMatch(actual -> expected.equals(actual)))) {
+            return false;
+        }
+        if (!expectedAtomExpression.getAtomsURI().isEmpty()
+                        && !expectedAtomExpression
+                                        .getAtomsURI()
+                                        .stream().allMatch(expected -> actualAtomExpression
+                                                        .getAtomsURI().stream()
+                                                        .anyMatch(actual -> expected.equals(actual)))) {
+            return false;
+        }
+        return true;
     }
 
     private boolean matches(AuthTokenTestSpec tokenSpec, AuthToken actualToken) {
@@ -331,21 +464,27 @@ public class WonAclEvaluatorTests {
         return message;
     }
 
-    public static Stream<Resource> getOkOperationRequests() throws IOException {
+    public Stream<Resource> getOkOperationRequests() throws IOException {
         Resource[] files = ResourcePatternUtils.getResourcePatternResolver(loader)
                         .getResources("classpath:/won/opreq/ok/opreq*.ttl");
         return Stream.of(files);
     }
 
-    public static Stream<Resource> getFailOperationRequests() throws IOException {
+    public Stream<Resource> getFailOperationRequests() throws IOException {
         Resource[] files = ResourcePatternUtils.getResourcePatternResolver(loader)
                         .getResources("classpath:/won/opreq/fail/opreq*.ttl");
         return Stream.of(files);
     }
 
-    public static Stream<Resource> getSpecOperationRequests() throws IOException {
+    public Stream<Resource> getSpecOperationRequests() throws IOException {
         Resource[] files = ResourcePatternUtils.getResourcePatternResolver(loader)
                         .getResources("classpath:/won/opreq/spec/opreq*.ttl");
+        return Stream.of(files);
+    }
+
+    public Stream<Resource> getDomainSpecOperationRequests() throws IOException {
+        Resource[] files = ResourcePatternUtils.getResourcePatternResolver(loader)
+                        .getResources("classpath:/won/opreq/domain1/case*.ttl");
         return Stream.of(files);
     }
 }

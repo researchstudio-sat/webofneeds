@@ -1,0 +1,218 @@
+@prefix auth:         <https://w3id.org/won/auth#> .
+@prefix won:          <https://w3id.org/won/core#> .
+@prefix wx-buddy:     <https://w3id.org/won/ext/buddy#> .
+@prefix wx-hold:      <https://w3id.org/won/ext/hold#> .
+@prefix wx-schema:    <https://w3id.org/won/ext/schema#> .
+@prefix msg:          <https://w3id.org/won/message#> .
+@prefix ex:           <https://example.com/test/> .
+@prefix owl:          <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix party:        <http://example.org/test/party#> .
+@prefix shrek:        <http://example.org/test/shrek#> .
+@prefix donkey:       <http://example.org/test/donkey#> .
+@prefix dragon:       <http://example.org/test/dragon#> .
+@prefix magicmirror:  <http://example.org/test/magicmirror#> .
+@prefix pinocchio:    <http://example.org/test/pinocchio#> .
+@prefix lordfarquaad: <http://example.org/test/lordfarquaad#> .
+
+# Shrek is organizing a rather secretive party. His friends can see an invitation without time/location details.
+# Friends of friends can see that, too. Guests who are personally invited can see the time/location details.
+# Friends who ask to come can see the details once the request has been accepted by Shrek.
+
+
+# Grants a wx-buddy:BuddySocket token to buddies
+
+ex:grantBuddyTokenAuth
+    a            auth:Authorization ;
+    auth:grantee [ auth:socket [ auth:socketType wx-buddy:BuddySocket ;
+                                 auth:targetAtom [ ] ] ] ;
+    auth:grant   [ auth:operation [ auth:requestToken [ auth:tokenScope   wx-buddy:BuddySocket ;
+                                                        auth:expiresAfter 3600 ] ] ] .
+
+# Grants a "buddyOfBuddy" token to buddies of shrek's buddies
+
+shrek:grantBuddyOfBuddyTokenAuth
+    a           auth:Authorization ;
+    auth:bearer [ auth:tokenScope wx-buddy:BuddySocket ;
+                  auth:issuer     [ auth:socket [ auth:socketType  wx-buddy:BuddySocket ;
+                                                  auth:connections [ auth:connectionState won:Connected ;
+                                                                     auth:targetAtom      [ ] ] ] ] ] ;
+    auth:grant  [ auth:operation [ auth:requestToken [ auth:tokenScope   "buddyOfBuddy" ;
+                                                       auth:expiresAfter 3600 ] ] ] .
+
+# Allows direct buddies and bearers of a "buddyOfBuddy" token signed by the holder of the
+# party (Shrek's persona atom) to see the graph #invitationWithoutSpecifics
+# and to connect/communicate via the wx-schema:AttendeeSocket - which allows
+# Shrek (as the owner of the party atom), to accept/deny their requests to attend
+
+party:unspecificInvitationAuth
+    a           auth:Authorization ;
+    auth:bearer [ auth:tokenScope "buddyOfBuddy", wx-buddy:BuddySocket ;
+                  auth:issuer     [ auth:socket [ auth:socketType wx-hold:HoldableSocket ;
+                                                  auth:targetAtom [ ] ] ] ] ;
+    auth:grant  [ auth:graph  [ auth:graphType auth:sysinfoGraph ;
+                                auth:graphIri  party:invitationWithoutSpecifics ;
+                                auth:operation auth:opRead ] ;
+                  auth:socket [ auth:socketType wx-schema:AttendeeSocket ;
+                                auth:operation  auth:opConnectClose, auth:opCommunicate ] ] .
+
+# All atoms connected on the wx-schema:AttendeeSocket get read access to
+# the content graph #timeDateAndLocation, containing all information needed to
+# attend. Shrek can invite people directly by requesting a connection with them
+# on the attendee socket.
+
+party:attendeeAuth
+    a            auth:Authorization ;
+    auth:grantee [ auth:socket [ auth:socketType wx-schema:AttendeeSocket ;
+                                 auth:connection [ auth:targetAtom      [ ] ;
+                                                   auth:connectionState won:Connected, won:RequestSent ] ] ] ;
+    auth:grant   [ auth:graph  [ auth:graphType auth:sysinfoGraph ;
+                                 auth:graphIri  party:invitationWithoutSpecifics, party:timeDateAndLocation ;
+                                 auth:operation auth:opRead ] ;
+                   auth:socket [ auth:socketType wx-schema:AttendeeSocket ;
+                                 auth:operation  auth:opConnectClose, auth:opCommunicate, auth:opRead ] ] .
+
+
+# Any atom is allowed to get the authentication info
+# for read on graphs and sending messages to the attendee socket
+
+
+
+party:authInfos
+    a                    auth:Authorization ;
+    auth:grantee         auth:anyone ;
+    auth:provideAuthInfo [ auth:operation auth:opRead ;
+                           auth:socket [ auth:socketType wx-schema:AttendeeSocket ;
+                                         auth:operation  [ auth:messageTo auth:anyMessageType ] ] ] .
+
+# Anyony can learn how to obtain a wx-buddy:BuddySocket token
+
+ex:buddySocketTokenInfoAuth
+    a                    auth:Authorization ;
+    auth:grantee         auth:anyone ;
+    auth:provideAuthInfo [ auth:operation [ auth:requestToken [ auth:tokenScope wx-buddy:BuddySocket ] ] ] .
+
+# buddies can learn how to get the buddyofbuddy and buddy socket token
+
+ex:buddyOfBuddyTokenInfoAuth
+    a                    auth:Authorization ;
+    auth:grantee         [ auth:socket     [ auth:socketType wx-buddy:BuddySocket ] ;
+                           auth:connection [ auth:targetAtom [ ] ] ] ;
+    auth:provideAuthInfo [ auth:operation [ auth:requestToken [ auth:tokenScope wx-buddy:BuddySocket ] ] ;
+                           auth:operation [ auth:requestToken [ auth:tokenScope "buddyOfBuddy" ] ] ] .
+
+
+## shrek's buddy network (and connection to the party)
+
+ex:shrek
+    a          won:Atom, won:Persona ;
+    won:socket shrek:buddySocket, shrek:holderSocket ;
+    won:state  won:Active .
+
+shrek:buddySocket
+    a                    won:Socket ;
+    won:socketDefinition wx-buddy:BuddySocket ;
+    won:connections      shrek:buddyConnections .
+
+shrek:holderSocket
+    a                    won:socket ;
+    won:socketDefinition wx-hold:HolderSocket ;
+    won:connections      shrek:held1 .
+
+shrek:held1
+    a                   won:Connection ;
+    won:targetAtom      ex:party ;
+    won:connectionState won:Connected .
+
+shrek:buddyConnections
+    rdfs:member shrek:buddy1, shrek:buddy2, shrek:buddy3 .
+
+shrek:buddy1
+    a                   won:Connection ;
+    won:targetAtom      ex:donkey ;
+    won:connectionState won:Connected .
+
+shrek:buddy2
+    a                   won:Connection ;
+    won:targetAtom      ex:fiona ;
+    won:connectionState won:Connected .
+
+shrek:buddy3
+    a                   won:Connection ;
+    won:targetAtom      ex:lordfarquaad ;
+    won:connectionState won:RequestReceived .
+
+
+## donkey's buddy network
+
+ex:donkey
+    a          won:Atom, won:Persona ;
+    won:socket donkey:buddySocket ;
+    won:state  won:Active .
+
+donkey:buddySocket
+    a                    won:Socket ;
+    won:socketDefinition wx-buddy:BuddySocket ;
+    won:connections      donkey:buddyConnections .
+
+donkey:buddyConnections
+    rdfs:member donkey:buddy1, donkey:buddy2, donkey:buddy3 .
+
+donkey:buddy1
+    a                   won:Connection ;
+    won:targetAtom      ex:shrek ;
+    won:connectionState won:Connected .
+
+donkey:buddy2
+    a                   won:Connection ;
+    won:targetAtom      ex:dragon ;
+    won:connectionState won:Connected .
+
+donkey:buddy3
+    a                   won:Connection ;
+    won:targetAtom      ex:lordfarquaad ;
+    won:connectionState won:RequestReceived .
+
+## The party
+
+ex:party
+    a                won:Atom, ex:SecretParty ;
+    won:socket       party:attendeeSocket, party:holdableSocket ;
+    won:contentGraph party:invitationWithoutSpecifics, party:timeDateAndLocation .
+
+party:holdableSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-hold:HoldableSocket ;
+    won:connections      party:holdableSocketConnections .
+
+party:holdableSocketConnections
+    rdfs:member party:heldBy .
+
+party:heldBy
+    a                   won:Connection ;
+    won:targetAtom      ex:shrek ;
+    won:connectionState won:Connected .
+
+party:attendeeSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-schema:AttendeeSocket ;
+    won:connections      party:attendeeSocketConnections .
+
+party:attendeeSocketConnections
+    rdfs:member party:guest1, party:guest2, party:guest3 .
+
+party:guest1
+    a                   won:Connection ;
+    won:targetAtom      ex:shrek ;
+    won:connectionState won:Connected .
+
+party:guest2
+    a                   won:Connection ;
+    won:targetAtom      ex:magicmirror ;
+    won:connectionState won:RequestSent .
+
+party:guest3
+    a                   won:Connection ;
+    won:targetAtom      ex:pinocchio ;
+    won:connectionState won:Connected .

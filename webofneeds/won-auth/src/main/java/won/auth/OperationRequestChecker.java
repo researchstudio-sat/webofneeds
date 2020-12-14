@@ -398,18 +398,18 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
             return requested.when(new FalseUnless() {
                 @Override
                 public Boolean is(MessageOperationExpression requestedOption) {
-                    if (ANY_MESSAGE_TYPE.equals(granted.getMessageTosMessageWildcard())
+                    if (ANY_MESSAGE_TYPE.equals(granted.getMessageToMessageWildcard())
                                     && !requestedOption.getMessageTosUnion().isEmpty()
                                     && (requestedOption.getMessageOnBehalfsUnion().isEmpty()
                                                     || ANY_MESSAGE_TYPE.equals(
-                                                                    granted.getMessageOnBehalfsMessageWildcard()))) {
+                                                                    granted.getMessageOnBehalfMessageWildcard()))) {
                         return true;
                     }
-                    if (ANY_MESSAGE_TYPE.equals(granted.getMessageOnBehalfsMessageWildcard())
+                    if (ANY_MESSAGE_TYPE.equals(granted.getMessageOnBehalfMessageWildcard())
                                     && !requestedOption.getMessageOnBehalfsUnion().isEmpty()
                                     && (requestedOption.getMessageTosUnion().isEmpty()
                                                     || ANY_MESSAGE_TYPE.equals(
-                                                                    granted.getMessageOnBehalfsMessageWildcard()))) {
+                                                                    granted.getMessageToMessageWildcard()))) {
                         return true;
                     }
                     Set<MessageType> requestedTos = collectMessageTypes(requestedOption.getMessageTosUnion());

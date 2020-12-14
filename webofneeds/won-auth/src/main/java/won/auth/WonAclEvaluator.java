@@ -50,8 +50,8 @@ public class WonAclEvaluator {
         Set<Authorization> requestorIsGranteeOf = new HashSet<>();
         boolean grantAuthInfo = canProvideAuthInfo(authorizations, request,
                         requestorIsGranteeOf);
-        return authorizations.stream()
-                        .map(auth -> decide(auth, request, grantAuthInfo))
+        Optional<AclEvalResult> result = authorizations.stream()
+                        .map(auth -> decide(auth, request, grantAuthInfo, requestorIsGranteeOf))
                         .reduce((left, right) -> {
                             AclEvalResult merged = new AclEvalResult();
                             if (ACCESS_GRANTED.equals(left.getDecision())
@@ -65,13 +65,41 @@ public class WonAclEvaluator {
                             tokens.addAll(right.getIssueTokens());
                             merged.setIssueTokens(tokens);
                             if (ACCESS_DENIED.equals(merged.getDecision())) {
-                                Set<AuthInfo> authInfos = new HashSet<>();
-                                authInfos.addAll(left.getAuthInfos());
-                                authInfos.addAll(right.getAuthInfos());
-                                merged.setAuthInfos(authInfos);
+                                merged.setProvideAuthInfo(
+                                                merge(left.getProvideAuthInfo(),
+                                                                right.getProvideAuthInfo()));
                             }
                             return merged;
-                        }).get();
+                        });
+        return result.orElse(accessControlDecision(false, request));
+    }
+
+    private AuthInfo merge(AuthInfo left, AuthInfo right) {
+        AuthInfo merged = new AuthInfo();
+        copyAuthInfo(left, merged);
+        copyAuthInfo(right, merged);
+        return merged;
+    }
+
+    private void copyAuthInfo(AuthInfo from, AuthInfo to) {
+        if (from != null) {
+            for (TokenShape bearer : from.getBearers()) {
+                to.addBearer(bearer);
+            }
+            for (AseRoot grantee : from.getGranteesAseRoot()) {
+                to.addGranteesAseRoot(grantee);
+            }
+            if (from.getGranteeGranteeWildcard() != null) {
+                to.setGranteeGranteeWildcard(from.getGranteeGranteeWildcard());
+            }
+        }
+    }
+
+    private AclEvalResult accessControlDecision(boolean accessGranted, OperationRequest request) {
+        AclEvalResult result = new AclEvalResult();
+        result.setDecision(accessGranted ? ACCESS_GRANTED : ACCESS_DENIED);
+        result.setRequestedOperation(request);
+        return result;
     }
 
     public boolean provideAuthInfo(Set<Authorization> authorizations,
@@ -82,7 +110,7 @@ public class WonAclEvaluator {
     private boolean canProvideAuthInfo(Set<Authorization> authorizations, OperationRequest request,
                     Set<Authorization> requestorIsGranteeOf) {
         return authorizations.stream()
-                        .filter(authorization -> !authorization.getProvideAuthInfos().isEmpty())
+                        .filter(authorization -> authorization.getProvideAuthInfo() != null)
                         .filter(authorization -> isRequestorAGrantee(authorization, request)
                                         || isRequestorBearerOfAcceptedToken(authorization, request))
                         .map(authorization -> {
@@ -92,18 +120,23 @@ public class WonAclEvaluator {
                             requestorIsGranteeOf.add(authorization); // side effect!
                             return authorization;
                         })
-                        .anyMatch(authorization -> canProvideAuthInfo(authorization, request));
+                        .anyMatch(authorization -> {
+                            boolean ret = canProvideAuthInfo(authorization, request);
+                            if (logger.isDebugEnabled() && ret) {
+                                logger.debug("providing auth info for {} ", authorization);
+                            }
+                            return ret;
+                        });
     }
 
     private static boolean canProvideAuthInfo(Authorization authorization, OperationRequest request) {
-        for (AseRoot root : authorization.getProvideAuthInfos()) {
-            OperationRequestChecker operationRequestChecker = new OperationRequestChecker(request);
-            root.accept(operationRequestChecker);
-            boolean finalDecision = operationRequestChecker.getFinalDecision();
-            debug("providing auth info : {}", authorization, request, finalDecision);
-            if (finalDecision) {
-                return true;
-            }
+        AseRoot root = authorization.getProvideAuthInfo();
+        OperationRequestChecker operationRequestChecker = new OperationRequestChecker(request);
+        root.accept(operationRequestChecker);
+        boolean finalDecision = operationRequestChecker.getFinalDecision();
+        debug("providing auth info : {}", authorization, request, finalDecision);
+        if (finalDecision) {
+            return true;
         }
         return false;
     }
@@ -163,7 +196,7 @@ public class WonAclEvaluator {
             acd.setDecision(ACCESS_GRANTED);
         }
         if (!accessGranted && authInfo != null) {
-            acd.setAuthInfos(Collections.singleton(authInfo));
+            acd.setProvideAuthInfo(authInfo);
         }
         if (accessGranted) {
             for (TokenOperationExpression op : authorization.getGrants().stream()

@@ -8,8 +8,8 @@
 <#authorization>
     a auth:Authorization ;
     auth:grantee [ auth:atom ex:atom2 ] ;
-    auth:grant [
-                   auth:operation auth:opGetAuthInfo
+    auth:provideAuthInfo [
+                   auth:operation auth:anyOperation
                ] .
 
 <#request>

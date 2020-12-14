@@ -1,0 +1,36 @@
+@prefix auth:         <https://w3id.org/won/auth#> .
+@prefix won:          <https://w3id.org/won/core#> .
+@prefix wx-buddy:     <https://w3id.org/won/ext/buddy#> .
+@prefix wx-hold:      <https://w3id.org/won/ext/hold#> .
+@prefix wx-schema:    <https://w3id.org/won/ext/schema#> .
+@prefix msg:          <https://w3id.org/won/message#> .
+@prefix ex:           <https://example.com/test/> .
+@prefix owl:          <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix party:        <http://example.org/test/party#> .
+@prefix shrek:        <http://example.org/test/shrek#> .
+@prefix donkey:       <http://example.org/test/donkey#> .
+@prefix dragon:       <http://example.org/test/dragon#> .
+@prefix magicmirror:  <http://example.org/test/magicmirror#> .
+@prefix pinocchio:    <http://example.org/test/pinocchio#> .
+@prefix lordfarquaad: <http://example.org/test/lordfarquaad#> .
+
+# dragon gets a wx-buddy:BuddySocket token from donkey
+
+dragon:expectedResult3
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessGranted ;
+    auth:requestedOperation dragon:request3 ;
+    auth:issueToken         [ auth:tokenScope   wx-buddy:BuddySocket ;
+                              auth:tokenIss     ex:donkey ;
+                              auth:tokenSub     ex:dragon ;
+                              auth:expiresAfter 3600 ] .
+
+dragon:request3
+    a                 auth:OperationRequest ;
+    auth:operation    [ auth:requestToken [ auth:tokenScope wx-buddy:BuddySocket ] ] ;
+    auth:requestor    ex:dragon ;
+    auth:reqAtom      ex:donkey ;
+    auth:reqPosition  auth:positionRoot ;
+    auth:reqAtomState won:Active .

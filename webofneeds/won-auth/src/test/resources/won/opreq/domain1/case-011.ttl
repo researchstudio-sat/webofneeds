@@ -1,0 +1,42 @@
+@prefix auth:         <https://w3id.org/won/auth#> .
+@prefix won:          <https://w3id.org/won/core#> .
+@prefix wx-buddy:     <https://w3id.org/won/ext/buddy#> .
+@prefix wx-hold:      <https://w3id.org/won/ext/hold#> .
+@prefix wx-schema:    <https://w3id.org/won/ext/schema#> .
+@prefix msg:          <https://w3id.org/won/message#> .
+@prefix ex:           <https://example.com/test/> .
+@prefix owl:          <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix party:        <http://example.org/test/party#> .
+@prefix shrek:        <http://example.org/test/shrek#> .
+@prefix donkey:       <http://example.org/test/donkey#> .
+@prefix dragon:       <http://example.org/test/dragon#> .
+@prefix magicmirror:  <http://example.org/test/magicmirror#> .
+@prefix pinocchio:    <http://example.org/test/pinocchio#> .
+@prefix lordfarquaad: <http://example.org/test/lordfarquaad#> .
+
+# donkey can see the time/date/location info because he is shrek's buddy
+
+donkey:expectedResult1
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessGranted ;
+    auth:requestedOperation donkey:request1 .
+
+donkey:request1
+    a                 auth:OperationRequest ;
+    auth:operation    auth:opRead ;
+    auth:requestor    ex:donkey ;
+    auth:reqAtom      ex:party ;
+    auth:reqPosition  auth:positionAtomGraph ;
+    auth:reqGraph     party:invitationWithoutSpecifics ;
+    auth:reqAtomState won:Active ;
+    auth:bearsToken   donkey:buddyTokenFromShrek .
+
+donkey:buddyTokenFromShrek
+    a               auth:AuthToken ;
+    auth:tokenScope wx-buddy:BuddySocket ;
+    auth:tokenIss   ex:shrek ;
+    auth:tokenSub   ex:donkey ;
+    auth:tokenIat   "2020-12-03T17:00:00"^^xsd:dateTime ;
+    auth:tokenExp   "2020-12-03T18:00:00"^^xsd:dateTime .

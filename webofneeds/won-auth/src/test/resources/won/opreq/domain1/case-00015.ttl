@@ -1,0 +1,39 @@
+@prefix auth:         <https://w3id.org/won/auth#> .
+@prefix won:          <https://w3id.org/won/core#> .
+@prefix wx-buddy:     <https://w3id.org/won/ext/buddy#> .
+@prefix wx-hold:      <https://w3id.org/won/ext/hold#> .
+@prefix wx-schema:    <https://w3id.org/won/ext/schema#> .
+@prefix msg:          <https://w3id.org/won/message#> .
+@prefix ex:           <https://example.com/test/> .
+@prefix owl:          <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix party:        <http://example.org/test/party#> .
+@prefix shrek:        <http://example.org/test/shrek#> .
+@prefix donkey:       <http://example.org/test/donkey#> .
+@prefix dragon:       <http://example.org/test/dragon#> .
+@prefix magicmirror:  <http://example.org/test/magicmirror#> .
+@prefix pinocchio:    <http://example.org/test/pinocchio#> .
+@prefix lordfarquaad: <http://example.org/test/lordfarquaad#> .
+
+# lordfarquaad cannot see who is attending or invited
+
+lordfarquaad:expectedResult4
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessDenied ;
+    auth:requestedOperation lordfarquaad:request4 ;
+    auth:provideAuthInfo    [ auth:grantee [ auth:socket [ auth:socketType wx-schema:AttendeeSocket ;
+                                                           auth:connection [ auth:targetAtom      [ ] ;
+                                                                             auth:connectionState won:Connected,
+                                                                                                  won:RequestSent ] ] ] ] .
+
+lordfarquaad:request4
+    a                   auth:OperationRequest ;
+    auth:operation      auth:opRead ;
+    auth:requestor      ex:lordfarquaad ;
+    auth:reqAtom        ex:party ;
+    auth:reqAtomState   won:Active ;
+    auth:reqPosition    auth:positionConnections ;
+    auth:reqSocket      party:attendeeSocket ;
+    auth:reqSocketType  wx-schema:AttendeeSocket ;
+    auth:reqConnections party:attendeeSocketConnections .

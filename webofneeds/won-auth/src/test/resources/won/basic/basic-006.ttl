@@ -1,0 +1,7 @@
+@prefix auth: <https://w3id.org/won/auth#> .
+@prefix ex:   <https://example.com/test/> .
+
+ex:auth
+    a auth:Authorization ;
+    auth:grantee auth:anyone ;
+    auth:grant [ auth:operation auth:anyOperation ].

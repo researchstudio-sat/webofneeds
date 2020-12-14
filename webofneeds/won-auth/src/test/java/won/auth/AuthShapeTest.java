@@ -3,6 +3,7 @@ package won.auth;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.compose.Union;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.Lang;
@@ -111,7 +112,16 @@ public class AuthShapeTest {
                         NodeFactory.createURI(AUTH + "operationRequestShape"), shapes, data, true);
     }
 
+    @Test
+    public void testBasicShape_006() throws IOException {
+        Shapes shapes = loadShapes(shapesDef);
+        Graph data = loadData(loader.getResource("classpath:/won/basic/basic-006.ttl"));
+        assertConformsTo(NodeFactory.createURI("https://example.com/test/auth"),
+                        NodeFactory.createURI(AUTH + "authorizationShape"), shapes, data, true);
+    }
+
     private void assertConformsTo(Node focusNode, Node shapeNode, Shapes shapes, Graph data, boolean expected) {
+        data = new Union(data, shapes.getGraph());
         ResettableErrorHandler handler = new ResettableErrorHandler();
         Shape shape = shapes.getShape(shapeNode);
         if (shape == null) {
@@ -166,7 +176,7 @@ public class AuthShapeTest {
         }
         Graph g = data.getGraph();
         long start = CPUUtils.getCpuTime();
-        ValidationReport report = ShaclValidator.get().validate(shapes, g);
+        ValidationReport report = ShaclValidator.get().validate(shapes, new Union(g, shapes.getGraph()));
         long duration = CPUUtils.getCpuTime() - start;
         logger.debug("validation took {} millis ", (double) duration / 1000000d);
         if (!report.conforms()) {
@@ -203,14 +213,15 @@ public class AuthShapeTest {
     public Stream<Resource> getAuthorizations() throws IOException {
         Resource[] files = ResourcePatternUtils.getResourcePatternResolver(loader)
                         .getResources("classpath:/won/auth/*.ttl");
-        return Stream.of(files);
+        return Stream.of(files).sorted((left, right) -> left.getFilename().compareTo(right.getFilename()));
     }
 
     public Stream<Resource> getOperationRequests() throws IOException {
         Resource[] okFiles = ResourcePatternUtils.getResourcePatternResolver(loader)
                         .getResources("classpath:/won/opreq/ok/*.ttl");
         Resource[] failFiles = ResourcePatternUtils.getResourcePatternResolver(loader)
-                        .getResources("classpath:/won/opreq/ok/*.ttl");
-        return Stream.concat(Stream.of(okFiles), Stream.of(failFiles));
+                        .getResources("classpath:/won/opreq/fail/*.ttl");
+        return Stream.concat(Stream.of(okFiles), Stream.of(failFiles))
+                        .sorted((left, right) -> left.getFilename().compareTo(right.getFilename()));
     }
 }

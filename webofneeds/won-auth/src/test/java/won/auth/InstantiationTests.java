@@ -2,6 +2,7 @@ package won.auth;
 
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.compose.Union;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shacl.Shapes;
@@ -87,7 +88,17 @@ public class InstantiationTests {
         Shapes shapes = loadShapes(shapesDef);
         Shacl2JavaInstanceFactory factory = new Shacl2JavaInstanceFactory(shapes, "won.auth.model");
         Graph data = loadGraph(loader.getResource("classpath:/won/basic/basic-005.ttl"));
-        factory.load(data);
+        factory.load(new Union(shapes.getGraph(), data));
+        logger.debug("done instantiating");
+        Assert.assertEquals(3, factory.size());
+    }
+
+    @Test
+    public void test_basic_006() throws IOException {
+        Shapes shapes = loadShapes(shapesDef);
+        Shacl2JavaInstanceFactory factory = new Shacl2JavaInstanceFactory(shapes, "won.auth.model");
+        Graph data = loadGraph(loader.getResource("classpath:/won/basic/basic-006.ttl"));
+        factory.load(new Union(shapes.getGraph(), data));
         logger.debug("done instantiating");
         Assert.assertEquals(3, factory.size());
     }

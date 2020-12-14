@@ -1,0 +1,17 @@
+@base              <https://example.com/test/atom1> .
+@prefix auth:      <https://w3id.org/won/auth#> .
+@prefix msg:       <https://w3id.org/won/message#> .
+@prefix won:       <https://w3id.org/won/core#> .
+@prefix wx-buddy:  <https://w3id.org/won/ext/buddy#> .
+@prefix wx-hold:   <https://w3id.org/won/ext/hold#> .
+@prefix wx-schema: <https://w3id.org/won/ext/schema#> .
+
+<#authorization2Party>
+    a            auth:Authorization ;
+    auth:grantee [ auth:socket [ auth:socketType wx-schema:AttendeeSocket ;
+                                 auth:connection [ auth:connectionState won:Connected, won:RequestSent ] ;
+                                 auth:targetAtom [ ] ] ] ;
+    auth:grant   [ auth:graph [ auth:graphType auth:sysinfoGraph ;
+                                auth:graphIri  <#invitationWithoutSpecifics>, <#timeDateAndLocation> ;
+                                auth:operation auth:opRead ] ] .
+
