@@ -240,14 +240,15 @@ public class WonAclEvaluator {
             AuthToken token = new AuthToken();
             token.setTokenIss(request.getReqAtom());
             token.setTokenSub(request.getRequestor());
-            if (tokenSpec.getNodeSigned() == null || tokenSpec.getNodeSigned()){
+            if (tokenSpec.getNodeSigned() == null || tokenSpec.getNodeSigned()) {
                 Optional<URI> nodeUri = this.atomNodeChecker.getNodeOfAtom(request.getReqAtom());
                 if (!nodeUri.isPresent()) {
-                    throw new IllegalStateException("Cannot issue token, nodeUri of " + request.getReqAtom() + " not found");
+                    throw new IllegalStateException(
+                                    "Cannot issue token, nodeUri of " + request.getReqAtom() + " not found");
                 }
                 token.setTokenSig(nodeUri.get());
             } else {
-                //don't set the sig field
+                // don't set the sig field
             }
             Calendar cal = Calendar.getInstance();
             cal.setTime(new Date());
@@ -347,7 +348,7 @@ public class WonAclEvaluator {
         debug("valid tokens: {}", authorization, request, decoded.size());
         Set<AuthToken> finalDecoded = decoded;
         if (decoded.size() > 0) {
-            return authorization.getBearers().stream().anyMatch( tokenShape -> {
+            return authorization.getBearers().stream().anyMatch(tokenShape -> {
                 Set<AseRoot> aseRoots = tokenShape.getIssuersAseRoot();
                 Set<AtomExpression> atomExpressions = tokenShape.getIssuersAtomExpression();
                 Set<AuthToken> elegibleTokens = filterTokensByScope(finalDecoded, tokenShape);

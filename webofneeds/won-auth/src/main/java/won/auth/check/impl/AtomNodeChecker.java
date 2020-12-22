@@ -31,7 +31,8 @@ public class AtomNodeChecker implements won.auth.check.AtomNodeChecker {
         return node.equals(wonNodeURI);
     }
 
-    @Override public Optional<URI> getNodeOfAtom(URI atom) {
+    @Override
+    public Optional<URI> getNodeOfAtom(URI atom) {
         Dataset atomDataset = WonLinkedDataUtils.getFullAtomDataset(atom, linkedDataSource);
         if (atomDataset == null) {
             return Optional.empty();

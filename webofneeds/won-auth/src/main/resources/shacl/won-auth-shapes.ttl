@@ -135,7 +135,8 @@ auth:tokenScopePropertyShape
     sh:maxCount 1 ;
     sh:or       ( [ sh:nodeKind sh:IRI ]
                   [ sh:nodeKind sh:Literal ;
-                    sh:datatype xsd:string ] ) .
+                    sh:datatype xsd:string ;
+                    sh:pattern  "^[^\\s]+$" ; ] ) .
 
 auth:tokenIatPropertyShape
     a           sh:PropertyShape ;
@@ -461,9 +462,10 @@ auth:tokenShapeShape
     sh:targetObjectsOf auth:bearer ;
     sh:property        [ sh:path     auth:tokenScope ;
                          sh:minCount 1 ;
-                         sh:or       ( [ sh:nodeKind sh:Literal ;
-                                         sh:datatype xsd:string ]
-                                       [ sh:nodeKind sh:IRI ] ) ] ;
+                         sh:or       ( [ sh:nodeKind sh:IRI ]
+                                       [ sh:nodeKind sh:Literal ;
+                                         sh:datatype xsd:string ;
+                                         sh:pattern  "^[^\\s]+$" ] ) ] ;
     sh:property        [ sh:path     auth:issuer ;
                          sh:or       ( [ sh:node auth:atomExpressionShape ]
                                        [ sh:node auth:aseRootShape ] ) ;

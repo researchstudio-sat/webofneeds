@@ -142,7 +142,7 @@ public class WonAclEvaluatorTest {
                             Graph graph = loadGraph(testCaseResource);
                             try {
                                 evaluateTestWithSpec(shapes, atomDataShapes, evaluator, targetAtomChecker,
-                                    atomNodeChecker, graph, testCaseResource);
+                                                atomNodeChecker, graph, testCaseResource);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -164,7 +164,8 @@ public class WonAclEvaluatorTest {
                         testCaseResource -> {
                             try {
                                 Graph testCase = loadGraph(testCaseResource);
-                                evaluateTestWithSpec(shapes, atomDataShapes, evaluator, targetAtomChecker, atomNodeChecker,
+                                evaluateTestWithSpec(shapes, atomDataShapes, evaluator, targetAtomChecker,
+                                                atomNodeChecker,
                                                 new Union(domainBase, testCase), testCaseResource);
                             } catch (IOException e) {
                                 e.printStackTrace();
@@ -192,9 +193,9 @@ public class WonAclEvaluatorTest {
     }
 
     private void evaluateTestWithSpec(Shapes shapes, Shapes atomDataShapes,
-        WonAclEvaluator evaluator, ModelBasedTargetAtomCheckEvaluator targetAtomChecker,
-        ModelBasedAtomNodeChecker atomNodeChecker, Graph graph,
-        Resource resource)
+                    WonAclEvaluator evaluator, ModelBasedTargetAtomCheckEvaluator targetAtomChecker,
+                    ModelBasedAtomNodeChecker atomNodeChecker, Graph graph,
+                    Resource resource)
                     throws IOException {
         withDurationLog("validating with auth shapes",
                         () -> validateTestData(shapes, graph, true,
@@ -205,7 +206,7 @@ public class WonAclEvaluatorTest {
         withDurationLog("instantiating test atom entities (targetAtomChecker)",
                         () -> targetAtomChecker.loadData(graph));
         withDurationLog("instantiating test atom entities (atomNodeChecker)",
-            () -> atomNodeChecker.loadData(graph));
+                        () -> atomNodeChecker.loadData(graph));
         withDurationLog("instantiating auth/req entities",
                         () -> evaluator.loadData(graph));
         withDurationLog("making auth decision",

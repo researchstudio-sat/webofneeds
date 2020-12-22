@@ -13,7 +13,7 @@
 
 <#authorization6>
     a           auth:Authorization ;
-    auth:bearer [ auth:tokenScope  "my highly trusted friends" ;
+    auth:bearer [ auth:tokenScope  "my-highly-trusted-friends" ;
                   auth:issuer [ auth:socket [ auth:socketType wx-hold:HoldableSocket ;
                                               auth:targetAtom [ ] ] ] ] ;
     auth:grant  [ auth:operation auth:anyOperation ] .

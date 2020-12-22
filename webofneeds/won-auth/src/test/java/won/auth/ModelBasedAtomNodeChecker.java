@@ -24,15 +24,18 @@ public class ModelBasedAtomNodeChecker implements AtomNodeChecker {
 
     @Override
     public boolean isNodeOfAtom(URI atomUri, URI nodeUri) {
-        Optional<won.auth.test.model.Atom> atom = instanceFactory.getInstanceOfType(atomUri.toString(), won.auth.test.model.Atom.class);
+        Optional<won.auth.test.model.Atom> atom = instanceFactory.getInstanceOfType(atomUri.toString(),
+                        won.auth.test.model.Atom.class);
         if (!atom.isPresent()) {
             return false;
         }
         return nodeUri.equals(atom.get().getWonNode());
     }
 
-    @Override public Optional<URI> getNodeOfAtom(URI atomUri) {
-        Optional<won.auth.test.model.Atom> atom = instanceFactory.getInstanceOfType(atomUri.toString(), won.auth.test.model.Atom.class);
+    @Override
+    public Optional<URI> getNodeOfAtom(URI atomUri) {
+        Optional<won.auth.test.model.Atom> atom = instanceFactory.getInstanceOfType(atomUri.toString(),
+                        won.auth.test.model.Atom.class);
         if (!atom.isPresent()) {
             return Optional.empty();
         }

@@ -5,5 +5,6 @@ import java.util.Optional;
 
 public interface AtomNodeChecker {
     boolean isNodeOfAtom(URI atom, URI node);
+
     Optional<URI> getNodeOfAtom(URI atom);
 }
