@@ -1,13 +1,17 @@
 package won.auth;
 
+import java.util.function.Predicate;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.compose.Union;
 import org.apache.jena.shacl.Shapes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.auth.check.AtomNodeChecker;
 import won.auth.check.TargetAtomCheck;
 import won.auth.check.TargetAtomCheckEvaluator;
 import won.auth.model.*;
+import won.cryptography.rdfsign.WebIdKeyLoader;
 import won.shacl2java.Shacl2JavaInstanceFactory;
 
 import java.lang.invoke.MethodHandles;
@@ -26,15 +30,25 @@ public class WonAclEvaluator {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final long DEFAULT_TOKEN_EXPIRES_AFTER_SECONDS = 3600;
     private TargetAtomCheckEvaluator targetAtomCheckEvaluator;
+    private AtomNodeChecker atomNodeChecker;
+    private WebIdKeyLoader webIdKeyLoader;
     private Shacl2JavaInstanceFactory instanceFactory;
+    private Shapes shapes;
 
-    public WonAclEvaluator(Shapes shapes, TargetAtomCheckEvaluator targetAtomCheckEvaluator) {
+    public WonAclEvaluator(
+                    Shapes shapes,
+                    TargetAtomCheckEvaluator targetAtomCheckEvaluator,
+                    AtomNodeChecker atomNodeChecker,
+                    WebIdKeyLoader webIdKeyLoader) {
         this.targetAtomCheckEvaluator = targetAtomCheckEvaluator;
+        this.shapes = shapes;
         this.instanceFactory = new Shacl2JavaInstanceFactory(shapes, "won.auth.model");
+        this.webIdKeyLoader = webIdKeyLoader;
+        this.atomNodeChecker = atomNodeChecker;
     }
 
     public void loadData(Graph dataGraph) {
-        this.instanceFactory.load(dataGraph);
+        this.instanceFactory.load(new Union(shapes.getGraph(), dataGraph));
     }
 
     public Set<Authorization> getAuthorizations() {
@@ -46,42 +60,48 @@ public class WonAclEvaluator {
         return this.instanceFactory.getInstancesOfType(OperationRequest.class);
     }
 
+    public AclEvalResult decide(OperationRequest request) {
+        return this.decide(this.getAuthorizations(), request);
+    }
+
     public AclEvalResult decide(Set<Authorization> authorizations, OperationRequest request) {
         Set<Authorization> requestorIsGranteeOf = new HashSet<>();
         boolean grantAuthInfo = canProvideAuthInfo(authorizations, request,
                         requestorIsGranteeOf);
         Optional<AclEvalResult> result = authorizations.stream()
                         .map(auth -> decide(auth, request, grantAuthInfo, requestorIsGranteeOf))
-                        .reduce((left, right) -> {
-                            AclEvalResult merged = new AclEvalResult();
-                            if (ACCESS_GRANTED.equals(left.getDecision())
-                                            || ACCESS_GRANTED.equals(right.getDecision())) {
-                                merged.setDecision(ACCESS_GRANTED);
-                            } else {
-                                merged.setDecision(ACCESS_DENIED);
-                            }
-                            HashSet<AuthToken> tokens = new HashSet<>();
-                            tokens.addAll(left.getIssueTokens());
-                            tokens.addAll(right.getIssueTokens());
-                            merged.setIssueTokens(tokens);
-                            if (ACCESS_DENIED.equals(merged.getDecision())) {
-                                merged.setProvideAuthInfo(
-                                                merge(left.getProvideAuthInfo(),
-                                                                right.getProvideAuthInfo()));
-                            }
-                            return merged;
-                        });
+                        .reduce((left, right) -> mergeAclEvalResults(left, right));
         return result.orElse(accessControlDecision(false, request));
     }
 
-    private AuthInfo merge(AuthInfo left, AuthInfo right) {
+    public static AclEvalResult mergeAclEvalResults(AclEvalResult left, AclEvalResult right) {
+        AclEvalResult merged = new AclEvalResult();
+        if (ACCESS_GRANTED.equals(left.getDecision())
+                        || ACCESS_GRANTED.equals(right.getDecision())) {
+            merged.setDecision(ACCESS_GRANTED);
+        } else {
+            merged.setDecision(ACCESS_DENIED);
+        }
+        HashSet<AuthToken> tokens = new HashSet<>();
+        tokens.addAll(left.getIssueTokens());
+        tokens.addAll(right.getIssueTokens());
+        merged.setIssueTokens(tokens);
+        if (ACCESS_DENIED.equals(merged.getDecision())) {
+            merged.setProvideAuthInfo(
+                            merge(left.getProvideAuthInfo(),
+                                            right.getProvideAuthInfo()));
+        }
+        return merged;
+    }
+
+    public static AuthInfo merge(AuthInfo left, AuthInfo right) {
         AuthInfo merged = new AuthInfo();
         copyAuthInfo(left, merged);
         copyAuthInfo(right, merged);
         return merged;
     }
 
-    private void copyAuthInfo(AuthInfo from, AuthInfo to) {
+    private static void copyAuthInfo(AuthInfo from, AuthInfo to) {
         if (from != null) {
             for (TokenShape bearer : from.getBearers()) {
                 to.addBearer(bearer);
@@ -187,7 +207,7 @@ public class WonAclEvaluator {
         return accessControlDecision(decisionSoFar, authorization, request, authInfo);
     }
 
-    private static AclEvalResult accessControlDecision(boolean accessGranted, Authorization authorization,
+    private AclEvalResult accessControlDecision(boolean accessGranted, Authorization authorization,
                     OperationRequest request, AuthInfo authInfo) {
         AclEvalResult acd = new AclEvalResult();
         if (!accessGranted) {
@@ -199,35 +219,67 @@ public class WonAclEvaluator {
             acd.setProvideAuthInfo(authInfo);
         }
         if (accessGranted) {
-            for (TokenOperationExpression op : authorization.getGrants().stream()
-                            .flatMap(root -> root.getOperationsTokenOperationExpression().stream())
-                            .collect(Collectors.toSet())) {
-                TokenSpecification tokenSpec = op.getRequestToken();
-                AuthToken token = new AuthToken();
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(new Date());
-                XSDDateTime iat = new XSDDateTime(cal);
-                if (tokenSpec.getExpiresAfterBigInteger() != null) {
-                    cal.add(Calendar.SECOND, tokenSpec.getExpiresAfterBigInteger().intValueExact());
-                } else if (tokenSpec.getExpiresAfterLong() != null) {
-                    cal.add(Calendar.SECOND, tokenSpec.getExpiresAfterLong().intValue());
-                } else if (tokenSpec.getExpiresAfterInteger() != null) {
-                    cal.add(Calendar.SECOND, tokenSpec.getExpiresAfterInteger());
-                }
-                XSDDateTime exp = new XSDDateTime(cal);
-                token.setTokenExp(exp);
-                token.setTokenIat(iat);
-                token.setTokenIss(request.getReqAtom());
-                token.setTokenSub(request.getRequestor());
-                if (tokenSpec.getTokenScopeURI() != null) {
-                    token.setTokenScopeURI(tokenSpec.getTokenScopeURI());
-                } else if (tokenSpec.getTokenScopeString() != null) {
-                    token.setTokenScopeString(tokenSpec.getTokenScopeString());
-                }
-                acd.addIssueToken(token);
-            }
+            acd.setIssueTokens(getRequestedTokens(authorization, request));
         }
         return acd;
+    }
+
+    private Set<AuthToken> getRequestedTokens(Authorization authorization, OperationRequest request) {
+        TokenOperationExpression tokenOperationExpression = request.getOperationTokenOperationExpression();
+        if (tokenOperationExpression == null) {
+            return Collections.emptySet();
+        }
+        Set<AuthToken> authTokens = new HashSet<>();
+        boolean allRequested = tokenOperationExpression
+                        .getRequestToken().getTokenScopesUnion().isEmpty();
+        for (TokenOperationExpression op : authorization.getGrants().stream()
+                        .flatMap(root -> root.getOperationsTokenOperationExpression().stream())
+                        .filter(isRequestedToken(request, allRequested))
+                        .collect(Collectors.toSet())) {
+            TokenSpecification tokenSpec = op.getRequestToken();
+            AuthToken token = new AuthToken();
+            token.setTokenIss(request.getReqAtom());
+            token.setTokenSub(request.getRequestor());
+            if (tokenSpec.getNodeSigned() == null || tokenSpec.getNodeSigned()){
+                Optional<URI> nodeUri = this.atomNodeChecker.getNodeOfAtom(request.getReqAtom());
+                if (!nodeUri.isPresent()) {
+                    throw new IllegalStateException("Cannot issue token, nodeUri of " + request.getReqAtom() + " not found");
+                }
+                token.setTokenSig(nodeUri.get());
+            } else {
+                //don't set the sig field
+            }
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(new Date());
+            XSDDateTime iat = new XSDDateTime(cal);
+            if (tokenSpec.getExpiresAfterBigInteger() != null) {
+                cal.add(Calendar.SECOND, tokenSpec.getExpiresAfterBigInteger().intValueExact());
+            } else if (tokenSpec.getExpiresAfterLong() != null) {
+                cal.add(Calendar.SECOND, tokenSpec.getExpiresAfterLong().intValue());
+            } else if (tokenSpec.getExpiresAfterInteger() != null) {
+                cal.add(Calendar.SECOND, tokenSpec.getExpiresAfterInteger());
+            }
+            XSDDateTime exp = new XSDDateTime(cal);
+            token.setTokenExp(exp);
+            token.setTokenIat(iat);
+            if (tokenSpec.getTokenScopeURI() != null) {
+                token.setTokenScopeURI(tokenSpec.getTokenScopeURI());
+            } else if (tokenSpec.getTokenScopeString() != null) {
+                token.setTokenScopeString(tokenSpec.getTokenScopeString());
+            }
+            authTokens.add(token);
+        }
+        return authTokens;
+    }
+
+    private static Predicate<TokenOperationExpression> isRequestedToken(OperationRequest request,
+                    boolean allRequested) {
+        return op -> allRequested
+                        || (!op.getRequestToken().getTokenScopesUnion().isEmpty()
+                                        && op.getRequestToken().getTokenScopesUnion().containsAll(
+                                                        request.getOperationTokenOperationExpression()
+                                                                        .getRequestToken()
+                                                                        .getTokenScopesUnion()));
     }
 
     private static boolean isOperationGranted(Authorization authorization, OperationRequest request) {
@@ -293,16 +345,18 @@ public class WonAclEvaluator {
                         .filter(token -> isTokenValid(token))
                         .collect(Collectors.toSet());
         debug("valid tokens: {}", authorization, request, decoded.size());
+        Set<AuthToken> finalDecoded = decoded;
         if (decoded.size() > 0) {
-            for (TokenShape tokenShape : authorization.getBearers()) {
+            return authorization.getBearers().stream().anyMatch( tokenShape -> {
                 Set<AseRoot> aseRoots = tokenShape.getIssuersAseRoot();
                 Set<AtomExpression> atomExpressions = tokenShape.getIssuersAtomExpression();
-                Set<AuthToken> elegibleTokens = filterTokensByScope(decoded, tokenShape);
+                Set<AuthToken> elegibleTokens = filterTokensByScope(finalDecoded, tokenShape);
                 debug("tokens with correct scope: {}", authorization, request, elegibleTokens.size());
-                if (isIssuerAccepted(elegibleTokens, aseRoots, atomExpressions, request.getReqAtom())) {
-                    return true;
-                }
-            }
+                return elegibleTokens.stream()
+                                .filter(isIssuerAccepted(aseRoots, atomExpressions, request.getReqAtom()))
+                                .filter(isSignerAccepted(tokenShape))
+                                .findFirst().isPresent();
+            });
         }
         return false;
     }
@@ -328,9 +382,9 @@ public class WonAclEvaluator {
         return elegibleTokens;
     }
 
-    private boolean isIssuerAccepted(Set<AuthToken> elegibleTokens, Set<AseRoot> aseRoots,
+    private Predicate<AuthToken> isIssuerAccepted(Set<AseRoot> aseRoots,
                     Set<AtomExpression> atomExpressions, URI baseAtom) {
-        return elegibleTokens.stream().anyMatch(token -> {
+        return token -> {
             URI issuer = token.getTokenIss();
             if (isIssuerInAtomExpressions(baseAtom, atomExpressions, issuer)) {
                 return true;
@@ -339,7 +393,28 @@ public class WonAclEvaluator {
                 return true;
             }
             return false;
-        });
+        };
+    }
+
+    private Predicate<AuthToken> isSignerAccepted(TokenShape tokenShape) {
+        return token -> {
+            // by default, tokens are node-signed.
+            if (tokenShape.getNodeSigned() == null || tokenShape.getNodeSigned()) {
+                URI signer = token.getTokenSig();
+                if (signer == null) {
+                    // token should be node-signed but no sig field present - don't accept
+                    return false;
+                }
+                // accept signer if it is the atom's ndoe
+                return atomNodeChecker.isNodeOfAtom(token.getTokenIss(), token.getTokenSig());
+            } else {
+                if (token.getTokenSig() != null) {
+                    // token is not node-signed but a sig field is present - don't accept
+                    return false;
+                }
+                return true;
+            }
+        };
     }
 
     private boolean isIssuerATargetAtom(URI baseAtom, Set<AseRoot> aseRoots, URI issuer) {
@@ -373,7 +448,12 @@ public class WonAclEvaluator {
         if (encodedTokens.isEmpty()) {
             return Collections.emptySet();
         }
-        throw new UnsupportedOperationException("Not yet implemented");
+        return encodedTokens
+                        .parallelStream()
+                        .map(tokenStr -> AuthUtils.parseToken(tokenStr, webIdKeyLoader))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .collect(Collectors.toSet());
     }
 
     private static void debug(String message, Authorization auth, OperationRequest request, Object... params) {

@@ -12,6 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <name>Authorization</name>
     <artifactId>won-auth</artifactId>
+    <packaging>jar</packaging>
     <properties>
             <shacl2java.generate-sources.outputDir>${project.basedir}/target/generated-sources/shacl2java</shacl2java.generate-sources.outputDir>
         <shacl2java.generate-test-sources.outputDir>${project.basedir}/target/generated-test-sources/shacl2java</shacl2java.generate-test-sources.outputDir>
@@ -20,8 +21,42 @@
     <dependencies>
         <dependency>
             <groupId>at.researchstudio.sat</groupId>
+            <artifactId>won-core</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <!-- avoid version clash between the transitive
+                         dependencies (httpclient and jena) -->
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>at.researchstudio.sat</groupId>
+            <artifactId>won-cryptography</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <!-- avoid version clash between the transitive
+                         dependencies (httpclient and jena) -->
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-utils-shacl2java</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <!-- avoid version clash between the transitive
+                         dependencies (httpclient and jena) -->
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- LOGGING STUFF -->
         <!-- TEST STUFF -->
@@ -62,6 +97,21 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
+        </dependency>
+        <!-- JWT -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId> <!-- or jjwt-gson if Gson is preferred -->
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 

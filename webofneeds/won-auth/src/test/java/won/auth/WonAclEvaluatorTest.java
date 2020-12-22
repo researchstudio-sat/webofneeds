@@ -10,7 +10,6 @@ import org.apache.jena.shacl.ValidationReport;
 import org.apache.jena.shacl.lib.ShLib;
 import org.apache.jena.shacl.sys.ShaclSystem;
 import org.apache.jena.sparql.graph.GraphFactory;
-import org.hamcrest.core.AllOf;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,7 +38,7 @@ import java.util.stream.Stream;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class)
-public class WonAclEvaluatorTests {
+public class WonAclEvaluatorTest {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Configuration
@@ -90,8 +89,10 @@ public class WonAclEvaluatorTests {
         ModelBasedTargetAtomCheckEvaluator targetAtomChecker = withDurationLog("initializing TargetAtomChecker",
                         () -> new ModelBasedTargetAtomCheckEvaluator(atomDataShapes,
                                         "won.auth.test.model"));
+        ModelBasedAtomNodeChecker atomNodeChecker = new ModelBasedAtomNodeChecker(atomDataShapes,
+                        "won.auth.test.model");
         WonAclEvaluator evaluator = withDurationLog("initializing WonAclEvaluator",
-                        () -> new WonAclEvaluator(shapes, targetAtomChecker));
+                        () -> new WonAclEvaluator(shapes, targetAtomChecker, atomNodeChecker, null));
         getFailOperationRequests().forEach(
                         testCaseResource -> {
                             Graph graph = null;
@@ -110,8 +111,10 @@ public class WonAclEvaluatorTests {
         Shapes atomDataShapes = loadShapes(atomDataShapesDef);
         ModelBasedTargetAtomCheckEvaluator targetAtomChecker = new ModelBasedTargetAtomCheckEvaluator(atomDataShapes,
                         "won.auth.test.model");
+        ModelBasedAtomNodeChecker atomNodeChecker = new ModelBasedAtomNodeChecker(atomDataShapes,
+                        "won.auth.test.model");
         WonAclEvaluator evaluator = withDurationLog("initializing WonAclEvaluator",
-                        () -> new WonAclEvaluator(shapes, targetAtomChecker));
+                        () -> new WonAclEvaluator(shapes, targetAtomChecker, atomNodeChecker, null));
         getOkOperationRequests().forEach(
                         testCaseResource -> {
                             Graph graph = null;
@@ -130,14 +133,16 @@ public class WonAclEvaluatorTests {
         Shapes atomDataShapes = loadShapes(atomDataShapesDef);
         ModelBasedTargetAtomCheckEvaluator targetAtomChecker = new ModelBasedTargetAtomCheckEvaluator(atomDataShapes,
                         "won.auth.test.model");
+        ModelBasedAtomNodeChecker atomNodeChecker = new ModelBasedAtomNodeChecker(atomDataShapes,
+                        "won.auth.test.model");
         WonAclEvaluator evaluator = withDurationLog("initializing WonAclEvaluator",
-                        () -> new WonAclEvaluator(shapes, targetAtomChecker));
+                        () -> new WonAclEvaluator(shapes, targetAtomChecker, atomNodeChecker, null));
         getSpecOperationRequests().forEach(
                         testCaseResource -> {
                             Graph graph = loadGraph(testCaseResource);
                             try {
                                 evaluateTestWithSpec(shapes, atomDataShapes, evaluator, targetAtomChecker,
-                                                graph, testCaseResource);
+                                    atomNodeChecker, graph, testCaseResource);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -150,14 +155,16 @@ public class WonAclEvaluatorTests {
         Shapes atomDataShapes = loadShapes(atomDataShapesDef);
         ModelBasedTargetAtomCheckEvaluator targetAtomChecker = new ModelBasedTargetAtomCheckEvaluator(atomDataShapes,
                         "won.auth.test.model");
+        ModelBasedAtomNodeChecker atomNodeChecker = new ModelBasedAtomNodeChecker(atomDataShapes,
+                        "won.auth.test.model");
         Graph domainBase = loadGraph(loader.getResource("classpath:/won/opreq/domain1/domain.ttl"));
         WonAclEvaluator evaluator = withDurationLog("initializing WonAclEvaluator",
-                        () -> new WonAclEvaluator(shapes, targetAtomChecker));
+                        () -> new WonAclEvaluator(shapes, targetAtomChecker, atomNodeChecker, null));
         getDomainSpecOperationRequests().forEach(
                         testCaseResource -> {
                             try {
                                 Graph testCase = loadGraph(testCaseResource);
-                                evaluateTestWithSpec(shapes, atomDataShapes, evaluator, targetAtomChecker,
+                                evaluateTestWithSpec(shapes, atomDataShapes, evaluator, targetAtomChecker, atomNodeChecker,
                                                 new Union(domainBase, testCase), testCaseResource);
                             } catch (IOException e) {
                                 e.printStackTrace();
@@ -179,14 +186,15 @@ public class WonAclEvaluatorTests {
         withDurationLog("instantiating test atom entities",
                         () -> targetAtomChecker.loadData(graph));
         withDurationLog("instantiating auth/req entities",
-                        () -> evaluator.loadData(new Union(shapes.getGraph(), graph)));
+                        () -> evaluator.loadData(graph));
         withDurationLog("making auth decision",
                         () -> checkExpectedAuthDecision(evaluator, accessDenied, resource.getFilename()));
     }
 
     private void evaluateTestWithSpec(Shapes shapes, Shapes atomDataShapes,
-                    WonAclEvaluator evaluator, ModelBasedTargetAtomCheckEvaluator targetAtomChecker, Graph graph,
-                    Resource resource)
+        WonAclEvaluator evaluator, ModelBasedTargetAtomCheckEvaluator targetAtomChecker,
+        ModelBasedAtomNodeChecker atomNodeChecker, Graph graph,
+        Resource resource)
                     throws IOException {
         withDurationLog("validating with auth shapes",
                         () -> validateTestData(shapes, graph, true,
@@ -194,10 +202,12 @@ public class WonAclEvaluatorTests {
         withDurationLog("validating with atom test data shapes",
                         () -> validateTestData(atomDataShapes, graph, false,
                                         resource.getFilename() + " validated against atom test data shapes"));
-        withDurationLog("instantiating test atom entities",
+        withDurationLog("instantiating test atom entities (targetAtomChecker)",
                         () -> targetAtomChecker.loadData(graph));
+        withDurationLog("instantiating test atom entities (atomNodeChecker)",
+            () -> atomNodeChecker.loadData(graph));
         withDurationLog("instantiating auth/req entities",
-                        () -> evaluator.loadData(new Union(graph, shapes.getGraph())));
+                        () -> evaluator.loadData(graph));
         withDurationLog("making auth decision",
                         () -> checkSpecifiedAuthDecision(evaluator, resource.getFilename()));
     }
@@ -239,7 +249,7 @@ public class WonAclEvaluatorTests {
                     String testIdentifier) {
         for (Authorization auth : loadedEvaluator.getAuthorizations()) {
             for (OperationRequest opReq : loadedEvaluator.getOperationRequests()) {
-                logger.debug("checking OpRequest {} against Authorization {} ", opReq.get_node(), auth.get_node());
+                logger.debug("checking OpRequest {} against Authorization {} ", opReq.getNode(), auth.getNode());
                 String message = makeWrongAuthDecisionMessage(testIdentifier, expected, auth, opReq);
                 AclEvalResult decision = null;
                 long start = System.currentTimeMillis();
@@ -262,7 +272,7 @@ public class WonAclEvaluatorTests {
             long start = System.currentTimeMillis();
             AclEvalResult actualResult = loadedEvaluator.decide(loadedEvaluator.getAuthorizations(), opReq);
             logDuration("making authorization decision", start);
-            logger.debug("checking OpRequest {} against Authorizations ", opReq.get_node());
+            logger.debug("checking OpRequest {} against Authorizations ", opReq.getNode());
             DecisionValue expected = spec.getDecision();
             Assert.assertEquals(String.format("%s: wrong ACL decision", testIdentifier), expected,
                             actualResult.getDecision());
@@ -276,7 +286,7 @@ public class WonAclEvaluatorTests {
                         Assert.fail(String.format(
                                         "%s, Spec %s: None of the actual tokens %s match the specified token %s",
                                         testIdentifier,
-                                        spec.get_node(),
+                                        spec.getNode(),
                                         actualResult.getIssueTokens().stream().map(AuthToken::toStringAllFields)
                                                         .collect(Collectors.joining(",", "[", "]")),
                                         tokenSpec.toStringAllFields()));
@@ -286,14 +296,14 @@ public class WonAclEvaluatorTests {
                 Assert.fail(String.format(
                                 "%s, Spec %s: Tokens granted but none specified",
                                 testIdentifier,
-                                spec.get_node()));
+                                spec.getNode()));
             }
             if (spec.getProvideAuthInfo() != null) {
                 AuthInfo expectedAuthInfo = spec.getProvideAuthInfo();
                 if (!matches(expectedAuthInfo, actualResult.getProvideAuthInfo())) {
                     Assert.fail(String.format(
                                     "%s, Spec %s: None of the actual auth infos %s match the specified authInfo %s",
-                                    testIdentifier, spec.get_node(),
+                                    testIdentifier, spec.getNode(),
                                     actualResult.getProvideAuthInfo() != null
                                                     ? actualResult.getProvideAuthInfo().toStringAllFields()
                                                     : "null",
@@ -303,7 +313,7 @@ public class WonAclEvaluatorTests {
                 Assert.fail(String.format(
                                 "%s, Spec %s: Auth info provided but none specified",
                                 testIdentifier,
-                                spec.get_node()));
+                                spec.getNode()));
             }
             logger.debug("authinfo : {}",
                             actualResult.getProvideAuthInfo() != null
@@ -459,8 +469,8 @@ public class WonAclEvaluatorTests {
         testIdentifier = testIdentifier != null ? testIdentifier + ": " : "";
         testIdentifier = testIdentifier.replaceAll("(/[^/])[^/]+(?=/)", "$1"); // abbreviate path
         String message = String.format("%sAuthorization %s should %s" + "authorize operation %s but it does%s",
-                        testIdentifier, auth.get_node(), expected.equals(DecisionValue.ACCESS_GRANTED) ? "" : "not ",
-                        opReq.get_node(), expected.equals(DecisionValue.ACCESS_GRANTED) ? " not" : "");
+                        testIdentifier, auth.getNode(), expected.equals(DecisionValue.ACCESS_GRANTED) ? "" : "not ",
+                        opReq.getNode(), expected.equals(DecisionValue.ACCESS_GRANTED) ? " not" : "");
         return message;
     }
 

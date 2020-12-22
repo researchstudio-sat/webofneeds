@@ -12,23 +12,27 @@
 @prefix dct:  <http://purl.org/dc/terms/> .
 
 won:atomShape
-    a              sh:NodeShape ;
-    sh:targetObjectsOf won:targetAtom, won:Atom;
-    sh:targetClass won:Atom ;
-    sh:property    [ sh:path won:socket ;
-                     sh:node won:socketShape ; ] ;
-    sh:property    [ sh:path     won:state ;
-                     sh:nodeKind sh:IRI ;
-                     sh:in       ( won:Active won:Inactive ) ] ;
-    sh:property    [ sh:path     [ sh:inversePath rdfg:subGraphOf ] ;
-                     sh:nodeKind sh:IRI ;
-                     sh:node     won:sysinfoGraphShape ] ;
-    sh:property    [ sh:path     won:contentGraph ;
-                     sh:nodeKind sh:IRI ] ;
-    sh:property    [ sh:path     won:messageContainer ;
-                     sh:maxCount 1 ;
-                     sh:nodeKind sh:IRI ;
-                     sh:node     won:messageContainerShape ] .
+    a                  sh:NodeShape ;
+    sh:targetObjectsOf won:targetAtom, won:Atom ;
+    sh:targetClass     won:Atom ;
+    sh:property        [ sh:path won:socket ;
+                         sh:node won:socketShape ; ] ;
+    sh:property        [ sh:path     won:state ;
+                         sh:nodeKind sh:IRI ;
+                         sh:in       ( won:Active won:Inactive ) ] ;
+    sh:property        [ sh:path     [ sh:inversePath rdfg:subGraphOf ] ;
+                         sh:nodeKind sh:IRI ;
+                         sh:node     won:sysinfoGraphShape ] ;
+    sh:property        [ sh:path     won:contentGraph ;
+                         sh:nodeKind sh:IRI ] ;
+    sh:property        [ sh:path     won:messageContainer ;
+                         sh:maxCount 1 ;
+                         sh:nodeKind sh:IRI ;
+                         sh:node     won:messageContainerShape ] ;
+    sh:property        [ sh:path     won:wonNode ;
+                         sh:nodeKind sh:IRI ;
+                         sh:maxCount 1 ;
+                         sh:minCount 1 ] .
 
 won:messageContainerShape
     a           sh:NodeShape ;
@@ -50,39 +54,40 @@ won:connectionContainerShape
     a           sh:NodeShape ;
     sh:property [ sh:path     rdfs:member ;
                   sh:nodeKind sh:IRI ;
-                  sh:class     won:Connection ] .
+                  sh:class    won:Connection ] .
 
 won:connectionShape
-    a           sh:NodeShape ;
+    a              sh:NodeShape ;
     sh:targetClass won:Connection ;
-    sh:property [ sh:path     won:connectionState ;
-                  sh:nodeKind sh:IRI ;
-                  sh:maxCount 1 ;
-                  sh:in       ( won:Suggested won:RequestSent won:RequestReceived won:Connected won:Closed ) ] ;
-    sh:property [ sh:path     won:targetAtom ;
-                  sh:nodeKind sh:IRI ;
-                  sh:maxCount 1 ;
-                  sh:class     won:Atom ] ;
-    sh:property [ sh:path     won:targetConnection ;
-                  sh:nodeKind sh:IRI ;
-                  sh:maxCount 1 ;
-                  sh:class     won:Connection ] ;
-    sh:property [ sh:path     won:targetSocket ;
-                  sh:nodeKind sh:IRI ;
-                  sh:maxCount 1 ;
-                  sh:node     won:socketShape ] ;
-    sh:property [ sh:path     won:atom ;
-                  sh:nodeKind sh:IRI ;
-                  sh:maxCount 1 ;
-                  sh:class     won:Atom ] ;
-    sh:property [ sh:path     won:socket ;
-                  sh:nodeKind sh:IRI ;
-                  sh:maxCount 1 ;
-                  sh:node     won:socketShape ] ;
-    sh:property [ sh:path     won:messageContainer ;
-                  sh:nodeKind sh:IRI ;
-                  sh:maxCount 1 ;
-                  sh:node     won:won:messageContainerShape ] .
+    sh:property    [ sh:path     won:connectionState ;
+                     sh:nodeKind sh:IRI ;
+                     sh:maxCount 1 ;
+                     sh:in       ( won:Suggested won:RequestSent won:RequestReceived won:Connected
+                                   won:Closed ) ] ;
+    sh:property    [ sh:path     won:targetAtom ;
+                     sh:nodeKind sh:IRI ;
+                     sh:maxCount 1 ;
+                     sh:class    won:Atom ] ;
+    sh:property    [ sh:path     won:targetConnection ;
+                     sh:nodeKind sh:IRI ;
+                     sh:maxCount 1 ;
+                     sh:class    won:Connection ] ;
+    sh:property    [ sh:path     won:targetSocket ;
+                     sh:nodeKind sh:IRI ;
+                     sh:maxCount 1 ;
+                     sh:node     won:socketShape ] ;
+    sh:property    [ sh:path     won:atom ;
+                     sh:nodeKind sh:IRI ;
+                     sh:maxCount 1 ;
+                     sh:class    won:Atom ] ;
+    sh:property    [ sh:path     won:socket ;
+                     sh:nodeKind sh:IRI ;
+                     sh:maxCount 1 ;
+                     sh:node     won:socketShape ] ;
+    sh:property    [ sh:path     won:messageContainer ;
+                     sh:nodeKind sh:IRI ;
+                     sh:maxCount 1 ;
+                     sh:node     won:won:messageContainerShape ] .
 
 won:messageShape
     a           sh:NodeShape ;

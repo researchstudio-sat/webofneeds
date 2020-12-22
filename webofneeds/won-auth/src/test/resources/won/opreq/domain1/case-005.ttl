@@ -15,6 +15,8 @@
 @prefix magicmirror:  <http://example.org/test/magicmirror#> .
 @prefix pinocchio:    <http://example.org/test/pinocchio#> .
 @prefix lordfarquaad: <http://example.org/test/lordfarquaad#> .
+@prefix ftc:        <https://example.org/test/fairytalecreatures#> .
+
 
 # dragon can see the invitiation info with her token from shrek
 
@@ -39,5 +41,6 @@ dragon:shreksBuddyOfBuddyToken
     auth:tokenScope "buddyOfBuddy" ;
     auth:tokenIss   ex:shrek ;
     auth:tokenSub   ex:dragon ;
+    auth:tokenSig   ftc:node ;
     auth:tokenIat   "2020-12-03T17:00:00"^^xsd:dateTime ;
     auth:tokenExp   "2020-12-03T18:00:00"^^xsd:dateTime .

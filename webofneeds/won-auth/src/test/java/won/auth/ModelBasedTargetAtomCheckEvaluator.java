@@ -43,7 +43,7 @@ public class ModelBasedTargetAtomCheckEvaluator implements TargetAtomCheckEvalua
         }
         sockets = sockets
                         .parallelStream()
-                        .filter(socket -> check.isSocketAllowed(URI.create(socket.get_node().toString())))
+                        .filter(socket -> check.isSocketAllowed(URI.create(socket.getNode().toString())))
                         .collect(Collectors.toSet());
         if (logger.isDebugEnabled()) {
             logger.debug("candidate sockets after filtering socket URIs: {} ", Arrays.asList(sockets.toArray()));
@@ -68,7 +68,7 @@ public class ModelBasedTargetAtomCheckEvaluator implements TargetAtomCheckEvalua
                         .parallelStream()
                         .anyMatch(c -> c
                                         .getTargetAtom()
-                                        .get_node().toString()
+                                        .getNode().toString()
                                         .equals(check.getRequestedTarget().toString()));
         if (logger.isDebugEnabled()) {
             logger.debug("{} target atom {} in connections' targetAtoms", foundIt ? "found" : "did not find",

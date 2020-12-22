@@ -15,6 +15,7 @@
 @prefix magicmirror:  <http://example.org/test/magicmirror#> .
 @prefix pinocchio:    <http://example.org/test/pinocchio#> .
 @prefix lordfarquaad: <http://example.org/test/lordfarquaad#> .
+@prefix ftc:          <https://example.org/test/fairytalecreatures#> .
 
 # Shrek is organizing a rather secretive party. His friends can see an invitation without time/location details.
 # Friends of friends can see that, too. Guests who are personally invited can see the time/location details.
@@ -28,27 +29,34 @@ ex:grantBuddyTokenAuth
     auth:grantee [ auth:socket [ auth:socketType wx-buddy:BuddySocket ;
                                  auth:targetAtom [ ] ] ] ;
     auth:grant   [ auth:operation [ auth:requestToken [ auth:tokenScope   wx-buddy:BuddySocket ;
+                                                        auth:nodeSigned   false ;
                                                         auth:expiresAfter 3600 ] ] ] .
 
-# Grants a "buddyOfBuddy" token to buddies of shrek's buddies
+# Grants a "buddyOfBuddy" token to buddies of shrek's buddies ( buddySocket token must be signed by shrek's key)
 
 shrek:grantBuddyOfBuddyTokenAuth
     a           auth:Authorization ;
     auth:bearer [ auth:tokenScope wx-buddy:BuddySocket ;
+                  auth:nodeSigned false ;
                   auth:issuer     [ auth:socket [ auth:socketType  wx-buddy:BuddySocket ;
-                                                  auth:connections [ auth:connectionState won:Connected ;
-                                                                     auth:targetAtom      [ ] ] ] ] ] ;
+                                                  auth:connections [ auth:connectionState
+                                                                                     won:Connected ;
+                                                                     auth:targetAtom [ ] ] ] ] ] ;
     auth:grant  [ auth:operation [ auth:requestToken [ auth:tokenScope   "buddyOfBuddy" ;
                                                        auth:expiresAfter 3600 ] ] ] .
 
-# Allows direct buddies and bearers of a "buddyOfBuddy" token signed by the holder of the
-# party (Shrek's persona atom) to see the graph #invitationWithoutSpecifics
+# Allows direct buddies and bearers of a "buddyOfBuddy" token issued by the holder of the
+# party (Shrek's persona atom's) to see the graph #invitationWithoutSpecifics
 # and to connect/communicate via the wx-schema:AttendeeSocket - which allows
 # Shrek (as the owner of the party atom), to accept/deny their requests to attend
 
 party:unspecificInvitationAuth
     a           auth:Authorization ;
-    auth:bearer [ auth:tokenScope "buddyOfBuddy", wx-buddy:BuddySocket ;
+    auth:bearer [ auth:tokenScope "buddyOfBuddy" ;
+                  auth:issuer     [ auth:socket [ auth:socketType wx-hold:HoldableSocket ;
+                                                  auth:targetAtom [ ] ] ] ] ;
+    auth:bearer [ auth:tokenScope wx-buddy:BuddySocket ;
+                  auth:nodeSigned false ;
                   auth:issuer     [ auth:socket [ auth:socketType wx-hold:HoldableSocket ;
                                                   auth:targetAtom [ ] ] ] ] ;
     auth:grant  [ auth:graph  [ auth:graphType auth:sysinfoGraph ;
@@ -66,32 +74,38 @@ party:attendeeAuth
     a            auth:Authorization ;
     auth:grantee [ auth:socket [ auth:socketType wx-schema:AttendeeSocket ;
                                  auth:connection [ auth:targetAtom      [ ] ;
-                                                   auth:connectionState won:Connected, won:RequestSent ] ] ] ;
+                                                   auth:connectionState won:Connected,
+                                                                        won:RequestSent ] ] ] ;
     auth:grant   [ auth:graph  [ auth:graphType auth:sysinfoGraph ;
-                                 auth:graphIri  party:invitationWithoutSpecifics, party:timeDateAndLocation ;
+                                 auth:graphIri  party:invitationWithoutSpecifics,
+                                                party:timeDateAndLocation ;
                                  auth:operation auth:opRead ] ;
                    auth:socket [ auth:socketType wx-schema:AttendeeSocket ;
-                                 auth:operation  auth:opConnectClose, auth:opCommunicate, auth:opRead ] ] .
+                                 auth:operation  auth:opConnectClose, auth:opCommunicate,
+                                                 auth:opRead ] ] .
 
 
 # Any atom is allowed to get the authentication info
 # for read on graphs and sending messages to the attendee socket
 
 
-
 party:authInfos
     a                    auth:Authorization ;
     auth:grantee         auth:anyone ;
     auth:provideAuthInfo [ auth:operation auth:opRead ;
-                           auth:socket [ auth:socketType wx-schema:AttendeeSocket ;
-                                         auth:operation  [ auth:messageTo auth:anyMessageType ] ] ] .
+                           auth:socket    [ auth:socketType wx-schema:AttendeeSocket ;
+                                            auth:operation
+                                                            [ auth:messageTo
+                                                                    auth:anyMessageType ] ] ] .
 
 # Anyony can learn how to obtain a wx-buddy:BuddySocket token
 
 ex:buddySocketTokenInfoAuth
     a                    auth:Authorization ;
     auth:grantee         auth:anyone ;
-    auth:provideAuthInfo [ auth:operation [ auth:requestToken [ auth:tokenScope wx-buddy:BuddySocket ] ] ] .
+    auth:provideAuthInfo
+                         [ auth:operation
+                                 [ auth:requestToken [ auth:tokenScope wx-buddy:BuddySocket ] ] ] .
 
 # buddies can learn how to get the buddyofbuddy and buddy socket token
 
@@ -99,16 +113,22 @@ ex:buddyOfBuddyTokenInfoAuth
     a                    auth:Authorization ;
     auth:grantee         [ auth:socket     [ auth:socketType wx-buddy:BuddySocket ] ;
                            auth:connection [ auth:targetAtom [ ] ] ] ;
-    auth:provideAuthInfo [ auth:operation [ auth:requestToken [ auth:tokenScope wx-buddy:BuddySocket ] ] ;
-                           auth:operation [ auth:requestToken [ auth:tokenScope "buddyOfBuddy" ] ] ] .
+    auth:provideAuthInfo
+                         [ auth:operation
+                                          [ auth:requestToken
+                                                  [ auth:tokenScope wx-buddy:BuddySocket ] ] ;
+                           auth:operation
+                                          [ auth:requestToken
+                                                  [ auth:tokenScope "buddyOfBuddy" ] ] ] .
 
 
 ## shrek's buddy network (and connection to the party)
 
 ex:shrek
-    a          won:Atom, won:Persona ;
-    won:socket shrek:buddySocket, shrek:holderSocket ;
-    won:state  won:Active .
+    a           won:Atom, won:Persona ;
+    won:socket  shrek:buddySocket, shrek:holderSocket ;
+    won:state   won:Active ;
+    won:wonNode ftc:node .
 
 shrek:buddySocket
     a                    won:Socket ;
@@ -147,9 +167,10 @@ shrek:buddy3
 ## donkey's buddy network
 
 ex:donkey
-    a          won:Atom, won:Persona ;
-    won:socket donkey:buddySocket ;
-    won:state  won:Active .
+    a           won:Atom, won:Persona ;
+    won:socket  donkey:buddySocket ;
+    won:state   won:Active ;
+    won:wonNode ftc:node .
 
 donkey:buddySocket
     a                    won:Socket ;
@@ -179,7 +200,8 @@ donkey:buddy3
 ex:party
     a                won:Atom, ex:SecretParty ;
     won:socket       party:attendeeSocket, party:holdableSocket ;
-    won:contentGraph party:invitationWithoutSpecifics, party:timeDateAndLocation .
+    won:contentGraph party:invitationWithoutSpecifics, party:timeDateAndLocation ;
+    won:wonNode      ftc:node .
 
 party:holdableSocket
     a                    won:Socket ;
@@ -216,3 +238,7 @@ party:guest3
     a                   won:Connection ;
     won:targetAtom      ex:pinocchio ;
     won:connectionState won:Connected .
+
+ftc:node
+    a won:Node .
+

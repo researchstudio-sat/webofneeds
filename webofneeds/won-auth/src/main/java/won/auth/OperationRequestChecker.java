@@ -356,8 +356,9 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
             return requested.when(new FalseUnless() {
                 @Override
                 public Boolean is(TokenOperationExpression option) {
-                    boolean scopeFits = false;
-                    if (grantedScope != null) {
+                    // by not specifiying a scope, you implicitly request all tokens
+                    boolean scopeFits = option.getRequestToken().getTokenScopesUnion().isEmpty();
+                    if (!scopeFits && grantedScope != null) {
                         String reqScope = option.getRequestToken().getTokenScopeString();
                         if (grantedScope.equals(reqScope)) {
                             scopeFits = true;
@@ -388,7 +389,7 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
             return requested.when(new FalseUnless() {
                 @Override
                 public Boolean is(SimpleOperationExpression requestedOption) {
-                    return granted.get_node().equals(requestedOption.get_node());
+                    return granted.getNode().equals(requestedOption.getNode());
                 }
             });
         }

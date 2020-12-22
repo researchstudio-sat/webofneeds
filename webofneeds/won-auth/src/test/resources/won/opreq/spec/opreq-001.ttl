@@ -19,11 +19,11 @@ ex:expectedResult
 
 
 <#authorization>
-    a               auth:Authorization ;
-    auth:bearer     [ auth:tokenScope  wx-buddy:BuddySocket ;
-                      auth:issuer [ auth:socket [ auth:socketType wx-buddy:BuddySocket ;
+    a           auth:Authorization ;
+    auth:bearer [ auth:tokenScope wx-buddy:BuddySocket ;
+                  auth:issuer     [ auth:socket [ auth:socketType wx-buddy:BuddySocket ;
                                                   auth:targetAtom [ ] ] ] ] ;
-    auth:grant [ auth:operation auth:opRead ] .
+    auth:grant  [ auth:operation auth:opRead ] .
 
 <#request>
     a                auth:OperationRequest ;
@@ -38,6 +38,7 @@ ex:token1
     auth:tokenScope wx-buddy:BuddySocket ;
     auth:tokenIss   ex:atom3 ;
     auth:tokenSub   ex:atom2 ;
+    auth:tokenSig   ex:node ;
     auth:tokenIat   "2020-12-03T22:30:00"^^xsd:dateTime ;
     auth:tokenExp   "2020-12-03T23:30:00"^^xsd:dateTime .
 
@@ -46,7 +47,8 @@ ex:atom1
     a                    won:Atom ;
     won:socket           atom1:buddySocket ;
     won:state            won:Active ;
-    won:messageContainer atom1:msg .
+    won:messageContainer atom1:msg ;
+    won:wonNode          ex:node .
 
 atom1:buddySocket
     a                    won:Socket ;
@@ -60,3 +62,7 @@ atom1:bsConn1
     a                   won:Connection ;
     won:targetAtom      ex:atom3 ;
     won:connectionState won:Connected .
+
+ex:atom3
+    a           won:Atom ;
+    won:wonNode ex:node .

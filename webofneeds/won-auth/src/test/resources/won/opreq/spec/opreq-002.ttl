@@ -22,6 +22,7 @@ ex:expectedResult
     auth:issueToken         [ auth:tokenScope   "buddyOfBuddy" ;
                               auth:tokenIss     ex:atom1 ;
                               auth:tokenSub     ex:atom2 ;
+                              auth:tokenSig     ex:node ;
                               auth:expiresAfter 3600 ] .
 
 
@@ -35,7 +36,7 @@ ex:expectedResult
 
 <#request>
     a                auth:OperationRequest ;
-    auth:operation   [ auth:requestToken [ auth:tokenScope   "buddyOfBuddy" ; ] ] ;
+    auth:operation   [ auth:requestToken [ auth:tokenScope "buddyOfBuddy" ; ] ] ;
     auth:requestor   ex:atom2 ;
     auth:reqAtom     ex:atom1 ;
     auth:reqPosition auth:positionRoot ;
@@ -46,6 +47,7 @@ ex:token1
     auth:tokenScope wx-buddy:BuddySocket ;
     auth:tokenIss   ex:atom3 ;
     auth:tokenSub   ex:atom2 ;
+    auth:tokenSig   ex:node ;
     auth:tokenIat   "2020-12-03T17:00:00"^^xsd:dateTime ;
     auth:tokenExp   "2020-12-03T18:00:00"^^xsd:dateTime .
 
@@ -54,7 +56,8 @@ ex:atom1
     a                    won:Atom ;
     won:socket           atom1:buddySocket, ex:exSocket ;
     won:state            won:Active ;
-    won:messageContainer atom1:msg .
+    won:messageContainer atom1:msg ;
+    won:wonNode          ex:node .
 
 atom1:buddySocket
     a                    won:Socket ;
@@ -88,3 +91,7 @@ atom1:exConn1
     a                   won:Connection ;
     won:targetAtom      ex:atom4 ;
     won:connectionState won:RequestSent .
+
+ex:atom3
+    a           won:Atom ;
+    won:wonNode ex:node .

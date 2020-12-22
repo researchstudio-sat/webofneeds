@@ -15,6 +15,7 @@
 @prefix magicmirror:  <http://example.org/test/magicmirror#> .
 @prefix pinocchio:    <http://example.org/test/pinocchio#> .
 @prefix lordfarquaad: <http://example.org/test/lordfarquaad#> .
+@prefix ftc:          <https://example.org/test/fairytalecreatures#> .
 
 # donkey can see the time/date/location info because he is shrek's buddy
 
