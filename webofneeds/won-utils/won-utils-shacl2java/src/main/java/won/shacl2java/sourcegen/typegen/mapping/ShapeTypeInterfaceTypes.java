@@ -1,15 +1,14 @@
 package won.shacl2java.sourcegen.typegen.mapping;
 
 import com.squareup.javapoet.TypeSpec;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import won.shacl2java.sourcegen.typegen.UpdateableTypeSpecMapping;
-import won.shacl2java.sourcegen.typegen.support.ProducerConsumerMap;
-
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import won.shacl2java.sourcegen.typegen.UpdateableTypeSpecMapping;
+import won.shacl2java.sourcegen.typegen.support.ProducerConsumerMap;
 
 /**
  * For shapes that have additional <code>rdf:type</code> statements, interfaces

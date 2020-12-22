@@ -2,19 +2,6 @@ package won.shacl2java.sourcegen;
 
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.shacl.Shapes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import won.shacl2java.Shacl2JavaConfig;
-import won.shacl2java.sourcegen.typegen.*;
-import won.shacl2java.sourcegen.typegen.logic.*;
-import won.shacl2java.sourcegen.typegen.mapping.*;
-import won.shacl2java.sourcegen.typegen.support.*;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -23,6 +10,34 @@ import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.shacl.Shapes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import won.shacl2java.Shacl2JavaConfig;
+import won.shacl2java.sourcegen.typegen.TypegenContext;
+import won.shacl2java.sourcegen.typegen.logic.IndividualsGenerator;
+import won.shacl2java.sourcegen.typegen.logic.MainTypesGenerator;
+import won.shacl2java.sourcegen.typegen.logic.MainTypesPostprocessor;
+import won.shacl2java.sourcegen.typegen.logic.ShapeTypeInterfaceGenerator;
+import won.shacl2java.sourcegen.typegen.logic.ShapeTypeInterfaceImplementer;
+import won.shacl2java.sourcegen.typegen.logic.ShapeTypeInterfacePopulator;
+import won.shacl2java.sourcegen.typegen.logic.UnionEmulationPostprocessor;
+import won.shacl2java.sourcegen.typegen.logic.VisitorAcceptMethodAdder;
+import won.shacl2java.sourcegen.typegen.logic.VisitorImplGenerator;
+import won.shacl2java.sourcegen.typegen.logic.VisitorInterfaceGenerator;
+import won.shacl2java.sourcegen.typegen.mapping.IndividualClassNames;
+import won.shacl2java.sourcegen.typegen.mapping.ShapeTargetClasses;
+import won.shacl2java.sourcegen.typegen.mapping.ShapeTypeImplTypes;
+import won.shacl2java.sourcegen.typegen.mapping.ShapeTypeInterfaceTypes;
+import won.shacl2java.sourcegen.typegen.mapping.ShapeTypeSpecs;
+import won.shacl2java.sourcegen.typegen.mapping.TypeSpecNames;
+import won.shacl2java.sourcegen.typegen.mapping.VisitorClassTypeSpecs;
+import won.shacl2java.sourcegen.typegen.mapping.VisitorInterfaceTypes;
+import won.shacl2java.sourcegen.typegen.support.NameClashDetector;
 
 public class SourceGenerator {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -105,14 +120,17 @@ public class SourceGenerator {
         VisitorInterfaceGenerator visitorInterfaceGenerator = new VisitorInterfaceGenerator(
                         config,
                         visitorClassTypeSpecs.consumer(),
+                        shapeTypeSpecs.consumer(),
                         visitorInterfaceTypes.producer());
         VisitorImplGenerator visitorImplGenerator = new VisitorImplGenerator(
                         config,
-                        visitorClassTypeSpecs.consumer());
+                        visitorClassTypeSpecs.consumer(),
+                        shapeTypeSpecs.consumer());
         VisitorAcceptMethodAdder visitorAcceptMethodAdder = new VisitorAcceptMethodAdder(
                         config,
                         visitorClassTypeSpecs.consumer(),
-                        visitorInterfaceTypes.consumer());
+                        visitorInterfaceTypes.consumer(),
+                        shapeTypeSpecs.consumer());
         UnionEmulationPostprocessor unionEmulationPostprocessor = new UnionEmulationPostprocessor(
                         config,
                         shapeTypeInterfaceTypes.consumer(),

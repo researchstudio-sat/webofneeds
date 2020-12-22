@@ -1,15 +1,14 @@
 package won.shacl2java.sourcegen.typegen;
 
 import com.squareup.javapoet.TypeSpec;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TypegenContext {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

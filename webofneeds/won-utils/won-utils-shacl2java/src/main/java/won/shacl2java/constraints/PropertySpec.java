@@ -1,10 +1,13 @@
 package won.shacl2java.constraints;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.graph.Node;
 import org.apache.jena.shacl.parser.Shape;
-
-import java.util.*;
 
 public class PropertySpec {
     private Integer shMinCount;

@@ -2,21 +2,23 @@ package won.shacl2java.sourcegen.typegen.logic;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeSpec;
+import java.net.URI;
+import java.util.Collections;
+import java.util.Set;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.shacl.Shapes;
 import org.apache.jena.shacl.vocabulary.SHACL;
 import org.apache.jena.vocabulary.RDF;
 import won.shacl2java.Shacl2JavaConfig;
+import won.shacl2java.sourcegen.typegen.TypesGenerator;
+import won.shacl2java.sourcegen.typegen.mapping.ShapeTypeInterfaceTypes;
 import won.shacl2java.sourcegen.typegen.mapping.TypeSpecNames;
 import won.shacl2java.sourcegen.typegen.support.NameClashDetector;
-import won.shacl2java.sourcegen.typegen.mapping.ShapeTypeInterfaceTypes;
-import won.shacl2java.sourcegen.typegen.TypesGenerator;
-
-import java.net.URI;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static javax.lang.model.element.Modifier.PUBLIC;
 import static won.shacl2java.util.NameUtils.classNameForShapeURI;

@@ -1,11 +1,9 @@
 package won.shacl2java.instantiation;
 
-import org.apache.jena.graph.Node;
-
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import org.apache.jena.graph.Node;
 
 /**
  * Holds a data Node, and optionally a node identifying a shape that the data

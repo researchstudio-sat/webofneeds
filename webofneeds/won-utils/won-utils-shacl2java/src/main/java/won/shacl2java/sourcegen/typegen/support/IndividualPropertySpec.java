@@ -1,11 +1,10 @@
 package won.shacl2java.sourcegen.typegen.support;
 
 import com.squareup.javapoet.ClassName;
-import org.apache.jena.graph.Node;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import org.apache.jena.graph.Node;
 
 public class IndividualPropertySpec {
     private Node predicate;

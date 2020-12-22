@@ -1,15 +1,19 @@
 package won.shacl2java.util;
 
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.jena.graph.Node;
 import org.apache.jena.shacl.Shapes;
 import org.apache.jena.shacl.parser.NodeShape;
 import org.apache.jena.shacl.parser.PropertyShape;
 import org.apache.jena.shacl.parser.Shape;
+import won.shacl2java.constraints.EnumShapeChecker;
+import won.shacl2java.constraints.NodeShapeCollector;
 import won.shacl2java.constraints.PropertySpec;
-import won.shacl2java.constraints.*;
-
-import java.util.Set;
-import java.util.stream.Collectors;
+import won.shacl2java.constraints.PropertySpecCollector;
+import won.shacl2java.constraints.ShNodeKindCollector;
+import won.shacl2java.constraints.ShNodeShapeCollector;
+import won.shacl2java.constraints.ShPropertyShapeCollector;
 
 public class ShapeUtils {
     public static Set<Node> getShNodeShapeNodes(Shape shape) {

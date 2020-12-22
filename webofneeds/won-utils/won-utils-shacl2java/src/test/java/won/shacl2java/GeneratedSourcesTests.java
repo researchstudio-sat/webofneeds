@@ -1,5 +1,12 @@
 package won.shacl2java;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Map;
+import java.util.Set;
 import org.apache.jena.ext.com.google.common.io.Files;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -24,14 +31,8 @@ import test1.Person;
 import test2.AseRoot;
 import test2.AtomState;
 import test2.Authorization;
-import test2.OperationExpression;
-
-import java.io.File;
-import java.io.IOException;
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.Map;
-import java.util.Set;
+import test2.RdfOutput;
+import test2.SimpleOperationExpression;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class)
@@ -94,7 +95,7 @@ public class GeneratedSourcesTests {
         Shacl2JavaInstanceFactory factory = new Shacl2JavaInstanceFactory(shapes, config.getPackageName());
         factory.load(data.getGraph());
         Map<String, Set<Object>> entities = factory.getInstanceMap();
-        Assert.assertEquals(5, entities.size());
+        Assert.assertEquals(4, entities.size());
         Object o = entities.get("https://example.com/test/atom1#authorization1").stream().findFirst().get();
         Assert.assertEquals(Authorization.class, o.getClass());
         Authorization authShape = (Authorization) o;
@@ -106,8 +107,10 @@ public class GeneratedSourcesTests {
         Assert.assertNotNull(grant.getAtomStates());
         Assert.assertNotNull(grant.getOperationsUnion());
         Assert.assertEquals(AtomState.class, grant.getAtomStates().stream().findAny().get().getClass());
-        Assert.assertEquals(OperationExpression.class,
+        Assert.assertEquals(SimpleOperationExpression.class,
                         grant.getOperationsUnion().stream().findAny().get().getClass());
+        // just make sure obtaining rdf throws no exceptions
+        RDFDataMgr.write(new StringWriter(), RdfOutput.toGraph(authShape), Lang.TTL);
     }
 
     @Test
@@ -119,11 +122,13 @@ public class GeneratedSourcesTests {
         Shacl2JavaInstanceFactory factory = new Shacl2JavaInstanceFactory(shapes, config.getPackageName());
         factory.load(data.getGraph());
         Map<String, Set<Object>> entities = factory.getInstanceMap();
-        Assert.assertEquals(12, entities.size());
+        Assert.assertEquals(7, entities.size());
         Object o = entities.get("https://example.com/test/atom1#authorization5").stream().findFirst().get();
         Assert.assertEquals(Authorization.class, o.getClass());
         Authorization authShape = (Authorization) o;
         Assert.assertEquals(1, authShape.getGranteesAtomExpression().size());
+        // just make sure obtaining rdf throws no exceptions
+        RDFDataMgr.write(new StringWriter(), RdfOutput.toGraph(authShape), Lang.TTL);
     }
 
     @Test
@@ -135,12 +140,14 @@ public class GeneratedSourcesTests {
         Shacl2JavaInstanceFactory factory = new Shacl2JavaInstanceFactory(shapes, config.getPackageName());
         factory.load(data.getGraph());
         Map<String, Set<Object>> entities = factory.getInstanceMap();
-        Assert.assertEquals(10, entities.size());
+        Assert.assertEquals(8, entities.size());
         Object o = entities.get("https://example.com/test/atom1#authorization2").stream().findFirst().get();
         Assert.assertEquals(Authorization.class, o.getClass());
         Authorization authShape = (Authorization) o;
         Assert.assertEquals(1, authShape.getGranteesAtomExpression().size());
         Set grantees = authShape.getGranteesAseRoot();
         grantees.forEach(g -> logger.info("grantee: {} ", g));
+        // just make sure obtaining rdf throws no exceptions
+        RDFDataMgr.write(new StringWriter(), RdfOutput.toGraph(authShape), Lang.TTL);
     }
 }

@@ -1,10 +1,12 @@
 package won.shacl2java.constraints;
 
-import org.apache.jena.shacl.engine.constraint.ConstraintOpN;
-import org.apache.jena.shacl.parser.*;
-
 import java.util.HashSet;
 import java.util.Set;
+import org.apache.jena.shacl.engine.constraint.ConstraintOpN;
+import org.apache.jena.shacl.parser.Constraint;
+import org.apache.jena.shacl.parser.ConstraintVisitorBase;
+import org.apache.jena.shacl.parser.PropertyShape;
+import org.apache.jena.shacl.parser.Shape;
 
 public class ShPropertyShapeCollector extends ConstraintVisitorBase {
     private Set<PropertyShape> propertyShapes = new HashSet<>();

@@ -1,8 +1,7 @@
 package won.shacl2java.validation;
 
-import org.apache.jena.riot.system.ErrorHandler;
-
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.apache.jena.riot.system.ErrorHandler;
 
 public class ResettableErrorHandler implements ErrorHandler {
     private AtomicBoolean warning = new AtomicBoolean(false);

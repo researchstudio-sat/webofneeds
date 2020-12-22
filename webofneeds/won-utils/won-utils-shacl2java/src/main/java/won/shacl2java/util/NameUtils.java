@@ -2,6 +2,9 @@ package won.shacl2java.util;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
+import java.net.URI;
+import java.util.Optional;
+import java.util.regex.Matcher;
 import org.apache.jena.graph.Node;
 import org.apache.jena.shacl.parser.PropertyShape;
 import org.apache.jena.shacl.parser.Shape;
@@ -10,10 +13,6 @@ import org.apache.jena.sparql.path.P_Link;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathVisitorBase;
 import won.shacl2java.Shacl2JavaConfig;
-
-import java.net.URI;
-import java.util.Optional;
-import java.util.regex.Matcher;
 
 public class NameUtils {
     public static String setterNameForField(FieldSpec field) {

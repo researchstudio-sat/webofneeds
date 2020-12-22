@@ -1,6 +1,21 @@
 package won.shacl2java.sourcegen.typegen.logic;
 
-import com.squareup.javapoet.*;
+import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeSpec;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Literal;
@@ -14,23 +29,19 @@ import org.slf4j.LoggerFactory;
 import won.shacl2java.Shacl2JavaConfig;
 import won.shacl2java.annotation.ShapeNode;
 import won.shacl2java.constraints.EnumShapeChecker;
+import won.shacl2java.model.GraphEntity;
 import won.shacl2java.sourcegen.typegen.TypesGenerator;
-import won.shacl2java.sourcegen.typegen.mapping.*;
+import won.shacl2java.sourcegen.typegen.mapping.IndividualClassNames;
+import won.shacl2java.sourcegen.typegen.mapping.ShapeTargetClasses;
+import won.shacl2java.sourcegen.typegen.mapping.ShapeTypeSpecs;
+import won.shacl2java.sourcegen.typegen.mapping.TypeSpecNames;
+import won.shacl2java.sourcegen.typegen.mapping.VisitorClassTypeSpecs;
 import won.shacl2java.sourcegen.typegen.support.NameClashDetector;
-import won.shacl2java.sourcegen.typegen.support.ProducerConsumerMap;
 import won.shacl2java.util.NameUtils;
 import won.shacl2java.util.ShapeUtils;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.PUBLIC;
-import static won.shacl2java.sourcegen.typegen.support.TypegenUtils.generateGetter;
-import static won.shacl2java.sourcegen.typegen.support.TypegenUtils.generateSetter;
 
 public class MainTypesGenerator implements TypesGenerator {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -43,7 +54,8 @@ public class MainTypesGenerator implements TypesGenerator {
     private TypeSpecNames.Producer typeSpecNames;
     private ShapeTargetClasses.Producer shapeTargetClasses;
 
-    public MainTypesGenerator(Shapes shapes, Shacl2JavaConfig config, NameClashDetector nameClashDetector,
+    public MainTypesGenerator(Shapes shapes, Shacl2JavaConfig config,
+                    NameClashDetector nameClashDetector,
                     IndividualClassNames.Consumer individualClassNames,
                     ShapeTypeSpecs.Producer shapeTypeSpecs,
                     VisitorClassTypeSpecs.Producer visitorClassTypeSpecs,
@@ -61,7 +73,8 @@ public class MainTypesGenerator implements TypesGenerator {
     @Override
     public Set<TypeSpec> generate() {
         return StreamSupport
-                        .stream(Spliterators.spliteratorUnknownSize(shapes.iteratorAll(), Spliterator.ORDERED), false)
+                        .stream(Spliterators.spliteratorUnknownSize(shapes.iteratorAll(), Spliterator.ORDERED),
+                                        false)
                         .distinct()
                         .filter(s -> s.isNodeShape())
                         .map(shape -> {
@@ -91,7 +104,9 @@ public class MainTypesGenerator implements TypesGenerator {
     public TypeSpec generateClass(Shape shape, Shapes shapes, Shacl2JavaConfig config) {
         String name = NameUtils.classNameForShape(shape, config);
         nameClashDetector.detectNameClash(shape, name);
-        TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(name).addModifiers(PUBLIC);
+        TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(name)
+                        .superclass(ClassName.get(GraphEntity.class))
+                        .addModifiers(PUBLIC);
         typeBuilder.addJavadoc(getJavadocGeneratedForShape(shape));
         typeBuilder.addAnnotation(
                         AnnotationSpec.builder(ShapeNode.class)
@@ -101,18 +116,15 @@ public class MainTypesGenerator implements TypesGenerator {
                                         .build());
         typeBuilder.addMethod(
                         MethodSpec.constructorBuilder()
+                                        .addParameter(ClassName.get(Node.class), "node")
+                                        .addParameter(ClassName.get(Graph.class), "graph")
                                         .addModifiers(PUBLIC)
-                                        .build());
-        addNodeFieldAndAccessors(typeBuilder);
-        // Set<Shape> relevantShapes = new HashSet<Shape>();
-        // relevantShapes.add(shape);
-        // relevantShapes.addAll(
-        // ShapeUtils.getShNodeShapeNodes(shape)
-        // .stream()
-        // .map(shapes::getShape)
-        // .collect(Collectors.toSet()));
-        // configureTypeWithNodeShapes(typeBuilder, relevantShapes, shapes, config);
-        // addEqualsHashCodeToString(typeBuilder, config);
+                                        .addStatement("super(node,graph)")
+                                        .build())
+                        .addMethod(
+                                        MethodSpec.constructorBuilder()
+                                                        .addModifiers(PUBLIC)
+                                                        .build());
         TypeSpec typeSpec = typeBuilder.build();
         // remember type for visitor pattern generation
         shape.getShapeGraph()
@@ -131,7 +143,8 @@ public class MainTypesGenerator implements TypesGenerator {
         return typeSpec;
     }
 
-    public TypeSpec generateEnum(Shacl2JavaConfig config, Shape shape, EnumShapeChecker enumShapeChecker) {
+    public TypeSpec generateEnum(Shacl2JavaConfig config, Shape shape,
+                    EnumShapeChecker enumShapeChecker) {
         ClassName name = NameUtils.javaPoetClassNameForShape(shape, config);
         nameClashDetector.detectNameClash(shape, name.simpleName());
         TypeSpec.Builder typeBuilder = TypeSpec.enumBuilder(name).addModifiers(PUBLIC);
@@ -189,16 +202,5 @@ public class MainTypesGenerator implements TypesGenerator {
         }
         String uri = shapeNode.getURI();
         return String.format("Generated for shape <a href=\"%s\">%s</a>", uri, uri);
-    }
-
-    private static void addNodeFieldAndAccessors(TypeSpec.Builder typeBuilder) {
-        FieldSpec nodeField = FieldSpec.builder(TypeName.get(Node.class), "_node")
-                        .addModifiers(PRIVATE).build();
-        MethodSpec setter = generateSetter(nodeField);
-        MethodSpec getter = generateGetter(nodeField);
-        typeBuilder
-                        .addField(nodeField)
-                        .addMethod(setter)
-                        .addMethod(getter);
     }
 }

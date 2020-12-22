@@ -2,6 +2,15 @@ package won.shacl2java.testutil;
 
 import ch.qos.logback.classic.Level;
 import com.squareup.javapoet.TypeSpec;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.net.URL;
+import java.util.Objects;
+import java.util.Set;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -10,19 +19,8 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shacl.Shapes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.shacl2java.sourcegen.SourceGenerator;
 import won.shacl2java.Shacl2JavaConfig;
-
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.net.URL;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import won.shacl2java.sourcegen.SourceGenerator;
 
 public class Shacl2JavaTestSourcesGenerator {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

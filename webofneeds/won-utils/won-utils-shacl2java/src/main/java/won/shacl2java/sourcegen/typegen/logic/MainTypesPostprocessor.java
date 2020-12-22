@@ -1,6 +1,23 @@
 package won.shacl2java.sourcegen.typegen.logic;
 
-import com.squareup.javapoet.*;
+import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterizedTypeName;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Method;
+import java.net.URI;
+import java.util.ArrayDeque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Node_Blank;
 import org.apache.jena.rdf.model.Literal;
@@ -17,25 +34,24 @@ import won.shacl2java.annotation.PropertyPath;
 import won.shacl2java.constraints.PropertySpec;
 import won.shacl2java.sourcegen.typegen.TypesPostprocessor;
 import won.shacl2java.sourcegen.typegen.mapping.ShapeTargetClasses;
-import won.shacl2java.sourcegen.typegen.mapping.TypeSpecNames;
-import won.shacl2java.sourcegen.typegen.support.ProducerConsumerMap;
 import won.shacl2java.sourcegen.typegen.mapping.ShapeTypeSpecs;
+import won.shacl2java.sourcegen.typegen.mapping.TypeSpecNames;
 import won.shacl2java.sourcegen.typegen.support.IndividualPropertySpec;
+import won.shacl2java.sourcegen.typegen.support.ProducerConsumerMap;
 import won.shacl2java.util.CollectionUtils;
 import won.shacl2java.util.NameUtils;
 import won.shacl2java.util.ShapeUtils;
 
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
-import java.net.URI;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import static com.squareup.javapoet.TypeSpec.Kind.CLASS;
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.PUBLIC;
-import static won.shacl2java.sourcegen.typegen.support.TypegenUtils.*;
-import static won.shacl2java.util.NameUtils.*;
+import static won.shacl2java.sourcegen.typegen.support.TypegenUtils.findCommonSuperclassOrSuperinterface;
+import static won.shacl2java.sourcegen.typegen.support.TypegenUtils.generateAdder;
+import static won.shacl2java.sourcegen.typegen.support.TypegenUtils.generateGetter;
+import static won.shacl2java.sourcegen.typegen.support.TypegenUtils.generateSetter;
+import static won.shacl2java.util.NameUtils.getterNameForField;
+import static won.shacl2java.util.NameUtils.plural;
+import static won.shacl2java.util.NameUtils.propertyNameForPath;
 
 public class MainTypesPostprocessor implements TypesPostprocessor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -78,7 +94,9 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                                             .map(shapes::getShape)
                                             .collect(Collectors.toSet()));
             configureTypeWithNodeShapes(typeBuilder, relevantShapes, shapes, config);
-            addEqualsHashCodeToString(typeBuilder, config);
+            ClassName typeClass = ClassName.get(config.getPackageName(), typeBuilder.build().name);
+            addToStringAllFields(typeBuilder);
+            addDeepEquals(typeBuilder, typeClass);
             changes.put(typeSpec, typeBuilder.build());
         }
         return changes;
@@ -245,7 +263,7 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                                         AnnotationSpec.builder(PropertyPath.class)
                                                         .addMember(
                                                                         "value",
-                                                                        "{ $S }",
+                                                                        "$S",
                                                                         path.toString())
                                                         .build())
                         .build();
@@ -303,49 +321,7 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
         }
     }
 
-    private static void addEqualsHashCodeToString(TypeSpec.Builder typeBuilder, Shacl2JavaConfig config) {
-        ClassName typeClass = ClassName.get(config.getPackageName(), typeBuilder.build().name);
-        MethodSpec toString = MethodSpec.methodBuilder("toString")
-                        .returns(ClassName.get(String.class))
-                        .addStatement("return getClass().getSimpleName()+\"{_node=\" + get_node() + \"}\"")
-                        .addModifiers(PUBLIC)
-                        .build();
-        MethodSpec.Builder toStringAllFieldsBuilder = MethodSpec.methodBuilder("toStringAllFields");
-        toStringAllFieldsBuilder.addModifiers(PUBLIC)
-                        .returns(TypeName.get(String.class))
-                        .addStatement("$T sb = new $T()", StringBuilder.class, StringBuilder.class)
-                        .addStatement(" sb.append(getClass().getSimpleName()).append($S)", "{");
-        typeBuilder.fieldSpecs.stream()
-                        .forEach(fs -> toStringAllFieldsBuilder
-                                        .addStatement("sb.append($S).append($S)", fs.name, "=")
-                                        .beginControlFlow("if ($N != null) ", fs.name)
-                                        .addStatement("sb.append($N.toString())", fs.name)
-                                        .nextControlFlow("else")
-                                        .addStatement("sb.append($S)", "null")
-                                        .endControlFlow()
-                                        .addStatement("sb.append($S)", ", "));
-        toStringAllFieldsBuilder
-                        .addStatement("sb.delete(sb.length() - 2, sb.length())")
-                        .addStatement("sb.append($S)", "}")
-                        .addStatement("return sb.toString()");
-        typeBuilder.addMethod(toStringAllFieldsBuilder.build());
-        MethodSpec hashCode = MethodSpec.methodBuilder("hashCode")
-                        .addModifiers(PUBLIC)
-                        .returns(TypeName.INT)
-                        .addStatement("return $T.hash($N)", TypeName.get(Objects.class), "_node")
-                        .build();
-        MethodSpec equals = MethodSpec.methodBuilder("equals")
-                        .addModifiers(PUBLIC)
-                        .addParameter(TypeName.OBJECT, "o")
-                        .returns(TypeName.BOOLEAN)
-                        .addStatement("if (this == o) return true")
-                        .addStatement("if (o == null || getClass() != o.getClass()) return false")
-                        .addStatement("$T obj = ($T) o", typeClass, typeClass)
-                        .beginControlFlow("if (_node == null)")
-                        .addStatement("return false")
-                        .endControlFlow()
-                        .addStatement("return _node.equals(obj._node)")
-                        .build();
+    private static void addDeepEquals(TypeSpec.Builder typeBuilder, ClassName typeClass) {
         MethodSpec.Builder deepEqualsBuilder = MethodSpec.methodBuilder("deepEquals")
                         .addModifiers(PUBLIC)
                         .addParameter(TypeName.OBJECT, "o")
@@ -393,7 +369,7 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                                     .endControlFlow();
                 } else {
                     deepEqualsBuilder
-                                    .addStatement("$N child = this.$N()", subElementType, getter)
+                                    .addStatement("$T child = this.$N()", subElementType, getter)
                                     .beginControlFlow("if (child != null)")
                                     .beginControlFlow("try ")
                                     .addStatement("$T m = child.getClass().getMethod($S, $T.class, $T.class)",
@@ -418,9 +394,28 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                         .addStatement("visited.pop()")
                         .addStatement("return true");
         typeBuilder.addMethod(deepEqualsBuilder.build());
-        typeBuilder.addMethod(equals);
-        typeBuilder.addMethod(hashCode);
-        typeBuilder.addMethod(toString);
+    }
+
+    private static void addToStringAllFields(TypeSpec.Builder typeBuilder) {
+        MethodSpec.Builder toStringAllFieldsBuilder = MethodSpec.methodBuilder("toStringAllFields");
+        toStringAllFieldsBuilder.addModifiers(PUBLIC)
+                        .returns(TypeName.get(String.class))
+                        .addStatement("$T sb = new $T()", StringBuilder.class, StringBuilder.class)
+                        .addStatement(" sb.append(getClass().getSimpleName()).append($S)", "{");
+        typeBuilder.fieldSpecs.stream()
+                        .forEach(fs -> toStringAllFieldsBuilder
+                                        .addStatement("sb.append($S).append($S)", fs.name, "=")
+                                        .beginControlFlow("if ($N != null) ", fs.name)
+                                        .addStatement("sb.append($N.toString())", fs.name)
+                                        .nextControlFlow("else")
+                                        .addStatement("sb.append($S)", "null")
+                                        .endControlFlow()
+                                        .addStatement("sb.append($S)", ", "));
+        toStringAllFieldsBuilder
+                        .addStatement("sb.delete(sb.length() - 2, sb.length())")
+                        .addStatement("sb.append($S)", "}")
+                        .addStatement("return sb.toString()");
+        typeBuilder.addMethod(toStringAllFieldsBuilder.build());
     }
 
     private class PropertyHelper {

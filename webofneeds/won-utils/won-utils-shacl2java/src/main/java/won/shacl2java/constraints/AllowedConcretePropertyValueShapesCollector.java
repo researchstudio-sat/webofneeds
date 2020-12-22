@@ -1,11 +1,10 @@
 package won.shacl2java.constraints;
 
-import org.apache.jena.graph.Node;
-import org.apache.jena.shacl.Shapes;
-import org.apache.jena.shacl.parser.*;
-
-import java.util.HashSet;
 import java.util.Set;
+import org.apache.jena.shacl.parser.NodeShape;
+import org.apache.jena.shacl.parser.PropertyShape;
+import org.apache.jena.shacl.parser.Shape;
+import org.apache.jena.shacl.parser.ShapeVisitor;
 
 public class AllowedConcretePropertyValueShapesCollector implements ShapeVisitor {
     private Set<Shape> shapes = null;

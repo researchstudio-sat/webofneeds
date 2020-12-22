@@ -6,15 +6,9 @@ import com.github.rvesse.airline.SingleCommand;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
-import com.github.rvesse.airline.annotations.restrictions.RequireSome;
 import com.github.rvesse.airline.annotations.restrictions.Required;
 import com.github.rvesse.airline.help.cli.CliCommandUsageGenerator;
-import com.github.rvesse.airline.help.cli.CliGlobalUsageGenerator;
 import com.github.rvesse.airline.parser.errors.ParseArgumentsMissingException;
-import org.slf4j.LoggerFactory;
-import won.shacl2java.sourcegen.SourceGenerator;
-import won.shacl2java.sourcegen.SourceGeneratorStats;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -23,6 +17,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.slf4j.LoggerFactory;
+import won.shacl2java.sourcegen.SourceGenerator;
+import won.shacl2java.sourcegen.SourceGeneratorStats;
 
 @Command(name = "sourcegen", description = "Generate Java classes from SHACL shapes")
 public class Shacl2JavaSrcGenCommand {

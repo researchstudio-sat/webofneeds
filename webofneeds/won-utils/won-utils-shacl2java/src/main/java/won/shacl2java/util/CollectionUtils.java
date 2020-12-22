@@ -1,7 +1,5 @@
 package won.shacl2java.util;
 
-import org.apache.jena.shacl.parser.Shape;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;

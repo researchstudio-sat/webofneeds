@@ -1,6 +1,11 @@
 package won.shacl2java.sourcegen.typegen.support;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 public class ProducerConsumerMap<K, V> {
@@ -26,11 +31,15 @@ public class ProducerConsumerMap<K, V> {
         }
 
         public Set<K> keySet() {
-            return internalMap.keySet();
+            return Collections.unmodifiableSet(internalMap.keySet());
+        }
+
+        public Collection<V> values() {
+            return Collections.unmodifiableCollection(internalMap.values());
         }
 
         public Set<Map.Entry<K, V>> entrySet() {
-            return internalMap.entrySet();
+            return Collections.unmodifiableSet(internalMap.entrySet());
         }
 
         public V getOrDefault(Object key, V defaultValue) {

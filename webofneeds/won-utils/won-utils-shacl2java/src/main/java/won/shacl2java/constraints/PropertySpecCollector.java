@@ -1,14 +1,5 @@
 package won.shacl2java.constraints;
 
-import org.apache.jena.shacl.engine.constraint.*;
-import org.apache.jena.shacl.parser.Constraint;
-import org.apache.jena.shacl.parser.ConstraintVisitor;
-import org.apache.jena.shacl.parser.ConstraintVisitorBase;
-import org.apache.jena.shacl.parser.Shape;
-import org.apache.jena.shacl.vocabulary.SHACL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.Optional;
@@ -16,8 +7,27 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static won.shacl2java.constraints.ConstraintVisitorAlgorithm.visitDepthFirst;
+import org.apache.jena.shacl.engine.constraint.ClassConstraint;
+import org.apache.jena.shacl.engine.constraint.ConstraintOp1;
+import org.apache.jena.shacl.engine.constraint.ConstraintOpN;
+import org.apache.jena.shacl.engine.constraint.DatatypeConstraint;
+import org.apache.jena.shacl.engine.constraint.HasValueConstraint;
+import org.apache.jena.shacl.engine.constraint.InConstraint;
+import org.apache.jena.shacl.engine.constraint.MaxCount;
+import org.apache.jena.shacl.engine.constraint.MinCount;
+import org.apache.jena.shacl.engine.constraint.NodeKindConstraint;
+import org.apache.jena.shacl.engine.constraint.ShAnd;
+import org.apache.jena.shacl.engine.constraint.ShNode;
+import org.apache.jena.shacl.engine.constraint.ShNot;
+import org.apache.jena.shacl.engine.constraint.ShOr;
+import org.apache.jena.shacl.engine.constraint.ShXone;
+import org.apache.jena.shacl.parser.Constraint;
+import org.apache.jena.shacl.parser.ConstraintVisitor;
+import org.apache.jena.shacl.parser.ConstraintVisitorBase;
+import org.apache.jena.shacl.parser.Shape;
+import org.apache.jena.shacl.vocabulary.SHACL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PropertySpecCollector extends ConstraintVisitorBase {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

@@ -1,14 +1,13 @@
 package won.shacl2java.instantiation;
 
+import java.util.Objects;
+import java.util.Set;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.shacl.engine.ValidationContext;
 import org.apache.jena.shacl.parser.PropertyShape;
 import org.apache.jena.shacl.parser.Shape;
-
-import java.util.Objects;
-import java.util.Set;
 
 public class DerivedInstantiationContext extends InstantiationContext {
     private InstantiationContext parentContext;

@@ -1,9 +1,8 @@
 package won.shacl2java;
 
+import java.time.Duration;
 import org.junit.Test;
 import won.shacl2java.sourcegen.SourceGeneratorStats;
-
-import java.time.Duration;
 
 public class SourceGeneratorStatsTest {
     @Test

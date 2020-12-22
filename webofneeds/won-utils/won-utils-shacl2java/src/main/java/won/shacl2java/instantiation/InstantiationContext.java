@@ -1,5 +1,12 @@
 package won.shacl2java.instantiation;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
@@ -8,14 +15,8 @@ import org.apache.jena.shacl.engine.ValidationContext;
 import org.apache.jena.shacl.parser.PropertyShape;
 import org.apache.jena.shacl.parser.Shape;
 import won.shacl2java.util.ShapeUtils;
-import won.shacl2java.validation.ResettableErrorHandler;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import static won.shacl2java.util.CollectionUtils.addToMultivalueConcurrentHashMap;
-import static won.shacl2java.util.CollectionUtils.addToMultivalueMap;
 
 public class InstantiationContext {
     private ConcurrentHashMap<String, Set<Class<?>>> shapeClasses = new ConcurrentHashMap<>();

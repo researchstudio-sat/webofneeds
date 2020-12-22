@@ -1,10 +1,9 @@
 package won.shacl2java.sourcegen.typegen.support;
 
-import org.apache.jena.graph.Node;
-import org.apache.jena.shacl.parser.Shape;
-
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.jena.graph.Node;
+import org.apache.jena.shacl.parser.Shape;
 
 public class NameClashDetector {
     private Map<String, Node> classNames = new HashMap<>();

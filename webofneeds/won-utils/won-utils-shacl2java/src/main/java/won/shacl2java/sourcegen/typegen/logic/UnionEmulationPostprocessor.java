@@ -1,23 +1,29 @@
 package won.shacl2java.sourcegen.typegen.logic;
 
-import com.squareup.javapoet.*;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import won.shacl2java.Shacl2JavaConfig;
-import won.shacl2java.sourcegen.typegen.mapping.ShapeTypeImplTypes;
-import won.shacl2java.sourcegen.typegen.mapping.ShapeTypeInterfaceTypes;
-import won.shacl2java.sourcegen.typegen.TypesPostprocessor;
-
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterizedTypeName;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.TypeVariableName;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import won.shacl2java.Shacl2JavaConfig;
+import won.shacl2java.sourcegen.typegen.TypesPostprocessor;
+import won.shacl2java.sourcegen.typegen.mapping.ShapeTypeImplTypes;
+import won.shacl2java.sourcegen.typegen.mapping.ShapeTypeInterfaceTypes;
 
-import static javax.lang.model.element.Modifier.*;
-import static won.shacl2java.util.CollectionUtils.addToMultivalueMap;
+import static javax.lang.model.element.Modifier.ABSTRACT;
+import static javax.lang.model.element.Modifier.DEFAULT;
+import static javax.lang.model.element.Modifier.PUBLIC;
+import static javax.lang.model.element.Modifier.STATIC;
 
 public class UnionEmulationPostprocessor implements TypesPostprocessor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

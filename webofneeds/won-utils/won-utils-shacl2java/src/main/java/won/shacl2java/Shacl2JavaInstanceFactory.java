@@ -1,6 +1,33 @@
 package won.shacl2java;
 
-import io.github.classgraph.*;
+import io.github.classgraph.AnnotationInfo;
+import io.github.classgraph.AnnotationParameterValue;
+import io.github.classgraph.AnnotationParameterValueList;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfo;
+import io.github.classgraph.ClassInfoList;
+import io.github.classgraph.FieldInfo;
+import io.github.classgraph.ScanResult;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
@@ -13,6 +40,7 @@ import org.apache.jena.shacl.parser.PropertyShape;
 import org.apache.jena.shacl.parser.Shape;
 import org.apache.jena.shacl.validation.VLib;
 import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.sparql.graph.GraphFactory;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
 import org.slf4j.Logger;
@@ -27,15 +55,6 @@ import won.shacl2java.instantiation.InstantiationContext;
 import won.shacl2java.util.CollectionUtils;
 import won.shacl2java.util.NameUtils;
 import won.shacl2java.util.ShapeUtils;
-import won.shacl2java.validation.ResettableErrorHandler;
-
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.*;
-import java.net.URI;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import static org.apache.jena.shacl.validation.VLib.focusNodes;
 import static org.apache.jena.shacl.validation.VLib.isFocusNode;
@@ -122,6 +141,9 @@ public class Shacl2JavaInstanceFactory {
     }
 
     private void scanPackages(InstantiationContext ctx) {
+        // we pass this graph to individuals to hide their triples in the
+        // base graph when generating RDF using RdfOutput
+        Graph graphForIndividuals = GraphFactory.createGraphMem();
         try (ScanResult scanResult = new ClassGraph().enableAllInfo().acceptPackages(packagesToScan)
                         .scan()) {
             ClassInfoList shapeClassInfoList = scanResult.getClassesWithAnnotation(ShapeNode.class.getName());
@@ -157,9 +179,15 @@ public class Shacl2JavaInstanceFactory {
                         nodes = paramVals.get("value");
                         String focusNodeStr = ((String[]) nodes.getValue())[0];
                         Node focusNode = NodeFactory.createURI(focusNodeStr);
-                        Method m = instance.getClass().getMethod("set_node", Node.class);
+                        Method m = instance.getClass().getMethod("setNode", Node.class);
                         if (m != null) {
                             m.invoke(instance, focusNode);
+                        } else {
+                            continue;
+                        }
+                        m = instance.getClass().getMethod("setGraph", Graph.class);
+                        if (m != null) {
+                            m.invoke(instance, graphForIndividuals);
                         } else {
                             continue;
                         }
@@ -167,7 +195,7 @@ public class Shacl2JavaInstanceFactory {
                         ctx.setFocusNodeForInstance(instance, focusNode);
                         ctx.addShapeForFocusNode(focusNode, this.shapes.getShape(shapeNode));
                     } catch (Exception e) {
-                        throw new IllegalStateException("Cannot set node using set_node() on instance " + instance, e);
+                        throw new IllegalStateException("Cannot set node using setNode() on instance " + instance, e);
                     }
                 }
             }
@@ -412,18 +440,14 @@ public class Shacl2JavaInstanceFactory {
                 return instantiateEnum(focusNode, type);
             }
         }
-        return instantiateClass(focusNode, classForShape);
+        return instantiateClass(focusNode, classForShape, ctx.getData());
     }
 
-    public Object instantiateClass(Node focusNode, Class<?> classForShape)
+    public Object instantiateClass(Node focusNode, Class<?> classForShape, Graph graph)
                     throws InstantiationException,
                     IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Object instance;
-        instance = classForShape.getDeclaredConstructor().newInstance();
-        Method nodeSetter = instance.getClass().getMethod("set_node", Node.class);
-        if (nodeSetter != null) {
-            nodeSetter.invoke(instance, focusNode);
-        }
+        instance = classForShape.getDeclaredConstructor(Node.class, Graph.class).newInstance(focusNode, graph);
         return instance;
     }
 
@@ -524,14 +548,12 @@ public class Shacl2JavaInstanceFactory {
         if (propertyPath == null) {
             return;
         }
-        String[] shapeURIs = propertyPath.value();
-        if (shapeURIs == null || shapeURIs.length == 0) {
+        String propertyPathStr = propertyPath.value();
+        if (propertyPathStr == null || propertyPathStr.trim().length() == 0) {
             return;
         }
-        Stream.of(shapeURIs)
-                        .map(pathStr -> PathParser.parse(pathStr, PrefixMapping.Standard))
-                        .forEach(
-                                        path -> CollectionUtils.addToMultivalueMap(fieldsByPath, path, field));
+        CollectionUtils.addToMultivalueMap(fieldsByPath, PathParser.parse(propertyPathStr, PrefixMapping.Standard),
+                        field);
     }
 
     private void wireIndividuals(Object instance, Field field, InstantiationContext ctx) {

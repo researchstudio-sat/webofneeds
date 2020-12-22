@@ -3,17 +3,22 @@ package won.shacl2java.sourcegen.typegen.logic;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.shacl2java.Shacl2JavaConfig;
+import won.shacl2java.sourcegen.typegen.TypesPostprocessor;
 import won.shacl2java.sourcegen.typegen.mapping.ShapeTypeImplTypes;
 import won.shacl2java.sourcegen.typegen.mapping.ShapeTypeInterfaceTypes;
-import won.shacl2java.sourcegen.typegen.TypesPostprocessor;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.*;
-import java.util.stream.Collectors;
 
 import static javax.lang.model.element.Modifier.DEFAULT;
 import static javax.lang.model.element.Modifier.PUBLIC;
@@ -50,8 +55,8 @@ public class ShapeTypeInterfacePopulator implements TypesPostprocessor {
                         Set<MethodSpec> candidateInterfaceMethods = type.methodSpecs.stream()
                                         .filter(m -> m.hasModifier(PUBLIC))
                                         .filter(m -> !m.isConstructor())
-                                        .filter(m -> !m.name.equals("get_node"))
-                                        .filter(m -> !m.name.equals("set_node"))
+                                        .filter(m -> !m.name.equals("getNode"))
+                                        .filter(m -> !m.name.equals("setNode"))
                                         .filter(m -> !Arrays.stream(Object.class.getMethods())
                                                         .anyMatch(om -> om.getName().equals(m.name)))
                                         .map(methodSpec -> {

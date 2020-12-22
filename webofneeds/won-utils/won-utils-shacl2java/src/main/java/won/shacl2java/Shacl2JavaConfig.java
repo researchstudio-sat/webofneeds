@@ -8,6 +8,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Shacl2JavaConfig {
+    public static final String DEFAULT_VISITOR_FOR_ALL_CLASSES_NAME = "GeneralVisitor";
+    public static final String DEFAULT_VISITOR_HOST_FOR_ALL_CLASSES_NAME = "GeneralVisitorHost";
     private String packageName;
     private String outputDir;
     private Pattern classNameRegex;

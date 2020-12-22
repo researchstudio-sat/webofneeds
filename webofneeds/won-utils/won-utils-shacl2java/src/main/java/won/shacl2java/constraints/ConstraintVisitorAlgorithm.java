@@ -1,14 +1,13 @@
 package won.shacl2java.constraints;
 
+import java.util.HashSet;
+import java.util.Set;
 import org.apache.jena.graph.Node;
 import org.apache.jena.shacl.engine.constraint.ConstraintOp1;
 import org.apache.jena.shacl.engine.constraint.ConstraintOpN;
 import org.apache.jena.shacl.parser.Constraint;
 import org.apache.jena.shacl.parser.ConstraintVisitor;
 import org.apache.jena.shacl.parser.Shape;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class ConstraintVisitorAlgorithm {
     public static void visitBreadthFirst(Shape shape, ConstraintVisitor visitor) {

@@ -1,12 +1,22 @@
 package won.shacl2java.sourcegen.typegen.support;
 
-import com.squareup.javapoet.*;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterizedTypeName;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import won.shacl2java.Shacl2JavaConfig;
 import won.shacl2java.util.NameUtils;
-
-import java.net.URI;
-import java.util.*;
-import java.util.stream.Collectors;
 
 import static javax.lang.model.element.Modifier.PUBLIC;
 
