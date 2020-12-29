@@ -10,6 +10,8 @@
 
     <https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc>
             a       <https://w3id.org/won/message#FromExternal> ;
+            <https://w3id.org/won/message#envelope>
+                    <https://nodeblue.master.matchat.org/won/resource/event/b61f2188yjicxqtkg1vc#envelope> ;
             <https://w3id.org/won/message#messageType>
                     <https://w3id.org/won/message#AtomHintMessage> ;
             <https://w3id.org/won/message#recipientAtom> 

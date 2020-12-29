@@ -61,6 +61,7 @@ p1:envelope {
     <wm:/jq15ga3aacsxbvl9nngw>
             a                    msg:FromOwner ;
             msg:content          p1:content-d0zo ;
+            msg:envelope         p1:envelope ;
             msg:messageType      msg:CreateMessage ;
             msg:protocolVersion  "1.0" ;
             msg:recipientNode    p3:resource ;

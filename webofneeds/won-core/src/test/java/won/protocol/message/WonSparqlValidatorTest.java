@@ -13,7 +13,7 @@ import java.io.IOException;
  * User: ypanchenko Date: 02.06.2015
  */
 public class WonSparqlValidatorTest {
-    private static final String RESOURCE_FILE_CREATE_MSG_VALID = "/validation/valid/create_msg.trig";
+    private static final String RESOURCE_FILE_CREATE_MSG_VALID = "/validation/valid/create_msg2.trig";
     private static final String RESOURCE_FILE_CREATE_MSG_INVALID = "/validation/invalid/create_msg_invalid.trig";
     private static final String RESOURCE_FILE_ASK_CONSTRAINT = "/validation/query/query_ask_missing_type.rq";
     private static final String RESOURCE_FILE_SELECT_CONSTRAINT = "/validation/query/query_select_invalid_envelope_chain.rq";

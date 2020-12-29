@@ -38,6 +38,6 @@
                                          ] ;
             won:uriPrefixSpecification   [ won:atomUriPrefix        "https://satvm05.researchstudio.at/won/resource/atom" ;
                                            won:connectionUriPrefix  "https://satvm05.researchstudio.at/won/resource/connection" ;
-                                           won:eventUriPrefix       "https://satvm05.researchstudio.at/won/resource/msg"
+                                           won:messageUriPrefix       "https://satvm05.researchstudio.at/won/resource/msg"
                                          ] .
 }
