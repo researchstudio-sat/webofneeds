@@ -72,6 +72,11 @@ webofneeds/won-docker/image/owner/required-libs/
 webofneeds/won-docker/image/wonnode/conf/
 webofneeds/won-docker/image/wonnode/required-libs/
 webofneeds/won-docker/image/wonnode/won.war
+webofneeds/won-docker/deploy/local_build/mongodb
+webofneeds/won-docker/deploy/local_build/postgres
+webofneeds/won-docker/deploy/local_build/bigdata
+webofneeds/won-docker/deploy/local_build/won-client-certs
+webofneeds/won-docker/deploy/local_build/won-server-certs
 webofneeds/won-utils/won-utils-import/sample_atoms/
 
 #local config and data
