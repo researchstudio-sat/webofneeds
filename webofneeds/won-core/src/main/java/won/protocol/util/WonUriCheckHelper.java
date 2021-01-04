@@ -5,8 +5,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class WonUriCheckHelper {
-    private static Pattern PATTERN_CONNECTION = Pattern.compile("/[a-zA-Z0-9]+/c/[a-zA-Z0-9]+");
-    private static Pattern PATTERN_SOCKET = Pattern.compile("/[a-zA-Z0-9]+#[a-zA-Z0-9]+");
+    private static Pattern PATTERN_CONNECTION = Pattern.compile("/[\\-\\._~\\+a-zA-Z0-9]+/c/[\\-\\._~\\+a-zA-Z0-9]+");
+    private static Pattern PATTERN_SOCKET = Pattern.compile("/[\\-\\._~\\+a-zA-Z0-9]+#[\\-\\._~\\+a-zA-Z0-9]+");
 
     public static boolean isValidConnectionURI(String atomURIPrefix, String connectionUriToCheck) {
         Objects.requireNonNull(atomURIPrefix);

@@ -17,6 +17,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -117,6 +118,13 @@ public class AuthUtils {
         }
     }
 
+    /**
+     * Returns a shallow clone of the provided <code>OperationRequest</code>. The
+     * <code>set*()</code> methods are safe to use on the result.
+     * 
+     * @param toClone
+     * @return
+     */
     public static OperationRequest cloneShallow(OperationRequest toClone) {
         if (toClone == null) {
             return null;
@@ -134,13 +142,13 @@ public class AuthUtils {
         clone.setReqConnectionMessage(toClone.getReqConnectionMessage());
         clone.setReqConnectionMessages(toClone.getReqConnectionMessages());
         clone.setReqConnectionState(toClone.getReqConnectionState());
-        clone.setReqGraphs(toClone.getReqGraphs());
-        clone.setReqGraphTypes(toClone.getReqGraphTypes());
+        clone.setReqGraphs(Collections.unmodifiableSet(toClone.getReqGraphs()));
+        clone.setReqGraphTypes(Collections.unmodifiableSet(toClone.getReqGraphTypes()));
         clone.setReqPosition(toClone.getReqPosition());
         clone.setReqSocket(toClone.getReqSocket());
         clone.setReqSocketType(toClone.getReqSocketType());
-        clone.setBearsEncodedTokens(toClone.getBearsEncodedTokens());
-        clone.setBearsTokens(toClone.getBearsTokens());
+        clone.setBearsEncodedTokens(Collections.unmodifiableSet(toClone.getBearsEncodedTokens()));
+        clone.setBearsTokens(Collections.unmodifiableSet(toClone.getBearsTokens()));
         return clone;
     }
 

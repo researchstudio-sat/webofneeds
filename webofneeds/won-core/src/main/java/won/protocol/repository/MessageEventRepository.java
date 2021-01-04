@@ -19,6 +19,8 @@ import won.protocol.model.MessageEvent;
 import won.protocol.model.unread.UnreadMessageInfoForConnection;
 
 public interface MessageEventRepository extends WonRepository<MessageEvent> {
+    List<MessageEvent> findByMessageURI(URI messageURI);
+
     Optional<MessageEvent> findFirstByMessageURIAndParentURI(URI messageUri, URI parentUri);
 
     Optional<MessageEvent> findOneByMessageURIAndParentURI(URI messageURI, URI parentURI);

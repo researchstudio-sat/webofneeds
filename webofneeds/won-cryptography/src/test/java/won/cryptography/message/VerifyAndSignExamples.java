@@ -11,6 +11,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import won.cryptography.rdfsign.WebIdKeyLoader;
 import won.cryptography.service.CryptographyService;
 import won.cryptography.service.keystore.FileBasedKeyStoreService;
 import won.cryptography.utils.TestSigningUtils;
@@ -49,7 +50,9 @@ public class VerifyAndSignExamples {
         ownerAddingProcessor = new SignatureAddingWonMessageProcessor();
         ownerAddingProcessor.setCryptographyService(cryptographyService);
         checkingProcessor = new SignatureCheckingWonMessageProcessor();
-        checkingProcessor.setLinkedDataSource(new TestingDataSource());
+        WebIdKeyLoader keyLoader = new WebIdKeyLoader();
+        keyLoader.setLinkedDataSource(new TestingDataSource());
+        checkingProcessor.setWebIdKeyLoader(keyLoader);
     }
 
     @Test

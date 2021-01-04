@@ -45,6 +45,24 @@
             <artifactId>won-cryptography</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>at.researchstudio.sat</groupId>
+            <artifactId>won-auth</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>at.researchstudio.sat</groupId>
+            <artifactId>won-utils-shacl2java</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <!-- avoid version clash between the transitive
+                         dependencies (httpclient and jena) -->
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
         <!-- spring stuff -->
         <dependency>
@@ -62,6 +80,10 @@
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-tdb</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-shacl</artifactId>
         </dependency>
         <!-- messaging -->
         <dependency>

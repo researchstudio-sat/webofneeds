@@ -18,6 +18,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -47,10 +48,16 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import won.auth.AuthUtils;
+import won.auth.model.AclEvalResult;
+import won.auth.model.DecisionValue;
+import won.auth.model.GraphType;
+import won.auth.model.OperationRequest;
 import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.cryptography.service.CryptographyService;
 import won.node.service.nodeconfig.URIService;
 import won.node.service.persistence.AtomInformationService;
+import won.node.springsecurity.acl.WonAclEvalContext;
 import won.protocol.exception.NoSuchAtomException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessageType;
@@ -77,6 +84,10 @@ import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.RDFG;
 import won.protocol.vocabulary.WON;
+
+import static won.auth.model.Individuals.POSITION_ATOM_GRAPH;
+import static won.node.springsecurity.acl.WonAclEvalContext.Mode.ALLOW_ALL;
+import static won.node.springsecurity.acl.WonAclEvalContext.Mode.FILTER;
 
 /**
  * Creates rdf models from the relational database. TODO: conform to:
@@ -214,7 +225,11 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
     }
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public DataWithEtag<Dataset> getAtomDataset(final URI atomUri, String etag) {
+    public DataWithEtag<Dataset> getAtomDataset(final URI atomUri, String etag,
+                    WonAclEvalContext wonAclEvalContext) {
+        if (wonAclEvalContext == null) {
+            wonAclEvalContext = WonAclEvalContext.allowAll();
+        }
         Instant start = logger.isDebugEnabled() ? Instant.now() : null;
         DataWithEtag<Atom> atomDataWithEtag;
         try {
@@ -242,56 +257,100 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
         }
         Atom atom = atomDataWithEtag.getData();
         String newEtag = atomDataWithEtag.getEtag();
-        // load the dataset from storage
+        // load the dataset from storage or use empty one
         boolean isDeleted = (atom.getState() == AtomState.DELETED);
         Dataset dataset = isDeleted ? DatasetFactory.createGeneral() : atom.getDatatsetHolder().getDataset();
-        Model metaModel = atomModelMapper.toModel(atom);
-        Resource atomResource = metaModel.getResource(atomUri.toString());
-        String atomMetaInformationURI = uriService.createAtomSysInfoGraphURI(atomUri).toString();
-        Resource atomMetaInformationResource = metaModel.getResource(atomMetaInformationURI);
-        // link atomMetaInformationURI to atom via rdfg:subGraphOf
-        atomMetaInformationResource.addProperty(RDFG.SUBGRAPH_OF, atomResource);
-        // add connections
-        Resource connectionsContainer = metaModel.createResource(atom.getAtomURI().toString() + "/c");
-        metaModel.add(metaModel.createStatement(atomResource, WON.connections, connectionsContainer));
-        // add atom event container
-        Resource atomMessageContainer = metaModel.createResource(atom.getAtomURI().toString() + "#msg",
-                        WON.MessageContainer);
-        metaModel.add(metaModel.createStatement(atomResource, WON.messageContainer, atomMessageContainer));
-        // add atom event URIs
-        Collection<MessageEvent> messageEvents = messageEventRepository.findByParentURI(atomUri);
-        for (MessageEvent messageEvent : messageEvents) {
-            metaModel.add(metaModel.createStatement(atomMessageContainer, RDFS.member,
-                            metaModel.getResource(messageEvent.getMessageURI().toString())));
+        // filter by acl
+        if (!isDeleted && wonAclEvalContext.isModeFilter()) {
+            dataset = filterByAcl(atom.getAtomURI(), dataset, wonAclEvalContext);
         }
-        // add WON node link
-        atomResource.addProperty(WON.wonNode, metaModel.createResource(this.resourceURIPrefix));
-        // link all atom graphs taken from the create message to atom uri:
-        Iterator<String> namesIt = dataset.listNames();
-        while (namesIt.hasNext()) {
-            String name = namesIt.next();
-            Resource atomGraphResource = metaModel.getResource(name);
-            atomResource.addProperty(WON.contentGraph, atomGraphResource);
+        // check acl: should we add sysinfo graph?
+        AclEvalResult result = null;
+        if (wonAclEvalContext.isModeFilter()) {
+            URI aclGraphUri = uriService.createSysInfoGraphURIForAtomURI(atomUri);
+            OperationRequest operationRequest = AuthUtils.cloneShallow(wonAclEvalContext.getOperationRequest());
+            operationRequest.setReqPosition(POSITION_ATOM_GRAPH);
+            operationRequest.setReqGraphs(Collections.singleton(aclGraphUri));
+            result = wonAclEvalContext.getWonAclEvaluator().decide(operationRequest);
         }
-        // add meta model to dataset
-        dataset.addNamedModel(atomMetaInformationURI, metaModel);
+        if (wonAclEvalContext.isModeAllowAll() || DecisionValue.ACCESS_GRANTED.equals(result.getDecision())) {
+            addSysInfoGraph(atom, dataset);
+        }
+        // add prefixes
         addBaseUriAndDefaultPrefixes(dataset);
         if (logger.isDebugEnabled() && start != null) {
             Instant finish = Instant.now();
-            logger.debug("getAtomDataset({}) took {}ms", atomUri, Duration.between(start, finish).toMillis());
+            logger.debug("getAtomDataset({}) took {} ms", atomUri, Duration.between(start, finish).toMillis());
         }
         return new DataWithEtag<>(dataset, newEtag, etag, isDeleted);
     }
 
+    private Dataset filterByAcl(URI atomUri, Dataset dataset, WonAclEvalContext wonAclEvalContext) {
+        Dataset filtered = DatasetFactory.createGeneral();
+        String aclGraphUri = uriService.createAclGraphURIForAtomURI(atomUri).toString();
+        Iterator<String> graphUriIt = filtered.listNames();
+        while (graphUriIt.hasNext()) {
+            String graphUri = graphUriIt.next();
+            OperationRequest operationRequest = AuthUtils.cloneShallow(wonAclEvalContext.getOperationRequest());
+            operationRequest.setReqPosition(POSITION_ATOM_GRAPH);
+            operationRequest.setReqGraphs(Collections.singleton(URI.create(graphUri)));
+            if (graphUri.equals(aclGraphUri)) {
+                operationRequest.setReqGraphTypes(Collections.singleton(GraphType.ACL_GRAPH));
+            } else {
+                operationRequest.setReqGraphTypes(Collections.singleton(GraphType.CONTENT_GRAPH));
+            }
+            AclEvalResult result = wonAclEvalContext.getWonAclEvaluator().decide(operationRequest);
+            if (DecisionValue.ACCESS_GRANTED.equals(result.getDecision())) {
+                filtered.addNamedModel(graphUri, dataset.getNamedModel(graphUri));
+            }
+        }
+        return filtered;
+    }
+
+    public void addSysInfoGraph(Atom atom, Dataset dataset) {
+        Model sysInfoModel = atomModelMapper.toModel(atom);
+        Resource atomResource = sysInfoModel.getResource(atom.getAtomURI().toString());
+        String atomSysInfoURI = uriService.createSysInfoGraphURIForAtomURI(atom.getAtomURI()).toString();
+        Resource atomSysInfoResource = sysInfoModel.getResource(atomSysInfoURI);
+        // link atomMetaInformationURI to atom via rdfg:subGraphOf
+        atomSysInfoResource.addProperty(RDFG.SUBGRAPH_OF, atomResource);
+        // add connections
+        Resource connectionsContainer = sysInfoModel.createResource(atom.getAtomURI().toString() + "/c");
+        sysInfoModel.add(sysInfoModel.createStatement(atomResource, WON.connections, connectionsContainer));
+        // add atom event container
+        Resource atomMessageContainer = sysInfoModel.createResource(atom.getAtomURI().toString() + "#msg",
+                        WON.MessageContainer);
+        sysInfoModel.add(sysInfoModel.createStatement(atomResource, WON.messageContainer, atomMessageContainer));
+        // add atom event URIs
+        Collection<MessageEvent> messageEvents = messageEventRepository.findByParentURI(atom.getAtomURI());
+        for (MessageEvent messageEvent : messageEvents) {
+            sysInfoModel.add(sysInfoModel.createStatement(atomMessageContainer, RDFS.member,
+                            sysInfoModel.getResource(messageEvent.getMessageURI().toString())));
+        }
+        // add WON node link
+        atomResource.addProperty(WON.wonNode, sysInfoModel.createResource(this.resourceURIPrefix));
+        // add meta model to dataset
+        dataset.addNamedModel(atomSysInfoURI, sysInfoModel);
+        // link all atom graphs taken from the create message to atom uri:
+        Iterator<String> namesIt = dataset.listNames();
+        while (namesIt.hasNext()) {
+            String name = namesIt.next();
+            Resource atomGraphResource = sysInfoModel.getResource(name);
+            atomResource.addProperty(WON.contentGraph, atomGraphResource);
+        }
+    }
+
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public Dataset getAtomDataset(final URI atomUri, boolean deep, Integer deepLayerSize)
+    public Dataset getAtomDataset(final URI atomUri, boolean deep, Integer deepLayerSize,
+                    WonAclEvalContext wonAclEvalContext)
                     throws NoSuchAtomException, NoSuchConnectionException, NoSuchMessageException {
-        Dataset dataset = getAtomDataset(atomUri, null).getData();
+        Dataset dataset = getAtomDataset(atomUri, null, wonAclEvalContext).getData();
         if (deep) {
             Atom atom = atomInformationService.readAtom(atomUri);
             if (atom.getState() == AtomState.ACTIVE) {
                 // only add deep data if atom is active
+                logger.warn("TODO: filter deep atom dataset request with ACL!");
                 Slice<URI> slice = atomInformationService.listConnectionURIs(atomUri, 1, deepLayerSize, null, null);
                 AtomInformationService.PagedResource<Dataset, URI> connectionsResource = toContainerPage(
                                 this.uriService.createConnectionContainerURIForAtom(atomUri).toString(), slice);
@@ -1056,7 +1115,7 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
         Dataset dataset = isDeleted ? DatasetFactory.createGeneral() : atom.getDatatsetHolder().getDataset();
         Model metaModel = atomModelMapper.toModel(atom);
         Resource atomResource = metaModel.getResource(atomUri.toString());
-        String atomMetaInformationURI = uriService.createAtomSysInfoGraphURI(atomUri).toString();
+        String atomMetaInformationURI = uriService.createSysInfoGraphURIForAtomURI(atomUri).toString();
         Resource atomMetaInformationResource = metaModel.getResource(atomMetaInformationURI);
         // link atomMetaInformationURI to atom via rdfg:subGraphOf
         atomMetaInformationResource.addProperty(RDFG.SUBGRAPH_OF, atomResource);

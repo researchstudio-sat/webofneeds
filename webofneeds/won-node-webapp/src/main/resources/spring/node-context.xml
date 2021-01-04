@@ -138,10 +138,13 @@
 	<sec:authentication-manager id="clientCertificateWebIdAuthenticationManager">
 		<sec:authentication-provider ref="preAuthenticationProvider" />
 	</sec:authentication-manager>
+	<bean id="wonAclAccessDecisionVoter" class ="won.node.springsecurity.acl.WonAclAccessDecisionVoter" />
+	<bean id="targetAtomCheckEvaluator" class="won.node.springsecurity.acl.WonTargetAtomCheckEvaluator" />
+	<bean id="atomNodeChecker" class="won.auth.check.impl.AtomNodeChecker" />
 	<bean id="webIdBasedAccessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
 		<constructor-arg>
 			<list>
-				<bean class="won.node.springsecurity.DefaultWoNAccessDecisionVoter" />
+				<ref bean="wonAclAccessDecisionVoter"/>
 			</list>
 		</constructor-arg>
 	</bean>

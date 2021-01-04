@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import org.apache.camel.CamelContext;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.ReadWrite;
@@ -27,6 +28,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import won.node.service.linkeddata.generate.LinkedDataService;
 import won.node.service.linkeddata.lookup.SocketLookupFromLinkedData;
 import won.node.service.persistence.DataDerivationService;
 import won.node.service.nodeconfig.URIService;
@@ -43,6 +45,7 @@ import won.protocol.repository.AtomMessageContainerRepository;
 import won.protocol.repository.AtomRepository;
 import won.protocol.repository.MessageEventRepository;
 import won.protocol.service.WonNodeInformationService;
+import won.protocol.util.linkeddata.LinkedDataSource;
 
 @ContextConfiguration(locations = { "classpath:/won/node/PersistenceTest.xml",
                 "classpath:/spring/component/storage/jdbc-storage.xml",
@@ -84,13 +87,17 @@ public class PersistenceTest {
     SocketLookupFromLinkedData socketLookup;
     @MockBean
     WonNodeInformationService wonNodeInformationService;
+    @MockBean
+    CamelContext camelContext;
+    @MockBean
+    LinkedDataSource linkedDataSource;
 
     @Before
     public void setUp() {
         Mockito.when(uriService.isAtomURI(any(URI.class))).thenReturn(true);
         Mockito.when(uriService.getAtomResourceURIPrefix()).then(x -> "uri:/node/resource/atom");
         Mockito.when(uriService.getResourceURIPrefix()).then(x -> "uri:/node/resource");
-        Mockito.when(uriService.createAtomSysInfoGraphURI(any(URI.class))).thenCallRealMethod();
+        Mockito.when(uriService.createSysInfoGraphURIForAtomURI(any(URI.class))).thenCallRealMethod();
     }
 
     @Test(expected = DataIntegrityViolationException.class)

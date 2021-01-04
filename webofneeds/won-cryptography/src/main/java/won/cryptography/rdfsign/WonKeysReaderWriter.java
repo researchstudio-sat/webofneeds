@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.Provider;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
 import org.bouncycastle.jce.ECNamedCurveTable;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
 
@@ -43,6 +45,8 @@ import won.protocol.vocabulary.WONMSG;
  * 27.03.2015
  */
 public class WonKeysReaderWriter {
+    private static final Provider securityProvider = new BouncyCastleProvider();
+
     public WonKeysReaderWriter() {
     }
 
@@ -140,7 +144,7 @@ public class WonKeysReaderWriter {
                     org.bouncycastle.math.ec.ECPoint ecPoint = ecSpec.getCurve().createPoint(new BigInteger(qx, 16),
                                     new BigInteger(qy, 16));
                     ECPublicKeySpec pubKeySpec = new ECPublicKeySpec(ecPoint, ecSpec);
-                    KeyFactory keyFactory = KeyFactory.getInstance(algName, "BC");
+                    KeyFactory keyFactory = KeyFactory.getInstance(algName, securityProvider);
                     PublicKey key = keyFactory.generatePublic(pubKeySpec);
                     keys.put(keyAgent.getURI(), key);
                 }

@@ -170,7 +170,11 @@ public class WonAclEvaluator {
                     boolean provideAuthInfo, Set<Authorization> requestorIsGranteeOf) {
         // determine if the requestor is in the set of grantees
         boolean decisionSoFar = false;
-        if (requestorIsGranteeOf.contains(authorization)) {
+        if (request.getReqAtom().equals(request.getRequestor())) {
+            // owner of atom is requestor - allow anything
+            decisionSoFar = true;
+        } else if (requestorIsGranteeOf.contains(authorization)) {
+            // requestor is grantee, we have established that earlier
             decisionSoFar = true;
         } else {
             if (isRequestorAGrantee(authorization, request)) {
@@ -200,10 +204,10 @@ public class WonAclEvaluator {
                     authInfo.setGranteeGranteeWildcard(authorization.getGranteeGranteeWildcard());
                 }
             } else {
+                debug("operation is not granted", authorization, request);
                 decisionSoFar = false;
             }
         }
-        debug("operation is not granted", authorization, request);
         return accessControlDecision(decisionSoFar, authorization, request, authInfo);
     }
 

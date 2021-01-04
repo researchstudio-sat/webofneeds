@@ -6,6 +6,9 @@
 @prefix hold:<https://w3id.org/won/ext/hold#>.
 @prefix buddy:<https://w3id.org/won/ext/buddy#>.
 
+# Note: this example does not lead to an error any more
+# as defaultSockets have been dropped.
+
 ex:atom1 a won:Atom ;
     dc:title "Test Atom 1" ;
     won:socket sub:socket1 ;

@@ -305,15 +305,6 @@ public interface AtomInformationService {
     DataWithEtag<Atom> readAtom(URI atomURI, String etag) throws NoSuchAtomException;
 
     /**
-     * Retrieves the public description of the atom as an RDF graph.
-     *
-     * @param atomURI
-     * @return
-     * @throws NoSuchAtomException
-     */
-    Model readAtomContent(URI atomURI) throws NoSuchAtomException;
-
-    /**
      * Read general information about the connection.
      *
      * @param connectionURI

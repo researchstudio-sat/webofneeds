@@ -30,10 +30,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.util.StopWatch;
 import org.springframework.web.client.HttpClientErrorException;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
+import won.cryptography.rdfsign.WebIdKeyLoader;
 import won.cryptography.rdfsign.SignatureVerificationState;
 import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.protocol.exception.WonMessageProcessingException;
@@ -52,20 +49,15 @@ import won.protocol.util.linkeddata.LinkedDataSource;
  */
 public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private final Ehcache webIdCache;
+    @Autowired
+    private WebIdKeyLoader webIdKeyLoader;
 
     public SignatureCheckingWonMessageProcessor() {
-        CacheManager manager = CacheManager.getInstance();
-        this.webIdCache = new Cache("SignatureCheckingWonMessageProcessor", 100, false, false, 3600, 3600);
-        manager.addCache(webIdCache);
     }
 
-    public void setLinkedDataSource(final LinkedDataSource linkedDataSource) {
-        this.linkedDataSource = linkedDataSource;
+    public void setWebIdKeyLoader(WebIdKeyLoader webIdKeyLoader) {
+        this.webIdKeyLoader = webIdKeyLoader;
     }
-
-    @Autowired
-    private LinkedDataSource linkedDataSource;
 
     @Override
     public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
@@ -200,7 +192,7 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
             if (!keys.containsKey(refKey)) {
                 logger.debug("loading referenced key {}", refKey);
                 sw.start("load referenced key");
-                Set<PublicKey> resolvedKeys = loadKey(refKey, keyReader);
+                Set<PublicKey> resolvedKeys = webIdKeyLoader.loadKey(refKey);
                 sw.stop();
                 for (PublicKey resolvedKey : resolvedKeys) {
                     keys.put(refKey, resolvedKey);
@@ -215,29 +207,5 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
             logger.debug(LogMarkers.TIMING, "Timing info: \n{}", sw.prettyPrint());
         }
         return keys;
-    }
-
-    public Set<PublicKey> loadKey(String keyURI, WonKeysReaderWriter keyReader)
-                    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
-        Element cachedElement = webIdCache.get(keyURI);
-        if (cachedElement != null) {
-            return (Set<PublicKey>) cachedElement.getObjectValue();
-        } else {
-            Set<PublicKey> ret = loadKeyRemotely(keyReader, keyURI);
-            if (ret != null && ret.size() > 0) {
-                webIdCache.put(new Element(keyURI, ret));
-            }
-            return ret;
-        }
-    }
-
-    public Set<PublicKey> loadKeyRemotely(WonKeysReaderWriter keyReader, String refKey)
-                    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
-        Dataset keyDataset = linkedDataSource.getDataForResource(URI.create(refKey));
-        // TODO replace the WonKeysReaderWriter methods with WonRDFUtils methods and use
-        // the WonKeysReaderWriter
-        // itself internally there in those methods
-        Set<PublicKey> resolvedKeys = keyReader.readFromDataset(keyDataset, refKey);
-        return resolvedKeys;
     }
 }

@@ -25,6 +25,8 @@ import won.protocol.util.WonUriCheckHelper;
  */
 @Component
 public class URIService implements InitializingBean {
+    private static final String ACL_GRAPH_SUFFIX = "#acl";
+    private static final String TOKEN_ENDPOINT_SUFFIX = "/token";
     // prefix of any URI
     private String generalURIPrefix;
     // prefix of an atom resource
@@ -46,6 +48,9 @@ public class URIService implements InitializingBean {
     private Pattern atomMessagesPattern;
     private Pattern atomUnreadPattern;
     private Pattern atomUriPattern;
+    private Pattern messageUriPattern;
+    private Pattern connectionContainerUriPattern;
+    private Pattern tokenEndpointUriPattern;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -53,29 +58,31 @@ public class URIService implements InitializingBean {
         this.connectionResourceURIPrefix = this.resourceURIPrefix + "/connection";
         this.messageResourceURIPrefix = this.resourceURIPrefix + "/msg";
         this.attachmentResourceURIPrefix = this.resourceURIPrefix + "/attachment";
-        this.connectionMessagesPattern = Pattern.compile(atomResourceURIPrefix + "/[a-zA-Z0-9]+/c/[a-zA-Z0-9]+/msg");
-        this.connectionUriPattern = Pattern.compile(atomResourceURIPrefix + "/[a-zA-Z0-9]+/c/[a-zA-Z0-9]+");
-        this.atomMessagesPattern = Pattern.compile(atomResourceURIPrefix + "/[a-zA-Z0-9]+/msg");
-        this.atomUnreadPattern = Pattern.compile(atomResourceURIPrefix + "/[a-zA-Z0-9]+/unread");
-        this.atomUriPattern = Pattern.compile(atomResourceURIPrefix + "/[a-zA-Z0-9]+");
+        this.connectionMessagesPattern = Pattern
+                        .compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+/c/[\\-\\._~\\+a-zA-Z0-9]+/msg\\b");
+        this.messageUriPattern = Pattern
+                        .compile(messageResourceURIPrefix
+                                        + "/[123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ]+\\b");
+        this.connectionUriPattern = Pattern
+                        .compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+/c/[\\-\\._~\\+a-zA-Z0-9]+\\b");
+        this.connectionContainerUriPattern = Pattern.compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+/c\\b");
+        this.atomMessagesPattern = Pattern.compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+/msg\\b");
+        this.atomUnreadPattern = Pattern.compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+/unread\\b");
+        this.atomUriPattern = Pattern.compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+\\b");
+        this.tokenEndpointUriPattern = Pattern
+                        .compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+" + TOKEN_ENDPOINT_SUFFIX + "\\b");
     }
 
     public boolean isMessageURI(URI toCheck) {
         if (toCheck == null)
             return false;
-        return toCheck.toString().startsWith(messageResourceURIPrefix);
+        return messageUriPattern.matcher(toCheck.toString()).lookingAt();
     }
 
     public boolean isAtomURI(URI toCheck) {
         if (toCheck == null)
             return false;
-        return toCheck.toString().startsWith(atomResourceURIPrefix);
-    }
-
-    public boolean isConnectionURI(URI toCheck) {
-        if (toCheck == null)
-            return false;
-        return WonUriCheckHelper.isValidConnectionURI(this.atomResourceURIPrefix, toCheck.toString());
+        return atomUriPattern.matcher(toCheck.toString()).lookingAt();
     }
 
     public boolean isAtomMessagesURI(URI toCheck) {
@@ -90,6 +97,28 @@ public class URIService implements InitializingBean {
             return false;
         Matcher m = atomUnreadPattern.matcher(toCheck.toString());
         return m.lookingAt();
+    }
+
+    public boolean isTokenEndpointURI(URI toCheck) {
+        if (toCheck == null) {
+            return false;
+        }
+        Matcher m = tokenEndpointUriPattern.matcher(toCheck.toString());
+        return m.lookingAt();
+    }
+
+    public boolean isConnectionContainerURI(URI toCheck) {
+        if (toCheck == null) {
+            return false;
+        }
+        Matcher m = connectionContainerUriPattern.matcher(toCheck.toString());
+        return m.lookingAt();
+    }
+
+    public boolean isConnectionURI(URI toCheck) {
+        if (toCheck == null)
+            return false;
+        return WonUriCheckHelper.isValidConnectionURI(this.atomResourceURIPrefix, toCheck.toString());
     }
 
     public boolean isConnectionMessagesURI(URI toCheck) {
@@ -115,6 +144,24 @@ public class URIService implements InitializingBean {
         return URI.create(m.group());
     }
 
+    /**
+     * Attempts to find the atom uri in any sub-uri (e.g atom messages, connection,
+     * connection messages)
+     *
+     * @param subUri
+     * @return the atom uri or null if the argument is null or the atom uri pattern
+     * is not present.
+     */
+    public URI getAtomURIofSubURI(URI subUri) {
+        if (subUri == null)
+            return null;
+        Matcher m = atomUriPattern.matcher(subUri.toString());
+        if (!m.find()) {
+            return null;
+        }
+        return URI.create(m.group());
+    }
+
     public URI getAtomURIofAtomUnreadURI(URI atomUnreadURI) {
         if (atomUnreadURI == null)
             return null;
@@ -127,7 +174,7 @@ public class URIService implements InitializingBean {
      * Transforms the specified URI, which may be a resource URI or a page URI, to a
      * data URI. If the specified URI doesn't start with the right prefix, it's
      * returned unchanged.
-     * 
+     *
      * @param pageOrResourceURI
      * @return
      */
@@ -146,7 +193,7 @@ public class URIService implements InitializingBean {
      * Transforms the specified URI, which may be a resource URI or a page URI, to a
      * page URI. If the specified URI doesn't start with the right prefix, it's
      * returned unchanged.
-     * 
+     *
      * @param dataOrResourceURI
      * @return
      */
@@ -163,9 +210,9 @@ public class URIService implements InitializingBean {
 
     /**
      * Transforms the specified URI, which may be a resource URI or a page URI, to a
-     * page URI. If the specified URI doesn't start with the right prefix, it's
+     * resource URI. If the specified URI doesn't start with the right prefix, it's
      * returned unchanged.
-     * 
+     *
      * @param pageOrDataURI
      * @return
      */
@@ -210,6 +257,17 @@ public class URIService implements InitializingBean {
         return URI.create(attachmentResourceURIPrefix + "/" + id);
     }
 
+    public URI createAclGraphURIForAtomURI(URI atomUri) {
+        return URI.create(atomUri + ACL_GRAPH_SUFFIX);
+    }
+
+    public URI createSysInfoGraphURIForAtomURI(final URI atomURI) {
+        // TODO: [SECURITY] it's possible to submit atom data that clashes with this
+        // name,
+        // which may lead to undefined behavior
+        return URI.create(atomURI + "#sysinfo");
+    }
+
     public String getAtomResourceURIPrefix() {
         return atomResourceURIPrefix;
     }
@@ -238,17 +296,10 @@ public class URIService implements InitializingBean {
         this.generalURIPrefix = generalURIPrefix;
     }
 
-    public URI createAtomSysInfoGraphURI(final URI atomURI) {
-        // TODO: [SECURITY] it's possible to submit atom data that clashes with this
-        // name,
-        // which may lead to undefined behavior
-        return URI.create(atomURI.toString() + "#sysinfo");
-    }
-
     /**
      * Assumes the specified uri to be of the form [connectionURI]/event/[long event
      * id].
-     * 
+     *
      * @param eventURI
      * @return
      */

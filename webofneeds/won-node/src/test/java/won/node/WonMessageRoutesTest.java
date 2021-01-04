@@ -52,6 +52,8 @@ import org.junit.BeforeClass;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,11 +73,13 @@ import won.node.service.persistence.AtomService;
 import won.node.service.persistence.ConnectionService;
 import won.node.service.persistence.MessageService;
 import won.node.service.persistence.OwnerManagementService;
+import won.node.springsecurity.acl.WonAclEvalContext;
 import won.protocol.exception.WonMessageNotWellFormedException;
 import won.protocol.jms.AtomProtocolCommunicationService;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
+import won.protocol.message.WonMessageType;
 import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.impl.KeyForNewAtomAddingProcessor;
@@ -89,9 +93,9 @@ import won.protocol.service.WonNodeInfoBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.service.impl.MessageRoutingInfoServiceWithLookup;
 import won.protocol.util.AtomModelWrapper;
+import won.protocol.util.CheapInsecureRandomString;
 import won.protocol.util.Prefixer;
 import won.protocol.util.RdfUtils;
-import won.protocol.util.WonMessageUriHelper;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.pretty.Lang_WON;
 import won.protocol.vocabulary.WONMSG;
@@ -124,6 +128,7 @@ import won.test.category.RequiresPosgresServer;
 @Rollback
 @Category(RequiresPosgresServer.class)
 public abstract class WonMessageRoutesTest {
+    protected final CheapInsecureRandomString randomString = new CheapInsecureRandomString();
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     protected static final String OWNERAPPLICATION_ID_OWNER1 = "ownerapp-1";
     protected static final String OWNERAPPLICATION_ID_OWNER2 = "ownerapp-2";
@@ -280,10 +285,24 @@ public abstract class WonMessageRoutesTest {
         Objects.requireNonNull(messageURI);
         return (Exchange ex) -> {
             WonMessage msg = getMessageRequired(ex);
-            boolean result = (msg.getMessageTypeRequired().isFailureResponse()
-                            && messageURI.equals(msg.getRespondingToMessageURI()));
+            boolean result = msg.getMessageType().isFailureResponse()
+                            && messageURI.equals(msg.getRespondingToMessageURI());
             if (!result) {
-                logMessageForFailedPredicate(getClass().getName(), "mesaggeURI", messageURI, msg);
+                Optional<WonMessage> response = msg.getResponse();
+                if (response.isPresent()) {
+                    result = response.get().getMessageType().isFailureResponse()
+                                    && messageURI.equals(response.get().getRespondingToMessageURI());
+                }
+                if (!result) {
+                    response = msg.getRemoteResponse();
+                    if (response.isPresent()) {
+                        result = response.get().getMessageType().isFailureResponse()
+                                        && messageURI.equals(response.get().getRespondingToMessageURI());
+                    }
+                }
+            }
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "messageURI", messageURI, msg);
             }
             return result;
         };
@@ -300,10 +319,24 @@ public abstract class WonMessageRoutesTest {
         @Override
         public boolean matches(Exchange exchange) {
             WonMessage msg = getMessageRequired(exchange);
-            boolean result = (msg.getMessageTypeRequired().isFailureResponse()
-                            && messageURI.equals(msg.getRespondingToMessageURI()));
+            boolean result = msg.getMessageType().isFailureResponse()
+                            && messageURI.equals(msg.getRespondingToMessageURI());
             if (!result) {
-                logMessageForFailedPredicate(getClass().getName(), "mesaggeURI", messageURI, msg);
+                Optional<WonMessage> response = msg.getResponse();
+                if (response.isPresent()) {
+                    result = response.get().getMessageType().isFailureResponse()
+                                    && messageURI.equals(response.get().getRespondingToMessageURI());
+                }
+                if (!result) {
+                    response = msg.getRemoteResponse();
+                    if (response.isPresent()) {
+                        result = response.get().getMessageType().isFailureResponse()
+                                        && messageURI.equals(response.get().getRespondingToMessageURI());
+                    }
+                }
+            }
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "messageURI", messageURI, msg);
             }
             return result;
         }
@@ -329,8 +362,22 @@ public abstract class WonMessageRoutesTest {
         @Override
         public boolean matches(Exchange exchange) {
             WonMessage msg = getMessageRequired(exchange);
-            boolean result = (msg.getMessageTypeRequired().isSuccessResponse()
-                            && messageURI.equals(msg.getRespondingToMessageURI()));
+            boolean result = msg.getMessageType().isSuccessResponse()
+                            && messageURI.equals(msg.getRespondingToMessageURI());
+            if (!result) {
+                Optional<WonMessage> response = msg.getResponse();
+                if (response.isPresent()) {
+                    result = response.get().getMessageType().isSuccessResponse()
+                                    && messageURI.equals(response.get().getRespondingToMessageURI());
+                }
+                if (!result) {
+                    response = msg.getRemoteResponse();
+                    if (response.isPresent()) {
+                        result = response.get().getMessageType().isSuccessResponse()
+                                        && messageURI.equals(response.get().getRespondingToMessageURI());
+                    }
+                }
+            }
             if (!result) {
                 logMessageForFailedPredicate(getClass().getName(), "messageURI", messageURI, msg);
             }
@@ -761,9 +808,11 @@ public abstract class WonMessageRoutesTest {
 
     protected void prepareMockitoStubs(URI atomURI, URI socketURI, URI atomURI2, URI socketURI2) {
         Mockito.when(linkedDataSource.getDataForResource(eq(atomURI)))
-                        .then(x -> linkedDataService.getAtomDataset(atomURI, false, null));
+                        .then(x -> linkedDataService.getAtomDataset(atomURI, false, null,
+                                        WonAclEvalContext.allowAll()));
         Mockito.when(linkedDataSource.getDataForResource(eq(atomURI2)))
-                        .then(x -> linkedDataService.getAtomDataset(atomURI2, false, null));
+                        .then(x -> linkedDataService.getAtomDataset(atomURI2, false, null,
+                                        WonAclEvalContext.allowAll()));
         Mockito.when(socketLookup.getCapacity(eq(socketURI))).thenReturn(Optional.of(10));
         Mockito.when(socketLookup.getCapacity(eq(socketURI2))).thenReturn(Optional.of(10));
         Mockito.when(socketLookup.isCompatible(socketURI, socketURI2)).thenReturn(true);
@@ -778,6 +827,22 @@ public abstract class WonMessageRoutesTest {
                         .thenReturn(Optional.of(URI_NODE_1));
         Mockito.when(messageRoutingInfoServiceWithLookup.recipientNode(any(WonMessage.class)))
                         .thenReturn(Optional.of(URI_NODE_1));
+        Mockito.when(uriService.createAclGraphURIForAtomURI(any(URI.class))).thenAnswer(
+                        new Answer() {
+                            @Override
+                            public Object answer(InvocationOnMock invocation) throws Throwable {
+                                URI uri = (URI) invocation.getArguments()[0];
+                                return URI.create(uri + "#acl");
+                            }
+                        });
+        Mockito.when(uriService.createSysInfoGraphURIForAtomURI(any(URI.class))).thenAnswer(
+                        new Answer() {
+                            @Override
+                            public Object answer(InvocationOnMock invocation) throws Throwable {
+                                URI uri = (URI) invocation.getArguments()[0];
+                                return URI.create(uri + "#sysinfo");
+                            }
+                        });
     }
 
     protected void executeInSeparateThreadAndWaitForResult(Runnable checks) throws InterruptedException {
@@ -919,15 +984,16 @@ public abstract class WonMessageRoutesTest {
     }
 
     protected URI newAtomURI() {
-        return URI.create(URI_NODE_1 + "/atom/atom" + counter.incrementAndGet());
+        return URI.create(URI_NODE_1 + "/atom/atom" + counter.incrementAndGet() + "-" + randomString.nextString(20));
     }
 
     protected URI newConnectionURI(URI atomUri) {
-        return URI.create(atomUri.toString() + "/c/connection" + counter.incrementAndGet());
+        return URI.create(atomUri.toString() + "/c/connection" + counter.incrementAndGet() + "-"
+                        + randomString.nextString(20));
     }
 
     protected URI newMessageURI() {
-        return URI.create("wm:/message" + counter.incrementAndGet());
+        return URI.create("wm:/message" + counter.incrementAndGet() + "-" + randomString.nextString(20));
     }
 
     protected Dataset loadDatasetAndReplaceAtomURI(String file, URI atomURI) throws IOException {
@@ -1068,7 +1134,7 @@ public abstract class WonMessageRoutesTest {
         Mockito.when(uriService.isAtomURI(any(URI.class))).thenReturn(true);
         Mockito.when(uriService.getAtomResourceURIPrefix()).then(x -> URI_NODE_1.toString() + "/atom");
         Mockito.when(uriService.getResourceURIPrefix()).then(x -> URI_NODE_1.toString());
-        Mockito.when(uriService.createAtomSysInfoGraphURI(any(URI.class))).thenCallRealMethod();
+        Mockito.when(uriService.createSysInfoGraphURIForAtomURI(any(URI.class))).thenCallRealMethod();
         // Mockito.when(linkedDataSource.getDataForResource(any(URI.class),
         // any(URI.class)))
         // .thenThrow(new UnsupportedOperationException("cannot do linkeddata lookups

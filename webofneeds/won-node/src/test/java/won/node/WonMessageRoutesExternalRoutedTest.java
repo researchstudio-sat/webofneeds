@@ -2,6 +2,7 @@ package won.node;
 
 import static org.mockito.Matchers.*;
 
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.Date;
 import java.util.Optional;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
+import won.node.springsecurity.acl.WonAclEvalContext;
 import won.node.test.WonMessageRoutesTestHelper;
 import won.protocol.agreement.AgreementProtocolState;
 import won.protocol.message.WonMessage;
@@ -419,7 +421,7 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         toMatcherMockEndpoint.expectedMessageCount(0);
         sendFromOwner(acceptMessage, OWNERAPPLICATION_ID_OWNER2);
         assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
-        RDFDataMgr.write(System.err, Prefixer.setPrefixes(collector.getCollected()), Lang_WON.TRIG_WON_CONVERSATION);
+        printConversationIfDebugging(collector);
         assertCorrectAgreements("Wrong agreement content", collector.getCollected(),
                         collectIntoGraph(contentForProposal.getMessageContent(), proposal.getMessageURI()));
     }
@@ -517,7 +519,7 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         toMatcherMockEndpoint.expectedMessageCount(0);
         sendFromOwner(acceptMessage, OWNERAPPLICATION_ID_OWNER2);
         assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
-        RDFDataMgr.write(System.err, Prefixer.setPrefixes(collector.getCollected()), Lang_WON.TRIG_WON_CONVERSATION);
+        printConversationIfDebugging(collector);
         assertCorrectAgreements("Wrong agreement content", collector.getCollected(),
                         collectIntoGraph(contentForProposal.getMessageContent(), claim.getMessageURI()));
     }
@@ -644,7 +646,7 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         toMatcherMockEndpoint.expectedMessageCount(0);
         sendFromOwner(acceptCancelMessage, OWNERAPPLICATION_ID_OWNER2);
         assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
-        RDFDataMgr.write(System.err, Prefixer.setPrefixes(collector.getCollected()), Lang_WON.TRIG_WON_CONVERSATION);
+        printConversationIfDebugging(collector);
         assertCorrectAgreements("Wrong agreement content", collector.getCollected(), DatasetFactory.createGeneral());
     }
 
@@ -756,7 +758,7 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         toMatcherMockEndpoint.expectedMessageCount(0);
         sendFromOwner(acceptMessage, OWNERAPPLICATION_ID_OWNER2);
         assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
-        RDFDataMgr.write(System.err, Prefixer.setPrefixes(collector.getCollected()), Lang_WON.TRIG_WON_CONVERSATION);
+        printConversationIfDebugging(collector);
         assertCorrectAgreements("Wrong agreement content", collector.getCollected(), DatasetFactory.createGeneral());
     }
 
@@ -853,8 +855,17 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         toMatcherMockEndpoint.expectedMessageCount(0);
         sendFromOwner(rejectMessage, OWNERAPPLICATION_ID_OWNER2);
         assertMockEndpointsSatisfiedAndReset(collector, toOwnerMockEndpoint, toMatcherMockEndpoint);
-        RDFDataMgr.write(System.err, Prefixer.setPrefixes(collector.getCollected()), Lang_WON.TRIG_WON_CONVERSATION);
+        printConversationIfDebugging(collector);
         assertCorrectAgreements("Wrong agreement content", collector.getCollected(), DatasetFactory.createGeneral());
+    }
+
+    public void printConversationIfDebugging(MessageCollector collector) {
+        if (logger.isDebugEnabled()) {
+            StringWriter sw = new StringWriter();
+            RDFDataMgr.write(sw, Prefixer.setPrefixes(collector.getCollected()),
+                            Lang_WON.TRIG_WON_CONVERSATION);
+            logger.debug("wrong agreement content in conversation\n{}", sw.toString());
+        }
     }
 
     private Dataset collectIntoGraph(Dataset ds, URI graphURI) {
@@ -1447,13 +1458,16 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         expectedOutput = RdfUtils.cloneDataset(expectedOutput);
         // check that the computed dataset is the expected one
         Dataset actual = AgreementProtocolState.of(input).getAgreements();
-        // TODO: remove before checking in
         RdfUtils.Pair<Dataset> diff = RdfUtils.diff(expectedOutput, actual);
         if (!(diff.getFirst().isEmpty() && diff.getSecond().isEmpty())) {
-            System.out.println("diff - only in expected:");
-            RDFDataMgr.write(System.out, diff.getFirst(), Lang.TRIG);
-            System.out.println("diff - only in actual:");
-            RDFDataMgr.write(System.out, diff.getSecond(), Lang.TRIG);
+            if (logger.isDebugEnabled()) {
+                StringWriter sw = new StringWriter();
+                RDFDataMgr.write(sw, diff.getFirst(), Lang.TRIG);
+                logger.debug("diff - only in expected: \n{}", sw.toString());
+                sw = new StringWriter();
+                RDFDataMgr.write(sw, diff.getSecond(), Lang.TRIG);
+                logger.debug("diff - only in actual:\n{}", sw.toString());
+            }
         }
         Assert.assertTrue(errormessage, RdfUtils.isIsomorphicWith(expectedOutput, actual));
     }
@@ -1578,7 +1592,8 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         URI groupSocketURI = URI.create(groupAtomURI.toString() + "#groupSocket");
         prepareMockitoStubs(atomURI, socketURI, atomURI2, socketURI2);
         Mockito.when(linkedDataSource.getDataForResource(eq(groupAtomURI)))
-                        .then(x -> linkedDataService.getAtomDataset(groupAtomURI, false, null));
+                        .then(x -> linkedDataService.getAtomDataset(groupAtomURI, false, null,
+                                        WonAclEvalContext.allowAll()));
         WonMessage createAtom1Msg = prepareFromOwner(makeCreateAtomMessage(atomURI,
                         "/won/node/WonMessageRoutesTest/data/test-atom1.ttl"));
         WonMessage createAtom2Msg = prepareFromOwner(makeCreateAtomMessage(atomURI2,
@@ -1681,11 +1696,14 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         URI groupSocketURI = URI.create(groupAtomURI.toString() + "#groupSocket");
         prepareMockitoStubs(atomURI, socketURI, atomURI2, socketURI2);
         Mockito.when(linkedDataSource.getDataForResource(eq(groupAtomURI)))
-                        .then(x -> linkedDataService.getAtomDataset(groupAtomURI, false, null));
+                        .then(x -> linkedDataService.getAtomDataset(groupAtomURI, false, null,
+                                        WonAclEvalContext.allowAll()));
         Mockito.when(linkedDataSource.getDataForResource(eq(atomURI3)))
-                        .then(x -> linkedDataService.getAtomDataset(atomURI3, false, null));
+                        .then(x -> linkedDataService.getAtomDataset(atomURI3, false, null,
+                                        WonAclEvalContext.allowAll()));
         Mockito.when(linkedDataSource.getDataForResource(eq(atomURI4)))
-                        .then(x -> linkedDataService.getAtomDataset(atomURI4, false, null));
+                        .then(x -> linkedDataService.getAtomDataset(atomURI4, false, null,
+                                        WonAclEvalContext.allowAll()));
         WonMessage createAtom1Msg = prepareFromOwner(makeCreateAtomMessage(atomURI,
                         "/won/node/WonMessageRoutesTest/data/test-atom1.ttl"));
         WonMessage createAtom2Msg = prepareFromOwner(makeCreateAtomMessage(atomURI2,

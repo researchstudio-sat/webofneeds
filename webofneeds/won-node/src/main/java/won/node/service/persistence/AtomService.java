@@ -42,11 +42,13 @@ import won.protocol.model.AtomState;
 import won.protocol.model.ConnectionContainer;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.DatasetHolder;
+import won.protocol.model.Lock;
 import won.protocol.model.OwnerApplication;
 import won.protocol.model.Socket;
 import won.protocol.repository.AtomMessageContainerRepository;
 import won.protocol.repository.AtomRepository;
 import won.protocol.repository.ConnectionContainerRepository;
+import won.protocol.repository.LockRepository;
 import won.protocol.repository.MessageEventRepository;
 import won.protocol.repository.OwnerApplicationRepository;
 import won.protocol.repository.SocketRepository;
@@ -67,6 +69,8 @@ public class AtomService {
     SocketRepository socketRepository;
     @Autowired
     OwnerApplicationRepository ownerApplicationRepository;
+    @Autowired
+    LockRepository lockRepository;
     @Autowired
     MessageEventRepository messageEventRepository;
     @Autowired
@@ -153,6 +157,7 @@ public class AtomService {
     }
 
     public Atom createAtom(final WonMessage wonMessage) {
+        acquireOwnerApplicationLock();
         wonMessage.getMessageType().requireType(WonMessageType.CREATE_ATOM);
         Dataset atomContent = wonMessage.getMessageContent();
         List<WonMessage.AttachmentHolder> attachmentHolders = wonMessage.getAttachments();
@@ -426,6 +431,10 @@ public class AtomService {
         atom = atomRepository.save(atom);
         split.stop();
         return atom;
+    }
+
+    private void acquireOwnerApplicationLock() {
+        Lock lock = lockRepository.getOwnerapplicationLock();
     }
 
     public void activate(WonMessage wonMessage) throws NoSuchAtomException {

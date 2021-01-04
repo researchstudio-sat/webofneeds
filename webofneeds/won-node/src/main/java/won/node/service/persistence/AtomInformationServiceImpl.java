@@ -339,15 +339,6 @@ public class AtomInformationServiceImpl implements AtomInformationService {
     }
 
     @Override
-    public Model readAtomContent(final URI atomURI) throws NoSuchAtomException {
-        if (atomURI == null)
-            throw new IllegalArgumentException("atomURI is not set");
-        Atom atom = DataAccessUtils.loadAtom(atomRepository, atomURI);
-        return (atom == null || atom.getState() == AtomState.DELETED) ? ModelFactory.createDefaultModel()
-                        : atom.getDatatsetHolder().getDataset().getDefaultModel();
-    }
-
-    @Override
     public Connection readConnection(final URI connectionURI) throws NoSuchConnectionException {
         if (connectionURI == null)
             throw new IllegalArgumentException("connectionURI is not set");

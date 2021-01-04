@@ -16,4 +16,5 @@
     <bean id="keyPairService" class="won.cryptography.service.KeyPairService" >
         <constructor-arg name="keyInformationExtractor" ref="keyInformationExtractorBouncyCastle"/>
     </bean>
+    <bean id="webIdKeyLoader" class="won.cryptography.rdfsign.WebIdKeyLoader" />
 </beans>

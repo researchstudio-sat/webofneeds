@@ -11,10 +11,12 @@
 package won.protocol.repository;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import java.util.Set;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
@@ -264,4 +266,88 @@ public interface ConnectionRepository extends WonRepository<Connection> {
     Slice<Connection> getConnectionsAfterByActivityDate(@Param("atom") URI atomURI,
                     @Param("resumeDate") Date resumeEventDate, @Param("messageType") WonMessageType messageType,
                     @Param("referenceDate") Date referenceDate, Pageable pageable);
+
+    @Query("select case when (count(con) > 0) then true else false end "
+                    + "from Connection con where con.atomURI = :fromAtom and con.targetAtomURI = :toAtom")
+    boolean existsWithAtomAndTargetAtom(@Param("fromAtom") URI fromAtom, @Param("toAtom") URI toAtom);
+
+    @Query("select case when (count(con) > 0) then true else false end "
+                    + "from Connection con where "
+                    + "con.atomURI = :fromAtom "
+                    + "and con.targetAtomURI = :toAtom "
+                    + "and con.state in :allowedStates ")
+    boolean existsWithAtomAndTargetAtomAndStates(
+                    @Param("fromAtom") URI fromAtom,
+                    @Param("toAtom") URI toAtom,
+                    @Param("allowedStates") Collection<URI> allowedStates);
+
+    @Query("select case when (count(con) > 0) then true else false end "
+                    + "from Connection con where "
+                    + "con.atomURI = :fromAtom "
+                    + "and con.targetAtomURI = :toAtom "
+                    + "and con.typeURI in :allowedSocketTypes ")
+    boolean existsWithAtomAndTargetAtomAndSocketTypes(
+                    @Param("fromAtom") URI fromAtom,
+                    @Param("toAtom") URI toAtom,
+                    @Param("allowedSocketTypes") Collection<URI> allowedSocketTypes);
+
+    @Query("select case when (count(con) > 0) then true else false end "
+                    + "from Connection con where "
+                    + "con.atomURI = :fromAtom "
+                    + "and con.targetAtomURI = :toAtom "
+                    + "and con.socketURI in :allowedSockets ")
+    boolean existsWithAtomAndTargetAtomAndSockets(
+                    @Param("fromAtom") URI fromAtom,
+                    @Param("toAtom") URI toAtom,
+                    @Param("allowedSockets") Collection<URI> allowedSockets);
+
+    @Query("select case when (count(con) > 0) then true else false end "
+                    + "from Connection con where "
+                    + "con.atomURI = :fromAtom "
+                    + "and con.targetAtomURI = :toAtom "
+                    + "and con.state in :allowedStates "
+                    + "and con.typeURI in :allowedSocketTypes ")
+    boolean existsWithAtomAndTargetAtomAndStatesAndSocketTypes(
+                    @Param("fromAtom") URI fromAtom,
+                    @Param("toAtom") URI toAtom,
+                    @Param("allowedStates") Collection<URI> allowedStates,
+                    @Param("allowedSocketTypes") Collection<URI> allowedSocketTypes);
+
+    @Query("select case when (count(con) > 0) then true else false end "
+                    + "from Connection con where "
+                    + "con.atomURI = :fromAtom "
+                    + "and con.targetAtomURI = :toAtom "
+                    + "and con.state in :allowedStates "
+                    + "and con.socketURI in :allowedSockets ")
+    boolean existsWithAtomAndTargetAtomAndStatesAndSockets(
+                    @Param("fromAtom") URI fromAtom,
+                    @Param("toAtom") URI toAtom,
+                    @Param("allowedStates") Collection<URI> allowedStates,
+                    @Param("allowedSockets") Collection<URI> allowedSockets);
+
+    @Query("select case when (count(con) > 0) then true else false end "
+                    + "from Connection con where "
+                    + "con.atomURI = :fromAtom "
+                    + "and con.targetAtomURI = :toAtom "
+                    + "and con.typeURI in :allowedSocketTypes "
+                    + "and con.socketURI in :allowedSockets ")
+    boolean existsWithAtomAndTargetAtomAndSocketTypesAndSockets(
+                    @Param("fromAtom") URI fromAtom,
+                    @Param("toAtom") URI toAtom,
+                    @Param("allowedSocketTypes") Collection<URI> allowedSocketTypes,
+                    @Param("allowedSockets") Collection<URI> allowedSockets);
+
+    @Query("select case when (count(con) > 0) then true else false end "
+                    + "from Connection con where "
+                    + "con.atomURI = :fromAtom "
+                    + "and con.targetAtomURI = :toAtom "
+                    + "and con.state in :allowedStates "
+                    + "and con.typeURI in :allowedSocketTypes "
+                    + "and con.socketURI in :allowedSockets ")
+    boolean existsWithAtomAndTargetAtomAndStatesAndSocketTypesAndSockets(
+                    @Param("fromAtom") URI fromAtom,
+                    @Param("toAtom") URI toAtom,
+                    @Param("allowedStates") Collection<URI> allowedStates,
+                    @Param("allowedSocketTypes") Collection<URI> allowedSocketTypes,
+                    @Param("allowedSockets") Collection<URI> allowedSockets);
 }

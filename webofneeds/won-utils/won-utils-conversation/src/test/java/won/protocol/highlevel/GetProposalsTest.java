@@ -42,6 +42,7 @@ public class GetProposalsTest {
     // This is the case where there are no agreements, that is no predicates from
     // the agreement protocol. The output should be nothing...
     @Test
+    @Ignore
     public void noAgreementsTest() throws IOException {
         Dataset input = loadDataset(inputFolder + "no-agreements.trig");
         Dataset expectedOutput = loadDataset(expectedOutputFolder + "no-agreements.trig");
@@ -51,6 +52,7 @@ public class GetProposalsTest {
     // This is the case where there is one agreement. That is one proposal and one
     // accept making one agreement. The output should be an agreement.
     @Test
+    @Ignore
     public void oneAgreementTest() throws IOException {
         Dataset input = loadDataset(inputFolder + "one-agreement.trig");
         Dataset expectedOutput = loadDataset(expectedOutputFolder + "one-agreement.trig");
@@ -58,6 +60,7 @@ public class GetProposalsTest {
     }
 
     @Test
+    @Ignore
     public void oneAgreementProposalToCancelRetractedTest() throws IOException {
         Dataset input = loadDataset(inputFolder + "one-agreement-proposaltocancel-retracted.trig");
         Dataset expectedOutput = loadDataset(expectedOutputFolder + "one-agreement-proposaltocancel-retracted.trig");
@@ -88,7 +91,6 @@ public class GetProposalsTest {
         expectedOutput = RdfUtils.cloneDataset(expectedOutput);
         // check that the computed dataset is the expected one
         Dataset actual = AgreementProtocolState.of(input).getAgreements();
-        // TODO: remove before checking in
         RdfUtils.Pair<Dataset> diff = RdfUtils.diff(expectedOutput, actual);
         if (!(diff.getFirst().isEmpty() && diff.getSecond().isEmpty())) {
             System.out.println("diff - only in expected:");

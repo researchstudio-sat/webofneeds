@@ -19,6 +19,7 @@ import org.apache.jena.rdf.model.Model;
 import org.springframework.context.NoSuchMessageException;
 
 import won.node.service.persistence.AtomInformationService;
+import won.node.springsecurity.acl.WonAclEvalContext;
 import won.protocol.exception.NoSuchAtomException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessageType;
@@ -353,9 +354,11 @@ public interface LinkedDataService {
      *
      * @param atomUri
      * @param etag
+     * @param wonAclEvalContext
      * @return dataset with etag describing the atom or null if not found
      */
-    DataWithEtag<Dataset> getAtomDataset(final URI atomUri, String etag);
+    DataWithEtag<Dataset> getAtomDataset(final URI atomUri, String etag,
+                    WonAclEvalContext wonAclEvalContext);
 
     Dataset getAtomDatasetForFilter(final URI atomUri);
 
@@ -368,10 +371,12 @@ public interface LinkedDataService {
      * events' datasets
      * @param deepLayerSize - number of connections and events to include in the
      * deep atom dataset
+     * @param wonAclEvalContext
      * @return
      * @throws NoSuchAtomException
      */
-    Dataset getAtomDataset(final URI atomUri, final boolean deep, final Integer deepLayerSize)
+    Dataset getAtomDataset(final URI atomUri, final boolean deep, final Integer deepLayerSize,
+                    WonAclEvalContext wonAclEvalContext)
                     throws NoSuchAtomException, NoSuchConnectionException, NoSuchMessageException;
 
     /**

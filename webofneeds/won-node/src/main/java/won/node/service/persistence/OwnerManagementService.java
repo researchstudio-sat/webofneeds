@@ -13,7 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import won.protocol.model.Lock;
 import won.protocol.model.OwnerApplication;
+import won.protocol.repository.LockRepository;
 import won.protocol.repository.OwnerApplicationRepository;
 import won.protocol.service.ApplicationManagementService;
 
@@ -26,11 +28,14 @@ public class OwnerManagementService implements ApplicationManagementService {
     @Autowired
     private OwnerApplicationRepository ownerApplicationRepository;
     @Autowired
+    private LockRepository lockRepository;
+    @Autowired
     private CamelContext camelContext;
 
     @Override
     public String registerOwnerApplication(String ownerApplicationId) {
-        logger.debug("ownerApplicationId: " + ownerApplicationId.toString());
+        logger.debug("about to register ownerApplicationId: {}", ownerApplicationId);
+        Lock lock = lockRepository.getOwnerapplicationLock();
         Optional<OwnerApplication> ownerApplication = ownerApplicationRepository
                         .findOneByOwnerApplicationId(ownerApplicationId);
         if (!ownerApplication.isPresent()) {

@@ -21,6 +21,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -31,10 +33,8 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
@@ -59,11 +59,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.HandlerMapping;
-
 import won.cryptography.service.RegistrationServer;
 import won.node.service.linkeddata.generate.LinkedDataService;
 import won.node.service.nodeconfig.URIService;
 import won.node.service.persistence.AtomInformationService;
+import won.node.springsecurity.acl.WonAclRequestHelper;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.exception.NoSuchAtomException;
 import won.protocol.exception.NoSuchConnectionException;
@@ -159,13 +159,18 @@ public class LinkedDataWebController implements InitializingBean {
 
     // webmvc controller method
     @RequestMapping("${uri.path.page}/atom/{identifier}")
-    public String showAtomPage(@PathVariable String identifier, Model model, HttpServletResponse response) {
+    public String showAtomPage(@PathVariable String identifier, Model model,
+                    HttpServletRequest request,
+                    HttpServletResponse response) {
         URI atomURI = uriService.createAtomURIForId(identifier);
-        Dataset rdfDataset = linkedDataService.getAtomDataset(atomURI, null).getData();
+        Dataset rdfDataset = linkedDataService
+                        .getAtomDataset(atomURI, null, WonAclRequestHelper.getWonAclEvaluationContext(request))
+                        .getData();
         if (rdfDataset == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "notFoundView";
         }
+        // TODO AUTH: extract acl graph and interpret
         model.addAttribute("rdfDataset", rdfDataset);
         model.addAttribute("resourceURI", atomURI.toString());
         model.addAttribute("dataURI", uriService.toDataURIIfPossible(atomURI).toString());
@@ -184,11 +189,16 @@ public class LinkedDataWebController implements InitializingBean {
      */
     // webmvc controller method
     @RequestMapping("${uri.path.page}/atom/{identifier}/deep")
-    public String showDeepAtomPage(@PathVariable String identifier, Model model, HttpServletResponse response,
+    public String showDeepAtomPage(@PathVariable String identifier, Model model,
+                    HttpServletRequest request, HttpServletResponse response,
                     @RequestParam(value = "layer-size", required = false) Integer layerSize) {
         try {
             URI atomURI = uriService.createAtomURIForId(identifier);
-            Dataset rdfDataset = linkedDataService.getAtomDataset(atomURI, true, layerSize);
+            Dataset rdfDataset = linkedDataService.getAtomDataset(atomURI, true, layerSize,
+                            WonAclRequestHelper.getWonAclEvaluationContext(request));
+            // TODO AUTH: extract acl graph and interpret
+            // TODO AUTH: Research how to handle lower layers
+            logger.warn("TODO: apply ACLs to atom/{identifier}/deep request!");
             model.addAttribute("rdfDataset", rdfDataset);
             model.addAttribute("resourceURI", atomURI.toString());
             model.addAttribute("dataURI", uriService.toDataURIIfPossible(atomURI).toString());
@@ -297,6 +307,8 @@ public class LinkedDataWebController implements InitializingBean {
     @RequestMapping("${uri.path.page}/attachment/{identifier}")
     public String showAttachmentPage(@PathVariable(value = "identifier") String identifier, Model model,
                     HttpServletResponse response) {
+        // TODO AUTH: load atom dataset
+        // TODO AUTH: extract acl graph and interpret
         URI attachmentURI = uriService.createAttachmentURIForId(identifier);
         return createDatasetResponse(model, response, attachmentURI);
     }
@@ -453,6 +465,7 @@ public class LinkedDataWebController implements InitializingBean {
         return "rdfDatasetView";
     }
 
+    // TODO AUTH Check if we can safely delete this
     // webmvc controller method
     @RequestMapping("${uri.path.page}/connection")
     public String showConnectionURIListPage(@RequestParam(value = "p", required = false) Integer page,
@@ -517,6 +530,7 @@ public class LinkedDataWebController implements InitializingBean {
                     Model model, HttpServletResponse response) {
         URI atomURI = uriService.createAtomURIForId(identifier);
         try {
+            // TODO: post-filter returned connections
             ConnectionState connectionState = getConnectionState(state);
             DateParameter dateParam = new DateParameter(timestamp);
             WonMessageType eventsType = getMessageType(type);
@@ -719,6 +733,7 @@ public class LinkedDataWebController implements InitializingBean {
         return preferedSize;
     }
 
+    // TODO AUTH: check if we can safely delete this method
     @RequestMapping(value = "${uri.path.data}/connection", method = RequestMethod.GET, produces = {
                     "application/ld+json", "application/trig", "application/n-quads" })
     public ResponseEntity<Dataset> listConnectionURIs(HttpServletRequest request,
@@ -825,7 +840,8 @@ public class LinkedDataWebController implements InitializingBean {
 
             @Override
             public DataWithEtag<Dataset> loadDataWithEtag(final URI uri, final String etag) {
-                return linkedDataService.getAtomDataset(uri, etag);
+                return linkedDataService.getAtomDataset(uri, etag,
+                                WonAclRequestHelper.getWonAclEvaluationContext(request));
             }
 
             @Override
@@ -885,7 +901,8 @@ public class LinkedDataWebController implements InitializingBean {
         logger.debug("readAtom() called");
         URI atomUri = URI.create(this.atomResourceURIPrefix + "/" + identifier);
         try {
-            Dataset dataset = linkedDataService.getAtomDataset(atomUri, true, layerSize);
+            Dataset dataset = linkedDataService.getAtomDataset(atomUri, true, layerSize,
+                            WonAclRequestHelper.getWonAclEvaluationContext(request));
             // TODO: atom information does change over time. The immutable atom information
             // should never expire, the mutable should
             HttpHeaders headers = new HttpHeaders();
@@ -894,6 +911,18 @@ public class LinkedDataWebController implements InitializingBean {
         } catch (NoSuchAtomException | NoSuchConnectionException | NoSuchMessageException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @RequestMapping(value = "${uri.path.resource}/atom/{identifier}/token", method = RequestMethod.GET, produces = {
+                    "application/json" })
+    public ResponseEntity<Collection<String>> requestToken(
+                    HttpServletRequest request,
+                    @RequestParam String scopes) {
+        Set<String> tokens = WonAclRequestHelper.getGrantedTokens(request);
+        if (tokens != null) {
+            return new ResponseEntity<Collection<String>>(tokens, HttpStatus.OK);
+        }
+        return new ResponseEntity<Collection<String>>(Collections.emptySet(), HttpStatus.NO_CONTENT);
     }
 
     @RequestMapping(value = "${uri.path.data}", method = RequestMethod.GET, produces = { "application/ld+json",
@@ -1159,6 +1188,8 @@ public class LinkedDataWebController implements InitializingBean {
                     @RequestParam(value = "timeof", required = false) String timestamp,
                     @RequestParam(value = "state", required = false) String state) {
         logger.debug("readConnectionsOfAtom() called");
+        // TODO: pass aclevaluator and operationRequest down to linkeddataservice as an
+        // additional filter
         URI atomUri = uriService.createAtomURIForId(identifier);
         Dataset rdfDataset;
         HttpHeaders headers = new HttpHeaders();
