@@ -41,7 +41,7 @@
               <policyEntries>
               	<!-- producer flow control causes congestion in our setting. disable and discard pending messages -->
               	<!-- decided after reviewing https://access.redhat.com/documentation/en-US/Fuse_ESB_Enterprise/7.1/html-single/ActiveMQ_Tuning_Guide/index.html -->
-              	<policyEntry topic=">" producerFlowControl="false" memoryLimit="10mb" optimizedDispatch="true" queuePrefetch="1" useCache="false" expireMessagesPeriod="10" gcInactiveDestinations="true" inactiveTimoutBeforeGC="30000">
+              	<policyEntry topic=">" producerFlowControl="false" memoryLimit="10mb" optimizedDispatch="true" queuePrefetch="1" useCache="false" expireMessagesPeriod="30000" gcInactiveDestinations="true" inactiveTimoutBeforeGC="30000">
               		<pendingMessageLimitStrategy>
                     	<constantPendingMessageLimitStrategy limit="10"/>
                   	</pendingMessageLimitStrategy>
@@ -54,7 +54,7 @@
 						<sharedDeadLetterStrategy processExpired="false"/>
 			         </deadLetterStrategy>
               	</policyEntry>
-              	<policyEntry queue=">" producerFlowControl="false" memoryLimit="10mb" optimizedDispatch="true" queuePrefetch="1" useCache="false" expireMessagesPeriod="10" gcInactiveDestinations="true" inactiveTimoutBeforeGC="30000">
+              	<policyEntry queue=">" producerFlowControl="false" memoryLimit="10mb" optimizedDispatch="true" queuePrefetch="1" useCache="false" expireMessagesPeriod="30000" gcInactiveDestinations="true" inactiveTimoutBeforeGC="30000">
               		<pendingMessageLimitStrategy>
                     	<constantPendingMessageLimitStrategy limit="10"/> 
                   	</pendingMessageLimitStrategy>
