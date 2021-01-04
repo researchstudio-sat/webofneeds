@@ -72,6 +72,13 @@
                 <entry key="hibernate.integrator_provider">
                     <bean class="won.protocol.model.parentaware.ParentAwareIntegratorProvider" />
                 </entry>
+                <!--
+                    tried to reduce the >30s init time at startup by setting this to false and getting
+                    the settings right, but aborted that attempt after some time.
+                    Never got past `SchemaManagementException: Schema-validation: missing table [public.ATOM_OWNERAPP]`
+                    Seems related to hibernate's PhysicalNamingStrategy and ImplicitNamingStrategy.
+                 -->
+                <entry key="hibernate.temp.use_jdbc_metadata_defaults" value="true" />
             </map>
         </property>
     </bean>
