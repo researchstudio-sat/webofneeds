@@ -6,7 +6,7 @@ set -o nounset
 source ${script_path}/setenv.sh
 if (${setup_ok})
 then
-  "${script_path}"/setup-postgres-volume.sh
+  "${script_path}"/setup-volumes.sh
   ## start the containers
   echo "Starting environment based on docker-compose env var COMPOSE_FILE=${COMPOSE_FILE}"
   docker-compose up -d

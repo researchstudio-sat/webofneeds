@@ -17,7 +17,7 @@ mvn -Pskip-tests install
 ```
 
 When starting for the first time, run the `deploy.sh`bash script:
-It will create a volume for the postgres container (required)
+It will create a volume for the mongodb and postgres container (required)
 ```
 ./deploy.sh
 ```
@@ -50,5 +50,5 @@ docker-compose restart wonnode
 ### Docker Sharing options 
 * Under Windows, docker isn't very stable when sharing many directories. It's easier to just share the whole webofneeds direcory with docker than to share the individual mounts.
 ### Keeping data across restarts
-* By default, postgres and bigdata use volumes and keep their data. This can be disabled by commenting out the `volumes` keys in docker-compose.yml
+* By default, mongodb, postgres and bigdata use volumes and keep their data. This can be disabled by commenting out the `volumes` keys in docker-compose.yml
 NOTE: there is only *one* postgres volume, even if you run this environment in multiple base folders. 

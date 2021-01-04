@@ -35,7 +35,8 @@ RUN ${DEV_MODE} && sed -i \
 "${catalina.base}/won/override-classes/won-node",\
 "${catalina.base}/won/libs/*.jar"\
 |g' \
-/usr/local/tomcat/conf/catalina.properties
+/usr/local/tomcat/conf/catalina.properties \
+|| echo " ---| Step skipped (DEV_MODE=${DEV_MODE})"
 
 
 # uncomment the following line to access tomcat manager with admin user
@@ -51,14 +52,19 @@ RUN unzip /usr/local/tomcat/webapps/won.war -d /usr/local/tomcat/webapps/won
 RUN rm /usr/local/tomcat/webapps/won.war
 
 ## if DEV_MODE=true, remove all won dependency jars (we mount the respective class files into the container)
-RUN ${DEV_MODE} && rm /usr/local/tomcat/webapps/won/WEB-INF/lib/won-auth*.jar \
+RUN ${DEV_MODE} \
+&& rm /usr/local/tomcat/webapps/won/WEB-INF/lib/won-auth*.jar \
                       /usr/local/tomcat/webapps/won/WEB-INF/lib/won-utils-shacl2java*.jar \
                       /usr/local/tomcat/webapps/won/WEB-INF/lib/won-core*.jar \
                       /usr/local/tomcat/webapps/won/WEB-INF/lib/won-vocab*.jar \
                       /usr/local/tomcat/webapps/won/WEB-INF/lib/won-cryptography*.jar \
-                      /usr/local/tomcat/webapps/won/WEB-INF/lib/won-node*.jar
-RUN ${DEV_MODE} && mkdir -p /usr/local/tomcat/won/libs
-RUN ${DEV_MODE} && mv /usr/local/tomcat/webapps/won/WEB-INF/lib/* /usr/local/tomcat/won/libs
+                      /usr/local/tomcat/webapps/won/WEB-INF/lib/won-node*.jar \
+|| echo " ---| Step skipped (DEV_MODE=${DEV_MODE})"
+
+RUN ${DEV_MODE} \
+&& mkdir -p /usr/local/tomcat/won/libs \
+&& mv /usr/local/tomcat/webapps/won/WEB-INF/lib/* /usr/local/tomcat/won/libs \
+|| echo " ---| Step skipped (DEV_MODE=${DEV_MODE})"
 
 # add the bouncy castle libraries to the jre as well as to the java.security config (we need them in the jre, only tomcat lib folder doesn't work)
 ADD ./required-libs/* /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/

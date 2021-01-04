@@ -25,17 +25,23 @@ ARG DEV_MODE=false
 ## and restart the container
 ## Note: this is connected to the many volume mounts in deploy/local_build/docker-compose.xml
 ## for owner and wonnode
-RUN ${DEV_MODE} && sed -i \
+RUN ${DEV_MODE} \
+&& sed -i \
 -e 's|^\(shared\.loader.*\)|\1,\
-"${catalina.base}/won/override-classes/won-auth",\
-"${catalina.base}/won/override-classes/won-utils-shacl2java",\
+"${catalina.base}/won/override-classes/won-owner",\
+"${catalina.base}/won/override-classes/won-owner-webapp",\
 "${catalina.base}/won/override-classes/won-core",\
 "${catalina.base}/won/override-classes/won-vocab",\
 "${catalina.base}/won/override-classes/won-cryptography",\
-"${catalina.base}/won/override-classes/won-node",\
+"${catalina.base}/won/override-classes/won-matcher",\
+"${catalina.base}/won/override-classes/won-utils-mail",\
+"${catalina.base}/won/override-classes/won-utils-goals",\
+"${catalina.base}/won/override-classes/won-utils-conversation",\
+"${catalina.base}/won/override-classes/won-utils-batch",\
 "${catalina.base}/won/libs/*.jar"\
 |g' \
-/usr/local/tomcat/conf/catalina.properties
+/usr/local/tomcat/conf/catalina.properties \
+|| echo " ---| Step skipped (DEV_MODE=${DEV_MODE})"
 
 # uncomment the following line to access tomcat manager with admin user
 #ADD ./tomcat-users.xml /usr/local/tomcat/conf/
@@ -51,18 +57,20 @@ RUN rm /usr/local/tomcat/webapps/owner.war
 
 
 ## if DEV_MODE=true, remove all won dependency jars (we mount the respective class files into the container)
-RUN ${DEV_MODE} && rm /usr/local/tomcat/webapps/won/WEB-INF/lib/won-owner*.jar \
-                      /usr/local/tomcat/webapps/won/WEB-INF/lib/won-core*.jar \
-                      /usr/local/tomcat/webapps/won/WEB-INF/lib/won-vocab*.jar \
-                      /usr/local/tomcat/webapps/won/WEB-INF/lib/won-cryptography*.jar \
-                      /usr/local/tomcat/webapps/won/WEB-INF/lib/won-matcher*.jar \
-                      /usr/local/tomcat/webapps/won/WEB-INF/lib/won-utils-mail*.jar \
-                      /usr/local/tomcat/webapps/won/WEB-INF/lib/won-utils-goals*.jar \
-                      /usr/local/tomcat/webapps/won/WEB-INF/lib/won-utils-conversation*.jar \
-                      /usr/local/tomcat/webapps/won/WEB-INF/lib/won-utils-batch*.jar
-RUN ${DEV_MODE} && mkdir -p /usr/local/tomcat/won/libs
-RUN ${DEV_MODE} && mv /usr/local/tomcat/webapps/won/WEB-INF/lib/* /usr/local/tomcat/won/libs
-RUN ${DEV_MODE} && rm -f /usr/local/tomcat/webapps/won/WEB-INF/classes/*
+RUN ${DEV_MODE} \
+&& rm /usr/local/tomcat/webapps/owner/WEB-INF/lib/won-owner*.jar \
+      /usr/local/tomcat/webapps/owner/WEB-INF/lib/won-core*.jar \
+      /usr/local/tomcat/webapps/owner/WEB-INF/lib/won-vocab*.jar \
+      /usr/local/tomcat/webapps/owner/WEB-INF/lib/won-cryptography*.jar \
+      /usr/local/tomcat/webapps/owner/WEB-INF/lib/won-matcher*.jar \
+      /usr/local/tomcat/webapps/owner/WEB-INF/lib/won-utils-mail*.jar \
+      /usr/local/tomcat/webapps/owner/WEB-INF/lib/won-utils-goals*.jar \
+      /usr/local/tomcat/webapps/owner/WEB-INF/lib/won-utils-conversation*.jar \
+      /usr/local/tomcat/webapps/owner/WEB-INF/lib/won-utils-batch*.jar \
+|| echo " ---| Step skipped (DEV_MODE=${DEV_MODE})"
+RUN ${DEV_MODE} && mkdir -p /usr/local/tomcat/won/libs || echo " ---| Step skipped (DEV_MODE=${DEV_MODE})"
+RUN ${DEV_MODE} && mv /usr/local/tomcat/webapps/owner/WEB-INF/lib/* /usr/local/tomcat/won/libs  || echo " ---| Step skipped (DEV_MODE=${DEV_MODE})"
+RUN ${DEV_MODE} && rm -rf /usr/local/tomcat/webapps/owner/WEB-INF/classes/*  || echo " ---| Step skipped (DEV_MODE=${DEV_MODE})"
 
 # add the bouncy castle libraries to the jre as well as to the java.security config (we need them in the jre, only tomcat lib folder doesn't work)
 ADD ./required-libs/* /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/

@@ -5,7 +5,9 @@
 # this is the workaround from
 # https://forums.docker.com/t/trying-to-get-postgres-to-work-on-persistent-windows-mount-two-issues/12456/5?u=friism
 # (see also 'volumes' section in docker-compose.yml)
-echo "creating posgres volume"
+echo "creating posgres-data volume"
 docker volume create --name postgres-data -d local
+echo "creating mongodb-data volume"
+docker volume create --name mongodb-data -d local
 echo -e "listing volumes:\n\n"
 docker volume ls
