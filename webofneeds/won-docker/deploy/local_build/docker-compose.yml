@@ -1,4 +1,13 @@
 version: "3"
+# CONFIGURATION:
+#
+# By default, this config assumes that docker-compose is run
+# in the `webofneeds/webofneeds/won-docker/deploy/local_build` folder. If this is not the case,
+# the following two environment variables have to be set
+#
+# ${base_folder:-.}: the directory to be used for volumes and temp files
+# ${WON_GIT_REPO:-./../../../..}: the base directory that the webofneeds project was cloned into
+
 services:
   # create self-signed server certificate for $deploy_host
   gencert:
@@ -8,7 +17,7 @@ services:
       - "CN=wonnode"
       - "PASS=pass:changeit"
     volumes:
-      - $base_folder/won-server-certs:/usr/local/certs/out/
+      - ${base_folder:-.}/won-server-certs:/usr/local/certs/out/
 
   # portsgres atom databases for owner and wonnode
   postgres:
@@ -18,7 +27,7 @@ services:
     environment:
       - "PGDATA=/var/lib/postgresql/data/pgdata"
     volumes:
-      #- $base_folder/postgres/data/pgdata:/var/lib/postgresql/data/pgdata
+      #- ${base_folder:-.}/postgres/data/pgdata:/var/lib/postgresql/data/pgdata
       # use a named volume here to work around a postgres/docker incompatibility under windows
       # (see end of file)
       - postgres-data:/var/lib/postgresql/data/pgdata
@@ -50,15 +59,15 @@ services:
       - "61617:61617"
       - "62001:62001"
     volumes:
-      - $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/
-      - $base_folder/won-client-certs/wonnode:/usr/local/tomcat/won/client-certs/
-      - $base_folder/logback-config:/usr/local/tomcat/won/logback-config/
-      - $base_folder/../../../won-auth/target/classes:/usr/local/tomcat/won/override-classes/won-auth
-      - $base_folder/../../../won-utils/won-utils-shacl2java/target/classes:/usr/local/tomcat/won/override-classes/won-utils-shacl2java
-      - $base_folder/../../../won-core/target/classes:/usr/local/tomcat/won/override-classes/won-core
-      - $base_folder/../../../won-vocab/target/classes:/usr/local/tomcat/won/override-classes/won-vocab
-      - $base_folder/../../../won-cryptography/target/classes:/usr/local/tomcat/won/override-classes/won-cryptography
-      - $base_folder/../../../won-node/target/classes:/usr/local/tomcat/won/override-classes/won-node
+      - ${base_folder:-.}/won-server-certs:/usr/local/tomcat/conf/ssl/
+      - ${base_folder:-.}/won-client-certs/wonnode:/usr/local/tomcat/won/client-certs/
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-docker/deploy/local_build/logback-config:/usr/local/tomcat/won/logback-config/
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-auth/target/classes:/usr/local/tomcat/won/override-classes/won-auth
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-utils/won-utils-shacl2java/target/classes:/usr/local/tomcat/won/override-classes/won-utils-shacl2java
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-core/target/classes:/usr/local/tomcat/won/override-classes/won-core
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-vocab/target/classes:/usr/local/tomcat/won/override-classes/won-vocab
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-cryptography/target/classes:/usr/local/tomcat/won/override-classes/won-cryptography
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-node/target/classes:/usr/local/tomcat/won/override-classes/won-node
     depends_on:
       - postgres
 
@@ -74,7 +83,7 @@ services:
       - "27017:27017"
       - "28017:28017"
     volumes:
-      - $base_folder/mongodb/data/db:/data/db
+      - ${base_folder:-.}/mongodb/data/db:/data/db
 
 # debug bot used to test atom communication
 #  debug_bot:
@@ -118,19 +127,19 @@ services:
       - "8082:8443"
       - "62000:62000"
     volumes:
-      - $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/
-      - $base_folder/won-client-certs/owner:/usr/local/tomcat/won/client-certs/
-      - $base_folder/logback-config:/usr/local/tomcat/won/logback-config/
-      - $base_folder/../../../won-owner-webapp/target/classes:/usr/local/tomcat/won/override-classes/won-owner-webapp/
-      - $base_folder/../../../won-owner/target/classes:/usr/local/tomcat/won/override-classes/won-owner/
-      - $base_folder/../../../won-core/target/classes:/usr/local/tomcat/won/override-classes/won-core/
-      - $base_folder/../../../won-vocab/target/classes:/usr/local/tomcat/won/override-classes/won-vocab/
-      - $base_folder/../../../won-cryptography/target/classes:/usr/local/tomcat/won/override-classes/won-cryptography/
-      - $base_folder/../../../won-matcher/target/classes:/usr/local/tomcat/won/override-classes/won-matcher/
-      - $base_folder/../../../won-utils/won-utils-mail/target/classes:/usr/local/tomcat/won/override-classes/won-utils-mail
-      - $base_folder/../../../won-utils/won-utils-goals/target/classes:/usr/local/tomcat/won/override-classes/won-utils-goals
-      - $base_folder/../../../won-utils/won-utils-conversation/target/classes:/usr/local/tomcat/won/override-classes/won-utils-conversation
-      - $base_folder/../../../won-utils/won-utils-batch/target/classes:/usr/local/tomcat/won/override-classes/won-utils-batch
+      - ${base_folder:-.}/won-server-certs:/usr/local/tomcat/conf/ssl/
+      - ${base_folder:-.}/won-client-certs/owner:/usr/local/tomcat/won/client-certs/
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-docker/deploy/local_build/logback-config:/usr/local/tomcat/won/logback-config/
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-owner-webapp/target/classes:/usr/local/tomcat/won/override-classes/won-owner-webapp/
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-owner/target/classes:/usr/local/tomcat/won/override-classes/won-owner/
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-core/target/classes:/usr/local/tomcat/won/override-classes/won-core/
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-vocab/target/classes:/usr/local/tomcat/won/override-classes/won-vocab/
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-cryptography/target/classes:/usr/local/tomcat/won/override-classes/won-cryptography/
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-matcher/target/classes:/usr/local/tomcat/won/override-classes/won-matcher/
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-utils/won-utils-mail/target/classes:/usr/local/tomcat/won/override-classes/won-utils-mail
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-utils/won-utils-goals/target/classes:/usr/local/tomcat/won/override-classes/won-utils-goals
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-utils/won-utils-conversation/target/classes:/usr/local/tomcat/won/override-classes/won-utils-conversation
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-utils/won-utils-batch/target/classes:/usr/local/tomcat/won/override-classes/won-utils-batch
     depends_on:
       - wonnode
       - postgres
@@ -140,7 +149,7 @@ services:
     restart: always
     build: ../../image/bigdata
     volumes:
-      - $base_folder/bigdata/data/:/usr/src/bigdata/data
+      - ${base_folder:-.}/bigdata/data/:/usr/src/bigdata/data
     ports:
       - "10000:9999"
 
@@ -170,8 +179,8 @@ services:
     restart: always
     image: webofneeds/solr:live
     #volumes:
-    #  - $base_folder/solr/won/data:/opt/solr/server/solr/won/data
-    #  - $base_folder/solr/wontest/data:/opt/solr/server/solr/wontest/data
+    #  - ${base_folder:-.}/solr/won/data:/opt/solr/server/solr/won/data
+    #  - ${base_folder:-.}/solr/wontest/data:/opt/solr/server/solr/wontest/data
     ports:
       - "8984:8983"
 
@@ -217,7 +226,7 @@ services:
     depends_on:
       - matcher_service
     volumes:
-      - $base_folder/won-client-certs/matcher_sparql:/usr/src/matcher-sparql/client-certs/
+      - ${base_folder:-.}/won-client-certs/matcher_sparql:/usr/src/matcher-sparql/client-certs/
 
 # postgres has trouble to just use normal volume mount (must be created by same user as
 # the one executing postgres)
