@@ -17,15 +17,21 @@ services:
     #image: webofneeds/postgres:live
     environment:
       - "PGDATA=/var/lib/postgresql/data/pgdata"
-    #volumes:
-    #  - $base_folder/postgres/data/pgdata:/var/lib/postgresql/data/pgdata
+    volumes:
+      #- $base_folder/postgres/data/pgdata:/var/lib/postgresql/data/pgdata
+      # use a named volume here to work around a postgres/docker incompatibility under windows
+      # (see end of file)
+      - postgres-data:/var/lib/postgresql/data/pgdata
     ports:
       - "5433:5432"
 
   # wonnode server => access https://$deploy_host:8889/won
   wonnode:
     restart: always
-    build: ../../image/wonnode
+    build:
+      context: ../../image/wonnode
+      args:
+        DEV_MODE: "true"
     #image: webofneeds/wonnode:live
     environment:
       - "uri.host=wonnode"
@@ -37,12 +43,22 @@ services:
       - "db.ddl.strategy=validate"
       - "CERTIFICATE_PASSWORD=changeit"
       - "activemq.broker.port=61617"
+      - "LOGBACK_CONFIG=../logback-config/logback.xml"
+      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62001,server=y,suspend=n"
     ports:
       - "8889:8443"
       - "61617:61617"
+      - "62001:62001"
     volumes:
       - $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/
       - $base_folder/won-client-certs/wonnode:/usr/local/tomcat/won/client-certs/
+      - $base_folder/logback-config:/usr/local/tomcat/won/logback-config/
+      - $base_folder/../../../won-auth/target/classes:/usr/local/tomcat/won/override-classes/won-auth
+      - $base_folder/../../../won-utils/won-utils-shacl2java/target/classes:/usr/local/tomcat/won/override-classes/won-utils-shacl2java
+      - $base_folder/../../../won-core/target/classes:/usr/local/tomcat/won/override-classes/won-core
+      - $base_folder/../../../won-vocab/target/classes:/usr/local/tomcat/won/override-classes/won-vocab
+      - $base_folder/../../../won-cryptography/target/classes:/usr/local/tomcat/won/override-classes/won-cryptography
+      - $base_folder/../../../won-node/target/classes:/usr/local/tomcat/won/override-classes/won-node
     depends_on:
       - postgres
 
@@ -60,7 +76,7 @@ services:
     volumes:
       - $base_folder/mongodb/data/db:/data/db
 
-  # debug bot used to test atom communication
+# debug bot used to test atom communication
 #  debug_bot:
 #    restart: always
 #    build: ../../image/bots
@@ -95,12 +111,26 @@ services:
       - "db.sql.password=won"
       - "db.ddl.strategy=validate"
       - "CERTIFICATE_PASSWORD=changeit"
-      - "LOGBACK_CONFIG=logback_debug.xml"
+      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62000,server=y,suspend=n"
+      #- "logback.configurationFile=/usr/local/tomcat/won/logback-config/logback.xml"
+      - "LOGBACK_CONFIG=../logback-config/logback.xml"
     ports:
       - "8082:8443"
+      - "62000:62000"
     volumes:
       - $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/
       - $base_folder/won-client-certs/owner:/usr/local/tomcat/won/client-certs/
+      - $base_folder/logback-config:/usr/local/tomcat/won/logback-config/
+      - $base_folder/../../../won-owner-webapp/target/classes:/usr/local/tomcat/won/override-classes/won-owner-webapp/
+      - $base_folder/../../../won-owner/target/classes:/usr/local/tomcat/won/override-classes/won-owner/
+      - $base_folder/../../../won-core/target/classes:/usr/local/tomcat/won/override-classes/won-core/
+      - $base_folder/../../../won-vocab/target/classes:/usr/local/tomcat/won/override-classes/won-vocab/
+      - $base_folder/../../../won-cryptography/target/classes:/usr/local/tomcat/won/override-classes/won-cryptography/
+      - $base_folder/../../../won-matcher/target/classes:/usr/local/tomcat/won/override-classes/won-matcher/
+      - $base_folder/../../../won-utils/won-utils-mail/target/classes:/usr/local/tomcat/won/override-classes/won-utils-mail
+      - $base_folder/../../../won-utils/won-utils-goals/target/classes:/usr/local/tomcat/won/override-classes/won-utils-goals
+      - $base_folder/../../../won-utils/won-utils-conversation/target/classes:/usr/local/tomcat/won/override-classes/won-utils-conversation
+      - $base_folder/../../../won-utils/won-utils-batch/target/classes:/usr/local/tomcat/won/override-classes/won-utils-batch
     depends_on:
       - wonnode
       - postgres
@@ -109,8 +139,8 @@ services:
   bigdata:
     restart: always
     build: ../../image/bigdata
-    #volumes:
-    #  - $base_folder/bigdata/data/:/usr/src/bigdata/data
+    volumes:
+      - $base_folder/bigdata/data/:/usr/src/bigdata/data
     ports:
       - "10000:9999"
 
@@ -120,11 +150,15 @@ services:
     build: ../../image/matcher-service
     #image: webofneeds/matcher_service:live
     environment:
-      - "node.host=wonnode"
-      - "cluster.seedNodes=localhost:2561"
+      - "node.host=matcherservice"
+      - "cluster.seedNodes=matcherservice:2561"
       - "uri.sparql.endpoint=http://bigdata:9999/blazegraph/namespace/kb/sparql"
       - "wonNodeController.wonNode.crawl=https://wonnode:8443/won/resource"
       - "cluster.local.port=2561"
+    networks:
+      default:
+        aliases:
+          - matcherservice
     ports:
       - "2561:2561"
     depends_on:
@@ -147,11 +181,15 @@ services:
     build: ../../image/matcher-solr
     #image: webofneeds/matcher_solr:live
     environment:
-      - "node.host=wonnode"
-      - "cluster.seedNodes=matcher_service:2561"
+      - "node.host=matchersolr"
+      - "cluster.seedNodes=matcherservice:2561"
       - "cluster.local.port=2562"
       - "matcher.solr.uri.solr.server=http://solr:8983/solr/"
       - "matcher.solr.uri.solr.server.public=http://solr:8983/solr/"
+    networks:
+      default:
+        aliases:
+          - matchersolr
     ports:
       - "2562:2562"
     depends_on:
@@ -164,15 +202,28 @@ services:
     build: ../../image/matcher-sparql
     image: webofneeds/matcher_sparql:int
     environment:
-      - "node.host=wonnode"
-      - "cluster.seedNodes=matcher_service:2561"
+      - "node.host=matchersparql"
+      - "cluster.seedNodes=matcherservice:2561"
       - "cluster.local.port=2564"
       - "matcher.sparql.uri.sparql.endpoint=http://bigdata:9999/blazegraph/namespace/kb/sparql"
-      - "matcher.sparql.uri.public=http://matcher_sparql/sparql/"
+      - "matcher.sparql.uri.public=http://matchersparql/sparql/"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+    networks:
+      default:
+        aliases:
+          - matchersparql
     ports:
       - "2564:2564"
     depends_on:
       - matcher_service
     volumes:
       - $base_folder/won-client-certs/matcher_sparql:/usr/src/matcher-sparql/client-certs/
+
+# postgres has trouble to just use normal volume mount (must be created by same user as
+# the one executing postgres)
+# this is the workaround from
+# https://forums.docker.com/t/trying-to-get-postgres-to-work-on-persistent-windows-mount-two-issues/12456/5?u=friism
+# (see also setenv.sh)
+volumes:
+  postgres-data:
+    external: true

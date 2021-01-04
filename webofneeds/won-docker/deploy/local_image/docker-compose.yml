@@ -121,11 +121,15 @@ services:
     #build: ../../image/matcher-service
     image: webofneeds/matcher_service:live
     environment:
-      - "node.host=wonnode"
-      - "cluster.seedNodes=localhost:2561"
+      - "node.host=matcherservice"
+      - "cluster.seedNodes=matcherservice:2561"
       - "uri.sparql.endpoint=http://bigdata:9999/blazegraph/namespace/kb/sparql"
       - "wonNodeController.wonNode.crawl=https://wonnode:8443/won/resource"
       - "cluster.local.port=2561"
+    networks:
+      default:
+        aliases:
+          - matcherservice
     ports:
       - "2561:2561"
     depends_on:
@@ -148,11 +152,15 @@ services:
     #build: ../../image/matcher-solr
     image: webofneeds/matcher_solr:live
     environment:
-      - "node.host=wonnode"
-      - "cluster.seedNodes=matcher_service:2561"
+      - "node.host=matchersolr"
+      - "cluster.seedNodes=matcherservice:2561"
       - "cluster.local.port=2562"
       - "matcher.solr.uri.solr.server=http://solr:8983/solr/"
       - "matcher.solr.uri.solr.server.public=http://solr:8983/solr/"
+    networks:
+      default:
+        aliases:
+          - matchersolr
     ports:
       - "2562:2562"
     depends_on:
@@ -165,12 +173,16 @@ services:
     #build: ../../image/matcher-sparql
     image: webofneeds/matcher_sparql:int
     environment:
-      - "node.host=wonnode"
-      - "cluster.seedNodes=matcher_service:2561"
+      - "node.host=matchersparql"
+      - "cluster.seedNodes=matcherservice:2561"
       - "cluster.local.port=2564"
       - "matcher.sparql.uri.sparql.endpoint=http://bigdata:9999/blazegraph/namespace/kb/sparql"
-      - "matcher.sparql.uri.public=http://matcher_sparql/sparql/"
+      - "matcher.sparql.uri.public=http://matchersparql/sparql/"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+    networks:
+      default:
+        aliases:
+          - matchersparql
     ports:
       - "2564:2564"
     depends_on:

@@ -45,6 +45,33 @@
                 </executions>
             </plugin>
 
+            <plugin>
+                <!--
+                     Cleans up the required-libs folders in the image-directory
+                     that are created by the maven-resources-plugin. Need to do this
+                     as over time, multiple incompatible versions of jars might accumulate
+                     there, leading to runtime errors
+                 -->
+                <artifactId>maven-clean-plugin</artifactId>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>image/owner/required-libs</directory>
+                            <includes>
+                                <!-- deletes the whole directory -->
+                                <include>**</include>
+                            </includes>
+                        </fileset>
+                        <fileset>
+                            <directory>image/wonnode/required-libs</directory>
+                            <includes>
+                                <!-- deletes the whole directory -->
+                                <include>**</include>
+                            </includes>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
 
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
