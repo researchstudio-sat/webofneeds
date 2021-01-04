@@ -27,8 +27,6 @@ import java.util.*;
  * User: fsalcher Date: 13.06.2014
  */
 public class CertificateService {
-    private static final String PROVIDER_BC = org.bouncycastle.jce.provider.BouncyCastleProvider.PROVIDER_NAME;
-
     public CertificateService() {
     }
 
@@ -75,7 +73,7 @@ public class CertificateService {
                 addToCertBuilderWebIdInfo(certBuilder, webId);
             }
             ContentSigner certSigner = createContentSigner(key);
-            cert = new JcaX509CertificateConverter().setProvider(PROVIDER_BC)
+            cert = new JcaX509CertificateConverter().setProvider(BCProvider.getInstance())
                             .getCertificate(certBuilder.build(certSigner));
             cert.checkValidity(new Date());
             cert.verify(cert.getPublicKey());
@@ -113,7 +111,7 @@ public class CertificateService {
             throw new IllegalArgumentException(key.getPublic().getAlgorithm() + " is not supported");
         }
         JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder(signatureAlgorithm);
-        return csBuilder.setProvider(PROVIDER_BC).build(key.getPrivate());
+        return csBuilder.setProvider(BCProvider.getInstance()).build(key.getPrivate());
     }
 
     private X509v3CertificateBuilder createBuilderWithBasicInfo(BigInteger serialNumber, KeyPair key,

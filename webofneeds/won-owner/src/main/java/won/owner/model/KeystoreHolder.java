@@ -1,5 +1,7 @@
 package won.owner.model;
 
+import java.security.Provider;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,12 +12,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.security.KeyStore;
+import won.cryptography.service.BCProvider;
 
 @Entity
 @Table(name = "keystore")
 public class KeystoreHolder {
     private static final int DEFAULT_BYTE_ARRAY_SIZE = 500;
-    private static final String PROVIDER_BC = org.bouncycastle.jce.provider.BouncyCastleProvider.PROVIDER_NAME;
     private static final String KEY_STORE_TYPE = "UBER";
     @Id
     @GeneratedValue
@@ -80,7 +82,7 @@ public class KeystoreHolder {
         if (keystoreData == null || keystoreData.length == 0) {
             // return a new, empty key store if there is no key store yet.
             try {
-                store = java.security.KeyStore.getInstance(KEY_STORE_TYPE, PROVIDER_BC);
+                store = java.security.KeyStore.getInstance(KEY_STORE_TYPE, BCProvider.getInstance());
                 store.load(null, password.toCharArray());
                 // also set this key store so we can save it to db. (hence the synchronized
                 // methods)
@@ -92,7 +94,7 @@ public class KeystoreHolder {
         }
         inputStream = new ByteArrayInputStream(getKeystoreBytes());
         try {
-            store = java.security.KeyStore.getInstance(KEY_STORE_TYPE, PROVIDER_BC);
+            store = java.security.KeyStore.getInstance(KEY_STORE_TYPE, BCProvider.getInstance());
             store.load(inputStream, password.toCharArray());
         } catch (Exception e) {
             logger.error("Could not load key store " + getId(), e);

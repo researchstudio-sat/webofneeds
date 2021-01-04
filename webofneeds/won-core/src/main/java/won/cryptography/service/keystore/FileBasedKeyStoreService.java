@@ -9,18 +9,21 @@ import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 
+import java.util.Objects;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.cryptography.service.BCProvider;
 
 /**
  * User: fsalcher Date: 12.06.2014
  */
 public class FileBasedKeyStoreService extends AbstractKeyStoreService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final String PROVIDER_BC = org.bouncycastle.jce.provider.BouncyCastleProvider.PROVIDER_NAME;
     private static final String KEY_STORE_TYPE = "UBER";
     // 'UBER' is more secure, 'PKCS12' is supported by all tools, easier for
     // debugging, e.g. when importing keys,
@@ -29,24 +32,23 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
     private String storePW;
     private File storeFile;
     private java.security.KeyStore store;
-    private final String provider;
     private final String keyStoreType;
 
     public FileBasedKeyStoreService(String filePath, String storePW) {
-        this(new File(filePath), storePW, PROVIDER_BC, KEY_STORE_TYPE);
+        this(new File(filePath), storePW, KEY_STORE_TYPE);
     }
 
     public FileBasedKeyStoreService(File storeFile, String storePW) {
-        this(storeFile, storePW, PROVIDER_BC, KEY_STORE_TYPE);
+        this(storeFile, storePW, KEY_STORE_TYPE);
     }
 
-    public FileBasedKeyStoreService(File storeFile, String storePW, String provider, String keyStoreType) {
+    public FileBasedKeyStoreService(File storeFile, String storePW,
+                    String keyStoreType) {
         this.storeFile = storeFile;
         this.storePW = storePW;
-        this.provider = provider;
         this.keyStoreType = keyStoreType;
         logger.info("Using key store file {} with key store type {}, provider {}",
-                        new Object[] { storeFile, keyStoreType, provider });
+                        new Object[] { storeFile, keyStoreType, BCProvider.getInstance().getClass().getName() });
     }
 
     /*
@@ -196,8 +198,18 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
 
     public void init() throws Exception {
         try {
-            store = (provider == null) ? java.security.KeyStore.getInstance(keyStoreType)
-                            : java.security.KeyStore.getInstance(keyStoreType, provider);
+            try {
+                store = java.security.KeyStore.getInstance(keyStoreType, BCProvider.getInstance());
+            } catch (Exception e) {
+                // try again with standard provider resolution
+                try {
+                    store = java.security.KeyStore.getInstance(keyStoreType);
+                } catch (Exception e2) {
+                    logger.error("Error initializing key store with provider {}: {} - fallback to default provider failed, too (see stacktrace below).",
+                                    BCProvider.getInstance().getClass(), e.getMessage());
+                    throw e2;
+                }
+            }
             logger.debug("KEYSTORE: " + store);
             if (storeFile == null || !storeFile.exists() || !storeFile.isFile())
                 store.load(null, null);
@@ -211,39 +223,18 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((keyStoreType == null) ? 0 : keyStoreType.hashCode());
-        result = prime * result + ((provider == null) ? 0 : provider.hashCode());
-        result = prime * result + ((storeFile == null) ? 0 : storeFile.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        FileBasedKeyStoreService that = (FileBasedKeyStoreService) o;
+        return Objects.equals(storeFile, that.storeFile) &&
+                        Objects.equals(keyStoreType, that.keyStoreType);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        FileBasedKeyStoreService other = (FileBasedKeyStoreService) obj;
-        if (keyStoreType == null) {
-            if (other.keyStoreType != null)
-                return false;
-        } else if (!keyStoreType.equals(other.keyStoreType))
-            return false;
-        if (provider == null) {
-            if (other.provider != null)
-                return false;
-        } else if (!provider.equals(other.provider))
-            return false;
-        if (storeFile == null) {
-            if (other.storeFile != null)
-                return false;
-        } else if (!storeFile.equals(other.storeFile))
-            return false;
-        return true;
+    public int hashCode() {
+        return Objects.hash(storeFile, keyStoreType);
     }
 }

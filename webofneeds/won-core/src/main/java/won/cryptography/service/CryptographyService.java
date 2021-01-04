@@ -42,7 +42,6 @@ public class CryptographyService {
     private String keyToTrustFilePassword;
     private String keyToTrustAlias = null;
     private String keyToTrustAliasUnder = null;
-    private String keyToTrustProvider = null;
     private String keyToTrustKeystoreType = null;
 
     public CryptographyService(KeyStoreService keyStoreService) {
@@ -94,7 +93,7 @@ public class CryptographyService {
             return;
         }
         FileBasedKeyStoreService keyToTrustKeyStoreService = new FileBasedKeyStoreService(new File(this.keyToTrustFile),
-                        keyToTrustFilePassword, keyToTrustProvider, keyToTrustKeystoreType);
+                        keyToTrustFilePassword, keyToTrustKeystoreType);
         try {
             keyToTrustKeyStoreService.init();
         } catch (Exception e) {
@@ -195,9 +194,5 @@ public class CryptographyService {
 
     public void setKeyToTrustKeystoreType(String keyToTrustKeystoreType) {
         this.keyToTrustKeystoreType = keyToTrustKeystoreType;
-    }
-
-    public void setKeyToTrustProvider(String keyToTrustProvider) {
-        this.keyToTrustProvider = keyToTrustProvider;
     }
 }
