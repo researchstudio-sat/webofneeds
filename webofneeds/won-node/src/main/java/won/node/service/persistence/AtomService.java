@@ -414,7 +414,8 @@ public class AtomService {
                 authorizedApplications = new ArrayList<OwnerApplication>(1);
             }
             authorizedApplications.add(ownerApplication);
-            atom.setAuthorizedApplications(authorizedApplications);
+            atom.setAuthorizedApplications(authorizedApplications.stream().distinct().collect(
+                            Collectors.toList()));
         } else {
             logger.debug("owner application is new - creating");
             List<OwnerApplication> ownerApplicationList = new ArrayList<>(1);
@@ -422,7 +423,8 @@ public class AtomService {
             ownerApplication.setOwnerApplicationId(ownerApplicationID);
             ownerApplication = ownerApplicationRepository.save(ownerApplication);
             ownerApplicationList.add(ownerApplication);
-            atom.setAuthorizedApplications(ownerApplicationList);
+            atom.setAuthorizedApplications(ownerApplicationList.stream().distinct().collect(
+                            Collectors.toList()));
             logger.debug("setting OwnerApp ID: " + ownerApplicationList.get(0));
         }
         split.stop();
