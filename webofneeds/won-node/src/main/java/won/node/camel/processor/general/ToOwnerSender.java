@@ -74,7 +74,8 @@ public class ToOwnerSender extends AbstractCamelProcessor {
                         .collect(Collectors.toList());
         if (queueNames.isEmpty()) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Cannot send message to ownerApplication with Id(s){}: no queues registered",
+                logger.warn("Cannot send message to {} via ownerApplication with Id(s){}: no queues registered",
+                                msg.getRecipientAtomURI(),
                                 Arrays.toString(ownerApps.stream().map(OwnerApplication::getOwnerApplicationId)
                                                 .collect(Collectors.toList()).toArray()));
             }
