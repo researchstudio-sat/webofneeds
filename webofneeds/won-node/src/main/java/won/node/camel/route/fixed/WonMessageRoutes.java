@@ -60,7 +60,8 @@ public class WonMessageRoutes extends RouteBuilder {
                         .to("bean:uriConsistencyChecker")
                         .to("bean:parentFinder")
                         .to("bean:uriInUseChecker")
-                        .to("bean:signatureChecker");
+                        .to("bean:signatureChecker")
+                        .to("bean:ownerApplicationAuthorizer");
         /**
          * Incoming from owner application: 1. process with direct:msgFromOwner (which
          * triggers other routes onCompletion) 2. send the message and the response back

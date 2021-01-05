@@ -81,7 +81,7 @@
 	</bean>
 	<bean name="signatureToResponseAdder" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
 		<constructor-arg ref="signatureAddingProcessor" />
-		<constructor-arg name="header">  
+		<constructor-arg name="header">
 			<array>
 				<util:constant static-field="won.protocol.message.processor.camel.WonCamelConstants.RESPONSE_HEADER" />
 			</array>
@@ -89,7 +89,7 @@
 	</bean>
 	<bean name="signatureToMessageAdder" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
 		<constructor-arg ref="signatureAddingProcessor" />
-		<constructor-arg name="header">  
+		<constructor-arg name="header">
 			<array>
 				<util:constant static-field="won.protocol.message.processor.camel.WonCamelConstants.MESSAGE_HEADER" />
 			</array>
@@ -97,7 +97,7 @@
 	</bean>
 	<bean name="persister" class="won.node.camel.processor.general.MessagePersistingProcessor" />
 	<bean name="responsePersister" class="won.node.camel.processor.general.ResponsePersistingProcessor" />
-		
+
 	<!-- routing logic for wonMessages, computing which message-type specific processor -->
 	<bean name="fixedMessageProcessorSlip" class="won.node.camel.processor.general.MessageTypeSlipComputer">
 		<constructor-arg value="won.node.camel.processor.annotation.FixedMessageProcessor" />
@@ -120,4 +120,5 @@
 	<bean name="routingInfoExtractor" class="won.node.camel.processor.general.RoutingInfoExtractor"  />
 	<bean name="parentFinder" class="won.node.camel.processor.general.ParentFinder" />
 	<bean name="socketTypeExtractor" class="won.node.camel.processor.general.SocketTypeExtractor" />
+	<bean name="ownerApplicationAuthorizer" class="won.node.camel.processor.general.OwnerApplicationAuthorizer" />
 </beans>
