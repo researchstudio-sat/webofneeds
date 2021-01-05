@@ -86,29 +86,31 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
                             "Could not load recipient WonNodeInfo (won node " + recipientNode.get() + ")");
         }
         sw.stop();
-        sw.start("senderAtomUriCheck");
-        checkAtomUri(message.getSenderAtomURI(), senderNodeInfo);
-        sw.stop();
-        sw.start("senderSocketUriCheck");
-        checkSocketUri(message.getSenderSocketURI(), senderNodeInfo);
-        sw.stop();
+        if (!message.getMessageType().isHintMessage()) {
+            sw.start("senderAtomUriCheck");
+            checkAtomUri(message.getSenderAtomURI(), senderNodeInfo);
+            sw.stop();
+            sw.start("senderSocketUriCheck");
+            checkSocketUri(message.getSenderSocketURI(), senderNodeInfo);
+            sw.stop();
+            // there is no way atom or connection uri can be on the recipient node and the
+            // recipient node is different from the sender node
+            sw.start("atomUriCheck");
+            checkAtomUri(message.getAtomURI(), senderNodeInfo);
+            sw.stop();
+            sw.start("connectionUriCheck");
+            checkConnectionUri(message.getConnectionURI(), senderNodeInfo);
+            // Check that atom URI for create_atom message corresponds to local pattern
+            sw.stop();
+            sw.start("createMsgAtomUriCheck");
+            checkCreateMsgAtomURI(message, senderNodeInfo);
+            sw.stop();
+        }
         sw.start("recipientAtomUriCheck");
         checkAtomUri(message.getRecipientAtomURI(), recipientNodeInfo);
         sw.stop();
         sw.start("recipientSocketUriCheck");
         checkSocketUri(message.getRecipientSocketURI(), recipientNodeInfo);
-        // there is no way atom or connection uri can be on the recipient node and the
-        // recipient node is different from the sender node
-        sw.stop();
-        sw.start("atomUriCheck");
-        checkAtomUri(message.getAtomURI(), senderNodeInfo);
-        sw.stop();
-        sw.start("connectionUriCheck");
-        checkConnectionUri(message.getConnectionURI(), senderNodeInfo);
-        // Check that atom URI for create_atom message corresponds to local pattern
-        sw.stop();
-        sw.start("createMsgAtomUriCheck");
-        checkCreateMsgAtomURI(message, senderNodeInfo);
         sw.stop();
         sw.start("signerCheck");
         WonMessageDirection statedDirection = message.getEnvelopeType();
