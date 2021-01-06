@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import won.cryptography.ssl.AliasFromFingerprintGenerator;
 import won.cryptography.ssl.AliasGenerator;
 import won.protocol.exception.WonProtocolException;
-import won.protocol.service.ApplicationManagementService;
+import won.protocol.service.OwnerManagementService;
 
 /**
  * User: ypanchenko Date: 08.10.2015
@@ -22,7 +22,7 @@ import won.protocol.service.ApplicationManagementService;
 public class RegistrationServerCertificateBased implements RegistrationServer {
     final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
-    private ApplicationManagementService ownerManagementService;
+    private OwnerManagementService ownerManagementService;
     private TrustStrategy trustStrategy;
     private AliasGenerator aliasGenerator = new AliasFromFingerprintGenerator();
 

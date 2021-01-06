@@ -1,7 +1,5 @@
 package won.protocol.util.pretty;
 
-import static org.apache.jena.riot.writer.WriterConst.*;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
@@ -24,10 +21,17 @@ import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.util.iterator.ExtendedIterator;
-
 import won.protocol.message.WonMessageUtils;
 import won.protocol.util.pretty.sort.SortGraph;
 import won.protocol.util.pretty.sort.SortNode;
+
+import static org.apache.jena.riot.writer.WriterConst.GDFT_BRACE;
+import static org.apache.jena.riot.writer.WriterConst.INDENT_GDFT;
+import static org.apache.jena.riot.writer.WriterConst.INDENT_GNMD;
+import static org.apache.jena.riot.writer.WriterConst.NL_GDFT_END;
+import static org.apache.jena.riot.writer.WriterConst.NL_GDFT_START;
+import static org.apache.jena.riot.writer.WriterConst.NL_GNMD_END;
+import static org.apache.jena.riot.writer.WriterConst.NL_GNMD_START;
 
 public class ConversationDatasetWriterFactory implements WriterDatasetRIOTFactory {
     @Override

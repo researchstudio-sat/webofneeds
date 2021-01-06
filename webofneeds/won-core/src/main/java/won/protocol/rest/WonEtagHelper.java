@@ -107,7 +107,7 @@ public class WonEtagHelper {
         if (etags.size() == 0)
             return null;
         if (etags.size() > 1) {
-            logger.info("found more than one If-None-Match header values, only using first one");
+            logger.debug("found more than one If-None-Match header values, only using first one");
         }
         ;
         return fromEtagValue(etags.get(0));

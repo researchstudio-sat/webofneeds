@@ -83,7 +83,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.jena</groupId>
-            <artifactId>jena-base</artifactId>
+            <artifactId>jena-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.jena</groupId>

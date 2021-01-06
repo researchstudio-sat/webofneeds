@@ -12,6 +12,7 @@ package won.node.activemq;
 
 import org.apache.activemq.broker.Broker;
 import org.apache.activemq.broker.BrokerPlugin;
+import won.node.service.persistence.ActiveMQOwnerManagementService;
 import won.node.service.persistence.OwnerManagementService;
 
 /**
@@ -19,7 +20,7 @@ import won.node.service.persistence.OwnerManagementService;
  */
 public class CertificateCheckingBrokerPlugin implements BrokerPlugin {
     private String queueNamePrefixToCheck = "OwnerProtocol.Out.";
-    private OwnerManagementService ownerManagementService;
+    private ActiveMQOwnerManagementService ownerManagementService;
 
     @Override
     public Broker installPlugin(final Broker broker) {
@@ -30,7 +31,7 @@ public class CertificateCheckingBrokerPlugin implements BrokerPlugin {
         this.queueNamePrefixToCheck = queueNamePrefixToCheck;
     }
 
-    public void setOwnerManagementService(OwnerManagementService ownerManagementService) {
+    public void setOwnerManagementService(ActiveMQOwnerManagementService ownerManagementService) {
         this.ownerManagementService = ownerManagementService;
     }
 }

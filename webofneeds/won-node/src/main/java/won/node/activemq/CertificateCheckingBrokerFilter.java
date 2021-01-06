@@ -10,6 +10,8 @@
  */
 package won.node.activemq;
 
+import java.lang.invoke.MethodHandles;
+import java.security.cert.X509Certificate;
 import org.apache.activemq.broker.Broker;
 import org.apache.activemq.broker.BrokerFilter;
 import org.apache.activemq.broker.ConnectionContext;
@@ -17,12 +19,9 @@ import org.apache.activemq.broker.region.Subscription;
 import org.apache.activemq.command.ConsumerInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Transactional;
 import won.cryptography.ssl.AliasFromFingerprintGenerator;
 import won.cryptography.ssl.AliasGenerator;
-
-import java.lang.invoke.MethodHandles;
-import java.security.cert.X509Certificate;
+import won.node.service.persistence.ActiveMQOwnerManagementService;
 import won.node.service.persistence.OwnerManagementService;
 
 /**
@@ -32,19 +31,18 @@ import won.node.service.persistence.OwnerManagementService;
  */
 public class CertificateCheckingBrokerFilter extends BrokerFilter {
     private final String queueNamePrefixToCheck;
-    private OwnerManagementService ownerManagementService;
+    private ActiveMQOwnerManagementService ownerManagementService;
     private final AliasGenerator aliasGenerator = new AliasFromFingerprintGenerator();
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public CertificateCheckingBrokerFilter(final Broker next, String queueNamePrefixToCheck,
-                    OwnerManagementService ownerManagementService) {
+                    ActiveMQOwnerManagementService ownerManagementService) {
         super(next);
         this.ownerManagementService = ownerManagementService;
         this.queueNamePrefixToCheck = queueNamePrefixToCheck;
     }
 
     @Override
-    @Transactional
     public Subscription addConsumer(final ConnectionContext context, final ConsumerInfo info) throws Exception {
         assert info != null : "ConsumerInfo must not be null";
         assert context != null : "ConnectionContext must not be null";

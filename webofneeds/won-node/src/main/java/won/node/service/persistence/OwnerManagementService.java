@@ -13,17 +13,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.transaction.annotation.Transactional;
 import won.protocol.model.Lock;
 import won.protocol.model.OwnerApplication;
 import won.protocol.repository.LockRepository;
 import won.protocol.repository.OwnerApplicationRepository;
-import won.protocol.service.ApplicationManagementService;
 
 /**
  * User: sbyim Date: 11.11.13
  */
 @org.springframework.stereotype.Component
-public class OwnerManagementService implements ApplicationManagementService {
+public class OwnerManagementService implements ActiveMQOwnerManagementService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     private OwnerApplicationRepository ownerApplicationRepository;
@@ -33,6 +33,7 @@ public class OwnerManagementService implements ApplicationManagementService {
     private CamelContext camelContext;
 
     @Override
+    @Transactional
     public String registerOwnerApplication(String ownerApplicationId) {
         logger.debug("about to register ownerApplicationId: {}", ownerApplicationId);
         Lock lock = lockRepository.getOwnerapplicationLock();
@@ -75,6 +76,7 @@ public class OwnerManagementService implements ApplicationManagementService {
         }
     }
 
+    @Override
     public List<String> generateQueueNamesForOwnerApplication(OwnerApplication ownerApplication) {
         List<String> queueNames = new ArrayList<>();
         String ownerApplicationId = ownerApplication.getOwnerApplicationId();
@@ -82,10 +84,12 @@ public class OwnerManagementService implements ApplicationManagementService {
         return queueNames;
     }
 
+    @Override
     public String generateQueueNameForOwnerApplicationId(String ownerApplicationId) {
         return "activemq:queue:OwnerProtocol.Out." + ownerApplicationId;
     }
 
+    @Override
     public String generateCamelEndpointNameForQueueName(String ownerApplicationOutQueue) {
         if (ownerApplicationOutQueue == null
                         || !ownerApplicationOutQueue.startsWith("OwnerProtocol.Out.")) {
@@ -94,6 +98,7 @@ public class OwnerManagementService implements ApplicationManagementService {
         return "activemq:queue:" + ownerApplicationOutQueue;
     }
 
+    @Override
     public String generateOwnerApplicationIdForQueueName(String ownerApplicationOutQueue) {
         if (ownerApplicationOutQueue == null
                         || !ownerApplicationOutQueue.startsWith("OwnerProtocol.Out.")) {
@@ -109,11 +114,14 @@ public class OwnerManagementService implements ApplicationManagementService {
      * 
      * @return the sanitized queue name
      */
-    public String sanitizeQueueNameForOwnerApplication(OwnerApplication ownerApplication, String queueName) {
+    @Override
+    public String sanitizeQueueNameForOwnerApplication(OwnerApplication ownerApplication,
+                    String queueName) {
         String ownerApplicationId = ownerApplication.getOwnerApplicationId();
         return sanitizeQueueNameForOwnerApplicationId(queueName, ownerApplicationId);
     }
 
+    @Override
     public String sanitizeQueueNameForOwnerApplicationId(String queueName,
                     String ownerApplicationId) {
         if (ownerApplicationId != null && ownerApplicationId.trim().equals(queueName.trim())) {
@@ -133,6 +141,7 @@ public class OwnerManagementService implements ApplicationManagementService {
      * @param queueName
      * @return
      */
+    @Override
     public boolean existsCamelEndpointForOwnerApplicationQueue(String queueName) {
         return (camelContext.hasEndpoint(queueName) != null);
     }

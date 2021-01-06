@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import won.node.camel.processor.AbstractCamelProcessor;
+import won.node.service.persistence.ActiveMQOwnerManagementService;
 import won.node.service.persistence.OwnerManagementService;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
@@ -44,7 +45,7 @@ import won.protocol.repository.OwnerApplicationRepository;
 public class ToOwnerSender extends AbstractCamelProcessor {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
-    private OwnerManagementService ownerManagementService;
+    private ActiveMQOwnerManagementService ownerManagementService;
     @Autowired
     private OwnerApplicationRepository ownerApplicationRepository;
     @Autowired

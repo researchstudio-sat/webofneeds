@@ -37,7 +37,7 @@ public class DataDerivationService {
      * @param atom
      */
     public void deriveDataIfNecessary(Atom atom) {
-        logger.info("Checking data derivation for atom {}", atom.getAtomURI());
+        logger.debug("Checking data derivation for atom {}", atom.getAtomURI());
         DatasetHolder datasetHolder = atom.getDatatsetHolder();
         Dataset dataset = null;
         if (datasetHolder == null) {
@@ -52,7 +52,7 @@ public class DataDerivationService {
         if (atomDataset.containsNamedModel(derivedDataGraphUri)) {
             atomDataset.removeNamedModel(derivedDataGraphUri);
             atom.getDatatsetHolder().setDataset(atomDataset);
-            logger.info("Derived data for atom {}", atom.getAtomURI());
+            logger.debug("Derived data for atom {}", atom.getAtomURI());
         }
         datasetHolderRepository.save(datasetHolder);
     }
@@ -85,7 +85,7 @@ public class DataDerivationService {
         dataset.addNamedModel(derivedDataMetadataGraphUri, generateDerivationMetadata(con));
         con.getDatasetHolder().setDataset(dataset);
         datasetHolderRepository.save(datasetHolder);
-        logger.info("Derived data for connection {}", con.getConnectionURI());
+        logger.debug("Derived data for connection {}", con.getConnectionURI());
     }
 
     private boolean derivedDataIsUpToDate(Connection con, Model metadataModel) {
@@ -111,7 +111,7 @@ public class DataDerivationService {
             Resource atomRes = model.getResource(con.getAtomURI().toString());
             Resource targetAtomRes = model.getResource(con.getTargetAtomURI().toString());
             if (con.getState() == ConnectionState.CONNECTED) {
-                logger.info("adding data for connection {}", con.getConnectionURI());
+                logger.debug("adding data for connection {}", con.getConnectionURI());
                 socketConfig.get().getDerivationProperties().stream()
                                 .map(u -> model.createProperty(u.toString()))
                                 .forEach(p -> model.add(atomRes, p, targetAtomRes));
