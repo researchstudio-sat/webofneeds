@@ -42,7 +42,7 @@ services:
       - "DELETE_CONTENTS_ON_STARTUP=true"
     volumes:
       - wonnode-won-deps:/destData:rw
-      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-docker/deploy/local_build/logback-config:/srcData/logback-config:ro
+      #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-docker/deploy/local_build/logback-config:/srcData/logback-config:ro
       - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-auth/target/classes:/srcData/won-auth:ro
       - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-auth/generated-sources/shacl2java:/srcData/won-auth-s2j:ro
       - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-utils/won-utils-shacl2java/target/classes:/srcData/won-utils-shacl2java:ro
@@ -84,8 +84,8 @@ services:
     volumes:
       - ${base_folder:-.}/won-server-certs:/usr/local/tomcat/conf/ssl/:ro
       - ${base_folder:-.}/won-client-certs/wonnode:/usr/local/tomcat/won/client-certs/:rw
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-docker/deploy/local_build/logback-config:/usr/local/tomcat/won/logback-config/:ro
       - wonnode-won-deps:/usr/local/tomcat/webapps/won/WEB-INF/classes:ro
-      #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-docker/deploy/local_build/logback-config:/usr/local/tomcat/won/logback-config/
       #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-auth/target/classes:/usr/local/tomcat/won/override-classes/won-auth
       #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-utils/won-utils-shacl2java/target/classes:/usr/local/tomcat/won/override-classes/won-utils-shacl2java
       #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-core/target/classes:/usr/local/tomcat/won/override-classes/won-core
@@ -137,7 +137,7 @@ services:
       - "DELETE_CONTENTS_ON_STARTUP=true"
     volumes:
       - owner-won-deps:/destData:rw
-      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-docker/deploy/local_build/logback-config:/srcData/logback-config:ro
+      #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-docker/deploy/local_build/logback-config:/srcData/logback-config:ro
       - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-owner-webapp/target/classes:/srcData/won-owner-webapp:ro
       - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-owner/target/classes:/srcData/won-owner:ro
       - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-core/target/classes:/srcData/won-core:ro
@@ -182,8 +182,8 @@ services:
     volumes:
       - ${base_folder:-.}/won-server-certs:/usr/local/tomcat/conf/ssl/:ro
       - ${base_folder:-.}/won-client-certs/owner:/usr/local/tomcat/won/client-certs/:rw
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-docker/deploy/local_build/logback-config:/usr/local/tomcat/won/logback-config/:ro
       - owner-won-deps:/usr/local/tomcat/webapps/owner/WEB-INF/classes:ro
-      #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-docker/deploy/local_build/logback-config:/usr/local/tomcat/won/logback-config/
       #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-owner-webapp/target/classes:/usr/local/tomcat/won/override-classes/won-owner-webapp/
       #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-owner/target/classes:/usr/local/tomcat/won/override-classes/won-owner/
       #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-core/target/classes:/usr/local/tomcat/won/override-classes/won-core/
