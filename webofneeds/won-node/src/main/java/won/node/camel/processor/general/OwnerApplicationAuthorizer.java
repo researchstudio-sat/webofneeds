@@ -14,8 +14,8 @@ import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Atom;
 
 /**
- * Adds the ownerapplication that was used to send this message to the sender atom's list of
- * authorized ownerapplications.
+ * Adds the ownerapplication that was used to send this message to the sender
+ * atom's list of authorized ownerapplications.
  */
 public class OwnerApplicationAuthorizer extends AbstractCamelProcessor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

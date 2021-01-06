@@ -83,6 +83,10 @@
         </dependency>
         <dependency>
             <groupId>org.apache.jena</groupId>
+            <artifactId>jena-base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
             <artifactId>jena-shacl</artifactId>
         </dependency>
         <!-- messaging -->

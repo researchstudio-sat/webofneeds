@@ -8,23 +8,29 @@
  * KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package won.cryptography.activemq;
+package won.node.activemq;
 
 import org.apache.activemq.broker.Broker;
 import org.apache.activemq.broker.BrokerPlugin;
+import won.node.service.persistence.OwnerManagementService;
 
 /**
  * Broker plugin for checking consumer's certificates against queue names.
  */
 public class CertificateCheckingBrokerPlugin implements BrokerPlugin {
     private String queueNamePrefixToCheck = "OwnerProtocol.Out.";
+    private OwnerManagementService ownerManagementService;
 
     @Override
     public Broker installPlugin(final Broker broker) {
-        return new CertificateCheckingBrokerFilter(broker, this.queueNamePrefixToCheck);
+        return new CertificateCheckingBrokerFilter(broker, this.queueNamePrefixToCheck, this.ownerManagementService);
     }
 
     public void setQueueNamePrefixToCheck(final String queueNamePrefixToCheck) {
         this.queueNamePrefixToCheck = queueNamePrefixToCheck;
+    }
+
+    public void setOwnerManagementService(OwnerManagementService ownerManagementService) {
+        this.ownerManagementService = ownerManagementService;
     }
 }

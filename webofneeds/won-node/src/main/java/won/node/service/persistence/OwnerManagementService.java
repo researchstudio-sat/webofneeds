@@ -77,8 +77,29 @@ public class OwnerManagementService implements ApplicationManagementService {
 
     public List<String> generateQueueNamesForOwnerApplication(OwnerApplication ownerApplication) {
         List<String> queueNames = new ArrayList<>();
-        queueNames.add("activemq:queue:OwnerProtocol.Out." + ownerApplication.getOwnerApplicationId());
+        String ownerApplicationId = ownerApplication.getOwnerApplicationId();
+        queueNames.add(generateQueueNameForOwnerApplicationId(ownerApplicationId));
         return queueNames;
+    }
+
+    public String generateQueueNameForOwnerApplicationId(String ownerApplicationId) {
+        return "activemq:queue:OwnerProtocol.Out." + ownerApplicationId;
+    }
+
+    public String generateCamelEndpointNameForQueueName(String ownerApplicationOutQueue) {
+        if (ownerApplicationOutQueue == null
+                        || !ownerApplicationOutQueue.startsWith("OwnerProtocol.Out.")) {
+            throw new IllegalArgumentException("Not an owner queue name: " + ownerApplicationOutQueue);
+        }
+        return "activemq:queue:" + ownerApplicationOutQueue;
+    }
+
+    public String generateOwnerApplicationIdForQueueName(String ownerApplicationOutQueue) {
+        if (ownerApplicationOutQueue == null
+                        || !ownerApplicationOutQueue.startsWith("OwnerProtocol.Out.")) {
+            throw new IllegalArgumentException("Not an owner queue name: " + ownerApplicationOutQueue);
+        }
+        return ownerApplicationOutQueue.substring("OwnerProtocol.Out.".length());
     }
 
     /**
@@ -90,10 +111,16 @@ public class OwnerManagementService implements ApplicationManagementService {
      */
     public String sanitizeQueueNameForOwnerApplication(OwnerApplication ownerApplication, String queueName) {
         String ownerApplicationId = ownerApplication.getOwnerApplicationId();
+        return sanitizeQueueNameForOwnerApplicationId(queueName, ownerApplicationId);
+    }
+
+    public String sanitizeQueueNameForOwnerApplicationId(String queueName,
+                    String ownerApplicationId) {
         if (ownerApplicationId != null && ownerApplicationId.trim().equals(queueName.trim())) {
-            String newQueueName = "activemq:queue:OwnerProtocol.Out." + ownerApplicationId;
+            String newQueueName = generateQueueNameForOwnerApplicationId(ownerApplicationId);
             if (logger.isDebugEnabled()) {
-                logger.debug("automatically converting ownerApplicationId {} to queue name {}", ownerApplicationId,
+                logger.debug("automatically converting ownerApplicationId {} to queue name {}",
+                                ownerApplicationId,
                                 newQueueName);
             }
             return newQueueName;

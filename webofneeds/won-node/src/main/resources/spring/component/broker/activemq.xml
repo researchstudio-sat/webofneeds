@@ -187,8 +187,9 @@
         </sslContext>
 
         <plugins>
-            <spring:bean id="certificateCheckingPlugin" class="won.cryptography.activemq.CertificateCheckingBrokerPlugin">
+            <spring:bean id="certificateCheckingPlugin" class="won.node.activemq.CertificateCheckingBrokerPlugin">
                 <spring:property name="queueNamePrefixToCheck" value="OwnerProtocol.Out." />
+                <spring:property name="ownerManagementService" ref="ownerManagementService" />
             </spring:bean>
         </plugins>
 

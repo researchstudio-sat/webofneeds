@@ -1,8 +1,11 @@
 package won.cryptography.rdfsign;
 
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
+import io.ipfs.multibase.Base58;
+import io.ipfs.multihash.Multihash.Type;
 import java.io.StringWriter;
 import java.lang.invoke.MethodHandles;
-import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
@@ -10,20 +13,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Random;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.stream.Collectors;
-
-import org.apache.jena.ext.com.google.common.collect.Streams;
+import java.util.stream.StreamSupport;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
-import io.ipfs.multibase.Base58;
-import io.ipfs.multihash.Multihash.Type;
 import won.protocol.message.WonSignatureData;
 
 /**
@@ -93,7 +91,8 @@ public class WonSigner {
             RDFDataMgr.write(sw, dataset, Lang.TRIG);
             logger.debug("signing dataset with content: {}", sw.toString());
         }
-        List<String> graphURIs = Streams.stream(dataset.listNames()).collect(Collectors.toList());
+        List<String> graphURIs = StreamSupport.stream(Spliterators.spliteratorUnknownSize(dataset.listNames(),
+                        Spliterator.ORDERED), false).collect(Collectors.toList());
         // create GraphCollection with one NamedGraph that corresponds to this Model
         GraphCollection inputGraphCollection = ModelConverter.fromDataset(dataset);
         // sign the NamedGraph inside that GraphCollection
