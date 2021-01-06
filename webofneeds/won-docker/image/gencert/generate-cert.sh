@@ -21,6 +21,26 @@ if [ -z "$PASS" ]; then
 #	echo "PASS is $PASS"
 fi
 
+if [ -z "$SAN" ]
+then
+  echo "SAN is empty, certificate will not have subject alternative names"
+  SAN_OPT=""
+else
+  SAN_OPT="-config req.config"
+  rm -rf req.config
+  cat >> req.config << EOL
+[ req ]
+distinguished_name = dn
+x509_extensions = ext
+[ dn ]
+common_name = ${CN}
+[ ext ]
+subjectAltName = ${SAN}
+EOL
+  echo "SAN is ${SAN}, adding as the certificate's alternative names, complete openssl option is ${SAN_OPT}"
+  echo "contents of req.config: "
+  cat req.config
+fi
 
 ############################
 # print some info messages
@@ -30,7 +50,7 @@ echo "any generated certificates will be put into $out_folder"
 echo "if run as docker, use -v YOUR_MOUNTED_FOLDER:$out_folder if you want to persist any generated certificates in YOUR_MOUNTED_FOLDER"
 echo "if specified YOUR_MOUNTED_FOLDER already contains certificates, no new certificates are generated"
 echo "......................................................................."
-
+echo "openssl version: $(openssl version)"
 
 #######################################################################
 # generate pem private key and self-signed certificate, if do not exist
@@ -49,13 +69,14 @@ else
 	echo "$key_pem_file not found. Generating self-signed certificate."
 
 
-	if [ -z "$OPENSSL_CONFIG_FILE" ]; then
-		openssl req -x509 -newkey rsa:2048 -keyout $key_pem_file -out $cert_pem_file -passout $PASS -days 365 -subj "/CN=${CN}"
-	else
-		openssl req -x509 -newkey rsa:2048 -keyout $key_pem_file -out $cert_pem_file -passout $PASS -days 365 -subj "/CN=${CN}" -config $OPENSSL_CONFIG_FILE
+	if [ ! -z "$OPENSSL_CONFIG_FILE" ]; then
+	  echo "OPENSSL_CONFIG_FILE parameter is no longer supported!"
 	fi
 
+  openssl req -x509 -newkey rsa:2048 -keyout $key_pem_file -out $cert_pem_file -passout $PASS -days 365 -subj "/CN=${CN}" ${SAN_OPT}
+
 	openssl x509 -in $cert_pem_file -noout -text
+
 	echo "Self-signed certificate generated - please do not use it for production!"
 fi
 

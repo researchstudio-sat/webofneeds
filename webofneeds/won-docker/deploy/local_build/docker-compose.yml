@@ -34,7 +34,25 @@ services:
     ports:
       - "5433:5432"
 
-  # wonnode server => access https://$deploy_host:8889/won
+  wonnode_devsync:
+    restart: "no"
+    build: ../../image/devsync
+    environment:
+      - "DAEMON_MODE=false"
+      - "DELETE_CONTENTS_ON_STARTUP=true"
+    volumes:
+      - wonnode-won-deps:/destData:rw
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-docker/deploy/local_build/logback-config:/srcData/logback-config:ro
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-auth/target/classes:/srcData/won-auth:ro
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-auth/generated-sources/shacl2java:/srcData/won-auth-s2j:ro
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-utils/won-utils-shacl2java/target/classes:/srcData/won-utils-shacl2java:ro
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-core/target/classes:/srcData/won-core:ro
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-vocab/target/classes:/srcData/won-vocab:ro
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-cryptography/target/classes:/srcData/won-cryptography:ro
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-node/target/classes:/srcData/won-node:ro
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-node-webapp/target/classes:/srcData/won-node-webapp:ro
+
+  # wonnode server => access https://$deploy_host:8443/won
   wonnode:
     restart: always
     build:
@@ -53,22 +71,29 @@ services:
       - "CERTIFICATE_PASSWORD=changeit"
       - "activemq.broker.port=61617"
       - "LOGBACK_CONFIG=../logback-config/logback.xml"
-      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62001,server=y,suspend=n"
+      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62000,server=y,suspend=n
+                  -Dcom.sun.management.jmxremote.port=61000 -Dcom.sun.management.jmxremote.authenticate=false
+                  -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=61001
+                  -Djava.rmi.server.hostname=wonnode" #wonnode is correct here!
     ports:
-      - "8889:8443"
+      - "8443:8443" #ports have to be the same so we can use the same wonNodeUri from inside and outside
       - "61617:61617"
-      - "62001:62001"
+      - "62000:62000"
+      - "61000:61000"
+      - "61001:61001"
     volumes:
-      - ${base_folder:-.}/won-server-certs:/usr/local/tomcat/conf/ssl/
-      - ${base_folder:-.}/won-client-certs/wonnode:/usr/local/tomcat/won/client-certs/
-      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-docker/deploy/local_build/logback-config:/usr/local/tomcat/won/logback-config/
-      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-auth/target/classes:/usr/local/tomcat/won/override-classes/won-auth
-      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-utils/won-utils-shacl2java/target/classes:/usr/local/tomcat/won/override-classes/won-utils-shacl2java
-      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-core/target/classes:/usr/local/tomcat/won/override-classes/won-core
-      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-vocab/target/classes:/usr/local/tomcat/won/override-classes/won-vocab
-      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-cryptography/target/classes:/usr/local/tomcat/won/override-classes/won-cryptography
-      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-node/target/classes:/usr/local/tomcat/won/override-classes/won-node
+      - ${base_folder:-.}/won-server-certs:/usr/local/tomcat/conf/ssl/:ro
+      - ${base_folder:-.}/won-client-certs/wonnode:/usr/local/tomcat/won/client-certs/:rw
+      - wonnode-won-deps:/usr/local/tomcat/webapps/won/WEB-INF/classes:ro
+      #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-docker/deploy/local_build/logback-config:/usr/local/tomcat/won/logback-config/
+      #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-auth/target/classes:/usr/local/tomcat/won/override-classes/won-auth
+      #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-utils/won-utils-shacl2java/target/classes:/usr/local/tomcat/won/override-classes/won-utils-shacl2java
+      #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-core/target/classes:/usr/local/tomcat/won/override-classes/won-core
+      #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-vocab/target/classes:/usr/local/tomcat/won/override-classes/won-vocab
+      #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-cryptography/target/classes:/usr/local/tomcat/won/override-classes/won-cryptography
+      #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-node/target/classes:/usr/local/tomcat/won/override-classes/won-node
     depends_on:
+      - wonnode_devsync
       - postgres
 
   # mongodb for persistent debug bot
@@ -104,6 +129,26 @@ services:
 #      - wonnode
 #      - mongodb
 
+  owner_devsync:
+    restart: "no"
+    build: ../../image/devsync
+    environment:
+      - "DAEMON_MODE=false"
+      - "DELETE_CONTENTS_ON_STARTUP=true"
+    volumes:
+      - owner-won-deps:/destData:rw
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-docker/deploy/local_build/logback-config:/srcData/logback-config:ro
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-owner-webapp/target/classes:/srcData/won-owner-webapp:ro
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-owner/target/classes:/srcData/won-owner:ro
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-core/target/classes:/srcData/won-core:ro
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-vocab/target/classes:/srcData/won-vocab:ro
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-cryptography/target/classes:/srcData/won-cryptography:ro
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-matcher/target/classes:/srcData/won-matcher:ro
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-utils/won-utils-mail/target/classes:/srcData/won-utils-mail:ro
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-utils/won-utils-goals/target/classes:/srcData/won-utils-goals:ro
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-utils/won-utils-conversation/target/classes:/srcData/won-utils-conversation:ro
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-utils/won-utils-batch/target/classes:/srcData/won-utils-batch:ro
+
   # owner application (frontend) => access https://$deploy_host:8082/owner
   owner:
     restart: always
@@ -123,29 +168,36 @@ services:
       - "db.sql.password=won"
       - "db.ddl.strategy=validate"
       - "CERTIFICATE_PASSWORD=changeit"
-      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62000,server=y,suspend=n"
+      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62010,server=y,suspend=n
+                  -Dcom.sun.management.jmxremote.port=61010 -Dcom.sun.management.jmxremote.authenticate=false
+                  -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=61011
+                  -Djava.rmi.server.hostname=wonnode" #wonnode is correct here!"
       #- "logback.configurationFile=/usr/local/tomcat/won/logback-config/logback.xml"
       - "LOGBACK_CONFIG=../logback-config/logback.xml"
     ports:
       - "8082:8443"
-      - "62000:62000"
+      - "62010:62010"
+      - "61010:61010"
+      - "61011:61011"
     volumes:
-      - ${base_folder:-.}/won-server-certs:/usr/local/tomcat/conf/ssl/
-      - ${base_folder:-.}/won-client-certs/owner:/usr/local/tomcat/won/client-certs/
-      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-docker/deploy/local_build/logback-config:/usr/local/tomcat/won/logback-config/
-      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-owner-webapp/target/classes:/usr/local/tomcat/won/override-classes/won-owner-webapp/
-      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-owner/target/classes:/usr/local/tomcat/won/override-classes/won-owner/
-      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-core/target/classes:/usr/local/tomcat/won/override-classes/won-core/
-      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-vocab/target/classes:/usr/local/tomcat/won/override-classes/won-vocab/
-      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-cryptography/target/classes:/usr/local/tomcat/won/override-classes/won-cryptography/
-      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-matcher/target/classes:/usr/local/tomcat/won/override-classes/won-matcher/
-      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-utils/won-utils-mail/target/classes:/usr/local/tomcat/won/override-classes/won-utils-mail
-      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-utils/won-utils-goals/target/classes:/usr/local/tomcat/won/override-classes/won-utils-goals
-      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-utils/won-utils-conversation/target/classes:/usr/local/tomcat/won/override-classes/won-utils-conversation
-      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-utils/won-utils-batch/target/classes:/usr/local/tomcat/won/override-classes/won-utils-batch
+      - ${base_folder:-.}/won-server-certs:/usr/local/tomcat/conf/ssl/:ro
+      - ${base_folder:-.}/won-client-certs/owner:/usr/local/tomcat/won/client-certs/:rw
+      - owner-won-deps:/usr/local/tomcat/webapps/owner/WEB-INF/classes:ro
+      #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-docker/deploy/local_build/logback-config:/usr/local/tomcat/won/logback-config/
+      #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-owner-webapp/target/classes:/usr/local/tomcat/won/override-classes/won-owner-webapp/
+      #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-owner/target/classes:/usr/local/tomcat/won/override-classes/won-owner/
+      #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-core/target/classes:/usr/local/tomcat/won/override-classes/won-core/
+      #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-vocab/target/classes:/usr/local/tomcat/won/override-classes/won-vocab/
+      #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-cryptography/target/classes:/usr/local/tomcat/won/override-classes/won-cryptography/
+      #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-matcher/target/classes:/usr/local/tomcat/won/override-classes/won-matcher/
+      #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-utils/won-utils-mail/target/classes:/usr/local/tomcat/won/override-classes/won-utils-mail
+      #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-utils/won-utils-goals/target/classes:/usr/local/tomcat/won/override-classes/won-utils-goals
+      #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-utils/won-utils-conversation/target/classes:/usr/local/tomcat/won/override-classes/won-utils-conversation
+      #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-utils/won-utils-batch/target/classes:/usr/local/tomcat/won/override-classes/won-utils-batch
     depends_on:
-      - wonnode
+      - owner_devsync
       - postgres
+      - wonnode
 
   # bigdata rdf store for matcher service
   bigdata:
@@ -240,4 +292,8 @@ volumes:
   postgres-data:
     external: true
   mongodb-data:
+    external: true
+  wonnode-won-deps:
+    external: true
+  owner-won-deps:
     external: true

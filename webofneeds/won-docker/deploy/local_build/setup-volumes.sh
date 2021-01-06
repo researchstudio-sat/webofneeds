@@ -9,5 +9,10 @@ echo "creating posgres-data volume"
 docker volume create --name postgres-data -d local
 echo "creating mongodb-data volume"
 docker volume create --name mongodb-data -d local
+echo "creating wonnode-won-deps volume"
+docker volume create --name wonnode-won-deps -d local
+echo "creating owner-won-deps volume"
+docker volume create --name owner-won-deps -d local
 echo -e "listing volumes:\n\n"
+
 docker volume ls

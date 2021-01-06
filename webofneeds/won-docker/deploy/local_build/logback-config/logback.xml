@@ -27,8 +27,11 @@
     <!-- avoid logging Exceptions with stack traces on WARN level when JMS Connection is broken -->
     <logger name="org.apache.camel.component.jms.reply.TemporaryQueueReplyManager" level="ERROR"/>
     <logger name="org.springframework.jms.connection.CachingConnectionFactory" level="ERROR"/>
-    <logger name="won.node.springsecurity.acl.WonAclAccessDecisionVoter" level="DEBUG" />
-
+    <logger name="won.node.springsecurity.acl.WonAclAccessDecisionVoter" level="WARN" />
+    <logger name="won" level="INFO" />
+    <logger name="won.node.camel" level="DEBUG" />
+    <logger name="org.apache.camel" level="WARN" />
+    <logger name="org.apache.activemq" level="WARN" />
     <!-- available log-levels: DEBUG, INFO, WARN, ERROR -->
     <root level="info">
         <appender-ref ref="STDOUT"/>

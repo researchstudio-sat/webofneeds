@@ -18,25 +18,6 @@ ADD ./ssl/server.xml /usr/local/tomcat/conf/
 # switch classloader hacks on if in dev mode (enabled by providing DEV_MODE=true in the build
 # environment or via --build-arg DEV_MODE=true
 ARG DEV_MODE=false
-# only if DEV_MODE=true:
-#
-## add dirs to the shared loader that we can mount our local
-## build classes directories into, so we only need to compile one module
-## and restart the container
-## Note: this is connected to the many volume mounts in deploy/local_build/docker-compose.xml
-## for owner and wonnode
-RUN ${DEV_MODE} && sed -i \
--e 's|^\(shared\.loader.*\)|\1,\
-"${catalina.base}/won/override-classes/won-auth",\
-"${catalina.base}/won/override-classes/won-utils-shacl2java",\
-"${catalina.base}/won/override-classes/won-core",\
-"${catalina.base}/won/override-classes/won-vocab",\
-"${catalina.base}/won/override-classes/won-cryptography",\
-"${catalina.base}/won/override-classes/won-node",\
-"${catalina.base}/won/libs/*.jar"\
-|g' \
-/usr/local/tomcat/conf/catalina.properties \
-|| echo " ---| Step skipped (DEV_MODE=${DEV_MODE})"
 
 
 # uncomment the following line to access tomcat manager with admin user
@@ -61,10 +42,10 @@ RUN ${DEV_MODE} \
                       /usr/local/tomcat/webapps/won/WEB-INF/lib/won-node*.jar \
 || echo " ---| Step skipped (DEV_MODE=${DEV_MODE})"
 
-RUN ${DEV_MODE} \
-&& mkdir -p /usr/local/tomcat/won/libs \
-&& mv /usr/local/tomcat/webapps/won/WEB-INF/lib/* /usr/local/tomcat/won/libs \
-|| echo " ---| Step skipped (DEV_MODE=${DEV_MODE})"
+#RUN ${DEV_MODE} \
+#&& mkdir -p /usr/local/tomcat/won/libs \
+#&& mv /usr/local/tomcat/webapps/won/WEB-INF/lib/* /usr/local/tomcat/won/libs \
+#|| echo " ---| Step skipped (DEV_MODE=${DEV_MODE})"
 
 # add the bouncy castle libraries to the jre as well as to the java.security config (we need them in the jre, only tomcat lib folder doesn't work)
 ADD ./required-libs/* /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/
