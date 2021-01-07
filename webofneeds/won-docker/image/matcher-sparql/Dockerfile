@@ -11,6 +11,8 @@ ENV LOGBACK_CONFIG=logback.xml
 
 # add the default monitoring output directory
 RUN mkdir -p /usr/src/matcher-sparql/monitoring/logs
+# add folder for certs that can be replaced by mounted volume if needed
+RUN mkdir -p /usr/src/matcher-sparql/client-certs
 ENV monitoring.output.dir=/usr/src/matcher-sparql/monitoring/logs
 
 # add the jar and the conf directory

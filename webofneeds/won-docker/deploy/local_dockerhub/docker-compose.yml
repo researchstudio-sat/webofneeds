@@ -1,33 +1,29 @@
 version: "3"
-
-# Note: this configuration is used for integration tests
-# except for the server cert folder, no volumes are mounted so as to
-# provide a clean initial state
-
 services:
   # create self-signed server certificate for $deploy_host
   gencert:
-    build: ../../image/gencert
+    image: webofneeds/gencert:live
     environment:
       - "CN=wonnode"
       - "PASS=pass:changeit"
     volumes:
-      - ./won-server-certs:/usr/local/certs/out/
+      - $base_folder/won-server-certs:/usr/local/certs/out/
 
   # portsgres atom databases for owner and wonnode
   postgres:
     restart: always
-    build: ../../image/postgres
+    image: webofneeds/postgres:live
     environment:
       - "PGDATA=/var/lib/postgresql/data/pgdata"
+    #volumes:
+    #  - $base_folder/postgres/data/pgdata:/var/lib/postgresql/data/pgdata
     ports:
       - "5433:5432"
 
-  # wonnode server => access https://$deploy_host:8443/won
+  # wonnode server => access https://$deploy_host:8889/won
   wonnode:
     restart: always
-    build:
-      context: ../../image/wonnode
+    image: webofneeds/wonnode:live
     environment:
       - "uri.host=wonnode"
       - "http.port=8443"
@@ -38,27 +34,52 @@ services:
       - "db.ddl.strategy=validate"
       - "CERTIFICATE_PASSWORD=changeit"
       - "activemq.broker.port=61617"
-      - "LOGBACK_CONFIG=logback.xml"
-      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62000,server=y,suspend=n
-                  -Dcom.sun.management.jmxremote.port=61000 -Dcom.sun.management.jmxremote.authenticate=false
-                  -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=61001
-                  -Djava.rmi.server.hostname=wonnode" #wonnode is correct here!
     ports:
-      - "8443:8443" #ports have to be the same so we can use the same wonNodeUri from inside and outside
+      - "8889:8443"
       - "61617:61617"
-      - "62000:62000"
-      - "61000:61000"
-      - "61001:61001"
     volumes:
-      - ./won-server-certs:/usr/local/tomcat/conf/ssl/:ro
+      - $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/
+      - $base_folder/won-client-certs/wonnode:/usr/local/tomcat/won/client-certs/
     depends_on:
       - postgres
+
+  # mongodb for persistent debug bot
+  mongodb:
+    restart: always
+    image: tutum/mongodb:3.2
+    environment:
+      - "MONGODB_USER=won"
+      - "MONGODB_DATABASE=won"
+      - "MONGODB_PASS=won"
+    ports:
+      - "27017:27017"
+      - "28017:28017"
+    volumes:
+      - $base_folder/mongodb/data/db:/data/db
+
+  # debug bot used to test atom communication
+#  debug_bot:
+#    restart: always
+#    #build: ../../image/bots
+#    image: webofneeds/bots:live
+#    environment:
+#      - "node.default.host=wonnode"
+#      - "node.default.http.port=8443"
+#      - "won.node.uris=https://wonnode:8443/won/resource"
+#      - "botContext.impl=mongoBotContext"
+#      - "botContext.mongodb.user=won"
+#      - "botContext.mongodb.pass=won"
+#      - "botContext.mongodb.host=mongodb"
+#      - "botContext.mongodb.port=27017"
+#      - "botContext.mongodb.database=won"
+#    depends_on:
+#      - wonnode
+#      - mongodb
 
   # owner application (frontend) => access https://$deploy_host:8082/owner
   owner:
     restart: always
-    build:
-      context: ../../image/owner
+    image: webofneeds/owner:live
     environment:
       - "node.default.host=wonnode"
       - "uri.host=owner"
@@ -70,31 +91,27 @@ services:
       - "db.sql.password=won"
       - "db.ddl.strategy=validate"
       - "CERTIFICATE_PASSWORD=changeit"
-      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62010,server=y,suspend=n
-                  -Dcom.sun.management.jmxremote.port=61010 -Dcom.sun.management.jmxremote.authenticate=false
-                  -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=61011
-                  -Djava.rmi.server.hostname=wonnode" #wonnode is correct here!"
-      #- "logback.configurationFile=/usr/local/tomcat/won/logback-config/logback.xml"
       - "LOGBACK_CONFIG=logback.xml"
     ports:
       - "8082:8443"
     volumes:
-      - $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ # needed for ssl access
+      - $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/
+      - $base_folder/won-client-certs/owner:/usr/local/tomcat/won/client-certs/
     depends_on:
-      - postgres
       - wonnode
+      - postgres
 
   # bigdata rdf store for matcher service
   bigdata:
     restart: always
-    build: ../../image/bigdata
+    image: webofneeds/bigdata:latest
     ports:
       - "10000:9999"
 
   # matcher service on connect with wonnode
   matcher_service:
     restart: always
-    build: ../../image/matcher-service
+    image: webofneeds/matcher_service:live
     environment:
       - "node.host=matcherservice"
       - "cluster.seedNodes=matcherservice:2561"
@@ -115,13 +132,16 @@ services:
   solr:
     restart: always
     image: webofneeds/solr:live
+    #volumes:
+    #  - $base_folder/solr/won/data:/opt/solr/server/solr/won/data
+    #  - $base_folder/solr/wontest/data:/opt/solr/server/solr/wontest/data
     ports:
       - "8984:8983"
 
   # solr matcher and connect to matcher service
   matcher_solr:
     restart: always
-    build: ../../image/matcher-solr
+    image: webofneeds/matcher_solr:live
     environment:
       - "node.host=matchersolr"
       - "cluster.seedNodes=matcherservice:2561"
@@ -141,7 +161,6 @@ services:
   # sparql matcher and connect to matcher service
   matcher_sparql:
     restart: always
-    build: ../../image/matcher-sparql
     image: webofneeds/matcher_sparql:int
     environment:
       - "node.host=matchersparql"
@@ -158,3 +177,5 @@ services:
       - "2564:2564"
     depends_on:
       - matcher_service
+    volumes:
+      - $base_folder/won-client-certs/matcher_sparql:/usr/src/matcher-sparql/client-certs/

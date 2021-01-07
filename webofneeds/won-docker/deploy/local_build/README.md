@@ -1,7 +1,9 @@
-# Local won environment
+# Local won development environment
 
-This folder contains a docker-compose configuration. The services therein are 
-a complete won environment including matcher and debugbot. `won-node-webapp` and `won-owner-webapp` automatically load the contents of `target/classes` of their `won-*` dependencies. No need to build any jars or wars, just restart the container using
+This folder contains a docker-compose configuration intended for use while developing. The services therein are 
+a complete won environment including matcher. 
+
+`won-node-webapp` and `won-owner-webapp` automatically load the contents of `target/classes` of their `won-*` dependencies. No need to build any jars or wars, just restart the container using
 ```
  docker-compose stop wonnode owner && docker-compose up -d wonnode owner
 ```
@@ -25,14 +27,19 @@ If you want another owner app or bot to connect: it will only work if this link 
 ## Preparation
  
 Build the webofneeds project (the fast way is probably desired):
+
 ```
-cd ${clone-base}/webofneeds/webofneeds
+cd ${clone-base} # the directory the project was cloned into
+cd webofneeds
 mvn -Pskip-tests install
 ```
 
 When starting for the first time, run the `deploy.sh`bash script:
 It will create a volume for the mongodb and postgres container (required)
+
 ```
+cd ${clone-base} # the directory the project was cloned into
+cd webofneeds/won-docker/deploy/local_build
 ./deploy.sh
 ```
 
