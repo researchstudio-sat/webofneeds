@@ -79,7 +79,7 @@ services:
     ports:
       - "8082:8443"
     volumes:
-      - $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ # needed for ssl access
+      - ./won-server-certs:/usr/local/tomcat/conf/ssl/ # needed for ssl access
     depends_on:
       - postgres
       - wonnode
