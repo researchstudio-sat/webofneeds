@@ -46,7 +46,3 @@ Then, you can start e.g. the [won-debugbot](https://github.com/researchstudio-sa
 export WON_NODE_URI="https://wonnode:8443/won"
 java -jar target/bot.jar
 ```
-
-# Caution
-
-This configuration is used in automated integration tests. Modifying it may cause these tests to fail.

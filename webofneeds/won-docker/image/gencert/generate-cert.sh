@@ -23,7 +23,7 @@ fi
 
 if [ -z "$SAN" ]
 then
-  echo "SAN is empty, certificate will not have subject alternative names"
+  echo "SAN is empty, certificate will not have subject alternative names. To set, use eg SAN=DNS:localhost,DNS:example.com"
   SAN_OPT=""
 else
   SAN_OPT="-config req.config"

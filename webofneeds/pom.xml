@@ -86,6 +86,7 @@
         <module>won-test</module>
         <module>won-parent-pom</module>
         <module>won-auth</module>
+        <module>won-integrationtest</module>
     </modules>
     <properties>
         <doclint>none</doclint>
@@ -129,6 +130,7 @@
         <net.sf.ehcache.version>2.6.8</net.sf.ehcache.version>
         <org.apache.jena.version>3.18.0-SNAPSHOT</org.apache.jena.version>
         <org.apache.jena-tdb.version>3.18.0-SNAPSHOT</org.apache.jena-tdb.version>
+        <org.apache.httpcomponents.version>4.5.13</org.apache.httpcomponents.version>
         <org.hibernate.version>5.4.8.Final</org.hibernate.version>
         <org.hibernate.hibernate-validator.version>5.4.3.Final</org.hibernate.hibernate-validator.version>
         <org.javasimon.version>3.4.0</org.javasimon.version>
@@ -139,6 +141,7 @@
         <org.springframework.version>4.3.18.RELEASE</org.springframework.version>
         <org.springframework.security.version>4.2.9.RELEASE</org.springframework.security.version>
         <org.slf4j.version>1.6.6</org.slf4j.version>
+        <org.testcontainers.version>1.15.1</org.testcontainers.version>
         <org.hsqldb.version>2.5.0</org.hsqldb.version>
         <postgresql.version>42.2.8</postgresql.version>
         <flyway.version>4.0.3</flyway.version>
@@ -471,7 +474,12 @@
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>4.5.13</version>
+                <version>${org.apache.httpcomponents.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>fluent-hc</artifactId>
+                <version>${org.apache.httpcomponents.version}</version>
             </dependency>
             <dependency>
                 <!-- our dependencies depend on different versions, we'll choose here -->
@@ -866,6 +874,12 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers</artifactId>
+                <version>${org.testcontainers.version}</version>
                 <scope>test</scope>
             </dependency>
             <!-- dependency>

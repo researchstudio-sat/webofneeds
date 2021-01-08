@@ -1,0 +1,161 @@
+version: "3"
+
+# Note: this configuration is used for integration tests
+# except for the server cert folder, no volumes are mounted so as to
+# provide a clean initial state
+
+services:
+  # create self-signed server certificate for $deploy_host
+  gencert:
+    build: image/gencert
+    environment:
+      - "CN=wonnode"
+      - "PASS=pass:changeit"
+      - "SAN=DNS:localhost,DNS:wonnode"
+    volumes:
+      - ./won-server-certs:/usr/local/certs/out/
+
+  # portsgres atom databases for owner and wonnode
+  postgres:
+    restart: always
+    build: image/postgres
+    environment:
+      - "PGDATA=/var/lib/postgresql/data/pgdata"
+    ports:
+      - "5433:5432"
+
+  # wonnode server => access https://$deploy_host:8443/won
+  wonnode:
+    restart: always
+    build:
+      context: ./image/wonnode
+    environment:
+      - "uri.host=wonnode"
+      - "http.port=8443"
+      - "db.sql.jdbcDriverClass=org.postgresql.Driver"
+      - "db.sql.jdbcUrl=jdbc:postgresql://postgres:5432/won_node"
+      - "db.sql.user=won"
+      - "db.sql.password=won"
+      - "db.ddl.strategy=validate"
+      - "CERTIFICATE_PASSWORD=changeit"
+      - "activemq.broker.port=61617"
+      - "LOGBACK_CONFIG=logback.xml"
+      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62000,server=y,suspend=n
+                  -Dcom.sun.management.jmxremote.port=61000 -Dcom.sun.management.jmxremote.authenticate=false
+                  -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=61001
+                  -Djava.rmi.server.hostname=wonnode" #wonnode is correct here!
+    ports:
+      - "8443:8443" #ports have to be the same so we can use the same wonNodeUri from inside and outside
+      - "61617:61617"
+      - "62000:62000"
+      - "61000:61000"
+      - "61001:61001"
+    volumes:
+      - ./won-server-certs:/usr/local/tomcat/conf/ssl/:ro
+    depends_on:
+      - postgres
+
+  # owner application (frontend) => access https://$deploy_host:8082/owner
+  owner:
+    restart: always
+    build:
+      context: ./image/owner
+    environment:
+      - "node.default.host=wonnode"
+      - "uri.host=owner"
+      - "http.port=8443"
+      - "node.default.http.port=8443"
+      - "db.sql.jdbcDriverClass=org.postgresql.Driver"
+      - "db.sql.jdbcUrl=jdbc:postgresql://postgres:5432/won_owner"
+      - "db.sql.user=won"
+      - "db.sql.password=won"
+      - "db.ddl.strategy=validate"
+      - "CERTIFICATE_PASSWORD=changeit"
+      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62010,server=y,suspend=n
+                  -Dcom.sun.management.jmxremote.port=61010 -Dcom.sun.management.jmxremote.authenticate=false
+                  -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=61011
+                  -Djava.rmi.server.hostname=wonnode" #wonnode is correct here!"
+      #- "logback.configurationFile=/usr/local/tomcat/won/logback-config/logback.xml"
+      - "LOGBACK_CONFIG=logback.xml"
+    ports:
+      - "8082:8443"
+    volumes:
+      - ./won-server-certs:/usr/local/tomcat/conf/ssl/ # needed for ssl access
+    depends_on:
+      - postgres
+      - wonnode
+
+  # bigdata rdf store for matcher service
+  bigdata:
+    restart: always
+    build: ./image/bigdata
+    ports:
+      - "10000:9999"
+
+  # matcher service on connect with wonnode
+  matcher_service:
+    restart: always
+    build: ./image/matcher-service
+    environment:
+      - "node.host=matcherservice"
+      - "cluster.seedNodes=matcherservice:2561"
+      - "uri.sparql.endpoint=http://bigdata:9999/blazegraph/namespace/kb/sparql"
+      - "wonNodeController.wonNode.crawl=https://wonnode:8443/won/resource"
+      - "cluster.local.port=2561"
+    networks:
+      default:
+        aliases:
+          - matcherservice
+    ports:
+      - "2561:2561"
+    depends_on:
+      - bigdata
+      - wonnode
+
+  # solr server as an atom index
+  solr:
+    restart: always
+    image: webofneeds/solr:live
+    ports:
+      - "8984:8983"
+
+  # solr matcher and connect to matcher service
+  matcher_solr:
+    restart: always
+    build: ./image/matcher-solr
+    environment:
+      - "node.host=matchersolr"
+      - "cluster.seedNodes=matcherservice:2561"
+      - "cluster.local.port=2562"
+      - "matcher.solr.uri.solr.server=http://solr:8983/solr/"
+      - "matcher.solr.uri.solr.server.public=http://solr:8983/solr/"
+    networks:
+      default:
+        aliases:
+          - matchersolr
+    ports:
+      - "2562:2562"
+    depends_on:
+      - solr
+      - matcher_service
+
+  # sparql matcher and connect to matcher service
+  matcher_sparql:
+    restart: always
+    build: ./image/matcher-sparql
+    image: webofneeds/matcher_sparql:int
+    environment:
+      - "node.host=matchersparql"
+      - "cluster.seedNodes=matcherservice:2561"
+      - "cluster.local.port=2564"
+      - "matcher.sparql.uri.sparql.endpoint=http://bigdata:9999/blazegraph/namespace/kb/sparql"
+      - "matcher.sparql.uri.public=http://matchersparql/sparql/"
+      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+    networks:
+      default:
+        aliases:
+          - matchersparql
+    ports:
+      - "2564:2564"
+    depends_on:
+      - matcher_service
