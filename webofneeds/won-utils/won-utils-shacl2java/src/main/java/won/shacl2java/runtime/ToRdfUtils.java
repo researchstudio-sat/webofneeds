@@ -18,7 +18,8 @@ public class ToRdfUtils {
     public static Node getAsNode(Object value) {
         if (value instanceof GraphEntity) {
             GraphEntity entity = (GraphEntity) value;
-            return getNodeSetToBlankNodeIfNull(entity);
+            entity.createNodeIfNecessary();
+            return entity.getNode();
         }
         if (value instanceof Boolean || value instanceof Number || value instanceof String
                         || value instanceof XSDDateTime) {
@@ -44,14 +45,5 @@ public class ToRdfUtils {
             logger.debug("Could not convert value {} to Node", value);
         }
         return null;
-    }
-
-    public static Node getNodeSetToBlankNodeIfNull(GraphEntity entity) {
-        Node node = entity.getNode();
-        if (node == null) {
-            node = NodeFactory.createBlankNode();
-            entity.setNode(node);
-        }
-        return node;
     }
 }

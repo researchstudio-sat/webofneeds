@@ -83,6 +83,15 @@ public class VisitorImplGenerator implements TypesGenerator {
                                                             config.DEFAULT_VISITOR_HOST_FOR_ALL_CLASSES_NAME),
                                                             "startingNode")
                                             .addStatement("Graph graph = $T.createGraphMem()", GraphFactory.class)
+                                            .addStatement("populateGraph(startingNode, graph)")
+                                            .addStatement("return graph")
+                                            .build())
+                            .addMethod(MethodSpec.methodBuilder("populateGraph")
+                                            .addModifiers(PUBLIC, STATIC)
+                                            .addParameter(ClassName.get(config.getPackageName(),
+                                                            config.DEFAULT_VISITOR_HOST_FOR_ALL_CLASSES_NAME),
+                                                            "startingNode")
+                                            .addParameter(ClassName.get(Graph.class), "graph")
                                             .addStatement("$T graphEntityVisitor = $L",
                                                             GraphEntityVisitor.class,
                                                             TypeSpec.anonymousClassBuilder("")
@@ -96,7 +105,6 @@ public class VisitorImplGenerator implements TypesGenerator {
                                                                             .build())
                                             .addStatement("startingNode.accept(new $T(graphEntityVisitor))",
                                                             engineClassName)
-                                            .addStatement("return graph")
                                             .build())
                             .build();
             newTypeSpecs.add(rdfOutput);

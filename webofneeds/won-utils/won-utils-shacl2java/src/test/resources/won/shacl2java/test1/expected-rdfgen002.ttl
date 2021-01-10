@@ -1,0 +1,8 @@
+<http://example.com/ns#Bob>
+    <https://example.com/ns#address>
+        [ <https://example.com/ns#postalCode>
+              "1234" ] ;
+    <https://example.com/ns#firstName>
+        "Bob" ;
+    <https://example.com/ns#lastName>
+        "The Builder" .

@@ -103,9 +103,9 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                         .addAnnotation(Override.class)
                         .addParameter(ParameterizedTypeName.get(Consumer.class, Triple.class), "tripleConsumer")
                         .addStatement("$T obj = null", Node.class)
-                        .addStatement("$T entityNode = $T.getNodeSetToBlankNodeIfNull(this)", Node.class,
-                                        ToRdfUtils.class)
-                        .beginControlFlow("if (getGraph() == null)");
+                        .addStatement("$T entityNode = getNodeCreateIfNecessary()", Node.class)
+                        .beginControlFlow("if (getGraph() == null)")
+                        .addStatement("additionalTriplesToRdf(tripleConsumer)");
         for (Shape relevantShape : relevantShapes) {
             Set<PropertyShape> propertyShapes = new HashSet();
             propertyShapes.addAll(relevantShape.getPropertyShapes());

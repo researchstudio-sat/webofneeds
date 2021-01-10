@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ContextConfiguration;
@@ -93,7 +94,7 @@ public class GeneratedSourcesTests {
     }
 
     @Test
-    public void test1Generated_data002() throws IOException {
+    public void test1Generated_rdfgen002() throws IOException {
         Shapes shapes = loadShapes(testBaseFolder.createRelative("test1/shapes.ttl"));
         Person bob = new Person("http://example.com/ns#Bob");
         bob.setNode(NodeFactory.createURI("http://example.com/ns#Bob"));
@@ -103,7 +104,9 @@ public class GeneratedSourcesTests {
         address.setPostalCode("1234");
         bob.addAddress(address);
         Graph graph = test1.RdfOutput.toGraph(bob);
-        RDFDataMgr.write(System.out, graph, Lang.TTL);
+        Model expected = loadData(new ClassPathResource("won/shacl2java/test1/expected-rdfgen002.ttl"));
+        Assert.assertTrue("generated graph differs from expected",
+                        graph.isIsomorphicWith(expected.getGraph()));
     }
 
     @Test

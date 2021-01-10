@@ -1,7 +1,12 @@
 package won.shacl2java.runtime.model;
 
+import java.net.URI;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
@@ -10,6 +15,8 @@ import org.apache.jena.graph.Triple;
 public class GraphEntity {
     private Node node;
     private Graph graph;
+    private Set<EntityTriple> entityTriples = new HashSet<>();
+    private Set<InverseEntityTriple> inverseEntityTriples = new HashSet<>();
 
     /**
      * Create entity identified by the specified URI.
@@ -76,6 +83,11 @@ public class GraphEntity {
         return this.node;
     }
 
+    public Node getNodeCreateIfNecessary() {
+        createNodeIfNecessary();
+        return this.node;
+    }
+
     public void setNode(Node node) {
         requireEntityNodeKind(node);
         this.node = node;
@@ -104,6 +116,24 @@ public class GraphEntity {
                             "Cannot export RDF from GraphEntity without a node. Call createNode() first.");
         }
         graph.find(this.node, null, null).forEach(consumer);
+        additionalTriplesToRdf(consumer);
+    }
+
+    /**
+     * Provides the triples to the consumer that have been added via
+     * <code>addEntityRelation</code> or <code>addEntityTriple</code>.
+     * 
+     * @param consumer
+     */
+    protected void additionalTriplesToRdf(Consumer<Triple> consumer) {
+        getEntityTriples().forEach(t -> consumer.accept(t));
+        getInverseEntityTriples().forEach(t -> consumer.accept(t));
+    }
+
+    public void createNodeIfNecessary() {
+        if (this.node == null) {
+            createNode();
+        }
     }
 
     public void createNode() {
@@ -111,6 +141,42 @@ public class GraphEntity {
             throw new IllegalStateException("GraphEntity already has a node");
         }
         this.node = NodeFactory.createBlankNode();
+    }
+
+    public void addEntityTriple(Node predicate, Node object) {
+        this.entityTriples.add(new EntityTriple(predicate, object));
+    }
+
+    public void addEntityTriple(String predicate, Node object) {
+        this.entityTriples.add(new EntityTriple(predicate, object));
+    }
+
+    public void addEntityTriple(URI predicate, Node object) {
+        this.entityTriples.add(new EntityTriple(predicate, object));
+    }
+
+    public Set<Triple> getEntityTriples() {
+        createNodeIfNecessary();
+        return entityTriples.stream().map(e -> new Triple(this.node, e.getPredicate(), e.getObject()))
+                        .collect(Collectors.toSet());
+    }
+
+    public void addInverseEntityTriple(Node subject, Node predicate) {
+        this.inverseEntityTriples.add(new InverseEntityTriple(subject, predicate));
+    }
+
+    public void addInverseEntityTriple(String subject, String predicate) {
+        this.inverseEntityTriples.add(new InverseEntityTriple(subject, predicate));
+    }
+
+    public void addInverseEntityTriple(URI subject, URI predicate) {
+        this.inverseEntityTriples.add(new InverseEntityTriple(subject, predicate));
+    }
+
+    public Set<Triple> getInverseEntityTriples() {
+        createNodeIfNecessary();
+        return inverseEntityTriples.stream().map(e -> new Triple(e.getSubject(), e.getPredicate(), this.node))
+                        .collect(Collectors.toSet());
     }
 
     @Override
