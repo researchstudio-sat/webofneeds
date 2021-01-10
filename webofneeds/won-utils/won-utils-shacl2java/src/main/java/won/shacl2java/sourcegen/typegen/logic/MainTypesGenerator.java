@@ -13,12 +13,20 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
+import org.apache.jena.datatypes.RDFDatatype;
+import org.apache.jena.datatypes.TypeMapper;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.graph.impl.LiteralLabel;
+import org.apache.jena.graph.impl.LiteralLabelFactory;
 import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.impl.LiteralImpl;
 import org.apache.jena.riot.other.G;
 import org.apache.jena.shacl.Shapes;
 import org.apache.jena.shacl.parser.Shape;
@@ -29,7 +37,7 @@ import org.slf4j.LoggerFactory;
 import won.shacl2java.Shacl2JavaConfig;
 import won.shacl2java.annotation.ShapeNode;
 import won.shacl2java.constraints.EnumShapeChecker;
-import won.shacl2java.model.GraphEntity;
+import won.shacl2java.runtime.model.GraphEntity;
 import won.shacl2java.sourcegen.typegen.TypesGenerator;
 import won.shacl2java.sourcegen.typegen.mapping.IndividualClassNames;
 import won.shacl2java.sourcegen.typegen.mapping.ShapeTargetClasses;
@@ -123,6 +131,25 @@ public class MainTypesGenerator implements TypesGenerator {
                                         .build())
                         .addMethod(
                                         MethodSpec.constructorBuilder()
+                                                        .addParameter(ClassName.get(String.class), "uri")
+                                                        .addParameter(ClassName.get(Graph.class), "graph")
+                                                        .addModifiers(PUBLIC)
+                                                        .addStatement("super(uri,graph)")
+                                                        .build())
+                        .addMethod(
+                                        MethodSpec.constructorBuilder()
+                                                        .addParameter(ClassName.get(Node.class), "node")
+                                                        .addModifiers(PUBLIC)
+                                                        .addStatement("super(node)")
+                                                        .build())
+                        .addMethod(
+                                        MethodSpec.constructorBuilder()
+                                                        .addParameter(ClassName.get(String.class), "uri")
+                                                        .addModifiers(PUBLIC)
+                                                        .addStatement("super(uri)")
+                                                        .build())
+                        .addMethod(
+                                        MethodSpec.constructorBuilder()
                                                         .addModifiers(PUBLIC)
                                                         .build());
         TypeSpec typeSpec = typeBuilder.build();
@@ -157,22 +184,45 @@ public class MainTypesGenerator implements TypesGenerator {
                                         .build());
         ClassName valueClassName = ClassName.OBJECT;
         List<Object> convertedValues = new ArrayList<>();
+        String argumentsFormat = null;
+        Function<Object, Object[]> argMapper = null;
         if (SHACL.IRI.equals(enumShapeChecker.getNodeKind())) {
-            valueClassName = ClassName.get(String.class);
-            convertedValues = enumShapeChecker.getValues().stream().map(n -> n.getURI())
+            valueClassName = ClassName.get(URI.class);
+            convertedValues = enumShapeChecker.getValues().stream().map(n -> URI.create(n.getURI()))
                             .collect(Collectors.toList());
+            argumentsFormat = "URI.create($S)";
+            argMapper = val -> new Object[] { val.toString() };
         } else if (SHACL.Literal.equals(enumShapeChecker.getNodeKind())) {
             valueClassName = ClassName.get(Literal.class);
             convertedValues = enumShapeChecker.getValues().stream().map(n -> n.getLiteral())
                             .collect(Collectors.toList());
+            Literal lit = null;
+            LiteralLabelFactory.create(lit.getLexicalForm(),
+                            TypeMapper.getInstance().getTypeByName(lit.getDatatypeURI()));
+            argumentsFormat = "$T.create($S, $T.getInstance().getTypeByName($S))";
+            argMapper = val -> new Object[] {
+                            LiteralLabelFactory.class,
+                            ((Literal) val).getLexicalForm(),
+                            TypeMapper.class,
+                            ((Literal) val).getDatatypeURI()
+            };
         } else if (enumShapeChecker.getValues().stream().allMatch(n -> n.isURI())) {
-            valueClassName = ClassName.get(String.class);
-            convertedValues = enumShapeChecker.getValues().stream().map(n -> n.getURI())
+            valueClassName = ClassName.get(URI.class);
+            convertedValues = enumShapeChecker.getValues().stream().map(n -> URI.create(n.getURI()))
                             .collect(Collectors.toList());
+            argumentsFormat = "URI.create($S)";
+            argMapper = val -> new Object[] { val.toString() };
         } else if (enumShapeChecker.getValues().stream().allMatch(n -> n.isLiteral())) {
             valueClassName = ClassName.get(Literal.class);
             convertedValues = enumShapeChecker.getValues().stream().map(n -> n.getLiteral())
                             .collect(Collectors.toList());
+            argumentsFormat = "$T.create($S, $T.getInstance().getTypeByName($S))";
+            argMapper = val -> new Object[] {
+                            LiteralLabelFactory.class,
+                            ((Literal) val).getLexicalForm(),
+                            TypeMapper.class,
+                            ((Literal) val).getDatatypeURI()
+            };
         } else {
             return null;
         }
@@ -190,7 +240,7 @@ public class MainTypesGenerator implements TypesGenerator {
                                         .addModifiers(PUBLIC).build());
         for (Object value : convertedValues) {
             typeBuilder.addEnumConstant(NameUtils.enumConstantName(value),
-                            TypeSpec.anonymousClassBuilder("$S", value).build());
+                            TypeSpec.anonymousClassBuilder(argumentsFormat, argMapper.apply(value)).build());
         }
         return typeBuilder.build();
     }

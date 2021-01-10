@@ -1,37 +1,26 @@
 package won.shacl2java.sourcegen.typegen.logic;
 
-import com.squareup.javapoet.AnnotationSpec;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
-import com.squareup.javapoet.TypeName;
-import com.squareup.javapoet.TypeSpec;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
-import java.net.URI;
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+import com.squareup.javapoet.*;
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Node_Blank;
+import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.shacl.Shapes;
 import org.apache.jena.shacl.parser.PropertyShape;
 import org.apache.jena.shacl.parser.Shape;
 import org.apache.jena.shacl.vocabulary.SHACL;
+import org.apache.jena.sparql.path.P_Inverse;
+import org.apache.jena.sparql.path.P_Link;
 import org.apache.jena.sparql.path.Path;
+import org.apache.jena.sparql.path.PathVisitorBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.shacl2java.Shacl2JavaConfig;
 import won.shacl2java.annotation.Individual;
 import won.shacl2java.annotation.PropertyPath;
 import won.shacl2java.constraints.PropertySpec;
+import won.shacl2java.runtime.ToRdfUtils;
 import won.shacl2java.sourcegen.typegen.TypesPostprocessor;
 import won.shacl2java.sourcegen.typegen.mapping.ShapeTargetClasses;
 import won.shacl2java.sourcegen.typegen.mapping.ShapeTypeSpecs;
@@ -42,16 +31,18 @@ import won.shacl2java.util.CollectionUtils;
 import won.shacl2java.util.NameUtils;
 import won.shacl2java.util.ShapeUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Method;
+import java.net.URI;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
 import static com.squareup.javapoet.TypeSpec.Kind.CLASS;
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.PUBLIC;
-import static won.shacl2java.sourcegen.typegen.support.TypegenUtils.findCommonSuperclassOrSuperinterface;
-import static won.shacl2java.sourcegen.typegen.support.TypegenUtils.generateAdder;
-import static won.shacl2java.sourcegen.typegen.support.TypegenUtils.generateGetter;
-import static won.shacl2java.sourcegen.typegen.support.TypegenUtils.generateSetter;
-import static won.shacl2java.util.NameUtils.getterNameForField;
-import static won.shacl2java.util.NameUtils.plural;
-import static won.shacl2java.util.NameUtils.propertyNameForPath;
+import static won.shacl2java.sourcegen.typegen.support.TypegenUtils.*;
+import static won.shacl2java.util.NameUtils.*;
 
 public class MainTypesPostprocessor implements TypesPostprocessor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -105,6 +96,16 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
     private void configureTypeWithNodeShapes(TypeSpec.Builder typeBuilder, Set<Shape> relevantShapes,
                     Shapes shapes,
                     Shacl2JavaConfig config) {
+        // first,prepare a methodbuilder for the toRdf method
+        // we will add statements to it while processing the relevant shapes
+        MethodSpec.Builder toRdfBuilder = MethodSpec.methodBuilder("toRdf")
+                        .addModifiers(PUBLIC)
+                        .addAnnotation(Override.class)
+                        .addParameter(ParameterizedTypeName.get(Consumer.class, Triple.class), "tripleConsumer")
+                        .addStatement("$T obj = null", Node.class)
+                        .addStatement("$T entityNode = $T.getNodeSetToBlankNodeIfNull(this)", Node.class,
+                                        ToRdfUtils.class)
+                        .beginControlFlow("if (getGraph() == null)");
         for (Shape relevantShape : relevantShapes) {
             Set<PropertyShape> propertyShapes = new HashSet();
             propertyShapes.addAll(relevantShape.getPropertyShapes());
@@ -136,11 +137,13 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                 }
                 boolean addTypeSuffix = propertySpecs.size() > 1;
                 for (PropertySpec propertySpec : propertySpecs) {
-                    addFieldWithPropertySpec(shapes, propertyName.get(), path, propertySpec, typeBuilder, fieldsPerPath,
+                    addFieldWithPropertySpec(shapes, propertyName.get(), path, propertySpec, typeBuilder, toRdfBuilder,
+                                    fieldsPerPath,
                                     config,
                                     addTypeSuffix);
                 }
             }
+            // add union getter
             fieldsPerPath.entrySet().stream().forEach(pathToFields -> {
                 Set<FieldSpec> fieldSpecs = pathToFields.getValue();
                 if (fieldSpecs.size() < 2) {
@@ -153,6 +156,7 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                 }
             });
         }
+        //
         relevantShapes
                         .stream()
                         .flatMap(s -> checkShapeForIndividuals(s).stream())
@@ -162,7 +166,12 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                                         (left, right) -> IndividualPropertySpec.merge(left, right)))
                         .values()
                         .stream()
-                        .forEach(spec -> addFieldWithIndividualPropertySpec(spec, typeBuilder, config));
+                        .forEach(spec -> addFieldWithIndividualPropertySpec(spec, typeBuilder, toRdfBuilder, config));
+        // finish toRdf method
+        toRdfBuilder.nextControlFlow("else")
+                        .addStatement("super.toRdf(tripleConsumer)")
+                        .endControlFlow();
+        typeBuilder.addMethod(toRdfBuilder.build());
     }
 
     private Set<IndividualPropertySpec> checkShapeForIndividuals(Shape shape) {
@@ -251,7 +260,8 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
     }
 
     private void addFieldWithPropertySpec(Shapes shapes, String propertyName, Path path, PropertySpec propertySpec,
-                    TypeSpec.Builder typeBuilder, Map<Path, Set<FieldSpec>> fieldsPerPath, Shacl2JavaConfig config,
+                    TypeSpec.Builder typeBuilder, MethodSpec.Builder toRdfMethodBuilder,
+                    Map<Path, Set<FieldSpec>> fieldsPerPath, Shacl2JavaConfig config,
                     boolean addTypeSuffix) {
         logger.debug("adding field {} for propertySpec: {}", propertyName, propertySpec);
         PropertyHelper helper = new PropertyHelper(shapes, propertyName, propertySpec, config, addTypeSuffix);
@@ -285,7 +295,79 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                         .addMethod(setter)
                         .addMethod(getter);
         if (!propertySpec.isSingletonProperty()) {
-            typeBuilder.addMethod(generateAdder(field));
+            typeBuilder.addMethod(generateAdder(field, helper.getFieldNameSingular()));
+        }
+        boolean singleton = propertySpec.isSingletonProperty();
+        generateToRdfForField(path, toRdfMethodBuilder, getter, singleton);
+    }
+
+    private void generateToRdfForField(Path path, MethodSpec.Builder toRdfMethodBuilder, MethodSpec getter,
+                    boolean isSingleton) {
+        if (isSingleton) {
+            toRdfMethodBuilder
+                            .addStatement("obj = $T.getAsNode($N())", ToRdfUtils.class, getter.name)
+                            .beginControlFlow("if (obj != null)");
+            transcribeTriples(pathToTriples(path), "entityNode", "obj", toRdfMethodBuilder);
+            toRdfMethodBuilder.endControlFlow();
+        } else {
+            toRdfMethodBuilder
+                            .beginControlFlow("$T.ofNullable($N()).orElse($T.emptySet()).forEach(val ->",
+                                            Optional.class,
+                                            getter.name,
+                                            Collections.class)
+                            .addStatement("Node object = $T.getAsNode(val)", ToRdfUtils.class)
+                            .beginControlFlow("if (object != null)");
+            transcribeTriples(pathToTriples(path), "entityNode", "object", toRdfMethodBuilder);
+            toRdfMethodBuilder.endControlFlow()
+                            .endControlFlow(")");
+        }
+    }
+
+    private static List<Triple> pathToTriples(Path path) {
+        List<Triple> triples = new ArrayList<>();
+        path.visit(new PathVisitorBase() {
+            private Node tip = NodeFactory.createBlankNode("start");
+
+            @Override
+            public void visit(P_Link pathNode) {
+                Node nextTip = NodeFactory.createBlankNode();
+                Triple nextStep = new Triple(tip, pathNode.getNode(), nextTip);
+                triples.add(nextStep);
+                tip = nextTip;
+            }
+
+            public void visit(P_Inverse pathNode) {
+                Path uninverted = pathNode.getSubPath();
+                if (uninverted instanceof P_Link) {
+                    Node nextTip = NodeFactory.createBlankNode();
+                    Triple nextStep = new Triple(nextTip, ((P_Link) uninverted).getNode(), tip);
+                    triples.add(nextStep);
+                    tip = nextTip;
+                }
+            }
+        });
+        return triples;
+    }
+
+    private static void transcribeTriples(List<Triple> triples, String start, String target,
+                    MethodSpec.Builder toRdfBuilder) {
+        Map<Node, String> nodeToVarName = new HashMap<>();
+        for (int i = 0; i < triples.size(); i++) {
+            String subject = null;
+            String object = null;
+            if (i == 0) {
+                subject = start;
+            } else {
+                subject = "node" + (i - 1);
+            }
+            if (i == triples.size() - 1) {
+                object = target;
+            } else {
+                object = "node" + i;
+                toRdfBuilder.addStatement("$T $N = $T.createBlankNode()", Node.class, object, NodeFactory.class);
+            }
+            toRdfBuilder.addStatement("tripleConsumer.accept(new $T($N, $T.createURI($S), $N))",
+                            Triple.class, subject, NodeFactory.class, triples.get(i).getPredicate().getURI(), object);
         }
     }
 
@@ -298,7 +380,7 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
     }
 
     private void addFieldWithIndividualPropertySpec(IndividualPropertySpec propertySpec,
-                    TypeSpec.Builder typeBuilder, Shacl2JavaConfig config) {
+                    TypeSpec.Builder typeBuilder, MethodSpec.Builder toRdfBuilder, Shacl2JavaConfig config) {
         logger.debug("adding field {} for individual property spec: {}", propertySpec.getPredicate().getLocalName(),
                         propertySpec);
         IndividualPropertyHelper helper = new IndividualPropertyHelper(propertySpec, config, false);
@@ -317,8 +399,10 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                         .addMethod(setter)
                         .addMethod(getter);
         if (!propertySpec.isSingletonProperty()) {
-            typeBuilder.addMethod(generateAdder(field));
+            typeBuilder.addMethod(generateAdder(field, helper.getFieldNameSingular()));
         }
+        generateToRdfForField(new P_Link(propertySpec.getPredicate()), toRdfBuilder, getter,
+                        propertySpec.isSingletonProperty());
     }
 
     private static void addDeepEquals(TypeSpec.Builder typeBuilder, ClassName typeClass) {
@@ -454,6 +538,10 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
             return name + propertyKindSuffix + typeSuffix;
         }
 
+        public String getFieldNameSingular() {
+            return basePropertyName + propertyKindSuffix + typeSuffix;
+        }
+
         private String getTypeIndicator() {
             if (baseType == null) {
                 return "";
@@ -502,7 +590,12 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
          */
         private Class<?> determineCandidateJavaType() {
             if (propertySpec.getShDatatype() != null) {
-                return propertySpec.getShDatatype().getJavaClass();
+                Class<?> clazz = propertySpec.getShDatatype().getJavaClass();
+                if (clazz == null) {
+                    throw new IllegalArgumentException("Cannot determine Java type for sh:datatype "
+                                    + propertySpec.getShDatatype() + ". This datatype does not seem to be defined");
+                }
+                return clazz;
             } else if (SHACL.IRI.equals(propertySpec.getShNodeKind())) {
                 // if we're using this, we indicate that the String is an IRI
                 return URI.class;
@@ -572,6 +665,10 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                 name = plural(name);
             }
             return name + typeSuffix;
+        }
+
+        public String getFieldNameSingular() {
+            return basePropertyName + typeSuffix;
         }
 
         private String getTypeIndicator() {

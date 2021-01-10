@@ -1,4 +1,4 @@
-package won.shacl2java.model;
+package won.shacl2java.runtime.model;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -11,9 +11,54 @@ public class GraphEntity {
     private Node node;
     private Graph graph;
 
+    /**
+     * Create entity identified by the specified URI.
+     * 
+     * @param uri
+     */
+    public GraphEntity(String uri) {
+        this(uri, null);
+    }
+
+    /**
+     * Create entity identified by the specified URI attached to the specified
+     * graph.
+     * 
+     * @param uri
+     */
+    public GraphEntity(String uri, Graph graph) {
+        this(NodeFactory.createURI(uri), graph);
+    }
+
+    /**
+     * Create entity identified by the specified node.
+     * 
+     * @param node
+     */
+    public GraphEntity(Node node) {
+        this(node, null);
+    }
+
+    /**
+     * Create entity identified by the specified node attached to the specified
+     * graph.
+     * 
+     * @param node the node (optional) - must be URI or blank node
+     * @param graph the graph (optional)
+     */
     public GraphEntity(Node node, Graph graph) {
         this.node = node;
         this.graph = graph;
+        requireEntityNodeKind(node);
+    }
+
+    public void requireEntityNodeKind(Node node) {
+        if (node != null) {
+            if (!(node.isBlank() || node.isURI())) {
+                throw new IllegalArgumentException(
+                                "A GraphEntity's node must be an URI or a blank node, but received: " + node);
+            }
+        }
     }
 
     public GraphEntity() {
@@ -32,6 +77,7 @@ public class GraphEntity {
     }
 
     public void setNode(Node node) {
+        requireEntityNodeKind(node);
         this.node = node;
     }
 

@@ -5,14 +5,20 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.apache.jena.ext.com.google.common.io.Files;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shacl.Shapes;
+import org.apache.jena.sparql.graph.GraphFactory;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -84,6 +90,20 @@ public class GeneratedSourcesTests {
         Assert.assertEquals(Address.class, o.getClass());
         Assert.assertSame(o, bob.getAddresses().stream().findFirst().get());
         Assert.assertEquals("1234", bob.getAddresses().stream().findFirst().get().getPostalCode());
+    }
+
+    @Test
+    public void test1Generated_data002() throws IOException {
+        Shapes shapes = loadShapes(testBaseFolder.createRelative("test1/shapes.ttl"));
+        Person bob = new Person("http://example.com/ns#Bob");
+        bob.setNode(NodeFactory.createURI("http://example.com/ns#Bob"));
+        bob.addFirstName("Bob");
+        bob.setLastName("The Builder");
+        Address address = new Address();
+        address.setPostalCode("1234");
+        bob.addAddress(address);
+        Graph graph = test1.RdfOutput.toGraph(bob);
+        RDFDataMgr.write(System.out, graph, Lang.TTL);
     }
 
     @Test
